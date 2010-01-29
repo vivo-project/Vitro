@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
+         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+         xmlns:owl="http://www.w3.org/2002/07/owl#"
+         xmlns:vitro="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#"
+         xmlns="http://vivo.library.cornell.edu/ns/0.1#">
+
+<owl:DatatypeProperty rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#username"/>
+<owl:DatatypeProperty rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#md5password"/>
+<owl:DatatypeProperty rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#oldpassword"/>
+<owl:DatatypeProperty rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#modTime"/>
+<owl:DatatypeProperty rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#firstTime"/>
+<owl:DatatypeProperty rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#loginCount"/>
+<owl:DatatypeProperty rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#roleURI"/>
+
+<vitro:User rdf:about="#bjl23">
+    <vitro:username rdf:datatype="http://www.w3.org/2001/XMLSchema#string">bjl23</vitro:username>
+    <vitro:md5password rdf:datatype="http://www.w3.org/2001/XMLSchema#string">6ECCCD6725A0E17E0D9C91B4F63389CF</vitro:md5password>
+    <vitro:oldpassword rdf:datatype="http://www.w3.org/2001/XMLSchema#string">8F6E2222AE1B0017EB1476BFE68C01EC</vitro:oldpassword>
+    <vitro:modTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2007-07-17T14:54:14</vitro:modTime>
+    <vitro:firstTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2004-11-16T16:05:07</vitro:firstTime>
+    <vitro:loginCount rdf:datatype="http://www.w3.org/2001/XMLSchema#int">410</vitro:loginCount>
+    <vitro:roleURI rdf:datatype="http://www.w3.org/2001/XMLSchema#string">role:/50</vitro:roleURI>    
+</vitro:User>
+
+<vitro:User rdf:about="#bdc34">
+    <vitro:username rdf:datatype="http://www.w3.org/2001/XMLSchema#string">brian</vitro:username>
+    <vitro:md5password rdf:datatype="http://www.w3.org/2001/XMLSchema#string">57EC9E19B943F4D3633B375111061C11</vitro:md5password>
+    <vitro:oldpassword rdf:datatype="http://www.w3.org/2001/XMLSchema#string">8F6E2222AE1B0017EB1476BFE68C01EC</vitro:oldpassword>
+    <vitro:modTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2007-03-27T14:54:14</vitro:modTime>
+    <vitro:firstTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2004-11-30T16:05:07</vitro:firstTime>
+    <vitro:loginCount rdf:datatype="http://www.w3.org/2001/XMLSchema#int">282</vitro:loginCount>
+    <vitro:roleURI rdf:datatype="http://www.w3.org/2001/XMLSchema#string">role:/50</vitro:roleURI>
+</vitro:User>
+
+</rdf:RDF>

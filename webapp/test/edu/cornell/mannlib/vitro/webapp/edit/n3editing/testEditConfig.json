@@ -1,0 +1,64 @@
+ {
+    "formUrl" : "${formUrl}",
+    "editKey" : "${editKey}",
+
+    "subject"   : ["series",    "${subjectUriJson}", ],
+    "predicate" : ["predicate", "${predicateUriJson}" ],
+    "object"    : ["talk", "${objectUriJson}", "URI" ],
+
+   "urlPatternToReturnTo"      : "/entity",
+    "n3required"    : [  ],
+    "n3optional"    : [  ],
+    "newResources"  : { "talk" : "http://vivo.library.cornell.edu/ns/0.1#individual" },
+    "urisInScope"    : { },
+    "literalsInScope": { },
+    "urisOnForm"     : ["room"],
+    "literalsOnForm" :  [  "talkName", "field222" ],
+    "sparqlForLiterals" : { },
+    "sparqlForUris" : {  },
+    "sparqlForExistingLiterals" : {    },
+    "sparqlForExistingUris" : {    },
+     "filesOnForm"               : [ ],
+    "fields" : {
+      "talkName" : {
+         "newResource"      : "false",
+         "validators"       : [ "nonempty" ],
+         "optionsType"      : "UNDEFINED",
+         "literalOptions"   : [],
+         "subjectUri"       : "${param.subjectUri}",
+         "subjectClassUri"  : "",
+         "predicateUri"     : "",
+         "objectClassUri"   : "",
+         "rangeDatatypeUri" : "",
+         "rangeLang"    :"",
+         "assertions"       : [  ]
+      },
+
+      "room" : {
+         "newResource"      : "false",
+         "validators"       : [ ],
+         "optionsType"      : "INDIVIDUALS_VIA_OBJECT_PROPERTY",
+         "literalOptions"   : [" (none)"],
+         "subjectUri"       : "${param.subjectUri}",
+         "subjectClassUri"  : "",
+         "predicateUri"     : "${heldInObjProp}",
+         "objectClassUri"   : "${buildingClass}",
+         "rangeDatatypeUri" : "",
+         "rangeLang"    :"",
+         "assertions"       : [  ]
+      } ,
+       "field222" : {
+         "newResource"      : "false",
+         "validators"       : [ ],
+         "optionsType"      : "DATETIME",
+         "literalOptions"   : [],
+         "subjectUri"       : "${param.subjectUri}",
+         "subjectClassUri"  : "",
+         "predicateUri"     : "",
+         "objectClassUri"   : "",
+         "rangeDatatypeUri" : "",
+         "rangeLang"    :"",
+         "assertions"       : [ ]
+      }
+    }
+  }
