@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+xmlns:dc="http://purl.org/dc/elements/1.1/"
+xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+xmlns:owl="http://www.w3.org/2002/07/owl#"
+xmlns:vitro="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#"
+xmlns:akts="http://www.aktors.org/ontology/support#"
+xmlns:aktp="http://www.aktors.org/ontology/portal#"
+xmlns:hr="http://vivo.cornell.edu/ns/hr/0.9/hr.owl#"
+xmlns:mann="http://vivo.cornell.edu/ns/mannadditions/0.1#"
+xmlns:socsci="http://vivo.library.cornell.edu/ns/vivo/socsci/0.1/socsci.owl"
+xmlns:thomson="info:/fake/nsuri/for/Thomson/wos"
+xmlns:vivoa="http://vivo.library.cornell.edu/abox#"
+xmlns:vivo="http://vivo.library.cornell.edu/ns/0.1#"
+>
+
+  <owl:Ontology rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl">
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Vitro internals</rdfs:label>
+  </owl:Ontology>
+
+<!-- externalIDs -->
+
+  <owl:DatatypeProperty rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#externalID"/> 
+
+
+<!-- begin BJL afterthoughts -->
+
+  <owl:AnnotationProperty rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#descriptionAnnot"/> 
+  <owl:AnnotationProperty rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#shortDef"/>
+  <owl:AnnotationProperty rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#example"/>
+  <owl:AnnotationProperty rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#displayLimit"/>
+  <owl:AnnotationProperty rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#hidden"/>
+
+<!-- begin Pellet additions -->
+
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#moreTag">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#PrimaryTabContent">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#linkedEntity">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#Collection">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#entitySortField">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#rootTab">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#flag3Set">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#MixedTab">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#SubcollectionCategory">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#rssUrl">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#bannerImage">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#inPortal">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#rootBreadCrumbAnchor">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#flag2Set">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#entitySortDirection">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#contactMail">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#flag2Mode">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#urlPrefix">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#dayLimit">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#galleryRows">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#aboutText">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#imageWidth">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#flag3SearchFiltering">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#PrimaryTab">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#Portal">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#flag2SearchFiltering">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#statusId">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#Subcollection">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#tabBody">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#logotypeWidth">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#galleryCols">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#subTabOf">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#modTime">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#rootBreadCrumbURL">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#AutoLinkableTab">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#copyrightURL">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#autoLinkedToTab">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#shortHand">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#copyrightAnchor">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#imageThumbWidth">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#Tab">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#flag3Numeric">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#sunset">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#logotypeImage">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#flag3Mode">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#acknowledgeText">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#themeDir">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#SecondaryTab">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#ManuallyLinkableTab">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#flag2Numeric">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#bannerHeight">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#flag1SearchFiltering">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#sunrise">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#bannerWidth">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </rdf:Description>
+
+<!-- end Pellet additions -->
+
+</rdf:RDF>

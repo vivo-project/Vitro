@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+<!DOCTYPE taglib PUBLIC "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.1//EN" 
+  "http://java.sun.com/j2ee/dtds/web-jsptaglibrary_1_1.dtd">
+<taglib>
+	<tlibversion>1.0</tlibversion>
+	<jspversion>1.1</jspversion>
+	<shortname>Vitro Editing Form Library</shortname>
+	<info>
+		This tag library contains tags for constructing vitro
+		editing forms.  The tag names shadow html elements
+		but provide additional attributes for specifying
+		how dynamic content should be retrieved from persistent
+		storage.
+	</info>
+	
+	<tag>
+		<name>option</name>
+		<tagclass>edu.cornell.mannlib.vedit.tags.OptionTag</tagclass>
+		<bodycontent>empty</bodycontent>
+		<attribute>
+			<name>name</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>		
+	</tag>
+
+	<tag>
+		<name>value</name>
+		<tagclass>edu.cornell.mannlib.vedit.tags.ValueTag</tagclass>
+		<bodycontent>empty</bodycontent>
+		<attribute>
+			<name>name</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>		
+	</tag>
+	
+	<tag>
+		<name>dynamicFields</name>
+		<tagclass>edu.cornell.mannlib.vedit.tags.DynamicFieldsTag</tagclass>
+		<bodycontent>empty</bodycontent>
+		<attribute>
+			<name>type</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>usePage</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+	
+	<tag>
+		<name>error</name>
+		<tagclass>edu.cornell.mannlib.vedit.tags.ErrorTag</tagclass>
+		<bodycontent>empty</bodycontent>
+		<attribute>
+			<name>name</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>		
+	</tag>
+	
+</taglib>

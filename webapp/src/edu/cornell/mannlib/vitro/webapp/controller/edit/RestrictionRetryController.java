@@ -1,0 +1,159 @@
+package edu.cornell.mannlib.vitro.webapp.controller.edit;
+
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import com.ibm.icu.text.Collator;
+
+import edu.cornell.mannlib.vedit.beans.EditProcessObject;
+import edu.cornell.mannlib.vedit.beans.FormObject;
+import edu.cornell.mannlib.vedit.beans.Option;
+import edu.cornell.mannlib.vedit.controller.BaseEditController;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.JenaNetidPolicy.ContextSetup;
+import edu.cornell.mannlib.vitro.webapp.beans.Datatype;
+import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
+import edu.cornell.mannlib.vitro.webapp.beans.Property;
+import edu.cornell.mannlib.vitro.webapp.beans.VClass;
+import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
+import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
+import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
+
+public class RestrictionRetryController extends BaseEditController {
+	
+	private static final Log log = LogFactory.getLog(RestrictionRetryController.class.getName());
+	private static final boolean DATA = true;
+	private static final boolean OBJECT = false;
+	
+	public void doGet(HttpServletRequest req, HttpServletResponse response) {
+		
+		VitroRequest request = new VitroRequest(req);
+		if (!checkLoginStatus(request,response))
+		    return;
+		
+		try {
+		    super.doGet(request,response);
+		} catch (Exception e) {
+		    log.error("PropertyRetryController encountered exception calling super.doGet()");
+		}
+		
+		try {
+			
+			EditProcessObject epo = createEpo(request);
+			
+			request.setAttribute("editAction","addRestriction");
+			epo.setAttribute("VClassURI", request.getParameter("VClassURI"));
+			
+			String restrictionTypeStr = request.getParameter("restrictionType");
+			epo.setAttribute("restrictionType",restrictionTypeStr);
+			
+			
+			
+			// default to object property restriction
+			boolean propertyType = ("data".equals(request.getParameter("propertyType"))) ? DATA : OBJECT ;
+			
+			List<Property> pList = (propertyType == OBJECT) 
+				? getWebappDaoFactory().getObjectPropertyDao().getAllObjectProperties()
+			    : getWebappDaoFactory().getDataPropertyDao().getAllDataProperties();
+			List<Option> onPropertyList = new LinkedList<Option>(); 
+			Collections.sort(pList, new PropSorter());
+			for (Iterator<Property> i = pList.iterator(); i.hasNext(); ) {
+				Property p = i.next(); 
+				onPropertyList.add( new Option(p.getURI(),p.getLocalNameWithPrefix()) );
+			}
+					
+			epo.setFormObject(new FormObject());
+			epo.getFormObject().getOptionLists().put("onProperty", onPropertyList);
+			
+			if (restrictionTypeStr.equals("someValuesFrom")) {
+				request.setAttribute("specificRestrictionForm","someValuesFromRestriction_retry.jsp");
+				List<Option> optionList = (propertyType == OBJECT) 
+					? getValueClassOptionList()
+					: getValueDatatypeOptionList() ;
+				epo.getFormObject().getOptionLists().put("ValueClass",optionList);
+			} else if (restrictionTypeStr.equals("allValuesFrom")) {
+				request.setAttribute("specificRestrictionForm","allValuesFromRestriction_retry.jsp");
+				List<Option> optionList = (propertyType == OBJECT) 
+					? getValueClassOptionList()
+				    : getValueDatatypeOptionList() ;
+				epo.getFormObject().getOptionLists().put("ValueClass",optionList);
+			} else if (restrictionTypeStr.equals("hasValue")) {
+				request.setAttribute("specificRestrictionForm", "hasValueRestriction_retry.jsp");
+				if (propertyType == OBJECT) {
+					request.setAttribute("propertyType", "object");	
+				} else {
+					request.setAttribute("propertyType", "data");
+					List<Option> datatypeOptions = getValueDatatypeOptionList();
+					datatypeOptions.add(0, new Option("", "none (plain literal)"));
+					epo.getFormObject().getOptionLists().put("ValueDatatype", datatypeOptions);
+				}	
+			} else if (restrictionTypeStr.equals("minCardinality") || restrictionTypeStr.equals("maxCardinality") || restrictionTypeStr.equals("cardinality")) {
+				request.setAttribute("specificRestrictionForm", "cardinalityRestriction_retry.jsp");
+			} 
+			
+	        RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
+	        request.setAttribute("bodyJsp","/templates/edit/formBasic.jsp");
+	        request.setAttribute("formJsp","/templates/edit/specific/restriction_retry.jsp");
+	        request.setAttribute("scripts","/templates/edit/formBasic.js");
+	        request.setAttribute("title","Add Restriction");
+	        request.setAttribute("_action","insert");
+	        setRequestAttributes(request,epo);
+	
+	        try {
+	            rd.forward(request, response);
+	        } catch (Exception e) {
+	            log.error(this.getClass().getName()+"PropertyRetryController could not forward to view.");
+	            log.error(e.getMessage());
+	            log.error(e.getStackTrace());
+	        }
+        
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	private List<Option> getValueClassOptionList() {
+		List<Option> valueClassOptionList = new LinkedList<Option>();
+		VClassDao vcDao = getWebappDaoFactory().getVClassDao();
+		for (Iterator i = vcDao.getAllVclasses().iterator(); i.hasNext(); ) {
+			VClass vc = (VClass) i.next();
+			valueClassOptionList.add(new Option(vc.getURI(), vc.getLocalNameWithPrefix()));
+		}
+		return valueClassOptionList;
+	}
+	
+	private List<Option> getValueDatatypeOptionList() {
+		List<Option> valueClassOptionList = new LinkedList<Option>();
+		DatatypeDao dtDao = getWebappDaoFactory().getDatatypeDao();
+		for (Iterator i = dtDao.getAllDatatypes().iterator(); i.hasNext(); ) {
+			Datatype dt = (Datatype) i.next();
+			valueClassOptionList.add(new Option(dt.getUri(), dt.getName()));
+		}
+		return valueClassOptionList;
+	}
+	
+	private class PropSorter implements Comparator<Property> {
+		
+		public int compare(Property p1, Property p2) {
+			if (p1.getLocalNameWithPrefix() == null) return 1;
+			if (p2.getLocalNameWithPrefix() == null) return -1;
+			return Collator.getInstance().compare(p1.getLocalNameWithPrefix(), p2.getLocalNameWithPrefix());
+		}
+		
+	}
+	
+}
