@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.servlet.setup;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;

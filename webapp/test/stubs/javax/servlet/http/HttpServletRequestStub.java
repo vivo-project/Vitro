@@ -1,6 +1,6 @@
-package stubs.javax.servlet.http;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package stubs.javax.servlet.http;
 
 import java.io.BufferedReader;
 import java.io.IOException;

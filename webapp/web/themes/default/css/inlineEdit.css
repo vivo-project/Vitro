@@ -1,3 +1,5 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
 /****************************************
  * Albert R. Mann Library 
  * Cornell University
@@ -9,8 +11,6 @@ Title:		Academic Profile screen styles
 Author:		mw542@cornell.edu
 Updated:	April 21, 2008
 */
-
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
 /*div#header a, div#header img {display: none; }*/
 div#header { height: 72px; }

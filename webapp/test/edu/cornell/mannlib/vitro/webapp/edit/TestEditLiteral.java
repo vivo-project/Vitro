@@ -1,7 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.edit;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
+package edu.cornell.mannlib.vitro.webapp.edit;
 
 import org.junit.Assert;
 import org.junit.Before;

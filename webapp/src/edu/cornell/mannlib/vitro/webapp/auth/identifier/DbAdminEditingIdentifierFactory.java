@@ -1,3 +1,5 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
 package edu.cornell.mannlib.vitro.webapp.auth.identifier;
 
 import javax.servlet.ServletContext;
@@ -7,8 +9,6 @@ import javax.servlet.http.HttpSession;
 import edu.cornell.mannlib.vedit.beans.LoginFormBean;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.RoleBasedPolicy;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.RoleBasedPolicy.AuthRole;
-
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
 public class DbAdminEditingIdentifierFactory implements IdentifierBundleFactory{
     

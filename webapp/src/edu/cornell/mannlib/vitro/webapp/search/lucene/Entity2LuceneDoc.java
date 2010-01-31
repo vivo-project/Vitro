@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.search.lucene;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.search.lucene;
 
 import java.util.HashSet;
 import java.util.Iterator;

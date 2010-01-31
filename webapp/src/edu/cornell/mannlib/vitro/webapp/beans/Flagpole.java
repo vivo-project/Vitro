@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.beans;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.beans;
 
 /**
  * TODO: jc55, Please put a description of this class and its intended use here.

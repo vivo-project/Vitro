@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vedit.controller;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vedit.controller;
 
 import java.io.IOException;
 import java.text.DateFormat;

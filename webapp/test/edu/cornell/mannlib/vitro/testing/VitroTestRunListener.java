@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.testing;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.testing;
 
 import static edu.cornell.mannlib.vitro.testing.VitroTestRunner.ReportLevel.BRIEF;
 import static edu.cornell.mannlib.vitro.testing.VitroTestRunner.ReportLevel.FULL;

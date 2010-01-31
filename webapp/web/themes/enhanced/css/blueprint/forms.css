@@ -1,3 +1,5 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
 /* -------------------------------------------------------------- 
    
    forms.css
@@ -8,9 +10,6 @@
    * For text fields, use class .title or .text
    
 -------------------------------------------------------------- */
-
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
-
 
 label       { font-weight: bold; display: block; margin-top: .5em; }
 fieldset    { padding:1.4em; margin: 0 0 1.5em 0; border: 1px solid #ccc; }

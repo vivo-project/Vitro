@@ -1,8 +1,8 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
 package edu.cornell.mannlib.vitro.webapp.search.docbuilder;
 
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
-
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
 /**
  * The Obj2Doc is an object that can translate something into

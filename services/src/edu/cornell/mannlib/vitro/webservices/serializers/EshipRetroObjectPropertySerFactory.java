@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webservices.serializers;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webservices.serializers;
 
 import org.apache.axis.Constants;
 import org.apache.axis.encoding.SerializerFactory;

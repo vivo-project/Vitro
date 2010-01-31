@@ -1,3 +1,5 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
 package edu.cornell.mannlib.vitro.webapp.auth.identifier;
 
 import javax.servlet.ServletContext;
@@ -9,8 +11,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.RoleBasedPolicy;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
 /** 
  * Attempts to simulate the action of NetIdIdentifierFactory.java using the

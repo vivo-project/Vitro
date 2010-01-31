@@ -1,7 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.beans;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
+package edu.cornell.mannlib.vitro.webapp.beans;
 
 // TODO bjl23 this is the link method, nothing to do here, just drawing your attention to it.
 

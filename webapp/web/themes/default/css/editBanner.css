@@ -1,3 +1,5 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
 /****************************************
  * Albert R. Mann Library 
  * Cornell University
@@ -9,8 +11,6 @@ Title:		VIVO - CU Banner when editing
 Author:		mw542@cornell.edu
 Updated:	March 7, 2008
 */
-
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
 #cu-logo img { display: none; }
 

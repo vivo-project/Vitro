@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.flags;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.flags;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.flags.SunsetFlag;

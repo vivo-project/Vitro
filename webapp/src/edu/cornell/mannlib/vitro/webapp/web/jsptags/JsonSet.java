@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.web.jsptags;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.web.jsptags;
 
 import javax.servlet.jsp.tagext.BodyTagSupport;
 import javax.servlet.jsp.JspException;

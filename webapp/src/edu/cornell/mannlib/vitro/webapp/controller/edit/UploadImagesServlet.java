@@ -1,6 +1,7 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
 /**
  * @version 0.9 2004-01-29
  * @author Jon Corson-Rikert

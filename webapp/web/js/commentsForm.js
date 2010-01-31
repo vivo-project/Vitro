@@ -1,4 +1,6 @@
-<!-- /* $This file is distributed under the terms of the license in /doc/license.txt$ */ -->
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+<!-- -->
 
 <script language="JavaScript" type="text/javascript">
 <!--

@@ -1,3 +1,5 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
 /****************************************
  * Albert R. Mann Library 
  * Cornell University
@@ -8,8 +10,6 @@
 Title:		Faculty Reporting Demo  
 Updated:	February 5, 2008
 */
-
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
 /* Resetting from 2-column layout */
 #content.full { width: 100%; margin-top: 40px; }

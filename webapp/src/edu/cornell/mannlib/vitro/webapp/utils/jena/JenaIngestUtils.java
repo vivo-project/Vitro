@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.utils.jena;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.utils.jena;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
