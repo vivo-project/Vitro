@@ -590,6 +590,11 @@ span.statementWrap:hover em.nonEditable {
   font-style: normal;
 }
 
+.verbosePropertyListing {
+    color: gray;
+    font-size: 0.75em;
+    margin-left: 1em;
+}
 
 /************************
 Backend forms
