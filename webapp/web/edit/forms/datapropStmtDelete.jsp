@@ -96,5 +96,5 @@
             <jsp:include page="${postForm}"/>
 <%      }
      } else {
-           throw new Error("In datapropStmtDelete.jsp, no match via hashcode to existing datatype property "+predicateUri+" for subject "+subject.getName()+"\n");
+           throw new Error("In datapropStmtDelete.jsp, no match via hashcode to existing data property "+predicateUri+" for subject "+subject.getName()+"\n");
      }%>
