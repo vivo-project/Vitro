@@ -27,7 +27,7 @@ public class JenaPersistentDataSourceSetup extends JenaDataSourceSetupBase imple
 		boolean firstStartup = false;
 		
         try {
-            dbModel = makeDBModelFromPropertiesFile(sce.getServletContext().getRealPath(CONNECTION_PROP_LOCATION), JENA_DB_MODEL, DB_ONT_MODEL_SPEC);
+            dbModel = makeDBModelFromConfigurationProperties(JENA_DB_MODEL, DB_ONT_MODEL_SPEC);
             
             ClosableIterator stmtIt = dbModel.listStatements();
             try {
@@ -63,14 +63,14 @@ public class JenaPersistentDataSourceSetup extends JenaDataSourceSetupBase imple
         } catch (Throwable t) {
 			System.out.println("**** ERROR *****");
             System.out.println("Vitro unable to open Jena database model.");
-			System.out.println("Check that connection.properties has been created WEB-INF/classes, ");
+			System.out.println("Check that the configuration properties file has been created in WEB-INF/classes, ");
 			System.out.println("and that the database connection parameters are accurate. ");
 			System.out.println("****************");
         }        
         
         // default inference graph
         try {
-        	Model infDbModel = makeDBModelFromPropertiesFile(sce.getServletContext().getRealPath(CONNECTION_PROP_LOCATION), JENA_INF_MODEL, DB_ONT_MODEL_SPEC);
+        	Model infDbModel = makeDBModelFromConfigurationProperties(JENA_INF_MODEL, DB_ONT_MODEL_SPEC);
         	OntModel infModel = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC);
         	if (infDbModel != null) {
         		long startTime = System.currentTimeMillis();
@@ -86,7 +86,7 @@ public class JenaPersistentDataSourceSetup extends JenaDataSourceSetupBase imple
         
         // user accounts Model
         try {
-        	Model userAccountsDbModel = makeDBModelFromPropertiesFile(sce.getServletContext().getRealPath(CONNECTION_PROP_LOCATION), JENA_USER_ACCOUNTS_MODEL, DB_ONT_MODEL_SPEC);
+        	Model userAccountsDbModel = makeDBModelFromConfigurationProperties(JENA_USER_ACCOUNTS_MODEL, DB_ONT_MODEL_SPEC);
         	if (firstStartup) {
         		readOntologyFilesInPathSet(AUTHPATH, sce.getServletContext(), userAccountsDbModel);
         	}

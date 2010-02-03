@@ -2,12 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.Calendar;
 import java.util.Date;
@@ -22,31 +18,29 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
-import com.hp.hpl.jena.ontology.OntModel;
 
-import edu.cornell.mannlib.vitro.webapp.auth.policy.JenaNetidPolicy.ContextSetup;
+import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
-import edu.cornell.mannlib.vitro.webapp.controller.BrowseController.RebuildGroupCacheThread;
 
 public class ContactMailServlet extends VitroHttpServlet {
+	private static final Logger LOG = Logger.getLogger(ContactMailServlet.class);
+	
     public static HttpServletRequest request;
     public static HttpServletRequest response;
-    protected final static String CONNECTION_PROP_LOCATION = "/WEB-INF/classes/connection.properties";
     private static String smtpHost = null;
     private static final Log log = LogFactory.getLog(ContactMailServlet.class.getName());
 
     public void init(ServletConfig servletConfig) throws javax.servlet.ServletException {
         super.init(servletConfig);
-        ServletContext sContext = servletConfig.getServletContext();
-        smtpHost = getSmtpHostFromPropertiesFile(sContext.getRealPath(CONNECTION_PROP_LOCATION));
+        smtpHost = getSmtpHostFromProperties();
     }
     
     public static boolean isSmtpHostConfigured() {
@@ -56,43 +50,15 @@ public class ContactMailServlet extends VitroHttpServlet {
         return true;
     }
 
-    private String getSmtpHostFromPropertiesFile(final String filename){
-
-        if (filename == null || filename.length() <= 0) {
-            throw new Error(
-                    "To establish the Contact Us mail capability you must  "
-                    + "specify an SMTP server host name in the "
-                    + "connection.properties file along with the "
-                    + "database connection parameters.");
-                    		
-        }
-
-        File propF = new File(filename );
-        InputStream is;
-        try {
-            is = new FileInputStream(propF);
-        } catch (FileNotFoundException e) {
-            log.error("Could not load file "+filename);
-            throw new Error("Could not load file " + filename
-                    + '\n' + e.getMessage());
-        }
-
-        Properties dbProps = new Properties();
-        try {
-            dbProps.load(is);
-            String host = dbProps.getProperty("Vitro.smtpHost");
-            /* doesn't display in catalina.out, not sure why
-if (host!=null && !host.equals("")){
-    System.out.println("Found Vitro.smtpHost value of "+host+" in "+filename);
-} else {
-    System.out.println("No Vitro.smtpHost specified in "+filename);
-}           */
-            return (host != null && host.length()>0) ? host : null;
-        } catch (IOException e) {
-            throw new Error("Could not load any properties from file " + filename + '\n'
-                    + e.getMessage());
-        }
-    }
+	private String getSmtpHostFromProperties() {
+		String host = ConfigurationProperties.getProperty("Vitro.smtpHost");
+		if (host != null && !host.equals("")) {
+			LOG.info("Found Vitro.smtpHost value of " + host);
+		} else {
+			System.out.println("No Vitro.smtpHost specified");
+		}
+		return (host != null && host.length() > 0) ? host : null;
+	}
     
     public void doGet( HttpServletRequest request, HttpServletResponse response )
         throws ServletException, IOException {
@@ -104,7 +70,8 @@ if (host!=null && !host.equals("")){
         String status = null; // holds the error status
         
         if (smtpHost==null || smtpHost.equals("")){
-            status = "This application has not yet been configured to send mail -- smtp host has not been identified in connection.properties";
+            status = "This application has not yet been configured to send mail " +
+            		"-- smtp host has not been identified in the Configuration Properties file.";
             response.sendRedirect( "test?bodyJsp=" + errpage + "&ERR=" + status + "&home=" + portal.getPortalId() );
             return;
         }

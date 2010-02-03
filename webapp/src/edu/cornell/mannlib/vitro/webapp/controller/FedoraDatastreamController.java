@@ -4,7 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.controller;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -31,12 +30,11 @@ import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
 
+import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.controller.edit.N3MultiPartUpload;
-import edu.cornell.mannlib.vitro.webapp.controller.edit.N3MultiPartUpload.PostUpload;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
@@ -54,7 +52,6 @@ import fedora.server.types.gen.Datastream;
  */
 public class FedoraDatastreamController extends VitroHttpServlet implements Constants{
     private static String FEDORA_PROPERTIES = "/WEB-INF/fedora.properties";
-    private static String FEDORA_FOXML_1_1 = "info:fedora/fedora-system:FOXML-1.1";
     private static String DEFAULT_DSID = "DS1";
     
     private String fedoraUrl = null;
@@ -71,7 +68,6 @@ public class FedoraDatastreamController extends VitroHttpServlet implements Cons
     private static String fileUriPrefix = DEFAULT_FILE_URI_PREFIX;
     private static String baseDirectoryForFiles = DEFAULT_BASE_DIR;
     private static int maxFileSize = DEFAULT_MAX_SIZE;
-    private static PostUpload postUpload = null;
     
     /**
      * The get will present a form to the user. 
@@ -394,59 +390,23 @@ public class FedoraDatastreamController extends VitroHttpServlet implements Cons
         }
     }
     
-    public void init() throws ServletException {
-        super.init();
-        String realPropFile = getServletContext().getRealPath(
-                N3MultiPartUpload.FILE_UPLOAD_PROP_FILE);
-        File propF = new File(realPropFile);
-        if (propF != null && propF.exists() && propF.isFile()) {
-            if (!propF.canRead()) {
-                log.error("There is a file upload configuration file at "
-                        + realPropFile + " but is is not readable");
-                return;
-            }
+	public void init() throws ServletException {
+		super.init();
 
-            InputStream is;
-            try {
-                is = new FileInputStream(propF);
-            } catch (FileNotFoundException e) {
-                log.error("Could not load file " + realPropFile, e);
-                return;
-            }
+		fileUriPrefix = ConfigurationProperties.getProperty(
+				"n3.defaultUriPrefix", DEFAULT_FILE_URI_PREFIX);
+		baseDirectoryForFiles = ConfigurationProperties.getProperty(
+				"n3.baseDirectoryForFiles", DEFAULT_BASE_DIR);
 
-            Properties props = new Properties();
-            try {
-                props.load(is);
-                is.close();
-            } catch (IOException e) {
-                log.error(
-                        "could not load properties from file " + realPropFile,
-                        e);
-            }
-            fileUriPrefix = props.getProperty("defaultUriPrefix",
-                    DEFAULT_FILE_URI_PREFIX);
-            baseDirectoryForFiles = props.getProperty("baseDirectoryForFiles",
-                    DEFAULT_BASE_DIR);
-
-//            String postUploadProcess = props.getProperty("postUploadProcess");
-//            System.out.println("Attempting to load postUploadProcess "
-//                    + postUploadProcess);
-//            postUpload = getPostUpload(postUploadProcess);
-
-            String maxSize = props.getProperty("maxSize", Long
-                    .toString(DEFAULT_MAX_SIZE));
-            try {
-                maxFileSize = Integer.parseInt(maxSize);
-            } catch (NumberFormatException nfe) {
-                log.error(nfe);
-                maxFileSize = DEFAULT_MAX_SIZE;
-            }
-        } else {
-            System.out
-                    .println("No properties file found for N3MultiPartUpload at "
-                            + realPropFile);
-        }
-    }
+		String maxSize = ConfigurationProperties.getProperty("n3.maxSize", Long
+				.toString(DEFAULT_MAX_SIZE));
+		try {
+			maxFileSize = Integer.parseInt(maxSize);
+		} catch (NumberFormatException nfe) {
+			log.error(nfe);
+			maxFileSize = DEFAULT_MAX_SIZE;
+		}
+	}
     
     private void setup(OntModel model, ServletContext context) {
         this.configurationStatus = "";

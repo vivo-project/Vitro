@@ -161,9 +161,7 @@
 
       <!-- copy properties files -->        
       <copy todir="${webapp.build}/WEB-INF/classes">
-        <fileset dir="${webapp.dir}/config" includes="connection.properties" />
-        <fileset file="${webapp.dir}/config/upload.properties" />
-        <fileset file="${webapp.dir}/config/LuceneSetup.properties" />
+        <fileset dir="${webapp.dir}/config" includes="deploy.properties" />
       </copy>
      
       <copy todir="${webapp.build}/WEB-INF/tlds">
@@ -208,6 +206,9 @@
           	<exclude name="servlet-api.jar"/>
           </fileset>
         </copy>
+
+		<copy file="${webapp.dir}/context.xml"
+              tofile="${webapp.build}/META-INF/context.xml" />
     </target>
 
     <!-- ==================== Local Modifications ============================ -->

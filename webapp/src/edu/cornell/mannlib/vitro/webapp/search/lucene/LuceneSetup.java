@@ -4,11 +4,9 @@ package edu.cornell.mannlib.vitro.webapp.search.lucene;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Properties;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -18,6 +16,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.BooleanQuery;
 
+import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
@@ -55,13 +54,13 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
         /**
          * Gets run to set up DataSource when the webapp servlet context gets created.
          */
-        @SuppressWarnings({ "static-access", "unchecked" })
+        @SuppressWarnings("unchecked")
         public void contextInitialized(ServletContextEvent sce) {
         	try {
 	            ServletContext context = sce.getServletContext();
 	            log.info("**** Running "+this.getClass().getName()+".contextInitialized()");
 	
-	            indexDir = getIndexDirName(sce.getServletContext());
+	            indexDir = getIndexDirName();
 	            log.info("Directory of full text index: " + indexDir );
 	
 	            setBoolMax();
@@ -135,62 +134,40 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
             BooleanQuery.setMaxClauseCount(16384);
         }
         
-        /** Directory to store lucene index use when none is specified. */ 
-        private String DEFAULT_INDEX_DIR = "/fullTextIndex";
-        
-        /** name of the properties file to look for in the 'resources' */
-        private String LUCENE_PROPERTIES = "/LuceneSetup.properties";
+	/**
+	 * Gets the name of the directory to store the lucene index in. The
+	 * {@link ConfigurationProperties} should have a property named
+	 * 'LuceneSetup.indexDir' which has the directory to store the lucene index
+	 * for this clone in. If the property is not found, an exception will be
+	 * thrown.
+	 * 
+	 * @return a string that is the directory to store the lucene index.
+	 * @throws IllegalStateException
+	 *             if the property is not found.
+	 * @throws IOException
+	 *             if the directory doesn't exist and we fail to create it.
+	 */
+	private String getIndexDirName()
+			throws IOException {
+		String dirName = ConfigurationProperties
+				.getProperty("LuceneSetup.indexDir");
+		if (dirName == null) {
+			throw new IllegalStateException(
+					"LuceneSetup.indexDir not found in properties file.");
+		}
 
-        /**
-         * Gets the name of the directory to store the lucene index in.
-         * This is stored in a file named LuceneSetup.properties
-         * which should be on the classpath in the default package.
-         * That file should have a property named 'LuceneSetup.indexDir'
-         * which has the directory to store the lucene index for this
-         * clone in.  If the property file is not found or the 
-         * LuceneSetup.indexDir is not found, then DEFAULT_INDEX_DIR will 
-         * be used.
-         * @param servletContext 
-         * @return a string that is the directory to store the lucene
-         * index.
-         *
-         * @throws IOException
-         */
-        private  String getIndexDirName(ServletContext servletContext) {
-            String dirName = null;
-            
-            // Check if we can get the properties file
-            Properties props = new Properties();
-            InputStream raw = this.getClass().getResourceAsStream( LUCENE_PROPERTIES );
-            if (raw != null){                     
-                try{ 
-                    props.load( raw ); 
-                }catch (Exception ex){
-                    log.info("Could not load properties file " + LUCENE_PROPERTIES);
-                    props = null;
-                }finally { 
-                    try{ raw.close(); } 
-                    catch(Exception ex){} 
-                }
+		File dir = new File(dirName);
+		if (!dir.exists()) {
+			boolean created = dir.mkdir();
+			if (!created) {
+				throw new IOException(
+						"Unable to create Lucene index directory at '" + dir
+								+ "'");
+			}
+		}
 
-                // Check if we can get the indexDir property from the file
-                if( props != null ){
-                    dirName = props.getProperty("LuceneSetup.indexDir");
-                    if( dirName == null ){
-                        log.info("LuceneSetup.indexDir not found in file " + LUCENE_PROPERTIES + " using default.");                                          
-                    }
-                }
-            }
-            
-            if( dirName == null ){
-                dirName = servletContext.getRealPath(DEFAULT_INDEX_DIR);
-                File dir = new File( dirName);
-                if( !dir.exists() )
-                    dir.mkdir();
-            }
-            
-            return dirName;
-        }
+		return dirName;
+	}
 
     /**
      * Gets the analyzer that will be used when building the indexing
@@ -198,7 +175,6 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
      *
      * @return
      */
-    @SuppressWarnings("static-access")
     private Analyzer getAnalyzer() {
         return new VitroAnalyzer();
     }

@@ -32,7 +32,7 @@ public class ModelAuditorSetup extends JenaDataSourceSetupBase implements Servle
         	Model baseModel = ontModel.getBaseModel();
         	OntModel dynamicUnionModel = (OntModel) sce.getServletContext().getAttribute("jenaOntModel");
             log.debug("Setting model auditor database...");
-            OntModel auditModel = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC,makeDBModelFromPropertiesFile(sce.getServletContext().getRealPath(CONNECTION_PROP_LOCATION), JENA_AUDIT_MODEL, DB_ONT_MODEL_SPEC));
+            OntModel auditModel = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC,makeDBModelFromConfigurationProperties(JENA_AUDIT_MODEL, DB_ONT_MODEL_SPEC));
             sce.getServletContext().setAttribute("jenaAuditModel", auditModel);
             ModelAuditor ma = new ModelAuditor(auditModel,ontModel);
             baseModel.register(ma);

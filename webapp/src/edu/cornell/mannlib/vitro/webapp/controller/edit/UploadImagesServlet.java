@@ -31,6 +31,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginFormBean;
+import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -42,10 +43,6 @@ public class UploadImagesServlet extends VitroHttpServlet {
     private static final Log log = LogFactory.getLog(UploadImagesServlet.class.getName());
     private String sourceDirName;  // all uploaded images are copied to the source directory, not just the application context
     private String websiteDirName; // the application context
-    private String webAppName;     // the name of the application context (e.g., vivo, usaep)
-
-    private static String UPLOAD_SERVLET_PROPERTIES = "/upload.properties";
-    private static String UPLOAD_SERVLET_PROPERTIES_WIN="\\upload.properties";
 
     /**
      * Notice that init() gets called the first time the servlet is requested,
@@ -56,15 +53,6 @@ public class UploadImagesServlet extends VitroHttpServlet {
 
         // something like: /usr/local/tomcat/webapps/vivo
         websiteDirName = getServletContext().getRealPath("");
-
-        //get the last directory, which should be the webapp name.
-        String[] dirs = new String[0];
-        if (File.separator.equals("\\")) {
-            dirs =  websiteDirName.split("\\\\");
-        } else {
-            dirs =  websiteDirName.split(File.separator);
-        }
-        webAppName = dirs[dirs.length-1];
 
         // something like: /usr/local/src/Vitro/dream/common/web
         try{
@@ -546,24 +534,9 @@ public class UploadImagesServlet extends VitroHttpServlet {
      * @throws IOException
      */
     private  String getSourceDirName() throws IOException{
-        Properties props = new Properties();
-        InputStream raw = this.getClass().getResourceAsStream( UPLOAD_SERVLET_PROPERTIES );
-        if (raw == null) {
-            raw = this.getClass().getResourceAsStream( UPLOAD_SERVLET_PROPERTIES_WIN );
-            if (raw == null)
-                throw new IOException("UploadImagesServlet.getSourceDirName()" +
-                        " Failed to find resource: " + UPLOAD_SERVLET_PROPERTIES );
-        }
-        try{
-            props.load( raw );
-        } catch (Exception ex){
-            throw new IOException("unable to load upload.properties file: " + ex.getMessage());
-        } finally {
-            raw.close();
-        }
-        String dirName = props.getProperty("UploadImagesServlet.sourceDirName");
+        String dirName = ConfigurationProperties.getProperty("UploadImagesServlet.sourceDirName");
         if( dirName == null ) {
-            log.error("getSourceDirName(): property sourceDirName not defined in upload.properties");
+            log.error("getSourceDirName(): property sourceDirName not defined in configuration properties");
         } else {
             File dir = new File(dirName);
             if(!dir.exists()) {
