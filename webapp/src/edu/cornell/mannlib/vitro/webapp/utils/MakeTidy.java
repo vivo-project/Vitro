@@ -10,7 +10,6 @@ import java.io.StringWriter;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.w3c.tidy.Node;
 import org.w3c.tidy.Tidy;
 
 public class MakeTidy {
@@ -54,10 +53,7 @@ public class MakeTidy {
 	    StringWriter sw = new StringWriter();
       /*Node rootNode = */tidy. parse(new StringReader(value),sw);
         String outputStr = sw.toString();
-        if (outFile != null /*&& log.isDebugEnabled()*/) {
-            outFile.println("\nTidied Output:\n"+outputStr+"\n");
-        }
-        outFile.flush();
+		log.debug("\nTidied Output:\n" + outputStr + "\n");
         return outputStr;        
 	}
 }
