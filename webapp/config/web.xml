@@ -924,6 +924,36 @@
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.BrowseController</servlet-class>
     <load-on-startup>5</load-on-startup>
   </servlet>
+  
+  <servlet>
+    <servlet-name>browsecontrollerJsp</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.BrowseControllerJsp</servlet-class>
+    <load-on-startup>5</load-on-startup>
+  </servlet>
+  
+  <servlet>
+    <servlet-name>browsecontrollerStringTemplate</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.BrowseControllerStringTemplate</servlet-class>
+    <load-on-startup>5</load-on-startup>
+  </servlet>
+  
+  <servlet>
+    <servlet-name>browsecontrollerFreeMarker</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.BrowseControllerFreeMarker</servlet-class>
+    <load-on-startup>5</load-on-startup>
+  </servlet>
+  
+  <servlet>
+    <servlet-name>browsecontrollerVelocity</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.BrowseControllerVelocity</servlet-class>
+    <load-on-startup>5</load-on-startup>
+  </servlet>
+  
+  <servlet>
+    <servlet-name>browsecontrollerWicket</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.BrowseControllerWicket</servlet-class>
+    <load-on-startup>5</load-on-startup>
+  </servlet>
 
   <servlet>
     <servlet-name>pubsbyorg</servlet-name>
@@ -1032,6 +1062,30 @@
   <servlet-mapping>
     <servlet-name>browsecontroller</servlet-name>
     <url-pattern>/browsecontroller</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>browsecontroller</servlet-name>
+    <url-pattern>/browsecontroller</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>browsecontrollerJsp</servlet-name>
+    <url-pattern>/browsecontroller-jsp</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>browsecontrollerStringTemplate</servlet-name>
+    <url-pattern>/browsecontroller-stringtemplate</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>browsecontrollerFreeMarker</servlet-name>
+    <url-pattern>/browsecontroller-freemarker</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>browsecontrollerVelocity</servlet-name>
+    <url-pattern>/browsecontroller-velocity</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>browsecontrollerWicket</servlet-name>
+    <url-pattern>/browsecontroller-wicket</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>pubsbyorg</servlet-name>
