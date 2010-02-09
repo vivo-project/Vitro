@@ -17,13 +17,12 @@
   <env-entry>
     <env-entry-name>jdbc/vitro/connectionType</env-entry-name>
     <!--
-    How to get a DataSource, Valid values:
-        SERVER_XML_POOL gets a named DataSource connection from the JNDI context, 
-                most likely that was set up tomcat/conf/server.xml
-        PROPERTIES_FILE_POOL makes a DataSource using properties from a file that
-                is pointed to by the JNDI name "java:comp/env/path.configuration"
-                (set in the Tomcat context).
-    -->
+           				How to get a DataSource, Valid valies:
+                        SERVER_XML_POOL gets a named DataSource connection from the
+                        JNDI context, most likely that was set up tomcat/conf/server.xml
+                        PROPERTIES_FILE_POOL makes a DataSource using properties from
+                        a file in the classpath at /beans/connection.properties
+           -->
     <!--            <env-entry-value>SERVER_XML_POOL</env-entry-value> -->
     <env-entry-type>java.lang.String</env-entry-type>
     <env-entry-value>PROPERTIES_FILE_POOL</env-entry-value>
@@ -924,36 +923,6 @@
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.BrowseController</servlet-class>
     <load-on-startup>5</load-on-startup>
   </servlet>
-  
-  <servlet>
-    <servlet-name>browsecontrollerJsp</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.BrowseControllerJsp</servlet-class>
-    <load-on-startup>5</load-on-startup>
-  </servlet>
-  
-  <servlet>
-    <servlet-name>browsecontrollerStringTemplate</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.BrowseControllerStringTemplate</servlet-class>
-    <load-on-startup>5</load-on-startup>
-  </servlet>
-  
-  <servlet>
-    <servlet-name>browsecontrollerFreeMarker</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.BrowseControllerFreeMarker</servlet-class>
-    <load-on-startup>5</load-on-startup>
-  </servlet>
-  
-  <servlet>
-    <servlet-name>browsecontrollerVelocity</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.BrowseControllerVelocity</servlet-class>
-    <load-on-startup>5</load-on-startup>
-  </servlet>
-  
-  <servlet>
-    <servlet-name>browsecontrollerWicket</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.BrowseControllerWicket</servlet-class>
-    <load-on-startup>5</load-on-startup>
-  </servlet>
 
   <servlet>
     <servlet-name>pubsbyorg</servlet-name>
@@ -1062,30 +1031,6 @@
   <servlet-mapping>
     <servlet-name>browsecontroller</servlet-name>
     <url-pattern>/browsecontroller</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>browsecontroller</servlet-name>
-    <url-pattern>/browsecontroller</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>browsecontrollerJsp</servlet-name>
-    <url-pattern>/browsecontroller-jsp</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>browsecontrollerStringTemplate</servlet-name>
-    <url-pattern>/browsecontroller-stringtemplate</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>browsecontrollerFreeMarker</servlet-name>
-    <url-pattern>/browsecontroller-freemarker</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>browsecontrollerVelocity</servlet-name>
-    <url-pattern>/browsecontroller-velocity</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>browsecontrollerWicket</servlet-name>
-    <url-pattern>/browsecontroller-wicket</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>pubsbyorg</servlet-name>
