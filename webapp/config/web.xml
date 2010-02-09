@@ -932,6 +932,12 @@
   </servlet>
   
   <servlet>
+    <servlet-name>browsecontrollerJsp2</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.BrowseControllerJsp2</servlet-class>
+    <load-on-startup>5</load-on-startup>
+  </servlet>
+  
+  <servlet>
     <servlet-name>browsecontrollerStringTemplate</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.BrowseControllerStringTemplate</servlet-class>
     <load-on-startup>5</load-on-startup>
@@ -1070,6 +1076,10 @@
   <servlet-mapping>
     <servlet-name>browsecontrollerJsp</servlet-name>
     <url-pattern>/browsecontroller-jsp</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>browsecontrollerJsp2</servlet-name>
+    <url-pattern>/browsecontroller-jsp2</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>browsecontrollerStringTemplate</servlet-name>

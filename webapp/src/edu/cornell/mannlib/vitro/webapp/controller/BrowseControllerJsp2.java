@@ -33,7 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 
-public class BrowseControllerJsp extends VitroHttpServlet {
+public class BrowseControllerJsp2 extends VitroHttpServlet {
     static final long serialVersionUID=2006030721126L;
 
     private transient ConcurrentHashMap<Integer, List> _groupListMap
@@ -42,7 +42,7 @@ public class BrowseControllerJsp extends VitroHttpServlet {
             = new ConcurrentLinkedQueue<String>();
     private RebuildGroupCacheThread _cacheRebuildThread;
 
-    private static final Log log = LogFactory.getLog(BrowseControllerJsp.class.getName());
+    private static final Log log = LogFactory.getLog(BrowseControllerJsp2.class.getName());
 
     public void init(javax.servlet.ServletConfig servletConfig)
             throws javax.servlet.ServletException {
@@ -89,29 +89,16 @@ public class BrowseControllerJsp extends VitroHttpServlet {
             String message = "";
             List<VClassGroup> groups = getGroups(vreq.getWebappDaoFactory().getVClassGroupDao(), vreq.getPortal().getPortalId());
 
+            // Return a list of VClassGroups to the view
             if (groups == null || groups.isEmpty()) {
             	message = "There are not yet any items in the system.";
             }
             else {
-            	/* 
-            	 * RY A hack to get EL to work. When we pass in groups, it errors on getting any
-            	 * attribute of a group as we iterate through. Turning it into a HashMap is ugly,
-            	 * though: (1) We lose all attributes of the vclassgroup except the public name;
-            	 * (2) In particular, we lose the display order. BrowseControllerJsp2 will attempt
-            	 * to get EL to work with the groups data structure.
-            	 */
-                HashMap<String, List<VClass>> vcgroups = new  HashMap<String, List<VClass>>();
-                Iterator i = groups.iterator();
-                VClassGroup group;
-                while (i.hasNext()) {
-                	group = (VClassGroup) i.next();
-                	vcgroups.put(group.getPublicName(), group.getVitroClassList());
-                }
-            	request.setAttribute("classGroups", vcgroups);
+            	request.setAttribute("classGroups", groups);
             }            
             
             request.setAttribute("title","Index to "+vreq.getPortal().getAppName()+" Contents");
-            request.setAttribute("bodyJsp","/templates/browse/browseGroupJsp.jsp");
+            request.setAttribute("bodyJsp","/templates/browse/browseGroupJsp2.jsp");
             request.setAttribute("message", message);
             //FINALLY: send off to the BASIC_JSP to get turned into HTML
             RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
@@ -255,8 +242,8 @@ public class BrowseControllerJsp extends VitroHttpServlet {
 
     /* ******************  Jena Model Change Listener***************************** */
     private class BrowseControllerChangeListener extends StatementListener {
-        private BrowseControllerJsp controller = null;
-        public BrowseControllerChangeListener(BrowseControllerJsp controller){
+        private BrowseControllerJsp2 controller = null;
+        public BrowseControllerChangeListener(BrowseControllerJsp2 controller){
             this.controller=controller;
         }
 
@@ -285,13 +272,13 @@ public class BrowseControllerJsp extends VitroHttpServlet {
     }
     /* ******************** RebuildGroupCacheThread **************** */
     protected class RebuildGroupCacheThread extends Thread {
-        BrowseControllerJsp controller;
+        BrowseControllerJsp2 controller;
         boolean die = false;
         boolean queueChange = false;
         long queueChangeMills = 0;
         private boolean awareOfQueueChange = false;
 
-        RebuildGroupCacheThread(BrowseControllerJsp controller) {
+        RebuildGroupCacheThread(BrowseControllerJsp2 controller) {
             this.controller = controller;
         }
         public void run() {
