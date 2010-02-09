@@ -12,6 +12,7 @@
         <c:otherwise>
             <c:forEach var="group" items="${classGroups}">
                 <%--  Doesn't work when classGroups is a List of VClassGroups: <h2>${group.publicName}</h2> --%>
+                <h2>${group}</h2>
                 <ul>
 	                <c:forEach var="vclass" items="${group}">
 	                    <c:url var="url" value="entitylist">
