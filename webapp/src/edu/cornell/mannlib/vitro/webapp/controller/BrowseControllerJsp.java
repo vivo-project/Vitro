@@ -2,9 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller;
 
-import java.util.Collection;
-import java.util.Iterator;
-
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.listeners.StatementListener;
 import com.hp.hpl.jena.rdf.model.Statement;
@@ -17,6 +14,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
+import edu.cornell.mannlib.vitro.webapp.dao.filtering.VClassGroupDaoFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
@@ -86,20 +84,29 @@ public class BrowseControllerJsp extends VitroHttpServlet {
             if( vreq.getParameter("clearcache") != null ) //mainly for debugging
                 clearGroupCache();
 
-            PortalFlag portalState= vreq.getPortalFlag();
+            //PortalFlag portalState= vreq.getPortalFlag();
 
-            List groups = getGroups(vreq.getWebappDaoFactory().getVClassGroupDao(), vreq.getPortal().getPortalId());
+            String message = "";
+            List<VClassGroup> groups = getGroups(vreq.getWebappDaoFactory().getVClassGroupDao(), vreq.getPortal().getPortalId());
 
-            // CREATE THE DATA STRUCTURE HERE!!! 
-            
-            // We probably won't need this value - set classgroups to something, maybe empty string?
-            request.setAttribute("classgroupsIsEmpty", groups == null || groups.isEmpty() );
-            request.setAttribute("classgroups",groups);
-            
+            // Return a list of VClassGroups to the view
+            if (groups == null || groups.isEmpty()) {
+            	message = "There are not yet any items in the system.";
+            }
+            else {
+                HashMap<String, List<VClass>> vcgroups = new  HashMap<String, List<VClass>>();
+                Iterator i = groups.iterator();
+                VClassGroup group;
+                while (i.hasNext()) {
+                	group = (VClassGroup) i.next();
+                	vcgroups.put(group.getPublicName(), group.getVitroClassList());
+                }
+            	request.setAttribute("classGroups", vcgroups);
+            }            
             
             request.setAttribute("title","Index to "+vreq.getPortal().getAppName()+" Contents");
             request.setAttribute("bodyJsp","/templates/browse/browseGroupJsp.jsp");
-
+            request.setAttribute("message", message);
             //FINALLY: send off to the BASIC_JSP to get turned into HTML
             RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
             // run directly to body for testing: RequestDispatcher rd = request.getRequestDispatcher(Controllers.BROWSE_GROUP_JSP);
@@ -116,7 +123,8 @@ public class BrowseControllerJsp extends VitroHttpServlet {
         _cacheRebuildThread.kill();
     }
 
-    private List getGroups( VClassGroupDao vcgDao, int portalId ){
+    private List<VClassGroup> getGroups( VClassGroupDao vcgDao, int portalId ){
+    	List groupsToReturn;
         List grp = _groupListMap.get(portalId);
         if( grp == null ){
             log.debug("needed to build vclassGroups for portal " + portalId);
@@ -126,12 +134,15 @@ public class BrowseControllerJsp extends VitroHttpServlet {
             // now cull out the groups with no populated classes
             //removeUnpopulatedClasses( groups);
             vcgDao.removeUnpopulatedGroups(groups);
+            
+            // Map each vclass to the number of individuals in that class
 
             _groupListMap.put(portalId, groups);
-            return groups;
+            groupsToReturn = groups;
         } else {
-            return grp;
+            groupsToReturn = grp;
         }
+        return (List<VClassGroup>) groupsToReturn;
     }
     
     private static boolean ORDER_BY_DISPLAYRANK = true;
