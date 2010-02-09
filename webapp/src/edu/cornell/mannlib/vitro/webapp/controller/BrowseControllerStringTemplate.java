@@ -32,7 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 
-public class BrowseControllerStringTemplate extends BrowseController {
+public class BrowseControllerStringTemplate extends VitroHttpServlet {
     static final long serialVersionUID=2006030721126L;
 
     private transient ConcurrentHashMap<Integer, List> _groupListMap
@@ -41,7 +41,7 @@ public class BrowseControllerStringTemplate extends BrowseController {
             = new ConcurrentLinkedQueue<String>();
     private RebuildGroupCacheThread _cacheRebuildThread;
 
-    private static final Log log = LogFactory.getLog(BrowseController.class.getName());
+    private static final Log log = LogFactory.getLog(BrowseControllerStringTemplate.class.getName());
 
     public void init(javax.servlet.ServletConfig servletConfig)
             throws javax.servlet.ServletException {
@@ -104,7 +104,7 @@ public class BrowseControllerStringTemplate extends BrowseController {
             // run directly to body for testing: RequestDispatcher rd = request.getRequestDispatcher(Controllers.BROWSE_GROUP_JSP);
             rd.forward(request, response);
         } catch (Throwable e) {
-            log.debug("BrowseController.doGet(): "+ e);
+            log.debug("BrowseControllerStringTemplate.doGet(): "+ e);
             request.setAttribute("javax.servlet.jsp.jspException",e);
             RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
             rd.forward(request, response);
@@ -237,8 +237,8 @@ public class BrowseControllerStringTemplate extends BrowseController {
 
     /* ******************  Jena Model Change Listener***************************** */
     private class BrowseControllerChangeListener extends StatementListener {
-        private BrowseController controller = null;
-        public BrowseControllerChangeListener(BrowseController controller){
+        private BrowseControllerStringTemplate controller = null;
+        public BrowseControllerChangeListener(BrowseControllerStringTemplate controller){
             this.controller=controller;
         }
 
@@ -267,13 +267,13 @@ public class BrowseControllerStringTemplate extends BrowseController {
     }
     /* ******************** RebuildGroupCacheThread **************** */
     protected class RebuildGroupCacheThread extends Thread {
-        BrowseController controller;
+        BrowseControllerStringTemplate controller;
         boolean die = false;
         boolean queueChange = false;
         long queueChangeMills = 0;
         private boolean awareOfQueueChange = false;
 
-        RebuildGroupCacheThread(BrowseController controller) {
+        RebuildGroupCacheThread(BrowseControllerStringTemplate controller) {
             this.controller = controller;
         }
         public void run() {

@@ -2,6 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller;
 
+import java.util.Collection;
+import java.util.Iterator;
+
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.listeners.StatementListener;
 import com.hp.hpl.jena.rdf.model.Statement;
@@ -32,7 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 
-public class BrowseControllerJsp extends BrowseController {
+public class BrowseControllerJsp extends VitroHttpServlet {
     static final long serialVersionUID=2006030721126L;
 
     private transient ConcurrentHashMap<Integer, List> _groupListMap
@@ -41,7 +44,7 @@ public class BrowseControllerJsp extends BrowseController {
             = new ConcurrentLinkedQueue<String>();
     private RebuildGroupCacheThread _cacheRebuildThread;
 
-    private static final Log log = LogFactory.getLog(BrowseController.class.getName());
+    private static final Log log = LogFactory.getLog(BrowseControllerJsp.class.getName());
 
     public void init(javax.servlet.ServletConfig servletConfig)
             throws javax.servlet.ServletException {
@@ -86,25 +89,23 @@ public class BrowseControllerJsp extends BrowseController {
             PortalFlag portalState= vreq.getPortalFlag();
 
             List groups = getGroups(vreq.getWebappDaoFactory().getVClassGroupDao(), vreq.getPortal().getPortalId());
-            if( groups == null || groups.isEmpty() )
-            	request.setAttribute("classgroupsIsEmpty", true);
+
+            // CREATE THE DATA STRUCTURE HERE!!! 
             
-            
-            // stick the data in the requestScope
+            // We probably won't need this value - set classgroups to something, maybe empty string?
+            request.setAttribute("classgroupsIsEmpty", groups == null || groups.isEmpty() );
             request.setAttribute("classgroups",groups);
-            request.setAttribute("portalState",portalState);
-
+            
+            
             request.setAttribute("title","Index to "+vreq.getPortal().getAppName()+" Contents");
-
-            request.setAttribute("bodyJsp",Controllers.BROWSE_GROUP_JSP);
-            //request.setAttribute("bodyJsp",Controllers.DEBUG_JSP);
+            request.setAttribute("bodyJsp","/templates/browse/browseGroupJsp.jsp");
 
             //FINALLY: send off to the BASIC_JSP to get turned into HTML
             RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
             // run directly to body for testing: RequestDispatcher rd = request.getRequestDispatcher(Controllers.BROWSE_GROUP_JSP);
             rd.forward(request, response);
         } catch (Throwable e) {
-            log.debug("BrowseController.doGet(): "+ e);
+            log.debug("BrowseControllerJsp.doGet(): "+ e);
             request.setAttribute("javax.servlet.jsp.jspException",e);
             RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
             rd.forward(request, response);
@@ -237,8 +238,8 @@ public class BrowseControllerJsp extends BrowseController {
 
     /* ******************  Jena Model Change Listener***************************** */
     private class BrowseControllerChangeListener extends StatementListener {
-        private BrowseController controller = null;
-        public BrowseControllerChangeListener(BrowseController controller){
+        private BrowseControllerJsp controller = null;
+        public BrowseControllerChangeListener(BrowseControllerJsp controller){
             this.controller=controller;
         }
 
@@ -267,13 +268,13 @@ public class BrowseControllerJsp extends BrowseController {
     }
     /* ******************** RebuildGroupCacheThread **************** */
     protected class RebuildGroupCacheThread extends Thread {
-        BrowseController controller;
+        BrowseControllerJsp controller;
         boolean die = false;
         boolean queueChange = false;
         long queueChangeMills = 0;
         private boolean awareOfQueueChange = false;
 
-        RebuildGroupCacheThread(BrowseController controller) {
+        RebuildGroupCacheThread(BrowseControllerJsp controller) {
             this.controller = controller;
         }
         public void run() {

@@ -32,7 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 
-public class BrowseControllerVelocity extends BrowseController {
+public class BrowseControllerVelocity extends VitroHttpServlet {
     static final long serialVersionUID=2006030721126L;
 
     private transient ConcurrentHashMap<Integer, List> _groupListMap
@@ -41,7 +41,7 @@ public class BrowseControllerVelocity extends BrowseController {
             = new ConcurrentLinkedQueue<String>();
     private RebuildGroupCacheThread _cacheRebuildThread;
 
-    private static final Log log = LogFactory.getLog(BrowseController.class.getName());
+    private static final Log log = LogFactory.getLog(BrowseControllerVelocity.class.getName());
 
     public void init(javax.servlet.ServletConfig servletConfig)
             throws javax.servlet.ServletException {
@@ -104,7 +104,7 @@ public class BrowseControllerVelocity extends BrowseController {
             // run directly to body for testing: RequestDispatcher rd = request.getRequestDispatcher(Controllers.BROWSE_GROUP_JSP);
             rd.forward(request, response);
         } catch (Throwable e) {
-            log.debug("BrowseController.doGet(): "+ e);
+            log.debug("BrowseControllerVelocity.doGet(): "+ e);
             request.setAttribute("javax.servlet.jsp.jspException",e);
             RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
             rd.forward(request, response);
@@ -237,8 +237,8 @@ public class BrowseControllerVelocity extends BrowseController {
 
     /* ******************  Jena Model Change Listener***************************** */
     private class BrowseControllerChangeListener extends StatementListener {
-        private BrowseController controller = null;
-        public BrowseControllerChangeListener(BrowseController controller){
+        private BrowseControllerVelocity controller = null;
+        public BrowseControllerChangeListener(BrowseControllerVelocity controller){
             this.controller=controller;
         }
 
@@ -267,13 +267,13 @@ public class BrowseControllerVelocity extends BrowseController {
     }
     /* ******************** RebuildGroupCacheThread **************** */
     protected class RebuildGroupCacheThread extends Thread {
-        BrowseController controller;
+        BrowseControllerVelocity controller;
         boolean die = false;
         boolean queueChange = false;
         long queueChangeMills = 0;
         private boolean awareOfQueueChange = false;
 
-        RebuildGroupCacheThread(BrowseController controller) {
+        RebuildGroupCacheThread(BrowseControllerVelocity controller) {
             this.controller = controller;
         }
         public void run() {
