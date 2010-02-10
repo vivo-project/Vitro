@@ -8,19 +8,17 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.vocabulary.RDF;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
-import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
+import edu.cornell.mannlib.vitro.webapp.beans.display.VClassGroupDisplay;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
-import edu.cornell.mannlib.vitro.webapp.dao.filtering.VClassGroupDaoFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.joda.time.DateTime;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -93,20 +91,18 @@ public class BrowseControllerJsp extends VitroHttpServlet {
             	message = "There are not yet any items in the system.";
             }
             else {
-            	/* 
-            	 * RY A hack to get EL to work. When we pass in groups, it errors on getting any
-            	 * attribute of a group as we iterate through. Turning it into a HashMap is ugly,
-            	 * though: (1) We lose all attributes of the vclassgroup except the public name;
-            	 * (2) In particular, we lose the display order. BrowseControllerJsp2 will attempt
-            	 * to get EL to work with the groups data structure.
-            	 */
-                HashMap<String, List<VClass>> vcgroups = new  HashMap<String, List<VClass>>();
-                Iterator i = groups.iterator();
-                VClassGroup group;
-                while (i.hasNext()) {
-                	group = (VClassGroup) i.next();
-                	vcgroups.put(group.getPublicName(), group.getVitroClassList());
-                }
+            	// Create a list of VClassGroupDisplay objects, each of which wraps a VClassGroup object.
+            	// This allows EL to access VClassGroup properties like publicName, which it can't do
+            	// if passed a linked list.
+            	List<VClassGroupDisplay> vcgroups = new ArrayList<VClassGroupDisplay>();
+            	Iterator i = groups.iterator();
+            	VClassGroup group;
+            	VClassGroupDisplay displayGroup;
+            	while (i.hasNext()) {
+            		group = (VClassGroup) i.next();
+            		displayGroup = new VClassGroupDisplay(group);
+            		vcgroups.add(displayGroup);
+            	}
             	request.setAttribute("classGroups", vcgroups);
             }            
             
