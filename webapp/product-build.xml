@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ====================================================================== 
+     Build script for the Vivo Products.
+                   
+     jeb228                                                                
+     ====================================================================== -->
+<project name="vivoProduct" default="describe">
+
+	<!--
+     This script should not be run on its own. 
+     It should only be run from the build script of an individual Product.
+    -->
+	<fail>
+		<condition>
+			<equals arg1="${ant.file.vivoProduct}" arg2="${ant.file}" />
+		</condition>
+		This script should not be run by itself.
+     	It should be invoked from the build script of a Vivo product.
+	</fail>
+
+	<!-- 
+	 If paths are based on this, they will work, regardless of whether this 
+	 script is run on its own or included into an individual Product build script.
+	 -->
+	<dirname property="vivoProduct.basedir" file="${ant.file.vivoProduct}" />
+	<import file="${vivoProduct.basedir}/build.xml" />
+
+	<!-- Is there a "src" directory in the product? -->
+	<property name="product.source.dir" location="./src" />
+	<available property="product.sources.exist" file="${product.source.dir}" />
+
+	<!-- Is there a "test" directory in the product? -->
+	<property name="product.test.dir" location="./test" />
+	<available property="product.tests.exist" file="${product.test.dir}" />
+
+	<path id="product.compile.classpath">
+		<pathelement location="${classes.dir}" />
+		<path refid="compile.classpath" />
+	</path>
+
+	<path id="product.test.compile.classpath">
+		<path refid="test.compile.classpath" />
+	</path>
+
+	<path id="product.test.run.classpath">
+		<path refid="test.run.classpath" />
+	</path>
+
+
+	<!-- ================================= 
+          target: describe              
+         ================================= -->
+	<target name="describe" description="--> The default target.">
+		<echo>
+clean    - Delete all artifacts so the next build will be from scratch.
+compile  - Compile the Java source files.
+test     - Compile and run the JUnit tests.
+war      - Assemble everything into a deployable WAR file.
+deploy   - Deploy the application directly into the Tomcat webapps directory.
+	    </echo>
+	</target>
+
+	<!-- ================================= 
+          target: clean              
+         ================================= -->
+	<target name="clean" depends="vitroCore.clean" description="--> Delete all artifacts.">
+	</target>
+
+	<!-- ================================= 
+          target: compile              
+         ================================= -->
+	<target name="compile"
+	        depends="vitroCore.compile, productCompile"
+	        description="--> Compile Java sources.">
+	</target>
+
+	<target name="test" depends="vitroCore.test, productTest" description="-->Run JUnit tests">
+	</target>
+
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: productCompile                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="productCompile" depends="vitroCore.compile" if="product.sources.exist">
+		<!-- deletes all files that depend on changed .java files -->
+		<depend srcdir="${product.source.dir}"
+		        destdir="${classes.dir}"
+		        closure="false"
+		        cache=".depcache">
+			<classpath refid="product.compile.classpath" />
+		</depend>
+
+		<javac srcdir="${product.source.dir}"
+		       destdir="${classes.dir}"
+		       debug="true"
+		       deprecation="true"
+		       optimize="true"
+		       source="1.5">
+			<classpath refid="product.compile.classpath" />
+		</javac>
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: productTest                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="productTest" depends="vitroCore.test" if="product.tests.exist">
+		<javac srcdir="${product.test.dir}"
+		       destdir="${test.classes.dir}"
+		       debug="true"
+		       deprecation="true"
+		       optimize="false"
+		       source="1.5">
+			<classpath refid="product.test.compile.classpath" />
+		</javac>
+
+		<java classname="edu.cornell.mannlib.vitro.testing.VitroTestRunner"
+		      fork="yes"
+		      failonerror="true">
+			<classpath refid="product.test.run.classpath" />
+			<arg file="${product.test.dir}" />
+			<arg value="${testlevel}" />
+		</java>
+	</target>
+
+
+</project>
+
+
+<!-- ..................................................................................... -->
+<!-- ..................................................................................... -->
+<!-- ..................................................................................... -->
+<!-- ..................................................................................... -->
+<!-- ..................................................................................... -->
+<!-- ..................................................................................... -->
+<!-- ..................................................................................... -->
+<!-- ..................................................................................... -->
+
+
+<!--
+<!.. $This file is distributed under the terms of the license in /doc/license.txt$ ..>
+
+<project name="VIVO" default="describe" basedir=".">
+
+	<property file="config/build.properties" />
+
+	<!.. ================================= 
+          target: describe              
+         ================================= ..>
+	<target name="describe" depends="" description="describes the available targets.">
+		<echo>
+Available targets:
+all    - Runs "clean", then "deploy".
+clean  - Removes any artifacts from previous builds, so the next build will be
+            a clean one.
+deploy - Rssembles the VIVO application and deploys it to the "webapps" 
+            directory of your Tomcat server.
+		</echo>
+	</target>
+
+	<!.. ================================= 
+          target: all              
+         ================================= ..>
+	<target name="all" depends="clean, deploy" description="description" />
+
+	<!.. ================================= 
+          target: clean              
+         ================================= ..>
+	<target name="clean" description="Start with a fresh build.">
+		<delete dir="${deploy.staging.dir}" />
+	</target>
+
+	<!.. ================================= 
+          target: deploy              
+         ================================= ..>
+	<target name="deploy"
+	        depends="runCoreBuild"
+	        description="Assemble the VIVO application and deploy it.">
+	</target>
+
+	<!.. - - - - - - - - - - - - - - - - - 
+          target: prepare                      
+          
+          Move everything into a work-area, so we can merge core with vivoweb.
+         - - - - - - - - - - - - - - - - - ..>
+	<target name="prepare">
+		<mkdir dir="${deploy.staging.dir}" />
+		<copy todir="${deploy.staging.dir}">
+			<fileset dir="vitro-core">
+				<!.. if the core build directory exists, skip it. ..>
+				<exclude name="${core-build.blocking.path}" />
+				<!.. omit any themes from the core. ..>
+				<exclude name="${themes.blocking.path}" />
+			</fileset>
+		</copy>
+	</target>
+
+	<!.. - - - - - - - - - - - - - - - - - 
+          target: properties                      
+         - - - - - - - - - - - - - - - - - ..>
+	<target name="properties" depends="prepare">
+
+		<dependset>
+			<srcfilelist dir="." files="${deploy.properties.file}" />
+			<targetfilelist dir="."
+			                files="${globalbuild.properties.file},${vitrodeploy.properties.file},${vitroUsers.owl.file}" />
+		</dependset>
+
+		<copy file="${globalbuild.template.file}"
+		      tofile="${globalbuild.properties.file}"
+		      filtering="true">
+			<filterchain>
+				<expandproperties />
+			</filterchain>
+		</copy>
+
+		<copy file="${vitrodeploy.template.file}"
+		      tofile="${vitrodeploy.properties.file}"
+		      filtering="true">
+			<filterchain>
+				<expandproperties />
+			</filterchain>
+		</copy>
+
+		<copy file="${vitroUsers.template.file}" tofile="${vitroUsers.owl.file}" filtering="true">
+			<filterchain>
+				<expandproperties />
+			</filterchain>
+		</copy>
+	</target>
+
+	<!.. - - - - - - - - - - - - - - - - - 
+          target: themes                      
+         - - - - - - - - - - - - - - - - - ..>
+	<target name="themes">
+		<copy todir="${themes.destination.dir}">
+			<fileset dir="${themes.source.dir}" />
+		</copy>
+	</target>
+
+	<!.. - - - - - - - - - - - - - - - - - 
+          target: ontology
+         - - - - - - - - - - - - - - - - - ..>
+	<target name="ontology">
+		<copy todir="${ontology.destination.dir}">
+			<fileset dir="${ontology.source.dir}" />
+		</copy>
+	</target>
+
+	<!.. - - - - - - - - - - - - - - - - - 
+          target: model
+         - - - - - - - - - - - - - - - - - ..>
+	<target name="model">
+		<copy todir="${submodels.destination.dir}">
+			<fileset dir="${submodels.source.dir}" />
+		</copy>
+		<copy todir="${init-data.destination.dir}">
+			<fileset dir="${init-data.source.dir}" />
+		</copy>
+	</target>
+
+	<!.. - - - - - - - - - - - - - - - - - 
+          target: modifications                      
+         - - - - - - - - - - - - - - - - - ..>
+    <target name="modifications">
+		<copy todir="${modifications.destination.dir}">
+			<fileset dir="${modifications.source.dir}" />
+		</copy>
+    </target>
+
+	<!.. - - - - - - - - - - - - - - - - - 
+          target: runCoreBuild                      
+         - - - - - - - - - - - - - - - - - ..>
+	<target name="runCoreBuild" depends="properties, themes, ontology, model, modifications">
+		<ant antfile="${vitro-core.build.file}" inheritall="false" target="deploy" />
+	</target>
+
+</project>
+-->
