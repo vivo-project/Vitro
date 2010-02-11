@@ -8,6 +8,8 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.ModelSelector" %>
+<%@ page import="com.hp.hpl.jena.ontology.OntModel"%>
 <%@ page import="org.apache.commons.logging.Log" %>
 <%@ page import="org.apache.commons.logging.LogFactory" %>
 <%@page import="edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary"%>
@@ -86,6 +88,11 @@
     String formTitle   ="";
     String submitLabel ="";
     Model model = (Model)application.getAttribute("jenaOntModel");
+    editConfig.setWriteModelSelector( new ModelSelector(){
+    	public OntModel getModel(HttpServletRequest request, ServletContext context){
+    		return (OntModel)context.getAttribute("userAccountsOntModel");
+    	}
+    });
     if( request.getAttribute("object") != null ){//this block is for an edit of an existing object property statement
         editConfig.prepareForObjPropUpdate( model );
         formTitle   = "Change person that user may edit as";
