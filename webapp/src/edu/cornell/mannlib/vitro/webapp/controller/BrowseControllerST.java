@@ -8,8 +8,8 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.vocabulary.RDF;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
-import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
+import edu.cornell.mannlib.vitro.webapp.beans.display.VClassGroupDisplay;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
@@ -19,7 +19,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.joda.time.DateTime;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -32,7 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 
-public class BrowseControllerStringTemplate extends VitroHttpServlet {
+public class BrowseControllerST extends VitroHttpServlet {
     static final long serialVersionUID=2006030721126L;
 
     private transient ConcurrentHashMap<Integer, List> _groupListMap
@@ -41,7 +40,7 @@ public class BrowseControllerStringTemplate extends VitroHttpServlet {
             = new ConcurrentLinkedQueue<String>();
     private RebuildGroupCacheThread _cacheRebuildThread;
 
-    private static final Log log = LogFactory.getLog(BrowseControllerStringTemplate.class.getName());
+    private static final Log log = LogFactory.getLog(BrowseControllerST.class.getName());
 
     public void init(javax.servlet.ServletConfig servletConfig)
             throws javax.servlet.ServletException {
@@ -83,28 +82,39 @@ public class BrowseControllerStringTemplate extends VitroHttpServlet {
             if( vreq.getParameter("clearcache") != null ) //mainly for debugging
                 clearGroupCache();
 
-            PortalFlag portalState= vreq.getPortalFlag();
+            //PortalFlag portalState= vreq.getPortalFlag();
 
-            List groups = getGroups(vreq.getWebappDaoFactory().getVClassGroupDao(), vreq.getPortal().getPortalId());
-            if( groups == null || groups.isEmpty() )
-            	request.setAttribute("classgroupsIsEmpty", true);
-            
-            
-            // stick the data in the requestScope
-            request.setAttribute("classgroups",groups);
-            request.setAttribute("portalState",portalState);
+            String message = "";
+            List<VClassGroup> groups = getGroups(vreq.getWebappDaoFactory().getVClassGroupDao(), vreq.getPortal().getPortalId());
 
+            if (groups == null || groups.isEmpty()) {
+            	message = "There are not yet any items in the system.";
+            }
+            else {
+            	// Create a list of VClassGroupDisplay objects, each of which wraps a VClassGroup object.
+            	// This allows EL to access VClassGroup properties like publicName, which it can't do
+            	// if passed a linked list.
+            	List<VClassGroupDisplay> vcgroups = new ArrayList<VClassGroupDisplay>();
+            	Iterator i = groups.iterator();
+            	VClassGroup group;
+            	VClassGroupDisplay displayGroup;
+            	while (i.hasNext()) {
+            		group = (VClassGroup) i.next();
+            		displayGroup = new VClassGroupDisplay(group);
+            		vcgroups.add(displayGroup);
+            	}
+            	request.setAttribute("classGroups", vcgroups);
+            }            
+            
             request.setAttribute("title","Index to "+vreq.getPortal().getAppName()+" Contents");
-
-            request.setAttribute("bodyJsp",Controllers.BROWSE_GROUP_JSP);
-            //request.setAttribute("bodyJsp",Controllers.DEBUG_JSP);
-
+            request.setAttribute("bodyJsp","/templates/browse/browseGroupStringTemplate.jsp");
+            request.setAttribute("message", message);
             //FINALLY: send off to the BASIC_JSP to get turned into HTML
             RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
             // run directly to body for testing: RequestDispatcher rd = request.getRequestDispatcher(Controllers.BROWSE_GROUP_JSP);
             rd.forward(request, response);
         } catch (Throwable e) {
-            log.debug("BrowseControllerStringTemplate.doGet(): "+ e);
+            log.debug("BrowseControllerST.doGet(): "+ e);
             request.setAttribute("javax.servlet.jsp.jspException",e);
             RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
             rd.forward(request, response);
@@ -115,7 +125,8 @@ public class BrowseControllerStringTemplate extends VitroHttpServlet {
         _cacheRebuildThread.kill();
     }
 
-    private List getGroups( VClassGroupDao vcgDao, int portalId ){
+    private List<VClassGroup> getGroups( VClassGroupDao vcgDao, int portalId ){
+    	List groupsToReturn;
         List grp = _groupListMap.get(portalId);
         if( grp == null ){
             log.debug("needed to build vclassGroups for portal " + portalId);
@@ -125,12 +136,15 @@ public class BrowseControllerStringTemplate extends VitroHttpServlet {
             // now cull out the groups with no populated classes
             //removeUnpopulatedClasses( groups);
             vcgDao.removeUnpopulatedGroups(groups);
+            
+            // Map each vclass to the number of individuals in that class
 
             _groupListMap.put(portalId, groups);
-            return groups;
+            groupsToReturn = groups;
         } else {
-            return grp;
+            groupsToReturn = grp;
         }
+        return (List<VClassGroup>) groupsToReturn;
     }
     
     private static boolean ORDER_BY_DISPLAYRANK = true;
@@ -237,8 +251,8 @@ public class BrowseControllerStringTemplate extends VitroHttpServlet {
 
     /* ******************  Jena Model Change Listener***************************** */
     private class BrowseControllerChangeListener extends StatementListener {
-        private BrowseControllerStringTemplate controller = null;
-        public BrowseControllerChangeListener(BrowseControllerStringTemplate controller){
+        private BrowseControllerST controller = null;
+        public BrowseControllerChangeListener(BrowseControllerST controller){
             this.controller=controller;
         }
 
@@ -267,13 +281,13 @@ public class BrowseControllerStringTemplate extends VitroHttpServlet {
     }
     /* ******************** RebuildGroupCacheThread **************** */
     protected class RebuildGroupCacheThread extends Thread {
-        BrowseControllerStringTemplate controller;
+        BrowseControllerST controller;
         boolean die = false;
         boolean queueChange = false;
         long queueChangeMills = 0;
         private boolean awareOfQueueChange = false;
 
-        RebuildGroupCacheThread(BrowseControllerStringTemplate controller) {
+        RebuildGroupCacheThread(BrowseControllerST controller) {
             this.controller = controller;
         }
         public void run() {

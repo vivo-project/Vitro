@@ -85,6 +85,8 @@ public class Controllers {
 
     public static final Object SEARCH_ERROR_JSP = "/search_error.jsp";
 
+    public static final String CONTACT_JSP = "/comments";
+    
     //public static final String TAB_ENTITIES_LIST_JSP = "templates/tab/tabEntities.jsp";
 
     private static List letters = null;
