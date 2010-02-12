@@ -61,6 +61,8 @@ public class JenaPersistentDataSourceSetup extends JenaDataSourceSetupBase imple
             System.out.println("Refer to servlet container documentation about increasing heap space.");
             System.out.println("****************");
         } catch (Throwable t) {
+        	System.out.println("Logging error details");
+        	log.error("Unable to open db model", t);
 			System.out.println("**** ERROR *****");
             System.out.println("Vitro unable to open Jena database model.");
 			System.out.println("Check that the configuration properties file has been created in WEB-INF/classes, ");
