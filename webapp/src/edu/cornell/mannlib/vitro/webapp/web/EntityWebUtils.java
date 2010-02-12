@@ -67,13 +67,16 @@ public class EntityWebUtils {
 
         // see if we can get the URI from a namespace prefix and a local name
 		String requestURI = vreq.getRequestURI();
+		
 		String[] requestParts = requestURI.split("/individual/");
 		String[] URIParts = requestParts[1].split("/");
+		
 		String namespace = "";
 		NamespaceMapper namespaceMapper = NamespaceMapperFactory.getNamespaceMapper(vreq.getSession().getServletContext());
 		String t;
 		namespace = ( (t = namespaceMapper.getNamespaceForPrefix(URIParts[0])) != null) ? t : "";
 		String localName = URIParts[1];
+		
 		return vreq.getWebappDaoFactory().getIndividualDao().getIndividualByURI(namespace+localName);
 
 //        entityIdStr = vreq.getParameter("adw");

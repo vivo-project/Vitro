@@ -148,6 +148,7 @@ public class EntityController extends VitroHttpServlet {
                 // insert test for whether a css files of the same name exists, and populate the customCss string for use when construction the header
             }
             String netid = iwDao.getNetId(entity.getURI());
+            
             vreq.setAttribute("netid", netid);
             vreq.setAttribute("vclassName", vclassName);
             vreq.setAttribute("entity",entity);
@@ -202,7 +203,7 @@ public class EntityController extends VitroHttpServlet {
             vreq.setAttribute("scripts", "/templates/entity/entity_inject_head.jsp");
 
             RequestDispatcher rd = vreq.getRequestDispatcher( view );
-            rd.forward(req,res);
+            rd.forward(vreq,res);
         } catch (Throwable e) {
             log.error(e);
             req.setAttribute("javax.servlet.jsp.jspException",e);
