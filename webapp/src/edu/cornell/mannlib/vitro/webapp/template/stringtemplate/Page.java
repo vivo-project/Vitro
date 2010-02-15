@@ -227,7 +227,7 @@ public class Page {
     		return url;
     	}
     	
-    	public boolean getActive() {
+    	public boolean isActive() {
     		return active;
     	}
     }
