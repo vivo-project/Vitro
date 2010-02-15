@@ -4,9 +4,12 @@ package edu.cornell.mannlib.vitro.webapp.template.stringtemplate;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.List;
+import java.util.ArrayList;
+//import java.util.HashMap;
+//import java.util.Iterator;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -15,14 +18,17 @@ import javax.servlet.http.HttpSession;
 
 import org.antlr.stringtemplate.*;
 
+import edu.cornell.mannlib.vedit.beans.LoginFormBean;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+//import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+//import edu.cornell.mannlib.vitro.webapp.web.TabWebUtil;
 
 public class Page {
 	
-    /** Template library **/
+    /* Template library */
     protected static StringTemplateGroup templates =
         new StringTemplateGroup("stGroup", "vitro-core/webapp/web/templates/stringtemplates");
 
@@ -35,7 +41,7 @@ public class Page {
 //	protected List<String> scripts = new ArrayList<String>();
 
 	ServletContext servletContext;
-    HttpServletRequest request;
+    VitroRequest request;
     HttpServletResponse response;
     PrintWriter out;
        
@@ -48,21 +54,23 @@ public class Page {
         out = response.getWriter();
   
         StringTemplate pageST = templates.getInstanceOf("page");
-        
 
-        
         String loginName = getLoginName(request); 
         if (loginName == null) {
         	pageST.setAttribute("loginUrl", getUrl(Controllers.LOGIN));
         }
         else {
+        	pageST.setAttribute("loginName", loginName);
         	pageST.setAttribute("logoutUrl", getUrl(Controllers.LOGOUT));
+        	pageST.setAttribute("siteAdminUrl", getUrl(Controllers.SITE_ADMIN));
         }
  
         int portalId = portal.getPortalId();
         pageST.setAttribute("portalId", portalId);
 
         pageST.setAttribute("title", getTitle());
+        
+        pageST.setAttribute("tabMenu", getTabMenu(request));
         
         // We'll need to separate theme-general and theme-specific stylesheet
         // dirs, so we need either two attributes or a list.
@@ -124,7 +132,7 @@ public class Page {
 //    	//scripts.add
 //    }
     
-    public void setRequest(HttpServletRequest request) {
+    public void setRequest(VitroRequest request) {
     	this.request = request;
     }
     
@@ -132,11 +140,12 @@ public class Page {
     	this.response = response;
     }
     
-    protected String getLoginName(HttpServletRequest request) {
+    private final String getLoginName(HttpServletRequest request) {
     	
         String loginName = null;
-        LoginFormBean loginBean = new LoginFormBean();
-        if (loginBean.testSessionLevel(request) > -1) {
+        HttpSession session = request.getSession();
+        LoginFormBean loginBean = (LoginFormBean) session.getAttribute("loginHandler");
+        if (loginBean != null && loginBean.testSessionLevel(request) > -1) {
             loginName = loginBean.getLoginName();
         }   
         return loginName;
@@ -168,6 +177,59 @@ public class Page {
     		url = "/" + url;
     	}
     	return contextPath + url;
+    }
+
+    private List<TabMenuItem> getTabMenu(HttpServletRequest request) {
+    	List<TabMenuItem> tabMenu = new ArrayList<TabMenuItem>();
+    	
+// NB Tabs are not generated dynamically in the current code, they are simply hard-coded in menu.jsp.
+// Needs to be fixed later.
+//    	List primaryTabs = request.getWebappDaoFactory().getTabDao().getPrimaryTabs(portalId);
+//    	
+//        int tabId = TabWebUtil.getTabIdFromRequest(request); 
+//        int rootId = TabWebUtil.getRootTabId(request); 
+//        List tabLevels = request.getWebappDaoFactory().getTabDao().getTabHierarcy(tabId,rootId);
+//        request.setAttribute("tabLevels", tabLevels);
+//        
+//        String uri = (String)request.getAttribute("javax.servlet.forward.request_uri");
+    	
+    	tabMenu.add(new TabMenuItem("Home", "index.jsp?primary=1"));
+    	tabMenu.add(new TabMenuItem("Index", "browsecontroller"));
+    	tabMenu.add(new TabMenuItem("Index - JSP", "browsecontroller-jsp"));
+    	tabMenu.add(new TabMenuItem("Index - ST", "browsecontroller-stringtemplate"));
+    	tabMenu.add(new TabMenuItem("Index - FM", "browsecontroller-freemarker"));
+    	tabMenu.add(new TabMenuItem("Index - Velocity", "browsecontroller-velocity"));   	
+    	tabMenu.add(new TabMenuItem("Index - Wicket", "browsecontroller-wicket"));
+
+    	return tabMenu;
+    }
+    
+    private class TabMenuItem {
+    	String linkText;
+    	String url;
+    	boolean active = false;
+    	
+    	public TabMenuItem(String linkText, String path) {
+    		Page page = Page.this;
+    		this.linkText = linkText;
+    		url = page.getUrl(path);
+    		
+    		HttpServletRequest request = page.request;
+    		String requestUrl = request.getServletPath();
+    		active = requestUrl.equals("/" + path);
+    	}
+    	
+    	public String getLinkText() {
+    		return linkText; 
+    	}
+    	
+    	public String getUrl() {
+    		return url;
+    	}
+    	
+    	public boolean getActive() {
+    		return active;
+    	}
     }
 
 }

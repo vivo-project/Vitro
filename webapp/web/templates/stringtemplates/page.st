@@ -8,8 +8,8 @@ $head()$
     <div id="wrap" class="container">
         <div id="header">
             $identity()$
-            $!  $menu()$ !$
-
+            $menu()$
+            $! $search()$ !$
         </div> <!-- header --> 
         
         <hr class="hidden" />

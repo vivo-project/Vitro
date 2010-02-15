@@ -1,3 +1,5 @@
+$! $This file is distributed under the terms of the license in /doc/license.txt$ !$
+
 <div id="identity">
 
     <h1><a title="Home" href="$homeUrl$">$siteName$</a></h1>

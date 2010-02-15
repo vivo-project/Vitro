@@ -1,3 +1,5 @@
+$! $This file is distributed under the terms of the license in /doc/license.txt$ !$
+
 $if (copyrightText)$
     <div class="copyright">
         &copy;$copyrightYear$&nbsp;
