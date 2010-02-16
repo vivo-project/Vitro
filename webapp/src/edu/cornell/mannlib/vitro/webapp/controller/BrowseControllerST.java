@@ -17,10 +17,12 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
+import edu.cornell.mannlib.vitro.webapp.template.stringtemplate.Page;
+import edu.cornell.mannlib.vitro.webapp.utils.StringTemplateUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.antlr.stringtemplate.StringTemplate;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -79,45 +81,16 @@ public class BrowseControllerST extends VitroHttpServlet {
             super.doGet(request, response);
             VitroRequest vreq = new VitroRequest(request);
 
-            if( vreq.getParameter("clearcache") != null ) //mainly for debugging
-                clearGroupCache();
-
-            //PortalFlag portalState= vreq.getPortalFlag();
-
-            String message = "";
-            List<VClassGroup> groups = getGroups(vreq.getWebappDaoFactory().getVClassGroupDao(), vreq.getPortal().getPortalId());
-
-            if (groups == null || groups.isEmpty()) {
-            	message = "There are not yet any items in the system.";
-            }
-            else {
-            	// Create a list of VClassGroupDisplay objects, each of which wraps a VClassGroup object.
-            	// This allows EL to access VClassGroup properties like publicName, which it can't do
-            	// if passed a linked list.
-            	List<VClassGroupDisplay> vcgroups = new ArrayList<VClassGroupDisplay>();
-            	Iterator i = groups.iterator();
-            	VClassGroup group;
-            	VClassGroupDisplay displayGroup;
-            	while (i.hasNext()) {
-            		group = (VClassGroup) i.next();
-            		displayGroup = new VClassGroupDisplay(group);
-            		vcgroups.add(displayGroup);
-            	}
-            	request.setAttribute("classGroups", vcgroups);
-            }            
+            Portal portal = vreq.getPortal();
+            Page p = new BrowseGroupPage(portal);
+            p.setRequest(vreq);
+            p.setResponse(response);
+            p.generate();
             
-            request.setAttribute("title","Index to "+vreq.getPortal().getAppName()+" Contents");
-            request.setAttribute("bodyJsp","/templates/browse/browseGroupStringTemplate.jsp");
-            request.setAttribute("message", message);
-            //FINALLY: send off to the BASIC_JSP to get turned into HTML
-            RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
-            // run directly to body for testing: RequestDispatcher rd = request.getRequestDispatcher(Controllers.BROWSE_GROUP_JSP);
-            rd.forward(request, response);
         } catch (Throwable e) {
-            log.debug("BrowseControllerST.doGet(): "+ e);
-            request.setAttribute("javax.servlet.jsp.jspException",e);
-            RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
-            rd.forward(request, response);
+            log.error("BrowseController could not forward to view.");
+            log.error(e.getMessage());
+            log.error(e.getStackTrace());
         }
     }
 
@@ -340,4 +313,51 @@ public class BrowseControllerST extends VitroHttpServlet {
     }
 
     protected static String REBUILD_EVERY_PORTAL ="Rebuild every portal.";
+    
+    private class BrowseGroupPage extends Page {
+
+    	public BrowseGroupPage(Portal portal) {
+    		super(BrowseControllerST.this.getServletContext(), portal);
+    	}
+    	
+    	public StringTemplate body() {
+        	StringTemplate bodyST = templates.getInstanceOf("browseGroup");
+
+            if( request.getParameter("clearcache") != null ) //mainly for debugging
+                clearGroupCache();
+
+            //PortalFlag portalState= vreq.getPortalFlag();
+
+            String message = "";
+            List<VClassGroup> groups = getGroups(request.getWebappDaoFactory().getVClassGroupDao(), request.getPortal().getPortalId());
+
+            if (groups == null || groups.isEmpty()) {
+            	message = "There are not yet any items in the system.";
+            	bodyST.setAttribute("message", message); 
+            }
+            else {
+            	// Create a list of VClassGroupDisplay objects, each of which wraps a VClassGroup object.
+            	// This allows EL to access VClassGroup properties like publicName, which it can't do
+            	// if passed a linked list.
+            	List<VClassGroupDisplay> vcgroups = new ArrayList<VClassGroupDisplay>();
+            	Iterator i = groups.iterator();
+            	VClassGroup group;
+            	VClassGroupDisplay displayGroup;
+            	while (i.hasNext()) {
+            		group = (VClassGroup) i.next();
+            		displayGroup = new VClassGroupDisplay(group);
+            		vcgroups.add(displayGroup);
+            	}
+            	bodyST.setAttribute("classGroups", vcgroups);
+            }     
+            bodyST.setAttribute("entityListUri", getUrl("/entitylist?vclassid="));
+                      
+        	return bodyST;    		
+    	}
+    	
+    	public String getTitle() {
+    		return "Index to " + portal.getAppName() + " Contents";
+    	}
+    	
+    }
 }

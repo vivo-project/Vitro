@@ -36,7 +36,7 @@ public class VClassGroupDisplay {
         return vClassGroup.getDisplayRank();
     }
     
-    public String getURI() {
+    public String getUri() {
     	return vClassGroup.getURI();
     }
     

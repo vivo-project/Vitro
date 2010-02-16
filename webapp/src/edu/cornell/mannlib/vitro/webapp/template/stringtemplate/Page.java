@@ -36,17 +36,16 @@ public class Page {
     static {
         templates.setRefreshInterval(0); // don't cache templates
     }
-    
+
+	ServletContext servletContext;
+    protected VitroRequest request;
+    HttpServletResponse response;
+    PrintWriter out;
 	protected Portal portal;
 //	protected List<String> stylesheets = new ArrayList<String>();
 //	protected List<String> scripts = new ArrayList<String>();
-
-	ServletContext servletContext;
-    VitroRequest request;
-    HttpServletResponse response;
-    PrintWriter out;
-    
-    int FILTER_SECURITY_LEVEL = LoginFormBean.EDITOR;
+ 
+    static final int FILTER_SECURITY_LEVEL = LoginFormBean.EDITOR;
        
     public Page(ServletContext servletContext, Portal portal) {
     	this.servletContext = servletContext;
@@ -216,8 +215,8 @@ public class Page {
     	tabMenu.add(new TabMenuItem("Index", "browsecontroller"));
     	tabMenu.add(new TabMenuItem("Index - JSP", "browsecontroller-jsp"));
     	tabMenu.add(new TabMenuItem("Index - ST", "browsecontroller-stringtemplate"));
-    	tabMenu.add(new TabMenuItem("Index - FM", "browsecontroller-freemarker"));
-    	tabMenu.add(new TabMenuItem("Index - Velocity", "browsecontroller-velocity"));   	
+    	tabMenu.add(new TabMenuItem("Index - Velocity", "browsecontroller-velocity"));
+    	tabMenu.add(new TabMenuItem("Index - FM", "browsecontroller-freemarker"));   	
     	tabMenu.add(new TabMenuItem("Index - Wicket", "browsecontroller-wicket"));
 
     	return tabMenu;

@@ -6,7 +6,7 @@ import org.antlr.stringtemplate.StringTemplate;
 
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 
-public class StringTemplateUtils {
+public class StringTemplateUtil {
 
 	// StringTemplate templates handle null values correctly through an if test, but
 	// an empty string is still treated as a value, so we use this method to prevent

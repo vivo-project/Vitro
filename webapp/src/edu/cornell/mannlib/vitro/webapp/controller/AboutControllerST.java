@@ -15,7 +15,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.template.stringtemplate.Page;
-import edu.cornell.mannlib.vitro.webapp.utils.StringTemplateUtils;
+import edu.cornell.mannlib.vitro.webapp.utils.StringTemplateUtil;
 
 public class AboutControllerST extends VitroHttpServlet {
 	
@@ -58,8 +58,8 @@ public class AboutControllerST extends VitroHttpServlet {
         public StringTemplate body() {
         	StringTemplate bodyST = templates.getInstanceOf("about");
         	
-        	StringTemplateUtils.setTemplateStringAttribute(bodyST, "aboutText", portal.getAboutText());
-        	StringTemplateUtils.setTemplateStringAttribute(bodyST, "acknowledgeText", portal.getAcknowledgeText());
+        	StringTemplateUtil.setTemplateStringAttribute(bodyST, "aboutText", portal.getAboutText());
+        	StringTemplateUtil.setTemplateStringAttribute(bodyST, "acknowledgeText", portal.getAcknowledgeText());
         	
         	return bodyST;
         }
