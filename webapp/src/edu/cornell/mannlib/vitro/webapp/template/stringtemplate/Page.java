@@ -24,7 +24,8 @@ import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 //import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-//import edu.cornell.mannlib.vitro.webapp.web.TabWebUtil;
+import edu.cornell.mannlib.vitro.webapp.web.PortalWebUtil;
+import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 
 public class Page {
 	
@@ -44,6 +45,8 @@ public class Page {
     VitroRequest request;
     HttpServletResponse response;
     PrintWriter out;
+    
+    int FILTER_SECURITY_LEVEL = LoginFormBean.EDITOR;
        
     public Page(ServletContext servletContext, Portal portal) {
     	this.servletContext = servletContext;
@@ -55,15 +58,7 @@ public class Page {
   
         StringTemplate pageST = templates.getInstanceOf("page");
 
-        String loginName = getLoginName(request); 
-        if (loginName == null) {
-        	pageST.setAttribute("loginUrl", getUrl(Controllers.LOGIN));
-        }
-        else {
-        	pageST.setAttribute("loginName", loginName);
-        	pageST.setAttribute("logoutUrl", getUrl(Controllers.LOGOUT));
-        	pageST.setAttribute("siteAdminUrl", getUrl(Controllers.SITE_ADMIN));
-        }
+        setLoginInfo(pageST, request);
  
         int portalId = portal.getPortalId();
         pageST.setAttribute("portalId", portalId);
@@ -71,6 +66,10 @@ public class Page {
         pageST.setAttribute("title", getTitle());
         
         pageST.setAttribute("tabMenu", getTabMenu(request));
+        
+        ApplicationBean appBean = request.getAppBean();
+        PortalWebUtil.populateSearchOptions(portal, appBean, request.getWebappDaoFactory().getPortalDao());
+        PortalWebUtil.populateNavigationChoices(portal, request, appBean, request.getWebappDaoFactory().getPortalDao());
         
         // We'll need to separate theme-general and theme-specific stylesheet
         // dirs, so we need either two attributes or a list.
@@ -98,6 +97,8 @@ public class Page {
         pageST.setAttribute("aboutStUrl", getUrl(Controllers.ABOUT + "-stringtemplate?home=" + portalId));
     	// RY Change constants in Controllers from *_JSP to *_URL
         pageST.setAttribute("contactUrl", getUrl(Controllers.CONTACT_JSP));
+        
+        pageST.setAttribute("searchUrl", getUrl(Controllers.SEARCH_URL));
         
         String copyrightText = portal.getCopyrightAnchor();
         if ( ! StringUtils.isBlank(copyrightText) ) {
@@ -140,15 +141,33 @@ public class Page {
     	this.response = response;
     }
     
-    private final String getLoginName(HttpServletRequest request) {
+    private final void setLoginInfo(StringTemplate template, VitroRequest request) {
     	
         String loginName = null;
+        int securityLevel;
+        
         HttpSession session = request.getSession();
         LoginFormBean loginBean = (LoginFormBean) session.getAttribute("loginHandler");
         if (loginBean != null && loginBean.testSessionLevel(request) > -1) {
             loginName = loginBean.getLoginName();
+            securityLevel = Integer.parseInt(loginBean.getLoginRole());
         }   
-        return loginName;
+        if (loginName == null) {
+        	template.setAttribute("loginUrl", getUrl(Controllers.LOGIN));
+        }
+        else {
+        	template.setAttribute("loginName", loginName);
+        	template.setAttribute("logoutUrl", getUrl(Controllers.LOGOUT));
+        	template.setAttribute("siteAdminUrl", getUrl(Controllers.SITE_ADMIN));
+        	securityLevel = Integer.parseInt(loginBean.getLoginRole());
+        	if (securityLevel >= FILTER_SECURITY_LEVEL) {
+        		ApplicationBean appBean = request.getAppBean();
+        		if (appBean.isFlag1Active()) {
+        			template.setAttribute("showFlag1SearchField", true);
+        		}
+        	}
+        	
+        }       
 
     }   
     

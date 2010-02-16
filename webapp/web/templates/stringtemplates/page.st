@@ -8,8 +8,11 @@ $head()$
     <div id="wrap" class="container">
         <div id="header">
             $identity()$
-            $menu()$
-            $! $search()$ !$
+            
+            <div id="navAndSearch" class="block">
+            	$menu()$
+            	$search()$
+            </div> <!-- navAndSearch -->
         </div> <!-- header --> 
         
         <hr class="hidden" />

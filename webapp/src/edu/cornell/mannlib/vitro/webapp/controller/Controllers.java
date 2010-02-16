@@ -64,7 +64,8 @@ public class Controllers {
     public static final String TAB_PRIMARY_JSP = "/templates/tabs/tabprimary.jsp";
 
     public static final String ALPHA_INDEX_JSP = "/templates/alpha/alphaIndex.jsp";
-
+    
+    public static final String SEARCH_URL = "/search";
     public static final String SEARCH_BASIC_JSP = "/templates/search/searchBasic.jsp";
     public static final String SEARCH_PAGED_JSP = "/templates/search/searchPaged.jsp";
     public static final String SEARCH_FAILED_JSP = "/templates/search/searchFailed.jsp";
