@@ -269,6 +269,15 @@
   </servlet-mapping>
   
   <servlet>
+    <servlet-name>AboutControllerSTGF</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.AboutControllerSTGF</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>AboutControllerSTGF</servlet-name>
+    <url-pattern>/about-stringtemplategroupfile</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
     <servlet-name>SiteAdminController</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.SiteAdminController</servlet-class>
   </servlet>
@@ -945,7 +954,13 @@
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.BrowseControllerST</servlet-class>
     <load-on-startup>5</load-on-startup>
   </servlet>
-  
+
+  <servlet>
+    <servlet-name>browsecontrollerSTGF</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.BrowseControllerSTGF</servlet-class>
+    <load-on-startup>5</load-on-startup>
+  </servlet>
+    
   <servlet>
     <servlet-name>browsecontrollerFreeMarker</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.BrowseControllerFreeMarker</servlet-class>
@@ -1083,6 +1098,10 @@
   <servlet-mapping>
     <servlet-name>browsecontrollerST</servlet-name>
     <url-pattern>/browsecontroller-stringtemplate</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>browsecontrollerSTGF</servlet-name>
+    <url-pattern>/browsecontroller-stringtemplategroupfile</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>browsecontrollerFreeMarker</servlet-name>

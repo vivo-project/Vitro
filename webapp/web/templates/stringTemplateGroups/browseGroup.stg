@@ -1,0 +1,26 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+group browseGroup : page;
+
+/******************** MAIN ********************/
+main() ::= <<
+
+	<div id="content" class="siteMap">
+	
+		$if (message)$
+			<p>$message$</p>
+		$else$
+			$classGroups: classGroup()$
+		$endif$
+	
+	</div> <!-- content -->
+>>
+
+/******************** CLASSGROUP ********************/
+classGroup() ::= <<
+
+	<h2>$attr.publicName$</h2>
+	<ul>
+		$attr.vitroClassList: classList()$
+	</ul>
+>>

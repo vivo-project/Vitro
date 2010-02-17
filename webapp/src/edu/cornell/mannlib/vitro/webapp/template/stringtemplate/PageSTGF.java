@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.template.stringtemplate;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -27,14 +29,14 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.web.PortalWebUtil;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 
-public class Page {
+public class PageSTGF {
 	
-    /* Template library */
-    protected static StringTemplateGroup templates =
-        new StringTemplateGroup("stGroup", "vitro-core/webapp/web/templates/stringtemplates");
-
+	public static final String TEMPLATE_GROUP_DIR = "vitro-core/webapp/web/templates/stringTemplateGroups/";
+	// RY In the actual implementation, we should have a single data structure to contain all the template 
+	// groups, rather than separate static variables.
+    protected static StringTemplateGroup pageTemplates = null;    
     static {
-        templates.setRefreshInterval(0); // don't cache templates
+    	initTemplateGroup(pageTemplates, "page.stg");
     }
 
 	ServletContext servletContext;
@@ -47,15 +49,26 @@ public class Page {
  
     static final int FILTER_SECURITY_LEVEL = LoginFormBean.EDITOR;
        
-    public Page(ServletContext servletContext, Portal portal) {
+    public PageSTGF(ServletContext servletContext, Portal portal) {
     	this.servletContext = servletContext;
     	this.portal = portal;
+    }
+    
+    public static void initTemplateGroup(StringTemplateGroup templateGroup, String path) {
+    	path = TEMPLATE_GROUP_DIR + path;
+    	try {   		
+    		templateGroup = new StringTemplateGroup(new FileReader(path), org.antlr.stringtemplate.language.DefaultTemplateLexer.class);
+    		templateGroup.setRefreshInterval(0); // don't cache templates
+    	}
+    	catch (FileNotFoundException e){
+    		// catch error
+    	} 	
     }
 
     public void generate() throws IOException {
         out = response.getWriter();
   
-        StringTemplate pageST = templates.getInstanceOf("page");
+        StringTemplate pageST = pageTemplates.getInstanceOf("main");
 
         setLoginInfo(pageST, request);
  
@@ -94,7 +107,7 @@ public class Page {
         
         pageST.setAttribute("aboutUrl", getUrl(Controllers.ABOUT + "?home=" + portalId));
         pageST.setAttribute("aboutStUrl", getUrl(Controllers.ABOUT + "-stringtemplate?home=" + portalId));
-        pageST.setAttribute("aboutStgfUrl", getUrl(Controllers.ABOUT + "-stringtemplategroupfile?home=" + portalId));        
+        pageST.setAttribute("aboutStgfUrl", getUrl(Controllers.ABOUT + "-stringtemplategroupfile?home=" + portalId));
     	// RY Change constants in Controllers from *_JSP to *_URL
         pageST.setAttribute("contactUrl", getUrl(Controllers.CONTACT_JSP));
         
@@ -230,7 +243,7 @@ public class Page {
     	boolean active = false;
     	
     	public TabMenuItem(String linkText, String path) {
-    		Page page = Page.this;
+    		PageSTGF page = PageSTGF.this;
     		this.linkText = linkText;
     		url = page.getUrl(path);
     		
