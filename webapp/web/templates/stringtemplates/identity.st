@@ -20,7 +20,7 @@ $! $This file is distributed under the terms of the license in /doc/license.txt$
         
         <li class="border"><a href="$aboutUrl$">About</a></li>
         <li class="border"><a href="$aboutStUrl$">About-ST</a></li>
-        <li class="border"><a href="$aboutStgfUrl$">About-STGF</a></li>
+        $! <li class="border"><a href="$aboutStgfUrl$">About-STGF</a></li> !$
         <li><a href="$contactUrl$">Contact Us</a></li>
         
     </ul>

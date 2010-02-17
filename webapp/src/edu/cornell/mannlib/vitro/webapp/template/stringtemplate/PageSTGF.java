@@ -30,20 +30,13 @@ import edu.cornell.mannlib.vitro.webapp.web.PortalWebUtil;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 
 public class PageSTGF {
-	
-	public static final String TEMPLATE_GROUP_DIR = "vitro-core/webapp/web/templates/stringTemplateGroups/";
-	// RY In the actual implementation, we should have a single data structure to contain all the template 
-	// groups, rather than separate static variables.
-    protected static StringTemplateGroup pageTemplates = null;    
-    static {
-    	initTemplateGroup(pageTemplates, "page.stg");
-    }
 
 	ServletContext servletContext;
     protected VitroRequest request;
     HttpServletResponse response;
     PrintWriter out;
 	protected Portal portal;
+	protected StringTemplateGroup pageTemplates;
 //	protected List<String> stylesheets = new ArrayList<String>();
 //	protected List<String> scripts = new ArrayList<String>();
  
@@ -52,16 +45,29 @@ public class PageSTGF {
     public PageSTGF(ServletContext servletContext, Portal portal) {
     	this.servletContext = servletContext;
     	this.portal = portal;
+    	/* 
+    	 * RY In the actual implementation, we should have a single data structure to contain all the template 
+    	 * groups, rather than separate static variables.
+    	 * Also, the template groups should be static variables with a static initialization block,
+    	 * but I can't get that to work yet. There are complications because the subclasses of Page are
+    	 * inner classes and therefore can't have static initializers. So the static initializer would have
+    	 * to belong to the controller, which seems to cause some inheritance problems. For this prototype
+    	 * version, just use instance members. 
+    	 */
+        pageTemplates = initTemplateGroup("page.stg");
     }
     
-    public static void initTemplateGroup(StringTemplateGroup templateGroup, String path) {
-    	path = TEMPLATE_GROUP_DIR + path;
+    protected StringTemplateGroup initTemplateGroup(String templateFilename) {
+    	String path = servletContext.getRealPath("/templates/stringTemplateGroups");
+    	path = path + "/" + templateFilename;
     	try {   		
-    		templateGroup = new StringTemplateGroup(new FileReader(path), org.antlr.stringtemplate.language.DefaultTemplateLexer.class);
+    		StringTemplateGroup templateGroup = new StringTemplateGroup(new FileReader(path), org.antlr.stringtemplate.language.DefaultTemplateLexer.class);
     		templateGroup.setRefreshInterval(0); // don't cache templates
+    		return templateGroup;
     	}
     	catch (FileNotFoundException e){
     		// catch error
+    		return null;
     	} 	
     }
 
@@ -70,6 +76,7 @@ public class PageSTGF {
   
         StringTemplate pageST = pageTemplates.getInstanceOf("main");
 
+        // RY RUNTIME ERROR here: can't set an attribute of pageST. ???
         setLoginInfo(pageST, request);
  
         int portalId = portal.getPortalId();

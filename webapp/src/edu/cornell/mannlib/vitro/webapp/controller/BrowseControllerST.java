@@ -350,7 +350,7 @@ public class BrowseControllerST extends VitroHttpServlet {
             	}
             	bodyST.setAttribute("classGroups", vcgroups);
             }     
-            bodyST.setAttribute("entityListUri", getUrl("/entitylist?vclassid="));
+            bodyST.setAttribute("entityListUri", getUrl("/entitylist?vclassId="));
                       
         	return bodyST;    		
     	}

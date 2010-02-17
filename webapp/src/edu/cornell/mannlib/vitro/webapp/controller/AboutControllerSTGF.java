@@ -21,11 +21,6 @@ import edu.cornell.mannlib.vitro.webapp.utils.StringTemplateUtil;
 public class AboutControllerSTGF extends VitroHttpServlet {
 	
 	private static final Log log = LogFactory.getLog(AboutControllerSTGF.class.getName());
-
-	private static StringTemplateGroup aboutTemplates = null;	
-	static {
-		PageSTGF.initTemplateGroup(aboutTemplates, "about.stg");
-	}
 	
     public void doGet( HttpServletRequest request, HttpServletResponse response )
     	throws IOException, ServletException {
@@ -52,13 +47,17 @@ public class AboutControllerSTGF extends VitroHttpServlet {
     }
     
     private class AboutPage extends PageSTGF { 	
-    	
+
+    	// RY This should be static with a static initializer; see notes in PageSTGF
+    	private StringTemplateGroup aboutTemplates;	
+
     	// RY Note to myself: constructors are not inherited, so this must be declared 
     	// for each subclass of Page.
     	// Not sure if the portal should be handled in the constructor. That might have
     	// implications for template caching.
     	public AboutPage(Portal portal) {
     		super(AboutControllerSTGF.this.getServletContext(), portal);
+    		aboutTemplates = initTemplateGroup("about.stg");
     	}
 
         public StringTemplate body() {

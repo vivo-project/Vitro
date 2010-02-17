@@ -94,7 +94,7 @@ public class Page {
         
         pageST.setAttribute("aboutUrl", getUrl(Controllers.ABOUT + "?home=" + portalId));
         pageST.setAttribute("aboutStUrl", getUrl(Controllers.ABOUT + "-stringtemplate?home=" + portalId));
-        pageST.setAttribute("aboutStgfUrl", getUrl(Controllers.ABOUT + "-stringtemplategroupfile?home=" + portalId));        
+        //pageST.setAttribute("aboutStgfUrl", getUrl(Controllers.ABOUT + "-stringtemplategroupfile?home=" + portalId));        
     	// RY Change constants in Controllers from *_JSP to *_URL
         pageST.setAttribute("contactUrl", getUrl(Controllers.CONTACT_JSP));
         
@@ -216,7 +216,7 @@ public class Page {
     	tabMenu.add(new TabMenuItem("Index", "browsecontroller"));
     	tabMenu.add(new TabMenuItem("Index - JSP", "browsecontroller-jsp"));
     	tabMenu.add(new TabMenuItem("Index - ST", "browsecontroller-stringtemplate"));
-    	tabMenu.add(new TabMenuItem("Index - ST GF", "browsecontroller-stringtemplategroupfile"));
+    	//tabMenu.add(new TabMenuItem("Index - ST GF", "browsecontroller-stringtemplategroupfile"));
     	tabMenu.add(new TabMenuItem("Index - Velocity", "browsecontroller-velocity"));
     	tabMenu.add(new TabMenuItem("Index - FM", "browsecontroller-freemarker"));   	
     	tabMenu.add(new TabMenuItem("Index - Wicket", "browsecontroller-wicket"));

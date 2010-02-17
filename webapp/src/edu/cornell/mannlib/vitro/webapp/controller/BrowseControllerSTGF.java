@@ -44,11 +44,6 @@ public class BrowseControllerSTGF extends VitroHttpServlet {
     private RebuildGroupCacheThread _cacheRebuildThread;
 
     private static final Log log = LogFactory.getLog(BrowseControllerSTGF.class.getName());
-   
-	private static StringTemplateGroup browseGroupTemplates = null;	
-	static {
-		PageSTGF.initTemplateGroup(browseGroupTemplates, "browseGroup.stg");
-	}
 	
     public void init(javax.servlet.ServletConfig servletConfig)
             throws javax.servlet.ServletException {
@@ -321,9 +316,13 @@ public class BrowseControllerSTGF extends VitroHttpServlet {
     protected static String REBUILD_EVERY_PORTAL ="Rebuild every portal.";
     
     private class BrowseGroupPage extends PageSTGF {
-
+    	 
+    	// RY This should be static with a static initializer; see notes in PageSTGF
+    	private StringTemplateGroup browseGroupTemplates;	
+    	
     	public BrowseGroupPage(Portal portal) {
     		super(BrowseControllerSTGF.this.getServletContext(), portal);
+    		browseGroupTemplates = initTemplateGroup("browseGroup.stg");
     	}
     	
     	public StringTemplate body() {
