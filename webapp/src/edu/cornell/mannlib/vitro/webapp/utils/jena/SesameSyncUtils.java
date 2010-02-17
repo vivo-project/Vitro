@@ -27,41 +27,41 @@ public class SesameSyncUtils {
 	    Repository myRepository = new HTTPRepository(serverURI, repositoryId);
 	    myRepository.initialize();
 	    RepositoryConnection myConn = myRepository.getConnection();    
-	    System.out.println(myConn.size()+" statements in remote Sesame");
 	    
-	    Resource contextRes = (contextId != null) 
-	    	? new URIImpl(contextId) : null ;
-	    		
-	    if (contextRes != null) {
-	    	myConn.clear(contextRes);
-	    } else {
-	    	myConn.clear();
-	    }
-	    
-	    System.out.println("Cleared");
-	    System.out.println(myConn.size());
-	    
-	    PipedInputStream in = new PipedInputStream();
-	    PipedOutputStream out = new PipedOutputStream(in);
+	    myConn.setAutoCommit(false);
 	    try {
-		    new Thread((new JenaOutputter(jenaModel, out))).start();
+	    
+		    Resource contextRes = (contextId != null) 
+		    	? new URIImpl(contextId) : null ;
+		    		
 		    if (contextRes != null) {
-		    	myConn.add(in, null, RDFFormat.NTRIPLES, contextRes);
+		    	myConn.clear(contextRes);
 		    } else {
-		    	myConn.add(in, null, RDFFormat.NTRIPLES);
+		    	myConn.clear();
 		    }
+		    
+		    PipedInputStream in = new PipedInputStream();
+		    PipedOutputStream out = new PipedOutputStream(in);
+		    try {
+			    new Thread((new JenaOutputter(jenaModel, out))).start();
+			    if (contextRes != null) {
+			    	myConn.add(in,"http://example.org/base/", RDFFormat.NTRIPLES, contextRes);
+			    } else {
+			    	myConn.add(in,"http://example.org/base/", RDFFormat.NTRIPLES);
+			    }
+		    } finally {
+		    	in.close();
+		    }
+		    
+		    myConn.commit();
+		    
+	    } catch (Exception e) {
+	    	myConn.rollback();
+            e.printStackTrace();
 	    } finally {
-	    	in.close();
-	    }
-	    
-	    System.out.println("Jena model added");
-	    System.out.println(myConn.size());
-	    
-	    myConn.commit();
-	    
-	    myConn.close();
-	    
-	    
+	    	myConn.close();
+	    } 
+  
 	}
 	
 	private class JenaOutputter implements Runnable {
