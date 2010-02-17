@@ -35,11 +35,11 @@
 	</path>
 
 	<path id="test.run.classpath">
+		<!-- To get the data files and the correct log4j.properties, this comes before classes.dir -->
+		<pathelement location="${test.source.dir}" />
+
 		<pathelement location="${test.classes.dir}" />
 		<path refid="test.compile.classpath" />
-
-		<!-- Test data files are stored with the test source -->
-		<pathelement location="${test.source.dir}" />
 	</path>
 
 
@@ -48,6 +48,7 @@
          ================================= -->
 	<target name="describe" description="--> The default target.">
 		<echo>
+all      - Runs "clean", then "deploy".
 clean    - Delete all artifacts so the next build will be from scratch.
 compile  - Compile the Java source files.
 test     - Compile and run the JUnit tests.
@@ -55,6 +56,11 @@ war      - Assemble everything into a deployable WAR file.
 deploy   - Deploy the application directly into the Tomcat webapps directory.
 	    </echo>
 	</target>
+
+	<!-- ================================= 
+          target: all              
+         ================================= -->
+	<target name="all" depends="clean, deploy" description="Run 'clean', then 'deploy'" />
 
 	<!-- ================================= 
           target: clean              
@@ -120,7 +126,10 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
          ================================= -->
 	<target name="compile" depends="prepare" description="Compile Java sources">
 		<!-- deletes all files that depend on changed .java files -->
-		<depend srcdir="${source.dir}" destdir="${classes.dir}" closure="false" cache=".depcache">
+		<depend srcdir="${source.dir}"
+		        destdir="${classes.dir}"
+		        closure="false"
+		        cache="${build.dir}/.depcache">
 			<classpath refid="compile.classpath" />
 		</depend>
 
@@ -161,7 +170,13 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
          - - - - - - - - - - - - - - - - - -->
 	<target name="copyEtc" depends="test">
 		<copy todir="${build.war.dir}">
-			<fileset dir="${web.dir}" />
+			<fileset dir="${web.dir}">
+				<!--
+					If a product doesn't want the core themes, it can
+					set this property and they will be skipped. 
+				-->
+				<exclude name="themes/**/*" if="skip.core.themes" />
+			</fileset>
 		</copy>
 
 		<copy todir="${build.war.dir}/WEB-INF">
@@ -177,6 +192,16 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 			</filterchain>
 		</copy>
 
+		<!-- TODO: Have the Jena code read the userId directly from the deploy.properties -->
+		<copy file="${vitroCore.basedir}/ontologies/auth/example.vitroUsers.owl"
+		      tofile="${build.war.dir}/WEB-INF/ontologies/auth/vitroUsers.owl"
+		      filtering="true">
+			<filterchain>
+				<expandproperties />
+			</filterchain>
+		</copy>
+		<!-- TODO: Have the Jena code read the userId directly from the deploy.properties -->
+
 		<copy todir="${build.war.dir}/WEB-INF/classes">
 			<fileset file="${config.dir}/deploy.properties" />
 		</copy>
@@ -187,10 +212,10 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 
 		<!-- TODO Get rid of these webservices files -->
 		<copy todir="${build.war.dir}/WEB-INF/lib">
-			<fileset dir="${ws.lib}" includes="**/*" excludes="*.LCK" />
+			<fileset dir="${vitroCore.basedir}/../services/lib" includes="**/*" excludes="*.LCK" />
 		</copy>
 		<copy todir="${build.war.dir}">
-			<fileset dir="${ws.dir}/additions" includes="**/*" />
+			<fileset dir="${vitroCore.basedir}/../services/additions" includes="**/*" />
 		</copy>
 		<!-- TODO Get rid of these webservices files -->
 
@@ -219,64 +244,20 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 			</fileset>
 		</copy>
 
-		<copy file="${webapp.dir}/context.xml" tofile="${webapp.build}/META-INF/context.xml" />
+		<copy file="${webapp.dir}/context.xml" tofile="${build.war.dir}/META-INF/context.xml" />
 	</target>
 
-</project>
+	<!-- ================================= 
+          target: deploy              
+         ================================= -->
+	<target name="deploy" depends="copyEtc" description="Deploy to Tomcat">
+		<property name="webapp.deploy.home" value="${tomcat.home}/webapps/${webapp.name}" />
 
-
-<!-- ..................................................................................... -->
-<!-- ..................................................................................... -->
-<!-- ..................................................................................... -->
-<!-- ..................................................................................... -->
-<!-- ..................................................................................... -->
-<!-- ..................................................................................... -->
-<!-- ..................................................................................... -->
-<!-- ..................................................................................... -->
-
-<!--
-<project name="vivoWebApp" default="test" basedir="../">
-
-	</.. Load user property definition overrides ..>
-	<property file="./config/globalbuild.properties" />
-
-	</.. ==================== Runtime Classpath =========================== ..>
-	<path id="webapp-run.classpath">
-		</.. some other jars we need ..>
-		</.. build dir ..>
-		<pathelement path="${webapp.build}" />
-	</path>
-
-	</.. ==================== Deploy Target =================================== ..>
-	</..
-        The "deploy" target copies the contents of the build directory into a
-        location required by our servlet container, and picks up any external
-        dependencies along the way.  After restarting the servlet container, you
-        can now test your web application.    ..>
-	<target name="deploy"
-	        depends="compile,test,copyEtc, localMods"
-	        description="Deploy application to servlet container">
-		</.. Copy the contents of the build directory ..>
 		<mkdir dir="${webapp.deploy.home}" />
+
 		<copy todir="${webapp.deploy.home}">
-			<fileset dir="${webapp.build}" />
+			<fileset dir="${build.war.dir}" />
 		</copy>
 	</target>
 
-	</.. ==================== Javadoc Target ================================== ..>
-	</..
-        The "javadoc" target creates Javadoc API documentation for the Java
-        classes included in your application.  Normally, this is only required
-        when preparing a distribution release, but is available as a separate
-        target in case the developer wants to create Javadocs independently.
-      ..>
-	<target name="javadoc" depends="compile" description="Create Javadoc API documentation">
-		<mkdir dir="${dist.home}/docs" />
-		<javadoc sourcepath="src"
-		         classpathref="compile.classpath"
-		         destdir="${dist.home}/docs"
-		         packagenames="*" />
-	</target>
-
 </project>
--->
