@@ -267,7 +267,7 @@
     <servlet-name>AboutControllerST</servlet-name>
     <url-pattern>/about-stringtemplate</url-pattern>
   </servlet-mapping>
-  
+
   <!--
   <servlet>
     <servlet-name>AboutControllerSTGF</servlet-name>
@@ -278,6 +278,25 @@
     <url-pattern>/about-stringtemplategroupfile</url-pattern>
   </servlet-mapping>
   -->
+   
+  <servlet>
+    <servlet-name>AboutControllerVelocity</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.AboutControllerVelocity</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>AboutControllerVelocity</servlet-name>
+    <url-pattern>/about-velocity</url-pattern>
+  </servlet-mapping>
+ 
+  <servlet>
+    <servlet-name>AboutControllerFreeMarker</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.AboutControllerFreeMarker</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>AboutControllerFreeMarker</servlet-name>
+    <url-pattern>/about-freemarker</url-pattern>
+  </servlet-mapping> 
+
   <servlet>
     <servlet-name>SiteAdminController</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.SiteAdminController</servlet-class>
@@ -963,16 +982,16 @@
     <load-on-startup>5</load-on-startup>
   </servlet>
   -->
-  
-  <servlet>
-    <servlet-name>browsecontrollerFreeMarker</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.BrowseControllerFreeMarker</servlet-class>
-    <load-on-startup>5</load-on-startup>
-  </servlet>
-  
+
   <servlet>
     <servlet-name>browsecontrollerVelocity</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.BrowseControllerVelocity</servlet-class>
+    <load-on-startup>5</load-on-startup>
+  </servlet>
+   
+  <servlet>
+    <servlet-name>browsecontrollerFreeMarker</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.BrowseControllerFreeMarker</servlet-class>
     <load-on-startup>5</load-on-startup>
   </servlet>
   
@@ -1109,12 +1128,12 @@
   </servlet-mapping>
   -->
   <servlet-mapping>
-    <servlet-name>browsecontrollerFreeMarker</servlet-name>
-    <url-pattern>/browsecontroller-freemarker</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
     <servlet-name>browsecontrollerVelocity</servlet-name>
     <url-pattern>/browsecontroller-velocity</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>browsecontrollerFreeMarker</servlet-name>
+    <url-pattern>/browsecontroller-freemarker</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>browsecontrollerWicket</servlet-name>

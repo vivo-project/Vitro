@@ -23,9 +23,10 @@ import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-//import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.web.PortalWebUtil;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
+import edu.cornell.mannlib.vitro.webapp.web.TabWebUtil;
 
 public class Page {
 	
@@ -64,7 +65,7 @@ public class Page {
 
         pageST.setAttribute("title", getTitle());
         
-        pageST.setAttribute("tabMenu", getTabMenu(request));
+        pageST.setAttribute("tabMenu", getTabMenu(request, portalId));
         
         ApplicationBean appBean = request.getAppBean();
         PortalWebUtil.populateSearchOptions(portal, appBean, request.getWebappDaoFactory().getPortalDao());
@@ -95,7 +96,8 @@ public class Page {
         pageST.setAttribute("aboutUrl", getUrl(Controllers.ABOUT + "?home=" + portalId));
         pageST.setAttribute("aboutStUrl", getUrl(Controllers.ABOUT + "-stringtemplate?home=" + portalId));
         //pageST.setAttribute("aboutStgfUrl", getUrl(Controllers.ABOUT + "-stringtemplategroupfile?home=" + portalId));        
-    	// RY Change constants in Controllers from *_JSP to *_URL
+        pageST.setAttribute("aboutVUrl", getUrl(Controllers.ABOUT + "-velocity?home=" + portalId));
+        // RY Change constants in Controllers from *_JSP to *_URL
         pageST.setAttribute("contactUrl", getUrl(Controllers.CONTACT_JSP));
         
         pageST.setAttribute("searchUrl", getUrl(Controllers.SEARCH_URL));
@@ -198,19 +200,14 @@ public class Page {
     	return contextPath + url;
     }
 
-    private List<TabMenuItem> getTabMenu(HttpServletRequest request) {
+    private List<TabMenuItem> getTabMenu(VitroRequest request, int portalId) {
     	List<TabMenuItem> tabMenu = new ArrayList<TabMenuItem>();
     	
-// NB Tabs are not generated dynamically in the current code, they are simply hard-coded in menu.jsp.
-// Needs to be fixed later.
-//    	List primaryTabs = request.getWebappDaoFactory().getTabDao().getPrimaryTabs(portalId);
-//    	
-//        int tabId = TabWebUtil.getTabIdFromRequest(request); 
-//        int rootId = TabWebUtil.getRootTabId(request); 
-//        List tabLevels = request.getWebappDaoFactory().getTabDao().getTabHierarcy(tabId,rootId);
-//        request.setAttribute("tabLevels", tabLevels);
-//        
-//        String uri = (String)request.getAttribute("javax.servlet.forward.request_uri");
+    	List primaryTabs = request.getWebappDaoFactory().getTabDao().getPrimaryTabs(portalId);    	
+        int tabId = TabWebUtil.getTabIdFromRequest(request); 
+        int rootId = TabWebUtil.getRootTabId(request); 
+        List tabLevels = request.getWebappDaoFactory().getTabDao().getTabHierarcy(tabId,rootId);
+        request.setAttribute("tabLevels", tabLevels);       
     	
     	tabMenu.add(new TabMenuItem("Home", "index.jsp?primary=1"));
     	tabMenu.add(new TabMenuItem("Index", "browsecontroller"));

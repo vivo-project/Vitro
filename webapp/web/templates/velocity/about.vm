@@ -1,0 +1,14 @@
+<html>
+    <head>
+        <title>$title</title>
+    </head>
+    <body>
+        #if ($aboutText)
+            <div class="pageGroupBody" id="aboutText">$aboutText</div>
+        #end
+        #if ($acknowledgeText)
+            <div class="pageGroupBody" id="acknowledgementText">$acknowledgeText</div> 
+        #end    
+    </body>
+</html>
+            
