@@ -22,7 +22,6 @@ import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.web.PortalWebUtil;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.web.TabWebUtil;
@@ -204,10 +203,10 @@ public class Page {
     	List<TabMenuItem> tabMenu = new ArrayList<TabMenuItem>();
     	
     	// Tabs stored in database
-    	List<Tab> primaryTabs = request.getWebappDaoFactory().getTabDao().getPrimaryTabs(portalId);    	
+    	List primaryTabs = request.getWebappDaoFactory().getTabDao().getPrimaryTabs(portalId);    	
         int tabId = TabWebUtil.getTabIdFromRequest(request); 
         int rootId = TabWebUtil.getRootTabId(request); 
-        List<Integer> tabLevels = (List<Integer>) request.getWebappDaoFactory().getTabDao().getTabHierarcy(tabId,rootId);
+        List tabLevels = request.getWebappDaoFactory().getTabDao().getTabHierarcy(tabId,rootId);
         request.setAttribute("tabLevels", tabLevels); 
         Iterator<Tab> primaryTabIterator = primaryTabs.iterator();
         Iterator tabLevelIterator = tabLevels.iterator();
