@@ -8,8 +8,7 @@ import java.io.PrintWriter;
 import java.util.Calendar;
 import java.util.List;
 import java.util.ArrayList;
-//import java.util.HashMap;
-//import java.util.Iterator;
+import java.util.Iterator;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -27,6 +26,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.web.PortalWebUtil;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.web.TabWebUtil;
+import edu.cornell.mannlib.vitro.webapp.beans.Tab;
 
 public class Page {
 	
@@ -203,13 +203,22 @@ public class Page {
     private List<TabMenuItem> getTabMenu(VitroRequest request, int portalId) {
     	List<TabMenuItem> tabMenu = new ArrayList<TabMenuItem>();
     	
-    	List primaryTabs = request.getWebappDaoFactory().getTabDao().getPrimaryTabs(portalId);    	
+    	// Tabs stored in database
+    	List<Tab> primaryTabs = request.getWebappDaoFactory().getTabDao().getPrimaryTabs(portalId);    	
         int tabId = TabWebUtil.getTabIdFromRequest(request); 
         int rootId = TabWebUtil.getRootTabId(request); 
-        List tabLevels = request.getWebappDaoFactory().getTabDao().getTabHierarcy(tabId,rootId);
-        request.setAttribute("tabLevels", tabLevels);       
-    	
-    	tabMenu.add(new TabMenuItem("Home", "index.jsp?primary=1"));
+        List<Integer> tabLevels = (List<Integer>) request.getWebappDaoFactory().getTabDao().getTabHierarcy(tabId,rootId);
+        request.setAttribute("tabLevels", tabLevels); 
+        Iterator<Tab> primaryTabIterator = primaryTabs.iterator();
+        Iterator tabLevelIterator = tabLevels.iterator();
+    	Tab tab;
+        while (primaryTabIterator.hasNext()) {
+        	tab = (Tab) primaryTabIterator.next();
+        	tabMenu.add(new TabMenuItem(tab.getTitle(), "index.jsp?primary=" + tab.getTabId()));
+        	// RY Also need to loop through nested tab levels, but not doing that now.
+        }
+        
+        // Hard-coded tabs
     	tabMenu.add(new TabMenuItem("Index", "browsecontroller"));
     	tabMenu.add(new TabMenuItem("Index - JSP", "browsecontroller-jsp"));
     	tabMenu.add(new TabMenuItem("Index - ST", "browsecontroller-stringtemplate"));
