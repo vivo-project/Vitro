@@ -6,39 +6,50 @@
      Build script for the Vitro core webapp.
      
      This can be used on its own, or included into a Product build script.
-                          
-     jeb228                                                                
      ====================================================================== -->
 
 <project name="vitroCore" default="describe">
 
+	<!-- - - - - - - - - - - - - - - - - - 
+          properties                      
+         - - - - - - - - - - - - - - - - - -->
 	<!-- 
-	 If file paths are based on this, they will work, regardless of whether this 
-	 script is run on its own or included into a Product build script.
+		The build directory is located under the directory with the top-level
+		script, so if called from a Product build script, the build directory
+		will be in the Product directory.
+	-->
+	<property name="build.dir" location=".build" />
+
+	<!-- 
+		The webapp directory is based on this script, regardless of whether we 
+		run this script alone, or call it from a Product build script. 
 	 -->
 	<dirname property="vitroCore.basedir" file="${ant.file.vitroCore}" />
+	<property name="webapp.dir" location="${vitroCore.basedir}" />
 
-	<property file="${vitroCore.basedir}/build.properties" />
 
 	<!-- - - - - - - - - - - - - - - - - - 
           paths: for compiling and running                      
          - - - - - - - - - - - - - - - - - -->
 	<path id="compile.classpath">
-		<fileset dir="${library.dir}">
+		<fileset dir="${webapp.dir}/lib">
 			<include name="**/*.jar" />
 		</fileset>
 	</path>
 
 	<path id="test.compile.classpath">
-		<pathelement location="${classes.dir}" />
+		<pathelement location="${build.dir}/war/WEB-INF/classes" />
 		<path refid="compile.classpath" />
 	</path>
 
 	<path id="test.run.classpath">
-		<!-- To get the data files and the correct log4j.properties, this comes before classes.dir -->
-		<pathelement location="${test.source.dir}" />
+		<!-- 
+			To get the data files and the correct log4j.properties, 
+			this comes before the classes directory 
+		-->
+		<pathelement location="${webapp.dir}/test" />
 
-		<pathelement location="${test.classes.dir}" />
+		<pathelement location="${build.dir}/testclasses" />
 		<path refid="test.compile.classpath" />
 	</path>
 
@@ -117,8 +128,8 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
          - - - - - - - - - - - - - - - - - -->
 	<target name="prepare" depends="properties">
 		<mkdir dir="${build.dir}" />
-		<mkdir dir="${classes.dir}" />
-		<mkdir dir="${test.classes.dir}" />
+		<mkdir dir="${build.dir}/war/WEB-INF/classes" />
+		<mkdir dir="${build.dir}/testclasses" />
 	</target>
 
 	<!-- ================================= 
@@ -126,15 +137,15 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
          ================================= -->
 	<target name="compile" depends="prepare" description="Compile Java sources">
 		<!-- deletes all files that depend on changed .java files -->
-		<depend srcdir="${source.dir}"
-		        destdir="${classes.dir}"
+		<depend srcdir="${webapp.dir}/src"
+		        destdir="${build.dir}/war/WEB-INF/classes"
 		        closure="false"
 		        cache="${build.dir}/.depcache">
 			<classpath refid="compile.classpath" />
 		</depend>
 
-		<javac srcdir="${source.dir}"
-		       destdir="${classes.dir}"
+		<javac srcdir="${webapp.dir}/src"
+		       destdir="${build.dir}/war/WEB-INF/classes"
 		       debug="true"
 		       deprecation="true"
 		       optimize="true"
@@ -147,8 +158,8 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
           target: test              
          ================================= -->
 	<target name="test" depends="compile" description="Run JUnit tests">
-		<javac srcdir="${test.source.dir}"
-		       destdir="${test.classes.dir}"
+		<javac srcdir="${webapp.dir}/test"
+		       destdir="${build.dir}/testclasses"
 		       debug="true"
 		       deprecation="true"
 		       optimize="false"
@@ -160,7 +171,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		      fork="yes"
 		      failonerror="true">
 			<classpath refid="test.run.classpath" />
-			<arg file="${test.source.dir}" />
+			<arg file="${webapp.dir}/test" />
 			<arg value="${testlevel}" />
 		</java>
 	</target>
@@ -169,8 +180,8 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
           target: copyEtc                      
          - - - - - - - - - - - - - - - - - -->
 	<target name="copyEtc" depends="test">
-		<copy todir="${build.war.dir}">
-			<fileset dir="${web.dir}">
+		<copy todir="${build.dir}/war">
+			<fileset dir="${webapp.dir}/web">
 				<!--
 					If a product doesn't want the core themes, it can
 					set this property and they will be skipped. 
@@ -179,13 +190,13 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 			</fileset>
 		</copy>
 
-		<copy todir="${build.war.dir}/WEB-INF">
-			<fileset file="${config.dir}/web.xml" />
-			<fileset file="${config.dir}/dwr.xml" />
+		<copy todir="${build.dir}/war/WEB-INF">
+			<fileset file="${webapp.dir}/config/web.xml" />
+			<fileset file="${webapp.dir}/config/dwr.xml" />
 		</copy>
 
-		<copy file="${config.dir}/default.log4j.properties"
-		      tofile="${build.war.dir}/WEB-INF/classes/log4j.properties"
+		<copy file="${webapp.dir}/config/default.log4j.properties"
+		      tofile="${build.dir}/war/WEB-INF/classes/log4j.properties"
 		      filtering="true">
 			<filterchain>
 				<expandproperties />
@@ -194,7 +205,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 
 		<!-- TODO: Have the Jena code read the userId directly from the deploy.properties -->
 		<copy file="${vitroCore.basedir}/ontologies/auth/example.vitroUsers.owl"
-		      tofile="${build.war.dir}/WEB-INF/ontologies/auth/vitroUsers.owl"
+		      tofile="${build.dir}/war/WEB-INF/ontologies/auth/vitroUsers.owl"
 		      filtering="true">
 			<filterchain>
 				<expandproperties />
@@ -202,49 +213,49 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		</copy>
 		<!-- TODO: Have the Jena code read the userId directly from the deploy.properties -->
 
-		<copy todir="${build.war.dir}/WEB-INF/classes">
-			<fileset file="${config.dir}/deploy.properties" />
+		<copy todir="${build.dir}/war/WEB-INF/classes">
+			<fileset file="${deploy.properties.file}" />
 		</copy>
 
-		<copy todir="${build.war.dir}/WEB-INF/tlds">
+		<copy todir="${build.dir}/war/WEB-INF/tlds">
 			<fileset dir="${webapp.dir}/config/tlds" includes="**/*" excludes="*.LCK" />
 		</copy>
 
 		<!-- TODO Get rid of these webservices files -->
-		<copy todir="${build.war.dir}/WEB-INF/lib">
+		<copy todir="${build.dir}/war/WEB-INF/lib">
 			<fileset dir="${vitroCore.basedir}/../services/lib" includes="**/*" excludes="*.LCK" />
 		</copy>
-		<copy todir="${build.war.dir}">
+		<copy todir="${build.dir}/war">
 			<fileset dir="${vitroCore.basedir}/../services/additions" includes="**/*" />
 		</copy>
 		<!-- TODO Get rid of these webservices files -->
 
 		<!-- TODO: These aren't needed in the core -->
-		<copy todir="${build.war.dir}/WEB-INF/ontologies">
-			<fileset dir="${ontologies.dir}" />
+		<copy todir="${build.dir}/war/WEB-INF/ontologies">
+			<fileset dir="${webapp.dir}/ontologies" />
 		</copy>
-		<copy todir="${build.war.dir}/WEB-INF/submodels" failonerror="false">
+		<copy todir="${build.dir}/war/WEB-INF/submodels" failonerror="false">
 			<fileset dir="${webapp.dir}/model/submodels" />
 		</copy>
-		<copy todir="${build.war.dir}/WEB-INF/init-data" failonerror="false">
+		<copy todir="${build.dir}/war/WEB-INF/init-data" failonerror="false">
 			<fileset dir="${webapp.dir}/model/init-data" />
 		</copy>
 		<!-- TODO: These aren't needed in the core -->
 
 		<!-- xml files from src tree -->
-		<copy todir="${build.war.dir}/WEB-INF/classes">
+		<copy todir="${build.dir}/war/WEB-INF/classes">
 			<fileset dir="${webapp.dir}/src" includes="**/*.xml" />
 		</copy>
 
-		<copy todir="${build.war.dir}/WEB-INF/lib">
-			<fileset dir="${library.dir}">
+		<copy todir="${build.dir}/war/WEB-INF/lib">
+			<fileset dir="${webapp.dir}/lib">
 				<!-- these are already in Tomcat: we shouldn't conflict. -->
 				<exclude name="jsp-api.jar" />
 				<exclude name="servlet-api.jar" />
 			</fileset>
 		</copy>
 
-		<copy file="${webapp.dir}/context.xml" tofile="${build.war.dir}/META-INF/context.xml" />
+		<copy file="${webapp.dir}/context.xml" tofile="${build.dir}/war/META-INF/context.xml" />
 	</target>
 
 	<!-- ================================= 
@@ -256,7 +267,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		<mkdir dir="${webapp.deploy.home}" />
 
 		<copy todir="${webapp.deploy.home}">
-			<fileset dir="${build.war.dir}" />
+			<fileset dir="${build.dir}/war" />
 		</copy>
 	</target>
 

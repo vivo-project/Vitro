@@ -100,24 +100,24 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
           target: productCopy                      
          - - - - - - - - - - - - - - - - - -->
 	<target name="productCopy" depends="copyEtc, test">
-		<copy todir="${build.war.dir}/themes">
+		<copy todir="${build.dir}/war/themes">
 			<fileset dir="${product.themes.dir}" />
 		</copy>
 
 		<!-- TODO: Merge these into the productMods -->
-		<copy todir="${build.war.dir}/WEB-INF/ontologies/user">
+		<copy todir="${build.dir}/war/WEB-INF/ontologies/user">
 			<fileset dir="./ontology" />
 		</copy>
 
-		<copy todir="${build.war.dir}/WEB-INF/submodels">
+		<copy todir="${build.dir}/war/WEB-INF/submodels">
 			<fileset dir="./model/submodels" />
 		</copy>
-		<copy todir="${build.war.dir}/WEB-INF/init-data">
+		<copy todir="${build.dir}/war/WEB-INF/init-data">
 			<fileset dir="./model/init-data" />
 		</copy>
 		<!-- TODO: Merge these into the productMods -->
 
-		<copy todir="${build.war.dir}">
+		<copy todir="${build.dir}/war">
 			<fileset dir="./modifications" />
 		</copy>
 	</target>
