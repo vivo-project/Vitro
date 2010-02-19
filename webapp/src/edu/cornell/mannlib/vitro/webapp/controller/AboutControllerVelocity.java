@@ -23,10 +23,10 @@ import org.apache.velocity.exception.ResourceNotFoundException;
 import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.MethodInvocationException;
 
-
+import edu.cornell.mannlib.vitro.webapp.template.velocity.PageController;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 
-public class AboutControllerVelocity extends VitroHttpServlet {
+public class AboutControllerVelocity extends PageController {
 	
 	private static final Log log = LogFactory.getLog(AboutControllerVelocity.class.getName());
 	
@@ -34,16 +34,9 @@ public class AboutControllerVelocity extends VitroHttpServlet {
     	throws IOException, ServletException {
         try {
             super.doGet(request,response);
-            PrintWriter out = response.getWriter();
-            VitroRequest vreq = new VitroRequest(request);
-            Portal portal = vreq.getPortal();
-            ServletContext sc = getServletContext();
-            String templatePath = sc.getRealPath("/templates/velocity");
+
             String templateName = "about.vm";
-            
-            Properties p = new Properties();
-            p.setProperty("file.resource.loader.path", templatePath);
-            Velocity.init(p);
+
             
             VelocityContext context = new VelocityContext();           
             context.put("title", "About " + portal.getAppName());
@@ -81,6 +74,10 @@ public class AboutControllerVelocity extends VitroHttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException {
     	doGet(request, response);
+    }
+    
+    protected String getTitle() {
+    	return "About " + portal.getAppName();
     }
 
 

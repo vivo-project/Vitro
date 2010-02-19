@@ -189,6 +189,11 @@
           <fileset dir="${webapp.dir}/model/submodels"/>
         </copy>
 
+        <!-- copy the velocity files -->
+        <copy todir="${webapp.build}/WEB-INF/velocity" failonerror="false">
+          <fileset dir="${webapp.dir}/velocity"/>
+        </copy>
+		
         <!-- copy the init-data files -->
         <copy todir="${webapp.build}/WEB-INF/init-data" failonerror="false">
           <fileset dir="${webapp.dir}/model/init-data"/>
