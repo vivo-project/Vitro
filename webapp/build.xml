@@ -1,324 +1,284 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <!-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
-<!-- <!DOCTYPE project PUBLIC "-//ANT//DTD project//EN" "ant16.dtd" >  this doesn't seem to work well. -->
+<!-- ====================================================================== 
+     Build script for the Vitro core webapp.
+     
+     This can be used on its own, or included into a Product build script.
+     ====================================================================== -->
 
-<project name="vivoWebApp" default="test" basedir="../">
+<project name="vitroCore" default="describe">
 
-	<!-- Load user property definition overrides -->
-	<property file="./config/globalbuild.properties"/>
+	<!-- - - - - - - - - - - - - - - - - - 
+          properties                      
+         - - - - - - - - - - - - - - - - - -->
+	<!-- 
+		The build directory is located under the directory with the top-level
+		script, so if called from a Product build script, the build directory
+		will be in the Product directory.
+	-->
+	<property name="build.dir" location=".build" />
 
-    <!-- defined in globalbuild.properties -->
-    <!-- <property name="webapp.dir" value="./webapp"/>  -->
-    <!-- <property name="webapp.build" value="${webapp.dir}/.build"/> -->
+	<!-- 
+		The webapp directory is based on this script, regardless of whether we 
+		run this script alone, or call it from a Product build script. 
+	 -->
+	<dirname property="vitroCore.basedir" file="${ant.file.vitroCore}" />
+	<property name="webapp.dir" location="${vitroCore.basedir}" />
 	
-	<!-- Property Definitions -->
-    <property name="app.name" value="vitro-webapp"/>
-    <property name="app.version" value="3.0"/>
+	<!--
+		The log file names will be prefixed with the project name, if this is
+		called from a Product build script.
+	-->
+	<condition property="logfile.prefix" value="">
+		<equals arg1="${ant.file.vitroCore}" arg2="${ant.file}" />
+	</condition>
+	<property name="logfile.prefix" value="${ant.project.name}."/>
 
-    <!-- default lucene index dir:: -->
-    <property name="luceneIndexDir" value="/usr/local/lucene/vitroAntdefault"/>
-    
-    <!-- defined in globalbuild.properties -->
-	<property name="source.dir" value="${source.home}"/>
-    
-    <!-- The clones/build.xml file modifies this default upload directory, now used for images -->
-    <property name="uploadDir" value="${source.dir}/webapp/web" />
 
-	<property name="compile.debug" value="true"/>
-    <property name="compile.deprecation" value="true" />
-    <property name="compile.optimize" value="true" />
 
-	<property name="dist.home" value="${webapp.dir}/dist"/>
-
-    <!-- directory for local modifications -->
-    <property name="modDir"    value="modifications"/>
-
-    <property name="axis.port" value="8080"/>
-    <property name="axis.server" value="localhost"/>
-
-	<!-- ==================== Compilation Classpath =========================== -->
-  	
-	<path id="webapp-compile.classpath">
-      <!-- Include all JAR files that will be included in /WEB-INF/lib -->
-      <fileset dir="webapp/lib">        
-	        <include name="**/*.jar"/>
-      </fileset>
-    </path>
-	
-	<!-- ==================== Runtime Classpath =========================== -->
-	<path id="webapp-run.classpath">
-      <!-- some other jars we need -->
-      <!-- build dir -->
-      <pathelement path="${webapp.build}"/>
+	<!-- - - - - - - - - - - - - - - - - - 
+          paths: for compiling and running                      
+         - - - - - - - - - - - - - - - - - -->
+	<path id="compile.classpath">
+		<fileset dir="${webapp.dir}/lib">
+			<include name="**/*.jar" />
+		</fileset>
 	</path>
 
-    <!-- =================== Axis Classpath ============================== -->
-    <!-- need to include the classes directory so that axis can 
-         find the necessary compiled classes  -->
-    <path id="axis.classpath">
-      <pathelement path="${webapp.build}/WEB-INF/classes"/>
-      <fileset dir="webapp/lib">
-        <include name="**/*.jar" />
-      </fileset>
-    </path>
-    <!-- ================== set up the ant axis tasks ================ -->
-    <taskdef resource="axis-tasks.properties" classpathref="axis.classpath" />
+	<path id="test.compile.classpath">
+		<pathelement location="${build.dir}/war/WEB-INF/classes" />
+		<path refid="compile.classpath" />
+	</path>
 
-	<!-- ==================== All Target ====================================== -->
-	<!--  The "all" target is a shortcut for running the "clean" target followed
-          by the "compile" target, to force a complete recompile.  -->
-	<target name="all" depends="clean,compile" description="Clean build and dist, then compile"/>
-	<!-- ==================== Clean Target ==================================== -->
-	<!-- The "clean" target deletes any previous "build" and "dist" directory,
-     so that you can be ensured the application can be built from scratch.  
-     do not delete the ${deploy.home}/images directory !!! that's where images 
-     are uploaded to-->
-	<target name="clean" description="Delete old build and dist directories">
-		<delete failonerror="false" dir="${webapp.build}"/>
+	<path id="test.run.classpath">
+		<!-- 
+			To get the data files and the correct log4j.properties, 
+			this comes before the classes directory 
+		-->
+		<pathelement location="${webapp.dir}/test" />
+
+		<pathelement location="${build.dir}/testclasses" />
+		<path refid="test.compile.classpath" />
+	</path>
+
+
+	<!-- ================================= 
+          target: describe              
+         ================================= -->
+	<target name="describe" description="--> The default target.">
+		<echo>
+all      - Runs "clean", then "deploy".
+clean    - Delete all artifacts so the next build will be from scratch.
+compile  - Compile the Java source files.
+test     - Compile and run the JUnit tests.
+war      - Assemble everything into a deployable WAR file.
+deploy   - Deploy the application directly into the Tomcat webapps directory.
+	    </echo>
 	</target>
-        
-	<!-- ==================== Compile Target ================================== -->
-	<!--
-        The "compile" target transforms source files (from your "src" directory)
-        into object files in the appropriate location in the build directory.
-        This example assumes that you will be including your classes in an
-        unpacked directory hierarchy under "/WEB-INF/classes".
-    -->
-    <target name="compile" depends="prepare" description="Compile Java sources">
-        <!-- deletes all files that depend on changes .java files -->        
-        <depend srcdir="${webapp.dir}/src" 
-                destdir="${webapp.build}/WEB-INF/classes"                
-                closure="false"
-                cache=".depcache">
-          <classpath refid="webapp-compile.classpath"/>
-        </depend>
-        
-        <echo>Compile webapp</echo>
-		<javac srcdir="${webapp.dir}/src" 
-               destdir="${webapp.build}/WEB-INF/classes" 
-               debug="${compile.debug}" 
-               deprecation="${compile.deprecation}" 
-               optimize="${compile.optimize}" 
-               source="1.5">
-          <classpath refid="webapp-compile.classpath"/>
-<!--           <compilerarg value="-Xlint:unchecked"/> -->
-		</javac>
-    	
-    	<echo>Compile unit tests</echo>
-        <javac srcdir="${webapp.dir}/test"
-    	       destdir="${webapp.build}/WEB-INF/classes" 
-        	   debug="yes"
-    	       source="1.5">
-          <classpath refid="webapp-compile.classpath"/>
-       	</javac>
-    </target>
 
-	<!-- ==================== Test Target ================================== -->
-	<!--
-        The "test" target runs JUnit tests against the compiled classes.
-    -->
-	<target name="test" depends="prepare,compile" description="Run JUnit tests" unless="skiptests">
-		<java classname="edu.cornell.mannlib.vitro.testing.VitroTestRunner" fork="yes" failonerror="true">
-    		<classpath>
-    			<!-- The classes and their supporting JARs -->
-    			<pathelement location="${webapp.build}/WEB-INF/classes" />
-    			<path refid="webapp-compile.classpath" />
-    			
-    			<!-- Test data files are stored with the test source -->
-    			<pathelement location="${webapp.dir}/test" />
-    		</classpath>
+	<!-- ================================= 
+          target: all              
+         ================================= -->
+	<target name="all" depends="clean, deploy" description="Run 'clean', then 'deploy'" />
+
+	<!-- ================================= 
+          target: clean              
+         ================================= -->
+	<target name="clean" description="--> Delete all artifacts.">
+		<delete dir="${build.dir}" />
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: properties                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="properties">
+		<!--
+			If calling from a Product build script, then this property
+			already points to the deploy.properties file of the Product. 
+		-->
+		<property name="deploy.properties.file" location="config/deploy.properties" />
+
+		<fail message="You must create a &quot;${deploy.properties.file}&quot; file.">
+			<condition>
+				<not>
+					<available file="${deploy.properties.file}" />
+				</not>
+			</condition>
+		</fail>
+
+		<property file="${deploy.properties.file}" />
+
+		<fail unless="tomcat.home"
+		      message="${deploy.properties.file} must contain a value for tomcat.home" />
+		<fail unless="webapp.name"
+		      message="${deploy.properties.file} must contain a value for webapp.name" />
+		<fail unless="upload.directory"
+		      message="${deploy.properties.file} must contain a value for upload.directory" />
+		<fail unless="LuceneSetup.indexDir"
+		      message="${deploy.properties.file} must contain a value for LuceneSetup.indexDir" />
+		<fail unless="Vitro.defaultNamespace"
+		      message="${deploy.properties.file} must contain a value for Vitro.defaultNamespace" />
+		<fail unless="Vitro.smtpHost"
+		      message="${deploy.properties.file} must contain a value for Vitro.smtpHost (may be empty)" />
+		<fail unless="VitroConnection.DataSource.url"
+		      message="${deploy.properties.file} must contain a value for VitroConnection.DataSource.url" />
+		<fail unless="VitroConnection.DataSource.username"
+		      message="${deploy.properties.file} must contain a value for VitroConnection.DataSource.username" />
+		<fail unless="VitroConnection.DataSource.password"
+		      message="${deploy.properties.file} must contain a value for VitroConnection.DataSource.password" />
+		<fail unless="initialAdminUser"
+		      message="${deploy.properties.file} must contain a value for initialAdminUser" />
+
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: prepare                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="prepare" depends="properties">
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${build.dir}/war/WEB-INF/classes" />
+		<mkdir dir="${build.dir}/testclasses" />
+	</target>
+
+	<!-- ================================= 
+          target: compile              
+         ================================= -->
+	<target name="compile" depends="prepare" description="Compile Java sources">
+		<!-- deletes all files that depend on changed .java files -->
+		<depend srcdir="${webapp.dir}/src"
+		        destdir="${build.dir}/war/WEB-INF/classes"
+		        closure="false"
+		        cache="${build.dir}/.depcache">
+			<classpath refid="compile.classpath" />
+		</depend>
+
+		<javac srcdir="${webapp.dir}/src"
+		       destdir="${build.dir}/war/WEB-INF/classes"
+		       debug="true"
+		       deprecation="true"
+		       optimize="true"
+		       source="1.5">
+			<classpath refid="compile.classpath" />
+		</javac>
+	</target>
+
+	<!-- ================================= 
+          target: test              
+         ================================= -->
+	<target name="test" depends="compile" description="Run JUnit tests">
+		<javac srcdir="${webapp.dir}/test"
+		       destdir="${build.dir}/testclasses"
+		       debug="true"
+		       deprecation="true"
+		       optimize="false"
+		       source="1.5">
+			<classpath refid="test.compile.classpath" />
+		</javac>
+
+		<java classname="edu.cornell.mannlib.vitro.testing.VitroTestRunner"
+		      fork="yes"
+		      failonerror="true">
+			<classpath refid="test.run.classpath" />
 			<arg file="${webapp.dir}/test" />
 			<arg value="${testlevel}" />
-    	</java>
-    </target>
+		</java>
+	</target>
 
-<!--     ============================== Copy Etc ============================== -->
-<!--     There are configuration files under dream/etc that need to go in different  -->
-<!--     places in the build.  This target copies them to the correct places. -->
-    <target name="copyEtc" 
-            description="copies the files from the dream/etc dir to correct places in build">
-      <echo> ${tomcat.home}</echo>
-      <copy todir="${webapp.build}/WEB-INF">
-        <fileset file="${webapp.dir}/config/web.xml"/>
-        <fileset file="${webapp.dir}/config/dwr.xml"/>
-      </copy>
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: copyEtc                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="copyEtc" depends="test">
+		<copy todir="${build.dir}/war">
+			<fileset dir="${webapp.dir}/web">
+				<!--
+					If a product doesn't want the core themes, it can
+					set this property and they will be skipped. 
+				-->
+				<exclude name="themes/**/*" if="skip.core.themes" />
+			</fileset>
+		</copy>
 
-      <!-- copy the default log4j config and then copy the override if it exists -->
-      <copy file="${webapp.dir}/config/default.log4j.properties"
-            tofile="${webapp.build}/WEB-INF/classes/log4j.properties"
-            filtering="true">
-        <filterchain><expandproperties/></filterchain>
-      </copy>
-      <copy file="${webapp.dir}/config/debugging.log4j.properties"
-            tofile="${webapp.build}/WEB-INF/classes/log4j.properties"
-            filtering="true"
-            failonerror="false">     
-        <filterchain><expandproperties/></filterchain>
-      </copy>
+		<copy todir="${build.dir}/war/WEB-INF">
+			<fileset file="${webapp.dir}/config/web.xml" />
+			<fileset file="${webapp.dir}/config/dwr.xml" />
+		</copy>
 
+		<copy file="${webapp.dir}/config/default.log4j.properties"
+		      tofile="${build.dir}/war/WEB-INF/classes/log4j.properties"
+		      filtering="true">
+			<filterchain>
+				<expandproperties />
+			</filterchain>
+		</copy>
 
-      <!-- copy properties files -->        
-      <copy todir="${webapp.build}/WEB-INF/classes">
-        <fileset dir="${webapp.dir}/config" includes="deploy.properties" />
-      </copy>
-     
-      <copy todir="${webapp.build}/WEB-INF/tlds">
-			<fileset dir="${webapp.dir}/config/tlds" includes="**/*" excludes="*.LCK"/></copy>
-            
-        <!-- copy the webservices files -->
-        <copy todir="${webapp.build}/WEB-INF/lib">
-		  <fileset dir="${ws.lib}"
-                   includes="**/*"
-                   excludes="*.LCK"/>
-        </copy>
-        <copy todir="${webapp.build}">
-		  <fileset dir="${ws.dir}/additions"
-                   includes="**/*"
-                   excludes=".svn"/>
-        </copy>
-        
-        <!-- copy the ontology files -->
-        <copy todir="${webapp.build}/WEB-INF/ontologies">
-          <fileset dir="${webapp.dir}/ontologies"/>
-        </copy>
+		<!-- TODO: Have the Jena code read the userId directly from the deploy.properties -->
+		<copy file="${vitroCore.basedir}/ontologies/auth/example.vitroUsers.owl"
+		      tofile="${build.dir}/war/WEB-INF/ontologies/auth/vitroUsers.owl"
+		      filtering="true">
+			<filterchain>
+				<expandproperties />
+			</filterchain>
+		</copy>
+		<!-- TODO: Have the Jena code read the userId directly from the deploy.properties -->
 
-        <!-- copy the model files -->
-        <copy todir="${webapp.build}/WEB-INF/submodels" failonerror="false">
-          <fileset dir="${webapp.dir}/model/submodels"/>
-        </copy>
+		<copy todir="${build.dir}/war/WEB-INF/classes">
+			<fileset file="${deploy.properties.file}" />
+		</copy>
 
-        <!-- copy the init-data files -->
-        <copy todir="${webapp.build}/WEB-INF/init-data" failonerror="false">
-          <fileset dir="${webapp.dir}/model/init-data"/>
-        </copy>
+		<copy todir="${build.dir}/war/WEB-INF/tlds">
+			<fileset dir="${webapp.dir}/config/tlds" includes="**/*" excludes="*.LCK" />
+		</copy>
 
-        <!-- xml files from src tree -->
-        <copy todir="${webapp.build}/WEB-INF/classes">
-          <fileset dir="${webapp.dir}/src" includes="**/*.xml" excludes="*.svn"/>
-        </copy>
+		<!-- TODO Get rid of these webservices files -->
+		<copy todir="${build.dir}/war/WEB-INF/lib">
+			<fileset dir="${vitroCore.basedir}/../services/lib" includes="**/*" excludes="*.LCK" />
+		</copy>
+		<copy todir="${build.dir}/war">
+			<fileset dir="${vitroCore.basedir}/../services/additions" includes="**/*" />
+		</copy>
+		<!-- TODO Get rid of these webservices files -->
 
-        <copy todir="${webapp.build}/WEB-INF/lib">
-          <fileset dir="${webapp.lib}">
-            <!-- these are already in Tomcat: we shouldn't conflict. -->
-          	<exclude name="jsp-api.jar"/>
-          	<exclude name="servlet-api.jar"/>
-          </fileset>
-        </copy>
+		<!-- TODO: These aren't needed in the core -->
+		<copy todir="${build.dir}/war/WEB-INF/ontologies">
+			<fileset dir="${webapp.dir}/ontologies" />
+		</copy>
+		<copy todir="${build.dir}/war/WEB-INF/submodels" failonerror="false">
+			<fileset dir="${webapp.dir}/model/submodels" />
+		</copy>
+		<copy todir="${build.dir}/war/WEB-INF/init-data" failonerror="false">
+			<fileset dir="${webapp.dir}/model/init-data" />
+		</copy>
+		<!-- TODO: These aren't needed in the core -->
 
-		<copy file="${webapp.dir}/context.xml"
-              tofile="${webapp.build}/META-INF/context.xml" />
-    </target>
+		<!-- xml files from src tree -->
+		<copy todir="${build.dir}/war/WEB-INF/classes">
+			<fileset dir="${webapp.dir}/src" includes="**/*.xml" />
+		</copy>
 
-    <!-- ==================== Local Modifications ============================ -->
-    <!-- The localMods target will copy local modifications into the build directory
-         so that a user can who is not using the clone system can have a way to
-         apply simple chages to the deployed web application.  In many cases
-         there will be no modifications directory so this will do nothing. -->
-    <target name="localMods" depends="compile,test,copyEtc"
-            description="Adds local modifications to build">
-      <copy todir="${webapp.build}" overwrite="true" preservelastmodified="true" failonerror="false">
-        <fileset dir="${modDir}" />
-      </copy>
-    </target>
-            
-    <!-- ==================== Deploy Target =================================== -->
-    <!--
-        The "deploy" target copies the contents of the build directory into a
-        location required by our servlet container, and picks up any external
-        dependencies along the way.  After restarting the servlet container, you
-        can now test your web application.    -->
-	<target name="deploy" depends="compile,test,copyEtc, localMods" 
-            description="Deploy application to servlet container">
-        <!-- Copy the contents of the build directory -->
-		<mkdir dir="${webapp.deploy.home}"/>
+		<copy todir="${build.dir}/war/WEB-INF/lib">
+			<fileset dir="${webapp.dir}/lib">
+				<!-- these are already in Tomcat: we shouldn't conflict. -->
+				<exclude name="jsp-api.jar" />
+				<exclude name="servlet-api.jar" />
+			</fileset>
+		</copy>
+
+		<copy file="${webapp.dir}/context.xml" tofile="${build.dir}/war/META-INF/context.xml" />
+	</target>
+
+	<!-- ================================= 
+          target: deploy              
+         ================================= -->
+	<target name="deploy" depends="copyEtc" description="Deploy to Tomcat">
+		<property name="webapp.deploy.home" value="${tomcat.home}/webapps/${webapp.name}" />
+
+		<mkdir dir="${webapp.deploy.home}" />
+
 		<copy todir="${webapp.deploy.home}">
-			<fileset dir="${webapp.build}"/>
+			<fileset dir="${build.dir}/war" />
 		</copy>
 	</target>
-
-    <!-- ==================== Jar Target ==================== -->
-    <target name="jar" depends="compile,test" description="Makes a jar file">
-      <jar jarfile="${webapp.dir.jar}" basedir="${webapp.build}/WEB-INF/classes"/>
-    </target>
-
-	<!-- ==================== Javadoc Target ================================== -->
-	<!--
-        The "javadoc" target creates Javadoc API documentation for the Java
-        classes included in your application.  Normally, this is only required
-        when preparing a distribution release, but is available as a separate
-        target in case the developer wants to create Javadocs independently.
-      -->
-	<target name="javadoc" depends="compile" description="Create Javadoc API documentation">
-		<mkdir dir="${dist.home}/docs"/>
-		<javadoc sourcepath="src" classpathref="compile.classpath" destdir="${dist.home}/docs" 
-                 packagenames="*"/>
-	</target>
-
-	<!-- ==================== Prepare Target ================================== -->
-	<!--
-        The "prepare" target is used to create the "build" destination directory,
-        and copy the static contents of your web application to it.  
-        Normally, this task is executed indirectly when needed. -->
-	<target name="prepare">
-		<!-- Create build directory and copy static content -->
-		<mkdir dir="${webapp.build}"/>
-		<mkdir dir="${webapp.build}/WEB-INF/classes"/>
-		<mkdir dir="${webapp.build}/WEB-INF/classes/properties"/>
-		<mkdir dir="${webapp.build}/WEB-INF/tlds"/>
-		<!--mkdir dir="${webapp.build}/jsp"/-->
-		<copy todir="${webapp.build}">
-			<fileset dir="${webapp.dir}/web"/>
-		</copy>
-	</target>
-
-    <!-- ==================== setupWs task ==================== -->
-    <target name="setupWs" 
-            description="invoke axis admin to deploy and expose VitroWs">
-    <!-- Notice that this can be run from the command line too:
-         $ java org.apache.axis.client.AdminClient \
-           -lhttp://localhost:8080/vivo/services/AdminService deploy.wsdd -->    
-      <axis-admin
-          port="${axis.port}"
-          hostname="${axis.server}"
-          failonerror="true"
-          servletpath="${webapp.name}/services/AdminService"
-          debug="true"
-          xmlfile="${webapp.dir}/config/VitroWs3.wsdd" />
-    </target>
-
-	<!-- ==================== axis prepare Target ======================== -->
-	<!--
-        The "axis" target is used to fill the "build" directory with files needed
-        for axis web services.
-        Normally, this task is executed indirectly when needed. -->
-    <target name="axisPrepare">
-      <copy todir="${webapp.build}/WEB-INF/classes">
-        <fileset dir="${webapp.dir}/config/axisproperties"
-                 includes="**/*"
-                 excludes=".svn"/>
-      </copy>
-      <copy file="${webapp.dir}/config/VitroWs3.wsdd" 
-            todir="${webapp.build}/WEB-INF" />
-    </target>
-
-    <!-- =================== Create modifications directory ============== -->
-    <target name="prepareModDir"
-            description="create a directory structure to hold 
-                         local modifications"
-            depends="compile,test,copyEtc">
-      <mkdir dir="${modDir}"/>
-      <copy todir="${modDir}" >
-        <fileset dir="${webapp.build}">
-          <type type="dir"/>
-          <exclude name="WEB-INF/classes/"/>
-          <exclude name="jenaIngest"/>
-          <exclude name="src"/>
-        </fileset>
-      </copy>
-
-    </target>
-            
 
 </project>
