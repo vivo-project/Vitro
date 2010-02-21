@@ -22,12 +22,12 @@
     </fail>
 
 	<!-- - - - - - - - - - - - - - - - - - 
-          properties
+      properties
                                 
-          File paths are based on this file's parent directory, so we can find 
-          the files even when this script is included into an individual 
-          Product build script.
-         - - - - - - - - - - - - - - - - - -->
+      File paths are based on this file's parent directory, so we can find 
+      the files even when this script is included into an individual 
+      Product build script.
+     - - - - - - - - - - - - - - - - - -->
 	<dirname property="vivoProduct.basedir" file="${ant.file.vivoProduct}" />
 	<import file="${vivoProduct.basedir}/build.xml" />
 
@@ -43,8 +43,18 @@
 	<property name="product.themes.dir" location="./themes" />
 	<available property="product.themes.exist" file="${product.themes.dir}" />
 
+	<!-- Is there a modifications directory in the product? -->
+	<property name="product.modifications.dir" location="./modifications" />
+	<available property="product.modifications.exist" file="${product.modifications.dir}" />
+
 	<path id="product.compile.classpath">
 		<pathelement location="${classes.dir}" />
+		
+		<!-- These come before the core classpath, so our local mods can override -->
+		<fileset dir="${product.modifications.dir}/WEB-INF/lib">
+			<include name="**/*.jar" />
+		</fileset>
+		
 		<path refid="compile.classpath" />
 	</path>
 
@@ -110,19 +120,6 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 			<fileset dir="${product.themes.dir}" />
 		</copy>
 
-		<!-- TODO: Merge these into the productMods -->
-		<copy todir="${build.dir}/war/WEB-INF/ontologies/user">
-			<fileset dir="./ontology" />
-		</copy>
-
-		<copy todir="${build.dir}/war/WEB-INF/submodels">
-			<fileset dir="./model/submodels" />
-		</copy>
-		<copy todir="${build.dir}/war/WEB-INF/init-data">
-			<fileset dir="./model/init-data" />
-		</copy>
-		<!-- TODO: Merge these into the productMods -->
-
 		<!-- TODO: Have the Jena code read the userId directly from the deploy.properties -->
 		<copy file="config/vitroUsers.owl.template"
 		      tofile="${build.dir}/war/WEB-INF/ontologies/auth/vitroUsers.owl"
@@ -134,7 +131,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		<!-- TODO: Have the Jena code read the userId directly from the deploy.properties -->
 
 		<copy todir="${build.dir}/war">
-			<fileset dir="./modifications" />
+			<fileset dir="${product.modifications.dir}" />
 		</copy>
 	</target>
 
@@ -144,14 +141,14 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 	<target name="productCompile" depends="vitroCore.compile" if="product.sources.exist">
 		<!-- deletes all files that depend on changed .java files -->
 		<depend srcdir="${product.source.dir}"
-		        destdir="${classes.dir}"
+		        destdir="${build.dir}/war/WEB-INF/classes"
 		        closure="false"
 		        cache="${build.dir}/.depcache">
 			<classpath refid="product.compile.classpath" />
 		</depend>
 
 		<javac srcdir="${product.source.dir}"
-		       destdir="${classes.dir}"
+		       destdir="${build.dir}/war/WEB-INF/classes"
 		       debug="true"
 		       deprecation="true"
 		       optimize="true"
