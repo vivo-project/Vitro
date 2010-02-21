@@ -534,7 +534,7 @@ public class UploadImagesServlet extends VitroHttpServlet {
      * @throws IOException
      */
     private  String getSourceDirName() throws IOException{
-        String dirName = ConfigurationProperties.getProperty("UploadImagesServlet.sourceDirName");
+        String dirName = ConfigurationProperties.getProperty("upload.directory");
         if( dirName == null ) {
             log.error("getSourceDirName(): property sourceDirName not defined in configuration properties");
         } else {
