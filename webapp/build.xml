@@ -240,18 +240,6 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		</copy>
 		<!-- TODO Get rid of these webservices files -->
 
-		<!-- TODO: These aren't needed in the core -->
-		<copy todir="${build.dir}/war/WEB-INF/ontologies">
-			<fileset dir="${webapp.dir}/ontologies" />
-		</copy>
-		<copy todir="${build.dir}/war/WEB-INF/submodels" failonerror="false">
-			<fileset dir="${webapp.dir}/model/submodels" />
-		</copy>
-		<copy todir="${build.dir}/war/WEB-INF/init-data" failonerror="false">
-			<fileset dir="${webapp.dir}/model/init-data" />
-		</copy>
-		<!-- TODO: These aren't needed in the core -->
-
 		<!-- xml files from src tree -->
 		<copy todir="${build.dir}/war/WEB-INF/classes">
 			<fileset dir="${webapp.dir}/src" includes="**/*.xml" />
