@@ -58,10 +58,10 @@ public class Page {
         StringTemplate pageST = templates.getInstanceOf("page");
 
         setLoginInfo(pageST, request);
- 
+
         int portalId = portal.getPortalId();
         pageST.setAttribute("portalId", portalId);
-
+        
         pageST.setAttribute("title", getTitle());
         
         pageST.setAttribute("tabMenu", getTabMenu(request, portalId));
@@ -228,7 +228,9 @@ public class Page {
 
     	return tabMenu;
     }
-    
+
+	// RY INTERESTING: Velocity cannot access TabMenuItem methods unless the class is public.
+	// StringTemplate can. Which behavior is correct?
     private class TabMenuItem {
     	String linkText;
     	String url;

@@ -279,28 +279,6 @@
   </servlet-mapping>
   -->
   
-  <!-- Define Velocity template compiler -->
-  <servlet>
-    <servlet-name>velocity</servlet-name>
-    <servlet-class>
-        org.apache.velocity.tools.view.servlet.VelocityLayoutServlet
-    </servlet-class>
-	<init-param>
-        <param-name>org.apache.velocity.toolbox</param-name>
-        <param-value>/WEB-INF/velocity/toolbox.xml</param-value>
-    </init-param>
-    <init-param>
-        <param-name>org.apache.velocity.properties</param-name>
-        <param-value>/WEB-INF/velocity/velocity.properties</param-value>
-    </init-param>
-    <!-- Map *.vm files to Velocity -->
-    <servlet-mapping>
-        <servlet-name>velocity</servlet-name>
-        <url-pattern>*.vm</url-pattern>
-    </servlet-mapping>
-  </servlet>
-  
-  <!--
   <servlet>
     <servlet-name>AboutControllerVelocity</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.AboutControllerVelocity</servlet-class>
@@ -309,7 +287,6 @@
     <servlet-name>AboutControllerVelocity</servlet-name>
     <url-pattern>/about-velocity</url-pattern>
   </servlet-mapping>
-  -->
   
   <servlet>
     <servlet-name>AboutControllerFreeMarker</servlet-name>
@@ -1096,6 +1073,40 @@
     <servlet-name>authtest</servlet-name>
     <url-pattern>/authtest</url-pattern>
   </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>xyzcontroller</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.XYZController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>xyzcontroller</servlet-name>
+    <url-pattern>*.xyz</url-pattern>
+  </servlet-mapping>
+  
+  <!-- Define Velocity template compiler -->
+  <servlet>
+    <servlet-name>velocity</servlet-name>
+    <servlet-class>
+        edu.cornell.mannlib.vitro.webapp.controller.VelocityLayoutServlet
+    </servlet-class>
+	<!--
+    <init-param>
+        <param-name>org.apache.velocity.toolbox</param-name>
+        <param-value>/WEB-INF/velocity/toolbox.xml</param-value>
+    </init-param>
+    <init-param>
+        <param-name>org.apache.velocity.properties</param-name>
+        <param-value>/WEB-INF/velocity/velocity.properties</param-value>
+    </init-param>
+	-->
+    <!-- Map *.vm files to Velocity -->
+    <servlet-mapping>
+        <servlet-name>velocity</servlet-name>
+        <url-pattern>*.vm</url-pattern>
+    </servlet-mapping>
+  </servlet>
+  
+  
 
   <!-- ============================== servlet-mappings ======================== -->
   <servlet-mapping>

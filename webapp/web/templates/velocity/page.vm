@@ -1,1 +1,29 @@
-Hello world
+## $This file is distributed under the terms of the license in /doc/license.txt$ 
+
+#parse("doctype.vm")
+
+#parse("head.vm")
+
+<body>
+    <div id="wrap" class="container">
+        <div id="header">
+            #parse("identity.vm")
+            
+            <div id="navAndSearch" class="block">
+                #parse("menu.vm")
+                ##parse("search.vm")
+            </div> <!-- navAndSearch -->
+            
+        </div> <!-- header --> 
+        
+        <hr class="hidden" />
+        
+        <div id="contentwrap">       
+               
+        </div> <!-- contentwrap -->
+    
+        #parse("footer.vm")
+    
+    </div> <!-- wrap -->
+</body>
+</html>
