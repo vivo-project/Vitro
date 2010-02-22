@@ -49,12 +49,12 @@
 
 	<path id="product.compile.classpath">
 		<pathelement location="${classes.dir}" />
-		
+
 		<!-- These come before the core classpath, so our local mods can override -->
 		<fileset dir="${product.modifications.dir}/WEB-INF/lib">
 			<include name="**/*.jar" />
 		</fileset>
-		
+
 		<path refid="compile.classpath" />
 	</path>
 
@@ -70,7 +70,7 @@
 	<!-- ================================= 
           target: describe              
          ================================= -->
-	<target name="describe" description="--> The default target.">
+	<target name="describe" description="--> Describe the targets (this is the default).">
 		<echo>
 all      - Runs "clean", then "deploy".
 clean    - Delete all artifacts so the next build will be from scratch.
@@ -84,7 +84,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 	<!-- ================================= 
           target: all              
          ================================= -->
-	<target name="all" depends="clean, deploy" description="Run 'clean', then 'deploy'" />
+	<target name="all" depends="clean, deploy" description="--> Run 'clean', then 'deploy'" />
 
 	<!-- ================================= 
           target: clean              
@@ -103,13 +103,15 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 	<!-- ================================= 
           target: test              
          ================================= -->
-	<target name="test" depends="vitroCore.test, productTest" description="-->Run JUnit tests">
+	<target name="test" depends="vitroCore.test, productTest" description="--> Run JUnit tests">
 	</target>
 
 	<!-- ================================= 
           target: deploy              
          ================================= -->
-	<target name="deploy" depends="productCopy, vitroCore.deploy" description="description">
+	<target name="deploy"
+	        depends="productCopy, vitroCore.deploy"
+	        description="--> Build the app and install in Tomcat">
 	</target>
 
 	<!-- - - - - - - - - - - - - - - - - - 
