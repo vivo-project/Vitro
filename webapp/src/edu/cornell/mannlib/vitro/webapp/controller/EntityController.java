@@ -175,7 +175,6 @@ public class EntityController extends VitroHttpServlet {
             } else {
                 log.debug("Found view parameter "+view+" in request for rendering "+entity.getName());
             }
-            
             //set title before we do the highlighting so we don't get markup in it.
             vreq.setAttribute("title",entity.getName());
             //setup highlighter for search terms

@@ -21,4 +21,6 @@ public interface UserDao {
     public void deleteUser(User user);
 
     public List<String> getIndividualsUserMayEditAs(String userURI);
+    
+    public List<String> getUserAccountEmails();
 }

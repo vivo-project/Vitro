@@ -892,6 +892,12 @@
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.ContactMailServlet</servlet-class>
     <load-on-startup>5</load-on-startup>
   </servlet>
+  
+  <servlet>
+    <servlet-name>mailusers</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.MailUsersServlet</servlet-class>
+     <load-on-startup>5</load-on-startup>
+  </servlet>
 
   <servlet>
     <servlet-name>entity</servlet-name>
@@ -1003,6 +1009,10 @@
   <servlet-mapping>
     <servlet-name>sendmail</servlet-name>
     <url-pattern>/sendmail</url-pattern>
+  </servlet-mapping>
+   <servlet-mapping>
+    <servlet-name>mailusers</servlet-name>
+    <url-pattern>/mailusers</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>entity</servlet-name>

@@ -40,6 +40,8 @@ public class UserDaoJena extends JenaBaseDao implements UserDao {
     	return getOntModelSelector().getUserAccountsModel();
     }
     
+    
+    
     public List<User> getAllUsers() {
         List<User> allUsersList = new ArrayList<User>();
         getOntModel().enterCriticalSection(Lock.READ);
@@ -228,5 +230,60 @@ public class UserDaoJena extends JenaBaseDao implements UserDao {
         }
         return uris;
     }
+
+    //Method to get all user accounts that are associated with a person where said person has email address
+    public List<String> getUserAccountEmails() {
+        List<String> email = new ArrayList<String>();
+        List<String> uris = new ArrayList<String>();
+        OntModel ontModel = getOntModel();
+        OntModel baseModel =  getOntModelSelector().getFullModel();
+        ontModel.enterCriticalSection(Lock.READ);
+        String swrcOntology = "http://swrc.ontoware.org/ontology#";
+        String emailProperty = swrcOntology + "email";
+        String emailValue, uri;
+        System.out.println("To clarify here is may edit as " + VitroVocabulary.MAY_EDIT_AS);
+        try{
+        	 Property emailProp = ontModel.getProperty(emailProperty);
+             StmtIterator it = ontModel.listStatements(
+                    null,
+                    ontModel.getProperty(VitroVocabulary.MAY_EDIT_AS),
+                    (RDFNode)null);
+            while(it.hasNext()){
+                try{
+                    Statement stmt = (Statement) it.next();
+                    if( stmt != null && stmt.getObject()!= null 
+                            && stmt.getObject().asNode() != null 
+                            && stmt.getObject().asNode().getURI() != null )
+                    {
+                    	
+                    uri = stmt.getObject().asNode().getURI();	
+                    System.out.println("Returned URI is " + uri);
+                    StmtIterator emailIt = baseModel.listStatements(baseModel.createResource(uri), baseModel.createProperty(emailProperty), (RDFNode) null);
+                    System.out.println("Email iterator successfull ? " + emailIt.hasNext());
+                    while(emailIt.hasNext()) {
+                    	Statement emailSt = (Statement) emailIt.next();
+                    	if(emailSt != null && emailSt.getObject().isLiteral() && emailSt.getObject() != null) {
+                    		email.add(emailSt.getLiteral().getString());
+                    		//Issue: this prints out the email in a tags
+                    		System.out.println("Email Iterator Object Value" + emailSt.getLiteral().getString());
+                    	} else {
+                    		//System.out.println("Unfortunately email statement is null");
+                    	}
+                    }
+                       
+                    }
+                }catch(Exception ex){
+                    log.debug("error in get User Account Emails()",ex);
+                }
+                
+                
+            } 
+            
+        }finally{
+            ontModel.leaveCriticalSection();
+        }
+        return email;
+    }
+    
 
 }
