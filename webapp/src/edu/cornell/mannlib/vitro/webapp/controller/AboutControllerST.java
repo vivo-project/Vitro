@@ -15,7 +15,6 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.template.stringtemplate.Page;
-import edu.cornell.mannlib.vitro.webapp.utils.StringTemplateUtil;
 
 public class AboutControllerST extends VitroHttpServlet {
 	
@@ -59,9 +58,12 @@ public class AboutControllerST extends VitroHttpServlet {
         	
         	StringTemplate bodyST = templates.getInstanceOf("about");       
         	
-        	StringTemplateUtil.setTemplateStringAttribute(bodyST, "aboutText", portal.getAboutText());
-        	StringTemplateUtil.setTemplateStringAttribute(bodyST, "acknowledgeText", portal.getAcknowledgeText());
-        	
+        	// These methods return null rather than empty string if the
+        	// value is undefined, so the stringtemplate $if (acknowledgeText)$ ... $endif$
+        	// will successfully prevent outputting the div if the text is null. 
+        	bodyST.setAttribute("aboutText", portal.getAboutText());
+        	bodyST.setAttribute("acknowledgeText", portal.getAcknowledgeText());
+
         	return bodyST;
         }
 

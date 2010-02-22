@@ -983,13 +983,11 @@
   </servlet>
   -->
    
-  <!--
   <servlet>
     <servlet-name>browsecontrollerVelocity</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.BrowseControllerVelocity</servlet-class>
     <load-on-startup>5</load-on-startup>
   </servlet>
-  -->
   
   <servlet>
     <servlet-name>browsecontrollerFreeMarker</servlet-name>
@@ -1163,12 +1161,10 @@
     <url-pattern>/browsecontroller-stringtemplategroupfile</url-pattern>
   </servlet-mapping>
   -->
-  <!--
   <servlet-mapping>
     <servlet-name>browsecontrollerVelocity</servlet-name>
     <url-pattern>/browsecontroller-velocity</url-pattern>
   </servlet-mapping>
-  -->
   
   <servlet-mapping>
     <servlet-name>browsecontrollerFreeMarker</servlet-name>
