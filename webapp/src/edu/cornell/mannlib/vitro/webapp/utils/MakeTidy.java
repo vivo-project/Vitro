@@ -2,32 +2,24 @@
 
 package edu.cornell.mannlib.vitro.webapp.utils;
 
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.io.Writer;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.w3c.tidy.Tidy;
 
 public class MakeTidy {
-    private static final Log log = LogFactory.getLog(MakeTidy.class.getName());
-    private static PrintWriter outFile = null;
-    
-    public MakeTidy() {
-        try {
-            outFile = new PrintWriter( new FileWriter( "tidyErrorOutput.log"));
-            System.out.println("logging errors to tidy.error.output in Tomcat logs directory\n");
-        } catch (IOException ex) {
-            log.error("cannot open Tidy error output file");
-        }
-    }
+	private static final Logger log = Logger.getLogger(MakeTidy.class);
+	private static PrintWriter outFile = new PrintWriter(new LoggingWriter(log,
+			Level.INFO));
 
-	public String process (String value) {
-	    Tidy tidy = new Tidy(); // obtain a new Tidy instance
-	    
+	public String process(String value) {
+		Tidy tidy = new Tidy(); // obtain a new Tidy instance
+
 	    // set desired config options using tidy setters: see http://jtidy.sourceforge.net/apidocs/index.html
 	    tidy.setAsciiChars(true);                // convert quotes and dashes to nearest ASCII character
 	    tidy.setDropEmptyParas(true);            // discard empty p elements
@@ -44,16 +36,72 @@ public class MakeTidy {
 	    tidy.setWord2000(true);                  // draconian cleaning for Word 2000
         tidy.setXHTML(true);                     // output extensible HTML
 	    
-        if (outFile != null /* && (log.isDebugEnabled() */) {
-            tidy.setErrout(outFile);
-            tidy.setShowErrors(Integer.MAX_VALUE);
-            outFile.println("\nInput:\n"+value+"\n");
-        }
-        
-	    StringWriter sw = new StringWriter();
-      /*Node rootNode = */tidy. parse(new StringReader(value),sw);
-        String outputStr = sw.toString();
+		tidy.setErrout(outFile);
+		tidy.setShowErrors(Integer.MAX_VALUE);
+		outFile.println("\nInput:\n" + value + "\n");
+
+		StringWriter sw = new StringWriter();
+		/* Node rootNode = */tidy.parse(new StringReader(value), sw);
+		String outputStr = sw.toString();
 		log.debug("\nTidied Output:\n" + outputStr + "\n");
-        return outputStr;        
+		return outputStr;
+	}
+
+	private static class LoggingWriter extends Writer {
+		private final Logger logger;
+		private final Level level;
+		private String buffer;
+
+		LoggingWriter(Logger logger, Level level) {
+			this.logger = logger;
+			this.level = level;
+			this.buffer = "";
+		}
+
+		/**
+		 * Append the new stuff to the buffer, and write any complete lines to
+		 * the log.
+		 */
+		@Override
+		public void write(char[] cbuf, int off, int len) throws IOException {
+			buffer += new String(cbuf, off, len);
+			dumpLines();
+		}
+
+		/**
+		 * If the buffer isn't empty, clean it out by completing the line and
+		 * dumping it to the log.
+		 */
+		@Override
+		public void close() throws IOException {
+			if (buffer.length() > 0) {
+				buffer += "\n";
+				dumpLines();
+			}
+		}
+
+		/**
+		 * We don't want to log a partial line, so {@link #flush()} does
+		 * nothing.
+		 */
+		@Override
+		public void flush() throws IOException {
+		}
+
+		/**
+		 * If there are any complete lines in the buffer, write them to the log
+		 * and remove them from the buffer.
+		 */
+		private void dumpLines() {
+			while (true) {
+				int lineEnd = buffer.indexOf("\n");
+				if (lineEnd == -1) {
+					return;
+				} else {
+					logger.log(level, buffer.substring(0, lineEnd).trim());
+					buffer = buffer.substring(lineEnd + 1);
+				}
+			}
+		}
 	}
 }
