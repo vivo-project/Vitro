@@ -8,7 +8,7 @@ import org.junit.Test;
 
 import com.hp.hpl.jena.rdf.model.Literal;
 
-public class TestEditLiteral {
+public class EditLiteralTest {
 
     @Test
     public void testEqual(){
