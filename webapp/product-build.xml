@@ -118,21 +118,21 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
           target: productCopy                      
          - - - - - - - - - - - - - - - - - -->
 	<target name="productCopy" depends="copyEtc, test">
-		<copy todir="${build.dir}/war/themes">
+		<copy todir="${build.dir}/war/themes" overwrite="true">
 			<fileset dir="${product.themes.dir}" />
 		</copy>
 
 		<!-- TODO: Have the Jena code read the userId directly from the deploy.properties -->
 		<copy file="config/vitroUsers.owl.template"
 		      tofile="${build.dir}/war/WEB-INF/ontologies/auth/vitroUsers.owl"
-		      filtering="true">
+		      filtering="true" overwrite="true">
 			<filterchain>
 				<expandproperties />
 			</filterchain>
 		</copy>
 		<!-- TODO: Have the Jena code read the userId directly from the deploy.properties -->
 
-		<copy todir="${build.dir}/war">
+		<copy todir="${build.dir}/war" overwrite="true">
 			<fileset dir="${product.modifications.dir}" />
 		</copy>
 	</target>
