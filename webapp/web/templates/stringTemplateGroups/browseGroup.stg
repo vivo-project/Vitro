@@ -4,16 +4,12 @@ group browseGroup : page;
 
 /******************** MAIN ********************/
 main() ::= <<
-
-	<div id="content" class="siteMap">
 	
-		$if (message)$
-			<p>$message$</p>
-		$else$
-			$classGroups: classGroup()$
-		$endif$
-	
-	</div> <!-- content -->
+	$if (message)$
+		<p>$message$</p>
+	$else$
+		$classGroups: classGroup()$
+	$endif$	
 >>
 
 /******************** CLASSGROUP ********************/

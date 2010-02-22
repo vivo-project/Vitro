@@ -56,7 +56,8 @@ public class AboutControllerST extends VitroHttpServlet {
     	}
 
         public StringTemplate body() {
-        	StringTemplate bodyST = templates.getInstanceOf("about");
+        	
+        	StringTemplate bodyST = templates.getInstanceOf("about");       
         	
         	StringTemplateUtil.setTemplateStringAttribute(bodyST, "aboutText", portal.getAboutText());
         	StringTemplateUtil.setTemplateStringAttribute(bodyST, "acknowledgeText", portal.getAcknowledgeText());

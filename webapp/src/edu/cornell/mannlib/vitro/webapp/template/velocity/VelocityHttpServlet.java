@@ -18,13 +18,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.antlr.stringtemplate.StringTemplate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
-import org.apache.velocity.exception.MethodInvocationException;
 import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
 
@@ -127,26 +125,8 @@ public class VelocityHttpServlet extends VitroHttpServlet {
 	        // Get page-specific body content
 	        context.put("body", getBody());
 	
-	        Template template = null;
-	        try {
-	        	template = Velocity.getTemplate(templateName);
-	
-	        }
-	        catch (ResourceNotFoundException e) {
-	        	System.out.println("Can't find template " + templateName);
-	        }
-	        catch (ParseErrorException e) {
-	        	System.out.println("Problem parsing template " + templateName);
-	        }           	
-	        catch (MethodInvocationException e) {
-	        	System.out.println("Method invocation exception in template " + templateName);
-	        }
-	
-	        StringWriter sw = new StringWriter();
-	        if (template != null) {
-	        	template.merge(context, sw);
-	        	out.print(sw);
-	        }
+	        StringWriter sw = mergeTemplateToContext(templateName, context);
+	        out.print(sw);
 	        
 	    } catch (Throwable e) {
 	        log.error("PageController could not forward to view.");
@@ -166,6 +146,34 @@ public class VelocityHttpServlet extends VitroHttpServlet {
     
     protected String getBody() {
     	return null;
+    }
+    
+    protected StringWriter mergeTemplateToContext(String templateName, VelocityContext context) {
+    	
+        Template template = null;
+        try {
+        	template = Velocity.getTemplate(templateName);
+        }
+        catch (ResourceNotFoundException e) {
+        	System.out.println("Can't find template " + templateName);
+        }
+        catch (ParseErrorException e) {
+        	System.out.println("Problem parsing template " + templateName);
+        }           	
+        catch (Exception e) {
+        	System.out.println("Error merging template " + templateName + " to context");
+        }
+
+        StringWriter sw = new StringWriter();
+        if (template != null) {
+        	try {
+        		template.merge(context, sw);
+        	}
+        	catch (IOException e) {
+        		System.out.println("Error merging template " + templateName + " to context");
+        	}
+        }
+        return sw;
     }
 
 	//  public void setStylesheets() {

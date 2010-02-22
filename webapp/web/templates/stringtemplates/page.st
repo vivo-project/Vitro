@@ -18,7 +18,9 @@ $head()$
         <hr class="hidden" />
         
         <div id="contentwrap">       
-            $body$    
+        	<div id="content" $if (contentClass)$ class="$contentClass$" $endif$>
+            	$body$  
+           	</div> <!-- content -->  
         </div> <!-- contentwrap -->
     
         $footer()$

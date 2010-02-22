@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.utils;
 
 import org.antlr.stringtemplate.StringTemplate;
-
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 
 public class StringTemplateUtil {
@@ -18,4 +17,5 @@ public class StringTemplateUtil {
 			template.setAttribute(attribute, value);
 		}
 	}
+	
 }

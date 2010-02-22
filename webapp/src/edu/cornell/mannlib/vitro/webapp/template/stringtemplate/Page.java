@@ -42,6 +42,8 @@ public class Page {
     HttpServletResponse response;
     PrintWriter out;
 	protected Portal portal;
+	protected StringTemplate pageST;
+	
 //	protected List<String> stylesheets = new ArrayList<String>();
 //	protected List<String> scripts = new ArrayList<String>();
  
@@ -55,7 +57,7 @@ public class Page {
     public void generate() throws IOException {
         out = response.getWriter();
   
-        StringTemplate pageST = templates.getInstanceOf("page");
+        pageST = templates.getInstanceOf("page");
 
         setLoginInfo(pageST, request);
 

@@ -321,6 +321,11 @@ public class BrowseControllerST extends VitroHttpServlet {
     	}
     	
     	public StringTemplate body() {
+    		
+        	// Set main page template attributes specific to this page
+        	pageST.setAttribute("contentClass", "siteMap");
+        	
+        	// Set body template attributes
         	StringTemplate bodyST = templates.getInstanceOf("browseGroup");
 
             if( request.getParameter("clearcache") != null ) //mainly for debugging

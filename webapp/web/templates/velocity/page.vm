@@ -19,7 +19,9 @@
         <hr class="hidden" />
         
         <div id="contentwrap">       
-               
+            <div id="content" #if ($contentClass) class="$contentClass" #end>
+                $body  
+            </div> <!-- content -->
         </div> <!-- contentwrap -->
     
         #parse("footer.vm")

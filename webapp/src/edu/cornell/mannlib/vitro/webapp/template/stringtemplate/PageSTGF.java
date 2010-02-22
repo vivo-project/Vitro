@@ -35,6 +35,7 @@ public class PageSTGF {
     PrintWriter out;
 	protected Portal portal;
 	protected StringTemplateGroup pageTemplates;
+	protected StringTemplate pageST;
 //	protected List<String> stylesheets = new ArrayList<String>();
 //	protected List<String> scripts = new ArrayList<String>();
  
@@ -72,7 +73,7 @@ public class PageSTGF {
     public void generate() throws IOException {
         out = response.getWriter();
   
-        StringTemplate pageST = pageTemplates.getInstanceOf("main");
+        pageST = pageTemplates.getInstanceOf("main");
 
         // RY RUNTIME ERROR here: can't set an attribute of pageST. ???
         setLoginInfo(pageST, request);
