@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -32,8 +31,7 @@ public class Page {
     /* Template library */
     public static StringTemplateGroup templates = null;
 
-	ServletContext servletContext;
-    protected VitroRequest request;
+    protected VitroRequest vreq;
     HttpServletResponse response;
     PrintWriter out;
 	protected Portal portal;
@@ -44,8 +42,7 @@ public class Page {
  
     static final int FILTER_SECURITY_LEVEL = LoginFormBean.EDITOR;
        
-    public Page(ServletContext servletContext, Portal portal) {
-    	this.servletContext = servletContext;
+    public Page(Portal portal) {
     	this.portal = portal;
     }
 
@@ -54,18 +51,18 @@ public class Page {
   
         pageST = templates.getInstanceOf("page");
 
-        setLoginInfo(pageST, request);
+        setLoginInfo(pageST, vreq);
 
         int portalId = portal.getPortalId();
         pageST.setAttribute("portalId", portalId);
         
         pageST.setAttribute("title", getTitle());
         
-        pageST.setAttribute("tabMenu", getTabMenu(request, portalId));
+        pageST.setAttribute("tabMenu", getTabMenu(vreq, portalId));
         
-        ApplicationBean appBean = request.getAppBean();
-        PortalWebUtil.populateSearchOptions(portal, appBean, request.getWebappDaoFactory().getPortalDao());
-        PortalWebUtil.populateNavigationChoices(portal, request, appBean, request.getWebappDaoFactory().getPortalDao());
+        ApplicationBean appBean = vreq.getAppBean();
+        PortalWebUtil.populateSearchOptions(portal, appBean, vreq.getWebappDaoFactory().getPortalDao());
+        PortalWebUtil.populateNavigationChoices(portal, vreq, appBean, vreq.getWebappDaoFactory().getPortalDao());
         
         // We'll need to separate theme-general and theme-specific stylesheet
         // dirs, so we need either two attributes or a list.
@@ -131,22 +128,22 @@ public class Page {
 //    	//scripts.add
 //    }
     
-    public void setRequest(VitroRequest request) {
-    	this.request = request;
+    public void setRequest(VitroRequest vreq) {
+    	this.vreq = vreq;
     }
     
     public void setResponse(HttpServletResponse response) {
     	this.response = response;
     }
     
-    private final void setLoginInfo(StringTemplate template, VitroRequest request) {
+    private final void setLoginInfo(StringTemplate template, VitroRequest vreq) {
     	
         String loginName = null;
         int securityLevel;
         
-        HttpSession session = request.getSession();
+        HttpSession session = vreq.getSession();
         LoginFormBean loginBean = (LoginFormBean) session.getAttribute("loginHandler");
-        if (loginBean != null && loginBean.testSessionLevel(request) > -1) {
+        if (loginBean != null && loginBean.testSessionLevel(vreq) > -1) {
             loginName = loginBean.getLoginName();
             securityLevel = Integer.parseInt(loginBean.getLoginRole());
         }   
@@ -159,7 +156,7 @@ public class Page {
         	template.setAttribute("siteAdminUrl", getUrl(Controllers.SITE_ADMIN));
         	securityLevel = Integer.parseInt(loginBean.getLoginRole());
         	if (securityLevel >= FILTER_SECURITY_LEVEL) {
-        		ApplicationBean appBean = request.getAppBean();
+        		ApplicationBean appBean = vreq.getAppBean();
         		if (appBean.isFlag1Active()) {
         			template.setAttribute("showFlag1SearchField", true);
         		}
@@ -188,7 +185,7 @@ public class Page {
 //    }
     
     protected String getUrl(String path) {
-    	String contextPath = servletContext.getContextPath();
+    	String contextPath = vreq.getContextPath();
     	String url = path;
     	if ( ! url.startsWith("/") ) {
     		url = "/" + url;
@@ -196,15 +193,15 @@ public class Page {
     	return contextPath + url;
     }
 
-    private List<TabMenuItem> getTabMenu(VitroRequest request, int portalId) {
+    private List<TabMenuItem> getTabMenu(VitroRequest vreq, int portalId) {
     	List<TabMenuItem> tabMenu = new ArrayList<TabMenuItem>();
     	
     	// Tabs stored in database
-    	List primaryTabs = request.getWebappDaoFactory().getTabDao().getPrimaryTabs(portalId);    	
-        int tabId = TabWebUtil.getTabIdFromRequest(request); 
-        int rootId = TabWebUtil.getRootTabId(request); 
-        List tabLevels = request.getWebappDaoFactory().getTabDao().getTabHierarcy(tabId,rootId);
-        request.setAttribute("tabLevels", tabLevels); 
+    	List primaryTabs = vreq.getWebappDaoFactory().getTabDao().getPrimaryTabs(portalId);    	
+        int tabId = TabWebUtil.getTabIdFromRequest(vreq); 
+        int rootId = TabWebUtil.getRootTabId(vreq); 
+        List tabLevels = vreq.getWebappDaoFactory().getTabDao().getTabHierarcy(tabId,rootId);
+        vreq.setAttribute("tabLevels", tabLevels); 
         Iterator<Tab> primaryTabIterator = primaryTabs.iterator();
         Iterator tabLevelIterator = tabLevels.iterator();
     	Tab tab;
@@ -238,8 +235,8 @@ public class Page {
     		this.linkText = linkText;
     		url = page.getUrl(path);
     		
-    		HttpServletRequest request = page.request;
-    		String requestUrl = request.getServletPath();
+    		HttpServletRequest vreq = page.vreq;
+    		String requestUrl = vreq.getServletPath();
     		active = requestUrl.equals("/" + path);
     	}
     	

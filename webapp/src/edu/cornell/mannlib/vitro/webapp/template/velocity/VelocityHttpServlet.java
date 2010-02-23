@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -47,7 +46,6 @@ public class VelocityHttpServlet extends VitroHttpServlet {
 	protected PrintWriter out;
 	protected Portal portal;
 	protected VelocityContext context;
-	protected ServletContext servletContext;
 	
     public void doGet( HttpServletRequest request, HttpServletResponse response )
 		throws IOException, ServletException {
@@ -57,21 +55,9 @@ public class VelocityHttpServlet extends VitroHttpServlet {
 	        out = response.getWriter();
 	        vreq = new VitroRequest(request);
 	        portal = vreq.getPortal();
-	        
-	        servletContext = getServletContext();
-	        // RY FIX! This needs to be done in a static initializer, not when
-	        // processing each request.
-	        String templatePath = servletContext.getRealPath("/templates/velocity");
+	        context = new VelocityContext();   	        
 	        String templateName = "page.vm";
-	        
-	        // This should be done once on application startup only!!
-	        Properties p = new Properties();
-	        p.setProperty("file.resource.loader.path", templatePath);
-	        p.setProperty("runtime.references.strict", "true"); // for debugging; turn off in production
-	        Velocity.init(p);
-	        
-	        context = new VelocityContext();   
-	        
+	        	               
 	        setLoginInfo();
 	        
 	        int portalId = portal.getPortalId();
@@ -132,7 +118,7 @@ public class VelocityHttpServlet extends VitroHttpServlet {
 	        out.print(sw);
 	        
 	    } catch (Throwable e) {
-	        log.error("PageController could not forward to view.");
+	        log.error("VelocityHttpServlet could not forward to view.");
 	        log.error(e.getMessage());
 	        log.error(e.getStackTrace());
 	    }
@@ -237,7 +223,7 @@ public class VelocityHttpServlet extends VitroHttpServlet {
 	//}
 	
 	protected String getUrl(String path) {
-		String contextPath = servletContext.getContextPath();
+		String contextPath = vreq.getContextPath();
 		String url = path;
 		if ( ! url.startsWith("/") ) {
 			url = "/" + url;

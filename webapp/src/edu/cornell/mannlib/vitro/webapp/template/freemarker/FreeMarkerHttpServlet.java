@@ -5,7 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.template.freemarker;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Properties;
 
 import java.util.Calendar;
 import java.util.List;
@@ -42,7 +41,6 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 	protected VitroRequest vreq;
 	protected PrintWriter out;
 	protected Portal portal;
-	protected ServletContext servletContext;
 	
     public void doGet( HttpServletRequest request, HttpServletResponse response )
 		throws IOException, ServletException {
@@ -229,14 +227,14 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 	//    return url;       
 	//}
 	
-	protected String getUrl(String path) {
-		String contextPath = servletContext.getContextPath();
-		String url = path;
-		if ( ! url.startsWith("/") ) {
-			url = "/" + url;
-		}
-		return contextPath + url;
-	}
+//	protected String getUrl(String path) {
+//		String contextPath = vreq.getContextPath();
+//		String url = path;
+//		if ( ! url.startsWith("/") ) {
+//			url = "/" + url;
+//		}
+//		return contextPath + url;
+//	}
 	
 //	private List<TabMenuItem> getTabMenu(int portalId) {
 //		List<TabMenuItem> tabMenu = new ArrayList<TabMenuItem>();

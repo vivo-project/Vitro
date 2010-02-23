@@ -51,7 +51,7 @@ public class AboutControllerST extends VitroHttpServlet {
     	// Not sure if the portal should be handled in the constructor. That might have
     	// implications for template caching.
     	public AboutPage(Portal portal) {
-    		super(AboutControllerST.this.getServletContext(), portal);
+    		super(portal);
     	}
 
         public StringTemplate body() {

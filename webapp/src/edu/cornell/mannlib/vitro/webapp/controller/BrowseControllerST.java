@@ -316,7 +316,7 @@ public class BrowseControllerST extends VitroHttpServlet {
     private class BrowseGroupPage extends Page {
 
     	public BrowseGroupPage(Portal portal) {
-    		super(BrowseControllerST.this.getServletContext(), portal);
+    		super(portal);
     	}
     	
     	public StringTemplate body() {
@@ -327,13 +327,13 @@ public class BrowseControllerST extends VitroHttpServlet {
         	// Set body template attributes
         	StringTemplate bodyST = templates.getInstanceOf("browseGroup");
 
-            if( request.getParameter("clearcache") != null ) //mainly for debugging
+            if( vreq.getParameter("clearcache") != null ) //mainly for debugging
                 clearGroupCache();
 
             //PortalFlag portalState= vreq.getPortalFlag();
 
             String message = "";
-            List<VClassGroup> groups = getGroups(request.getWebappDaoFactory().getVClassGroupDao(), request.getPortal().getPortalId());
+            List<VClassGroup> groups = getGroups(vreq.getWebappDaoFactory().getVClassGroupDao(), vreq.getPortal().getPortalId());
 
             if (groups == null || groups.isEmpty()) {
             	message = "There are not yet any items in the system.";
