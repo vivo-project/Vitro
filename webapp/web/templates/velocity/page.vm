@@ -11,7 +11,7 @@
             
             <div id="navAndSearch" class="block">
                 #parse("menu.vm")
-                ##parse("search.vm")
+                #parse("search.vm")
             </div> <!-- navAndSearch -->
             
         </div> <!-- header --> 
