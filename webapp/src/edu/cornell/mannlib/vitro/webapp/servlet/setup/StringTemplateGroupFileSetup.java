@@ -1,3 +1,5 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
 import javax.servlet.ServletContext;
@@ -7,9 +9,8 @@ import javax.servlet.ServletContextListener;
 import org.antlr.stringtemplate.StringTemplateGroup;
 
 import edu.cornell.mannlib.vitro.webapp.template.stringtemplate.Page;
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-public class StringTemplateSetup implements ServletContextListener {
+public class StringTemplateGroupFileSetup implements ServletContextListener {
 
 	// Set default theme based on themes present on the file system
 	public void contextInitialized(ServletContextEvent event) {
@@ -25,4 +26,5 @@ public class StringTemplateSetup implements ServletContextListener {
 		// nothing to do here
 	}
 }
+
 

@@ -30,7 +30,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 public class PageSTGF {
 
 	ServletContext servletContext;
-    protected VitroRequest request;
+    protected VitroRequest vreq;
     HttpServletResponse response;
     PrintWriter out;
 	protected Portal portal;
@@ -57,8 +57,7 @@ public class PageSTGF {
     }
     
     protected StringTemplateGroup initTemplateGroup(String templateFilename) {
-    	String path = servletContext.getRealPath("/templates/stringTemplateGroups");
-    	path = path + "/" + templateFilename;
+    	String path = pageTemplates.getRootDir() + "/" + templateFilename;
     	try {   		
     		StringTemplateGroup templateGroup = new StringTemplateGroup(new FileReader(path), org.antlr.stringtemplate.language.DefaultTemplateLexer.class);
     		templateGroup.setRefreshInterval(0); // don't cache templates
@@ -76,18 +75,18 @@ public class PageSTGF {
         pageST = pageTemplates.getInstanceOf("main");
 
         // RY RUNTIME ERROR here: can't set an attribute of pageST. ???
-        setLoginInfo(pageST, request);
+        setLoginInfo(pageST, vreq);
  
         int portalId = portal.getPortalId();
         pageST.setAttribute("portalId", portalId);
 
         pageST.setAttribute("title", getTitle());
         
-        pageST.setAttribute("tabMenu", getTabMenu(request));
+        pageST.setAttribute("tabMenu", getTabMenu(vreq));
         
-        ApplicationBean appBean = request.getAppBean();
-        PortalWebUtil.populateSearchOptions(portal, appBean, request.getWebappDaoFactory().getPortalDao());
-        PortalWebUtil.populateNavigationChoices(portal, request, appBean, request.getWebappDaoFactory().getPortalDao());
+        ApplicationBean appBean = vreq.getAppBean();
+        PortalWebUtil.populateSearchOptions(portal, appBean, vreq.getWebappDaoFactory().getPortalDao());
+        PortalWebUtil.populateNavigationChoices(portal, vreq, appBean, vreq.getWebappDaoFactory().getPortalDao());
         
         // We'll need to separate theme-general and theme-specific stylesheet
         // dirs, so we need either two attributes or a list.
@@ -153,7 +152,7 @@ public class PageSTGF {
 //    }
     
     public void setRequest(VitroRequest request) {
-    	this.request = request;
+    	vreq = request;
     }
     
     public void setResponse(HttpServletResponse response) {
@@ -209,7 +208,7 @@ public class PageSTGF {
 //    }
     
     protected String getUrl(String path) {
-    	String contextPath = servletContext.getContextPath();
+    	String contextPath = vreq.getContextPath();
     	String url = path;
     	if ( ! url.startsWith("/") ) {
     		url = "/" + url;
@@ -253,7 +252,7 @@ public class PageSTGF {
     		this.linkText = linkText;
     		url = page.getUrl(path);
     		
-    		HttpServletRequest request = page.request;
+    		HttpServletRequest request = page.vreq;
     		String requestUrl = request.getServletPath();
     		active = requestUrl.equals("/" + path);
     	}

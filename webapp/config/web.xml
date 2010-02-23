@@ -138,6 +138,12 @@
   
   <listener>
     <listener-class>
+        edu.cornell.mannlib.vitro.webapp.servlet.setup.StringTemplateGroupFileSetup
+    </listener-class>
+  </listener>
+  
+  <listener>
+    <listener-class>
         edu.cornell.mannlib.vitro.webapp.servlet.setup.VelocitySetup
     </listener-class>
   </listener>
