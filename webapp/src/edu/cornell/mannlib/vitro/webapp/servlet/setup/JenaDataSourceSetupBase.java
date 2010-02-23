@@ -165,7 +165,7 @@ public class JenaDataSourceSetupBase {
 				+ "defaultAdminUser");
 		model.add(model.createStatement(user, model
 				.createProperty(VitroVocabulary.RDF_TYPE), model
-				.createLiteral(VitroVocabulary.USER)));
+				.getResource(VitroVocabulary.USER)));
 		model.add(model.createStatement(user, model
 				.createProperty(VitroVocabulary.USER_USERNAME), model
 				.createTypedLiteral(initialAdminUsername)));
