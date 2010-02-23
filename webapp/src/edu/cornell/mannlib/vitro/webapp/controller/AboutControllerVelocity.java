@@ -20,8 +20,6 @@ public class AboutControllerVelocity extends VelocityHttpServlet {
     }
     
     protected String getBody() {
-    	
-        String templateName = "about.vm";
         
         // Use chained contexts so values like title are available to both contexts.
         // For example, title is used in the <head> element and also as a page
@@ -35,9 +33,8 @@ public class AboutControllerVelocity extends VelocityHttpServlet {
         // in the context if it's an empty string.
         vc.put("aboutText", portal.getAboutText());
         vc.put("acknowledgeText", portal.getAcknowledgeText()); 
-        
-        StringWriter sw = mergeTemplateToContext(templateName, vc);       
-        return sw.toString();
+          	
+        return mergeBodyTemplateToContext("about.vm", vc);       	     
     }
 
 

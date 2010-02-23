@@ -5,7 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.template.velocity;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Properties;
 
 import java.util.Calendar;
 import java.util.List;
@@ -164,6 +163,10 @@ public class VelocityHttpServlet extends VitroHttpServlet {
         	}
         }
         return sw;
+    }
+    
+    protected String mergeBodyTemplateToContext(String templateName, VelocityContext context) {
+    	return mergeTemplateToContext(templateName, context).toString();
     }
 
 	//  public void setStylesheets() {
