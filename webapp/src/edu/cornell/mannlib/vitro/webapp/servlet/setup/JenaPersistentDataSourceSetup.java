@@ -89,9 +89,13 @@ public class JenaPersistentDataSourceSetup extends JenaDataSourceSetupBase imple
         // user accounts Model
         try {
         	Model userAccountsDbModel = makeDBModelFromConfigurationProperties(JENA_USER_ACCOUNTS_MODEL, DB_ONT_MODEL_SPEC);
-        	if (firstStartup) {
-        		readOntologyFilesInPathSet(AUTHPATH, sce.getServletContext(), userAccountsDbModel);
-        	}
+			if (userAccountsDbModel.size() == 0) {
+				readOntologyFilesInPathSet(AUTHPATH, sce.getServletContext(),
+						userAccountsDbModel);
+				if (userAccountsDbModel.size() == 0) {
+					createInitialAdminUser(userAccountsDbModel);
+				}
+			}
         	OntModel userAccountsModel = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC);
         	userAccountsModel.add(userAccountsDbModel);
         	userAccountsModel.getBaseModel().register(new ModelSynchronizer(userAccountsDbModel));

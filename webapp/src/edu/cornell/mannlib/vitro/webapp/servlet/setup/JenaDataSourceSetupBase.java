@@ -15,8 +15,10 @@ import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Resource;
 
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDBGraphGenerator;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RegeneratingGraph;
 
@@ -126,18 +128,53 @@ public class JenaDataSourceSetupBase {
        return dbModel;
    }
 
-   public static void readOntologyFilesInPathSet(String path, ServletContext ctx, Model model) {
-	   Set<String> paths = ctx.getResourcePaths(path);
-	   for(String p : paths) {
-           log.debug("Loading ontology file at " + p);
-           InputStream ontologyInputStream = ctx.getResourceAsStream(p);
-           try {
-               model.read(ontologyInputStream,null);
-               log.debug("...successful");
-           } catch (Throwable t) {
-               log.debug("...unsuccessful");
-           }
-       }
-   }
+	public static void readOntologyFilesInPathSet(String path,
+			ServletContext ctx, Model model) {
+		Set<String> paths = ctx.getResourcePaths(path);
+		if (paths != null) {
+			for (String p : paths) {
+				log.debug("Loading ontology file at " + p);
+				InputStream ontologyInputStream = ctx.getResourceAsStream(p);
+				try {
+					model.read(ontologyInputStream, null);
+					log.debug("...successful");
+				} catch (Throwable t) {
+					log.debug("...unsuccessful");
+				}
+			}
+		}
+	}
    
+	/**
+	 * If the {@link ConfigurationProperties} has a name for the initial admin
+	 * user, create the user and add it to the model.
+	 */
+	protected void createInitialAdminUser(Model model) {
+		String initialAdminUsername = ConfigurationProperties
+				.getProperty("initialAdminUser");
+		if (initialAdminUsername == null) {
+			return;
+		}
+
+		// A hard-coded MD5 encryption of "defaultAdmin"
+		String initialAdminPassword = "22BA075EC8951A70960A0A95C0BC2294";
+
+		String vitroDefaultNs = "http://vitro.mannlib.cornell.edu/ns/vitro/default#";
+
+		Resource user = model.createResource(vitroDefaultNs
+				+ "defaultAdminUser");
+		model.add(model.createStatement(user, model
+				.createProperty(VitroVocabulary.RDF_TYPE), model
+				.createLiteral(VitroVocabulary.USER)));
+		model.add(model.createStatement(user, model
+				.createProperty(VitroVocabulary.USER_USERNAME), model
+				.createTypedLiteral(initialAdminUsername)));
+		model.add(model.createStatement(user, model
+				.createProperty(VitroVocabulary.USER_MD5PASSWORD), model
+				.createTypedLiteral(initialAdminPassword)));
+		model.add(model.createStatement(user, model
+				.createProperty(VitroVocabulary.USER_ROLE), model
+				.createTypedLiteral("role:/50")));
+	}
+
 }

@@ -81,6 +81,9 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
             }
             if (userAccountsModel.size() == 0) {
             	readOntologyFilesInPathSet(AUTHPATH, sce.getServletContext(), userAccountsModel);
+	            if (userAccountsModel.size() == 0) {
+	            	createInitialAdminUser(userAccountsModel);
+	            }
             }
             
             ensureEssentialInterfaceData(memModel, sce, wadf);
