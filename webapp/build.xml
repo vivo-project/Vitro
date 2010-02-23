@@ -213,16 +213,6 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 			</filterchain>
 		</copy>
 
-		<!-- TODO: Have the Jena code read the userId directly from the deploy.properties -->
-		<copy file="${vitroCore.basedir}/ontologies/auth/example.vitroUsers.owl"
-		      tofile="${build.dir}/war/WEB-INF/ontologies/auth/vitroUsers.owl"
-		      filtering="true">
-			<filterchain>
-				<expandproperties />
-			</filterchain>
-		</copy>
-		<!-- TODO: Have the Jena code read the userId directly from the deploy.properties -->
-
 		<copy todir="${build.dir}/war/WEB-INF/classes">
 			<fileset file="${deploy.properties.file}" />
 		</copy>
