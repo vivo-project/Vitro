@@ -130,6 +130,24 @@
     </listener-class>
   </listener>
 
+  <listener>
+    <listener-class>
+        edu.cornell.mannlib.vitro.webapp.servlet.setup.StringTemplateSetup
+    </listener-class>
+  </listener>
+  
+  <listener>
+    <listener-class>
+        edu.cornell.mannlib.vitro.webapp.servlet.setup.VelocitySetup
+    </listener-class>
+  </listener>
+   
+  <listener>
+  	<listener-class>
+  		edu.cornell.mannlib.vitro.webapp.servlet.setup.FreeMarkerSetup
+  	</listener-class>
+  </listener>
+
   <!--
     <listener>
         <listener-class>

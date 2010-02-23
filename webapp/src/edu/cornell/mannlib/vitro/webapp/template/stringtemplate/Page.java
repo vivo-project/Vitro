@@ -30,12 +30,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Tab;
 public class Page {
 	
     /* Template library */
-    protected static StringTemplateGroup templates =
-        new StringTemplateGroup("stGroup", "vitro-core/webapp/web/templates/stringtemplates");
-
-    static {
-        templates.setRefreshInterval(0); // don't cache templates
-    }
+    public static StringTemplateGroup templates = null;
 
 	ServletContext servletContext;
     protected VitroRequest request;

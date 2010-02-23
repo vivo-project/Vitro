@@ -20,6 +20,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
@@ -31,7 +32,6 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vedit.beans.LoginFormBean;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 import edu.cornell.mannlib.vitro.webapp.web.PortalWebUtil;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
@@ -59,9 +59,12 @@ public class VelocityHttpServlet extends VitroHttpServlet {
 	        portal = vreq.getPortal();
 	        
 	        servletContext = getServletContext();
+	        // RY FIX! This needs to be done in a static initializer, not when
+	        // processing each request.
 	        String templatePath = servletContext.getRealPath("/templates/velocity");
 	        String templateName = "page.vm";
 	        
+	        // This should be done once on application startup only!!
 	        Properties p = new Properties();
 	        p.setProperty("file.resource.loader.path", templatePath);
 	        p.setProperty("runtime.references.strict", "true"); // for debugging; turn off in production
@@ -154,6 +157,7 @@ public class VelocityHttpServlet extends VitroHttpServlet {
         try {
         	template = Velocity.getTemplate(templateName);
         }
+        // RY Change the System.out.println statements to logging statements
         catch (ResourceNotFoundException e) {
         	System.out.println("Can't find template " + templateName);
         }
