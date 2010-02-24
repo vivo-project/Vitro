@@ -132,7 +132,7 @@
   <!--
     <listener>
         <listener-class>
-            edu.cornell.mannlib.vitro.webapp.auth.identifier.FakeSelfEditingIdentifierFactory.SetupFakeSelfEditingIdentifierFactory
+            edu.cornell.mannlib.vitro.webapp.auth.identifier.SetupFakeSelfEditingIdentifierFactory
         </listener-class>
     </listener>
 -->
