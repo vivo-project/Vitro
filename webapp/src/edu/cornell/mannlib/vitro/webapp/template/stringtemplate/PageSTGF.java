@@ -113,7 +113,9 @@ public class PageSTGF {
         pageST.setAttribute("aboutUrl", getUrl(Controllers.ABOUT + "?home=" + portalId));
         pageST.setAttribute("aboutStUrl", getUrl(Controllers.ABOUT + "-stringtemplate?home=" + portalId));
         pageST.setAttribute("aboutStgfUrl", getUrl(Controllers.ABOUT + "-stringtemplategroupfile?home=" + portalId));
-    	// RY Change constants in Controllers from *_JSP to *_URL
+        pageST.setAttribute("aboutVUrl", getUrl(Controllers.ABOUT + "-velocity?home=" + portalId));
+        pageST.setAttribute("aboutFMUrl", getUrl(Controllers.ABOUT + "-freemarker?home=" + portalId));
+        // RY Change constants in Controllers from *_JSP to *_URL
         pageST.setAttribute("contactUrl", getUrl(Controllers.CONTACT_JSP));
         
         pageST.setAttribute("searchUrl", getUrl(Controllers.SEARCH_URL));

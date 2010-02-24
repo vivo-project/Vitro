@@ -42,7 +42,6 @@ public class VelocityHttpServlet extends VitroHttpServlet {
     private static final int FILTER_SECURITY_LEVEL = LoginFormBean.EDITOR;
     
 	protected VitroRequest vreq;
-	protected PrintWriter out;
 	protected Portal portal;
 	protected VelocityContext context;
 	
@@ -51,11 +50,10 @@ public class VelocityHttpServlet extends VitroHttpServlet {
     	try {
 	        super.doGet(request,response);
 	        
-	        out = response.getWriter();
+	        PrintWriter out = response.getWriter();
 	        vreq = new VitroRequest(request);
 	        portal = vreq.getPortal();
 	        context = new VelocityContext();   	        
-	        String templateName = "page.vm";
 	        	               
 	        setLoginInfo();
 	        
@@ -84,7 +82,9 @@ public class VelocityHttpServlet extends VitroHttpServlet {
 	        
 	        context.put("siteName", portal.getAppName());
 	        
-	        context.put("homeUrl", portal.getRootBreadCrumbURL());
+	        String homeURL = (portal.getRootBreadCrumbURL()!=null && portal.getRootBreadCrumbURL().length()>0) ?
+	        		portal.getRootBreadCrumbURL() : vreq.getContextPath()+"/";
+	        context.put("homeUrl", homeURL);
 	        context.put("tagline", portal.getShortHand());
 	         
 	        String bannerImage = portal.getBannerImage();
@@ -96,6 +96,7 @@ public class VelocityHttpServlet extends VitroHttpServlet {
 	        context.put("aboutStUrl", getUrl(Controllers.ABOUT + "-stringtemplate?home=" + portalId));
 	        //context.put("aboutStgfUrl", getUrl(Controllers.ABOUT + "-stringtemplategroupfile?home=" + portalId));        
 	        context.put("aboutVUrl", getUrl(Controllers.ABOUT + "-velocity?home=" + portalId));
+	        context.put("aboutFMUrl", getUrl(Controllers.ABOUT + "-freemarker?home=" + portalId));
 	        // RY Change constants in Controllers from *_JSP to *_URL
 	        context.put("contactUrl", getUrl(Controllers.CONTACT_JSP));
 	        
@@ -112,7 +113,8 @@ public class VelocityHttpServlet extends VitroHttpServlet {
 	        
 	        // Get page-specific body content
 	        context.put("body", getBody());
-	
+
+	        String templateName = "page.vm";
 	        StringWriter sw = mergeTemplateToContext(templateName, context);
 	        out.print(sw);
 	        
@@ -272,9 +274,9 @@ public class VelocityHttpServlet extends VitroHttpServlet {
 		boolean active = false;
 		
 		public TabMenuItem(String linkText, String path) {
-			VelocityHttpServlet pc = VelocityHttpServlet.this;
+			VelocityHttpServlet vs = VelocityHttpServlet.this;
 			this.linkText = linkText;
-			url = pc.getUrl(path);
+			url = vs.getUrl(path);
 			
 			String requestUrl = vreq.getServletPath();
 			active = requestUrl.equals("/" + path);

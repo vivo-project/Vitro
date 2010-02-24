@@ -78,7 +78,9 @@ public class Page {
         
         pageST.setAttribute("siteName", portal.getAppName());
         
-        pageST.setAttribute("homeUrl", portal.getRootBreadCrumbURL());
+        String homeURL = (portal.getRootBreadCrumbURL()!=null && portal.getRootBreadCrumbURL().length()>0) ?
+        		portal.getRootBreadCrumbURL() : vreq.getContextPath()+"/";
+        pageST.setAttribute("homeUrl", homeURL);
         pageST.setAttribute("tagline", portal.getShortHand());
          
         String bannerImage = portal.getBannerImage();
@@ -90,6 +92,7 @@ public class Page {
         pageST.setAttribute("aboutStUrl", getUrl(Controllers.ABOUT + "-stringtemplate?home=" + portalId));
         //pageST.setAttribute("aboutStgfUrl", getUrl(Controllers.ABOUT + "-stringtemplategroupfile?home=" + portalId));        
         pageST.setAttribute("aboutVUrl", getUrl(Controllers.ABOUT + "-velocity?home=" + portalId));
+        pageST.setAttribute("aboutVUrl", getUrl(Controllers.ABOUT + "-freemarker?home=" + portalId));
         // RY Change constants in Controllers from *_JSP to *_URL
         pageST.setAttribute("contactUrl", getUrl(Controllers.CONTACT_JSP));
         
