@@ -7,7 +7,6 @@ import com.hp.hpl.jena.rdf.listeners.StatementListener;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.vocabulary.RDF;
 
-import edu.cornell.mannlib.vitro.webapp.template.velocity.VelocityHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
@@ -19,27 +18,20 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
+import edu.cornell.mannlib.vitro.webapp.template.freemarker.FreeMarkerHttpServlet;
 
-import org.antlr.stringtemplate.StringTemplate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.apache.velocity.VelocityContext;
+import freemarker.template.*;
 
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import java.io.IOException;
-import java.io.StringWriter;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-
-public class BrowseControllerFreeMarker extends VelocityHttpServlet {
+public class BrowseControllerFreeMarker extends FreeMarkerHttpServlet {
     static final long serialVersionUID=2006030721126L;
 
     private transient ConcurrentHashMap<Integer, List> _groupListMap
@@ -78,13 +70,10 @@ public class BrowseControllerFreeMarker extends VelocityHttpServlet {
 
     protected String getBody() {
 
-    	// Set main page template attributes specific to this page
-    	context.put("contentClass", "siteMap");
+    	Map body = new HashMap();
     	
-        // Use chained contexts so values like title are available to both contexts.
-        // For example, title is used in the <head> element and also as a page
-        // title, so it's needed in both contexts.
-        VelocityContext vc = new VelocityContext(context);
+    	// Set main page template attributes specific to this page
+    	root.put("contentClass", "siteMap");
         
     	if( vreq.getParameter("clearcache") != null ) //mainly for debugging
     		clearGroupCache();
@@ -96,13 +85,13 @@ public class BrowseControllerFreeMarker extends VelocityHttpServlet {
 
     	if (groups == null || groups.isEmpty()) {
     		message = "There are not yet any items in the system.";
-    		vc.put("message", message); 
+    		body.put("message", message); 
     	}
     	else {
     		// Create a list of VClassGroupDisplay objects, each of which wraps a VClassGroup object.
     		// This allows EL to access VClassGroup properties like publicName, which it can't do
     		// if passed a linked list.
-    		List<VClassGroupDisplay> vcgroups = new ArrayList<VClassGroupDisplay>();
+    		SimpleSequence vcgroups = new SimpleSequence();
     		Iterator i = groups.iterator();
     		VClassGroup group;
     		VClassGroupDisplay displayGroup;
@@ -111,11 +100,12 @@ public class BrowseControllerFreeMarker extends VelocityHttpServlet {
     			displayGroup = new VClassGroupDisplay(group);
     			vcgroups.add(displayGroup);
     		}
-    		vc.put("classGroups", vcgroups);
+    		body.put("classGroups", vcgroups);
     	}     
-    	vc.put("entityListUri", getUrl("/entitylist?vclassId="));
+    	body.put("entityListUri", getUrl("/entitylist?vclassId="));
 
-    	return mergeBodyTemplateToContext("browseGroup.vm", vc); 
+        String templateName = "browseGroup.ftl";       
+        return mergeBodyToTemplate(templateName, body);
     }
 
     public void destroy(){

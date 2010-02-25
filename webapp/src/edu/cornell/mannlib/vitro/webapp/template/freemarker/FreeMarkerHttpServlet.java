@@ -4,13 +4,10 @@ package edu.cornell.mannlib.vitro.webapp.template.freemarker;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.Writer;
-import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 
 import java.util.Calendar;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +19,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.velocity.VelocityContext;
 
 import freemarker.template.*;
 

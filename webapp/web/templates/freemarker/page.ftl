@@ -20,7 +20,7 @@
         <hr class="hidden" />
 
         <div id="contentwrap">      
-            <div id="content" <#if contentClass??> class="${contentClass}" </#if>
+            <div id="content" <#if contentClass??> class="${contentClass}" </#if>>
                 ${body} 
             </div> <!-- content -->
         </div> <!-- contentwrap -->

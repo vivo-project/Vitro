@@ -2,18 +2,11 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller; 
 
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.io.StringWriter;
-import java.io.IOException;
-
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import freemarker.template.*;
 
 import edu.cornell.mannlib.vitro.webapp.template.freemarker.FreeMarkerHttpServlet;
 
