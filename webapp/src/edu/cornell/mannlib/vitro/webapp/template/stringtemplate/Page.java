@@ -92,7 +92,7 @@ public class Page {
         pageST.setAttribute("aboutStUrl", getUrl(Controllers.ABOUT + "-stringtemplate?home=" + portalId));
         //pageST.setAttribute("aboutStgfUrl", getUrl(Controllers.ABOUT + "-stringtemplategroupfile?home=" + portalId));        
         pageST.setAttribute("aboutVUrl", getUrl(Controllers.ABOUT + "-velocity?home=" + portalId));
-        pageST.setAttribute("aboutVUrl", getUrl(Controllers.ABOUT + "-freemarker?home=" + portalId));
+        pageST.setAttribute("aboutFMUrl", getUrl(Controllers.ABOUT + "-freemarker?home=" + portalId));
         // RY Change constants in Controllers from *_JSP to *_URL
         pageST.setAttribute("contactUrl", getUrl(Controllers.CONTACT_JSP));
         

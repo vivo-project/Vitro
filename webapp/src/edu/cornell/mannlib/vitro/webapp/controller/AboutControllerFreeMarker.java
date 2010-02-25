@@ -28,7 +28,7 @@ public class AboutControllerFreeMarker extends FreeMarkerHttpServlet {
     protected String getBody() {
         
     	Map body = new HashMap();
-        
+    
         // *** RY Velocity works like StringTemplate here: if the value is an empty string,
         // an if test on the variable will succeed, unlike the EL empty operator.
         // Since these methods return nulls rather than empty strings, this is ok here,
