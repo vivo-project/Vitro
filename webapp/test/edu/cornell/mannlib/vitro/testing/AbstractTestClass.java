@@ -225,8 +225,8 @@ public abstract class AbstractTestClass {
 	/**
 	 * Create a file and fill it with the contents provided.
 	 */
-	protected File createFile(File directory, String filename, String contents)
-			throws IOException {
+	protected static File createFile(File directory, String filename,
+			String contents) throws IOException {
 		Writer writer = null;
 		try {
 			File file = new File(directory, filename);
