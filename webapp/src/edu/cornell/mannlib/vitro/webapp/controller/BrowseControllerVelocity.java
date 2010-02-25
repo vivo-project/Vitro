@@ -1,7 +1,5 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-//***** in getBody() - context.put("contentClass", "siteMap") *****//
-
 package edu.cornell.mannlib.vitro.webapp.controller;
 
 import com.hp.hpl.jena.ontology.OntModel;

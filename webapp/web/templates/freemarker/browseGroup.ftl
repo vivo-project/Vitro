@@ -3,12 +3,12 @@
 <#if message??>
     <p>${message}</p>
 <#else>
-    <#list classGroups as classgroup>
+    <#list classGroups as classGroup>
         <h2>${classGroup.publicName}</h2>
     
         <ul>
-            <#list $classGroup.vitroClassList as $class>
-                <li><a href="${entityListUri}${class.URI}">$class.name</a> (${class.entityCount})</li>
+            <#list classGroup.vitroClassList as class>
+                <li><a href="${entityListUri}${class.URI}">${class.name}</a> (${class.entityCount})</li>
             </#list>
         </ul>
     </#list>

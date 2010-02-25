@@ -6,10 +6,12 @@ import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.listeners.StatementListener;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.vocabulary.RDF;
+
+import edu.cornell.mannlib.vitro.webapp.template.velocity.VelocityHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
-import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
+import edu.cornell.mannlib.vitro.webapp.beans.display.VClassGroupDisplay;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
@@ -17,22 +19,27 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
+
+import org.antlr.stringtemplate.StringTemplate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.joda.time.DateTime;
 
-import javax.servlet.RequestDispatcher;
+import org.apache.velocity.VelocityContext;
+
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
+import java.io.StringWriter;
+
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 
-public class BrowseControllerFreeMarker extends VitroHttpServlet {
+public class BrowseControllerFreeMarker extends VelocityHttpServlet {
     static final long serialVersionUID=2006030721126L;
 
     private transient ConcurrentHashMap<Integer, List> _groupListMap
@@ -64,51 +71,51 @@ public class BrowseControllerFreeMarker extends VitroHttpServlet {
         _cacheRebuildThread.start();
         _cacheRebuildThread.informOfQueueChange();
     }
-
-    public void doPost(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException,IOException {
-        doGet(request, response);
+      
+    protected String getTitle() {
+    	return "Index to " + portal.getAppName() + " Contents";
     }
 
-    /**
-     * @author bdc34 adapted by jc55
-     */
-    public void doGet( HttpServletRequest request, HttpServletResponse response )
-    throws IOException, ServletException {
-        try {
-            //call doGet of super-class (that would be VitroHttpServlet).
-            super.doGet(request, response);
-            VitroRequest vreq = new VitroRequest(request);
+    protected String getBody() {
 
-            if( vreq.getParameter("clearcache") != null ) //mainly for debugging
-                clearGroupCache();
+    	// Set main page template attributes specific to this page
+    	context.put("contentClass", "siteMap");
+    	
+        // Use chained contexts so values like title are available to both contexts.
+        // For example, title is used in the <head> element and also as a page
+        // title, so it's needed in both contexts.
+        VelocityContext vc = new VelocityContext(context);
+        
+    	if( vreq.getParameter("clearcache") != null ) //mainly for debugging
+    		clearGroupCache();
 
-            PortalFlag portalState= vreq.getPortalFlag();
+    	//PortalFlag portalState= vreq.getPortalFlag();
 
-            List groups = getGroups(vreq.getWebappDaoFactory().getVClassGroupDao(), vreq.getPortal().getPortalId());
-            if( groups == null || groups.isEmpty() )
-            	request.setAttribute("classgroupsIsEmpty", true);
-            
-            
-            // stick the data in the requestScope
-            request.setAttribute("classgroups",groups);
-            request.setAttribute("portalState",portalState);
+    	String message = "";
+    	List<VClassGroup> groups = getGroups(vreq.getWebappDaoFactory().getVClassGroupDao(), vreq.getPortal().getPortalId());
 
-            request.setAttribute("title","Index to "+vreq.getPortal().getAppName()+" Contents");
+    	if (groups == null || groups.isEmpty()) {
+    		message = "There are not yet any items in the system.";
+    		vc.put("message", message); 
+    	}
+    	else {
+    		// Create a list of VClassGroupDisplay objects, each of which wraps a VClassGroup object.
+    		// This allows EL to access VClassGroup properties like publicName, which it can't do
+    		// if passed a linked list.
+    		List<VClassGroupDisplay> vcgroups = new ArrayList<VClassGroupDisplay>();
+    		Iterator i = groups.iterator();
+    		VClassGroup group;
+    		VClassGroupDisplay displayGroup;
+    		while (i.hasNext()) {
+    			group = (VClassGroup) i.next();
+    			displayGroup = new VClassGroupDisplay(group);
+    			vcgroups.add(displayGroup);
+    		}
+    		vc.put("classGroups", vcgroups);
+    	}     
+    	vc.put("entityListUri", getUrl("/entitylist?vclassId="));
 
-            request.setAttribute("bodyJsp",Controllers.BROWSE_GROUP_JSP);
-            //request.setAttribute("bodyJsp",Controllers.DEBUG_JSP);
-
-            //FINALLY: send off to the BASIC_JSP to get turned into HTML
-            RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
-            // run directly to body for testing: RequestDispatcher rd = request.getRequestDispatcher(Controllers.BROWSE_GROUP_JSP);
-            rd.forward(request, response);
-        } catch (Throwable e) {
-            log.debug("BrowseControllerFreeMarker.doGet(): "+ e);
-            request.setAttribute("javax.servlet.jsp.jspException",e);
-            RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
-            rd.forward(request, response);
-        }
+    	return mergeBodyTemplateToContext("browseGroup.vm", vc); 
     }
 
     public void destroy(){
