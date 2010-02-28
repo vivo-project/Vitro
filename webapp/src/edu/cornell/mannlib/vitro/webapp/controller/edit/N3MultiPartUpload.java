@@ -107,6 +107,8 @@ public class N3MultiPartUpload extends VitroHttpServlet {
 
             String maxSize = ConfigurationProperties.getProperty("n3.maxSize", Long
                     .toString(DEFAULT_MAX_SIZE));
+            //DEBUG ADDED
+            System.out.println("Max size is " + maxSize);
             try {
                 maxFileSize = Integer.parseInt(maxSize);
             } catch (NumberFormatException nfe) {
@@ -176,6 +178,10 @@ public class N3MultiPartUpload extends VitroHttpServlet {
                     log.debug("File in multipart content request:  field "
                             + name + " with file name " + item.getName()
                             + " detected.");
+                    //Debug line
+                    System.out.println("File in multipart content request:  field "
+                            + name + " with file name " + item.getName()
+                            + " detected.");
                 } else {
                     List<FileItem> itemList = new ArrayList<FileItem>();
                     itemList.add(item);
@@ -216,9 +222,9 @@ public class N3MultiPartUpload extends VitroHttpServlet {
                 && editConfig.getObject().trim().length() > 0;
         log.debug(requestIsAnUpdate ? "request is an update for a file object"
                 : "request is for a new file object");
-
+        System.out.println("Request type, update or new: " + requestIsAnUpdate);
         /** *************************************************** */
-        if (requestIsAnUpdate) {
+        if (requestIsAnUpdate) {System.out.println("Currently existing file reosurce edit not supported");
           log.error("Editing an existing file resource is not supported by N3MultiPartUpload.java ");
           request.setAttribute("errors", "Editing an existing file resource is not supported.");
           RequestDispatcher rd = request

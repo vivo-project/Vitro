@@ -68,7 +68,7 @@ public class MailUsersServlet extends VitroHttpServlet {
         VitroRequest vreq = new VitroRequest(request);
         Portal portal = vreq.getPortal();
 
-        String   confirmpage    = "/thankyou.jsp";
+        String   confirmpage    = "/confirmUserMail.jsp";
         String   errpage        = "/contact_err.jsp";
         String status = null; // holds the error status
         
@@ -106,14 +106,6 @@ public class MailUsersServlet extends VitroHttpServlet {
         List<String> deliverToArray = null;
         int recipientCount = 0;
         String deliveryfrom = null;
-        deliveryfrom = "hjk54@cornell.edu"; //Who would this message be delivered from?
-        //Place-holder delivery To Array
-        /*deliverToArray = new String[] {
-        		"huda.khan@gmail.com",
-        		"huda.khan@colorado.edu",
-        		"hjk54@cornell.edu",
-        		"huda_jalil_khan@hotmail.com"
-        };*/
         
         
         UserDao uDao = getWebappDaoFactory().getUserDao();
@@ -135,11 +127,12 @@ public class MailUsersServlet extends VitroHttpServlet {
         String   webusername    = vreq.getParameter("webusername");// Null.trim(); will give you an exception
         String   webuseremail   = vreq.getParameter("webuseremail");//.trim();
         String   comments       = vreq.getParameter("s34gfd88p9x1"); //what does this string signify?
-        webusername = "hjk54";
-        webuseremail = "hjk54@cornell.edu";
+        //webusername = "hjk54";
+        //webuseremail = "hjk54@cornell.edu";
         //comments = "following are comments";
         
        webusername=webusername.trim();
+       deliveryfrom = webuseremail; 
        comments=comments.trim();
         
 
@@ -150,7 +143,7 @@ public class MailUsersServlet extends VitroHttpServlet {
         String lineSeparator = System.getProperty("line.separator"); // \r\n on windows, \n on unix
         // from MyLibrary
         msgBuf.setLength(0);
-        msgBuf.append("Content-Type: text/html; charset='us-ascii'" + lineSeparator);
+        //msgBuf.append("Content-Type: text/html; charset='us-ascii'" + lineSeparator);
         msgBuf.append("<html>" + lineSeparator );
         msgBuf.append("<head>" + lineSeparator );
         msgBuf.append("<style>a {text-decoration: none}</style>" + lineSeparator );
@@ -160,13 +153,7 @@ public class MailUsersServlet extends VitroHttpServlet {
         msgBuf.append("<h4>" + deliveryfrom + "</h4>" + lineSeparator );
         msgBuf.append("<h4>From: "+webusername +" (" + webuseremail + ")"+" at IP address "+request.getRemoteAddr()+"</h4>"+lineSeparator);
 
-        if (!(originalReferer == null || originalReferer.equals("none"))){
-            //The spam filter that is being used by the listsrv is rejecting <a href="...
-            //so try with out the markup, if that sill doesn't work,
-            //uncomment the following line to strip the http://
-            //msgBuf.append("<p><i>likely viewing page " + stripProtocol(originalReferer) );
-            msgBuf.append("<p><i>likely viewing page " + originalReferer );
-        }
+        //Don't need any 'likely viewing page' portion to be emailed out to the others
 
         msgBuf.append(lineSeparator + "</i></p><h3>Comments:</h3>" + lineSeparator );
         if (comments==null || comments.equals("")) {

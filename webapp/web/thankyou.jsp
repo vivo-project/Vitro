@@ -13,7 +13,9 @@ Portal portalBean=vreq.getPortal();
 
 <div id="content">
     <h2>Feedback</h2>
-
+	<c:set var='themeDir'>
+  		<c:if test="${!empty context && context != ''}">/${context}</c:if>/<%=portalBean.getThemeDir()%>
+	</c:set>
     <img src="${themeDir}site_icons/mail.gif" alt="mailbox"/><br/>
 
     <p>Thank you for contacting our curation and development team. We will respond to your inquiry as soon as possible.</p>

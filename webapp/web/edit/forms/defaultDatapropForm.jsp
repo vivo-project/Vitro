@@ -10,7 +10,6 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration" %>
 <%@ taglib prefix="v" uri="http://vitro.mannlib.cornell.edu/vitro/tags" %>
 <%@page import="edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils"%>
-
 <%! private static HashMap<String,String> defaultsForXSDtypes ;
   static {
 	defaultsForXSDtypes = new HashMap<String,String>();

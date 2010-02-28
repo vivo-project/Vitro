@@ -241,7 +241,6 @@ public class UserDaoJena extends JenaBaseDao implements UserDao {
         String swrcOntology = "http://swrc.ontoware.org/ontology#";
         String emailProperty = swrcOntology + "email";
         String emailValue, uri;
-        System.out.println("To clarify here is may edit as " + VitroVocabulary.MAY_EDIT_AS);
         try{
         	 Property emailProp = ontModel.getProperty(emailProperty);
              StmtIterator it = ontModel.listStatements(
@@ -257,15 +256,12 @@ public class UserDaoJena extends JenaBaseDao implements UserDao {
                     {
                     	
                     uri = stmt.getObject().asNode().getURI();	
-                    System.out.println("Returned URI is " + uri);
                     StmtIterator emailIt = baseModel.listStatements(baseModel.createResource(uri), baseModel.createProperty(emailProperty), (RDFNode) null);
-                    System.out.println("Email iterator successfull ? " + emailIt.hasNext());
                     while(emailIt.hasNext()) {
                     	Statement emailSt = (Statement) emailIt.next();
                     	if(emailSt != null && emailSt.getObject().isLiteral() && emailSt.getObject() != null) {
                     		email.add(emailSt.getLiteral().getString());
                     		//Issue: this prints out the email in a tags
-                    		System.out.println("Email Iterator Object Value" + emailSt.getLiteral().getString());
                     	} else {
                     		//System.out.println("Unfortunately email statement is null");
                     	}
@@ -283,6 +279,50 @@ public class UserDaoJena extends JenaBaseDao implements UserDao {
             ontModel.leaveCriticalSection();
         }
         return email;
+    }
+    
+    //for a specific user account, get the email address
+    public String getUserEmailAddress (String userURI) {
+    	 OntModel ontModel = getOntModel();
+         OntModel baseModel =  getOntModelSelector().getFullModel();
+         ontModel.enterCriticalSection(Lock.READ);
+         String swrcOntology = "http://swrc.ontoware.org/ontology#";
+         String emailProperty = swrcOntology + "email";
+         String personUri, emailValue = null;
+         
+         try {
+        	 //Get person account associated with this email address
+        	 StmtIterator it = ontModel.listStatements(
+                     ontModel.createResource(userURI),
+                     ontModel.getProperty(VitroVocabulary.MAY_EDIT_AS),
+                     (RDFNode)null);
+        	 try{
+	        	 while(it.hasNext()) {
+	        		 Statement personStmt = (Statement) it.next();
+	        		 if(personStmt != null 
+	        		 	&& personStmt.getObject() != null 
+	        		 	&& personStmt.getObject().asNode() != null
+	        		 	&& personStmt.getObject().asNode().getURI() != null) {
+	        			 personUri = personStmt.getObject().asNode().getURI();
+	        			 
+	        			 StmtIterator emailIt = baseModel.listStatements(baseModel.createResource(personUri),
+	        					 baseModel.createProperty(emailProperty),
+	        					 (RDFNode)null);
+	        			 while(emailIt.hasNext()) {
+	        				 Statement emailStmt = (Statement) emailIt.next();
+	        				 if(emailStmt != null && emailStmt.getObject().isLiteral() && emailStmt.getObject() != null) {
+	                     		emailValue = emailStmt.getLiteral().getString();
+	                     	}
+	        			 }
+	        		 }
+	        	 }
+        	 } catch(Exception ex) {
+        		 System.out.println("Error occurred in retrieving email and/or user uri");
+        	 }
+         }finally{
+             ontModel.leaveCriticalSection();
+         }
+         return emailValue;
     }
     
 

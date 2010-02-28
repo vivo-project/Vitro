@@ -25,10 +25,8 @@
 		<p class="normal">My full name is:</p>
 		<input style="width:33%;" type="text" name="webusername" maxlength="255"/><br/><br/>
 
-		<p class="normal"><i>${siteName} is a service that depends on regular updates and feedback.
-			Please help us out by providing any necessary corrections and suggestions for additional content (people, departments, courses, research services, etc.)
-			that you would like to see represented.</i></p>
-		<h3>Enter your comments, questions, or suggestions in the box below.</h3>
+		
+		<h3>Enter your message below. This message will be emailed to all email addresses associated with user accounts. </h3>
 
 		<textarea name="s34gfd88p9x1" rows="10" cols="90"></textarea>
 		<div>

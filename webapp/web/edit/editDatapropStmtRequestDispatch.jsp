@@ -145,7 +145,6 @@
     } else {
         vreq.setAttribute("form", formParam);
     }
-
     if( session.getAttribute("requestedFromEntity") == null )
         session.setAttribute("requestedFromEntity", subjectUri );
 %>

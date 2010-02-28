@@ -51,7 +51,7 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
        ? EditConfiguration.newEditKey(session)
        : EditConfiguration.getEditKey(request);
    request.setAttribute("editKey", editKey);
-   
+  
    // set the referrer URL, if available
    setEditReferer(editKey, request.getHeader("Referer"), request.getSession()); 
 
@@ -64,7 +64,7 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
    String formParam = request.getParameter("editform");
    String command = request.getParameter("cmd");
    String typeOfNew = request.getParameter("typeOfNew");
-   
+  
    //If there is no specified editForm then the subjectURI and the predicate
    //are needed to determin which form to use for this edit. 
    if (formParam == null || "".equals(formParam)) {
@@ -173,54 +173,60 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
     
     if( predicateUri != null ){            
         objectProp = wdf.getObjectPropertyDao().getObjectPropertyByURI(predicateUri);
+        customForm = objectProp.getCustomEntryForm();
         request.setAttribute("predicate", objectProp);  
-        
-        boolean isForwardToCreateNew = 
-            ( objectProp != null && objectProp.getOfferCreateNewOption() && objectProp.getSelectFromExisting() == false)
-         || ( objectProp != null && objectProp.getOfferCreateNewOption() && "create".equals(command));
-                        
-        if (isForwardToCreateNew) {
-        	request.setAttribute("isForwardToCreateNew", new Boolean(true));
-            if (customForm != null && customForm.length() > 0) {
-                //bdc34: maybe this should be the custom form on the class, not the property.
+        //Offer create new and select from existing are ignored if there is a custom form
+        if (customForm != null && customForm.length() > 0) {
+        	//bdc34: maybe this should be the custom form on the class, not the property.
                 form = objectProp.getCustomEntryForm();
-            } else {
-                //If a objectProperty is both provideSelect and offerCreateNewOption
-                // and a user gos to a defaultObjectProperty.jsp form then the user is
-                // offered the option to create a new Individual and replace the 
-                // object in the existing objectPropertyStatement with this new individual. 
-                boolean isReplaceWithNew =
-                    isEditOfExistingStmt && "create".equals(command) 
-                      && objectProp != null && objectProp.getOfferCreateNewOption() == true;                
-                                    
-                // If an objectProperty is selectFromExisitng==false and offerCreateNewOption == true
-                // the we want to forward to the create new form but edit the existing object
-                // of the objPropStmt.
-                boolean isForwardToCreateButEdit = 
-                    isEditOfExistingStmt && objectProp != null 
-                      && objectProp.getOfferCreateNewOption() == true 
-                      && objectProp.getSelectFromExisting() == false
-                      && ! "create".equals(command);
-                
-                if( isReplaceWithNew ){
-                    request.setAttribute("isReplaceWithNew", new Boolean(true));
-                    form = DEFAULT_ADD_INDIVIDUAL;
-                }else  if( isForwardToCreateButEdit ){
-                    request.setAttribute("isForwardToCreateButEdit", new Boolean(true));
-                    form = DEFAULT_ADD_INDIVIDUAL;
-                }else {
-                    form = DEFAULT_ADD_INDIVIDUAL;
-                }
-            }
+        }
+        else {
+	        boolean isForwardToCreateNew = 
+	            ( objectProp != null && objectProp.getOfferCreateNewOption() && objectProp.getSelectFromExisting() == false)
+	         || ( objectProp != null && objectProp.getOfferCreateNewOption() && "create".equals(command));   
+	                 
+	        if (isForwardToCreateNew) {
+	        	
+	        	request.setAttribute("isForwardToCreateNew", new Boolean(true));
+	            
+	                //If a objectProperty is both provideSelect and offerCreateNewOption
+	                // and a user goes to a defaultObjectProperty.jsp form then the user is
+	                // offered the option to create a new Individual and replace the 
+	                // object in the existing objectPropertyStatement with this new individual. 
+	                boolean isReplaceWithNew =
+	                    isEditOfExistingStmt && "create".equals(command) 
+	                      && objectProp != null && objectProp.getOfferCreateNewOption() == true;                
+	                                    
+	                // If an objectProperty is selectFromExisitng==false and offerCreateNewOption == true
+	                // the we want to forward to the create new form but edit the existing object
+	                // of the objPropStmt.
+	                boolean isForwardToCreateButEdit = 
+	                    isEditOfExistingStmt && objectProp != null 
+	                      && objectProp.getOfferCreateNewOption() == true 
+	                      && objectProp.getSelectFromExisting() == false
+	                      && ! "create".equals(command);
+	                
+	                if( isReplaceWithNew ){
+	                    request.setAttribute("isReplaceWithNew", new Boolean(true));
+	                    form = DEFAULT_ADD_INDIVIDUAL;
+	                }else  if( isForwardToCreateButEdit ){
+	                    request.setAttribute("isForwardToCreateButEdit", new Boolean(true));
+	                    form = DEFAULT_ADD_INDIVIDUAL;
+	                }else {
+	                    form = DEFAULT_ADD_INDIVIDUAL;
+	                }
+	            
+	        }
+	        
+	        if( ! isForwardToCreateNew ){
+	            if( objectProp != null && objectProp.getCustomEntryForm() != null && objectProp.getCustomEntryForm().length() > 0){
+	                form = objectProp.getCustomEntryForm();
+	            }else{
+	                form = DEFAULT_OBJ_FORM ;
+	            }
+	        }
         }
         
-        if( ! isForwardToCreateNew ){
-            if( objectProp != null && objectProp.getCustomEntryForm() != null && objectProp.getCustomEntryForm().length() > 0){
-                form = objectProp.getCustomEntryForm();
-            }else{
-                form = DEFAULT_OBJ_FORM ;
-            }
-        }
     } else {
         //case where a form was passed as a http parameter
         form = formParam;
