@@ -6,7 +6,7 @@
         <h3>Reports</h3>
     
         <ul>
-            <li><a href="customsparql">Custom Report: File Publication Date < 1 YEAR AGO</a></li>   
+            <li><a href="customsparql">Custom Report: File Publication Date &lt; 1 YEAR AGO</a></li>   
         </ul>
     </div>
 <% } %> 
