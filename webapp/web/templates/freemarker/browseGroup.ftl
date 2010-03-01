@@ -5,7 +5,7 @@
 <#else>
     <#list classGroups as classGroup>
         <h2>${classGroup.publicName}</h2>
-    
+        <#--include "${classGroup.publicName}.ftl"-->
         <ul>
             <#list classGroup.vitroClassList as class>
                 <li><a href="${entityListUri}${class.URI}">${class.name}</a> (${class.entityCount})</li>

@@ -5,7 +5,7 @@
 #else
     #foreach ($classGroup in $classGroups)
         <h2>$classGroup.publicName</h2>
-    
+        ##parse("${classGroup.publicName}.vm")
         <ul>
             #foreach ($class in $classGroup.vitroClassList)
                 <li><a href="${entityListUri}${class.URI}">$class.name</a> ($class.entityCount)</li>

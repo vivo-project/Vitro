@@ -20,6 +20,11 @@
         
         <div id="contentwrap">       
             <div id="content" #if ($contentClass) class="$contentClass" #end>
+                #* TEST
+                #if ($contentClass)
+                    #parse("${contentClass}.vm")
+                #end
+                *#
                 $body  
             </div> <!-- content -->
         </div> <!-- contentwrap -->

@@ -19,6 +19,15 @@ $head()$
         
         <div id="contentwrap">       
         	<div id="content" $if (contentClass)$ class="$contentClass$" $endif$>
+        	
+				$! TESTS
+        	    $testTemplateArg(foo=title)$
+        	    $testTemplateArg(bar="This is a test")$
+        	    $if (contentClass)$
+        	    	$(contentClass)()$
+        	    $endif$
+ 				!$
+ 				
             	$body$  
            	</div> <!-- content -->  
         </div> <!-- contentwrap -->

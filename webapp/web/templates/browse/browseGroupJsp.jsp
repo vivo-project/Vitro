@@ -3,7 +3,6 @@
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c" %>
 
 <div id="content" class="siteMap">
-    
 	<c:choose>
 	    <c:when test="${!empty message}">
 	        <p>${message}</p>
@@ -12,6 +11,7 @@
         <c:otherwise>
             <c:forEach var="group" items="${classGroups}">
                 <h2>${group.publicName}</h2> 
+                <%-- <jsp:include page="${group.publicName}.jsp" /> --%>
                 <ul>
 	                <c:forEach var="vclass" items="${group.vitroClassList}">
 	                    <c:url var="url" value="entitylist">

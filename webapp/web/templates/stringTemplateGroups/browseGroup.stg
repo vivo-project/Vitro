@@ -20,3 +20,9 @@ classGroup() ::= <<
 		$attr.vitroClassList: classList()$
 	</ul>
 >>
+
+/******************** CLASSLIST ********************/
+classList() ::= <<
+
+	<li><a href="$entityListUri$$attr.URI$">$attr.name$</a> ($attr.entityCount$)</li>
+>>

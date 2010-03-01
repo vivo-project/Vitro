@@ -19,7 +19,7 @@ public class VelocitySetup implements ServletContextListener {
 		
         Properties p = new Properties();
         p.setProperty("file.resource.loader.path", templatePath);
-        p.setProperty("runtime.references.strict", "true"); // for debugging; turn off in production
+        //p.setProperty("runtime.references.strict", "true"); // for debugging; turn off in production
         
         try {
         	Velocity.init(p);

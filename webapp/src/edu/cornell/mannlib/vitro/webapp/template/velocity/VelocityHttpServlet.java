@@ -261,7 +261,7 @@ public class VelocityHttpServlet extends VitroHttpServlet {
 		//tabMenu.add(new TabMenuItem("Index - ST GF", "browsecontroller-stringtemplategroupfile"));
 		tabMenu.add(new TabMenuItem("Index - Velocity", "browsecontroller-velocity"));
 		tabMenu.add(new TabMenuItem("Index - FM", "browsecontroller-freemarker"));   	
-		tabMenu.add(new TabMenuItem("Index - Wicket", "browsecontroller-wicket"));
+		//tabMenu.add(new TabMenuItem("Index - Wicket", "browsecontroller-wicket"));
 	
 		return tabMenu;
 	}
