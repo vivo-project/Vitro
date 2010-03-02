@@ -73,7 +73,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.Field;
  * optional.
  */
 public class N3MultiPartUpload extends VitroHttpServlet {
-    private static final int DEFAULT_MAX_SIZE = 1024 * 1024 * 50;
+    private static final int DEFAULT_MAX_SIZE = 1024 * 1024 * 1024;
 
     private static final String DEFAULT_FILE_URI_PREFIX = "http://vivo.library.cornell.edu/ns/0.1#file";
 
