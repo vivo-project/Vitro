@@ -58,5 +58,9 @@ public class UserDaoFiltering extends BaseFiltering implements UserDao{
     public List<String> getUserAccountEmails() {
     	return innerDao.getUserAccountEmails();
     }
+    
+    public String getUserEmailAddress(String userURI) {
+    	return innerDao.getUserEmailAddress(userURI);
+    }
 
 }

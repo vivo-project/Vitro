@@ -282,13 +282,13 @@ public class UserDaoJena extends JenaBaseDao implements UserDao {
     }
     
     //for a specific user account, get the email address
-    public String getUserEmailAddress (String userURI) {
+    public String getUserEmailAddress(String userURI) {
     	 OntModel ontModel = getOntModel();
          OntModel baseModel =  getOntModelSelector().getFullModel();
          ontModel.enterCriticalSection(Lock.READ);
          String swrcOntology = "http://swrc.ontoware.org/ontology#";
          String emailProperty = swrcOntology + "email";
-         String personUri, emailValue = null;
+         String personUri, emailValue = "";
          
          try {
         	 //Get person account associated with this email address

@@ -134,9 +134,6 @@ public class MailUsersServlet extends VitroHttpServlet {
        webusername=webusername.trim();
        deliveryfrom = webuseremail; 
        comments=comments.trim();
-        
-
-
         //Removed spam filtering code
 
         StringBuffer msgBuf = new StringBuffer(); // contains the intro copy for the body of the email message

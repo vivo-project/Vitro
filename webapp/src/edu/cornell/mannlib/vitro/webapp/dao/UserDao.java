@@ -23,4 +23,6 @@ public interface UserDao {
     public List<String> getIndividualsUserMayEditAs(String userURI);
     
     public List<String> getUserAccountEmails();
+    
+    public String getUserEmailAddress(String userURI);
 }

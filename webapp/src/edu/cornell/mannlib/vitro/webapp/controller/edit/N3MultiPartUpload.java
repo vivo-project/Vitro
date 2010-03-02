@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,6 +44,8 @@ import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
+import edu.cornell.mannlib.vedit.beans.LoginFormBean;
+import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
@@ -52,6 +55,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditN3Generator;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditN3Utils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditSubmission;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.Field;
+import edu.cornell.mannlib.vitro.webapp.utils.MailUtil;
 
 /**
  * Process a N3 form submission with a multipart data encoding. This follows a
@@ -178,10 +182,6 @@ public class N3MultiPartUpload extends VitroHttpServlet {
                     log.debug("File in multipart content request:  field "
                             + name + " with file name " + item.getName()
                             + " detected.");
-                    //Debug line
-                    System.out.println("File in multipart content request:  field "
-                            + name + " with file name " + item.getName()
-                            + " detected.");
                 } else {
                     List<FileItem> itemList = new ArrayList<FileItem>();
                     itemList.add(item);
@@ -222,9 +222,9 @@ public class N3MultiPartUpload extends VitroHttpServlet {
                 && editConfig.getObject().trim().length() > 0;
         log.debug(requestIsAnUpdate ? "request is an update for a file object"
                 : "request is for a new file object");
-        System.out.println("Request type, update or new: " + requestIsAnUpdate);
         /** *************************************************** */
-        if (requestIsAnUpdate) {System.out.println("Currently existing file reosurce edit not supported");
+        String uploadFileName = "";
+        if (requestIsAnUpdate) {System.out.println("Currently existing file resource edit not supported");
           log.error("Editing an existing file resource is not supported by N3MultiPartUpload.java ");
           request.setAttribute("errors", "Editing an existing file resource is not supported.");
           RequestDispatcher rd = request
@@ -258,7 +258,10 @@ public class N3MultiPartUpload extends VitroHttpServlet {
                                     + fileItemKey + " and file "
                                     + fileItem.getName() + "\n"
                                     + requiredFieldAssertions.get(fileItemKey));
+                            
                         }
+                        //Save upload file name for use in email confirmation
+                        uploadFileName = fileItem.getName();
                     } catch (Exception e) {
                         long t = System.currentTimeMillis();
                         log.error("uplaod ticket " + t + " " + e.getMessage(), e);
@@ -268,7 +271,6 @@ public class N3MultiPartUpload extends VitroHttpServlet {
                     }
                 }
             }
-            
             if ( ! saveFileToDiskSuccess) {
                 if (errors != null && !errors.isEmpty()) {
                     String form = editConfig.getFormUrl();
@@ -322,7 +324,6 @@ public class N3MultiPartUpload extends VitroHttpServlet {
                         }
                     }
                 }
-
                 if (postUploadSuccess) {
                     /* **** Save the models for all the files **** */
                     String editorUri = EditN3Utils.getEditorUri(request,
@@ -354,6 +355,14 @@ public class N3MultiPartUpload extends VitroHttpServlet {
                     .getRequestDispatcher("/edit/fileUploadError.jsp");
             rd.forward(request, resp);
         } else {
+        	//This is before the redirect occurs from postEditCleanUp
+        	//Send out email confirmation here
+        	try {
+        		sendUserEmail(session, uploadFileName);
+        	} catch(Exception ex) {
+        		System.out.println("Problem with retrieving and/or sending email");
+        	}
+        	
             RequestDispatcher rd = request
                     .getRequestDispatcher("/edit/postEditCleanUp.jsp");
             rd.forward(request, resp);
@@ -584,6 +593,45 @@ public class N3MultiPartUpload extends VitroHttpServlet {
         }
         return out;
     }
+    
+    public void sendUserEmail(HttpSession session, String uploadFileName) {
+		LoginFormBean loginBean = (LoginFormBean) session.getAttribute("loginHandler");
+        String userURI = loginBean.getUserURI();
+        try{
+	        System.out.println("User URI is " + userURI);
+	        UserDao uDao = getWebappDaoFactory().getUserDao();
+	        String email = uDao.getUserEmailAddress(userURI);
+	        String deliveryFrom = "hjk54@cornell.edu";//TO DO: replace with email address to be used
+	        //Now send message
+	        MailUtil mu = new MailUtil();
+	        List<String> deliverToArray = new ArrayList<String>();
+	        deliverToArray.add(email);
+	        
+	        //Compose body of message
+	        StringBuffer msgBuf = new StringBuffer();
+	        String lineSeparator = System.getProperty("line.separator"); 
+	        msgBuf.setLength(0);
+	        msgBuf.append("<html>" + lineSeparator );
+	        msgBuf.append("<head>" + lineSeparator );
+	        msgBuf.append("<style>a {text-decoration: none}</style>" + lineSeparator );
+	        msgBuf.append("<title>" + deliveryFrom + "</title>" + lineSeparator );
+	        msgBuf.append("</head>" + lineSeparator );
+	        msgBuf.append("<body>" + lineSeparator );
+	        String messageBody = "<h4>File has been uploaded to datastar";
+	        //Include file name if it exists and is not empty
+	        if(uploadFileName != null && uploadFileName != "") {
+	        	messageBody += ": " + uploadFileName;
+	        }
+	        messageBody += "</h4>";
+	        msgBuf.append(messageBody + lineSeparator + "</body></html>");
+	        String messageText = msgBuf.toString();
+	        
+	        //Send message
+	        mu.sendMessage(messageText, "Datastar File Upload: Success", deliveryFrom, email, deliverToArray);
+        } catch(Exception ex) {
+        	System.out.println("Error " + ex.getMessage());
+        }
+	}
 
     private boolean logAddRetract(String msg, Map<String, List<String>> add,
             Map<String, List<String>> retract) {
