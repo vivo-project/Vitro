@@ -167,7 +167,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 	<!-- ================================= 
           target: test              
          ================================= -->
-	<target name="test" depends="compile" description="--> Run JUnit tests">
+	<target name="test" depends="compile" unless="skiptests" description="--> Run JUnit tests">
 		<javac srcdir="${webapp.dir}/test"
 		       destdir="${build.dir}/testclasses"
 		       debug="true"

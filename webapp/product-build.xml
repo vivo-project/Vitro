@@ -103,7 +103,10 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 	<!-- ================================= 
           target: test              
          ================================= -->
-	<target name="test" depends="vitroCore.test, productTest" description="--> Run JUnit tests">
+	<target name="test"
+	        depends="vitroCore.test, productTest"
+	        unless="skiptests"
+	        description="--> Run JUnit tests">
 	</target>
 
 	<!-- ================================= 
@@ -152,7 +155,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 	<!-- - - - - - - - - - - - - - - - - - 
           target: productTest                      
          - - - - - - - - - - - - - - - - - -->
-	<target name="productTest" depends="vitroCore.test" if="product.tests.exist">
+	<target name="productTest" depends="vitroCore.test" if="product.tests.exist" unless="skiptests">
 		<javac srcdir="${product.test.dir}"
 		       destdir="${test.classes.dir}"
 		       debug="true"
