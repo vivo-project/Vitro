@@ -118,14 +118,14 @@ public class EditSubmission {
 
         this.basicValidation = new BasicValidation(editConfig,this);
         Map<String,String> errors = basicValidation.validateUris( urisFromForm );
-        if( errors != null )
-        validationErrors.putAll( errors );
+        if( errors != null ) {
+            validationErrors.putAll( errors );
+        }
         
         errors = basicValidation.validateLiterals( literalsFromForm );
-        if( errors != null )
+        if( errors != null ) {
             validationErrors.putAll( errors);
-        
-        validationErrors.putAll( basicValidation.validateLiterals( literalsFromForm ));
+        }
     }
 
     public EditSubmission(Map<String, String[]> queryParameters, EditConfiguration editConfig, 
@@ -340,8 +340,8 @@ public class EditSubmission {
 
     public String toString(){
         String[] names ={
-                 "literalsFromFrom",
-                "urisFromFrom","validationErrors","basicValidation"
+                 "literalsFromForm",
+                 "urisFromForm","validationErrors","basicValidation"
         };
         JSONObject obj = new JSONObject(this,names);
         return obj.toString();
