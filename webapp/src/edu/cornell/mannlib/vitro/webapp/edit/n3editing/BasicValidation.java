@@ -30,7 +30,7 @@ public class BasicValidation {
     EditConfiguration editConfig;
     
     public BasicValidation(EditConfiguration editConfig, EditSubmission editSub){
-    	this.editConfig = editConfig;
+        this.editConfig = editConfig;
         Map<String,List<String>> validatorsForFields = new HashMap<String,List<String>>();
         for(String fieldName: editConfig.getFields().keySet()){
             Field field = editConfig.getField(fieldName);
@@ -57,10 +57,7 @@ public class BasicValidation {
                     String validateMsg = validate(validationType,value);
                     if( validateMsg != null) {
                         errors.put(name,validateMsg);
-                        if (validateMsg == REQUIRED_FIELD_EMPTY_MSG) {
-                        	continue;
-                        }
-                    }	
+                    }    
                 }
             }
         }               
@@ -72,69 +69,78 @@ public class BasicValidation {
         HashMap<String,String> errors = new HashMap<String,String>();
 
         for( String name : editConfig.getLiteralsOnForm() ){
-        	Literal literal = varNamesToValues.get(name);
-        	List<String>validations = varsToValidations.get(name);
-        	if( validations != null ){
-        		  for( String validationType : validations){
-        			String value = null;
-        			try{
-        				if( literal != null )
-        					value = literal.getString();
-        			}catch(Throwable th){ 
-        				log.debug("could not convert literal to string" , th); 
-        			}
-                    String validateMsg = validate(validationType, value );
+            Literal literal = varNamesToValues.get(name);
+            List<String>validations = varsToValidations.get(name);
+            if( validations != null ){
+                // NB this is case-sensitive
+                boolean isRequiredField = validations.contains("nonempty");
+                for( String validationType : validations){
+                    String value = null;
+                    try{
+                        if( literal != null )
+                            value = literal.getString();
+                    }catch(Throwable th){ 
+                        log.debug("could not convert literal to string" , th); 
+                    }
+                    // Empty field: if required, include only the empty field
+                    // error message, not a format validation message. If non-required, 
+                    // don't do format validation, since that is both unnecessary and may 
+                    // incorrectly generate errors.
+                    if (isEmpty(value)) {
+                        if (isRequiredField) {
+                           errors.put(name, REQUIRED_FIELD_EMPTY_MSG);
+                        }
+                        break;
+                    }
+                    String validateMsg = validate(validationType, value);
                     if( validateMsg != null) {
                         errors.put(name,validateMsg);
-						// If it's a required field that is empty, do not continue with
-						// other validations for this field.
-    					if (validateMsg == REQUIRED_FIELD_EMPTY_MSG) {
-    						break;
-    					}
                     }
                 }
-        	}
+            }
         }
         return errors;
     }
     
-	public Map<String,String>validateFiles(Map<String, List<FileItem>> fileItemMap) {		
-		
-		HashMap<String,String> errors = new HashMap<String,String>();
-		for(String name: editConfig.getFilesOnForm() ){			
-			List<String> validators = varsToValidations.get(name);			
-			for( String validationType : validators){
-				String validateMsg = validate(validationType, fileItemMap.get(name));
-				if( validateMsg != null ) {
-					errors.put(name, validateMsg);
-				}	
-			}
-		}			
-		return errors;	
-	}
-	
+    public Map<String,String>validateFiles(Map<String, List<FileItem>> fileItemMap) {        
+        
+        HashMap<String,String> errors = new HashMap<String,String>();
+        for(String name: editConfig.getFilesOnForm() ){            
+            List<String> validators = varsToValidations.get(name);            
+            for( String validationType : validators){
+                String validateMsg = validate(validationType, fileItemMap.get(name));
+                if( validateMsg != null ) {
+                    errors.put(name, validateMsg);
+                }    
+            }
+        }            
+        return errors;    
+    }
+    
     
     private String validate(String validationType, List<FileItem> fileItems) {
-    	if( "nonempty".equalsIgnoreCase(validationType)){
-    		if( fileItems == null || fileItems.size() == 0 ){
-    			return "a file must be entered for this field";
-    		}else{
-    			FileItem fileItem = fileItems.get(0);
-    			if( fileItem == null || fileItem.getName() == null || fileItem.getName().length() < 1 || fileItem.getSize() < 0){
-    				return "a file must be entered for this field";
-    			}
-    		}
-    	}
-    	return null;
-	}
+        if( "nonempty".equalsIgnoreCase(validationType)){
+            if( fileItems == null || fileItems.size() == 0 ){
+                return "a file must be entered for this field.";
+            }else{
+                FileItem fileItem = fileItems.get(0);
+                if( fileItem == null || fileItem.getName() == null || fileItem.getName().length() < 1 || fileItem.getSize() < 0){
+                    return "a file must be entered for this field.";
+                }
+            }
+        }
+        return null;
+    }
 
-	/* null indicates success. A returned string is the validation
+    /* null indicates success. A returned string is the validation
     error message.
      */
     public String validate(String validationType, String value){
-    	// Required field validation
+        // Required field validation.
+        // For literals, testing empty required values in validateLiterals.
+        // This case may be needed for validation of other field types.
         if( "nonempty".equalsIgnoreCase(validationType)){
-            if( value == null || value.trim().length() == 0 )
+            if( isEmpty(value) )
                 return REQUIRED_FIELD_EMPTY_MSG;
         }
         // Format validation
@@ -142,15 +148,15 @@ public class BasicValidation {
             if( isDate( value))
                 return SUCCESS;
             else
-                return "must be in valid date format mm/dd/yyyy";
+                return "must be in valid date format mm/dd/yyyy.";
         }else if( validationType.indexOf("datatype:") == 0 ) {
-        	String datatypeURI = validationType.substring(9);
-        	String errorMsg = validateAgainstDatatype( value, datatypeURI ); 
-        	if ( errorMsg == null ) { 
-        		return SUCCESS;
-        	} else {
-        		return errorMsg;
-        	}
+            String datatypeURI = validationType.substring(9);
+            String errorMsg = validateAgainstDatatype( value, datatypeURI ); 
+            if ( errorMsg == null ) { 
+                return SUCCESS;
+            } else {
+                return errorMsg;
+            }
         }
         return null; //
     }
@@ -162,24 +168,24 @@ public class BasicValidation {
     private static DatatypeDaoJena ddao = null;
     
     public static synchronized String validateAgainstDatatype( String value, String datatypeURI ) {
-    	if ( ( datatypeURI != null ) && ( datatypeURI.length()>0 ) ) {
-    		RDFDatatype datatype = TypeMapper.getInstance().getSafeTypeByName(datatypeURI);
-    		if ( datatype == null ) {
-    			throw new RuntimeException( datatypeURI + " is not a recognized datatype");
-    		}
-    		if ( datatype.isValid(value) ) {
-    			return null;
-    		} else {
-    			// TODO: better way of getting more friendly names for common datatypes
-    			if (ddao == null) {
-    			    ddao = new DatatypeDaoJena(new WebappDaoFactoryJena(ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)));
-    			}
-    			Datatype dtype = ddao.getDatatypeByURI(datatypeURI);
-    			String dtypeMsg = (dtype != null) ? dtype.getName() : datatypeURI;
-    			return " Please correct this value. (Must be a valid " + dtypeMsg + ")";
-    		}
-    	}
-    	return null;
+        if ( ( datatypeURI != null ) && ( datatypeURI.length()>0 ) ) {
+            RDFDatatype datatype = TypeMapper.getInstance().getSafeTypeByName(datatypeURI);
+            if ( datatype == null ) {
+                throw new RuntimeException( datatypeURI + " is not a recognized datatype");
+            }
+            if ( datatype.isValid(value) ) {
+                return null;
+            } else {
+                // TODO: better way of getting more friendly names for common datatypes
+                if (ddao == null) {
+                    ddao = new DatatypeDaoJena(new WebappDaoFactoryJena(ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)));
+                }
+                Datatype dtype = ddao.getDatatypeByURI(datatypeURI);
+                String dtypeMsg = (dtype != null) ? dtype.getName() : datatypeURI;
+                return " Please correct this value: must be a valid " + dtypeMsg + ".";
+            }
+        }
+        return null;
     }
 
     private void checkValidations(){
@@ -187,10 +193,10 @@ public class BasicValidation {
         for( String key : varsToValidations.keySet()){
             for( String validator : varsToValidations.get(key)){
                 if( ! basicValidations.contains( validator)) {
-                	if ( ! ( ( validator != null) &&  
-                		 ( validator.indexOf( "datatype:" ) == 0 ) ) ) {
-                	    unknown.add(validator);
-                	}
+                    if ( ! ( ( validator != null) &&  
+                         ( validator.indexOf( "datatype:" ) == 0 ) ) ) {
+                        unknown.add(validator);
+                    }
                 }
             }
         }
@@ -199,11 +205,15 @@ public class BasicValidation {
 
         throw new Error( "Unknown basic validators: " + unknown.toArray());
     }
+    
+    private static boolean isEmpty(String value) {
+        return (value == null || value.trim().isEmpty()); 
+    }
 
 
     /** we use null to indicate success */
     public final static String SUCCESS = null;
-    public final static String REQUIRED_FIELD_EMPTY_MSG = "This field must not be empty";
+    public final static String REQUIRED_FIELD_EMPTY_MSG = "This field must not be empty.";
     
     /** regex for strings like "12/31/2004" */
     private final String dateRegex = "((1[012])|([1-9]))/((3[10])|([12][0-9])|([1-9]))/[\\d]{4}";
