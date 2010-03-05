@@ -55,8 +55,12 @@ public class BasicValidation {
             if( validations!= null){
                 for( String validationType : validations){
                     String validateMsg = validate(validationType,value);
-                    if( validateMsg != null)
+                    if( validateMsg != null) {
                         errors.put(name,validateMsg);
+                        if (validateMsg == REQUIRED_FIELD_EMPTY_MSG) {
+                        	continue;
+                        }
+                    }	
                 }
             }
         }               
@@ -80,8 +84,14 @@ public class BasicValidation {
         				log.debug("could not convert literal to string" , th); 
         			}
                     String validateMsg = validate(validationType, value );
-                    if( validateMsg != null)
+                    if( validateMsg != null) {
                         errors.put(name,validateMsg);
+						// If it's a required field that is empty, do not continue with
+						// other validations for this field.
+    					if (validateMsg == REQUIRED_FIELD_EMPTY_MSG) {
+    						break;
+    					}
+                    }
                 }
         	}
         }
@@ -93,18 +103,19 @@ public class BasicValidation {
 		HashMap<String,String> errors = new HashMap<String,String>();
 		for(String name: editConfig.getFilesOnForm() ){			
 			List<String> validators = varsToValidations.get(name);			
-			for( String valdationType : validators){
-				String validateMsg = validate(valdationType, fileItemMap.get(name));
-				if( validateMsg != null )
+			for( String validationType : validators){
+				String validateMsg = validate(validationType, fileItemMap.get(name));
+				if( validateMsg != null ) {
 					errors.put(name, validateMsg);
+				}	
 			}
 		}			
 		return errors;	
 	}
 	
     
-    private String validate(String valdationType, List<FileItem> fileItems) {
-    	if( "nonempty".equalsIgnoreCase(valdationType)){
+    private String validate(String validationType, List<FileItem> fileItems) {
+    	if( "nonempty".equalsIgnoreCase(validationType)){
     		if( fileItems == null || fileItems.size() == 0 ){
     			return "a file must be entered for this field";
     		}else{
@@ -121,12 +132,13 @@ public class BasicValidation {
     error message.
      */
     public String validate(String validationType, String value){
+    	// Required field validation
         if( "nonempty".equalsIgnoreCase(validationType)){
             if( value == null || value.trim().length() == 0 )
-                return "this field must not be empty";
-            else
-                return SUCCESS;
-        }else if("isDate".equalsIgnoreCase(validationType)){
+                return REQUIRED_FIELD_EMPTY_MSG;
+        }
+        // Format validation
+        if("isDate".equalsIgnoreCase(validationType)){
             if( isDate( value))
                 return SUCCESS;
             else
@@ -191,7 +203,8 @@ public class BasicValidation {
 
     /** we use null to indicate success */
     public final static String SUCCESS = null;
-
+    public final static String REQUIRED_FIELD_EMPTY_MSG = "This field must not be empty";
+    
     /** regex for strings like "12/31/2004" */
     private final String dateRegex = "((1[012])|([1-9]))/((3[10])|([12][0-9])|([1-9]))/[\\d]{4}";
     private final Pattern datePattern = Pattern.compile(dateRegex);
