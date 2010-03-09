@@ -63,7 +63,7 @@ public class ContextStub implements Context {
 		if (name == null) {
 			throw new NullPointerException("ContextStub: name may not be null.");
 		}
-		if (name.isEmpty()) {
+		if (isEmpty(name)) {
 			throw new NamingException("ContextStub: name may not be empty.");
 		}
 		parent.rebind(contextPath + "/" + name, obj);
@@ -76,7 +76,7 @@ public class ContextStub implements Context {
 		if (name == null) {
 			throw new NamingException("ContextStub: name may not be null.");
 		}
-		if (name.isEmpty()) {
+		if (isEmpty(name)) {
 			return this;
 		}
 		return parent.lookup(contextPath + "/" + name);
@@ -211,5 +211,9 @@ public class ContextStub implements Context {
 	public void unbind(String name) throws NamingException {
 		throw new RuntimeException("ContextStub.unbind() not implemented.");
 	}
+
+    private boolean isEmpty(String string) {
+        return (string == null || string.trim().length() == 0);
+    }
 
 }

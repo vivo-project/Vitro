@@ -80,13 +80,17 @@ public class InitialContextStub extends InitialContext {
 		return ContextStub.getInstance("", this);
 	}
 
+    private boolean isEmpty(String string) {
+        return (string == null || string.trim().length() == 0);
+    }
+
 	@Override
 	public void bind(String name, Object obj) throws NamingException {
 		if (name == null) {
 			throw new NullPointerException(
 					"InitialContextStub: name may not be null.");
 		}
-		if (name.isEmpty()) {
+		if (isEmpty(name)) {
 			throw new NamingException(
 					"InitialContextStub: name may not be empty.");
 		}
@@ -104,7 +108,7 @@ public class InitialContextStub extends InitialContext {
 			throw new NullPointerException(
 					"InitialContextStub: name may not be null.");
 		}
-		if (name.isEmpty()) {
+		if (isEmpty(name)) {
 			throw new NamingException(
 					"InitialContextStub: name may not be empty.");
 		}
@@ -118,7 +122,7 @@ public class InitialContextStub extends InitialContext {
 			throw new NullPointerException(
 					"InitialContextStub: name may not be null");
 		}
-		if (name.isEmpty()) {
+		if (isEmpty(name)) {
 			return this;
 		}
 		if (bindings.containsKey(name)) {

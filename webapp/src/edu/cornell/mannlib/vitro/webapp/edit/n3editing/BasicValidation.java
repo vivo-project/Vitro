@@ -207,7 +207,7 @@ public class BasicValidation {
     }
     
     private static boolean isEmpty(String value) {
-        return (value == null || value.trim().isEmpty()); 
+        return (value == null || value.trim().length() == 0); 
     }
 
 
