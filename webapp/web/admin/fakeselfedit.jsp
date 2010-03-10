@@ -9,11 +9,11 @@
 <form action="<c:url value="/admin/fakeselfedit"/>" >
     <input type="text" name="netid" value="${netid}"/>
     <input type="hidden" name="force" value="1"/>
-    <input type="submit" value="use this netid for testing"/>
+    &nbsp;<input type="submit" value="use this netid for testing"/>
 </form>
 
-
-<form action="<c:url value="fakeselfedit"/>" >
+<br />
+<form action="<c:url value="/admin/fakeselfedit"/>" >
     <input type="hidden" name="stopfaking" value="1"/>
     <input type="submit" value="stop using netid for testing"/>
 </form>

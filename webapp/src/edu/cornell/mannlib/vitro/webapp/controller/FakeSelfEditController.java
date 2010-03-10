@@ -32,7 +32,10 @@ public class FakeSelfEditController extends VitroHttpServlet {
 //        if (!checkLoginStatus(request, response)) {
 //            return;
 //        }
-        String redirectUrl = null;
+        
+        String redirectUrl = null;       
+        String netid = null;
+        String msg = null;
         
         try {
             super.doGet(request,response);
@@ -43,53 +46,59 @@ public class FakeSelfEditController extends VitroHttpServlet {
             LoginFormBean loginHandler = null;
             if( obj != null && obj instanceof LoginFormBean )
                 loginHandler = ((LoginFormBean)obj);
-            if( loginHandler == null ||
-                ! "authenticated".equalsIgnoreCase(loginHandler.getLoginStatus()) ||
-                 Integer.parseInt(loginHandler.getLoginRole()) <= LoginFormBean.CURATOR ){       
+            
+            // Not logged in to site admin
+            if ( loginHandler == null ||
+                 ! "authenticated".equalsIgnoreCase(loginHandler.getLoginStatus()) ||
+                 Integer.parseInt(loginHandler.getLoginRole()) <= LoginFormBean.CURATOR ) {       
       
                 session.setAttribute("postLoginRequest",
                         vreq.getRequestURI()); //+( vreq.getQueryString()!=null?('?' + vreq.getQueryString()):"" ));
+                // Redirect to site admin login page
                 redirectUrl=request.getContextPath() + Controllers.LOGIN + "?login=block";
+            }
+            
+            // Logged in to site admin
+            else {
+                // Handle form submission
+                // Form to use netid submitted 
+                if(  vreq.getParameter("force") != null ){        
+                    VitroRequestPrep.forceToSelfEditing(request);
+                    netid = request.getParameter("netid");
+                    FakeSelfEditingIdentifierFactory.clearFakeIdInSession( session );
+                    FakeSelfEditingIdentifierFactory.putFakeIdInSession( netid , session );
+                    // Redirect to user's entity page
+                    redirectUrl = request.getContextPath() + Controllers.ENTITY + "?netid=" + netid;
+                }
+            
+                // Form to stop using netid submitted
+                else if ( request.getParameter("stopfaking") != null) {
+                    VitroRequestPrep.forceOutOfSelfEditing(request);
+                    FakeSelfEditingIdentifierFactory.clearFakeIdInSession( session );  
+                    // Redirect to home page
+                    redirectUrl = request.getContextPath(); 
+                }
+            }
+            
+            if (redirectUrl != null) {
                 response.sendRedirect(redirectUrl);
                 return;
             }
             
-            String netid = null;
-            String msg = null;
-
-            // Form to use netid submitted 
-            if(  vreq.getParameter("force") != null ){        
-                VitroRequestPrep.forceToSelfEditing(request);
-                netid = request.getParameter("netid");
-                msg = "You are using the netid '" + netid + "' to test self-editing."
-;                FakeSelfEditingIdentifierFactory.clearFakeIdInSession( session );
-                FakeSelfEditingIdentifierFactory.putFakeIdInSession( netid , session );
-                //redirectUrl = request.getContextPath() + "/admin/fakeselfedit" + "?netid=" + netid;        
-            }
-            else {
-                // Form to stop using netid submitted
-                if ( request.getParameter("stopfaking") != null){
-                    VitroRequestPrep.forceOutOfSelfEditing(request);
-                    FakeSelfEditingIdentifierFactory.clearFakeIdInSession( session );
-                }    
-                netid = (String)session.getAttribute(FakeSelfEditingIdentifierFactory.FAKE_SELF_EDIT_NETID);
-                msg = "You have not configured a netid to test self-editing.";
-                if( netid != null ) {
-                    msg = "You are testing self-editing as '" + netid + "'.";
-                    //redirectUrl = request.getContextPath() + "/admin/fakeselfedit" + "?netid=" + netid;
-                }
-                else {
-                    netid = "";
-                }
-            }
-
-            if (redirectUrl != null) {
-                response.sendRedirect(redirectUrl);
-                return;                
-            }
+            // On page, form not yet submitted
+            // Check if already logged in from previous form submission
+            netid = (String)session.getAttribute(FakeSelfEditingIdentifierFactory.FAKE_SELF_EDIT_NETID);
             
-            request.setAttribute("msg", msg);
-            request.setAttribute("netid", netid); 
+            // Already logged in from a previous request
+            if ( netid != null ) {
+                msg = "You are testing self-editing as '" + netid + "'.";                   
+            }
+            // Not logged in
+            else {
+                msg = "You have not configured a netid to test self-editing.";
+            }                  
+            
+            request.setAttribute("msg", msg); 
             
             request.setAttribute("title", "Self-Edit Test");
             request.setAttribute("bodyJsp", "/admin/fakeselfedit.jsp");
