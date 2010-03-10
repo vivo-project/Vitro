@@ -8,8 +8,7 @@ import java.util.Set;
 import javax.servlet.ServletContext;
 
 import org.apache.commons.dbcp.BasicDataSource;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.ontology.OntModelSpec;
@@ -59,7 +58,7 @@ public class JenaDataSourceSetupBase {
    static final OntModelSpec DB_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM;
    static final OntModelSpec MEM_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM; 
    
-   private static final Log log = LogFactory.getLog(JenaDataSourceSetupBase.class.getName());   
+   private static final Logger log = Logger.getLogger(JenaDataSourceSetupBase.class);   
    
     /**
     * Sets up a Model and DB connection using values from
@@ -130,6 +129,7 @@ public class JenaDataSourceSetupBase {
 
 	public static void readOntologyFilesInPathSet(String path,
 			ServletContext ctx, Model model) {
+		log.debug("Reading ontology files from '" + path + "'");
 		Set<String> paths = ctx.getResourcePaths(path);
 		if (paths != null) {
 			for (String p : paths) {
@@ -139,7 +139,7 @@ public class JenaDataSourceSetupBase {
 					model.read(ontologyInputStream, null);
 					log.debug("...successful");
 				} catch (Throwable t) {
-					log.debug("...unsuccessful");
+					log.error("Failed to load ontology file at '" + p + "'", t);
 				}
 			}
 		}
