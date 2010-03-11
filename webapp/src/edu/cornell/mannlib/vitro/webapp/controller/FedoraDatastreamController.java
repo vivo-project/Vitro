@@ -415,7 +415,7 @@ public class FedoraDatastreamController extends VitroHttpServlet implements Cons
             	wdf.getDataPropertyStatementDao().deleteDataPropertyStatementsForIndividualByDataProperty(fileEntity, contentType);            
 	            dps = new DataPropertyStatementImpl();
 	            dps.setIndividualURI(fileEntity.getURI());
-	            dps.setDatapropURI(VitroVocabulary.CONTENT_TYPE);
+	            dps.setDatapropURI(contentType.getURI());
 	            dps.setData(fileRes.getContentType());
 	            wdf.getDataPropertyStatementDao().insertNewDataPropertyStatement(dps);
             }
