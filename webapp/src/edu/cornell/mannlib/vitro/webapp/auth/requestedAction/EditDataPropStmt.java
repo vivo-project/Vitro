@@ -8,6 +8,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.VisitingPolicyIface;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 
 public class EditDataPropStmt implements RequestedAction {
 
@@ -15,6 +16,13 @@ public class EditDataPropStmt implements RequestedAction {
     
     public EditDataPropStmt(DataPropertyStatement dps){
         this.dataPropStmt = dps;
+    }
+    
+    public EditDataPropStmt(String subjectUri, String predicateUri, String data) {
+        dataPropStmt = new DataPropertyStatementImpl();
+        dataPropStmt.setIndividualURI(subjectUri);
+        dataPropStmt.setDatapropURI(predicateUri);
+        dataPropStmt.setData(data);        
     }
     
     public PolicyDecision accept(VisitingPolicyIface policy, IdentifierBundle whoToAuth) {

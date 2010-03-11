@@ -17,7 +17,7 @@
 
 	<tag>
 		<name>editLinks</name>
-        <display-name>Edit Links for Propery</display-name>
+        <display-name>Edit Links for Property</display-name>
         <description>
             Create the A elements for a specified Property.
         </description>

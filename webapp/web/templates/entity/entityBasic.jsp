@@ -10,8 +10,10 @@
 <%@ page import="org.apache.commons.logging.Log" %>
 <%@ page import="org.apache.commons.logging.LogFactory" %>
 <%@ page import="java.util.List" %>
+
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c" %>
 <%@ taglib uri="http://vitro.mannlib.cornell.edu/vitro/tags/StringProcessorTag" prefix="p" %>
+<%@ taglib uri="http://vitro.mannlib.cornell.edu/vitro/tags/PropertyEditLink" prefix="edLnk" %>
 
 <%@ page errorPage="/error.jsp"%>
 <%! 
@@ -50,6 +52,9 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
               sessionScope.loginHandler.loginRole >= LoginFormBean.NON_EDITOR}">
     <c:set var="showCuratorEdits" value="${true}"/>
 </c:if>
+
+<c:set var="showEdits" value="${showSelfEdits || showCuratorEdits}" />
+
 <c:set var='imageDir' value='images' />
 <c:set var="themeDir"><c:out value="${portalBean.themeDir}" /></c:set>
 <%
@@ -73,6 +78,10 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
 <c:set var='portal' value='${currentPortalId}'/>
 <c:set var='portalBean' value='${currentPortal}'/>
 
+<c:set var="vitroNsUri" value="http://vitro.mannlib.cornell.edu/ns/vitro/0.7#" />
+<c:set var="typeUri" value="http://www.w3.org/1999/02/22-rdf-syntax-ns#type" />
+<c:set var="labelUri" value="http://www.w3.org/2000/01/rdf-schema#label" />
+
 <c:set var='themeDir'><c:out value='${portalBean.themeDir}' /></c:set>
 
     <div id="content">
@@ -91,7 +100,14 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
                     <p><a href="${backToSubjectLink}">&larr; return to ${relatedSubject.name}</a></p>
 	            </c:when>
 	            <c:otherwise>
-	                <h2><p:process>${entity.name}</p:process></h2> 
+	            <div class="vitroNsPropertyValue">
+                    <div class="statementWrap">
+	                   <h2><p:process>${entity.name}</p:process></h2> 
+	                   <c:if test="${showEdits}">
+                            <c:set var="editLinks"><edLnk:editLinks item="${labelUri}" icons="false"/></c:set>
+                            <c:if test="${!empty editLinks}"><span class="editLinks">${editLinks}</span></c:if>             
+                        </c:if>
+                    </div></div>
 	                <c:if test="${!empty entity.moniker}">
 	                    <p:process><em class="moniker">${entity.moniker}</em></p:process>
 	                </c:if>
@@ -142,7 +158,7 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
                 <div class='description'>${entity.description}</div>
             </p:process>
             <c:choose>
-                <c:when test="${showCuratorEdits || showSelfEdits}">
+                <c:when test="${showEdits}">
                      <c:import url="${entityMergedPropsListJsp}">
                          <c:param name="mode" value="edit"/>
                          <c:param name="grouped" value="false"/>

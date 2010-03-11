@@ -70,20 +70,25 @@
     Individual subject = wdf.getIndividualDao().getIndividualByURI(subjectUri);
     if( subject == null ) {
         log.error("Could not find subject Individual '"+subjectUri+"' in model");
-        throw new Error("editDatapropStmtRequest.jsp: Could not find subject Individual in model: '" + subjectUri + "'");
+        throw new Error("editDatapropStmtRequestDispatch.jsp: Could not find subject Individual in model: '" + subjectUri + "'");
     }
     vreq.setAttribute("subject", subject);
 
     DataProperty dataproperty = wdf.getDataPropertyDao().getDataPropertyByURI( predicateUri );
-    if( dataproperty == null ) {
-        log.error("Could not find data property '"+predicateUri+"' in model");
-        throw new Error("editDatapropStmtRequest.jsp: Could not find DataProperty in model: " + predicateUri);
+    if( dataproperty == null) {
+        // We must have either a dataproperty or a custom form
+        // A custom form is used for a vitro namespace property
+        if (formParam == null) {
+            log.error("Could not find data property '"+predicateUri+"' in model");
+            throw new Error("editDatapropStmtRequest.jsp: Could not find DataProperty in model: " + predicateUri);
+        }
     }
-    vreq.setAttribute("predicate", dataproperty);
+    else {
+        vreq.setAttribute("predicate", dataproperty);
+    }
 
     String url= "/edit/editDatapropStmtRequestDispatch.jsp"; //I'd like to get this from the request but...
     vreq.setAttribute("formUrl", url + "?" + vreq.getQueryString());
-
 
     String datapropKeyStr = vreq.getParameter("datapropKey");
     int dataHash = 0;
@@ -99,7 +104,7 @@
 
     DataPropertyStatement dps = null;
     if( dataHash != 0) {
-        dps = RdfLiteralHash.getDataPropertyStmtByHash( subject ,dataHash);
+        dps = RdfLiteralHash.getDataPropertyStmtByHash(subject, dataHash);
 
         if (dps==null) {
             log.error("No match to existing data property \""+predicateUri+"\" statement for subject \""+subjectUri+"\" via key "+datapropKeyStr);
@@ -112,7 +117,7 @@
     if( log.isDebugEnabled() ){
         log.debug("predicate for DataProperty from request is " + dataproperty.getURI() + " with rangeDatatypeUri of '" + dataproperty.getRangeDatatypeURI() + "'");
         if( dps == null )
-            log.debug("no exisitng DataPropertyStatement statement was found, making a new statemet");
+            log.debug("no existng DataPropertyStatement statement was found, making a new statemet");
         else{
             log.debug("Found an existing DataPropertyStatement");
             String msg = "existing datapropstmt: ";
@@ -141,7 +146,7 @@
         } else {
             form = DEFAULT_DATA_FORM;
         }
-        vreq.setAttribute("form" ,form);
+        vreq.setAttribute("form", form);
     } else {
         vreq.setAttribute("form", formParam);
     }
