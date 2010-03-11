@@ -426,7 +426,7 @@ public class FedoraDatastreamController extends VitroHttpServlet implements Cons
 	            wdf.getDataPropertyStatementDao().deleteDataPropertyStatementsForIndividualByDataProperty(fileEntity, fileSize);            
 	            dps = new DataPropertyStatementImpl();
 	            dps.setIndividualURI(fileEntity.getURI());
-	            dps.setDatapropURI(VitroVocabulary.FILE_SIZE);
+	            dps.setDatapropURI(fileSize.getURI());
 	            dps.setData(Long.toString(fileRes.getSize()));
 	            wdf.getDataPropertyStatementDao().insertNewDataPropertyStatement(dps);
 	            //System.out.println("Updated file size with " + fileRes.getSize());
