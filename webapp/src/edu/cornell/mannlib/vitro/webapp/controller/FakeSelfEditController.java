@@ -76,7 +76,7 @@ public class FakeSelfEditController extends VitroHttpServlet {
                     VitroRequestPrep.forceOutOfSelfEditing(request);
                     FakeSelfEditingIdentifierFactory.clearFakeIdInSession( session );  
                     // Redirect to home page
-                    redirectUrl = request.getContextPath(); 
+                    redirectUrl = request.getContextPath() + "/"; 
                 }
             }
             
