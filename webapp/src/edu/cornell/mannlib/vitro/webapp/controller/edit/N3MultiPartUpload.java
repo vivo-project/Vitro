@@ -224,7 +224,7 @@ public class N3MultiPartUpload extends VitroHttpServlet {
                 : "request is for a new file object");
         /** *************************************************** */
         String uploadFileName = "";
-        if (requestIsAnUpdate) {System.out.println("Currently existing file resource edit not supported");
+        if (requestIsAnUpdate) {
           log.error("Editing an existing file resource is not supported by N3MultiPartUpload.java ");
           request.setAttribute("errors", "Editing an existing file resource is not supported.");
           RequestDispatcher rd = request
@@ -260,6 +260,11 @@ public class N3MultiPartUpload extends VitroHttpServlet {
                                     + requiredFieldAssertions.get(fileItemKey));
                             
                         }
+                        //DEBUG
+                        System.out.println("build assertions for field "
+                                + fileItemKey + " and file "
+                                + fileItem.getName() + "\n"
+                                + requiredFieldAssertions.get(fileItemKey));
                         //Save upload file name for use in email confirmation
                         uploadFileName = fileItem.getName();
                     } catch (Exception e) {
@@ -294,6 +299,12 @@ public class N3MultiPartUpload extends VitroHttpServlet {
                         log.debug( it.nextStatement().toString() );
                     }
                     
+                }
+                
+                //DEBUG to see what statements are being added
+                StmtIterator it = assertionModel.listStatements();
+                while(it.hasNext()){
+                    System.out.println("NEXT Statement:" +  it.nextStatement().toString() );
                 }
 
                 /* ****** do PostUpload if there is one ******* */

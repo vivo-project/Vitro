@@ -6,7 +6,8 @@
         <h3>Reports</h3>
     
         <ul>
-            <li><a href="customsparql">Custom Report: File Publication Date &lt; 1 YEAR AGO</a></li>   
+            <li><a href="customsparql?queryType=fileupload">Custom Report: File Publication Date &gt; 1 YEAR AGO</a></li>   
+            <li><a href="customsparql?queryType=filedelete">Custom Report: File Deleted &gt; 1 YEAR AGO</a></li>   
         </ul>
     </div>
 <% } %> 

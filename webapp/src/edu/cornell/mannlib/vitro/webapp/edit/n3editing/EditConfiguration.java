@@ -1,6 +1,7 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -8,6 +9,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Calendar;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;
@@ -32,6 +34,9 @@ import edu.cornell.mannlib.vitro.webapp.auth.identifier.UserToIndIdentifierFacto
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
+import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
+import com.hp.hpl.jena.datatypes.xsd.XSDDateTime;
+import com.hp.hpl.jena.datatypes.BaseDatatype;
 
 /**
  * Represents a set of fields on a form and how parameters from a from
@@ -224,7 +229,12 @@ public class EditConfiguration {
         if( getSparqlForAdditionalLiteralsInScope() != null && 
             getSparqlForAdditionalLiteralsInScope().containsKey("currentTime") &&
             USE_SYSTEM_VALUE.equals(getSparqlForAdditionalLiteralsInScope().get("currentTime"))){
-            getLiteralsInScope().put("currentTime", ResourceFactory.createTypedLiteral(new Date()));            
+        	//Updating so that this is represented as an XSD Date Time literal - to allow for comparison later
+        	//Currently it appears that this is only used for file upload 
+            //getLiteralsInScope().put("currentTime", ResourceFactory.createTypedLiteral(new Date()));
+        	SimpleDateFormat dateTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    		String formattedDate = dateTime.format(Calendar.getInstance().getTime());
+    		getLiteralsInScope().put("currentTime", ResourceFactory.createTypedLiteral(formattedDate, XSDDatatype.XSDdateTime));
         }            
         
         /* editing user */

@@ -18,6 +18,7 @@
     <input type="hidden" name="fileUri" value="${fileUri}"/>
     <input type="hidden" name="pid" value="${pid}"/>
     <input type="hidden" name="dsid" value="${dsid}"/>
-
+    <!--Adding use new name set to true so that it is overwritten correctly-->
+	<input type="hidden" name="useNewName" value="true"/>
     <input type="submit" id="submit" value="submit" />
   </form>
