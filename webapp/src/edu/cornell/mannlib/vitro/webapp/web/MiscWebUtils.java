@@ -16,8 +16,6 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.impl.ModelCom;
 
-import edu.cornell.mannlib.vitro.webapp.auth.policy.JenaNetidPolicy.ContextSetup;
-
 public class MiscWebUtils {
     /**
          * Takes each http request parameter in req that has a name that matches
@@ -171,6 +169,27 @@ public class MiscWebUtils {
         return rv;
     }
 
+
+    public static void debugPrintHeaders(HttpServletRequest req){
+	    Enumeration hnames = req.getHeaderNames();
+	    while( hnames.hasMoreElements() ){
+	    	String name = (String) hnames.nextElement();
+	    	System.out.println("header " + name);
+	    	String value = req.getHeader(name);
+	    	System.out.println("    " + value);
+	    	Enumeration values = req.getHeaders(name);
+	    	if( values == null ){
+	    		System.out.println("    enumeration was null");            		
+	    	}else{
+	    		System.out.println("    enumeration values");
+	    		while( values.hasMoreElements() ){
+	    			String val = (String) values.nextElement();
+	    			System.out.println("    " + value);
+	    		}
+	    	}            
+	    }
+    }
+    
     /**
         This isfrom org.json.simple.JSONObject
 
