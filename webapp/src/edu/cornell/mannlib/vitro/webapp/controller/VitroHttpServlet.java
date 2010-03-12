@@ -28,6 +28,9 @@ public class VitroHttpServlet extends HttpServlet
     private WebappDaoFactory myAssertionsWebappDaoFactory = null;
     private WebappDaoFactory myDeductionsWebappDaoFactory = null;
 
+    public final static String RDFXML_MIMETYPE ="application/rdf+xml";
+    public final static String N3_MIMETYPE ="text/rdf+n3"; //unofficial and unregistered      
+    
     /**
      * Setup the auth flag, portal flag and portal bean objects.
      * Put them in the request attributes.
