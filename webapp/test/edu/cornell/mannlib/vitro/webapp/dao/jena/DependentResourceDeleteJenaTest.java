@@ -777,4 +777,63 @@ public class DependentResourceDeleteJenaTest {
         Assert.assertTrue( same );
     }
 
+    @org.junit.Ignore @org.junit.Test
+    public void testDeleteWithNonZeroInDegree() {
+        /*
+          This tests deleteing a position context node from the orginization side.
+          Currently the required behaivor is that the position context node not be
+          deleted when the object property statement is deleted from the org side.
+        */
+        String source = 
+            "@prefix vitro: <" + VitroVocabulary.vitroURI + "> . \n" +
+            "@prefix ex: <http://example.com/> . \n" +            
+            "@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> . \n"+
+            "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> . \n"+
+            "@prefix owl:  <http://www.w3.org/2002/07/owl#> . \n"+
+            " ex:bob  ex:a \"Bob\".   \n" +
+            " ex:orgP ex:a \"orgP\".   \n" +
+            " ex:bob  ex:hasPosition ex:position1 .   \n" +            
+            " ex:orgP ex:hasPosition ex:position1 .   \n" +
+            " ex:position1 rdf:type " + depRes + " . \n" +
+            " ex:position1 ex:a \"This is Position1\". \n" +
+            " ex:position1 ex:b \"2343\" . ";         	
+        
+        String expected = 
+            "@prefix vitro: <" + VitroVocabulary.vitroURI + "> . \n" +
+            "@prefix ex: <http://example.com/> . \n" +            
+            "@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> . \n"+
+            "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> . \n"+
+            "@prefix owl:  <http://www.w3.org/2002/07/owl#> . \n"+
+            " ex:bob  ex:a \"Bob\".   \n" +
+            " ex:orgP ex:a \"orgP\".   \n" +
+            " ex:bob  ex:hasPosition ex:position1 .   \n" +            
+            " ex:position1 rdf:type " + depRes + " . \n" +
+            " ex:position1 ex:a \"This is Position1\". \n" +
+            " ex:position1 ex:hasOrgName \"org xyz\" . \n" +
+            " ex:position1 ex:b \"2343\" . ";
+            
+        String additions =     
+        	"@prefix ex: <http://example.com/> . \n" +                    	        
+        	" ex:position1 ex:hasOrgName \"org xyz\" . ";
+        
+        String retractions =     
+        	"@prefix ex: <http://example.com/> . \n" +                    	        
+        	" ex:orgP ex:hasPosition ex:position1 . ";        
+                
+        Model sourceModel = (ModelFactory.createDefaultModel()).read(new StringReader(source), "", "N3");                                              
+        Model additionsModel = (ModelFactory.createDefaultModel()).read(new StringReader(additions), "", "N3");
+        Model retractionsModel = (ModelFactory.createDefaultModel()).read(new StringReader(retractions), "", "N3");
+        
+        Model depDeletes = 
+        	DependentResourceDeleteJena.getDependentResourceDeleteForChange(additionsModel, retractionsModel, sourceModel);                        
+        sourceModel.remove(depDeletes);
+        sourceModel.remove(retractionsModel);
+        sourceModel.add(additionsModel);
+                        
+        Model expectedModel = (ModelFactory.createDefaultModel()).read(new StringReader(expected), "", "N3");
+        boolean same = expectedModel.isIsomorphicWith( sourceModel );
+        if( ! same ) printModels( expectedModel, sourceModel);
+        Assert.assertTrue( same );
+    }
+
 }
