@@ -216,7 +216,7 @@ private final OntModelSpec DEFAULT_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM;
 		} else {
 			// limit resources to those in the supplied namespace
 			describeQueryStrBuff
-			.append("    FILTER (afn:namespace(?res) == \"")
+			.append("    FILTER (afn:namespace(?res) = \"")
 			.append(namespace)
 			.append("\") \n");	
 		}

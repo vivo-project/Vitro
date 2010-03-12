@@ -30,6 +30,8 @@ public class Controllers {
     public static final String SITE_ADMIN = "/siteAdmin";
     public static final String LOGIN = "/siteAdmin";
     public static final String LOGOUT = "/siteAdmin";
+    
+    public static final String EXPORT_RDF = "/export";
 
     // jsps go here:
     

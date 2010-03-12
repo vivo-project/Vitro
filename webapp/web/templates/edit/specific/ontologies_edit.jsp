@@ -6,6 +6,7 @@
           xmlns:c="http://java.sun.com/jstl/core" 
           xmlns:form="http://vitro.mannlib.cornell.edu/edit/tags"
           version="2.0">
+<jsp:directive.page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers"/>
 
 
 <div class="editingForm">
@@ -57,6 +58,24 @@
                 <input type="hidden" name="mode" value="renameResource"/>
                 <input type="hidden" name="controller" value="Refactor"/>
         </form>
+
+        <div style="margin-left:-0.5em;margin-top:0.5em;padding:0.5em;border-style:solid;border-width:1px;">
+            <form action="${exportURL}" method="get">
+                <input type="hidden" name="subgraph" value="tbox"/>
+                <input type="hidden" name="assertedOrInferred" value="asserted"/>
+                <input type="hidden" name="ontologyURI" value="${Ontology.URI}"/>
+                <input type="submit" class="form-button" name="submit" value="export ontology to RDF"/>
+                <div style="padding:0;margin-top:0.3em;white-space:nowrap;">
+	                <input type="radio" name="format" value="RDF/XML-ABBREV" checked="checked" selected="selected"/> RDF/XML abbreviated
+	                <input type="radio" name="format" value="RDF/XML"/> RDF/XML
+	                <input type="radio" name="format" value="N3"/> N3
+	                <input type="radio" name="format" value="N-TRIPLES"/> N-Triples
+	                <input type="radio" name="format" value="TURTLE"/> Turtle
+                </div>
+            </form>
+        </div>
+
+
 	</td>
 </tr>
 </table>

@@ -85,7 +85,8 @@ public class OntologyEditController extends BaseEditController {
         // See OntologyDaoJena.ontologyFromOntologyResource() comments
         String realURI = OntologyDaoJena.adjustOntologyURI(o.getURI());
         request.setAttribute("realURI", realURI);
-
+        request.setAttribute("exportURL", request.getContextPath() + Controllers.EXPORT_RDF);
+        
         Portal portal = (new VitroRequest(request)).getPortal();
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         request.setAttribute("epoKey",epo.getKey());
