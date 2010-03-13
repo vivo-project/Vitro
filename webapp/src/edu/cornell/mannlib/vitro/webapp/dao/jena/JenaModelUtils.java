@@ -130,10 +130,6 @@ public class JenaModelUtils {
         	    }
     		} catch (Exception e) {
     			log.error("Unable to create class groups automatically based on class hierarchy");
-    			Individual thingsClassGroup = tempModel.createIndividual(wadf.getDefaultNamespace()+"vitroClassGroupThings",classGroupClass);
-    			thingsClassGroup.addLabel("Things",null);
-    			thingsClassGroup.addProperty(tempModel.getProperty(VitroVocabulary.DISPLAY_RANK_ANNOT),"50",XSDDatatype.XSDint);
-    			tempModel.add(OWL.Thing, inClassGroupProperty, thingsClassGroup);
     		}
     		vitroInternalsSubmodel.enterCriticalSection(Lock.WRITE);
     		try {

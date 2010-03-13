@@ -11,6 +11,7 @@ import javax.servlet.ServletContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
@@ -22,6 +23,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.util.ResourceUtils;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
+import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
@@ -86,7 +88,6 @@ public class InitialJenaModelUtils {
 	}
 	
 	public static Model basicPortalAndRootTab(String defaultNamespace) {
-
 		OntModel essentialInterfaceData = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
         Resource portalClass = essentialInterfaceData.getResource(VitroVocabulary.PORTAL);
         Property themeDirProperty = essentialInterfaceData.getProperty(VitroVocabulary.PORTAL_THEMEDIR);
@@ -110,8 +111,22 @@ public class InitialJenaModelUtils {
 		rootTab.addProperty(tabInPortalProperty, portal1);
 		portal1.addProperty(rootTabProperty, rootTab);
 		
-		return essentialInterfaceData;
-		
+		return essentialInterfaceData;		
 	}
+	
+	public static Model basicClassgroup(String defaultNamespace) {
+		OntModel m = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+		Individual thingsClassGroup = m.createIndividual(
+				defaultNamespace+"vitroClassGroupThings", 
+				m.createResource(VitroVocabulary.CLASSGROUP));
+		thingsClassGroup.addLabel("Things", null);
+		thingsClassGroup.addProperty(
+				m.getProperty(VitroVocabulary.DISPLAY_RANK_ANNOT),
+				"50", XSDDatatype.XSDint);
+		m.add(OWL.Thing, 
+				m.getProperty(VitroVocabulary.IN_CLASSGROUP), thingsClassGroup);
+		return m;
+	}
+	
 	
 }

@@ -800,22 +800,13 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
         public void addVClassesToGroups(List <VClassGroup> groups) {
             getOntModel().enterCriticalSection(Lock.READ);
             try {
-                if ((groups != null) && (groups.size()>0)) {
+                if (groups != null) {
                     Iterator groupIt = groups.iterator();
                     while (groupIt.hasNext()) {
                         VClassGroup g = (VClassGroup) groupIt.next();
                         addVClassesToGroup(g);
                     }
-                } else {
-                    VClassGroup vcg = new VClassGroup();
-                    vcg.setURI("null://null#0");
-                    vcg.setNamespace("null://null#");
-                    vcg.setLocalName("0");
-                    vcg.setPublicName("Browse Categories");
-                    vcg.addAll(getAllVclasses());
-                    java.util.Collections.sort(vcg.getVitroClassList());
-                    groups.add(vcg);
-                }
+                } 
             } finally {
                 getOntModel().leaveCriticalSection();
             }
