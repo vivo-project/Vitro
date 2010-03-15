@@ -304,10 +304,6 @@ public class PropertyEditLinks extends TagSupport{
             ls.setMouseoverText("delete this relationship");
             links[index] = ls; index++;
 
-//             String imgUrl = makeRelativeHref( themeDir + "site_icons/trashcan.gif");
-
-//             str += "<a class\"delete image\" href=" + url + " title=\"delete\">" +
-//                     "<img src=" + imgUrl + " alt=\"(delete)\"/></a>\n";
         } else {
             log.debug("NO permission to DELETE this object property statement ("+opropStmt.getPropertyURI()+") found in policy");
         }
@@ -329,26 +325,19 @@ public class PropertyEditLinks extends TagSupport{
         String dpropHash = String.valueOf(RdfLiteralHash.makeRdfLiteralHash( dpropStmt ));
         String dispatchUrl = contextPath + "edit/editDatapropStmtRequestDispatch.jsp";
         
-        //String propName = getNameFromUri(predicateUri);
-        //String editForm = "defaultVitroNsPropForm.jsp";
-
-        LinkStruct ls = new LinkStruct();
         int index = 0;
         
         if ( contains( allowedAccessTypeArray, EditLinkAccess.MODIFY ) ){ 
             log.debug("Permission found to UPDATE vitro namespace property " + predicateUri);
+            LinkStruct ls = new LinkStruct();
             String url = makeRelativeHref(dispatchUrl, 
                                           "subjectUri", subjectUri,
                                           "predicateUri", predicateUri,
                                           "datapropKey",  dpropHash,
                                           "vitroNsProp", "true");
-                                          // RY If we use a single vitro ns form for all vitro ns props, we won't need the editForm param.
-                                          // See if they can reasonably be combined into a single form, then have 
-                                          // editDatapropStmtRequestDispatch use a default vitro ns form if no custom form is specified.
-                                          //"editForm", editForm);
             ls.setHref(url);
             ls.setType("edit");
-            ls.setMouseoverText("edit this property");
+            ls.setMouseoverText("edit this text");
             links[index] = ls; 
             index++;
         }
@@ -359,16 +348,16 @@ public class PropertyEditLinks extends TagSupport{
         // Name and type can be edited but not deleted
         if ( !( predicateUri.endsWith("#label") || predicateUri.endsWith("#type") ) ) {
             if ( contains( allowedAccessTypeArray, EditLinkAccess.DELETE ) ){ 
+                LinkStruct ls = new LinkStruct();
                 log.debug("Permission found to DELETE vitro namespace property " + predicateUri);
                 String url = makeRelativeHref(dispatchUrl, 
                                               "subjectUri", subjectUri,
                                               "predicateUri", predicateUri,
                                               "datapropKey",  dpropHash,
                                               "vitroNsProp", "true");
-                                              //"editForm", editForm);
                 ls.setHref(url);
                 ls.setType("delete");
-                ls.setMouseoverText("delete this property");
+                ls.setMouseoverText("delete this text");
                 links[index] = ls; 
                 index++;
             }

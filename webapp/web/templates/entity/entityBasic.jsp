@@ -78,9 +78,20 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
 <c:set var='portal' value='${currentPortalId}'/>
 <c:set var='portalBean' value='${currentPortal}'/>
 
-<c:set var="vitroNsUri" value="http://vitro.mannlib.cornell.edu/ns/vitro/0.7#" />
-<c:set var="typeUri" value="http://www.w3.org/1999/02/22-rdf-syntax-ns#type" />
 <c:set var="labelUri" value="http://www.w3.org/2000/01/rdf-schema#label" />
+<c:set var="typeUri" value="http://www.w3.org/1999/02/22-rdf-syntax-ns#type" />
+<c:set var="vitroNsUri" value="http://vitro.mannlib.cornell.edu/ns/vitro/0.7#" />
+
+<c:if test="${showEdits}">
+    <c:set var="labelEditLinks"><edLnk:editLinks item="${labelUri}" data="${entity.name}" icons="false"/></c:set>
+    <c:set var="monikerEditLinks"><edLnk:editLinks item="${vitroNsUri}moniker" data="${entity.moniker}" icons="false"/></c:set>
+    <c:set var="blurbEditLinks"><edLnk:editLinks item="${vitroNsUri}blurb" data="${entity.blurb}" icons="false"/></c:set>
+    <c:set var="citationEditLinks"><edLnk:editLinks item="${vitroNsUri}citation" data="${entity.citation}" icons="false"/></c:set>
+    <c:set var="descriptionEditLinks"><edLnk:editLinks item="${vitroNsUri}description" data="${entity.description}" icons="false"/></c:set>
+    <c:set var="timekeyEditLinks"><edLnk:editLinks item="${vitroNsUri}timekey" data="${entity.timekey}" icons="false"/></c:set>
+    <c:set var="urlEditLinks"><edLnk:editLinks item="${vitroNsUri}url" data="${entity.url}" icons="false"/></c:set>
+    <c:set var="anchorEditLinks"><edLnk:editLinks item="${vitroNsUri}anchor" data="${entity.anchor}" icons="false"/></c:set>       
+</c:if>
 
 <c:set var='themeDir'><c:out value='${portalBean.themeDir}' /></c:set>
 
@@ -89,7 +100,7 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
         
         <div class='contents entity'>
 
-       		<div id="label">
+       		<div id="labelAndMoniker">
 	            <c:choose>
 		            <c:when test="${!empty relatedSubject}">
 		                <h2><p:process>${relatingPredicate.domainPublic} for ${relatedSubject.name}</p:process></h2>
@@ -100,18 +111,29 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
 	                    <p><a href="${backToSubjectLink}">&larr; return to ${relatedSubject.name}</a></p>
 		            </c:when>
 		            <c:otherwise>
-		            <div class="vitroNsPropertyValue">
-	                    <div class="statementWrap">
-		                   <h2><p:process>${entity.name}</p:process></h2> 
-		                   <c:if test="${showEdits}">
-	                            <c:set var="editLinks"><edLnk:editLinks item="${labelUri}" data="${entity.name}" icons="false"/></c:set>
-	                            <c:if test="${!empty editLinks}"><span class="editLinks">${editLinks}</span></c:if>             
-	                        </c:if>
+		                <div class="vitroNsPropertyValue" id="label">
+	                        <div class="statementWrap">
+		                       <h2><p:process>${entity.name}</p:process></h2> 
+		                       <c:if test="${!empty labelEditLinks}">
+                                   <span class="editLinks">${labelEditLinks}</span>       
+                               </c:if> 
+	                        </div>
 	                    </div>
-	                </div>
-		            <c:if test="${!empty entity.moniker}">
-		                <p:process><em class="moniker">${entity.moniker}</em></p:process>
-		            </c:if>
+	                    <c:choose>
+		                    <c:when test="${!empty entity.moniker}">
+		                        <div class="vitroNsPropertyValue" id="moniker">
+		                            <div class="statementWrap">
+		                                <p:process><em class="moniker">${entity.moniker}</em></p:process>
+                                        <c:if test="${!empty monikerEditLinks}">
+                                            <span class="editLinks">${monikerEditLinks}</span>         
+                                        </c:if>		                    
+		                            </div>
+		                        </div>
+		                    </c:when>
+		                    <c:otherwise>
+		                      <%-- Show the add link --%>
+		                    </c:otherwise>
+		                </c:choose>
 		            </c:otherwise>
 	            </c:choose>
             </div><!-- entity label -->
