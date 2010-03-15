@@ -5,11 +5,17 @@ package edu.cornell.mannlib.vitro.webapp.edit.n3editing;
 import java.util.List;
 
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.web.jsptags.InputElementFormattingTag;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import com.hp.hpl.jena.rdf.model.Literal;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 
 public class RdfLiteralHash {
     
@@ -86,5 +92,39 @@ public class RdfLiteralHash {
         }
         return null;
     }
+    
+    public static DataPropertyStatement getVitroNsPropertyStmtByHash(Individual ind, Model model, int hash) {
+        if (ind == null || model == null || hash == 0) {
+            return null;
+        }
+        DataPropertyStatement dps = null;
+        StmtIterator stmts = model.listStatements(model.createResource(ind.getURI()), null, (RDFNode)null);
+        try {
+            while (stmts.hasNext()) {
+                Statement stmt = stmts.nextStatement();
+                RDFNode node = stmt.getObject();
+                if ( node.isLiteral() ){
+                    Literal lit = (Literal)node.as(Literal.class);
+                    String value = lit.getLexicalForm();
+                    String lang = lit.getLanguage();
+                    String datatypeURI = lit.getDatatypeURI();
+                    dps = new DataPropertyStatementImpl();
+                    dps.setDatatypeURI(datatypeURI);
+                    dps.setLanguage(lang);
+                    dps.setData(value);
+                    dps.setDatapropURI(stmt.getPredicate().toString());
+                                   
+                    if (doesStmtMatchHash(dps, hash)) {
+                        break;
+                    }
+                }
+            }
+            //} catch {
+
+            } finally{
+                stmts.close();
+            }
+            return dps;
+        }
     
 }

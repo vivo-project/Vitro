@@ -1,5 +1,6 @@
 <%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
 
+<%@ page import="com.hp.hpl.jena.rdf.model.Model" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.DataProperty" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Individual" %>
@@ -33,7 +34,8 @@
 
     final String DEFAULT_DATA_FORM = "defaultDatapropForm.jsp";
     final String DEFAULT_ERROR_FORM = "error.jsp";
-   
+    final String DEFAULT_VITRO_NS_FORM = "defaultVitroNsPropForm.jsp";
+    
     if (!VitroRequestPrep.isSelfEditing(request) && !LoginFormBean.loggedIn(request, LoginFormBean.NON_EDITOR)) {        
         %> <c:redirect url="<%= Controllers.LOGIN %>" /> <%  
     }
@@ -49,6 +51,7 @@
     String predicateUri = vreq.getParameter("predicateUri");
     String formParam    = vreq.getParameter("editForm");
     String command      = vreq.getParameter("cmd");
+    boolean isVitroNsProp = vreq.getParameter("vitroNsProp").equals("true") ? true : false;
 
     if( subjectUri == null || subjectUri.trim().length() == 0 ) {
         log.error("required subjectUri parameter missing");
@@ -76,9 +79,8 @@
 
     DataProperty dataproperty = wdf.getDataPropertyDao().getDataPropertyByURI( predicateUri );
     if( dataproperty == null) {
-        // We must have either a dataproperty or a custom form
-        // A custom form is used for a vitro namespace property
-        if (formParam == null) {
+        // No dataproperty will be returned for a vitro ns prop
+        if (!isVitroNsProp) {
             log.error("Could not find data property '"+predicateUri+"' in model");
             throw new Error("editDatapropStmtRequest.jsp: Could not find DataProperty in model: " + predicateUri);
         }
@@ -103,9 +105,19 @@
     }
 
     DataPropertyStatement dps = null;
+    // We don't need a dataprop statement in the request if we're using a custom form
+    // RY But we need the dps to call the edit config's prepareForDataPropUpdate.
+    // So we can either create the dps here, or in the custom form, or change
+    // prepareForDataPropUpdate to use the datahash to get the dps
     if( dataHash != 0) {
-        dps = RdfLiteralHash.getDataPropertyStmtByHash(subject, dataHash);
-
+        if (isVitroNsProp) {
+            Model model = (Model)application.getAttribute("jenaOntModel");
+            dps = RdfLiteralHash.getVitroNsPropertyStmtByHash(subject, model, dataHash);           
+        }
+        else {
+            dps = RdfLiteralHash.getDataPropertyStmtByHash(subject, dataHash);
+        }
+                              
         if (dps==null) {
             log.error("No match to existing data property \""+predicateUri+"\" statement for subject \""+subjectUri+"\" via key "+datapropKeyStr);
             %><jsp:forward page="/edit/messages/dataPropertyStatementMissing.jsp"></jsp:forward> <%

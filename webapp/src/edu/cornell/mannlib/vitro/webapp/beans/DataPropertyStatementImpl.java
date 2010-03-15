@@ -28,6 +28,12 @@ public class DataPropertyStatementImpl implements VitroTimeWindowedResource, Dat
             this.individualURI = individual.getURI();
         }
     }
+    
+    public DataPropertyStatementImpl(String individualUri, String propertyUri, String data){
+        individualURI = individualUri;
+        datapropURI = propertyUri;
+        this.data = data;
+    }
 
     public String getIndividualURI() {
         return individualURI;

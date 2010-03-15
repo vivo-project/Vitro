@@ -16,8 +16,7 @@ public class VitroVocabulary {
      * There are a lot of places we'd like to be able to use a bnode ID instead of a URI.  The following special string
      * indicates that the local name of a 'URI' should actually be treated as a bnode ID.
      */
-    public static final String PSEUDO_BNODE_NS = "http://vitro.mannlib.cornell.edu/ns/bnode#";
-    
+    public static final String PSEUDO_BNODE_NS = "http://vitro.mannlib.cornell.edu/ns/bnode#"; 
     
     public static final String RDF = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
     public static final String RDFS = "http://www.w3.org/2000/01/rdf-schema#";

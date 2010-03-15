@@ -92,7 +92,7 @@ and set a flag in the request to indicate "back button confusion"
     EditSubmission submission = new EditSubmission(vreq.getParameterMap(), editConfig);  
     
     Map<String,String> errors = submission.getValidationErrors();
-    EditSubmission.putEditSubmissionInSession(session,submission);
+    EditSubmission.putEditSubmissionInSession(session,submission);   
 
     if( errors != null && ! errors.isEmpty() ){
         String form = editConfig.getFormUrl();

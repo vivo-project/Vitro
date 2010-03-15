@@ -18,13 +18,6 @@ public class EditDataPropStmt implements RequestedAction {
         this.dataPropStmt = dps;
     }
     
-    public EditDataPropStmt(String subjectUri, String predicateUri, String data) {
-        dataPropStmt = new DataPropertyStatementImpl();
-        dataPropStmt.setIndividualURI(subjectUri);
-        dataPropStmt.setDatapropURI(predicateUri);
-        dataPropStmt.setData(data);        
-    }
-    
     public PolicyDecision accept(VisitingPolicyIface policy, IdentifierBundle whoToAuth) {
         return policy.visit(whoToAuth,this);
     }
