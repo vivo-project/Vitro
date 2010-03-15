@@ -11,11 +11,12 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement" %>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib prefix="v" uri="http://vitro.mannlib.cornell.edu/vitro/tags" %>
 
 <%
-    org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger("edu.cornell.mannlib.vitro.jsp.edit.forms.vitroNsEditLabelForm.jsp");
-    log.debug("Starting vitroNsEditLabelForm.jsp");
+    org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger("edu.cornell.mannlib.vitro.jsp.edit.forms.defaultVitroNsPropForm.jsp");
+    log.debug("Starting defaultVitroNsPropForm.jsp");
     
     VitroRequest vreq = new VitroRequest(request);
     WebappDaoFactory wdf = vreq.getWebappDaoFactory();
@@ -32,6 +33,7 @@
     if( subject == null ) {
         throw new Error("In vitroNsEditLabelForm.jsp, could not find subject " + subjectUri);
     }
+
 %>
 
 <%-- RY Once this is working, change to just one vitroNsEditForm for all vitro ns props, by parameterizing the predicate.
@@ -42,44 +44,50 @@ Not sure sparqlForExistingLiterals is needed: see defaultDatapropForm - doesn't 
 so it can be more easily copied to another form. 
 Also change hard-coded predicate to ?predicate, so it will be picked up from the editConfig predicate --%>
 
+<c:set var="predicate" value="<%=predicateUri%>" />
+<c:set var="propertyName" value="${fn:substringAfter(predicate, '#')}" />
+
 <%--  Then enter a SPARQL query for the field, by convention concatenating the field id with "Existing"
       to convey that the expression is used to retrieve any existing value for the field in an existing individual.
       This must then be referenced in the sparqlForExistingLiterals section of the JSON block below
       and in the literalsOnForm --%>
-<v:jsonset var="labelExisting">
-    SELECT ?labelExisting WHERE {
-        ?subject <http://www.w3.org/2000/01/rdf-schema#label> ?labelExisting }
+<v:jsonset var="dataExisting">
+    SELECT ?dataExisting WHERE {
+        ?subject <${predicate}> ?dataExisting }
 </v:jsonset>
 
 <%--  Pair the "existing" query with the skeleton of what will be asserted for a new statement involving this field.
       The actual assertion inserted in the model will be created via string substitution into the ? variables.
       NOTE the pattern of punctuation (a period after the prefix URI and after the ?field) --%>
-<v:jsonset var="labelAssertion"  >
-    ?subject <http://www.w3.org/2000/01/rdf-schema#label> ?label .
+<v:jsonset var="dataAssertion"  >
+    ?subject <${predicate}> ?label .
 </v:jsonset>
+
+<%-- RY This will be the default, but base it on propertyName --%>
+<c:set var="rangeDatatypeUri" value="http://www.w3.org/2001/XMLSchema#string" />
 
 <c:set var="editjson" scope="request">
   {
     "formUrl"              : "${formUrl}",
     "editKey"              : "${editKey}",
-    "datapropKey"          : "<%=datapropKeyStr==null?"":datapropKeyStr%>",    
+    "datapropKey"          : "<%= datapropKeyStr == null ? "" : datapropKeyStr %>",    
     "urlPatternToReturnTo" : "/entity",
 
     "subject"   : ["subject",   "${subjectUriJson}" ],
     "predicate" : ["predicate", "${predicateUriJson}" ],
-    "object"    : ["label", "", "DATAPROPHASH" ],
+    "object"    : ["${propertyName}", "", "DATAPROPHASH" ],
     
-    "n3required"    : [ "${labelAssertion}" ],
+    "n3required"    : [ "${dataAssertion}" ],
     "n3optional"    : [ ],
     "newResources"  : { },
     "urisInScope"    : { },
     "literalsInScope": { },
     "urisOnForm"     : [ ],
-    "literalsOnForm" :  [ "label" ],
+    "literalsOnForm" :  [ "${propertyName}" ],
     "filesOnForm"    : [ ],
     "sparqlForLiterals" : { },
     "sparqlForUris" : {  },
-    "sparqlForExistingLiterals" : { "label" : "${labelExisting}" },
+    "sparqlForExistingLiterals" : { "${propertyName}" : "${dataExisting}" },
     "sparqlForExistingUris" : { },
     "fields" : {
       "label" : {
@@ -89,9 +97,9 @@ Also change hard-coded predicate to ?predicate, so it will be picked up from the
          "literalOptions"   : [ ],
          "predicateUri"     : "",
          "objectClassUri"   : "",
-         "rangeDatatypeUri" : "http://www.w3.org/2001/XMLSchema#string",
+         "rangeDatatypeUri" : "${rangeDatatypeUri}",
          "rangeLang"        : "",
-         "assertions"       : [ "${labelAssertion}" ]
+         "assertions"       : [ "${dataAssertion}" ]
       }
   }
 }
@@ -109,19 +117,18 @@ Also change hard-coded predicate to ?predicate, so it will be picked up from the
         editConfig.prepareForDataPropUpdate(model,dps);
     }    
 
-    /* prepare the <title> and text for the submit button */
-    // RY Generalize this if we use the same form for all vitro ns props
-    String submitLabel = "Edit name";    
-    request.setAttribute("title", "Edit the name of " + subject.getName() + ":");
-
 %>
+
+<c:set var="propertyLabel" value="${propertyName == 'label' ? 'name' : propertyName}" />
+<c:set var="submitLabel" value="Edit ${propertyLabel}" />
+<c:set var="title" scope="request" value="Edit the ${propertyLabel} of ${subject.name}:" />
 
 <jsp:include page="${preForm}"/>
 
 <h2>${title}</h2>
 <form action="<c:url value="/edit/processDatapropRdfForm.jsp"/>" >
     <v:input type="text" id="label" size="30" />
-    <p class="submit"><v:input type="submit" id="submit" value="<%=submitLabel%>" cancel="${param.subjectUri}"/></p>
+    <p class="submit"><v:input type="submit" id="submit" value="${submitLabel}" cancel="${param.subjectUri}"/></p>
 </form>
 
 <jsp:include page="${postForm}"/>

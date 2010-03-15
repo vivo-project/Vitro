@@ -159,9 +159,9 @@ public class PropertyEditLinks extends TagSupport{
         return SKIP_BODY;
     }
     
-    private String getNameFromUri(String predicateUri) {
-        return predicateUri.substring(predicateUri.lastIndexOf('#')+1);
-    }
+//    private String getNameFromUri(String predicateUri) {
+//        return predicateUri.substring(predicateUri.lastIndexOf('#')+1);
+//    }
 
     protected LinkStruct[] doDataProp(DataProperty dprop, Individual entity, String themeDir, EditLinkAccess[] allowedAccessTypeArray, String contextPath) {
         if( allowedAccessTypeArray == null || dprop == null || allowedAccessTypeArray.length == 0 ) {
@@ -329,8 +329,8 @@ public class PropertyEditLinks extends TagSupport{
         String dpropHash = String.valueOf(RdfLiteralHash.makeRdfLiteralHash( dpropStmt ));
         String dispatchUrl = contextPath + "edit/editDatapropStmtRequestDispatch.jsp";
         
-        String propName = getNameFromUri(predicateUri);
-        String editForm = "vitroNsEdit" + StringUtils.capitalize(propName) + "Form.jsp";
+        //String propName = getNameFromUri(predicateUri);
+        //String editForm = "defaultVitroNsPropForm.jsp";
 
         LinkStruct ls = new LinkStruct();
         int index = 0;
@@ -341,11 +341,11 @@ public class PropertyEditLinks extends TagSupport{
                                           "subjectUri", subjectUri,
                                           "predicateUri", predicateUri,
                                           "datapropKey",  dpropHash,
-                                          "vitroNsProp", "true",
+                                          "vitroNsProp", "true");
                                           // RY If we use a single vitro ns form for all vitro ns props, we won't need the editForm param.
                                           // See if they can reasonably be combined into a single form, then have 
                                           // editDatapropStmtRequestDispatch use a default vitro ns form if no custom form is specified.
-                                          "editForm", editForm);
+                                          //"editForm", editForm);
             ls.setHref(url);
             ls.setType("edit");
             ls.setMouseoverText("edit this property");
@@ -364,7 +364,8 @@ public class PropertyEditLinks extends TagSupport{
                                               "subjectUri", subjectUri,
                                               "predicateUri", predicateUri,
                                               "datapropKey",  dpropHash,
-                                              "editForm", editForm);
+                                              "vitroNsProp", "true");
+                                              //"editForm", editForm);
                 ls.setHref(url);
                 ls.setType("delete");
                 ls.setMouseoverText("delete this property");
@@ -429,25 +430,6 @@ public class PropertyEditLinks extends TagSupport{
         return element + "</a>\n";
     }
 
-   
-    
-//    protected Map<Property,EditLinkAccess[]> getAccess(){
-//        //right now we return an all access, all the time hashmap.
-//        return new HashMap<Property,EditLinkAccess[]>(){
-//
-//            public boolean containsKey(Object key) { return true; }
-//
-//            public EditLinkAccess[] get(Object key) {
-//                    EditLinkAccess[] ela = { EditLinkAccess.MODIFY,
-//                            EditLinkAccess.DELETE, EditLinkAccess.ADDNEW,
-//                            EditLinkAccess.INFO, EditLinkAccess.ADMIN  };
-//                    return ela;
-//            }
-//            public boolean isEmpty() { return false; }
-//        };
-//    }
-//    
-    
     public static final EditLinkAccess[] NO_ACCESS = {};
     public static final EditLinkAccess[] ACCESS_TEMPLATE = {}; 
 

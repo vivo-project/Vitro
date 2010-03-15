@@ -33,8 +33,8 @@
       ************************************** */
 
     final String DEFAULT_DATA_FORM = "defaultDatapropForm.jsp";
-    final String DEFAULT_ERROR_FORM = "error.jsp";
     final String DEFAULT_VITRO_NS_FORM = "defaultVitroNsPropForm.jsp";
+    final String DEFAULT_ERROR_FORM = "error.jsp";
     
     if (!VitroRequestPrep.isSelfEditing(request) && !LoginFormBean.loggedIn(request, LoginFormBean.NON_EDITOR)) {        
         %> <c:redirect url="<%= Controllers.LOGIN %>" /> <%  
@@ -51,7 +51,8 @@
     String predicateUri = vreq.getParameter("predicateUri");
     String formParam    = vreq.getParameter("editForm");
     String command      = vreq.getParameter("cmd");
-    boolean isVitroNsProp = vreq.getParameter("vitroNsProp").equals("true") ? true : false;
+    String vitroNsProp  = vreq.getParameter("vitroNsProp");
+    boolean isVitroNsProp = vitroNsProp != null && vitroNsProp.equals("true") ? true : false;
 
     if( subjectUri == null || subjectUri.trim().length() == 0 ) {
         log.error("required subjectUri parameter missing");
@@ -105,10 +106,6 @@
     }
 
     DataPropertyStatement dps = null;
-    // We don't need a dataprop statement in the request if we're using a custom form
-    // RY But we need the dps to call the edit config's prepareForDataPropUpdate.
-    // So we can either create the dps here, or in the custom form, or change
-    // prepareForDataPropUpdate to use the datahash to get the dps
     if( dataHash != 0) {
         if (isVitroNsProp) {
             Model model = (Model)application.getAttribute("jenaOntModel");
@@ -150,19 +147,26 @@
 <%      return;
     }
 
-    if( formParam == null ){        
-        String form = dataproperty.getCustomEntryForm();
+    String form = null;
+    if (formParam != null) {
+        form = formParam;
+    }   
+    else if (isVitroNsProp) {  // dataproperty is null here
+        form = DEFAULT_VITRO_NS_FORM; 
+    }
+    else {
+        form = dataproperty.getCustomEntryForm();
         if (form != null && form.length()>0) {
             log.warn("have a custom form for this data property: "+form);
             vreq.setAttribute("hasCustomForm","true");
         } else {
             form = DEFAULT_DATA_FORM;
         }
-        vreq.setAttribute("form", form);
-    } else {
-        vreq.setAttribute("form", formParam);
     }
-    if( session.getAttribute("requestedFromEntity") == null )
+    vreq.setAttribute("form", form);
+
+    if( session.getAttribute("requestedFromEntity") == null ) {
         session.setAttribute("requestedFromEntity", subjectUri );
+    }    
 %>
 <jsp:forward page="/edit/forms/${form}"  />
