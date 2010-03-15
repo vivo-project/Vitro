@@ -28,8 +28,12 @@ public class VitroHttpServlet extends HttpServlet
     private WebappDaoFactory myAssertionsWebappDaoFactory = null;
     private WebappDaoFactory myDeductionsWebappDaoFactory = null;
 
+    public final static String XHTML_MIMETYPE ="application/xhtml+xml";
+    public final static String HTML_MIMETYPE ="text/html";
+    
     public final static String RDFXML_MIMETYPE ="application/rdf+xml";
-    public final static String N3_MIMETYPE ="text/rdf+n3"; //unofficial and unregistered      
+    public final static String N3_MIMETYPE ="text/n3"; //unofficial and unregistered
+    public final static String TTL_MIMETYPE = "text/turtle"; //unofficial and unregistered
     
     /**
      * Setup the auth flag, portal flag and portal bean objects.

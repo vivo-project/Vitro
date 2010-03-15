@@ -4,8 +4,11 @@ package edu.cornell.mannlib.vitro.webapp.controller;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.RequestDispatcher;
@@ -13,6 +16,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -20,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ModelMaker;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -35,7 +40,9 @@ import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQuery;
 import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQueryWrapper;
-import edu.cornell.mannlib.vitro.webapp.web.EntityWebUtils;
+import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapper;
+import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapperFactory;
+import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 import edu.cornell.mannlib.vitro.webapp.web.jsptags.StringProcessorTag;
 
 /**
@@ -52,157 +59,44 @@ public class EntityController extends VitroHttpServlet {
     private String default_body_jsp = Controllers.ENTITY_JSP;
     private ApplicationBean appBean;
     
-    /**
-     *
-     * @author bdc34
-     */
     public void doGet( HttpServletRequest req, HttpServletResponse res )
     throws IOException, ServletException {
         try {
-            super.doGet(req, res);
-
-            log.debug("In doGet");
+            super.doGet(req, res);            
 
             VitroRequest vreq = new VitroRequest(req);
-            IndividualDao iwDao = vreq.getWebappDaoFactory().getIndividualDao();
-            ObjectPropertyDao opDao = vreq.getWebappDaoFactory().getObjectPropertyDao();
+            //get URL without hostname or servlet context
+            String url = req.getRequestURI().substring(req.getContextPath().length());            
+            
+            //Check to see if the request is for a non-information resource, redirect if it is.
+            String redirectURL = checkForRedirect ( url, req.getHeader("accept") );
+            if( redirectURL != null ){
+            	doRedirect( req, res, redirectURL );
+            	return;
+            }            	           
 
-            Individual entity = null;
+            ContentType rdfFormat = checkForLinkedDataRequest(url,req.getHeader("accept"));
+            if( rdfFormat != null ){
+            	doRdf( vreq, res, rdfFormat );
+            	return;
+            }                                 
+
+            Individual indiv = null;
             try{
-                entity = EntityWebUtils.getEntityFromRequest(vreq);
+                indiv = getEntityFromRequest( vreq);
             }catch(Throwable th){
                 doHelp(res);
                 return;
             }
-            if( entity == null ){
-                doNotFound(req, res );
-                return;
+            
+            if( indiv == null || checkForHidden(vreq, indiv) || checkForSunset(vreq, indiv)){
+            	doNotFound(vreq, res);
+            	return;
             }
             
-            if ( checkForHidden( vreq, entity ) ||
-                 checkForSunset( vreq, entity ) ){         
-                doNotFound( req, res);
-                return;
-            } 
+            doHtml( vreq, res , indiv);                    
+            return;
             
-            //Check if a "relatedSubjectUri" parameter has been supplied, and,
-            //if so, retrieve the related individual.t
-            //Some individuals make little sense standing alone and should
-            //be displayed in the context of their relationship to another.
-            String relatedSubjectUri = vreq.getParameter("relatedSubjectUri"); 
-            if (relatedSubjectUri != null) {
-            	Individual relatedSubjectInd = iwDao.getIndividualByURI(relatedSubjectUri);
-            	if (relatedSubjectInd != null) {
-            		vreq.setAttribute("relatedSubject", relatedSubjectInd);
-            	}
-            }
-            String relatingPredicateUri = vreq.getParameter("relatingPredicateUri");
-            if (relatingPredicateUri != null) {
-            	ObjectProperty relatingPredicateProp = opDao.getObjectPropertyByURI(relatingPredicateUri);
-            	if (relatingPredicateProp != null) {
-            		vreq.setAttribute("relatingPredicate", relatingPredicateProp);
-            	}
-            }
-
-            entity.setKeywords(iwDao.getKeywordsForIndividualByMode(entity.getURI(),"visible"));
-            entity.sortForDisplay();
-
-            String vclassName = "unknown";
-            String customView = null;
-            String customCss = null;
-            if( entity.getVClass() != null ){
-                vclassName = entity.getVClass().getName();
-                List<VClass> clasList = entity.getVClasses(true);
-                for (VClass clas : clasList) {
-                    customView = clas.getCustomDisplayView();
-                    if (customView != null) {
-                        if (customView.length()>0) {
-                            vclassName = clas.getName(); // reset entity vclassname to name of class where a custom view
-                            log.debug("Found direct class ["+clas.getName()+"] with custom view "+customView+"; resetting entity vclassName to this class");
-                            break;
-                        } else {
-                            customView = null;
-                        }
-                    }
-                }
-                if (customView == null) { //still
-                    clasList = entity.getVClasses(false);
-                    for (VClass clas : clasList) {
-                        customView = clas.getCustomDisplayView();
-                        if (customView != null) {
-                            if (customView.length()>0) {
-                                // note that NOT changing entity vclassName here yet
-                                log.debug("Found inferred class ["+clas.getName()+"] with custom view "+customView);
-                                break;
-                            } else {
-                                customView = null;
-                            }
-                        }
-                    }
-                }
-            } else {
-                log.error("Entity " + entity.getURI() + " with vclass URI " +
-                        entity.getVClassURI() + ", no vclass with that URI exists");
-            }
-            if (customView!=null) {
-                // insert test for whether a css files of the same name exists, and populate the customCss string for use when construction the header
-            }
-            String netid = iwDao.getNetId(entity.getURI());
-            
-            vreq.setAttribute("netid", netid);
-            vreq.setAttribute("vclassName", vclassName);
-            vreq.setAttribute("entity",entity);
-            Portal portal = vreq.getPortal();
-            vreq.setAttribute("portal",String.valueOf(portal));
-            String view= getViewFromRequest(req);
-            if( view == null){
-                if (customView == null) {
-                    view = default_jsp;
-                    vreq.setAttribute("bodyJsp","/"+Controllers.ENTITY_JSP);
-                    log.debug("no custom view and no view parameter in request for rendering "+entity.getName());
-                } else {
-                    view = default_jsp;
-                    log.debug("setting custom view templates/entity/"+ customView + " for rendering "+entity.getName());
-                    vreq.setAttribute("bodyJsp", "/templates/entity/"+customView);
-                }
-                vreq.setAttribute("entityPropsListJsp",Controllers.ENTITY_PROP_LIST_JSP);
-                vreq.setAttribute("entityDatapropsListJsp",Controllers.ENTITY_DATAPROP_LIST_JSP);
-                vreq.setAttribute("entityMergedPropsListJsp",Controllers.ENTITY_MERGED_PROP_LIST_GROUPED_JSP);
-                vreq.setAttribute("entityKeywordsListJsp",Controllers.ENTITY_KEYWORDS_LIST_JSP);
-            } else if (view.equals("rdf.rdf")) { 
-            	writeRDF(entity, req, res);
-				// BJL23 temporarily disabling this until we add filtering of hidden properties (get RDF through Vitro API with filtering DAOs)
-            } else {
-                log.debug("Found view parameter "+view+" in request for rendering "+entity.getName());
-            }
-            //set title before we do the highlighting so we don't get markup in it.
-            vreq.setAttribute("title",entity.getName());
-            //setup highlighter for search terms
-            checkForSearch(req, entity);
-
-			// set CSS and script elements
-            String contextPath = "";
-            if (req.getContextPath().length()>1) {
-            	contextPath = req.getContextPath();
-            }
-            String css = "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\" href=\""
-			+ contextPath + "/" + portal.getThemeDir() + "css/entity.css\"/>\n"
-			+ "<script language='JavaScript' type='text/javascript' src='"+contextPath+"/js/toggle.js'></script> \n";
-            if (customCss!=null) {
-                css += customCss;
-            }
-
-			// generate link to RDF representation for semantic web clients like Piggy Bank
-			// BJL 2008-07-16: I'm temporarily commenting this out because I forgot we need to make sure it filters out the hidden properties
-            // generate url for this entity
-            // String individualToRDF = "http://"+vreq.getServerName()+":"+vreq.getServerPort()+vreq.getContextPath()+"/entity?home=1&uri="+forURL(entity.getURI())+"&view=rdf.rdf"; 
-            //css += "<link rel='alternate' type='application/rdf+xml' title='"+entity.getName()+"' href='"+individualToRDF+"' />";
-
-            vreq.setAttribute("css",css);
-            vreq.setAttribute("scripts", "/templates/entity/entity_inject_head.jsp");
-
-            RequestDispatcher rd = vreq.getRequestDispatcher( view );
-            rd.forward(vreq,res);
         } catch (Throwable e) {
             log.error(e);
             req.setAttribute("javax.servlet.jsp.jspException",e);
@@ -210,8 +104,366 @@ public class EntityController extends VitroHttpServlet {
             rd.forward(req, res);
         }
     }
+
+	private void doHtml(VitroRequest vreq, HttpServletResponse res, Individual indiv) throws ServletException, IOException {
+    	IndividualDao iwDao = vreq.getWebappDaoFactory().getIndividualDao();
+        ObjectPropertyDao opDao = vreq.getWebappDaoFactory().getObjectPropertyDao();
+        
+        //Check if a "relatedSubjectUri" parameter has been supplied, and,
+        //if so, retrieve the related individual.t
+        //Some individuals make little sense standing alone and should
+        //be displayed in the context of their relationship to another.
+        String relatedSubjectUri = vreq.getParameter("relatedSubjectUri"); 
+        if (relatedSubjectUri != null) {
+        	Individual relatedSubjectInd = iwDao.getIndividualByURI(relatedSubjectUri);
+        	if (relatedSubjectInd != null) {
+        		vreq.setAttribute("relatedSubject", relatedSubjectInd);
+        	}
+        }
+        String relatingPredicateUri = vreq.getParameter("relatingPredicateUri");
+        if (relatingPredicateUri != null) {
+        	ObjectProperty relatingPredicateProp = opDao.getObjectPropertyByURI(relatingPredicateUri);
+        	if (relatingPredicateProp != null) {
+        		vreq.setAttribute("relatingPredicate", relatingPredicateProp);
+        	}
+        }
+
+        indiv.setKeywords(iwDao.getKeywordsForIndividualByMode(indiv.getURI(),"visible"));
+        indiv.sortForDisplay();
+
+        String vclassName = "unknown";
+        String customView = null;
+        String customCss = null;
+        if( indiv.getVClass() != null ){
+            vclassName = indiv.getVClass().getName();
+            List<VClass> clasList = indiv.getVClasses(true);
+            for (VClass clas : clasList) {
+                customView = clas.getCustomDisplayView();
+                if (customView != null) {
+                    if (customView.length()>0) {
+                        vclassName = clas.getName(); // reset entity vclassname to name of class where a custom view
+                        log.debug("Found direct class ["+clas.getName()+"] with custom view "+customView+"; resetting entity vclassName to this class");
+                        break;
+                    } else {
+                        customView = null;
+                    }
+                }
+            }
+            if (customView == null) { //still
+                clasList = indiv.getVClasses(false);
+                for (VClass clas : clasList) {
+                    customView = clas.getCustomDisplayView();
+                    if (customView != null) {
+                        if (customView.length()>0) {
+                            // note that NOT changing entity vclassName here yet
+                            log.debug("Found inferred class ["+clas.getName()+"] with custom view "+customView);
+                            break;
+                        } else {
+                            customView = null;
+                        }
+                    }
+                }
+            }
+        } else {
+            log.error("Entity " + indiv.getURI() + " with vclass URI " +
+                    indiv.getVClassURI() + ", no vclass with that URI exists");
+        }
+        if (customView!=null) {
+            // insert test for whether a css files of the same name exists, and populate the customCss string for use when construction the header
+        }
+        String netid = iwDao.getNetId(indiv.getURI());
+        
+        vreq.setAttribute("netid", netid);
+        vreq.setAttribute("vclassName", vclassName);
+        vreq.setAttribute("entity",indiv);
+        Portal portal = vreq.getPortal();
+        vreq.setAttribute("portal",String.valueOf(portal));
+        String view= getViewFromRequest(vreq);
+        if( view == null){
+            if (customView == null) {
+                view = default_jsp;
+                vreq.setAttribute("bodyJsp","/"+Controllers.ENTITY_JSP);
+                log.debug("no custom view and no view parameter in request for rendering "+indiv.getName());
+            } else {
+                view = default_jsp;
+                log.debug("setting custom view templates/entity/"+ customView + " for rendering "+indiv.getName());
+                vreq.setAttribute("bodyJsp", "/templates/entity/"+customView);
+            }
+            vreq.setAttribute("entityPropsListJsp",Controllers.ENTITY_PROP_LIST_JSP);
+            vreq.setAttribute("entityDatapropsListJsp",Controllers.ENTITY_DATAPROP_LIST_JSP);
+            vreq.setAttribute("entityMergedPropsListJsp",Controllers.ENTITY_MERGED_PROP_LIST_GROUPED_JSP);
+            vreq.setAttribute("entityKeywordsListJsp",Controllers.ENTITY_KEYWORDS_LIST_JSP);
+        } else if (view.equals("rdf.rdf")) { 
+        	writeRDF(indiv, vreq, res);
+			// BJL23 temporarily disabling this until we add filtering of hidden properties (get RDF through Vitro API with filtering DAOs)
+        } else {
+            log.debug("Found view parameter "+view+" in request for rendering "+indiv.getName());
+        }
+        //set title before we do the highlighting so we don't get markup in it.
+        vreq.setAttribute("title",indiv.getName());
+        //setup highlighter for search terms
+        checkForSearch(vreq, indiv);
+
+		// set CSS and script elements
+        String contextPath = "";
+        if (vreq.getContextPath().length()>1) {
+        	contextPath = vreq.getContextPath();
+        }
+        String css = "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\" href=\""
+		+ contextPath + "/" + portal.getThemeDir() + "css/entity.css\"/>\n"
+		+ "<script language='JavaScript' type='text/javascript' src='"+contextPath+"/js/toggle.js'></script> \n";
+        if (customCss!=null) {
+            css += customCss;
+        }
+
+		// generate link to RDF representation for semantic web clients like Piggy Bank
+		// BJL 2008-07-16: I'm temporarily commenting this out because I forgot we need to make sure it filters out the hidden properties
+        // generate url for this entity
+        // String individualToRDF = "http://"+vreq.getServerName()+":"+vreq.getServerPort()+vreq.getContextPath()+"/entity?home=1&uri="+forURL(entity.getURI())+"&view=rdf.rdf"; 
+        //css += "<link rel='alternate' type='application/rdf+xml' title='"+entity.getName()+"' href='"+individualToRDF+"' />";
+
+        vreq.setAttribute("css",css);
+        vreq.setAttribute("scripts", "/templates/entity/entity_inject_head.jsp");
+
+        RequestDispatcher rd = vreq.getRequestDispatcher( view );
+        rd.forward(vreq,res);		
+	}
+
+	private void doRdf(VitroRequest vreq, HttpServletResponse res,
+			ContentType rdfFormat) throws IOException, ServletException {    	
+
+		Individual indiv = getEntityFromRequest(vreq);		
+		if( indiv == null ){
+			doNotFound(vreq, res);
+			return;
+		}
+				
+		Model ontModel = null;
+		HttpSession session = vreq.getSession(false);
+		if( session != null )
+			ontModel =(Model)session.getAttribute("jenaOntModel");		
+		if( ontModel == null)
+			ontModel = (Model)getServletContext().getAttribute("jenaOntModel");
+				
+		Model newModel = getRDF(indiv, ontModel, ModelFactory.createDefaultModel(), true);
+		
+		res.setContentType(rdfFormat.getMediaType());
+		String format = ""; 
+		if ( RDFXML_MIMETYPE.equals(rdfFormat.getMediaType()))
+			format = "RDF/XML";
+		else if( N3_MIMETYPE.equals(rdfFormat.getMediaType()))
+			format = "N3";
+		else if ( TTL_MIMETYPE.equals(rdfFormat.getMediaType()))
+			format ="TTL";
+		
+		newModel.write( res.getOutputStream(), format );		
+	}
+
+	private void doRedirect(HttpServletRequest req, HttpServletResponse res,
+			String redirectURL) {	
+		// It seems like there must be a better way to do this
+		String hn = req.getHeader("Host");		
+    	res.setHeader("Location", res.encodeURL( "http://" + hn + req.getContextPath() + redirectURL ));
+    	res.setStatus(res.SC_SEE_OTHER);		
+	}
+
+
+	private static Pattern LINKED_DATA_URL = Pattern.compile("^/individual/([^/]*)$");		
+	private static Pattern NS_PREFIX_URL = Pattern.compile("^/individual/([^/]*)/([^/]*)$");
+	
+    /**
+        Gets the entity id from the request.
+        Works for the following styles of URLs:        
+        
+        /individual?id=individualLocalName
+        /individual?entityId=individualLocalName
+        /individual?uri=urlencodedURI
+        /individual?nedit=bdc34
+        /individual?nedIt=bdc34
+        /individual/nsprefix/localname
+        /individual/localname         
+        /individual/localname/localname.rdf
+        /individual/localname/localname.n3
+        /individual/localname/localname.ttl
+        /individual/localname/localname.html
+          
+        @return null on failure.
+    */
+    public static Individual getEntityFromRequest(VitroRequest vreq) {
+        String netIdStr = null;
+        Individual entity = null;
+        IndividualDao iwDao = vreq.getWebappDaoFactory().getIndividualDao();
+
+        String entityIdStr = vreq.getParameter("id");
+        if (entityIdStr == null || entityIdStr.equals(""))
+            entityIdStr = vreq.getParameter("entityId");
+
+        if( entityIdStr != null){
+            try {
+                String entityURI = vreq.getWebappDaoFactory().getDefaultNamespace()+"individual"+entityIdStr;
+                entity = iwDao.getIndividualByURI(entityURI);
+            } catch ( Exception e ) {
+                log.warn("Could not parse entity id: " + entityIdStr);
+                return null; 
+            }
+            return entity;
+        }
+
+        String entityURIStr = vreq.getParameter("uri");
+        if (entityURIStr != null) {
+            try {
+                entity = iwDao.getIndividualByURI(entityURIStr);
+            } catch (Exception e) {             
+                log.warn("Could not retrieve entity "+entityURIStr);
+                return null;
+            }
+            return entity;
+        }
+        
+        //get URL without hostname or servlet context
+        String url = vreq.getRequestURI().substring(vreq.getContextPath().length());
+        
+		/* check for parts of URL that indicate request for RDF
+		   http://vivo.cornell.edu/individual/n23/n23.rdf
+		   http://vivo.cornell.edu/individual/n23/n23.n3
+		   http://vivo.cornell.edu/individual/n23/n23.ttl */					
+		String uri = null;
+		Matcher m = RDF_REQUEST.matcher(url);
+		if( m.matches() && m.groupCount() == 1)
+			uri = m.group(1);
+		m = N3_REQUEST.matcher(url);
+		if( m.matches() && m.groupCount() == 1)
+			uri = m.group(1);
+		m = TTL_REQUEST.matcher(url);
+		if( m.matches() && m.groupCount() == 1)
+			uri= m.group(1);
+		m = HTML_REQUEST.matcher(url);
+		if( m.matches() && m.groupCount() == 1)
+			uri= m.group(1);
+		if( uri != null )
+			return iwDao.getIndividualByURI(vreq.getWebappDaoFactory().getDefaultNamespace() + uri);
+		
+        // see if we can get the URI from a name space prefix and a local name
+        Matcher prefix_match = NS_PREFIX_URL.matcher(url);
+		if( prefix_match.matches() && prefix_match.groupCount() == 2){		
+			String prefix = prefix_match.group(1);
+			String localName = prefix_match.group(2);
+			
+			//String[] requestParts = requestURI.split("/individual/");
+			//String[] URIParts = requestParts[1].split("/");
+			//String localName = URIParts[1];
+			
+			String namespace = "";
+			NamespaceMapper namespaceMapper = NamespaceMapperFactory.getNamespaceMapper(vreq.getSession().getServletContext());
+			String t;
+			namespace = ( (t = namespaceMapper.getNamespaceForPrefix(prefix)) != null) ? t : "";
+						
+			return iwDao.getIndividualByURI(namespace+localName);
+		}
+
+        // see if we can get a local name
+		Matcher linkedDataMatch = LINKED_DATA_URL.matcher(url);
+		if( linkedDataMatch.matches() && linkedDataMatch.groupCount() == 1){
+			String localName = linkedDataMatch.group(1);
+			String ns = vreq.getWebappDaoFactory().getDefaultNamespace();
+			return iwDao.getIndividualByURI( ns + localName );
+		}
+		
+		//so we try to get the netid
+        netIdStr = vreq.getParameter("netId");      
+        if (netIdStr==null || netIdStr.equals(""))
+            netIdStr = vreq.getParameter("netid");
+        if ( netIdStr != null ){
+            uri = iwDao.getIndividualURIFromNetId(netIdStr);
+            return iwDao.getIndividualByURI(uri);
+        }
+
+		return null;		
+    }
+ 
+	
+	private static Pattern URI_PATTERN = Pattern.compile("^/individual/([^/]*)$");
+    //Redirect if the request is for http://hostname/individual/localname
+    // if accept is nothing or text/html redirect to ???
+    // if accept is some RDF thing redirect to the URL for RDF
+	private String checkForRedirect(String url, String acceptHeader) {
+		Matcher m = URI_PATTERN.matcher(url);
+		if( m.matches() && m.groupCount() == 1 ){			
+			ContentType c = checkForLinkedDataRequest(url, acceptHeader);			
+			if( c != null ){
+				String redirectUrl = "/individual/" + m.group(1) + "/" + m.group(1) ; 
+				if( RDFXML_MIMETYPE.equals( c.getMediaType())  ){
+					return redirectUrl + ".rdf";
+				}else if( N3_MIMETYPE.equals( c.getMediaType() )){
+					return redirectUrl + ".n3";
+				}else if( TTL_MIMETYPE.equals( c.getMediaType() )){
+					return redirectUrl + ".ttl";
+				}else{ //this case shouldn't happen					
+					return redirectUrl + ".rdf";
+				}				
+			}else{
+				//redirect to HTML representation
+				return "/individual/" + m.group(1) + "/" + m.group(1) + ".html";
+			}				
+		}else{			
+			return null;
+		}
+	}
+
+	private static Pattern RDF_REQUEST = Pattern.compile("^/individual/([^/]*)/\\1.rdf$");
+    private static Pattern N3_REQUEST = Pattern.compile("^/individual/([^/]*)/\\1.n3$");
+    private static Pattern TTL_REQUEST = Pattern.compile("^/individual/([^/]*)/\\1.ttl$");
+    private static Pattern HTML_REQUEST = Pattern.compile("^/individual/([^/]*)/\\1.html$");
     
-    private boolean checkForSunset(VitroRequest vreq, Individual entity) {
+    /**  
+     * @return null if this is not a linked data request, returns content type if it is a 
+     * linked data request.
+     */
+	private ContentType checkForLinkedDataRequest(String url, String acceptHeader) {		
+		try {
+			//check the accept header			
+			if (acceptHeader != null) {
+				List<ContentType> actualContentTypes = new ArrayList<ContentType>();				
+				actualContentTypes.add(new ContentType( XHTML_MIMETYPE ));
+				actualContentTypes.add(new ContentType( HTML_MIMETYPE ));				
+				
+				actualContentTypes.add(new ContentType( RDFXML_MIMETYPE ));
+				actualContentTypes.add(new ContentType( N3_MIMETYPE ));
+				actualContentTypes.add(new ContentType( TTL_MIMETYPE ));
+				
+								
+				ContentType best = ContentType.getBestContentType(acceptHeader,actualContentTypes);
+				if (best!=null && (
+						RDFXML_MIMETYPE.equals(best.getMediaType()) || 
+						N3_MIMETYPE.equals(best.getMediaType()) ||
+						TTL_MIMETYPE.equals(best.getMediaType()) ))
+					return best;				
+			}
+			
+			/*
+			 * check for parts of URL that indicate request for RDF
+			   http://vivo.cornell.edu/individual/n23/n23.rdf
+			   http://vivo.cornell.edu/individual/n23/n23.n3
+			   http://vivo.cornell.edu/individual/n23/n23.ttl
+			 */
+						
+			Matcher m = RDF_REQUEST.matcher(url);
+			if( m.matches() )
+				return new ContentType(RDFXML_MIMETYPE);
+			m = N3_REQUEST.matcher(url);
+			if( m.matches() )
+				return new ContentType(N3_MIMETYPE);
+			m = TTL_REQUEST.matcher(url);
+			if( m.matches() )
+				return new ContentType(TTL_MIMETYPE);
+			
+		} catch (Throwable th) {
+			log.error("problem while checking accept header " , th);
+		}
+		return null;
+	}  
+
+	private boolean checkForSunset(VitroRequest vreq, Individual entity) {
         // TODO Auto-generated method stub
         return false;
     }
@@ -266,6 +518,7 @@ public class EntityController extends VitroHttpServlet {
     		Property dp = ontModel.getProperty(ds.getDatapropURI());
     		//if(!(dp instanceof DatatypeProperty)) System.out.println("not datatype prop "+dp.getURI());
 
+    		//TODO: improve to handle languages and XSD data types 
     		Literal lit = newModel.createLiteral(ds.getData());
     		newModel.add(newModel.createStatement(subj, dp, lit));
     	}
@@ -282,9 +535,7 @@ public class EntityController extends VitroHttpServlet {
     	return newModel;
     }
 
-    private void checkForSearch(HttpServletRequest req, Individual ent) {
-        
-        
+    private void checkForSearch(HttpServletRequest req, Individual ent) {                
         if (req.getSession().getAttribute("LastQuery") != null) {
             VitroQueryWrapper qWrap = (VitroQueryWrapper) req.getSession()
                     .getAttribute("LastQuery");
