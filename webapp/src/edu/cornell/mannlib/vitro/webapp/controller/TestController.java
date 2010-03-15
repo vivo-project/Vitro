@@ -2,22 +2,17 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller;
 
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
-import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
-import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
-import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQuery;
-import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQueryWrapper;
-import edu.cornell.mannlib.vitro.webapp.web.EntityWebUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.io.IOException;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 
 /**
  * for testing styles and JSPs
