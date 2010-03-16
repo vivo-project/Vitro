@@ -56,7 +56,6 @@ public class RdfLiteralHash {
     }
 
     /**
-     * 
      * @param stmt
      * @param hash
      * @return
@@ -75,15 +74,30 @@ public class RdfLiteralHash {
         return stmtHash == hash;
     }
     
-    
     /**
-     * 
-     * @param ind, may be null and getDataPropertyStatements() may return null.
+     * Forward to either getDataPropertyStmtByHash or getVitroNsPropByHash, depending on the type of property.
+     * @param ind
      * @param hash
+     * @param model
+     * @param isVitroNsProp
      * @return a DataPropertyStatement if found or null if not found
      */
+    // RY Instead of a code fork here, we should have a method of Individual getAllDataPropertyStatements() which
+    // doesn't filter out the vitro ns property statements. This would also simplify the front end editing of the vitro ns
+    // properties, because they wouldn't have to be a special case.
+    public static DataPropertyStatement getPropertyStmtByHash(Individual ind, int hash, Model model, boolean isVitroNsProp) {
+        
+        if (ind == null) return null;
+        
+        DataPropertyStatement dps = isVitroNsProp ? RdfLiteralHash.getVitroNsPropertyStmtByHash(ind, model, hash) :
+            RdfLiteralHash.getDataPropertyStmtByHash(ind, hash);
+
+        return dps;
+    }
+    
+
     public static DataPropertyStatement getDataPropertyStmtByHash( Individual ind, int hash){       
-        if( ind == null )  return null;
+
         List<DataPropertyStatement> statements = ind.getDataPropertyStatements();
         if( statements == null ) return null;
         for( DataPropertyStatement dps : statements){
@@ -92,11 +106,15 @@ public class RdfLiteralHash {
         }
         return null;
     }
-    
+
+    /**
+     * 
+     * @param ind, may be null and getDataPropertyStatements() may return null.
+     * @param hash
+     * @return a DataPropertyStatement if found or null if not found
+     */
     public static DataPropertyStatement getVitroNsPropertyStmtByHash(Individual ind, Model model, int hash) {
-        if (ind == null || model == null || hash == 0) {
-            return null;
-        }
+
         DataPropertyStatement dps = null;
         StmtIterator stmts = model.listStatements(model.createResource(ind.getURI()), null, (RDFNode)null);
         try {
@@ -113,6 +131,7 @@ public class RdfLiteralHash {
                     dps.setLanguage(lang);
                     dps.setData(value);
                     dps.setDatapropURI(stmt.getPredicate().toString());
+                    dps.setIndividualURI(ind.getURI());
                                    
                     if (doesStmtMatchHash(dps, hash)) {
                         break;

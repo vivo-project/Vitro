@@ -36,14 +36,6 @@
 
 %>
 
-<%-- RY Once this is working, change to just one vitroNsEditForm for all vitro ns props, by parameterizing the predicate.
-The title and submit button text will need to be customized.
-Not sure sparqlForExistingLiterals is needed: see defaultDatapropForm - doesn't use it.
- --%>
-<%-- RY Change labelExisting, label, and labelAssertion to variables once this is working,
-so it can be more easily copied to another form. 
-Also change hard-coded predicate to ?predicate, so it will be picked up from the editConfig predicate --%>
-
 <c:set var="predicate" value="<%=predicateUri%>" />
 <c:set var="propertyName" value="${fn:substringAfter(predicate, '#')}" />
 
@@ -60,11 +52,19 @@ Also change hard-coded predicate to ?predicate, so it will be picked up from the
       The actual assertion inserted in the model will be created via string substitution into the ? variables.
       NOTE the pattern of punctuation (a period after the prefix URI and after the ?field) --%>
 <v:jsonset var="dataAssertion"  >
-    ?subject <${predicate}> ?label .
+    ?subject <${predicate}> ?${propertyName} .
 </v:jsonset>
 
 <%-- RY This will be the default, but base it on propertyName --%>
 <c:set var="rangeDatatypeUri" value="http://www.w3.org/2001/XMLSchema#string" />
+
+<%-- RY Add other validation cases here.  --%>
+<c:choose>
+    <c:when test="${propertyName == 'label' || propertyName == 'type'}">
+        <c:set var="validator" value="nonempty" />
+    </c:when>
+
+</c:choose>
 
 <c:set var="editjson" scope="request">
   {
@@ -72,7 +72,8 @@ Also change hard-coded predicate to ?predicate, so it will be picked up from the
     "editKey"              : "${editKey}",
     "datapropKey"          : "<%= datapropKeyStr == null ? "" : datapropKeyStr %>",    
     "urlPatternToReturnTo" : "/entity",
-
+    "isVitroNsProp"        : "true",
+    
     "subject"   : ["subject",   "${subjectUriJson}" ],
     "predicate" : ["predicate", "${predicateUriJson}" ],
     "object"    : ["${propertyName}", "", "DATAPROPHASH" ],
@@ -90,9 +91,9 @@ Also change hard-coded predicate to ?predicate, so it will be picked up from the
     "sparqlForExistingLiterals" : { "${propertyName}" : "${dataExisting}" },
     "sparqlForExistingUris" : { },
     "fields" : {
-      "label" : {
+      "${propertyName}" : {
          "newResource"      : "false",
-         "validators"       : [ "nonempty" ],
+         "validators"       : [ <c:if test="${!empty validator}">"${validator}"</c:if> ],
          "optionsType"      : "UNDEFINED",
          "literalOptions"   : [ ],
          "predicateUri"     : "",
@@ -106,10 +107,14 @@ Also change hard-coded predicate to ?predicate, so it will be picked up from the
 </c:set>
 
 <%
+
     EditConfiguration editConfig = EditConfiguration.getConfigFromSession(session,request);
     if (editConfig == null) {
+        log.debug("No editConfig in session. Making new editConfig.");
+        log.debug(vreq.getAttribute("editjson"));
         editConfig = new EditConfiguration((String)vreq.getAttribute("editjson"));
         EditConfiguration.putConfigInSession(editConfig, session);
+
     }
     
     if ( datapropKeyStr != null && datapropKeyStr.trim().length() > 0  ) {
@@ -127,7 +132,7 @@ Also change hard-coded predicate to ?predicate, so it will be picked up from the
 
 <h2>${title}</h2>
 <form action="<c:url value="/edit/processDatapropRdfForm.jsp"/>" >
-    <v:input type="text" id="label" size="30" />
+    <v:input type="text" id="${propertyName}" size="30" />
     <p class="submit"><v:input type="submit" id="submit" value="${submitLabel}" cancel="${param.subjectUri}"/></p>
 </form>
 

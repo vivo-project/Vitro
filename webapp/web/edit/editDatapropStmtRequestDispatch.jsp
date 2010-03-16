@@ -14,9 +14,11 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Portal" %>
 <%@ page import="java.util.HashMap" %>
+<%@ page import="org.apache.commons.logging.Log" %>
+<%@ page import="org.apache.commons.logging.LogFactory" %>
 <%
-    org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.edit.editDatapropStmtRequestDispatch");
-    //Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.edit.editDatapropStmtRequestDispatch");
+    //org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.edit.editDatapropStmtRequestDispatch.jsp");
+    final Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.edit.editDatapropStmtRequestDispatch.jsp");
 %>
 <%
     // Decide which form to forward to, set subjectUri, subjectUriJson, predicateUri, predicateUriJson in request
@@ -107,13 +109,9 @@
 
     DataPropertyStatement dps = null;
     if( dataHash != 0) {
-        if (isVitroNsProp) {
-            Model model = (Model)application.getAttribute("jenaOntModel");
-            dps = RdfLiteralHash.getVitroNsPropertyStmtByHash(subject, model, dataHash);           
-        }
-        else {
-            dps = RdfLiteralHash.getDataPropertyStmtByHash(subject, dataHash);
-        }
+        Model model = (Model)application.getAttribute("jenaOntModel");
+        dps = RdfLiteralHash.getPropertyStmtByHash(subject, dataHash, model, isVitroNsProp);
+
                               
         if (dps==null) {
             log.error("No match to existing data property \""+predicateUri+"\" statement for subject \""+subjectUri+"\" via key "+datapropKeyStr);
@@ -124,7 +122,9 @@
     }
 
     if( log.isDebugEnabled() ){
-        log.debug("predicate for DataProperty from request is " + dataproperty.getURI() + " with rangeDatatypeUri of '" + dataproperty.getRangeDatatypeURI() + "'");
+        if (dataproperty != null) {
+            log.debug("predicate for DataProperty from request is " + dataproperty.getURI() + " with rangeDatatypeUri of '" + dataproperty.getRangeDatatypeURI() + "'");
+        }
         if( dps == null )
             log.debug("no existng DataPropertyStatement statement was found, making a new statemet");
         else{
@@ -134,7 +134,9 @@
             msg += " prop uri: <"+dps.getDatapropURI() + ">\n";
             msg += " prop data: \"" + dps.getData() + "\"\n";
             msg += " datatype: <" + dps.getDatatypeURI() + ">\n";
-            msg += " hash of this stmt: " + RdfLiteralHash.makeRdfLiteralHash(dps);
+            //if (!isVitroNsProp) {
+                msg += " hash of this stmt: " + RdfLiteralHash.makeRdfLiteralHash(dps);
+            //}
             log.debug(msg);
         }
     }

@@ -62,15 +62,15 @@ and set a flag in the request to indicate "back button confusion"
  
 --%>
 <%! 
-    public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.edit.processDatapropRdfForm.jsp");
+
+    final Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.edit.processDatapropRdfForm.jsp");
 %>
 <%    
     log.debug("Starting processDatapropRdfForm.jsp");
 
     if( session == null)
         throw new Error("need to have session");
-%>
-<%
+
     boolean selfEditing = VitroRequestPrep.isSelfEditing(request);
     if (!selfEditing && !LoginFormBean.loggedIn(request, LoginFormBean.NON_EDITOR)) {
         %><c:redirect url="<%= Controllers.LOGIN %>" /><%
@@ -132,7 +132,7 @@ and set a flag in the request to indicate "back button confusion"
             throw new Error("In processDatapropRdfForm.jsp, could not find subject Individual via uri " + subjectUri);
         }
         
-        boolean backButtonProblems = checkForBackButtonConfusion( submission, editConfig, subject, wdf);
+        boolean backButtonProblems = checkForBackButtonConfusion(application, submission, editConfig, subject, wdf);
         if( backButtonProblems ){
             %><jsp:forward page="/edit/messages/datapropertyBackButtonProblems.jsp"/><%
             return;
@@ -369,14 +369,18 @@ and set a flag in the request to indicate "back button confusion"
         return fieldChanged;
     }
 
-    private boolean checkForBackButtonConfusion(EditSubmission submission,
+    private boolean checkForBackButtonConfusion(ServletContext application, EditSubmission submission,
             EditConfiguration editConfig, Individual subject,
             WebappDaoFactory wdf) {
         if (editConfig.getDatapropKey() == null
                 || editConfig.getDatapropKey().length() == 0)
             return false;
-        DataPropertyStatement dps = RdfLiteralHash.getDataPropertyStmtByHash(
-                subject, Integer.parseInt(editConfig.getDatapropKey()));
+        
+        Model model =  (Model)application.getAttribute("jenaOntModel");
+        int dpropHash = Integer.parseInt(editConfig.getDatapropKey());
+        boolean isVitroNsProp = editConfig.isVitroNsProp();
+        DataPropertyStatement dps = RdfLiteralHash.getPropertyStmtByHash(subject, dpropHash, model, isVitroNsProp);
+
         if (dps != null)
             return false;
         DataProperty dp = wdf.getDataPropertyDao().getDataPropertyByURI(

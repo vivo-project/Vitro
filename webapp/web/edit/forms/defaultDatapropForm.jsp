@@ -126,7 +126,6 @@
 </c:set>
 
 <%
-System.out.println(request.getAttribute("editjson"));
     if( log.isDebugEnabled()) log.debug(request.getAttribute("editjson"));
 
     EditConfiguration editConfig = new EditConfiguration((String)vreq.getAttribute("editjson"));

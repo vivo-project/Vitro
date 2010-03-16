@@ -235,13 +235,6 @@ public class InputElementFormattingTag extends TagSupport {
             log.debug("doValue():", ex);
         }
 
-        //here we are looking for defaults since everything else failed
-//        Field field = editConfig.getField( getId() );
-//        if( field == null )
-//            log.debug("doValue(): when looking for default value, could not find Field object in EditConfig");
-//        else
-//            return field.getDefault();
-
         log.debug("doValue(): No existing or default value for key '"+getId()+"' found from in editConfig or"
                 +" or editSub");
         return "";

@@ -39,7 +39,7 @@ and set a flag in the request to indicate "back button confusion"
     public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.edit.datapropertyBackButtonProblems.jsp");
 %>
 <%
-
+System.out.println("IN BACK BUTTON JSP");
     log.debug("Starting datapropertyBackButtonProblems.jsp");
 
     if( session == null)
@@ -57,7 +57,7 @@ and set a flag in the request to indicate "back button confusion"
 
     VitroRequest vreq = new VitroRequest(request);
     EditConfiguration editConfig = EditConfiguration.getConfigFromSession(session,vreq);
-    EditSubmission submission = new EditSubmission(vreq, vreq.getParameterMap(), editConfig);
+    EditSubmission submission = new EditSubmission(vreq.getParameterMap(), editConfig);
 
     EditN3Generator n3Subber = editConfig.getN3Generator();
     List<String> n3Required = editConfig.getN3Required();
@@ -182,13 +182,13 @@ and set a flag in the request to indicate "back button confusion"
             jenaOntModel.remove( model );
         }
     }catch(Throwable t){
-        errorMessages.add("In processDatapropRdfForm.jsp, error adding edit change n3required model to in memory model \n"+ t.getMessage() );
+        errorMessages.add("In datapropertyBackButtonProblems.jsp, error adding edit change n3required model to in memory model \n"+ t.getMessage() );
     }finally{
         lock.leaveCriticalSection();
     }
 %>
 
-<jsp:forward page="postEditCleanUp.jsp"/>
+<jsp:forward page="../postEditCleanUp.jsp"/>
 
 <%!
 

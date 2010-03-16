@@ -89,8 +89,7 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
     <c:set var="citationEditLinks"><edLnk:editLinks item="${vitroNsUri}citation" data="${entity.citation}" icons="false"/></c:set>
     <c:set var="descriptionEditLinks"><edLnk:editLinks item="${vitroNsUri}description" data="${entity.description}" icons="false"/></c:set>
     <c:set var="timekeyEditLinks"><edLnk:editLinks item="${vitroNsUri}timekey" data="${entity.timekey}" icons="false"/></c:set>
-    <c:set var="urlEditLinks"><edLnk:editLinks item="${vitroNsUri}url" data="${entity.url}" icons="false"/></c:set>
-    <c:set var="anchorEditLinks"><edLnk:editLinks item="${vitroNsUri}anchor" data="${entity.anchor}" icons="false"/></c:set>       
+    <c:set var="urlEditLinks"><edLnk:editLinks item="${vitroNsUri}url" data="${entity.url}" icons="false"/></c:set>       
 </c:if>
 
 <c:set var='themeDir'><c:out value='${portalBean.themeDir}' /></c:set>
