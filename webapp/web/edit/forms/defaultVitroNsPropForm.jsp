@@ -72,7 +72,6 @@
     "editKey"              : "${editKey}",
     "datapropKey"          : "<%= datapropKeyStr == null ? "" : datapropKeyStr %>",    
     "urlPatternToReturnTo" : "/entity",
-    "isVitroNsProp"        : "true",
     
     "subject"   : ["subject",   "${subjectUriJson}" ],
     "predicate" : ["predicate", "${predicateUriJson}" ],
@@ -127,6 +126,7 @@
 <c:set var="propertyLabel" value="${propertyName == 'label' ? 'name' : propertyName}" />
 <c:set var="submitLabel" value="Edit ${propertyLabel}" />
 <c:set var="title" scope="request" value="Edit the ${propertyLabel} of ${subject.name}:" />
+<c:set var="vitroNsProp" scope="request" value="true" />
 
 <jsp:include page="${preForm}"/>
 
@@ -135,6 +135,17 @@
     <v:input type="text" id="${propertyName}" size="30" />
     <p class="submit"><v:input type="submit" id="submit" value="${submitLabel}" cancel="${param.subjectUri}"/></p>
 </form>
+
+<c:if test="${ (!empty param.datapropKey) && (empty param.deleteProhibited) }">
+     <form class="deleteForm" action="editDatapropStmtRequestDispatch.jsp" method="post">                               
+            <label for="delete"><h3>Delete this entry?</h3></label>
+            <input type="hidden" name="subjectUri"   value="${param.subjectUri}"/>
+            <input type="hidden" name="predicateUri" value="${param.predicateUri}"/>
+            <input type="hidden" name="datapropKey"  value="${param.datapropKey}"/>                
+            <input type="hidden" name="cmd"          value="delete"/>
+            <v:input type="submit" id="delete" value="Delete" cancel="" />
+     </form>
+</c:if>
 
 <jsp:include page="${postForm}"/>
 

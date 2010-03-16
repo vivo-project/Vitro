@@ -1,5 +1,7 @@
 <%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
 
+<%@ page import="com.hp.hpl.jena.rdf.model.Model" %>
+
 <%@ page import="edu.cornell.mannlib.vedit.beans.LoginFormBean" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.DataProperty" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement" %>
@@ -23,7 +25,7 @@
     if (!VitroRequestPrep.isSelfEditing(request) && !LoginFormBean.loggedIn(request, LoginFormBean.NON_EDITOR)) {%>
         <c:redirect url="<%= Controllers.LOGIN %>" />
 <%  }
-
+    
     String subjectUri   = request.getParameter("subjectUri");
     String predicateUri = request.getParameter("predicateUri");
     String datapropKeyStr  = request.getParameter("datapropKey");
@@ -50,8 +52,14 @@
     request.setAttribute("subjectName",subject.getName());
 
     String dataValue=null;
-   // DataPropertyStatement dps=EditConfiguration.findDataPropertyStatementViaHashcode(subject,predicateUri,dataHash);
-     DataPropertyStatement dps= RdfLiteralHash.getDataPropertyStmtByHash(subject,dataHash);
+    // DataPropertyStatement dps=EditConfiguration.findDataPropertyStatementViaHashcode(subject,predicateUri,dataHash);    
+    //DataPropertyStatement dps= RdfLiteralHash.getDataPropertyStmtByHash(subject,dataHash);
+    
+    Model model = (Model)application.getAttribute("jenaOntModel");
+    String vitroNsProp  = vreq.getParameter("vitroNsProp");
+    boolean isVitroNsProp = vitroNsProp != null && vitroNsProp.equals("true") ? true : false;
+    DataPropertyStatement dps = RdfLiteralHash.getPropertyStmtByHash(subject, dataHash, model, isVitroNsProp);
+    
     if( log.isDebugEnabled() ){
         log.debug("attempting to delete dataPropertyStatement: subjectURI <" + dps.getIndividualURI() +">");
         log.debug( "predicateURI <" + dps.getDatapropURI() + ">");

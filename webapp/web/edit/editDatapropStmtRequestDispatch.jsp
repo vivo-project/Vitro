@@ -16,6 +16,9 @@
 <%@ page import="java.util.HashMap" %>
 <%@ page import="org.apache.commons.logging.Log" %>
 <%@ page import="org.apache.commons.logging.LogFactory" %>
+
+<%@ taglib prefix="c" uri="http://java.sun.com/jstl/core"%>
+
 <%
     //org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.edit.editDatapropStmtRequestDispatch.jsp");
     final Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.edit.editDatapropStmtRequestDispatch.jsp");
@@ -53,7 +56,7 @@
     String predicateUri = vreq.getParameter("predicateUri");
     String formParam    = vreq.getParameter("editForm");
     String command      = vreq.getParameter("cmd");
-    String vitroNsProp  = vreq.getParameter("vitroNsProp");
+    String vitroNsProp = vreq.getParameter("vitroNsProp");
     boolean isVitroNsProp = vitroNsProp != null && vitroNsProp.equals("true") ? true : false;
 
     if( subjectUri == null || subjectUri.trim().length() == 0 ) {
@@ -64,13 +67,15 @@
         log.error("required subjectUri parameter missing");
         throw new Error("predicateUri was empty, it is required by editDatapropStmtRequestDispatch");
     }
+    
+    /* since we have the URIs let's put the individual, data property, and optional data property statement in the request */
+    
     vreq.setAttribute("subjectUri", subjectUri);
     vreq.setAttribute("subjectUriJson", MiscWebUtils.escape(subjectUri));
     vreq.setAttribute("predicateUri", predicateUri);
     vreq.setAttribute("predicateUriJson", MiscWebUtils.escape(predicateUri));
-
-    /* since we have the URIs let's put the individual, data property, and optional data property statement in the request */
-    
+    vreq.setAttribute("vitroNsProp", vitroNsProp);
+ 
     WebappDaoFactory wdf = vreq.getWebappDaoFactory();
 
     Individual subject = wdf.getIndividualDao().getIndividualByURI(subjectUri);
@@ -82,7 +87,7 @@
 
     DataProperty dataproperty = wdf.getDataPropertyDao().getDataPropertyByURI( predicateUri );
     if( dataproperty == null) {
-        // No dataproperty will be returned for a vitro ns prop
+        // No dataproperty will be returned for a vitro ns prop, but we shouldn't throw an error.
         if (!isVitroNsProp) {
             log.error("Could not find data property '"+predicateUri+"' in model");
             throw new Error("editDatapropStmtRequest.jsp: Could not find DataProperty in model: " + predicateUri);
@@ -111,7 +116,6 @@
     if( dataHash != 0) {
         Model model = (Model)application.getAttribute("jenaOntModel");
         dps = RdfLiteralHash.getPropertyStmtByHash(subject, dataHash, model, isVitroNsProp);
-
                               
         if (dps==null) {
             log.error("No match to existing data property \""+predicateUri+"\" statement for subject \""+subjectUri+"\" via key "+datapropKeyStr);
@@ -126,7 +130,7 @@
             log.debug("predicate for DataProperty from request is " + dataproperty.getURI() + " with rangeDatatypeUri of '" + dataproperty.getRangeDatatypeURI() + "'");
         }
         if( dps == null )
-            log.debug("no existng DataPropertyStatement statement was found, making a new statemet");
+            log.debug("no existing DataPropertyStatement statement was found, making a new statemet");
         else{
             log.debug("Found an existing DataPropertyStatement");
             String msg = "existing datapropstmt: ";
@@ -134,9 +138,7 @@
             msg += " prop uri: <"+dps.getDatapropURI() + ">\n";
             msg += " prop data: \"" + dps.getData() + "\"\n";
             msg += " datatype: <" + dps.getDatatypeURI() + ">\n";
-            //if (!isVitroNsProp) {
-                msg += " hash of this stmt: " + RdfLiteralHash.makeRdfLiteralHash(dps);
-            //}
+            msg += " hash of this stmt: " + RdfLiteralHash.makeRdfLiteralHash(dps);
             log.debug(msg);
         }
     }

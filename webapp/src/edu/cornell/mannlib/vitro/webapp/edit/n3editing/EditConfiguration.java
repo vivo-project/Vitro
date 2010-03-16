@@ -87,7 +87,6 @@ public class EditConfiguration {
     String entityToReturnTo;
     String formUrl;
     String editKey;
-    boolean isVitroNsProp;
 
     EditN3Generator n3generator;   
     private String originalJson;
@@ -169,9 +168,6 @@ public class EditConfiguration {
             entityToReturnTo = subjectUri;
 
             urlPatternToReturnTo = obj.getString("urlPatternToReturnTo");
-
-            String vitroNsPropParam = obj.getString("isVitroNsProp");
-            isVitroNsProp = vitroNsPropParam != null && vitroNsPropParam.equalsIgnoreCase("true");
             
             JSONArray predicate = obj.getJSONArray("predicate");
             if( predicate.length() != 2 )
@@ -513,14 +509,6 @@ public class EditConfiguration {
 
     public void setUrlPatternToReturnTo(String s) {
         urlPatternToReturnTo = s;
-    }
-    
-    public boolean isVitroNsProp() {
-        return isVitroNsProp;
-    }
-
-    public void setIsVitroNsProp(boolean b) {
-        isVitroNsProp = b;
     }
 
      /** return a copy of the value so that the configuration is not modified by external code.

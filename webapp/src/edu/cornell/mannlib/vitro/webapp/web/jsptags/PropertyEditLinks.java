@@ -327,14 +327,25 @@ public class PropertyEditLinks extends TagSupport{
         
         int index = 0;
         
-        if ( contains( allowedAccessTypeArray, EditLinkAccess.MODIFY ) ){ 
-            log.debug("Permission found to UPDATE vitro namespace property " + predicateUri);
+        boolean deleteAllowed = ( contains( allowedAccessTypeArray, EditLinkAccess.DELETE ) && 
+            !( predicateUri.endsWith("#label") || predicateUri.endsWith("#type") ) );
+
+        if( contains( allowedAccessTypeArray, EditLinkAccess.MODIFY ) ){
+            log.debug("permission found to UPDATE vitro namepsace property statement "+ predicateUri);
             LinkStruct ls = new LinkStruct();
-            String url = makeRelativeHref(dispatchUrl, 
-                                          "subjectUri", subjectUri,
-                                          "predicateUri", predicateUri,
-                                          "datapropKey",  dpropHash,
-                                          "vitroNsProp", "true");
+            String url = deleteAllowed 
+                ? makeRelativeHref(dispatchUrl,
+                        "subjectUri",   subjectUri,
+                        "predicateUri", predicateUri,
+                        "datapropKey",  dpropHash,
+                        "vitroNsProp",  "true")
+                : makeRelativeHref(dispatchUrl,
+                        "subjectUri",   subjectUri,
+                        "predicateUri", predicateUri,
+                        "datapropKey",  dpropHash,
+                        "vitroNsProp",  "true",
+                        "deleteProhibited", "prohibited");
+                
             ls.setHref(url);
             ls.setType("edit");
             ls.setMouseoverText("edit this text");
@@ -346,24 +357,22 @@ public class PropertyEditLinks extends TagSupport{
         }
 
         // Name and type can be edited but not deleted
-        if ( !( predicateUri.endsWith("#label") || predicateUri.endsWith("#type") ) ) {
-            if ( contains( allowedAccessTypeArray, EditLinkAccess.DELETE ) ){ 
-                LinkStruct ls = new LinkStruct();
-                log.debug("Permission found to DELETE vitro namespace property " + predicateUri);
-                String url = makeRelativeHref(dispatchUrl, 
-                                              "subjectUri", subjectUri,
-                                              "predicateUri", predicateUri,
-                                              "datapropKey",  dpropHash,
-                                              "vitroNsProp", "true");
-                ls.setHref(url);
-                ls.setType("delete");
-                ls.setMouseoverText("delete this text");
-                links[index] = ls; 
-                index++;
-            }
-            else {
-                log.debug("NO permission found to DELETE vitro namespace property " + predicateUri);
-            }
+        if ( deleteAllowed ) {
+            LinkStruct ls = new LinkStruct();
+            log.debug("Permission found to DELETE vitro namespace property " + predicateUri);
+            String url = makeRelativeHref(dispatchUrl, 
+                                          "subjectUri", subjectUri,
+                                          "predicateUri", predicateUri,
+                                          "datapropKey",  dpropHash,
+                                          "vitroNsProp", "true");
+            ls.setHref(url);
+            ls.setType("delete");
+            ls.setMouseoverText("delete this text");
+            links[index] = ls; 
+            index++;
+        }
+        else {
+            log.debug("NO permission found to DELETE vitro namespace property " + predicateUri);
         }
             
         return links;

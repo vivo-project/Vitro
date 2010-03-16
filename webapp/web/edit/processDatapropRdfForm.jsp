@@ -132,7 +132,7 @@ and set a flag in the request to indicate "back button confusion"
             throw new Error("In processDatapropRdfForm.jsp, could not find subject Individual via uri " + subjectUri);
         }
         
-        boolean backButtonProblems = checkForBackButtonConfusion(application, submission, editConfig, subject, wdf);
+        boolean backButtonProblems = checkForBackButtonConfusion(vreq, application, submission, editConfig, subject, wdf);
         if( backButtonProblems ){
             %><jsp:forward page="/edit/messages/datapropertyBackButtonProblems.jsp"/><%
             return;
@@ -369,16 +369,17 @@ and set a flag in the request to indicate "back button confusion"
         return fieldChanged;
     }
 
-    private boolean checkForBackButtonConfusion(ServletContext application, EditSubmission submission,
+    private boolean checkForBackButtonConfusion(VitroRequest vreq, ServletContext application, EditSubmission submission,
             EditConfiguration editConfig, Individual subject,
             WebappDaoFactory wdf) {
         if (editConfig.getDatapropKey() == null
                 || editConfig.getDatapropKey().length() == 0)
             return false;
         
-        Model model =  (Model)application.getAttribute("jenaOntModel");
+        Model model = (Model)application.getAttribute("jenaOntModel");
         int dpropHash = Integer.parseInt(editConfig.getDatapropKey());
-        boolean isVitroNsProp = editConfig.isVitroNsProp();
+        String vitroNsProp = vreq.getParameter("vitroNsProp");
+        boolean isVitroNsProp = vitroNsProp != null && vitroNsProp.equals("true");
         DataPropertyStatement dps = RdfLiteralHash.getPropertyStmtByHash(subject, dpropHash, model, isVitroNsProp);
 
         if (dps != null)
