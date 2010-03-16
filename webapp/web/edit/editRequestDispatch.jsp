@@ -171,7 +171,7 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
     String customForm = null;
     String form = DEFAULT_OBJ_FORM;
     
-    if( predicateUri != null ){            
+    if( predicateUri != null && ( formParam == null || formParam.length() == 0 ) ){       
         objectProp = wdf.getObjectPropertyDao().getObjectPropertyByURI(predicateUri);
         customForm = objectProp.getCustomEntryForm();
         request.setAttribute("predicate", objectProp);  
