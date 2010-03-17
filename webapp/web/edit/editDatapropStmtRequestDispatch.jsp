@@ -17,8 +17,6 @@
 <%@ page import="org.apache.commons.logging.Log" %>
 <%@ page import="org.apache.commons.logging.LogFactory" %>
 
-<%@ taglib prefix="c" uri="http://java.sun.com/jstl/core"%>
-
 <%
     //org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.edit.editDatapropStmtRequestDispatch.jsp");
     final Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.edit.editDatapropStmtRequestDispatch.jsp");
@@ -56,8 +54,9 @@
     String predicateUri = vreq.getParameter("predicateUri");
     String formParam    = vreq.getParameter("editForm");
     String command      = vreq.getParameter("cmd");
+    
     String vitroNsProp = vreq.getParameter("vitroNsProp");
-    boolean isVitroNsProp = vitroNsProp != null && vitroNsProp.equals("true") ? true : false;
+    boolean isVitroNsProp = (vitroNsProp != null && vitroNsProp.equals("true")) ? true : false;
 
     if( subjectUri == null || subjectUri.trim().length() == 0 ) {
         log.error("required subjectUri parameter missing");
@@ -74,7 +73,7 @@
     vreq.setAttribute("subjectUriJson", MiscWebUtils.escape(subjectUri));
     vreq.setAttribute("predicateUri", predicateUri);
     vreq.setAttribute("predicateUriJson", MiscWebUtils.escape(predicateUri));
-    vreq.setAttribute("vitroNsProp", vitroNsProp);
+    //vreq.setAttribute("vitroNsProp", vitroNsProp);
  
     WebappDaoFactory wdf = vreq.getWebappDaoFactory();
 

@@ -132,7 +132,7 @@ public class PropertyEditLinks extends TagSupport{
             DataProperty prop = (DataProperty)item; // a DataProperty populated for this subject individual            
             links = doDataProp( prop, entity, themeDir,policyToAccess(ids, policy, entity.getURI(), prop), contextPath ) ;
         } else if (item instanceof String && data != null) {
-            DataPropertyStatement dps =  (DataPropertyStatement) new DataPropertyStatementImpl(entity.getURI(), (String)item, data);  
+            DataPropertyStatement dps =  (DataPropertyStatement) new DataPropertyStatementImpl(entity.getURI(), (String)item, data); 
             links = doVitroNamespaceProp( dps, themeDir, policyToAccess(ids, policy, dps), contextPath );     
         } else {
             log.error("PropertyEditLinks cannot make links for an object of type "+item.getClass().getName());

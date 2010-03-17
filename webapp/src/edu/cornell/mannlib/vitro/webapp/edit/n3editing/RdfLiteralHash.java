@@ -100,7 +100,7 @@ public class RdfLiteralHash {
 
         List<DataPropertyStatement> statements = ind.getDataPropertyStatements();
         if( statements == null ) return null;
-        for( DataPropertyStatement dps : statements){
+        for( DataPropertyStatement dps : statements){  
             if( doesStmtMatchHash(dps, hash) )
                 return dps;
         }
@@ -131,8 +131,7 @@ public class RdfLiteralHash {
                     dps.setLanguage(lang);
                     dps.setData(value);
                     dps.setDatapropURI(stmt.getPredicate().toString());
-                    dps.setIndividualURI(ind.getURI());
-                                   
+                    dps.setIndividualURI(ind.getURI());          
                     if (doesStmtMatchHash(dps, hash)) {
                         break;
                     }

@@ -51,13 +51,13 @@
     if( subject == null ) throw new Error("could not find subject " + subjectUri);
     request.setAttribute("subjectName",subject.getName());
 
-    String dataValue=null;
-    // DataPropertyStatement dps=EditConfiguration.findDataPropertyStatementViaHashcode(subject,predicateUri,dataHash);    
-    //DataPropertyStatement dps= RdfLiteralHash.getDataPropertyStmtByHash(subject,dataHash);
-    
-    Model model = (Model)application.getAttribute("jenaOntModel");
     String vitroNsProp  = vreq.getParameter("vitroNsProp");
     boolean isVitroNsProp = vitroNsProp != null && vitroNsProp.equals("true") ? true : false;
+            
+    String dataValue=null;
+    
+    Model model = (Model)application.getAttribute("jenaOntModel");
+
     DataPropertyStatement dps = RdfLiteralHash.getPropertyStmtByHash(subject, dataHash, model, isVitroNsProp);
     
     if( log.isDebugEnabled() ){
@@ -99,6 +99,7 @@
                 <input type="hidden" name="datapropKey"  value="${param.datapropKey}"/>
                 <input type="hidden" name="y"            value="1"/>
                 <input type="hidden" name="cmd"          value="delete"/>
+                <input type="hidden" name="vitroNsProp"  value="<%= vitroNsProp %>" />
                 <v:input type="submit" id="submit" value="Delete" cancel="${param.subjectUri}" />
             </form>
             <jsp:include page="${postForm}"/>

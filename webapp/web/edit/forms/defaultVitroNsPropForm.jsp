@@ -9,6 +9,7 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.VitroRequest"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement" %>
+<%@page import="edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils"%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
@@ -55,8 +56,7 @@
     ?subject <${predicate}> ?${propertyName} .
 </v:jsonset>
 
-<%-- RY This will be the default, but base it on propertyName --%>
-<c:set var="rangeDatatypeUri" value="http://www.w3.org/2001/XMLSchema#string" />
+
 
 <%-- RY Add other validation cases here.  --%>
 <c:choose>
@@ -97,7 +97,7 @@
          "literalOptions"   : [ ],
          "predicateUri"     : "",
          "objectClassUri"   : "",
-         "rangeDatatypeUri" : "${rangeDatatypeUri}",
+         "rangeDatatypeUri" : "",
          "rangeLang"        : "",
          "assertions"       : [ "${dataAssertion}" ]
       }
@@ -133,6 +133,7 @@
 <h2>${title}</h2>
 <form action="<c:url value="/edit/processDatapropRdfForm.jsp"/>" >
     <v:input type="text" id="${propertyName}" size="30" />
+    <input type="hidden" name="vitroNsProp" value="true" />
     <p class="submit"><v:input type="submit" id="submit" value="${submitLabel}" cancel="${param.subjectUri}"/></p>
 </form>
 
@@ -143,6 +144,7 @@
             <input type="hidden" name="predicateUri" value="${param.predicateUri}"/>
             <input type="hidden" name="datapropKey"  value="${param.datapropKey}"/>                
             <input type="hidden" name="cmd"          value="delete"/>
+            <input type="hidden" name="vitroNsProp" value="true" />
             <v:input type="submit" id="delete" value="Delete" cancel="" />
      </form>
 </c:if>
