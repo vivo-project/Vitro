@@ -364,7 +364,8 @@ public class PropertyEditLinks extends TagSupport{
                                           "subjectUri", subjectUri,
                                           "predicateUri", predicateUri,
                                           "datapropKey",  dpropHash,
-                                          "vitroNsProp", "true");
+                                          "vitroNsProp", "true",
+                                          "cmd", "delete");
             ls.setHref(url);
             ls.setType("delete");
             ls.setMouseoverText("delete this text");
