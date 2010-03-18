@@ -23,7 +23,11 @@
     if( session == null)
         throw new Error("need to have session");
     if (!VitroRequestPrep.isSelfEditing(request) && !LoginFormBean.loggedIn(request, LoginFormBean.NON_EDITOR)) {%>
-        <c:redirect url="<%= Controllers.LOGIN %>" />
+        
+<%@page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.StandardModelSelector"%>
+<%@page import="com.hp.hpl.jena.shared.Lock"%>
+<%@page import="com.hp.hpl.jena.ontology.OntModel"%>
+<%@page import="edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent"%><c:redirect url="<%= Controllers.LOGIN %>" />
 <%  }
     
     String subjectUri   = request.getParameter("subjectUri");
@@ -51,13 +55,13 @@
     if( subject == null ) throw new Error("could not find subject " + subjectUri);
     request.setAttribute("subjectName",subject.getName());
 
-    String vitroNsProp  = vreq.getParameter("vitroNsProp");
-    boolean isVitroNsProp = vitroNsProp != null && vitroNsProp.equals("true") ? true : false;
-            
     String dataValue=null;
     
     Model model = (Model)application.getAttribute("jenaOntModel");
-
+    
+    String vitroNsProp  = vreq.getParameter("vitroNsProp");
+    boolean isVitroNsProp = vitroNsProp != null && vitroNsProp.equals("true") ? true : false;
+    
     DataPropertyStatement dps = RdfLiteralHash.getPropertyStmtByHash(subject, dataHash, model, isVitroNsProp);
     
     if( log.isDebugEnabled() ){
@@ -78,8 +82,25 @@
     
     if (dps!=null) {
         dataValue = dps.getData().trim();
-        if( request.getParameter("y") != null ) { //do the delete
-            wdf.getDataPropertyStatementDao().deleteDataPropertyStatement(dps);%>
+        
+      	//do the delete
+        if( request.getParameter("y") != null ) {
+        	if( isVitroNsProp ){
+        			OntModel writeModel = (new StandardModelSelector()).getModel(request, application);        			
+        			writeModel.enterCriticalSection(Lock.WRITE);
+        			try{
+        				writeModel.getBaseModel().notifyEvent(new EditEvent(editorUri,true));
+        				writeModel.remove(
+        						writeModel.getResource(subjectUri), 
+        						writeModel.getProperty(predicateUri),
+        						writeModel.createLiteral(dps.getData()));
+        			}finally{
+        				writeModel.leaveCriticalSection();
+        			}        			        			
+        	}else{
+            	wdf.getDataPropertyStatementDao().deleteDataPropertyStatement(dps);
+        	}        	                
+            %>
 
 			<%-- grab the predicate URI and trim it down to get the Local Name so we can send the user back to the appropriate property --%>
 		    <c:set var="predicateUri" value="${param.predicateUri}" />
@@ -99,7 +120,7 @@
                 <input type="hidden" name="datapropKey"  value="${param.datapropKey}"/>
                 <input type="hidden" name="y"            value="1"/>
                 <input type="hidden" name="cmd"          value="delete"/>
-                <input type="hidden" name="vitroNsProp"  value="<%= vitroNsProp %>" />
+                <input type="hidden" name="vitroNsProp"  value="${param.vitroNsProp}" /> 
                 <v:input type="submit" id="submit" value="Delete" cancel="${param.subjectUri}" />
             </form>
             <jsp:include page="${postForm}"/>

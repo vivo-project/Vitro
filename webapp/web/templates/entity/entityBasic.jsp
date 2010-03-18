@@ -25,16 +25,16 @@ Individual entity = (Individual)request.getAttribute("entity");
 %>
 
 <c:if test="${!empty entityURI}">
-	<c:set var="myEntityURI" scope="request" value="${entityURI}"/>
-	<%
-		try {
-			VitroRequest vreq = new VitroRequest(request);
-			entity = vreq.getWebappDaoFactory().getIndividualDao().getIndividualByURI((String)request.getAttribute("myEntityURI"));
-			System.out.println("entityBasic rendering "+entity.getURI());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	%>
+    <c:set var="myEntityURI" scope="request" value="${entityURI}"/>
+    <%
+        try {
+            VitroRequest vreq = new VitroRequest(request);
+            entity = vreq.getWebappDaoFactory().getIndividualDao().getIndividualByURI((String)request.getAttribute("myEntityURI"));
+            System.out.println("entityBasic rendering "+entity.getURI());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    %>
 </c:if>
 
 <% 
@@ -82,16 +82,6 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
 <c:set var="typeUri" value="http://www.w3.org/1999/02/22-rdf-syntax-ns#type" />
 <c:set var="vitroNsUri" value="http://vitro.mannlib.cornell.edu/ns/vitro/0.7#" />
 
-<c:if test="${showEdits}">
-    <c:set var="labelEditLinks"><edLnk:editLinks item="${labelUri}" data="${entity.name}" icons="false"/></c:set>
-    <c:set var="monikerEditLinks"><edLnk:editLinks item="${vitroNsUri}moniker" data="${entity.moniker}" icons="false"/></c:set>
-    <c:set var="blurbEditLinks"><edLnk:editLinks item="${vitroNsUri}blurb" data="${entity.blurb}" icons="false"/></c:set>
-    <c:set var="citationEditLinks"><edLnk:editLinks item="${vitroNsUri}citation" data="${entity.citation}" icons="false"/></c:set>
-    <c:set var="descriptionEditLinks"><edLnk:editLinks item="${vitroNsUri}description" data="${entity.description}" icons="false"/></c:set>
-    <c:set var="timekeyEditLinks"><edLnk:editLinks item="${vitroNsUri}timekey" data="${entity.timekey}" icons="false"/></c:set>
-    <c:set var="urlEditLinks"><edLnk:editLinks item="${vitroNsUri}url" data="${entity.url}" icons="false"/></c:set>       
-</c:if>
-
 <c:set var='themeDir'><c:out value='${portalBean.themeDir}' /></c:set>
 
     <div id="content">
@@ -99,68 +89,75 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
         
         <div class='contents entity'>
 
-       		<div id="labelAndMoniker">
-	            <c:choose>
-		            <c:when test="${!empty relatedSubject}">
-		                <h2><p:process>${relatingPredicate.domainPublic} for ${relatedSubject.name}</p:process></h2>
-	                    <c:url var="backToSubjectLink" value="/entity">
-	                        <c:param name="home" value="${portalBean.portalId}"/>
-	                        <c:param name="uri" value="${relatedSubject.URI}"/>
-	                    </c:url>
-	                    <p><a href="${backToSubjectLink}">&larr; return to ${relatedSubject.name}</a></p>
-		            </c:when>
-		            <c:otherwise>
-		                <div class="vitroNsPropertyValue" id="label">
-	                        <div class="statementWrap">
-		                       <h2><p:process>${entity.name}</p:process></h2> 
-		                       <c:if test="${!empty labelEditLinks}">
-                                   <span class="editLinks">${labelEditLinks}</span>       
+            <div id="labelAndMoniker">
+                <c:choose>
+                    <c:when test="${!empty relatedSubject}">
+                        <h2><p:process>${relatingPredicate.domainPublic} for ${relatedSubject.name}</p:process></h2>
+                        <c:url var="backToSubjectLink" value="/entity">
+                            <c:param name="home" value="${portalBean.portalId}"/>
+                            <c:param name="uri" value="${relatedSubject.URI}"/>
+                        </c:url>
+                        <p><a href="${backToSubjectLink}">&larr; return to ${relatedSubject.name}</a></p>
+                    </c:when>
+                    <c:otherwise>
+                        <div class="datatypePropertyValue" id="label">
+                            <div class="statementWrap">
+                               <h2><p:process>${entity.name}</p:process></h2> 
+                               <c:if test="${showEdits}">
+                                   <span class="editLinks"><edLnk:editLinks item="${labelUri}" data="${entity.name}" icons="false"/></span>       
                                </c:if> 
-	                        </div>
-	                    </div>
-	                    <c:choose>
-		                    <c:when test="${!empty entity.moniker}">
-		                        <div class="vitroNsPropertyValue" id="moniker">
-		                            <div class="statementWrap">
-		                                <p:process><em class="moniker">${entity.moniker}</em></p:process>
-                                        <c:if test="${!empty monikerEditLinks}">
-                                            <span class="editLinks">${monikerEditLinks}</span>         
-                                        </c:if>		                    
-		                            </div>
-		                        </div>
-		                    </c:when>
-		                    <c:otherwise>
-		                      <%-- Show the add link --%>
-		                    </c:otherwise>
-		                </c:choose>
-		            </c:otherwise>
-	            </c:choose>
-            </div><!-- entity label -->
+                            </div>
+                        </div>
+                        <c:choose>
+                            <c:when test="${!empty entity.moniker}">
+                                <div class="datatypePropertyValue" id="moniker">
+                                    <div class="statementWrap">
+                                        <p:process><em class="moniker">${entity.moniker}</em></p:process>
+                                        <c:if test="${showEdits}">
+                                            <span class="editLinks"><edLnk:editLinks item="${vitroNsUri}moniker" data="${entity.moniker}" icons="false"/></span>         
+                                        </c:if>                         
+                                    </div>
+                                </div>
+                            </c:when>
+                            <c:otherwise>
+                              <%-- Show the add link --%>
+                            </c:otherwise>
+                        </c:choose>
+                    </c:otherwise>
+                </c:choose>
+            </div><!-- labelAndMoniker -->
             <c:if test="${ (!empty entity.anchor) || (!empty entity.linksList) }">
-                <ul class="externalLinks">
-	                <c:if test="${!empty entity.anchor}">
-	                    <c:choose>
-	                        <c:when test="${!empty entity.url}">
-	                            <c:url var="entityUrl" value="${entity.url}" />
-	                            <li class="primary"><a class="externalLink" href="<c:out value="${entityUrl}"/>"><p:process>${entity.anchor}</p:process></a></li>
-	                        </c:when>
-	                        <c:otherwise>
-	                            <li class="primary"><span class="externalLink"><p:process>${entity.anchor}</p:process></span></li>
-	                        </c:otherwise>
-	                    </c:choose>
-	                </c:if>
-                    <c:if test="${!empty entity.linksList }">
-	                    <c:forEach items="${entity.linksList}" var='link' varStatus="count">
-	                        <c:url var="linkUrl" value="${link.url}" />
-	                        <c:choose>
-	                          <c:when test="${empty entity.url && count.first==true}"><li class="first"></c:when>
-	                          <c:otherwise><li></c:otherwise>
-	                        </c:choose>
-	                        <a class="externalLink" href="<c:out value="${linkUrl}"/>"><p:process>${link.anchor}</p:process></a></li>
-	                    </c:forEach>
-	                </c:if>
-                </ul>
-	        </c:if>   
+                <div class="datatypePropertyValue">
+                    <div class="statementWrap">
+                        <ul class="externalLinks">
+                           <c:if test="${!empty entity.anchor}">
+                               <c:choose>
+                                   <c:when test="${!empty entity.url}">
+                                       <c:url var="entityUrl" value="${entity.url}" />
+                                       <li class="primary"><a class="externalLink" href="<c:out value="${entityUrl}"/>"><p:process>${entity.anchor}</p:process></a></li>
+                                   </c:when>
+                                   <c:otherwise>
+                                       <li class="primary"><span class="externalLink"><p:process>${entity.anchor}</p:process></span></li>
+                                   </c:otherwise>
+                               </c:choose>
+                               <c:if test="${showEdits}">
+                                   <span class="editLinks"><edLnk:editLinks item="${vitroNsUri}url" data="${entity.url}" icons="false"/></span>         
+                               </c:if> 
+                           </c:if>
+                           <c:if test="${!empty entity.linksList }">
+                               <c:forEach items="${entity.linksList}" var='link' varStatus="count">
+                                   <c:url var="linkUrl" value="${link.url}" />
+                                   <c:choose>
+                                       <c:when test="${empty entity.url && count.first==true}"><li class="first"></c:when>
+                                       <c:otherwise><li></c:otherwise>
+                                   </c:choose>
+                                   <a class="externalLink" href="<c:out value="${linkUrl}"/>"><p:process>${link.anchor}</p:process></a></li>
+                               </c:forEach>
+                           </c:if>
+                        </ul>
+                    </div>
+                </div>
+            </c:if>   
             <c:if test="${!empty entity.imageThumb}">
                 <div class="thumbnail">
                     <c:if test="${!empty entity.imageFile}">
@@ -172,12 +169,37 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
                     <c:if test="${!empty entity.imageFile}"></a></c:if>
                 </div>
                 <c:if test="${!empty entity.citation}">
-                    <div class="citation">${entity.citation}</div>
+                    <div class="datatypePropertyValue">
+                        <div class="statementWrap">
+                            <div class="citation">${entity.citation}</div>
+                            <c:if test="${showEdits}">
+                                <span class="editLinks"><edLnk:editLinks item="${vitroNsUri}citation" data="${entity.citation}" icons="false"/></span>         
+                            </c:if> 
+                        </div>
+                    </div>
                 </c:if>
             </c:if>
             <p:process>
-                <div class='description'>${entity.blurb}</div>
-                <div class='description'>${entity.description}</div>
+                <c:if test="${!empty entity.blurb}">
+                    <div class="datatypePropertyValue">
+                        <div class="statementWrap">
+                            <div class="description">${entity.blurb}</div>
+                            <c:if test="${showEdits}">
+                                <span class="editLinks"><edLnk:editLinks item="${vitroNsUri}blurb" data="${entity.blurb}" icons="false"/></span>         
+                            </c:if> 
+                        </div>
+                    </div>
+                </c:if>                              
+                <c:if test="${!empty entity.description}">
+                    <div class="datatypePropertyValue">
+                        <div class="statementWrap">
+                            <div class="description">${entity.description}</div>
+                            <c:if test="${showEdits}">
+                                <span class="editLinks"><edLnk:editLinks item="${vitroNsUri}description" data="${entity.description}" icons="false"/></span>         
+                            </c:if> 
+                        </div>
+                    </div>
+                </c:if>
             </p:process>
             <c:choose>
                 <c:when test="${showEdits}">
@@ -196,13 +218,19 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
                      </c:import>
                  </c:otherwise>
             </c:choose>
-            <p/>
             <p:process>
                 <c:if test="${(!empty entity.citation) && (empty entity.imageThumb)}">
-                    <div class="citation">${entity.citation}</div>
+                    <div class="datatypePropertyValue">
+                        <div class="statementWrap">
+                            <div class="citation">${entity.citation}</div>
+                            <c:if test="${showEdits}">
+                                <span class="editLinks"><edLnk:editLinks item="${vitroNsUri}citation" data="${entity.citation}" icons="false"/></span>         
+                            </c:if> 
+                        </div>
+                    </div>
                 </c:if>
                 <c:if test="${!empty entity.keywordString}">
-               	    <p id="keywords">Keywords: ${entity.keywordString}</p>
+                    <p id="keywords">Keywords: ${entity.keywordString}</p>
                 </c:if>
             </p:process>
             ${requestScope.servletButtons}

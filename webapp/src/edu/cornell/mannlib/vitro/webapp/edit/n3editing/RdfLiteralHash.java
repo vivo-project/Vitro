@@ -55,6 +55,7 @@ public class RdfLiteralHash {
         return hashMe.hashCode();
     }
 
+
     /**
      * @param stmt
      * @param hash
@@ -122,18 +123,9 @@ public class RdfLiteralHash {
                 Statement stmt = stmts.nextStatement();
                 RDFNode node = stmt.getObject();
                 if ( node.isLiteral() ){
-                    Literal lit = (Literal)node.as(Literal.class);
-                    String value = lit.getLexicalForm();
-                    String lang = lit.getLanguage();
-                    String datatypeURI = lit.getDatatypeURI();
-                    dps = new DataPropertyStatementImpl();
-                    dps.setDatatypeURI(datatypeURI);
-                    dps.setLanguage(lang);
-                    dps.setData(value);
-                    dps.setDatapropURI(stmt.getPredicate().toString());
-                    dps.setIndividualURI(ind.getURI());          
+                    dps = makeDataPropertyStatementFromStatement(stmt, node);          
                     if (doesStmtMatchHash(dps, hash)) {
-                        break;
+                        return dps;
                     }
                 }
             }
@@ -142,7 +134,63 @@ public class RdfLiteralHash {
             } finally{
                 stmts.close();
             }
-            return dps;
+            return null;
         }
+    
+    public static int makeVitroNsLiteralHash( Individual subject, String predicateUri, String value, Model  model) { 
+        
+        String subjectUri = subject.getURI();
+        
+        StmtIterator stmts = model.listStatements(model.createResource(subjectUri), 
+                                                  model.getProperty(predicateUri), 
+                                                  (RDFNode) null);                     
+        DataPropertyStatement dps = null;
+        int hash = 0;
+        int count = 0;
+        try {           
+            while (stmts.hasNext()) {
+                Statement stmt = stmts.nextStatement();
+                RDFNode node = stmt.getObject();
+                if (node.isLiteral()) {
+                    count++;
+                    dps = makeDataPropertyStatementFromStatement(stmt, node);
+                    hash = makeRdfLiteralHash(dps);
+                }
+            }
+        } finally {
+            stmts.close();
+        }
+        
+        if( count == 1 ) {
+            return hash;
+        } else if( count == 0 ){
+            log.debug("No data property statement for " +
+                    "subject:" + subjectUri + "\npredicate:" + predicateUri + "\nvalue: " + value);
+            throw new IllegalArgumentException("Could not create RdfLiteralHash because " +
+                    "there was no data property statement with the given value.");      
+        } else{
+            log.debug("Multiple data property statements for " +
+                    "subject:" + subjectUri + "\npredicate:" + predicateUri + "\nvalue: " + value);
+            throw new IllegalArgumentException("Could not create RdfLiteralHash because " +
+                    "there were multiple data property statements with the given value.");                  
+        }       
+    }
+
+    private static DataPropertyStatement makeDataPropertyStatementFromStatement(Statement statement, RDFNode node) {
+
+        Literal lit = (Literal) node.as(Literal.class);
+        String value = lit.getLexicalForm();
+        String lang = lit.getLanguage();
+        String datatypeUri = lit.getDatatypeURI();
+
+        DataPropertyStatement dps = new DataPropertyStatementImpl();
+        dps.setDatatypeURI(datatypeUri);
+        dps.setLanguage(lang);
+        dps.setData(value);
+        dps.setDatapropURI(statement.getPredicate().getURI());
+        dps.setIndividualURI(statement.getSubject().getURI());
+         
+        return dps;
+    }
     
 }

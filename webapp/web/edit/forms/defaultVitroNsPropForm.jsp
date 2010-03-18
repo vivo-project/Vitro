@@ -126,7 +126,6 @@
 <c:set var="propertyLabel" value="${propertyName == 'label' ? 'name' : propertyName}" />
 <c:set var="submitLabel" value="Edit ${propertyLabel}" />
 <c:set var="title" scope="request" value="Edit the ${propertyLabel} of ${subject.name}:" />
-<c:set var="vitroNsProp" scope="request" value="true" />
 
 <jsp:include page="${preForm}"/>
 

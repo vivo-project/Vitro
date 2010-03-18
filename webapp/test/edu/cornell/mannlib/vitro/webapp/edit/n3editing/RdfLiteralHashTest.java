@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing;
 
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,9 +10,15 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.vocabulary.XSD;
+
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
+import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 public class RdfLiteralHashTest {
 
@@ -179,5 +186,28 @@ public class RdfLiteralHashTest {
         Assert.assertNull(stmt);
 
     }
+    
+    @Test
+    public void testgetVitroNsPropertyStatement(){
 
+        String n3 =
+            "@prefix vitro: <" + VitroVocabulary.vitroURI + "> . \n" +
+            "@prefix ex: <http://example.com/> . \n" +
+            "@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> . \n"+
+            "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n"+
+            " ex:bob vitro:moniker \"great\"^^<"+XSD.xstring.getURI()+"> ." ;
+               
+        Model model = (ModelFactory.createDefaultModel()).read(new StringReader(n3), "", "N3");
+
+        Individual bob = new IndividualImpl();
+        bob.setURI("http://example.com/bob");
+
+        int hash = RdfLiteralHash.makeVitroNsLiteralHash(bob,VitroVocabulary.MONIKER, "great", model);
+        DataPropertyStatement stmt = RdfLiteralHash.getVitroNsPropertyStmtByHash(bob, model, hash);
+       
+        Assert.assertEquals("great", stmt.getData());
+        Assert.assertEquals(XSD.xstring.getURI(), stmt.getDatatypeURI());
+        Assert.assertEquals(VitroVocabulary.MONIKER, stmt.getDatapropURI());
+        Assert.assertEquals("http://example.com/bob", stmt.getIndividualURI());
+    }
 }

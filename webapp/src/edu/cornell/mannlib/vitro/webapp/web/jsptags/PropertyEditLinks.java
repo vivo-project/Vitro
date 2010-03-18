@@ -20,6 +20,8 @@ import javax.servlet.jsp.tagext.TagSupport;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.rdf.model.Model;
+
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.ServletIdentifierBundleFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyList;
@@ -132,8 +134,8 @@ public class PropertyEditLinks extends TagSupport{
             DataProperty prop = (DataProperty)item; // a DataProperty populated for this subject individual            
             links = doDataProp( prop, entity, themeDir,policyToAccess(ids, policy, entity.getURI(), prop), contextPath ) ;
         } else if (item instanceof String && data != null) {
-            DataPropertyStatement dps =  (DataPropertyStatement) new DataPropertyStatementImpl(entity.getURI(), (String)item, data); 
-            links = doVitroNamespaceProp( dps, themeDir, policyToAccess(ids, policy, dps), contextPath );     
+            DataPropertyStatement dps = (DataPropertyStatement) new DataPropertyStatementImpl(entity.getURI(), (String)item, data); 
+            links = doVitroNamespaceProp( dps, entity, themeDir, policyToAccess(ids, policy, dps), contextPath );     
         } else {
             log.error("PropertyEditLinks cannot make links for an object of type "+item.getClass().getName());
         	return SKIP_BODY;
@@ -158,10 +160,6 @@ public class PropertyEditLinks extends TagSupport{
 
         return SKIP_BODY;
     }
-    
-//    private String getNameFromUri(String predicateUri) {
-//        return predicateUri.substring(predicateUri.lastIndexOf('#')+1);
-//    }
 
     protected LinkStruct[] doDataProp(DataProperty dprop, Individual entity, String themeDir, EditLinkAccess[] allowedAccessTypeArray, String contextPath) {
         if( allowedAccessTypeArray == null || dprop == null || allowedAccessTypeArray.length == 0 ) {
@@ -310,21 +308,22 @@ public class PropertyEditLinks extends TagSupport{
         return links;
     }
     
-    protected LinkStruct[] doVitroNamespaceProp(DataPropertyStatement dpropStmt, String themeDir, EditLinkAccess[] allowedAccessTypeArray, String contextPath) {
+    protected LinkStruct[] doVitroNamespaceProp(DataPropertyStatement dpropStmt, Individual subject, String themeDir, EditLinkAccess[] allowedAccessTypeArray, String contextPath) {
       
         if( allowedAccessTypeArray == null || dpropStmt == null || allowedAccessTypeArray.length == 0 ) {
             log.debug("Null or empty access type array for vitro namespace property " + dpropStmt.getDatapropURI());
             return empty_array;
         }
-        
-        LinkStruct[] links = new LinkStruct[2];
-        
-        String subjectUri = dpropStmt.getIndividualURI();
+
+        String subjectUri = subject.getURI();
         String predicateUri = dpropStmt.getDatapropURI();
+        String value = dpropStmt.getData();        
+        Model model =  (Model)pageContext.getServletContext().getAttribute("jenaOntModel");
         
-        String dpropHash = String.valueOf(RdfLiteralHash.makeRdfLiteralHash( dpropStmt ));
+        String dpropHash = String.valueOf(RdfLiteralHash.makeVitroNsLiteralHash( subject, predicateUri, value, model ));
         String dispatchUrl = contextPath + "edit/editDatapropStmtRequestDispatch.jsp";
         
+        LinkStruct[] links = new LinkStruct[2]; 
         int index = 0;
         
         boolean deleteAllowed = ( contains( allowedAccessTypeArray, EditLinkAccess.DELETE ) && 

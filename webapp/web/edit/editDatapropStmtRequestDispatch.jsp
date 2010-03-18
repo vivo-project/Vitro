@@ -55,7 +55,7 @@
     String formParam    = vreq.getParameter("editForm");
     String command      = vreq.getParameter("cmd");
     
-    String vitroNsProp = vreq.getParameter("vitroNsProp");
+    String vitroNsProp = (String) vreq.getParameter("vitroNsProp");
     boolean isVitroNsProp = (vitroNsProp != null && vitroNsProp.equals("true")) ? true : false;
 
     if( subjectUri == null || subjectUri.trim().length() == 0 ) {
@@ -67,13 +67,11 @@
         throw new Error("predicateUri was empty, it is required by editDatapropStmtRequestDispatch");
     }
     
-    /* since we have the URIs let's put the individual, data property, and optional data property statement in the request */
-    
+    // Since we have the URIs let's put the individual, data property, and optional data property statement in the request
     vreq.setAttribute("subjectUri", subjectUri);
     vreq.setAttribute("subjectUriJson", MiscWebUtils.escape(subjectUri));
     vreq.setAttribute("predicateUri", predicateUri);
     vreq.setAttribute("predicateUriJson", MiscWebUtils.escape(predicateUri));
-    //vreq.setAttribute("vitroNsProp", vitroNsProp);
  
     WebappDaoFactory wdf = vreq.getWebappDaoFactory();
 
