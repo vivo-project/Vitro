@@ -42,10 +42,7 @@
     
     Model model =  (Model)application.getAttribute("jenaOntModel");
     
-    // RY ***** Get the rangeDatatypeUri - need to get the existing value datatype. Or just hardcode? 
-    //String rangeDatatypeUri = vreq.getWebappDaoFactory().getDataPropertyDao().getRequiredDatatypeURI(subject, prop);
-    //String rangeDatatypeUri = prop.getRangeDatatypeURI();
-    String rangeDatatypeUri = "http://www.w3.org/2001/XMLSchema#string";
+    String rangeDatatypeUri = dps.getDatatypeURI(); 
     String rangeDatatypeUriJson = MiscWebUtils.escape(rangeDatatypeUri);
     vreq.setAttribute("rangeDatatypeUriJson", rangeDatatypeUriJson);
     
