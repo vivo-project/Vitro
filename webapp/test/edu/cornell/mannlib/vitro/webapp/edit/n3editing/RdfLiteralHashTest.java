@@ -188,7 +188,7 @@ public class RdfLiteralHashTest {
     }
     
     @Test
-    public void testgetVitroNsPropertyStatement(){
+    public void testGetVitroNsPropertyStatement(){
 
         String n3 =
             "@prefix vitro: <" + VitroVocabulary.vitroURI + "> . \n" +

@@ -1,5 +1,8 @@
 <%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
 
+<%@ page import="java.util.ArrayList"%>
+<%@ page import="java.util.Arrays"%>
+
 <%@ page import="com.hp.hpl.jena.rdf.model.Literal"%>
 <%@ page import="com.hp.hpl.jena.rdf.model.Model"%>
 
@@ -11,6 +14,7 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.VitroRequest"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement" %>
 <%@page import="edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils"%>
+<%@page import="edu.cornell.mannlib.vitro.webapp.utils.StringUtils" %>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
@@ -42,7 +46,21 @@
     //String rangeDatatypeUri = vreq.getWebappDaoFactory().getDataPropertyDao().getRequiredDatatypeURI(subject, prop);
     //String rangeDatatypeUri = prop.getRangeDatatypeURI();
     String rangeDatatypeUri = "http://www.w3.org/2001/XMLSchema#string";
-    vreq.setAttribute("rangeDatatypeUriJson", MiscWebUtils.escape(rangeDatatypeUri));
+    String rangeDatatypeUriJson = MiscWebUtils.escape(rangeDatatypeUri);
+    vreq.setAttribute("rangeDatatypeUriJson", rangeDatatypeUriJson);
+    
+
+    ArrayList<String> validatorList = new ArrayList<String>();
+    if (predicateUri.equals(VitroVocabulary.LABEL) || predicateUri.equals(VitroVocabulary.RDF_TYPE)) {
+        validatorList.add("nonempty");       
+    }
+    if (!rangeDatatypeUriJson.isEmpty()) {
+        validatorList.add("datatype:" + rangeDatatypeUriJson);
+    }
+    String validators = StringUtils.quotedList(validatorList, ",");
+    System.out.println("VALIDATORS: " + validators);
+    vreq.setAttribute("validators", StringUtils.quotedList(validatorList, ","));
+    
 
 %>
 
@@ -65,15 +83,12 @@
     ?subject <${predicate}> ?${propertyName} .
 </v:jsonset>
 
+<%
 
-
-<%-- RY Add other validation cases here.  --%>
-<c:choose>
-    <c:when test="${propertyName == 'label' || propertyName == 'type'}">
-        <c:set var="validator" value="nonempty" />
-    </c:when>
-
-</c:choose>
+%>
+<c:if test="${propertyName == 'label' || propertyName == 'type'}">
+    <c:set var="validator" value="nonempty" scope="request" />
+</c:if>
 
 <c:set var="editjson" scope="request">
   {
@@ -101,7 +116,7 @@
     "fields" : {
       "${propertyName}" : {
          "newResource"      : "false",
-         "validators"       : [ <c:if test="${!empty validator}">"${validator}"</c:if> ],
+         "validators"       : [ ${validators} ],
          "optionsType"      : "UNDEFINED",
          "literalOptions"   : [ ],
          "predicateUri"     : "",
@@ -114,8 +129,12 @@
 }
 </c:set>
 
-<%
 
+
+<%
+System.out.println(request.getAttribute("editjson"));
+    if( log.isDebugEnabled()) log.debug(request.getAttribute("editjson"));
+    
     EditConfiguration editConfig = EditConfiguration.getConfigFromSession(session,request);
     if (editConfig == null) {
         log.debug("No editConfig in session. Making new editConfig.");
