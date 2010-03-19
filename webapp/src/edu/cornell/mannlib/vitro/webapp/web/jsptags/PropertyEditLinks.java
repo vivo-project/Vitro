@@ -146,15 +146,12 @@ public class PropertyEditLinks extends TagSupport{
         } else {
             try{    
                 JspWriter out = pageContext.getOut();
-                if( links != null && links.length > 0){
-                    // Include the wrapping span here, rather than in the JSP, so if there are no links we don't get the span.
-                    out.print("<span class=\"editLinks\">");
+                if( links != null){
                     for( LinkStruct ln : links ){
                         if( ln != null ){
                             out.print( makeElement( ln ) + '\n' );
                         }
                     }
-                    out.print("</span>");
                 }               
             } catch(IOException ioe){
                 log.error( ioe );

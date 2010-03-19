@@ -114,8 +114,8 @@ RY Description not working - FIX
                             <div class="statementWrap">
                                <h2><p:process>${entity.name}</p:process></h2> 
                                <c:if test="${showEdits}">
-                                   <%--  <span class="editLinks"><edLnk:editLinks item="<%= VitroVocabulary.LABEL %>" data="${entity.name}" icons="false"/></span> --%>   
-                                   <edLnk:editLinks item="<%= VitroVocabulary.LABEL %>" data="${entity.name}" icons="false"/>   
+                                   <c:set var="editLinks"><edLnk:editLinks item="<%= VitroVocabulary.LABEL %>" data="${entity.name}" icons="false"/></c:set>
+                                   <c:if test="${!empty editLinks}"><span class="editLinks">${editLinks}</span></c:if>                                    
                                </c:if> 
                             </div>
                         </div>
@@ -125,7 +125,8 @@ RY Description not working - FIX
                                     <div class="statementWrap">
                                         <p:process><em class="moniker">${entity.moniker}</em></p:process>
                                         <c:if test="${showEdits}">
-                                            <edLnk:editLinks item="<%= VitroVocabulary.MONIKER %>" data="${entity.moniker}" icons="false"/>         
+                                            <c:set var="editLinks"><edLnk:editLinks item="<%= VitroVocabulary.MONIKER %>" data="${entity.moniker}" icons="false"/></c:set>
+                                            <c:if test="${!empty editLinks}"><span class="editLinks">${editLinks}</span></c:if>                                                                                           
                                         </c:if>                         
                                     </div>
                                 </div>
@@ -153,7 +154,8 @@ RY Description not working - FIX
                                </c:choose>
                                <%--
                                <c:if test="${showEdits}">
-                                   <edLnk:editLinks item="<%= VitroVocabulary.LINK_ANCHOR %>" data="${entity.anchor}" icons="false"/>         
+                                   <c:set var="editLinks"><edLnk:editLinks item="<%= VitroVocabulary.LINK_ANCHOR %>" data="${entity.anchor}" icons="false"/></c:set>
+                                   <c:if test="${!empty editLinks}"><span class="editLinks">${editLinks}</span></c:if>                                                                           
                                </c:if>
                                --%> 
                            </c:if>
@@ -185,9 +187,11 @@ RY Description not working - FIX
                     <div class="datatypePropertyValue">
                         <div class="statementWrap">
                             <div class="citation">${entity.citation}</div>
+                            <%-- 
                             <c:if test="${showEdits}">
-                                <edLnk:editLinks item="<%= VitroVocabulary.CITATION %>" data="${entity.citation}" icons="false"/>        
-                            </c:if> 
+                                <c:set var="editLinks"><edLnk:editLinks item="<%= VitroVocabulary.CITATION %>" data="${entity.citation}" icons="false"/></c:set>
+                                <c:if test="${!empty editLinks}"><span class="editLinks">${editLinks}</span></c:if>                                                                                       
+                            </c:if> --%> 
                         </div>
                     </div>
                 </c:if>
@@ -197,9 +201,11 @@ RY Description not working - FIX
                     <div class="datatypePropertyValue">
                         <div class="statementWrap">
                             <div class="description">${entity.blurb}</div>
+                            <%-- 
                             <c:if test="${showEdits}">
-                                <edLnk:editLinks item="<%= VitroVocabulary.BLURB %>" data="${entity.blurb}" icons="false"/>         
-                            </c:if> 
+                                <c:set var="editLinks"><edLnk:editLinks item="<%= VitroVocabulary.BLURB %>" data="${entity.blurb}" icons="false"/></c:set>
+                                <c:if test="${!empty editLinks}"><span class="editLinks">${editLinks}</span></c:if>                                                                     
+                            </c:if> --%>
                         </div>
                     </div>
                 </c:if>                              
@@ -207,9 +213,11 @@ RY Description not working - FIX
                     <div class="datatypePropertyValue">
                         <div class="statementWrap">
                             <div class="description">${entity.description}</div>
+                            <%-- 
                             <c:if test="${showEdits}">
-                                <edLnk:editLinks item="<%= VitroVocabulary.DESCRIPTION %>" data="${entity.description}" icons="false"/>    
-                            </c:if> 
+                                <c:set var="editLinks"><edLnk:editLinks item="<%= VitroVocabulary.DESCRIPTION %>" data="${entity.description}" icons="false"/></c:set>
+                                <c:if test="${!empty editLinks}"><span class="editLinks">${editLinks}</span></c:if>                                                               
+                            </c:if> --%> 
                         </div>
                     </div>
                 </c:if>
@@ -236,9 +244,11 @@ RY Description not working - FIX
                     <div class="datatypePropertyValue">
                         <div class="statementWrap">
                             <div class="citation">${entity.citation}</div>
+                            <%-- 
                             <c:if test="${showEdits}">
-                                <edLnk:editLinks item="<%= VitroVocabulary.CITATION %>" data="${entity.citation}" icons="false"/>         
-                            </c:if> 
+                                <c:set var="editLinks"><edLnk:editLinks item="<%= VitroVocabulary.CITATION %>" data="${entity.citation}" icons="false"/></c:set>
+                                <c:if test="${!empty editLinks}"><span class="editLinks">${editLinks}</span></c:if>                                                                     
+                            </c:if> --%>
                         </div>
                     </div>
                 </c:if>
