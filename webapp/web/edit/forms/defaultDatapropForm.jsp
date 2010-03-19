@@ -117,7 +117,7 @@
                                        "literalOptions"   : [ ${rangeDefaultJson} ],
                                        "predicateUri"     : "",
                                        "objectClassUri"   : "",
-                                       "rangeDatatypeUri" : "${rangeDatatypeUriJson}"  ,
+                                       "rangeDatatypeUri" : "${rangeDatatypeUriJson}",
                                        "rangeLang"        : "${rangeLangJson}",
                                        "assertions"       : ["${n3ForEdit}"]
                                      }

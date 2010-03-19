@@ -7,8 +7,11 @@
 <%@ page import="edu.cornell.mannlib.vedit.beans.LoginFormBean" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.VitroRequest"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary" %>
+
 <%@ page import="org.apache.commons.logging.Log" %>
 <%@ page import="org.apache.commons.logging.LogFactory" %>
+
 <%@ page import="java.util.List" %>
 
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c" %>
@@ -23,6 +26,10 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 log.debug("Starting entityBasic.jsp");
 Individual entity = (Individual)request.getAttribute("entity");
 %>
+
+<c:set var="labelUri" value="http://www.w3.org/2000/01/rdf-schema#label" />
+<c:set var="typeUri" value="http://www.w3.org/1999/02/22-rdf-syntax-ns#type" />
+<c:set var="vitroUri" value="http://vitro.mannlib.cornell.edu/ns/vitro/0.7#" />
 
 <c:if test="${!empty entityURI}">
     <c:set var="myEntityURI" scope="request" value="${entityURI}"/>
@@ -78,9 +85,12 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
 <c:set var='portal' value='${currentPortalId}'/>
 <c:set var='portalBean' value='${currentPortal}'/>
 
+<%-- Using VitroVocabulary constants instead. 
+RY Description not working - FIX
 <c:set var="labelUri" value="http://www.w3.org/2000/01/rdf-schema#label" />
 <c:set var="typeUri" value="http://www.w3.org/1999/02/22-rdf-syntax-ns#type" />
-<c:set var="vitroNsUri" value="http://vitro.mannlib.cornell.edu/ns/vitro/0.7#" />
+<c:set var="vitroUri" value="http://vitro.mannlib.cornell.edu/ns/vitro/0.7#" />
+--%>
 
 <c:set var='themeDir'><c:out value='${portalBean.themeDir}' /></c:set>
 
@@ -104,7 +114,8 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
                             <div class="statementWrap">
                                <h2><p:process>${entity.name}</p:process></h2> 
                                <c:if test="${showEdits}">
-                                   <span class="editLinks"><edLnk:editLinks item="${labelUri}" data="${entity.name}" icons="false"/></span>       
+                                   <%--  <span class="editLinks"><edLnk:editLinks item="<%= VitroVocabulary.LABEL %>" data="${entity.name}" icons="false"/></span> --%>   
+                                   <edLnk:editLinks item="<%= VitroVocabulary.LABEL %>" data="${entity.name}" icons="false"/>   
                                </c:if> 
                             </div>
                         </div>
@@ -114,7 +125,7 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
                                     <div class="statementWrap">
                                         <p:process><em class="moniker">${entity.moniker}</em></p:process>
                                         <c:if test="${showEdits}">
-                                            <span class="editLinks"><edLnk:editLinks item="${vitroNsUri}moniker" data="${entity.moniker}" icons="false"/></span>         
+                                            <edLnk:editLinks item="<%= VitroVocabulary.MONIKER %>" data="${entity.moniker}" icons="false"/>         
                                         </c:if>                         
                                     </div>
                                 </div>
@@ -140,9 +151,11 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
                                        <li class="primary"><span class="externalLink"><p:process>${entity.anchor}</p:process></span></li>
                                    </c:otherwise>
                                </c:choose>
+                               <%--
                                <c:if test="${showEdits}">
-                                   <span class="editLinks"><edLnk:editLinks item="${vitroNsUri}url" data="${entity.url}" icons="false"/></span>         
-                               </c:if> 
+                                   <edLnk:editLinks item="<%= VitroVocabulary.LINK_ANCHOR %>" data="${entity.anchor}" icons="false"/>         
+                               </c:if>
+                               --%> 
                            </c:if>
                            <c:if test="${!empty entity.linksList }">
                                <c:forEach items="${entity.linksList}" var='link' varStatus="count">
@@ -173,7 +186,7 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
                         <div class="statementWrap">
                             <div class="citation">${entity.citation}</div>
                             <c:if test="${showEdits}">
-                                <span class="editLinks"><edLnk:editLinks item="${vitroNsUri}citation" data="${entity.citation}" icons="false"/></span>         
+                                <edLnk:editLinks item="<%= VitroVocabulary.CITATION %>" data="${entity.citation}" icons="false"/>        
                             </c:if> 
                         </div>
                     </div>
@@ -185,7 +198,7 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
                         <div class="statementWrap">
                             <div class="description">${entity.blurb}</div>
                             <c:if test="${showEdits}">
-                                <span class="editLinks"><edLnk:editLinks item="${vitroNsUri}blurb" data="${entity.blurb}" icons="false"/></span>         
+                                <edLnk:editLinks item="<%= VitroVocabulary.BLURB %>" data="${entity.blurb}" icons="false"/>         
                             </c:if> 
                         </div>
                     </div>
@@ -195,7 +208,7 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
                         <div class="statementWrap">
                             <div class="description">${entity.description}</div>
                             <c:if test="${showEdits}">
-                                <span class="editLinks"><edLnk:editLinks item="${vitroNsUri}description" data="${entity.description}" icons="false"/></span>         
+                                <edLnk:editLinks item="<%= VitroVocabulary.DESCRIPTION %>" data="${entity.description}" icons="false"/>    
                             </c:if> 
                         </div>
                     </div>
@@ -224,7 +237,7 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
                         <div class="statementWrap">
                             <div class="citation">${entity.citation}</div>
                             <c:if test="${showEdits}">
-                                <span class="editLinks"><edLnk:editLinks item="${vitroNsUri}citation" data="${entity.citation}" icons="false"/></span>         
+                                <edLnk:editLinks item="<%= VitroVocabulary.CITATION %>" data="${entity.citation}" icons="false"/>         
                             </c:if> 
                         </div>
                     </div>

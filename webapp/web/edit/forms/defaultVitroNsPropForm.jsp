@@ -6,6 +6,7 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Individual"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration"%>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.RdfLiteralHash"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.VitroRequest"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement" %>
@@ -34,6 +35,14 @@
     if( subject == null ) {
         throw new Error("In vitroNsEditLabelForm.jsp, could not find subject " + subjectUri);
     }
+    
+    Model model =  (Model)application.getAttribute("jenaOntModel");
+    
+    // RY ***** Get the rangeDatatypeUri - need to get it from the 
+    //String rangeDatatypeUri = vreq.getWebappDaoFactory().getDataPropertyDao().getRequiredDatatypeURI(subject, prop);
+    //String rangeDatatypeUri = prop.getRangeDatatypeURI();
+    String rangeDatatypeUri = "http://www.w3.org/2001/XMLSchema#string";
+    vreq.setAttribute("rangeDatatypeUriJson", MiscWebUtils.escape(rangeDatatypeUri));
 
 %>
 
@@ -97,7 +106,7 @@
          "literalOptions"   : [ ],
          "predicateUri"     : "",
          "objectClassUri"   : "",
-         "rangeDatatypeUri" : "",
+         "rangeDatatypeUri" : "${rangeDatatypeUriJson}",
          "rangeLang"        : "",
          "assertions"       : [ "${dataAssertion}" ]
       }
@@ -117,7 +126,6 @@
     }
     
     if ( datapropKeyStr != null && datapropKeyStr.trim().length() > 0  ) {
-        Model model =  (Model)application.getAttribute("jenaOntModel");
         editConfig.prepareForDataPropUpdate(model,dps);
     }    
 

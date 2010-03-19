@@ -204,10 +204,16 @@ public class RdfLiteralHashTest {
 
         int hash = RdfLiteralHash.makeVitroNsLiteralHash(bob,VitroVocabulary.MONIKER, "great", model);
         DataPropertyStatement stmt = RdfLiteralHash.getVitroNsPropertyStmtByHash(bob, model, hash);
-       
-        Assert.assertEquals("great", stmt.getData());
-        Assert.assertEquals(XSD.xstring.getURI(), stmt.getDatatypeURI());
-        Assert.assertEquals(VitroVocabulary.MONIKER, stmt.getDatapropURI());
-        Assert.assertEquals("http://example.com/bob", stmt.getIndividualURI());
+        
+        String data = stmt.getData();
+        String datatypeUri = stmt.getDatatypeURI();
+        String predicateUri = stmt.getDatapropURI();
+        String subjectUri = stmt.getIndividualURI();
+        
+        Assert.assertEquals("great", data);
+        Assert.assertEquals(XSD.xstring.getURI(), datatypeUri);
+        Assert.assertEquals(VitroVocabulary.MONIKER, predicateUri);
+        Assert.assertEquals("http://example.com/bob", subjectUri);
+      
     }
 }

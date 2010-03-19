@@ -45,7 +45,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.RdfLiteralHash;
-import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 /**
  * JSP tag to generate the HTML of links for edit, delete or
@@ -146,12 +146,15 @@ public class PropertyEditLinks extends TagSupport{
         } else {
             try{    
                 JspWriter out = pageContext.getOut();
-                if( links != null ){
+                if( links != null && links.length > 0){
+                    // Include the wrapping span here, rather than in the JSP, so if there are no links we don't get the span.
+                    out.print("<span class=\"editLinks\">");
                     for( LinkStruct ln : links ){
                         if( ln != null ){
                             out.print( makeElement( ln ) + '\n' );
                         }
                     }
+                    out.print("</span>");
                 }               
             } catch(IOException ioe){
                 log.error( ioe );
@@ -327,7 +330,7 @@ public class PropertyEditLinks extends TagSupport{
         int index = 0;
         
         boolean deleteAllowed = ( contains( allowedAccessTypeArray, EditLinkAccess.DELETE ) && 
-            !( predicateUri.endsWith("#label") || predicateUri.endsWith("#type") ) );
+            !( predicateUri.equals(VitroVocabulary.LABEL)) || predicateUri.equals(VitroVocabulary.RDF_TYPE) );
 
         if( contains( allowedAccessTypeArray, EditLinkAccess.MODIFY ) ){
             log.debug("permission found to UPDATE vitro namepsace property statement "+ predicateUri);
@@ -495,25 +498,6 @@ public class PropertyEditLinks extends TagSupport{
         return access;
     }
 
-//    protected EditLinkAccess[] policyToAccess( IdentifierBundle ids, PolicyIface policy, String subjectUri, String propertyUri) {
-//        
-//        ArrayList<EditLinkAccess> list = new ArrayList<EditLinkAccess>(2);
-//        
-//        RequestedAction action = new EditDataPropStmt(subjectUri, propertyUri, (String) null);
-//        PolicyDecision dec = policy.isAuthorized(ids, action);        
-//        if ( dec != null && dec.getAuthorized() == Authorization.AUTHORIZED ){
-//            list.add( EditLinkAccess.MODIFY);
-//        } 
-//
-//        action = new DropDataPropStmt(subjectUri, propertyUri, (String) null);
-//        dec = policy.isAuthorized(ids, action);        
-//        if( dec != null && dec.getAuthorized() == Authorization.AUTHORIZED ){
-//            list.add( EditLinkAccess.DELETE );
-//        }
-//       
-//        return list.toArray(ACCESS_TEMPLATE);
-//    }
-    
     public enum EditLinkAccess{ MODIFY, DELETE, ADDNEW, INFO, ADMIN  };
 
     public class LinkStruct {
