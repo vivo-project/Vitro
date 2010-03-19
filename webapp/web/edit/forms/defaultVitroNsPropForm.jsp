@@ -37,12 +37,12 @@
     
     Individual subject = (Individual)vreq.getAttribute("subject");
     if( subject == null ) {
-        throw new Error("In vitroNsEditLabelForm.jsp, could not find subject " + subjectUri);
+        throw new Error("In defaultVitroNsPropForm.jsp, could not find subject " + subjectUri);
     }
     
     Model model =  (Model)application.getAttribute("jenaOntModel");
     
-    // RY ***** Get the rangeDatatypeUri - need to get it from the 
+    // RY ***** Get the rangeDatatypeUri - need to get the existing value datatype. Or just hardcode? 
     //String rangeDatatypeUri = vreq.getWebappDaoFactory().getDataPropertyDao().getRequiredDatatypeURI(subject, prop);
     //String rangeDatatypeUri = prop.getRangeDatatypeURI();
     String rangeDatatypeUri = "http://www.w3.org/2001/XMLSchema#string";
@@ -57,10 +57,7 @@
     if (!rangeDatatypeUriJson.isEmpty()) {
         validatorList.add("datatype:" + rangeDatatypeUriJson);
     }
-    String validators = StringUtils.quotedList(validatorList, ",");
-    System.out.println("VALIDATORS: " + validators);
     vreq.setAttribute("validators", StringUtils.quotedList(validatorList, ","));
-    
 
 %>
 
@@ -132,7 +129,6 @@
 
 
 <%
-System.out.println(request.getAttribute("editjson"));
     if( log.isDebugEnabled()) log.debug(request.getAttribute("editjson"));
     
     EditConfiguration editConfig = EditConfiguration.getConfigFromSession(session,request);

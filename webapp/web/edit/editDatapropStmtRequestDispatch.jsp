@@ -85,6 +85,7 @@
     DataProperty dataproperty = wdf.getDataPropertyDao().getDataPropertyByURI( predicateUri );
     if( dataproperty == null) {
         // No dataproperty will be returned for a vitro ns prop, but we shouldn't throw an error.
+        // RY This is not necessarily true...
         if (!isVitroNsProp) {
             log.error("Could not find data property '"+predicateUri+"' in model");
             throw new Error("editDatapropStmtRequest.jsp: Could not find DataProperty in model: " + predicateUri);

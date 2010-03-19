@@ -1,6 +1,9 @@
 <%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
 
 <%@ page import="com.hp.hpl.jena.rdf.model.Model" %>
+<%@ page import="com.hp.hpl.jena.rdf.model.Resource" %>
+<%@ page import="com.hp.hpl.jena.rdf.model.Literal" %>
+<%@ page import="com.hp.hpl.jena.rdf.model.Property" %>
 
 <%@ page import="edu.cornell.mannlib.vedit.beans.LoginFormBean" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.DataProperty" %>
@@ -89,11 +92,11 @@
         			OntModel writeModel = (new StandardModelSelector()).getModel(request, application);        			
         			writeModel.enterCriticalSection(Lock.WRITE);
         			try{
-        				writeModel.getBaseModel().notifyEvent(new EditEvent(editorUri,true));
+        			    writeModel.getBaseModel().notifyEvent(new EditEvent(editorUri,true));
         				writeModel.remove(
         						writeModel.getResource(subjectUri), 
         						writeModel.getProperty(predicateUri),
-        						writeModel.createLiteral(dps.getData()));
+        						writeModel.createTypedLiteral(dps.getData(), dps.getDatatypeURI()));
         			}finally{
         				writeModel.leaveCriticalSection();
         			}        			        			
