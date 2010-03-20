@@ -61,6 +61,7 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
 </c:if>
 
 <c:set var="showEdits" value="${showSelfEdits || showCuratorEdits}" />
+<c:set var="editingClass" value="${showEdits ? 'editing' : ''}" />
 
 <c:set var='imageDir' value='images' />
 <c:set var="themeDir"><c:out value="${portalBean.themeDir}" /></c:set>
@@ -97,7 +98,7 @@ RY Description not working - FIX
     <div id="content">
         <jsp:include page="entityAdmin.jsp"/> 
         
-        <div class='contents entity'>
+        <div class="contents entity ${editingClass}">
 
             <div id="labelAndMoniker">
                 <c:choose>
@@ -119,8 +120,14 @@ RY Description not working - FIX
                                </c:if> 
                             </div>
                         </div>
-                        <c:choose>
-                            <c:when test="${!empty entity.moniker}">
+                        <%-- For moniker, only wrap in the div if editing. Otherwise, displays inline next to label. --%>
+                        <c:if test="${showEdits}">
+                            <div id="dprop-vitro-moniker" class="propsItem editing" style="display:block;">                              
+                                <h3 class="propertyName">moniker</h3>
+                                <%-- Here's where we add the plus link, but only if there isn't already a moniker. --%>
+                        </c:if>
+                        <c:if test="${!empty entity.moniker}">
+                            <div class="datatypeProperties">
                                 <div class="datatypePropertyValue" id="moniker">
                                     <div class="statementWrap">
                                         <p:process><em class="moniker">${entity.moniker}</em></p:process>
@@ -130,11 +137,9 @@ RY Description not working - FIX
                                         </c:if>                         
                                     </div>
                                 </div>
-                            </c:when>
-                            <c:otherwise>
-                              <%-- Show the add link --%>
-                            </c:otherwise>
-                        </c:choose>
+                            </div>
+                        </c:if>
+                        <c:if test="${showEdits}"></div></c:if>               
                     </c:otherwise>
                 </c:choose>
             </div><!-- labelAndMoniker -->
