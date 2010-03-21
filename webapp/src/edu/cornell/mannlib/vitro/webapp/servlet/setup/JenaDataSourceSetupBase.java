@@ -22,6 +22,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.RDBGraphGenerator;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RegeneratingGraph;
 
 public class JenaDataSourceSetupBase {
+	private static final Logger LOG = Logger.getLogger(JenaDataSourceSetupBase.class);
 
     protected final static int DEFAULT_MAXWAIT = 10000, //ms
     DEFAULT_MAXACTIVE = 40,
@@ -58,8 +59,6 @@ public class JenaDataSourceSetupBase {
    static final OntModelSpec DB_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM;
    static final OntModelSpec MEM_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM; 
    
-   private static final Logger log = Logger.getLogger(JenaDataSourceSetupBase.class);   
-   
     /**
     * Sets up a Model and DB connection using values from
     * a properties file.
@@ -79,6 +78,8 @@ public class JenaDataSourceSetupBase {
    }
 
    protected BasicDataSource makeBasicDataSource(String dbDriverClassname, String jdbcUrl, String username, String password) {
+		LOG.debug("makeBasicDataSource('" + dbDriverClassname + "', '"
+				+ jdbcUrl + "', '" + username + "', '" + password + "')");
 	   BasicDataSource ds = new BasicDataSource();
        ds.setDriverClassName(dbDriverClassname);
        ds.setUrl(jdbcUrl);
@@ -116,7 +117,7 @@ public class JenaDataSourceSetupBase {
                //Graph g = maker.openGraph(JENA_DB_MODEL,false);
                //dbModel = ModelFactory.createModelForGraph(g);
                //maker.openModel(JENA_DB_MODEL);
-               log.debug("Using database at "+ds.getUrl());
+            	LOG.debug("Using database at "+ds.getUrl());
             } catch (Throwable t) {
                 t.printStackTrace();
             }
@@ -129,17 +130,17 @@ public class JenaDataSourceSetupBase {
 
 	public static void readOntologyFilesInPathSet(String path,
 			ServletContext ctx, Model model) {
-		log.debug("Reading ontology files from '" + path + "'");
+		LOG.debug("Reading ontology files from '" + path + "'");
 		Set<String> paths = ctx.getResourcePaths(path);
 		if (paths != null) {
 			for (String p : paths) {
-				log.debug("Loading ontology file at " + p);
+				LOG.debug("Loading ontology file at " + p);
 				InputStream ontologyInputStream = ctx.getResourceAsStream(p);
 				try {
 					model.read(ontologyInputStream, null);
-					log.debug("...successful");
+					LOG.debug("...successful");
 				} catch (Throwable t) {
-					log.error("Failed to load ontology file at '" + p + "'", t);
+					LOG.error("Failed to load ontology file at '" + p + "'", t);
 				}
 			}
 		}
