@@ -878,5 +878,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
     	} catch (Exception e) {
     		log.error(e);
     	}
-    }    
+    }
+    
+    
 }

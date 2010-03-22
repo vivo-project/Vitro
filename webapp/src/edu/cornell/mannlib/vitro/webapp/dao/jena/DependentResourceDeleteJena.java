@@ -9,26 +9,49 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
 
+import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
+/**
+ * This class handles deletion of resources based on the annotation vitro:dependentResourceAnnot.
+ * 
+ * The vitro:dependentResourceAnnot 
+ * 
+ * For example, take a graph like:
+ * 
+ *   ex:bob  ex:hasPositionHistory ex:positionHistory23 .
+ *   ex:positionHistory23 ex:hasTitle "position 23 was great" .
+ *   ex:hasPositionHistory vitro.dependentResourceAnnot "true"^^xsd:boolean .
+ *   
+ * When the object property statement ex:bob ex:hasPositionHistory ex:positioinHisroty23 is
+ * deleted, then everything about ex:positionHistory23 should be deleted because  
+ * ex:hasPositionHistory is a dependent resource property.
+ *  
+ * @author bdc34
+ *
+ */
 public class DependentResourceDeleteJena {
     
 	public static List<Statement> getDependentResourceDeleteList ( Statement stmt, Model model){
 		if( model == null ) throw new IllegalArgumentException("model must not be null.");
-		return getDependentResourceDeleteList(stmt, model, new HashSet<String>());		
+		return getDependentResourceDeleteList(stmt, model, new HashSet<String>(), false);		
 	}
 	
-	public static List<Statement> getDependentResourceDeleteList (RDFNode node, Model model){
-		if( model == null ) throw new IllegalArgumentException("model must not be null.");
-		return getDependentResourceDeleteList(node, model, new HashSet<String>());
+	public static List<Statement> getDependentResourceDeleteList(Resource deleteMe, Model sourceModel) {
+		List<Statement> deletes = new LinkedList<Statement>();				 
+		for( Statement stmt : getAllStatements(deleteMe, sourceModel)){
+			deletes.add(stmt);
+			deletes.addAll(getDependentResourceDeleteList(stmt, sourceModel, new HashSet<String>(), false));
+		}
+		return deletes;		
 	}
 	
 	public static Model getDependentResourceDeleteForChange( Model assertions, Model retractions, Model sourceModel){
@@ -103,53 +126,27 @@ public class DependentResourceDeleteJena {
 		return toRemove;
 	}
 
-	private static List<Statement> getDependentResourceDeleteList ( Statement stmt, Model model, Set<String> visitedUris){                        
+	private static List<Statement> getDependentResourceDeleteList ( Statement stmt, Model model, Set<String> visitedUris, boolean perviousWasDependentResource ){                        
         if( stmt == null ) 
             return Collections.emptyList();        
         
         List<Statement> toDelete = new LinkedList<Statement>();
+        toDelete.add(stmt);        
         RDFNode obj = stmt.getObject();
-        if( obj.isLiteral() ){
-            toDelete.add(stmt);                        
-        }else if( obj.isResource() ){        	
-            Resource res = (Resource)obj.as(Resource.class);
-            String id = res.isAnon()?res.getId().toString():res.getURI();
-            toDelete.add(stmt);                            
-            if(!visitedUris.contains(id) && isStubResource(res, model)  ){
-            	visitedUris.add(id);
-            	for( Statement stubStmt : getAllStatements(res, model)){                        	
-            		toDelete.addAll( getDependentResourceDeleteList(stubStmt, model,visitedUris));                        	
-            	}                         
-            }                
-        }    
-        return toDelete;
-    }
 
-    private static List<Statement> getDependentResourceDeleteList (RDFNode node, Model model, Set<String> visitedUris){
-        if( node == null ) 
-            return Collections.emptyList();        
-        
-        List<Statement> toDelete = new LinkedList<Statement>();
-        
-        if( node.isLiteral() ){
-        	//Literals are ignored
-        }else if( node.isResource() ){        	
-            Resource res = (Resource)node.as(Resource.class);
-            String id = res.isAnon()?res.getId().toString():res.getURI();                            
-            if(!visitedUris.contains(id) && isStubResource(res, model)  ){
-            	visitedUris.add(id);
-            	for( Statement stubStmt : getAllStatements(res, model)){                        	
-            		toDelete.addAll( getDependentResourceDeleteList(stubStmt, model,visitedUris) );                        	
-            	}                         
-            }                
-        }    
-        return toDelete;    	
-    }
-    
-    private static boolean isStubResource(Resource res, Model model){
-    	//boolean q = res.hasProperty(RDF.type, model.createProperty(VitroVocabulary.DEPENDENT_RESOURCE));
-    	boolean q = model.contains(res, RDF.type,model.createProperty(VitroVocabulary.DEPENDENT_RESOURCE));
-    	return q;                       
+        if( ( obj.canAs(Resource.class) && isPredicateDependencyRelation(stmt.getPredicate(), model) )
+        	|| ( obj.isAnon() && perviousWasDependentResource ) ){                	
+    		Resource res = (Resource)obj.as(Resource.class);
+    		String id = res.isAnon()?res.getId().toString():res.getURI();
+                                
+    		if( !visitedUris.contains(id) ){
+    			visitedUris.add(id);
+    			for( Statement stubStmt : getAllStatements(res, model)){                        	
+    				toDelete.addAll( getDependentResourceDeleteList(stubStmt, model,visitedUris,true));                        	
+    			}                         
+    		}                        	  
+        }
+        return toDelete;
     }
     
     private static List<Statement> getAllStatements(Resource res, Model model){
@@ -171,6 +168,14 @@ public class DependentResourceDeleteJena {
     
     	return deleteUs;
     }
+
+    private static boolean isPredicateDependencyRelation( Property predicate , Model model){
+    	return model.containsLiteral(
+    			model.getResource(predicate.getURI()), 
+    			model.createProperty(VitroVocabulary.PROPERTY_DEPENDENCYPROPERTYANNOT), 
+    			true);
+    }
+
 
     
 }

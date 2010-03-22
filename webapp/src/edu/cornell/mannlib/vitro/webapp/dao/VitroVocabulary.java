@@ -88,7 +88,6 @@ public class VitroVocabulary {
     public static final String IMAGEFILE = vitroURI+"imageFile";
     public static final String IMAGETHUMB = vitroURI+"imageThumb";
     
-    public static final String DEPENDENT_RESOURCE = vitroURI + "DependentResource";
     // ================== property related =================================
 
     public static final String PROPERTY_ENTITYSORTDIRECTION = vitroURI+"individualSortDirectionAnnot";
@@ -106,9 +105,10 @@ public class VitroVocabulary {
     public static final String PROPERTY_OFFERCREATENEWOPTIONANNOT = vitroURI+"offerCreateNewOptionAnnot";
     public static final String PROPERTY_INPROPERTYGROUPANNOT = vitroURI+"inPropertyGroupAnnot";
     public static final String PROPERTYGROUP = vitroURI + "PropertyGroup";
-    public static final String MASKS_PROPERTY = VitroVocabulary.vitroURI + "masksProperty";
-    public static final String SKIP_EDIT_FORM = VitroVocabulary.vitroURI + "skipEditForm";
-
+    public static final String MASKS_PROPERTY = vitroURI + "masksProperty";
+    public static final String SKIP_EDIT_FORM = vitroURI + "skipEditForm";
+    public static final String PROPERTY_DEPENDENCYPROPERTYANNOT = vitroURI + "dependencyPropertyAnnot";
+    
     // ================== keyword related ==================================
 
     public static final String KEYWORD = vitroURI+"Keyword";
