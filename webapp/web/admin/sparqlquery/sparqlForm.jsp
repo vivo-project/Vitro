@@ -18,6 +18,13 @@ PREFIX swrl:  <http://www.w3.org/2003/11/swrl#>
 PREFIX swrlb: <http://www.w3.org/2003/11/swrlb#>
 PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#>
 PREFIX vivo:  <http://vivo.library.cornell.edu/ns/0.1#>
+PREFIX geopolitical.owl: <http://aims.fao.org/aos/geopolitical.owl#> 
+PREFIX bibo: <http://purl.org/ontology/bibo/>   
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX event: <http://purl.org/NET/c4dm/event.owl#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX core: <http://vivoweb.org/ontology/core#>
 #
 # This example query gets the label, research focus, and netID 
 # for 20 Cornell employees.
