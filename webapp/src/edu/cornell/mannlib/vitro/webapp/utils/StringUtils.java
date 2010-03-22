@@ -11,7 +11,8 @@ public class StringUtils {
     }
     
     public static String quote(String s) {
-        return s.isEmpty() ? "" : '"' + s + '"';
+        boolean b = s.isEmpty();
+        return isEmpty(s) ? "" : '"' + s + '"';
     }
     
     public static String join(List<?> list, boolean quote, String glue) {
@@ -41,5 +42,9 @@ public class StringUtils {
     public static String quotedList(List<?> list, String glue) {
     
         return join(list, true, glue);
-    }        
+    }  
+    
+    public static boolean isEmpty(String s) {
+        return s == null || s.length() <= 0;
+    }
 }
