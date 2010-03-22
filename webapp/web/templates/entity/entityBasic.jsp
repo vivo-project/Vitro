@@ -124,6 +124,7 @@ RY Description not working - FIX
                         <c:if test="${showEdits}">
                             <div id="dprop-vitro-moniker" class="propsItem editing" style="display:block;">                              
                                 <h3 class="propertyName">moniker</h3>
+                                <c:if test="${showEdits}"><edLnk:editLinks item="<%= VitroVocabulary.MONIKER %>" icons="false"/></c:if>
                                 <%-- Here's where we add the plus link, but only if there isn't already a moniker. --%>
                         </c:if>
                         <c:if test="${!empty entity.moniker}">
@@ -142,7 +143,7 @@ RY Description not working - FIX
                         <c:if test="${showEdits}"></div></c:if>               
                     </c:otherwise>
                 </c:choose>
-            </div><!-- labelAndMoniker -->
+            </div><!-- end labelAndMoniker -->
             <c:if test="${ (!empty entity.anchor) || (!empty entity.linksList) }">
                 <div class="datatypePropertyValue">
                     <div class="statementWrap">

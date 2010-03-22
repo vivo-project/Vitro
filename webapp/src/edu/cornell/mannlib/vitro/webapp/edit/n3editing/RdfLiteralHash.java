@@ -86,11 +86,11 @@ public class RdfLiteralHash {
     // RY Instead of a code fork here, we should have a method of Individual getAllDataPropertyStatements() which
     // doesn't filter out the vitro ns property statements. This would also simplify the front end editing of the vitro ns
     // properties, because they wouldn't have to be a special case.
-    public static DataPropertyStatement getPropertyStmtByHash(Individual ind, int hash, Model model, boolean isVitroNsProp) {
+    public static DataPropertyStatement getPropertyStmtByHash(Individual ind, String predicateUri, int hash, Model model, boolean isVitroNsProp) {
         
         if (ind == null) return null;
         
-        DataPropertyStatement dps = isVitroNsProp ? RdfLiteralHash.getVitroNsPropertyStmtByHash(ind, model, hash) :
+        DataPropertyStatement dps = isVitroNsProp ? RdfLiteralHash.getVitroNsPropertyStmtByHash(ind, predicateUri, model, hash) :
             RdfLiteralHash.getDataPropertyStmtByHash(ind, hash);
 
         return dps;
@@ -114,10 +114,12 @@ public class RdfLiteralHash {
      * @param hash
      * @return a DataPropertyStatement if found or null if not found
      */
-    public static DataPropertyStatement getVitroNsPropertyStmtByHash(Individual ind, Model model, int hash) {
+    public static DataPropertyStatement getVitroNsPropertyStmtByHash(Individual ind, String predicateUri, Model model, int hash) {
 
         DataPropertyStatement dps = null;
-        StmtIterator stmts = model.listStatements(model.createResource(ind.getURI()), null, (RDFNode)null);
+        StmtIterator stmts = model.listStatements(model.createResource(ind.getURI()),  
+                                                  model.getProperty(predicateUri),
+                                                  (RDFNode)null);
         try {
             while (stmts.hasNext()) {
                 Statement stmt = stmts.nextStatement();

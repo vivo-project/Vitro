@@ -21,6 +21,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.ServletIdentifierBundleFactory;
@@ -133,9 +135,15 @@ public class PropertyEditLinks extends TagSupport{
         } else if( item instanceof DataProperty ){
             DataProperty prop = (DataProperty)item; // a DataProperty populated for this subject individual            
             links = doDataProp( prop, entity, themeDir,policyToAccess(ids, policy, entity.getURI(), prop), contextPath ) ;
-        } else if (item instanceof String && data != null) {
-            DataPropertyStatement dps = (DataPropertyStatement) new DataPropertyStatementImpl(entity.getURI(), (String)item, data); 
-            links = doVitroNamespaceProp( dps, entity, themeDir, policyToAccess(ids, policy, dps), contextPath );     
+        } else if (item instanceof String && isVitroNsProp((String) item)) {  
+            String subjectUri = entity.getURI();
+            if (data != null) {    // links to edit or delete an existing value
+                DataPropertyStatement dps = (DataPropertyStatement) new DataPropertyStatementImpl(subjectUri, (String)item, data); 
+                links = doVitroNamespacePropStmt( dps, entity, themeDir, policyToAccess(ids, policy, dps), contextPath );           
+            } else {    // link to add a new value
+
+                links = doVitroNsProp( subjectUri, (String)item, themeDir, policyToAccess(ids, policy, subjectUri, (String)item), contextPath ) ;
+            }
         } else {
             log.error("PropertyEditLinks cannot make links for an object of type "+item.getClass().getName());
         	return SKIP_BODY;
@@ -160,6 +168,10 @@ public class PropertyEditLinks extends TagSupport{
 
         return SKIP_BODY;
     }
+        
+    private boolean isVitroNsProp(String predicateUri) {       
+        return VitroVocabulary.VITRO_NS_PROPERTIES.contains(predicateUri);
+    }
 
     protected LinkStruct[] doDataProp(DataProperty dprop, Individual entity, String themeDir, EditLinkAccess[] allowedAccessTypeArray, String contextPath) {
         if( allowedAccessTypeArray == null || dprop == null || allowedAccessTypeArray.length == 0 ) {
@@ -183,6 +195,39 @@ public class PropertyEditLinks extends TagSupport{
                 links[0] = ls;
             } else {
                 log.debug("no add link generated for property "+dprop.getPublicName());
+            }
+        }
+        return links;
+    }
+
+    protected LinkStruct[] doVitroNsProp(String subjectUri, String propertyUri, String themeDir, EditLinkAccess[] allowedAccessTypeArray, String contextPath) {
+        if( allowedAccessTypeArray == null || subjectUri == null || allowedAccessTypeArray.length == 0 ) {
+            log.debug("null or empty access type array in doDataProp for vitro namespace property " + propertyUri + "; most likely just a property prohibited from editing");
+            return empty_array;
+        }
+        LinkStruct[] links = new LinkStruct[1];
+        
+        Model model =  (Model)pageContext.getServletContext().getAttribute("jenaOntModel");
+        StmtIterator stmts = model.listStatements(model.createResource(subjectUri), 
+                                                  model.getProperty(propertyUri), 
+                                                  (RDFNode) null);  
+        
+        if (stmts.hasNext()) {       
+            log.debug("not showing an \"add\" link for vitro namespace property " + propertyUri + " because it has a limit of 1");
+        } else {
+            if( contains( allowedAccessTypeArray, EditLinkAccess.ADDNEW ) ){
+                log.debug("vitro namespace property "+propertyUri+" gets an \"add\" link");
+                String url = makeRelativeHref(contextPath + "edit/editDatapropStmtRequestDispatch.jsp",
+                                              "subjectUri",   subjectUri,
+                                              "predicateUri", propertyUri,
+                                              "vitroNsProp",  "true");
+                LinkStruct ls = new LinkStruct();
+                ls.setHref( url );
+                ls.setType("add");
+                ls.setMouseoverText("add a new entry");
+                links[0] = ls;
+            } else {
+                log.debug("no add link generated for vitro namespace property "+propertyUri);
             }
         }
         return links;
@@ -308,7 +353,7 @@ public class PropertyEditLinks extends TagSupport{
         return links;
     }
     
-    protected LinkStruct[] doVitroNamespaceProp(DataPropertyStatement dpropStmt, Individual subject, String themeDir, EditLinkAccess[] allowedAccessTypeArray, String contextPath) {
+    protected LinkStruct[] doVitroNamespacePropStmt(DataPropertyStatement dpropStmt, Individual subject, String themeDir, EditLinkAccess[] allowedAccessTypeArray, String contextPath) {
       
         if( allowedAccessTypeArray == null || dpropStmt == null || allowedAccessTypeArray.length == 0 ) {
             log.debug("Null or empty access type array for vitro namespace property " + dpropStmt.getDatapropURI());
@@ -481,9 +526,16 @@ public class PropertyEditLinks extends TagSupport{
     }
 
     protected EditLinkAccess[] policyToAccess( IdentifierBundle ids, PolicyIface policy, String subjectUri, DataProperty item) {
+       
+        String propertyUri = item.getURI();
+        return policyToAccess(ids, policy, subjectUri, propertyUri);
+    }
+
+    protected EditLinkAccess[] policyToAccess( IdentifierBundle ids, PolicyIface policy, String subjectUri, String propertyUri) {
+  
         EditLinkAccess[] access;
-        
-        RequestedAction action = new AddDataPropStmt(subjectUri, item.getURI(), RequestActionConstants.SOME_LITERAL, null, null);
+  
+        RequestedAction action = new AddDataPropStmt(subjectUri, propertyUri, RequestActionConstants.SOME_LITERAL, null, null);
         PolicyDecision dec = policy.isAuthorized(ids, action);
         
         if(  dec != null && dec.getAuthorized() == Authorization.AUTHORIZED ){
@@ -494,7 +546,7 @@ public class PropertyEditLinks extends TagSupport{
         
         return access;
     }
-
+    
     public enum EditLinkAccess{ MODIFY, DELETE, ADDNEW, INFO, ADMIN  };
 
     public class LinkStruct {

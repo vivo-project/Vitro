@@ -201,9 +201,11 @@ public class RdfLiteralHashTest {
 
         Individual bob = new IndividualImpl();
         bob.setURI("http://example.com/bob");
+        
+        String propertyUri = VitroVocabulary.MONIKER;
 
-        int hash = RdfLiteralHash.makeVitroNsLiteralHash(bob,VitroVocabulary.MONIKER, "great", model);
-        DataPropertyStatement stmt = RdfLiteralHash.getVitroNsPropertyStmtByHash(bob, model, hash);
+        int hash = RdfLiteralHash.makeVitroNsLiteralHash(bob, propertyUri, "great", model);
+        DataPropertyStatement stmt = RdfLiteralHash.getVitroNsPropertyStmtByHash(bob, propertyUri, model, hash);
         
         String data = stmt.getData();
         String datatypeUri = stmt.getDatatypeURI();

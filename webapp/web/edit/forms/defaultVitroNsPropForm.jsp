@@ -2,6 +2,7 @@
 
 <%@ page import="java.util.ArrayList"%>
 <%@ page import="java.util.Arrays"%>
+<%@ page import="java.util.HashMap"%>
 
 <%@ page import="com.hp.hpl.jena.rdf.model.Literal"%>
 <%@ page import="com.hp.hpl.jena.rdf.model.Model"%>
@@ -30,6 +31,8 @@
     
     String subjectUri   = vreq.getParameter("subjectUri");
     String predicateUri = vreq.getParameter("predicateUri");
+    String propertyName = predicateUri.substring(predicateUri.lastIndexOf("#")+1);
+    vreq.setAttribute("propertyName", propertyName);
  
     DataPropertyStatement dps = (DataPropertyStatement)vreq.getAttribute("dataprop");
      
@@ -42,16 +45,43 @@
     
     Model model =  (Model)application.getAttribute("jenaOntModel");
     
-    String rangeDatatypeUri = dps.getDatatypeURI(); 
-    String rangeDatatypeUriJson = MiscWebUtils.escape(rangeDatatypeUri);
-    vreq.setAttribute("rangeDatatypeUriJson", rangeDatatypeUriJson);
+    // Get datatype and language for the data property statement
+    String rangeDatatypeUri = null,
+           rangeLang = null;
     
+    if (dps != null) {
+        
+        rangeDatatypeUri = dps.getDatatypeURI();        
+        if (rangeDatatypeUri == null) {
+            log.debug("no range datatype uri set on vitro namespace property statement for property " + predicateUri + " in defaultVitroNsPropForm.jsp");
+        } else {
+            log.debug("range datatype uri of [" + rangeDatatypeUri + "] on vitro namespace property statement for property " + predicateUri + " in defaultVitroNsPropForm.jsp");
+        }        
+        
+        rangeLang = dps.getLanguage();
+        if( rangeLang == null ) {            
+            log.debug("no language attribute on vitro namespace property statement for property " + predicateUri + " in defaultVitroNsPropForm.jsp");
+            rangeLang = "";
+        } else {
+            log.debug("language attribute of ["+rangeLang+"] on vitro namespace property statement for property " + predicateUri + " in defaultVitroNsPropForm.jsp");
+        }
+        
+    } else {
+        log.debug("No incoming vitro namespace property statement for property "+predicateUri+"; adding a new statement");  
+        rangeDatatypeUri = VitroVocabulary.getVitroNsPropDatatypeUri(predicateUri);   
+    }
+    
+    String rangeDatatypeUriJson = rangeDatatypeUri == null ? "" : MiscWebUtils.escape(rangeDatatypeUri);
+  
+    vreq.setAttribute("rangeDatatypeUriJson", rangeDatatypeUriJson);   
+    vreq.setAttribute("rangeLangJson", rangeLang);    
 
+    // Create list of validators
     ArrayList<String> validatorList = new ArrayList<String>();
     if (predicateUri.equals(VitroVocabulary.LABEL) || predicateUri.equals(VitroVocabulary.RDF_TYPE)) {
         validatorList.add("nonempty");       
     }
-    if (!rangeDatatypeUriJson.isEmpty()) {
+    if (!StringUtils.isEmpty(rangeDatatypeUriJson)) {
         validatorList.add("datatype:" + rangeDatatypeUriJson);
     }
     vreq.setAttribute("validators", StringUtils.quotedList(validatorList, ","));
@@ -59,7 +89,6 @@
 %>
 
 <c:set var="predicate" value="<%=predicateUri%>" />
-<c:set var="propertyName" value="${fn:substringAfter(predicate, '#')}" />
 
 <%--  Then enter a SPARQL query for the field, by convention concatenating the field id with "Existing"
       to convey that the expression is used to retrieve any existing value for the field in an existing individual.
@@ -76,13 +105,6 @@
 <v:jsonset var="dataAssertion"  >
     ?subject <${predicate}> ?${propertyName} .
 </v:jsonset>
-
-<%
-
-%>
-<c:if test="${propertyName == 'label' || propertyName == 'type'}">
-    <c:set var="validator" value="nonempty" scope="request" />
-</c:if>
 
 <c:set var="editjson" scope="request">
   {
@@ -116,14 +138,12 @@
          "predicateUri"     : "",
          "objectClassUri"   : "",
          "rangeDatatypeUri" : "${rangeDatatypeUriJson}",
-         "rangeLang"        : "",
+         "rangeLang"        : "${rangeLangJson}",
          "assertions"       : [ "${dataAssertion}" ]
       }
   }
 }
 </c:set>
-
-
 
 <%
     if( log.isDebugEnabled()) log.debug(request.getAttribute("editjson"));
@@ -141,19 +161,20 @@
         editConfig.prepareForDataPropUpdate(model,dps);
     }    
 
+    String propertyLabel = propertyName  == "label" ? "name" : propertyName;
+    String actionText = dps == null ? "Add new " : "Edit ";
+    String submitLabel = actionText + propertyName;
+    String title = actionText + propertyName + " for " + subject.getName();
+  
 %>
-
-<c:set var="propertyLabel" value="${propertyName == 'label' ? 'name' : propertyName}" />
-<c:set var="submitLabel" value="Edit ${propertyLabel}" />
-<c:set var="title" scope="request" value="Edit the ${propertyLabel} of ${subject.name}:" />
 
 <jsp:include page="${preForm}"/>
 
-<h2>${title}</h2>
+<h2><%= title %></h2>
 <form action="<c:url value="/edit/processDatapropRdfForm.jsp"/>" >
     <v:input type="text" id="${propertyName}" size="30" />
     <input type="hidden" name="vitroNsProp" value="true" />
-    <p class="submit"><v:input type="submit" id="submit" value="${submitLabel}" cancel="${param.subjectUri}"/></p>
+    <p class="submit"><v:input type="submit" id="submit" value="<%= submitLabel %>" cancel="${param.subjectUri}"/></p>
 </form>
 
 <c:if test="${ (!empty param.datapropKey) && (empty param.deleteProhibited) }">
@@ -169,4 +190,5 @@
 </c:if>
 
 <jsp:include page="${postForm}"/>
+
 

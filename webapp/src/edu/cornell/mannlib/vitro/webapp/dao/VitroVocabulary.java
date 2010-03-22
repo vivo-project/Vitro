@@ -2,6 +2,11 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao;
 
+import java.util.Arrays;
+import java.util.List;
+
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.vocabulary.XSD;
 import com.hp.hpl.jena.ontology.AnnotationProperty;
 
 public class VitroVocabulary {
@@ -278,5 +283,28 @@ public class VitroVocabulary {
     public static final String NAMESPACE_ISCURRENTPREFIXMAPPING = vitroURI + "isCurrentPrefixMapping";
     
     public static final String ONTOLOGY_PREFIX_ANNOT = vitroURI + "ontologyPrefixAnnot";
+  
     
+    
+    public static final List<String> VITRO_NS_PROPERTIES = Arrays.asList(BLURB, CITATION, DESCRIPTION, LABEL, LINK_ANCHOR, MONIKER, PRIMARY_LINK, RDF_TYPE, TIMEKEY);
+
+    public static String getVitroNsPropDatatypeUri(String propName) {
+        Resource datatype = propName == TIMEKEY ? XSD.dateTime : XSD.xstring;
+        return datatype.getURI();
+    }
+    
+//    public static final Map<String, String> VITRO_NS_PROPERTIES = new HashMap<String, String>() {
+//        {
+//            put(BLURB, XSD.xstring.getURI());
+//            put(CITATION, XSD.xstring.getURI());
+//            put(DESCRIPTION, XSD.xstring.getURI());
+//            put(LABEL, XSD.xstring.getURI());
+//            put(LINK_ANCHOR, XSD.xstring.getURI());
+//            put(MONIKER, XSD.xstring.getURI());
+//            put(PRIMARY_LINK, XSD.xstring.getURI()); 
+//            put(RDF_TYPE, XSD.xstring.getURI());
+//            put(TIMEKEY, XSD.dateTime.getURI());            
+//        }
+//    };
+
 }

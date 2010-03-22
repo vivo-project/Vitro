@@ -68,7 +68,7 @@
             vreq.setAttribute("rangeLangJson", rangeLang);
         }
     } else {
-        log.debug("No incoming dataproperty statement attribute for property "+prop.getPublicName()+", adding a new statement");                
+        log.debug("No incoming dataproperty statement attribute for property "+prop.getPublicName()+"; adding a new statement");                
         if(rangeDatatypeUri != null && rangeDatatypeUri.length() > 0) {                        
             String defaultVal = defaultsForXSDtypes.get(rangeDatatypeUri);
             if( defaultVal == null )            	
