@@ -108,7 +108,8 @@ public class VitroVocabulary {
     public static final String MASKS_PROPERTY = vitroURI + "masksProperty";
     public static final String SKIP_EDIT_FORM = vitroURI + "skipEditForm";
     public static final String PROPERTY_DEPENDENCYPROPERTYANNOT = vitroURI + "dependencyPropertyAnnot";
-    
+	public static final String PROPERTY_COLLATEBYSUBCLASSANNOT = vitroURI + "collateBySubclassAnnot";
+	
     // ================== keyword related ==================================
 
     public static final String KEYWORD = vitroURI+"Keyword";
@@ -277,8 +278,5 @@ public class VitroVocabulary {
     public static final String NAMESPACE_ISCURRENTPREFIXMAPPING = vitroURI + "isCurrentPrefixMapping";
     
     public static final String ONTOLOGY_PREFIX_ANNOT = vitroURI + "ontologyPrefixAnnot";
-
-
-    
     
 }

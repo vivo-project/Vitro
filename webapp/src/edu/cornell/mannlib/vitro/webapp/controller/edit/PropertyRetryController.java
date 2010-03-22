@@ -192,6 +192,7 @@ public class PropertyRetryController extends BaseEditController {
         request.setAttribute("selectFromExisting",propertyForEditing.getSelectFromExisting());
         request.setAttribute("offerCreateNewOption", propertyForEditing.getOfferCreateNewOption());
         request.setAttribute("forceStubObjectDeletion", propertyForEditing.getForceStubObjectDeletion());
+        request.setAttribute("collateBySubclass", propertyForEditing.getCollateBySubclass());
         
         //checkboxes are pretty annoying : we don't know if someone *unchecked* a box, so we have to default to false on updates.
         if (propertyForEditing.getURI() != null) {
@@ -202,6 +203,7 @@ public class PropertyRetryController extends BaseEditController {
         	propertyForEditing.setSelectFromExisting(false);
         	propertyForEditing.setOfferCreateNewOption(false);
         	propertyForEditing.setForceStubObjectDeletion(false);
+        	propertyForEditing.setCollateBySubclass(false);
         }
 
         epo.setFormObject(foo);

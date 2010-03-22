@@ -223,6 +223,9 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
             Boolean forceStubObjectDeletionObj = getPropertyBooleanValue(op,PROPERTY_FORCESTUBDELETIONANNOT);
             p.setForceStubObjectDeletion(forceStubObjectDeletionObj==null ? false : forceStubObjectDeletionObj);
 
+            Boolean collateBySubclass = getPropertyBooleanValue(op,PROPERTY_COLLATEBYSUBCLASSANNOT);
+            p.setCollateBySubclass(collateBySubclass==null ? false : collateBySubclass);
+            
             // the <i> thing from the old system causes sorting problems and ugliness; here is an inelegant way of dealing with it for now (Note <i>s will disappear on update)
             if (p.getDomainSidePhasedOut() != null) {
             	p.setDomainSidePhasedOut(stripItalics(p.getDomainSidePhasedOut()));
@@ -364,8 +367,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
 	        com.hp.hpl.jena.ontology.ObjectProperty p = ontModel.createObjectProperty(prop.getURI());
 	        com.hp.hpl.jena.ontology.ObjectProperty inv = null;
 	        if (hasInverse(prop)) {
-	        	System.out.println(prop.getURIInverse());
-	        	System.out.println("non-null inverse URI");
+	        	log.debug("non-null inverse URI: " +prop.getURIInverse());	        	
 	        	errMsgStr = getWebappDaoFactory().checkURI(prop.getURIInverse());
 	        	if (errMsgStr != null) {
 	        		throw new InsertException("Unusable URI for inverse property: "+errMsgStr);
@@ -603,6 +605,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         updatePropertyBooleanValue(p,PROPERTY_SELECTFROMEXISTINGANNOT,prop.getSelectFromExisting(),ontModel,JenaBaseDao.KEEP_ONLY_IF_FALSE);
         updatePropertyBooleanValue(p,PROPERTY_OFFERCREATENEWOPTIONANNOT,prop.getOfferCreateNewOption(),ontModel,JenaBaseDao.KEEP_ONLY_IF_TRUE);
         updatePropertyBooleanValue(p,PROPERTY_FORCESTUBDELETIONANNOT,prop.getForceStubObjectDeletion(),ontModel,JenaBaseDao.KEEP_ONLY_IF_TRUE);
+        updatePropertyBooleanValue(p,PROPERTY_COLLATEBYSUBCLASSANNOT,prop.getCollateBySubclass(),ontModel,JenaBaseDao.KEEP_ONLY_IF_TRUE);
         try {
         	p.removeAll(PROPERTY_INPROPERTYGROUPANNOT);
         	if (prop.getGroupURI() != null && prop.getGroupURI().length()>0) {

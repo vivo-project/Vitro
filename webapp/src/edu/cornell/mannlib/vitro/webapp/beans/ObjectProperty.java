@@ -75,6 +75,8 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
     private boolean offerCreateNewOption = false;
     private boolean forceStubObjectDeletion = false;
     
+    private boolean collateBySubclass = false;
+    
     public ObjectProperty() {
         super();
     }
@@ -252,6 +254,14 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
     public void setInverseFunctional(boolean inverseFunctional) {
     	this.inverseFunctional = inverseFunctional;
     }
+
+	public void setCollateBySubclass(boolean collate) {
+		collateBySubclass = collate;
+	}
+	
+	public boolean getCollateBySubclass() {
+		return collateBySubclass;
+	}
     
     /**
      * adds a single ObjectPropertyStatement object to Property's object property statements List.

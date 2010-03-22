@@ -151,6 +151,19 @@
         <font size="2" color="red"><form:error name="ObjectIndividualSortPropertyURI"/></font>
 	</td>
 </tr>
+<tr class="editformcell">  
+	<td valign="bottom" colspan="5">      
+        <c:choose>
+            <c:when test="${collateBySubclass}">
+    	        <input name="CollateBySubclass" type="checkbox" value="TRUE" checked="checked"/>collate by subclass
+            </c:when>
+            <c:otherwise>
+                <input name="CollateBySubclass" type="checkbox" value="TRUE"/>collate by subclass
+            </c:otherwise>            
+        </c:choose>
+        <font size="2" color="red"><form:error name="CollateBySubclass"/></font>            
+  </td>
+</tr>
 <tr class="editformcell">
     <td valign="bottom" colspan="1">
         <c:choose>
