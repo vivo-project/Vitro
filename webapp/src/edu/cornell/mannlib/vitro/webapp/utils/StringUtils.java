@@ -11,7 +11,6 @@ public class StringUtils {
     }
     
     public static String quote(String s) {
-        boolean b = s.isEmpty();
         return isEmpty(s) ? "" : '"' + s + '"';
     }
     
