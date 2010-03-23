@@ -125,7 +125,7 @@ RY Description not working - FIX
 
                         <%-- Moniker. Wrap in the div only if editing. If not editing, displays inline next to label. --%>
                         <c:if test="${showEdits}">
-                            <div id="dprop-vitro-moniker" class="propsItem editing" style="display:block;">                              
+                            <div id="dprop-vitro-moniker" class="propsItem editing">                              
                                 <h3 class="propertyName">moniker</h3>
                                 <edLnk:editLinks item="<%= VitroVocabulary.MONIKER %>" icons="false"/>
                         </c:if>
@@ -198,7 +198,7 @@ RY Description not working - FIX
                 </div>
                 
                 <%-- Citation --%>
-                <div id="dprop-vitro-citation" class="propsItem ${editingClass}" style="display:block;">   
+                <div id="dprop-vitro-citation" class="propsItem ${editingClass}">   
                     <c:if test="${showEdits}">                           
                         <h3 class="propertyName">citation</h3>
                         <edLnk:editLinks item="<%= VitroVocabulary.CITATION %>" icons="false"/>
@@ -222,46 +222,50 @@ RY Description not working - FIX
             <p:process>
 
                 <%-- Blurb --%>
-                <div id="dprop-vitro-blurb" class="propsItem ${editingClass}" style="display:block;">   
-                    <c:if test="${showEdits}">                           
-                        <h3 class="propertyName">blurb</h3>
-                        <edLnk:editLinks item="<%= VitroVocabulary.BLURB %>" icons="false"/>
-                    </c:if>
-                    <c:if test="${!empty entity.blurb}">
-                        <div class="datatypeProperties">
-                            <div class="datatypePropertyValue">
-                                <div class="statementWrap">
-                                    <div class="description">${entity.blurb}</div>
-                                    <c:if test="${showEdits}">
-                                        <c:set var="editLinks"><edLnk:editLinks item="<%= VitroVocabulary.BLURB %>" data="${entity.blurb}" icons="false"/></c:set>
-                                        <c:if test="${!empty editLinks}"><span class="editLinks">${editLinks}</span></c:if>                                                                     
-                                    </c:if> 
-                                </div>
-                            </div>
-                        </div>
-                    </c:if>     
-                </div>
+                <c:if test="${showEdits || !empty entity.blurb}">
+	                <div id="dprop-vitro-blurb" class="propsItem ${editingClass}">   
+	                    <c:if test="${showEdits}">                           
+	                        <h3 class="propertyName">blurb</h3>
+	                        <edLnk:editLinks item="<%= VitroVocabulary.BLURB %>" icons="false"/>
+	                    </c:if>
+	                    <c:if test="${!empty entity.blurb}">
+	                        <div class="datatypeProperties">
+	                            <div class="datatypePropertyValue">
+	                                <div class="statementWrap">
+	                                    <div class="description">${entity.blurb}</div>
+	                                    <c:if test="${showEdits}">
+	                                        <c:set var="editLinks"><edLnk:editLinks item="<%= VitroVocabulary.BLURB %>" data="${entity.blurb}" icons="false"/></c:set>
+	                                        <c:if test="${!empty editLinks}"><span class="editLinks">${editLinks}</span></c:if>                                                                     
+	                                    </c:if> 
+	                                </div>
+	                            </div>
+	                        </div>
+	                    </c:if>     
+	                </div>
+                </c:if>
 
-                <%-- Description --%>                   
-                <div id="dprop-vitro-description" class="propsItem ${editingClass}" style="display:block;">   
-                    <c:if test="${showEdits}">                           
-                        <h3 class="propertyName">description</h3>
-                        <edLnk:editLinks item="<%= VitroVocabulary.DESCRIPTION %>" icons="false"/>
-                    </c:if>
-                    <c:if test="${!empty entity.description}">
-                        <div class="datatypeProperties">
-                            <div class="datatypePropertyValue">
-                                <div class="statementWrap">
-                                    <div class="description">${entity.description}</div>
-                                    <c:if test="${showEdits}">
-                                        <c:set var="editLinks"><edLnk:editLinks item="<%= VitroVocabulary.DESCRIPTION %>" data="${entity.description}" icons="false"/></c:set>
-                                        <c:if test="${!empty editLinks}"><span class="editLinks">${editLinks}</span></c:if>                                                                     
-                                    </c:if> 
-                                </div>
-                            </div>
-                        </div>
-                    </c:if>     
-                </div>
+                <%-- Description --%>   
+                <c:if test="${showEdits || !empty entity.description}">                
+	                <div id="dprop-vitro-description" class="propsItem ${editingClass}">   
+	                    <c:if test="${showEdits}">                           
+	                        <h3 class="propertyName">description</h3>
+	                        <edLnk:editLinks item="<%= VitroVocabulary.DESCRIPTION %>" icons="false"/>
+	                    </c:if>
+	                    <c:if test="${!empty entity.description}">
+	                        <div class="datatypeProperties">
+	                            <div class="datatypePropertyValue">
+	                                <div class="statementWrap">
+	                                    <div class="description">${entity.description}</div>
+	                                    <c:if test="${showEdits}">
+	                                        <c:set var="editLinks"><edLnk:editLinks item="<%= VitroVocabulary.DESCRIPTION %>" data="${entity.description}" icons="false"/></c:set>
+	                                        <c:if test="${!empty editLinks}"><span class="editLinks">${editLinks}</span></c:if>                                                                     
+	                                    </c:if> 
+	                                </div>
+	                            </div>
+	                        </div>
+	                    </c:if>     
+	                </div>
+                </c:if>
                                 
             </p:process>
             
@@ -275,25 +279,27 @@ RY Description not working - FIX
 
             <p:process>
                 <%-- Citation, if no thumbnail --%>
-                <div id="dprop-vitro-citation" class="propsItem ${editingClass}" style="display:block;">   
-                    <c:if test="${showEdits}">                           
-                        <h3 class="propertyName">citation</h3>
-                        <edLnk:editLinks item="<%= VitroVocabulary.CITATION %>" icons="false"/>
-                    </c:if>
-                    <c:if test="${!empty entity.citation}">
-                        <div class="datatypeProperties">
-                            <div class="datatypePropertyValue">
-                                <div class="statementWrap">
-                                    ${entity.citation}
-                                    <c:if test="${showEdits}">
-                                        <c:set var="editLinks"><edLnk:editLinks item="<%= VitroVocabulary.CITATION %>" data="${entity.citation}" icons="false"/></c:set>
-                                        <c:if test="${!empty editLinks}"><span class="editLinks">${editLinks}</span></c:if>                                                                     
-                                    </c:if> 
+                <c:if test="${empty entity.imageThumb}">
+                    <div id="dprop-vitro-citation" class="propsItem ${editingClass}">   
+                        <c:if test="${showEdits}">                           
+                            <h3 class="propertyName">citation</h3>
+                            <edLnk:editLinks item="<%= VitroVocabulary.CITATION %>" icons="false"/>
+                        </c:if>
+                        <c:if test="${!empty entity.citation}">
+                            <div class="datatypeProperties">
+                                <div class="datatypePropertyValue">
+                                    <div class="statementWrap">
+                                        ${entity.citation}
+                                        <c:if test="${showEdits}">
+                                            <c:set var="editLinks"><edLnk:editLinks item="<%= VitroVocabulary.CITATION %>" data="${entity.citation}" icons="false"/></c:set>
+                                            <c:if test="${!empty editLinks}"><span class="editLinks">${editLinks}</span></c:if>                                                                     
+                                        </c:if> 
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </c:if>     
-                </div>
+                        </c:if>     
+                    </div>
+                </c:if>
                 <c:if test="${!empty entity.keywordString}">
                     <p id="keywords">Keywords: ${entity.keywordString}</p>
                 </c:if>
