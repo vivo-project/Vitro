@@ -107,6 +107,7 @@ public class DbAdminEditingPolicy implements VisitingPolicyIface {
             this.editableVitroUris = new HashSet<String>();
             this.editableVitroUris.add(VitroVocabulary.MONIKER);
             this.editableVitroUris.add(VitroVocabulary.BLURB);
+            this.editableVitroUris.add(VitroVocabulary.DESCRIPTION);            
             this.editableVitroUris.add(VitroVocabulary.MODTIME);
             this.editableVitroUris.add(VitroVocabulary.TIMEKEY);
 

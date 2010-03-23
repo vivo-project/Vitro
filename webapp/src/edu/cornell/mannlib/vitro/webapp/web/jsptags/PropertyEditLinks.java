@@ -141,7 +141,6 @@ public class PropertyEditLinks extends TagSupport{
                 DataPropertyStatement dps = (DataPropertyStatement) new DataPropertyStatementImpl(subjectUri, (String)item, data); 
                 links = doVitroNamespacePropStmt( dps, entity, themeDir, policyToAccess(ids, policy, dps), contextPath );           
             } else {    // link to add a new value
-
                 links = doVitroNsProp( subjectUri, (String)item, themeDir, policyToAccess(ids, policy, subjectUri, (String)item), contextPath ) ;
             }
         } else {
