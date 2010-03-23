@@ -266,24 +266,12 @@ RY Description not working - FIX
             </p:process>
             
             <%-- Properties --%>
-
-			<c:choose>
-			    <c:when test="${showEdits}">
-			         <c:import url="${entityMergedPropsListJsp}">
-			             <c:param name="mode" value="edit"/>
-			             <c:param name="grouped" value="false"/>
-			             <%-- unless a value is provided, properties not assigned to a group will not have a tab or appear on the page --%>
-			             <c:param name="unassignedPropsGroupName" value=""/>
-			         </c:import>
-			     </c:when>
-			     <c:otherwise>
-			         <c:import url="${entityMergedPropsListJsp}">
-			             <c:param name="grouped" value="false"/>
-			             <%-- unless a value is provided, properties not assigned to a group will not have a tab or appear on the page --%>
-			             <c:param name="unassignedPropsGroupName" value=""/>
-			         </c:import>
-			     </c:otherwise>
-			</c:choose>
+            <c:import url="${entityMergedPropsListJsp}">
+                <c:param name="mode" value="${showEdits ? 'edit' : ''}"/>
+                <c:param name="grouped" value="false"/>
+                <%-- unless a value is provided, properties not assigned to a group will not have a tab or appear on the page --%>
+                <c:param name="unassignedPropsGroupName" value=""/>
+            </c:import>
 
             <p:process>
                 <%-- Citation, if no thumbnail --%>
