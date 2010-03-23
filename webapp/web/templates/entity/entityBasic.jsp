@@ -186,38 +186,54 @@ RY Description not working - FIX
             </c:if>   
             
             <%-- Thumbnail (with citation) --%>
-            <c:if test="${!empty entity.imageThumb}">
-                <div class="thumbnail">
-                    <c:if test="${!empty entity.imageFile}">
-                        <c:url var="imageUrl" value="/${imageDir}/${entity.imageFile}" />
-                        <a class="image" href="${imageUrl}">
-                    </c:if>
-                    <c:url var="imageSrc" value='/${imageDir}/${entity.imageThumb}'/>
-                    <img src="<c:out value="${imageSrc}"/>" title="click to view larger image in new window" alt="" width="150"/>
-                    <c:if test="${!empty entity.imageFile}"></a></c:if>
-                </div>
-                
-                <%-- Citation --%>
-                <div id="dprop-vitro-citation" class="propsItem ${editingClass}">   
-                    <c:if test="${showEdits}">                           
-                        <h3 class="propertyName">citation</h3>
-                        <edLnk:editLinks item="<%= VitroVocabulary.CITATION %>" icons="false"/>
-                    </c:if>
-                    <c:if test="${!empty entity.citation}">
-                        <div class="datatypeProperties">
-                            <div class="datatypePropertyValue">
-                                <div class="statementWrap">
-                                    ${entity.citation}
-                                    <c:if test="${showEdits}">
-                                        <c:set var="editLinks"><edLnk:editLinks item="<%= VitroVocabulary.CITATION %>" data="${entity.citation}" icons="false"/></c:set>
-                                        <c:if test="${!empty editLinks}"><span class="editLinks">${editLinks}</span></c:if>                                                                     
-                                    </c:if> 
-                                </div>
+            <div id="dprop-vitro-image" class="propsItem ${editingClass}"> 
+                <c:if test="${showEdits}">
+                    <h3 class="propertyName">image</h3>
+                    <edLnk:editLinks item="<%= VitroVocabulary.IMAGETHUMB %>" icons="false" />
+                </c:if>
+                <c:if test="${!empty entity.imageThumb}">
+                    <div class="datatypeProperties">
+                        <div class="datatypePropertyValue">
+                            <div class="statementWrap thumbnail"> 
+                            <c:set var="imageTitle" value="${entity.name}" />              
+                                <c:if test="${!empty entity.imageFile}">
+                                    <c:url var="imageUrl" value="/${imageDir}/${entity.imageFile}" />
+                                    <a class="image" href="${imageUrl}">
+                                    <c:set var="imageTitle" value="click to view larger image in new window" />
+                                </c:if>
+                                <c:url var="imageSrc" value='/${imageDir}/${entity.imageThumb}'/>
+                                <img src="<c:out value="${imageSrc}"/>" title="${imageTitle}" alt="" width="150"/>
+                                <c:if test="${!empty entity.imageFile}"></a></c:if>
+                                <c:if test="${showEdits}">
+                                    <c:set var="editLinks"><edLnk:editLinks item="<%= VitroVocabulary.IMAGETHUMB %>" data="${entity.imageThumb}" icons="false"/></c:set>
+                                    <c:if test="${!empty editLinks}"><span class="editLinks">${editLinks}</span></c:if>                                                                     
+                                </c:if>                                   
                             </div>
                         </div>
-                    </c:if>     
-                </div>
-            </c:if>
+                    </div> 
+                
+                    <%-- Citation --%>
+                    <div id="dprop-vitro-citation" class="propsItem ${editingClass}">   
+                        <c:if test="${showEdits}">                           
+                            <h3 class="propertyName">citation</h3>
+                            <edLnk:editLinks item="<%= VitroVocabulary.CITATION %>" icons="false"/>
+                        </c:if>
+                        <c:if test="${!empty entity.citation}">
+                            <div class="datatypeProperties">
+                                <div class="datatypePropertyValue">
+                                    <div class="statementWrap">
+                                        ${entity.citation}
+                                        <c:if test="${showEdits}">
+                                            <c:set var="editLinks"><edLnk:editLinks item="<%= VitroVocabulary.CITATION %>" data="${entity.citation}" icons="false"/></c:set>
+                                            <c:if test="${!empty editLinks}"><span class="editLinks">${editLinks}</span></c:if>                                                                     
+                                        </c:if> 
+                                    </div>
+                                </div>
+                            </div>
+                        </c:if>     
+                    </div>
+                </c:if>
+            </div>
             
             <p:process>
 

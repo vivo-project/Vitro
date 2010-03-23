@@ -286,7 +286,7 @@ public class VitroVocabulary {
   
     
     
-    public static final List<String> VITRO_NS_PROPERTIES = Arrays.asList(BLURB, CITATION, DESCRIPTION, LABEL, LINK_ANCHOR, MONIKER, PRIMARY_LINK, RDF_TYPE, TIMEKEY);
+    public static final List<String> VITRO_NS_PROPERTIES = Arrays.asList(BLURB, CITATION, DESCRIPTION, IMAGETHUMB, LABEL, LINK_ANCHOR, MONIKER, PRIMARY_LINK, RDF_TYPE, TIMEKEY);
 
     public static String getVitroNsPropDatatypeUri(String propName) {
         Resource datatype = propName == TIMEKEY ? XSD.dateTime : XSD.xstring;

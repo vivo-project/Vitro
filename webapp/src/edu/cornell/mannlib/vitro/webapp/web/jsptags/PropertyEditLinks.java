@@ -167,10 +167,6 @@ public class PropertyEditLinks extends TagSupport{
 
         return SKIP_BODY;
     }
-        
-    private boolean isVitroNsProp(String predicateUri) {       
-        return VitroVocabulary.VITRO_NS_PROPERTIES.contains(predicateUri);
-    }
 
     protected LinkStruct[] doDataProp(DataProperty dprop, Individual entity, String themeDir, EditLinkAccess[] allowedAccessTypeArray, String contextPath) {
         if( allowedAccessTypeArray == null || dprop == null || allowedAccessTypeArray.length == 0 ) {
@@ -213,17 +209,22 @@ public class PropertyEditLinks extends TagSupport{
         
         if (stmts.hasNext()) {       
             log.debug("not showing an \"add\" link for vitro namespace property " + propertyUri + " because it has a limit of 1");
-        } else {
+        } else {       
             if( contains( allowedAccessTypeArray, EditLinkAccess.ADDNEW ) ){
                 log.debug("vitro namespace property "+propertyUri+" gets an \"add\" link");
-                String url = makeRelativeHref(contextPath + "edit/editDatapropStmtRequestDispatch.jsp",
-                                              "subjectUri",   subjectUri,
-                                              "predicateUri", propertyUri,
-                                              "vitroNsProp",  "true");
-                LinkStruct ls = new LinkStruct();
-                ls.setHref( url );
-                ls.setType("add");
-                ls.setMouseoverText("add a new entry");
+                LinkStruct ls = null;
+                if (propertyUri.equals(VitroVocabulary.IMAGETHUMB)) {
+                    ls = getImageLink(subjectUri, contextPath, "add");                   
+                } else {
+                    String url = makeRelativeHref(contextPath +"edit/editDatapropStmtRequestDispatch.jsp",
+                                                  "subjectUri",   subjectUri,
+                                                  "predicateUri", propertyUri,
+                                                  "vitroNsProp",  "true");
+                    ls = new LinkStruct();
+                    ls.setHref( url );
+                    ls.setType("add");
+                    ls.setMouseoverText("add a new entry");                   
+                }
                 links[0] = ls;
             } else {
                 log.debug("no add link generated for vitro namespace property "+propertyUri);
@@ -361,13 +362,26 @@ public class PropertyEditLinks extends TagSupport{
 
         String subjectUri = subject.getURI();
         String predicateUri = dpropStmt.getDatapropURI();
+        
+        LinkStruct[] links = new LinkStruct[2]; 
+        
+        if (predicateUri.equals(VitroVocabulary.IMAGETHUMB)) {
+            if( contains( allowedAccessTypeArray, EditLinkAccess.MODIFY ) ){
+                log.debug("permission found to UPDATE vitro namepsace property statement "+ predicateUri);
+                links[0] = getImageLink(subjectUri, contextPath, "edit");
+                return links; 
+            }
+            else {
+                log.debug("NO permission found to DELETE vitro namespace property " + predicateUri);
+            }           
+        }
+        
         String value = dpropStmt.getData();        
         Model model =  (Model)pageContext.getServletContext().getAttribute("jenaOntModel");
         
         String dpropHash = String.valueOf(RdfLiteralHash.makeVitroNsLiteralHash( subject, predicateUri, value, model ));
         String dispatchUrl = contextPath + "edit/editDatapropStmtRequestDispatch.jsp";
-        
-        LinkStruct[] links = new LinkStruct[2]; 
+
         int index = 0;
         
         boolean deleteAllowed = ( contains( allowedAccessTypeArray, EditLinkAccess.DELETE ) && 
@@ -391,7 +405,7 @@ public class PropertyEditLinks extends TagSupport{
                 
             ls.setHref(url);
             ls.setType("edit");
-            ls.setMouseoverText("edit this text");
+            ls.setMouseoverText(predicateUri.equals("label") ? "edit name" : "edit this text");
             links[index] = ls; 
             index++;
         }
@@ -576,12 +590,21 @@ public class PropertyEditLinks extends TagSupport{
         
     }
 
-//    public interface CheckAccess{
-//        boolean access(ObjectProperty prop,          EditLinkAccess access );
-//        boolean access(DataProperty   prop,          EditLinkAccess access );
-//        boolean access(ObjectPropertyStatement stmt, EditLinkAccess access );   
-//        boolean access(DataPropertyStatement   stmt, EditLinkAccess access );        
-//    }
-
     private LinkStruct[] empty_array = {};
+    
+    private LinkStruct getImageLink(String subjectUri, String contextPath, String action) {
+        LinkStruct ls = new LinkStruct();
+        String url = makeRelativeHref(contextPath + "uploadimages.jsp",
+                                      "entityUri", subjectUri);
+        ls.setHref(url);
+        ls.setType(action);
+        ls.setMouseoverText("upload a  new image");        
+        return ls;
+    }
+    
+    
+    private boolean isVitroNsProp(String predicateUri) {       
+        return VitroVocabulary.VITRO_NS_PROPERTIES.contains(predicateUri);
+    }
+
 }
