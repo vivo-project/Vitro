@@ -187,11 +187,14 @@ public class JenaBaseDao extends JenaBaseDaoCon {
                     existingValue = ((Literal)object).getString();
                 }
             }
-            if ( (existingValue!=null && value == null) || (existingValue!=null && value != null && !(existingValue.equals(value)) ) ) {
-                model.removeAll(res, dataprop, null);
-            }
-            if ( (existingValue==null && value != null && value.length()>0) || (existingValue!=null && value != null && value.length()>0 && !(existingValue.equals(value)) ) ) {
-                model.add(res, dataprop, value, XSDDatatype.XSDstring);
+            
+            if (value == null  || value.length() == 0) {
+                 model.removeAll(res, dataprop, null);
+            } else if (existingValue == null ) {
+                 model.add(res, dataprop, value, XSDDatatype.XSDstring);	
+            } else if (!existingValue.equals(value)) {
+         		 model.removeAll(res, dataprop, null);
+           		 model.add(res, dataprop, value, XSDDatatype.XSDstring);
             }
         }
     }
@@ -258,9 +261,23 @@ public class JenaBaseDao extends JenaBaseDaoCon {
      * convenience method for use with functional datatype properties
      */
     protected void updatePropertyIntValue(Resource res, Property dataprop, int value, Model model) {
-        if (dataprop != null) {
-            model.removeAll(res, dataprop, null);
-            model.add(res, dataprop, Integer.toString(value), XSDDatatype.XSDint);
+        
+    	if (dataprop != null) {	
+            Integer existingValue = null;
+            Statement stmt = res.getProperty(dataprop);
+            if (stmt != null) {
+                RDFNode object = stmt.getObject();
+                if (object != null && object.isLiteral()){
+                    existingValue = ((Literal)object).getInt();
+                }
+            }
+        	
+            if (existingValue == null ) {
+                  model.add(res, dataprop, Integer.toString(value), XSDDatatype.XSDint);	
+            } else if (existingValue.intValue() != value) {
+        		  model.removeAll(res, dataprop, null);
+        		  model.add(res, dataprop, Integer.toString(value), XSDDatatype.XSDint);
+            }            
         }
     }
 
@@ -292,12 +309,12 @@ public class JenaBaseDao extends JenaBaseDaoCon {
      * convenience method for use with functional datatype properties
      */
     protected void updatePropertyNonNegativeIntValue(Resource res, Property dataprop, int value, Model model) {
-        if (dataprop != null) {
-            model.removeAll(res, dataprop, null);
-            if (value>-1) {
-                model.add(res, dataprop, Integer.toString(value), XSDDatatype.XSDint);
-            }
-        }
+
+    	if (value < 0)
+       	  return;
+
+    	updatePropertyIntValue(res,dataprop,value,model);
+        
     }
 
     /**
@@ -313,10 +330,25 @@ public class JenaBaseDao extends JenaBaseDaoCon {
      * convenience method for use with functional properties
      */
     protected void updatePropertyFloatValue(Resource res, Property dataprop, Float value, Model model) {
-        if (dataprop != null) {
-            model.removeAll(res, dataprop, null);
-            if( value != null )
-                model.add(res, dataprop, Float.toString(value), XSDDatatype.XSDfloat);            
+
+    	if (dataprop != null) {	
+            Float existingValue = null;
+            Statement stmt = res.getProperty(dataprop);
+            if (stmt != null) {
+                RDFNode object = stmt.getObject();
+                if (object != null && object.isLiteral()){
+                    existingValue = ((Literal)object).getFloat();
+                }
+            }
+
+            if (value == null) {
+                 model.removeAll(res, dataprop, null);
+            } else if (existingValue == null ) {
+                 model.add(res, dataprop, Float.toString(value), XSDDatatype.XSDfloat);	
+            } else if (existingValue != value) {
+         		 model.removeAll(res, dataprop, null);
+          		 model.add(res, dataprop, Float.toString(value), XSDDatatype.XSDfloat);
+            }
         }
     }
     
@@ -364,16 +396,31 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     protected synchronized void updatePropertyDateValue(Resource res, DatatypeProperty dataprop, Date value, Model model) {
         try {
             if (dataprop != null) {
-                model.removeAll(res, dataprop, null);
-                if (value != null) {
-                    model.add(res, dataprop, xsdDateFormat.format(value), XSDDatatype.XSDdate);
+                if (value == null) {
+                    model.removeAll(res, dataprop, null);
+                } else {
+	                Date existingValue = null;
+	                Statement stmt = res.getProperty(dataprop);
+	                if (stmt != null) {
+	                    RDFNode object = stmt.getObject();
+	                    if (object != null && object.isLiteral()){
+	                        existingValue = (Date)((Literal)object).getValue();
+	                    }
+	                }
+		                
+	                if (existingValue == null ) {
+	                     model.add(res, dataprop, xsdDateFormat.format(value), XSDDatatype.XSDdate);	
+	                } else if (existingValue != value) {
+	             		 model.removeAll(res, dataprop, null);
+	              		 model.add(res, dataprop, xsdDateFormat.format(value), XSDDatatype.XSDdate);
+	                }
                 }
             }
         } catch (Exception e) {
             log.error("Error in updatePropertyDateValue");
         }
     }
-
+    
     /**
      * convenience method
      */
@@ -443,10 +490,45 @@ public class JenaBaseDao extends JenaBaseDaoCon {
      * convenience method for use with functional object properties
      */
     protected void updatePropertyResourceURIValue(Resource res, ObjectProperty prop, String objectURI) {
-        Resource objectRes = getOntModel().getResource(objectURI);
-        if (prop != null && objectRes != null) {
-            res.removeAll(prop);
-            res.addProperty(prop, objectRes);
+
+    	Model model = res.getModel();
+    	
+    	if (model != null) {
+    		updatePropertyResourceURIValue(res, prop, objectURI, model);
+    	}    	           
+    }
+
+    /**
+     * convenience method for use with functional properties
+     */
+    protected void updatePropertyResourceURIValue(Resource res, Property prop, String uri, Model model) {
+
+        if (prop != null) {
+            if (uri == null) {
+                model.removeAll(res, prop, null);
+            } else {
+                String badURIErrorStr = checkURI(uri);
+                if (badURIErrorStr != null) {
+                	log.error(badURIErrorStr);
+                	return;
+                }
+
+                Resource existingValue = null;
+                Statement stmt = res.getProperty(prop);
+                if (stmt != null) {
+                    RDFNode object = stmt.getObject();
+                    if (object != null && object.isResource()){
+                        existingValue = (Resource)object;
+                    }
+                }
+	                
+                if (existingValue == null ) {
+                     model.add(res, prop, model.createResource(uri));	
+                } else if (!(existingValue.getURI()).equals(uri)) {
+             		 model.removeAll(res, prop, null);
+              		 model.add(res, prop, model.createResource(uri));
+                }
+            }
         }
     }
 
@@ -463,12 +545,59 @@ public class JenaBaseDao extends JenaBaseDaoCon {
      * convenience method for use with functional object properties
      */
     protected void updatePropertyResourceValue(Resource res, Property prop, Resource objectRes) {
-        if (prop != null && objectRes != null) {
-            res.removeAll(prop);
-            res.addProperty(prop, objectRes);
+        
+    	Model model = res.getModel();
+    	
+    	if (model != null) {
+    		updatePropertyResourceValue(res, prop, objectRes, model);
         }
+    	
     }
 
+    /**
+     * convenience method for use with functional object properties
+     */
+    protected void updatePropertyResourceValue(Resource res, Property prop, Resource objectRes, Model model) {
+    	
+        if (prop != null) {
+            if (objectRes == null) {
+                model.removeAll(res, prop, null);
+            } else {
+                Resource existingValue = null;
+                Statement stmt = res.getProperty(prop);
+                if (stmt != null) {
+                    RDFNode object = stmt.getObject();
+                    if (object != null && object.isResource()){
+                        existingValue = (Resource)object;
+                    }
+                }
+	                
+                if (existingValue == null ) {
+                     model.add(res, prop, objectRes);	
+                } else if (!existingValue.equals(objectRes)) {
+             		 model.removeAll(res, prop, null);
+              		 model.add(res, prop, objectRes);
+                }
+            }
+        }
+    }
+    
+    /**
+     * convenience method for updating the RDFS label
+     */
+    protected void updateRDFSLabel(OntClass ontCls, String label) {
+    	
+    	if (label != null && label.length() > 0) {
+    		
+    		String existingValue = ontCls.getLabel((String) getDefaultLanguage());
+    	    
+    		if (existingValue == null || !existingValue.equals(label)) {
+    			ontCls.setLabel(label, (String) getDefaultLanguage());	
+    	    }
+    	} else {
+    		ontCls.removeAll(RDFS.label);
+    	}
+    }
     
     private String getLabel(String lang, List<RDFNode>labelList) {
     	Iterator<RDFNode> labelIt = labelList.iterator();

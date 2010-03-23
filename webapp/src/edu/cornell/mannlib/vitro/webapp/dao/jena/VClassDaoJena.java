@@ -885,90 +885,41 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
 
         public void updateVClass(VClass cls, OntModel ontModel) {
             ontModel.enterCriticalSection(Lock.WRITE);
-            getOntModel().getBaseModel().notifyEvent(new EditEvent(getWebappDaoFactory().getUserURI(),true));
+            ontModel.getBaseModel().notifyEvent(new EditEvent(getWebappDaoFactory().getUserURI(),true));
             try {
                 OntClass ontCls = ontModel.getOntClass(cls.getURI());
+                
                 if (ontCls != null) {
-                    try {
-                    	if (cls.getName() != null && cls.getName().length() > 0) {
-                    		ontCls.setLabel(cls.getName(), (String) getDefaultLanguage());
-                    	} else {
-                    		ontCls.removeAll(RDFS.label);
-                    	}
-                    } catch (Exception e) {
-                        log.error("error updating label for class "+cls.getURI());
-                    }
-                    if (IN_CLASSGROUP != null) {
-                        try {
-                            if (cls.getGroupURI() != null) {
-	                            String badURIErrorStr = checkURI(cls.getGroupURI());
-	                            if (badURIErrorStr == null) {
-	                            	ontCls.addProperty(IN_CLASSGROUP, ResourceFactory.createResource(cls.getGroupURI()));
-	                            } else {
-	                            	log.error(badURIErrorStr);
-	                            }
-                            } else {
-                            	ontCls.removeAll(IN_CLASSGROUP);	
-                            }
-                        } catch (Exception e) {
-                            log.error("error linking class "+cls.getURI()+" to class group");
-                        }
-                    } else {
-                        log.error("vitro:inClassgroup property not found in RBox");
-                    }
+                	updateRDFSLabel(ontCls, cls.getName());
+                    updatePropertyResourceURIValue(ontCls,IN_CLASSGROUP,cls.getGroupURI(),ontModel);
                     updatePropertyStringValue(ontCls,SHORTDEF,cls.getShortDef(),ontModel);
                     updatePropertyStringValue(ontCls,EXAMPLE_ANNOT,cls.getExample(),ontModel);
                     updatePropertyStringValue(ontCls,DESCRIPTION_ANNOT,cls.getDescription(),ontModel);
                     updatePropertyIntValue(ontCls,DISPLAY_LIMIT,cls.getDisplayLimit(),ontModel);
                     updatePropertyIntValue(ontCls,DISPLAY_RANK_ANNOT,cls.getDisplayRank(),ontModel);
                     updatePropertyFloatValue(ontCls, SEARCH_BOOST_ANNOT, cls.getSearchBoost(), ontModel);
-                    if (HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT != null) {
-                        try {
-                            ontCls.removeAll(HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT);
-                            if (cls.getHiddenFromDisplayBelowRoleLevel()!=null) {
-                                String badURIErrorStr = checkURI(cls.getHiddenFromDisplayBelowRoleLevel().getURI());
-                                if (badURIErrorStr == null) {
-                                    ontCls.addProperty(HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT, ResourceFactory.createResource(cls.getHiddenFromDisplayBelowRoleLevel().getURI()));
-                                } else {
-                                    log.error(badURIErrorStr);
-                                }
-                            }
-                        } catch (Exception e) {
-                            log.error("error linking class "+cls.getURI()+" to HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL edit role");
-                        }
-                    } else {
-                        log.error("vitro:hiddenFromDisplayBelowRoleLevelAnnot property not found in RBox");
+                    
+                    if (cls.getHiddenFromDisplayBelowRoleLevel() != null) {
+                      updatePropertyResourceURIValue(ontCls,HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT,cls.getHiddenFromDisplayBelowRoleLevel().getURI(),ontModel);                    
+                    }
+                      
+                    if (cls.getProhibitedFromUpdateBelowRoleLevel() != null) {
+                      updatePropertyResourceURIValue(ontCls,PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT,cls.getProhibitedFromUpdateBelowRoleLevel().getURI(),ontModel);
                     }
                     
-                    if (PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT != null) {
-                        try {
-                            ontCls.removeAll(PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT);
-                            if (cls.getProhibitedFromUpdateBelowRoleLevel()!=null) {
-                                String badURIErrorStr = checkURI(cls.getProhibitedFromUpdateBelowRoleLevel().getURI());
-                                if (badURIErrorStr == null) {
-                                    ontCls.addProperty(PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT, ResourceFactory.createResource(cls.getProhibitedFromUpdateBelowRoleLevel().getURI()));
-                                } else {
-                                    log.error(badURIErrorStr);
-                                }
-                            }
-                        } catch (Exception e) {
-                            log.error("error linking class "+cls.getURI()+" to PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL edit role");
-                        }
-                    } else {
-                        log.error("vitro:prohibitedFromUpdateBelowRoleLevelAnnot property not found in RBox");
-                    }
                     updatePropertyStringValue(ontCls,PROPERTY_CUSTOMENTRYFORMANNOT,cls.getCustomEntryForm(),ontModel);
                     updatePropertyStringValue(ontCls,PROPERTY_CUSTOMDISPLAYVIEWANNOT,cls.getCustomDisplayView(),ontModel);
                     updatePropertyStringValue(ontCls,PROPERTY_CUSTOMSHORTVIEWANNOT,cls.getCustomShortView(),ontModel);
                     updatePropertyStringValue(ontCls,PROPERTY_CUSTOMSEARCHVIEWANNOT,cls.getCustomSearchView(),ontModel);
                 } else {
-                    log.error("error: cannot find class "+cls.getURI()+" for updating");
+                    log.error("error: cannot find jena class "+cls.getURI()+" for updating");
                 }
             } finally {
             	getOntModel().getBaseModel().notifyEvent(new EditEvent(getWebappDaoFactory().getUserURI(),false));
                 ontModel.leaveCriticalSection();
             }
         }
+
 
         private VClass vClassWebappFromOntClass(OntClass cls) {
             VClass vcw = new VClass();
