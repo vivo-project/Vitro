@@ -111,6 +111,8 @@ RY Description not working - FIX
                         <p><a href="${backToSubjectLink}">&larr; return to ${relatedSubject.name}</a></p>
                     </c:when>
                     <c:otherwise>
+                    
+                        <%-- Label --%>
                         <div class="datatypePropertyValue" id="label">
                             <div class="statementWrap">
                                <h2><p:process>${entity.name}</p:process></h2> 
@@ -120,12 +122,12 @@ RY Description not working - FIX
                                </c:if> 
                             </div>
                         </div>
-                        <%-- For moniker, only wrap in the div if editing. Otherwise, displays inline next to label. --%>
+                        
+                        <%-- Moniker. Wrap in the div only if editing. If not editing, displays inline next to label. --%>
                         <c:if test="${showEdits}">
                             <div id="dprop-vitro-moniker" class="propsItem editing" style="display:block;">                              
                                 <h3 class="propertyName">moniker</h3>
-                                <c:if test="${showEdits}"><edLnk:editLinks item="<%= VitroVocabulary.MONIKER %>" icons="false"/></c:if>
-                                <%-- Here's where we add the plus link, but only if there isn't already a moniker. --%>
+                                <edLnk:editLinks item="<%= VitroVocabulary.MONIKER %>" icons="false"/>
                         </c:if>
                         <c:if test="${!empty entity.moniker}">
                             <div class="datatypeProperties">
@@ -140,10 +142,12 @@ RY Description not working - FIX
                                 </div>
                             </div>
                         </c:if>
-                        <c:if test="${showEdits}"></div></c:if>               
+                        <c:if test="${showEdits}"></div></c:if> <%-- end dprop-vitro-moniker --%>              
                     </c:otherwise>
                 </c:choose>
             </div><!-- end labelAndMoniker -->
+            
+            <%-- Links --%>
             <c:if test="${ (!empty entity.anchor) || (!empty entity.linksList) }">
                 <div class="datatypePropertyValue">
                     <div class="statementWrap">
@@ -179,6 +183,8 @@ RY Description not working - FIX
                     </div>
                 </div>
             </c:if>   
+            
+            <%-- Thumbnail --%>
             <c:if test="${!empty entity.imageThumb}">
                 <div class="thumbnail">
                     <c:if test="${!empty entity.imageFile}">
@@ -189,6 +195,7 @@ RY Description not working - FIX
                     <img src="<c:out value="${imageSrc}"/>" title="click to view larger image in new window" alt="" width="150"/>
                     <c:if test="${!empty entity.imageFile}"></a></c:if>
                 </div>
+                <%-- Citation --%>
                 <c:if test="${!empty entity.citation}">
                     <div class="datatypePropertyValue">
                         <div class="statementWrap">
@@ -202,19 +209,32 @@ RY Description not working - FIX
                     </div>
                 </c:if>
             </c:if>
+            
             <p:process>
-                <c:if test="${!empty entity.blurb}">
-                    <div class="datatypePropertyValue">
-                        <div class="statementWrap">
-                            <div class="description">${entity.blurb}</div>
-                            <%-- 
-                            <c:if test="${showEdits}">
-                                <c:set var="editLinks"><edLnk:editLinks item="<%= VitroVocabulary.BLURB %>" data="${entity.blurb}" icons="false"/></c:set>
-                                <c:if test="${!empty editLinks}"><span class="editLinks">${editLinks}</span></c:if>                                                                     
-                            </c:if> --%>
+            
+                <%-- Blurb --%>
+                <div id="dprop-vitro-blurb" class="propsItem ${editingClass}" style="display:block;">   
+                    <c:if test="${showEdits}">                           
+                        <h3 class="propertyName">blurb</h3>
+                        <edLnk:editLinks item="<%= VitroVocabulary.BLURB %>" icons="false"/>
+                    </c:if>
+                    <c:if test="${!empty entity.blurb}">
+                        <div class="datatypeProperties">
+                            <div class="datatypePropertyValue">
+                                <div class="statementWrap">
+                                    <div class="description">${entity.blurb}</div>
+                                        <c:if test="${showEdits}">
+                                            <c:set var="editLinks"><edLnk:editLinks item="<%= VitroVocabulary.BLURB %>" data="${entity.blurb}" icons="false"/></c:set>
+                                            <c:if test="${!empty editLinks}"><span class="editLinks">${editLinks}</span></c:if>                                                                     
+                                        </c:if> 
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </c:if>                              
+                    </c:if>     
+                </div>
+                      
+                <%-- Description --%>                   
                 <c:if test="${!empty entity.description}">
                     <div class="datatypePropertyValue">
                         <div class="statementWrap">
@@ -228,24 +248,19 @@ RY Description not working - FIX
                     </div>
                 </c:if>
             </p:process>
-            <c:choose>
-                <c:when test="${showEdits}">
-                     <c:import url="${entityMergedPropsListJsp}">
-                         <c:param name="mode" value="edit"/>
-                         <c:param name="grouped" value="false"/>
-                         <%-- unless a value is provided, properties not assigned to a group will not have a tab or appear on the page --%>
-                         <c:param name="unassignedPropsGroupName" value=""/>
-                     </c:import>
-                 </c:when>
-                 <c:otherwise>
-                     <c:import url="${entityMergedPropsListJsp}">
-                         <c:param name="grouped" value="false"/>
-                         <%-- unless a value is provided, properties not assigned to a group will not have a tab or appear on the page --%>
-                         <c:param name="unassignedPropsGroupName" value=""/>
-                     </c:import>
-                 </c:otherwise>
-            </c:choose>
+            
+            <%-- Properties --%>
+
+         <c:import url="${entityMergedPropsListJsp}">
+             <%-- <c:param name="mode" value="edit"/> --%>
+             <c:param name="grouped" value="false"/>
+             <%-- unless a value is provided, properties not assigned to a group will not have a tab or appear on the page --%>
+             <c:param name="unassignedPropsGroupName" value=""/>
+         </c:import>
+
+            
             <p:process>
+                <%-- Citation, if no thumbnail --%>
                 <c:if test="${(!empty entity.citation) && (empty entity.imageThumb)}">
                     <div class="datatypePropertyValue">
                         <div class="statementWrap">

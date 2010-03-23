@@ -2,7 +2,6 @@
 
 <%@ page import="java.util.ArrayList"%>
 <%@ page import="java.util.Arrays"%>
-<%@ page import="java.util.HashMap"%>
 
 <%@ page import="com.hp.hpl.jena.rdf.model.Literal"%>
 <%@ page import="com.hp.hpl.jena.rdf.model.Model"%>
@@ -21,9 +20,18 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib prefix="v" uri="http://vitro.mannlib.cornell.edu/vitro/tags" %>
 
+<%! 
+    private String getInputType(String propertyName) {
+        String inputType = StringUtils.equalsOneOf(propertyName, "blurb", "description") ? "textarea" : "text";
+        return  inputType;
+    }
+    String thisPage = "defaultVitroNsPropForm.jsp";
+    String inThisPage = " in " + thisPage;
+
+%>
 <%
-    org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger("edu.cornell.mannlib.vitro.jsp.edit.forms.defaultVitroNsPropForm.jsp");
-    log.debug("Starting defaultVitroNsPropForm.jsp");
+    org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger("edu.cornell.mannlib.vitro.jsp.edit.forms." + thisPage);
+    log.debug("Starting " + thisPage);
     
     VitroRequest vreq = new VitroRequest(request);
     WebappDaoFactory wdf = vreq.getWebappDaoFactory();
@@ -40,7 +48,7 @@
     
     Individual subject = (Individual)vreq.getAttribute("subject");
     if( subject == null ) {
-        throw new Error("In defaultVitroNsPropForm.jsp, could not find subject " + subjectUri);
+        throw new Error("In " + thisPage + ", could not find subject " + subjectUri);
     }
     
     Model model =  (Model)application.getAttribute("jenaOntModel");
@@ -53,17 +61,17 @@
         
         rangeDatatypeUri = dps.getDatatypeURI();        
         if (rangeDatatypeUri == null) {
-            log.debug("no range datatype uri set on vitro namespace property statement for property " + predicateUri + " in defaultVitroNsPropForm.jsp");
+            log.debug("no range datatype uri set on vitro namespace property statement for property " + predicateUri + inThisPage);
         } else {
-            log.debug("range datatype uri of [" + rangeDatatypeUri + "] on vitro namespace property statement for property " + predicateUri + " in defaultVitroNsPropForm.jsp");
+            log.debug("range datatype uri of [" + rangeDatatypeUri + "] on vitro namespace property statement for property " + predicateUri + inThisPage);
         }        
         
         rangeLang = dps.getLanguage();
         if( rangeLang == null ) {            
-            log.debug("no language attribute on vitro namespace property statement for property " + predicateUri + " in defaultVitroNsPropForm.jsp");
+            log.debug("no language attribute on vitro namespace property statement for property " + predicateUri + inThisPage);
             rangeLang = "";
         } else {
-            log.debug("language attribute of ["+rangeLang+"] on vitro namespace property statement for property " + predicateUri + " in defaultVitroNsPropForm.jsp");
+            log.debug("language attribute of ["+rangeLang+"] on vitro namespace property statement for property " + predicateUri + inThisPage);
         }
         
     } else {
@@ -161,18 +169,26 @@
         editConfig.prepareForDataPropUpdate(model,dps);
     }    
 
-    String propertyLabel = propertyName  == "label" ? "name" : propertyName;
+    // Configure form
+    String propertyLabel = propertyName.equals("label") ? "name" : propertyName;
     String actionText = dps == null ? "Add new " : "Edit ";
-    String submitLabel = actionText + propertyName;
-    String title = actionText + propertyName + " for " + subject.getName();
+    String submitLabel = actionText + propertyLabel;
+    String title = actionText + "<em>" + propertyLabel + "</em> for " + subject.getName();
+    
+    String inputType = getInputType(propertyName);
+    log.debug(propertyName + " needs input type " + inputType + inThisPage);
+    boolean useTinyMCE = inputType.equals("textarea");
+    log.debug( (useTinyMCE ? "" : "not ") + "using tinyMCE to edit " + propertyName + inThisPage);
   
 %>
 
-<jsp:include page="${preForm}"/>
+<jsp:include page="${preForm}">
+    <jsp:param name="useTinyMCE" value="<%= useTinyMCE %>"/>
+</jsp:include>
 
 <h2><%= title %></h2>
 <form action="<c:url value="/edit/processDatapropRdfForm.jsp"/>" >
-    <v:input type="text" id="${propertyName}" size="30" />
+    <v:input type="<%= inputType %>" id="${propertyName}" size="30" />
     <input type="hidden" name="vitroNsProp" value="true" />
     <p class="submit"><v:input type="submit" id="submit" value="<%= submitLabel %>" cancel="${param.subjectUri}"/></p>
 </form>

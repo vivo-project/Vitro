@@ -71,4 +71,14 @@ public class StringUtilsTest extends AbstractTestClass {
         Assert.assertEquals("\"apple\"|\"banana\"|\"orange\"", StringUtils.quotedList(stringList, "|"));
         Assert.assertEquals("\"apple\",\"banana\",\"orange\"", StringUtils.quotedList(stringList, null));
     }
+    
+    @Test
+    public void testEqualsOneOf() {
+        
+        String s1 = "cat";
+        Assert.assertTrue(StringUtils.equalsOneOf(s1, "dog", "mouse", "cat", "horse"));
+        Assert.assertTrue(StringUtils.equalsOneOf(s1, "cat"));
+        Assert.assertFalse(StringUtils.equalsOneOf(s1, "dog", "mouse", "horse"));
+        Assert.assertFalse(StringUtils.equalsOneOf(s1));       
+    }
 }

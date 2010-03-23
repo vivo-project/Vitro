@@ -38,12 +38,22 @@ public class StringUtils {
         return join(list, false, ",");
     }
     
-    public static String quotedList(List<?> list, String glue) {
-    
+    public static String quotedList(List<?> list, String glue) {    
         return join(list, true, glue);
     }  
     
+    // Because we can't use Java 1.6 String.isEmpty()
     public static boolean isEmpty(String s) {
         return s == null || s.length() <= 0;
+    }
+    
+    public static boolean equalsOneOf(String s, String... strings) {
+        
+        for (String item : strings) {
+            if (item.equals(s)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
