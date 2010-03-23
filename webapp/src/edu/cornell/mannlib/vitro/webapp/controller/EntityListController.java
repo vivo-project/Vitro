@@ -18,12 +18,6 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- * Handles requests for entity information.
- * The methods for sorting Property/ObjectPropertyStatement Lists are here also.
- * @author bdc34
- *
- */
 public class EntityListController extends VitroHttpServlet {
 
     long startTime = -1;

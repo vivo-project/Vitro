@@ -554,4 +554,15 @@ public class ObjectPropertyFiltering extends ObjectProperty {
         innerObjectProperty.setForceStubObjectDeletion(b);
     }
 
+	@Override
+	public boolean getCollateBySubclass() {		
+		return innerObjectProperty.getCollateBySubclass();
+	}
+
+	@Override
+	public void setCollateBySubclass(boolean collate) {		
+		innerObjectProperty.setCollateBySubclass(collate);
+	}
+
+    
 }

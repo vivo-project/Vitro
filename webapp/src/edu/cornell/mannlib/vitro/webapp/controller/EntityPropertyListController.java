@@ -12,12 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-/**
- * Handles requests for entity information.
- * The methods for sorting Property/ObjectPropertyStatement Lists are here also.
- * @author bdc34
- *
- */
 public class EntityPropertyListController extends VitroHttpServlet {
 
     /**
