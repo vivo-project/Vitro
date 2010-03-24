@@ -60,8 +60,8 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
     <c:set var="showCuratorEdits" value="${true}"/>
 </c:if>
 
-<c:set var="showEdits" value="${showSelfEdits || showCuratorEdits}" />
-<c:set var="editingClass" value="${showEdits ? 'editing' : ''}" />
+<c:set var="showEdits" value="${showSelfEdits || showCuratorEdits}" scope="request"/>
+<c:set var="editingClass" value="${showEdits ? 'editing' : ''}" scope="request"/>
 
 <c:set var='imageDir' value='images' />
 <c:set var="themeDir"><c:out value="${portalBean.themeDir}" /></c:set>
@@ -125,7 +125,7 @@ RY Description not working - FIX
 
                         <%-- Moniker. Wrap in the div only if editing. If not editing, displays inline next to label. --%>
                         <c:if test="${showEdits}">
-                            <div id="dprop-vitro-moniker" class="propsItem editing">                              
+                            <div id="dprop-vitro-moniker" class="propsItem ${editingClass}">                              
                                 <h3 class="propertyName">moniker</h3>
                                 <edLnk:editLinks item="<%= VitroVocabulary.MONIKER %>" icons="false"/>
                         </c:if>
@@ -149,91 +149,86 @@ RY Description not working - FIX
             </div> <!-- end labelAndMoniker -->
             
             <%-- Links --%>
-            <c:if test="${ (!empty entity.anchor) || (!empty entity.linksList) }">
-                <div class="datatypePropertyValue">
-                    <div class="statementWrap">
-                        <ul class="externalLinks">
-                           <c:if test="${!empty entity.anchor}">
-                               <c:choose>
-                                   <c:when test="${!empty entity.url}">
-                                       <c:url var="entityUrl" value="${entity.url}" />
-                                       <li class="primary"><a class="externalLink" href="<c:out value="${entityUrl}"/>"><p:process>${entity.anchor}</p:process></a></li>
-                                   </c:when>
-                                   <c:otherwise>
-                                       <li class="primary"><span class="externalLink"><p:process>${entity.anchor}</p:process></span></li>
-                                   </c:otherwise>
-                               </c:choose>
-                               <%--
-                               <c:if test="${showEdits}">
-                                   <c:set var="editLinks"><edLnk:editLinks item="<%= VitroVocabulary.LINK_ANCHOR %>" data="${entity.anchor}" icons="false"/></c:set>
-                                   <c:if test="${!empty editLinks}"><span class="editLinks">${editLinks}</span></c:if>                                                                           
-                               </c:if>
-                               --%> 
-                           </c:if>
-                           <c:if test="${!empty entity.linksList }">
-                               <c:forEach items="${entity.linksList}" var='link' varStatus="count">
-                                   <c:url var="linkUrl" value="${link.url}" />
-                                   <c:choose>
-                                       <c:when test="${empty entity.url && count.first==true}"><li class="first"></c:when>
-                                       <c:otherwise><li></c:otherwise>
-                                   </c:choose>
-                                   <a class="externalLink" href="<c:out value="${linkUrl}"/>"><p:process>${link.anchor}</p:process></a></li>
-                               </c:forEach>
-                           </c:if>
-                        </ul>
+            <c:if test="${ showEdits || !empty entity.anchor || !empty entity.linksList }"> 
+                <div id="dprop-vitro-link" class="propsItem ${editingClass}">
+                    <c:if test="${showEdits}">
+                        <h3 class="propertyName">links</h3>
+                        <edLnk:editLinks item="<%= VitroVocabulary.LINK_ANCHOR %>" icons="false" />
+                    </c:if>
+                    <div class="datatypeProperties">
+                        <div class="datatypePropertyValue">
+                            <div class="statementWrap">
+                                <ul class="externalLinks">
+                                    <c:if test="${!empty entity.anchor}">
+                                        <c:choose>
+                                            <c:when test="${!empty entity.url}">
+                                                <c:url var="entityUrl" value="${entity.url}" />
+                                                <li class="primary"><a class="externalLink" href="<c:out value="${entityUrl}"/>"><p:process>${entity.anchor}</p:process></a></li>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <li class="primary"><span class="externalLink"><p:process>${entity.anchor}</p:process></span></li>
+                                            </c:otherwise>
+                                        </c:choose>
+                                        <%--
+                                        <c:if test="${showEdits}">
+                                            <c:set var="editLinks"><edLnk:editLinks item="<%= VitroVocabulary.LINK_ANCHOR %>" data="${entity.anchor}" icons="false"/></c:set>
+                                            <c:if test="${!empty editLinks}"><span class="editLinks">${editLinks}</span></c:if>                                                                           
+                                        </c:if>
+                                        --%> 
+                                    </c:if>
+                                    <c:if test="${!empty entity.linksList }">
+                                        <c:forEach items="${entity.linksList}" var='link' varStatus="count">
+                                            <c:url var="linkUrl" value="${link.url}" />
+                                            <c:choose>
+                                                <c:when test="${empty entity.url && count.first==true}"><li class="first"></c:when>
+                                                <c:otherwise><li></c:otherwise>
+                                            </c:choose>
+                                            <a class="externalLink" href="<c:out value="${linkUrl}"/>"><p:process>${link.anchor}</p:process></a></li>
+                                        </c:forEach>
+                                    </c:if>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </c:if>   
             
             <%-- Thumbnail (with citation) --%>
-            <div id="dprop-vitro-image" class="propsItem ${editingClass}"> 
-                <c:if test="${showEdits}">
-                    <h3 class="propertyName">image</h3>
-                    <edLnk:editLinks item="<%= VitroVocabulary.IMAGETHUMB %>" icons="false" />
-                </c:if>
-                <c:if test="${!empty entity.imageThumb}">
-                    <div class="datatypeProperties">
-                        <div class="datatypePropertyValue">
-                            <div class="statementWrap thumbnail"> 
-                            <c:set var="imageTitle" value="${entity.name}" />              
-                                <c:if test="${!empty entity.imageFile}">
-                                    <c:url var="imageUrl" value="/${imageDir}/${entity.imageFile}" />
-                                    <a class="image" href="${imageUrl}">
-                                    <c:set var="imageTitle" value="click to view larger image in new window" />
-                                </c:if>
-                                <c:url var="imageSrc" value='/${imageDir}/${entity.imageThumb}'/>
-                                <img src="<c:out value="${imageSrc}"/>" title="${imageTitle}" alt="" width="150"/>
-                                <c:if test="${!empty entity.imageFile}"></a></c:if>
-                                <c:if test="${showEdits}">
-                                    <c:set var="editLinks"><edLnk:editLinks item="<%= VitroVocabulary.IMAGETHUMB %>" data="${entity.imageThumb}" icons="false"/></c:set>
-                                    <c:if test="${!empty editLinks}"><span class="editLinks">${editLinks}</span></c:if>                                                                     
-                                </c:if>                                   
-                            </div>
-                        </div>
-                    </div> 
+            <c:if test="${showEdits || !empty entity.imageThumb}">
+	            <div id="dprop-vitro-image" class="propsItem ${editingClass}"> 
+	                <c:if test="${showEdits}">
+	                    <h3 class="propertyName">image</h3>
+	                    <edLnk:editLinks item="<%= VitroVocabulary.IMAGETHUMB %>" icons="false" />
+	                </c:if>
+	                <c:if test="${!empty entity.imageThumb}">
+	                    <div class="datatypeProperties">
+	                        <div class="datatypePropertyValue">
+	                            <div class="statementWrap thumbnail"> 
+	                            <c:set var="imageTitle" value="${entity.name}" />              
+	                                <c:if test="${!empty entity.imageFile}">
+	                                    <c:url var="imageUrl" value="/${imageDir}/${entity.imageFile}" />
+	                                    <a class="image" href="${imageUrl}">
+	                                    <c:set var="imageTitle" value="click to view larger image in new window" />
+	                                </c:if>
+	                                <c:url var="imageSrc" value='/${imageDir}/${entity.imageThumb}'/>
+	                                <img src="<c:out value="${imageSrc}"/>" title="${imageTitle}" alt="" width="150"/>
+	                                <c:if test="${!empty entity.imageFile}"></a></c:if>
+	                                <c:if test="${showEdits}">
+	                                    <c:set var="editLinks"><edLnk:editLinks item="<%= VitroVocabulary.IMAGETHUMB %>" data="${entity.imageThumb}" icons="false"/></c:set>
+	                                    <c:if test="${!empty editLinks}"><span class="editLinks">${editLinks}</span></c:if>                                                                     
+	                                </c:if>                                   
+	                            </div>
+	                        </div>
+	                    </div> 
                 
-                    <%-- Citation --%>
-                    <div id="dprop-vitro-citation" class="propsItem ${editingClass}">   
-                        <c:if test="${showEdits}">                           
-                            <h3 class="propertyName">citation</h3>
-                            <edLnk:editLinks item="<%= VitroVocabulary.CITATION %>" icons="false"/>
-                        </c:if>
-                        <c:if test="${!empty entity.citation}">
-                            <div class="datatypeProperties">
-                                <div class="datatypePropertyValue">
-                                    <div class="statementWrap">
-                                        ${entity.citation}
-                                        <c:if test="${showEdits}">
-                                            <c:set var="editLinks"><edLnk:editLinks item="<%= VitroVocabulary.CITATION %>" data="${entity.citation}" icons="false"/></c:set>
-                                            <c:if test="${!empty editLinks}"><span class="editLinks">${editLinks}</span></c:if>                                                                     
-                                        </c:if> 
-                                    </div>
-                                </div>
-                            </div>
-                        </c:if>     
-                    </div>
-                </c:if>
-            </div>
+	                    <%-- Citation --%>
+                        <jsp:include page="entityCitation.jsp">
+                            <jsp:param name="showEdits" value="${showEdits}" />
+                        </jsp:include>
+                        
+	                </c:if>
+	            </div>
+            </c:if>
             
             <p:process>
 
@@ -295,31 +290,20 @@ RY Description not working - FIX
 
             <p:process>
                 <%-- Citation, if no thumbnail --%>
-                <c:if test="${empty entity.imageThumb}">
-                    <div id="dprop-vitro-citation" class="propsItem ${editingClass}">   
-                        <c:if test="${showEdits}">                           
-                            <h3 class="propertyName">citation</h3>
-                            <edLnk:editLinks item="<%= VitroVocabulary.CITATION %>" icons="false"/>
-                        </c:if>
-                        <c:if test="${!empty entity.citation}">
-                            <div class="datatypeProperties">
-                                <div class="datatypePropertyValue">
-                                    <div class="statementWrap">
-                                        ${entity.citation}
-                                        <c:if test="${showEdits}">
-                                            <c:set var="editLinks"><edLnk:editLinks item="<%= VitroVocabulary.CITATION %>" data="${entity.citation}" icons="false"/></c:set>
-                                            <c:if test="${!empty editLinks}"><span class="editLinks">${editLinks}</span></c:if>                                                                     
-                                        </c:if> 
-                                    </div>
-                                </div>
-                            </div>
-                        </c:if>     
-                    </div>
-                </c:if>
+                <c:if test="${empty entity.imageThumb}"> 
+                    <jsp:include page="entityCitation.jsp">
+                        <jsp:param name="showEdits" value="${showEdits}" />
+                    </jsp:include>
+	            </c:if>
+                
+                <%-- Keywords --%>
                 <c:if test="${!empty entity.keywordString}">
                     <p id="keywords">Keywords: ${entity.keywordString}</p>
                 </c:if>
+                
             </p:process>
+            
             ${requestScope.servletButtons}
+            
         </div> <!--  contents -->
     </div> <!-- content -->
