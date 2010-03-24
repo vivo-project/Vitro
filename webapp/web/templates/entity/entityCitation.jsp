@@ -2,6 +2,7 @@
 
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary" %>
 
+<%@ taglib uri="http://vitro.mannlib.cornell.edu/vitro/tags/PropertyEditLink" prefix="edLnk" %>
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c" %>
 
 <c:if test="${showEdits || !empty entity.citation}">

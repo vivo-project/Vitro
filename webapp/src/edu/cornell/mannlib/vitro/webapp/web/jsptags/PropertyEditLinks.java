@@ -2,15 +2,10 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.jsptags;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
@@ -46,8 +41,9 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.RdfLiteralHash;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.RdfLiteralHash;
+import edu.cornell.mannlib.vitro.webapp.utils.FrontEndEditingUtils;
 
 /**
  * JSP tag to generate the HTML of links for edit, delete or
@@ -604,7 +600,7 @@ public class PropertyEditLinks extends TagSupport{
     
     
     private boolean isVitroNsProp(String predicateUri) {       
-        return VitroVocabulary.VITRO_NS_PROPERTIES.contains(predicateUri);
+        return FrontEndEditingUtils.VITRO_NS_PROPS_FOR_FRONT_END_EDITING.contains(predicateUri);
     }
 
 }

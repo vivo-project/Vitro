@@ -13,8 +13,9 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.VitroRequest"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement" %>
-<%@page import="edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils"%>
-<%@page import="edu.cornell.mannlib.vitro.webapp.utils.StringUtils" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils"%>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.utils.StringUtils" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.utils.FrontEndEditingUtils" %>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
@@ -76,7 +77,7 @@
         
     } else {
         log.debug("No incoming vitro namespace property statement for property "+predicateUri+"; adding a new statement");  
-        rangeDatatypeUri = VitroVocabulary.getVitroNsPropDatatypeUri(predicateUri);   
+        rangeDatatypeUri = FrontEndEditingUtils.getVitroNsPropDatatypeUri(predicateUri);   
     }
     
     String rangeDatatypeUriJson = rangeDatatypeUri == null ? "" : MiscWebUtils.escape(rangeDatatypeUri);
