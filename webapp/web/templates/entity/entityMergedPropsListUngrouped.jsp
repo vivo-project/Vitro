@@ -70,7 +70,7 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
  		<c:set var="stmtCounter" value="0"/>
 <%		if (p instanceof ObjectProperty) {
  			ObjectProperty op = (ObjectProperty)p;%>
- 			<c:set var="objProp" value="<%=op%>"/>
+ 			<c:set var="objProp" value="<%=op%>"/> 		
  			<c:set var="editableInSomeWay" value="${false}"/>
  			<c:if test="${showSelfEdits || showCuratorEdits}">
 	    		<edLnk:editLinks item="${objProp}" var="links" />
@@ -78,6 +78,7 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 	    			<c:set var="editableInSomeWay" value="${true}"/>
 	    		</c:if>                                                       
       		</c:if>
+      		
 	    	<c:set var="objStyle" value="display: block;"/>
 	    	<c:set var="objRows" value="${fn:length(objProp.objectPropertyStatements)}"/>
 	    	<c:if test="${objRows==0}"><c:set var="objStyle" value="display: block;"/></c:if>
@@ -136,12 +137,29 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 					<c:if test="${objRows>0}">
       					<ul class='properties'>
   					</c:if>
-					<c:forEach items="${objProp.objectPropertyStatements}" var="objPropertyStmt">
+					<c:set var="collateByClass" value="<%=op.getCollateBySubclass()%>"/>
+					<c:if test="${collateByClass }" >
+						<c:set var="collateClassesShownCount" value="0"/>
+						<c:set var="collateCurrentClass" value="_none"/>				
+					</c:if>
+					<c:forEach items="${objProp.objectPropertyStatements}" var="objPropertyStmt">															
+						<c:if test="${ collateByClass && collateCurrentClass!=objPropertyStmt.object.VClassURI}">						   
+		            		<c:if test="${ collateClassesShownCount > 0 }">
+		            			</ul></li><!-- collateClasses -->
+		            		</c:if>
+		            		<c:set var="collateCurrentClass" value="${objPropertyStmt.object.VClassURI}" />
+		            		<c:set var="collateCurrentClassName" value="${objPropertyStmt.object.VClass.name}" />
+		            		<c:set var="collateClassesShownCount" value="${collateClassesShown + 1}"/>		            		
+		            		<li>
+		            		${collateCurrentClassName }
+		            		<ul class='properties'><!-- collateClasses -->
+		            	</c:if>
+		            	
 						<c:if test="${stmtCounter == displayLimit}"><!-- set up toggle div and expandable continuation div -->
   							</ul>
   		                	<c:set var="hiddenDivCount" value="${hiddenDivCount+1}"/>
 							<c:url var="themePath" value="/${themeDir}site_icons" />
-
+						
                <div class="navlinkblock ">
                  <span class="entityMoreSpan">
                    <c:out value='${objRows - stmtCounter}' />
@@ -199,6 +217,7 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
       					</span></li>
 						<c:set var="stmtCounter" value="${stmtCounter+1}"/>
 					</c:forEach>
+					<c:if test="${ collateClassesShownCount > 0 }"></ul></li><!-- collateClasses 2 --></c:if>					
 					<c:if test="${objRows > 0}"></ul></c:if>
    					<c:if test="${stmtCounter > displayLimit}">
    					</div><%-- navlinkblock --%>
