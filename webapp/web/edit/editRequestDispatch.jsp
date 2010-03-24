@@ -234,7 +234,8 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 
     request.setAttribute("form", form);
 %>
-<jsp:forward page="/edit/forms/${form}"/>
+<jsp:forward page="/edit/forms/${form}" />
+
 
 <%!
 

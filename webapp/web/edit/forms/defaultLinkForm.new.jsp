@@ -9,7 +9,7 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.DataProperty" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary"%>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary" %>
 
 <%@ page import="java.util.List" %>
 
@@ -18,15 +18,13 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
 <%@ taglib prefix="v" uri="http://vitro.mannlib.cornell.edu/vitro/tags" %>
-<%! 
+<%!  
     public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.edit.forms.defaultLinkForm.jsp");
-%>
-<%
-    String predicateUri = (String)request.getAttribute("predicateUri");
 %>
 
 <c:set var="vitroUri" value="<%= VitroVocabulary.vitroURI %>" />
 <c:set var="rdfUri" value="<%= VitroVocabulary.RDF %>" />
+<c:set var="rdfsUri" value="<%= VitroVocabulary.RDFS %>" />
 
 <%--  Enter here any class names to be used for constructing INDIVIDUALS_VIA_VCLASS pick lists
       These are then referenced in the field's ObjectClassUri but not elsewhere.
@@ -39,20 +37,18 @@
       Each of these must then be referenced in the sparqlForExistingLiterals section of the JSON block below
       and in the literalsOnForm --%>
 <v:jsonset var="urlExisting" >
-      PREFIX vitro: <${vitroUri}> .
       SELECT ?urlExisting
-      WHERE { ?link vitro:linkURL ?urlExisting }
+      WHERE { ?link <${predicateUri}> ?urlExisting }
 </v:jsonset>
 <%--  Pair the "existing" query with the skeleton of what will be asserted for a new statement involving this field.
       The actual assertion inserted in the model will be created via string substitution into the ? variables.
       NOTE the pattern of punctuation (a period after the prefix URI and after the ?field) --%> 
 <v:jsonset var="urlAssertion" >
-      @prefix vitro: <${vitroUri}> .
-      ?link vitro:linkURL ?url .
+      ?link <${predicateUri}> ?url .
 </v:jsonset>
 
 <v:jsonset var="anchorExisting" >
-      PREFIX vitro: <${vitroUri}> .
+      PREFIX vitro: <${vitroUri}>
       SELECT ?anchorExisting
       WHERE { ?link vitro:linkAnchor ?anchorExisting }
 </v:jsonset>
@@ -68,7 +64,7 @@
       @prefix rdf:  <${rdfUri}> .
       @prefix vitro: <${vitroUri}> .
 
-      ?subject <${predicateUri}>  ?link .
+      ?subject <${predicateUri}> ?link .
 
       ?link rdf:type vitro:Link .
 
@@ -96,7 +92,7 @@
     
     "n3required"        : [ "${n3ForEdit}" ],
     "n3optional"        : [ "${n3Optional}" ],
-    "newResources"      : { "link" : "http://vivo.library.cornell.edu/ns/0.1#individual" },
+    "newResources"      : { },
     "urisInScope"       : { },
     "literalsInScope"   : { },
     "urisOnForm"        : [ ],
@@ -143,6 +139,7 @@
         editConfig = new EditConfiguration((String)request.getAttribute("editjson"));
         EditConfiguration.putConfigInSession(editConfig, session);
     }
+    
 
     Model model =  (Model)application.getAttribute("jenaOntModel");
     String objectUri = (String)request.getAttribute("objectUri");    
@@ -156,14 +153,13 @@
     Individual subject = (Individual)request.getAttribute("subject");
 
     String submitLabel=""; 
-    String title="";
-    String linkType = predicateUri.equals(VitroVocabulary.PRIMARY_LINK) ? "primary" : "additional";
+    String title = "";
     if (objectUri != null) {
-    	title = "Edit <em>" + linkType + " link</em> for " + subject.getName();
+    	title = "Edit <em>url</em> for " + subject.getName();
         submitLabel = "Save changes";
     } else {
-        title = "Create a new <em>" + linkType + " link</em> for " + subject.getName();
-        submitLabel = "Create new link";
+        title = "Create a new <em>url</em> for " + subject.getName();
+        submitLabel = "Create new url";
     }
 
 %>
@@ -173,8 +169,8 @@
 <h2><%= title %></h2>
 <form action="<c:url value="/edit/processRdfForm2.jsp"/>" >
     <v:input type="text" label="URL" id="url" size="70"/>
-    <v:input type="text" label="Link anchor text" id="anchor" size="60"/>
-    <p class="submit"><v:input type="submit" id="submit" value="<%=submitLabel%>" cancel="${param.subjectUri}"/></p>
+    <v:input type="text" label="Anchor text" id="anchor" size="60"/><br />
+    <v:input type="submit" id="submit" value="<%=submitLabel%>" cancel="${param.subjectUri}"/>
 </form>
 
 <jsp:include page="${postForm}"/>

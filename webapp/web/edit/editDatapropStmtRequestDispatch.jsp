@@ -36,7 +36,7 @@
       ************************************** */
 
     final String DEFAULT_DATA_FORM = "defaultDatapropForm.jsp";
-    final String DEFAULT_VITRO_NS_FORM = "defaultVitroNsPropForm.jsp";
+    final String DEFAULT_VITRO_NS_FORM = "defaultVitroNsDataPropForm.jsp";
     final String DEFAULT_ERROR_FORM = "error.jsp";
     
     if (!VitroRequestPrep.isSelfEditing(request) && !LoginFormBean.loggedIn(request, LoginFormBean.NON_EDITOR)) {        

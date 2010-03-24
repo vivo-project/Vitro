@@ -12,16 +12,20 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 public class FrontEndEditingUtils {
  
-    public static final List<String> VITRO_NS_PROPS_FOR_FRONT_END_EDITING = Arrays.asList(VitroVocabulary.BLURB, 
-                                                                                          VitroVocabulary.CITATION, 
-                                                                                          VitroVocabulary.DESCRIPTION, 
-                                                                                          VitroVocabulary.IMAGETHUMB, 
-                                                                                          VitroVocabulary.LABEL, 
-                                                                                          VitroVocabulary.LINK_ANCHOR, 
-                                                                                          VitroVocabulary.MONIKER, 
-                                                                                          VitroVocabulary.PRIMARY_LINK                                                                                          
-                                                                                          //, RDF_TYPE, TIMEKEY
-                                                                                          );
+    public static final List<String> VITRO_NS_DATAPROPS = Arrays.asList(VitroVocabulary.BLURB,                                                                         
+                                                                        VitroVocabulary.CITATION, 
+                                                                        VitroVocabulary.DESCRIPTION, 
+                                                                        VitroVocabulary.IMAGETHUMB, 
+                                                                        VitroVocabulary.LABEL, 
+                                                                        VitroVocabulary.MONIKER
+                                                                        // VitroVocabulary.RDF_TYPE,
+                                                                        // VitroVocabulary.TIMEKEY
+                                                                        );
+    
+    public static final List<String> VITRO_NS_OBJECT_PROPS = Arrays.asList(VitroVocabulary.ADDITIONAL_LINK,
+                                                                           VitroVocabulary.PRIMARY_LINK
+                                                                           );
+            
 
     public static String getVitroNsPropDatatypeUri(String propName) {
         //Resource datatype = propName == TIMEKEY ? XSD.dateTime : XSD.xstring;

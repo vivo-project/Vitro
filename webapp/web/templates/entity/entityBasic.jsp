@@ -149,11 +149,19 @@ RY Description not working - FIX
             </div> <!-- end labelAndMoniker -->
             
             <%-- Links --%>
-            <c:if test="${ showEdits || !empty entity.anchor || !empty entity.linksList }"> 
-                <div id="dprop-vitro-link" class="propsItem ${editingClass}">
+            <c:if test="${ showEdits || !empty entity.url || !empty entity.linksList }"> 
+                <div id="dprop-vitro-urls" class="propsItem ${editingClass}">
                     <c:if test="${showEdits}">
                         <h3 class="propertyName">links</h3>
-                        <edLnk:editLinks item="<%= VitroVocabulary.LINK_ANCHOR %>" icons="false" />
+                        <c:choose>
+                            <c:when test="${empty entity.url}">
+                                <c:set var="addUrlPredicate" value="<%= VitroVocabulary.PRIMARY_LINK %>" />
+                            </c:when>
+                            <c:otherwise>
+                                <c:set var="addUrlPredicate" value="<%= VitroVocabulary.ADDITIONAL_LINK %>" />
+                            </c:otherwise>
+                        </c:choose>
+                        <edLnk:editLinks item="${addUrlPredicate}" icons="false" />
                     </c:if>
                     <div class="datatypeProperties">
                         <div class="datatypePropertyValue">
