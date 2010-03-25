@@ -156,7 +156,7 @@ public class PropertyEditLinks extends TagSupport{
                     // This is NOT the correct object property statement - we need the link individual uri in data, instead of the link URL
                     // Then we can combine this with doObjPropStmt
                     ObjectPropertyStatement prop = new ObjectPropertyStatementImpl(subjectUri, predicateUri, data);
-                    links = doVitroNsObjPropStmt( subjectUri, predicateUri, data, policyToAccess(ids, policy, prop), contextPath );                       
+                    links = doObjPropStmt( prop, policyToAccess(ids, policy, prop), contextPath );                       
                 }                    
             }
             else {
@@ -426,24 +426,8 @@ public class PropertyEditLinks extends TagSupport{
         String subjectUri = opropStmt.getSubjectURI();
         String predicateUri = opropStmt.getPropertyURI();
         String objectUri = opropStmt.getObjectURI();
-        String mouseoverLabel = "relationship";
         
-        return doObjPropStmt(subjectUri, predicateUri, objectUri, allowedAccessTypeArray, contextPath, mouseoverLabel);
-    }
-    
-    protected LinkStruct[] doVitroNsObjPropStmt(String subjectUri, String predicateUri, String objectUri, EditLinkAccess[] allowedAccessTypeArray, String contextPath) {
-        if( allowedAccessTypeArray == null || subjectUri == null || allowedAccessTypeArray.length == 0 ) {
-            log.info("null or empty access type array in doObjPropStmt for " + predicateUri);
-            return empty_array;
-        }
-
-        Model model =  (Model)pageContext.getServletContext().getAttribute("jenaOntModel");
-
         String mouseoverLabel = getObjPropMouseoverLabel(predicateUri);
-        return doObjPropStmt(subjectUri, predicateUri, objectUri, allowedAccessTypeArray, contextPath, mouseoverLabel);
-    }
-       
-    protected LinkStruct[] doObjPropStmt(String subjectUri, String predicateUri, String objectUri, EditLinkAccess[] allowedAccessTypeArray, String contextPath, String mouseoverLabel) {       
         
         LinkStruct[] links = new LinkStruct[2];
         int index=0;

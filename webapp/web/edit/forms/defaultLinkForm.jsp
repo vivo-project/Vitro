@@ -2,6 +2,8 @@
 
 <%@ page import="com.hp.hpl.jena.rdf.model.Literal" %>
 <%@ page import="com.hp.hpl.jena.rdf.model.Model" %>
+<%@ page import="com.hp.hpl.jena.vocabulary.XSD" %>
+
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Individual" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.VClass" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration" %>
@@ -10,6 +12,7 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.DataProperty" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary"%>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils"%>
 
 <%@ page import="java.util.List" %>
 
@@ -27,12 +30,20 @@
     vreq.setAttribute("defaultNamespace", wdf.getDefaultNamespace());
     
     String propertyUri = (String) request.getAttribute("predicateUri");
-    String objectUri = (String) request.getAttribute("objectUri");
-   
+    String objectUri = (String) request.getAttribute("objectUri");  
+    
+    String stringDatatypeUriJson = MiscWebUtils.escape(XSD.xstring.toString());
+    String uriDatatypeUriJson = MiscWebUtils.escape(XSD.anyURI.toString());
 %>
 
-<c:set var="vitroUri" value="<%= VitroVocabulary.vitroURI %>" />
+<c:set var="stringDatatypeUriJson" value="<%= stringDatatypeUriJson %>" />
+<c:set var="uriDatatypeUriJson" value="<%= uriDatatypeUriJson %>" />
+
 <c:set var="rdfUri" value="<%= VitroVocabulary.RDF %>" />
+<c:set var="vitroUri" value="<%= VitroVocabulary.vitroURI %>" />
+<c:set var="linkUrl" value="<%= VitroVocabulary.LINK_URL %>" />
+<c:set var="linkAnchor" value="<%= VitroVocabulary.LINK_ANCHOR %>" />
+<c:set var="linkDisplayRank" value="<%= VitroVocabulary.LINK_DISPLAYRANK_URL %>" />
 
 <%--  Enter here any class names to be used for constructing INDIVIDUALS_VIA_VCLASS pick lists
       These are then referenced in the field's ObjectClassUri but not elsewhere.
@@ -46,23 +57,30 @@
       and in the literalsOnForm --%>
 <v:jsonset var="urlExisting" >
       SELECT ?urlExisting
-      WHERE { ?subject ?predicate  ?urlExisting }
+      WHERE { ?link <${linkUrl}>  ?urlExisting }
 </v:jsonset>
 <%--  Pair the "existing" query with the skeleton of what will be asserted for a new statement involving this field.
       The actual assertion inserted in the model will be created via string substitution into the ? variables.
       NOTE the pattern of punctuation (a period after the prefix URI and after the ?field) --%> 
 <v:jsonset var="urlAssertion" >
-      ?subject ?predicate  ?url .
+      ?link <${linkUrl}>  ?url .
 </v:jsonset>
 
 <v:jsonset var="anchorExisting" >
-      PREFIX vitro: <${vitroUri}> .
       SELECT ?anchorExisting
-      WHERE { ?link vitro:linkAnchor ?anchorExisting }
+      WHERE { ?link <${linkAnchor}> ?anchorExisting } 
 </v:jsonset>
 <v:jsonset var="anchorAssertion" >
-      @prefix vitro: <${vitroUri}> .
-      ?link vitro:linkAnchor ?anchor .
+      ?link <${linkAnchor}> ?anchor .
+</v:jsonset>
+
+<%-- RY Currently display rank is always hard-coded to -1, but later we may want to enable sorting. --%>
+<v:jsonset var="displayRankExisting" >
+      SELECT ?displayRankExisting
+      WHERE { ?link <${linkDisplayRank}> ?displayRankExisting } 
+</v:jsonset>
+<v:jsonset var="displayRankAssertion" >
+      ?link <${linkDisplayRank}> ?displayRank .
 </v:jsonset>
 
 <%--  When not retrieving a literal via a datatype property, put the SPARQL statement into
@@ -77,16 +95,12 @@
       ?link rdf:type vitro:Link .
 
       ?link
-          vitro:linkURL         ?url ;
-          vitro:linkAnchor      ?anchor .
+          <${linkUrl}>  ?url ;
+          <${linkAnchor}> ?anchor ;
+          <${linkDisplayRank}> ?displayRank .
           
 </v:jsonset>
 
-<v:jsonset var="n3Optional">
-      @prefix rdf:  <${rdfUri}> .
-    
-      ?link rdf:type ?type .
-</v:jsonset>
 
 <c:set var="editjson" scope="request">
   {
@@ -99,48 +113,61 @@
     "object"    : ["link", "${objectUriJson}", "URI" ],
     
     "n3required"        : [ "${n3ForEdit}" ],
-    "n3optional"        : [ "${n3Optional}" ],
+    "n3optional"        : [ ],
     "newResources"      : { "link" : "${defaultNamespace}" },
     "urisInScope"       : { },
     "literalsInScope"   : { },
     "urisOnForm"        : [ ],
-    "literalsOnForm"    : [ "url", "anchor" ],
+    "literalsOnForm"    : [ "url", "anchor", "displayRank" ],
     "filesOnForm"       : [ ],
     "sparqlForLiterals" : { },
     "sparqlForUris"     : { },
     "sparqlForExistingLiterals" : {
         "url"         : "${urlExisting}",
-        "anchor"      : "${anchorExisting}"
+        "anchor"      : "${anchorExisting}",
+        "displayRank" : "${displayRankExisting}"
     },
     "sparqlForExistingUris" : { },
     "fields" : {
       "url" : {
          "newResource"      : "false",
-         "validators"       : [ "nonempty" ],
+         "validators"       : [ "nonempty", "datatype:${uriDatatypeUriJson}" ],
          "optionsType"      : "UNDEFINED",
          "literalOptions"   : [ ],
          "predicateUri"     : "",
          "objectClassUri"   : "",
-         "rangeDatatypeUri" : "",
+         "rangeDatatypeUri" : "${uriDatatypeUriJson}",
          "rangeLang"        : "",
          "assertions"       : [ "${urlAssertion}" ]
       },
       "anchor" : {
          "newResource"      : "false",
-         "validators"       : [ "nonempty" ],
+         "validators"       : [ "nonempty", "datatype:${stringDatatypeUriJson}" ],
          "optionsType"      : "UNDEFINED",
          "literalOptions"   : [ ],
          "predicateUri"     : "",
          "objectClassUri"   : "",
-         "rangeDatatypeUri" : "",
+         "rangeDatatypeUri" : "${stringDatatypeUriJson}",
          "rangeLang"        : "",
          "assertions"       : [ "${anchorAssertion}" ]
+      },
+      "displayRank" : {
+         "newResource"      : "false",
+         "validators"       : [ ],
+         "optionsType"      : "UNDEFINED",
+         "literalOptions"   : [ ],
+         "predicateUri"     : "",
+         "objectClassUri"   : "",
+         "rangeDatatypeUri" : "${stringDatatypeUriJson}",
+         "rangeLang"        : "",
+         "assertions"       : [ "${displayRankAssertion}" ]      
       }
     }
   }
 </c:set>
 <%
     log.debug(request.getAttribute("editjson"));
+System.out.println(request.getAttribute("editjson"));
     
     EditConfiguration editConfig = EditConfiguration.getConfigFromSession(session,request);
     if( editConfig == null ){
@@ -156,16 +183,16 @@
     }
 
     /* get some data to make the form more useful */
-    Individual subject = (Individual)request.getAttribute("subject");
+    String subjectName = ((Individual)request.getAttribute("subject")).getName();
 
     String submitLabel=""; 
     String title="";
-    String linkType = propertyUri.equals(VitroVocabulary.PRIMARY_LINK) ? "primary" : "additional";
+    String linkCategory = propertyUri.equals(VitroVocabulary.PRIMARY_LINK) ? "primary" : "additional";
     if (objectUri != null) {
-    	title = "Edit <em>" + linkType + " link</em> for " + subject.getName();
+    	title = "Edit <em>" + linkCategory + " link</em> for " + subjectName;
         submitLabel = "Save changes";
     } else {
-        title = "Create a new <em>" + linkType + " link</em> for " + subject.getName();
+        title = "Create a new <em>" + linkCategory + " link</em> for " + subjectName;
         submitLabel = "Create new link";
     }
 
@@ -177,6 +204,7 @@
 <form action="<c:url value="/edit/processRdfForm2.jsp"/>" >
     <v:input type="text" label="URL" id="url" size="70"/>
     <v:input type="text" label="Link anchor text" id="anchor" size="70"/>
+    <input type="hidden" name="displayRank" value="-1" />
     <p class="submit"><v:input type="submit" id="submit" value="<%=submitLabel%>" cancel="${param.subjectUri}"/></p>
 </form>
 
