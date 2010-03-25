@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.beans;
 
-import edu.cornell.mannlib.vitro.webapp.beans.*;
 import org.json.JSONException;
 import org.json.JSONObject;
 
