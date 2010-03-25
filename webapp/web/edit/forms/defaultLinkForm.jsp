@@ -22,7 +22,13 @@
     public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.edit.forms.defaultLinkForm.jsp");
 %>
 <%
-    String predicateUri = (String)request.getAttribute("predicateUri");
+    VitroRequest vreq = new VitroRequest(request);
+    WebappDaoFactory wdf = vreq.getWebappDaoFactory();
+    vreq.setAttribute("defaultNamespace", wdf.getDefaultNamespace());
+    
+    String propertyUri = (String) request.getAttribute("predicateUri");
+    String objectUri = (String) request.getAttribute("objectUri");
+   
 %>
 
 <c:set var="vitroUri" value="<%= VitroVocabulary.vitroURI %>" />
@@ -39,16 +45,14 @@
       Each of these must then be referenced in the sparqlForExistingLiterals section of the JSON block below
       and in the literalsOnForm --%>
 <v:jsonset var="urlExisting" >
-      PREFIX vitro: <${vitroUri}> .
       SELECT ?urlExisting
-      WHERE { ?link vitro:linkURL ?urlExisting }
+      WHERE { ?subject ?predicate  ?urlExisting }
 </v:jsonset>
 <%--  Pair the "existing" query with the skeleton of what will be asserted for a new statement involving this field.
       The actual assertion inserted in the model will be created via string substitution into the ? variables.
       NOTE the pattern of punctuation (a period after the prefix URI and after the ?field) --%> 
 <v:jsonset var="urlAssertion" >
-      @prefix vitro: <${vitroUri}> .
-      ?link vitro:linkURL ?url .
+      ?subject ?predicate  ?url .
 </v:jsonset>
 
 <v:jsonset var="anchorExisting" >
@@ -68,7 +72,7 @@
       @prefix rdf:  <${rdfUri}> .
       @prefix vitro: <${vitroUri}> .
 
-      ?subject <${predicateUri}>  ?link .
+      ?subject ?predicate  ?link .
 
       ?link rdf:type vitro:Link .
 
@@ -96,7 +100,7 @@
     
     "n3required"        : [ "${n3ForEdit}" ],
     "n3optional"        : [ "${n3Optional}" ],
-    "newResources"      : { "link" : "http://vivo.library.cornell.edu/ns/0.1#individual" },
+    "newResources"      : { "link" : "${defaultNamespace}" },
     "urisInScope"       : { },
     "literalsInScope"   : { },
     "urisOnForm"        : [ ],
@@ -144,8 +148,7 @@
         EditConfiguration.putConfigInSession(editConfig, session);
     }
 
-    Model model =  (Model)application.getAttribute("jenaOntModel");
-    String objectUri = (String)request.getAttribute("objectUri");    
+    Model model =  (Model)application.getAttribute("jenaOntModel");   
     if( objectUri != null ){        
         editConfig.prepareForObjPropUpdate(model);            
     }else{
@@ -157,7 +160,7 @@
 
     String submitLabel=""; 
     String title="";
-    String linkType = predicateUri.equals(VitroVocabulary.PRIMARY_LINK) ? "primary" : "additional";
+    String linkType = propertyUri.equals(VitroVocabulary.PRIMARY_LINK) ? "primary" : "additional";
     if (objectUri != null) {
     	title = "Edit <em>" + linkType + " link</em> for " + subject.getName();
         submitLabel = "Save changes";
@@ -173,7 +176,7 @@
 <h2><%= title %></h2>
 <form action="<c:url value="/edit/processRdfForm2.jsp"/>" >
     <v:input type="text" label="URL" id="url" size="70"/>
-    <v:input type="text" label="Link anchor text" id="anchor" size="60"/>
+    <v:input type="text" label="Link anchor text" id="anchor" size="70"/>
     <p class="submit"><v:input type="submit" id="submit" value="<%=submitLabel%>" cancel="${param.subjectUri}"/></p>
 </form>
 

@@ -23,8 +23,8 @@
 public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.templates.entity.entityBasic.jsp");
 %>
 <%
-log.debug("Starting entityBasic.jsp");
-Individual entity = (Individual)request.getAttribute("entity");
+    log.debug("Starting entityBasic.jsp");
+    Individual entity = (Individual)request.getAttribute("entity");
 %>
 
 <c:set var="labelUri" value="http://www.w3.org/2000/01/rdf-schema#label" />
@@ -86,13 +86,6 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
 <c:set var='portal' value='${currentPortalId}'/>
 <c:set var='portalBean' value='${currentPortal}'/>
 
-<%-- Using VitroVocabulary constants instead. 
-RY Description not working - FIX
-<c:set var="labelUri" value="http://www.w3.org/2000/01/rdf-schema#label" />
-<c:set var="typeUri" value="http://www.w3.org/1999/02/22-rdf-syntax-ns#type" />
-<c:set var="vitroUri" value="http://vitro.mannlib.cornell.edu/ns/vitro/0.7#" />
---%>
-
 <c:set var='themeDir'><c:out value='${portalBean.themeDir}' /></c:set>
 
     <div id="content">
@@ -150,7 +143,7 @@ RY Description not working - FIX
             
             <%-- Links --%>
             <c:if test="${ showEdits || !empty entity.url || !empty entity.linksList }"> 
-                <div id="dprop-vitro-urls" class="propsItem ${editingClass}">
+                <div id="dprop-vitro-links" class="propsItem ${editingClass}">
                     <c:if test="${showEdits}">
                         <h3 class="propertyName">links</h3>
                         <c:choose>
@@ -163,42 +156,49 @@ RY Description not working - FIX
                         </c:choose>
                         <edLnk:editLinks item="${addUrlPredicate}" icons="false" />
                     </c:if>
-                    <div class="datatypeProperties">
-                        <div class="datatypePropertyValue">
-                            <div class="statementWrap">
-                                <ul class="externalLinks">
-                                    <c:if test="${!empty entity.anchor}">
-                                        <c:choose>
-                                            <c:when test="${!empty entity.url}">
-                                                <c:url var="entityUrl" value="${entity.url}" />
-                                                <li class="primary"><a class="externalLink" href="<c:out value="${entityUrl}"/>"><p:process>${entity.anchor}</p:process></a></li>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <li class="primary"><span class="externalLink"><p:process>${entity.anchor}</p:process></span></li>
-                                            </c:otherwise>
-                                        </c:choose>
-                                        <%--
-                                        <c:if test="${showEdits}">
-                                            <c:set var="editLinks"><edLnk:editLinks item="<%= VitroVocabulary.LINK_ANCHOR %>" data="${entity.anchor}" icons="false"/></c:set>
-                                            <c:if test="${!empty editLinks}"><span class="editLinks">${editLinks}</span></c:if>                                                                           
-                                        </c:if>
-                                        --%> 
-                                    </c:if>
-                                    <c:if test="${!empty entity.linksList }">
-                                        <c:forEach items="${entity.linksList}" var='link' varStatus="count">
-                                            <c:url var="linkUrl" value="${link.url}" />
-                                            <c:choose>
-                                                <c:when test="${empty entity.url && count.first==true}"><li class="first"></c:when>
-                                                <c:otherwise><li></c:otherwise>
-                                            </c:choose>
-                                            <a class="externalLink" href="<c:out value="${linkUrl}"/>"><p:process>${link.anchor}</p:process></a></li>
-                                        </c:forEach>
-                                    </c:if>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                    <ul class="externalLinks properties">
+                        <%-- Primary link --%>
+                        <c:if test="${!empty entity.anchor}">                              
+                            <c:choose>
+                                <c:when test="${!empty entity.url}">
+                                    <c:url var="entityUrl" value="${entity.url}" />
+                                    <li class="primary">
+                                        <span class="statementWrap">
+                                            <a class="externalLink" href="<c:out value="${entityUrl}"/>"><p:process>${entity.anchor}</p:process></a>
+                                            <c:if test="${showEdits}">
+                                                <c:set var="editLinks"><edLnk:editLinks item="<%= VitroVocabulary.PRIMARY_LINK %>" data="${entity.url}" icons="false"/></c:set>
+                                                <c:if test="${!empty editLinks}"><span class="editLinks">${editLinks}</span></c:if>                                                                           
+                                            </c:if>
+                                        </span>
+                                    </li>
+                                </c:when>
+                                <c:otherwise>
+                                    <%--  RY For now, not providing editing links for anchor text with no url. Should fix. --%>
+                                    <li class="primary"><span class="externalLink"><p:process>${entity.anchor}</p:process></span></li>
+                                </c:otherwise>
+                            </c:choose>
+                        </c:if>
+                        
+                        <%-- Additional links --%>
+                        <c:if test="${!empty entity.linksList }">
+                            <c:forEach items="${entity.linksList}" var='link' varStatus="count"> 
+                                <c:url var="linkUrl" value="${link.url}" />
+                                <c:choose>
+                                    <c:when test="${empty entity.url && count.first==true}"><li class="first"></c:when>
+                                    <c:otherwise><li></c:otherwise>
+                                </c:choose>
+                                <span class="statementWrap">
+                                    <a class="externalLink" href="<c:out value="${linkUrl}"/>"><p:process>${link.anchor}</p:process></a>
+                                    <c:if test="${showEdits}">
+                                        <c:set var="editLinks"><edLnk:editLinks item="<%= VitroVocabulary.ADDITIONAL_LINK %>" data="${linkUrl}" icons="false"/></c:set>
+                                        <c:if test="${!empty editLinks}"><span class="editLinks">${editLinks}</span></c:if>                                                                           
+                                    </c:if>  
+                                </span>
+                                </li>                                          
+                            </c:forEach>
+                        </c:if>
+                    </ul>                   
+                </div> <!-- end dprop-vitro-links  -->
             </c:if>   
             
             <%-- Thumbnail (with citation) --%>

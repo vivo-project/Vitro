@@ -12,7 +12,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 public class FrontEndEditingUtils {
  
-    public static final List<String> VITRO_NS_DATAPROPS = Arrays.asList(VitroVocabulary.BLURB,                                                                         
+    public static final List<String> VITRO_NS_DATA_PROPS = Arrays.asList(VitroVocabulary.BLURB,                                                                         
                                                                         VitroVocabulary.CITATION, 
                                                                         VitroVocabulary.DESCRIPTION, 
                                                                         VitroVocabulary.IMAGETHUMB, 
