@@ -141,14 +141,14 @@ public class PropertyEditLinks extends TagSupport{
         } else if (item instanceof String) {            
             String predicateUri = (String) item;
             String subjectUri = entity.getURI();
-            if (isVitroNsDataProp(predicateUri)) {
+            if (FrontEndEditingUtils.isVitroNsDataProp(predicateUri)) {
                 if (data == null) { // link to add a new value
                     links = doVitroNsDataProp( subjectUri, predicateUri, policyToAccess(ids, policy, subjectUri, predicateUri), contextPath );
                 } else { // links to edit or delete an existing value
                     DataPropertyStatement dps = (DataPropertyStatement) new DataPropertyStatementImpl(subjectUri, predicateUri, data); 
                     links = doVitroNsDataPropStmt( dps, entity, policyToAccess(ids, policy, dps), contextPath );                       
                 }           
-            } else if (isVitroNsObjProp(predicateUri)) {
+            } else if (FrontEndEditingUtils.isVitroNsObjProp(predicateUri)) {
                 if (data == null) { // link to add a new value
                     links = doObjProp( subjectUri, predicateUri, policyToAccess(ids, policy, subjectUri, predicateUri), contextPath );
                 } else { // links to edit or delete an existing value  
@@ -638,15 +638,6 @@ public class PropertyEditLinks extends TagSupport{
         ls.setType(action);
         ls.setMouseoverText("upload a  new image");        
         return ls;
-    }
-    
-    
-    private boolean isVitroNsDataProp(String predicateUri) {       
-        return FrontEndEditingUtils.VITRO_NS_DATA_PROPS.contains(predicateUri);
-    }
-    
-    private boolean isVitroNsObjProp(String predicateUri) {       
-        return FrontEndEditingUtils.VITRO_NS_OBJECT_PROPS.contains(predicateUri);
     }
     
     private String getObjPropMouseoverLabel(String propertyUri) {

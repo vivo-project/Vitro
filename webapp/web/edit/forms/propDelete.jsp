@@ -6,9 +6,7 @@
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory.SelfEditing"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.identifier.RoleIdentifier"%>
-<%@page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditN3Utils"%><%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
-<%@ taglib prefix="v" uri="http://vitro.mannlib.cornell.edu/vitro/tags" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jstl/functions" %>
+<%@page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditN3Utils"%>
 <%@ page import="edu.cornell.mannlib.vedit.beans.LoginFormBean" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Individual" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement"%>
@@ -21,9 +19,17 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.LinksDao" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.utils.FrontEndEditingUtils" %>
+<%@ page import="com.hp.hpl.jena.rdf.model.Model" %>
+
 <%@ page import="java.util.List" %>
+
 <%@ page import="org.apache.commons.logging.Log" %>
 <%@ page import="org.apache.commons.logging.LogFactory" %>
+
+<%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
+<%@ taglib prefix="v" uri="http://vitro.mannlib.cornell.edu/vitro/tags" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jstl/functions" %>
 
 <%! 
 public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.edit.forms.propDelete.jsp");
@@ -46,7 +52,7 @@ public WebappDaoFactory getUnfilteredDaoFactory() {
     }
     boolean selfEditing = VitroRequestPrep.isSelfEditing(request);
     if (!selfEditing && !LoginFormBean.loggedIn(request, LoginFormBean.NON_EDITOR)) {%>
-        <c:redirect url="<%= Controllers.LOGIN %>" />
+        <c:redirect url="<%= Controllers.LOGIN %>" />       
 <%  }
 
     String subjectUri   = request.getParameter("subjectUri");
@@ -94,9 +100,15 @@ public WebappDaoFactory getUnfilteredDaoFactory() {
     String customShortView = null;
     String shortViewPrefix = "/templates/entity/";
     Individual object = getUnfilteredDaoFactory().getIndividualDao().getIndividualByURI(objectUri);
+    
     if( object == null ) {
-        log.warn("Could not find object individual "+objectUri+" via wdf.getIndividualDao().getIndividualByURI(objectUri)");
+        //log.warn("Could not find object individual "+objectUri+" via wdf.getIndividualDao().getIndividualByURI(objectUri)");
         request.setAttribute("objectName","(name unspecified)");
+      } else if (FrontEndEditingUtils.isVitroNsObjProp(predicateUri)) {
+          Model model = (Model)application.getAttribute("jenaOntModel");
+          request.setAttribute("individual", object);
+          request.setAttribute("objectName", FrontEndEditingUtils.getVitroNsObjDisplayName(predicateUri, object, model));
+          log.debug("setting object name " + (String)request.getAttribute("objectName") + " for vitro namespace object property " + predicateUri);
     } else {
         for (VClass clas : object.getVClasses(true)) { // direct VClasses, not inferred, and not including Vitro namespace
             request.setAttribute("rangeClassName", clas.getName());
@@ -130,7 +142,7 @@ public WebappDaoFactory getUnfilteredDaoFactory() {
 <jsp:include page="${preForm}"/>
 
 <form action="editRequestDispatch.jsp" method="get">
-    <label for="submit"><h2>Are you sure you want to delete the following entry from <em>${propertyName}</em>?</h2></label>
+    <label for="submit"><h2>Are you sure you want to delete the following entry for <em>${propertyName}</em>?</h2></label>
     <div class="toBeDeleted objProp">
     	<c:choose>
     		<c:when test="${!empty customShortView}">
