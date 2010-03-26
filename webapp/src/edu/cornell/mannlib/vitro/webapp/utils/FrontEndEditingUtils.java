@@ -70,7 +70,7 @@ public class FrontEndEditingUtils {
         if (StringUtils.equalsOneOf(predicateUri, VitroVocabulary.PRIMARY_LINK, VitroVocabulary.ADDITIONAL_LINK)) {            
             String linkAnchor = getLiteralValue(model, object, VitroVocabulary.LINK_ANCHOR);
             String linkUrl = getLiteralValue(model, object, VitroVocabulary.LINK_URL);            
-            displayName = "<a href='" + linkUrl + "'>" + linkAnchor + "</a>";                       
+            displayName = "<a class='externalLink' href='" + linkUrl + "'>" + linkAnchor + "</a>";                       
         }
         
         return displayName;

@@ -68,7 +68,7 @@ public WebappDaoFactory getUnfilteredDaoFactory() {
     if( prop == null ) {
         throw new Error("In propDelete.jsp, could not find property " + predicateUri);
     }
-    request.setAttribute("propertyName",prop.getDomainPublic());
+    request.setAttribute("propertyName",prop.getDomainPublic().toLowerCase());
 
     //do the delete
     if( request.getParameter("y") != null ) {
@@ -158,7 +158,7 @@ public WebappDaoFactory getUnfilteredDaoFactory() {
     <input type="hidden" name="objectUri"    value="${param.objectUri}"/>
     <input type="hidden" name="y"            value="1"/>
     <input type="hidden" name="cmd"          value="delete"/>
-    <v:input type="submit" id="submit" value="Delete" cancel="${param.subjectUri}" />
+    <p class="submit"><v:input type="submit" id="submit" value="Delete" cancel="${param.subjectUri}" /></p>
 	
 </form>
 
