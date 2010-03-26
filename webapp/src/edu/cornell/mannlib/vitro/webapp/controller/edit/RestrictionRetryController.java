@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.vocabulary.RDFS;
 import com.ibm.icu.text.Collator;
 
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
@@ -96,9 +97,6 @@ public class RestrictionRetryController extends BaseEditController {
 					request.setAttribute("propertyType", "object");	
 				} else {
 					request.setAttribute("propertyType", "data");
-					List<Option> datatypeOptions = getValueDatatypeOptionList();
-					datatypeOptions.add(0, new Option("", "none (plain literal)"));
-					epo.getFormObject().getOptionLists().put("ValueDatatype", datatypeOptions);
 				}	
 			} else if (restrictionTypeStr.equals("minCardinality") || restrictionTypeStr.equals("maxCardinality") || restrictionTypeStr.equals("cardinality")) {
 				request.setAttribute("specificRestrictionForm", "cardinalityRestriction_retry.jsp");
@@ -137,13 +135,14 @@ public class RestrictionRetryController extends BaseEditController {
 	}
 	
 	private List<Option> getValueDatatypeOptionList() {
-		List<Option> valueClassOptionList = new LinkedList<Option>();
+		List<Option> valueDatatypeOptionList = new LinkedList<Option>();
 		DatatypeDao dtDao = getWebappDaoFactory().getDatatypeDao();
 		for (Iterator i = dtDao.getAllDatatypes().iterator(); i.hasNext(); ) {
 			Datatype dt = (Datatype) i.next();
-			valueClassOptionList.add(new Option(dt.getUri(), dt.getName()));
+			valueDatatypeOptionList.add(new Option(dt.getUri(), dt.getName()));
 		}
-		return valueClassOptionList;
+		valueDatatypeOptionList.add(new Option(RDFS.Literal.getURI(), "rdfs:Literal"));
+		return valueDatatypeOptionList;
 	}
 	
 	private class PropSorter implements Comparator<Property> {
