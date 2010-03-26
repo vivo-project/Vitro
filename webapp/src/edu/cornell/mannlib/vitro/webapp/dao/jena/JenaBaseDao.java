@@ -345,7 +345,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
                  model.removeAll(res, dataprop, null);
             } else if (existingValue == null ) {
                  model.add(res, dataprop, Float.toString(value), XSDDatatype.XSDfloat);	
-            } else if (existingValue != value) {
+            } else if (existingValue.compareTo(value) != 0) {
          		 model.removeAll(res, dataprop, null);
           		 model.add(res, dataprop, Float.toString(value), XSDDatatype.XSDfloat);
             }
@@ -487,9 +487,9 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     }
 
     /**
-     * convenience method for use with functional object properties
+     * convenience method for use with functional properties
      */
-    protected void updatePropertyResourceURIValue(Resource res, ObjectProperty prop, String objectURI) {
+    protected void updatePropertyResourceURIValue(Resource res, Property prop, String objectURI) {
 
     	Model model = res.getModel();
     	
@@ -542,7 +542,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     }
 
     /**
-     * convenience method for use with functional object properties
+     * convenience method for use with functional properties
      */
     protected void updatePropertyResourceValue(Resource res, Property prop, Resource objectRes) {
         
@@ -555,7 +555,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     }
 
     /**
-     * convenience method for use with functional object properties
+     * convenience method for use with functional properties
      */
     protected void updatePropertyResourceValue(Resource res, Property prop, Resource objectRes, Model model) {
     	
@@ -585,17 +585,17 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     /**
      * convenience method for updating the RDFS label
      */
-    protected void updateRDFSLabel(OntClass ontCls, String label) {
+    protected void updateRDFSLabel(OntResource ontRes, String label) {
     	
     	if (label != null && label.length() > 0) {
     		
-    		String existingValue = ontCls.getLabel((String) getDefaultLanguage());
+    		String existingValue = ontRes.getLabel((String) getDefaultLanguage());
     	    
     		if (existingValue == null || !existingValue.equals(label)) {
-    			ontCls.setLabel(label, (String) getDefaultLanguage());	
+    			ontRes.setLabel(label, (String) getDefaultLanguage());	
     	    }
     	} else {
-    		ontCls.removeAll(RDFS.label);
+    		ontRes.removeAll(RDFS.label);
     	}
     }
     

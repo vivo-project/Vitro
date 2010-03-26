@@ -75,16 +75,17 @@ public class VClassDaoTest {
 		// Save copies of sub-model and super-model
 		
 		// uncommment the next two lines to debug failures
-		//System.out.println("**Before updating VClass:");		
-		//printModels(superModel, subModel);
+		System.out.println("**Before updating VClass:");		
+		printModels(superModel, subModel);
+		
+		superModel.removeSubModel(subModel);
 		
 		OntModel origSubModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
 		origSubModel.add(subModel);
-		
-		superModel.remove(subModel);
 		OntModel origSuperModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
 		origSuperModel.add(superModel);
-		superModel.add(subModel);
+		
+		superModel.addSubModel(subModel);
 		
 		// Populate the VClass with the data in the sub-model and then update the combined model
 		WebappDaoFactoryJena wdfj = new WebappDaoFactoryJena(superModel);
@@ -102,10 +103,11 @@ public class VClassDaoTest {
         // Verify that the sub-model and super-model are both unchanged
 
         // uncommment the next two lines to debug failures
-        //System.out.println("\n**After updating VClass:");
-        //printModels(superModel,subModel);
+        System.out.println("\n**After updating VClass:");
+        printModels(superModel,subModel);
 
-        superModel.remove(subModel);        
+        superModel.removeSubModel(subModel);
+        
 		//modtime affects the diff but we don't care about that difference
 		wipeOutModTime(origSubModel);
 		wipeOutModTime(origSuperModel);
@@ -123,7 +125,7 @@ public class VClassDaoTest {
 		// Detach the submodel for printing to get an accurate
 		// account of what is in each.
 		
-	    superModel.remove(subModel);
+	    superModel.removeSubModel(subModel);
 	    
 		System.out.println("\nThe sub-model has " + subModel.size() + " statements:");
 		System.out.println("---------------------------------------------------");
