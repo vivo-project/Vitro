@@ -75,8 +75,8 @@ public class VClassDaoTest {
 		// Save copies of sub-model and super-model
 		
 		// uncommment the next two lines to debug failures
-		System.out.println("**Before updating VClass:");		
-		printModels(superModel, subModel);
+		//System.out.println("**Before updating VClass:");		
+		//printModels(superModel, subModel);
 		
 		superModel.removeSubModel(subModel);
 		
@@ -103,8 +103,8 @@ public class VClassDaoTest {
         // Verify that the sub-model and super-model are both unchanged
 
         // uncommment the next two lines to debug failures
-        System.out.println("\n**After updating VClass:");
-        printModels(superModel,subModel);
+        //System.out.println("\n**After updating VClass:");
+        //printModels(superModel,subModel);
 
         superModel.removeSubModel(subModel);
         
