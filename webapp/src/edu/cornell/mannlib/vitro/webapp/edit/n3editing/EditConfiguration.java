@@ -251,12 +251,15 @@ public class EditConfiguration {
               UserToIndIdentifierFactory.getIndividualsForUser(ids);
                         
             if( userUris == null || userUris.size() == 0 ){
+            	System.out.println("Cound not find user ur for edit request");
                 log.error("Could not find a userUri for edit request, make " +
                         "sure that there is an IdentifierBundleFactory that " +
                 "produces userUri identifiers in the context.");
             } else if( userUris.size() > 1  ){
                 log.error("Found multiple userUris, using the first in list.");
+                System.out.println("Found multiple user uris");
             }else {
+            	System.out.println("EditConfiguration.java - checking system value for User URI " + userUris.get(0));
                 getUrisInScope().put("editingUser",userUris.get(0));
             }
         }   

@@ -305,6 +305,7 @@ public class InputElementFormattingTag extends TagSupport {
         Map<String,String> errors = editSub.getValidationErrors();
         if( errors == null || errors.isEmpty())
             return "";
+           
         String val = errors.get(getId());
         if( val != null){
             return val;
@@ -340,7 +341,6 @@ public class InputElementFormattingTag extends TagSupport {
             /* populate the pieces */
             String classStr = doClass();
             String errorStr = getValidationErrors(editSub);
-
             JspWriter out = pageContext.getOut();
 
             boolean definitionTags = false; // current default
@@ -355,12 +355,15 @@ public class InputElementFormattingTag extends TagSupport {
             }
             
             Field field = editConfig == null ? null : editConfig.getField(getId());
+           
             if( getType().equalsIgnoreCase("date") || 
                     (field != null && field.getRangeDatatypeUri() != null && field.getRangeDatatypeUri().equals(XSD.date.getURI())) ){
                 //if its a dataprop that should be a string override type and use date picker    
                 if (definitionTags) { out.print("<dg>"); }
                 out.print(  generateHtmlForDate(getId(),editConfig,editSub)  );
                 if (definitionTags) { out.print("</dg>"); }
+                
+                
             } else if ( getType().equalsIgnoreCase("time") || 
             		(field != null && field.getRangeDatatypeUri() != null && field.getRangeDatatypeUri().equals(XSD.time.getURI()))  ) {
             	if (definitionTags) { out.print("<dd>"); }
@@ -636,14 +639,14 @@ public class InputElementFormattingTag extends TagSupport {
                 }                
         }else{
             //try to get default value
-        	System.out.println("Trying to get the default value");
+        	
             Field field = editConfig.getField(fieldName);
             List<List<String>> options = field.getLiteralOptions();
             if( options.size() >=1 && options.get(0) != null && 
                     options.get(0).size() >= 1 && options.get(0).get(0) != null){
                 dateStrFromLit = options.get(0).get(0);                
             }else{
-            	System.out.println("No default value found for field " + fieldName);
+            	
                 log.debug("no default found for field " + fieldName);
             }
         }
@@ -680,7 +683,7 @@ public class InputElementFormattingTag extends TagSupport {
         }
 
         String sb = "";
-
+		
         sb += " <div class=\"inlineForm\" id=\"textdate"+fieldName+"\"> \n";
         sb += "      <label for=\"year"+fieldName+"\">year</label> \n";
         sb += "      <input type=\"text\"  size=\"4\" id=\"year"+fieldName+"\" "+ "name=\"year"+fieldName+"\" maxlength=\"4\" value=\"" + ((year != 0) ? year : "") + "\"/>\n";
@@ -737,6 +740,10 @@ public class InputElementFormattingTag extends TagSupport {
         sb += "        <option value=\"31\" "+(day == 31?SELECTED:"")+">31</option>  \n";
         sb += "      </select> \n";
         sb += "</div> \n";
+        if(fieldName.equals("expectedPublicationDateEdited")) {
+        	
+        	sb += "<input type='hidden' id='validDateParam' name='validDateParam' value='dateNotPast'/>";
+        }
         return sb;
     }
     
@@ -744,7 +751,7 @@ public class InputElementFormattingTag extends TagSupport {
     public String generateHtmlForTime(String fieldName,
     		EditConfiguration editConfig, EditSubmission editSub ) {
             DateTime dt = null;                
-            
+           
             int hour = -1;
             int minute = -1;
             
@@ -933,7 +940,7 @@ public class InputElementFormattingTag extends TagSupport {
     
     public String generateHtmlForDateTime(String fieldName, 
             EditConfiguration editConfig, EditSubmission editSub ){
-        DateTime dt = null;                       
+        DateTime dt = null;                     
         if( editSub != null && editSub.getLiteralsFromForm() != null && 
             editSub.getLiteralsFromForm().get(fieldName) != null ){
         	//found the field on the EditSubmission
@@ -1028,7 +1035,7 @@ public class InputElementFormattingTag extends TagSupport {
 	        hour =  dt.getHourOfDay();
 	        minute =  dt.getMinuteOfHour();
         }
-
+		
         String sb = "";
 
         sb += " <div class=\"inlineForm\" id=\"textdate"+fieldName+"\"> \n";
@@ -1087,9 +1094,9 @@ public class InputElementFormattingTag extends TagSupport {
         sb += "        <option value=\"31\" "+(day == 31?SELECTED:"")+">31</option>  \n";
         sb += "      </select> \n";
         sb += " \n";
-
+		
         sb += generateMarkupForTime(fieldName, hour, minute);
-        
+       
         sb += "</div> \n";
 
         return sb;

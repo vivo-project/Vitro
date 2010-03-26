@@ -16,6 +16,8 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.Field" %>
 <%@ page import="java.io.StringReader" %>
 <%@ page import="java.util.*" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="java.util.Iterator" %>
 <%@page import="org.apache.commons.logging.LogFactory"%>
 <%@page import="org.apache.commons.logging.Log"%>
 <%@page import="org.apache.commons.fileupload.servlet.ServletFileUpload"%>
@@ -66,14 +68,25 @@ are well formed.
      * we have to make a copy. */
     Map <String,String[]> queryParameters = null;        
     queryParameters = vreq.getParameterMap();        
-    
+    Iterator it = queryParameters.entrySet().iterator();
+   	while (it.hasNext()) {
+        Map.Entry pairs = (Map.Entry)it.next();
+       	String[] value= (String[]) pairs.getValue();
+        System.out.println(pairs.getKey() + " = ");
+        if(value != null && value.length > 0 ) {
+        	int i;
+        	for(i = 0; i < value.length; i++) {
+        		System.out.println("   " + value[i]);
+        	}
+        }
+    }
     List<String>  errorMessages = new ArrayList<String>();                   
     
     EditConfiguration editConfig = EditConfiguration.getConfigFromSession(session,vreq,queryParameters);    
     if( editConfig == null ){
         %><jsp:forward page="/edit/messages/noEditConfigFound.jsp"/><%
     }    
-    EditN3Generator n3Subber = editConfig.getN3Generator();        
+    EditN3Generator n3Subber = editConfig.getN3Generator();     
     EditSubmission submission = new EditSubmission(queryParameters,editConfig);
            
     /* entity to return to may be a variable */
@@ -85,7 +98,7 @@ are well formed.
     Map<String,String> errors =  submission.getValidationErrors();
     EditSubmission.putEditSubmissionInSession(session,submission);
 
-    if(  errors != null && ! errors.isEmpty() ){   	
+    if(  errors != null && ! errors.isEmpty() ){   
         String form = editConfig.getFormUrl();
         vreq.setAttribute("formUrl", form);
         %><jsp:forward page="${formUrl}"/><%
@@ -296,14 +309,14 @@ are well formed.
     List<ModelChangePreprocessor> modelChangePreprocessors = editConfig.getModelChangePreprocessors();
     if ( modelChangePreprocessors != null ) {
         for ( ModelChangePreprocessor pp : modelChangePreprocessors ) {
-        	pp.preprocess( actualRetractions, actualAssertions );
+        	pp.preprocess( actualRetractions, actualAssertions, request );
         }
     }
     
     // get the model to write to here in case a preprocessor has switched the write layer
     OntModel writeModel = editConfig.getWriteModelSelector().getModel(request,application);  
    
-    String editorUri = EditN3Utils.getEditorUri(vreq,session,application);    
+    String editorUri = EditN3Utils.getEditorUri(vreq,session,application); 
     Lock lock = null;
     try{
         lock =  writeModel.getLock();

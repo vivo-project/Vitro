@@ -21,7 +21,7 @@
     org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger("edu.cornell.mannlib.vitro.jsp.edit.forms.defaultDatapropForm.jsp");
 	log.debug("Starting defaultDatapropForm.jsp");
 	VitroRequest vreq = new VitroRequest(request);
-    
+    System.out.println("Default data prop form is being called");
     String subjectUri   = vreq.getParameter("subjectUri");
     String predicateUri = vreq.getParameter("predicateUri");
 

@@ -18,7 +18,6 @@
             
 <%          if (securityLevel >= loginHandler.DBA) { %>
                 <li><a href="listUsers?home=<%=portal.getPortalId()%>">User accounts</a></li>    
-                <li><a href="usermail?home=<%=portal.getPortalId()%>">Email All Users</a></li>
 <%          } %>      
         </ul>
     </div>

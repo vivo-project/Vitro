@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.edit.n3editing;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * This will remove old relation triple for an edit.  
@@ -22,7 +23,7 @@ public class DefaultAddMissingIndividualFormModelPreprocessor implements
         this.objectUri = objectUri;
     }
 
-    public void preprocess( Model retractionsModel, Model additionsModel) {
+    public void preprocess( Model retractionsModel, Model additionsModel, HttpServletRequest r) {
         if( retractionsModel == null || additionsModel == null)
             return;                
         

@@ -151,6 +151,8 @@ public class FedoraDatastreamController extends VitroHttpServlet implements Cons
             IndividualDao iwDao = vreq.getWebappDaoFactory().getIndividualDao();
             Individual entity = iwDao.getIndividualByURI(fileUri);
             
+
+            
             if( entity == null )
                 throw new FdcException( "No entity found in system for file uri " + fileUri);
             //System.out.println("Entity == null:" + (entity == null));                

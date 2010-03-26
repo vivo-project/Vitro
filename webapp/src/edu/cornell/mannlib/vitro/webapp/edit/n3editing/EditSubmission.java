@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Calendar;
 
 import javax.servlet.http.HttpSession;
 
@@ -46,7 +47,6 @@ public class EditSubmission {
     }
     
     public EditSubmission(Map<String,String[]> queryParameters,  EditConfiguration editConfig){
-    	
         if( editConfig == null )
             throw new Error("EditSubmission needs an EditConfiguration");            
         this.editKey = editConfig.getEditKey();         
@@ -70,7 +70,6 @@ public class EditSubmission {
                 log.debug("No value found for query parameter " + var);              
             }
         }
-                
         this.literalsFromForm =new HashMap<String,Literal>();        
         for(String var: editConfig.getLiteralsOnForm() ){            
             Field field = editConfig.getField(var);
@@ -126,6 +125,8 @@ public class EditSubmission {
         if( errors != null ) {
             validationErrors.putAll( errors);
         }
+        
+        
     }
 
     public EditSubmission(Map<String, String[]> queryParameters, EditConfiguration editConfig, 
@@ -156,7 +157,7 @@ public class EditSubmission {
      *  "2008-03-14T00:00:00"^^<http://www.w3.org/2001/XMLSchema#dateTime>
      */
     public Literal  getDateTime(Map<String,String[]> queryParameters,String fieldName){
-        DateTime dt = null;                   
+    	DateTime dt = null;                   
         List<String> year = Arrays.asList(queryParameters.get("year"+ fieldName));
         List<String> month = Arrays.asList(queryParameters.get("month" + fieldName));
         List<String> day = Arrays.asList(queryParameters.get("day" + fieldName));
@@ -301,9 +302,36 @@ public class EditSubmission {
             return null;
         }
         
+        //Removing this 
+        /*
+        boolean compareCurrentDate = false;
+        String[] dateNotPastArgs = queryParameters.get("validDateParam");
+        if(dateNotPastArgs != null && dateNotPastArgs.length > 0) {
+        	
+        	compareCurrentDate = (dateNotPastArgs[0].equals("dateNotPast"));
+        }*/ 
+        
         try{
             dt = dateFormater.parseDateTime(year.get(0) +'-'+ month.get(0) +'-'+ day.get(0));
             String dateStr = dateFormater.print(dt);
+            
+            /*if(compareCurrentDate) {
+            	Calendar c = Calendar.getInstance();
+            	//Set to last year
+            	int currentYear = c.get(Calendar.YEAR);
+            	//?Set to time starting at 00 this morning?
+            	Calendar inputC = Calendar.getInstance();
+            	inputC.set(Integer.parseInt(yearParamStr), Integer.parseInt(monthParamStr) - 1, Integer.parseInt(dayParamStr));
+            	//if input time is more than a year ago
+            	if(inputC.before(c)) {
+            		errors += "Please enter a future target date for publication (past dates are invalid).";
+            		validationErrors.put( fieldName, errors);
+            		//Returning null makes the error message "field is empty" display instead
+            		//return null;
+            	}
+            	
+            }*/
+            
             return new EditLiteral(dateStr,DATE_URI, null );
         }catch(IllegalFieldValueException ifve){
             validationErrors.put( fieldName, ifve.getLocalizedMessage() );

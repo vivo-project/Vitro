@@ -74,11 +74,15 @@ public class BasicValidation {
             if( validations != null ){
                 // NB this is case-sensitive
                 boolean isRequiredField = validations.contains("nonempty");
+                
                 for( String validationType : validations){
                     String value = null;
                     try{
-                        if( literal != null )
+                        if( literal != null ){
                             value = literal.getString();
+                            System.out.println("get data type uri " + literal.asNode().getLiteralDatatype().getURI());
+
+                        }
                     }catch(Throwable th){ 
                         log.debug("could not convert literal to string" , th); 
                     }
@@ -92,6 +96,7 @@ public class BasicValidation {
                         }
                         break;
                     }
+                    
                     String validateMsg = validate(validationType, value);
                     if( validateMsg != null) {
                         errors.put(name,validateMsg);
@@ -149,7 +154,8 @@ public class BasicValidation {
                 return SUCCESS;
             else
                 return "must be in valid date format mm/dd/yyyy.";
-        }else if( validationType.indexOf("datatype:") == 0 ) {
+        }
+        else if( validationType.indexOf("datatype:") == 0 ) {
             String datatypeURI = validationType.substring(9);
             String errorMsg = validateAgainstDatatype( value, datatypeURI ); 
             if ( errorMsg == null ) { 
@@ -157,6 +163,34 @@ public class BasicValidation {
             } else {
                 return errorMsg;
             }
+        } 
+        
+        //Date not past validation
+        if( "dateNotPast".equalsIgnoreCase(validationType)){
+        	System.out.println("date not past - Value " + value);
+        	//if( ! past (value) )
+        	// return "date must not be in the past";
+        	//Current date
+        	Calendar c = Calendar.getInstance();
+        	//Input
+        	Calendar inputC = Calendar.getInstance();
+        	String yearParamStr, monthParamStr, dayParamStr;
+        	int yearDash = value.indexOf("-");
+    		int monthDash = value.lastIndexOf("-");
+        	if(yearDash != -1 && yearDash != monthDash) {
+        		yearParamStr = value.substring(0, yearDash);
+        		monthParamStr = value.substring(yearDash + 1, monthDash);
+        		dayParamStr = value.substring(monthDash + 1, value.length());
+        		System.out.println("Year param str " + yearParamStr + " - MonthPAram:" + monthParamStr + " - day:" + dayParamStr);
+        		inputC.set(Integer.parseInt(yearParamStr), Integer.parseInt(monthParamStr) - 1, Integer.parseInt(dayParamStr));
+        		if(inputC.before(c)) {
+            		return this.DATE_NOT_PAST_MSG;
+            		//Returning null makes the error message "field is empty" display instead
+            		//return null;
+            	} else {
+            		return SUCCESS;
+            	}
+        	}	
         }
         return null; //
     }
@@ -214,7 +248,7 @@ public class BasicValidation {
     /** we use null to indicate success */
     public final static String SUCCESS = null;
     public final static String REQUIRED_FIELD_EMPTY_MSG = "This field must not be empty.";
-    
+    public final static String DATE_NOT_PAST_MSG = "Please enter a future target date for publication (past dates are invalid).";
     /** regex for strings like "12/31/2004" */
     private final String dateRegex = "((1[012])|([1-9]))/((3[10])|([12][0-9])|([1-9]))/[\\d]{4}";
     private final Pattern datePattern = Pattern.compile(dateRegex);
@@ -222,7 +256,7 @@ public class BasicValidation {
     static final List<String> basicValidations;
     static{
         basicValidations = Arrays.asList(
-        "nonempty","isDate" );
+        "nonempty","isDate","dateNotPast" );
     }
 
     private Log log = LogFactory.getLog(BasicValidation.class);
