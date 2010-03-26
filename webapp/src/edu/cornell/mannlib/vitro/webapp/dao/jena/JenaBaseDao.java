@@ -504,7 +504,9 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     protected void updatePropertyResourceURIValue(Resource res, Property prop, String uri, Model model) {
 
         if (prop != null) {
-            if (uri == null) {
+            if (uri == null || uri.length() == 0) { 
+            	// the empty string test is due to a deficiency in the
+            	// backend editing where empty strings are treated as nulls
                 model.removeAll(res, prop, null);
             } else {
                 String badURIErrorStr = checkURI(uri);
