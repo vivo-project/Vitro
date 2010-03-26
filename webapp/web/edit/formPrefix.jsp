@@ -69,24 +69,21 @@
 <%	String useAutoComplete = (useAutoComplete=request.getParameter("useAutoComplete")) != null && !(useAutoComplete.equals("")) ? useAutoComplete : "false";
 	if (useAutoComplete.equalsIgnoreCase("true")) { %>
 	    <link rel="stylesheet" type="text/css" href="../js/jquery_plugins/jquery-autocomplete/jquery.autocomplete.css"/>	
-<%	} 
+<%	} %>
 
 
-    List<String> customJs = (List<String>)request.getAttribute("customJs"); 
-    if (customJs != null) {
-        for (String jsFile : customJs ){
-%>
-            <script type="text/javascript" src="<%= jsFile %>"></script>
-<% }
-} 
-%>        
+    <c:forEach var="jsFile" items="${customJs}">
+        <script type="text/javascript" src="${jsFile}"></script>
+    </c:forEach>     
     
-
-    <!-- <link rel="stylesheet" type="text/css" href="../js/jquery_plugins/ui.datepicker.css"/> -->
     <link rel="stylesheet" type="text/css" href="../js/jquery_plugins/thickbox/thickbox.css"/>	
 	<link rel="stylesheet" type="text/css" href="<c:url value="/${themeDir}css/screen.css"/>" media="screen"/>	
 	<link rel="stylesheet" type="text/css" href="<c:url value="/${themeDir}css/formedit.css" />" media="screen"/>
-    
+
+    <c:forEach var="cssFile" items="${customCss}">
+        <link rel="stylesheet" type="text/css" href="${cssFile}" media="screen"/>
+    </c:forEach>
+     
     <title>Edit</title>
 </head>
 <body class="formsEdit">
