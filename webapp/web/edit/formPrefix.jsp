@@ -1,8 +1,10 @@
 <%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
 
+<%@ page import="java.util.List" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep"%>
+
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
-<%@page import="edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep"%>
-    
+
 <c:set var='themeDir'><c:out value='${portalBean.themeDir}'/></c:set>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
@@ -67,7 +69,18 @@
 <%	String useAutoComplete = (useAutoComplete=request.getParameter("useAutoComplete")) != null && !(useAutoComplete.equals("")) ? useAutoComplete : "false";
 	if (useAutoComplete.equalsIgnoreCase("true")) { %>
 	    <link rel="stylesheet" type="text/css" href="../js/jquery_plugins/jquery-autocomplete/jquery.autocomplete.css"/>	
-<%	} %>
+<%	} 
+
+
+    List<String> customJs = (List<String>)request.getAttribute("customJs"); 
+    if (customJs != null) {
+        for (String jsFile : customJs ){
+%>
+            <script type="text/javascript" src="<%= jsFile %>"></script>
+<% }
+} 
+%>        
+    
 
     <!-- <link rel="stylesheet" type="text/css" href="../js/jquery_plugins/ui.datepicker.css"/> -->
     <link rel="stylesheet" type="text/css" href="../js/jquery_plugins/thickbox/thickbox.css"/>	
