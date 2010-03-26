@@ -43,6 +43,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
+import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
 
@@ -308,9 +309,14 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
         List<DataProperty> datapropsForClass = new ArrayList();
         OntModel ontModel = getOntModelSelector().getTBoxModel();
         try {
-	        HashSet<String> superclassURIs = new HashSet<String>(getWebappDaoFactory().getVClassDao().getAllSuperClassURIs(vclassURI));
-	        Iterator superclassURIsIt = superclassURIs.iterator();
+        	VClassDao vcDao = getWebappDaoFactory().getVClassDao();
+	        HashSet<String> superclassURIs = new HashSet<String>(vcDao.getAllSuperClassURIs(vclassURI));
 	        superclassURIs.add(vclassURI);
+	        for (String equivURI : vcDao.getEquivalentClassURIs(vclassURI)) {
+	        	superclassURIs.add(equivURI);
+	        	superclassURIs.addAll(vcDao.getAllSuperClassURIs(equivURI));
+	        }
+	        Iterator superclassURIsIt = superclassURIs.iterator();
 	        ontModel.enterCriticalSection(Lock.READ);
 	        try {
 	            Iterator dataprops = ontModel.listDatatypeProperties();

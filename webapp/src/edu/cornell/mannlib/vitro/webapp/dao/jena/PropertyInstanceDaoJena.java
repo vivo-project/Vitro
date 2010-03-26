@@ -134,11 +134,16 @@ public class PropertyInstanceDaoJena extends JenaBaseDao implements
         }
         List<PropertyInstance> propInsts = new ArrayList();
         
-        List<String> allSuperclassURIs = getWebappDaoFactory().getVClassDao().getAllSuperClassURIs(classURI);
+        VClassDao vcDao = getWebappDaoFactory().getVClassDao();
         
-        if (allSuperclassURIs == null)
-            allSuperclassURIs = new ArrayList();
+        Set<String> allSuperclassURIs = new HashSet<String>();
+       
         allSuperclassURIs.add(classURI);
+        for (String equivURI : vcDao.getEquivalentClassURIs(classURI)) {
+        	allSuperclassURIs.add(equivURI);
+        	allSuperclassURIs.addAll(vcDao.getAllSuperClassURIs(equivURI));
+        }
+        allSuperclassURIs.addAll(vcDao.getAllSuperClassURIs(classURI));
         
         try {
         
