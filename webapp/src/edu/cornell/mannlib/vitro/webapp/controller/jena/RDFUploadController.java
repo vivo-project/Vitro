@@ -40,7 +40,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 
 public class RDFUploadController extends BaseEditController {
 	
-    private static int maxFileSizeInBytes = 1024 * 1024 * 100; //100mb 
+    private static int maxFileSizeInBytes = 1024 * 1024 * 2000; //2000mb 
 	
 	public void doPost(HttpServletRequest req, HttpServletResponse response) throws ServletException {
         boolean isMultipart = ServletFileUpload.isMultipartContent(req);        
