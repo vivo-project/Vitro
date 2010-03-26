@@ -168,6 +168,7 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
                                         <span class="statementWrap">
                                             <a class="externalLink" href="<c:out value="${entityUrl}"/>"><p:process>${entity.anchor}</p:process></a>
                                             <c:if test="${showEdits}">
+                                                <em>(primary link)</em>
                                                 <c:set var="editLinks"><edLnk:editLinks item="<%= VitroVocabulary.PRIMARY_LINK %>" data="${entity.primaryLink.URI}" icons="false"/></c:set>
                                                 <c:if test="${!empty editLinks}"><span class="editLinks">${editLinks}</span></c:if>                                                                           
                                             </c:if>
@@ -192,6 +193,7 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
                                 <span class="statementWrap">
                                     <a class="externalLink" href="<c:out value="${linkUrl}"/>"><p:process>${link.anchor}</p:process></a>
                                     <c:if test="${showEdits}">
+                                        <em>(additional link)</em>
                                         <c:set var="editLinks"><edLnk:editLinks item="<%= VitroVocabulary.ADDITIONAL_LINK %>" data="${link.URI}" icons="false"/></c:set>
                                         <c:if test="${!empty editLinks}"><span class="editLinks">${editLinks}</span></c:if>                                                                           
                                     </c:if>  
