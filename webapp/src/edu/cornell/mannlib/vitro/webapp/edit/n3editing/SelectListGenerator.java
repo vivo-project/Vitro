@@ -264,6 +264,37 @@ public class SelectListGenerator {
                 }
                 break;
 
+            case CHILD_VCLASSES_WITH_PARENT: //so we have a vclass URI
+                vclassUri = field.getObjectClassUri();
+                if (vclassUri==null || vclassUri.equals("")){
+                    log.error("no vclassUri found for field \""+fieldName+"\" in SelectListGenerator.getOptions() when OptionsType CHILD_VCLASSES specified");
+                } else {
+                    // first test to see whether there's a default "leave blank" value specified with the literal options
+                    String defaultOption=null;
+                    if ((defaultOption=getDefaultOption(field))!=null) {
+                        optionsMap.put(LEFT_BLANK, defaultOption);
+                    }
+                    // now populate the options                
+                    if( wDaoFact == null ) log.error("could not get WebappDaoFactory from request in SelectListGenerator.getOptions().");
+    
+                    VClassDao vclassDao = wDaoFact.getVClassDao();
+                    List<String> subClassList = vclassDao.getAllSubClassURIs(vclassUri);
+                    if( subClassList == null || subClassList.size()==0 ) { 
+                        log.debug("No subclasses of " + vclassUri + " found in the model so only default value from field's literalOptions will be used" );
+                    } else {                
+                        for( String subClassUri : subClassList ) {
+                            VClass subClass = vclassDao.getVClassByURI(subClassUri);
+                            if( subClass != null && !OWL.Nothing.getURI().equals(subClassUri)) {                        
+                                optionsMap.put(subClassUri,subClass.getName().trim());                        
+                                ++optionsCount;
+                            }
+                        }
+                    optionsMap.put(vclassUri, "Other");
+                    ++optionsCount;
+                    }
+                }
+                break;
+                
             case UNDEFINED :
                 log.error("optionsType \"UNDEFINED\" for Field \""+fieldName+"\" in SelectListGenerator.getOptions()");
                 break;

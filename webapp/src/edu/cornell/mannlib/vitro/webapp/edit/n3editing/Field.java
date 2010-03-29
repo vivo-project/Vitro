@@ -23,6 +23,7 @@ public class Field {
         INDIVIDUALS_VIA_VCLASS, 
         MONIKERS_VIA_VCLASS, 
         CHILD_VCLASSES, 
+        CHILD_VCLASSES_WITH_PARENT,
         FILE, 
         UNDEFINED, 
         DATETIME, 
@@ -214,6 +215,8 @@ public class Field {
             setOptionsType(Field.OptionsType.DATETIME);
         } else if ("CHILD_VCLASSES".equalsIgnoreCase(s)) {            
             setOptionsType(Field.OptionsType.CHILD_VCLASSES);
+        } else if ("CHILD_VCLASSES_WITH_PARENT".equalsIgnoreCase(s)) {            
+            setOptionsType(Field.OptionsType.CHILD_VCLASSES_WITH_PARENT);            
         } else if ("FILE".equalsIgnoreCase(s)) {
             setOptionsType(Field.OptionsType.FILE);            
         } else if ("DATE".equalsIgnoreCase(s)) {
