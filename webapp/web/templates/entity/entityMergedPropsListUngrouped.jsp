@@ -154,72 +154,66 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 		            		${collateCurrentClassName }
 		            		<ul class='properties'><!-- collateClasses -->
 		            	</c:if>
-		            	
+
 						<c:if test="${stmtCounter == displayLimit}"><!-- set up toggle div and expandable continuation div -->
-  							</ul>
+							<c:if test="${ collateByClass }"> </ul></li></c:if>
+							<c:if test="${ ! collateByClass }"> </ul></c:if>  							
   		                	<c:set var="hiddenDivCount" value="${hiddenDivCount+1}"/>
 							<c:url var="themePath" value="/${themeDir}site_icons" />
-						
-               <div class="navlinkblock ">
-                 <span class="entityMoreSpan">
-                   <c:out value='${objRows - stmtCounter}' />
-                   <c:choose>
-                       <c:when test='${displayLimit==0}'> entries</c:when>
-                       <c:otherwise> more</c:otherwise>
-                   </c:choose>
-                 </span>
-               
-                 <div class="extraEntities">
-              		 <ul class="properties">
+									
+			               <div class="navlinkblock ">
+			                 <span class="entityMoreSpan">
+			                   <c:out value='${objRows - stmtCounter}' />
+			                   <c:choose>
+			                       <c:when test='${displayLimit==0}'> entries</c:when>
+			                       <c:otherwise> more</c:otherwise>
+			                   </c:choose>
+			                 </span>
+			               
+			                 <div class="extraEntities">
+			                 <c:if test="${ collateByClass }"> <li></c:if>
+							 <ul class="properties">
+			              		 
 						</c:if>
-     					<li><span class="statementWrap">
-     					<c:set var="opStmt" value="${objPropertyStmt}" scope="request"/>
-           				<c:url var="propertyLink" value="/entity">
-               				<c:param name="home" value="${portal.portalId}"/>
-               				<c:param name="uri" value="${objPropertyStmt.object.URI}"/>
-               				<%--
-<%							ObjectPropertyStatement oStmt = (ObjectPropertyStatement)request.getAttribute("opStmt");
-							if (oStmt!=null) {
-								Individual obj= (Individual)oStmt.getObject();
-								if (obj != null) {
-									if (!obj.doesFlag1Match(currentPortalId)) {%>
-										<c:param name="jump" value="true"/>
-<%									}
-								}
-							}%>
-							--%>
-           				</c:url>
-						<c:remove var="opStmt" scope="request"/>
-          				<c:forEach items="${objPropertyStmt.object.VClasses}" var="type">
-         					<c:if test="${!empty type.customShortView}">
-         						<c:set var="altRenderJsp" value="${type.customShortView}"/>
-         					</c:if>
-         				</c:forEach> 
-            			<c:choose>
-				            <c:when test="${!empty altRenderJsp}">
-								<c:set scope="request" var="individual" value="${objPropertyStmt.object}"/>
-								<c:set scope="request" var="predicateUri" value="${objProp.URI}"/>
-								<jsp:include page="${altRenderJsp}" flush="true"/>
-				            	<c:remove var="altRenderJsp"/>
-				    		</c:when>
-				            <c:otherwise>
-				            	<a class="propertyLink" href='<c:out value="${propertyLink}"/>'><p:process><c:out value="${objPropertyStmt.object.name}"/></p:process></a>
-				            	<c:if test="${!empty objPropertyStmt.object.moniker}">
-				                    <p:process><c:out value="| ${objPropertyStmt.object.moniker}"/></p:process>
-				                </c:if>
-							</c:otherwise>
-	            		</c:choose>
-	            		<c:if test="${showSelfEdits || showCuratorEdits}">
-         					  <c:set var="editLinks"><edLnk:editLinks item="${objPropertyStmt}" icons="false"/></c:set>
-         					  <c:if test="${!empty editLinks}"><span class="editLinks">${editLinks}&nbsp;</span></c:if>
-         					  <c:if test="${empty editLinks}"><em class="nonEditable">(non-editable) </em></c:if>
-         					</c:if>
-      					</span></li>
+     					<li>
+	     					<span class="statementWrap">
+	     					<c:set var="opStmt" value="${objPropertyStmt}" scope="request"/>
+	           				<c:url var="propertyLink" value="/entity">
+	               				<c:param name="home" value="${portal.portalId}"/>
+	               				<c:param name="uri" value="${objPropertyStmt.object.URI}"/>               			
+	           				</c:url>
+							<c:remove var="opStmt" scope="request"/>
+	          				<c:forEach items="${objPropertyStmt.object.VClasses}" var="type">
+	         					<c:if test="${!empty type.customShortView}">
+	         						<c:set var="altRenderJsp" value="${type.customShortView}"/>
+	         					</c:if>
+	         				</c:forEach> 
+	            			<c:choose>
+					            <c:when test="${!empty altRenderJsp}">
+									<c:set scope="request" var="individual" value="${objPropertyStmt.object}"/>
+									<c:set scope="request" var="predicateUri" value="${objProp.URI}"/>
+									<jsp:include page="${altRenderJsp}" flush="true"/>
+					            	<c:remove var="altRenderJsp"/>
+					    		</c:when>
+					            <c:otherwise>
+					            	<a class="propertyLink" href='<c:out value="${propertyLink}"/>'><p:process><c:out value="${objPropertyStmt.object.name}"/></p:process></a>
+					            	<c:if test="${!empty objPropertyStmt.object.moniker}">
+					                    <p:process><c:out value="| ${objPropertyStmt.object.moniker}"/></p:process>
+					                </c:if>
+								</c:otherwise>
+		            		</c:choose>
+		            		<c:if test="${showSelfEdits || showCuratorEdits}">
+	         					  <c:set var="editLinks"><edLnk:editLinks item="${objPropertyStmt}" icons="false"/></c:set>
+	         					  <c:if test="${!empty editLinks}"><span class="editLinks">${editLinks}&nbsp;</span></c:if>
+	         					  <c:if test="${empty editLinks}"><em class="nonEditable">(non-editable) </em></c:if>
+	         					</c:if>
+	      					</span>
+      					</li>
 						<c:set var="stmtCounter" value="${stmtCounter+1}"/>
 					</c:forEach>
-					<c:if test="${ collateClassesShownCount > 0 }"></ul></li><!-- collateClasses 2 --></c:if>					
 					<c:if test="${objRows > 0}"></ul></c:if>
-   					<c:if test="${stmtCounter > displayLimit}">
+					<c:if test="${ collateClassesShownCount > 0 }"></li><!-- collateClasses 2 --></c:if>										
+   					<c:if test="${ stmtCounter > displayLimit}">
    					</div><%-- navlinkblock --%>
    					</div><%-- extraEntities --%></c:if>
  				</div><!-- ${objProp.localNameWithPrefix} -->
