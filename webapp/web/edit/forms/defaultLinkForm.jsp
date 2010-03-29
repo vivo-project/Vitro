@@ -167,7 +167,6 @@
 </c:set>
 <%
     log.debug(request.getAttribute("editjson"));
-System.out.println(request.getAttribute("editjson"));
     
     EditConfiguration editConfig = EditConfiguration.getConfigFromSession(session,request);
     if( editConfig == null ){

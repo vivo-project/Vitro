@@ -96,7 +96,10 @@
   }
 </c:set>
 
-<%  /* now put edit configuration Json object into session */
+<%  
+    log.debug(request.getAttribute("editjson"));
+
+    /* now put edit configuration Json object into session */
     EditConfiguration editConfig = new EditConfiguration((String)request.getAttribute("editjson"));
     EditConfiguration.putConfigInSession(editConfig, session);
     String formTitle   ="";
