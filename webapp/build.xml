@@ -205,6 +205,10 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 			<fileset file="${webapp.dir}/config/dwr.xml" />
 		</copy>
 
+		<copy todir="${build.dir}/war/WEB-INF">
+			<fileset dir="${webapp.dir}" includes="ontologies/**/*" />
+		</copy>
+
 		<copy file="${webapp.dir}/config/default.log4j.properties"
 		      tofile="${build.dir}/war/WEB-INF/classes/log4j.properties"
 		      filtering="true">
@@ -257,6 +261,16 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		<copy todir="${webapp.deploy.home}">
 			<fileset dir="${build.dir}/war" />
 		</copy>
+
+		<!-- Discard any ontology files from previous builds. -->
+		<sync todir="${webapp.deploy.home}/WEB-INF/ontologies" includeEmptyDirs="true">
+			<fileset dir="${build.dir}/war/WEB-INF/ontologies" includes="**/*" />
+		</sync>
+
+		<!-- Discard any submodel files from previous builds. -->
+		<sync todir="${webapp.deploy.home}/WEB-INF/submodels" includeemptydirs="true">
+			<fileset dir="${build.dir}/war/WEB-INF/submodels" includes="**/*" />
+		</sync>
 	</target>
 
 </project>
