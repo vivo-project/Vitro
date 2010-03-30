@@ -2,9 +2,10 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
-import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -18,6 +19,7 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vedit.beans.LoginFormBean;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.RoleBasedPolicy.AuthRole;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
@@ -194,6 +196,16 @@ public class Authenticate extends VitroHttpServlet  {
             			: contextPostLoginRequest;
             	}
             }
+            
+            if( AuthRole.USER.roleUri().equals( user.getRoleURI() ) ){
+            	/* if this is a self editor, redirect the to their page */
+	           	List<String> uris = userDao.getIndividualsUserMayEditAs(user.getURI());
+	           	if( uris != null && uris.size() > 0 ){
+	           		forwardStr = request.getContextPath() + "/individual?uri=" + URLEncoder.encode(uris.get(0), "UTF-8");
+	           	}
+            }
+           
+            
             if (forwardStr != null) {
                 response.sendRedirect(forwardStr);
             } else {
