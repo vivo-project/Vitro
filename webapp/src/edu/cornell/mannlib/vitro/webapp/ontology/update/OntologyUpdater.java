@@ -127,7 +127,7 @@ public class OntologyUpdater {
 	
 	private void assertSuccess() {
 	    Model m = ontModelSelector.getApplicationMetadataModel();
-	    InputStream inStream = context.getResourceAsStream(SUCCESS_ASSERTIONS);
+	    InputStream inStream = context.getResourceAsStream(SUCCESS_ASSERTIONS_FILE);
 	    m.enterCriticalSection(Lock.WRITE);
 	    try {
 	    	m.read(inStream, SUCCESS_RDF_FORMAT);
