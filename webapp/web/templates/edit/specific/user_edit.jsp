@@ -63,7 +63,7 @@
     <tr><td>User may edit as the following Individuals:</td></tr>           
     <c:forEach items="${requestScope.mayEditAsStmts }" var="stmt">
         <tr>
-            <td>${stmt.objectURI}</td>
+            <td>${stmt.object.name}</td>
             <c:url var="deleteUrl" value="/edit/editRequestDispatch.jsp">
                 <c:param name="subjectUri">${user.URI}</c:param>
                 <c:param name="predicateUri">${requestScope.predicateUri}</c:param>
