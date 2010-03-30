@@ -316,6 +316,13 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
             </p:process>
             
             ${requestScope.servletButtons}
-            
+        
+        <!-- 
+        	<c:if test="${not empty entityLinkedDataURL}">
+        	  <c:url var="rdfImg" value="/images/edit_icons/rdf_w3c_icon48.gif"/>
+        	  <a href="${entityLinkedDataURL}" title="get this as RDF/XML"><img src="${rdfImg}"/></a>
+        	</c:if>    
+        	 -->
         </div> <!--  contents -->
+        
     </div> <!-- content -->

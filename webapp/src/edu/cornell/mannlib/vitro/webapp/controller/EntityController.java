@@ -216,6 +216,11 @@ public class EntityController extends VitroHttpServlet {
             css += customCss;
         }
 
+        if(  indiv.getURI().startsWith( vreq.getWebappDaoFactory().getDefaultNamespace() )){        	
+        	vreq.setAttribute("entityLinkedDataURL", indiv.getURI() + "/" + indiv.getLocalName() + ".rdf");	
+        }
+        
+        
 		// generate link to RDF representation for semantic web clients like Piggy Bank
 		// BJL 2008-07-16: I'm temporarily commenting this out because I forgot we need to make sure it filters out the hidden properties
         // generate url for this entity
