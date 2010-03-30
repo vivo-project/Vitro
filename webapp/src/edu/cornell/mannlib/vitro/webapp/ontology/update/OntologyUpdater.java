@@ -103,7 +103,12 @@ public class OntologyUpdater {
 		Model m = ontModelSelector.getApplicationMetadataModel();
 		Query query = QueryFactory.create(sparqlQueryStr);
 		QueryExecution qexec = QueryExecutionFactory.create(query, m);
-		return qexec.execAsk();
+		
+		// if the ASK query DOES have a solution (i.e. the assertions exist
+		// showing that the update has already been performed), then the update
+		// is NOT required.
+		return !qexec.execAsk(); 
+		
 	}
 	
 	/**
