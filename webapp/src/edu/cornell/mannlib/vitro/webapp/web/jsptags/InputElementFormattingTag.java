@@ -56,6 +56,7 @@ public class InputElementFormattingTag extends TagSupport {
     private String  type;
     private String  label;
     private String  cssClass;
+    private String  labelClass;
     private String  value;
     private String  error;
     private int     size = 0;
@@ -93,6 +94,13 @@ public class InputElementFormattingTag extends TagSupport {
     }
     public void setCssClass(String classStr) {
         this.cssClass = classStr;
+    }
+    
+    public String getLabelClass() {
+        return labelClass;
+    }
+    public void setLabelClass(String labelClassStr) {
+        this.labelClass = labelClassStr;
     }
 
     public String getValue() {
@@ -156,6 +164,14 @@ public class InputElementFormattingTag extends TagSupport {
     }
     public void setCancel(String s){
         cancel = s;
+    }
+    
+    private String doLabelClass() {
+        String labelClass = getLabelClass();
+        if (labelClass != null && !labelClass.equals("")) {
+            return " class=\""+labelClass+"\"";
+        }
+        return "";
     }
 
     private String doClass() {
@@ -350,7 +366,7 @@ public class InputElementFormattingTag extends TagSupport {
             
             if( getLabel()!=null && !getLabel().equals("")) {
                 if (definitionTags) { out.println("<dt>"); }
-                out.println("<label for=\""+getId()+"\">"+getLabel()+"</label>");
+                out.println("<label" + doLabelClass() + " for=\""+getId()+"\">"+getLabel()+"</label>");
                 if (definitionTags) { out.println("</dt>"); }
             }
             

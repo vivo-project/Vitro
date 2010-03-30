@@ -60,6 +60,7 @@
 	    </script>
 <%	} %>
 
+    <script language="javascript" type="text/javascript" src="../js/extensions/String.js"></script>
 	<script language="javascript" type="text/javascript" src="../js/jquery.js"></script>
 	<script language="javascript" type="text/javascript" src="../js/jquery_plugins/jquery.bgiframe.pack.js"></script>
 	<script language="javascript" type="text/javascript" src="../js/jquery_plugins/thickbox/thickbox-compressed.js"></script>
