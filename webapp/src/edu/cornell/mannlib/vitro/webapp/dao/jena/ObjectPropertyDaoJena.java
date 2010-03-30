@@ -66,7 +66,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         entity.setPropertyList(props);
     }
 
-    private ObjectProperty propertyFromOntProperty(OntProperty op) {
+    protected ObjectProperty propertyFromOntProperty(OntProperty op) {
         if (op==null) {
             return null;
         }

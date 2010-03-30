@@ -3,7 +3,9 @@
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Property;
@@ -52,6 +54,9 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         if (entity.getURI() == null)
             return entity;
         else {
+        	Map<String, ObjectProperty> uriToObjectProperty = new HashMap<String,ObjectProperty>();
+        	
+        	ObjectPropertyDaoJena opDaoJena = new ObjectPropertyDaoJena(getWebappDaoFactory());
             Resource ind = getOntModel().getResource(entity.getURI());
             List<ObjectPropertyStatement> objPropertyStmtList = new ArrayList<ObjectPropertyStatement>();
             ClosableIterator propIt = ind.listProperties();
@@ -71,12 +76,13 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
                             objPropertyStmt.setPropertyURI(st.getPredicate().getURI());
                             try {
                                 Property prop = st.getPredicate();
-                                ObjectProperty p = new ObjectProperty();
-                                p.setURI(prop.getURI());
-                                p.setNamespace(prop.getNameSpace());
-                                p.setLocalName(prop.getLocalName());
-                                //p.setDomainPublic(prop.getLabel(null));
-                                objPropertyStmt.setProperty(p);
+                                if( uriToObjectProperty.containsKey(prop.getURI())){
+                                	objPropertyStmt.setProperty(uriToObjectProperty.get(prop.getURI()));
+                                }else{
+                                	ObjectProperty p = opDaoJena.propertyFromOntProperty(getOntModel().createOntProperty(prop.getURI()));
+                                	uriToObjectProperty.put(prop.getURI(), p);
+                                	objPropertyStmt.setProperty(uriToObjectProperty.get(prop.getURI()));
+                                }                                
                             } catch (Throwable g) {
                                 ObjectProperty q = new ObjectProperty();
                                 q.setDomainPublic("error");

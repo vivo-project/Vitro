@@ -4,7 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.controller;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.io.Writer;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +20,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.datatypes.TypeMapper;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -245,7 +245,7 @@ public class EntityController extends VitroHttpServlet {
 		if( ontModel == null)
 			ontModel = (Model)getServletContext().getAttribute("jenaOntModel");
 				
-		Model newModel = getRDF(indiv, ontModel, ModelFactory.createDefaultModel(), true);
+		Model newModel = getRDF(indiv, ontModel, ModelFactory.createDefaultModel(), 0);
 		
 		res.setContentType(rdfFormat.getMediaType());
 		String format = ""; 
@@ -479,7 +479,7 @@ public class EntityController extends VitroHttpServlet {
     	Resource i = ontModel.getResource(entity.getURI());
     	ModelMaker modelMaker = ontModel.getImportModelMaker();
     	Model newModel = modelMaker.createModel(entity.getURI(), false);
-    	newModel = getRDF(entity, ontModel, newModel, true);
+    	newModel = getRDF(entity, ontModel, newModel, 0);
     	try {
     		ServletOutputStream outstream = res.getOutputStream();
     		/*
@@ -510,28 +510,37 @@ public class EntityController extends VitroHttpServlet {
     }
     
     // Adds data from ontModel about entity to newModel. Go down 1 level if recurse is true
-    private Model getRDF(Individual entity, Model ontModel, Model newModel, boolean recurse) {
+    private Model getRDF(Individual entity, Model ontModel, Model newModel, int recurseDepth ) {
     	Resource subj = ontModel.getResource(entity.getURI());
+    	
     	List<DataPropertyStatement> dstates = entity.getDataPropertyStatements();
     	//System.out.println("data: "+dstates.size());
+    	TypeMapper typeMapper = TypeMapper.getInstance();
     	for (DataPropertyStatement ds: dstates) {
     		Property dp = ontModel.getProperty(ds.getDatapropURI());
-    		//if(!(dp instanceof DatatypeProperty)) System.out.println("not datatype prop "+dp.getURI());
-
-    		//TODO: improve to handle languages and XSD data types 
-    		Literal lit = newModel.createLiteral(ds.getData());
+	    	Literal lit = null;
+	        if ((ds.getLanguage()) != null && (ds.getLanguage().length()>0)) {
+	        	lit = ontModel.createLiteral(ds.getData(),ds.getLanguage());
+	        } else if ((ds.getDatatypeURI() != null) && (ds.getDatatypeURI().length()>0)) {
+	        	lit = ontModel.createTypedLiteral(ds.getData(),typeMapper.getSafeTypeByName(ds.getDatatypeURI()));
+	        } else {
+	        	lit = ontModel.createLiteral(ds.getData());
+	        } 
     		newModel.add(newModel.createStatement(subj, dp, lit));
     	}
-    	if(recurse) {
+    	
+    	if( recurseDepth < 5 ){
 	    	List<ObjectPropertyStatement> ostates = entity.getObjectPropertyStatements();
-	    	//System.out.println("obj: "+ostates.size());
 	    	for (ObjectPropertyStatement os: ostates) {
+	    		ObjectProperty objProp = os.getProperty();
 	    		Property op = ontModel.getProperty(os.getPropertyURI());
 	    		Resource obj = ontModel.getResource(os.getObjectURI());
 	    		newModel.add(newModel.createStatement(subj, op, obj));
-	    		newModel.add(getRDF(os.getObject(), ontModel, newModel, false));
+	    		if( objProp.getStubObjectRelation() )
+	    			newModel.add(getRDF(os.getObject(), ontModel, newModel, recurseDepth + 1));
 	    	}
     	}
+    	
     	return newModel;
     }
 
