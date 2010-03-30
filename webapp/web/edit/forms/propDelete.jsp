@@ -110,10 +110,11 @@ public WebappDaoFactory getUnfilteredDaoFactory() {
           request.setAttribute("objectName", FrontEndEditingUtils.getVitroNsObjDisplayName(predicateUri, object, model));
           log.debug("setting object name " + (String)request.getAttribute("objectName") + " for vitro namespace object property " + predicateUri);
     } else {
-        for (VClass clas : object.getVClasses(true)) { // direct VClasses, not inferred, and not including Vitro namespace
+        for (VClass clas : object.getVClasses()) { 
             request.setAttribute("rangeClassName", clas.getName());
             foundClass = true;
             customShortView = clas.getCustomShortView();
+            
     	    if (customShortView != null && customShortView.trim().length()>0) {
     	        log.debug("setting object name from VClass custom short view");
     	        request.setAttribute("customShortView",shortViewPrefix + customShortView.trim());
@@ -142,7 +143,7 @@ public WebappDaoFactory getUnfilteredDaoFactory() {
 <jsp:include page="${preForm}"/>
 
 <form action="editRequestDispatch.jsp" method="get">
-    <label for="submit"><h2>Are you sure you want to delete the following entry for <em>${propertyName}</em>?</h2></label>
+    <label for="submit"><h2>Are you sure you want to delete the following entry from <em>${propertyName}</em>?</h2></label>
     <div class="toBeDeleted objProp">
     	<c:choose>
     		<c:when test="${!empty customShortView}">
