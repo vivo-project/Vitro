@@ -114,7 +114,7 @@ are well formed.
     
     boolean requestIsAnUpdate =  editConfig.getObject() != null && editConfig.getObject().trim().length() > 0; 
     if( requestIsAnUpdate ){
-        //handle a update of an existing object    
+        //handle update of an existing object    
         if( log.isDebugEnabled()) log.debug("editing an existing resource: " + editConfig.getObject() );        
 
         Map<String,List<String>> fieldAssertions = fieldsToAssertionMap(editConfig.getFields());
@@ -122,20 +122,20 @@ are well formed.
         
         /* ********** URIs and Literals on Form/Parameters *********** */
         fieldAssertions = n3Subber.substituteIntoValues(  submission.getUrisFromForm(), submission.getLiteralsFromForm(), fieldAssertions);
-        if(log.isDebugEnabled()) logAddRetract("subsititued in literals from form",fieldAssertions,fieldRetractions);
+        if(log.isDebugEnabled()) logAddRetract("substituted in literals from form",fieldAssertions,fieldRetractions);
         entToReturnTo = n3Subber.subInUris(submission.getUrisFromForm(),entToReturnTo);        
         //fieldRetractions does NOT get values from form.
         
         /* ****************** URIs and Literals in Scope ************** */
         fieldAssertions = n3Subber.substituteIntoValues(editConfig.getUrisInScope(), editConfig.getLiteralsInScope(), fieldAssertions );
         fieldRetractions = n3Subber.substituteIntoValues(editConfig.getUrisInScope(), editConfig.getLiteralsInScope(), fieldRetractions);
-        if(log.isDebugEnabled()) logAddRetract("subsititued in URIs and Literals from scope",fieldAssertions,fieldRetractions);
+        if(log.isDebugEnabled()) logAddRetract("substituted in URIs and Literals from scope",fieldAssertions,fieldRetractions);
         entToReturnTo = n3Subber.subInUris(editConfig.getUrisInScope(),entToReturnTo);
         
         //do edits ever need new resources? (YES)
         Map<String,String> varToNewResource = newToUriMap(editConfig.getNewResources(),resourcesModel);
         fieldAssertions = n3Subber.substituteIntoValues(varToNewResource, null, fieldAssertions);
-        if(log.isDebugEnabled()) logAddRetract("subsititued in URIs for new resources",fieldAssertions,fieldRetractions);
+        if(log.isDebugEnabled()) logAddRetract("substituted in URIs for new resources",fieldAssertions,fieldRetractions);
         entToReturnTo = n3Subber.subInUris(varToNewResource,entToReturnTo);
         //fieldRetractions does NOT get values from form.
 
@@ -205,23 +205,23 @@ are well formed.
         //sub in resource uris off form
         n3Required = n3Subber.subInUris(submission.getUrisFromForm(), n3Required);
         n3Optional = n3Subber.subInUris(submission.getUrisFromForm(), n3Optional);        
-        if(log.isDebugEnabled()) logRequuiredOpt("subsititued in URIs  off from ",n3Required,n3Optional);
+        if(log.isDebugEnabled()) logRequiredOpt("substituted in URIs  off from ",n3Required,n3Optional);
         entToReturnTo = n3Subber.subInUris(submission.getUrisFromForm(), entToReturnTo);
 
         //sub in literals from form
         n3Required = n3Subber.subInLiterals(submission.getLiteralsFromForm(), n3Required);
         n3Optional = n3Subber.subInLiterals(submission.getLiteralsFromForm(), n3Optional);
-        if(log.isDebugEnabled()) logRequuiredOpt("subsititued in literals off from ",n3Required,n3Optional);
+        if(log.isDebugEnabled()) logRequiredOpt("substituted in literals off from ",n3Required,n3Optional);
 
         /* ****************** URIs and Literals in Scope ************** */        
         n3Required = n3Subber.subInUris( editConfig.getUrisInScope(), n3Required);
         n3Optional = n3Subber.subInUris( editConfig.getUrisInScope(), n3Optional);
-        if(log.isDebugEnabled()) logRequuiredOpt("subsititued in URIs from scope ",n3Required,n3Optional);
+        if(log.isDebugEnabled()) logRequiredOpt("substituted in URIs from scope ",n3Required,n3Optional);
         entToReturnTo = n3Subber.subInUris(editConfig.getUrisInScope(), entToReturnTo);
         
         n3Required = n3Subber.subInLiterals( editConfig.getLiteralsInScope(), n3Required);
         n3Optional = n3Subber.subInLiterals( editConfig.getLiteralsInScope(), n3Optional);
-        if(log.isDebugEnabled()) logRequuiredOpt("subsititued in Literals from scope ",n3Required,n3Optional);
+        if(log.isDebugEnabled()) logRequiredOpt("substituted in Literals from scope ",n3Required,n3Optional);
         
         /* ****************** New Resources ********************** */
         Map<String,String> varToNewResource = newToUriMap(editConfig.getNewResources(),resourcesModel);         
@@ -230,7 +230,7 @@ are well formed.
         //have already been substituted in by urisInScope.
         n3Required = n3Subber.subInUris( varToNewResource, n3Required);
         n3Optional = n3Subber.subInUris( varToNewResource, n3Optional);
-        if(log.isDebugEnabled()) logRequuiredOpt("subsititued in URIs for new resources  ",n3Required,n3Optional);               
+        if(log.isDebugEnabled()) logRequiredOpt("substituted in URIs for new resources  ",n3Required,n3Optional);               
         entToReturnTo = n3Subber.subInUris(varToNewResource, entToReturnTo);
         
         //deal with required N3
@@ -481,7 +481,7 @@ are well formed.
         return true;
     }
   
-    private boolean logRequuiredOpt(String msg, List<String>required, List<String>optional){
+    private boolean logRequiredOpt(String msg, List<String>required, List<String>optional){
         log.debug(msg);
         if( required != null ) log.debug( "required: " + required.toString() );
         if( optional != null ) log.debug( "optional: " +  optional.toString() );
