@@ -172,7 +172,7 @@ public class DependentResourceDeleteJena {
     private static boolean isPredicateDependencyRelation( Property predicate , Model model){
     	return model.containsLiteral(
     			model.getResource(predicate.getURI()), 
-    			model.createProperty(VitroVocabulary.PROPERTY_DEPENDENCYPROPERTYANNOT), 
+    			model.createProperty(VitroVocabulary.PROPERTY_STUBOBJECTPROPERTYANNOT), 
     			true);
     }
 

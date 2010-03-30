@@ -191,7 +191,7 @@ public class PropertyRetryController extends BaseEditController {
         request.setAttribute("inverseFunctional",propertyForEditing.getInverseFunctional());
         request.setAttribute("selectFromExisting",propertyForEditing.getSelectFromExisting());
         request.setAttribute("offerCreateNewOption", propertyForEditing.getOfferCreateNewOption());
-        request.setAttribute("forceStubObjectDeletion", propertyForEditing.getForceStubObjectDeletion());
+        request.setAttribute("stubObjectRelation", propertyForEditing.getStubObjectRelation());
         request.setAttribute("collateBySubclass", propertyForEditing.getCollateBySubclass());
         
         //checkboxes are pretty annoying : we don't know if someone *unchecked* a box, so we have to default to false on updates.
@@ -202,7 +202,7 @@ public class PropertyRetryController extends BaseEditController {
         	propertyForEditing.setInverseFunctional(false);
         	propertyForEditing.setSelectFromExisting(false);
         	propertyForEditing.setOfferCreateNewOption(false);
-        	propertyForEditing.setForceStubObjectDeletion(false);
+        	propertyForEditing.setStubObjectRelation(false);
         	propertyForEditing.setCollateBySubclass(false);
         }
 

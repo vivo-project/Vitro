@@ -49,4 +49,39 @@ public class ObjectPropertyDaoJenaTest {
 			Assert.fail(e.getMessage());
 		}
 	}
+	
+	@Test
+	public void testStubObjectProperty(){
+		/* Check that we can save collateBySubclass */
+		OntModel model = ModelFactory.createOntologyModel();
+		WebappDaoFactory wdf = new WebappDaoFactoryJena(model);
+		
+		ObjectProperty op1 = new ObjectProperty();
+		String propURI = "http://example.com/testObjectProp" ;		
+		op1.setURI(propURI);
+		Assert.assertFalse(op1.getStubObjectRelation());
+		try {
+			wdf.getObjectPropertyDao().insertObjectProperty(op1);
+			ObjectProperty op2 = wdf.getObjectPropertyDao().getObjectPropertyByURI(propURI);
+			Assert.assertNotNull(op2);
+			Assert.assertFalse(op2.getStubObjectRelation());
+			
+			op2.setStubObjectRelation(true);
+			wdf.getObjectPropertyDao().updateObjectProperty(op2);
+			
+			ObjectProperty op3 = wdf.getObjectPropertyDao().getObjectPropertyByURI(propURI);
+			Assert.assertNotNull(op3);
+			Assert.assertTrue(op3.getStubObjectRelation());
+			
+			op3.setStubObjectRelation(false);
+			wdf.getObjectPropertyDao().updateObjectProperty(op3);
+			
+			ObjectProperty op4 = wdf.getObjectPropertyDao().getObjectPropertyByURI(propURI);
+			Assert.assertNotNull(op4);
+			Assert.assertFalse(op4.getStubObjectRelation());
+			
+		} catch (InsertException e) {
+			Assert.fail(e.getMessage());
+		}
+	}
 }

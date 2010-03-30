@@ -148,7 +148,7 @@ public class PropertyEditController extends BaseEditController {
         results.add(p.getCustomEntryForm() == null ? "unspecified" : p.getCustomEntryForm()); // column 13
         results.add(p.getSelectFromExisting() ? "true" : "false"); // column 14
         results.add(p.getOfferCreateNewOption() ? "true" : "false"); // column 15
-        results.add(p.getForceStubObjectDeletion() ? "true" : "false"); // column 16
+        results.add(p.getStubObjectRelation() ? "true" : "false"); // column 16
         results.add(p.getURI()); // column 17
         request.setAttribute("results",results);
         request.setAttribute("columncount",NUM_COLS);

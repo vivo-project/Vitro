@@ -73,7 +73,7 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
     
     private boolean selectFromExisting = true;
     private boolean offerCreateNewOption = false;
-    private boolean forceStubObjectDeletion = false;
+    private boolean stubObjectRelation = false;
     
     private boolean collateBySubclass = false;
     
@@ -363,12 +363,12 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
         this.offerCreateNewOption = b;
     }
     
-    public boolean getForceStubObjectDeletion() {
-        return forceStubObjectDeletion;
+    public boolean getStubObjectRelation() {
+        return stubObjectRelation;
     }
     
-    public void setForceStubObjectDeletion(boolean b) {
-        this.forceStubObjectDeletion = b;
+    public void setStubObjectRelation(boolean b) {
+        this.stubObjectRelation = b;
     }
     
     /**

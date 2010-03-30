@@ -100,7 +100,6 @@ public class VitroVocabulary {
     public static final String PROPERTY_OBJECTINDIVIDUALSORTPROPERTY = vitroURI+"objectIndividualSortProperty";
     public static final String PROPERTY_FULLPROPERTYNAMEANNOT = vitroURI+"fullPropertyNameAnnot";
     public static final String PROPERTY_CUSTOMSEARCHVIEWANNOT = vitroURI+"customSearchViewAnnot";
-    public static final String PROPERTY_FORCESTUBDELETIONANNOT = vitroURI+"forceStubDeletionAnnot";
     //public static final String PROPERTY_SELFEDITPROHIBITEDANNOT = vitroURI+"selfEditProhibitedAnnot";
     //public static final String PROPERTY_CURATOREDITPROHIBITEDANNOT = vitroURI+"curatorEditProhibitedAnnot";
     public static final String PROPERTY_CUSTOMENTRYFORMANNOT = vitroURI+"customEntryFormAnnot";
@@ -112,7 +111,7 @@ public class VitroVocabulary {
     public static final String PROPERTYGROUP = vitroURI + "PropertyGroup";
     public static final String MASKS_PROPERTY = vitroURI + "masksProperty";
     public static final String SKIP_EDIT_FORM = vitroURI + "skipEditForm";
-    public static final String PROPERTY_DEPENDENCYPROPERTYANNOT = vitroURI + "dependencyPropertyAnnot";
+    public static final String PROPERTY_STUBOBJECTPROPERTYANNOT = vitroURI + "stubObjectPropertyAnnot";
 	public static final String PROPERTY_COLLATEBYSUBCLASSANNOT = vitroURI + "collateBySubclassAnnot";
 	
     // ================== keyword related ==================================

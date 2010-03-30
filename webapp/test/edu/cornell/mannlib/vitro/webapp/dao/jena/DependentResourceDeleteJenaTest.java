@@ -18,10 +18,10 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 public class DependentResourceDeleteJenaTest {
 	String isDependentRelation =
-		" <"+VitroVocabulary.PROPERTY_DEPENDENCYPROPERTYANNOT+"> \"true\"^^xsd:boolean .\n" ;
+		" <"+VitroVocabulary.PROPERTY_STUBOBJECTPROPERTYANNOT+"> \"true\"^^xsd:boolean .\n" ;
 	
 	String nosePropIsDependentRel = 
-	"<"+VitroVocabulary.PROPERTY_DEPENDENCYPROPERTYANNOT+"> rdf:type owl:AnnotationProperty .\n" +
+	"<"+VitroVocabulary.PROPERTY_STUBOBJECTPROPERTYANNOT+"> rdf:type owl:AnnotationProperty .\n" +
     " ex:hasNose " + isDependentRelation;
 	
     String prefixesN3 = 

@@ -220,8 +220,8 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
             p.setSelectFromExisting(selectFromObj==null ? true : selectFromObj);
             Boolean offerCreateObj = getPropertyBooleanValue(op,PROPERTY_OFFERCREATENEWOPTIONANNOT);
             p.setOfferCreateNewOption(offerCreateObj==null ? false : offerCreateObj);
-            Boolean forceStubObjectDeletionObj = getPropertyBooleanValue(op,PROPERTY_FORCESTUBDELETIONANNOT);
-            p.setForceStubObjectDeletion(forceStubObjectDeletionObj==null ? false : forceStubObjectDeletionObj);
+            Boolean dependencyDeletionObj = getPropertyBooleanValue(op,PROPERTY_STUBOBJECTPROPERTYANNOT);
+            p.setStubObjectRelation(dependencyDeletionObj==null ? false : dependencyDeletionObj);
 
             Boolean collateBySubclass = getPropertyBooleanValue(op,PROPERTY_COLLATEBYSUBCLASSANNOT);
             p.setCollateBySubclass(collateBySubclass==null ? false : collateBySubclass);
@@ -604,7 +604,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         updatePropertyStringValue(p,PROPERTY_CUSTOMENTRYFORMANNOT,prop.getCustomEntryForm(),ontModel);
         updatePropertyBooleanValue(p,PROPERTY_SELECTFROMEXISTINGANNOT,prop.getSelectFromExisting(),ontModel,JenaBaseDao.KEEP_ONLY_IF_FALSE);
         updatePropertyBooleanValue(p,PROPERTY_OFFERCREATENEWOPTIONANNOT,prop.getOfferCreateNewOption(),ontModel,JenaBaseDao.KEEP_ONLY_IF_TRUE);
-        updatePropertyBooleanValue(p,PROPERTY_FORCESTUBDELETIONANNOT,prop.getForceStubObjectDeletion(),ontModel,JenaBaseDao.KEEP_ONLY_IF_TRUE);
+        updatePropertyBooleanValue(p,PROPERTY_STUBOBJECTPROPERTYANNOT,prop.getStubObjectRelation(),ontModel,JenaBaseDao.KEEP_ONLY_IF_TRUE);
         updatePropertyBooleanValue(p,PROPERTY_COLLATEBYSUBCLASSANNOT,prop.getCollateBySubclass(),ontModel,JenaBaseDao.KEEP_ONLY_IF_TRUE);
         try {
         	p.removeAll(PROPERTY_INPROPERTYGROUPANNOT);

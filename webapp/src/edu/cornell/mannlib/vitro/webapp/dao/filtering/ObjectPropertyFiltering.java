@@ -545,13 +545,13 @@ public class ObjectPropertyFiltering extends ObjectProperty {
     }
 
     @Override
-    public boolean getForceStubObjectDeletion() {
-        return innerObjectProperty.getForceStubObjectDeletion();
+    public boolean getStubObjectRelation() {
+        return innerObjectProperty.getStubObjectRelation();
     }
 
     @Override
-    public void setForceStubObjectDeletion(boolean b) {
-        innerObjectProperty.setForceStubObjectDeletion(b);
+    public void setStubObjectRelation(boolean b) {
+        innerObjectProperty.setStubObjectRelation(b);
     }
 
 	@Override

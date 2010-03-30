@@ -33,10 +33,10 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 public class JenaBaseDaoTest {
 	String isDependentRelation =
-		" <"+VitroVocabulary.PROPERTY_DEPENDENCYPROPERTYANNOT+"> \"true\"^^xsd:boolean .\n" ;
+		" <"+VitroVocabulary.PROPERTY_STUBOBJECTPROPERTYANNOT+"> \"true\"^^xsd:boolean .\n" ;
 	
 	String nosePropIsDependentRel = 
-	"<"+VitroVocabulary.PROPERTY_DEPENDENCYPROPERTYANNOT+"> rdf:type owl:AnnotationProperty .\n" +
+	"<"+VitroVocabulary.PROPERTY_STUBOBJECTPROPERTYANNOT+"> rdf:type owl:AnnotationProperty .\n" +
     " ex:hasNose " + isDependentRelation;
 	
     String prefixesN3 = 
@@ -104,7 +104,7 @@ public class JenaBaseDaoTest {
 				"<http://example.com/prop1>  " +
 				"    a       owl:ObjectProperty ; " +
 				"    rdfs:label \"Prop 1 Dependent Relation\" ; " +
-				"    <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#dependencyPropertyAnnot> \"true\"^^xsd:boolean ." ;
+			         isDependentRelation ;
 										
 			Model expectedModel = (ModelFactory.createOntologyModel()).read(new StringReader(expected), "", "N3");
 			
@@ -185,7 +185,7 @@ public class JenaBaseDaoTest {
 			"<http://example.com/prop1>  " +
 			"    a       owl:ObjectProperty ; " +
 			"    rdfs:label \"Prop 1 Dependent Relation\" ; " +
-			"    <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#dependencyPropertyAnnot> \"true\"^^xsd:boolean ." ;
+			     isDependentRelation ;
 									
 		Model expectedModel = (ModelFactory.createOntologyModel()).read(new StringReader(expected), "", "N3");		
 				
@@ -193,6 +193,11 @@ public class JenaBaseDaoTest {
 		wipeOutModTime(expectedModel);
 		wipeOutModTime(model);
 
+		System.out.println("expected Model" );
+		expectedModel.write(System.out,"N3");
+		System.out.println("result model");
+		model.write(System.out,"N3");
+		
 		Assert.assertTrue( model.isIsomorphicWith(expectedModel));		
 	}
 	

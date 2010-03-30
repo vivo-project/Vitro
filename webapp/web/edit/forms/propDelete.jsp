@@ -76,7 +76,7 @@ public WebappDaoFactory getUnfilteredDaoFactory() {
         String editorUri = EditN3Utils.getEditorUri(request,session,application);        
          wdf = wdf.getUserAwareDaoFactory(editorUri);
         
-        if (prop.getForceStubObjectDeletion()) {
+        if (prop.getStubObjectRelation()) {
             Individual object = (Individual)request.getAttribute("object");
             if (object==null) {
                 object = getUnfilteredDaoFactory().getIndividualDao().getIndividualByURI(objectUri);
