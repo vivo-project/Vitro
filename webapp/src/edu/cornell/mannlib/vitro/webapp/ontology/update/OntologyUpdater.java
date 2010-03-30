@@ -39,7 +39,7 @@ public class OntologyUpdater {
 
 	private final String DATA_DIR = "/WEB-INF/ontologies/update/";
 	private final String ASK_QUERY_FILE = DATA_DIR + "ask.sparql";
-	private final String SUCCESS_ASSERTIONS = DATA_DIR + "success.n3";
+	private final String SUCCESS_ASSERTIONS_FILE = DATA_DIR + "success.n3";
 	private final String SUCCESS_RDF_FORMAT = "N3";
 	private final String DIFF_FILE = DATA_DIR + "diff.tab.txt";
 	
