@@ -192,11 +192,6 @@ public class JenaBaseDaoTest {
 		//modtime times make it difficult to compare graphs
 		wipeOutModTime(expectedModel);
 		wipeOutModTime(model);
-
-		System.out.println("expected Model" );
-		expectedModel.write(System.out,"N3");
-		System.out.println("result model");
-		model.write(System.out,"N3");
 		
 		Assert.assertTrue( model.isIsomorphicWith(expectedModel));		
 	}
