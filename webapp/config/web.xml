@@ -78,6 +78,12 @@
      <listener-class>edu.cornell.mannlib.vitro.webapp.servlet.setup.AttachSubmodels</listener-class>
   </listener>
 
+  <!-- Invokes process to perform updates to align with ontology changes if needed -->
+
+  <listener>
+     <listener-class>edu.cornell.mannlib.vitro.webapp.servlet.setup.UpdateKnowledgeBase</listener-class>
+  </listener>
+
   <!-- Pellet setup enables reasoning.  Inferences are cached in a separate DB graph. -->
   <!-- Changing the class name sets the kindss of inferences that are materialized. -->
   <!-- See documentation for details. -->

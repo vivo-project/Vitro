@@ -4,13 +4,12 @@ package edu.cornell.mannlib.vitro.webapp.ontology.update;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-
-import javax.servlet.ServletContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -19,11 +18,8 @@ import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
-import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.shared.Lock;
-
-import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 
 /**
  * Performs knowledge base updates if necessary to align with a
@@ -37,21 +33,14 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
  */
 public class OntologyUpdater {
 
-	private final String DATA_DIR = "/WEB-INF/ontologies/update/";
-	private final String ASK_QUERY_FILE = DATA_DIR + "ask.sparql";
-	private final String SUCCESS_ASSERTIONS_FILE = DATA_DIR + "success.n3";
-	private final String SUCCESS_RDF_FORMAT = "N3";
-	private final String DIFF_FILE = DATA_DIR + "diff.tab.txt";
+	
 	
 	private final Log log = LogFactory.getLog(OntologyUpdater.class);
 	
-	private ServletContext context;
-	private OntModelSelector ontModelSelector;
+	private OntologyUpdateSettings settings;
 	
-	public OntologyUpdater(ServletContext context, 
-			OntModelSelector ontModelSelector) {
-		this.context = context;
-		this.ontModelSelector = ontModelSelector;
+	public OntologyUpdater(OntologyUpdateSettings settings) {
+		this.settings = settings;
 	}
 	
 	public void update() throws IOException {	
@@ -67,12 +56,12 @@ public class OntologyUpdater {
 	private void performUpdate() {
 		List<AtomicOntologyChange> changes = getAtomicOntologyChanges();
 		
-		//preprocessChanges(changes);
 		//updateTBox(changes);
+		//preprocessChanges(changes);
 		
 		updateABox(changes);
 		
-		updateAnnotations();
+		updateTBoxAnnotations();
 		
 		// perform additional additions and retractions
 	}
@@ -84,10 +73,9 @@ public class OntologyUpdater {
 	private void updateABox(List<AtomicOntologyChange> changes) {
 		// perform operations based on change objects
 		// run additional SPARQL CONSTRUCTS 
-
 	}
 	
-	private void updateAnnotations() {
+	private void updateTBoxAnnotations() {
 		// Stella's code is called here
 	}
 	
@@ -96,11 +84,11 @@ public class OntologyUpdater {
 	 * needs to be updated to conform to a new ontology version
 	 */
 	private boolean updateRequired() throws IOException {
-		String sparqlQueryStr = loadSparqlQuery(ASK_QUERY_FILE);
+		String sparqlQueryStr = loadSparqlQuery(settings.getAskQueryFile());
 		if (sparqlQueryStr == null) {
 			return false;
 		}
-		Model m = ontModelSelector.getApplicationMetadataModel();
+		Model m = settings.getOntModelSelector().getApplicationMetadataModel();
 		Query query = QueryFactory.create(sparqlQueryStr);
 		QueryExecution qexec = QueryExecutionFactory.create(query, m);
 		
@@ -117,7 +105,7 @@ public class OntologyUpdater {
 	 * @return the query string or null if file not found
 	 */
 	private String loadSparqlQuery(String filePath) throws IOException {
-		File file = new File(context.getRealPath(filePath));	
+		File file = new File(settings.getAskQueryFile());	
 		if (!file.exists()) {
 			return null;
 		}
@@ -130,15 +118,21 @@ public class OntologyUpdater {
 		return fileContents.toString();				
 	}
 	
-	private void assertSuccess() {
-	    Model m = ontModelSelector.getApplicationMetadataModel();
-	    InputStream inStream = context.getResourceAsStream(SUCCESS_ASSERTIONS_FILE);
-	    m.enterCriticalSection(Lock.WRITE);
-	    try {
-	    	m.read(inStream, SUCCESS_RDF_FORMAT);
-	    } finally {
-	    	m.leaveCriticalSection();
-	    }
+	private void assertSuccess() throws FileNotFoundException {
+		try {
+		    Model m = settings.getOntModelSelector().getApplicationMetadataModel();
+		    File successAssertionsFile = 
+		    	new File(settings.getSuccessAssertionsFile()); 
+		    InputStream inStream = new FileInputStream(successAssertionsFile);
+		    m.enterCriticalSection(Lock.WRITE);
+		    try {
+		    	m.read(inStream, settings.getSuccessRDFFormat());
+		    } finally {
+		    	m.leaveCriticalSection();
+		    }
+		} catch (Exception e) {
+			// TODO: log something to the error log
+		}
 	}
 	
 }
