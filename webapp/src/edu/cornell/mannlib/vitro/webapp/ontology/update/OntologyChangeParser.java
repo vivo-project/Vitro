@@ -30,7 +30,7 @@ public class OntologyChangeParser {
 	 */
 	
 	@SuppressWarnings({ "unchecked", "null", "static-access" })
-	public static ArrayList<AtomicOntologyChange> parseFile() throws IOException{
+	public static ArrayList<AtomicOntologyChange> parseFile(String diffPath) throws IOException{
 		
 		AtomicOntologyChange changeObj;
 		ArrayList<AtomicOntologyChange> changeObjects = new ArrayList<AtomicOntologyChange>();
@@ -40,7 +40,7 @@ public class OntologyChangeParser {
 		String sourceURI = null;
 		String destinationURI = null;
 		StringTokenizer stArr = null; 
-		FileInputStream in = new FileInputStream(new File("/WEB-INF/ontologies/update/diff.tab.txt"));
+		FileInputStream in = new FileInputStream(new File(diffPath));
 		CSVReader readFile = new SimpleReader();
 		
 		List<String[]> rows = readFile.parse(in);
