@@ -117,7 +117,7 @@ public class UserRetryController extends BaseEditController {
         
         /* has no impact on anything, so don't confuse by showing */
         /* bdc34: Datastar needs non-backend-editing users for logging in non-Cornell people*/ 
-        Option nonEditor = new Option(ROLE_PROTOCOL+loginBean.getNonEditor(), "unprivileged user");
+        Option nonEditor = new Option(ROLE_PROTOCOL+loginBean.getNonEditor(), "self editor");
         nonEditor.setSelected(userForEditing.getRoleURI().equals(nonEditor.getValue()));
         
         Option editor = new Option(ROLE_PROTOCOL+loginBean.getEditor(), "editor");

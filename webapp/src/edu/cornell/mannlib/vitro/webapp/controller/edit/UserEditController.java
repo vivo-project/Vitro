@@ -32,7 +32,7 @@ public class UserEditController extends BaseEditController {
     private static final Log log = LogFactory.getLog(UserEditController.class.getName());
 
     public UserEditController() {
-        roleNameStr[1] = "unprivileged";
+        roleNameStr[1] = "self editor";
         roleNameStr[4] = "editor";
         roleNameStr[5] = "curator";
         roleNameStr[50] = "system administrator";
