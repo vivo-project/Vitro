@@ -68,7 +68,7 @@ public class OntologyUpdater {
 	
 	private List<AtomicOntologyChange> getAtomicOntologyChanges() 
 			throws IOException {
-		return OntologyChangeParser.parseFile(settings.getDiffFile());
+		return (new OntologyChangeParser()).parseFile(settings.getDiffFile());
 	}
 	
 	private void updateABox(List<AtomicOntologyChange> changes) {
