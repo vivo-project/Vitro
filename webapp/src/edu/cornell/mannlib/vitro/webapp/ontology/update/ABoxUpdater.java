@@ -5,15 +5,13 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.ontology.OntModelSpec;
-import com.hp.hpl.jena.rdf.model.Literal;
+import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
-import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.rdf.model.Statement;
 
 public class ABoxUpdater {
 
@@ -46,16 +44,60 @@ public class ABoxUpdater {
 		
 		
 	}
-
-	public void logChange(Statement statement, boolean add) throws IOException {
-		logger.log( (add ? "Added " : "Removed") + "Statement: subject = " + statement.getSubject().getURI() +
-				" property = " + statement.getPredicate().getURI() +
-                " object = " + (statement.getObject().isLiteral() ? ((Resource)statement.getObject()).getURI() : ((Literal)statement.getObject()).getLexicalForm()));	
+	
+	public void processPropertyChanges(List<AtomicOntologyChange> changes) throws IOException {
+		
+		Iterator propItr = changes.iterator();
+		
+		while(propItr.hasNext()){
+			
+			AtomicOntologyChange propChangeObj = (AtomicOntologyChange)
+			                                     propItr.next();
+			
+			switch (propChangeObj.getAtomicChangeType()){
+			case ADD: addProperties(propChangeObj);
+			break;
+			case DELETE: deleteProperties(propChangeObj);
+			break;
+			case RENAME: renameProperties(propChangeObj);
+			break;
+			default: logger.logError("Property change can't be null");
+			break;
+		    }		
+		}
 	}
-
-	public void processPropertyChanges(List<AtomicOntologyChange> changes) {
+	
+	private void addProperties(AtomicOntologyChange propObj){
 		
 	}
+	private void deleteProperties(AtomicOntologyChange propObj){
+		
+	}
+	private void renameProperties(AtomicOntologyChange propObj){
+		Model renamePropAddModel = ModelFactory.createDefaultModel();
+		Model renamePropRetractModel = 
+			ModelFactory.createDefaultModel();
+		Statement tempStatement = null;
+		Property tempProperty = null; 
+		
 	
-	
+		StmtIterator stmItr = aboxModel.listStatements();
+		while(stmItr.hasNext()){
+			tempStatement = stmItr.nextStatement();
+			if(tempStatement.getPredicate().toString().
+					equalsIgnoreCase(propObj.getSourceURI())){
+				tempProperty = ResourceFactory.createProperty(
+						propObj.getDestinationURI());
+				aboxModel.remove(tempStatement);
+				renamePropRetractModel.add(tempStatement);
+				aboxModel.add(tempStatement.getSubject(),tempProperty
+						,tempStatement.getObject());
+				renamePropAddModel.add(tempStatement.getSubject(),
+						tempProperty,tempStatement.getObject());
+			}
+		}
+		record.recordAdditions(renamePropAddModel);
+		record.recordRetractions(renamePropRetractModel);	
+	}
+		
 }
