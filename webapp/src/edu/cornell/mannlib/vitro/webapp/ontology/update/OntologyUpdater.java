@@ -14,6 +14,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
@@ -54,7 +55,11 @@ public class OntologyUpdater {
 	}
 	
 	private void performUpdate() throws IOException {
-		List<AtomicOntologyChange> changes = getAtomicOntologyChanges();
+		List<AtomicOntologyChange> rawChanges = getAtomicOntologyChanges();
+		
+		AtomicOntologyChangeLists changes = 
+				new AtomicOntologyChangeLists(rawChanges, 
+						settings.getOntModelSelector().getTBoxModel());
 		
 		//updateTBox(changes);
 		//preprocessChanges(changes);
@@ -71,7 +76,9 @@ public class OntologyUpdater {
 		return (new OntologyChangeParser()).parseFile(settings.getDiffFile());
 	}
 	
-	private void updateABox(List<AtomicOntologyChange> changes) {
+
+	
+	private void updateABox(AtomicOntologyChangeLists changes) {
 		// perform operations based on change objects
 		// run additional SPARQL CONSTRUCTS 
 	}
@@ -140,6 +147,34 @@ public class OntologyUpdater {
 		
 	}
 	
+	/**
+	 * A class that allows to access two different ontology change lists,
+	 * one for class changes and the other for property changes.  The 
+	 * constructor will split a list containing both types of changes.
+	 * @author bjl23
+	 *
+	 */
+	private class AtomicOntologyChangeLists {
+		
+		private List<AtomicOntologyChange> atomicClassChanges;
+
+		private List<AtomicOntologyChange> atomicPropertyChanges;
+		
+		public AtomicOntologyChangeLists(
+				List<AtomicOntologyChange> changeList, OntModel tboxModel) {
+			// TODO: split the main list of change objects into two lists 
+			// depending on whether they refer to classes or properties
+		}
+		
+		public List<AtomicOntologyChange> getAtomicClassChanges() {
+			return atomicClassChanges;
+		}
+
+		public List<AtomicOntologyChange> getAtomicPropertyChanges() {
+			return atomicPropertyChanges;
+		}
+		
+	}
 	
 	
 }
