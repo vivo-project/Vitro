@@ -4,6 +4,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib uri="http://vitro.mannlib.cornell.edu/vitro/tags/StringProcessorTag" prefix="p" %>
 <%@ taglib uri="http://vitro.mannlib.cornell.edu/vitro/tags/PropertyEditLink" prefix="edLnk" %>
+
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Portal" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Individual" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.VitroRequest" %>
@@ -21,6 +22,11 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.DataProperty" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.RdfLiteralHash" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.dao.VClassDao" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.beans.VClass" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep" %>
+<%@ page import="edu.cornell.mannlib.vedit.beans.LoginFormBean" %>
+
 <%@ page import="java.util.Collection" %>
 <%@ page import="java.util.Collections" %>
 <%@ page import="java.util.Comparator" %>
@@ -28,10 +34,10 @@
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.Iterator" %>
 <%@ page import="java.util.HashSet" %>
+
 <%@ page import="org.apache.commons.logging.Log" %>
 <%@ page import="org.apache.commons.logging.LogFactory" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep" %>
-<%@ page import="edu.cornell.mannlib.vedit.beans.LoginFormBean" %>
+
 <jsp:useBean id="loginHandler" class="edu.cornell.mannlib.vedit.beans.LoginFormBean" scope="session" />
 <%! 
 public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.templates.entity.entityMergedPropsList.jsp");
@@ -65,6 +71,8 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 
     WebappDaoFactory wdf = vreq.getWebappDaoFactory();
 	PropertyGroupDao pgDao = wdf.getPropertyGroupDao();
+    VClassDao vcDao = wdf.getVClassDao();
+    
     ArrayList<Property> propsList = (ArrayList) request.getAttribute("mergedList");
 	for (Property p : propsList) {%>
  		<c:set var="stmtCounter" value="0"/>
@@ -182,12 +190,27 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 	               				<c:param name="home" value="${portal.portalId}"/>
 	               				<c:param name="uri" value="${objPropertyStmt.object.URI}"/>               			
 	           				</c:url>
+
+							<%
+							   // Make this a method of some object: Individual or ...?
+						       String customShortView = null;
+							   Individual object = ((ObjectPropertyStatement)request.getAttribute("opStmt")).getObject();
+						       List<VClass> vclasses = object.getVClasses();
+
+						       vclassLoop: for (VClass vclass : vclasses) {
+						           String vclassUri = vclass.getURI();
+						           List<String> superClassUris = vcDao.getAllSuperClassURIs(vclassUri);
+						           for (String superClassUri : superClassUris) {
+						               VClass cl = vcDao.getVClassByURI(superClassUri);
+						               customShortView = cl.getCustomShortView();
+						               if (customShortView != null) { 
+						                   break vclassLoop; 
+						               }
+						           }
+						       }    
+							%>
 							<c:remove var="opStmt" scope="request"/>
-	          				<c:forEach items="${objPropertyStmt.object.VClasses}" var="type">
-	         					<c:if test="${!empty type.customShortView}">
-	         						<c:set var="altRenderJsp" value="${type.customShortView}"/>
-	         					</c:if>
-	         				</c:forEach> 
+	         				<c:set var="altRenderJsp" value="<%= customShortView %>" />
 	            			<c:choose>
 					            <c:when test="${!empty altRenderJsp}">
 									<c:set scope="request" var="individual" value="${objPropertyStmt.object}"/>
