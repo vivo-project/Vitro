@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
+import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntProperty;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -43,6 +45,7 @@ public class ABoxUpdater {
 	}
 
 	public void addClass(AtomicOntologyChange change) {
+	
 			
 	}
 
@@ -52,14 +55,10 @@ public class ABoxUpdater {
 	}
 	
 	public void processPropertyChanges(List<AtomicOntologyChange> changes) throws IOException {
-		
 		Iterator propItr = changes.iterator();
-		
 		while(propItr.hasNext()){
-			
 			AtomicOntologyChange propChangeObj = (AtomicOntologyChange)
 			                                     propItr.next();
-			
 			switch (propChangeObj.getAtomicChangeType()){
 			case ADD: addProperties(propChangeObj);
 			break;
@@ -73,11 +72,40 @@ public class ABoxUpdater {
 		}
 	}
 	
-	private void addProperties(AtomicOntologyChange propObj){
-		
+	private void addProperties(AtomicOntologyChange propObj) throws IOException{
+		Statement tempStatement = null;
+		OntProperty tempProperty = newTboxModel.getOntProperty
+		(propObj.getDestinationURI()).getSuperProperty();
+		StmtIterator stmItr = aboxModel.listStatements();
+		int count = 0;
+		while(stmItr.hasNext()){
+			tempStatement = stmItr.nextStatement();
+			if(tempStatement.getPredicate().getURI().
+					equalsIgnoreCase(tempProperty.getURI())){
+				count++;			
+			}
+		}
+		logger.log("The Property " + tempProperty.getURI() + 
+				"which occurs " + count + "times in database has " +
+						"a new subProperty " + propObj.getDestinationURI() +
+				"added to Core 1.0");
+		logger.log("Please review accordingly");			
 	}
-	private void deleteProperties(AtomicOntologyChange propObj){
-		
+	private void deleteProperties(AtomicOntologyChange propObj) throws IOException{
+		OntModel deletePropModel = ModelFactory.createOntologyModel();
+		Statement tempStatement = null;
+		StmtIterator stmItr = aboxModel.listStatements();
+		while(stmItr.hasNext()){
+			tempStatement = stmItr.nextStatement();
+			if(tempStatement.getPredicate().getURI().equalsIgnoreCase
+					(propObj.getSourceURI())){
+				deletePropModel.add(tempStatement);	
+			}
+		}
+		aboxModel = (OntModel) aboxModel.difference(deletePropModel);	
+		record.recordRetractions(deletePropModel);
+		logger.log("All statements using " + propObj.getSourceURI() +
+				"were removed. Please refer removed data model");
 	}
 	private void renameProperties(AtomicOntologyChange propObj){
 		Model renamePropAddModel = ModelFactory.createDefaultModel();
@@ -85,12 +113,10 @@ public class ABoxUpdater {
 			ModelFactory.createDefaultModel();
 		Statement tempStatement = null;
 		Property tempProperty = null; 
-		
-	
 		StmtIterator stmItr = aboxModel.listStatements();
 		while(stmItr.hasNext()){
 			tempStatement = stmItr.nextStatement();
-			if(tempStatement.getPredicate().toString().
+			if(tempStatement.getPredicate().getURI().
 					equalsIgnoreCase(propObj.getSourceURI())){
 				tempProperty = ResourceFactory.createProperty(
 						propObj.getDestinationURI());
