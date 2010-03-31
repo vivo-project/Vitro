@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
@@ -99,5 +100,12 @@ public class ABoxUpdater {
 		record.recordAdditions(renamePropAddModel);
 		record.recordRetractions(renamePropRetractModel);	
 	}
+	
+	public void logChange(Statement statement, boolean add) throws IOException {
+		logger.log( (add ? "Added " : "Removed") + "Statement: subject = " + statement.getSubject().getURI() +
+				" property = " + statement.getPredicate().getURI() +
+                " object = " + (statement.getObject().isLiteral() ? ((Resource)statement.getObject()).getURI() : ((Literal)statement.getObject()).getLexicalForm()));	
+	}
+
 		
 }
