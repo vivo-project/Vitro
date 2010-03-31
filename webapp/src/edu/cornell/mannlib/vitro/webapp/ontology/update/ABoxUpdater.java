@@ -16,14 +16,19 @@ import com.hp.hpl.jena.rdf.model.Statement;
 
 public class ABoxUpdater {
 
-	private OntModel tboxModel;
+	private OntModel oldTboxModel;
+	private OntModel newTboxModel;
 	private OntModel aboxModel;
 	private OntologyChangeLogger logger;  
 	private OntologyChangeRecord record;
 	
-	public ABoxUpdater(OntModel tboxModel, OntModel aboxModel,
-				       OntologyChangeLogger logger, OntologyChangeRecord record) {
-		this.tboxModel = tboxModel;
+	public ABoxUpdater(OntModel oldTboxModel,
+			           OntModel newTboxModel,
+			           OntModel aboxModel,
+		               OntologyChangeLogger logger,
+		               OntologyChangeRecord record) {
+		this.oldTboxModel = oldTboxModel;
+		this.newTboxModel = newTboxModel;
 		this.aboxModel = aboxModel;
 		this.logger = logger;
 		this.record = record;
