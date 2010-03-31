@@ -30,7 +30,7 @@ public class OntologyChangeParser {
 	 */
 	
 	@SuppressWarnings({ "unchecked", "null", "static-access" })
-	public static ArrayList<AtomicOntologyChange> parseFile(String diffPath) throws IOException{
+	public ArrayList<AtomicOntologyChange> parseFile(String diffPath) throws IOException{
 		
 		AtomicOntologyChange changeObj;
 		ArrayList<AtomicOntologyChange> changeObjects = new ArrayList<AtomicOntologyChange>();
