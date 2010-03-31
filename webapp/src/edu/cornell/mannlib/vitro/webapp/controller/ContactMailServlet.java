@@ -50,12 +50,12 @@ public class ContactMailServlet extends VitroHttpServlet {
         return true;
     }
 
-	private String getSmtpHostFromProperties() {
+	public static String getSmtpHostFromProperties() {
 		String host = ConfigurationProperties.getProperty("Vitro.smtpHost");
 		if (host != null && !host.equals("")) {
-			LOG.info("Found Vitro.smtpHost value of " + host);
+			LOG.debug("Found Vitro.smtpHost value of " + host);
 		} else {
-			System.out.println("No Vitro.smtpHost specified");
+			LOG.debug("No Vitro.smtpHost specified");
 		}
 		return (host != null && host.length() > 0) ? host : null;
 	}
