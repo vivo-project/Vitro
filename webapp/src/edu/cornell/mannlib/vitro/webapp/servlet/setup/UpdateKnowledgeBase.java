@@ -60,8 +60,13 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		try {
 			(new OntologyUpdater(settings)).update(); 
 		} catch (IOException ioe) {
-			throw new RuntimeException("IOException updating knowledge base " +
-					"for ontology changes", ioe);
+			String errMsg = "IOException updating knowledge base " +
+				"for ontology changes: ";
+			// Tomcat doesn't always seem to print exceptions thrown from
+			// context listeners
+			System.out.println(errMsg);
+			ioe.printStackTrace();
+			throw new RuntimeException(errMsg, ioe);
 		}
 		
 	}	

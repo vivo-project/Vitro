@@ -53,7 +53,7 @@ public class OntologyUpdater {
 		}
 	}
 	
-	private void performUpdate() {
+	private void performUpdate() throws IOException {
 		List<AtomicOntologyChange> changes = getAtomicOntologyChanges();
 		
 		//updateTBox(changes);
@@ -66,8 +66,9 @@ public class OntologyUpdater {
 		// perform additional additions and retractions
 	}
 	
-	private List<AtomicOntologyChange> getAtomicOntologyChanges() {
-		return null; //Anup's code is called here
+	private List<AtomicOntologyChange> getAtomicOntologyChanges() 
+			throws IOException {
+		return OntologyChangeParser.parseFile(settings.getDiffFile());
 	}
 	
 	private void updateABox(List<AtomicOntologyChange> changes) {
@@ -134,5 +135,11 @@ public class OntologyUpdater {
 			// TODO: log something to the error log
 		}
 	}
+	
+	private void log(String log) {
+		
+	}
+	
+	
 	
 }
