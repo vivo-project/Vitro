@@ -45,6 +45,8 @@ public class OntologyUpdater {
 	private OntologyChangeLogger logger;
 	private OntologyChangeRecord record;
 	
+	private OntModel OLD_TBOX_MODEL = null; // TODO change this
+	
 	public OntologyUpdater(OntologyUpdateSettings settings) {
 		this.settings = settings;
 		this.logger = new SimpleOntologyChangeLogger(settings.getLogFile(),
@@ -68,7 +70,8 @@ public class OntologyUpdater {
 		
 		AtomicOntologyChangeLists changes = 
 				new AtomicOntologyChangeLists(rawChanges, 
-						settings.getOntModelSelector().getTBoxModel());
+						settings.getOntModelSelector().getTBoxModel(), 
+						OLD_TBOX_MODEL);
 		
 		//updateTBox(changes);
 		//preprocessChanges(changes);
@@ -177,9 +180,9 @@ public class OntologyUpdater {
 
 		private List<AtomicOntologyChange> atomicPropertyChanges;
 		
-		public AtomicOntologyChangeLists(
+		public AtomicOntologyChangeLists (
 				List<AtomicOntologyChange> changeList, OntModel newTboxModel,
-				OntModel oldTboxModel) {
+				OntModel oldTboxModel) throws IOException {
 			
 			String str = null;
 			Iterator<AtomicOntologyChange> listItr = changeList.iterator();
