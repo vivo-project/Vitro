@@ -19,6 +19,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
@@ -113,6 +114,11 @@ public class ABoxUpdater {
 	 *                    
 	 */
 	public void renameClass(AtomicOntologyChange change) throws IOException {
+		
+		aboxModel.enterCriticalSection(Lock.WRITE);
+		
+		try {
+			
 	       OntModel additions = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
 	       OntModel retractions = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
 	       
@@ -150,6 +156,11 @@ public class ABoxUpdater {
 		   record.recordRetractions(retractions);
 		   aboxModel.add(additions);
 		   record.recordAdditions(additions);
+		   
+		} finally {
+			aboxModel.leaveCriticalSection();
+		}
+		
 	}
 
 	/**

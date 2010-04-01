@@ -26,9 +26,6 @@ import com.hp.hpl.jena.shared.Lock;
  * Performs knowledge base updates if necessary to align with a
  * new ontology version.
  * 
- * This class assumes that config and mapping data files are available
- * at DATA_DIR.
- * 
  * @author bjl23
  *
  */

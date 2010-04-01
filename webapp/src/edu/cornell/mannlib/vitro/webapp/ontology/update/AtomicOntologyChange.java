@@ -29,6 +29,12 @@ public class AtomicOntologyChange {
     }
 
 	
+	/**
+	 * Contains the URI of a class or property in the previous version of
+	 * the ontology, or null if a new class or property was introduced
+	 * in the current version of the ontology.
+	 * @return
+	 */
 	public String getSourceURI() {
 		return this.sourceURI;
 	}
@@ -37,6 +43,12 @@ public class AtomicOntologyChange {
 		this.sourceURI = sourceURI;
 	}
 	
+	/**
+	 * Contains the URI of a class or property in the current version of 
+	 * the ontology, or null if a class or property was removed from the
+	 * previous version of the ontology.
+	 * @return
+	 */
 	public String getDestinationURI() {
 		return this.destinationURI;
 	}
