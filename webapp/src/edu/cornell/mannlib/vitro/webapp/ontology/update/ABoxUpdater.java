@@ -119,8 +119,8 @@ public class ABoxUpdater {
 		
 		try {
 			
-	       OntModel additions = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
-	       OntModel retractions = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+	       Model additions = ModelFactory.createDefaultModel();
+	       Model retractions = ModelFactory.createDefaultModel();
 	       
 		   Resource oldClass = ResourceFactory.createResource(change.getSourceURI());
 		   Resource newClass = ResourceFactory.createResource(change.getDestinationURI());	   
