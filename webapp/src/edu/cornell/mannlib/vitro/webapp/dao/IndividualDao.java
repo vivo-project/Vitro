@@ -141,7 +141,7 @@ public interface IndividualDao extends ObjectSourceIface {
 
 	/**
 	 * Standard way to get a new URI that is not yet used.
-	 * @param individual
+	 * @param individual, may be null
 	 * @return new URI that is not found in the subject, predicate or object position of any statement.
 	 * @throws InsertException Could not create a URI
 	 */

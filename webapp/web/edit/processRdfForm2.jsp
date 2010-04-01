@@ -58,11 +58,16 @@ are well formed.
     if (!selfEditing && !LoginFormBean.loggedIn(request, LoginFormBean.NON_EDITOR)) {
 %>
         
-<%@page import="edu.cornell.mannlib.vitro.webapp.dao.jena.DependentResourceDeleteJena"%><c:redirect url="<%= Controllers.LOGIN %>" />      
+<%@page import="edu.cornell.mannlib.vitro.webapp.dao.jena.DependentResourceDeleteJena"%>
+<%@page import="edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory"%>
+<%@page import="edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl"%>
+<%@page import="edu.cornell.mannlib.vitro.webapp.beans.Individual"%>
+<%@page import="edu.cornell.mannlib.vitro.webapp.dao.InsertException"%><c:redirect url="<%= Controllers.LOGIN %>" />      
 <%
     }
     
     VitroRequest vreq = new VitroRequest(request);
+    WebappDaoFactory wdf = vreq.getWebappDaoFactory();
     
     /* the post parameters seem to get consumed by the parsing so
      * we have to make a copy. */
@@ -133,7 +138,7 @@ are well formed.
         entToReturnTo = n3Subber.subInUris(editConfig.getUrisInScope(),entToReturnTo);
         
         //do edits ever need new resources? (YES)
-        Map<String,String> varToNewResource = newToUriMap(editConfig.getNewResources(),resourcesModel);
+        Map<String,String> varToNewResource = newToUriMap(editConfig.getNewResources(),wdf);
         fieldAssertions = n3Subber.substituteIntoValues(varToNewResource, null, fieldAssertions);
         if(log.isDebugEnabled()) logAddRetract("substituted in URIs for new resources",fieldAssertions,fieldRetractions);
         entToReturnTo = n3Subber.subInUris(varToNewResource,entToReturnTo);
@@ -224,7 +229,7 @@ are well formed.
         if(log.isDebugEnabled()) logRequiredOpt("substituted in Literals from scope ",n3Required,n3Optional);
         
         /* ****************** New Resources ********************** */
-        Map<String,String> varToNewResource = newToUriMap(editConfig.getNewResources(),resourcesModel);         
+        Map<String,String> varToNewResource = newToUriMap(editConfig.getNewResources(),wdf);         
 
         //if we are editing an existing prop, no new resources will be substituted since the var will
         //have already been substituted in by urisInScope.
@@ -376,26 +381,41 @@ are well formed.
      
     /* ******************** Utility methods ********************** */
     
-    public Map<String,String> newToUriMap(Map<String,String> newResources, Model model){
+    public Map<String,String> newToUriMap(Map<String,String> newResources, WebappDaoFactory wdf){
         HashMap<String,String> newUris = new HashMap<String,String>();
         for( String key : newResources.keySet()){
-            newUris.put(key,makeNewUri(newResources.get(key), model));
+            newUris.put(key,makeNewUri(newResources.get(key), wdf));
         }
          return newUris;
     }
 
     
-    public String makeNewUri(String prefix, Model model){
-        if( prefix == null || prefix.length() == 0 )
-            prefix = defaultUriPrefix;
-
-        String uri = prefix + Math.abs( random.nextInt() );
-        Resource r = ResourceFactory.createResource(uri);
-        while( model.containsResource(r) ){
-            uri = prefix + random.nextInt();
-            r = ResourceFactory.createResource(uri);
+    public String makeNewUri(String prefix, WebappDaoFactory wdf){
+        if( prefix == null || prefix.length() == 0 ){
+        	String uri = null;       
+        	try{
+        		uri = wdf.getIndividualDao().getUnusedURI(null);
+            }catch(InsertException ex){
+            	log.error("could not create uri");
+            }        
+			return uri;
         }
-        return uri;
+        
+        String goodURI = null;
+        int attempts = 0;
+        while( goodURI == null && attempts < 30 ){            
+            Individual ind = new IndividualImpl();
+            ind.setURI( prefix + random.nextInt() );
+            try{
+        		goodURI = wdf.getIndividualDao().getUnusedURI(ind);
+            }catch(InsertException ex){
+            	log.debug("could not create uri");
+            }
+            attempts++;
+        }        
+        if( goodURI == null )
+        	log.error("could not create uri for prefix " + prefix);
+        return goodURI;
     }
 
     static Random random = new Random();

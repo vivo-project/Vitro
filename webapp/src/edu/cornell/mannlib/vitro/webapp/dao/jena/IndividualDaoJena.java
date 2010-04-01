@@ -1106,14 +1106,15 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
                     RDF.type ,
                     getOntModel().getResource(vclassURI));        
     }
-
+    
 	public String getUnusedURI(Individual individual) throws InsertException {
 		String errMsg = null;		
 		String namespace = null;
 		String uri = null;
 		boolean uriIsGood = false;
 		
-		if ( (individual.getURI() != null && individual.getURI().startsWith( DEFAULT_NAMESPACE ) ) 
+		if ( individual == null || 
+			(individual.getURI() != null && individual.getURI().startsWith( DEFAULT_NAMESPACE ) ) 
 			|| individual.getNamespace() == null 
 			|| individual.getNamespace().length() == 0 
 		    || DEFAULT_NAMESPACE.equals(individual.getNamespace()) ){
