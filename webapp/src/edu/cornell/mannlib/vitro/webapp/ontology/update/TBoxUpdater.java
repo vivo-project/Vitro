@@ -6,12 +6,15 @@ import java.io.IOException;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Literal;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.NodeIterator;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.shared.Lock;
 
 /**  
 * Performs knowledge base updates to the tbox to align with a new ontology version
@@ -58,22 +61,34 @@ public class TBoxUpdater {
 	 * knowledge base to be updated are provided in the class constructor and are
 	 * referenced via class level variables. 
 	 *                    
+	 * If the default value (i.e. the value that is provided in the vivo-core-
+	 * annotations files) of a vitro annotation property has been changed for a vivo
+	 * core class, and that default value has not been changed in the site knowledge
+	 * base, then update the value in the site knowledge base to be the new default.
+	 * Also, if a new vitro annotation property setting (i.e. either an existing 
+	 * setting applied to an existing class where it wasn't applied before, or
+	 * an existing setting applied to a new class) has been applied to a vivo
+	 * core class then copy that new property statement into the site model.
+	 *                    
 	 *  Writes to the change log file, the error log file, and the incremental change
 	 *  knowledge base.                  
+	 *  
+	 *  Note: as specified, this method for now assume that no new vitro annotation
+	 *  properties have been introduced. This should be updated for future versions.
 	 */
 	public void updateVitroPropertyDefaultValues() throws IOException {
-					
-    /*	   For each statement in the previous version of the ontology, look for a statement
-		   with the same subject and predicate in the current version, and if the object of
-		   the statement has changed then examine the site model to see if it needs to be
-		   updated. If the site model has *not* changed the object of the statement as it appears
-		   in the previous version, then update it to be the value as it appears in the current
-		   version. 
-		  
-		   If the site has updated the value of a class property for which the default has
-		   changed, log a message suggesting that they review the setting.
-    */		  
-		  
+				
+		siteModel.enterCriticalSection(Lock.WRITE);
+		
+		try {
+			
+	       Model additions = ModelFactory.createDefaultModel();
+	       Model retractions = ModelFactory.createDefaultModel();
+		
+    	 //  Update defaults values for vitro annotation properties in the site model
+         //  if the default has changed in the new version of the ontology AND if 
+         //  the site hasn't overidden the previous default in their knowledge base.
+    		    
 		  StmtIterator iter = oldTboxModel.listStatements();
 		  
 		  int stmtCount = 0;
@@ -120,7 +135,10 @@ public class TBoxUpdater {
 				 
 				 if (!siteObject.equals(oldObject)) {
 	        	    try {
-						siteModel.removeAll(subject, predicate, null);
+	        	    	StmtIterator it = siteModel.listStatements(subject, predicate, (RDFNode)null);
+	        	    	while (it.hasNext()) {
+	        	    	  retractions.add(it.next());	
+	        	    	}
 					} catch (Exception e) {
 						logger.logError("Error removing statement for subject = " + subject.getURI() + 
 							            "and property = " + predicate.getURI() +
@@ -128,7 +146,7 @@ public class TBoxUpdater {
 					}
 
 	        	    try {
-	    				siteModel.add(subject, predicate, newObject);
+	    				additions.add(subject, predicate, newObject);
 	    				
 						logger.log("Changed the value of property "  + predicate.getURI() +
 								" of class = " + subject.getURI() + 
@@ -143,6 +161,51 @@ public class TBoxUpdater {
 					}
 				 }
 			 }		  
-		  }
-		}
+		   }
+		  
+		   siteModel.add(additions);
+		   record.recordAdditions(additions);
+		   siteModel.remove(retractions);
+		   record.recordRetractions(retractions);
+		
+		   // log summary of changes
+           StmtIterator addedIter = additions.listStatements();
+           logger.log("Updated the default vitro annotation value for " + 
+        		   addedIter.toList().size() + " statments in the knowledge base.");
+		   
+           StmtIterator removedIter = retractions.listStatements();
+           int numRemoved = removedIter.toList().size() - addedIter.toList().size();
+           logger.log("Removed " + numRemoved +
+        		      " superfluous vitro annotation property settings from the knowledge base.");
+           
+		    //	   Copy annotation property settings that were introduced in the new ontology
+		    //     into the site model.
+		    //		  
+
+			Model newAnnotationSettings = newTboxModel.difference(oldTboxModel);
+			siteModel.add(newAnnotationSettings);
+			record.recordAdditions(newAnnotationSettings);
+            
+			// log the additions
+            iter = newAnnotationSettings.listStatements();
+			  
+            //summary
+            logger.log("Added " + iter.toList().size() + " new annotation property settings to the knowledge base. This includes " +
+                         "exsiting annotation properties applied to exsiting classes where they weren't applied before, or existing " +
+                         "properties applied to new classes. No new annotation properties have been introduced.");
+            //details
+            
+			while (iter.hasNext()) {
+				Statement statement = iter.next();
+				
+				logger.log( "added Statement: subject = " + statement.getSubject().getURI() +
+						" property = " + statement.getPredicate().getURI() +
+		                " object = " + (statement.getObject().isLiteral() ? ((Resource)statement.getObject()).getURI() 
+		                		                                          : ((Literal)statement.getObject()).getLexicalForm()));	
+			}
+		   
+	} finally {
+		siteModel.leaveCriticalSection();
+	}
+}
 }
