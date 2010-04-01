@@ -179,8 +179,7 @@ public class ABoxUpdater {
 	 */
 	public void addClass(AtomicOntologyChange change) throws IOException {
 	   
-		//TODO - is sourceURI the right thing here?
-		OntClass addedClass = newTboxModel.getOntClass(change.getSourceURI());
+		OntClass addedClass = newTboxModel.getOntClass(change.getDestinationURI());
 		
 		if (addedClass == null) {
 			// TODO - log 
@@ -244,7 +243,6 @@ public class ABoxUpdater {
 		OntClass replacementClass = newTboxModel.getOntClass(parent.getURI());
 		
 		while (replacementClass == null) {
-			 //ditto
 			 parent = parent.getSuperClass();
 	    	 replacementClass = newTboxModel.getOntClass(parent.getURI()); 			
 		} 
@@ -254,16 +252,15 @@ public class ABoxUpdater {
 	}
 	
 	public void processPropertyChanges(List<AtomicOntologyChange> changes) throws IOException {
-		Iterator propItr = changes.iterator();
+		Iterator<AtomicOntologyChange> propItr = changes.iterator();
 		while(propItr.hasNext()){
-			AtomicOntologyChange propChangeObj = (AtomicOntologyChange)
-			                                     propItr.next();
+			AtomicOntologyChange propChangeObj = propItr.next();
 			switch (propChangeObj.getAtomicChangeType()){
-			case ADD: addProperties(propChangeObj);
+			case ADD: addProperty(propChangeObj);
 			break;
-			case DELETE: deleteProperties(propChangeObj);
+			case DELETE: deleteProperty(propChangeObj);
 			break;
-			case RENAME: renameProperties(propChangeObj);
+			case RENAME: renameProperty(propChangeObj);
 			break;
 			default: logger.logError("Property change can't be null");
 			break;
@@ -271,64 +268,101 @@ public class ABoxUpdater {
 		}
 	}
 	
-	private void addProperties(AtomicOntologyChange propObj) throws IOException{
-		Statement tempStatement = null;
+	private void addProperty(AtomicOntologyChange propObj) throws IOException{
 		OntProperty tempProperty = newTboxModel.getOntProperty
 		(propObj.getDestinationURI()).getSuperProperty();
-		StmtIterator stmItr = aboxModel.listStatements();
-		int count = 0;
-		while(stmItr.hasNext()){
-			tempStatement = stmItr.nextStatement();
-			if(tempStatement.getPredicate().getURI().
-					equalsIgnoreCase(tempProperty.getURI())){
-				count++;			
-			}
+		if (tempProperty == null) {
+			return;
 		}
+		int count = aboxModel.listStatements(
+				(Resource) null, tempProperty, (RDFNode) null).toSet().size();
 		logger.log("The Property " + tempProperty.getURI() + 
 				"which occurs " + count + "times in database has " +
 						"a new subProperty " + propObj.getDestinationURI() +
 				"added to Core 1.0");
 		logger.log("Please review accordingly");			
 	}
-	private void deleteProperties(AtomicOntologyChange propObj) throws IOException{
-		OntModel deletePropModel = ModelFactory.createOntologyModel();
-		Statement tempStatement = null;
-		StmtIterator stmItr = aboxModel.listStatements();
-		while(stmItr.hasNext()){
-			tempStatement = stmItr.nextStatement();
-			if(tempStatement.getPredicate().getURI().equalsIgnoreCase
-					(propObj.getSourceURI())){
-				deletePropModel.add(tempStatement);	
-			}
+	
+	private void deleteProperty(AtomicOntologyChange propObj) throws IOException{
+		OntProperty deletedProperty = oldTboxModel.getOntProperty(propObj.getSourceURI());
+		
+		if (deletedProperty == null) {
+			// TODO - log 
+			return;
 		}
-		aboxModel = (OntModel) aboxModel.difference(deletePropModel);	
-		record.recordRetractions(deletePropModel);
-		logger.log("All statements using " + propObj.getSourceURI() +
-				"were removed. Please refer removed data model");
+		
+		OntProperty parent = deletedProperty.getSuperProperty();
+		OntProperty replacementProperty = newTboxModel.getOntProperty(parent.getURI());
+		
+		while (replacementProperty == null) {
+			 parent = parent.getSuperProperty();
+			 if (parent == null) {
+				 break;
+			 }
+	    	 replacementProperty = newTboxModel.getOntProperty(parent.getURI()); 			
+		} 
+		
+		OntModel deletePropModel = ModelFactory.createOntologyModel();
+		
+		if (replacementProperty == null) {
+			aboxModel.enterCriticalSection(Lock.WRITE);
+			try {
+				deletePropModel.add(aboxModel.listStatements(
+						(Resource) null, deletedProperty, (RDFNode) null));
+				aboxModel.remove(deletePropModel);
+			} finally {
+				aboxModel.leaveCriticalSection();
+			}
+			record.recordRetractions(deletePropModel);
+			logger.log(deletePropModel.size() + " statements using " + 
+					propObj.getSourceURI() + " were removed. " +
+					" Please refer to the removed data model");
+		} else {
+			AtomicOntologyChange chg = new AtomicOntologyChange(deletedProperty.getURI(), replacementProperty.getURI(), AtomicChangeType.RENAME);
+			renameProperty(chg);
+		}		
+		
 	}
-	private void renameProperties(AtomicOntologyChange propObj){
+	
+	private void renameProperty(AtomicOntologyChange propObj) throws IOException {
+		
+		OntProperty oldProperty = oldTboxModel.getOntProperty(propObj.getSourceURI());
+		OntProperty newProperty = newTboxModel.getOntProperty(propObj.getDestinationURI());
+		
+		if (oldProperty == null || newProperty == null) {
+			// TODO - log 
+			return;
+		}
+		
 		Model renamePropAddModel = ModelFactory.createDefaultModel();
 		Model renamePropRetractModel = 
 			ModelFactory.createDefaultModel();
-		Statement tempStatement = null;
-		Property tempProperty = null; 
-		StmtIterator stmItr = aboxModel.listStatements();
-		while(stmItr.hasNext()){
-			tempStatement = stmItr.nextStatement();
-			if(tempStatement.getPredicate().getURI().
-					equalsIgnoreCase(propObj.getSourceURI())){
-				tempProperty = ResourceFactory.createProperty(
-						propObj.getDestinationURI());
-				aboxModel.remove(tempStatement);
-				renamePropRetractModel.add(tempStatement);
-				aboxModel.add(tempStatement.getSubject(),tempProperty
-						,tempStatement.getObject());
-				renamePropAddModel.add(tempStatement.getSubject(),
-						tempProperty,tempStatement.getObject());
+		
+		aboxModel.enterCriticalSection(Lock.WRITE);
+		try {
+			renamePropRetractModel.add(	aboxModel.listStatements(
+					(Resource) null, oldProperty, (RDFNode) null));
+			StmtIterator stmItr = renamePropRetractModel.listStatements();
+			while(stmItr.hasNext()) {
+				Statement tempStatement = stmItr.nextStatement();
+				renamePropAddModel.add( tempStatement.getSubject(),
+										newProperty,
+										tempStatement.getObject() );
 			}
+			aboxModel.remove(renamePropRetractModel);
+			aboxModel.add(renamePropAddModel);
+		} finally {
+			aboxModel.leaveCriticalSection();
 		}
+		
 		record.recordAdditions(renamePropAddModel);
-		record.recordRetractions(renamePropRetractModel);	
+		record.recordRetractions(renamePropRetractModel);
+		
+		logger.log(renamePropRetractModel.size() + " statments using " +
+				"property " + propObj.getSourceURI() + " were changed to use " +
+				propObj.getDestinationURI() + " instead. Please refer to the " +
+				"removed data model and the added data model.");
+		
 	}
 
 	

@@ -27,10 +27,12 @@ public class SimpleOntologyChangeLogger implements OntologyChangeLogger {
 					
 	
 	public void log(String logMessage) throws IOException {
+		//TODO get calling method info from stack and include in message
 		logWriter.write(logMessage + "\n");
 	}
 
 	public void logError(String errorMessage) throws IOException {
+		//TODO get calling method info from stack and include in message
 		errorWriter.write(errorMessage + "\n");
 	}
 	
