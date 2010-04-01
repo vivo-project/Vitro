@@ -9,17 +9,23 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntProperty;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.shared.Lock;
 
 /**
@@ -172,9 +178,48 @@ public class OntologyUpdater {
 		private List<AtomicOntologyChange> atomicPropertyChanges;
 		
 		public AtomicOntologyChangeLists(
-				List<AtomicOntologyChange> changeList, OntModel tboxModel) {
-			// TODO: split the main list of change objects into two lists 
-			// depending on whether they refer to classes or properties
+				List<AtomicOntologyChange> changeList, OntModel newTboxModel,
+				OntModel oldTboxModel) {
+			
+			String str = null;
+			Iterator<AtomicOntologyChange> listItr = changeList.iterator();
+			while(listItr.hasNext()){
+				AtomicOntologyChange changeObj = listItr.next();
+				if(!changeObj.getSourceURI().equals(str)){
+					if(oldTboxModel.getOntProperty(changeObj.
+							getSourceURI()) != null){
+						atomicPropertyChanges.add(changeObj);
+					}
+					else if(oldTboxModel.getOntClass(changeObj.
+							getSourceURI()) != null) {
+						atomicClassChanges.add(changeObj);
+					}
+					else{
+						logger.logError("Source URI is neither a Property" +
+								" nor a Class. " + "Change Object skipped");
+					}
+					
+				}
+				else if(!changeObj.getDestinationURI().equals(str)){
+					if(newTboxModel.getOntProperty(changeObj.
+							getDestinationURI()) != null){
+						atomicPropertyChanges.add(changeObj);
+					}
+					else if(newTboxModel.getOntClass(changeObj.
+							getDestinationURI()) != null){
+						atomicClassChanges.add(changeObj);
+					}
+					else{
+						logger.logError("Destination URI is neither a Property" +
+								" nor a Class. " + "Change Object skipped");
+					}
+				}
+				else{
+					logger.logError("Source and Destination URI can't be null. " 
+							+ "Change Object skipped" );
+				}
+			}
+			logger.log("Property and Class change Object lists seperated");
 		}
 		
 		public List<AtomicOntologyChange> getAtomicClassChanges() {
