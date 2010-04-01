@@ -240,6 +240,7 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
     }
 
     private final boolean DONT_CHECK_UNIQUENESS=false;
+    private final boolean DO_CHECK_UNIQUENESS=true;
 
     /**
      * Inserts a new Individual into the knowledge base.
@@ -247,28 +248,7 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
      */
     public String insertNewIndividual(Individual ent, OntModel ontModel) throws InsertException {
     	
-        String preferredURI = ent.getURI();
-        if (preferredURI == null) {
-        	String namespace = (ent.getNamespace() != null) ? ent.getNamespace() : DEFAULT_NAMESPACE;
-        	String localName = ent.getName();
-        	if (localName == null) {
-        		Random random = new Random(System.currentTimeMillis());
-            	localName = "individual" + random.nextInt(Integer.MAX_VALUE);
-        	} else {
-        	    localName = localName.replaceAll("\\W", "");
-        	    if (localName.length() < 2) {        	
-        	        localName = "individual" + ent.getName().hashCode();
-        	    } else if (Character.isDigit(localName.charAt(0))) {
-        	        localName = "n" + localName;
-        	    }
-        	}
-        	preferredURI = namespace + localName;
-        } else {
-        	String errMsgStr = getWebappDaoFactory().checkURI(ent.getURI(),DONT_CHECK_UNIQUENESS); // turning off uniqueness check so cloning will work and use the _1 business below
-            if (errMsgStr != null) {
-                throw new InsertException(errMsgStr);
-            }
-        }
+        String preferredURI = getUnusedURI(ent);          
            
         String entURI = null;
         
@@ -288,7 +268,7 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
             int count = 0;
             while (test != null) {
                 ++count;
-                entURI = new String(preferredURI) + "_" + count;
+                entURI = new String(preferredURI) + count;
                 test = ontModel.getIndividual(entURI);
             }
             
@@ -1127,4 +1107,70 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
                     getOntModel().getResource(vclassURI));        
     }
 
+	public String getUnusedURI(Individual individual) throws InsertException {
+		String errMsg = null;		
+		String namespace = null;
+		String uri = null;
+		boolean uriIsGood = false;
+		
+		if ( (individual.getURI() != null && individual.getURI().startsWith( DEFAULT_NAMESPACE ) ) 
+			|| individual.getNamespace() == null 
+			|| individual.getNamespace().length() == 0 
+		    || DEFAULT_NAMESPACE.equals(individual.getNamespace()) ){
+			//we always want local names like n23423 for the default namespace
+			namespace = DEFAULT_NAMESPACE;
+			uri = null;			
+		}else if( individual.getURI() != null ){
+			errMsg = getWebappDaoFactory().checkURI(individual.getURI());
+			if( errMsg == null){
+				uriIsGood = true;
+				uri = individual.getURI();
+			}else{
+				throw new InsertException(errMsg);
+			}
+		}else{
+			namespace = individual.getNamespace();
+			if( namespace == null || namespace.length() == 0 )
+				namespace = DEFAULT_NAMESPACE;
+			String localName = individual.getName();
+			
+			/* try to use the specified namespace and local name */
+			if (localName != null) {							
+				localName = localName.replaceAll("\\W", "");
+				localName = localName.replaceAll(":", "");
+				if (localName.length() > 2) {
+					if (Character.isDigit(localName.charAt(0))) {
+						localName = "n" + localName;
+					}
+					uri = namespace + localName;
+					errMsg = getWebappDaoFactory().checkURI(uri);
+					if( errMsg == null)
+						uriIsGood = true;
+					else
+						throw new InsertException(errMsg);					
+				}
+			}
+			/* else try namespace + n2343 */ 			
+		}
+		
+		Random random = new Random(System.currentTimeMillis());
+		int attempts = 0;
+		
+		while( uriIsGood == false && attempts < 30 ){			
+			String localName = "n" + random.nextInt( Math.min(Integer.MAX_VALUE,(int)Math.pow(2,attempts + 13)) );
+			uri = namespace + localName;			
+			errMsg = getWebappDaoFactory().checkURI(uri);
+			if(  errMsg != null)
+				uri = null;
+			else
+				uriIsGood = true;				
+			attempts++;
+		}
+		
+		if( uri == null )
+			throw new InsertException("Could not create URI for individual: " + errMsg);
+								
+		return uri;
+	}
+	
 }

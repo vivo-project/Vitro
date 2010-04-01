@@ -248,4 +248,8 @@ class IndividualDaoFiltering extends BaseFiltering implements IndividualDao{
         return innerIndividualDao.isIndividualOfClass(vclassURI, indURI);
     }
 
+	public String getUnusedURI(Individual individual) throws InsertException {
+		return innerIndividualDao.getUnusedURI(individual);
+	}
+
 }
