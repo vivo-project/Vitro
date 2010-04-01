@@ -190,27 +190,11 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 	               				<c:param name="home" value="${portal.portalId}"/>
 	               				<c:param name="uri" value="${objPropertyStmt.object.URI}"/>               			
 	           				</c:url>
-
 							<%
-							   // Make this a method of some object: Individual or ...?
-						       String customShortView = null;
-							   Individual object = ((ObjectPropertyStatement)request.getAttribute("opStmt")).getObject();
-						       List<VClass> vclasses = object.getVClasses();
-
-						       vclassLoop: for (VClass vclass : vclasses) {
-						           String vclassUri = vclass.getURI();
-						           List<String> superClassUris = vcDao.getAllSuperClassURIs(vclassUri);
-						           for (String superClassUri : superClassUris) {
-						               VClass cl = vcDao.getVClassByURI(superClassUri);
-						               customShortView = cl.getCustomShortView();
-						               if (customShortView != null) { 
-						                   break vclassLoop; 
-						               }
-						           }
-						       }    
+							   String customShortView = getCustomShortView(request, vcDao); 
 							%>
-							<c:remove var="opStmt" scope="request"/>
 	         				<c:set var="altRenderJsp" value="<%= customShortView %>" />
+	         				<c:remove var="opStmt" scope="request"/>
 	            			<c:choose>
 					            <c:when test="${!empty altRenderJsp}">
 									<c:set scope="request" var="individual" value="${objPropertyStmt.object}"/>
@@ -359,3 +343,33 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
    } // end for (Property p : g.getPropertyList()
 %>
 
+<%!
+// Get custom short view from either the object's class or one of its superclasses.
+// This is needed because the inference update happens asynchronously, so when a new
+// property has been added and the page is reloaded, the custom short view from a
+// superclass may not have been inferred yet.
+private String getCustomShortView(HttpServletRequest request, VClassDao vcDao) {
+    String customShortView = null;
+    Individual object = ((ObjectPropertyStatement)request.getAttribute("opStmt")).getObject();
+    List<VClass> vclasses = object.getVClasses();
+
+    vclassLoop: for (VClass vclass : vclasses) {
+        // Use this class's custom short view, if there is one
+        customShortView = vclass.getCustomShortView();
+        if (customShortView != null) {
+            break;
+        }
+        // Otherwise, check for superclass custom short views
+        String vclassUri = vclass.getURI();
+        List<String> superClassUris = vcDao.getAllSuperClassURIs(vclassUri);
+        for (String superClassUri : superClassUris) {
+            VClass vc = vcDao.getVClassByURI(superClassUri);
+            customShortView = vc.getCustomShortView();
+            if (customShortView != null) { 
+                break vclassLoop; 
+            }
+        }
+    }  
+    return customShortView;
+}
+%>
