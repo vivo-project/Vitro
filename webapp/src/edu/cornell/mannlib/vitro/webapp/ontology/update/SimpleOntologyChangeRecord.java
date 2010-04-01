@@ -8,6 +8,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 public class SimpleOntologyChangeRecord implements OntologyChangeRecord {
 
@@ -16,16 +17,13 @@ public class SimpleOntologyChangeRecord implements OntologyChangeRecord {
 	
 	private final static String RDF_SYNTAX = "RDF/XML-ABBREV";
 	
-	private Model additionsModel;
-	private Model retractionsModel;
+	private Model additionsModel = ModelFactory.createDefaultModel();
+	private Model retractionsModel = ModelFactory.createDefaultModel();
 	private File additionsFile;
 	private File retractionsFile;
 	
 	public SimpleOntologyChangeRecord(
-			Model additionsModel, Model retractionsModel,
 			String additionsFile, String retractionsFile) {
-		this.additionsModel = additionsModel;
-		this.retractionsModel = retractionsModel;
 		this.additionsFile = new File(additionsFile);
 		if (!this.additionsFile.exists()) {
 			throw new RuntimeException(this.getClass().getName() + 

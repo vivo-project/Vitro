@@ -11,6 +11,7 @@ public class OntologyUpdateSettings {
 	private String diffFile;
 	private String logFile;
 	private String errorLogFile;
+	private String addedDataFile;
 	private String removedDataFile;
 	private OntModelSelector ontModelSelector;
 	
@@ -58,6 +59,12 @@ public class OntologyUpdateSettings {
 	}
 	public void setErrorLogFile(String errorLogFile) {
 		this.errorLogFile = errorLogFile;
+	}
+	public String getAddedDataFile() {
+		return addedDataFile;
+	}
+	public void setAddedDataFile(String addedDataFile) {
+		this.addedDataFile = addedDataFile;
 	}
 	public String getRemovedDataFile() {
 		return removedDataFile;

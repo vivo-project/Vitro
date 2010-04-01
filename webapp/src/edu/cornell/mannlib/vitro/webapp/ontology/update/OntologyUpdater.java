@@ -36,9 +36,15 @@ public class OntologyUpdater {
 	private final Log log = LogFactory.getLog(OntologyUpdater.class);
 	
 	private OntologyUpdateSettings settings;
+	private OntologyChangeLogger logger;
+	private OntologyChangeRecord record;
 	
 	public OntologyUpdater(OntologyUpdateSettings settings) {
 		this.settings = settings;
+		this.logger = new SimpleOntologyChangeLogger(settings.getLogFile(),
+													settings.getErrorLogFile());
+		this.record = new SimpleOntologyChangeRecord(
+				settings.getAddedDataFile(), settings.getRemovedDataFile());
 	}
 	
 	public void update() throws IOException {	
@@ -75,8 +81,16 @@ public class OntologyUpdater {
 	
 
 	
-	private void updateABox(AtomicOntologyChangeLists changes) {
-		// perform operations based on change objects
+	private void updateABox(AtomicOntologyChangeLists changes) 
+			throws IOException {
+		// TODO get models from somewhere
+		OntModel oldTBoxModel = null;
+		OntModel newTBoxModel = null;
+		OntModel ABoxModel = null;
+		ABoxUpdater aboxUpdater = new ABoxUpdater(
+				oldTBoxModel, newTBoxModel, ABoxModel, logger, record);
+		aboxUpdater.processPropertyChanges(changes.getAtomicPropertyChanges());
+		aboxUpdater.processClassChanges(changes.getAtomicClassChanges());
 		// run additional SPARQL CONSTRUCTS 
 	}
 	

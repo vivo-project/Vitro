@@ -302,7 +302,7 @@ public class ABoxUpdater {
 	    	 replacementProperty = newTboxModel.getOntProperty(parent.getURI()); 			
 		} 
 		
-		OntModel deletePropModel = ModelFactory.createOntologyModel();
+		Model deletePropModel = ModelFactory.createDefaultModel();
 		
 		if (replacementProperty == null) {
 			aboxModel.enterCriticalSection(Lock.WRITE);
