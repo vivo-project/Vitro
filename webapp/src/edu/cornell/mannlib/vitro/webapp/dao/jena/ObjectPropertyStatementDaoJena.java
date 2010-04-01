@@ -79,23 +79,28 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
                                 if( uriToObjectProperty.containsKey(prop.getURI())){
                                 	objPropertyStmt.setProperty(uriToObjectProperty.get(prop.getURI()));
                                 }else{
-                                	ObjectProperty p = opDaoJena.propertyFromOntProperty(getOntModel().createOntProperty(prop.getURI()));
-                                	uriToObjectProperty.put(prop.getURI(), p);
-                                	objPropertyStmt.setProperty(uriToObjectProperty.get(prop.getURI()));
+                                	ObjectProperty p = opDaoJena.propertyFromOntProperty(getOntModel().getObjectProperty(prop.getURI()));
+                                	if( p != null ){
+                                		uriToObjectProperty.put(prop.getURI(), p);
+                                		objPropertyStmt.setProperty(uriToObjectProperty.get(prop.getURI()));
+                                	}else{
+                                		//if ObjectProperty not found in ontology, skip it
+                                		continue;
+                                	}
                                 }                                
                             } catch (Throwable g) {
-                                ObjectProperty q = new ObjectProperty();
-                                q.setDomainPublic("error");
-                                // g.printStackTrace();
+                                //do not add statement to list
+                            	log.debug("exception while trying to get object property for statement list, statement skipped.", g);
+                            	continue;                                                                
                             }
                             if (objPropertyStmt.getObjectURI() != null) {
                                 Individual objInd = getWebappDaoFactory().getIndividualDao().getIndividualByURI(objPropertyStmt.getObjectURI());
                                 objPropertyStmt.setObject(objInd);
                             }
-                            if ((objPropertyStmt.getSubjectURI() != null) && (objPropertyStmt.getPropertyURI() != null) && (objPropertyStmt.getObject() != null))
-                                objPropertyStmtList.add(objPropertyStmt);
-                            else {
-                                //log.error("At least one null value in ObjectPropertyStatement.  Discarding.");
+
+                            //add object property statement to list for Individual
+                            if ((objPropertyStmt.getSubjectURI() != null) && (objPropertyStmt.getPropertyURI() != null) && (objPropertyStmt.getObject() != null)){
+                                objPropertyStmtList.add(objPropertyStmt);                           
                             } 
                         } catch (Throwable t) {
                             t.printStackTrace();
