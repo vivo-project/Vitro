@@ -139,13 +139,13 @@ public class ABoxUpdater {
 			   Statement newStatement = ResourceFactory.createStatement(newClass, oldStatement.getPredicate(), oldStatement.getObject());
 			   retractions.add(oldStatement);
 			   additions.add(newStatement);
-			   logChange(oldStatement, false);
-			   logChange(newStatement,true);
+			   //logChange(oldStatement, false);
+			   //logChange(newStatement,true);
 		   }
 		   
 		   //log summary of changes
 		   if (count > 0) {
-			   logger.log("Changing " + count + " subject referernces to the "  + oldClass.getURI() + " class to be " + newClass.getURI());
+			   logger.log("Changing " + count + " subject reference" + ((count > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class to be " + newClass.getURI());
 		   }
 
 		   // Change class references in the objects of statements
@@ -160,12 +160,12 @@ public class ABoxUpdater {
 			   additions.add(newStatement);
 			   //TODO - worried about logging changes before the changes have actually been made
 			   // in the model
-			   logChanges(oldStatement, newStatement);
+			   //logChanges(oldStatement, newStatement);
 		   }
 		   
 		   //log summary of changes
 		   if (count > 0) {
-			   logger.log("Changing " + count + " object referernces to the "  + oldClass.getURI() + " class to be " + newClass.getURI());
+			   logger.log("Changing " + count + " object reference" + ((count > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class to be " + newClass.getURI());
 		   }
 		   
 		   aboxModel.remove(retractions);
@@ -235,10 +235,9 @@ public class ABoxUpdater {
 					
 					if (count > 0) {
 						//TODO - take out the detailed logging after our internal testing is completed.
-				        logger.log("There are " + count + " individuals in the model that are of type " + parentOfAddedClass.getURI() + "," +
+				        logger.log("There " + ((count > 1) ? "are" : "is") + " " + count + " individuals in the model that are of type " + parentOfAddedClass.getURI() + "," +
 				        		    " and a new subclass of that class has been added: " + addedClass.getURI() + ". " +
-				        		    "Please review the following individuals to see whether they should be of type: " +  addedClass.getURI() + ":" +
-				        		    indList );
+				        		    "Please review " + ((count > 1) ? "these" : "this") + " individual" + ((count > 1) ? "s" : "") + " to see whether " + ((count > 1) ? "they" : "it") + " should be of type: " +  addedClass.getURI() );
 					}
 				}				
 			}			
@@ -332,10 +331,10 @@ public class ABoxUpdater {
 				(Resource) null, superProperty, (RDFNode) null).toSet().size();
 		if (count > 0) {
 			logger.log("The Property " + superProperty.getURI() + 
-					" which occurs " + count + " times in database has " +
-							"a new subProperty " + propObj.getDestinationURI() +
+					" which occurs " + count + " time " + ((count > 1) ? "s" : "") + " in the database has " +
+							"a new subproperty " + propObj.getDestinationURI() +
 					" in the new ontology version. ");
-			logger.log("Please review accordingly.");
+			logger.log("Please review uses of this property to see if " + propObj.getDestinationURI() + " is a more appropriate choice.");
 		}
 	}
 	
@@ -374,10 +373,10 @@ public class ABoxUpdater {
 				aboxModel.leaveCriticalSection();
 			}
 			record.recordRetractions(deletePropModel);
+			boolean plural = (deletePropModel.size() > 1);
 			if (deletePropModel.size() > 0) {
-				logger.log(deletePropModel.size() + " statements using " + 
-						propObj.getSourceURI() + " were removed. " +
-						" Please refer to the removed data model");
+				logger.log(deletePropModel.size() + " statement" + (plural ? "s" : "") + " using " + 
+						propObj.getSourceURI() + " " + (plural ? "were" : "was") + " removed. ");
 			}
 		} else {
 			AtomicOntologyChange chg = new AtomicOntologyChange(deletedProperty.getURI(), replacementProperty.getURI(), AtomicChangeType.RENAME);
@@ -422,10 +421,12 @@ public class ABoxUpdater {
 		record.recordRetractions(renamePropRetractModel);
 		
 		if (renamePropRetractModel.size() > 0) {
-			logger.log(renamePropRetractModel.size() + " statments using " +
-					"property " + propObj.getSourceURI() + " were changed to use " +
-					propObj.getDestinationURI() + " instead. Please refer to the " +
-					"removed data model and the added data model.");
+			logger.log(renamePropRetractModel.size() + " statment" + 
+					((renamePropRetractModel.size() > 1) ? "s" : "") + " using " +
+					"property " + propObj.getSourceURI() + " " + 
+					((renamePropRetractModel.size() > 1) ? "were" : "was") 
+					+ " changed to use " +
+					propObj.getDestinationURI() + " instead.");
 		}
 		
 	}
