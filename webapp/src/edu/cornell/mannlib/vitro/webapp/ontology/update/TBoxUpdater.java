@@ -69,6 +69,9 @@ public class TBoxUpdater {
 	 * setting applied to an existing class where it wasn't applied before, or
 	 * an existing setting applied to a new class) has been applied to a vivo
 	 * core class then copy that new property statement into the site model.
+	 * If a property setting for a class exists in the old ontology but
+	 * not in the new one, then that statement will be removed from the
+	 * site knowledge base.
 	 *                    
 	 *  Writes to the change log file, the error log file, and the incremental change
 	 *  knowledge base.                  
