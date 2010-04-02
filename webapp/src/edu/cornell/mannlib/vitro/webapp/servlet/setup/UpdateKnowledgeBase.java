@@ -42,7 +42,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	
 	public void contextInitialized(ServletContextEvent sce) {
 		
-		
+		/*
 		
 		ServletContext ctx = sce.getServletContext();
 		
@@ -75,6 +75,8 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			ioe.printStackTrace();
 			throw new RuntimeException(errMsg, ioe);
 		}	
+		
+		*/
 		
 	}	
 	
