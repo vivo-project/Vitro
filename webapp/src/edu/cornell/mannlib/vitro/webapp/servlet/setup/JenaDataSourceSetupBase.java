@@ -134,7 +134,7 @@ public class JenaDataSourceSetupBase {
 		Set<String> paths = ctx.getResourcePaths(path);
 		if (paths != null) {
 			for (String p : paths) {
-				LOG.debug("Loading ontology file at " + p);
+				LOG.info("Loading ontology file at " + p);
 				InputStream ontologyInputStream = ctx.getResourceAsStream(p);
 				try {
 					model.read(ontologyInputStream, null);
