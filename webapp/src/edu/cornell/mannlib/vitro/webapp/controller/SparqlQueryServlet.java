@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -41,6 +42,12 @@ import com.hp.hpl.jena.vocabulary.XSD;
 import edu.cornell.mannlib.vedit.beans.LoginFormBean;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
+
+/* @author ass92 */
+
+import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
+import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
+
 
 /**
  * Services a sparql query.  This will return a simple error message and a 501 if
@@ -311,7 +318,33 @@ public class SparqlQueryServlet extends BaseEditController {
             
             VitroRequest vreq = new VitroRequest(req);
             Portal portal = vreq.getPortal();
+            
+            /* @author ass92 */
                   
+            
+            OntologyDao daoObj = getWebappDaoFactory().getOntologyDao();
+            List ontologiesObj = daoObj.getAllOntologies();
+            ArrayList prefixList = new ArrayList();
+            
+            if(ontologiesObj !=null && ontologiesObj.size()>0){
+            	
+            	Iterator ontItr = ontologiesObj.iterator();
+            	while(ontItr.hasNext()){
+            		Ontology ont = (Ontology) ontItr.next();
+            		prefixList.add(ont.getPrefix() == null ? "(not yet specified)" : ont.getPrefix());
+            		prefixList.add(ont.getURI() == null ? "" : ont.getURI());
+            	}
+            	
+            }
+            else{
+            	prefixList.add("<strong>" + "No Ontologies added" + "</strong>");
+            	prefixList.add("<strong>" + "Load Ontologies" + "</strong>");
+            }
+            
+            req.setAttribute("prefixList", prefixList);
+            
+            /* Code change completed */
+            
             req.setAttribute("portalBean",portal);
             // nac26: 2009-09-25 - this was causing problems in safari on localhost installations because the href did not include the context.  The edit.css is not being used here anyway (or anywhere else for that matter)
             // req.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+portal.getThemeDir()+"css/edit.css\"/>");
