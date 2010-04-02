@@ -95,8 +95,7 @@ public class ABoxUpdater {
 				  renameClass(change);
 			      break;
 			   default:
-				  //TODO - get method name automatically
-				  logger.logError(this.getClass().getName() + " processClassChanges: unexpected change type indicator: " + change.getAtomicChangeType());
+				  logger.logError("unexpected change type indicator: " + change.getAtomicChangeType());
 		    }		
 		}
 	}
@@ -120,6 +119,7 @@ public class ABoxUpdater {
 	       Model additions = ModelFactory.createDefaultModel();
 	       Model retractions = ModelFactory.createDefaultModel();
 	       
+	       //TODO - look for these in the models and log error if not found
 		   Resource oldClass = ResourceFactory.createResource(change.getSourceURI());
 		   Resource newClass = ResourceFactory.createResource(change.getDestinationURI());	   
 		   
@@ -140,7 +140,6 @@ public class ABoxUpdater {
 
 		   // Change class references in the objects of statements
 		   iter = aboxModel.listStatements((Resource) null, (Property) null, oldClass);
-
 
 		   //log summary of changes
 		   logger.log("Changing " + iter.toList().size() + " object referernces to the "  + oldClass.getURI() + " class to be " + newClass.getURI());
@@ -185,7 +184,7 @@ public class ABoxUpdater {
 		OntClass addedClass = newTboxModel.getOntClass(change.getDestinationURI());
 		
 		if (addedClass == null) {
-			logger.logError(this.getClass().getName() + " :  addClass - didn't find the added class " + change.getSourceURI() + " in the new model.");
+			logger.logError("didn't find the added class " + change.getSourceURI() + " in the new model.");
 			return;
 		}
 		
@@ -237,7 +236,7 @@ public class ABoxUpdater {
 		OntClass deletedClass = oldTboxModel.getOntClass(change.getSourceURI());
 		
 		if (deletedClass == null) {
-			logger.logError(this.getClass().getName() + " :  deleteClass - didn't find the deleted class " +
+			logger.logError("didn't find the deleted class " +
 					        change.getSourceURI() + " in the old model.");
 			return;
 		}
@@ -269,7 +268,7 @@ public class ABoxUpdater {
 			break;
 			case RENAME: renameProperty(propChangeObj);
 			break;
-			default: logger.logError("Property change can't be null");
+			default: logger.logError("unexpected change type indicator: " + propChangeObj.getAtomicChangeType());
 			break;
 		    }		
 		}
