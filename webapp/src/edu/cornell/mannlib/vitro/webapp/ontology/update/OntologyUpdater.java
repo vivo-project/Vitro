@@ -50,11 +50,6 @@ public class OntologyUpdater {
 	private OntologyChangeLogger logger;
 	private OntologyChangeRecord record;
 	
-	private OntModel OLD_TBOX_MODEL = null; // TODO change this
-	
-	private OntModel oldTBoxAnnotationsModel;
-	private OntModel newTBoxAnnotationsModel;
-	
 	public OntologyUpdater(OntologyUpdateSettings settings) {
 		this.settings = settings;
 		this.logger = new SimpleOntologyChangeLogger(settings.getLogFile(),
@@ -83,7 +78,7 @@ public class OntologyUpdater {
 		AtomicOntologyChangeLists changes = 
 				new AtomicOntologyChangeLists(rawChanges, 
 						settings.getOntModelSelector().getTBoxModel(), 
-						OLD_TBOX_MODEL);
+						settings.getOldTBoxModel());
 		
 		//updateTBox(changes);
 		//preprocessChanges(changes);
@@ -182,7 +177,8 @@ public class OntologyUpdater {
 	}
 	
 	private void updateTBoxAnnotations() throws IOException {
-		(new TBoxUpdater(oldTBoxAnnotationsModel, newTBoxAnnotationsModel,
+		(new TBoxUpdater(settings.getOldTBoxAnnotationsModel(),
+				settings.getNewTBoxAnnotationsModel(),
 		        settings.getOntModelSelector().getTBoxModel(), logger, record))
 		        .updateVitroPropertyDefaultValues();
 	}

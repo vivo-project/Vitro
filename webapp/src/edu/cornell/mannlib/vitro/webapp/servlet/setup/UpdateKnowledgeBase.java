@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Iterator;
 
@@ -15,6 +16,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.RDFNode;
@@ -55,10 +57,15 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 									"removedData.rdf";
 	private final String SPARQL_CONSTRUCTS_DIR = DATA_DIR + "sparqlConstructs/";
 	private final String MISC_REPLACEMENTS_FILE = DATA_DIR + "miscReplacements.rdf";
+	private final String OLD_TBOX_MODEL_DIR = DATA_DIR + "oldVersion/";
+	private final String OLD_TBOX_ANNOTATIONS_DIR = DATA_DIR + "oldAnnotations/";
 	
 	public void contextInitialized(ServletContextEvent sce) {
-				
-		/* 
+		
+		// TODO remove when ready
+		if (true) {
+			return;
+		}
 
 		ServletContext ctx = sce.getServletContext();
 		
@@ -80,6 +87,11 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		WebappDaoFactory wadf = (WebappDaoFactory) ctx.getAttribute("webappDaoFactory");
 		settings.setDefaultNamespace(wadf.getDefaultNamespace());
 		
+		OntModel oldTBoxModel = loadModelFromDirectory(ctx.getRealPath(OLD_TBOX_MODEL_DIR));
+		settings.setOldTBoxModel(oldTBoxModel);
+		OntModel oldTBoxAnnotationsModel = loadModelFromDirectory(ctx.getRealPath(OLD_TBOX_ANNOTATIONS_DIR));
+		settings.setOldTBoxAnnotationsModel(oldTBoxAnnotationsModel);
+		
 		try {
 			doMiscAppMetadataReplacements(ctx.getRealPath(MISC_REPLACEMENTS_FILE), oms);
 			(new OntologyUpdater(settings)).update(); 
@@ -93,7 +105,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			throw new RuntimeException(errMsg, ioe);
 		}	
 		
-		*/
+		
 		
 	}	
 	
@@ -132,6 +144,35 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			log.error("Error performing miscellaneous application metadata " +
 					" replacements.", e);
 		}
+	}
+	
+	private OntModel loadModelFromDirectory(String directoryPath) {
+		OntModel om = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+		File directory = new File(directoryPath);
+		if (!directory.isDirectory()) {
+			throw new RuntimeException(directoryPath + " must be a directory " +
+					"containing RDF files.");
+		}
+		File[] rdfFiles = directory.listFiles();
+		for (int i = 0; i < rdfFiles.length; i++) {
+			try {
+				File f = rdfFiles[i];
+				FileInputStream fis = new FileInputStream(f);
+				try {
+					if (f.getName().endsWith(".n3")) {
+						om.read(fis, null, "N3");
+					} else {
+						om.read(fis, null, "RDF/XML");
+					}
+				} catch (Exception e) {
+					log.error("Unable to load RDF from " + f.getName(), e); 
+				}
+			} catch (FileNotFoundException fnfe) {
+				log.error(rdfFiles[i].getName() + " not found. Unable to load" +
+						" RDF from this location.");
+			}
+		}
+		return om;
 	}
 	
 	public void contextDestroyed(ServletContextEvent arg0) {
