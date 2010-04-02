@@ -21,7 +21,6 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
-import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 
@@ -145,7 +144,7 @@ public class ABoxUpdater {
 		   
 		   //log summary of changes
 		   if (count > 0) {
-			   logger.log("Changing " + count + " subject reference" + ((count > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class to be " + newClass.getURI());
+			   logger.log("Changed " + count + " subject reference" + ((count > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class to be " + newClass.getURI());
 		   }
 
 		   // Change class references in the objects of statements
@@ -165,7 +164,7 @@ public class ABoxUpdater {
 		   
 		   //log summary of changes
 		   if (count > 0) {
-			   logger.log("Changing " + count + " object reference" + ((count > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class to be " + newClass.getURI());
+			   logger.log("Changed " + count + " object reference" + ((count > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class to be " + newClass.getURI());
 		   }
 		   
 		   aboxModel.remove(retractions);
