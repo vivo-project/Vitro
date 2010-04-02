@@ -98,8 +98,6 @@ public class UserEditController extends BaseEditController {
                 new ArrayList<ObjectPropertyStatement>(mayEditAsUris.size());
             for(String objURI: mayEditAsUris){
             	Individual editAs = getWebappDaoFactory().getIndividualDao().getIndividualByURI(objURI);
-            	if( editAs == null ) 
-            		continue;
                 ObjectPropertyStatement stmt = new ObjectPropertyStatementImpl();
                 stmt.setSubjectURI(u.getURI());
                 stmt.setPropertyURI(VitroVocabulary.MAY_EDIT_AS);

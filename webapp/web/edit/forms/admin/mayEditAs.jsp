@@ -31,7 +31,9 @@
             + " Looking for " + RANGE_CLASS);
     request.setAttribute("rangeClassUriJson", MiscWebUtils.escape(RANGE_CLASS));
     
-    request.setAttribute("predicateUriJson", MiscWebUtils.escape(PREDICATE));        
+    request.setAttribute("predicateUriJson", MiscWebUtils.escape(PREDICATE));
+    
+    request.setAttribute("objectUriJson" , MiscWebUtils.escape((String)request.getAttribute("objectUri")));    
 %>
 
 <v:jsonset var="n3ForEdit"  >
@@ -116,7 +118,7 @@
         <label for="delete"><h3>Remove the right to edit as this person?</h3></label>
         <input type="hidden" name="subjectUri"   value="${param.subjectUri}"/>
         <input type="hidden" name="predicateUri" value="${param.predicateUri}"/>
-        <input type="hidden" name="objectUri"    value="${param.objectUri}"/>    
+        <input type="hidden" name="objectVar"    value="${param.objectUri}"/>    
         <input type="hidden" name="editform"    value="edit/admin/mayEditAs.jsp"/>
         <v:input type="submit" id="delete" value="Remove" cancel="" />
     </form>

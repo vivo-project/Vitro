@@ -63,10 +63,15 @@
     <tr><td>User may edit as the following Individuals:</td></tr>           
     <c:forEach items="${requestScope.mayEditAsStmts }" var="stmt">
         <tr>
-            <td>${stmt.object.name}</td>
+        	<c:if test="${stmt.object == null or empty stmt.object.name }">
+        		<td> ${stmt.objectURI}</td>
+        	</c:if>
+        	<c:if test="${stmt.object != null and !empty stmt.object.name }">
+        		<td> ${stmt.object.name}</td>
+        	</c:if>            
             <c:url var="deleteUrl" value="/edit/editRequestDispatch.jsp">
                 <c:param name="subjectUri">${user.URI}</c:param>
-                <c:param name="predicateUri">${requestScope.predicateUri}</c:param>
+                <c:param name="predicateUri">${stmt.propertyURI}</c:param>
                 <c:param name="objectUri">${stmt.objectURI}</c:param>
                 <c:param name="editform">admin/mayEditAs.jsp</c:param>                
             </c:url>
