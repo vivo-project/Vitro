@@ -10,6 +10,7 @@ import javax.servlet.ServletContextListener;
 
 import com.hp.hpl.jena.ontology.OntModel;
 
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDao;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SimpleOntModelSelector;
@@ -37,10 +38,11 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 									"knowledgeBaseUpdate.error.log";
 	private final String REMOVED_DATA_FILE = DATA_DIR + REMOVED_DATA_DIR +
 									"removedData.rdf";
+	private final String SPARQL_CONSTRUCTS_DIR = DATA_DIR + "sparqlConstructs/";
 	
 	public void contextInitialized(ServletContextEvent sce) {
 		
-		/*
+		
 		
 		ServletContext ctx = sce.getServletContext();
 		
@@ -51,6 +53,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		OntologyUpdateSettings settings = new OntologyUpdateSettings();
 		settings.setAskQueryFile(ctx.getRealPath(ASK_QUERY_FILE));
 		settings.setDataDir(ctx.getRealPath(DATA_DIR));
+		settings.setSparqlConstructsDir(ctx.getRealPath(SPARQL_CONSTRUCTS_DIR));
 		settings.setDiffFile(ctx.getRealPath(DIFF_FILE));
 		settings.setSuccessAssertionsFile(
 				ctx.getRealPath(SUCCESS_ASSERTIONS_FILE));
@@ -58,6 +61,8 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		settings.setLogFile(ctx.getRealPath(LOG_FILE));
 		settings.setErrorLogFile(ctx.getRealPath(ERROR_LOG_FILE));
 		settings.setRemovedDataFile(ctx.getRealPath(REMOVED_DATA_FILE));
+		WebappDaoFactory wadf = (WebappDaoFactory) ctx.getAttribute("webappDaoFactory");
+		settings.setDefaultNamespace(wadf.getDefaultNamespace());
 		
 		try {
 			(new OntologyUpdater(settings)).update(); 
@@ -69,9 +74,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			System.out.println(errMsg);
 			ioe.printStackTrace();
 			throw new RuntimeException(errMsg, ioe);
-		}
-		
-		*/
+		}	
 		
 	}	
 	

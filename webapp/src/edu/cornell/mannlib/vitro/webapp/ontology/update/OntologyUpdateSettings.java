@@ -1,10 +1,13 @@
 package edu.cornell.mannlib.vitro.webapp.ontology.update;
 
+import com.hp.hpl.jena.ontology.OntModel;
+
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 
 public class OntologyUpdateSettings {
 
 	private String dataDir;
+	private String sparqlConstructsDir;
 	private String askQueryFile;
 	private String successAssertionsFile;
 	private String successRDFFormat = "N3";
@@ -13,13 +16,24 @@ public class OntologyUpdateSettings {
 	private String errorLogFile;
 	private String addedDataFile;
 	private String removedDataFile;
+	private String defaultNamespace;
 	private OntModelSelector ontModelSelector;
+	private OntModel oldTBoxModel;
+	private OntModel newTBoxModel;
+	private OntModel oldTBoxAnnotationsModel;
+	private OntModel newTBoxAnnotationsModel;
 	
 	public String getDataDir() {
 		return dataDir;
 	}
 	public void setDataDir(String dataDir) {
 		this.dataDir = dataDir;
+	}
+	public String getSparqlConstructsDir() {
+		return sparqlConstructsDir;
+	}
+	public void setSparqlConstructsDir(String sparqlConstructsDir) {
+		this.sparqlConstructsDir = sparqlConstructsDir;
 	}
 	public String getAskQueryFile() {
 		return askQueryFile;
@@ -72,8 +86,38 @@ public class OntologyUpdateSettings {
 	public void setRemovedDataFile(String removedDataFile) {
 		this.removedDataFile = removedDataFile;
 	}
+	public String getDefaultNamespace() {
+		return defaultNamespace;
+	}
+	public void setDefaultNamespace(String defaultNamespace) {
+		this.defaultNamespace = defaultNamespace;
+	}
 	public void setOntModelSelector(OntModelSelector ontModelSelector) {
 		this.ontModelSelector = ontModelSelector;
+	}
+	public OntModel getOldTBoxModel() {
+		return oldTBoxModel;
+	}
+	public void setOldTBoxModel(OntModel oldTBoxModel) {
+		this.oldTBoxModel = oldTBoxModel;
+	}
+	public OntModel getNewTBoxModel() {
+		return newTBoxModel;
+	}
+	public void setNewTBoxModel(OntModel newTBoxModel) {
+		this.newTBoxModel = newTBoxModel;
+	}
+	public OntModel getOldTBoxAnnotationsModel() {
+		return oldTBoxAnnotationsModel;
+	}
+	public void setOldTBoxAnnotationsModel(OntModel oldTBoxAnnotationsModel) {
+		this.oldTBoxAnnotationsModel = oldTBoxAnnotationsModel;
+	}
+	public OntModel getNewTBoxAnnotationsModel() {
+		return newTBoxAnnotationsModel;
+	}
+	public void setNewTBoxAnnotationsModel(OntModel newTBoxAnnotationsModel) {
+		this.newTBoxAnnotationsModel = newTBoxAnnotationsModel;
 	}
 	
 }

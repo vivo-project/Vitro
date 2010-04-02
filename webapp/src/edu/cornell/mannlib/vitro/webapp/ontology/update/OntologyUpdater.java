@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -22,11 +23,15 @@ import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.shared.Lock;
+
+import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils;
 
 /**
  * Performs knowledge base updates if necessary to align with a
@@ -47,6 +52,9 @@ public class OntologyUpdater {
 	
 	private OntModel OLD_TBOX_MODEL = null; // TODO change this
 	
+	private OntModel oldTBoxAnnotationsModel;
+	private OntModel newTBoxAnnotationsModel;
+	
 	public OntologyUpdater(OntologyUpdateSettings settings) {
 		this.settings = settings;
 		this.logger = new SimpleOntologyChangeLogger(settings.getLogFile(),
@@ -66,6 +74,10 @@ public class OntologyUpdater {
 	}
 	
 	private void performUpdate() throws IOException {
+		
+		performSparqlConstructs(settings.getSparqlConstructsDir(),
+				                settings.getOntModelSelector().getABoxModel());
+		
 		List<AtomicOntologyChange> rawChanges = getAtomicOntologyChanges();
 		
 		AtomicOntologyChangeLists changes = 
@@ -82,6 +94,72 @@ public class OntologyUpdater {
 		
 		// perform additional additions and retractions
 	}
+	
+	/**
+	 * Performs a set of arbitrary SPARQL CONSTRUCT queries on the 
+	 * data, for changes that cannot be expressed as simple property
+	 * or class additions, deletions, or renamings.
+	 * Blank nodes created by the queries are given random URIs.
+	 * @param sparqlConstructDir
+	 * @param aboxModel
+	 */
+	private void performSparqlConstructs(String sparqlConstructDir, 
+			OntModel aboxModel) throws IOException {
+		Model anonModel = ModelFactory.createDefaultModel();
+		File sparqlConstructDirectory = new File(sparqlConstructDir);
+		if (!sparqlConstructDirectory.isDirectory()) {
+			logger.logError(this.getClass().getName() + 
+					"performSparqlConstructs() expected to find a directory " +
+					" at " + sparqlConstructDir + ". Unable to execute " +
+					" SPARQL CONSTRUCTS.");
+			return;
+		}
+		File[] sparqlFiles = sparqlConstructDirectory.listFiles();
+		for (int i = 0; i < sparqlFiles.length; i ++) {
+			File sparqlFile = sparqlFiles[i];			
+			try {
+				BufferedReader reader = 
+					new BufferedReader(new FileReader(sparqlFile));
+				StringBuffer fileContents = new StringBuffer();
+				String ln;
+				while ( (ln = reader.readLine()) != null) {
+					fileContents.append(ln).append('\n');
+				}
+				try {
+					Query q = QueryFactory.create(fileContents.toString(), 
+							Syntax.syntaxARQ);
+					aboxModel.enterCriticalSection(Lock.WRITE);
+					try {
+						QueryExecution qe = QueryExecutionFactory.create(q,
+								aboxModel);
+						qe.execConstruct(anonModel);
+					} finally {
+						aboxModel.leaveCriticalSection();
+					}
+				} catch (Exception e) {
+					logger.logError(this.getClass().getName() + 
+							".performSparqlConstructs() unable to execute " +
+							"query at " + sparqlFile);
+				}
+			} catch (FileNotFoundException fnfe) {
+				logger.logError(this.getClass().getName() + 
+						".performSparqlConstructs() could not find " +
+						" SPARQL CONSTRUCT file " + sparqlFile + ". Skipping.");
+			}	
+		}
+		
+		aboxModel.enterCriticalSection(Lock.WRITE);
+		try {
+			JenaIngestUtils jiu = new JenaIngestUtils();
+			jiu.renameBNodes(anonModel, settings.getDefaultNamespace() + "n", 
+					aboxModel);
+		} finally {
+			aboxModel.leaveCriticalSection();
+		}
+		
+
+	}
+	
 	
 	private List<AtomicOntologyChange> getAtomicOntologyChanges() 
 			throws IOException {
@@ -103,8 +181,10 @@ public class OntologyUpdater {
 		// run additional SPARQL CONSTRUCTS 
 	}
 	
-	private void updateTBoxAnnotations() {
-		// Stella's code is called here
+	private void updateTBoxAnnotations() throws IOException {
+		(new TBoxUpdater(oldTBoxAnnotationsModel, newTBoxAnnotationsModel,
+		        settings.getOntModelSelector().getTBoxModel(), logger, record))
+		        .updateVitroPropertyDefaultValues();
 	}
 	
 	/**
