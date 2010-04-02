@@ -59,9 +59,12 @@ public class OntologyUpdater {
 				settings.getAddedDataFile(), settings.getRemovedDataFile());
 	}
 	
-	public void update() throws IOException {	
+	public boolean update() throws IOException {	
+		
 		// Check to see if the update is necessary.
-		if (updateRequired()) {
+		
+		boolean updateRequired = updateRequired();
+		if (updateRequired) {
 			performUpdate();
 			
 			if (!logger.errorsWritten()) {
@@ -74,6 +77,9 @@ public class OntologyUpdater {
 			record.writeChanges();
 			logger.closeLogs();
 		}
+		
+		return updateRequired;
+		
 	}
 	
 	private void performUpdate() throws IOException {

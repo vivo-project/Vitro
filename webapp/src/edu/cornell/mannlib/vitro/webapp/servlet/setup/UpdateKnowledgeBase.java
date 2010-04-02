@@ -100,8 +100,10 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			settings.setNewTBoxAnnotationsModel(newTBoxAnnotationsModel);
 			
 			try {
-				doMiscAppMetadataReplacements(ctx.getRealPath(MISC_REPLACEMENTS_FILE), oms);
-				(new OntologyUpdater(settings)).update(); 
+				boolean updateRequired = (new OntologyUpdater(settings)).update();
+				if (updateRequired) {
+					doMiscAppMetadataReplacements(ctx.getRealPath(MISC_REPLACEMENTS_FILE), oms);
+				}
 			} catch (IOException ioe) {
 				String errMsg = "IOException updating knowledge base " +
 					"for ontology changes: ";
