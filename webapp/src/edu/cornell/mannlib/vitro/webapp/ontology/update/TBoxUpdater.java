@@ -186,7 +186,7 @@ public class TBoxUpdater {
            long numRemoved = actualRetractions.size() - actualAdditions.size();
            if (numRemoved > 0) {
 	           logger.log("Removed " + numRemoved +
-	        		      " superfluous vitro annotation property settings from the knowledge base.");
+	        		      " superfluous vitro annotation property setting" + ((numRemoved > 1) ? "s" : "") + " from the knowledge base.");
            }
            
 		    //	   Copy annotation property settings that were introduced in the new ontology
@@ -208,7 +208,8 @@ public class TBoxUpdater {
 			// log the additions
             //summary
 			if (newAnnotationSettingsToAdd.size() > 0) {
-	            logger.log("Added " + newAnnotationSettingsToAdd.size() + " new annotation property settings to the knowledge base. This includes " +
+				boolean plural = (newAnnotationSettingsToAdd.size() > 1);
+	            logger.log("Added " + newAnnotationSettingsToAdd.size() + " new annotation property setting" + (plural ? "s" : "") + " to the knowledge base. This includes " +
 	                         "existing annotation properties applied to existing classes where they weren't applied before, or existing " +
 	                         "properties applied to new classes. No new annotation properties have been introduced.");
 			}
@@ -218,8 +219,8 @@ public class TBoxUpdater {
 				Statement statement = iter.next();
 				
 				logger.log( "added Statement: subject = " + statement.getSubject().getURI() +
-						" property = " + statement.getPredicate().getURI() +
-		                " object = " + (statement.getObject().isLiteral() ? ((Resource)statement.getObject()).getURI() 
+						    " property = " + statement.getPredicate().getURI() +
+		                    " object = " + (statement.getObject().isLiteral() ? ((Resource)statement.getObject()).getURI() 
 		                		                                          : ((Literal)statement.getObject()).getLexicalForm()));	
 			}
 		   
