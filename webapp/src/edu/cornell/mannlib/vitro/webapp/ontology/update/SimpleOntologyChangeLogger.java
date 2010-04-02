@@ -13,6 +13,8 @@ public class SimpleOntologyChangeLogger implements OntologyChangeLogger {
 	private Writer logWriter;
 	private Writer errorWriter;
 	
+	private boolean errorsWritten = false;
+	
 	public SimpleOntologyChangeLogger( String logPath, 
 									   String errorPath ) {
 		File logFile = new File(logPath);
@@ -40,6 +42,7 @@ public class SimpleOntologyChangeLogger implements OntologyChangeLogger {
 
 	public void logError(String errorMessage) throws IOException {
 
+		errorsWritten = true;
 		Exception e = new Exception();
 		StackTraceElement[] elements = e.getStackTrace();
 		String className = ((StackTraceElement)elements[1]).getClassName();
@@ -56,5 +59,9 @@ public class SimpleOntologyChangeLogger implements OntologyChangeLogger {
 		logWriter.close();
 		errorWriter.flush();
 		errorWriter.close();
+	}
+	
+	public boolean errorsWritten() {
+		return errorsWritten;
 	}
 }

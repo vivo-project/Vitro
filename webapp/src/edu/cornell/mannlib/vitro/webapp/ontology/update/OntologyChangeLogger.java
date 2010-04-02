@@ -12,4 +12,6 @@ public interface OntologyChangeLogger {
 	
 	public void closeLogs() throws IOException;
 	
+	public boolean errorsWritten();
+	
 }

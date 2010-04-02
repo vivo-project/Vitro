@@ -80,7 +80,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			settings.setDiffFile(ctx.getRealPath(DIFF_FILE));
 			settings.setSuccessAssertionsFile(
 					ctx.getRealPath(SUCCESS_ASSERTIONS_FILE));
-			settings.setSuccessRDFFormat(ctx.getRealPath(SUCCESS_RDF_FORMAT));
+			settings.setSuccessRDFFormat(SUCCESS_RDF_FORMAT);
 			settings.setLogFile(ctx.getRealPath(LOG_FILE));
 			settings.setErrorLogFile(ctx.getRealPath(ERROR_LOG_FILE));
 			settings.setAddedDataFile(ctx.getRealPath(ADDED_DATA_FILE));

@@ -63,9 +63,15 @@ public class OntologyUpdater {
 		// Check to see if the update is necessary.
 		if (updateRequired()) {
 			performUpdate();
-			// add assertions to the knowledge base showing that the 
-			// update was successful, so we don't need to run it again.
-			assertSuccess();
+			
+			if (!logger.errorsWritten()) {
+				// add assertions to the knowledge base showing that the 
+				// update was successful, so we don't need to run it again.
+				// TODO improve error handling in future version.
+				assertSuccess();
+			}
+			
+			logger.closeLogs();
 		}
 	}
 	
@@ -88,7 +94,6 @@ public class OntologyUpdater {
 		
 		updateTBoxAnnotations();
 		
-		logger.closeLogs();
 	}
 	
 	/**
@@ -224,7 +229,7 @@ public class OntologyUpdater {
 		return fileContents.toString();				
 	}
 	
-	private void assertSuccess() throws FileNotFoundException {
+	private void assertSuccess() throws FileNotFoundException, IOException {
 		try {
 		    Model m = settings.getOntModelSelector().getApplicationMetadataModel();
 		    File successAssertionsFile = 
@@ -232,17 +237,15 @@ public class OntologyUpdater {
 		    InputStream inStream = new FileInputStream(successAssertionsFile);
 		    m.enterCriticalSection(Lock.WRITE);
 		    try {
-		    	m.read(inStream, settings.getSuccessRDFFormat());
+		    	m.read(inStream, null, settings.getSuccessRDFFormat());
+		    	logger.log(" finished without errors.");
 		    } finally {
 		    	m.leaveCriticalSection();
 		    }
 		} catch (Exception e) {
-			// TODO: log something to the error log
+			logger.logError(" unable to make RDF assertions about successful " +
+					" update to new ontology version: " + e.getMessage());
 		}
-	}
-	
-	private void log(String log) {
-		
 	}
 	
 	/**
