@@ -112,6 +112,7 @@ public class ABoxUpdater {
 	 */
 	public void renameClass(AtomicOntologyChange change) throws IOException {
 		
+		logger.log("Processing a class rename from: " + change.getSourceURI() + " to " + change.getDestinationURI());
 		aboxModel.enterCriticalSection(Lock.WRITE);
 		
 		try {
@@ -181,10 +182,12 @@ public class ABoxUpdater {
 	 */
 	public void addClass(AtomicOntologyChange change) throws IOException {
 	   
+		logger.log("Processing a class addition of class " + change.getDestinationURI());
+		
 		OntClass addedClass = newTboxModel.getOntClass(change.getDestinationURI());
 		
 		if (addedClass == null) {
-			logger.logError("didn't find the added class " + change.getSourceURI() + " in the new model.");
+			logger.logError("didn't find the added class " + change.getDestinationURI() + " in the new model.");
 			return;
 		}
 		
@@ -233,6 +236,8 @@ public class ABoxUpdater {
 	 */
 	public void deleteClass(AtomicOntologyChange change) throws IOException {
 
+		logger.log("Processing a class deletion of class " + change.getSourceURI());
+		
 		OntClass deletedClass = oldTboxModel.getOntClass(change.getSourceURI());
 		
 		if (deletedClass == null) {
