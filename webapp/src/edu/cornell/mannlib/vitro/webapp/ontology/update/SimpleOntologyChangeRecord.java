@@ -46,12 +46,16 @@ public class SimpleOntologyChangeRecord implements OntologyChangeRecord {
 	
 	public void recordAdditions(Model incrementalAdditions) {
 		additionsModel.add(incrementalAdditions);
-		write(additionsModel, additionsFile);
+		if (additionsModel.size() > 0) {
+			write(additionsModel, additionsFile);
+		}
 	}
 
 	public void recordRetractions(Model incrementalRetractions) {
 		retractionsModel.add(incrementalRetractions);
-		write(retractionsModel, retractionsFile);
+		if (retractionsModel.size() > 0) {
+			write(retractionsModel, retractionsFile);
+		}
 	}
 	
 	private void write(Model model, File file) {

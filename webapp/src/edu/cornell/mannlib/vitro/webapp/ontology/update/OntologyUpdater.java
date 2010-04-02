@@ -84,7 +84,7 @@ public class OntologyUpdater {
 		
 		AtomicOntologyChangeLists changes = 
 				new AtomicOntologyChangeLists(rawChanges, 
-						settings.getOntModelSelector().getTBoxModel(), 
+						settings.getNewTBoxModel(), 
 						settings.getOldTBoxModel());
 		
 		//updateTBox(changes);
@@ -186,7 +186,7 @@ public class OntologyUpdater {
 	private void updateTBoxAnnotations() throws IOException {
 		(new TBoxUpdater(settings.getOldTBoxAnnotationsModel(),
 				settings.getNewTBoxAnnotationsModel(),
-		        settings.getOntModelSelector().getTBoxModel(), logger, record))
+		        settings.getOntModelSelector().getABoxModel(), logger, record))
 		        .updateVitroPropertyDefaultValues();
 	}
 	

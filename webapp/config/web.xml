@@ -72,16 +72,17 @@
     <listener-class>edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetup</listener-class>
   </listener>
 
+  <!-- Invokes process to perform updates to align with ontology changes if needed -->
+  <!-- Needs to run before submodels are attached and Pellet is set up -->
+
+  <listener>
+     <listener-class>edu.cornell.mannlib.vitro.webapp.servlet.setup.UpdateKnowledgeBase</listener-class>
+  </listener>
+
   <!-- Attaching submodels permits extra RDF files to be made visible without storing the data in the DB. -->
 
   <listener>
      <listener-class>edu.cornell.mannlib.vitro.webapp.servlet.setup.AttachSubmodels</listener-class>
-  </listener>
-
-  <!-- Invokes process to perform updates to align with ontology changes if needed -->
-
-  <listener>
-     <listener-class>edu.cornell.mannlib.vitro.webapp.servlet.setup.UpdateKnowledgeBase</listener-class>
   </listener>
 
   <!-- Pellet setup enables reasoning.  Inferences are cached in a separate DB graph. -->

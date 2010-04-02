@@ -122,7 +122,11 @@ public class TBoxUpdater {
 			 
 			 if (!newObject.equals(oldObject)) {
 				 objects = siteModel.listObjectsOfProperty(subject,predicate);
-
+				 
+				 if (!objects.hasNext()) {
+					 continue;
+				 }
+				 
 				 RDFNode siteObject = objects.next();
 				 if (objects.hasNext()) {
 					 logger.logError("Warning: found " + objects.toList().size() +
@@ -163,18 +167,18 @@ public class TBoxUpdater {
 			 }		  
 		   }
 		  
-		   siteModel.add(additions);
-		   record.recordAdditions(additions);
-		   siteModel.remove(retractions);
-		   record.recordRetractions(retractions);
+		   Model actualAdditions = additions.difference(retractions);
+		   siteModel.add(actualAdditions);
+		   record.recordAdditions(actualAdditions);
+		   Model actualRetractions = retractions.difference(additions);
+		   siteModel.remove(actualRetractions);
+		   record.recordRetractions(actualRetractions);
 		
 		   // log summary of changes
-           StmtIterator addedIter = additions.listStatements();
            logger.log("Updated the default vitro annotation value for " + 
-        		   addedIter.toList().size() + " statments in the knowledge base.");
+        		   actualAdditions.size() + " statments in the knowledge base.");
 		   
-           StmtIterator removedIter = retractions.listStatements();
-           int numRemoved = removedIter.toList().size() - addedIter.toList().size();
+           long numRemoved = actualRetractions.size() - actualAdditions.size();
            logger.log("Removed " + numRemoved +
         		      " superfluous vitro annotation property settings from the knowledge base.");
            
@@ -183,15 +187,21 @@ public class TBoxUpdater {
 		    //		  
 
 			Model newAnnotationSettings = newTboxModel.difference(oldTboxModel);
-			siteModel.add(newAnnotationSettings);
-			record.recordAdditions(newAnnotationSettings);
+			Model newAnnotationSettingsToAdd = ModelFactory.createDefaultModel();
+			StmtIterator newStmtIt = newAnnotationSettings.listStatements();
+			while (newStmtIt.hasNext()) {
+				Statement stmt = newStmtIt.next();
+				if (!siteModel.contains(stmt)) {
+					newAnnotationSettingsToAdd.add(stmt);
+				}
+			}
+			siteModel.add(newAnnotationSettingsToAdd);
+			record.recordAdditions(newAnnotationSettingsToAdd);
             
 			// log the additions
-            iter = newAnnotationSettings.listStatements();
-			  
             //summary
-            logger.log("Added " + iter.toList().size() + " new annotation property settings to the knowledge base. This includes " +
-                         "exsiting annotation properties applied to exsiting classes where they weren't applied before, or existing " +
+            logger.log("Added " + newAnnotationSettingsToAdd.size() + " new annotation property settings to the knowledge base. This includes " +
+                         "existing annotation properties applied to existing classes where they weren't applied before, or existing " +
                          "properties applied to new classes. No new annotation properties have been introduced.");
             //details
             

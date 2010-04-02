@@ -60,6 +60,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	private final String SPARQL_CONSTRUCTS_DIR = DATA_DIR + "sparqlConstructs/";
 	private final String MISC_REPLACEMENTS_FILE = DATA_DIR + "miscReplacements.rdf";
 	private final String OLD_TBOX_MODEL_DIR = DATA_DIR + "oldVersion/";
+	private final String NEW_TBOX_MODEL_DIR = "/WEB-INF/submodels/";
 	private final String OLD_TBOX_ANNOTATIONS_DIR = DATA_DIR + "oldAnnotations/";
 	private final String NEW_TBOX_ANNOTATIONS_DIR = "/WEB-INF/ontologies/user";
 	
@@ -91,7 +92,8 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			settings.setOntModelSelector(oms);
 			OntModel oldTBoxModel = loadModelFromDirectory(ctx.getRealPath(OLD_TBOX_MODEL_DIR));
 			settings.setOldTBoxModel(oldTBoxModel);
-			settings.setNewTBoxModel(oms.getTBoxModel());
+			OntModel newTBoxModel = loadModelFromDirectory(ctx.getRealPath(NEW_TBOX_MODEL_DIR));
+			settings.setNewTBoxModel(newTBoxModel);
 			OntModel oldTBoxAnnotationsModel = loadModelFromDirectory(ctx.getRealPath(OLD_TBOX_ANNOTATIONS_DIR));
 			settings.setOldTBoxAnnotationsModel(oldTBoxAnnotationsModel);
 			OntModel newTBoxAnnotationsModel = loadModelFromDirectory(ctx.getRealPath(NEW_TBOX_ANNOTATIONS_DIR));
