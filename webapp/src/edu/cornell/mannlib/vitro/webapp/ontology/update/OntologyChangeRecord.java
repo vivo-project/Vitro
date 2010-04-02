@@ -10,4 +10,6 @@ public interface OntologyChangeRecord {
 	
 	public void recordRetractions(Model incrementalRetractions);
 	
+	public void writeChanges();
+	
 }

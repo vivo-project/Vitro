@@ -19,7 +19,7 @@ public class SimpleOntologyChangeRecord implements OntologyChangeRecord {
 	private final static Log log = 
 			LogFactory.getLog(SimpleOntologyChangeRecord.class);
 	
-	private final static String RDF_SYNTAX = "RDF/XML-ABBREV";
+	private final static String RDF_SYNTAX = "N3";
 	
 	private Model additionsModel = ModelFactory.createDefaultModel();
 	private Model retractionsModel = ModelFactory.createDefaultModel();
@@ -46,16 +46,11 @@ public class SimpleOntologyChangeRecord implements OntologyChangeRecord {
 	
 	public void recordAdditions(Model incrementalAdditions) {
 		additionsModel.add(incrementalAdditions);
-		if (additionsModel.size() > 0) {
-			write(additionsModel, additionsFile);
-		}
+	
 	}
 
 	public void recordRetractions(Model incrementalRetractions) {
 		retractionsModel.add(incrementalRetractions);
-		if (retractionsModel.size() > 0) {
-			write(retractionsModel, retractionsFile);
-		}
 	}
 	
 	private void write(Model model, File file) {
@@ -65,6 +60,15 @@ public class SimpleOntologyChangeRecord implements OntologyChangeRecord {
 		} catch (FileNotFoundException fnfe) {
 			log.error(this.getClass().getName() + 
 					  " unable to write to RDF file", fnfe);
+		}
+	}
+	
+	public void writeChanges() {
+		if (additionsModel.size() > 0) {
+			write(additionsModel, additionsFile);
+		}
+		if (retractionsModel.size() > 0) {
+			write(retractionsModel, retractionsFile);
 		}
 	}
 

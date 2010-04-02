@@ -71,6 +71,7 @@ public class OntologyUpdater {
 				assertSuccess();
 			}
 			
+			record.writeChanges();
 			logger.closeLogs();
 		}
 	}

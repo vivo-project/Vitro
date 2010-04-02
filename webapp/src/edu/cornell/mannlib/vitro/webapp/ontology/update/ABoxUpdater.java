@@ -374,7 +374,7 @@ public class ABoxUpdater {
 			record.recordRetractions(deletePropModel);
 			boolean plural = (deletePropModel.size() > 1);
 			if (deletePropModel.size() > 0) {
-				logger.log(deletePropModel.size() + " statement" + (plural ? "s" : "") + " using " + 
+				logger.log(deletePropModel.size() + " statement" + (plural ? "s" : "") + " with predicate " + 
 						propObj.getSourceURI() + " " + (plural ? "were" : "was") + " removed. ");
 			}
 		} else {
@@ -421,8 +421,8 @@ public class ABoxUpdater {
 		
 		if (renamePropRetractModel.size() > 0) {
 			logger.log(renamePropRetractModel.size() + " statment" + 
-					((renamePropRetractModel.size() > 1) ? "s" : "") + " using " +
-					"property " + propObj.getSourceURI() + " " + 
+					((renamePropRetractModel.size() > 1) ? "s" : "") +
+					" with predicate " + propObj.getSourceURI() + " " + 
 					((renamePropRetractModel.size() > 1) ? "were" : "was") 
 					+ " changed to use " +
 					propObj.getDestinationURI() + " instead.");
