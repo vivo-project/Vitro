@@ -36,7 +36,7 @@ public class SimpleOntologyChangeLogger implements OntologyChangeLogger {
 		className = className.substring(className.lastIndexOf('.') + 1 );
 		String methodName = ((StackTraceElement)elements[1]).getMethodName();
 		
-		logWriter.write(className + "." + methodName +  ":  " + logMessage + "\n");
+		logWriter.write(className + "." + methodName +  ":  " + logMessage + "\n\n");
 		logWriter.flush();
 	}
 
