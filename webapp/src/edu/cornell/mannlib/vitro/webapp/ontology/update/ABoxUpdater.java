@@ -3,11 +3,13 @@
 package edu.cornell.mannlib.vitro.webapp.ontology.update;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.ontology.OntProperty;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -36,6 +38,9 @@ public class ABoxUpdater {
 	private OntModel aboxModel;
 	private OntologyChangeLogger logger;  
 	private OntologyChangeRecord record;
+	private OntClass OWL_THING = (ModelFactory
+			.createOntologyModel(OntModelSpec.OWL_MEM))
+			.createClass(OWL.Thing.getURI());
 
 	/**
 	 * 
@@ -127,10 +132,9 @@ public class ABoxUpdater {
 		   // Change class references in the subjects of statements
 		   StmtIterator iter = aboxModel.listStatements(oldClass, (Property) null, (RDFNode) null);
 
-		   //log summary of changes
-		   logger.log("Changing " + iter.toList().size() + " subject referernces to the "  + oldClass.getURI() + " class to be " + newClass.getURI());
-		   
-		   while (iter.hasNext()) {	
+		   int count = 0;
+		   while (iter.hasNext()) {
+			   count++;
 			   Statement oldStatement = iter.next();
 			   Statement newStatement = ResourceFactory.createStatement(newClass, oldStatement.getPredicate(), oldStatement.getObject());
 			   retractions.add(oldStatement);
@@ -138,14 +142,18 @@ public class ABoxUpdater {
 			   logChange(oldStatement, false);
 			   logChange(newStatement,true);
 		   }
+		   
+		   //log summary of changes
+		   if (count > 0) {
+			   logger.log("Changing " + count + " subject referernces to the "  + oldClass.getURI() + " class to be " + newClass.getURI());
+		   }
 
 		   // Change class references in the objects of statements
 		   iter = aboxModel.listStatements((Resource) null, (Property) null, oldClass);
 
-		   //log summary of changes
-		   logger.log("Changing " + iter.toList().size() + " object referernces to the "  + oldClass.getURI() + " class to be " + newClass.getURI());
-		   
-		   while (iter.hasNext()) {	
+		   count = 0;
+		   while (iter.hasNext()) {
+			   count++;
 			   Statement oldStatement = iter.next();
 			   Statement newStatement = ResourceFactory.createStatement(oldStatement.getSubject(), oldStatement.getPredicate(), newClass);
 			   retractions.add(oldStatement);
@@ -153,6 +161,11 @@ public class ABoxUpdater {
 			   //TODO - worried about logging changes before the changes have actually been made
 			   // in the model
 			   logChanges(oldStatement, newStatement);
+		   }
+		   
+		   //log summary of changes
+		   if (count > 0) {
+			   logger.log("Changing " + count + " object referernces to the "  + oldClass.getURI() + " class to be " + newClass.getURI());
 		   }
 		   
 		   aboxModel.remove(retractions);
@@ -191,7 +204,18 @@ public class ABoxUpdater {
 			return;
 		}
 		
-		ExtendedIterator<OntClass> classIter = addedClass.listSuperClasses(true);
+		List<OntClass> classList = addedClass.listSuperClasses(true).toList();
+		List<OntClass> namedClassList = new ArrayList<OntClass>();
+		for (OntClass ontClass : classList) { 
+			if (!ontClass.isAnon()) {
+				namedClassList.add(ontClass);
+			}
+		}
+		if (namedClassList.isEmpty()) {
+			namedClassList.add(OWL_THING);
+		}
+		
+		Iterator<OntClass> classIter = namedClassList.iterator();
 		
 		while (classIter.hasNext()) {
 			OntClass parentOfAddedClass = classIter.next();
@@ -209,11 +233,13 @@ public class ABoxUpdater {
 						indList += "\n\t" + stmt.getSubject().getURI(); 
 					}
 					
-					//TODO - take out the detailed logging after our internal testing is completed.
-			        logger.log("There are " + count + " individuals in the model that are of type " + parentOfAddedClass.getURI() + "," +
-			        		    " and a new subclass of that class has been added: " + addedClass.getURI() + ". " +
-			        		    "Please review the following individuals to see whether they should be of type: " +  addedClass.getURI() + ":" +
-			        		    indList );		
+					if (count > 0) {
+						//TODO - take out the detailed logging after our internal testing is completed.
+				        logger.log("There are " + count + " individuals in the model that are of type " + parentOfAddedClass.getURI() + "," +
+				        		    " and a new subclass of that class has been added: " + addedClass.getURI() + ". " +
+				        		    "Please review the following individuals to see whether they should be of type: " +  addedClass.getURI() + ":" +
+				        		    indList );
+					}
 				}				
 			}			
 		}
@@ -246,7 +272,17 @@ public class ABoxUpdater {
 			return;
 		}
 
-		OntClass parent = deletedClass.getSuperClass();
+		List<OntClass> classList = deletedClass.listSuperClasses(true).toList();
+		List<OntClass> namedClassList = new ArrayList<OntClass>();
+		for (OntClass ontClass : classList) { 
+			if (!ontClass.isAnon()) {
+				namedClassList.add(ontClass);
+			}
+		}
+		OntClass parent = (namedClassList.isEmpty()) 
+								? namedClassList.get(0) 
+								: OWL_THING;
+		
 		OntClass replacementClass = newTboxModel.getOntClass(parent.getURI());
 		
 		while (replacementClass == null) {
@@ -255,7 +291,7 @@ public class ABoxUpdater {
 		} 
 
 	   //log summary of changes
-	   logger.log("CLass " + deletedClass.getURI() + " has been deleted. Any references to it in the knowledge base will be changed to " + 
+	   logger.log("Class " + deletedClass.getURI() + " has been deleted. Any references to it in the knowledge base will be changed to " + 
 			        replacementClass.getURI());
 
 		AtomicOntologyChange chg = new AtomicOntologyChange(deletedClass.getURI(), replacementClass.getURI(), AtomicChangeType.RENAME);
@@ -281,37 +317,50 @@ public class ABoxUpdater {
 	
 	private void addProperty(AtomicOntologyChange propObj) throws IOException{
 		OntProperty tempProperty = newTboxModel.getOntProperty
-		(propObj.getDestinationURI()).getSuperProperty();
+			(propObj.getDestinationURI());
 		if (tempProperty == null) {
+			logger.logError("Unable to find property " + 
+					propObj.getDestinationURI() +
+					" in newTBoxModel");
+			return;
+		}
+		OntProperty superProperty = tempProperty.getSuperProperty();
+		if (superProperty == null) {
 			return;
 		}
 		int count = aboxModel.listStatements(
-				(Resource) null, tempProperty, (RDFNode) null).toSet().size();
-		logger.log("The Property " + tempProperty.getURI() + 
-				"which occurs " + count + "times in database has " +
-						"a new subProperty " + propObj.getDestinationURI() +
-				"added to Core 1.0");
-		logger.log("Please review accordingly");			
+				(Resource) null, superProperty, (RDFNode) null).toSet().size();
+		if (count > 0) {
+			logger.log("The Property " + superProperty.getURI() + 
+					" which occurs " + count + " times in database has " +
+							"a new subProperty " + propObj.getDestinationURI() +
+					" in the new ontology version. ");
+			logger.log("Please review accordingly.");
+		}
 	}
 	
 	private void deleteProperty(AtomicOntologyChange propObj) throws IOException{
 		OntProperty deletedProperty = oldTboxModel.getOntProperty(propObj.getSourceURI());
 		
 		if (deletedProperty == null) {
-			// TODO - log 
+			logger.logError("expected to find property " 
+					+ propObj.getSourceURI() + " in oldTBoxModel");
 			return;
 		}
 		
+		OntProperty replacementProperty = null;
 		OntProperty parent = deletedProperty.getSuperProperty();
-		OntProperty replacementProperty = newTboxModel.getOntProperty(parent.getURI());
-		
-		while (replacementProperty == null) {
-			 parent = parent.getSuperProperty();
-			 if (parent == null) {
-				 break;
-			 }
-	    	 replacementProperty = newTboxModel.getOntProperty(parent.getURI()); 			
-		} 
+		if (parent != null) {
+			replacementProperty = newTboxModel.getOntProperty(parent.getURI());
+			
+			while (replacementProperty == null) {
+				 parent = parent.getSuperProperty();
+				 if (parent == null) {
+					 break;
+				 }
+		    	 replacementProperty = newTboxModel.getOntProperty(parent.getURI()); 			
+			} 
+		}
 		
 		Model deletePropModel = ModelFactory.createDefaultModel();
 		
@@ -325,9 +374,11 @@ public class ABoxUpdater {
 				aboxModel.leaveCriticalSection();
 			}
 			record.recordRetractions(deletePropModel);
-			logger.log(deletePropModel.size() + " statements using " + 
-					propObj.getSourceURI() + " were removed. " +
-					" Please refer to the removed data model");
+			if (deletePropModel.size() > 0) {
+				logger.log(deletePropModel.size() + " statements using " + 
+						propObj.getSourceURI() + " were removed. " +
+						" Please refer to the removed data model");
+			}
 		} else {
 			AtomicOntologyChange chg = new AtomicOntologyChange(deletedProperty.getURI(), replacementProperty.getURI(), AtomicChangeType.RENAME);
 			renameProperty(chg);
@@ -341,7 +392,8 @@ public class ABoxUpdater {
 		OntProperty newProperty = newTboxModel.getOntProperty(propObj.getDestinationURI());
 		
 		if (oldProperty == null || newProperty == null) {
-			// TODO - log 
+			logger.logError(" expects non-null old property and new property "
+					+ "URIs");
 			return;
 		}
 		
@@ -369,10 +421,12 @@ public class ABoxUpdater {
 		record.recordAdditions(renamePropAddModel);
 		record.recordRetractions(renamePropRetractModel);
 		
-		logger.log(renamePropRetractModel.size() + " statments using " +
-				"property " + propObj.getSourceURI() + " were changed to use " +
-				propObj.getDestinationURI() + " instead. Please refer to the " +
-				"removed data model and the added data model.");
+		if (renamePropRetractModel.size() > 0) {
+			logger.log(renamePropRetractModel.size() + " statments using " +
+					"property " + propObj.getSourceURI() + " were changed to use " +
+					propObj.getDestinationURI() + " instead. Please refer to the " +
+					"removed data model and the added data model.");
+		}
 		
 	}
 

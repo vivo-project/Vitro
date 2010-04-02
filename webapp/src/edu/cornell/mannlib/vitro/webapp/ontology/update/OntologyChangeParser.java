@@ -24,6 +24,12 @@ import java.util.ArrayList;
 
 public class OntologyChangeParser {
 
+	private OntologyChangeLogger logger;
+	
+	public OntologyChangeParser(OntologyChangeLogger logger) {
+		this.logger = logger;
+	}
+		
 	/**
 	 * @param args
 	 * @throws IOException 
@@ -31,6 +37,8 @@ public class OntologyChangeParser {
 	
 	@SuppressWarnings({ "unchecked", "null", "static-access" })
 	public ArrayList<AtomicOntologyChange> parseFile(String diffPath) throws IOException{
+		
+		logger.log("Parsing PromptDiff file at " + diffPath);
 		
 		AtomicOntologyChange changeObj;
 		ArrayList<AtomicOntologyChange> changeObjects = new ArrayList<AtomicOntologyChange>();
@@ -42,56 +50,44 @@ public class OntologyChangeParser {
 		StringTokenizer stArr = null; 
 		FileInputStream in = new FileInputStream(new File(diffPath));
 		CSVReader readFile = new SimpleReader();
+		readFile.setSeperator('\t');
 		
 		List<String[]> rows = readFile.parse(in);
 		
 		for(int rowNum = 0; rowNum < rows.size(); rowNum++){
 			
 			String[] cols = rows.get(rowNum);
-			
-			for(int col =0; col < cols.length; col++){
-				String column = cols[col].trim();
-				stArr = new StringTokenizer(column,"	");
-				countColumns = stArr.countTokens();
+			if (cols.length != 5) {
+				logger.logError("Invalid PromptDiff data at row " + (rowNum + 1) 
+					   + ". Expected 5 columns; found " + cols.length );
+			} else {
+		
 				changeObj = new AtomicOntologyChange();
-				
-					if(countColumns == 4){
-						
-						URI = stArr.nextToken();
-						rename = stArr.nextToken();
-						String check = stArr.nextToken();
-						
-						if(check.equalsIgnoreCase("Add")){
-							
-							AtomicChangeType atomicChangeType = changeObj.getAtomicChangeType();
-							changeObj.setAtomicChangeType(atomicChangeType.ADD);
-							changeObj.setDestinationURI(URI);
-							changeObjects.add(changeObj);
-							
-						}
-						else{
-							AtomicChangeType atomicChangeType = changeObj.getAtomicChangeType();
-							changeObj.setAtomicChangeType(atomicChangeType.DELETE);
-							changeObj.setSourceURI(URI);
-							changeObjects.add(changeObj);
-						}
-					}
-					else{
-						
-						sourceURI = stArr.nextToken();
-						destinationURI = stArr.nextToken();
-						AtomicChangeType atomicChangeType = changeObj.getAtomicChangeType();
-						changeObj.setAtomicChangeType(atomicChangeType.RENAME);
-						changeObj.setSourceURI(sourceURI);
-						changeObj.setDestinationURI(destinationURI);
-						changeObjects.add(changeObj);
-					     
-					}
+				if (cols[0] != null && cols[0].length() > 0) {
+					changeObj.setSourceURI(cols[0]);
+				}
+				if (cols[1] != null && cols[1].length() > 0) {
+					changeObj.setDestinationURI(cols[1]);
+				}
+				if ("Yes".equals(cols[2])) {
+					changeObj.setAtomicChangeType(AtomicChangeType.RENAME);
+				} else if ("Delete".equals(cols[3])) {
+					changeObj.setAtomicChangeType(AtomicChangeType.DELETE); 
+				} else if ("Add".equals(cols[3])) {
+					changeObj.setAtomicChangeType(AtomicChangeType.ADD);
+				} else {
+					logger.logError("Invalid rename or change type data: '" +
+							cols[2] + " " + cols[3] + "'");
+				}
+				changeObjects.add(changeObj);
 					
 			}
 			
 		}
 		
+		if (changeObjects.size() == 0) {
+			logger.log("did not find any changes in PromptDiff output file.");
+		}
 		return changeObjects;
 	}
 

@@ -9,6 +9,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -87,7 +88,7 @@ public class OntologyUpdater {
 		
 		updateTBoxAnnotations();
 		
-		// perform additional additions and retractions
+		logger.closeLogs();
 	}
 	
 	/**
@@ -158,7 +159,8 @@ public class OntologyUpdater {
 	
 	private List<AtomicOntologyChange> getAtomicOntologyChanges() 
 			throws IOException {
-		return (new OntologyChangeParser()).parseFile(settings.getDiffFile());
+		return (new OntologyChangeParser(logger))
+				.parseFile(settings.getDiffFile());
 	}
 	
 
@@ -166,9 +168,9 @@ public class OntologyUpdater {
 	private void updateABox(AtomicOntologyChangeLists changes) 
 			throws IOException {
 		// TODO get models from somewhere
-		OntModel oldTBoxModel = null;
-		OntModel newTBoxModel = null;
-		OntModel ABoxModel = null;
+		OntModel oldTBoxModel = settings.getOldTBoxModel();
+		OntModel newTBoxModel = settings.getNewTBoxModel();
+		OntModel ABoxModel = settings.getOntModelSelector().getABoxModel();
 		ABoxUpdater aboxUpdater = new ABoxUpdater(
 				oldTBoxModel, newTBoxModel, ABoxModel, logger, record);
 		aboxUpdater.processPropertyChanges(changes.getAtomicPropertyChanges());
@@ -252,19 +254,20 @@ public class OntologyUpdater {
 	 */
 	private class AtomicOntologyChangeLists {
 		
-		private List<AtomicOntologyChange> atomicClassChanges;
+		private List<AtomicOntologyChange> atomicClassChanges = 
+				new ArrayList<AtomicOntologyChange>();
 
-		private List<AtomicOntologyChange> atomicPropertyChanges;
+		private List<AtomicOntologyChange> atomicPropertyChanges =
+				new ArrayList<AtomicOntologyChange>();
 		
 		public AtomicOntologyChangeLists (
 				List<AtomicOntologyChange> changeList, OntModel newTboxModel,
 				OntModel oldTboxModel) throws IOException {
 			
-			String str = null;
 			Iterator<AtomicOntologyChange> listItr = changeList.iterator();
 			while(listItr.hasNext()){
 				AtomicOntologyChange changeObj = listItr.next();
-				if(!changeObj.getSourceURI().equals(str)){
+				if(changeObj.getSourceURI() != null){
 					if(oldTboxModel.getOntProperty(changeObj.
 							getSourceURI()) != null){
 						atomicPropertyChanges.add(changeObj);
@@ -279,7 +282,7 @@ public class OntologyUpdater {
 					}
 					
 				}
-				else if(!changeObj.getDestinationURI().equals(str)){
+				else if(changeObj.getDestinationURI() != null){
 					if(newTboxModel.getOntProperty(changeObj.
 							getDestinationURI()) != null){
 						atomicPropertyChanges.add(changeObj);
@@ -298,7 +301,7 @@ public class OntologyUpdater {
 							+ "Change Object skipped" );
 				}
 			}
-			logger.log("Property and Class change Object lists seperated");
+			//logger.log("Property and Class change Object lists separated");
 		}
 		
 		public List<AtomicOntologyChange> getAtomicClassChanges() {

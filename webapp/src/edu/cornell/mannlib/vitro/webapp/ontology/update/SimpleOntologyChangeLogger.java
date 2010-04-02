@@ -33,6 +33,7 @@ public class SimpleOntologyChangeLogger implements OntologyChangeLogger {
 		String methodName = ((StackTraceElement)elements[1]).getMethodName();
 		
 		logWriter.write(className + "." + methodName +  ":  " + logMessage + "\n");
+		logWriter.flush();
 	}
 
 	public void logError(String errorMessage) throws IOException {
@@ -45,6 +46,7 @@ public class SimpleOntologyChangeLogger implements OntologyChangeLogger {
 		int lineNumber = ((StackTraceElement)elements[1]).getLineNumber(); 
 
 		errorWriter.write(className + "." + methodName +  " line " + lineNumber + ":  " + errorMessage + "\n");
+		errorWriter.flush();
 	}
 	
 	public void closeLogs() throws IOException {

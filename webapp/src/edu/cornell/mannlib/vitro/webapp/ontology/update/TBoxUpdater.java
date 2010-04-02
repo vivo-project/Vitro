@@ -103,35 +103,35 @@ public class TBoxUpdater {
 			 
 			 NodeIterator objects = newTboxModel.listObjectsOfProperty(subject, predicate);
 			 
-			 if ((objects == null) || (objects.toList().size() == 0) ) {
-				 logger.logError("Error: found a statement for subject = " + subject.getURI() +
-						 " and property = "  + predicate.getURI() +
-						 " in the old version but not the new version of the ontology.");
-				 continue;
-				 			 
-			 } else if (objects.toList().size() > 1) {
+			 if ((objects == null) || (!objects.hasNext()) ) {
+				 retractions.add(siteModel.listStatements(subject, predicate, (RDFNode) null));
+				 //logger.log("Error: found a statement for subject = " + subject.getURI() +
+				 //  	 " and property = "  + predicate.getURI() +
+				 //		 " in the old version but not the new version of the ontology.");
+				 continue;			 			 
+			 }
+			
+			 RDFNode newObject = objects.next();
+			 if (objects.hasNext()) {
 				 logger.logError("Error: found " + objects.toList().size() +
 						 " statements with subject = " + subject.getURI() + 
 						 " and property = " + predicate.getURI() +
 						 " in the new version of the ontology. (maximum of one is expected)");
-				 continue;
+				 continue; 
 			 }
-			 
-			 RDFNode newObject = objects.next();
 			 
 			 if (!newObject.equals(oldObject)) {
 				 objects = siteModel.listObjectsOfProperty(subject,predicate);
 
-				 if (objects.toList().size() > 1) {
+				 RDFNode siteObject = objects.next();
+				 if (objects.hasNext()) {
 					 logger.logError("Warning: found " + objects.toList().size() +
 							 " statements with subject = " + subject.getURI() + 
 							 " and property = " + predicate.getURI() +
 							 " in the site model (maximum of one is expected). +" +
 							 " did not perform any update on this property");
-					 continue;
+					 continue;					 
 				 }
-
-				 RDFNode siteObject = objects.next();
 				 
 				 if (!siteObject.equals(oldObject)) {
 	        	    try {
@@ -149,11 +149,11 @@ public class TBoxUpdater {
 	    				additions.add(subject, predicate, newObject);
 	    				
 						logger.log("Changed the value of property "  + predicate.getURI() +
-								" of class = " + subject.getURI() + 
+								" of subject = " + subject.getURI() + 
 								" from " +
-								 (newObject.isLiteral() ? ((Resource)oldObject).getURI() : ((Literal)oldObject).getLexicalForm()) +								
+								 (oldObject.isResource() ? ((Resource)oldObject).getURI() : ((Literal)oldObject).getLexicalForm()) +								
 								" to " + 
-								 (newObject.isLiteral() ? ((Resource)newObject).getURI() : ((Literal)newObject).getLexicalForm()) +
+								 (newObject.isResource() ? ((Resource)newObject).getURI() : ((Literal)newObject).getLexicalForm()) +
 								 " in the knowledge base:\n");
 					} catch (Exception e) {
 						logger.logError("Error trying to change the value of property " + predicate.getURI() +

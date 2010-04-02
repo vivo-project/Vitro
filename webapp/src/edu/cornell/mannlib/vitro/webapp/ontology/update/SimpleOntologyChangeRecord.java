@@ -3,6 +3,8 @@ package edu.cornell.mannlib.vitro.webapp.ontology.update;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,12 +27,16 @@ public class SimpleOntologyChangeRecord implements OntologyChangeRecord {
 	public SimpleOntologyChangeRecord(
 			String additionsFile, String retractionsFile) {
 		this.additionsFile = new File(additionsFile);
-		if (!this.additionsFile.exists()) {
-			throw new RuntimeException(this.getClass().getName() + 
+		try {
+			FileWriter test = new FileWriter(additionsFile);
+		} catch (IOException ioe) {
+				throw new RuntimeException(this.getClass().getName() + 
 					" unable to create required file at " + additionsFile);
-		}
+		}	
 		this.retractionsFile = new File(retractionsFile);
-		if (!this.retractionsFile.exists()) {
+		try { 
+			FileWriter test = new FileWriter(retractionsFile);
+		} catch (IOException ioe) {
 			throw new RuntimeException(this.getClass().getName() + 
 					" unable to create required file at " + retractionsFile);			
 		}
