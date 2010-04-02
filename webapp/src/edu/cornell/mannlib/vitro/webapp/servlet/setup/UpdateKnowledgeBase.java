@@ -59,6 +59,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	private final String MISC_REPLACEMENTS_FILE = DATA_DIR + "miscReplacements.rdf";
 	private final String OLD_TBOX_MODEL_DIR = DATA_DIR + "oldVersion/";
 	private final String OLD_TBOX_ANNOTATIONS_DIR = DATA_DIR + "oldAnnotations/";
+	private final String NEW_TBOX_ANNOTATIONS_DIR = "/WEB-INF/ontologies/user";
 	
 	public void contextInitialized(ServletContextEvent sce) {
 		
@@ -89,8 +90,11 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		
 		OntModel oldTBoxModel = loadModelFromDirectory(ctx.getRealPath(OLD_TBOX_MODEL_DIR));
 		settings.setOldTBoxModel(oldTBoxModel);
+		settings.setNewTBoxModel(oms.getTBoxModel());
 		OntModel oldTBoxAnnotationsModel = loadModelFromDirectory(ctx.getRealPath(OLD_TBOX_ANNOTATIONS_DIR));
 		settings.setOldTBoxAnnotationsModel(oldTBoxAnnotationsModel);
+		OntModel newTBoxAnnotationsModel = loadModelFromDirectory(ctx.getRealPath(NEW_TBOX_ANNOTATIONS_DIR));
+		settings.setNewTBoxAnnotationsModel(newTBoxAnnotationsModel);
 		
 		try {
 			doMiscAppMetadataReplacements(ctx.getRealPath(MISC_REPLACEMENTS_FILE), oms);
