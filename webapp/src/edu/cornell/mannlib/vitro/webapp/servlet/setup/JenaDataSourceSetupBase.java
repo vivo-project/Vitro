@@ -24,17 +24,16 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.RegeneratingGraph;
 public class JenaDataSourceSetupBase {
 	private static final Logger LOG = Logger.getLogger(JenaDataSourceSetupBase.class);
 
-    protected final static int DEFAULT_MAXWAIT = 10000, //ms
-    DEFAULT_MAXACTIVE = 40,
-    DEFAULT_MAXIDLE = 10,
-    DEFAULT_TIMEBETWEENEVICTIONS = 30 * 60 * 1000, //ms
-    DEFAULT_TESTSPEREVICTION = 3,
-    DEFAULT_MINEVICTIONIDLETIME = 1000 * 60 * 30; //ms
+	protected final static int DEFAULT_MAXWAIT = 10000, // ms
+			DEFAULT_MAXACTIVE = 40,
+			DEFAULT_MAXIDLE = 10,
+			DEFAULT_TIMEBETWEENEVICTIONS = 30 * 60 * 1000, // ms
+			DEFAULT_TESTSPEREVICTION = 3,
+			DEFAULT_MINEVICTIONIDLETIME = 1000 * 60 * 30; // ms
 
     protected final static String DEFAULT_VALIDATIONQUERY = "SELECT 1";
-    protected final static boolean DEFAULT_TESTONBORROW = true,
-    DEFAULT_TESTONRETURN = true,
-    DEFAULT_TESTWHILEIDLE = true;
+	protected final static boolean DEFAULT_TESTONBORROW = true,
+			DEFAULT_TESTONRETURN = true, DEFAULT_TESTWHILEIDLE = true;
 
    protected static String BASE = "/WEB-INF/ontologies/";
    protected static String USERPATH = BASE+"user/";
