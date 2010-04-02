@@ -2,13 +2,26 @@
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Iterator;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDao;
@@ -24,7 +37,9 @@ import edu.cornell.mannlib.vitro.webapp.ontology.update.OntologyUpdater;
  *
  */
 public class UpdateKnowledgeBase implements ServletContextListener {
-
+	
+	private final static Log log = LogFactory.getLog(UpdateKnowledgeBase.class);
+	
 	private final String DATA_DIR = "/WEB-INF/ontologies/update/";
 	private final String LOG_DIR = "logs/";
 	private final String REMOVED_DATA_DIR = "removedData/";
@@ -39,11 +54,12 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	private final String REMOVED_DATA_FILE = DATA_DIR + REMOVED_DATA_DIR +
 									"removedData.rdf";
 	private final String SPARQL_CONSTRUCTS_DIR = DATA_DIR + "sparqlConstructs/";
+	private final String MISC_REPLACEMENTS_FILE = DATA_DIR + "miscReplacements.rdf";
 	
 	public void contextInitialized(ServletContextEvent sce) {
-		
-		/*
-		
+				
+		/* 
+
 		ServletContext ctx = sce.getServletContext();
 		
 		OntModelSelector oms = new SimpleOntModelSelector(
@@ -65,6 +81,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		settings.setDefaultNamespace(wadf.getDefaultNamespace());
 		
 		try {
+			doMiscAppMetadataReplacements(ctx.getRealPath(MISC_REPLACEMENTS_FILE), oms);
 			(new OntologyUpdater(settings)).update(); 
 		} catch (IOException ioe) {
 			String errMsg = "IOException updating knowledge base " +
@@ -79,6 +96,43 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		*/
 		
 	}	
+	
+	/**
+	 * Replace any triple X P S in the application metadata model
+	 * with X P T where P and T are specified in the input file
+	 * @param filename containing replacement values
+	 * @param OntModelSelector oms
+	 */
+	private void doMiscAppMetadataReplacements(String filename, OntModelSelector oms) {
+		try {
+		    Model replacementValues = ModelFactory.createDefaultModel();
+		    OntModel applicationMetadataModel = oms.getApplicationMetadataModel();
+		    FileInputStream fis = new FileInputStream(new File(filename));
+		    replacementValues.read(fis, null);
+		    StmtIterator replaceIt = replacementValues.listStatements();
+		    while (replaceIt.hasNext()) {
+		    	Statement replacement = replaceIt.nextStatement();
+		    	applicationMetadataModel.enterCriticalSection(Lock.WRITE);
+		    	try {
+		    		Iterator<Resource> resIt = 
+		    			    applicationMetadataModel.listSubjectsWithProperty(
+		    				replacement.getPredicate(), replacement.getObject());
+		    		while (resIt.hasNext()) {
+		    			Resource subj = resIt.next();
+		    			applicationMetadataModel.removeAll(
+		    					subj, replacement.getPredicate(), (RDFNode) null);
+		    			applicationMetadataModel.add(
+		    					subj, replacement.getPredicate(), replacement.getObject());
+		    		}
+		    	} finally {
+		    		
+		    	}
+		    }
+		} catch (Exception e) {
+			log.error("Error performing miscellaneous application metadata " +
+					" replacements.", e);
+		}
+	}
 	
 	public void contextDestroyed(ServletContextEvent arg0) {
 		// nothing to do	
