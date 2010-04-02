@@ -3,12 +3,12 @@
 package edu.cornell.mannlib.vitro.webapp.ontology.update;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.ontology.OntProperty;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -25,7 +25,6 @@ import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.webapp.ontology.update.AtomicOntologyChange.AtomicChangeType;
-
 
 /**  
 * Performs knowledge base updates to the abox to align with a new ontology version
@@ -128,7 +127,9 @@ public class ABoxUpdater {
 		   // Change class references in the subjects of statements
 		   StmtIterator iter = aboxModel.listStatements(oldClass, (Property) null, (RDFNode) null);
 
-		   // TODO - catch and report exceptions in adding and removing from the model
+		   //log summary of changes
+		   logger.log("Changing " + iter.toList().size() + " subject referernces to the "  + oldClass.getURI() + " class to be " + newClass.getURI());
+		   
 		   while (iter.hasNext()) {	
 			   Statement oldStatement = iter.next();
 			   Statement newStatement = ResourceFactory.createStatement(newClass, oldStatement.getPredicate(), oldStatement.getObject());
@@ -137,17 +138,20 @@ public class ABoxUpdater {
 			   logChange(oldStatement, false);
 			   logChange(newStatement,true);
 		   }
-		   
+
 		   // Change class references in the objects of statements
 		   iter = aboxModel.listStatements((Resource) null, (Property) null, oldClass);
 
-		   // TODO - catch and report exceptions in adding and removing from the model
+
+		   //log summary of changes
+		   logger.log("Changing " + iter.toList().size() + " object referernces to the "  + oldClass.getURI() + " class to be " + newClass.getURI());
+		   
 		   while (iter.hasNext()) {	
 			   Statement oldStatement = iter.next();
 			   Statement newStatement = ResourceFactory.createStatement(oldStatement.getSubject(), oldStatement.getPredicate(), newClass);
 			   retractions.add(oldStatement);
 			   additions.add(newStatement);
-			   //TODO - worried about logging changes before the changes are already made
+			   //TODO - worried about logging changes before the changes have actually been made
 			   // in the model
 			   logChanges(oldStatement, newStatement);
 		   }
@@ -165,11 +169,11 @@ public class ABoxUpdater {
 
 	/**
 	 * 
-	 * Examine a knowledge based on a class addition to the ontology, and
+	 * Examine a knowledge based on a class addition to the ontology and
 	 * add messages to the change log indicating where manual review is 
-	 * recommended. If the added class has a parent in the new ontology
+	 * recommended. If the added class has a direct parent in the new ontology
 	 * that is not OWL.Thing, and if the knowledge base contains individuals
-	 * asserted to be in the parent class, then log message recommending
+	 * asserted to be in the parent class, then log a message recommending
 	 * review of those individuals to see whether they are of the new
 	 * class type.
 	 *  
@@ -182,11 +186,11 @@ public class ABoxUpdater {
 		OntClass addedClass = newTboxModel.getOntClass(change.getDestinationURI());
 		
 		if (addedClass == null) {
-			// TODO - log 
+			logger.logError(this.getClass().getName() + " :  addClass - didn't find the added class " + change.getSourceURI() + " in the new model.");
 			return;
 		}
 		
-		ExtendedIterator<OntClass> classIter = addedClass.listSuperClasses();
+		ExtendedIterator<OntClass> classIter = addedClass.listSuperClasses(true);
 		
 		while (classIter.hasNext()) {
 			OntClass parentOfAddedClass = classIter.next();
@@ -204,6 +208,7 @@ public class ABoxUpdater {
 						indList += "\n\t" + stmt.getSubject().getURI(); 
 					}
 					
+					//TODO - take out the detailed logging after our internal testing is completed.
 			        logger.log("There are " + count + " individuals in the model that are of type " + parentOfAddedClass.getURI() + "," +
 			        		    " and a new subclass of that class has been added: " + addedClass.getURI() + ". " +
 			        		    "Please review the following individuals to see whether they should be of type: " +  addedClass.getURI() + ":" +
@@ -215,13 +220,14 @@ public class ABoxUpdater {
 
 	/**
 	 * 
-	 * Update a knowledge base to account for a class deletion from the ontology.
+	 * Update a knowledge base to account for a class deletion in the ontology.
 	 * All references to the deleted class URI in either the subject or the object
 	 * position of a statement are changed to use the closest available parent of
 	 * the deleted class from the previous ontology that remains in the new version
-	 * of the ontology. If the deleted class has more than one closest available parent,
-	 * then no change is made to the knowledge base, and message indicating that manual
-	 * review is necessary is added to the change log.
+	 * of the ontology. Note that the closest available parent may be owl:Thing.
+	 * If the deleted class has more than one closest available parent, then
+	 * change individuals that were asserted to be of the deleted class to be 
+	 * asserted to be of both parent classes. 
 	 *  
 	 * @param   change - an AtomicOntologyChange object representing a class
 	 *                   delete operation.
@@ -232,13 +238,11 @@ public class ABoxUpdater {
 		OntClass deletedClass = oldTboxModel.getOntClass(change.getSourceURI());
 		
 		if (deletedClass == null) {
-			logger.logError(this.getClass().getName() + " :  deleteClass - didn't find the deleted class " + change.getSourceURI() + " in the old model.");
+			logger.logError(this.getClass().getName() + " :  deleteClass - didn't find the deleted class " +
+					        change.getSourceURI() + " in the old model.");
 			return;
 		}
-		
-		//TODO - what if there are multiple parents? maybe
-		// in that case don't do the rename, but rather
-		// log a message that they will have to review?
+
 		OntClass parent = deletedClass.getSuperClass();
 		OntClass replacementClass = newTboxModel.getOntClass(parent.getURI());
 		
@@ -246,7 +250,11 @@ public class ABoxUpdater {
 			 parent = parent.getSuperClass();
 	    	 replacementClass = newTboxModel.getOntClass(parent.getURI()); 			
 		} 
-		
+
+	   //log summary of changes
+	   logger.log("CLass " + deletedClass.getURI() + " has been deleted. Any references to it in the knowledge base will be changed to " + 
+			        replacementClass.getURI());
+
 		AtomicOntologyChange chg = new AtomicOntologyChange(deletedClass.getURI(), replacementClass.getURI(), AtomicChangeType.RENAME);
 		renameClass(chg);		
 	}
