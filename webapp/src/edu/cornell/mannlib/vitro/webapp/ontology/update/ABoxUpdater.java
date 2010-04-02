@@ -439,7 +439,7 @@ public class ABoxUpdater {
 	public void logChange(Statement statement, boolean add) throws IOException {
 		logger.log( (add ? "Added " : "Removed") + "Statement: subject = " + statement.getSubject().getURI() +
 				" property = " + statement.getPredicate().getURI() +
-                " object = " + (statement.getObject().isLiteral() ? ((Resource)statement.getObject()).getURI() 
-                		                                          : ((Literal)statement.getObject()).getLexicalForm()));	
+                " object = " + (statement.getObject().isLiteral() ?  ((Literal)statement.getObject()).getLexicalForm()
+                		                                          : ((Resource)statement.getObject()).getURI()));	
 	}
 }
