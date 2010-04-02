@@ -146,7 +146,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		    					subj, replacement.getPredicate(), replacement.getObject());
 		    		}
 		    	} finally {
-		    		
+		    		applicationMetadataModel.leaveCriticalSection();
 		    	}
 		    }
 		} catch (Exception e) {
