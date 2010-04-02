@@ -516,7 +516,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
  
 /*     3/29/2010 sjm. Commenting out per bjl. As far as we can tell from looking at the code, these fields
  *                    are no longer used by the application. Leaving this here commented out for now though,
- *                    just in case. Also, we deprecated the fields in ObjectProperty.java     
+ *                    just in case.   
  
         
         if (prop.getDomainSidePhasedOut() != null) {
