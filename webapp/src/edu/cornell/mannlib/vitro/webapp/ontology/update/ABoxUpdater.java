@@ -291,8 +291,8 @@ public class ABoxUpdater {
 		} 
 
 	   //log summary of changes
-	   logger.log("Class " + deletedClass.getURI() + " has been deleted. Any references to it in the knowledge base will be changed to " + 
-			        replacementClass.getURI());
+	   //logger.log("Class " + deletedClass.getURI() + " has been deleted. Any references to it in the knowledge base will be changed to " + 
+	   //		        replacementClass.getURI());
 
 		AtomicOntologyChange chg = new AtomicOntologyChange(deletedClass.getURI(), replacementClass.getURI(), AtomicChangeType.RENAME);
 		renameClass(chg);		

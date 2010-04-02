@@ -140,7 +140,7 @@ public class TBoxUpdater {
 					 continue;					 
 				 }
 				 
-				 if (!siteObject.equals(oldObject)) {
+				 if (siteObject.equals(oldObject)) {
 	        	    try {
 	        	    	StmtIterator it = siteModel.listStatements(subject, predicate, (RDFNode)null);
 	        	    	while (it.hasNext()) {
@@ -178,12 +178,16 @@ public class TBoxUpdater {
 		   record.recordRetractions(actualRetractions);
 		
 		   // log summary of changes
-           logger.log("Updated the default vitro annotation value for " + 
-        		   actualAdditions.size() + " statments in the knowledge base.");
+		   if (actualAdditions.size() > 0) {
+	           logger.log("Updated the default vitro annotation value for " + 
+	        		   actualAdditions.size() + " statments in the knowledge base.");
+		   }
 		   
            long numRemoved = actualRetractions.size() - actualAdditions.size();
-           logger.log("Removed " + numRemoved +
-        		      " superfluous vitro annotation property settings from the knowledge base.");
+           if (numRemoved > 0) {
+	           logger.log("Removed " + numRemoved +
+	        		      " superfluous vitro annotation property settings from the knowledge base.");
+           }
            
 		    //	   Copy annotation property settings that were introduced in the new ontology
 		    //     into the site model.
