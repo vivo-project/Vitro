@@ -238,7 +238,7 @@ public class OntologyUpdater {
 		    m.enterCriticalSection(Lock.WRITE);
 		    try {
 		    	m.read(inStream, null, settings.getSuccessRDFFormat());
-		    	logger.log(" finished without errors.");
+		    	logger.log("Successfully finished processing ontology changes.");
 		    } finally {
 		    	m.leaveCriticalSection();
 		    }

@@ -207,9 +207,11 @@ public class TBoxUpdater {
             
 			// log the additions
             //summary
-            logger.log("Added " + newAnnotationSettingsToAdd.size() + " new annotation property settings to the knowledge base. This includes " +
-                         "existing annotation properties applied to existing classes where they weren't applied before, or existing " +
-                         "properties applied to new classes. No new annotation properties have been introduced.");
+			if (newAnnotationSettingsToAdd.size() > 0) {
+	            logger.log("Added " + newAnnotationSettingsToAdd.size() + " new annotation property settings to the knowledge base. This includes " +
+	                         "existing annotation properties applied to existing classes where they weren't applied before, or existing " +
+	                         "properties applied to new classes. No new annotation properties have been introduced.");
+			}
             //details
             
 			while (iter.hasNext()) {

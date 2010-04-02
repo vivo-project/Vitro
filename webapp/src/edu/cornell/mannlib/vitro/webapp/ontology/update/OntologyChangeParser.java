@@ -38,8 +38,6 @@ public class OntologyChangeParser {
 	@SuppressWarnings({ "unchecked", "null", "static-access" })
 	public ArrayList<AtomicOntologyChange> parseFile(String diffPath) throws IOException{
 		
-		logger.log("Parsing PromptDiff file at " + diffPath);
-		
 		AtomicOntologyChange changeObj;
 		ArrayList<AtomicOntologyChange> changeObjects = new ArrayList<AtomicOntologyChange>();
 		int countColumns = 0;
