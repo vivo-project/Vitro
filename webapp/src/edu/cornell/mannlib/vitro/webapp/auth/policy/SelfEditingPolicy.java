@@ -194,13 +194,13 @@ public class SelfEditingPolicy implements VisitingPolicyIface {
         if( uri == null || uri.length() == 0 )
             return false;
 
-        if( editableVitroUris.contains( uri ) )
-            return true;
-
         if( prohibitedProperties.contains(uri)) {
             log.debug("The uri "+uri+" represents a predicate that cannot be modified because it is on a list of properties prohibited from self editing");
             return false;
         }
+        
+        if( editableVitroUris.contains( uri ) )
+            return true;
 
         String namespace = uri.substring(0, Util.splitNamespace(uri));
         //Matcher match = ns.matcher(uri);
@@ -276,7 +276,7 @@ public class SelfEditingPolicy implements VisitingPolicyIface {
         }
 
         //many predicates are prohibited by namespace but there are many ones that self editors need to work with
-        if(  prohibitedNs.contains(action.uriOfPredicate() ) && ! editableVitroUris.contains( action.uriOfPredicate() ) ) {
+        if(  prohibitedNs.contains(action.uriOfPredicate() )  ) {
             log.debug("SelfEditingPolicy for DropDatapropStmt is inconclusive because it does not grant access to admin controls");
             return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy does not grant access to admin controls");
         }
@@ -338,10 +338,8 @@ public class SelfEditingPolicy implements VisitingPolicyIface {
         if(  prohibitedNs.contains( action.getResourceUri() ) )
             return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy does not grant access to admin resources");
 
-        //many predicates are prohibited by namespace but there are many ones that self editors need to work with
-        if(  prohibitedNs.contains(action.getDataPropUri() ) && ! editableVitroUris.contains( action.getDataPropUri() ) )
+        if(  prohibitedProperties.contains( action.getDataPropUri() ) )
             return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy does not grant access to admin controls");
-
         
         if( !canModifyPredicate( action.getDataPropUri() ) )
             return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy does not grant access to admin predicates; " +
