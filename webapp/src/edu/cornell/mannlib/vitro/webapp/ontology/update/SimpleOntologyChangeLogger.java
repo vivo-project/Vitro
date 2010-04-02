@@ -2,7 +2,6 @@ package edu.cornell.mannlib.vitro.webapp.ontology.update;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
@@ -25,15 +24,27 @@ public class SimpleOntologyChangeLogger implements OntologyChangeLogger {
 		}
 	}
 					
-	
 	public void log(String logMessage) throws IOException {
-		//TODO get calling method info from stack and include in message
-		logWriter.write(logMessage + "\n");
+		
+		Exception e = new Exception();
+		StackTraceElement[] elements = e.getStackTrace();
+		String className = ((StackTraceElement)elements[1]).getClassName();
+		className = className.substring(className.lastIndexOf('.') + 1 );
+		String methodName = ((StackTraceElement)elements[1]).getMethodName();
+		
+		logWriter.write(className + "." + methodName +  ":  " + logMessage + "\n");
 	}
 
 	public void logError(String errorMessage) throws IOException {
-		//TODO get calling method info from stack and include in message
-		errorWriter.write(errorMessage + "\n");
+
+		Exception e = new Exception();
+		StackTraceElement[] elements = e.getStackTrace();
+		String className = ((StackTraceElement)elements[1]).getClassName();
+		className = className.substring(className.lastIndexOf('.') + 1 );
+		String methodName = ((StackTraceElement)elements[1]).getMethodName();
+		int lineNumber = ((StackTraceElement)elements[1]).getLineNumber(); 
+
+		errorWriter.write(className + "." + methodName +  " line " + lineNumber + ":  " + errorMessage + "\n");
 	}
 	
 	public void closeLogs() throws IOException {
@@ -42,5 +53,4 @@ public class SimpleOntologyChangeLogger implements OntologyChangeLogger {
 		errorWriter.flush();
 		errorWriter.close();
 	}
-
 }
