@@ -360,7 +360,14 @@ public class PropertyEditLinks extends TagSupport{
         String value = dpropStmt.getData();        
         Model model =  (Model)pageContext.getServletContext().getAttribute("jenaOntModel");
         
-        String dpropHash = String.valueOf(RdfLiteralHash.makeVitroNsLiteralHash( subject, predicateUri, value, model ));
+        String dpropHash = null;
+        try{
+        	dpropHash = String.valueOf(RdfLiteralHash.makeVitroNsLiteralHash( subject, predicateUri, value, model ));
+        }catch(IllegalArgumentException ex){
+        	log.debug("could not create hash for " + subject + " " + predicateUri + " " + value);
+        	return links;
+        }
+        
         String dispatchUrl = contextPath + "edit/editDatapropStmtRequestDispatch.jsp";
 
         int index = 0;
