@@ -282,13 +282,13 @@ public class InputElementFormattingTag extends TagSupport {
         } else if ( "admin".equals( getCancel() )){
             return " or <a class=\"cancel\" href=\"" + vreq.getContextPath()
             + Controllers.SITE_ADMIN + " title=\"Cancel\">"+labelStr+"</a>";
-        }else if( "dashboard".equals( getCancel() )){ //this case is Datastar specific.
+        }else if( "dashboard".equals( getCancel() )){ //this case is Datastar-specific.
             	return " or <a class=\"cancel\" href=\"" + vreq.getContextPath() 
             	+ "/dashboard\" title=\"Cancel\">"+labelStr+"</a>";
         }else if (getCancel()!=null && !getCancel().equals("")) {        	
             if( editConfig != null && editConfig.getEditKey() != null ){
                 try{
-                return " or <a class=\"cancel\" href=\"" + vreq.getContextPath()
+                return "<span class=\"or\"> or </span><a class=\"cancel\" href=\"" + vreq.getContextPath()
                         + "/edit/postEditCleanUp.jsp?editKey="+ URLEncoder.encode(editConfig.getEditKey(),"UTF-8")
                         +"\" title=\"Cancel\">"+labelStr+"</a>";
                 }catch(UnsupportedEncodingException ex){
