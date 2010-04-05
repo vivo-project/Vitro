@@ -17,9 +17,7 @@ PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX xsd:   <http://www.w3.org/2001/XMLSchema#>
 PREFIX owl:   <http://www.w3.org/2002/07/owl#>
 PREFIX swrl:  <http://www.w3.org/2003/11/swrl#>
-PREFIX swrlb: <http://www.w3.org/2003/11/swrlb#>
-<%
-List prefixes = (List)request.getAttribute("prefixList");
+PREFIX swrlb: <http://www.w3.org/2003/11/swrlb#><%List prefixes = (List)request.getAttribute("prefixList");
 if(prefixes != null){
 	Iterator prefixItr = prefixes.iterator();
 	Integer count = 0;
@@ -29,14 +27,9 @@ if(prefixes != null){
 			count++;
 			prefixText = "j." + count.toString();		
 		}
-		String urlText = (String) prefixItr.next();
-		%>
-PREFIX <%=prefixText%>: <<%=urlText%>>
-<% 		
-	}
-}
-	
-%>
+		String urlText = (String) prefixItr.next();%>
+PREFIX <%=prefixText%>: <<%=urlText%>><%}}%>
+
 #
 # This example query gets 20 geographic locations
 # and (if available) their labels
