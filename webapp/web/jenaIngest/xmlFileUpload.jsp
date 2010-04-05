@@ -20,14 +20,19 @@
     <form action="jenaXmlFileUpload" method="post" enctype="multipart/form-data">
     
     <input type="file" name="xmlfile"/>
+
+    <p>XML file</p>
     
 	<select name="targetModel">
-
+        <option value="vitro:baseOntModel">webapp assertions</option>
 <%  for (Iterator it = maker.listModels(); it.hasNext(); ) {
 	String modelName = (String) it.next();        %> 
 	  <option value="<%=modelName%>"><%= modelName %></option>                
 <% } %>
         </select>
+
+        <p>Destination model</p>
+
         <input type="submit" name="submit" value="upload XML and convert to RDF"/>
     </form>
     
