@@ -8,8 +8,11 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
+import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
+import com.hp.hpl.jena.ontology.OntProperty;
+import com.hp.hpl.jena.ontology.Restriction;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
@@ -436,4 +439,44 @@ public class JenaBaseDaoTest {
 		Assert.assertTrue(preModel.size() == postModel.size());
 		
 	}
+		
+	@Test
+	/**
+	 * Test that removing classes or properties used in restrictions
+	 * does not leave behind broken, syntactically-invalid restrictions.
+	 * The restrictions should be deleted.
+	 */
+	public void testPreventInvalidRestrictionsOnDeletion() {
+		OntModel m = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+		WebappDaoFactoryJena wadf = new WebappDaoFactoryJena(m);
+		
+		String ns = "http://example.org/ontology/";
+		String class1URI = ns + "Class1";
+		String class2URI = ns + "Class2";
+		String propURI = ns + "property";
+		
+		OntClass class1 = m.createClass(class1URI);
+		OntClass class2 = m.createClass(class2URI);
+		OntProperty prop = m.createObjectProperty(propURI);
+		Restriction rest = m.createAllValuesFromRestriction(null, prop, class2);
+		class1.addSuperClass(rest);
+		
+		ObjectProperty op = wadf.getObjectPropertyDao().getObjectPropertyByURI(propURI);
+		wadf.getObjectPropertyDao().deleteObjectProperty(op);
+		
+		Assert.assertEquals(class1.listSuperClasses().toSet().size(), 0);
+		Assert.assertEquals(m.size(), 2); // just rdf:type owl:Class for Class1 and Class2
+		
+		prop = m.createObjectProperty(propURI);
+		rest = m.createAllValuesFromRestriction(null, prop, class2);
+		class1.addSuperClass(rest);
+		
+		VClass vclass = wadf.getVClassDao().getVClassByURI(class2URI);
+		wadf.getVClassDao().deleteVClass(vclass);
+		
+		Assert.assertEquals(class1.listSuperClasses().toSet().size(), 0);
+		Assert.assertEquals(m.size(), 2); // just rdf:type for Class1 and Prop
+		
+	}	
+	
 }

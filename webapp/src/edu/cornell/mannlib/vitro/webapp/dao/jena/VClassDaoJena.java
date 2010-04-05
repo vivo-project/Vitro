@@ -189,6 +189,23 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
     	try {
     		OntClass cls = getOntClass(ontModel,URI);
     		if (cls != null) {
+    			//Remove restriction class.
+            	Iterator<Resource> restIt = ontModel.listSubjectsWithProperty(OWL.allValuesFrom, cls);
+            	while(restIt.hasNext()) {
+            		Resource restRes = restIt.next();
+            		if (restRes.canAs(OntResource.class)) {
+            			OntResource restOntRes = (OntResource) restRes.as(OntResource.class);
+            			smartRemove(restOntRes, ontModel);
+            		}
+            	}
+            	restIt = ontModel.listSubjectsWithProperty(OWL.someValuesFrom, cls);
+            	while(restIt.hasNext()) {
+            		Resource restRes = restIt.next();
+            		if (restRes.canAs(OntResource.class)) {
+            			OntResource restOntRes = (OntResource) restRes.as(OntResource.class);
+            			smartRemove(restOntRes, ontModel);
+            		}
+            	}
     			removeRulesMentioningResource(cls, ontModel);
     			smartRemove(cls, ontModel);
     		}
