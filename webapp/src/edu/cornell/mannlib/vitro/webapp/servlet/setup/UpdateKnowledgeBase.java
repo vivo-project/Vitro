@@ -132,21 +132,26 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		    OntModel applicationMetadataModel = oms.getApplicationMetadataModel();
 		    FileInputStream fis = new FileInputStream(new File(filename));
 		    replacementValues.read(fis, null);
+		    Model retractions = ModelFactory.createDefaultModel();
+		    Model additions = ModelFactory.createDefaultModel();
 		    StmtIterator replaceIt = replacementValues.listStatements();
 		    while (replaceIt.hasNext()) {
 		    	Statement replacement = replaceIt.nextStatement();
 		    	applicationMetadataModel.enterCriticalSection(Lock.WRITE);
 		    	try {
-		    		Iterator<Resource> resIt = 
-		    			    applicationMetadataModel.listSubjectsWithProperty(
-		    				replacement.getPredicate(), replacement.getObject());
-		    		while (resIt.hasNext()) {
-		    			Resource subj = resIt.next();
-		    			applicationMetadataModel.removeAll(
-		    					subj, replacement.getPredicate(), (RDFNode) null);
-		    			applicationMetadataModel.add(
-		    					subj, replacement.getPredicate(), replacement.getObject());
+		    		StmtIterator stmtIt = 
+		    			    applicationMetadataModel.listStatements( 
+		    			    		(Resource) null, replacement.getPredicate(),
+		    			    		(RDFNode) null);
+		    		while (stmtIt.hasNext()) {
+		    			Statement stmt = stmtIt.nextStatement();
+		    			retractions.add(stmt);
+		    			additions.add(stmt.getSubject(),
+		    					replacement.getPredicate(), 
+		    					replacement.getObject());
 		    		}
+		    		applicationMetadataModel.remove(retractions);
+		    		applicationMetadataModel.add(additions);
 		    	} finally {
 		    		applicationMetadataModel.leaveCriticalSection();
 		    	}

@@ -159,8 +159,8 @@ public class OntologyUpdater {
 		aboxModel.enterCriticalSection(Lock.WRITE);
 		try {
 			JenaIngestUtils jiu = new JenaIngestUtils();
-			jiu.renameBNodes(anonModel, settings.getDefaultNamespace() + "n", 
-					aboxModel);
+			aboxModel.add(jiu.renameBNodes(anonModel, settings.getDefaultNamespace() + "n", 
+					aboxModel));
 		} finally {
 			aboxModel.leaveCriticalSection();
 		}
