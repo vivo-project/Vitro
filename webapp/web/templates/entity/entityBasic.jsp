@@ -256,7 +256,7 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
            	 	 	<c:set var="editLinksForExistingBlurb"><edLnk:editLinks item="<%= VitroVocabulary.BLURB %>" data="${entity.blurb}" icons="false"/></c:set>
 				 </c:if>
           	 	 <c:set var="editLinksForNewBlurb"><edLnk:editLinks item="<%= VitroVocabulary.BLURB %>" icons="false"/></c:set>            	              	 
-                 <c:if test="${showEdits || (( empty entity.blurb and not empty editLinksForNewBlurb)or( not empty entity.blurb and not empty editLinksForExistingBlurb)) }">                           
+                 <c:if test="${showEdits || (( empty entity.blurb and not empty editLinksForNewBlurb) or ( not empty entity.blurb and not empty editLinksForExistingBlurb)) }">                           
                      <h3 class="propertyName">blurb</h3>
                      ${editLinksForNewBlurb}
                  </c:if>                 
@@ -283,7 +283,7 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
             	</c:if>
             	<c:set var="editLinksForNewDesc"><edLnk:editLinks item="<%= VitroVocabulary.DESCRIPTION %>" icons="false"/></c:set>
             	
-            	<c:if test="${showEdits || ((empty entity.description and not empty editLinksForNewDesc)or(not empty entity.description and not empty editLinksForExisitngDesc))}">
+            	<c:if test="${showEdits || ((empty entity.description and not empty editLinksForNewDesc) or (not empty entity.description and not empty editLinksForExisitngDesc))}">
                      <h3 class="propertyName">description</h3>
                       ${editLinksForNewDesc}
                  </c:if>

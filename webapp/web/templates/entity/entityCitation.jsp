@@ -10,7 +10,7 @@
 			<c:set var="editLinksForExisting"><edLnk:editLinks item="<%= VitroVocabulary.CITATION %>" data="${entity.citation}" icons="false"/></c:set>
 		</c:if>
 		<c:set var="editLinksForNew"><edLnk:editLinks item="<%= VitroVocabulary.CITATION %>" icons="false"/></c:set>            	              	 
-		<c:if test="${showEdits or (( empty entity.citation and !empty editLinksForNew)or( ! empty entity.citation and !empty editLinksForExisting)) }">                           
+		<c:if test="${showEdits or (( empty entity.citation and !empty editLinksForNew) or ( ! empty entity.citation and !empty editLinksForExisting)) }">                           
 			<h3 class="propertyName">citation</h3>
 			${editLinksForNew}
 		</c:if>                 
