@@ -60,9 +60,8 @@ public class RestrictionRetryController extends BaseEditController {
 			
 			String restrictionTypeStr = request.getParameter("restrictionType");
 			epo.setAttribute("restrictionType",restrictionTypeStr);
-			
-			
-			
+			request.setAttribute("restrictionType",restrictionTypeStr);
+				
 			// default to object property restriction
 			boolean propertyType = ("data".equals(request.getParameter("propertyType"))) ? DATA : OBJECT ;
 			
