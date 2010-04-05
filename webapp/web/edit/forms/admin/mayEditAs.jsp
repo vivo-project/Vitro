@@ -17,7 +17,7 @@
 <%@ taglib prefix="v" uri="http://vitro.mannlib.cornell.edu/vitro/tags" %>
 <%!
     public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.edit.forms.admin.mayEditAs.jsp");
-    public static String RANGE_CLASS = "http://xmlns.com/foaf/0.1/Agent";    
+    public static String RANGE_CLASS = "http://xmlns.com/foaf/0.1/Person";    
     public static String PREDICATE = VitroVocabulary.MAY_EDIT_AS;
 %>
 <%
@@ -97,12 +97,12 @@
     });
     if( request.getAttribute("object") != null ){//this block is for an edit of an existing object property statement
         editConfig.prepareForObjPropUpdate( model );
-        formTitle   = "Change person that user may edit as";
-        submitLabel = "save change";
+        formTitle   = "Change person associated with this user account";
+        submitLabel = "Save Change";
     } else {
         editConfig.prepareForNonUpdate( model );     
-        formTitle   = "Add person that user may edit as";
-        submitLabel = "add edit right";        
+        formTitle   = "Select person to associate with this user account";
+        submitLabel = "Create Association";        
     }
 %>
 <jsp:include page="${preForm}"/>
@@ -115,7 +115,7 @@
 
 <c:if test="${!empty param.objectUri}" >
     <form class="deleteForm" action="<c:url value="/edit/n3Delete.jsp"/>" method="post">       
-        <label for="delete"><h3>Remove the right to edit as this person?</h3></label>
+        <label for="delete"><h3>Or remove this association?</h3></label>
         <input type="hidden" name="subjectUri"   value="${param.subjectUri}"/>
         <input type="hidden" name="predicateUri" value="${param.predicateUri}"/>
         <input type="hidden" name="objectVar"    value="${param.objectUri}"/>    
