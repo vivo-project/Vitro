@@ -250,17 +250,19 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
             
            	
             <%-- Blurb --%>
-            <c:if test="${showEdits || !empty entity.blurb}">
-	             <div id="dprop-vitro-blurb" class="propsItem ${editingClass}">
-				 <c:if test="${not empty entity.blurb }">                          	 
+            <c:if test="${showEdits || !empty entity.blurb}">	             								
+				<c:if test="${not empty entity.blurb }">                          	 
            	 	 	<c:set var="editLinksForExistingBlurb"><edLnk:editLinks item="<%= VitroVocabulary.BLURB %>" data="${entity.blurb}" icons="false"/></c:set>
-				 </c:if>
-          	 	 <c:set var="editLinksForNewBlurb"><edLnk:editLinks item="<%= VitroVocabulary.BLURB %>" icons="false"/></c:set>            	              	 
-                 <c:if test="${showEdits || (( empty entity.blurb and not empty editLinksForNewBlurb) or ( not empty entity.blurb and not empty editLinksForExistingBlurb)) }">                           
-                     <h3 class="propertyName">blurb</h3>
-                     ${editLinksForNewBlurb}
-                 </c:if>                 
-                 <c:if test="${!empty entity.blurb}">
+				</c:if>
+				<c:set var="editLinksForNewBlurb"><edLnk:editLinks item="<%= VitroVocabulary.BLURB %>" icons="false"/></c:set>
+				<c:set var="mayEditBlurb" value="${showEdits && (( empty entity.blurb and not empty editLinksForNewBlurb) or ( not empty entity.blurb and not empty editLinksForExistingBlurb)) }"/>
+								          	
+				<c:if test="${ mayEditBlurb || ! empty entity.blurb }">
+					<div id="dprop-vitro-blurb" class="propsItem ${editingClass}">
+					<h3 class="propertyName">blurb</h3> ${editLinksForNewBlurb}
+				</c:if>
+				                 
+                <c:if test="${!empty entity.blurb}">
                      <div class="datatypeProperties">
                          <div class="datatypePropertyValue">
                              <div class="statementWrap">
@@ -271,35 +273,40 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
                              </div>
                          </div>
                      </div>
-                 </c:if>     
-             </div>
+                </c:if>     
+                <c:if test="${ mayEditBlurb || ! empty entity.blurb }">
+             		</div>
+             	</c:if>
             </c:if>
 
             <%-- Description --%>              
             <c:if test="${ showEdits || !empty entity.description}">
-              	<div id="dprop-vitro-description" class="propsItem ${editingClass}">
             	<c:if test="${not empty entity.description }">
 					<c:set var="editLinksForExisitngDesc"><edLnk:editLinks item="<%= VitroVocabulary.DESCRIPTION %>" data="${entity.description}" icons="false"/></c:set>
             	</c:if>
-            	<c:set var="editLinksForNewDesc"><edLnk:editLinks item="<%= VitroVocabulary.DESCRIPTION %>" icons="false"/></c:set>
-            	
-            	<c:if test="${showEdits || ((empty entity.description and not empty editLinksForNewDesc) or (not empty entity.description and not empty editLinksForExisitngDesc))}">
-                     <h3 class="propertyName">description</h3>
-                      ${editLinksForNewDesc}
-                 </c:if>
-                 <c:if test="${!empty entity.description}">
-                     <div class="datatypeProperties">
-                         <div class="datatypePropertyValue">
-                             <div class="statementWrap">
-                                 <div class="description"><p:process>${entity.description}</p:process></div>                                 
-                                 <c:if test="${showEdits && !empty editLinksForExisitngDesc}">	                                    
-                                 	<span class="editLinks">${editLinksForExisitngDesc}</span>                                                                     
-                                 </c:if> 
-                             </div>
-                         </div>
-                     </div>
-                 </c:if>     
-             </div>
+            	<c:set var="editLinksForNewDesc"><edLnk:editLinks item="<%= VitroVocabulary.DESCRIPTION %>" icons="false"/></c:set>            	
+            	<c:set var="mayEditDesc" value="${showEdits && ((empty entity.description and not empty editLinksForNewDesc) or (not empty entity.description and not empty editLinksForExisitngDesc))}"/>
+	
+				<c:if test="${mayEditDesc || ! empty entity.description }">
+					<div id="dprop-vitro-description" class="propsItem ${editingClass}">
+					<h3 class="propertyName">description</h3> ${editLinksForNewDesc}
+				</c:if>
+
+                <c:if test="${!empty entity.description}">
+                    <div class="datatypeProperties">
+                        <div class="datatypePropertyValue">
+                            <div class="statementWrap">
+                                <div class="description"><p:process>${entity.description}</p:process></div>                                 
+                                <c:if test="${showEdits && !empty editLinksForExisitngDesc}">	                                    
+                                	<span class="editLinks">${editLinksForExisitngDesc}</span>                                                                     
+                                </c:if> 
+                            </div>
+                        </div>
+                    </div>
+                </c:if>
+                <c:if test="${mayEditDesc || ! empty entity.description }">     
+            		</div>
+            	</c:if>
             </c:if>
                             
         
