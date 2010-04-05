@@ -382,11 +382,18 @@ are well formed.
     /* ******************** Utility methods ********************** */
     
     public Map<String,String> newToUriMap(Map<String,String> newResources, WebappDaoFactory wdf){
-        HashMap<String,String> newUris = new HashMap<String,String>();
-        for( String key : newResources.keySet()){
-            newUris.put(key,makeNewUri(newResources.get(key), wdf));
+        HashMap<String,String> newVarsToUris = new HashMap<String,String>();
+        HashSet<String> newUris = new HashSet<String>();
+        for( String key : newResources.keySet()){        	
+            String prefix = newResources.get(key);
+        	String uri = makeNewUri(prefix, wdf);
+        	while( newUris.contains(uri) ){
+        		uri = makeNewUri(prefix,wdf);
+        	}
+        	newVarsToUris.put(key,uri);
+        	newUris.add(uri);
         }
-         return newUris;
+         return newVarsToUris;
     }
 
     
