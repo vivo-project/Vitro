@@ -17,18 +17,20 @@
 
 %>
 
+    <p><a href="ingest">Ingest Home</a></p>
+
     <h2>Smush Resources</h2>
 
     <form action="ingest" method="get"i>
         <input type="hidden" name="action" value="smushSingleModel"/>
 
     <h3>URI of Property with which To Smush
-	<input type="text" name="propertyURI"/> 
+	<input type="text" style="width:40%;" name="propertyURI"/> 
 
     <h3>Select Source Models</h3>
 
     <ul>
-
+           <li> <input type="checkbox" name="sourceModelName" value="vitro:baseOntModel"/>webapp assertions</li>
 <%
     for (Iterator it = maker.listModels(); it.hasNext(); ) {
 	String modelName = (String) it.next();
@@ -41,6 +43,7 @@
     <h3>Select Destination Model</h3>
 
     <select name="destinationModelName">
+        <option value="vitro:baseOntModel">webapp assertions</option>
 <%
     for (Iterator it = maker.listModels(); it.hasNext(); ) {
 	String modelName = (String) it.next();
