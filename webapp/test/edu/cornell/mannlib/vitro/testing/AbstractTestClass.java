@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.testing;
 
-import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.fail;
 
 import java.io.BufferedReader;
@@ -18,12 +17,9 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashSet;
 import java.util.Properties;
-import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -41,7 +37,6 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
