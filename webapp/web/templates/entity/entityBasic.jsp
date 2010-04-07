@@ -152,7 +152,7 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
 	                <c:set var="canEditPrimaryLinks"><edLnk:editLinks item="<%= VitroVocabulary.PRIMARY_LINK %>" icons="false"/></c:set>
     		        <c:set var="canEditAdditionalLinks"><edLnk:editLinks item="<%= VitroVocabulary.ADDITIONAL_LINK %>" icons="false"/></c:set>
                     <c:if test="${showEdits and !empty canEditPrimaryLinks and !empty canEditAdditionalLinks}">
-                        <h3 class="propertyName">links</h3>
+                        <h3 class="propertyName">web pages</h3>
                         <c:choose>
                             <c:when test="${empty entity.url}">
                                 <c:set var="addUrlPredicate" value="<%= VitroVocabulary.PRIMARY_LINK %>" />
