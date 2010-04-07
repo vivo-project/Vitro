@@ -226,20 +226,19 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
  				</div><!-- ${objProp.localNameWithPrefix} -->
  			</c:if>
 <%		} else if (p instanceof DataProperty) {
-  			DataProperty dp = (DataProperty)p;%>
+  			DataProperty dp = (DataProperty)p;%>  			
   			<c:set var="dataProp" value="<%=dp%>"/>
  			<c:set var="dataRows" value="${fn:length(dataProp.dataPropertyStatements)}"/>
- 			
- 			<c:set var="hasRowsToShow" value="${ dataRows > 0 }"/>
- 			<c:if test="${showSelfEdits || showCuratorEdits}"><edLnk:editLinks var="editLinks" item="${dataProp}" icons="false"/></c:if>
- 			<c:set var="mayEdit" value="${ !empty editLinks }"/>
- 			
-		    <c:set var="dataStyle" value="display: block;"/>
-		    <c:if test="${dataRows==0}"><c:set var="dataStyle" value="display: block;"/></c:if>		    
-			<c:set var="classForEditControls" value=""/>
-		    <c:if test="${showSelfEdits || showCuratorEdits}"><c:set var="classForEditControls" value=" editing"/></c:if>
-            <c:set var="uniqueDpropDivName" value="${fn:replace(dataProp.localNameWithPrefix,':','-')}"/>
-            <c:if test="${ hasRowsToShow or mayEdit }">
+ 						 		
+ 			<c:set var="hasRowsToShow" value="${ dataRows > 0 }"/> 			 			 			
+ 			<c:if test="${showSelfEdits || showCuratorEdits}"><c:remove var="mayAddDataprop"/><edLnk:editLinks var="mayAddDataprop" item="${dataProp}" icons="false"/></c:if>
+ 			<c:set var="mayEdit" value="${ !empty mayAddDataprop }"/> 			 			
+ 			<c:if test="${ hasRowsToShow or mayEdit }">
+			    <c:set var="dataStyle" value="display: block;"/>
+			    <c:if test="${dataRows==0}"><c:set var="dataStyle" value="display: block;"/></c:if>		    
+				<c:set var="classForEditControls" value=""/>
+			    <c:if test="${showSelfEdits || showCuratorEdits}"><c:set var="classForEditControls" value=" editing"/></c:if>
+	            <c:set var="uniqueDpropDivName" value="${fn:replace(dataProp.localNameWithPrefix,':','-')}"/>            
 	 			<div id="${'dprop-'}${uniqueDpropDivName}" class="propsItem ${classForEditControls}" style="${dataStyle}">
 					<h3 class="propertyName">${dataProp.editLabel}</h3>
 					<c:if test="${showSelfEdits || showCuratorEdits}"><edLnk:editLinks item="${dataProp}" icons="false"/></c:if> 					
