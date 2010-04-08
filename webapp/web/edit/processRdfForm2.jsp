@@ -73,18 +73,7 @@ are well formed.
      * we have to make a copy. */
     Map <String,String[]> queryParameters = null;        
     queryParameters = vreq.getParameterMap();        
-    Iterator it = queryParameters.entrySet().iterator();
-   	while (it.hasNext()) {
-        Map.Entry pairs = (Map.Entry)it.next();
-       	String[] value= (String[]) pairs.getValue();
-        System.out.println(pairs.getKey() + " = ");
-        if(value != null && value.length > 0 ) {
-        	int i;
-        	for(i = 0; i < value.length; i++) {
-        		System.out.println("   " + value[i]);
-        	}
-        }
-    }
+  
     List<String>  errorMessages = new ArrayList<String>();                   
     
     EditConfiguration editConfig = EditConfiguration.getConfigFromSession(session,vreq,queryParameters);    

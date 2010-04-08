@@ -80,8 +80,6 @@ public class BasicValidation {
                     try{
                         if( literal != null ){
                             value = literal.getString();
-                            System.out.println("get data type uri " + literal.asNode().getLiteralDatatype().getURI());
-
                         }
                     }catch(Throwable th){ 
                         log.debug("could not convert literal to string" , th); 
@@ -167,7 +165,6 @@ public class BasicValidation {
         
         //Date not past validation
         if( "dateNotPast".equalsIgnoreCase(validationType)){
-        	System.out.println("date not past - Value " + value);
         	//if( ! past (value) )
         	// return "date must not be in the past";
         	//Current date
@@ -181,7 +178,6 @@ public class BasicValidation {
         		yearParamStr = value.substring(0, yearDash);
         		monthParamStr = value.substring(yearDash + 1, monthDash);
         		dayParamStr = value.substring(monthDash + 1, value.length());
-        		System.out.println("Year param str " + yearParamStr + " - MonthPAram:" + monthParamStr + " - day:" + dayParamStr);
         		inputC.set(Integer.parseInt(yearParamStr), Integer.parseInt(monthParamStr) - 1, Integer.parseInt(dayParamStr));
         		if(inputC.before(c)) {
             		return this.DATE_NOT_PAST_MSG;
