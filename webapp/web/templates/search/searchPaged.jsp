@@ -148,7 +148,7 @@ if( request.getAttribute("types") != null ){
  int hitsLength = (Integer)request.getAttribute("hitsLength");
  int maxHitSize = (Integer)request.getAttribute("maxHitSize");
  String basePageUrl =  
-     getServletContext().getContextPath() + "/search?querytext="
+     request.getContextPath() + "/search?querytext="
          +URLEncoder.encode(request.getParameter("querytext"),"UTF-8") +
          request.getAttribute("refinment");
  
