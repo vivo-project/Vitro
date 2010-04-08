@@ -45,51 +45,6 @@
 </tr>
 </table>
 
-<c:if test="true"> <!-- test="${requestScope.user.roleURI == 1 }">  -->
-
-<h3 class="associate">Associate user account with a person</h3>
-<table class="form-background" border="0" cellpadding="2" cellspacing="2">  
-  <c:if test="${requestScope.mayEditAsStmts != null }">          
-    <c:forEach items="${requestScope.mayEditAsStmts }" var="stmt">
-      <c:url var="deleteUrl" value="/edit/editRequestDispatch.jsp">
-        <c:param name="subjectUri">${user.URI}</c:param>
-        <c:param name="predicateUri">${stmt.propertyURI}</c:param>
-        <c:param name="objectUri">${stmt.objectURI}</c:param>
-        <c:param name="editform">admin/mayEditAs.jsp</c:param>                
-      </c:url>
-      <tr>
-        <td>
-        	<c:if test="${stmt.object == null or empty stmt.object.name }">
-        		<c:set var="associatedIndividual" value="${stmt.objectURI}" />
-        	</c:if>
-        	<c:if test="${stmt.object != null and !empty stmt.object.name }">
-        	  <c:set var="associatedIndividual" value="${stmt.object.name}" />
-        	</c:if>            
-          ${associatedIndividual} -- <a href="${deleteUrl}">Change or Remove Association</a>
-        </td>            
-      </tr>
-    </c:forEach> 
-    <tr><td><em class="note">Note: <c:if test="${requestScope.user.roleURI == 1 }">This association allows the user to edit this person and be redirected to the person's profile when logging in.</c:if><c:if test="${requestScope.user.roleURI != 1 }">This association will result in the user being redirected to the person's profile when logging in.</c:if></em></td></tr>             
-  </c:if>
-  
-  <c:if test="${requestScope.mayEditAsStmts == null  }">
-    <tr>
-      <td>
-        <c:url var="addUrl" value="/edit/editRequestDispatch.jsp">
-        <c:param name="subjectUri">${user.URI}</c:param>
-        <c:param name="editform">admin/mayEditAs.jsp</c:param>
-        </c:url>
-        This user account is not associated with a person -- <a href="${addUrl}">Select a person</a>
-      </td>
-    </tr>
-    <tr>
-      <td><em class="note">Note: <c:if test="${requestScope.user.roleURI == 1 }">Until an association is made, the self editor has no permissions to edit. Associating this user account to a person allows the user to edit this person and be redirected to the person's profile when logging in.</c:if><c:if test="${requestScope.user.roleURI != 1 }">Associating this user account to a person will result in the user being redirected to the person's profile when logging in.</c:if></em></td>
-    </tr>  
-  </c:if>
-    
-</table>
-
-</c:if>
 </div>
 </div>
 </jsp:root>
