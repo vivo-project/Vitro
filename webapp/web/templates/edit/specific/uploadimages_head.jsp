@@ -1,6 +1,7 @@
 <%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
 
 <script type="text/javascript" language="JavaScript" src="js/toggle.js"></script>
+<%-- 
 <script type="text/javascript" language="JavaScript">
 /**************************************************** MODE OPTIONS  ***********************************************************/
 
@@ -18,9 +19,12 @@ function refreshModeValue() {
 	switchElementDisplay('thumbnailExtra');
 }
 </script>
-
+--%>
 <style type="text/css">
 .dropdownExtra { display: none; }
+.comment {
+    color: #6a5acd;
+}   
 </style>
 
 
