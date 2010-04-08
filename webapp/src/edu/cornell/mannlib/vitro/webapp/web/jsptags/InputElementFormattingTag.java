@@ -33,12 +33,12 @@ import com.hp.hpl.jena.datatypes.xsd.XSDDateTime;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.vocabulary.XSD;
 
+import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditSubmission;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.Field;
@@ -536,9 +536,12 @@ public class InputElementFormattingTag extends TagSupport {
 			EditConfiguration editConfig, WebappDaoFactory wdf) {    	    
     	ObjectProperty op = 
     		wdf.getObjectPropertyDao().getObjectPropertyByURI(editConfig.getPredicateUri());
-    	    	
+
+    	Individual sub = 
+    		wdf.getIndividualDao().getIndividualByURI(editConfig.getSubjectUri());
+    	
     	List<VClass> vclasses = null;
-    	vclasses = wdf.getVClassDao().getVClassesForProperty(op.getURI(), true);    	
+    	vclasses = wdf.getVClassDao().getVClassesForProperty(sub.getVClassURI(), op.getURI());    	
     	if( vclasses == null )
     		vclasses = wdf.getVClassDao().getAllVclasses();
     	
