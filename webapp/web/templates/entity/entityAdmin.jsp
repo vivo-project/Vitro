@@ -41,12 +41,7 @@
       		    <c:param name="home" value="${currentPortalId}"/>
               <c:param name="uri" value="${entity.URI}"/>
             </c:url>
-          <a href='<c:out value="${editHref}"/>'> edit this individual</a> | 
-          <c:url var="cloneHref" value="/cloneEntity">
-              <c:param name="home" value="${currentPortalId}"/>
-              <c:param name="uri" value="${entity.URI}"/>
-          </c:url>
-          <a href='<c:out value="${cloneHref}"/>'> clone this individual </a>
+          <a href='<c:out value="${editHref}"/>'> edit this individual</a> 
           <p>Resource URI: <c:out value="${entity.URI}"/></p>
           </div>
     </div>
