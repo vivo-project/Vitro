@@ -2,10 +2,13 @@
 
 package edu.cornell.mannlib.vitro.webapp.utils;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class StringUtils {
-    
+
     public static String capitalize(String s) {
         return s.substring(0, 1).toUpperCase() + s.substring(1);
     }
@@ -19,10 +22,14 @@ public class StringUtils {
         if (glue == null) {
             glue = ",";
         }
-        String joinedList = "";
+        
+        String joinedList = "";      
         
         int count = 0;
         for (Object o : list) {
+            if (o == null) {
+                continue;
+            }
             String s = o.toString();
             if (count > 0) {
                 joinedList += glue;
@@ -38,9 +45,37 @@ public class StringUtils {
         return join(list, false, ",");
     }
     
+    public static String join(List<?> list, String glue) {
+        return join(list, false, glue);
+    }
+    
+    public static String join(String glue, String ...strings) {
+        List<String> list =  new ArrayList<String>();
+        for (String s : strings) {
+            list.add(s);
+        }
+        return join(list, false, glue);        
+    }
+    
+    public static String join(String[] stringArray, boolean quote, String glue) {
+        return join(Arrays.asList(stringArray), quote, glue);
+    }
+    
+    public static String join(String[] stringArray) {
+        return join(Arrays.asList(stringArray));
+    }
+    
+    public static String join(String[] stringArray, String glue) {
+        return join(Arrays.asList(stringArray), false, glue);
+    }
+    
     public static String quotedList(List<?> list, String glue) {    
         return join(list, true, glue);
-    }  
+    } 
+    
+    public static String quotedList(String[] stringArray, String glue) {
+        return quotedList(Arrays.asList(stringArray), glue);
+    }
     
     // Because we can't use Java 1.6 String.isEmpty()
     public static boolean isEmpty(String s) {
@@ -56,4 +91,9 @@ public class StringUtils {
         }
         return false;
     }
+    
+    public static String setNullToEmptyString(String s) {
+        return s == null ? "" : s;
+    }
+    
 }
