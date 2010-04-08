@@ -27,15 +27,6 @@
 	<dirname property="vitroCore.basedir" file="${ant.file.vitroCore}" />
 	<property name="webapp.dir" location="${vitroCore.basedir}" />
 
-	<!--
-		The log file names will be prefixed with the project name, if this is
-		called from a Product build script.
-	-->
-	<condition property="logfile.prefix" value="">
-		<equals arg1="${ant.file.vitroCore}" arg2="${ant.file}" />
-	</condition>
-	<property name="logfile.prefix" value="${ant.project.name}." />
-
 
 
 	<!-- - - - - - - - - - - - - - - - - - 
