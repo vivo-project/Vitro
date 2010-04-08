@@ -229,109 +229,115 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
   			DataProperty dp = (DataProperty)p;%>
   			<c:set var="dataProp" value="<%=dp%>"/>
  			<c:set var="dataRows" value="${fn:length(dataProp.dataPropertyStatements)}"/>
+ 			
+ 			<c:set var="hasRowsToShow" value="${ dataRows > 0 }"/>
+ 			<c:if test="${showSelfEdits || showCuratorEdits}"><edLnk:editLinks var="editLinks" item="${dataProp}" icons="false"/></c:if>
+ 			<c:set var="mayEdit" value="${ !empty editLinks }"/>
+ 			
 		    <c:set var="dataStyle" value="display: block;"/>
-		    <c:if test="${dataRows==0}"><c:set var="dataStyle" value="display: block;"/></c:if>
+		    <c:if test="${dataRows==0}"><c:set var="dataStyle" value="display: block;"/></c:if>		    
 			<c:set var="classForEditControls" value=""/>
 		    <c:if test="${showSelfEdits || showCuratorEdits}"><c:set var="classForEditControls" value=" editing"/></c:if>
             <c:set var="uniqueDpropDivName" value="${fn:replace(dataProp.localNameWithPrefix,':','-')}"/>
- 			<div id="${'dprop-'}${uniqueDpropDivName}" class="propsItem ${classForEditControls}" style="${dataStyle}">
-				<h3 class="propertyName">${dataProp.editLabel}</h3>
-		    	<c:if test="${showSelfEdits || showCuratorEdits}"><edLnk:editLinks item="${dataProp}" icons="false"/></c:if>
-		    	
-		    	<%-- Verbose property display additions for data properties, using context variable verbosePropertyListing --%>
-                <c:if test="${showCuratorEdits && verbosePropertyListing}">
-                    <c:url var="propertyEditLink" value="/datapropEdit">
-                        <c:param name="home" value="${portal.portalId}"/>
-                        <c:param name="uri" value="${dataProp.URI}"/>
-                    </c:url>
-                    <c:choose>
-                        <c:when test="${!empty dataProp.hiddenFromDisplayBelowRoleLevel.label}"><c:set var="displayCue" value="${dataProp.hiddenFromDisplayBelowRoleLevel.label}"/></c:when>
-                        <c:otherwise><c:set var="displayCue" value="unspecified"/></c:otherwise>
-                    </c:choose>
-                    <c:choose>
-                        <c:when test="${!empty dataProp.prohibitedFromUpdateBelowRoleLevel.label}"><c:set var="updateCue" value="${dataProp.prohibitedFromUpdateBelowRoleLevel.label}"/></c:when>
-                        <c:otherwise><c:set var="updateCue" value="unspecified"/></c:otherwise>
-                    </c:choose>
-                    <c:choose>
-                        <c:when test="${!empty dataProp.localNameWithPrefix}"><c:set var="localName" value="${dataProp.localNameWithPrefix}"/></c:when>
-                        <c:otherwise><c:set var="localName" value="no local name"/></c:otherwise>
-                    </c:choose>
-                    <c:choose>
-                        <c:when test="${!empty dataProp.displayTier}"><c:set var="displayTier" value="${dataProp.displayTier}"/></c:when>
-                        <c:otherwise><c:set var="displayTier" value="blank"/></c:otherwise>
-                    </c:choose>
-                    <c:choose>
-                        <c:when test="${!empty dataProp.groupURI}">
-<%                          PropertyGroup pg = pgDao.getGroupByURI(dp.getGroupURI());
-                            if (pg!=null && pg.getName()!=null) {
-                                request.setAttribute("groupName",pg.getName());%>
-                                <span class="verbosePropertyListing"><a class="propertyLink" href="${propertyEditLink}"/>${localName}</a> (data property); display tier ${displayTier} within group ${groupName}; display level: ${displayCue}; update level: ${updateCue}</span>
-<%                          } else {%>
-                                <span class="verbosePropertyListing"><a class="propertyLink" href="${propertyEditLink}"/>${localName}</a> (data property); display tier ${displayTier}; display level: ${displayCue}; update level: ${updateCue}</span>
-<%                          } %>
-                        </c:when>
-                        <c:otherwise>
-                            <span class="verbosePropertyListing"><a class="propertyLink" href="${propertyEditLink}"/>${localName}</a> (data property); display tier ${displayTier}; display level: ${displayCue}; update level: ${updateCue}</span>
-                        </c:otherwise>
-                    </c:choose>
-                </c:if>
-                <%-- end Verbose property display additions for data properties --%>
-		    	
-				<c:set var="displayLimit" value="${dataProp.displayLimit}"/>
-				<c:if test="${displayLimit<0}">
-				    <c:set var="displayLimit" value="32"/> <% /* arbitrary limit if value is unset, i.e. -1 */ %>
-				</c:if>
-				<c:if test="${fn:length(dataProp.dataPropertyStatements)-displayLimit==1}"><c:set var="displayLimit" value="${displayLimit+1}"/></c:if>
-				<c:if test="${displayLimit < 0}"><c:set var="displayLimit" value="20"/></c:if>
-				<c:if test="${!empty dataProp.dataPropertyStatements}"><div class="datatypeProperties"></c:if>
- 			    	<c:if test="${dataRows > 1}">
-						<ul class="datatypePropertyValue">
+            <c:if test="${ hasRowsToShow or mayEdit }">
+	 			<div id="${'dprop-'}${uniqueDpropDivName}" class="propsItem ${classForEditControls}" style="${dataStyle}">
+					<h3 class="propertyName">${dataProp.editLabel}</h3>
+					<c:if test="${showSelfEdits || showCuratorEdits}"><edLnk:editLinks item="${dataProp}" icons="false"/></c:if> 					
+			    	<%-- Verbose property display additions for data properties, using context variable verbosePropertyListing --%>
+	                <c:if test="${showCuratorEdits && verbosePropertyListing}">
+	                    <c:url var="propertyEditLink" value="/datapropEdit">
+	                        <c:param name="home" value="${portal.portalId}"/>
+	                        <c:param name="uri" value="${dataProp.URI}"/>
+	                    </c:url>
+	                    <c:choose>
+	                        <c:when test="${!empty dataProp.hiddenFromDisplayBelowRoleLevel.label}"><c:set var="displayCue" value="${dataProp.hiddenFromDisplayBelowRoleLevel.label}"/></c:when>
+	                        <c:otherwise><c:set var="displayCue" value="unspecified"/></c:otherwise>
+	                    </c:choose>
+	                    <c:choose>
+	                        <c:when test="${!empty dataProp.prohibitedFromUpdateBelowRoleLevel.label}"><c:set var="updateCue" value="${dataProp.prohibitedFromUpdateBelowRoleLevel.label}"/></c:when>
+	                        <c:otherwise><c:set var="updateCue" value="unspecified"/></c:otherwise>
+	                    </c:choose>
+	                    <c:choose>
+	                        <c:when test="${!empty dataProp.localNameWithPrefix}"><c:set var="localName" value="${dataProp.localNameWithPrefix}"/></c:when>
+	                        <c:otherwise><c:set var="localName" value="no local name"/></c:otherwise>
+	                    </c:choose>
+	                    <c:choose>
+	                        <c:when test="${!empty dataProp.displayTier}"><c:set var="displayTier" value="${dataProp.displayTier}"/></c:when>
+	                        <c:otherwise><c:set var="displayTier" value="blank"/></c:otherwise>
+	                    </c:choose>
+	                    <c:choose>
+	                        <c:when test="${!empty dataProp.groupURI}">
+	<%                          PropertyGroup pg = pgDao.getGroupByURI(dp.getGroupURI());
+	                            if (pg!=null && pg.getName()!=null) {
+	                                request.setAttribute("groupName",pg.getName());%>
+	                                <span class="verbosePropertyListing"><a class="propertyLink" href="${propertyEditLink}"/>${localName}</a> (data property); display tier ${displayTier} within group ${groupName}; display level: ${displayCue}; update level: ${updateCue}</span>
+	<%                          } else {%>
+	                                <span class="verbosePropertyListing"><a class="propertyLink" href="${propertyEditLink}"/>${localName}</a> (data property); display tier ${displayTier}; display level: ${displayCue}; update level: ${updateCue}</span>
+	<%                          } %>
+	                        </c:when>
+	                        <c:otherwise>
+	                            <span class="verbosePropertyListing"><a class="propertyLink" href="${propertyEditLink}"/>${localName}</a> (data property); display tier ${displayTier}; display level: ${displayCue}; update level: ${updateCue}</span>
+	                        </c:otherwise>
+	                    </c:choose>
+	                </c:if>
+	                <%-- end Verbose property display additions for data properties --%>
+			    	
+					<c:set var="displayLimit" value="${dataProp.displayLimit}"/>
+					<c:if test="${displayLimit<0}">
+					    <c:set var="displayLimit" value="32"/> <% /* arbitrary limit if value is unset, i.e. -1 */ %>
 					</c:if>
-					<c:if test="${dataRows == 1}">
-						<div class="datatypePropertyValue"><span class="statementWrap">
-					</c:if>
-					<c:forEach items="${dataProp.dataPropertyStatements}" var="dataPropertyStmt">
-						<c:if test="${stmtCounter == displayLimit}">
-  							<c:if test="${dataRows > 1 && displayLimit < 0}"></ul></c:if>
-     
-                       <div class="navlinkblock ">
-                         <span class="entityMoreSpan">
-                           <c:out value='${dataRows - stmtCounter}' />
-                           <c:choose>
-                               <c:when test='${displayLimit==0}'> entries</c:when>
-                               <c:otherwise> more</c:otherwise>
-                           </c:choose>
-                         </span>
-
-                      <div class="extraEntities">
+					<c:if test="${fn:length(dataProp.dataPropertyStatements)-displayLimit==1}"><c:set var="displayLimit" value="${displayLimit+1}"/></c:if>
+					<c:if test="${displayLimit < 0}"><c:set var="displayLimit" value="20"/></c:if>
+					<c:if test="${!empty dataProp.dataPropertyStatements}"><div class="datatypeProperties"></c:if>
+	 			    	<c:if test="${dataRows > 1}">
+							<ul class="datatypePropertyValue">
 						</c:if>
-		            	<c:set var="stmtCounter" value="${stmtCounter+1}"/>
-		            	<c:choose>
-		                	<c:when test='${dataRows==1}'>
-  		                	<p:process>${dataPropertyStmt.data}</p:process>
-		                	    <c:if test="${showSelfEdits || showCuratorEdits}">
-               					    <c:set var="editLinks"><edLnk:editLinks item="${dataPropertyStmt}" icons="false"/></c:set>
-  		                	    <c:if test="${!empty editLinks}"><span class="editLinks">${editLinks}&nbsp;</span></c:if>
-  		                	    <c:if test="${empty editLinks}"><em class="nonEditable">(non-editable) </em></c:if>
-		                	    </c:if>
-		                	</c:when>
-		                	<c:otherwise>
-		                	    <li><span class="statementWrap">
-		                	    <p:process>${dataPropertyStmt.data}</p:process>
-		                	    <c:if test="${showSelfEdits || showCuratorEdits}">
-		                	      <c:set var="editLinks"><edLnk:editLinks item="${dataPropertyStmt}" icons="false"/></c:set>
-  		                	    <c:if test="${!empty editLinks}"><span class="editLinks">${editLinks}&nbsp;</span></c:if>
-  		                	    <c:if test="${empty editLinks}"><em class="nonEditable">(non-editable) </em></c:if>
-		                	    </c:if>
-		                	    </span></li>
-		                	</c:otherwise>
-		            	</c:choose>
-		            	
-       					<c:if test="${dataRows==1}"></span></div></c:if>
-					</c:forEach>
-					<c:if test="${stmtCounter > displayLimit}"></div></div></c:if>
-                <c:if test="${!empty dataProp.dataPropertyStatements}"></div><!-- datatypeProperties --></c:if>
-			</div><!-- ${dataProp.localNameWithPrefix} -->		
+						<c:if test="${dataRows == 1}">
+							<div class="datatypePropertyValue"><span class="statementWrap">
+						</c:if>
+						<c:forEach items="${dataProp.dataPropertyStatements}" var="dataPropertyStmt">
+							<c:if test="${stmtCounter == displayLimit}">
+	  							<c:if test="${dataRows > 1 && displayLimit < 0}"></ul></c:if>
+	     
+	                       <div class="navlinkblock ">
+	                         <span class="entityMoreSpan">
+	                           <c:out value='${dataRows - stmtCounter}' />
+	                           <c:choose>
+	                               <c:when test='${displayLimit==0}'> entries</c:when>
+	                               <c:otherwise> more</c:otherwise>
+	                           </c:choose>
+	                         </span>
+	
+	                      <div class="extraEntities">
+							</c:if>
+			            	<c:set var="stmtCounter" value="${stmtCounter+1}"/>
+			            	<c:choose>
+			                	<c:when test='${dataRows==1}'>
+	  		                	<p:process>${dataPropertyStmt.data}</p:process>
+			                	    <c:if test="${showSelfEdits || showCuratorEdits}">
+	               					    <c:set var="editLinks"><edLnk:editLinks item="${dataPropertyStmt}" icons="false"/></c:set>
+	  		                	    <c:if test="${!empty editLinks}"><span class="editLinks">${editLinks}&nbsp;</span></c:if>
+	  		                	    <c:if test="${empty editLinks}"><em class="nonEditable">(non-editable) </em></c:if>
+			                	    </c:if>
+			                	</c:when>
+			                	<c:otherwise>
+			                	    <li><span class="statementWrap">
+			                	    <p:process>${dataPropertyStmt.data}</p:process>
+			                	    <c:if test="${showSelfEdits || showCuratorEdits}">
+			                	      <c:set var="editLinks"><edLnk:editLinks item="${dataPropertyStmt}" icons="false"/></c:set>
+	  		                	    <c:if test="${!empty editLinks}"><span class="editLinks">${editLinks}&nbsp;</span></c:if>
+	  		                	    <c:if test="${empty editLinks}"><em class="nonEditable">(non-editable) </em></c:if>
+			                	    </c:if>
+			                	    </span></li>
+			                	</c:otherwise>
+			            	</c:choose>
+			            	
+	       					<c:if test="${dataRows==1}"></span></div></c:if>
+						</c:forEach>
+						<c:if test="${stmtCounter > displayLimit}"></div></div></c:if>
+	                <c:if test="${!empty dataProp.dataPropertyStatements}"></div><!-- datatypeProperties --></c:if>
+				</div><!-- ${dataProp.localNameWithPrefix} -->	
+			</c:if>	
 <%		} else { // keyword property -- ignore
 		    if (p instanceof KeywordProperty) {%>
 				<p>Not expecting keyword properties here.</p>
