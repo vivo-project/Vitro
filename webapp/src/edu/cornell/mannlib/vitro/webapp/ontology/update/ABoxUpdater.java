@@ -35,6 +35,7 @@ public class ABoxUpdater {
 	private OntModel oldTboxModel;
 	private OntModel newTboxModel;
 	private OntModel aboxModel;
+	private OntModel newTBoxAnnotationsModel;
 	private OntologyChangeLogger logger;  
 	private OntologyChangeRecord record;
 	private OntClass OWL_THING = (ModelFactory
@@ -57,12 +58,14 @@ public class ABoxUpdater {
 	public ABoxUpdater(OntModel oldTboxModel,
 			           OntModel newTboxModel,
 			           OntModel aboxModel,
+			           OntModel newAnnotationsModel,
 		               OntologyChangeLogger logger,
 		               OntologyChangeRecord record) {
 		
 		this.oldTboxModel = oldTboxModel;
 		this.newTboxModel = newTboxModel;
 		this.aboxModel = aboxModel;
+		this.newTBoxAnnotationsModel = newAnnotationsModel;
 		this.logger = logger;
 		this.record = record;
 	}
@@ -133,8 +136,16 @@ public class ABoxUpdater {
 
 		   int count = 0;
 		   while (iter.hasNext()) {
-			   count++;
 			   Statement oldStatement = iter.next();
+			   if (newTBoxAnnotationsModel.contains(oldStatement)) {
+				   continue; 
+				   // if this statement was loaded from the new annotations,
+				   // don't attempt to remove it.
+				   // This happens in cases where a class hasn't really
+				   // been removed, but we just want to map any ABox
+				   // data using it to use a different class instead.
+			   }
+			   count++;
 			   Statement newStatement = ResourceFactory.createStatement(newClass, oldStatement.getPredicate(), oldStatement.getObject());
 			   retractions.add(oldStatement);
 			   additions.add(newStatement);
