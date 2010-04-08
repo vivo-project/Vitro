@@ -30,6 +30,8 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils;
@@ -159,8 +161,20 @@ public class OntologyUpdater {
 		aboxModel.enterCriticalSection(Lock.WRITE);
 		try {
 			JenaIngestUtils jiu = new JenaIngestUtils();
-			aboxModel.add(jiu.renameBNodes(anonModel, settings.getDefaultNamespace() + "n", 
-					aboxModel));
+			Model additions = jiu.renameBNodes(anonModel, settings.getDefaultNamespace() + "n", 
+					aboxModel);
+			Model actualAdditions = ModelFactory.createDefaultModel();
+			StmtIterator stmtIt = additions.listStatements();
+			while (stmtIt.hasNext()) {
+				Statement stmt = stmtIt.nextStatement();
+				if (!aboxModel.contains(stmt)) {
+					actualAdditions.add(stmt);
+				}
+			}
+			aboxModel.add(actualAdditions);
+			logger.log("Constructed " + actualAdditions.size() + " new " +
+					   "statements using SPARQL CONSTRUCT queries.");
+			record.recordAdditions(actualAdditions);
 		} finally {
 			aboxModel.leaveCriticalSection();
 		}
