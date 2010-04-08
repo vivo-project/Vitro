@@ -115,8 +115,9 @@ public class UserRetryController extends BaseEditController {
 
         LoginFormBean loginBean = (LoginFormBean) request.getSession().getAttribute("loginHandler");
         
-        /* has no impact on anything, so don't confuse by showing */
-        /* bdc34: Datastar needs non-backend-editing users for logging in non-Cornell people*/ 
+        /* This is being removed just for NIHVIVO release 1.0 because self editing is not going to be in that release. */
+        /* THIS CHANGE MUST NOT BE PROPIGATED TO THE TRUNK, datastar needs self editors */
+        /* see http://issues.library.cornell.edu/browse/NIHVIVO-335 */
         Option nonEditor = new Option(ROLE_PROTOCOL+loginBean.getNonEditor(), "self editor");
         nonEditor.setSelected(userForEditing.getRoleURI().equals(nonEditor.getValue()));
         
@@ -129,8 +130,12 @@ public class UserRetryController extends BaseEditController {
 
         List roleOptionList = new LinkedList();
 
-        if (nonEditor.getSelected() || (Integer.decode(loginBean.getLoginRole()) >= loginBean.getNonEditor()))
-            roleOptionList.add(nonEditor); 
+        /* This is being removed just for NIHVIVO release 1.0 because self editing is not going to be in that release. */
+        /* THIS CHANGE MUST NOT BE PROPIGATED TO THE TRUNK, datastar needs self editors */
+        /* see http://issues.library.cornell.edu/browse/NIHVIVO-335 */
+        if (nonEditor.getSelected() )
+            roleOptionList.add(nonEditor);
+        
         if (editor.getSelected() || (Integer.decode(loginBean.getLoginRole()) >= loginBean.getEditor()))
             roleOptionList.add(editor);
         if (curator.getSelected() || (Integer.decode(loginBean.getLoginRole()) >= loginBean.getCurator()))
