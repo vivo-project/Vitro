@@ -17,7 +17,8 @@ PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX xsd:   <http://www.w3.org/2001/XMLSchema#>
 PREFIX owl:   <http://www.w3.org/2002/07/owl#>
 PREFIX swrl:  <http://www.w3.org/2003/11/swrl#>
-PREFIX swrlb: <http://www.w3.org/2003/11/swrlb#><%List prefixes = (List)request.getAttribute("prefixList");
+PREFIX swrlb: <http://www.w3.org/2003/11/swrlb#>
+PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#><%List prefixes = (List)request.getAttribute("prefixList");
 if(prefixes != null){
 	Iterator prefixItr = prefixes.iterator();
 	Integer count = 0;
