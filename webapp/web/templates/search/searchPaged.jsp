@@ -89,7 +89,7 @@ if( request.getAttribute("types") != null ){
     out.println("<li>");
     out.print("<a href='"
                + response.encodeURL(
-                       getServletContext().getContextPath()
+                       request.getContextPath()
                        +"/entity?uri=" + escapedURIStr 
                        + portalParm )
                + "'>" 
