@@ -1039,6 +1039,10 @@
     <url-pattern>/individual/*</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
+    <servlet-name>entity</servlet-name>
+    <url-pattern>/display/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
     <servlet-name>updateEntityFlags</servlet-name>
     <url-pattern>/updateEntityFlags</url-pattern>
   </servlet-mapping>

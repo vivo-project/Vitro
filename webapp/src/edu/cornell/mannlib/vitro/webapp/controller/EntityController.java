@@ -403,13 +403,10 @@ public class EntityController extends VitroHttpServlet {
 					return redirectUrl + ".n3";
 				}else if( TTL_MIMETYPE.equals( c.getMediaType() )){
 					return redirectUrl + ".ttl";
-				}else{ //this case shouldn't happen					
-					return redirectUrl + ".rdf";
-				}				
-			}else{
-				//redirect to HTML representation
-				return "/individual/" + m.group(1) + "/" + m.group(1) + ".html";
-			}				
+				}//else send them to html													
+			}
+			//else redirect to HTML representation
+			return "/display/" + m.group(1) ;
 		}else{			
 			return null;
 		}
@@ -418,7 +415,7 @@ public class EntityController extends VitroHttpServlet {
 	private static Pattern RDF_REQUEST = Pattern.compile("^/individual/([^/]*)/\\1.rdf$");
     private static Pattern N3_REQUEST = Pattern.compile("^/individual/([^/]*)/\\1.n3$");
     private static Pattern TTL_REQUEST = Pattern.compile("^/individual/([^/]*)/\\1.ttl$");
-    private static Pattern HTML_REQUEST = Pattern.compile("^/individual/([^/]*)/\\1.html$");
+    private static Pattern HTML_REQUEST = Pattern.compile("^/display/([^/]*)$");
     
     /**  
      * @return null if this is not a linked data request, returns content type if it is a 
