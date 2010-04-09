@@ -119,7 +119,8 @@ public class UserRetryController extends BaseEditController {
         /* THIS CHANGE MUST NOT BE PROPIGATED TO THE TRUNK, datastar needs self editors */
         /* see http://issues.library.cornell.edu/browse/NIHVIVO-335 */
         Option nonEditor = new Option(ROLE_PROTOCOL+loginBean.getNonEditor(), "self editor");
-        nonEditor.setSelected(userForEditing.getRoleURI().equals(nonEditor.getValue()));
+        if( ! "insert".equals(action))
+        	nonEditor.setSelected(userForEditing.getRoleURI().equals(nonEditor.getValue()));
         
         Option editor = new Option(ROLE_PROTOCOL+loginBean.getEditor(), "editor");
         editor.setSelected(userForEditing.getRoleURI().equals(editor.getValue()));
