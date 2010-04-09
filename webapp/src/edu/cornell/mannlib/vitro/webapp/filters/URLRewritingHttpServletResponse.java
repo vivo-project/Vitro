@@ -27,6 +27,7 @@ import org.openrdf.model.URI;
 import org.openrdf.model.impl.URIImpl;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapper;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapperFactory;
 
@@ -37,12 +38,14 @@ public class URLRewritingHttpServletResponse implements HttpServletResponse {
 	private HttpServletResponse _response;
 	private HttpServletRequest _request;
 	private ServletContext _context;
+	private WebappDaoFactory wadf;
 	private int contextPathDepth;
 	private Pattern slashPattern = Pattern.compile("/");
 	
 	public URLRewritingHttpServletResponse(HttpServletResponse response, HttpServletRequest request, ServletContext context) {
 		this._response = response;
 		this._context = context;
+		this.wadf = (WebappDaoFactory) context.getAttribute("webappDaoFactory");
 		this.contextPathDepth = slashPattern.split(request.getContextPath()).length-1;
 	}
 
@@ -94,8 +97,11 @@ public class URLRewritingHttpServletResponse implements HttpServletResponse {
 				return _response.encodeURL(inUrl);
 			}
 			
-			// rewrite home parameters as portal prefixes for URLs not relative to the current location
-			if (url.pathBeginsWithSlash && PortalPickerFilter.isPortalPickingActive) {
+			// rewrite home parameters as portal prefixes or remove
+			// if there is only one portal
+			if ( url.pathBeginsWithSlash && 
+					(PortalPickerFilter.isPortalPickingActive ||
+						wadf.getPortalDao().isSinglePortal()) ) {
 				PortalPickerFilter ppf = PortalPickerFilter.getPortalPickerFilter(this._context);
 				if ( (ppf != null) && (url.queryParams != null) ) {
 					Iterator<String[]> qpIt = url.queryParams.iterator();
@@ -149,7 +155,16 @@ public class URLRewritingHttpServletResponse implements HttpServletResponse {
 							if ( (uri.getNamespace() != null) && (uri.getLocalName() != null) ) { 
 								String prefix = nsMap.getPrefixForNamespace(uri.getNamespace());
 								String localName = uri.getLocalName();
-								if (prefix != null) {
+								if (wadf.getDefaultNamespace().
+										equals(uri.getNamespace())
+										&& prefix == null) {
+									// make a URI that matches the URI
+									// of the resource to support
+									// linked data request
+									url.pathParts.add(localName);
+									// remove the ugly uri parameter
+									indexToRemove = qpIndex;
+								} else if (prefix != null) {
 									// add the pretty path parts
 									url.pathParts.add(prefix);
 									url.pathParts.add(localName);
