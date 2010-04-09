@@ -116,7 +116,7 @@ public class UserRetryController extends BaseEditController {
         LoginFormBean loginBean = (LoginFormBean) request.getSession().getAttribute("loginHandler");
         
         /* This is being removed just for NIHVIVO release 1.0 because self editing is not going to be in that release. */
-        /* THIS CHANGE MUST NOT BE PROPIGATED TO THE TRUNK, datastar needs self editors */
+        /* THIS CHANGE MUST NOT BE PROPAGATED TO THE TRUNK, datastar needs self editors */
         /* see http://issues.library.cornell.edu/browse/NIHVIVO-335 */
         Option nonEditor = new Option(ROLE_PROTOCOL+loginBean.getNonEditor(), "self editor");
         if( ! "insert".equals(action))

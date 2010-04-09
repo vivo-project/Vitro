@@ -119,10 +119,10 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
 
                         <%-- Moniker. Wrap in the div only if editing. If not editing, displays inline next to label. --%>
                         <c:if test="${showEdits}">
-                        	<c:set var="monikerEditLinks"><edLnk:editLinks item="<%= VitroVocabulary.MONIKER %>" icons="false"/></c:set>
-                        	<c:if test="${!empty monikerEditLinks }">
+                        	<c:set var="monikerAddLinks"><edLnk:editLinks item="<%= VitroVocabulary.MONIKER %>" icons="false"/></c:set>
+                        	<c:if test="${!empty monikerAddLinks }">
                             	<div id="dprop-vitro-moniker" class="propsItem ${editingClass}">                              
-                                	<h3 class="propertyName">moniker</h3>
+                                	<h3 class="propertyName">moniker</h3>${monikerAddLinks}
                             </c:if>
                         </c:if>
                         
