@@ -99,9 +99,9 @@ public class OntologyUpdater {
 		//updateTBox(changes);
 		//preprocessChanges(changes);
 		
-		updateABox(changes);
-		
 		updateTBoxAnnotations();
+		
+		updateABox(changes);
 		
 	}
 	

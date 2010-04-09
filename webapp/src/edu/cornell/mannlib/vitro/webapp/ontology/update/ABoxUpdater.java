@@ -132,6 +132,14 @@ public class ABoxUpdater {
 		   Resource newClass = ResourceFactory.createResource(change.getDestinationURI());	   
 		   
 		   // Change class references in the subjects of statements
+		   
+		   // BJL 2010-04-09 : This is commented out because
+		   // we do not want to rename the class in annotation
+		   // statements.  This is handled by the TBox updater.
+		   // All we want to change in this method
+		   // is individuals that had the old class as an rdf:type.
+		   
+		   /*
 		   StmtIterator iter = aboxModel.listStatements(oldClass, (Property) null, (RDFNode) null);
 
 		   int count = 0;
@@ -157,11 +165,12 @@ public class ABoxUpdater {
 		   if (count > 0) {
 			   logger.log("Changed " + count + " subject reference" + ((count > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class to be " + newClass.getURI());
 		   }
+		   */
 
-		   // Change class references in the objects of statements
-		   iter = aboxModel.listStatements((Resource) null, (Property) null, oldClass);
+		   // Change class references in the objects of rdf:type statements
+		   StmtIterator iter = aboxModel.listStatements((Resource) null, RDF.type, oldClass);
 
-		   count = 0;
+		   int count = 0;
 		   while (iter.hasNext()) {
 			   count++;
 			   Statement oldStatement = iter.next();
