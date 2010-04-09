@@ -115,7 +115,11 @@
 		    			log.debug("Found multiple classes when attempting to get range vclass.");
 		    		classOfObjectFillers = classes.get(0);
 		    	}
-		    }             
+		    }else{
+		    	classOfObjectFillers = wdf.getVClassDao().getVClassByURI(prop.getRangeVClassURI());
+		    	if( classOfObjectFillers == null )
+		    		classOfObjectFillers = wdf.getVClassDao().getTopConcept();
+		    }
         	
             log.debug("property set to offer \"create new\" option; custom form: ["+prop.getCustomEntryForm()+"]");
             formTitle   = "Select an existing "+classOfObjectFillers.getName()+" for "+subject.getName();
