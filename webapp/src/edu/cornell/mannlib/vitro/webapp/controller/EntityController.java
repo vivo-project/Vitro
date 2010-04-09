@@ -28,6 +28,7 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ModelMaker;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
@@ -249,8 +250,14 @@ public class EntityController extends VitroHttpServlet {
 			ontModel =(Model)session.getAttribute("jenaOntModel");		
 		if( ontModel == null)
 			ontModel = (Model)getServletContext().getAttribute("jenaOntModel");
-				
-		Model newModel = getRDF(indiv, ontModel, ModelFactory.createDefaultModel(), 0);
+			
+		Model newModel;
+		ontModel.enterCriticalSection(Lock.READ);
+		try {
+			newModel = getRDF(indiv, ontModel, ModelFactory.createDefaultModel(), 0);
+		} finally {
+			ontModel.leaveCriticalSection();
+		}
 		
 		res.setContentType(rdfFormat.getMediaType());
 		String format = ""; 
