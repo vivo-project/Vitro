@@ -69,7 +69,8 @@ public class VitroVocabulary {
     public static final String SUNRISE = vitroURI+"sunrise";
     public static final String SUNSET = vitroURI+"sunset";
 
-
+    public static final String DEPENDENT_RESORUCE = "http://vivoweb.org/ontology/core#DependentResource";
+    
     //////////////////////////////////////////
 
 
