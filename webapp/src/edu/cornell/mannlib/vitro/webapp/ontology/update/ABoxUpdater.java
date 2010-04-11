@@ -24,6 +24,7 @@ import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.ontology.update.AtomicOntologyChange.AtomicChangeType;
 
 /**  
@@ -133,16 +134,21 @@ public class ABoxUpdater {
 		   
 		   // Change class references in the subjects of statements
 		   
-		   // BJL 2010-04-09 : This is commented out because
-		   // we do not want to rename the class in annotation
-		   // statements.  This is handled by the TBox updater.
-		   // All we want to change in this method
-		   // is individuals that had the old class as an rdf:type.
+		   // BJL 2010-04-09 : In future versions we need to keep track of
+		   // the difference between true direct renamings and "use-insteads."
+		   // For now, the best behavior is to remove any remaining statements
+		   // where the old class is the subject, *unless* the statements
+		   // is part of the new annotations file (see comment below) or the
+		   // predicate is vitro:autolinkedToTab.  In the latter case,
+		   // the autolinking annotation should be rewritten using the 
+		   // new class name.
 		   
-		   /*
+		   Property autoLinkedToTab = ResourceFactory.createProperty(VitroVocabulary.TAB_AUTOLINKEDTOTAB);
+		   
 		   StmtIterator iter = aboxModel.listStatements(oldClass, (Property) null, (RDFNode) null);
 
-		   int count = 0;
+		   int renameCount = 0;
+		   int removeCount = 0;
 		   while (iter.hasNext()) {
 			   Statement oldStatement = iter.next();
 			   if (newTBoxAnnotationsModel.contains(oldStatement)) {
@@ -153,26 +159,32 @@ public class ABoxUpdater {
 				   // been removed, but we just want to map any ABox
 				   // data using it to use a different class instead.
 			   }
-			   count++;
-			   Statement newStatement = ResourceFactory.createStatement(newClass, oldStatement.getPredicate(), oldStatement.getObject());
-			   retractions.add(oldStatement);
-			   additions.add(newStatement);
+			   if (autoLinkedToTab.equals(oldStatement.getPredicate())) {
+				   renameCount++;
+				   Statement newStatement = ResourceFactory.createStatement(newClass, oldStatement.getPredicate(), oldStatement.getObject());
+				   additions.add(newStatement);
+			   } else {
+				   removeCount++;
+				   retractions.add(oldStatement);
+			   }
 			   //logChange(oldStatement, false);
 			   //logChange(newStatement,true);
 		   }
 		   
 		   //log summary of changes
-		   if (count > 0) {
-			   logger.log("Changed " + count + " subject reference" + ((count > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class to be " + newClass.getURI());
+		   if (renameCount > 0) {
+			   logger.log("Changed " + renameCount + " subject reference" + ((renameCount > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class to be " + newClass.getURI());
 		   }
-		   */
+		   if (removeCount > 0) {
+			   logger.log("Removed " + removeCount + " remaining subject reference" + ((removeCount > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class");
+		   }
 
 		   // Change class references in the objects of rdf:type statements
-		   StmtIterator iter = aboxModel.listStatements((Resource) null, RDF.type, oldClass);
+		   iter = aboxModel.listStatements((Resource) null, (Property) null, oldClass);
 
-		   int count = 0;
+		   renameCount = 0;
 		   while (iter.hasNext()) {
-			   count++;
+			   renameCount++;
 			   Statement oldStatement = iter.next();
 			   Statement newStatement = ResourceFactory.createStatement(oldStatement.getSubject(), oldStatement.getPredicate(), newClass);
 			   retractions.add(oldStatement);
@@ -183,8 +195,8 @@ public class ABoxUpdater {
 		   }
 		   
 		   //log summary of changes
-		   if (count > 0) {
-			   logger.log("Changed " + count + " object reference" + ((count > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class to be " + newClass.getURI());
+		   if (renameCount > 0) {
+			   logger.log("Changed " + renameCount + " object reference" + ((renameCount > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class to be " + newClass.getURI());
 		   }
 		   
 		   aboxModel.remove(retractions);

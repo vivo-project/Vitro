@@ -96,9 +96,7 @@ public class OntologyUpdater {
 						settings.getNewTBoxModel(), 
 						settings.getOldTBoxModel());
 		
-		//updateTBox(changes);
-		//preprocessChanges(changes);
-		
+		//process the TBox before the ABox
 		updateTBoxAnnotations();
 		
 		updateABox(changes);
