@@ -41,16 +41,25 @@ public class SearchReindexingListener implements ModelChangedListener {
 			}else{ // editEvent is the end of an edit
 				log.debug("doing search index build");
 				IndexBuilder builder = (IndexBuilder) context.getAttribute(IndexBuilder.class.getName());
-				for( String uri: getAndClearChangedUris()){
-					builder.addToChangedUris(uri);
-				}				
-				new Thread(builder).start();				
+				if( builder != null ){
+					for( String uri: getAndClearChangedUris()){
+						builder.addToChangedUris(uri);
+					}				
+					new Thread(builder).start();
+				}else{
+					log.debug("Could not get IndexBuilder from servlet context, cannot create index for full text seraching.");
+					getAndClearChangedUris(); //clear list of changes because they cannot be indexed.
+				}								
 			}		
 		} 
 	}
 	
-	private boolean isNormalPredicate(Property p) {
+	private boolean isNormalPredicate(Property p) {		
 		if( p == null ) return false;
+		
+		/* currently the only predicate that is filtered out is rdf:type.
+		 * It may be useful to improve this so that it may be configured 
+		 * at run time.*/
 		if( RDF.type.equals( p ))
 			return false;
 		else 
