@@ -97,6 +97,7 @@ public class ContactMailServlet extends VitroHttpServlet {
         		.getAttribute("commentsFormReferer");
         if (originalReferer != null) {
         	request.getSession().removeAttribute("commentsFormReferer");
+        	/* does not support legitimate clients that don't send the Referer header
         	  String referer = request.getHeader("Referer");
               if (referer == null || 
               		(referer.indexOf("comments") <0 
@@ -105,6 +106,7 @@ public class ContactMailServlet extends VitroHttpServlet {
                   			   "Contact Us or Corrections page.";
                   statusMsg = SPAM_MESSAGE;
               }
+            */
         } else {
             originalReferer = "none";
         }
