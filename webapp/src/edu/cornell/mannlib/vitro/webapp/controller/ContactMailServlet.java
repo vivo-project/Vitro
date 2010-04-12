@@ -90,7 +90,9 @@ public class ContactMailServlet extends VitroHttpServlet {
             // status = SPAM_MESSAGE;
         } else {
             String referer = request.getHeader("Referer");
-            if (referer.indexOf("comments")<0 && referer.indexOf("correction")<0) {
+            if (referer == null || 
+            		(referer.indexOf("comments") <0 
+            		  && referer.indexOf("correction") <0) ) {
                 probablySpam=true;
                 status = SPAM_MESSAGE ;
                 spamReason = "The form was not submitted from the Contact Us or Corrections page.";
