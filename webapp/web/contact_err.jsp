@@ -8,6 +8,8 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.VitroRequest" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Portal" %>
 
+<%@ taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
+
 <%
 VitroRequest vreq = new VitroRequest(request);
 String errorString=request.getParameter("ERR");
@@ -16,10 +18,16 @@ if (errorString == null || errorString.equals("")) {
 }
 %>
 
+<c:set var="portal" value="${requestScope.portalBean}"/>
+<c:set var="themeDir"><c:out value="${portalBean.themeDir}"/></c:set>
+
+<%-- Need to get the context --%>
+<c:url var="themeDir" value="/${themeDir}"/>
+
 <table>
 <tr>
     <td align="center" colspan="3">
-		<img src="site_icons/bomb.gif" alt="failed email"/><br/>
+		<img src="${themeDir}site_icons/bomb.gif" alt="failed email"/><br/>
 <%      if ( errorString != null && !errorString.equals("")) {%>
 			<p class="normal">We report the following error in processing your request:<br/>
 		    <b><%=errorString%></b>

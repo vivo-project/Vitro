@@ -6,16 +6,21 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Portal" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.VitroRequest" %>
 
+<%@ taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
+
 <%
 VitroRequest vreq = new VitroRequest(request);
 Portal portalBean=vreq.getPortal();
 %>
 
+<c:set var="portal" value="${requestScope.portalBean}"/>
+<c:set var="themeDir"><c:out value="${portalBean.themeDir}"/></c:set>
+
+
+<c:url var="themeDir" value="/${themeDir}"/>
+
 <div id="content">
     <h2>Feedback</h2>
-	<c:set var='themeDir'>
-  		<c:if test="${!empty context && context != ''}">/${context}</c:if>/<%=portalBean.getThemeDir()%>
-	</c:set>
     <img src="${themeDir}site_icons/mail.gif" alt="mailbox"/><br/>
 
     <p>Thank you for contacting our curation and development team. We will respond to your inquiry as soon as possible.</p>
