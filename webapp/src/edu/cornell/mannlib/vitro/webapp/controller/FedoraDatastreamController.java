@@ -318,7 +318,7 @@ public class FedoraDatastreamController extends VitroHttpServlet implements Cons
                 fileUri = queryParameters.get("fileUri").get(0);
             }
             boolean useNewName=false;
-            if( "true".equals(queryParameters.get("useNewName"))){System.out.println("Use new name parameter is true");
+            if( "true".equals(queryParameters.get("useNewName"))){
                 useNewName = true;
             }
             if( pId == null || pId.length() == 0 ) 
@@ -413,7 +413,6 @@ public class FedoraDatastreamController extends VitroHttpServlet implements Cons
             DataProperty contentType = wdf.getDataPropertyDao().getDataPropertyByURI(this.contentTypeProperty);
             if(contentType != null)
             {
-            	System.out.println("Setting content type to " + fileRes.getContentType());
             	wdf.getDataPropertyStatementDao().deleteDataPropertyStatementsForIndividualByDataProperty(fileEntity, contentType);            
 	            dps = new DataPropertyStatementImpl();
 	            dps.setIndividualURI(fileEntity.getURI());
@@ -462,29 +461,10 @@ public class FedoraDatastreamController extends VitroHttpServlet implements Cons
 	            } else {
 	            	//System.out.println("file name property is null");
 	            }
-	            
-	            //This doesn't seem to be settable as a data property - how else could we set this?
-	            /*
-	            DataProperty fileLocationProperty = wdf.getDataPropertyDao().getDataPropertyByURI(this.fileLocationProperty);
-	            if(fileLocationProperty != null) {
-	            	wdf.getDataPropertyStatementDao().deleteDataPropertyStatementsForIndividualByDataProperty(fileEntity, fileLocationProperty);            
-	            	dps = new DataPropertyStatementImpl();
-		            dps.setIndividualURI(fileEntity.getURI());
-		            dps.setDatapropURI(fileLocationProperty.getURI());
-		            dps.setData(saveLocation); //This follows the pattern of the original file upload - the name returned from the uploaded file object
-		            wdf.getDataPropertyStatementDao().insertNewDataPropertyStatement(dps);
-	            } else {
-	            	System.out.println("File location property is null");
-	            }
-	            */
-	            
+	            	            
 	            //Need to also update the check sum node - how would we do that
 	            //Find checksum node related to this particular file uri, then go ahead and update two specific fields
-	            //ObjectProperty checksumNode = wdf.getObjectPropertyDao().getObjectPropertyByURI(this.checksumNodeProperty);
-	            //if(checksumNode != null) {
-	            //	System.out.println("Check sum node is not equal to null");
-	            //	fileEntity.
-	            //}
+	            
 	            List<ObjectPropertyStatement >csNodeStatements = fileEntity.getObjectPropertyMap().get(this.checksumNodeProperty).getObjectPropertyStatements();
 	            if(csNodeStatements.size() == 0) {
 	            	System.out.println("No object property statements correspond to this property");

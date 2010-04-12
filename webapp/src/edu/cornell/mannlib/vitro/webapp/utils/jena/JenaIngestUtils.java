@@ -350,7 +350,6 @@ public class JenaIngestUtils {
 	 * @return
 	 */
 	public Model dedupAndExtract( Model model, String preferredNamespace ) {
-		
 		Model extractsModel = ModelFactory.createDefaultModel();
 		
 		HashMap<String, String> rewriteURIUsing = new HashMap<String, String>();

@@ -67,7 +67,6 @@ public class EntityController extends VitroHttpServlet {
             VitroRequest vreq = new VitroRequest(req);
             //get URL without hostname or servlet context
             String url = req.getRequestURI().substring(req.getContextPath().length());            
-            
             //Check to see if the request is for a non-information resource, redirect if it is.
             String redirectURL = checkForRedirect ( url, req.getHeader("accept") );
             if( redirectURL != null ){
@@ -77,6 +76,7 @@ public class EntityController extends VitroHttpServlet {
 
             ContentType rdfFormat = checkForLinkedDataRequest(url,req.getHeader("accept"));
             if( rdfFormat != null ){
+            	System.out.println("RDF Format? ");
             	doRdf( vreq, res, rdfFormat );
             	return;
             }                                 
@@ -229,7 +229,6 @@ public class EntityController extends VitroHttpServlet {
 
         vreq.setAttribute("css",css);
         vreq.setAttribute("scripts", "/templates/entity/entity_inject_head.jsp");
-
         RequestDispatcher rd = vreq.getRequestDispatcher( view );
         rd.forward(vreq,res);		
 	}

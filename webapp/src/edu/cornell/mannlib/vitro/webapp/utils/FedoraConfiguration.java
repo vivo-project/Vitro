@@ -71,7 +71,6 @@ public class FedoraConfiguration {
                     adminUser = props.getProperty("adminUser");
                     adminPassword = props.getProperty("adminPassword");
                     pidNamespace = props.getProperty("pidNamespace");
-                    
                     if( fedoraUrl == null || adminUser == null || adminPassword == null ){
                         if( fedoraUrl == null ){
                             log.error("'fedoraUrl' not found in properties file");        

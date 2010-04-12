@@ -75,9 +75,8 @@ public class MailUsersServlet extends VitroHttpServlet {
         if (smtpHost==null || smtpHost.equals("")){
             status = "This application has not yet been configured to send mail " +
             		"-- smtp host has not been identified in the Configuration Properties file.";
-            System.out.println("Status incorrect - would redirect otherwise");
-            //response.sendRedirect( "test?bodyJsp=" + errpage + "&ERR=" + status + "&home=" + portal.getPortalId() );
-            //return;
+            response.sendRedirect( "test?bodyJsp=" + errpage + "&ERR=" + status + "&home=" + portal.getPortalId() );
+            return;
         }
 
         String SPAM_MESSAGE = "Your message was flagged as spam.";
