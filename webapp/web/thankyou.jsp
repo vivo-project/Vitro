@@ -16,7 +16,7 @@ Portal portalBean=vreq.getPortal();
 <c:set var="portal" value="${requestScope.portalBean}"/>
 <c:set var="themeDir"><c:out value="${portalBean.themeDir}"/></c:set>
 
-
+<%-- Need to get the context --%>
 <c:url var="themeDir" value="/${themeDir}"/>
 
 <div id="content">
