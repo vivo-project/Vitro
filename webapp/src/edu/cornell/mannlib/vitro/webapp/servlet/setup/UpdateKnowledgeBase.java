@@ -54,9 +54,9 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	private final String ERROR_LOG_FILE = DATA_DIR + LOG_DIR +
 									"knowledgeBaseUpdate.error.log";
 	private final String REMOVED_DATA_FILE = DATA_DIR + CHANGED_DATA_DIR +
-									"removedData.rdf";
+									"removedData.n3";
 	private final String ADDED_DATA_FILE = DATA_DIR + CHANGED_DATA_DIR +
-								    "addedData.rdf";
+								    "addedData.n3";
 	private final String SPARQL_CONSTRUCTS_DIR = DATA_DIR + "sparqlConstructs/";
 	private final String MISC_REPLACEMENTS_FILE = DATA_DIR + "miscReplacements.rdf";
 	private final String OLD_TBOX_MODEL_DIR = DATA_DIR + "oldVersion/";
