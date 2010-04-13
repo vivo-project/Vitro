@@ -8,6 +8,11 @@ import java.util.Map;
 import com.hp.hpl.jena.rdf.model.Literal;
 
 public class PersonHasPositionValidator implements N3Validator {
+    
+    private static String DUPLICATE_ERROR = "Must choose an existing organization or create a new one, not both.";
+    private static String MISSING_ORG_ERROR = "Must either choose an existing organization or create a new one.";
+    private static String MISSING_ORG_TYPE_ERROR = "Must select a type for the new organization.";
+    private static String MISSING_ORG_NAME_ERROR = "Must select a name for the new organization.";
 	 
 	public Map<String,String> validate(EditConfiguration editConfig, EditSubmission editSub){
 //		Map<String,String> existingUris = editConfig.getUrisInScope();
@@ -25,18 +30,21 @@ public class PersonHasPositionValidator implements N3Validator {
 		if( "".equals(organizationUri))
 			organizationUri = null;
 		
-		System.out.println("newOrgName " + newOrgName);
-		System.out.println("newOrgType " + newOrgType);
-		System.out.println("organizationUri " + organizationUri);
+//		System.out.println("newOrgName " + newOrgName);
+//		System.out.println("newOrgType " + newOrgType);
+//		System.out.println("organizationUri " + organizationUri);
 		
 		Map<String,String> errors = new HashMap<String,String>();		
 		if( organizationUri != null && (newOrgName != null || newOrgType != null)  ){
-			errors.put("newOrgName", "Must choose from an existing orginization or create a new one, not both.");	
-			errors.put("organizationUri", "Must choose from an existing orginizations or create a new one, not both.");
+			errors.put("newOrgName", DUPLICATE_ERROR);	
+			errors.put("organizationUri", DUPLICATE_ERROR);
+		} else if ( organizationUri == null && newOrgName == null && newOrgType == null) {
+            errors.put("newOrgName", MISSING_ORG_ERROR);   
+            errors.put("organizationUri", MISSING_ORG_ERROR);		    		    
 		}else if( organizationUri == null && newOrgName != null && newOrgType == null) {
-			errors.put("newOrgType", "Must select a type for the new organization");			
+			errors.put("newOrgType", MISSING_ORG_TYPE_ERROR);			
 		}else if( organizationUri == null && newOrgName == null && newOrgType != null) {
-			errors.put("newOrgName", "Must select a name for the new organization");			
+			errors.put("newOrgName", MISSING_ORG_NAME_ERROR);			
 		}
 		
 		if( errors.size() != 0 )
