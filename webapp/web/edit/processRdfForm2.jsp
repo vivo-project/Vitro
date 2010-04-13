@@ -89,13 +89,16 @@ are well formed.
         entToReturnTo.add(" "+editConfig.getEntityToReturnTo()+" ");
     }    
     
-    Map<String,String> errors =  submission.getValidationErrors();
+    Map<String,String> errors = submission.getValidationErrors();
     EditSubmission.putEditSubmissionInSession(session,submission);
 
     if(  errors != null && ! errors.isEmpty() ){   
         String form = editConfig.getFormUrl();
         vreq.setAttribute("formUrl", form);
-        %><jsp:forward page="${formUrl}"/><%
+        vreq.setAttribute("view", vreq.getParameter("view"));
+        %>
+            <jsp:forward page="${formUrl}" />
+        <%
         return;
     }
 
