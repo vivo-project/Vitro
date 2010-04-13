@@ -126,6 +126,15 @@ public class EditSubmission {
             validationErrors.putAll( errors);
         }
         
+        if(editConfig.getValidators() != null ){
+        	for( N3Validator validator : editConfig.getValidators()){
+        		if( validator != null ){     
+        			errors = validator.validate(editConfig, this);
+        			if ( errors != null )
+        				validationErrors.putAll(errors);
+        		}
+        	}
+        }
         
     }
 
