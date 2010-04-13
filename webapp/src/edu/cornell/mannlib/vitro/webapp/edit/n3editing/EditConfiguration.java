@@ -3,13 +3,12 @@
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Calendar;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;
@@ -24,6 +23,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
@@ -32,11 +32,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.ServletIdentifierBundleFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.UserToIndIdentifierFactory;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
-import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
-import com.hp.hpl.jena.datatypes.xsd.XSDDateTime;
-import com.hp.hpl.jena.datatypes.BaseDatatype;
 
 /**
  * Represents a set of fields on a form and how parameters from a from
@@ -88,7 +84,9 @@ public class EditConfiguration {
     String formUrl;
     String editKey;
 
-    EditN3Generator n3generator;   
+    List<N3Validator> validators;
+
+	EditN3Generator n3generator;   
     private String originalJson;
 
     private List<ModelChangePreprocessor> modelChangePreprocessors;
@@ -963,5 +961,15 @@ public class EditConfiguration {
     public void setResourceModelSelector(ModelSelector resourceModelSelector) {
         if( resourceModelSelector != null )
             this.resourceModelSelector = resourceModelSelector;
-    }       
+    }
+        
+    public List<N3Validator> getValidators() {
+		return validators;
+	}
+
+    public void addValidator( N3Validator validator){
+    	if( this.validators == null )
+    		this.validators = new ArrayList<N3Validator>();
+    	this.validators.add(validator);    		
+    }    
 }
