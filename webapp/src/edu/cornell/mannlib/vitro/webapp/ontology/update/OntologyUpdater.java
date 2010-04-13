@@ -96,12 +96,10 @@ public class OntologyUpdater {
 						settings.getNewTBoxModel(), 
 						settings.getOldTBoxModel());
 		
-		//updateTBox(changes);
-		//preprocessChanges(changes);
+		//process the TBox before the ABox
+		updateTBoxAnnotations();
 		
 		updateABox(changes);
-		
-		updateTBoxAnnotations();
 		
 	}
 	
@@ -172,8 +170,12 @@ public class OntologyUpdater {
 				}
 			}
 			aboxModel.add(actualAdditions);
-			logger.log("Constructed " + actualAdditions.size() + " new " +
-					   "statements using SPARQL CONSTRUCT queries.");
+			if (actualAdditions.size() > 0) {
+				logger.log("Constructed " + actualAdditions.size() + " new " +
+						   "statement" 
+						   + ((actualAdditions.size() > 1) ? "s" : "") + 
+						   " using SPARQL CONSTRUCT queries.");
+			}
 			record.recordAdditions(actualAdditions);
 		} finally {
 			aboxModel.leaveCriticalSection();
@@ -198,7 +200,8 @@ public class OntologyUpdater {
 		OntModel newTBoxModel = settings.getNewTBoxModel();
 		OntModel ABoxModel = settings.getOntModelSelector().getABoxModel();
 		ABoxUpdater aboxUpdater = new ABoxUpdater(
-				oldTBoxModel, newTBoxModel, ABoxModel, logger, record);
+				oldTBoxModel, newTBoxModel, ABoxModel, 
+				settings.getNewTBoxAnnotationsModel(), logger, record);
 		aboxUpdater.processPropertyChanges(changes.getAtomicPropertyChanges());
 		aboxUpdater.processClassChanges(changes.getAtomicClassChanges());
 		// run additional SPARQL CONSTRUCTS 
