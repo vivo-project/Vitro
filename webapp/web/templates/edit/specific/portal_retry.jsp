@@ -42,14 +42,15 @@
         </td>
     </c:if>     
 </tr>
-        
-<tr class="editformcell">
+
+<!-- With introduction of new logo that includes tagline as part of the image, hiding this field for now to reduce user confusion -->        
+<!-- <tr class="editformcell">
     <td valign="top" colspan="2">
         <b>Tagline </b> <i>appears in header, just to the right of the logo (leave blank to have no tagline)</i><br />
         <input type="text" name="ShortHand" value="<form:value name="ShortHand"/>" ${longField} maxlength="50" />
         <font color="red"><form:error name="ShortHand"/></font>
     </td>
-</tr>
+</tr> -->
     
 <tr class="editformcell">
     <td valign="bottom" colspan="2">
