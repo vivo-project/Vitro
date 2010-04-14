@@ -117,30 +117,16 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
                             </div>
                         </div>
 
-                        <%-- Moniker. Wrap in the div only if editing. If not editing, displays inline next to label. --%>
-                        <c:if test="${showEdits}">
-                        	<c:set var="monikerAddLinks"><edLnk:editLinks item="<%= VitroVocabulary.MONIKER %>" icons="false"/></c:set>
-                        	<c:if test="${!empty monikerAddLinks }">
-                            	<div id="dprop-vitro-moniker" class="propsItem ${editingClass}">                              
-                                	<h3 class="propertyName">moniker</h3>${monikerAddLinks}
-                            </c:if>
-                        </c:if>
-                        
+                        <%-- Moniker--%>                       
                         <c:if test="${!empty entity.moniker}">
                             <div class="datatypeProperties">
                                 <div class="datatypePropertyValue" id="moniker">
                                     <div class="statementWrap">
-                                        <p:process><em class="moniker">${entity.moniker}</em></p:process>
-                                        <c:if test="${showEdits}">
-                                            <c:set var="editLinks"><edLnk:editLinks item="<%= VitroVocabulary.MONIKER %>" data="${entity.moniker}" icons="false"/></c:set>
-                                            <c:if test="${!empty editLinks}"><span class="editLinks">${editLinks}</span></c:if>                                                                                           
-                                        </c:if>                         
+                                        <p:process><em class="moniker">${entity.moniker}</em></p:process>                       
                                     </div>
                                 </div>
                             </div>
-                        </c:if>
-                        
-                        <c:if test="${showEdits && !empty monikerEditLinks}"></div></c:if> <%-- end dprop-vitro-moniker --%>                             
+                        </c:if>                             
                                   
                     </c:otherwise>
                 </c:choose>
@@ -240,44 +226,11 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
 	                    </div> 
                 
 	                    <%-- Citation --%>
-                        <jsp:include page="entityCitation.jsp">
-                            <jsp:param name="showEdits" value="${showEdits}" />
-                        </jsp:include>
+                        <jsp:include page="entityCitation.jsp" />
                         
 	                </c:if>
 	            </div>
-            </c:if>
-            
-           	
-            <%-- Blurb --%>
-            <c:if test="${showEdits || !empty entity.blurb}">	             								
-				<c:if test="${not empty entity.blurb }">                          	 
-           	 	 	<c:set var="editLinksForExistingBlurb"><edLnk:editLinks item="<%= VitroVocabulary.BLURB %>" data="${entity.blurb}" icons="false"/></c:set>
-				</c:if>
-				<c:set var="editLinksForNewBlurb"><edLnk:editLinks item="<%= VitroVocabulary.BLURB %>" icons="false"/></c:set>
-				<c:set var="mayEditBlurb" value="${showEdits && (( empty entity.blurb and not empty editLinksForNewBlurb) or ( not empty entity.blurb and not empty editLinksForExistingBlurb)) }"/>
-								          	
-				<c:if test="${ mayEditBlurb || ! empty entity.blurb }">
-					<div id="dprop-vitro-blurb" class="propsItem ${editingClass}">
-					<h3 class="propertyName">blurb</h3> ${editLinksForNewBlurb}
-				</c:if>
-				                 
-                <c:if test="${!empty entity.blurb}">
-                     <div class="datatypeProperties">
-                         <div class="datatypePropertyValue">
-                             <div class="statementWrap">
-                                 <div class="description"><p:process>${entity.blurb}</p:process></div>                        
-                                 <c:if test="${showEdits && !empty editLinksForExistingBlurb}">	                                   
-                                		<span class="editLinks">${editLinksForExistingBlurb}</span>                                                                     
-                                 </c:if> 
-                             </div>
-                         </div>
-                     </div>
-                </c:if>     
-                <c:if test="${ mayEditBlurb || ! empty entity.blurb }">
-             		</div>
-             	</c:if>
-            </c:if>
+            </c:if>  
 
             <%-- Description --%>              
             <c:if test="${ showEdits || !empty entity.description}">
@@ -309,9 +262,8 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
             	</c:if>
             </c:if>
                             
-        
             
-            <%-- Properties --%>
+            <%-- Ontology properties --%>
             <c:import url="${entityMergedPropsListJsp}">
                 <c:param name="mode" value="${showEdits ? 'edit' : ''}"/>
                 <c:param name="grouped" value="false"/>
@@ -319,21 +271,27 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
                 <c:param name="unassignedPropsGroupName" value=""/>
             </c:import>
 
-            <p:process>
-                <%-- Citation, if no thumbnail --%>
-                <c:if test="${empty entity.imageThumb}"> 
-                    <jsp:include page="entityCitation.jsp">
-                        <jsp:param name="showEdits" value="${showEdits}" />
-                    </jsp:include>
-	            </c:if>
-                
-                <%-- Keywords --%>
-                <c:if test="${!empty entity.keywordString}">
-                    <p id="keywords">Keywords: ${entity.keywordString}</p>
-                </c:if>
-                
-            </p:process>
+            <%-- Blurb --%>                              
+            <c:if test="${!empty entity.blurb}">
+                 <div class="datatypeProperties">
+                     <div class="datatypePropertyValue">
+                         <div class="statementWrap">
+                             <p:process><div class="description">${entity.blurb}</div></p:process>                        
+                         </div>
+                     </div>
+                 </div>
+            </c:if>   
+                      
+            <%-- Citation, if no thumbnail --%>
+            <c:if test="${empty entity.imageThumb}"> 
+                <jsp:include page="entityCitation.jsp" />
+            </c:if>
             
+            <%-- Keywords --%>
+            <c:if test="${!empty entity.keywordString}">
+                <p:process><p id="keywords">Keywords: ${entity.keywordString}</p></p:process>
+            </c:if>
+                               
             ${requestScope.servletButtons}
         
         <!-- 
