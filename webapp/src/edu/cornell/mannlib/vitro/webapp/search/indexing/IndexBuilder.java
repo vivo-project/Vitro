@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.search.indexing;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,6 +14,10 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
+import edu.cornell.mannlib.vitro.webapp.beans.VClass;
+import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ObjectSourceIface;
 import edu.cornell.mannlib.vitro.webapp.utils.EntityChangeListener;
@@ -35,9 +40,13 @@ import edu.cornell.mannlib.vitro.webapp.utils.EntityChangeListener;
  *
  */
 public class IndexBuilder implements Runnable, EntityChangeListener{
-    List sourceList = new LinkedList();
+    List<ObjectSourceIface> sourceList = new LinkedList<ObjectSourceIface>();
     IndexerIface indexer = null;
-
+    ServletContext context = null;
+    
+    long lastRun = 0;
+    List<String> changedUris = null;         
+    
     public static final boolean UPDATE_DOCS = false;
     public static final boolean NEW_DOCS = true;
     
@@ -48,13 +57,16 @@ public class IndexBuilder implements Runnable, EntityChangeListener{
                 List /*ObjectSourceIface*/ sources ){
         this.indexer = indexer;
         this.sourceList = sources;
-
+        this.context = context;
+        
+        changedUris = new LinkedList<String>();        	
+       	
         //add this to the context as a EntityChangeListener so that we can
         //be notified of entity changes.
         context.setAttribute(EntityChangeListener.class.getName(), this);
     }
 
-    public void addObjectSource(ObjectSourceIface osi) {
+    public void addObjectSource(ObjectSourceIface osi) {    	
         if (osi != null)
             sourceList.add(osi);
     }
@@ -63,7 +75,7 @@ public class IndexBuilder implements Runnable, EntityChangeListener{
         return indexer.isIndexing();
     }
 
-    public List getObjectSourceList() {
+    public List<ObjectSourceIface> getObjectSourceList() {
         return sourceList;
     }
 
@@ -71,7 +83,7 @@ public class IndexBuilder implements Runnable, EntityChangeListener{
         log.debug(this.getClass().getName()
                 + " performing doFullRebuildIndex()\n");
 
-        Iterator sources = sourceList.iterator();
+        Iterator<ObjectSourceIface> sources = sourceList.iterator();
         List listOfIterators = new LinkedList();
         while(sources.hasNext()){
             Object obj = sources.next();
@@ -83,6 +95,10 @@ public class IndexBuilder implements Runnable, EntityChangeListener{
                          + obj.getClass().getName() + "\n"
                          + "\tIt doesn not implement ObjectSourceIface.\n");
         }
+        
+        //clear out changed uris since we are doing a full index rebuild
+        getAndEmptyChangedUris();
+        
         if( listOfIterators.size() == 0){ log.debug("Warning: no ObjectSources found.");}
         doBuild( listOfIterators, true, NEW_DOCS );
         log.debug(this.getClass().getName() + ".doFullRebuildIndex() Done \n");
@@ -92,9 +108,9 @@ public class IndexBuilder implements Runnable, EntityChangeListener{
         doUpdateIndex();
     }
 
-    public void doUpdateIndex() {
-        long since = indexer.getModified() - 60000;
-
+    public void doUpdateIndex() {        
+    	long since = indexer.getModified() - 60000;
+    		    		
         Iterator<ObjectSourceIface> sources = sourceList.iterator();
         List<Iterator<ObjectSourceIface>> listOfIterators = 
             new LinkedList<Iterator<ObjectSourceIface>>();
@@ -108,10 +124,50 @@ public class IndexBuilder implements Runnable, EntityChangeListener{
                         + obj.getClass().getName() + "\n"
                         + "\tIt doesn not implement " + "ObjectSourceIface.\n");
         }
+                     
+        List<Individual> changedInds = addDepResourceClasses(checkForDeletes(getAndEmptyChangedUris()));        
+        listOfIterators.add( (new IndexBuilder.BuilderObjectSource(changedInds)).getUpdatedSinceIterator(0) );
+        
         doBuild( listOfIterators, false,  UPDATE_DOCS );
     }
 
-    public void clearIndex(){
+    private List<Individual> addDepResourceClasses(List<Individual> inds) {
+    	WebappDaoFactory wdf = (WebappDaoFactory)context.getAttribute("webappDaoFactory");
+    	VClassDao vClassDao = wdf.getVClassDao();
+    	java.util.ListIterator<Individual> it = inds.listIterator();
+    	VClass depResVClass = new VClass(VitroVocabulary.DEPENDENT_RESORUCE); 
+    	while(it.hasNext()){
+    		Individual ind = it.next();
+    		List<VClass> classes = ind.getVClasses();
+    		boolean isDepResource = false;
+            for( VClass clazz : classes){
+            	if( !isDepResource && VitroVocabulary.DEPENDENT_RESORUCE.equals(  clazz.getURI() ) ){            		
+            		isDepResource = true;
+            		break;
+            	}
+            }
+            if( ! isDepResource ){ 
+	            for( VClass clazz : classes){   	            
+            		List<String> superClassUris = vClassDao.getAllSuperClassURIs(clazz.getURI());
+            		for( String uri : superClassUris){
+            			if( VitroVocabulary.DEPENDENT_RESORUCE.equals( uri ) ){            				
+            				isDepResource = true;
+            				break;
+            			}
+            		}
+            		if( isDepResource )
+            			break;	            	
+	            }
+            }
+            if( isDepResource){
+            	classes.add(depResVClass);
+            	ind.setVClasses(classes, true);
+            }
+    	}
+    	return inds;
+	}
+
+	public void clearIndex(){
         try {
             indexer.clearIndex();
         } catch (IndexingException e) {
@@ -162,7 +218,7 @@ public class IndexBuilder implements Runnable, EntityChangeListener{
             indexer.endIndexing();
         }
     }
-
+    
     /**
      * Use the back end indexer to index each object that the Iterator returns.
      * @param items
@@ -175,6 +231,23 @@ public class IndexBuilder implements Runnable, EntityChangeListener{
         }
     }
 
+    private List<Individual> checkForDeletes(List<String> uris){
+    	 WebappDaoFactory wdf = (WebappDaoFactory)context.getAttribute("webappDaoFactory");
+    	List<Individual> nonDeletes = new LinkedList<Individual>();
+    	for( String uri: uris){
+    		if( uri != null ){
+    			Individual ind = wdf.getIndividualDao().getIndividualByURI(uri);
+    			if( ind != null)
+    				nonDeletes.add(ind);
+    			else{
+    				log.debug("found delete in changed uris");
+    				entityDeleted(uri);
+    			}
+    		}
+    	}
+    	return nonDeletes;
+    }
+    
     /**
      * Use the backend indexer to index a single item.
      * @param item
@@ -192,12 +265,15 @@ public class IndexBuilder implements Runnable, EntityChangeListener{
 
     /* These methods are so that the IndexBuilder may register for entity changes */
     public void entityAdded(String entityURI) {
-        log.debug("IndexBuilder.entityAdded() " + entityURI);
+        if( log.isDebugEnabled()) 
+        	log.debug("IndexBuilder.entityAdded() " + entityURI);
+        addToChangedUris(entityURI);
         (new Thread(this)).start();
     }
-
+    
     public void entityDeleted(String entityURI) {
-        log.debug("IndexBuilder.entityDeleted() " + entityURI);
+    	if( log.isDebugEnabled()) 
+    		log.debug("IndexBuilder.entityDeleted() " + entityURI);
         Individual ent = new IndividualImpl(entityURI);
         try {
             indexer.removeFromIndex(ent);
@@ -207,7 +283,51 @@ public class IndexBuilder implements Runnable, EntityChangeListener{
     }
 
     public void entityUpdated(String entityURI) {
-        log.debug("IndexBuilder.entityUpdate() " + entityURI);
+    	if( log.isDebugEnabled()) 
+    		log.debug("IndexBuilder.entityUpdate() " + entityURI);
+    	addToChangedUris(entityURI);
         (new Thread(this)).start();
+    }
+        
+    public synchronized void addToChangedUris(String uri){
+    	changedUris.add(uri);
+    }
+        
+    public synchronized void addToChangedUris(Collection<String> uris){
+    	changedUris.addAll(uris);    	
+    }
+    
+    private synchronized List<String> getAndEmptyChangedUris(){
+    	LinkedList<String> out = new LinkedList<String>(); 
+    	out.addAll( changedUris );    	
+    	changedUris = new LinkedList<String>();
+    	return out;
+    }
+    
+    private class BuilderObjectSource implements ObjectSourceIface {
+    	private final List<Individual> individuals; 
+    	public BuilderObjectSource( List<Individual>  individuals){
+    		this.individuals=individuals;
+    	}
+		
+		public Iterator getAllOfThisTypeIterator() {
+			return new Iterator(){
+				final Iterator it = individuals.iterator();
+				
+				public boolean hasNext() {
+					return it.hasNext();
+				}
+				
+				public Object next() {
+					return it.next();
+				}
+				
+				public void remove() { /* not implemented */}				
+			};
+		}
+		
+		public Iterator getUpdatedSinceIterator(long msSinceEpoc) {
+			return getAllOfThisTypeIterator();
+		}
     }
 }
