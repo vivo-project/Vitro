@@ -27,7 +27,11 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ModelMaker;
 import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.shared.Lock;
+import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
@@ -67,6 +71,7 @@ public class EntityController extends VitroHttpServlet {
             VitroRequest vreq = new VitroRequest(req);
             //get URL without hostname or servlet context
             String url = req.getRequestURI().substring(req.getContextPath().length());            
+            
             //Check to see if the request is for a non-information resource, redirect if it is.
             String redirectURL = checkForRedirect ( url, req.getHeader("accept") );
             if( redirectURL != null ){
@@ -76,7 +81,6 @@ public class EntityController extends VitroHttpServlet {
 
             ContentType rdfFormat = checkForLinkedDataRequest(url,req.getHeader("accept"));
             if( rdfFormat != null ){
-            	System.out.println("RDF Format? ");
             	doRdf( vreq, res, rdfFormat );
             	return;
             }                                 
@@ -193,9 +197,6 @@ public class EntityController extends VitroHttpServlet {
             vreq.setAttribute("entityDatapropsListJsp",Controllers.ENTITY_DATAPROP_LIST_JSP);
             vreq.setAttribute("entityMergedPropsListJsp",Controllers.ENTITY_MERGED_PROP_LIST_GROUPED_JSP);
             vreq.setAttribute("entityKeywordsListJsp",Controllers.ENTITY_KEYWORDS_LIST_JSP);
-        } else if (view.equals("rdf.rdf")) { 
-        	writeRDF(indiv, vreq, res);
-			// BJL23 temporarily disabling this until we add filtering of hidden properties (get RDF through Vitro API with filtering DAOs)
         } else {
             log.debug("Found view parameter "+view+" in request for rendering "+indiv.getName());
         }
@@ -229,6 +230,7 @@ public class EntityController extends VitroHttpServlet {
 
         vreq.setAttribute("css",css);
         vreq.setAttribute("scripts", "/templates/entity/entity_inject_head.jsp");
+
         RequestDispatcher rd = vreq.getRequestDispatcher( view );
         rd.forward(vreq,res);		
 	}
@@ -242,14 +244,15 @@ public class EntityController extends VitroHttpServlet {
 			return;
 		}
 				
-		Model ontModel = null;
+		OntModel ontModel = null;
 		HttpSession session = vreq.getSession(false);
 		if( session != null )
-			ontModel =(Model)session.getAttribute("jenaOntModel");		
+			ontModel =(OntModel)session.getAttribute("jenaOntModel");		
 		if( ontModel == null)
-			ontModel = (Model)getServletContext().getAttribute("jenaOntModel");
-				
-		Model newModel = getRDF(indiv, ontModel, ModelFactory.createDefaultModel(), 0);
+			ontModel = (OntModel)getServletContext().getAttribute("jenaOntModel");
+			
+		Model newModel;
+		newModel = getRDF(indiv, ontModel, ModelFactory.createDefaultModel(), 0);		
 		
 		res.setContentType(rdfFormat.getMediaType());
 		String format = ""; 
@@ -402,13 +405,10 @@ public class EntityController extends VitroHttpServlet {
 					return redirectUrl + ".n3";
 				}else if( TTL_MIMETYPE.equals( c.getMediaType() )){
 					return redirectUrl + ".ttl";
-				}else{ //this case shouldn't happen					
-					return redirectUrl + ".rdf";
-				}				
-			}else{
-				//redirect to HTML representation
-				return "/individual/" + m.group(1) + "/" + m.group(1) + ".html";
-			}				
+				}//else send them to html													
+			}
+			//else redirect to HTML representation
+			return "/display/" + m.group(1) ;
 		}else{			
 			return null;
 		}
@@ -417,7 +417,7 @@ public class EntityController extends VitroHttpServlet {
 	private static Pattern RDF_REQUEST = Pattern.compile("^/individual/([^/]*)/\\1.rdf$");
     private static Pattern N3_REQUEST = Pattern.compile("^/individual/([^/]*)/\\1.n3$");
     private static Pattern TTL_REQUEST = Pattern.compile("^/individual/([^/]*)/\\1.ttl$");
-    private static Pattern HTML_REQUEST = Pattern.compile("^/individual/([^/]*)/\\1.html$");
+    private static Pattern HTML_REQUEST = Pattern.compile("^/display/([^/]*)$");
     
     /**  
      * @return null if this is not a linked data request, returns content type if it is a 
@@ -476,59 +476,22 @@ public class EntityController extends VitroHttpServlet {
         // TODO Auto-generated method stub
         return false;
     }
-
-    private void writeRDF(Individual entity, HttpServletRequest req, HttpServletResponse res) {
-    	OntModel ontModel = (OntModel) getServletContext().getAttribute("jenaOntModel");
-    	
-    	Resource i = ontModel.getResource(entity.getURI());
-    	ModelMaker modelMaker = ontModel.getImportModelMaker();
-    	Model newModel = modelMaker.createModel(entity.getURI(), false);
-    	newModel = getRDF(entity, ontModel, newModel, 0);
-    	try {
-    		ServletOutputStream outstream = res.getOutputStream();
-    		/*
-			newModel.remove(newModel.listStatements());
-        	newModel.add(aboutEntity);
-        	aboutEntity.close();
-        	StmtIterator aboutEntity2 = ontModel.listStatements(i , null, (RDFNode)null);
-        	while(aboutEntity2.hasNext()) {
-        		Statement st = aboutEntity2.nextStatement();
-        		Resource o = null;
-        		Property p = st.getPredicate();
-        		RDFNode obj = st.getObject();
-        		if(!(obj instanceof Literal)) o = (Resource)obj;
-        		if(!p.getURI().equals(RDF.type.getURI()) && o!=null) {
-        			StmtIterator aboutObject = ontModel.listStatements(o, null, (RDFNode)null);
-        			newModel.add(aboutObject);
-        		}
-        	}
-        	*/
-        	res.setContentType("application/rdf+xml");
-        	newModel.write(outstream);
-    	}
-    	catch (Throwable e) {
-    		log.error(e);
-    		System.out.println(e);
-    	}
-    	
-    }
-    
-    // Adds data from ontModel about entity to newModel. Go down 1 level if recurse is true
-    private Model getRDF(Individual entity, Model ontModel, Model newModel, int recurseDepth ) {
-    	Resource subj = ontModel.getResource(entity.getURI());
+ 
+    private Model getRDF(Individual entity, OntModel contextModel, Model newModel, int recurseDepth ) {
+    	Resource subj = newModel.getResource(entity.getURI());
     	
     	List<DataPropertyStatement> dstates = entity.getDataPropertyStatements();
     	//System.out.println("data: "+dstates.size());
     	TypeMapper typeMapper = TypeMapper.getInstance();
     	for (DataPropertyStatement ds: dstates) {
-    		Property dp = ontModel.getProperty(ds.getDatapropURI());
+    		Property dp = newModel.getProperty(ds.getDatapropURI());
 	    	Literal lit = null;
 	        if ((ds.getLanguage()) != null && (ds.getLanguage().length()>0)) {
-	        	lit = ontModel.createLiteral(ds.getData(),ds.getLanguage());
+	        	lit = newModel.createLiteral(ds.getData(),ds.getLanguage());
 	        } else if ((ds.getDatatypeURI() != null) && (ds.getDatatypeURI().length()>0)) {
-	        	lit = ontModel.createTypedLiteral(ds.getData(),typeMapper.getSafeTypeByName(ds.getDatatypeURI()));
+	        	lit = newModel.createTypedLiteral(ds.getData(),typeMapper.getSafeTypeByName(ds.getDatatypeURI()));
 	        } else {
-	        	lit = ontModel.createLiteral(ds.getData());
+	        	lit = newModel.createLiteral(ds.getData());
 	        } 
     		newModel.add(newModel.createStatement(subj, dp, lit));
     	}
@@ -537,17 +500,35 @@ public class EntityController extends VitroHttpServlet {
 	    	List<ObjectPropertyStatement> ostates = entity.getObjectPropertyStatements();
 	    	for (ObjectPropertyStatement os: ostates) {
 	    		ObjectProperty objProp = os.getProperty();
-	    		Property op = ontModel.getProperty(os.getPropertyURI());
-	    		Resource obj = ontModel.getResource(os.getObjectURI());
+	    		Property op = newModel.getProperty(os.getPropertyURI());
+	    		Resource obj = newModel.getResource(os.getObjectURI());
 	    		newModel.add(newModel.createStatement(subj, op, obj));
 	    		if( objProp.getStubObjectRelation() )
-	    			newModel.add(getRDF(os.getObject(), ontModel, newModel, recurseDepth + 1));
+	    			newModel.add(getRDF(os.getObject(), contextModel, newModel, recurseDepth + 1));
 	    	}
     	}
     	
+    	newModel = getLabelAndTypes(entity, contextModel, newModel );
     	return newModel;
     }
 
+    /* Get the properties that are difficult to get via a filtered WebappDaoFactory. */
+    private Model getLabelAndTypes(Individual entity, Model ontModel, Model newModel){
+    	for( VClass vclass : entity.getVClasses()){
+    		newModel.add(newModel.getResource(entity.getURI()), RDF.type, newModel.getResource(vclass.getURI()));
+    	}
+    	
+    	ontModel.enterCriticalSection(Lock.READ);
+		try {
+			newModel.add(ontModel.listStatements(ontModel.getResource(entity.getURI()), RDFS.label, (RDFNode)null));
+		} finally {
+			ontModel.leaveCriticalSection();
+		}
+		
+    	return newModel;
+    }
+    
+    
     private void checkForSearch(HttpServletRequest req, Individual ent) {                
         if (req.getSession().getAttribute("LastQuery") != null) {
             VitroQueryWrapper qWrap = (VitroQueryWrapper) req.getSession()
