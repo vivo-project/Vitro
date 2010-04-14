@@ -1,8 +1,9 @@
-package edu.cornell.mannlib.vitro.webapp.edit.n3editing;
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
+package edu.cornell.mannlib.vitro.webapp.edit.n3editing;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -22,6 +23,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
@@ -30,7 +32,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.ServletIdentifierBundleFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.UserToIndIdentifierFactory;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
 
 /**
@@ -83,7 +84,9 @@ public class EditConfiguration {
     String formUrl;
     String editKey;
 
-    EditN3Generator n3generator;   
+    List<N3Validator> validators;
+
+	EditN3Generator n3generator;   
     private String originalJson;
 
     private List<ModelChangePreprocessor> modelChangePreprocessors;
@@ -163,7 +166,7 @@ public class EditConfiguration {
             entityToReturnTo = subjectUri;
 
             urlPatternToReturnTo = obj.getString("urlPatternToReturnTo");
-
+            
             JSONArray predicate = obj.getJSONArray("predicate");
             if( predicate.length() != 2 )
               throw new Error("EditConfiguration predicate field must be an array with two items: [varnameForPredicate, predicateUri]");
@@ -224,7 +227,12 @@ public class EditConfiguration {
         if( getSparqlForAdditionalLiteralsInScope() != null && 
             getSparqlForAdditionalLiteralsInScope().containsKey("currentTime") &&
             USE_SYSTEM_VALUE.equals(getSparqlForAdditionalLiteralsInScope().get("currentTime"))){
-            getLiteralsInScope().put("currentTime", ResourceFactory.createTypedLiteral(new Date()));            
+        	//Updating so that this is represented as an XSD Date Time literal - to allow for comparison later
+        	//Currently it appears that this is only used for file upload 
+            //getLiteralsInScope().put("currentTime", ResourceFactory.createTypedLiteral(new Date()));
+        	SimpleDateFormat dateTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    		String formattedDate = dateTime.format(Calendar.getInstance().getTime());
+    		getLiteralsInScope().put("currentTime", ResourceFactory.createTypedLiteral(formattedDate, XSDDatatype.XSDdateTime));
         }            
         
         /* editing user */
@@ -241,12 +249,15 @@ public class EditConfiguration {
               UserToIndIdentifierFactory.getIndividualsForUser(ids);
                         
             if( userUris == null || userUris.size() == 0 ){
+            	System.out.println("Cound not find user ur for edit request");
                 log.error("Could not find a userUri for edit request, make " +
                         "sure that there is an IdentifierBundleFactory that " +
                 "produces userUri identifiers in the context.");
             } else if( userUris.size() > 1  ){
                 log.error("Found multiple userUris, using the first in list.");
+                System.out.println("Found multiple user uris");
             }else {
+            	System.out.println("EditConfiguration.java - checking system value for User URI " + userUris.get(0));
                 getUrisInScope().put("editingUser",userUris.get(0));
             }
         }   
@@ -950,5 +961,15 @@ public class EditConfiguration {
     public void setResourceModelSelector(ModelSelector resourceModelSelector) {
         if( resourceModelSelector != null )
             this.resourceModelSelector = resourceModelSelector;
-    }       
+    }
+        
+    public List<N3Validator> getValidators() {
+		return validators;
+	}
+
+    public void addValidator( N3Validator validator){
+    	if( this.validators == null )
+    		this.validators = new ArrayList<N3Validator>();
+    	this.validators.add(validator);    		
+    }    
 }

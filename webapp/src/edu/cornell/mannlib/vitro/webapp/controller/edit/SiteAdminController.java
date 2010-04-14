@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.controller.edit;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -79,8 +79,8 @@ public class SiteAdminController extends BaseEditController {
         request.setAttribute("singlePortal",new Boolean(vreq.getWebappDaoFactory().getPortalDao().isSinglePortal()));
         
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);        
-        request.setAttribute("bodyJsp","/siteAdmin/main.jsp");
-        request.setAttribute("scripts","/siteAdmin/scripts.jsp");
+        request.setAttribute("bodyJsp","/siteAdmin/siteAdminMain.jsp");
+        request.setAttribute("scripts","/siteAdmin/siteAdminScripts.jsp");
         request.setAttribute("title",((Portal)request.getAttribute("portalBean")).getAppName() + " Site Administration");
         request.setAttribute("epoKey",epo.getKey());
         try {

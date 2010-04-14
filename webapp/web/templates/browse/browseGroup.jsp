@@ -6,7 +6,8 @@
 <%@ page import="java.util.Iterator" %>
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c" %><%/* this odd thing points to something in web.xml */ %>
 <%@ page errorPage="/error.jsp"%>
-<jsp:useBean id="loginHandler" class="edu.cornell.mannlib.vedit.beans.LoginFormBean" scope="session" />
+
+<%@page import="com.hp.hpl.jena.vocabulary.OWL"%><jsp:useBean id="loginHandler" class="edu.cornell.mannlib.vedit.beans.LoginFormBean" scope="session" />
 <%  /***********************************************
          Display Browse Results (the "Index" menu command)
 
@@ -67,11 +68,14 @@ if( request.getAttribute("classgroupsIsEmpty") != null && ((Boolean)request.getA
                         classObj = classIter.next();
                         if (classObj!=null && classObj instanceof VClass) {
                             VClass theClass=(VClass)classObj;
-                            String linkStr=response.encodeURL("entitylist");
-                if (theClass.getURI() == null)
-                    theClass.setURI("null://null");
-                            String queryStr="?vclassId="+URLEncoder.encode(theClass.getURI(),"UTF-8")+additionalParameterStr; %>
-                            <li><a href="<%=linkStr+queryStr%>"><%=theClass.getName()%></a> (<%=theClass.getEntityCount()%>)</li>
+                            //filter out owl:Thing
+                            if( theClass.getName() == null || OWL.Thing.getURI().equals(theClass.getURI()))
+                            	continue;
+                           	String linkStr=response.encodeURL("entitylist");
+               				if (theClass.getURI() == null)
+                   				theClass.setURI("null://null");
+                           	String queryStr="?vclassId="+URLEncoder.encode(theClass.getURI(),"UTF-8")+additionalParameterStr; %>
+                           	<li><a href="<%=linkStr+queryStr%>"><%=theClass.getName()%></a> (<%=theClass.getEntityCount()%>)</li>
     <%                  }
                     }%>
                     </ul>

@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.edit.validator.impl;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.edit.validator.impl;
 
 import edu.cornell.mannlib.vedit.validator.ValidationObject;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;

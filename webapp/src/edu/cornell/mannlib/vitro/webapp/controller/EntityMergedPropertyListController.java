@@ -1,13 +1,17 @@
-package edu.cornell.mannlib.vitro.webapp.controller;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -23,9 +27,11 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
+import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyInstance;
+import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
@@ -33,18 +39,13 @@ import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.PropertyMaskingSetup;
 
-/**
- * Handles requests for entity information.
- * The methods for sorting Property/ObjectPropertyStatement Lists are here also.
- * @author bdc34
- *
- */
 public class EntityMergedPropertyListController extends VitroHttpServlet {
 
     /**
      * This gets the Entity object in the requestScope "entity" and
-     * sets up a merged property list for it, including Object and Data properties
-     * to be sortable and displayable along with other properties.
+     * sets up a merged property list for it.  This merged list includes 
+     * Object and Data properties.
+     * 
      * After that a jsp is called to draw the data.
      *
      * Expected parameters:
@@ -52,7 +53,7 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
      * Expected Attributes:
      * entity - set to entity to display properties for.
      *
-     * @author bdc34, then jc55
+     * @author jc55 forked this file from EntityPropertyListController  
      */
     
     private static final Log log = LogFactory.getLog(EntityMergedPropertyListController.class.getName());
@@ -173,6 +174,10 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
                 } catch (Exception ex) {
                     log.error("Exception sorting merged property list: " + ex.getMessage());
                 }
+                
+                //deal with collateBySubclass annotations on object properties                
+                mergedPropertyList = collateBySubclass( mergedPropertyList );
+                
                 if (groupedMode) {
                     int groupsCount=0;
                     try {
@@ -212,6 +217,7 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
                     mergedPropertyList.clear();
                 }
             }
+            
             if (groupedMode) {
                 req.setAttribute("groupsList",groupsList);
             } else {
@@ -236,7 +242,7 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
         }
     }
 
-    public void doPost(HttpServletRequest request, HttpServletResponse response)
+	public void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException,IOException {
         doGet(request, response);
     }
@@ -412,4 +418,112 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
             return 0;
         }
     }
+    
+    
+    private List<Property> collateBySubclass(List<Property> mergedPropertyList) {
+    	for( Property prop : mergedPropertyList){
+    		if( prop instanceof ObjectProperty && ((ObjectProperty)prop).getCollateBySubclass() ){    			
+    			collateBySubclass((ObjectProperty)prop);
+    		}
+    	}    	
+    	return mergedPropertyList;
+	}
+    
+    /**
+     * Sort the object property statements for each property so that they 
+     * are sorted first by subclass and then by rdfs:label.
+     * 
+     * This will be tricky since "subclass" is vaguely defined. Here directly 
+     * asserted classes are used.
+     */
+	private void collateBySubclass(ObjectProperty prop) {
+		List<ObjectPropertyStatement> orgStmtList = prop.getObjectPropertyStatements();
+		if( orgStmtList == null )
+			return;
+		Map<String,VClass> directClasses = getDirectClasses( getObjectsFromStmts( orgStmtList ) );
+		//don't do collateBySubclass if there is only one class
+		if( directClasses.size() < 2 )
+			prop.setCollateBySubclass(false); //this overrides the value from the model
+		else{
+			System.out.println("statements for object property: " + orgStmtList.size());
+			//get list of direct classes and sort them 
+			List<VClass> vclasses = new LinkedList<VClass>(directClasses.values());
+			Collections.sort(
+					vclasses, 
+					new Comparator<VClass>(){
+						public int compare(VClass o1, VClass o2) {
+							return o1.getName().compareTo(o2.getName());
+						}
+					});
+			
+			//order object property statements by sorted direct class list
+			List<ObjectPropertyStatement> sortedStmtList = new LinkedList<ObjectPropertyStatement>();
+			for (VClass clazz : vclasses) {
+				// get all obj prop stmts with objects of this class
+				List<ObjectPropertyStatement> stmtsForClass = new ArrayList<ObjectPropertyStatement>();
+				
+				System.out.println("statements for object property: " + orgStmtList.size());
+				Iterator<ObjectPropertyStatement> it = orgStmtList.iterator();
+				while( it.hasNext()){
+					ObjectPropertyStatement stmt = it.next();
+					//if (stmt.getObject().getVClasses(true).contains(clazz)) {
+					
+					Individual obj = stmt.getObject();
+					List<VClass> vclassesForObj = obj.getVClasses(true);					
+					if (vclassesForObj != null && vclassesForObj.contains(clazz)) {
+						System.out.println("adding " + stmt + " to class "
+								+ clazz.getURI());
+						System.out.println("subjectURI " + stmt.getSubjectURI()
+								+ " objectURI" + stmt.getObject().getURI());
+						System.out.println("stmtsForclass size: "
+								+ stmtsForClass.size());						
+						System.out.println("stmtsForclass size: "
+								+ stmtsForClass.size());
+						
+						stmtsForClass.add(stmt);
+					}
+				}
+
+				Collections.sort(stmtsForClass,
+						new Comparator<ObjectPropertyStatement>() {
+							public int compare(ObjectPropertyStatement o1,
+									ObjectPropertyStatement o2) {
+								return o1.getObject().getName().compareTo(
+										o2.getObject().getName());
+							}
+						});
+				System.out.println("stmtsForclass size after sort: "
+						+ stmtsForClass.size());
+				System.out.println("sortedStmtList size before add: "
+						+ sortedStmtList.size());
+				sortedStmtList.addAll(stmtsForClass);
+				System.out.println("sortedStmtList size after add: "
+						+ sortedStmtList.size());
+			}
+			prop.setObjectPropertyStatements(sortedStmtList);
+		}
+			
+	}
+
+
+
+	private List<Individual> getObjectsFromStmts(List<ObjectPropertyStatement> orgStmtList) {
+		List<Individual> individuals = new LinkedList<Individual>();
+		for( ObjectPropertyStatement stmt : orgStmtList ){
+			individuals.add( stmt.getObject() );
+		}			
+		return individuals;
+	}
+
+	private Map<String,VClass> getDirectClasses(List<Individual> objectsFromStmts) {
+		Map<String,VClass> directClasses = new HashMap<String,VClass>();
+
+		for (Individual ind : objectsFromStmts) {
+			for (VClass clazz : ind.getVClasses(true)) {
+				directClasses.put(clazz.getURI(),clazz);
+			}
+		}
+		return directClasses;
+	}
+
 }

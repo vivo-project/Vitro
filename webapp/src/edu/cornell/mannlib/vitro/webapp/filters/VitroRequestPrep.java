@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.filters;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.filters;
 
 import java.io.IOException;
 import java.util.regex.Matcher;
@@ -140,7 +140,7 @@ public class VitroRequestPrep implements Filter {
                 	return;
                 }
                 vreq.setPortal(portal);
-                portalFlag = new PortalFlag((HttpServletRequest)request,_appbean, portal);
+                portalFlag = new PortalFlag((HttpServletRequest)request,_appbean, portal, wdf);
                 vreq.setPortalFlag(portalFlag);
             }
         }catch(FlagException ex){

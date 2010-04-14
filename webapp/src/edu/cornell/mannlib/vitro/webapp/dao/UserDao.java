@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.dao;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.dao;
 
 import edu.cornell.mannlib.vitro.webapp.beans.User;
 
@@ -21,4 +21,8 @@ public interface UserDao {
     public void deleteUser(User user);
 
     public List<String> getIndividualsUserMayEditAs(String userURI);
+    
+    public List<String> getUserAccountEmails();
+    
+    public String getUserEmailAddress(String userURI);
 }

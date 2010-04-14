@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.auth.policy;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.auth.policy;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -17,6 +17,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AddDataPropStmt;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AddObjectPropStmt;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.DropDataPropStmt;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.DropObjectPropStmt;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.EditDataPropStmt;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.EditObjPropStmt;
@@ -178,7 +179,63 @@ public class SelfEditingPolicyTest extends AbstractTestClass {
         Assert.assertNotNull(dec);
         Assert.assertEquals(Authorization.INCONCLUSIVE, dec.getAuthorized());
     }
-
+    
+    @Test
+    public void testForbiddenMoniker(){
+    	  Set<String> badProps = new HashSet<String>();
+          badProps.add(VitroVocabulary.MONIKER);          
+          SelfEditingPolicy badPropPolicy = new SelfEditingPolicy(badProps,null,null,null);
+          
+          RequestedAction whatToAuth = null;
+          
+          whatToAuth = new AddDataPropStmt(
+                  SELFEDITOR_URI, VitroVocabulary.MONIKER ,"someValue", null, null);                
+          PolicyDecision dec = badPropPolicy.isAuthorized(ids, whatToAuth);
+          Assert.assertNotNull(dec);
+          Assert.assertEquals(Authorization.INCONCLUSIVE, dec.getAuthorized());
+          
+          whatToAuth = new AddDataPropStmt(
+                  SAFE_RESOURCE ,VitroVocabulary.MONIKER , "somevalue", null, null);                
+          dec = badPropPolicy.isAuthorized(ids, whatToAuth);
+          Assert.assertNotNull(dec);
+          Assert.assertEquals(Authorization.INCONCLUSIVE, dec.getAuthorized());
+          
+          DataPropertyStatement dps = new DataPropertyStatementImpl();
+          dps.setIndividualURI(SELFEDITOR_URI);
+          dps.setDatapropURI(VitroVocabulary.MONIKER);
+          dps.setData("some moniker");
+          whatToAuth = new EditDataPropStmt(dps);                      
+          dec = badPropPolicy.isAuthorized(ids, whatToAuth);
+          Assert.assertNotNull(dec);
+          Assert.assertEquals(Authorization.INCONCLUSIVE, dec.getAuthorized());
+          
+          
+          //try where moniker is permitted
+          badProps = new HashSet<String>();                   
+          badPropPolicy = new SelfEditingPolicy(badProps,null,null,null);                    
+          
+          whatToAuth = new AddDataPropStmt(
+                  SELFEDITOR_URI, VitroVocabulary.MONIKER ,"somevalue", null, null);                
+          dec = badPropPolicy.isAuthorized(ids, whatToAuth);
+          Assert.assertNotNull(dec);
+          Assert.assertEquals(Authorization.AUTHORIZED, dec.getAuthorized());
+          
+          whatToAuth = new AddDataPropStmt(
+        		  UNSAFE_RESOURCE ,VitroVocabulary.MONIKER , "somevalue", null, null);                
+          dec = badPropPolicy.isAuthorized(ids, whatToAuth);
+          Assert.assertNotNull(dec);
+          Assert.assertEquals(Authorization.INCONCLUSIVE, dec.getAuthorized());
+          
+          dps = new DataPropertyStatementImpl();
+          dps.setIndividualURI(SAFE_RESOURCE);
+          dps.setDatapropURI(VitroVocabulary.MONIKER);
+          dps.setData("some moniker");
+          whatToAuth = new EditDataPropStmt(dps);                      
+          dec = badPropPolicy.isAuthorized(ids, whatToAuth);
+          Assert.assertNotNull(dec);
+          Assert.assertEquals(Authorization.INCONCLUSIVE, dec.getAuthorized());
+    }
+    
     @Test
     public void testVisitIdentifierBundleAddObjectPropStmt() {
         AddObjectPropStmt whatToAuth = new AddObjectPropStmt(

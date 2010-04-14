@@ -17,6 +17,8 @@
 
 %>
 
+    <p><a href="ingest">Ingest Home</a></p>
+
     <h2>Convert CSV to RDF</h2>
 
     <form action="ingest" method="get"i>
@@ -42,6 +44,7 @@
     <p>Class Name for Resources</p>
 
     <select name="destinationModelName">
+        <option value="vitro:baseOntModel">webapp assertions</option>
 <%
     for (Iterator it = maker.listModels(); it.hasNext(); ) {
 	String modelName = (String) it.next();
@@ -53,6 +56,7 @@
     <p>Destination Model</p>
 
    <select name="tboxDestinationModelName">
+        <option value="vitro:baseOntModel">webapp assertions</option>
 <%
     for (Iterator it = maker.listModels(); it.hasNext(); ) {
 	String modelName = (String) it.next();

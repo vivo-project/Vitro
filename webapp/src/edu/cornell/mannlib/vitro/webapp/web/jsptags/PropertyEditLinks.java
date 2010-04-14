@@ -1,13 +1,11 @@
-package edu.cornell.mannlib.vitro.webapp.web.jsptags;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.web.jsptags;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
@@ -16,6 +14,10 @@ import javax.servlet.jsp.tagext.TagSupport;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.ServletIdentifierBundleFactory;
@@ -35,10 +37,15 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActio
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.RdfLiteralHash;
+import edu.cornell.mannlib.vitro.webapp.utils.FrontEndEditingUtils;
+import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 
 /**
  * JSP tag to generate the HTML of links for edit, delete or
@@ -54,6 +61,7 @@ public class PropertyEditLinks extends TagSupport{
     Object item;
     String var;
     String icons;
+    String data;
     
     private static final Log log = LogFactory.getLog(PropertyEditLinks.class.getName());
     
@@ -67,6 +75,9 @@ public class PropertyEditLinks extends TagSupport{
 
     public void setIcons(String ic){ icons = ic; }
     public String getIcons(){ return icons; }
+    
+    public void setData(String data){ this.data = data; }
+    public String getData(){ return data; }
             
     @Override
     public int doStartTag() throws JspException {
@@ -98,7 +109,6 @@ public class PropertyEditLinks extends TagSupport{
         Individual entity = (Individual)pageContext.getRequest().getAttribute("entity");           
                  
         LinkStruct[] links = null;
-        String themeDir = (String)pageContext.getAttribute("themeDir");
 
         //get context prefix needs to end with a slash like "/vivo/" or "/"
         String contextPath =  ((HttpServletRequest)pageContext.getRequest()).getContextPath();
@@ -109,27 +119,52 @@ public class PropertyEditLinks extends TagSupport{
         
         if( item instanceof ObjectPropertyStatement ){
             ObjectPropertyStatement prop = (ObjectPropertyStatement)item;           
-            links = doObjPropStmt( prop, themeDir, policyToAccess(ids, policy, prop), contextPath );
+            links = doObjPropStmt( prop, policyToAccess(ids, policy, prop), contextPath );  
             
         } else if( item instanceof DataPropertyStatement ){
             DataPropertyStatement prop = (DataPropertyStatement)item;
-            links = doDataPropStmt( prop, themeDir, policyToAccess(ids, policy, prop), contextPath );
+            links = doDataPropStmt( prop, policyToAccess(ids, policy, prop), contextPath );
+            
+        } else if (entity == null) {
+            log.error("unable to find an Individual in request using var name 'entity'");
+            return SKIP_BODY;         
             
         } else if( item instanceof ObjectProperty ){
-            ObjectProperty prop = (ObjectProperty)item;           
-            if( entity == null ) {
-                log.error("unable to find an Individual in request using var name 'entity'");
-                return SKIP_BODY;
-            }            
-            links = doObjProp( prop, entity, themeDir, policyToAccess(ids, policy, entity.getURI(), prop), contextPath );
+            ObjectProperty prop = (ObjectProperty)item;                     
+            links = doObjProp( prop, entity, policyToAccess(ids, policy, entity.getURI(), prop), contextPath );  
             
         } else if( item instanceof DataProperty ){
-            DataProperty prop = (DataProperty)item; // a DataProperty populated for this subject individual
-            if( entity == null ) {
-                log.error("unable to find an Individual in request using var name 'entity'");
+            DataProperty prop = (DataProperty)item; // a DataProperty populated for this subject individual            
+            links = doDataProp( prop, entity, policyToAccess(ids, policy, entity.getURI(), prop),contextPath );
+            
+        // Vitro namespace property    
+        } else if (item instanceof String) {            
+            String predicateUri = (String) item;
+            String subjectUri = entity.getURI();
+            if (FrontEndEditingUtils.isVitroNsDataProp(predicateUri)) {
+                if (data == null) { // link to add a new value
+                    links = doVitroNsDataProp( subjectUri, predicateUri, policyToAccess(ids, policy, subjectUri, predicateUri), contextPath );
+                } else { // links to edit or delete an existing value
+                    DataPropertyStatement dps = (DataPropertyStatement) new DataPropertyStatementImpl(subjectUri, predicateUri, data); 
+                    links = doVitroNsDataPropStmt( dps, entity, policyToAccess(ids, policy, dps), contextPath );                       
+                }           
+            } else if (FrontEndEditingUtils.isVitroNsObjProp(predicateUri)) {
+                if (data == null) { // link to add a new value
+                    links = doObjProp( subjectUri, predicateUri, policyToAccess(ids, policy, subjectUri, predicateUri), contextPath );
+                } else { // links to edit or delete an existing value  
+                    // RY **** May need new policyToAccess which gets the specific obj prop statement using the data as well as subject and predicate
+                    // This is NOT the correct object property statement - we need the link individual uri in data, instead of the link URL
+                    // Then we can combine this with doObjPropStmt
+                    ObjectPropertyStatement prop = new ObjectPropertyStatementImpl(subjectUri, predicateUri, data);
+                    links = doObjPropStmt( prop, policyToAccess(ids, policy, prop), contextPath );                       
+                }                    
+            }
+            else {
+                log.error("PropertyEditLinks cannot make links for an object of type " + predicateUri);
                 return SKIP_BODY;
-            }            
-            links = doDataProp( prop, entity, themeDir,policyToAccess(ids, policy, entity.getURI(), prop), contextPath ) ;
+            }
+            
+
         } else {
             log.error("PropertyEditLinks cannot make links for an object of type "+item.getClass().getName());
         	return SKIP_BODY;
@@ -140,7 +175,7 @@ public class PropertyEditLinks extends TagSupport{
         } else {
             try{    
                 JspWriter out = pageContext.getOut();
-                if( links != null ){
+                if( links != null){
                     for( LinkStruct ln : links ){
                         if( ln != null ){
                             out.print( makeElement( ln ) + '\n' );
@@ -155,7 +190,7 @@ public class PropertyEditLinks extends TagSupport{
         return SKIP_BODY;
     }
 
-    protected LinkStruct[] doDataProp(DataProperty dprop, Individual entity, String themeDir, EditLinkAccess[] allowedAccessTypeArray, String contextPath) {
+    protected LinkStruct[] doDataProp(DataProperty dprop, Individual entity, EditLinkAccess[] allowedAccessTypeArray, String contextPath) {
         if( allowedAccessTypeArray == null || dprop == null || allowedAccessTypeArray.length == 0 ) {
             log.debug("null or empty access type array in doDataProp for dprop "+dprop.getPublicName()+"; most likely just a property prohibited from editing");
             return empty_array;
@@ -182,28 +217,74 @@ public class PropertyEditLinks extends TagSupport{
         return links;
     }
 
+    protected LinkStruct[] doVitroNsDataProp(String subjectUri, String propertyUri, EditLinkAccess[] allowedAccessTypeArray, String contextPath) {
+        if( allowedAccessTypeArray == null || subjectUri == null || allowedAccessTypeArray.length == 0 ) {
+            log.debug("null or empty access type array in doDataProp for vitro namespace property " + propertyUri + "; most likely just a property prohibited from editing");
+            return empty_array;
+        }
+        LinkStruct[] links = new LinkStruct[1];
+        
+        Model model =  (Model)pageContext.getServletContext().getAttribute("jenaOntModel");
+        StmtIterator stmts = model.listStatements(model.createResource(subjectUri), 
+                                                  model.getProperty(propertyUri), 
+                                                  (RDFNode) null);  
+        
+        if (stmts.hasNext()) {       
+            log.debug("not showing an \"add\" link for vitro namespace property " + propertyUri + " because it has a limit of 1");
+        } else {       
+            if( contains( allowedAccessTypeArray, EditLinkAccess.ADDNEW ) ){
+                log.debug("vitro namespace property "+propertyUri+" gets an \"add\" link");
+                LinkStruct ls = null;
+                if (propertyUri.equals(VitroVocabulary.IMAGETHUMB)) {
+                    ls = getImageLink(subjectUri, contextPath, "add");                   
+                } else {
+                    String url = makeRelativeHref(contextPath +"edit/editDatapropStmtRequestDispatch.jsp",
+                                                  "subjectUri",   subjectUri,
+                                                  "predicateUri", propertyUri,
+                                                  "vitroNsProp",  "true");
+                    ls = new LinkStruct();
+                    ls.setHref( url );
+                    ls.setType("add");
+                    ls.setMouseoverText("add a new entry");                   
+                }
+                links[0] = ls;
+            } else {
+                log.debug("no add link generated for vitro namespace property "+propertyUri);
+            }
+        }
+        return links;
+    }
 
-    protected LinkStruct[] doObjProp(ObjectProperty oprop, Individual entity, String themeDir, EditLinkAccess[] allowedAccessTypeArray, String contextPath) {
+    protected LinkStruct[] doObjProp(ObjectProperty oprop, Individual entity, EditLinkAccess[] allowedAccessTypeArray, String contextPath) {
         if( allowedAccessTypeArray == null || oprop == null || allowedAccessTypeArray.length == 0 ) {
             log.debug("null or empty access type array in doObjProp for oprop "+oprop.getDomainPublic()+"; most likely just a property prohibited from editing");
             return empty_array;
         }
+
+        return doObjProp(entity.getURI(), oprop.getURI(), allowedAccessTypeArray, contextPath);
+    }
+    
+    protected LinkStruct[] doObjProp(String subjectUri, String predicateUri, EditLinkAccess[] allowedAccessTypeArray, String contextPath) {
+        if( allowedAccessTypeArray == null || subjectUri == null || allowedAccessTypeArray.length == 0 ) {
+            log.debug("null or empty access type array in doObjProp for oprop "+ predicateUri +"; most likely just a property prohibited from editing");
+            return empty_array;
+        }
         LinkStruct[] links = new LinkStruct[1];
 
-        if( contains( allowedAccessTypeArray, EditLinkAccess.ADDNEW )){
+        if( contains( allowedAccessTypeArray, EditLinkAccess.ADDNEW )){           
             String url= makeRelativeHref(contextPath + "edit/editRequestDispatch.jsp",
-                                         "subjectUri",   entity.getURI(),
-                                         "predicateUri", oprop.getURI());
+                                         "subjectUri",   subjectUri,
+                                         "predicateUri", predicateUri);
             LinkStruct ls = new LinkStruct();
             ls.setHref( url );
             ls.setType("add");
-            ls.setMouseoverText("add relationship");
+            ls.setMouseoverText("add " + getObjPropMouseoverLabel(predicateUri));
             links[0]=ls;
         }
         return links;
     }
 
-    protected LinkStruct[] doDataPropStmt(DataPropertyStatement dpropStmt, String themeDir, EditLinkAccess[] allowedAccessTypeArray, String contextPath) {
+    protected LinkStruct[] doDataPropStmt(DataPropertyStatement dpropStmt, EditLinkAccess[] allowedAccessTypeArray, String contextPath) {
         if( allowedAccessTypeArray == null || dpropStmt == null || allowedAccessTypeArray.length == 0 ) {
             log.info("null or empty access type array in doDataPropStmt for "+dpropStmt.getDatapropURI());
             return empty_array;
@@ -211,7 +292,7 @@ public class PropertyEditLinks extends TagSupport{
         LinkStruct[] links = new LinkStruct[2];
         int index=0;
 
-        String dpropHash =  String.valueOf(RdfLiteralHash.makeRdfLiteralHash( dpropStmt ));
+        String dpropHash = String.valueOf(RdfLiteralHash.makeRdfLiteralHash( dpropStmt ));
 
         if( contains( allowedAccessTypeArray, EditLinkAccess.MODIFY ) ){
             log.debug("permission found to UPDATE data property statement "+dpropStmt.getDatapropURI()+" ("+dpropStmt.getData()+") so icon created");
@@ -231,11 +312,6 @@ public class PropertyEditLinks extends TagSupport{
             ls.setMouseoverText("edit this text");
             links[index] = ls;             index++;
 
-
-//             String imgUrl = makeRelativeHref( themeDir + "site_icons/pencil.gif");
-
-//             str += "<a class\"edit image\" href=" + url + " title=\"edit\">" +
-//                     "<img src=" + imgUrl + " alt=\"(edit)\"/></a>\n";
         } else {
             log.debug("NO permission to UPDATE this data property statement ("+dpropStmt.getDatapropURI()+") found in policy");
         }
@@ -252,78 +328,164 @@ public class PropertyEditLinks extends TagSupport{
             ls.setMouseoverText("delete this text");
             links[index] = ls;     index++;
 
-//             String imgUrl = makeRelativeHref( themeDir + "site_icons/trashcan.gif");
-
-//             str += "<a class\"delete image\" href=" + url + " title=\"delete\">" +
-//                     "<img src=" + imgUrl + " alt=\"(delete)\"/></a>\n";
         } else {
             log.debug("NO permission to DELETE this data property statement ("+dpropStmt.getDatapropURI()+") found in policy");
         }
         return links;
     }
 
-    protected LinkStruct[] doObjPropStmt(ObjectPropertyStatement opropStmt, String themeDir2, EditLinkAccess[] allowedAccessTypeArray, String contextPath) {
+    protected LinkStruct[] doVitroNsDataPropStmt(DataPropertyStatement dpropStmt, Individual subject, EditLinkAccess[] allowedAccessTypeArray, String contextPath) {
+        
+        if( allowedAccessTypeArray == null || dpropStmt == null || allowedAccessTypeArray.length == 0 ) {
+            log.debug("Null or empty access type array for vitro namespace property " + dpropStmt.getDatapropURI());
+            return empty_array;
+        }
+
+        String subjectUri = subject.getURI();
+        String predicateUri = dpropStmt.getDatapropURI();
+        
+        LinkStruct[] links = new LinkStruct[2]; 
+        
+        if (predicateUri.equals(VitroVocabulary.IMAGETHUMB)) {
+            if( contains( allowedAccessTypeArray, EditLinkAccess.MODIFY ) ){
+                log.debug("permission found to UPDATE vitro namepsace property statement "+ predicateUri);
+                links[0] = getImageLink(subjectUri, contextPath, "edit");
+                return links; 
+            }
+            else {
+                log.debug("NO permission found to DELETE vitro namespace property " + predicateUri);
+            }           
+        }
+        
+        String value = dpropStmt.getData();        
+        Model model =  (Model)pageContext.getServletContext().getAttribute("jenaOntModel");
+        
+        String dpropHash = null;
+        try{
+        	dpropHash = String.valueOf(RdfLiteralHash.makeVitroNsLiteralHash( subject, predicateUri, value, model ));
+        }catch(IllegalArgumentException ex){
+        	log.debug("could not create hash for " + subject + " " + predicateUri + " " + value);
+        	return links;
+        }
+        
+        String dispatchUrl = contextPath + "edit/editDatapropStmtRequestDispatch.jsp";
+
+        int index = 0;
+        
+        boolean deleteAllowed = ( contains( allowedAccessTypeArray, EditLinkAccess.DELETE ) && 
+            !( predicateUri.equals(VitroVocabulary.LABEL)) || predicateUri.equals(VitroVocabulary.RDF_TYPE) );
+
+        if( contains( allowedAccessTypeArray, EditLinkAccess.MODIFY ) ){
+            log.debug("permission found to UPDATE vitro namepsace property statement "+ predicateUri);
+            LinkStruct ls = new LinkStruct();
+            String url = deleteAllowed 
+                ? makeRelativeHref(dispatchUrl,
+                        "subjectUri",   subjectUri,
+                        "predicateUri", predicateUri,
+                        "datapropKey",  dpropHash,
+                        "vitroNsProp",  "true")
+                : makeRelativeHref(dispatchUrl,
+                        "subjectUri",   subjectUri,
+                        "predicateUri", predicateUri,
+                        "datapropKey",  dpropHash,
+                        "vitroNsProp",  "true",
+                        "deleteProhibited", "prohibited");
+                
+            ls.setHref(url);
+            ls.setType("edit");
+            ls.setMouseoverText(predicateUri.equals("label") ? "edit name" : "edit this text");
+            links[index] = ls; 
+            index++;
+        }
+        else {
+            log.debug("NO permission found to UPDATE vitro namespace property " + predicateUri);
+        }
+
+        // Name and type can be edited but not deleted
+        if ( deleteAllowed ) {
+            LinkStruct ls = new LinkStruct();
+            log.debug("Permission found to DELETE vitro namespace property " + predicateUri);
+            String url = makeRelativeHref(dispatchUrl, 
+                                          "subjectUri", subjectUri,
+                                          "predicateUri", predicateUri,
+                                          "datapropKey",  dpropHash,
+                                          "vitroNsProp", "true",
+                                          "cmd", "delete");
+            ls.setHref(url);
+            ls.setType("delete");
+            ls.setMouseoverText("delete this text");
+            links[index] = ls; 
+            index++;
+        }
+        else {
+            log.debug("NO permission found to DELETE vitro namespace property " + predicateUri);
+        }
+            
+        return links;
+    }
+
+    protected LinkStruct[] doObjPropStmt(ObjectPropertyStatement opropStmt, EditLinkAccess[] allowedAccessTypeArray, String contextPath) {
         if( allowedAccessTypeArray == null || opropStmt == null || allowedAccessTypeArray.length == 0 ) {
             log.info("null or empty access type array in doObjPropStmt for "+opropStmt.getPropertyURI());
             return empty_array;
         }
+        
+        String subjectUri = opropStmt.getSubjectURI();
+        String predicateUri = opropStmt.getPropertyURI();
+        String objectUri = opropStmt.getObjectURI();
+        
+        String mouseoverLabel = getObjPropMouseoverLabel(predicateUri);
+        
         LinkStruct[] links = new LinkStruct[2];
         int index=0;
         
-        if( contains( allowedAccessTypeArray, EditLinkAccess.MODIFY ) ){        	
-            log.debug("permission found to UPDATE object property statement "+opropStmt.getPropertyURI()+" so icon created");
+        if( contains( allowedAccessTypeArray, EditLinkAccess.MODIFY ) ){            
+            log.debug("permission found to UPDATE object property statement "+ predicateUri +" so icon created");
             String url = ( contains( allowedAccessTypeArray, EditLinkAccess.DELETE ) ) 
                 ? makeRelativeHref(contextPath + "edit/editRequestDispatch.jsp",
-                    "subjectUri",   opropStmt.getSubjectURI(),
-                    "predicateUri", opropStmt.getPropertyURI(),
-                    "objectUri",    opropStmt.getObjectURI())
+                    "subjectUri",   subjectUri,
+                    "predicateUri", predicateUri,
+                    "objectUri",    objectUri)
                 : makeRelativeHref(contextPath + "edit/editRequestDispatch.jsp",
-                    "subjectUri",   opropStmt.getSubjectURI(),
-                    "predicateUri", opropStmt.getPropertyURI(),
-                    "objectUri",    opropStmt.getObjectURI(),
+                    "subjectUri",   subjectUri,
+                    "predicateUri", predicateUri,
+                    "objectUri",    objectUri,
                     "deleteProhibited", "prohibited");
 
             LinkStruct ls = new LinkStruct();
             ls.setHref( url );
             ls.setType("edit");
-            ls.setMouseoverText("change this relationship");
+            ls.setMouseoverText("change this " + mouseoverLabel);
             links[index] = ls; index++;
 
-//             String imgUrl = makeRelativeHref( themeDir + "site_icons/pencil.gif");
-
-//             str += "<a class\"edit image\" href=" + url + " title=\"edit\">" +
-//                     "<img src=" + imgUrl + " alt=\"(edit)\"/></a>\n";
         } else {
-            log.debug("NO permission to UPDATE this object property statement ("+opropStmt.getPropertyURI()+") found in policy");
+            log.debug("NO permission to UPDATE this object property statement (" + predicateUri + ") found in policy");
         }
         if( contains( allowedAccessTypeArray, EditLinkAccess.DELETE ) ){
-            log.debug("permission found to DELETE object property statement "+opropStmt.getPropertyURI()+" so icon created");
+            log.debug("permission found to DELETE object property statement "+ predicateUri + " so icon created");
             String url = makeRelativeHref(contextPath + "edit/editRequestDispatch.jsp",
-                    "subjectUri",   opropStmt.getSubjectURI(),
-                    "predicateUri", opropStmt.getPropertyURI(),
-                    "objectUri",    opropStmt.getObjectURI(),
+                    "subjectUri",   subjectUri,
+                    "predicateUri", predicateUri,
+                    "objectUri",    objectUri,
                     "cmd",          "delete");
             LinkStruct ls = new LinkStruct();
             ls.setHref( url );
             ls.setType("delete");
-            ls.setMouseoverText("delete this relationship");
+            ls.setMouseoverText("delete this " + mouseoverLabel);
             links[index] = ls; index++;
 
-//             String imgUrl = makeRelativeHref( themeDir + "site_icons/trashcan.gif");
-
-//             str += "<a class\"delete image\" href=" + url + " title=\"delete\">" +
-//                     "<img src=" + imgUrl + " alt=\"(delete)\"/></a>\n";
         } else {
-            log.debug("NO permission to DELETE this object property statement ("+opropStmt.getPropertyURI()+") found in policy");
+            log.debug("NO permission to DELETE this object property statement (" + predicateUri + ") found in policy");
         }
         return links;
     }
+    
 
     /* ********************* utility methods ********************************* */
     protected static String makeRelativeHref( String baseUrl, String ... queries ) {
         String href = baseUrl;
         if( queries == null || queries.length % 2 != 0 )
-            log.debug("makeRelativeHref() needs a even number of queries");
+            log.debug("makeRelativeHref() needs an even number of queries");
 
         for( int i=0; i < queries.length; i=i+2){
             String separator = ( i==0 ? "?" : "&amp;" );
@@ -369,25 +531,6 @@ public class PropertyEditLinks extends TagSupport{
         return element + "</a>\n";
     }
 
-   
-    
-//    protected Map<Property,EditLinkAccess[]> getAccess(){
-//        //right now we return an all access, all the time hashmap.
-//        return new HashMap<Property,EditLinkAccess[]>(){
-//
-//            public boolean containsKey(Object key) { return true; }
-//
-//            public EditLinkAccess[] get(Object key) {
-//                    EditLinkAccess[] ela = { EditLinkAccess.MODIFY,
-//                            EditLinkAccess.DELETE, EditLinkAccess.ADDNEW,
-//                            EditLinkAccess.INFO, EditLinkAccess.ADMIN  };
-//                    return ela;
-//            }
-//            public boolean isEmpty() { return false; }
-//        };
-//    }
-//    
-    
     public static final EditLinkAccess[] NO_ACCESS = {};
     public static final EditLinkAccess[] ACCESS_TEMPLATE = {}; 
 
@@ -441,9 +584,16 @@ public class PropertyEditLinks extends TagSupport{
     }
 
     protected EditLinkAccess[] policyToAccess( IdentifierBundle ids, PolicyIface policy, String subjectUri, DataProperty item) {
+       
+        String propertyUri = item.getURI();
+        return policyToAccess(ids, policy, subjectUri, propertyUri);
+    }
+
+    protected EditLinkAccess[] policyToAccess( IdentifierBundle ids, PolicyIface policy, String subjectUri, String propertyUri) {
+  
         EditLinkAccess[] access;
-        
-        RequestedAction action = new AddDataPropStmt(subjectUri, item.getURI(), RequestActionConstants.SOME_LITERAL, null, null);
+  
+        RequestedAction action = new AddDataPropStmt(subjectUri, propertyUri, RequestActionConstants.SOME_LITERAL, null, null);
         PolicyDecision dec = policy.isAuthorized(ids, action);
         
         if(  dec != null && dec.getAuthorized() == Authorization.AUTHORIZED ){
@@ -454,7 +604,7 @@ public class PropertyEditLinks extends TagSupport{
         
         return access;
     }
-
+    
     public enum EditLinkAccess{ MODIFY, DELETE, ADDNEW, INFO, ADMIN  };
 
     public class LinkStruct {
@@ -485,12 +635,26 @@ public class PropertyEditLinks extends TagSupport{
         
     }
 
-//    public interface CheckAccess{
-//        boolean access(ObjectProperty prop,          EditLinkAccess access );
-//        boolean access(DataProperty   prop,          EditLinkAccess access );
-//        boolean access(ObjectPropertyStatement stmt, EditLinkAccess access );   
-//        boolean access(DataPropertyStatement   stmt, EditLinkAccess access );        
-//    }
-
     private LinkStruct[] empty_array = {};
+    
+    private LinkStruct getImageLink(String subjectUri, String contextPath, String action) {
+        LinkStruct ls = new LinkStruct();
+        String url = makeRelativeHref(contextPath + "uploadimages.jsp",
+                                      "entityUri", subjectUri);
+        ls.setHref(url);
+        ls.setType(action);
+        ls.setMouseoverText("upload a  new image");        
+        return ls;
+    }
+    
+    private String getObjPropMouseoverLabel(String propertyUri) {
+        String mouseoverText = "relationship"; // default
+
+        if (StringUtils.equalsOneOf(propertyUri, VitroVocabulary.ADDITIONAL_LINK, VitroVocabulary.PRIMARY_LINK)) {
+            mouseoverText = "link";
+        } 
+        
+        return mouseoverText;
+    }
+
 }

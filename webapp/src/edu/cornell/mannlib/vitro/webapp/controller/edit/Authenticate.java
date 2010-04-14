@@ -1,9 +1,11 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
-import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -17,6 +19,7 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vedit.beans.LoginFormBean;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.RoleBasedPolicy.AuthRole;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
@@ -70,7 +73,7 @@ public class Authenticate extends VitroHttpServlet  {
             */
             String userEnteredPasswordAfterMd5Conversion=f.getLoginPassword(); // won't be null
             if ( userEnteredPasswordAfterMd5Conversion.equals("") ) { // shouldn't get through JS form verification
-                f.setErrorMsg( "loginPassword","please enter a password" );
+                f.setErrorMsg( "loginPassword","Please enter a password" );
                 f.setLoginStatus("bad_password");
                 response.sendRedirect(loginUrl);
                 return;
@@ -104,30 +107,40 @@ public class Authenticate extends VitroHttpServlet  {
                         f.setErrorMsg( "loginPassword", "Please try entering provided password again" );
                         f.setLoginStatus("first_login_mistyped");
                     } else if (user.getOldPassword().equals( userEnteredPasswordAfterMd5Conversion ) ) {
-                        f.setErrorMsg( "loginPassword", "Please pick a different password from initially provided one" );
+                        f.setErrorMsg( "loginPassword", "Please pick a different password from the one provided initially" );
                         f.setLoginStatus("changing_password_repeated_old");
                     } else { // successfully provided different, private password
-                        f.setErrorMsg( "loginPassword", "Please re-enter new private password" );
+                        f.setErrorMsg( "loginPassword", "Please re-enter new private password for confirmation" );
                         user.setMd5password(userEnteredPasswordAfterMd5Conversion);
                         user.setLoginCount(1);
                         userDao.updateUser(user);
                         f.setLoginStatus("changing_password");
-                    }
+                    }                    
+                } else if (f.getLoginStatus().equals("first_login_changing_password")) { // User has been prompted to change password, but has re-entered the original one
+                    f.setErrorMsg( "loginPassword", "Please pick a different password from the one provided initially" ); // store password in database but force immediate re-entry
+                    user.setOldPassword(user.getMd5password());
+                    userDao.updateUser(user);
+                    f.setLoginStatus("first_login_changing_password");                                       
                 } else { // entered a password that matches initial md5password in database; now force them to change it
                     // oldpassword could be null or not null depending on number of mistries
                     f.setErrorMsg( "loginPassword", "Please now choose a private password" ); // store password in database but force immediate re-entry
                     user.setOldPassword(user.getMd5password());
                     userDao.updateUser(user);
-                    f.setLoginStatus("first_login_changing_password");
+                    f.setLoginStatus("first_login_changing_password");     
                 }
                 response.sendRedirect(loginUrl);
                 return;
             } else if ( user.getMd5password()==null ) { // DBA has forced entry of a new password for user with a loginCount > 0
                 if ( user.getOldPassword() != null && user.getOldPassword().equals( userEnteredPasswordAfterMd5Conversion ) ) {
-                    f.setErrorMsg( "loginPassword", "Please pick a different password from your old one" );
+                    f.setErrorMsg( "loginPassword", "Please pick a different password from your previous one" );
                     f.setLoginStatus("changing_password_repeated_old");
-                } else {
-                    f.setErrorMsg( "loginPassword", "Please re-enter new password" );
+                } else if (f.getLoginStatus().equals("changing_password")){ // User has been prompted to change password, but has re-entered the original one
+                    f.setErrorMsg( "loginPassword", "Please pick a different password from the one provided initially" );
+                    user.setMd5password(userEnteredPasswordAfterMd5Conversion);
+                    userDao.updateUser(user);
+                    f.setLoginStatus("changing_password");                                           
+                } else { // User has entered provided password; now prompt to change password
+                    f.setErrorMsg( "loginPassword", "Please re-enter new password for confirmation" );
                     user.setMd5password(userEnteredPasswordAfterMd5Conversion);
                     userDao.updateUser(user);
                     f.setLoginStatus("changing_password");
@@ -193,6 +206,16 @@ public class Authenticate extends VitroHttpServlet  {
             			: contextPostLoginRequest;
             	}
             }
+            
+            if( AuthRole.USER.roleUri().equals( user.getRoleURI() ) ){
+            	/* if this is a self editor, redirect the to their page */
+	           	List<String> uris = userDao.getIndividualsUserMayEditAs(user.getURI());
+	           	if( uris != null && uris.size() > 0 ){
+	           		forwardStr = request.getContextPath() + "/individual?uri=" + URLEncoder.encode(uris.get(0), "UTF-8");
+	           	}
+            }
+           
+            
             if (forwardStr != null) {
                 response.sendRedirect(forwardStr);
             } else {

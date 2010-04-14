@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.beans;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.beans;
 
 import java.util.Date;
 
@@ -27,6 +27,12 @@ public class DataPropertyStatementImpl implements VitroTimeWindowedResource, Dat
         if( individual != null ){
             this.individualURI = individual.getURI();
         }
+    }
+    
+    public DataPropertyStatementImpl(String individualUri, String propertyUri, String data){
+        individualURI = individualUri;
+        datapropURI = propertyUri;
+        this.data = data;
     }
 
     public String getIndividualURI() {

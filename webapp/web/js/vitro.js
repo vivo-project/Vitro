@@ -1,11 +1,11 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
 /**
    These are utility functions for Vitro js pages.
    Much of this is based on the util.js of the DWR package.
 
    @author Brian Caruso
 */
-
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
 var vitroJsLoaded = true; //just indicates that this file was loaded.
 

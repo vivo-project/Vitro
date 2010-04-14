@@ -1,8 +1,10 @@
 <%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
 
+<%@ page import="java.util.List" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep"%>
+
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
-<%@page import="edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep"%>
-    
+
 <c:set var='themeDir'><c:out value='${portalBean.themeDir}'/></c:set>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
@@ -58,6 +60,7 @@
 	    </script>
 <%	} %>
 
+    <script language="javascript" type="text/javascript" src="../js/extensions/String.js"></script>
 	<script language="javascript" type="text/javascript" src="../js/jquery.js"></script>
 	<script language="javascript" type="text/javascript" src="../js/jquery_plugins/jquery.bgiframe.pack.js"></script>
 	<script language="javascript" type="text/javascript" src="../js/jquery_plugins/thickbox/thickbox-compressed.js"></script>
@@ -69,11 +72,19 @@
 	    <link rel="stylesheet" type="text/css" href="../js/jquery_plugins/jquery-autocomplete/jquery.autocomplete.css"/>	
 <%	} %>
 
-    <!-- <link rel="stylesheet" type="text/css" href="../js/jquery_plugins/ui.datepicker.css"/> -->
+
+    <c:forEach var="jsFile" items="${customJs}">
+        <script type="text/javascript" src="${jsFile}"></script>
+    </c:forEach>     
+    
     <link rel="stylesheet" type="text/css" href="../js/jquery_plugins/thickbox/thickbox.css"/>	
 	<link rel="stylesheet" type="text/css" href="<c:url value="/${themeDir}css/screen.css"/>" media="screen"/>	
 	<link rel="stylesheet" type="text/css" href="<c:url value="/${themeDir}css/formedit.css" />" media="screen"/>
-    
+
+    <c:forEach var="cssFile" items="${customCss}">
+        <link rel="stylesheet" type="text/css" href="${cssFile}" media="screen"/>
+    </c:forEach>
+     
     <title>Edit</title>
 </head>
 <body class="formsEdit">

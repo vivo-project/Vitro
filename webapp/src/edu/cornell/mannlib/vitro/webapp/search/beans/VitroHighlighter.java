@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.search.beans;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.search.beans;
 
 import java.io.IOException;
 import java.io.Reader;

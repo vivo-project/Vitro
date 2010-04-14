@@ -50,15 +50,20 @@
 					</c:choose>
 				</td>
 			</tr>
+			 <%-- RY Disabling large image upload
 			<tr>
+			    
 				<td bgcolor="#C8D8F8"  valign="middle" colspan="1" align="right">
 					<b>Select Image Type</b><br/>
 				</td>
+
 				<td colspan="2" bgcolor="#C8D8F8" align="left">
 					<input type="radio" name="type" value="thumb" checked="checked" onclick="refreshModeValue();" /> thumbnail (150px x 150px only)
 					<input type="radio" name="type" value="larger" onclick="refreshModeValue();" /> optional larger image
 				</td>
+				
 			</tr>
+			--%>
 			<tr>
 				<td bgcolor="#C8D8F8"  valign="middle" colspan="1" align="right">
 					<b>Select Image File</b>
@@ -67,6 +72,7 @@
 					</c:if>
 				</td>
 				<td colspan="2" bgcolor="#C8D8F8" align="left">
+				    <span class="comment">Please note: images are displayed at approximately 150x150px. Smaller images may not display optimally.</span><br />
 					<input type="file" size="55" name="file1"/>
 				</td>
 			</tr>
@@ -76,7 +82,7 @@
 				</td>
 				<td colspan="2" bgcolor="#C8D8F8" align="left">
 					<div id="thumbnailExtra" class="dropdownExtra">
-						(instead of uploading larger image -- use only when uploading thumbnail)<br/>
+						<%--  (instead of uploading larger image -- use only when uploading thumbnail)<br/> --%>
 						<input type="text" size="55" name="remoteURL" value="http://"/>
 					</div>
 				</td>
@@ -106,6 +112,7 @@
 			</tr>
 			<tr>
 				<td colspan="3" bgcolor="#C8D8F8" align="center">
+				    <input type="hidden" name="type" value="thumb" /> <%-- RY Disabling large image upload --%>
 					<p>
 					<input type="submit" name="submitMode" class="yellowbutton" value="Upload Selected Image"/>
 					<input type="reset" name="reset" class="plainbutton" value="Reset" onclick="document.refreshForm.submit();"/>

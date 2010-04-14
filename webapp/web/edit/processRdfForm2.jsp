@@ -16,6 +16,8 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.Field" %>
 <%@ page import="java.io.StringReader" %>
 <%@ page import="java.util.*" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="java.util.Iterator" %>
 <%@page import="org.apache.commons.logging.LogFactory"%>
 <%@page import="org.apache.commons.logging.Log"%>
 <%@page import="org.apache.commons.fileupload.servlet.ServletFileUpload"%>
@@ -56,24 +58,29 @@ are well formed.
     if (!selfEditing && !LoginFormBean.loggedIn(request, LoginFormBean.NON_EDITOR)) {
 %>
         
-<%@page import="edu.cornell.mannlib.vitro.webapp.dao.jena.DependentResourceDeleteJena"%><c:redirect url="<%= Controllers.LOGIN %>" />      
+<%@page import="edu.cornell.mannlib.vitro.webapp.dao.jena.DependentResourceDeleteJena"%>
+<%@page import="edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory"%>
+<%@page import="edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl"%>
+<%@page import="edu.cornell.mannlib.vitro.webapp.beans.Individual"%>
+<%@page import="edu.cornell.mannlib.vitro.webapp.dao.InsertException"%><c:redirect url="<%= Controllers.LOGIN %>" />      
 <%
     }
     
     VitroRequest vreq = new VitroRequest(request);
+    WebappDaoFactory wdf = vreq.getWebappDaoFactory();
     
     /* the post parameters seem to get consumed by the parsing so
      * we have to make a copy. */
     Map <String,String[]> queryParameters = null;        
     queryParameters = vreq.getParameterMap();        
-    
+  
     List<String>  errorMessages = new ArrayList<String>();                   
     
     EditConfiguration editConfig = EditConfiguration.getConfigFromSession(session,vreq,queryParameters);    
     if( editConfig == null ){
         %><jsp:forward page="/edit/messages/noEditConfigFound.jsp"/><%
     }    
-    EditN3Generator n3Subber = editConfig.getN3Generator();        
+    EditN3Generator n3Subber = editConfig.getN3Generator();     
     EditSubmission submission = new EditSubmission(queryParameters,editConfig);
            
     /* entity to return to may be a variable */
@@ -85,7 +92,7 @@ are well formed.
     Map<String,String> errors =  submission.getValidationErrors();
     EditSubmission.putEditSubmissionInSession(session,submission);
 
-    if(  errors != null && ! errors.isEmpty() ){   	
+    if(  errors != null && ! errors.isEmpty() ){   
         String form = editConfig.getFormUrl();
         vreq.setAttribute("formUrl", form);
         %><jsp:forward page="${formUrl}"/><%
@@ -101,7 +108,7 @@ are well formed.
     
     boolean requestIsAnUpdate =  editConfig.getObject() != null && editConfig.getObject().trim().length() > 0; 
     if( requestIsAnUpdate ){
-        //handle a update of an existing object    
+        //handle update of an existing object    
         if( log.isDebugEnabled()) log.debug("editing an existing resource: " + editConfig.getObject() );        
 
         Map<String,List<String>> fieldAssertions = fieldsToAssertionMap(editConfig.getFields());
@@ -109,20 +116,20 @@ are well formed.
         
         /* ********** URIs and Literals on Form/Parameters *********** */
         fieldAssertions = n3Subber.substituteIntoValues(  submission.getUrisFromForm(), submission.getLiteralsFromForm(), fieldAssertions);
-        if(log.isDebugEnabled()) logAddRetract("subsititued in literals from form",fieldAssertions,fieldRetractions);
+        if(log.isDebugEnabled()) logAddRetract("substituted in literals from form",fieldAssertions,fieldRetractions);
         entToReturnTo = n3Subber.subInUris(submission.getUrisFromForm(),entToReturnTo);        
         //fieldRetractions does NOT get values from form.
         
         /* ****************** URIs and Literals in Scope ************** */
         fieldAssertions = n3Subber.substituteIntoValues(editConfig.getUrisInScope(), editConfig.getLiteralsInScope(), fieldAssertions );
         fieldRetractions = n3Subber.substituteIntoValues(editConfig.getUrisInScope(), editConfig.getLiteralsInScope(), fieldRetractions);
-        if(log.isDebugEnabled()) logAddRetract("subsititued in URIs and Literals from scope",fieldAssertions,fieldRetractions);
+        if(log.isDebugEnabled()) logAddRetract("substituted in URIs and Literals from scope",fieldAssertions,fieldRetractions);
         entToReturnTo = n3Subber.subInUris(editConfig.getUrisInScope(),entToReturnTo);
         
         //do edits ever need new resources? (YES)
-        Map<String,String> varToNewResource = newToUriMap(editConfig.getNewResources(),resourcesModel);
+        Map<String,String> varToNewResource = newToUriMap(editConfig.getNewResources(),wdf);
         fieldAssertions = n3Subber.substituteIntoValues(varToNewResource, null, fieldAssertions);
-        if(log.isDebugEnabled()) logAddRetract("subsititued in URIs for new resources",fieldAssertions,fieldRetractions);
+        if(log.isDebugEnabled()) logAddRetract("substituted in URIs for new resources",fieldAssertions,fieldRetractions);
         entToReturnTo = n3Subber.subInUris(varToNewResource,entToReturnTo);
         //fieldRetractions does NOT get values from form.
 
@@ -192,32 +199,32 @@ are well formed.
         //sub in resource uris off form
         n3Required = n3Subber.subInUris(submission.getUrisFromForm(), n3Required);
         n3Optional = n3Subber.subInUris(submission.getUrisFromForm(), n3Optional);        
-        if(log.isDebugEnabled()) logRequuiredOpt("subsititued in URIs  off from ",n3Required,n3Optional);
+        if(log.isDebugEnabled()) logRequiredOpt("substituted in URIs  off from ",n3Required,n3Optional);
         entToReturnTo = n3Subber.subInUris(submission.getUrisFromForm(), entToReturnTo);
 
         //sub in literals from form
         n3Required = n3Subber.subInLiterals(submission.getLiteralsFromForm(), n3Required);
         n3Optional = n3Subber.subInLiterals(submission.getLiteralsFromForm(), n3Optional);
-        if(log.isDebugEnabled()) logRequuiredOpt("subsititued in literals off from ",n3Required,n3Optional);
+        if(log.isDebugEnabled()) logRequiredOpt("substituted in literals off from ",n3Required,n3Optional);
 
         /* ****************** URIs and Literals in Scope ************** */        
         n3Required = n3Subber.subInUris( editConfig.getUrisInScope(), n3Required);
         n3Optional = n3Subber.subInUris( editConfig.getUrisInScope(), n3Optional);
-        if(log.isDebugEnabled()) logRequuiredOpt("subsititued in URIs from scope ",n3Required,n3Optional);
+        if(log.isDebugEnabled()) logRequiredOpt("substituted in URIs from scope ",n3Required,n3Optional);
         entToReturnTo = n3Subber.subInUris(editConfig.getUrisInScope(), entToReturnTo);
         
         n3Required = n3Subber.subInLiterals( editConfig.getLiteralsInScope(), n3Required);
         n3Optional = n3Subber.subInLiterals( editConfig.getLiteralsInScope(), n3Optional);
-        if(log.isDebugEnabled()) logRequuiredOpt("subsititued in Literals from scope ",n3Required,n3Optional);
+        if(log.isDebugEnabled()) logRequiredOpt("substituted in Literals from scope ",n3Required,n3Optional);
         
         /* ****************** New Resources ********************** */
-        Map<String,String> varToNewResource = newToUriMap(editConfig.getNewResources(),resourcesModel);         
+        Map<String,String> varToNewResource = newToUriMap(editConfig.getNewResources(),wdf);         
 
         //if we are editing an existing prop, no new resources will be substituted since the var will
         //have already been substituted in by urisInScope.
         n3Required = n3Subber.subInUris( varToNewResource, n3Required);
         n3Optional = n3Subber.subInUris( varToNewResource, n3Optional);
-        if(log.isDebugEnabled()) logRequuiredOpt("subsititued in URIs for new resources  ",n3Required,n3Optional);               
+        if(log.isDebugEnabled()) logRequiredOpt("substituted in URIs for new resources  ",n3Required,n3Optional);               
         entToReturnTo = n3Subber.subInUris(varToNewResource, entToReturnTo);
         
         //deal with required N3
@@ -296,14 +303,14 @@ are well formed.
     List<ModelChangePreprocessor> modelChangePreprocessors = editConfig.getModelChangePreprocessors();
     if ( modelChangePreprocessors != null ) {
         for ( ModelChangePreprocessor pp : modelChangePreprocessors ) {
-        	pp.preprocess( actualRetractions, actualAssertions );
+        	pp.preprocess( actualRetractions, actualAssertions, request );
         }
     }
     
     // get the model to write to here in case a preprocessor has switched the write layer
     OntModel writeModel = editConfig.getWriteModelSelector().getModel(request,application);  
    
-    String editorUri = EditN3Utils.getEditorUri(vreq,session,application);    
+    String editorUri = EditN3Utils.getEditorUri(vreq,session,application); 
     Lock lock = null;
     try{
         lock =  writeModel.getLock();
@@ -363,26 +370,48 @@ are well formed.
      
     /* ******************** Utility methods ********************** */
     
-    public Map<String,String> newToUriMap(Map<String,String> newResources, Model model){
-        HashMap<String,String> newUris = new HashMap<String,String>();
-        for( String key : newResources.keySet()){
-            newUris.put(key,makeNewUri(newResources.get(key), model));
+    public Map<String,String> newToUriMap(Map<String,String> newResources, WebappDaoFactory wdf){
+        HashMap<String,String> newVarsToUris = new HashMap<String,String>();
+        HashSet<String> newUris = new HashSet<String>();
+        for( String key : newResources.keySet()){        	
+            String prefix = newResources.get(key);
+        	String uri = makeNewUri(prefix, wdf);
+        	while( newUris.contains(uri) ){
+        		uri = makeNewUri(prefix,wdf);
+        	}
+        	newVarsToUris.put(key,uri);
+        	newUris.add(uri);
         }
-         return newUris;
+         return newVarsToUris;
     }
 
     
-    public String makeNewUri(String prefix, Model model){
-        if( prefix == null || prefix.length() == 0 )
-            prefix = defaultUriPrefix;
-
-        String uri = prefix + Math.abs( random.nextInt() );
-        Resource r = ResourceFactory.createResource(uri);
-        while( model.containsResource(r) ){
-            uri = prefix + random.nextInt();
-            r = ResourceFactory.createResource(uri);
+    public String makeNewUri(String prefix, WebappDaoFactory wdf){
+        if( prefix == null || prefix.length() == 0 ){
+        	String uri = null;       
+        	try{
+        		uri = wdf.getIndividualDao().getUnusedURI(null);
+            }catch(InsertException ex){
+            	log.error("could not create uri");
+            }        
+			return uri;
         }
-        return uri;
+        
+        String goodURI = null;
+        int attempts = 0;
+        while( goodURI == null && attempts < 30 ){            
+            Individual ind = new IndividualImpl();
+            ind.setURI( prefix + random.nextInt() );
+            try{
+        		goodURI = wdf.getIndividualDao().getUnusedURI(ind);
+            }catch(InsertException ex){
+            	log.debug("could not create uri");
+            }
+            attempts++;
+        }        
+        if( goodURI == null )
+        	log.error("could not create uri for prefix " + prefix);
+        return goodURI;
     }
 
     static Random random = new Random();
@@ -468,7 +497,7 @@ are well formed.
         return true;
     }
   
-    private boolean logRequuiredOpt(String msg, List<String>required, List<String>optional){
+    private boolean logRequiredOpt(String msg, List<String>required, List<String>optional){
         log.debug(msg);
         if( required != null ) log.debug( "required: " + required.toString() );
         if( optional != null ) log.debug( "optional: " +  optional.toString() );

@@ -20,20 +20,8 @@
     ObjectProperty prop = (ObjectProperty)request.getAttribute("predicate");
 
     VitroRequest vreq = new VitroRequest(request);
-    WebappDaoFactory wdf = vreq.getWebappDaoFactory();
-    if( prop.getRangeVClassURI() == null ) {
-    	log.debug("Property has null for its range class URI");
-    	// If property has no explicit range, we will use e.g. owl:Thing.
-    	// Typically an allValuesFrom restriction will come into play later.
-    	VClass top = wdf.getVClassDao().getTopConcept();
-    	prop.setRangeVClassURI(top.getURI());
-    	log.debug("Using "+prop.getRangeVClassURI());
-    }
-
-    VClass rangeClass = wdf.getVClassDao().getVClassByURI( prop.getRangeVClassURI());
-    if( rangeClass == null ) log.debug("Cannot find class for range for property.  Looking for " + prop.getRangeVClassURI() );    
+    WebappDaoFactory wdf = vreq.getWebappDaoFactory();  
 %>
-
 
 <%@page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.SelectListGenerator"%>
 <%@page import="java.util.Map"%><v:jsonset var="queryForInverse" >
@@ -96,11 +84,14 @@
   }
 </c:set>
 
-<%  /* now put edit configuration Json object into session */
+<%  
+    log.debug(request.getAttribute("editjson"));
+
+    /* now put edit configuration Json object into session */
     EditConfiguration editConfig = new EditConfiguration((String)request.getAttribute("editjson"));
     EditConfiguration.putConfigInSession(editConfig, session);
     String formTitle   ="";
-    String submitLabel ="";
+    String submitLabel ="";   
     Model model = (Model)application.getAttribute("jenaOntModel");
     if( request.getAttribute("object") != null ){//this block is for an edit of an existing object property statement
         editConfig.prepareForObjPropUpdate( model );
@@ -109,8 +100,29 @@
     } else {
         editConfig.prepareForNonUpdate( model );
         if ( prop.getOfferCreateNewOption() ) {
+        	//Try to get the name of the class to select from
+       	  	VClass classOfObjectFillers = null;
+    
+		    if( prop.getRangeVClassURI() == null ) {    	
+		    	// If property has no explicit range, try to get classes 
+		    	List<VClass> classes = wdf.getVClassDao().getVClassesForProperty(subject.getVClassURI(), prop.getURI());
+		    	if( classes == null || classes.size() == 0 || classes.get(0) == null ){	    	
+			    	// If property has no explicit range, we will use e.g. owl:Thing.
+			    	// Typically an allValuesFrom restriction will come into play later.	    	
+			    	classOfObjectFillers = wdf.getVClassDao().getTopConcept();	    	
+		    	} else {
+		    		if( classes.size() > 1 )
+		    			log.debug("Found multiple classes when attempting to get range vclass.");
+		    		classOfObjectFillers = classes.get(0);
+		    	}
+		    }else{
+		    	classOfObjectFillers = wdf.getVClassDao().getVClassByURI(prop.getRangeVClassURI());
+		    	if( classOfObjectFillers == null )
+		    		classOfObjectFillers = wdf.getVClassDao().getTopConcept();
+		    }
+        	
             log.debug("property set to offer \"create new\" option; custom form: ["+prop.getCustomEntryForm()+"]");
-            formTitle   = "Select an existing "+rangeClass.getName()+" for "+subject.getName();
+            formTitle   = "Select an existing "+classOfObjectFillers.getName()+" for "+subject.getName();
             submitLabel = "select existing";
         } else {
             formTitle   = "Add an entry to: <em>"+prop.getDomainPublic()+"</em>";

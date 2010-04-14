@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.flags;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.flags;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -9,6 +9,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
 import edu.cornell.mannlib.vitro.webapp.flags.RequestToPortalFlag;
 
@@ -118,10 +119,11 @@ public class PortalFlag   {
      * Use this to make a new PortalFlag from the http request and the ServletContext.
      *
      * @param req
+     * @param wdf TODO
      */
-    public PortalFlag(HttpServletRequest req,ApplicationBean appBean, Portal portalBean)
+    public PortalFlag(HttpServletRequest req,ApplicationBean appBean, Portal portalBean, WebappDaoFactory wdf)
         throws FlagException {
-        RequestToPortalFlag.preparePortalStateForFiltering(this, req,appBean,portalBean);
+        RequestToPortalFlag.preparePortalStateForFiltering(this, req,appBean,portalBean,wdf);
     }
 
     /******************* methods *************************/

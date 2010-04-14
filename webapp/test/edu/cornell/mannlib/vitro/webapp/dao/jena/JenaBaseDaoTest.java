@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.dao.jena;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import java.io.StringReader;
 
@@ -8,12 +8,18 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
+import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
+import com.hp.hpl.jena.ontology.OntProperty;
+import com.hp.hpl.jena.ontology.Restriction;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.vocabulary.RDFS;
+import com.hp.hpl.jena.vocabulary.XSD;
 
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
@@ -29,141 +35,104 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 
 public class JenaBaseDaoTest {
+	String isDependentRelation =
+		" <"+VitroVocabulary.PROPERTY_STUBOBJECTPROPERTYANNOT+"> \"true\"^^xsd:boolean .\n" ;
 	
+	String nosePropIsDependentRel = 
+	"<"+VitroVocabulary.PROPERTY_STUBOBJECTPROPERTYANNOT+"> rdf:type owl:AnnotationProperty .\n" +
+    " ex:hasNose " + isDependentRelation;
+	
+    String prefixesN3 = 
+        "@prefix vitro: <" + VitroVocabulary.vitroURI + "> . \n" +
+        "@prefix xsd: <" + XSD.getURI() + "> . \n " +                   
+        "@prefix rdf:  <" + RDF.getURI() + "> . \n"+
+        "@prefix rdfs: <" + RDFS.getURI() + "> . \n"+
+        "@prefix owl:  <" + OWL.getURI() + "> . \n" +
+        "@prefix ex: <http://example.com/> . \n" ;
+    
 	@Test
 	public void smartRemoveTestForIndivdiualDelete(){
 		
-		OntModel model = ModelFactory.createOntologyModel();
-		WebappDaoFactoryJena wdfj = new WebappDaoFactoryJena( model );
-
-		/* Need to have the DEPENDENT_RESOURCE class in the model */
-		VClass cls = new VClass();
-		cls.setURI(VitroVocabulary.DEPENDENT_RESOURCE);
-		try {
-			wdfj.getVClassDao().insertNewVClass(cls);
-		} catch (InsertException e1) {
-			Assert.fail("could not create class for dependentResourc");
-		}
+		String n3 = prefixesN3 + 
+			"ex:prop1 rdf:type owl:ObjectProperty ." +
+			"ex:prop1 rdfs:label \"Prop 1 Dependent Relation\" ." +
+			"ex:prop1 " + isDependentRelation;
+					
+		Model readInModel = (ModelFactory.createDefaultModel()).read(new StringReader(n3), "", "N3");
+		OntModel ontModel = ModelFactory.createOntologyModel();
+		ontModel.add(readInModel);
+		WebappDaoFactoryJena wdfj = new WebappDaoFactoryJena( ontModel);
 		
-		/* Need to have an Object Property */
-		ObjectProperty op = new ObjectProperty();
-		op.setURI("http://example.com/prop1");
 		try {
-			wdfj.getObjectPropertyDao().insertObjectProperty(op);
-		} catch (InsertException e1) {
-			Assert.fail("Could not create object property.");
-		}
-		
-		Individual ind = new IndividualImpl();
-		ind.setURI("http://example.com/bob");
-		ind.setName("Smith, Bob");
-		try {
-			wdfj.getIndividualDao().insertNewIndividual(ind);
-		} catch (InsertException e) {
-			Assert.fail("Could not create new Individual Smith, Bob");
-		}
-				
-		Individual indxyz = new IndividualImpl();
-		indxyz.setURI("http://example.com/depResXYZ");
-		indxyz.setName("depResXYZ");
-		indxyz.setVClassURI(VitroVocabulary.DEPENDENT_RESOURCE);
-		try {
+			ObjectProperty prop1 = wdfj.getObjectPropertyDao().getObjectPropertyByURI("http://example.com/prop1");
+			Assert.assertNotNull(prop1);
+			
+			Individual ind = new IndividualImpl();
+			ind.setURI("http://example.com/bob");
+			ind.setName("Smith, Bob");		
+			
+			wdfj.getIndividualDao().insertNewIndividual(ind);			
+					
+			Individual indxyz = new IndividualImpl();
+			indxyz.setURI("http://example.com/depResXYZ");
+			indxyz.setName("depResXYZ");			
 			wdfj.getIndividualDao().insertNewIndividual(indxyz);			
-		} catch (InsertException e) {
-			Assert.fail("Could not create new Individual depResXYZ");
-		}				
-		StmtIterator it = model.listStatements(model.createResource("http://example.com/depResXYZ"),
-				RDF.type, model.createResource(VitroVocabulary.DEPENDENT_RESOURCE));
-		Assert.assertTrue("depResXYZ did not get rdf:type vitro:dependentResource" ,
-				it != null && it.nextStatement() != null);
+			
+			Individual indAbc = new IndividualImpl();
+			indAbc.setURI("http://example.com/depResNested");
+			indAbc.setName("depResNested");					
+			wdfj.getIndividualDao().insertNewIndividual(indAbc);								
 		
-		Individual indAbc = new IndividualImpl();
-		indAbc.setURI("http://example.com/depResNested");
-		indAbc.setName("depResNested");
-		indAbc.setVClassURI(VitroVocabulary.DEPENDENT_RESOURCE);
-		try {
-			wdfj.getIndividualDao().insertNewIndividual(indAbc);			
-		} catch (InsertException e) {
-			Assert.fail("Could not create new Individual depResNested");
-		}	
-		it = model.listStatements(model.createResource("http://example.com/depResNested"),
-				RDF.type, model.createResource(VitroVocabulary.DEPENDENT_RESOURCE));
-		Assert.assertTrue("depResNested did not get rdf:type vitro:dependentResource" ,
-				it != null && it.nextStatement() != null);
+			ObjectPropertyStatement ops = new ObjectPropertyStatementImpl();
+			ops.setSubjectURI("http://example.com/bob");
+			ops.setPropertyURI("http://example.com/prop1");
+			ops.setObjectURI("http://example.com/depResXYZ");
+			wdfj.getObjectPropertyStatementDao().insertNewObjectPropertyStatement(ops);
 		
-		
-		ObjectPropertyStatement ops = new ObjectPropertyStatementImpl();
-		ops.setSubjectURI("http://example.com/bob");
-		ops.setPropertyURI("http://example.com/prop1");
-		ops.setObjectURI("http://example.com/depResXYZ");
-		wdfj.getObjectPropertyStatementDao().insertNewObjectPropertyStatement(ops);
-		
-		ops = new ObjectPropertyStatementImpl();
-		ops.setSubjectURI("http://example.com/depResXYZ");
-		ops.setPropertyURI("http://example.com/prop1");
-		ops.setObjectURI("http://example.com/depResNested");
-		wdfj.getObjectPropertyStatementDao().insertNewObjectPropertyStatement(ops);
-		
-		String expected = "<rdf:RDF\n"+
-		"    xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\n"+
-		"    xmlns:j.0=\"http://vitro.mannlib.cornell.edu/ns/vitro/0.7#\"\n"+
-		"    xmlns:xsd=\"http://www.w3.org/2001/XMLSchema#\"\n"+
-		"    xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\"\n"+
-		"    xmlns:owl=\"http://www.w3.org/2002/07/owl#\"\n"+
-		"    xmlns:j.1=\"http://example.com/\" > \n"+
-		"  <rdf:Description rdf:about=\"http://example.com/bob\">\n"+
-		"    <j.0:modTime rdf:datatype=\"http://www.w3.org/2001/XMLSchema#dateTime\">2010-01-25T15:27:54</j.0:modTime>\n"+
-		"    <rdfs:label xml:lang=\"en-US\">Smith, Bob</rdfs:label>\n"+
-		"    <rdf:type rdf:resource=\"http://www.w3.org/2002/07/owl#Thing\"/>\n"+
-		"  </rdf:Description>\n"+
-		"  <rdf:Description rdf:about=\"http://vitro.mannlib.cornell.edu/ns/vitro/0.7#DependentResource\">\n"+
-		"    <j.0:displayRankAnnot rdf:datatype=\"http://www.w3.org/2001/XMLSchema#int\">-1</j.0:displayRankAnnot>\n"+
-		"    <j.0:displayLimitAnnot rdf:datatype=\"http://www.w3.org/2001/XMLSchema#int\">-1</j.0:displayLimitAnnot>\n"+
-		"    <rdf:type rdf:resource=\"http://www.w3.org/2002/07/owl#Class\"/>\n"+
-		"  </rdf:Description>\n"+
-		"  <rdf:Description rdf:about=\"http://example.com/prop1\">\n"+
-		"    <j.0:selectFromExistingAnnot rdf:datatype=\"http://www.w3.org/2001/XMLSchema#boolean\">true</j.0:selectFromExistingAnnot>\n"+
-		"    <j.0:displayLimitAnnot rdf:datatype=\"http://www.w3.org/2001/XMLSchema#int\">5</j.0:displayLimitAnnot>\n"+
-		"    <rdf:type rdf:resource=\"http://www.w3.org/2002/07/owl#ObjectProperty\"/>\n"+
-		"  </rdf:Description>\n"+
-		"</rdf:RDF>";
-		
-		wdfj.getIndividualDao().deleteIndividual("http://example.com/depResXYZ");
-		
-		
-		Model expectedModel = (ModelFactory.createOntologyModel()).read(new StringReader(expected), "", "RDF/XML");
-		
-		//modtime times make it difficult to compare graphs
-		wipeOutModTime(expectedModel);
-		wipeOutModTime(model);
-		
-		Assert.assertTrue( model.isIsomorphicWith(expectedModel));		
+			ops = new ObjectPropertyStatementImpl();
+			ops.setSubjectURI("http://example.com/depResXYZ");
+			ops.setPropertyURI("http://example.com/prop1");
+			ops.setObjectURI("http://example.com/depResNested");
+			wdfj.getObjectPropertyStatementDao().insertNewObjectPropertyStatement(ops);
+			
+			wdfj.getIndividualDao().deleteIndividual("http://example.com/depResXYZ");
+			
+			String expected =
+				"@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> . "+
+				"@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> ."+
+				"@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> ."+
+				"@prefix owl:     <http://www.w3.org/2002/07/owl#> . "+
+				"<http://example.com/bob>      a       owl:Thing ; " +
+				"    rdfs:label \"Smith, Bob\"@en-US . "+
+				"<http://example.com/prop1>  " +
+				"    a       owl:ObjectProperty ; " +
+				"    rdfs:label \"Prop 1 Dependent Relation\" ; " +
+			         isDependentRelation ;
+										
+			Model expectedModel = (ModelFactory.createOntologyModel()).read(new StringReader(expected), "", "N3");
+			
+			//modtime times make it difficult to compare graphs
+			wipeOutModTime(expectedModel);
+			wipeOutModTime(ontModel);			  
+			    			
+			Assert.assertTrue( ontModel.isIsomorphicWith(expectedModel) );	
+			} catch (InsertException e) {
+				Assert.fail(e.getMessage());
+		}
 	}
 	
 	@Test
 	public void smartRemoveTestForObjPropStmtDelete(){
-		
+		String n3 = prefixesN3 + 
+			"ex:prop1 rdf:type owl:ObjectProperty ." +
+			"ex:prop1 rdfs:label \"Prop 1 Dependent Relation\" ." +
+			"ex:prop1 " + isDependentRelation;
+				
+		Model readInModel = (ModelFactory.createDefaultModel()).read(new StringReader(n3), "", "N3");
 		OntModel model = ModelFactory.createOntologyModel();
-		WebappDaoFactoryJena wdfj = new WebappDaoFactoryJena( model );
-
-		/* Need to have the DEPENDENT_RESOURCE class in the model */
-		VClass cls = new VClass();
-		cls.setURI(VitroVocabulary.DEPENDENT_RESOURCE);
-		try {
-			wdfj.getVClassDao().insertNewVClass(cls);
-		} catch (InsertException e1) {
-			Assert.fail("could not create class for dependentResourc");
-		}
-		
-		/* Need to have an Object Property */
-		ObjectProperty op = new ObjectProperty();
-		op.setURI("http://example.com/prop1");
-		try {
-			wdfj.getObjectPropertyDao().insertObjectProperty(op);
-		} catch (InsertException e1) {
-			Assert.fail("Could not create object property.");
-		}
-		
+		model.add(readInModel);
+		WebappDaoFactoryJena wdfj = new WebappDaoFactoryJena( model);								
+				
 		Individual ind = new IndividualImpl();
 		ind.setURI("http://example.com/bob");
 		ind.setName("Smith, Bob");
@@ -176,31 +145,20 @@ public class JenaBaseDaoTest {
 		Individual indxyz = new IndividualImpl();
 		indxyz.setURI("http://example.com/depResXYZ");
 		indxyz.setName("depResXYZ");
-		indxyz.setVClassURI(VitroVocabulary.DEPENDENT_RESOURCE);
 		try {
 			wdfj.getIndividualDao().insertNewIndividual(indxyz);			
 		} catch (InsertException e) {
 			Assert.fail("Could not create new Individual depResXYZ");
 		}				
-		StmtIterator it = model.listStatements(model.createResource("http://example.com/depResXYZ"),
-				RDF.type, model.createResource(VitroVocabulary.DEPENDENT_RESOURCE));
-		Assert.assertTrue("depResXYZ did not get rdf:type vitro:dependentResource" ,
-				it != null && it.nextStatement() != null);
 		
 		Individual indAbc = new IndividualImpl();
 		indAbc.setURI("http://example.com/depResNested");
 		indAbc.setName("depResNested");
-		indAbc.setVClassURI(VitroVocabulary.DEPENDENT_RESOURCE);
 		try {
 			wdfj.getIndividualDao().insertNewIndividual(indAbc);			
 		} catch (InsertException e) {
 			Assert.fail("Could not create new Individual depResNested");
-		}	
-		it = model.listStatements(model.createResource("http://example.com/depResNested"),
-				RDF.type, model.createResource(VitroVocabulary.DEPENDENT_RESOURCE));
-		Assert.assertTrue("depResNested did not get rdf:type vitro:dependentResource" ,
-				it != null && it.nextStatement() != null);
-		
+		}			
 		
 		ObjectPropertyStatement ops = new ObjectPropertyStatementImpl();
 		ops.setSubjectURI("http://example.com/bob");
@@ -213,31 +171,6 @@ public class JenaBaseDaoTest {
 		ops.setPropertyURI("http://example.com/prop1");
 		ops.setObjectURI("http://example.com/depResNested");
 		wdfj.getObjectPropertyStatementDao().insertNewObjectPropertyStatement(ops);
-		
-		String expected = "<rdf:RDF\n"+
-		"    xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\n"+
-		"    xmlns:j.0=\"http://vitro.mannlib.cornell.edu/ns/vitro/0.7#\"\n"+
-		"    xmlns:xsd=\"http://www.w3.org/2001/XMLSchema#\"\n"+
-		"    xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\"\n"+
-		"    xmlns:owl=\"http://www.w3.org/2002/07/owl#\"\n"+
-		"    xmlns:j.1=\"http://example.com/\" > \n"+
-		"  <rdf:Description rdf:about=\"http://example.com/bob\">\n"+
-		"    <j.0:modTime rdf:datatype=\"http://www.w3.org/2001/XMLSchema#dateTime\">2010-01-25T15:27:54</j.0:modTime>\n"+
-		"    <rdfs:label xml:lang=\"en-US\">Smith, Bob</rdfs:label>\n"+
-		"    <rdf:type rdf:resource=\"http://www.w3.org/2002/07/owl#Thing\"/>\n"+
-		"  </rdf:Description>\n"+
-		"  <rdf:Description rdf:about=\"http://vitro.mannlib.cornell.edu/ns/vitro/0.7#DependentResource\">\n"+
-		"    <j.0:displayRankAnnot rdf:datatype=\"http://www.w3.org/2001/XMLSchema#int\">-1</j.0:displayRankAnnot>\n"+
-		"    <j.0:displayLimitAnnot rdf:datatype=\"http://www.w3.org/2001/XMLSchema#int\">-1</j.0:displayLimitAnnot>\n"+
-		"    <rdf:type rdf:resource=\"http://www.w3.org/2002/07/owl#Class\"/>\n"+
-		"  </rdf:Description>\n"+
-		"  <rdf:Description rdf:about=\"http://example.com/prop1\">\n"+
-		"    <j.0:selectFromExistingAnnot rdf:datatype=\"http://www.w3.org/2001/XMLSchema#boolean\">true</j.0:selectFromExistingAnnot>\n"+
-		"    <j.0:displayLimitAnnot rdf:datatype=\"http://www.w3.org/2001/XMLSchema#int\">5</j.0:displayLimitAnnot>\n"+
-		"    <rdf:type rdf:resource=\"http://www.w3.org/2002/07/owl#ObjectProperty\"/>\n"+
-		"  </rdf:Description>\n"+
-		"</rdf:RDF>";
-								
 		
 		ops = new ObjectPropertyStatementImpl();
 		ops.setSubjectURI("http://example.com/bob");
@@ -245,8 +178,20 @@ public class JenaBaseDaoTest {
 		ops.setObjectURI("http://example.com/depResXYZ");
 		wdfj.getObjectPropertyStatementDao().deleteObjectPropertyStatement(ops);
 		
-		Model expectedModel = (ModelFactory.createOntologyModel()).read(new StringReader(expected), "", "RDF/XML");
-		
+		String expected =
+			"@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> . "+
+			"@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> ."+
+			"@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> ."+
+			"@prefix owl:     <http://www.w3.org/2002/07/owl#> . "+
+			"<http://example.com/bob>      a       owl:Thing ; " +
+			"    rdfs:label \"Smith, Bob\"@en-US . "+
+			"<http://example.com/prop1>  " +
+			"    a       owl:ObjectProperty ; " +
+			"    rdfs:label \"Prop 1 Dependent Relation\" ; " +
+			     isDependentRelation ;
+									
+		Model expectedModel = (ModelFactory.createOntologyModel()).read(new StringReader(expected), "", "N3");		
+				
 		//modtime times make it difficult to compare graphs
 		wipeOutModTime(expectedModel);
 		wipeOutModTime(model);
@@ -254,107 +199,174 @@ public class JenaBaseDaoTest {
 		Assert.assertTrue( model.isIsomorphicWith(expectedModel));		
 	}
 	
+	
 	@Test
-	public void smartRemoveTestForObjPropDelete(){
+	public void smartRemoveTestForObjPropDelete(){				
+		String n3 = prefixesN3 + 
+			"ex:prop1 rdf:type owl:ObjectProperty ." +
+			"ex:prop1 rdfs:label \"Prop 1 Dependent Relation\" ." +
+			"ex:prop1 " + isDependentRelation;
+					
+		Model readInModel = (ModelFactory.createDefaultModel()).read(new StringReader(n3), "", "N3");
+		OntModel ontModel = ModelFactory.createOntologyModel();
+		ontModel.add(readInModel);
+		WebappDaoFactoryJena wdfj = new WebappDaoFactoryJena( ontModel);
 		
-		OntModel model = ModelFactory.createOntologyModel();
-		WebappDaoFactoryJena wdfj = new WebappDaoFactoryJena( model );
-
-		/* Need to have the DEPENDENT_RESOURCE class in the model */
-		VClass cls = new VClass();
-		cls.setURI(VitroVocabulary.DEPENDENT_RESOURCE);
 		try {
-			wdfj.getVClassDao().insertNewVClass(cls);
-		} catch (InsertException e1) {
-			Assert.fail("could not create class for dependentResourc");
-		}
-		
-		/* Need to have an Object Property */
-		ObjectProperty op = new ObjectProperty();
-		op.setURI("http://example.com/prop1");
-		try {
-			wdfj.getObjectPropertyDao().insertObjectProperty(op);
-		} catch (InsertException e1) {
-			Assert.fail("Could not create object property.");
-		}
-		
-		Individual ind = new IndividualImpl();
-		ind.setURI("http://example.com/bob");
-		ind.setName("Smith, Bob");
-		try {
-			wdfj.getIndividualDao().insertNewIndividual(ind);
-		} catch (InsertException e) {
-			Assert.fail("Could not create new Individual Smith, Bob");
-		}
-				
-		Individual indxyz = new IndividualImpl();
-		indxyz.setURI("http://example.com/depResXYZ");
-		indxyz.setName("depResXYZ");
-		indxyz.setVClassURI(VitroVocabulary.DEPENDENT_RESOURCE);
-		try {
+			ObjectProperty prop1 = wdfj.getObjectPropertyDao().getObjectPropertyByURI("http://example.com/prop1");
+			Assert.assertNotNull(prop1);
+			
+			Individual ind = new IndividualImpl();
+			ind.setURI("http://example.com/bob");
+			ind.setName("Smith, Bob");		
+			
+			wdfj.getIndividualDao().insertNewIndividual(ind);			
+					
+			Individual indxyz = new IndividualImpl();
+			indxyz.setURI("http://example.com/depResXYZ");
+			indxyz.setName("depResXYZ");			
 			wdfj.getIndividualDao().insertNewIndividual(indxyz);			
-		} catch (InsertException e) {
-			Assert.fail("Could not create new Individual depResXYZ");
-		}				
-		StmtIterator it = model.listStatements(model.createResource("http://example.com/depResXYZ"),
-				RDF.type, model.createResource(VitroVocabulary.DEPENDENT_RESOURCE));
-		Assert.assertTrue("depResXYZ did not get rdf:type vitro:dependentResource" ,
-				it != null && it.nextStatement() != null);
+			
+			Individual indAbc = new IndividualImpl();
+			indAbc.setURI("http://example.com/depResNested");
+			indAbc.setName("depResNested");					
+			wdfj.getIndividualDao().insertNewIndividual(indAbc);								
 		
-		Individual indAbc = new IndividualImpl();
-		indAbc.setURI("http://example.com/depResNested");
-		indAbc.setName("depResNested");
-		indAbc.setVClassURI(VitroVocabulary.DEPENDENT_RESOURCE);
-		try {
-			wdfj.getIndividualDao().insertNewIndividual(indAbc);			
-		} catch (InsertException e) {
-			Assert.fail("Could not create new Individual depResNested");
-		}	
-		it = model.listStatements(model.createResource("http://example.com/depResNested"),
-				RDF.type, model.createResource(VitroVocabulary.DEPENDENT_RESOURCE));
-		Assert.assertTrue("depResNested did not get rdf:type vitro:dependentResource" ,
-				it != null && it.nextStatement() != null);
+			ObjectPropertyStatement ops = new ObjectPropertyStatementImpl();
+			ops.setSubjectURI("http://example.com/bob");
+			ops.setPropertyURI("http://example.com/prop1");
+			ops.setObjectURI("http://example.com/depResXYZ");
+			wdfj.getObjectPropertyStatementDao().insertNewObjectPropertyStatement(ops);
 		
-		
-		ObjectPropertyStatement ops = new ObjectPropertyStatementImpl();
-		ops.setSubjectURI("http://example.com/bob");
-		ops.setPropertyURI("http://example.com/prop1");
-		ops.setObjectURI("http://example.com/depResXYZ");
-		wdfj.getObjectPropertyStatementDao().insertNewObjectPropertyStatement(ops);
-		
-		ops = new ObjectPropertyStatementImpl();
-		ops.setSubjectURI("http://example.com/depResXYZ");
-		ops.setPropertyURI("http://example.com/prop1");
-		ops.setObjectURI("http://example.com/depResNested");
-		wdfj.getObjectPropertyStatementDao().insertNewObjectPropertyStatement(ops);
-		
-		String expected = "<rdf:RDF\n"+
-		"    xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\n"+
-		"    xmlns:j.0=\"http://vitro.mannlib.cornell.edu/ns/vitro/0.7#\"\n"+
-		"    xmlns:xsd=\"http://www.w3.org/2001/XMLSchema#\"\n"+
-		"    xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\"\n"+
-		"    xmlns:owl=\"http://www.w3.org/2002/07/owl#\"\n"+
-		"    xmlns:j.1=\"http://example.com/\" > \n"+
-		"  <rdf:Description rdf:about=\"http://example.com/bob\">\n"+
-		"    <rdfs:label xml:lang=\"en-US\">Smith, Bob</rdfs:label>\n"+
-		"    <rdf:type rdf:resource=\"http://www.w3.org/2002/07/owl#Thing\"/>\n"+
-		"  </rdf:Description>\n"+
-		"  <rdf:Description rdf:about=\"http://vitro.mannlib.cornell.edu/ns/vitro/0.7#DependentResource\">\n"+
-		"    <j.0:displayRankAnnot rdf:datatype=\"http://www.w3.org/2001/XMLSchema#int\">-1</j.0:displayRankAnnot>\n"+
-		"    <j.0:displayLimitAnnot rdf:datatype=\"http://www.w3.org/2001/XMLSchema#int\">-1</j.0:displayLimitAnnot>\n"+
-		"    <rdf:type rdf:resource=\"http://www.w3.org/2002/07/owl#Class\"/>\n"+
-		"  </rdf:Description>\n"+
-		"</rdf:RDF>";
-								
-		wdfj.getObjectPropertyDao().deleteObjectProperty(op);
-		
-		Model expectedModel = (ModelFactory.createOntologyModel()).read(new StringReader(expected), "", "RDF/XML");
-		
-		//modtime times make it difficult to compare graphs
-		wipeOutModTime(expectedModel);
-		wipeOutModTime(model);
-		Assert.assertTrue( model.isIsomorphicWith(expectedModel));		
+			ops = new ObjectPropertyStatementImpl();
+			ops.setSubjectURI("http://example.com/depResXYZ");
+			ops.setPropertyURI("http://example.com/prop1");
+			ops.setObjectURI("http://example.com/depResNested");
+			wdfj.getObjectPropertyStatementDao().insertNewObjectPropertyStatement(ops);
+			
+			wdfj.getObjectPropertyDao().deleteObjectProperty(prop1);
+			
+			String expected =
+				"@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> . "+
+				"@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> ."+
+				"@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> ."+
+				"@prefix owl:     <http://www.w3.org/2002/07/owl#> . "+
+				"<http://example.com/bob>      a       owl:Thing ; " +
+				"    rdfs:label \"Smith, Bob\"@en-US . " ;
+										
+			Model expectedModel = (ModelFactory.createOntologyModel()).read(new StringReader(expected), "", "N3");
+			
+			//modtime times make it difficult to compare graphs
+			wipeOutModTime(expectedModel);
+			wipeOutModTime(ontModel);			  
+			    			
+			Assert.assertTrue( ontModel.isIsomorphicWith(expectedModel) );	
+			} catch (InsertException e) {
+				Assert.fail(e.getMessage());
+		}
 	}
+	
+//	@Test
+//	public void smartRemoveTestForObjPropDelete(){
+//		
+//		OntModel model = ModelFactory.createOntologyModel();
+//		WebappDaoFactoryJena wdfj = new WebappDaoFactoryJena( model );
+//
+//		/* Need to have the DEPENDENT_RESOURCE class in the model */
+//		VClass cls = new VClass();
+//		//cls.setURI(VitroVocabulary.DEPENDENT_RESOURCE);
+//		try {
+//			wdfj.getVClassDao().insertNewVClass(cls);
+//		} catch (InsertException e1) {
+//			Assert.fail("could not create class for dependentResourc");
+//		}
+//		
+//		/* Need to have an Object Property */
+//		ObjectProperty op = new ObjectProperty();
+//		op.setURI("http://example.com/prop1");
+//		try {
+//			wdfj.getObjectPropertyDao().insertObjectProperty(op);
+//		} catch (InsertException e1) {
+//			Assert.fail("Could not create object property.");
+//		}
+//		
+//		Individual ind = new IndividualImpl();
+//		ind.setURI("http://example.com/bob");
+//		ind.setName("Smith, Bob");
+//		try {
+//			wdfj.getIndividualDao().insertNewIndividual(ind);
+//		} catch (InsertException e) {
+//			Assert.fail("Could not create new Individual Smith, Bob");
+//		}
+//				
+//		Individual indxyz = new IndividualImpl();
+//		indxyz.setURI("http://example.com/depResXYZ");
+//		indxyz.setName("depResXYZ");
+//		//indxyz.setVClassURI(VitroVocabulary.DEPENDENT_RESOURCE);
+//		try {
+//			wdfj.getIndividualDao().insertNewIndividual(indxyz);			
+//		} catch (InsertException e) {
+//			Assert.fail("Could not create new Individual depResXYZ");
+//		}				
+////		StmtIterator it = model.listStatements(model.createResource("http://example.com/depResXYZ"),
+////				RDF.type, model.createResource(VitroVocabulary.DEPENDENT_RESOURCE));
+////		Assert.assertTrue("depResXYZ did not get rdf:type vitro:dependentResource" ,
+////				it != null && it.nextStatement() != null);
+//		
+//		Individual indAbc = new IndividualImpl();
+//		indAbc.setURI("http://example.com/depResNested");
+//		indAbc.setName("depResNested");
+////		indAbc.setVClassURI(VitroVocabulary.DEPENDENT_RESOURCE);
+//		try {
+//			wdfj.getIndividualDao().insertNewIndividual(indAbc);			
+//		} catch (InsertException e) {
+//			Assert.fail("Could not create new Individual depResNested");
+//		}	
+////		it = model.listStatements(model.createResource("http://example.com/depResNested"),
+////				RDF.type, model.createResource(VitroVocabulary.DEPENDENT_RESOURCE));
+////		Assert.assertTrue("depResNested did not get rdf:type vitro:dependentResource" ,
+////				it != null && it.nextStatement() != null);
+//		
+//		
+//		ObjectPropertyStatement ops = new ObjectPropertyStatementImpl();
+//		ops.setSubjectURI("http://example.com/bob");
+//		ops.setPropertyURI("http://example.com/prop1");
+//		ops.setObjectURI("http://example.com/depResXYZ");
+//		wdfj.getObjectPropertyStatementDao().insertNewObjectPropertyStatement(ops);
+//		
+//		ops = new ObjectPropertyStatementImpl();
+//		ops.setSubjectURI("http://example.com/depResXYZ");
+//		ops.setPropertyURI("http://example.com/prop1");
+//		ops.setObjectURI("http://example.com/depResNested");
+//		wdfj.getObjectPropertyStatementDao().insertNewObjectPropertyStatement(ops);
+//		
+//		String expected = "<rdf:RDF\n"+
+//		"    xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\n"+
+//		"    xmlns:j.0=\"http://vitro.mannlib.cornell.edu/ns/vitro/0.7#\"\n"+
+//		"    xmlns:xsd=\"http://www.w3.org/2001/XMLSchema#\"\n"+
+//		"    xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\"\n"+
+//		"    xmlns:owl=\"http://www.w3.org/2002/07/owl#\"\n"+
+//		"    xmlns:j.1=\"http://example.com/\" > \n"+
+//		"  <rdf:Description rdf:about=\"http://example.com/bob\">\n"+
+//		"    <rdfs:label xml:lang=\"en-US\">Smith, Bob</rdfs:label>\n"+
+//		"    <rdf:type rdf:resource=\"http://www.w3.org/2002/07/owl#Thing\"/>\n"+
+//		"  </rdf:Description>\n"+
+//		"  <rdf:Description rdf:about=\"http://vitro.mannlib.cornell.edu/ns/vitro/0.7#DependentResource\">\n"+
+//		"    <j.0:displayRankAnnot rdf:datatype=\"http://www.w3.org/2001/XMLSchema#int\">-1</j.0:displayRankAnnot>\n"+
+//		"    <j.0:displayLimitAnnot rdf:datatype=\"http://www.w3.org/2001/XMLSchema#int\">-1</j.0:displayLimitAnnot>\n"+
+//		"    <rdf:type rdf:resource=\"http://www.w3.org/2002/07/owl#Class\"/>\n"+
+//		"  </rdf:Description>\n"+
+//		"</rdf:RDF>";
+//								
+//		wdfj.getObjectPropertyDao().deleteObjectProperty(op);
+//		
+//		Model expectedModel = (ModelFactory.createOntologyModel()).read(new StringReader(expected), "", "RDF/XML");
+//		
+//		//modtime times make it difficult to compare graphs
+//		wipeOutModTime(expectedModel);
+//		wipeOutModTime(model);
+//		Assert.assertTrue( model.isIsomorphicWith(expectedModel));		
+//	}
 	void printModels(Model expected, Model result){
     	System.out.println("Expected:");
     	expected.write(System.out);
@@ -427,4 +439,44 @@ public class JenaBaseDaoTest {
 		Assert.assertTrue(preModel.size() == postModel.size());
 		
 	}
+		
+	@Test
+	/**
+	 * Test that removing classes or properties used in restrictions
+	 * does not leave behind broken, syntactically-invalid restrictions.
+	 * The restrictions should be deleted.
+	 */
+	public void testPreventInvalidRestrictionsOnDeletion() {
+		OntModel m = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+		WebappDaoFactoryJena wadf = new WebappDaoFactoryJena(m);
+		
+		String ns = "http://example.org/ontology/";
+		String class1URI = ns + "Class1";
+		String class2URI = ns + "Class2";
+		String propURI = ns + "property";
+		
+		OntClass class1 = m.createClass(class1URI);
+		OntClass class2 = m.createClass(class2URI);
+		OntProperty prop = m.createObjectProperty(propURI);
+		Restriction rest = m.createAllValuesFromRestriction(null, prop, class2);
+		class1.addSuperClass(rest);
+		
+		ObjectProperty op = wadf.getObjectPropertyDao().getObjectPropertyByURI(propURI);
+		wadf.getObjectPropertyDao().deleteObjectProperty(op);
+		
+		Assert.assertEquals(class1.listSuperClasses().toSet().size(), 0);
+		Assert.assertEquals(m.size(), 2); // just rdf:type owl:Class for Class1 and Class2
+		
+		prop = m.createObjectProperty(propURI);
+		rest = m.createAllValuesFromRestriction(null, prop, class2);
+		class1.addSuperClass(rest);
+		
+		VClass vclass = wadf.getVClassDao().getVClassByURI(class2URI);
+		wadf.getVClassDao().deleteVClass(vclass);
+		
+		Assert.assertEquals(class1.listSuperClasses().toSet().size(), 0);
+		Assert.assertEquals(m.size(), 2); // just rdf:type for Class1 and Prop
+		
+	}	
+	
 }

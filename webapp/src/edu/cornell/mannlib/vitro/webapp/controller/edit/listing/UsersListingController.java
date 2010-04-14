@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.controller.edit.listing;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.controller.edit.listing;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ public class UsersListingController extends BaseEditController {
     private String[] roleNameStr = new String[51];
 
     public UsersListingController() {
-        roleNameStr[1] = "unprivileged";
+        roleNameStr[1] = "self editor";
         roleNameStr[4] = "editor";
         roleNameStr[5] = "curator";
         roleNameStr[50] = "system administrator";

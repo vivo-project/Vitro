@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.auth.identifier;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.auth.identifier;
 
 /** 
  * Indicates who the user is and what roles/groups they belong to.

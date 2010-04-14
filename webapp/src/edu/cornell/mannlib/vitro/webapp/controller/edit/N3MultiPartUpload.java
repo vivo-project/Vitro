@@ -1,16 +1,15 @@
-package edu.cornell.mannlib.vitro.webapp.controller.edit;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -45,7 +44,9 @@ import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
-import edu.cornell.mannlib.vitro.webapp.controller.FedoraDatastreamController;
+import edu.cornell.mannlib.vedit.beans.LoginFormBean;
+import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
+import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
@@ -54,6 +55,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditN3Generator;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditN3Utils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditSubmission;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.Field;
+import edu.cornell.mannlib.vitro.webapp.utils.MailUtil;
 
 /**
  * Process a N3 form submission with a multipart data encoding. This follows a
@@ -75,7 +77,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.Field;
  * optional.
  */
 public class N3MultiPartUpload extends VitroHttpServlet {
-    private static final int DEFAULT_MAX_SIZE = 1024 * 1024 * 50;
+    private static final int DEFAULT_MAX_SIZE = 1024 * 1024 * 1024;
 
     private static final String DEFAULT_FILE_URI_PREFIX = "http://vivo.library.cornell.edu/ns/0.1#file";
 
@@ -96,56 +98,27 @@ public class N3MultiPartUpload extends VitroHttpServlet {
     @Override
     public void init() throws ServletException {
         super.init();
-        String realPropFile = getServletContext().getRealPath(
-                FILE_UPLOAD_PROP_FILE);
-        File propF = new File(realPropFile);
-        if (propF != null && propF.exists() && propF.isFile()) {
-            if (!propF.canRead()) {
-                log.error("There is a file upload configuration file at "
-                        + realPropFile + " but is is not readable");
-                return;
-            }
-
-            InputStream is;
-            try {
-                is = new FileInputStream(propF);
-            } catch (FileNotFoundException e) {
-                log.error("Could not load file " + realPropFile, e);
-                return;
-            }
-
-            Properties props = new Properties();
-            try {
-                props.load(is);
-                is.close();
-            } catch (IOException e) {
-                log.error(
-                        "could not load properties from file " + realPropFile,
-                        e);
-            }
-            fileUriPrefix = props.getProperty("defaultUriPrefix",
+        
+            fileUriPrefix = ConfigurationProperties.getProperty("n3.defaultUriPrefix",
                     DEFAULT_FILE_URI_PREFIX);
-            baseDirectoryForFiles = props.getProperty("baseDirectoryForFiles",
+            baseDirectoryForFiles = ConfigurationProperties.getProperty("n3.baseDirectoryForFiles",
                     DEFAULT_BASE_DIR);
 
-            String postUploadProcess = props.getProperty("postUploadProcess");
+            String postUploadProcess = ConfigurationProperties.getProperty("n3.postUploadProcess");
             System.out.println("Attempting to load postUploadProcess "
                     + postUploadProcess);
             postUpload = getPostUpload(postUploadProcess);
 
-            String maxSize = props.getProperty("maxSize", Long
+            String maxSize = ConfigurationProperties.getProperty("n3.maxSize", Long
                     .toString(DEFAULT_MAX_SIZE));
+            //DEBUG ADDED
+            System.out.println("Max size is " + maxSize);
             try {
                 maxFileSize = Integer.parseInt(maxSize);
             } catch (NumberFormatException nfe) {
                 log.error(nfe);
                 maxFileSize = DEFAULT_MAX_SIZE;
             }
-        } else {
-            System.out
-                    .println("No properties file found for N3MultiPartUpload at "
-                            + realPropFile);
-        }
     }
 
     @Override
@@ -249,8 +222,8 @@ public class N3MultiPartUpload extends VitroHttpServlet {
                 && editConfig.getObject().trim().length() > 0;
         log.debug(requestIsAnUpdate ? "request is an update for a file object"
                 : "request is for a new file object");
-
         /** *************************************************** */
+        String uploadFileName = "";
         if (requestIsAnUpdate) {
           log.error("Editing an existing file resource is not supported by N3MultiPartUpload.java ");
           request.setAttribute("errors", "Editing an existing file resource is not supported.");
@@ -285,7 +258,15 @@ public class N3MultiPartUpload extends VitroHttpServlet {
                                     + fileItemKey + " and file "
                                     + fileItem.getName() + "\n"
                                     + requiredFieldAssertions.get(fileItemKey));
+                            
                         }
+                        //DEBUG
+                        System.out.println("build assertions for field "
+                                + fileItemKey + " and file "
+                                + fileItem.getName() + "\n"
+                                + requiredFieldAssertions.get(fileItemKey));
+                        //Save upload file name for use in email confirmation
+                        uploadFileName = fileItem.getName();
                     } catch (Exception e) {
                         long t = System.currentTimeMillis();
                         log.error("uplaod ticket " + t + " " + e.getMessage(), e);
@@ -295,7 +276,6 @@ public class N3MultiPartUpload extends VitroHttpServlet {
                     }
                 }
             }
-            
             if ( ! saveFileToDiskSuccess) {
                 if (errors != null && !errors.isEmpty()) {
                     String form = editConfig.getFormUrl();
@@ -319,6 +299,12 @@ public class N3MultiPartUpload extends VitroHttpServlet {
                         log.debug( it.nextStatement().toString() );
                     }
                     
+                }
+                
+                //DEBUG to see what statements are being added
+                StmtIterator it = assertionModel.listStatements();
+                while(it.hasNext()){
+                    System.out.println("NEXT Statement:" +  it.nextStatement().toString() );
                 }
 
                 /* ****** do PostUpload if there is one ******* */
@@ -349,7 +335,6 @@ public class N3MultiPartUpload extends VitroHttpServlet {
                         }
                     }
                 }
-
                 if (postUploadSuccess) {
                     /* **** Save the models for all the files **** */
                     String editorUri = EditN3Utils.getEditorUri(request,
@@ -381,6 +366,14 @@ public class N3MultiPartUpload extends VitroHttpServlet {
                     .getRequestDispatcher("/edit/fileUploadError.jsp");
             rd.forward(request, resp);
         } else {
+        	//This is before the redirect occurs from postEditCleanUp
+        	//Send out email confirmation here
+        	try {
+        		sendUserEmail(session, uploadFileName);
+        	} catch(Exception ex) {
+        		System.out.println("Problem with retrieving and/or sending email");
+        	}
+        	
             RequestDispatcher rd = request
                     .getRequestDispatcher("/edit/postEditCleanUp.jsp");
             rd.forward(request, resp);
@@ -611,6 +604,45 @@ public class N3MultiPartUpload extends VitroHttpServlet {
         }
         return out;
     }
+    
+    public void sendUserEmail(HttpSession session, String uploadFileName) {
+		LoginFormBean loginBean = (LoginFormBean) session.getAttribute("loginHandler");
+        String userURI = loginBean.getUserURI();
+        try{
+	        System.out.println("User URI is " + userURI);
+	        UserDao uDao = getWebappDaoFactory().getUserDao();
+	        String email = uDao.getUserEmailAddress(userURI);
+	        String deliveryFrom = "hjk54@cornell.edu";//TO DO: replace with email address to be used
+	        //Now send message
+	        MailUtil mu = new MailUtil();
+	        List<String> deliverToArray = new ArrayList<String>();
+	        deliverToArray.add(email);
+	        
+	        //Compose body of message
+	        StringBuffer msgBuf = new StringBuffer();
+	        String lineSeparator = System.getProperty("line.separator"); 
+	        msgBuf.setLength(0);
+	        msgBuf.append("<html>" + lineSeparator );
+	        msgBuf.append("<head>" + lineSeparator );
+	        msgBuf.append("<style>a {text-decoration: none}</style>" + lineSeparator );
+	        msgBuf.append("<title>" + deliveryFrom + "</title>" + lineSeparator );
+	        msgBuf.append("</head>" + lineSeparator );
+	        msgBuf.append("<body>" + lineSeparator );
+	        String messageBody = "<h4>File has been uploaded to datastar";
+	        //Include file name if it exists and is not empty
+	        if(uploadFileName != null && uploadFileName != "") {
+	        	messageBody += ": " + uploadFileName;
+	        }
+	        messageBody += "</h4>";
+	        msgBuf.append(messageBody + lineSeparator + "</body></html>");
+	        String messageText = msgBuf.toString();
+	        
+	        //Send message
+	        mu.sendMessage(messageText, "Datastar File Upload: Success", deliveryFrom, email, deliverToArray);
+        } catch(Exception ex) {
+        	System.out.println("Error " + ex.getMessage());
+        }
+	}
 
     private boolean logAddRetract(String msg, Map<String, List<String>> add,
             Map<String, List<String>> retract) {
@@ -623,8 +655,6 @@ public class N3MultiPartUpload extends VitroHttpServlet {
     }
 
     static Random random = new Random();
-
-    public static final String FILE_UPLOAD_PROP_FILE = "/WEB-INF/N3MultiPartUpload.properties";
 
     private static Property FILE_LOCATION_PROP = ResourceFactory
             .createProperty(VitroVocabulary.FILE_LOCATION);

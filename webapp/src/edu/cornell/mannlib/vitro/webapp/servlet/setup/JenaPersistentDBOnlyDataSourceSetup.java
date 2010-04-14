@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.servlet.setup;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -27,7 +27,7 @@ public class JenaPersistentDBOnlyDataSourceSetup extends JenaDataSourceSetupBase
 		OntModel memModel = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC);
 		OntModel dbModel = null;
         try {
-            Model dbPlainModel = makeDBModelFromPropertiesFile(sce.getServletContext().getRealPath(CONNECTION_PROP_LOCATION), JENA_DB_MODEL, DB_ONT_MODEL_SPEC);
+            Model dbPlainModel = makeDBModelFromConfigurationProperties(JENA_DB_MODEL, DB_ONT_MODEL_SPEC);
             dbModel = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC,dbPlainModel);
             boolean isEmpty = true;
             ClosableIterator stmtIt = dbModel.listStatements();
@@ -57,7 +57,7 @@ public class JenaPersistentDBOnlyDataSourceSetup extends JenaDataSourceSetupBase
         } catch (Throwable t) {
 			System.out.println("**** ERROR *****");
             System.out.println("Vitro unable to open Jena database model.");
-			System.out.println("Check that connection.properties has been created WEB-INF/classes, ");
+			System.out.println("Check that the configuration properties file has been created in WEB-INF/classes, ");
 			System.out.println("and that the database connection parameters are accurate. ");
 			System.out.println("****************");
         }
@@ -77,7 +77,7 @@ public class JenaPersistentDBOnlyDataSourceSetup extends JenaDataSourceSetupBase
         
         // default inference graph
         try {
-        	Model infDbPlainModel = makeDBModelFromPropertiesFile(sce.getServletContext().getRealPath(CONNECTION_PROP_LOCATION), JENA_INF_MODEL, DB_ONT_MODEL_SPEC);
+        	Model infDbPlainModel = makeDBModelFromConfigurationProperties(JENA_INF_MODEL, DB_ONT_MODEL_SPEC);
         	OntModel infDbModel = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC,infDbPlainModel);
         	sce.getServletContext().setAttribute("inferenceOntModel",infDbModel);
         } catch (Throwable e) {

@@ -1,23 +1,18 @@
-package edu.cornell.mannlib.vitro.webapp.controller;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
-import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
-import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
-import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQuery;
-import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQueryWrapper;
-import edu.cornell.mannlib.vitro.webapp.web.EntityWebUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+package edu.cornell.mannlib.vitro.webapp.controller;
+
+import java.io.IOException;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 
 /**
  * for testing styles and JSPs
@@ -40,7 +35,8 @@ public class TestController extends VitroHttpServlet {
             VitroRequest vreq = new VitroRequest(req);
 
             Portal portal = vreq.getPortal();
-            vreq.setAttribute("portal",String.valueOf(portal));
+            vreq.setAttribute("portalBean", portal);
+            vreq.setAttribute("portal", portal);
 
             String body = vreq.getParameter("bodyJsp");
             if( body != null )

@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.web.jsptags;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.web.jsptags;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -33,12 +33,12 @@ import com.hp.hpl.jena.datatypes.xsd.XSDDateTime;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.vocabulary.XSD;
 
+import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditSubmission;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.Field;
@@ -56,6 +56,7 @@ public class InputElementFormattingTag extends TagSupport {
     private String  type;
     private String  label;
     private String  cssClass;
+    private String  labelClass;
     private String  value;
     private String  error;
     private int     size = 0;
@@ -93,6 +94,13 @@ public class InputElementFormattingTag extends TagSupport {
     }
     public void setCssClass(String classStr) {
         this.cssClass = classStr;
+    }
+    
+    public String getLabelClass() {
+        return labelClass;
+    }
+    public void setLabelClass(String labelClassStr) {
+        this.labelClass = labelClassStr;
     }
 
     public String getValue() {
@@ -156,6 +164,14 @@ public class InputElementFormattingTag extends TagSupport {
     }
     public void setCancel(String s){
         cancel = s;
+    }
+    
+    private String doLabelClass() {
+        String labelClass = getLabelClass();
+        if (labelClass != null && !labelClass.equals("")) {
+            return " class=\""+labelClass+"\"";
+        }
+        return "";
     }
 
     private String doClass() {
@@ -235,13 +251,6 @@ public class InputElementFormattingTag extends TagSupport {
             log.debug("doValue():", ex);
         }
 
-        //here we are looking for defaults since everything else failed
-//        Field field = editConfig.getField( getId() );
-//        if( field == null )
-//            log.debug("doValue(): when looking for default value, could not find Field object in EditConfig");
-//        else
-//            return field.getDefault();
-
         log.debug("doValue(): No existing or default value for key '"+getId()+"' found from in editConfig or"
                 +" or editSub");
         return "";
@@ -273,13 +282,13 @@ public class InputElementFormattingTag extends TagSupport {
         } else if ( "admin".equals( getCancel() )){
             return " or <a class=\"cancel\" href=\"" + vreq.getContextPath()
             + Controllers.SITE_ADMIN + " title=\"Cancel\">"+labelStr+"</a>";
-        }else if( "dashboard".equals( getCancel() )){ //this case is Datastar specific.
+        }else if( "dashboard".equals( getCancel() )){ //this case is Datastar-specific.
             	return " or <a class=\"cancel\" href=\"" + vreq.getContextPath() 
             	+ "/dashboard\" title=\"Cancel\">"+labelStr+"</a>";
         }else if (getCancel()!=null && !getCancel().equals("")) {        	
             if( editConfig != null && editConfig.getEditKey() != null ){
                 try{
-                return " or <a class=\"cancel\" href=\"" + vreq.getContextPath()
+                return "<span class=\"or\"> or </span><a class=\"cancel\" href=\"" + vreq.getContextPath()
                         + "/edit/postEditCleanUp.jsp?editKey="+ URLEncoder.encode(editConfig.getEditKey(),"UTF-8")
                         +"\" title=\"Cancel\">"+labelStr+"</a>";
                 }catch(UnsupportedEncodingException ex){
@@ -312,6 +321,7 @@ public class InputElementFormattingTag extends TagSupport {
         Map<String,String> errors = editSub.getValidationErrors();
         if( errors == null || errors.isEmpty())
             return "";
+           
         String val = errors.get(getId());
         if( val != null){
             return val;
@@ -347,7 +357,6 @@ public class InputElementFormattingTag extends TagSupport {
             /* populate the pieces */
             String classStr = doClass();
             String errorStr = getValidationErrors(editSub);
-
             JspWriter out = pageContext.getOut();
 
             boolean definitionTags = false; // current default
@@ -357,17 +366,20 @@ public class InputElementFormattingTag extends TagSupport {
             
             if( getLabel()!=null && !getLabel().equals("")) {
                 if (definitionTags) { out.println("<dt>"); }
-                out.println("<label for=\""+getId()+"\">"+getLabel()+"</label>");
+                out.println("<label" + doLabelClass() + " for=\""+getId()+"\">"+getLabel()+"</label>");
                 if (definitionTags) { out.println("</dt>"); }
             }
             
             Field field = editConfig == null ? null : editConfig.getField(getId());
+           
             if( getType().equalsIgnoreCase("date") || 
                     (field != null && field.getRangeDatatypeUri() != null && field.getRangeDatatypeUri().equals(XSD.date.getURI())) ){
                 //if its a dataprop that should be a string override type and use date picker    
                 if (definitionTags) { out.print("<dg>"); }
                 out.print(  generateHtmlForDate(getId(),editConfig,editSub)  );
                 if (definitionTags) { out.print("</dg>"); }
+                
+                
             } else if ( getType().equalsIgnoreCase("time") || 
             		(field != null && field.getRangeDatatypeUri() != null && field.getRangeDatatypeUri().equals(XSD.time.getURI()))  ) {
             	if (definitionTags) { out.print("<dd>"); }
@@ -524,9 +536,12 @@ public class InputElementFormattingTag extends TagSupport {
 			EditConfiguration editConfig, WebappDaoFactory wdf) {    	    
     	ObjectProperty op = 
     		wdf.getObjectPropertyDao().getObjectPropertyByURI(editConfig.getPredicateUri());
-    	    	
+
+    	Individual sub = 
+    		wdf.getIndividualDao().getIndividualByURI(editConfig.getSubjectUri());
+    	
     	List<VClass> vclasses = null;
-    	vclasses = wdf.getVClassDao().getVClassesForProperty(op.getURI(), true);    	
+    	vclasses = wdf.getVClassDao().getVClassesForProperty(sub.getVClassURI(), op.getURI());    	
     	if( vclasses == null )
     		vclasses = wdf.getVClassDao().getAllVclasses();
     	
@@ -643,14 +658,14 @@ public class InputElementFormattingTag extends TagSupport {
                 }                
         }else{
             //try to get default value
-        	System.out.println("Trying to get the default value");
+        	
             Field field = editConfig.getField(fieldName);
             List<List<String>> options = field.getLiteralOptions();
             if( options.size() >=1 && options.get(0) != null && 
                     options.get(0).size() >= 1 && options.get(0).get(0) != null){
                 dateStrFromLit = options.get(0).get(0);                
             }else{
-            	System.out.println("No default value found for field " + fieldName);
+            	
                 log.debug("no default found for field " + fieldName);
             }
         }
@@ -687,7 +702,7 @@ public class InputElementFormattingTag extends TagSupport {
         }
 
         String sb = "";
-
+		
         sb += " <div class=\"inlineForm\" id=\"textdate"+fieldName+"\"> \n";
         sb += "      <label for=\"year"+fieldName+"\">year</label> \n";
         sb += "      <input type=\"text\"  size=\"4\" id=\"year"+fieldName+"\" "+ "name=\"year"+fieldName+"\" maxlength=\"4\" value=\"" + ((year != 0) ? year : "") + "\"/>\n";
@@ -744,6 +759,10 @@ public class InputElementFormattingTag extends TagSupport {
         sb += "        <option value=\"31\" "+(day == 31?SELECTED:"")+">31</option>  \n";
         sb += "      </select> \n";
         sb += "</div> \n";
+        if(fieldName.equals("expectedPublicationDateEdited")) {
+        	
+        	sb += "<input type='hidden' id='validDateParam' name='validDateParam' value='dateNotPast'/>";
+        }
         return sb;
     }
     
@@ -751,7 +770,7 @@ public class InputElementFormattingTag extends TagSupport {
     public String generateHtmlForTime(String fieldName,
     		EditConfiguration editConfig, EditSubmission editSub ) {
             DateTime dt = null;                
-            
+           
             int hour = -1;
             int minute = -1;
             
@@ -940,7 +959,7 @@ public class InputElementFormattingTag extends TagSupport {
     
     public String generateHtmlForDateTime(String fieldName, 
             EditConfiguration editConfig, EditSubmission editSub ){
-        DateTime dt = null;                       
+        DateTime dt = null;                     
         if( editSub != null && editSub.getLiteralsFromForm() != null && 
             editSub.getLiteralsFromForm().get(fieldName) != null ){
         	//found the field on the EditSubmission
@@ -1035,7 +1054,7 @@ public class InputElementFormattingTag extends TagSupport {
 	        hour =  dt.getHourOfDay();
 	        minute =  dt.getMinuteOfHour();
         }
-
+		
         String sb = "";
 
         sb += " <div class=\"inlineForm\" id=\"textdate"+fieldName+"\"> \n";
@@ -1094,9 +1113,9 @@ public class InputElementFormattingTag extends TagSupport {
         sb += "        <option value=\"31\" "+(day == 31?SELECTED:"")+">31</option>  \n";
         sb += "      </select> \n";
         sb += " \n";
-
+		
         sb += generateMarkupForTime(fieldName, hour, minute);
-        
+       
         sb += "</div> \n";
 
         return sb;

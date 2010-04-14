@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.dao.jena;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,14 +10,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.AllValuesFromRestriction;
 import com.hp.hpl.jena.ontology.DatatypeProperty;
-import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntProperty;
 import com.hp.hpl.jena.ontology.OntResource;
@@ -45,6 +43,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
+import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
 
@@ -310,9 +309,14 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
         List<DataProperty> datapropsForClass = new ArrayList();
         OntModel ontModel = getOntModelSelector().getTBoxModel();
         try {
-	        HashSet<String> superclassURIs = new HashSet<String>(getWebappDaoFactory().getVClassDao().getAllSuperClassURIs(vclassURI));
-	        Iterator superclassURIsIt = superclassURIs.iterator();
+        	VClassDao vcDao = getWebappDaoFactory().getVClassDao();
+	        HashSet<String> superclassURIs = new HashSet<String>(vcDao.getAllSuperClassURIs(vclassURI));
 	        superclassURIs.add(vclassURI);
+	        for (String equivURI : vcDao.getEquivalentClassURIs(vclassURI)) {
+	        	superclassURIs.add(equivURI);
+	        	superclassURIs.addAll(vcDao.getAllSuperClassURIs(equivURI));
+	        }
+	        Iterator superclassURIsIt = superclassURIs.iterator();
 	        ontModel.enterCriticalSection(Lock.READ);
 	        try {
 	            Iterator dataprops = ontModel.listDatatypeProperties();
@@ -575,26 +579,12 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
         ontModel.enterCriticalSection(Lock.WRITE);
         try {
             com.hp.hpl.jena.ontology.DatatypeProperty jDataprop = ontModel.getDatatypeProperty(dtp.getURI());
-            if (dtp.getPublicName() == null || dtp.getPublicName().length() == 0) {
-            	jDataprop.removeAll(RDFS.label);
-            } else {
-            	jDataprop.setLabel(dtp.getPublicName(), (String) getDefaultLanguage());
-            }
-            Resource domainRes = null;
-            if ( (dtp.getDomainClassURI() != null) && (dtp.getDomainClassURI().length()>0) ) {
-            	domainRes = ontModel.getResource(dtp.getDomainClassURI());
-            }
-            jDataprop.removeAll(RDFS.domain);
-            if (domainRes != null) {
-            	jDataprop.setDomain(domainRes);
-            }
-            if (dtp.getRangeDatatypeURI() != null && !dtp.getRangeDatatypeURI().equals("")) {
-                Resource rangeResource = ontModel.getResource(dtp.getRangeDatatypeURI());
-                if (rangeResource != null)
-                    jDataprop.setRange(rangeResource);
-            } else {
-            	jDataprop.removeAll(RDFS.range);
-            }
+            
+            updateRDFSLabel(jDataprop, dtp.getPublicName());
+            
+            updatePropertyResourceURIValue(jDataprop, RDFS.domain,dtp.getDomainClassURI(),ontModel);
+            updatePropertyResourceURIValue(jDataprop, RDFS.range,dtp.getRangeDatatypeURI(),ontModel);
+            
             if (dtp.getFunctional()) {
                	if (!ontModel.contains(jDataprop,RDF.type,OWL.FunctionalProperty)) {
             		ontModel.add(jDataprop,RDF.type,OWL.FunctionalProperty);
@@ -604,37 +594,25 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
             		ontModel.remove(jDataprop,RDF.type,OWL.FunctionalProperty);
             	}
             }
+            
             updatePropertyStringValue(jDataprop, EXAMPLE, dtp.getExample(), ontModel);
             updatePropertyStringValue(jDataprop, DESCRIPTION_ANNOT, dtp.getDescription(), ontModel);
             updatePropertyStringValue(jDataprop, PUBLIC_DESCRIPTION_ANNOT, dtp.getPublicDescription(), ontModel);
             updatePropertyNonNegativeIntValue(jDataprop, DISPLAY_RANK_ANNOT, dtp.getDisplayTier(), ontModel);
             updatePropertyNonNegativeIntValue(jDataprop, DISPLAY_LIMIT, dtp.getDisplayLimit(), ontModel);
-            //updatePropertyStringValue(jDataprop, HIDDEN_ANNOT, dtp.getHidden(), ontModel);
-            jDataprop.removeAll(HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT);
-            if (HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT != null && dtp.getHiddenFromDisplayBelowRoleLevel() != null) { // only need to add if present
-                jDataprop.addProperty(HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT, ResourceFactory.createResource(dtp.getHiddenFromDisplayBelowRoleLevel().getURI()));
-            }
-            jDataprop.removeAll(PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT);
-            if (PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT != null && dtp.getProhibitedFromUpdateBelowRoleLevel() != null) { // only need to add if present
-                jDataprop.addProperty(PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT, ResourceFactory.createResource(dtp.getProhibitedFromUpdateBelowRoleLevel().getURI()));
-            }
-            /*
-            updatePropertyBooleanValue(jDataprop, PROPERTY_SELFEDITPROHIBITEDANNOT, dtp.isSelfEditProhibited(), ontModel, JenaBaseDao.KEEP_ONLY_IF_TRUE);
-            updatePropertyBooleanValue(jDataprop, PROPERTY_CURATOREDITPROHIBITEDANNOT, dtp.isCuratorEditProhibited(), ontModel, JenaBaseDao.KEEP_ONLY_IF_TRUE);
-            */
-            try {
-            	jDataprop.removeAll(PROPERTY_INPROPERTYGROUPANNOT);
-            	if (dtp.getGroupURI() != null && dtp.getGroupURI().length()>0) {
-                	String badURIErrorStr = checkURI(dtp.getGroupURI());
-                	if (badURIErrorStr == null) {
-                		jDataprop.addProperty(PROPERTY_INPROPERTYGROUPANNOT, ontModel.getResource(dtp.getGroupURI()));
-                	} else {
-                		log.error(badURIErrorStr);
-                	}
-            	}
-            } catch (Exception e) {
-                log.error("error linking data property "+dtp.getURI()+" to property group");
-            }
+           
+            if (dtp.getHiddenFromDisplayBelowRoleLevel() != null) {
+              updatePropertyResourceURIValue(jDataprop,HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT,dtp.getHiddenFromDisplayBelowRoleLevel().getURI(),ontModel);                    
+            }            
+            
+            if (dtp.getProhibitedFromUpdateBelowRoleLevel() != null) {
+                updatePropertyResourceURIValue(jDataprop,PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT,dtp.getProhibitedFromUpdateBelowRoleLevel().getURI(),ontModel);                    
+            }            
+
+            if (dtp.getGroupURI() != null) {
+                updatePropertyResourceURIValue(jDataprop,PROPERTY_INPROPERTYGROUPANNOT,dtp.getGroupURI(),ontModel);                    
+            }                        
+                        
             updatePropertyStringValue(jDataprop,PROPERTY_CUSTOMENTRYFORMANNOT,dtp.getCustomEntryForm(),ontModel);
         } finally {
             ontModel.leaveCriticalSection();

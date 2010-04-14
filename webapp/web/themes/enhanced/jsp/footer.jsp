@@ -22,7 +22,7 @@
      * 2005-07-07   JCR   included LoginFormBean so can substitute filterbrowse for portalbrowse for authorized users
      */
 
-    final Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.web.themes.default.enhanced.jsp");
+    final Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.web.themes.enhanced.footer.jsp");
 
     VitroRequest vreq = new VitroRequest(request);
 

@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.dao.jena;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -39,6 +39,8 @@ public class UserDaoJena extends JenaBaseDao implements UserDao {
     protected OntModel getOntModel() {
     	return getOntModelSelector().getUserAccountsModel();
     }
+    
+    
     
     public List<User> getAllUsers() {
         List<User> allUsersList = new ArrayList<User>();
@@ -228,5 +230,100 @@ public class UserDaoJena extends JenaBaseDao implements UserDao {
         }
         return uris;
     }
+
+    //Method to get all user accounts that are associated with a person where said person has email address
+    public List<String> getUserAccountEmails() {
+        List<String> email = new ArrayList<String>();
+        List<String> uris = new ArrayList<String>();
+        OntModel ontModel = getOntModel();
+        OntModel baseModel =  getOntModelSelector().getFullModel();
+        ontModel.enterCriticalSection(Lock.READ);
+        String swrcOntology = "http://swrc.ontoware.org/ontology#";
+        String emailProperty = swrcOntology + "email";
+        String emailValue, uri;
+        try{
+        	 Property emailProp = ontModel.getProperty(emailProperty);
+             StmtIterator it = ontModel.listStatements(
+                    null,
+                    ontModel.getProperty(VitroVocabulary.MAY_EDIT_AS),
+                    (RDFNode)null);
+            while(it.hasNext()){
+                try{
+                    Statement stmt = (Statement) it.next();
+                    if( stmt != null && stmt.getObject()!= null 
+                            && stmt.getObject().asNode() != null 
+                            && stmt.getObject().asNode().getURI() != null )
+                    {
+                    	
+                    uri = stmt.getObject().asNode().getURI();	
+                    StmtIterator emailIt = baseModel.listStatements(baseModel.createResource(uri), baseModel.createProperty(emailProperty), (RDFNode) null);
+                    while(emailIt.hasNext()) {
+                    	Statement emailSt = (Statement) emailIt.next();
+                    	if(emailSt != null && emailSt.getObject().isLiteral() && emailSt.getObject() != null) {
+                    		email.add(emailSt.getLiteral().getString());
+                    		//Issue: this prints out the email in a tags
+                    	} else {
+                    		//System.out.println("Unfortunately email statement is null");
+                    	}
+                    }
+                       
+                    }
+                }catch(Exception ex){
+                    log.debug("error in get User Account Emails()",ex);
+                }
+                
+                
+            } 
+            
+        }finally{
+            ontModel.leaveCriticalSection();
+        }
+        return email;
+    }
+    
+    //for a specific user account, get the email address
+    public String getUserEmailAddress(String userURI) {
+    	 OntModel ontModel = getOntModel();
+         OntModel baseModel =  getOntModelSelector().getFullModel();
+         ontModel.enterCriticalSection(Lock.READ);
+         String swrcOntology = "http://swrc.ontoware.org/ontology#";
+         String emailProperty = swrcOntology + "email";
+         String personUri, emailValue = "";
+         
+         try {
+        	 //Get person account associated with this email address
+        	 StmtIterator it = ontModel.listStatements(
+                     ontModel.createResource(userURI),
+                     ontModel.getProperty(VitroVocabulary.MAY_EDIT_AS),
+                     (RDFNode)null);
+        	 try{
+	        	 while(it.hasNext()) {
+	        		 Statement personStmt = (Statement) it.next();
+	        		 if(personStmt != null 
+	        		 	&& personStmt.getObject() != null 
+	        		 	&& personStmt.getObject().asNode() != null
+	        		 	&& personStmt.getObject().asNode().getURI() != null) {
+	        			 personUri = personStmt.getObject().asNode().getURI();
+	        			 
+	        			 StmtIterator emailIt = baseModel.listStatements(baseModel.createResource(personUri),
+	        					 baseModel.createProperty(emailProperty),
+	        					 (RDFNode)null);
+	        			 while(emailIt.hasNext()) {
+	        				 Statement emailStmt = (Statement) emailIt.next();
+	        				 if(emailStmt != null && emailStmt.getObject().isLiteral() && emailStmt.getObject() != null) {
+	                     		emailValue = emailStmt.getLiteral().getString();
+	                     	}
+	        			 }
+	        		 }
+	        	 }
+        	 } catch(Exception ex) {
+        		 System.out.println("Error occurred in retrieving email and/or user uri");
+        	 }
+         }finally{
+             ontModel.leaveCriticalSection();
+         }
+         return emailValue;
+    }
+    
 
 }

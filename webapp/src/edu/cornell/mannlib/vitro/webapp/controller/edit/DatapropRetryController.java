@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.controller.edit;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -182,7 +182,7 @@ public class DatapropRetryController extends BaseEditController {
         request.setAttribute("colspan","4");
         request.setAttribute("scripts","/templates/edit/formBasic.js");
         request.setAttribute("formJsp","/templates/edit/specific/dataprop_retry.jsp");
-        request.setAttribute("title","Datatype Property Editing Form");
+        request.setAttribute("title","Data Property Editing Form");
         request.setAttribute("_action",action);
         request.setAttribute("unqualifiedClassName","DatatypeProperty");
         setRequestAttributes(request,epo);

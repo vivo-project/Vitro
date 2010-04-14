@@ -1,9 +1,13 @@
-package edu.cornell.mannlib.vitro.webapp.dao;
-
-import com.hp.hpl.jena.ontology.AnnotationProperty;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
+package edu.cornell.mannlib.vitro.webapp.dao;
+
+import java.util.Arrays;
+import java.util.List;
+
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.vocabulary.XSD;
+import com.hp.hpl.jena.ontology.AnnotationProperty;
 
 public class VitroVocabulary {
 
@@ -17,13 +21,13 @@ public class VitroVocabulary {
      * There are a lot of places we'd like to be able to use a bnode ID instead of a URI.  The following special string
      * indicates that the local name of a 'URI' should actually be treated as a bnode ID.
      */
-    public static final String PSEUDO_BNODE_NS = "http://vitro.mannlib.cornell.edu/ns/bnode#";
-    
+    public static final String PSEUDO_BNODE_NS = "http://vitro.mannlib.cornell.edu/ns/bnode#"; 
     
     public static final String RDF = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
     public static final String RDFS = "http://www.w3.org/2000/01/rdf-schema#";
     public static final String RDF_TYPE = RDF+"type";
-
+    public static final String LABEL = RDFS + "label";
+    
     public static final String SUBCLASS_OF = RDFS+"subClassOf";
 
     public static final String OWL = "http://www.w3.org/2002/07/owl#";
@@ -65,7 +69,8 @@ public class VitroVocabulary {
     public static final String SUNRISE = vitroURI+"sunrise";
     public static final String SUNSET = vitroURI+"sunset";
 
-
+    public static final String DEPENDENT_RESORUCE = "http://vivoweb.org/ontology/core#DependentResource";
+    
     //////////////////////////////////////////
 
 
@@ -89,7 +94,6 @@ public class VitroVocabulary {
     public static final String IMAGEFILE = vitroURI+"imageFile";
     public static final String IMAGETHUMB = vitroURI+"imageThumb";
     
-    public static final String DEPENDENT_RESOURCE = vitroURI + "DependentResource";
     // ================== property related =================================
 
     public static final String PROPERTY_ENTITYSORTDIRECTION = vitroURI+"individualSortDirectionAnnot";
@@ -97,7 +101,6 @@ public class VitroVocabulary {
     public static final String PROPERTY_OBJECTINDIVIDUALSORTPROPERTY = vitroURI+"objectIndividualSortProperty";
     public static final String PROPERTY_FULLPROPERTYNAMEANNOT = vitroURI+"fullPropertyNameAnnot";
     public static final String PROPERTY_CUSTOMSEARCHVIEWANNOT = vitroURI+"customSearchViewAnnot";
-    public static final String PROPERTY_FORCESTUBDELETIONANNOT = vitroURI+"forceStubDeletionAnnot";
     //public static final String PROPERTY_SELFEDITPROHIBITEDANNOT = vitroURI+"selfEditProhibitedAnnot";
     //public static final String PROPERTY_CURATOREDITPROHIBITEDANNOT = vitroURI+"curatorEditProhibitedAnnot";
     public static final String PROPERTY_CUSTOMENTRYFORMANNOT = vitroURI+"customEntryFormAnnot";
@@ -107,9 +110,11 @@ public class VitroVocabulary {
     public static final String PROPERTY_OFFERCREATENEWOPTIONANNOT = vitroURI+"offerCreateNewOptionAnnot";
     public static final String PROPERTY_INPROPERTYGROUPANNOT = vitroURI+"inPropertyGroupAnnot";
     public static final String PROPERTYGROUP = vitroURI + "PropertyGroup";
-    public static final String MASKS_PROPERTY = VitroVocabulary.vitroURI + "masksProperty";
-    public static final String SKIP_EDIT_FORM = VitroVocabulary.vitroURI + "skipEditForm";
-
+    public static final String MASKS_PROPERTY = vitroURI + "masksProperty";
+    public static final String SKIP_EDIT_FORM = vitroURI + "skipEditForm";
+    public static final String PROPERTY_STUBOBJECTPROPERTYANNOT = vitroURI + "stubObjectPropertyAnnot";
+	public static final String PROPERTY_COLLATEBYSUBCLASSANNOT = vitroURI + "collateBySubclassAnnot";
+	
     // ================== keyword related ==================================
 
     public static final String KEYWORD = vitroURI+"Keyword";
@@ -278,8 +283,6 @@ public class VitroVocabulary {
     public static final String NAMESPACE_ISCURRENTPREFIXMAPPING = vitroURI + "isCurrentPrefixMapping";
     
     public static final String ONTOLOGY_PREFIX_ANNOT = vitroURI + "ontologyPrefixAnnot";
+  
 
-
-    
-    
 }

@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.search.lucene;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.search.lucene;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -19,6 +19,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
 import edu.cornell.mannlib.vitro.webapp.search.docbuilder.Obj2DocIface;
 import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
@@ -81,6 +82,15 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         if(!( obj instanceof Individual))
             return null;
         Individual ent = (Individual)obj;
+        
+        List<VClass> classes = ent.getVClasses();
+        for( VClass clazz : classes){
+        	if( VitroVocabulary.DEPENDENT_RESORUCE.equals(  clazz.getURI() ) ){
+        		return null;
+        	}
+        }
+        
+        
         String value;
         Document doc = new Document();
 

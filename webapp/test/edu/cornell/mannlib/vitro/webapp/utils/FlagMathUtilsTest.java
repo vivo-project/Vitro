@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.utils;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.utils;
 
 import static edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils.bits2Numeric;
 import static edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils.numeric2Portalid;

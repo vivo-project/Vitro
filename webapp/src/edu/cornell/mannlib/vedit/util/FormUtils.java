@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vedit.util;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vedit.util;
 
 import java.lang.reflect.Method;
 import java.text.ParseException;

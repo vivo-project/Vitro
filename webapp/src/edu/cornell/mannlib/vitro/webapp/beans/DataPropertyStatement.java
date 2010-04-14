@@ -1,11 +1,13 @@
-package edu.cornell.mannlib.vitro.webapp.beans;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.beans;
 
 import java.util.Date;
 
+import com.hp.hpl.jena.rdf.model.Property;
+
 /**
- * a class representing an particular instance of a data property
+ * a class representing a particular instance of a data property
  *
  */
 public interface DataPropertyStatement {
@@ -20,7 +22,7 @@ public interface DataPropertyStatement {
 
     public String getDatapropURI();
 
-    public void setDatapropURI(String datapropURI);
+    public void setDatapropURI(String propertyURI);
 
     public String getDatatypeURI();
 

@@ -1,12 +1,17 @@
-package edu.cornell.mannlib.vitro.testing;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.testing;
 
 import static edu.cornell.mannlib.vitro.testing.VitroTestRunner.ReportLevel.BRIEF;
 import static edu.cornell.mannlib.vitro.testing.VitroTestRunner.ReportLevel.FULL;
 import static edu.cornell.mannlib.vitro.testing.VitroTestRunner.ReportLevel.MORE;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import org.junit.runner.Description;
 import org.junit.runner.Result;
@@ -22,6 +27,9 @@ import edu.cornell.mannlib.vitro.testing.VitroTestRunner.ReportLevel;
  * lifecycle methods are broken down into semantic chunks and executed. Three
  * levels of output are available.
  * 
+ * On the surface, JUnit treats "failures" (failed assertions) the same as
+ * "errors" (unexpected exceptions). We're going to distinguish between them.
+ * 
  * @author jeb228
  */
 public class VitroTestRunListener extends RunListener {
@@ -29,17 +37,20 @@ public class VitroTestRunListener extends RunListener {
 
 	private int classCount;
 	private int testsTotal;
+	private int errorsTotal;
 	private int failuresTotal;
 	private int ignoresTotal;
 	private long overallStartTime;
 
 	private Class<?> currentClass;
 	private int testsCurrentClass;
+	private int errorsCurrentClass;
 	private int failuresCurrentClass;
 	private int ignoresCurrentClass;
 	private long classStartTime;
 
 	private String currentTest;
+	private boolean testHadError;
 	private boolean testFailed;
 	private boolean testIgnored;
 	private long testStartTime;
@@ -48,9 +59,9 @@ public class VitroTestRunListener extends RunListener {
 		this.reportLevel = reportLevel;
 	}
 
-	/** Did any of the tests fail? */
-	public boolean isFailure() {
-		return failuresTotal > 0;
+	/** Did any of the tests fail or have errors? */
+	public boolean didEverythingPass() {
+		return (failuresTotal == 0) && (errorsTotal == 0);
 	}
 
 	// -------------------------------------------------------------------------
@@ -80,14 +91,24 @@ public class VitroTestRunListener extends RunListener {
 
 	@Override
 	public void testAssumptionFailure(Failure failure) {
-		testFailed = true;
-		reportFailure(failure);
+		if (isError(failure)) {
+			testHadError = true;
+			reportError(failure);
+		} else {
+			testFailed = true;
+			reportFailure(failure);
+		}
 	}
 
 	@Override
 	public void testFailure(Failure failure) throws Exception {
-		testFailed = true;
-		reportFailure(failure);
+		if (isError(failure)) {
+			testHadError = true;
+			reportError(failure);
+		} else {
+			testFailed = true;
+			reportFailure(failure);
+		}
 	}
 
 	@Override
@@ -137,22 +158,23 @@ public class VitroTestRunListener extends RunListener {
 			System.out
 					.println("Starting test run at " + time(overallStartTime));
 			System.out.println();
-			System.out.println("Tests Pass Fail Ignore Seconds");
+			System.out.println("Tests Pass Error Fail Ignore Seconds");
 		}
 	}
 
 	private void reportTestRun() {
-		int successes = testsTotal - failuresTotal - ignoresTotal;
+		int successes = testsTotal - errorsTotal - failuresTotal - ignoresTotal;
 
 		if (reportLevel != BRIEF) {
 			System.out.println();
 		}
 
 		System.out.format(
-				"Tests Pass Fail Ignore Seconds  TOTAL (%d classes)\n",
+				"Tests Pass Error Fail Ignore Seconds  TOTAL (%d classes)\n",
 				classCount);
-		System.out.format(" %4d %4d %4d  %4d  %6s\n", testsTotal, successes,
-				failuresTotal, ignoresTotal, elapsed(overallStartTime));
+		System.out.format(" %4d %4d  %4d %4d  %4d  %6s\n", testsTotal,
+				successes, errorsTotal, failuresTotal, ignoresTotal,
+				elapsed(overallStartTime));
 
 		if (reportLevel != BRIEF) {
 			System.out.println("Ending test run at "
@@ -164,6 +186,7 @@ public class VitroTestRunListener extends RunListener {
 		currentClass = description.getTestClass();
 		classStartTime = System.currentTimeMillis();
 		testsCurrentClass = 0;
+		errorsCurrentClass = 0;
 		failuresCurrentClass = 0;
 		ignoresCurrentClass = 0;
 	}
@@ -171,29 +194,32 @@ public class VitroTestRunListener extends RunListener {
 	private void closeCurrentClass() {
 		classCount++;
 		testsTotal += testsCurrentClass;
+		errorsTotal += errorsCurrentClass;
 		failuresTotal += failuresCurrentClass;
 		ignoresTotal += ignoresCurrentClass;
 	}
 
 	private void reportCurrentClassStart() {
 		if (reportLevel == FULL) {
-			System.out.format("Tests Pass Fail Ignore Seconds  %s\n",
+			System.out.format("Tests Pass Error Fail Ignore Seconds  %s\n",
 					currentClass.getName());
 		}
 	}
 
 	private void reportCurrentClass() {
-		int successes = testsCurrentClass - failuresCurrentClass
-				- ignoresCurrentClass;
+		int successes = testsCurrentClass - errorsCurrentClass
+				- failuresCurrentClass - ignoresCurrentClass;
 		if (reportLevel == MORE) {
-			System.out.format(" %4d %4d %4d  %4d  %6s %s\n", testsCurrentClass,
-					successes, failuresCurrentClass, ignoresCurrentClass,
+			System.out.format(" %4d %4d  %4d %4d  %4d  %6s %s\n",
+					testsCurrentClass, successes, errorsCurrentClass,
+					failuresCurrentClass, ignoresCurrentClass,
 					elapsed(classStartTime), currentClass.getSimpleName());
 		}
 		if (reportLevel == FULL) {
-			System.out.println("-----------------------------");
-			System.out.format(" %4d %4d %4d  %4d  %6s\n", testsCurrentClass,
-					successes, failuresCurrentClass, ignoresCurrentClass,
+			System.out.println("-----------------------------------");
+			System.out.format(" %4d %4d  %4d %4d  %4d  %6s\n",
+					testsCurrentClass, successes, errorsCurrentClass,
+					failuresCurrentClass, ignoresCurrentClass,
 					elapsed(classStartTime));
 			System.out.println();
 		}
@@ -201,12 +227,16 @@ public class VitroTestRunListener extends RunListener {
 
 	private void openCurrentTest(Description description) {
 		currentTest = description.getMethodName();
+		testHadError = false;
 		testFailed = false;
 		testIgnored = false;
 		testStartTime = System.currentTimeMillis();
 	}
 
 	private void closeCurrentTest() {
+		if (testHadError) {
+			errorsCurrentClass++;
+		}
 		if (testFailed) {
 			failuresCurrentClass++;
 		}
@@ -214,6 +244,21 @@ public class VitroTestRunListener extends RunListener {
 			ignoresCurrentClass++;
 		}
 		testsCurrentClass++;
+	}
+
+	private boolean isError(Failure failure) {
+		Throwable throwable = failure.getException();
+		return (throwable != null) && !(throwable instanceof AssertionError);
+	}
+
+	private void reportError(Failure error) {
+		Description description = error.getDescription();
+		String methodName = description.getMethodName();
+		String className = description.getTestClass().getName();
+		String message = error.getMessage();
+		System.out.format("EXCEPTION:   test %s() in %s: %s\n",
+				methodName, className, message);
+		System.out.println(formatStackTrace(error.getException()));
 	}
 
 	private void reportFailure(Failure failure) {
@@ -227,12 +272,15 @@ public class VitroTestRunListener extends RunListener {
 
 	private void reportCurrentTest() {
 		if (reportLevel == FULL) {
-			char passFlag = (testIgnored | testFailed) ? ' ' : '1';
+			char passFlag = (testIgnored | testFailed | testHadError) ? ' '
+					: '1';
+			char errorFlag = testHadError ? '1' : ' ';
 			char failFlag = testFailed ? '1' : ' ';
 			char ignoreFlag = testIgnored ? '1' : ' ';
-			System.out.format("         %c    %c      %c %6s        %s()\n",
-					passFlag, failFlag, ignoreFlag, elapsed(testStartTime),
-					currentTest);
+			System.out.format(
+					"         %c     %c    %c      %c %6s        %s()\n",
+					passFlag, errorFlag, failFlag, ignoreFlag,
+					elapsed(testStartTime), currentTest);
 		}
 	}
 
@@ -253,4 +301,47 @@ public class VitroTestRunListener extends RunListener {
 		return String.format("%6.2f", ((float) interval) / 1000.0);
 	}
 
+	/**
+	 * Trim the stack trace: don't show the line saying "23 more", and don't
+	 * show the lines about org.junit or java.lang.reflect or sun.reflect.
+	 * 
+	 * Once we hit some "client code", we won't trim any futher lines even if
+	 * they belong to org.junit, or the others.
+	 * 
+	 * If we have nested exceptions, the process repeats for each "Caused by"
+	 * section.
+	 */
+	private String formatStackTrace(Throwable throwable) {
+		StringWriter w = new StringWriter();
+		throwable.printStackTrace(new PrintWriter(w));
+		String[] lineArray = w.toString().split("\\n");
+		List<String> lines = new ArrayList<String>(Arrays.asList(lineArray));
+
+		boolean removing = true;
+		for (int i = lines.size() - 1; i > 0; i--) {
+			String line = lines.get(i);
+			if (removing) {
+				if (line.matches("\\s*[\\.\\s\\d]+more\\s*")
+						|| line.contains("at "
+								+ VitroTestRunner.class.getName())
+						|| line.contains("at org.junit.")
+						|| line.contains("at java.lang.reflect.")
+						|| line.contains("at sun.reflect.")) {
+					lines.remove(line);
+				} else {
+					removing = false;
+				}
+			} else {
+				if (line.contains("Caused by: ")) {
+					removing = true;
+				}
+			}
+		}
+
+		StringBuilder result = new StringBuilder();
+		for (String line : lines) {
+			result.append(line).append('\n');
+		}
+		return result.toString().trim();
+	}
 }

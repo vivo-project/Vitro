@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.controller.edit;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +32,7 @@ public class UserEditController extends BaseEditController {
     private static final Log log = LogFactory.getLog(UserEditController.class.getName());
 
     public UserEditController() {
-        roleNameStr[1] = "unprivileged";
+        roleNameStr[1] = "self editor";
         roleNameStr[4] = "editor";
         roleNameStr[5] = "curator";
         roleNameStr[50] = "system administrator";
@@ -97,10 +97,12 @@ public class UserEditController extends BaseEditController {
             List<ObjectPropertyStatement> mayEditAsStmts = 
                 new ArrayList<ObjectPropertyStatement>(mayEditAsUris.size());
             for(String objURI: mayEditAsUris){
+            	Individual editAs = getWebappDaoFactory().getIndividualDao().getIndividualByURI(objURI);
                 ObjectPropertyStatement stmt = new ObjectPropertyStatementImpl();
                 stmt.setSubjectURI(u.getURI());
                 stmt.setPropertyURI(VitroVocabulary.MAY_EDIT_AS);
-                stmt.setObjectURI(objURI);  
+                stmt.setObjectURI(objURI);
+                stmt.setObject(editAs);
                 mayEditAsStmts.add(stmt);
             }
             request.setAttribute("mayEditAsStmts", mayEditAsStmts);

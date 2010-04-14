@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.dao.filtering;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.dao.filtering;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -545,13 +545,24 @@ public class ObjectPropertyFiltering extends ObjectProperty {
     }
 
     @Override
-    public boolean getForceStubObjectDeletion() {
-        return innerObjectProperty.getForceStubObjectDeletion();
+    public boolean getStubObjectRelation() {
+        return innerObjectProperty.getStubObjectRelation();
     }
 
     @Override
-    public void setForceStubObjectDeletion(boolean b) {
-        innerObjectProperty.setForceStubObjectDeletion(b);
+    public void setStubObjectRelation(boolean b) {
+        innerObjectProperty.setStubObjectRelation(b);
     }
 
+	@Override
+	public boolean getCollateBySubclass() {		
+		return innerObjectProperty.getCollateBySubclass();
+	}
+
+	@Override
+	public void setCollateBySubclass(boolean collate) {		
+		innerObjectProperty.setCollateBySubclass(collate);
+	}
+
+    
 }

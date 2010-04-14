@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.controller;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.controller;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +30,8 @@ public class Controllers {
     public static final String SITE_ADMIN = "/siteAdmin";
     public static final String LOGIN = "/siteAdmin";
     public static final String LOGOUT = "/siteAdmin";
+    
+    public static final String EXPORT_RDF = "/export";
 
     // jsps go here:
     

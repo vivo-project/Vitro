@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.controller.edit;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -53,7 +53,7 @@ public class DatapropEditController extends BaseEditController {
         PropertyGroupDao pgDao = getWebappDaoFactory().getPropertyGroupDao();
 
         ArrayList results = new ArrayList();
-        results.add("Datatype Property");
+        results.add("Data Property");
         results.add("ontology");
         results.add("display name");
         results.add("domain");
@@ -180,7 +180,7 @@ public class DatapropEditController extends BaseEditController {
         request.setAttribute("datatypeProperty", dp);
         request.setAttribute("bodyJsp","/templates/edit/specific/dataprops_edit.jsp");
         request.setAttribute("portalBean",portal);
-        request.setAttribute("title","Datatype Property Control Panel");
+        request.setAttribute("title","Data Property Control Panel");
         request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+portal.getThemeDir()+"css/edit.css\"/>");
 
         try {

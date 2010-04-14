@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.dao.jena;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -21,6 +21,7 @@ import com.hp.hpl.jena.ontology.OntProperty;
 import com.hp.hpl.jena.ontology.Restriction;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.vocabulary.OWL;
@@ -60,13 +61,14 @@ public class PropertyInstanceDaoJena extends JenaBaseDao implements
             	getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),true,subjectURI));
             	try {
             		ontModel.remove(subjRes,pred,objRes);
+            		
             		updatePropertyDateTimeValue(subjRes,MODTIME,Calendar.getInstance().getTime(),getOntModel());
             	} finally {
             		getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),false,subjectURI));
             	}
             	try{            		
-            		getOntModel().getBaseModel().notifyEvent(new IndividualDeletionEvent(getWebappDaoFactory().getUserURI(),true,objectURI));
-            		List<Statement> depResStmts = DependentResourceDeleteJena.getDependentResourceDeleteList(objRes,ontModel);
+            		getOntModel().getBaseModel().notifyEvent(new IndividualDeletionEvent(getWebappDaoFactory().getUserURI(),true,objectURI));            		
+            		List<Statement> depResStmts = DependentResourceDeleteJena.getDependentResourceDeleteList(ResourceFactory.createStatement(subjRes, pred, objRes),ontModel);
             		getOntModel().remove(depResStmts);
             	} finally {
             		getOntModel().getBaseModel().notifyEvent(new IndividualDeletionEvent(getWebappDaoFactory().getUserURI(),false,objectURI));
@@ -134,11 +136,16 @@ public class PropertyInstanceDaoJena extends JenaBaseDao implements
         }
         List<PropertyInstance> propInsts = new ArrayList();
         
-        List<String> allSuperclassURIs = getWebappDaoFactory().getVClassDao().getAllSuperClassURIs(classURI);
+        VClassDao vcDao = getWebappDaoFactory().getVClassDao();
         
-        if (allSuperclassURIs == null)
-            allSuperclassURIs = new ArrayList();
+        Set<String> allSuperclassURIs = new HashSet<String>();
+       
         allSuperclassURIs.add(classURI);
+        for (String equivURI : vcDao.getEquivalentClassURIs(classURI)) {
+        	allSuperclassURIs.add(equivURI);
+        	allSuperclassURIs.addAll(vcDao.getAllSuperClassURIs(equivURI));
+        }
+        allSuperclassURIs.addAll(vcDao.getAllSuperClassURIs(classURI));
         
         try {
         

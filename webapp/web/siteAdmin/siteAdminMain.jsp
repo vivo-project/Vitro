@@ -37,6 +37,7 @@
         
         <%@ include file="advancedDataTools.jsp" %> 
         
+        <%@ include file="customReports.jsp" %> 
         <%-- 
         <%@ include file="sessionPreferences.jsp" %>      
         --%>

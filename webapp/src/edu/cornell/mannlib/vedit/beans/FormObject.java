@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vedit.beans;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vedit.beans;
 
 import java.io.Serializable;
 import java.util.HashMap;

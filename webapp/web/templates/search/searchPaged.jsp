@@ -89,7 +89,7 @@ if( request.getAttribute("types") != null ){
     out.println("<li>");
     out.print("<a href='"
                + response.encodeURL(
-                       getServletContext().getContextPath()
+                       request.getContextPath()
                        +"/entity?uri=" + escapedURIStr 
                        + portalParm )
                + "'>" 
@@ -148,7 +148,7 @@ if( request.getAttribute("types") != null ){
  int hitsLength = (Integer)request.getAttribute("hitsLength");
  int maxHitSize = (Integer)request.getAttribute("maxHitSize");
  String basePageUrl =  
-     getServletContext().getContextPath() + "/search?querytext="
+     request.getContextPath() + "/search?querytext="
          +URLEncoder.encode(request.getParameter("querytext"),"UTF-8") +
          request.getAttribute("refinment");
  

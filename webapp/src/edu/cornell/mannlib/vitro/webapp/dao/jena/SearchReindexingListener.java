@@ -1,146 +1,145 @@
-package edu.cornell.mannlib.vitro.webapp.dao.jena;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
+package edu.cornell.mannlib.vitro.webapp.dao.jena;
+
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.ServletContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelChangedListener;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.shared.Lock;
+import com.hp.hpl.jena.vocabulary.RDF;
 
-import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.event.IndividualCreationEvent;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.event.IndividualDeletionEvent;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.event.IndividualEditEvent;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.event.IndividualUpdateEvent;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
 
 
-public class SearchReindexingListener implements ModelChangedListener {
+public class SearchReindexingListener implements ModelChangedListener {			
+	private ServletContext context;		
+	private HashSet<String> changedUris;	
 	
-	private static final Log log = LogFactory.getLog(SearchReindexingListener.class.getName());	
-	
-	private OntModel ontModel;
-	private ServletContext servletContext;
-	
-	protected DateFormat xsdDateTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-	
-	private boolean dirty = false;
-	private boolean indexing = false;
-
-	public SearchReindexingListener(OntModel ontModel, ServletContext sc) {
-		this.ontModel = ontModel;
-		this.servletContext = sc;
+	public SearchReindexingListener(OntModel ontModel, ServletContext sc) {		
+		this.context = sc;
+		this.changedUris = new HashSet<String>();		
 	}	
+
+	public void notifyEvent(Model arg0, Object arg1) {
+		if ( (arg1 instanceof EditEvent) ){
+			EditEvent editEvent = (EditEvent)arg1;
+			if( editEvent.getBegin() ){
+				
+			}else{ // editEvent is the end of an edit
+				log.debug("doing search index build");
+				IndexBuilder builder = (IndexBuilder) context.getAttribute(IndexBuilder.class.getName());
+				if( builder != null ){
+					for( String uri: getAndClearChangedUris()){
+						builder.addToChangedUris(uri);
+					}				
+					new Thread(builder).start();
+				}else{
+					log.debug("Could not get IndexBuilder from servlet context, cannot create index for full text seraching.");
+					getAndClearChangedUris(); //clear list of changes because they cannot be indexed.
+				}								
+			}		
+		} 
+	}
 	
-	private class Reindexer implements Runnable {
-		public void run() {
-			while(dirty) {
-				dirty = false;
-				IndexBuilder builder = (IndexBuilder) servletContext.getAttribute(IndexBuilder.class.getName());
-				indexing = true;
-				try {
-		        builder.run();
-				} finally {
-					indexing = false;
-				}
-			}
+	private boolean isNormalPredicate(Property p) {		
+		if( p == null ) return false;
+		
+		/* currently the only predicate that is filtered out is rdf:type.
+		 * It may be useful to improve this so that it may be configured 
+		 * at run time.*/
+		if( RDF.type.equals( p ))
+			return false;
+		else 
+			return true;
+	}
+
+	private synchronized Set<String> getAndClearChangedUris(){
+		log.debug("getting and clearing changed URIs.");
+		
+		Set<String> out = changedUris;
+		changedUris = new HashSet<String>();
+		return out;
+	}
+	
+	private synchronized void addChange(Statement stmt){
+		if( stmt == null ) return;
+		if( stmt.getSubject().isURIResource() ){			
+			changedUris.add( stmt.getSubject().getURI());
+			log.debug(stmt.getSubject().getURI());
 		}
+				
+		if( stmt.getObject().isURIResource() && isNormalPredicate( stmt.getPredicate() ) ){
+			changedUris.add( ((Resource) stmt.getObject().as(Resource.class)).getURI() );
+			log.debug(((Resource) stmt.getObject().as(Resource.class)).getURI());
+		}	
 	}
 	
-	public void addedStatement(Statement arg0) {
-
+	public void addedStatement(Statement stmt) {
+		addChange(stmt);
 	}
 
-	
 	public void addedStatements(Statement[] arg0) {
-		// TODO Auto-generated method stub
-
+		for(Statement stmt : arg0)
+			addChange(stmt);
 	}
-
 	
-	public void addedStatements(List arg0) {
-		// TODO Auto-generated method stub
-
+	public void addedStatements(List arg0) {		
+		for(Statement stmt : (List<Statement>)arg0)
+			addChange(stmt);
 	}
-
 	
 	public void addedStatements(StmtIterator arg0) {
-		// TODO Auto-generated method stub
-
-	}
-
-	
-	public void addedStatements(Model arg0) {
-		// TODO Auto-generated method stub
-
-	}
-
-	
-	public void notifyEvent(Model arg0, Object arg1) {
-		if ((arg1 instanceof IndividualCreationEvent) || (arg1 instanceof IndividualUpdateEvent)) {
-			IndividualEditEvent ee = (IndividualEditEvent) arg1;
-			if (!ee.getBegin()) {
-				dirty=true;
-				if (!indexing) {
-					new Thread(new Reindexer()).start();
-				}
+		if( arg0 != null ){
+			while( arg0.hasNext() ){
+				addChange(arg0.nextStatement());
 			}
-		} else if (arg1 instanceof IndividualDeletionEvent) {
-			IndividualEditEvent ee = (IndividualEditEvent) arg1;
-	        IndexBuilder builder = (IndexBuilder) servletContext.getAttribute(IndexBuilder.class.getName());
-	        if (builder != null) {
-	        	builder.entityDeleted(ee.getIndividualURI());
-	        } else {
-	        	log.warn("Unable to remove individual from search index: no attribute " + IndexBuilder.class.getName() + " in servlet context");
-	        }
 		}
 	}
-
 	
-	public void removedStatement(Statement arg0) {
-		// TODO Auto-generated method stub
-
+	public void addedStatements(Model arg0) {
+		if( arg0 != null)
+			addedStatements(arg0.listStatements());
 	}
 
+	public void removedStatement(Statement stmt){
+		addChange(stmt);
+	}
 	
 	public void removedStatements(Statement[] arg0) {
-		// TODO Auto-generated method stub
-
+		for(Statement stmt : arg0)
+			addChange(stmt);
 	}
-
 	
-	public void removedStatements(List arg0) {
-		// TODO Auto-generated method stub
-
+	public void removedStatements(List arg0) {		
+		for(Statement stmt : (List<Statement>)arg0)
+			addChange(stmt);
 	}
-
 	
 	public void removedStatements(StmtIterator arg0) {
-		// TODO Auto-generated method stub
-
+		if( arg0 != null ){
+			while( arg0.hasNext() ){
+				addChange(arg0.nextStatement());
+			}
+		}
 	}
-
 	
 	public void removedStatements(Model arg0) {
-		// TODO Auto-generated method stub
-
+		if( arg0 != null)
+			removedStatements(arg0.listStatements());
 	}
-
+	
+	private static final Log log = LogFactory.getLog(SearchReindexingListener.class.getName());
 }

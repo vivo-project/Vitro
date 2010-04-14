@@ -1,14 +1,12 @@
-package edu.cornell.mannlib.vitro.webapp.beans;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.beans;
 
 import java.util.Date;
 import java.util.Comparator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import edu.cornell.mannlib.vitro.webapp.controller.EntityController;
 
 /**
  * a class representing a particular instance of an object property
@@ -39,8 +37,16 @@ sunrise
 sunset
 qualifier
     */
+    
+   public ObjectPropertyStatementImpl() { }
 
-   /* (non-Javadoc)
+   public ObjectPropertyStatementImpl(String subjectUri, String propertyUri, String objectUri) {
+        subjectURI = subjectUri;
+        propertyURI = propertyUri;
+        objectURI = objectUri;        
+    }
+
+/* (non-Javadoc)
  * @see edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement#toString()
  */
 public String toString(){

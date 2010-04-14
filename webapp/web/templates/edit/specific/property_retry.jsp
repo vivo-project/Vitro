@@ -151,6 +151,19 @@
         <font size="2" color="red"><form:error name="ObjectIndividualSortPropertyURI"/></font>
 	</td>
 </tr>
+<tr class="editformcell">  
+	<td valign="bottom" colspan="5">      
+        <c:choose>
+            <c:when test="${collateBySubclass}">
+    	        <input name="CollateBySubclass" type="checkbox" value="TRUE" checked="checked"/>collate by subclass
+            </c:when>
+            <c:otherwise>
+                <input name="CollateBySubclass" type="checkbox" value="TRUE"/>collate by subclass
+            </c:otherwise>            
+        </c:choose>
+        <font size="2" color="red"><form:error name="CollateBySubclass"/></font>            
+  </td>
+</tr>
 <tr class="editformcell">
     <td valign="bottom" colspan="1">
         <c:choose>
@@ -203,14 +216,14 @@
     	<td valign="bottom" colspan="1">
     		<em><strong>Caution:</strong>delete object when statement deleted?</em><br />
        		<c:choose>
-            	<c:when test="${forceStubObjectDeletion}">
-    	        	<input name="ForceStubObjectDeletion" type="checkbox" value="TRUE" checked="checked"/>force deletion
+            	<c:when test="${stubObjectRelation}">
+    	        	<input name="StubObjectRelation" type="checkbox" value="TRUE" checked="checked"/>stub object relation with force delete
             	</c:when>
             	<c:otherwise>
-                	<input name="ForceStubObjectDeletion" type="checkbox" value="TRUE"/>force deletion
+                	<input name="StubObjectRelation" type="checkbox" value="TRUE"/>stub object relation with force delete
             	</c:otherwise>
         	</c:choose>
-    		<font size="2" color="red"><form:error name="ForceStubObjectDeletion"/></font>
+    		<font size="2" color="red"><form:error name="stubObjectRelation"/></font>
     	</td>
     	<td valign="bottom" colspan="1">
     		<em>select from existing choices when adding statements?</em><br />

@@ -17,16 +17,19 @@
 
 %>
 
+    <p><a href="ingest">Ingest Home</a></p>
+
     <h2>Subtract One Model from Another</h2>
 
     <form action="ingest" method="get"i>
         <input type="hidden" name="action" value="subtractModels"/>
 
     <select name="modela">
+         <option value="vitro:baseOntModel">webapp assertions</option>
 <%
     for (Iterator it = maker.listModels(); it.hasNext(); ) {
 	String modelName = (String) it.next();
-        %> <option value="<%=modelName%>"/><%=modelName%></option>
+        %> <option value="<%=modelName%>"><%=modelName%></option>
         <%    
     }
 %>   
@@ -34,6 +37,7 @@
     <p>model to be subtracted from</p>
 
     <select name="modelb">
+         <option value="vitro:baseOntModel">webapp assertions</option>
 <%
     for (Iterator it = maker.listModels(); it.hasNext(); ) {
 	String modelName = (String) it.next();
@@ -45,6 +49,8 @@
     <p>model to subtract</p>
 
     <select name="destinationModelName">
+         <option value="vitro:baseOntModel">webapp assertions</option>
+
 <%
     for (Iterator it = maker.listModels(); it.hasNext(); ) {
 	String modelName = (String) it.next();

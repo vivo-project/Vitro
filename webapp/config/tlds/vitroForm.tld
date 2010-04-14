@@ -152,7 +152,12 @@
 			<name>cssClass</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
-		</attribute>
+        </attribute>
+    	<attribute>
+    		<name>labelClass</name>
+    		<required>false</required>
+    		<rtexprvalue>true</rtexprvalue>
+    	</attribute>
 		<attribute>
 			<name>value</name>
 			<required>false</required>

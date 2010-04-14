@@ -20,7 +20,7 @@ if( vreq.getParameter("subjectUri") != null ){
     Individual individual = vreq.getWebappDaoFactory().getIndividualDao().getIndividualByURI(vreq.getParameter("subjectUri"));
     String name = "the individual you were trying to edit.";
     if( individual != null && individual.getName() != null ){ 
-          name = individual.getName() + ".";
+          name = individual.getName();
      } %>    
      <c:url value="/entity" var="entityPage">
        <c:param name="uri"><%=vreq.getParameter("subjectUri")%></c:param>

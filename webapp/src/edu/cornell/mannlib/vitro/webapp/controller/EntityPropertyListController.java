@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.controller;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.controller;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -12,12 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-/**
- * Handles requests for entity information.
- * The methods for sorting Property/ObjectPropertyStatement Lists are here also.
- * @author bdc34
- *
- */
 public class EntityPropertyListController extends VitroHttpServlet {
 
     /**

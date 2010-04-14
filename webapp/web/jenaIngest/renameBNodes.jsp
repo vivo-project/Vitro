@@ -17,6 +17,8 @@
 
 %>
 
+    <p><a href="ingest">Ingest Home</a></p>
+
     <h2>Convert Blank Nodes to Named Resources</h2>
 
     <form action="ingest" method="get"i>
@@ -25,7 +27,7 @@
     <h3>Select URI prefix</h3>
    
 	<p>URIs will be constructed from the following string concatenated with a random integer:</p>
-	<input type="text" name="namespaceEtcStr"/> 
+	<input type="text" style="width:65%;" name="namespaceEtcStr"/> 
 
     <p/>
 
@@ -45,6 +47,7 @@
     <h3>Select Destination Model</h3>
 
     <select name="destinationModelName">
+        <option value="vitro:baseOntModel">webapp assertions</option>
 <%
     for (Iterator it = maker.listModels(); it.hasNext(); ) {
 	String modelName = (String) it.next();

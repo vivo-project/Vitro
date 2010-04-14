@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.testing;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.testing;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.fail;
@@ -225,8 +225,8 @@ public abstract class AbstractTestClass {
 	/**
 	 * Create a file and fill it with the contents provided.
 	 */
-	protected File createFile(File directory, String filename, String contents)
-			throws IOException {
+	protected static File createFile(File directory, String filename,
+			String contents) throws IOException {
 		Writer writer = null;
 		try {
 			File file = new File(directory, filename);

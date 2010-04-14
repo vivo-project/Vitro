@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.edit.n3editing;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.edit.n3editing;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,6 +23,7 @@ public class Field {
         INDIVIDUALS_VIA_VCLASS, 
         MONIKERS_VIA_VCLASS, 
         CHILD_VCLASSES, 
+        CHILD_VCLASSES_WITH_PARENT,
         FILE, 
         UNDEFINED, 
         DATETIME, 
@@ -214,6 +215,8 @@ public class Field {
             setOptionsType(Field.OptionsType.DATETIME);
         } else if ("CHILD_VCLASSES".equalsIgnoreCase(s)) {            
             setOptionsType(Field.OptionsType.CHILD_VCLASSES);
+        } else if ("CHILD_VCLASSES_WITH_PARENT".equalsIgnoreCase(s)) {            
+            setOptionsType(Field.OptionsType.CHILD_VCLASSES_WITH_PARENT);            
         } else if ("FILE".equalsIgnoreCase(s)) {
             setOptionsType(Field.OptionsType.FILE);            
         } else if ("DATE".equalsIgnoreCase(s)) {

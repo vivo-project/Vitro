@@ -58,8 +58,8 @@
     
     /* the post parameters seem to get consumed by the parsing so
      * we have to make a copy. */
-    Map <String,List<String>> queryParameters = null;        
-    queryParameters = request.getParameterMap();        
+    Map <String,String[]> queryParameters = null;        
+    queryParameters = request.getParameterMap();    
     
     List<String>  errorMessages = new ArrayList<String>();    
 
@@ -68,7 +68,7 @@
         %><jsp:forward page="/edit/messages/noEditConfigFound.jsp"/><%
     }
     EditN3Generator n3Subber = editConfig.getN3Generator();
-    EditSubmission submission = new EditSubmission(queryParameters, editConfig);     
+    EditSubmission submission = new EditSubmission(queryParameters, editConfig);
 
     Map<String,String> errors =  submission.getValidationErrors();
     EditSubmission.putEditSubmissionInSession(session,submission);
@@ -205,10 +205,12 @@
     }    
     
     OntModel queryModel = editConfig.getQueryModelSelector().getModel(request,application);
+    Model emptyModel = ModelFactory.createDefaultModel();
+    
     if( editConfig.isUseDependentResourceDelete() ){
     	Model depResRetractions = 
     		DependentResourceDeleteJena
-    		.getDependentResourceDeleteForChange(null,allPossibleToDelete,queryModel);
+    		.getDependentResourceDeleteForChange(emptyModel,allPossibleToDelete,queryModel);
     	allPossibleToDelete.add( depResRetractions );
     }    
     

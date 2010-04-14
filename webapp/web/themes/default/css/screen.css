@@ -1,3 +1,5 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
 /****************************************
  CSS for default Vitro application / VIVO
  main site styles
@@ -8,8 +10,6 @@
  Original version
  2006-01-05 bdc34
 *****************************************/
-
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
 @import url("tab.css");
 /*@import url("editBanner.css");*/
@@ -192,6 +192,12 @@ textarea {
 	margin-top:0.5ex;
 	margin-bottom:0.3ex;
 	padding-left:0.2em;
+}
+
+.verbosePropertyListing {
+    color: gray;
+    font-size: 0.75em;
+    margin-left: 1em;
 }
 
 /********************** header ************************************/

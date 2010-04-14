@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.servlet.setup;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -8,6 +8,7 @@ import javax.servlet.ServletContextEvent;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Literal;
@@ -16,6 +17,7 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
+import com.hp.hpl.jena.vocabulary.OWL;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
@@ -79,8 +81,12 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
             if (isEmpty(memModel)) {
             	loadDataFromFilesystem(memModel, sce.getServletContext());
             }
+            
             if (userAccountsModel.size() == 0) {
             	readOntologyFilesInPathSet(AUTHPATH, sce.getServletContext(), userAccountsModel);
+	            if (userAccountsModel.size() == 0) {
+	            	createInitialAdminUser(userAccountsModel);
+	            }
             }
             
             ensureEssentialInterfaceData(memModel, sce, wadf);
@@ -142,11 +148,9 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
 	        	essentialInterfaceData = InitialJenaModelUtils.loadInitialModel(sce.getServletContext(), defaultNamespace);
 	        	if (essentialInterfaceData.size() == 0) {
 	        		essentialInterfaceData = InitialJenaModelUtils.basicPortalAndRootTab(defaultNamespace);
+	        		essentialInterfaceData.add(InitialJenaModelUtils.basicClassgroup(wadf.getDefaultNamespace()));
 	        	}
 	            //JenaModelUtils.makeClassGroupsFromRootClasses(wadf,memModel,essentialInterfaceData);       
-	            if (!essentialInterfaceData.isEmpty()) {
-	            	memModel.addSubModel(essentialInterfaceData);
-	            }
 	            memModel.add(essentialInterfaceData);
         	} else {
         		//Set the default namespace to the namespace of the first portal object we find.

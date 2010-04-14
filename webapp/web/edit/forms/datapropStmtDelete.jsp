@@ -1,5 +1,10 @@
 <%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
 
+<%@ page import="com.hp.hpl.jena.rdf.model.Model" %>
+<%@ page import="com.hp.hpl.jena.rdf.model.Resource" %>
+<%@ page import="com.hp.hpl.jena.rdf.model.Literal" %>
+<%@ page import="com.hp.hpl.jena.rdf.model.Property" %>
+
 <%@ page import="edu.cornell.mannlib.vedit.beans.LoginFormBean" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.DataProperty" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement" %>
@@ -21,9 +26,13 @@
     if( session == null)
         throw new Error("need to have session");
     if (!VitroRequestPrep.isSelfEditing(request) && !LoginFormBean.loggedIn(request, LoginFormBean.NON_EDITOR)) {%>
-        <c:redirect url="<%= Controllers.LOGIN %>" />
+        
+<%@page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.StandardModelSelector"%>
+<%@page import="com.hp.hpl.jena.shared.Lock"%>
+<%@page import="com.hp.hpl.jena.ontology.OntModel"%>
+<%@page import="edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent"%><c:redirect url="<%= Controllers.LOGIN %>" />
 <%  }
-
+    
     String subjectUri   = request.getParameter("subjectUri");
     String predicateUri = request.getParameter("predicateUri");
     String datapropKeyStr  = request.getParameter("datapropKey");
@@ -50,8 +59,14 @@
     request.setAttribute("subjectName",subject.getName());
 
     String dataValue=null;
-   // DataPropertyStatement dps=EditConfiguration.findDataPropertyStatementViaHashcode(subject,predicateUri,dataHash);
-     DataPropertyStatement dps= RdfLiteralHash.getDataPropertyStmtByHash(subject,dataHash);
+    
+    Model model = (Model)application.getAttribute("jenaOntModel");
+    
+    String vitroNsProp  = vreq.getParameter("vitroNsProp");
+    boolean isVitroNsProp = vitroNsProp != null && vitroNsProp.equals("true") ? true : false;
+    
+    DataPropertyStatement dps = RdfLiteralHash.getPropertyStmtByHash(subject, predicateUri, dataHash, model, isVitroNsProp);
+    
     if( log.isDebugEnabled() ){
         log.debug("attempting to delete dataPropertyStatement: subjectURI <" + dps.getIndividualURI() +">");
         log.debug( "predicateURI <" + dps.getDatapropURI() + ">");
@@ -70,8 +85,25 @@
     
     if (dps!=null) {
         dataValue = dps.getData().trim();
-        if( request.getParameter("y") != null ) { //do the delete
-            wdf.getDataPropertyStatementDao().deleteDataPropertyStatement(dps);%>
+        
+      	//do the delete
+        if( request.getParameter("y") != null ) {
+        	if( isVitroNsProp ){
+        			OntModel writeModel = (new StandardModelSelector()).getModel(request, application);        			
+        			writeModel.enterCriticalSection(Lock.WRITE);
+        			try{
+        			    writeModel.getBaseModel().notifyEvent(new EditEvent(editorUri,true));
+        				writeModel.remove(
+        						writeModel.getResource(subjectUri), 
+        						writeModel.getProperty(predicateUri),
+        						writeModel.createTypedLiteral(dps.getData(), dps.getDatatypeURI()));
+        			}finally{
+        				writeModel.leaveCriticalSection();
+        			}        			        			
+        	}else{
+            	wdf.getDataPropertyStatementDao().deleteDataPropertyStatement(dps);
+        	}        	                
+            %>
 
 			<%-- grab the predicate URI and trim it down to get the Local Name so we can send the user back to the appropriate property --%>
 		    <c:set var="predicateUri" value="${param.predicateUri}" />
@@ -91,10 +123,11 @@
                 <input type="hidden" name="datapropKey"  value="${param.datapropKey}"/>
                 <input type="hidden" name="y"            value="1"/>
                 <input type="hidden" name="cmd"          value="delete"/>
+                <input type="hidden" name="vitroNsProp"  value="${param.vitroNsProp}" /> 
                 <v:input type="submit" id="submit" value="Delete" cancel="${param.subjectUri}" />
             </form>
             <jsp:include page="${postForm}"/>
 <%      }
      } else {
-           throw new Error("In datapropStmtDelete.jsp, no match via hashcode to existing datatype property "+predicateUri+" for subject "+subject.getName()+"\n");
+           throw new Error("In datapropStmtDelete.jsp, no match via hashcode to existing data property "+predicateUri+" for subject "+subject.getName()+"\n");
      }%>

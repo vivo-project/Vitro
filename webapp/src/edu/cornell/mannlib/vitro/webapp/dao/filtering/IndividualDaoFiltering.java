@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.dao.filtering;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.dao.filtering;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -247,5 +247,9 @@ class IndividualDaoFiltering extends BaseFiltering implements IndividualDao{
     public boolean isIndividualOfClass(String vclassURI, String indURI) {
         return innerIndividualDao.isIndividualOfClass(vclassURI, indURI);
     }
+
+	public String getUnusedURI(Individual individual) throws InsertException {
+		return innerIndividualDao.getUnusedURI(individual);
+	}
 
 }

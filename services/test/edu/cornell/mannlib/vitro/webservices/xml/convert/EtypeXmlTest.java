@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webservices.xml.convert.test;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webservices.xml.convert.test;
 
 import edu.cornell.mannlib.vitro.beans.VClass;
 import edu.cornell.mannlib.vitro.webservices.xml.convert.*;

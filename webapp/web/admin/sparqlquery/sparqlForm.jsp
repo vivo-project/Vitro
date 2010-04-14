@@ -2,6 +2,8 @@
 
 <%@page import="com.hp.hpl.jena.rdf.model.ModelMaker"%>
 <%@page import="java.util.Iterator"%>
+<%@page import="java.util.ArrayList"%>
+<%@page import="java.util.List"%>
 
 <body>
 <div id="content" class="sparqlform">
@@ -9,28 +11,37 @@
 <form action='sparqlquery'>
 query:
 <div>
-<textarea name='query' rows ='23' cols='100' class="span-23">
+<textarea name='query' rows ='30' cols='100' class="span-23">
 PREFIX rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX xsd:   <http://www.w3.org/2001/XMLSchema#>
 PREFIX owl:   <http://www.w3.org/2002/07/owl#>
 PREFIX swrl:  <http://www.w3.org/2003/11/swrl#>
 PREFIX swrlb: <http://www.w3.org/2003/11/swrlb#>
-PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#>
-PREFIX vivo:  <http://vivo.library.cornell.edu/ns/0.1#>
+PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#><%List prefixes = (List)request.getAttribute("prefixList");
+if(prefixes != null){
+	Iterator prefixItr = prefixes.iterator();
+	Integer count = 0;
+	while (prefixItr.hasNext()){
+		String prefixText = (String) prefixItr.next();
+		if(prefixText.equals("(not yet specified)")){
+			count++;
+			prefixText = "j." + count.toString();		
+		}
+		String urlText = (String) prefixItr.next();%>
+PREFIX <%=prefixText%>: <<%=urlText%>><%}}%>
+
 #
-# This example query gets the label, research focus, and netID 
-# for 20 Cornell employees.
+# This example query gets 20 geographic locations
+# and (if available) their labels
 #
-SELECT ?person ?personLabel ?focus ?netid
-WHERE 
+SELECT ?geoLocation ?label
+WHERE
 {
- ?person vivo:CornellemailnetId ?netid .
- ?person rdf:type vivo:CornellEmployee .
- ?person vivo:researchFocus ?focus. 
- OPTIONAL { ?person rdfs:label ?personLabel }
+  ?geoLocation rdf:type core:GeographicLocation .
+  OPTIONAL { ?geoLocation rdfs:label ?label }
 }
-limit 20
+LIMIT 20
 </textarea>
 </div>
 

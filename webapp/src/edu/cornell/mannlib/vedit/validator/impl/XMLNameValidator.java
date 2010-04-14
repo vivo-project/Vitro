@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vedit.validator.impl;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vedit.validator.impl;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

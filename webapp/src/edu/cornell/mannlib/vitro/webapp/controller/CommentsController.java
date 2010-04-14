@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.controller;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.controller;
 
 import java.io.IOException;
 
@@ -33,7 +33,8 @@ public class CommentsController extends VitroHttpServlet{
             if (!ContactMailServlet.isSmtpHostConfigured()) {
                 request.setAttribute("title", "Comments and Feedback Form");
                 request.setAttribute("bodyJsp", "/contact_err.jsp");// <<< this is where the body gets set
-                request.setAttribute("ERR","This application has not yet been configured to send mail -- smtp host has not been specified in connection.properties");
+                request.setAttribute("ERR","This application has not yet been configured to send mail -- " +
+                		"smtp host has not been specified in the configuration properties file.");
                 RequestDispatcher errd = request.getRequestDispatcher(Controllers.BASIC_JSP);
                 errd.forward(request, response);
             }

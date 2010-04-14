@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.dao.jena;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -130,10 +130,6 @@ public class JenaModelUtils {
         	    }
     		} catch (Exception e) {
     			log.error("Unable to create class groups automatically based on class hierarchy");
-    			Individual thingsClassGroup = tempModel.createIndividual(wadf.getDefaultNamespace()+"vitroClassGroupThings",classGroupClass);
-    			thingsClassGroup.addLabel("Things",null);
-    			thingsClassGroup.addProperty(tempModel.getProperty(VitroVocabulary.DISPLAY_RANK_ANNOT),"50",XSDDatatype.XSDint);
-    			tempModel.add(OWL.Thing, inClassGroupProperty, thingsClassGroup);
     		}
     		vitroInternalsSubmodel.enterCriticalSection(Lock.WRITE);
     		try {
@@ -216,7 +212,7 @@ private final OntModelSpec DEFAULT_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM;
 		} else {
 			// limit resources to those in the supplied namespace
 			describeQueryStrBuff
-			.append("    FILTER (afn:namespace(?res) == \"")
+			.append("    FILTER (afn:namespace(?res) = \"")
 			.append(namespace)
 			.append("\") \n");	
 		}

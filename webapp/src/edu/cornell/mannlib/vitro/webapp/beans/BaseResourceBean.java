@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.beans;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.beans;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -207,4 +207,27 @@ public class BaseResourceBean implements ResourceBean {
     }
     */
 
+	@Override
+	public boolean equals(Object obj) {
+		if(obj == null ) 
+			return false;
+		else if (obj instanceof BaseResourceBean ){
+			String thisURI = this.getURI();
+			String thatURI = ((BaseResourceBean)obj).getURI();
+			if( thisURI != null && thatURI != null ){
+				return thisURI.equals(thatURI);
+			}
+		}
+		return obj.hashCode() == this.hashCode();			
+	}
+	
+	@Override
+	public int hashCode() {
+		if( getURI() != null )
+			return getURI().hashCode();
+		else
+			return super.hashCode();
+	}
+
+    
 }

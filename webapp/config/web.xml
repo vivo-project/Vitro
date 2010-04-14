@@ -72,6 +72,13 @@
     <listener-class>edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetup</listener-class>
   </listener>
 
+  <!-- Invokes process to perform updates to align with ontology changes if needed -->
+  <!-- Needs to run before submodels are attached and Pellet is set up -->
+
+  <listener>
+     <listener-class>edu.cornell.mannlib.vitro.webapp.servlet.setup.UpdateKnowledgeBase</listener-class>
+  </listener>
+
   <!-- Attaching submodels permits extra RDF files to be made visible without storing the data in the DB. -->
 
   <listener>
@@ -104,15 +111,11 @@
     <listener-class> edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup </listener-class>
   </listener>
 
-  <!--
- 
-    <listener>
-        <listener-class>
-            edu.cornell.mannlib.vitro.webapp.auth.policy.setup.SelfEditingPolicySetup
-        </listener-class>
-    </listener>
-
--->
+	<listener>
+		<listener-class>
+	        edu.cornell.mannlib.vitro.webapp.auth.policy.setup.SelfEditingPolicySetup
+		</listener-class>
+	</listener>    
 
   <listener>
     <listener-class> edu.cornell.mannlib.vitro.webapp.auth.policy.setup.EditorEditingPolicySetup
@@ -132,7 +135,7 @@
   <!--
     <listener>
         <listener-class>
-            edu.cornell.mannlib.vitro.webapp.auth.identifier.FakeSelfEditingIdentifierFactory.SetupFakeSelfEditingIdentifierFactory
+            edu.cornell.mannlib.vitro.webapp.auth.identifier.SetupFakeSelfEditingIdentifierFactory
         </listener-class>
     </listener>
 -->
@@ -256,6 +259,15 @@
   <servlet-mapping>
     <servlet-name>AboutController</servlet-name>
     <url-pattern>/about</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>FakeSelfEditController</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.FakeSelfEditController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>FakeSelfEditController</servlet-name>
+    <url-pattern>/admin/fakeselfedit</url-pattern>
   </servlet-mapping>
 
   <servlet>
@@ -892,6 +904,12 @@
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.ContactMailServlet</servlet-class>
     <load-on-startup>5</load-on-startup>
   </servlet>
+  
+  <servlet>
+    <servlet-name>mailusers</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.MailUsersServlet</servlet-class>
+     <load-on-startup>5</load-on-startup>
+  </servlet>
 
   <servlet>
     <servlet-name>entity</servlet-name>
@@ -1004,6 +1022,10 @@
     <servlet-name>sendmail</servlet-name>
     <url-pattern>/sendmail</url-pattern>
   </servlet-mapping>
+   <servlet-mapping>
+    <servlet-name>mailusers</servlet-name>
+    <url-pattern>/mailusers</url-pattern>
+  </servlet-mapping>
   <servlet-mapping>
     <servlet-name>entity</servlet-name>
     <url-pattern>/entity</url-pattern>
@@ -1015,6 +1037,10 @@
   <servlet-mapping>
     <servlet-name>entity</servlet-name>
     <url-pattern>/individual/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>entity</servlet-name>
+    <url-pattern>/display/*</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>updateEntityFlags</servlet-name>

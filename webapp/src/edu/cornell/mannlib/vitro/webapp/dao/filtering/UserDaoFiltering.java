@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.dao.filtering;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.dao.filtering;
 
 import edu.cornell.mannlib.vitro.webapp.beans.*;
 import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
@@ -53,6 +53,14 @@ public class UserDaoFiltering extends BaseFiltering implements UserDao{
 
     public List<String> getIndividualsUserMayEditAs(String userURI) {
         return innerDao.getIndividualsUserMayEditAs(userURI);
+    }
+    
+    public List<String> getUserAccountEmails() {
+    	return innerDao.getUserAccountEmails();
+    }
+    
+    public String getUserEmailAddress(String userURI) {
+    	return innerDao.getUserEmailAddress(userURI);
     }
 
 }

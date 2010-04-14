@@ -1,5 +1,6 @@
 <%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
 
+<%@ page import="com.hp.hpl.jena.rdf.model.Model" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.DataProperty" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Individual" %>
@@ -13,9 +14,12 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Portal" %>
 <%@ page import="java.util.HashMap" %>
+<%@ page import="org.apache.commons.logging.Log" %>
+<%@ page import="org.apache.commons.logging.LogFactory" %>
+
 <%
-    org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.edit.editDatapropStmtRequestDispatch");
-    //Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.edit.editDatapropStmtRequestDispatch");
+    //org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.edit.editDatapropStmtRequestDispatch.jsp");
+    final Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.edit.editDatapropStmtRequestDispatch.jsp");
 %>
 <%
     // Decide which form to forward to, set subjectUri, subjectUriJson, predicateUri, predicateUriJson in request
@@ -32,8 +36,9 @@
       ************************************** */
 
     final String DEFAULT_DATA_FORM = "defaultDatapropForm.jsp";
+    final String DEFAULT_VITRO_NS_FORM = "defaultVitroNsDataPropForm.jsp";
     final String DEFAULT_ERROR_FORM = "error.jsp";
-   
+    
     if (!VitroRequestPrep.isSelfEditing(request) && !LoginFormBean.loggedIn(request, LoginFormBean.NON_EDITOR)) {        
         %> <c:redirect url="<%= Controllers.LOGIN %>" /> <%  
     }
@@ -49,6 +54,9 @@
     String predicateUri = vreq.getParameter("predicateUri");
     String formParam    = vreq.getParameter("editForm");
     String command      = vreq.getParameter("cmd");
+    
+    String vitroNsProp = (String) vreq.getParameter("vitroNsProp");
+    boolean isVitroNsProp = (vitroNsProp != null && vitroNsProp.equals("true")) ? true : false;
 
     if( subjectUri == null || subjectUri.trim().length() == 0 ) {
         log.error("required subjectUri parameter missing");
@@ -58,32 +66,37 @@
         log.error("required subjectUri parameter missing");
         throw new Error("predicateUri was empty, it is required by editDatapropStmtRequestDispatch");
     }
+    
+    // Since we have the URIs let's put the individual, data property, and optional data property statement in the request
     vreq.setAttribute("subjectUri", subjectUri);
     vreq.setAttribute("subjectUriJson", MiscWebUtils.escape(subjectUri));
     vreq.setAttribute("predicateUri", predicateUri);
     vreq.setAttribute("predicateUriJson", MiscWebUtils.escape(predicateUri));
-
-    /* since we have the URIs let's put the individual, data property, and optional data property statement in the request */
-    
+ 
     WebappDaoFactory wdf = vreq.getWebappDaoFactory();
 
     Individual subject = wdf.getIndividualDao().getIndividualByURI(subjectUri);
     if( subject == null ) {
         log.error("Could not find subject Individual '"+subjectUri+"' in model");
-        throw new Error("editDatapropStmtRequest.jsp: Could not find subject Individual in model: '" + subjectUri + "'");
+        throw new Error("editDatapropStmtRequestDispatch.jsp: Could not find subject Individual in model: '" + subjectUri + "'");
     }
     vreq.setAttribute("subject", subject);
 
     DataProperty dataproperty = wdf.getDataPropertyDao().getDataPropertyByURI( predicateUri );
-    if( dataproperty == null ) {
-        log.error("Could not find data property '"+predicateUri+"' in model");
-        throw new Error("editDatapropStmtRequest.jsp: Could not find DataProperty in model: " + predicateUri);
+    if( dataproperty == null) {
+        // No dataproperty will be returned for a vitro ns prop, but we shouldn't throw an error.
+        // RY This is not necessarily true...
+        if (!isVitroNsProp) {
+            log.error("Could not find data property '"+predicateUri+"' in model");
+            throw new Error("editDatapropStmtRequest.jsp: Could not find DataProperty in model: " + predicateUri);
+        }
     }
-    vreq.setAttribute("predicate", dataproperty);
+    else {
+        vreq.setAttribute("predicate", dataproperty);
+    }
 
     String url= "/edit/editDatapropStmtRequestDispatch.jsp"; //I'd like to get this from the request but...
     vreq.setAttribute("formUrl", url + "?" + vreq.getQueryString());
-
 
     String datapropKeyStr = vreq.getParameter("datapropKey");
     int dataHash = 0;
@@ -99,8 +112,9 @@
 
     DataPropertyStatement dps = null;
     if( dataHash != 0) {
-        dps = RdfLiteralHash.getDataPropertyStmtByHash( subject ,dataHash);
-
+        Model model = (Model)application.getAttribute("jenaOntModel");
+        dps = RdfLiteralHash.getPropertyStmtByHash(subject, predicateUri, dataHash, model, isVitroNsProp);
+                              
         if (dps==null) {
             log.error("No match to existing data property \""+predicateUri+"\" statement for subject \""+subjectUri+"\" via key "+datapropKeyStr);
             %><jsp:forward page="/edit/messages/dataPropertyStatementMissing.jsp"></jsp:forward> <%
@@ -110,9 +124,11 @@
     }
 
     if( log.isDebugEnabled() ){
-        log.debug("predicate for DataProperty from request is " + dataproperty.getURI() + " with rangeDatatypeUri of '" + dataproperty.getRangeDatatypeURI() + "'");
+        if (dataproperty != null) {
+            log.debug("predicate for DataProperty from request is " + dataproperty.getURI() + " with rangeDatatypeUri of '" + dataproperty.getRangeDatatypeURI() + "'");
+        }
         if( dps == null )
-            log.debug("no exisitng DataPropertyStatement statement was found, making a new statemet");
+            log.debug("no existing DataPropertyStatement statement was found, making a new statemet");
         else{
             log.debug("Found an existing DataPropertyStatement");
             String msg = "existing datapropstmt: ";
@@ -133,20 +149,26 @@
 <%      return;
     }
 
-    if( formParam == null ){        
-        String form = dataproperty.getCustomEntryForm();
+    String form = null;
+    if (formParam != null) {
+        form = formParam;
+    }   
+    else if (isVitroNsProp) {  // dataproperty is null here
+        form = DEFAULT_VITRO_NS_FORM; 
+    }
+    else {
+        form = dataproperty.getCustomEntryForm();
         if (form != null && form.length()>0) {
             log.warn("have a custom form for this data property: "+form);
             vreq.setAttribute("hasCustomForm","true");
         } else {
             form = DEFAULT_DATA_FORM;
         }
-        vreq.setAttribute("form" ,form);
-    } else {
-        vreq.setAttribute("form", formParam);
     }
+    vreq.setAttribute("form", form);
 
-    if( session.getAttribute("requestedFromEntity") == null )
+    if( session.getAttribute("requestedFromEntity") == null ) {
         session.setAttribute("requestedFromEntity", subjectUri );
+    }    
 %>
 <jsp:forward page="/edit/forms/${form}"  />

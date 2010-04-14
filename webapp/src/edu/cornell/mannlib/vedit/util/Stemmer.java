@@ -1,6 +1,7 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
 package edu.cornell.mannlib.vedit.util;
 
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
 /*
 
    Porter stemmer in Java. The original paper is in

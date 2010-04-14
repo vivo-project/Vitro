@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.controller.edit;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -115,10 +115,12 @@ public class UserRetryController extends BaseEditController {
 
         LoginFormBean loginBean = (LoginFormBean) request.getSession().getAttribute("loginHandler");
         
-        /* has no impact on anything, so don't confuse by showing */
-        /* bdc34: Datastar needs non-backend-editing users for logging in non-Cornell people*/ 
-        Option nonEditor = new Option(ROLE_PROTOCOL+loginBean.getNonEditor(), "unprivileged user");
-        nonEditor.setSelected(userForEditing.getRoleURI().equals(nonEditor.getValue()));
+        /* This is being removed just for NIHVIVO release 1.0 because self editing is not going to be in that release. */
+        /* THIS CHANGE MUST NOT BE PROPAGATED TO THE TRUNK, datastar needs self editors */
+        /* see http://issues.library.cornell.edu/browse/NIHVIVO-335 */
+        Option nonEditor = new Option(ROLE_PROTOCOL+loginBean.getNonEditor(), "self editor");
+        if( ! "insert".equals(action))
+        	nonEditor.setSelected(userForEditing.getRoleURI().equals(nonEditor.getValue()));
         
         Option editor = new Option(ROLE_PROTOCOL+loginBean.getEditor(), "editor");
         editor.setSelected(userForEditing.getRoleURI().equals(editor.getValue()));
@@ -129,8 +131,12 @@ public class UserRetryController extends BaseEditController {
 
         List roleOptionList = new LinkedList();
 
-        if (nonEditor.getSelected() || (Integer.decode(loginBean.getLoginRole()) >= loginBean.getNonEditor()))
-            roleOptionList.add(nonEditor); 
+        /* This is being removed just for NIHVIVO release 1.0 because self editing is not going to be in that release. */
+        /* THIS CHANGE MUST NOT BE PROPIGATED TO THE TRUNK, datastar needs self editors */
+        /* see http://issues.library.cornell.edu/browse/NIHVIVO-335 */
+        if (nonEditor.getSelected() )
+            roleOptionList.add(nonEditor);
+        
         if (editor.getSelected() || (Integer.decode(loginBean.getLoginRole()) >= loginBean.getEditor()))
             roleOptionList.add(editor);
         if (curator.getSelected() || (Integer.decode(loginBean.getLoginRole()) >= loginBean.getCurator()))

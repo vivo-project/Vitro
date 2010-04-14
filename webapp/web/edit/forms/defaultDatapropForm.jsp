@@ -10,7 +10,6 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration" %>
 <%@ taglib prefix="v" uri="http://vitro.mannlib.cornell.edu/vitro/tags" %>
 <%@page import="edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils"%>
-
 <%! private static HashMap<String,String> defaultsForXSDtypes ;
   static {
 	defaultsForXSDtypes = new HashMap<String,String>();
@@ -22,7 +21,6 @@
     org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger("edu.cornell.mannlib.vitro.jsp.edit.forms.defaultDatapropForm.jsp");
 	log.debug("Starting defaultDatapropForm.jsp");
 	VitroRequest vreq = new VitroRequest(request);
-    
     String subjectUri   = vreq.getParameter("subjectUri");
     String predicateUri = vreq.getParameter("predicateUri");
 
@@ -69,7 +67,7 @@
             vreq.setAttribute("rangeLangJson", rangeLang);
         }
     } else {
-        log.debug("No incoming dataproperty statement attribute for property "+prop.getPublicName()+", adding a new statement");                
+        log.debug("No incoming dataproperty statement attribute for property "+prop.getPublicName()+"; adding a new statement");                
         if(rangeDatatypeUri != null && rangeDatatypeUri.length() > 0) {                        
             String defaultVal = defaultsForXSDtypes.get(rangeDatatypeUri);
             if( defaultVal == null )            	
@@ -118,7 +116,7 @@
                                        "literalOptions"   : [ ${rangeDefaultJson} ],
                                        "predicateUri"     : "",
                                        "objectClassUri"   : "",
-                                       "rangeDatatypeUri" : "${rangeDatatypeUriJson}"  ,
+                                       "rangeDatatypeUri" : "${rangeDatatypeUriJson}",
                                        "rangeLang"        : "${rangeLangJson}",
                                        "assertions"       : ["${n3ForEdit}"]
                                      }

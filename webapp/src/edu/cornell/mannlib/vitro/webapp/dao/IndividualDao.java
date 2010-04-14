@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.dao;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.dao;
 
 import java.sql.SQLException;
 import java.util.Collection;
@@ -119,25 +119,34 @@ public interface IndividualDao extends ObjectSourceIface {
 
     public List<Individual> getIndividualsByDataProperty(String dataPropertyUri, String value, String datatypeUri, String lang);
     
-        void fillVClassForIndividual(Individual individual);
+	void fillVClassForIndividual(Individual individual);
 
-        List <String> monikers( String vclassURI );
+	List<String> monikers(String vclassURI);
 
-        @SuppressWarnings("unchecked")
-        List<String> getKeywordsForIndividual(String individualURI);
+	@SuppressWarnings("unchecked")
+	List<String> getKeywordsForIndividual(String individualURI);
 
-        @SuppressWarnings("unchecked")
-        List<String> getKeywordsForIndividualByMode(String individualURI, String modeStr);
-        
-        @SuppressWarnings("unchecked")
-        List<Keyword> getKeywordObjectsForIndividual(String individualURI);
+	@SuppressWarnings("unchecked")
+	List<String> getKeywordsForIndividualByMode(String individualURI,
+			String modeStr);
 
-        String getIndividualURIFromNetId(String netIdStr);
+	@SuppressWarnings("unchecked")
+	List<Keyword> getKeywordObjectsForIndividual(String individualURI);
 
-        String getNetId(String entityURI);
+	String getIndividualURIFromNetId(String netIdStr);
 
-        String getStatus(String entityURI);
+	String getNetId(String entityURI);
 
+	String getStatus(String entityURI);
+
+	/**
+	 * Standard way to get a new URI that is not yet used.
+	 * @param individual, may be null
+	 * @return new URI that is not found in the subject, predicate or object position of any statement.
+	 * @throws InsertException Could not create a URI
+	 */
+	String getUnusedURI(Individual individual) throws InsertException;
+	
     @Deprecated
     public abstract Individual getIndividualByExternalId(int externalIdType,
                                                          String externalIdValue);

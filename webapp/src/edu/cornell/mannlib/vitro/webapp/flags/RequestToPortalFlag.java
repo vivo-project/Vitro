@@ -1,22 +1,21 @@
-package edu.cornell.mannlib.vitro.webapp.flags;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
-import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
-import edu.cornell.mannlib.vitro.webapp.flags.FlagException;
-import edu.cornell.mannlib.vitro.webapp.flags.AuthFlag;
-import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
-import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
+package edu.cornell.mannlib.vitro.webapp.flags;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.List;
-import java.util.Arrays;
-import java.util.Set;
-import java.util.HashSet;
+
+import edu.cornell.mannlib.vedit.beans.LoginFormBean;
+import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
+import edu.cornell.mannlib.vitro.webapp.beans.Portal;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
 
 /**
  * Created by IntelliJ IDEA.
@@ -145,7 +144,7 @@ public class RequestToPortalFlag {
      */
 
     public static void preparePortalStateForFiltering(PortalFlag portalFlag, HttpServletRequest req,
-        ApplicationBean appBean, Portal portalBean) throws FlagException {
+        ApplicationBean appBean, Portal portalBean, WebappDaoFactory wdf) throws FlagException {
     	
     	VitroRequest request = new VitroRequest(req);
     	
@@ -163,7 +162,8 @@ public class RequestToPortalFlag {
         portalFlag.flag3Active=appBean.isFlag3Active() ;
 
         if(  !portalBean.isFlag1Filtering() 
-            || "nofiltering".equals(req.getParameter("flag1")) ) {
+            || "nofiltering".equals(req.getParameter("flag1")) 
+            || wdf.getApplicationDao().isFlag1Active() ) {
             portalFlag.flag1Active=false;
             portalFlag.flag2Active=false;
             portalFlag.flag3Active=false;

@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.beans;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.beans;
 
 import java.beans.XMLEncoder;
 import java.text.Collator;
@@ -73,7 +73,9 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
     
     private boolean selectFromExisting = true;
     private boolean offerCreateNewOption = false;
-    private boolean forceStubObjectDeletion = false;
+    private boolean stubObjectRelation = false;
+    
+    private boolean collateBySubclass = false;
     
     public ObjectProperty() {
         super();
@@ -252,6 +254,14 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
     public void setInverseFunctional(boolean inverseFunctional) {
     	this.inverseFunctional = inverseFunctional;
     }
+
+	public void setCollateBySubclass(boolean collate) {
+		collateBySubclass = collate;
+	}
+	
+	public boolean getCollateBySubclass() {
+		return collateBySubclass;
+	}
     
     /**
      * adds a single ObjectPropertyStatement object to Property's object property statements List.
@@ -353,12 +363,12 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
         this.offerCreateNewOption = b;
     }
     
-    public boolean getForceStubObjectDeletion() {
-        return forceStubObjectDeletion;
+    public boolean getStubObjectRelation() {
+        return stubObjectRelation;
     }
     
-    public void setForceStubObjectDeletion(boolean b) {
-        this.forceStubObjectDeletion = b;
+    public void setStubObjectRelation(boolean b) {
+        this.stubObjectRelation = b;
     }
     
     /**

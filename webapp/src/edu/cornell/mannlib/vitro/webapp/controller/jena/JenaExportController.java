@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.controller.jena;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.controller.jena;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -78,6 +78,7 @@ public class JenaExportController extends BaseEditController {
 		String formatParam = vreq.getParameter("format");
 		String subgraphParam = vreq.getParameter("subgraph");
 		String assertedOrInferredParam = vreq.getParameter("assertedOrInferred");
+		String ontologyURI = vreq.getParameter("ontologyURI");
 		
 		Model model = null;
 		
@@ -109,7 +110,7 @@ public class JenaExportController extends BaseEditController {
 		} else if ( "tbox".equals(subgraphParam) ) {
 			if (limitToInferred) {
 				Model fullModel = getOntModelFromAttribute( FULL_ONT_MODEL_ATTR, vreq );
-				model = xutil.extractTBox( fullModel );
+				model = xutil.extractTBox( fullModel, ontologyURI );
 				try { 
 					inferenceModel.enterCriticalSection(Lock.READ);
 					model = model.intersection(inferenceModel);
@@ -117,7 +118,7 @@ public class JenaExportController extends BaseEditController {
 					inferenceModel.leaveCriticalSection();
 				}
 			} else {
-				model = xutil.extractTBox( model );
+				model = xutil.extractTBox( model, ontologyURI );
 			}
 		} 
 		

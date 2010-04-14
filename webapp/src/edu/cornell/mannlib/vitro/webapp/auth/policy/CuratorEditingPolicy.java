@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.auth.policy;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.auth.policy;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -104,6 +104,7 @@ public class CuratorEditingPolicy implements VisitingPolicyIface {
             this.editableVitroUris = new HashSet<String>();
             this.editableVitroUris.add(VitroVocabulary.MONIKER);
             this.editableVitroUris.add(VitroVocabulary.BLURB);
+            this.editableVitroUris.add(VitroVocabulary.DESCRIPTION);               
             this.editableVitroUris.add(VitroVocabulary.MODTIME);
             this.editableVitroUris.add(VitroVocabulary.TIMEKEY);
 

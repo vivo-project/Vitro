@@ -25,11 +25,11 @@
 	<td>
         <form action="showDataPropertyHierarchy" method="get">
             <input type="hidden" name="home" value="${portalBean.portalId}" />
-            <input type="submit" class="form-button" value="Datatype Property Hierarchy"/>
+            <input type="submit" class="form-button" value="Data Property Hierarchy"/>
         </form>
 		<form action="listDatatypeProperties" method="get">
 			<input type="hidden" name="home" value="${portalBean.portalId}" />
-			<input type="submit" class="form-button" value="All Datatype Properties"/>
+			<input type="submit" class="form-button" value="All Data Properties"/>
 		</form>
         <form action="listDataPropertyStatements" method="get">
         	<input type="hidden" name="home" value="${portalBean.portalId}" />
@@ -44,14 +44,14 @@
 			<input type="hidden" name="home" value="${portalBean.portalId}" />
 			<input type="hidden" name="controller" value="Dataprop"/>
 			<input type="hidden" name="uri" value="${datatypeProperty.URI}"/>
-			<input type="submit" class="form-button" value="Edit This Datatype Property"/>
+			<input type="submit" class="form-button" value="Edit this Data Property"/>
 		</form>
 	</td>
 	<td valign="bottom">
 		<form action="editForm" method="get">
 			<input type="hidden" name="home" value="${portalBean.portalId}" />
 			<input type="hidden" name="controller" value="Dataprop"/>
-			<input type="submit" class="form-button" value="Add New Datatype Property"/>
+			<input type="submit" class="form-button" value="Add New Data Property"/>
 		</form>
 		<form action="editForm" method="get">
             <input type="submit" class="form-button" value="Change URI"/>

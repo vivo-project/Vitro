@@ -1,6 +1,7 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.Collection;

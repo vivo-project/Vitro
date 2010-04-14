@@ -1,6 +1,6 @@
-package stubs.javax.servlet.http;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package stubs.javax.servlet.http;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,6 +23,7 @@ import javax.servlet.http.HttpSession;
  * 
  * @author jeb228
  */
+@SuppressWarnings("deprecation")
 public class HttpServletRequestStub implements HttpServletRequest {
 	// ----------------------------------------------------------------------
 	// Stub infrastructure
@@ -55,7 +56,6 @@ public class HttpServletRequestStub implements HttpServletRequest {
 		parameters.remove(name);
 	}
 
-
 	// ----------------------------------------------------------------------
 	// Stub methods
 	// ----------------------------------------------------------------------
@@ -68,11 +68,11 @@ public class HttpServletRequestStub implements HttpServletRequest {
 	}
 
 	public Map getParameterMap() {
-        Map<String,String[]> map = new HashMap<String,String[]>();
-        for( String key : parameters.keySet() ){
-           map.put(key, parameters.get(key).toArray(new String[0]));
-        }
-        return map;
+		Map<String, String[]> map = new HashMap<String, String[]>();
+		for (String key : parameters.keySet()) {
+			map.put(key, parameters.get(key).toArray(new String[0]));
+		}
+		return map;
 	}
 
 	// ----------------------------------------------------------------------

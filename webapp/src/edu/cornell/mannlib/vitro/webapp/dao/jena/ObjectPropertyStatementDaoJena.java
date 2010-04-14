@@ -1,9 +1,11 @@
-package edu.cornell.mannlib.vitro.webapp.dao.jena;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
+package edu.cornell.mannlib.vitro.webapp.dao.jena;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Property;
@@ -52,6 +54,9 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         if (entity.getURI() == null)
             return entity;
         else {
+        	Map<String, ObjectProperty> uriToObjectProperty = new HashMap<String,ObjectProperty>();
+        	
+        	ObjectPropertyDaoJena opDaoJena = new ObjectPropertyDaoJena(getWebappDaoFactory());
             Resource ind = getOntModel().getResource(entity.getURI());
             List<ObjectPropertyStatement> objPropertyStmtList = new ArrayList<ObjectPropertyStatement>();
             ClosableIterator propIt = ind.listProperties();
@@ -71,25 +76,31 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
                             objPropertyStmt.setPropertyURI(st.getPredicate().getURI());
                             try {
                                 Property prop = st.getPredicate();
-                                ObjectProperty p = new ObjectProperty();
-                                p.setURI(prop.getURI());
-                                p.setNamespace(prop.getNameSpace());
-                                p.setLocalName(prop.getLocalName());
-                                //p.setDomainPublic(prop.getLabel(null));
-                                objPropertyStmt.setProperty(p);
+                                if( uriToObjectProperty.containsKey(prop.getURI())){
+                                	objPropertyStmt.setProperty(uriToObjectProperty.get(prop.getURI()));
+                                }else{
+                                	ObjectProperty p = opDaoJena.propertyFromOntProperty(getOntModel().getObjectProperty(prop.getURI()));
+                                	if( p != null ){
+                                		uriToObjectProperty.put(prop.getURI(), p);
+                                		objPropertyStmt.setProperty(uriToObjectProperty.get(prop.getURI()));
+                                	}else{
+                                		//if ObjectProperty not found in ontology, skip it
+                                		continue;
+                                	}
+                                }                                
                             } catch (Throwable g) {
-                                ObjectProperty q = new ObjectProperty();
-                                q.setDomainPublic("error");
-                                // g.printStackTrace();
+                                //do not add statement to list
+                            	log.debug("exception while trying to get object property for statement list, statement skipped.", g);
+                            	continue;                                                                
                             }
                             if (objPropertyStmt.getObjectURI() != null) {
                                 Individual objInd = getWebappDaoFactory().getIndividualDao().getIndividualByURI(objPropertyStmt.getObjectURI());
                                 objPropertyStmt.setObject(objInd);
                             }
-                            if ((objPropertyStmt.getSubjectURI() != null) && (objPropertyStmt.getPropertyURI() != null) && (objPropertyStmt.getObject() != null))
-                                objPropertyStmtList.add(objPropertyStmt);
-                            else {
-                                //log.error("At least one null value in ObjectPropertyStatement.  Discarding.");
+
+                            //add object property statement to list for Individual
+                            if ((objPropertyStmt.getSubjectURI() != null) && (objPropertyStmt.getPropertyURI() != null) && (objPropertyStmt.getObject() != null)){
+                                objPropertyStmtList.add(objPropertyStmt);                           
                             } 
                         } catch (Throwable t) {
                             t.printStackTrace();

@@ -1,7 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.controller.jena;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
+package edu.cornell.mannlib.vitro.webapp.controller.jena;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,7 +40,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 
 public class RDFUploadController extends BaseEditController {
 	
-    private static int maxFileSizeInBytes = 1024 * 1024 * 100; //100mb 
+    private static int maxFileSizeInBytes = 1024 * 1024 * 2000; //2000mb 
 	
 	public void doPost(HttpServletRequest req, HttpServletResponse response) throws ServletException {
         boolean isMultipart = ServletFileUpload.isMultipartContent(req);        

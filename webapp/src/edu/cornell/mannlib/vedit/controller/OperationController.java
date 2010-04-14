@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vedit.controller;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vedit.controller;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -116,6 +116,7 @@ public class OperationController extends BaseEditController {
             boolean status = performEdit(epo, newObj, action);
             if (status == FAILURE) {
             	retry(request,response);
+            	return;
             }
             
             /* put request parameters and attributes into epo where the listeners can see */
@@ -165,6 +166,7 @@ public class OperationController extends BaseEditController {
        
             try {
             	retry(request, response);
+            	return;
             } catch (IOException ioe) {
             	log.error(this.getClass().getName() + " IOError on redirect: ", ioe);
             }

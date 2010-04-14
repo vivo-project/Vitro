@@ -1,15 +1,21 @@
-package edu.cornell.mannlib.vitro.webapp.edit.n3editing;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.edit.n3editing;
 
 import java.util.List;
 
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.web.jsptags.InputElementFormattingTag;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import com.hp.hpl.jena.rdf.model.Literal;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 
 public class RdfLiteralHash {
     
@@ -49,8 +55,8 @@ public class RdfLiteralHash {
         return hashMe.hashCode();
     }
 
+
     /**
-     * 
      * @param stmt
      * @param hash
      * @return
@@ -69,22 +75,124 @@ public class RdfLiteralHash {
         return stmtHash == hash;
     }
     
+    /**
+     * Forward to either getDataPropertyStmtByHash or getVitroNsPropByHash, depending on the type of property.
+     * @param ind
+     * @param hash
+     * @param model
+     * @param isVitroNsProp
+     * @return a DataPropertyStatement if found or null if not found
+     */
+    // RY Instead of a code fork here, we should have a method of Individual getAllDataPropertyStatements() which
+    // doesn't filter out the vitro ns property statements. This would also simplify the front end editing of the vitro ns
+    // properties, because they wouldn't have to be a special case.
+    public static DataPropertyStatement getPropertyStmtByHash(Individual ind, String predicateUri, int hash, Model model, boolean isVitroNsProp) {
+        
+        if (ind == null) return null;
+        
+        DataPropertyStatement dps = isVitroNsProp ? RdfLiteralHash.getVitroNsPropertyStmtByHash(ind, predicateUri, model, hash) :
+            RdfLiteralHash.getDataPropertyStmtByHash(ind, hash);
+
+        return dps;
+    }
     
+
+    public static DataPropertyStatement getDataPropertyStmtByHash( Individual ind, int hash){       
+
+        List<DataPropertyStatement> statements = ind.getDataPropertyStatements();
+        if( statements == null ) return null;
+        for( DataPropertyStatement dps : statements){  
+            if( doesStmtMatchHash(dps, hash) )
+                return dps;
+        }
+        return null;
+    }
+
     /**
      * 
      * @param ind, may be null and getDataPropertyStatements() may return null.
      * @param hash
      * @return a DataPropertyStatement if found or null if not found
      */
-    public static DataPropertyStatement getDataPropertyStmtByHash( Individual ind, int hash){       
-        if( ind == null )  return null;
-        List<DataPropertyStatement> statements = ind.getDataPropertyStatements();
-        if( statements == null ) return null;
-        for( DataPropertyStatement dps : statements){
-            if( doesStmtMatchHash(dps, hash) )
-                return dps;
+    public static DataPropertyStatement getVitroNsPropertyStmtByHash(Individual ind, String predicateUri, Model model, int hash) {
+
+        DataPropertyStatement dps = null;
+        StmtIterator stmts = model.listStatements(model.createResource(ind.getURI()),  
+                                                  model.getProperty(predicateUri),
+                                                  (RDFNode)null);
+        try {
+            while (stmts.hasNext()) {
+                Statement stmt = stmts.nextStatement();
+                RDFNode node = stmt.getObject();
+                if ( node.isLiteral() ){
+                    dps = makeDataPropertyStatementFromStatement(stmt, node);          
+                    if (doesStmtMatchHash(dps, hash)) {
+                        return dps;
+                    }
+                }
+            }
+            //} catch {
+
+            } finally{
+                stmts.close();
+            }
+            return null;
         }
-        return null;
+    
+    public static int makeVitroNsLiteralHash( Individual subject, String predicateUri, String value, Model  model) { 
+        
+        String subjectUri = subject.getURI();
+        
+        StmtIterator stmts = model.listStatements(model.createResource(subjectUri), 
+                                                  model.getProperty(predicateUri), 
+                                                  (RDFNode) null);                     
+        DataPropertyStatement dps = null;
+        int hash = 0;
+        int count = 0;
+        try {           
+            while (stmts.hasNext()) {
+                Statement stmt = stmts.nextStatement();
+                RDFNode node = stmt.getObject();
+                if (node.isLiteral()) {
+                    count++;
+                    dps = makeDataPropertyStatementFromStatement(stmt, node);
+                    hash = makeRdfLiteralHash(dps);
+                }
+            }
+        } finally {
+            stmts.close();
+        }
+        
+        if( count == 1 ) {
+            return hash;
+        } else if( count == 0 ){
+            log.debug("No data property statement for " +
+                    "subject:" + subjectUri + "\npredicate:" + predicateUri + "\nvalue: " + value);
+            throw new IllegalArgumentException("Could not create RdfLiteralHash because " +
+                    "there was no data property statement with the given value.");      
+        } else{
+            log.debug("Multiple data property statements for " +
+                    "subject:" + subjectUri + "\npredicate:" + predicateUri + "\nvalue: " + value);
+            throw new IllegalArgumentException("Could not create RdfLiteralHash because " +
+                    "there were multiple data property statements with the given value.");                  
+        }       
+    }
+
+    private static DataPropertyStatement makeDataPropertyStatementFromStatement(Statement statement, RDFNode node) {
+
+        Literal lit = (Literal) node.as(Literal.class);
+        String value = lit.getLexicalForm();
+        String lang = lit.getLanguage();
+        String datatypeUri = lit.getDatatypeURI();
+
+        DataPropertyStatement dps = new DataPropertyStatementImpl();
+        dps.setDatatypeURI(datatypeUri);
+        dps.setLanguage(lang);
+        dps.setData(value);
+        dps.setDatapropURI(statement.getPredicate().getURI());
+        dps.setIndividualURI(statement.getSubject().getURI());
+         
+        return dps;
     }
     
 }

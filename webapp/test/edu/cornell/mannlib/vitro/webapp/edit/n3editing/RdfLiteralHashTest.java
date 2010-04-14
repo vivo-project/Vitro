@@ -1,7 +1,8 @@
-package edu.cornell.mannlib.vitro.webapp.edit.n3editing;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
+package edu.cornell.mannlib.vitro.webapp.edit.n3editing;
+
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,9 +10,15 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.vocabulary.XSD;
+
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
+import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 public class RdfLiteralHashTest {
 
@@ -179,5 +186,36 @@ public class RdfLiteralHashTest {
         Assert.assertNull(stmt);
 
     }
+    
+    @Test
+    public void testGetVitroNsPropertyStatement(){
 
+        String n3 =
+            "@prefix vitro: <" + VitroVocabulary.vitroURI + "> . \n" +
+            "@prefix ex: <http://example.com/> . \n" +
+            "@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> . \n"+
+            "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n"+
+            " ex:bob vitro:moniker \"great\"^^<"+XSD.xstring.getURI()+"> ." ;
+               
+        Model model = (ModelFactory.createDefaultModel()).read(new StringReader(n3), "", "N3");
+
+        Individual bob = new IndividualImpl();
+        bob.setURI("http://example.com/bob");
+        
+        String propertyUri = VitroVocabulary.MONIKER;
+
+        int hash = RdfLiteralHash.makeVitroNsLiteralHash(bob, propertyUri, "great", model);
+        DataPropertyStatement stmt = RdfLiteralHash.getVitroNsPropertyStmtByHash(bob, propertyUri, model, hash);
+        
+        String data = stmt.getData();
+        String datatypeUri = stmt.getDatatypeURI();
+        String predicateUri = stmt.getDatapropURI();
+        String subjectUri = stmt.getIndividualURI();
+        
+        Assert.assertEquals("great", data);
+        Assert.assertEquals(XSD.xstring.getURI(), datatypeUri);
+        Assert.assertEquals(VitroVocabulary.MONIKER, predicateUri);
+        Assert.assertEquals("http://example.com/bob", subjectUri);
+      
+    }
 }

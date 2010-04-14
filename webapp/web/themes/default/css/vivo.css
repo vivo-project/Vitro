@@ -1,3 +1,5 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
 /****************************************
  * Albert R. Mann Library 
  * Cornell University
@@ -11,8 +13,6 @@ Updated:	June 11, 2008
                 * bjl23@cornell.edu tweaked a.add and a.edit and copied dt/dd styling
                   because alignment was way off on default theme
 */
-
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
 /* **** 2008-06-11 BJL copied from VIVO's vivo.css **** */
 form dt {

@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.dao.jena;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -66,7 +66,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         entity.setPropertyList(props);
     }
 
-    private ObjectProperty propertyFromOntProperty(OntProperty op) {
+    protected ObjectProperty propertyFromOntProperty(OntProperty op) {
         if (op==null) {
             return null;
         }
@@ -220,9 +220,12 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
             p.setSelectFromExisting(selectFromObj==null ? true : selectFromObj);
             Boolean offerCreateObj = getPropertyBooleanValue(op,PROPERTY_OFFERCREATENEWOPTIONANNOT);
             p.setOfferCreateNewOption(offerCreateObj==null ? false : offerCreateObj);
-            Boolean forceStubObjectDeletionObj = getPropertyBooleanValue(op,PROPERTY_FORCESTUBDELETIONANNOT);
-            p.setForceStubObjectDeletion(forceStubObjectDeletionObj==null ? false : forceStubObjectDeletionObj);
+            Boolean dependencyDeletionObj = getPropertyBooleanValue(op,PROPERTY_STUBOBJECTPROPERTYANNOT);
+            p.setStubObjectRelation(dependencyDeletionObj==null ? false : dependencyDeletionObj);
 
+            Boolean collateBySubclass = getPropertyBooleanValue(op,PROPERTY_COLLATEBYSUBCLASSANNOT);
+            p.setCollateBySubclass(collateBySubclass==null ? false : collateBySubclass);
+            
             // the <i> thing from the old system causes sorting problems and ugliness; here is an inelegant way of dealing with it for now (Note <i>s will disappear on update)
             if (p.getDomainSidePhasedOut() != null) {
             	p.setDomainSidePhasedOut(stripItalics(p.getDomainSidePhasedOut()));
@@ -364,8 +367,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
 	        com.hp.hpl.jena.ontology.ObjectProperty p = ontModel.createObjectProperty(prop.getURI());
 	        com.hp.hpl.jena.ontology.ObjectProperty inv = null;
 	        if (hasInverse(prop)) {
-	        	System.out.println(prop.getURIInverse());
-	        	System.out.println("non-null inverse URI");
+	        	log.debug("non-null inverse URI: " +prop.getURIInverse());	        	
 	        	errMsgStr = getWebappDaoFactory().checkURI(prop.getURIInverse());
 	        	if (errMsgStr != null) {
 	        		throw new InsertException("Unusable URI for inverse property: "+errMsgStr);
@@ -385,6 +387,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
     	updateProperty(prop,getOntModel());
     }
 
+    
     public void updateProperty(ObjectProperty prop, OntModel ontModel) {
         if (prop.getURI()==null || prop.getURI().length()<3) {
             return;
@@ -398,20 +401,24 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
 	        }
 	        com.hp.hpl.jena.ontology.ObjectProperty inv = null;
 	        if (hasInverse(prop)) {
-		    try {
-	            	inv = ontModel.getObjectProperty(prop.getURIInverse());
-	            	inv.setInverseOf(p);
-	            	p.setInverseOf(inv);
-                    } catch (Exception e) {
-			System.out.println("Couldn't set "+prop.getURIInverse()+" as inverse");
-			// BJL: What we really want to do here is create a new property as inverse
-		    }      
+			    try {
+		            	inv = ontModel.getObjectProperty(prop.getURIInverse());
+		            	
+		            	if  (!inv.isInverseOf(p)) {
+		            	  inv.setInverseOf(p);
+		            	  p.setInverseOf(inv);
+		            	}
+	            } catch (Exception e) {
+	                   System.out.println("Couldn't set "+prop.getURIInverse()+" as inverse");
+				       // BJL: What we really want to do here is create a new property as inverse
+			    }      
 	        }
-                try {
-	            doUpdate(prop,p,inv,ontModel);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+	        
+            try {
+	             doUpdate(prop,p,inv,ontModel);
+            } catch (Exception e) {
+                 e.printStackTrace();
+            }
         } finally {
         	getOntModel().getBaseModel().notifyEvent(new EditEvent(getWebappDaoFactory().getUserURI(),false));
         	ontModel.leaveCriticalSection();
@@ -420,32 +427,31 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
     
     /* This method assumes that the caller is locking and unlocking the model */
     private void doUpdate(ObjectProperty prop, OntProperty p, OntProperty inv, OntModel ontModel) {
-    	if (inv != null) {
-    		if ((prop.getRangePublic() != null) && (prop.getRangePublic().length() > 0)) {
-    			inv.setLabel(prop.getRangePublic(), (String) getDefaultLanguage());
-    		} else {
-    			inv.removeAll(RDFS.label);
-    		}
+        
+        updateRDFSLabel(p,prop.getDomainPublic());
+
+        if (inv != null) {
+    		updateRDFSLabel(inv,prop.getRangePublic());
     	}
+
     	try {
-	        if (p.getSuperProperty() != null) { 
-	            p.removeSuperProperty(p.getSuperProperty());
-	        }
 	        String parentURI = prop.getParentURI();
 	        if (parentURI != null) {
 		        com.hp.hpl.jena.ontology.ObjectProperty parent = ontModel.getObjectProperty(prop.getParentURI());
 		        if (parent != null) {
-		            p.addSuperProperty(parent);
+		        	
+		        	if (!p.hasSuperProperty(parent, true)) {
+		               p.addSuperProperty(parent);
+		        	}
+		        	
 		            if (inv != null) {
 		                OntProperty parentInv = parent.getInverse();
-		                if (inv.getSuperProperty() != null) {
-		                	if (inv.getSuperProperty() != null) {
-		                		inv.removeSuperProperty(inv.getSuperProperty());
-		                	}
-		                }
+		                
 		                if (parentInv != null) {
-		                    inv.setSuperProperty(parentInv);
-		                }
+		                	if (!inv.hasSuperProperty(parentInv,true)) {
+		                	   inv.setSuperProperty(parentInv);
+		                	}
+		                }		                
 		            }
 		        }
 	        }
@@ -454,10 +460,12 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
     		// plus, this whole section needs reworking
     		log.error("Unable to update parent property for "+prop.getURI(), e);
     	}
+    	
         if (prop.getTransitive()) {
         	if (!getOntModel().contains(p,RDF.type,OWL.TransitiveProperty)) {
         		getOntModel().add(p,RDF.type,OWL.TransitiveProperty);
         	}
+        	
         	if ( (inv != null) && (!getOntModel().contains(inv,RDF.type,OWL.TransitiveProperty))) {
         		getOntModel().add(inv,RDF.type,OWL.TransitiveProperty);
         	}
@@ -469,6 +477,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         		getOntModel().remove(inv,RDF.type,OWL.TransitiveProperty);
         	}
         }
+        
         if (prop.getSymmetric()) {
         	if (!getOntModel().contains(p,RDF.type,OWL.SymmetricProperty)) {
         		getOntModel().add(p,RDF.type,OWL.SymmetricProperty);
@@ -484,6 +493,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         		getOntModel().remove(inv,RDF.type,OWL.SymmetricProperty);
         	}
         }
+        
         if (prop.getFunctional()) {
         	if (!getOntModel().contains(p,RDF.type,OWL.FunctionalProperty)) {
         		getOntModel().add(p,RDF.type,OWL.FunctionalProperty);
@@ -493,6 +503,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         		getOntModel().remove(p,RDF.type,OWL.FunctionalProperty);
         	}
         }
+        
         if (prop.getInverseFunctional()) {
         	if (!getOntModel().contains(p,RDF.type,OWL.InverseFunctionalProperty)) {
         		getOntModel().add(p,RDF.type,OWL.InverseFunctionalProperty);
@@ -502,35 +513,48 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         		getOntModel().remove(p,RDF.type,OWL.InverseFunctionalProperty);
         	}
         }
+ 
+/*     3/29/2010 sjm. Commenting out per bjl. As far as we can tell from looking at the code, these fields
+ *                    are no longer used by the application. Leaving this here commented out for now though,
+ *                    just in case.   
+ 
+        
         if (prop.getDomainSidePhasedOut() != null) {
         	updatePropertyStringValue(p,PROPERTY_FULLPROPERTYNAMEANNOT,prop.getDomainSidePhasedOut(),ontModel);
         }
         if (prop.getRangeSidePhasedOut() != null && inv != null) {
         	updatePropertyStringValue(inv,PROPERTY_FULLPROPERTYNAMEANNOT,prop.getRangeSidePhasedOut(),ontModel);
         }
-        if (prop.getDomainPublic() != null && prop.getDomainPublic().length() > 0) {
-            p.setLabel(prop.getDomainPublic(), (String) getDefaultLanguage());
-        } else {
-        	p.removeAll(RDFS.label);
-        }
-        p.removeAll(RDFS.domain);
-        if (inv != null) {
-        	inv.removeAll(RDFS.range);
-        }
+*/        
+    	
         if ( (prop.getDomainVClassURI() != null) && (prop.getDomainVClassURI().length()>0) ) {
-            p.setDomain(ontModel.getResource(prop.getDomainVClassURI()));
-            if (inv != null)
-                inv.setRange(p.getDomain());
+            if (!p.hasDomain(ontModel.getResource(prop.getDomainVClassURI()))) {
+        	    p.setDomain(ontModel.getResource(prop.getDomainVClassURI()));
+                if (inv != null) {
+                   inv.setRange(p.getDomain());
+                }
+            }
+        } else {
+            p.removeAll(RDFS.domain);
+            if (inv != null) {
+            	inv.removeAll(RDFS.range);
+            }        	
         }
-        p.removeAll(RDFS.range);
-        if (inv != null) {
-        	inv.removeAll(RDFS.domain);
-        }
+                
         if ( (prop.getRangeVClassURI() != null) && (prop.getRangeVClassURI().length()>0) ) {
-            p.setRange(ontModel.getResource(prop.getRangeVClassURI()));
-            if (inv != null)
-                inv.setDomain(p.getRange());
+            if (!p.hasRange(ontModel.getResource(prop.getRangeVClassURI()))) {
+               p.setRange(ontModel.getResource(prop.getRangeVClassURI()));
+               if (inv != null) {
+                   inv.setDomain(p.getRange());
+               }
+            }
+        } else {
+            p.removeAll(RDFS.range);
+            if (inv != null) {
+            	inv.removeAll(RDFS.domain);
+            }        	
         }
+        
         updatePropertyStringValue(p,EXAMPLE_ANNOT,prop.getExample(),getOntModel());
         updatePropertyStringValue(p,DESCRIPTION_ANNOT,prop.getDescription(),getOntModel());
         updatePropertyStringValue(p,PUBLIC_DESCRIPTION_ANNOT,prop.getPublicDescription(),getOntModel());
@@ -540,33 +564,21 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         if (inv != null) {
             updatePropertyStringValue(inv,EXAMPLE_ANNOT,prop.getExample(),getOntModel());
             updatePropertyStringValue(inv,DESCRIPTION_ANNOT,prop.getDescription(),getOntModel());
-            //updatePropertyStringValue(inv,PUBLIC_DESCRIPTION_ANNOT,prop.getPublicDescription(),getOntModel());
             updatePropertyNonNegativeIntValue(inv,DISPLAY_LIMIT,prop.getRangeDisplayLimit(),getOntModel());
             updatePropertyStringValue(inv,PROPERTY_ENTITYSORTFIELD,prop.getRangeEntitySortField(),getOntModel());
             updatePropertyStringValue(inv,PROPERTY_ENTITYSORTDIRECTION,prop.getRangeEntitySortDirection(),getOntModel());
         }
-        if (DISPLAY_RANK_ANNOT != null) {
-            try {
-            	p.removeAll(DISPLAY_RANK_ANNOT);
-            	if (prop.getDomainDisplayTier() != null) {
-                    int domainDisplayTierInt = Integer.decode(prop.getDomainDisplayTier());
-                    if (domainDisplayTierInt > -1) {
-                        p.addProperty(DISPLAY_RANK_ANNOT, prop.getDomainDisplayTier(), XSDDatatype.XSDint);
-                    }
+                
+    	if (prop.getDomainDisplayTier() != null) {
+    		updatePropertyNonNegativeIntValue(p,DISPLAY_RANK_ANNOT,Integer.decode(prop.getDomainDisplayTier()),getOntModel());
+
+    		if (inv != null) {
+            	if (prop.getRangeDisplayTier() != null) {
+            		updatePropertyNonNegativeIntValue(inv,DISPLAY_RANK_ANNOT,Integer.decode(prop.getRangeDisplayTier()),getOntModel());
             	}
-            } catch (NumberFormatException e) {}
-            if (inv != null) {
-                try {
-                	inv.removeAll(DISPLAY_RANK_ANNOT);
-                	if (prop.getRangeDisplayTier() != null) {
-                        int rangeDisplayTierInt = Integer.decode(prop.getRangeDisplayTier());
-                        if (rangeDisplayTierInt >-1) {
-                            inv.addProperty(DISPLAY_RANK_ANNOT, prop.getRangeDisplayTier(), XSDDatatype.XSDint);
-                        }
-                	}
-                } catch (NumberFormatException e) {}
-            }
-        }
+    		}
+    	}
+    	
         String oldObjectIndividualSortPropertyURI = null;
     	RDFNode sortPropertyNode = p.getPropertyValue(PROPERTY_OBJECTINDIVIDUALSORTPROPERTY);
     	if (sortPropertyNode != null && sortPropertyNode instanceof Resource) {
@@ -589,33 +601,21 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         	}
         }
 
-        p.removeAll(HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT);
-        if (HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT != null && prop.getHiddenFromDisplayBelowRoleLevel() != null) { // only need to add if present
-            p.addProperty(HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT, ResourceFactory.createResource(prop.getHiddenFromDisplayBelowRoleLevel().getURI()));
+        if (prop.getHiddenFromDisplayBelowRoleLevel() != null) {
+        	updatePropertyResourceURIValue(p, HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT, prop.getHiddenFromDisplayBelowRoleLevel().getURI());
         }
 
-        p.removeAll(PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT);
-        if (PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT != null && prop.getProhibitedFromUpdateBelowRoleLevel() != null) { // only need to add if present
-            p.addProperty(PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT, ResourceFactory.createResource(prop.getProhibitedFromUpdateBelowRoleLevel().getURI()));
+        if (prop.getProhibitedFromUpdateBelowRoleLevel() != null) {
+        	updatePropertyResourceURIValue(p, PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT, prop.getProhibitedFromUpdateBelowRoleLevel().getURI());
         }
 
         updatePropertyStringValue(p,PROPERTY_CUSTOMENTRYFORMANNOT,prop.getCustomEntryForm(),ontModel);
         updatePropertyBooleanValue(p,PROPERTY_SELECTFROMEXISTINGANNOT,prop.getSelectFromExisting(),ontModel,JenaBaseDao.KEEP_ONLY_IF_FALSE);
         updatePropertyBooleanValue(p,PROPERTY_OFFERCREATENEWOPTIONANNOT,prop.getOfferCreateNewOption(),ontModel,JenaBaseDao.KEEP_ONLY_IF_TRUE);
-        updatePropertyBooleanValue(p,PROPERTY_FORCESTUBDELETIONANNOT,prop.getForceStubObjectDeletion(),ontModel,JenaBaseDao.KEEP_ONLY_IF_TRUE);
-        try {
-        	p.removeAll(PROPERTY_INPROPERTYGROUPANNOT);
-        	if (prop.getGroupURI() != null && prop.getGroupURI().length()>0) {
-            	String badURIErrorStr = checkURI(prop.getGroupURI());
-            	if (badURIErrorStr == null) {
-            		p.addProperty(PROPERTY_INPROPERTYGROUPANNOT, getOntModel().getResource(prop.getGroupURI()));
-            	} else {
-            		log.error(badURIErrorStr);
-            	}
-        	}
-        } catch (Exception e) {
-            log.error("error linking object property "+prop.getURI()+" to property group");
-        }
+        updatePropertyBooleanValue(p,PROPERTY_STUBOBJECTPROPERTYANNOT,prop.getStubObjectRelation(),ontModel,JenaBaseDao.KEEP_ONLY_IF_TRUE);
+        updatePropertyBooleanValue(p,PROPERTY_COLLATEBYSUBCLASSANNOT,prop.getCollateBySubclass(),ontModel,JenaBaseDao.KEEP_ONLY_IF_TRUE);
+        
+        updatePropertyResourceURIValue(p, PROPERTY_INPROPERTYGROUPANNOT, prop.getGroupURI());
     }
 
     public void deleteObjectProperty(ObjectProperty prop) {

@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.testing;
-
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.testing;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -97,8 +97,8 @@ public class VitroTestRunner {
 	/**
 	 * Did any of the tests fail?
 	 */
-	private boolean isFailure() {
-		return this.listener.isFailure();
+	private boolean didEverythingPass() {
+		return this.listener.didEverythingPass();
 	}
 
 	/**
@@ -136,7 +136,7 @@ public class VitroTestRunner {
 		VitroTestRunner runner = new VitroTestRunner(sourceRootDir, reportLevel);
 		runner.run();
 
-		if (runner.isFailure()) {
+		if (!runner.didEverythingPass()) {
 			System.exit(1);
 		}
 	}

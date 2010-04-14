@@ -1,8 +1,8 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
 package edu.cornell.mannlib.vitro.webapp.beans;
 
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
-
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
 /**
  * User: bdc34
