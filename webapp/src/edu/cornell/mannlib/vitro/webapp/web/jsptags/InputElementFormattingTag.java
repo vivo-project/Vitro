@@ -524,7 +524,7 @@ public class InputElementFormattingTag extends TagSupport {
             }
 
             if( errorStr!=null && !errorStr.equals("")) {
-                out.println("<p class=\"validationError\">"+errorStr+"</p>");
+                out.println("<p id=\""+getId()+"_validationError\" class=\"validationError\">"+errorStr+"</p>");
             }
         } catch (IOException ex) {
             log.error("Error in doStartTag: " + ex.getMessage());

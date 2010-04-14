@@ -9,10 +9,10 @@ import com.hp.hpl.jena.rdf.model.Literal;
 
 public class PersonHasPositionValidator implements N3Validator {
     
-    private static String DUPLICATE_ERROR = "Must choose an existing organization or create a new one, not both.";
-    private static String MISSING_ORG_ERROR = "Must specify an organization.";
+    private static String DUPLICATE_ERROR = "Must select an existing organization or create a new one, not both.";
+    private static String MISSING_ORG_ERROR = "Must either select an existing organization or create a new one.";
     private static String MISSING_ORG_TYPE_ERROR = "Must select a type for the new organization.";
-    private static String MISSING_ORG_NAME_ERROR = "Must select a name for the new organization.";
+    private static String MISSING_ORG_NAME_ERROR = "Must specify a name for the new organization.";
 	 
 	public Map<String,String> validate(EditConfiguration editConfig, EditSubmission editSub){
 //		Map<String,String> existingUris = editConfig.getUrisInScope();
