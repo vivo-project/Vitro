@@ -35,7 +35,8 @@ public class TestController extends VitroHttpServlet {
             VitroRequest vreq = new VitroRequest(req);
 
             Portal portal = vreq.getPortal();
-            vreq.setAttribute("portal",String.valueOf(portal));
+            vreq.setAttribute("portalBean", portal);
+            vreq.setAttribute("portal", portal);
 
             String body = vreq.getParameter("bodyJsp");
             if( body != null )
