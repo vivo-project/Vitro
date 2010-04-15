@@ -1,0 +1,131 @@
+#
+# A list of files and directories that are known exceptions to the 
+# license-insertion process.
+#
+# Files will only be altered if they contain a "magic" license place-holder, 
+# but if they match one of the file-matchers and don't contain a place-holder,
+# the process will write a warning.
+#
+# File-matchers are:
+# '*.java', '*.jsp', '*.tld', '*.xsl', '*.xslt', '*.css', '*.js', 'build.xml'
+#
+# Known exceptions listed here produce no warnings.
+#
+
+# ContentType from Google gdata API, Apache 2.0 license included in file.
+webapp/src/edu/cornell/mannlib/vitro/webapp/web/ContentType.java
+
+# The JSON Java source files from json.org
+webapp/src/org/json/*
+
+# TinyMCE from tinymce.moxiecode.com
+webapp/web/js/tiny_mce/*
+webapp/web/js/tiny_mce/**/*
+
+# From apache.org under the Apache license.
+webapp/web/admin/axis/SOAPMonitorApplet.java
+services/additions/admin/axis/SOAPMonitorApplet.java
+
+# JQuery from jquery.com
+webapp/web/js/jquery.js
+webapp/web/js/jquery_plugins/*
+
+# From pajhome.org.uk
+webapp/web/js/md5.js
+
+# From dojotoolkit.org
+webapp/web/dojo.js
+webapp/web/src/AdapterRegistry.js
+webapp/web/src/animation/*
+webapp/web/src/animation.js
+webapp/web/src/behavior.js
+webapp/web/src/bootstrap1.js
+webapp/web/src/bootstrap2.js
+webapp/web/src/browser_debug.js
+webapp/web/src/collections/*
+webapp/web/src/compat/*
+webapp/web/src/crypto/*
+webapp/web/src/crypto.js
+webapp/web/src/data/*
+webapp/web/src/data.js
+webapp/web/src/date.js
+webapp/web/src/debug/*
+webapp/web/src/debug.js
+webapp/web/src/Deferred.js
+webapp/web/src/dnd/*
+webapp/web/src/doc.js
+webapp/web/src/dom.js
+webapp/web/src/event/*
+webapp/web/src/event.js
+webapp/web/src/experimental.js
+webapp/web/src/flash.js
+webapp/web/src/fx/*
+webapp/web/src/graphics/*
+webapp/web/src/hostenv_adobesvg.js
+webapp/web/src/hostenv_browser.js
+webapp/web/src/hostenv_dashboard.js
+webapp/web/src/hostenv_jsc.js
+webapp/web/src/hostenv_rhino.js
+webapp/web/src/hostenv_spidermonkey.js
+webapp/web/src/hostenv_svg.js
+webapp/web/src/hostenv_wsh.js
+webapp/web/src/html/*
+webapp/web/src/html.js
+webapp/web/src/i18n/*
+webapp/web/src/iCalendar.js
+webapp/web/src/io/*
+webapp/web/src/io.js
+webapp/web/src/json.js
+webapp/web/src/lang/*
+webapp/web/src/lang.js
+webapp/web/src/lfx/*
+webapp/web/src/loader.js
+webapp/web/src/loader_xd.js
+webapp/web/src/logging/*
+webapp/web/src/math/*
+webapp/web/src/math.js
+webapp/web/src/profile.js
+webapp/web/src/reflect/*
+webapp/web/src/regexp.js
+webapp/web/src/rpc/*
+webapp/web/src/selection/*
+webapp/web/src/storage/*
+webapp/web/src/storage.js
+webapp/web/src/string/* 
+webapp/web/src/string.js
+webapp/web/src/style.js
+webapp/web/src/svg.js
+webapp/web/src/text/*
+webapp/web/src/undo/*
+webapp/web/src/uri/*
+webapp/web/src/uuid/*
+webapp/web/src/validate/*
+webapp/web/src/validate.js
+webapp/web/src/widget/*
+webapp/web/src/widget/**/*
+webapp/web/src/xml/*
+
+# PROBLEM? Third-party tlds - where do they come from?
+webapp/config/tlds/c.tld
+webapp/config/tlds/fn.tld
+webapp/config/tlds/sparqltag.tld
+webapp/config/tlds/taglibs-mailer.tld
+webapp/config/tlds/taglibs-random.tld
+webapp/config/tlds/taglibs-string.tld
+
+# PROBLEM: It appears that these files require a LICENSE file to accompany them.
+webapp/web/themes/enhanced/css/blueprint/grid.css
+webapp/web/themes/enhanced/css/blueprint/ie.css
+
+# PROBLEM: This is from www.involutionstudios.com, not blueprint. What are the license restrictions? 
+webapp/web/themes/enhanced/css/blueprint/liquid.css
+
+# PROBLEM? from simon.incutio.com, but what are the license restrictions?
+webapp/web/js/betterDateInput.js
+
+# PROBLEM? from wrox.com, but what are the license restrictions?
+webapp/web/js/detect.js
+
+# PROBLEM? perhaps from www.dannyg.com, but what are the license restrictions?
+webapp/web/toggle.js
+webapp/web/js/toggle.js

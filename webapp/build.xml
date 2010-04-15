@@ -264,4 +264,23 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		</sync>
 	</target>
 
+	<!-- ================================= 
+          target: licenser             
+          
+          In regular use, checks that all appropriate source files have license tags.
+          At release time, applies license text to source files.
+         ================================= -->
+	<target name="licenser" description="--> Check source files for licensing tags">
+		<property name="licenser.properties.file"
+		          location="${webapp.dir}/config/licenser/licenser.properties" />
+		<property name="licenser.label" value="Vitro core" />
+
+		<echo message="Checking license tags on ${licenser.label}" />
+
+		<exec executable="ruby" dir="${webapp.dir}/../utilities/licenser" failonerror="true">
+			<arg value="licenser.rb" />
+			<arg value="${licenser.properties.file}" />
+			<redirector outputproperty="licenser.test.output" alwayslog="true" />
+		</exec>
+	</target>
 </project>

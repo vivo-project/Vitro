@@ -174,5 +174,23 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		</java>
 	</target>
 
+	<!-- ================================= 
+          target: licenser             
+          
+          In regular use, checks that all appropriate source files have license tags.
+          At release time, applies license text to source files.
+         ================================= -->
+	<target name="licenser" description="--> Check source files for licensing tags">
+		<!-- Once for the product... -->
+		<antcall target="vitroCore.licenser">
+			<param name="licenser.properties.file" value="${licenser.product.properties.file}" />
+			<param name="licenser.label" value="${ant.project.name}" />
+		</antcall>
 
+		<!-- ...and once for the core. -->
+		<condition property="licenser.properties.file" value="${licenser.core.properties.file}">
+			<isset property="licenser.core.properties.file"/>
+		</condition>
+		<antcall target="vitroCore.licenser" />
+	</target>
 </project>
