@@ -23,19 +23,19 @@ class Licenser
   private
   # ------------------------------------------------------------------------------------
   #
-  # Some paths in the properties file, if they are relative, should be relative to the 
-  # properties file itself. 
+  # Some paths in the properties file, if they are relative, should be relative to the
+  # properties file itself.
   def relative_to_properties(properties, key)
     path = properties[key]
     base = File.dirname(properties['properties_file_path'])
 
     return nil if path == nil
-    return path if Pathname.new(path).absolute?
+    return File.expand_path(path) if Pathname.new(path).absolute?
     return File.expand_path(File.join(base, path))
   end
 
-  # Some paths in the properties file, if they are relative, should be relative to the 
-  # source directory. 
+  # Some paths in the properties file, if they are relative, should be relative to the
+  # source directory.
   def relative_to_source(properties, key)
     path = properties[key]
     base = @source_dir ? @source_dir : ''
@@ -126,7 +126,7 @@ class Licenser
   def scan_dir(source_dir, target_dir)
     @stats.enter_directory(source_dir)
 
-    Dir.mkdir(File.join(@target_dir, target_dir)) if !@scan_only
+    Dir.mkdir(File.expand_path(target_dir, @target_dir)) if !@scan_only
 
     Dir.foreach(File.join(@source_dir, source_dir)) do |filename|
       source_path_relative = File.join(source_dir, filename)
