@@ -179,6 +179,9 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
           
           In regular use, checks that all appropriate source files have license tags.
           At release time, applies license text to source files.
+          
+          NOTE: don't override licenser.properties.file from the command line.
+          Instead, override licenser.core.properties.file and licenser.product.properties.file
          ================================= -->
 	<target name="licenser" description="--> Check source files for licensing tags">
 		<!-- Once for the product... -->
@@ -189,7 +192,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 
 		<!-- ...and once for the core. -->
 		<condition property="licenser.properties.file" value="${licenser.core.properties.file}">
-			<isset property="licenser.core.properties.file"/>
+			<isset property="licenser.core.properties.file" />
 		</condition>
 		<antcall target="vitroCore.licenser" />
 	</target>
