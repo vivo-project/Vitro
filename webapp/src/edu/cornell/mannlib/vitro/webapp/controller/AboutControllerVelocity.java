@@ -10,6 +10,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
 
 import edu.cornell.mannlib.vitro.webapp.template.velocity.VelocityHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.beans.TestBean;
 
 public class AboutControllerVelocity extends VelocityHttpServlet {
 	
@@ -33,6 +34,11 @@ public class AboutControllerVelocity extends VelocityHttpServlet {
         // in the context if it's an empty string.
         vc.put("aboutText", portal.getAboutText());
         vc.put("acknowledgeText", portal.getAcknowledgeText()); 
+        
+        TestBean testBean = new TestBean();
+        vc.put("testBean", testBean);
+        
+        vc.put("nothing", null);
           	
         return mergeBodyTemplateToContext("about.vm", vc);       	     
     }

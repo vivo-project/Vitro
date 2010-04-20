@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller; 
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,6 +11,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.template.freemarker.FreeMarkerHttpServlet;
+import freemarker.template.SimpleDate;
+import freemarker.template.TemplateDateModel;
 
 public class AboutControllerFreeMarker extends FreeMarkerHttpServlet {
 	
@@ -21,15 +25,30 @@ public class AboutControllerFreeMarker extends FreeMarkerHttpServlet {
     protected String getBody() {
         
     	Map body = new HashMap();
+    	
+    	/* For testing equivalences of Java Strings and FreeMarker SimpleScalar in the template
+    	String about = portal.getAboutText();
+    	SimpleScalar aboutSS = new SimpleScalar(about);
+    	String aboutStr = aboutSS.getAsString();
+    	String aboutStr2 = aboutSS.toString();
+    	body.put("aboutSS", aboutSS);
+    	body.put("aboutStr", aboutStr);
+    	body.put("aboutStr2", aboutStr2);
+    	*/
+    	
+    	Calendar date = Calendar.getInstance();
+    	Date d1 = date.getTime();
+    	SimpleDate d = new SimpleDate(d1, TemplateDateModel.DATE);
+    	body.put("date", d);
+
+        Calendar datetime = Calendar.getInstance();
+        Date d2 = datetime.getTime();
+    	SimpleDate dt = new SimpleDate(d2, TemplateDateModel.DATETIME);
+        body.put("datetime", dt); 	
     
-        // *** RY Velocity works like StringTemplate here: if the value is an empty string,
-        // an if test on the variable will succeed, unlike the EL empty operator.
-        // Since these methods return nulls rather than empty strings, this is ok here,
-        // but in other cases, we might need a utility method that won't put the value
-        // in the context if it's an empty string.
         body.put("aboutText", portal.getAboutText());
         body.put("acknowledgeText", portal.getAcknowledgeText()); 
- 
+
         String templateName = "about.ftl";       
         return mergeBodyToTemplate(templateName, body);
 

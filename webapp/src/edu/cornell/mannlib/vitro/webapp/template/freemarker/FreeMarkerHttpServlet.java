@@ -5,11 +5,11 @@ package edu.cornell.mannlib.vitro.webapp.template.freemarker;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-
+import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
-import java.util.Iterator;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -20,18 +20,22 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import freemarker.template.*;
-
+import edu.cornell.mannlib.vedit.beans.LoginFormBean;
+import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
+import edu.cornell.mannlib.vitro.webapp.beans.Tab;
+import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
-import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 import edu.cornell.mannlib.vitro.webapp.web.PortalWebUtil;
-import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.web.TabWebUtil;
-import edu.cornell.mannlib.vitro.webapp.beans.Tab;
+
+import freemarker.template.Configuration;
+//import freemarker.template.SimpleSequence;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
+import freemarker.template.TemplateModelException;
 
 public class FreeMarkerHttpServlet extends VitroHttpServlet {
 
@@ -65,7 +69,10 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 	        	System.out.println("Can't set shared variable 'title'.");
 	        }
 
-	        SimpleSequence menu = getTabMenu(portalId);
+	        // FreeMarker does this wrapping automatically - no need to create the
+	        // SimpleSequence directly.
+	        //SimpleSequence menu = getTabMenu(portalId);
+	        List<TabMenuItem> menu = getTabMenu(portalId);
 	        root.put("tabMenu", menu);
 
 	        ApplicationBean appBean = vreq.getAppBean();
@@ -233,8 +240,8 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 		return contextPath + url;
 	}
 	
-	private SimpleSequence getTabMenu(int portalId) {
-		SimpleSequence tabMenu = new SimpleSequence();
+	private List<TabMenuItem> getTabMenu(int portalId) {
+		List<TabMenuItem> tabMenu = new ArrayList<TabMenuItem>();
 	
 		//Tabs stored in database
 		List primaryTabs = vreq.getWebappDaoFactory().getTabDao().getPrimaryTabs(portalId);    	

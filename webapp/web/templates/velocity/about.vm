@@ -1,7 +1,11 @@
 ## $This file is distributed under the terms of the license in /doc/license.txt$
 
 <h2>$title</h2>
-<h3>$!foo</h3>
+
+<h4>$testBean.sayHello()</h4>
+
+<h4>$!bar</h4>
+
 #if ($aboutText)
     <div class="pageGroupBody" id="aboutText">$aboutText</div>
 #end

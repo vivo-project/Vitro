@@ -91,7 +91,11 @@ public class BrowseControllerFreeMarker extends FreeMarkerHttpServlet {
     		// Create a list of VClassGroupDisplay objects, each of which wraps a VClassGroup object.
     		// This allows EL to access VClassGroup properties like publicName, which it can't do
     		// if passed a linked list.
-    		SimpleSequence vcgroups = new SimpleSequence();
+    	    
+    	    // Don't need to explicitly create SimpleSequence object. FreeMarker will automatically wrap
+    	    // the list in a SimpleSequence.
+    		//SimpleSequence vcgroups = new SimpleSequence();
+    	    List<VClassGroupDisplay> vcgroups = new ArrayList<VClassGroupDisplay>();
     		Iterator i = groups.iterator();
     		VClassGroup group;
     		VClassGroupDisplay displayGroup;

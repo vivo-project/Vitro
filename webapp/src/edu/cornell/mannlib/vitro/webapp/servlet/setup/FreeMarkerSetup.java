@@ -15,8 +15,7 @@ import freemarker.template.DefaultObjectWrapper;
 import edu.cornell.mannlib.vitro.webapp.template.freemarker.FreeMarkerHttpServlet;
 
 public class FreeMarkerSetup implements ServletContextListener {
-	
-	// Set default theme based on themes present on the file system
+
 	public void contextInitialized(ServletContextEvent event) {	
 		
 		ServletContext sc = event.getServletContext();	
