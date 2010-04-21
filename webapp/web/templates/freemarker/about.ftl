@@ -17,6 +17,19 @@ Simple scalar converted to string with toString(): ${aboutStr2}<br />
 </strong>
 -->
 
+<link rel="stylesheet" type="text/css" href="${stylesheetDir}ss1.css" />
+
+<h2>${title}</h2>
+<p class="noticeme">The red font color on the title of this page, and the styling of this paragraph, demonstrate the use of a stylesheet that has been invoked by the template and moved into the head by the servlet.</p>
+
+<#if aboutText??>
+    <div class="pageGroupBody" id="aboutText">${aboutText}</div>
+</#if>
+    
+<#if acknowledgeText??>
+    <div class="pageGroupBody" id="acknowledgementText">${acknowledgeText}</div> 
+</#if>
+          
 <h3>Today's date, in different formats</h3>
 <p>${date}</p>
 <p>${date?string.short}</p>
@@ -28,16 +41,4 @@ Simple scalar converted to string with toString(): ${aboutStr2}<br />
 <p>${datetime?string.short}</p>
 <p>${datetime?string.medium}</p>
 <p>${datetime?string.long}</p>
-<p>${datetime?string.full}</p>
-
-<h2>${title}</h2>
-
-<#if aboutText??>
-    <div class="pageGroupBody" id="aboutText">${aboutText}</div>
-</#if>
-    
-<#if acknowledgeText??>
-    <div class="pageGroupBody" id="acknowledgementText">${acknowledgeText}</div> 
-</#if>
-          
-            
+<p>${datetime?string.full}</p>          

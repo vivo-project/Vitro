@@ -21,11 +21,6 @@
 
         <div id="contentwrap">      
             <div id="content" <#if contentClass??> class="${contentClass}" </#if>>
-                <#--
-                <#if contentClass??> 
-                    <#include "${contentClass}.ftl">
-                </#if>
-                -->
                 ${body} 
             </div> <!-- content -->
         </div> <!-- contentwrap -->

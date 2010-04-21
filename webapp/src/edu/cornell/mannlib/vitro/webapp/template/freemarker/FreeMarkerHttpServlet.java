@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -30,9 +32,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 import edu.cornell.mannlib.vitro.webapp.web.PortalWebUtil;
 import edu.cornell.mannlib.vitro.webapp.web.TabWebUtil;
-
 import freemarker.template.Configuration;
-//import freemarker.template.SimpleSequence;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateModelException;
@@ -61,7 +61,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 	        int portalId = portal.getPortalId();
 	        root.put("portalId", portalId);
 	        
-	        // Makes $title available to all templates
+	        // Make title available to all templates
 	        try {
 	        	config.setSharedVariable("title", getTitle());
 	        } catch (TemplateModelException e) {
@@ -83,13 +83,13 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 	        // dirs, so we need either two attributes or a list.
 	        String themeDir = portal.getThemeDir();
 	        String stylesheetDir = getUrl(themeDir + "css/");
-	        root.put("stylesheetDir", stylesheetDir);
-
-//	        setStylesheets();
-//	        root.put("stylesheets", stylesheets);
-//	        
-//	        setScripts();
-//	        root.put("scripts", scripts);
+            // Make stylesheetDir available to all templates
+            try {
+                config.setSharedVariable("stylesheetDir", stylesheetDir);
+            } catch (TemplateModelException e) {
+                // RY change to a logging statement
+                System.out.println("Can't set shared variable 'stylesheetDir'.");
+            } 
 	        
 	        root.put("siteName", portal.getAppName());
 
@@ -121,12 +121,16 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 	        }
 	        
 	        root.put("termsOfUseUrl", getUrl("/termsOfUse?home=" + portalId));
-	        
+	         
 	        // Get page-specific body content
-	        root.put("body", getBody());
-
+	        //root.put("body", getBody());
+	        String body = getBody();
+	        // extract link tags, add to a list, put the list in the root
+	        body = extractLinkTagsFromBody(body);
+	        root.put("body", body);
 	        String templateName = "page.ftl";
-	        StringWriter sw = mergeToTemplate(templateName, root);     
+	        StringWriter sw = mergeToTemplate(templateName, root);   
+	        
 	        out.print(sw);
        
 	    } catch (Throwable e) {
@@ -184,6 +188,22 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 	//public void setScripts() {
 	//	//scripts.add
 	//}
+ 
+    private String extractLinkTagsFromBody(String body) {
+        List<String> links = new ArrayList<String>();
+        
+        String re = "<link[^>]*>";
+        Pattern pattern = Pattern.compile(re);
+        Matcher matcher = pattern.matcher(body);
+        while (matcher.find()) {
+            links.add(matcher.group());
+        }
+
+        root.put("stylesheets", links);
+        
+        body = matcher.replaceAll("");
+        return body;
+    }
 
 	private final void setLoginInfo() {
 		
@@ -238,6 +258,17 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 			url = "/" + url;
 		}
 		return contextPath + url;
+	}
+	
+	/* RY Experimental approach to moving link tags generated in templates to the head element. Another approach
+	 * would be to not generate the head from within the main page template, but separately, and after the body 
+	 * gets generated. Then move the link tags to an array, to get passed to the template that generates the 
+	 * link tags. The page components are assembled by the controller rather than in the page template. Either
+	 * way, it's pretty ugly.
+	 */
+	private String moveLinkTagsToHead(String body) {
+	    
+	    return null;
 	}
 	
 	private List<TabMenuItem> getTabMenu(int portalId) {

@@ -2,15 +2,19 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller; 
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.template.freemarker.FreeMarkerHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.beans.TestBean;
+
 import freemarker.template.SimpleDate;
 import freemarker.template.TemplateDateModel;
 
@@ -48,8 +52,8 @@ public class AboutControllerFreeMarker extends FreeMarkerHttpServlet {
     
         body.put("aboutText", portal.getAboutText());
         body.put("acknowledgeText", portal.getAcknowledgeText()); 
-
-        String templateName = "about.ftl";       
+        
+        String templateName = "about.ftl";             
         return mergeBodyToTemplate(templateName, body);
 
     }

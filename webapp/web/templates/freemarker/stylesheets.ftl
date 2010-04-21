@@ -2,4 +2,8 @@
 
 <link rel="stylesheet" type="text/css" href="${stylesheetDir}screen.css" media="screen"/>
 <link rel="stylesheet" type="text/css" href="${stylesheetDir}print.css" media="print"/>
+
+<#list stylesheets as stylesheet>
+    ${stylesheet}
+</#list>
     
