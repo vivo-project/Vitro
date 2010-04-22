@@ -15,7 +15,13 @@ Simple scalar converted to string with toString(): ${aboutStr2}<br />
     aboutStr and aboutStr2 are equal<br />
 </#if>
 </strong>
+
+
+<h3>${testBean.name}</h3>
+${testBean.setName("Fred")}
+<h3>${testBean.name}</h3>
 -->
+
 
 <link rel="stylesheet" type="text/css" href="${stylesheetDir}ss1.css" />
 

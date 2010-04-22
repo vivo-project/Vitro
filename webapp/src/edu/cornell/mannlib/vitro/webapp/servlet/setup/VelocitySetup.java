@@ -19,7 +19,7 @@ public class VelocitySetup implements ServletContextListener {
         Properties p = new Properties();
         // RY May need to change this to webapp.resource.loader.path - see http://velocity.apache.org/engine/devel/webapps.html
         p.setProperty("file.resource.loader.path", templatePath);
-        p.setProperty("runtime.references.strict", "true"); // for debugging; turn off in production
+        //p.setProperty("runtime.references.strict", "true"); // for debugging; turn off in production
         //p.setProperty("eventhandler.invalidreference.class", "org.apache.velocity.app.event.implement.ReportInvalidReferences");
         //p.setProperty("eventhandler.nullset.class", "edu.cornell.mannlib.vitro.webapp.template.velocity.VitroNullSetEventHandler");
         //p.setProperty("eventhandler.include.class", "edu.cornell.mannlib.vitro.webapp.template.velocity.VitroIncludeEventHandler");

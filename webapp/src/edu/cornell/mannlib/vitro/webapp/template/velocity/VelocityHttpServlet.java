@@ -10,6 +10,8 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -112,7 +114,10 @@ public class VelocityHttpServlet extends VitroHttpServlet {
 	        context.put("termsOfUseUrl", getUrl("/termsOfUse?home=" + portalId));
 	        
 	        // Get page-specific body content
-	        context.put("body", getBody());
+	        //context.put("body", getBody());
+	        String body = getBody();
+	        body = extractLinkTagsFromBody(body);
+	        context.put("body", body);
 
 	        String templateName = "page.vm";
 	        StringWriter sw = mergeTemplateToContext(templateName, context);
@@ -178,6 +183,22 @@ public class VelocityHttpServlet extends VitroHttpServlet {
 	//public void setScripts() {
 	//	//scripts.add
 	//}
+    
+    private String extractLinkTagsFromBody(String body) {
+        List<String> links = new ArrayList<String>();
+        
+        String re = "<link[^>]*>";
+        Pattern pattern = Pattern.compile(re);
+        Matcher matcher = pattern.matcher(body);
+        while (matcher.find()) {
+            links.add(matcher.group());
+        }
+
+        context.put("stylesheets", links);
+        
+        body = matcher.replaceAll("");
+        return body;
+    }
 
 	private final void setLoginInfo() {
 		

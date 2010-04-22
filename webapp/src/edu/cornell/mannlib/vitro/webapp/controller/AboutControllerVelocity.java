@@ -36,11 +36,22 @@ public class AboutControllerVelocity extends VelocityHttpServlet {
         vc.put("acknowledgeText", portal.getAcknowledgeText()); 
         
         TestBean testBean = new TestBean();
+        testBean.setName("Jack");
         vc.put("testBean", testBean);
-        
-        vc.put("nothing", null);
+        System.out.println("Velocity TESTBEAN NAME = " + testBean.getName());
+
+        int[] ints =  {1, 2, 3};
+        vc.put("ints", ints);
+        System.out.println("Velocity  ints[0] = " + ints[0]);
           	
-        return mergeBodyTemplateToContext("about.vm", vc);       	     
+        String body = mergeBodyTemplateToContext("about.vm", vc);     
+        
+        // Velocity templates can set properties of objects in their context, and these
+        // changes persist after returning here.
+        System.out.println("Velocity TESTBEAN NAME = " + testBean.getName());
+        System.out.println("Velocity ints[0] = " + ints[0]);
+        
+        return body;
     }
 
 

@@ -128,6 +128,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 	        // extract link tags, add to a list, put the list in the root
 	        body = extractLinkTagsFromBody(body);
 	        root.put("body", body);
+	        
 	        String templateName = "page.ftl";
 	        StringWriter sw = mergeToTemplate(templateName, root);   
 	        
