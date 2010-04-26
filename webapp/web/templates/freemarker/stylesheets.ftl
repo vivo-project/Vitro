@@ -6,4 +6,3 @@
 <#list stylesheets as stylesheet>
     ${stylesheet}
 </#list>
-    

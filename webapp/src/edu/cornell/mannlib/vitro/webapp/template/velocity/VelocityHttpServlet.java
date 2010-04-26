@@ -113,12 +113,18 @@ public class VelocityHttpServlet extends VitroHttpServlet {
 	        
 	        context.put("termsOfUseUrl", getUrl("/termsOfUse?home=" + portalId));
 	        
+	        List<String> stylesheets = new ArrayList<String>();
+	        stylesheets.add("ss2.css");
+	        context.put("stylesheets", stylesheets);
+	        System.out.println("Velocity size of stylesheets before body template processing: " + stylesheets.size());
+	        
 	        // Get page-specific body content
 	        //context.put("body", getBody());
 	        String body = getBody();
-	        body = extractLinkTagsFromBody(body);
+	        //body = extractLinkTagsFromBody(body);
 	        context.put("body", body);
-
+            System.out.println("Velocity size of stylesheets after body template processing: " + stylesheets.size());
+            
 	        String templateName = "page.vm";
 	        StringWriter sw = mergeTemplateToContext(templateName, context);
 	        out.print(sw);

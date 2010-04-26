@@ -25,9 +25,9 @@ public class AboutControllerST extends VitroHttpServlet {
         try {
             super.doGet(request,response);
             VitroRequest vreq = new VitroRequest(request);
-            Portal portal = vreq.getPortal();
+            //Portal portal = vreq.getPortal();
             
-            Page p = new AboutPage(portal);
+            Page p = new AboutPage(vreq, response);
             p.setRequest(vreq);
             p.setResponse(response);
             p.generate();
@@ -50,8 +50,8 @@ public class AboutControllerST extends VitroHttpServlet {
     	// for each subclass of Page.
     	// Not sure if the portal should be handled in the constructor. That might have
     	// implications for template caching.
-    	public AboutPage(Portal portal) {
-    		super(portal);
+    	public AboutPage(VitroRequest vreq, HttpServletResponse response) {
+    		super(vreq, response);
     	}
 
         public StringTemplate body() {

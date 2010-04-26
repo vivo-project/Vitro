@@ -20,10 +20,22 @@ Simple scalar converted to string with toString(): ${aboutStr2}<br />
 <h3>${testBean.name}</h3>
 ${testBean.setName("Fred")}
 <h3>${testBean.name}</h3>
+
+
+<h3>${myName}</h3>
+<#assign myName = "Jack">
+<h3>${myName}</h3>
+-->
+
+<link rel="stylesheet" type="text/css" href="${stylesheetDir}ss1.css" />
+
+<#--
+<h3>Hello, ${mySession.getAttribute("loginHandler").loginName}</h3>
+${mySession.getAttribute("loginHandler").setLoginName("Thomas Jefferson")}
+<h3>Hello, ${mySession.getAttribute("loginHandler").loginName}</h3>
 -->
 
 
-<link rel="stylesheet" type="text/css" href="${stylesheetDir}ss1.css" />
 
 <h2>${title}</h2>
 <p class="noticeme">The red font color on the title of this page, and the styling of this paragraph, demonstrate the use of a stylesheet that has been invoked by the template and moved into the head by the servlet.</p>

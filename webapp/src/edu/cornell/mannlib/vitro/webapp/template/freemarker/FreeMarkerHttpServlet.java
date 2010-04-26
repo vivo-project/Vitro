@@ -90,7 +90,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
                 // RY change to a logging statement
                 System.out.println("Can't set shared variable 'stylesheetDir'.");
             } 
-	        
+            
 	        root.put("siteName", portal.getAppName());
 
 	        String homeURL = (portal.getRootBreadCrumbURL()!=null && portal.getRootBreadCrumbURL().length()>0) ?
@@ -122,13 +122,27 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 	        
 	        root.put("termsOfUseUrl", getUrl("/termsOfUse?home=" + portalId));
 	         
+	        HttpSession session = vreq.getSession();
+	        try {
+	            config.setSharedVariable("mySession", session);
+	        } catch (TemplateModelException e) {
+	            // RY change to a logging statement
+	            System.out.println("Can't set shared variable 'mySession'.");
+	        } 
+            // This value is changed by the template when session is put in the template context
+            LoginFormBean loginHandler = (LoginFormBean)session.getAttribute("loginHandler");
+            if (loginHandler != null) {
+                System.out.println("FreeMarker SESSION LOGINNAME = " + loginHandler.getLoginName());
+            } else {
+                System.out.println("FreeMarker SESSION: not logged in");
+            }
+	        
 	        // Get page-specific body content
 	        //root.put("body", getBody());
 	        String body = getBody();
 	        // extract link tags, add to a list, put the list in the root
 	        body = extractLinkTagsFromBody(body);
-	        root.put("body", body);
-	        
+	        root.put("body", body);            
 	        String templateName = "page.ftl";
 	        StringWriter sw = mergeToTemplate(templateName, root);   
 	        
@@ -190,6 +204,11 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 	//	//scripts.add
 	//}
  
+    // This is the only way to do this in FreeMarker. We cannot: (1) put a sequence of stylesheets in the template
+    // context which the template can add to, because the template cannot call methods on the container. The template
+    // can create a container but not add to one.
+    // (2) create a sequence of stylesheets or a scalar to hold the name of a stylesheet in the template, because
+    // it does not get passed back to the controller. The template can create only local variables.
     private String extractLinkTagsFromBody(String body) {
         List<String> links = new ArrayList<String>();
         

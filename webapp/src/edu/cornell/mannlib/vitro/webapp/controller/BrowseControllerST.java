@@ -85,8 +85,7 @@ public class BrowseControllerST extends VitroHttpServlet {
             super.doGet(request, response);
             VitroRequest vreq = new VitroRequest(request);
 
-            Portal portal = vreq.getPortal();
-            Page p = new BrowseGroupPage(portal);
+            Page p = new BrowseGroupPage(vreq, response);
             p.setRequest(vreq);
             p.setResponse(response);
             p.generate();
@@ -320,8 +319,8 @@ public class BrowseControllerST extends VitroHttpServlet {
     
     private class BrowseGroupPage extends Page {
 
-    	public BrowseGroupPage(Portal portal) {
-    		super(portal);
+    	public BrowseGroupPage(VitroRequest vreq, HttpServletResponse response) {
+    		super(vreq, response);
     	}
     	
     	public StringTemplate body() {

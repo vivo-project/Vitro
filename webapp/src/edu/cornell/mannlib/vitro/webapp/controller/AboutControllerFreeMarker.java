@@ -53,17 +53,23 @@ public class AboutControllerFreeMarker extends FreeMarkerHttpServlet {
         body.put("aboutText", portal.getAboutText());
         body.put("acknowledgeText", portal.getAcknowledgeText()); 
         
+        /*
         TestBean testBean = new TestBean();
         testBean.setName("Jack");
         body.put("testBean", testBean);
         System.out.println("Freemarker TESTBEAN NAME = " + testBean.getName());
 
+        String  myName = "John";
+        body.put("myName", myName);
+        */
+        
         String templateName = "about.ftl";             
         String bodyString = mergeBodyToTemplate(templateName, body);
         
         // FreeMarker templates can set properties of objects in their context, and these
         // changes persist after returning here.
-        System.out.println("Freemarker TESTBEAN NAME = " + testBean.getName());
+        //System.out.println("Freemarker TESTBEAN NAME = " + testBean.getName());
+        //System.out.println("FreeMarker myName = " + myName);
         
         return bodyString;
 

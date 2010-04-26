@@ -9,12 +9,18 @@
 <h3>$ints.get(0)</h3>
 $ints.set(0, 10)
 <h3>$ints.get(0)</h3>
+*#
 
+
+#*
 <h3>$testBean.name</h3>
 $testBean.setName("Fred")
 <h3>$testBean.name</h3>
 *#
 
+<p style="display:none">$stylesheets.add("ss1.css")</p>
+
+<h3>$!bar</h3>
 
 #if ($aboutText)
     <div class="pageGroupBody" id="aboutText">$aboutText</div>
@@ -25,6 +31,6 @@ $testBean.setName("Fred")
 #end
 
 
-<link rel="stylesheet" type="text/css" href="${stylesheetDir}ss1.css" />
+##<link rel="stylesheet" type="text/css" href="${stylesheetDir}ss1.css" />
 
             

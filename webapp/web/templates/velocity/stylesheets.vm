@@ -3,7 +3,9 @@
 <link rel="stylesheet" type="text/css" href="${stylesheetDir}screen.css" media="screen"/>
 <link rel="stylesheet" type="text/css" href="${stylesheetDir}print.css" media="print"/>
 
+
 #foreach ($stylesheet in $stylesheets)
-    $stylesheet
+    ## $stylesheet
+    <link rel="stylesheet" type="text/css" href="${stylesheetDir}${stylesheet}" />
 #end
-    
+

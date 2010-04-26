@@ -42,8 +42,10 @@ public class Page {
  
     static final int FILTER_SECURITY_LEVEL = LoginFormBean.EDITOR;
        
-    public Page(Portal portal) {
-    	this.portal = portal;
+    public Page(VitroRequest vreq, HttpServletResponse response) {
+        this.vreq = vreq;
+        this.response = response;
+        portal = vreq.getPortal();
     }
 
     public void generate() throws IOException {
