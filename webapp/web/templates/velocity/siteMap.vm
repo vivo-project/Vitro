@@ -1,1 +1,0 @@
-<h3>Hello from siteMap.vm</h3>

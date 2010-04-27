@@ -116,7 +116,6 @@ public class EntityListControllerFM extends FreeMarkerHttpServlet {
 
     }
 
-
     // RY Rewrite as a template
     private void doHelp(HttpServletResponse res)
     throws IOException, ServletException {
