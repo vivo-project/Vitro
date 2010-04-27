@@ -138,6 +138,30 @@
     </listener-class>
   </listener>
 
+  <listener>
+    <listener-class>
+        edu.cornell.mannlib.vitro.webapp.servlet.setup.StringTemplateSetup
+    </listener-class>
+  </listener>
+  
+  <listener>
+    <listener-class>
+        edu.cornell.mannlib.vitro.webapp.servlet.setup.StringTemplateGroupFileSetup
+    </listener-class>
+  </listener>
+  
+  <listener>
+    <listener-class>
+        edu.cornell.mannlib.vitro.webapp.servlet.setup.VelocitySetup
+    </listener-class>
+  </listener>
+   
+  <listener>
+    <listener-class>
+        edu.cornell.mannlib.vitro.webapp.servlet.setup.FreeMarkerSetup
+    </listener-class>
+  </listener>
+
   <!--
     <listener>
         <listener-class>
@@ -266,7 +290,45 @@
     <servlet-name>AboutController</servlet-name>
     <url-pattern>/about</url-pattern>
   </servlet-mapping>
+
+  <servlet>
+    <servlet-name>AboutControllerST</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.AboutControllerST</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>AboutControllerST</servlet-name>
+    <url-pattern>/about-stringtemplate</url-pattern>
+  </servlet-mapping>
+
+  <!--
+  <servlet>
+    <servlet-name>AboutControllerSTGF</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.AboutControllerSTGF</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>AboutControllerSTGF</servlet-name>
+    <url-pattern>/about-stringtemplategroupfile</url-pattern>
+  </servlet-mapping>
+  -->
   
+  <servlet>
+    <servlet-name>AboutControllerVelocity</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.AboutControllerVelocity</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>AboutControllerVelocity</servlet-name>
+    <url-pattern>/about-velocity</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>AboutControllerFreeMarker</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.AboutControllerFreeMarker</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>AboutControllerFreeMarker</servlet-name>
+    <url-pattern>/about-freemarker</url-pattern>
+  </servlet-mapping> 
+    
   <servlet>
     <servlet-name>FakeSelfEditController</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.FakeSelfEditController</servlet-class>
@@ -923,6 +985,11 @@
   </servlet>
 
   <servlet>
+    <servlet-name>entityFM</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.EntityControllerFreeMarker</servlet-class>
+  </servlet>
+  
+  <servlet>
     <servlet-name>updateEntityFlags</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.UpdateEntityFlagServlet</servlet-class>
   </servlet>
@@ -948,6 +1015,38 @@
     <load-on-startup>5</load-on-startup>
   </servlet>
 
+  <servlet>
+    <servlet-name>browsecontrollerJsp</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.BrowseControllerJsp</servlet-class>
+    <load-on-startup>5</load-on-startup>
+  </servlet>
+  
+  <servlet>
+    <servlet-name>browsecontrollerST</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.BrowseControllerST</servlet-class>
+    <load-on-startup>5</load-on-startup>
+  </servlet>
+
+  <!--
+  <servlet>
+    <servlet-name>browsecontrollerSTGF</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.BrowseControllerSTGF</servlet-class>
+    <load-on-startup>5</load-on-startup>
+  </servlet>
+  -->
+   
+  <servlet>
+    <servlet-name>browsecontrollerVelocity</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.BrowseControllerVelocity</servlet-class>
+    <load-on-startup>5</load-on-startup>
+  </servlet>
+  
+  <servlet>
+    <servlet-name>browsecontrollerFreeMarker</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.BrowseControllerFreeMarker</servlet-class>
+    <load-on-startup>5</load-on-startup>
+  </servlet>
+  
   <servlet>
     <servlet-name>pubsbyorg</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.vclass.PubsByDepartmentServlet</servlet-class>
@@ -1048,6 +1147,20 @@
     <servlet-name>entity</servlet-name>
     <url-pattern>/display/*</url-pattern>
   </servlet-mapping>
+  
+  <servlet-mapping>
+    <servlet-name>entityFM</servlet-name>
+    <url-pattern>/entityFM</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>entityFM</servlet-name>
+    <url-pattern>/entityFM/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>entityFM</servlet-name>
+    <url-pattern>/individualFM/*</url-pattern>
+  </servlet-mapping>
+  
   <servlet-mapping>
     <servlet-name>updateEntityFlags</servlet-name>
     <url-pattern>/updateEntityFlags</url-pattern>
@@ -1064,6 +1177,31 @@
     <servlet-name>browsecontroller</servlet-name>
     <url-pattern>/browsecontroller</url-pattern>
   </servlet-mapping>
+  
+  <servlet-mapping>
+    <servlet-name>browsecontrollerJsp</servlet-name>
+    <url-pattern>/browsecontroller-jsp</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>browsecontrollerST</servlet-name>
+    <url-pattern>/browsecontroller-stringtemplate</url-pattern>
+  </servlet-mapping>
+  <!--
+  <servlet-mapping>
+    <servlet-name>browsecontrollerSTGF</servlet-name>
+    <url-pattern>/browsecontroller-stringtemplategroupfile</url-pattern>
+  </servlet-mapping>
+  -->
+  <servlet-mapping>
+    <servlet-name>browsecontrollerVelocity</servlet-name>
+    <url-pattern>/browsecontroller-velocity</url-pattern>
+  </servlet-mapping>
+  
+  <servlet-mapping>
+    <servlet-name>browsecontrollerFreeMarker</servlet-name>
+    <url-pattern>/browsecontroller-freemarker</url-pattern>
+  </servlet-mapping>
+  
   <servlet-mapping>
     <servlet-name>pubsbyorg</servlet-name>
     <url-pattern>/pubsbyorg</url-pattern>
