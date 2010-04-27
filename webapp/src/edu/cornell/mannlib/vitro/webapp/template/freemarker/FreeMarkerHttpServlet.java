@@ -44,6 +44,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
     public static Configuration config = null;
     
 	protected VitroRequest vreq;
+	protected HttpServletResponse response;
 	protected Portal portal;
 	protected Map root = new HashMap();
 	
@@ -54,6 +55,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 	        
 	        PrintWriter out = response.getWriter();
 	        vreq = new VitroRequest(request);
+	        this.response = response;
 	        portal = vreq.getPortal();       
 
 	        setLoginInfo();
@@ -122,6 +124,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 	        
 	        root.put("termsOfUseUrl", getUrl("/termsOfUse?home=" + portalId));
 	         
+	        /*
 	        HttpSession session = vreq.getSession();
 	        try {
 	            config.setSharedVariable("mySession", session);
@@ -136,9 +139,9 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
             } else {
                 System.out.println("FreeMarker SESSION: not logged in");
             }
+            */
 	        
 	        // Get page-specific body content
-	        //root.put("body", getBody());
 	        String body = getBody();
 	        // extract link tags, add to a list, put the list in the root
 	        body = extractLinkTagsFromBody(body);
