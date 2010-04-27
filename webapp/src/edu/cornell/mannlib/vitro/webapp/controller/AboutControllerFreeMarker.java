@@ -17,6 +17,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.TestBean;
 
 import freemarker.template.SimpleDate;
 import freemarker.template.TemplateDateModel;
+import freemarker.template.TemplateModelException;
 
 public class AboutControllerFreeMarker extends FreeMarkerHttpServlet {
 	
@@ -28,7 +29,7 @@ public class AboutControllerFreeMarker extends FreeMarkerHttpServlet {
     
     protected String getBody() {
         
-    	Map body = new HashMap();
+    	Map<String, Object> body = new HashMap<String, Object>();
     	
     	/* For testing equivalences of Java Strings and FreeMarker SimpleScalar in the template
     	String about = portal.getAboutText();

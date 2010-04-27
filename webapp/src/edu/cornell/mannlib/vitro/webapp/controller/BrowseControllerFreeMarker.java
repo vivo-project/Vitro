@@ -106,7 +106,7 @@ public class BrowseControllerFreeMarker extends FreeMarkerHttpServlet {
     		}
     		body.put("classGroups", vcgroups);
     	}     
-    	body.put("entityListUri", getUrl("/entitylist?vclassId="));
+    	body.put("entityListUri", getUrl("/entitylistFM?vclassId="));
 
         String templateName = "browseGroup.ftl";       
         return mergeBodyToTemplate(templateName, body);
