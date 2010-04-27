@@ -1,0 +1,28 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+group browseGroup : page;
+
+/******************** MAIN ********************/
+main() ::= <<
+	
+	$if (message)$
+		<p>$message$</p>
+	$else$
+		$classGroups: classGroup()$
+	$endif$	
+>>
+
+/******************** CLASSGROUP ********************/
+classGroup() ::= <<
+
+	<h2>$attr.publicName$</h2>
+	<ul>
+		$attr.vitroClassList: classList()$
+	</ul>
+>>
+
+/******************** CLASSLIST ********************/
+classList() ::= <<
+
+	<li><a href="$entityListUri$$attr.URI$">$attr.name$</a> ($attr.entityCount$)</li>
+>>

@@ -1,0 +1,173 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+group page;
+
+/******************** MAIN PAGE ********************/
+main() ::= <<
+
+$doctype()$
+
+$head()$
+
+<body>
+    <div id="wrap" class="container">
+        <div id="header">
+            $identity()$
+            
+            <div id="navAndSearch" class="block">
+            	$menu()$
+            	$search()$
+            </div> <!-- navAndSearch -->
+        </div> <!-- header --> 
+        
+        <hr class="hidden" />
+        
+        <div id="contentwrap">   
+        	<div id="content" $if (contentClass)$ class="$contentClass$" $endif$>
+            	$body$  
+           	</div> <!-- content -->
+      </div> <!-- contentwrap -->
+    
+        $footer()$
+    
+    </div> <!-- wrap -->
+</body>
+</html>
+>>
+
+/******************** DOCTYPE ********************/
+doctype() ::= <<
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">  
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+>>
+
+/******************** HEAD ********************/
+head() ::= <<
+<head>
+    $title()$
+    $stylesheets()$
+</head>
+>>
+
+/******************** TITLE ********************/
+title() ::= <<
+<title>$title$</title>
+>>
+
+/******************** STYLESHEETS ********************/
+stylesheets() ::= <<
+<link rel="stylesheet" type="text/css" href="$stylesheetDir$screen.css" media="screen"/>
+<link rel="stylesheet" type="text/css" href="$stylesheetDir$print.css" media="print"/>
+>>
+
+/******************** IDENTITY ********************/
+identity() ::= <<
+<div id="identity">
+
+    <h1><a title="Home" href="$homeUrl$">$siteName$</a></h1>
+    
+    $!
+    $if (tagline)$
+        <em>$tagline$</em>
+    $endif$
+    !$
+    
+    <ul id="otherMenu">    
+        $if (loginName)$
+            <li class="border">
+                Logged in as <strong>$loginName$</strong> (<a href="$logoutUrl$">Log out</a>)     
+            </li> 
+            <li class="border"><a href="$siteAdminUrl$">Site Admin</a></li> 
+        $else$
+             <li class="border"><a title="log in to manage this site" href="$loginUrl$">Log in</a></li>
+        $endif$ 
+        
+        <li class="border"><a href="$aboutUrl$">About</a></li>
+        <li class="border"><a href="$aboutStUrl$">About-ST</a></li>
+        <li class="border"><a href="$aboutStgfUrl$">About-STGF</a></li>
+        <li class="border"><a href="$aboutVUrl$">About-Velocity</a></li>
+        <li class="border"><a href="$aboutFMUrl$">About-FreeMarker</a></li>
+        <li><a href="$contactUrl$">Contact Us</a></li>
+        
+    </ul>
+    
+</div>
+>>
+
+/******************** TAB MENU ********************/
+menu() ::= <<
+<div id="primaryAndOther">
+	<ul id="primary">
+    	$tabMenu: tabMenuItem()$
+    </ul>
+</div>
+>>
+
+/******************** TAB MENU ITEM ********************/
+tabMenuItem() ::= <<
+<li>
+	<a href="$attr.url$" $if(attr.active)$ class="activeTab" $endif$>
+		$attr.linkText$
+	</a>
+</li>
+>>
+
+/******************** SEARCH ********************/
+search() ::= <<
+<div id="searchBlock">
+    <form id="searchForm" action="$searchUrl$" >                	
+    	<label for="search">Search </label>
+    	
+      	$if (showFlag1SearchField)$
+	      	<select id="search-form-modifier" name="flag1" class="form-item" >
+	        	<option value="nofiltering" selected="selected">entire database ($loginName$)</option>
+	      		<option value="$portalId$">$tagline$</option>
+	      	</select>
+	    $else$
+      		<input type="hidden" name="flag1" value="$portalId$" />
+      	$endif$
+
+      	<input type="text" name="querytext" id="search" class="search-form-item" value="$querytext$" size="20" />
+    	<input class="search-form-submit" name="submit" type="submit"  value="Search" />
+  	</form>
+</div>
+>>
+
+/******************** FOOTER ********************/
+footer() ::= <<
+<div id="footer">
+  
+    $if (bannerImageUrl)$
+        <img class="footerLogo" src="$bannerImageUrl$" alt="$tagline$"/>
+    $endif$
+  
+    <div class="footerLinks">
+        <ul class="otherNav">     
+            <li><a href="$aboutUrl$" title="more about this web site">About</a></li>      
+            <li class="last"><a href="$contactUrl$" title="feedback form">Contact Us</a></li>
+        </ul>
+    </div>
+    
+    $copyright()$
+
+    All Rights Reserved. <a href="$termsOfUseUrl$">Terms of Use</a>
+
+</div>
+$! SCRIPT TAGS WILL GO HERE !$
+>>
+
+/******************** COPYRIGHT ********************/
+copyright() ::= <<
+$if (copyrightText)$
+    <div class="copyright">
+        &copy;$copyrightYear$&nbsp;
+        
+        $if (copyrightUrl)$
+            <a href="$copyrightUrl$">$copyrightText$</a>
+        $else$
+            $copyrightText$
+        $endif$       
+    </div>
+$endif$
+>>

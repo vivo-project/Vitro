@@ -1,0 +1,36 @@
+## $This file is distributed under the terms of the license in /doc/license.txt$
+
+<h2>$title</h2>
+<p class="noticeme">The red font color on the title of this page, and the styling of this paragraph, demonstrate the use of a stylesheet that has been invoked by the template and moved into the head by the servlet.</p>
+
+## Velocity templates can set properties of objects passed from the servlet, and these changes persist
+## after return to the servlet. 
+#*
+<h3>$ints.get(0)</h3>
+$ints.set(0, 10)
+<h3>$ints.get(0)</h3>
+*#
+
+
+#*
+<h3>$testBean.name</h3>
+$testBean.setName("Fred")
+<h3>$testBean.name</h3>
+*#
+
+<p style="display:none">$stylesheets.add("ss1.css")</p>
+
+<h3>$!bar</h3>
+
+#if ($aboutText)
+    <div class="pageGroupBody" id="aboutText">$aboutText</div>
+#end
+    
+#if ($acknowledgeText)
+    <div class="pageGroupBody" id="acknowledgementText">$acknowledgeText</div> 
+#end
+
+
+##<link rel="stylesheet" type="text/css" href="${stylesheetDir}ss1.css" />
+
+            

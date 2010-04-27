@@ -1,0 +1,13 @@
+## $This file is distributed under the terms of the license in /doc/license.txt$ 
+
+<div id="primaryAndOther">
+    <ul id="primary">
+        #foreach ($item in $tabMenu)
+            <li>
+                <a href="$item.Url" #if ($item.Active) class="activeTab" #end>
+                    $item.LinkText
+                </a>
+            </li>           
+        #end
+    </ul>
+</div>
