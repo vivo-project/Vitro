@@ -2,10 +2,14 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
@@ -20,11 +24,14 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
+import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyDao;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 
 public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
+	
+	protected static final Log log = LogFactory.getLog(PropertyDaoJena.class.getName());
 	
     public PropertyDaoJena(WebappDaoFactoryJena wadf) {
         super(wadf);
@@ -266,5 +273,100 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
         }
     		
 	}
-    
+	
+	/**
+	 * Finds the classes that have a definition involving a restriction
+	 * on the given property. 
+	 *
+	 * @param   propertyURI  identifier of a property
+	 * @return  a list of VClass objects representing the classes that have
+	 *          definitions involving a restriction on the given property.
+	 */
+
+    public List <VClass> getClassesRestrictedOn(String propertyURI) {
+    	
+    	if (propertyURI == null) {
+    		log.info("getClassesRestrictedOn: called with null propertyURI");
+    		return null;
+    	}
+    	    	
+		OntModel ontModel = getOntModel();	
+		ontModel.enterCriticalSection(Lock.READ);
+		
+		HashSet<String> classURISet = new HashSet<String>();
+		
+		try {
+			Resource targetProp = ontModel.getResource(propertyURI);
+			   
+			if (targetProp != null) {
+			
+			    StmtIterator stmtIter = ontModel.listStatements((Resource) null, OWL.onProperty, (RDFNode) targetProp);
+	
+			    while (stmtIter.hasNext()) {
+				   Statement statement = stmtIter.next();
+				   
+				   if ( statement.getSubject().canAs(OntClass.class) ) {
+					   classURISet.addAll(getRelatedClasses((OntClass) statement.getSubject().as(OntClass.class)));
+				   } else {
+					   log.warn("getClassesRestrictedOn: Unexpected use of onProperty: it is not applied to a restriction");
+				   }
+			    }
+			} else {
+	    		log.error("getClassesRestrictedOn: Error: didn't find a Property in the ontology model for the URI: " +  propertyURI);				
+			}
+		} finally {
+			ontModel.leaveCriticalSection();
+		}
+
+		List<VClass> classes = new ArrayList<VClass>();
+		Iterator<String> iter = classURISet.iterator();
+		
+		VClassDao vcd = getWebappDaoFactory().getVClassDao();
+		
+		while (iter.hasNext()) {
+		
+		   String curi = iter.next();
+		   VClass vc = vcd.getVClassByURI(curi);
+		  
+		   if (vc != null) {
+		       classes.add(vc);	  
+		   } else {
+			   log.error("getClassesRestrictedOn: Error: no VClass found for URI: " + curi);
+		   }	
+		}
+       
+        return (classes.size()>0) ? classes : null;
+    }
+
+	/**
+	 * Finds all named superclasses, subclasses and equivalent classes of
+	 * the given class.
+	 *
+	 * @param   resourceURI  identifier of a class
+	 * @return  set of class URIs
+	 * 
+	 * Note: this method assumes that the caller holds a read lock on
+	 * the ontology model.
+	 */
+
+    public HashSet<String> getRelatedClasses(OntClass ontClass) {
+    	
+        HashSet<String> classSet = new HashSet<String>();
+  
+        List<OntClass> classList = ontClass.listEquivalentClasses().toList();
+        classList.addAll(ontClass.listSubClasses().toList());
+        classList.addAll(ontClass.listSuperClasses().toList());
+        
+        Iterator<OntClass> it = classList.iterator();
+		         
+        while (it.hasNext()) {
+        	OntClass oc = it.next();
+        	
+        	if (!oc.isAnon()) {
+        		classSet.add(oc.getURI());
+        	}
+        }
+        		
+        return classSet;
+    }
 }
