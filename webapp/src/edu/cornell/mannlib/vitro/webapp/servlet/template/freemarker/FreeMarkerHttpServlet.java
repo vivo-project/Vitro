@@ -228,7 +228,9 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         String copyrightText = portal.getCopyrightAnchor();
         if ( ! StringUtils.isEmpty(copyrightText) ) {
             root.put("copyrightText", copyrightText);
-            int thisYear = Calendar.getInstance().get(Calendar.YEAR);
+            int thisYear = Calendar.getInstance().get(Calendar.YEAR);  // use ${copyrightYear?c} in template
+            //String thisYear = ((Integer)Calendar.getInstance().get(Calendar.YEAR)).toString(); // use ${copyrightYear} in template
+            //SimpleDate thisYear = new SimpleDate(Calendar.getInstance().getTime(), TemplateDateModel.DATE); // use ${copyrightYear?string("yyyy")} in template
             root.put("copyrightYear", thisYear);
             root.put("copyrightUrl", portal.getCopyrightURL());
         }
