@@ -59,11 +59,8 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 		throws IOException, ServletException {
     	try {
 	        doSetup(request, response);
-	        setTitle();
-	        
-	        // Get page-specific body content	        
-	        root.put("body", getBody());  
-	        
+	        setTitle();	        
+	        doBody();	        
 	        writeOutput(response);
        
 	    } catch (Throwable e) {
@@ -76,6 +73,10 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 	    throws ServletException, IOException {
 		doGet(request, response);
+	}
+	
+	protected void doBody() {
+	    root.put("body", getBody());
 	}
 	
 	protected void setSharedVariable(String key, String value) {

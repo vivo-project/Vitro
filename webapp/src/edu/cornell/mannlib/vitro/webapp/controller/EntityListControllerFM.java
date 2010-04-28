@@ -51,14 +51,14 @@ public class EntityListControllerFM extends FreeMarkerHttpServlet {
             Object obj = vreq.getAttribute("vclass");
             vclass=null;
             if( obj == null ) { // look for vitroclass id parameter
-                String vitroClassIdStr=vreq.getParameter("vclassId");
+                String vitroClassIdStr=req.getParameter("vclassId");
                 if (vitroClassIdStr!=null && !vitroClassIdStr.equals("")) {
                     try {
                             //TODO have to change this so vclass's group and entity count are populated
                             vclass = vreq.getWebappDaoFactory().getVClassDao().getVClassByURI(vitroClassIdStr);
                             if (vclass == null) {
                                 log.error("Couldn't retrieve vclass "+vitroClassIdStr);
-                                response.sendRedirect(Controllers.BROWSE_CONTROLLER+"-freeMarker?"+vreq.getQueryString());
+                                response.sendRedirect(Controllers.BROWSE_CONTROLLER+"-freemarker?"+vreq.getQueryString());
                             }
                         } catch (Exception ex) {
                             throw new HelpException("EntityListControllerFM: request parameter 'vclassId' must be a URI string");
@@ -71,7 +71,9 @@ public class EntityListControllerFM extends FreeMarkerHttpServlet {
                         + VClass.class.getName() );
             }
             if (vclass!=null){
-                getBody();
+                doBody();
+                // We'll want to write output in all cases, just call different body templates for the various error cases
+                writeOutput(response);
             }
         // RY Rewrite error cases for FreeMarker, not JSP
         } catch (HelpException help){

@@ -8,7 +8,8 @@
         <#--include "${classGroup.publicName}.ftl"-->
         <ul>
             <#list classGroup.vitroClassList as class>
-                <li><a href="${entityListUri}${class.URI}">${class.name}</a> (${class.entityCount})</li>
+                <#assign url = "${entityListUri}${class.URI?url}">
+                <li><a href="${url}">${class.name}</a> (${class.entityCount})</li>
             </#list>
         </ul>
     </#list>

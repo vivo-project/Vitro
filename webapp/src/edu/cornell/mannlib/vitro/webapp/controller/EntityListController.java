@@ -41,7 +41,7 @@ public class EntityListController extends VitroHttpServlet {
         try {
             super.doGet(req, res);
             VitroRequest vreq = new VitroRequest(req);
-            Object obj = req.getAttribute("vclass");
+            Object obj = vreq.getAttribute("vclass");
             VClass vclass=null;
             if( obj == null ) { // look for vitroclass id parameter
                 String vitroClassIdStr=req.getParameter("vclassId");
