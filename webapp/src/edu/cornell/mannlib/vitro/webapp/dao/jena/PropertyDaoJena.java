@@ -283,10 +283,10 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
 	 *          definitions involving a restriction on the given property.
 	 */
 
-    public List <VClass> getClassesRestrictedOn(String propertyURI) {
+    public List <VClass> getClassesWithRestrictionOnProperty(String propertyURI) {
     	
     	if (propertyURI == null) {
-    		log.info("getClassesRestrictedOn: called with null propertyURI");
+    		log.info("getClassesWithRestrictionOnProperty: called with null propertyURI");
     		return null;
     	}
     	    	
@@ -308,11 +308,11 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
 				   if ( statement.getSubject().canAs(OntClass.class) ) {
 					   classURISet.addAll(getRelatedClasses((OntClass) statement.getSubject().as(OntClass.class)));
 				   } else {
-					   log.warn("getClassesRestrictedOn: Unexpected use of onProperty: it is not applied to a restriction");
+					   log.warn("getClassesWithRestrictionOnProperty: Unexpected use of onProperty: it is not applied to a class");
 				   }
 			    }
 			} else {
-	    		log.error("getClassesRestrictedOn: Error: didn't find a Property in the ontology model for the URI: " +  propertyURI);				
+	    		log.error("getClassesWithRestrictionOnProperty: Error: didn't find a Property in the ontology model for the URI: " +  propertyURI);				
 			}
 		} finally {
 			ontModel.leaveCriticalSection();
@@ -331,7 +331,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
 		   if (vc != null) {
 		       classes.add(vc);	  
 		   } else {
-			   log.error("getClassesRestrictedOn: Error: no VClass found for URI: " + curi);
+			   log.error("getClassesWithRestrictionOnProperty: Error: no VClass found for URI: " + curi);
 		   }	
 		}
        

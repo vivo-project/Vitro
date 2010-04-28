@@ -185,8 +185,8 @@ class DataPropertyDaoFiltering extends BaseFiltering implements DataPropertyDao{
 		innerDataPropertyDao.removeEquivalentProperty(property, equivalentProperty);
 	}
 	
-    public List <VClass> getClassesRestrictedOn(String propertyURI) {
-    	return innerDataPropertyDao.getClassesRestrictedOn(propertyURI);
+    public List <VClass> getClassesWithRestrictionOnProperty(String propertyURI) {
+    	return innerDataPropertyDao.getClassesWithRestrictionOnProperty(propertyURI);
     }
 
 }

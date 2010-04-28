@@ -198,8 +198,8 @@ class ObjectPropertyDaoFiltering extends BaseFiltering implements ObjectProperty
 		return innerObjectPropertyDao.skipEditForm(predicateURI);
 	}
 	
-    public List <VClass> getClassesRestrictedOn(String propertyURI) {
-    	return innerObjectPropertyDao.getClassesRestrictedOn(propertyURI);
+    public List <VClass> getClassesWithRestrictionOnProperty(String propertyURI) {
+    	return innerObjectPropertyDao.getClassesWithRestrictionOnProperty(propertyURI);
     }
 	
 }

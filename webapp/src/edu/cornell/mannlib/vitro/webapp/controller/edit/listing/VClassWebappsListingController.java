@@ -50,7 +50,7 @@ public class VClassWebappsListingController extends BaseEditController {
         
         if (request.getParameter("showPropertyRestrictions") != null) {
         	PropertyDao pdao = getWebappDaoFactory().getObjectPropertyDao();
-        	classes = pdao.getClassesRestrictedOn(request.getParameter("propertyURI"));
+        	classes = pdao.getClassesWithRestrictionOnProperty(request.getParameter("propertyURI"));
         } else {
         	VClassDao vcdao = getWebappDaoFactory().getVClassDao();
         	

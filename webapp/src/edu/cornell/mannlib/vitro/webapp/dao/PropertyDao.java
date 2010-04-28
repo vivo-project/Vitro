@@ -43,6 +43,6 @@ public interface PropertyDao {
     
     List <String> getEquivalentPropertyURIs(String propertyURI);
     
-    List <VClass> getClassesRestrictedOn(String propertyURI);
+    List <VClass> getClassesWithRestrictionOnProperty(String propertyURI);
     
 }
