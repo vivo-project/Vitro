@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -32,10 +33,13 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 import edu.cornell.mannlib.vitro.webapp.web.PortalWebUtil;
 import edu.cornell.mannlib.vitro.webapp.web.TabWebUtil;
+
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateModelException;
+import freemarker.template.SimpleDate;
+import freemarker.template.TemplateDateModel;
 
 public class FreeMarkerHttpServlet extends VitroHttpServlet {
 
@@ -224,7 +228,8 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         String copyrightText = portal.getCopyrightAnchor();
         if ( ! StringUtils.isEmpty(copyrightText) ) {
             root.put("copyrightText", copyrightText);
-            root.put("copyrightYear", Calendar.getInstance().get(Calendar.YEAR));
+            int thisYear = Calendar.getInstance().get(Calendar.YEAR);
+            root.put("copyrightYear", thisYear);
             root.put("copyrightUrl", portal.getCopyrightURL());
         }
         

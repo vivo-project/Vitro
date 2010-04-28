@@ -58,7 +58,7 @@ public class EntityListControllerFM extends FreeMarkerHttpServlet {
                             vclass = vreq.getWebappDaoFactory().getVClassDao().getVClassByURI(vitroClassIdStr);
                             if (vclass == null) {
                                 log.error("Couldn't retrieve vclass "+vitroClassIdStr);
-                                response.sendRedirect(Controllers.BROWSE_CONTROLLER+"FreeMarker?"+vreq.getQueryString());
+                                response.sendRedirect(Controllers.BROWSE_CONTROLLER+"-freeMarker?"+vreq.getQueryString());
                             }
                         } catch (Exception ex) {
                             throw new HelpException("EntityListControllerFM: request parameter 'vclassId' must be a URI string");

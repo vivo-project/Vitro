@@ -2,7 +2,7 @@
 
 <#if copyrightText??>
     <div class="copyright">
-        &copy;${copyrightYear}&nbsp;
+        &copy;${copyrightYear?c}&nbsp;
         
         <#if copyrightUrl??>
             <a href="${copyrightUrl}">${copyrightText}</a>

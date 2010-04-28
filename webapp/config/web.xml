@@ -844,6 +844,15 @@
   </servlet-mapping>
 
   <servlet>
+    <servlet-name>EntityListControllerFM</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.EntityListControllerFM</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>EntityListControllerFM</servlet-name>
+    <url-pattern>/entitylistFM</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
     <servlet-name>SearchController</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.search.controller.PagedSearchController</servlet-class>
   </servlet>
