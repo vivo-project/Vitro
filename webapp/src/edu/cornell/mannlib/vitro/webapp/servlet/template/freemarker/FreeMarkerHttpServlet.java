@@ -7,7 +7,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -27,19 +26,17 @@ import edu.cornell.mannlib.vedit.beans.LoginFormBean;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.Tab;
+import edu.cornell.mannlib.vitro.webapp.controller.ContactMailServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 import edu.cornell.mannlib.vitro.webapp.web.PortalWebUtil;
 import edu.cornell.mannlib.vitro.webapp.web.TabWebUtil;
-
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateModelException;
-import freemarker.template.SimpleDate;
-import freemarker.template.TemplateDateModel;
 
 public class FreeMarkerHttpServlet extends VitroHttpServlet {
 
@@ -181,7 +178,11 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         setLoginInfo();
         
         int portalId = portal.getPortalId();
-        root.put("portalId", portalId);
+        try {
+            config.setSharedVariable("portalId", portalId);
+        } catch (TemplateModelException e) {
+            log.error("Can't set shared variable 'portalId'.");
+        } 
 
         // FreeMarker does this wrapping automatically - no need to create the
         // SimpleSequence directly.
@@ -197,7 +198,6 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         // dirs, so we need either two attributes or a list.
         String themeDir = portal.getThemeDir();
         String stylesheetDir = getUrl(themeDir + "css/");
-        // Make stylesheetDir available to all templates
         try {
             config.setSharedVariable("stylesheetDir", stylesheetDir);
         } catch (TemplateModelException e) {
@@ -222,7 +222,9 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         root.put("aboutVUrl", getUrl(Controllers.ABOUT + "-velocity?home=" + portalId));
         root.put("aboutFMUrl", getUrl(Controllers.ABOUT + "-freemarker?home=" + portalId));
         // RY Change constants in Controllers from *_JSP to *_URL
-        root.put("contactUrl", getUrl(Controllers.CONTACT_JSP));
+        if (ContactMailServlet.getSmtpHostFromProperties() != null) {
+            root.put("contactUrl", getUrl(Controllers.CONTACT_JSP + "?home=" + portalId));
+        }
         
         root.put("searchUrl", getUrl(Controllers.SEARCH_URL));
         

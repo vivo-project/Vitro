@@ -24,7 +24,9 @@
         <li class="border"><a href="${aboutStUrl}">About-ST</a></li>
         <#-- <li class="border"><a href="$aboutStgfUrl">About-STGF</a></li> -->
         <li class="border"><a href="${aboutVUrl}">About-Velocity</a></li>
-        <li class="border"><a href="${aboutFMUrl}">About-FreeMarker</a></li>
-        <li><a href="${contactUrl}">Contact Us</a></li>        
+        <li <#if contactUrl??>class="border"</#if>><a href="${aboutFMUrl}">About-FreeMarker</a></li>
+        <#if contactUrl??>
+            <li><a href="${contactUrl}">Contact Us</a></li>
+        </#if>        
     </ul>   
 </div>

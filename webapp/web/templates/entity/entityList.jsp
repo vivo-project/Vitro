@@ -31,7 +31,7 @@
 
 <div class="entityList">
 <h2>${title}</h2>
-<c:if test="${!empty subTitle}"><h4>${subTitle}"</h4></c:if>
+<c:if test="${!empty subTitle}"><h4>${subTitle}</h4></c:if>
 
 <% /* <p>${pageTime} milliseconds</p> */ %>
 

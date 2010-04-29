@@ -8,8 +8,10 @@
   
     <div class="footerLinks">
         <ul class="otherNav">     
-            <li><a href="${aboutUrl}" title="more about this web site">About</a></li>      
-            <li class="last"><a href="${contactUrl}" title="feedback form">Contact Us</a></li>
+            <li <#if !contactUrl??>class="last"</#if>><a href="${aboutUrl}" title="more about this web site">About</a></li>  
+            <#if contactUrl??>    
+                <li class="last"><a href="${contactUrl}" title="feedback form">Contact Us</a></li>
+            </#if>
         </ul>
     </div>
     

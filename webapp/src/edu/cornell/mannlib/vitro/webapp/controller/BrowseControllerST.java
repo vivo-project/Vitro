@@ -10,7 +10,7 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
-import edu.cornell.mannlib.vitro.webapp.beans.display.VClassGroupDisplay;
+import edu.cornell.mannlib.vitro.webapp.display.VClassGroupDisplay;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;

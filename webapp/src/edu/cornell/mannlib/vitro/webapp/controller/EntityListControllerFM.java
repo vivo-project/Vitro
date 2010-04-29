@@ -43,6 +43,8 @@ public class EntityListControllerFM extends FreeMarkerHttpServlet {
      * @author bdc34
      */
     
+    // TODO Rewrite error cases to use FreeMarker templates. Restructure so we're always doing the body
+    // and then calling writeOutput().
     public void doGet( HttpServletRequest req, HttpServletResponse res )
     throws IOException, ServletException {
         startTime = System.currentTimeMillis(); // TODO: remove
@@ -71,8 +73,7 @@ public class EntityListControllerFM extends FreeMarkerHttpServlet {
                         + VClass.class.getName() );
             }
             if (vclass!=null){
-                doBody();
-                // We'll want to write output in all cases, just call different body templates for the various error cases
+                doBody();                
                 writeOutput(response);
             }
         // RY Rewrite error cases for FreeMarker, not JSP
