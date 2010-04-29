@@ -47,12 +47,21 @@
 	<property name="product.modifications.dir" location="./modifications" />
 	<available property="product.modifications.exist" file="${product.modifications.dir}" />
 
+	<!-- If there is a WEB-INF/lib in the mods directory, it goes into the compile classpath -->
+	<!-- Otherwise, use a real directory but disable the "include" in the fileset -->
+	<available property="product.mods.lib.exists" file="${product.modifications.dir}/WEB-INF/lib" />
+	<condition property="product.mods.lib.dir"
+	           value="${product.modifications.dir}/WEB-INF/lib"
+	           else="${webapp.dir}/lib">
+		<available file="${product.modifications.dir}/WEB-INF/lib" />
+	</condition>
+
 	<path id="product.compile.classpath">
 		<pathelement location="${classes.dir}" />
 
 		<!-- These come before the core classpath, so our local mods can override -->
-		<fileset dir="${product.modifications.dir}/WEB-INF/lib">
-			<include name="**/*.jar" />
+		<fileset dir="${product.mods.lib.dir}">
+			<include name="**/*.jar" if="product.mods.lib.exists" />
 		</fileset>
 
 		<path refid="compile.classpath" />
