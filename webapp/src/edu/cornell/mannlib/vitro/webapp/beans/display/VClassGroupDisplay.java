@@ -16,6 +16,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
  * so that JSP EL can access properties such as publicName.
  * 
  * RY We may want an abstract display class as a superclass.
+ * RY We may want an interface that the superclass would implement.
  * RY We may want to nest this class in the VClassGroup class.
  */
 public class VClassGroupDisplay {
@@ -24,6 +25,7 @@ public class VClassGroupDisplay {
 	
     private VClassGroup vClassGroup;
     
+    // RY Probably don't want the default constructor.
     public VClassGroupDisplay() {
     	vClassGroup = new VClassGroup();
     }
