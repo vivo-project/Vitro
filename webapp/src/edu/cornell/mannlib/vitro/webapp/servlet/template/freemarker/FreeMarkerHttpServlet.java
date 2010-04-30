@@ -183,6 +183,12 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         } catch (TemplateModelException e) {
             log.error("Can't set shared variable 'portalId'.");
         } 
+        
+        try {
+            config.setSharedVariable("contextPath", vreq.getContextPath());
+        } catch (TemplateModelException e) {
+            log.error("Can't set shared variable 'contextPath'.");
+        }        
 
         // FreeMarker does this wrapping automatically - no need to create the
         // SimpleSequence directly.

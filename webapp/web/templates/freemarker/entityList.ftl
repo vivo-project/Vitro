@@ -19,7 +19,8 @@
                 </#list>
                 <li>
                     <#-- RY Create a directive to work like c:url with c:param -->
-                    <a href="/entity?home=${portalId!}&uri=${entity.URI?url}">${entity.name}</a> | <#-- add p:process to name -->
+                    <#-- RY The JSP version includes URL rewriting in a filter - see URLRewritingHttpServletResponse -->
+                    <a href="${entityUrl}${entity.URI?url}">${entity.name}</a> | <#-- add p:process to name -->
                     <#if entity.moniker?has_content>
                         ${entity.moniker} <#-- add p:process -->
                     <#else>

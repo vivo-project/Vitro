@@ -11,6 +11,9 @@ import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.tagext.BodyContent;
 import javax.servlet.jsp.tagext.BodyTagSupport;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jga.fn.UnaryFunctor;
 
 /**
@@ -19,6 +22,8 @@ import net.sf.jga.fn.UnaryFunctor;
  */
 
 public class StringProcessorTag extends BodyTagSupport {
+   
+    private static final Log log = LogFactory.getLog(StringProcessorTag.class.getName());
     
     public void setPageContext(PageContext pageContext){
         this.pageContext = pageContext;
@@ -26,6 +31,7 @@ public class StringProcessorTag extends BodyTagSupport {
     
     @Override
     public int doStartTag(){
+        log.debug("In StringProcessorTag.doStartTag()");
         Object obj =  pageContext.getRequest().getAttribute(STRING_PROCESSOR) ;
         if( obj == null || !(obj instanceof UnaryFunctor) )                   
             return EVAL_BODY_INCLUDE;

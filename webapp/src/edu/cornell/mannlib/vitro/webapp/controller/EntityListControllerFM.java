@@ -95,9 +95,12 @@ public class EntityListControllerFM extends FreeMarkerHttpServlet {
  
         Map<String, Object> body = new HashMap<String, Object>();
         
-        //get list of entities,
+        //get list of entities
         List<Individual> entities = vreq.getWebappDaoFactory().getIndividualDao().getIndividualsByVClass(vclass);
         body.put("entities",entities);
+        
+        // But the JSP version includes url rewriting via URLRewritingHttpServletResponse
+        body.put("entityUrl", config.getSharedVariable("contextPath") + "/entity?home=" + config.getSharedVariable("portalId") + "&uri=");
 
         if (entities == null) {
             log.error("entities list is null");
