@@ -67,6 +67,7 @@ public class Controllers {
 
     public static final String ALPHA_INDEX_JSP = "/templates/alpha/alphaIndex.jsp";
 
+    public static final String SEARCH_URL = "/search";
     public static final String SEARCH_BASIC_JSP = "/templates/search/searchBasic.jsp";
     public static final String SEARCH_PAGED_JSP = "/templates/search/searchPaged.jsp";
     public static final String SEARCH_FAILED_JSP = "/templates/search/searchFailed.jsp";
@@ -87,6 +88,8 @@ public class Controllers {
 
     public static final Object SEARCH_ERROR_JSP = "/search_error.jsp";
 
+    public static final String CONTACT_URL = "/comments";
+    
     //public static final String TAB_ENTITIES_LIST_JSP = "templates/tab/tabEntities.jsp";
 
     private static List letters = null;

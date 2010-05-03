@@ -138,6 +138,12 @@
     </listener-class>
   </listener>
 
+  <listener>
+    <listener-class>
+        edu.cornell.mannlib.vitro.webapp.servlet.setup.FreeMarkerSetup
+    </listener-class>
+  </listener>
+  
   <!--
     <listener>
         <listener-class>
@@ -266,6 +272,15 @@
     <servlet-name>AboutController</servlet-name>
     <url-pattern>/about</url-pattern>
   </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>AboutControllerFM</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.AboutControllerFM</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>AboutControllerFM</servlet-name>
+    <url-pattern>/about-fm</url-pattern>
+  </servlet-mapping> 
   
   <servlet>
     <servlet-name>FakeSelfEditController</servlet-name>
@@ -782,6 +797,15 @@
   </servlet-mapping>
 
   <servlet>
+    <servlet-name>IndividualListControllerFM</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.IndividualListControllerFM</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>IndividualListControllerFM</servlet-name>
+    <url-pattern>/individuallistFM</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
     <servlet-name>SearchController</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.search.controller.PagedSearchController</servlet-class>
   </servlet>
@@ -923,6 +947,11 @@
   </servlet>
 
   <servlet>
+    <servlet-name>individualFM</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.IndividualControllerFM</servlet-class>
+  </servlet>
+  
+  <servlet>
     <servlet-name>updateEntityFlags</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.UpdateEntityFlagServlet</servlet-class>
   </servlet>
@@ -945,6 +974,12 @@
   <servlet>
     <servlet-name>browsecontroller</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.BrowseController</servlet-class>
+    <load-on-startup>5</load-on-startup>
+  </servlet>
+  
+  <servlet>
+    <servlet-name>browsecontrollerFM</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.BrowseControllerFM</servlet-class>
     <load-on-startup>5</load-on-startup>
   </servlet>
 
@@ -1063,6 +1098,10 @@
   <servlet-mapping>
     <servlet-name>browsecontroller</servlet-name>
     <url-pattern>/browsecontroller</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>browsecontrollerFM</servlet-name>
+    <url-pattern>/browsecontroller-fm</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>pubsbyorg</servlet-name>
