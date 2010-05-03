@@ -8,10 +8,10 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.webapp.servlet.template.velocity.VelocityHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.view.VClassGroupView;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
-import edu.cornell.mannlib.vitro.webapp.display.VClassGroupDisplay;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
@@ -95,13 +95,13 @@ public class BrowseControllerVelocity extends VelocityHttpServlet {
     		// Create a list of VClassGroupDisplay objects, each of which wraps a VClassGroup object.
     		// This allows EL to access VClassGroup properties like publicName, which it can't do
     		// if passed a linked list.
-    		List<VClassGroupDisplay> vcgroups = new ArrayList<VClassGroupDisplay>();
+    		List<VClassGroupView> vcgroups = new ArrayList<VClassGroupView>();
     		Iterator i = groups.iterator();
     		VClassGroup group;
-    		VClassGroupDisplay displayGroup;
+    		VClassGroupView displayGroup;
     		while (i.hasNext()) {
     			group = (VClassGroup) i.next();
-    			displayGroup = new VClassGroupDisplay(group);
+    			displayGroup = new VClassGroupView(group);
     			vcgroups.add(displayGroup);
     		}
     		vc.put("classGroups", vcgroups);

@@ -9,7 +9,6 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
-import edu.cornell.mannlib.vitro.webapp.display.VClassGroupDisplay;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
@@ -19,6 +18,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
 import edu.cornell.mannlib.vitro.webapp.template.stringtemplate.PageSTGF;
 import edu.cornell.mannlib.vitro.webapp.utils.StringTemplateUtil;
+import edu.cornell.mannlib.vitro.webapp.view.VClassGroupView;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.antlr.stringtemplate.StringTemplate;
@@ -348,13 +349,13 @@ public class BrowseControllerSTGF extends VitroHttpServlet {
             	// Create a list of VClassGroupDisplay objects, each of which wraps a VClassGroup object.
             	// This allows EL to access VClassGroup properties like publicName, which it can't do
             	// if passed a linked list.
-            	List<VClassGroupDisplay> vcgroups = new ArrayList<VClassGroupDisplay>();
+            	List<VClassGroupView> vcgroups = new ArrayList<VClassGroupView>();
             	Iterator i = groups.iterator();
             	VClassGroup group;
-            	VClassGroupDisplay displayGroup;
+            	VClassGroupView displayGroup;
             	while (i.hasNext()) {
             		group = (VClassGroup) i.next();
-            		displayGroup = new VClassGroupDisplay(group);
+            		displayGroup = new VClassGroupView(group);
             		vcgroups.add(displayGroup);
             	}
             	bodyST.setAttribute("classGroups", vcgroups);

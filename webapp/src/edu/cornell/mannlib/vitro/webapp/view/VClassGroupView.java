@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.display;
+package edu.cornell.mannlib.vitro.webapp.view;
 
 import java.util.List;
 
@@ -19,18 +19,18 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
  * RY We may want an interface that the superclass would implement.
  * RY We may want to nest this class in the VClassGroup class.
  */
-public class VClassGroupDisplay {
+public class VClassGroupView {
 
-	private static final Log log = LogFactory.getLog(VClassGroupDisplay.class.getName());
+	private static final Log log = LogFactory.getLog(VClassGroupView.class.getName());
 	
     private VClassGroup vClassGroup;
     
     // RY Probably don't want the default constructor.
-    public VClassGroupDisplay() {
+    public VClassGroupView() {
     	vClassGroup = new VClassGroup();
     }
     
-    public VClassGroupDisplay(VClassGroup vClassGroup) {
+    public VClassGroupView(VClassGroup vClassGroup) {
     	this.vClassGroup = vClassGroup;
     }
 

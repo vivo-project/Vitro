@@ -10,7 +10,6 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
-import edu.cornell.mannlib.vitro.webapp.display.VClassGroupDisplay;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
@@ -19,6 +18,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
 import edu.cornell.mannlib.vitro.webapp.servlet.template.freemarker.FreeMarkerHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.view.VClassGroupView;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -95,13 +95,13 @@ public class BrowseControllerFreeMarker extends FreeMarkerHttpServlet {
     	    // Don't need to explicitly create SimpleSequence object. FreeMarker will automatically wrap
     	    // the list in a SimpleSequence.
     		//SimpleSequence vcgroups = new SimpleSequence();
-    	    List<VClassGroupDisplay> vcgroups = new ArrayList<VClassGroupDisplay>();
+    	    List<VClassGroupView> vcgroups = new ArrayList<VClassGroupView>();
     		Iterator i = groups.iterator();
     		VClassGroup group;
-    		VClassGroupDisplay displayGroup;
+    		VClassGroupView displayGroup;
     		while (i.hasNext()) {
     			group = (VClassGroup) i.next();
-    			displayGroup = new VClassGroupDisplay(group);
+    			displayGroup = new VClassGroupView(group);
     			vcgroups.add(displayGroup);
     		}
     		body.put("classGroups", vcgroups);
