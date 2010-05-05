@@ -88,25 +88,17 @@ public class BrowseControllerFM extends FreeMarkerHttpServlet {
     		body.put("message", message); 
     	}
     	else {
-    		// Create a list of VClassGroupDisplay objects, each of which wraps a VClassGroup object.
-    		// This allows EL to access VClassGroup properties like publicName, which it can't do
-    		// if passed a linked list.
-    	    
-    	    // Don't need to explicitly create SimpleSequence object. FreeMarker will automatically wrap
-    	    // the list in a SimpleSequence.
-    		//SimpleSequence vcgroups = new SimpleSequence();
     	    List<VClassGroupView> vcgroups = new ArrayList<VClassGroupView>();
-    		Iterator i = groups.iterator();
+    		Iterator<VClassGroup> i = groups.iterator();
     		VClassGroup group;
     		VClassGroupView displayGroup;
     		while (i.hasNext()) {
     			group = (VClassGroup) i.next();
-    			displayGroup = new VClassGroupView(group);
+    			displayGroup = new VClassGroupView(vreq.getContextPath(), group);
     			vcgroups.add(displayGroup);
     		}
     		body.put("classGroups", vcgroups);
     	}     
-    	body.put("entityListUri", getUrl("/individuallistFM?vclassId="));
 
         String templateName = "browseGroup.ftl";       
         return mergeBodyToTemplate(templateName, body);

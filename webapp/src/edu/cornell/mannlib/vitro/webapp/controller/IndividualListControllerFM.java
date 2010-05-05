@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,10 +20,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
-import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
-import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.flags.FlagException;
-import edu.cornell.mannlib.vitro.webapp.controller.FreeMarkerHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.view.IndividualView;
 
 public class IndividualListControllerFM extends FreeMarkerHttpServlet {
 
@@ -73,8 +71,8 @@ public class IndividualListControllerFM extends FreeMarkerHttpServlet {
                         + VClass.class.getName() );
             }
             if (vclass!=null){
-                doBody();                
-                writeOutput(response);
+                setBody();                
+                write(response);
             }
         // RY Rewrite error cases for FreeMarker, not JSP
         } catch (HelpException help){
@@ -95,15 +93,17 @@ public class IndividualListControllerFM extends FreeMarkerHttpServlet {
  
         Map<String, Object> body = new HashMap<String, Object>();
         
-        //get list of entities
-        List<Individual> entities = vreq.getWebappDaoFactory().getIndividualDao().getIndividualsByVClass(vclass);
-        body.put("entities",entities);
+        // Create list of individuals
+        List<Individual> individualList = vreq.getWebappDaoFactory().getIndividualDao().getIndividualsByVClass(vclass);
+        List<IndividualView> individuals = new ArrayList<IndividualView>();
+        
+        body.put("individuals", individuals);
         
         // But the JSP version includes url rewriting via URLRewritingHttpServletResponse
-        body.put("entityUrl", config.getSharedVariable("contextPath") + "/entity?home=" + config.getSharedVariable("portalId") + "&uri=");
+        body.put("individualUrl", config.getSharedVariable("contextPath") + "/entity?home=" + config.getSharedVariable("portalId") + "&uri=");
 
-        if (entities == null) {
-            log.error("entities list is null");
+        if (individuals == null) {
+            log.error("individuals list is null");
         }
 
         // Use instead of getTitle(), because we have a subtitle too

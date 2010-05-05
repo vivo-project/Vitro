@@ -2,13 +2,15 @@
 
 package edu.cornell.mannlib.vitro.webapp.view;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
+import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 
 /*
  * A VClassGroupDisplay object is associated with a VClassGroup for display.
@@ -19,19 +21,20 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
  * RY We may want an interface that the superclass would implement.
  * RY We may want to nest this class in the VClassGroup class.
  */
-public class VClassGroupView {
+public class VClassGroupView extends ViewObject {
 
 	private static final Log log = LogFactory.getLog(VClassGroupView.class.getName());
 	
-    private VClassGroup vClassGroup;
+    private VClassGroup vClassGroup = null;
+    private List<VClassView> classes = null;
     
-    // RY Probably don't want the default constructor.
-    public VClassGroupView() {
-    	vClassGroup = new VClassGroup();
+    public VClassGroupView(String contextPath, VClassGroup vClassGroup) {
+        super(contextPath);
+        init(vClassGroup);
     }
     
-    public VClassGroupView(VClassGroup vClassGroup) {
-    	this.vClassGroup = vClassGroup;
+    private void init(VClassGroup vClassGroup) {
+        this.vClassGroup = vClassGroup;
     }
 
     public int getDisplayRank() {
@@ -54,7 +57,17 @@ public class VClassGroupView {
     	return vClassGroup.getPublicName();
     }
     
-    public List<VClass> getVitroClassList() {
-    	return vClassGroup.getVitroClassList();
+    public List<VClassView> getClasses() {
+        // Do we need to store the classes as an instance member? Would we ever access this method more than once per template?
+        if (classes == null) {
+            List<VClass> classList = vClassGroup.getVitroClassList();
+            classes = new ArrayList<VClassView>();
+            Iterator<VClass> i = classList.iterator();
+            while (i.hasNext()) {
+                classes.add(new VClassView(getContextPath(), (VClass) i.next()));
+            }
+        }
+        
+        return classes;
     }
 }

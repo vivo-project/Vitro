@@ -58,8 +58,8 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
     	try {
 	        doSetup(request, response);
 	        setTitle();	        
-	        doBody();	        
-	        writeOutput(response);
+	        setBody();	        
+	        write(response);
        
 	    } catch (Throwable e) {
 	        log.error("FreeMarkerHttpServlet could not forward to view.");
@@ -73,7 +73,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 		doGet(request, response);
 	}
 	
-	protected void doBody() {
+	protected void setBody() {
 	    root.put("body", getBody());
 	}
 	
@@ -147,7 +147,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         return body;
     }
     
-    protected void writeOutput(HttpServletResponse response) {
+    protected void write(HttpServletResponse response) {
 
         String templateName = "page.ftl";
         StringWriter sw = mergeToTemplate(templateName, root);          
@@ -178,6 +178,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 
         setLoginInfo();
         
+        // RY Can this be removed? Do templates need it? Ideally, they should not.
         int portalId = portal.getPortalId();
         try {
             config.setSharedVariable("portalId", portalId);
@@ -185,6 +186,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
             log.error("Can't set shared variable 'portalId'.");
         } 
         
+        // RY Remove this. Templates shouldn't use it. ViewObjects will use it.
         try {
             config.setSharedVariable("contextPath", vreq.getContextPath());
         } catch (TemplateModelException e) {
@@ -310,11 +312,10 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 	
 	protected String getUrl(String path) {
 		String contextPath = vreq.getContextPath();
-		String url = path;
-		if ( ! url.startsWith("/") ) {
-			url = "/" + url;
+		if ( ! path.startsWith("/") ) {
+			path = "/" + path;
 		}
-		return contextPath + url;
+		return contextPath + path;
 	}
 	
 	/* RY Experimental approach to moving link tags generated in templates to the head element. Another approach
@@ -353,8 +354,9 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 		return tabMenu;
 	}
 	
-	//RY INTERESTING: Velocity cannot access TabMenuItem methods unless the class is public.
-	//StringTemplate can. Which behavior is correct?
+	// RY INTERESTING: Velocity and FreeMarker cannot access TabMenuItem methods unless the class is public.
+	// StringTemplate can. 
+	// RY Move to view object. Get context path same way other objects do. But in this case we need the request object also, so just use that.
 	public class TabMenuItem {
 		String linkText;
 		String url;

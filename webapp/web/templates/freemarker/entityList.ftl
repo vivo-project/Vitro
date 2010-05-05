@@ -11,6 +11,7 @@
         <ul>
             <#list entities as entity>
                 <#-- Iterate through the object's class hierarchy, looking for a custom view -->
+                <#-- RY This should be done in a view method -->
                 <#list entity.VClasses as type>
                     <#if type.customSearchView?has_content>
                         <#assign altRender = type.customSearchView>
