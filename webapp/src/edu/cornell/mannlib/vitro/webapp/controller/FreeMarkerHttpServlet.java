@@ -31,6 +31,8 @@ import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
+import edu.cornell.mannlib.vitro.webapp.view.tabMenu.TabMenu;
+import edu.cornell.mannlib.vitro.webapp.view.tabMenu.TabMenuItem;
 import edu.cornell.mannlib.vitro.webapp.web.PortalWebUtil;
 import edu.cornell.mannlib.vitro.webapp.web.TabWebUtil;
 
@@ -193,9 +195,6 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
             log.error("Can't set shared variable 'contextPath'.");
         }        
 
-        // FreeMarker does this wrapping automatically - no need to create the
-        // SimpleSequence directly.
-        //SimpleSequence menu = getTabMenu(portalId);
         List<TabMenuItem> menu = getTabMenu(portalId);
         root.put("tabMenu", menu);
 
@@ -225,6 +224,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
             root.put("bannerImageUrl", getUrl(themeDir + "site_icons/" + bannerImage));
         }
         
+        // RY Package these into a topMenu or something
         root.put("aboutUrl", getUrl(Controllers.ABOUT + "?home=" + portalId));
         root.put("aboutFMUrl", getUrl(Controllers.ABOUT + "-fm?home=" + portalId));
         if (ContactMailServlet.getSmtpHostFromProperties() != null) {
@@ -244,23 +244,6 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         }
         
         root.put("termsOfUseUrl", getUrl("/termsOfUse?home=" + portalId));
-         
-        /*
-        HttpSession session = vreq.getSession();
-        try {
-            config.setSharedVariable("mySession", session);
-        } catch (TemplateModelException e) {
-            // RY change to a logging statement
-            System.out.println("Can't set shared variable 'mySession'.");
-        } 
-        // This value is changed by the template when session is put in the template context
-        LoginFormBean loginHandler = (LoginFormBean)session.getAttribute("loginHandler");
-        if (loginHandler != null) {
-            System.out.println("FreeMarker SESSION LOGINNAME = " + loginHandler.getLoginName());
-        } else {
-            System.out.println("FreeMarker SESSION: not logged in");
-        }
-        */
         
     }
 
@@ -292,24 +275,6 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 	    }       	
 	}   
 	
-//	protected String getUrl(String path, HashMap<String, String> params) {
-//		String url = getUrl(path);
-//		
-//		if (params.size() > 0) {
-//	    	Iterator i = params.keySet().iterator();
-//	    	String key;
-//	    	String glue;
-//	    	int counter = 1;
-//	    	do {       		
-//	    		key = (String) i.next();
-//	    		glue = counter > 1 ? "&" : "?";
-//	    		url += glue + key + "=" + params.get(key);
-//	    		counter++;
-//	    	} while (i.hasNext());
-//		}
-//	    return url;       
-//	}
-	
 	protected String getUrl(String path) {
 		String contextPath = vreq.getContextPath();
 		if ( ! path.startsWith("/") ) {
@@ -318,70 +283,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 		return contextPath + path;
 	}
 	
-	/* RY Experimental approach to moving link tags generated in templates to the head element. Another approach
-	 * would be to not generate the head from within the main page template, but separately, and after the body 
-	 * gets generated. Then move the link tags to an array, to get passed to the template that generates the 
-	 * link tags. The page components are assembled by the controller rather than in the page template. Either
-	 * way, it's pretty ugly.
-	 */
-	private String moveLinkTagsToHead(String body) {
-	    
-	    return null;
-	}
-	
-	private List<TabMenuItem> getTabMenu(int portalId) {
-		List<TabMenuItem> tabMenu = new ArrayList<TabMenuItem>();
-	
-		//Tabs stored in database
-		List primaryTabs = vreq.getWebappDaoFactory().getTabDao().getPrimaryTabs(portalId);    	
-	    int tabId = TabWebUtil.getTabIdFromRequest(vreq); 
-	    int rootId = TabWebUtil.getRootTabId(vreq); 
-	    List tabLevels = vreq.getWebappDaoFactory().getTabDao().getTabHierarcy(tabId,rootId);
-	    vreq.setAttribute("tabLevels", tabLevels); 
-	    Iterator<Tab> primaryTabIterator = primaryTabs.iterator();
-	    Iterator tabLevelIterator = tabLevels.iterator();
-		Tab tab;
-	    while (primaryTabIterator.hasNext()) {
-	    	tab = (Tab) primaryTabIterator.next();
-	    	tabMenu.add(new TabMenuItem(tab.getTitle(), "index.jsp?primary=" + tab.getTabId()));
-	    	// RY Also need to loop through nested tab levels, but not doing that now.
-	    }
-	    
-	    // Hard-coded tabs
-		tabMenu.add(new TabMenuItem("Index", "browsecontroller"));
-		tabMenu.add(new TabMenuItem("Index - FM", "browsecontroller-fm"));   	
-	
-		return tabMenu;
-	}
-	
-	// RY INTERESTING: Velocity and FreeMarker cannot access TabMenuItem methods unless the class is public.
-	// StringTemplate can. 
-	// RY Move to view object. Get context path same way other objects do. But in this case we need the request object also, so just use that.
-	public class TabMenuItem {
-		String linkText;
-		String url;
-		boolean active = false;
-		
-		public TabMenuItem(String linkText, String path) {
-			FreeMarkerHttpServlet fs = FreeMarkerHttpServlet.this;
-			this.linkText = linkText;
-			url = fs.getUrl(path);
-			
-			String requestUrl = vreq.getServletPath();
-			active = requestUrl.equals("/" + path);
-		}
-		
-		public String getLinkText() {
-			return linkText; 
-		}
-		
-		public String getUrl() {
-			return url;
-		}
-		
-		public boolean isActive() {
-			return active;
-		}
+	private TabMenu getTabMenu(int portalId) {
+	    return new TabMenu(vreq, portalId);
 	}
 }
-

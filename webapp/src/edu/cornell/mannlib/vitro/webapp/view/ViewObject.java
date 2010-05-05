@@ -5,21 +5,16 @@ package edu.cornell.mannlib.vitro.webapp.view;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-//import javax.servlet.ServletContext;
-//import javax.servlet.http.HttpServletRequest;
-//import javax.servlet.http.HttpServletResponse;
-
-//import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 
 public abstract class ViewObject {
 
     private static final Log log = LogFactory.getLog(ViewObject.class.getName());
     // We may need a method to do the work of p:process
     
-//    protected HttpServletRequest request;
 //    protected HttpServletResponse response;
 //    protected ServletContext context;
 //    protected Portal portal;
