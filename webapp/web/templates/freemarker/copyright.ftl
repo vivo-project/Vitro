@@ -1,11 +1,12 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
-<#if copyrightText??>
-    <#assign copyright = copyrightText>
-    <#if copyrightUrl??>
-        <#assign copyright><a href="${copyrightUrl}">${copyrightText}</a></#assign>
-    </#if>
+<#if copyright??>
     <div class="copyright">
-        &copy;${copyrightYear?c} ${copyright}                  
+        &copy;${copyright.year?c}
+        <#if copyright.url??>
+            <a href="${copyright.url}">${copyright.text}</a>
+        <#else>
+            ${copyright.text}
+        </#if>                 
     </div>
 </#if>

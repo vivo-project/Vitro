@@ -55,8 +55,7 @@ public class FreeMarkerSetup implements ServletContextListener {
             log.error("Error setting value for url_escaping_charset.");
         }
 
-		FreeMarkerHttpServlet.config = cfg;
-        
+		FreeMarkerHttpServlet.config = cfg;       
 	}
 
 	public void contextDestroyed(ServletContextEvent event) {

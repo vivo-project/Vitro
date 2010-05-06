@@ -8,7 +8,6 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -25,17 +24,11 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vedit.beans.LoginFormBean;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
-import edu.cornell.mannlib.vitro.webapp.beans.Tab;
-import edu.cornell.mannlib.vitro.webapp.controller.ContactMailServlet;
-import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
-import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
-import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
-import edu.cornell.mannlib.vitro.webapp.view.tabMenu.TabMenu;
-import edu.cornell.mannlib.vitro.webapp.view.tabMenu.TabMenuItem;
+import edu.cornell.mannlib.vitro.webapp.view.menu.MainMenuItem;
+import edu.cornell.mannlib.vitro.webapp.view.menu.Menu;
+import edu.cornell.mannlib.vitro.webapp.view.menu.TabMenu;
 import edu.cornell.mannlib.vitro.webapp.web.PortalWebUtil;
-import edu.cornell.mannlib.vitro.webapp.web.TabWebUtil;
-
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -53,7 +46,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 	protected Map<String, Object> root = new HashMap<String, Object>();
 	
 	// Some servlets have their own doGet() method, in which case they need to call 
-	// doSetup(), setTitle(), and writeOutput() themselves. Other servlets define only
+	// doSetup(), setTitle(), setBody(), and write() themselves. Other servlets define only
 	// a getBody() and getTitle() method and use the parent doGet() method.
     public void doGet( HttpServletRequest request, HttpServletResponse response )
 		throws IOException, ServletException {
@@ -133,6 +126,9 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
     // can create a container but not add to one.
     // (2) create a sequence of stylesheets or a scalar to hold the name of a stylesheet in the template, because
     // it does not get passed back to the controller. The template can create only local variables.
+    
+    // *** RY But we can create a view object with an add method, that the templates could use to add to the
+    // list. ***
     private String extractLinkTagsFromBody(String body) {
         List<String> links = new ArrayList<String>();
         
@@ -177,10 +173,9 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         vreq = new VitroRequest(request);
         this.response = response;
         portal = vreq.getPortal();       
-
-        setLoginInfo();
         
         // RY Can this be removed? Do templates need it? Ideally, they should not.
+        // Only needed for some weird stuff in search box that I think is only used in old default theme.
         int portalId = portal.getPortalId();
         try {
             config.setSharedVariable("portalId", portalId);
@@ -195,7 +190,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
             log.error("Can't set shared variable 'contextPath'.");
         }        
 
-        List<TabMenuItem> menu = getTabMenu(portalId);
+        TabMenu menu = getTabMenu(portalId);
         root.put("tabMenu", menu);
 
         ApplicationBean appBean = vreq.getAppBean();
@@ -213,38 +208,42 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         } 
         
         root.put("siteName", portal.getAppName());
-
-        String homeURL = (portal.getRootBreadCrumbURL()!=null && portal.getRootBreadCrumbURL().length()>0) ?
+        root.put("tagline", portal.getShortHand());
+        
+        setUrls(portalId, themeDir);
+        setLoginInfo();      
+        setCopyrightInfo();
+    }
+    
+    // Define the URLs that are accessible to the templates. Note that we do not create menus here,
+    // because we want the templates to be free to define the link text and where the links are displayed.
+    private final void setUrls(int portalId, String themeDir) {
+        // The urls that are accessible to the templates. 
+        // NB We are not using our menu object mechanism to build menus here, because we want the 
+        // view to control which links go where, and the link text and title.
+        Map<String, String> urls = new HashMap<String, String>();
+        
+        String homeUrl = (portal.getRootBreadCrumbURL()!=null && portal.getRootBreadCrumbURL().length()>0) ?
                 portal.getRootBreadCrumbURL() : vreq.getContextPath()+"/";
-        root.put("homeUrl", homeURL);
-        //root.put("tagline", portal.getShortHand());
-         
+        urls.put("home", homeUrl);
+
         String bannerImage = portal.getBannerImage();
         if ( ! StringUtils.isEmpty(bannerImage)) {
-            root.put("bannerImageUrl", getUrl(themeDir + "site_icons/" + bannerImage));
+            root.put("bannerImage", getUrl(themeDir + "site_icons/" + bannerImage));
         }
-        
-        // RY Package these into a topMenu or something
-        root.put("aboutUrl", getUrl(Controllers.ABOUT + "?home=" + portalId));
-        root.put("aboutFMUrl", getUrl(Controllers.ABOUT + "-fm?home=" + portalId));
+
+        urls.put("about", getUrl(Controllers.ABOUT + "?home=" + portalId));
+        urls.put("aboutFM", getUrl(Controllers.ABOUT + "-fm?home=" + portalId)); // TEMPORARY
         if (ContactMailServlet.getSmtpHostFromProperties() != null) {
-            root.put("contactUrl", getUrl(Controllers.CONTACT_URL + "?home=" + portalId));
+            urls.put("contact", getUrl(Controllers.CONTACT_URL + "?home=" + portalId));
         }
+        urls.put("search", getUrl(Controllers.SEARCH_URL));
+        urls.put("termsOfUse", getUrl("/termsOfUse?home=" + portalId));        
+        urls.put("login", getUrl(Controllers.LOGIN));
+        urls.put("logout", getUrl(Controllers.LOGOUT));
+        urls.put("siteAdmin", getUrl(Controllers.SITE_ADMIN));     
         
-        root.put("searchUrl", getUrl(Controllers.SEARCH_URL));
-        
-        String copyrightText = portal.getCopyrightAnchor();
-        if ( ! StringUtils.isEmpty(copyrightText) ) {
-            root.put("copyrightText", copyrightText);
-            int thisYear = Calendar.getInstance().get(Calendar.YEAR);  // use ${copyrightYear?c} in template
-            //String thisYear = ((Integer)Calendar.getInstance().get(Calendar.YEAR)).toString(); // use ${copyrightYear} in template
-            //SimpleDate thisYear = new SimpleDate(Calendar.getInstance().getTime(), TemplateDateModel.DATE); // use ${copyrightYear?string("yyyy")} in template
-            root.put("copyrightYear", thisYear);
-            root.put("copyrightUrl", portal.getCopyrightURL());
-        }
-        
-        root.put("termsOfUseUrl", getUrl("/termsOfUse?home=" + portalId));
-        
+        root.put("urls", urls);
     }
 
 	private final void setLoginInfo() {
@@ -258,13 +257,9 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 	        loginName = loginBean.getLoginName();
 	        securityLevel = Integer.parseInt(loginBean.getLoginRole());
 	    }   
-	    if (loginName == null) {
-	    	root.put("loginUrl", getUrl(Controllers.LOGIN));
-	    }
-	    else {
+	    if (loginName != null) {
 	    	root.put("loginName", loginName);
-	    	root.put("logoutUrl", getUrl(Controllers.LOGOUT));
-	    	root.put("siteAdminUrl", getUrl(Controllers.SITE_ADMIN));
+
 	    	securityLevel = Integer.parseInt(loginBean.getLoginRole());
 	    	if (securityLevel >= FILTER_SECURITY_LEVEL) {
 	    		ApplicationBean appBean = vreq.getAppBean();
@@ -272,8 +267,23 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 	    			root.put("showFlag1SearchField", true);
 	    		}
 	    	}	    	
-	    }       	
+	    } 	    
 	}   
+	
+	private final void setCopyrightInfo() {
+
+        String copyrightText = portal.getCopyrightAnchor();
+        if ( ! StringUtils.isEmpty(copyrightText) ) {
+            Map<String, Object> copyright =  new HashMap<String, Object>();
+            copyright.put("text", copyrightText);
+            int thisYear = Calendar.getInstance().get(Calendar.YEAR);  // use ${copyrightYear?c} in template
+            //String thisYear = ((Integer)Calendar.getInstance().get(Calendar.YEAR)).toString(); // use ${copyrightYear} in template
+            //SimpleDate thisYear = new SimpleDate(Calendar.getInstance().getTime(), TemplateDateModel.DATE); // use ${copyrightYear?string("yyyy")} in template
+            copyright.put("year", thisYear);
+            copyright.put("url", portal.getCopyrightURL());
+            root.put("copyright", copyright);
+        } 
+	}
 	
 	protected String getUrl(String path) {
 		String contextPath = vreq.getContextPath();
@@ -286,4 +296,5 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 	private TabMenu getTabMenu(int portalId) {
 	    return new TabMenu(vreq, portalId);
 	}
+	
 }

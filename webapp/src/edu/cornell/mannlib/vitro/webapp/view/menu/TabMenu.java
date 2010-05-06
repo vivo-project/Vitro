@@ -1,8 +1,7 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.view.tabMenu;
+package edu.cornell.mannlib.vitro.webapp.view.menu;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -14,18 +13,18 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 
 import edu.cornell.mannlib.vitro.webapp.web.TabWebUtil;
 
-public class TabMenu extends ArrayList {
+/** A main menu constructed from persisted tab data
+ * 
+ * @author rjy7
+ *
+ */
+public class TabMenu extends MainMenu {
     
+    private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(TabMenu.class.getName());
-    
-    private VitroRequest vreq;
-    private int portalId;
-    private String contextPath;
-    
+       
     public TabMenu(VitroRequest vreq, int portalId) {
-        this.vreq = vreq;
-        this.portalId = portalId;  
-        this.contextPath = vreq.getContextPath();
+        super(vreq, portalId);
         
         //Tabs stored in database
         List<Tab> primaryTabs = vreq.getWebappDaoFactory().getTabDao().getPrimaryTabs(portalId);        
@@ -38,13 +37,15 @@ public class TabMenu extends ArrayList {
         Tab tab;
         while (primaryTabIterator.hasNext()) {
             tab = (Tab) primaryTabIterator.next();
-            this.add(new TabMenuItem(tab.getTitle(), "index.jsp?primary=" + tab.getTabId(), vreq));
+            addItem(tab.getTitle(), "/index.jsp?primary=" + tab.getTabId());
             // RY Also need to loop through nested tab levels, but not doing that now.
         }
         
-        // Hard-coded tabs
-        this.add(new TabMenuItem("Index", "browsecontroller", vreq));
-        this.add(new TabMenuItem("Index - FM", "browsecontroller-fm", vreq));      
+        // Hard-coded tabs. It's not really a good idea to have these here, since any menu item that doesn't
+        // come from the db should be accessible to the template to change the text. But we need them here
+        // to apply the "active" mechanism.
+        addItem("Index", "/browsecontroller");
+        addItem("Index - FM", "/browsecontroller-fm");      
     }
 
 }

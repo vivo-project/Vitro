@@ -25,14 +25,6 @@ public abstract class ViewObject {
     
     public ViewObject() { }
     
-// For now we seem to just need the context path. Can add others if needed.
-//    public ViewObject(HttpServletRequest request, HttpServletResponse response, ServletContext context, Portal portal) {
-//        this.request = request;
-//        this.response = response;
-//        this.context = context;
-//        this.portal = portal;
-//    }
-    
     public ViewObject(String contextPath) {
         this.contextPath = contextPath;
     }
@@ -43,7 +35,8 @@ public abstract class ViewObject {
     
     // Get an arbitrary property value - i.e., one that the view object doesn't have a method for.
     public String getProperty(String property) {
-        return "";
+        String value = null;
+        return value;  // finish this
     }
     
     protected String encodeUrl(String url) {
