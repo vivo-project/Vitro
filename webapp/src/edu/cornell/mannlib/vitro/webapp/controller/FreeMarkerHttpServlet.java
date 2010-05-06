@@ -25,8 +25,6 @@ import edu.cornell.mannlib.vedit.beans.LoginFormBean;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
-import edu.cornell.mannlib.vitro.webapp.view.menu.MainMenuItem;
-import edu.cornell.mannlib.vitro.webapp.view.menu.Menu;
 import edu.cornell.mannlib.vitro.webapp.view.menu.TabMenu;
 import edu.cornell.mannlib.vitro.webapp.web.PortalWebUtil;
 import freemarker.template.Configuration;

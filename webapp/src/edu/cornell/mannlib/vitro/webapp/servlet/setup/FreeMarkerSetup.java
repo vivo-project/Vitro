@@ -12,6 +12,7 @@ import javax.servlet.ServletContextListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.FreeMarkerHttpServlet;
 
 import freemarker.template.Configuration;
@@ -42,7 +43,12 @@ public class FreeMarkerSetup implements ServletContextListener {
 			log.error("Error specifying template directory.");
 		}
 		
-		cfg.setTemplateUpdateDelay(0); // no template caching in development - change for production
+		// RY This setting won't take effect until we use Configuration.getTemplate() to
+		// create templates.
+		String buildEnv = ConfigurationProperties.getProperty("Environment.build");
+		if (buildEnv != null && buildEnv.equals("development")) {
+		    cfg.setTemplateUpdateDelay(0); // no template caching in development 
+		}
 		
 		// Specify how templates will see the data-model. This is an advanced topic...
 		// but just use this:
