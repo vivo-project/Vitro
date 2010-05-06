@@ -5,9 +5,9 @@ package edu.cornell.mannlib.vitro.webapp.view.menu;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.view.ViewObject;
 
-public class MenuItem {
+public class MenuItem extends ViewObject {
 
     private static final Log log = LogFactory.getLog(MenuItem.class.getName());
     

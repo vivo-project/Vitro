@@ -3,13 +3,15 @@
 package edu.cornell.mannlib.vitro.webapp.view.menu;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.view.ViewObject;
 
-public class Menu extends ArrayList<MenuItem> {
+public class Menu extends ViewObject {
 
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(Menu.class.getName());
@@ -17,15 +19,21 @@ public class Menu extends ArrayList<MenuItem> {
     protected VitroRequest vreq;
     protected int portalId;
     protected String contextPath;
+    protected List<MenuItem> items;
     
     public Menu(VitroRequest vreq, int portalId) {
         this.vreq = vreq;
         this.portalId = portalId;  
         contextPath = vreq.getContextPath();
+        items = new ArrayList<MenuItem>();
     }
     
     public void addItem(String text, String path) {
-        add(new MenuItem(text, getUrl(path)));
+        items.add(new MenuItem(text, getUrl(path)));
+    }
+    
+    public List<MenuItem> getItems() {
+        return items;
     }
     
     protected String getUrl(String path) {

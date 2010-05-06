@@ -2,7 +2,7 @@
 
 <div id="primaryAndOther">
     <ul id="primary">
-        <#list tabMenu as item>
+        <#list tabMenu.items as item>
             <li>
                 <a href="${item.url}" <#if item.active> class="activeTab" </#if>>
                     ${item.linkText}

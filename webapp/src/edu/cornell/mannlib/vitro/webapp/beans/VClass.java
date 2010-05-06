@@ -40,12 +40,10 @@ public class VClass extends BaseResourceBean implements Comparable<VClass>
     public  String getShortDef()            { return myShortDefinition; }
     public  void   setShortDef( String sd ) { myShortDefinition = sd; }
 
-    // TODO: [kwg8-08/01/07] What is this for?  It seems an entity count is the number of entities of
-    // this type in the database.  Is this the case?
-    // [bjl23 2007-08-12] Yep.  A count of individuals in the class.
     private int  myEntityCount = -1;
     
-    @Deprecated
+    // rjy7 Removing deprecation since currently we have no other means to get this value.
+    // @Deprecated
     public  int  getEntityCount()         { return myEntityCount; }
     
     public  void setEntityCount( int ec ) { myEntityCount = ec; }
