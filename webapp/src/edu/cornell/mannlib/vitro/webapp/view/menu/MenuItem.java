@@ -14,9 +14,9 @@ public class MenuItem extends ViewObject {
     private String text;
     private String url;
     
-    public MenuItem(String linkText, String url) {
+    public MenuItem(String linkText, String path) {
         text = linkText;
-        this.url = url;
+        url = getUrl(path);
     }
     
     public String getLinkText() {

@@ -14,7 +14,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.FreeMarkerHttpServlet;
-
+import edu.cornell.mannlib.vitro.webapp.view.ViewObject;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.TemplateException;
@@ -26,7 +26,10 @@ public class FreeMarkerSetup implements ServletContextListener {
 	public void contextInitialized(ServletContextEvent event) {	
 
 		ServletContext sc = event.getServletContext();	
+		
+		// RY Change this to multi-location template scheme
 		String templatePath = sc.getRealPath("/templates/freemarker");
+		
 		Configuration cfg = new Configuration();
 		
 		/* **** RY 
@@ -61,7 +64,11 @@ public class FreeMarkerSetup implements ServletContextListener {
             log.error("Error setting value for url_escaping_charset.");
         }
 
-		FreeMarkerHttpServlet.config = cfg;       
+		FreeMarkerHttpServlet.config = cfg;  
+		
+		String contextPath = sc.getContextPath();
+		FreeMarkerHttpServlet.contextPath = contextPath;
+		ViewObject.contextPath = contextPath;
 	}
 
 	public void contextDestroyed(ServletContextEvent event) {

@@ -13,23 +13,13 @@ public class IndividualView extends ViewObject {
     
     private static final Log log = LogFactory.getLog(IndividualView.class.getName());
     
-    private static String URL = "/individual";
+    private static final String URL = "/individual";
     
     private Individual individual;
     
     public IndividualView(Individual individual) {
-        init(individual);
-    }
-    
-    public IndividualView(String contextPath, Individual individual) {
-        super(contextPath);
-        init(individual);
-    }
-    
-    private void init(Individual individual) {
         this.individual = individual;
     }
-   
     
     public String getName() {
         return individual.getName();
@@ -46,7 +36,7 @@ public class IndividualView extends ViewObject {
     // Or maybe getProfileUrl - there might be other kinds of urls
     // e.g., getEditUrl, getDeleteUrl - these would return the computations of PropertyEditLinks
     public String getProfileUrl() {
-        return getContextPath() + URL + ""; // ADD IN the label from the individual's uri 
+        return contextPath + URL + ""; // ADD IN the label from the individual's uri 
     }
     
     public String getCustomView() {

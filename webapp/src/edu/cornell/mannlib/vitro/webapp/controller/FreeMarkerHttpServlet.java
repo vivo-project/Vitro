@@ -36,7 +36,9 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 
 	private static final Log log = LogFactory.getLog(FreeMarkerHttpServlet.class.getName());
     private static final int FILTER_SECURITY_LEVEL = LoginFormBean.EDITOR;
+    
     public static Configuration config = null;
+    public static String contextPath = null; // RY or do we need to store the entire ServletContext?
     
 	protected VitroRequest vreq;
 	protected HttpServletResponse response;
@@ -180,13 +182,6 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         } catch (TemplateModelException e) {
             log.error("Can't set shared variable 'portalId'.");
         } 
-        
-        // RY Remove this. Templates shouldn't use it. ViewObjects will use it.
-        try {
-            config.setSharedVariable("contextPath", vreq.getContextPath());
-        } catch (TemplateModelException e) {
-            log.error("Can't set shared variable 'contextPath'.");
-        }        
 
         TabMenu menu = getTabMenu(portalId);
         root.put("tabMenu", menu);
@@ -283,8 +278,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         } 
 	}
 	
-	protected String getUrl(String path) {
-		String contextPath = vreq.getContextPath();
+	public static String getUrl(String path) {
 		if ( ! path.startsWith("/") ) {
 			path = "/" + path;
 		}

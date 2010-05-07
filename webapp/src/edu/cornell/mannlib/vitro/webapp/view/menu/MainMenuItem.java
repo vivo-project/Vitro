@@ -18,8 +18,8 @@ public class MainMenuItem extends MenuItem {
 
     private boolean active;
     
-    public MainMenuItem(String linkText, String url, boolean active) {
-        super(linkText, url);
+    public MainMenuItem(String linkText, String path, boolean active) {
+        super(linkText, path);
         this.active = active;
     }
      

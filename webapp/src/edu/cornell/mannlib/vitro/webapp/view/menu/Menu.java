@@ -18,27 +18,20 @@ public class Menu extends ViewObject {
 
     protected VitroRequest vreq;
     protected int portalId;
-    protected String contextPath;
     protected List<MenuItem> items;
     
     public Menu(VitroRequest vreq, int portalId) {
         this.vreq = vreq;
         this.portalId = portalId;  
-        contextPath = vreq.getContextPath();
         items = new ArrayList<MenuItem>();
     }
     
     public void addItem(String text, String path) {
-        items.add(new MenuItem(text, getUrl(path)));
+        items.add(new MenuItem(text, path));
     }
     
     public List<MenuItem> getItems() {
         return items;
-    }
-    
-    protected String getUrl(String path) {
-        return contextPath + path;
-    }
-    
+    }  
     
 }

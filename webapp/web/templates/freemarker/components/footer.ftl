@@ -1,9 +1,9 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
 <div id="footer">
-  
+
     <#if bannerImageUrl??>
-        <img class="footerLogo" src="${urls.bannerImage}" alt="${tagline!}"/>
+        <img class="footerLogo" src="${urls.bannerImage}" alt="${tagline!}" />
     </#if>
   
     <div class="footerLinks">
@@ -21,4 +21,4 @@
 
 </div>
 
-<#-- SCRIPT TAGS WILL GO HERE --> 
+<#-- SCRIPT TAGS SHOULD GO HERE --> 

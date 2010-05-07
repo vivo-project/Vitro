@@ -28,12 +28,7 @@ public class VClassGroupView extends ViewObject {
     private VClassGroup vClassGroup = null;
     private List<VClassView> classes = null;
     
-    public VClassGroupView(String contextPath, VClassGroup vClassGroup) {
-        super(contextPath);
-        init(vClassGroup);
-    }
-    
-    private void init(VClassGroup vClassGroup) {
+    public VClassGroupView(VClassGroup vClassGroup) {
         this.vClassGroup = vClassGroup;
     }
 
@@ -64,7 +59,7 @@ public class VClassGroupView extends ViewObject {
             classes = new ArrayList<VClassView>();
             Iterator<VClass> i = classList.iterator();
             while (i.hasNext()) {
-                classes.add(new VClassView(getContextPath(), (VClass) i.next()));
+                classes.add(new VClassView((VClass) i.next()));
             }
         }
         

@@ -94,7 +94,7 @@ public class BrowseControllerFM extends FreeMarkerHttpServlet {
     		VClassGroupView displayGroup;
     		while (i.hasNext()) {
     			group = (VClassGroup) i.next();
-    			displayGroup = new VClassGroupView(vreq.getContextPath(), group);
+    			displayGroup = new VClassGroupView(group);
     			vcgroups.add(displayGroup);
     		}
     		body.put("classGroups", vcgroups);

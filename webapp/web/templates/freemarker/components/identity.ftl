@@ -5,7 +5,7 @@
     <h1><a title="Home" href="${urls.home}">${siteName}</a></h1>
     
     <#-- RY We will need this in non-NIH VIVO versions
-    <#if tagline??>
+    <#if tagline.has_content>
         <em>${tagline}</em>
     </#if>
     -->

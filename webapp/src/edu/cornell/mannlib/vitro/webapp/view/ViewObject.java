@@ -10,33 +10,22 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.controller.FreeMarkerHttpServlet;
+
 public abstract class ViewObject {
 
     private static final Log log = LogFactory.getLog(ViewObject.class.getName());
-    // We may need a method to do the work of p:process
-    
-//    protected HttpServletResponse response;
-//    protected ServletContext context;
-//    protected Portal portal;
-    
-    // Making private because we might change the way this is handled, and we don't want to change
-    // all subclasses. They'll just use the accessor method.
-    private String contextPath;
-    
-    public ViewObject() { }
-    
-    public ViewObject(String contextPath) {
-        this.contextPath = contextPath;
-    }
-    
-    protected String getContextPath() {
-        return contextPath;
-    }
+
+    public static String contextPath;
     
     // Get an arbitrary property value - i.e., one that the view object doesn't have a method for.
     public String getProperty(String property) {
         String value = null;
         return value;  // finish this
+    }
+    
+    protected static String getUrl(String path) {
+        return FreeMarkerHttpServlet.getUrl(path);
     }
     
     protected String encodeUrl(String url) {

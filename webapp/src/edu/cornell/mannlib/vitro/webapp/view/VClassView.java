@@ -10,29 +10,20 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 public class VClassView extends ViewObject {
     
     private static final Log log = LogFactory.getLog(VClassView.class.getName());
-    private static String URL = "/individuallistFM?vclassId=";
+    private static final String URL = "/individuallistFM?vclassId=";
     
     private VClass vclass;
     
-    public VClassView(String contextPath, VClass vclass) {
-        super(contextPath);
-        init(vclass);
-    }
-    
     public VClassView(VClass vclass) {
-       init(vclass); 
-    }
-    
-    private void init(VClass vclass) {
         this.vclass = vclass;
     }
-    
+
     public String getName() {
         return vclass.getName();
     }
     
     public String getUrl() {
-        return getContextPath() + URL + encodeUrl(vclass.getURI()); 
+        return contextPath + URL + encodeUrl(vclass.getURI()); 
     }
     
     public int getEntityCount() {

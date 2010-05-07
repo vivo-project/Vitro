@@ -22,9 +22,8 @@ public class MainMenu extends Menu {
     }
 
     public void addItem(String text, String path) {
-        String url = getUrl(path);
         boolean active = vreq.getServletPath().equals(path);
-        MainMenuItem i = new MainMenuItem(text, url, active);
+        MainMenuItem i = new MainMenuItem(text, path, active);
         items.add(i);
     }    
 }
