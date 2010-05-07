@@ -1,18 +1,18 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
-<#include "doctype.html">
+<#include "../components/doctype.html">
 
-<#include "head.ftl">
+<#include "../components/head.ftl">
 
 <body>
     <div id="wrap" class="container">
         <div id="header">
         
-            <#include "identity.ftl">
+            <#include "../components/identity.ftl">
             
             <div id="navAndSearch" class="block">
-                <#include "menu.ftl">  
-                <#include "search.ftl">
+                <#include "../components/menu.ftl">  
+                <#include "../components/search.ftl">
             </div> <!-- navAndSearch --> 
                       
         </div> <!-- header --> 
@@ -25,7 +25,7 @@
             </div> <!-- content -->
         </div> <!-- contentwrap -->
     
-        <#include "footer.ftl">
+        <#include "../components/footer.ftl">
                                       
     </div> <!-- wrap -->  
 </body>

@@ -1101,7 +1101,7 @@
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>browsecontrollerFM</servlet-name>
-    <url-pattern>/browsecontroller-fm</url-pattern>
+    <url-pattern>/browse</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>pubsbyorg</servlet-name>

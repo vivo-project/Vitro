@@ -45,7 +45,7 @@ public class TabMenu extends MainMenu {
         // come from the db should be accessible to the template to change the text. But we need them here
         // to apply the "active" mechanism.
         addItem("Index", "/browsecontroller");
-        addItem("Index - FM", "/browsecontroller-fm");      
+        addItem("Index - FM", "/browse");      
     }
 
 }

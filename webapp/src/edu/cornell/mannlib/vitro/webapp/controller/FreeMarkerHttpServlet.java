@@ -145,7 +145,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
     
     protected void write(HttpServletResponse response) {
 
-        String templateName = "page.ftl";
+        String templateName = "page/default.ftl";
         StringWriter sw = mergeToTemplate(templateName, root);          
         try {
             PrintWriter out = response.getWriter();

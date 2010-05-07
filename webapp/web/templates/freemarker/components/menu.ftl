@@ -7,7 +7,7 @@
                 <a href="${item.url}" <#if item.active> class="activeTab" </#if>>
                     ${item.linkText}
                 </a>
-            </li>           
+            </li>          
         </#list>
     </ul>
 </div>

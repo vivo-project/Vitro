@@ -33,7 +33,7 @@ public class AboutControllerFM extends FreeMarkerHttpServlet {
         body.put("aboutText", portal.getAboutText());
         body.put("acknowledgeText", portal.getAcknowledgeText()); 
         
-        String templateName = "about.ftl";             
+        String templateName = "body/about.ftl";             
         return mergeBodyToTemplate(templateName, body);
 
     }
