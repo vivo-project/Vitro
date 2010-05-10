@@ -11,7 +11,7 @@ import org.junit.Test;
 import junit.framework.Assert;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
-import edu.cornell.mannlib.vitro.webapp.utils.display.DateDisplayUtils;
+import edu.cornell.mannlib.vitro.webapp.utils.view.DateDisplayUtils;
 
 public class StringUtilsTest extends AbstractTestClass {
     

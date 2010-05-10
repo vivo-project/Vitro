@@ -1,10 +1,12 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.utils.display;
+package edu.cornell.mannlib.vitro.webapp.utils.view;
 
 import junit.framework.Assert;
 
 import org.junit.Test;
+
+import edu.cornell.mannlib.vitro.webapp.utils.view.DateDisplayUtils;
 
 public class DateDisplayUtilsTest {
     
@@ -31,8 +33,4 @@ public class DateDisplayUtilsTest {
         Assert.assertEquals("1/2/2010 - ", DateDisplayUtils.getDisplayDateRange(start1, (String)null));
         Assert.assertEquals(" - 3/4/2011", DateDisplayUtils.getDisplayDateRange((String)null, end1));       
     }
-    
-
-
-
 }
