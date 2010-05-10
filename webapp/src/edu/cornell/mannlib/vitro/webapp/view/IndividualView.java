@@ -45,6 +45,10 @@ public class IndividualView extends ViewObject {
         
         return customView;
     }
+    
+    public Object getProperty(String propertyName) {
+        return new Object();
+    }
 
 
 }

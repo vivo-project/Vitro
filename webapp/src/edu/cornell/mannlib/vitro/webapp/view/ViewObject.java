@@ -3,26 +3,21 @@
 package edu.cornell.mannlib.vitro.webapp.view;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URLEncoder;
-
-import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.FreeMarkerHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 
 public abstract class ViewObject {
 
     private static final Log log = LogFactory.getLog(ViewObject.class.getName());
 
     public static String contextPath;
-    
-    // Get an arbitrary property value - i.e., one that the view object doesn't have a method for.
-    public String getProperty(String property) {
-        String value = null;
-        return value;  // finish this
-    }
     
     protected static String getUrl(String path) {
         return FreeMarkerHttpServlet.getUrl(path);

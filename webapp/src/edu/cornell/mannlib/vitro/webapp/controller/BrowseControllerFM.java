@@ -100,7 +100,7 @@ public class BrowseControllerFM extends FreeMarkerHttpServlet {
     		body.put("classGroups", vcgroups);
     	}     
 
-        String templateName = "body/index.ftl";       
+        String templateName = "body/browseGroups.ftl";       
         return mergeBodyToTemplate(templateName, body);
     }
 
