@@ -20,6 +20,7 @@
             <li>grapefruit, limes</li>
         <@makeList>
 
+    RY Consider rewriting in Java. Probably designers won't want to modify this.
 -->
 <#macro makeList delim=",">
     <#assign text>
@@ -29,22 +30,38 @@
     <#assign text = text?replace("${delim}$", "", "r")>
 
     <#assign arr = text?split(delim)>
+    <#assign lastIndex = arr?size-1>
+    
     <#list arr as item>
-        <#-- The loop variable cannot have its value modified, so we use a new variable. -->
+        <#-- A FreeMarker loop variable cannot have its value modified, so we use a new variable. -->
         <#assign newItem = item>
-        <#-- rjy7 we're not accounting for the prior existence of an assigned class. Should parse the item for that. -->
+
         <#assign classVal = "">
-        <#if newItem == arr?first>
+        
+        <#-- Keep any class value already assigned -->
+        <#assign currentClass = newItem?matches("<li (class=[\'\"](.*?)[\'\"])")>
+        <#list currentClass as m>
+            <#assign classVal = m?groups[2]>
+            <#assign newItem = newItem?replace(m?groups[1], "")>
+        </#list>
+
+        <#-- Test indices, rather than comparing content, on the off chance
+        that there are two list items with the same content. -->
+        <#-- <#if item == arr?first> -->
+        <#if item_index == 0> 
             <#assign classVal = "${classVal} first">
         </#if>
-        <#if newItem == arr?last>
+        <#-- <#if item == arr?last> -->
+        <#if item_index == lastIndex>       
             <#assign classVal = "${classVal} last">
         </#if>
-        <#if classVal != "">       
-            <#-- replace first instance only, in case it contains nested li tags -->     
+        <#if classVal != ""> 
+            <#assign classVal = classVal?replace("^ ", "", "r")>      
+            <#-- Replace first instance only, in case it contains nested li tags. -->     
             <#assign newItem = newItem?replace("<li", "<li class=\"${classVal}\"", "f")>
         </#if>
         ${newItem}
     </#list>
 </#macro>
 
+<#----------------------------------------------------------------------------->
