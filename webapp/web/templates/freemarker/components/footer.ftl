@@ -11,7 +11,7 @@
     <div class="footerLinks">
         <ul class="otherNav">  
             <@l.makeList> 
-                <li class="green"><a href="${urls.about}" title="more about this web site">About</a></li>,
+                <li><a href="${urls.about}" title="more about this web site">About</a></li>,
                 <#if urls.contact??>    
                     <li><a href="${urls.contact}" title="feedback form">Contact Us</a></li>
                 </#if> 
