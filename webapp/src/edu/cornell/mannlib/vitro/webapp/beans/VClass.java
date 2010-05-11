@@ -45,7 +45,8 @@ public class VClass extends BaseResourceBean implements Comparable<VClass>
     // [bjl23 2007-08-12] Yep.  A count of individuals in the class.
     private int  myEntityCount = -1;
     
-    @Deprecated
+    // rjy7 Removing deprecation since currently we have no other means to get this value.
+    // @Deprecated
     public  int  getEntityCount()         { return myEntityCount; }
     
     public  void setEntityCount( int ec ) { myEntityCount = ec; }
@@ -107,8 +108,8 @@ public class VClass extends BaseResourceBean implements Comparable<VClass>
     public VClass( String namespace, String localName, String vclassName )
     {
         myName = vclassName;
-        namespace = namespace;
-        localName = localName;
+        this.namespace = namespace;
+        this.localName = localName;
         URI = namespace + localName;
     }
 
