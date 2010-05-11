@@ -423,7 +423,7 @@ public class EntityController extends VitroHttpServlet {
      * @return null if this is not a linked data request, returns content type if it is a 
      * linked data request.
      */
-	private ContentType checkForLinkedDataRequest(String url, String acceptHeader) {		
+	protected ContentType checkForLinkedDataRequest(String url, String acceptHeader) {		
 		try {
 			//check the accept header			
 			if (acceptHeader != null) {

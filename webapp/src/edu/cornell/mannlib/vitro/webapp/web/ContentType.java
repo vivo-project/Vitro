@@ -260,7 +260,7 @@ public class ContentType implements Serializable {
          if (qValue <= 0 || qValue > 1) {
            continue;
          }
-         curQ = qValue;
+         curQ = qValue + 0.0001F;
        }
      } catch (NumberFormatException ex) {
        // ignore exception
