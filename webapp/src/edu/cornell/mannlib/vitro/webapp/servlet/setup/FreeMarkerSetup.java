@@ -32,13 +32,6 @@ public class FreeMarkerSetup implements ServletContextListener {
 		
 		Configuration cfg = new Configuration();
 		
-		/* **** RY 
-	    Here's what I want to do to avoid having to pass in the contextPath to every view object created (in order for them to create their URLs):
-	    Subclass Configuration. Add a static variable CONTEXT_PATH to it. Set that value here, and define a getter also. Then when creating
-	    urls in view object methods like getUrl(), we can reference that configuration value. None of this is possible unless we can use
-	    the method ServletContext.getContextPath(), new to Servlet API 2.5 andn therefore requiring tomcat 6 rather than 5.
-		*/
-		
 		// Specify the data source where the template files come from.
 		try {
 			cfg.setDirectoryForTemplateLoading(new File(templatePath));
