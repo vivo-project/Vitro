@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.utils;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -11,7 +10,6 @@ import org.junit.Test;
 import junit.framework.Assert;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
-import edu.cornell.mannlib.vitro.webapp.utils.display.DateDisplayUtils;
 
 public class StringUtilsTest extends AbstractTestClass {
     
