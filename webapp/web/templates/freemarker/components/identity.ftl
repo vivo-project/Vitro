@@ -24,7 +24,6 @@
             </#if> 
             
             <li><a href="${urls.about}$">About</a></li>,
-            <li><a href="${urls.aboutFM}">About - FM</a></li>,
             <#if urls.contact??>
                 <li><a href="${urls.contact}">Contact Us</a></li>
             </#if> 

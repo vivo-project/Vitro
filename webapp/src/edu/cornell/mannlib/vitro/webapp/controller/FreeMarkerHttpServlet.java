@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -13,6 +14,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -27,6 +29,11 @@ import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 import edu.cornell.mannlib.vitro.webapp.view.menu.TabMenu;
 import edu.cornell.mannlib.vitro.webapp.web.PortalWebUtil;
+
+import freemarker.cache.ClassTemplateLoader;
+import freemarker.cache.FileTemplateLoader;
+import freemarker.cache.MultiTemplateLoader;
+import freemarker.cache.TemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -34,11 +41,12 @@ import freemarker.template.TemplateModelException;
 
 public class FreeMarkerHttpServlet extends VitroHttpServlet {
 
-	private static final Log log = LogFactory.getLog(FreeMarkerHttpServlet.class.getName());
+    private static final long serialVersionUID = 1L;
+    private static final Log log = LogFactory.getLog(FreeMarkerHttpServlet.class.getName());
     private static final int FILTER_SECURITY_LEVEL = LoginFormBean.EDITOR;
     
     public static Configuration config = null;
-    public static String contextPath = null; // RY or do we need to store the entire ServletContext?
+    public static String contextPath = null; 
     
 	protected VitroRequest vreq;
 	protected HttpServletResponse response;
@@ -50,6 +58,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 	// a getBody() and getTitle() method and use the parent doGet() method.
     public void doGet( HttpServletRequest request, HttpServletResponse response )
 		throws IOException, ServletException {
+        
     	try {
 	        doSetup(request, response);
 	        setTitle();	        
@@ -161,19 +170,19 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
     protected void doSetup(HttpServletRequest request, HttpServletResponse response) {
 
         try {
-            super.doGet(request,response);
-        } catch (ServletException e1) {
+            super.doGet(request,response);   
+        } catch (ServletException e) {
             // TODO Auto-generated catch block
-            e1.printStackTrace();
-        } catch (IOException e1) {
+            e.printStackTrace();
+        } catch (IOException e) {
             // TODO Auto-generated catch block
-            e1.printStackTrace();
+            e.printStackTrace();
         }
-        
+ 
         vreq = new VitroRequest(request);
         this.response = response;
-        portal = vreq.getPortal();       
-        
+        portal = vreq.getPortal(); 
+
         // RY Can this be removed? Do templates need it? Ideally, they should not.
         // Only needed for some weird stuff in search box that I think is only used in old default theme.
         int portalId = portal.getPortalId();
@@ -183,6 +192,8 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
             log.error("Can't set shared variable 'portalId'.");
         } 
 
+        setTemplateLoader();
+        
         TabMenu menu = getTabMenu(portalId);
         root.put("tabMenu", menu);
 
@@ -226,7 +237,6 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         }
 
         urls.put("about", getUrl(Controllers.ABOUT + "?home=" + portalId));
-        urls.put("aboutFM", getUrl(Controllers.ABOUT + "-fm?home=" + portalId)); // TEMPORARY
         if (ContactMailServlet.getSmtpHostFromProperties() != null) {
             urls.put("contact", getUrl(Controllers.CONTACT_URL + "?home=" + portalId));
         }
@@ -276,6 +286,32 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
             copyright.put("url", portal.getCopyrightURL());
             root.put("copyright", copyright);
         } 
+	}
+
+    // Define template locations. Template loader will look first in the theme-specific
+    // location, then in the vitro location.
+    // RY We cannot do this in FreeMarkerSetup because (a) the theme depends on the portal,
+    // and we have multi-portal installations, and (b) we need to support theme-switching on the fly.
+    // To make more efficient, we could do this once, and then have a listener that does it again 
+    // when theme is switched.BUT this doesn't support (a), only (b), so  we have to do it on every request.
+	private final void setTemplateLoader() {
+	    
+	    // RY If this is needed in other methods, put in instance var
+	    ServletContext context = getServletContext();
+	    String themeTemplateDir = context.getRealPath(portal.getThemeDir()) + "/ftl";
+	    String vitroTemplateDir = context.getRealPath("/templates/freemarker");
+
+        try {
+            FileTemplateLoader themeFtl = new FileTemplateLoader(new File(themeTemplateDir));
+            FileTemplateLoader vitroFtl = new FileTemplateLoader(new File(vitroTemplateDir));
+            ClassTemplateLoader ctl = new ClassTemplateLoader(getClass(), "");
+            TemplateLoader[] loaders = new TemplateLoader[] { themeFtl, vitroFtl, ctl };
+            MultiTemplateLoader mtl = new MultiTemplateLoader(loaders);
+            config.setTemplateLoader(mtl);
+        } catch (IOException e) {
+            log.error("Error loading templates");
+        }
+        
 	}
 	
 	public static String getUrl(String path) {

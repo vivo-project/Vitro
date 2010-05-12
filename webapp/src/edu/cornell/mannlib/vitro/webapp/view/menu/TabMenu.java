@@ -44,8 +44,7 @@ public class TabMenu extends MainMenu {
         // Hard-coded tabs. It's not really a good idea to have these here, since any menu item that doesn't
         // come from the db should be accessible to the template to change the text. But we need them here
         // to apply the "active" mechanism.
-        addItem("Index", "/browsecontroller");
-        addItem("Index - FM", "/browse");      
+        addItem("Index", "/browsecontroller");     
     }
 
 }
