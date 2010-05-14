@@ -28,8 +28,8 @@ import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 import edu.cornell.mannlib.vitro.webapp.view.menu.TabMenu;
+import edu.cornell.mannlib.vitro.webapp.web.BreadCrumbsUtil;
 import edu.cornell.mannlib.vitro.webapp.web.PortalWebUtil;
-
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.cache.MultiTemplateLoader;
@@ -219,6 +219,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         
         root.put("siteName", portal.getAppName());
         root.put("tagline", portal.getShortHand());
+        root.put("breadcrumbs", BreadCrumbsUtil.getBreadCrumbsDiv(request));
         
         setUrls(portalId, themeDir);
         setLoginInfo();      
