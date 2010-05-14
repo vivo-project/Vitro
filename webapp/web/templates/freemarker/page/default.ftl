@@ -10,6 +10,7 @@
         
             <#include "/components/identity.ftl">
             
+            <#-- Note to UI team: do not change this div without also making the change in menu.jsp -->
             <div id="navAndSearch" class="block">
                 <#include "/components/menu.ftl">  
                 <#include "/components/search.ftl">

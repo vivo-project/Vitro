@@ -47,6 +47,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
     
     public static Configuration config = null;
     public static String contextPath = null; 
+    public static ServletContext context = null;
     
 	protected VitroRequest vreq;
 	protected HttpServletResponse response;
@@ -60,6 +61,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 		throws IOException, ServletException {
         
     	try {
+    	    callSuperGet(request, response);  // RY Yuck...redo
 	        doSetup(request, response);
 	        setTitle();	        
 	        setBody();	        
@@ -167,8 +169,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         }                    
     }
     
-    protected void doSetup(HttpServletRequest request, HttpServletResponse response) {
-
+    protected void callSuperGet(HttpServletRequest request, HttpServletResponse response) {
         try {
             super.doGet(request,response);   
         } catch (ServletException e) {
@@ -177,7 +178,12 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-        }
+        }       
+    }
+    
+    // RY This needs to be broken out as is for FreeMarkerComponentGenerator, which should not
+    // include callSuperGet(). So it's only temporary.
+    protected void doSetup(HttpServletRequest request, HttpServletResponse response) {
  
         vreq = new VitroRequest(request);
         this.response = response;
@@ -294,10 +300,8 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
     // and we have multi-portal installations, and (b) we need to support theme-switching on the fly.
     // To make more efficient, we could do this once, and then have a listener that does it again 
     // when theme is switched.BUT this doesn't support (a), only (b), so  we have to do it on every request.
-	private final void setTemplateLoader() {
+	protected final void setTemplateLoader() {
 	    
-	    // RY If this is needed in other methods, put in instance var
-	    ServletContext context = getServletContext();
 	    String themeTemplateDir = context.getRealPath(portal.getThemeDir()) + "/ftl";
 	    String vitroTemplateDir = context.getRealPath("/templates/freemarker");
 
@@ -324,5 +328,18 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 	private TabMenu getTabMenu(int portalId) {
 	    return new TabMenu(vreq, portalId);
 	}
-	
+
+    // TEMPORARY for transition from JSP to FreeMarker. Once transition
+    // is complete and no more pages are generated in JSP, this can be removed.
+    // Do this if FreeMarker is configured (i.e., not Datastar) and if we are not in
+    // a FreeMarkerHttpServlet, which will generate identity, menu, and footer from the page template.
+	// It's a static method because it needs to be called from JSPs that don't go through a servlet.
+    public static void getFreeMarkerComponentsForJsp(HttpServletRequest request, HttpServletResponse response) {
+        FreeMarkerComponentGenerator fcg = new FreeMarkerComponentGenerator(request, response);
+        request.setAttribute("ftl_identity", fcg.getIdentity());
+        request.setAttribute("ftl_menu", fcg.getMenu());
+        request.setAttribute("ftl_search", fcg.getSearch());
+        request.setAttribute("ftl_footer", fcg.getFooter());       
+    }
+    
 }

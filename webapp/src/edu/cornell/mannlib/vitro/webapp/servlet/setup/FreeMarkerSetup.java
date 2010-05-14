@@ -59,7 +59,10 @@ public class FreeMarkerSetup implements ServletContextListener {
 		
 		String contextPath = sc.getContextPath();
 		FreeMarkerHttpServlet.contextPath = contextPath;
+		FreeMarkerHttpServlet.context = sc;
 		ViewObject.contextPath = contextPath;
+		
+		// For JSP => FreeMarker transition. 
 		
 	}
 
