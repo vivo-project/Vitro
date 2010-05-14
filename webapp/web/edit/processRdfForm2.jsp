@@ -41,6 +41,8 @@
 <%@page import="edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.ModelChangePreprocessor"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
+<%@ page import="java.net.URLDecoder" %>
+
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
 
 <%-- 2nd prototype of processing.
@@ -73,7 +75,7 @@ are well formed.
      * we have to make a copy. */
     Map <String,String[]> queryParameters = null;        
     queryParameters = vreq.getParameterMap();        
-  
+ 
     List<String>  errorMessages = new ArrayList<String>();                   
     
     EditConfiguration editConfig = EditConfiguration.getConfigFromSession(session,vreq,queryParameters);    

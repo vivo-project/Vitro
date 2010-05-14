@@ -195,7 +195,7 @@ public class ConfigurationProperties {
 	 * @throws IllegalArgumentException
 	 *             If the path fails to locate a file or a resource.
 	 */
-	private static InputStream getConfigurationInputStream(String configPath) {
+	public static InputStream getConfigurationInputStream(String configPath) {
 		InputStream inStream = null;
 
 		// Try to find this as a file.

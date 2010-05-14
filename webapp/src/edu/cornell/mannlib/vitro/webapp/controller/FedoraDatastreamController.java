@@ -630,7 +630,7 @@ public class FedoraDatastreamController extends VitroHttpServlet implements Cons
 		}
 	}
    
-    private void setup(OntModel model, ServletContext context) {
+    public void setup(OntModel model, ServletContext context) {
         this.configurationStatus = "";
         StringBuffer status = new StringBuffer("");
         

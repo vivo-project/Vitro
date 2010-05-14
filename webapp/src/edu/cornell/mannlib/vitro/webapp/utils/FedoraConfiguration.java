@@ -24,7 +24,7 @@ public class FedoraConfiguration {
 
         private static String FEDORA_PROPERTIES = "/WEB-INF/fedora.properties";
         
-        private String fedoraUrl = null;
+        public String fedoraUrl = null;
         private String adminUser = null;
         private String adminPassword = null;
         private String pidNamespace = null;    
@@ -118,7 +118,7 @@ public class FedoraConfiguration {
             this.configurationStatus += status.toString();
         }
 
-        private boolean canConnectToFedoraServer( ){
+        public boolean canConnectToFedoraServer( ){
             try{
                 FedoraClient fc = new FedoraClient(fedoraUrl,adminUser, adminPassword);
                 String fedoraVersion = fc.getServerVersion();

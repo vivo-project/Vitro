@@ -55,7 +55,6 @@ public class MailUsersServlet extends VitroHttpServlet {
 	private String getSmtpHostFromProperties() {
 		String host = ConfigurationProperties.getProperty("Vitro.smtpHost");
 		if (host != null && !host.equals("")) {
-			System.out.println("Found Vitro.smtpHost value is " + host);
 			//LOG.info("Found Vitro.smtpHost value of " + host);
 		} else {
 			System.out.println("No Vitro.smtpHost specified");

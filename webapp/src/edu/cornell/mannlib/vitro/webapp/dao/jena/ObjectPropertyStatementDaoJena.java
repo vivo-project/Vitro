@@ -57,12 +57,14 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         	Map<String, ObjectProperty> uriToObjectProperty = new HashMap<String,ObjectProperty>();
         	
         	ObjectPropertyDaoJena opDaoJena = new ObjectPropertyDaoJena(getWebappDaoFactory());
+        	
             Resource ind = getOntModel().getResource(entity.getURI());
             List<ObjectPropertyStatement> objPropertyStmtList = new ArrayList<ObjectPropertyStatement>();
             ClosableIterator propIt = ind.listProperties();
             try {
                 while (propIt.hasNext()) {
                     Statement st = (Statement) propIt.next();
+                    
                     if (st.getObject().isResource() && !(NONUSER_NAMESPACES.contains(st.getPredicate().getNameSpace()))) {
                         try {
                             ObjectPropertyStatement objPropertyStmt = new ObjectPropertyStatementImpl();
