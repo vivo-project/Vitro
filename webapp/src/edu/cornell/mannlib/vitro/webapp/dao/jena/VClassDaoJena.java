@@ -417,7 +417,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
     }
     
     public void getAllSuperClassURIs(String classURI, HashSet<String> subtree){
-        List<String> directSuperclasses = getSuperClassURIs(classURI);     
+        List<String> directSuperclasses = getSuperClassURIs(classURI, true);     
         Iterator<String> it=directSuperclasses.iterator();
         while(it.hasNext()){
             String uri = (String)it.next();
@@ -607,16 +607,17 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
         return subURIs;
     }
     
-    public List <String> getSuperClassURIs(String classURI) {
+    public List <String> getSuperClassURIs(String classURI, boolean direct) {
         List supURIs = new ArrayList();
         OntClass subClass = getOntClass(getOntModel(), classURI);
         try {
-            Iterator supIt = subClass.listSuperClasses(true);
+            Iterator supIt = subClass.listSuperClasses(direct);
             while (supIt.hasNext()) {
                 OntClass cls = (OntClass) supIt.next();
                 supURIs.add(getClassURIStr(cls));
             }
         } catch (Exception e) {
+        	//TODO make this attempt respect the direct argument
         	// we'll try this again using a different method that doesn't try to convert to OntClass
         	List<Resource> supList = this.listDirectObjectPropertyValues(getOntModel().getResource(classURI), RDFS.subClassOf);
         	for (Resource res : supList) {
@@ -691,7 +692,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
             	OntResource superclass = null;
             	if (vclassURI != null) {
             		// TODO need a getAllSuperPropertyURIs method in ObjectPropertyDao
-            		List<String> superproperties = getWebappDaoFactory().getObjectPropertyDao().getSuperPropertyURIs(propertyURI);
+            		List<String> superproperties = getWebappDaoFactory().getObjectPropertyDao().getSuperPropertyURIs(propertyURI,false);
             		superproperties.add(propertyURI);
             		HashSet<String> subjSuperclasses = new HashSet<String>(getAllSuperClassURIs(vclassURI));
             		subjSuperclasses.add(vclassURI); 

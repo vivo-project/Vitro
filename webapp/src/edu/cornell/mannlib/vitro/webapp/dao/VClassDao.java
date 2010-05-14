@@ -48,7 +48,7 @@ public interface VClassDao {
 
     List <String> getAllSubClassURIs(String classURI);
 
-    List <String> getSuperClassURIs(String classURI);
+    List <String> getSuperClassURIs(String classURI, boolean direct);
 
     List <String> getAllSuperClassURIs(String classURI);
 

@@ -150,7 +150,7 @@ public class VclassEditController extends BaseEditController {
         } else {
         	vcDao = getWebappDaoFactory().getVClassDao();
         }
-        List superURIs = vcDao.getSuperClassURIs(vcl.getURI());
+        List superURIs = vcDao.getSuperClassURIs(vcl.getURI(),false);
         List superVClasses = new ArrayList();
         Iterator superURIit = superURIs.iterator();
         while (superURIit.hasNext()) {

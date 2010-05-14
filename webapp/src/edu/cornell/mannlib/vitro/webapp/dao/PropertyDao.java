@@ -37,7 +37,7 @@ public interface PropertyDao {
 
     List <String> getAllSubPropertyURIs(String propertyURI);
 
-    List <String> getSuperPropertyURIs(String propertyURI);
+    List <String> getSuperPropertyURIs(String propertyURI, boolean direct);
 
     List <String> getAllSuperPropertyURIs(String propertyURI);
     

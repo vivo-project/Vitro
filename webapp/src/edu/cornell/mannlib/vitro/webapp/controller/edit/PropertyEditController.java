@@ -171,7 +171,7 @@ public class PropertyEditController extends BaseEditController {
         } else {
         	opDao = getWebappDaoFactory().getObjectPropertyDao();
         }
-        List superURIs = opDao.getSuperPropertyURIs(p.getURI());
+        List superURIs = opDao.getSuperPropertyURIs(p.getURI(),false);
         List superProperties = new ArrayList();
         Iterator superURIit = superURIs.iterator();
         while (superURIit.hasNext()) {

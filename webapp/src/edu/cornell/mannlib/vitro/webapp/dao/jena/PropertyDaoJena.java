@@ -127,11 +127,11 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
     	return outputList;
     }
     
-    public List <String> getSuperPropertyURIs(String propertyURI) {
+    public List <String> getSuperPropertyURIs(String propertyURI, boolean direct) {
        	List<String> supURIs = new LinkedList<String>();
     	getOntModel().enterCriticalSection(Lock.READ);
     	try {
-            Iterator supIt = getOntModel().getOntProperty(propertyURI).listSuperProperties(true);
+            Iterator supIt = getOntModel().getOntProperty(propertyURI).listSuperProperties(direct);
             while (supIt.hasNext()) {
                 try {
                     OntProperty prop = (OntProperty) supIt.next();
@@ -147,7 +147,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
     }
 
     private void getAllSuperPropertyURIs(String propertyURI, HashSet<String> subtree){
-        List<String> directSuperproperties = getSuperPropertyURIs(propertyURI);     
+        List<String> directSuperproperties = getSuperPropertyURIs(propertyURI,true);     
         Iterator<String> it=directSuperproperties.iterator();
         while(it.hasNext()){
             String uri = (String)it.next();

@@ -120,8 +120,8 @@ class ObjectPropertyDaoFiltering extends BaseFiltering implements ObjectProperty
     	return innerObjectPropertyDao.getAllSubPropertyURIs(propertyURI);
     }
 
-    public List <String> getSuperPropertyURIs(String propertyURI) {
-    	return innerObjectPropertyDao.getSuperPropertyURIs(propertyURI);
+    public List <String> getSuperPropertyURIs(String propertyURI, boolean direct) {
+    	return innerObjectPropertyDao.getSuperPropertyURIs(propertyURI, direct);
     }
 
     public List <String> getAllSuperPropertyURIs(String propertyURI) {

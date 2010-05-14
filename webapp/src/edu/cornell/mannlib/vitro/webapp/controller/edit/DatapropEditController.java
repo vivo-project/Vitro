@@ -138,7 +138,7 @@ public class DatapropEditController extends BaseEditController {
             ? getAssertionsWebappDaoFactory().getDataPropertyDao()
             : getWebappDaoFactory().getDataPropertyDao();
         
-        List superURIs = assertionsDpDao.getSuperPropertyURIs(dp.getURI());
+        List superURIs = assertionsDpDao.getSuperPropertyURIs(dp.getURI(),false);
         List superProperties = new ArrayList();
         Iterator superURIit = superURIs.iterator();
         while (superURIit.hasNext()) {

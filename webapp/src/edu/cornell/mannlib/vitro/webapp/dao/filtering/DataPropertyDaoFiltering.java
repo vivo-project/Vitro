@@ -133,8 +133,8 @@ class DataPropertyDaoFiltering extends BaseFiltering implements DataPropertyDao{
     	return innerDataPropertyDao.getAllSubPropertyURIs(propertyURI);
     }
 
-    public List <String> getSuperPropertyURIs(String propertyURI) {
-    	return innerDataPropertyDao.getSuperPropertyURIs(propertyURI);
+    public List <String> getSuperPropertyURIs(String propertyURI, boolean direct) {
+    	return innerDataPropertyDao.getSuperPropertyURIs(propertyURI, direct);
     }
 
     public List <String> getAllSuperPropertyURIs(String propertyURI) {
