@@ -56,6 +56,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 	protected VitroRequest vreq;
 	protected HttpServletResponse response;
 	protected Portal portal;
+	protected String appName;
 	protected Map<String, Object> root = new HashMap<String, Object>();
 	
 	// Some servlets have their own doGet() method, in which case they need to call 
@@ -200,6 +201,13 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
             config.setSharedVariable("portalId", portalId);
         } catch (TemplateModelException e) {
             log.error("Can't set shared variable 'portalId'.");
+        } 
+        
+        appName = portal.getAppName();
+        try {
+            config.setSharedVariable("appName", appName);
+        } catch (TemplateModelException e) {
+            log.error("Can't set shared variable 'appName'.");
         } 
 
         setTemplateLoader();

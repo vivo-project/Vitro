@@ -26,6 +26,7 @@ public class IndividualListControllerFM extends FreeMarkerHttpServlet {
 
     long startTime = -1;
     
+    private static final long serialVersionUID = 1L;   
     private static final Log log = LogFactory.getLog(IndividualListControllerFM.class.getName());
     private VClass vclass = null;
 
@@ -117,7 +118,7 @@ public class IndividualListControllerFM extends FreeMarkerHttpServlet {
         }
         setSharedVariable("title", title);
 
-        String templateName = "entityList.ftl";
+        String templateName = "individualList.ftl";
         return mergeBodyToTemplate(templateName, body);
 
     }

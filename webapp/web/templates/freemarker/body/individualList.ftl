@@ -1,5 +1,7 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
+<#-- List individual members of a class. -->
+
 <div class="contents">
 
     <div class="entityList">
