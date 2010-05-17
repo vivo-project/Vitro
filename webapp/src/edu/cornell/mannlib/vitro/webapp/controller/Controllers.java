@@ -16,7 +16,9 @@ import java.util.List;
  */
 
 public class Controllers {
-    //servlet urls go here:
+    
+    // Servlet urls
+    
     public static final String ENTITY = "/entity";
     public static final String ENTITY_PROP_LIST = "/entityPropList";
     public static final String ENTITY_LIST = "/EntityList";
@@ -32,6 +34,11 @@ public class Controllers {
     public static final String LOGOUT = "/siteAdmin";
     
     public static final String EXPORT_RDF = "/export";
+    
+    public static final String CONTACT_URL = "/comments";
+    public static final String TERMS_OF_USE_URL = "/termsOfUse";
+    public static final String BROWSE = "/browse";
+    public static final String INDIVIDUAL_LIST_URL = "/entitylist"; // will change to individuallist
 
     // jsps go here:
     
@@ -88,7 +95,6 @@ public class Controllers {
 
     public static final Object SEARCH_ERROR_JSP = "/search_error.jsp";
 
-    public static final String CONTACT_URL = "/comments";
     
     //public static final String TAB_ENTITIES_LIST_JSP = "templates/tab/tabEntities.jsp";
 

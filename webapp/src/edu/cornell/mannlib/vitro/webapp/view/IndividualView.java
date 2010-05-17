@@ -35,6 +35,7 @@ public class IndividualView extends ViewObject {
     
     // Or maybe getProfileUrl - there might be other kinds of urls
     // e.g., getEditUrl, getDeleteUrl - these would return the computations of PropertyEditLinks
+    // Just call getUrl...
     public String getProfileUrl() {
         return contextPath + URL + ""; // ADD IN the label from the individual's uri 
     }

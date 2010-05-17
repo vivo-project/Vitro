@@ -2,36 +2,33 @@
 
 package edu.cornell.mannlib.vitro.webapp.view;
 
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.URLEncoder;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.FreeMarkerHttpServlet;
-import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
+
+// RY We may want an interface that the superclass would implement.
+// RY Consider using FreeMarker's DisplayObjectWrapper instead, or extending it.
 
 public abstract class ViewObject {
 
     private static final Log log = LogFactory.getLog(ViewObject.class.getName());
 
+    // RY Can probably remove this, since we're using the FreeMarkerHttpServlet methods instead
     public static String contextPath;
     
-    protected static String getUrl(String path) {
+    protected String getUrl(String path) {
         return FreeMarkerHttpServlet.getUrl(path);
     }
     
-    protected String encodeUrl(String url) {
-        String encoding = "ISO-8859-1";
-        String encodedUrl = null;
-        try {
-            encodedUrl = URLEncoder.encode(url, encoding);
-        } catch (UnsupportedEncodingException e) {
-            log.error("Error encoding url " + url + " with encoding " + encoding + ": Unsupported encoding.");
-        }
-        return encodedUrl;
+    protected String getUrl(String path, Map<String, String> params) {
+        return FreeMarkerHttpServlet.getUrl(path, params);
+    }
+    
+    protected String urlEncode(String str) {
+        return FreeMarkerHttpServlet.urlEncode(str);
     }
 
 }

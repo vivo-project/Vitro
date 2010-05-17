@@ -6,11 +6,15 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -242,13 +246,16 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         if ( ! StringUtils.isEmpty(bannerImage)) {
             root.put("bannerImage", getUrl(themeDir + "site_icons/" + bannerImage));
         }
+        
+        Map<String, String> portalParam = new HashMap<String, String>();
+        portalParam.put("home", "" + portalId);
 
-        urls.put("about", getUrl(Controllers.ABOUT + "?home=" + portalId));
+        urls.put("about", getUrl(Controllers.ABOUT, portalParam));
         if (ContactMailServlet.getSmtpHostFromProperties() != null) {
-            urls.put("contact", getUrl(Controllers.CONTACT_URL + "?home=" + portalId));
+            urls.put("contact", getUrl(Controllers.CONTACT_URL, portalParam));
         }
         urls.put("search", getUrl(Controllers.SEARCH_URL));
-        urls.put("termsOfUse", getUrl("/termsOfUse?home=" + portalId));        
+        urls.put("termsOfUse", getUrl(Controllers.TERMS_OF_USE_URL, portalParam));        
         urls.put("login", getUrl(Controllers.LOGIN));
         urls.put("logout", getUrl(Controllers.LOGOUT));
         urls.put("siteAdmin", getUrl(Controllers.SITE_ADMIN));     
@@ -318,14 +325,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         }
         
 	}
-	
-	public static String getUrl(String path) {
-		if ( ! path.startsWith("/") ) {
-			path = "/" + path;
-		}
-		return contextPath + path;
-	}
-	
+    
 	private TabMenu getTabMenu(int portalId) {
 	    return new TabMenu(vreq, portalId);
 	}
@@ -341,6 +341,43 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         request.setAttribute("ftl_menu", fcg.getMenu());
         request.setAttribute("ftl_search", fcg.getSearch());
         request.setAttribute("ftl_footer", fcg.getFooter());       
+    }
+    
+    
+    /* ******************** Utilities ******************* */
+
+    public static String getUrl(String path) {
+        if ( ! path.startsWith("/") ) {
+            path = "/" + path;
+        }
+        return contextPath + path;
+    }
+    
+    public static String getUrl(String path, Map<String, String> params) {
+        String url = getUrl(path);
+        
+        Iterator<String> i = params.keySet().iterator();
+        String key, value;
+        String glue = "?";
+        while (i.hasNext()) {
+            key = i.next();
+            value = params.get(key);
+            url += glue + key + "=" + urlEncode(value);
+            glue = "&";
+        }
+        
+        return url;
+    }
+
+    public static String urlEncode(String url) {
+        String encoding = "ISO-8859-1";
+        String encodedUrl = null;
+        try {
+            encodedUrl = URLEncoder.encode(url, encoding);
+        } catch (UnsupportedEncodingException e) {
+            log.error("Error encoding url " + url + " with encoding " + encoding + ": Unsupported encoding.");
+        }
+        return encodedUrl;
     }
     
 }

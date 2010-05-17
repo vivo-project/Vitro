@@ -2,15 +2,19 @@
 
 package edu.cornell.mannlib.vitro.webapp.view;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
+import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 
 public class VClassView extends ViewObject {
     
     private static final Log log = LogFactory.getLog(VClassView.class.getName());
-    private static final String URL = "/individuallistFM?vclassId=";
+    private static final String URL = Controllers.INDIVIDUAL_LIST_URL;
     
     private VClass vclass;
     
@@ -23,7 +27,9 @@ public class VClassView extends ViewObject {
     }
     
     public String getUrl() {
-        return contextPath + URL + encodeUrl(vclass.getURI()); 
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("vclassId", vclass.getURI());
+        return getUrl(URL, params);
     }
     
     public int getEntityCount() {

@@ -266,21 +266,12 @@
 
   <servlet>
     <servlet-name>AboutController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.AboutController</servlet-class>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.AboutControllerFM</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>AboutController</servlet-name>
     <url-pattern>/about</url-pattern>
   </servlet-mapping>
-  
-  <servlet>
-    <servlet-name>AboutControllerFM</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.AboutControllerFM</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>AboutControllerFM</servlet-name>
-    <url-pattern>/about-fm</url-pattern>
-  </servlet-mapping> 
   
   <servlet>
     <servlet-name>FakeSelfEditController</servlet-name>
@@ -968,16 +959,14 @@
 
   <servlet>
     <servlet-name>browsecontroller</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.BrowseController</servlet-class>
-    <load-on-startup>5</load-on-startup>
-  </servlet>
-  
-  <servlet>
-    <servlet-name>browsecontrollerFM</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.BrowseControllerFM</servlet-class>
     <load-on-startup>5</load-on-startup>
   </servlet>
-
+  <servlet-mapping>
+    <servlet-name>browsecontroller</servlet-name>
+    <url-pattern>/browse</url-pattern>
+  </servlet-mapping>
+  
   <servlet>
     <servlet-name>pubsbyorg</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.vclass.PubsByDepartmentServlet</servlet-class>
@@ -1089,14 +1078,6 @@
   <servlet-mapping>
     <servlet-name>logout</servlet-name>
     <url-pattern>/logout</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>browsecontroller</servlet-name>
-    <url-pattern>/browsecontroller</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>browsecontrollerFM</servlet-name>
-    <url-pattern>/browse</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>pubsbyorg</servlet-name>
