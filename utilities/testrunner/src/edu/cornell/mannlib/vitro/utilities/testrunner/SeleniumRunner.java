@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.utilities.testrunner;
 
+import static edu.cornell.mannlib.vitro.utilities.testrunner.SeleniumRunnerParameters.LOGFILE_NAME;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -13,23 +15,23 @@ import java.util.List;
  */
 public class SeleniumRunner {
 	private final SeleniumRunnerParameters parms;
-	private final Logger logger;
+	private final Listener listener;
 	private final UploadAreaCleaner uploadCleaner;
 	private final ModelCleaner modelCleaner;
 	private final SuiteRunner suiteRunner;
 
 	public SeleniumRunner(SeleniumRunnerParameters parms) {
 		this.parms = parms;
-		this.logger = parms.getLogger();
+		this.listener = parms.getListener();
 		this.uploadCleaner = new UploadAreaCleaner(parms);
 		this.modelCleaner = new ModelCleaner(parms);
 		this.suiteRunner = new SuiteRunner(parms);
 	}
 
 	public void runSelectedSuites() {
-		logger.runStarted();
+		listener.runStarted();
 		for (File suiteDir : parms.getSelectedSuites()) {
-			logger.suiteStarted(suiteDir);
+			listener.suiteStarted(suiteDir);
 			try {
 				if (parms.isCleanModel()) {
 					modelCleaner.clean();
@@ -39,11 +41,17 @@ public class SeleniumRunner {
 				}
 				suiteRunner.runSuite(suiteDir);
 			} catch (IOException e) {
-				logger.suiteFailed(suiteDir, e);
+				listener.suiteFailed(suiteDir, e);
+			} catch (CommandRunnerException e) {
+				listener.suiteFailed(suiteDir, e);
+			} catch (FatalException e) {
+				listener.runFailed(e);
+				e.printStackTrace();
+				break;
 			}
-			logger.suiteStopped(suiteDir);
+			listener.suiteStopped(suiteDir);
 		}
-		logger.runStopped();
+		listener.runStopped();
 	}
 
 	private static void selectAllSuites(SeleniumRunnerParameters parms) {
@@ -54,9 +62,13 @@ public class SeleniumRunner {
 		parms.setSelectedSuites(suites);
 	}
 
-	/**
-	 * @param args
-	 */
+	private static void usage(String message) {
+		System.out.println(message);
+		System.out.println("Usage is: SeleniumRunner <parameters_file> "
+				+ "[\"interactive\"]");
+		System.exit(1);
+	}
+
 	public static void main(String[] args) {
 		SeleniumRunnerParameters parms = null;
 		boolean interactive = false;
@@ -82,20 +94,20 @@ public class SeleniumRunner {
 			// TODO hook up the GUI.
 			throw new RuntimeException("interactive mode not implemented.");
 		} else {
+			File logFile = new File(parms.getOutputDirectory(), LOGFILE_NAME);
+			System.out.println("Log file is '" + logFile.getPath() + "'");
+
 			// Run all of the suites.
 			// For each suite, clean the model and the upload area.
 			selectAllSuites(parms);
 			parms.setCleanModel(true);
 			parms.setCleanUploads(true);
+
+			System.out.println(parms);
+
 			SeleniumRunner runner = new SeleniumRunner(parms);
 			runner.runSelectedSuites();
 		}
 	}
 
-	private static void usage(String message) {
-		System.out.println(message);
-		System.out.println("Usage is: SeleniumRunner <parameters_file> "
-				+ "[\"interactive\"]");
-		System.exit(1);
-	}
 }

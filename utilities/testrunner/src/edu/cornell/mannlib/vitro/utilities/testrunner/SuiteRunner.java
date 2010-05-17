@@ -3,26 +3,68 @@
 package edu.cornell.mannlib.vitro.utilities.testrunner;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * TODO
+ * Run a Selenium TestSuite in a sub-process.
  */
 public class SuiteRunner {
 
-	/**
-	 * @param parms
-	 */
+	private final SeleniumRunnerParameters parms;
+	private final CommandRunner runner;
+	private final Listener listener;
+
 	public SuiteRunner(SeleniumRunnerParameters parms) {
-		// TODO Auto-generated constructor stub
-		throw new RuntimeException("SuiteRunner Constructor not implemented.");
+		this.parms = parms;
+		this.runner = new CommandRunner(parms);
+		this.listener = parms.getListener();
 	}
 
 	/**
-	 * @param suiteDir
+	 * Run the suite.
 	 */
 	public void runSuite(File suiteDir) {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("SuiteRunner.runSuite() not implemented.");
+		listener.suiteTestingStarted(suiteDir);
+
+		List<String> cmd = new ArrayList<String>();
+		cmd.add("java");
+		cmd.add("-jar");
+		cmd.add(parms.getSeleniumJarPath().getPath());
+		cmd.add("-singleWindow");
+		cmd.add("-timeout");
+		cmd.add(String.valueOf(parms.getSuiteTimeoutLimit()));
+		cmd.add("-userExtensions");
+		cmd.add(parms.getUserExtensionsFile().getPath());
+
+		if (parms.hasFirefoxProfileDir()) {
+			cmd.add("-firefoxProfileTemplate");
+			cmd.add(parms.getFirefoxProfileDir().getPath());
+		}
+
+		String suiteName = suiteDir.getName();
+		File outputFile = new File(parms.getOutputDirectory(), suiteName
+				+ ".html");
+		File suiteFile = new File(suiteDir, "Suite.html");
+
+		cmd.add("-htmlSuite");
+		cmd.add("*firefox");
+		cmd.add(parms.getWebsiteUrl());
+		cmd.add(suiteFile.getPath());
+		cmd.add(outputFile.getPath());
+
+		try {
+			runner.run(cmd);
+		} catch (CommandRunnerException e) {
+			throw new FatalException(e);
+		}
+
+		int returnCode = runner.getReturnCode();
+		if (returnCode != 0) {
+			listener.suiteFailed(suiteDir, returnCode);
+		}
+
+		listener.suiteTestingStopped(suiteDir);
 	}
 
 }

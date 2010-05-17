@@ -11,11 +11,11 @@ import java.io.IOException;
  */
 public class UploadAreaCleaner {
 	private final SeleniumRunnerParameters parms;
-	private final Logger logger;
+	private final Listener listener;
 
 	public UploadAreaCleaner(SeleniumRunnerParameters parms) {
 		this.parms = parms;
-		this.logger = parms.getLogger();
+		this.listener = parms.getListener();
 	}
 
 	/**
@@ -29,7 +29,7 @@ public class UploadAreaCleaner {
 					+ "' is not a directory.");
 		}
 
-		logger.cleanUploadStart(uploadDirectory);
+		listener.cleanUploadStart(uploadDirectory);
 
 		try {
 			for (File file : uploadDirectory.listFiles()) {
@@ -40,10 +40,10 @@ public class UploadAreaCleaner {
 				}
 			}
 		} catch (IOException e) {
-			logger.cleanUploadFailed(uploadDirectory, e);
+			listener.cleanUploadFailed(uploadDirectory, e);
 			throw e;
 		} finally {
-			logger.cleanUploadStop(uploadDirectory);
+			listener.cleanUploadStop(uploadDirectory);
 		}
 	}
 

@@ -34,12 +34,12 @@ public class CommandRunner {
 	private File workingDirectory;
 
 	/* Gets informed of output as it arrives. Never null. */
-	private final Logger logger;
+	private final Listener listener;
 
 	private final Map<String, String> environmentAdditions = new HashMap<String, String>();
 
 	public CommandRunner(SeleniumRunnerParameters parms) {
-		this.logger = parms.getLogger();
+		this.listener = parms.getListener();
 	}
 
 	/** Set the directory that the command will run in. */
@@ -61,7 +61,7 @@ public class CommandRunner {
 	 *            {@link java.lang.ProcessBuilder#ProcessBuilder(List)}.
 	 */
 	public void run(List<String> command) throws CommandRunnerException {
-		logger.subProcessStart(command);
+		listener.subProcessStart(command);
 		try {
 			ProcessBuilder builder = new ProcessBuilder(command);
 
@@ -93,7 +93,43 @@ public class CommandRunner {
 			throw new CommandRunnerException(
 					"Exception when handling sub-process:", e);
 		}
-		logger.subProcessStop(command);
+		listener.subProcessStop(command);
+	}
+
+	/**
+	 * Run the command and don't wait for it to complete. {@link #stdErr} and
+	 * {@link #stdOut} will not be set, but output from the process may be sent
+	 * to the listener at any time.
+	 * 
+	 * @param command
+	 *            a list containing the operating system program and its
+	 *            arguments. See
+	 *            {@link java.lang.ProcessBuilder#ProcessBuilder(List)}.
+	 */
+	public void runAsBackground(List<String> command)
+			throws CommandRunnerException {
+		listener.subProcessStartInBackground(command);
+		try {
+			ProcessBuilder builder = new ProcessBuilder(command);
+
+			if (workingDirectory != null) {
+				builder.directory(workingDirectory);
+			}
+
+			if (!environmentAdditions.isEmpty()) {
+				builder.environment().putAll(this.environmentAdditions);
+			}
+
+			Process process = builder.start();
+			StreamEater outputEater = new StreamEater(process.getInputStream(),
+					false);
+			StreamEater errorEater = new StreamEater(process.getErrorStream(),
+					true);
+
+		} catch (IOException e) {
+			throw new CommandRunnerException(
+					"Exception when handling sub-process:", e);
+		}
 	}
 
 	public int getReturnCode() {
@@ -136,11 +172,11 @@ public class CommandRunner {
 					if (howMany > 0) {
 						String string = new String(buffer, 0, howMany);
 						contents.write(string);
-						
+
 						if (isError) {
-							logger.subProcessErrout(string);
+							listener.subProcessErrout(string);
 						} else {
-							logger.subProcessStdout(string);
+							listener.subProcessStdout(string);
 						}
 					} else if (howMany == 0) {
 						Thread.yield();
