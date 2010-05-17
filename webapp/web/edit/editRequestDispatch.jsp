@@ -230,7 +230,6 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
         //case where a form was passed as a http parameter
         form = formParam;
     }
-	System.out.println("Edit request dispatch - forwarding to form is " + form);
     request.setAttribute("form", form);
 %>
 <jsp:forward page="/edit/forms/${form}" />

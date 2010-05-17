@@ -33,7 +33,6 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep" %>
 <%@ page import="edu.cornell.mannlib.vedit.beans.LoginFormBean" %>
 <jsp:useBean id="loginHandler" class="edu.cornell.mannlib.vedit.beans.LoginFormBean" scope="session" />
-ENTITY merged props list
 <%! 
 public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.templates.entity.entityMergedPropsList.jsp");
 %>
@@ -60,7 +59,6 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
         throw new Error("Subject individual must be in request scope for entityMergedPropsList.jsp");
     }
 
-    System.out.println("Entity Merged Props list for " + subject.getURI());
     
     // Nick wants not to use explicit parameters to trigger visibility of a div, but for now we don't just want to always show the 1st one
     String openingGroupLocalName = (String) request.getParameter("curgroup");

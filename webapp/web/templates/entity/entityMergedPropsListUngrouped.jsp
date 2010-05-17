@@ -37,7 +37,6 @@
 
 <%@ page import="org.apache.commons.logging.Log" %>
 <%@ page import="org.apache.commons.logging.LogFactory" %>
-ENTITY merged props list ungrouped
 <jsp:useBean id="loginHandler" class="edu.cornell.mannlib.vedit.beans.LoginFormBean" scope="session" />
 <%! 
 public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.templates.entity.entityMergedPropsList.jsp");
@@ -58,7 +57,6 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 	if (subject==null) {
     	throw new Error("Subject individual must be in request scope for dashboardPropsList.jsp");
 	}
-	System.out.println("Entity merged props list ungrouped for " + subject.getURI());
 	// Nick wants not to use explicit parameters to trigger visibility of a div, but for now we don't just want to always show the 1st one
 	String openingGroupLocalName = (String) request.getParameter("curgroup");
     VitroRequest vreq = new VitroRequest(request);
