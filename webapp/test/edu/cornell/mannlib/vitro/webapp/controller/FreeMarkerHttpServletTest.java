@@ -10,6 +10,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreeMarkerHttpServlet;
 import freemarker.template.Configuration;
 
 public class FreeMarkerHttpServletTest extends AbstractTestClass {

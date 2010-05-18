@@ -7,14 +7,14 @@ package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 public class Router {
 
     public static final String ABOUT = "/about";
-    public static final String CONTACT = "/comments";
     public static final String BROWSE = "/browse";
+    public static final String COMMENT_FORM = "/comments";
     public static final String INDIVIDUAL = "/individual";
-    public static final String INDIVIDUAL_LIST = "/individuallist";
+    public static final String INDIVIDUAL_LIST = "/entitylist"; // change
     public static final String SEARCH = "/search"; 
     public static final String TERMS_OF_USE = "/termsOfUse";
     
-    // Put these under /siteAdmin/...
+    // Put these under /admin/...
     // Currently login, logout, and site admin are all the same page, but they don't have to be.
     public static final String LOGIN = "/siteAdmin";
     public static final String LOGOUT = "/siteAdmin";    

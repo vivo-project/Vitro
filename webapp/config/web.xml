@@ -837,14 +837,18 @@
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>CommentsController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.CommentsController</servlet-class>
+    <servlet-name>CommentFormController</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.CommentFormController</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>CommentsController</servlet-name>
+    <servlet-name>CommentFormController</servlet-name>
     <url-pattern>/comments</url-pattern>
   </servlet-mapping>
-
+  <servlet-mapping>
+    <servlet-name>CommentFormController</servlet-name>
+    <url-pattern>/contact</url-pattern>
+  </servlet-mapping>
+  
   <servlet>
     <servlet-name>JSON Service</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.JSONServlet</servlet-class>

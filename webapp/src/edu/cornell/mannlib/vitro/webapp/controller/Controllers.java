@@ -24,8 +24,6 @@ public class Controllers {
     public static final String TERMS_OF_USE_URL = "/termsOfUse";
     public static final String SEARCH_URL = "/search";
     
-
-    
     public static final String ENTITY = "/entity";
     public static final String ENTITY_PROP_LIST = "/entityPropList";
     public static final String ENTITY_LIST = "/EntityList";
