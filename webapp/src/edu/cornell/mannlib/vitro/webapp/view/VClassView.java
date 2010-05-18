@@ -9,12 +9,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
-import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.Router;
 
 public class VClassView extends ViewObject {
     
     private static final Log log = LogFactory.getLog(VClassView.class.getName());
-    private static final String URL = Controllers.INDIVIDUAL_LIST_URL;
+    private static final String URL = Router.INDIVIDUAL_LIST;
     
     private VClass vclass;
     

@@ -266,7 +266,7 @@
 
   <servlet>
     <servlet-name>AboutController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.AboutControllerFM</servlet-class>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.AboutController</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>AboutController</servlet-name>
@@ -788,12 +788,12 @@
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>IndividualListControllerFM</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.IndividualListControllerFM</servlet-class>
+    <servlet-name>IndividualListController</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListController</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>IndividualListControllerFM</servlet-name>
-    <url-pattern>/individuallistFM</url-pattern>
+    <servlet-name>IndividualListController</servlet-name>
+    <url-pattern>/individuallist</url-pattern>
   </servlet-mapping>
   
   <servlet>
@@ -829,7 +829,7 @@
 
   <servlet>
     <servlet-name>TermsOfUseController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.TermsOfUseControllerFM</servlet-class>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.TermsOfUseController</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>TermsOfUseController</servlet-name>
@@ -959,7 +959,7 @@
 
   <servlet>
     <servlet-name>browsecontroller</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.BrowseControllerFM</servlet-class>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.BrowseController</servlet-class>
     <load-on-startup>5</load-on-startup>
   </servlet>
   <servlet-mapping>

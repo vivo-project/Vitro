@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.controller;
+package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.listeners.StatementListener;
@@ -17,7 +17,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
-import edu.cornell.mannlib.vitro.webapp.controller.FreeMarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.view.VClassGroupView;
 
 import org.apache.commons.logging.Log;
@@ -31,7 +30,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class BrowseControllerFM extends FreeMarkerHttpServlet {
+public class BrowseController extends FreeMarkerHttpServlet {
     static final long serialVersionUID=2006030721126L;
 
     private transient ConcurrentHashMap<Integer, List> _groupListMap
@@ -40,7 +39,7 @@ public class BrowseControllerFM extends FreeMarkerHttpServlet {
             = new ConcurrentLinkedQueue<String>();
     private RebuildGroupCacheThread _cacheRebuildThread;
 
-    private static final Log log = LogFactory.getLog(BrowseControllerFM.class.getName());
+    private static final Log log = LogFactory.getLog(BrowseController.class.getName());
 
     public void init(javax.servlet.ServletConfig servletConfig)
             throws javax.servlet.ServletException {
@@ -230,8 +229,8 @@ public class BrowseControllerFM extends FreeMarkerHttpServlet {
 
     /* ******************  Jena Model Change Listener***************************** */
     private class BrowseControllerChangeListener extends StatementListener {
-        private BrowseControllerFM controller = null;
-        public BrowseControllerChangeListener(BrowseControllerFM controller){
+        private BrowseController controller = null;
+        public BrowseControllerChangeListener(BrowseController controller){
             this.controller=controller;
         }
 
@@ -260,13 +259,13 @@ public class BrowseControllerFM extends FreeMarkerHttpServlet {
     }
     /* ******************** RebuildGroupCacheThread **************** */
     protected class RebuildGroupCacheThread extends Thread {
-        BrowseControllerFM controller;
+        BrowseController controller;
         boolean die = false;
         boolean queueChange = false;
         long queueChangeMills = 0;
         private boolean awareOfQueueChange = false;
 
-        RebuildGroupCacheThread(BrowseControllerFM controller) {
+        RebuildGroupCacheThread(BrowseController controller) {
             this.controller = controller;
         }
         public void run() {

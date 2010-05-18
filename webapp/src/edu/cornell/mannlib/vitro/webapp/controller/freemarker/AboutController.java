@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.controller; 
+package edu.cornell.mannlib.vitro.webapp.controller.freemarker; 
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,10 +8,10 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class AboutControllerFM extends FreeMarkerHttpServlet {
+public class AboutController extends FreeMarkerHttpServlet {
 	
     private static final long serialVersionUID = 1L;
-    private static final Log log = LogFactory.getLog(AboutControllerFM.class.getName());
+    private static final Log log = LogFactory.getLog(AboutController.class.getName());
     
     protected String getTitle() {
     	return "About " + appName;

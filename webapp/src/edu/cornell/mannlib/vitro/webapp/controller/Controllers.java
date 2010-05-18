@@ -18,26 +18,26 @@ import java.util.List;
 public class Controllers {
     
     // Servlet urls
-       
-    public static final String SITE_ADMIN = "/siteAdmin";
-    public static final String LOGIN = "/siteAdmin";
-    public static final String LOGOUT = "/siteAdmin";
 
     public static final String ABOUT = "/about";
     public static final String CONTACT_URL = "/comments";
     public static final String TERMS_OF_USE_URL = "/termsOfUse";
+    public static final String SEARCH_URL = "/search";
     
-    public static final String BROWSE = "/browse";
-    public static final String INDIVIDUAL_LIST_URL = "/individuallist";
+
     
     public static final String ENTITY = "/entity";
     public static final String ENTITY_PROP_LIST = "/entityPropList";
     public static final String ENTITY_LIST = "/EntityList";
 
-    public static final String BROWSE_CONTROLLER = "browse";
+    public static final String BROWSE_CONTROLLER = "browsecontroller";
     public static final String RETRY_URL = "editForm";
     public static final String TAB_ENTITIES = "/TabEntitiesController";  
 
+    public static final String SITE_ADMIN = "/siteAdmin";
+    public static final String LOGIN = "/siteAdmin";
+    public static final String LOGOUT = "/siteAdmin";
+    
     public static final String EXPORT_RDF = "/export";
     
     // jsps go here:
@@ -74,7 +74,7 @@ public class Controllers {
 
     public static final String ALPHA_INDEX_JSP = "/templates/alpha/alphaIndex.jsp";
 
-    public static final String SEARCH_URL = "/search";
+
     public static final String SEARCH_BASIC_JSP = "/templates/search/searchBasic.jsp";
     public static final String SEARCH_PAGED_JSP = "/templates/search/searchPaged.jsp";
     public static final String SEARCH_FAILED_JSP = "/templates/search/searchFailed.jsp";

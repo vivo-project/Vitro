@@ -7,7 +7,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.controller.FreeMarkerHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreeMarkerHttpServlet;
 
 // RY We may want an interface that the superclass would implement.
 // RY Consider using FreeMarker's DisplayObjectWrapper instead, or extending it.
@@ -17,7 +17,7 @@ public abstract class ViewObject {
     private static final Log log = LogFactory.getLog(ViewObject.class.getName());
 
     // RY Can probably remove this, since we're using the FreeMarkerHttpServlet methods instead
-    public static String contextPath;
+    // public static String contextPath;
     
     protected String getUrl(String path) {
         return FreeMarkerHttpServlet.getUrl(path);

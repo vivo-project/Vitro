@@ -1,8 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.controller;
-
-import java.util.Map;
+package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,7 +20,7 @@ public class FreeMarkerComponentGenerator extends FreeMarkerHttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(FreeMarkerHttpServlet.class.getName());
 
-    FreeMarkerComponentGenerator(HttpServletRequest request, HttpServletResponse response) {
+    public FreeMarkerComponentGenerator(HttpServletRequest request, HttpServletResponse response) {
         doSetup(request, response);
     }
     

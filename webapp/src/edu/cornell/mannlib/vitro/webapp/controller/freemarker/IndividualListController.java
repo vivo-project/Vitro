@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.controller;
+package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,12 +22,12 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.view.IndividualView;
 
-public class IndividualListControllerFM extends FreeMarkerHttpServlet {
+public class IndividualListController extends FreeMarkerHttpServlet {
 
     long startTime = -1;
     
     private static final long serialVersionUID = 1L;   
-    private static final Log log = LogFactory.getLog(IndividualListControllerFM.class.getName());
+    private static final Log log = LogFactory.getLog(IndividualListController.class.getName());
     private VClass vclass = null;
 
     /**
@@ -59,7 +59,7 @@ public class IndividualListControllerFM extends FreeMarkerHttpServlet {
                             vclass = vreq.getWebappDaoFactory().getVClassDao().getVClassByURI(vitroClassIdStr);
                             if (vclass == null) {
                                 log.error("Couldn't retrieve vclass "+vitroClassIdStr);
-                                response.sendRedirect(Controllers.BROWSE_CONTROLLER+"-freemarker?"+vreq.getQueryString());
+                                response.sendRedirect(Router.BROWSE + "?"+vreq.getQueryString());
                             }
                         } catch (Exception ex) {
                             throw new HelpException("EntityListControllerFM: request parameter 'vclassId' must be a URI string");

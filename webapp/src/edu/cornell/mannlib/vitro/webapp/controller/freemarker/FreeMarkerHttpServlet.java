@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.controller;
+package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,6 +29,9 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vedit.beans.LoginFormBean;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
+import edu.cornell.mannlib.vitro.webapp.controller.ContactMailServlet;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 import edu.cornell.mannlib.vitro.webapp.view.menu.TabMenu;
 import edu.cornell.mannlib.vitro.webapp.web.BreadCrumbsUtil;
@@ -58,7 +60,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 	protected Portal portal;
 	protected String appName;
 	protected Map<String, Object> root = new HashMap<String, Object>();
-	
+    
 	// Some servlets have their own doGet() method, in which case they need to call 
 	// doSetup(), setTitle(), setBody(), and write() themselves. Other servlets define only
 	// a getBody() and getTitle() method and use the parent doGet() method.
@@ -66,7 +68,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 		throws IOException, ServletException {
         
     	try {
-    	    callSuperGet(request, response);  // RY Yuck...redo
+    	    callSuperGet(request, response);  // ??
 	        doSetup(request, response);
 	        setTitle();	        
 	        setBody();	        
@@ -258,15 +260,15 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         Map<String, String> portalParam = new HashMap<String, String>();
         portalParam.put("home", "" + portalId);
 
-        urls.put("about", getUrl(Controllers.ABOUT, portalParam));
+        urls.put("about", getUrl(Router.ABOUT, portalParam));
         if (ContactMailServlet.getSmtpHostFromProperties() != null) {
-            urls.put("contact", getUrl(Controllers.CONTACT_URL, portalParam));
+            urls.put("contact", getUrl(Router.CONTACT, portalParam));
         }
-        urls.put("search", getUrl(Controllers.SEARCH_URL));
-        urls.put("termsOfUse", getUrl(Controllers.TERMS_OF_USE_URL, portalParam));        
-        urls.put("login", getUrl(Controllers.LOGIN));
-        urls.put("logout", getUrl(Controllers.LOGOUT));
-        urls.put("siteAdmin", getUrl(Controllers.SITE_ADMIN));     
+        urls.put("search", getUrl(Router.SEARCH));
+        urls.put("termsOfUse", getUrl(Router.TERMS_OF_USE, portalParam));        
+        urls.put("login", getUrl(Router.LOGIN));
+        urls.put("logout", getUrl(Router.LOGOUT));
+        urls.put("siteAdmin", getUrl(Router.SITE_ADMIN));     
         
         root.put("urls", urls);
     }
@@ -387,5 +389,6 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         }
         return encodedUrl;
     }
+
     
 }

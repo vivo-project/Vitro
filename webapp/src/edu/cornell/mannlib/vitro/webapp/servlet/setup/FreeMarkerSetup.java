@@ -2,9 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
-import java.io.File;
-import java.io.IOException;
-
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -13,9 +10,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
-import edu.cornell.mannlib.vitro.webapp.controller.FreeMarkerHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreeMarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.view.ViewObject;
-
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.TemplateException;
@@ -60,9 +56,7 @@ public class FreeMarkerSetup implements ServletContextListener {
 		String contextPath = sc.getContextPath();
 		FreeMarkerHttpServlet.contextPath = contextPath;
 		FreeMarkerHttpServlet.context = sc;
-		ViewObject.contextPath = contextPath;
-		
-		// For JSP => FreeMarker transition. 
+		// ViewObject.contextPath = contextPath; 
 		
 	}
 

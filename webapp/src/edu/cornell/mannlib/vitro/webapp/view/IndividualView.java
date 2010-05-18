@@ -8,12 +8,13 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.Router;
 
 public class IndividualView extends ViewObject {
     
     private static final Log log = LogFactory.getLog(IndividualView.class.getName());
     
-    private static final String URL = "/individual";
+    private static final String URL = Router.INDIVIDUAL;
     
     private Individual individual;
     
@@ -37,7 +38,8 @@ public class IndividualView extends ViewObject {
     // e.g., getEditUrl, getDeleteUrl - these would return the computations of PropertyEditLinks
     // Just call getUrl...
     public String getProfileUrl() {
-        return contextPath + URL + ""; // ADD IN the label from the individual's uri 
+        //return contextPath + URL + ""; // ADD IN the label from the individual's uri 
+        return ""; // RY FIX THIS
     }
     
     public String getCustomView() {

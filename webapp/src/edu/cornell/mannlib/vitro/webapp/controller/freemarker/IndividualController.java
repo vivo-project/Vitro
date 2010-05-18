@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.controller;
+package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -39,6 +39,8 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
+import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQuery;
@@ -55,8 +57,10 @@ import edu.cornell.mannlib.vitro.webapp.web.jsptags.StringProcessorTag;
  * @author bdc34
  *
  */
-public class IndividualControllerFM extends VitroHttpServlet {
-    private static final Log log = LogFactory.getLog(IndividualControllerFM.class.getName());
+public class IndividualController extends FreeMarkerHttpServlet {
+    
+    private static final long serialVersionUID = 1L;
+    private static final Log log = LogFactory.getLog(IndividualController.class.getName());
 
     private String default_jsp      = Controllers.BASIC_JSP;
     private String default_body_jsp = Controllers.ENTITY_JSP;
