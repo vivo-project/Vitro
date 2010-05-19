@@ -20,14 +20,10 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 
 public class ContactMailController extends FreeMarkerHttpServlet {
 	private static final Logger LOG = Logger.getLogger(ContactMailController.class);
@@ -239,45 +235,20 @@ public class ContactMailController extends FreeMarkerHttpServlet {
     private String composeEmail(String webusername, String webuseremail,
     							String comments, String deliveryfrom,
     							String originalReferer, String ipAddr) {
+ 
+        Map<String, Object> email = new HashMap<String, Object>();
+        String template = "commentForm/email.ftl";
+        
+        email.put("subject", deliveryfrom);
+        email.put("name", webusername);
+        email.put("emailAddress", webuseremail);
+        email.put("comments", comments);
+        email.put("ip", ipAddr);
+        if ( !(originalReferer == null || originalReferer.equals("none")) ) {
+            email.put("referrer", urlDecode(originalReferer));
+        }
     	
-        StringBuffer msgBuf = new StringBuffer(); 
-        // contains the intro copy for the body of the email message
-        
-        String lineSeparator = System.getProperty("line.separator"); 
-        // \r\n on windows, \n on unix
-        
-        // from MyLibrary
-        msgBuf.setLength(0);
-        msgBuf.append("Content-Type: text/html; charset='us-ascii'" + lineSeparator);
-        msgBuf.append("<html>" + lineSeparator );
-        msgBuf.append("<head>" + lineSeparator );
-        msgBuf.append("<style>a {text-decoration: none}</style>" + lineSeparator );
-        msgBuf.append("<title>" + deliveryfrom + "</title>" + lineSeparator );
-        msgBuf.append("</head>" + lineSeparator );
-        msgBuf.append("<body>" + lineSeparator );
-        msgBuf.append("<h4>" + deliveryfrom + "</h4>" + lineSeparator );
-        msgBuf.append("<h4>From: "+webusername +" (" + webuseremail + ")" + 
-        		" at IP address " + ipAddr + "</h4>"+lineSeparator);
-
-        if (!(originalReferer == null || originalReferer.equals("none"))){
-            //The spam filter that is being used by the listsrv is rejecting <a href="...
-            //so try with out the markup, if that sill doesn't work,
-            //uncomment the following line to strip the http://
-            //msgBuf.append("<p><i>likely viewing page " + stripProtocol(originalReferer) );
-            msgBuf.append("<p><i>likely viewing page " + originalReferer );
-        }
-
-        msgBuf.append(lineSeparator + "</i></p><h3>Comments:</h3>" + lineSeparator );
-        if (comments==null || comments.equals("")) {
-            msgBuf.append("<p>BLANK MESSAGE</p>");
-        } else {
-            msgBuf.append("<p>"+comments+"</p>");
-        }
-        msgBuf.append("</body>" + lineSeparator );
-        msgBuf.append("</html>" + lineSeparator );
-
-        return msgBuf.toString();
-
+        return mergeBodyToTemplate(template, email);
     }
     
     private void writeBackupCopy(PrintWriter outFile, String msgText, 

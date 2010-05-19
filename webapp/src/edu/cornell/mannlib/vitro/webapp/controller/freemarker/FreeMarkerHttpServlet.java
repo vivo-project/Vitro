@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -250,15 +251,15 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         Map<String, String> portalParam = new HashMap<String, String>();
         portalParam.put("home", "" + portalId);
 
-        urls.put("about", getUrl(Router.ABOUT, portalParam));
+        urls.put("about", getUrl(Routes.ABOUT, portalParam));
         if (ContactMailServlet.getSmtpHostFromProperties() != null) {
-            urls.put("contact", getUrl(Router.COMMENT_FORM, portalParam));
+            urls.put("contact", getUrl(Routes.COMMENT_FORM, portalParam));
         }
-        urls.put("search", getUrl(Router.SEARCH));
-        urls.put("termsOfUse", getUrl(Router.TERMS_OF_USE, portalParam));        
-        urls.put("login", getUrl(Router.LOGIN));
-        urls.put("logout", getUrl(Router.LOGOUT));
-        urls.put("siteAdmin", getUrl(Router.SITE_ADMIN));     
+        urls.put("search", getUrl(Routes.SEARCH));
+        urls.put("termsOfUse", getUrl(Routes.TERMS_OF_USE, portalParam));        
+        urls.put("login", getUrl(Routes.LOGIN));
+        urls.put("logout", getUrl(Routes.LOGOUT));
+        urls.put("siteAdmin", getUrl(Routes.SITE_ADMIN));     
         
         setSharedVariable("urls", urls); 
     }
@@ -392,5 +393,15 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         return encodedUrl;
     }
 
+    public static String urlDecode(String url) {
+        String encoding = "ISO-8859-1";
+        String decodedUrl = null;
+        try {
+            decodedUrl = URLDecoder.decode(url, encoding);
+        } catch (UnsupportedEncodingException e) {
+            log.error("Error decoding url " + url + " with encoding " + encoding + ": Unsupported encoding.");
+        }
+        return decodedUrl;
+    }
     
 }

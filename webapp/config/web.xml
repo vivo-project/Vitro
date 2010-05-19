@@ -980,7 +980,7 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>sendMail</servlet-name>
-    <url-pattern>/sendMail</url-pattern>
+    <url-pattern>/submitFeedback</url-pattern>
   </servlet-mapping>
   
   <servlet>

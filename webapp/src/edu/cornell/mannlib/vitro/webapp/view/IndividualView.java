@@ -8,13 +8,13 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.Router;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.Routes;
 
 public class IndividualView extends ViewObject {
     
     private static final Log log = LogFactory.getLog(IndividualView.class.getName());
     
-    private static final String URL = Router.INDIVIDUAL;
+    private static final String URL = Routes.INDIVIDUAL;
     
     private Individual individual;
     

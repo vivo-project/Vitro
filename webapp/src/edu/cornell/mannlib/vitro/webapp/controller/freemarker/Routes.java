@@ -3,8 +3,9 @@
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
 // For now this class just holds constants for creating links. Could later be used to implement custom routing,
-// if we go that route.
-public class Router {
+// if we go that route. Separating from Controllers to keep track of which ones are being used with FreeMarker
+// Controllers; can recombine later if desired.
+public class Routes {
 
     public static final String ABOUT = "/about";
     public static final String BROWSE = "/browse";

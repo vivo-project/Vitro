@@ -27,7 +27,7 @@
         </p>
     </#if>
 
-    <form name="contact_form" action="sendMail" method="post" onsubmit="return ValidateForm('contact_form');">
+    <form name="contact_form" action="submitFeedback" method="post" onsubmit="return ValidateForm('contact_form');">
         <input type="hidden" name="home" value="${portalId}"/>
         <input type="hidden" name="RequiredFields" value="webusername,webuseremail,s34gfd88p9x1"/>
         <input type="hidden" name="RequiredFieldsNames" value="Name,Email address,Comments"/>
