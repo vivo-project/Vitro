@@ -45,13 +45,13 @@ public class VitroFilterUtils {
      * that has a annotation of hiddenFromDisplayBelowRoleLevel higher than current user's role level
      */
     public static VitroFilters getDisplayFilterByRoleLevel(RoleLevel role, WebappDaoFactory wdf){
-        log.warn("initializing HiddenFromDisplayBelowRoleLevelFilter");
+        log.info("initializing HiddenFromDisplayBelowRoleLevelFilter");
         return new HiddenFromDisplayBelowRoleLevelFilter(role, wdf);
     }
     
     /* bdc34: Currently, this is not called from anywhere in the code. */
     public static VitroFilters getUpdateFilterByRoleLevel(RoleLevel role, WebappDaoFactory wdf){
-        log.warn("initializing ProhibitedFromUpdateBelowRoleLevelFilter");
+        log.info("initializing ProhibitedFromUpdateBelowRoleLevelFilter");
         return new ProhibitedFromUpdateBelowRoleLevelFilter(role, wdf);
     }
 
