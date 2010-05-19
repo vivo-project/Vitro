@@ -23,15 +23,13 @@ public class TermsOfUseController extends FreeMarkerHttpServlet {
 
         Map<String, Object> body = new HashMap<String, Object>();
         
-        String websiteName = portal.getRootBreadCrumbAnchor();
-        if (StringUtils.isEmpty(websiteName)) {
-            websiteName = appName;
-        }
+        String rootBreadCrumbAnchor = portal.getRootBreadCrumbAnchor();
+        String websiteName = StringUtils.isEmpty(rootBreadCrumbAnchor) ? appName : rootBreadCrumbAnchor;
  
         body.put("websiteName", websiteName);
         body.put("copyrightAnchor", portal.getCopyrightAnchor());
         
-        String templateName = "body/termsOfUse.ftl";             
-        return mergeBodyToTemplate(templateName, body);
+        String bodyTemplate = "termsOfUse.ftl";             
+        return mergeBodyToTemplate(bodyTemplate, body);
     }
 }

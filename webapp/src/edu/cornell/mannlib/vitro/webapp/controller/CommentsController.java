@@ -57,7 +57,7 @@ public class CommentsController extends VitroHttpServlet{
             }
 
             request.setAttribute("siteName",portalBean.getAppName());
-            request.setAttribute("scripts","/js/commentsForm.js");
+            request.setAttribute("scripts","/js/commentsForm.jsp");
 
             if (request.getHeader("Referer") == null)
                 request.getSession().setAttribute("commentsFormReferer","none");

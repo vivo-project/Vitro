@@ -849,6 +849,17 @@
     <url-pattern>/contact</url-pattern>
   </servlet-mapping>
   
+  <!-- TEMPORARY - for comparison with new version -->
+  <servlet>
+    <servlet-name>CommentsController</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.CommentsController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>CommentsController</servlet-name>
+    <url-pattern>/comments-old</url-pattern>
+  </servlet-mapping>
+  <!-- end TEMPORARY -->
+  
   <servlet>
     <servlet-name>JSON Service</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.JSONServlet</servlet-class>
@@ -924,11 +935,27 @@
     <url-pattern>/dwr/*</url-pattern>
   </servlet-mapping>
 
+  <!-- Deprecated servlet (still used in Datastar) - retain temporarily for testing and comparison. -->
   <servlet>
     <servlet-name>sendmail</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.ContactMailServlet</servlet-class>
     <load-on-startup>5</load-on-startup>
   </servlet>
+  <servlet-mapping>
+    <servlet-name>sendmail</servlet-name>
+    <url-pattern>/sendmail</url-pattern>
+  </servlet-mapping>
+  <!-- end deprecated servlet -->
+  
+  <servlet>
+   <servlet-name>sendMail</servlet-name>
+   <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.ContactMailController</servlet-class>
+   <load-on-startup>5</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>sendMail</servlet-name>
+    <url-pattern>/sendMail</url-pattern>
+  </servlet-mapping>
   
   <servlet>
     <servlet-name>mailusers</servlet-name>
@@ -1046,10 +1073,6 @@
   <servlet-mapping>
     <servlet-name>fetch</servlet-name>
     <url-pattern>/fetch</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>sendmail</servlet-name>
-    <url-pattern>/sendmail</url-pattern>
   </servlet-mapping>
    <servlet-mapping>
     <servlet-name>mailusers</servlet-name>

@@ -17,10 +17,10 @@
     <p class="normal">${copyrightAnchor} makes no warranty, expressed or implied, including the warranties of merchantability 
     and fitness for a particular purpose, or assumes any legal liability or responsibility for the accuracy, 
     completeness, currency or usefulness of any material displayed or distributed through the 
-    ${appName} website or represents that its use would not infringe privately owned rights. 
+    ${siteName} website or represents that its use would not infringe privately owned rights. 
     ${copyrightAnchor} disclaims all warranties with regard to the information provided. Any reliance upon such information 
     is at your own risk. In no event will ${copyrightAnchor} be liable to you for any damages or losses whatsoever resulting 
-    from or caused by the ${appName} website or its contents.</p> 
+    from or caused by the ${siteName} website or its contents.</p> 
     
     <h3>Disclaimer of Endorsement</h3>
     <p class="normal">Reference herein to any specific commercial product, process, or service by trade name, 

@@ -72,7 +72,8 @@ public class BrowseController extends FreeMarkerHttpServlet {
     	Map body = new HashMap();
     	
     	// Set main page template attributes specific to this page
-    	root.put("contentClass", "siteMap");
+    	// But the template should control this! Try putting in a div inside the content.
+    	//root.put("contentClass", "siteMap");
         
     	if( vreq.getParameter("clearcache") != null ) //mainly for debugging
     		clearGroupCache();
@@ -99,8 +100,8 @@ public class BrowseController extends FreeMarkerHttpServlet {
     		body.put("classGroups", vcgroups);
     	}     
 
-        String templateName = "body/classGroups.ftl";       
-        return mergeBodyToTemplate(templateName, body);
+        String bodyTemplate = "classGroups.ftl";       
+        return mergeBodyToTemplate(bodyTemplate, body);
     }
 
     public void destroy(){

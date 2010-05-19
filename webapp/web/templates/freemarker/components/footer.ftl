@@ -24,5 +24,3 @@
     All Rights Reserved. <a href="${urls.termsOfUse}">Terms of Use</a>
 
 </div>
-
-<#-- SCRIPT TAGS SHOULD GO HERE --> 

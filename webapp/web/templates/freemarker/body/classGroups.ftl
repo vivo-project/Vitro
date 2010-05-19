@@ -5,12 +5,14 @@
 <#if message??>
     <p>${message}</p>
 <#else>
-    <#list classGroups as classGroup>
-        <h2>${classGroup.publicName}</h2>
-        <ul>
-            <#list classGroup.classes as class> 
-                <li><a href="${class.url}">${class.name}</a> (${class.entityCount})</li>
-            </#list>
-        </ul>
-    </#list>
+    <div class="siteMap">
+        <#list classGroups as classGroup>
+            <h2>${classGroup.publicName}</h2>
+            <ul>
+                <#list classGroup.classes as class> 
+                    <li><a href="${class.url}">${class.name}</a> (${class.entityCount})</li>
+                </#list>
+            </ul>
+        </#list>
+    </div>
 </#if>

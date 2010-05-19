@@ -3,17 +3,23 @@
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.ContactMailServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 
 /**
  *  Controller for comments ("contact us") page
@@ -21,69 +27,61 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
  */
 public class CommentFormController extends FreeMarkerHttpServlet {
 
-    public void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        doGet(request, response);
+    private static final long serialVersionUID = 1L;
+    private static final Log log = LogFactory.getLog(CommentFormController.class.getName());
+    
+    protected String getTitle() {
+        return appName + " Feedback Form";
     }
+    
+    protected String getBody() {
 
-    public void doGet( HttpServletRequest request, HttpServletResponse response )
-    throws IOException, ServletException {
-        super.doGet(request,response);
-        VitroRequest vreq = new VitroRequest(request);
-        try {
-        //this try block passes any errors to error.jsp
-            if (!ContactMailServlet.isSmtpHostConfigured()) {
-                request.setAttribute("title", "Comments and Feedback Form");
-                request.setAttribute("bodyJsp", "/contact_err.jsp");// <<< this is where the body gets set
-                request.setAttribute("ERR","This application has not yet been configured to send mail -- " +
-                		"smtp host has not been specified in the configuration properties file.");
-                RequestDispatcher errd = request.getRequestDispatcher(Controllers.BASIC_JSP);
-                errd.forward(request, response);
-            }
-            ApplicationBean appBean=vreq.getAppBean();
-            Portal portalBean=vreq.getPortal();
-
-            if ( (appBean.getMaxSharedPortalId()-appBean.getMinSharedPortalId()) > 1
-                    && ( (portalBean.getPortalId()    >= appBean.getMinSharedPortalId()
-                          && portalBean.getPortalId() <= appBean.getMaxSharedPortalId() )
-                          || portalBean.getPortalId() == appBean.getSharedPortalFlagNumeric() )
-                ) {
-                request.setAttribute("portalType","CALSResearch");
-            } else
-                if (portalBean.getAppName().equalsIgnoreCase("CALS Impact")){
-                request.setAttribute("portalType", "CALSImpact");
-            } else if (portalBean.getAppName().equalsIgnoreCase("VIVO")) {
-                request.setAttribute("portalType", "VIVO");
-            } else {
-                request.setAttribute("portalType", "clone");
-            }
-
-            request.setAttribute("siteName",portalBean.getAppName());
-            request.setAttribute("scripts","/js/commentsForm.js");
-
-            if (request.getHeader("Referer") == null)
-                request.getSession().setAttribute("commentsFormReferer","none");
-            else
-                request.getSession().setAttribute("commentsFormReferer",request.getHeader("Referer"));
-
-
-            request.setAttribute("portalId",Integer.valueOf(portalBean.getPortalId()));
-
-            request.setAttribute("title", portalBean.getAppName()+" Comments and Feedback Form");
-            request.setAttribute("bodyJsp", "/commentsForm.jsp");// <<< this is where the body gets set
-            request.setAttribute("portalBean",portalBean);
-
-            RequestDispatcher rd =
-                request.getRequestDispatcher(Controllers.BASIC_JSP);
-            rd.forward(request, response);
-
-        } catch (Throwable e) {
-            // This is how we use an error.jsp
-            //it expects javax.servlet.jsp.jspException to be set to the
-            //exception so that it can display the info out of that.
-            request.setAttribute("javax.servlet.jsp.jspException", e);
-            RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
-            rd.include(request, response);
+        Map<String, Object> body = new HashMap<String, Object>();
+        String bodyTemplate;
+        
+        if (!ContactMailServlet.isSmtpHostConfigured()) {
+            body.put("errorMessage", 
+                     "This application has not yet been configured to send mail. " +
+                     "An smtp host has not been specified in the configuration properties file.");
+            bodyTemplate = "commentForm/error.ftl";
         }
+        
+        else if (StringUtils.isEmpty(portal.getContactMail())) {
+            body.put("errorMessage", 
+                    "The site administrator has not configured an email address to receive the form submission.");
+            bodyTemplate = "commentForm/error.ftl";            
+        }
+        
+        else {
+
+            ApplicationBean appBean = vreq.getAppBean();
+            int portalId = portal.getPortalId();
+          
+            String portalType = null;
+            if ( (appBean.getMaxSharedPortalId()-appBean.getMinSharedPortalId()) > 1
+                  && ( (portalId  >= appBean.getMinSharedPortalId()
+                  && portalId <= appBean.getMaxSharedPortalId() )
+                  || portalId == appBean.getSharedPortalFlagNumeric() ) ) {
+                portalType = "CALSResearch";
+            } else if (appName.equalsIgnoreCase("CALS Impact")) {
+                portalType = "CALSImpact";
+            } else if (appName.equalsIgnoreCase("VIVO")){
+                portalType = "VIVO";
+            } else {
+                portalType = "clone";
+            }
+            body.put("portalType", portalType);
+
+            // Not used in template. Is it used in processing the form?
+            if (vreq.getHeader("Referer") == null) {
+                vreq.getSession().setAttribute("commentsFormReferer","none");
+            } else {
+                vreq.getSession().setAttribute("commentsFormReferer",vreq.getHeader("Referer"));
+            }
+           
+            bodyTemplate = "commentForm/form.ftl";
+        }
+        
+        return mergeBodyToTemplate(bodyTemplate, body);
     }
 }

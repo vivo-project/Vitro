@@ -24,8 +24,8 @@ public class AboutController extends FreeMarkerHttpServlet {
         body.put("aboutText", portal.getAboutText());
         body.put("acknowledgeText", portal.getAcknowledgeText()); 
         
-        String templateName = "body/about.ftl";             
-        return mergeBodyToTemplate(templateName, body);
+        String bodyTemplate = "about.ftl";             
+        return mergeBodyToTemplate(bodyTemplate, body);
 
     }
 

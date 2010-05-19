@@ -90,7 +90,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 	    root.put("body", getBody());
 	}
 	
-	protected void setSharedVariable(String key, String value) {
+	protected void setSharedVariable(String key, Object value) {
         try {
             config.setSharedVariable(key, value);
         } catch (TemplateModelException e) {
@@ -134,6 +134,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
     }
 
     protected String mergeBodyToTemplate(String templateName, Map<String, Object> map) {
+        templateName = "body/" + templateName;
     	String body = mergeToTemplate(templateName, map).toString();
     	extractLinkTagsFromBody(body);
     	return body;
@@ -199,18 +200,10 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         // RY Can this be removed? Do templates need it? Ideally, they should not.
         // Only needed for some weird stuff in search box that I think is only used in old default theme.
         int portalId = portal.getPortalId();
-        try {
-            config.setSharedVariable("portalId", portalId);
-        } catch (TemplateModelException e) {
-            log.error("Can't set shared variable 'portalId'.");
-        } 
+        setSharedVariable("portalId", portalId);
         
         appName = portal.getAppName();
-        try {
-            config.setSharedVariable("appName", appName);
-        } catch (TemplateModelException e) {
-            log.error("Can't set shared variable 'appName'.");
-        } 
+        setSharedVariable("siteName", appName);
 
         setTemplateLoader();
         
@@ -221,23 +214,20 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         PortalWebUtil.populateSearchOptions(portal, appBean, vreq.getWebappDaoFactory().getPortalDao());
         PortalWebUtil.populateNavigationChoices(portal, vreq, appBean, vreq.getWebappDaoFactory().getPortalDao());
         
-        // We'll need to separate theme-general and theme-specific stylesheet
-        // dirs, so we need either two attributes or a list.
-        String themeDir = portal.getThemeDir();
-        String stylesheetDir = getUrl(themeDir + "css/");
-        try {
-            config.setSharedVariable("stylesheetDir", stylesheetDir);
-        } catch (TemplateModelException e) {
-            log.error("Can't set shared variable 'stylesheetDir'.");
-        } 
-        
-        root.put("siteName", portal.getAppName());
         root.put("tagline", portal.getShortHand());
-        root.put("breadcrumbs", BreadCrumbsUtil.getBreadCrumbsDiv(request));
+        root.put("breadcrumbs", BreadCrumbsUtil.getBreadCrumbsDiv(vreq));
+
+        String themeDir = portal.getThemeDir();
         
         setUrls(portalId, themeDir);
         setLoginInfo();      
         setCopyrightInfo();
+        setThemeInfo(themeDir);
+        
+        // *** TEMPORARY. The templates shouldn't need to know this. Doing temporarily for script files
+        // till we put the script/css loading strategy in place. (Templates make a call to add files
+        // to a view object. These get iterated through in scripts.ftl and stylesheets.ftl.)
+        setSharedVariable("contextPath", contextPath);
     }
     
     // Define the URLs that are accessible to the templates. Note that we do not create menus here,
@@ -248,8 +238,8 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         // view to control which links go where, and the link text and title.
         Map<String, String> urls = new HashMap<String, String>();
         
-        String homeUrl = (portal.getRootBreadCrumbURL()!=null && portal.getRootBreadCrumbURL().length()>0) ?
-                portal.getRootBreadCrumbURL() : vreq.getContextPath()+"/";
+        String rootBreadCrumbUrl = portal.getRootBreadCrumbURL();
+        String homeUrl = StringUtils.isEmpty(rootBreadCrumbUrl) ? contextPath : rootBreadCrumbUrl; 
         urls.put("home", homeUrl);
 
         String bannerImage = portal.getBannerImage();
@@ -262,7 +252,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 
         urls.put("about", getUrl(Router.ABOUT, portalParam));
         if (ContactMailServlet.getSmtpHostFromProperties() != null) {
-            urls.put("contact", getUrl(Router.CONTACT, portalParam));
+            urls.put("contact", getUrl(Router.COMMENT_FORM, portalParam));
         }
         urls.put("search", getUrl(Router.SEARCH));
         urls.put("termsOfUse", getUrl(Router.TERMS_OF_USE, portalParam));        
@@ -270,7 +260,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         urls.put("logout", getUrl(Router.LOGOUT));
         urls.put("siteAdmin", getUrl(Router.SITE_ADMIN));     
         
-        root.put("urls", urls);
+        setSharedVariable("urls", urls); 
     }
 
 	private final void setLoginInfo() {
@@ -310,6 +300,18 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
             copyright.put("url", portal.getCopyrightURL());
             root.put("copyright", copyright);
         } 
+	}
+	
+	private final void setThemeInfo(String themeDir) {
+
+	    setSharedVariable("themeDir", getUrl(themeDir));
+
+        // We'll need to separate theme-general and theme-specific stylesheet
+        // dirs, so we need either two attributes or a list.
+        setSharedVariable("stylesheetDir", getUrl(themeDir + "css/"));
+        
+        setSharedVariable("siteIconDir", getUrl(themeDir + "site_icons/"));
+        
 	}
 
     // Define template locations. Template loader will look first in the theme-specific

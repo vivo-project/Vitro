@@ -22,7 +22,7 @@
         <hr class="hidden" />
 
         <div id="contentwrap">      
-            <div id="content" <#if contentClass??> class="${contentClass}" </#if>>
+            <div id="content">
                 <#-- We don't do title here because some pages don't get a title, or it may not be the same as the <title> text.
                 <h2>${title}</h2> -->                            
                 ${body} 
@@ -31,6 +31,8 @@
     
         <#include "/components/footer.ftl">
                                       
-    </div> <!-- wrap -->  
+    </div> <!-- wrap --> 
+    
+    <#include "/components/scripts.ftl"> 
 </body>
 </html>
