@@ -8,6 +8,7 @@ public class Router {
 
     public static final String ABOUT = "/about";
     public static final String BROWSE = "/browse";
+    public static final String CONTACT= "/comments"; // temporary - FreeMarkerHttpServlet in svn is looking for it
     public static final String COMMENT_FORM = "/comments";
     public static final String INDIVIDUAL = "/individual";
     public static final String INDIVIDUAL_LIST = "/entitylist"; // change
