@@ -76,7 +76,7 @@ public class ContactMailController extends FreeMarkerHttpServlet {
             body.put("errorMessage", 
                     "This application has not yet been configured to send mail. " +
                     "An smtp host has not been specified in the configuration properties file.");
-           bodyTemplate = "commentForm/error.ftl";
+            bodyTemplate = "commentForm/error.ftl";
         }
         
         else {
@@ -87,6 +87,7 @@ public class ContactMailController extends FreeMarkerHttpServlet {
             
             String validationMessage = validateInput(webusername, webuseremail,
             		comments); 
+            
             if (validationMessage != null) {
                 // rjy7 We should reload the form, not go to the error page!
                 body.put("errorMessage", 
@@ -168,16 +169,15 @@ public class ContactMailController extends FreeMarkerHttpServlet {
                 String msgText = composeEmail(webusername, webuseremail, comments, 
                 		deliveryfrom, originalReferer, vreq.getRemoteAddr());
                 
-                // debugging
-                FileWriter fw = null;
+                // Write the email to a backup file
                 try {
-                    fw = new FileWriter(context.getRealPath(EMAIL_BACKUP_FILE_PATH),true);
+                    FileWriter fw = new FileWriter(context.getRealPath(EMAIL_BACKUP_FILE_PATH),true);
+                    PrintWriter outFile = new PrintWriter(fw); 
+                    writeBackupCopy(outFile, msgText, spamReason);
                 }
                 catch (IOException e){
                     LOG.error("Can't open file to write email backup");                   
                 }
-                PrintWriter outFile = new PrintWriter(fw); 
-                writeBackupCopy(outFile, msgText, spamReason);
         
                 // Set the smtp host
                 Properties props = System.getProperties();
