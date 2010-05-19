@@ -49,8 +49,25 @@ public class Listener {
 		log(e);
 	}
 
+	public void runEndTime() {
+		log("Testing complete.");
+	}
+
 	public void runStopped() {
 		log("Run stopped.");
+	}
+	
+	public void cleanOutputStart(File outputDirectory) {
+		log("Output area cleaning started: " + outputDirectory.getPath());
+	}
+
+	public void cleanOutputFailed(File outputDirectory, IOException e) {
+		log("Output area cleaning failed: " + outputDirectory.getPath());
+		log(e);
+	}
+
+	public void cleanOutputStop(File outputDirectory) {
+		log("Output area cleaning stopped: " + outputDirectory.getPath());
 	}
 
 	public void webappStopping(String tomcatStopCommand) {

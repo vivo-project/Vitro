@@ -19,6 +19,7 @@ public class SeleniumRunner {
 	private final UploadAreaCleaner uploadCleaner;
 	private final ModelCleaner modelCleaner;
 	private final SuiteRunner suiteRunner;
+	private final OutputManager outputManager;
 
 	public SeleniumRunner(SeleniumRunnerParameters parms) {
 		this.parms = parms;
@@ -26,34 +27,42 @@ public class SeleniumRunner {
 		this.uploadCleaner = new UploadAreaCleaner(parms);
 		this.modelCleaner = new ModelCleaner(parms);
 		this.suiteRunner = new SuiteRunner(parms);
+		this.outputManager = new OutputManager(parms);
 	}
 
 	public void runSelectedSuites() {
-		listener.runStarted();
-		for (File suiteDir : parms.getSelectedSuites()) {
-			listener.suiteStarted(suiteDir);
-			try {
-				if (parms.isCleanModel()) {
-					modelCleaner.clean();
+		try {
+			listener.runStarted();
+			outputManager.cleanOutputDirectory();
+			for (File suiteDir : parms.getSelectedSuites()) {
+				listener.suiteStarted(suiteDir);
+				try {
+					if (parms.isCleanModel()) {
+						modelCleaner.clean();
+					}
+					if (parms.isCleanUploads()) {
+						uploadCleaner.clean();
+					}
+					suiteRunner.runSuite(suiteDir);
+				} catch (IOException e) {
+					listener.suiteFailed(suiteDir, e);
+				} catch (CommandRunnerException e) {
+					listener.suiteFailed(suiteDir, e);
 				}
-				if (parms.isCleanUploads()) {
-					uploadCleaner.clean();
-				}
-				suiteRunner.runSuite(suiteDir);
-			} catch (IOException e) {
-				listener.suiteFailed(suiteDir, e);
-			} catch (CommandRunnerException e) {
-				listener.suiteFailed(suiteDir, e);
-			} catch (FatalException e) {
-				listener.runFailed(e);
-				e.printStackTrace();
-				break;
+				listener.suiteStopped(suiteDir);
 			}
-			listener.suiteStopped(suiteDir);
+			listener.runEndTime();
+			outputManager.summarizeOutput();
+		} catch (IOException e) {
+			listener.runFailed(e);
+			e.printStackTrace();
+		} catch (FatalException e) {
+			listener.runFailed(e);
+			e.printStackTrace();
 		}
 		listener.runStopped();
 	}
-
+	
 	private static void selectAllSuites(SeleniumRunnerParameters parms) {
 		List<File> suites = new ArrayList<File>();
 		for (File parentDir : parms.getSuiteParentDirectories()) {

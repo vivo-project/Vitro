@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.utilities.testrunner;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 
 /**
@@ -34,9 +33,9 @@ public class UploadAreaCleaner {
 		try {
 			for (File file : uploadDirectory.listFiles()) {
 				if (file.isFile()) {
-					deleteFile(file);
+					FileHelper.deleteFile(file);
 				} else {
-					purgeDirectoryRecursively(uploadDirectory);
+					FileHelper.purgeDirectoryRecursively(file);
 				}
 			}
 		} catch (IOException e) {
@@ -44,55 +43,6 @@ public class UploadAreaCleaner {
 			throw e;
 		} finally {
 			listener.cleanUploadStop(uploadDirectory);
-		}
-	}
-
-	/**
-	 * Delete all of the files in a directory, any sub-directories, and the
-	 * directory itself.
-	 */
-	protected static void purgeDirectoryRecursively(File directory)
-			throws IOException {
-		File[] files = directory.listFiles();
-		for (File file : files) {
-			if (file.isDirectory()) {
-				purgeDirectoryRecursively(file);
-			} else {
-				deleteFile(file);
-			}
-		}
-		deleteFile(directory);
-	}
-
-	/**
-	 * Delete a file, either before or after the test. If it can't be deleted,
-	 * complain.
-	 */
-	protected static void deleteFile(File file) throws IOException {
-		if (file.exists()) {
-			file.delete();
-		}
-		if (!file.exists()) {
-			return;
-		}
-
-		/*
-		 * If we were unable to delete the file, is it because it's a non-empty
-		 * directory?
-		 */
-		if (!file.isDirectory()) {
-			final StringBuffer message = new StringBuffer(
-					"Can't delete directory '" + file.getPath() + "'\n");
-			file.listFiles(new FileFilter() {
-				public boolean accept(File pathname) {
-					message.append("   contains file '" + pathname + "'\n");
-					return true;
-				}
-			});
-			throw new IOException(message.toString().trim());
-		} else {
-			throw new IOException("Unable to delete file '" + file.getPath()
-					+ "'");
 		}
 	}
 

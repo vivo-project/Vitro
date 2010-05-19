@@ -27,6 +27,8 @@ public class SeleniumRunnerParameters {
 	public static final String PROP_FIREFOX_PROFILE_PATH = "firefox_profile_template_path";
 	public static final String PROP_SUITE_TIMEOUT_LIMIT = "suite_timeout_limit";
 	public static final String PROP_SELENIUM_JAR_PATH = "selenium_jar_path";
+	public static final String PROP_IGNORED_TESTS = "ignored_tests_file";
+	public static final String PROP_SUMMARY_CSS = "summary_css_file";
 
 	public static final String LOGFILE_NAME = "log_file.txt";
 
@@ -40,6 +42,8 @@ public class SeleniumRunnerParameters {
 	private final File logFile;
 	private final Collection<File> suiteParentDirectories;
 	private final ModelCleanerProperties modelCleanerProperties;
+	private final IgnoredTests ignoredTests;
+	private final File summaryCssFile;
 
 	private Collection<File> selectedSuites = Collections.emptySet();
 	private boolean cleanModel = true;
@@ -70,6 +74,8 @@ public class SeleniumRunnerParameters {
 			this.uploadDirectory = checkReadWriteDirectory(props,
 					PROP_UPLOAD_DIRECTORY);
 
+			this.summaryCssFile = checkSummaryCssFile(props);
+
 			this.outputDirectory = checkReadWriteDirectory(props,
 					PROP_OUTPUT_DIRECTORY);
 			this.logFile = new File(this.outputDirectory, LOGFILE_NAME);
@@ -78,6 +84,14 @@ public class SeleniumRunnerParameters {
 			this.suiteParentDirectories = checkSuiteParentDirectories(props);
 
 			this.modelCleanerProperties = new ModelCleanerProperties(props);
+
+			// Get the list of ignored tests.
+			String ignoredFilesPath = getRequiredProperty(props,
+					PROP_IGNORED_TESTS);
+			File ignoredFilesFile = new File(ignoredFilesPath);
+			FileHelper.checkReadableFile(ignoredFilesFile, "File '"
+					+ ignoredFilesPath + "'");
+			this.ignoredTests = new IgnoredTests(ignoredFilesFile);
 		} finally {
 			if (propsReader != null) {
 				try {
@@ -87,6 +101,17 @@ public class SeleniumRunnerParameters {
 				}
 			}
 		}
+	}
+
+	/**
+	 * The CSS file must be specified, must exist, and must be readable.
+	 */
+	private File checkSummaryCssFile(Properties props) {
+		String summaryCssPath = getRequiredProperty(props, PROP_SUMMARY_CSS);
+		File cssFile = new File(summaryCssPath);
+		FileHelper.checkReadableFile(cssFile, "File '" + summaryCssPath
+				+ "'");
+		return cssFile;
 	}
 
 	/**
@@ -120,8 +145,8 @@ public class SeleniumRunnerParameters {
 	}
 
 	/**
-	 * Check that there is a property for the output directory, and that it
-	 * points to a valid directory.
+	 * Check that there is a property for the required directory path, and that
+	 * it points to a valid directory.
 	 */
 	private File checkReadWriteDirectory(Properties props, String key) {
 		String value = getRequiredProperty(props, key);
@@ -265,12 +290,24 @@ public class SeleniumRunnerParameters {
 		return outputDirectory;
 	}
 
+	public File getLogFile() {
+		return logFile;
+	}
+
+	public File getSummaryCssFile() {
+		return summaryCssFile;
+	}
+
 	public Collection<File> getSuiteParentDirectories() {
 		return suiteParentDirectories;
 	}
 
 	public ModelCleanerProperties getModelCleanerProperties() {
 		return modelCleanerProperties;
+	}
+
+	public IgnoredTests getIgnoredTests() {
+		return ignoredTests;
 	}
 
 	public void setSelectedSuites(Collection<File> selectedSuites) {
@@ -307,9 +344,9 @@ public class SeleniumRunnerParameters {
 				+ "\n  outputDirectory: " + outputDirectory.getPath()
 				+ "\n  suiteParentDirectories: " + suiteParentDirectories
 				+ "\n  modelCleanerProperties: " + modelCleanerProperties
-				+ "\n\n  selectedSuites: " + showSelectedSuites()
-				+ "\n  cleanModel: " + cleanModel + "\n  cleanUploads: "
-				+ cleanUploads;
+				+ "\n" + ignoredTests + "\n\n  selectedSuites: "
+				+ showSelectedSuites() + "\n  cleanModel: " + cleanModel
+				+ "\n  cleanUploads: " + cleanUploads;
 	}
 
 	private String showSelectedSuites() {

@@ -37,10 +37,12 @@ public class SuiteRunner {
 		cmd.add("-userExtensions");
 		cmd.add(parms.getUserExtensionsFile().getPath());
 
-		if (parms.hasFirefoxProfileDir()) {
-			cmd.add("-firefoxProfileTemplate");
-			cmd.add(parms.getFirefoxProfileDir().getPath());
-		}
+		// TODO - figure out why the use of a template means running the test
+		// twice in simultaneous tabs.
+		// if (parms.hasFirefoxProfileDir()) {
+		// cmd.add("-firefoxProfileTemplate");
+		// cmd.add(parms.getFirefoxProfileDir().getPath());
+		// }
 
 		String suiteName = suiteDir.getName();
 		File outputFile = new File(parms.getOutputDirectory(), suiteName
