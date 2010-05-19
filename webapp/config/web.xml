@@ -218,7 +218,33 @@
         <url-pattern>/*</url-pattern>
   </filter-mapping-->
 
+  <!--  Spring setup ****************************************************  -->
+<!--
+  <context-param>
+	<param-name>contextConfigLocation</param-name>
+	<param-value>/WEB-INF/baseConfig/*.xml, /WEB-INF/localConfig/*.xml</param-value>
+  </context-param>
+  
+  <listener>
+    <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+  </listener>
 
+  <servlet>
+	<servlet-name>dispatcher</servlet-name>
+	<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+	 <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>/WEB-INF/baseConfig/dispatcher-servlet.xml, /WEB-INF/localConfig/dispatcher-servlet.xml</param-value>
+        </init-param>        
+	<load-on-startup>2</load-on-startup>	
+  </servlet>
+
+  <servlet-mapping>
+	<servlet-name>dispatcher</servlet-name>
+	<url-pattern>/spring</url-pattern>
+  </servlet-mapping>
+    
+    -->
   <!-- Servlets ********************************************************** -->
   <servlet>
     <!--adding only trimSpaces param to defaults to clean up html output-->
@@ -1188,67 +1214,5 @@
   <!-- 	</error-page>
  -->
 
-  <!-- apache axis stuff -->
-  <!-- Axis is a library that allows java methods to be called as web services.
-     see http://ws.apache.org/axis/java/install.html -->
-
-  <listener>
-    <listener-class>org.apache.axis.transport.http.AxisHTTPSessionListener</listener-class>
-  </listener>
-
-  <servlet>
-    <servlet-name>AxisServlet</servlet-name>
-    <servlet-class> org.apache.axis.transport.http.AxisServlet </servlet-class>
-  </servlet>
-
-  <servlet>
-    <servlet-name>AxisAdminServlet</servlet-name>
-    <servlet-class> org.apache.axis.transport.http.AdminServlet </servlet-class>
-    <load-on-startup>100</load-on-startup>
-  </servlet>
-
-  <servlet>
-    <servlet-name>SOAPMonitorService</servlet-name>
-    <servlet-class> org.apache.axis.monitor.SOAPMonitorService </servlet-class>
-    <init-param>
-      <param-name>SOAPMonitorPort</param-name>
-      <param-value>5001</param-value>
-    </init-param>
-    <load-on-startup>100</load-on-startup>
-  </servlet>
-
-  <servlet-mapping>
-    <servlet-name>AxisAdminServlet</servlet-name>
-    <url-pattern>/AxisAdminServlet</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
-    <servlet-name>AxisServlet</servlet-name>
-    <url-pattern>/servlet/AxisServlet</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
-    <servlet-name>AxisServlet</servlet-name>
-    <url-pattern>*.jws</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
-    <servlet-name>AxisServlet</servlet-name>
-    <url-pattern>/services/*</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
-    <servlet-name>SOAPMonitorService</servlet-name>
-    <url-pattern>/SOAPMonitor</url-pattern>
-  </servlet-mapping>
-
-  <mime-mapping>
-    <extension>xsd</extension>
-    <mime-type>text/xml</mime-type>
-  </mime-mapping>
-  <mime-mapping>
-    <extension>wsdl</extension>
-    <mime-type>text/xml</mime-type>
-  </mime-mapping>
-
+  
 </web-app>
