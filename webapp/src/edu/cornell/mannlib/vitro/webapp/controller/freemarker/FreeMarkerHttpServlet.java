@@ -258,9 +258,14 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         urls.put("search", getUrl(Routes.SEARCH));
         urls.put("termsOfUse", getUrl(Routes.TERMS_OF_USE, portalParam));        
         urls.put("login", getUrl(Routes.LOGIN));
-        urls.put("logout", getUrl(Routes.LOGOUT));
-        urls.put("siteAdmin", getUrl(Routes.SITE_ADMIN));     
         
+        Map<String, String> logoutParams = new HashMap<String, String>();
+        logoutParams.put("home", "" + portalId);
+        logoutParams.put("loginSubmitMode", "Log Out");
+        urls.put("logout", getUrl(Routes.LOGOUT, logoutParams));
+        
+        urls.put("siteAdmin", getUrl(Routes.SITE_ADMIN));     
+        System.out.println("LOGOUT: " + urls.get("logout"));
         setSharedVariable("urls", urls); 
     }
 

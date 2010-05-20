@@ -26,7 +26,9 @@ import org.apache.log4j.Logger;
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 
 public class ContactMailController extends FreeMarkerHttpServlet {
-	private static final Logger LOG = Logger.getLogger(ContactMailController.class);
+
+    private static final long serialVersionUID = 1L;
+    private static final Logger LOG = Logger.getLogger(ContactMailController.class);
 	
     private final static String CONFIRM_PAGE        = "/thankyou.jsp";
     private final static String ERR_PAGE            = "/contact_err.jsp";

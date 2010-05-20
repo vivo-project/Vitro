@@ -16,9 +16,9 @@ public class Routes {
     public static final String TERMS_OF_USE = "/termsOfUse";
     
     // Put these under /admin/...
-    // Currently login, logout, and site admin are all the same page, but they don't have to be.
+    // Currently login and site admin are on the same page, but they don't have to be.
     public static final String LOGIN = "/siteAdmin";
-    public static final String LOGOUT = "/siteAdmin";    
+    public static final String LOGOUT = "/login_process.jsp"; 
     public static final String SITE_ADMIN = "/siteAdmin"; 
  
 }
