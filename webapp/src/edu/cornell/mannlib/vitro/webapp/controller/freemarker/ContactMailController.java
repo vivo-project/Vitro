@@ -174,41 +174,41 @@ public class ContactMailController extends FreeMarkerHttpServlet {
                     FileWriter fw = new FileWriter(context.getRealPath(EMAIL_BACKUP_FILE_PATH),true);
                     PrintWriter outFile = new PrintWriter(fw); 
                     writeBackupCopy(outFile, msgText, spamReason);
+       
+                    // Set the smtp host
+                    Properties props = System.getProperties();
+                    props.put("mail.smtp.host", smtpHost);
+                    Session s = Session.getDefaultInstance(props,null); // was Session.getInstance(props,null);
+                    //s.setDebug(true);
+                    try {
+                    	
+                    	if (spamReason == null) {
+            	        	sendMessage(s, webuseremail, deliverToArray, deliveryfrom, 
+            	        			recipientCount, msgText);
+                    	}
+            
+                    } catch (AddressException e) {
+                        statusMsg = "Please supply a valid email address.";
+                        outFile.println( statusMsg );
+                        outFile.println( e.getMessage() );
+                    } catch (SendFailedException e) {
+                        statusMsg = "The system was unable to deliver your mail.  Please try again later.  [SEND FAILED]";
+                        outFile.println( statusMsg );
+                        outFile.println( e.getMessage() );
+                    } catch (MessagingException e) {
+                        statusMsg = "The system was unable to deliver your mail.  Please try again later.  [MESSAGING]";
+                        outFile.println( statusMsg );
+                        outFile.println( e.getMessage() );
+                        e.printStackTrace();
+                    }
+            
+                    outFile.flush();
+                    outFile.close();
                 }
                 catch (IOException e){
                     LOG.error("Can't open file to write email backup");                   
-                }
-        
-                // Set the smtp host
-                Properties props = System.getProperties();
-                props.put("mail.smtp.host", smtpHost);
-                Session s = Session.getDefaultInstance(props,null); // was Session.getInstance(props,null);
-                //s.setDebug(true);
-                try {
-                	
-                	if (spamReason == null) {
-        	        	sendMessage(s, webuseremail, deliverToArray, deliveryfrom, 
-        	        			recipientCount, msgText);
-                	}
-        
-                } catch (AddressException e) {
-                    statusMsg = "Please supply a valid email address.";
-                    outFile.println( statusMsg );
-                    outFile.println( e.getMessage() );
-                } catch (SendFailedException e) {
-                    statusMsg = "The system was unable to deliver your mail.  Please try again later.  [SEND FAILED]";
-                    outFile.println( statusMsg );
-                    outFile.println( e.getMessage() );
-                } catch (MessagingException e) {
-                    statusMsg = "The system was unable to deliver your mail.  Please try again later.  [MESSAGING]";
-                    outFile.println( statusMsg );
-                    outFile.println( e.getMessage() );
-                    e.printStackTrace();
-                }
-        
-                outFile.flush();
-                outFile.close();
-          
+                }         
+                
                 // Message was sent successfully
                 if (statusMsg == null && spamReason == null) {                  
                     bodyTemplate = "commentForm/confirmation.ftl";
