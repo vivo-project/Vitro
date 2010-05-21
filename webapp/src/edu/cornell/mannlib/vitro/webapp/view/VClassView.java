@@ -32,7 +32,7 @@ public class VClassView extends ViewObject {
         return getUrl(URL, params);
     }
     
-    public int getEntityCount() {
+    public int getIndividualCount() {
         return vclass.getEntityCount();
     }
 

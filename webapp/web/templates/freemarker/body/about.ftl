@@ -11,4 +11,3 @@
 <#if acknowledgeText??>
     <div class="pageGroupBody" id="acknowledgementText">${acknowledgeText}</div> 
 </#if>
-         

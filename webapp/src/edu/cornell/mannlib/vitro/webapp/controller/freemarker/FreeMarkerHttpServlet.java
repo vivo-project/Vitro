@@ -34,9 +34,12 @@ import edu.cornell.mannlib.vitro.webapp.controller.ContactMailServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
+import edu.cornell.mannlib.vitro.webapp.view.fileList.ScriptList;
+import edu.cornell.mannlib.vitro.webapp.view.fileList.StylesheetList;
 import edu.cornell.mannlib.vitro.webapp.view.menu.TabMenu;
 import edu.cornell.mannlib.vitro.webapp.web.BreadCrumbsUtil;
 import edu.cornell.mannlib.vitro.webapp.web.PortalWebUtil;
+
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.cache.MultiTemplateLoader;
@@ -67,7 +70,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 	// a getBody() and getTitle() method and use the parent doGet() method.
     public void doGet( HttpServletRequest request, HttpServletResponse response )
 		throws IOException, ServletException {
-        
+
     	try {
     	    callSuperGet(request, response);  // ??
 	        doSetup(request, response);
@@ -137,32 +140,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
     protected String mergeBodyToTemplate(String templateName, Map<String, Object> map) {
         templateName = "body/" + templateName;
     	String body = mergeToTemplate(templateName, map).toString();
-    	extractLinkTagsFromBody(body);
     	return body;
-    }
- 
-    // This is the only way to do this in FreeMarker. We cannot: (1) put a sequence of stylesheets in the template
-    // context which the template can add to, because the template cannot call methods on the container. The template
-    // can create a container but not add to one.
-    // (2) create a sequence of stylesheets or a scalar to hold the name of a stylesheet in the template, because
-    // it does not get passed back to the controller. The template can create only local variables.
-    
-    // *** RY But we can create a view object with an add method, that the templates could use to add to the
-    // list. ***
-    private String extractLinkTagsFromBody(String body) {
-        List<String> links = new ArrayList<String>();
-        
-        String re = "<link[^>]*>";
-        Pattern pattern = Pattern.compile(re);
-        Matcher matcher = pattern.matcher(body);
-        while (matcher.find()) {
-            links.add(matcher.group());
-        }
-
-        root.put("stylesheets", links);  // SIDE-EFFECT
-        
-        body = matcher.replaceAll("");
-        return body;
     }
     
     protected void write(HttpServletResponse response) {
@@ -218,17 +196,20 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         root.put("tagline", portal.getShortHand());
         root.put("breadcrumbs", BreadCrumbsUtil.getBreadCrumbsDiv(vreq));
 
-        String themeDir = portal.getThemeDir();
+        String themeDir = getThemeDir();
         
         setUrls(portalId, themeDir);
         setLoginInfo();      
         setCopyrightInfo();
         setThemeInfo(themeDir);
         
-        // *** TEMPORARY. The templates shouldn't need to know this. Doing temporarily for script files
-        // till we put the script/css loading strategy in place. (Templates make a call to add files
-        // to a view object. These get iterated through in scripts.ftl and stylesheets.ftl.)
-        setSharedVariable("contextPath", contextPath);
+        // Here themeDir SHOULD NOT have the context path already added to it.
+        setSharedVariable("stylesheets", new StylesheetList(themeDir)); 
+        setSharedVariable("scripts", new ScriptList()); 
+    }
+    
+    public String getThemeDir() {
+        return portal.getThemeDir().replaceAll("/$", "");
     }
     
     // Define the URLs that are accessible to the templates. Note that we do not create menus here,
@@ -265,7 +246,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         urls.put("logout", getUrl(Routes.LOGOUT, logoutParams));
         
         urls.put("siteAdmin", getUrl(Routes.SITE_ADMIN));     
-        System.out.println("LOGOUT: " + urls.get("logout"));
+        
         setSharedVariable("urls", urls); 
     }
 
@@ -310,14 +291,15 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 	
 	private final void setThemeInfo(String themeDir) {
 
-	    setSharedVariable("themeDir", getUrl(themeDir));
+	    themeDir = getUrl(themeDir);
+	    setSharedVariable("themeDir", themeDir);
 
         // We'll need to separate theme-general and theme-specific stylesheet
         // dirs, so we need either two attributes or a list.
-        setSharedVariable("stylesheetDir", getUrl(themeDir + "css/"));
+        setSharedVariable("stylesheetDir", themeDir + "/css");
         
-        setSharedVariable("siteIconDir", getUrl(themeDir + "site_icons/"));
-        
+        setSharedVariable("siteIconDir", themeDir + "/site_icons");
+
 	}
 
     // Define template locations. Template loader will look first in the theme-specific
@@ -325,10 +307,10 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
     // RY We cannot do this in FreeMarkerSetup because (a) the theme depends on the portal,
     // and we have multi-portal installations, and (b) we need to support theme-switching on the fly.
     // To make more efficient, we could do this once, and then have a listener that does it again 
-    // when theme is switched.BUT this doesn't support (a), only (b), so  we have to do it on every request.
+    // when theme is switched. BUT this doesn't support (a), only (b), so  we have to do it on every request.
 	protected final void setTemplateLoader() {
 	    
-	    String themeTemplateDir = context.getRealPath(portal.getThemeDir()) + "/ftl";
+	    String themeTemplateDir = context.getRealPath(getThemeDir()) + "/ftl";
 	    String vitroTemplateDir = context.getRealPath("/templates/freemarker");
 
         try {

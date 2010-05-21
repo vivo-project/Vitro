@@ -27,7 +27,7 @@
         </p>
     </#if>
 
-    <form name="contact_form" action="submitFeedback" method="post" onsubmit="return ValidateForm('contact_form');">
+    <form name="contact_form" id="contact_form" action="submitFeedback" method="post" onsubmit="return ValidateForm('contact_form');">
         <input type="hidden" name="home" value="${portalId}"/>
         <input type="hidden" name="RequiredFields" value="webusername,webuseremail,s34gfd88p9x1"/>
         <input type="hidden" name="RequiredFieldsNames" value="Name,Email address,Comments"/>
@@ -41,11 +41,11 @@
         <p><input style="width:25%;" type="text" name="webuseremail" maxlength="255"/></p>
 
 
-        <label>Your comments, questions, or suggestions</label>
+        <label>Comments, questions, or suggestions</label>
 
         <textarea name="s34gfd88p9x1" rows="10" cols="90"></textarea>
         
-        <div>
+        <div class="buttons">
             <input type="submit" value="Send Mail" class="yellowbutton"/>
             <input type="reset" value="Clear Form" class="plainbutton"/>
         </div
@@ -55,5 +55,6 @@
     
 </div>
 
-<#-- RY This is temporary. -->
-<script src="${contextPath}/js/commentForm.js"></script>
+<#-- RY This is temporary. 
+<script src="${contextPath}/js/commentForm.js"></script>-->
+${scripts.add("/js/commentForm.js")}

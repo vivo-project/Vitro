@@ -10,7 +10,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreeMarkerHttpServlet;
 
 // RY We may want an interface that the superclass would implement.
-// RY Consider using FreeMarker's DisplayObjectWrapper instead, or extending it.
+// RY Consider using FreeMarker's object wrappers instead.
 
 public abstract class ViewObject {
 

@@ -10,7 +10,8 @@
             <h2>${classGroup.publicName}</h2>
             <ul>
                 <#list classGroup.classes as class> 
-                    <li><a href="${class.url}">${class.name}</a> (${class.entityCount})</li>
+                    <li><a href="${class.url}">${class.name}</a> (${class.individualCount})</li>
+
                 </#list>
             </ul>
         </#list>

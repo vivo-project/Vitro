@@ -82,7 +82,6 @@ public class BrowseController extends FreeMarkerHttpServlet {
 
     	String message = "";
     	List<VClassGroup> groups = getGroups(vreq.getWebappDaoFactory().getVClassGroupDao(), vreq.getPortal().getPortalId());
-
     	if (groups == null || groups.isEmpty()) {
     		message = "There are not yet any items in the system.";
     		body.put("message", message); 
