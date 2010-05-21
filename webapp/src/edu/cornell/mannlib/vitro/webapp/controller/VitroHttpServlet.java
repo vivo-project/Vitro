@@ -69,7 +69,7 @@ public class VitroHttpServlet extends HttpServlet
         // is complete and no more pages are generated in JSP, this can be removed.
         // Do this if FreeMarker is configured (i.e., not Datastar) and if we are not in
         // a FreeMarkerHttpServlet, which will generate identity, menu, and footer from the page template.
-        if ( FreeMarkerHttpServlet.config != null && !(this instanceof FreeMarkerHttpServlet) ) {
+        if ( FreeMarkerHttpServlet.isConfigured() && !(this instanceof FreeMarkerHttpServlet) ) {
             FreeMarkerHttpServlet.getFreeMarkerComponentsForJsp(request, response);
         }
     }

@@ -140,7 +140,7 @@
 
   <listener>
     <listener-class>
-        edu.cornell.mannlib.vitro.webapp.servlet.setup.FreeMarkerSetup
+        edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreeMarkerSetup
     </listener-class>
   </listener>
   

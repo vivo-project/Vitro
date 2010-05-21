@@ -55,9 +55,9 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
     private static final Log log = LogFactory.getLog(FreeMarkerHttpServlet.class.getName());
     private static final int FILTER_SECURITY_LEVEL = LoginFormBean.EDITOR;
     
-    public static Configuration config = null;
-    public static String contextPath = null; 
-    public static ServletContext context = null;
+    protected static Configuration config = null;
+    protected static String contextPath = null; 
+    protected static ServletContext context = null;
     
 	protected VitroRequest vreq;
 	protected HttpServletResponse response;
@@ -345,7 +345,10 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         request.setAttribute("ftl_search", fcg.getSearch());
         request.setAttribute("ftl_footer", fcg.getFooter());       
     }
-    
+
+    public static boolean isConfigured() {
+        return config != null;
+    }
     
     /* ******************** Utilities ******************* */
 
