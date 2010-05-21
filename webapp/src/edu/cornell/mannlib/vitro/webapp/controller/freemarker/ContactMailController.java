@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -30,8 +31,6 @@ public class ContactMailController extends FreeMarkerHttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger LOG = Logger.getLogger(ContactMailController.class);
 	
-    private final static String CONFIRM_PAGE        = "/thankyou.jsp";
-    private final static String ERR_PAGE            = "/contact_err.jsp";
     private final static String SPAM_MESSAGE        = "Your message was flagged as spam.";
     private final static String EMAIL_BACKUP_FILE_PATH = "/WEB-INF/LatestMessage.html";
     
@@ -185,7 +184,7 @@ public class ContactMailController extends FreeMarkerHttpServlet {
                     try {
                     	
                     	if (spamReason == null) {
-            	        	sendMessage(s, webuseremail, deliverToArray, deliveryfrom, 
+            	        	sendMessage(s, webuseremail, webusername, deliverToArray, deliveryfrom, 
             	        			recipientCount, msgText);
                     	}
             
@@ -272,7 +271,7 @@ public class ContactMailController extends FreeMarkerHttpServlet {
         // outFile.close();
     }
     
-    private void sendMessage(Session s, String webuseremail, 
+    private void sendMessage(Session s, String webuseremail, String webusername,
     		String[] deliverToArray, String deliveryfrom, int recipientCount,
     		String msgText) 
     		throws AddressException, SendFailedException, MessagingException {
@@ -281,7 +280,12 @@ public class ContactMailController extends FreeMarkerHttpServlet {
         //System.out.println("trying to send message from servlet");
 
         // Set the from address
-        msg.setFrom( new InternetAddress( webuseremail ));
+        try {
+            msg.setFrom( new InternetAddress( webuseremail, webusername ));
+        } catch (UnsupportedEncodingException e) {
+            LOG.error("Can't set message sender with personal name " + webusername + " due to UnsupportedEncodingException");
+            msg.setFrom( new InternetAddress( webuseremail ) );
+        }
 
         // Set the recipient address
         

@@ -1,6 +1,6 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
-<img src="${siteIconDir}/bomb.gif" alt="email error"/>
+<img src="${siteIconPath}/bomb.gif" alt="email error"/>
 
 
 <p class="normal">An error occurred during the processing of your request.<br />

@@ -36,10 +36,3 @@
     <#include "/components/scripts.ftl"> 
 </body>
 </html>
-
-<#-- How to add a stylesheet:
-${stylesheets.addFromTheme("/sample.css");
-${stylesheets.add("/themes/vivo-basic/css/sample.css"}
-NOT (gets contextPath added twice):
-${stylesheets.add(stylesheetDir + "/sample.css")}
--->

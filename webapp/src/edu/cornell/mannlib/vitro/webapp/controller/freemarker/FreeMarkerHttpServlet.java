@@ -291,14 +291,17 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 	
 	private final void setThemeInfo(String themeDir) {
 
-	    themeDir = getUrl(themeDir);
-	    setSharedVariable("themeDir", themeDir);
-
-        // We'll need to separate theme-general and theme-specific stylesheet
-        // dirs, so we need either two attributes or a list.
+	    // This value will be available to any template as a path for adding a new stylesheet.
+	    // It does not contain the context path, because the methods to generate the href
+	    // attribute from the string passed in by the template automatically add the context path.
         setSharedVariable("stylesheetDir", themeDir + "/css");
         
-        setSharedVariable("siteIconDir", themeDir + "/site_icons");
+        String themeDirWithContext = getUrl(themeDir);
+        
+        // This value is used only in stylesheets.ftl and already contains the context path.
+        root.put("stylesheetPath", themeDirWithContext + "/css");
+        
+        setSharedVariable("siteIconPath", themeDirWithContext + "/site_icons");
 
 	}
 
