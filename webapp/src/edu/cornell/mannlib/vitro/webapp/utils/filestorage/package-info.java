@@ -1,3 +1,5 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
 /**
  * <p>
  * The code in this package implements the Vitro file-storage system.
@@ -24,7 +26,7 @@
  * but is different in several respects:
  *   <ul>
  *     <li>
- *       Each “object” will consist only of a single file, 
+ *       Each "object" will consist only of a single file, 
  *       causing the entire issue of object encapsulation to be moot.
  *     </li>
  *     <li>
@@ -77,6 +79,16 @@
  *   would be converted to this:
  *   <pre>a~n3424/myPhoto.jpg</pre>
  * </p>
+ * <p>
+ *   The namespaces and their assigned prefixes are stored in a properties file 
+ *   when the structure is initialized. When the structure is re-opened, the
+ *   file is read to find the correct prefixes. The file
+ *   might look like this:
+ *   <pre>
+ *     a = http://the.first.namespace/
+ *     b = http://the.second.namespace/
+ *   </pre>
+ * </p>
  * 
  * <h1>ID encoding</h1>
  * 
@@ -91,10 +103,6 @@
  *   to be required, since few files are named with the special characters.
  * </p>
  * 
- * <p></p>
- * <p></p>
- * <p></p>
- * <p></p>
  */
 
 package edu.cornell.mannlib.vitro.webapp.utils.filestorage;
