@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.view;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -30,5 +32,22 @@ public abstract class ViewObject {
     protected String urlEncode(String str) {
         return FreeMarkerHttpServlet.urlEncode(str);
     }
+    
+    /*
+     * public static List<?> wrapList(List<?> list, Class cl) 
+     * throw error if cl not a child of ViewObject
+     * This block of code is going to be repeated a lot:
+            List<VClassGroup> groups = // code to get the data
+            List<VClassGroupView> vcgroups = new ArrayList<VClassGroupView>(groups.size());
+            Iterator<VClassGroup> i = groups.iterator();
+            while (i.hasNext()) {
+                vcgroups.add(new VClassGroupView(i.next()));
+            }
+            body.put("classGroups", vcgroups);
+    Can we generalize it to a generic method of ViewObject - wrapList() ? 
+    static method of ViewObject
+    Params: groups, VClassGroupView (the name of the class) - but must be a child of ViewObject
+    Return: List<viewObjectType>
+     */
 
 }

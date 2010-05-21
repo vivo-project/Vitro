@@ -62,6 +62,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 	protected VitroRequest vreq;
 	protected HttpServletResponse response;
 	protected Portal portal;
+	protected int portalId;
 	protected String appName;
 	protected Map<String, Object> root = new HashMap<String, Object>();
     
@@ -178,15 +179,17 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 
         // RY Can this be removed? Do templates need it? Ideally, they should not.
         // Only needed for some weird stuff in search box that I think is only used in old default theme.
-        int portalId = portal.getPortalId();
-        setSharedVariable("portalId", portalId);
+        // Some forms need it also, in which case it should get set in the getBody() method and passed to that
+        // body template.
+        portalId = portal.getPortalId();
+        root.put("portalId", portalId);
         
         appName = portal.getAppName();
         setSharedVariable("siteName", appName);
 
         setTemplateLoader();
         
-        TabMenu menu = getTabMenu(portalId);
+        TabMenu menu = getTabMenu();
         root.put("tabMenu", menu);
 
         ApplicationBean appBean = vreq.getAppBean();
@@ -198,7 +201,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 
         String themeDir = getThemeDir();
         
-        setUrls(portalId, themeDir);
+        setUrls(themeDir);
         setLoginInfo();      
         setCopyrightInfo();
         setThemeInfo(themeDir);
@@ -214,7 +217,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
     
     // Define the URLs that are accessible to the templates. Note that we do not create menus here,
     // because we want the templates to be free to define the link text and where the links are displayed.
-    private final void setUrls(int portalId, String themeDir) {
+    private final void setUrls(String themeDir) {
         // The urls that are accessible to the templates. 
         // NB We are not using our menu object mechanism to build menus here, because we want the 
         // view to control which links go where, and the link text and title.
@@ -240,8 +243,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         urls.put("termsOfUse", getUrl(Routes.TERMS_OF_USE, portalParam));        
         urls.put("login", getUrl(Routes.LOGIN));
         
-        Map<String, String> logoutParams = new HashMap<String, String>();
-        logoutParams.put("home", "" + portalId);
+        Map<String, String> logoutParams = new HashMap<String, String>(portalParam);
         logoutParams.put("loginSubmitMode", "Log Out");
         urls.put("logout", getUrl(Routes.LOGOUT, logoutParams));
         
@@ -329,7 +331,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         
 	}
     
-	private TabMenu getTabMenu(int portalId) {
+	private TabMenu getTabMenu() {
 	    return new TabMenu(vreq, portalId);
 	}
 

@@ -31,7 +31,7 @@
 <div id="content">
 <div class="contents">
 
-<div class="entityList">
+<div class="individualList">
 <h2>${title}</h2>
 <c:if test="${!empty subTitle}"><h4>${subTitle}"</h4></c:if>
 

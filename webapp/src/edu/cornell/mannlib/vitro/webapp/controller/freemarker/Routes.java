@@ -11,7 +11,7 @@ public class Routes {
     public static final String BROWSE = "/browse";
     public static final String COMMENT_FORM = "/comments";
     public static final String INDIVIDUAL = "/individual";
-    public static final String INDIVIDUAL_LIST = "/entitylist"; // change
+    public static final String INDIVIDUAL_LIST = "/entitylist"; // "/individuallist";
     public static final String SEARCH = "/search"; 
     public static final String TERMS_OF_USE = "/termsOfUse";
     

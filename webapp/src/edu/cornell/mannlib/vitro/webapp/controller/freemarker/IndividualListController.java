@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -62,13 +63,13 @@ public class IndividualListController extends FreeMarkerHttpServlet {
                                 response.sendRedirect(Routes.BROWSE + "?"+vreq.getQueryString());
                             }
                         } catch (Exception ex) {
-                            throw new HelpException("EntityListControllerFM: request parameter 'vclassId' must be a URI string");
+                            throw new HelpException("IndividualListController: request parameter 'vclassId' must be a URI string");
                     }
                 }
             } else if (obj instanceof VClass) {
                 vclass = (VClass)obj;
             } else {
-                throw new HelpException("EntityListControllerFM: attribute 'vclass' must be of type "
+                throw new HelpException("IndividualListController: attribute 'vclass' must be of type "
                         + VClass.class.getName() );
             }
             if (vclass!=null){
@@ -96,12 +97,16 @@ public class IndividualListController extends FreeMarkerHttpServlet {
         
         // Create list of individuals
         List<Individual> individualList = vreq.getWebappDaoFactory().getIndividualDao().getIndividualsByVClass(vclass);
-        List<IndividualView> individuals = new ArrayList<IndividualView>();
-        
+        List<IndividualView> individuals = new ArrayList<IndividualView>(individualList.size());
+        Iterator<Individual> i = individualList.iterator();
+        while (i.hasNext()) {
+            individuals.add(new IndividualView(i.next()));
+        }        
         body.put("individuals", individuals);
         
         // But the JSP version includes url rewriting via URLRewritingHttpServletResponse
-        body.put("individualUrl", config.getSharedVariable("contextPath") + "/entity?home=" + config.getSharedVariable("portalId") + "&uri=");
+        // RY *** FIX  - define getUrl method of IndividualView
+        body.put("individualUrl", getUrl("/entity?home=" + portalId + "&uri="));
 
         if (individuals == null) {
             log.error("individuals list is null");

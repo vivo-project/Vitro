@@ -6,9 +6,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
-import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.Routes;
+import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 
 public class IndividualView extends ViewObject {
     
@@ -26,8 +25,9 @@ public class IndividualView extends ViewObject {
         return individual.getName();
     }
     
-    public String getMoniker() {
-        return individual.getMoniker();
+    public String getTagline() {
+        String tagline = individual.getMoniker();
+        return StringUtils.isEmpty(tagline) ? individual.getVClass().getName() : tagline;
     }
     
     public String getUri() {
@@ -36,10 +36,18 @@ public class IndividualView extends ViewObject {
     
     // Or maybe getProfileUrl - there might be other kinds of urls
     // e.g., getEditUrl, getDeleteUrl - these would return the computations of PropertyEditLinks
-    // Just call getUrl...
+    // RY **** Need to account for everything in URLRewritingHttpServlet
     public String getProfileUrl() {
-        //return contextPath + URL + ""; // ADD IN the label from the individual's uri 
-        return ""; // RY FIX THIS
+        return getUrl("/individual/" + individual.getLocalName());
+    }
+    
+    public String getRenderer() {
+        // TODO
+        // iterate through class hierarchy looking for a custom renderer. If none, use
+        // default individual renderer. template will just do an include on individual.renderer
+        // Use individual.getVClasses() - this is the class hierarchy
+        // Question: what order are they returned in ? If from specific to general, break out of the iteration as soon as we find one.
+        return null;
     }
     
     public String getCustomView() {

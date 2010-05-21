@@ -87,14 +87,10 @@ public class BrowseController extends FreeMarkerHttpServlet {
     		body.put("message", message); 
     	}
     	else {
-    	    List<VClassGroupView> vcgroups = new ArrayList<VClassGroupView>();
+    	    List<VClassGroupView> vcgroups = new ArrayList<VClassGroupView>(groups.size());
     		Iterator<VClassGroup> i = groups.iterator();
-    		VClassGroup group;
-    		VClassGroupView displayGroup;
     		while (i.hasNext()) {
-    			group = (VClassGroup) i.next();
-    			displayGroup = new VClassGroupView(group);
-    			vcgroups.add(displayGroup);
+    		    vcgroups.add(new VClassGroupView(i.next()));
     		}
     		body.put("classGroups", vcgroups);
     	}     

@@ -55,7 +55,6 @@ public class CommentFormController extends FreeMarkerHttpServlet {
         else {
 
             ApplicationBean appBean = vreq.getAppBean();
-            int portalId = portal.getPortalId();
           
             String portalType = null;
             if ( (appBean.getMaxSharedPortalId()-appBean.getMinSharedPortalId()) > 1
@@ -71,6 +70,8 @@ public class CommentFormController extends FreeMarkerHttpServlet {
                 portalType = "clone";
             }
             body.put("portalType", portalType);
+            
+            body.put("portalId", portalId);
 
             // Not used in template. Is it used in processing the form?
             if (vreq.getHeader("Referer") == null) {
