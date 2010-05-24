@@ -44,6 +44,9 @@
  *       A namespace/prefix capability will be used to shorten file paths, 
  *       but with more flexibility than the prefix algorithm given in the specification.
  *     </li>
+ *     <li>
+ *       "shorty" directory names may be up to 3 characters long, not 2.
+ *     </li>
  *   </ul> 
  * </p>
  *
@@ -91,8 +94,61 @@
  * </p>
  * 
  * <h1>ID encoding</h1>
- * 
+ *
  * <p>
+ *   This is a multi-step process:
+ *   <ul>
+ *     <li>
+ *       <strong>Namespace recognition</strong> -
+ *       If the ID begins with a recognized namespace, then that namespace is 
+ *       stripped from the ID, and the prefix associated with that namespace 
+ *       is set aside for later in the process.
+ *     </li> 
+ *     <li>
+ *       <strong>Rare character encoding</strong> -
+ *       Illegal characters are translated to their hexadecimal equivalents, 
+ *       as are some rarely used characters which will be given other 
+ *       purposes later in the process. The translated characters include any
+ *       octet outside of the visible ASCII range (21-7e), and these additional
+ *       characters: 
+ *       <pre> " * + , &lt; = &gt; ? ^ | \ ~ </pre>
+ *       The hexadecimal encoding consists of a caret followed by 2 hex digits, 
+ *       e.g.: ^7C
+ *     </li> 
+ *     <li>
+ *       <strong>Common character encoding</strong> -
+ *       To keep the file paths short and readable, characters that are used
+ *       commonly in IDs but may be illegal in the file system are translated
+ *       to a single, lesser-used character.
+ *       <ul>
+ *         <li> / becomes = </li> 
+ *         <li> : becomes + </li> 
+ *         <li> . becomes , </li> 
+ *       </ul>
+ *     </li> 
+ *     <li>
+ *       <strong>Prefixing</strong> -
+ *       If a namespace was recognized on the ID in the first step, the 
+ *       associated prefix letter will be prepended to the string, with a 
+ *       tilde separator.
+ *     </li> 
+ *     <li>
+ *       <strong>Path breakdown</strong> -
+ *       Finally, path separator characters are inserted after every third 
+ *       character in the processed ID string.
+ *     </li> 
+ *   </ul>
+ *   Examples:
+ *   <br/><code>ark:/13030/xt12t3</code> becomes 
+ *        <code>ark/+=1/303/0=x/t12/t3</code>
+ *   <br/><code>http://n2t.info/urn:nbn:se:kb:repos-1</code> becomes 
+ *        <code>htt/p+=/=n2/t,i/nfo/=ur/n+n/bn+/se+/kb+/rep/os-/1</code>
+ *   <br/><code>what-the-*@?#!^!~?</code> becomes 
+ *        <code>wha/t-t/he-/^2a/@^3/f#!/^5e/!^7/e^3/f</code>
+ *   <br/><code>http://vivo.myDomain.edu/file/n3424</code> with namespace 
+ *        <code>http://vivo.myDomain.edu/file/</code> and prefix 
+ *        <code>a</code> becomes 
+ *        <code>a~n/342/4</code>
  * </p>
  * 
  * <h1>Filename encoding</h1>
@@ -103,6 +159,10 @@
  *   to be required, since few files are named with the special characters.
  * </p>
  * 
+ * <p>
+ *   The encoding process is the same as the "rare character encoding" and 
+ *   "common character encoding" steps used for ID encoding.
+ * </p>
  */
 
 package edu.cornell.mannlib.vitro.webapp.utils.filestorage;

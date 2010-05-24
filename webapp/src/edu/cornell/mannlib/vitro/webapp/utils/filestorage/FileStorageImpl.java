@@ -4,8 +4,10 @@ package edu.cornell.mannlib.vitro.webapp.utils.filestorage;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -32,6 +34,7 @@ public class FileStorageImpl implements FileStorage {
 	private final File baseDir;
 	private final File rootDir;
 	private final File namespaceFile;
+	private final long maximumFileSize;
 	private final Map<Character, String> namespacesMap;
 
 	// ----------------------------------------------------------------------
@@ -50,7 +53,7 @@ public class FileStorageImpl implements FileStorage {
 	 *             missing, or if it isn't in the expected form.
 	 */
 	FileStorageImpl() throws IOException {
-		this(figureBaseDir(), figureFileNamespace());
+		this(figureBaseDir(), figureFileNamespace(), figureMaximumFileSize());
 	}
 
 	/**
@@ -62,16 +65,19 @@ public class FileStorageImpl implements FileStorage {
 	 *             if the configuration property doesn't point to an existing,
 	 *             writeable directory.
 	 */
-	FileStorageImpl(File baseDir, Collection<String> namespaces)
-			throws IOException {
+	FileStorageImpl(File baseDir, Collection<String> namespaces,
+			long maximumFileSize) throws IOException {
 		checkBaseDirValid(baseDir);
 		checkNamespacesValid(namespaces);
+		checkMaximumFileSizeValid(maximumFileSize);
 
 		this.baseDir = baseDir;
-		this.rootDir = new File(baseDir, "file_storage_root");
+		this.rootDir = new File(this.baseDir, "file_storage_root");
 
 		this.namespaceFile = new File(baseDir,
 				"file_storage_namespaces.properties");
+
+		this.maximumFileSize = maximumFileSize;
 
 		if (rootDir.exists() && namespaceFile.exists()) {
 			this.namespacesMap = confirmNamespaces(namespaces);
@@ -88,6 +94,13 @@ public class FileStorageImpl implements FileStorage {
 					"Storage directory '' has been partially initialized. '"
 							+ namespaceFile.getPath() + "' exists, but '"
 							+ rootDir.getPath() + "' does not.");
+		}
+	}
+
+	private void checkMaximumFileSizeValid(long maximumFileSize) {
+		if (maximumFileSize < 0) {
+			throw new IllegalArgumentException(
+					"Maximum file size may not be negative.");
 		}
 	}
 
@@ -170,6 +183,23 @@ public class FileStorageImpl implements FileStorage {
 		String fileNamespace = defaultNamespace.substring(0, hostLength)
 				+ fileSuffix;
 		return Collections.singleton(fileNamespace);
+	}
+
+	/**
+	 * Get the configuration property for the maximum file size and translate it
+	 * into a long integer. It must be a positive integer, optionally followed
+	 * by "K", "M", or "G" (to indicate kilobytes, megabytes, or gigabytes).
+	 */
+	private static long figureMaximumFileSize() {
+		String fileSizeString = ConfigurationProperties
+				.getProperty(PROPERTY_FILE_MAXIMUM_SIZE);
+		if (fileSizeString == null) {
+			throw new IllegalArgumentException(
+					"Configuration properties must contain a value for '"
+							+ PROPERTY_FILE_MAXIMUM_SIZE + "'");
+		}
+
+		return FileStorageHelper.parseMaximumFileSize(fileSizeString);
 	}
 
 	/**
@@ -263,7 +293,8 @@ public class FileStorageImpl implements FileStorage {
 
 		}
 
-		File file = FileStorageHelper.getFullPath(this.rootDir, id, filename);
+		File file = FileStorageHelper.getFullPath(this.rootDir, id, filename,
+				this.namespacesMap);
 
 		OutputStream out = null;
 		try {
@@ -297,7 +328,7 @@ public class FileStorageImpl implements FileStorage {
 		}
 
 		File file = FileStorageHelper.getFullPath(this.rootDir, id,
-				existingFilename);
+				existingFilename, this.namespacesMap);
 
 		file.delete();
 		if (file.exists()) {
@@ -317,7 +348,8 @@ public class FileStorageImpl implements FileStorage {
 	 */
 	@Override
 	public String getFilename(String id) throws IOException {
-		File dir = FileStorageHelper.getPathToIdDirectory(this.rootDir, id);
+		File dir = FileStorageHelper.getPathToIdDirectory(id,
+				this.namespacesMap, this.rootDir);
 
 		if ((!dir.exists()) || (!dir.isDirectory())) {
 			return null;
@@ -344,16 +376,44 @@ public class FileStorageImpl implements FileStorage {
 
 	/**
 	 * {@inheritDoc}
+	 * 
+	 * @throws IOException
+	 *             if the file is larger than the maximum allowable size.
 	 */
 	@Override
-	public byte[] getfile(String id, String filename)
-			throws FileNotFoundException, IOException {
-		// gets the bytes from the file
-		// throws FileNotFoundException if the file does not exist
-		// throws IOException
+	public byte[] getFile(String id, String filename) throws IOException {
 
-		// TODO Auto-generated method stub
-		throw new RuntimeException("FileStorage.getfile() not implemented.");
+		File file = FileStorageHelper.getFullPath(this.rootDir, id, filename,
+				this.namespacesMap);
+
+		if (!file.exists()) {
+			throw new FileNotFoundException("No file exists with ID '" + id
+					+ "', file location '" + file + "'");
+		}
+
+		InputStream in = null;
+		try {
+			in = new BufferedInputStream(new FileInputStream(file));
+			ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+			byte[] buffer = new byte[4096];
+			int howMany;
+			while (-1 != (howMany = in.read(buffer))) {
+				if (bytes.size() > this.maximumFileSize) {
+					throw new IOException("File is too large at this ID: '"
+							+ id + "', file location '" + file + "'");
+				}
+				bytes.write(buffer, 0, howMany);
+			}
+			bytes.close();
+			return bytes.toByteArray();
+		} finally {
+			if (in != null) {
+				try {
+					in.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
-
 }

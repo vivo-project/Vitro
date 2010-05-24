@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.utils.filestorage;
 
 import static edu.cornell.mannlib.vitro.webapp.utils.filestorage.FileStorageFactory.PROPERTY_IMPLEMETATION_CLASSNAME;
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -28,7 +29,8 @@ import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 
 /**
- * TODO
+ * This just checks the interaction between the configuration properties, the
+ * system properties, and the implementation of {@link FileStorage}.
  */
 public class FileStorageFactoryTest extends AbstractTestClass {
 	private static final String configProperties = "#mock config properties file\n";
@@ -62,7 +64,7 @@ public class FileStorageFactoryTest extends AbstractTestClass {
 	@Test
 	public void createDefaultImplementation() throws IOException {
 		setConfigurationProperties(tempDir.getPath(),
-				"http://vivo.myDomain.edu/individual/");
+				"http://vivo.myDomain.edu/individual/", "50M");
 		FileStorage fs = FileStorageFactory.getFileStorage();
 		assertEquals("implementation class", FileStorageImpl.class, fs
 				.getClass());
@@ -80,13 +82,20 @@ public class FileStorageFactoryTest extends AbstractTestClass {
 	@Test(expected = IllegalArgumentException.class)
 	public void baseDirectoryDoesntExist() throws IOException {
 		setConfigurationProperties("/bogus/Directory",
-				"http://vivo.myDomain.edu/individual/");
+				"http://vivo.myDomain.edu/individual/", "50M");
 		FileStorageFactory.getFileStorage();
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void defaultNamespaceIsBogus() throws IOException {
-		setConfigurationProperties(tempDir.getPath(), "namespace");
+		setConfigurationProperties(tempDir.getPath(), "namespace", "50M");
+		FileStorageFactory.getFileStorage();
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void invalidMaximumFileSize() throws IOException {
+		setConfigurationProperties(tempDir.getPath(),
+				"http://vivo.myDomain.edu/individual/", "50X");
 		FileStorageFactory.getFileStorage();
 	}
 
@@ -115,10 +124,11 @@ public class FileStorageFactoryTest extends AbstractTestClass {
 	// ----------------------------------------------------------------------
 
 	private void setConfigurationProperties(String baseDir,
-			String defaultNamespace) {
+			String defaultNamespace, String maxFileSize) {
 		Map<String, String> map = new HashMap<String, String>();
-		map.put("upload.directory", baseDir);
-		map.put("Vitro.defaultNamespace", defaultNamespace);
+		map.put(FileStorage.PROPERTY_FILE_STORAGE_BASE_DIR, baseDir);
+		map.put(FileStorage.PROPERTY_DEFAULT_NAMESPACE, defaultNamespace);
+		map.put(FileStorage.PROPERTY_FILE_MAXIMUM_SIZE, maxFileSize);
 
 		try {
 			Field f = ConfigurationProperties.class.getDeclaredField("theMap");
@@ -147,7 +157,7 @@ public class FileStorageFactoryTest extends AbstractTestClass {
 			return "filename";
 		}
 
-		public byte[] getfile(String id, String filename)
+		public byte[] getFile(String id, String filename)
 				throws FileNotFoundException, IOException {
 			return new byte[0];
 		}
@@ -171,7 +181,7 @@ public class FileStorageFactoryTest extends AbstractTestClass {
 			return "filename";
 		}
 
-		public byte[] getfile(String id, String filename)
+		public byte[] getFile(String id, String filename)
 				throws FileNotFoundException, IOException {
 			return new byte[0];
 		}

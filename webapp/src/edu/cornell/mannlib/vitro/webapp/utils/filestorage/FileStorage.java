@@ -17,6 +17,12 @@ public interface FileStorage {
 	 * {@link ConfigurationProperties} for the file storage base directory.
 	 */
 	String PROPERTY_FILE_STORAGE_BASE_DIR = "upload.directory";
+	
+	/**
+	 * The default implementation will use this key to ask  
+	 * {@link ConfigurationProperties} for the maximum permissible file size.
+	 */
+	String PROPERTY_FILE_MAXIMUM_SIZE = "file.maximum.size";
 
 	/**
 	 * The default implementation will use this key to ask
@@ -24,6 +30,11 @@ public interface FileStorage {
 	 */
 	String PROPERTY_DEFAULT_NAMESPACE = "Vitro.defaultNamespace";
 
+	/**
+	 * How often to we insert path separator characters?
+	 */
+	int SHORTY_LENGTH = 3;
+	
 	/**
 	 * Store the bytes from this stream as a file with the specified ID and
 	 * filename. If the file already exists, it is over-written.
@@ -50,7 +61,7 @@ public interface FileStorage {
 	 * @throws FileNotFoundException
 	 *             if there is no file that matches this ID and filename.
 	 */
-	byte[] getfile(String id, String filename) throws FileNotFoundException,
+	byte[] getFile(String id, String filename) throws FileNotFoundException,
 			IOException;
 
 	/**
