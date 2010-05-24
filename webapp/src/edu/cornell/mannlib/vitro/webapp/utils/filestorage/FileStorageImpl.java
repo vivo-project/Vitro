@@ -34,7 +34,6 @@ public class FileStorageImpl implements FileStorage {
 	private final File baseDir;
 	private final File rootDir;
 	private final File namespaceFile;
-	private final long maximumFileSize;
 	private final Map<Character, String> namespacesMap;
 
 	// ----------------------------------------------------------------------
@@ -53,7 +52,7 @@ public class FileStorageImpl implements FileStorage {
 	 *             missing, or if it isn't in the expected form.
 	 */
 	FileStorageImpl() throws IOException {
-		this(figureBaseDir(), figureFileNamespace(), figureMaximumFileSize());
+		this(figureBaseDir(), figureFileNamespace());
 	}
 
 	/**
@@ -65,19 +64,15 @@ public class FileStorageImpl implements FileStorage {
 	 *             if the configuration property doesn't point to an existing,
 	 *             writeable directory.
 	 */
-	FileStorageImpl(File baseDir, Collection<String> namespaces,
-			long maximumFileSize) throws IOException {
+	FileStorageImpl(File baseDir, Collection<String> namespaces) throws IOException {
 		checkBaseDirValid(baseDir);
 		checkNamespacesValid(namespaces);
-		checkMaximumFileSizeValid(maximumFileSize);
 
 		this.baseDir = baseDir;
 		this.rootDir = new File(this.baseDir, "file_storage_root");
 
 		this.namespaceFile = new File(baseDir,
 				"file_storage_namespaces.properties");
-
-		this.maximumFileSize = maximumFileSize;
 
 		if (rootDir.exists() && namespaceFile.exists()) {
 			this.namespacesMap = confirmNamespaces(namespaces);
@@ -94,13 +89,6 @@ public class FileStorageImpl implements FileStorage {
 					"Storage directory '' has been partially initialized. '"
 							+ namespaceFile.getPath() + "' exists, but '"
 							+ rootDir.getPath() + "' does not.");
-		}
-	}
-
-	private void checkMaximumFileSizeValid(long maximumFileSize) {
-		if (maximumFileSize < 0) {
-			throw new IllegalArgumentException(
-					"Maximum file size may not be negative.");
 		}
 	}
 
@@ -183,23 +171,6 @@ public class FileStorageImpl implements FileStorage {
 		String fileNamespace = defaultNamespace.substring(0, hostLength)
 				+ fileSuffix;
 		return Collections.singleton(fileNamespace);
-	}
-
-	/**
-	 * Get the configuration property for the maximum file size and translate it
-	 * into a long integer. It must be a positive integer, optionally followed
-	 * by "K", "M", or "G" (to indicate kilobytes, megabytes, or gigabytes).
-	 */
-	private static long figureMaximumFileSize() {
-		String fileSizeString = ConfigurationProperties
-				.getProperty(PROPERTY_FILE_MAXIMUM_SIZE);
-		if (fileSizeString == null) {
-			throw new IllegalArgumentException(
-					"Configuration properties must contain a value for '"
-							+ PROPERTY_FILE_MAXIMUM_SIZE + "'");
-		}
-
-		return FileStorageHelper.parseMaximumFileSize(fileSizeString);
 	}
 
 	/**
@@ -398,10 +369,6 @@ public class FileStorageImpl implements FileStorage {
 			byte[] buffer = new byte[4096];
 			int howMany;
 			while (-1 != (howMany = in.read(buffer))) {
-				if (bytes.size() > this.maximumFileSize) {
-					throw new IOException("File is too large at this ID: '"
-							+ id + "', file location '" + file + "'");
-				}
 				bytes.write(buffer, 0, howMany);
 			}
 			bytes.close();

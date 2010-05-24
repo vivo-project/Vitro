@@ -21,7 +21,6 @@ import org.apache.log4j.Logger;
  * <li>convert an ID (with namespaces) to an absolute path</li>
  * <li>convert an ID (with namespaces) and a filename to a full path for storing
  * the file</li>
- * <li>parse the string that specifies the maximum size of an uploaded file</li>
  * </ul>
  */
 public class FileStorageHelper {
@@ -257,50 +256,6 @@ public class FileStorageHelper {
 			Map<Character, String> namespacesMap) {
 		return new File(getPathToIdDirectory(id, namespacesMap, rootDir),
 				encodeName(filename));
-	}
-
-	/**
-	 * Translate the configuration property for maximum file size from a
-	 * <code>String</code> to a <code>long</code>.
-	 * 
-	 * The string must be represent a positive integer, optionally followed by
-	 * "K", "M", or "G" (to indicate kilobytes, megabytes, or gigabytes).
-	 */
-	public static long parseMaximumFileSize(String fileSizeString) {
-		long factor = 1L;
-		String integerString;
-		int shorter = fileSizeString.length() - 1;
-		if (fileSizeString.endsWith("K")) {
-			factor = 1024L;
-			integerString = fileSizeString.substring(0, shorter);
-		} else if (fileSizeString.endsWith("M")) {
-			factor = 1024L * 1024L;
-			integerString = fileSizeString.substring(0, shorter);
-		} else if (fileSizeString.endsWith("G")) {
-			factor = 1024L * 1024L * 1024L;
-			integerString = fileSizeString.substring(0, shorter);
-		} else {
-			integerString = fileSizeString;
-		}
-
-		long value = 0;
-		try {
-			value = Long.parseLong(integerString);
-
-		} catch (NumberFormatException e) {
-			throw new IllegalArgumentException(
-					"Maximum file size is invalid: '" + fileSizeString
-							+ "'. Must be a positive integer, "
-							+ "optionally followed by 'K', 'M', or 'G'");
-		}
-
-		if (value <= 0L) {
-			throw new IllegalArgumentException(
-					"Maximum file size must be more than 0: '" + fileSizeString
-							+ "'");
-		}
-
-		return value * factor;
 	}
 
 }

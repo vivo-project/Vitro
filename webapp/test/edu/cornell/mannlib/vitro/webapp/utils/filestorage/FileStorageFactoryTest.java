@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.utils.filestorage;
 
 import static edu.cornell.mannlib.vitro.webapp.utils.filestorage.FileStorageFactory.PROPERTY_IMPLEMETATION_CLASSNAME;
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -64,7 +63,7 @@ public class FileStorageFactoryTest extends AbstractTestClass {
 	@Test
 	public void createDefaultImplementation() throws IOException {
 		setConfigurationProperties(tempDir.getPath(),
-				"http://vivo.myDomain.edu/individual/", "50M");
+				"http://vivo.myDomain.edu/individual/");
 		FileStorage fs = FileStorageFactory.getFileStorage();
 		assertEquals("implementation class", FileStorageImpl.class, fs
 				.getClass());
@@ -82,20 +81,13 @@ public class FileStorageFactoryTest extends AbstractTestClass {
 	@Test(expected = IllegalArgumentException.class)
 	public void baseDirectoryDoesntExist() throws IOException {
 		setConfigurationProperties("/bogus/Directory",
-				"http://vivo.myDomain.edu/individual/", "50M");
+				"http://vivo.myDomain.edu/individual/");
 		FileStorageFactory.getFileStorage();
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void defaultNamespaceIsBogus() throws IOException {
-		setConfigurationProperties(tempDir.getPath(), "namespace", "50M");
-		FileStorageFactory.getFileStorage();
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public void invalidMaximumFileSize() throws IOException {
-		setConfigurationProperties(tempDir.getPath(),
-				"http://vivo.myDomain.edu/individual/", "50X");
+		setConfigurationProperties(tempDir.getPath(), "namespace");
 		FileStorageFactory.getFileStorage();
 	}
 
@@ -124,11 +116,10 @@ public class FileStorageFactoryTest extends AbstractTestClass {
 	// ----------------------------------------------------------------------
 
 	private void setConfigurationProperties(String baseDir,
-			String defaultNamespace, String maxFileSize) {
+			String defaultNamespace) {
 		Map<String, String> map = new HashMap<String, String>();
 		map.put(FileStorage.PROPERTY_FILE_STORAGE_BASE_DIR, baseDir);
 		map.put(FileStorage.PROPERTY_DEFAULT_NAMESPACE, defaultNamespace);
-		map.put(FileStorage.PROPERTY_FILE_MAXIMUM_SIZE, maxFileSize);
 
 		try {
 			Field f = ConfigurationProperties.class.getDeclaredField("theMap");

@@ -199,41 +199,4 @@ public class FileStorageHelperTest {
 		assertEquals("fullPath", FULL_RESULT_PATH, actual);
 	}
 
-	// ----------------------------------------------------------------------
-	// parseMaximumFileSize
-	// ----------------------------------------------------------------------
-
-	@Test
-	public void parseMaximumFileSizeBare() {
-		long size = FileStorageHelper.parseMaximumFileSize("1467898");
-		assertEquals("", 1467898, size);
-	}
-
-	@Test
-	public void parseMaximumFileSizeWithSuffixes() {
-		long size = FileStorageHelper.parseMaximumFileSize("152K");
-		assertEquals("", 152L * 1024L, size);
-
-		size = FileStorageHelper.parseMaximumFileSize("47M");
-		assertEquals("", 47L * 1024L * 1024L, size);
-
-		size = FileStorageHelper.parseMaximumFileSize("3G");
-		assertEquals("", 3L * 1024L * 1024L * 1024L, size);
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public void parseMaximumFileSizeInvalidSuffix() {
-		FileStorageHelper.parseMaximumFileSize("152X");
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public void parseMaximumFileSizeNegativeNumber() {
-		FileStorageHelper.parseMaximumFileSize("-3K");
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public void parseMaximumFileSizeEmbeddedBadCharacter() {
-		FileStorageHelper.parseMaximumFileSize("1G52K");
-	}
-
 }

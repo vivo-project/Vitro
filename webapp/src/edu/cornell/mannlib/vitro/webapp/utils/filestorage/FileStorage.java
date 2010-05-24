@@ -19,12 +19,6 @@ public interface FileStorage {
 	String PROPERTY_FILE_STORAGE_BASE_DIR = "upload.directory";
 	
 	/**
-	 * The default implementation will use this key to ask  
-	 * {@link ConfigurationProperties} for the maximum permissible file size.
-	 */
-	String PROPERTY_FILE_MAXIMUM_SIZE = "file.maximum.size";
-
-	/**
 	 * The default implementation will use this key to ask
 	 * {@link ConfigurationProperties} for the default URI namespace.
 	 */
