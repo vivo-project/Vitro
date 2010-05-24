@@ -4,7 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.utils.filestorage;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
@@ -64,7 +63,8 @@ public class FileStorageImpl implements FileStorage {
 	 *             if the configuration property doesn't point to an existing,
 	 *             writeable directory.
 	 */
-	FileStorageImpl(File baseDir, Collection<String> namespaces) throws IOException {
+	FileStorageImpl(File baseDir, Collection<String> namespaces)
+			throws IOException {
 		checkBaseDirValid(baseDir);
 		checkNamespacesValid(namespaces);
 
@@ -347,12 +347,10 @@ public class FileStorageImpl implements FileStorage {
 
 	/**
 	 * {@inheritDoc}
-	 * 
-	 * @throws IOException
-	 *             if the file is larger than the maximum allowable size.
 	 */
 	@Override
-	public byte[] getFile(String id, String filename) throws IOException {
+	public InputStream getInputStream(String id, String filename)
+			throws IOException {
 
 		File file = FileStorageHelper.getFullPath(this.rootDir, id, filename,
 				this.namespacesMap);
@@ -362,25 +360,6 @@ public class FileStorageImpl implements FileStorage {
 					+ "', file location '" + file + "'");
 		}
 
-		InputStream in = null;
-		try {
-			in = new BufferedInputStream(new FileInputStream(file));
-			ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-			byte[] buffer = new byte[4096];
-			int howMany;
-			while (-1 != (howMany = in.read(buffer))) {
-				bytes.write(buffer, 0, howMany);
-			}
-			bytes.close();
-			return bytes.toByteArray();
-		} finally {
-			if (in != null) {
-				try {
-					in.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
+		return new FileInputStream(file);
 	}
 }

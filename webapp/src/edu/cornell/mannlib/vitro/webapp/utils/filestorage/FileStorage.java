@@ -17,7 +17,7 @@ public interface FileStorage {
 	 * {@link ConfigurationProperties} for the file storage base directory.
 	 */
 	String PROPERTY_FILE_STORAGE_BASE_DIR = "upload.directory";
-	
+
 	/**
 	 * The default implementation will use this key to ask
 	 * {@link ConfigurationProperties} for the default URI namespace.
@@ -28,7 +28,7 @@ public interface FileStorage {
 	 * How often to we insert path separator characters?
 	 */
 	int SHORTY_LENGTH = 3;
-	
+
 	/**
 	 * Store the bytes from this stream as a file with the specified ID and
 	 * filename. If the file already exists, it is over-written.
@@ -50,13 +50,15 @@ public interface FileStorage {
 	String getFilename(String id) throws IOException;
 
 	/**
-	 * Get the contents of the file with this ID and this filename.
+	 * Get a stream that will provide the contents of the file that was stored
+	 * with this ID and this filename. Close the stream when you're finished
+	 * with it.
 	 * 
 	 * @throws FileNotFoundException
 	 *             if there is no file that matches this ID and filename.
 	 */
-	byte[] getFile(String id, String filename) throws FileNotFoundException,
-			IOException;
+	InputStream getInputStream(String id, String filename)
+			throws FileNotFoundException, IOException;
 
 	/**
 	 * If a file exists with this ID, it will be deleted, regardless of the file

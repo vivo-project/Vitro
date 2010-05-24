@@ -6,6 +6,7 @@ import static edu.cornell.mannlib.vitro.webapp.utils.filestorage.FileStorageFact
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -148,10 +149,11 @@ public class FileStorageFactoryTest extends AbstractTestClass {
 			return "filename";
 		}
 
-		public byte[] getFile(String id, String filename)
+		public InputStream getInputStream(String id, String filename)
 				throws FileNotFoundException, IOException {
-			return new byte[0];
+			return new ByteArrayInputStream(new byte[0]);
 		}
+
 	}
 
 	/** This class has no zero-argument constructor. */
@@ -172,10 +174,11 @@ public class FileStorageFactoryTest extends AbstractTestClass {
 			return "filename";
 		}
 
-		public byte[] getFile(String id, String filename)
+		public InputStream getInputStream(String id, String filename)
 				throws FileNotFoundException, IOException {
-			return new byte[0];
+			return new ByteArrayInputStream(new byte[0]);
 		}
+
 	}
 
 	/** This class does not implement the FileStorage interface. */
