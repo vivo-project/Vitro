@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.io.Reader;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -69,10 +70,10 @@ public class FileStorageImpl implements FileStorage {
 		checkNamespacesValid(namespaces);
 
 		this.baseDir = baseDir;
-		this.rootDir = new File(this.baseDir, "file_storage_root");
+		this.rootDir = new File(this.baseDir, FILE_STORAGE_ROOT);
 
 		this.namespaceFile = new File(baseDir,
-				"file_storage_namespaces.properties");
+				FILE_STORAGE_NAMESPACES_PROPERTIES);
 
 		if (rootDir.exists() && namespaceFile.exists()) {
 			this.namespacesMap = confirmNamespaces(namespaces);
@@ -80,15 +81,15 @@ public class FileStorageImpl implements FileStorage {
 			this.namespacesMap = mapNamespaces(namespaces);
 			initializeStorage();
 		} else if (rootDir.exists()) {
-			throw new IllegalStateException(
-					"Storage directory '' has been partially initialized. '"
-							+ rootDir.getPath() + "' exists, but '"
-							+ namespaceFile.getPath() + "' does not.");
+			throw new IllegalStateException("Storage directory '"
+					+ baseDir.getPath() + "' has been partially initialized. '"
+					+ FILE_STORAGE_ROOT + "' exists, but '"
+					+ FILE_STORAGE_NAMESPACES_PROPERTIES + "' does not.");
 		} else {
-			throw new IllegalStateException(
-					"Storage directory '' has been partially initialized. '"
-							+ namespaceFile.getPath() + "' exists, but '"
-							+ rootDir.getPath() + "' does not.");
+			throw new IllegalStateException("Storage directory '"
+					+ baseDir.getPath() + "' has been partially initialized. '"
+					+ FILE_STORAGE_NAMESPACES_PROPERTIES + "' exists, but '"
+					+ FILE_STORAGE_ROOT + "' does not.");
 		}
 	}
 
@@ -222,9 +223,11 @@ public class FileStorageImpl implements FileStorage {
 	private Map<Character, String> confirmNamespaces(
 			Collection<String> namespaces) throws IOException {
 		Map<Character, String> map;
+		Reader reader = null;
 		try {
+			reader = new FileReader(this.namespaceFile);
 			Properties props = new Properties();
-			props.load(new FileReader(this.namespaceFile));
+			props.load(reader);
 			map = new HashMap<Character, String>();
 			for (Object key : props.keySet()) {
 				char keyChar = key.toString().charAt(0);
@@ -232,6 +235,14 @@ public class FileStorageImpl implements FileStorage {
 			}
 		} catch (Exception e) {
 			throw new IOException("Problem loading the namespace file.");
+		} finally {
+			if (reader != null) {
+				try {
+					reader.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 
 		Set<String> requestedNamespaces = new HashSet<String>(namespaces);
@@ -249,11 +260,28 @@ public class FileStorageImpl implements FileStorage {
 	}
 
 	// ----------------------------------------------------------------------
+	// package access methods -- used in unit tests.
+	// ----------------------------------------------------------------------
+
+	File getBaseDir() {
+		return this.baseDir;
+	}
+
+	Map<Character, String> getNamespaces() {
+		return this.namespacesMap;
+	}
+
+	// ----------------------------------------------------------------------
 	// Public methods
 	// ----------------------------------------------------------------------
 
 	/**
 	 * {@inheritDoc}
+	 * 
+	 * <p>
+	 * Before creating the file, we may need to create one or more parent
+	 * directories to put it in.
+	 * </p>
 	 */
 	@Override
 	public void createFile(String id, String filename, InputStream bytes)
@@ -266,6 +294,16 @@ public class FileStorageImpl implements FileStorage {
 
 		File file = FileStorageHelper.getFullPath(this.rootDir, id, filename,
 				this.namespacesMap);
+		File parent = file.getParentFile();
+
+		if (!parent.exists()) {
+			parent.mkdirs();
+			if (!parent.exists()) {
+				throw new IOException(
+						"Failed to create parent directories for file with ID '"
+								+ id + "', file location '" + file + "'");
+			}
+		}
 
 		OutputStream out = null;
 		try {

@@ -43,14 +43,24 @@ public class FileStorageHelper {
 			'=', '+' };
 
 	/**
+	 * Windows reserves these names (case-insensitive), so they can't be used
+	 * for directories or files.
+	 */
+	public static final String[] WINDOWS_RESERVED_NAMES = new String[] { "CON",
+			"PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "COM4", "COM5",
+			"COM6", "COM7", "COM8", "COM9", "LPT1", "LPT2", "LPT3", "LPT4",
+			"LPT5", "LPT6", "LPT7", "LPT8", "LPT9" };
+
+	/**
 	 * Encode the filename as needed to guard against illegal characters.
 	 * 
 	 * @see edu.cornell.mannlib.vitro.webapp.utils.filestorage
 	 */
 	public static String encodeName(String filename) {
 		String hexed = addHexEncoding(filename);
-		return addSingleCharacterConversions(hexed,
+		String cleaned = addSingleCharacterConversions(hexed,
 				NAME_SINGLE_CHARACTER_SOURCES, NAME_SINGLE_CHARACTER_TARGETS);
+		return excludeWindowsReservedNames(cleaned);
 	}
 
 	/**
@@ -124,14 +134,44 @@ public class FileStorageHelper {
 	}
 
 	/**
+	 * If a requested filename, after cleaning, is one of the Windows reserved
+	 * words, add a tilde in front.
+	 */
+	private static String excludeWindowsReservedNames(String cleanedName) {
+		for (String word : WINDOWS_RESERVED_NAMES) {
+			if (word.equalsIgnoreCase(cleanedName)) {
+				return '~' + cleanedName;
+			}
+		}
+		return cleanedName;
+	}
+
+	/**
 	 * Restore the filename to its original form, removing the encoding.
 	 * 
 	 * @see edu.cornell.mannlib.vitro.webapp.utils.filestorage
 	 */
-	public static String decodeName(String coded) {
-		String hexed = removeSingleCharacterConversions(coded,
+	public static String decodeName(String stored) {
+		String unexcluded = unexcludeWindowsReservedNames(stored);
+		String hexed = removeSingleCharacterConversions(unexcluded,
 				NAME_SINGLE_CHARACTER_SOURCES, NAME_SINGLE_CHARACTER_TARGETS);
 		return removeHexEncoding(hexed);
+	}
+
+	/**
+	 * If the stored filename was a tilde followed by a Windows reserved word,
+	 * strip the tilde.
+	 */
+	private static String unexcludeWindowsReservedNames(String stored) {
+		if (stored.startsWith("~")) {
+			String remainder = stored.substring(1);
+			for (String word : WINDOWS_RESERVED_NAMES) {
+				if (word.equalsIgnoreCase(remainder)) {
+					return remainder;
+				}
+			}
+		}
+		return stored;
 	}
 
 	/**
@@ -186,7 +226,7 @@ public class FileStorageHelper {
 	 * Translate the object ID to a relative directory path. A recognized
 	 * namespace is translated to its prefix, and illegal characters are
 	 * encoded. The resulting string is broken up into 3-character directory
-	 * names (or less).
+	 * names (or less). Windows reserved words are prefixed with tilde.
 	 * 
 	 * @see edu.cornell.mannlib.vitro.webapp.utils.filestorage
 	 */
@@ -206,7 +246,11 @@ public class FileStorageHelper {
 		String cleaned = addSingleCharacterConversions(hexed,
 				PATH_SINGLE_CHARACTER_SOURCES, PATH_SINGLE_CHARACTER_TARGETS);
 		String prefixed = applyPrefixChar(prefix, cleaned);
-		return insertPathDelimiters(prefixed);
+		String brokenUp = insertPathDelimiters(prefixed);
+		String result = excludeWindowsWordsFromPath(brokenUp);
+		LOG.debug("id2Path: id='" + id + "', namespaces='" + namespacesMap
+				+ "', path='" + result + "'");
+		return result;
 	}
 
 	/**
@@ -232,7 +276,29 @@ public class FileStorageHelper {
 			}
 			path.append(prefixed.charAt(i));
 		}
+		LOG.debug("Insert path delimiters to '" + prefixed + "' giving '"
+				+ path + "'");
 		return path.toString();
+	}
+
+	/**
+	 * Check each part in the path, and if it is a Windows reserved word, add a
+	 * tilde. This only applies to the relative path.
+	 */
+	private static String excludeWindowsWordsFromPath(String rawPath) {
+		String path = rawPath.replace(File.separatorChar, '/');
+		String[] parts = path.split("/");
+		
+		StringBuilder newPath = new StringBuilder();
+		
+		for (int i = 0; i < parts.length; i++) {
+			String part = excludeWindowsReservedNames(parts[i]);
+			if (i > 0) {
+				newPath.append(File.separatorChar);
+			}
+			newPath.append(part);
+		}
+		return newPath.toString();
 	}
 
 	/**

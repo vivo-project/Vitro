@@ -134,8 +134,17 @@
  *     </li> 
  *     <li>
  *       <strong>Path breakdown</strong> -
- *       Finally, path separator characters are inserted after every third 
- *       character in the processed ID string.
+ *       Path separator characters are inserted after every third character 
+ *       in the processed ID string.
+ *     </li> 
+ *     <li>
+ *       <strong>Exclusion of reserved Windows filenames</strong> -
+ *       Windows will not permit certain specific filename or directory names,
+ *       so if any part of the path would be equal to one of those reserved
+ *       names, it is prefixed with a tilde. The reserved names are:
+ *       CON, PRN, AUX, NUL, COM1, COM2, COM3, COM4, COM5, COM6, COM7, COM8, 
+ *       COM9, LPT1, LPT2, LPT3, LPT4, LPT5, LPT6, LPT7, LPT8, and LPT9.
+ *       And remember, Windows is case-insensitive. 
  *     </li> 
  *   </ul>
  *   Examples:
@@ -161,7 +170,8 @@
  * 
  * <p>
  *   The encoding process is the same as the "rare character encoding" and 
- *   "common character encoding" steps used for ID encoding.
+ *   "common character encoding" steps used for ID encoding, except that 
+ *   periods are not encoded.
  * </p>
  */
 

@@ -48,6 +48,16 @@ public class FileStorageHelperTest {
 	private static File FULL_RESULT_PATH = new File(
 			"/usr/local/vivo/uploads/file_storage_root/b~n/323/4,X/XX/myPhoto.jpg");
 
+	private static Map<Character, String> WINDOWS_PREFIX_MAP = initWindowsPrefixMap();
+	/** This reserved word will be modified. */
+	private static String WINDOWS_NAME = "lpT8";
+	/** This ID would translate to a path with a reserved word. */
+	private static String WINDOWS_ID = "prefix:createdConflict";
+	/** Not allowed to change the root, even if it contains reserved words. */
+	private static File WINDOWS_ROOT = new File("/usr/aux/root/");
+	private static File WINDOWS_FULL_PATH = new File(
+			"/usr/aux/root/a~c/rea/ted/~Con/fli/ct/~lpT8");
+
 	private static Map<Character, String> EMPTY_NAMESPACES = Collections
 			.emptyMap();
 	private static Map<Character, String> NAMESPACES = initPrefixMap();
@@ -56,6 +66,12 @@ public class FileStorageHelperTest {
 		Map<Character, String> map = new HashMap<Character, String>();
 		map.put('a', "junk");
 		map.put('b', "http://vivo.myDomain.edu/file/");
+		return map;
+	}
+
+	private static Map<Character, String> initWindowsPrefixMap() {
+		Map<Character, String> map = new HashMap<Character, String>();
+		map.put('a', "prefix:");
 		return map;
 	}
 
@@ -197,6 +213,13 @@ public class FileStorageHelperTest {
 		File actual = FileStorageHelper.getFullPath(FULL_ROOT, FULL_ID,
 				FULL_NAME, NAMESPACES);
 		assertEquals("fullPath", FULL_RESULT_PATH, actual);
+	}
+
+	@Test
+	public void checkWindowsExclusions() {
+		File actual = FileStorageHelper.getFullPath(WINDOWS_ROOT, WINDOWS_ID,
+				WINDOWS_NAME, WINDOWS_PREFIX_MAP);
+		assertEquals("windows exclusion", WINDOWS_FULL_PATH, actual);
 	}
 
 }
