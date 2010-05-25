@@ -804,6 +804,7 @@
     <url-pattern>/listObjectPropertyStatements</url-pattern>
   </servlet-mapping>
 
+  <!--
   <servlet>
     <servlet-name>EntityListController</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.EntityListController</servlet-class>
@@ -812,7 +813,8 @@
     <servlet-name>EntityListController</servlet-name>
     <url-pattern>/entitylist</url-pattern>
   </servlet-mapping>
-
+  -->
+  
   <servlet>
     <servlet-name>IndividualListController</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListController</servlet-class>
@@ -863,28 +865,13 @@
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>CommentFormController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.CommentFormController</servlet-class>
+    <servlet-name>ContactFormController</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.ContactFormController</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>CommentFormController</servlet-name>
-    <url-pattern>/comments</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>CommentFormController</servlet-name>
+    <servlet-name>ContactFormController</servlet-name>
     <url-pattern>/contact</url-pattern>
   </servlet-mapping>
-  
-  <!-- TEMPORARY - for comparison with new version -->
-  <servlet>
-    <servlet-name>CommentsController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.CommentsController</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>CommentsController</servlet-name>
-    <url-pattern>/comments-old</url-pattern>
-  </servlet-mapping>
-  <!-- end TEMPORARY -->
   
   <servlet>
     <servlet-name>JSON Service</servlet-name>

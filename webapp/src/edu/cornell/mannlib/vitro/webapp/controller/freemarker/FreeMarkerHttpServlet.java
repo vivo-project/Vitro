@@ -193,7 +193,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 
         urls.put("about", getUrl(Routes.ABOUT, portalParam));
         if (ContactMailServlet.getSmtpHostFromProperties() != null) {
-            urls.put("contact", getUrl(Routes.COMMENT_FORM, portalParam));
+            urls.put("contact", getUrl(Routes.CONTACT, portalParam));
         }
         urls.put("search", getUrl(Routes.SEARCH));
         urls.put("termsOfUse", getUrl(Routes.TERMS_OF_USE, portalParam));        

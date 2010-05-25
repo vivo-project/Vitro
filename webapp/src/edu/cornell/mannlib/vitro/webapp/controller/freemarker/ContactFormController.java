@@ -25,10 +25,10 @@ import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
  *  Controller for comments ("contact us") page
  *  * @author bjl23
  */
-public class CommentFormController extends FreeMarkerHttpServlet {
+public class ContactFormController extends FreeMarkerHttpServlet {
 
     private static final long serialVersionUID = 1L;
-    private static final Log log = LogFactory.getLog(CommentFormController.class.getName());
+    private static final Log log = LogFactory.getLog(ContactFormController.class.getName());
     
     protected String getTitle() {
         return appName + " Feedback Form";
@@ -43,13 +43,13 @@ public class CommentFormController extends FreeMarkerHttpServlet {
             body.put("errorMessage", 
                      "This application has not yet been configured to send mail. " +
                      "An smtp host has not been specified in the configuration properties file.");
-            bodyTemplate = "commentForm/error.ftl";
+            bodyTemplate = "contactForm/error.ftl";
         }
         
         else if (StringUtils.isEmpty(portal.getContactMail())) {
             body.put("errorMessage", 
                     "The site administrator has not configured an email address to receive the form submission.");
-            bodyTemplate = "commentForm/error.ftl";            
+            bodyTemplate = "contactForm/error.ftl";            
         }
         
         else {
@@ -75,12 +75,12 @@ public class CommentFormController extends FreeMarkerHttpServlet {
 
             // Not used in template. Is it used in processing the form?
             if (vreq.getHeader("Referer") == null) {
-                vreq.getSession().setAttribute("commentsFormReferer","none");
+                vreq.getSession().setAttribute("contactFormReferer","none");
             } else {
-                vreq.getSession().setAttribute("commentsFormReferer",vreq.getHeader("Referer"));
+                vreq.getSession().setAttribute("contactFormReferer",vreq.getHeader("Referer"));
             }
            
-            bodyTemplate = "commentForm/form.ftl";
+            bodyTemplate = "contactForm/form.ftl";
         }
         
         return mergeBodyToTemplate(bodyTemplate, body);

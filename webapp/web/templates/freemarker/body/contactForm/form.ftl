@@ -33,7 +33,7 @@
         <input type="hidden" name="RequiredFieldsNames" value="Name,Email address,Comments"/>
         <input type="hidden" name="EmailFields" value="webuseremail"/>
         <input type="hidden" name="EmailFieldsNames" value="emailaddress"/>
-        <input type="hidden" name="DeliveryType" value="comment"/>
+        <input type="hidden" name="DeliveryType" value="contact"/>
     
         <label for="webusername">Full name</label>
         <p><input style="width:33%;" type="text" name="webusername" maxlength="255"/></p>

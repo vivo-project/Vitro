@@ -1,6 +1,6 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
-<#-- Confirmation page for comment form -->
+<#-- Contact form submission confirmation page -->
 
 <h2>Thank you for your feedback</h2>
 <img src="${siteIconPath}/mail.gif" alt="mailbox"/><br/>

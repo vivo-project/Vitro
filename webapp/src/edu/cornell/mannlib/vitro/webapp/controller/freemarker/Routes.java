@@ -9,9 +9,9 @@ public class Routes {
 
     public static final String ABOUT = "/about";
     public static final String BROWSE = "/browse";
-    public static final String COMMENT_FORM = "/comments";
+    public static final String CONTACT = "/contact";
     public static final String INDIVIDUAL = "/individual";
-    public static final String INDIVIDUAL_LIST = "/individuallist"; // "/entitylist"; "/individuallist";
+    public static final String INDIVIDUAL_LIST = "/individuallist"; 
     public static final String SEARCH = "/search"; 
     public static final String TERMS_OF_USE = "/termsOfUse";
     

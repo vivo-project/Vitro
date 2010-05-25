@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Calendar;
 import java.util.Date;
@@ -77,7 +78,7 @@ public class ContactMailController extends FreeMarkerHttpServlet {
             body.put("errorMessage", 
                     "This application has not yet been configured to send mail. " +
                     "An smtp host has not been specified in the configuration properties file.");
-            bodyTemplate = "commentForm/error.ftl";
+            bodyTemplate = "contactForm/error.ftl";
         }
         
         else {
@@ -93,7 +94,7 @@ public class ContactMailController extends FreeMarkerHttpServlet {
                 // rjy7 We should reload the form, not go to the error page!
                 body.put("errorMessage", 
                         "Invalid submission");
-            	bodyTemplate = "commentForm/error.ftl";
+            	bodyTemplate = "contactForm/error.ftl";
             }
             
             else {
@@ -103,9 +104,9 @@ public class ContactMailController extends FreeMarkerHttpServlet {
                 
                 String spamReason = null;
                 
-                String originalReferer = (String) vreq.getSession().getAttribute("commentsFormReferer");        		
+                String originalReferer = (String) vreq.getSession().getAttribute("contactFormReferer");        		
                 if (originalReferer != null) {
-                	vreq.getSession().removeAttribute("commentsFormReferer");
+                	vreq.getSession().removeAttribute("contactFormReferer");
                 	/* does not support legitimate clients that don't send the Referer header
                 	  String referer = request.getHeader("Referer");
                       if (referer == null || 
@@ -132,7 +133,7 @@ public class ContactMailController extends FreeMarkerHttpServlet {
                 int recipientCount = 0;
                 String deliveryfrom = null;
         
-                if ("comment".equals(formType)) {
+                if ("contact".equals(formType)) {
                     if (portal.getContactMail() == null || portal.getContactMail().trim().length()==0) {
                         LOG.error("No contact mail address defined in current portal "+portal.getPortalId());
                         throw new Error(
@@ -142,18 +143,6 @@ public class ContactMailController extends FreeMarkerHttpServlet {
                         deliverToArray = portal.getContactMail().split(",");
                     }
                     deliveryfrom   = "Message from the "+portal.getAppName()+" Contact Form";
-                } else if ("correction".equals(formType)) {
-                    if (portal.getCorrectionMail() == null || portal.getCorrectionMail().trim().length()==0) {
-                        LOG.error("Expecting one or more correction email addresses to be specified in current portal "+portal.getPortalId()+"; will attempt to use contact mail address");
-                        if (portal.getContactMail() == null || portal.getContactMail().trim().length()==0) {
-                            LOG.error("No contact mail address or correction mail address defined in current portal "+portal.getPortalId());
-                        } else {
-                            deliverToArray = portal.getContactMail().split(",");
-                        }
-                    } else {
-                        deliverToArray = portal.getCorrectionMail().split(",");
-                    }
-                    deliveryfrom   = "Message from the "+portal.getAppName()+" Correction Form (ARMANN-nospam)";
                 } else {
                     deliverToArray = portal.getContactMail().split(",");
                     statusMsg = SPAM_MESSAGE ;
@@ -212,10 +201,10 @@ public class ContactMailController extends FreeMarkerHttpServlet {
                 
                 // Message was sent successfully
                 if (statusMsg == null && spamReason == null) {                  
-                    bodyTemplate = "commentForm/confirmation.ftl";
+                    bodyTemplate = "contactForm/confirmation.ftl";
                 } else {
                     body.put("errorMessage", statusMsg);
-                    bodyTemplate = "commentForm/error.ftl";
+                    bodyTemplate = "contactForm/error.ftl";
                 }   
             }
         }
@@ -238,7 +227,7 @@ public class ContactMailController extends FreeMarkerHttpServlet {
     							String originalReferer, String ipAddr) {
  
         Map<String, Object> email = new HashMap<String, Object>();
-        String template = "commentForm/email.ftl";
+        String template = "contactForm/email.ftl";
         
         email.put("subject", deliveryfrom);
         email.put("name", webusername);
@@ -254,21 +243,23 @@ public class ContactMailController extends FreeMarkerHttpServlet {
     
     private void writeBackupCopy(PrintWriter outFile, String msgText, 
     		String spamReason) {
+
+        Map<String, Object> backup = new HashMap<String, Object>();
+        String template = "contactForm/backup.ftl";
+        
     	Calendar cal = Calendar.getInstance();
-        outFile.println("<hr/>");
-        outFile.println();
-        outFile.println("<p>"+cal.getTime()+"</p>");
-        outFile.println();
+    	backup.put("datetime", cal.getTime().toString());
+
         if (spamReason != null) {
-            outFile.println("<p>REJECTED - SPAM</p>");
-            outFile.println("<p>"+spamReason+"</p>");
-            outFile.println();
+            backup.put("spamReason", spamReason);
         }
-        outFile.print( msgText );
-        outFile.println();
-        outFile.println();
+        
+        backup.put("msgText", msgText);
+
+        String backupText = mergeBodyToTemplate(template, backup);
+        outFile.print(backupText);
         outFile.flush();
-        // outFile.close();
+        //outFile.close(); 
     }
     
     private void sendMessage(Session s, String webuseremail, String webusername,
