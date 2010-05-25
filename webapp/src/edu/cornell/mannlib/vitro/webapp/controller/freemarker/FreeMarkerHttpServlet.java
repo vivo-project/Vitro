@@ -66,17 +66,12 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 	protected String appName;
 	protected Map<String, Object> root = new HashMap<String, Object>();
     
-	// Some servlets have their own doGet() method, in which case they need to call 
-	// doSetup(), setTitle(), setBody(), and write() themselves. Other servlets define only
-	// a getBody() and getTitle() method and use the parent doGet() method.
     public void doGet( HttpServletRequest request, HttpServletResponse response )
 		throws IOException, ServletException {
 
     	try {
-    	    callSuperGet(request, response);  // ??
 	        doSetup(request, response);
-	        setTitle();	        
-	        setBody();	        
+	        setTitleAndBody();
 	        write(response);
        
 	    } catch (Throwable e) {
@@ -90,89 +85,22 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 	    throws ServletException, IOException {
 		doGet(request, response);
 	}
-	
-	protected void setBody() {
-	    root.put("body", getBody());
-	}
-	
-	protected void setSharedVariable(String key, Object value) {
-        try {
-            config.setSharedVariable(key, value);
-        } catch (TemplateModelException e) {
-            log.error("Can't set shared variable '" + key + "'.");
-        }	    
-	}
-	
-	protected void setTitle() {
-	    setSharedVariable("title", getTitle());	    
-	}
 
-    protected String getTitle() { 
-    	return null; 
-    }
-    
-    protected String getBody() {
-    	return null;
-    }
-    
-    protected StringWriter mergeToTemplate(String templateName, Map<String, Object> map) {
-    	
-        Template template = null;
-        try {
-        	template = config.getTemplate(templateName);
-        } catch (IOException e) {
-        	log.error("Cannot get template " + templateName);
-        }
-        StringWriter sw = new StringWriter();
-        if (template != null) {	        
-            try {
-				template.process(map, sw);
-			} catch (TemplateException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}        	
-        }
-        return sw;
-    }
-
-    protected String mergeBodyToTemplate(String templateName, Map<String, Object> map) {
-        templateName = "body/" + templateName;
-    	String body = mergeToTemplate(templateName, map).toString();
-    	return body;
-    }
-    
-    protected void write(HttpServletResponse response) {
-
-        String templateName = "page/default.ftl";
-        StringWriter sw = mergeToTemplate(templateName, root);          
-        try {
-            PrintWriter out = response.getWriter();
-            out.print(sw);     
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }                    
-    }
-    
-    protected void callSuperGet(HttpServletRequest request, HttpServletResponse response) {
-        try {
-            super.doGet(request,response);   
-        } catch (ServletException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }       
-    }
-    
-    // RY This needs to be broken out as is for FreeMarkerComponentGenerator, which should not
-    // include callSuperGet(). So it's only temporary.
+	// Basic setup needed by all controllers
     protected void doSetup(HttpServletRequest request, HttpServletResponse response) {
- 
+        
+        if ( !(this instanceof FreeMarkerComponentGenerator) ) {
+            try {
+                super.doGet(request,response);   
+            } catch (ServletException e) {
+                log.error("Servlet exception calling VitroHttpRequest.doGet()");
+                e.printStackTrace();
+            } catch (IOException e) {
+                log.error("IO exception calling VitroHttpRequest.doGet()");
+                e.printStackTrace();
+            }                
+        }
+        
         vreq = new VitroRequest(request);
         this.response = response;
         portal = vreq.getPortal(); 
@@ -209,6 +137,34 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         // Here themeDir SHOULD NOT have the context path already added to it.
         setSharedVariable("stylesheets", new StylesheetList(themeDir)); 
         setSharedVariable("scripts", new ScriptList()); 
+    }
+
+    // Define template locations. Template loader will look first in the theme-specific
+    // location, then in the vitro location.
+    // RY We cannot do this in FreeMarkerSetup because (a) the theme depends on the portal,
+    // and we have multi-portal installations, and (b) we need to support theme-switching on the fly.
+    // To make more efficient, we could do this once, and then have a listener that does it again 
+    // when theme is switched. BUT this doesn't support (a), only (b), so  we have to do it on every request.
+    protected final void setTemplateLoader() {
+        
+        String themeTemplateDir = context.getRealPath(getThemeDir()) + "/ftl";
+        String vitroTemplateDir = context.getRealPath("/templates/freemarker");
+
+        try {
+            FileTemplateLoader themeFtl = new FileTemplateLoader(new File(themeTemplateDir));
+            FileTemplateLoader vitroFtl = new FileTemplateLoader(new File(vitroTemplateDir));
+            ClassTemplateLoader ctl = new ClassTemplateLoader(getClass(), "");
+            TemplateLoader[] loaders = new TemplateLoader[] { themeFtl, vitroFtl, ctl };
+            MultiTemplateLoader mtl = new MultiTemplateLoader(loaders);
+            config.setTemplateLoader(mtl);
+        } catch (IOException e) {
+            log.error("Error loading templates");
+        }
+        
+    }
+
+    private TabMenu getTabMenu() {
+        return new TabMenu(vreq, portalId);
     }
     
     public String getThemeDir() {
@@ -252,31 +208,31 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         setSharedVariable("urls", urls); 
     }
 
-	private final void setLoginInfo() {
-		
-	    String loginName = null;
-	    int securityLevel;
-	    
-	    HttpSession session = vreq.getSession();
-	    LoginFormBean loginBean = (LoginFormBean) session.getAttribute("loginHandler");
-	    if (loginBean != null && loginBean.testSessionLevel(vreq) > -1) {
-	        loginName = loginBean.getLoginName();
-	        securityLevel = Integer.parseInt(loginBean.getLoginRole());
-	    }   
-	    if (loginName != null) {
-	    	root.put("loginName", loginName);
+    private final void setLoginInfo() {
+        
+        String loginName = null;
+        int securityLevel;
+        
+        HttpSession session = vreq.getSession();
+        LoginFormBean loginBean = (LoginFormBean) session.getAttribute("loginHandler");
+        if (loginBean != null && loginBean.testSessionLevel(vreq) > -1) {
+            loginName = loginBean.getLoginName();
+            securityLevel = Integer.parseInt(loginBean.getLoginRole());
+        }   
+        if (loginName != null) {
+            root.put("loginName", loginName);
 
-	    	securityLevel = Integer.parseInt(loginBean.getLoginRole());
-	    	if (securityLevel >= FILTER_SECURITY_LEVEL) {
-	    		ApplicationBean appBean = vreq.getAppBean();
-	    		if (appBean.isFlag1Active()) {
-	    			root.put("showFlag1SearchField", true);
-	    		}
-	    	}	    	
-	    } 	    
-	}   
-	
-	private final void setCopyrightInfo() {
+            securityLevel = Integer.parseInt(loginBean.getLoginRole());
+            if (securityLevel >= FILTER_SECURITY_LEVEL) {
+                ApplicationBean appBean = vreq.getAppBean();
+                if (appBean.isFlag1Active()) {
+                    root.put("showFlag1SearchField", true);
+                }
+            }           
+        }       
+    }   
+    
+    private final void setCopyrightInfo() {
 
         String copyrightText = portal.getCopyrightAnchor();
         if ( ! StringUtils.isEmpty(copyrightText) ) {
@@ -289,13 +245,13 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
             copyright.put("url", portal.getCopyrightURL());
             root.put("copyright", copyright);
         } 
-	}
-	
-	private final void setThemeInfo(String themeDir) {
+    }
+    
+    private final void setThemeInfo(String themeDir) {
 
-	    // This value will be available to any template as a path for adding a new stylesheet.
-	    // It does not contain the context path, because the methods to generate the href
-	    // attribute from the string passed in by the template automatically add the context path.
+        // This value will be available to any template as a path for adding a new stylesheet.
+        // It does not contain the context path, because the methods to generate the href
+        // attribute from the string passed in by the template automatically add the context path.
         setSharedVariable("stylesheetDir", themeDir + "/css");
         
         String themeDirWithContext = getUrl(themeDir);
@@ -305,41 +261,107 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         
         setSharedVariable("siteIconPath", themeDirWithContext + "/site_icons");
 
-	}
-
-    // Define template locations. Template loader will look first in the theme-specific
-    // location, then in the vitro location.
-    // RY We cannot do this in FreeMarkerSetup because (a) the theme depends on the portal,
-    // and we have multi-portal installations, and (b) we need to support theme-switching on the fly.
-    // To make more efficient, we could do this once, and then have a listener that does it again 
-    // when theme is switched. BUT this doesn't support (a), only (b), so  we have to do it on every request.
-	protected final void setTemplateLoader() {
-	    
-	    String themeTemplateDir = context.getRealPath(getThemeDir()) + "/ftl";
-	    String vitroTemplateDir = context.getRealPath("/templates/freemarker");
-
-        try {
-            FileTemplateLoader themeFtl = new FileTemplateLoader(new File(themeTemplateDir));
-            FileTemplateLoader vitroFtl = new FileTemplateLoader(new File(vitroTemplateDir));
-            ClassTemplateLoader ctl = new ClassTemplateLoader(getClass(), "");
-            TemplateLoader[] loaders = new TemplateLoader[] { themeFtl, vitroFtl, ctl };
-            MultiTemplateLoader mtl = new MultiTemplateLoader(loaders);
-            config.setTemplateLoader(mtl);
-        } catch (IOException e) {
-            log.error("Error loading templates");
-        }
-        
-	}
+    }
     
-	private TabMenu getTabMenu() {
-	    return new TabMenu(vreq, portalId);
+    // Default case is to set title first, because it's used in the body. However, in some cases
+    // the title is based on values computed during compilation of the body (e.g., IndividualListController). 
+    // Individual controllers can override this method to set title and body together. End result must be:
+    // body is added to root with key "body" 
+    // title is set as a shared variable with key "title" 
+    // This can be achieved by making sure setBody() and setTitle() are called.
+    protected void setTitleAndBody() {
+        setTitle();
+        setBody();
+    }
+
+	protected void setBody() {
+	    root.put("body", getBody());
 	}
 
+    protected String getBody() {
+        return ""; // body should never be null
+    }
+    
+	protected void setTitle() {
+	    String title = getTitle();
+	    // If the individual controller fails to assign a non-null, non-empty title
+	    if (StringUtils.isEmpty(title)) {
+	        title = appName;
+	    }
+	    // Title is a shared variable because it's used in both body and head elements.
+	    setSharedVariable("title", title); 
+	}
+	
+    protected String getTitle() { 
+    	return "";
+    }
+
+    protected void setSharedVariable(String key, Object value) {
+        try {
+            config.setSharedVariable(key, value);
+        } catch (TemplateModelException e) {
+            log.error("Can't set shared variable '" + key + "'.");
+        }       
+    }
+    
+    protected StringWriter mergeToTemplate(String templateName, Map<String, Object> map) {
+    	
+        Template template = null;
+        try {
+        	template = config.getTemplate(templateName);
+        } catch (IOException e) {
+        	log.error("Cannot get template " + templateName);
+        }
+        StringWriter sw = new StringWriter();
+        if (template != null) {	        
+            try {
+				template.process(map, sw);
+			} catch (TemplateException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}        	
+        }
+        return sw;
+    }
+
+    protected String mergeBodyToTemplate(String templateName, Map<String, Object> map) {
+        templateName = "body/" + templateName;
+    	String body = mergeToTemplate(templateName, map).toString();
+    	return body;
+    }
+    
+    protected void write(HttpServletResponse response) {
+
+        String templateName = "page/" + getPageTemplateName();
+        
+        StringWriter sw = mergeToTemplate(templateName, root);          
+        try {
+            PrintWriter out = response.getWriter();
+            out.print(sw);     
+        } catch (IOException e) {
+            log.error("FreeMarkerHttpServlet cannot write output");
+            e.printStackTrace();
+        }                    
+    }
+    
+    // Can be overridden by individual controllers
+    protected String getPageTemplateName() {
+        return "default.ftl";
+    }
+
+
+    public static boolean isConfigured() {
+        return config != null;
+    }
+    
     // TEMPORARY for transition from JSP to FreeMarker. Once transition
     // is complete and no more pages are generated in JSP, this can be removed.
     // Do this if FreeMarker is configured (i.e., not Datastar) and if we are not in
     // a FreeMarkerHttpServlet, which will generate identity, menu, and footer from the page template.
-	// It's a static method because it needs to be called from JSPs that don't go through a servlet.
+    // It's a static method because it needs to be called from JSPs that don't go through a servlet.
     public static void getFreeMarkerComponentsForJsp(HttpServletRequest request, HttpServletResponse response) {
         FreeMarkerComponentGenerator fcg = new FreeMarkerComponentGenerator(request, response);
         request.setAttribute("ftl_identity", fcg.getIdentity());
@@ -347,12 +369,8 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         request.setAttribute("ftl_search", fcg.getSearch());
         request.setAttribute("ftl_footer", fcg.getFooter());       
     }
-
-    public static boolean isConfigured() {
-        return config != null;
-    }
     
-    /* ******************** Utilities ******************* */
+    /* ******************** Static utilities ******************* */
 
     public static String getUrl(String path) {
         if ( ! path.startsWith("/") ) {

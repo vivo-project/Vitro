@@ -11,7 +11,7 @@
             <ul>
                 <#list classGroup.classes as class> 
                     <li><a href="${class.url}">${class.name}</a> (${class.individualCount})</li>
-
+    
                 </#list>
             </ul>
         </#list>

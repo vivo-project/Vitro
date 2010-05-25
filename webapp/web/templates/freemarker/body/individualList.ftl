@@ -7,16 +7,21 @@
     <div class="individualList">
         <h2>${title}</h2>
         <#if subtitle??>
-            <h4>${subTitle}"</h4>
+            <h4>${subtitle}</h4>
         </#if>
         
-        <#-- RY NEED TO ACCOUNT FOR p:process stuff -->
-        <ul>
-            <#list individuals as individual>
-                <li>
-                    <a href="${individual.profileUrl}">${individual.name}</a> ${individual.tagline}                  
-                </li>
-            </#list>
-        </ul>
-    </div>
+        <#if message??>
+            <p>${message}</p>
+        <#else>
+            <#-- RY NEED TO ACCOUNT FOR p:process stuff -->
+            <ul>
+                <#list individuals as individual>
+                    <li>
+                        <a href="${individual.profileUrl}">${individual.name}</a> ${individual.tagline}                  
+                    </li>
+                </#list>
+            </ul>
+        </#if>
+    </div>   
+
 </div>

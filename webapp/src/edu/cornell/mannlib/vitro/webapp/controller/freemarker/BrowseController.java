@@ -18,11 +18,10 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
 import edu.cornell.mannlib.vitro.webapp.view.VClassGroupView;
+import freemarker.template.SimpleSequence;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import freemarker.template.*;
 
 import javax.servlet.ServletContext;
 
@@ -69,8 +68,10 @@ public class BrowseController extends FreeMarkerHttpServlet {
 
     protected String getBody() {
 
-    	Map body = new HashMap();
-    	
+    	Map<String, Object> body = new HashMap<String, Object>();
+        String bodyTemplate = "classGroups.ftl"; 
+        String message = null;
+        
     	// Set main page template attributes specific to this page
     	// But the template should control this! Try putting in a div inside the content.
     	//root.put("contentClass", "siteMap");
@@ -80,22 +81,25 @@ public class BrowseController extends FreeMarkerHttpServlet {
 
     	//PortalFlag portalState= vreq.getPortalFlag();
 
-    	String message = "";
-    	List<VClassGroup> groups = getGroups(vreq.getWebappDaoFactory().getVClassGroupDao(), vreq.getPortal().getPortalId());
+    	List<VClassGroup> groups = getGroups(vreq.getWebappDaoFactory().getVClassGroupDao(), portalId);
     	if (groups == null || groups.isEmpty()) {
     		message = "There are not yet any items in the system.";
-    		body.put("message", message); 
     	}
     	else {
-    	    List<VClassGroupView> vcgroups = new ArrayList<VClassGroupView>(groups.size());
-    		Iterator<VClassGroup> i = groups.iterator();
-    		while (i.hasNext()) {
-    		    vcgroups.add(new VClassGroupView(i.next()));
+    	    // FreeMarker will wrap vcgroups in a SimpleSequence. So do we want to create the SimpleSequence directly?
+    	    // But, makes code less portable to another system.
+    	    // SimpleSequence vcgroups = new SimpleSequence(groups.size());   	    
+    	    List<VClassGroupView> vcgroups = new ArrayList<VClassGroupView>(groups.size());   	    
+    		for (VClassGroup g: groups) {
+    		    vcgroups.add(new VClassGroupView(g));
     		}
     		body.put("classGroups", vcgroups);
-    	}     
-
-        String bodyTemplate = "classGroups.ftl";       
+    	} 
+    	
+    	if (message != null) {
+    	    body.put("message", message);
+    	} 
+    	
         return mergeBodyToTemplate(bodyTemplate, body);
     }
 

@@ -25,6 +25,8 @@ public class IndividualView extends ViewObject {
         return individual.getName();
     }
     
+    // RY However, the moniker should undergo p:process but the class name shouldn't! 
+    // So, it needs to be callable from Java.
     public String getTagline() {
         String tagline = individual.getMoniker();
         return StringUtils.isEmpty(tagline) ? individual.getVClass().getName() : tagline;
