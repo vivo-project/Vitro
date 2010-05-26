@@ -7,6 +7,10 @@ import java.util.Arrays;
 import java.util.List;
 
 public class StringUtils {
+    
+    private StringUtils() {
+        throw new AssertionError();
+    }
 
     public static String capitalize(String s) {
         return s.substring(0, 1).toUpperCase() + s.substring(1);

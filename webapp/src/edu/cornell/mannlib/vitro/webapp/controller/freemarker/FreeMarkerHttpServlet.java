@@ -6,17 +6,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -39,7 +31,6 @@ import edu.cornell.mannlib.vitro.webapp.view.fileList.StylesheetList;
 import edu.cornell.mannlib.vitro.webapp.view.menu.TabMenu;
 import edu.cornell.mannlib.vitro.webapp.web.BreadCrumbsUtil;
 import edu.cornell.mannlib.vitro.webapp.web.PortalWebUtil;
-
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.cache.MultiTemplateLoader;
@@ -56,7 +47,6 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
     private static final int FILTER_SECURITY_LEVEL = LoginFormBean.EDITOR;
     
     protected static Configuration config = null;
-    protected static String contextPath = null; 
     protected static ServletContext context = null;
     
 	protected VitroRequest vreq;
@@ -179,31 +169,29 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         // view to control which links go where, and the link text and title.
         Map<String, String> urls = new HashMap<String, String>();
         
-        String rootBreadCrumbUrl = portal.getRootBreadCrumbURL();
-        String homeUrl = StringUtils.isEmpty(rootBreadCrumbUrl) ? contextPath : rootBreadCrumbUrl; 
-        urls.put("home", homeUrl);
+        urls.put("home", Routes.getHomeUrl(portal));
 
         String bannerImage = portal.getBannerImage();
         if ( ! StringUtils.isEmpty(bannerImage)) {
-            root.put("bannerImage", getUrl(themeDir + "site_icons/" + bannerImage));
+            root.put("bannerImage", Routes.getUrl(themeDir + "site_icons/" + bannerImage));
         }
         
         Map<String, String> portalParam = new HashMap<String, String>();
         portalParam.put("home", "" + portalId);
 
-        urls.put("about", getUrl(Routes.ABOUT, portalParam));
+        urls.put("about", Routes.getUrl(Routes.ABOUT, portalParam));
         if (ContactMailServlet.getSmtpHostFromProperties() != null) {
-            urls.put("contact", getUrl(Routes.CONTACT, portalParam));
+            urls.put("contact", Routes.getUrl(Routes.CONTACT, portalParam));
         }
-        urls.put("search", getUrl(Routes.SEARCH));
-        urls.put("termsOfUse", getUrl(Routes.TERMS_OF_USE, portalParam));        
-        urls.put("login", getUrl(Routes.LOGIN));
+        urls.put("search", Routes.getUrl(Routes.SEARCH));
+        urls.put("termsOfUse", Routes.getUrl(Routes.TERMS_OF_USE, portalParam));        
+        urls.put("login", Routes.getUrl(Routes.LOGIN));
         
         Map<String, String> logoutParams = new HashMap<String, String>(portalParam);
         logoutParams.put("loginSubmitMode", "Log Out");
-        urls.put("logout", getUrl(Routes.LOGOUT, logoutParams));
+        urls.put("logout", Routes.getUrl(Routes.LOGOUT, logoutParams));
         
-        urls.put("siteAdmin", getUrl(Routes.SITE_ADMIN));     
+        urls.put("siteAdmin", Routes.getUrl(Routes.SITE_ADMIN));     
         
         setSharedVariable("urls", urls); 
     }
@@ -254,7 +242,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         // attribute from the string passed in by the template automatically add the context path.
         setSharedVariable("stylesheetDir", themeDir + "/css");
         
-        String themeDirWithContext = getUrl(themeDir);
+        String themeDirWithContext = Routes.getUrl(themeDir);
         
         // This value is used only in stylesheets.ftl and already contains the context path.
         root.put("stylesheetPath", themeDirWithContext + "/css");
@@ -368,53 +356,6 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         request.setAttribute("ftl_menu", fcg.getMenu());
         request.setAttribute("ftl_search", fcg.getSearch());
         request.setAttribute("ftl_footer", fcg.getFooter());       
-    }
-    
-    /* ******************** Static utilities ******************* */
-
-    public static String getUrl(String path) {
-        if ( ! path.startsWith("/") ) {
-            path = "/" + path;
-        }
-        return contextPath + path;
-    }
-    
-    public static String getUrl(String path, Map<String, String> params) {
-        String url = getUrl(path);
-        
-        Iterator<String> i = params.keySet().iterator();
-        String key, value;
-        String glue = "?";
-        while (i.hasNext()) {
-            key = i.next();
-            value = params.get(key);
-            url += glue + key + "=" + urlEncode(value);
-            glue = "&";
-        }
-        
-        return url;
-    }
-
-    public static String urlEncode(String url) {
-        String encoding = "ISO-8859-1";
-        String encodedUrl = null;
-        try {
-            encodedUrl = URLEncoder.encode(url, encoding);
-        } catch (UnsupportedEncodingException e) {
-            log.error("Error encoding url " + url + " with encoding " + encoding + ": Unsupported encoding.");
-        }
-        return encodedUrl;
-    }
-
-    public static String urlDecode(String url) {
-        String encoding = "ISO-8859-1";
-        String decodedUrl = null;
-        try {
-            decodedUrl = URLDecoder.decode(url, encoding);
-        } catch (UnsupportedEncodingException e) {
-            log.error("Error decoding url " + url + " with encoding " + encoding + ": Unsupported encoding.");
-        }
-        return decodedUrl;
     }
     
 }

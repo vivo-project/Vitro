@@ -51,12 +51,10 @@ public class FreeMarkerSetup implements ServletContextListener {
         }
 
 		FreeMarkerHttpServlet.config = cfg;  
-		
-		String contextPath = sc.getContextPath();
-		FreeMarkerHttpServlet.contextPath = contextPath;
-		FreeMarkerHttpServlet.context = sc;
-		// ViewObject.contextPath = contextPath; 
-		
+        FreeMarkerHttpServlet.context = sc;
+        
+		Routes.contextPath = sc.getContextPath();
+
 	}
 
 	public void contextDestroyed(ServletContextEvent event) {

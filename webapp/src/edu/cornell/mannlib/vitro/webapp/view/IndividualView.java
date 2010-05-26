@@ -44,13 +44,13 @@ public class IndividualView extends ViewObject {
         return getUrl("/individual/" + individual.getLocalName());
     }
     
-    public String getShortView() {
+    public String getListView() {
         // TODO
         // iterate through class hierarchy looking for a custom short view. If none, use
         // default individual short view. template will just do an include on individual.shortView
         // Use individual.getVClasses() - this is the class hierarchy
         // Question: what order are they returned in ? If from specific to general, break out of the iteration as soon as we find one.
-        return null;
+        return "defaultIndividualListView.ftl";
     }
     
     public String getCustomView() {

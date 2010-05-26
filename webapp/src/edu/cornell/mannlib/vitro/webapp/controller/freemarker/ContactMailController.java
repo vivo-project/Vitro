@@ -235,7 +235,7 @@ public class ContactMailController extends FreeMarkerHttpServlet {
         email.put("comments", comments);
         email.put("ip", ipAddr);
         if ( !(originalReferer == null || originalReferer.equals("none")) ) {
-            email.put("referrer", urlDecode(originalReferer));
+            email.put("referrer", Routes.urlDecode(originalReferer));
         }
     	
         return mergeBodyToTemplate(template, email);
