@@ -3,7 +3,6 @@
 <#-- List individual members of a class. -->
 
 <div class="contents">
-
     <div class="individualList">
         <h2>${title}</h2>
         <#if subtitle??>
@@ -17,11 +16,10 @@
             <ul>
                 <#list individuals as individual>
                     <li>
-                        <a href="${individual.profileUrl}">${individual.name}</a> ${individual.tagline}                  
+                        <#include "partials/defaultIndividualListView.ftl">              
                     </li>
                 </#list>
             </ul>
         </#if>
     </div>   
-
 </div>

@@ -131,8 +131,16 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 				    		</c:if>                                                       
 	        			</c:if>
 				    	<c:set var="objStyle" value="display: block;"/>
+				    	
+				    	<%-- rjy7 We have a logic problem here: if the custom short view dictates that the item NOT be rendered,
+                        and because of this there are NO items to render, we shouldn't show the label when not in edit mode. 
+                        Example: people ( = positionHistory) of an organization don't render if the position end date is in the past.
+                        So the organization might not have any current people, in which case we shouldn't show the "people" label.
+                        We need to compute objRows on the basis of the rendering, not the number of objectPropertyStatements.
+                        See NIHVIVO-512. --%>
+                        
 				    	<c:set var="objRows" value="${fn:length(objProp.objectPropertyStatements)}"/>
-				    	<c:if test="${objRows==0}"><c:set var="objStyle" value="display: block;"/></c:if>
+				    	<c:if test="${objRows==0}"><c:set var="objStyle" value="display: block;"/></c:if>				    					    	
 				    	<c:if test="${editableInSomeWay || objRows>0}">
 				    		<c:set var="first" value=""/><c:if test="${counter == 0}"><c:set var="first" value=" first"/></c:if>
             		        <c:set var="last" value=""/><c:if test="${(counter+1) == propTotal}"><c:set var="last" value=" last"/></c:if>

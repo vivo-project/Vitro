@@ -36,17 +36,18 @@ public class IndividualView extends ViewObject {
         return individual.getURI();
     }
     
-    // Or maybe getProfileUrl - there might be other kinds of urls
-    // e.g., getEditUrl, getDeleteUrl - these would return the computations of PropertyEditLinks
+    // Return link to individual's profile page.
+    // There may be other urls associated with the individual. E.g., we might need 
+    // getEditUrl(), getDeleteUrl() to return the links computed by PropertyEditLinks.
     // RY **** Need to account for everything in URLRewritingHttpServlet
     public String getProfileUrl() {
         return getUrl("/individual/" + individual.getLocalName());
     }
     
-    public String getRenderer() {
+    public String getShortView() {
         // TODO
-        // iterate through class hierarchy looking for a custom renderer. If none, use
-        // default individual renderer. template will just do an include on individual.renderer
+        // iterate through class hierarchy looking for a custom short view. If none, use
+        // default individual short view. template will just do an include on individual.shortView
         // Use individual.getVClasses() - this is the class hierarchy
         // Question: what order are they returned in ? If from specific to general, break out of the iteration as soon as we find one.
         return null;

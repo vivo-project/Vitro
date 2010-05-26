@@ -57,6 +57,14 @@ import edu.cornell.mannlib.vitro.webapp.web.jsptags.StringProcessorTag;
  * @author bdc34
  *
  */
+
+/* IMPLEMENTATION NOTES
+
+- See NIHVIVO-512:
+build up the list of actually rendered items first. Only then, if there are any, add the label on top. 
+
+*/
+
 public class IndividualController extends FreeMarkerHttpServlet {
     
     private static final long serialVersionUID = 1L;

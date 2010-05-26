@@ -18,7 +18,7 @@
             </@l.makeList>
         </ul>
     </div>
-  
+
     <#include "copyright.ftl">
 
     All Rights Reserved. <a href="${urls.termsOfUse}">Terms of Use</a>
