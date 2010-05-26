@@ -175,4 +175,4 @@
  * </p>
  */
 
-package edu.cornell.mannlib.vitro.webapp.utils.filestorage;
+package edu.cornell.mannlib.vitro.webapp.filestorage.backend;

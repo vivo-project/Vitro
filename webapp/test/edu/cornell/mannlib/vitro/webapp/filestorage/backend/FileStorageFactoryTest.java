@@ -1,8 +1,8 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.utils.filestorage;
+package edu.cornell.mannlib.vitro.webapp.filestorage.backend;
 
-import static edu.cornell.mannlib.vitro.webapp.utils.filestorage.FileStorageFactory.PROPERTY_IMPLEMETATION_CLASSNAME;
+import static edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageFactory.PROPERTY_IMPLEMETATION_CLASSNAME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
