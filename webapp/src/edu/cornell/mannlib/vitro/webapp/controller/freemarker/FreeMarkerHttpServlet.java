@@ -105,6 +105,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         // body template.
         portalId = portal.getPortalId();
         root.put("portalId", portalId);
+        System.out.println("PORTAL ID: " + portalId);
         
         appName = portal.getAppName();
         setSharedVariable("siteName", appName);

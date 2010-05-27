@@ -127,14 +127,17 @@ public class UrlBuilder {
     }
     
     public static String getUrl(String path, Params params) {
-        
-        String url = getUrl(path);       
+        path = getPath(path, params);
+        return getUrl(path);       
+    }
+    
+    public static String getPath(String path, Params params) {
         String glue = "?";
         for (String key : params.keySet()) {
-            url += glue + key + "=" + urlEncode(params.get(key));
+            path += glue + key + "=" + urlEncode(params.get(key));
             glue = "&";
         }
-        return url;
+        return path;       
     }
 
     public static String urlEncode(String url) {

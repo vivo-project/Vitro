@@ -24,16 +24,16 @@ public class MainMenu extends Menu {
     }
 
     public void addItem(String text, String path) {
-        boolean active = isActiveItem(path);
-        MainMenuItem i = new MainMenuItem(text, path, active);
-        items.add(i);
+        boolean isActive = isActiveItem(path);
+        addItem(text, path, isActive);
     }  
+
+    public void addItem(String text, String path, boolean isActive) {
+        MainMenuItem i = new MainMenuItem(text, path, isActive);
+        items.add(i);
+    }
     
-    // RY NEED TO FIX: doesn't work for Home and other generated tabs:
-    // vreq.getServletPath() = /templates/page/basicPage.jsp
-    // vreq.getRequestURL() = http://localhost:8080/vivo/templates/page/basicPage.jsp
-    // vreq.getRequestURI() = /vivo/templates/page/basicPage.jsp
-    private boolean isActiveItem(String path) {
+    protected boolean isActiveItem(String path) {
         return vreq.getServletPath().equals(path);
     }
 }
