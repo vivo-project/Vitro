@@ -57,9 +57,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 	protected String appName;
 	protected UrlBuilder urlBuilder;
 
-	// RY Change to private. Only used now by FreeMarkerComponentGenerator, which 
-    // can be moved here as a nested class. Subclasses should not use root.
-	protected Map<String, Object> root = new HashMap<String, Object>();
+	private Map<String, Object> root = new HashMap<String, Object>();
     
     public void doGet( HttpServletRequest request, HttpServletResponse response )
 		throws IOException, ServletException {
@@ -344,7 +342,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         return config != null;
     }
     
-    // TEMPORARY for transition from JSP to FreeMarker. Once transition
+    // TEMPORARY methods for transition from JSP to FreeMarker. Once transition
     // is complete and no more pages are generated in JSP, this can be removed.
     // Do this if FreeMarker is configured (i.e., not Datastar) and if we are not in
     // a FreeMarkerHttpServlet, which will generate identity, menu, and footer from the page template.
@@ -356,43 +354,10 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         request.setAttribute("ftl_search", fcg.getSearch());
         request.setAttribute("ftl_footer", fcg.getFooter());       
     }
-    
-    /**
-     * TEMPORARY for transition from JSP to FreeMarker. Once transition
-     * is complete and no more pages are generated in JSP, this can be removed.
-     * 
-     * @author rjy7
-     *
-     */
-//    public class FreeMarkerComponentGenerator extends FreeMarkerHttpServlet {
-//
-//        private static final long serialVersionUID = 1L;
-//
-//        FreeMarkerComponentGenerator(HttpServletRequest request, HttpServletResponse response) {
-//            doSetup(request, response);
-//        }
-//        
-//        public String getIdentity() {
-//            return get("identity");
-//        }
-//
-//        public String getMenu() {
-//            return get("menu");
-//        }
-//        
-//        public String getSearch() {
-//            return get("search");
-//        }
-//
-//        public String getFooter() {
-//            return get("footer"); 
-//        }
-//        
-//        private String get(String templateName) {
-//            String template = "partials/" + templateName + ".ftl";
-//            return mergeToTemplate(template, root).toString();
-//        }
-//        
-//    }
+    // This method is called by FreeMarkerComponentGenerator, since root is private.
+    // Don't want to make root protected because other controllers shouldn't add to it.
+    protected String mergeTemplateToRoot(String template) {
+        return mergeToTemplate(template, root).toString();
+    }
 
 }

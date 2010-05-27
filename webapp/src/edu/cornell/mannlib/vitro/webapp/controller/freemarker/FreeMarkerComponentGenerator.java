@@ -2,6 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -19,9 +22,9 @@ public class FreeMarkerComponentGenerator extends FreeMarkerHttpServlet {
 
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(FreeMarkerHttpServlet.class.getName());
-
+    
     FreeMarkerComponentGenerator(HttpServletRequest request, HttpServletResponse response) {
-        doSetup(request, response);
+        doSetup(request, response);       
     }
     
     public String getIdentity() {
@@ -42,7 +45,7 @@ public class FreeMarkerComponentGenerator extends FreeMarkerHttpServlet {
     
     private String get(String templateName) {
         String template = "page/partials/" + templateName + ".ftl";
-        return mergeToTemplate(template, root).toString();
+        return mergeTemplateToRoot(template);
     }
     
 }
