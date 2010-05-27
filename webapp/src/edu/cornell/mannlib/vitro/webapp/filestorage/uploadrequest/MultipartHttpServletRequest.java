@@ -40,34 +40,29 @@ class MultipartHttpServletRequest extends FileUploadServletRequest {
 	 * and the uploaded files.
 	 */
 	public MultipartHttpServletRequest(HttpServletRequest request,
-			int maxFileSize) throws IOException {
+			int maxFileSize) throws IOException, FileUploadException {
 		super(request);
 
 		Map<String, List<String>> parameters = new HashMap<String, List<String>>();
 		Map<String, List<FileItem>> files = new HashMap<String, List<FileItem>>();
 
-		try {
-			File tempDir = figureTemporaryDirectory(request);
-			ServletFileUpload upload = createUploadHandler(maxFileSize, tempDir);
-			
-			List<FileItem> items = parseRequestIntoFileItems(request, upload);
-			for (FileItem item : items) {
-				// Process a regular form field
-				if (item.isFormField()) {
-					addToParameters(parameters, item.getFieldName(), item
-							.getString("UTF-8"));
-					LOG.debug("Form field (parameter) " + item.getFieldName()
-							+ "=" + item.getString());
-				} else {
-					addToFileItems(files, item);
-					LOG.debug("File " + item.getFieldName() + ": "
-							+ item.getName());
-				}
+		File tempDir = figureTemporaryDirectory(request);
+		ServletFileUpload upload = createUploadHandler(maxFileSize, tempDir);
+
+		List<FileItem> items = parseRequestIntoFileItems(request, upload);
+		for (FileItem item : items) {
+			// Process a regular form field
+			if (item.isFormField()) {
+				addToParameters(parameters, item.getFieldName(), item
+						.getString("UTF-8"));
+				LOG.debug("Form field (parameter) " + item.getFieldName() + "="
+						+ item.getString());
+			} else {
+				addToFileItems(files, item);
+				LOG
+						.debug("File " + item.getFieldName() + ": "
+								+ item.getName());
 			}
-		} catch (FileUploadException e) {
-			String message = "Failed to parse a multipart-content request.";
-			LOG.error(message, e);
-			throw new IOException(message, e);
 		}
 
 		this.parameters = Collections.unmodifiableMap(parameters);
@@ -77,7 +72,7 @@ class MultipartHttpServletRequest extends FileUploadServletRequest {
 	}
 
 	/**
-	 * Find the temporary storage directory for this webapp. 
+	 * Find the temporary storage directory for this webapp.
 	 */
 	private File figureTemporaryDirectory(HttpServletRequest request) {
 		return (File) request.getSession().getServletContext().getAttribute(

@@ -18,6 +18,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.FileUploadBase.SizeLimitExceededException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 /**
@@ -41,7 +43,8 @@ public abstract class FileUploadServletRequest implements HttpServletRequest {
 	 * Wrap this {@link HttpServletRequest} in an appropriate wrapper class.
 	 */
 	public static FileUploadServletRequest parseRequest(
-			HttpServletRequest request, int maxFileSize) throws IOException {
+			HttpServletRequest request, int maxFileSize) throws IOException,
+			FileUploadException {
 		boolean isMultipart = ServletFileUpload.isMultipartContent(request);
 		if (isMultipart) {
 			return new MultipartHttpServletRequest(request, maxFileSize);
