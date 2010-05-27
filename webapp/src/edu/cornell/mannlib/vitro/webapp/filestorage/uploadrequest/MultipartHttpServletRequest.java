@@ -39,22 +39,21 @@ class MultipartHttpServletRequest extends FileUploadServletRequest {
 	 * Parse the multipart request. Store the info about the request parameters
 	 * and the uploaded files.
 	 */
-	public MultipartHttpServletRequest(HttpServletRequest request)
-			throws IOException {
+	public MultipartHttpServletRequest(HttpServletRequest request,
+			int maxFileSize) throws IOException {
 		super(request);
 
 		Map<String, List<String>> parameters = new HashMap<String, List<String>>();
 		Map<String, List<FileItem>> files = new HashMap<String, List<FileItem>>();
 
 		try {
-			FileItemFactory factory = new DiskFileItemFactory();
-			ServletFileUpload upload = new ServletFileUpload(factory);
+			ServletFileUpload upload = createUploadHandler(maxFileSize);
 			List<FileItem> items = parseRequestIntoFileItems(request, upload);
 			for (FileItem item : items) {
 				// Process a regular form field
 				if (item.isFormField()) {
 					addToParameters(parameters, item.getFieldName(), item
-							.getString());
+							.getString("UTF-8"));
 					LOG.debug("Form field (parameter) " + item.getFieldName()
 							+ "=" + item.getString());
 				} else {
@@ -75,6 +74,20 @@ class MultipartHttpServletRequest extends FileUploadServletRequest {
 		LOG.debug("Files are: " + this.files);
 	}
 
+	/**
+	 * Create an upload handler that will throw an exception if the file is too
+	 * large.
+	 */
+	private ServletFileUpload createUploadHandler(int maxFileSize) {
+		DiskFileItemFactory factory = new DiskFileItemFactory();
+		factory.setSizeThreshold(maxFileSize);
+
+		ServletFileUpload upload = new ServletFileUpload(factory);
+		upload.setSizeMax(maxFileSize);
+
+		return upload;
+	}
+
 	/** Either create a new List for the value, or add to an existing List. */
 	private void addToParameters(Map<String, List<String>> map, String name,
 			String value) {
@@ -85,15 +98,14 @@ class MultipartHttpServletRequest extends FileUploadServletRequest {
 	}
 
 	/** Either create a new List for the file, or add to an existing List. */
-	private void addToFileItems(Map<String, List<FileItem>> map, 
-			FileItem file) {
+	private void addToFileItems(Map<String, List<FileItem>> map, FileItem file) {
 		String name = file.getFieldName();
 		if (!map.containsKey(name)) {
 			map.put(name, new ArrayList<FileItem>());
 		}
 		map.get(name).add(file);
 	}
-	
+
 	/** Minimize the code that uses the unchecked cast. */
 	@SuppressWarnings("unchecked")
 	private List<FileItem> parseRequestIntoFileItems(HttpServletRequest req,
@@ -145,7 +157,7 @@ class MultipartHttpServletRequest extends FileUploadServletRequest {
 	}
 
 	@Override
-	public Map<?, ?> getParameterMap() {
+	public Map<String, String[]> getParameterMap() {
 		Map<String, String[]> result = new HashMap<String, String[]>();
 		for (Entry<String, List<String>> entry : parameters.entrySet()) {
 			result.put(entry.getKey(), entry.getValue().toArray(EMPTY_ARRAY));

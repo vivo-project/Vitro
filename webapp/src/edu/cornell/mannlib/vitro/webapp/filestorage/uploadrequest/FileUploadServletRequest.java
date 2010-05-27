@@ -41,10 +41,10 @@ public abstract class FileUploadServletRequest implements HttpServletRequest {
 	 * Wrap this {@link HttpServletRequest} in an appropriate wrapper class.
 	 */
 	public static FileUploadServletRequest parseRequest(
-			HttpServletRequest request) throws IOException {
+			HttpServletRequest request, int maxFileSize) throws IOException {
 		boolean isMultipart = ServletFileUpload.isMultipartContent(request);
 		if (isMultipart) {
-			return new MultipartHttpServletRequest(request);
+			return new MultipartHttpServletRequest(request, maxFileSize);
 		} else {
 			return new SimpleHttpServletRequestWrapper(request);
 		}
