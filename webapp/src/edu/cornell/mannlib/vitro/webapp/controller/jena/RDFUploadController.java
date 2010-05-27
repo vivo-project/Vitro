@@ -2,12 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.jena;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -19,8 +15,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -37,64 +31,24 @@ import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaModelUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
+import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest;
 
 public class RDFUploadController extends BaseEditController {
 	
     private static int maxFileSizeInBytes = 1024 * 1024 * 2000; //2000mb 
 	
-	public void doPost(HttpServletRequest req, HttpServletResponse response) throws ServletException {
-        boolean isMultipart = ServletFileUpload.isMultipartContent(req);        
-        if (!isMultipart) {
-            // TODO: forward to error message
-            throw new ServletException("Must POST a multipart encoded request");
-        }
-        
-        /* The post parameters seem to get consumed by the parsing so we have to make a copy. */
-        Map<String, List<String>> queryParameters = new HashMap<String, List<String>>();
-        Map<String, List<FileItem>> fileStreams = new HashMap<String, List<FileItem>>();
+	public void doPost(HttpServletRequest rawRequest,
+			HttpServletResponse response) throws ServletException, IOException {
+		FileUploadServletRequest req = null;
+		try {
+			req = FileUploadServletRequest.parseRequest(rawRequest,
+					maxFileSizeInBytes);
+		} catch (FileUploadException e) {
+			forwardToFileUploadError(e.getLocalizedMessage(), req, response);
+			return;
+		}
 
-        Iterator<FileItem> iter;
-        try {
-            iter = getFileItemIterator(req);
-        } catch (FileUploadException e) {             
-            forwardToFileUploadError(e.getLocalizedMessage(), req, response);
-            return;
-        }
-
-        // get files or parameter values
-        while (iter.hasNext()) {
-            FileItem item = (FileItem) iter.next();
-            String name = item.getFieldName();
-            if (item.isFormField()) {
-                if (queryParameters.containsKey(name)) {                    
-                    try {
-                        String value = item.getString("UTF-8");
-                        queryParameters.get(name).add(value);
-                    } catch (UnsupportedEncodingException e) {
-                        forwardToFileUploadError(e.getLocalizedMessage(), req, response);
-                        return;
-                    }                    
-                } else {
-                    List<String> valueList = new ArrayList<String>(1);                    
-                    try {
-                        String value = item.getString("UTF-8");
-                        valueList.add(value);
-                    } catch (UnsupportedEncodingException e) {
-                        forwardToFileUploadError(e.getLocalizedMessage(), req, response);
-                        return;
-                    }                    
-                    queryParameters.put(name, valueList);
-                }
-            } else {
-                if (fileStreams.containsKey(name)) {
-                    fileStreams.get(name).add(item);
-                } else {
-                    List<FileItem> itemList = new ArrayList<FileItem>();
-                    itemList.add(item);
-                    fileStreams.put(name, itemList);
-                }
-            }
-        }
+		Map<String, List<FileItem>> fileStreams = req.getFiles();
 	    
 		VitroRequest request = new VitroRequest(req);		
 		if (!checkLoginStatus(request,response) ){
@@ -118,15 +72,15 @@ public class RDFUploadController extends BaseEditController {
 				
 		Portal currentPortal = request.getPortal();		
 	    			   
-		boolean remove = isRemoveRequest(queryParameters);
+		boolean remove = "remove".equals(request.getParameter("mode"));
 		String verb = remove?"Removed":"Added";
 		
-		String languageStr = getLanguage(queryParameters);
+		String languageStr = request.getParameter("language");
 		
-		boolean makeClassgroups = (queryParameters.get("makeClassgroups") != null) ? true : false;
+		boolean makeClassgroups = (request.getParameter("makeClassgroups") != null);
 		
 		int[] portalArray = null;
-		String individualCheckIn = getCheckIn(queryParameters); 
+		String individualCheckIn = request.getParameter("checkIndividualsIntoPortal"); 
 		if (individualCheckIn != null) {
 		    if (individualCheckIn.equals("current")) {
 		        portalArray = new int[1];
@@ -152,7 +106,7 @@ public class RDFUploadController extends BaseEditController {
 		Model tempModel = null;
 		
 		/* ********************* GET RDF by URL ********************** */
-		String RDFUrlStr =  getRdfUrl(queryParameters);
+		String RDFUrlStr =  request.getParameter("rdfUrl");
 		if (RDFUrlStr != null && RDFUrlStr.length() > 0) {
 			tempModel = ModelFactory.createDefaultModel();
 			try {
@@ -218,41 +172,6 @@ public class RDFUploadController extends BaseEditController {
     }
 
     
-    private String getCheckIn(Map<String, List<String>> queryParameters) {
-        //request.getParameter("checkIndividualsIntoPortal");
-        
-        List<String> checkins = queryParameters.get("checkIndividualsIntoPortal");
-        if( checkins != null && checkins.size() > 0 )
-            return checkins.get(0);
-        else
-            return null;
-    }
-
-
-    private boolean isRemoveRequest(Map<String, List<String>> queryParameters) {
-        List<String> modes = queryParameters.get("mode");
-        if( modes != null && modes.size() > 0 && "remove".equals(modes.get(0)))
-            return true;
-        else 
-            return false;
-    }
-
-    private String getLanguage(Map<String, List<String>> queryParameters) {
-        List<String> langs = queryParameters.get("language");
-        if( langs != null && langs.size() > 0 )
-            return langs.get(0);
-        else
-            return null;
-    }
-
-    private String getRdfUrl(Map<String, List<String>> queryParameters){
-        List<String> items = queryParameters.get("rdfUrl");
-        if( items != null && items.size() > 0)
-            return items.get(0);
-        else
-            return null;        
-    }
-    
     private long operateOnModel(OntModel mainModel, Model changesModel, boolean remove, boolean makeClassgroups, int[] portal,  String userURI) {
         mainModel.enterCriticalSection(Lock.WRITE);
         try {
@@ -295,20 +214,5 @@ public class RDFUploadController extends BaseEditController {
      }
      
      
-	@SuppressWarnings("unchecked")
-    private Iterator<FileItem> getFileItemIterator(HttpServletRequest request)
-	throws FileUploadException {	    	    	   	    
-	    // Create a factory for disk-based file items
-	    File tempDir = (File)getServletContext().getAttribute("javax.servlet.context.tempdir");
-	    DiskFileItemFactory factory = new DiskFileItemFactory();
-	    factory.setSizeThreshold(maxFileSizeInBytes);
-	    factory.setRepository(tempDir);
-
-	    // Create a new file upload handler
-	    ServletFileUpload upload = new ServletFileUpload(factory);
-	    upload.setSizeMax(maxFileSizeInBytes);
-	    return upload.parseRequest(request).iterator();
-    }
-
 	private static final Log log = LogFactory.getLog(RDFUploadController.class.getName());
 }
