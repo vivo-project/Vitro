@@ -25,6 +25,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.ContactMailServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Routes;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 import edu.cornell.mannlib.vitro.webapp.view.fileList.ScriptList;
 import edu.cornell.mannlib.vitro.webapp.view.fileList.StylesheetList;
@@ -54,6 +55,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 	protected Portal portal;
 	protected int portalId;
 	protected String appName;
+	protected UrlBuilder urlBuilder;
 	protected Map<String, Object> root = new HashMap<String, Object>();
     
     public void doGet( HttpServletRequest request, HttpServletResponse response )
@@ -94,6 +96,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         vreq = new VitroRequest(request);
         this.response = response;
         portal = vreq.getPortal(); 
+        urlBuilder = new UrlBuilder(portal);
 
         // RY Can this be removed? Do templates need it? Ideally, they should not.
         // Only needed for some weird stuff in search box that I think is only used in old default theme.
@@ -169,29 +172,22 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         // view to control which links go where, and the link text and title.
         Map<String, String> urls = new HashMap<String, String>();
         
-        urls.put("home", Routes.getHomeUrl(portal));
+        urls.put("home", urlBuilder.getHomeUrl());
 
         String bannerImage = portal.getBannerImage();
         if ( ! StringUtils.isEmpty(bannerImage)) {
-            root.put("bannerImage", Routes.getUrl(themeDir + "site_icons/" + bannerImage));
+            root.put("bannerImage", UrlBuilder.getUrl(themeDir + "site_icons/" + bannerImage));
         }
-        
-        Map<String, String> portalParam = new HashMap<String, String>();
-        portalParam.put("home", "" + portalId);
 
-        urls.put("about", Routes.getUrl(Routes.ABOUT, portalParam));
+        urls.put("about", urlBuilder.getPortalUrl(Routes.ABOUT));
         if (ContactMailServlet.getSmtpHostFromProperties() != null) {
-            urls.put("contact", Routes.getUrl(Routes.CONTACT, portalParam));
+            urls.put("contact", urlBuilder.getPortalUrl(Routes.CONTACT));
         }
-        urls.put("search", Routes.getUrl(Routes.SEARCH));
-        urls.put("termsOfUse", Routes.getUrl(Routes.TERMS_OF_USE, portalParam));        
-        urls.put("login", Routes.getUrl(Routes.LOGIN));
-        
-        Map<String, String> logoutParams = new HashMap<String, String>(portalParam);
-        logoutParams.put("loginSubmitMode", "Log Out");
-        urls.put("logout", Routes.getUrl(Routes.LOGOUT, logoutParams));
-        
-        urls.put("siteAdmin", Routes.getUrl(Routes.SITE_ADMIN));     
+        urls.put("search", urlBuilder.getPortalUrl(Routes.SEARCH));  
+        urls.put("termsOfUse", urlBuilder.getPortalUrl(Routes.TERMS_OF_USE));  
+        urls.put("login", urlBuilder.getPortalUrl(Routes.LOGIN));          
+        urls.put("logout", urlBuilder.getLogoutUrl());       
+        urls.put("siteAdmin", urlBuilder.getPortalUrl(Routes.LOGIN));  
         
         setSharedVariable("urls", urls); 
     }
@@ -242,7 +238,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         // attribute from the string passed in by the template automatically add the context path.
         setSharedVariable("stylesheetDir", themeDir + "/css");
         
-        String themeDirWithContext = Routes.getUrl(themeDir);
+        String themeDirWithContext = UrlBuilder.getUrl(themeDir);
         
         // This value is used only in stylesheets.ftl and already contains the context path.
         root.put("stylesheetPath", themeDirWithContext + "/css");

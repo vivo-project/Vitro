@@ -2,64 +2,60 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import junit.framework.Assert;
 
 import org.junit.Test;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreeMarkerHttpServlet;
-import freemarker.template.Configuration;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Params;
 
-public class RoutesTest extends AbstractTestClass {
+public class UrlBuilderTest extends AbstractTestClass {
     
     @Test
     public void testGetUrl() {
-        Routes.contextPath = "/vivo";
+        UrlBuilder.contextPath = "/vivo";
         
         String path1 = "/individual";
-        Assert.assertEquals("/vivo/individual", Routes.getUrl(path1));
+        Assert.assertEquals("/vivo/individual", UrlBuilder.getUrl(path1));
         
         int portalId = 1;
         String path2 = "/individual?home=" + portalId;
-        Assert.assertEquals("/vivo/individual?home=1", Routes.getUrl(path2));
+        Assert.assertEquals("/vivo/individual?home=1", UrlBuilder.getUrl(path2));
     }
     
     @Test
     public void testGetUrlWithEmptyContext() {
-        Routes.contextPath = "";
+        UrlBuilder.contextPath = "";
         String path = "/individual";
-        Assert.assertEquals(path, Routes.getUrl(path));
+        Assert.assertEquals(path, UrlBuilder.getUrl(path));
     }
     
     @Test
     public void testGetUrlWithParams() {
-        Routes.contextPath = "/vivo";
+        UrlBuilder.contextPath = "/vivo";
         String path = "/individual";
-        Map<String, String> params = new HashMap<String, String>();
+        Params params = new Params();
         int portalId = 1;
         params.put("home", "" + portalId);
         params.put("name", "Tom");
-        Assert.assertEquals("/vivo/individual?home=1&name=Tom", Routes.getUrl(path, params));
+        Assert.assertEquals("/vivo/individual?home=1&name=Tom", UrlBuilder.getUrl(path, params));
     }
 
     @Test
     public void testEncodeUrl() {
-        Routes.contextPath = "/vivo";
+        UrlBuilder.contextPath = "/vivo";
         String path = "/individuallist";
-        Map<String, String> params = new HashMap<String, String>();
+        Params params = new Params();
         String vClassUri = "http://vivoweb.org/ontology/core#FacultyMember";
         params.put("vclassId", vClassUri);
-        Assert.assertEquals("/vivo/individuallist?vclassId=http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23FacultyMember", Routes.getUrl(path, params));    
+        Assert.assertEquals("/vivo/individuallist?vclassId=http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23FacultyMember", UrlBuilder.getUrl(path, params));    
     }
     
     @Test
     public void testDecodeUrl() {
         String vClassUri = "http://vivoweb.org/ontology/core#FacultyMember";
         String vClassUriEncoded = "http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23FacultyMember";
-        Assert.assertEquals(vClassUri, Routes.urlDecode(vClassUriEncoded));          
+        Assert.assertEquals(vClassUri, UrlBuilder.urlDecode(vClassUriEncoded));          
     }
     
 }

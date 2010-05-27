@@ -24,7 +24,7 @@ public class TabMenu extends MainMenu {
     private static final Log log = LogFactory.getLog(TabMenu.class.getName());
        
     public TabMenu(VitroRequest vreq, int portalId) {
-        super(vreq, portalId);
+        super(vreq);
         
         //Tabs stored in database
         List<Tab> primaryTabs = vreq.getWebappDaoFactory().getTabDao().getPrimaryTabs(portalId);        

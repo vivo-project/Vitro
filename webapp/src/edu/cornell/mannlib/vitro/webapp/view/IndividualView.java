@@ -6,14 +6,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.Routes;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Routes;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 
 public class IndividualView extends ViewObject {
     
     private static final Log log = LogFactory.getLog(IndividualView.class.getName());
     
-    private static final String URL = Routes.INDIVIDUAL;
+    private static final String PATH = Routes.INDIVIDUAL.path();
     
     private Individual individual;
     

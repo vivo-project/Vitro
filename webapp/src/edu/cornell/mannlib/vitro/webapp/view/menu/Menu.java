@@ -16,13 +16,9 @@ public class Menu extends ViewObject {
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(Menu.class.getName());
 
-    protected VitroRequest vreq;
-    protected int portalId;
     protected List<MenuItem> items;
     
-    public Menu(VitroRequest vreq, int portalId) {
-        this.vreq = vreq;
-        this.portalId = portalId;  
+    public Menu() {  
         items = new ArrayList<MenuItem>();
     }
     

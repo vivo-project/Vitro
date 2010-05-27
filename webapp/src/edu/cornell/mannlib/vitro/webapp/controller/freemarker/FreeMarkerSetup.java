@@ -53,7 +53,7 @@ public class FreeMarkerSetup implements ServletContextListener {
 		FreeMarkerHttpServlet.config = cfg;  
         FreeMarkerHttpServlet.context = sc;
         
-		Routes.contextPath = sc.getContextPath();
+		UrlBuilder.contextPath = sc.getContextPath();
 
 	}
 

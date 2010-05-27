@@ -5,8 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.view.menu;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-
 /** A menu item that indicates whether it is the active item or not.
  * 
  * @author rjy7

@@ -2,35 +2,26 @@
 
 package edu.cornell.mannlib.vitro.webapp.view;
 
-import java.util.Map;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.Routes;
-
-// RY We may want an interface that the superclass would implement.
-// RY Consider using FreeMarker's object wrappers instead.
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Params;
 
 public abstract class ViewObject {
 
     private static final Log log = LogFactory.getLog(ViewObject.class.getName());
 
-    // RY Can probably remove this, since we're using the FreeMarkerHttpServlet methods instead
-    // public static String contextPath;
-    
-    protected String getUrl(String path) {
-        return Routes.getUrl(path);
+    // Wrap UrlBuilder method so templates can call ${item.url}
+    public String getUrl(String path) {
+        return UrlBuilder.getUrl(path);
     }
-    
-    protected String getUrl(String path, Map<String, String> params) {
-        return Routes.getUrl(path, params);
+
+    // Wrap UrlBuilder method so templates can call ${item.url}
+    public String getUrl(String path, Params params) {
+        return UrlBuilder.getUrl(path, params);
     }
-    
-    protected String urlEncode(String str) {
-        return Routes.urlEncode(str);
-    }
-    
+
     /*
      * public static List<?> wrapList(List<?> list, Class cl) 
      * throw error if cl not a child of ViewObject

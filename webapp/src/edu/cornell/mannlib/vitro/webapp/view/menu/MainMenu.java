@@ -17,13 +17,23 @@ public class MainMenu extends Menu {
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(MainMenu.class.getName());
     
-    public MainMenu(VitroRequest vreq, int portalId) {
-        super(vreq, portalId);
+    protected VitroRequest vreq;
+    
+    public MainMenu(VitroRequest vreq) {
+        this.vreq = vreq;
     }
 
     public void addItem(String text, String path) {
-        boolean active = vreq.getServletPath().equals(path);
+        boolean active = isActiveItem(path);
         MainMenuItem i = new MainMenuItem(text, path, active);
         items.add(i);
-    }    
+    }  
+    
+    // RY NEED TO FIX: doesn't work for Home and other generated tabs:
+    // vreq.getServletPath() = /templates/page/basicPage.jsp
+    // vreq.getRequestURL() = http://localhost:8080/vivo/templates/page/basicPage.jsp
+    // vreq.getRequestURI() = /vivo/templates/page/basicPage.jsp
+    private boolean isActiveItem(String path) {
+        return vreq.getServletPath().equals(path);
+    }
 }

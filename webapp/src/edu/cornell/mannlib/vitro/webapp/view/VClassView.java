@@ -2,19 +2,17 @@
 
 package edu.cornell.mannlib.vitro.webapp.view;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.Routes;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Params;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Routes;
 
 public class VClassView extends ViewObject {
     
     private static final Log log = LogFactory.getLog(VClassView.class.getName());
-    private static final String URL = Routes.INDIVIDUAL_LIST;
+    private static final String PATH = Routes.INDIVIDUAL_LIST.path();
     
     private VClass vclass;
     
@@ -27,9 +25,7 @@ public class VClassView extends ViewObject {
     }
     
     public String getUrl() {
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("vclassId", vclass.getURI());
-        return getUrl(URL, params);
+        return getUrl(PATH, new Params("vclassId", vclass.getURI()));
     }
     
     public int getIndividualCount() {

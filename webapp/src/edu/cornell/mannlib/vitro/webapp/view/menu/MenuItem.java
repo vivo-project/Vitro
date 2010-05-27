@@ -12,11 +12,11 @@ public class MenuItem extends ViewObject {
     private static final Log log = LogFactory.getLog(MenuItem.class.getName());
     
     private String text;
-    private String url;
+    private String path;
     
     public MenuItem(String linkText, String path) {
         text = linkText;
-        url = getUrl(path);
+        this.path = path;
     }
     
     public String getLinkText() {
@@ -24,7 +24,6 @@ public class MenuItem extends ViewObject {
     }
     
     public String getUrl() {
-        return url;
-    }
-    
+        return getUrl(path);
+    } 
 }
