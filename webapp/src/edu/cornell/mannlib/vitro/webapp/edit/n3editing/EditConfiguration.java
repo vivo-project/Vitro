@@ -630,27 +630,6 @@ public class EditConfiguration {
         configs.put(ec.editKey , ec);
     }
 
-//    public static EditConfiguration getConfigFromSession( HttpSession sess, HttpServletRequest request, Map<String,List<String>> queryParameters){
-//        boolean isMultipart = ServletFileUpload.isMultipartContent(request);
-//        String key = null;
-//        if( isMultipart )
-//            key = getEditKey(request);
-//        else
-//            key = getEditKey(queryParameters, request);
-//        if( key == null )
-//            throw new Error("EditConfiguration: Cannot get a editKey from the request");
-//
-//        Map<String,EditConfiguration> configs = (Map<String,EditConfiguration>)sess.getAttribute("EditConfigurations");
-//        if( configs == null )
-//          return null;
-//
-//        EditConfiguration config = configs.get( key );
-//        if( config == null )
-//            return null;
-//        else
-//            return config;
-//    }
-
     public static EditConfiguration getConfigFromSession(HttpSession sess, String editKey){
         Map<String,EditConfiguration> configs = (Map<String,EditConfiguration>)sess.getAttribute("EditConfigurations");
         if( configs == null )
@@ -668,56 +647,13 @@ public class EditConfiguration {
      * request or session.  If the queryParams are supplied, look for the editKey
      * there first since multipart parsing might have cleared them from the request.
      */
-    public static EditConfiguration getConfigFromSession( HttpSession sess, HttpServletRequest request, Map queryParams){
-        
-        if( queryParams!= null && queryParams.containsKey("editKey") 
-                && queryParams.get("editKey") != null ){            
-            Object obj = queryParams.get("editKey");
-            String key = null;            
-            if( obj == null )
-                key = null;
-            else if( obj instanceof String[])
-                key= ((String[])obj)[0];            
-            else if( obj instanceof List)
-                key = (String)((List)obj).get(0);            
-                        
-            if( key == null )
-                return null;
-            else
-                return getConfigFromSession(sess, key);        
-        } else {
-            return getConfigFromSession(sess, request);
-        }        
-    }
-    
     public static EditConfiguration getConfigFromSession( HttpSession sess, HttpServletRequest request ){
-        String key = "";                   
-        key = getEditKey(request);
+        String key = getEditKey(request);
         
         if( key == null )
             return null;
         return getConfigFromSession(sess, key);
     }
-
-    /**
-     * The editKey can be a HTTP query parameter or it can be a request attribute.
-     */
-//    protected static String getEditKey(Map<String,List<String>> queryParameters, HttpServletRequest request){
-////        if( queryParameters == null )
-////            throw new Error("need to have a non-null set of queryParameters to get the editKey");
-//        Object obj = queryParameters.get("editKey");
-//        if( obj instanceof List ){
-//            List<String> keyList = (List<String>) obj;
-//            if( keyList  != null && keyList.size() == 1 ){
-//                return keyList.get(0);
-//            } else {
-//                return  getEditKey( request );
-//            }
-//        }else if( obj instanceof String){
-//            return (String)obj;
-//        }else
-//            return getEditKey(request);
-//    }
 
     /**
      * The editKey can be a HTTP query parameter or it can be a request attribute.

@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -20,9 +19,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -46,6 +42,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditN3Generator;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditN3Utils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditSubmission;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.Field;
+import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest;
 import edu.cornell.mannlib.vitro.webapp.utils.MailUtil;
 
 /**
@@ -113,81 +110,24 @@ public class N3MultiPartUpload extends VitroHttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse resp)
+    protected void doPost(HttpServletRequest rawRequest, HttpServletResponse resp)
             throws ServletException, IOException {
         log.debug("N3MultiPartProcess 0.01");
+        
+		FileUploadServletRequest request = FileUploadServletRequest
+				.parseRequest(rawRequest, maxFileSize);
+        log.debug("multipart content detected: " + request.isMultipart());
 
         ServletContext application = getServletContext();
         HttpSession session = request.getSession();
-        boolean isMultipart = ServletFileUpload.isMultipartContent(request);
-
-        /*
-         * the post parameters seem to get consumed by the parsing so we have to
-         * make a copy.
-         */
-        Map<String, List<String>> queryParameters = null;
-        Map<String, List<FileItem>> fileStreams = null;
-        if (!isMultipart) {
-            // TODO: forward to error message
-            throw new ServletException("Must POST a multipart encoded request");
-        }
-
-        log.debug("multipart content detected");
-        queryParameters = new HashMap<String, List<String>>();
-        fileStreams = new HashMap<String, List<FileItem>>();
-
-        Iterator<FileItem> iter;
-        try {
-            iter = getFileItemIterator(request);
-        } catch (FileUploadException e) {
-            log.debug(e);                        
-            request.setAttribute("errors", e.getLocalizedMessage());
-            RequestDispatcher rd = request
-                    .getRequestDispatcher("/edit/fileUploadError.jsp");
-            rd.forward(request, resp);            
-            return;
-        }
-
-        // get files or parameter values
-        while (iter.hasNext()) {
-            FileItem item = (FileItem) iter.next();
-            String name = item.getFieldName();
-            if (item.isFormField()) {
-                if (queryParameters.containsKey(name)) {
-                    // String value = new
-                    // String(item.getString().getBytes("ISO-8859-1"), "UTF-8");
-                    String value = item.getString("UTF-8");
-                    queryParameters.get(name).add(value);
-                } else {
-                    List<String> valueList = new ArrayList<String>(1);
-                    // String value = new
-                    // String(item.getString().getBytes("ISO-8859-1"), "UTF-8");
-                    String value = item.getString("UTF-8");
-                    valueList.add(value);
-                    queryParameters.put(name, valueList);
-                }
-            } else {
-                if (fileStreams.containsKey(name)) {
-                    fileStreams.get(name).add(item);
-                    log.debug("File in multipart content request:  field "
-                            + name + " with file name " + item.getName()
-                            + " detected.");
-                } else {
-                    List<FileItem> itemList = new ArrayList<FileItem>();
-                    itemList.add(item);
-                    fileStreams.put(name, itemList);
-                }
-            }
-        }
 
         List<String> errorMessages = new ArrayList<String>();
         OntModel jenaOntModel = getJenaOntModel(request, application);
 
-        EditConfiguration editConfig = EditConfiguration.getConfigFromSession(
-                session, request, queryParameters);
-        putEditKeyInRequest(request, queryParameters);
+		EditConfiguration editConfig = EditConfiguration.getConfigFromSession(
+				session, request);
         EditSubmission submission = 
-            new EditSubmission(convertParams(queryParameters), editConfig, fileStreams);
+            new EditSubmission(request.getParameterMap(), editConfig, request.getFiles());
         EditN3Generator n3Subber = editConfig.getN3Generator();
 
         if (editConfig == null) {
@@ -225,7 +165,7 @@ public class N3MultiPartUpload extends VitroHttpServlet {
             Map<String, List<Model>> requiredFieldAssertions = new HashMap<String, List<Model>>();
 
             boolean saveFileToDiskSuccess = false;
-            for (String fileItemKey : fileStreams.keySet()) {
+            for (String fileItemKey : request.getFiles().keySet()) {
                 Field field = editConfig.getField(fileItemKey);
                 if (field.getOptionsType() != Field.OptionsType.FILE) {
                     log.debug("Field "
@@ -236,7 +176,7 @@ public class N3MultiPartUpload extends VitroHttpServlet {
                 }
 
                 /* build the models from the field assertions for each file */
-                for (FileItem fileItem : fileStreams.get(fileItemKey)) {
+                for (FileItem fileItem : request.getFiles().get(fileItemKey)) {
                     try {
                         requiredFieldAssertions.putAll(buildModelsForFileItem(
                                 fileItem, editConfig, submission, field
@@ -370,25 +310,6 @@ public class N3MultiPartUpload extends VitroHttpServlet {
         }
     }
 
-    private Map<String, String[]> convertParams(
-            Map<String, List<String>> queryParameters) {
-        HashMap<String,String[]> out = new HashMap<String,String[]>();
-        for( String key : queryParameters.keySet()){
-            List<String> item = queryParameters.get(key);            
-            out.put(key, item.toArray(new String[item.size()]));
-        }
-        return out;
-    }
-
-    /**
-     * Since the HTTP query parameters are consumed by the multipart parse we
-     * need to put the editKey in the request attributes.
-     */
-    private void putEditKeyInRequest(HttpServletRequest request,
-            Map<String, List<String>> queryParameters) {
-        request.setAttribute("editKey", queryParameters.get("editKey").get(0));
-    }
-
     private Map<String, List<Model>> buildModelsForFileItem(FileItem fileItem,
             EditConfiguration editConfig, EditSubmission submission,
             List<String> assertions, OntModel jenaOntModel,
@@ -504,19 +425,6 @@ public class N3MultiPartUpload extends VitroHttpServlet {
             r = ResourceFactory.createResource(uri);
         }
         return uri;
-    }
-
-    private Iterator<FileItem> getFileItemIterator(HttpServletRequest request)
-            throws FileUploadException {
-        // Create a factory for disk-based file items
-        DiskFileItemFactory factory = new DiskFileItemFactory();
-        factory.setSizeThreshold(maxFileSize);
-        factory.setRepository(new File(baseDirectoryForFiles));
-
-        // Create a new file upload handler
-        ServletFileUpload upload = new ServletFileUpload(factory);
-        upload.setSizeMax(maxFileSize);
-        return upload.parseRequest(request).iterator();
     }
 
     private OntModel getJenaOntModel(HttpServletRequest request,
