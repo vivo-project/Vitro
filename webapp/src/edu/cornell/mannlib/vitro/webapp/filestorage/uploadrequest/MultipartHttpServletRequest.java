@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,7 +15,6 @@ import java.util.Map.Entry;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -47,7 +47,9 @@ class MultipartHttpServletRequest extends FileUploadServletRequest {
 		Map<String, List<FileItem>> files = new HashMap<String, List<FileItem>>();
 
 		try {
-			ServletFileUpload upload = createUploadHandler(maxFileSize);
+			File tempDir = figureTemporaryDirectory(request);
+			ServletFileUpload upload = createUploadHandler(maxFileSize, tempDir);
+			
 			List<FileItem> items = parseRequestIntoFileItems(request, upload);
 			for (FileItem item : items) {
 				// Process a regular form field
@@ -75,12 +77,21 @@ class MultipartHttpServletRequest extends FileUploadServletRequest {
 	}
 
 	/**
+	 * Find the temporary storage directory for this webapp. 
+	 */
+	private File figureTemporaryDirectory(HttpServletRequest request) {
+		return (File) request.getSession().getServletContext().getAttribute(
+				"javax.servlet.context.tempdir");
+	}
+
+	/**
 	 * Create an upload handler that will throw an exception if the file is too
 	 * large.
 	 */
-	private ServletFileUpload createUploadHandler(int maxFileSize) {
+	private ServletFileUpload createUploadHandler(int maxFileSize, File tempDir) {
 		DiskFileItemFactory factory = new DiskFileItemFactory();
 		factory.setSizeThreshold(maxFileSize);
+		factory.setRepository(tempDir);
 
 		ServletFileUpload upload = new ServletFileUpload(factory);
 		upload.setSizeMax(maxFileSize);
