@@ -3,18 +3,13 @@
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Random;
 
 import javax.servlet.RequestDispatcher;
@@ -36,19 +31,15 @@ import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
-import com.hp.hpl.jena.vocabulary.RDF;
-import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vedit.beans.LoginFormBean;
-import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
-import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditN3Generator;
@@ -145,7 +136,6 @@ public class N3MultiPartUpload extends VitroHttpServlet {
         queryParameters = new HashMap<String, List<String>>();
         fileStreams = new HashMap<String, List<FileItem>>();
 
-        List<String> fileUploadErrors = new ArrayList<String>();
         Iterator<FileItem> iter;
         try {
             iter = getFileItemIterator(request);
@@ -382,11 +372,10 @@ public class N3MultiPartUpload extends VitroHttpServlet {
 
     private Map<String, String[]> convertParams(
             Map<String, List<String>> queryParameters) {
-        // TODO Auto-generated method stub
         HashMap<String,String[]> out = new HashMap<String,String[]>();
         for( String key : queryParameters.keySet()){
-            List item = queryParameters.get(key);            
-            out.put(key, (String[])item.toArray(new String[item.size()]));
+            List<String> item = queryParameters.get(key);            
+            out.put(key, item.toArray(new String[item.size()]));
         }
         return out;
     }
@@ -416,10 +405,10 @@ public class N3MultiPartUpload extends VitroHttpServlet {
         /* **** Make a URI for the file that was just saved **** */
         String newFileUri = makeNewUri(editConfig.getNewResources().get(
                 "fileURI"), jenaOntModel);
-        assertions = n3Subber.subInUris("fileURI", newFileUri, assertions);
+        assertions = EditN3Generator.subInUris("fileURI", newFileUri, assertions);
 
         /* **** URIs and Literals on Form/Parameters ** */
-        assertions = n3Subber.subInUris(submission.getUrisFromForm(),
+        assertions = EditN3Generator.subInUris(submission.getUrisFromForm(),
                 assertions);
         assertions = n3Subber.subInLiterals(submission.getLiteralsFromForm(),
                 assertions);
@@ -427,7 +416,7 @@ public class N3MultiPartUpload extends VitroHttpServlet {
             log.debug("subsititued in literals from form: " + assertions);
 
         /* **** URIs and Literals in Scope ************ */
-        assertions = n3Subber
+        assertions = EditN3Generator
                 .subInUris(editConfig.getUrisInScope(), assertions);
         assertions = n3Subber.subInLiterals(editConfig.getLiteralsInScope(),
                 assertions);
@@ -456,8 +445,6 @@ public class N3MultiPartUpload extends VitroHttpServlet {
     private List<String> saveFileAndSubInFileInfo(FileItem fileItem,
             String dataDir, EditN3Generator n3generator, List<String> assertions)
             throws Exception {
-        String saveDir = dataDir;
-
         String originalName = fileItem.getName();
         String name = originalName.replaceAll("[,+\\\\/$%^&*#@!<>'\"~;]", "_");
         name = name.replace("..", "_");
@@ -547,9 +534,7 @@ public class N3MultiPartUpload extends VitroHttpServlet {
         String name = "edu.cornell.mannlib.datastar.DataStarPostUpload";
 
         try {
-            Class clazz = this.getClass();
-            ClassLoader cload = clazz.getClassLoader();
-            Class newClass = cload.loadClass(name);
+            Class<?> newClass = Class.forName(name);
             Object obj = newClass.newInstance();
             if (obj instanceof PostUpload) {
                 newPu = (PostUpload) obj;
@@ -644,39 +629,17 @@ public class N3MultiPartUpload extends VitroHttpServlet {
         }
 	}
 
-    private boolean logAddRetract(String msg, Map<String, List<String>> add,
-            Map<String, List<String>> retract) {
-        log.debug(msg);
-        if (add != null)
-            log.debug("assertions: " + add.toString());
-        if (retract != null)
-            log.debug("retractions: " + retract.toString());
-        return true;
-    }
+//    private boolean logAddRetract(String msg, Map<String, List<String>> add,
+//            Map<String, List<String>> retract) {
+//        log.debug(msg);
+//        if (add != null)
+//            log.debug("assertions: " + add.toString());
+//        if (retract != null)
+//            log.debug("retractions: " + retract.toString());
+//        return true;
+//    }
 
     static Random random = new Random();
-
-    private static Property FILE_LOCATION_PROP = ResourceFactory
-            .createProperty(VitroVocabulary.FILE_LOCATION);
-
-    private static Property CONTENT_TYPE_PROP = ResourceFactory
-            .createProperty(VitroVocabulary.CONTENT_TYPE);
-
-    private static Property FILE_NAME_PROP = ResourceFactory
-            .createProperty(VitroVocabulary.FILE_NAME);
-
-    private static Property HAS_FILE_PROP = ResourceFactory
-            .createProperty(VitroVocabulary.HAS_FILE);
-
-    private static Property FILE_CLASS = ResourceFactory
-            .createProperty(VitroVocabulary.FILE_CLASS);
-
-    private static Property RDF_TYPE = RDF.type;
-
-    private static Property RDFS_LABEL = RDFS.label;
-
-    private static Property FILE_ERROR_UPLOADING = ResourceFactory
-            .createProperty(VitroVocabulary.vitroURI + "fileErrorUploading");
 
     Log log = LogFactory.getLog(N3MultiPartUpload.class);
 }
