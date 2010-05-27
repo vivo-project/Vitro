@@ -72,8 +72,8 @@ public class ContactFormController extends FreeMarkerHttpServlet {
             body.put("portalType", portalType);
             
             body.put("portalId", portalId);
+            body.put("formAction", "submitFeedback");
 
-            // Not used in template. Is it used in processing the form?
             if (vreq.getHeader("Referer") == null) {
                 vreq.getSession().setAttribute("contactFormReferer","none");
             } else {

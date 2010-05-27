@@ -20,7 +20,7 @@ public class FreeMarkerComponentGenerator extends FreeMarkerHttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(FreeMarkerHttpServlet.class.getName());
 
-    public FreeMarkerComponentGenerator(HttpServletRequest request, HttpServletResponse response) {
+    FreeMarkerComponentGenerator(HttpServletRequest request, HttpServletResponse response) {
         doSetup(request, response);
     }
     
@@ -41,7 +41,7 @@ public class FreeMarkerComponentGenerator extends FreeMarkerHttpServlet {
     }
     
     private String get(String templateName) {
-        String template = "components/" + templateName + ".ftl";
+        String template = "page/partials/" + templateName + ".ftl";
         return mergeToTemplate(template, root).toString();
     }
     

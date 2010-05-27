@@ -72,10 +72,6 @@ public class BrowseController extends FreeMarkerHttpServlet {
         String bodyTemplate = "classGroups.ftl"; 
         String message = null;
         
-    	// Set main page template attributes specific to this page
-    	// But the template should control this! Try putting in a div inside the content.
-    	//root.put("contentClass", "siteMap");
-        
     	if( vreq.getParameter("clearcache") != null ) //mainly for debugging
     		clearGroupCache();
 
