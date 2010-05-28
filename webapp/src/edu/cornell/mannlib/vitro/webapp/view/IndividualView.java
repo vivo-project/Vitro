@@ -6,14 +6,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Routes;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
+import edu.cornell.mannlib.vitro.webapp.view.ViewFinder.ClassView;
 
 public class IndividualView extends ViewObject {
     
     private static final Log log = LogFactory.getLog(IndividualView.class.getName());
     
-    private static final String PATH = Routes.INDIVIDUAL.path();
+    private static final String PATH = Route.INDIVIDUAL.path();
     
     private Individual individual;
     
@@ -44,13 +45,10 @@ public class IndividualView extends ViewObject {
         return getUrl("/individual/" + individual.getLocalName());
     }
     
-    public String getListView() {
-        // TODO
-        // iterate through class hierarchy looking for a custom short view. If none, use
-        // default individual short view. template will just do an include on individual.shortView
-        // Use individual.getVClasses() - this is the class hierarchy
-        // Question: what order are they returned in ? If from specific to general, break out of the iteration as soon as we find one.
-        return "defaultIndividualListView.ftl";
+    public String getSearchView() {
+        
+        ViewFinder vf = new ViewFinder(ClassView.SEARCH);
+        return vf.findView(individual, context);
     }
     
     public String getCustomView() {

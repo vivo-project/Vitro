@@ -25,7 +25,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.ContactMailServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Routes;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 import edu.cornell.mannlib.vitro.webapp.view.fileList.ScriptList;
 import edu.cornell.mannlib.vitro.webapp.view.fileList.StylesheetList;
@@ -180,15 +180,15 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
             root.put("bannerImage", UrlBuilder.getUrl(themeDir + "site_icons/" + bannerImage));
         }
 
-        urls.put("about", urlBuilder.getPortalUrl(Routes.ABOUT));
+        urls.put("about", urlBuilder.getPortalUrl(Route.ABOUT));
         if (ContactMailServlet.getSmtpHostFromProperties() != null) {
-            urls.put("contact", urlBuilder.getPortalUrl(Routes.CONTACT));
+            urls.put("contact", urlBuilder.getPortalUrl(Route.CONTACT));
         }
-        urls.put("search", urlBuilder.getPortalUrl(Routes.SEARCH));  
-        urls.put("termsOfUse", urlBuilder.getPortalUrl(Routes.TERMS_OF_USE));  
-        urls.put("login", urlBuilder.getPortalUrl(Routes.LOGIN));          
+        urls.put("search", urlBuilder.getPortalUrl(Route.SEARCH));  
+        urls.put("termsOfUse", urlBuilder.getPortalUrl(Route.TERMS_OF_USE));  
+        urls.put("login", urlBuilder.getPortalUrl(Route.LOGIN));          
         urls.put("logout", urlBuilder.getLogoutUrl());       
-        urls.put("siteAdmin", urlBuilder.getPortalUrl(Routes.LOGIN));  
+        urls.put("siteAdmin", urlBuilder.getPortalUrl(Route.LOGIN));  
         
         setSharedVariable("urls", urls); 
     }

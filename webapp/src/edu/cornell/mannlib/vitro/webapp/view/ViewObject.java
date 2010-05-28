@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.view;
 
+import javax.servlet.ServletContext;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -11,6 +13,8 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Params;
 public abstract class ViewObject {
 
     private static final Log log = LogFactory.getLog(ViewObject.class.getName());
+    
+    public static ServletContext context = null;
 
     // Wrap UrlBuilder method so templates can call ${item.url}
     public String getUrl(String path) {

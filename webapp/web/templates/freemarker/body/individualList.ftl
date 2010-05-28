@@ -14,9 +14,9 @@
         <#else>
             <#-- RY NEED TO ACCOUNT FOR p:process stuff -->
             <ul>
-                <#list individuals as individual>
+                <#list individuals as individual>                   
                     <li>
-                        <#include "partials/defaultIndividualListView.ftl">              
+                        <#include "partials/class/view/search/${individual.searchView}">              
                     </li>
                 </#list>
             </ul>

@@ -17,23 +17,18 @@ import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 public class UrlBuilder {
 
     private static final Log log = LogFactory.getLog(UrlBuilder.class.getName());
+
+    protected static String contextPath = null;   
+    private static boolean addPortalParam = PortalPickerFilter.isPortalPickingActive();
     
     private Portal portal;
         
-    // This is static so that getUrl() can be static and refer to contextPath.
-    // getUrl() is static so that view objects can call it without 
-    // having to instantiate an object and inject knowledge of the context path, which 
-    // they don't have.
-    protected static String contextPath = null;
-    
-    private static boolean isMultiPortal = PortalPickerFilter.isPortalPickingActive();
-    
-    public enum Routes {
+    public enum Route {
         ABOUT("/about"),
         BROWSE("/browse"),
         CONTACT("/contact"),
         INDIVIDUAL("/individual"),
-        INDIVIDUAL_LIST("/entitylist"), // "/individuallist"
+        INDIVIDUAL_LIST("/individuallist"), // individuallist entitylist
         SEARCH("/search"),
         TERMS_OF_USE("/termsOfUse"),
         
@@ -44,7 +39,7 @@ public class UrlBuilder {
         
         private final String path;
         
-        Routes(String path) {
+        Route(String path) {
             this.path = path;
         }
         
@@ -75,7 +70,7 @@ public class UrlBuilder {
     }
     
     public String getLogoutUrl() {
-        return getPortalUrl(Routes.LOGOUT.url(), new Params("loginSubmitMode", "logout"));
+        return getPortalUrl(Route.LOGOUT.url(), new Params("loginSubmitMode", "logout"));
     }
     
     public Params getPortalParam() {
@@ -83,21 +78,21 @@ public class UrlBuilder {
     }
 
     public String getPortalUrl(String path) {
-        return isMultiPortal ? getUrl(path, getPortalParam()) : getUrl(path);
+        return addPortalParam ? getUrl(path, getPortalParam()) : getUrl(path);
     }
     
     public String getPortalUrl(String path, Params params) {
-        if (isMultiPortal) {
+        if (addPortalParam) {
             params.putAll(getPortalParam());
         }
         return getUrl(path, params);
     }
     
-    public String getPortalUrl(Routes route) {
+    public String getPortalUrl(Route route) {
         return getPortalUrl(route.path());
     }
     
-    public String getPortalUrl(Routes route, Params params) {
+    public String getPortalUrl(Route route, Params params) {
         return getPortalUrl(route.path(), params);
     }
     

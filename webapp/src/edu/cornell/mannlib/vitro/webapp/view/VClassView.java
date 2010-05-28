@@ -7,12 +7,12 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Params;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Routes;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 
 public class VClassView extends ViewObject {
     
     private static final Log log = LogFactory.getLog(VClassView.class.getName());
-    private static final String PATH = Routes.INDIVIDUAL_LIST.path();
+    private static final String PATH = Route.INDIVIDUAL_LIST.path();
     
     private VClass vclass;
     
