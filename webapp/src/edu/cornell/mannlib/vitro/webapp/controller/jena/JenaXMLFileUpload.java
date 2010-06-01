@@ -13,11 +13,9 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import javax.xml.transform.stream.StreamSource;
 
 import net.sf.saxon.s9api.Processor;
@@ -40,10 +38,9 @@ import com.hp.hpl.jena.rdf.model.ModelMaker;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
 
+import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
-import edu.cornell.mannlib.vedit.controller.BaseEditController;
-import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSpecialModelMaker;
 
@@ -96,8 +93,6 @@ public class JenaXMLFileUpload  extends BaseEditController  {
 	 */
 	public void doPost(HttpServletRequest request, HttpServletResponse resp)
 	throws ServletException, IOException {
-		ServletContext application = getServletContext();
-		HttpSession session = request.getSession();
 		boolean isMultipart = ServletFileUpload.isMultipartContent(request);
 
 		/*
@@ -115,7 +110,6 @@ public class JenaXMLFileUpload  extends BaseEditController  {
         queryParameters = new HashMap<String, List<String>>();
         fileStreams = new HashMap<String, List<FileItem>>();
 
-        List<String> fileUploadErrors = new ArrayList<String>();
         Iterator<FileItem> iter;
         try {
             iter = getFileItemIterator(request);
