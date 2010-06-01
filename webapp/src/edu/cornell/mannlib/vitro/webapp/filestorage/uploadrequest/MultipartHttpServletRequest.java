@@ -133,6 +133,29 @@ class MultipartHttpServletRequest extends FileUploadServletRequest {
 		return files;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * There may be more than one file item with the given name. If the first
+	 * one is empty (size is zero), keep looking for a non-empty one.
+	 * </p>
+	 */
+	@Override
+	public FileItem getFileItem(String name) {
+		List<FileItem> items = files.get(name);
+		if (items == null) {
+			return null;
+		}
+
+		for (FileItem item : items) {
+			if (item.getSize() > 0L) {
+				return item;
+			}
+		}
+
+		return null;
+	}
+
 	// ----------------------------------------------------------------------
 	// Parameter-related methods won't find anything on the delegate request,
 	// since parsing consumed the parameters. So we need to look to the parsed

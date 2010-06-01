@@ -19,7 +19,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.FileUploadBase.SizeLimitExceededException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 /**
@@ -71,9 +70,21 @@ public abstract class FileUploadServletRequest implements HttpServletRequest {
 	// New functionality to be implemented by the subclasses.
 	// ----------------------------------------------------------------------
 
+	/** Was this a multipart HTTP request? */
 	public abstract boolean isMultipart();
 
+	/**
+	 * Get the map of file items, by name.
+	 */
 	public abstract Map<String, List<FileItem>> getFiles();
+
+	/**
+	 * Find a non-empty file item with this name.
+	 * 
+	 * @return the first such file item, or <code>null</code> if no matching,
+	 *         non-empty items were found.
+	 */
+	public abstract FileItem getFileItem(String string);
 
 	// ----------------------------------------------------------------------
 	// Delegated methods.

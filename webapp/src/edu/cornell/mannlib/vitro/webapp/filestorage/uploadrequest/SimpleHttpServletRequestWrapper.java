@@ -35,6 +35,11 @@ class SimpleHttpServletRequestWrapper extends FileUploadServletRequest {
 	public Map<String, List<FileItem>> getFiles() {
 		return Collections.emptyMap();
 	}
+	
+	@Override
+	public FileItem getFileItem(String string) {
+		return null;
+	}
 
 	// ----------------------------------------------------------------------
 	// Since this is not a multipart request, the parameter methods can be
