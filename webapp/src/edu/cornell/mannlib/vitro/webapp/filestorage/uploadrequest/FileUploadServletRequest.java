@@ -33,6 +33,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
  * sub-classes.
  * </p>
  */
+@SuppressWarnings("deprecation")
 public abstract class FileUploadServletRequest implements HttpServletRequest {
 	// ----------------------------------------------------------------------
 	// The factory method
@@ -200,7 +201,6 @@ public abstract class FileUploadServletRequest implements HttpServletRequest {
 		return delegate.isRequestedSessionIdFromURL();
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public boolean isRequestedSessionIdFromUrl() {
 		return delegate.isRequestedSessionIdFromUrl();
@@ -281,7 +281,6 @@ public abstract class FileUploadServletRequest implements HttpServletRequest {
 		return delegate.getReader();
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public String getRealPath(String path) {
 		return delegate.getRealPath(path);
