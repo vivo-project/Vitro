@@ -269,6 +269,13 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		      failonerror="false">
 			<fileset dir="${build.dir}/war/WEB-INF/submodels" includes="**/*" />
 		</sync>
+
+		<!-- Discard any template files from previous builds. -->
+		<sync todir="${webapp.deploy.home}/themes"
+		      includeemptydirs="true"
+		      failonerror="false">
+			<fileset dir="${build.dir}/war/themes" includes="**/*" />
+		</sync>
 	</target>
 
 	<!-- ================================= 
