@@ -7,8 +7,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -27,8 +25,6 @@ import net.sf.saxon.s9api.XsltTransformer;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -43,11 +39,12 @@ import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSpecialModelMaker;
+import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest;
 
 public class JenaXMLFileUpload  extends BaseEditController  {	
 	Log log = LogFactory.getLog(JenaXMLFileUpload.class);
 	private String baseDirectoryForFiles;
-	private long maxFileSize = 1024 * 1024 * 500;
+	private int maxFileSize = 1024 * 1024 * 500;
 	
 	private XsltExecutable xsltExec;
 	private Processor processor;
@@ -91,83 +88,38 @@ public class JenaXMLFileUpload  extends BaseEditController  {
 	 * defaultNamespace - namespace to use for elements in xml that lack a namespace
 	 * 
 	 */
-	public void doPost(HttpServletRequest request, HttpServletResponse resp)
+	public void doPost(HttpServletRequest rawRequest, HttpServletResponse resp)
 	throws ServletException, IOException {
-		boolean isMultipart = ServletFileUpload.isMultipartContent(request);
-
-		/*
-		 * the post parameters seem to get consumed by the parsing so we have to
-		 * make a copy.
-		 */
-		Map<String, List<String>> queryParameters = null;
-		Map<String, List<FileItem>> fileStreams = null;
-		if (!isMultipart) {
-			// TODO: forward to error message
-			throw new ServletException("Must POST a multipart encoded request");
+		FileUploadServletRequest request = null;
+		try {
+			request = FileUploadServletRequest
+					.parseRequest(rawRequest, maxFileSize);
+		} catch (FileUploadException e) {
+            // TODO: forward to error message
+            throw new ServletException("Size limit exceeded: " + e.getLocalizedMessage());
 		}
-		
-		log.debug("multipart content detected");
-        queryParameters = new HashMap<String, List<String>>();
-        fileStreams = new HashMap<String, List<FileItem>>();
-
-        Iterator<FileItem> iter;
-        try {
-            iter = getFileItemIterator(request);
-        } catch (FileUploadException e) {
-            log.debug(e);                        
-            request.setAttribute("errors", e.getLocalizedMessage());
-            RequestDispatcher rd = request
-                    .getRequestDispatcher("/edit/fileUploadError.jsp");
-            rd.forward(request, resp);            
-            return;
-        }
-
-        // get files or parameter values
-        while (iter.hasNext()) {
-            FileItem item = (FileItem) iter.next();
-            String name = item.getFieldName();
-            if (item.isFormField()) {
-                if (queryParameters.containsKey(name)) {
-                    // String value = new
-                    // String(item.getString().getBytes("ISO-8859-1"), "UTF-8");
-                    String value = item.getString("UTF-8");
-                    queryParameters.get(name).add(value);
-                } else {
-                    List<String> valueList = new ArrayList<String>(1);
-                    // String value = new
-                    // String(item.getString().getBytes("ISO-8859-1"), "UTF-8");
-                    String value = item.getString("UTF-8");
-                    valueList.add(value);
-                    queryParameters.put(name, valueList);
-                }
-            } else {
-                if (fileStreams.containsKey(name)) {
-                    fileStreams.get(name).add(item);
-                    log.debug("File in multipart content request:  field "
-                            + name + " with file name " + item.getName()
-                            + " detected.");
-                } else {
-                    List<FileItem> itemList = new ArrayList<FileItem>();
-                    itemList.add(item);
-                    fileStreams.put(name, itemList);
-                }
-            }
+        if (request.isMultipart()) {
+        	log.debug("multipart content detected");
+        } else {
+            // TODO: forward to error message
+            throw new ServletException("Must POST a multipart encoded request");
         }
 
 		if (!checkLoginStatus(request,resp)) 
 			return;		        
         VitroRequest vreq = new VitroRequest(request);        
         ModelMaker modelMaker = getVitroJenaModelMaker(vreq);
-        List<String> targetModel = queryParameters.get("targetModel");               
-        if( targetModel == null || targetModel.size() < 1)
-        	throw new ServletException("targetModel not specified.");        
+        String targetModel = request.getParameter("targetModel");               
+		if (targetModel == null) {
+			throw new ServletException("targetModel not specified.");
+		}
         
-        Model m = modelMaker.getModel(targetModel.get(0));
+        Model m = modelMaker.getModel(targetModel);
         if( m == null )
         	throw new ServletException("targetModel '" + targetModel + "' was not found.");
-        request.setAttribute("targetModel", targetModel.get(0));
+        request.setAttribute("targetModel", targetModel);
         
-        List<File> filesToLoad = saveFiles( fileStreams );    
+        List<File> filesToLoad = saveFiles( request.getFiles() );    
         List<File> rdfxmlToLoad = convertFiles( filesToLoad);
         List<Model> modelsToLoad = loadRdfXml( rdfxmlToLoad );
     
@@ -186,7 +138,7 @@ public class JenaXMLFileUpload  extends BaseEditController  {
 		request.setAttribute("title","Uploaded files and converted to RDF");
 		request.setAttribute("bodyJsp","/jenaIngest/xmlFileUploadSuccess.jsp");
 		
-		request.setAttribute("fileItems",fileStreams);				
+		request.setAttribute("fileItems",request.getFiles());				
 
         Portal portal = vreq.getPortal();
 		RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);      
@@ -341,17 +293,4 @@ public class JenaXMLFileUpload  extends BaseEditController  {
 		
 	}
 	
-	private Iterator<FileItem> getFileItemIterator(HttpServletRequest request)
-	throws FileUploadException {
-		// Create a factory for disk-based file items
-		DiskFileItemFactory factory = new DiskFileItemFactory();
-		factory.setSizeThreshold((int) maxFileSize);
-		factory.setRepository(new File(baseDirectoryForFiles));
-
-		// Create a new file upload handler
-		ServletFileUpload upload = new ServletFileUpload(factory);
-		upload.setSizeMax(maxFileSize);
-		return upload.parseRequest(request).iterator();
-	}
-
 }
