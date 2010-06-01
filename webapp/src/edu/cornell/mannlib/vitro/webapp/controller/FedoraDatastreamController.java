@@ -31,25 +31,23 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
 
-import com.hp.hpl.jena.datatypes.BaseDatatype;
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
-import com.hp.hpl.jena.datatypes.xsd.XSDDateTime;
 import com.hp.hpl.jena.ontology.DatatypeProperty;
 import com.hp.hpl.jena.ontology.ObjectProperty;
 import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.vocabulary.RDFS;
 import com.hp.hpl.jena.vocabulary.XSD;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.Resource;
 import com.ibm.icu.util.Calendar;
 
+import edu.cornell.mannlib.vedit.beans.LoginFormBean;
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
@@ -57,8 +55,6 @@ import fedora.client.FedoraClient;
 import fedora.common.Constants;
 import fedora.server.management.FedoraAPIM;
 import fedora.server.types.gen.Datastream;
-import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
 
 
 /**
@@ -81,9 +77,7 @@ public class FedoraDatastreamController extends VitroHttpServlet implements Cons
     private boolean connected = false;
     
     private static final int DEFAULT_MAX_SIZE = 1024 * 1024 * 50;//Shoudl this be changed to 1 GB to be consistent
-    private static final String DEFAULT_FILE_URI_PREFIX = "http://vivo.library.cornell.edu/ns/0.1#individual";
     private static final String DEFAULT_BASE_DIR = "/usr/local/vitrofiles";
-    private static String fileUriPrefix = DEFAULT_FILE_URI_PREFIX;
     private static String baseDirectoryForFiles = DEFAULT_BASE_DIR;
     private static int maxFileSize = DEFAULT_MAX_SIZE;
     
@@ -377,8 +371,6 @@ public class FedoraDatastreamController extends VitroHttpServlet implements Cons
             }
 
             File uploadedFile = new File(saveLocation);
-            //System.out.println("Uploaded file path " + uploadedFile.getPath() + " - get file?" + uploadedFile.getName());
-            String uploadedFileLocation = uploadedFile.getAbsolutePath();
             
             try {
                 fileRes.write(uploadedFile);
@@ -615,8 +607,6 @@ public class FedoraDatastreamController extends VitroHttpServlet implements Cons
 	public void init() throws ServletException {
 		super.init();
 
-		fileUriPrefix = ConfigurationProperties.getProperty(
-				"n3.defaultUriPrefix", DEFAULT_FILE_URI_PREFIX);
 		baseDirectoryForFiles = ConfigurationProperties.getProperty(
 				"n3.baseDirectoryForFiles", DEFAULT_BASE_DIR);
 
