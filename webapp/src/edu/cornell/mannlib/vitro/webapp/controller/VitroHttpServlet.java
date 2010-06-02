@@ -64,14 +64,6 @@ public class VitroHttpServlet extends HttpServlet
             request.getAttribute("webappDaoFactory") == null ){
             log.warn("request scope was not prepared by VitroRequestPrep");
         }
-        
-        // TEMPORARY for transition from JSP to FreeMarker. Once transition
-        // is complete and no more pages are generated in JSP, this can be removed.
-        // Do this if FreeMarker is configured (i.e., not Datastar) and if we are not in
-        // a FreeMarkerHttpServlet, which will generate identity, menu, and footer from the page template.
-        if ( FreeMarkerHttpServlet.isConfigured() && !(this instanceof FreeMarkerHttpServlet) ) {
-            FreeMarkerHttpServlet.getFreeMarkerComponentsForJsp(request, response);
-        }
     }
    
 
