@@ -1,3 +1,15 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
-<a href="${individual.profileUrl}">${individual.name}</a> ${individual.tagline} 
+<#-- Default individual search view -->
+
+<#import "/macros/list.ftl" as l>
+
+<a href="${individual.profileUrl}">${individual.name}</a>
+<ul class="individualData">
+    <@l.firstLastList>
+        <li>${individual.tagline}</li>,
+        <#list individual.links as link>
+            <li><a class="externalLink" href="${link.url}">${link.anchor}</a></li>,            
+        </#list>
+    </@l.firstLastList>
+</ul>

@@ -32,7 +32,7 @@ public class UrlBuilder {
         SEARCH("/search"),
         TERMS_OF_USE("/termsOfUse"),
         
-        // put under /admin
+        // RY put these under /admin/
         LOGIN("/siteAdmin"),
         LOGOUT("/login_process.jsp"),
         SITE_ADMIN("/siteAdmin");

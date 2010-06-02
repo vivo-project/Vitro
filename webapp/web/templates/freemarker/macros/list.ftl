@@ -1,6 +1,8 @@
 <#-- 
+    Macro: firstLastList
+    
     Output a sequence of <li> elements, adding classes "first" and "last" to first and last list elements, respectively. 
-    It is helpful when the list elements are generated conditionally, to avoid complex tests for the presence/absence
+    Especially useful when the list elements are generated conditionally, to avoid complex tests for the presence/absence
     of other list elements in order to assign these classes.
     
     Input should be a series of <li> elements separated by some delimiter. Default delimiter value is ",".
@@ -8,27 +10,27 @@
     Tolerates a delimiter following the last <li> element.
     
     Usage:
-        <@makeList>
+        <@firstLastList>
             <li>apples</li>,
             <li>bananas</li>,
             <li>oranges</li>
-        <@makeList>
+        <@firstLastList>
         
-        <@makeList delim="??">
+        <@firstLastList delim="??">
             <li>apples, oranges</li>??
             <li>bananas, lemons</li>??
             <li>grapefruit, limes</li>
-        <@makeList>
+        <@firstLastList>
 
     RY Consider rewriting in Java. Probably designers won't want to modify this.
 -->
-<#macro makeList delim=",">
+<#macro firstLastList delim=",">
     <#assign text>
         <#nested>
     </#assign>
-    
+
     <#-- Strip out a list-final delimiter, else (unlike most languages) it results in an empty final array item. -->
-    <#assign text = text?replace("${delim}$", "", "r")>
+    <#assign text = text?replace("${delim}\\s*$", "", "r")>
 
     <#assign items = text?split(delim)>
     
@@ -45,13 +47,9 @@
             <#assign newItem = newItem?replace(m?groups[1], "")>
         </#list>
 
-        <#-- Test indices, rather than comparing content, on the remote chance
-        that there are two list items with the same content. -->
-        <#-- <#if item == arr?first> -->
         <#if item_index == 0> 
             <#assign classVal = "${classVal} first">
         </#if>
-        <#-- <#if item == arr?last> -->
         <#if !item_has_next>       
             <#assign classVal = "${classVal} last">
         </#if>
@@ -66,3 +64,5 @@
 </#macro>
 
 <#----------------------------------------------------------------------------->
+
+

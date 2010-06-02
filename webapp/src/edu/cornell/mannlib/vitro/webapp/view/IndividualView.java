@@ -2,10 +2,14 @@
 
 package edu.cornell.mannlib.vitro.webapp.view;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.beans.Link;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 import edu.cornell.mannlib.vitro.webapp.view.ViewFinder.ClassView;
@@ -44,23 +48,45 @@ public class IndividualView extends ViewObject {
     public String getProfileUrl() {
         return getUrl("/individual/" + individual.getLocalName());
     }
-    
-    public String getSearchView() {
         
-        ViewFinder vf = new ViewFinder(ClassView.SEARCH);
-        return vf.findView(individual, context);
+    public String getSearchView() {        
+        return getView(ClassView.SEARCH);
     }
     
-    public String getCustomView() {
-        // see code currently in entityList.ftl
-        String customView = null;
-        
-        return customView;
+    public String getShortView() {        
+        return getView(ClassView.SHORT);
     }
     
-    public Object getProperty(String propertyName) {
-        return new Object();
+    public String getDisplayView() {        
+        return getView(ClassView.DISPLAY);
     }
-
+    
+    private String getView(ClassView view) {
+        ViewFinder vf = new ViewFinder(view);
+        return vf.findClassView(individual, context);
+    }
+    
+    public Link getPrimaryLink() {
+        Link primaryLink = null;
+        String anchor = individual.getAnchor();
+        String url = individual.getUrl();
+        if (anchor != null && url != null) {
+            primaryLink = new Link();
+            primaryLink.setAnchor(individual.getAnchor());
+            primaryLink.setUrl(individual.getUrl());           
+        } 
+        return primaryLink;
+    }
+    
+    public List<Link> getLinks() {
+        List<Link> additionalLinks = individual.getLinksList();
+        List<Link> links = new ArrayList<Link>(additionalLinks.size()+1);
+        Link primaryLink = getPrimaryLink();
+        if (primaryLink != null) {
+            links.add(primaryLink);
+        }        
+        links.addAll(additionalLinks);
+        return links;      
+    }
 
 }

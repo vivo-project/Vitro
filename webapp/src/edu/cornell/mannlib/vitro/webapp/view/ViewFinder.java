@@ -27,7 +27,8 @@ public class ViewFinder {
     
     public enum ClassView { 
         DISPLAY("getCustomDisplayView", "/view/display"),
-        FORM("getCustomEntryForm", "/form"),
+        // NB this is not the value currently used for custom forms - we use the value on the object property
+        FORM("getCustomEntryForm", "/form"), 
         SEARCH("getCustomSearchView", "/view/search"),
         SHORT("getCustomShortView", "/view/short"); 
         
@@ -64,9 +65,8 @@ public class ViewFinder {
         this.view = view;
     }
     
-    public String findView(Individual individual, ServletContext context) {
-        String viewName = "default.ftl";
-        // For now, all custom views are attached to classes.
+    public String findClassView(Individual individual, ServletContext context) {
+        String viewName = "default.ftl"; 
         List<VClass> vclasses = individual.getVClasses();
         Method method = view.getMethod();
         /* RY The logic here is incorrect. The vclasses are

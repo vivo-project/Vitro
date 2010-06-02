@@ -16,6 +16,7 @@
             <ul>
                 <#list individuals as individual>                   
                     <li>
+                        <#-- Currently we just use the search view here; there's no custom list view defined. -->
                         <#include "partials/class/view/search/${individual.searchView}">              
                     </li>
                 </#list>
