@@ -46,7 +46,7 @@ public class IndividualView extends ViewObject {
     // getEditUrl(), getDeleteUrl() to return the links computed by PropertyEditLinks.
     // RY **** Need to account for everything in URLRewritingHttpServlet
     public String getProfileUrl() {
-        return getUrl("/individual/" + individual.getLocalName());
+        return getUrl(PATH + "/" + individual.getLocalName());
     }
         
     public String getSearchView() {        

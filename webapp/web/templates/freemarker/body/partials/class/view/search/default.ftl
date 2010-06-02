@@ -2,13 +2,14 @@
 
 <#-- Default individual search view -->
 
-<#import "/macros/list.ftl" as l>
+<#import "/lib/list.ftl" as l>
 
 <a href="${individual.profileUrl}">${individual.name}</a>
 <ul class="individualData">
     <@l.firstLastList>
         <li>${individual.tagline}</li>,
         <#list individual.links as link>
+            ${link.setAnchor("Changing Anchor Text")}
             <li><a class="externalLink" href="${link.url}">${link.anchor}</a></li>,            
         </#list>
     </@l.firstLastList>

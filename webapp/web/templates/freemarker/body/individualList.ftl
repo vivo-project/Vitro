@@ -12,7 +12,6 @@
         <#if message??>
             <p>${message}</p>
         <#else>
-            <#-- RY NEED TO ACCOUNT FOR p:process stuff -->
             <ul>
                 <#list individuals as individual>                   
                     <li>

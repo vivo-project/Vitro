@@ -348,7 +348,6 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
     // a FreeMarkerHttpServlet, which will generate identity, menu, and footer from the page template.
     // It's a static method because it needs to be called from JSPs that don't go through a servlet.
     public static void getFreeMarkerComponentsForJsp(HttpServletRequest request, HttpServletResponse response) {
-        System.out.println("IN getFreeMarkerComponentsForJsp");
         FreeMarkerComponentGenerator fcg = new FreeMarkerComponentGenerator(request, response);
         request.setAttribute("ftl_identity", fcg.getIdentity());
         request.setAttribute("ftl_menu", fcg.getMenu());

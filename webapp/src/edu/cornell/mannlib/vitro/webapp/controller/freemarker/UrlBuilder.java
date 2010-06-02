@@ -28,7 +28,7 @@ public class UrlBuilder {
         BROWSE("/browse"),
         CONTACT("/contact"),
         INDIVIDUAL("/individual"),
-        INDIVIDUAL_LIST("/individuallist"), // individuallist entitylist
+        INDIVIDUAL_LIST("/entitylist"), // entitylist individuallist
         SEARCH("/search"),
         TERMS_OF_USE("/termsOfUse"),
         

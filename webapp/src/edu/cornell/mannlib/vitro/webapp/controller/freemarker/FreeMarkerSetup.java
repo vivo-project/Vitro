@@ -26,14 +26,14 @@ public class FreeMarkerSetup implements ServletContextListener {
 		Configuration cfg = new Configuration();
 		
 		// Specify the data source where the template files come from.
+		// RY Now being done for each request, in order to support multi-portal apps
+		// and dynamic theme-loading.
 //		try {
 //			cfg.setDirectoryForTemplateLoading(new File(templatePath));
 //		} catch (IOException e) {
 //			log.error("Error specifying template directory.");
 //		}
 		
-		// RY This setting won't take effect until we use Configuration.getTemplate() to
-		// create templates.
 		String buildEnv = ConfigurationProperties.getProperty("Environment.build");
 		if (buildEnv != null && buildEnv.equals("development")) {
 		    cfg.setTemplateUpdateDelay(0); // no template caching in development 
