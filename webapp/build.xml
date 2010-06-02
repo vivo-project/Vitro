@@ -150,7 +150,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		       debug="true"
 		       deprecation="true"
 		       optimize="true"
-		       source="1.5">
+		       source="1.6">
 			<classpath refid="compile.classpath" />
 		</javac>
 	</target>
@@ -164,7 +164,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		       debug="true"
 		       deprecation="true"
 		       optimize="false"
-		       source="1.5">
+		       source="1.6">
 			<classpath refid="test.compile.classpath" />
 		</javac>
 
@@ -271,9 +271,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		</sync>
 
 		<!-- Discard any template files from previous builds. -->
-		<sync todir="${webapp.deploy.home}/themes"
-		      includeemptydirs="true"
-		      failonerror="false">
+		<sync todir="${webapp.deploy.home}/themes" includeemptydirs="true" failonerror="false">
 			<fileset dir="${build.dir}/war/themes" includes="**/*" />
 		</sync>
 	</target>
@@ -297,4 +295,5 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 			<redirector outputproperty="licenser.test.output" alwayslog="true" />
 		</exec>
 	</target>
+
 </project>
