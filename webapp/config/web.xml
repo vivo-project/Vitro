@@ -144,6 +144,12 @@
     </listener-class>
   </listener>
   
+  <listener>
+    <listener-class>
+        edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup
+    </listener-class>
+  </listener>
+  
   <!--
     <listener>
         <listener-class>

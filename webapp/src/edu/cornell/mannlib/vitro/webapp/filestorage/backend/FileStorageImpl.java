@@ -16,15 +16,12 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.Map.Entry;
-
-import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 
 /**
  * The default implementation of {@link FileStorage}.
@@ -39,21 +36,6 @@ public class FileStorageImpl implements FileStorage {
 	// ----------------------------------------------------------------------
 	// Constructors and helper methods.
 	// ----------------------------------------------------------------------
-
-	/**
-	 * Use the configuration properties to create an instance.
-	 * 
-	 * @throws IllegalArgumentException
-	 *             if the configuration property for the base directory is
-	 *             missing, or if it doesn't point to an existing, writeable
-	 *             directory.
-	 * @throws IllegalArgumentException
-	 *             if the configuration property for the default namespace is
-	 *             missing, or if it isn't in the expected form.
-	 */
-	FileStorageImpl() throws IOException {
-		this(figureBaseDir(), figureFileNamespace());
-	}
 
 	/**
 	 * Use the arguments to create an instance. If the base directory is empty,
@@ -121,57 +103,6 @@ public class FileStorageImpl implements FileStorage {
 					"File upload directory is not writeable: '"
 							+ baseDir.getPath() + "'");
 		}
-	}
-
-	/**
-	 * Get the configuration property for the file storage base directory, and
-	 * check that it points to an existing, writeable directory.
-	 * 
-	 * For use by the constructor in implementations of {@link FileStorage}.
-	 */
-	static File figureBaseDir() {
-		String baseDirPath = ConfigurationProperties
-				.getProperty(PROPERTY_FILE_STORAGE_BASE_DIR);
-		if (baseDirPath == null) {
-			throw new IllegalArgumentException(
-					"Configuration properties must contain a value for '"
-							+ PROPERTY_FILE_STORAGE_BASE_DIR + "'");
-		}
-		return new File(baseDirPath);
-	}
-
-	/**
-	 * Get the configuration property for the default namespace, and derive the
-	 * file namespace from it. The default namespace is assumed to be in this
-	 * form: <code>http://vivo.mydomain.edu/individual/</code>
-	 * 
-	 * For use by the constructor in implementations of {@link FileStorage}.
-	 * 
-	 * @returns the file namespace is assumed to be in this form:
-	 *          <code>http://vivo.mydomain.edu/file/</code>
-	 */
-	static Collection<String> figureFileNamespace() {
-		String defaultNamespace = ConfigurationProperties
-				.getProperty(PROPERTY_DEFAULT_NAMESPACE);
-		if (defaultNamespace == null) {
-			throw new IllegalArgumentException(
-					"Configuration properties must contain a value for '"
-							+ PROPERTY_DEFAULT_NAMESPACE + "'");
-		}
-
-		String defaultSuffix = "/individual/";
-		String fileSuffix = "/file/";
-
-		if (!defaultNamespace.endsWith(defaultSuffix)) {
-			throw new IllegalArgumentException(
-					"Default namespace does not match the expected form: '"
-							+ defaultNamespace + "'");
-		}
-
-		int hostLength = defaultNamespace.length() - defaultSuffix.length();
-		String fileNamespace = defaultNamespace.substring(0, hostLength)
-				+ fileSuffix;
-		return Collections.singleton(fileNamespace);
 	}
 
 	/**

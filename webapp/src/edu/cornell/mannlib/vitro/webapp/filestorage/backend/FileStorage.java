@@ -6,24 +6,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
-import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
-
 /**
  * The interface for the File Storage system.
  */
 public interface FileStorage {
-	/**
-	 * The default implementation will use this key to ask
-	 * {@link ConfigurationProperties} for the file storage base directory.
-	 */
-	String PROPERTY_FILE_STORAGE_BASE_DIR = "upload.directory";
-
-	/**
-	 * The default implementation will use this key to ask
-	 * {@link ConfigurationProperties} for the default URI namespace.
-	 */
-	String PROPERTY_DEFAULT_NAMESPACE = "Vitro.defaultNamespace";
-
 	/**
 	 * The name of the root directory, within the base directory.
 	 */

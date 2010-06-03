@@ -2,7 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.filestorage.backend;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -19,7 +20,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Level;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -49,6 +49,10 @@ public class FileStorageImplTest extends AbstractTestClass {
 			purgeDirectoryRecursively(tempDir);
 		}
 	}
+
+	// ----------------------------------------------------------------------
+	// tests
+	// ----------------------------------------------------------------------
 
 	@Test(expected = IllegalArgumentException.class)
 	public void baseDirDoesntExist() throws IOException {
