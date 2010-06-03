@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.utilities.testrunner;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -56,42 +57,54 @@ public class SeleniumRunnerParameters {
 	 */
 	public SeleniumRunnerParameters(String propertiesFilepath)
 			throws IOException {
+		Properties props = loadPropertiesFile(propertiesFilepath);
+
+		this.websiteUrl = getRequiredProperty(props, PROP_WEBSITE_URL);
+		this.userExtensionsFile = checkReadableFile(props,
+				PROP_USER_EXTENSIONS_PATH);
+		this.firefoxProfileDir = checkOptionalReadableDirectory(props,
+				PROP_FIREFOX_PROFILE_PATH);
+		this.suiteTimeoutLimit = getRequiredIntegerProperty(props,
+				PROP_SUITE_TIMEOUT_LIMIT);
+		this.seleniumJarPath = checkReadableFile(props, PROP_SELENIUM_JAR_PATH);
+		this.uploadDirectory = checkReadWriteDirectory(props,
+				PROP_UPLOAD_DIRECTORY);
+
+		this.summaryCssFile = checkSummaryCssFile(props);
+
+		this.outputDirectory = checkOutputDirectory(props);
+		this.logFile = new File(this.outputDirectory, LOGFILE_NAME);
+		this.listener = new Listener(this.logFile);
+
+		this.suiteParentDirectories = checkSuiteParentDirectories(props);
+
+		this.modelCleanerProperties = new ModelCleanerProperties(props);
+
+		// Get the list of ignored tests.
+		String ignoredFilesPath = getRequiredProperty(props, PROP_IGNORED_TESTS);
+		File ignoredFilesFile = new File(ignoredFilesPath);
+		FileHelper.checkReadableFile(ignoredFilesFile, "File '"
+				+ ignoredFilesPath + "'");
+		this.ignoredTests = new IgnoredTests(ignoredFilesFile);
+	}
+
+	/**
+	 * Load the properties from the properties file.
+	 */
+	private Properties loadPropertiesFile(String propertiesFilepath)
+			throws FileNotFoundException, IOException {
+		File propsFile = new File(propertiesFilepath);
+		if (!propsFile.exists()) {
+			throw new FileNotFoundException("Property file does not exist: '"
+					+ propsFile + "'");
+		}
+
 		Reader propsReader = null;
 		try {
-			propsReader = new FileReader(new File(propertiesFilepath));
+			propsReader = new FileReader(propsFile);
 			Properties props = new Properties();
 			props.load(propsReader);
-
-			this.websiteUrl = getRequiredProperty(props, PROP_WEBSITE_URL);
-			this.userExtensionsFile = checkReadableFile(props,
-					PROP_USER_EXTENSIONS_PATH);
-			this.firefoxProfileDir = checkOptionalReadableDirectory(props,
-					PROP_FIREFOX_PROFILE_PATH);
-			this.suiteTimeoutLimit = getRequiredIntegerProperty(props,
-					PROP_SUITE_TIMEOUT_LIMIT);
-			this.seleniumJarPath = checkReadableFile(props,
-					PROP_SELENIUM_JAR_PATH);
-			this.uploadDirectory = checkReadWriteDirectory(props,
-					PROP_UPLOAD_DIRECTORY);
-
-			this.summaryCssFile = checkSummaryCssFile(props);
-
-			this.outputDirectory = checkReadWriteDirectory(props,
-					PROP_OUTPUT_DIRECTORY);
-			this.logFile = new File(this.outputDirectory, LOGFILE_NAME);
-			this.listener = new Listener(this.logFile);
-
-			this.suiteParentDirectories = checkSuiteParentDirectories(props);
-
-			this.modelCleanerProperties = new ModelCleanerProperties(props);
-
-			// Get the list of ignored tests.
-			String ignoredFilesPath = getRequiredProperty(props,
-					PROP_IGNORED_TESTS);
-			File ignoredFilesFile = new File(ignoredFilesPath);
-			FileHelper.checkReadableFile(ignoredFilesFile, "File '"
-					+ ignoredFilesPath + "'");
-			this.ignoredTests = new IgnoredTests(ignoredFilesFile);
+			return props;
 		} finally {
 			if (propsReader != null) {
 				try {
@@ -109,8 +122,7 @@ public class SeleniumRunnerParameters {
 	private File checkSummaryCssFile(Properties props) {
 		String summaryCssPath = getRequiredProperty(props, PROP_SUMMARY_CSS);
 		File cssFile = new File(summaryCssPath);
-		FileHelper.checkReadableFile(cssFile, "File '" + summaryCssPath
-				+ "'");
+		FileHelper.checkReadableFile(cssFile, "File '" + summaryCssPath + "'");
 		return cssFile;
 	}
 
@@ -121,6 +133,11 @@ public class SeleniumRunnerParameters {
 	private File checkOptionalReadableDirectory(Properties props, String key) {
 		String value = props.getProperty(key);
 		if (value == null) {
+			return null;
+		}
+
+		value = value.trim();
+		if (value.trim().length() == 0) {
 			return null;
 		}
 
@@ -155,22 +172,26 @@ public class SeleniumRunnerParameters {
 
 		if (!dir.exists()) {
 			throw new IllegalArgumentException("Directory " + key + " '"
-					+ value + "' does not exist.");
+					+ value + "' does not exist. (" + dir.getAbsolutePath()
+					+ ")");
 		}
 
 		if (!dir.isDirectory()) {
 			throw new IllegalArgumentException("Directory " + key + " '"
-					+ value + "' is not a directory.");
+					+ value + "' is not a directory. (" + dir.getAbsolutePath()
+					+ ")");
 		}
 
 		if (!dir.canRead()) {
 			throw new IllegalArgumentException("Directory " + key + " '"
-					+ value + "' is not readable.");
+					+ value + "' is not readable. (" + dir.getAbsolutePath()
+					+ ")");
 		}
 
 		if (!dir.canWrite()) {
 			throw new IllegalArgumentException("Directory " + key + " '"
-					+ value + "' is not writeable.");
+					+ value + "' is not writeable. (" + dir.getAbsolutePath()
+					+ ")");
 		}
 		return dir;
 	}
@@ -181,18 +202,61 @@ public class SeleniumRunnerParameters {
 		File file = new File(value);
 
 		if (!file.exists()) {
-			throw new IllegalArgumentException("File " + key
-					+ ": '' does not exist.");
+			throw new IllegalArgumentException("File " + key + ": '" + value
+					+ "' does not exist. (" + file.getAbsolutePath() + ")");
 		}
 		if (!file.isFile()) {
-			throw new IllegalArgumentException("File " + key
-					+ ": '' is not a file.");
+			throw new IllegalArgumentException("File " + key + ": '" + value
+					+ "' is not a file. (" + file.getAbsolutePath() + ")");
 		}
 		if (!file.canRead()) {
-			throw new IllegalArgumentException("File " + key
-					+ ": '' is not readable.");
+			throw new IllegalArgumentException("File " + key + ": '" + value
+					+ "' is not readable. (" + file.getAbsolutePath() + ")");
 		}
 		return file;
+	}
+
+	/**
+	 * Get the property for the output directory. If it does not exist, create
+	 * it (the parent must exist). Ensure that it is writeable.
+	 */
+	private File checkOutputDirectory(Properties props) throws IOException {
+		String value = getRequiredProperty(props, PROP_OUTPUT_DIRECTORY);
+		File outputDirectory = new File(value);
+		File outputParent = outputDirectory.getParentFile();
+
+		if (!outputDirectory.exists()) {
+			if (!outputParent.exists()) {
+				throw new IllegalArgumentException(
+						"Output directory does not exist, nor does its parent. '"
+								+ outputDirectory + "' ("
+								+ outputDirectory.getAbsolutePath() + ")");
+			}
+			outputDirectory.mkdir();
+			if (!outputDirectory.exists()) {
+				throw new IOException("Failed to create output directory: '"
+						+ outputDirectory + "' ("
+						+ outputDirectory.getAbsolutePath() + ")");
+			}
+		}
+
+		if (!outputDirectory.isDirectory()) {
+			throw new IllegalArgumentException("Suite directory '"
+					+ outputDirectory.getPath() + "' is not a directory. ("
+					+ outputDirectory.getAbsolutePath() + ")");
+		}
+		if (!outputDirectory.canRead()) {
+			throw new IllegalArgumentException("Suite directory '"
+					+ outputDirectory.getPath() + "' is not readable. ("
+					+ outputDirectory.getAbsolutePath() + ")");
+		}
+		if (!outputDirectory.canWrite()) {
+			throw new IllegalArgumentException("Suite directory '"
+					+ outputDirectory.getPath() + "' is not writeable. ("
+					+ outputDirectory.getAbsolutePath() + ")");
+		}
+
+		return outputDirectory;
 	}
 
 	/**
@@ -209,15 +273,18 @@ public class SeleniumRunnerParameters {
 
 			if (!dir.exists()) {
 				throw new IllegalArgumentException("Suite directory '"
-						+ dir.getPath() + "' does not exist.");
+						+ dir.getPath() + "' does not exist. ("
+						+ dir.getAbsolutePath() + ")");
 			}
 			if (!dir.isDirectory()) {
 				throw new IllegalArgumentException("Suite directory '"
-						+ dir.getPath() + "' is not a directory.");
+						+ dir.getPath() + "' is not a directory. ("
+						+ dir.getAbsolutePath() + ")");
 			}
 			if (!dir.canRead()) {
 				throw new IllegalArgumentException("Suite directory '"
-						+ dir.getPath() + "' is not readable.");
+						+ dir.getPath() + "' is not readable. ("
+						+ dir.getAbsolutePath() + ")");
 			}
 			dirs.add(dir);
 		}
@@ -336,12 +403,12 @@ public class SeleniumRunnerParameters {
 
 	public String toString() {
 		return "Parameters:" + "\n  websiteUrl: " + websiteUrl
-				+ "\n  userExtensionsFile: " + userExtensionsFile.getPath()
-				+ "\n  firefoxProfileDir: " + firefoxProfileDir.getPath()
+				+ "\n  userExtensionsFile: " + userExtensionsFile
+				+ "\n  firefoxProfileDir: " + firefoxProfileDir
 				+ "\n  suiteTimeoutLimit: " + suiteTimeoutLimit
-				+ "\n  seleniumJarPath: " + seleniumJarPath.getPath()
-				+ "\n  uploadDirectory: " + uploadDirectory.getPath()
-				+ "\n  outputDirectory: " + outputDirectory.getPath()
+				+ "\n  seleniumJarPath: " + seleniumJarPath
+				+ "\n  uploadDirectory: " + uploadDirectory
+				+ "\n  outputDirectory: " + outputDirectory
 				+ "\n  suiteParentDirectories: " + suiteParentDirectories
 				+ "\n  modelCleanerProperties: " + modelCleanerProperties
 				+ "\n" + ignoredTests + "\n\n  selectedSuites: "

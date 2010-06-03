@@ -96,7 +96,7 @@ public class SeleniumRunner {
 		try {
 			parms = new SeleniumRunnerParameters(args[0]);
 		} catch (IOException e) {
-			usage("Can't read properties file: " + e);
+			usage("Can't read properties file: " + e.getMessage());
 		}
 
 		if (interactive) {
