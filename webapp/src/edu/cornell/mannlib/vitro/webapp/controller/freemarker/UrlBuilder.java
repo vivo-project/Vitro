@@ -70,7 +70,7 @@ public class UrlBuilder {
     }
     
     public String getLogoutUrl() {
-        return getPortalUrl(Route.LOGOUT.url(), new Params("loginSubmitMode", "logout"));
+        return getPortalUrl(Route.LOGOUT.path(), new Params("loginSubmitMode", "Log Out"));
     }
     
     public Params getPortalParam() {
