@@ -2,9 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker; 
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -25,13 +23,6 @@ public class AboutController extends FreeMarkerHttpServlet {
     
         body.put("aboutText", portal.getAboutText());
         body.put("acknowledgeText", portal.getAcknowledgeText()); 
-        
-        // Test of #list directive in template on undefined, null, or empty values
-        // Basic idea: empty list okay, null or undefined value not okay
-        // List<String> apples = new ArrayList<String>();  // no error
-        // List<String> apples = null; // error
-        // body.put("apples", apples);
-        // no apples in body: error
    
         String bodyTemplate = "about.ftl";             
         return mergeBodyToTemplate(bodyTemplate, body);

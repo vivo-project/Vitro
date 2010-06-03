@@ -28,20 +28,34 @@ public class FreeMarkerSetup implements ServletContextListener {
 		// Specify the data source where the template files come from.
 		// RY Now being done for each request, in order to support multi-portal apps
 		// and dynamic theme-loading.
-//		try {
-//			cfg.setDirectoryForTemplateLoading(new File(templatePath));
-//		} catch (IOException e) {
-//			log.error("Error specifying template directory.");
-//		}
+		// try {
+		// 	cfg.setDirectoryForTemplateLoading(new File(templatePath));
+		// } catch (IOException e) {
+		// 	log.error("Error specifying template directory.");
+		// }
 		
 		String buildEnv = ConfigurationProperties.getProperty("Environment.build");
 		if (buildEnv != null && buildEnv.equals("development")) {
 		    cfg.setTemplateUpdateDelay(0); // no template caching in development 
 		}
 		
-		// Specify how templates will see the data-model. This is an advanced topic...
-		// but just use this:
-		cfg.setObjectWrapper(new DefaultObjectWrapper());
+	    // Specify how templates will see the data-model. This is an advanced topic...
+        // but just use this:
+        cfg.setObjectWrapper(new DefaultObjectWrapper());
+        
+		
+		// Set some formatting defaults. These can be overridden at the template
+		// or environment (template-processing) level, or for an individual
+        // instance by using built-ins.
+		cfg.setLocale(java.util.Locale.US);
+		
+		String dateFormat = "M/d/yyyy";
+		cfg.setDateFormat(dateFormat);
+		String timeFormat = "hh:mm a";
+	    cfg.setTimeFormat(timeFormat);
+		cfg.setDateTimeFormat(dateFormat + " " + timeFormat);
+		
+		//cfg.setNumberFormat("#,##0.##");
 		
 		try {
             cfg.setSetting("url_escaping_charset", "ISO-8859-1");
