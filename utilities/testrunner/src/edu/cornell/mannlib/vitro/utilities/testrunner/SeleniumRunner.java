@@ -62,7 +62,7 @@ public class SeleniumRunner {
 		}
 		listener.runStopped();
 	}
-	
+
 	private static void selectAllSuites(SeleniumRunnerParameters parms) {
 		List<File> suites = new ArrayList<File>();
 		for (File parentDir : parms.getSuiteParentDirectories()) {
@@ -87,10 +87,13 @@ public class SeleniumRunner {
 		}
 
 		if (args.length == 2) {
-			if (!"interactive".equalsIgnoreCase(args[1])) {
-				usage("Invalid argument '" + args[1] + "'");
+			String option = args[1].trim();
+			if (option.length() > 0) {
+				if (!"interactive".equalsIgnoreCase(args[1])) {
+					usage("Invalid argument '" + args[1] + "'");
+				}
+				interactive = true;
 			}
-			interactive = true;
 		}
 
 		try {
