@@ -11,4 +11,9 @@
         name="path.configuration" 
         value="deploy.properties"
         />
+        
+    <!--
+        Disable the attempt to persist sessions when Tomcat shuts down. 
+    -->
+    <Manager pathname="" />
 </Context>
