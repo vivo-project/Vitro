@@ -19,6 +19,7 @@ import javax.servlet.ServletException;
 /**
  * A simple stand-in for the {@link ServletContext}, for use in unit tests.
  */
+@SuppressWarnings("deprecation")
 public class ServletContextStub implements ServletContext {
 
 	// ----------------------------------------------------------------------
