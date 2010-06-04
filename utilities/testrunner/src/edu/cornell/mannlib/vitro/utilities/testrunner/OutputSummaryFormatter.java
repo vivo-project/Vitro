@@ -89,7 +89,7 @@ public class OutputSummaryFormatter {
 	/**
 	 * The overall status for the run is the worst status of any component.
 	 */
-	private Status figureOverallStatus(LogStats log, List<SuiteStats> suites) {
+	public Status figureOverallStatus(LogStats log, List<SuiteStats> suites) {
 		if (log.hasErrors()) {
 			return Status.ERROR;
 		}

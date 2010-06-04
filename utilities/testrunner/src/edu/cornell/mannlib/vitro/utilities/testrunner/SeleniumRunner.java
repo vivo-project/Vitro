@@ -30,7 +30,8 @@ public class SeleniumRunner {
 		this.outputManager = new OutputManager(parms);
 	}
 
-	public void runSelectedSuites() {
+	public boolean runSelectedSuites() {
+		boolean success;
 		try {
 			listener.runStarted();
 			outputManager.cleanOutputDirectory();
@@ -52,15 +53,18 @@ public class SeleniumRunner {
 				listener.suiteStopped(suiteDir);
 			}
 			listener.runEndTime();
-			outputManager.summarizeOutput();
+			success = true;
 		} catch (IOException e) {
 			listener.runFailed(e);
+			success = false;
 			e.printStackTrace();
 		} catch (FatalException e) {
 			listener.runFailed(e);
+			success = false;
 			e.printStackTrace();
 		}
 		listener.runStopped();
+		return success;
 	}
 
 	private static void selectAllSuites(SeleniumRunnerParameters parms) {
@@ -81,6 +85,7 @@ public class SeleniumRunner {
 	public static void main(String[] args) {
 		SeleniumRunnerParameters parms = null;
 		boolean interactive = false;
+		boolean success = false;
 
 		if ((args.length != 1) && (args.length != 2)) {
 			usage("Wrong number of arguments.");
@@ -118,8 +123,10 @@ public class SeleniumRunner {
 			System.out.println(parms);
 
 			SeleniumRunner runner = new SeleniumRunner(parms);
-			runner.runSelectedSuites();
+			success = runner.runSelectedSuites();
 		}
+
+		System.exit(success ? 0 : -1);
 	}
 
 }

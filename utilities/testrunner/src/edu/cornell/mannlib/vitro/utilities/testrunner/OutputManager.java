@@ -57,7 +57,7 @@ public class OutputManager {
 	 * Parse each of the output files from the test suites, and create a unified
 	 * output file.
 	 */
-	public void summarizeOutput() {
+	public Status summarizeOutput() {
 		LogStats log = LogStats.parse(parms.getLogFile());
 		
 		List<SuiteStats> suites = new ArrayList<SuiteStats>();
@@ -71,6 +71,7 @@ public class OutputManager {
 		
 		OutputSummaryFormatter formatter = new OutputSummaryFormatter(parms);
 		formatter.format(log, suites);
+		return formatter.figureOverallStatus(log, suites);
 	}
 
 	private static class HtmlFileFilter implements FileFilter {
