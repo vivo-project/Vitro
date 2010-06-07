@@ -53,7 +53,8 @@ public class SeleniumRunner {
 				listener.suiteStopped(suiteDir);
 			}
 			listener.runEndTime();
-			success = true;
+			Status status = outputManager.summarizeOutput();
+			success = (status == Status.OK);
 		} catch (IOException e) {
 			listener.runFailed(e);
 			success = false;
