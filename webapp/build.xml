@@ -203,9 +203,16 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 			<fileset dir="${webapp.dir}" includes="submodels/**/*" />
 		</copy>
 
-		<copy file="${webapp.dir}/config/default.log4j.properties"
-		      tofile="${build.dir}/war/WEB-INF/classes/log4j.properties"
-		      filtering="true">
+		<!-- use the production Log4J properties, unless a debug version exists. -->
+		<available file="${webapp.dir}/config/debug.log4j.properties"
+		           property="debug.log4j.exists" />
+		<copy tofile="${build.dir}/war/WEB-INF/classes/log4j.properties"
+		      filtering="true"
+		      overwrite="true">
+			<fileset dir="${webapp.dir}/config">
+				<include name="default.log4j.properties" unless="debug.log4j.exists" />
+				<include name="debug.log4j.properties" if="debug.log4j.exists" />
+			</fileset>
 			<filterchain>
 				<expandproperties />
 			</filterchain>
