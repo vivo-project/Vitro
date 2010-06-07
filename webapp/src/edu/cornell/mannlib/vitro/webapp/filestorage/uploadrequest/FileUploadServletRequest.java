@@ -27,6 +27,14 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
  * request parameters.
  * </p>
  * <p>
+ * The request will have an attribute named by {@link #FILE_ITEM_MAP}. Either
+ * this attribute or the call to {@link #getFiles()} will produce a map that may
+ * be empty but is never null. The keys to the map are the field names for the
+ * file fields. Since a form may have multiple fields with the same name, each
+ * field name maps to a list of items. If a user does not provide a file to be
+ * uploaded in a given field, the length of the file will be 0.
+ * </p>
+ * <p>
  * Most methods are declared here, and simply delegate to the wrapped request.
  * Methods that have to do with parameters or files are handled differently for
  * simple requests and multipart request, and are implemented in the
@@ -35,6 +43,8 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
  */
 @SuppressWarnings("deprecation")
 public abstract class FileUploadServletRequest implements HttpServletRequest {
+	public static final String FILE_ITEM_MAP = "file_item_map";
+
 	// ----------------------------------------------------------------------
 	// The factory method
 	// ----------------------------------------------------------------------

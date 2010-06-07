@@ -69,6 +69,7 @@ class MultipartHttpServletRequest extends FileUploadServletRequest {
 		LOG.debug("Parameters are: " + this.parameters);
 		this.files = Collections.unmodifiableMap(files);
 		LOG.debug("Files are: " + this.files);
+		request.setAttribute(FILE_ITEM_MAP, this.files);
 	}
 
 	/**

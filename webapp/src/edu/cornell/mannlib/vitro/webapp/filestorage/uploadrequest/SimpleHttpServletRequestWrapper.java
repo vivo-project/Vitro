@@ -20,6 +20,7 @@ class SimpleHttpServletRequestWrapper extends FileUploadServletRequest {
 
 	SimpleHttpServletRequestWrapper(HttpServletRequest request) {
 		super(request);
+		request.setAttribute(FILE_ITEM_MAP, Collections.EMPTY_MAP);
 	}
 
 	// ----------------------------------------------------------------------
@@ -35,7 +36,7 @@ class SimpleHttpServletRequestWrapper extends FileUploadServletRequest {
 	public Map<String, List<FileItem>> getFiles() {
 		return Collections.emptyMap();
 	}
-	
+
 	@Override
 	public FileItem getFileItem(String string) {
 		return null;
