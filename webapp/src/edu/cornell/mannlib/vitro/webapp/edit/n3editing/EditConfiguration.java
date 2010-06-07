@@ -297,15 +297,26 @@ public class EditConfiguration {
      * and return it.
      */
     public void prepareForObjPropUpdate( Model model ){
-        if( model == null ) throw new Error("EditConfiguration.prepareForObjPropUpdate() needs a Model");
+        if( model == null ) {
+        	//Added parens and output
+        	System.out.println("Model is null and will be throwing an error");
+        	throw new Error("EditConfiguration.prepareForObjPropUpdate() needs a Model");}
         if( !isObjectResource )
+        {
+        	//Added parens and output
+        	System.out.println("This is not an object resource? lacks dataprop ");
             throw new Error("This request does not appear to be for an update since it lacks a dataprop object or a dataProp hash key ");              
-        //find the variable for object, this anchors the paths to the existing values
+        }
+            //find the variable for object, this anchors the paths to the existing values
         if( object == null || object.trim().length() == 0)
-            throw new Error("This request does not appear to be for an update since it lacks an object");                   
+        {
+        	//Added parens and output
+        	System.out.println("Object is null or object length is null");
+            throw new Error("This request does not appear to be for an update since it lacks an object");   
+        }
                         
         getUrisInScope().put( varNameForObject, object);
-        
+        System.out.println("Putting uris in scope - var name for ojbect " + varNameForObject + " and object is " + object);
         // run SPARQL, sub in values
         SparqlEvaluate sparqlEval = new SparqlEvaluate( model );
         runSparqlForAdditional( sparqlEval );

@@ -120,7 +120,6 @@ public class BasicValidation {
         return errors;    
     }
     
-    
     private String validate(String validationType, List<FileItem> fileItems) {
         if( "nonempty".equalsIgnoreCase(validationType)){
             if( fileItems == null || fileItems.size() == 0 ){
@@ -245,6 +244,8 @@ public class BasicValidation {
     public final static String SUCCESS = null;
     public final static String REQUIRED_FIELD_EMPTY_MSG = "This field must not be empty.";
     public final static String DATE_NOT_PAST_MSG = "Please enter a future target date for publication (past dates are invalid).";
+    //public final static String MIN_FIELDS_NOT_POPULATED = "Please enter values for at least ";
+    //public final static String FORM_ERROR_FIELD_ID = "formannotationerrors";
     /** regex for strings like "12/31/2004" */
     private final String dateRegex = "((1[012])|([1-9]))/((3[10])|([12][0-9])|([1-9]))/[\\d]{4}";
     private final Pattern datePattern = Pattern.compile(dateRegex);

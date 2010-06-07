@@ -94,7 +94,6 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
    } else {
        formParam = null;
    }
-
    String objectUri = request.getParameter("objectUri");
    if (objectUri != null) {
        request.setAttribute("objectUri", objectUri);

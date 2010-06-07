@@ -38,7 +38,6 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
         try {
             VitroRequest vreq = new VitroRequest(request);
             entity = vreq.getWebappDaoFactory().getIndividualDao().getIndividualByURI((String)request.getAttribute("myEntityURI"));
-            System.out.println("entityBasic rendering "+entity.getURI());
         } catch (Exception e) {
             e.printStackTrace();
         }

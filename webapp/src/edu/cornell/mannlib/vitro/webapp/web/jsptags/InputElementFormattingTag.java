@@ -340,6 +340,7 @@ public class InputElementFormattingTag extends TagSupport {
                 log.error("Error in doStartTag: input element id is blank or not specified.");
             }
 
+            
             HttpSession session = pageContext.getSession();
             EditConfiguration editConfig = EditConfiguration.getConfigFromSession(session,(HttpServletRequest) pageContext.getRequest());
             EditSubmission editSub = EditSubmission.getEditSubmissionFromSession(session,editConfig);
@@ -519,7 +520,12 @@ public class InputElementFormattingTag extends TagSupport {
                    
             } else if( getType().equalsIgnoreCase("editKey")) {
                 log.warn("Input element of type editKey was ignored, editKey fields are created by InputElementFormat submit and cancel.");
-            } else { // among other things, not supporting input type "reset"
+            } 
+            //added this for general form validation errors
+            else if(getType().equalsIgnoreCase("formerror")) {
+            	//print nothing since error string still printed below
+            }
+            else { // among other things, not supporting input type "reset"
                 log.error("Error in InputElementFormattingTag.doStartTag(): unknown input element type "+getType());
             }
 

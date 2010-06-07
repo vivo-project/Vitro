@@ -323,24 +323,6 @@ public class EditSubmission {
         try{
             dt = dateFormater.parseDateTime(year.get(0) +'-'+ month.get(0) +'-'+ day.get(0));
             String dateStr = dateFormater.print(dt);
-            
-            /*if(compareCurrentDate) {
-            	Calendar c = Calendar.getInstance();
-            	//Set to last year
-            	int currentYear = c.get(Calendar.YEAR);
-            	//?Set to time starting at 00 this morning?
-            	Calendar inputC = Calendar.getInstance();
-            	inputC.set(Integer.parseInt(yearParamStr), Integer.parseInt(monthParamStr) - 1, Integer.parseInt(dayParamStr));
-            	//if input time is more than a year ago
-            	if(inputC.before(c)) {
-            		errors += "Please enter a future target date for publication (past dates are invalid).";
-            		validationErrors.put( fieldName, errors);
-            		//Returning null makes the error message "field is empty" display instead
-            		//return null;
-            	}
-            	
-            }*/
-            
             return new EditLiteral(dateStr,DATE_URI, null );
         }catch(IllegalFieldValueException ifve){
             validationErrors.put( fieldName, ifve.getLocalizedMessage() );
