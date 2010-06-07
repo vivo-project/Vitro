@@ -78,7 +78,9 @@ are well formed.
  
     List<String>  errorMessages = new ArrayList<String>();                   
     
-    EditConfiguration editConfig = EditConfiguration.getConfigFromSession(session,vreq,queryParameters);    
+    //this version has been removed from the updated code
+    //EditConfiguration editConfig = EditConfiguration.getConfigFromSession(session,vreq,queryParameters); 
+    EditConfiguration editConfig = EditConfiguration.getConfigFromSession(session, request);
     if( editConfig == null ){
         %><jsp:forward page="/edit/messages/noEditConfigFound.jsp"/><%
     }    
@@ -320,13 +322,13 @@ are well formed.
     try{
         lock =  writeModel.getLock();
         lock.enterCriticalSection(Lock.WRITE);
-   //     writeModel.getBaseModel().notifyEvent(new EditEvent(editorUri,true));   
-   //     writeModel.add( actualAssertions );
-   //     writeModel.remove( actualRetractions );
+        writeModel.getBaseModel().notifyEvent(new EditEvent(editorUri,true));   
+        writeModel.add( actualAssertions );
+        writeModel.remove( actualRetractions );
     }catch(Throwable t){
         errorMessages.add("error adding edit change n3required model to in memory model \n"+ t.getMessage() );
     }finally{
-   //     writeModel.getBaseModel().notifyEvent(new EditEvent(editorUri,false));
+        writeModel.getBaseModel().notifyEvent(new EditEvent(editorUri,false));
         lock.leaveCriticalSection();
     }
     
