@@ -12,6 +12,9 @@
 # Known exceptions listed here produce no warnings.
 #
 
+# The AI ingest files are exceptions -- until we decide otherwise.
+utilities/ingest/**/*
+
 # ContentType from Google gdata API, Apache 2.0 license included in file.
 webapp/src/edu/cornell/mannlib/vitro/webapp/web/ContentType.java
 
