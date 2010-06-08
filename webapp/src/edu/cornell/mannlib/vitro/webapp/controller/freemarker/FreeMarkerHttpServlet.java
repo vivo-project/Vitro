@@ -141,7 +141,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
     // when theme is switched. BUT this doesn't support (a), only (b), so  we have to do it on every request.
     protected final void setTemplateLoader() {
         
-        String themeTemplateDir = context.getRealPath(getThemeDir()) + "/ftl";
+        String themeTemplateDir = context.getRealPath(getThemeDir()) + "/templates";
         String vitroTemplateDir = context.getRealPath("/templates/freemarker");
 
         try {
