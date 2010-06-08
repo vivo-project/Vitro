@@ -55,6 +55,4 @@
     
 </div>
 
-<#-- RY This is temporary. 
-<script src="${contextPath}/js/commentForm.js"></script>-->
 ${scripts.add("/js/commentForm.js")}

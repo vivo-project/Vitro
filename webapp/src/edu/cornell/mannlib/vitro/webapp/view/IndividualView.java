@@ -26,25 +26,17 @@ public class IndividualView extends ViewObject {
         this.individual = individual;
     }
     
-    public String getName() {
-        return individual.getName();
-    }
-    
-    // RY However, the moniker should undergo p:process but the class name shouldn't! 
-    // So, it needs to be callable from Java.
+    /* These methods perform some manipulation of the data returned by the Individual methods */
     public String getTagline() {
         String tagline = individual.getMoniker();
         return StringUtils.isEmpty(tagline) ? individual.getVClass().getName() : tagline;
-    }
-    
-    public String getUri() {
-        return individual.getURI();
     }
     
     // Return link to individual's profile page.
     // There may be other urls associated with the individual. E.g., we might need 
     // getEditUrl(), getDeleteUrl() to return the links computed by PropertyEditLinks.
     // RY **** Need to account for everything in URLRewritingHttpServlet
+    // Currently this is incorrect for individuals that are not in the default namespace (e.g., geographic individuals).
     public String getProfileUrl() {
         return getUrl(PATH + "/" + individual.getLocalName());
     }
@@ -78,6 +70,9 @@ public class IndividualView extends ViewObject {
         return primaryLink;
     }
     
+    // RY Here we really want to return List<LinkView> objects. Instead of writing the LinkView class by hand,
+    // it would be better to use an alternate FreeMarker BeanWrapper that creates a read-only template data object.
+    // That would also be used to return the lists of object properties and data properties of the individual.
     public List<Link> getLinks() {
         List<Link> additionalLinks = individual.getLinksList();
         List<Link> links = new ArrayList<Link>(additionalLinks.size()+1);
@@ -89,4 +84,38 @@ public class IndividualView extends ViewObject {
         return links;      
     }
 
+    /* These methods simply forward to the Individual methods. It would be desirable to implement a scheme
+       for proxying or delegation so that the methods don't need to be simply listed here. 
+       A Ruby-style method missing method would be ideal. */
+    public String getName() {
+        return individual.getName();
+    }
+
+    public String getUri() {
+        return individual.getURI();
+    }
+    
+    public String getDescription() {
+        return individual.getDescription();
+    }
+    
+    public String getBlurb() {
+        return individual.getBlurb();
+    }
+    
+    public String getCitation() {
+        return individual.getBlurb();
+    }
+    
+    public List<String> getKeywords() {
+        return individual.getKeywords();
+    }
+    
+    public String getImageFile() {
+        return individual.getImageFile();
+    }
+    
+    public String getImageThumb() {
+        return individual.getImageThumb();
+    }
 }

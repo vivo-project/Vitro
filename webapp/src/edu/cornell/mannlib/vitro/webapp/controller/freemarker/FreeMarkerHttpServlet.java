@@ -6,8 +6,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -37,6 +39,8 @@ import freemarker.cache.FileTemplateLoader;
 import freemarker.cache.MultiTemplateLoader;
 import freemarker.cache.TemplateLoader;
 import freemarker.template.Configuration;
+import freemarker.template.DefaultObjectWrapper;
+import freemarker.template.ObjectWrapper;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateModelException;
@@ -127,10 +131,24 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         setLoginInfo();      
         setCopyrightInfo();
         setThemeInfo(themeDir);
+        setScriptAndStylesheetObjects(themeDir);       
+
+    }
+    
+    private void setScriptAndStylesheetObjects(String themeDir) {
+        
+        // Temporarily switch to an object wrapper that exposes write methods.
+        // The templates can add files to the script and stylesheet lists
+        // by calling the add() method.
+        ObjectWrapper defaultWrapper = config.getObjectWrapper();
+        config.setObjectWrapper(new DefaultObjectWrapper());
         
         // Here themeDir SHOULD NOT have the context path already added to it.
         setSharedVariable("stylesheets", new StylesheetList(themeDir)); 
         setSharedVariable("scripts", new ScriptList()); 
+        
+        config.setObjectWrapper(defaultWrapper);         
+
     }
 
     // Define template locations. Template loader will look first in the theme-specific
