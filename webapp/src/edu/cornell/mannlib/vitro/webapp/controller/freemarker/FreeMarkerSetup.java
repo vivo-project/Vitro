@@ -64,7 +64,6 @@ public class FreeMarkerSetup implements ServletContextListener {
 		try {
             cfg.setSetting("url_escaping_charset", "ISO-8859-1");
         } catch (TemplateException e) {
-            // TODO Auto-generated catch block
             log.error("Error setting value for url_escaping_charset.");
         }
 

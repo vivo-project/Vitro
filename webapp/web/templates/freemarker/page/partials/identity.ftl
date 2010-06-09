@@ -15,16 +15,13 @@
             <#if loginName??>
                 <li>
                     Logged in as <strong>${loginName}</strong> (<a href="${urls.logout}">Log out</a>)     
-                </li>, 
-                <li><a href="${urls.siteAdmin}">Site Admin</a></li>, 
+                </li>
+                <li><a href="${urls.siteAdmin}">Site Admin</a></li>
             <#else>
-                 <li><a title="log in to manage this site" href="${urls.login}">Log in</a></li>,
+                 <li><a title="log in to manage this site" href="${urls.login}">Log in</a></li>
             </#if> 
             
-            <li><a href="${urls.about}">About</a></li>,
-            <#if urls.contact??>
-                <li><a href="${urls.contact}">Contact Us</a></li>
-            </#if> 
+            <#include "subMenuLinks.ftl">
         </@l.firstLastList>       
     </ul>   
 </div>
