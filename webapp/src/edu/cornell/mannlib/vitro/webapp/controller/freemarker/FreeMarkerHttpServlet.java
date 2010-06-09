@@ -6,10 +6,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -38,11 +36,12 @@ import freemarker.cache.ClassTemplateLoader;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.cache.MultiTemplateLoader;
 import freemarker.cache.TemplateLoader;
+import freemarker.ext.beans.BeansWrapper;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
-import freemarker.template.ObjectWrapper;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
 
 public class FreeMarkerHttpServlet extends VitroHttpServlet {
@@ -137,18 +136,20 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
     
     private void setScriptAndStylesheetObjects(String themeDir) {
         
-        // Temporarily switch to an object wrapper that exposes write methods.
-        // The templates can add files to the script and stylesheet lists
-        // by calling the add() method.
-        ObjectWrapper defaultWrapper = config.getObjectWrapper();
-        config.setObjectWrapper(new DefaultObjectWrapper());
-        
-        // Here themeDir SHOULD NOT have the context path already added to it.
-        setSharedVariable("stylesheets", new StylesheetList(themeDir)); 
-        setSharedVariable("scripts", new ScriptList()); 
-        
-        config.setObjectWrapper(defaultWrapper);         
-
+        // Use an object wrapper that exposes write methods, instead of the
+        // configuration's object wrapper, which doesn't, so the templates can
+        // add stylesheets and scripts to the lists by calling their add() methods.
+        BeansWrapper wrapper = new DefaultObjectWrapper();
+        try {
+            // Here themeDir SHOULD NOT have the context path already added to it.
+            TemplateModel stylesheets = wrapper.wrap(new StylesheetList(themeDir));
+            setSharedVariable("stylesheets", stylesheets);
+            
+            TemplateModel scripts = wrapper.wrap(new ScriptList());
+            setSharedVariable("scripts", scripts);
+        } catch (TemplateModelException e) {
+            log.error("Error creating stylesheet and script TemplateModels");
+        }
     }
 
     // Define template locations. Template loader will look first in the theme-specific

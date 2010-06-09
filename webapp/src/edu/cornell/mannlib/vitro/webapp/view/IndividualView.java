@@ -70,9 +70,6 @@ public class IndividualView extends ViewObject {
         return primaryLink;
     }
     
-    // RY Here we really want to return List<LinkView> objects. Instead of writing the LinkView class by hand,
-    // it would be better to use an alternate FreeMarker BeanWrapper that creates a read-only template data object.
-    // That would also be used to return the lists of object properties and data properties of the individual.
     public List<Link> getLinks() {
         List<Link> additionalLinks = individual.getLinksList();
         List<Link> links = new ArrayList<Link>(additionalLinks.size()+1);
