@@ -11,6 +11,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.view.ViewObject;
+import freemarker.ext.beans.BeansWrapper;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.TemplateException;
@@ -39,10 +40,13 @@ public class FreeMarkerSetup implements ServletContextListener {
 		    cfg.setTemplateUpdateDelay(0); // no template caching in development 
 		}
 		
-	    // Specify how templates will see the data-model. This is an advanced topic...
-        // but just use this:
-        cfg.setObjectWrapper(new DefaultObjectWrapper());
-        
+	    // Specify how templates will see the data-model. 
+		// The default wrapper exposes set methods unless exposure level is set.
+		// By default we want to block exposure of set methods. 
+		// cfg.setObjectWrapper(new DefaultObjectWrapper());
+		BeansWrapper wrapper = new DefaultObjectWrapper();
+		wrapper.setExposureLevel(BeansWrapper.EXPOSE_PROPERTIES_ONLY);
+        cfg.setObjectWrapper(wrapper);
 		
 		// Set some formatting defaults. These can be overridden at the template
 		// or environment (template-processing) level, or for an individual
@@ -60,7 +64,6 @@ public class FreeMarkerSetup implements ServletContextListener {
 		try {
             cfg.setSetting("url_escaping_charset", "ISO-8859-1");
         } catch (TemplateException e) {
-            // TODO Auto-generated catch block
             log.error("Error setting value for url_escaping_charset.");
         }
 

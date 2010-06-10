@@ -44,8 +44,6 @@ public class VClassGroupView extends ViewObject {
     }
     
     public List<VClassView> getClasses() {
-        // Do we need to store the classes as an instance member? Would we ever access this method more than once per template?
-        // Don't do this in the constructor, since we might not need it.
         if (classes == null) {
             List<VClass> classList = vClassGroup.getVitroClassList();
             classes = new ArrayList<VClassView>();

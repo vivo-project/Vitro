@@ -36,9 +36,12 @@ import freemarker.cache.ClassTemplateLoader;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.cache.MultiTemplateLoader;
 import freemarker.cache.TemplateLoader;
+import freemarker.ext.beans.BeansWrapper;
 import freemarker.template.Configuration;
+import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
 
 public class FreeMarkerHttpServlet extends VitroHttpServlet {
@@ -127,10 +130,26 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         setLoginInfo();      
         setCopyrightInfo();
         setThemeInfo(themeDir);
+        setScriptAndStylesheetObjects(themeDir);       
+
+    }
+    
+    private void setScriptAndStylesheetObjects(String themeDir) {
         
-        // Here themeDir SHOULD NOT have the context path already added to it.
-        setSharedVariable("stylesheets", new StylesheetList(themeDir)); 
-        setSharedVariable("scripts", new ScriptList()); 
+        // Use an object wrapper that exposes write methods, instead of the
+        // configuration's object wrapper, which doesn't, so the templates can
+        // add stylesheets and scripts to the lists by calling their add() methods.
+        BeansWrapper wrapper = new DefaultObjectWrapper();
+        try {
+            // Here themeDir SHOULD NOT have the context path already added to it.
+            TemplateModel stylesheets = wrapper.wrap(new StylesheetList(themeDir));
+            setSharedVariable("stylesheets", stylesheets);
+            
+            TemplateModel scripts = wrapper.wrap(new ScriptList());
+            setSharedVariable("scripts", scripts);
+        } catch (TemplateModelException e) {
+            log.error("Error creating stylesheet and script TemplateModels");
+        }
     }
 
     // Define template locations. Template loader will look first in the theme-specific
@@ -141,7 +160,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
     // when theme is switched. BUT this doesn't support (a), only (b), so  we have to do it on every request.
     protected final void setTemplateLoader() {
         
-        String themeTemplateDir = context.getRealPath(getThemeDir()) + "/ftl";
+        String themeTemplateDir = context.getRealPath(getThemeDir()) + "/templates";
         String vitroTemplateDir = context.getRealPath("/templates/freemarker");
 
         try {
