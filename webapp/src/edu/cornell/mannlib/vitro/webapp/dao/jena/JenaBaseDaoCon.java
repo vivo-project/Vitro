@@ -60,8 +60,7 @@ public class JenaBaseDaoCon {
     protected DatatypeProperty   MODTIME = _constModel.createDatatypeProperty(VitroVocabulary.MODTIME);
     protected DatatypeProperty   TIMEKEY = _constModel.createDatatypeProperty(VitroVocabulary.TIMEKEY);
     protected DatatypeProperty   CITATION = _constModel.createDatatypeProperty(VitroVocabulary.CITATION);
-    protected DatatypeProperty   IMAGETHUMB = _constModel.createDatatypeProperty(VitroVocabulary.IMAGETHUMB);
-    protected DatatypeProperty   IMAGEFILE = _constModel.createDatatypeProperty(VitroVocabulary.IMAGEFILE);
+    protected ObjectProperty     IND_MAIN_IMAGE = _constModel.createObjectProperty(VitroVocabulary.IND_MAIN_IMAGE);
 
     protected DatatypeProperty   DISPLAY_RANK = _constModel.createDatatypeProperty(VitroVocabulary.DISPLAY_RANK);
     protected AnnotationProperty DISPLAY_RANK_ANNOT = _constModel.createAnnotationProperty(VitroVocabulary.DISPLAY_RANK_ANNOT);
@@ -182,6 +181,9 @@ public class JenaBaseDaoCon {
     protected  ObjectProperty     TAB_INDIVIDUALRELATION_INVOLVESTAB = _constModel.createObjectProperty(VitroVocabulary.TAB_INDIVIDUALRELATION_INVOLVESTAB);
     
     protected AnnotationProperty  ONTOLOGY_PREFIX_ANNOT = _constModel.createAnnotationProperty(VitroVocabulary.ONTOLOGY_PREFIX_ANNOT);
+    
+    protected  OntClass           FS_FILE = _constModel.createClass(VitroVocabulary.FS_FILE_CLASS);
+    protected  OntClass           FS_BYTESTREAM = _constModel.createClass(VitroVocabulary.FS_BYTESTREAM_CLASS);
     
     public OntModel getConstModel() {
         return _constModel;

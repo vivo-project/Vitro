@@ -235,7 +235,7 @@ public class PropertyEditLinks extends TagSupport{
             if( contains( allowedAccessTypeArray, EditLinkAccess.ADDNEW ) ){
                 log.debug("vitro namespace property "+propertyUri+" gets an \"add\" link");
                 LinkStruct ls = null;
-                if (propertyUri.equals(VitroVocabulary.IMAGETHUMB)) {
+                if (propertyUri.equals(VitroVocabulary.IND_MAIN_IMAGE)) {
                     ls = getImageLink(subjectUri, contextPath, "add");                   
                 } else {
                     String url = makeRelativeHref(contextPath +"edit/editDatapropStmtRequestDispatch.jsp",
@@ -346,7 +346,7 @@ public class PropertyEditLinks extends TagSupport{
         
         LinkStruct[] links = new LinkStruct[2]; 
         
-        if (predicateUri.equals(VitroVocabulary.IMAGETHUMB)) {
+        if (predicateUri.equals(VitroVocabulary.IND_MAIN_IMAGE)) {
             if( contains( allowedAccessTypeArray, EditLinkAccess.MODIFY ) ){
                 log.debug("permission found to UPDATE vitro namepsace property statement "+ predicateUri);
                 links[0] = getImageLink(subjectUri, contextPath, "edit");
@@ -643,7 +643,7 @@ public class PropertyEditLinks extends TagSupport{
                                       "entityUri", subjectUri);
         ls.setHref(url);
         ls.setType(action);
-        ls.setMouseoverText("upload a  new image");        
+        ls.setMouseoverText("upload a new image");        
         return ls;
     }
     

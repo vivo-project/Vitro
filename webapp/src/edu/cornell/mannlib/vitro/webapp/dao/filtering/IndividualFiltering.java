@@ -221,18 +221,24 @@ public class IndividualFiltering implements Individual {
         return _innerIndividual.getFlag3Set();
     }
 
+	@Override
+	public String getMainImageUri() {
+		return _innerIndividual.getMainImageUri();
+	}
 
-    public String getImageFile() {
-        return _innerIndividual.getImageFile();
-    }
+    @Override
+	public String getImageUrl() {
+    	return _innerIndividual.getImageUrl();
+	}
 
 
-    public String getImageThumb() {
-        return _innerIndividual.getImageThumb();
-    }
+	@Override
+	public String getThumbUrl() {
+		return _innerIndividual.getThumbUrl();
+	}
 
 
-    public List<String> getKeywords() {
+	public List<String> getKeywords() {
         return _innerIndividual.getKeywords();
     }
 
@@ -384,15 +390,10 @@ public class IndividualFiltering implements Individual {
     }
 
 
-    public void setImageFile(String imageFile) {
-        _innerIndividual.setImageFile(imageFile);
-    }
-
-
-    public void setImageThumb(String imageThumb) {
-        _innerIndividual.setImageThumb(imageThumb);
-    }
-
+    @Override
+	public void setMainImageUri(String mainImageUri) {
+    	_innerIndividual.setMainImageUri(mainImageUri);
+	}
 
     public void setKeywords(List<String> keywords) {
         _innerIndividual.setKeywords(keywords);

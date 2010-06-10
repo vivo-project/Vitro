@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.io.StringReader;
 
 import junit.framework.Assert;
@@ -15,7 +17,6 @@ import com.hp.hpl.jena.ontology.OntProperty;
 import com.hp.hpl.jena.ontology.Restriction;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
@@ -110,12 +111,8 @@ public class JenaBaseDaoTest {
 			         isDependentRelation ;
 										
 			Model expectedModel = (ModelFactory.createOntologyModel()).read(new StringReader(expected), "", "N3");
-			
-			//modtime times make it difficult to compare graphs
-			wipeOutModTime(expectedModel);
-			wipeOutModTime(ontModel);			  
-			    			
-			Assert.assertTrue( ontModel.isIsomorphicWith(expectedModel) );	
+
+			assertEquivalentModels(expectedModel, ontModel);
 			} catch (InsertException e) {
 				Assert.fail(e.getMessage());
 		}
@@ -192,11 +189,7 @@ public class JenaBaseDaoTest {
 									
 		Model expectedModel = (ModelFactory.createOntologyModel()).read(new StringReader(expected), "", "N3");		
 				
-		//modtime times make it difficult to compare graphs
-		wipeOutModTime(expectedModel);
-		wipeOutModTime(model);
-		
-		Assert.assertTrue( model.isIsomorphicWith(expectedModel));		
+		assertEquivalentModels(expectedModel, model);
 	}
 	
 	
@@ -256,11 +249,7 @@ public class JenaBaseDaoTest {
 										
 			Model expectedModel = (ModelFactory.createOntologyModel()).read(new StringReader(expected), "", "N3");
 			
-			//modtime times make it difficult to compare graphs
-			wipeOutModTime(expectedModel);
-			wipeOutModTime(ontModel);			  
-			    			
-			Assert.assertTrue( ontModel.isIsomorphicWith(expectedModel) );	
+			assertEquivalentModels(expectedModel, ontModel);
 			} catch (InsertException e) {
 				Assert.fail(e.getMessage());
 		}
@@ -367,17 +356,7 @@ public class JenaBaseDaoTest {
 //		wipeOutModTime(model);
 //		Assert.assertTrue( model.isIsomorphicWith(expectedModel));		
 //	}
-	void printModels(Model expected, Model result){
-    	System.out.println("Expected:");
-    	expected.write(System.out);
-    	System.out.println("Result:");
-    	result.write(System.out);    
-    }
 
-	void wipeOutModTime(Model model){
-		model.removeAll(null, model.createProperty(VitroVocabulary.MODTIME), null);
-	}
-	
 	@Test 
 	/**
 	 * Tests that any statements with a property as predicate are removed
@@ -478,5 +457,32 @@ public class JenaBaseDaoTest {
 		Assert.assertEquals(m.size(), 2); // just rdf:type for Class1 and Prop
 		
 	}	
+
+	/**
+	 * Compare the contents of the expected model with the actual model (not counting modification times).
+	 */
+	private void assertEquivalentModels(Model expected, Model actual) {
+		// modtime times make it difficult to compare graphs
+		wipeOutModTime(expected);
+		wipeOutModTime(actual);
+
+		if (actual.isIsomorphicWith(expected)) {
+			return;
+		}
+
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		PrintStream p = new PrintStream(out, true);
+		p.println("Models do not match: expected <");
+		expected.write(out);
+		p.println("> but was <");
+		actual.write(out);
+		p.println(">");
+		Assert.fail(out.toString());
+	}
+
+	private void wipeOutModTime(Model model){
+		model.removeAll(null, model.createProperty(VitroVocabulary.MODTIME), null);
+	}
 	
+
 }

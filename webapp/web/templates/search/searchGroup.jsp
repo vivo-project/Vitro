@@ -24,7 +24,6 @@
     	    throw new JspException(e);
         }
 %>
-<c:set var='imageDir' value='images' />
 <c:set var='entities' value='${requestScope.entities}'/><%/* just moving this into page scope for easy use */ %>
 <c:set var='classgroup' value='${requestScope.classgroup}'/>
 
@@ -40,11 +39,11 @@
 				<c:forEach items="${entity.linksList}" var='link'>
 					| <a href='<c:url value="${link.url}"/>'${link.anchor}</a>
 				</c:forEach>
-				<c:if test="${!empty entity.imageThumb}">
+				<c:if test="${!empty entity.thumbUrl}">
 				<div class="thumbnail">
-					<c:if test="${!empty entity.imageFile}"><a target="_new" href="<c:url value='${imageDir}/${entity.imageFile}'/>"></c:if>
-					<img src="<c:url value='${imageDir}/${entity.imageThumb}'/>" title="click to view larger image in new window" width="150">
-					<c:if test="${!empty entity.imageFile}"></a></c:if>
+					<c:if test="${!empty entity.imageUrl}"><a target="_new" href="<c:url value='${entity.imageUrl}'/>"></c:if>
+					<img src="<c:url value='${entity.thumbUrl}'/>" title="click to view larger image in new window" width="150">
+					<c:if test="${!empty entity.imageUrl}"></a></c:if>
 				</div>
 				</c:if>
 				<c:import url="${entityPropsListJsp}" /><%/* here we import the properties for the entity */ %>

@@ -5,8 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.auth.policy;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -110,8 +108,7 @@ public class SelfEditingPolicy implements VisitingPolicyIface {
             this.editableVitroUris.add(VitroVocabulary.TIMEKEY);
 
             this.editableVitroUris.add(VitroVocabulary.CITATION);
-            this.editableVitroUris.add(VitroVocabulary.IMAGEFILE);
-            this.editableVitroUris.add(VitroVocabulary.IMAGETHUMB);
+            this.editableVitroUris.add(VitroVocabulary.IND_MAIN_IMAGE);
 
             this.editableVitroUris.add(VitroVocabulary.LINK);
             this.editableVitroUris.add(VitroVocabulary.PRIMARY_LINK);

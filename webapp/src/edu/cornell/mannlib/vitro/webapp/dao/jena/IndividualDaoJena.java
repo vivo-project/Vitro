@@ -21,7 +21,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
 
-import com.hp.hpl.jena.ontology.DatatypeProperty;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntResource;
@@ -56,7 +55,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.KeywordDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.IndividualCreationEvent;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.IndividualDeletionEvent;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.IndividualUpdateEvent;
@@ -313,8 +311,10 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
                 addPropertyDateTimeValue(ind,SUNSET,ent.getSunset(), ontModel);
                 addPropertyDateTimeValue(ind,TIMEKEY,ent.getTimekey(), ontModel);
                 addPropertyDateTimeValue(ind,MODTIME,Calendar.getInstance().getTime(),ontModel);
-                addPropertyStringValue(ind,IMAGETHUMB,ent.getImageThumb(),ontModel);
-                addPropertyStringValue(ind,IMAGEFILE,ent.getImageFile(),ontModel);
+                if (ent.getMainImageUri() != null) {
+                	addPropertyResourceURIValue(ind, IND_MAIN_IMAGE, ent.getMainImageUri());
+                }
+                
                 if (ent.getAnchor()!= null && ent.getAnchor().length()>0 && LINK != null) {
                     com.hp.hpl.jena.ontology.Individual primaryLink = ontModel.createIndividual(entURI+"_primaryLink", LINK);
                     primaryLink.addProperty(RDF.type, LINK);
@@ -379,8 +379,9 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
         ent.getFlag1Numeric();
         ent.getFlag1Set();
         ent.getFlag2Set();
-        ent.getImageFile();
-        ent.getImageThumb();
+        ent.getMainImageUri();
+        ent.getImageUrl();
+        ent.getThumbUrl();
         ent.getKeywords();
         ent.getKeywordString();
         ent.getLinksList();
@@ -472,9 +473,10 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
                 updatePropertyDateTimeValue(ind,SUNRISE,ent.getSunrise(), ontModel);
                 updatePropertyDateTimeValue(ind,SUNSET,ent.getSunset(), ontModel);
                 updatePropertyDateTimeValue(ind,TIMEKEY,ent.getTimekey(), ontModel);
-                updatePropertyStringValue(ind,IMAGETHUMB,ent.getImageThumb(),ontModel);
-                updatePropertyStringValue(ind,IMAGEFILE,ent.getImageFile(),ontModel);
                 updatePropertyDateTimeValue(ind,MODTIME,Calendar.getInstance().getTime(),ontModel);
+                if (ent.getMainImageUri() != null) {
+                    updatePropertyResourceURIValue(ind, IND_MAIN_IMAGE, ent.getMainImageUri(), ontModel);
+                }
                 if (ent.getAnchor()!= null && ent.getAnchor().length()>0) {
                     if (LINK != null && PRIMARY_LINK != null) {
                         boolean updatedExisting = false;

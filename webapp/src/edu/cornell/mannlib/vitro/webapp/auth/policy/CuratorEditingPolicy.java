@@ -109,8 +109,7 @@ public class CuratorEditingPolicy implements VisitingPolicyIface {
             this.editableVitroUris.add(VitroVocabulary.TIMEKEY);
 
             this.editableVitroUris.add(VitroVocabulary.CITATION);
-            this.editableVitroUris.add(VitroVocabulary.IMAGEFILE);
-            this.editableVitroUris.add(VitroVocabulary.IMAGETHUMB);
+            this.editableVitroUris.add(VitroVocabulary.IND_MAIN_IMAGE);
 
             this.editableVitroUris.add(VitroVocabulary.LINK);
             this.editableVitroUris.add(VitroVocabulary.PRIMARY_LINK);

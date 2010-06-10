@@ -28,13 +28,13 @@ public class FileStorageSetup implements ServletContextListener {
 	 * The default implementation will use this key to ask
 	 * {@link ConfigurationProperties} for the file storage base directory.
 	 */
-	static final String PROPERTY_FILE_STORAGE_BASE_DIR = "upload.directory";
+	public static final String PROPERTY_FILE_STORAGE_BASE_DIR = "upload.directory";
 
 	/**
 	 * The default implementation will use this key to ask
 	 * {@link ConfigurationProperties} for the default URI namespace.
 	 */
-	static final String PROPERTY_DEFAULT_NAMESPACE = "Vitro.defaultNamespace";
+	public static final String PROPERTY_DEFAULT_NAMESPACE = "Vitro.defaultNamespace";
 
 	/**
 	 * Create an implementation of {@link FileStorage} and store it in the
@@ -46,7 +46,7 @@ public class FileStorageSetup implements ServletContextListener {
 		FileStorage fs;
 		try {
 			File baseDirectory = figureBaseDir();
-			Collection<String> fileNamespace = figureFileNamespace();
+			Collection<String> fileNamespace = confirmDefaultNamespace();
 			fs = new FileStorageImpl(baseDirectory, fileNamespace);
 		} catch (IOException e) {
 			throw new IllegalStateException(
@@ -75,16 +75,15 @@ public class FileStorageSetup implements ServletContextListener {
 	}
 
 	/**
-	 * Get the configuration property for the default namespace, and derive the
-	 * file namespace from it. The default namespace is assumed to be in this
-	 * form: <code>http://vivo.mydomain.edu/individual/</code>
+	 * Get the configuration property for the default namespace, and confirm
+	 * that it is in the proper form. The default namespace is assumed to be in
+	 * this form: <code>http://vivo.mydomain.edu/individual/</code>
 	 * 
 	 * For use by the constructor in implementations of {@link FileStorage}.
 	 * 
-	 * @returns the file namespace is assumed to be in this form:
-	 *          <code>http://vivo.mydomain.edu/file/</code>
+	 * @returns a collection containing the default namespace.
 	 */
-	private Collection<String> figureFileNamespace() {
+	private Collection<String> confirmDefaultNamespace() {
 		String defaultNamespace = ConfigurationProperties
 				.getProperty(PROPERTY_DEFAULT_NAMESPACE);
 		if (defaultNamespace == null) {
@@ -94,7 +93,6 @@ public class FileStorageSetup implements ServletContextListener {
 		}
 
 		String defaultSuffix = "/individual/";
-		String fileSuffix = "/file/";
 
 		if (!defaultNamespace.endsWith(defaultSuffix)) {
 			throw new IllegalArgumentException(
@@ -102,10 +100,7 @@ public class FileStorageSetup implements ServletContextListener {
 							+ defaultNamespace + "'");
 		}
 
-		int hostLength = defaultNamespace.length() - defaultSuffix.length();
-		String fileNamespace = defaultNamespace.substring(0, hostLength)
-				+ fileSuffix;
-		return Collections.singleton(fileNamespace);
+		return Collections.singleton(defaultNamespace);
 	}
 
 	@Override

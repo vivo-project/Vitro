@@ -84,11 +84,11 @@ public interface Individual extends ResourceBean, VitroTimeWindowedResource, Com
     String getStatus();
     void setStatus(String s);
 
-    String getImageFile();
-    void setImageFile(String imageFile);
-
-    String getImageThumb();
-    void setImageThumb(String imageThumb);
+    void setMainImageUri(String mainImageUri);
+    String getMainImageUri();
+    
+    String getImageUrl();
+    String getThumbUrl();
 
     String getUrl();
     void setUrl(String url);

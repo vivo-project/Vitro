@@ -150,6 +150,13 @@
     </listener-class>
   </listener>
   
+  <!-- On shutdown, this will kill the background thread started by Apache Commons File Upload -->
+  <listener>
+    <listener-class>
+      org.apache.commons.fileupload.servlet.FileCleanerCleanup
+    </listener-class>
+  </listener>
+
   <!--
     <listener>
         <listener-class>
@@ -165,6 +172,7 @@
         </listener-class>
     </listener>
 -->
+
 
   <!-- Filters ********************************************************** -->
   <!-- in 2.4 spec, filter chain order is first by filter-mapping <url-pattern> order in web.xml,

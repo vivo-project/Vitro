@@ -40,6 +40,8 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.filestorage.FileModelHelper;
+import edu.cornell.mannlib.vitro.webapp.filestorage.FileServingHelper;
 import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
 
 public class IndividualJena extends IndividualImpl implements Individual {
@@ -474,33 +476,45 @@ public class IndividualJena extends IndividualImpl implements Individual {
         }
     }
 
-    public String getImageFile() {
-        if (this.imageFile != null) {
-            return imageFile;
-        } else {
-            ind.getOntModel().enterCriticalSection(Lock.READ);
-            try {
-                imageFile = webappDaoFactory.getJenaBaseDao().getPropertyStringValue(ind,webappDaoFactory.getJenaBaseDao().IMAGEFILE);
-                return imageFile;
-            } finally {
-                ind.getOntModel().leaveCriticalSection();
-            }
-        }
-    }
+	@Override
+	public String getMainImageUri() {
+		if (this.mainImageUri != null) {
+			return mainImageUri;
+		} else {
+			for (ObjectPropertyStatement stmt : getObjectPropertyStatements()) {
+				if (stmt.getPropertyURI()
+						.equals(VitroVocabulary.IND_MAIN_IMAGE)) {
+					mainImageUri = stmt.getObjectURI();
+					return mainImageUri;
+				}
+			}
+			return null;
+		}
+	}
 
-    public String getImageThumb() {
-        if (this.imageThumb != null) {
-            return imageThumb;
-        } else {
-            ind.getOntModel().enterCriticalSection(Lock.READ);
-            try {
-                imageThumb = webappDaoFactory.getJenaBaseDao().getPropertyStringValue(ind,webappDaoFactory.getJenaBaseDao().IMAGETHUMB);
-                return imageThumb;
-            } finally {
-                ind.getOntModel().leaveCriticalSection();
-            }
-        }
-    }
+	@Override
+	public String getImageUrl() {
+		if (this.imageUrl != null) {
+			return imageUrl;
+		} else {
+			String imageUri = FileModelHelper.getMainImageUri(this);
+			String filename = FileModelHelper.getMainImageFilename(this);
+			imageUrl = FileServingHelper.getBytestreamAliasUrl(imageUri, filename);
+			return imageUrl;
+		}
+	}
+
+	@Override
+	public String getThumbUrl() {
+		if (this.thumbUrl != null) {
+			return thumbUrl;
+		} else {
+			String imageUri = FileModelHelper.getThumbnailUri(this);
+			String filename = FileModelHelper.getThumbnailFilename(this);
+			thumbUrl = FileServingHelper.getBytestreamAliasUrl(imageUri, filename);
+			return thumbUrl;
+		}
+	}
 
     public String getAnchor() {
         if (this.anchor != null) {
