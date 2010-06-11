@@ -358,9 +358,13 @@ public class UploadImagesServlet extends VitroHttpServlet {
 			// Store the file in the FileStorage system.
 			fileStorage.createFile(byteStream.getURI(), filename, inputStream);
 
-			// Set the file as the main image for the person.
-			person.setMainImageUri(file.getURI());
-			getWebappDaoFactory().getIndividualDao().updateIndividual(person);
+			// Set the file as the thumbnail on the main image for the person.
+			String mainImageUri = person.getMainImageUri();
+			getWebappDaoFactory().getObjectPropertyStatementDao()
+					.insertNewObjectPropertyStatement(
+							new ObjectPropertyStatementImpl(mainImageUri,
+									VitroVocabulary.FS_THUMBNAIL_IMAGE, file
+											.getURI()));
 		} catch (FileAlreadyExistsException e) {
 			throw new IllegalStateException("Can't create the image file: "
 					+ e.getMessage(), e);
