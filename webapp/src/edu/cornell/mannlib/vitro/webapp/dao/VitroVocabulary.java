@@ -2,12 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao;
 
-import java.util.Arrays;
-import java.util.List;
-
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.vocabulary.XSD;
-import com.hp.hpl.jena.ontology.AnnotationProperty;
 
 public class VitroVocabulary {
 
@@ -291,7 +285,7 @@ public class VitroVocabulary {
     
     public static final String FS_FILENAME = VITRO_PUBLIC + "filename";
     public static final String FS_MIME_TYPE = VITRO_PUBLIC + "mimeType";
-    public static final String FS_ATRTRIBUTION = VITRO_PUBLIC + "attribution";
+    public static final String FS_ATTRIBUTION = VITRO_PUBLIC + "attribution";
     public static final String FS_DOWNLOAD_LOCATION = VITRO_PUBLIC + "downloadLocation";
     public static final String FS_THUMBNAIL_IMAGE = VITRO_PUBLIC + "thumbnailImage";
     
