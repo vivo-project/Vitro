@@ -23,10 +23,13 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.apache.log4j.Logger;
+
 /**
  * The default implementation of {@link FileStorage}.
  */
 public class FileStorageImpl implements FileStorage {
+	private static final Logger log = Logger.getLogger(FileStorageImpl.class);
 
 	private final File baseDir;
 	private final File rootDir;
@@ -290,6 +293,8 @@ public class FileStorageImpl implements FileStorage {
 	public String getFilename(String id) throws IOException {
 		File dir = FileStorageHelper.getPathToIdDirectory(id,
 				this.namespacesMap, this.rootDir);
+		log.debug("ID '" + id + "' translates to this directory path: '" + dir
+				+ "'");
 
 		if ((!dir.exists()) || (!dir.isDirectory())) {
 			return null;
