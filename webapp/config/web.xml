@@ -1061,13 +1061,16 @@
   <servlet>
     <servlet-name>uploadImages</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.UploadImagesServlet</servlet-class>
-    <init-param>
-      <param-name>workspaceDir</param-name>
-      <!-- This is the source directory, so can't be automatically prepended with something like /usr/local/tomcat/webapps/vivo -->
-      <param-value>/usr/local/src/Vitro/dream/common/web</param-value>
-    </init-param>
-    <!--load-on-startup>2</load-on-startup-->
   </servlet>
+  
+  <servlet>
+    <servlet-name>serveFiles</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.filestorage.serving.FileServingServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>serveFiles</servlet-name>
+    <url-pattern>/file/*</url-pattern>
+  </servlet-mapping>
 
   <servlet>
     <servlet-name>generic_editprep</servlet-name>
