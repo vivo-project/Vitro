@@ -199,10 +199,10 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
 	                            <div class="statementWrap thumbnail"> 
 	                            <c:set var="imageTitle" value="${entity.name}" />              
 	                                <c:if test="${!empty entity.imageUrl}">
-	                                    <a class="image" href="${entity.imageUrl}">
+	                                    <a class="image" href="<c:url value='${entity.imageUrl}'/>">
 	                                    <c:set var="imageTitle" value="click to view larger image in new window" />
 	                                </c:if>
-	                                <img src="<c:out value="${entity.thumbUrl}"/>" title="${imageTitle}" alt="" width="150"/>
+	                                <img src="<c:url value='${entity.thumbUrl}'/>" title="${imageTitle}" alt="" width="150"/>
 	                                <c:if test="${!empty entity.imageUrl}"></a></c:if>
 	                                <c:if test="${showEdits}">
 	                                    <c:set var="editLinks"><edLnk:editLinks item="<%= VitroVocabulary.IND_MAIN_IMAGE %>" data="${entity.thumbUrl}" icons="false"/></c:set>
