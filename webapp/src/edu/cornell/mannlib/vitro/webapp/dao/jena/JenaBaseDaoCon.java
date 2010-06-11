@@ -60,7 +60,6 @@ public class JenaBaseDaoCon {
     protected DatatypeProperty   MODTIME = _constModel.createDatatypeProperty(VitroVocabulary.MODTIME);
     protected DatatypeProperty   TIMEKEY = _constModel.createDatatypeProperty(VitroVocabulary.TIMEKEY);
     protected DatatypeProperty   CITATION = _constModel.createDatatypeProperty(VitroVocabulary.CITATION);
-    protected ObjectProperty     IND_MAIN_IMAGE = _constModel.createObjectProperty(VitroVocabulary.IND_MAIN_IMAGE);
 
     protected DatatypeProperty   DISPLAY_RANK = _constModel.createDatatypeProperty(VitroVocabulary.DISPLAY_RANK);
     protected AnnotationProperty DISPLAY_RANK_ANNOT = _constModel.createAnnotationProperty(VitroVocabulary.DISPLAY_RANK_ANNOT);
@@ -184,7 +183,15 @@ public class JenaBaseDaoCon {
     
     protected  OntClass           FS_FILE = _constModel.createClass(VitroVocabulary.FS_FILE_CLASS);
     protected  OntClass           FS_BYTESTREAM = _constModel.createClass(VitroVocabulary.FS_BYTESTREAM_CLASS);
-    
+    protected  ObjectProperty     FS_DOWNLOAD_LOCATION = _constModel.createObjectProperty(VitroVocabulary.FS_DOWNLOAD_LOCATION);
+    protected  ObjectProperty     FS_THUMBNAIL_IMAGE = _constModel.createObjectProperty(VitroVocabulary.FS_THUMBNAIL_IMAGE);
+    protected  DatatypeProperty   FS_FILENAME = _constModel.createDatatypeProperty(VitroVocabulary.FS_FILENAME);
+    protected  DatatypeProperty   FS_MIME_TYPE = _constModel.createDatatypeProperty(VitroVocabulary.FS_MIME_TYPE);
+    protected  DatatypeProperty   FS_ATTRIBUTION = _constModel.createDatatypeProperty(VitroVocabulary.FS_ATTRIBUTION);
+
+    protected ObjectProperty     IND_MAIN_IMAGE = _constModel.createObjectProperty(VitroVocabulary.IND_MAIN_IMAGE);
+    protected ObjectProperty     IND_IMAGE = _constModel.createObjectProperty(VitroVocabulary.IND_IMAGE);
+
     public OntModel getConstModel() {
         return _constModel;
     }
