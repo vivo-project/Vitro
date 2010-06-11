@@ -12,6 +12,7 @@ import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 
@@ -28,6 +29,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         super(wadf);
     }
 
+    @Override
     public void deleteObjectPropertyStatement(ObjectPropertyStatement objPropertyStmt) {
     	deleteObjectPropertyStatement(objPropertyStmt, getOntModelSelector().getABoxModel());
     }
@@ -50,6 +52,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         }
     }
 
+    @Override
     public Individual fillExistingObjectPropertyStatements(Individual entity) {
         if (entity.getURI() == null)
             return entity;
@@ -60,7 +63,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         	
             Resource ind = getOntModel().getResource(entity.getURI());
             List<ObjectPropertyStatement> objPropertyStmtList = new ArrayList<ObjectPropertyStatement>();
-            ClosableIterator propIt = ind.listProperties();
+            ClosableIterator<Statement> propIt = ind.listProperties();
             try {
                 while (propIt.hasNext()) {
                     Statement st = (Statement) propIt.next();
@@ -119,16 +122,18 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
     
     private int NO_LIMIT = -1;
     
+    @Override
     public List<ObjectPropertyStatement> getObjectPropertyStatements (ObjectProperty objectProperty) {
     	return getObjectPropertyStatements(objectProperty, NO_LIMIT, NO_LIMIT);
     }
     
+    @Override
     public List<ObjectPropertyStatement> getObjectPropertyStatements (ObjectProperty objectProperty, int startIndex, int endIndex) {
     	getOntModel().enterCriticalSection(Lock.READ);
     	List<ObjectPropertyStatement> opss = new ArrayList<ObjectPropertyStatement>();
     	try {
     		Property prop = ResourceFactory.createProperty(objectProperty.getURI());
-    		ClosableIterator opsIt = getOntModel().listStatements(null,prop,(Resource)null);
+    		ClosableIterator<Statement> opsIt = getOntModel().listStatements(null,prop,(Resource)null);
     		try {
     			int count = 0;
     			while ( (opsIt.hasNext()) && ((endIndex<0) || (count<endIndex)) ) {
@@ -151,12 +156,52 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
     			opsIt.close();
     		}
     	} finally {
-    		getOntModel().leaveCriticalSection()
-;    	}
+    		getOntModel().leaveCriticalSection();
+    	}
     	return opss;
     }
 
-    public int insertNewObjectPropertyStatement(ObjectPropertyStatement objPropertyStmt) {
+	@Override
+	public List<ObjectPropertyStatement> getObjectPropertyStatements(
+			ObjectPropertyStatement objPropertyStmt) {
+		List<ObjectPropertyStatement> opss = new ArrayList<ObjectPropertyStatement>();
+
+		getOntModel().enterCriticalSection(Lock.READ);
+		try {
+			String subjectUri = objPropertyStmt.getSubjectURI();
+			String propertyUri = objPropertyStmt.getPropertyURI();
+			String objectUri = objPropertyStmt.getObjectURI();
+
+			Resource subject = (subjectUri == null) ? null : ResourceFactory.createResource(subjectUri);
+			Property property = (propertyUri == null) ? null : ResourceFactory
+					.createProperty(propertyUri);
+			Resource object = (objectUri == null) ? null : ResourceFactory.createResource(objectUri);
+			StmtIterator opsIt = getOntModel().listStatements(subject, property, object);
+			try {
+				while (opsIt.hasNext()) {
+					Statement stmt = opsIt.next();
+					if (stmt.getObject().isResource()) {
+						Resource objRes = (Resource) stmt.getObject();
+						if (!objRes.isAnon()) {
+							ObjectPropertyStatement ops = new ObjectPropertyStatementImpl();
+							ops.setSubjectURI(stmt.getSubject().getURI());
+							ops.setPropertyURI(stmt.getPredicate().getURI());
+							ops.setObjectURI(objRes.getURI());
+							opss.add(ops);
+						}
+					}
+				}
+			} finally {
+				opsIt.close();
+			}
+		} finally {
+			getOntModel().leaveCriticalSection();
+		}
+		return opss;
+	}
+
+    @Override
+	public int insertNewObjectPropertyStatement(ObjectPropertyStatement objPropertyStmt) {
     	return insertNewObjectPropertyStatement(objPropertyStmt, getOntModelSelector().getABoxModel());
     }
 

@@ -23,6 +23,8 @@ public interface ObjectPropertyStatementDao {
     
     List<ObjectPropertyStatement> getObjectPropertyStatements(ObjectProperty objectProperty, int startIndex, int endIndex);
 
+    List<ObjectPropertyStatement> getObjectPropertyStatements(ObjectPropertyStatement objPropertyStmt);
+    
     Individual fillExistingObjectPropertyStatements( Individual entity );
 
     int insertNewObjectPropertyStatement(ObjectPropertyStatement objPropertyStmt );
