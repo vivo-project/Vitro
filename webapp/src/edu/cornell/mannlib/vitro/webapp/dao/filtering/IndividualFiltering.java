@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.dao.filtering;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -71,10 +72,21 @@ public class IndividualFiltering implements Individual {
 
     public List<DataPropertyStatement> getDataPropertyStatements() {
         List<DataPropertyStatement> dstmts = _innerIndividual.getDataPropertyStatements();
-        List<DataPropertyStatement> outDstmts = new LinkedList<DataPropertyStatement>();
-        Filter.filter(dstmts,_filters.getDataPropertyStatementFilter(), outDstmts);
-        return outDstmts;
+        return filterDataPropertyStatements(dstmts);      
     }
+    
+    public List<DataPropertyStatement> getDataPropertyStatements(String propertyUri) {
+        List<DataPropertyStatement> dstmts = _innerIndividual.getDataPropertyStatements(propertyUri);
+        return filterDataPropertyStatements(dstmts);        
+    }
+    
+    private List<DataPropertyStatement> filterDataPropertyStatements(List<DataPropertyStatement> dStmts) {
+        List<DataPropertyStatement> outDstmts = new LinkedList<DataPropertyStatement>();
+        Filter.filter(dStmts,_filters.getDataPropertyStatementFilter(), outDstmts);
+        return outDstmts;          
+    }
+    
+
       
     public Map<String, DataProperty> getDataPropertyMap() {
         Map<String,DataProperty> innerMap = _innerIndividual.getDataPropertyMap();
@@ -109,7 +121,7 @@ public class IndividualFiltering implements Individual {
     public List<ObjectPropertyStatement> getObjectPropertyStatements() {
 
         List<ObjectPropertyStatement> stmts = _innerIndividual.getObjectPropertyStatements();
-        return ObjectPropertyStatementDaoFiltering.filterAndWrapList(stmts, _filters);
+        return filterObjectPropertyStatements(stmts); 
 //
 //         //filter ObjectPropertyStatements from inner
 //        List<ObjectPropertyStatement> filteredStmts = new LinkedList<ObjectPropertyStatement>();
@@ -133,6 +145,17 @@ public class IndividualFiltering implements Individual {
 //        return stmts;
     }
 
+    public List<ObjectPropertyStatement> getObjectPropertyStatements(String propertyUri) {
+        List<ObjectPropertyStatement> stmts = _innerIndividual.getObjectPropertyStatements(propertyUri);
+        return filterObjectPropertyStatements(stmts);       
+    }
+    
+    private List<ObjectPropertyStatement> filterObjectPropertyStatements(List<ObjectPropertyStatement> opStmts) {
+        return ObjectPropertyStatementDaoFiltering.filterAndWrapList(opStmts, _filters); 
+    }
+
+
+    
     //TODO: may cause problems since one can get ObjectPropertyStatement list from
     // the ObjectProperty, and that won't be filtered.
     //might need to make a ObjectPropertyFiltering and a ObjectPropertyStatementFiltering    
@@ -560,5 +583,36 @@ public class IndividualFiltering implements Individual {
 
     public void setSearchBoost(Float boost) { _innerIndividual.setSearchBoost( boost ); }
     public Float getSearchBoost() {return _innerIndividual.getSearchBoost(); }
-      
+
+    public List<String> getDataValues(String propertyUri) {
+        List<DataPropertyStatement> stmts = getDataPropertyStatements(propertyUri);
+        // Since the statements have been filtered, we can just take the data values without filtering.
+        List<String> dataValues = new ArrayList<String>(stmts.size());
+        for (DataPropertyStatement stmt : stmts) {
+            dataValues.add(stmt.getData());
+        }
+        return dataValues;      
+    }
+    
+    public String getDataValue(String propertyUri) {
+        List<DataPropertyStatement> stmts = getDataPropertyStatements(propertyUri);
+        // Since the statements have been filtered, we can just take the first data value without filtering.
+        return stmts.isEmpty() ? null : stmts.get(0).getData();
+    }
+    
+    public List<Individual> getRelatedIndividuals(String propertyUri) {
+        List<ObjectPropertyStatement> stmts = getObjectPropertyStatements(propertyUri);
+        // Since the statements have been filtered, we can just take the individuals without filtering.
+        List<Individual> relatedIndividuals = new ArrayList<Individual>(stmts.size());
+        for (ObjectPropertyStatement stmt : stmts) {
+            relatedIndividuals.add(stmt.getObject());
+        }
+        return relatedIndividuals; 
+    }
+    
+    public Individual getRelatedIndividual(String propertyUri) {
+        List<ObjectPropertyStatement> stmts = getObjectPropertyStatements(propertyUri); 
+        // Since the statements have been filtered, we can just take the first individual without filtering.
+        return stmts.isEmpty() ? null : stmts.get(0).getObject();
+    }
 }

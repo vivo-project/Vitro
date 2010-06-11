@@ -48,6 +48,10 @@ public interface Individual extends ResourceBean, VitroTimeWindowedResource, Com
     
     void setDataPropertyStatements(List<DataPropertyStatement> list);
     List<DataPropertyStatement> getDataPropertyStatements();
+    List<DataPropertyStatement> getDataPropertyStatements(String propertyUri);
+    
+    List<String> getDataValues(String propertyUri);
+    String getDataValue(String propertyUri);
 
     VClass getVClass();
     void setVClass(VClass class1);
@@ -59,6 +63,10 @@ public interface Individual extends ResourceBean, VitroTimeWindowedResource, Com
 
     void setObjectPropertyStatements(List<ObjectPropertyStatement> list);
     List<ObjectPropertyStatement> getObjectPropertyStatements();
+    List<ObjectPropertyStatement> getObjectPropertyStatements(String propertyUri);
+    
+    List<Individual> getRelatedIndividuals(String propertyUri);
+    Individual getRelatedIndividual(String propertyUri);
 
     List<DataPropertyStatement> getExternalIds();
     void setExternalIds(List<DataPropertyStatement> externalIds);
