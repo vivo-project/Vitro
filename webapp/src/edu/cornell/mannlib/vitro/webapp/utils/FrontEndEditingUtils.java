@@ -21,7 +21,6 @@ public class FrontEndEditingUtils {
     private static final List<String> VITRO_NS_DATA_PROPS = Arrays.asList(VitroVocabulary.BLURB,                                                                         
                                                                         VitroVocabulary.CITATION, 
                                                                         VitroVocabulary.DESCRIPTION, 
-                                                                        VitroVocabulary.IND_MAIN_IMAGE, 
                                                                         VitroVocabulary.LABEL, 
                                                                         VitroVocabulary.MONIKER
                                                                         // VitroVocabulary.RDF_TYPE,
