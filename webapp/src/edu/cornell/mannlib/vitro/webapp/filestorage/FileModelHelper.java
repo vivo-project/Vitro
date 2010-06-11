@@ -9,8 +9,9 @@ import org.apache.log4j.Logger;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
+import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 /**
  * Static methods to help manipulate the model, with regard to uploaded files.
@@ -27,6 +28,8 @@ public class FileModelHelper {
 		Individual mainFile = getRelatedIndividual(entity,
 				VitroVocabulary.IND_MAIN_IMAGE);
 		if (mainFile == null) {
+			log.debug("Entity had no associated main image: '"
+					+ entity.getURI() + "'");
 			return null;
 		}
 
@@ -38,6 +41,8 @@ public class FileModelHelper {
 			return null;
 		}
 
+		log.debug("mainImageBytestreamUri for '" + entity.getURI() + "' is '"
+				+ byteStream.getURI() + "'");
 		return byteStream.getURI();
 	}
 
@@ -50,28 +55,36 @@ public class FileModelHelper {
 		Individual mainFile = getRelatedIndividual(entity,
 				VitroVocabulary.IND_MAIN_IMAGE);
 		if (mainFile == null) {
+			log.debug("Entity had no associated main image: '"
+					+ entity.getURI() + "'");
 			return null;
 		}
 
 		String filename = getDataValue(mainFile, VitroVocabulary.FS_FILENAME);
 		if (filename == null) {
-			log.error("File individual had no filename: '"
-					+ mainFile.getURI() + "'");
+			log.error("File individual had no filename: '" + mainFile.getURI()
+					+ "'");
 			return null;
 		}
 
+		log.debug("mainImageFilename for '" + entity.getURI() + "' is '"
+				+ filename + "'");
 		return filename;
 	}
 
 	/**
 	 * Locate the individual that represents the bytestream of the thumbnail of
 	 * the main image.
-	 * @return the URI, or <code>null</code> if there is no such thumbnail image.
+	 * 
+	 * @return the URI, or <code>null</code> if there is no such thumbnail
+	 *         image.
 	 */
 	public static String getThumbnailUri(Individual entity) {
 		Individual mainFile = getRelatedIndividual(entity,
 				VitroVocabulary.IND_MAIN_IMAGE);
 		if (mainFile == null) {
+			log.debug("Entity had no associated main image: '"
+					+ entity.getURI() + "'");
 			return null;
 		}
 
@@ -91,18 +104,23 @@ public class FileModelHelper {
 			return null;
 		}
 
+		log.debug("thumbnailBytestreamUri for '" + entity.getURI() + "' is '"
+				+ byteStream.getURI() + "'");
 		return byteStream.getURI();
 	}
 
 	/**
 	 * Find the filename of the thumbnail of the main image.
 	 * 
-	 * @return the filename, or <code>null</code> if there is no such thumbnail image.
+	 * @return the filename, or <code>null</code> if there is no such thumbnail
+	 *         image.
 	 */
 	public static String getThumbnailFilename(Individual entity) {
 		Individual mainFile = getRelatedIndividual(entity,
 				VitroVocabulary.IND_MAIN_IMAGE);
 		if (mainFile == null) {
+			log.debug("Entity had no associated main image: '"
+					+ entity.getURI() + "'");
 			return null;
 		}
 
@@ -116,12 +134,51 @@ public class FileModelHelper {
 
 		String filename = getDataValue(thumbFile, VitroVocabulary.FS_FILENAME);
 		if (filename == null) {
-			log.error("File individual had no filename: '"
-					+ thumbFile.getURI() + "'");
+			log.error("File individual had no filename: '" + thumbFile.getURI()
+					+ "'");
 			return null;
 		}
 
+		log.debug("thumbnailFilename for '" + entity.getURI() + "' is '"
+				+ filename + "'");
 		return filename;
+	}
+
+	/**
+	 * If this URI represents a ByteStream object, we need to find it's
+	 * surrogate object in order to find the mime type.
+	 * 
+	 * @return the mime type, or <code>null</code>
+	 */
+	public static String getMimeTypeForBytestream(String bytestreamUri,
+			WebappDaoFactory webappDaoFactory) {
+		if (bytestreamUri == null) {
+			return null;
+		}
+
+		ObjectPropertyStatement opStmt = new ObjectPropertyStatementImpl(null,
+				VitroVocabulary.FS_DOWNLOAD_LOCATION, bytestreamUri);
+		List<ObjectPropertyStatement> stmts = webappDaoFactory
+				.getObjectPropertyStatementDao().getObjectPropertyStatements(
+						opStmt);
+		if (stmts.size() > 0) {
+			String uris = "";
+			for (ObjectPropertyStatement stmt : stmts) {
+				uris += "'" + stmt.getSubjectURI() + "' ";
+			}
+			log.warn("Found " + stmts.size() + " Individuals that claim '"
+					+ bytestreamUri + "' as its bytestream:" + uris);
+		}
+		if (stmts.isEmpty()) {
+			log.warn("No individual claims '" + "' as its bytestream.");
+			return null;
+		}
+		Individual surrogate = webappDaoFactory.getIndividualDao()
+				.getIndividualByURI(stmts.get(0).getSubjectURI());
+
+		String mimeType = getDataValue(surrogate, VitroVocabulary.FS_MIME_TYPE);
+		log.debug("mimeType for '" + bytestreamUri + "' is '" + mimeType + "'");
+		return mimeType;
 	}
 
 	/**
@@ -143,8 +200,8 @@ public class FileModelHelper {
 	}
 
 	/**
-	 * Inspect the data properties on this individual and find the value of
-	 * the specified property.
+	 * Inspect the data properties on this individual and find the value of the
+	 * specified property.
 	 * 
 	 * @return the value of the first such property, or <code>null</code>.
 	 */
@@ -153,7 +210,7 @@ public class FileModelHelper {
 				.getDataPropertyStatements();
 		for (DataPropertyStatement dpStmt : dpStmts) {
 			if (dpStmt.getDatapropURI().equals(propertyUri)) {
-				return dpStmt.getString();
+				return dpStmt.getData();
 			}
 		}
 		return null;
