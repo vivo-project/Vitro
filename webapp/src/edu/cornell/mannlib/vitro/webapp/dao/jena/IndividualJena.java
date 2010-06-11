@@ -495,11 +495,16 @@ public class IndividualJena extends IndividualImpl implements Individual {
 	@Override
 	public String getImageUrl() {
 		if (this.imageUrl != null) {
+			log.debug("imageUrl was cached for " + getURI() + ": '"
+					+ this.imageUrl + "'");
 			return imageUrl;
 		} else {
 			String imageUri = FileModelHelper.getMainImageUri(this);
 			String filename = FileModelHelper.getMainImageFilename(this);
-			imageUrl = FileServingHelper.getBytestreamAliasUrl(imageUri, filename);
+			imageUrl = FileServingHelper.getBytestreamAliasUrl(imageUri,
+					filename);
+			log.debug("figured imageUrl for " + getURI() + ": '"
+					+ this.imageUrl + "'");
 			return imageUrl;
 		}
 	}
@@ -507,11 +512,15 @@ public class IndividualJena extends IndividualImpl implements Individual {
 	@Override
 	public String getThumbUrl() {
 		if (this.thumbUrl != null) {
+			log.debug("thumbUrl was cached for " + getURI() + ": '"
+					+ this.thumbUrl + "'");
 			return thumbUrl;
 		} else {
 			String imageUri = FileModelHelper.getThumbnailUri(this);
 			String filename = FileModelHelper.getThumbnailFilename(this);
 			thumbUrl = FileServingHelper.getBytestreamAliasUrl(imageUri, filename);
+			log.debug("figured thumbUrl for " + getURI() + ": '"
+					+ this.thumbUrl + "'");
 			return thumbUrl;
 		}
 	}
