@@ -47,9 +47,8 @@ public class VClassGroupView extends ViewObject {
         if (classes == null) {
             List<VClass> classList = vClassGroup.getVitroClassList();
             classes = new ArrayList<VClassView>();
-            Iterator<VClass> i = classList.iterator();
-            while (i.hasNext()) {
-                classes.add(new VClassView((VClass) i.next()));
+            for (VClass vc : classList) {
+                classes.add(new VClassView(vc));
             }
         }
         

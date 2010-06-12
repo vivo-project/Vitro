@@ -126,8 +126,34 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
     public void setDataPropertyStatements(List <DataPropertyStatement>list) {
          dataPropertyStatements = list;
     }
-    public List <DataPropertyStatement>getDataPropertyStatements(){
+    public List<DataPropertyStatement> getDataPropertyStatements(){
         return dataPropertyStatements;
+    }
+    
+    public List<DataPropertyStatement> getDataPropertyStatements(String propertyUri) {
+        List<DataPropertyStatement> stmts = getDataPropertyStatements();
+        List<DataPropertyStatement> stmtsForProp = new ArrayList<DataPropertyStatement>();
+        for (DataPropertyStatement stmt : stmts) {
+            if (stmt.getDatapropURI().equals(propertyUri)) {
+                stmtsForProp.add(stmt);
+            }
+        }
+        return stmtsForProp;        
+    }
+    
+    public List<String> getDataValues(String propertyUri) {     
+        List<DataPropertyStatement> stmts = getDataPropertyStatements(propertyUri);
+        List<String> dataValues = new ArrayList<String>(stmts.size());
+        for (DataPropertyStatement stmt : stmts) {
+            dataValues.add(stmt.getData());
+        }
+        return dataValues;
+    }
+ 
+
+    public String getDataValue(String propertyUri) {
+        List<DataPropertyStatement> stmts = getDataPropertyStatements(propertyUri);
+        return stmts.isEmpty() ? null : stmts.get(0).getData();
     }
 
     public VClass getVClass() {
@@ -161,8 +187,33 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
          objectPropertyStatements = list;
     }
 
-    public List <ObjectPropertyStatement>getObjectPropertyStatements(){
+    public List <ObjectPropertyStatement> getObjectPropertyStatements(){
         return objectPropertyStatements;
+    }
+    
+    public List<ObjectPropertyStatement> getObjectPropertyStatements(String propertyUri) {
+        List<ObjectPropertyStatement> stmts = getObjectPropertyStatements();
+        List<ObjectPropertyStatement> stmtsForProp = new ArrayList<ObjectPropertyStatement>();
+        for (ObjectPropertyStatement stmt : stmts) {
+            if (stmt.getPropertyURI().equals(propertyUri)) {
+                stmtsForProp.add(stmt);
+            }
+        }
+        return stmtsForProp;
+    }
+    
+    public List<Individual> getRelatedIndividuals(String propertyUri) {
+        List<ObjectPropertyStatement> stmts = getObjectPropertyStatements(propertyUri);
+        List<Individual> relatedIndividuals = new ArrayList<Individual>(stmts.size());
+        for (ObjectPropertyStatement stmt : stmts) {
+            relatedIndividuals.add(stmt.getObject());
+        }
+        return relatedIndividuals;       
+    }
+    
+    public Individual getRelatedIndividual(String propertyUri) {
+        List<ObjectPropertyStatement> stmts = getObjectPropertyStatements(propertyUri);    
+        return stmts.isEmpty() ? null : stmts.get(0).getObject();
     }
 
     public List<DataPropertyStatement> getExternalIds(){
