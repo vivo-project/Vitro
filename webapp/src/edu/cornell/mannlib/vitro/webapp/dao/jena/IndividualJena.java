@@ -499,7 +499,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
 					+ this.imageUrl + "'");
 			return imageUrl;
 		} else {
-			String imageUri = FileModelHelper.getMainImageUri(this);
+			String imageUri = FileModelHelper.getMainImageBytestreamUri(this);
 			String filename = FileModelHelper.getMainImageFilename(this);
 			imageUrl = FileServingHelper.getBytestreamAliasUrl(imageUri,
 					filename);
@@ -516,7 +516,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
 					+ this.thumbUrl + "'");
 			return thumbUrl;
 		} else {
-			String imageUri = FileModelHelper.getThumbnailUri(this);
+			String imageUri = FileModelHelper.getThumbnailBytestreamUri(this);
 			String filename = FileModelHelper.getThumbnailFilename(this);
 			thumbUrl = FileServingHelper.getBytestreamAliasUrl(imageUri, filename);
 			log.debug("figured thumbUrl for " + getURI() + ": '"

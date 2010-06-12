@@ -28,22 +28,10 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
-
-import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
-import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
-import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
-import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
-import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
-import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.filestorage.FileModelHelper;
 import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileAlreadyExistsException;
 import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorage;
 import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup;
@@ -122,32 +110,6 @@ public class UploadImagesServlet extends VitroHttpServlet {
 	}
 
 	/**
-	 * <pre>
-	 * doPost()
-	 *   Do as much as possible before we begin updating the model:
-	 *     read the file
-	 *     get the mime-type
-	 *     be sure that we have a Person to associate with
-	 *     generate the thumbnail and assign a filename and mime-type
-	 *   If they already have a mainImage:
-	 *     check to see whether anyone else is associated with that image.
-	 *       if not, delete it -- remove the file, remove the individuals.
-	 *   Update the model
-	 *     for the thumbnail:
-	 *       create the File and FileByteStream individuals
-	 *       store the file in the file system
-	 *       add properties to the File (surrogate)
-	 *         filename, mimeType, downloadLocation
-	 *     for the main image:
-	 *       create the File and FileByteStream individuals
-	 *       store the file in the file system
-	 *       add properties to the File (surrogate)
-	 *         filename, mimeType, downloadLocation
-	 *       add property thumbnailImage
-	 *     set main image as mainImage in the person.
-	 * </pre>
-	 */
-	/**
 	 * <p>
 	 * Store an image file as the main image for the associated individual. The
 	 * request must be a multi-part request containing the file. It must also
@@ -170,9 +132,13 @@ public class UploadImagesServlet extends VitroHttpServlet {
 				FileItem imageFileItem = validateImageFromRequest(request);
 				Individual person = validateEntityUriFromRequest(request);
 
-				removeExistingImage(person, request);
-				storeMainImageFile(person, imageFileItem);
-				generateThumbnailAndStore(person, imageFileItem);
+				FileModelHelper fileModelHelper = new FileModelHelper(
+						getWebappDaoFactory());
+
+				removeExistingImage(person, fileModelHelper);
+				storeMainImageFile(person, imageFileItem, fileModelHelper);
+				generateThumbnailAndStore(person, imageFileItem,
+						fileModelHelper);
 
 				displaySuccess(request, response, person);
 			} catch (UserErrorException e) {
@@ -264,44 +230,53 @@ public class UploadImagesServlet extends VitroHttpServlet {
 	}
 
 	/**
-	 * If the Individual already has a main image, remove it. If nobody else is
-	 * referring to that image, delete it.
+	 * If this entity already had a main image, remove the connection. If the
+	 * image and the thumbnail are no longer used by anyone, remove them from
+	 * the model, and from the file system.
 	 */
-	private void removeExistingImage(Individual person, VitroRequest request) {
-		OntModel model = request.getJenaOntModel();
-		IndividualDao individualDao = getWebappDaoFactory().getIndividualDao();
-
-		// No existing image? Nothing to do.
-		String existingImageUri = person.getMainImageUri();
-		if (existingImageUri == null) {
+	private void removeExistingImage(Individual person,
+			FileModelHelper fileModelHelper) {
+		Individual mainImage = fileModelHelper.removeMainImage(person);
+		if (mainImage == null) {
 			return;
 		}
 
-		// Remove the reference to the existing image.
-		person.setMainImageUri(null);
-		individualDao.updateIndividual(person);
+		Individual thumbnail = FileModelHelper.getThumbnailForImage(mainImage);
 
-		// If anyone else is using the image, we are done.
-		if (isBeingUsed(model, existingImageUri)) {
-			return;
+		if (!fileModelHelper.isFileReferenced(mainImage)) {
+			Individual bytes = FileModelHelper.getBytestreamForFile(mainImage);
+			if (bytes != null) {
+				try {
+					fileStorage.deleteFile(bytes.getURI());
+				} catch (IOException e) {
+					throw new IllegalStateException(
+							"Can't delete the main image file: '"
+									+ bytes.getURI() + "'", e);
+				}
+			}
+			fileModelHelper.removeFileFromModel(mainImage);
 		}
-
-		// Nobody is using the image. Delete the image and its thumbnail.
-		Individual existingImage = individualDao
-				.getIndividualByURI(existingImageUri);
-		Individual existingThumbnail = getRelatedIndividual(existingImage,
-				VitroVocabulary.FS_THUMBNAIL_IMAGE);
-		if (existingThumbnail != null) {
-			deleteStoredFile(existingThumbnail, individualDao);
+		if (!fileModelHelper.isFileReferenced(thumbnail)) {
+			Individual bytes = FileModelHelper.getBytestreamForFile(thumbnail);
+			if (bytes != null) {
+				try {
+					fileStorage.deleteFile(bytes.getURI());
+				} catch (IOException e) {
+					throw new IllegalStateException(
+							"Can't delete the thumbnail file: '"
+									+ bytes.getURI() + "'", e);
+				}
+			}
+			fileModelHelper.removeFileFromModel(thumbnail);
 		}
-		deleteStoredFile(existingImage, individualDao);
 	}
 
 	/**
 	 * Store this image in the model and in the file storage system, and set it
 	 * as the main image for this person.
 	 */
-	private void storeMainImageFile(Individual person, FileItem imageFileItem) {
+	private void storeMainImageFile(Individual person, FileItem imageFileItem,
+			FileModelHelper fileModelHelper) {
 		InputStream inputStream = null;
 		try {
 			inputStream = imageFileItem.getInputStream();
@@ -309,21 +284,22 @@ public class UploadImagesServlet extends VitroHttpServlet {
 			String filename = getSimpleFilename(imageFileItem);
 
 			// Create the file individuals in the model
-			Individual byteStream = createByteStreamIndividual();
-			Individual file = createFileIndividual(mimeType, filename,
-					byteStream);
+			Individual byteStream = fileModelHelper
+					.createByteStreamIndividual();
+			Individual file = fileModelHelper.createFileIndividual(mimeType,
+					filename, byteStream);
 
 			// Store the file in the FileStorage system.
 			fileStorage.createFile(byteStream.getURI(), filename, inputStream);
 
 			// Set the file as the main image for the person.
-			person.setMainImageUri(file.getURI());
-			getWebappDaoFactory().getIndividualDao().updateIndividual(person);
+			fileModelHelper.setAsMainImageOnEntity(person, file);
 		} catch (FileAlreadyExistsException e) {
-			throw new IllegalStateException("Can't create the image file: "
-					+ e.getMessage(), e);
+			throw new IllegalStateException(
+					"Can't create the main image file: " + e.getMessage(), e);
 		} catch (IOException e) {
-			throw new IllegalStateException("Can't create the image file", e);
+			throw new IllegalStateException("Can't create the main image file",
+					e);
 		} finally {
 			if (inputStream != null) {
 				try {
@@ -340,7 +316,7 @@ public class UploadImagesServlet extends VitroHttpServlet {
 	 * the file storage system, and set it as the thumbnail on the main image.
 	 */
 	private void generateThumbnailAndStore(Individual person,
-			FileItem imageFileItem) {
+			FileItem imageFileItem, FileModelHelper fileModelHelper) {
 
 		InputStream inputStream = null;
 		try {
@@ -351,25 +327,22 @@ public class UploadImagesServlet extends VitroHttpServlet {
 			String filename = createThumbnailFilename(getSimpleFilename(imageFileItem));
 
 			// Create the file individuals in the model
-			Individual byteStream = createByteStreamIndividual();
-			Individual file = createFileIndividual(mimeType, filename,
-					byteStream);
+			Individual byteStream = fileModelHelper
+					.createByteStreamIndividual();
+			Individual file = fileModelHelper.createFileIndividual(mimeType,
+					filename, byteStream);
 
 			// Store the file in the FileStorage system.
 			fileStorage.createFile(byteStream.getURI(), filename, inputStream);
 
 			// Set the file as the thumbnail on the main image for the person.
-			String mainImageUri = person.getMainImageUri();
-			getWebappDaoFactory().getObjectPropertyStatementDao()
-					.insertNewObjectPropertyStatement(
-							new ObjectPropertyStatementImpl(mainImageUri,
-									VitroVocabulary.FS_THUMBNAIL_IMAGE, file
-											.getURI()));
+			fileModelHelper.setThumbnailOnIndividual(person, file);
 		} catch (FileAlreadyExistsException e) {
-			throw new IllegalStateException("Can't create the image file: "
+			throw new IllegalStateException("Can't create the thumbnail file: "
 					+ e.getMessage(), e);
 		} catch (IOException e) {
-			throw new IllegalStateException("Can't create the image file", e);
+			throw new IllegalStateException("Can't create the thumbnail file",
+					e);
 		} finally {
 			if (inputStream != null) {
 				try {
@@ -462,116 +435,6 @@ public class UploadImagesServlet extends VitroHttpServlet {
 
 		String extension = filename.substring(periodHere);
 		return RECOGNIZED_FILE_TYPES.get(extension);
-	}
-
-	/**
-	 * Is this individual referred to by anyone else in the model?
-	 */
-	private boolean isBeingUsed(OntModel model, String individualUri) {
-		Resource individual = model.getResource(individualUri);
-		StmtIterator stmts = model.listStatements(null, null, individual);
-		try {
-			return stmts.hasNext();
-		} finally {
-			stmts.close();
-		}
-	}
-
-	/**
-	 * Delete the file, remove the FileByteStream and the File from the model.
-	 */
-	private void deleteStoredFile(Individual file, IndividualDao individualDao) {
-		Individual byteStream = getRelatedIndividual(file,
-				VitroVocabulary.FS_DOWNLOAD_LOCATION);
-		if (byteStream == null) {
-			throw new IllegalStateException(
-					"Failed to delete the existing image: "
-							+ "no byteStream individual attached to file '"
-							+ file.getUrl() + "'");
-		}
-
-		try {
-			fileStorage.deleteFile(byteStream.getUrl());
-		} catch (IOException e) {
-			throw new IllegalStateException(
-					"Failed to delete the existing image file.", e);
-		}
-
-		individualDao.deleteIndividual(byteStream);
-		individualDao.deleteIndividual(file);
-	}
-
-	/**
-	 * Inspect the object properties on this individual and find the object of
-	 * the specified property.
-	 * 
-	 * @return the object of the first such property, or <code>null</code>.
-	 */
-	private Individual getRelatedIndividual(Individual individual,
-			String propertyUri) {
-		List<ObjectPropertyStatement> opStmts = individual
-				.getObjectPropertyStatements();
-		for (ObjectPropertyStatement opStmt : opStmts) {
-			if (opStmt.getPropertyURI().equals(propertyUri)) {
-				return opStmt.getObject();
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * Create an individual in the model to represent the file bytestream.
-	 */
-	private Individual createByteStreamIndividual() {
-		IndividualDao individualDao = getWebappDaoFactory().getIndividualDao();
-
-		Individual byteStream = new IndividualImpl();
-		byteStream.setVClassURI(VitroVocabulary.FS_BYTESTREAM_CLASS);
-		String uri = null;
-		try {
-			uri = individualDao.insertNewIndividual(byteStream);
-		} catch (InsertException e) {
-			throw new IllegalStateException(
-					"Failed to create the bytestream individual.", e);
-		}
-
-		return individualDao.getIndividualByURI(uri);
-	}
-
-	/**
-	 * Create a file surrogate individual in the model.
-	 */
-	private Individual createFileIndividual(String mimeType, String filename,
-			Individual byteStream) {
-		IndividualDao individualDao = getWebappDaoFactory().getIndividualDao();
-		DataPropertyStatementDao dataPropertyStatementDao = getWebappDaoFactory()
-				.getDataPropertyStatementDao();
-		ObjectPropertyStatementDao objectPropertyStatementDao = getWebappDaoFactory()
-				.getObjectPropertyStatementDao();
-
-		Individual file = new IndividualImpl();
-		file.setVClassURI(VitroVocabulary.FS_FILE_CLASS);
-
-		String uri = null;
-		try {
-			uri = individualDao.insertNewIndividual(file);
-		} catch (InsertException e) {
-			throw new IllegalStateException(
-					"Failed to create the file individual.", e);
-		}
-
-		dataPropertyStatementDao
-				.insertNewDataPropertyStatement(new DataPropertyStatementImpl(
-						uri, VitroVocabulary.FS_FILENAME, filename));
-		dataPropertyStatementDao
-				.insertNewDataPropertyStatement(new DataPropertyStatementImpl(
-						uri, VitroVocabulary.FS_MIME_TYPE, mimeType));
-		objectPropertyStatementDao
-				.insertNewObjectPropertyStatement(new ObjectPropertyStatementImpl(
-						uri, VitroVocabulary.FS_DOWNLOAD_LOCATION, byteStream
-								.getURI()));
-
-		return individualDao.getIndividualByURI(uri);
 	}
 
 	private InputStream scaleImageForThumbnail(InputStream source, int width,

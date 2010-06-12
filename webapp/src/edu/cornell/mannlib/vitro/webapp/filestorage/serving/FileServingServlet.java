@@ -104,8 +104,8 @@ public class FileServingServlet extends VitroHttpServlet {
 		}
 
 		// Get the MIME type.
-		String mimeType = FileModelHelper.getMimeTypeForBytestream(uri,
-				getWebappDaoFactory());
+		String mimeType = new FileModelHelper(getWebappDaoFactory())
+				.getMimeTypeForBytestream(uri);
 
 		// Open the actual byte stream.
 		InputStream in;
