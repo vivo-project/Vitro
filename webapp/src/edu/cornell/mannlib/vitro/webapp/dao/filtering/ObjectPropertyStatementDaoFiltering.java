@@ -27,6 +27,7 @@ class ObjectPropertyStatementDaoFiltering extends BaseFiltering implements Objec
     }
 
     
+    @Override
     public void deleteObjectPropertyStatement(ObjectPropertyStatement objPropertyStmt) {
         innerObjectPropertyStatementDao.deleteObjectPropertyStatement(objPropertyStmt);
     }
@@ -48,6 +49,7 @@ class ObjectPropertyStatementDaoFiltering extends BaseFiltering implements Objec
         }
     }
     
+    @Override
     public Individual fillExistingObjectPropertyStatements(Individual entity) {
         Individual ind = innerObjectPropertyStatementDao.fillExistingObjectPropertyStatements(entity);
         if( ind == null ) 
@@ -58,15 +60,24 @@ class ObjectPropertyStatementDaoFiltering extends BaseFiltering implements Objec
         }
     }
 
+    @Override
     public List<ObjectPropertyStatement> getObjectPropertyStatements(ObjectProperty objectProperty) {
     	return filterAndWrapList( innerObjectPropertyStatementDao.getObjectPropertyStatements(objectProperty), filters );
     }
     
+    @Override
     public List<ObjectPropertyStatement> getObjectPropertyStatements(ObjectProperty objectProperty, int startIndex, int endIndex) {
     	return filterAndWrapList( innerObjectPropertyStatementDao.getObjectPropertyStatements(objectProperty, startIndex, endIndex) ,filters);    	
     }
     
-    public int insertNewObjectPropertyStatement(ObjectPropertyStatement objPropertyStmt) {
+    @Override
+	public List<ObjectPropertyStatement> getObjectPropertyStatements(
+			ObjectPropertyStatement objPropertyStmt) {
+    	return filterAndWrapList(innerObjectPropertyStatementDao.getObjectPropertyStatements(objPropertyStmt), filters);
+	}
+
+    @Override
+	public int insertNewObjectPropertyStatement(ObjectPropertyStatement objPropertyStmt) {
         return innerObjectPropertyStatementDao.insertNewObjectPropertyStatement(objPropertyStmt);
     }
 
