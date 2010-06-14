@@ -6,6 +6,14 @@ if (!vitro) {
 }
 
 vitro.customFormUtils = {
+		
+	hideForm: function() {
+		this.hideFields(this.form);
+	},
+	
+	clearFormData: function() {
+		this.clearFields(this.form);
+	},
 
     // This method should always be called instead of calling hide() directly on any
     // element containing form fields.
