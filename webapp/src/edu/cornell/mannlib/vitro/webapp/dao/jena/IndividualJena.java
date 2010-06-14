@@ -478,7 +478,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
 
 	@Override
 	public String getMainImageUri() {
-		if (this.mainImageUri != null) {
+		if (this.mainImageUri != NOT_INITIALIZED) {
 			return mainImageUri;
 		} else {
 			for (ObjectPropertyStatement stmt : getObjectPropertyStatements()) {

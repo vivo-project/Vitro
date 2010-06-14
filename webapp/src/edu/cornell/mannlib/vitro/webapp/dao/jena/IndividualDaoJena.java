@@ -474,9 +474,7 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
                 updatePropertyDateTimeValue(ind,SUNSET,ent.getSunset(), ontModel);
                 updatePropertyDateTimeValue(ind,TIMEKEY,ent.getTimekey(), ontModel);
                 updatePropertyDateTimeValue(ind,MODTIME,Calendar.getInstance().getTime(),ontModel);
-                if (ent.getMainImageUri() != null) {
-                    updatePropertyResourceURIValue(ind, IND_MAIN_IMAGE, ent.getMainImageUri(), ontModel);
-                }
+                updatePropertyResourceURIValue(ind, IND_MAIN_IMAGE, ent.getMainImageUri(), ontModel);
                 if (ent.getAnchor()!= null && ent.getAnchor().length()>0) {
                     if (LINK != null && PRIMARY_LINK != null) {
                         boolean updatedExisting = false;

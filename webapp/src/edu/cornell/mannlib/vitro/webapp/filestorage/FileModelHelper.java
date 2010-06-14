@@ -339,16 +339,6 @@ public class FileModelHelper {
 		Individual mainImage = getMainImage(person);
 		person.setMainImageUri(null);
 		individualDao.updateIndividual(person);
-		{
-			// TODO remove this kluge:
-			if (mainImage != null) {
-				objectPropertyStatementDao
-						.deleteObjectPropertyStatement(new ObjectPropertyStatementImpl(
-								person.getURI(),
-								VitroVocabulary.IND_MAIN_IMAGE, mainImage
-										.getURI()));
-			}
-		}
 		log.debug("Removed main image '" + getUri(mainImage) + "' from '"
 				+ person.getURI() + "'");
 		return mainImage;

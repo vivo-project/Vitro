@@ -14,7 +14,15 @@ import java.util.*;
  * Represents a single entity record.
 */
 public class IndividualImpl extends BaseResourceBean implements Individual, Comparable<Individual> {
-    public String name = null;
+	/**
+	 * This can be used as a "not initialized" indicator for a property that
+	 * could validly be set to <code>null</code>. If <code>get()</code> is
+	 * called on such a property, and the property has this value, the correct
+	 * value can be fetched and cached.
+	 */
+	protected static final String NOT_INITIALIZED = "__%NOT_INITIALIZED%__";
+
+	public String name = null;
     public String vClassURI = null;
     protected VClass vClass = null;
     protected List<VClass> directVClasses = null;
@@ -248,12 +256,14 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
     
 	@Override
 	public String getMainImageUri() {
-		return mainImageUri;
+		return (mainImageUri == NOT_INITIALIZED) ? null : mainImageUri;
 	}
 
 	@Override
 	public void setMainImageUri(String mainImageUri) {
 		this.mainImageUri = mainImageUri;
+		this.imageUrl = null;
+		this.thumbUrl = null;
 	}
 
 	@Override
@@ -261,19 +271,11 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
 		return "imageUrl";
 	}
 
-	public void setImageUrl(String imageUrl) {
-		this.imageUrl = imageUrl;
-	}
-	
 	@Override
 	public String getThumbUrl() {
 		return "thumbUrl";
 	}
 
-	public void setThumbUrl(String thumbUrl) {
-		this.thumbUrl = thumbUrl;
-	}
-	
 	public String getUrl() {
         return url;
     }
