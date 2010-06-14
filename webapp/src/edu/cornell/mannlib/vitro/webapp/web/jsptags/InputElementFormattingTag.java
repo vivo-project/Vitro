@@ -55,6 +55,7 @@ public class InputElementFormattingTag extends TagSupport {
     private String  id;
     private String  type;
     private String  label;
+    private String  cancelLabel;
     private String  cssClass;
     private String  labelClass;
     private String  value;
@@ -89,6 +90,12 @@ public class InputElementFormattingTag extends TagSupport {
         this.label = labelStr;
     }
 
+    public String getCancelLabel() {
+        return cancelLabel;
+    }
+    public void setCancelLabel(String cancelLabel) {
+        this.cancelLabel = cancelLabel;
+    }
     public String getCssClass() {
         return cssClass;
     }
@@ -273,7 +280,10 @@ public class InputElementFormattingTag extends TagSupport {
 
     private String doCancel(String labelStr, EditConfiguration editConfig){
         if (labelStr==null || labelStr.equals("")) {
-            labelStr="Cancel";
+            labelStr = getCancelLabel();
+            if (labelStr==null || labelStr.equals("")) {
+                labelStr="Cancel";
+            }
         }
         VitroRequest vreq = new VitroRequest((HttpServletRequest)pageContext.getRequest());
         if( "about".equals( getCancel() )){
@@ -1003,7 +1013,7 @@ public class InputElementFormattingTag extends TagSupport {
         			log.debug("found existing literal of type Date for field " + fieldName);
         		}else if( valueFromLiteral instanceof String){
         			strFromLit = (String) valueFromLiteral;        			
-        			log.debug("found exisitng literal of type String for field " + fieldName);
+        			log.debug("found existing literal of type String for field " + fieldName);
         		} else if ( valueFromLiteral instanceof XSDDateTime) {
         			strFromLit = date.getLexicalForm();
         			log.debug("found existing literal of type XSDDateTime for field " + fieldName);
@@ -1126,6 +1136,6 @@ public class InputElementFormattingTag extends TagSupport {
 
         return sb;
     }
-
-     final String SELECTED = "selected=\"selected\"";
+    
+    final String SELECTED = "selected=\"selected\"";
 }
