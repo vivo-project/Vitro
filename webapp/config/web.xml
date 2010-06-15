@@ -157,6 +157,14 @@
     </listener-class>
   </listener>
 
+  <!-- Invokes a process to move any uploaded files into the new file storage system. -->
+  <!-- Needs to be run after FileStorageSetup and JenaDataSourceSetup. -->
+  <listener>
+    <listener-class>
+        edu.cornell.mannlib.vitro.webapp.servlet.setup.UpdateUploadedFiles
+    </listener-class>
+  </listener>
+  
   <!--
     <listener>
         <listener-class>

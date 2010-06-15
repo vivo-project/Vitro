@@ -237,6 +237,13 @@ public class FileModelHelper {
 				.getDataPropertyStatementDao();
 	}
 
+	/** 
+	 * Some of these methods require an Individual as an argument.
+	 */
+	public Individual getIndividualByUri(String uri) {
+		return individualDao.getIndividualByURI(uri);
+	}
+	
 	/**
 	 * If this URI represents a ByteStream object, we need to find it's
 	 * surrogate object in order to find the mime type.

@@ -45,7 +45,7 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
     protected String description = null;
     protected String anchor = null;
     protected String blurb = null;
-    protected String mainImageUri;
+    protected String mainImageUri = NOT_INITIALIZED;
     protected String imageUrl;
     protected String thumbUrl;
     protected String citation = null;
