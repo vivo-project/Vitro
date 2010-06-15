@@ -13,6 +13,7 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditN3Generator" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditSubmission" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditSubmissionPreprocessor" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.Field" %>
 <%@ page import="java.io.StringReader" %>
 <%@ page import="java.util.*" %>
@@ -86,6 +87,12 @@ are well formed.
     }    
     EditN3Generator n3Subber = editConfig.getN3Generator();     
     EditSubmission submission = new EditSubmission(queryParameters,editConfig);
+    
+    // Preprocess the form submission
+    EditSubmission processedSubmission = submission.clone();
+    for (EditSubmissionPreprocessor preprocessor : editConfig.getEditSubmissionPreprocessors()) {
+        preprocessor.preprocess(processedSubmission);
+    }
            
     /* entity to return to may be a variable */
     List<String> entToReturnTo = new ArrayList<String>(1);
@@ -122,9 +129,9 @@ are well formed.
         Map<String,List<String>> fieldRetractions= fieldsToRetractionMap(editConfig.getFields());        
         
         /* ********** URIs and Literals on Form/Parameters *********** */
-        fieldAssertions = n3Subber.substituteIntoValues(  submission.getUrisFromForm(), submission.getLiteralsFromForm(), fieldAssertions);
+        fieldAssertions = n3Subber.substituteIntoValues(  processedSubmission.getUrisFromForm(), processedSubmission.getLiteralsFromForm(), fieldAssertions);
         if(log.isDebugEnabled()) logAddRetract("substituted in literals from form",fieldAssertions,fieldRetractions);
-        entToReturnTo = n3Subber.subInUris(submission.getUrisFromForm(),entToReturnTo);        
+        entToReturnTo = n3Subber.subInUris(processedSubmission.getUrisFromForm(),entToReturnTo);        
         //fieldRetractions does NOT get values from form.
         
         /* ****************** URIs and Literals in Scope ************** */
@@ -204,14 +211,14 @@ are well formed.
         
         /* ********** URIs and Literals on Form/Parameters *********** */
         //sub in resource uris off form
-        n3Required = n3Subber.subInUris(submission.getUrisFromForm(), n3Required);
-        n3Optional = n3Subber.subInUris(submission.getUrisFromForm(), n3Optional);        
+        n3Required = n3Subber.subInUris(processedSubmission.getUrisFromForm(), n3Required);
+        n3Optional = n3Subber.subInUris(processedSubmission.getUrisFromForm(), n3Optional);        
         if(log.isDebugEnabled()) logRequiredOpt("substituted in URIs  off from ",n3Required,n3Optional);
-        entToReturnTo = n3Subber.subInUris(submission.getUrisFromForm(), entToReturnTo);
+        entToReturnTo = n3Subber.subInUris(processedSubmission.getUrisFromForm(), entToReturnTo);
 
         //sub in literals from form
-        n3Required = n3Subber.subInLiterals(submission.getLiteralsFromForm(), n3Required);
-        n3Optional = n3Subber.subInLiterals(submission.getLiteralsFromForm(), n3Optional);
+        n3Required = n3Subber.subInLiterals(processedSubmission.getLiteralsFromForm(), n3Required);
+        n3Optional = n3Subber.subInLiterals(processedSubmission.getLiteralsFromForm(), n3Optional);
         if(log.isDebugEnabled()) logRequiredOpt("substituted in literals off from ",n3Required,n3Optional);
 
         /* ****************** URIs and Literals in Scope ************** */        

@@ -91,6 +91,8 @@ public class EditConfiguration {
 
     private List<ModelChangePreprocessor> modelChangePreprocessors;
     
+    private List<EditSubmissionPreprocessor> editSubmissionPreprocessors = null;
+
     /** 
      * If true, then any dependent resources that are unlinked should be
      * removed using DependentResourceDelete. 
@@ -919,4 +921,14 @@ public class EditConfiguration {
     		this.validators = new ArrayList<N3Validator>();
     	this.validators.add(validator);    		
     }    
+
+    public void addEditSubmissionPreprocessor( EditSubmissionPreprocessor preprocessor){
+        if( editSubmissionPreprocessors == null )
+            editSubmissionPreprocessors = new ArrayList<EditSubmissionPreprocessor>();
+        editSubmissionPreprocessors.add(preprocessor);         
+    }  
+    
+    public List<EditSubmissionPreprocessor> getEditSubmissionPreprocessors() {
+        return editSubmissionPreprocessors;
+    }
 }
