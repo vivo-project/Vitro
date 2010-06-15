@@ -91,18 +91,6 @@
                 <font size="2" color="red"><form:error name="Timekey"/></font>
         </td>
     </tr>
-    <tr class="editformcell" id='thumbnailFilenameTr'>
-        <td id="thumbnailTd" valign="bottom" colspan="1">
-			<b>Thumbnail Filename</b> <em>Optional and usually more convenient to upload from previous screen</em>
-                <input type="text" name="ThumbnailFilename" value="<form:value name="ThumbnailFilename"/>" size="60" maxlength="255" />
-                <font size="2" color="red"><form:error name="ThumbnailFilename"/></font>
-        </td>
-        <td id="optionalImageTd" valign="bottom" colspan="1">
-			<b>Optional Larger Image</b> <em>(filename or full path)</em>
-                <input type="text" name="LargerImage" value="<form:value name="LargerImage"/>" size="60" maxlength="255" />
-                <font size="2" color="red"><form:error name="LargerImage"/></font>
-        </td>
-    </tr>
 	<tr class="editformcell" id="portalFlagsTr">
        		<td id="portalFlagsTd" valign="bottom" colspan="3">
             	<b>portal</b> <i>(uncheck to hide in any portal)</i> <br />
