@@ -49,6 +49,7 @@ public interface Individual extends ResourceBean, VitroTimeWindowedResource, Com
     void setDataPropertyStatements(List<DataPropertyStatement> list);
     List<DataPropertyStatement> getDataPropertyStatements();
     List<DataPropertyStatement> getDataPropertyStatements(String propertyUri);
+    DataPropertyStatement getDataPropertyStatement(String propertyUri);
     
     List<String> getDataValues(String propertyUri);
     String getDataValue(String propertyUri);

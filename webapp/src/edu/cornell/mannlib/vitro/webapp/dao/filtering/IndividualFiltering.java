@@ -84,9 +84,7 @@ public class IndividualFiltering implements Individual {
         List<DataPropertyStatement> outDstmts = new LinkedList<DataPropertyStatement>();
         Filter.filter(dStmts,_filters.getDataPropertyStatementFilter(), outDstmts);
         return outDstmts;          
-    }
-    
-
+    }    
       
     public Map<String, DataProperty> getDataPropertyMap() {
         Map<String,DataProperty> innerMap = _innerIndividual.getDataPropertyMap();
@@ -598,6 +596,12 @@ public class IndividualFiltering implements Individual {
         List<DataPropertyStatement> stmts = getDataPropertyStatements(propertyUri);
         // Since the statements have been filtered, we can just take the first data value without filtering.
         return stmts.isEmpty() ? null : stmts.get(0).getData();
+    }
+    
+    public DataPropertyStatement getDataPropertyStatement(String propertyUri) {
+        List<DataPropertyStatement> stmts = getDataPropertyStatements(propertyUri);
+        // Since the statements have been filtered, we can just take the first data value without filtering.
+        return stmts.isEmpty() ? null : stmts.get(0);       
     }
     
     public List<Individual> getRelatedIndividuals(String propertyUri) {
