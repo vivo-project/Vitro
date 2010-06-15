@@ -25,7 +25,6 @@ import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.ModelMaker;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -42,6 +41,10 @@ import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
+import edu.cornell.mannlib.vitro.webapp.filestorage.FileModelHelper;
+import edu.cornell.mannlib.vitro.webapp.filestorage.FileServingHelper;
+import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorage;
+import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup;
 import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQuery;
 import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQueryWrapper;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapper;
@@ -95,6 +98,13 @@ public class EntityController extends VitroHttpServlet {
             
             if( indiv == null || checkForHidden(vreq, indiv) || checkForSunset(vreq, indiv)){
             	doNotFound(vreq, res);
+            	return;
+            }
+
+            // If this is an uploaded file, redirect to its "alias URL".
+            String aliasUrl = getAliasUrlForBytestreamIndividual(indiv);
+            if (aliasUrl != null) {
+            	res.sendRedirect(req.getContextPath() + aliasUrl);
             	return;
             }
             
@@ -476,6 +486,47 @@ public class EntityController extends VitroHttpServlet {
         // TODO Auto-generated method stub
         return false;
     }
+    
+	/**
+	 * If this entity represents a File Bytestream, get its alias URL so we can
+	 * properly serve the file contents.
+	 */
+	private String getAliasUrlForBytestreamIndividual(Individual entity)
+			throws IOException {
+		if (!FileModelHelper.isFileBytestream(entity)) {
+			log.debug("Entity at '" + entity.getURI()
+					+ "' is not recognized as a FileByteStream.");
+			return null;
+		}
+
+		FileStorage fs = (FileStorage) getServletContext().getAttribute(
+				FileStorageSetup.ATTRIBUTE_NAME);
+		if (fs == null) {
+			log.error("Servlet context does not contain file storage at '"
+					+ FileStorageSetup.ATTRIBUTE_NAME + "'");
+			return null;
+		}
+
+		String filename = fs.getFilename(entity.getURI());
+		if (filename == null) {
+			log.error("Entity at '" + entity.getURI()
+					+ "' is recognized as a FileByteStream, "
+					+ "but the file system does not recognize it.");
+			return null;
+		}
+
+		String url = FileServingHelper.getBytestreamAliasUrl(entity.getURI(),
+				filename);
+		if (url.equals(entity.getURI())) {
+			log.error("Entity at '" + entity.getURI()
+					+ "' is recognized as a FileByteStream, "
+					+ "but can't be translated to an alias URL.");
+			return null;
+		}
+
+		log.debug("Alias URL for '" + entity.getURI() + "' is '" + url + "'");
+		return url;
+	}
  
     private Model getRDF(Individual entity, OntModel contextModel, Model newModel, int recurseDepth ) {
     	Resource subj = newModel.getResource(entity.getURI());
@@ -578,7 +629,7 @@ public class EntityController extends VitroHttpServlet {
         out.println("<p>id is the id of the entity to query for. netid also works.</p>");
         out.println("</body></html>");
     }
-
+    
     private void doNotFound(HttpServletRequest req, HttpServletResponse res)
     throws IOException, ServletException {
         VitroRequest vreq = new VitroRequest(req);

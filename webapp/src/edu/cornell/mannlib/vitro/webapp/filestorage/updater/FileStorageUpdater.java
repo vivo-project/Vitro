@@ -157,7 +157,7 @@ public class FileStorageUpdater {
 	 * run the process more than once, we will see multiple files.
 	 */
 	private File getTimestampedFilename(File upgradeDirectory) {
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-ddTHH-mm-sss");
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH-mm-sss");
 		String filename = "upgradeLog." + sdf.format(new Date()) + ".txt";
 		return new File(upgradeDirectory, filename);
 	}

@@ -12,12 +12,14 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
+import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDaoCon;
 
 /**
  * <p>
@@ -36,6 +38,20 @@ public class FileModelHelper {
 	// ----------------------------------------------------------------------
 	// Static methods -- the Individual holds all necessary references.
 	// ----------------------------------------------------------------------
+
+	/**
+	 * Is this a FileByteStream individual?
+	 */
+	public static boolean isFileBytestream(Individual entity) {
+		for (VClass vClass : entity.getVClasses()) {
+			if (VitroVocabulary.FS_BYTESTREAM_CLASS.equals(vClass.getURI())) {
+				log.debug("Entity '" + entity.getURI() + "' is a bytestream");
+				return true;
+			}
+		}
+		log.debug("Entity '" + entity.getURI() + "' is not a bytestream");
+		return false;
+	}
 
 	/**
 	 * Locate the file surrogate for the main image of this entity.
@@ -237,13 +253,13 @@ public class FileModelHelper {
 				.getDataPropertyStatementDao();
 	}
 
-	/** 
+	/**
 	 * Some of these methods require an Individual as an argument.
 	 */
 	public Individual getIndividualByUri(String uri) {
 		return individualDao.getIndividualByURI(uri);
 	}
-	
+
 	/**
 	 * If this URI represents a ByteStream object, we need to find it's
 	 * surrogate object in order to find the mime type.
