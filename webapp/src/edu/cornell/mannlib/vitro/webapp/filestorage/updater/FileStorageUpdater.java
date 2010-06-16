@@ -5,8 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.filestorage.updater;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -17,7 +15,6 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -40,7 +37,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.filestorage.FileModelHelper;
-import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileAlreadyExistsException;
 import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorage;
 
 /**
@@ -56,9 +52,9 @@ import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorage;
  * as <code>upgrade/upgradeLog2010-06-20T14-55-00.txt</code>, for example. If
  * for any reason, the upgrade process must run again, the log will not be
  * overwritten.</li>
- * <li>A directory of "deleted" files - these were thumbnail files or extra main
- * image files -- see the details below.</li>
- * <li>A directory of "unreferenced" files - these wee in the image directory,
+ * <li>A directory of "deleted" files - these were extra thumbnail files or
+ * extra main image files -- see the details below.</li>
+ * <li>A directory of "unreferenced" files - these were in the image directory,
  * but not connected to any entity.</li>
  * </ul>
  * </p>
@@ -66,16 +62,17 @@ import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorage;
  * We consider some special cases:
  * <ul>
  * <li>
- * In the old style, some thumbnails bore no relationship to the main image. So,
- * if we find a main image and a thumbnail, we will discard the thumbnail file
- * (move it to the "deleted" directory), and generate a new one.</li>
+ * In the old style, it was possible to have a main image without a thumbnail.
+ * If we find that, we will generate a scaled down copy of the main image, store
+ * that as a thumbnail image file, and then proceed.</li>
  * <li>
  * In the old style, it was possible to have a thumbnail without a main image.
- * If we find that, we will delare the thumbnail to be the main image, and
- * generate a new thumbnail.</li>
+ * If we find that, we will make a copy of the thumbnail image file, declare
+ * that copy to be the main image, and then proceed.</li>
  * <li>
- * We may find individuals with more than one main image. If so, we will discard
- * all but the first one (move them to the "deleted" directory).</li>
+ * We may find individuals with more than one main image, or more than one
+ * thumbnail. If so, we will discard all but the first one (move them to the
+ * "deleted" directory).</li>
  * </ul>
  * </p>
  * <p>
@@ -90,13 +87,14 @@ import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorage;
  * <li>Tie these together and attach to the entity that owns the image.</li>
  * </ul>
  * </li>
- * <li>Generate a new thumbnail.
+ * <li>Translate the thumbnail.
  * <ul>
- * <li>Scale the main image to produce a thumbnail</li>
  * <li>Store the thumbnail in the new file system.</li>
  * <li>Create a ByteStream individual for the thumbnail.</li>
  * <li>Create a Surrogate individual for the thumbnail.</li>
  * <li>Tie these together and attach to the Surrogate for the main image.</li>
+ * </ul>
+ * </li>
  * </ul>
  * </p>
  * <p>
@@ -163,12 +161,26 @@ public class FileStorageUpdater {
 	}
 
 	/**
+	 * <p>
 	 * Go through all of the individuals who have image files or thumbnail
 	 * files, adjusting them to the new way.
-	 * 
-	 * If an individual has a thumbnail but no main image, convert the thumbnail
-	 * to a main image and proceed. Then we can treat all images in the same
-	 * way.
+	 * </p>
+	 * <p>
+	 * Maybe there is nothing to do. If that's true, we don't even create a log
+	 * file, we just exit.
+	 * </p>
+	 * <p>
+	 * In the old style, main images were independent from thumbnails, but we
+	 * won't permit that any more.
+	 * <ul>
+	 * <li>
+	 * If an individual has a thumbnail but no main image, make a copy of the
+	 * thumbnail to become the main image.</li>
+	 * <li>If an individual has a main image but no thumbnail, make a scaled
+	 * copy of the main image to become the thumbnail.</li>
+	 * </ul>
+	 * Once this has been done, we can process all individuals in the same way.
+	 * </p>
 	 */
 	public void update() {
 		// If there is nothing to do, we're done: don't even create a log file.
@@ -179,6 +191,7 @@ public class FileStorageUpdater {
 		try {
 			updateLog = new PrintWriter(this.logFile);
 			adjustIndividualsWhoAreAllThumbs();
+			adjustIndividualsWhoHaveNoThumbs();
 			processIndividualsWhoHaveImages();
 			cleanupImagesDirectory(imageDirectory);
 		} catch (FileNotFoundException e) {
@@ -218,8 +231,8 @@ public class FileStorageUpdater {
 	}
 
 	/**
-	 * For every individual with thumbnails but no main images, make each
-	 * thumbnail into a main image.
+	 * For every individual with thumbnails but no main images, create a main
+	 * image from the first thumbnail.
 	 */
 	private void adjustIndividualsWhoAreAllThumbs() {
 		ResIterator haveThumb = model.listResourcesWithProperty(thumbProperty);
@@ -227,55 +240,54 @@ public class FileStorageUpdater {
 			while (haveThumb.hasNext()) {
 				Resource resource = haveThumb.next();
 
-				// Resources who do have main images don't need anything here.
 				if (resource.getProperty(imageProperty) == null) {
-					for (String value : getValues(resource, thumbProperty)) {
-						resource.addProperty(imageProperty, value);
-						logIt(resource, "moved thumbnail '" + value
-								+ "' to main image.");
-					}
-					resource.removeAll(thumbProperty);
+					createMainImageFromThumbnail(resource);
 				}
 			}
 		} finally {
 			haveThumb.close();
 		}
-
 	}
 
 	/**
-	 * Find all individuals that have main files. For each one:
+	 * This individual has a thumbnail but no main image. Create one.
 	 * <ul>
-	 * <li>Discard any thumbnail files.</li>
-	 * <li>Translate the first main image into the new system.</li>
-	 * <li>Generate and store a new thumbnail for the image.</li>
-	 * <li>Discard any other main image files.</li>
-	 * <li>Remove all old-style main image properties.</li>
-	 * <li>Remove all old-style thumbnail properties.</li>
+	 * <li>Figure a name for the main image.</li>
+	 * <li>Copy the thumbnail image file into the main image file.</li>
+	 * <li>Set that file as an image (old-style) on the individual.</li>
 	 * </ul>
 	 */
-	private void processIndividualsWhoHaveImages() {
-		Property imageProperty = model.createProperty(IMAGEFILE);
+	private void createMainImageFromThumbnail(Resource resource) {
+		String thumbFilename = getValues(resource, thumbProperty).get(0);
+		String mainFilename = addFilenamePrefix("_main_image_", thumbFilename);
+		logIt(resource, "creating a main file at '" + mainFilename
+				+ "' to match the thumbnail at '" + thumbFilename + "'");
+
+		try {
+			File thumbFile = new File(imageDirectory, thumbFilename);
+			File mainFile = new File(imageDirectory, mainFilename);
+			copyFile(thumbFile, mainFile);
+
+			resource.addProperty(imageProperty, mainFilename);
+		} catch (IOException e) {
+			logIt(resource, "failed to create main file '" + mainFilename + "'");
+			logIt(e);
+		}
+	}
+
+	/**
+	 * For every individual with main images but no thumbnails, create a
+	 * thumbnail from the first main image.
+	 */
+	private void adjustIndividualsWhoHaveNoThumbs() {
 		ResIterator haveImage = model.listResourcesWithProperty(imageProperty);
 		try {
 			while (haveImage.hasNext()) {
 				Resource resource = haveImage.next();
-				for (String value : getValues(resource, thumbProperty)) {
-					discardThumbnail(resource, value);
-				}
-				resource.removeAll(thumbProperty);
 
-				boolean first = true;
-				for (String value : getValues(resource, imageProperty)) {
-					if (first) {
-						translateMainImage(resource, value);
-						generateThumbnailAndStore(resource);
-					} else {
-						discardExtraMainImage(resource, value);
-					}
-					first = false;
+				if (resource.getProperty(thumbProperty) == null) {
+					createThumbnailFromMainImage(resource);
 				}
-				resource.removeAll(imageProperty);
 			}
 		} finally {
 			haveImage.close();
@@ -283,60 +295,180 @@ public class FileStorageUpdater {
 	}
 
 	/**
-	 * If they have an old-style thumbnail, move it to the "discarded"
-	 * directory.
+	 * This individual has a main image but no thumbnail. Create one.
+	 * <ul>
+	 * <li>Figure a name for the thumbnail image.</li>
+	 * <li>Make a scaled copy of the main image into the thumbnail.</li>
+	 * <li>Set that file as a thumbnail (old-style) on the individual.</li>
+	 * </ul>
 	 */
-	private void discardThumbnail(Resource resource, String path) {
+	private void createThumbnailFromMainImage(Resource resource) {
+		String mainFilename = getValues(resource, imageProperty).get(0);
+		String thumbFilename = addFilenamePrefix("_thumbnail_", mainFilename);
+		logIt(resource, "creating a thumbnail at '" + thumbFilename
+				+ "' from the main image at '" + mainFilename + "'");
+
+		File mainFile = new File(imageDirectory, mainFilename);
+		File thumbFile = new File(imageDirectory, thumbFilename);
 		try {
-			logIt(resource, "discarding old thumbnail at '" + path + "'");
-			File oldFile = new File(imageDirectory, path);
-			File deletedFile = new File(deletedDirectory, path);
-			moveFile(oldFile, deletedFile);
+			generateThumbnailImage(mainFile, thumbFile, THUMBNAIL_WIDTH,
+					THUMBNAIL_HEIGHT);
+
+			resource.addProperty(thumbProperty, mainFilename);
 		} catch (IOException e) {
+			logIt(resource, "failed to create thumbnail file '" + thumbFilename
+					+ "'");
 			logIt(e);
 		}
 	}
 
 	/**
-	 * <pre>
-	 *   Translate the main image into the new system
-	 *   	Create a new File, FileByteStream.
-	 *   	Attach to the individual.
-	 *   	Attempt to infer MIME type. 
-	 *   	Copy into the File system.
-	 *   	Delete from images directory,
-	 * </pre>
+	 * Read in the main image, and scale it to a thumbnail that maintains the
+	 * aspect ratio, but doesn't exceed either of these dimensions.
+	 */
+	private void generateThumbnailImage(File mainFile, File thumbFile,
+			int maxWidth, int maxHeight) throws IOException {
+		BufferedImage bsrc = ImageIO.read(mainFile);
+
+		double scale = Math.min(((double) maxWidth) / bsrc.getWidth(),
+				((double) maxHeight) / bsrc.getHeight());
+		AffineTransform at = AffineTransform.getScaleInstance(scale, scale);
+
+		int newWidth = (int) scale * bsrc.getWidth();
+		int newHeight = (int) scale * bsrc.getHeight();
+		BufferedImage bdest = new BufferedImage(newWidth, newHeight,
+				BufferedImage.TYPE_INT_RGB);
+		Graphics2D g = bdest.createGraphics();
+
+		g.drawRenderedImage(bsrc, at);
+
+		ImageIO.write(bdest, "JPG", thumbFile);
+	}
+
+	/**
+	 * By the time we get here, any individual with a main image also has a
+	 * thumbnail, and vice versa. For each one, translate one main image and one
+	 * thumbnail into the new system and discard any other images.
+	 */
+	private void processIndividualsWhoHaveImages() {
+		ResIterator haveImage = model.listResourcesWithProperty(imageProperty);
+		try {
+			while (haveImage.hasNext()) {
+				Resource resource = haveImage.next();
+				translateImagesAndDiscardExtras(resource);
+			}
+		} finally {
+			haveImage.close();
+		}
+	}
+
+	/**
+	 * This individual has at least one main image and at least one thumbnail.
+	 * <ul>
+	 * <li>Translate the first main image into the new system.</li>
+	 * <li>Translate the first thumbnail into the new system.</li>
+	 * <li>Discard any other main image files or thumbnail files.</li>
+	 * <li>Remove all old-style main image properties.</li>
+	 * <li>Remove all old-style thumbnail properties.</li>
+	 * </ul>
+	 */
+	private void translateImagesAndDiscardExtras(Resource resource) {
+		boolean first;
+
+		first = true;
+		for (String value : getValues(resource, imageProperty)) {
+			if (first) {
+				translateMainImage(resource, value);
+			} else {
+				discardExtraImage(resource, value, "main image");
+			}
+			first = false;
+		}
+		resource.removeAll(imageProperty);
+
+		first = true;
+		for (String value : getValues(resource, thumbProperty)) {
+			if (first) {
+				translateThumbnail(resource, value);
+			} else {
+				discardExtraImage(resource, value, "thumbnail");
+			}
+		}
+		resource.removeAll(thumbProperty);
+	}
+
+	/**
+	 * Translate the main image into the new system
 	 */
 	private void translateMainImage(Resource resource, String path) {
+		logIt(resource, "translating main image '" + path
+				+ "' into the file storage");
+
+		Individual file;
+		try {
+			file = translateFile(resource, path);
+
+			// Set the file as the thumbnail for the person.
+			Individual person = fileModelHelper.getIndividualByUri(resource
+					.getURI());
+			fileModelHelper.setAsMainImageOnEntity(person, file);
+		} catch (IOException e) {
+			logIt(resource, "Can't create the main image file.");
+			logIt(e);
+		}
+	}
+
+	/**
+	 * Translate the thumbnail into the new system.
+	 */
+	private void translateThumbnail(Resource resource, String path) {
+		logIt(resource, "translating thumbnail '" + path
+				+ "' into the file storage");
+
+		Individual file;
+		try {
+			file = translateFile(resource, path);
+
+			// Set the file as the thumbnail for the person.
+			Individual person = fileModelHelper.getIndividualByUri(resource
+					.getURI());
+			fileModelHelper.setThumbnailOnIndividual(person, file);
+		} catch (IOException e) {
+			logIt(resource, "Can't create the thumbnail file.");
+			logIt(e);
+		}
+	}
+
+	/**
+	 * Translate an image file into the new system
+	 * <ul>
+	 * <li>Create a new File, FileByteStream.</li>
+	 * <li>Attempt to infer MIME type.</li>
+	 * <li>Copy into the File system.</li>
+	 * <li>Delete from images directory.</li>
+	 * </ul>
+	 * 
+	 * @return the new File surrogate.
+	 */
+	private Individual translateFile(Resource resource, String path)
+			throws IOException {
 		File oldFile = new File(imageDirectory, path);
 		String filename = getSimpleFilename(path);
-		String mimeType = getMimeType(resource, filename);
+		String mimeType = guessMimeType(resource, filename);
 
 		// Create the file individuals in the model
 		Individual byteStream = fileModelHelper.createByteStreamIndividual();
 		Individual file = fileModelHelper.createFileIndividual(mimeType,
 				filename, byteStream);
 
-		logIt(resource, "translating main image '" + path
+		logIt(resource, "translating image '" + path
 				+ "' into the file storage as '" + file.getURI() + "'");
 
 		InputStream inputStream = null;
 		try {
-			inputStream = new FileInputStream(oldFile);
-
 			// Store the file in the FileStorage system.
+			inputStream = new FileInputStream(oldFile);
 			fileStorage.createFile(byteStream.getURI(), filename, inputStream);
-
-			// Set the file as the main image for the person.
-			Individual person = fileModelHelper.getIndividualByUri(resource
-					.getURI());
-			fileModelHelper.setAsMainImageOnEntity(person, file);
-		} catch (FileAlreadyExistsException e) {
-			logIt(resource, "Can't create the main image file.");
-			logIt(e);
-		} catch (IOException e) {
-			logIt(resource, "Can't create the main image file.");
-			logIt(e);
 		} finally {
 			if (inputStream != null) {
 				try {
@@ -352,80 +484,17 @@ public class FileStorageUpdater {
 		} catch (IOException e) {
 			throw new IllegalStateException(e);
 		}
+
+		return file;
 	}
 
 	/**
-	 * <pre>
-	 *   Generate the thumbnail.
-	 *   	Create a new File, FileByteStream
-	 *   	attach to the main image
-	 *   	Mime type and filename come from generation process.
-	 *   	Copy into the file system.
-	 * </pre>
+	 * If they have more than one main image or more than one thumbnail, move
+	 * the extras to the "deleted" directory.
 	 */
-	private void generateThumbnailAndStore(Resource resource) {
-		Individual person = fileModelHelper.getIndividualByUri(resource
-				.getURI());
-		String mainBytestreamUri = FileModelHelper
-				.getMainImageBytestreamUri(person);
-		String mainFilename = FileModelHelper.getMainImageFilename(person);
-		String thumbnailFilename = createThumbnailFilename(getSimpleFilename(mainFilename));
-		String mimeType = getMimeType(resource, thumbnailFilename);
-
-		// Create the file individuals in the model
-		Individual thumbByteStream = fileModelHelper
-				.createByteStreamIndividual();
-		Individual thumbSurrogate = fileModelHelper.createFileIndividual(
-				mimeType, thumbnailFilename, thumbByteStream);
-
-		logIt(resource, "generating new thumbnail image " + "and storing as '"
-				+ thumbSurrogate.getURI() + "'");
-
-		InputStream mainImageInputStream = null;
-		InputStream thumbnailInputStream = null;
+	private void discardExtraImage(Resource resource, String path, String label) {
 		try {
-			mainImageInputStream = fileStorage.getInputStream(
-					mainBytestreamUri, mainFilename);
-			thumbnailInputStream = scaleImageForThumbnail(mainImageInputStream,
-					THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT);
-
-			// Store the file in the FileStorage system.
-			fileStorage.createFile(thumbByteStream.getURI(), thumbnailFilename,
-					thumbnailInputStream);
-
-			// Set the file as the thumbnail on the main image for the person.
-			fileModelHelper.setThumbnailOnIndividual(person, thumbSurrogate);
-		} catch (FileAlreadyExistsException e) {
-			logIt(resource, "Can't create the thumbnail file.");
-			logIt(e);
-		} catch (IOException e) {
-			logIt(resource, "Can't create the thumbnail file.");
-			logIt(e);
-		} finally {
-			if (thumbnailInputStream != null) {
-				try {
-					thumbnailInputStream.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-			if (mainImageInputStream != null) {
-				try {
-					mainImageInputStream.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
-
-	/**
-	 * If they have more than one main image, move any redundant ones to the
-	 * "deleted" directory.
-	 */
-	private void discardExtraMainImage(Resource resource, String path) {
-		try {
-			logIt(resource, "discarding a redundant main image at '" + path
+			logIt(resource, "discarding a redundant " + label + " at '" + path
 					+ "'");
 			File oldFile = new File(imageDirectory, path);
 			File deletedFile = new File(deletedDirectory, path);
@@ -495,7 +564,7 @@ public class FileStorageUpdater {
 	 * Read all of the specified properties on a resource, and return a
 	 * {@link List} of the {@link String} values.
 	 */
-	private Collection<String> getValues(Resource resource, Property property) {
+	private List<String> getValues(Resource resource, Property property) {
 		List<String> list = new ArrayList<String>();
 		StmtIterator stmts = resource.listProperties(property);
 		try {
@@ -524,50 +593,9 @@ public class FileStorageUpdater {
 	}
 
 	/**
-	 * Take the image file, and create a scaled down version of it.
-	 * 
-	 * @param source
-	 *            the input stream of the image file - you must close this
-	 *            yourself.
-	 * @return the input stream of the thumbnail - you must close this also.
+	 * Guess what the MIME type might be.
 	 */
-	private InputStream scaleImageForThumbnail(InputStream source, int width,
-			int height) throws IOException {
-		BufferedImage bsrc = ImageIO.read(source);
-
-		AffineTransform at = AffineTransform.getScaleInstance((double) width
-				/ bsrc.getWidth(), (double) height / bsrc.getHeight());
-
-		BufferedImage bdest = new BufferedImage(width, height,
-				BufferedImage.TYPE_INT_RGB);
-		Graphics2D g = bdest.createGraphics();
-
-		g.drawRenderedImage(bsrc, at);
-
-		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-		ImageIO.write(bdest, "JPG", buffer);
-		return new ByteArrayInputStream(buffer.toByteArray());
-	}
-
-	/**
-	 * Create a name for the thumbnail from the name of the original file.
-	 * "myPicture.anything" becomes "thumbnail_myPicture.jpg".
-	 */
-	private String createThumbnailFilename(String filename) {
-		String prefix = "thumbnail_";
-		String extension = ".jpg";
-		int periodHere = filename.lastIndexOf('.');
-		if (periodHere == -1) {
-			return prefix + filename + extension;
-		} else {
-			return prefix + filename.substring(0, periodHere) + extension;
-		}
-	}
-
-	/**
-	 * Guess as to what the MIME type might be.
-	 */
-	private String getMimeType(Resource resource, String filename) {
+	private String guessMimeType(Resource resource, String filename) {
 		if (filename.endsWith(".gif")) {
 			return "image/gif";
 		} else if (filename.endsWith(".png")) {
@@ -591,10 +619,41 @@ public class FileStorageUpdater {
 	 * location.
 	 */
 	private void moveFile(File from, File to) throws IOException {
+		copyFile(from, to);
+		deleteFile(from);
+	}
+
+	/**
+	 * Copy a file from one location to another.
+	 */
+	private void copyFile(File from, File to) throws IOException {
 		if (!from.exists()) {
 			throw new FileNotFoundException("File '" + from.getAbsolutePath()
 					+ "' does not exist.");
 		}
+
+		InputStream in = null;
+		try {
+			in = new FileInputStream(from);
+			writeFile(in, to);
+		} finally {
+			if (in != null) {
+				try {
+					in.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	/**
+	 * Create a file with the contents of this data stream.
+	 * 
+	 * @param stream
+	 *            the data stream. You must close it afterward.
+	 */
+	private void writeFile(InputStream stream, File to) throws IOException {
 		if (to.exists()) {
 			throw new IOException("File '" + to.getAbsolutePath()
 					+ "' already exists.");
@@ -609,24 +668,15 @@ public class FileStorageUpdater {
 			}
 		}
 
-		InputStream in = null;
 		OutputStream out = null;
 		try {
-			in = new FileInputStream(from);
 			out = new FileOutputStream(to);
 			byte[] buffer = new byte[8192];
 			int howMany;
-			while (-1 != (howMany = in.read(buffer))) {
+			while (-1 != (howMany = stream.read(buffer))) {
 				out.write(buffer, 0, howMany);
 			}
 		} finally {
-			if (in != null) {
-				try {
-					in.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
 			if (out != null) {
 				try {
 					out.close();
@@ -635,8 +685,6 @@ public class FileStorageUpdater {
 				}
 			}
 		}
-
-		deleteFile(from);
 	}
 
 	/**
@@ -647,6 +695,21 @@ public class FileStorageUpdater {
 		if (file.exists()) {
 			throw new IOException("Failed to delete file '"
 					+ file.getAbsolutePath() + "'");
+		}
+	}
+
+	/**
+	 * Find the filename within a path so we can add this prefix to it, while
+	 * retaining the path.
+	 */
+	private String addFilenamePrefix(String prefix, String path) {
+		int slashHere = Math.max(path.lastIndexOf('/'), path.lastIndexOf('\\'));
+		if (slashHere == -1) {
+			return prefix + path;
+		} else {
+			String dirs = path.substring(0, slashHere + 1);
+			String filename = path.substring(slashHere + 1);
+			return dirs + prefix + filename;
 		}
 	}
 
