@@ -74,13 +74,26 @@
 
   <!-- Invokes process to perform updates to align with ontology changes if needed -->
   <!-- Needs to run before submodels are attached and Pellet is set up -->
-
   <listener>
      <listener-class>edu.cornell.mannlib.vitro.webapp.servlet.setup.UpdateKnowledgeBase</listener-class>
   </listener>
 
+  <listener>
+    <listener-class>
+        edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup
+    </listener-class>
+  </listener>
+  
+  <!-- Invokes a process to move any uploaded files into the new file storage system. -->
+  <!-- Needs to run after FileStorageSetup and JenaDataSourceSetup. -->
+  <!-- Should run before Pellet is set up. -->
+  <listener>
+    <listener-class>
+        edu.cornell.mannlib.vitro.webapp.servlet.setup.UpdateUploadedFiles
+    </listener-class>
+  </listener>
+  
   <!-- Attaching submodels permits extra RDF files to be made visible without storing the data in the DB. -->
-
   <listener>
      <listener-class>edu.cornell.mannlib.vitro.webapp.servlet.setup.AttachSubmodels</listener-class>
   </listener>
@@ -143,25 +156,11 @@
         edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreeMarkerSetup
     </listener-class>
   </listener>
-  
-  <listener>
-    <listener-class>
-        edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup
-    </listener-class>
-  </listener>
-  
+
   <!-- On shutdown, this will kill the background thread started by Apache Commons File Upload -->
   <listener>
     <listener-class>
       org.apache.commons.fileupload.servlet.FileCleanerCleanup
-    </listener-class>
-  </listener>
-
-  <!-- Invokes a process to move any uploaded files into the new file storage system. -->
-  <!-- Needs to be run after FileStorageSetup and JenaDataSourceSetup. -->
-  <listener>
-    <listener-class>
-        edu.cornell.mannlib.vitro.webapp.servlet.setup.UpdateUploadedFiles
     </listener-class>
   </listener>
   
