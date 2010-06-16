@@ -461,7 +461,7 @@ public class TabDaoJena extends JenaBaseDao implements TabDao {
      * @param rootTab if > 0 prepend as root
      * @return List of Integer objects
      */
-    public List getTabHierarcy(int tabId, int rootTab){
+    public List getTabHierarchy(int tabId, int rootTab){
         List hier = new LinkedList();
         hier.add(0,new Integer(tabId));
         int current = tabId;

@@ -139,8 +139,8 @@ public class TabDaoFiltering extends BaseFiltering implements TabDao{
 
 
     /** note not currently filtered */
-    public List getTabHierarcy(int tabId, int rootTab) {
-        return innerDao.getTabHierarcy(tabId, rootTab);
+    public List getTabHierarchy(int tabId, int rootTab) {
+        return innerDao.getTabHierarchy(tabId, rootTab);
     }
 
     /** note not currently filtered */
