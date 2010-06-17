@@ -191,13 +191,15 @@ public class FileStorageUpdater {
 		log.info("Updating pre-1.1 file references. Log file is " + logFile);
 
 		try {
+			logFile.getParentFile().mkdirs();
 			updateLog = new PrintWriter(this.logFile);
+
 			adjustIndividualsWhoAreAllThumbs();
 			adjustIndividualsWhoHaveNoThumbs();
 			processIndividualsWhoHaveImages();
 			cleanupImagesDirectory(imageDirectory);
 		} catch (FileNotFoundException e) {
-			log.error(e);
+			log.error("can't create log file.", e);
 		} finally {
 			if (updateLog != null) {
 				updateLog.flush();
@@ -210,7 +212,7 @@ public class FileStorageUpdater {
 					"FileStorageUpdate was unsuccessful -- "
 							+ "model still contains pre-1.1 file references.");
 		}
-		
+
 		log.info("Finished updating pre-1.1 file references.");
 	}
 
@@ -324,7 +326,7 @@ public class FileStorageUpdater {
 			generateThumbnailImage(mainFile, thumbFile, THUMBNAIL_WIDTH,
 					THUMBNAIL_HEIGHT);
 
-			resource.addProperty(thumbProperty, mainFilename);
+			resource.addProperty(thumbProperty, thumbFilename);
 		} catch (IOException e) {
 			logIt(resource, "failed to create thumbnail file '" + thumbFilename
 					+ "'");
@@ -343,8 +345,8 @@ public class FileStorageUpdater {
 		double scale = Math.min(((double) maxWidth) / bsrc.getWidth(),
 				((double) maxHeight) / bsrc.getHeight());
 		AffineTransform at = AffineTransform.getScaleInstance(scale, scale);
-		int newWidth = (int) scale * bsrc.getWidth();
-		int newHeight = (int) scale * bsrc.getHeight();
+		int newWidth = (int) (scale * bsrc.getWidth());
+		int newHeight = (int) (scale * bsrc.getHeight());
 		logIt("Scaling '" + mainFile + "' by a factor of " + scale + ", from "
 				+ bsrc.getWidth() + "x" + bsrc.getHeight() + " to " + newWidth
 				+ "x" + newHeight);
@@ -414,12 +416,8 @@ public class FileStorageUpdater {
 	 * Translate the main image into the new system
 	 */
 	private void translateMainImage(Resource resource, String path) {
-		logIt(resource, "translating main image '" + path
-				+ "' into the file storage");
-
-		Individual file;
 		try {
-			file = translateFile(resource, path);
+			Individual file = translateFile(resource, path, "main image");
 
 			// Set the file as the thumbnail for the person.
 			Individual person = fileModelHelper.getIndividualByUri(resource
@@ -435,12 +433,8 @@ public class FileStorageUpdater {
 	 * Translate the thumbnail into the new system.
 	 */
 	private void translateThumbnail(Resource resource, String path) {
-		logIt(resource, "translating thumbnail '" + path
-				+ "' into the file storage");
-
-		Individual file;
 		try {
-			file = translateFile(resource, path);
+			Individual file = translateFile(resource, path, "thumbnail");
 
 			// Set the file as the thumbnail for the person.
 			Individual person = fileModelHelper.getIndividualByUri(resource
@@ -463,8 +457,8 @@ public class FileStorageUpdater {
 	 * 
 	 * @return the new File surrogate.
 	 */
-	private Individual translateFile(Resource resource, String path)
-			throws IOException {
+	private Individual translateFile(Resource resource, String path,
+			String label) throws IOException {
 		File oldFile = new File(imageDirectory, path);
 		String filename = getSimpleFilename(path);
 		String mimeType = guessMimeType(resource, filename);
@@ -474,7 +468,7 @@ public class FileStorageUpdater {
 		Individual file = fileModelHelper.createFileIndividual(mimeType,
 				filename, byteStream);
 
-		logIt(resource, "translating image '" + path
+		logIt(resource, "translating " + label + " '" + path
 				+ "' into the file storage as '" + file.getURI() + "'");
 
 		InputStream inputStream = null;
