@@ -69,7 +69,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 	        doSetup(request, response);
 	        setUpPage();
 	        setTitleAndBody();
-	        write(response);
+	        writePage();
        
 	    } catch (Throwable e) {
 	        log.error("FreeMarkerHttpServlet could not forward to view.");
@@ -344,18 +344,25 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
     	return body;
     }
     
-    protected void write(HttpServletResponse response) {
-
+    protected void writePage() {
         String templateName = "page/" + getPageTemplateName();
+        writeTemplate(templateName, root);                   
+    }
+    
+    protected void writeTemplate(String templateName, Map<String, Object> map) {       
+        StringWriter sw = mergeToTemplate(templateName, map);          
+        write(sw);
+    }
+    
+    protected void write(StringWriter sw) {
         
-        StringWriter sw = mergeToTemplate(templateName, root);          
         try {
             PrintWriter out = response.getWriter();
             out.print(sw);     
         } catch (IOException e) {
             log.error("FreeMarkerHttpServlet cannot write output");
             e.printStackTrace();
-        }                    
+        }            
     }
     
     // Can be overridden by individual controllers to use a different basic page layout.
