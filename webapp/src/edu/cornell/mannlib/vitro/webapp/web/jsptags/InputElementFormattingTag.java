@@ -43,6 +43,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditSubmission;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.Field;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.SelectListGenerator;
+import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 
 /**
  * This tag will build an option list for individuals of a VClass.
@@ -56,6 +57,7 @@ public class InputElementFormattingTag extends TagSupport {
     private String  type;
     private String  label;
     private String  cancelLabel;
+    private String  cancelUrl;
     private String  cssClass;
     private String  labelClass;
     private String  value;
@@ -95,6 +97,12 @@ public class InputElementFormattingTag extends TagSupport {
     }
     public void setCancelLabel(String cancelLabel) {
         this.cancelLabel = cancelLabel;
+    }
+    public String getCancelUrl() {
+        return cancelUrl;
+    }
+    public void setCancelUrl(String cancelUrl) {
+        this.cancelUrl = cancelUrl;
     }
     public String getCssClass() {
         return cssClass;
@@ -295,12 +303,19 @@ public class InputElementFormattingTag extends TagSupport {
         }else if( "dashboard".equals( getCancel() )){ //this case is Datastar-specific.
             	return " or <a class=\"cancel\" href=\"" + vreq.getContextPath() 
             	+ "/dashboard\" title=\"Cancel\">"+labelStr+"</a>";
-        }else if (getCancel()!=null && !getCancel().equals("")) {        	
+        }else if (getCancel()!=null && !getCancel().equals("") && !getCancel().equals("false")) {        	
             if( editConfig != null && editConfig.getEditKey() != null ){
                 try{
-                return "<span class=\"or\"> or </span><a class=\"cancel\" href=\"" + vreq.getContextPath()
-                        + "/edit/postEditCleanUp.jsp?editKey="+ URLEncoder.encode(editConfig.getEditKey(),"UTF-8")
-                        +"\" title=\"Cancel\">"+labelStr+"</a>";
+                    String url =  vreq.getContextPath() + 
+                                  "/edit/postEditCleanUp.jsp?editKey="+ 
+                                  URLEncoder.encode(editConfig.getEditKey(),"UTF-8") +
+                                  "&cancel=true";
+                    String cancelUrl = getCancelUrl();
+                    if (!StringUtils.isEmpty(cancelUrl)) {
+                        url += "&url=" + cancelUrl;
+                    }
+                    return "<span class=\"or\"> or </span><a class=\"cancel\" href=\"" +
+                        url + "\" title=\"Cancel\">"+labelStr+"</a>";
                 }catch(UnsupportedEncodingException ex){
                     log.error( "doCancel(): " , ex);
                 }

@@ -3,6 +3,7 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditSubmission" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.utils.StringUtils" %>
 <%@page import="org.apache.commons.logging.Log"%>
 <%@page import="org.apache.commons.logging.LogFactory"%>
 <%@page import="com.hp.hpl.jena.rdf.model.ResourceFactory"%>
@@ -41,13 +42,24 @@
         }
         
         //set up base URL
-        if( editConfig == null || editConfig.getUrlPatternToReturnTo() == null){
-        	urlPattern = "/individual";            
-        }else{
-        	urlPattern = editConfig.getUrlPatternToReturnTo();        	
+        String cancel = request.getParameter("cancel");
+        String urlPatternToReturnTo = null;
+        String urlPatternToCancelTo = null;
+        if (editConfig != null) {
+            urlPatternToReturnTo = editConfig.getUrlPatternToReturnTo();
+            urlPatternToCancelTo = request.getParameter("url");
+        }
+        // If a different cancel return path has been designated, use it. Otherwise, use the regular return path.
+        if (cancel != null && cancel.equals("true") && !StringUtils.isEmpty(urlPatternToCancelTo)) {
+            urlPattern = urlPatternToCancelTo;
+        }
+        else if (!StringUtils.isEmpty(urlPatternToReturnTo)) {
+        	urlPattern = urlPatternToReturnTo;       
+        } else {
+        	urlPattern = "/individual";       	
         }
         
-        //looks like a redirec to an profile page, try to add anchor for property that was just edited.
+        //looks like a redirect to a profile page, try to add anchor for property that was just edited.
         if( urlPattern.endsWith("individual") || urlPattern.endsWith("entity") ){        	
        		if( predicateLocalName != null && predicateLocalName.length() > 0){
        			predicateAnchor = "#" + predicateLocalName;

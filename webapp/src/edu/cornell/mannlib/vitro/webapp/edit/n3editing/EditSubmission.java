@@ -29,7 +29,7 @@ import com.hp.hpl.jena.vocabulary.XSD;
 
 import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
 
-public class EditSubmission implements Cloneable {
+public class EditSubmission {
     private String editKey;
 
     private Map<String,Literal> literalsFromForm ;
@@ -413,16 +413,6 @@ public class EditSubmission implements Cloneable {
         }
         return out;
     }     
-    
-    public EditSubmission clone() {
-        try {
-            return (EditSubmission) super.clone();
-        } catch (CloneNotSupportedException e) {
-            // TODO Auto-generated catch block
-            log.error("Error cloning EditSubmission object: CloneNotSupported exception");
-            return null;
-        }
-    }
-    
+
     private Log log = LogFactory.getLog(EditSubmission.class);
 }

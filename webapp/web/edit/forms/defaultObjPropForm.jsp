@@ -150,7 +150,7 @@
 	    </c:if>
 	    <v:input type="select" id="objectVar" size="80" />
 	    <div style="margin-top: 1em">
-	        <v:input type="submit" id="submit" value="<%=submitLabel%>" cancel="${param.subjectUri}"/>
+	        <v:input type="submit" id="submit" value="<%=submitLabel%>" cancel="true"/>
 	    </div>    
     </form>
   </c:if>

@@ -204,7 +204,7 @@
     <v:input type="text" label="URL" id="url" size="70"/>
     <v:input type="text" label="Link anchor text" id="anchor" size="70"/>
     <input type="hidden" name="displayRank" value="-1" />
-    <p class="submit"><v:input type="submit" id="submit" value="<%=submitLabel%>" cancel="${param.subjectUri}"/></p>
+    <p class="submit"><v:input type="submit" id="submit" value="<%=submitLabel%>" cancel="true"/></p>
 </form>
 
 <jsp:include page="${postForm}"/>

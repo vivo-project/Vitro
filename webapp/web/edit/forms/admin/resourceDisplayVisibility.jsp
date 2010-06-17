@@ -129,7 +129,7 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 <h2>Set Display Visibility</h2>
 <form action="<c:url value="/edit/processRdfForm2.jsp"/>" >
     <v:input type="select" id="displayRole" size="80" />
-    <v:input type="submit" id="submit" value="submit" cancel="${param.subjectUri}"/>
+    <v:input type="submit" id="submit" value="submit" cancel="true"/>
 </form>
 
 <jsp:include page="${postForm}"/>
