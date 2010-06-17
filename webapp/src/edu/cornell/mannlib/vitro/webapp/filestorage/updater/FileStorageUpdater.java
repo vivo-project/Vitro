@@ -185,8 +185,10 @@ public class FileStorageUpdater {
 	public void update() {
 		// If there is nothing to do, we're done: don't even create a log file.
 		if (!isThereAnythingToDo()) {
+			log.debug("Found no pre-1.1 file references.");
 			return;
 		}
+		log.info("Updating pre-1.1 file references. Log file is " + logFile);
 
 		try {
 			updateLog = new PrintWriter(this.logFile);
@@ -202,6 +204,14 @@ public class FileStorageUpdater {
 				updateLog.close();
 			}
 		}
+
+		if (isThereAnythingToDo()) {
+			throw new IllegalStateException(
+					"FileStorageUpdate was unsuccessful -- "
+							+ "model still contains pre-1.1 file references.");
+		}
+		
+		log.info("Finished updating pre-1.1 file references.");
 	}
 
 	/**
@@ -333,9 +343,12 @@ public class FileStorageUpdater {
 		double scale = Math.min(((double) maxWidth) / bsrc.getWidth(),
 				((double) maxHeight) / bsrc.getHeight());
 		AffineTransform at = AffineTransform.getScaleInstance(scale, scale);
-
 		int newWidth = (int) scale * bsrc.getWidth();
 		int newHeight = (int) scale * bsrc.getHeight();
+		logIt("Scaling '" + mainFile + "' by a factor of " + scale + ", from "
+				+ bsrc.getWidth() + "x" + bsrc.getHeight() + " to " + newWidth
+				+ "x" + newHeight);
+
 		BufferedImage bdest = new BufferedImage(newWidth, newHeight,
 				BufferedImage.TYPE_INT_RGB);
 		Graphics2D g = bdest.createGraphics();

@@ -73,12 +73,12 @@ public class UpdateUploadedFiles implements ServletContextListener {
 						+ "' does not exist.");
 			}
 
+			
 			FileStorageUpdater fsu = new FileStorageUpdater(wadf, jenaOntModel,
 					fileStorage, uploadDirectory);
 			fsu.update();
-
 		} catch (Exception e) {
-			log.error("We got a problem: ", e);
+			log.error(e);
 			throw new RuntimeException(e);
 		}
 	}
