@@ -24,7 +24,8 @@ public class FreeMarkerComponentGenerator extends FreeMarkerHttpServlet {
     private static final Log log = LogFactory.getLog(FreeMarkerHttpServlet.class.getName());
     
     FreeMarkerComponentGenerator(HttpServletRequest request, HttpServletResponse response) {
-        doSetup(request, response);       
+        doSetup(request, response);      
+        setUpPage();
     }
     
     public String getIdentity() {
