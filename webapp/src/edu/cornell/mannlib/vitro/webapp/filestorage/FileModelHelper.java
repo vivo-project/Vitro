@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
@@ -19,7 +18,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDaoCon;
 
 /**
  * <p>
@@ -64,8 +62,8 @@ public class FileModelHelper {
 			return null;
 		}
 
-		Individual mainFile = getRelatedIndividual(entity,
-				VitroVocabulary.IND_MAIN_IMAGE);
+		Individual mainFile = entity
+				.getRelatedIndividual(VitroVocabulary.IND_MAIN_IMAGE);
 
 		if (mainFile == null) {
 			log.debug("Entity '" + entity.getURI()
@@ -90,8 +88,8 @@ public class FileModelHelper {
 			return null;
 		}
 
-		Individual thumbFile = getRelatedIndividual(fileSurrogate,
-				VitroVocabulary.FS_THUMBNAIL_IMAGE);
+		Individual thumbFile = fileSurrogate
+				.getRelatedIndividual(VitroVocabulary.FS_THUMBNAIL_IMAGE);
 
 		if (thumbFile == null) {
 			log.warn("Main image file '" + fileSurrogate.getURI()
@@ -116,8 +114,8 @@ public class FileModelHelper {
 			return null;
 		}
 
-		Individual byteStream = getRelatedIndividual(fileSurrogate,
-				VitroVocabulary.FS_DOWNLOAD_LOCATION);
+		Individual byteStream = fileSurrogate
+				.getRelatedIndividual(VitroVocabulary.FS_DOWNLOAD_LOCATION);
 
 		if (byteStream == null) {
 			log.error("File surrogate '" + fileSurrogate.getURI()
@@ -142,8 +140,8 @@ public class FileModelHelper {
 			return null;
 		}
 
-		String filename = getDataValue(fileSurrogate,
-				VitroVocabulary.FS_FILENAME);
+		String filename = fileSurrogate
+				.getDataValue(VitroVocabulary.FS_FILENAME);
 
 		if (filename == null) {
 			log.error("File had no filename: '" + fileSurrogate.getURI() + "'");
@@ -165,8 +163,8 @@ public class FileModelHelper {
 			return null;
 		}
 
-		String mimeType = getDataValue(fileSurrogate,
-				VitroVocabulary.FS_MIME_TYPE);
+		String mimeType = fileSurrogate
+				.getDataValue(VitroVocabulary.FS_MIME_TYPE);
 
 		if (mimeType == null) {
 			log.error("File had no mimeType: '" + fileSurrogate.getURI() + "'");
@@ -408,45 +406,6 @@ public class FileModelHelper {
 		Individual bytestream = getBytestreamForFile(surrogate);
 		individualDao.deleteIndividual(bytestream);
 		individualDao.deleteIndividual(surrogate);
-	}
-
-	// ----------------------------------------------------------------------
-	// Will these be replaced by the new methods on Individual??
-	// ----------------------------------------------------------------------
-
-	/**
-	 * Inspect the object properties on this individual and find the object of
-	 * the specified property.
-	 * 
-	 * @return the object of the first such property, or <code>null</code>.
-	 */
-	private static Individual getRelatedIndividual(Individual individual,
-			String propertyUri) {
-		List<ObjectPropertyStatement> opStmts = individual
-				.getObjectPropertyStatements();
-		for (ObjectPropertyStatement opStmt : opStmts) {
-			if (opStmt.getPropertyURI().equals(propertyUri)) {
-				return opStmt.getObject();
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * Inspect the data properties on this individual and find the value of the
-	 * specified property.
-	 * 
-	 * @return the value of the first such property, or <code>null</code>.
-	 */
-	private static String getDataValue(Individual individual, String propertyUri) {
-		List<DataPropertyStatement> dpStmts = individual
-				.getDataPropertyStatements();
-		for (DataPropertyStatement dpStmt : dpStmts) {
-			if (dpStmt.getDatapropURI().equals(propertyUri)) {
-				return dpStmt.getData();
-			}
-		}
-		return null;
 	}
 
 }
