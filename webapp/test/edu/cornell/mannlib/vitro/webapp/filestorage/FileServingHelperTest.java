@@ -12,6 +12,7 @@ import java.util.Map;
 
 import javax.naming.InitialContext;
 
+import org.apache.log4j.Level;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -77,6 +78,7 @@ public class FileServingHelperTest extends AbstractTestClass {
 
 	@Test
 	public void notInDefaultNamespace() {
+		setLoggerLevel(FileServingHelper.class, Level.ERROR);
 		assertCorrectUrl("notInTheNamespace",
 				"somefilename.ext", "notInTheNamespace");
 	}
