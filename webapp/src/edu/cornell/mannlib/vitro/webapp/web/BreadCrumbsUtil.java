@@ -51,7 +51,7 @@ public class BreadCrumbsUtil {
             //get the "RootBreadCrumb" if there is one
             ret += getRootBreadCrumb(vreq, separator, portal);
 
-            List chain = vreq.getWebappDaoFactory().getTabDao().getTabHierarcy(tabId,rootId);
+            List chain = vreq.getWebappDaoFactory().getTabDao().getTabHierarchy(tabId,rootId);
             for(int i=0; i<chain.size(); i++){
                 Integer id = (Integer)chain.get(i);
                 if( rootId == id.intValue() ){

@@ -249,7 +249,7 @@
 <h2>${title}</h2>
 <form action="<c:url value="/edit/processRdfForm2.jsp"/>" ><br/>
     <v:input type="text" label="name (required)" id="name" size="30"/><br/>    
-    <v:input type="submit" id="submit" value="<%=submitButtonLabel%>" cancel="${param.subjectUri}"/>
+    <v:input type="submit" id="submit" value="<%=submitButtonLabel%>" cancel="true"/>
 </form>
 
 <jsp:include page="${postForm}"/>

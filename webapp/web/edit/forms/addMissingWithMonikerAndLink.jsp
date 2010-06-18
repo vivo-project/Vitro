@@ -264,7 +264,7 @@ $(document).ready(function() {
     <hr/>
     <v:input type="select" label="label (optional)" id="moniker"/> <em>start typing to see existing choices, or add a new label</em>
     <v:input type="text" label="associated web page (optional)" id="linkUrl" size="50"/>
-    <v:input type="submit" id="submit" value="<%=submitButtonLabel%>" cancel="${param.subjectUri}"/>
+    <v:input type="submit" id="submit" value="<%=submitButtonLabel%>" cancel="true"/>
 </form>
 
 <jsp:include page="${postForm}"/>

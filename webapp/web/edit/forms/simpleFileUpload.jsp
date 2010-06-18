@@ -98,7 +98,7 @@
 <h2>Upload a File</h2>
 <form action="<c:url value="/edit/processRdfForm2.jsp"/>" ENCTYPE="multipart/form-data" method="POST">
     File <v:input type="file" id="fileResource" />
-    <v:input type="submit" id="submit" value="submit" cancel="${param.subjectUri}"/>    
+    <v:input type="submit" id="submit" value="submit" cancel="true"/>    
 </form>
 
 <jsp:include page="${postForm}"/>

@@ -10,7 +10,7 @@ import org.junit.Test;
  * Date: Oct 24, 2007
  * Time: 10:51:01 AM
  */
-public class TabFitleringTest {
+public class TabFilteringTest {
 
     @Before
     public void setUp() throws Exception {

@@ -13,15 +13,19 @@
 
     </div><!-- end wrap -->
 
-    <script language="javascript" type="text/javascript" src="../js/extensions/String.js"></script>
-    <script language="javascript" type="text/javascript" src="../js/jquery.js"></script>
-    <script language="javascript" type="text/javascript" src="../js/jquery_plugins/jquery.bgiframe.pack.js"></script>
-    <script language="javascript" type="text/javascript" src="../js/jquery_plugins/thickbox/thickbox-compressed.js"></script>
-    <!-- <script language="javascript" type="text/javascript" src="../js/jquery_plugins/ui.datepicker.js"></script> -->
-    <script language="javascript" type="text/javascript" src="../js/jquery_plugins/jquery-autocomplete/jquery.autocomplete.pack.js"></script>
+    <script type="text/javascript" src="<c:url value="/js/extensions/String.js"/>"></script></script>
+    <script type="text/javascript" src="<c:url value="/js/jquery.js"/>"></script>
+    <script type="text/javascript" src="<c:url value="/js/jquery_plugins/jquery.bgiframe.pack.js"/>"></script>
+    <script type="text/javascript" src="<c:url value="/js/jquery_plugins/thickbox/thickbox-compressed.js"/>"></script>
+    <!-- <script type="text/javascript" src="<c:url value="/js/jquery_plugins/ui.datepicker.js"/>"></script> -->
+    
+<%  String useAutoComplete = (useAutoComplete=request.getParameter("useAutoComplete")) != null && !(useAutoComplete.equals("")) ? useAutoComplete : "false";
+    if (useAutoComplete.equalsIgnoreCase("true")) { %>
+        <script type="text/javascript" src="<c:url value="/js/jquery_plugins/jquery-autocomplete/jquery.autocomplete.pack.js"/>"></script> 
+<%  } %>
         
     <c:forEach var="jsFile" items="${customJs}">
-        <script type="text/javascript" src="${jsFile}"></script>
+        <script type="text/javascript" src="<c:url value="${jsFile}"/>"></script>
     </c:forEach>  
     
 </body>

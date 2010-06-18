@@ -145,7 +145,7 @@ public class EditSubmission {
     	validationErrors.putAll(this.basicValidation.validateFiles( fileItems ) );
 	}
 
-	private Literal createLiteral(String value, String datatypeUri, String lang){
+	protected Literal createLiteral(String value, String datatypeUri, String lang){
         if( datatypeUri != null ){            
             if( "http://www.w3.org/2001/XMLSchema:anyURI".equals(datatypeUri) ){
                 try {
@@ -404,7 +404,6 @@ public class EditSubmission {
         sess.removeAttribute("editSubmission");
     }
 
-
     public static Map<String, String[]> convertParams(
             Map<String, List<String>> queryParameters) {
         HashMap<String,String[]> out = new HashMap<String,String[]>();
@@ -414,6 +413,6 @@ public class EditSubmission {
         }
         return out;
     }     
-    
+
     private Log log = LogFactory.getLog(EditSubmission.class);
 }

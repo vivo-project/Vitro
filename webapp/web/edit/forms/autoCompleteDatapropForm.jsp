@@ -171,7 +171,7 @@ $(document).ready(function() {
     	<p class="propEntryHelpText">${predicate.publicDescription}</p>
 	</c:if>
     <v:input type="select" id="${dataLiteral}"/>
-    <v:input type="submit" id="submit" value="<%=submitLabel%>" cancel="${param.subjectUri}"/>
+    <v:input type="submit" id="submit" value="<%=submitLabel%>" cancel="true"/>
 </form>
 <jsp:include page="${postForm}"/>
 

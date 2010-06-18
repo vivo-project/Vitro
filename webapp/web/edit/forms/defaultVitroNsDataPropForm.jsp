@@ -191,7 +191,7 @@
 <form action="<c:url value="/edit/processDatapropRdfForm.jsp"/>" >
     <v:input type="<%= inputType %>" id="${propertyName}" size="30" />
     <input type="hidden" name="vitroNsProp" value="true" />
-    <p class="submit"><v:input type="submit" id="submit" value="<%= submitLabel %>" cancel="${param.subjectUri}"/></p>
+    <p class="submit"><v:input type="submit" id="submit" value="<%= submitLabel %>" cancel="true"/></p>
 </form>
 
 <c:if test="${ (!empty param.datapropKey) && (empty param.deleteProhibited) }">

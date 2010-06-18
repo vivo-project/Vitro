@@ -159,7 +159,7 @@ public WebappDaoFactory getUnfilteredDaoFactory() {
     <input type="hidden" name="objectUri"    value="${param.objectUri}"/>
     <input type="hidden" name="y"            value="1"/>
     <input type="hidden" name="cmd"          value="delete"/>
-    <p class="submit"><v:input type="submit" id="submit" value="Delete" cancel="${param.subjectUri}" /></p>
+    <p class="submit"><v:input type="submit" id="submit" value="Delete" cancel="true" /></p>
 	
 </form>
 

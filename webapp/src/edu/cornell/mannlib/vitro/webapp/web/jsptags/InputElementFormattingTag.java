@@ -43,6 +43,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditSubmission;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.Field;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.SelectListGenerator;
+import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 
 /**
  * This tag will build an option list for individuals of a VClass.
@@ -55,6 +56,8 @@ public class InputElementFormattingTag extends TagSupport {
     private String  id;
     private String  type;
     private String  label;
+    private String  cancelLabel;
+    private String  cancelUrl;
     private String  cssClass;
     private String  labelClass;
     private String  value;
@@ -89,6 +92,18 @@ public class InputElementFormattingTag extends TagSupport {
         this.label = labelStr;
     }
 
+    public String getCancelLabel() {
+        return cancelLabel;
+    }
+    public void setCancelLabel(String cancelLabel) {
+        this.cancelLabel = cancelLabel;
+    }
+    public String getCancelUrl() {
+        return cancelUrl;
+    }
+    public void setCancelUrl(String cancelUrl) {
+        this.cancelUrl = cancelUrl;
+    }
     public String getCssClass() {
         return cssClass;
     }
@@ -273,7 +288,10 @@ public class InputElementFormattingTag extends TagSupport {
 
     private String doCancel(String labelStr, EditConfiguration editConfig){
         if (labelStr==null || labelStr.equals("")) {
-            labelStr="Cancel";
+            labelStr = getCancelLabel();
+            if (labelStr==null || labelStr.equals("")) {
+                labelStr="Cancel";
+            }
         }
         VitroRequest vreq = new VitroRequest((HttpServletRequest)pageContext.getRequest());
         if( "about".equals( getCancel() )){
@@ -285,12 +303,19 @@ public class InputElementFormattingTag extends TagSupport {
         }else if( "dashboard".equals( getCancel() )){ //this case is Datastar-specific.
             	return " or <a class=\"cancel\" href=\"" + vreq.getContextPath() 
             	+ "/dashboard\" title=\"Cancel\">"+labelStr+"</a>";
-        }else if (getCancel()!=null && !getCancel().equals("")) {        	
+        }else if (getCancel()!=null && !getCancel().equals("") && !getCancel().equals("false")) {        	
             if( editConfig != null && editConfig.getEditKey() != null ){
                 try{
-                return "<span class=\"or\"> or </span><a class=\"cancel\" href=\"" + vreq.getContextPath()
-                        + "/edit/postEditCleanUp.jsp?editKey="+ URLEncoder.encode(editConfig.getEditKey(),"UTF-8")
-                        +"\" title=\"Cancel\">"+labelStr+"</a>";
+                    String url =  vreq.getContextPath() + 
+                                  "/edit/postEditCleanUp.jsp?editKey="+ 
+                                  URLEncoder.encode(editConfig.getEditKey(),"UTF-8") +
+                                  "&cancel=true";
+                    String cancelUrl = getCancelUrl();
+                    if (!StringUtils.isEmpty(cancelUrl)) {
+                        url += "&url=" + cancelUrl;
+                    }
+                    return "<span class=\"or\"> or </span><a class=\"cancel\" href=\"" +
+                        url + "\" title=\"Cancel\">"+labelStr+"</a>";
                 }catch(UnsupportedEncodingException ex){
                     log.error( "doCancel(): " , ex);
                 }
@@ -1003,7 +1028,7 @@ public class InputElementFormattingTag extends TagSupport {
         			log.debug("found existing literal of type Date for field " + fieldName);
         		}else if( valueFromLiteral instanceof String){
         			strFromLit = (String) valueFromLiteral;        			
-        			log.debug("found exisitng literal of type String for field " + fieldName);
+        			log.debug("found existing literal of type String for field " + fieldName);
         		} else if ( valueFromLiteral instanceof XSDDateTime) {
         			strFromLit = date.getLexicalForm();
         			log.debug("found existing literal of type XSDDateTime for field " + fieldName);
@@ -1126,6 +1151,6 @@ public class InputElementFormattingTag extends TagSupport {
 
         return sb;
     }
-
-     final String SELECTED = "selected=\"selected\"";
+    
+    final String SELECTED = "selected=\"selected\"";
 }

@@ -155,7 +155,7 @@
     	<label for="${dataLiteral}"><p class="propEntryHelpText">${predicate.publicDescription}</p></label>
 	</c:if>
     <v:input type="textarea" id="${dataLiteral}" rows="2"/>
-    <v:input type="submit" id="submit" value="<%=submitLabel%>" cancel="${param.subjectUri}"/>
+    <v:input type="submit" id="submit" value="<%=submitLabel%>" cancel="true"/>
 </form>
 
 <c:if test="${ (!empty param.datapropKey) && (empty param.deleteProhibited) }">

@@ -34,10 +34,10 @@ public class TabMenu extends MainMenu {
         List<Tab> primaryTabs = vreq.getWebappDaoFactory().getTabDao().getPrimaryTabs(portalId);        
         int tabId = TabWebUtil.getTabIdFromRequest(vreq); 
         int rootId = TabWebUtil.getRootTabId(vreq); 
-        List tabLevels = vreq.getWebappDaoFactory().getTabDao().getTabHierarcy(tabId,rootId);
+        List tabLevels = vreq.getWebappDaoFactory().getTabDao().getTabHierarchy(tabId,rootId);
         vreq.setAttribute("tabLevels", tabLevels); 
         Iterator<Tab> primaryTabIterator = primaryTabs.iterator();
-        Iterator tabLevelIterator = tabLevels.iterator();
+        //Iterator tabLevelIterator = tabLevels.iterator();
         Tab tab;
         while (primaryTabIterator.hasNext()) {
             tab = (Tab) primaryTabIterator.next();

@@ -67,8 +67,9 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 
     	try {
 	        doSetup(request, response);
+	        setUpPage();
 	        setTitleAndBody();
-	        write(response);
+	        writePage();
        
 	    } catch (Throwable e) {
 	        log.error("FreeMarkerHttpServlet could not forward to view.");
@@ -82,7 +83,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 		doGet(request, response);
 	}
 
-	// Basic setup needed by all controllers
+	// Basic setup needed by all FreeMarker controllers
     protected void doSetup(HttpServletRequest request, HttpServletResponse response) {
         
         if ( !(this instanceof FreeMarkerComponentGenerator) ) {
@@ -100,6 +101,14 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         vreq = new VitroRequest(request);
         this.response = response;
         portal = vreq.getPortal(); 
+
+        setTemplateLoader();
+    }
+    
+    // Setup needed by all controllers that display a full page.
+    // Controllers that display parts of a page, respond to an Ajax request, etc., do not use this. 
+    protected void setUpPage() {
+        
         urlBuilder = new UrlBuilder(portal);
 
         // RY Can this be removed? Do templates need it? Ideally, they should not.
@@ -111,8 +120,6 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         
         appName = portal.getAppName();
         setSharedVariable("siteName", appName);
-
-        setTemplateLoader();
         
         TabMenu menu = getTabMenu();
         root.put("tabMenu", menu);
@@ -123,7 +130,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         
         root.put("tagline", portal.getShortHand());
         root.put("breadcrumbs", BreadCrumbsUtil.getBreadCrumbsDiv(vreq));
-
+ 
         String themeDir = getThemeDir();
         
         setUrls(themeDir);
@@ -337,18 +344,25 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
     	return body;
     }
     
-    protected void write(HttpServletResponse response) {
-
+    protected void writePage() {
         String templateName = "page/" + getPageTemplateName();
+        writeTemplate(templateName, root);                   
+    }
+    
+    protected void writeTemplate(String templateName, Map<String, Object> map) {       
+        StringWriter sw = mergeToTemplate(templateName, map);          
+        write(sw);
+    }
+    
+    protected void write(StringWriter sw) {
         
-        StringWriter sw = mergeToTemplate(templateName, root);          
         try {
             PrintWriter out = response.getWriter();
             out.print(sw);     
         } catch (IOException e) {
             log.error("FreeMarkerHttpServlet cannot write output");
             e.printStackTrace();
-        }                    
+        }            
     }
     
     // Can be overridden by individual controllers to use a different basic page layout.
