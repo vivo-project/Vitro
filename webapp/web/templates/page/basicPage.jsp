@@ -61,6 +61,7 @@
 </head>
 <body ${requestScope.bodyAttr}>
 <div id="wrap" class="container">
+  <div id="research_instance">This is a research instance. Not the <a href="http://vivo.iu.edu/">official IU VIVO instance</a>.</div>
   <div id="header">
     <jsp:include page="/${themeDir}jsp/identity.jsp" flush="true"/>
     <jsp:include page="/${themeDir}jsp/menu.jsp" flush="true"/>
