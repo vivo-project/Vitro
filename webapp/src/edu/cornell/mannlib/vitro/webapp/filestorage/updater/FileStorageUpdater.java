@@ -2,38 +2,16 @@
 
 package edu.cornell.mannlib.vitro.webapp.filestorage.updater;
 
-import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import javax.imageio.ImageIO;
-
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.ResIterator;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
 
-import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.filestorage.FileModelHelper;
@@ -61,6 +39,10 @@ import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorage;
  * <p>
  * We consider some special cases:
  * <ul>
+ * <li>An individual may refer to an image file that does not actually exist. If
+ * so, that reference will be deleted.</li>
+ * <li>There may be more than one reference to the same image file. If so, all
+ * but the first such reference will be deleted.</li>
  * <li>
  * In the old style, it was possible to have a main image without a thumbnail.
  * If we find that, we will generate a scaled down copy of the main image, store
@@ -103,61 +85,39 @@ import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorage;
  * while preserving any internal tree structure.
  * </p>
  */
-public class FileStorageUpdater {
+public class FileStorageUpdater implements FSUController {
 	private static final Log log = LogFactory.getLog(FileStorageUpdater.class);
 
-	private static final String IMAGEFILE = VitroVocabulary.vitroURI
-			+ "imageFile";
-	private static final String IMAGETHUMB = VitroVocabulary.vitroURI
-			+ "imageThumb";
-
 	/** How wide should a generated thumbnail image be (in pixels)? */
-	private static final int THUMBNAIL_WIDTH = 150;
+	public static final int THUMBNAIL_WIDTH = 150;
 
 	/** How high should a generated thumbnail image be (in pixels)? */
-	private static final int THUMBNAIL_HEIGHT = 150;
+	public static final int THUMBNAIL_HEIGHT = 150;
+
+	/** How is the main image referenced in the old scheme? */
+	public static final String IMAGEFILE = VitroVocabulary.vitroURI
+			+ "imageFile";
+
+	/** How is the thumbnail referenced in the old scheme? */
+	public static final String IMAGETHUMB = VitroVocabulary.vitroURI
+			+ "imageThumb";
 
 	private final Model model;
-	private final Property imageProperty;
-	private final Property thumbProperty;
 
 	private final FileStorage fileStorage;
-	private FileModelHelper fileModelHelper;
-
+	private final FileModelHelper fileModelHelper;
 	private final File imageDirectory;
-	private final File deletedDirectory;
-	private final File unreferencedDirectory;
+	private final File upgradeDirectory;
 
-	private final File logFile;
-	private PrintWriter updateLog;
-	private final SimpleDateFormat timeStamper = new SimpleDateFormat(
-			"yyyy-MM-dd HH:mm:ss");
+	private FSULog updateLog;
 
 	public FileStorageUpdater(WebappDaoFactory wadf, Model model,
 			FileStorage fileStorage, File uploadDirectory) {
 		this.model = model;
-		this.imageProperty = model.createProperty(IMAGEFILE);
-		this.thumbProperty = model.createProperty(IMAGETHUMB);
-
 		this.fileStorage = fileStorage;
 		this.fileModelHelper = new FileModelHelper(wadf);
-
 		this.imageDirectory = new File(uploadDirectory, "images");
-
-		File upgradeDirectory = new File(uploadDirectory, "upgrade");
-		this.deletedDirectory = new File(upgradeDirectory, "deleted");
-		this.unreferencedDirectory = new File(upgradeDirectory, "unreferenced");
-		this.logFile = getTimestampedFilename(upgradeDirectory);
-	}
-
-	/**
-	 * Create a filename for the log file that contains a timestamp, so if we
-	 * run the process more than once, we will see multiple files.
-	 */
-	private File getTimestampedFilename(File upgradeDirectory) {
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH-mm-sss");
-		String filename = "upgradeLog." + sdf.format(new Date()) + ".txt";
-		return new File(upgradeDirectory, filename);
+		this.upgradeDirectory = new File(uploadDirectory, "upgrade");
 	}
 
 	/**
@@ -166,20 +126,14 @@ public class FileStorageUpdater {
 	 * files, adjusting them to the new way.
 	 * </p>
 	 * <p>
-	 * Maybe there is nothing to do. If that's true, we don't even create a log
-	 * file, we just exit.
+	 * If there is nothing to do, don't even create a log file, just exit.
 	 * </p>
 	 * <p>
-	 * In the old style, main images were independent from thumbnails, but we
-	 * won't permit that any more.
-	 * <ul>
-	 * <li>
-	 * If an individual has a thumbnail but no main image, make a copy of the
-	 * thumbnail to become the main image.</li>
-	 * <li>If an individual has a main image but no thumbnail, make a scaled
-	 * copy of the main image to become the thumbnail.</li>
-	 * </ul>
-	 * Once this has been done, we can process all individuals in the same way.
+	 * If there is something to do, go through the whole process.
+	 * </p>
+	 * <p>
+	 * At the end, there should be nothing to do. If that's true, clean out the
+	 * old images directory.
 	 * </p>
 	 */
 	public void update() {
@@ -188,40 +142,54 @@ public class FileStorageUpdater {
 			log.debug("Found no pre-1.1 file references.");
 			return;
 		}
-		log.info("Updating pre-1.1 file references. Log file is " + logFile);
+
+		// Create the upgrade directory and the log file.
+		setup();
 
 		try {
-			logFile.getParentFile().mkdirs();
-			updateLog = new PrintWriter(this.logFile);
+			// Remove any image properties that don't point to literals.
+			new NonLiteralPropertyRemover(this).remove();
 
-			adjustIndividualsWhoAreAllThumbs();
-			adjustIndividualsWhoHaveNoThumbs();
-			processIndividualsWhoHaveImages();
-			cleanupImagesDirectory(imageDirectory);
-		} catch (FileNotFoundException e) {
-			log.error("can't create log file.", e);
-		} finally {
-			if (updateLog != null) {
-				updateLog.flush();
-				updateLog.close();
+			// Remove any image properties that point to files that don't exist.
+			new DeadEndPropertyRemover(this).remove();
+
+			// No resource may have multiple main images or multiple thumbnails.
+			new MultiplePropertyRemover(this).remove();
+
+			// Create a main image for any thumbnail that doesn't have one.
+			new AllThumbsAdjuster(this).adjust();
+
+			// Create a thumbnail for any main image that doesn't have one.
+			new NoThumbsAdjuster(this).adjust();
+
+			// Copy all images into the new file storage system, translating
+			// into the new schema. Get a list of all the images we translated.
+			ImageSchemaTranslater translater = new ImageSchemaTranslater(this);
+			List<String> translatedFiles = translater.translate();
+
+			if (isThereAnythingToDo()) {
+				throw new IllegalStateException(
+						"FileStorageUpdate was unsuccessful -- "
+								+ "model still contains pre-1.1 file references.");
 			}
-		}
 
-		if (isThereAnythingToDo()) {
-			throw new IllegalStateException(
-					"FileStorageUpdate was unsuccessful -- "
-							+ "model still contains pre-1.1 file references.");
+			// Clean out the old image directory, separating into files which
+			// were translated, and files for which we found no reference.
+			new ImageDirectoryCleaner(this).clean(translatedFiles);
+		} finally {
+			updateLog.close();
 		}
 
 		log.info("Finished updating pre-1.1 file references.");
 	}
 
 	/**
-	 * Query the model. If there is anybody with a main image or a thumbnail in
-	 * the old style, then we have work to do.
+	 * Query the model. If there are any resources with old-style image
+	 * properties, we have work to do.
 	 */
 	private boolean isThereAnythingToDo() {
-		ResIterator haveImage = model.listResourcesWithProperty(imageProperty);
+		ResIterator haveImage = model.listResourcesWithProperty(model
+				.createProperty(IMAGEFILE));
 		try {
 			if (haveImage.hasNext()) {
 				return true;
@@ -230,7 +198,8 @@ public class FileStorageUpdater {
 			haveImage.close();
 		}
 
-		ResIterator haveThumb = model.listResourcesWithProperty(thumbProperty);
+		ResIterator haveThumb = model.listResourcesWithProperty(model
+				.createProperty(IMAGETHUMB));
 		try {
 			if (haveThumb.hasNext()) {
 				return true;
@@ -243,502 +212,61 @@ public class FileStorageUpdater {
 	}
 
 	/**
-	 * For every individual with thumbnails but no main images, create a main
-	 * image from the first thumbnail.
+	 * Create the upgrade directory. Create the log file. If we fail, drop dead.
 	 */
-	private void adjustIndividualsWhoAreAllThumbs() {
-		ResIterator haveThumb = model.listResourcesWithProperty(thumbProperty);
+	private void setup() {
 		try {
-			while (haveThumb.hasNext()) {
-				Resource resource = haveThumb.next();
-
-				if (resource.getProperty(imageProperty) == null) {
-					createMainImageFromThumbnail(resource);
-				}
-			}
-		} finally {
-			haveThumb.close();
-		}
-	}
-
-	/**
-	 * This individual has a thumbnail but no main image. Create one.
-	 * <ul>
-	 * <li>Figure a name for the main image.</li>
-	 * <li>Copy the thumbnail image file into the main image file.</li>
-	 * <li>Set that file as an image (old-style) on the individual.</li>
-	 * </ul>
-	 */
-	private void createMainImageFromThumbnail(Resource resource) {
-		String thumbFilename = getValues(resource, thumbProperty).get(0);
-		String mainFilename = addFilenamePrefix("_main_image_", thumbFilename);
-		logIt(resource, "creating a main file at '" + mainFilename
-				+ "' to match the thumbnail at '" + thumbFilename + "'");
-
-		try {
-			File thumbFile = new File(imageDirectory, thumbFilename);
-			File mainFile = new File(imageDirectory, mainFilename);
-			copyFile(thumbFile, mainFile);
-
-			resource.addProperty(imageProperty, mainFilename);
+			this.upgradeDirectory.mkdirs();
+			updateLog = new FSULog(this.upgradeDirectory);
+			log.info("Updating pre-1.1 file references. Log file is "
+					+ updateLog.getFilename());
 		} catch (IOException e) {
-			logIt(resource, "failed to create main file '" + mainFilename + "'");
-			logIt(e);
-		}
-	}
-
-	/**
-	 * For every individual with main images but no thumbnails, create a
-	 * thumbnail from the first main image.
-	 */
-	private void adjustIndividualsWhoHaveNoThumbs() {
-		ResIterator haveImage = model.listResourcesWithProperty(imageProperty);
-		try {
-			while (haveImage.hasNext()) {
-				Resource resource = haveImage.next();
-
-				if (resource.getProperty(thumbProperty) == null) {
-					createThumbnailFromMainImage(resource);
-				}
+			if (updateLog != null) {
+				updateLog.close();
 			}
-		} finally {
-			haveImage.close();
+			throw new IllegalStateException("can't create log file: '"
+					+ updateLog.getFilename() + "'", e);
 		}
 	}
 
-	/**
-	 * This individual has a main image but no thumbnail. Create one.
-	 * <ul>
-	 * <li>Figure a name for the thumbnail image.</li>
-	 * <li>Make a scaled copy of the main image into the thumbnail.</li>
-	 * <li>Set that file as a thumbnail (old-style) on the individual.</li>
-	 * </ul>
-	 */
-	private void createThumbnailFromMainImage(Resource resource) {
-		String mainFilename = getValues(resource, imageProperty).get(0);
-		String thumbFilename = addFilenamePrefix("_thumbnail_", mainFilename);
-		logIt(resource, "creating a thumbnail at '" + thumbFilename
-				+ "' from the main image at '" + mainFilename + "'");
+	// ----------------------------------------------------------------------
+	// Methods to set up the individual scanners.
+	// ----------------------------------------------------------------------
 
-		File mainFile = new File(imageDirectory, mainFilename);
-		File thumbFile = new File(imageDirectory, thumbFilename);
-		try {
-			generateThumbnailImage(mainFile, thumbFile, THUMBNAIL_WIDTH,
-					THUMBNAIL_HEIGHT);
-
-			resource.addProperty(thumbProperty, thumbFilename);
-		} catch (IOException e) {
-			logIt(resource, "failed to create thumbnail file '" + thumbFilename
-					+ "'");
-			logIt(e);
-		}
+	@Override
+	public Model getModel() {
+		return this.model;
 	}
 
-	/**
-	 * Read in the main image, and scale it to a thumbnail that maintains the
-	 * aspect ratio, but doesn't exceed either of these dimensions.
-	 */
-	private void generateThumbnailImage(File mainFile, File thumbFile,
-			int maxWidth, int maxHeight) throws IOException {
-		BufferedImage bsrc = ImageIO.read(mainFile);
-
-		double scale = Math.min(((double) maxWidth) / bsrc.getWidth(),
-				((double) maxHeight) / bsrc.getHeight());
-		AffineTransform at = AffineTransform.getScaleInstance(scale, scale);
-		int newWidth = (int) (scale * bsrc.getWidth());
-		int newHeight = (int) (scale * bsrc.getHeight());
-		logIt("Scaling '" + mainFile + "' by a factor of " + scale + ", from "
-				+ bsrc.getWidth() + "x" + bsrc.getHeight() + " to " + newWidth
-				+ "x" + newHeight);
-
-		BufferedImage bdest = new BufferedImage(newWidth, newHeight,
-				BufferedImage.TYPE_INT_RGB);
-		Graphics2D g = bdest.createGraphics();
-
-		g.drawRenderedImage(bsrc, at);
-
-		ImageIO.write(bdest, "JPG", thumbFile);
+	@Override
+	public FSULog getUpdateLog() {
+		return this.updateLog;
 	}
 
-	/**
-	 * By the time we get here, any individual with a main image also has a
-	 * thumbnail, and vice versa. For each one, translate one main image and one
-	 * thumbnail into the new system and discard any other images.
-	 */
-	private void processIndividualsWhoHaveImages() {
-		ResIterator haveImage = model.listResourcesWithProperty(imageProperty);
-		try {
-			while (haveImage.hasNext()) {
-				Resource resource = haveImage.next();
-				translateImagesAndDiscardExtras(resource);
-			}
-		} finally {
-			haveImage.close();
-		}
+	@Override
+	public FileModelHelper getFileModelHelper() {
+		return this.fileModelHelper;
 	}
 
-	/**
-	 * This individual has at least one main image and at least one thumbnail.
-	 * <ul>
-	 * <li>Translate the first main image into the new system.</li>
-	 * <li>Translate the first thumbnail into the new system.</li>
-	 * <li>Discard any other main image files or thumbnail files.</li>
-	 * <li>Remove all old-style main image properties.</li>
-	 * <li>Remove all old-style thumbnail properties.</li>
-	 * </ul>
-	 */
-	private void translateImagesAndDiscardExtras(Resource resource) {
-		boolean first;
-
-		first = true;
-		for (String value : getValues(resource, imageProperty)) {
-			if (first) {
-				translateMainImage(resource, value);
-			} else {
-				discardExtraImage(resource, value, "main image");
-			}
-			first = false;
-		}
-		resource.removeAll(imageProperty);
-
-		first = true;
-		for (String value : getValues(resource, thumbProperty)) {
-			if (first) {
-				translateThumbnail(resource, value);
-			} else {
-				discardExtraImage(resource, value, "thumbnail");
-			}
-		}
-		resource.removeAll(thumbProperty);
+	@Override
+	public FileStorage getFileStorage() {
+		return this.fileStorage;
 	}
 
-	/**
-	 * Translate the main image into the new system
-	 */
-	private void translateMainImage(Resource resource, String path) {
-		try {
-			Individual file = translateFile(resource, path, "main image");
+	@Override
+	public File getImageDirectory() {
+		return this.imageDirectory;
 
-			// Set the file as the thumbnail for the person.
-			Individual person = fileModelHelper.getIndividualByUri(resource
-					.getURI());
-			fileModelHelper.setAsMainImageOnEntity(person, file);
-		} catch (IOException e) {
-			logIt(resource, "Can't create the main image file.");
-			logIt(e);
-		}
 	}
 
-	/**
-	 * Translate the thumbnail into the new system.
-	 */
-	private void translateThumbnail(Resource resource, String path) {
-		try {
-			Individual file = translateFile(resource, path, "thumbnail");
-
-			// Set the file as the thumbnail for the person.
-			Individual person = fileModelHelper.getIndividualByUri(resource
-					.getURI());
-			fileModelHelper.setThumbnailOnIndividual(person, file);
-		} catch (IOException e) {
-			logIt(resource, "Can't create the thumbnail file.");
-			logIt(e);
-		}
+	@Override
+	public File getTranslatedDirectory() {
+		return new File(this.upgradeDirectory, "translatedImages");
 	}
 
-	/**
-	 * Translate an image file into the new system
-	 * <ul>
-	 * <li>Create a new File, FileByteStream.</li>
-	 * <li>Attempt to infer MIME type.</li>
-	 * <li>Copy into the File system.</li>
-	 * <li>Delete from images directory.</li>
-	 * </ul>
-	 * 
-	 * @return the new File surrogate.
-	 */
-	private Individual translateFile(Resource resource, String path,
-			String label) throws IOException {
-		File oldFile = new File(imageDirectory, path);
-		String filename = getSimpleFilename(path);
-		String mimeType = guessMimeType(resource, filename);
-
-		// Create the file individuals in the model
-		Individual byteStream = fileModelHelper.createByteStreamIndividual();
-		Individual file = fileModelHelper.createFileIndividual(mimeType,
-				filename, byteStream);
-
-		logIt(resource, "translating " + label + " '" + path
-				+ "' into the file storage as '" + file.getURI() + "'");
-
-		InputStream inputStream = null;
-		try {
-			// Store the file in the FileStorage system.
-			inputStream = new FileInputStream(oldFile);
-			fileStorage.createFile(byteStream.getURI(), filename, inputStream);
-		} finally {
-			if (inputStream != null) {
-				try {
-					inputStream.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-
-		try {
-			deleteFile(oldFile);
-		} catch (IOException e) {
-			throw new IllegalStateException(e);
-		}
-
-		return file;
+	@Override
+	public File getUnreferencedDirectory() {
+		return new File(this.upgradeDirectory, "unreferencedImages");
 	}
 
-	/**
-	 * If they have more than one main image or more than one thumbnail, move
-	 * the extras to the "deleted" directory.
-	 */
-	private void discardExtraImage(Resource resource, String path, String label) {
-		try {
-			logIt(resource, "discarding a redundant " + label + " at '" + path
-					+ "'");
-			File oldFile = new File(imageDirectory, path);
-			File deletedFile = new File(deletedDirectory, path);
-			moveFile(oldFile, deletedFile);
-		} catch (IOException e) {
-			logIt(e);
-		}
-	}
-
-	/**
-	 * Go through the images directory, and discard any that remain. They must
-	 * not have been referenced by any existing individuals.
-	 */
-	private void cleanupImagesDirectory(File directory) {
-		logIt("Cleaning up image directory '" + directory + "'");
-		try {
-			File targetDirectory = makeCorrespondingDirectory(directory);
-			File[] children = directory.listFiles();
-			for (File child : children) {
-				if (child.isDirectory()) {
-					cleanupImagesDirectory(child);
-				} else {
-					logIt("Moving unreferenced file '" + child.getPath() + "'");
-					try {
-						moveFile(child, new File(targetDirectory, child
-								.getName()));
-					} catch (IOException e) {
-						logIt("Can't move unreferenced file '"
-								+ child.getAbsolutePath() + "'");
-						logIt(e);
-					}
-				}
-			}
-		} catch (IOException e) {
-			logIt("Failed to clean up images directory '"
-					+ directory.getAbsolutePath() + "'");
-			logIt(e);
-		}
-	}
-
-	/**
-	 * Figure out the path from the "images" directory to this one, and create a
-	 * corresponding directory in the "unreferenced" area.
-	 */
-	private File makeCorrespondingDirectory(File directory) throws IOException {
-		String imagesPath = imageDirectory.getAbsolutePath();
-		String thisPath = directory.getAbsolutePath();
-
-		if (!thisPath.startsWith(imagesPath)) {
-			throw new IOException("Can't make a corresponding directory for '"
-					+ thisPath + "'");
-		}
-
-		String suffix = thisPath.substring(imagesPath.length());
-
-		File corresponding = new File(unreferencedDirectory, suffix);
-		corresponding.mkdirs();
-		if (!corresponding.exists()) {
-			throw new IOException("Failed to create corresponding directory '"
-					+ corresponding.getAbsolutePath() + "'");
-		}
-
-		return corresponding;
-	}
-
-	/**
-	 * Read all of the specified properties on a resource, and return a
-	 * {@link List} of the {@link String} values.
-	 */
-	private List<String> getValues(Resource resource, Property property) {
-		List<String> list = new ArrayList<String>();
-		StmtIterator stmts = resource.listProperties(property);
-		try {
-			while (stmts.hasNext()) {
-				Statement stmt = stmts.next();
-				RDFNode object = stmt.getObject();
-				if (object.isLiteral()) {
-					list.add(((Literal) object).getString());
-				} else {
-					logIt(resource, "property value was not a literal: "
-							+ "property is '" + property.getURI()
-							+ "', value is '" + object + "'");
-				}
-			}
-		} finally {
-			stmts.close();
-		}
-		return list;
-	}
-
-	/**
-	 * Remove any path parts, and just get the filename and extension.
-	 */
-	private String getSimpleFilename(String path) {
-		return FilenameUtils.getName(path);
-	}
-
-	/**
-	 * Guess what the MIME type might be.
-	 */
-	private String guessMimeType(Resource resource, String filename) {
-		if (filename.endsWith(".gif")) {
-			return "image/gif";
-		} else if (filename.endsWith(".png")) {
-			return "image/png";
-		} else if (filename.endsWith(".jpg")) {
-			return "image/jpeg";
-		} else if (filename.endsWith(".jpeg")) {
-			return "image/jpeg";
-		} else if (filename.endsWith(".jpe")) {
-			return "image/jpeg";
-		} else {
-			logIt(resource,
-					"can't recognize the MIME type of this image file: '"
-							+ filename + "'");
-			return "image";
-		}
-	}
-
-	/**
-	 * Copy a file from one location to another, and remove it from the original
-	 * location.
-	 */
-	private void moveFile(File from, File to) throws IOException {
-		copyFile(from, to);
-		deleteFile(from);
-	}
-
-	/**
-	 * Copy a file from one location to another.
-	 */
-	private void copyFile(File from, File to) throws IOException {
-		if (!from.exists()) {
-			throw new FileNotFoundException("File '" + from.getAbsolutePath()
-					+ "' does not exist.");
-		}
-
-		InputStream in = null;
-		try {
-			in = new FileInputStream(from);
-			writeFile(in, to);
-		} finally {
-			if (in != null) {
-				try {
-					in.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
-
-	/**
-	 * Create a file with the contents of this data stream.
-	 * 
-	 * @param stream
-	 *            the data stream. You must close it afterward.
-	 */
-	private void writeFile(InputStream stream, File to) throws IOException {
-		if (to.exists()) {
-			throw new IOException("File '" + to.getAbsolutePath()
-					+ "' already exists.");
-		}
-
-		File parent = to.getParentFile();
-		if (!parent.exists()) {
-			parent.mkdirs();
-			if (!parent.exists()) {
-				throw new IOException("Can't create parent directory for '"
-						+ to.getAbsolutePath() + "'");
-			}
-		}
-
-		OutputStream out = null;
-		try {
-			out = new FileOutputStream(to);
-			byte[] buffer = new byte[8192];
-			int howMany;
-			while (-1 != (howMany = stream.read(buffer))) {
-				out.write(buffer, 0, howMany);
-			}
-		} finally {
-			if (out != null) {
-				try {
-					out.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
-
-	/**
-	 * Delete this file, and make sure that it's gone.
-	 */
-	private void deleteFile(File file) throws IOException {
-		file.delete();
-		if (file.exists()) {
-			throw new IOException("Failed to delete file '"
-					+ file.getAbsolutePath() + "'");
-		}
-	}
-
-	/**
-	 * Find the filename within a path so we can add this prefix to it, while
-	 * retaining the path.
-	 */
-	private String addFilenamePrefix(String prefix, String path) {
-		int slashHere = Math.max(path.lastIndexOf('/'), path.lastIndexOf('\\'));
-		if (slashHere == -1) {
-			return prefix + path;
-		} else {
-			String dirs = path.substring(0, slashHere + 1);
-			String filename = path.substring(slashHere + 1);
-			return dirs + prefix + filename;
-		}
-	}
-
-	/**
-	 * Write this message to the update log.
-	 */
-	private void logIt(String message) {
-		updateLog.println(timeStamper.format(new Date()) + " " + message);
-	}
-
-	/**
-	 * Write this message about this resource to the update log.
-	 */
-	private void logIt(Resource resource, String message) {
-		logIt("On resource '" + resource.getURI() + "', " + message);
-	}
-
-	/**
-	 * Write this exception to the update log.
-	 */
-	private void logIt(Exception e) {
-		logIt(e.toString());
-		e.printStackTrace(updateLog);
-	}
 }

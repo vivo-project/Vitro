@@ -78,7 +78,7 @@ public class UpdateUploadedFiles implements ServletContextListener {
 					fileStorage, uploadDirectory);
 			fsu.update();
 		} catch (Exception e) {
-			log.error(e);
+			log.error("Unknown problem", e);
 			throw new RuntimeException(e);
 		}
 	}
