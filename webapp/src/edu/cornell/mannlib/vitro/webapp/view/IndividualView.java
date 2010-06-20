@@ -108,11 +108,11 @@ public class IndividualView extends ViewObject {
         return individual.getKeywords();
     }
     
-    public String getImageFile() {
-        return individual.getImageFile();
+    public String getImageUrl() {
+        return individual.getImageUrl();
     }
     
-    public String getImageThumb() {
-        return individual.getImageThumb();
+    public String getThumbUrl() {
+        return individual.getThumbUrl();
     }
 }

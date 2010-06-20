@@ -2,600 +2,480 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
-/**
- * @version 0.9 2004-01-29
- * @author Jon Corson-Rikert
- *
- * UPDATES:
- * 2005-07-22 jc55  added support for entering remote image URL when uploading thumbnail image
- * 2005-06-30 jc55  added support for home parameter
- */
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-/************** DOCUMENTATION *********************
- * This servlet uses 3 directory locations on the server, which for illustrative purposes
- *     we assume has the Tomcat application context at /usr/local/tomcat/webapps/vivo
- *     and the source code and build files at /usr/local/src/Vitro/dream
- *
- *  1) workspaceDir: a temp directory where the file is uploaded to and reports are stored
- *  2) websiteDir  : a website directory where the image is copied so that it appears on the website immediately after upload
- *  3) sourceDir   : the directory in the source tree where the images are stored so that the context can be recreated and/or moved
- *
- */
+import javax.imageio.ImageIO;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.UnavailableException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-import java.io.*;
-import java.util.*;
-import javax.servlet.http.*;
-import javax.servlet.*;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.log4j.Logger;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
-import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-
-import com.oreilly.servlet.MultipartRequest;
-import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
+import edu.cornell.mannlib.vitro.webapp.filestorage.FileModelHelper;
+import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileAlreadyExistsException;
+import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorage;
+import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup;
+import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest;
 
 public class UploadImagesServlet extends VitroHttpServlet {
-    private static final Log log = LogFactory.getLog(UploadImagesServlet.class.getName());
-    private String sourceDirName;  // all uploaded images are copied to the source directory, not just the application context
-    private String websiteDirName; // the application context
+	private static final Logger log = Logger
+			.getLogger(UploadImagesServlet.class);
 
-    /**
-     * Notice that init() gets called the first time the servlet is requested,
-     * at least under tomcat 5.5.
-     */
-    public void init(ServletConfig config) throws ServletException {
-        super.init(config);
+	/** Recognized file extensions mapped to MIME-types. */
+	private static final Map<String, String> RECOGNIZED_FILE_TYPES = createFileTypesMap();
 
-        // something like: /usr/local/tomcat/webapps/vivo
-        websiteDirName = getServletContext().getRealPath("");
+	/** The field in the HTTP request that holds the file. */
+	public static final String FILE_FIELD_NAME = "file1";
 
-        // something like: /usr/local/src/Vitro/dream/common/web
-        try{
-            sourceDirName = getSourceDirName();
-        }catch(Exception ex){
-            log.error("initialization Exception: "+ex.getMessage());
-        }
+	/** The field in the HTTP request that holds the individual's URI. */
+	public static final String URI_FIELD_NAME = "entityUri";
 
-        log.info("UploadImagesServlet initialized to copy uploaded images to source directory: " + sourceDirName);
-    }
+	/** Limit file size to 50 megabytes. */
+	private static final int MAXIMUM_FILE_SIZE = 50 * 1024 * 1024;
 
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException,IOException {
-        doPost(request, response);
-    }
+	/** How wide should a generated thumbnail image be (in pixels)? */
+	private static final int THUMBNAIL_WIDTH = 150;
 
-    /* (non-Javadoc)
-     * @see javax.servlet.http.HttpServlet#doPost(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
-     */
-    /* (non-Javadoc)
-     * @see javax.servlet.http.HttpServlet#doPost(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
-     */
-    public void doPost(HttpServletRequest req,
-            HttpServletResponse response)
-        throws ServletException, IOException
-    {
-    	
-    	VitroRequest request = new VitroRequest(req);
-    	
-        boolean overwriteExistingImage=false;
-        //BufferedReader in = null;
-        PrintWriter out = null;
+	/** How high should a generated thumbnail image be (in pixels)? */
+	private static final int THUMBNAIL_HEIGHT = 150;
 
-        File sourceDir;    // the working source directory for the website -- put the file here so if the site is refreshed the file won't be lost
-        File contentDir;   // the actual website directory -- make a copy there so the user can see the uploaded file before the next ant deploy
-        File tempDir;      // a temporary directory in the Tomcat context where files are uploaded before copying to sourceDir and websiteDir, and where reports are stored
+	private FileStorage fileStorage;
 
-        String paramStr = "<table align='center' width='75%'><tr><td align='left'>";
-        String destinationStr=null;
-        String imageTypeStr=null;
-        String primaryContentTypeStr=null;
-        ArrayList secondaryContentTypeList=null;
+	private static Map<String, String> createFileTypesMap() {
+		Map<String, String> map = new HashMap<String, String>();
+		map.put(".gif", "image/gif");
+		map.put(".png", "image/png");
+		map.put(".jpg", "image/jpeg");
+		map.put(".jpeg", "image/jpeg");
+		map.put(".jpe", "image/jpeg");
+		return Collections.unmodifiableMap(map);
+	}
 
-        String individualURI=null;
+	/**
+	 * On startup, get a reference to the {@link FileStorage} system from the
+	 * {@link ServletContext}.
+	 * 
+	 * @throws UnavailableException
+	 *             if the attribute is missing, or is not of the correct type.
+	 */
+	@Override
+	public void init() throws ServletException {
+		Object o = getServletContext().getAttribute(
+				FileStorageSetup.ATTRIBUTE_NAME);
+		if (o instanceof FileStorage) {
+			fileStorage = (FileStorage) o;
+		} else if (o == null) {
+			throw new UnavailableException(this.getClass().getSimpleName()
+					+ " could not initialize. Attribute '"
+					+ FileStorageSetup.ATTRIBUTE_NAME
+					+ "' was not set in the servlet context.");
+		} else {
+			throw new UnavailableException(this.getClass().getSimpleName()
+					+ " could not initialize. Attribute '"
+					+ FileStorageSetup.ATTRIBUTE_NAME
+					+ "' in the servlet context contained an instance of '"
+					+ o.getClass().getName() + "' instead of '"
+					+ FileStorage.class.getName() + "'");
+		}
+	}
 
-        String userName=null;
-        HttpSession session = request.getSession();
-        LoginFormBean fb = (LoginFormBean) session.getAttribute("loginHandler");
-        String tempDirName=null;
-        if ( fb != null ) {
-            userName = fb.getLoginName();
-            tempDirName = websiteDirName + "/" + "batch";
-            tempDir = new File(tempDirName);
-            if (!tempDir.exists() ) {
-                tempDir.mkdir();
-                paramStr += "<p>Created new temporary working upload directory: " + tempDir.toString() + "</p>";
-            }
-            tempDirName += "/" + userName;
-            tempDir = new File(tempDirName);
-            if (!tempDir.exists()) {
-                tempDir.mkdir();
-                paramStr += "<p>Created new temporary working upload directory for user: " + userName + ": " + tempDir.toString() + "</p>";
-            }
-        } else {
-            request.setAttribute("processError","User name not decoded from login formbean");
-            getServletConfig().getServletContext().getRequestDispatcher("/uploadimages.jsp").forward( request, response );
-            return;
-        }
+	/**
+	 * Treat a GET request like a POST request. However, since a GET request
+	 * cannot contain uploaded files, this should produce an error.
+	 */
+	@Override
+	public void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		doPost(request, response);
+	}
 
-        // Use an advanced form of the constructor that specifies a character encoding
-        // of the request (not of the file contents) and a file rename policy.
-        MultipartRequest multi = new MultipartRequest(request,tempDirName,10*1024*1024,"ISO-8859-1",new DefaultFileRenamePolicy());
+	/**
+	 * <p>
+	 * Store an image file as the main image for the associated individual. The
+	 * request must be a multi-part request containing the file. It must also
+	 * contain a parameter for the URI of the individual.
+	 * </p>
+	 * <p>
+	 * If the individual already has a main image, it will be removed. The new
+	 * image is stored, and a thumbnail is generated and stored.
+	 * </p>
+	 */
+	@Override
+	protected void doPost(HttpServletRequest rawRequest,
+			HttpServletResponse response) throws ServletException, IOException {
+		List<String> errors = new ArrayList<String>();
 
-        String userStr="unknown"; // could get this from userName above
-        String remoteLocStr=null;
+		try {
+			VitroRequest request = new VitroRequest(FileUploadServletRequest
+					.parseRequest(rawRequest, MAXIMUM_FILE_SIZE));
+			try {
+				FileItem imageFileItem = validateImageFromRequest(request);
+				Individual person = validateEntityUriFromRequest(request);
 
-        paramStr += "<p>PARAMS: <br><ul>";
-        Enumeration params = multi.getParameterNames();
-        while (params.hasMoreElements()) {
-            String name = (String)params.nextElement();
-            if ( name.equalsIgnoreCase("entityUri")) {
-                individualURI = multi.getParameter(name);
-                paramStr += "<li>Individual URI = " + individualURI + "</li>";
-                request.setAttribute("entityUri", individualURI );
-            } else if ( name.equalsIgnoreCase("mode")) {
-                String modeStr = multi.getParameter(name);
-                overwriteExistingImage = modeStr.equalsIgnoreCase("replace") ? true : false;
-                paramStr += "<li>overwriting existing image = " + overwriteExistingImage + "</li>";
-            } else if ( name.equalsIgnoreCase("submitter")) {
-                userStr = multi.getParameter(name);
-                //workDirName += "/" + userStr;
-                paramStr += "<li>user " + userStr + " storing in server directory = " + websiteDirName + "</li>";
-            } else if ( name.equalsIgnoreCase("submitMode")) {
-                String submitStr = multi.getParameter(name);
-                paramStr += "<li>submitted via button: " + submitStr + "</li>";
-            } else if ( name.equalsIgnoreCase("destination")) {
-                destinationStr = multi.getParameter(name);
-                paramStr += "<li>destination directory: " + destinationStr + "</li>";
-                request.setAttribute("destination", destinationStr );
-            } else if ( name.equalsIgnoreCase("type")) {
-                imageTypeStr = multi.getParameter(name);
-                paramStr += "<li>imageType: " + imageTypeStr + "</li>";
-                request.setAttribute("type", imageTypeStr );
-            } else if ( name.equalsIgnoreCase("contentType")) {
-                String contentTypeStr = multi.getParameter(name);
-                paramStr += "<li>acceptable content types: " + contentTypeStr + "</li>";
-                StringTokenizer acceptedTypeTokens = new StringTokenizer( contentTypeStr,"/");
-                int partCount = acceptedTypeTokens.countTokens();
-                if ( partCount > 0 ) {
-                    secondaryContentTypeList = new ArrayList();
-                    for (int i=0; i<partCount; i++ ) {
-                        switch (i) {
-                            case 0: primaryContentTypeStr = acceptedTypeTokens.nextToken(); break;
-                            default: secondaryContentTypeList.add(acceptedTypeTokens.nextToken());break;
-                        }
-                    }
-                }
-            } else if ( name.equalsIgnoreCase("home")) {
-                String portalIdStr=multi.getParameter(name);
-                request.setAttribute("home",portalIdStr);
-            } else if ( name.equalsIgnoreCase("remoteURL")) {
-                remoteLocStr=multi.getParameter(name);
-            } else {
-                String value = multi.getParameter(name);
-                paramStr += "<li>unexpected parameter [" + name + "] =" + value + "</li>";
-            }
-        }
+				FileModelHelper fileModelHelper = new FileModelHelper(
+						getWebappDaoFactory());
 
-        try {
-        	
-        	sourceDir = null;
-        	try {
-	            sourceDir = new File(sourceDirName);
-	            if (!sourceDir.exists()) {
-	                sourceDir.mkdir();
-	                paramStr += "<li>Created new modifications directory in source area from which app is deployed: " + sourceDir.toString() + "</li>";
-	            }
-	            sourceDir = new File(sourceDirName + "/images");
-	            if (!sourceDir.exists()) {
-	                sourceDir.mkdir();
-	                paramStr += "<li>Created new image directory: " + sourceDir.toString() + "</li>";
-	            }
-	            StringTokenizer uploadTokens = new StringTokenizer( destinationStr,"/");
-	            int uploadDepthCount = uploadTokens.countTokens();
-	            if ( uploadDepthCount > 0 ) {
-	                for (int i=0; i<uploadDepthCount; i++ ) {
-	                    String nextDirStr = uploadTokens.nextToken();
-	                    sourceDir = new File( sourceDir.getAbsolutePath() + "/" + nextDirStr);
-	                    if ( !sourceDir.exists() ) {
-	                        sourceDir.mkdir();
-	                        paramStr += "<li>Created new source directory: " + sourceDir.toString() + "</li>";
-	                    }
-	                }
-	            }
-        	} catch (Exception e) {
-        		log.warn("Unable to use source directory to back up uploaded image", e);
-        	}
+				removeExistingImage(person, fileModelHelper);
+				storeMainImageFile(person, imageFileItem, fileModelHelper);
+				generateThumbnailAndStore(person, imageFileItem,
+						fileModelHelper);
 
-            String contentDirName = websiteDirName;
-            // check if top level output directory exists
-            contentDir = new File(contentDirName);
-            if (!contentDir.exists()) {
-                contentDir.mkdir();
-                paramStr += "<li>Created new web site directory: " + contentDir.toString() + "</li>";
-            }
-            contentDirName += "/" + "images";
-            contentDir = new File( contentDirName );
-            if (!contentDir.exists()) {
-                contentDir.mkdir();
-                paramStr += "<p>Created new website content directory " + contentDir.toString() + "</p>";
-            }
-            StringTokenizer outputTokens = new StringTokenizer( destinationStr,"/");
-            int outputDepthCount = outputTokens.countTokens();
-            if ( outputDepthCount > 0 ) {
-                for (int i=0; i<outputDepthCount; i++ ) {
-                    String nextDirStr = outputTokens.nextToken();
-                    contentDir = new File( contentDir.getAbsolutePath() + "/" + nextDirStr);
-                    if (!contentDir.exists()) {
-                        contentDir.mkdir();
-                        paramStr += "<li>Created new content directory: " + contentDir.toString() + "</li>";
-                    }
-                }
-            }
-        } catch (Exception ex) {
-            log.error("Exception when creating directories ", ex);
-            request.setAttribute("processError","Upload failed: unable to create directories for uploads.  See error log for details.");
-            getServletConfig().getServletContext().getRequestDispatcher("/uploadimages.jsp").forward( request, response );
-            return;
-        }
+				displaySuccess(request, response, person);
+			} catch (UserErrorException e) {
+				// No need to log it - it's a user error.
+				errors.add(e.getMessage());
+				displayFailure(request, response, errors);
+			} catch (IllegalStateException e) {
+				log.error(e);
+				errors.add(e.getMessage());
+				displayFailure(request, response, errors);
+			}
+		} catch (FileUploadException e) {
+			log.error(e);
+			errors.add(e.getMessage());
+			displayFailure(rawRequest, response, errors);
+		}
+	}
 
-        paramStr += "</ul></p></td></tr></table>";
-        request.setAttribute("prevparams", paramStr );
+	/**
+	 * The image must be present and non-empty, and must have a mime-type that
+	 * represents an image we support.
+	 * 
+	 * We rely on the fact that a {@link FileUploadServletRequest} will always
+	 * have a map of {@link FileItem}s, even if it is empty. However, that map
+	 * may not contain the field that we want, or that field may contain an
+	 * empty file.
+	 * 
+	 * @throws UserErrorException
+	 *             if there is no file, if it is empty, or if it is not an image
+	 *             file.
+	 */
+	@SuppressWarnings("unchecked")
+	private FileItem validateImageFromRequest(HttpServletRequest request)
+			throws UserErrorException {
+		Map<String, List<FileItem>> map = (Map<String, List<FileItem>>) request
+				.getAttribute(FileUploadServletRequest.FILE_ITEM_MAP);
+		List<FileItem> list = map.get(FILE_FIELD_NAME);
+		if ((list == null) || list.isEmpty()) {
+			throw new UserErrorException("The form did not contain a '"
+					+ FILE_FIELD_NAME + "' field.");
+		}
 
-        String originalFileName = null;
-        String infileFullPathName = null;
-        String filesystemName = null;
+		FileItem file = list.get(0);
+		if (file.getSize() == 0) {
+			throw new UserErrorException("No file was uploaded in '"
+					+ FILE_FIELD_NAME + "'");
+		}
 
-        Enumeration files = multi.getFileNames();
-        if (files.hasMoreElements()) {
-            String thisInputName = (String)files.nextElement();
-            filesystemName = multi.getFilesystemName(thisInputName); // file name after any renaming, e.g., if file by that name already exists
-            originalFileName = multi.getOriginalFileName(thisInputName); // before renaming policy applied
-            if (thisInputName == null || thisInputName.equals("")) {
-                log.error("No input file provided for upload");
-                request.setAttribute("processError","Error: no input file provided for upload");
-                getServletConfig().getServletContext().getRequestDispatcher("/uploadimages.jsp").forward( request, response );
-                return;
-            }
+		String filename = getSimpleFilename(file);
+		String mimeType = getMimeType(file);
+		if (!RECOGNIZED_FILE_TYPES.containsValue(mimeType)) {
+			throw new UserErrorException("'" + filename
+					+ "' is not a recognized image file type. "
+					+ "These are the recognized types: "
+					+ RECOGNIZED_FILE_TYPES);
+		}
 
-            String typeStr = multi.getContentType(thisInputName);
-            if ( typeStr==null || typeStr.equals("")) {
-                log.error("Error: if input file provided, it has no readable file type");
-                request.setAttribute("processError","Error: if an input file was provided, it has no readable file type");
-                getServletConfig().getServletContext().getRequestDispatcher("/uploadimages.jsp").forward( request, response );
-                return;
-            }
+		return file;
+	}
 
-            StringTokenizer contentTypeTokens = new StringTokenizer( typeStr,"/");
-            int typeTokenCount = contentTypeTokens.countTokens();
-            if ( typeTokenCount == 2 ) {
-                for (int i=0; i<typeTokenCount; i++ ) {
-                    String partStr = contentTypeTokens.nextToken();
-                    switch (i) {
-                        case 0: if (!partStr.equalsIgnoreCase(primaryContentTypeStr)) {
-                                    log.error("Error: file uploaded (" + originalFileName + ") is not of primary content type '" + primaryContentTypeStr + "'");
-                                    request.setAttribute("processError","Error: file uploaded (" + originalFileName + ") is not of primary content type '" + primaryContentTypeStr + "'");
-                                    getServletConfig().getServletContext().getRequestDispatcher("/uploadimages.jsp").forward( request, response );
-                                    return;
-                                }
-                                break;
-                        case 1: if (secondaryContentTypeList.size() > 0) {
-                                    Iterator typeIter = secondaryContentTypeList.iterator();
-                                    boolean typeMatch=false;
-                                    String typeConcat=primaryContentTypeStr;
-                                    int count=0;
-                                    while ( typeIter.hasNext() ) {
-                                        String whichType = (String)typeIter.next();
-                                        if ( count == 0 ) {
-                                            typeConcat="/" + whichType;
-                                        } else {
-                                            typeConcat+=" or " + primaryContentTypeStr + "/" + whichType;
-                                        }
-                                        ++count;
-                                        if (whichType.equals("*") || whichType.equalsIgnoreCase(partStr)) {
-                                            typeMatch=true;
-                                        }
-                                    }
-                                    if (!typeMatch) {
-                                        log.error("Error: file uploaded (" + originalFileName + ") has content type " + typeStr + " that does not match '" + primaryContentTypeStr + typeConcat + "'");
-                                        request.setAttribute("processError","Error: file uploaded (" + originalFileName + ") has content type " + typeStr + " that does not match " + primaryContentTypeStr + typeConcat );
-                                        getServletConfig().getServletContext().getRequestDispatcher("/uploadimages.jsp").forward( request, response );
-                                        return;
-                                    }
-                                } // else any secondary type accepted
-                                break;
-                    }
-                }
-            } else {
-                log.error("Error: file uploaded (" + originalFileName + ") has unrecognized content type '" + typeStr + "'");
-                request.setAttribute("processError","Error: file uploaded (" + originalFileName + ") has unrecognized content type '" + typeStr + "'");
-                getServletConfig().getServletContext().getRequestDispatcher("/uploadimages.jsp").forward( request, response );
-                return;
-            }
+	/**
+	 * The entity URI must be present and non-empty, and must refer to an
+	 * existing individual.
+	 * 
+	 * @throws UserErrorException
+	 *             if there is no entity URI, or if it is empty.
+	 */
+	private Individual validateEntityUriFromRequest(VitroRequest request)
+			throws UserErrorException {
+		String entityUri = request.getParameter(URI_FIELD_NAME);
+		if (entityUri == null) {
+			throw new UserErrorException("The form did not contain a '"
+					+ URI_FIELD_NAME + "' field.");
+		}
+		entityUri = entityUri.trim();
+		if (entityUri.length() == 0) {
+			throw new UserErrorException("The form did not contain a '"
+					+ URI_FIELD_NAME + "' field.");
+		}
 
-            File f = multi.getFile(thisInputName); // see Core Java v1 pp 769 onward on File managment
-            if (f != null) {
-                 infileFullPathName = f.toString();
-            }
-        }
+		Individual entity = request.getWebappDaoFactory().getIndividualDao()
+				.getIndividualByURI(entityUri);
+		if (entity == null) {
+			throw new UserErrorException(
+					"No entity exists with the provided URI: '" + entityUri
+							+ "'");
+		}
+		return entity;
+	}
 
-        request.setAttribute("input",originalFileName); // but can't specify value parameter for form inputs of type file
+	/**
+	 * If this entity already had a main image, remove the connection. If the
+	 * image and the thumbnail are no longer used by anyone, remove them from
+	 * the model, and from the file system.
+	 */
+	private void removeExistingImage(Individual person,
+			FileModelHelper fileModelHelper) {
+		Individual mainImage = fileModelHelper.removeMainImage(person);
+		if (mainImage == null) {
+			return;
+		}
 
-        int posDot = originalFileName.lastIndexOf('.'); //filesystemName.lastIndexOf('.') to increment versions;
-        try {
-            // BufferedReader handles the input file like a TEXT file (you can read lines from it)
-            // BufferedInputStream handles the input file like a BINARY file (if you want to read a line from it you must read
-            //   it character by character until finding the line separator)
-            // They are meant to do DIFFERENT things -- use the class that is more suitable for your task
-            // For uploading text and parsing it use: BufferedReader in = new BufferedReader(new FileReader(infileFullPathName));
-            out= new PrintWriter( new FileWriter( tempDir + "/" + originalFileName.substring(0,posDot) + ".html"));
-            request.setAttribute("outputLink","<a target='_new' href='batch/" + userName + "/" + originalFileName.substring(0,posDot) + ".html'>"+originalFileName.substring(0,posDot)+".html</a>");
+		Individual thumbnail = FileModelHelper.getThumbnailForImage(mainImage);
 
-        } catch ( IOException ex ) {
-            request.setAttribute("processError","error creating report file " + tempDir + "/" + originalFileName.substring(0,posDot) + ".html: " + ex.getMessage());
-            getServletConfig().getServletContext().getRequestDispatcher("/uploadimages.jsp").forward( request, response );
-            return;
-        }
+		if (!fileModelHelper.isFileReferenced(mainImage)) {
+			Individual bytes = FileModelHelper.getBytestreamForFile(mainImage);
+			if (bytes != null) {
+				try {
+					fileStorage.deleteFile(bytes.getURI());
+				} catch (IOException e) {
+					throw new IllegalStateException(
+							"Can't delete the main image file: '"
+									+ bytes.getURI() + "'", e);
+				}
+			}
+			fileModelHelper.removeFileFromModel(mainImage);
+		}
+		if (!fileModelHelper.isFileReferenced(thumbnail)) {
+			Individual bytes = FileModelHelper.getBytestreamForFile(thumbnail);
+			if (bytes != null) {
+				try {
+					fileStorage.deleteFile(bytes.getURI());
+				} catch (IOException e) {
+					throw new IllegalStateException(
+							"Can't delete the thumbnail file: '"
+									+ bytes.getURI() + "'", e);
+				}
+			}
+			fileModelHelper.removeFileFromModel(thumbnail);
+		}
+	}
 
-        out.println("<html>");
-        out.println("<head>");
-        out.println("<title>Upload Report</title>");
-        out.println("<script language='Javascript'>");
-        out.println("function destroy( windowRef ) {");
-        out.println("  if (windowRef && !windowRef.closed) {");
-        out.println("     windowRef.close();");
-        out.println("  }");
-        out.println("}");
-        out.println("</script>");
-        out.println("</head>");
-        out.println("<body>");
-        out.println("<h2>Image Upload Report</h2>");
+	/**
+	 * Store this image in the model and in the file storage system, and set it
+	 * as the main image for this person.
+	 */
+	private void storeMainImageFile(Individual person, FileItem imageFileItem,
+			FileModelHelper fileModelHelper) {
+		InputStream inputStream = null;
+		try {
+			inputStream = imageFileItem.getInputStream();
+			String mimeType = getMimeType(imageFileItem);
+			String filename = getSimpleFilename(imageFileItem);
 
-        out.println( loadImage(request,originalFileName,overwriteExistingImage,destinationStr,imageTypeStr,individualURI,remoteLocStr));
+			// Create the file individuals in the model
+			Individual byteStream = fileModelHelper
+					.createByteStreamIndividual();
+			Individual file = fileModelHelper.createFileIndividual(mimeType,
+					filename, byteStream);
 
-        String contextName = request.getContextPath(); // e.g., /vivo
-        log.info("context name from getContextPath(): " + contextName);
+			// Store the file in the FileStorage system.
+			fileStorage.createFile(byteStream.getURI(), filename, inputStream);
 
-        out.println("<p><a href='" +  contextName + File.separator + "images" + File.separator + destinationStr + File.separator + originalFileName + "'>" + originalFileName + "</a></p>");
-        out.println("<p><img width='100' src='" + contextName + File.separator + "images" + File.separator + destinationStr + File.separator + originalFileName + "' alt='" + originalFileName + "'/></p>");
-        out.println("<p><img src='" + contextName + File.separator + "images" + File.separator + destinationStr + File.separator + originalFileName + "' alt='" + originalFileName + "'/></p>");
+			// Set the file as the main image for the person.
+			fileModelHelper.setAsMainImageOnEntity(person, file);
+		} catch (FileAlreadyExistsException e) {
+			throw new IllegalStateException(
+					"Can't create the main image file: " + e.getMessage(), e);
+		} catch (IOException e) {
+			throw new IllegalStateException("Can't create the main image file",
+					e);
+		} finally {
+			if (inputStream != null) {
+				try {
+					inputStream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
 
-        // Actually open the input file for copying
-        BufferedInputStream input = new BufferedInputStream(new FileInputStream(infileFullPathName));
+	/**
+	 * Generate the thumbnail image from the original, store in the model and in
+	 * the file storage system, and set it as the thumbnail on the main image.
+	 */
+	private void generateThumbnailAndStore(Individual person,
+			FileItem imageFileItem, FileModelHelper fileModelHelper) {
 
+		InputStream inputStream = null;
+		try {
+			inputStream = scaleImageForThumbnail(
+					imageFileItem.getInputStream(), THUMBNAIL_WIDTH,
+					THUMBNAIL_HEIGHT);
+			String mimeType = RECOGNIZED_FILE_TYPES.get(".jpg");
+			String filename = createThumbnailFilename(getSimpleFilename(imageFileItem));
 
-        // Create the copies of the uploaded file
-        FileOutputStream sourceFile = null;     // The copy of the uploaded file for the working directory
-        FileOutputStream contentFile = null;  // the copy put directly on the web site so the user can see it before next ant deploy is done
-        if (sourceDir != null) {
-	        try {
-	            sourceFile = new FileOutputStream(sourceDir + File.separator + originalFileName); // fileSystemName to increment versions); // apparently don't need File.separator
-	        } catch (FileNotFoundException fnf ) {
-	            request.setAttribute("processError","Warning: could not create image backup file (" + sourceDir + File.separator + originalFileName);
-	        }
-        } else {
-        	String msg = "<p>Warning: unable to make a backup copy of uploaded image.</p>";
-        	Object processErrorAttribute = request.getAttribute("processError");
-        	if ( (processErrorAttribute != null) && (processErrorAttribute instanceof String) ) {
-        		request.setAttribute("processError",((String)processErrorAttribute)+msg);
-        	} else {
-        		request.setAttribute("processError",msg);
-        	}
-        }
-        try {
-            contentFile  = new FileOutputStream(contentDir + File.separator + originalFileName); // fileSystemName to increment versions);
-        } catch (FileNotFoundException fnf) {
-            out.println("Error: the image file cannot be created<br/>");
-            out.println(fnf.getMessage() + "<br/>");
-            request.setAttribute("processError","Error: could not create image file (" + contentDir + File.separator + originalFileName);
-            getServletConfig().getServletContext().getRequestDispatcher("/uploadimages.jsp").forward( request, response );
-            return;
-        }
+			// Create the file individuals in the model
+			Individual byteStream = fileModelHelper
+					.createByteStreamIndividual();
+			Individual file = fileModelHelper.createFileIndividual(mimeType,
+					filename, byteStream);
 
+			// Store the file in the FileStorage system.
+			fileStorage.createFile(byteStream.getURI(), filename, inputStream);
 
-         /* Read from the Input Stream and write into the File OutputStream */
-        int length = 1000;
-        byte[] byteArray = new byte[1000];
-        try {
-            length = input.read( byteArray );
-            while (length != -1) {
-                if (sourceFile != null)
-                    sourceFile.write( byteArray, 0, length);
-                contentFile.write( byteArray, 0, length);
-                length = input.read( byteArray );
-            }
-        } catch (IOException ioe) {
-            out.println("The input file does not seem to be readable (IO Error): </br>");
-            out.println( ioe.getMessage() + "<br/>");
-        } catch (Exception e) {
-            out.println("<br> The Following Exception occured in the servlet:</br>");
-            out.println("<br>" + e.toString() + " </br>");
-        }
+			// Set the file as the thumbnail on the main image for the person.
+			fileModelHelper.setThumbnailOnIndividual(person, file);
+		} catch (FileAlreadyExistsException e) {
+			throw new IllegalStateException("Can't create the thumbnail file: "
+					+ e.getMessage(), e);
+		} catch (IOException e) {
+			throw new IllegalStateException("Can't create the thumbnail file",
+					e);
+		} finally {
+			if (inputStream != null) {
+				try {
+					inputStream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
 
-        if (sourceFile != null)
-            sourceFile.close();
-        contentFile.close();
+	/**
+	 * Everything went fine. Forward back to the JSP.
+	 */
+	private void displaySuccess(VitroRequest request,
+			HttpServletResponse response, Individual person)
+			throws ServletException, IOException {
+		try {
+			request.setAttribute(URI_FIELD_NAME, person.getURI());
 
-        try { // now delete input file from temp directory
-            out.println("<p>opening " + infileFullPathName + " for deletion</p>");
-            File tempFile = new File( infileFullPathName );
-            if ( tempFile.exists()) {
-                try {
-                    boolean gone = tempFile.delete();
-                    if ( gone ) {
-                        out.println("<p>deleted file " + infileFullPathName + " since has been copied to web site</p>");
-                    } else {
-                        out.println("<p>could not delete file " + infileFullPathName + "</p>");
-                    }
-                } catch ( Exception ex ) {
-                    out.println("<p>Exception: " + ex.getMessage() + "<br>");
-                    ex.printStackTrace ();
-                    out.println("</p>");
-                }
-            } else {
-                out.println("<p>Error -- file " + infileFullPathName + " does not exist</p>");
-            }
-        } catch (Exception ex) {
-            out.println("<p>Exception: " + ex.getMessage() + "<br/>");
-            ex.printStackTrace ();
-            out.println("</p>");
-        }
+			String individualURI = person.getURI();
+			String recordName = person.getName();
+			if ((recordName == null) || recordName.isEmpty()) {
+				recordName = "here";
+			}
+			request.setAttribute("processError",
+					"updated individual <a href=\"entity?uri="
+							+ java.net.URLEncoder
+									.encode(individualURI, "UTF-8") + "\">"
+							+ recordName + "</a>");
+			request.setAttribute("outputLink", "<img src='"
+					+ person.getMainImageUri() + "'>");
+			getServletContext().getRequestDispatcher("/uploadimages.jsp")
+					.forward(request, response);
+		} catch (UnsupportedEncodingException e) {
+			log.error("This can't happen.", e);
+		}
+	}
 
-        out.println("<form name='closeForm'><input type='submit' value='close window' onclick='destroy(window)'></form>");
-        out.println("</body></html>");
-        out.flush();
-        out.close();
+	/**
+	 * Problem! Format the error messages and forward back to the JSP.
+	 */
+	private void displayFailure(HttpServletRequest request,
+			HttpServletResponse response, List<String> errors)
+			throws ServletException, IOException {
+		String entityUri = request.getParameter(URI_FIELD_NAME);
+		request.setAttribute(URI_FIELD_NAME, entityUri);
 
-        getServletContext().getRequestDispatcher( "/uploadimages.jsp" ).forward( request, response );
-    }
+		StringBuilder formatted = new StringBuilder();
+		for (String error : errors) {
+			if (formatted.length() > 0) {
+				formatted.append("<br/>");
+			}
+			formatted.append(error);
+		}
 
+		request.setAttribute("processError", formatted.toString());
+		getServletContext().getRequestDispatcher("/uploadimages.jsp").forward(
+				request, response);
+	}
 
-    public String loadImage(HttpServletRequest request,String fileName,boolean overwriteExisting,String destination,String imageType,String individualURI,String optionalRemoteLocStr)
-    {
-        String messageStr="<p>";
+	/**
+	 * Internet Explorer and Opera will give you the full path along with the
+	 * filename. This will remove the path.
+	 */
+	private String getSimpleFilename(FileItem item) {
+		String fileName = item.getName();
+		if (fileName == null) {
+			return null;
+		} else {
+			return FilenameUtils.getName(fileName);
+		}
+	}
 
-        // first check to verify that individual exists .
-        Individual individual = getWebappDaoFactory().getIndividualDao().getIndividualByURI(individualURI);
-        String recordName = null, previousImageStr=null;
-        try {
-            if (individual != null) {
-                recordName = individual.getName();
-                previousImageStr = individual.getImageThumb();
-                messageStr += "<p>Uploading file for individual: " + recordName + "</p>";
-            } else {
-                log.error("Error: no individual found with URI " + individualURI);
-                request.setAttribute("processError","Error: no individual found with URI " + individualURI);
-                messageStr += "Error: no individual found with URI " + individualURI + "</p>";
-                return messageStr;
-            }
-        } catch ( Exception ex ) {
-            log.error("Error: exception on checking individual URI " + individualURI + ": " + ex.getMessage());
-            request.setAttribute("processError","Error: exception on checking individual URI " + individualURI + ": " + ex.getMessage());
-            return messageStr;
-        }
+	/**
+	 * Get the MIME type as supplied by the browser. If none, try to infer it
+	 * from the filename extension and the map of recognized MIME types.
+	 */
+	private String getMimeType(FileItem file) {
+		String mimeType = file.getContentType();
+		if (mimeType != null) {
+			return mimeType;
+		}
 
-        boolean individualUpdated=false;
-        boolean noExistingImage=(previousImageStr==null || previousImageStr.equals(""))? true : false;
-        if (noExistingImage || overwriteExisting) {
-            if (imageType.equalsIgnoreCase("thumb")) {
-                if (optionalRemoteLocStr!=null && !optionalRemoteLocStr.equals("") && !optionalRemoteLocStr.equals("http://")) {
-                    individual.setImageFile(optionalRemoteLocStr);
-                    individual.setImageThumb(destination+"/"+fileName);
-                } else {
-                    individual.setImageThumb(destination+"/"+fileName);
-                }
-            } else {
-                individual.setImageFile(destination+"/"+fileName);
-            }
-            try {
-                getWebappDaoFactory().getIndividualDao().updateIndividual(individual);
-                individualUpdated=true;
-            } catch ( Exception ex ) {
-                log.error("Error: Exception on getWebappDaoFactory().getIndividualDao().updateIndividual(" + individualURI +"); message: " + ex.getMessage());
-                request.setAttribute("processError","Error: Exception on getWebappDaoFactory().getIndividualDao().updateIndividual(" + individualURI +"); message: " + ex.getMessage());
-                return messageStr;
-            }
-        } else if (!noExistingImage) {
-            if (imageType.equalsIgnoreCase("thumb")) {
-                messageStr += "<p>This individual already has a thumbnail image associated with it: " + previousImageStr + "</p>";
-            } else {
-                messageStr += "<p>This individual already has an optional large-size image associated with it: " + previousImageStr + "</p>";
-            }
-        }
+		String filename = getSimpleFilename(file);
+		int periodHere = filename.lastIndexOf('.');
+		if (periodHere == -1) {
+			return null;
+		}
 
-        messageStr += "<table width='70%' border='1' cellspacing='1' cellpadding='1'>";
-        messageStr += "<tr><th>individual id</th><th>image</th></tr>";
-        messageStr += "<tr align='center'>";
-        messageStr += "<td>" + individualURI + "</td>";
-        messageStr += "<td>" + ((fileName == null || fileName.equals("")) ? "<font color='red'>missing image file name</font>" : fileName )   + "</td>";
-        messageStr += "</tr>";
-        messageStr += "</table>";
+		String extension = filename.substring(periodHere);
+		return RECOGNIZED_FILE_TYPES.get(extension);
+	}
 
-        try {
-            if (individualUpdated) {
-                request.setAttribute("processError","updated individual <a href=\"entity?uri=" + java.net.URLEncoder.encode(individualURI,"UTF-8") + "\">"+recordName+"</a>");
-            } else {
-                request.setAttribute("processError","individual <a href=\"entity?uri=" + java.net.URLEncoder.encode(individualURI,"UTF-8") + "\">"+recordName+"</a> already has an image: please confirm if you wish to replace it");
-            }
-        } catch (UnsupportedEncodingException ex) {
-            request.setAttribute("processError","Could not create link to individual "+recordName+" (URI: "+individualURI+")");
-        }
+	private InputStream scaleImageForThumbnail(InputStream source, int width,
+			int height) throws IOException {
+		BufferedImage bsrc = ImageIO.read(source);
 
-        return messageStr;
-    }
+		AffineTransform at = AffineTransform.getScaleInstance((double) width
+				/ bsrc.getWidth(), (double) height / bsrc.getHeight());
 
-    /**
-     * attempts to get the property file from UPLOAD_SERVLET_PROPERTIES
-     * and returns the property UploadImagesServlet.sourceDirName.
-     * @return returns the property UploadImagesServlet.sourceDirName
-     * @throws IOException
-     */
-    private  String getSourceDirName() throws IOException{
-        String dirName = ConfigurationProperties.getProperty("upload.directory");
-        if( dirName == null ) {
-            log.error("getSourceDirName(): property sourceDirName not defined in configuration properties");
-        } else {
-            File dir = new File(dirName);
-            if(!dir.exists()) {
-                log.warn("getSourceDirName(): " +
-                    "The specified upload directory "+ dirName + " does not exist. " +
-                    "Not saving upload images to source dir.");
-            }
-            if(!dir.canWrite()) {
-                log.warn("getSourceDirName(): " +
-                    "The specified upload directory "+ dirName + " is not writable." +
-                    " Not saving upload images to source dir.");
-            }
-        }
-        return dirName;
-    }
+		BufferedImage bdest = new BufferedImage(width, height,
+				BufferedImage.TYPE_INT_RGB);
+		Graphics2D g = bdest.createGraphics();
 
-    private static String stripDoubleQuotes( String termStr ) {
-        if (termStr==null || termStr.equals("")) {
-            return termStr;
-        }
-        int whichChar = 32; //double quote
-        int characterPosition= -1;
-        while ( ( characterPosition = termStr.indexOf( whichChar, characterPosition+1 ) ) >= 0 ) {
-            termStr = termStr.substring( characterPosition+1 );
-            ++characterPosition;
-        }
-        return termStr;
-    }
+		g.drawRenderedImage(bsrc, at);
 
+		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+		ImageIO.write(bdest, "JPG", buffer);
+		return new ByteArrayInputStream(buffer.toByteArray());
+	}
 
-    private static String escapeSingleQuotes( String termStr ) {
-        if (termStr==null || termStr.equals("")) {
-            return termStr;
-        }
-        int whichChar = 39; //single quote
-        int characterPosition= -1;
-        while ( ( characterPosition = termStr.indexOf( whichChar, characterPosition+1 ) ) >= 0 ) {
-            if ( characterPosition == 0 ) // just drop it
-                termStr = termStr.substring( characterPosition+1 );
-            else if ( termStr.charAt(characterPosition-1) != 92 ) // already escaped
-                termStr = termStr.substring(0,characterPosition) + "\\" + termStr.substring(characterPosition);
-            ++characterPosition;
-        }
-        return termStr;
-    }
+	/**
+	 * Create a name for the thumbnail from the name of the original file.
+	 * "myPicture.anything" becomes "thumbnail_myPicture.jpg".
+	 */
+	private String createThumbnailFilename(String filename) {
+		String prefix = "thumbnail_";
+		String extension = ".jpg";
+		int periodHere = filename.lastIndexOf('.');
+		if (periodHere == -1) {
+			return prefix + filename + extension;
+		} else {
+			return prefix + filename.substring(0, periodHere) + extension;
+		}
+	}
 
-
-    private static String stripLeadingAndTrailingSpaces( String termStr ) {
-        int characterPosition= -1;
-
-        while ( ( characterPosition = termStr.indexOf( 32, characterPosition+1 ) ) == 0 ) {
-            termStr = termStr.substring(characterPosition+1);
-        }
-        while ( termStr.indexOf(32) >= (termStr.length()-1) ) {
-            termStr = termStr.substring(0,termStr.length()-1);
-        }
-        return termStr;
-    }
+	/**
+	 * Indicates that we should complain to the user.
+	 */
+	private static class UserErrorException extends Exception {
+		UserErrorException(String message) {
+			super(message);
+		}
+	}
 }
-
-
-

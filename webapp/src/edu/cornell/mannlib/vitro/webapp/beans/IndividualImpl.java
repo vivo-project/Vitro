@@ -14,7 +14,15 @@ import java.util.*;
  * Represents a single entity record.
 */
 public class IndividualImpl extends BaseResourceBean implements Individual, Comparable<Individual> {
-    public String name = null;
+	/**
+	 * This can be used as a "not initialized" indicator for a property that
+	 * could validly be set to <code>null</code>. If <code>get()</code> is
+	 * called on such a property, and the property has this value, the correct
+	 * value can be fetched and cached.
+	 */
+	protected static final String NOT_INITIALIZED = "__%NOT_INITIALIZED%__";
+
+	public String name = null;
     public String vClassURI = null;
     protected VClass vClass = null;
     protected List<VClass> directVClasses = null;
@@ -35,10 +43,11 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
     protected String moniker = null;
     protected String url = null;
     protected String description = null;
-    protected String imageFile = null;
     protected String anchor = null;
     protected String blurb = null;
-    protected String imageThumb = null;
+    protected String mainImageUri = NOT_INITIALIZED;
+    protected String imageUrl;
+    protected String thumbUrl;
     protected String citation = null;
     protected int statusId = 0;
     protected String status = null;
@@ -249,19 +258,30 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
     public String getStatus()         {return status;}
     public void   setStatus(String s) {status=s;     }
 
-    public String getImageFile() {
-        return imageFile;
-    }
-    public void setImageFile(String imageFile) {
-        this.imageFile = imageFile;
-    }
-    public String getImageThumb() {
-        return imageThumb;
-    }
-    public void setImageThumb(String imageThumb) {
-        this.imageThumb = imageThumb;
-    }
-    public String getUrl() {
+    
+	@Override
+	public String getMainImageUri() {
+		return (mainImageUri == NOT_INITIALIZED) ? null : mainImageUri;
+	}
+
+	@Override
+	public void setMainImageUri(String mainImageUri) {
+		this.mainImageUri = mainImageUri;
+		this.imageUrl = null;
+		this.thumbUrl = null;
+	}
+
+	@Override
+	public String getImageUrl() {
+		return "imageUrl";
+	}
+
+	@Override
+	public String getThumbUrl() {
+		return "thumbUrl";
+	}
+
+	public String getUrl() {
         return url;
     }
     public void setUrl(String url) {

@@ -116,8 +116,6 @@ public class CloneEntityServlet extends BaseEditController {
         ind.setBlurb("");
         ind.setDescription("");
         ind.setCitation("");
-        ind.setImageFile("");
-        ind.setImageThumb("");
  
         String cloneURI=individualDao.insertNewIndividual(ind);
         if (cloneURI == null){ log.error("Error inserting cloned individual"); return; }

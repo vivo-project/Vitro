@@ -34,7 +34,6 @@
  	<c:out value="${requestScope.columns}" default="8"/>
 </c:set>
 
-<c:set var='IMG_DIR' value='images/' />
 <c:set var='IMG_WIDTH' value='100'/>
 
 <table class='tabEntities entityListForGalleryTab'>
@@ -43,15 +42,14 @@
 	  	<c:forEach var='col' begin="1" end="${columns}" step="1">
 	  		<c:set var='ent' value='${entities[count]}'/>
 			<c:set var='count' value='${count + 1}'/>
-	  		<c:if test="${ not empty ent and not empty ent.imageThumb}">
+	  		<c:if test="${ not empty ent and not empty ent.thumbUrl}">
 			<td>
 				<c:url var="entityHref" value="/entity">
 					<c:param name="home" value="${portal.portalId}"/>
 					<c:param name="uri" value="${ent.URI}"/>
 				</c:url>
 				<a class="image" href="<c:out value="${entityHref}"/>" >
-					<c:url var="imageSrc" value="${IMG_DIR}${ent.imageThumb}"/>
-					<img width="${IMG_WIDTH}" src="<c:out value="${imageSrc}"/>" title="${ent.name}" alt="${ent.name}" />
+					<img width="${IMG_WIDTH}" src="<c:url value='${ent.thumbUrl}'/>" title="${ent.name}" alt="${ent.name}" />
 				</a>
 			</td>
 			</c:if>

@@ -36,7 +36,7 @@ public class TabEntityFactoryGalleryJena extends TabEntityFactoryJena
         implements TabEntityFactory {
 
     private TabEntityFactory _innerFactory = null;
-    public final UnaryFunctor<Individual,Boolean>onlyWithThumbs = new OnlyWithThumbs();
+    public final UnaryFunctor<Individual,Boolean>onlyWithMainImage = new OnlyWithMainImage();
 
     public TabEntityFactoryGalleryJena(TabEntityFactory innerEntFactory, Tab tab, int auth_level, ApplicationBean appBean, WebappDaoFactoryJena wadf) {
         super(tab, auth_level, appBean, wadf);
@@ -79,7 +79,7 @@ public class TabEntityFactoryGalleryJena extends TabEntityFactoryJena
             return Collections.EMPTY_LIST;
 
         List filteredEnts = new LinkedList( );
-        Filter.filter(ents,onlyWithThumbs,filteredEnts);
+        Filter.filter(ents,onlyWithMainImage,filteredEnts);
 
         if( filteredEnts.size() <= numberOfrequestedEnts)
             return filteredEnts;
@@ -94,10 +94,10 @@ public class TabEntityFactoryGalleryJena extends TabEntityFactoryJena
         return entsOut;
     }
 
-    private class OnlyWithThumbs extends UnaryFunctor<Individual,Boolean>{
+    private class OnlyWithMainImage extends UnaryFunctor<Individual,Boolean>{
         @Override
         public Boolean fn(Individual arg) {
-            return  arg.getImageThumb() != null;
+            return  arg.getMainImageUri()!= null;
         }
     }
 }

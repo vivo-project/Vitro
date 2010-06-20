@@ -38,7 +38,6 @@ public class EntitySerializer implements Serializer {
     public static final String IMAGEFILE_MBER= "imageFile";
     public static final String ANCHOR_MBER= "anchor";
     public static final String BLURB_MBER= "blurb";
-    public static final String IMAGETHUMB_MBER= "imageThumb";
     public static final String CITATION_MBER= "citation";
     public static final String STATUS_MBER= "status";
     public static final String PROPERTYLIST_MBER= "propertyList";
@@ -82,10 +81,9 @@ public class EntitySerializer implements Serializer {
         context.serialize(new QName("",  SUNRISE_MBER), null, ent.getSunrise());
         context.serialize(new QName("",  SUNSET_MBER), null, ent.getSunset());
         context.serialize(new QName("",  TIMEKEY_MBER), null, ent.getTimekey());
-        context.serialize(new QName("",  IMAGEFILE_MBER), null, ent.getImageFile());
+        context.serialize(new QName("",  IMAGEFILE_MBER), null, ent.getMainImageUri());
         context.serialize(new QName("",  ANCHOR_MBER), null, ent.getAnchor());
         context.serialize(new QName("",  BLURB_MBER), null, ent.getBlurb());
-        context.serialize(new QName("",  IMAGETHUMB_MBER), null, ent.getImageThumb());
         context.serialize(new QName("",  CITATION_MBER), null, ent.getCitation());
         context.serialize(new QName("",  STATUS_MBER), null, ent.getStatus());
         context.serialize(new QName("",  LINKSLIST_MBER), null, ent.getLinksList());

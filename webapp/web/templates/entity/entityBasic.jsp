@@ -63,18 +63,8 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
 <c:set var="showEdits" value="${showSelfEdits || showCuratorEdits}" scope="request"/>
 <c:set var="editingClass" value="${showEdits ? 'editing' : ''}" scope="request"/>
 
-<c:set var='imageDir' value='images' />
 <c:set var="themeDir"><c:out value="${portalBean.themeDir}" /></c:set>
 <%
-    //here we build up the url for the larger image.
-    String imageUrl = null;
-    if (entity.getImageFile() != null && 
-        entity.getImageFile().indexOf("http:")==0) {
-        imageUrl =  entity.getImageFile();
-    } else {
-        imageUrl = response.encodeURL( "/images/" + entity.getImageFile() );                     
-    }
-
     //anytime we are at an entity page we shouldn't have an editing config or submission
     session.removeAttribute("editjson");
     EditConfiguration.clearAllConfigsInSession(session);
@@ -196,28 +186,26 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
             </c:if>   
             
             <%-- Thumbnail (with citation) --%>
-            <c:if test="${showEdits || !empty entity.imageThumb}">
+            <c:if test="${showEdits || !empty entity.thumbUrl}">
 	            <div id="dprop-vitro-image" class="propsItem ${editingClass}"> 
-	            	<c:set var="mayEditThumbnail"><edLnk:editLinks item="<%= VitroVocabulary.IMAGETHUMB %>" icons="false" /></c:set>
-	                <c:if test="${showEdits and !empty mayEditThumbnail}">
+	            	<c:set var="mayEditImage"><edLnk:editLinks item="<%= VitroVocabulary.IND_MAIN_IMAGE %>" icons="false" /></c:set>
+	                <c:if test="${showEdits and !empty mayEditImage}">
 	                    <h3 class="propertyName">image</h3>
-	                    <edLnk:editLinks item="<%= VitroVocabulary.IMAGETHUMB %>" icons="false" />
+	                    <edLnk:editLinks item="<%= VitroVocabulary.IND_MAIN_IMAGE %>" icons="false" />
 	                </c:if>
-	                <c:if test="${!empty entity.imageThumb}">
+	                <c:if test="${!empty entity.thumbUrl}">
 	                    <div class="datatypeProperties">
 	                        <div class="datatypePropertyValue">
 	                            <div class="statementWrap thumbnail"> 
 	                            <c:set var="imageTitle" value="${entity.name}" />              
-	                                <c:if test="${!empty entity.imageFile}">
-	                                    <c:url var="imageUrl" value="/${imageDir}/${entity.imageFile}" />
-	                                    <a class="image" href="${imageUrl}">
+	                                <c:if test="${!empty entity.imageUrl}">
+	                                    <a class="image" href="<c:url value='${entity.imageUrl}'/>">
 	                                    <c:set var="imageTitle" value="click to view larger image in new window" />
 	                                </c:if>
-	                                <c:url var="imageSrc" value='/${imageDir}/${entity.imageThumb}'/>
-	                                <img src="<c:out value="${imageSrc}"/>" title="${imageTitle}" alt="" width="150"/>
-	                                <c:if test="${!empty entity.imageFile}"></a></c:if>
+	                                <img src="<c:url value='${entity.thumbUrl}'/>" title="${imageTitle}" alt="" width="150"/>
+	                                <c:if test="${!empty entity.imageUrl}"></a></c:if>
 	                                <c:if test="${showEdits}">
-	                                    <c:set var="editLinks"><edLnk:editLinks item="<%= VitroVocabulary.IMAGETHUMB %>" data="${entity.imageThumb}" icons="false"/></c:set>
+	                                    <c:set var="editLinks"><edLnk:editLinks item="<%= VitroVocabulary.IND_MAIN_IMAGE %>" data="${entity.thumbUrl}" icons="false"/></c:set>
 	                                    <c:if test="${!empty editLinks}"><span class="editLinks">${editLinks}</span></c:if>                                                                     
 	                                </c:if>                                   
 	                            </div>
@@ -282,7 +270,7 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
             </c:if>   
                       
             <%-- Citation, if no thumbnail --%>
-            <c:if test="${empty entity.imageThumb}"> 
+            <c:if test="${empty entity.thumbUrl}"> 
                 <jsp:include page="entityCitation.jsp" />
             </c:if>
             

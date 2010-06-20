@@ -55,15 +55,15 @@
 
 <owl:ObjectProperty rdf:about="#thumbnailImage">
 	<rdfs:domain><owl:Class rdf:about="#File"/></rdfs:domain>
- <rdfs:range><owl:Class rdf:about="#File"/></rdfs:range>
+	<rdfs:range><owl:Class rdf:about="#File"/></rdfs:range>
 </owl:ObjectProperty>
 
 <owl:ObjectProperty rdf:about="#mainImage">
- <rdfs:range><owl:Class rdf:about="#File"/></rdfs:range>
+	<rdfs:range><owl:Class rdf:about="#File"/></rdfs:range>
 </owl:ObjectProperty>
 
 <owl:ObjectProperty rdf:about="#image">
- <rdfs:range><owl:Class rdf:about="#File"/></rdfs:range>
+	<rdfs:range><owl:Class rdf:about="#File"/></rdfs:range>
 </owl:ObjectProperty>
 
 </rdf:RDF>

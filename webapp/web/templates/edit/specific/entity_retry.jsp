@@ -103,17 +103,5 @@
         </td>
     </tr>
 
-    <tr class="editformcell" id='thumbnailFilenameTr'>
-        <td id="thumbnailTd" valign="bottom" colspan="1">
-			<b>Thumbnail Filename</b> <em>Optional and usually more convenient to upload from previous screen</em><br/>
-                <input type="text" name="ImageThumb" value="<form:value name="ImageThumb"/>" maxlength="255" />
-                <p class="error"><form:error name="ImageThumb"/></p>
-        </td>
-        <td id="optionalImageTd" valign="bottom" colspan="1">
-			<b>Optional Larger Image</b> <em>(filename or full path)</em>
-                <input type="text" name="ImageFile" value="<form:value name="ImageFile"/>" maxlength="255" />
-                <p class="error"><form:error name="ImageFile"/></p>
-        </td>
-    </tr>
 
 
