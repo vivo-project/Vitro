@@ -30,7 +30,7 @@ public class NoThumbsAdjuster extends FsuScanner {
 	 */
 	public void adjust() {
 		updateLog.section("Creating thumbnails to match main images.");
-		
+
 		ResIterator haveImage = model.listResourcesWithProperty(imageProperty);
 		try {
 			while (haveImage.hasNext()) {
@@ -56,12 +56,12 @@ public class NoThumbsAdjuster extends FsuScanner {
 	private void createThumbnailFromMainImage(Resource resource) {
 		String mainFilename = getValues(resource, imageProperty).get(0);
 		String thumbFilename = addFilenamePrefix("_thumbnail_", mainFilename);
-		thumbFilename = checkNameConflicts(thumbFilename);
 		updateLog.log(resource, "creating a thumbnail at '" + thumbFilename
 				+ "' from the main image at '" + mainFilename + "'");
 
 		File mainFile = new File(imageDirectory, mainFilename);
 		File thumbFile = new File(imageDirectory, thumbFilename);
+		thumbFile = checkNameConflicts(thumbFile);
 		try {
 			generateThumbnailImage(mainFile, thumbFile,
 					FileStorageUpdater.THUMBNAIL_WIDTH,

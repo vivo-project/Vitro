@@ -52,13 +52,13 @@ public class AllThumbsAdjuster extends FsuScanner {
 	private void createMainImageFromThumbnail(Resource resource) {
 		String thumbFilename = getValues(resource, thumbProperty).get(0);
 		String mainFilename = addFilenamePrefix("_main_image_", thumbFilename);
-		mainFilename = checkNameConflicts(mainFilename);
 		updateLog.log(resource, "creating a main file at '" + mainFilename
 				+ "' to match the thumbnail at '" + thumbFilename + "'");
 
 		try {
 			File thumbFile = new File(imageDirectory, thumbFilename);
 			File mainFile = new File(imageDirectory, mainFilename);
+			mainFile = checkNameConflicts(mainFile);
 			FileUtil.copyFile(thumbFile, mainFile);
 
 			resource.addProperty(imageProperty, mainFilename);

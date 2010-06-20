@@ -96,27 +96,27 @@ public abstract class FsuScanner {
 	 * We are about to create a file - if a file of this name already exists,
 	 * increment the name until we have no collision.
 	 * 
-	 * @return the original name, or the incremented name.
+	 * @return the original file, or the file with the incremented name.
 	 */
-	protected String checkNameConflicts(final String path) {
-		File file = new File(path);
+	protected File checkNameConflicts(final File file) {
 		if (!file.exists()) {
 			// No conflict.
-			return path;
+			return file;
 		}
 
 		File parent = file.getParentFile();
 		String filename = file.getName();
 		for (int i = 0; i < 100; i++) {
-			file = new File(parent, i + filename);
-			if (!file.exists()) {
-				updateLog.log("File '" + path + "' already exists, using '"
-						+ file + "' to avoid conflict.");
-				return file.getPath();
+			File newFile = new File(parent, i + filename);
+			if (!newFile.exists()) {
+				updateLog.log("File '" + file + "' already exists, using '"
+						+ newFile + "' to avoid conflict.");
+				return newFile;
 			}
 		}
-		
-		updateLog.error("File '' already exists. Unable to avoid conflict.");
-		return path;
+
+		updateLog.error("File '" + file
+				+ "' already exists. Unable to avoid conflict.");
+		return file;
 	}
 }
