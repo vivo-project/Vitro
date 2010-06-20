@@ -584,7 +584,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
             try {
                 webappDaoFactory.getLinksDao().addLinksToIndividual( this );
             } catch (Exception e) {
-                log.error(this.getClass().getName()+" could not addLinksToIndividual for "+this.getURI());
+                log.error(this.getClass().getName()+" could not addLinksToIndividual for "+this.getURI(), e);
             }
             return this.linksList;
         }
@@ -597,7 +597,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
             try {
                 webappDaoFactory.getLinksDao().addPrimaryLinkToIndividual( this );
             } catch (Exception e) {
-                log.error(this.getClass().getName()+" could not addPrimaryLinkToIndividual for "+this.getURI());
+                log.error(this.getClass().getName()+" could not addPrimaryLinkToIndividual for "+this.getURI(), e);
             }
             return this.primaryLink;
         }
@@ -611,7 +611,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
             try {
                 this.setKeywords(webappDaoFactory.getIndividualDao().getKeywordsForIndividual(this.getURI()));
             } catch (Exception e) {
-                log.error(this.getClass().getName()+" could not getKeywords for "+this.getURI());
+                log.error(this.getClass().getName()+" could not getKeywords for "+this.getURI(), e);
             }
             return this.keywords;
         }
@@ -624,7 +624,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
             try {
                 this.setKeywordObjects(webappDaoFactory.getIndividualDao().getKeywordObjectsForIndividual(this.getURI()));
             } catch (Exception e) {
-                log.error(this.getClass().getName()+" could not get Keyword Objects for "+this.getURI());
+                log.error(this.getClass().getName()+" could not get Keyword Objects for "+this.getURI(), e);
             }
         }
         return this.keywordObjects;
@@ -642,7 +642,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
                     stmt.setObject(webappDaoFactory.getIndividualDao().getIndividualByURI(stmt.getObject().getURI()));
                 }
             } catch (Exception e) {
-                log.error(this.getClass().getName()+" could not fill existing ObjectPropertyStatements for "+this.getURI());
+                log.error(this.getClass().getName()+" could not fill existing ObjectPropertyStatements for "+this.getURI(), e);
             }
             return this.objectPropertyStatements;
         }
@@ -655,7 +655,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
             try {
                 webappDaoFactory.getObjectPropertyDao().fillObjectPropertiesForIndividual( this );
             } catch (Exception e) {
-                log.error(this.getClass().getName()+" could not fillEntityProperties for "+this.getURI());
+                log.error(this.getClass().getName()+" could not fillEntityProperties for "+this.getURI(), e);
             }
             return this.propertyList;
         }
@@ -688,7 +688,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
             try {
                 webappDaoFactory.getDataPropertyStatementDao().fillExistingDataPropertyStatementsForIndividual(this/*,false*/);
             } catch (Exception e) {
-                log.error(this.getClass().getName()+" could not fill existing DataPropertyStatements for "+this.getURI());
+                log.error(this.getClass().getName()+" could not fill existing DataPropertyStatements for "+this.getURI(), e);
             }
             return this.dataPropertyStatements;
         }
@@ -701,7 +701,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
             try {
                 webappDaoFactory.getDataPropertyDao().fillDataPropertiesForIndividual( this );
             } catch (Exception e) {
-                log.error(this.getClass().getName()+" could not fill data properties for "+this.getURI());
+                log.error(this.getClass().getName()+" could not fill data properties for "+this.getURI(), e);
             }
             return this.datatypePropertyList;
         }
@@ -737,7 +737,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
                 dpsList.addAll(webappDaoFactory.getIndividualDao().getExternalIds(this.getURI(), null));
                 this.externalIds = dpsList;
             } catch (Exception e) {
-                log.error(this.getClass().getName()+" could not fill external IDs for "+this.getURI());
+                log.error(this.getClass().getName()+" could not fill external IDs for "+this.getURI(), e);
             }
             return this.externalIds;
         }
@@ -894,12 +894,12 @@ public class IndividualJena extends IndividualImpl implements Individual {
             try {
                 Collections.sort(getObjectPropertyStatements(), comp);
             } catch (Exception e) {
-                log.error("Exception sorting object property statements for object property "+this.getURI());
+                log.error("Exception sorting object property statements for object property "+this.getURI(), e);
             }
 
     		
     	} catch (Exception e) {
-    		log.error(e);
+    		log.error(e, e);
     	}
     }
     
