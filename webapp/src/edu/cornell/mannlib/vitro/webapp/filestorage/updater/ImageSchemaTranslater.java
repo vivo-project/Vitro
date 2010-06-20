@@ -6,9 +6,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.commons.io.FilenameUtils;
 
@@ -41,11 +42,11 @@ public class ImageSchemaTranslater extends FsuScanner {
 	 * thumbnail, and vice versa, and exactly one of each. For each one,
 	 * translate the main image and the thumbnail into the new system.
 	 */
-	public List<String> translate() {
+	public Collection<String> translate() {
 		updateLog.section("Copying images into the new file storage, "
 				+ "and adding them to the new model.");
 
-		List<String> translated = new ArrayList<String>();
+		SortedSet<String> translated = new TreeSet<String>();
 		ResIterator haveImage = model.listResourcesWithProperty(imageProperty);
 		try {
 			while (haveImage.hasNext()) {

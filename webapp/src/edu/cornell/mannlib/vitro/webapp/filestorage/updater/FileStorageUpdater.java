@@ -4,7 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.filestorage.updater;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
+import java.util.Collection;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -165,7 +165,7 @@ public class FileStorageUpdater implements FSUController {
 			// Copy all images into the new file storage system, translating
 			// into the new schema. Get a list of all the images we translated.
 			ImageSchemaTranslater translater = new ImageSchemaTranslater(this);
-			List<String> translatedFiles = translater.translate();
+			Collection<String> translatedFiles = translater.translate();
 
 			if (isThereAnythingToDo()) {
 				throw new IllegalStateException(

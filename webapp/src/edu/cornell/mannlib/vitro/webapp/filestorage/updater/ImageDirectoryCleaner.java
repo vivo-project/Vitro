@@ -4,7 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.filestorage.updater;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * Clean out the old image directory. Copy the files into the upgrade directory,
@@ -26,7 +26,7 @@ public class ImageDirectoryCleaner extends FsuScanner {
 	/**
 	 * Remove all of the files from the old image directory.
 	 */
-	public void clean(List<String> translatedFiles) {
+	public void clean(Collection<String> translatedFiles) {
 		updateLog.section("Cleaning the old image directory of "
 				+ "files that were translated.");
 		removeTranslatedFiles(translatedFiles);
@@ -39,7 +39,7 @@ public class ImageDirectoryCleaner extends FsuScanner {
 	/**
 	 * Move all of the files that we translated into the new system.
 	 */
-	private void removeTranslatedFiles(List<String> translatedFiles) {
+	private void removeTranslatedFiles(Collection<String> translatedFiles) {
 		for (String path : translatedFiles) {
 			updateLog.log("moving image file '" + path
 					+ "' to the 'translated' directory.");
