@@ -4,9 +4,12 @@ package edu.cornell.mannlib.vitro.webapp.filestorage.updater;
 
 import java.util.List;
 
+import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.Statement;
 
 /**
  * If a resource has more than one image or more than one thumbnail, this
@@ -50,12 +53,19 @@ public class MultiplePropertyRemover extends FsuScanner {
 	 */
 	private void removeExtraProperties(Resource resource, Property prop,
 			String label) {
-		List<String> values = getValues(resource, prop);
-		for (int i = 1; i < values.size(); i++) {
-			String value = values.get(i);
-			updateLog.log(resource, "removing extra " + label + " property: '"
-					+ value + "'");
-			removeStatement(resource, prop, value);
+		List<Statement> stmts = getStatements(resource, prop);
+		for (int i = 1; i < stmts.size(); i++) {
+			Statement stmt = stmts.get(i);
+			RDFNode node = stmt.getObject();
+			if (node.isLiteral()) {
+				String value = ((Literal) node).getString();
+				updateLog.warn(resource, "removing extra " + label
+						+ " property: '" + value + "'");
+			} else {
+				updateLog.warn(resource, "removing extra " + label
+						+ " property: '" + node + "'");
+			}
+			model.remove(stmt);
 		}
 	}
 }

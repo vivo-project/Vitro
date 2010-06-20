@@ -24,7 +24,8 @@ public class AllThumbsAdjuster extends FsuScanner {
 	 * image from the first thumbnail.
 	 */
 	public void adjust() {
-		updateLog.section("Creating main images for thumbnails that have none.");
+		updateLog.section("Creating main images for thumbnails "
+				+ "that have none.");
 
 		ResIterator haveThumb = model.listResourcesWithProperty(thumbProperty);
 		try {
@@ -51,6 +52,7 @@ public class AllThumbsAdjuster extends FsuScanner {
 	private void createMainImageFromThumbnail(Resource resource) {
 		String thumbFilename = getValues(resource, thumbProperty).get(0);
 		String mainFilename = addFilenamePrefix("_main_image_", thumbFilename);
+		mainFilename = checkNameConflicts(mainFilename);
 		updateLog.log(resource, "creating a main file at '" + mainFilename
 				+ "' to match the thumbnail at '" + thumbFilename + "'");
 

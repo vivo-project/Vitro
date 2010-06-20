@@ -68,7 +68,7 @@ public class NonLiteralPropertyRemover extends FsuScanner {
 		}
 
 		for (RDFNode bogusValue : bogusValues) {
-			updateLog.log(resource, "discarding " + label
+			updateLog.warn(resource, "discarding " + label
 					+ " property with non-literal as object: '" + bogusValue
 					+ "'");
 			model.createStatement(resource, prop, bogusValue).remove();

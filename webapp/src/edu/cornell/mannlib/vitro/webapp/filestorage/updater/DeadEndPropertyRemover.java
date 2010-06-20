@@ -4,9 +4,12 @@ package edu.cornell.mannlib.vitro.webapp.filestorage.updater;
 
 import java.io.File;
 
+import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.Statement;
 
 /**
  * Removes any image properties (main or thumbnail) that point to files that
@@ -47,20 +50,24 @@ public class DeadEndPropertyRemover extends FsuScanner {
 	}
 
 	/**
-	 * Check these properties on this resource. If any of them does not point to
-	 * an existing file, remove the property.
+	 * Check these statments on this resource. If any of them does not point to
+	 * an existing file, remove the statement.
 	 */
 	private void removeDeadEndPropertiesFromResource(Resource resource,
 			Property prop, String label) {
-		for (String filename : getValues(resource, prop)) {
-			File file = new File(imageDirectory, filename);
-			if (!file.exists()) {
-				updateLog.warn(resource, "removing link to " + label + " '"
-						+ filename + "': file does not exist at '"
-						+ file.getAbsolutePath() + "'.");
-				removeStatement(resource, prop, filename);
+		for (Statement stmt : getStatements(resource, prop)) {
+			RDFNode node = stmt.getObject();
+			if (node.isLiteral()) {
+				String filename = ((Literal)node).getString();
+				File file = new File(imageDirectory, filename);
+				if (!file.exists()) {
+					updateLog.warn(resource, "removing link to " + label + " '"
+							+ filename + "': file does not exist at '"
+							+ file.getAbsolutePath() + "'.");
+					model.remove(stmt);
+				}
 			}
 		}
 	}
-
+	
 }

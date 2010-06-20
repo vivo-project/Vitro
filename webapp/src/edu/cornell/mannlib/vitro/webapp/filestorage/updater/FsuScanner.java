@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.filestorage.updater;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,14 +61,20 @@ public abstract class FsuScanner {
 	}
 
 	/**
-	 * Create a statement that represents these items, and remove it from the
-	 * mode
+	 * Read all of the specified properties on a resource, and return a
+	 * {@link List} of the {@link Statement}s.
 	 */
-	protected void removeStatement(Resource resource, Property prop,
-			String value) {
-		Literal object = model.createLiteral(value);
-		Statement stmt = model.createStatement(resource, prop, object);
-		stmt.remove();
+	protected List<Statement> getStatements(Resource resource, Property property) {
+		List<Statement> list = new ArrayList<Statement>();
+		StmtIterator stmts = resource.listProperties(property);
+		try {
+			while (stmts.hasNext()) {
+				list.add(stmts.next());
+			}
+		} finally {
+			stmts.close();
+		}
+		return list;
 	}
 
 	/**
@@ -85,4 +92,31 @@ public abstract class FsuScanner {
 		}
 	}
 
+	/**
+	 * We are about to create a file - if a file of this name already exists,
+	 * increment the name until we have no collision.
+	 * 
+	 * @return the original name, or the incremented name.
+	 */
+	protected String checkNameConflicts(final String path) {
+		File file = new File(path);
+		if (!file.exists()) {
+			// No conflict.
+			return path;
+		}
+
+		File parent = file.getParentFile();
+		String filename = file.getName();
+		for (int i = 0; i < 100; i++) {
+			file = new File(parent, i + filename);
+			if (!file.exists()) {
+				updateLog.log("File '" + path + "' already exists, using '"
+						+ file + "' to avoid conflict.");
+				return file.getPath();
+			}
+		}
+		
+		updateLog.error("File '' already exists. Unable to avoid conflict.");
+		return path;
+	}
 }

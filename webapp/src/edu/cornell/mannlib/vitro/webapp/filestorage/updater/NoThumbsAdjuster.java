@@ -56,6 +56,7 @@ public class NoThumbsAdjuster extends FsuScanner {
 	private void createThumbnailFromMainImage(Resource resource) {
 		String mainFilename = getValues(resource, imageProperty).get(0);
 		String thumbFilename = addFilenamePrefix("_thumbnail_", mainFilename);
+		thumbFilename = checkNameConflicts(thumbFilename);
 		updateLog.log(resource, "creating a thumbnail at '" + thumbFilename
 				+ "' from the main image at '" + mainFilename + "'");
 

@@ -143,8 +143,8 @@ public class ImageSchemaTranslater extends FsuScanner {
 			inputStream = new FileInputStream(oldFile);
 			fileStorage.createFile(byteStream.getURI(), filename, inputStream);
 		} catch (IOException e) {
-			updateLog
-					.error(resource, "Can't create the " + label + " file.", e);
+			updateLog.error(resource, "Can't create the " + label + " file. ",
+					e);
 		} finally {
 			if (inputStream != null) {
 				try {
@@ -169,15 +169,15 @@ public class ImageSchemaTranslater extends FsuScanner {
 	 * Guess what the MIME type might be.
 	 */
 	private String guessMimeType(Resource resource, String filename) {
-		if (filename.endsWith(".gif")) {
+		if (filename.endsWith(".gif") || filename.endsWith(".GIF")) {
 			return "image/gif";
-		} else if (filename.endsWith(".png")) {
+		} else if (filename.endsWith(".png") || filename.endsWith(".PNG")) {
 			return "image/png";
-		} else if (filename.endsWith(".jpg")) {
+		} else if (filename.endsWith(".jpg") || filename.endsWith(".JPG")) {
 			return "image/jpeg";
-		} else if (filename.endsWith(".jpeg")) {
+		} else if (filename.endsWith(".jpeg") || filename.endsWith(".JPEG")) {
 			return "image/jpeg";
-		} else if (filename.endsWith(".jpe")) {
+		} else if (filename.endsWith(".jpe") || filename.endsWith(".JPE")) {
 			return "image/jpeg";
 		} else {
 			updateLog.warn(resource,
