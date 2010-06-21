@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -69,6 +70,9 @@ import edu.cornell.mannlib.vitro.webapp.utils.Csv2Rdf;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestWorkflowProcessor;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.WorkflowOntology;
+
+import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
+import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 
 public class JenaIngestController extends BaseEditController {
 
@@ -324,6 +328,28 @@ public class JenaIngestController extends BaseEditController {
 			} finally {
 				jenaOntModel.leaveCriticalSection();
 			}
+			/*ass92*/
+			 OntologyDao daoObj = getWebappDaoFactory().getOntologyDao();
+	            List ontologiesObj = daoObj.getAllOntologies();
+	            ArrayList prefixList = new ArrayList();
+	            
+	            if(ontologiesObj !=null && ontologiesObj.size()>0){
+	            	
+	            	Iterator ontItr = ontologiesObj.iterator();
+	            	while(ontItr.hasNext()){
+	            		Ontology ont = (Ontology) ontItr.next();
+	            		prefixList.add(ont.getPrefix() == null ? "(not yet specified)" : ont.getPrefix());
+	            		prefixList.add(ont.getURI() == null ? "" : ont.getURI());
+	            	}
+	            	
+	            }
+	            else{
+	            	prefixList.add("<strong>" + "No Ontologies added" + "</strong>");
+	            	prefixList.add("<strong>" + "Load Ontologies" + "</strong>");
+	            }
+	            
+	            request.setAttribute("prefixList", prefixList);
+	            /*complete*/
 			if (sparqlQueryStr != null) {
 				String validationMessage = "";
 				if (request.getParameterValues("sourceModelName") == null) {
