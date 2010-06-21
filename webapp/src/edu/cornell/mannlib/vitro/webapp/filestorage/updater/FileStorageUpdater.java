@@ -176,6 +176,8 @@ public class FileStorageUpdater implements FSUController {
 			// Clean out the old image directory, separating into files which
 			// were translated, and files for which we found no reference.
 			new ImageDirectoryCleaner(this).clean(translatedFiles);
+			
+			updateLog.section("File Storage update is complete.");
 		} finally {
 			updateLog.close();
 		}
