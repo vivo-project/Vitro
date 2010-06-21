@@ -349,6 +349,11 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         writeTemplate(templateName, root);                   
     }
     
+    protected void ajaxWrite(String templateName, Map<String, Object> map) {
+        templateName = "ajax/" + templateName;
+        writeTemplate(templateName, map);                   
+    }
+    
     protected void writeTemplate(String templateName, Map<String, Object> map) {       
         StringWriter sw = mergeToTemplate(templateName, map);          
         write(sw);

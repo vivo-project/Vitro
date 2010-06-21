@@ -75,7 +75,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.Html2Text;
 
 /**
  * PagedSearchController is the new search controller that interacts 
- * directly with the lucene API and returns paged, relivance ranked results.
+ * directly with the lucene API and returns paged, relevance ranked results.
  *  
  * @author bdc34
  *
@@ -114,7 +114,7 @@ public class PagedSearchController extends VitroHttpServlet implements Searcher{
             Portal portal = vreq.getPortal();
             PortalFlag portalFlag = vreq.getPortalFlag();
             
-            //make sure a IndividualDao is available 
+            //make sure an IndividualDao is available 
             if( vreq.getWebappDaoFactory() == null 
                     || vreq.getWebappDaoFactory().getIndividualDao() == null ){
                 log.error("makeUsableBeans() could not get IndividualDao ");
@@ -152,7 +152,7 @@ public class PagedSearchController extends VitroHttpServlet implements Searcher{
             
             String qtxt = vreq.getParameter(VitroQuery.QUERY_PARAMETER_NAME);
             Analyzer analyzer = getAnalyzer(getServletContext());
-            Query query = getQuery(vreq, portalFlag, analyzer, indexDir);             
+            Query query = getQuery(vreq, portalFlag, analyzer, indexDir, qtxt);             
             log.debug("query for '" + qtxt +"' is " + query.toString());
             
             if (query == null ) {
@@ -428,10 +428,10 @@ public class PagedSearchController extends VitroHttpServlet implements Searcher{
     }
 
     private Query getQuery(VitroRequest request, PortalFlag portalState,
-                       Analyzer analyzer, String indexDir ) throws SearchException{
+                       Analyzer analyzer, String indexDir, String querystr ) throws SearchException{
         Query query = null;
         try{
-            String querystr = request.getParameter(VitroQuery.QUERY_PARAMETER_NAME);
+            //String querystr = request.getParameter(VitroQuery.QUERY_PARAMETER_NAME);
             if( querystr == null){
                 log.error("There was no Parameter '"+VitroQuery.QUERY_PARAMETER_NAME            
                     +"' in the request.");                
@@ -487,6 +487,9 @@ public class PagedSearchController extends VitroHttpServlet implements Searcher{
                 boolQuery.add( flagQuery, BooleanClause.Occur.MUST);
                 query = boolQuery;
             }
+            
+            log.debug("Query: " + query);
+            
         }catch (Exception ex){
             throw new SearchException(ex.getMessage());
         }

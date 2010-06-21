@@ -36,6 +36,19 @@ public class TestController extends FreeMarkerHttpServlet {
         Date now = cal.getTime();
         body.put("now", now);
         // In template: ${now?date}, ${now?datetime}, ${now?time}
+        
+        // You can add to a collection AFTER putting it in the template data model
+        List<String> fruit = new ArrayList<String>();
+        fruit.add("apples");
+        fruit.add("bananas");
+        body.put("fruit", fruit);
+        fruit.add("oranges");
+        
+        // But you cannot modify a scalar after putting it in the data model - the
+        // template still gets the old value
+        String animal = "elephant";
+        body.put("animal", animal);
+        animal = "camel";
    
         // Create the template to see the examples live.
         String bodyTemplate = "test.ftl";             

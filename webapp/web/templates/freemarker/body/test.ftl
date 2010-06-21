@@ -3,13 +3,24 @@
 <#-- FreeMarker test cases -->
 
 <h2>Dates</h2>
-
-<p>${now?datetime}</p>
-<p>${now?date}</p>
-<p>${now?time}</p>
+<ul>
+<li>${now?datetime}</li>
+<li>${now?date}</li>
+<li>${now?time}</li>
+</ul>
 
 <h2>Apples</h2>
-
+<ul>
 <#list apples as apple>
-    <p>${apple}</p>
+    <li>${apple}</li>
 </#list>
+</ul>
+
+<h2>Fruit</h2>
+<ul>
+<#list fruit as f>
+    <li>${f}</li>
+</#list>
+</ul>
+
+<p><strong>Animal:</strong> ${animal}</p>

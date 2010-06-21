@@ -875,6 +875,19 @@
   </servlet-mapping>
 
   <servlet>
+    <servlet-name>AutocompleteController</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.search.controller.AutocompleteController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>AutocompleteController</servlet-name>
+    <url-pattern>/autocomplete</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>AutocompleteController</servlet-name>
+    <url-pattern>/populateselect</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
     <servlet-name>AdminController</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.AdminController</servlet-class>
   </servlet>
