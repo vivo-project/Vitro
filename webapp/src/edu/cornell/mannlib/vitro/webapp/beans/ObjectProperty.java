@@ -59,7 +59,7 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
 
     private String domainEntitySortField = null;
     private String domainEntitySortDirection = null;
-    private String domainDisplayTier = null;
+    private String domainDisplayTier = "-1";
     private int domainDisplayLimit = 5;
     private String domainQuickEditJsp = null;
 
@@ -67,7 +67,7 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
     
     private String rangeEntitySortField = null;
     private String rangeEntitySortDirection = null;
-    private String rangeDisplayTier = null;
+    private String rangeDisplayTier = "-1";
     private int rangeDisplayLimit = 5;
     private String rangeQuickEditJsp = null;
     
