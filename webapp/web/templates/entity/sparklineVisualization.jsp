@@ -49,6 +49,7 @@
 
 <c:set var='portalBean' value='${currentPortal}'/>
 <c:set var="themeDir"><c:out value="${portalBean.themeDir}" /></c:set>
+<c:url var="loadingImageLink" value="/${themeDir}site_icons/visualization/ajax-loader.gif"></c:url>
 
 	<!-- START Visualization Code -->            
 	<c:url var="visualizationURL" value="/admin/visQuery">
@@ -91,7 +92,7 @@
 	
 		function renderVisualization(visualizationURL) {
 	
-			$("#vis_container").empty().html('<img src="/vivo/${themeDir}utility/ajax-loader.gif" />');
+			$("#vis_container").empty().html('<img src="${loadingImageLink}" />');
 	
 			   $.ajax({
 				   url: visualizationURL,

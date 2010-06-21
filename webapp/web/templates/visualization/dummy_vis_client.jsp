@@ -87,6 +87,8 @@
 	<c:param name="uri" value="http://vivo.library.cornell.edu/ns/0.1#individual192"/>
 </c:url>
 
+<c:url var="loadingImageLink" value="/${themeDir}site_icons/visualization/ajax-loader.gif"></c:url>
+
 <style type="text/css">
 	.get_vis {
 		background-color:Yellow;
@@ -105,7 +107,7 @@ $(document).ready(function() {
 
 	function renderVisualization(visualizationURL) {
 
-		$("#ajax_recipient").empty().html('<img src="/vivo/${themeDir}utility/ajax-loader.gif" />');
+		$("#ajax_recipient").empty().html('<img src="${loadingImageLink}" />');
 
 		   $.ajax({
 			   url: visualizationURL,
