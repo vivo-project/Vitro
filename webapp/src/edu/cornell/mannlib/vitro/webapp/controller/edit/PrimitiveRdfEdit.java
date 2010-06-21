@@ -36,7 +36,7 @@ public class PrimitiveRdfEdit extends FreeMarkerHttpServlet{
 //			doError(response,"You must be logged in to use this servlet.",HttpStatus.SC_UNAUTHORIZED);
 //			return;
 //		}
-		return mergeBodyToTemplate("primitiveRdfEdit.fmt",new HashMap());
+		return mergeBodyToTemplate("primitiveRdfEdit.ftl",new HashMap());
 	}
 
 	@Override
@@ -79,7 +79,7 @@ public class PrimitiveRdfEdit extends FreeMarkerHttpServlet{
          * the default language, "RDF/XML". "RDF/XML-ABBREV" is a synonym for "RDF/XML" */
 		String format = request.getParameter("RdfFormat");		
 		if( format == null )		    
-			format = "RDF/XML";		
+			format = "N3";		
 		if ( ! ("N-TRIPLE".equals(format) || "TURTLE".equals(format) || "TTL".equals(format)
 			    || "N3".equals(format)|| "RDF/XML-ABBREV".equals(format) || "RDF/XML".equals(format) )){
 			doError(response,"RdfFormat was not recoganized.",500);
@@ -198,7 +198,7 @@ public class PrimitiveRdfEdit extends FreeMarkerHttpServlet{
 		if( session == null || session.getAttribute("jenaOntModel") == null )
 			return (OntModel)getServletContext().getAttribute("jenaOntModel");
 		else
-			return (OntModel)session.getAttribute("jeanOntModel");
+			return (OntModel)session.getAttribute("jenaOntModel");
 	}
 	
 	protected OntModel getQueryModel(HttpServletRequest request){
