@@ -417,7 +417,11 @@ public class SparqlQueryServlet extends BaseEditController {
         "PREFIX swrl:  <http://www.w3.org/2003/11/swrl#>\n" +
         "PREFIX swrlb: <http://www.w3.org/2003/11/swrlb#>\n" +
         "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#>\n"+
-        "PREFIX vivo:  <http://vivo.library.cornell.edu/ns/0.1#>\n"+
+        "PREFIX vivo:  <http://vivo.library.cornell.edu/ns/0.1#>\n" +
+        "PREFIX bibo: <http://purl.org/ontology/bibo/>\n" +
+        "PREFIX foaf: <http://xmlns.com/foaf/0.1/>\n" +
+        "PREFIX core: <http://vivoweb.org/ontology/core#>\n" +
+        "PREFIX aktp:  <http://www.aktors.org/ontology/portal#>\n"+
         "#\n" +
         "# This query gets all range entities labels and types of a person\n"+
         "# A query like this could be used to get enough info to create a display\n"+

@@ -1085,6 +1085,26 @@
     <servlet-name>SparqlQuery</servlet-name>
     <url-pattern>/admin/sparqlquery</url-pattern>
   </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>DummyVisClient</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.visualization.DummyVisClientController</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>DummyVisClient</servlet-name>
+    <url-pattern>/admin/dummyVisClient</url-pattern>
+  </servlet-mapping>
+  
+   <servlet>
+    <servlet-name>VisualizationController</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.visualization.VisualizationController</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>VisualizationController</servlet-name>
+    <url-pattern>/admin/visQuery</url-pattern>
+  </servlet-mapping>
 
   <servlet>
     <servlet-name>authtest</servlet-name>

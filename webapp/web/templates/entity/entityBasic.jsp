@@ -131,6 +131,10 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
                 </c:choose>
             </div> <!-- end labelAndMoniker -->
             
+            <!-- START Sparkline Visualization -->
+            <jsp:include page="sparklineVisualization.jsp"/>
+            <!-- END Sparkline Visualization -->
+            
             <%-- Links --%>                                                                                       
             <c:if test="${ showEdits || !empty entity.url || !empty entity.linksList }"> 
                 <div id="dprop-vitro-links" class="propsItem ${editingClass}">
