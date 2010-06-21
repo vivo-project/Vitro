@@ -1,3 +1,5 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
 import java.io.IOException;
@@ -115,14 +117,14 @@ public class PrimitiveRdfEdit extends FreeMarkerHttpServlet{
 		if( hasPermission ){
 			String editorUri = EditN3Utils.getEditorUri(vreq,request.getSession(false),getServletContext());			
 			try {
-				processChanges(request, additions, retractions, getWriteModel(request),getQueryModel(request), editorUri);
+				processChanges( additions, retractions, getWriteModel(request),getQueryModel(request), editorUri);
 			} catch (Exception e) {
 				doError(response,e.getMessage(),HttpStatus.SC_INTERNAL_SERVER_ERROR);
 			}			
 		}
 	}
 	
-	protected void processChanges( HttpServletRequest request, Set<Model> additions, Set<Model> retractions, OntModel writeModel, OntModel queryModel, String editorURI ) throws Exception{
+	protected void processChanges(Set<Model> additions, Set<Model> retractions, OntModel writeModel, OntModel queryModel, String editorURI ) throws Exception{
 		Model a = com.hp.hpl.jena.rdf.model.ModelFactory.createDefaultModel();
 		for(Model m : additions)
 			a.add(m);
@@ -131,10 +133,10 @@ public class PrimitiveRdfEdit extends FreeMarkerHttpServlet{
 		for(Model m : retractions)
 			r.add(m);
 		
-		procesChanges(request,a,r,writeModel,queryModel,editorURI);		
+		procesChanges(a,r,writeModel,queryModel,editorURI);		
 	}
 	
-	protected void procesChanges(HttpServletRequest request, Model additions, Model retractions, OntModel writeModel, OntModel queryModel, String editorURI ) throws Exception{		
+	protected void procesChanges(Model additions, Model retractions, OntModel writeModel, OntModel queryModel, String editorURI ) throws Exception{		
     /*
      * Do a diff on the additions and retractions and then only add the delta to the jenaOntModel.
      */            
@@ -176,6 +178,7 @@ public class PrimitiveRdfEdit extends FreeMarkerHttpServlet{
 				StringReader reader = new StringReader(param);
 				Model model = com.hp.hpl.jena.rdf.model.ModelFactory.createDefaultModel();			
 				model.read(reader, null, format);
+				models.add(model);
 			}catch(Error ex){
 				log.error("Error reading RDF as " + format + " in " + param);
 				throw new Exception("Error reading RDF, set log level to debug for this class to get error messages in the sever logs.");
