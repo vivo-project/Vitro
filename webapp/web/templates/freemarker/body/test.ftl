@@ -24,3 +24,7 @@
 </ul>
 
 <p><strong>Animal:</strong> ${animal}</p>
+
+<@dump var="fruit" />
+<@dump var="urls" />
+<@dump var="data_model" />
