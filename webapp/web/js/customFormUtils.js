@@ -31,5 +31,30 @@ vitro.customFormUtils = {
         // the markup, for customized positioning, in which case we will empty them
         // but not remove them here. See findValidationErrors().  
         el.find('.validationError').remove();      
-    }
+    },
+       
+    // Return true iff there are validation errors on the form
+    findValidationErrors: function() {
+
+        return this.form.find('.validationError').length > 0;
+    	
+// RY For now, we just need to look for the presence of the error elements.
+// Later, however, we may generate empty error messages in the markup, for
+// customized positioning, in which case we need to look for whether they have 
+// content. See clearFormData().
+//    	var foundErrors = false,
+//    	    errors = this.form.find('.validationError'),
+//    	    numErrors = errors.length,
+//    	    i,
+//    	    error;
+//    	
+//    	for (i = 0; foundErrors == false && i < numErrors; i++) {
+//    		error = errors[i];
+//    		if (error.html() != '') {
+//    			foundErrors = true;
+//    		}
+//    	}
+//    	
+//    	return foundErrors;
+    },
 }
