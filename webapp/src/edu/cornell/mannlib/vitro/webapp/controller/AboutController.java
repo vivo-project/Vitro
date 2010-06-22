@@ -29,7 +29,7 @@ public class AboutController extends VitroHttpServlet {
             request.setAttribute("aboutText", portal.getAboutText());
             request.setAttribute("acknowledgeText", portal.getAcknowledgeText());
             request.setAttribute("bodyJsp", "/about.jsp");
-            
+           
             RequestDispatcher rd =
                 request.getRequestDispatcher(Controllers.BASIC_JSP);
             rd.forward(request, response);

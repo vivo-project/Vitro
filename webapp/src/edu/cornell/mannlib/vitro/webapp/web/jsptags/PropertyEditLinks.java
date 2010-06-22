@@ -107,7 +107,6 @@ public class PropertyEditLinks extends TagSupport{
         }
         
         Individual entity = (Individual)pageContext.getRequest().getAttribute("entity");           
-                 
         LinkStruct[] links = null;
 
         //get context prefix needs to end with a slash like "/vivo/" or "/"

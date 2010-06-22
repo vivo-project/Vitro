@@ -81,7 +81,6 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
    }else{
        log.debug("Found editform in http parameters.");
    }
-
    request.setAttribute("subjectUri", subjectUri);
    request.setAttribute("subjectUriJson", MiscWebUtils.escape(subjectUri));
    if (predicateUri != null) {
@@ -99,7 +98,6 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
        request.setAttribute("objectUri", objectUri);
        request.setAttribute("objectUriJson", MiscWebUtils.escape(objectUri));            
    }
-
    if( typeOfNew != null )
 	   request.setAttribute("typeOfNew", typeOfNew);	   	     
    
@@ -182,7 +180,6 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 	        boolean isForwardToCreateNew = 
 	            ( objectProp != null && objectProp.getOfferCreateNewOption() && objectProp.getSelectFromExisting() == false)
 	         || ( objectProp != null && objectProp.getOfferCreateNewOption() && "create".equals(command));   
-	                 
 	        if (isForwardToCreateNew) {
 	        	
 	        	request.setAttribute("isForwardToCreateNew", new Boolean(true));
