@@ -30,10 +30,6 @@ public class PersonHasPositionValidator implements N3Validator {
 		if( "".equals(organizationUri))
 			organizationUri = null;
 		
-//		System.out.println("newOrgName " + newOrgName);
-//		System.out.println("newOrgType " + newOrgType);
-//		System.out.println("organizationUri " + organizationUri);
-		
 		Map<String,String> errors = new HashMap<String,String>();		
 		if( organizationUri != null && (newOrgName != null || newOrgType != null)  ){
 			errors.put("newOrgName", DUPLICATE_ERROR);	
