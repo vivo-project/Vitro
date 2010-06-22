@@ -39,6 +39,7 @@ public class JenaDataSourceSetupBase {
    protected static String USERPATH = BASE+"user/";
    protected static String SYSTEMPATH = BASE+"system/";
    protected static String AUTHPATH = BASE+"auth/";
+   protected static String APPPATH = BASE+"app/";
 
    String DB_USER =   "jenatest";                          // database user id
    String DB_PASSWD = "jenatest";                          // database password
@@ -49,6 +50,7 @@ public class JenaDataSourceSetupBase {
    static final String JENA_INF_MODEL = "http://vitro.mannlib.cornell.edu/default/vitro-kb-inf";
    static final String JENA_USER_ACCOUNTS_MODEL = "http://vitro.mannlib.cornell.edu/default/vitro-kb-userAccounts";
    static final String JENA_APPLICATION_METADATA_MODEL = "http://vitro.mannlib.cornell.edu/default/vitro-kb-applicationMetadata";
+   static final String JENA_DISPLAY_METADATA_MODEL = "http://vitro.mannlib.cornell.edu/default/vitro-kb-displayMetadata";
 
    static final String DEFAULT_DEFAULT_NAMESPACE = "http://vitro.mannlib.cornell.edu/ns/default#";
    

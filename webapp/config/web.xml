@@ -82,7 +82,7 @@
     <listener-class>
         edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup
     </listener-class>
-  </listener>
+  </listener> 
   
   <!-- Invokes a process to move any uploaded files into the new file storage system. -->
   <!-- Needs to run after FileStorageSetup and JenaDataSourceSetup. -->
@@ -91,7 +91,7 @@
     <listener-class>
         edu.cornell.mannlib.vitro.webapp.servlet.setup.UpdateUploadedFiles
     </listener-class>
-  </listener>
+  </listener> 
   
   <!-- Attaching submodels permits extra RDF files to be made visible without storing the data in the DB. -->
   <listener>
@@ -99,7 +99,7 @@
   </listener>
 
   <!-- Pellet setup enables reasoning.  Inferences are cached in a separate DB graph. -->
-  <!-- Changing the class name sets the kindss of inferences that are materialized. -->
+  <!-- Changing the class name sets the kinds of inferences that are materialized. -->
   <!-- See documentation for details. -->
   <!-- If used, must be run after JenaDataSourceSetup -->
 
@@ -295,6 +295,15 @@
     <url-pattern>/SearchIndex</url-pattern>
   </servlet-mapping>
 
+  <servlet>
+  	<servlet-name>NavigationController</servlet-name>
+  	<servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.NavigationController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+  	<servlet-name>NavigationController</servlet-name>
+  	<url-pattern>/nav/*</url-pattern>
+  </servlet-mapping>
+  
   <servlet>
     <servlet-name>TestController</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.TestController</servlet-class>
