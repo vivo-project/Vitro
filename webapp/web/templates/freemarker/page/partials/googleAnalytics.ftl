@@ -1,5 +1,3 @@
-<#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
-
 <#-- NOTICE: This is SAMPLE Google Analytics code. You must replace it with your institution's code. -->
 
 <#--

@@ -11,6 +11,9 @@
 #
 # Known exceptions listed here produce no warnings.
 #
+# Any files added to this list should include a comment, so we know where they
+# came from, or why they don't require a license statement.
+#
 
 # The AI ingest files are exceptions -- until we decide otherwise.
 utilities/ingest/**/*
@@ -108,6 +111,9 @@ webapp/web/src/validate.js
 webapp/web/src/widget/*
 webapp/web/src/widget/**/*
 webapp/web/src/xml/*
+
+# Sample code from Google.
+webapp/web/templates/freemarker/page/partials/googleAnalytics.ftl
 
 # PROBLEM? Third-party tlds - where do they come from?
 webapp/config/tlds/c.tld
