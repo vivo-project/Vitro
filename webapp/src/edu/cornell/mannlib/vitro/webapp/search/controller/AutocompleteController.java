@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.search.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -116,6 +117,9 @@ public class AutocompleteController extends FreeMarkerHttpServlet implements Sea
             Query query = getQuery(vreq, portalFlag, analyzer, indexDir, qtxt);             
             log.debug("query for '" + qtxt +"' is " + query.toString());
             
+            // Get the list of uris that should be excluded from the results
+            List<String> urisToExclude = Arrays.asList(vreq.getParameterValues("filter"));
+            
             if (query == null ) {
                 doNoQuery(templateName, map);
                 return;
@@ -157,6 +161,9 @@ public class AutocompleteController extends FreeMarkerHttpServlet implements Sea
                 try{                     
                     Document doc = searcherForRequest.doc(topDocs.scoreDocs[i].doc);                    
                     String uri = doc.get(Entity2LuceneDoc.term.URI);
+                    if (urisToExclude.contains(uri)) {
+                        continue;
+                    }
                     Individual ind = iDao.getIndividualByURI(uri);
                     if (ind != null) {
                         String name = ind.getName();

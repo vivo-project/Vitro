@@ -16,25 +16,28 @@ public class PublicationHasAuthorValidator implements N3Validator {
             EditSubmission editSub) {
         Map<String,String> urisFromForm = editSub.getUrisFromForm();
         Map<String,Literal> literalsFromForm = editSub.getLiteralsFromForm();
-        
-        Literal firstName = literalsFromForm.get("firstName");
-        if( firstName.getLexicalForm() != null && "".equals(firstName.getLexicalForm()) )
-            firstName = null;
 
-        Literal lastName = literalsFromForm.get("lastName");
-        if( lastName.getLexicalForm() != null && "".equals(lastName.getLexicalForm()) )
-            lastName = null;
+        Map<String,String> errors = new HashMap<String,String>();   
         
         String personUri = urisFromForm.get("personUri");
         if ("".equals(personUri)) {
             personUri = null;
         }
+        // If there's a personUri, then we're done. The firstName and lastName fields are
+        // disabled and so don't get submitted.
+        if (personUri != null) {
+            return null;
+        }
         
-        Map<String,String> errors = new HashMap<String,String>();   
+        Literal firstName = literalsFromForm.get("firstName");
+        if( firstName != null && firstName.getLexicalForm() != null && "".equals(firstName.getLexicalForm()) )
+            firstName = null;
+
+        Literal lastName = literalsFromForm.get("lastName");
+        if( lastName != null && lastName.getLexicalForm() != null && "".equals(lastName.getLexicalForm()) )
+            lastName = null;
         
-        if (personUri == null && lastName == null && firstName == null) {
-            errors.put("lastName", MISSING_AUTHOR_ERROR);
-        } else if (lastName != null && firstName == null) {
+        if (lastName != null && firstName == null) {
             errors.put("firstName", MISSING_FIRST_NAME_ERROR);
         } else if (lastName == null && firstName != null) {
             errors.put("lastName", MISSING_LAST_NAME_ERROR);
