@@ -137,8 +137,10 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         setLoginInfo();      
         setCopyrightInfo();
         setThemeInfo(themeDir);
-        setScriptAndStylesheetObjects(themeDir);       
-
+        setScriptAndStylesheetObjects(themeDir);   
+        
+        setSharedVariable("dump", new edu.cornell.mannlib.vitro.webapp.web.directives.DumpDirective());
+        setSharedVariable("dumpDataModel", new edu.cornell.mannlib.vitro.webapp.web.directives.DumpDataModelDirective());
     }
     
     private void setScriptAndStylesheetObjects(String themeDir) {

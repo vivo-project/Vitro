@@ -25,6 +25,6 @@
 
 <p><strong>Animal:</strong> ${animal}</p>
 
-<@dump var="fruit" />
+<@dump var="now" />
 <@dump var="urls" />
-<@dump var="data_model" />
+<@dump var="fruit" />

@@ -41,41 +41,8 @@ public class DumpDirective implements TemplateDirectiveModel {
         String var = ((SimpleScalar)o).getAsString();
 
         TemplateHashModel dataModel = env.getDataModel();
-        String output;
-        
-        if (var.equals("data_model")) {       
-            output = "Data model: ";
-            Map<String, Object> dm = (Map<String, Object>) DeepUnwrap.permissiveUnwrap(dataModel);
-            Set varNames = dm.keySet();
-            for (Object varName : varNames) {
-                output += (String) varName + ", ";
-            }
-            
-            // Add shared variables
-            Configuration config = env.getConfiguration();
-            Set sharedVars = config.getSharedVariableNames();
-            Iterator i = sharedVars.iterator();
-            while (i.hasNext()) {
-                String sv = (String) i.next();
-                TemplateModel tm = config.getSharedVariable(sv);
-                if (tm instanceof TemplateDirectiveModel ||
-                        // Legacy built-ins that are added to all configurations
-                        tm instanceof freemarker.template.utility.CaptureOutput ||
-                        tm instanceof freemarker.template.utility.StandardCompress ||
-                        tm instanceof freemarker.template.utility.HtmlEscape ||
-                        tm instanceof freemarker.template.utility.NormalizeNewlines ||
-                        tm instanceof freemarker.template.utility.XmlEscape) {
-                    continue;
-                }
-                output += sv + ", ";
-            }
-
-            output = output.replaceAll(", $", ".");
-            
-        } else {           
-            TemplateModel val = dataModel.get(var);            
-            output = var + ": " + val.toString();           
-        }
+        TemplateModel val = dataModel.get(var);            
+        String output = var + ": " + val.toString();           
         
         // RY Improve by making presentation of various types more nuanced
         // Also merge to a template for formatting
