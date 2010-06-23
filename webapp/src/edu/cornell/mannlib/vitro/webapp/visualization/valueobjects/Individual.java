@@ -6,8 +6,8 @@ public class Individual {
 	private String individualURL;
 	
 	public Individual(String individualURL, String individualLabel) {
-		this.individualLabel = individualLabel;
 		this.individualURL = individualURL;
+		this.individualLabel = individualLabel;
 	}
 	
 	public Individual(String individualURL) {

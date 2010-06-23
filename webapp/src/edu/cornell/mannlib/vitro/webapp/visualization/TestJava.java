@@ -36,7 +36,7 @@ public class TestJava {
 		System.out.println(sampleBlurns);
 		for (String blurb : sampleBlurns) {
 			
-			System.out.println(blurb);
+			System.out.println(blurb.substring(0, 10));
 		}
 		Map<String, Integer> yearToPublicationCount = new TreeMap<String, Integer>();
 

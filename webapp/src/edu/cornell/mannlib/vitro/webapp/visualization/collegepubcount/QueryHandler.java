@@ -276,7 +276,7 @@ public class QueryHandler {
 															  String ontologyHandle) {
 		
 		String sparqlQuery = " {?department " + ontologyHandle + " ?" + employeeHandle + " . " 
-							+ "?" + employeeHandle + " rdf:type foaf:Individual; rdfs:label ?authorLabel. " 
+							+ "?" + employeeHandle + " rdf:type foaf:Person; rdfs:label ?authorLabel. " 
 							+ "OPTIONAL { ?" + employeeHandle + " vivo:authorOf ?document ." +
 										" ?document rdf:type bibo:Document ." +
 										" ?document rdfs:label ?documentLabel ." +

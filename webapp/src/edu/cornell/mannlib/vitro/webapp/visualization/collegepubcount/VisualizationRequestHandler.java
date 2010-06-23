@@ -40,6 +40,8 @@ import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.VivoEmployee;
 
 public class VisualizationRequestHandler {
 
+	private static final int MAX_NAME_TEXT_LENGTH = 10;
+
 	public static final String VIS_CONTAINER_URL_HANDLE = "container";
 
 	public static final String COLLEGE_URI_URL_HANDLE = "uri";
@@ -348,7 +350,7 @@ public class VisualizationRequestHandler {
 		collegeName = "";
 		}
 		
-		String outputFileName = slugify(collegeName + "depts-pub-count") + ".csv";
+		String outputFileName = slugify(collegeName) + "depts-pub-count" + ".csv";
 		
 		response.setContentType("application/octet-stream");
 		response.setHeader("Content-Disposition","attachment;filename=" + outputFileName);
@@ -379,7 +381,7 @@ public class VisualizationRequestHandler {
 	 * @return
 	 */
 	private String slugify(String textToBeSlugified) {
-		return textToBeSlugified.toLowerCase().replaceAll("[^a-zA-Z0-9-]", "-");
+		return textToBeSlugified.toLowerCase().replaceAll("[^a-zA-Z0-9-]", "-").substring(0, MAX_NAME_TEXT_LENGTH);
 	}
 
 	private void generateCsvFileBuffer(

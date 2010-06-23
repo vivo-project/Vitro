@@ -11,7 +11,7 @@ import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.VOConstants.E
  * @author cdtank
  *
  */
-public class VivoEmployee extends Individual{
+public class VivoEmployee extends Individual {
 
 	private EmployeeType employeeType; 
 	private Set<VivoDepartmentOrDivision> parentDepartments = new HashSet<VivoDepartmentOrDivision>();

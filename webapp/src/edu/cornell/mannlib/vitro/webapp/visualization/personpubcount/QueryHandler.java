@@ -166,7 +166,7 @@ public class QueryHandler {
 							+ SPARQL_QUERY_COMMON_SELECT_CLAUSE
 							+ "(str(<" + queryURI + ">) as ?authPersonLit) "
 							+ "WHERE { "
-							+ "<" + queryURI + "> rdf:type foaf:Individual ; vivo:authorOf ?document ; rdfs:label ?authorLabel.  "
+							+ "<" + queryURI + "> rdf:type foaf:Person ; vivo:authorOf ?document ; rdfs:label ?authorLabel.  "
 							+  SPARQL_QUERY_COMMON_WHERE_CLAUSE
 							+ "}";
 
@@ -179,7 +179,7 @@ public class QueryHandler {
 		throws MalformedQueryParametersException {
 
         if(this.queryParam == null || "".equals(queryParam)) {
-        	throw new MalformedQueryParametersException("URI parameter is either null or empty.");
+        	throw new MalformedQueryParametersException("URL parameter is either null or empty.");
         } else {
 
         	/*

@@ -34,6 +34,8 @@ import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.BiboDocument;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.Individual;
 
 public class VisualizationRequestHandler {
+	
+	private static final int MAX_NAME_TEXT_LENGTH = 10;
 
 	public static final String VIS_CONTAINER_URL_HANDLE = "container";
 
@@ -97,7 +99,7 @@ public class VisualizationRequestHandler {
 	    	 * */
 	    	Map<String, Integer> yearToPublicationCount =
 	    		queryManager.getYearToPublicationCount(authorDocuments);
-
+	    	
 	    	/*
 	    	 * In order to avoid unneeded computations we have pushed this "if" condition up.
 	    	 * This case arises when the render mode is data. In that case we dont want to generate 
@@ -205,8 +207,7 @@ public class VisualizationRequestHandler {
 			authorName = "";
 		}
 		
-		String outputFileName = slugify(authorName + "report") 
-								+ ".pdf";
+		String outputFileName = slugify(authorName) + "report" + ".pdf";
 		
 		response.setContentType("application/pdf");
 		response.setHeader("Content-Disposition", "attachment;filename=" + outputFileName);
@@ -262,8 +263,7 @@ public class VisualizationRequestHandler {
 		authorName = "";
 		}
 		
-		String outputFileName = slugify(authorName + "pub-count-sparkline") 
-		+ ".csv";
+		String outputFileName = slugify(authorName) + "pub-count-sparkline" + ".csv";
 		
 		response.setContentType("application/octet-stream");
 		response.setHeader("Content-Disposition","attachment;filename=" + outputFileName);
@@ -293,7 +293,7 @@ public class VisualizationRequestHandler {
 	 * @return
 	 */
 	private String slugify(String textToBeSlugified) {
-		return textToBeSlugified.toLowerCase().replaceAll("[^a-zA-Z0-9-]", "-");
+		return textToBeSlugified.toLowerCase().replaceAll("[^a-zA-Z0-9-]", "-").substring(0, MAX_NAME_TEXT_LENGTH);
 	}
 
 	private void generateCsvFileBuffer(Map<String, Integer> yearToPublicationCount, 
