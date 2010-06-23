@@ -24,6 +24,7 @@ import edu.cornell.mannlib.vitro.webapp.visualization.exceptions.MalformedQueryP
 import edu.cornell.mannlib.vitro.webapp.visualization.sparqlutils.QueryConstants;
 import edu.cornell.mannlib.vitro.webapp.visualization.sparqlutils.QueryFieldLabels;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.BiboDocument;
+import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.Individual;
 
 
 
@@ -38,6 +39,12 @@ public class QueryHandler {
 
 	private String queryParam, resultFormatParam, rdfResultFormatParam;
 	private DataSource dataSource;
+
+	private Individual author; 
+
+	public Individual getAuthor() {
+		return author;
+	}
 
 	private Log log;
 
@@ -72,7 +79,7 @@ public class QueryHandler {
 
 	private List<BiboDocument> createJavaValueObjects(ResultSet resultSet) {
 		List<BiboDocument> authorDocuments = new ArrayList<BiboDocument>();
-
+		
 		while (resultSet.hasNext()) {
 			QuerySolution solution = resultSet.nextSolution();
 
@@ -106,14 +113,19 @@ public class QueryHandler {
 				biboDocument.setPublicationYear(publicationYearNode.toString());
 			}
 			
+			/*
+			 * Since we are getting publication count for just one author at a time we need
+			 * to create only one "Individual" instance. We test against the null for "author" to
+			 * make sure that it has not already been instantiated. 
+			 * */
 			RDFNode authorURLNode = solution.get(QueryFieldLabels.AUTHOR_URL);
-			if (authorURLNode != null) {
-				biboDocument.setAuthorURL(authorURLNode.toString());
-			}
-
-			RDFNode authorLabelNode = solution.get(QueryFieldLabels.AUTHOR_LABEL);
-			if (authorLabelNode != null) {
-				biboDocument.setAuthorLabel(authorLabelNode.toString());
+			if (authorURLNode != null && author == null) {
+				author = new Individual(authorURLNode.toString());
+				RDFNode authorLabelNode = solution.get(QueryFieldLabels.AUTHOR_LABEL);
+				if (authorLabelNode != null) {
+					author.setIndividualLabel(authorLabelNode.toString());
+				}
+				
 			}
 
 			authorDocuments.add(biboDocument);
@@ -154,7 +166,7 @@ public class QueryHandler {
 							+ SPARQL_QUERY_COMMON_SELECT_CLAUSE
 							+ "(str(<" + queryURI + ">) as ?authPersonLit) "
 							+ "WHERE { "
-							+ "<" + queryURI + "> rdf:type foaf:Person ; vivo:authorOf ?document ; rdfs:label ?authorLabel.  "
+							+ "<" + queryURI + "> rdf:type foaf:Individual ; vivo:authorOf ?document ; rdfs:label ?authorLabel.  "
 							+  SPARQL_QUERY_COMMON_WHERE_CLAUSE
 							+ "}";
 

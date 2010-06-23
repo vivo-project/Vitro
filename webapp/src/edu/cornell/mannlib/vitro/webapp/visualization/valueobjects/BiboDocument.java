@@ -4,50 +4,24 @@ import java.util.Calendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class BiboDocument {
+public class BiboDocument extends Individual{
 
 	public static final String DEFAULT_PUBLICATION_YEAR = "Unknown";
 	public static final int MINIMUM_PUBLICATION_YEAR = 1800;
 	private static final int CURRENT_YEAR = Calendar.getInstance().get(Calendar.YEAR);
 
-	private String authorURL;
-	private String authorLabel;
-	private String documentURL;
 	private String documentMoniker;
-	private String documentLabel;
 	private String documentBlurb;
 	private String documentDescription;
 	private String publicationYear;
 	private String parsedPublicationYear = DEFAULT_PUBLICATION_YEAR;
 
-
-
 	public BiboDocument(String documentURL) {
-		this.documentURL = documentURL;
-	}
-	
-	public String getAuthorURL() {
-		return authorURL;
-	}
-	
-	public void setAuthorURL(String authorURL) {
-		this.authorURL = authorURL;
-	}
-	
-	public String getAuthorLabel() {
-		return authorLabel;
-	}
-	
-	public void setAuthorLabel(String authorLabel) {
-		this.authorLabel = authorLabel;
+		super(documentURL);
 	}
 	
 	public String getDocumentURL() {
-		return documentURL;
-	}
-	
-	public void setDocumentURL(String documentURL) {
-		this.documentURL = documentURL;
+		return this.getIndividualURL();
 	}
 	
 	public String getDocumentMoniker() {
@@ -59,11 +33,11 @@ public class BiboDocument {
 	}
 	
 	public String getDocumentLabel() {
-		return documentLabel;
+		return this.getIndividualLabel();
 	}
 	
 	public void setDocumentLabel(String documentLabel) {
-		this.documentLabel = documentLabel;
+		this.setIndividualLabel(documentLabel);
 	}
 	
 	public String getDocumentBlurb() {

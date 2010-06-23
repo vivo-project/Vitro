@@ -45,6 +45,9 @@ public class TestJava {
 		yearToPublicationCount.put("2002", 5);
 		yearToPublicationCount.put("2090", 7);
 		yearToPublicationCount.put("2087", 6);
+		
+		String emptyString = "";
+		System.out.println(emptyString.isEmpty());
 
 //		System.out.println(Collections.max(yearToPublicationCount.keySet()));
 //		System.out.println(Collections.min(yearToPublicationCount.keySet()));

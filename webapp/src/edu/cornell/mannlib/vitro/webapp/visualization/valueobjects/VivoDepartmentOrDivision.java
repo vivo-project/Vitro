@@ -9,14 +9,12 @@ import java.util.Set;
  * @author cdtank
  *
  */
-public class VivoDepartmentOrDivision {
+public class VivoDepartmentOrDivision extends Individual {
 
-	private String departmentURL;
-	private String departmentLabel;
 	private Set<VivoCollegeOrSchool> parentColleges = new HashSet<VivoCollegeOrSchool>();
 
 	public VivoDepartmentOrDivision(String departmentURL, VivoCollegeOrSchool parentCollege) {
-		this.departmentURL = departmentURL;
+		super(departmentURL);
 		addParentCollege(parentCollege);
 	}
 
@@ -29,19 +27,15 @@ public class VivoDepartmentOrDivision {
 	}
 
 	public String getDepartmentURL() {
-		return departmentURL;
+		return this.getIndividualURL();
 	}
 
 	public String getDepartmentLabel() {
-		if (departmentLabel != null) {
-			return departmentLabel;
-		} else {
-			return "";
-		}
+		return this.getIndividualLabel();
 	}
 
 	public void setDepartmentLabel(String departmentLabel) {
-		this.departmentLabel = departmentLabel;
+		this.setIndividualLabel(departmentLabel);
 	}
 
 }

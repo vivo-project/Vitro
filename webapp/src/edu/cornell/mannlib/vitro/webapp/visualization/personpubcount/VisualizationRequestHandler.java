@@ -31,6 +31,7 @@ import edu.cornell.mannlib.vitro.webapp.visualization.PDFDocument;
 import edu.cornell.mannlib.vitro.webapp.visualization.VisualizationCodeGenerator;
 import edu.cornell.mannlib.vitro.webapp.visualization.exceptions.MalformedQueryParametersException;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.BiboDocument;
+import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.Individual;
 
 public class VisualizationRequestHandler {
 
@@ -104,15 +105,17 @@ public class VisualizationRequestHandler {
 	    	 * It is ugly! 
 	    	 * */
 	    	if (DATA_RENDER_MODE_URL_VALUE.equalsIgnoreCase(renderMode)) { 
-				prepareVisualizationQueryDataResponse(authorDocuments,
+				prepareVisualizationQueryDataResponse(queryManager.getAuthor(),
+													  authorDocuments,
 													  yearToPublicationCount);
 				return;
 			}
 	    	
 	    	
 	    	if (PDF_RENDER_MODE_URL_VALUE.equalsIgnoreCase(renderMode)) { 
-				prepareVisualizationQueryPDFResponse(authorDocuments,
-													  yearToPublicationCount);
+				prepareVisualizationQueryPDFResponse(queryManager.getAuthor(),
+													 authorDocuments,
+													 yearToPublicationCount);
 				return;
 			}
 	    	
@@ -182,7 +185,7 @@ public class VisualizationRequestHandler {
 
 	}
 
-	private void prepareVisualizationQueryPDFResponse(List<BiboDocument> authorDocuments,
+	private void prepareVisualizationQueryPDFResponse(Individual author, List<BiboDocument> authorDocuments,
 													   Map<String, Integer> yearToPublicationCount) {
 		
 		String authorName = null; 
@@ -192,7 +195,7 @@ public class VisualizationRequestHandler {
 		 * individual. 
 		 * */
 		if (authorDocuments.size() > 0) {
-			authorName = ((BiboDocument) authorDocuments.get(0)).getAuthorLabel();
+			authorName = author.getIndividualLabel();
 		}
 		
 		/*
@@ -239,7 +242,7 @@ public class VisualizationRequestHandler {
 			}
 	}
 
-	private void prepareVisualizationQueryDataResponse(List<BiboDocument> authorDocuments,
+	private void prepareVisualizationQueryDataResponse(Individual author, List<BiboDocument> authorDocuments,
 			   Map<String, Integer> yearToPublicationCount) {
 
 		String authorName = null; 
@@ -249,7 +252,7 @@ public class VisualizationRequestHandler {
 		* individual. 
 		* */
 		if (authorDocuments.size() > 0) {
-		authorName = ((BiboDocument) authorDocuments.get(0)).getAuthorLabel();
+		authorName = author.getIndividualLabel();
 		}
 		
 		/*
@@ -323,7 +326,7 @@ public class VisualizationRequestHandler {
 
         request.setAttribute("bodyJsp", "/templates/visualization/publication_count.jsp");
         request.setAttribute("portalBean", portal);
-        request.setAttribute("title", "Person Publication Count visualization");
+        request.setAttribute("title", "Individual Publication Count visualization");
         request.setAttribute("scripts", "/templates/visualization/visualization_scripts.jsp");
 
 	}
@@ -352,7 +355,7 @@ public class VisualizationRequestHandler {
 		RequestDispatcher requestDispatcher = request.getRequestDispatcher(Controllers.BASIC_JSP);
 		request.setAttribute("bodyJsp", "/templates/visualization/visualization_error.jsp");
 		request.setAttribute("portalBean", portal);
-		request.setAttribute("title", "Visualization Query Error - Person Publication Count");
+		request.setAttribute("title", "Visualization Query Error - Individual Publication Count");
 
 		try {
 			requestDispatcher.forward(request, response);

@@ -33,6 +33,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.visualization.PDFDocument;
 import edu.cornell.mannlib.vitro.webapp.visualization.exceptions.MalformedQueryParametersException;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.BiboDocument;
+import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.Individual;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.VivoCollegeOrSchool;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.VivoDepartmentOrDivision;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.VivoEmployee;
@@ -132,12 +133,15 @@ public class VisualizationRequestHandler {
 	    	 * It is ugly! 
 	    	 * */
 	    	if (DATA_RENDER_MODE_URL_VALUE.equalsIgnoreCase(renderMode)) { 
-				prepareVisualizationQueryDataResponse(departmentToPublicationsOverTime,
+				prepareVisualizationQueryDataResponse(
+													  departmentToPublicationsOverTime,
 													  queryManager.getCollegeURLToVO());
 				
-				System.out.println(publishedYearsForCollege);
+				log.debug(publishedYearsForCollege);
 				return;
 			}
+	    	
+	    	
 	    	
 	    	/*
 	    	if (PDF_RENDER_MODE_URL_VALUE.equalsIgnoreCase(renderMode)) { 
@@ -263,8 +267,9 @@ public class VisualizationRequestHandler {
 		return departmentYearToPublicationCount;
 	}
 
-	private void prepareVisualizationQueryPDFResponse(List<BiboDocument> authorDocuments,
-													   Map<String, Integer> yearToPublicationCount) {
+	private void prepareVisualizationQueryPDFResponse(Individual college, 
+													  List<BiboDocument> authorDocuments,
+													  Map<String, Integer> yearToPublicationCount) {
 		
 		String authorName = null; 
 		
@@ -273,7 +278,7 @@ public class VisualizationRequestHandler {
 		 * individual. 
 		 * */
 		if (authorDocuments.size() > 0) {
-			authorName = ((BiboDocument) authorDocuments.get(0)).getAuthorLabel();
+			authorName = college.getIndividualLabel();
 		}
 		
 		/*
@@ -298,28 +303,21 @@ public class VisualizationRequestHandler {
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
 				PdfWriter pdfWriter = PdfWriter.getInstance(document, baos);
 				document.open();
-//				document.add(new Paragraph("JSS Chintan Deepak Tank "));
-//				document.add(Chunk.NEWLINE);
-//				document.add(new Paragraph("The method used to generate this PDF was: TEST OPST"));
 				
-				PDFDocument pdfDocument = new PDFDocument(authorName, yearToPublicationCount, document, pdfWriter);
-				
-				
+				PDFDocument pdfDocument = new PDFDocument(authorName, 
+														  yearToPublicationCount, 
+														  document, 
+														  pdfWriter);
 				document.close();
 
-				// setting some response headers
 				response.setHeader("Expires", "0");
 				response.setHeader("Cache-Control", "must-revalidate, post-check=0, pre-check=0");
 				response.setHeader("Pragma", "public");
-				// setting the content type
-				// the contentlength is needed for MSIE!!!
 				response.setContentLength(baos.size());
-				// write ByteArrayOutputStream to the ServletOutputStream
+				
 				baos.writeTo(responseOutputStream);
 				responseOutputStream.flush();
 				responseOutputStream.close();
-				
-//				System.out.println("done with response o/p stream");
 				
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -340,7 +338,7 @@ public class VisualizationRequestHandler {
 		* */
 //		System.out.println(collegeURLToVO);
 		if (collegeURLToVO.size() > 0) {
-//		collegeName = ((VivoCollegeOrSchool) collegeURLToVO.entrySet().iterator().next()).getCollegeLabel();
+			collegeName = ((VivoCollegeOrSchool) collegeURLToVO.values().iterator().next()).getCollegeLabel();
 		}
 		
 		/*
@@ -350,8 +348,7 @@ public class VisualizationRequestHandler {
 		collegeName = "";
 		}
 		
-		String outputFileName = slugify(collegeName + "depts-pub-count") 
-		+ ".csv";
+		String outputFileName = slugify(collegeName + "depts-pub-count") + ".csv";
 		
 		response.setContentType("application/octet-stream");
 		response.setHeader("Content-Disposition","attachment;filename=" + outputFileName);
@@ -439,7 +436,7 @@ public class VisualizationRequestHandler {
 
         request.setAttribute("bodyJsp", "/templates/visualization/publication_count.jsp");
         request.setAttribute("portalBean", portal);
-        request.setAttribute("title", "Person Publication Count Visualization");
+        request.setAttribute("title", "Individual Publication Count Visualization");
         request.setAttribute("scripts", "/templates/visualization/visualization_scripts.jsp");
 
 	}
@@ -468,7 +465,7 @@ public class VisualizationRequestHandler {
 		RequestDispatcher requestDispatcher = request.getRequestDispatcher(Controllers.BASIC_JSP);
 		request.setAttribute("bodyJsp", "/templates/visualization/visualization_error.jsp");
 		request.setAttribute("portalBean", portal);
-		request.setAttribute("title", "Visualization Query Error - Person Publication Count");
+		request.setAttribute("title", "Visualization Query Error - Individual Publication Count");
 
 		try {
 			requestDispatcher.forward(request, response);

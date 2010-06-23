@@ -120,8 +120,11 @@ public class QueryHandler {
 				currentEmployee.addParentDepartment(currentDepartment);
 			} else {
 				currentEmployee = new VivoEmployee(employeeNode.toString(), currentEmployeeType, currentDepartment);
+				RDFNode authorLabelNode = solution.get(QueryFieldLabels.AUTHOR_LABEL);
+				if (authorLabelNode != null) {
+					currentEmployee.setIndividualLabel(authorLabelNode.toString());
+				}
 				employeeURLToVO.put(employeeNode.toString(), currentEmployee);
-				
 			}
 			
 			RDFNode documentNode = solution.get(QueryFieldLabels.DOCUMENT_URL);
@@ -203,11 +206,6 @@ public class QueryHandler {
 				biboDocument.setPublicationYear(publicationYearNode.toString());
 			}
 			
-			RDFNode authorLabelNode = solution.get(QueryFieldLabels.AUTHOR_LABEL);
-			if (authorLabelNode != null) {
-				biboDocument.setAuthorLabel(authorLabelNode.toString());
-			}
-
 			return biboDocument;
 	}
 	
@@ -278,7 +276,7 @@ public class QueryHandler {
 															  String ontologyHandle) {
 		
 		String sparqlQuery = " {?department " + ontologyHandle + " ?" + employeeHandle + " . " 
-							+ "?" + employeeHandle + " rdf:type foaf:Person; rdfs:label ?authorLabel. " 
+							+ "?" + employeeHandle + " rdf:type foaf:Individual; rdfs:label ?authorLabel. " 
 							+ "OPTIONAL { ?" + employeeHandle + " vivo:authorOf ?document ." +
 										" ?document rdf:type bibo:Document ." +
 										" ?document rdfs:label ?documentLabel ." +

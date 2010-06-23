@@ -11,26 +11,27 @@ import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.VOConstants.E
  * @author cdtank
  *
  */
-public class VivoEmployee {
+public class VivoEmployee extends Individual{
 
-	private String employeeURL;
 	private EmployeeType employeeType; 
 	private Set<VivoDepartmentOrDivision> parentDepartments = new HashSet<VivoDepartmentOrDivision>();
 	private Set<BiboDocument> authorDocuments = new HashSet<BiboDocument>();
 
-	public VivoEmployee(String employeeURL, EmployeeType employeeType, VivoDepartmentOrDivision parentDepartment) {
-		this.employeeURL = employeeURL;
+	public VivoEmployee(String employeeURL, 
+						EmployeeType employeeType, 
+						VivoDepartmentOrDivision parentDepartment) {
+		super(employeeURL);
 		addParentDepartment(parentDepartment);
 	}
 
 	public String getEmployeeURL() {
-		return employeeURL;
+		return this.getIndividualURL();
 	}
 
-	public void setEmployeeURL(String employeeURL) {
-		this.employeeURL = employeeURL;
+	public String getEmployeeName() {
+		return this.getIndividualLabel();
 	}
-
+	
 	public EmployeeType getEmployeeType() {
 		return employeeType;
 	}
