@@ -10,7 +10,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.ViewObject;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
@@ -69,7 +69,7 @@ public class FreeMarkerSetup implements ServletContextListener {
 
 		FreeMarkerHttpServlet.config = cfg;  
         FreeMarkerHttpServlet.context = sc;
-        ViewObject.context = sc;
+        BaseTemplateModel.context = sc;
 		UrlBuilder.contextPath = sc.getContextPath();
 
 	}

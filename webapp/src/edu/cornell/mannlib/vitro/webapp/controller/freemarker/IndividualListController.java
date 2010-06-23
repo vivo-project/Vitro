@@ -14,7 +14,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.IndividualView;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.IndividualTemplateModel;
 
 /** 
  * Generates a list of individuals for display in a template 
@@ -64,7 +64,7 @@ public class IndividualListController extends FreeMarkerHttpServlet {
             if (vclass != null) {
                 // Create list of individual view objects
                 List<Individual> individualList = vreq.getWebappDaoFactory().getIndividualDao().getIndividualsByVClass(vclass);
-                List<IndividualView> individuals = new ArrayList<IndividualView>(individualList.size());
+                List<IndividualTemplateModel> individuals = new ArrayList<IndividualTemplateModel>(individualList.size());
 
                 if (individualList == null) {
                     // RY Is this really an error? 
@@ -72,7 +72,7 @@ public class IndividualListController extends FreeMarkerHttpServlet {
                     message = "No individuals to display.";
                 } else {            
                     for (Individual i: individualList) {
-                        individuals.add(new IndividualView(i));
+                        individuals.add(new IndividualTemplateModel(i));
                     }                   
                 }
 

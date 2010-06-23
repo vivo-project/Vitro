@@ -9,9 +9,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.ViewObject;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 
-public class Menu extends ViewObject {
+public class Menu extends BaseTemplateModel {
 
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(Menu.class.getName());

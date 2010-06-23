@@ -12,17 +12,18 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Link;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.ViewFinder.ClassView;
+import edu.cornell.mannlib.vitro.webapp.web.ViewFinder;
+import edu.cornell.mannlib.vitro.webapp.web.ViewFinder.ClassView;
 
-public class IndividualView extends ViewObject {
+public class IndividualTemplateModel extends BaseTemplateModel {
     
-    private static final Log log = LogFactory.getLog(IndividualView.class.getName());
+    private static final Log log = LogFactory.getLog(IndividualTemplateModel.class.getName());
     
     private static final String PATH = Route.INDIVIDUAL.path();
     
     private Individual individual;
     
-    public IndividualView(Individual individual) {
+    public IndividualTemplateModel(Individual individual) {
         this.individual = individual;
     }
     

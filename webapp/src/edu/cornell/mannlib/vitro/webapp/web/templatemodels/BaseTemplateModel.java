@@ -10,9 +10,9 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Params;
 
-public abstract class ViewObject {
+public abstract class BaseTemplateModel {
 
-    private static final Log log = LogFactory.getLog(ViewObject.class.getName());
+    private static final Log log = LogFactory.getLog(BaseTemplateModel.class.getName());
     
     public static ServletContext context = null;
 

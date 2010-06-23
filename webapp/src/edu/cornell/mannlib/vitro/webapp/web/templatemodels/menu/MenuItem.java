@@ -5,9 +5,9 @@ package edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.ViewObject;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 
-public class MenuItem extends ViewObject {
+public class MenuItem extends BaseTemplateModel {
 
     private static final Log log = LogFactory.getLog(MenuItem.class.getName());
     

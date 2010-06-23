@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.web.templatemodels;
+package edu.cornell.mannlib.vitro.webapp.web;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;

@@ -17,7 +17,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassGroupView;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassGroupTemplateModel;
 import freemarker.template.SimpleSequence;
 
 import org.apache.commons.logging.Log;
@@ -85,9 +85,9 @@ public class BrowseController extends FreeMarkerHttpServlet {
     	    // FreeMarker will wrap vcgroups in a SimpleSequence. So do we want to create the SimpleSequence directly?
     	    // But, makes code less portable to another system.
     	    // SimpleSequence vcgroups = new SimpleSequence(groups.size());   	    
-    	    List<VClassGroupView> vcgroups = new ArrayList<VClassGroupView>(groups.size());   	    
+    	    List<VClassGroupTemplateModel> vcgroups = new ArrayList<VClassGroupTemplateModel>(groups.size());   	    
     		for (VClassGroup g: groups) {
-    		    vcgroups.add(new VClassGroupView(g));
+    		    vcgroups.add(new VClassGroupTemplateModel(g));
     		}
     		body.put("classGroups", vcgroups);
     	} 

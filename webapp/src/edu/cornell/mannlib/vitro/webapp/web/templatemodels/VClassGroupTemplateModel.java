@@ -12,14 +12,14 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 
-public class VClassGroupView extends ViewObject {
+public class VClassGroupTemplateModel extends BaseTemplateModel {
 
-	private static final Log log = LogFactory.getLog(VClassGroupView.class.getName());
+	private static final Log log = LogFactory.getLog(VClassGroupTemplateModel.class.getName());
 	
     private VClassGroup vClassGroup = null;
-    private List<VClassView> classes = null;
+    private List<VClassTemplateModel> classes = null;
     
-    public VClassGroupView(VClassGroup vClassGroup) {
+    public VClassGroupTemplateModel(VClassGroup vClassGroup) {
         this.vClassGroup = vClassGroup;
     }
 
@@ -43,12 +43,12 @@ public class VClassGroupView extends ViewObject {
     	return vClassGroup.getPublicName();
     }
     
-    public List<VClassView> getClasses() {
+    public List<VClassTemplateModel> getClasses() {
         if (classes == null) {
             List<VClass> classList = vClassGroup.getVitroClassList();
-            classes = new ArrayList<VClassView>();
+            classes = new ArrayList<VClassTemplateModel>();
             for (VClass vc : classList) {
-                classes.add(new VClassView(vc));
+                classes.add(new VClassTemplateModel(vc));
             }
         }
         
