@@ -8,7 +8,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
 
@@ -23,8 +24,7 @@ import edu.cornell.mannlib.vitro.webapp.filestorage.updater.FileStorageUpdater;
  * TODO
  */
 public class UpdateUploadedFiles implements ServletContextListener {
-	private static final Logger log = Logger
-			.getLogger(UpdateUploadedFiles.class);
+	private static final Log log = LogFactory.getLog(UpdateUploadedFiles.class);
 
 	/**
 	 * Nothing to do on teardown.

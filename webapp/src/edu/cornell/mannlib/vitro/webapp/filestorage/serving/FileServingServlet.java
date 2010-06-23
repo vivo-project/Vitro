@@ -16,7 +16,8 @@ import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -46,8 +47,7 @@ import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup;
  * </p>
  */
 public class FileServingServlet extends VitroHttpServlet {
-	private static final Logger log = Logger
-			.getLogger(FileServingServlet.class);
+	private static final Log log = LogFactory.getLog(FileServingServlet.class);
 
 	private FileStorage fileStorage;
 
@@ -112,7 +112,7 @@ public class FileServingServlet extends VitroHttpServlet {
 		try {
 			in = fileStorage.getInputStream(uri, actualFilename);
 		} catch (FileNotFoundException e) {
-			log.error(e);
+			log.error(e, e);
 			response.sendError(SC_INTERNAL_SERVER_ERROR, e.toString());
 			return;
 		}

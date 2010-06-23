@@ -14,7 +14,8 @@ import javax.servlet.jsp.tagext.SimpleTagSupport;
 import net.djpowell.sparqltag.SelectTag;
 import net.djpowell.sparqltag.SparqlTag;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
@@ -37,6 +38,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.IterableAdaptor;
  */
 
 public class ListSparqlTag extends SelectTag {
+	private static final Log log = LogFactory.getLog(ListSparqlTag.class);
 
 /**
  * 
@@ -44,7 +46,7 @@ public class ListSparqlTag extends SelectTag {
  * the queryExecution gets closed.
  */    
     public void doTag() throws JspException {
-        trc.debug("CollectionSparqlTag.doTag()");
+    	log.debug("CollectionSparqlTag.doTag()");
 
         SparqlTag container = ((SparqlTag)SimpleTagSupport.findAncestorWithClass(this, SparqlTag.class));
         if (container == null) {
@@ -55,7 +57,7 @@ public class ListSparqlTag extends SelectTag {
         
         Query query = parseQuery();
         QueryExecution qex = QueryExecutionFactory.create(query, model, qparams);
-        trc.debug("query executed");
+        log.debug("query executed");
         
         ResultSet results;
         model.enterCriticalSection(Lock.READ);
@@ -64,16 +66,16 @@ public class ListSparqlTag extends SelectTag {
             List<Map<String,RDFNode>> resultList = new LinkedList<Map<String,RDFNode>>();
 
             for( QuerySolution qs : IterableAdaptor.adapt( (Iterator<QuerySolution>)results )  ){
-                trc.debug("found solution");
+            	log.debug("found solution");
                 HashMap<String,RDFNode> map1 = new HashMap<String,RDFNode>();
                 for( String name : IterableAdaptor.adapt((Iterator<String>)qs.varNames())){
                     RDFNode value = qs.get(name);
-                    if( trc.isDebugEnabled() ){trc.debug(name + ": " + value.toString() );}
+                    if( log.isDebugEnabled() ){log.debug(name + ": " + value.toString() );}
                     map1.put(name, value);
                 }
                 resultList.add(map1);
             }    
-            trc.debug("setting " + var + " to a list of size " + resultList.size() );
+            log.debug("setting " + var + " to a list of size " + resultList.size() );
             getJspContext().setAttribute(var, resultList);
         } finally {
             model.leaveCriticalSection();
@@ -88,6 +90,4 @@ public class ListSparqlTag extends SelectTag {
             }  
         }            
     }
-
-    private static final Logger trc = Logger.getLogger(ListSparqlTag.class);
 }

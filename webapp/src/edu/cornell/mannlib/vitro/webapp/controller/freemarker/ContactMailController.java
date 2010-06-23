@@ -5,7 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Calendar;
 import java.util.Date;
@@ -23,14 +22,15 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.ServletConfig;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 
 public class ContactMailController extends FreeMarkerHttpServlet {
-
+	private static final Log log = LogFactory
+			.getLog(ContactMailController.class);
     private static final long serialVersionUID = 1L;
-    private static final Logger LOG = Logger.getLogger(ContactMailController.class);
 	
     private final static String SPAM_MESSAGE        = "Your message was flagged as spam.";
     private final static String EMAIL_BACKUP_FILE_PATH = "/WEB-INF/LatestMessage.html";
@@ -56,9 +56,9 @@ public class ContactMailController extends FreeMarkerHttpServlet {
 	public static String getSmtpHostFromProperties() {
 		String host = ConfigurationProperties.getProperty("Vitro.smtpHost");
 		if (host != null && !host.equals("")) {
-			LOG.debug("Found Vitro.smtpHost value of " + host);
+			log.debug("Found Vitro.smtpHost value of " + host);
 		} else {
-			LOG.debug("No Vitro.smtpHost specified");
+			log.debug("No Vitro.smtpHost specified");
 		}
 		return (host != null && host.length() > 0) ? host : null;
 	}
@@ -135,7 +135,7 @@ public class ContactMailController extends FreeMarkerHttpServlet {
         
                 if ("contact".equals(formType)) {
                     if (portal.getContactMail() == null || portal.getContactMail().trim().length()==0) {
-                        LOG.error("No contact mail address defined in current portal "+portal.getPortalId());
+                    	log.error("No contact mail address defined in current portal "+portal.getPortalId());
                         throw new Error(
                                 "To establish the Contact Us mail capability the system administrators must  "
                                 + "specify an email address in the current portal.");
@@ -150,7 +150,7 @@ public class ContactMailController extends FreeMarkerHttpServlet {
                 }
                 recipientCount=(deliverToArray == null) ? 0 : deliverToArray.length;
                 if (recipientCount == 0) {
-                    LOG.error("recipientCount is 0 when DeliveryType specified as \""+formType+"\"");
+                	log.error("recipientCount is 0 when DeliveryType specified as \""+formType+"\"");
                     throw new Error(
                             "To establish the Contact Us mail capability the system administrators must  "
                             + "specify at least one email address in the current portal.");
@@ -196,7 +196,7 @@ public class ContactMailController extends FreeMarkerHttpServlet {
                     outFile.close();
                 }
                 catch (IOException e){
-                    LOG.error("Can't open file to write email backup");                   
+                	log.error("Can't open file to write email backup");                   
                 }         
                 
                 // Message was sent successfully
@@ -274,7 +274,8 @@ public class ContactMailController extends FreeMarkerHttpServlet {
         try {
             msg.setFrom( new InternetAddress( webuseremail, webusername ));
         } catch (UnsupportedEncodingException e) {
-            LOG.error("Can't set message sender with personal name " + webusername + " due to UnsupportedEncodingException");
+        	log.error("Can't set message sender with personal name " + webusername + 
+        			" due to UnsupportedEncodingException");
             msg.setFrom( new InternetAddress( webuseremail ) );
         }
 

@@ -23,13 +23,14 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * The default implementation of {@link FileStorage}.
  */
 public class FileStorageImpl implements FileStorage {
-	private static final Logger log = Logger.getLogger(FileStorageImpl.class);
+	private static final Log log = LogFactory.getLog(FileStorageImpl.class);
 
 	private final File baseDir;
 	private final File rootDir;

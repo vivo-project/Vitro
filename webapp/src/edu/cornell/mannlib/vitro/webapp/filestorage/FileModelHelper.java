@@ -4,7 +4,8 @@ package edu.cornell.mannlib.vitro.webapp.filestorage;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -31,7 +32,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
  * </p>
  */
 public class FileModelHelper {
-	private static final Logger log = Logger.getLogger(FileModelHelper.class);
+	private static final Log log = LogFactory.getLog(FileModelHelper.class);
 
 	// ----------------------------------------------------------------------
 	// Static methods -- the Individual holds all necessary references.

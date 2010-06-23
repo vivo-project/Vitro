@@ -2,7 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.filestorage;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup;
@@ -11,7 +12,7 @@ import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup;
  * Static methods to help when serving uploaded files.
  */
 public class FileServingHelper {
-	private static final Logger log = Logger.getLogger(FileServingHelper.class);
+	private static final Log log = LogFactory.getLog(FileServingHelper.class);
 
 	private static final String DEFAULT_PATH = "/individual/";
 	private static final String FILE_PATH = "/file/";

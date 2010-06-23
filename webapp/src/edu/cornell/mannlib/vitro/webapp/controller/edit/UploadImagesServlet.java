@@ -26,7 +26,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
@@ -38,8 +39,7 @@ import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup;
 import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest;
 
 public class UploadImagesServlet extends VitroHttpServlet {
-	private static final Logger log = Logger
-			.getLogger(UploadImagesServlet.class);
+	private static final Log log = LogFactory.getLog(UploadImagesServlet.class);
 
 	/** Recognized file extensions mapped to MIME-types. */
 	private static final Map<String, String> RECOGNIZED_FILE_TYPES = createFileTypesMap();
@@ -146,12 +146,12 @@ public class UploadImagesServlet extends VitroHttpServlet {
 				errors.add(e.getMessage());
 				displayFailure(request, response, errors);
 			} catch (IllegalStateException e) {
-				log.error(e);
+				log.error(e, e);
 				errors.add(e.getMessage());
 				displayFailure(request, response, errors);
 			}
 		} catch (FileUploadException e) {
-			log.error(e);
+			log.error(e, e);
 			errors.add(e.getMessage());
 			displayFailure(rawRequest, response, errors);
 		}

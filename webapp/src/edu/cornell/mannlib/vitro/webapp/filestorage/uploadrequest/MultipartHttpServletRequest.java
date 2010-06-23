@@ -18,7 +18,8 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * A wrapper for a servlet request that holds multipart content. Parsing the
@@ -27,8 +28,8 @@ import org.apache.log4j.Logger;
  * here, to answer file-related requests.
  */
 class MultipartHttpServletRequest extends FileUploadServletRequest {
-	private static final Logger LOG = Logger
-			.getLogger(MultipartHttpServletRequest.class);
+	private static final Log log = LogFactory
+			.getLog(MultipartHttpServletRequest.class);
 
 	private static final String[] EMPTY_ARRAY = new String[0];
 
@@ -55,20 +56,20 @@ class MultipartHttpServletRequest extends FileUploadServletRequest {
 			if (item.isFormField()) {
 				addToParameters(parameters, item.getFieldName(), item
 						.getString("UTF-8"));
-				LOG.debug("Form field (parameter) " + item.getFieldName() + "="
+				log.debug("Form field (parameter) " + item.getFieldName() + "="
 						+ item.getString());
 			} else {
 				addToFileItems(files, item);
-				LOG
+				log
 						.debug("File " + item.getFieldName() + ": "
 								+ item.getName());
 			}
 		}
 
 		this.parameters = Collections.unmodifiableMap(parameters);
-		LOG.debug("Parameters are: " + this.parameters);
+		log.debug("Parameters are: " + this.parameters);
 		this.files = Collections.unmodifiableMap(files);
-		LOG.debug("Files are: " + this.files);
+		log.debug("Files are: " + this.files);
 		request.setAttribute(FILE_ITEM_MAP, this.files);
 	}
 
@@ -192,7 +193,7 @@ class MultipartHttpServletRequest extends FileUploadServletRequest {
 		for (Entry<String, List<String>> entry : parameters.entrySet()) {
 			result.put(entry.getKey(), entry.getValue().toArray(EMPTY_ARRAY));
 		}
-		LOG.debug("resulting parameter map: " + result);
+		log.debug("resulting parameter map: " + result);
 		return result;
 	}
 

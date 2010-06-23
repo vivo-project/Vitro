@@ -8,7 +8,8 @@ import java.io.File;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * A collection of utility routines used by the file storage system. Routines
@@ -24,7 +25,7 @@ import org.apache.log4j.Logger;
  * </ul>
  */
 public class FileStorageHelper {
-	private static final Logger LOG = Logger.getLogger(FileStorageHelper.class);
+	private static final Log log = LogFactory.getLog(FileStorageHelper.class);
 
 	public static final char HEX_ESCAPE_CHAR = '^';
 
@@ -80,7 +81,7 @@ public class FileStorageHelper {
 			result.append(hexEncodeCharacter(clear.charAt(i)));
 		}
 
-		LOG.debug("Add hex encodings to '" + clear + "' giving '" + result
+		log.debug("Add hex encodings to '" + clear + "' giving '" + result
 				+ "'");
 		return result.toString();
 	}
@@ -115,7 +116,7 @@ public class FileStorageHelper {
 			char c = encoded.charAt(i);
 			result.append(translateSingleCharacter(c, sources, targets));
 		}
-		LOG.debug("Add single character conversions to '" + encoded
+		log.debug("Add single character conversions to '" + encoded
 				+ "' giving '" + result + "'");
 		return result.toString();
 	}
@@ -185,7 +186,7 @@ public class FileStorageHelper {
 			char c = cleaned.charAt(i);
 			result.append(translateSingleCharacter(c, targets, sources));
 		}
-		LOG.debug("Remove single character conversions from '" + cleaned
+		log.debug("Remove single character conversions from '" + cleaned
 				+ "' giving '" + result + "'");
 		return result.toString();
 	}
@@ -217,7 +218,7 @@ public class FileStorageHelper {
 				result.append(c);
 			}
 		}
-		LOG.debug("Remove hex encodings from '" + encoded + "' giving '"
+		log.debug("Remove hex encodings from '" + encoded + "' giving '"
 				+ result + "'");
 		return result.toString();
 	}
@@ -248,7 +249,7 @@ public class FileStorageHelper {
 		String prefixed = applyPrefixChar(prefix, cleaned);
 		String brokenUp = insertPathDelimiters(prefixed);
 		String result = excludeWindowsWordsFromPath(brokenUp);
-		LOG.debug("id2Path: id='" + id + "', namespaces='" + namespacesMap
+		log.debug("id2Path: id='" + id + "', namespaces='" + namespacesMap
 				+ "', path='" + result + "'");
 		return result;
 	}
@@ -276,7 +277,7 @@ public class FileStorageHelper {
 			}
 			path.append(prefixed.charAt(i));
 		}
-		LOG.debug("Insert path delimiters to '" + prefixed + "' giving '"
+		log.debug("Insert path delimiters to '" + prefixed + "' giving '"
 				+ path + "'");
 		return path.toString();
 	}

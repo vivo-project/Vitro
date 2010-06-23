@@ -17,7 +17,8 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Loads the configuration properties from a properties file. The path to the
@@ -40,8 +41,8 @@ import org.apache.log4j.Logger;
  * @author jeb228
  */
 public class ConfigurationProperties {
-	private static final Logger LOG = Logger
-			.getLogger(ConfigurationProperties.class);
+	private static final Log log = LogFactory
+			.getLog(ConfigurationProperties.class);
 
 	/**
 	 * The JNDI naming context where Tomcat stores environment attributes.
@@ -132,7 +133,7 @@ public class ConfigurationProperties {
 			try {
 				inStream.close();
 			} catch (IOException e) {
-				LOG.error("Failed to close input stream", e);
+				log.error("Failed to close input stream", e);
 			}
 		}
 
@@ -143,7 +144,7 @@ public class ConfigurationProperties {
 			newMap.put(key, props.getProperty(key));
 		}
 
-		LOG.info("Configuration properties are: " + newMap);
+		log.info("Configuration properties are: " + newMap);
 
 		// Save an unmodifiable version of the Map
 		return Collections.unmodifiableMap(newMap);
@@ -163,7 +164,7 @@ public class ConfigurationProperties {
 					+ "\" failed. Is the context file missing?";
 			Context envCtx = (Context) new InitialContext().lookup(JNDI_BASE);
 			if (envCtx == null) {
-				LOG.error(message);
+				log.error(message);
 				throw new IllegalStateException(message);
 			}
 
@@ -173,7 +174,7 @@ public class ConfigurationProperties {
 					+ "'. Is the context file set up correctly?";
 			String configPath = (String) envCtx.lookup(PATH_CONFIGURATION);
 			if (configPath == null) {
-				LOG.error(message);
+				log.error(message);
 				throw new IllegalStateException(message);
 			}
 
