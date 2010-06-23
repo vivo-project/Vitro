@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.view.menu;
+package edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +9,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.view.ViewObject;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.ViewObject;
 
 public class Menu extends ViewObject {
 

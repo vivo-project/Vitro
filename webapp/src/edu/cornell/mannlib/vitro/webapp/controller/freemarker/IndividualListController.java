@@ -14,7 +14,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
-import edu.cornell.mannlib.vitro.webapp.view.IndividualView;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.IndividualView;
 
 /** 
  * Generates a list of individuals for display in a template 

@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.view.fileList;
+package edu.cornell.mannlib.vitro.webapp.web.templatemodels.fileList;
 
 public class ScriptList extends FileList {
     

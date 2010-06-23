@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.view.menu;
+package edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu;
 
 import java.util.Iterator;
 import java.util.List;

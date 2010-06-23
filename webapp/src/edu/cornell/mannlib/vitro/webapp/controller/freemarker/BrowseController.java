@@ -17,7 +17,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
-import edu.cornell.mannlib.vitro.webapp.view.VClassGroupView;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassGroupView;
 import freemarker.template.SimpleSequence;
 
 import org.apache.commons.logging.Log;
