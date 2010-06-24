@@ -25,6 +25,22 @@
 
 <p><strong>Animal:</strong> ${animal}</p>
 
+<h2>Zoo 1</h2>
+<ul>
+<#list zoo1.animals as animal>
+    <li>${animal}</li>
+</#list>
+</ul>
+
+<h2>Zoo 2</h2>
+<ul>
+<#list zoo2.animals as animal>
+    <li>${animal}</li>
+</#list>
+</ul>
+
+<p><strong>Berries: </strong>${berries}</p>
+
 <@dump var="now" />
 <@dump var="urls" />
 <@dump var="fruit" />
