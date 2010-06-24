@@ -41,6 +41,11 @@ public class FreeMarkerComponentGenerator extends FreeMarkerHttpServlet {
         request.setAttribute("ftl_search", get("search", root, config));
         request.setAttribute("ftl_footer", get("footer", root, config));
     }
+
+    private String get(String templateName, Map<String, Object> root, Configuration config) {
+        String template = "page/partials/" + templateName + ".ftl";
+        return mergeToTemplate(template, root, config).toString();
+    }
     
     // RY We need the servlet context in getConfig(). For some reason using the method inherited from
     // GenericServlet bombs.
@@ -51,25 +56,7 @@ public class FreeMarkerComponentGenerator extends FreeMarkerHttpServlet {
     protected static void setServletContext(ServletContext sc) {
         context = sc;
     }
-//    public String getIdentity() {
-//        return get("identity");
-//    }
-//
-//    public String getMenu() {
-//        return get("menu");
-//    }
-//    
-//    public String getSearch() {
-//        return get("search");
-//    }
-//
-//    public String getFooter() {
-//        return get("footer"); 
-//    }
-//    
-    private String get(String templateName, Map<String, Object> root, Configuration config) {
-        String template = "page/partials/" + templateName + ".ftl";
-        return mergeToTemplate(template, root, config).toString();
-    }
+  
+
 
 }

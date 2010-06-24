@@ -438,7 +438,9 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
     // TEMPORARY method for transition from JSP to FreeMarker. 
     // It's a static method because it needs to be called from JSPs that don't go through a servlet.
     public static void getFreeMarkerComponentsForJsp(HttpServletRequest request, HttpServletResponse response) {
-        FreeMarkerComponentGenerator fcg = new FreeMarkerComponentGenerator(request, response);
+        // We need to create a FreeMarkerHttpServlet object in order to call the instance methods
+        // to set up the data model.
+        new FreeMarkerComponentGenerator(request, response);
     }
 
 }
