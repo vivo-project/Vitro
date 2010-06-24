@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.ServletException;
@@ -22,27 +23,29 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vedit.beans.LoginFormBean;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreeMarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DependentResourceDeleteJena;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditN3Utils;
+import freemarker.template.Configuration;
 
 public class PrimitiveRdfEdit extends FreeMarkerHttpServlet{
 
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected String getBody() {
+	protected String getBody(VitroRequest vreq, Map<String, Object> body, Configuration config) {
 //		boolean loggedIn = checkLoginStatus(request, response);
 //		if( !loggedIn){
 //			doError(response,"You must be logged in to use this servlet.",HttpStatus.SC_UNAUTHORIZED);
 //			return;
 //		}
-		return mergeBodyToTemplate("primitiveRdfEdit.ftl",new HashMap());
+		return mergeBodyToTemplate("primitiveRdfEdit.ftl",new HashMap<String, Object>(), config);
 	}
 
 	@Override
-	protected String getTitle() {
+	protected String getTitle(String siteName) {
 		return "RDF edit";
 	}
 
@@ -50,6 +53,7 @@ public class PrimitiveRdfEdit extends FreeMarkerHttpServlet{
 	public void doPost(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 		
+        VitroRequest vreq = new VitroRequest(request);
 		boolean loggedIn = checkLoginStatus(request, response);
 		if( !loggedIn){
 			doError(response,"You must be logged in to use this servlet.",HttpStatus.SC_UNAUTHORIZED);
@@ -113,7 +117,7 @@ public class PrimitiveRdfEdit extends FreeMarkerHttpServlet{
 			//if not okay, send error message
 			doError(response,"Insufficent permissions.",HttpStatus.SC_UNAUTHORIZED);
 		}
-		
+
 		if( hasPermission ){
 			String editorUri = EditN3Utils.getEditorUri(vreq,request.getSession(false),getServletContext());			
 			try {

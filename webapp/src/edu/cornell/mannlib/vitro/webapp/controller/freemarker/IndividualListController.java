@@ -13,8 +13,10 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.IndividualTemplateModel;
+import freemarker.template.Configuration;
 
 /** 
  * Generates a list of individuals for display in a template 
@@ -23,23 +25,18 @@ public class IndividualListController extends FreeMarkerHttpServlet {
   
     private static final long serialVersionUID = 1L;   
     private static final Log log = LogFactory.getLog(IndividualListController.class.getName());
-    private VClass vclass = null;
-    private String title = null;
-    
-    protected void setTitleAndBody() {
-        setBody();        
-    }
+//    private VClass vclass = null;
+//    private String title = null;
 
-    protected String getBody() {
+    protected String getBody(VitroRequest vreq, Map<String, Object> body, Configuration config) {
  
-        Map<String, Object> body = new HashMap<String, Object>();
         String bodyTemplate = "individualList.ftl";
         String errorMessage = null;
         String message = null;
         
         try {
             Object obj = vreq.getAttribute("vclass");
-            vclass = null;
+            VClass vclass = null;
             if ( obj == null ) { // look for vitroclass id parameter
                 String vitroClassIdStr = vreq.getParameter("vclassId");
                 if ( !StringUtils.isEmpty(vitroClassIdStr)) { 
@@ -77,13 +74,15 @@ public class IndividualListController extends FreeMarkerHttpServlet {
                 }
 
                 // Set title and subtitle. Title will be retrieved later in getTitle().   
-                VClassGroup classGroup = vclass.getGroup();       
+                VClassGroup classGroup = vclass.getGroup();  
+                String title;
                 if (classGroup == null) {
                     title = vclass.getName();
                 } else {
                     title = classGroup.getPublicName();
                     body.put("subtitle", vclass.getName());
                 }
+                body.put("title", title);
                 
                 body.put("individuals", individuals);
             }   
@@ -100,16 +99,8 @@ public class IndividualListController extends FreeMarkerHttpServlet {
         } else if (message != null) {
             body.put("message", message);
         }
-        
-        setTitle();
     
-        return mergeBodyToTemplate(bodyTemplate, body);
-    }
-   
-    protected String getTitle() {
-        // The title is determined during compilation of the body, so we put it in an instance variable
-        // to be retrieved later.
-        return title;
+        return mergeBodyToTemplate(bodyTemplate, body, config);
     }
       
     private class HelpException extends Throwable {

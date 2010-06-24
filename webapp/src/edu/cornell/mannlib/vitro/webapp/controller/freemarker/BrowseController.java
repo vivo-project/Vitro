@@ -10,6 +10,7 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
@@ -18,6 +19,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassGroupTemplateModel;
+import freemarker.template.Configuration;
 import freemarker.template.SimpleSequence;
 
 import org.apache.commons.logging.Log;
@@ -62,13 +64,12 @@ public class BrowseController extends FreeMarkerHttpServlet {
         _cacheRebuildThread.informOfQueueChange();
     }
       
-    protected String getTitle() {
-    	return "Index to " + portal.getAppName() + " Contents";
+    protected String getTitle(String siteName) {
+    	return "Index to " + siteName + " Contents";
     }
 
-    protected String getBody() {
+    protected String getBody(VitroRequest vreq, Map<String, Object> body, Configuration config) {
 
-    	Map<String, Object> body = new HashMap<String, Object>();
         String bodyTemplate = "classGroups.ftl"; 
         String message = null;
         
@@ -77,6 +78,7 @@ public class BrowseController extends FreeMarkerHttpServlet {
 
     	//PortalFlag portalState= vreq.getPortalFlag();
 
+    	int portalId = vreq.getPortal().getPortalId();
     	List<VClassGroup> groups = getGroups(vreq.getWebappDaoFactory().getVClassGroupDao(), portalId);
     	if (groups == null || groups.isEmpty()) {
     		message = "There are not yet any items in the system.";
@@ -96,7 +98,7 @@ public class BrowseController extends FreeMarkerHttpServlet {
     	    body.put("message", message);
     	} 
     	
-        return mergeBodyToTemplate(bodyTemplate, body);
+        return mergeBodyToTemplate(bodyTemplate, body, config);
     }
 
     public void destroy(){

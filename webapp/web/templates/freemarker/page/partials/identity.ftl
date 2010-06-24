@@ -6,8 +6,8 @@
 
     <h1><a title="Home" href="${urls.home}">${siteName}</a></h1>
     
-    <#if tagline.has_content>
-        <em>${tagline}</em>
+    <#if siteTagline>
+        <em>${siteTagline}</em>
     </#if>
     
     <ul id="otherMenu">  

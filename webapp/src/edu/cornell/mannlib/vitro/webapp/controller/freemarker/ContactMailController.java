@@ -26,6 +26,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.beans.Portal;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import freemarker.template.Configuration;
 
 public class ContactMailController extends FreeMarkerHttpServlet {
 	private static final Log log = LogFactory
@@ -63,13 +66,13 @@ public class ContactMailController extends FreeMarkerHttpServlet {
 		return (host != null && host.length() > 0) ? host : null;
 	}
 	
-    protected String getTitle() {
-        return appName + " Feedback Form";
+    protected String getTitle(String siteName) {
+        return siteName + " Feedback Form";
     }
     
-    protected String getBody() {
+    protected String getBody(VitroRequest vreq, Map<String, Object> body, Configuration config) {
     	
-        Map<String, Object> body = new HashMap<String, Object>();
+        Portal portal = vreq.getPortal();
         String bodyTemplate = null;
         
         String statusMsg = null; // holds the error status
@@ -157,13 +160,13 @@ public class ContactMailController extends FreeMarkerHttpServlet {
                 }
         
                 String msgText = composeEmail(webusername, webuseremail, comments, 
-                		deliveryfrom, originalReferer, vreq.getRemoteAddr());
+                		deliveryfrom, originalReferer, vreq.getRemoteAddr(), config);
                 
                 // Write the email to a backup file
                 try {
-                    FileWriter fw = new FileWriter(context.getRealPath(EMAIL_BACKUP_FILE_PATH),true);
+                    FileWriter fw = new FileWriter(getServletContext().getRealPath(EMAIL_BACKUP_FILE_PATH),true);
                     PrintWriter outFile = new PrintWriter(fw); 
-                    writeBackupCopy(outFile, msgText, spamReason);
+                    writeBackupCopy(outFile, msgText, spamReason, config);
        
                     // Set the smtp host
                     Properties props = System.getProperties();
@@ -209,7 +212,7 @@ public class ContactMailController extends FreeMarkerHttpServlet {
             }
         }
         
-        return mergeBodyToTemplate(bodyTemplate, body);
+        return mergeBodyToTemplate(bodyTemplate, body, config);
 
     }
     
@@ -224,7 +227,7 @@ public class ContactMailController extends FreeMarkerHttpServlet {
     
     private String composeEmail(String webusername, String webuseremail,
     							String comments, String deliveryfrom,
-    							String originalReferer, String ipAddr) {
+    							String originalReferer, String ipAddr, Configuration config) {
  
         Map<String, Object> email = new HashMap<String, Object>();
         String template = "contactForm/email.ftl";
@@ -238,11 +241,11 @@ public class ContactMailController extends FreeMarkerHttpServlet {
             email.put("referrer", UrlBuilder.urlDecode(originalReferer));
         }
     	
-        return mergeBodyToTemplate(template, email);
+        return mergeBodyToTemplate(template, email, config);
     }
     
     private void writeBackupCopy(PrintWriter outFile, String msgText, 
-    		String spamReason) {
+    		String spamReason, Configuration config) {
 
         Map<String, Object> backup = new HashMap<String, Object>();
         String template = "contactForm/backup.ftl";
@@ -256,7 +259,7 @@ public class ContactMailController extends FreeMarkerHttpServlet {
         
         backup.put("msgText", msgText);
 
-        String backupText = mergeBodyToTemplate(template, backup);
+        String backupText = mergeBodyToTemplate(template, backup, config);
         outFile.print(backupText);
         outFile.flush();
         //outFile.close(); 

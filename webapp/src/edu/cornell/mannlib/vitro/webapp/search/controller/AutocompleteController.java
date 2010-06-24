@@ -47,6 +47,7 @@ import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneIndexer;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup;
 import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
+import freemarker.template.Configuration;
 
 /**
  * AutocompleteController is used to generate autocomplete and select element content
@@ -93,17 +94,18 @@ public class AutocompleteController extends FreeMarkerHttpServlet implements Sea
         
         String templateName = request.getServletPath().equals("/autocomplete") ? "autocompleteResults.ftl" : "selectResults.ftl";        
         Map<String, Object> map = new HashMap<String, Object>();
+
+        VitroRequest vreq = new VitroRequest(request);
+        Configuration config = getConfig(vreq);
+        PortalFlag portalFlag = vreq.getPortalFlag();
         
         try {
-            doSetup(request, response);
-            
-            PortalFlag portalFlag = vreq.getPortalFlag();
-            
+ 
             // make sure an IndividualDao is available 
             if( vreq.getWebappDaoFactory() == null 
                     || vreq.getWebappDaoFactory().getIndividualDao() == null ){
                 log.error("makeUsableBeans() could not get IndividualDao ");
-                doSearchError(templateName, map);
+                doSearchError(templateName, map, config, response);
                 return;
             }
             IndividualDao iDao = vreq.getWebappDaoFactory().getIndividualDao();                       
@@ -121,7 +123,7 @@ public class AutocompleteController extends FreeMarkerHttpServlet implements Sea
             List<String> urisToExclude = Arrays.asList(vreq.getParameterValues("filter"));
             
             if (query == null ) {
-                doNoQuery(templateName, map);
+                doNoQuery(templateName, map, config, response);
                 return;
             }
             
@@ -138,20 +140,20 @@ public class AutocompleteController extends FreeMarkerHttpServlet implements Sea
                     topDocs = searcherForRequest.search(query,null,maxHitSize);
                 }catch (Exception ex){
                     log.error(ex);
-                    doFailedSearch(templateName, map);
+                    doFailedSearch(templateName, map, config, response);
                     return;
                 }
             }
 
             if( topDocs == null || topDocs.scoreDocs == null){
                 log.error("topDocs for a search was null");                
-                doFailedSearch(templateName, map);
+                doFailedSearch(templateName, map, config, response);
                 return;
             }
             
             int hitsLength = topDocs.scoreDocs.length;
             if ( hitsLength < 1 ){                
-                doFailedSearch(templateName, map);
+                doFailedSearch(templateName, map, config, response);
                 return;
             }            
             log.debug("found "+hitsLength+" hits"); 
@@ -178,11 +180,11 @@ public class AutocompleteController extends FreeMarkerHttpServlet implements Sea
 
             Collections.sort(results);
             map.put("results", results);
-            ajaxWrite(templateName, map);
+            ajaxWrite(templateName, map, config, response);
    
         } catch (Throwable e) {
             log.error("AutocompleteController(): " + e);            
-            doSearchError(templateName, map);
+            doSearchError(templateName, map, config, response);
             return;
         }
     }
@@ -333,16 +335,16 @@ public class AutocompleteController extends FreeMarkerHttpServlet implements Sea
     }
     
 
-    private void doNoQuery(String templateName, Map<String, Object> map) {
-        ajaxWrite(templateName, map);
+    private void doNoQuery(String templateName, Map<String, Object> map, Configuration config, HttpServletResponse response) {
+        ajaxWrite(templateName, map, config, response);
     }
 
-    private void doFailedSearch(String templateName, Map<String, Object> map) {
-        ajaxWrite(templateName, map);
+    private void doFailedSearch(String templateName, Map<String, Object> map, Configuration config, HttpServletResponse response) {
+        ajaxWrite(templateName, map, config, response);
     }
  
-    private void doSearchError(String templateName, Map<String, Object> map) {
-        ajaxWrite(templateName, map);
+    private void doSearchError(String templateName, Map<String, Object> map, Configuration config, HttpServletResponse response) {
+        ajaxWrite(templateName, map, config, response);
     }
 
     public static final int MAX_QUERY_LENGTH = 500;

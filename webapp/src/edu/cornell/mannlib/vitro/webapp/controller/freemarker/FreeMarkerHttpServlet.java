@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginFormBean;
+import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.ContactMailServlet;
@@ -32,7 +33,6 @@ import edu.cornell.mannlib.vitro.webapp.web.PortalWebUtil;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.filelist.ScriptList;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.filelist.StylesheetList;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu.TabMenu;
-
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.cache.MultiTemplateLoader;
@@ -51,43 +51,10 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
     private static final Log log = LogFactory.getLog(FreeMarkerHttpServlet.class.getName());
     private static final int FILTER_SECURITY_LEVEL = LoginFormBean.EDITOR;
     
-    protected static Configuration config = null;
-    protected static ServletContext context = null;
-    
-	protected VitroRequest vreq;
-	protected HttpServletResponse response;
-	protected Portal portal;
-	protected int portalId;
-	protected String appName;
-	protected UrlBuilder urlBuilder;
-
-	private Map<String, Object> root = new HashMap<String, Object>();
-    
     public void doGet( HttpServletRequest request, HttpServletResponse response )
 		throws IOException, ServletException {
 
-    	try {
-	        doSetup(request, response);
-	        setUpPage();
-	        setTitleAndBody();
-	        writePage();
-       
-	    } catch (Throwable e) {
-	        log.error("FreeMarkerHttpServlet could not forward to view.");
-	        log.error(e.getMessage());
-	        log.error(e.getStackTrace());
-	    }
-	}
-    
-	public void doPost(HttpServletRequest request, HttpServletResponse response)
-	    throws ServletException, IOException {
-		doGet(request, response);
-	}
-
-	// Basic setup needed by all FreeMarker controllers
-    protected void doSetup(HttpServletRequest request, HttpServletResponse response) {
-        
-        if ( !(this instanceof FreeMarkerComponentGenerator) ) {
+        if ( !(this instanceof FreeMarkerComponentGenerator) ) {        
             try {
                 super.doGet(request,response);   
             } catch (ServletException e) {
@@ -96,81 +63,110 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
             } catch (IOException e) {
                 log.error("IOException calling VitroHttpRequest.doGet()");
                 e.printStackTrace();
-            }                
+            } 
         }
         
-        vreq = new VitroRequest(request);
-        this.response = response;
-        portal = vreq.getPortal(); 
+    	try {
+	        VitroRequest vreq = new VitroRequest(request);
+	        Configuration config = getConfig(vreq);
+	        
+	        // We can't use shared variables in the FreeMarker configuration to store anything 
+	        // except theme-specific data, because multiple portals or apps might share the same theme. So instead
+	        // just put the shared variables in both root and body.
+	        Map<String, Object> sharedVariables = getSharedVariables(vreq); // start by getting the title here
 
-        setTemplateLoader();
+	        // root is the map used to create the page shell - header, footer, menus, etc.
+	        Map<String, Object> root = new HashMap<String, Object>(sharedVariables);
+
+	        // body is the map used to create the page body
+	        Map<String, Object> body = new HashMap<String, Object>(sharedVariables);
+	        
+	        setUpRoot(vreq, root); 	        
+	        root.put("body", getBody(vreq, body, config)); // need config to get and process template
+	        
+	        // what about title - can we get it back out of the body at this point?
+	        
+	        writePage(root, config, response);
+       
+	    } catch (Throwable e) {
+	        log.error("FreeMarkerHttpServlet could not forward to view.");
+	        log.error(e.getMessage());
+	        log.error(e.getStackTrace());
+	    }
+	}
+
+    public void doPost(HttpServletRequest request, HttpServletResponse response)
+    throws ServletException, IOException {
+        doGet(request, response);
+    }
+   
+    protected Configuration getConfig(VitroRequest request) {
+        
+        String themeDir = getThemeDir(request.getPortal());        
+        return getConfigForTheme(themeDir);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected Configuration getConfigForTheme(String themeDir) {
+        
+        Map<String, Configuration> themeToConfigMap = (Map<String, Configuration>) getServletContext().getAttribute("themeToConfigMap");
+        
+        if (themeToConfigMap.containsKey(themeDir)) {
+            return themeToConfigMap.get(themeDir);
+        } else {
+            Configuration config = getNewConfig(themeDir);
+            themeToConfigMap.put(themeDir, config);
+            return config;
+        }
     }
     
-    // Setup needed by all controllers that display a full page.
-    // Controllers that display parts of a page, respond to an Ajax request, etc., do not use this. 
-    protected void setUpPage() {
+    private Configuration getNewConfig(String themeDir) {
         
-        urlBuilder = new UrlBuilder(portal);
+        Configuration config = new Configuration();
 
-        // RY Can this be removed? Do templates need it? Ideally, they should not.
-        // Only needed for some weird stuff in search box that I think is only used in old default theme.
-        // Some forms need it also, in which case it should get set in the getBody() method and passed to that
-        // body template.
-        portalId = portal.getPortalId();
-        root.put("portalId", portalId);
-        
-        appName = portal.getAppName();
-        setSharedVariable("siteName", appName);
-        
-        TabMenu menu = getTabMenu();
-        root.put("tabMenu", menu);
+        String buildEnv = ConfigurationProperties.getProperty("Environment.build");
+        if (buildEnv != null && buildEnv.equals("development")) {
+            config.setTemplateUpdateDelay(0); // no template caching in development 
+        }
 
-        ApplicationBean appBean = vreq.getAppBean();
-        PortalWebUtil.populateSearchOptions(portal, appBean, vreq.getWebappDaoFactory().getPortalDao());
-        PortalWebUtil.populateNavigationChoices(portal, vreq, appBean, vreq.getWebappDaoFactory().getPortalDao());
-        
-        root.put("tagline", portal.getShortHand());
-        root.put("breadcrumbs", BreadCrumbsUtil.getBreadCrumbsDiv(vreq));
- 
-        String themeDir = getThemeDir();
-        
-        setUrls(themeDir);
-        setLoginInfo();      
-        setCopyrightInfo();
-        setThemeInfo(themeDir);
-        setScriptAndStylesheetObjects(themeDir);   
-        
-        setSharedVariable("dump", new edu.cornell.mannlib.vitro.webapp.web.directives.DumpDirective());
-        setSharedVariable("dumpDataModel", new edu.cornell.mannlib.vitro.webapp.web.directives.DumpDataModelDirective());
-    }
-    
-    private void setScriptAndStylesheetObjects(String themeDir) {
-        
-        // Use an object wrapper that exposes write methods, instead of the
-        // configuration's object wrapper, which doesn't, so the templates can
-        // add stylesheets and scripts to the lists by calling their add() methods.
+        // Specify how templates will see the data-model. 
+        // The default wrapper exposes set methods unless exposure level is set.
+        // By default we want to block exposure of set methods. 
+        // config.setObjectWrapper(new DefaultObjectWrapper());
         BeansWrapper wrapper = new DefaultObjectWrapper();
+        wrapper.setExposureLevel(BeansWrapper.EXPOSE_PROPERTIES_ONLY);
+        config.setObjectWrapper(wrapper);
+
+        // Set some formatting defaults. These can be overridden at the template
+        // or environment (template-processing) level, or for an individual
+        // instance by using built-ins.
+        config.setLocale(java.util.Locale.US);
+        
+        String dateFormat = "M/d/yyyy";
+        config.setDateFormat(dateFormat);
+        String timeFormat = "hh:mm a";
+        config.setTimeFormat(timeFormat);
+        config.setDateTimeFormat(dateFormat + " " + timeFormat);
+        
+        //config.setNumberFormat("#,##0.##");
+        
         try {
-            // Here themeDir SHOULD NOT have the context path already added to it.
-            TemplateModel stylesheets = wrapper.wrap(new StylesheetList(themeDir));
-            setSharedVariable("stylesheets", stylesheets);
-            
-            TemplateModel scripts = wrapper.wrap(new ScriptList());
-            setSharedVariable("scripts", scripts);
-        } catch (TemplateModelException e) {
-            log.error("Error creating stylesheet and script TemplateModels");
+            config.setSetting("url_escaping_charset", "ISO-8859-1");
+        } catch (TemplateException e) {
+            log.error("Error setting value for url_escaping_charset.");
         }
+        
+        config.setTemplateLoader(getTemplateLoader(config, themeDir));
+        
+        return config;
     }
 
     // Define template locations. Template loader will look first in the theme-specific
     // location, then in the vitro location.
-    // RY We cannot do this in FreeMarkerSetup because (a) the theme depends on the portal,
-    // and we have multi-portal installations, and (b) we need to support theme-switching on the fly.
-    // To make more efficient, we could do this once, and then have a listener that does it again 
-    // when theme is switched. BUT this doesn't support (a), only (b), so  we have to do it on every request.
-    protected final void setTemplateLoader() {
+    protected final TemplateLoader getTemplateLoader(Configuration config, String themeDir) {
         
-        String themeTemplateDir = context.getRealPath(getThemeDir()) + "/templates";
+        ServletContext context = getServletContext();
+        String themeTemplateDir = context.getRealPath(themeDir) + "/templates";
         String vitroTemplateDir = context.getRealPath("/templates/freemarker");
 
         try {
@@ -179,35 +175,61 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
             ClassTemplateLoader ctl = new ClassTemplateLoader(getClass(), "");
             TemplateLoader[] loaders = new TemplateLoader[] { themeFtl, vitroFtl, ctl };
             MultiTemplateLoader mtl = new MultiTemplateLoader(loaders);
-            config.setTemplateLoader(mtl);
+            return mtl;
         } catch (IOException e) {
             log.error("Error loading templates");
+            return null;
         }
         
     }
 
-    private TabMenu getTabMenu() {
-        return new TabMenu(vreq, portalId);
+    // We can't use shared variables in the FreeMarker configuration to store anything 
+    // except theme-specific data, because multiple portals or apps might share the same theme. So instead
+    // we'll get all the shared variables here, and put them in both root and body maps.
+    protected Map<String, Object> getSharedVariables(VitroRequest vreq) {
+        
+        Map<String, Object> map = new HashMap<String, Object>();
+        
+        Portal portal = vreq.getPortal();
+        // Ideally, templates wouldn't need portal id. Currently used as a hidden input value
+        // in the site search box, so needed for now.
+        map.put("portalId", portal.getPortalId());
+        
+        String siteName = portal.getAppName();
+        map.put("siteName", siteName);
+        map.put("title", getTitle(siteName));
+
+        String themeDir = getThemeDir(portal);
+        UrlBuilder urlBuilder = new UrlBuilder(portal);
+        
+        map.put("urls", getUrls(themeDir, urlBuilder)); 
+
+        // This value will be available to any template as a path for adding a new stylesheet.
+        // It does not contain the context path, because the methods to generate the href
+        // attribute from the string passed in by the template automatically add the context path.
+        map.put("stylesheetDir", themeDir + "/css");
+
+        map.put("stylesheets", getStylesheetList(themeDir));
+        map.put("scripts", getScriptList());
+  
+        addDirectives(map);
+        
+        return  map;
     }
-    
-    public String getThemeDir() {
+
+    public String getThemeDir(Portal portal) {
         return portal.getThemeDir().replaceAll("/$", "");
     }
-    
+
     // Define the URLs that are accessible to the templates. Note that we do not create menus here,
     // because we want the templates to be free to define the link text and where the links are displayed.
-    private final void setUrls(String themeDir) {
+    private final Map<String, String> getUrls(String themeDir, UrlBuilder urlBuilder) {
         // The urls that are accessible to the templates. 
         // NB We are not using our menu object mechanism to build menus here, because we want the 
         // view to control which links go where, and the link text and title.
         Map<String, String> urls = new HashMap<String, String>();
         
         urls.put("home", urlBuilder.getHomeUrl());
-
-        String bannerImage = portal.getBannerImage();
-        if ( ! StringUtils.isEmpty(bannerImage)) {
-            root.put("bannerImage", UrlBuilder.getUrl(themeDir + "site_icons/" + bannerImage));
-        }
 
         urls.put("about", urlBuilder.getPortalUrl(Route.ABOUT));
         if (ContactMailServlet.getSmtpHostFromProperties() != null) {
@@ -218,11 +240,86 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         urls.put("login", urlBuilder.getPortalUrl(Route.LOGIN));          
         urls.put("logout", urlBuilder.getLogoutUrl());       
         urls.put("siteAdmin", urlBuilder.getPortalUrl(Route.LOGIN));  
+
+        urls.put("siteIcons", urlBuilder.getPortalUrl(themeDir + "/site_icons"));
+        return urls;
+    }
+    
+    private TemplateModel getStylesheetList(String themeDir) {
         
-        setSharedVariable("urls", urls); 
+        // For script and stylesheet lists, use an object wrapper that exposes write methods, 
+        // instead of the configuration's object wrapper, which doesn't. The templates can
+        // add stylesheets and scripts to the lists by calling their add() methods.
+        BeansWrapper wrapper = new DefaultObjectWrapper();
+        try {
+            // Here themeDir SHOULD NOT have the context path already added to it.
+            return wrapper.wrap(new StylesheetList(themeDir));       
+        } catch (TemplateModelException e) {
+            log.error("Error creating stylesheet TemplateModel");
+            return null;
+        }
+    }
+    
+    private TemplateModel getScriptList() {
+        
+        // For script and stylesheet lists, use an object wrapper that exposes write methods, 
+        // instead of the configuration's object wrapper, which doesn't. The templates can
+        // add stylesheets and scripts to the lists by calling their add() methods.
+        BeansWrapper wrapper = new DefaultObjectWrapper();
+        try {
+            return wrapper.wrap(new ScriptList());       
+        } catch (TemplateModelException e) {
+            log.error("Error creating script TemplateModel");
+            return null;
+        }        
+    }
+    
+    // Add any Java directives the templates should have access to
+    private void addDirectives(Map<String, Object> map) {
+        map.put("dump", new edu.cornell.mannlib.vitro.webapp.web.directives.DumpDirective());
+        map.put("dumpDataModel", new edu.cornell.mannlib.vitro.webapp.web.directives.DumpDataModelDirective());       
+    }
+    
+    // Add variables that should be available only to the page's root map, not to the body.
+    // RY This is protected instead of private so FreeMarkerComponentGenerator can access.
+    // Once we don't need that (i.e., jsps have been eliminated) we can make it private.
+    protected void setUpRoot(VitroRequest vreq, Map<String, Object> root) {
+        
+        root.put("tabMenu", getTabMenu(vreq));
+
+        Portal portal = vreq.getPortal();
+        
+        ApplicationBean appBean = vreq.getAppBean();
+        PortalWebUtil.populateSearchOptions(portal, appBean, vreq.getWebappDaoFactory().getPortalDao());
+        PortalWebUtil.populateNavigationChoices(portal, vreq, appBean, vreq.getWebappDaoFactory().getPortalDao()); 
+        
+        addLoginInfo(vreq, root);      
+        
+        root.put("copyright", getCopyrightInfo(portal));
+    
+        root.put("siteTagline", portal.getShortHand());
+        root.put("breadcrumbs", BreadCrumbsUtil.getBreadCrumbsDiv(vreq));
+    
+        String themeDir = getThemeDir(portal);
+
+        // This value is used only in stylesheets.ftl and already contains the context path.
+        root.put("stylesheetPath", UrlBuilder.getUrl(themeDir + "/css"));  
+
+        String bannerImage = portal.getBannerImage();  
+        if ( ! StringUtils.isEmpty(bannerImage)) {
+            root.put("bannerImage", UrlBuilder.getUrl(themeDir + "site_icons/" + bannerImage));
+        }
+        
+    }   
+
+    private TabMenu getTabMenu(VitroRequest vreq) {
+        // RY There's a vreq.getPortalId() method, but not sure if it returns
+        // same value as this.
+        int portalId = vreq.getPortal().getPortalId();
+        return new TabMenu(vreq, portalId);
     }
 
-    private final void setLoginInfo() {
+    private final void addLoginInfo(VitroRequest vreq, Map<String, Object> root) {
         
         String loginName = null;
         int securityLevel;
@@ -246,79 +343,43 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         }       
     }   
     
-    private final void setCopyrightInfo() {
+    private final Map<String, Object> getCopyrightInfo(Portal portal) {
 
+        Map<String, Object> copyright = null;
         String copyrightText = portal.getCopyrightAnchor();
         if ( ! StringUtils.isEmpty(copyrightText) ) {
-            Map<String, Object> copyright =  new HashMap<String, Object>();
+            copyright =  new HashMap<String, Object>();
             copyright.put("text", copyrightText);
             int thisYear = Calendar.getInstance().get(Calendar.YEAR);  // use ${copyrightYear?c} in template
             //String thisYear = ((Integer)Calendar.getInstance().get(Calendar.YEAR)).toString(); // use ${copyrightYear} in template
             //SimpleDate thisYear = new SimpleDate(Calendar.getInstance().getTime(), TemplateDateModel.DATE); // use ${copyrightYear?string("yyyy")} in template
             copyright.put("year", thisYear);
             copyright.put("url", portal.getCopyrightURL());
-            root.put("copyright", copyright);
         } 
+        return copyright;
     }
-    
-    private final void setThemeInfo(String themeDir) {
-
-        // This value will be available to any template as a path for adding a new stylesheet.
-        // It does not contain the context path, because the methods to generate the href
-        // attribute from the string passed in by the template automatically add the context path.
-        setSharedVariable("stylesheetDir", themeDir + "/css");
-        
-        String themeDirWithContext = UrlBuilder.getUrl(themeDir);
-        
-        // This value is used only in stylesheets.ftl and already contains the context path.
-        root.put("stylesheetPath", themeDirWithContext + "/css");
-        
-        setSharedVariable("siteIconPath", themeDirWithContext + "/site_icons");
-
-    }
-    
+   
     // Default case is to set title first, because it's used in the body. However, in some cases
     // the title is based on values computed during compilation of the body (e.g., IndividualListController). 
     // Individual controllers can override this method to set title and body together. End result must be:
     // body is added to root with key "body" 
     // title is set as a shared variable with key "title" 
     // This can be achieved by making sure setBody() and setTitle() are called.
-    protected void setTitleAndBody() {
-        setTitle();
-        setBody();
-    }
+//    protected void setTitleAndBody() {
+//        setTitle();
+//        setBody();
+//    }
 
-	protected void setBody() {
-	    root.put("body", getBody());
-	}
-
-    protected String getBody() {
-        return ""; // body should never be null
+    // Subclasses will override. This serves as a default.
+    protected String getTitle(String siteName) {        
+        return siteName;
     }
     
-	protected void setTitle() {
-	    String title = getTitle();
-	    // If the individual controller fails to assign a non-null, non-empty title
-	    if (StringUtils.isEmpty(title)) {
-	        title = appName;
-	    }
-	    // Title is a shared variable because it's used in both body and head elements.
-	    setSharedVariable("title", title); 
-	}
-	
-    protected String getTitle() { 
-    	return "";
+    protected String getBody(VitroRequest vreq, Map<String, Object> body, Configuration config) {
+        return "";
     }
 
-    protected void setSharedVariable(String key, Object value) {
-        try {
-            config.setSharedVariable(key, value);
-        } catch (TemplateModelException e) {
-            log.error("Can't set shared variable '" + key + "'.");
-        }       
-    }
-    
-    protected StringWriter mergeToTemplate(String templateName, Map<String, Object> map) {
+    protected StringWriter mergeToTemplate(String templateName, Map<String, Object> map, Configuration config) {
     	
         Template template = null;
         try {
@@ -341,28 +402,28 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         return sw;
     }
 
-    protected String mergeBodyToTemplate(String templateName, Map<String, Object> map) {
+    protected String mergeBodyToTemplate(String templateName, Map<String, Object> map, Configuration config) {
         templateName = "body/" + templateName;
-    	String body = mergeToTemplate(templateName, map).toString();
+    	String body = mergeToTemplate(templateName, map, config).toString();
     	return body;
     }
     
-    protected void writePage() {
+    protected void writePage(Map<String, Object> root, Configuration config, HttpServletResponse response) {
         String templateName = "page/" + getPageTemplateName();
-        writeTemplate(templateName, root);                   
+        writeTemplate(templateName, root, config, response);                   
     }
     
-    protected void ajaxWrite(String templateName, Map<String, Object> map) {
+    protected void ajaxWrite(String templateName, Map<String, Object> map, Configuration config, HttpServletResponse response) {
         templateName = "ajax/" + templateName;
-        writeTemplate(templateName, map);                   
+        writeTemplate(templateName, map, config, response);                   
     }
     
-    protected void writeTemplate(String templateName, Map<String, Object> map) {       
-        StringWriter sw = mergeToTemplate(templateName, map);          
-        write(sw);
+    protected void writeTemplate(String templateName, Map<String, Object> map, Configuration config, HttpServletResponse response) {       
+        StringWriter sw = mergeToTemplate(templateName, map, config);          
+        write(sw, response);
     }
     
-    protected void write(StringWriter sw) {
+    protected void write(StringWriter sw, HttpServletResponse response) {
         
         try {
             PrintWriter out = response.getWriter();
@@ -378,10 +439,10 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         return "default.ftl";
     }
 
-
-    public static boolean isConfigured() {
-        return config != null;
-    }
+//
+//    public static boolean isConfigured() {
+//        return config != null;
+//    }
     
     // TEMPORARY methods for transition from JSP to FreeMarker. Once transition
     // is complete and no more pages are generated in JSP, this can be removed.
@@ -390,15 +451,10 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
     // It's a static method because it needs to be called from JSPs that don't go through a servlet.
     public static void getFreeMarkerComponentsForJsp(HttpServletRequest request, HttpServletResponse response) {
         FreeMarkerComponentGenerator fcg = new FreeMarkerComponentGenerator(request, response);
-        request.setAttribute("ftl_identity", fcg.getIdentity());
-        request.setAttribute("ftl_menu", fcg.getMenu());
-        request.setAttribute("ftl_search", fcg.getSearch());
-        request.setAttribute("ftl_footer", fcg.getFooter());       
-    }
-    // This method is called by FreeMarkerComponentGenerator, since root is private.
-    // Don't want to make root protected because other controllers shouldn't add to it.
-    protected String mergeTemplateToRoot(String template) {
-        return mergeToTemplate(template, root).toString();
+//        request.setAttribute("ftl_identity", fcg.getIdentity());
+//        request.setAttribute("ftl_menu", fcg.getMenu());
+//        request.setAttribute("ftl_search", fcg.getSearch());
+//        request.setAttribute("ftl_footer", fcg.getFooter());       
     }
 
 }
