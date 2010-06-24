@@ -2,9 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
-import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -26,6 +26,8 @@ public class FreeMarkerComponentGenerator extends FreeMarkerHttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(FreeMarkerHttpServlet.class.getName());
     
+    private static ServletContext context = null;
+    
     FreeMarkerComponentGenerator(HttpServletRequest request, HttpServletResponse response) {
         VitroRequest vreq = new VitroRequest(request);
         Configuration config = getConfig(vreq);
@@ -40,6 +42,15 @@ public class FreeMarkerComponentGenerator extends FreeMarkerHttpServlet {
         request.setAttribute("ftl_footer", get("footer", root, config));
     }
     
+    // RY We need the servlet context in getConfig(). For some reason using the method inherited from
+    // GenericServlet bombs.
+    public ServletContext getServletContext() {
+        return context;
+    }
+    
+    protected static void setServletContext(ServletContext sc) {
+        context = sc;
+    }
 //    public String getIdentity() {
 //        return get("identity");
 //    }

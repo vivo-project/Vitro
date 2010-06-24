@@ -53,18 +53,16 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
     
     public void doGet( HttpServletRequest request, HttpServletResponse response )
 		throws IOException, ServletException {
-
-        if ( !(this instanceof FreeMarkerComponentGenerator) ) {        
-            try {
-                super.doGet(request,response);   
-            } catch (ServletException e) {
-                log.error("ServletException calling VitroHttpRequest.doGet()");
-                e.printStackTrace();
-            } catch (IOException e) {
-                log.error("IOException calling VitroHttpRequest.doGet()");
-                e.printStackTrace();
-            } 
-        }
+  
+        try {
+            super.doGet(request,response);   
+        } catch (ServletException e) {
+            log.error("ServletException calling VitroHttpRequest.doGet()");
+            e.printStackTrace();
+        } catch (IOException e) {
+            log.error("IOException calling VitroHttpRequest.doGet()");
+            e.printStackTrace();
+        } 
         
     	try {
 	        VitroRequest vreq = new VitroRequest(request);
@@ -84,8 +82,6 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 	        setUpRoot(vreq, root); 	        
 	        root.put("body", getBody(vreq, body, config)); // need config to get and process template
 	        
-	        // what about title - can we get it back out of the body at this point?
-	        
 	        writePage(root, config, response);
        
 	    } catch (Throwable e) {
@@ -100,16 +96,16 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         doGet(request, response);
     }
    
-    protected Configuration getConfig(VitroRequest request) {
+    protected Configuration getConfig(VitroRequest vreq) {
         
-        String themeDir = getThemeDir(request.getPortal());        
+        String themeDir = getThemeDir(vreq.getPortal());        
         return getConfigForTheme(themeDir);
     }
 
     @SuppressWarnings("unchecked")
     protected Configuration getConfigForTheme(String themeDir) {
         
-        Map<String, Configuration> themeToConfigMap = (Map<String, Configuration>) getServletContext().getAttribute("themeToConfigMap");
+        Map<String, Configuration> themeToConfigMap = (Map<String, Configuration>) (getServletContext().getAttribute("themeToConfigMap"));
         
         if (themeToConfigMap.containsKey(themeDir)) {
             return themeToConfigMap.get(themeDir);
@@ -439,22 +435,10 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         return "default.ftl";
     }
 
-//
-//    public static boolean isConfigured() {
-//        return config != null;
-//    }
-    
-    // TEMPORARY methods for transition from JSP to FreeMarker. Once transition
-    // is complete and no more pages are generated in JSP, this can be removed.
-    // Do this if FreeMarker is configured (i.e., not Datastar) and if we are not in
-    // a FreeMarkerHttpServlet, which will generate identity, menu, and footer from the page template.
+    // TEMPORARY method for transition from JSP to FreeMarker. 
     // It's a static method because it needs to be called from JSPs that don't go through a servlet.
     public static void getFreeMarkerComponentsForJsp(HttpServletRequest request, HttpServletResponse response) {
         FreeMarkerComponentGenerator fcg = new FreeMarkerComponentGenerator(request, response);
-//        request.setAttribute("ftl_identity", fcg.getIdentity());
-//        request.setAttribute("ftl_menu", fcg.getMenu());
-//        request.setAttribute("ftl_search", fcg.getSearch());
-//        request.setAttribute("ftl_footer", fcg.getFooter());       
     }
 
 }
