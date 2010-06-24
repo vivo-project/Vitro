@@ -37,7 +37,8 @@ public class TestController extends FreeMarkerHttpServlet {
         body.put("now", now);
         // In template: ${now?date}, ${now?datetime}, ${now?time}
         
-        // You can add to a collection AFTER putting it in the template data model
+        // You can add to a collection AFTER putting it in the template data model.
+        // The data model contains a reference to the collection, not a copy.
         List<String> fruit = new ArrayList<String>();
         fruit.add("apples");
         fruit.add("bananas");
@@ -49,11 +50,30 @@ public class TestController extends FreeMarkerHttpServlet {
         String animal = "elephant";
         body.put("animal", animal);
         animal = "camel";
-   
+        
+        // Because the data model contains a reference to the collection, changing
+        // one also changes the other.
+        List<String> animals = new ArrayList<String>();
+        animals.add("elephant");
+        animals.add("tiger");
+        Map<String, List> zoo1 = new HashMap<String, List>();
+        Map<String, List> zoo2 = new HashMap<String, List>();
+        zoo1.put("animals", animals);
+        zoo2.put("animals", animals);
+        zoo1.get("animals").add("monkey");       
+        body.put("zoo1", zoo1);
+        body.put("zoo2", zoo2);
+        
+        getBerries(body);
+          
         // Create the template to see the examples live.
         String bodyTemplate = "test.ftl";             
         return mergeBodyToTemplate(bodyTemplate, body);
 
+    }
+    
+    private void getBerries(Map<String, Object> body) {
+        body.put("berries", "strawberries, raspberries, blueberries");
     }
 
 }
