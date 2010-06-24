@@ -9,6 +9,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import freemarker.template.Configuration;
+
 /**
  * A place for storing test cases.
  * @author rjy7
@@ -22,9 +25,7 @@ public class TestController extends FreeMarkerHttpServlet {
         return "Test";
     }
     
-    protected String getBody() {
-        
-        Map<String, Object> body = new HashMap<String, Object>();
+    protected String getBody(VitroRequest vreq, Map<String, Object> body, Configuration config) {
         
         // Test of #list directive in template on undefined, null, and empty values.
         // Basic idea: empty list okay, null or undefined value not okay.
@@ -68,7 +69,7 @@ public class TestController extends FreeMarkerHttpServlet {
           
         // Create the template to see the examples live.
         String bodyTemplate = "test.ftl";             
-        return mergeBodyToTemplate(bodyTemplate, body);
+        return mergeBodyToTemplate(bodyTemplate, body, config);
 
     }
     

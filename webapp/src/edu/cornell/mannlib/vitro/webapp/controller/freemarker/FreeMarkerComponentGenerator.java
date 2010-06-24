@@ -2,14 +2,17 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
-import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import freemarker.template.Configuration;
 
 /**
  * TEMPORARY for transition from JSP to FreeMarker. Once transition
@@ -23,30 +26,37 @@ public class FreeMarkerComponentGenerator extends FreeMarkerHttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(FreeMarkerHttpServlet.class.getName());
     
+    private static ServletContext context = null;
+    
     FreeMarkerComponentGenerator(HttpServletRequest request, HttpServletResponse response) {
-        doSetup(request, response);      
-        setUpPage();
-    }
-    
-    public String getIdentity() {
-        return get("identity");
+        VitroRequest vreq = new VitroRequest(request);
+        Configuration config = getConfig(vreq);
+
+        // root is the map used to create the page shell - header, footer, menus, etc.
+        Map<String, Object> root = getSharedVariables(vreq); 
+        setUpRoot(vreq, root);  
+        
+        request.setAttribute("ftl_identity", get("identity", root, config));
+        request.setAttribute("ftl_menu", get("menu", root, config));
+        request.setAttribute("ftl_search", get("search", root, config));
+        request.setAttribute("ftl_footer", get("footer", root, config));
     }
 
-    public String getMenu() {
-        return get("menu");
-    }
-    
-    public String getSearch() {
-        return get("search");
-    }
-
-    public String getFooter() {
-        return get("footer"); 
-    }
-    
-    private String get(String templateName) {
+    private String get(String templateName, Map<String, Object> root, Configuration config) {
         String template = "page/partials/" + templateName + ".ftl";
-        return mergeTemplateToRoot(template);
+        return mergeToTemplate(template, root, config).toString();
     }
     
+    // RY We need the servlet context in getConfig(). For some reason using the method inherited from
+    // GenericServlet bombs.
+    public ServletContext getServletContext() {
+        return context;
+    }
+    
+    protected static void setServletContext(ServletContext sc) {
+        context = sc;
+    }
+  
+
+
 }

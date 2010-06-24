@@ -4,7 +4,7 @@
 
 <h2>${title}</h2>
 
-<img src="${siteIconPath}/bomb.gif" alt="email error"/>
+<img src="${urls.siteIcons}/bomb.gif" alt="email error"/>
 
 <p class="normal">An error occurred during the processing of your request.<br />
     <#if errorMessage?has_content>       

@@ -20,6 +20,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.ContactMailServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
+import freemarker.template.Configuration;
 
 /**
  *  Controller for comments ("contact us") page
@@ -30,14 +31,14 @@ public class ContactFormController extends FreeMarkerHttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(ContactFormController.class.getName());
     
-    protected String getTitle() {
-        return appName + " Feedback Form";
+    protected String getTitle(String siteName) {
+        return siteName + " Feedback Form";
     }
     
-    protected String getBody() {
+    protected String getBody(VitroRequest vreq, Map<String, Object> body, Configuration config) {
 
-        Map<String, Object> body = new HashMap<String, Object>();
         String bodyTemplate;
+        Portal portal = vreq.getPortal();
         
         if (!ContactMailServlet.isSmtpHostConfigured()) {
             body.put("errorMessage", 
@@ -54,9 +55,11 @@ public class ContactFormController extends FreeMarkerHttpServlet {
         
         else {
 
-            ApplicationBean appBean = vreq.getAppBean();
-          
+            ApplicationBean appBean = vreq.getAppBean();          
             String portalType = null;
+            int portalId = portal.getPortalId();
+            String appName = portal.getAppName();
+            
             if ( (appBean.getMaxSharedPortalId()-appBean.getMinSharedPortalId()) > 1
                   && ( (portalId  >= appBean.getMinSharedPortalId()
                   && portalId <= appBean.getMaxSharedPortalId() )
@@ -83,6 +86,6 @@ public class ContactFormController extends FreeMarkerHttpServlet {
             bodyTemplate = "contactForm/form.ftl";
         }
         
-        return mergeBodyToTemplate(bodyTemplate, body);
+        return mergeBodyToTemplate(bodyTemplate, body, config);
     }
 }

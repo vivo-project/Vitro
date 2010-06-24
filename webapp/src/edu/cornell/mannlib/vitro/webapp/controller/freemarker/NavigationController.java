@@ -27,7 +27,9 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.web.DisplayVocabulary;
+import freemarker.template.Configuration;
 
 public class NavigationController extends FreeMarkerHttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -45,7 +47,7 @@ public class NavigationController extends FreeMarkerHttpServlet {
 	}
 	
 	@Override
-	protected String getBody() {		
+	protected String getBody(VitroRequest vreq, Map<String, Object> body, Configuration config) {		
 		OntModel displayOntModel = (OntModel)getServletContext().getAttribute("displayOntModel");
 		OntModel jenaOntModel = (OntModel)getServletContext().getAttribute("jenaOntModel");
 				
@@ -54,7 +56,7 @@ public class NavigationController extends FreeMarkerHttpServlet {
 		Map<String,Object> values = getValues(ind, displayOntModel,jenaOntModel, getValuesFromRequest(/*?*/) );		
 		String template = getTemplate(ind, displayOntModel);		
 		
-		return mergeBodyToTemplate(template, values);
+		return mergeBodyToTemplate(template, values, config);
 	}
 	
 	private Map<String,Object>getValuesFromRequest(){
@@ -157,12 +159,6 @@ public class NavigationController extends FreeMarkerHttpServlet {
 	 interface ValueFactory {
 		void configure( Map<String,String> config);
 		Map<String,Object> getValues(OntModel model, Map<String,Object> values);		
-	}
-	
-	@Override
-	protected String getTitle() {
-		// TODO Auto-generated method stub
-		return super.getTitle();
 	}
 		
 	private class NavigationURLPatternListener extends StatementListener {		
