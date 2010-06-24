@@ -27,31 +27,16 @@ import com.itextpdf.text.pdf.PdfWriter;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.visualization.VisualizationFrameworkConstants;
 import edu.cornell.mannlib.vitro.webapp.visualization.PDFDocument;
 import edu.cornell.mannlib.vitro.webapp.visualization.VisualizationCodeGenerator;
+import edu.cornell.mannlib.vitro.webapp.visualization.constants.VOConstants;
+import edu.cornell.mannlib.vitro.webapp.visualization.constants.VisConstants;
 import edu.cornell.mannlib.vitro.webapp.visualization.exceptions.MalformedQueryParametersException;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.BiboDocument;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.Individual;
 
 public class VisualizationRequestHandler {
-	
-	private static final int MAX_NAME_TEXT_LENGTH = 10;
-
-	public static final String VIS_CONTAINER_URL_HANDLE = "container";
-
-	public static final String INDIVIDUAL_URI_URL_HANDLE = "uri";
-
-	public static final String VIS_MODE_URL_HANDLE = "vis_mode";
-
-	public static final String RENDER_MODE_URL_HANDLE = "render_mode";
-	
-	public static final String STANDALONE_RENDER_MODE_URL_VALUE = "standalone";
-
-	public static final String DYNAMIC_RENDER_MODE_URL_VALUE = "dynamic";
-	
-	public static final String DATA_RENDER_MODE_URL_VALUE = "data";
-	
-	public static final String PDF_RENDER_MODE_URL_VALUE = "pdf";
 	
 	private VitroRequest vitroRequest;
 	private HttpServletRequest request;
@@ -75,13 +60,13 @@ public class VisualizationRequestHandler {
 		String resultFormatParam = "RS_TEXT";
         String rdfResultFormatParam = "RDF/XML-ABBREV";
 
-        String individualURIParam = vitroRequest.getParameter(INDIVIDUAL_URI_URL_HANDLE);
+        String individualURIParam = vitroRequest.getParameter(VisualizationFrameworkConstants.INDIVIDUAL_URI_URL_HANDLE);
 
-        String renderMode = vitroRequest.getParameter(RENDER_MODE_URL_HANDLE);
+        String renderMode = vitroRequest.getParameter(VisualizationFrameworkConstants.RENDER_MODE_URL_HANDLE);
         
-        String visMode = vitroRequest.getParameter(VIS_MODE_URL_HANDLE);
+        String visMode = vitroRequest.getParameter(VisualizationFrameworkConstants.VIS_MODE_URL_HANDLE);
 
-        String visContainer = vitroRequest.getParameter(VIS_CONTAINER_URL_HANDLE);
+        String visContainer = vitroRequest.getParameter(VisualizationFrameworkConstants.VIS_CONTAINER_URL_HANDLE);
 
         QueryHandler queryManager =
         	new QueryHandler(individualURIParam,
@@ -106,7 +91,7 @@ public class VisualizationRequestHandler {
 	    	 * HTML code to render sparkline, tables etc. Ideally I would want to avoid this flow.
 	    	 * It is ugly! 
 	    	 * */
-	    	if (DATA_RENDER_MODE_URL_VALUE.equalsIgnoreCase(renderMode)) { 
+	    	if (VisualizationFrameworkConstants.DATA_RENDER_MODE_URL_VALUE.equalsIgnoreCase(renderMode)) { 
 				prepareVisualizationQueryDataResponse(queryManager.getAuthor(),
 													  authorDocuments,
 													  yearToPublicationCount);
@@ -114,7 +99,7 @@ public class VisualizationRequestHandler {
 			}
 	    	
 	    	
-	    	if (PDF_RENDER_MODE_URL_VALUE.equalsIgnoreCase(renderMode)) { 
+	    	if (VisualizationFrameworkConstants.PDF_RENDER_MODE_URL_VALUE.equalsIgnoreCase(renderMode)) { 
 				prepareVisualizationQueryPDFResponse(queryManager.getAuthor(),
 													 authorDocuments,
 													 yearToPublicationCount);
@@ -130,7 +115,7 @@ public class VisualizationRequestHandler {
 	    	 * was rendered we dont want to be influenced by the "DEFAULT_PUBLICATION_YEAR".
 	    	 * */
 	    	Set<String> publishedYears = new HashSet(yearToPublicationCount.keySet());
-	    	publishedYears.remove(BiboDocument.DEFAULT_PUBLICATION_YEAR);
+	    	publishedYears.remove(VOConstants.DEFAULT_PUBLICATION_YEAR);
 
 	    	VisualizationCodeGenerator visualizationCodeGenerator = 
 	    		new VisualizationCodeGenerator(yearToPublicationCount, log);
@@ -153,7 +138,7 @@ public class VisualizationRequestHandler {
 	    	 * */
 			RequestDispatcher requestDispatcher = null;
 
-			if (DYNAMIC_RENDER_MODE_URL_VALUE.equalsIgnoreCase(renderMode)) {
+			if (VisualizationFrameworkConstants.DYNAMIC_RENDER_MODE_URL_VALUE.equalsIgnoreCase(renderMode)) {
 
 				prepareVisualizationQueryDynamicResponse(request, response, vitroRequest,
 		    			visContentCode, visContextCode);
@@ -293,7 +278,8 @@ public class VisualizationRequestHandler {
 	 * @return
 	 */
 	private String slugify(String textToBeSlugified) {
-		return textToBeSlugified.toLowerCase().replaceAll("[^a-zA-Z0-9-]", "-").substring(0, MAX_NAME_TEXT_LENGTH);
+		return textToBeSlugified.toLowerCase().replaceAll("[^a-zA-Z0-9-]", "-")
+								.substring(0, VisConstants.MAX_NAME_TEXT_LENGTH);
 	}
 
 	private void generateCsvFileBuffer(Map<String, Integer> yearToPublicationCount, 

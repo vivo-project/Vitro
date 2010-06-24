@@ -1,9 +1,15 @@
 package edu.cornell.mannlib.vitro.webapp.visualization;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import com.hp.hpl.jena.iri.IRIFactory;
+
+import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.Node;
 
 public class TestJava {
 
@@ -44,8 +50,43 @@ public class TestJava {
 		yearToPublicationCount.put("2001", 5);
 		yearToPublicationCount.put("2002", 5);
 		yearToPublicationCount.put("2090", 7);
-		yearToPublicationCount.put("2087", 6);
+		yearToPublicationCount.put("Unknown", 6);
 		
+		Node egoNode;
+		
+		System.out.println();
+		
+		Map<String, Set<Integer>> biboDocumentURLToCoAuthors = new HashMap<String, Set<Integer>>();
+		
+		Set<Integer> coAuthorsForCurrentBiboDocument;
+		
+		if (biboDocumentURLToCoAuthors.containsKey("a")) {
+			coAuthorsForCurrentBiboDocument = biboDocumentURLToCoAuthors.get("a");
+		} else {
+			coAuthorsForCurrentBiboDocument = new HashSet<Integer>();
+			biboDocumentURLToCoAuthors.put("a", coAuthorsForCurrentBiboDocument);
+		}
+		
+		coAuthorsForCurrentBiboDocument.add(1);
+		
+		int actual_size = 4;
+//		int n = actual_size - 1;
+		
+		for (int ii = 0; ii < actual_size - 1; ii++) {
+			for (int jj = ii + 1; jj < actual_size; jj++) {
+				System.out.println(ii + " - " + jj );
+			}
+		}
+		
+		System.out.println(biboDocumentURLToCoAuthors);
+		
+
+		System.out.println(		new HashMap<String, Integer>(){{
+			put("sdsd", 4);
+		}});
+		
+		System.out.println(yearToPublicationCount.get("44454454"));
+		System.out.println(Collections.min(yearToPublicationCount.keySet()));
 		String emptyString = "";
 		System.out.println(emptyString.isEmpty());
 

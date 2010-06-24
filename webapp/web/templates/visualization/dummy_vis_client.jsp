@@ -87,6 +87,12 @@
 	<c:param name="uri" value="http://vivo.library.cornell.edu/ns/0.1#individual192"/>
 </c:url>
 
+<c:url var="coAuthorship1" value="/admin/visQuery">
+	<c:param name="vis" value="coauthorship"/>
+	<c:param name="render_mode" value="data"/>
+	<c:param name="uri" value="http://vivo.library.cornell.edu/ns/0.1#individual5748"/>
+</c:url>
+
 <c:url var="loadingImageLink" value="/${themeDir}site_icons/visualization/ajax-loader.gif"></c:url>
 
 <style type="text/css">
@@ -164,6 +170,19 @@ $(document).ready(function() {
 
 <div class="staticPageBackground">
 
+<style type="text/css">
+
+#test-bed {
+	background-color:red;
+	color:white;
+	text-align:center;
+}
+
+</style>
+
+<h1 id="test-bed">Visualization Testbed (Not to be seen by eventual end users)</h1>
+
+<a href='<c:out value="${coAuthorship1}"/>'>vis data query for coauthorship -> "Erb, Hollis Nancy"</a><br />
 <a href='<c:out value="${collegeCSV}"/>'>vis data query for college -> "School of Industrial and Labor Relations (ILR)"</a><br />
 <a href='<c:out value="${collegeCSV2}"/>'>vis data query for college -> "College of Agriculture and Life Sciences (CALS)"</a><br />
 <a href='<c:out value="${collegeCSV3}"/>'>vis data query for college -> "College of Arts and Sciences"</a><br />

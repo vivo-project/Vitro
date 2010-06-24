@@ -1,4 +1,4 @@
-package edu.cornell.mannlib.vitro.webapp.visualization.sparqlutils;
+package edu.cornell.mannlib.vitro.webapp.visualization.constants;
 
 public class QueryFieldLabels {
 	
@@ -18,6 +18,12 @@ public class QueryFieldLabels {
 	 * */
 	public static final String AUTHOR_URL = "authPersonLit";
 	public static final String AUTHOR_LABEL = "authorLabelLit";
+	
+	/*
+	 * Co-Author related field labels
+	 * */
+	public static final String CO_AUTHOR_URL = "coAuthPersonLit";
+	public static final String CO_AUTHOR_LABEL = "coAuthorLabelLit";
 	
 	/*
 	 * College related field labels 

@@ -1,6 +1,8 @@
-package edu.cornell.mannlib.vitro.webapp.visualization.valueobjects;
+package edu.cornell.mannlib.vitro.webapp.visualization.constants;
 
 public class VOConstants {
+	
+	public static final String DEFAULT_PUBLICATION_YEAR = "Unknown";
 	
 	/*
 	 * Employee related constants 
@@ -8,5 +10,7 @@ public class VOConstants {
 	public static enum EmployeeType {
 		ACADEMIC_FACULTY_EMPLOYEE, ACADEMIC_STAFF_EMPLOYEE
 	} 
+	
+	
 	
 }

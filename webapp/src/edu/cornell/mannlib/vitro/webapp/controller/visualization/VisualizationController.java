@@ -108,9 +108,11 @@ public class VisualizationController extends BaseEditController {
     public static final String PDF_REPORT_VIS_URL_VALUE
 									= "pdf_report";
     
-    
     public static final String COLLEGE_PUBLICATION_COUNT_VIS_URL_VALUE
 									= "college_pub_count";
+    
+    public static final String COAUTHORSHIP_VIS_URL_VALUE
+									= "coauthorship";
 
 
     @Override
@@ -160,6 +162,31 @@ public class VisualizationController extends BaseEditController {
     		
     		edu.cornell.mannlib.vitro.webapp.visualization.collegepubcount.VisualizationRequestHandler visRequestHandler =
     			new edu.cornell.mannlib.vitro.webapp.visualization.collegepubcount.VisualizationRequestHandler(vreq, request, response, log);
+
+            String rdfResultFormatParam = "RDF/XML-ABBREV";
+
+            DataSource dataSource = setupJENADataSource(request,
+            											response,
+            											vreq,
+            											rdfResultFormatParam);
+
+            if (dataSource != null) {
+
+            	/*
+            	 * This is side-effecting because the visualization content is added
+            	 * to the request object.
+            	 * */
+            	visRequestHandler.generateVisualization(dataSource);
+
+            } else {
+            	log.error("ERROR! data model empoty");
+            }
+ 
+    	} else if (COAUTHORSHIP_VIS_URL_VALUE
+    			.equalsIgnoreCase(vreq.getParameter(VIS_TYPE_URL_HANDLE))) {
+    		
+    		edu.cornell.mannlib.vitro.webapp.visualization.coauthorship.VisualizationRequestHandler visRequestHandler =
+    			new edu.cornell.mannlib.vitro.webapp.visualization.coauthorship.VisualizationRequestHandler(vreq, request, response, log);
 
             String rdfResultFormatParam = "RDF/XML-ABBREV";
 

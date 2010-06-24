@@ -1,4 +1,4 @@
-package edu.cornell.mannlib.vitro.webapp.visualization.sparqlutils;
+package edu.cornell.mannlib.vitro.webapp.visualization.constants;
 
 public class QueryConstants {
 	

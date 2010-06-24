@@ -3,7 +3,7 @@ package edu.cornell.mannlib.vitro.webapp.visualization.valueobjects;
 import java.util.HashSet;
 import java.util.Set;
 
-import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.VOConstants.EmployeeType;
+import edu.cornell.mannlib.vitro.webapp.visualization.constants.VOConstants.EmployeeType;
 
 /**
  * 

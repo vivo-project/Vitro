@@ -1,4 +1,4 @@
-package edu.cornell.mannlib.vitro.webapp.visualization.collegepubcount;
+package edu.cornell.mannlib.vitro.webapp.visualization.coauthorship;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -36,7 +36,9 @@ import edu.cornell.mannlib.vitro.webapp.visualization.constants.VOConstants;
 import edu.cornell.mannlib.vitro.webapp.visualization.constants.VisConstants;
 import edu.cornell.mannlib.vitro.webapp.visualization.exceptions.MalformedQueryParametersException;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.BiboDocument;
+import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.Edge;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.Individual;
+import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.Node;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.VivoCollegeOrSchool;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.VivoDepartmentOrDivision;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.VivoEmployee;
@@ -47,8 +49,6 @@ public class VisualizationRequestHandler {
 	private HttpServletRequest request;
 	private HttpServletResponse response;
 	private Log log;
-
-
 	
 	public VisualizationRequestHandler(VitroRequest vitroRequest,
 			HttpServletRequest request, HttpServletResponse response, Log log) {
@@ -65,7 +65,7 @@ public class VisualizationRequestHandler {
 		String resultFormatParam = "RS_TEXT";
         String rdfResultFormatParam = "RDF/XML-ABBREV";
 
-        String collegeURIParam = vitroRequest.getParameter(VisualizationFrameworkConstants.INDIVIDUAL_URI_URL_HANDLE);
+        String egoURIParam = vitroRequest.getParameter(VisualizationFrameworkConstants.INDIVIDUAL_URI_URL_HANDLE);
 
         String renderMode = vitroRequest.getParameter(VisualizationFrameworkConstants.RENDER_MODE_URL_HANDLE);
         
@@ -74,45 +74,17 @@ public class VisualizationRequestHandler {
         String visContainer = vitroRequest.getParameter(VisualizationFrameworkConstants.VIS_CONTAINER_URL_HANDLE);
 
         QueryHandler queryManager =
-        	new QueryHandler(collegeURIParam,
+        	new QueryHandler(egoURIParam,
 						     resultFormatParam,
 						     rdfResultFormatParam,
 						     dataSource,
+						     
 						     log);
 
 		try {
 			
-			Set<VivoEmployee> employees = queryManager.getVisualizationJavaValueObjects();
+			VisVOContainer authorNodesAndEdges = queryManager.getVisualizationJavaValueObjects();
 			
-			Map<VivoDepartmentOrDivision, Map<String, Integer>> departmentToPublicationsOverTime = 
-				new HashMap<VivoDepartmentOrDivision, Map<String,Integer>>();
-			
-			Set<String> publishedYearsForCollege = new HashSet<String>();
-			
-			for (VivoEmployee currentEmployee : employees) {
-				
-				Map<String, Integer> currentEmployeeYearToPublicationCount = 
-					queryManager.getYearToPublicationCount(currentEmployee.getAuthorDocuments());
-				
-				if (currentEmployeeYearToPublicationCount.size() > 0) {
-					
-					
-					publishedYearsForCollege.addAll(currentEmployeeYearToPublicationCount.keySet());
-				
-					for (VivoDepartmentOrDivision currentDepartment : currentEmployee.getParentDepartments()) {
-						
-						departmentToPublicationsOverTime.put(currentDepartment, 
-															 getUpdatedDepartmentPublicationsOverTime(
-																	 currentEmployeeYearToPublicationCount,
-																	 departmentToPublicationsOverTime
-																	 		.get(currentDepartment)));
-						
-					}
-				
-				}
-			}
-
-
 	    	/*
 	    	 * In order to avoid unneeded computations we have pushed this "if" condition up.
 	    	 * This case arises when the render mode is data. In that case we dont want to generate 
@@ -120,11 +92,8 @@ public class VisualizationRequestHandler {
 	    	 * It is ugly! 
 	    	 * */
 	    	if (VisualizationFrameworkConstants.DATA_RENDER_MODE_URL_VALUE.equalsIgnoreCase(renderMode)) { 
-				prepareVisualizationQueryDataResponse(
-													  departmentToPublicationsOverTime,
-													  queryManager.getCollegeURLToVO());
+				prepareVisualizationQueryDataResponse(authorNodesAndEdges);
 				
-				log.debug(publishedYearsForCollege);
 				return;
 			}
 	    	
@@ -146,7 +115,7 @@ public class VisualizationRequestHandler {
 	    	 * This is required because when deciding the range of years over which the vis
 	    	 * was rendered we dont want to be influenced by the "DEFAULT_PUBLICATION_YEAR".
 	    	 * */
-	    	publishedYearsForCollege.remove(VOConstants.DEFAULT_PUBLICATION_YEAR);
+//	    	publishedYearsForCollege.remove(VOConstants.DEFAULT_PUBLICATION_YEAR);
 
 	    	/*
 	    	VisualizationCodeGenerator visualizationCodeGenerator = 
@@ -313,29 +282,30 @@ public class VisualizationRequestHandler {
 			}
 	}
 
-	private void prepareVisualizationQueryDataResponse(
-				Map<VivoDepartmentOrDivision, Map<String, Integer>> departmentToPublicationsOverTime,
-				Map<String, VivoCollegeOrSchool> collegeURLToVO) {
+	private void prepareVisualizationQueryDataResponse(VisVOContainer authorNodesAndEdges) {
 
-		String collegeName = null; 
+		String egoName = null;
+		
+		Node egoNode = authorNodesAndEdges.getEgoNode();
+
 		
 		/*
 		* To protect against cases where there are no author documents associated with the
 		* individual. 
 		* */
 //		System.out.println(collegeURLToVO);
-		if (collegeURLToVO.size() > 0) {
-			collegeName = ((VivoCollegeOrSchool) collegeURLToVO.values().iterator().next()).getCollegeLabel();
+		if (egoNode != null) {
+			egoName = egoNode.getNodeName();
 		}
 		
 		/*
 		* To make sure that null/empty records for author names do not cause any mischief.
 		* */
-		if (collegeName == null) {
-		collegeName = "";
+		if (egoName == null) {
+		egoName = "";
 		}
 		
-		String outputFileName = slugify(collegeName) + "depts-pub-count" + ".csv";
+		String outputFileName = slugify(egoName) + "co-authorship" + ".txt";
 		
 		response.setContentType("application/octet-stream");
 		response.setHeader("Content-Disposition","attachment;filename=" + outputFileName);
@@ -348,8 +318,7 @@ public class VisualizationRequestHandler {
 		 * We are side-effecting responseWriter since we are directly manipulating the response 
 		 * object of the servlet.
 		 * */
-		generateCsvFileBuffer(departmentToPublicationsOverTime, 
-							  collegeURLToVO, 
+		generateCsvFileBuffer(authorNodesAndEdges, 
 							  responseWriter);
 
 		responseWriter.close();
@@ -370,43 +339,40 @@ public class VisualizationRequestHandler {
 								.substring(0, VisConstants.MAX_NAME_TEXT_LENGTH);
 	}
 
-	private void generateCsvFileBuffer(
-			Map<VivoDepartmentOrDivision, Map<String, Integer>> departmentToPublicationsOverTime,
-			Map<String, VivoCollegeOrSchool> collegeURLToVO, PrintWriter printWriter) {
+	private void generateCsvFileBuffer(VisVOContainer authorNodesAndEdges, 
+									   PrintWriter printWriter) {
 		
-        CSVWriter csvWriter = new SimpleWriter(printWriter);
-        
-        try {
-			csvWriter.append(new String[]{"School", "Department", "Year", "Publications"});
+        Node egoNode = authorNodesAndEdges.getEgoNode();
+		Set<Node> authorNodes = authorNodesAndEdges.getNodes();
+		Set<Edge> edges = authorNodesAndEdges.getEdges();
+		
+		printWriter.append("\nEGO => ");
+		printWriter.append(egoNode.getNodeID() + " - " + egoNode.getNodeName() + " -> " + egoNode.getNodeURL() + "\n");
+		printWriter.append("\tEarliest Publication - " + egoNode.getEarliestPublicationYearCount() 
+							+ "\n\tLatest Publication - " + egoNode.getLatestPublicationYearCount()
+							+ "\n\tUnknown Publication - " + egoNode.getUnknownPublicationYearCount());
+		
+		authorNodes.remove(egoNode);
+		
+		for (Node currNode : authorNodes) {
 			
-			Iterator<VivoCollegeOrSchool> collegeIterator = collegeURLToVO.values().iterator();
+			printWriter.append("\nCO-AUTHOR => ");
+			printWriter.append(currNode.getNodeID() + " - " + currNode.getNodeName() + " -> " + currNode.getNodeURL() + "\n");
+			printWriter.append("\tEarliest Publication - " + currNode.getEarliestPublicationYearCount() 
+								+ "\n\tLatest Publication - " + currNode.getLatestPublicationYearCount()
+								+ "\n\tUnknown Publication - " + currNode.getUnknownPublicationYearCount());
 			
-			while (collegeIterator.hasNext()) {
-				VivoCollegeOrSchool college = collegeIterator.next();
-				String collegeLabel = college.getCollegeLabel();
-				for (VivoDepartmentOrDivision currentDepartment : college.getDepartments()) {
-					
-					Map<String, Integer> currentDepartmentPublicationsOverTime = departmentToPublicationsOverTime.get(currentDepartment);
-					
-					/*
-					 * This because many departments might not have any publication.
-					 * */
-					if (currentDepartmentPublicationsOverTime != null) {
-						
-					for (Entry<String, Integer> currentEntry : currentDepartmentPublicationsOverTime.entrySet()) {
-						csvWriter.append(new Object[]{collegeLabel,
-													  currentDepartment.getDepartmentLabel(),
-													  currentEntry.getKey(), 
-													  currentEntry.getValue()});
-					}
-					
-					}
-					
-				}
-			}
-	        
-		} catch (IOException e) {
-			e.printStackTrace();
+		}
+		
+		for (Edge currentEdge : edges) {
+			
+			printWriter.append("\nEdge => ");
+			printWriter.append(currentEdge.getEdgeID() + " => " + currentEdge.getSourceNode().getNodeName() + " - " 
+									+ currentEdge.getTargetNode().getNodeName() + "\n");
+			printWriter.append("\tEarliest Collaboration - " + currentEdge.getEarliestCollaborationYearCount() 
+								+ "\n\tLatest Collaboration - " + currentEdge.getLatestCollaborationYearCount()
+								+ "\n\tUnknown Collaboration - " + currentEdge.getUnknownCollaborationYearCount());
+			
 		}
 		
 		printWriter.flush();

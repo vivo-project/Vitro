@@ -14,6 +14,8 @@ import java.util.Map.Entry;
 import org.apache.commons.logging.Log;
 
 import edu.cornell.mannlib.vitro.webapp.controller.visualization.VisualizationController;
+import edu.cornell.mannlib.vitro.webapp.controller.visualization.VisualizationFrameworkConstants;
+import edu.cornell.mannlib.vitro.webapp.visualization.constants.VOConstants;
 import edu.cornell.mannlib.vitro.webapp.visualization.personpubcount.VisualizationRequestHandler;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.BiboDocument;
 
@@ -142,8 +144,8 @@ public class VisualizationCodeGenerator {
 		 * Total publications will also consider publications that have no year associated with
 		 * it. Hence.
 		 * */
-		if (yearToPublicationCount.get(BiboDocument.DEFAULT_PUBLICATION_YEAR) != null) {
-			totalPublications += yearToPublicationCount.get(BiboDocument.DEFAULT_PUBLICATION_YEAR);
+		if (yearToPublicationCount.get(VOConstants.DEFAULT_PUBLICATION_YEAR) != null) {
+			totalPublications += yearToPublicationCount.get(VOConstants.DEFAULT_PUBLICATION_YEAR);
 		}
 
 		String sparklineDisplayOptions = "{width: 63, height: 21, showAxisLines: false, " +
@@ -333,7 +335,7 @@ public class VisualizationCodeGenerator {
 			String downloadFileCode;
 			if (yearToPublicationCount.size() > 0) {
 				downloadFileCode = "Download data as <a href='" + uri.toString() + "?" + 
-												 VisualizationRequestHandler.INDIVIDUAL_URI_URL_HANDLE + 
+												VisualizationFrameworkConstants.INDIVIDUAL_URI_URL_HANDLE + 
 												 "=" + URLEncoder.encode(individualURI, 
 														 				 VisualizationController.URL_ENCODING_SCHEME).toString() +
 												 "&" +
@@ -342,9 +344,8 @@ public class VisualizationCodeGenerator {
 														 						.PERSON_PUBLICATION_COUNT_VIS_URL_VALUE, 
 														 				 VisualizationController.URL_ENCODING_SCHEME).toString() +
 												 "&" +
-												 VisualizationRequestHandler.RENDER_MODE_URL_HANDLE + 
-												 "=" + URLEncoder.encode(VisualizationRequestHandler
-														 						.DATA_RENDER_MODE_URL_VALUE, 
+												 VisualizationFrameworkConstants.RENDER_MODE_URL_HANDLE + 
+												 "=" + URLEncoder.encode(VisualizationFrameworkConstants.DATA_RENDER_MODE_URL_VALUE, 
 										 				 				 VisualizationController.URL_ENCODING_SCHEME).toString() +
 												 "'>.csv</a> file.<br />";
 			} else {
@@ -374,7 +375,7 @@ public class VisualizationCodeGenerator {
 		String fullTimelineLink;
 		if (yearToPublicationCount.size() > 0) {
 			fullTimelineLink = "<a href='" + uri.toString() + "?" + 
-							 VisualizationRequestHandler.INDIVIDUAL_URI_URL_HANDLE + 
+							VisualizationFrameworkConstants.INDIVIDUAL_URI_URL_HANDLE + 
 							 "=" + URLEncoder.encode(individualURI, 
 									 				 VisualizationController.URL_ENCODING_SCHEME).toString() +
 							 "&" +
@@ -383,9 +384,8 @@ public class VisualizationCodeGenerator {
 									 						.PERSON_PUBLICATION_COUNT_VIS_URL_VALUE, 
 									 				 VisualizationController.URL_ENCODING_SCHEME).toString() +
 							 "&" +
-							 VisualizationRequestHandler.RENDER_MODE_URL_HANDLE + 
-							 "=" + URLEncoder.encode(VisualizationRequestHandler
-									 						.STANDALONE_RENDER_MODE_URL_VALUE, 
+							 VisualizationFrameworkConstants.RENDER_MODE_URL_HANDLE + 
+							 "=" + URLEncoder.encode(VisualizationFrameworkConstants.STANDALONE_RENDER_MODE_URL_VALUE, 
 					 				 				 VisualizationController.URL_ENCODING_SCHEME).toString() +
 							 "'>View full timeline and network.</a><br />";
 		} else {

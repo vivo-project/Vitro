@@ -21,14 +21,14 @@ import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 
+import edu.cornell.mannlib.vitro.webapp.visualization.constants.QueryConstants;
+import edu.cornell.mannlib.vitro.webapp.visualization.constants.QueryFieldLabels;
+import edu.cornell.mannlib.vitro.webapp.visualization.constants.VOConstants.EmployeeType;
 import edu.cornell.mannlib.vitro.webapp.visualization.exceptions.MalformedQueryParametersException;
-import edu.cornell.mannlib.vitro.webapp.visualization.sparqlutils.QueryConstants;
-import edu.cornell.mannlib.vitro.webapp.visualization.sparqlutils.QueryFieldLabels;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.BiboDocument;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.VivoCollegeOrSchool;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.VivoDepartmentOrDivision;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.VivoEmployee;
-import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.VOConstants.EmployeeType;
 
 
 

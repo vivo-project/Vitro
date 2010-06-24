@@ -4,9 +4,10 @@ import java.util.Calendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import edu.cornell.mannlib.vitro.webapp.visualization.constants.VOConstants;
+
 public class BiboDocument extends Individual{
 
-	public static final String DEFAULT_PUBLICATION_YEAR = "Unknown";
 	public static final int MINIMUM_PUBLICATION_YEAR = 1800;
 	private static final int CURRENT_YEAR = Calendar.getInstance().get(Calendar.YEAR);
 
@@ -14,7 +15,7 @@ public class BiboDocument extends Individual{
 	private String documentBlurb;
 	private String documentDescription;
 	private String publicationYear;
-	private String parsedPublicationYear = DEFAULT_PUBLICATION_YEAR;
+	private String parsedPublicationYear = VOConstants.DEFAULT_PUBLICATION_YEAR;
 
 	public BiboDocument(String documentURL) {
 		super(documentURL);
@@ -62,7 +63,7 @@ public class BiboDocument extends Individual{
 		String pattern = "(?<!-)\\b\\d{4}\\b(?=[^-])";
 		
 		Pattern yearPattern = Pattern.compile(pattern);
-		String publishedYear = DEFAULT_PUBLICATION_YEAR;
+		String publishedYear = VOConstants.DEFAULT_PUBLICATION_YEAR;
 
 		Matcher yearMatcher = yearPattern.matcher(documentBlurb);
 
