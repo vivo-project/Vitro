@@ -51,3 +51,5 @@
 <@dump var="fruit" />
 <@dumpDataModel />
 
+${stylesheets.addFromTheme("/sstest.css")}
+${scripts.addFromTheme("/jstest.js")}

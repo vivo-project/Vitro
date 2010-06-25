@@ -63,11 +63,12 @@ public class AutocompleteController extends FreeMarkerHttpServlet implements Sea
 
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(AutocompleteController.class.getName());
+
+    private static String QUERY_PARAMETER_NAME = "term";
+    private static String EXCLUDE_URI_PARAMETER_NAME = "excludeUri";
     
     private IndexSearcher searcher = null;
     String NORESULT_MSG = "";    
-    private String QUERY_PARAMETER_NAME = "term";
-    private int defaultHitsPerPage = 25;
     private int defaultMaxSearchSize= 1000;
 
     public void init(ServletConfig config) throws ServletException {
@@ -116,16 +117,17 @@ public class AutocompleteController extends FreeMarkerHttpServlet implements Sea
             
             String qtxt = vreq.getParameter(QUERY_PARAMETER_NAME);
             Analyzer analyzer = getAnalyzer(getServletContext());
-            Query query = getQuery(vreq, portalFlag, analyzer, indexDir, qtxt);             
-            log.debug("query for '" + qtxt +"' is " + query.toString());
             
-            // Get the list of uris that should be excluded from the results
-            String filters[] = vreq.getParameterValues("filter");
-            List<String> urisToExclude = new ArrayList<String>();   
+            // Get the list of individual uris that should be excluded from the search
+            String filters[] = vreq.getParameterValues(EXCLUDE_URI_PARAMETER_NAME);
+            List<String> urisToExclude = null; 
             if (filters != null) {
-                urisToExclude = Arrays.asList(vreq.getParameterValues("filter"));
+                urisToExclude = Arrays.asList(filters);
             }
             
+            Query query = getQuery(vreq, portalFlag, analyzer, indexDir, qtxt, urisToExclude);             
+            log.debug("query for '" + qtxt +"' is " + query.toString());
+
             if (query == null ) {
                 doNoQuery(templateName, map, config, response);
                 return;
@@ -167,9 +169,6 @@ public class AutocompleteController extends FreeMarkerHttpServlet implements Sea
                 try{                     
                     Document doc = searcherForRequest.doc(topDocs.scoreDocs[i].doc);                    
                     String uri = doc.get(Entity2LuceneDoc.term.URI);
-                    if (urisToExclude.contains(uri)) {
-                        continue;
-                    }
                     Individual ind = iDao.getIndividualByURI(uri);
                     if (ind != null) {
                         String name = ind.getName();
@@ -210,7 +209,7 @@ public class AutocompleteController extends FreeMarkerHttpServlet implements Sea
     }
 
     private Query getQuery(VitroRequest request, PortalFlag portalState,
-                       Analyzer analyzer, String indexDir, String querystr ) throws SearchException{
+                       Analyzer analyzer, String indexDir, String querystr, List<String> urisToExclude ) throws SearchException{
         Query query = null;
         try{
             if( querystr == null){
@@ -238,6 +237,17 @@ public class AutocompleteController extends FreeMarkerHttpServlet implements Sea
                                 (String)param)),
                     BooleanClause.Occur.MUST);
                 query = boolQuery;
+            }
+            
+            if (urisToExclude != null) {
+                for (String uri : urisToExclude) {
+                    BooleanQuery boolQuery = new BooleanQuery();
+                    boolQuery.add( query, BooleanClause.Occur.MUST);
+                    boolQuery.add( new TermQuery(
+                        new Term(Entity2LuceneDoc.term.URI, uri)),
+                        BooleanClause.Occur.MUST_NOT);     
+                    query = boolQuery;       
+                }
             }
             
             //check if this is classgroup filtered

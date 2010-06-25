@@ -38,10 +38,13 @@ public abstract class FileList extends BaseTemplateModel {
     public String getTags() {
         String tags = "";
       
-        Iterator<String> i = list.iterator();
-        while (i.hasNext()) {
-            tags += getTag(i.next());
+        for (String file : list) {
+            tags += getTag(file);
         }
+//        Iterator<String> i = list.iterator();
+//        while (i.hasNext()) {
+//            tags += getTag(i.next());
+//        }
         return tags;
     }
     
