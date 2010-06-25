@@ -23,6 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
@@ -210,8 +211,9 @@ public class AutocompleteController extends FreeMarkerHttpServlet implements Sea
 
     private Query getQuery(VitroRequest request, PortalFlag portalState,
                        Analyzer analyzer, String indexDir, String querystr, List<String> urisToExclude ) throws SearchException{
+        
         Query query = null;
-        try{
+        try {
             if( querystr == null){
                 log.error("There was no Parameter '"+ QUERY_PARAMETER_NAME            
                     +"' in the request.");                
@@ -221,16 +223,15 @@ public class AutocompleteController extends FreeMarkerHttpServlet implements Sea
                         "query length is " + MAX_QUERY_LENGTH );
                 return null;
             } 
-            
-            // The way the analyzer is set up, name:Sm* returns no results,
-            // but name:sm* does.
-            querystr = querystr.toLowerCase();
+
+            // Run the search term through the query parser so that it gets normalized in the same
+            // way the index is normalized.
+            QueryParser queryParser = new QueryParser(Entity2LuceneDoc.term.NAME, analyzer);
+            query = queryParser.parse(querystr + "*");
             
             {
-                BooleanQuery boolQuery = new BooleanQuery();          
-                boolQuery.add( 
-                    new WildcardQuery(new Term(Entity2LuceneDoc.term.NAME, querystr+'*')),
-                    BooleanClause.Occur.MUST);
+                BooleanQuery boolQuery = new BooleanQuery(); 
+                boolQuery.add(query, BooleanClause.Occur.MUST);
                 Object param = request.getParameter("type");
                 boolQuery.add(  new TermQuery(
                         new Term(Entity2LuceneDoc.term.RDFTYPE, 

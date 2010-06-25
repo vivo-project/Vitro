@@ -56,8 +56,8 @@ public class StartDateBeforeEndDate implements N3Validator {
         Calendar endDate = getDateFromLiteral(endLit);
 		try {
 		    if (startDate.compareTo(endDate) > 0) {
-                errors.put(startFieldName, "Start date must be before end date");
-                errors.put(endFieldName, "End date must be after start date");		        
+                errors.put(startFieldName, "Start date cannot follow end date");
+                errors.put(endFieldName, "End date cannot precede start date");		        
 		    }
 		} catch (NullPointerException npe){ 
 		    log.error("Cannot compare date to null.");
