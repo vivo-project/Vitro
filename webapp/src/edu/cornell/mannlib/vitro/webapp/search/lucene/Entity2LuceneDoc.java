@@ -47,6 +47,8 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         public static String MODTIME    = "modTime";
         /** Name of entity, tab or vclass */
         public static String NAME       = "name";
+        /** Name of entity, unstemmed */
+        public static String NAMEUNSTEMMED       = "nameunstemmed";
         /** Name of portal */
         public static String PORTAL     = "portal";
         /** time of index in msec since epoc */
@@ -109,6 +111,9 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
                                Field.Store.YES, Field.Index.ANALYZED);
         name.setBoost( NAME_BOOST );
         doc.add( name );
+        Field nameUn = new Field(term.NAMEUNSTEMMED, value, 
+        						Field.Store.YES, Field.Index.ANALYZED);
+        nameUn.setBoost( NAME_BOOST );
 
         //boost for entity
         if( ent.getSearchBoost() != null && ent.getSearchBoost() != 0 )

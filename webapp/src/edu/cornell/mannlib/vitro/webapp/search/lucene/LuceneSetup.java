@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.search.lucene;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -14,6 +15,9 @@ import javax.servlet.ServletContextEvent;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.KeywordAnalyzer;
+import org.apache.lucene.analysis.PerFieldAnalyzerWrapper;
+import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.search.BooleanQuery;
 
 import com.hp.hpl.jena.ontology.OntModel;
@@ -88,7 +92,7 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 	            // the queries need to know the analyzer to use so that the same one can be used
 	            // to analyze the fields in the incoming user query terms.
 	            LuceneSearcher searcher = new LuceneSearcher(
-	                    new LuceneQueryFactory(getAnalyzer(), indexDir),
+	                    new LuceneQueryFactory(getAnalyzer(), Entity2LuceneDoc.term.ALLTEXT),
 	                    indexDir);
 	            searcher.addObj2Doc(new Entity2LuceneDoc());
 	            context.setAttribute(Searcher.class.getName(), searcher);		           
@@ -186,11 +190,15 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
      *
      * @return
      */
-    private Analyzer getAnalyzer() {
-        return new VitroAnalyzer();
+    public Analyzer getAnalyzer() {
+        PerFieldAnalyzerWrapper analyzer = new PerFieldAnalyzerWrapper( new KeywordAnalyzer());
+        analyzer.addAnalyzer(Entity2LuceneDoc.term.ALLTEXT, new HtmlLowerStopStemAnalyzer());
+        analyzer.addAnalyzer(Entity2LuceneDoc.term.NAME, new HtmlLowerStopStemAnalyzer());
+        analyzer.addAnalyzer(Entity2LuceneDoc.term.ALLTEXTUNSTEMMED, new HtmlLowerStopAnalyzer());
+        analyzer.addAnalyzer(Entity2LuceneDoc.term.NAME, new HtmlLowerStopAnalyzer());        
+        return analyzer;
     }
     
-
     public static final String ANALYZER= "lucene.analyzer";
     public static final String INDEX_DIR = "lucene.indexDir";
     public static final String SEARCH_DATAPROPERTY_BLACKLIST = 

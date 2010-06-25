@@ -60,8 +60,6 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
         	unionOms.setUserAccountsModel(userAccountsModel);       
             
         	OntModel displayModel = ontModelFromContextAttribute(sce.getServletContext(),"displayOntModel");
-        	OntModel displayUnionModel = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC,ModelFactory.createUnion(displayModel, unionModel));
-        	sce.getServletContext().setAttribute("displayOntModel", displayUnionModel);
         	baseOms.setDisplayModel(displayModel);
         	inferenceOms.setDisplayModel(displayModel);
         	unionOms.setDisplayModel(displayModel);

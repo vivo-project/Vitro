@@ -37,6 +37,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
  * http://lucene.apache.org/java/docs/queryparsersyntax.html
  * http://today.java.net/pub/a/today/2003/11/07/QueryParserRules.html
  *
+ * This class is not thread safe, use one instance per request.
  * @author bdc34
  *
  */
@@ -47,48 +48,30 @@ public class LuceneQuery extends VitroQuery {
     private final int ADVANCED =2;
     private int queryType = SIMPLE;
 
-    public boolean defaultTimeWindow = true;
-
     private Query query = null;
     private Analyzer analyzer = null;
     
     private static final Log log = LogFactory.getLog(LuceneQuery.class.getName());
 
-    //private IndexReader indexReader;
-
     public LuceneQuery(VitroRequest request, PortalFlag portalState,
-                       Analyzer analyzer, String indexDir ){
-    	
+                       Analyzer analyzer, String defualtField ){    	
         super(request,portalState); //the super class will stash the parameters for us.
         this.analyzer = analyzer;
 
-//        if( indexReader == null ){
-//          try {
-//              indexReader = IndexReader.open( indexDir );
-//          } catch (IOException e) {
-//              System.out.println("LuceneQuery: could not create IndexReader"+e);
-//              e.printStackTrace();
-//          }
-//        }
         if( isAdvancedQuery( request ) ){
             queryType = ADVANCED;
         }
     }
 
     @SuppressWarnings("static-access")
-    private QueryParser getQueryParser(){
+    private QueryParser getQueryParser(){    	
         //defaultSearchField indicates which field search against when there is no term
         //indicated in the query string.
         //The analyzer is needed so that we use the same analyzer on the search queries as
         //was used on the text that was indexed.
-        VitroQueryParser qp = new VitroQueryParser(defaultSearchField,analyzer);
+        QueryParser qp = new QueryParser(defaultSearchField,analyzer);
         //this sets the query parser to AND all of the query terms it finds.
         qp.setDefaultOperator(QueryParser.AND_OPERATOR);
-        //set up the map of stemmed field names -> unstemmed field names
-        HashMap<String,String> map = new HashMap<String, String>();
-        map.put(Entity2LuceneDoc.term.ALLTEXT,Entity2LuceneDoc.term.ALLTEXTUNSTEMMED);
-        qp.setStemmedToUnstemmed(map);
-
         return qp;
     }
 
@@ -132,67 +115,7 @@ public class LuceneQuery extends VitroQuery {
 
         return this.query;
     }
-
-    /**
-     * Adds a Query that will get doc where the
-     * SUNSET is > NOW  and SUNRISE <= NOW. We'll do
-     * this by creating two RangeQueries, one to
-     * check that SUNRISE is between [BEGINNING_OF_TIME, NOW]
-     * and that SUNSET is between [NOW, END_OF_TIME]
-     * There don't seem to be any GraterThanQuery
-     * or LessThanQuery classes in lucene.
-     */
-//     private BooleanQuery makeDefaultTimeWindowQuery(){
-//         String nowStr = new DateTime().toString(LuceneIndexer.DATE_FORMAT);
-
-//         Term BEGINNING_OF_TIME = null;
-//         Term now = new Term(Entity2LuceneDoc.term.SUNRISE,nowStr );
-//         RangeQuery sunriseBeforeNow = new RangeQuery(BEGINNING_OF_TIME,now, true);
-
-//         Term END_OF_TIME = null;
-//         now = new Term(Entity2LuceneDoc.term.SUNSET,nowStr);
-//         RangeQuery sunsetAfterNow = new RangeQuery(now,END_OF_TIME, false);
-
-//         BooleanQuery qRv = new BooleanQuery();
-//         qRv.add( sunriseBeforeNow, BooleanClause.Occur.MUST);
-//         qRv.add( sunsetAfterNow, BooleanClause.Occur.MUST);
-
-//         return qRv;
-//     }
-
-    /**
-     * Makes queries to return only things between the given times and adds
-     * them as BooleanQuery objects.
-     *
-     * If earliest is null then the query include anything that existed before latest.
-     * If latest is null then the query will include anthing that existes after earliest.
-     * If both earliest and latest are null then NO restrictions will be added to the query.
-     */
-    private Query addTimeWindowedQuery( Query query, DateTime earliest, DateTime latest){
-        Query returnQuery = null;
-        if( earliest ==null && latest == null ) return query;
-
-        if( earliest != null && latest != null ){
-            //we work with the SUNSET here since that is the last time the
-            //object will be seen.
-             Term earliestTerm = new Term(Entity2LuceneDoc.term.SUNSET,
-                                          earliest.toString(LuceneIndexer.DATE_FORMAT));
-             Term latestTerm = new Term(Entity2LuceneDoc.term.SUNRISE,
-                                        latest.toString(LuceneIndexer.DATE_FORMAT));
-
-             RangeQuery timeWindowQuery = new RangeQuery(earliestTerm,latestTerm, true);
-             BooleanQuery bQuery = new BooleanQuery();
-             bQuery.add( query, BooleanClause.Occur.MUST);
-             bQuery.add( timeWindowQuery, BooleanClause.Occur.MUST);
-             returnQuery = bQuery;
-        }
-        return returnQuery;
-    }
-
-            // Term beginning_of_time = new Term(Entity2LuceneDoc.term.SUNSET,
-//                                               BEGINNING_OF_TIME);
-//             Term end_of_time = new Term(Entity2LuceneDoc.term.SUNRISE,
-//                                         END_OF_TIME);
+  
     /**
      * Makes a flag based query clause.  This is where searches can filter by portal.
      *
@@ -249,8 +172,6 @@ public class LuceneQuery extends VitroQuery {
     private boolean isAdvancedQuery(HttpServletRequest request){
         return false;
     }
-
-
 
     @Override
     public String getTerms() {

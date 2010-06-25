@@ -24,7 +24,8 @@ public class VitroAnalyzer extends Analyzer {
         if( Entity2LuceneDoc.term.ALLTEXT.equals(field) ||
             Entity2LuceneDoc.term.NAME.equals(field) )
             return stemmingAnalyzer.tokenStream(field, reader);
-        else if( Entity2LuceneDoc.term.ALLTEXTUNSTEMMED.equals(field) )
+        else if( Entity2LuceneDoc.term.ALLTEXTUNSTEMMED.equals(field) ||
+        		Entity2LuceneDoc.term.NAMEUNSTEMMED.equals(field) )
             return nonStemmingAnalyzer.tokenStream(field, reader);
         else{
             return keywordAnalyzer.tokenStream(field, reader);

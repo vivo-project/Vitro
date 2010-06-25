@@ -79,7 +79,7 @@ public class LuceneSetupCJK implements javax.servlet.ServletContextListener {
             // the queries need to know the analyzer to use so that the same one can be used
             // to analyze the fields in the incoming user query terms.
             LuceneSearcher searcher = new LuceneSearcher(
-                    new LuceneQueryFactory(getAnalyzer(), indexDir),
+                    new LuceneQueryFactory(getAnalyzer(), Entity2LuceneDoc.term.ALLTEXT),
                     indexDir);
             searcher.addObj2Doc(new Entity2LuceneDoc());
             context.setAttribute(Searcher.class.getName(), searcher);

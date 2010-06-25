@@ -2,8 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.search.lucene;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.lucene.analysis.Analyzer;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -14,15 +12,14 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQueryFactory;
 
 public class LuceneQueryFactory implements VitroQueryFactory {
 
-    public static final int MAX_QUERY_LENGTH = 500;
-    private String indexDir;
-
-    public LuceneQueryFactory(Analyzer analyzer, String indexDir ){
-        this.analyzer = analyzer;
-        this.indexDir = indexDir;
-    }
-
+    public static final int MAX_QUERY_LENGTH = 500;    
+    private String defaultField;
     private Analyzer analyzer = null;
+    
+    public LuceneQueryFactory(Analyzer analyzer, String defaultField ){
+        this.analyzer = analyzer;
+        this.defaultField = defaultField;
+    }    
 
     public VitroQuery getQuery(VitroRequest request, PortalFlag portalState) throws SearchException {
         //there should be a better way to integrate this with LuceneQuery
@@ -34,7 +31,7 @@ public class LuceneQueryFactory implements VitroQueryFactory {
         if( txt.length() > MAX_QUERY_LENGTH )
             throw new SearchException("The search was too long. The maximum " +
             		"query length is " + MAX_QUERY_LENGTH );
-        LuceneQuery query = new LuceneQuery(request, portalState, analyzer, indexDir);
+        LuceneQuery query = new LuceneQuery(request, portalState, analyzer, defaultField );
         return query;
     }
 

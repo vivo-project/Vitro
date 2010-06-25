@@ -503,13 +503,13 @@ public class PagedSearchController extends VitroHttpServlet implements Searcher{
         //indicated in the query string.
         //The analyzer is needed so that we use the same analyzer on the search queries as
         //was used on the text that was indexed.
-        VitroQueryParser qp = new VitroQueryParser(defaultSearchField,analyzer);
+        QueryParser qp = new QueryParser(defaultSearchField,analyzer);
         //this sets the query parser to AND all of the query terms it finds.
         qp.setDefaultOperator(QueryParser.AND_OPERATOR);
         //set up the map of stemmed field names -> unstemmed field names
-        HashMap<String,String> map = new HashMap<String, String>();
-        map.put(Entity2LuceneDoc.term.ALLTEXT,Entity2LuceneDoc.term.ALLTEXTUNSTEMMED);
-        qp.setStemmedToUnstemmed(map);
+//        HashMap<String,String> map = new HashMap<String, String>();
+//        map.put(Entity2LuceneDoc.term.ALLTEXT,Entity2LuceneDoc.term.ALLTEXTUNSTEMMED);
+//        qp.setStemmedToUnstemmed(map);
         return qp;
     }
  
