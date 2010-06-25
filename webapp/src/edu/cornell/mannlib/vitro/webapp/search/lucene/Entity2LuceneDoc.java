@@ -12,6 +12,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.Term;
 import org.joda.time.DateTime;
+import org.openrdf.model.vocabulary.OWL;
 
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -19,6 +20,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
 import edu.cornell.mannlib.vitro.webapp.search.docbuilder.Obj2DocIface;
 import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
@@ -72,8 +74,28 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
 
     private static String entClassName = Individual.class.getName();
 
-    public boolean canTranslate(Object obj) {
-        return (obj != null && obj instanceof Individual);
+    public boolean canTranslate(Object obj) {    	
+        if(obj != null && obj instanceof Individual){
+        	Individual ind = (Individual)obj;
+        	List<VClass> vclasses = ind.getVClasses();
+        	if( vclasses == null || vclasses.size() < 1 ){
+        		return false;
+        	}        		
+        	for( VClass c : vclasses ){
+        		if( c != null)
+        			if (VitroVocabulary.RDF_TYPE.equals(c.getURI()))
+        				return false;
+        			else if ( OWL.OBJECTPROPERTY.stringValue().equals((c.getURI())))
+        				return false;
+        			else if ( OWL.DATATYPEPROPERTY.stringValue().equals((c.getURI())))
+        				return false;
+        			else if ( OWL.ANNOTATIONPROPERTY.stringValue().equals((c.getURI())))
+        				return false;
+        	}
+        	return true;
+        }else{
+        	return false;
+        }
     }    
 
     @SuppressWarnings("static-access")
