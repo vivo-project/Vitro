@@ -5,6 +5,8 @@ package edu.cornell.mannlib.vitro.webapp.beans;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+
 import java.lang.reflect.Method;
 import java.sql.Timestamp;
 import java.text.Collator;
@@ -180,7 +182,20 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
     	return allVClasses;
     }
     
-    public List<VClass> getVClasses(boolean direct) {
+    @Override
+	public boolean isVClass(String uri) {
+    	if (uri == null) {
+    		return false;
+    	}
+		for (VClass vClass : getVClasses()) {
+			if (uri.equals(vClass.getURI())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public List<VClass> getVClasses(boolean direct) {
     	if (direct) {
     		return directVClasses;
     	} else {

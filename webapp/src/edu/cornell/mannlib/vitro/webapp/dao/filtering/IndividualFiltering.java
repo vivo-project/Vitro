@@ -509,7 +509,6 @@ public class IndividualFiltering implements Individual {
         return _innerIndividual.getKeywordObjects();
     }
 
-
     public List<VClass> getVClasses() {
         return _innerIndividual.getVClasses();
     }
@@ -518,7 +517,13 @@ public class IndividualFiltering implements Individual {
         return _innerIndividual.getVClasses(direct);
     }
 
-    public void setDataPropertyMap(Map<String, DataProperty> propertyMap) {
+    @Override
+	public boolean isVClass(String uri) {
+    	return _innerIndividual.isVClass(uri);
+	}
+
+
+	public void setDataPropertyMap(Map<String, DataProperty> propertyMap) {
         _innerIndividual.setDataPropertyMap(propertyMap);
     }
 

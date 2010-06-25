@@ -61,6 +61,9 @@ public interface Individual extends ResourceBean, VitroTimeWindowedResource, Com
     
     List<VClass> getVClasses(boolean direct);
     void setVClasses(List<VClass> vClassList, boolean direct);
+    
+    /** Does the individual belong to this class? */
+    boolean isVClass(String uri);
 
     void setObjectPropertyStatements(List<ObjectPropertyStatement> list);
     List<ObjectPropertyStatement> getObjectPropertyStatements();
