@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -69,7 +68,6 @@ import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneIndexer;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.SimpleLuceneHighlighter;
-import edu.cornell.mannlib.vitro.webapp.search.lucene.VitroQueryParser;
 import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.Html2Text;
 
