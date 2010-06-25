@@ -190,7 +190,7 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
      *
      * @return
      */
-    public Analyzer getAnalyzer() {
+    private Analyzer getAnalyzer() {
         PerFieldAnalyzerWrapper analyzer = new PerFieldAnalyzerWrapper( new KeywordAnalyzer());
         analyzer.addAnalyzer(Entity2LuceneDoc.term.ALLTEXT, new HtmlLowerStopStemAnalyzer());
         analyzer.addAnalyzer(Entity2LuceneDoc.term.NAME, new HtmlLowerStopStemAnalyzer());
