@@ -4,13 +4,14 @@ package edu.cornell.mannlib.vitro.webapp.web.directives;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 import freemarker.core.Environment;
-import freemarker.template.Configuration;
-import freemarker.template.SimpleScalar;
 import freemarker.template.TemplateDirectiveBody;
 import freemarker.template.TemplateDirectiveModel;
 import freemarker.template.TemplateException;
@@ -40,42 +41,32 @@ public class DumpDataModelDirective implements TemplateDirectiveModel {
         }
 
         TemplateHashModel dataModel = env.getDataModel();
-        String output = "Data model: ";
+        List<String> models = new ArrayList<String>();
+        List<String> directives = new ArrayList<String>();
           
         Map<String, Object> dm = (Map<String, Object>) DeepUnwrap.permissiveUnwrap(dataModel);
         Set varNames = dm.keySet();
         for (Object varName : varNames) {
-            output += (String) varName + ", ";
-        }
-        
-        // Add shared variables
-        Configuration config = env.getConfiguration();
-        Set sharedVars = config.getSharedVariableNames();
-        Iterator i = sharedVars.iterator();
-        while (i.hasNext()) {
-            String sv = (String) i.next();
-            TemplateModel tm = config.getSharedVariable(sv);
-            if (tm instanceof TemplateDirectiveModel ||
-                    // Legacy built-ins that are added to all configurations
-                    tm instanceof freemarker.template.utility.CaptureOutput ||
-                    tm instanceof freemarker.template.utility.StandardCompress ||
-                    tm instanceof freemarker.template.utility.HtmlEscape ||
-                    tm instanceof freemarker.template.utility.NormalizeNewlines ||
-                    tm instanceof freemarker.template.utility.XmlEscape) {
-                continue;
+            if (dm.get(varName) instanceof TemplateDirectiveModel) {
+                directives.add((String) varName);
+            } else {
+                models.add((String) varName);
             }
-            output += sv + ", ";
         }
 
-        output = output.replaceAll(", $", ".");
-            
-        
+        Collections.sort(models);
+        Collections.sort(directives);
+ 
         // RY Improve by making presentation of various types more nuanced
         // Also merge to a template for formatting
         // get config from environment; get a template from config
         // merge as in FreeMarkerHttpServlet.mergeToTemplate()
+        String modelNames = "<p><strong>Data model:</strong> " + StringUtils.join(models, ", ") + ".</p>";
+        String directiveNames = "<p><strong>Directives:</strong> " + StringUtils.join(directives, ", ") + ".</p>";
+
+        String output = modelNames + directiveNames;
         Writer out = env.getOut();
-        out.write(output + "<br />");
+        out.write(output);
 
     }
 

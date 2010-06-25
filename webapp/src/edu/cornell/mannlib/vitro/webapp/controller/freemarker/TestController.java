@@ -70,6 +70,7 @@ public class TestController extends FreeMarkerHttpServlet {
         body.put("bookTitle", "Pride and Prejudice");
         body.put("bookTitle", "Persuasion");
         
+        body.put("title", "VIVO Test");
           
         // Create the template to see the examples live.
         String bodyTemplate = "test.ftl";             

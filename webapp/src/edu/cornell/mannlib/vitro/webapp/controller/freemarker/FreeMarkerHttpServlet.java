@@ -82,6 +82,10 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 	        setUpRoot(vreq, root); 	        
 	        root.put("body", getBody(vreq, body, config)); // need config to get and process template
 	        
+	        // getBody() may have changed the title, so put the new value in the root map. (E.g., the title may
+	        // include an individual's name, which is only discovered when processing the body.)
+	        root.put("title", body.get("title"));
+	        
 	        writePage(root, config, response);
        
 	    } catch (Throwable e) {
@@ -357,11 +361,12 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         return copyright;
     }
 
-    // Subclasses will override. This serves as a default.
+    // Subclasses may override. This serves as a default.
     protected String getTitle(String siteName) {        
         return siteName;
     }
-    
+        
+    // Most subclasses will override. Some (e.g., ajax controllers) don't need to define a page body.
     protected String getBody(VitroRequest vreq, Map<String, Object> body, Configuration config) {
         return "";
     }

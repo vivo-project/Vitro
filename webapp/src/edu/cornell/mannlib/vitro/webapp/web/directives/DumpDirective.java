@@ -47,7 +47,7 @@ public class DumpDirective implements TemplateDirectiveModel {
         String output = var + ": " + val.toString();           
         
         // RY Improve by making presentation of various types more nuanced
-        // Also merge to a template for formatting
+        // Also merge to a template for formatting:
         // get config from environment; get a template from config
         // merge as in FreeMarkerHttpServlet.mergeToTemplate()
         Writer out = env.getOut();
