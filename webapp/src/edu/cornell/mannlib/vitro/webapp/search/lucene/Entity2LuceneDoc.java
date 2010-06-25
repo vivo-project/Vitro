@@ -120,7 +120,7 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
             doc.setBoost(ent.getSearchBoost());
 
         //rdf:type and ClassGroup
-        List<VClass> vclasses = ent.getVClasses();
+        List<VClass> vclasses = ent.getVClasses(false);
         for( VClass clz : vclasses){
             //document boost for given classes
             if( clz.getSearchBoost() != null )
