@@ -25,6 +25,9 @@
 
 <p><strong>Animal:</strong> ${animal}</p>
 
+<p><strong>Book Title:</strong> ${bookTitle}</p>
+
+
 <h2>Zoo 1</h2>
 <ul>
 <#list zoo1.animals as animal>

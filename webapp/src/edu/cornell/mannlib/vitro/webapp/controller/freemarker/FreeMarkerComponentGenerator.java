@@ -28,7 +28,7 @@ public class FreeMarkerComponentGenerator extends FreeMarkerHttpServlet {
     
     private static ServletContext context = null;
     
-    FreeMarkerComponentGenerator(HttpServletRequest request, HttpServletResponse response) {
+    FreeMarkerComponentGenerator(HttpServletRequest request) {
         VitroRequest vreq = new VitroRequest(request);
         Configuration config = getConfig(vreq);
 

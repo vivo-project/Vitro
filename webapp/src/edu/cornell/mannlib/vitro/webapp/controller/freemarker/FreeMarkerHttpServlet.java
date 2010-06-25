@@ -105,6 +105,8 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
     @SuppressWarnings("unchecked")
     protected Configuration getConfigForTheme(String themeDir) {
         
+        // The template loader is theme-specific because it specifies the theme template directory as a location to
+        // load templates from. Thus configurations are associated with themes rather than portals.
         Map<String, Configuration> themeToConfigMap = (Map<String, Configuration>) (getServletContext().getAttribute("themeToConfigMap"));
         
         if (themeToConfigMap.containsKey(themeDir)) {
@@ -354,17 +356,6 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         } 
         return copyright;
     }
-   
-    // Default case is to set title first, because it's used in the body. However, in some cases
-    // the title is based on values computed during compilation of the body (e.g., IndividualListController). 
-    // Individual controllers can override this method to set title and body together. End result must be:
-    // body is added to root with key "body" 
-    // title is set as a shared variable with key "title" 
-    // This can be achieved by making sure setBody() and setTitle() are called.
-//    protected void setTitleAndBody() {
-//        setTitle();
-//        setBody();
-//    }
 
     // Subclasses will override. This serves as a default.
     protected String getTitle(String siteName) {        
@@ -437,10 +428,10 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 
     // TEMPORARY method for transition from JSP to FreeMarker. 
     // It's a static method because it needs to be called from JSPs that don't go through a servlet.
-    public static void getFreeMarkerComponentsForJsp(HttpServletRequest request, HttpServletResponse response) {
+    public static void getFreeMarkerComponentsForJsp(HttpServletRequest request) {
         // We need to create a FreeMarkerHttpServlet object in order to call the instance methods
         // to set up the data model.
-        new FreeMarkerComponentGenerator(request, response);
+        new FreeMarkerComponentGenerator(request);
     }
 
 }

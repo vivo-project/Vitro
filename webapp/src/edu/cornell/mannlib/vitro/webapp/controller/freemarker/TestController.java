@@ -66,6 +66,10 @@ public class TestController extends FreeMarkerHttpServlet {
         body.put("zoo2", zoo2);
         
         getBerries(body);
+        
+        body.put("bookTitle", "Pride and Prejudice");
+        body.put("bookTitle", "Persuasion");
+        
           
         // Create the template to see the examples live.
         String bodyTemplate = "test.ftl";             
