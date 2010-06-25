@@ -111,9 +111,11 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
                                Field.Store.YES, Field.Index.ANALYZED);
         name.setBoost( NAME_BOOST );
         doc.add( name );
+        
         Field nameUn = new Field(term.NAMEUNSTEMMED, value, 
-        						Field.Store.YES, Field.Index.ANALYZED);
+        						Field.Store.YES, Field.Index.ANALYZED);        
         nameUn.setBoost( NAME_BOOST );
+        doc.add( nameUn );
 
         //boost for entity
         if( ent.getSearchBoost() != null && ent.getSearchBoost() != 0 )
