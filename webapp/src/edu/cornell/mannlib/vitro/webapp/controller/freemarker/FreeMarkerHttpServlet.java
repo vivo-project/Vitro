@@ -209,10 +209,10 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         // This value will be available to any template as a path for adding a new stylesheet.
         // It does not contain the context path, because the methods to generate the href
         // attribute from the string passed in by the template automatically add the context path.
-        map.put("stylesheetDir", themeDir + "/css");
+        map.put("themeStylesheetDir", themeDir + "/css");
 
         map.put("stylesheets", getStylesheetList(themeDir));
-        map.put("scripts", getScriptList());
+        map.put("scripts", getScriptList(themeDir));
   
         addDirectives(map);
         
@@ -262,14 +262,14 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         }
     }
     
-    private TemplateModel getScriptList() {
+    private TemplateModel getScriptList(String themeDir) {
         
         // For script and stylesheet lists, use an object wrapper that exposes write methods, 
         // instead of the configuration's object wrapper, which doesn't. The templates can
         // add stylesheets and scripts to the lists by calling their add() methods.
         BeansWrapper wrapper = new DefaultObjectWrapper();
         try {
-            return wrapper.wrap(new ScriptList());       
+            return wrapper.wrap(new ScriptList(themeDir));       
         } catch (TemplateModelException e) {
             log.error("Error creating script TemplateModel");
             return null;

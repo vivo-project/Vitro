@@ -101,7 +101,7 @@ public class AutocompleteController extends FreeMarkerHttpServlet implements Sea
         
         try {
  
-            // make sure an IndividualDao is available 
+            // make sure an IndividualDao is available
             if( vreq.getWebappDaoFactory() == null 
                     || vreq.getWebappDaoFactory().getIndividualDao() == null ){
                 log.error("makeUsableBeans() could not get IndividualDao ");
@@ -120,7 +120,11 @@ public class AutocompleteController extends FreeMarkerHttpServlet implements Sea
             log.debug("query for '" + qtxt +"' is " + query.toString());
             
             // Get the list of uris that should be excluded from the results
-            List<String> urisToExclude = Arrays.asList(vreq.getParameterValues("filter"));
+            String filters[] = vreq.getParameterValues("filter");
+            List<String> urisToExclude = new ArrayList<String>();   
+            if (filters != null) {
+                urisToExclude = Arrays.asList(vreq.getParameterValues("filter"));
+            }
             
             if (query == null ) {
                 doNoQuery(templateName, map, config, response);
