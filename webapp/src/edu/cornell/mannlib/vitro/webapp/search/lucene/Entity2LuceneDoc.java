@@ -75,27 +75,7 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
     private static String entClassName = Individual.class.getName();
 
     public boolean canTranslate(Object obj) {    	
-        if(obj != null && obj instanceof Individual){
-        	Individual ind = (Individual)obj;
-        	List<VClass> vclasses = ind.getVClasses();
-        	if( vclasses == null || vclasses.size() < 1 ){
-        		return false;
-        	}        		
-        	for( VClass c : vclasses ){
-        		if( c != null)
-        			if (VitroVocabulary.RDF_TYPE.equals(c.getURI()))
-        				return false;
-        			else if ( OWL.OBJECTPROPERTY.stringValue().equals((c.getURI())))
-        				return false;
-        			else if ( OWL.DATATYPEPROPERTY.stringValue().equals((c.getURI())))
-        				return false;
-        			else if ( OWL.ANNOTATIONPROPERTY.stringValue().equals((c.getURI())))
-        				return false;
-        	}
-        	return true;
-        }else{
-        	return false;
-        }
+        return (obj != null && obj instanceof Individual);        	
     }    
 
     @SuppressWarnings("static-access")

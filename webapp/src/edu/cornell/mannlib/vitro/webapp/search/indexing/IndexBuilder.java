@@ -107,8 +107,10 @@ public class IndexBuilder implements Runnable {
     	long since = indexer.getModified() - 60000;
     		    		
         Iterator<ObjectSourceIface> sources = sourceList.iterator();
-        List<Iterator<ObjectSourceIface>> listOfIterators = 
-            new LinkedList<Iterator<ObjectSourceIface>>();
+        
+        List<Iterator<Individual>> listOfIterators = 
+            new LinkedList<Iterator<Individual>>();
+        
         while (sources.hasNext()) {
             Object obj = sources.next();
             if (obj != null && obj instanceof ObjectSourceIface)
@@ -219,10 +221,10 @@ public class IndexBuilder implements Runnable {
      * @param items
      * @return
      */
-    protected void indexForSource(Iterator items , boolean newDocs){
-        if( items == null ) return;
-        while(items.hasNext()){
-            indexItem(items.next(), newDocs);
+    protected void indexForSource(Iterator<Individual> individuals , boolean newDocs){
+        if( individuals == null ) return;
+        while(individuals.hasNext()){
+            indexItem(individuals.next(), newDocs);
         }
     }
 
@@ -248,12 +250,17 @@ public class IndexBuilder implements Runnable {
      * @param item
      * @return
      */
-    protected void indexItem( Object item, boolean newDoc){
+    protected void indexItem( Individual ind, boolean newDoc){
         try{
-            indexer.index(item, newDoc);
+        	if( ind == null )
+        		return;
+        	if( ind.getVClasses() == null || ind.getVClasses().size() < 1 )
+        		return;
+        		
+            indexer.index(ind, newDoc);
         }catch(Throwable ex){            
             log.debug("IndexBuilder.indexItem() Error indexing "
-                    + item + "\n" +ex);
+                    + ind + "\n" +ex);
         }
         return ;
     }

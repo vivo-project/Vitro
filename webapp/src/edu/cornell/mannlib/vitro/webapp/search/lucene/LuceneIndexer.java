@@ -20,6 +20,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
+import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
 import edu.cornell.mannlib.vitro.webapp.search.beans.Searcher;
 import edu.cornell.mannlib.vitro.webapp.search.docbuilder.Obj2DocIface;
@@ -181,8 +182,7 @@ public class LuceneIndexer implements IndexerIface {
      * to setup the modifier.
      *
      */
-    public synchronized void index(Object obj, boolean newDoc) 
-    throws IndexingException {
+    public void index(Individual ind, boolean newDoc) throws IndexingException {
         if( ! indexing )
             throw new IndexingException("LuceneIndexer: must call " +
             		"startIndexing() before index().");
@@ -193,11 +193,11 @@ public class LuceneIndexer implements IndexerIface {
             Iterator<Obj2DocIface> it = getObj2DocList().iterator();
             while (it.hasNext()) {
                 Obj2DocIface obj2doc = (Obj2DocIface) it.next();
-                if (obj2doc.canTranslate(obj)) {
+                if (obj2doc.canTranslate(ind)) {
                     if( !newDoc ){
-                        writer.deleteDocuments((Term)obj2doc.getIndexId(obj));
+                        writer.deleteDocuments((Term)obj2doc.getIndexId(ind));
                     }
-                    Document d = (Document) obj2doc.translate(obj);
+                    Document d = (Document) obj2doc.translate(ind);
                     if( d != null)
                         writer.addDocument(d);
                 }
@@ -210,9 +210,8 @@ public class LuceneIndexer implements IndexerIface {
     /**
      * Removes a single object from index. <code>obj</code> is translated
      * using the obj2DocList.
-     */
-    public synchronized void removeFromIndex(Object obj ) 
-    throws IndexingException{        
+     */    
+    public void removeFromIndex(Individual ind) throws IndexingException {
         if( writer == null )
             throw new IndexingException("LuceneIndexer: cannot delete from " +
             		"index, IndexWriter is null.");
@@ -220,8 +219,8 @@ public class LuceneIndexer implements IndexerIface {
             Iterator<Obj2DocIface> it = getObj2DocList().iterator();
             while (it.hasNext()) {
                 Obj2DocIface obj2doc = (Obj2DocIface) it.next();
-                if (obj2doc.canTranslate(obj)) {
-                    writer.deleteDocuments((Term)obj2doc.getIndexId(obj));
+                if (obj2doc.canTranslate(ind)) {
+                    writer.deleteDocuments((Term)obj2doc.getIndexId(ind));
                 }
             }
         } catch (IOException ex) {            
@@ -311,4 +310,6 @@ public class LuceneIndexer implements IndexerIface {
         // The directory is now empty so delete it
         return dir.delete();
     }
+
+
 }

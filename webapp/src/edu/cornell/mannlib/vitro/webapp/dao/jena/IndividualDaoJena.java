@@ -986,19 +986,27 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
                     try {
                         while (typeIt.hasNext()) {
                             Resource typeRes = (Resource) typeIt.next();
+                            String type = typeRes.getURI();
                             // brute forcing this until we implement a better strategy
-                            if (VitroVocabulary.PORTAL.equals(typeRes.getURI()) || 
-                            	VitroVocabulary.TAB.equals(typeRes.getURI()) ||
-                            	VitroVocabulary.TAB_INDIVIDUALRELATION.equals(typeRes.getURI()) ||
-                            	VitroVocabulary.LINK.equals(typeRes.getURI()) ||
-                            	VitroVocabulary.KEYWORD.equals(typeRes.getURI()) ||
-                            	VitroVocabulary.KEYWORD_INDIVIDUALRELATION.equals(typeRes.getURI()) ||
-                            	VitroVocabulary.CLASSGROUP.equals(typeRes.getURI()) ||
-                            	VitroVocabulary.PROPERTYGROUP.equals(typeRes.getURI()) ||
-                            	VitroVocabulary.APPLICATION.equals(typeRes.getURI())) {    	
+                            if (VitroVocabulary.PORTAL.equals(type) || 
+                            	VitroVocabulary.TAB.equals(type) ||
+                            	VitroVocabulary.TAB_INDIVIDUALRELATION.equals(type) ||
+                            	VitroVocabulary.LINK.equals(type) ||
+                            	VitroVocabulary.KEYWORD.equals(type) ||
+                            	VitroVocabulary.KEYWORD_INDIVIDUALRELATION.equals(type) ||
+                            	VitroVocabulary.CLASSGROUP.equals(type) ||
+                            	VitroVocabulary.PROPERTYGROUP.equals(type) ||
+                            	VitroVocabulary.APPLICATION.equals(type)) {    	
                                 userVisible = false;
                                 break;
                             }
+                            if( OWL.ObjectProperty.getURI().equals(type) ||
+                            	OWL.DatatypeProperty.getURI().equals(type) ||
+                            	OWL.AnnotationProperty.getURI().equals(type) ||
+                            	RDF.type.getURI().equals(type) ){
+                            	userVisible = false;
+                            	break;
+                        	} 
                         }
                     } finally {
                         typeIt.close();
