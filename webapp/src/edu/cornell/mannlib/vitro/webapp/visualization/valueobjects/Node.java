@@ -66,18 +66,30 @@ public class Node extends Individual {
 	public Map<String, Integer> getEarliestPublicationYearCount() {
 		if (yearToPublicationCount == null) {
 			yearToPublicationCount = VOUtils.getYearToPublicationCount(authorDocuments);
+			System.out.println("early - " + yearToPublicationCount);
 		}
 		
-		final String earliestYear = Collections.min(yearToPublicationCount.keySet());
-		final Integer earliestYearPubCount = yearToPublicationCount.get(earliestYear);
+		/*
+		 * We do not want to consider the default publication year when we are checking 
+		 * for the min or max publication year. 
+		 * */
+		Set<String> yearsToBeConsidered = new HashSet<String>(yearToPublicationCount.keySet());
+		yearsToBeConsidered.remove(VOConstants.DEFAULT_PUBLICATION_YEAR);
 		
 		/*
-		 * If there is no minimum year available then we should imply so by returning a "null".
+		 * There can be a case when the only publication the author has no attached year to it
+		 * so essentially an "Unknown". In that case Collections.max or min will throw an 
+		 * NoSuchElementException.
+		 * 
+		 * If there is no maximum year available then we should imply so by returning a "null".
 		 * */
-		if (!earliestYear.equalsIgnoreCase(VOConstants.DEFAULT_PUBLICATION_YEAR)) {
+		if (yearsToBeConsidered.size() > 0) {
+			final String earliestYear = Collections.min(yearsToBeConsidered);
+			final Integer earliestYearPubCount = yearToPublicationCount.get(earliestYear);
+			
 			return new HashMap<String, Integer>(){{
-						put(earliestYear, earliestYearPubCount);
-					}};
+				put(earliestYear, earliestYearPubCount);
+			}};
 		} else {
 			return null;
 		}
@@ -89,36 +101,45 @@ public class Node extends Individual {
 			yearToPublicationCount = VOUtils.getYearToPublicationCount(authorDocuments);
 		}
 		
-		final String latestYear = Collections.max(yearToPublicationCount.keySet());
-		final Integer latestYearPubCount = yearToPublicationCount.get(latestYear);
+		/*
+		 * We do not want to consider the default publication year when we are checking 
+		 * for the min or max publication year. 
+		 * */
+		Set<String> yearsToBeConsidered = new HashSet<String>(yearToPublicationCount.keySet());
+		yearsToBeConsidered.remove(VOConstants.DEFAULT_PUBLICATION_YEAR);
 		
 		/*
+		 * There can be a case when the only publication the author has no attached year to it
+		 * so essentially an "Unknown". In that case Collections.max or min will throw an 
+		 * NoSuchElementException.
+		 * 
 		 * If there is no maximum year available then we should imply so by returning a "null".
 		 * */
-		if (!latestYear.equalsIgnoreCase(VOConstants.DEFAULT_PUBLICATION_YEAR)) {
+		if (yearsToBeConsidered.size() > 0) {
+			final String latestYear = Collections.max(yearsToBeConsidered);
+			final Integer latestYearPubCount = yearToPublicationCount.get(latestYear);
+			
 			return new HashMap<String, Integer>(){{
-						put(latestYear, latestYearPubCount);
-					}};
+				put(latestYear, latestYearPubCount);
+			}};
 		} else {
 			return null;
 		}
+		
 	}
 	
-	@SuppressWarnings("serial")
-	public Map<String, Integer> getUnknownPublicationYearCount() {
+	public Integer getUnknownPublicationYearCount() {
 		if (yearToPublicationCount == null) {
 			yearToPublicationCount = VOUtils.getYearToPublicationCount(authorDocuments);
 		}
 		
-		final Integer unknownYearPubCount = yearToPublicationCount.get(VOConstants.DEFAULT_PUBLICATION_YEAR);
+		Integer unknownYearPubCount = yearToPublicationCount.get(VOConstants.DEFAULT_PUBLICATION_YEAR);
 		
 		/*
 		 * If there is no unknown year available then we should imply so by returning a "null".
 		 * */
 		if (unknownYearPubCount != null) {
-			return new HashMap<String, Integer>(){{
-						put(VOConstants.DEFAULT_PUBLICATION_YEAR, unknownYearPubCount);
-					}};
+			return unknownYearPubCount;
 		} else {
 			return null;
 		}

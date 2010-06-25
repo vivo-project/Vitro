@@ -331,7 +331,7 @@ public class QueryHandler {
 							+ "		(str(<" + queryURI + ">) as ?" + QueryFieldLabels.AUTHOR_URL + ") " 
 							+ "		(str(?authorLabel) as ?" + QueryFieldLabels.AUTHOR_LABEL + ") " 
 							+ "		(str(?coAuthorPerson) as ?" + QueryFieldLabels.CO_AUTHOR_URL + ") " 
-							+ "		(str(?coAuthorLabel) as ?" + QueryFieldLabels.CO_AUTHOR_LABEL + ") "
+							+ "		(str(?coAuthorPersonLabel) as ?" + QueryFieldLabels.CO_AUTHOR_LABEL + ") "
 							+ "		(str(?document) as ?" + QueryFieldLabels.DOCUMENT_URL + ") "
 							+ "		(str(?documentLabel) as ?" + QueryFieldLabels.DOCUMENT_LABEL + ") "
 							+ "		(str(?documentMoniker) as ?" + QueryFieldLabels.DOCUMENT_MONIKER + ") "

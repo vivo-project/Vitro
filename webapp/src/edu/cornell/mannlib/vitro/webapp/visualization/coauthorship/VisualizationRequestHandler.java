@@ -352,7 +352,7 @@ public class VisualizationRequestHandler {
 							+ "\n\tLatest Publication - " + egoNode.getLatestPublicationYearCount()
 							+ "\n\tUnknown Publication - " + egoNode.getUnknownPublicationYearCount());
 		
-		authorNodes.remove(egoNode);
+//		authorNodes.remove(egoNode);
 		
 		for (Node currNode : authorNodes) {
 			
@@ -360,7 +360,9 @@ public class VisualizationRequestHandler {
 			printWriter.append(currNode.getNodeID() + " - " + currNode.getNodeName() + " -> " + currNode.getNodeURL() + "\n");
 			printWriter.append("\tEarliest Publication - " + currNode.getEarliestPublicationYearCount() 
 								+ "\n\tLatest Publication - " + currNode.getLatestPublicationYearCount()
-								+ "\n\tUnknown Publication - " + currNode.getUnknownPublicationYearCount());
+								+ "\n\tUnknown Publication - " + currNode.getUnknownPublicationYearCount()
+								+ "\n\tTotal Publications - " + currNode.getNumOfAuthoredWorks());
+			
 			
 		}
 		
@@ -371,7 +373,8 @@ public class VisualizationRequestHandler {
 									+ currentEdge.getTargetNode().getNodeName() + "\n");
 			printWriter.append("\tEarliest Collaboration - " + currentEdge.getEarliestCollaborationYearCount() 
 								+ "\n\tLatest Collaboration - " + currentEdge.getLatestCollaborationYearCount()
-								+ "\n\tUnknown Collaboration - " + currentEdge.getUnknownCollaborationYearCount());
+								+ "\n\tUnknown Collaboration - " + currentEdge.getUnknownCollaborationYearCount()
+								+ "\n\tTotal Collaboration - " + currentEdge.getNumOfCoAuthoredWorks());
 			
 		}
 		

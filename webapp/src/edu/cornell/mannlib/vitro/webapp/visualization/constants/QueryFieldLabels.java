@@ -23,7 +23,7 @@ public class QueryFieldLabels {
 	 * Co-Author related field labels
 	 * */
 	public static final String CO_AUTHOR_URL = "coAuthPersonLit";
-	public static final String CO_AUTHOR_LABEL = "coAuthorLabelLit";
+	public static final String CO_AUTHOR_LABEL = "coAuthPersonLabelLit";
 	
 	/*
 	 * College related field labels 

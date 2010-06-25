@@ -46,10 +46,10 @@ public class TestJava {
 		}
 		Map<String, Integer> yearToPublicationCount = new TreeMap<String, Integer>();
 
-		yearToPublicationCount.put("2003", 5);
-		yearToPublicationCount.put("2001", 5);
-		yearToPublicationCount.put("2002", 5);
-		yearToPublicationCount.put("2090", 7);
+//		yearToPublicationCount.put("2003", 5);
+//		yearToPublicationCount.put("2001", 5);
+//		yearToPublicationCount.put("2002", 5);
+//		yearToPublicationCount.put("2090", 7);
 		yearToPublicationCount.put("Unknown", 6);
 		
 		Node egoNode;
@@ -78,17 +78,31 @@ public class TestJava {
 			}
 		}
 		
-		System.out.println(biboDocumentURLToCoAuthors);
+		System.out.println(yearToPublicationCount);
 		
 
-		System.out.println(		new HashMap<String, Integer>(){{
+		Map<String, Integer> saHashMap = new HashMap<String, Integer>(){{
 			put("sdsd", 4);
-		}});
+			
+		}};
+		System.out.println(saHashMap.keySet());
 		
-		System.out.println(yearToPublicationCount.get("44454454"));
-		System.out.println(Collections.min(yearToPublicationCount.keySet()));
+		
+		Set<String> keySet = new HashSet<String>(yearToPublicationCount.keySet());
+		keySet.remove("Unknown");
+		
+		try {
+			System.out.println(Collections.min(keySet));
+		} catch (Exception e) {
+		} 
+		
+		
+		
+		
 		String emptyString = "";
 		System.out.println(emptyString.isEmpty());
+		
+		System.out.println(yearToPublicationCount);
 
 //		System.out.println(Collections.max(yearToPublicationCount.keySet()));
 //		System.out.println(Collections.min(yearToPublicationCount.keySet()));
