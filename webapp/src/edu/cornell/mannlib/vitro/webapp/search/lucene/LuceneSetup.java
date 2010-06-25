@@ -195,7 +195,7 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
         analyzer.addAnalyzer(Entity2LuceneDoc.term.ALLTEXT, new HtmlLowerStopStemAnalyzer());
         analyzer.addAnalyzer(Entity2LuceneDoc.term.NAME, new HtmlLowerStopStemAnalyzer());
         analyzer.addAnalyzer(Entity2LuceneDoc.term.ALLTEXTUNSTEMMED, new HtmlLowerStopAnalyzer());
-        analyzer.addAnalyzer(Entity2LuceneDoc.term.NAME, new HtmlLowerStopAnalyzer());        
+        analyzer.addAnalyzer(Entity2LuceneDoc.term.NAMEUNSTEMMED, new HtmlLowerStopAnalyzer());        
         return analyzer;
     }
     
