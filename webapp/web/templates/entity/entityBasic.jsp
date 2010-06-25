@@ -76,6 +76,7 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
 <c:set var='portal' value='${currentPortalId}'/>
 <c:set var='portalBean' value='${currentPortal}'/>
 
+
 <c:set var='themeDir'><c:out value='${portalBean.themeDir}' /></c:set>
 
     <div id="content">
@@ -186,38 +187,53 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
             </c:if>   
             
             <%-- Thumbnail (with citation) --%>
-            <c:if test="${showEdits || !empty entity.thumbUrl}">
-	            <div id="dprop-vitro-image" class="propsItem ${editingClass}"> 
-	            	<c:set var="mayEditImage"><edLnk:editLinks item="<%= VitroVocabulary.IND_MAIN_IMAGE %>" icons="false" /></c:set>
-	                <c:if test="${showEdits and !empty mayEditImage}">
-	                    <h3 class="propertyName">image</h3>
-	                    <edLnk:editLinks item="<%= VitroVocabulary.IND_MAIN_IMAGE %>" icons="false" />
-	                </c:if>
-	                <c:if test="${!empty entity.thumbUrl}">
+            <c:set var="isPerson" value="<%= entity.isVClass("http://xmlns.com/foaf/0.1/Person") %>" />
+            <c:set var="hasImage" value="${!empty entity.thumbUrl}" />
+            <c:set var="imageLinks"><edLnk:editLinks item="<%= VitroVocabulary.IND_MAIN_IMAGE %>" icons="false" /></c:set>
+            <c:choose>
+                <c:when test="${!isPerson && !hasImage}">
+                    <c:if test="${showEdits && !empty imageLinks}">
+                        <div id="dprop-vitro-image" class="propsItem ${editingClass}"> 
+	                        <h3 class="propertyName">image</h3>
+                            ${imageLinks}
+                        </div> 
+                    </c:if>
+                </c:when>
+                <c:when test="${isPerson && !hasImage}">
+                    <div id="dprop-vitro-image" class="propsItem ${editingClass}"> 
 	                    <div class="datatypeProperties">
 	                        <div class="datatypePropertyValue">
-	                            <div class="statementWrap thumbnail"> 
-	                            <c:set var="imageTitle" value="${entity.name}" />              
-	                                <c:if test="${!empty entity.imageUrl}">
-	                                    <a class="image" href="<c:url value='${entity.imageUrl}'/>">
-	                                    <c:set var="imageTitle" value="click to view larger image in new window" />
-	                                </c:if>
-	                                <img src="<c:url value='${entity.thumbUrl}'/>" title="${imageTitle}" alt="" width="150"/>
-	                                <c:if test="${!empty entity.imageUrl}"></a></c:if>
-	                                <c:if test="${showEdits}">
-	                                    <c:set var="editLinks"><edLnk:editLinks item="<%= VitroVocabulary.IND_MAIN_IMAGE %>" data="${entity.thumbUrl}" icons="false"/></c:set>
-	                                    <c:if test="${!empty editLinks}"><span class="editLinks">${editLinks}</span></c:if>                                                                     
-	                                </c:if>                                   
+	                            <div class="statementWrap thumbnail">
+                                    <img src="<c:url value='/images/dummyImages/person.thumbnail.jpg'/>" 
+                                                title="no image" alt="" width="150"/>
+                                    <c:if test="${showEdits}">
+                                        <span class="editLinks">${imageLinks}</span>
+                                    </c:if>                                   
 	                            </div>
 	                        </div>
 	                    </div> 
-                
-	                    <%-- Citation --%>
-                        <jsp:include page="entityCitation.jsp" />
-                        
-	                </c:if>
-	            </div>
-            </c:if>  
+                    </div> 
+                </c:when>
+                <c:otherwise> <%-- hasImage --%>
+                    <div id="dprop-vitro-image" class="propsItem ${editingClass}"> 
+	                    <div class="datatypeProperties">
+	                        <div class="datatypePropertyValue">
+	                            <div class="statementWrap thumbnail">
+	                                <a class="image" href="<c:url value='${entity.imageUrl}'/>">
+                                        <img src="<c:url value='${entity.thumbUrl}'/>" 
+                                                title="click to view larger image in new window" 
+                                                alt="" width="150"/>
+	                                </a>
+                                    <c:if test="${showEdits}">
+                                        <span class="editLinks">${imageLinks}</span>
+                                    </c:if>                                   
+	                            </div>
+	                        </div>
+	                    </div> 
+                    </div> 
+                    <jsp:include page="entityCitation.jsp" />
+                </c:otherwise>
+            </c:choose>
 
             <%-- Description --%>              
             <c:if test="${ showEdits || !empty entity.description}">
