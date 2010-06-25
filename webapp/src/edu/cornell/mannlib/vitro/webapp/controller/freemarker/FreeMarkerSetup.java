@@ -22,7 +22,7 @@ public class FreeMarkerSetup implements ServletContextListener {
 
 		ServletContext sc = event.getServletContext();	
 		sc.setAttribute("themeToConfigMap", new HashMap<String, Configuration>());
-        BaseTemplateModel.context = sc;
+        BaseTemplateModel.setServletContext(sc);
         FreeMarkerComponentGenerator.setServletContext(sc);
 		UrlBuilder.contextPath = sc.getContextPath();
 	}
