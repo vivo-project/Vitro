@@ -21,14 +21,12 @@ import org.joda.time.DateTime;
 import edu.cornell.mannlib.vedit.beans.LoginFormBean;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyInstance;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.utils.EntityChangeListener;
 
 /**
  * NOTE:does not work yet under semweb-align - gets tricky here
@@ -167,19 +165,6 @@ public Date parseStringToDate(String str) {
 public void doGet(HttpServletRequest request, HttpServletResponse response)
 throws ServletException, IOException {
     doPost(request,response);
-}
-
-
-private void addIndividualToLuceneIndex( ServletContext context, String uri ){
-    try{
-        Object obj = context.getAttribute(EntityChangeListener.class.getName());
-        if(obj != null && obj instanceof EntityChangeListener ){
-            EntityChangeListener listener = (EntityChangeListener) obj;
-            listener.entityUpdated( uri );
-        }
-    }catch(Throwable t){
-        log.error("GenericDBUpdate.checkForEntityChange() error:" + t);
-    }
 }
 
 /**

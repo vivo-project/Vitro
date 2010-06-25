@@ -94,11 +94,7 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
 	            }
             }                        
             
-            ensureEssentialInterfaceData(memModel, sce, wadf);
-        
-            SearchReindexingListener srl = new SearchReindexingListener(memModel, sce.getServletContext());
-        	unionModel.getBaseModel().register(srl);
-        	memModel.getBaseModel().register(srl);
+            ensureEssentialInterfaceData(memModel, sce, wadf);        
             
         	NamespaceMapper namespaceMapper = new NamespaceMapperJena(unionModel, unionModel, defaultNamespace);
         	sce.getServletContext().setAttribute("NamespaceMapper", namespaceMapper);

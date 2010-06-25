@@ -20,7 +20,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ObjectSourceIface;
-import edu.cornell.mannlib.vitro.webapp.utils.EntityChangeListener;
 
 /**
  * The IndexBuilder is used to rebuild or update a search index.
@@ -39,7 +38,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.EntityChangeListener;
  * @author bdc34
  *
  */
-public class IndexBuilder implements Runnable, EntityChangeListener{
+public class IndexBuilder implements Runnable {
     List<ObjectSourceIface> sourceList = new LinkedList<ObjectSourceIface>();
     IndexerIface indexer = null;
     ServletContext context = null;
@@ -60,10 +59,6 @@ public class IndexBuilder implements Runnable, EntityChangeListener{
         this.context = context;
         
         changedUris = new LinkedList<String>();        	
-       	
-        //add this to the context as a EntityChangeListener so that we can
-        //be notified of entity changes.
-        context.setAttribute(EntityChangeListener.class.getName(), this);
     }
 
     public void addObjectSource(ObjectSourceIface osi) {    	
@@ -262,15 +257,7 @@ public class IndexBuilder implements Runnable, EntityChangeListener{
         }
         return ;
     }
-
-    /* These methods are so that the IndexBuilder may register for entity changes */
-    public void entityAdded(String entityURI) {
-        if( log.isDebugEnabled()) 
-        	log.debug("IndexBuilder.entityAdded() " + entityURI);
-        addToChangedUris(entityURI);
-        (new Thread(this)).start();
-    }
-    
+     
     public void entityDeleted(String entityURI) {
     	if( log.isDebugEnabled()) 
     		log.debug("IndexBuilder.entityDeleted() " + entityURI);
@@ -282,13 +269,6 @@ public class IndexBuilder implements Runnable, EntityChangeListener{
         }
     }
 
-    public void entityUpdated(String entityURI) {
-    	if( log.isDebugEnabled()) 
-    		log.debug("IndexBuilder.entityUpdate() " + entityURI);
-    	addToChangedUris(entityURI);
-        (new Thread(this)).start();
-    }
-        
     public synchronized void addToChangedUris(String uri){
     	changedUris.add(uri);
     }

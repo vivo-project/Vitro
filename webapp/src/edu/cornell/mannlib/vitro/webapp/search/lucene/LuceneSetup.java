@@ -16,12 +16,16 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.BooleanQuery;
 
+import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.rdf.model.Model;
+
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.SearchReindexingListener;
 import edu.cornell.mannlib.vitro.webapp.search.beans.Searcher;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
 
@@ -108,6 +112,13 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 	            // to the servlet context so we can access it later in the webapp.
 	            context.setAttribute(IndexBuilder.class.getName(),builder);
 	
+	            //set up listeners so search index builder is notified of changes to model
+	            OntModel baseOntModel = (OntModel)sce.getServletContext().getAttribute("baseOntModel");
+	            OntModel jenaOntModel = (OntModel)sce.getServletContext().getAttribute("jenaOntModel");
+	            SearchReindexingListener srl = new SearchReindexingListener(baseOntModel, sce.getServletContext());
+	            baseOntModel.getBaseModel().register(srl);
+	        	jenaOntModel.getBaseModel().register(srl);
+	        	
 	            log.debug("**** End of "+this.getClass().getName()+".contextInitialized()");
         	} catch (Throwable t) {
         		log.error(t);
