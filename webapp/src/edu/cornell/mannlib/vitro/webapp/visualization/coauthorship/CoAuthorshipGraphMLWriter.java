@@ -14,8 +14,7 @@ public class CoAuthorshipGraphMLWriter {
 	
 	private StringBuilder coAuthorshipGraphMLContent;
 
-	public final String GRAPHML_HEADER = ""
-	        + "	<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" 
+	private final String GRAPHML_HEADER = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" 
 			+ "	<graphml xmlns=\"http://graphml.graphdrawing.org/xmlns\"\n"
 			+ "  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
 	        + "  xsi:schemaLocation=\"http://graphml.graphdrawing.org/xmlns\n"
@@ -27,6 +26,10 @@ public class CoAuthorshipGraphMLWriter {
 		
 		coAuthorshipGraphMLContent = createCoAuthorshipGraphMLContent(visVOContainer);
 		
+	}
+
+	public StringBuilder getCoAuthorshipGraphMLContent() {
+		return coAuthorshipGraphMLContent;
 	}
 
 	private StringBuilder createCoAuthorshipGraphMLContent(

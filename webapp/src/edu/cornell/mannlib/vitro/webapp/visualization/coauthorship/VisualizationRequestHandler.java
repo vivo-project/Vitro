@@ -3,14 +3,10 @@ package edu.cornell.mannlib.vitro.webapp.visualization.coauthorship;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -19,8 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
-import org.skife.csv.CSVWriter;
-import org.skife.csv.SimpleWriter;
 
 import com.hp.hpl.jena.query.DataSource;
 import com.itextpdf.text.Document;
@@ -32,16 +26,10 @@ import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.visualization.VisualizationFrameworkConstants;
 import edu.cornell.mannlib.vitro.webapp.visualization.PDFDocument;
-import edu.cornell.mannlib.vitro.webapp.visualization.constants.VOConstants;
 import edu.cornell.mannlib.vitro.webapp.visualization.constants.VisConstants;
 import edu.cornell.mannlib.vitro.webapp.visualization.exceptions.MalformedQueryParametersException;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.BiboDocument;
-import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.Edge;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.Individual;
-import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.Node;
-import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.VivoCollegeOrSchool;
-import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.VivoDepartmentOrDivision;
-import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.VivoEmployee;
 
 public class VisualizationRequestHandler {
 
@@ -100,14 +88,6 @@ public class VisualizationRequestHandler {
 	    	
 	    	
 	    	/*
-	    	if (PDF_RENDER_MODE_URL_VALUE.equalsIgnoreCase(renderMode)) { 
-				prepareVisualizationQueryPDFResponse(authorDocuments,
-													  yearToPublicationCount);
-				return;
-			}
-	    	*/
-	    	
-	    	/*
 	    	 * Computations required to generate HTML for the sparklines & related context.
 	    	 * */
 	    	
@@ -138,21 +118,12 @@ public class VisualizationRequestHandler {
 	    	 * a page with visualization on it.
 	    	 * */
 			
-			/*
 			RequestDispatcher requestDispatcher = null;
 
-			if (DYNAMIC_RENDER_MODE_URL_VALUE.equalsIgnoreCase(renderMode)) {
+	    	prepareVisualizationQueryStandaloneResponse(egoURIParam, request, response, vitroRequest);
 
-				prepareVisualizationQueryDynamicResponse(request, response, vitroRequest,
-		    			visContentCode, visContextCode);
+//		    	requestDispatcher = request.getRequestDispatcher(Controllers.BASIC_JSP);
 		    	requestDispatcher = request.getRequestDispatcher("/templates/page/blankPage.jsp");
-
-			} else {
-		    	prepareVisualizationQueryStandaloneResponse(request, response, vitroRequest,
-		    			visContentCode, visContextCode);
-
-		    	requestDispatcher = request.getRequestDispatcher(Controllers.BASIC_JSP);
-			}
 
 	    	try {
 	            requestDispatcher.forward(request, response);
@@ -162,7 +133,6 @@ public class VisualizationRequestHandler {
 	            log.error(e.getStackTrace());
 	        }
 
-*/
 		} catch (MalformedQueryParametersException e) {
 			try {
 				handleMalformedParameters(e.getMessage());
@@ -176,139 +146,9 @@ public class VisualizationRequestHandler {
 
 	}
 
-	private Map<String, Integer> getUpdatedDepartmentPublicationsOverTime(
-										Map<String, Integer> currentEmployeeYearToPublicationCount,
-										Map<String, Integer> currentDepartmentYearToPublicationCount) {
-		
-		Map<String, Integer> departmentYearToPublicationCount;
-		
-//		System.out.println("inside get updated dept pub obr time");
-		
-		/*
-		 * In case this is the first time we are consolidating publication counts over time for a department.
-		 * */
-		if (currentDepartmentYearToPublicationCount == null) {
-			departmentYearToPublicationCount = new TreeMap<String, Integer>();
-			
-//			System.out.println("new dept yr pub cnt");
-			
-		} else {
-			departmentYearToPublicationCount = currentDepartmentYearToPublicationCount;
-		}
-		
-		
-		Iterator employeePubCountIterator = currentEmployeeYearToPublicationCount.entrySet().iterator();
-		
-		while (employeePubCountIterator.hasNext()) {
-			Map.Entry<String, Integer> employeePubCountEntry = (Map.Entry) employeePubCountIterator.next();
-			
-			String employeePublicationYear = employeePubCountEntry.getKey();
-			Integer employeePublicationCount = employeePubCountEntry.getValue();
-			
-			try {
-			if (departmentYearToPublicationCount.containsKey(employeePublicationYear)) {
-				departmentYearToPublicationCount.put(employeePublicationYear,
-															departmentYearToPublicationCount
-																.get(employeePublicationYear) 
-															+ employeePublicationCount);
-
-    		} else {
-    			departmentYearToPublicationCount.put(employeePublicationYear, employeePublicationCount);
-    		}	
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		
-		return departmentYearToPublicationCount;
-	}
-
-	private void prepareVisualizationQueryPDFResponse(Individual college, 
-													  List<BiboDocument> authorDocuments,
-													  Map<String, Integer> yearToPublicationCount) {
-		
-		String authorName = null; 
-		
-		/*
-		 * To protect against cases where there are no author documents associated with the
-		 * individual. 
-		 * */
-		if (authorDocuments.size() > 0) {
-			authorName = college.getIndividualLabel();
-		}
-		
-		/*
-		 * To make sure that null/empty records for author names do not cause any mischief.
-		 * */
-		if (authorName == null) {
-			authorName = "";
-		}
-		
-		String outputFileName = slugify(authorName + "-report") 
-								+ ".pdf";
-		
-		response.setContentType("application/pdf");
-		response.setHeader("Content-Disposition","attachment;filename=" + outputFileName);
- 
-			ServletOutputStream responseOutputStream;
-			try {
-				responseOutputStream = response.getOutputStream();
-				
-				
-				Document document = new Document();
-				ByteArrayOutputStream baos = new ByteArrayOutputStream();
-				PdfWriter pdfWriter = PdfWriter.getInstance(document, baos);
-				document.open();
-				
-				PDFDocument pdfDocument = new PDFDocument(authorName, 
-														  yearToPublicationCount, 
-														  document, 
-														  pdfWriter);
-				document.close();
-
-				response.setHeader("Expires", "0");
-				response.setHeader("Cache-Control", "must-revalidate, post-check=0, pre-check=0");
-				response.setHeader("Pragma", "public");
-				response.setContentLength(baos.size());
-				
-				baos.writeTo(responseOutputStream);
-				responseOutputStream.flush();
-				responseOutputStream.close();
-				
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (DocumentException e) {
-				e.printStackTrace();
-			}
-	}
-
 	private void prepareVisualizationQueryDataResponse(VisVOContainer authorNodesAndEdges) {
 
-		String egoName = null;
-		
-		Node egoNode = authorNodesAndEdges.getEgoNode();
-
-		
-		/*
-		* To protect against cases where there are no author documents associated with the
-		* individual. 
-		* */
-//		System.out.println(collegeURLToVO);
-		if (egoNode != null) {
-			egoName = egoNode.getNodeName();
-		}
-		
-		/*
-		* To make sure that null/empty records for author names do not cause any mischief.
-		* */
-		if (egoName == null) {
-		egoName = "";
-		}
-		
-		String outputFileName = slugify(egoName) + "co-authorship" + ".txt";
-		
-		response.setContentType("application/octet-stream");
-		response.setHeader("Content-Disposition","attachment;filename=" + outputFileName);
+		response.setContentType("text/xml");
 		
 		try {
 		
@@ -318,97 +158,34 @@ public class VisualizationRequestHandler {
 		 * We are side-effecting responseWriter since we are directly manipulating the response 
 		 * object of the servlet.
 		 * */
-		generateCsvFileBuffer(authorNodesAndEdges, 
-							  responseWriter);
-
+		
+		CoAuthorshipGraphMLWriter coAuthorShipGraphMLWriter = new CoAuthorshipGraphMLWriter(authorNodesAndEdges);
+		
+		responseWriter.append(coAuthorShipGraphMLWriter.getCoAuthorshipGraphMLContent());
+		
 		responseWriter.close();
 		
 		} catch (IOException e) {
-		e.printStackTrace();
+			e.printStackTrace();
 		}
 	}
 	
-	/**
-	 * Currently the approach for slugifying filenames is naive. In future if there is need, 
-	 * we can write more sophisticated method.
-	 * @param textToBeSlugified
-	 * @return
-	 */
-	private String slugify(String textToBeSlugified) {
-		return textToBeSlugified.toLowerCase().replaceAll("[^a-zA-Z0-9-]", "-")
-								.substring(0, VisConstants.MAX_NAME_TEXT_LENGTH);
-	}
-
-	private void generateCsvFileBuffer(VisVOContainer authorNodesAndEdges, 
-									   PrintWriter printWriter) {
-		
-        Node egoNode = authorNodesAndEdges.getEgoNode();
-		Set<Node> authorNodes = authorNodesAndEdges.getNodes();
-		Set<Edge> edges = authorNodesAndEdges.getEdges();
-		
-		printWriter.append("\nEGO => ");
-		printWriter.append(egoNode.getNodeID() + " - " + egoNode.getNodeName() + " -> " + egoNode.getNodeURL() + "\n");
-		printWriter.append("\tEarliest Publication - " + egoNode.getEarliestPublicationYearCount() 
-							+ "\n\tLatest Publication - " + egoNode.getLatestPublicationYearCount()
-							+ "\n\tUnknown Publication - " + egoNode.getUnknownPublicationYearCount());
-		
-//		authorNodes.remove(egoNode);
-		
-		for (Node currNode : authorNodes) {
-			
-			printWriter.append("\nCO-AUTHOR => ");
-			printWriter.append(currNode.getNodeID() + " - " + currNode.getNodeName() + " -> " + currNode.getNodeURL() + "\n");
-			printWriter.append("\tEarliest Publication - " + currNode.getEarliestPublicationYearCount() 
-								+ "\n\tLatest Publication - " + currNode.getLatestPublicationYearCount()
-								+ "\n\tUnknown Publication - " + currNode.getUnknownPublicationYearCount()
-								+ "\n\tTotal Publications - " + currNode.getNumOfAuthoredWorks());
-			
-			
-		}
-		
-		for (Edge currentEdge : edges) {
-			
-			printWriter.append("\nEdge => ");
-			printWriter.append(currentEdge.getEdgeID() + " => " + currentEdge.getSourceNode().getNodeName() + " - " 
-									+ currentEdge.getTargetNode().getNodeName() + "\n");
-			printWriter.append("\tEarliest Collaboration - " + currentEdge.getEarliestCollaborationYearCount() 
-								+ "\n\tLatest Collaboration - " + currentEdge.getLatestCollaborationYearCount()
-								+ "\n\tUnknown Collaboration - " + currentEdge.getUnknownCollaborationYearCount()
-								+ "\n\tTotal Collaboration - " + currentEdge.getNumOfCoAuthoredWorks());
-			
-		}
-		
-		printWriter.flush();
-		
-	}
-
-	private void prepareVisualizationQueryStandaloneResponse(HttpServletRequest request,
-			HttpServletResponse response, VitroRequest vreq,
-			String visContentCode, String visContextCode) {
+	private void prepareVisualizationQueryStandaloneResponse(String egoURIParam, 
+															 HttpServletRequest request,
+															 HttpServletResponse response, 
+															 VitroRequest vreq) {
 
         Portal portal = vreq.getPortal();
 
-        request.setAttribute("visContentCode", visContentCode);
-        request.setAttribute("visContextCode", visContextCode);
+//        request.setAttribute("visContentCode", visContentCode);
+//        request.setAttribute("visContextCode", visContextCode);
 
-        request.setAttribute("bodyJsp", "/templates/visualization/publication_count.jsp");
+        request.setAttribute("egoURIParam", egoURIParam);
+        
+        request.setAttribute("bodyJsp", "/templates/visualization/co_authorship.jsp");
         request.setAttribute("portalBean", portal);
-        request.setAttribute("title", "Individual Publication Count Visualization");
-        request.setAttribute("scripts", "/templates/visualization/visualization_scripts.jsp");
-
-	}
-
-	private void prepareVisualizationQueryDynamicResponse(HttpServletRequest request,
-			HttpServletResponse response, VitroRequest vreq,
-			String visContentCode, String visContextCode) {
-
-        Portal portal = vreq.getPortal();
-
-        request.setAttribute("visContentCode", visContentCode);
-        request.setAttribute("visContextCode", visContextCode);
-
-        request.setAttribute("portalBean", portal);
-        request.setAttribute("bodyJsp", "/templates/visualization/ajax_vis_content.jsp");
+//        request.setAttribute("title", "Individual Publication Count Visualization");
+//        request.setAttribute("scripts", "/templates/visualization/visualization_scripts.jsp");
 
 	}
 
