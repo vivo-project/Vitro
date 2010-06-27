@@ -240,7 +240,7 @@ public class QueryHandler {
 	private String generateCollegeEmployeeSparqlQuery(String queryURI) {
 //		Resource uri1 = ResourceFactory.createResource(queryURI);
 
-		String sparqlQuery = QueryConstants.SPARQL_QUERY_PREFIXES
+		String sparqlQuery = QueryConstants.getSparqlPrefixQuery()
 							+ "SELECT (str(?collegeLabel) as ?" + QueryFieldLabels.COLLEGE_LABEL + ") " 
 							+ "		(str(?department) as ?" + QueryFieldLabels.DEPARTMENT_URL + ") " 
 							+ "		(str(?departmentLabel) as ?" + QueryFieldLabels.DEPARTMENT_LABEL + ") " 

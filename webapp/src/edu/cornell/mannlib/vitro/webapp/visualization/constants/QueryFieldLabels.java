@@ -3,6 +3,13 @@ package edu.cornell.mannlib.vitro.webapp.visualization.constants;
 public class QueryFieldLabels {
 	
 	/*
+	 * Generic Query related field labels 
+	 * */
+	public static final String PREDICATE = "predicateLit";
+	public static final String OBJECT = "objectLit";
+	
+	
+	/*
 	 * Document related field labels 
 	 * */
 	public static final String DOCUMENT_URL = "documentLit";

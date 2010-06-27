@@ -93,10 +93,122 @@
 	<c:param name="uri" value="http://vivo.library.cornell.edu/ns/0.1#individual5748"/>
 </c:url>
 
+<c:url var="coAuthorship2Data" value="/admin/visQuery">
+	<c:param name="vis" value="coauthorship"/>
+	<c:param name="render_mode" value="data"/>
+	<c:param name="uri" value="http://vivo.library.cornell.edu/ns/0.1#individual5156"/>
+</c:url>
+
+<c:url var="coAuthorship3Data" value="/admin/visQuery">
+	<c:param name="vis" value="coauthorship"/>
+	<c:param name="render_mode" value="data"/>
+	<c:param name="uri" value="http://vivo.library.cornell.edu/ns/0.1#individual5611"/>
+</c:url>
+
+
+<c:url var="coAuthorship4Data" value="/admin/visQuery">
+	<c:param name="vis" value="coauthorship"/>
+	<c:param name="render_mode" value="data"/>
+	<c:param name="uri" value="http://vivo.library.cornell.edu/ns/0.1#individual5412"/>
+</c:url>
+
 <c:url var="coAuthorship1" value="/admin/visQuery">
 	<c:param name="vis" value="coauthorship"/>
 	<c:param name="render_mode" value="standalone"/>
 	<c:param name="uri" value="http://vivo.library.cornell.edu/ns/0.1#individual5748"/>
+</c:url>
+
+<c:url var="coAuthorship2" value="/admin/visQuery">
+	<c:param name="vis" value="coauthorship"/>
+	<c:param name="render_mode" value="standalone"/>
+	<c:param name="uri" value="http://vivo.library.cornell.edu/ns/0.1#individual5156"/>
+</c:url>
+
+<c:url var="coAuthorship3" value="/admin/visQuery">
+	<c:param name="vis" value="coauthorship"/>
+	<c:param name="render_mode" value="standalone"/>
+	<c:param name="uri" value="http://vivo.library.cornell.edu/ns/0.1#individual5611"/>
+</c:url>
+
+<c:url var="coAuthorship4" value="/admin/visQuery">
+	<c:param name="vis" value="coauthorship"/>
+	<c:param name="render_mode" value="standalone"/>
+	<c:param name="uri" value="http://vivo.library.cornell.edu/ns/0.1#individual5412"/>
+</c:url>
+
+
+<c:url var="coAuthorship5" value="/admin/visQuery">
+	<c:param name="vis" value="coauthorship"/>
+	<c:param name="render_mode" value="standalone"/>
+	<c:param name="uri" value="http://vivo.library.cornell.edu/ns/0.1#individual5714"/>
+</c:url>
+
+<c:url var="coAuthorship5Data" value="/admin/visQuery">
+	<c:param name="vis" value="coauthorship"/>
+	<c:param name="render_mode" value="data"/>
+	<c:param name="uri" value="http://vivo.library.cornell.edu/ns/0.1#individual5714"/>
+</c:url>
+
+
+<c:url var="coAuthorship6" value="/admin/visQuery">
+	<c:param name="vis" value="coauthorship"/>
+	<c:param name="render_mode" value="standalone"/>
+	<c:param name="uri" value="http://vivo.library.cornell.edu/ns/0.1#individual240"/>
+</c:url>
+
+<c:url var="coAuthorship6Data" value="/admin/visQuery">
+	<c:param name="vis" value="coauthorship"/>
+	<c:param name="render_mode" value="data"/>
+	<c:param name="uri" value="http://vivo.library.cornell.edu/ns/0.1#individual240"/>
+</c:url>
+
+<c:url var="coAuthorship7" value="/admin/visQuery">
+	<c:param name="vis" value="coauthorship"/>
+	<c:param name="render_mode" value="standalone"/>
+	<c:param name="uri" value="http://vivo.library.cornell.edu/ns/0.1#individual37"/>
+</c:url>
+
+<c:url var="coAuthorship7Data" value="/admin/visQuery">
+	<c:param name="vis" value="coauthorship"/>
+	<c:param name="render_mode" value="data"/>
+	<c:param name="uri" value="http://vivo.library.cornell.edu/ns/0.1#individual37"/>
+</c:url>
+
+<c:url var="coAuthorship8" value="/admin/visQuery">
+	<c:param name="vis" value="coauthorship"/>
+	<c:param name="render_mode" value="standalone"/>
+	<c:param name="uri" value="http://vivo.library.cornell.edu/ns/0.1#individual5355"/>
+</c:url>
+
+<c:url var="coAuthorship8Data" value="/admin/visQuery">
+	<c:param name="vis" value="coauthorship"/>
+	<c:param name="render_mode" value="data"/>
+	<c:param name="uri" value="http://vivo.library.cornell.edu/ns/0.1#individual5355"/>
+</c:url>
+
+<c:url var="coAuthorship9" value="/admin/visQuery">
+	<c:param name="vis" value="coauthorship"/>
+	<c:param name="render_mode" value="standalone"/>
+	<c:param name="uri" value="http://vivo.library.cornell.edu/ns/0.1#individual5734"/>
+</c:url>
+
+
+<c:url var="coAuthorship9Data" value="/admin/visQuery">
+	<c:param name="vis" value="coauthorship"/>
+	<c:param name="render_mode" value="data"/>
+	<c:param name="uri" value="http://vivo.library.cornell.edu/ns/0.1#individual5734"/>
+</c:url>
+
+<c:url var="coAuthorship10" value="/admin/visQuery">
+	<c:param name="vis" value="coauthorship"/>
+	<c:param name="render_mode" value="standalone"/>
+	<c:param name="uri" value="http://vivo.library.cornell.edu/ns/0.1#individual12053"/>
+</c:url>
+
+<c:url var="coAuthorship10Data" value="/admin/visQuery">
+	<c:param name="vis" value="coauthorship"/>
+	<c:param name="render_mode" value="data"/>
+	<c:param name="uri" value="http://vivo.library.cornell.edu/ns/0.1#individual12053"/>
 </c:url>
 
 <c:url var="loadingImageLink" value="/${themeDir}site_icons/visualization/ajax-loader.gif"></c:url>
@@ -188,8 +300,30 @@ $(document).ready(function() {
 
 <h1 id="test-bed">Visualization Testbed (Not to be seen by eventual end users)</h1>
 
-<a href='<c:out value="${coAuthorship1}"/>'>vis link for coauthorship -> "Erb, Hollis Nancy"</a><br />
-<a href='<c:out value="${coAuthorship1Data}"/>'>vis data query for coauthorship -> "Erb, Hollis Nancy"</a><br />
+<a href='<c:out value="${coAuthorship1}"/>'>vis link for coauthorship -> "Erb, Hollis Nancy"</a>
+&nbsp;<a href='<c:out value="${coAuthorship1Data}"/>'>Data</a>
+<br />
+<a href='<c:out value="${coAuthorship2}"/>'>vis link for coauthorship -> "Not Working" {"Crane, Brian"}</a>&nbsp;
+<a href='<c:out value="${coAuthorship2Data}"/>'>Data</a><br />
+<a href='<c:out value="${coAuthorship3}"/>'>vis link for coauthorship -> "Merwin, Ian A"</a>&nbsp;
+<a href='<c:out value="${coAuthorship3Data}"/>'>Data</a><br />
+<a href='<c:out value="${coAuthorship4}"/>'>vis link for coauthorship -> "Thies, Janice"</a>&nbsp;
+<a href='<c:out value="${coAuthorship4Data}"/>'>Data</a><br />
+<a href='<c:out value="${coAuthorship5}"/>'>vis link for coauthorship -> "Not Working"</a>&nbsp;
+<a href='<c:out value="${coAuthorship5Data}"/>'>Data</a><br />
+<a href='<c:out value="${coAuthorship6}"/>'>vis link for coauthorship -> "Boor, Kathryn Jean"</a>&nbsp;
+<a href='<c:out value="${coAuthorship6Data}"/>'>Data</a><br />
+<a href='<c:out value="${coAuthorship7}"/>'>vis link for coauthorship -> "Wiedmann, Martin"</a>&nbsp;
+<a href='<c:out value="${coAuthorship7Data}"/>'>Data</a><br />
+<a href='<c:out value="${coAuthorship8}"/>'>vis link for coauthorship -> "Not Working"</a>&nbsp;
+<a href='<c:out value="${coAuthorship8Data}"/>'>Data</a><br />
+<a href='<c:out value="${coAuthorship9}"/>'>vis link for coauthorship -> "Not Working"</a>&nbsp;
+<a href='<c:out value="${coAuthorship9Data}"/>'>Data</a><br />
+<a href='<c:out value="${coAuthorship10}"/>'>vis link for coauthorship -> "Not Working"</a>&nbsp;
+<a href='<c:out value="${coAuthorship10Data}"/>'>Data</a><br />
+
+<br /><br /><br />
+
 <a href='<c:out value="${collegeCSV}"/>'>vis data query for college -> "School of Industrial and Labor Relations (ILR)"</a><br />
 <a href='<c:out value="${collegeCSV2}"/>'>vis data query for college -> "College of Agriculture and Life Sciences (CALS)"</a><br />
 <a href='<c:out value="${collegeCSV3}"/>'>vis data query for college -> "College of Arts and Sciences"</a><br />

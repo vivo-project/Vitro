@@ -1,35 +1,28 @@
 package edu.cornell.mannlib.vitro.webapp.visualization.coauthorship;
 
-import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.Set;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 
 import com.hp.hpl.jena.query.DataSource;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.pdf.PdfWriter;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.visualization.VisualizationController;
 import edu.cornell.mannlib.vitro.webapp.controller.visualization.VisualizationFrameworkConstants;
-import edu.cornell.mannlib.vitro.webapp.visualization.PDFDocument;
-import edu.cornell.mannlib.vitro.webapp.visualization.constants.VisConstants;
+import edu.cornell.mannlib.vitro.webapp.visualization.constants.QueryConstants;
 import edu.cornell.mannlib.vitro.webapp.visualization.exceptions.MalformedQueryParametersException;
-import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.BiboDocument;
-import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.Individual;
+import edu.cornell.mannlib.vitro.webapp.visualization.utils.GenericQueryHandler;
+import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.GenericQueryMap;
 
 public class VisualizationRequestHandler {
 
@@ -48,7 +41,7 @@ public class VisualizationRequestHandler {
 
 	}
 
-	public void generateVisualization(DataSource dataSource) {
+	public void generateVisualization(VisualizationController visualizationController, DataSource dataSource) {
 
 		String resultFormatParam = "RS_TEXT";
         String rdfResultFormatParam = "RDF/XML-ABBREV";
@@ -60,6 +53,103 @@ public class VisualizationRequestHandler {
         String visMode = vitroRequest.getParameter(VisualizationFrameworkConstants.VIS_MODE_URL_HANDLE);
 
         String visContainer = vitroRequest.getParameter(VisualizationFrameworkConstants.VIS_CONTAINER_URL_HANDLE);
+        
+        
+        
+        /*
+		 * If the data being requested is about a standalone image, which is used when we want
+		 * to render an image & other info for a co-author OR ego for that matter.
+		 * */
+		if (VisualizationFrameworkConstants.DATA_RENDER_MODE_URL_VALUE.equalsIgnoreCase(renderMode) 
+				&& VisualizationFrameworkConstants.IMAGE_VIS_MODE_URL_VALUE.equalsIgnoreCase(visMode) ) {
+			
+			
+			String filterRule = "?predicate = vitro:imageThumb";
+			GenericQueryHandler imageQueryHandler = new GenericQueryHandler(egoURIParam, 
+																			filterRule, 
+																			resultFormatParam, 
+																			rdfResultFormatParam, 
+																			dataSource, 
+																			log);
+			
+			try {
+				
+				GenericQueryMap imagePropertyToValues = imageQueryHandler.getJavaValueObjects();
+				
+				String imagePath = "";
+				/*
+				 * If there is no imageThumb property we want to give the link to "No Image" snap. 
+				 * */
+				if (imagePropertyToValues.size() > 0) {
+					
+					String vitroSparqlNamespace = QueryConstants.PREFIX_TO_NAMESPACE.get("vitro"); 
+					String imageThumbProperty = vitroSparqlNamespace + "imageThumb";
+					
+					Set<String> personImageThumbPaths = imagePropertyToValues.get(imageThumbProperty);
+					
+					/*
+					 * Although we know that there can be only one imagePath we are restricted by Java's
+					 * expression power.
+					 * */
+					for (String providedImagePath : personImageThumbPaths) {
+						imagePath = "/images/" + providedImagePath;
+					}
+					
+					String imageServerPath = visualizationController.getServletContext().getRealPath(imagePath);
+					
+					File imageFile = new File(imageServerPath) ;
+					
+					if (imageFile == null) {
+						
+						Portal portal = vitroRequest.getPortal();
+						String themeDir = portal != null ? portal.getThemeDir() : Portal.DEFAULT_THEME_DIR_FROM_CONTEXT;
+						
+						System.out.println("bfore cxtpth " + themeDir);
+						
+						themeDir = vitroRequest.getContextPath() + '/' + themeDir;
+						
+						System.out.println("bfore cxtpth " + themeDir);
+						
+						imagePath = themeDir + "site_icons/visualization/coauthorship/no_image.png";
+						
+						System.out.println(imagePath);
+						
+					}
+					
+					
+				} else {
+					
+					Portal portal = vitroRequest.getPortal();
+					String themeDir = portal != null ? portal.getThemeDir() : Portal.DEFAULT_THEME_DIR_FROM_CONTEXT;
+					
+					System.out.println("bfore cxtpth " + themeDir);
+					
+					themeDir = vitroRequest.getContextPath() + '/' + themeDir;
+					
+					System.out.println("bfore cxtpth " + themeDir);
+					
+					imagePath = themeDir + "site_icons/visualization/coauthorship/no_image.png";
+					
+					System.out.println(imagePath);
+					
+					
+					
+				}
+				
+				
+			} catch (MalformedQueryParametersException e) {
+				try {
+					handleMalformedParameters(e.getMessage());
+				} catch (ServletException e1) {
+					log.error(e1.getStackTrace());
+				} catch (IOException e1) {
+					log.error(e1.getStackTrace());
+				}
+				return;
+			}
+			
+		} 
+        
 
         QueryHandler queryManager =
         	new QueryHandler(egoURIParam,
@@ -80,12 +170,16 @@ public class VisualizationRequestHandler {
 	    	 * It is ugly! 
 	    	 * */
 	    	if (VisualizationFrameworkConstants.DATA_RENDER_MODE_URL_VALUE.equalsIgnoreCase(renderMode)) { 
-				prepareVisualizationQueryDataResponse(authorNodesAndEdges);
-				
-				return;
+			
+	    			/*
+	    			 * When just the graphML file is required - based on which actual visualization will 
+	    			 * be rendered.
+	    			 * */
+	    			prepareVisualizationQueryDataResponse(authorNodesAndEdges);
+					return;
+	    		
+	    		
 			}
-	    	
-	    	
 	    	
 	    	/*
 	    	 * Computations required to generate HTML for the sparklines & related context.
@@ -162,6 +256,23 @@ public class VisualizationRequestHandler {
 		CoAuthorshipGraphMLWriter coAuthorShipGraphMLWriter = new CoAuthorshipGraphMLWriter(authorNodesAndEdges);
 		
 		responseWriter.append(coAuthorShipGraphMLWriter.getCoAuthorshipGraphMLContent());
+		
+		responseWriter.close();
+		
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void prepareVisualizationQueryImageResponse(String imageURL) {
+
+		response.setContentType("text/plain");
+		
+		try {
+		
+		PrintWriter responseWriter = response.getWriter();
+		
+		responseWriter.append(imageURL);
 		
 		responseWriter.close();
 		

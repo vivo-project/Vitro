@@ -36,7 +36,6 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -169,7 +168,7 @@ public class VisualizationController extends BaseEditController {
             											response,
             											vreq,
             											rdfResultFormatParam);
-
+            
             if (dataSource != null) {
 
             	/*
@@ -201,7 +200,7 @@ public class VisualizationController extends BaseEditController {
             	 * This is side-effecting because the visualization content is added
             	 * to the request object.
             	 * */
-            	visRequestHandler.generateVisualization(dataSource);
+            	visRequestHandler.generateVisualization(this, dataSource);
 
             } else {
             	log.error("ERROR! data model empoty");

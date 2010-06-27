@@ -162,7 +162,7 @@ public class QueryHandler {
 	private String generateSparqlQuery(String queryURI) {
 //		Resource uri1 = ResourceFactory.createResource(queryURI);
 
-		String sparqlQuery = QueryConstants.SPARQL_QUERY_PREFIXES
+		String sparqlQuery = QueryConstants.getSparqlPrefixQuery()
 							+ SPARQL_QUERY_COMMON_SELECT_CLAUSE
 							+ "(str(<" + queryURI + ">) as ?authPersonLit) "
 							+ "WHERE { "

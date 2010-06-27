@@ -161,6 +161,8 @@ public class QueryHandler {
 				egoCoAuthorEdge = new Edge(egoNode, coAuthorNode, biboDocument, edgeIDGenerator);
 				edges.add(egoCoAuthorEdge);
 			}
+			
+			
 		}
 		
 		/*
@@ -326,7 +328,7 @@ public class QueryHandler {
 	private String generateEgoCoAuthorshipSparqlQuery(String queryURI) {
 //		Resource uri1 = ResourceFactory.createResource(queryURI);
 
-		String sparqlQuery = QueryConstants.SPARQL_QUERY_PREFIXES
+		String sparqlQuery = QueryConstants.getSparqlPrefixQuery()
 							+ "SELECT "
 							+ "		(str(<" + queryURI + ">) as ?" + QueryFieldLabels.AUTHOR_URL + ") " 
 							+ "		(str(?authorLabel) as ?" + QueryFieldLabels.AUTHOR_LABEL + ") " 
@@ -347,7 +349,7 @@ public class QueryHandler {
 							+ "OPTIONAL {  ?document vitro:moniker ?documentMoniker } . " 
 							+ "OPTIONAL {  ?document vitro:blurb ?documentBlurb } . " 
 							+ "OPTIONAL {  ?document vitro:description ?documentDescription } " 
-							+ "FILTER (<" + queryURI + "> != ?coAuthorPerson ) . "
+//							+ "FILTER (<" + queryURI + "> != ?coAuthorPerson ) . "
 							+ "}";
 
 		System.out.println(sparqlQuery);
