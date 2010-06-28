@@ -21,8 +21,8 @@ import edu.cornell.mannlib.vitro.webapp.controller.visualization.VisualizationCo
 import edu.cornell.mannlib.vitro.webapp.controller.visualization.VisualizationFrameworkConstants;
 import edu.cornell.mannlib.vitro.webapp.visualization.constants.QueryConstants;
 import edu.cornell.mannlib.vitro.webapp.visualization.exceptions.MalformedQueryParametersException;
-import edu.cornell.mannlib.vitro.webapp.visualization.utils.GenericQueryHandler;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.GenericQueryMap;
+import edu.cornell.mannlib.vitro.webapp.visualization.visutils.GenericQueryHandler;
 
 public class VisualizationRequestHandler {
 
@@ -54,8 +54,10 @@ public class VisualizationRequestHandler {
 
         String visContainer = vitroRequest.getParameter(VisualizationFrameworkConstants.VIS_CONTAINER_URL_HANDLE);
         
-        
-        
+        System.out.println("******************************************************");
+        System.out.println(VisualizationFrameworkConstants.VIS_MODE_URL_HANDLE);
+        System.out.println(vitroRequest.getParameter(VisualizationFrameworkConstants.VIS_MODE_URL_HANDLE));
+        System.out.println(VisualizationFrameworkConstants.IMAGE_VIS_MODE_URL_VALUE);
         /*
 		 * If the data being requested is about a standalone image, which is used when we want
 		 * to render an image & other info for a co-author OR ego for that matter.
@@ -99,7 +101,7 @@ public class VisualizationRequestHandler {
 					
 					File imageFile = new File(imageServerPath) ;
 					
-					if (imageFile == null) {
+					if (!imageFile.exists()) {
 						
 						Portal portal = vitroRequest.getPortal();
 						String themeDir = portal != null ? portal.getThemeDir() : Portal.DEFAULT_THEME_DIR_FROM_CONTEXT;
@@ -113,6 +115,17 @@ public class VisualizationRequestHandler {
 						imagePath = themeDir + "site_icons/visualization/coauthorship/no_image.png";
 						
 						System.out.println(imagePath);
+						
+					} else {
+						
+						System.out.println("ABSOLUTE PATH : " + imageFile.getAbsolutePath());
+						try {
+							System.out.println("ABSOLUTE PATH : " + imageFile.getCanonicalPath());
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						System.out.println("ABSOLUTE PATH : " + imageFile.getName());
 						
 					}
 					
@@ -136,6 +149,9 @@ public class VisualizationRequestHandler {
 					
 				}
 				
+				prepareVisualizationQueryImageResponse(imagePath);
+				return;
+				
 				
 			} catch (MalformedQueryParametersException e) {
 				try {
@@ -147,6 +163,7 @@ public class VisualizationRequestHandler {
 				}
 				return;
 			}
+			
 			
 		} 
         

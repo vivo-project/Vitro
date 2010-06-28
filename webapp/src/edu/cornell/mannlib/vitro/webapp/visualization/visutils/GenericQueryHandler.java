@@ -1,4 +1,4 @@
-package edu.cornell.mannlib.vitro.webapp.visualization.utils;
+package edu.cornell.mannlib.vitro.webapp.visualization.visutils;
 
 import org.apache.commons.logging.Log;
 

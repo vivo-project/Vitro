@@ -26,11 +26,11 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 import edu.cornell.mannlib.vitro.webapp.visualization.constants.QueryConstants;
 import edu.cornell.mannlib.vitro.webapp.visualization.constants.QueryFieldLabels;
 import edu.cornell.mannlib.vitro.webapp.visualization.exceptions.MalformedQueryParametersException;
-import edu.cornell.mannlib.vitro.webapp.visualization.utils.UniqueIDGenerator;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.BiboDocument;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.Edge;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.Node;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.VivoCollegeOrSchool;
+import edu.cornell.mannlib.vitro.webapp.visualization.visutils.UniqueIDGenerator;
 
 
 
@@ -115,6 +115,16 @@ public class QueryHandler {
 			}
 			
 			egoNode.addAuthorDocument(biboDocument);
+			
+			/*
+			 * After some discussion we concluded that for the purpose of this visualization
+			 * we do not want a co-author node or edge if the publication has only one
+			 * author and that happens to be the ego.
+			 * */
+			if (solution.get(QueryFieldLabels.AUTHOR_URL).toString().equalsIgnoreCase(
+					solution.get(QueryFieldLabels.CO_AUTHOR_URL).toString())) {
+				continue;
+			}
 			
 			Node coAuthorNode;
 			

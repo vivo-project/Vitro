@@ -2,6 +2,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.visualization;
 
 public class VisualizationFrameworkConstants {
 	
+	public static final String VIS_TYPE_URL_HANDLE = "vis";
 	public static final String VIS_CONTAINER_URL_HANDLE = "container";
 	public static final String INDIVIDUAL_URI_URL_HANDLE = "uri";
 	public static final String VIS_MODE_URL_HANDLE = "vis_mode";

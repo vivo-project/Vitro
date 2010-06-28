@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.Set;
 
 import edu.cornell.mannlib.vitro.webapp.visualization.constants.VOConstants;
-import edu.cornell.mannlib.vitro.webapp.visualization.utils.UniqueIDGenerator;
-import edu.cornell.mannlib.vitro.webapp.visualization.utils.VOUtils;
+import edu.cornell.mannlib.vitro.webapp.visualization.visutils.UniqueIDGenerator;
+import edu.cornell.mannlib.vitro.webapp.visualization.visutils.VOUtils;
 
 /**
  * 

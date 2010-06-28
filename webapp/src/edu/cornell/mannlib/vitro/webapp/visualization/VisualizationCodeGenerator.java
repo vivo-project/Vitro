@@ -339,7 +339,7 @@ public class VisualizationCodeGenerator {
 												 "=" + URLEncoder.encode(individualURI, 
 														 				 VisualizationController.URL_ENCODING_SCHEME).toString() +
 												 "&" +
-												 "vis" +
+												 VisualizationFrameworkConstants.VIS_TYPE_URL_HANDLE +
 												 "=" + URLEncoder.encode(VisualizationController
 														 						.PERSON_PUBLICATION_COUNT_VIS_URL_VALUE, 
 														 				 VisualizationController.URL_ENCODING_SCHEME).toString() +
