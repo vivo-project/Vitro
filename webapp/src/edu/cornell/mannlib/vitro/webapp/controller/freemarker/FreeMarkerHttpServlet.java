@@ -395,16 +395,17 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
     }
 
     protected String mergeBodyToTemplate(String templateName, Map<String, Object> map, Configuration config) {
-        templateName = "body/" + templateName;
+        templateName = "body/" + templateName;     // Remove once we flatten template directory
     	String body = mergeToTemplate(templateName, map, config).toString();
     	return body;
     }
     
     protected void writePage(Map<String, Object> root, Configuration config, HttpServletResponse response) {
-        String templateName = "page/" + getPageTemplateName();
+        String templateName = "page/" + getPageTemplateName();     // Remove the directory once we flatten template directory
         writeTemplate(templateName, root, config, response);                   
     }
     
+    // Remove this method once we flatten template directory   
     protected void ajaxWrite(String templateName, Map<String, Object> map, Configuration config, HttpServletResponse response) {
         templateName = "ajax/" + templateName;
         writeTemplate(templateName, map, config, response);                   

@@ -359,6 +359,8 @@ public class AutocompleteController extends FreeMarkerHttpServlet implements Sea
     }
  
     private void doSearchError(String templateName, Map<String, Object> map, Configuration config, HttpServletResponse response) {
+        // For now, we are not sending an error message back to the client because with the default autocomplete configuration it
+        // chokes.
         ajaxWrite(templateName, map, config, response);
     }
 
