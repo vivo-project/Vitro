@@ -7,9 +7,6 @@
 <@json.array results />
 -->
 
-<#if errorMsg??>${errorMsg}
-
-<#else>
 [ 
 <#if results??>
     <#list results as result>
@@ -17,4 +14,3 @@
     </#list>
 </#if>
 ]
-</#if>
