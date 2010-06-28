@@ -32,9 +32,8 @@ public class FileServingHelper {
 		}
 
 		if (!defaultNamespace.endsWith(DEFAULT_PATH)) {
-			throw new IllegalArgumentException(
-					"Default namespace does not match the expected form: '"
-							+ defaultNamespace + "'");
+			log.warn("Default namespace does not match the expected form: '"
+					+ defaultNamespace + "'");
 		}
 
 		return defaultNamespace;
