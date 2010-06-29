@@ -3,6 +3,7 @@
 
 <c:set var="portalBean" value="${requestScope.portalBean}"/>
 <c:set var="themeDir"><c:out value="${portalBean.themeDir}" /></c:set>
+<c:set var="contextPath"><c:out value="${pageContext.request.contextPath}" /></c:set>
 
 <c:url var="egoCoAuthorshipDataURL" value="/admin/visQuery">
 	<c:param name="vis" value="coauthorship"/>
@@ -60,16 +61,70 @@ var requiredRevision = 0;
    <div id="visPanel" style="float:left; width:610px;">
    <script language="JavaScript" type="text/javascript">
 
+	function getWellFormedURLs(given_uri, type) {
+
+		//general best practice is to put javascript code inside document.ready
+		//but in this case when i do that the function does not get called properly.
+		//so removing it for now.
+
+		//$(document).ready(function() {
+			
+		if (type == "coauthorship") {
+
+			var finalURL = $.ajax({
+				   url: "${contextPath}/admin/visQuery",
+				   data: ({vis: "utilities", vis_mode: "COAUTHORSHIP_URL", uri: given_uri}),
+				   dataType: "text",
+				   async: false,
+				   success:function(data){
+				     //console.log("COA - " + data);
+				   }
+				 }).responseText;
+
+			return finalURL;
+			
+			
+		} else if (type == "profile") {
+
+			var finalURL = $.ajax({
+				   url: "${contextPath}/admin/visQuery",
+				   data: ({vis: "utilities", vis_mode: "PROFILE_URL", uri: given_uri}),
+				   dataType: "text",
+				   async: false,
+				   success:function(data){
+				     //console.log("PROF - " + data);
+				   }
+				 }).responseText;
+
+			return finalURL;
+
+		}
+
+	 //});
+		
+	}
+
+	
 function nodeClickedJS(obj){
+	
 	$("#newsLetter").attr("style","visibility:visible");
 	$("#authorName").empty().append(obj[0]);
 	//$("#works").append("<img src='assets/Garfield.jpg'/><br /><br />");
 	$("#works").empty().append(obj[1]);
-	if(obj[2]){$("#profileUrl").attr("href",obj[2]);}
-	else{$("#profileUrl").attr("href","#");}
+
+	/*
+	Here obj[7] points to the uri of that individual
+	*/
+	if(obj[7]){
+		$("#profileUrl").attr("href", getWellFormedURLs(obj[7], "profile"));
+		$("#coAuthorshipVisUrl").attr("href", getWellFormedURLs(obj[7], "coauthorship"));
+	} else{
+		$("#profileUrl").attr("href","#");
+		$("#coAuthorshipVisUrl").attr("href","#");
+	}
+
 	$("#coAuthorName").empty().append(obj[name]);	
-	if(obj[6]){$("#coAuthorUrl").attr("href",obj[6]);}
-	else{$("#coAuthorUrl").attr("href","#");}
+
 	$("#coAuthors").empty().append(obj[5]);	
 	$("#firstPublication").empty().append((obj[3])?obj[3]+" First Publication":"");
 	$("#lastPublication").empty().append((obj[4])?obj[4]+" Last Publication":"");
@@ -151,7 +206,7 @@ if ( hasProductInstall && !hasRequestedVersion ) {
           <br/>
           <div><a href="#" id="profileUrl">Go to VIVO profile</a></div>
           <br/>
-          <div><a href="#" id="coAuthorUrl">Go to ego-centric co-author network of <span id="coAuthorName"></span></a></div>
+          <div><a href="#" id="coAuthorshipVisUrl">Go to ego-centric co-author network of <span id="coAuthorName"></span></a></div>
         </div>
           <br class="spacer">
           <span class="nlbottom"></span></div>
