@@ -471,18 +471,19 @@ public class PropertyEditLinks extends TagSupport{
 	protected LinkStruct[] doImageLinks(Individual entity,
 			IdentifierBundle ids, PolicyIface policy, String contextPath) {
 		Individual mainImage = FileModelHelper.getMainImage(entity);
+		Individual thumbnail = FileModelHelper.getThumbnailForImage(mainImage);
 
 		String subjectUri = entity.getURI();
 		String predicateUri = VitroVocabulary.IND_MAIN_IMAGE;
 
-		if (mainImage == null) {
+		if (thumbnail == null) {
 			EditLinkAccess[] accesses = policyToAccess(ids, policy, subjectUri,
 					predicateUri);
 
 			if (contains(accesses, EditLinkAccess.ADDNEW)) {
 				log.debug("permission to ADD main image to " + subjectUri);
 				return new LinkStruct[] { getImageLink(subjectUri, contextPath,
-						"edit", "upload an image") };
+						"edit", "upload an image", "add") };
 			} else {
 				log.debug("NO permission to ADD main image to " + subjectUri);
 				return empty_array;
@@ -497,7 +498,7 @@ public class PropertyEditLinks extends TagSupport{
 			if (contains(allowedAccessTypeArray, EditLinkAccess.MODIFY)) {
 				log.debug("permission to MODIFY main image to " + subjectUri);
 				links.add(getImageLink(subjectUri, contextPath, "edit",
-						"replace this image"));
+						"replace this image", "edit"));
 			} else {
 				log.debug("NO permission to MODIFY main image to  "
 						+ subjectUri);
@@ -506,7 +507,7 @@ public class PropertyEditLinks extends TagSupport{
 			if (contains(allowedAccessTypeArray, EditLinkAccess.DELETE)) {
 				log.debug("permission to DELETE main image to " + subjectUri);
 				links.add(getImageLink(subjectUri, contextPath, "delete",
-						"delete this image"));
+						"delete this image", "delete"));
 			} else {
 				log.debug("NO permission to DELETE main image to  "
 						+ subjectUri);
@@ -561,7 +562,7 @@ public class PropertyEditLinks extends TagSupport{
             }
             element +=  "<img src=\"" + imagePath+ "\" alt=\"" + ln.getType() + "\"/>";            
         } else {                          
-            element +=  ln.getType() ;
+            element +=  ln.getText() ;
         }        
         return element + "</a>\n";
     }
@@ -646,6 +647,7 @@ public class PropertyEditLinks extends TagSupport{
         String href;
         String type;
         String mouseoverText;
+        String text; // Defaults to be the same as type
         
         public String getHref() {
             return href;
@@ -668,18 +670,27 @@ public class PropertyEditLinks extends TagSupport{
             mouseoverText = s;
         }
         
+        public void setText(String text) {
+        	this.text = text;
+        }
+        
+        public String getText() {
+        	return (text == null) ? type: text;
+        }
+        
     }
 
     private LinkStruct[] empty_array = {};
     
 	private LinkStruct getImageLink(String subjectUri, String contextPath,
-			String action, String mouseOverText) {
+			String action, String mouseOverText, String text) {
 		LinkStruct ls = new LinkStruct();
 		String url = makeRelativeHref(contextPath + "uploadimages.jsp",
 				"entityUri", subjectUri);
 		ls.setHref(url);
 		ls.setType(action);
 		ls.setMouseoverText(mouseOverText);
+		ls.setText(text);
 		return ls;
 	}
     
