@@ -1,10 +1,14 @@
 package edu.cornell.mannlib.vitro.webapp.visualization.utilities;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Set;
 
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -12,9 +16,15 @@ import org.apache.commons.logging.Log;
 
 import com.hp.hpl.jena.query.DataSource;
 
+import edu.cornell.mannlib.vitro.webapp.beans.Portal;
+import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.visualization.VisualizationController;
 import edu.cornell.mannlib.vitro.webapp.controller.visualization.VisualizationFrameworkConstants;
+import edu.cornell.mannlib.vitro.webapp.visualization.constants.QueryConstants;
+import edu.cornell.mannlib.vitro.webapp.visualization.exceptions.MalformedQueryParametersException;
+import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.GenericQueryMap;
+import edu.cornell.mannlib.vitro.webapp.visualization.visutils.GenericQueryHandler;
 
 public class VisualizationRequestHandler {
 	
@@ -42,18 +52,79 @@ public class VisualizationRequestHandler {
         String visMode = vitroRequest.getParameter(VisualizationFrameworkConstants.VIS_MODE_URL_HANDLE);
         
         String profileVisMode = "PROFILE_URL";
-        
         String coAuthorVisMode = "COAUTHORSHIP_URL";
+        String imageVisMode = "IMAGE_URL";
+        
+		String resultFormatParam = "RS_TEXT";
+        String rdfResultFormatParam = "RDF/XML-ABBREV";
 
         String preparedURL = "";
 
         try {
         
+            /*
+    		 * If the url being requested is about a standalone image, which is used when we want
+    		 * to render an image & other info for a co-author OR ego for that matter.
+    		 * */
+    		if (imageVisMode.equalsIgnoreCase(visMode)) {
+    			
+    			
+    			String filterRule = "?predicate = vitro:imageThumb";
+    			GenericQueryHandler imageQueryHandler = new GenericQueryHandler(individualURIParam, 
+    																			filterRule, 
+    																			resultFormatParam, 
+    																			rdfResultFormatParam, 
+    																			dataSource, 
+    																			log);
+    			
+    			try {
+    				
+    				GenericQueryMap imagePropertyToValues = imageQueryHandler.getJavaValueObjects();
+    				
+    				String imagePath = "";
+    				/*
+    				 * If there is no imageThumb property we want to give the link to "No Image" snap. 
+    				 * */
+    				if (imagePropertyToValues.size() > 0) {
+    					
+    					String vitroSparqlNamespace = QueryConstants.PREFIX_TO_NAMESPACE.get("vitro"); 
+    					String imageThumbProperty = vitroSparqlNamespace + "imageThumb";
+    					
+    					Set<String> personImageThumbPaths = imagePropertyToValues.get(imageThumbProperty);
+    					
+    					/*
+    					 * Although we know that there can be only one imagePath we are restricted by Java's
+    					 * expression power.
+    					 * */
+    					for (String providedImagePath : personImageThumbPaths) {
+    						imagePath = "/images/" + providedImagePath;
+    					}
+    					
+    					
+    				} 
+    				
+    				prepareVisualizationQueryResponse(imagePath);
+    				return;
+    				
+    				
+    			} catch (MalformedQueryParametersException e) {
+    				try {
+    					handleMalformedParameters(e.getMessage());
+    				} catch (ServletException e1) {
+    					log.error(e1.getStackTrace());
+    				} catch (IOException e1) {
+    					log.error(e1.getStackTrace());
+    				}
+    				return;
+    			}
+    			
+    			
+    		} 
 	    	/*
 	    	 * By default we will be generating profile url else some specific url like coAuthorShip vis 
 	    	 * url for that individual.
 	    	 * */
-			if (coAuthorVisMode.equalsIgnoreCase(visMode)) {
+    		else if (coAuthorVisMode.equalsIgnoreCase(visMode)) {
 				
 				preparedURL += request.getContextPath()
 								+ "/admin/visQuery"
@@ -108,6 +179,27 @@ public class VisualizationRequestHandler {
 		
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+	}
+	
+	private void handleMalformedParameters(String errorMessage)
+		throws ServletException, IOException {
+	
+		Portal portal = vitroRequest.getPortal();
+		
+		request.setAttribute("error", errorMessage);
+		
+		RequestDispatcher requestDispatcher = request.getRequestDispatcher(Controllers.BASIC_JSP);
+		request.setAttribute("bodyJsp", "/templates/visualization/visualization_error.jsp");
+		request.setAttribute("portalBean", portal);
+		request.setAttribute("title", "Visualization Query Error - Individual Publication Count");
+		
+		try {
+			requestDispatcher.forward(request, response);
+		} catch (Exception e) {
+			log.error("EntityEditController could not forward to view.");
+			log.error(e.getMessage());
+			log.error(e.getStackTrace());
 		}
 	}
 	

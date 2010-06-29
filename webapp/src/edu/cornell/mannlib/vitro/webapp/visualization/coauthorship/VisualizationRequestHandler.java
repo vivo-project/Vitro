@@ -1,9 +1,7 @@
 package edu.cornell.mannlib.vitro.webapp.visualization.coauthorship;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Set;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -19,10 +17,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.visualization.VisualizationController;
 import edu.cornell.mannlib.vitro.webapp.controller.visualization.VisualizationFrameworkConstants;
-import edu.cornell.mannlib.vitro.webapp.visualization.constants.QueryConstants;
 import edu.cornell.mannlib.vitro.webapp.visualization.exceptions.MalformedQueryParametersException;
-import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.GenericQueryMap;
-import edu.cornell.mannlib.vitro.webapp.visualization.visutils.GenericQueryHandler;
 
 public class VisualizationRequestHandler {
 
@@ -58,116 +53,7 @@ public class VisualizationRequestHandler {
         System.out.println(VisualizationFrameworkConstants.VIS_MODE_URL_HANDLE);
         System.out.println(vitroRequest.getParameter(VisualizationFrameworkConstants.VIS_MODE_URL_HANDLE));
         System.out.println(VisualizationFrameworkConstants.IMAGE_VIS_MODE_URL_VALUE);
-        /*
-		 * If the data being requested is about a standalone image, which is used when we want
-		 * to render an image & other info for a co-author OR ego for that matter.
-		 * */
-		if (VisualizationFrameworkConstants.DATA_RENDER_MODE_URL_VALUE.equalsIgnoreCase(renderMode) 
-				&& VisualizationFrameworkConstants.IMAGE_VIS_MODE_URL_VALUE.equalsIgnoreCase(visMode) ) {
-			
-			
-			String filterRule = "?predicate = vitro:imageThumb";
-			GenericQueryHandler imageQueryHandler = new GenericQueryHandler(egoURIParam, 
-																			filterRule, 
-																			resultFormatParam, 
-																			rdfResultFormatParam, 
-																			dataSource, 
-																			log);
-			
-			try {
-				
-				GenericQueryMap imagePropertyToValues = imageQueryHandler.getJavaValueObjects();
-				
-				String imagePath = "";
-				/*
-				 * If there is no imageThumb property we want to give the link to "No Image" snap. 
-				 * */
-				if (imagePropertyToValues.size() > 0) {
-					
-					String vitroSparqlNamespace = QueryConstants.PREFIX_TO_NAMESPACE.get("vitro"); 
-					String imageThumbProperty = vitroSparqlNamespace + "imageThumb";
-					
-					Set<String> personImageThumbPaths = imagePropertyToValues.get(imageThumbProperty);
-					
-					/*
-					 * Although we know that there can be only one imagePath we are restricted by Java's
-					 * expression power.
-					 * */
-					for (String providedImagePath : personImageThumbPaths) {
-						imagePath = "/images/" + providedImagePath;
-					}
-					
-					String imageServerPath = visualizationController.getServletContext().getRealPath(imagePath);
-					
-					File imageFile = new File(imageServerPath) ;
-					
-					if (!imageFile.exists()) {
-						
-						Portal portal = vitroRequest.getPortal();
-						String themeDir = portal != null ? portal.getThemeDir() : Portal.DEFAULT_THEME_DIR_FROM_CONTEXT;
-						
-						System.out.println("bfore cxtpth " + themeDir);
-						
-						themeDir = vitroRequest.getContextPath() + '/' + themeDir;
-						
-						System.out.println("bfore cxtpth " + themeDir);
-						
-						imagePath = themeDir + "site_icons/visualization/coauthorship/no_image.png";
-						
-						System.out.println(imagePath);
-						
-					} else {
-						
-						System.out.println("ABSOLUTE PATH : " + imageFile.getAbsolutePath());
-						try {
-							System.out.println("ABSOLUTE PATH : " + imageFile.getCanonicalPath());
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						System.out.println("ABSOLUTE PATH : " + imageFile.getName());
-						
-					}
-					
-					
-				} else {
-					
-					Portal portal = vitroRequest.getPortal();
-					String themeDir = portal != null ? portal.getThemeDir() : Portal.DEFAULT_THEME_DIR_FROM_CONTEXT;
-					
-					System.out.println("bfore cxtpth " + themeDir);
-					
-					themeDir = vitroRequest.getContextPath() + '/' + themeDir;
-					
-					System.out.println("bfore cxtpth " + themeDir);
-					
-					imagePath = themeDir + "site_icons/visualization/coauthorship/no_image.png";
-					
-					System.out.println(imagePath);
-					
-					
-					
-				}
-				
-				prepareVisualizationQueryImageResponse(imagePath);
-				return;
-				
-				
-			} catch (MalformedQueryParametersException e) {
-				try {
-					handleMalformedParameters(e.getMessage());
-				} catch (ServletException e1) {
-					log.error(e1.getStackTrace());
-				} catch (IOException e1) {
-					log.error(e1.getStackTrace());
-				}
-				return;
-			}
-			
-			
-		} 
         
-
         QueryHandler queryManager =
         	new QueryHandler(egoURIParam,
 						     resultFormatParam,
@@ -273,23 +159,6 @@ public class VisualizationRequestHandler {
 		CoAuthorshipGraphMLWriter coAuthorShipGraphMLWriter = new CoAuthorshipGraphMLWriter(authorNodesAndEdges);
 		
 		responseWriter.append(coAuthorShipGraphMLWriter.getCoAuthorshipGraphMLContent());
-		
-		responseWriter.close();
-		
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	private void prepareVisualizationQueryImageResponse(String imageURL) {
-
-		response.setContentType("text/plain");
-		
-		try {
-		
-		PrintWriter responseWriter = response.getWriter();
-		
-		responseWriter.append(imageURL);
 		
 		responseWriter.close();
 		

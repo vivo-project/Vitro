@@ -98,15 +98,43 @@ var requiredRevision = 0;
 
 			return finalURL;
 
+		} else if (type == "image") {
+
+			var finalURL = $.ajax({
+				   url: "${contextPath}/admin/visQuery",
+				   data: ({vis: "utilities", vis_mode: "IMAGE_URL", uri: given_uri}),
+				   dataType: "text",
+				   async: false,
+				   success:function(data){
+				     //console.log("PROF - " + data);
+				   }
+				 }).responseText;
+
+			return finalURL;
+
 		}
 
 	 //});
 		
 	}
 
+	$.fn.image = function(src, successFunc, failureFunc){
+	    return this.each(function(){ 
+	        var i = new Image();
+	        i.src = src;
+	        i.onerror = failureFunc;
+	        i.onload = successFunc;
+	        
+	        //console.dir(i);
+	        //this.appendChild(i);
+
+	        return i;
+	    });
+	}
+
 	
 function nodeClickedJS(obj){
-	
+
 	$("#newsLetter").attr("style","visibility:visible");
 	$("#authorName").empty().append(obj[0]);
 	//$("#works").append("<img src='assets/Garfield.jpg'/><br /><br />");
@@ -118,11 +146,23 @@ function nodeClickedJS(obj){
 	if(obj[7]){
 		$("#profileUrl").attr("href", getWellFormedURLs(obj[7], "profile"));
 		$("#coAuthorshipVisUrl").attr("href", getWellFormedURLs(obj[7], "coauthorship"));
+		var imageLink = getWellFormedURLs(obj[7], "image");
+				
 	} else{
 		$("#profileUrl").attr("href","#");
 		$("#coAuthorshipVisUrl").attr("href","#");
 	}
 
+	var imageContainer = $("#profileImage");
+	imageContainer.image(imageLink, 
+						   function(){
+		   						imageContainer.append(this); 
+						   		console.log("The image is loaded now");
+					   		},
+						   function(){console.log("The image is NOT loaded");}
+	   );
+
+	   
 	$("#coAuthorName").empty().append(obj[name]);	
 
 	$("#coAuthors").empty().append(obj[5]);	
@@ -192,7 +232,7 @@ if ( hasProductInstall && !hasRequestedVersion ) {
    <br/><br/><br/><br/><br/><br/>
 <div id="newsLetter" style="visibility:hidden"> <span class="nltop"></span>
           <div class="middle" id="nodeData">
-          <div><img src="${noImage}" /></div>
+          <div id="profileImage"></div>
           <div class="bold"><strong><span id="authorName">&nbsp;</span></strong></div>
          <!-- <div class="italicize">Professor</div>
           <div class="italicize">Department of <span>???</span></div>
@@ -208,6 +248,7 @@ if ( hasProductInstall && !hasRequestedVersion ) {
           <br/>
           <div><a href="#" id="coAuthorshipVisUrl">Go to ego-centric co-author network of <span id="coAuthorName"></span></a></div>
         </div>
+        <div id="image_test"></div>
           <br class="spacer">
           <span class="nlbottom"></span></div>
 </div>
@@ -217,6 +258,8 @@ if ( hasProductInstall && !hasRequestedVersion ) {
 </div>
 <script>
 $(document).ready(function(){
+
+
 
 });
 </script>

@@ -1,4 +1,4 @@
-package edu.cornell.mannlib.vitro.webapp.visualization;
+package edu.cornell.mannlib.vitro.webapp.visualization.personpubcount;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -16,7 +16,6 @@ import org.apache.commons.logging.Log;
 import edu.cornell.mannlib.vitro.webapp.controller.visualization.VisualizationController;
 import edu.cornell.mannlib.vitro.webapp.controller.visualization.VisualizationFrameworkConstants;
 import edu.cornell.mannlib.vitro.webapp.visualization.constants.VOConstants;
-import edu.cornell.mannlib.vitro.webapp.visualization.personpubcount.VisualizationRequestHandler;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.BiboDocument;
 
 
