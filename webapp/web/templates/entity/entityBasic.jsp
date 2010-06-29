@@ -205,7 +205,7 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
 	                        <div class="datatypePropertyValue">
 	                            <div class="statementWrap thumbnail">
                                     <img src="<c:url value='/images/dummyImages/person.thumbnail.jpg'/>" 
-                                                title="no image" alt="" width="150"/>
+                                                title="no image" alt="" width="115"/>
                                     <c:if test="${showEdits}">
                                         <span class="editLinks">${imageLinks}</span>
                                     </c:if>                                   
@@ -221,8 +221,8 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
 	                            <div class="statementWrap thumbnail">
 	                                <a class="image" href="<c:url value='${entity.imageUrl}'/>">
                                         <img src="<c:url value='${entity.thumbUrl}'/>" 
-                                                title="click to view larger image in new window" 
-                                                alt="" width="150"/>
+                                                title="click to view larger image" 
+                                                alt="" width="115"/>
 	                                </a>
                                     <c:if test="${showEdits}">
                                         <span class="editLinks">${imageLinks}</span>
