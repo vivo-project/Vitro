@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 
+import com.google.gson.Gson;
 import com.hp.hpl.jena.query.DataSource;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
@@ -51,6 +52,7 @@ public class VisualizationRequestHandler {
 
         String visMode = vitroRequest.getParameter(VisualizationFrameworkConstants.VIS_MODE_URL_HANDLE);
         
+        String profileInfoMode = "PROFILE_INFO";
         String profileVisMode = "PROFILE_URL";
         String coAuthorVisMode = "COAUTHORSHIP_URL";
         String imageVisMode = "IMAGE_URL";
@@ -63,10 +65,50 @@ public class VisualizationRequestHandler {
         try {
         
             /*
-    		 * If the url being requested is about a standalone image, which is used when we want
-    		 * to render an image & other info for a co-author OR ego for that matter.
+    		 * If the info being requested is about a profile which includes the name, moniker
+    		 * & image url.
     		 * */
-    		if (imageVisMode.equalsIgnoreCase(visMode)) {
+    		if (profileInfoMode.equalsIgnoreCase(visMode)) {
+    			
+    			
+    			String filterRule = "?predicate = vitro:imageThumb || ?predicate = vitro:moniker  || ?predicate = rdfs:label";
+    			GenericQueryHandler imageQueryHandler = new GenericQueryHandler(individualURIParam, 
+    																			filterRule, 
+    																			resultFormatParam, 
+    																			rdfResultFormatParam, 
+    																			dataSource, 
+    																			log);
+    			
+    			try {
+    				
+    				GenericQueryMap profilePropertiesToValues = imageQueryHandler.getJavaValueObjects();
+    				
+    				profilePropertiesToValues.addEntry("imageContextPath", request.getContextPath() + "/images/");
+    				
+    				Gson profileInformation = new Gson();
+    				
+    				prepareVisualizationQueryResponse(profileInformation.toJson(profilePropertiesToValues));
+    				
+    				return;
+    				
+    				
+    			} catch (MalformedQueryParametersException e) {
+    				try {
+    					handleMalformedParameters(e.getMessage());
+    				} catch (ServletException e1) {
+    					log.error(e1.getStackTrace());
+    				} catch (IOException e1) {
+    					log.error(e1.getStackTrace());
+    				}
+    				return;
+    			}
+    			
+    			
+    		} else if (imageVisMode.equalsIgnoreCase(visMode)) {
+    			/*
+        		 * If the url being requested is about a standalone image, which is used when we want
+        		 * to render an image & other info for a co-author OR ego for that matter.
+        		 * */
     			
     			
     			String filterRule = "?predicate = vitro:imageThumb";
@@ -82,9 +124,7 @@ public class VisualizationRequestHandler {
     				GenericQueryMap imagePropertyToValues = imageQueryHandler.getJavaValueObjects();
     				
     				String imagePath = "";
-    				/*
-    				 * If there is no imageThumb property we want to give the link to "No Image" snap. 
-    				 * */
+
     				if (imagePropertyToValues.size() > 0) {
     					
     					String vitroSparqlNamespace = QueryConstants.PREFIX_TO_NAMESPACE.get("vitro"); 
@@ -97,10 +137,8 @@ public class VisualizationRequestHandler {
     					 * expression power.
     					 * */
     					for (String providedImagePath : personImageThumbPaths) {
-    						imagePath = "/images/" + providedImagePath;
+    						imagePath = request.getContextPath() + "/images/" + providedImagePath;
     					}
-    					
-    					
     				} 
     				
     				prepareVisualizationQueryResponse(imagePath);
@@ -119,12 +157,11 @@ public class VisualizationRequestHandler {
     			}
     			
     			
-    		} 
-	    	/*
-	    	 * By default we will be generating profile url else some specific url like coAuthorShip vis 
-	    	 * url for that individual.
-	    	 * */
-    		else if (coAuthorVisMode.equalsIgnoreCase(visMode)) {
+    		} else if (coAuthorVisMode.equalsIgnoreCase(visMode)) {
+    	    	/*
+    	    	 * By default we will be generating profile url else some specific url like coAuthorShip vis 
+    	    	 * url for that individual.
+    	    	 * */
 				
 				preparedURL += request.getContextPath()
 								+ "/admin/visQuery"

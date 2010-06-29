@@ -7,8 +7,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import com.google.gson.Gson;
 import com.hp.hpl.jena.iri.IRIFactory;
 
+import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.GenericQueryMap;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.Node;
 
 public class TestJava {
@@ -46,10 +48,10 @@ public class TestJava {
 		}
 		Map<String, Integer> yearToPublicationCount = new TreeMap<String, Integer>();
 
-//		yearToPublicationCount.put("2003", 5);
-//		yearToPublicationCount.put("2001", 5);
-//		yearToPublicationCount.put("2002", 5);
-//		yearToPublicationCount.put("2090", 7);
+		yearToPublicationCount.put("2003", 5);
+		yearToPublicationCount.put("2001", 5);
+		yearToPublicationCount.put("2002", 5);
+		yearToPublicationCount.put("2090", 7);
 		yearToPublicationCount.put("Unknown", 6);
 		
 		Node egoNode;
@@ -97,12 +99,32 @@ public class TestJava {
 		} 
 		
 		
+		GenericQueryMap stringToSetOfStrings = new GenericQueryMap();
+		
+		stringToSetOfStrings.put("A", yearToPublicationCount.keySet());
+		stringToSetOfStrings.put("B", yearToPublicationCount.keySet());
+		stringToSetOfStrings.put("C", yearToPublicationCount.keySet());
+		stringToSetOfStrings.put("imageOffset", keySet);
+		
+		Set<String> what = new HashSet<String>();
+		
+		what.add("sup");
+		
+		stringToSetOfStrings.put("imageOffset2", what);
 		
 		
 		String emptyString = "";
 		System.out.println(emptyString.isEmpty());
 		
-		System.out.println(yearToPublicationCount);
+		System.out.println(stringToSetOfStrings);
+		
+		Gson gson = new Gson();
+		String json = gson.toJson(stringToSetOfStrings); 
+		
+		
+		System.out.println(json);
+		
+		
 
 //		System.out.println(Collections.max(yearToPublicationCount.keySet()));
 //		System.out.println(Collections.min(yearToPublicationCount.keySet()));

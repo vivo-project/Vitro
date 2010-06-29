@@ -49,11 +49,6 @@ public class VisualizationRequestHandler {
 
         String visContainer = vitroRequest.getParameter(VisualizationFrameworkConstants.VIS_CONTAINER_URL_HANDLE);
         
-        System.out.println("******************************************************");
-        System.out.println(VisualizationFrameworkConstants.VIS_MODE_URL_HANDLE);
-        System.out.println(vitroRequest.getParameter(VisualizationFrameworkConstants.VIS_MODE_URL_HANDLE));
-        System.out.println(VisualizationFrameworkConstants.IMAGE_VIS_MODE_URL_VALUE);
-        
         QueryHandler queryManager =
         	new QueryHandler(egoURIParam,
 						     resultFormatParam,
