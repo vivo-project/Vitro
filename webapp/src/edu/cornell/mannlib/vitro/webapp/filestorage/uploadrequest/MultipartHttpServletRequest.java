@@ -4,6 +4,8 @@ package edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -50,6 +52,8 @@ class MultipartHttpServletRequest extends FileUploadServletRequest {
 		File tempDir = figureTemporaryDirectory(request);
 		ServletFileUpload upload = createUploadHandler(maxFileSize, tempDir);
 
+		parseQueryString(request.getQueryString(), parameters);
+
 		List<FileItem> items = parseRequestIntoFileItems(request, upload);
 		for (FileItem item : items) {
 			// Process a regular form field
@@ -71,6 +75,45 @@ class MultipartHttpServletRequest extends FileUploadServletRequest {
 		this.files = Collections.unmodifiableMap(files);
 		log.debug("Files are: " + this.files);
 		request.setAttribute(FILE_ITEM_MAP, this.files);
+	}
+
+	/**
+	 * Pull any parameters out of the URL.
+	 */
+	private void parseQueryString(String queryString,
+			Map<String, List<String>> parameters) {
+		log.debug("Query string is : '" + queryString + "'");
+		if (queryString != null) {
+			String[] pieces = queryString.split("&");
+
+			for (String piece : pieces) {
+				int equalsHere = piece.indexOf('=');
+				if (piece.trim().isEmpty()) {
+					// Ignore an empty piece.
+				} else if (equalsHere <= 0) {
+					// A parameter without a value.
+					addToParameters(parameters, decode(piece), "");
+				} else {
+					// A parameter with a value.
+					String key = piece.substring(0, equalsHere);
+					String value = piece.substring(equalsHere + 1);
+					addToParameters(parameters, decode(key), decode(value));
+				}
+			}
+		}
+		log.debug("Parameters from query string are: " + parameters);
+	}
+
+	/**
+	 * Remove any special URL-style encoding.
+	 */
+	private String decode(String encoded) {
+		try {
+			return URLDecoder.decode(encoded, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			log.error(e, e);
+			return encoded;
+		}
 	}
 
 	/**
