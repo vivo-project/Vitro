@@ -11,10 +11,17 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
+
 public class PrimitiveRdfEditTest {
+    
+    OntModel testModel;
+    WebappDaoFactory wdf;
 
 	private String testN3a = 
 		"<http://example.com/motorcycles/honda/vtl1000> <http://example.com/engines/displacement> \"1000cm3\" ." +
@@ -25,18 +32,12 @@ public class PrimitiveRdfEditTest {
 	
 	
 	@Before
-	public void setUp() throws Exception {
-	}
+	public void setUp() throws Exception { }
 
 	@Test
 	public void testProcessChanges() throws Exception {
 		OntModel writeModel = ModelFactory.createOntologyModel();
-		
-		String testN3a = 
-			"<http://example.com/motorcycles/honda/vtl1000> <http://example.com/engines/displacement> \"1000cm3\" ." +
-			"<http://example.com/motorcycles/honda/919> <http://example.com/engines/displacement> \"919cm3\" ." ;		
-		String testN3b = 
-			"<http://example.com/motorcycles/honda/919> <http://example.com/motorcycles/relatedTo> <http://exmaple.com/motorcycle/honda/599> ." ;
+        
 		int totalStmts = 3;
 		
 		PrimitiveRdfEdit pre = new PrimitiveRdfEdit();

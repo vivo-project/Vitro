@@ -1143,7 +1143,16 @@
     <servlet-name>primitiveRdfEdit</servlet-name>
     <url-pattern>/edit/primitiveRdfEdit</url-pattern>    
   </servlet-mapping>
-  
+
+  <servlet>
+    <servlet-name>primitiveRdfDelete</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.PrimitiveRdfDelete</servlet-class>    
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>primitiveRdfDelete</servlet-name>
+    <url-pattern>/edit/primitiveRdfDelete</url-pattern>    
+  </servlet-mapping>
+   
   <!-- ============================== servlet-mappings ======================== -->
   <servlet-mapping>
     <servlet-name>fetch</servlet-name>

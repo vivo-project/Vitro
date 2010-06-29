@@ -226,12 +226,16 @@ public class AutocompleteController extends FreeMarkerHttpServlet implements Sea
 
             // Run the search term through the query parser so that it gets normalized in the same
             // way the index is normalized.
-            QueryParser queryParser = new QueryParser(Entity2LuceneDoc.term.NAME, analyzer);
-            query = queryParser.parse(querystr + "*");
-            
+//            QueryParser queryParser = new QueryParser(Entity2LuceneDoc.term.NAMEUNSTEMMED, analyzer);
+//            query = queryParser.parse(querystr + "*");
+   
+            querystr = querystr.toLowerCase();
             {
                 BooleanQuery boolQuery = new BooleanQuery(); 
-                boolQuery.add(query, BooleanClause.Occur.MUST);
+                boolQuery.add( 
+                        new WildcardQuery(new Term(Entity2LuceneDoc.term.NAME, querystr + '*')),
+                        BooleanClause.Occur.MUST);                
+                //boolQuery.add(query, BooleanClause.Occur.MUST);
                 Object param = request.getParameter("type");
                 boolQuery.add(  new TermQuery(
                         new Term(Entity2LuceneDoc.term.RDFTYPE, 

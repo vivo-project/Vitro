@@ -3,11 +3,16 @@
 <div>
 <form method="POST">
 
-additions:
+Addition:<br />
 <textarea name="additions"></textarea>
 
-retractions:
+<br /><br />
+
+Retraction:<br />
 <textarea name="retractions"></textarea>
+
+<br /><br />
+
 <div>
 N3<input type="radio" name="rdfFormat" value="N3"/>
 TURTLE<input type="radio" name="rdfFormat" value="TURTLE"/>
