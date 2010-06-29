@@ -68,7 +68,8 @@ public class FileModelHelper {
 
 		if (mainFile == null) {
 			log.debug("Entity '" + entity.getURI()
-					+ "' had no associated main image.");
+					+ "' had no associated main image: mainImageURI="
+					+ entity.getMainImageUri());
 			return null;
 		} else {
 			log.debug("Entity '" + entity.getURI()
@@ -367,6 +368,25 @@ public class FileModelHelper {
 	}
 
 	/**
+	 * Remove the current thumbnail from this entity;
+	 * 
+	 * @return the file surrogate, or <code>null</code> if there was none.
+	 */
+	public Individual removeThumbnail(Individual person) {
+		Individual mainImage = getMainImage(person);
+		Individual thumbnail = getThumbnailForImage(mainImage);
+		if (thumbnail == null) {
+			log.debug("No thumbnail to remove from '" + person.getURI() + "'");
+			return null;
+		}
+		ObjectPropertyStatement stmt = new ObjectPropertyStatementImpl(
+				mainImage.getURI(), VitroVocabulary.FS_THUMBNAIL_IMAGE,
+				thumbnail.getURI());
+		objectPropertyStatementDao.deleteObjectPropertyStatement(stmt);
+		return thumbnail;
+	}
+
+	/**
 	 * Store this file surrogate as the thumnail on this entity.
 	 */
 	public void setThumbnailOnIndividual(Individual entity,
@@ -383,6 +403,9 @@ public class FileModelHelper {
 	 * file surrogate?
 	 */
 	public boolean isFileReferenced(Individual surrogate) {
+		if (surrogate == null) {
+			return false;
+		}
 		ObjectPropertyStatement opStmt = new ObjectPropertyStatementImpl(null,
 				null, surrogate.getURI());
 		List<ObjectPropertyStatement> stmts = objectPropertyStatementDao
@@ -405,8 +428,12 @@ public class FileModelHelper {
 	 */
 	public void removeFileFromModel(Individual surrogate) {
 		Individual bytestream = getBytestreamForFile(surrogate);
-		individualDao.deleteIndividual(bytestream);
-		individualDao.deleteIndividual(surrogate);
+		if (bytestream != null) {
+			individualDao.deleteIndividual(bytestream);
+		}
+		if (surrogate != null) {
+			individualDao.deleteIndividual(surrogate);
+		}
 	}
 
 }
