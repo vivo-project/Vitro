@@ -119,13 +119,29 @@ public class VisualizationCodeGenerator {
 		if (yearToPublicationCount.size() > 0) {
 			try {
 				minPublishedYear = Integer.parseInt(Collections.min(publishedYears));
+				System.out.println("min pub year - " + minPublishedYear);
 			} catch (NoSuchElementException e1) {
 				log.debug("vis: " + e1.getMessage() + " error occurred for " + yearToPublicationCount.toString());
 			} catch (NumberFormatException e2) {
 				log.debug("vis: " + e2.getMessage() + " error occurred for " + yearToPublicationCount.toString());
 			}
-			numOfYearsToBeRendered = currentYear - minPublishedYear + 1;
 		}
+		
+		int minPubYearConsidered = 0;
+		
+		/*
+		 * There might be a case that the author has made his first publication within the 
+		 * last 10 years but we want to make sure that the sparkline is representative of 
+		 * at least the last 10 years, so we will set the minPubYearConsidered to 
+		 * "currentYear - 10" which is also given by "shortSparkMinYear".
+		 * */
+		if (minPublishedYear > shortSparkMinYear) {
+			minPubYearConsidered = shortSparkMinYear;
+		} else {
+			minPubYearConsidered = minPublishedYear;
+		}
+		
+		numOfYearsToBeRendered = currentYear - minPubYearConsidered + 1;
 		
 		visualizationCode.append("<style type='text/css'>" +
 										"." + visualizationStyleClass + " table{" +
@@ -147,6 +163,9 @@ public class VisualizationCodeGenerator {
 												"margin-left:72px;" +
 												"position:absolute;" +
 										"}" +
+										".sparkline_range {" +
+												"color:#7BS69E;" +
+										"}" +
 								"</style>\n");
 
 		visualizationCode.append("<script type=\"text/javascript\">\n" +
@@ -159,9 +178,12 @@ public class VisualizationCodeGenerator {
 		int publicationCounter = 0;
 		int totalPublications = 0;
 		int renderedFullSparks = 0;
-		for (int publishedYear = minPublishedYear; publishedYear <= currentYear; publishedYear++) {
 
-				String stringPublishedYear = String.valueOf(publishedYear);
+		
+		System.out.println("min pub year v2 - " + minPublishedYear);
+		for (int publicationYear = minPubYearConsidered; publicationYear <= currentYear; publicationYear++) {
+
+				String stringPublishedYear = String.valueOf(publicationYear);
 				Integer currentPublications = yearToPublicationCount.get(stringPublishedYear);
 
 				if (currentPublications == null) {
@@ -237,7 +259,9 @@ public class VisualizationCodeGenerator {
 													   totalPublications, 
 													   sparklineDisplayOptions);	
 		} else {
-			generateFullSparklineVisualizationContent(visContainerID,
+			generateFullSparklineVisualizationContent(currentYear,
+					   								  minPubYearConsidered,
+					   								  visContainerID,
 													  visualizationCode, 
 													  totalPublications, 
 													  renderedFullSparks,
@@ -304,7 +328,10 @@ public class VisualizationCodeGenerator {
 														"+ renderedShortSparks" +
 														"+ ' Papers with year from '" +
 														"+ ' " + totalPublications + " '" +
-														"+ ' total'" +
+														"+ ' total " +
+														"<span class=\"sparkline_range\">" +
+														"(" + shortSparkMinYear + " - " + currentYear + ")" +
+														"</span>'" +
 														"+ '</p>';" +
 								"$(shortSparksText).prependTo('#" + visDivNames.get("SHORT_SPARK") + "');");
 
@@ -318,7 +345,7 @@ public class VisualizationCodeGenerator {
 		
 	}
 	private void generateFullSparklineVisualizationContent(
-			String visContainerID, StringBuilder visualizationCode,
+			int currentYear, int minPubYearConsidered, String visContainerID, StringBuilder visualizationCode,
 			int totalPublications, int renderedFullSparks,
 			String sparklineDisplayOptions) {
 		visualizationCode.append("var fullSparklineView = new google.visualization.DataView(data);\n" +
@@ -334,7 +361,10 @@ public class VisualizationCodeGenerator {
 												 "+ ' papers with year from '" +
 												 "+ ' " + totalPublications + " '" +
 												 "+ ' total'" +
-												 "+ '</p>';" +
+												"<span class=\"sparkline_range\">" +
+												"(" + minPubYearConsidered + " - " + currentYear + ")" +
+												"</span>'" +
+												"+ '</p>';" +
 								"$(allSparksText).prependTo('#" + visDivNames.get("FULL_SPARK") +"');");
 		
 		visualizationCode.append("}\n ");
@@ -417,7 +447,6 @@ public class VisualizationCodeGenerator {
 				valueObjectContainer.setDownloadDataLink(downloadURL);
 			} else {
 				downloadFileCode = "No data available to export.<br />";
-				valueObjectContainer.setDownloadDataLink("#");
 			}
 			
 			String tableCode = generateDataTable();
@@ -465,7 +494,6 @@ public class VisualizationCodeGenerator {
 		} else {
 			
 			fullTimelineLink = "No data available to render full timeline.<br />";
-			valueObjectContainer.setFullTimelineNetworkLink("#");
 		
 		}
 		
