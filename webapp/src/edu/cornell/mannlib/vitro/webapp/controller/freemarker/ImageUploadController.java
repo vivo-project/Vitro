@@ -71,6 +71,7 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	public static final String TEMPLATE_NEW = "imageUpload/newImage.ftl";
 	public static final String TEMPLATE_REPLACE = "imageUpload/replaceImage.ftl";
 	public static final String TEMPLATE_CROP = "imageUpload/cropImage.ftl";
+	public static final String TEMPLATE_ERROR = "error.ftl";
 
 	private static final String URL_HERE = UrlBuilder.getUrl("/uploadImages");
 
@@ -207,9 +208,9 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 			// Can't find the entity? Complain.
 			return showAddImagePageWithError(null, e.getMessage());
 		} catch (Exception e) {
-			// We weren't expecting this - dump as much info as possible.
+			// We weren't expecting this - log it, and apologize to the user.
 			log.error(e, e);
-			return doError(e.toString());
+			return new TemplateResponseValues(TEMPLATE_ERROR);
 		}
 	}
 
@@ -288,18 +289,6 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 		helper.removeExistingImage(entity);
 
 		return showIndividualDisplayPage(entity);
-	}
-
-	/**
-	 * Display a error message to the user.
-	 * 
-	 * @message The text of the error message.
-	 */
-	private TemplateResponseValues doError(String message) {
-		TemplateResponseValues rv = new TemplateResponseValues(
-				"errorMessage.ftl");
-		rv.put("errorMessage", message);
-		return rv;
 	}
 
 	/**
@@ -538,8 +527,8 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	/**
 	 * For debugging, dump all sorts of information about the request.
 	 * 
-	 * WARNING: if "req" represents a Multi-part request which has not
-	 * yet been parsed, then reading these parameters will consume them.
+	 * WARNING: if "req" represents a Multi-part request which has not yet been
+	 * parsed, then reading these parameters will consume them.
 	 */
 	@SuppressWarnings("unchecked")
 	private void dumpRequestDetails(HttpServletRequest req) {
