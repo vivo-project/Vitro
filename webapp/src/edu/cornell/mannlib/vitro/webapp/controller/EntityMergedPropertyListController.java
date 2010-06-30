@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -36,6 +37,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.PropertyMaskingSetup;
 
@@ -59,6 +61,11 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
     private static final Log log = LogFactory.getLog(EntityMergedPropertyListController.class.getName());
     private static final int MAX_GROUP_DISPLAY_RANK = 99;
     
+    /** Don't include these properties in the list. */
+	private static final Collection<String> SUPPRESSED_OBJECT_PROPERTIES = Collections
+			.unmodifiableCollection(Arrays
+					.asList(new String[] { VitroVocabulary.IND_MAIN_IMAGE }));
+
     public void doGet( HttpServletRequest request, HttpServletResponse res )
     throws IOException, ServletException {
     	
@@ -108,8 +115,10 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
             // now first get the properties this entity actually has, presumably populated with statements 
             List<ObjectProperty> objectPropertyList = subject.getObjectPropertyList();
             for (ObjectProperty op : objectPropertyList) {
-                op.setEditLabel(op.getDomainPublic());
-                mergedPropertyList.add(op);
+            	if (!SUPPRESSED_OBJECT_PROPERTIES.contains(op)) {
+                    op.setEditLabel(op.getDomainPublic());
+                    mergedPropertyList.add(op);
+            	}
             }
             
             if (editMode) {
