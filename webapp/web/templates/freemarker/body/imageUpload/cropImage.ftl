@@ -2,49 +2,12 @@
 
 <#-- Crop the replacement main image for an Individual, to produce a thumbnail. -->
 
-${scripts.add("/js/jquery-plugins/jcrop/jquery-1.4.2.pack.js")}
-${scripts.add("/js/jquery-plugins/jcrop/jquery.Jcrop.js")}
+${scripts.add("/js/jquery.js")}
+${scripts.add("/js/jquery_plugins/jcrop/jquery.Jcrop.js")}
+${scripts.add("/js/imageUpload/cropImage.js")}
 
 ${stylesheets.addFromTheme("/uploadImages.css")}
 ${stylesheets.addFromTheme("/jquery.Jcrop.css")}
-
-<script language="Javascript">
-
-		(function($) {
-
-			$(window).load(function(){
-
-				var jcrop_api = $.Jcrop('#cropbox',{
-					onChange: showPreview,
-					onSelect: showPreview,
-					aspectRatio: 1
-				});
-
-				var bounds = jcrop_api.getBounds();
-				var boundx = bounds[0];
-				var boundy = bounds[1];
-
-				function showPreview(coords)
-				{
-					if (parseInt(coords.w) > 0)
-					{
-						var rx = 115 / coords.w;
-						var ry = 115 / coords.h;
-
-						$('#preview').css({
-							width: Math.round(rx * boundx) + 'px',
-							height: Math.round(ry * boundy) + 'px',
-							marginLeft: '-' + Math.round(rx * coords.x) + 'px',
-							marginTop: '-' + Math.round(ry * coords.y) + 'px'
-						});
-					}
-				};
-
-			});
-
-		}(jQuery));
-
-</script>
 
 <div id="photoCroppingContainer">
        <h2>Photo Upload</h2>
@@ -54,7 +17,7 @@ ${stylesheets.addFromTheme("/jquery.Jcrop.css")}
               <p class="photoCroppingTitleBody">Your profile photo will look like the image below. </p>
               <div style="width:115px;height:115px;overflow:hidden;border:1px solid green;"> <img src="${imageUrl}" id="preview" /> </div>
               <div id="photoCroppingHowTo">
-                     <p class="photoCroppingNote">To make adjustments, you can drag around and resize the blue square to the right. When you are happy with your photo click the “Save Photo” button. </p>
+                     <p class="photoCroppingNote">To make adjustments, you can drag around and resize the blue square to the right. When you are happy with your photo click the "Save Photo" button. </p>
                      <form action="${formAction}"  method="post">
                      
                      <!-- Totally bogus -->
