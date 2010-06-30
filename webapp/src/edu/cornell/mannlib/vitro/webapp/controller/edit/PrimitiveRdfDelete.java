@@ -2,11 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.httpclient.HttpStatus;
@@ -17,7 +12,6 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
-import freemarker.template.Configuration;
 
 public class PrimitiveRdfDelete extends PrimitiveRdfEdit {
 

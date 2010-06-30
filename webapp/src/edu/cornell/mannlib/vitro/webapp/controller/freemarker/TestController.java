@@ -9,6 +9,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import freemarker.template.Configuration;
 
@@ -20,6 +23,7 @@ import freemarker.template.Configuration;
 public class TestController extends FreeMarkerHttpServlet {
 
     private static final long serialVersionUID = 1L;
+    private static final Log log = LogFactory.getLog(TestController.class);
 
     protected String getTitle() {
         return "Test";

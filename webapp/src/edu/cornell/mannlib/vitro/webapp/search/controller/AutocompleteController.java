@@ -8,9 +8,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -23,7 +26,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
@@ -126,6 +128,8 @@ public class AutocompleteController extends FreeMarkerHttpServlet implements Sea
                 urisToExclude = Arrays.asList(filters);
             }
             
+            //boolean tokenize = "true".equals(vreq.getParameter("tokenize"));
+            
             Query query = getQuery(vreq, portalFlag, analyzer, indexDir, qtxt, urisToExclude);             
             log.debug("query for '" + qtxt +"' is " + query.toString());
 
@@ -210,7 +214,7 @@ public class AutocompleteController extends FreeMarkerHttpServlet implements Sea
     }
 
     private Query getQuery(VitroRequest request, PortalFlag portalState,
-                       Analyzer analyzer, String indexDir, String querystr, List<String> urisToExclude ) throws SearchException{
+                       Analyzer analyzer, String indexDir, String querystr, List<String> urisToExclude) throws SearchException{
         
         Query query = null;
         try {
@@ -224,26 +228,22 @@ public class AutocompleteController extends FreeMarkerHttpServlet implements Sea
                 return null;
             } 
 
-            // Run the search term through the query parser so that it gets normalized in the same
-            // way the index is normalized.
-//            QueryParser queryParser = new QueryParser(Entity2LuceneDoc.term.NAMEUNSTEMMED, analyzer);
-//            query = queryParser.parse(querystr + "*");
-   
-            querystr = querystr.toLowerCase();
+            query = makeNameQuery(querystr, request);
+            
+
+            // Filter by type
             {
                 BooleanQuery boolQuery = new BooleanQuery(); 
-                boolQuery.add( 
-                        new WildcardQuery(new Term(Entity2LuceneDoc.term.NAME, querystr + '*')),
-                        BooleanClause.Occur.MUST);                
-                //boolQuery.add(query, BooleanClause.Occur.MUST);
-                Object param = request.getParameter("type");
+                String typeParam = (String) request.getParameter("type");
                 boolQuery.add(  new TermQuery(
                         new Term(Entity2LuceneDoc.term.RDFTYPE, 
-                                (String)param)),
+                                typeParam)),
                     BooleanClause.Occur.MUST);
+                boolQuery.add(query, BooleanClause.Occur.MUST);
                 query = boolQuery;
             }
             
+            // Uris that should be excluded from the results
             if (urisToExclude != null) {
                 for (String uri : urisToExclude) {
                     BooleanQuery boolQuery = new BooleanQuery();
@@ -254,18 +254,6 @@ public class AutocompleteController extends FreeMarkerHttpServlet implements Sea
                     query = boolQuery;       
                 }
             }
-            
-            //check if this is classgroup filtered
-//            Object param = request.getParameter("classgroup");
-//            if( param != null && !"".equals(param)){                         
-//                  BooleanQuery boolQuery = new BooleanQuery();
-//                  boolQuery.add( query, BooleanClause.Occur.MUST);
-//                  boolQuery.add(  new TermQuery(
-//                                      new Term(Entity2LuceneDoc.term.CLASSGROUP_URI, 
-//                                              (String)param)),
-//                                  BooleanClause.Occur.MUST);
-//                  query = boolQuery;
-//            }
 
             //if we have a flag/portal query then we add
             //it by making a BooelanQuery.
@@ -276,10 +264,78 @@ public class AutocompleteController extends FreeMarkerHttpServlet implements Sea
                 boolQuery.add( flagQuery, BooleanClause.Occur.MUST);
                 query = boolQuery;
             }
-
             
-        }catch (Exception ex){
+        } catch (Exception ex){
             throw new SearchException(ex.getMessage());
+        }
+
+        return query;
+    }
+    
+    private Query makeNameQuery(String querystr, HttpServletRequest request) {
+        String stemParam = (String) request.getParameter("stem"); 
+        boolean stem = "true".equals(stemParam);
+        
+        // The search index is lowercased
+        querystr = querystr.toLowerCase();
+        
+        // If the last token of the query string ends in a word-delimiting character
+        // it should not get a wildcard query term.
+        // E.g., "Dickens," should match "Dickens" but not "Dickenson"
+        // This test might need to be moved to makeNameQuery().
+        Pattern p = Pattern.compile("\\W$");
+        Matcher m = p.matcher(querystr);
+        boolean lastTermIsWildcard = !m.find();
+        
+        // RY We might also have a tokenize param. Then if tokenize is false, call a different
+        // method. Not sure yet.
+        return makeTokenizedNameQuery(querystr, stem, lastTermIsWildcard);
+    }
+    
+    private Query makeTokenizedNameQuery(String querystr, boolean stem, boolean lastTermIsWildcard) {
+    
+        Query query = null;
+  
+        String termName = stem ? Entity2LuceneDoc.term.NAME : Entity2LuceneDoc.term.NAMEUNSTEMMED;
+
+        List<String> terms = Arrays.asList(querystr.split("[, ]+"));
+        for (Iterator<String> i = terms.iterator(); i.hasNext(); ) {
+            String term = (String) i.next();
+            // All items but last get a regular term query
+            if (i.hasNext()) {
+                BooleanQuery boolQuery = new BooleanQuery(); 
+                boolQuery.add( 
+                        new TermQuery(new Term(termName, term)),
+                        BooleanClause.Occur.MUST);  
+                if (query != null) {
+                    boolQuery.add(query, BooleanClause.Occur.MUST);
+                }
+                query = boolQuery;                          
+            }
+            // Last item goes on to next block
+            else {
+                querystr = term;
+            }
+        }
+ 
+        // Last term
+        {
+            BooleanQuery boolQuery = new BooleanQuery();            
+            if (lastTermIsWildcard) {
+                log.debug("Adding wildcard query on last term");
+                boolQuery.add( 
+                        new WildcardQuery(new Term(termName, querystr + "*")),
+                        BooleanClause.Occur.MUST);                 
+            } else {
+                log.debug("Adding term query on last term");
+                boolQuery.add( 
+                        new TermQuery(new Term(termName, querystr)),
+                        BooleanClause.Occur.MUST);                    
+            }
+            if (query != null) {
+                boolQuery.add(query, BooleanClause.Occur.MUST); 
+            }
+            query = boolQuery;
         }
 
         return query;
