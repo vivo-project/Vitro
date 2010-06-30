@@ -4,10 +4,13 @@ package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServletRequest;
@@ -43,7 +46,7 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 
 	/** Limit file size to 50 megabytes. */
 	public static final int MAXIMUM_FILE_SIZE = 50 * 1024 * 1024;
-	
+
 	/** Generated thumbnails will be this big. */
 	public static final int THUMBNAIL_HEIGHT = 115;
 	public static final int THUMBNAIL_WIDTH = 115;
@@ -68,10 +71,6 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	public static final String TEMPLATE_NEW = "imageUpload/newImage.ftl";
 	public static final String TEMPLATE_REPLACE = "imageUpload/replaceImage.ftl";
 	public static final String TEMPLATE_CROP = "imageUpload/cropImage.ftl";
-	public static final String TEMPLATE_BOGUS = "imageUpload/bogus.ftl"; // TODO
-	// This
-	// is
-	// BOGUS!!
 
 	private static final String URL_HERE = UrlBuilder.getUrl("/uploadImages");
 
@@ -105,76 +104,124 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 
 	/**
 	 * <p>
-	 * Parse the multi-part request before letting the
-	 * {@link FreeMarkerHttpServlet} do its tricks.
+	 * Parse the multi-part request, process the request, and produce the
+	 * output.
 	 * </p>
 	 * <p>
 	 * If the request was a multi-part file upload, it will parse to a
 	 * normal-looking request with a "file_item_map" attribute.
 	 * </p>
+	 * <p>
+	 * The processing will produce a {@link ResponseValues} object, which
+	 * represents either a request for a FreeMarker template or a forwarding
+	 * operation.
+	 * <ul>
+	 * <li>If a FreeMarker template, we emulate the actions that
+	 * FreeMarkerHttpServlet would have taken to produce the output.</li>
+	 * <li>If a forwarding operation, we create a {@link RequestDispatcher} to
+	 * do the forwarding.</li>
+	 * </ul>
+	 * </p>
 	 */
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws IOException, ServletException {
+
 		try {
 			FileUploadServletRequest parsedRequest = FileUploadServletRequest
 					.parseRequest(request, MAXIMUM_FILE_SIZE);
 			if (log.isTraceEnabled()) {
 				dumpRequestDetails(parsedRequest);
 			}
-
-			super.doGet(parsedRequest, response);
-
 		} catch (FileUploadException e) {
-			// Swallow throw an exception here. Test for FILE_ITEM_MAP later.
+			// Swallow the exception here. Test for FILE_ITEM_MAP later.
 			log.error("Failed to parse the multi-part HTTP request", e);
+		}
+
+		try {
+			// execute super.super.doGet()
+			vitroHttpServletDoGet(request, response);
+
+			VitroRequest vreq = new VitroRequest(request);
+			ResponseValues values = buildTheResponse(vreq);
+
+			if (values.isForwardResponse()) {
+				doForward(vreq, response, values);
+			} else {
+				doTemplate(vreq, response, values);
+			}
+		} catch (Exception e) {
+			log.error("Could not produce response page", e);
 		}
 	}
 
-	protected String getTitle(String siteName) {
-		return "Photo Upload " + siteName;
+	/**
+	 * We processed a response, and want to show a template.
+	 */
+	private void doTemplate(VitroRequest vreq, HttpServletResponse response,
+			ResponseValues values) {
+		// Set it up like FreeMarkerHttpServlet.doGet() would do.
+		Configuration config = getConfig(vreq);
+		Map<String, Object> sharedVariables = getSharedVariables(vreq);
+		Map<String, Object> root = new HashMap<String, Object>(sharedVariables);
+		Map<String, Object> body = new HashMap<String, Object>(sharedVariables);
+		setUpRoot(vreq, root);
+
+		// Add the values that we got, and merge to the template.
+		body.putAll(values.getBodyMap());
+		root.put("body", mergeBodyToTemplate(values.getTemplateName(), body,
+				config));
+
+		// Continue to simulate FreeMarkerHttpServlet.doGet()
+		root.put("title", body.get("title"));
+		writePage(root, config, response);
 	}
 
 	/**
-	 * Handle the different possible actions - default action is to show the
-	 * intro screen.
+	 * We processsed a response, and want to forward to another page.
 	 */
-	protected String getBody(VitroRequest vreq, Map<String, Object> body,
-			Configuration config) {
+	private void doForward(HttpServletRequest req, HttpServletResponse resp,
+			ResponseValues values) throws ServletException, IOException {
+		req.getRequestDispatcher(values.getForwardUrl()).forward(req, resp);
+	}
+
+	/**
+	 * Handle the different actions. If not specified, the default action is to
+	 * show the intro screen.
+	 */
+	private ResponseValues buildTheResponse(VitroRequest vreq) {
 		String action = vreq.getParameter(PARAMETER_ACTION);
+
 		try {
 			Individual entity = validateEntityUri(vreq);
-
 			if (ACTION_UPLOAD.equals(action)) {
-				return doUploadImage(vreq, body, config, entity);
+				return doUploadImage(vreq, entity);
 			} else if (ACTION_SAVE.equals(action)) {
-				return doCreateThumbnail(vreq, body, config, entity);
+				return doCreateThumbnail(vreq, entity);
 			} else if (ACTION_DELETE.equals(action)) {
-				return doDeleteImage(body, config, entity);
+				return doDeleteImage(entity);
 			} else {
-				return doIntroScreen(body, config, entity);
+				return doIntroScreen(entity);
 			}
 		} catch (UserMistakeException e) {
-			return showAddImagePageWithError(body, config, null, e.getMessage());
+			// Can't find the entity? Complain.
+			return showAddImagePageWithError(null, e.getMessage());
 		} catch (Exception e) {
 			// We weren't expecting this - dump as much info as possible.
 			log.error(e, e);
-			return doError(e.toString(), body, config);
+			return doError(e.toString());
 		}
 	}
 
 	/**
 	 * Show the first screen in the upload process: Add or Replace.
 	 */
-	private String doIntroScreen(Map<String, Object> body,
-			Configuration config, Individual entity) {
-
+	private ResponseValues doIntroScreen(Individual entity) {
 		String thumbUrl = getThumbnailUrl(entity);
-
 		if (thumbUrl == null) {
-			return showAddImagePage(body, config, entity);
+			return showAddImagePage(entity);
 		} else {
-			return showReplaceImagePage(body, config, entity, thumbUrl);
+			return showReplaceImagePage(entity, thumbUrl);
 		}
 	}
 
@@ -182,8 +229,7 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	 * The user has selected their main image file. Remove any previous main
 	 * image (and thumbnail), and attach the new main image.
 	 */
-	private String doUploadImage(VitroRequest vreq, Map<String, Object> body,
-			Configuration config, Individual entity) {
+	private ResponseValues doUploadImage(VitroRequest vreq, Individual entity) {
 		ImageUploadHelper helper = new ImageUploadHelper(fileStorage,
 				getWebappDaoFactory());
 
@@ -195,10 +241,9 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 			String thumbUrl = getThumbnailUrl(entity);
 			String message = e.getMessage();
 			if (thumbUrl == null) {
-				return showAddImagePageWithError(body, config, entity, message);
+				return showAddImagePageWithError(entity, message);
 			} else {
-				return showReplaceImagePageWithError(body, config, entity,
-						thumbUrl, message);
+				return showReplaceImagePageWithError(entity, thumbUrl, message);
 			}
 		}
 
@@ -212,15 +257,15 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 				entityUri);
 
 		// Go to the cropping page.
-		return showCropImagePage(body, config, entity, getMainImageUrl(entity));
+		return showCropImagePage(entity, getMainImageUrl(entity));
 	}
 
 	/**
 	 * The user has specified how to crop the thumbnail. Crop it and attach it
 	 * to the main image.
 	 */
-	private String doCreateThumbnail(VitroRequest vreq,
-			Map<String, Object> body, Configuration config, Individual entity) {
+	private ResponseValues doCreateThumbnail(VitroRequest vreq,
+			Individual entity) {
 		ImageUploadHelper helper = new ImageUploadHelper(fileStorage,
 				getWebappDaoFactory());
 
@@ -230,20 +275,19 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 		helper.removeExistingThumbnail(entity);
 		helper.generateThumbnailAndStore(entity, crop);
 
-		return showIndividualDisplayPage(body, config, entity);
+		return showIndividualDisplayPage(entity);
 	}
 
 	/**
 	 * Delete the main image and the thumbnail from the individual.
 	 */
-	private String doDeleteImage(Map<String, Object> body,
-			Configuration config, Individual entity) {
+	private ResponseValues doDeleteImage(Individual entity) {
 		ImageUploadHelper helper = new ImageUploadHelper(fileStorage,
 				getWebappDaoFactory());
 
 		helper.removeExistingImage(entity);
 
-		return showIndividualDisplayPage(body, config, entity);
+		return showIndividualDisplayPage(entity);
 	}
 
 	/**
@@ -251,11 +295,11 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	 * 
 	 * @message The text of the error message.
 	 */
-	private String doError(String message, Map<String, Object> body,
-			Configuration config) {
-		String bodyTemplate = "errorMessage.ftl";
-		body.put("errorMessage", message);
-		return mergeBodyToTemplate(bodyTemplate, body, config);
+	private TemplateResponseValues doError(String message) {
+		TemplateResponseValues rv = new TemplateResponseValues(
+				"errorMessage.ftl");
+		rv.put("errorMessage", message);
+		return rv;
 	}
 
 	/**
@@ -341,70 +385,72 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	 * @param entity
 	 *            if this is null, then all URLs lead to the welcome page.
 	 */
-	private String showAddImagePage(Map<String, Object> body,
-			Configuration config, Individual entity) {
+	private TemplateResponseValues showAddImagePage(Individual entity) {
 		String formAction = (entity == null) ? "/" : formAction(
 				entity.getURI(), ACTION_UPLOAD);
 		String cancelUrl = (entity == null) ? "/" : displayPageUrl(entity
 				.getURI());
 
-		body.put(BODY_THUMBNAIL_URL, UrlBuilder.getUrl(DUMMY_THUMBNAIL_URL));
-		body.put(BODY_FORM_ACTION, formAction);
-		body.put(BODY_CANCEL_URL, cancelUrl);
-		body.put(BODY_TITLE, "Upload image" + forName(entity));
-		return mergeBodyToTemplate(TEMPLATE_NEW, body, config);
+		TemplateResponseValues rv = new TemplateResponseValues(TEMPLATE_NEW);
+		rv.put(BODY_THUMBNAIL_URL, UrlBuilder.getUrl(DUMMY_THUMBNAIL_URL));
+		rv.put(BODY_FORM_ACTION, formAction);
+		rv.put(BODY_CANCEL_URL, cancelUrl);
+		rv.put(BODY_TITLE, "Upload image" + forName(entity));
+		return rv;
 	}
 
 	/**
 	 * The individual has no image, but the user did something wrong.
 	 */
-	private String showAddImagePageWithError(Map<String, Object> body,
-			Configuration config, Individual entity, String message) {
-		body.put(BODY_ERROR_MESSAGE, message);
-		return showAddImagePage(body, config, entity);
+	private TemplateResponseValues showAddImagePageWithError(Individual entity,
+			String message) {
+		TemplateResponseValues rv = showAddImagePage(entity);
+		rv.put(BODY_ERROR_MESSAGE, message);
+		return rv;
 	}
 
 	/**
 	 * The individual has an image - go to the Replace Image page.
 	 */
-	private String showReplaceImagePage(Map<String, Object> body,
-			Configuration config, Individual entity, String thumbUrl) {
-		body.put(BODY_THUMBNAIL_URL, UrlBuilder.getUrl(thumbUrl));
-		body.put(BODY_DELETE_URL, formAction(entity.getURI(), ACTION_DELETE));
-		body.put(BODY_FORM_ACTION, formAction(entity.getURI(), ACTION_UPLOAD));
-		body.put(BODY_CANCEL_URL, displayPageUrl(entity.getURI()));
-		body.put(BODY_TITLE, "Replace image" + forName(entity));
-		return mergeBodyToTemplate(TEMPLATE_REPLACE, body, config);
+	private TemplateResponseValues showReplaceImagePage(Individual entity,
+			String thumbUrl) {
+		TemplateResponseValues rv = new TemplateResponseValues(TEMPLATE_REPLACE);
+		rv.put(BODY_THUMBNAIL_URL, UrlBuilder.getUrl(thumbUrl));
+		rv.put(BODY_DELETE_URL, formAction(entity.getURI(), ACTION_DELETE));
+		rv.put(BODY_FORM_ACTION, formAction(entity.getURI(), ACTION_UPLOAD));
+		rv.put(BODY_CANCEL_URL, displayPageUrl(entity.getURI()));
+		rv.put(BODY_TITLE, "Replace image" + forName(entity));
+		return rv;
 	}
 
 	/**
 	 * The individual has an image, but the user did something wrong.
 	 */
-	private String showReplaceImagePageWithError(Map<String, Object> body,
-			Configuration config, Individual entity, String thumbUrl,
-			String message) {
-		body.put(BODY_ERROR_MESSAGE, message);
-		return showReplaceImagePage(body, config, entity, thumbUrl);
+	private TemplateResponseValues showReplaceImagePageWithError(
+			Individual entity, String thumbUrl, String message) {
+		TemplateResponseValues rv = showReplaceImagePage(entity, thumbUrl);
+		rv.put(BODY_ERROR_MESSAGE, message);
+		return rv;
 	}
 
 	/**
 	 * We got their main image - go to the Crop Image page.
 	 */
-	private String showCropImagePage(Map<String, Object> body,
-			Configuration config, Individual entity, String imageUrl) {
-		body.put(BODY_MAIN_IMAGE_URL, UrlBuilder.getUrl(imageUrl));
-		body.put(BODY_FORM_ACTION, formAction(entity.getURI(), ACTION_SAVE));
-		body.put(BODY_CANCEL_URL, displayPageUrl(entity.getURI()));
-		body.put(BODY_TITLE, "Crop Photo" + forName(entity));
-		return mergeBodyToTemplate(TEMPLATE_CROP, body, config);
+	private TemplateResponseValues showCropImagePage(Individual entity,
+			String imageUrl) {
+		TemplateResponseValues rv = new TemplateResponseValues(TEMPLATE_CROP);
+		rv.put(BODY_MAIN_IMAGE_URL, UrlBuilder.getUrl(imageUrl));
+		rv.put(BODY_FORM_ACTION, formAction(entity.getURI(), ACTION_SAVE));
+		rv.put(BODY_CANCEL_URL, displayPageUrl(entity.getURI()));
+		rv.put(BODY_TITLE, "Crop Photo" + forName(entity));
+		return rv;
 	}
 
 	/**
 	 * All done - go to the individual display page.
 	 */
-	private String showIndividualDisplayPage(Map<String, Object> body,
-			Configuration config, Individual entity) {
-		return mergeBodyToTemplate(TEMPLATE_BOGUS, body, config);
+	private ForwardResponseValues showIndividualDisplayPage(Individual entity) {
+		return new ForwardResponseValues(displayPageUrl(entity.getURI()));
 	}
 
 	/**
@@ -413,15 +459,15 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	 */
 	private String displayPageUrl(String entityUri) {
 		if (DEFAULT_NAMESPACE == null) {
-			return UrlBuilder.getUrl("");
+			return "/";
 		} else if (!entityUri.startsWith(DEFAULT_NAMESPACE)) {
-			return UrlBuilder.getUrl("");
+			return "/";
 		} else {
 			String tail = entityUri.substring(DEFAULT_NAMESPACE.length());
 			if (!tail.startsWith("/")) {
 				tail = "/" + tail;
 			}
-			return UrlBuilder.getUrl("display" + tail);
+			return "display" + tail;
 		}
 	}
 
@@ -492,8 +538,8 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	/**
 	 * For debugging, dump all sorts of information about the request.
 	 * 
-	 * WARNING: if this request represents a Multi-part request which has not
-	 * yet been parsed, just reading these parameters will consume them.
+	 * WARNING: if "req" represents a Multi-part request which has not
+	 * yet been parsed, then reading these parameters will consume them.
 	 */
 	@SuppressWarnings("unchecked")
 	private void dumpRequestDetails(HttpServletRequest req) {
@@ -512,5 +558,79 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 			String valueOneLine = valueString.replace("\n", " | ");
 			log.trace("Attribute '" + key + "'=" + valueOneLine);
 		}
+	}
+
+	private static interface ResponseValues {
+		boolean isForwardResponse();
+
+		String getTemplateName();
+
+		Map<? extends String, ? extends Object> getBodyMap();
+
+		String getForwardUrl();
+	}
+
+	private static class TemplateResponseValues implements ResponseValues {
+		private final String templateName;
+		private final Map<String, Object> bodyMap = new HashMap<String, Object>();
+
+		public TemplateResponseValues(String templateName) {
+			this.templateName = templateName;
+		}
+
+		public void put(String key, Object value) {
+			this.bodyMap.put(key, value);
+		}
+
+		@Override
+		public boolean isForwardResponse() {
+			return false;
+		}
+
+		@Override
+		public String getForwardUrl() {
+			throw new IllegalStateException(
+					"This is not a forwarding response.");
+		}
+
+		@Override
+		public Map<? extends String, ? extends Object> getBodyMap() {
+			return Collections.unmodifiableMap(this.bodyMap);
+		}
+
+		@Override
+		public String getTemplateName() {
+			return this.templateName;
+		}
+
+	}
+
+	private static class ForwardResponseValues implements ResponseValues {
+		private final String forwardUrl;
+
+		public ForwardResponseValues(String forwardUrl) {
+			this.forwardUrl = forwardUrl;
+		}
+
+		@Override
+		public boolean isForwardResponse() {
+			return true;
+		}
+
+		@Override
+		public String getForwardUrl() {
+			return this.forwardUrl;
+		}
+
+		@Override
+		public Map<? extends String, ? extends Object> getBodyMap() {
+			throw new IllegalStateException("This is not a template response.");
+		}
+
+		@Override
+		public String getTemplateName() {
+			throw new IllegalStateException("This is not a template response.");
+		}
+
 	}
 }

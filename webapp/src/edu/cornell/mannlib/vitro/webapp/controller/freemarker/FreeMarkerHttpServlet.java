@@ -50,19 +50,21 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(FreeMarkerHttpServlet.class.getName());
     private static final int FILTER_SECURITY_LEVEL = LoginFormBean.EDITOR;
+
+	/**
+	 * If a subclass doesn't want to call <code>super.doGet(req, resp)</code>,
+	 * it can call this method instead, to run
+	 * <code>VitroHttpServlet.doGet(req, resp)</code>.
+	 */
+	protected final void vitroHttpServletDoGet(HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException {
+		super.doGet(request, response);
+	}
     
     public void doGet( HttpServletRequest request, HttpServletResponse response )
 		throws IOException, ServletException {
   
-        try {
-            super.doGet(request,response);   
-        } catch (ServletException e) {
-            log.error("ServletException calling VitroHttpRequest.doGet()");
-            e.printStackTrace();
-        } catch (IOException e) {
-            log.error("IOException calling VitroHttpRequest.doGet()");
-            e.printStackTrace();
-        } 
+        super.doGet(request,response);   
         
     	try {
 	        VitroRequest vreq = new VitroRequest(request);
@@ -89,9 +91,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 	        writePage(root, config, response);
        
 	    } catch (Throwable e) {
-	        log.error("FreeMarkerHttpServlet could not forward to view.");
-	        log.error(e.getMessage());
-	        log.error(e.getStackTrace());
+	        log.error("FreeMarkerHttpServlet could not forward to view.", e);
 	    }
 	}
 
@@ -422,8 +422,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
             PrintWriter out = response.getWriter();
             out.print(sw);     
         } catch (IOException e) {
-            log.error("FreeMarkerHttpServlet cannot write output");
-            e.printStackTrace();
+            log.error("FreeMarkerHttpServlet cannot write output", e);
         }            
     }
     
