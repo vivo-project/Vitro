@@ -30,7 +30,6 @@ function getWellFormedURLs(given_uri, type) {
 			dataType: "text",
 			async: false,
 			success:function(data){
-			console.log("PROF - " + data);
 		}
 		}).responseText;
 
@@ -44,32 +43,122 @@ function getWellFormedURLs(given_uri, type) {
 			dataType: "text",
 			async: false,
 			success:function(data){
-			console.log("IMAGE - " + data);
 		}
 		}).responseText;
 
-		 return contextPath + finalURL;
-//		return finalURL;
+		return finalURL;
+
+	} else if (type == "profile_info") {
+
+		var profileInfoJSON = $.ajax({
+			url: contextPath + "/admin/visQuery",
+			data: ({vis: "utilities", vis_mode: "PROFILE_INFO", uri: given_uri}),
+			dataType: "json",
+			async: false,
+			success:function(data){
+		}
+		}).responseText;
+
+		return profileInfoJSON;
 
 	}
-
+	
 	// });
-
 }
 
 $.fn.image = function(src, successFunc, failureFunc){
 	return this.each(function(){ 
-		var i = new Image();
-		i.src = src;
-		i.onerror = failureFunc;
-		i.onload = successFunc;
-
-		// console.dir(i);
-		// this.appendChild(i);
-
-		return i;
+		var profileImage = new Image();
+		profileImage.src = src;
+		profileImage.width = 150;
+		profileImage.onerror = failureFunc;
+		profileImage.onload = successFunc;
+		
+		
+		return profileImage;
 	});
 }
+
+function setProfileImage(imageContainerID, rawPath, contextPath) {
+	
+	if (imageContainerID == "") {
+		return;
+	}
+	
+	
+	var imageLink =  contextPath + rawPath;
+	
+	var imageContainer = $("#" + imageContainerID);
+	imageContainer.image(imageLink, 
+			function(){
+		imageContainer.empty().append(this); 
+	},
+	function(){
+		 //For performing any action on failure to
+		 //find the image.
+		imageContainer.empty();
+	}
+	);
+	
+}
+
+function setProfileMoniker(monikerContainerID, moniker) {
+	
+	if (monikerContainerID == "") {
+		return;
+	}
+	
+	$("#" + monikerContainerID).empty().text(moniker);
+	
+}
+
+function setProfileName(nameContainerID, name) {
+	
+	if (nameContainerID == "") {
+		return;
+	}
+	
+	$("#" + nameContainerID).empty().text(name);
+	
+	
+}
+
+function processProfileInformation(nameContainerID,
+								   monikerContainerID,
+								   imageContainerID,
+								   profileInfoJSON) {
+	
+	
+	var name, imageRawPath, imageContextPath, moniker;
+	
+	$.each(profileInfoJSON, function(key, set){
+		
+		 if (key.search(/imageThumb/i) > -1) {
+			 
+			 imageRawPath = set[0];
+			 
+		 } else if (key.search(/imageContextPath/i) > -1) {
+			 
+			 imageContextPath = set[0];
+			 
+		 } else if (key.search(/moniker/i) > -1) {
+			 
+			 moniker = set[0];
+			 
+		 } else if (key.search(/label/i) > -1) {
+			 
+			 name = set[0];
+			 
+		 }
+		 
+      });
+	
+	setProfileName(nameContainerID, name);
+	setProfileMoniker(monikerContainerID, moniker);
+	setProfileImage(imageContainerID, imageRawPath, imageContextPath);
+	
+}
+
 
 
 function nodeClickedJS(obj){
@@ -84,28 +173,17 @@ function nodeClickedJS(obj){
 	if(obj[7]){
 		$("#profileUrl").attr("href", getWellFormedURLs(obj[7], "profile"));
 		$("#coAuthorshipVisUrl").attr("href", getWellFormedURLs(obj[7], "coauthorship"));
-		var imageLink = getWellFormedURLs(obj[7], "image");
+		processProfileInformation("", 
+								  "profileMoniker",
+								  "profileImage",
+								  jQuery.parseJSON(getWellFormedURLs(obj[7], "profile_info")));
 
 	} else{
 		$("#profileUrl").attr("href","#");
 		$("#coAuthorshipVisUrl").attr("href","#");
 	}
 
-	var imageContainer = $("#profileImage");
-	imageContainer.image(imageLink, 
-			function(){
-		imageContainer.append(this); 
-	},
-	function(){
-		/*
-		 * For performing any action on failure to
-		 * find the image.
-		 */
-	}
-	);
-
-
-	$("#coAuthorName").empty().append(obj[name]);	
+	$("#coAuthorName").empty().append(obj[0]);	
 
 	$("#coAuthors").empty().append(obj[5]);	
 	$("#firstPublication").empty().append((obj[3])?obj[3]+" First Publication":"");
@@ -115,7 +193,27 @@ function nodeClickedJS(obj){
 
 }
 
-function renderVisualization() {
+function renderSparklineVisualization(visualizationURL) {
+	
+	 $(document).ready(function() {
+		 
+	//$("#ego_sparkline").empty().html('<img src="${loadingImageLink}" />');
+
+	   $.ajax({
+		   url: visualizationURL,
+		   dataType: "html",
+		   success:function(data){
+		     $("#ego_sparkline").html(data);
+
+		   }
+		 });
+	   
+	   
+	 });
+
+}
+
+function renderCoAuthorshipVisualization() {
 
 	//Version check for the Flash Player that has the ability to start Player
 	//Product Install (6.0r65)

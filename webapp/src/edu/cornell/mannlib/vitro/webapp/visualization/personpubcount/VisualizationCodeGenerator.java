@@ -5,6 +5,7 @@ import java.net.URLEncoder;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -35,23 +36,73 @@ public class VisualizationCodeGenerator {
 	private static final String SHORT_SPARKLINE_MODE_URL_HANDLE = "short";
 	
 	private static final String FULL_SPARKLINE_MODE_URL_HANDLE = "full";
-
+	
 	private Map<String, Integer> yearToPublicationCount;
 
 	private Log log;
 
-	public VisualizationCodeGenerator(Map<String, Integer> yearToPublicationCount, Log log) {
+	private VisVOContainer valueObjectContainer;
+
+	public VisualizationCodeGenerator(String requestURI, 
+									  String individualURIParam, 
+									  String visMode, 
+									  String visContainer, 
+									  List<BiboDocument> authorDocuments, 
+									  Map<String, Integer> yearToPublicationCount, 
+									  VisVOContainer valueObjectContainer, 
+									  Log log) {
+		
 		this.yearToPublicationCount = yearToPublicationCount;
+		this.valueObjectContainer = valueObjectContainer;
 		this.log = log;
+		
+		generateVisualizationCode(requestURI, 
+				  individualURIParam, 
+				  visMode, 
+				  visContainer, 
+				  authorDocuments);
+		
+		
 	}
-	public String getMainVisualizationCode(List<BiboDocument> authorDocuments,
-										   Set<String> publishedYears, 
+	
+	private void generateVisualizationCode(String requestURI,
+										   String individualURIParam, 
 										   String visMode, 
-										   String providedVisContainerID) {
+										   String visContainer,
+										   List<BiboDocument> authorDocuments) {
+		
+    	valueObjectContainer.setSparklineContent(getMainVisualizationCode(authorDocuments, 
+    																	  visMode, 
+    																	  visContainer));
+    	
+    	
+    	valueObjectContainer.setSparklineContext(getVisualizationContextCode(requestURI, 
+    																		 individualURIParam, 
+    																		 visMode));
+    	
+	}
+
+//	public VisVOContainer getValueObjectContainer() {
+//		
+//		
+//		
+//		return valueObjectContainer;
+//	}
+	
+	private String getMainVisualizationCode(List<BiboDocument> authorDocuments,
+										    String visMode, 
+										    String providedVisContainerID) {
 
 		int numOfYearsToBeRendered = 0;
 		int currentYear = Calendar.getInstance().get(Calendar.YEAR);
 		int shortSparkMinYear = currentYear - 10 + 1;
+		
+    	/*
+    	 * This is required because when deciding the range of years over which the vis
+    	 * was rendered we dont want to be influenced by the "DEFAULT_PUBLICATION_YEAR".
+    	 * */
+		Set<String> publishedYears = new HashSet(yearToPublicationCount.keySet());
+    	publishedYears.remove(VOConstants.DEFAULT_PUBLICATION_YEAR);
 		
 		/*
 		 * We are setting the default value of minPublishedYear to be 10 years before 
@@ -158,6 +209,14 @@ public class VisualizationCodeGenerator {
 		
 		
 		/*
+		 * By default these represents the range of the rendered sparks. Only in case of
+		 * "short" sparkline mode we will set the Earliest RenderedPublication year to
+		 * "currentYear - 10". 
+		 * */
+		valueObjectContainer.setEarliestRenderedPublicationYear(minPublishedYear);
+		valueObjectContainer.setLatestRenderedPublicationYear(currentYear);
+		
+		/*
 		 * The Full Sparkline will be rendered by default. Only if the url has specific mention of
 		 * SHORT_SPARKLINE_MODE_URL_HANDLE then we render the short sparkline and not otherwise.
 		 * */
@@ -169,6 +228,8 @@ public class VisualizationCodeGenerator {
 		 * They both side-effect "visualizationCode" 
 		 * */
 		if (SHORT_SPARKLINE_MODE_URL_HANDLE.equalsIgnoreCase(visMode)) {
+			
+			valueObjectContainer.setEarliestRenderedPublicationYear(shortSparkMinYear);
 			generateShortSparklineVisualizationContent(currentYear,
 													   shortSparkMinYear, 
 													   visContainerID, 
@@ -182,6 +243,9 @@ public class VisualizationCodeGenerator {
 													  renderedFullSparks,
 													  sparklineDisplayOptions);
 		}
+		
+		
+		
 		
 		
 
@@ -231,6 +295,8 @@ public class VisualizationCodeGenerator {
 								 		"renderedShortSparks += data.getValue(value, 1);" +
 								 "});\n");
 
+		
+		
 		/*
 		 * Generate the text introducing the vis.
 		 * */
@@ -303,7 +369,7 @@ public class VisualizationCodeGenerator {
 								"</script>\n";
 	}
 
-	public String getVisualizationContextCode(String uri, String individualURI, String visMode) {
+	private String getVisualizationContextCode(String uri, String individualURI, String visMode) {
 
 		String visualizationContextCode = "";
 		if (SHORT_SPARKLINE_MODE_URL_HANDLE.equalsIgnoreCase(visMode)) {
@@ -333,27 +399,33 @@ public class VisualizationCodeGenerator {
 			
 			String downloadFileCode;
 			if (yearToPublicationCount.size() > 0) {
-				downloadFileCode = "Download data as <a href='" + uri.toString() + "?" + 
-												VisualizationFrameworkConstants.INDIVIDUAL_URI_URL_HANDLE + 
-												 "=" + URLEncoder.encode(individualURI, 
-														 				 VisualizationController.URL_ENCODING_SCHEME).toString() +
-												 "&" +
-												 VisualizationFrameworkConstants.VIS_TYPE_URL_HANDLE +
-												 "=" + URLEncoder.encode(VisualizationController
-														 						.PERSON_PUBLICATION_COUNT_VIS_URL_VALUE, 
-														 				 VisualizationController.URL_ENCODING_SCHEME).toString() +
-												 "&" +
-												 VisualizationFrameworkConstants.RENDER_MODE_URL_HANDLE + 
-												 "=" + URLEncoder.encode(VisualizationFrameworkConstants.DATA_RENDER_MODE_URL_VALUE, 
-										 				 				 VisualizationController.URL_ENCODING_SCHEME).toString() +
-												 "'>.csv</a> file.<br />";
+				
+				
+				String downloadURL = uri.toString() 
+									 + "?" + VisualizationFrameworkConstants.INDIVIDUAL_URI_URL_HANDLE 
+									 + "=" + URLEncoder.encode(individualURI, 
+											 				   VisualizationController.URL_ENCODING_SCHEME).toString() 
+									 + "&" + VisualizationFrameworkConstants.VIS_TYPE_URL_HANDLE 
+									 + "=" + URLEncoder.encode(VisualizationController
+											 						.PERSON_PUBLICATION_COUNT_VIS_URL_VALUE, 
+											 				   VisualizationController.URL_ENCODING_SCHEME).toString() 
+									 + "&" + VisualizationFrameworkConstants.RENDER_MODE_URL_HANDLE 
+									 + "=" + URLEncoder.encode(VisualizationFrameworkConstants.DATA_RENDER_MODE_URL_VALUE, 
+							 				 				   VisualizationController.URL_ENCODING_SCHEME).toString();
+				downloadFileCode = "Download data as <a href='" + downloadURL + "'>.csv</a> file.<br />";
+				
+				valueObjectContainer.setDownloadDataLink(downloadURL);
 			} else {
 				downloadFileCode = "No data available to export.<br />";
-				
+				valueObjectContainer.setDownloadDataLink("#");
 			}
 			
-			divContextCode.append("<p>" + generateDataTable() +
+			String tableCode = generateDataTable();
+			
+			divContextCode.append("<p>" + tableCode +
 								  downloadFileCode + "</p>");
+			
+			valueObjectContainer.setTable(tableCode);
 
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
@@ -373,22 +445,27 @@ public class VisualizationCodeGenerator {
 		
 		String fullTimelineLink;
 		if (yearToPublicationCount.size() > 0) {
-			fullTimelineLink = "<a href='" + uri.toString() + "?" + 
-							VisualizationFrameworkConstants.INDIVIDUAL_URI_URL_HANDLE + 
-							 "=" + URLEncoder.encode(individualURI, 
-									 				 VisualizationController.URL_ENCODING_SCHEME).toString() +
-							 "&" +
-							 "vis" +
-							 "=" + URLEncoder.encode(VisualizationController
-									 						.PERSON_PUBLICATION_COUNT_VIS_URL_VALUE, 
-									 				 VisualizationController.URL_ENCODING_SCHEME).toString() +
-							 "&" +
-							 VisualizationFrameworkConstants.RENDER_MODE_URL_HANDLE + 
-							 "=" + URLEncoder.encode(VisualizationFrameworkConstants.STANDALONE_RENDER_MODE_URL_VALUE, 
-					 				 				 VisualizationController.URL_ENCODING_SCHEME).toString() +
-							 "'>View full timeline and network.</a><br />";
+			String fullTimelineNetworkURL = uri.toString() + "?" + 
+										VisualizationFrameworkConstants.INDIVIDUAL_URI_URL_HANDLE + 
+										 "=" + URLEncoder.encode(individualURI, 
+												 				 VisualizationController.URL_ENCODING_SCHEME).toString() +
+										 "&" +
+										 "vis" +
+										 "=" + URLEncoder.encode(VisualizationController
+												 						.PERSON_PUBLICATION_COUNT_VIS_URL_VALUE, 
+												 				 VisualizationController.URL_ENCODING_SCHEME).toString() +
+										 "&" +
+										 VisualizationFrameworkConstants.RENDER_MODE_URL_HANDLE + 
+										 "=" + URLEncoder.encode(VisualizationFrameworkConstants.STANDALONE_RENDER_MODE_URL_VALUE, 
+								 				 				 VisualizationController.URL_ENCODING_SCHEME).toString();
+			fullTimelineLink = "<a href='" + fullTimelineNetworkURL + "'>View full timeline and network.</a><br />";
+			
+			valueObjectContainer.setFullTimelineNetworkLink(fullTimelineNetworkURL);
+			
 		} else {
+			
 			fullTimelineLink = "No data available to render full timeline.<br />";
+			valueObjectContainer.setFullTimelineNetworkLink("#");
 		
 		}
 		

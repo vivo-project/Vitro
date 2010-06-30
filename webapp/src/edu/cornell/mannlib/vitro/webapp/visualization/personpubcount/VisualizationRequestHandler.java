@@ -109,26 +109,28 @@ public class VisualizationRequestHandler {
 	    	 * Computations required to generate HTML for the sparklines & related context.
 	    	 * */
 	    	
-	    	/*
-	    	 * This is required because when deciding the range of years over which the vis
-	    	 * was rendered we dont want to be influenced by the "DEFAULT_PUBLICATION_YEAR".
-	    	 * */
-	    	Set<String> publishedYears = new HashSet(yearToPublicationCount.keySet());
-	    	publishedYears.remove(VOConstants.DEFAULT_PUBLICATION_YEAR);
+	    	VisVOContainer valueObjectContainer = new VisVOContainer();
 
 	    	VisualizationCodeGenerator visualizationCodeGenerator = 
-	    		new VisualizationCodeGenerator(yearToPublicationCount, log);
+	    		new VisualizationCodeGenerator(vitroRequest.getRequestURI(),
+	    									   individualURIParam,
+	    									   visMode,
+	    									   visContainer,
+	    									   authorDocuments,
+	    									   yearToPublicationCount, 
+	    									   valueObjectContainer, 
+	    									   log);
 	    	
-			String visContentCode = visualizationCodeGenerator
-										.getMainVisualizationCode(authorDocuments,
-															  	  publishedYears,
-															  	  visMode,
-															  	  visContainer);
+	    	
+			String visContentCode = valueObjectContainer.getSparklineContent();
 
-			String visContextCode = visualizationCodeGenerator
-										.getVisualizationContextCode(vitroRequest.getRequestURI(), 
-																	 individualURIParam,
-																	 visMode);
+			String visContextCode = valueObjectContainer.getSparklineContext();
+			
+			System.out.println("ft url - " + valueObjectContainer.getFullTimelineNetworkLink());
+			System.out.println("dnld fl - " + valueObjectContainer.getDownloadDataLink());
+			System.out.println("table - " + valueObjectContainer.getTable());
+			System.out.println("min - " + valueObjectContainer.getEarliestRenderedPublicationYear());
+			System.out.println("max - " + valueObjectContainer.getLatestRenderedPublicationYear());
 
 
 	    	/*
