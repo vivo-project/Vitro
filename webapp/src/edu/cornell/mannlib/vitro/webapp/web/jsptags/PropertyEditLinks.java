@@ -685,8 +685,8 @@ public class PropertyEditLinks extends TagSupport{
 	private LinkStruct getImageLink(String subjectUri, String contextPath,
 			String action, String mouseOverText, String text) {
 		LinkStruct ls = new LinkStruct();
-		String url = makeRelativeHref(contextPath + "uploadimages.jsp",
-				"entityUri", subjectUri);
+		String url = makeRelativeHref(contextPath + "uploadImages",
+				"entityUri", subjectUri, "action", action);
 		ls.setHref(url);
 		ls.setType(action);
 		ls.setMouseoverText(mouseOverText);

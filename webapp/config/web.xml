@@ -362,15 +362,11 @@
 
   <servlet>
     <servlet-name>ImageUploadController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.ImageUploadController</servlet-class>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadController</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>ImageUploadController</servlet-name>
-    <url-pattern>/uploadimages</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>ImageUploadController</servlet-name>
-    <url-pattern>/uploadimages.jsp</url-pattern>
+    <url-pattern>/uploadImages</url-pattern>
   </servlet-mapping>
 
   <servlet>
@@ -1088,11 +1084,6 @@
   </servlet>
 
   <servlet>
-    <servlet-name>uploadImages</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.UploadImagesServlet</servlet-class>
-  </servlet>
-  
-  <servlet>
     <servlet-name>serveFiles</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.filestorage.serving.FileServingServlet</servlet-class>
   </servlet>
@@ -1197,10 +1188,6 @@
   <servlet-mapping>
     <servlet-name>coauthors</servlet-name>
     <url-pattern>/coauthors</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>uploadImages</servlet-name>
-    <url-pattern>/uploadImages</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>generic_create</servlet-name>
