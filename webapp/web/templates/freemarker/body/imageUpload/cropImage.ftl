@@ -20,12 +20,6 @@ ${stylesheets.addFromTheme("/jquery.Jcrop.css")}
                      <p class="photoCroppingNote">To make adjustments, you can drag around and resize the blue square to the right. When you are happy with your photo click the "Save Photo" button. </p>
                      <form action="${formAction}"  method="post">
                      
-                     <!-- Totally bogus -->
-                     <input type="hidden" name="x" value="75">
-                     <input type="hidden" name="y" value="50">
-                     <input type="hidden" name="h" value="150">
-                     <input type="hidden" name="w" value="150">
-                     
                      <input type="submit" value="Save photo">
                      or <a href="${cancelUrl}">Cancel</a>
                      </form>
