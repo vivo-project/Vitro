@@ -34,6 +34,7 @@ import edu.cornell.mannlib.vitro.webapp.visualization.constants.VisConstants;
 import edu.cornell.mannlib.vitro.webapp.visualization.exceptions.MalformedQueryParametersException;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.BiboDocument;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.Individual;
+import edu.cornell.mannlib.vitro.webapp.visualization.visutils.UtilityFunctions;
 
 public class VisualizationRequestHandler {
 	
@@ -147,7 +148,7 @@ public class VisualizationRequestHandler {
 
 			} else {
 		    	prepareVisualizationQueryStandaloneResponse(request, response, vitroRequest,
-		    			visContentCode, visContextCode);
+		    			visContentCode, visContextCode, valueObjectContainer);
 
 		    	requestDispatcher = request.getRequestDispatcher(Controllers.BASIC_JSP);
 			}
@@ -193,7 +194,7 @@ public class VisualizationRequestHandler {
 			authorName = "";
 		}
 		
-		String outputFileName = slugify(authorName) + "report" + ".pdf";
+		String outputFileName = UtilityFunctions.slugify(authorName) + "report" + ".pdf";
 		
 		response.setContentType("application/pdf");
 		response.setHeader("Content-Disposition", "attachment;filename=" + outputFileName);
@@ -249,7 +250,7 @@ public class VisualizationRequestHandler {
 		authorName = "";
 		}
 		
-		String outputFileName = slugify(authorName) + "pub-count-sparkline" + ".csv";
+		String outputFileName = UtilityFunctions.slugify(authorName) + "pub-count-sparkline" + ".csv";
 		
 		response.setContentType("application/octet-stream");
 		response.setHeader("Content-Disposition","attachment;filename=" + outputFileName);
@@ -272,17 +273,6 @@ public class VisualizationRequestHandler {
 		}
 	}
 	
-	/**
-	 * Currently the approach for slugifying filenames is naive. In future if there is need, 
-	 * we can write more sophisticated method.
-	 * @param textToBeSlugified
-	 * @return
-	 */
-	private String slugify(String textToBeSlugified) {
-		return textToBeSlugified.toLowerCase().replaceAll("[^a-zA-Z0-9-]", "-")
-								.substring(0, VisConstants.MAX_NAME_TEXT_LENGTH);
-	}
-
 	private void generateCsvFileBuffer(Map<String, Integer> yearToPublicationCount, 
 											   PrintWriter responseWriter) {
 		
@@ -304,12 +294,13 @@ public class VisualizationRequestHandler {
 
 	private void prepareVisualizationQueryStandaloneResponse(HttpServletRequest request,
 			HttpServletResponse response, VitroRequest vreq,
-			String visContentCode, String visContextCode) {
+			String visContentCode, String visContextCode, VisVOContainer valueObjectContainer) {
 
         Portal portal = vreq.getPortal();
 
         request.setAttribute("visContentCode", visContentCode);
         request.setAttribute("visContextCode", visContextCode);
+        request.setAttribute("sparklineVO", valueObjectContainer);
 
         request.setAttribute("bodyJsp", "/templates/visualization/publication_count.jsp");
         request.setAttribute("portalBean", portal);

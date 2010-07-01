@@ -164,7 +164,9 @@ public class VisualizationCodeGenerator {
 												"position:absolute;" +
 										"}" +
 										".sparkline_range {" +
-												"color:#7BS69E;" +
+												"color:#7BA69E;" +
+												"font-size:0.9em;" +
+												"font-style:italic;" +
 										"}" +
 								"</style>\n");
 
@@ -360,7 +362,7 @@ public class VisualizationCodeGenerator {
 												 "+ " + renderedFullSparks + "" +
 												 "+ ' papers with year from '" +
 												 "+ ' " + totalPublications + " '" +
-												 "+ ' total'" +
+												 "+ ' total " +
 												"<span class=\"sparkline_range\">" +
 												"(" + minPubYearConsidered + " - " + currentYear + ")" +
 												"</span>'" +

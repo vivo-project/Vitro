@@ -4,9 +4,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import edu.cornell.mannlib.vitro.webapp.visualization.constants.VisConstants;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.BiboDocument;
 
-public class VOUtils {
+public class UtilityFunctions {
 	
 	public static Map<String, Integer> getYearToPublicationCount(
 			Set<BiboDocument> authorDocuments) {
@@ -50,6 +51,17 @@ public class VOUtils {
     	}
 
 		return yearToPublicationCount;
+	}
+	
+	/**
+	 * Currently the approach for slugifying filenames is naive. In future if there is need, 
+	 * we can write more sophisticated method.
+	 * @param textToBeSlugified
+	 * @return
+	 */
+	public static String slugify(String textToBeSlugified) {
+		return textToBeSlugified.toLowerCase().replaceAll("[^a-zA-Z0-9-]", "-")
+								.substring(0, VisConstants.MAX_NAME_TEXT_LENGTH);
 	}
 
 }

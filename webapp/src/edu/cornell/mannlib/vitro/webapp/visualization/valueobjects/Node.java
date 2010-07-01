@@ -8,7 +8,7 @@ import java.util.Set;
 
 import edu.cornell.mannlib.vitro.webapp.visualization.constants.VOConstants;
 import edu.cornell.mannlib.vitro.webapp.visualization.visutils.UniqueIDGenerator;
-import edu.cornell.mannlib.vitro.webapp.visualization.visutils.VOUtils;
+import edu.cornell.mannlib.vitro.webapp.visualization.visutils.UtilityFunctions;
 
 /**
  * 
@@ -65,7 +65,7 @@ public class Node extends Individual {
 	@SuppressWarnings("serial")
 	public Map<String, Integer> getEarliestPublicationYearCount() {
 		if (yearToPublicationCount == null) {
-			yearToPublicationCount = VOUtils.getYearToPublicationCount(authorDocuments);
+			yearToPublicationCount = UtilityFunctions.getYearToPublicationCount(authorDocuments);
 			System.out.println("early - " + yearToPublicationCount);
 		}
 		
@@ -98,7 +98,7 @@ public class Node extends Individual {
 	@SuppressWarnings("serial")
 	public Map<String, Integer> getLatestPublicationYearCount() {
 		if (yearToPublicationCount == null) {
-			yearToPublicationCount = VOUtils.getYearToPublicationCount(authorDocuments);
+			yearToPublicationCount = UtilityFunctions.getYearToPublicationCount(authorDocuments);
 		}
 		
 		/*
@@ -130,7 +130,7 @@ public class Node extends Individual {
 	
 	public Integer getUnknownPublicationYearCount() {
 		if (yearToPublicationCount == null) {
-			yearToPublicationCount = VOUtils.getYearToPublicationCount(authorDocuments);
+			yearToPublicationCount = UtilityFunctions.getYearToPublicationCount(authorDocuments);
 		}
 		
 		Integer unknownYearPubCount = yearToPublicationCount.get(VOConstants.DEFAULT_PUBLICATION_YEAR);

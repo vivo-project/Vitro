@@ -1,4 +1,4 @@
-package edu.cornell.mannlib.vitro.webapp.visualization.coauthorship;
+package edu.cornell.mannlib.vitro.webapp.visualization.personlevel;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -15,8 +15,13 @@ import com.hp.hpl.jena.query.DataSource;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.visualization.VisualizationController;
 import edu.cornell.mannlib.vitro.webapp.controller.visualization.VisualizationFrameworkConstants;
+import edu.cornell.mannlib.vitro.webapp.visualization.coauthorship.CoAuthorshipGraphMLWriter;
+import edu.cornell.mannlib.vitro.webapp.visualization.coauthorship.QueryHandler;
+import edu.cornell.mannlib.vitro.webapp.visualization.coauthorship.VisVOContainer;
 import edu.cornell.mannlib.vitro.webapp.visualization.exceptions.MalformedQueryParametersException;
+import edu.cornell.mannlib.vitro.webapp.visualization.visutils.UtilityFunctions;
 
 public class VisualizationRequestHandler {
 
@@ -137,9 +142,13 @@ public class VisualizationRequestHandler {
 
 	}
 
-	private void prepareVisualizationQueryDataResponse(VisVOContainer authorNodesAndEdges) {
+	private void prepareVisualizationQueryDataResponse(VisVOContainer coAuthorsipVO) {
 
-		response.setContentType("text/xml");
+		String outputFileName = UtilityFunctions.slugify(coAuthorsipVO.getEgoNode().getNodeName()) 
+									+ "-coauthor-net" + ".graphml";
+		
+		response.setContentType("application/octet-stream");
+		response.setHeader("Content-Disposition", "attachment;filename=" + outputFileName);
 		
 		try {
 		
@@ -150,7 +159,7 @@ public class VisualizationRequestHandler {
 		 * object of the servlet.
 		 * */
 		
-		CoAuthorshipGraphMLWriter coAuthorShipGraphMLWriter = new CoAuthorshipGraphMLWriter(authorNodesAndEdges);
+		CoAuthorshipGraphMLWriter coAuthorShipGraphMLWriter = new CoAuthorshipGraphMLWriter(coAuthorsipVO);
 		
 		responseWriter.append(coAuthorShipGraphMLWriter.getCoAuthorshipGraphMLContent());
 		
@@ -173,7 +182,7 @@ public class VisualizationRequestHandler {
 
         request.setAttribute("egoURIParam", egoURIParam);
         
-        request.setAttribute("bodyJsp", "/templates/visualization/co_authorship.jsp");
+        request.setAttribute("bodyJsp", "/templates/visualization/person_level.jsp");
         request.setAttribute("portalBean", portal);
 //        request.setAttribute("title", "Individual Publication Count Visualization");
 //        request.setAttribute("scripts", "/templates/visualization/visualization_scripts.jsp");

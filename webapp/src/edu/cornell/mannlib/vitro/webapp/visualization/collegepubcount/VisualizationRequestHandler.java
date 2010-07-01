@@ -40,6 +40,7 @@ import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.Individual;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.VivoCollegeOrSchool;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.VivoDepartmentOrDivision;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.VivoEmployee;
+import edu.cornell.mannlib.vitro.webapp.visualization.visutils.UtilityFunctions;
 
 public class VisualizationRequestHandler {
 
@@ -275,7 +276,7 @@ public class VisualizationRequestHandler {
 			authorName = "";
 		}
 		
-		String outputFileName = slugify(authorName + "-report") 
+		String outputFileName = UtilityFunctions.slugify(authorName + "-report") 
 								+ ".pdf";
 		
 		response.setContentType("application/pdf");
@@ -335,7 +336,7 @@ public class VisualizationRequestHandler {
 		collegeName = "";
 		}
 		
-		String outputFileName = slugify(collegeName) + "depts-pub-count" + ".csv";
+		String outputFileName = UtilityFunctions.slugify(collegeName) + "depts-pub-count" + ".csv";
 		
 		response.setContentType("application/octet-stream");
 		response.setHeader("Content-Disposition","attachment;filename=" + outputFileName);
@@ -359,17 +360,6 @@ public class VisualizationRequestHandler {
 		}
 	}
 	
-	/**
-	 * Currently the approach for slugifying filenames is naive. In future if there is need, 
-	 * we can write more sophisticated method.
-	 * @param textToBeSlugified
-	 * @return
-	 */
-	private String slugify(String textToBeSlugified) {
-		return textToBeSlugified.toLowerCase().replaceAll("[^a-zA-Z0-9-]", "-")
-								.substring(0, VisConstants.MAX_NAME_TEXT_LENGTH);
-	}
-
 	private void generateCsvFileBuffer(
 			Map<VivoDepartmentOrDivision, Map<String, Integer>> departmentToPublicationsOverTime,
 			Map<String, VivoCollegeOrSchool> collegeURLToVO, PrintWriter printWriter) {

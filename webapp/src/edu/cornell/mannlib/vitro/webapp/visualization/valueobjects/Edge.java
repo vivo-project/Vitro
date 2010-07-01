@@ -8,7 +8,7 @@ import java.util.Set;
 
 import edu.cornell.mannlib.vitro.webapp.visualization.constants.VOConstants;
 import edu.cornell.mannlib.vitro.webapp.visualization.visutils.UniqueIDGenerator;
-import edu.cornell.mannlib.vitro.webapp.visualization.visutils.VOUtils;
+import edu.cornell.mannlib.vitro.webapp.visualization.visutils.UtilityFunctions;
 
 /**
  * 
@@ -64,7 +64,7 @@ public class Edge {
 	@SuppressWarnings("serial")
 	public Map<String, Integer> getEarliestCollaborationYearCount() {
 		if (yearToPublicationCount == null) {
-			yearToPublicationCount = VOUtils.getYearToPublicationCount(collaboratorDocuments);
+			yearToPublicationCount = UtilityFunctions.getYearToPublicationCount(collaboratorDocuments);
 		}
 		
 		/*
@@ -96,7 +96,7 @@ public class Edge {
 	@SuppressWarnings("serial")
 	public Map<String, Integer> getLatestCollaborationYearCount() {
 		if (yearToPublicationCount == null) {
-			yearToPublicationCount = VOUtils.getYearToPublicationCount(collaboratorDocuments);
+			yearToPublicationCount = UtilityFunctions.getYearToPublicationCount(collaboratorDocuments);
 		}
 		
 		/*
@@ -128,7 +128,7 @@ public class Edge {
 	@SuppressWarnings("serial")
 	public Integer getUnknownCollaborationYearCount() {
 		if (yearToPublicationCount == null) {
-			yearToPublicationCount = VOUtils.getYearToPublicationCount(collaboratorDocuments);
+			yearToPublicationCount = UtilityFunctions.getYearToPublicationCount(collaboratorDocuments);
 		}
 		
 		Integer unknownYearPubCount = yearToPublicationCount.get(VOConstants.DEFAULT_PUBLICATION_YEAR);
