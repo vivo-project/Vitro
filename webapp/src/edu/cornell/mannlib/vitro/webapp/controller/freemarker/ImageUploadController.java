@@ -62,6 +62,8 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	public static final String BODY_TITLE = "title";
 	public static final String BODY_ENTITY_NAME = "entityName";
 	public static final String BODY_MAIN_IMAGE_URL = "imageUrl";
+	public static final String BODY_MAIN_IMAGE_HEIGHT = "imageHeight";
+	public static final String BODY_MAIN_IMAGE_WIDTH = "imageWidth";
 	public static final String BODY_THUMBNAIL_URL = "thumbnailUrl";
 	public static final String BODY_CANCEL_URL = "cancelUrl";
 	public static final String BODY_DELETE_URL = "deleteUrl";
@@ -146,10 +148,13 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 			VitroRequest vreq = new VitroRequest(request);
 			ResponseValues values = buildTheResponse(vreq);
 
-			if (values.isForwardResponse()) {
+			switch (values.getType()) {
+			case FORWARD:
 				doForward(vreq, response, values);
-			} else {
+			case TEMPLATE:
 				doTemplate(vreq, response, values);
+			case EXCEPTION:
+				doException(vreq, response, values);
 			}
 		} catch (Exception e) {
 			log.error("Could not produce response page", e);
@@ -187,6 +192,15 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	}
 
 	/**
+	 * We processed a response, and need to display an internal exception.
+	 */
+	private void doException(VitroRequest vreq, HttpServletResponse resp,
+			ResponseValues values) {
+		log.error(values.getException(), values.getException());
+		doTemplate(vreq, resp, new TemplateResponseValues(TEMPLATE_ERROR));
+	}
+
+	/**
 	 * Handle the different actions. If not specified, the default action is to
 	 * show the intro screen.
 	 */
@@ -209,8 +223,7 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 			return showAddImagePageWithError(null, e.getMessage());
 		} catch (Exception e) {
 			// We weren't expecting this - log it, and apologize to the user.
-			log.error(e, e);
-			return new TemplateResponseValues(TEMPLATE_ERROR);
+			return new ExceptionResponseValues(e);
 		}
 	}
 
@@ -257,8 +270,10 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 		entity = getWebappDaoFactory().getIndividualDao().getIndividualByURI(
 				entityUri);
 
+		Dimensions mainImageSize = helper.getMainImageSize(entity);
+
 		// Go to the cropping page.
-		return showCropImagePage(entity, getMainImageUrl(entity));
+		return showCropImagePage(entity, getMainImageUrl(entity), mainImageSize);
 	}
 
 	/**
@@ -393,9 +408,7 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	 */
 	private TemplateResponseValues showAddImagePageWithError(Individual entity,
 			String message) {
-		TemplateResponseValues rv = showAddImagePage(entity);
-		rv.put(BODY_ERROR_MESSAGE, message);
-		return rv;
+		return showAddImagePage(entity).put(BODY_ERROR_MESSAGE, message);
 	}
 
 	/**
@@ -426,9 +439,11 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	 * We got their main image - go to the Crop Image page.
 	 */
 	private TemplateResponseValues showCropImagePage(Individual entity,
-			String imageUrl) {
+			String imageUrl, Dimensions dimensions) {
 		TemplateResponseValues rv = new TemplateResponseValues(TEMPLATE_CROP);
 		rv.put(BODY_MAIN_IMAGE_URL, UrlBuilder.getUrl(imageUrl));
+		rv.put(BODY_MAIN_IMAGE_HEIGHT, dimensions.height);
+		rv.put(BODY_MAIN_IMAGE_WIDTH, dimensions.width);
 		rv.put(BODY_FORM_ACTION, formAction(entity.getURI(), ACTION_SAVE));
 		rv.put(BODY_CANCEL_URL, displayPageUrl(entity.getURI()));
 		rv.put(BODY_TITLE, "Crop Photo" + forName(entity));
@@ -549,14 +564,30 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 		}
 	}
 
+	static class Dimensions {
+		final int width;
+		final int height;
+
+		Dimensions(int width, int height) {
+			this.width = width;
+			this.height = height;
+		}
+	}
+
 	private static interface ResponseValues {
-		boolean isForwardResponse();
+		enum ResponseType {
+			TEMPLATE, FORWARD, EXCEPTION
+		}
+
+		ResponseType getType();
 
 		String getTemplateName();
 
 		Map<? extends String, ? extends Object> getBodyMap();
 
 		String getForwardUrl();
+
+		Throwable getException();
 	}
 
 	private static class TemplateResponseValues implements ResponseValues {
@@ -567,19 +598,14 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 			this.templateName = templateName;
 		}
 
-		public void put(String key, Object value) {
+		public TemplateResponseValues put(String key, Object value) {
 			this.bodyMap.put(key, value);
+			return this;
 		}
 
 		@Override
-		public boolean isForwardResponse() {
-			return false;
-		}
-
-		@Override
-		public String getForwardUrl() {
-			throw new IllegalStateException(
-					"This is not a forwarding response.");
+		public ResponseType getType() {
+			return ResponseType.TEMPLATE;
 		}
 
 		@Override
@@ -592,6 +618,18 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 			return this.templateName;
 		}
 
+		@Override
+		public Throwable getException() {
+			throw new UnsupportedOperationException(
+					"This is not an exception response.");
+		}
+
+		@Override
+		public String getForwardUrl() {
+			throw new UnsupportedOperationException(
+					"This is not a forwarding response.");
+		}
+
 	}
 
 	private static class ForwardResponseValues implements ResponseValues {
@@ -602,8 +640,8 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 		}
 
 		@Override
-		public boolean isForwardResponse() {
-			return true;
+		public ResponseType getType() {
+			return ResponseType.FORWARD;
 		}
 
 		@Override
@@ -612,13 +650,57 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 		}
 
 		@Override
+		public String getTemplateName() {
+			throw new UnsupportedOperationException(
+					"This is not a template response.");
+		}
+
+		@Override
+		public Map<? extends String, ? extends Object> getBodyMap() {
+			throw new UnsupportedOperationException(
+					"This is not a template response.");
+		}
+
+		@Override
+		public Throwable getException() {
+			throw new UnsupportedOperationException(
+					"This is not an exception response.");
+		}
+
+	}
+
+	private static class ExceptionResponseValues implements ResponseValues {
+		private final Throwable cause;
+
+		public ExceptionResponseValues(Throwable cause) {
+			this.cause = cause;
+		}
+
+		@Override
+		public ResponseType getType() {
+			return ResponseType.EXCEPTION;
+		}
+
+		@Override
+		public Throwable getException() {
+			return cause;
+		}
+
+		@Override
+		public String getTemplateName() {
+			throw new UnsupportedOperationException(
+					"This is not a template response.");
+		}
+
+		@Override
 		public Map<? extends String, ? extends Object> getBodyMap() {
 			throw new IllegalStateException("This is not a template response.");
 		}
 
 		@Override
-		public String getTemplateName() {
-			throw new IllegalStateException("This is not a template response.");
+		public String getForwardUrl() {
+			throw new UnsupportedOperationException(
+					"This is not a forwarding response.");
 		}
 
 	}

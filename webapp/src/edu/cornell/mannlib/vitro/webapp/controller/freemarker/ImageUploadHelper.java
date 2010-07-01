@@ -11,6 +11,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
@@ -27,6 +28,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadController.Dimensions;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadController.UserMistakeException;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.filestorage.FileModelHelper;
@@ -353,5 +355,41 @@ public class ImageUploadHelper {
 		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 		ImageIO.write(bdest, "JPG", buffer);
 		return new ByteArrayInputStream(buffer.toByteArray());
+	}
+
+	/**
+	 * Find out how big the main image is.
+	 */
+	Dimensions getMainImageSize(Individual entity) {
+		String uri = FileModelHelper.getMainImageBytestreamUri(entity);
+		String filename = FileModelHelper.getMainImageFilename(entity);
+		InputStream stream = null;
+		try {
+			stream = fileStorage.getInputStream(uri, filename);
+			BufferedImage image = ImageIO.read(stream);
+			return new Dimensions(image.getWidth(), image.getHeight());
+		} catch (FileNotFoundException e) {
+			log.warn("No main image file for '" + showUri(entity) + "'; name='"
+					+ filename + "', bytestreamUri='" + uri + "'", e);
+			return new Dimensions(0, 0);
+		} catch (IOException e) {
+			log.warn(
+					"Can't read main image file for '" + showUri(entity)
+							+ "'; name='" + filename + "', bytestreamUri='"
+							+ uri + "'", e);
+			return new Dimensions(0, 0);
+		} finally {
+			if (stream != null) {
+				try {
+					stream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	private String showUri(Individual entity) {
+		return (entity == null) ? "null" : entity.getURI();
 	}
 }
