@@ -165,7 +165,6 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
         return dataValues;
     }
  
-
     public String getDataValue(String propertyUri) {
         List<DataPropertyStatement> stmts = getDataPropertyStatements(propertyUri);
         return stmts.isEmpty() ? null : stmts.get(0).getData();
