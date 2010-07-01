@@ -37,8 +37,6 @@ webapp/web/js/jquery.js
 webapp/web/js/jquery-ui/*
 webapp/web/js/jquery_plugins/*
 
-webapp/web/js/imageUpload/cropImage.js
-
 # From pajhome.org.uk
 webapp/web/js/md5.js
 
