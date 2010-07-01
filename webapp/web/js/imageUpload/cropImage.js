@@ -27,6 +27,14 @@
 				});
 			}
 		};
+		
+		$('#submitPhoto').click(function() {
+			var preview = $('#preview');
+			$('input[name=x]').val(preview.css('marginLeft').replace(/[^\d-]/g,''));
+			$('input[name=y]').val(preview.css('marginTop').replace(/[^\d-]/g,''));
+			$('input[name=w]').val(preview.css('width').replace(/[^\d-]/g,''));
+			$('input[name=h]').val(preview.css('height').replace(/[^\d-]/g,''));			
+		});
 
 	});
 
