@@ -127,7 +127,8 @@ public class VisualizationRequestHandler {
 
 	    	prepareVisualizationQueryStandaloneResponse(egoURIParam, sparklineVO, request, response, vitroRequest);
 
-	    	requestDispatcher = request.getRequestDispatcher("/templates/page/blankPage.jsp");
+//	    	requestDispatcher = request.getRequestDispatcher("/templates/page/blankPage.jsp");
+			requestDispatcher = request.getRequestDispatcher(Controllers.BASIC_JSP);
 
 	    	try {
 	            requestDispatcher.forward(request, response);
@@ -186,18 +187,15 @@ public class VisualizationRequestHandler {
 		VitroRequest vreq) {
 
         Portal portal = vreq.getPortal();
-
-//        request.setAttribute("visContentCode", visContentCode);
-//        request.setAttribute("visContextCode", visContextCode);
-
+        
         request.setAttribute("egoURIParam", egoURIParam);
         request.setAttribute("sparklineVO", sparklineVO);
         
-        request.setAttribute("bodyJsp", "/templates/visualization/person_level.jsp");
+        request.setAttribute("title", "Person Level Visualization");
         request.setAttribute("portalBean", portal);
-//        request.setAttribute("title", "Individual Publication Count Visualization");
-//        request.setAttribute("scripts", "/templates/visualization/visualization_scripts.jsp");
-
+        request.setAttribute("scripts", "/templates/visualization/person_level_inject_head.jsp");
+        
+        request.setAttribute("bodyJsp", "/templates/visualization/person_level.jsp");
 	}
 
 	private void handleMalformedParameters(String errorMessage)

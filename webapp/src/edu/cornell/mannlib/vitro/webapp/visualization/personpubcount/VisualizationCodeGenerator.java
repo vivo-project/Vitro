@@ -144,7 +144,7 @@ public class VisualizationCodeGenerator {
 		numOfYearsToBeRendered = currentYear - minPubYearConsidered + 1;
 		
 		visualizationCode.append("<style type='text/css'>" +
-										"." + visualizationStyleClass + " table{" +
+										/*"." + visualizationStyleClass + " table{" +
 										"		margin: 0;" +
 										"  		padding: 0;" +
 										"  		width: auto;" +
@@ -158,7 +158,7 @@ public class VisualizationCodeGenerator {
 										"#sparkline_data_table tfoot {" +
 												"color: red;" +
 												"font-size:0.9em;" +
-										"}" +
+										"}" +*/
 										".sparkline_text {" +
 												"margin-left:72px;" +
 												"position:absolute;" +
@@ -169,6 +169,9 @@ public class VisualizationCodeGenerator {
 												"font-style:italic;" +
 										"}" +
 								"</style>\n");
+		
+		
+		
 
 		visualizationCode.append("<script type=\"text/javascript\">\n" +
 								"function drawVisualization() {\n" +

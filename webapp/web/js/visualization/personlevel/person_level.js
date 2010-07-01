@@ -7,9 +7,11 @@ function getWellFormedURLs(given_uri, type) {
 
 	// $(document).ready(function() {
 
+	var finalURL;
+
 	if (type == "coauthorship") {
 
-		var finalURL = $.ajax({
+		finalURL = $.ajax({
 			url: contextPath + "/admin/visQuery",
 			data: ({vis: "utilities", vis_mode: "COAUTHORSHIP_URL", uri: given_uri}),
 			dataType: "text",
@@ -24,7 +26,7 @@ function getWellFormedURLs(given_uri, type) {
 
 	} else if (type == "profile") {
 
-		var finalURL = $.ajax({
+		finalURL = $.ajax({
 			url: contextPath + "/admin/visQuery",
 			data: ({vis: "utilities", vis_mode: "PROFILE_URL", uri: given_uri}),
 			dataType: "text",
@@ -37,7 +39,7 @@ function getWellFormedURLs(given_uri, type) {
 
 	} else if (type == "image") {
 
-		var finalURL = $.ajax({
+		finalURL = $.ajax({
 			url: contextPath + "/admin/visQuery",
 			data: ({vis: "utilities", vis_mode: "IMAGE_URL", uri: given_uri}),
 			dataType: "text",
@@ -62,7 +64,7 @@ function getWellFormedURLs(given_uri, type) {
 		return profileInfoJSON;
 
 	}
-	
+
 	// });
 }
 
@@ -70,99 +72,160 @@ $.fn.image = function(src, successFunc, failureFunc){
 	return this.each(function(){ 
 		var profileImage = new Image();
 		profileImage.src = src;
-		profileImage.width = 150;
+		profileImage.width = 90;
 		profileImage.onerror = failureFunc;
 		profileImage.onload = successFunc;
-		
-		
+
+
 		return profileImage;
 	});
-}
+};
 
 function setProfileImage(imageContainerID, rawPath, contextPath) {
-	
+
 	if (imageContainerID == "") {
 		return;
 	}
-	
-	
+
+
 	var imageLink =  contextPath + rawPath;
-	
+
 	var imageContainer = $("#" + imageContainerID);
 	imageContainer.image(imageLink, 
 			function(){
 		imageContainer.empty().append(this); 
 	},
 	function(){
-		 //For performing any action on failure to
-		 //find the image.
+		// For performing any action on failure to
+		// find the image.
 		imageContainer.empty();
 	}
 	);
-	
+
 }
 
 function setProfileMoniker(monikerContainerID, moniker) {
-	
+
 	if (monikerContainerID == "") {
 		return;
 	}
-	
+
 	$("#" + monikerContainerID).empty().text(moniker);
-	
+
 }
 
 function setProfileName(nameContainerID, name) {
-	
+
 	if (nameContainerID == "") {
 		return;
 	}
-	
+
 	$("#" + nameContainerID).empty().text(name);
-	
-	
+
+
 }
 
 function processProfileInformation(nameContainerID,
-								   monikerContainerID,
-								   imageContainerID,
-								   profileInfoJSON) {
-	
-	
+		monikerContainerID,
+		imageContainerID,
+		profileInfoJSON) {
+
+
 	var name, imageRawPath, imageContextPath, moniker;
-	
+
 	$.each(profileInfoJSON, function(key, set){
-		
-		 if (key.search(/imageThumb/i) > -1) {
-			 
-			 imageRawPath = set[0];
-			 
-		 } else if (key.search(/imageContextPath/i) > -1) {
-			 
-			 imageContextPath = set[0];
-			 
-		 } else if (key.search(/moniker/i) > -1) {
-			 
-			 moniker = set[0];
-			 
-		 } else if (key.search(/label/i) > -1) {
-			 
-			 name = set[0];
-			 
-		 }
-		 
-      });
-	
+
+		if (key.search(/imageThumb/i) > -1) {
+
+			imageRawPath = set[0];
+
+		} else if (key.search(/imageContextPath/i) > -1) {
+
+			imageContextPath = set[0];
+
+		} else if (key.search(/moniker/i) > -1) {
+
+			moniker = set[0];
+
+		} else if (key.search(/label/i) > -1) {
+
+			name = set[0];
+
+		}
+
+	});
+
 	setProfileName(nameContainerID, name);
 	setProfileMoniker(monikerContainerID, moniker);
 	setProfileImage(imageContainerID, imageRawPath, imageContextPath);
-	
+
 }
 
+function visLoaded(nodes){
 
+	var jsonedNodes = jQuery.parseJSON(nodes);
+
+	$(document).ready(function() { 
+		 createTable("coauthorships_table", "coauth_table_container", jsonedNodes.slice(1));
+	});
+
+}
+
+function createTable(tableID, tableContainer, tableData) {
+
+	var table = $('<table>');
+	table.attr('id', tableID);
+//	var columns = {'Author', 'Count'};
+	
+	
+	table.append($('<caption>').html("Co-Authorships"));  
+	
+	var header = $('<thead>');
+	
+	
+	var row = $('<tr>'); 
+	
+
+	// Loop thru our columns collection and add each one to the header row
+//	for (columnName in columns) {
+//	header.append($('<th>').html(columnName));
+//	}
+
+	row.append($('<th>').html("Author"));  
+	row.append($('<th>').html("Count"));  
+
+	header.append(row);
+	
+	table.append(header);
+
+	$.each(tableData, function(i, item){ 
+
+		var row = $('<tr>'); 
+
+		// console.log(item.name + " - " +
+		// item.number_of_authored_works);
+
+		row.append($('<td>').html(item.name));
+		row.append($('<td>').html(item.number_of_authored_works));
+
+
+		table.append(row);
+
+	});	
+
+//	var footer = $('<tr>');
+//	var addIcon = $('<img>').attr('src','path/to/add.gif').click(AddRow);
+//	footer.append($('<td>').append(addIcon));
+//	for (i in columns)
+//	footer.append($('<td>'));
+//	table.append(footer);
+
+	table.prependTo('#' + tableContainer);
+	// return false; // Return false so the link doesn't try to go anywhere
+}
 
 function nodeClickedJS(json){
-	
+
 	var obj = jQuery.parseJSON(json);
 
 	$("#newsLetter").attr("style","visibility:visible");
@@ -176,9 +239,9 @@ function nodeClickedJS(json){
 		$("#profileUrl").attr("href", getWellFormedURLs(obj.url, "profile"));
 		$("#coAuthorshipVisUrl").attr("href", getWellFormedURLs(obj.url, "coauthorship"));
 		processProfileInformation("", 
-								  "profileMoniker",
-								  "profileImage",
-								  jQuery.parseJSON(getWellFormedURLs(obj.url, "profile_info")));
+				"profileMoniker",
+				"profileImage",
+				jQuery.parseJSON(getWellFormedURLs(obj.url, "profile_info")));
 
 	} else{
 		$("#profileUrl").attr("href","#");
@@ -196,34 +259,34 @@ function nodeClickedJS(json){
 }
 
 function renderSparklineVisualization(visualizationURL) {
-	
-	 $(document).ready(function() {
-		 
-	//$("#ego_sparkline").empty().html('<img src="${loadingImageLink}" />');
 
-	   $.ajax({
-		   url: visualizationURL,
-		   dataType: "html",
-		   success:function(data){
-		     $("#ego_sparkline").html(data);
+	$(document).ready(function() {
 
-		   }
-		 });
-	   
-	   
-	 });
+		// $("#ego_sparkline").empty().html('<img src="${loadingImageLink}" />');
+
+		$.ajax({
+			url: visualizationURL,
+			dataType: "html",
+			success:function(data){
+			$("#ego_sparkline").html(data);
+
+		}
+		});
+
+
+	});
 
 }
 
 function renderCoAuthorshipVisualization() {
 
-	//Version check for the Flash Player that has the ability to start Player
-	//Product Install (6.0r65)
+	// Version check for the Flash Player that has the ability to start Player
+	// Product Install (6.0r65)
 	var hasProductInstall = DetectFlashVer(6, 0, 65);
-	
-	//Version check based upon the values defined in globals
+
+	// Version check based upon the values defined in globals
 	var hasRequestedVersion = DetectFlashVer(requiredMajorVersion, requiredMinorVersion, requiredRevision);
-	
+
 	if ( hasProductInstall && !hasRequestedVersion ) {
 		// DO NOT MODIFY THE FOLLOWING FOUR LINES
 		// Location visited after installation is complete if installation is
@@ -232,7 +295,7 @@ function renderCoAuthorshipVisualization() {
 		var MMredirectURL = window.location;
 		document.title = document.title.slice(0, 47) + " - Flash Player Installation";
 		var MMdoctitle = document.title;
-	
+
 		AC_FL_RunContent(
 				"src", "playerProductInstall",
 				"FlashVars", "MMredirectURL="+MMredirectURL+'&MMplayerType='+MMPlayerType+'&MMdoctitle='+MMdoctitle+"",
