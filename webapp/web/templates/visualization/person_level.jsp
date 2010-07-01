@@ -1,14 +1,12 @@
+<%@ page import="edu.cornell.mannlib.vitro.webapp.visualization.personpubcount.VisVOContainer" %>
+
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 
 <c:set var="portalBean" value="${requestScope.portalBean}" />
-<c:set var="portalBean" value="${requestScope.portalBean}" />
-<c:set var="themeDir">
-	<c:out value="${portalBean.themeDir}" />
-</c:set>
-<c:set var="contextPath">
-	<c:out value="${pageContext.request.contextPath}" />
-</c:set>
+<c:set var="themeDir"><c:out value="${portalBean.themeDir}" /></c:set>
+<c:set var="contextPath"><c:out value="${pageContext.request.contextPath}" /></c:set>
+<c:set var='sparkline' value='${requestScope.sparklineVO}'/>
 
 <c:url var="egoCoAuthorshipDataURL" value="/admin/visQuery">
 	<c:param name="vis" value="coauthorship" />
@@ -112,7 +110,7 @@ var contextPath = "${contextPath}";
 <%-- Image --%>  
 <div class="datatypeProperties">
     <div class="datatypePropertyValue">
-        <div id="ego_profile-image" class="statementWrap thumbnail"> 
+        <div id="ego_profile_image" class="statementWrap thumbnail"> 
         </div>
     </div>
 </div> 
@@ -122,7 +120,7 @@ var contextPath = "${contextPath}";
     <div class="datatypePropertyValue">
         <div id="ego_sparkline">
         
-        ${requestScope.egoURIParam}
+        ${sparkline.sparklineContent}
          
         </div>
     </div>
@@ -250,10 +248,10 @@ $(document).ready(function(){
 
 	processProfileInformation("ego_label", 
 							  "ego_moniker",
-							  "ego_profile-image",
+							  "ego_profile_image",
 							  jQuery.parseJSON(getWellFormedURLs("${requestScope.egoURIParam}", "profile_info")));
 
-	renderSparklineVisualization("${egoSparklineVisURL}");
+	//renderSparklineVisualization("${egoSparklineVisURL}");
 	
 
 	var obj = jQuery.parseJSON('{"name":"John"}');

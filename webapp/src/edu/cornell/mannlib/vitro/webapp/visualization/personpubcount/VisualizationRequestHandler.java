@@ -123,10 +123,6 @@ public class VisualizationRequestHandler {
 	    									   log);
 	    	
 	    	
-			String visContentCode = valueObjectContainer.getSparklineContent();
-
-			String visContextCode = valueObjectContainer.getSparklineContext();
-			
 			System.out.println("ft url - " + valueObjectContainer.getFullTimelineNetworkLink());
 			System.out.println("dnld fl - " + valueObjectContainer.getDownloadDataLink());
 			System.out.println("table - " + valueObjectContainer.getTable());
@@ -143,12 +139,12 @@ public class VisualizationRequestHandler {
 			if (VisualizationFrameworkConstants.DYNAMIC_RENDER_MODE_URL_VALUE.equalsIgnoreCase(renderMode)) {
 
 				prepareVisualizationQueryDynamicResponse(request, response, vitroRequest,
-		    			visContentCode, visContextCode);
+						valueObjectContainer);
 		    	requestDispatcher = request.getRequestDispatcher("/templates/page/blankPage.jsp");
 
 			} else {
 		    	prepareVisualizationQueryStandaloneResponse(request, response, vitroRequest,
-		    			visContentCode, visContextCode, valueObjectContainer);
+		    			valueObjectContainer);
 
 		    	requestDispatcher = request.getRequestDispatcher(Controllers.BASIC_JSP);
 			}
@@ -294,12 +290,10 @@ public class VisualizationRequestHandler {
 
 	private void prepareVisualizationQueryStandaloneResponse(HttpServletRequest request,
 			HttpServletResponse response, VitroRequest vreq,
-			String visContentCode, String visContextCode, VisVOContainer valueObjectContainer) {
+			VisVOContainer valueObjectContainer) {
 
         Portal portal = vreq.getPortal();
 
-        request.setAttribute("visContentCode", visContentCode);
-        request.setAttribute("visContextCode", visContextCode);
         request.setAttribute("sparklineVO", valueObjectContainer);
 
         request.setAttribute("bodyJsp", "/templates/visualization/publication_count.jsp");
@@ -310,13 +304,11 @@ public class VisualizationRequestHandler {
 	}
 
 	private void prepareVisualizationQueryDynamicResponse(HttpServletRequest request,
-			HttpServletResponse response, VitroRequest vreq,
-			String visContentCode, String visContextCode) {
+			HttpServletResponse response, VitroRequest vreq, VisVOContainer valueObjectContainer) {
 
         Portal portal = vreq.getPortal();
 
-        request.setAttribute("visContentCode", visContentCode);
-        request.setAttribute("visContextCode", visContextCode);
+        request.setAttribute("sparklineVO", valueObjectContainer);
 
         request.setAttribute("portalBean", portal);
         request.setAttribute("bodyJsp", "/templates/visualization/ajax_vis_content.jsp");

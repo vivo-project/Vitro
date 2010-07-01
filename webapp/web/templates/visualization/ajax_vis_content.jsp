@@ -1,3 +1,6 @@
-${requestScope.visContentCode}
+<%@ page import="edu.cornell.mannlib.vitro.webapp.visualization.personpubcount.VisVOContainer" %>
 
-${requestScope.visContextCode}
+<c:set var='sparkline' value='${requestScope.sparklineVO}'/>
+
+${sparkline.sparklineContent}
+${sparkline.sparklineContext}

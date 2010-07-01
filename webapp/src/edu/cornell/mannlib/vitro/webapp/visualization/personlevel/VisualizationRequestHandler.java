@@ -2,6 +2,8 @@ package edu.cornell.mannlib.vitro.webapp.visualization.personlevel;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -21,6 +23,8 @@ import edu.cornell.mannlib.vitro.webapp.visualization.coauthorship.CoAuthorshipG
 import edu.cornell.mannlib.vitro.webapp.visualization.coauthorship.QueryHandler;
 import edu.cornell.mannlib.vitro.webapp.visualization.coauthorship.VisVOContainer;
 import edu.cornell.mannlib.vitro.webapp.visualization.exceptions.MalformedQueryParametersException;
+import edu.cornell.mannlib.vitro.webapp.visualization.personpubcount.VisualizationCodeGenerator;
+import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.BiboDocument;
 import edu.cornell.mannlib.vitro.webapp.visualization.visutils.UtilityFunctions;
 
 public class VisualizationRequestHandler {
@@ -53,18 +57,25 @@ public class VisualizationRequestHandler {
 
         String visContainer = vitroRequest.getParameter(VisualizationFrameworkConstants.VIS_CONTAINER_URL_HANDLE);
         
-        QueryHandler queryManager =
-        	new QueryHandler(egoURIParam,
+        edu.cornell.mannlib.vitro.webapp.visualization.coauthorship.QueryHandler coAuthorshipQueryManager =
+        	new edu.cornell.mannlib.vitro.webapp.visualization.coauthorship.QueryHandler(egoURIParam,
 						     resultFormatParam,
 						     rdfResultFormatParam,
 						     dataSource,
-						     
+						     log);
+        
+        edu.cornell.mannlib.vitro.webapp.visualization.personpubcount.QueryHandler sparklineQueryManager =
+        	new edu.cornell.mannlib.vitro.webapp.visualization.personpubcount.QueryHandler(egoURIParam,
+						   	 resultFormatParam,
+						     rdfResultFormatParam,
+						     dataSource,
 						     log);
 
 		try {
 			
-			VisVOContainer authorNodesAndEdges = queryManager.getVisualizationJavaValueObjects();
-			
+			edu.cornell.mannlib.vitro.webapp.visualization.coauthorship.VisVOContainer coAuthorshipVO = 
+					coAuthorshipQueryManager.getVisualizationJavaValueObjects();
+					
 	    	/*
 	    	 * In order to avoid unneeded computations we have pushed this "if" condition up.
 	    	 * This case arises when the render mode is data. In that case we dont want to generate 
@@ -77,49 +88,46 @@ public class VisualizationRequestHandler {
 	    			 * When just the graphML file is required - based on which actual visualization will 
 	    			 * be rendered.
 	    			 * */
-	    			prepareVisualizationQueryDataResponse(authorNodesAndEdges);
+	    			prepareVisualizationQueryDataResponse(coAuthorshipVO);
 					return;
 	    		
 	    		
 			}
-	    	
+					
+			List<BiboDocument> authorDocuments = sparklineQueryManager.getVisualizationJavaValueObjects();
+			
+	    	/*
+	    	 * Create a map from the year to number of publications. Use the BiboDocument's
+	    	 * parsedPublicationYear to populate the data.
+	    	 * */
+	    	Map<String, Integer> yearToPublicationCount = sparklineQueryManager
+	    														.getYearToPublicationCount(authorDocuments);
+	    														
+	    														
 	    	/*
 	    	 * Computations required to generate HTML for the sparklines & related context.
 	    	 * */
 	    	
-	    	/*
-	    	 * This is required because when deciding the range of years over which the vis
-	    	 * was rendered we dont want to be influenced by the "DEFAULT_PUBLICATION_YEAR".
-	    	 * */
-//	    	publishedYearsForCollege.remove(VOConstants.DEFAULT_PUBLICATION_YEAR);
+	    	edu.cornell.mannlib.vitro.webapp.visualization.personpubcount.VisVOContainer sparklineVO = 
+	    		new edu.cornell.mannlib.vitro.webapp.visualization.personpubcount.VisVOContainer();
 
-	    	/*
-	    	VisualizationCodeGenerator visualizationCodeGenerator = 
-	    		new VisualizationCodeGenerator(yearToPublicationCount, log);
-	    	
-			String visContentCode = visualizationCodeGenerator
-										.getMainVisualizationCode(authorDocuments,
-															  	  publishedYears,
-															  	  visMode,
-															  	  visContainer);
-
-			String visContextCode = visualizationCodeGenerator
-										.getVisualizationContextCode(vitroRequest.getRequestURI(), 
-																	 collegeURIParam,
-																	 visMode);
-																	 */
-
-	    	/*
-	    	 * This is side-effecting because the response of this method is just to redirect to
-	    	 * a page with visualization on it.
-	    	 * */
+	    	edu.cornell.mannlib.vitro.webapp.visualization.personpubcount.VisualizationCodeGenerator visualizationCodeGenerator = 
+	    		new edu.cornell.mannlib.vitro.webapp.visualization.personpubcount.VisualizationCodeGenerator(
+	    			vitroRequest.getRequestURI(),
+	    			egoURIParam,
+	    			VisualizationCodeGenerator.FULL_SPARKLINE_MODE_URL_HANDLE,
+	    			visContainer,
+	    			authorDocuments,
+	    			yearToPublicationCount,
+	    			sparklineVO,
+	    			log);	    														
+			
 			
 			RequestDispatcher requestDispatcher = null;
 
-	    	prepareVisualizationQueryStandaloneResponse(egoURIParam, request, response, vitroRequest);
+	    	prepareVisualizationQueryStandaloneResponse(egoURIParam, sparklineVO, request, response, vitroRequest);
 
-//		    	requestDispatcher = request.getRequestDispatcher(Controllers.BASIC_JSP);
-		    	requestDispatcher = request.getRequestDispatcher("/templates/page/blankPage.jsp");
+	    	requestDispatcher = request.getRequestDispatcher("/templates/page/blankPage.jsp");
 
 	    	try {
 	            requestDispatcher.forward(request, response);
@@ -170,10 +178,12 @@ public class VisualizationRequestHandler {
 		}
 	}
 	
-	private void prepareVisualizationQueryStandaloneResponse(String egoURIParam, 
-															 HttpServletRequest request,
-															 HttpServletResponse response, 
-															 VitroRequest vreq) {
+	private void prepareVisualizationQueryStandaloneResponse(
+		String egoURIParam, 
+		edu.cornell.mannlib.vitro.webapp.visualization.personpubcount.VisVOContainer sparklineVO, 
+		HttpServletRequest request,
+		HttpServletResponse response, 
+		VitroRequest vreq) {
 
         Portal portal = vreq.getPortal();
 
@@ -181,6 +191,7 @@ public class VisualizationRequestHandler {
 //        request.setAttribute("visContextCode", visContextCode);
 
         request.setAttribute("egoURIParam", egoURIParam);
+        request.setAttribute("sparklineVO", sparklineVO);
         
         request.setAttribute("bodyJsp", "/templates/visualization/person_level.jsp");
         request.setAttribute("portalBean", portal);

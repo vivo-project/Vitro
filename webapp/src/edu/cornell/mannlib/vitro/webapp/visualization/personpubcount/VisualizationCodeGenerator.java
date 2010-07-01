@@ -33,9 +33,9 @@ public class VisualizationCodeGenerator {
 	
 	private static final String defaultVisContainerDivID = "vis_container";
 	
-	private static final String SHORT_SPARKLINE_MODE_URL_HANDLE = "short";
+	public static final String SHORT_SPARKLINE_MODE_URL_HANDLE = "short";
 	
-	private static final String FULL_SPARKLINE_MODE_URL_HANDLE = "full";
+	public static final String FULL_SPARKLINE_MODE_URL_HANDLE = "full";
 	
 	private Map<String, Integer> yearToPublicationCount;
 
