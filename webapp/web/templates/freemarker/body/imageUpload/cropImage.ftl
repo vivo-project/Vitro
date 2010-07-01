@@ -18,8 +18,14 @@ ${stylesheets.addFromTheme("/jquery.Jcrop.css")}
               <div style="width:115px;height:115px;overflow:hidden;border:1px solid green;"> <img src="${imageUrl}" id="preview" /> </div>
               <div id="photoCroppingHowTo">
                      <p class="photoCroppingNote">To make adjustments, you can drag around and resize the blue square to the right. When you are happy with your photo click the "Save Photo" button. </p>
-                     <form action="${formAction}"  method="post">
+                     <form id="cropImage" action="${formAction}"  method="post">
                      
+                     <!-- Javascript will populate these values -->
+                     <input type="hidden" name="x" value="" />
+                     <input type="hidden" name="y" value="" />
+                     <input type="hidden" name="w" value="" />
+                     <input type="hidden" name="h" value="" />
+                                          
                      <input type="submit" value="Save photo">
                      or <a href="${cancelUrl}">Cancel</a>
                      </form>

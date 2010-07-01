@@ -28,12 +28,16 @@
 			}
 		};
 		
-		$('#submitPhoto').click(function() {
+		function removeAlpha(str) {
+			return str.replace(/[^\d-]/g,'');
+		};
+		
+		$('#cropImage').submit(function() {
 			var preview = $('#preview');
-			$('input[name=x]').val(preview.css('marginLeft').replace(/[^\d-]/g,''));
-			$('input[name=y]').val(preview.css('marginTop').replace(/[^\d-]/g,''));
-			$('input[name=w]').val(preview.css('width').replace(/[^\d-]/g,''));
-			$('input[name=h]').val(preview.css('height').replace(/[^\d-]/g,''));			
+			$('input[name=x]').val(removeAlpha(preview.css('marginLeft')));
+			$('input[name=y]').val(removeAlpha(preview.css('marginTop')));
+			$('input[name=w]').val(removeAlpha(preview.css('width')));
+			$('input[name=h]').val(removeAlpha(preview.css('height')));			
 		});
 
 	});

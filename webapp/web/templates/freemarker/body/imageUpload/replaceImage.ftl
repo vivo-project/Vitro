@@ -16,9 +16,9 @@ ${stylesheets.addFromTheme("/uploadImages.css")}
        <a href="${deleteUrl}">Delete photo</a></div>
        <div id="photoUploadForm">
               <form action="${formAction}" enctype="multipart/form-data" method="post">
-                     <label>Replace  Photo <span> (JPEG, GIF or PNG. Max Size: 50 MB)</span></label>
+                     <label>Replace Photo <span> (JPEG, GIF or PNG. Max Size: 50 MB)</span></label>
                      <input type="file" name="datafile" size="30">
-                     <input type="submit" value="Upload a photo"> or <a href="${cancelUrl}">Cancel</a>
+                     <input type="submit" value="Upload photo"> or <a href="${cancelUrl}">Cancel</a>
               </form>
        </div>
 </div>
