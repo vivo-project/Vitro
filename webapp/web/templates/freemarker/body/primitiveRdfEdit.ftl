@@ -3,12 +3,12 @@
 <div>
 <form method="POST">
 
-Addition:<br />
+Additions:<br />
 <textarea name="additions"></textarea>
 
 <br /><br />
 
-Retraction:<br />
+Retractions:<br />
 <textarea name="retractions"></textarea>
 
 <br /><br />
