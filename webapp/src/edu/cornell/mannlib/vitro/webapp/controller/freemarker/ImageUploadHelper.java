@@ -329,8 +329,8 @@ public class ImageUploadHelper {
 		BufferedImage bsrc = ImageIO.read(source);
 
 		// Insure that x and y fall within the image dimensions.
-		int x = Math.max(0, Math.min(bsrc.getWidth(), crop.x));
-		int y = Math.max(0, Math.min(bsrc.getHeight(), crop.y));
+		int x = Math.max(0, Math.min(bsrc.getWidth(), Math.abs(crop.x)));
+		int y = Math.max(0, Math.min(bsrc.getHeight(), Math.abs(crop.y)));
 
 		// Insure that width and height are reasonable.
 		int w = Math.max(5, Math.min(bsrc.getWidth() - x, crop.width));
@@ -340,14 +340,21 @@ public class ImageUploadHelper {
 		double scaleWidth = ((double) THUMBNAIL_WIDTH) / ((double) w);
 		double scaleHeight = ((double) THUMBNAIL_HEIGHT) / ((double) h);
 
+		log.debug("Generating a thumbnail, initial crop info: " + crop.x + ", "
+				+ crop.y + ", " + crop.width + ", " + crop.height);
+		log.debug("Generating a thumbnail, bounded crop info: " + x + ", " + y
+				+ ", " + w + ", " + h);
+		log.debug("Generating a thumbnail, scales: " + scaleWidth + ", "
+				+ scaleHeight);
+
 		// Create the transform.
 		AffineTransform at = new AffineTransform();
-		at.translate(-x, -y);
 		at.scale(scaleWidth, scaleHeight);
+		at.translate(-x, -y);
 
 		// Apply the transform.
-		BufferedImage bdest = new BufferedImage(crop.width, crop.height,
-				BufferedImage.TYPE_INT_RGB);
+		BufferedImage bdest = new BufferedImage(THUMBNAIL_WIDTH,
+				THUMBNAIL_HEIGHT, BufferedImage.TYPE_INT_RGB);
 		Graphics2D g = bdest.createGraphics();
 		g.drawRenderedImage(bsrc, at);
 

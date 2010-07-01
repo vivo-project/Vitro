@@ -151,10 +151,13 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 			switch (values.getType()) {
 			case FORWARD:
 				doForward(vreq, response, values);
+				break;
 			case TEMPLATE:
 				doTemplate(vreq, response, values);
+				break;
 			case EXCEPTION:
 				doException(vreq, response, values);
+				break;
 			}
 		} catch (Exception e) {
 			log.error("Could not produce response page", e);
@@ -341,27 +344,30 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	 * Did we get the cropping coordinates?
 	 */
 	private CropRectangle validateCropCoordinates(VitroRequest vreq) {
-		int x = getRequiredIntegerParameter(vreq, "x");
-		int y = getRequiredIntegerParameter(vreq, "y");
-		int h = getRequiredIntegerParameter(vreq, "h");
-		int w = getRequiredIntegerParameter(vreq, "w");
+		int x = getIntegerParameter(vreq, "x", 0);
+		int y = getIntegerParameter(vreq, "y", 0);
+		int h = getIntegerParameter(vreq, "h", THUMBNAIL_HEIGHT);
+		int w = getIntegerParameter(vreq, "w", THUMBNAIL_WIDTH);
 		return new CropRectangle(x, y, h, w);
 	}
 
 	/**
 	 * We need this parameter on the request, and it must be a valid integer.
 	 */
-	private int getRequiredIntegerParameter(HttpServletRequest req, String key) {
+	private int getIntegerParameter(HttpServletRequest req, String key,
+			int defaultValue) {
 		String string = req.getParameter(key);
-		if (string == null) {
-			throw new IllegalStateException(
-					"Request did not contain a value for '" + key + "'");
+		if ((string == null) || (string.isEmpty())) {
+			log.debug("No value for '" + key + "'; using default value = "
+					+ defaultValue);
+			return defaultValue;
 		}
 		try {
 			return Integer.parseInt(string);
 		} catch (NumberFormatException e) {
-			throw new IllegalStateException("Value for '" + key
-					+ "' was not a valid integer: '" + string + "'");
+			log.warn("Value for '" + key + "' was not a valid integer: '"
+					+ string + "'; using default value = " + defaultValue);
+			return defaultValue;
 		}
 	}
 

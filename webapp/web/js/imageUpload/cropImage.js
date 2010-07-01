@@ -25,21 +25,14 @@
 					marginLeft: '-' + Math.round(rx * coords.x) + 'px',
 					marginTop: '-' + Math.round(ry * coords.y) + 'px'
 				});
+
+				$('input[name=x]').val(coords.x);
+				$('input[name=y]').val(coords.y);
+				$('input[name=w]').val(coords.w);
+				$('input[name=h]').val(coords.h);			
 			}
 		};
 		
-		function removeAlpha(str) {
-			return str.replace(/[^\d-]/g,'');
-		};
-		
-		$('#cropImage').submit(function() {
-			var preview = $('#preview');
-			$('input[name=x]').val(removeAlpha(preview.css('marginLeft')));
-			$('input[name=y]').val(removeAlpha(preview.css('marginTop')));
-			$('input[name=w]').val(removeAlpha(preview.css('width')));
-			$('input[name=h]').val(removeAlpha(preview.css('height')));			
-		});
-
 	});
 
 }(jQuery));
