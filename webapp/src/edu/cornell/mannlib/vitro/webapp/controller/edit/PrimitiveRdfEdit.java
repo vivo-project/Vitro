@@ -91,11 +91,12 @@ public class PrimitiveRdfEdit extends FreeMarkerHttpServlet{
     
     protected void processRequest(VitroRequest vreq, HttpServletResponse response) {
         
-        /* Test error case
+        //Test error case
+        /*
         if (1==1) {
             doError(response, "Test error", 500);
             return;
-        }*/
+        } */
         
         /* Predefined values for RdfFormat are "RDF/XML", 
          * "N-TRIPLE", "TURTLE" (or "TTL") and "N3". null represents 
