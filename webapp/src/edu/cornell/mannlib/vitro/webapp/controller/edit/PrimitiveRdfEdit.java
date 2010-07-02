@@ -90,6 +90,13 @@ public class PrimitiveRdfEdit extends FreeMarkerHttpServlet{
     }
     
     protected void processRequest(VitroRequest vreq, HttpServletResponse response) {
+        
+        /* Test error case
+        if (1==1) {
+            doError(response, "Test error", 500);
+            return;
+        }*/
+        
         /* Predefined values for RdfFormat are "RDF/XML", 
          * "N-TRIPLE", "TURTLE" (or "TTL") and "N3". null represents 
          * the default language, "RDF/XML". "RDF/XML-ABBREV" is a synonym for "RDF/XML" */
@@ -206,7 +213,7 @@ public class PrimitiveRdfEdit extends FreeMarkerHttpServlet{
         return models;
     }
     
-    protected void doError(HttpServletResponse response, String errorMsg,int httpstatus){
+    protected void doError(HttpServletResponse response, String errorMsg, int httpstatus){
         response.setStatus(httpstatus);
         try {
             response.getWriter().write(errorMsg);

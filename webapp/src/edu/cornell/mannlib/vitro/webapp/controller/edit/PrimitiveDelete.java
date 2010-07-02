@@ -13,10 +13,10 @@ import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 
-public class PrimitiveRdfDelete extends PrimitiveRdfEdit {
+public class PrimitiveDelete extends PrimitiveRdfEdit {
 
     private static final long serialVersionUID = 1L;
-    private static final Log log = LogFactory.getLog(PrimitiveRdfDelete.class);  
+    private static final Log log = LogFactory.getLog(PrimitiveDelete.class);  
 
     protected void processRequest(VitroRequest vreq, HttpServletResponse response) {
      
