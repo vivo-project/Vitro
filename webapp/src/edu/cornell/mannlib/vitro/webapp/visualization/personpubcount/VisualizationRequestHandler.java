@@ -113,7 +113,7 @@ public class VisualizationRequestHandler {
 	    	VisVOContainer valueObjectContainer = new VisVOContainer();
 
 	    	VisualizationCodeGenerator visualizationCodeGenerator = 
-	    		new VisualizationCodeGenerator(vitroRequest.getRequestURI(),
+	    		new VisualizationCodeGenerator(vitroRequest.getContextPath(),
 	    									   individualURIParam,
 	    									   visMode,
 	    									   visContainer,

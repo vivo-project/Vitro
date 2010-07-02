@@ -55,6 +55,7 @@ public class VisualizationRequestHandler {
         String profileInfoMode = "PROFILE_INFO";
         String profileVisMode = "PROFILE_URL";
         String coAuthorVisMode = "COAUTHORSHIP_URL";
+        String personLevelVisMode = "PERSON_LEVEL_URL";
         String imageVisMode = "IMAGE_URL";
         
 		String resultFormatParam = "RS_TEXT";
@@ -179,6 +180,34 @@ public class VisualizationRequestHandler {
 						 				 VisualizationController.URL_ENCODING_SCHEME).toString();
 				
 
+				prepareVisualizationQueryResponse(preparedURL);
+				return;
+
+			} else if (personLevelVisMode.equalsIgnoreCase(visMode)) {
+    	    	/*
+    	    	 * By default we will be generating profile url else some specific url like coAuthorShip vis 
+    	    	 * url for that individual.
+    	    	 * */
+				
+				preparedURL += request.getContextPath()
+								+ "/admin/visQuery"
+								+ "?" 
+								+ VisualizationFrameworkConstants.INDIVIDUAL_URI_URL_HANDLE 
+								+ "=" + URLEncoder.encode(individualURIParam, 
+						 				 VisualizationController.URL_ENCODING_SCHEME).toString()
+						 	    + "&"
+			 				    + VisualizationFrameworkConstants.VIS_TYPE_URL_HANDLE 
+								+ "=" + URLEncoder.encode("person_level", 
+						 				 VisualizationController.URL_ENCODING_SCHEME).toString()
+						 	    + "&"
+			 				    + VisualizationFrameworkConstants.VIS_CONTAINER_URL_HANDLE 
+								+ "=" + URLEncoder.encode("ego_sparkline", 
+						 				 VisualizationController.URL_ENCODING_SCHEME).toString()						 				 
+			 				    + "&"
+			 				    + VisualizationFrameworkConstants.RENDER_MODE_URL_HANDLE
+								+ "=" + URLEncoder.encode(VisualizationFrameworkConstants.STANDALONE_RENDER_MODE_URL_VALUE, 
+						 				 VisualizationController.URL_ENCODING_SCHEME).toString();
+				
 				prepareVisualizationQueryResponse(preparedURL);
 				return;
 

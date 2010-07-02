@@ -1,12 +1,8 @@
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c" %>
 
 <c:set var="portalBean" value="${requestScope.portalBean}" />
-<c:set var="themeDir">
-	<c:out value="${portalBean.themeDir}" />
-</c:set>
-<c:set var="contextPath">
-	<c:out value="${pageContext.request.contextPath}" />
-</c:set>
+<c:set var="themeDir"><c:out value="${portalBean.themeDir}" /></c:set>
+<c:set var="contextPath"><c:out value="${pageContext.request.contextPath}" /></c:set>
 
 <c:url var="egoCoAuthorshipDataFeederURL" value="/admin/visQuery">
 	<c:param name="vis" value="coauthorship" />
@@ -42,7 +38,6 @@ var requiredRevision = 0;
 var swfLink = "${swfLink}";
 var egoCoAuthorshipDataFeederURL = "${egoCoAuthorshipDataFeederURL}";
 var contextPath = "${contextPath}";
-
 
 // -->
 </script>

@@ -2,7 +2,10 @@
 
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
 
+<c:set var="portalBean" value="${requestScope.portalBean}" />
+<c:set var="themeDir"><c:out value="${portalBean.themeDir}" /></c:set>
 <c:url var="visImageContextPath" value="/${themeDir}site_icons/visualization/" />
+<c:url var="loadingImageLink" value="/${themeDir}site_icons/visualization/ajax-loader.gif"></c:url>
 
 <c:set var='sparkline' value='${requestScope.sparklineVO}' />
 
@@ -18,151 +21,129 @@
 	<c:param name="uri" value="${requestScope.egoURIParam}" />
 </c:url>
 
-<div id="body"><%-- Label --%>
-<div class="datatypePropertyValue">
-<div class="statementWrap"><span id="ego_label"
-	class="author_name"></span></div>
+<div id="body">
+
+
+<style type="text/css">
+
+#ego_profile {
+	padding:10px;
+}
+
+#ego_label {
+	font-size:1.1em;
+	margin-left:100px;
+	margin-top:9px;
+	position:absolute;
+}
+
+#ego_moniker {
+	margin-left:100px;
+	margin-top:27px;
+	position:absolute;
+}
+
+#ego_profile_image {
+	width: 100px;
+}
+
+#ego_sparkline {
+	cursor:pointer;
+	height:36px;
+	margin-left:10px;
+	margin-top:69px;
+	position:absolute;
+	width:471px;
+}
+
+</style>
+
+<div id="ego_profile">
+
+	<%-- Label --%>
+			<span id="ego_label" class="author_name"></span>
+	
+	<%-- Moniker--%>
+			<span id="ego_moniker" class="author_moniker"></span>
+	
+	<%-- Image --%>
+			<span id="ego_profile_image" class="thumbnail"></span>
+	
+	<%-- Sparkline --%>
+			<span id="ego_sparkline">${sparkline.sparklineContent}</span>
+
 </div>
 
-<%-- Moniker--%>
-<div class="datatypeProperties">
-<div class="datatypePropertyValue">
-<div class="statementWrap"><span id="ego_moniker"
-	class="author_moniker"></span></div>
-</div>
-</div>
-
-<%-- Image --%>
-<div class="datatypeProperties">
-<div class="datatypePropertyValue">
-<div id="ego_profile_image" class="statementWrap thumbnail"></div>
-</div>
-</div>
-
-<%-- Sparkline --%>
-<div class="datatypeProperties">
-<div class="datatypePropertyValue">
-<div id="ego_sparkline">${sparkline.sparklineContent}</div>
-</div>
-</div>
 
 
 <div id="topShadow"></div>
-<div id="bodyPannel" style="height: 900px;"><br class="spacer" />
-<div id="visPanel" style="float: left; width: 610px;">
-
-
-<script type="text/javascript">
-
-<!--
-
-renderCoAuthorshipVisualization();
-
-//-->
-
-</script></div>
-<div id="dataPanel" style="float: left; width: 150px;"><br />
-<br />
-<br />
-<br />
-<br />
-<br />
-
-<div id="newsLetter" style="visibility: hidden"><span
-	class="nltop"></span>
-<div class="middle" id="nodeData">
-<div id="profileImage"></div>
-<div class="bold"><strong><span id="authorName"
-	class="author_name">&nbsp;</span></strong></div>
-<div class="italicize"><span id="profileMoniker"
-	class="author_moniker"></span></div>
-<div class="works"><span class="numbers" style="width: 40px;"
-	id="works">6</span>&nbsp;&nbsp;<span class="title">Works</span></div>
-<div class="works"><span class="numbers" style="width: 40px;"
-	id="coAuthors">78</span>&nbsp;&nbsp;<span>Co-author(s)</span></div>
-<br />
-<div id="firstPublication"><span></span>&nbsp;<span>First
-Publication</span></div>
-<div id="lastPublication"><span></span>&nbsp;Last Publication</div>
-<br />
-<div><a href="#" id="profileUrl">VIVO profile</a></div>
-<br />
-<div><a href="#" id="coAuthorshipVisUrl">Co-author network of
-<span id="coAuthorName"></span></a></div>
-</div>
-<br class="spacer"> <span class="nlbottom"></span>
-</div>
-
-</div>
-
- <span class="no_href_styles"> <a href="${coAuthorshipDownloadFile}"><img
-	src="${visImageContextPath}download_graphml.png" width="91" height="25" /></a>
+<div id="bodyPannel" style="height: 900px;">
+	<br class="spacer" />
+	
+	<div id="visPanel" style="float: left; width: 610px;">
+		<script language="JavaScript" type="text/javascript">
+			<!--
+			renderCoAuthorshipVisualization();
+			//-->
+		</script>
+	</div>
+	
+	<div id="dataPanel" style="float: left; width: 150px;" style="visibility:hidden;" >
+		<br /><br /><br /><br /><br /><br />
+		
+		<div id="profileImage"></div>
+		
+		<div class="bold"><strong><span id="authorName" class="author_name">&nbsp;</span></strong></div>
+		
+		<div class="italicize"><span id="profileMoniker" class="author_moniker"></span></div>
+		<br />
+		<div class="works"><span class="numbers" style="width: 40px;" id="works"></span>&nbsp;&nbsp;<span class="title">Works</span></div>
+		<div class="works"><span class="numbers" style="width: 40px;" id="coAuthors"></span>&nbsp;&nbsp;<span>Co-author(s)</span></div>
+		
+		<div class="works" id="fPub" style="visibility:hidden"><span class="numbers" style="width:40px;" id="firstPublication"></span>&nbsp;&nbsp;<span>First Publication</span></div>
+		<div class="works" id="lPub" style="visibility:hidden"><span class="numbers" style="width:40px;" id="lastPublication"></span>&nbsp;&nbsp;<span>Last Publication</span></div>
+		
+		<br /><br />
+		   
+		<div><a href="#" id="profileUrl">VIVO profile</a></div>
+		<br />
+		<div><a href="#" id="coAuthorshipVisUrl">Co-author network of <span id="coAuthorName"></span></a></div>
+	</div>
+	
+	<span class="no_href_styles"><a href="${coAuthorshipDownloadFile}">
+ 	<img src="${visImageContextPath}download_graphml.png" width="91" height="25" /></a>
 </span>
-<div id="bottomShadow"></div>
+
+	<br class="spacer">
+</div>
+
+
 
 
 </div>
 
-<br class="spacer" />
-
-<style type="text/css">
-.vis-stats {
-	width: 760px;
-	margin: 0;
-	padding: 0;
-}
-
-.vis-tables {
-	width: 25%;
-	padding: 5px;
-	margin: 5px;
-	background-color: #FFF;
-	border: 1px solid #ddebf1;
-	float: left;
-}
-
-p.datatable {
-	font-size: 12px;
-	display: block;
-	margin: 2px;
-	padding: 0
-}
-
-.datatable table {
-	text-align: left;
-}
-
-.datatable img {
-	float: right;
-	cursor: pointer;
-}
-
-.datatable table caption {
-	color: #16234c;
-	margin: 0;
-	padding: 0;
-	font-size: 14px;
-}
-</style>
 
 <div class="vis-stats">
-<div class="vis-tables">
-<p class="datatable">${sparkline.table} 
-<a href="${egoSparklineDataURL}" class="no_href_styles">
-	<img src="${visImageContextPath}download_csv.png" width="91" height="25" />
-</a>
-</p>
+
+	<div class="vis-tables">
+		<p class="datatable">
+			${sparkline.table} 
+			<a href="${egoSparklineDataURL}" class="no_href_styles">
+				<img src="${visImageContextPath}download_csv.png" width="91" height="25" />
+			</a>
+		</p>
+	</div>
+
+	<div class="vis-tables">
+		<p id="coauth_table_container" class="datatable"></p>
+	</div>
+
 </div>
 
-<div class="vis-tables">
-<p id="coauth_table_container" class="datatable"></p>
-</div>
-
-</div>
-
-</div>
-<script>
+<script language="JavaScript" type="text/javascript">
 $(document).ready(function(){
+
+	$("#coauth_table_container").empty().html('<img id="loadingData" with="auto" src="${loadingImageLink}" />');
 
 	processProfileInformation("ego_label", 
 							  "ego_moniker",

@@ -83,10 +83,10 @@ $.fn.image = function(src, successFunc, failureFunc){
 
 function setProfileImage(imageContainerID, rawPath, contextPath) {
 
+	
 	if (imageContainerID == "") {
 		return;
 	}
-
 
 	var imageLink =  contextPath + rawPath;
 
@@ -175,21 +175,12 @@ function createTable(tableID, tableContainer, tableData) {
 
 	var table = $('<table>');
 	table.attr('id', tableID);
-//	var columns = {'Author', 'Count'};
-	
 	
 	table.append($('<caption>').html("Co-Authorships"));  
 	
 	var header = $('<thead>');
 	
-	
 	var row = $('<tr>'); 
-	
-
-	// Loop thru our columns collection and add each one to the header row
-//	for (columnName in columns) {
-//	header.append($('<th>').html(columnName));
-//	}
 
 	row.append($('<th>').html("Author"));  
 	row.append($('<th>').html("Count"));  
@@ -202,33 +193,22 @@ function createTable(tableID, tableContainer, tableData) {
 
 		var row = $('<tr>'); 
 
-		// console.log(item.name + " - " +
-		// item.number_of_authored_works);
-
 		row.append($('<td>').html(item.name));
 		row.append($('<td>').html(item.number_of_authored_works));
-
 
 		table.append(row);
 
 	});	
 
-//	var footer = $('<tr>');
-//	var addIcon = $('<img>').attr('src','path/to/add.gif').click(AddRow);
-//	footer.append($('<td>').append(addIcon));
-//	for (i in columns)
-//	footer.append($('<td>'));
-//	table.append(footer);
-
 	table.prependTo('#' + tableContainer);
-	// return false; // Return false so the link doesn't try to go anywhere
+	$('#' + tableContainer + " #loadingData").remove();
 }
 
 function nodeClickedJS(json){
 
 	var obj = jQuery.parseJSON(json);
 
-	$("#newsLetter").attr("style","visibility:visible");
+	$("#dataPanel").attr("style","visibility:visible");
 	$("#authorName").empty().append(obj.name);
 	$("#works").empty().append(obj.number_of_authored_works);
 
@@ -251,30 +231,13 @@ function nodeClickedJS(json){
 	$("#coAuthorName").empty().append(obj.name);	
 
 	$("#coAuthors").empty().append(obj.num_coauthors);	
-	$("#firstPublication").empty().append((obj.earliest_publication)?obj.earliest_publication+" First Publication":"");
-	$("#lastPublication").empty().append((obj.latest_publication)?obj.latest_publication+" Last Publication":"");
+	
+	$("#firstPublication").empty().append(obj.earliest_publication);
+	(obj.earliest_publication)?$("#fPub").attr("style","visibility:visible"):$("#fPub").attr("style","visibility:hidden");
+	$("#lastPublication").empty().append(obj.latest_publication);
+	(obj.latest_publication)?$("#lPub").attr("style","visibility:visible"):$("#lPub").attr("style","visibility:hidden");
 
 	// obj.url:the url parameter for node
-
-}
-
-function renderSparklineVisualization(visualizationURL) {
-
-	$(document).ready(function() {
-
-		// $("#ego_sparkline").empty().html('<img src="${loadingImageLink}" />');
-
-		$.ajax({
-			url: visualizationURL,
-			dataType: "html",
-			success:function(data){
-			$("#ego_sparkline").html(data);
-
-		}
-		});
-
-
-	});
 
 }
 
@@ -300,7 +263,7 @@ function renderCoAuthorshipVisualization() {
 				"src", "playerProductInstall",
 				"FlashVars", "MMredirectURL="+MMredirectURL+'&MMplayerType='+MMPlayerType+'&MMdoctitle='+MMdoctitle+"",
 				"width", "600",
-				"height", "800",
+				"height", "840",
 				"align", "middle",
 				"id", "CoAuthor",
 				"quality", "high",
@@ -315,10 +278,10 @@ function renderCoAuthorshipVisualization() {
 		// embed the Flash Content SWF when all tests are passed
 		AC_FL_RunContent(
 				"src", swfLink,
-				"flashVars", "graphmlUrl=" + egoCoAuthorshipDataURL,			
+				"flashVars", "graphmlUrl=" + egoCoAuthorshipDataFeederURL,			
 				"width", "600",
-				"height", "800",
-				"align", "middle",
+				"height", "840",
+				"align", "top",
 				"id", "CoAuthor",
 				"quality", "high",
 				"bgcolor", "#ffffff",

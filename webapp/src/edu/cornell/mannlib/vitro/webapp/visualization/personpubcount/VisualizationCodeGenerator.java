@@ -43,7 +43,7 @@ public class VisualizationCodeGenerator {
 
 	private VisVOContainer valueObjectContainer;
 
-	public VisualizationCodeGenerator(String requestURI, 
+	public VisualizationCodeGenerator(String contextPath, 
 									  String individualURIParam, 
 									  String visMode, 
 									  String visContainer, 
@@ -56,7 +56,7 @@ public class VisualizationCodeGenerator {
 		this.valueObjectContainer = valueObjectContainer;
 		this.log = log;
 		
-		generateVisualizationCode(requestURI, 
+		generateVisualizationCode(contextPath, 
 				  individualURIParam, 
 				  visMode, 
 				  visContainer, 
@@ -65,7 +65,7 @@ public class VisualizationCodeGenerator {
 		
 	}
 	
-	private void generateVisualizationCode(String requestURI,
+	private void generateVisualizationCode(String contextPath,
 										   String individualURIParam, 
 										   String visMode, 
 										   String visContainer,
@@ -76,7 +76,7 @@ public class VisualizationCodeGenerator {
     																	  visContainer));
     	
     	
-    	valueObjectContainer.setSparklineContext(getVisualizationContextCode(requestURI, 
+    	valueObjectContainer.setSparklineContext(getVisualizationContextCode(contextPath, 
     																		 individualURIParam, 
     																		 visMode));
     	
@@ -144,7 +144,7 @@ public class VisualizationCodeGenerator {
 		numOfYearsToBeRendered = currentYear - minPubYearConsidered + 1;
 		
 		visualizationCode.append("<style type='text/css'>" +
-										/*"." + visualizationStyleClass + " table{" +
+										"." + visualizationStyleClass + " table{" +
 										"		margin: 0;" +
 										"  		padding: 0;" +
 										"  		width: auto;" +
@@ -152,7 +152,7 @@ public class VisualizationCodeGenerator {
 										"    	border-spacing: 0;" +
 										"    	vertical-align: inherit;" +
 										"}" +
-										"#sparkline_data_table {" +
+										/*"#sparkline_data_table {" +
 												"width: auto;" +
 										"}" +
 										"#sparkline_data_table tfoot {" +
@@ -404,13 +404,13 @@ public class VisualizationCodeGenerator {
 								"</script>\n";
 	}
 
-	private String getVisualizationContextCode(String uri, String individualURI, String visMode) {
+	private String getVisualizationContextCode(String contextPath, String individualURI, String visMode) {
 
 		String visualizationContextCode = "";
 		if (SHORT_SPARKLINE_MODE_URL_HANDLE.equalsIgnoreCase(visMode)) {
-			visualizationContextCode = generateShortVisContext(uri, individualURI);
+			visualizationContextCode = generateShortVisContext(contextPath, individualURI);
 		} else {
-			visualizationContextCode = generateFullVisContext(uri, individualURI);
+			visualizationContextCode = generateFullVisContext(contextPath, individualURI);
 		}
 		
 		
@@ -425,7 +425,7 @@ public class VisualizationCodeGenerator {
 		return visualizationContextCode;
 	}
 	
-	private String generateFullVisContext(String uri, 
+	private String generateFullVisContext(String contextPath, 
 										 String individualURI) {
 		
 		StringBuilder divContextCode = new StringBuilder();
@@ -436,7 +436,8 @@ public class VisualizationCodeGenerator {
 			if (yearToPublicationCount.size() > 0) {
 				
 				
-				String downloadURL = uri.toString() 
+				String downloadURL = contextPath
+									 + "/admin/visQuery"
 									 + "?" + VisualizationFrameworkConstants.INDIVIDUAL_URI_URL_HANDLE 
 									 + "=" + URLEncoder.encode(individualURI, 
 											 				   VisualizationController.URL_ENCODING_SCHEME).toString() 
@@ -470,7 +471,7 @@ public class VisualizationCodeGenerator {
 	}
 	
 	
-	private String generateShortVisContext(String uri, 
+	private String generateShortVisContext(String contextPath, 
 			 String individualURI) {
 
 		StringBuilder divContextCode = new StringBuilder();
@@ -479,19 +480,40 @@ public class VisualizationCodeGenerator {
 		
 		String fullTimelineLink;
 		if (yearToPublicationCount.size() > 0) {
-			String fullTimelineNetworkURL = uri.toString() + "?" + 
-										VisualizationFrameworkConstants.INDIVIDUAL_URI_URL_HANDLE + 
-										 "=" + URLEncoder.encode(individualURI, 
-												 				 VisualizationController.URL_ENCODING_SCHEME).toString() +
-										 "&" +
-										 "vis" +
-										 "=" + URLEncoder.encode(VisualizationController
-												 						.PERSON_PUBLICATION_COUNT_VIS_URL_VALUE, 
-												 				 VisualizationController.URL_ENCODING_SCHEME).toString() +
-										 "&" +
-										 VisualizationFrameworkConstants.RENDER_MODE_URL_HANDLE + 
-										 "=" + URLEncoder.encode(VisualizationFrameworkConstants.STANDALONE_RENDER_MODE_URL_VALUE, 
-								 				 				 VisualizationController.URL_ENCODING_SCHEME).toString();
+//			String fullTimelineNetworkURL = uri.toString() + "?" + 
+//										VisualizationFrameworkConstants.INDIVIDUAL_URI_URL_HANDLE + 
+//										 "=" + URLEncoder.encode(individualURI, 
+//												 				 VisualizationController.URL_ENCODING_SCHEME).toString() +
+//										 "&" +
+//										 "vis" +
+//										 "=" + URLEncoder.encode(VisualizationController
+//												 						.PERSON_PUBLICATION_COUNT_VIS_URL_VALUE, 
+//												 				 VisualizationController.URL_ENCODING_SCHEME).toString() +
+//										 "&" +
+//										 VisualizationFrameworkConstants.RENDER_MODE_URL_HANDLE + 
+//										 "=" + URLEncoder.encode(VisualizationFrameworkConstants.STANDALONE_RENDER_MODE_URL_VALUE, 
+//								 				 				 VisualizationController.URL_ENCODING_SCHEME).toString();
+			
+			
+			String fullTimelineNetworkURL = contextPath
+							+ "/admin/visQuery"
+							+ "?" 
+							+ VisualizationFrameworkConstants.INDIVIDUAL_URI_URL_HANDLE 
+							+ "=" + URLEncoder.encode(individualURI, 
+					 				 VisualizationController.URL_ENCODING_SCHEME).toString()
+					 	    + "&"
+		 				    + VisualizationFrameworkConstants.VIS_TYPE_URL_HANDLE 
+							+ "=" + URLEncoder.encode("person_level", 
+					 				 VisualizationController.URL_ENCODING_SCHEME).toString()
+					 	    + "&"
+		 				    + VisualizationFrameworkConstants.VIS_CONTAINER_URL_HANDLE 
+							+ "=" + URLEncoder.encode("ego_sparkline", 
+					 				 VisualizationController.URL_ENCODING_SCHEME).toString()						 				 
+		 				    + "&"
+		 				    + VisualizationFrameworkConstants.RENDER_MODE_URL_HANDLE
+							+ "=" + URLEncoder.encode(VisualizationFrameworkConstants.STANDALONE_RENDER_MODE_URL_VALUE, 
+					 				 VisualizationController.URL_ENCODING_SCHEME).toString();
+			
 			fullTimelineLink = "<a href='" + fullTimelineNetworkURL + "'>View full timeline and network.</a><br />";
 			
 			valueObjectContainer.setFullTimelineNetworkLink(fullTimelineNetworkURL);
