@@ -21,8 +21,10 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vedit.beans.LoginFormBean;
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.filestorage.FileModelHelper;
 import edu.cornell.mannlib.vitro.webapp.filestorage.FileServingHelper;
@@ -147,6 +149,10 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 
 			VitroRequest vreq = new VitroRequest(request);
 			ResponseValues values = buildTheResponse(vreq);
+
+			// They can't do this if they aren't logged in.
+			if (!checkLoginStatus(request, response))
+				return;
 
 			switch (values.getType()) {
 			case FORWARD:
@@ -396,9 +402,9 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	 *            if this is null, then all URLs lead to the welcome page.
 	 */
 	private TemplateResponseValues showAddImagePage(Individual entity) {
-		String formAction = (entity == null) ? "/" : formAction(
+		String formAction = (entity == null) ? "" : formAction(
 				entity.getURI(), ACTION_UPLOAD);
-		String cancelUrl = (entity == null) ? "/" : displayPageUrl(entity
+		String cancelUrl = (entity == null) ? "" : displayPageUrl(entity
 				.getURI());
 
 		TemplateResponseValues rv = new TemplateResponseValues(TEMPLATE_NEW);
@@ -469,9 +475,9 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	 */
 	private String displayPageUrl(String entityUri) {
 		if (DEFAULT_NAMESPACE == null) {
-			return "/";
+			return "";
 		} else if (!entityUri.startsWith(DEFAULT_NAMESPACE)) {
-			return "/";
+			return "";
 		} else {
 			String tail = entityUri.substring(DEFAULT_NAMESPACE.length());
 			if (!tail.startsWith("/")) {
@@ -725,4 +731,25 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 		}
 
 	}
+
+	protected boolean checkLoginStatus(HttpServletRequest request,
+			HttpServletResponse response) {
+		LoginFormBean loginBean = (LoginFormBean) request.getSession()
+				.getAttribute("loginHandler");
+		String loginPage = request.getContextPath() + Controllers.LOGIN;
+		request.getSession().setAttribute("postLoginRequest",
+				request.getRequestURI() + "?" + request.getQueryString());
+		if ((loginBean == null)
+				|| (!loginBean.getLoginStatus().equals("authenticated"))) {
+			try {
+				response.sendRedirect(loginPage);
+				return false;
+			} catch (IOException ioe) {
+				log.error("could not redirect to login page", ioe);
+				return false;
+			}
+		}
+		return true;
+	}
+
 }
