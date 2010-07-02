@@ -536,11 +536,26 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 		final int height;
 		final int width;
 
-		private CropRectangle(int x, int y, int height, int width) {
+		CropRectangle(int x, int y, int height, int width) {
 			this.x = x;
 			this.y = y;
 			this.height = height;
 			this.width = width;
+		}
+
+		/** Produce a new crop rectangle that compensates for scaling. */
+		public CropRectangle unscale(float scale) {
+			int newX = (int) (x / scale);
+			int newY = (int) (y / scale);
+			int newHeight = (int) (height / scale);
+			int newWidth = (int) (width / scale);
+			return new CropRectangle(newX, newY, newHeight, newWidth);
+		}
+
+		@Override
+		public String toString() {
+			return "CropRectangle[x=" + x + ", y=" + y + ", w=" + width
+					+ ", h=" + height + "]";
 		}
 
 	}

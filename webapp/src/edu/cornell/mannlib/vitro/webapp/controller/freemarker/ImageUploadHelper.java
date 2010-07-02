@@ -28,6 +28,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadController.CropRectangle;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadController.Dimensions;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadController.UserMistakeException;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
@@ -41,6 +42,12 @@ import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServ
  */
 public class ImageUploadHelper {
 	private static final Log log = LogFactory.getLog(ImageUploadHelper.class);
+
+	/**
+	 * If the main image is larger than this, it will be displayed at reduced
+	 * scale.
+	 */
+	public static final int MAXIMUM_IMAGE_DISPLAY_WIDTH = 500;
 
 	/** Recognized file extensions mapped to MIME-types. */
 	private static final Map<String, String> RECOGNIZED_FILE_TYPES = createFileTypesMap();
@@ -325,8 +332,11 @@ public class ImageUploadHelper {
 	 * width, height).
 	 */
 	private InputStream scaleImageForThumbnail(InputStream source,
-			ImageUploadController.CropRectangle crop) throws IOException {
+			CropRectangle crop) throws IOException {
 		BufferedImage bsrc = ImageIO.read(source);
+
+		// If the image was displayed in reduced form, adjust the crop info.
+		crop = adjustForScaledImageDisplay(bsrc.getWidth(), crop);
 
 		// Insure that x and y fall within the image dimensions.
 		int x = Math.max(0, Math.min(bsrc.getWidth(), Math.abs(crop.x)));
@@ -340,10 +350,8 @@ public class ImageUploadHelper {
 		double scaleWidth = ((double) THUMBNAIL_WIDTH) / ((double) w);
 		double scaleHeight = ((double) THUMBNAIL_HEIGHT) / ((double) h);
 
-		log.debug("Generating a thumbnail, initial crop info: " + crop.x + ", "
-				+ crop.y + ", " + crop.width + ", " + crop.height);
-		log.debug("Generating a thumbnail, bounded crop info: " + x + ", " + y
-				+ ", " + w + ", " + h);
+		log.debug("Generating a thumbnail, initial crop info: " + crop);
+		log.debug("Generating a thumbnail, bounded crop info: " + crop);
 		log.debug("Generating a thumbnail, scales: " + scaleWidth + ", "
 				+ scaleHeight);
 
@@ -362,6 +370,24 @@ public class ImageUploadHelper {
 		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 		ImageIO.write(bdest, "JPG", buffer);
 		return new ByteArrayInputStream(buffer.toByteArray());
+	}
+
+	/**
+	 * If the source image was too big to fit in the page, then it was displayed
+	 * at a reduced scale. The crop values must expand to apply to the
+	 * full-sized image.
+	 */
+	private CropRectangle adjustForScaledImageDisplay(int imageWidth,
+			CropRectangle crop) {
+		if (imageWidth <= MAXIMUM_IMAGE_DISPLAY_WIDTH) {
+			return crop;
+		}
+
+		float displayScale = ((float) MAXIMUM_IMAGE_DISPLAY_WIDTH)
+				/ ((float) imageWidth);
+		log.debug("Generating a thumbnail, unscaled crop info: " + crop
+				+ ", displayScale=" + displayScale);
+		return crop.unscale(displayScale);
 	}
 
 	/**
