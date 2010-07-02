@@ -8,10 +8,16 @@ ${scripts.add("/js/imageUpload/validateUpload.js")}
 ${scripts.add("/js/imageUpload/confirmPhotoDeletion.js")}
 
 
+
 ${stylesheets.addFromTheme("/uploadImages.css")}
 
 <#if errorMessage??>
-    <h2>${errorMessage}</h2>
+   <script type="text/javascript">  
+    window.onload = load;  
+	function load(){  
+ 		alert("${errorMessage}");
+ 		}
+ 	</script>
 </#if>
 
 <div id="photoUploadContainer">
