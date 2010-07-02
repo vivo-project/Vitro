@@ -6,140 +6,156 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.servlet.ServletContext;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelChangedListener;
-import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
 
-
-public class SearchReindexingListener implements ModelChangedListener {			
-	private ServletContext context;		
+/**
+ * This class is thread safe.
+ */
+public class SearchReindexingListener implements ModelChangedListener {					
 	private HashSet<String> changedUris;	
+	private IndexBuilder indexBuilder;
 	
-	public SearchReindexingListener(OntModel ontModel, ServletContext sc) {		
-		this.context = sc;
+	public SearchReindexingListener(IndexBuilder indexBuilder) {
+		if(indexBuilder == null )
+			throw new IllegalArgumentException("Constructor parameter indexBuilder must not be null");		
+		this.indexBuilder = indexBuilder;
 		this.changedUris = new HashSet<String>();		
 	}	
 
-	public void notifyEvent(Model arg0, Object arg1) {
-		if ( (arg1 instanceof EditEvent) ){
-			EditEvent editEvent = (EditEvent)arg1;
-			if( editEvent.getBegin() ){
-				
-			}else{ // editEvent is the end of an edit
-				log.debug("doing search index build");
-				IndexBuilder builder = (IndexBuilder) context.getAttribute(IndexBuilder.class.getName());
-				if( builder != null ){
-					for( String uri: getAndClearChangedUris()){
-						builder.addToChangedUris(uri);
-					}				
-					new Thread(builder).start();
-				}else{
-					log.debug("Could not get IndexBuilder from servlet context, cannot create index for full text seraching.");
-					getAndClearChangedUris(); //clear list of changes because they cannot be indexed.
-				}								
-			}		
-		} 
-	}
-	
-	private boolean isNormalPredicate(Property p) {		
-		if( p == null ) return false;
-		
-		/* currently the only predicate that is filtered out is rdf:type.
-		 * It may be useful to improve this so that it may be configured 
-		 * at run time.*/
-		if( RDF.type.equals( p ))
-			return false;
-		else 
-			return true;
-	}
-
-	private synchronized Set<String> getAndClearChangedUris(){
-		log.debug("getting and clearing changed URIs.");
-		
-		Set<String> out = changedUris;
-		changedUris = new HashSet<String>();
-		return out;
-	}
-	
 	private synchronized void addChange(Statement stmt){
 		if( stmt == null ) return;
 		if( stmt.getSubject().isURIResource() ){			
-			changedUris.add( stmt.getSubject().getURI());
+			//changedUris.add( stmt.getSubject().getURI());
+			indexBuilder.addToChangedUris(stmt.getSubject().getURI());
 			log.debug(stmt.getSubject().getURI());
 		}
 				
-		if( stmt.getObject().isURIResource() && isNormalPredicate( stmt.getPredicate() ) ){
-			changedUris.add( ((Resource) stmt.getObject().as(Resource.class)).getURI() );
+		if( stmt.getObject().isURIResource() ){
+			//changedUris.add( ((Resource) stmt.getObject().as(Resource.class)).getURI() );
+			indexBuilder.addToChangedUris(((Resource) stmt.getObject()).getURI());			
 			log.debug(((Resource) stmt.getObject().as(Resource.class)).getURI());
 		}	
 	}
 	
+//	private synchronized Set<String> getAndClearChangedUris(){
+//		log.debug("Getting and clearing changed URIs.");		
+//		Set<String> out = changedUris;
+//		changedUris = new HashSet<String>();
+//		return out;
+//	}
+
+	private void doAyncIndex(){
+//		for( String uri: getAndClearChangedUris()){
+//			indexBuilder.addToChangedUris(uri);
+//		}				
+		new Thread(indexBuilder).start();		
+	}
+	
+	
+	@Override
+	public void notifyEvent(Model arg0, Object arg1) {
+		if ( (arg1 instanceof EditEvent) ){
+			EditEvent editEvent = (EditEvent)arg1;
+			if( !editEvent.getBegin() ){// editEvent is the end of an edit				
+				log.debug("Doing search index build at end of EditEvent");				
+				doAyncIndex();
+			}		
+		} else{
+			log.debug("ignoring event " + arg1.getClass().getName() + " "+ arg1 );
+		}
+	}
+	
+	@Override
 	public void addedStatement(Statement stmt) {
 		addChange(stmt);
+		//doAyncIndex();
 	}
 
-	public void addedStatements(Statement[] arg0) {
-		for(Statement stmt : arg0)
-			addChange(stmt);
-	}
-	
-	public void addedStatements(List arg0) {		
-		for(Statement stmt : (List<Statement>)arg0)
-			addChange(stmt);
-	}
-	
-	public void addedStatements(StmtIterator arg0) {
-		if( arg0 != null ){
-			while( arg0.hasNext() ){
-				addChange(arg0.nextStatement());
-			}
-		}
-	}
-	
-	public void addedStatements(Model arg0) {
-		if( arg0 != null)
-			addedStatements(arg0.listStatements());
-	}
-
+	@Override
 	public void removedStatement(Statement stmt){
 		addChange(stmt);
-	}
-	
-	public void removedStatements(Statement[] arg0) {
-		for(Statement stmt : arg0)
-			addChange(stmt);
-	}
-	
-	public void removedStatements(List arg0) {		
-		for(Statement stmt : (List<Statement>)arg0)
-			addChange(stmt);
-	}
-	
-	public void removedStatements(StmtIterator arg0) {
-		if( arg0 != null ){
-			while( arg0.hasNext() ){
-				addChange(arg0.nextStatement());
-			}
-		}
-	}
-	
-	public void removedStatements(Model arg0) {
-		if( arg0 != null)
-			removedStatements(arg0.listStatements());
+		//doAyncIndex();
 	}
 	
 	private static final Log log = LogFactory.getLog(SearchReindexingListener.class.getName());
+
+	@Override
+	public void addedStatements(Statement[] arg0) {
+		for( Statement s: arg0){
+			addChange(s);
+		}
+		//doAyncIndex();
+	}
+
+	@Override
+	public void addedStatements(List<Statement> arg0) {
+		for( Statement s: arg0){
+			addChange(s);
+		}
+		//doAyncIndex();
+	}
+
+	@Override
+	public void addedStatements(StmtIterator arg0) {
+		try{
+			while(arg0.hasNext()){
+				Statement s = arg0.nextStatement();
+				addChange(s);
+			}
+		}finally{
+			arg0.close();
+		}
+		//doAyncIndex();		
+	}
+
+	@Override
+	public void addedStatements(Model m) {
+		m.enterCriticalSection(Lock.READ);
+		StmtIterator it = null;
+		try{
+			it = m.listStatements();
+			while(it.hasNext()){
+				addChange(it.nextStatement());
+			}			
+		}finally{
+			if( it != null ) it.close();
+			m.leaveCriticalSection();
+		}
+		//doAyncIndex();
+	}
+
+	@Override
+	public void removedStatements(Statement[] arg0) {
+		//same as add stmts
+		this.addedStatements(arg0);		
+	}
+
+	@Override
+	public void removedStatements(List<Statement> arg0) {
+		//same as add
+		this.addedStatements(arg0);		
+	}
+
+	@Override
+	public void removedStatements(StmtIterator arg0) {
+		//same as add
+		this.addedStatements(arg0);
+	}
+
+	@Override
+	public void removedStatements(Model arg0) {
+		//same as add
+		this.addedStatements(arg0);
+	}
 }

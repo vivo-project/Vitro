@@ -90,15 +90,18 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
 
         //DocId
         String id = ent.getURI();
-        if( id == null )
+        if( id == null ){
+        	log.debug("cannot translate bnodes");
             throw new IndexingException("Not indexing bnodes");
+        }
         
         doc.add( new Field(term.DOCID, entClassName + id,
                             Field.Store.YES, Field.Index.NOT_ANALYZED));
 
         //vitro Id        
         doc.add(  new Field(term.URI, id, Field.Store.YES, Field.Index.NOT_ANALYZED));
-
+        log.debug( id );
+        
         //java class
         doc.add( new  Field(term.JCLASS, entClassName, Field.Store.YES, Field.Index.NOT_ANALYZED));
 
@@ -124,6 +127,8 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         //rdf:type and ClassGroup
         List<VClass> vclasses = ent.getVClasses(false);
         for( VClass clz : vclasses){
+        	log.debug( id + " as type " + clz.getURI() );
+        	
             //document boost for given classes
             if( clz.getSearchBoost() != null )
                 doc.setBoost( doc.getBoost() + clz.getSearchBoost() );            

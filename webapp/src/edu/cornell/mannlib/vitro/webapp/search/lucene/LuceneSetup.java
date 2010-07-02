@@ -121,9 +121,11 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 	            //set up listeners so search index builder is notified of changes to model
 	            OntModel baseOntModel = (OntModel)sce.getServletContext().getAttribute("baseOntModel");
 	            OntModel jenaOntModel = (OntModel)sce.getServletContext().getAttribute("jenaOntModel");
-	            SearchReindexingListener srl = new SearchReindexingListener(baseOntModel, sce.getServletContext());
+	            OntModel inferenceModel = (OntModel) sce.getServletContext().getAttribute("inferenceOntModel");
+	            SearchReindexingListener srl = new SearchReindexingListener(builder);
 	            baseOntModel.getBaseModel().register(srl);
 	        	jenaOntModel.getBaseModel().register(srl);
+	        	inferenceModel.register(srl);
 	        	
 	        	//set the classes that the indexBuilder ignores
 	        	OntModel displayOntModel = (OntModel)sce.getServletContext().getAttribute("displayOntModel");

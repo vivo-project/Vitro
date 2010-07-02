@@ -194,12 +194,18 @@ public class LuceneIndexer implements IndexerIface {
             while (it.hasNext()) {
                 Obj2DocIface obj2doc = (Obj2DocIface) it.next();
                 if (obj2doc.canTranslate(ind)) {
-                    if( !newDoc ){
-                        writer.deleteDocuments((Term)obj2doc.getIndexId(ind));
+                	Document d = (Document) obj2doc.translate(ind);
+                	if( d != null){
+                		if( !newDoc ){                    	                    		
+                			writer.updateDocument((Term)obj2doc.getIndexId(ind), d);
+                			log.debug("updated " + ind.getName() + " " + ind.getURI());
+                		}else{                    	
+                    		writer.addDocument(d);
+                    		log.debug("added " + ind.getName() + " " + ind.getURI());
+                		}
+                    }else{
+                    	log.debug("could not translate " + ind.getURI());
                     }
-                    Document d = (Document) obj2doc.translate(ind);
-                    if( d != null)
-                        writer.addDocument(d);
                 }
             }
         } catch (IOException ex) {
@@ -221,6 +227,7 @@ public class LuceneIndexer implements IndexerIface {
                 Obj2DocIface obj2doc = (Obj2DocIface) it.next();
                 if (obj2doc.canTranslate(ind)) {
                     writer.deleteDocuments((Term)obj2doc.getIndexId(ind));
+                    log.debug("deleted " + ind.getName() + " " + ind.getURI());
                 }
             }
         } catch (IOException ex) {            

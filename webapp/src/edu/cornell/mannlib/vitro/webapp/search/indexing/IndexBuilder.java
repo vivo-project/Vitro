@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.search.indexing;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -46,7 +47,7 @@ public class IndexBuilder implements Runnable {
     ProhibitedFromSearch classesProhibitedFromSearch = null;
     
     long lastRun = 0;
-    List<String> changedUris = null;         
+    Collection<String> changedUris = null;         
     
     public static final boolean UPDATE_DOCS = false;
     public static final boolean NEW_DOCS = true;
@@ -60,7 +61,7 @@ public class IndexBuilder implements Runnable {
         this.sourceList = sources;
         this.context = context;
         
-        changedUris = new LinkedList<String>();        	
+        changedUris = new HashSet<String>();        	
     }
 
     public void addObjectSource(ObjectSourceIface osi) {    	
@@ -210,9 +211,9 @@ public class IndexBuilder implements Runnable {
                 indexForSource((Iterator)obj, newDocs);
             }
         } catch (IndexingException ex) {
-            log.error("\t" + ex.getMessage(),ex);
+            log.error(ex,ex);
         } catch (Exception e) {
-            log.error("\t"+e.getMessage(),e);
+            log.error(e,e);
         } finally {
             indexer.endIndexing();
         }
