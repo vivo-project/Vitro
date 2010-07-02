@@ -2,7 +2,10 @@
 
 <#-- Upload a replacement main image for an Individual. -->
 
+
+
 ${scripts.add("/js/imageUpload/validateUpload.js")}
+${scripts.add("/js/imageUpload/confirmPhotoDeletion.js")}
 
 
 ${stylesheets.addFromTheme("/uploadImages.css")}
@@ -16,7 +19,7 @@ ${stylesheets.addFromTheme("/uploadImages.css")}
        <div id="photoUploadDefaultImageContainer">
               <h6>Current Photo</h6>
               <img src="${thumbnailUrl}" width="115" height="115" /> <br />
-       <a href="${deleteUrl}">Delete photo</a></div>
+       <a href='javascript:delete_photo("${deleteUrl}");'>Delete photo</a></div>
        <div id="photoUploadForm">
               <form action="${formAction}" enctype="multipart/form-data" method="post" onSubmit="return validate_upload_file(this)">
                      <label>Replace Photo <span> (JPEG, GIF or PNG. Max Size: 50 MB)</span></label>
