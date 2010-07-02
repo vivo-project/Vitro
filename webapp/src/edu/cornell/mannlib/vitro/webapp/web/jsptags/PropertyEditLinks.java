@@ -181,7 +181,7 @@ public class PropertyEditLinks extends TagSupport{
                 if( links != null){
                     for( LinkStruct ln : links ){
                         if( ln != null ){
-                            out.print( makeElement( ln ) + '\n' );
+                            out.print( ln.makeElement() + '\n' );
                         }
                     }
                 }               
@@ -482,8 +482,14 @@ public class PropertyEditLinks extends TagSupport{
 
 			if (contains(accesses, EditLinkAccess.ADDNEW)) {
 				log.debug("permission to ADD main image to " + subjectUri);
-				return new LinkStruct[] { getImageLink(subjectUri, contextPath,
-						"edit", "upload an image", "add") };
+				boolean isPerson = entity.isVClass("http://xmlns.com/foaf/0.1/Person");
+				if (isPerson) {
+					return new LinkStruct[] { getImageLink(subjectUri,
+							contextPath, "edit", "upload an image", "add") };
+				} else {
+					return new LinkStruct[] { getImageLink(subjectUri,
+							contextPath, "add", "upload an image", "add") };
+				}
 			} else {
 				log.debug("NO permission to ADD main image to " + subjectUri);
 				return empty_array;
@@ -540,31 +546,6 @@ public class PropertyEditLinks extends TagSupport{
             if( allowedAccessTypeArray[i] == accessType ) return true;
         }
         return false;
-    }
-
-    protected String makeElement( LinkStruct ln ){
-        String element = 
-            "<a class=\"image " + ln.getType() + "\" href=\"" + ln.getHref() + 
-            "\" title=\"" + (ln.getMouseoverText()==null ? ln.getType() : ln.getMouseoverText()) + "\">" ;
-        
-        if( "true".equalsIgnoreCase(getIcons()) ){
-            String contextPath=((HttpServletRequest)pageContext.getRequest()).getContextPath();
-            String imagePath=null;
-            if (contextPath==null) {
-                imagePath = ICON_DIR + ln.getType() + ".gif";
-                log.debug("image path when context path null: \""+imagePath+"\".");
-            } else if (contextPath.equals("")) {
-                imagePath = ICON_DIR + ln.getType() + ".gif";
-                log.debug("image path when context path blank: \""+imagePath+"\".");
-            } else {
-                imagePath = contextPath + ICON_DIR + ln.getType() + ".gif";
-                log.debug("image path when non-zero context path (\""+contextPath+"\"): \""+imagePath+"\".");
-            }
-            element +=  "<img src=\"" + imagePath+ "\" alt=\"" + ln.getType() + "\"/>";            
-        } else {                          
-            element +=  ln.getText() ;
-        }        
-        return element + "</a>\n";
     }
 
     public static final EditLinkAccess[] NO_ACCESS = {};
@@ -647,44 +628,65 @@ public class PropertyEditLinks extends TagSupport{
         String href;
         String type;
         String mouseoverText;
-        String text; // Defaults to be the same as type
         
-        public String getHref() {
-            return href;
-        }
         public void setHref(String href) {
             this.href = href;
-        }
-        public String getType() {
-            return type;
         }
         public void setType(String type) {
             this.type = type;
         }
-        
-        public String getMouseoverText() {
-            return mouseoverText;
-        }
-        
         public void setMouseoverText(String s) {
             mouseoverText = s;
         }
         
-        public void setText(String text) {
-        	this.text = text;
+        public String makeElement(){
+            String element = 
+                "<a class=\"image " + type + "\" href=\"" + href + 
+                "\" title=\"" + (mouseoverText==null ? type : mouseoverText) + "\">" ;
+            
+            if( "true".equalsIgnoreCase(getIcons()) ){
+                String contextPath=((HttpServletRequest)pageContext.getRequest()).getContextPath();
+                String imagePath=null;
+                if (contextPath==null) {
+                    imagePath = ICON_DIR + type + ".gif";
+                    log.debug("image path when context path null: \""+imagePath+"\".");
+                } else if (contextPath.equals("")) {
+                    imagePath = ICON_DIR + type + ".gif";
+                    log.debug("image path when context path blank: \""+imagePath+"\".");
+                } else {
+                    imagePath = contextPath + ICON_DIR + type + ".gif";
+                    log.debug("image path when non-zero context path (\""+contextPath+"\"): \""+imagePath+"\".");
+                }
+                element +=  "<img src=\"" + imagePath+ "\" alt=\"" + type + "\"/>";            
+            } else {                          
+                element +=  type ;
+            }        
+            return element + "</a>\n";
         }
-        
-        public String getText() {
-        	return (text == null) ? type: text;
-        }
-        
+
     }
 
+	public class ImageLinkStruct extends LinkStruct {
+		String text;
+
+		public void setText(String text) {
+			this.text = text;
+		}
+		
+		public String makeElement() {
+			String element = "<a class=\"image thumbnail " + type + "\" href=\"" + href + "\"";
+			element += " title=\"" + mouseoverText + "\">";
+			element += text;
+			element += "</a>\n";
+			return element;
+		}
+	}
+    
     private LinkStruct[] empty_array = {};
     
 	private LinkStruct getImageLink(String subjectUri, String contextPath,
 			String action, String mouseOverText, String text) {
-		LinkStruct ls = new LinkStruct();
+		ImageLinkStruct ls = new ImageLinkStruct();
 		String url = makeRelativeHref(contextPath + "uploadImages",
 				"entityUri", subjectUri, "action", action);
 		ls.setHref(url);
