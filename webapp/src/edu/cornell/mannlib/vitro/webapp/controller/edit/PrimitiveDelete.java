@@ -32,7 +32,7 @@ public class PrimitiveDelete extends PrimitiveRdfEdit {
         
         if( !hasPermission ){
             //if not okay, send error message
-            doError(response,"Insufficent permissions.",HttpStatus.SC_UNAUTHORIZED);
+            doError(response,"Insufficent permissions.", HttpStatus.SC_UNAUTHORIZED);
             return;
         }
 
