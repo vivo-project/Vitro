@@ -50,16 +50,6 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(FreeMarkerHttpServlet.class.getName());
     private static final int FILTER_SECURITY_LEVEL = LoginFormBean.EDITOR;
-
-	/**
-	 * If a subclass doesn't want to call <code>super.doGet(req, resp)</code>,
-	 * it can call this method instead, to run
-	 * <code>VitroHttpServlet.doGet(req, resp)</code>.
-	 */
-	protected final void vitroHttpServletDoGet(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
-		super.doGet(request, response);
-	}
     
     public void doGet( HttpServletRequest request, HttpServletResponse response )
 		throws IOException, ServletException {

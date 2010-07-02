@@ -142,8 +142,8 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 		}
 
 		try {
-			// execute super.super.doGet()
-			vitroHttpServletDoGet(request, response);
+			// do setup defined in VitroHttpServlet
+			setup(request);
 
 			VitroRequest vreq = new VitroRequest(request);
 			ResponseValues values = buildTheResponse(vreq);

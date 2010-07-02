@@ -44,26 +44,31 @@ public class VitroHttpServlet extends HttpServlet
     protected void doGet( HttpServletRequest request, HttpServletResponse response )
                           throws ServletException, IOException
     {
-    	if (request.getSession() != null) {
-	    	Object webappDaoFactoryAttr = request.getSession().getAttribute("webappDaoFactory");
-	    	if (webappDaoFactoryAttr != null && webappDaoFactoryAttr instanceof WebappDaoFactory) {
-	    		myWebappDaoFactory = (WebappDaoFactory) webappDaoFactoryAttr;
-	    	}
-	    	webappDaoFactoryAttr = request.getSession().getAttribute("assertionsWebappDaoFactory");
-	    	if (webappDaoFactoryAttr != null && webappDaoFactoryAttr instanceof WebappDaoFactory) {
-	    		myAssertionsWebappDaoFactory = (WebappDaoFactory) webappDaoFactoryAttr;
-	    	}
-	    	webappDaoFactoryAttr = request.getSession().getAttribute("deductionsWebappDaoFactory");
-	    	if (webappDaoFactoryAttr != null && webappDaoFactoryAttr instanceof WebappDaoFactory) {
-	    		myDeductionsWebappDaoFactory = (WebappDaoFactory) webappDaoFactoryAttr;
-	    	}
-    	}
-    	
+        setup(request);
+    }
+
+    protected final void setup(HttpServletRequest request) {
+        
+        if (request.getSession() != null) {
+            Object webappDaoFactoryAttr = request.getSession().getAttribute("webappDaoFactory");
+            if (webappDaoFactoryAttr != null && webappDaoFactoryAttr instanceof WebappDaoFactory) {
+                myWebappDaoFactory = (WebappDaoFactory) webappDaoFactoryAttr;
+            }
+            webappDaoFactoryAttr = request.getSession().getAttribute("assertionsWebappDaoFactory");
+            if (webappDaoFactoryAttr != null && webappDaoFactoryAttr instanceof WebappDaoFactory) {
+                myAssertionsWebappDaoFactory = (WebappDaoFactory) webappDaoFactoryAttr;
+            }
+            webappDaoFactoryAttr = request.getSession().getAttribute("deductionsWebappDaoFactory");
+            if (webappDaoFactoryAttr != null && webappDaoFactoryAttr instanceof WebappDaoFactory) {
+                myDeductionsWebappDaoFactory = (WebappDaoFactory) webappDaoFactoryAttr;
+            }
+        }
+        
         //check to see if VitroRequestPrep filter was run
         if( request.getAttribute("appBean") == null ||
             request.getAttribute("webappDaoFactory") == null ){
             log.warn("request scope was not prepared by VitroRequestPrep");
-        }
+        }        
     }
    
 
