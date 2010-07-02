@@ -122,12 +122,6 @@
 	<br class="spacer">
 </div>
 
-
-
-
-</div>
-
-
 <div class="vis-stats">
 
 	<div class="vis-tables">
@@ -144,6 +138,12 @@
 	</div>
 
 </div>
+
+
+</div>
+
+
+
 
 <script language="JavaScript" type="text/javascript">
 $(document).ready(function(){
