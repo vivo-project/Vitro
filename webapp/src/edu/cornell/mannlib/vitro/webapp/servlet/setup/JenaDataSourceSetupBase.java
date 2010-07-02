@@ -136,18 +136,30 @@ public class JenaDataSourceSetupBase {
 		Set<String> paths = ctx.getResourcePaths(path);
 		if (paths != null) {
 			for (String p : paths) {
-				log.info("Loading ontology file at " + p);
+				String format = getRdfFormat(p);
+				log.info("Loading ontology file at " + p + " as format " + format);
 				InputStream ontologyInputStream = ctx.getResourceAsStream(p);
 				try {
-					model.read(ontologyInputStream, null);
+					model.read(ontologyInputStream, null, format);
 					log.debug("...successful");
 				} catch (Throwable t) {
-					log.error("Failed to load ontology file at '" + p + "'", t);
+					log.error("Failed to load ontology file at '" + p + "' as format " + format, t);
 				}
 			}
 		}
 	}
    
+	private static String getRdfFormat(String filename){
+		String defaultformat = "RDF/XML";
+		if( filename == null )
+			return defaultformat;
+		else if( filename.endsWith("n3") )
+			return "N3";
+		else if( filename.endsWith("ttl") )
+			return "TURTLE";
+		else 
+			return defaultformat;
+	}
 	/**
 	 * If the {@link ConfigurationProperties} has a name for the initial admin
 	 * user, create the user and add it to the model.

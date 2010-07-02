@@ -20,11 +20,12 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ObjectSourceIface;
+import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 
 /**
  * The IndexBuilder is used to rebuild or update a search index.
- * It uses an implementation of a backend through an object that
- * implements IndexerIface.  An example of a backend is LuceneIndexer.
+ * It uses an implementation of a back-end through an object that
+ * implements IndexerIface.  An example of a back-end is LuceneIndexer.
  *
  * The IndexBuilder implements the EntityChangeListener so it can
  * be registered for Entity changes from the GenericDB classes.
@@ -42,6 +43,7 @@ public class IndexBuilder implements Runnable {
     List<ObjectSourceIface> sourceList = new LinkedList<ObjectSourceIface>();
     IndexerIface indexer = null;
     ServletContext context = null;
+    ProhibitedFromSearch classesProhibitedFromSearch = null;
     
     long lastRun = 0;
     List<String> changedUris = null;         
@@ -256,8 +258,17 @@ public class IndexBuilder implements Runnable {
         		return;
         	if( ind.getVClasses() == null || ind.getVClasses().size() < 1 )
         		return;
-        		
-            indexer.index(ind, newDoc);
+        	boolean prohibitedClass = false;
+        	if(  classesProhibitedFromSearch != null ){
+        		for( VClass vclass : ind.getVClasses() ){
+        			if( classesProhibitedFromSearch.isClassProhibited(vclass.getURI()) ){
+        				prohibitedClass = true;
+        				break;
+        			}        		
+        		}
+        	}
+        	if( !prohibitedClass )
+        		indexer.index(ind, newDoc);
         }catch(Throwable ex){            
             log.debug("IndexBuilder.indexItem() Error indexing "
                     + ind + "\n" +ex);
@@ -317,4 +328,13 @@ public class IndexBuilder implements Runnable {
 			return getAllOfThisTypeIterator();
 		}
     }
+
+	public ProhibitedFromSearch getClassesProhibitedFromSearch() {
+		return classesProhibitedFromSearch;
+	}
+
+	public void setClassesProhibitedFromSearch(
+			ProhibitedFromSearch classesProhibitedFromSearch) {
+		this.classesProhibitedFromSearch = classesProhibitedFromSearch;
+	}
 }

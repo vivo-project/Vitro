@@ -30,8 +30,10 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SearchReindexingListener;
+import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.beans.Searcher;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
+import edu.cornell.mannlib.vitro.webapp.web.DisplayVocabulary;
 
 /**
  * Setup objects for lucene searching and indexing.
@@ -122,6 +124,11 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 	            SearchReindexingListener srl = new SearchReindexingListener(baseOntModel, sce.getServletContext());
 	            baseOntModel.getBaseModel().register(srl);
 	        	jenaOntModel.getBaseModel().register(srl);
+	        	
+	        	//set the classes that the indexBuilder ignores
+	        	OntModel displayOntModel = (OntModel)sce.getServletContext().getAttribute("displayOntModel");
+	        	builder.setClassesProhibitedFromSearch(
+	        			new ProhibitedFromSearch(DisplayVocabulary.PRIMARY_LUCENE_INDEX_URI, displayOntModel));
 	        	
 	            log.debug("**** End of "+this.getClass().getName()+".contextInitialized()");
         	} catch (Throwable t) {
