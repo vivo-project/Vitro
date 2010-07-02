@@ -27,7 +27,8 @@
 <style type="text/css">
 
 #ego_profile {
-	padding:10px;
+	padding: 10px;
+	height: 100px;
 }
 
 #ego_label {
@@ -54,6 +55,10 @@
 	margin-top:69px;
 	position:absolute;
 	width:471px;
+}
+
+.thumbnail {
+	width: 100px;
 }
 
 </style>
