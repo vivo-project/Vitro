@@ -687,8 +687,15 @@ public class PropertyEditLinks extends TagSupport{
 	private LinkStruct getImageLink(String subjectUri, String contextPath,
 			String action, String mouseOverText, String text) {
 		ImageLinkStruct ls = new ImageLinkStruct();
-		String url = makeRelativeHref(contextPath + "uploadImages",
-				"entityUri", subjectUri, "action", action);
+		String url;
+		if (action == "delete") {
+			url = "javascript:delete_photo('"
+					+ makeRelativeHref(contextPath + "uploadImages",
+							"entityUri", subjectUri, "action", action) + "')";
+		} else {
+			url = makeRelativeHref(contextPath + "uploadImages", "entityUri",
+					subjectUri, "action", action);
+		}
 		ls.setHref(url);
 		ls.setType(action);
 		ls.setMouseoverText(mouseOverText);

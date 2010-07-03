@@ -306,3 +306,7 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
         </div> <!--  contents -->
         
     </div> <!-- content -->
+    
+<script type="text/javascript" src="/vivo/js/imageUpload/confirmPhotoDeletion.js"></script>
+
+
