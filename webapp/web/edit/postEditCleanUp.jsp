@@ -68,22 +68,12 @@
         }
     }
     
-    /* The parameter extra=true is just for ie6. */
-    if( resourceToRedirectTo != null ){    	
-    	  if( urlPattern != null && ( urlPattern.endsWith("entity") || urlPattern.endsWith("individual") )){  %>
-		      <%-- Here we're building the redirect URL to include an (unencoded) fragment identifier such as: #propertyName  --%>               
-		      <c:url context="/" var="encodedUrl" value="<%=urlPattern%>">
-			     <c:param name="uri" value="<%=resourceToRedirectTo%>" />
-			     <c:param name="extra" value="true"/> 
-              </c:url>
-		      <c:redirect url="${encodedUrl}${predicateAnchor}" />
-       <% } else { %>
-              <c:url context="/" var="encodedUrl" value="<%=urlPattern%>">              
-                 <c:param name="uri" value="<%=resourceToRedirectTo%>" />
-                 <c:param name="extra" value="true"/> 
-              </c:url>
-              <c:redirect url="${encodedUrl}${predicateAnchor}" />                    
-		<%} %>
+    if( resourceToRedirectTo != null ){ %>   	
+	    <c:url context="/" var="encodedUrl" value="<%=urlPattern%>">              
+	       <c:param name="uri" value="<%=resourceToRedirectTo%>" />
+	       <c:param name="extra" value="true"/>  <%--  For ie6 --%>
+	    </c:url>
+	    <c:redirect url="${encodedUrl}${predicateAnchor}" />                    
     <% } else { %>
         <c:redirect url="<%= Controllers.LOGIN %>" />
     <% } %>
