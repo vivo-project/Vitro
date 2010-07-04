@@ -321,26 +321,23 @@ public class IndividualJena extends IndividualImpl implements Individual {
                 	try {
                         // trying to deal with the fact that an entity may have more than 1 VClass
                         List<VClass> clasList = this.getVClasses(true);
-                        if (clasList == null || clasList.size()==0) {
-                            getVClass();
-                            moniker = this.vClass.getName();
-                        }
-                        if (clasList.size()==1) {
-                            moniker = this.vClass.getName();
-                        }
-                        VClass preferredClass = null;
-                        for (VClass clas : clasList) {
-                            if (clas.getCustomDisplayView() != null && clas.getCustomDisplayView().length()>0) {
-                                // arbitrarily deciding that the preferred class (could be >1) is one with a custom view
-                                preferredClass = clas;
-                                log.debug("Found direct class ["+clas.getName()+"] with custom view "+clas.getCustomDisplayView()+"; resetting entity vClass to this class");
-                            }
-                        }
-                        if (preferredClass == null) {
-                            // no basis for selecting a preferred class name to use
-                            moniker = null; // was this.getVClass().getName();
+                        if (clasList == null || clasList.size() < 2) {
+                            moniker = getVClass().getName();
                         } else {
-                            moniker = preferredClass.getName();
+                            VClass preferredClass = null;
+                            for (VClass clas : clasList) {
+                                if (clas.getCustomDisplayView() != null && clas.getCustomDisplayView().length()>0) {
+                                    // arbitrarily deciding that the preferred class (could be >1) is one with a custom view
+                                    preferredClass = clas;
+                                    log.debug("Found direct class ["+clas.getName()+"] with custom view "+clas.getCustomDisplayView()+"; resetting entity vClass to this class");
+                                }
+                            }
+                            if (preferredClass == null) {
+                                // no basis for selecting a preferred class name to use
+                                moniker = null; // was this.getVClass().getName();
+                            } else {
+                                moniker = preferredClass.getName();
+                            }
                         }
                 	} catch (Exception e) {}
                 }
