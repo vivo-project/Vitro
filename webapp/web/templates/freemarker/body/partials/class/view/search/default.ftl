@@ -7,7 +7,7 @@
 <a href="${individual.profileUrl}">${individual.name}</a>
 <ul class="individualData">
     <@l.firstLastList>
-        <li>${individual.tagline}</li>,
+        <li>${individual.moniker}</li>,
         <#list individual.links as link>
             <li><a class="externalLink" href="${link.url}">${link.anchor}</a></li>,            
         </#list>

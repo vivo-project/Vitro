@@ -28,10 +28,12 @@ public class IndividualTemplateModel extends BaseTemplateModel {
     }
     
     /* These methods perform some manipulation of the data returned by the Individual methods */
-    public String getTagline() {
-        String tagline = individual.getMoniker();
-        return StringUtils.isEmpty(tagline) ? individual.getVClass().getName() : tagline;
-    }
+// RY Individiual.getMoniker() was already trying to do this, but due to errors in the code it was not.
+// That's fixed now.
+//    public String getTagline() {
+//        String tagline = individual.getMoniker();
+//        return StringUtils.isEmpty(tagline) ? individual.getVClass().getName() : tagline;
+//    }
     
     // Return link to individual's profile page.
     // There may be other urls associated with the individual. E.g., we might need 
@@ -87,6 +89,10 @@ public class IndividualTemplateModel extends BaseTemplateModel {
        A Ruby-style method missing method would be ideal. */
     public String getName() {
         return individual.getName();
+    }
+    
+    public String getMoniker() {
+        return individual.getMoniker();
     }
 
     public String getUri() {
