@@ -5,10 +5,6 @@ function delete_photo(passUrl)  {
 
 		if (delete_photo_answer){
 			window.open(passUrl);
-			}
-			
-		else{
-			return false;
-			}
+			}	
 }
 
