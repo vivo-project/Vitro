@@ -2,7 +2,11 @@
 
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary" %>
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c" %>
-	
+
+<%-- vitro:citation is no longer being used see NIHVIVO-503 if there is a different property for
+     the citation it may be added here. --%>
+
+<%--
 <c:if test="${!empty entity.citation}">
 	<div class="datatypeProperties">
 		<div class="datatypePropertyValue">
@@ -12,3 +16,5 @@
 		</div>
 	</div>
 </c:if>     
+
+ --%>

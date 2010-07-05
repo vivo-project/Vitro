@@ -192,12 +192,8 @@ public class IndividualFiltering implements Individual {
 
     public String getBlurb() {
         return _innerIndividual.getBlurb();
-    }
-
-    public String getCitation() {
-        return _innerIndividual.getCitation();
-    }
-
+    }  
+    
     public String getDescription() {
         return _innerIndividual.getDescription();
     }
@@ -354,10 +350,6 @@ public class IndividualFiltering implements Individual {
 
     public void setBlurb(String in) {
         _innerIndividual.setBlurb(in);
-    }
-
-    public void setCitation(String in) {
-        _innerIndividual.setCitation(in);
     }
 
     public void setDatatypePropertyList(List<DataProperty> datatypePropertyList) {

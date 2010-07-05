@@ -211,7 +211,6 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         value+= " "+ ( ((t=ent.getMoniker()) == null)?"":t );
         value+= " "+ ( ((t=ent.getDescription()) == null)?"":t );
         value+= " "+ ( ((t=ent.getBlurb()) == null)?"":t );
-        value+= " "+ ( ((t=ent.getCitation()) == null)?"":t );
         value+= " "+ getKeyterms(ent);
 
 

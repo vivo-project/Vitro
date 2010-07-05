@@ -65,13 +65,6 @@
                 <font size="2" color="red"><form:error name="Description"/></font>
         </td>
     </tr>
-    <tr class="editformcell" id='citationTr'>
-        <td id="citationTd" valign="bottom" colspan="2">
-			<b>Citation</b> <em>Optional; max 255 chars; use also for image caption for news release
-                <input type="text" name="Citation" value="<form:value name="Citation"/>" size="80" maxlength="255" />
-                <font size="2" color="red"><form:error name="Citation"/></font>
-        </td>
-    </tr>
     <tr class="editformcell" id='sunriseTr'>
         <td id="sunriseTd" valign="bottom">
 			<b>Sunrise</b>, or date first visible (e.g., 2004-09-17) <em>Optional; populated primarily for entities such as new releases that are auto-linked to tabs for a spcified number of days following their release date</em>

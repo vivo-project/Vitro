@@ -457,21 +457,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
                 ind.getOntModel().leaveCriticalSection();
             }
         }
-    }
-    
-    public String getCitation() {
-        if (this.citation != null) {
-            return citation;
-        } else {
-            ind.getOntModel().enterCriticalSection(Lock.READ);
-            try {
-                citation = webappDaoFactory.getJenaBaseDao().getPropertyStringValue(ind,webappDaoFactory.getJenaBaseDao().CITATION);
-                return citation;
-            } finally {
-                ind.getOntModel().leaveCriticalSection();
-            }
-        }
-    }
+    }    
 
 	@Override
 	public String getMainImageUri() {

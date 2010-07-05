@@ -37,8 +37,7 @@ public class EntitySerializer implements Serializer {
     //public static final String MODTIME_MBER= "modTime";
     public static final String IMAGEFILE_MBER= "imageFile";
     public static final String ANCHOR_MBER= "anchor";
-    public static final String BLURB_MBER= "blurb";
-    public static final String CITATION_MBER= "citation";
+    public static final String BLURB_MBER= "blurb";    
     public static final String STATUS_MBER= "status";
     public static final String PROPERTYLIST_MBER= "propertyList";
     public static final String LINKSLIST_MBER= "linksList";
@@ -84,7 +83,6 @@ public class EntitySerializer implements Serializer {
         context.serialize(new QName("",  IMAGEFILE_MBER), null, ent.getMainImageUri());
         context.serialize(new QName("",  ANCHOR_MBER), null, ent.getAnchor());
         context.serialize(new QName("",  BLURB_MBER), null, ent.getBlurb());
-        context.serialize(new QName("",  CITATION_MBER), null, ent.getCitation());
         context.serialize(new QName("",  STATUS_MBER), null, ent.getStatus());
         context.serialize(new QName("",  LINKSLIST_MBER), null, ent.getLinksList());
         context.serialize(new QName("",  KEYWORDS_MBER), null, ent.getKeywords());

@@ -87,9 +87,6 @@ public interface Individual extends ResourceBean, VitroTimeWindowedResource, Com
     String getBlurb();
     void setBlurb(String in);
 
-    String getCitation();
-    void setCitation(String in);
-
     int getStatusId();
     void setStatusId(int in);
 

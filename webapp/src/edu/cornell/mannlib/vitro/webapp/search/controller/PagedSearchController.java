@@ -620,9 +620,6 @@ public class PagedSearchController extends VitroHttpServlet implements Searcher{
             if(ent.getDescription() != null )
                 sb.append(ent.getDescription()).append(' ');
 
-            if(ent.getCitation() != null)
-                sb.append(ent.getCitation()).append(' ');
-
             if(ent.getDataPropertyList() != null) {
                 Iterator edIt = ent.getDataPropertyList().iterator();
                 while (edIt.hasNext()) {

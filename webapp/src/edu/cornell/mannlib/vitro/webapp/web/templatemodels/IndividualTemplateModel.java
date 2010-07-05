@@ -105,11 +105,7 @@ public class IndividualTemplateModel extends BaseTemplateModel {
     
     public String getBlurb() {
         return individual.getBlurb();
-    }
-    
-    public String getCitation() {
-        return individual.getBlurb();
-    }
+    }   
     
     public List<String> getKeywords() {
         return individual.getKeywords();

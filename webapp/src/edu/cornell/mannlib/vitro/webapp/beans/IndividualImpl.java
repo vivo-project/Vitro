@@ -50,7 +50,6 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
     protected String mainImageUri = NOT_INITIALIZED;
     protected String imageUrl;
     protected String thumbUrl;
-    protected String citation = null;
     protected int statusId = 0;
     protected String status = null;
     protected List <Link>linksList = null;
@@ -262,10 +261,7 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
 
     public String getBlurb(){return blurb;}
     public void setBlurb(String in){blurb=in;}
-
-    public String getCitation(){return citation;}
-    public void setCitation(String in){citation=in;}
-
+    
     public int getStatusId(){return statusId;}
     public void setStatusId(int in){statusId=in;}
 

@@ -306,7 +306,6 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
                 addPropertyStringValue(ind,MONIKER,ent.getMoniker(),ontModel);
                 addPropertyStringValue(ind,BLURB,ent.getBlurb(),ontModel);
                 addPropertyStringValue(ind,DESCRIPTION,ent.getDescription(),ontModel);
-                addPropertyStringValue(ind,CITATION,ent.getCitation(),ontModel);
                 addPropertyDateTimeValue(ind,SUNRISE,ent.getSunrise(), ontModel);
                 addPropertyDateTimeValue(ind,SUNSET,ent.getSunset(), ontModel);
                 addPropertyDateTimeValue(ind,TIMEKEY,ent.getTimekey(), ontModel);
@@ -369,7 +368,6 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
     private void initInd(Individual ent) {
         ent.getAnchor();
         ent.getBlurb();
-        ent.getCitation();
         ent.getClass();
         ent.getVClasses(false);
         ent.getDataPropertyList();
@@ -468,8 +466,7 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
                 }
                 updatePropertyStringValue(ind,MONIKER,ent.getMoniker(),ontModel);
                 updatePropertyStringValue(ind,BLURB,ent.getBlurb(),ontModel);
-                updatePropertyStringValue(ind,DESCRIPTION,ent.getDescription(),ontModel);
-                updatePropertyStringValue(ind,CITATION,ent.getCitation(),ontModel);
+                updatePropertyStringValue(ind,DESCRIPTION,ent.getDescription(),ontModel);                
                 updatePropertyDateTimeValue(ind,SUNRISE,ent.getSunrise(), ontModel);
                 updatePropertyDateTimeValue(ind,SUNSET,ent.getSunset(), ontModel);
                 updatePropertyDateTimeValue(ind,TIMEKEY,ent.getTimekey(), ontModel);

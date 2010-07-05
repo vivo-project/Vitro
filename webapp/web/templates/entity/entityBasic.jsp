@@ -186,7 +186,7 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
                 </div> <!-- end dprop-vitro-links  -->
             </c:if>   
             
-            <%-- Thumbnail (with citation) --%>
+            <%-- Thumbnail  --%>
             <c:set var="isPerson" value='<%= entity.isVClass("http://xmlns.com/foaf/0.1/Person") %>' />
             <c:set var="hasImage" value="${!empty entity.thumbUrl}" />
             <c:set var="imageLinks"><edLnk:editLinks item="<%= VitroVocabulary.IND_MAIN_IMAGE %>" icons="false" /></c:set>
