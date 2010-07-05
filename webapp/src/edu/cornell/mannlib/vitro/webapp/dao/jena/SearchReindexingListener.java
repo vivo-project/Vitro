@@ -20,7 +20,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
 
 /**
- * This class is thread safe.
+ * This class is thread safe.  Notice that doAsyncIndexBuild() is frequently 
+ * called because the inference system does not seem to send notifyEvents. 
  */
 public class SearchReindexingListener implements ModelChangedListener {					
 	private HashSet<String> changedUris;	
@@ -38,30 +39,19 @@ public class SearchReindexingListener implements ModelChangedListener {
 		if( stmt.getSubject().isURIResource() ){			
 			//changedUris.add( stmt.getSubject().getURI());
 			indexBuilder.addToChangedUris(stmt.getSubject().getURI());
-			log.debug(stmt.getSubject().getURI());
+			log.debug("subject: " + stmt.getSubject().getURI());
 		}
 				
 		if( stmt.getObject().isURIResource() ){
 			//changedUris.add( ((Resource) stmt.getObject().as(Resource.class)).getURI() );
 			indexBuilder.addToChangedUris(((Resource) stmt.getObject()).getURI());			
-			log.debug(((Resource) stmt.getObject().as(Resource.class)).getURI());
+			log.debug("object: " + ((Resource) stmt.getObject().as(Resource.class)).getURI());
 		}	
 	}
-	
-//	private synchronized Set<String> getAndClearChangedUris(){
-//		log.debug("Getting and clearing changed URIs.");		
-//		Set<String> out = changedUris;
-//		changedUris = new HashSet<String>();
-//		return out;
-//	}
 
-	private void doAyncIndex(){
-//		for( String uri: getAndClearChangedUris()){
-//			indexBuilder.addToChangedUris(uri);
-//		}				
+	private void doAsyncIndexBuild(){
 		new Thread(indexBuilder).start();		
-	}
-	
+	}	
 	
 	@Override
 	public void notifyEvent(Model arg0, Object arg1) {
@@ -69,7 +59,7 @@ public class SearchReindexingListener implements ModelChangedListener {
 			EditEvent editEvent = (EditEvent)arg1;
 			if( !editEvent.getBegin() ){// editEvent is the end of an edit				
 				log.debug("Doing search index build at end of EditEvent");				
-				doAyncIndex();
+				doAsyncIndexBuild();
 			}		
 		} else{
 			log.debug("ignoring event " + arg1.getClass().getName() + " "+ arg1 );
@@ -79,13 +69,13 @@ public class SearchReindexingListener implements ModelChangedListener {
 	@Override
 	public void addedStatement(Statement stmt) {
 		addChange(stmt);
-		//doAyncIndex();
+		doAsyncIndexBuild();
 	}
 
 	@Override
 	public void removedStatement(Statement stmt){
 		addChange(stmt);
-		//doAyncIndex();
+		doAsyncIndexBuild();
 	}
 	
 	private static final Log log = LogFactory.getLog(SearchReindexingListener.class.getName());
@@ -95,7 +85,7 @@ public class SearchReindexingListener implements ModelChangedListener {
 		for( Statement s: arg0){
 			addChange(s);
 		}
-		//doAyncIndex();
+		doAsyncIndexBuild();
 	}
 
 	@Override
@@ -103,7 +93,7 @@ public class SearchReindexingListener implements ModelChangedListener {
 		for( Statement s: arg0){
 			addChange(s);
 		}
-		//doAyncIndex();
+		doAsyncIndexBuild();
 	}
 
 	@Override
@@ -116,7 +106,7 @@ public class SearchReindexingListener implements ModelChangedListener {
 		}finally{
 			arg0.close();
 		}
-		//doAyncIndex();		
+		doAsyncIndexBuild();		
 	}
 
 	@Override
@@ -132,7 +122,7 @@ public class SearchReindexingListener implements ModelChangedListener {
 			if( it != null ) it.close();
 			m.leaveCriticalSection();
 		}
-		//doAyncIndex();
+		doAsyncIndexBuild();
 	}
 
 	@Override

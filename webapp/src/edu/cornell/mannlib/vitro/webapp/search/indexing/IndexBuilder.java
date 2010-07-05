@@ -299,7 +299,7 @@ public class IndexBuilder implements Runnable {
     private synchronized List<String> getAndEmptyChangedUris(){
     	LinkedList<String> out = new LinkedList<String>(); 
     	out.addAll( changedUris );    	
-    	changedUris = new LinkedList<String>();
+    	changedUris = new HashSet<String>();
     	return out;
     }
     
