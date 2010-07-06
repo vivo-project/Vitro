@@ -6,6 +6,7 @@ ${scripts.add("/js/jquery.js")}
 ${scripts.add("/js/jquery_plugins/jcrop/jquery.Jcrop.js")}
 ${scripts.add("/js/imageUpload/cropImage.js")}
 
+
 ${stylesheets.addFromTheme("/uploadImages.css")}
 ${stylesheets.addFromTheme("/jquery.Jcrop.css")}
 
@@ -30,7 +31,7 @@ ${stylesheets.addFromTheme("/jquery.Jcrop.css")}
               <p class="photoCroppingTitleBody">Your profile photo will look like the image below. </p>
               <div style="width:115px;height:115px;overflow:hidden;border:1px solid green;"> <img src="${imageUrl}" id="preview" /> </div>
               <div id="photoCroppingHowTo">
-                     <p class="photoCroppingNote">To make adjustments, you can drag around and resize the blue square to the right. When you are happy with your photo click the "Save Photo" button. </p>
+                     <p class="photoCroppingNote">To make adjustments, you can drag around and resize the photo to the right. When you are happy with your photo click the "Save Photo" button. </p>
                      <form id="cropImage" action="${formAction}"  method="post">
                      
                      <!-- Javascript will populate these values -->
