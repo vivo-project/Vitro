@@ -211,6 +211,13 @@
 	<c:param name="uri" value="http://vivo.library.cornell.edu/ns/0.1#individual12053"/>
 </c:url>
 
+<c:url var="coAuthorshipSparklineData" value="/admin/visQuery">
+	<c:param name="vis" value="coauthorship"/>
+	<c:param name="vis_mode" value="sparkline"/>
+	<c:param name="render_mode" value="data"/>
+	<c:param name="uri" value="http://vivo.library.cornell.edu/ns/0.1#individual5748"/>
+</c:url>
+
 <c:url var="personLevel1" value="/admin/visQuery">
 	<c:param name="vis" value="person_level"/>
 	<c:param name="render_mode" value="standalone"/>
@@ -312,6 +319,7 @@ $(document).ready(function() {
 <a href='<c:out value="${coAuthorship1}"/>'>vis link for coauthorship -> "Erb, Hollis Nancy"</a>
 &nbsp;&nbsp;<a href='<c:out value="${coAuthorship1Data}"/>'>Data</a>
 &nbsp;&nbsp;<a href='<c:out value="${personLevel1}"/>'>Person Level</a>
+&nbsp;&nbsp;<a href='<c:out value="${coAuthorshipSparklineData}"/>'>Unique Coauthors CSV Data</a>
 <br />
 <a href='<c:out value="${coAuthorship2}"/>'>vis link for coauthorship -> "Not Working" {"Crane, Brian"}</a>&nbsp;
 <a href='<c:out value="${coAuthorship2Data}"/>'>Data</a><br />

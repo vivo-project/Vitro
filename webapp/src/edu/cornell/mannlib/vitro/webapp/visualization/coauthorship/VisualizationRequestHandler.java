@@ -223,23 +223,20 @@ public class VisualizationRequestHandler {
 	
 	private void generateCsvFileBuffer(Map<String, Set<Node>> yearToCoauthors, PrintWriter printWriter) {
 		
-        CSVWriter csvWriter = new SimpleWriter(printWriter);
+//        CSVWriter csvWriter = new SimpleWriter(printWriter);
         
-        try {
-			csvWriter.append(new String[]{"Year", "Number of Authors", "Authors"});
+        	printWriter.append("\"Year\", \"Number of Co-Authors\", \"Co-Author(s)\"\n");
 			
 			for (Entry<String, Set<Node>> currentEntry : yearToCoauthors.entrySet()) {
 				
-				csvWriter.append(new Object[]{currentEntry.getKey(),
-											  currentEntry.getValue().size(), 
-											  getCoauthorsString(currentEntry.getValue())});
+				printWriter.append("\"" + currentEntry.getKey() + "\"," 
+								   + "\"" + currentEntry.getValue().size() + "\","
+								   + "\"" + getCoauthorsString(currentEntry.getValue()) + "\"\n"
+											  );
+				
+				
 			}
 			
-	        
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
 		printWriter.flush();
 		
 	}
@@ -249,7 +246,7 @@ public class VisualizationRequestHandler {
 		StringBuilder coAuthorsMerged = new StringBuilder();
 		
 		for (Node currCoAuthor : coAuthors) {
-			coAuthorsMerged.append(currCoAuthor.getNodeName() + ", ");
+			coAuthorsMerged.append(currCoAuthor.getNodeName() + " | ");
 		}
 		
 		return coAuthorsMerged.toString();
