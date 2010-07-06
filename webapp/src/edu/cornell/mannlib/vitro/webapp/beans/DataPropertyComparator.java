@@ -20,7 +20,9 @@ public class DataPropertyComparator implements Comparator<Individual> {
 
         int result;
         
-        // This pushes null values to the end of the list
+        // Push null values to the end of the list.
+        // Is this generally what's wanted? Or should this class be 
+        // NullLastDataPropertyComparator?
         if (dps1 == null) {
             result = (dps2 == null) ? 0 : 1;
         } else if (dps2 == null) {
