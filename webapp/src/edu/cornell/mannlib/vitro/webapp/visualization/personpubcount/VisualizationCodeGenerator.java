@@ -82,13 +82,6 @@ public class VisualizationCodeGenerator {
     	
 	}
 
-//	public VisVOContainer getValueObjectContainer() {
-//		
-//		
-//		
-//		return valueObjectContainer;
-//	}
-	
 	private String getMainVisualizationCode(List<BiboDocument> authorDocuments,
 										    String visMode, 
 										    String providedVisContainerID) {
@@ -514,7 +507,7 @@ public class VisualizationCodeGenerator {
 							+ "=" + URLEncoder.encode(VisualizationFrameworkConstants.STANDALONE_RENDER_MODE_URL_VALUE, 
 					 				 VisualizationController.URL_ENCODING_SCHEME).toString();
 			
-			fullTimelineLink = "<a href='" + fullTimelineNetworkURL + "'>View full timeline and network.</a><br />";
+			fullTimelineLink = "<a href='" + fullTimelineNetworkURL + "'>View full timeline and co-author network</a><br />";
 			
 			valueObjectContainer.setFullTimelineNetworkLink(fullTimelineNetworkURL);
 			

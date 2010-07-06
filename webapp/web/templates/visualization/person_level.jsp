@@ -28,7 +28,7 @@
 
 #ego_profile {
 	padding: 10px;
-	height: 100px;
+	min-height: 100px;
 }
 
 #ego_label {
@@ -51,10 +51,18 @@
 #ego_sparkline {
 	cursor:pointer;
 	height:36px;
+	/*
 	margin-left:10px;
 	margin-top:69px;
-	position:absolute;
+	position:absolute;*/
 	width:471px;
+}
+
+#dataPanel {
+	/*
+	float: left; 
+	width: 150px; 
+	visibility:hidden;*/
 }
 
 .thumbnail {
@@ -74,8 +82,9 @@
 	<%-- Image --%>
 			<span id="ego_profile_image" class="thumbnail"></span>
 	
+	
 	<%-- Sparkline --%>
-			<span id="ego_sparkline">${sparkline.sparklineContent}</span>
+			<div id="ego_sparkline">${sparkline.sparklineContent}</div>
 
 </div>
 
@@ -93,8 +102,7 @@
 		</script>
 	</div>
 	
-	<div id="dataPanel" style="float: left; width: 150px;" style="visibility:hidden;" >
-		<br /><br /><br /><br /><br /><br />
+	<div id="dataPanel">
 		
 		<div id="profileImage"></div>
 		
@@ -116,8 +124,8 @@
 	</div>
 	
 	<span class="no_href_styles"><a href="${coAuthorshipDownloadFile}">
- 	<img src="${visImageContextPath}download_graphml.png" width="91" height="25" /></a>
-</span>
+ 		<img src="${visImageContextPath}download_graphml.png" width="91" height="25" /></a>
+	</span>
 
 	<br class="spacer">
 </div>

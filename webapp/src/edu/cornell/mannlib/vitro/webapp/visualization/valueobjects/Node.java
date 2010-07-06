@@ -20,6 +20,7 @@ public class Node extends Individual {
 
 	private int nodeID;
 	private Map<String, Integer> yearToPublicationCount;
+
 	private Set<BiboDocument> authorDocuments = new HashSet<BiboDocument>();
 
 	public Node(String nodeURL,
@@ -57,6 +58,12 @@ public class Node extends Individual {
 	}
 	
 	
+	public Map<String, Integer> getYearToPublicationCount() {
+		if (yearToPublicationCount == null) {
+			yearToPublicationCount = UtilityFunctions.getYearToPublicationCount(authorDocuments);
+		}
+		return yearToPublicationCount;
+	}
 	/*
 	 * getEarliest, Latest & Unknown Publication YearCount should only be used after 
 	 * the parsing of the entire sparql is done. Else it will give results based on
@@ -66,7 +73,6 @@ public class Node extends Individual {
 	public Map<String, Integer> getEarliestPublicationYearCount() {
 		if (yearToPublicationCount == null) {
 			yearToPublicationCount = UtilityFunctions.getYearToPublicationCount(authorDocuments);
-			System.out.println("early - " + yearToPublicationCount);
 		}
 		
 		/*

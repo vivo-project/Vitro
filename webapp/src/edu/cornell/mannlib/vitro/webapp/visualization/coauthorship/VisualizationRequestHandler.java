@@ -2,6 +2,12 @@ package edu.cornell.mannlib.vitro.webapp.visualization.coauthorship;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.Map.Entry;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -9,6 +15,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
+import org.skife.csv.CSVWriter;
+import org.skife.csv.SimpleWriter;
 
 import com.hp.hpl.jena.query.DataSource;
 
@@ -17,6 +25,10 @@ import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.visualization.VisualizationFrameworkConstants;
 import edu.cornell.mannlib.vitro.webapp.visualization.exceptions.MalformedQueryParametersException;
+import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.Node;
+import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.VivoCollegeOrSchool;
+import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.VivoDepartmentOrDivision;
+import edu.cornell.mannlib.vitro.webapp.visualization.visutils.UtilityFunctions;
 
 public class VisualizationRequestHandler {
 
@@ -48,6 +60,8 @@ public class VisualizationRequestHandler {
 
         String visContainer = vitroRequest.getParameter(VisualizationFrameworkConstants.VIS_CONTAINER_URL_HANDLE);
         
+        String sparklineVisMode = "sparkline";
+        
         QueryHandler queryManager =
         	new QueryHandler(egoURIParam,
 						     resultFormatParam,
@@ -64,19 +78,36 @@ public class VisualizationRequestHandler {
 	    	 * In order to avoid unneeded computations we have pushed this "if" condition up.
 	    	 * This case arises when the render mode is data. In that case we dont want to generate 
 	    	 * HTML code to render sparkline, tables etc. Ideally I would want to avoid this flow.
-	    	 * It is ugly! 
+	    	 * It is ugly!
 	    	 * */
-	    	if (VisualizationFrameworkConstants.DATA_RENDER_MODE_URL_VALUE.equalsIgnoreCase(renderMode)) { 
-			
+	    	
+			if (VisualizationFrameworkConstants.DATA_RENDER_MODE_URL_VALUE.equalsIgnoreCase(renderMode)) {
+				
+		    	/* 
+		    	 * We will be using the same visualization package for both sparkline & coauthorship flash 
+		    	 * vis. We will use "VIS_MODE_URL_HANDLE" as a modifier to differentiate between these two.
+		    	 * The defualt will be to render the coauthorship network vis.
+		    	 * */ 
+				
+				if (sparklineVisMode.equalsIgnoreCase(visMode)) { 
 	    			/*
-	    			 * When just the graphML file is required - based on which actual visualization will 
+	    			 * When the csv file is required - based on which sparkline visualization will 
 	    			 * be rendered.
 	    			 * */
-	    			prepareVisualizationQueryDataResponse(authorNodesAndEdges);
-					return;
-	    		
-	    		
+						prepareVisualizationQuerySparklineDataResponse(authorNodesAndEdges);
+						return;
+		    		
+				} else {
+		    			/*
+		    			 * When the graphML file is required - based on which coauthorship network visualization 
+		    			 * will be rendered.
+		    			 * */
+		    			prepareVisualizationQueryNetworkDataResponse(authorNodesAndEdges);
+						return;
+				}
 			}
+	    			
+			
 	    	
 	    	/*
 	    	 * Computations required to generate HTML for the sparklines & related context.
@@ -137,7 +168,7 @@ public class VisualizationRequestHandler {
 
 	}
 
-	private void prepareVisualizationQueryDataResponse(VisVOContainer authorNodesAndEdges) {
+	private void prepareVisualizationQueryNetworkDataResponse(VisVOContainer authorNodesAndEdges) {
 
 		response.setContentType("text/xml");
 		
@@ -161,6 +192,107 @@ public class VisualizationRequestHandler {
 		}
 	}
 	
+	private void prepareVisualizationQuerySparklineDataResponse(VisVOContainer authorNodesAndEdges) {
+		
+		
+		Map<String, Set<Node>> yearToCoauthors = getCoAuthorsStats(authorNodesAndEdges); 
+			
+		String outputFileName = UtilityFunctions.slugify(authorNodesAndEdges.getEgoNode().getNodeName()) 
+										+ "-coauthors" + ".csv";
+
+		response.setContentType("application/octet-stream");
+		response.setHeader("Content-Disposition", "attachment;filename=" + outputFileName);
+		
+		try {
+		
+		PrintWriter responseWriter = response.getWriter();
+		
+		/*
+		 * We are side-effecting responseWriter since we are directly manipulating the response 
+		 * object of the servlet.
+		 * */
+		generateCsvFileBuffer(yearToCoauthors, 
+							  responseWriter);
+
+		responseWriter.close();
+		
+		} catch (IOException e) {
+		e.printStackTrace();
+		}
+	}
+	
+	private void generateCsvFileBuffer(Map<String, Set<Node>> yearToCoauthors, PrintWriter printWriter) {
+		
+        CSVWriter csvWriter = new SimpleWriter(printWriter);
+        
+        try {
+			csvWriter.append(new String[]{"Year", "Number of Authors", "Authors"});
+			
+			for (Entry<String, Set<Node>> currentEntry : yearToCoauthors.entrySet()) {
+				
+				csvWriter.append(new Object[]{currentEntry.getKey(),
+											  currentEntry.getValue().size(), 
+											  getCoauthorsString(currentEntry.getValue())});
+			}
+			
+	        
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		printWriter.flush();
+		
+	}
+	
+	private String getCoauthorsString(Set<Node> coAuthors) {
+		
+		StringBuilder coAuthorsMerged = new StringBuilder();
+		
+		for (Node currCoAuthor : coAuthors) {
+			coAuthorsMerged.append(currCoAuthor.getNodeName() + ", ");
+		}
+		
+		return coAuthorsMerged.toString();
+	}
+	
+	private Map<String, Set<Node>> getCoAuthorsStats(VisVOContainer authorNodesAndEdges) {
+
+		Map<String, Set<Node>> yearToCoAuthors = new TreeMap<String, Set<Node>>();
+		
+		Node egoNode = authorNodesAndEdges.getEgoNode();
+		
+		for (Node currNode : authorNodesAndEdges.getNodes()) {
+					
+				/*
+				 * We have already printed the Ego Node info.
+				 * */
+				if (currNode != egoNode) {
+					
+					for (String year : currNode.getYearToPublicationCount().keySet()) {
+						
+						Set<Node> coAuthorNodes;
+						
+						if (yearToCoAuthors.containsKey(year)) {
+							
+							coAuthorNodes = yearToCoAuthors.get(year);
+							coAuthorNodes.add(currNode);
+							
+						} else {
+							
+							coAuthorNodes = new HashSet<Node>();
+							coAuthorNodes.add(currNode);
+							yearToCoAuthors.put(year, coAuthorNodes);
+						}
+						
+					}
+					
+				}
+		}
+		
+		
+		return yearToCoAuthors;
+	}
+
 	private void prepareVisualizationQueryStandaloneResponse(String egoURIParam, 
 															 HttpServletRequest request,
 															 HttpServletResponse response, 
