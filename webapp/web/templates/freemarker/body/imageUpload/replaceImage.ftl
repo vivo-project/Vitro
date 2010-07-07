@@ -28,7 +28,7 @@ ${stylesheets.addFromTheme("/uploadImages.css")}
        <a href='javascript:delete_photo("${deleteUrl}");'>Delete photo</a></div>
        <div id="photoUploadForm">
               <form action="${formAction}" enctype="multipart/form-data" method="post" onSubmit="return validate_upload_file(this)">
-                     <label>Replace Photo <span> (JPEG, GIF or PNG. Max Size: 50 MB)</span></label>
+                     <label>Replace Photo <span> (JPEG, GIF or PNG)</span></label>
                      <input type="file" name="datafile" size="30">
                      <input type="submit" value="Upload photo"> or <a href="${cancelUrl}">Cancel</a>
               </form>

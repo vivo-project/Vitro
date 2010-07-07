@@ -25,7 +25,7 @@ ${stylesheets.addFromTheme("/uploadImages.css")}
        <div id="photoUploadForm">
               <form action="${formAction}" enctype="multipart/form-data" method="post" onSubmit="return validate_upload_file(this)">
               
-                     <label>Upload a photo <span> (JPEG, GIF or PNG. Max Size: 50 MB)</span></label>
+                     <label>Upload a photo <span> (JPEG, GIF or PNG)</span></label>
                      <input type="file" name="datafile" size="30">
                      <input type="submit" value="Upload photo"> or <a href="${cancelUrl}">Cancel</a>
               </form>
