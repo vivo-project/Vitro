@@ -12,7 +12,8 @@ public class PublicationHasAuthorValidator implements N3Validator {
     private static String MISSING_AUTHOR_ERROR = "Must specify a new or existing author.";
     private static String MISSING_FIRST_NAME_ERROR = "Must specify the author's first name.";
     private static String MISSING_LAST_NAME_ERROR = "Must specify the author's last name.";
-    
+    private static String MALFORMED_LAST_NAME_ERROR = "Last name may not contain a comma. Please enter first name in first name field.";
+;    
     @Override
     public Map<String, String> validate(EditConfiguration editConfig,
             EditSubmission editSub) {
@@ -36,14 +37,24 @@ public class PublicationHasAuthorValidator implements N3Validator {
             firstName = null;
 
         Literal lastName = literalsFromForm.get("lastName");
-        if( lastName != null && lastName.getLexicalForm() != null && "".equals(lastName.getLexicalForm()) )
-            lastName = null;
-        
-        if (lastName != null && firstName == null) {
-            errors.put("firstName", MISSING_FIRST_NAME_ERROR);
-        } else if (lastName == null && firstName != null) {
-            errors.put("lastName", MISSING_LAST_NAME_ERROR);
+        String lastNameValue = "";
+        if (lastName != null) {
+            lastNameValue = lastName.getLexicalForm();
+            if( "".equals(lastNameValue) ) {
+                lastName = null;
+            }
         }
+
+        if (lastName == null) {
+            errors.put("lastName", MISSING_LAST_NAME_ERROR);
+        // Don't reject space in the last name: de Vries, etc.
+        } else if (lastNameValue.contains(",")) {            
+            errors.put("lastName", MALFORMED_LAST_NAME_ERROR);
+        }
+        
+        if (firstName == null) {
+            errors.put("firstName", MISSING_FIRST_NAME_ERROR);
+        }       
         
         return errors.size() != 0 ? errors : null;
     }
