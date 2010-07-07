@@ -6,7 +6,7 @@
 
 	<tr class="editformcell">
 		<td valign="bottom" colspan="2">
-			<b>User Name*</b><br/>
+			<b>Email address*</b><br/>
 			<input type="text" name="Username" value="${formValue['Username']}" size="60" maxlength="120" />
 			<span class="warning"><form:error name="Username"/></span>
 		</td>

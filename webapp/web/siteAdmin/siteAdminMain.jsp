@@ -17,7 +17,13 @@
     Portal portal = (Portal) request.getAttribute("portalBean");
     final String DEFAULT_SEARCH_METHOD = "fulltext"; /* options are fulltext/termlike */     
     
+    int securityLevel = loginHandler.ANYBODY;
+    String loginStatus = loginHandler.getLoginStatus(); 
+    if ( loginStatus.equals("authenticated")) {
+       securityLevel = Integer.parseInt( loginHandler.getLoginRole() );
+    }
 %>
+
 
 <div id="content">
 

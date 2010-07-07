@@ -13,14 +13,10 @@ function isValidLogin( theForm ) {
         theForm.loginName.focus();
         return false;
     }
-    if ( isEmptyOrWrongLength( theForm.loginPassword.value)) {
+    if ( isEmptyPassword( theForm.loginPassword.value)) {
         theForm.loginPassword.focus();
         return false;
     }
-
-    //alert("theForm.loginPassword.value=" + theForm.loginPassword.value );
-    theForm.loginPassword.value = calcMD5( theForm.loginPassword.value );
-    //alert("theForm.loginPassword.value=" + theForm.loginPassword.value );
     return true;
 }
 
@@ -32,13 +28,37 @@ function isEmpty( aStr ) {
     return false;
 }
 
-function isEmptyOrWrongLength( aStr ) {
+function isEmptyPassword( aStr ) {
     if ( aStr.length == 0 ) {
         alert("Please enter a password to log in");
         return true;
-    } else if ( aStr.length < <%=User.MIN_PASSWORD_LENGTH%> || aStr.length > <%=User.MAX_PASSWORD_LENGTH%>) {
-        alert("Please enter a password between 6 and 12 characters long");
+    }
+    return false;
+}
+
+function isReasonableNewPassword( theForm ) {
+	if ( isWrongLengthPassword( theForm.newPassword.value)) {
+	    theForm.newPassword.focus();
+	    return false;
+	}
+	if ( isMismatchedPasswords( theForm.newPassword.value, theForm.confirmPassword.value)) {
+	    theForm.newPassword.focus();
+	    return false;
+	}
+}
+
+function isWrongLengthPassword( aStr ) {
+    if ( aStr.length < <%=User.MIN_PASSWORD_LENGTH%> || aStr.length > <%=User.MAX_PASSWORD_LENGTH%>) {
+        alert("Please enter a password between <%=User.MIN_PASSWORD_LENGTH%> and <%=User.MAX_PASSWORD_LENGTH%> characters long");
         return true;
+    }
+    return false;
+}
+
+function isMismatchedPasswords( one, two ) {
+    if ( one != two ) {
+         alert("Passwords do not match");
+         return true;
     }
     return false;
 }

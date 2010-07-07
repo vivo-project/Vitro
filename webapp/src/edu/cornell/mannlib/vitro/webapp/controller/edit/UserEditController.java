@@ -68,7 +68,7 @@ public class UserEditController extends BaseEditController {
         }
 
         ArrayList results = new ArrayList();
-        results.add("User");
+        results.add("Email address");
         results.add("first name");
         results.add("last name");
         results.add("login count");
