@@ -172,7 +172,7 @@ public class Authenticate extends FreeMarkerHttpServlet {
 			LoginProcessBean bean = getLoginProcessBean(request);
 			bean.setState(State.FORCED_PASSWORD_CHANGE);
 		} else {
-			recordLoginInfo(request, user);
+			recordLoginInfo(request, user.getUsername());
 		}
 	}
 
@@ -226,8 +226,7 @@ public class Authenticate extends FreeMarkerHttpServlet {
 	}
 
 	/**
-	 * Store the changed password. They're not logged in yet, but they no longer
-	 * need to change their password.
+	 * Store the changed password. They are logged in.
 	 */
 	private void recordSuccessfulPasswordChange(HttpServletRequest request,
 			User user) {
@@ -235,22 +234,22 @@ public class Authenticate extends FreeMarkerHttpServlet {
 		String md5NewPassword = applyMd5Encoding(newPassword);
 		user.setOldPassword(user.getMd5password());
 		user.setMd5password(md5NewPassword);
-		user.setLoginCount(user.getLoginCount() + 1);
 		getUserDao(request).updateUser(user);
 		log.debug("Completed first-time password change.");
 
-		LoginProcessBean bean = getLoginProcessBean(request);
-		bean.setState(State.LOGGING_IN);
-		bean.setMessage(Message.PASSWORD_CHANGE_SAVED);
+		recordLoginInfo(request, user.getUsername());
 	}
 
 	/**
 	 * The user provided the correct information, and changed the password if
 	 * that was required. Record that they have logged in.
 	 */
-	private void recordLoginInfo(HttpServletRequest request, User user) {
+	private void recordLoginInfo(HttpServletRequest request, String username) {
 		log.debug("Completed login.");
 
+		// Get a fresh user object, so we know it's not stale.
+		User user = getUserDao(request).getUserByUsername(username);
+		
 		HttpSession session = request.getSession();
 
 		// Put the login info into the session.
