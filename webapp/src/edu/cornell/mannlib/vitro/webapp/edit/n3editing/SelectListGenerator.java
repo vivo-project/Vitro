@@ -22,9 +22,11 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
+import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
+import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 public class SelectListGenerator {
@@ -235,6 +237,7 @@ public class SelectListGenerator {
                     }
                 }
                 break;
+                
             case CHILD_VCLASSES: //so we have a vclass URI
                 vclassUri = field.getObjectClassUri();
                 if (vclassUri==null || vclassUri.equals("")){
@@ -291,6 +294,57 @@ public class SelectListGenerator {
                         }
                     optionsMap.put(vclassUri, "Other");
                     ++optionsCount;
+                    }
+                }
+                break;
+                
+            case VCLASSGROUP: 
+
+                String classGroupUri = field.getObjectClassUri(); // we're overloading this property to specify the classgroup
+                if (classGroupUri==null || classGroupUri.equals("")){
+                    log.error("no classGroupUri found for field \""+fieldName+"\" in SelectListGenerator.getOptions() when OptionsType VCLASSGROUP specified");
+                } else {
+                    // first test to see whether there's a default "leave blank" value specified with the literal options
+                    String defaultOption=null;
+                    if ((defaultOption=getDefaultOption(field))!=null) {
+                        optionsMap.put(LEFT_BLANK, defaultOption);
+                    }
+                    // now populate the options                
+                    if( wDaoFact == null ) log.error("could not get WebappDaoFactory from request in SelectListGenerator.getOptions().");
+                    
+                    VClassGroupDao vcgd = wDaoFact.getVClassGroupDao();
+                    
+                    // Need to call this method to populate the classgroups - otherwise the classgroup class list is empty
+                    List vClassGroups = vcgd.getPublicGroupsWithVClasses(); 
+                    
+                    if (vClassGroups == null) {
+                        log.error("No class groups found, so only default value from field's literalOptions will be used.");
+                    } else {                          
+                        VClassGroup vClassGroup = null;
+                        for (Object o : vClassGroups) {
+                            VClassGroup vcg = (VClassGroup) o;
+                            if (vcg.getURI().equals(classGroupUri)) {
+                                vClassGroup = vcg;
+                                break;
+                            }
+                        }
+                        if (vClassGroup == null) {
+                            log.error("No class group with uri " + classGroupUri + "found, so only default value from field's literalOptions will be used.");
+                        } else {                        
+                            List<VClass> vClassList = vClassGroup.getVitroClassList();
+
+                            if( vClassList == null || vClassList.size()==0 ) { 
+                                log.debug("No classes in class group " + classGroupUri + " found in the model, so only default value from field's literalOptions will be used" );
+                            } else {     
+                                for( VClass vClass : vClassList ) {
+                                    String vClassUri = vClass.getURI();
+                                    if( vClass != null && !OWL.Nothing.getURI().equals(vClassUri)) {                        
+                                        optionsMap.put(vClassUri,vClass.getName().trim());                        
+                                        ++optionsCount;
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
                 break;

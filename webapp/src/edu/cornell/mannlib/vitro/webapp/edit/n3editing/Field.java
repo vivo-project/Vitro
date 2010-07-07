@@ -24,6 +24,7 @@ public class Field {
         MONIKERS_VIA_VCLASS, 
         CHILD_VCLASSES, 
         CHILD_VCLASSES_WITH_PARENT,
+        VCLASSGROUP,
         FILE, 
         UNDEFINED, 
         DATETIME, 
@@ -216,7 +217,9 @@ public class Field {
         } else if ("CHILD_VCLASSES".equalsIgnoreCase(s)) {            
             setOptionsType(Field.OptionsType.CHILD_VCLASSES);
         } else if ("CHILD_VCLASSES_WITH_PARENT".equalsIgnoreCase(s)) {            
-            setOptionsType(Field.OptionsType.CHILD_VCLASSES_WITH_PARENT);            
+            setOptionsType(Field.OptionsType.CHILD_VCLASSES_WITH_PARENT);  
+        } else if ("VCLASSGROUP".equalsIgnoreCase(s)) {            
+            setOptionsType(Field.OptionsType.VCLASSGROUP);              
         } else if ("FILE".equalsIgnoreCase(s)) {
             setOptionsType(Field.OptionsType.FILE);            
         } else if ("DATE".equalsIgnoreCase(s)) {
