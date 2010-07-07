@@ -246,7 +246,7 @@ public class VisualizationRequestHandler {
 		StringBuilder coAuthorsMerged = new StringBuilder();
 		
 		for (Node currCoAuthor : coAuthors) {
-			coAuthorsMerged.append(currCoAuthor.getNodeName() + " | ");
+			coAuthorsMerged.append(currCoAuthor.getNodeName() + "; ");
 		}
 		
 		return coAuthorsMerged.toString();

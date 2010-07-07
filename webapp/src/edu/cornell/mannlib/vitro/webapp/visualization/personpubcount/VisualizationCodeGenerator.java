@@ -145,17 +145,19 @@ public class VisualizationCodeGenerator {
 										"    	border-spacing: 0;" +
 										"    	vertical-align: inherit;" +
 										"}" +
+										"td.sparkline_number { text-align:right; padding-right:10px; }" +
+										"td.sparkline_text   {text-align:left;}" +
 										/*"#sparkline_data_table {" +
 												"width: auto;" +
 										"}" +
 										"#sparkline_data_table tfoot {" +
 												"color: red;" +
 												"font-size:0.9em;" +
-										"}" +*/
+										"}" +
 										".sparkline_text {" +
 												"margin-left:72px;" +
 												"position:absolute;" +
-										"}" +
+										"}" +*/
 										".sparkline_range {" +
 												"color:#7BA69E;" +
 												"font-size:0.9em;" +
@@ -163,11 +165,15 @@ public class VisualizationCodeGenerator {
 										"}" +
 								"</style>\n");
 		
-		
+//		.sparkline {display:inline; margin:0; padding:0; width:600px }
+
+
+
+//		td.sparkline-img  {margin:0; padding:0; } 
 		
 
 		visualizationCode.append("<script type=\"text/javascript\">\n" +
-								"function drawVisualization() {\n" +
+								"function drawVisualization(providedSparklineImgID) {\n" +
 									"var data = new google.visualization.DataTable();\n" +
 									"data.addColumn('string', 'Year');\n" +
 									"data.addColumn('number', 'Publications');\n" +
@@ -303,7 +309,8 @@ public class VisualizationCodeGenerator {
 		 * Create the vis object and draw it in the div pertaining to short-sparkline.
 		 * */
 		visualizationCode.append("var short_spark = new google.visualization.ImageSparkLine(" +
-														"document.getElementById('" + visDivNames.get("SHORT_SPARK") + "')" +
+//														"document.getElementById('" + visDivNames.get("SHORT_SPARK") + "')" +
+														"document.getElementById(providedSparklineImgID)" +
 								 ");\n" +
 								 "short_spark.draw(shortSparklineView, " + sparklineDisplayOptions + ");\n");
 
@@ -322,16 +329,16 @@ public class VisualizationCodeGenerator {
 		/*
 		 * Generate the text introducing the vis.
 		 * */
-		visualizationCode.append("var shortSparksText = '<p class=\"sparkline_text\">'" +
-														"+ renderedShortSparks" +
+		visualizationCode.append("$('#" + visDivNames.get("SHORT_SPARK") + " td.sparkline_number').text(renderedShortSparks);");
+		visualizationCode.append("var shortSparksText = ''" +
 														"+ ' Papers with year from '" +
 														"+ ' " + totalPublications + " '" +
 														"+ ' total " +
 														"<span class=\"sparkline_range\">" +
 														"(" + shortSparkMinYear + " - " + currentYear + ")" +
 														"</span>'" +
-														"+ '</p>';" +
-								"$(shortSparksText).prependTo('#" + visDivNames.get("SHORT_SPARK") + "');");
+														"+ '';" +
+								"$('#" + visDivNames.get("SHORT_SPARK") + " td.sparkline_text').html(shortSparksText);");
 
 		visualizationCode.append("}\n ");
 		
@@ -342,6 +349,7 @@ public class VisualizationCodeGenerator {
 		visualizationCode.append(generateVisualizationActivator(visDivNames.get("SHORT_SPARK"), visContainerID));
 		
 	}
+	
 	private void generateFullSparklineVisualizationContent(
 			int currentYear, int minPubYearConsidered, String visContainerID, StringBuilder visualizationCode,
 			int totalPublications, int renderedFullSparks,
@@ -350,20 +358,21 @@ public class VisualizationCodeGenerator {
 								 "fullSparklineView.setColumns([1]);\n");
 		
 		visualizationCode.append("var full_spark = new google.visualization.ImageSparkLine(" +
-												"document.getElementById('" + visDivNames.get("FULL_SPARK") + "')" +
+//												"document.getElementById('" + visDivNames.get("FULL_SPARK") + "')" +
+												"document.getElementById(providedSparklineImgID)" +
 								");\n" +
 								"full_spark.draw(fullSparklineView, " + sparklineDisplayOptions + ");\n");
 		
-		visualizationCode.append("var allSparksText = '<p class=\"sparkline_text\"><b>Full Timeline</b> '" +
-												 "+ " + renderedFullSparks + "" +
+		visualizationCode.append("$('#" + visDivNames.get("FULL_SPARK") + " td.sparkline_number').text('" + renderedFullSparks + "');");
+		visualizationCode.append("var allSparksText = ''" +
 												 "+ ' papers with year from '" +
 												 "+ ' " + totalPublications + " '" +
 												 "+ ' total " +
 												"<span class=\"sparkline_range\">" +
 												"(" + minPubYearConsidered + " - " + currentYear + ")" +
 												"</span>'" +
-												"+ '</p>';" +
-								"$(allSparksText).prependTo('#" + visDivNames.get("FULL_SPARK") +"');");
+												"+ '';" +
+								"$('#" + visDivNames.get("FULL_SPARK") + " td.sparkline_text').html(allSparksText);");
 		
 		visualizationCode.append("}\n ");
 		
@@ -371,6 +380,27 @@ public class VisualizationCodeGenerator {
 		
 	}
 	private String generateVisualizationActivator(String sparklineID, String visContainerID) {
+		
+		String sparklineTableWrapper = "\n" +
+				"var table = $('<table>');" +
+				"table.attr('class', 'sparkline_wrapper_table');" +
+				"var row = $('<tr>');" +
+				"var sparklineImgTD = $('<td>');" +
+				"sparklineImgTD.attr('id', '" + sparklineID + "_img');" +
+				"sparklineImgTD.attr('width', '150');" +
+				"sparklineImgTD.attr('align', 'right');" +
+				"sparklineImgTD.attr('class', '" + visualizationStyleClass + "');" +
+				"row.append(sparklineImgTD);" +
+				"var sparklineNumberTD = $('<td>');" +
+				"sparklineNumberTD.attr('width', '100');" +
+				"sparklineNumberTD.attr('class', 'sparkline_number');" +
+				"row.append(sparklineNumberTD);" +
+				"var sparklineTextTD = $('<td>');" +
+				"sparklineTextTD.attr('width', '350');" +
+				"sparklineTextTD.attr('class', 'sparkline_text');" +
+				"row.append(sparklineTextTD);" +
+				"table.append(row);" +
+				"table.prependTo('#" + sparklineID + "');\n";
 		
 		return "$(document).ready(function() {" +
 								
@@ -387,12 +417,18 @@ public class VisualizationCodeGenerator {
 								"}" +
 								
 								"if ($('#" + sparklineID + "').length == 0) {" +
+								
 								"$('<div/>', {'id': '" + sparklineID + "'," +
 											 "'class': '" + visualizationStyleClass + "'" +
-										"}).prependTo('#" + visContainerID + "');" +
+										"});" +
+								
+								sparklineTableWrapper +
+										
+								"$('#" + sparklineID + "').prependTo('#" + visContainerID + "');" +
+								
 								"}" +
 								
-								"drawVisualization();" +
+								"drawVisualization('" + sparklineID + "_img');" +
 								"});" +
 								"</script>\n";
 	}
