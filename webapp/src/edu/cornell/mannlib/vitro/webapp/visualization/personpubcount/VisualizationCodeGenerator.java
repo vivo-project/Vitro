@@ -43,6 +43,10 @@ public class VisualizationCodeGenerator {
 
 	private VisVOContainer valueObjectContainer;
 
+	private String contextPath;
+
+	private String individualURIParam;
+
 	public VisualizationCodeGenerator(String contextPath, 
 									  String individualURIParam, 
 									  String visMode, 
@@ -52,23 +56,24 @@ public class VisualizationCodeGenerator {
 									  VisVOContainer valueObjectContainer, 
 									  Log log) {
 		
+		this.contextPath = contextPath;
+		this.individualURIParam = individualURIParam;
+		
 		this.yearToPublicationCount = yearToPublicationCount;
 		this.valueObjectContainer = valueObjectContainer;
+		
 		this.log = log;
 		
-		generateVisualizationCode(contextPath, 
-				  individualURIParam, 
-				  visMode, 
+		
+		generateVisualizationCode(visMode, 
 				  visContainer, 
 				  authorDocuments);
 		
 		
 	}
 	
-	private void generateVisualizationCode(String contextPath,
-										   String individualURIParam, 
-										   String visMode, 
-										   String visContainer,
+	private void generateVisualizationCode(String visMode,
+										   String visContainer, 
 										   List<BiboDocument> authorDocuments) {
 		
     	valueObjectContainer.setSparklineContent(getMainVisualizationCode(authorDocuments, 
@@ -76,9 +81,7 @@ public class VisualizationCodeGenerator {
     																	  visContainer));
     	
     	
-    	valueObjectContainer.setSparklineContext(getVisualizationContextCode(contextPath, 
-    																		 individualURIParam, 
-    																		 visMode));
+    	valueObjectContainer.setSparklineContext(getVisualizationContextCode(visMode));
     	
 	}
 
@@ -145,6 +148,9 @@ public class VisualizationCodeGenerator {
 										"    	border-spacing: 0;" +
 										"    	vertical-align: inherit;" +
 										"}" +
+										".sparkline_wrapper_table table{" +
+										"    	vertical-align: bottom;" +
+										"}" +
 										"td.sparkline_number { text-align:right; padding-right:5px; }" +
 										"td.sparkline_text   {text-align:left;}" +
 										/*"#sparkline_data_table {" +
@@ -157,12 +163,12 @@ public class VisualizationCodeGenerator {
 										".sparkline_text {" +
 												"margin-left:72px;" +
 												"position:absolute;" +
-										"}" +*/
+										"}" +
 										".sparkline_range {" +
 												"color:#7BA69E;" +
 												"font-size:0.9em;" +
 												"font-style:italic;" +
-										"}" +
+										"}" +*/
 								"</style>\n");
 		
 //		.sparkline {display:inline; margin:0; padding:0; width:600px }
@@ -353,6 +359,15 @@ public class VisualizationCodeGenerator {
 			int currentYear, int minPubYearConsidered, String visContainerID, StringBuilder visualizationCode,
 			int totalPublications, int renderedFullSparks,
 			String sparklineDisplayOptions) {
+		
+		String csvDownloadURL = ""; 
+		
+		try {
+			csvDownloadURL = getCSVDownloadURL();
+		} catch (UnsupportedEncodingException e) {
+			csvDownloadURL = "#";
+		}
+		
 		visualizationCode.append("var fullSparklineView = new google.visualization.DataView(data);\n" +
 								 "fullSparklineView.setColumns([1]);\n");
 		
@@ -363,14 +378,17 @@ public class VisualizationCodeGenerator {
 								"full_spark.draw(fullSparklineView, " + sparklineDisplayOptions + ");\n");
 		
 		visualizationCode.append("$('#" + visDivNames.get("FULL_SPARK") + " td.sparkline_number').text('" + renderedFullSparks + "');");
+		
+		
+		
 		visualizationCode.append("var allSparksText = ''" +
 												 "+ ' papers with year from '" +
 												 "+ ' " + totalPublications + " '" +
 												 "+ ' total " +
 												"<span class=\"sparkline_range\">" +
 												"(" + minPubYearConsidered + " - " + currentYear + ")" +
-												"</span>'" +
-												"+ '';" +
+												"</span> '" +
+												"+ ' <a href='" + csvDownloadURL + "' class='inline_href'>(.CSV File)</a>';" +
 								"$('#" + visDivNames.get("FULL_SPARK") + " td.sparkline_text').html(allSparksText);");
 		
 		visualizationCode.append("}\n ");
@@ -429,18 +447,18 @@ public class VisualizationCodeGenerator {
 										
 								"}" +
 								
-								"drawVisualization('" + sparklineID + "_img');" +
+								"drawVisualization(sparklineImgTD);" +
 								"});" +
 								"</script>\n";
 	}
 
-	private String getVisualizationContextCode(String contextPath, String individualURI, String visMode) {
+	private String getVisualizationContextCode(String visMode) {
 
 		String visualizationContextCode = "";
 		if (SHORT_SPARKLINE_MODE_URL_HANDLE.equalsIgnoreCase(visMode)) {
-			visualizationContextCode = generateShortVisContext(contextPath, individualURI);
+			visualizationContextCode = generateShortVisContext();
 		} else {
-			visualizationContextCode = generateFullVisContext(contextPath, individualURI);
+			visualizationContextCode = generateFullVisContext();
 		}
 		
 		
@@ -455,8 +473,7 @@ public class VisualizationCodeGenerator {
 		return visualizationContextCode;
 	}
 	
-	private String generateFullVisContext(String contextPath, 
-										 String individualURI) {
+	private String generateFullVisContext() {
 		
 		StringBuilder divContextCode = new StringBuilder();
 		
@@ -466,18 +483,8 @@ public class VisualizationCodeGenerator {
 			if (yearToPublicationCount.size() > 0) {
 				
 				
-				String downloadURL = contextPath
-									 + "/admin/visQuery"
-									 + "?" + VisualizationFrameworkConstants.INDIVIDUAL_URI_URL_HANDLE 
-									 + "=" + URLEncoder.encode(individualURI, 
-											 				   VisualizationController.URL_ENCODING_SCHEME).toString() 
-									 + "&" + VisualizationFrameworkConstants.VIS_TYPE_URL_HANDLE 
-									 + "=" + URLEncoder.encode(VisualizationController
-											 						.PERSON_PUBLICATION_COUNT_VIS_URL_VALUE, 
-											 				   VisualizationController.URL_ENCODING_SCHEME).toString() 
-									 + "&" + VisualizationFrameworkConstants.RENDER_MODE_URL_HANDLE 
-									 + "=" + URLEncoder.encode(VisualizationFrameworkConstants.DATA_RENDER_MODE_URL_VALUE, 
-							 				 				   VisualizationController.URL_ENCODING_SCHEME).toString();
+				String downloadURL = getCSVDownloadURL();
+				
 				downloadFileCode = "Download data as <a href='" + downloadURL + "'>.csv</a> file.<br />";
 				
 				valueObjectContainer.setDownloadDataLink(downloadURL);
@@ -499,10 +506,35 @@ public class VisualizationCodeGenerator {
 		return divContextCode.toString();
 		
 	}
+
+	private String getCSVDownloadURL()
+			throws UnsupportedEncodingException {
+		
+		if (yearToPublicationCount.size() > 0) {
+			
+		
+		String downloadURL = contextPath
+							 + "/admin/visQuery"
+							 + "?" + VisualizationFrameworkConstants.INDIVIDUAL_URI_URL_HANDLE 
+							 + "=" + URLEncoder.encode(individualURIParam, 
+									 				   VisualizationController.URL_ENCODING_SCHEME).toString() 
+							 + "&" + VisualizationFrameworkConstants.VIS_TYPE_URL_HANDLE 
+							 + "=" + URLEncoder.encode(VisualizationController
+									 						.PERSON_PUBLICATION_COUNT_VIS_URL_VALUE, 
+									 				   VisualizationController.URL_ENCODING_SCHEME).toString() 
+							 + "&" + VisualizationFrameworkConstants.RENDER_MODE_URL_HANDLE 
+							 + "=" + URLEncoder.encode(VisualizationFrameworkConstants.DATA_RENDER_MODE_URL_VALUE, 
+					 				 				   VisualizationController.URL_ENCODING_SCHEME).toString();
+		
+			return downloadURL;
+		} else {
+			return "#";
+		}
+		
+	}
 	
 	
-	private String generateShortVisContext(String contextPath, 
-			 String individualURI) {
+	private String generateShortVisContext() {
 
 		StringBuilder divContextCode = new StringBuilder();
 		
@@ -529,7 +561,7 @@ public class VisualizationCodeGenerator {
 							+ "/admin/visQuery"
 							+ "?" 
 							+ VisualizationFrameworkConstants.INDIVIDUAL_URI_URL_HANDLE 
-							+ "=" + URLEncoder.encode(individualURI, 
+							+ "=" + URLEncoder.encode(individualURIParam, 
 					 				 VisualizationController.URL_ENCODING_SCHEME).toString()
 					 	    + "&"
 		 				    + VisualizationFrameworkConstants.VIS_TYPE_URL_HANDLE 
@@ -587,7 +619,6 @@ public class VisualizationCodeGenerator {
 		}
 										
 		dataTable.append("</tbody>\n" +
-						"</tfoot>" +
 //						"<tfoot>" +
 //								"<tr><td colspan='2'>*DNA - Data not available</td></tr>" +
 //						"</tfoot>\n" +

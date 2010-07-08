@@ -26,6 +26,33 @@
 
 <style type="text/css">
 
+.sparkline_wrapper_table {
+	display: inline;
+}
+
+.author_name {
+	color: #13968c;
+	font-weight: bold;
+}
+
+.author_moniker {
+	color: #9C9C9C;
+}
+
+.sub_headings {
+	color: #121b3c;
+	padding-top: 5px;
+}
+
+.sub_headings a {
+	font-size:0.7em;
+}
+
+
+.inline_href {
+	display: inline;
+}
+
 #ego_profile {
 	padding: 10px;
 	min-height: 100px;
@@ -74,7 +101,7 @@
 <div id="ego_profile">
 
 	<%-- Label --%>
-			<span id="ego_label" class="author_name"></span>
+			<h1><span id="ego_label" class="author_name"></span></h1>
 	
 	<%-- Moniker--%>
 			<span id="ego_moniker" class="author_moniker"></span>
@@ -84,7 +111,13 @@
 	
 	
 	<%-- Sparkline --%>
-			<div id="ego_sparkline">${sparkline.sparklineContent}</div>
+		<h2 class="sub_headings">General Statistics</h2>
+			<div id="ego_sparkline">
+			${sparkline.sparklineContent}
+			</div>
+			
+			
+		<h2 class="sub_headings">Ego-Centric Co-Author Network <a href="${coAuthorshipDownloadFile}">(.GraphML File)</a></h2>
 
 </div>
 
