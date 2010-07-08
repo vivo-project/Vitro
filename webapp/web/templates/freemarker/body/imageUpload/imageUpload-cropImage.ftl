@@ -8,7 +8,7 @@ ${scripts.add("/js/imageUpload/cropImage.js")}
 
 
 ${stylesheets.addFromTheme("/uploadImages.css")}
-${stylesheets.addFromTheme("/jquery.Jcrop.css")}
+${stylesheets.add("/js/jquery_plugins/jcrop/jquery.Jcrop.css")}
 
 
 <#--Reduce original image to fit in the page layout  
