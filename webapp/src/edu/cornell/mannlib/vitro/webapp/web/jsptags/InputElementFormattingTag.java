@@ -54,6 +54,8 @@ import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
  */
 public class InputElementFormattingTag extends TagSupport {
     private String  id;
+    // NB name is optional. If not specified, the name comes from the id value.
+    private String  name; 
     private String  type;
     private String  label;
     private String  cancelLabel;
@@ -78,6 +80,13 @@ public class InputElementFormattingTag extends TagSupport {
         this.id = idStr;
     }
 
+    public String getName() {
+        return StringUtils.isEmpty(name) ? id : name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    
     public String getType() {
         return type;
     }
@@ -420,7 +429,7 @@ public class InputElementFormattingTag extends TagSupport {
                 String valueStr = doValue(editConfig, editSub);
                 String sizeStr  = doSize();
                 if (definitionTags) { out.print("<dd>"); }
-                out.print("<input "+classStr+" "+sizeStr+" type=\"text\" id=\""+getId()+"\" name=\""+getId()+"\" value=\""+valueStr+"\" />");
+                out.print("<input "+classStr+" "+sizeStr+" type=\"text\" id=\""+getId()+"\" name=\""+getName()+"\" value=\""+valueStr+"\" />");
                 if (definitionTags) { out.print("</dd>"); }
                 out.println();
             } else if (getType().equalsIgnoreCase("textarea")) {
@@ -428,22 +437,22 @@ public class InputElementFormattingTag extends TagSupport {
                 String rowStr = doRows();
                 String colStr = doCols();
                 if (definitionTags) { out.print("<dd>"); }
-                out.print("<textarea "+classStr+" id=\""+getId()+"\" name=\""+getId()+"\" "+rowStr+" "+colStr+" >"+valueStr+"</textarea>");
+                out.print("<textarea "+classStr+" id=\""+getId()+"\" name=\""+getName()+"\" "+rowStr+" "+colStr+" >"+valueStr+"</textarea>");
                 if (definitionTags) { out.print("</dd>"); }
                 out.println();
             } else if( getType().equalsIgnoreCase("select")) {
                 String valueStr = doValue(editConfig, editSub);
                 //String sizeStr = getSize(); //"style=\"width:"+getSize()+"%;\"";
-                Map <String,String> optionsMap = SelectListGenerator.getOptions(editConfig,getId(), wdf);
+                Map <String,String> optionsMap = SelectListGenerator.getOptions(editConfig,getName(), wdf);
                 if (optionsMap==null){
                     log.error("Error in InputElementFormattingTag.doStartTag(): null optionsMap returned from getOptions()");
                 }
                 if (optionsMap.size()>0) { // e.g., an Educational Background where may be no choices left after remove existing
                     if (definitionTags) { out.print("<dd>"); }
                     if (multiple!=null && !multiple.equals("")) {
-                        out.print("<select "+classStr+" id=\""+getId()+"\" name=\""+getId()+"\" multiple=\"multiple\" size=\""+(optionsMap.size() > 10? "10" : optionsMap.size())+"\">");
+                        out.print("<select "+classStr+" id=\""+getId()+"\" name=\""+getName()+"\" multiple=\"multiple\" size=\""+(optionsMap.size() > 10? "10" : optionsMap.size())+"\">");
                     } else {
-                        out.print("<select "+classStr+" id=\""+getId()+"\" name=\""+getId()+"\">");
+                        out.print("<select "+classStr+" id=\""+getId()+"\" name=\""+getName()+"\">");
                     }
                     optionsMap = getSortedMap(optionsMap);
                     Iterator iter = optionsMap.keySet().iterator();
@@ -459,12 +468,12 @@ public class InputElementFormattingTag extends TagSupport {
                     out.print("</select>");
                     if (definitionTags) { out.print("</dd>"); }
                 } else {
-                    out.println("<p><input type=\"hidden\" id=\""+getId()+"\" name=\""+getId()+"\" value=\""+valueStr+"\"/>no appropriate choice available</p>");
+                    out.println("<p><input type=\"hidden\" id=\""+getId()+"\" name=\""+getName()+"\" value=\""+valueStr+"\"/>no appropriate choice available</p>");
                 }
             } else if( getType().equalsIgnoreCase("checkbox")) {
                 String valueStr = doValue(editConfig, editSub);
                 if (definitionTags) { out.print("<dd>"); }
-                Map <String,String> optionsMap = SelectListGenerator.getOptions(editConfig,getId(),wdf);
+                Map <String,String> optionsMap = SelectListGenerator.getOptions(editConfig,getName(),wdf);
                 if (optionsMap==null){
                     log.error("Error in InputElementFormattingTag.doStartTag(): null optionsMap returned from getOptions()");
                 }
@@ -473,7 +482,7 @@ public class InputElementFormattingTag extends TagSupport {
                 while (iter.hasNext()) {
                     String key = (String) iter.next();
                     String mapValue = optionsMap.get(key);
-                    out.print("<input "+classStr+" type=\"checkbox\" name=\""+getId()+"\" value=\""+StringEscapeUtils.escapeHtml(key)+"\"");
+                    out.print("<input "+classStr+" type=\"checkbox\" name=\""+getName()+"\" value=\""+StringEscapeUtils.escapeHtml(key)+"\"");
                     if( key.equals( valueStr )){
                         out.print(" checked=\"checked\"");
                     }
@@ -483,7 +492,7 @@ public class InputElementFormattingTag extends TagSupport {
             } else if( getType().equalsIgnoreCase("radio")) {
                 String valueStr = doValue(editConfig, editSub);
                 if (definitionTags) { out.print("<dd>"); }
-                Map <String,String> optionsMap = SelectListGenerator.getOptions(editConfig,getId(),wdf);
+                Map <String,String> optionsMap = SelectListGenerator.getOptions(editConfig,getName(),wdf);
                 if (optionsMap==null){
                     log.error("Error in InputElementFormattingTag.doStartTag(): null optionsMap returned from getOptions()");
                 }
@@ -492,7 +501,7 @@ public class InputElementFormattingTag extends TagSupport {
                 while (iter.hasNext()) {
                     String key = (String) iter.next();
                     String mapValue = optionsMap.get(key);
-                    out.print("<input "+classStr+" type=\"radio\" name=\""+getId()+"\" value=\""+StringEscapeUtils.escapeHtml(key)+"\"");
+                    out.print("<input "+classStr+" type=\"radio\" name=\""+getName()+"\" value=\""+StringEscapeUtils.escapeHtml(key)+"\"");
                     if( key.equals( valueStr )){
                         out.print(" checked=\"checked\"");
                     }
@@ -501,14 +510,14 @@ public class InputElementFormattingTag extends TagSupport {
                 if (definitionTags) { out.print("</dd>"); }
             } else if( getType().equalsIgnoreCase("file")) {
 
-                String fieldName = getId();
+                String fieldName = getName();
                 if( editConfig.getUrisInScope().containsKey(fieldName) ){
                     //if there is a link to a file Individual then this is 
                     //a update and we should just disable the control
                     out.println("<input type='file' disabled='true'/>");
                 } else {
                     if(definitionTags) {out.print("<dd>");}
-                    out.print("<input type=\"file\" id=\""+getId()+"\" name=\""+getId() +"\" />");
+                    out.print("<input type=\"file\" id=\""+getId()+"\" name=\""+getName() +"\" />");
                     if(definitionTags) {out.print("</dd>");}
                     out.print("\n");
                 }
@@ -530,7 +539,7 @@ public class InputElementFormattingTag extends TagSupport {
             	}
             	if (optionsMap.size()>0) {
             		if (definitionTags) { out.print("<dd>"); }
-            		out.print("<select "+classStr+" id=\""+getId()+"\" name=\""+getId()+"\">");                       
+            		out.print("<select "+classStr+" id=\""+getId()+"\" name=\""+getName()+"\">");                       
             		optionsMap = getSortedMap(optionsMap);
             		Iterator<String> iter = optionsMap.keySet().iterator();
             		while (iter.hasNext()) {
