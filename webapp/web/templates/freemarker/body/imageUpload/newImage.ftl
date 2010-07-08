@@ -27,7 +27,7 @@ ${stylesheets.addFromTheme("/uploadImages.css")}
               
                      <label>Upload a photo <span> (JPEG, GIF or PNG)</span></label>
                      <input type="file" name="datafile" size="30">
-                     <input type="submit" value="Upload photo"> or <a href="${cancelUrl}">Cancel</a>
+                     <input  type="submit" value="Upload photo"> or <a class="cancelUpload"  href="${cancelUrl}">Cancel</a>
               </form>
        </div>
 </div>
