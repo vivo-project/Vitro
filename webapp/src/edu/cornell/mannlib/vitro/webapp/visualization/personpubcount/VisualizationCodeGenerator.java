@@ -174,6 +174,7 @@ public class VisualizationCodeGenerator {
 
 		visualizationCode.append("<script type=\"text/javascript\">\n" +
 								"function drawVisualization(providedSparklineImgID) {\n" +
+								"console.log(providedSparklineImgID)" +
 									"var data = new google.visualization.DataTable();\n" +
 									"data.addColumn('string', 'Year');\n" +
 									"data.addColumn('number', 'Publications');\n" +
@@ -310,7 +311,7 @@ public class VisualizationCodeGenerator {
 		 * */
 		visualizationCode.append("var short_spark = new google.visualization.ImageSparkLine(" +
 //														"document.getElementById('" + visDivNames.get("SHORT_SPARK") + "')" +
-														"document.getElementById(providedSparklineImgID)" +
+														"$('#' + providedSparklineImgID)[0]" +
 								 ");\n" +
 								 "short_spark.draw(shortSparklineView, " + sparklineDisplayOptions + ");\n");
 
@@ -359,7 +360,7 @@ public class VisualizationCodeGenerator {
 		
 		visualizationCode.append("var full_spark = new google.visualization.ImageSparkLine(" +
 //												"document.getElementById('" + visDivNames.get("FULL_SPARK") + "')" +
-												"document.getElementById(providedSparklineImgID)" +
+														"$('#' + providedSparklineImgID)[0]" +
 								");\n" +
 								"full_spark.draw(fullSparklineView, " + sparklineDisplayOptions + ");\n");
 		
@@ -385,7 +386,7 @@ public class VisualizationCodeGenerator {
 				"var table = $('<table>');" +
 				"table.attr('class', 'sparkline_wrapper_table');" +
 				"var row = $('<tr>');" +
-				"var sparklineImgTD = $('<td>');" +
+				"sparklineImgTD = $('<td>');" +
 				"sparklineImgTD.attr('id', '" + sparklineID + "_img');" +
 				"sparklineImgTD.attr('width', '150');" +
 				"sparklineImgTD.attr('align', 'right');" +
@@ -404,6 +405,9 @@ public class VisualizationCodeGenerator {
 		
 		return "$(document).ready(function() {" +
 								
+								"var sparklineImgTD; " +
+								
+		
 								/*
 								 * This is a nuclear option (creating the container in which everything goes)
 								 * the only reason this will be ever used is the API user never submitted a 
@@ -411,12 +415,12 @@ public class VisualizationCodeGenerator {
 								 * vis not appear in the calling page at all. So now atleast vis appears but 
 								 * appended at the bottom of the body.
 								 * */
-								"if ($('#" + visContainerID + "').length == 0) {" +
+								"if ($('#" + visContainerID + "').length === 0) {" +
 								"	$('<div/>', {'id': '" + visContainerID + "'" +
 								"     }).appendTo('body');" +
 								"}" +
 								
-								"if ($('#" + sparklineID + "').length == 0) {" +
+								"if ($('#" + sparklineID + "').length === 0) {" +
 								
 								"$('<div/>', {'id': '" + sparklineID + "'," +
 											 "'class': '" + visualizationStyleClass + "'" +
