@@ -145,7 +145,7 @@ public class VisualizationCodeGenerator {
 										"    	border-spacing: 0;" +
 										"    	vertical-align: inherit;" +
 										"}" +
-										"td.sparkline_number { text-align:right; padding-right:10px; }" +
+										"td.sparkline_number { text-align:right; padding-right:5px; }" +
 										"td.sparkline_text   {text-align:left;}" +
 										/*"#sparkline_data_table {" +
 												"width: auto;" +
@@ -173,8 +173,7 @@ public class VisualizationCodeGenerator {
 		
 
 		visualizationCode.append("<script type=\"text/javascript\">\n" +
-								"function drawVisualization(providedSparklineImgID) {\n" +
-								"console.log(providedSparklineImgID)" +
+								"function drawVisualization(providedSparklineImgTD) {\n" +
 									"var data = new google.visualization.DataTable();\n" +
 									"data.addColumn('string', 'Year');\n" +
 									"data.addColumn('number', 'Publications');\n" +
@@ -185,7 +184,6 @@ public class VisualizationCodeGenerator {
 		int renderedFullSparks = 0;
 
 		
-		System.out.println("min pub year v2 - " + minPublishedYear);
 		for (int publicationYear = minPubYearConsidered; publicationYear <= currentYear; publicationYear++) {
 
 				String stringPublishedYear = String.valueOf(publicationYear);
@@ -311,7 +309,7 @@ public class VisualizationCodeGenerator {
 		 * */
 		visualizationCode.append("var short_spark = new google.visualization.ImageSparkLine(" +
 //														"document.getElementById('" + visDivNames.get("SHORT_SPARK") + "')" +
-														"$('#' + providedSparklineImgID)[0]" +
+														"providedSparklineImgTD[0]" +
 								 ");\n" +
 								 "short_spark.draw(shortSparklineView, " + sparklineDisplayOptions + ");\n");
 
@@ -360,7 +358,7 @@ public class VisualizationCodeGenerator {
 		
 		visualizationCode.append("var full_spark = new google.visualization.ImageSparkLine(" +
 //												"document.getElementById('" + visDivNames.get("FULL_SPARK") + "')" +
-														"$('#' + providedSparklineImgID)[0]" +
+														"providedSparklineImgTD[0]" +
 								");\n" +
 								"full_spark.draw(fullSparklineView, " + sparklineDisplayOptions + ");\n");
 		
@@ -388,12 +386,13 @@ public class VisualizationCodeGenerator {
 				"var row = $('<tr>');" +
 				"sparklineImgTD = $('<td>');" +
 				"sparklineImgTD.attr('id', '" + sparklineID + "_img');" +
-				"sparklineImgTD.attr('width', '150');" +
+				"sparklineImgTD.attr('width', '75');" +
 				"sparklineImgTD.attr('align', 'right');" +
 				"sparklineImgTD.attr('class', '" + visualizationStyleClass + "');" +
 				"row.append(sparklineImgTD);" +
 				"var sparklineNumberTD = $('<td>');" +
-				"sparklineNumberTD.attr('width', '100');" +
+				"sparklineNumberTD.attr('width', '36');" +
+				"sparklineNumberTD.attr('align', 'right');" +
 				"sparklineNumberTD.attr('class', 'sparkline_number');" +
 				"row.append(sparklineNumberTD);" +
 				"var sparklineTextTD = $('<td>');" +
@@ -424,12 +423,10 @@ public class VisualizationCodeGenerator {
 								
 								"$('<div/>', {'id': '" + sparklineID + "'," +
 											 "'class': '" + visualizationStyleClass + "'" +
-										"});" +
+										"}).prependTo('#" + visContainerID + "');" +
 								
 								sparklineTableWrapper +
 										
-								"$('#" + sparklineID + "').prependTo('#" + visContainerID + "');" +
-								
 								"}" +
 								
 								"drawVisualization('" + sparklineID + "_img');" +
