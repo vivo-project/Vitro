@@ -188,7 +188,16 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 					set this property and they will be skipped. 
 				-->
 				<exclude name="themes/**/*" if="skip.core.themes" />
+				<!--
+				    Don't copy the freemarker templates; we need to flatten them. 
+				-->
+				<exclude name="templates/freemarker/" />
 			</fileset>
+		</copy>
+		<!-- Flatten the freemarker templates and copy them. -->
+		<copy todir="${build.dir}/war/templates/freemarker" includeemptydirs="false">
+			<fileset dir="${webapp.dir}/web/templates/freemarker" />
+			<flattenmapper />
 		</copy>
 
 		<copy todir="${build.dir}/war/WEB-INF">

@@ -2,7 +2,7 @@
 
 <#-- Default individual search view -->
 
-<#import "/lib/list.ftl" as l>
+<#import "listMacros.ftl" as l>
 
 <a href="${individual.profileUrl}">${individual.name}</a>
 <ul class="individualData">

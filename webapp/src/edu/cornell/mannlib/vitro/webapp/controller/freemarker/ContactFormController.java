@@ -44,13 +44,13 @@ public class ContactFormController extends FreeMarkerHttpServlet {
             body.put("errorMessage", 
                      "This application has not yet been configured to send mail. " +
                      "An smtp host has not been specified in the configuration properties file.");
-            bodyTemplate = "contactForm/error.ftl";
+            bodyTemplate = "contactForm-error.ftl";
         }
         
         else if (StringUtils.isEmpty(portal.getContactMail())) {
             body.put("errorMessage", 
                     "The site administrator has not configured an email address to receive the form submission.");
-            bodyTemplate = "contactForm/error.ftl";            
+            bodyTemplate = "contactForm-error.ftl";            
         }
         
         else {
@@ -83,7 +83,7 @@ public class ContactFormController extends FreeMarkerHttpServlet {
                 vreq.getSession().setAttribute("contactFormReferer",vreq.getHeader("Referer"));
             }
            
-            bodyTemplate = "contactForm/form.ftl";
+            bodyTemplate = "contactForm-form.ftl";
         }
         
         return mergeBodyToTemplate(bodyTemplate, body, config);

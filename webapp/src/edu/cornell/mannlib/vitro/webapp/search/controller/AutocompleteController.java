@@ -96,7 +96,8 @@ public class AutocompleteController extends FreeMarkerHttpServlet implements Sea
     public void doGet(HttpServletRequest request, HttpServletResponse response)
     throws IOException, ServletException {
         
-        String templateName = request.getServletPath().equals("/autocomplete") ? "autocompleteResults.ftl" : "selectResults.ftl";        
+        // String templateName = request.getServletPath().equals("/autocomplete") ? "autocompleteResults.ftl" : "selectResults.ftl";  
+        String templateName = "autocompleteResults.ftl";
         Map<String, Object> map = new HashMap<String, Object>();
 
         VitroRequest vreq = new VitroRequest(request);
@@ -188,7 +189,7 @@ public class AutocompleteController extends FreeMarkerHttpServlet implements Sea
 
             Collections.sort(results);
             map.put("results", results);
-            ajaxWrite(templateName, map, config, response);
+            writeTemplate(templateName, map, config, response);
    
         } catch (Throwable e) {
             log.error("AutocompleteController(): " + e);            
@@ -411,17 +412,17 @@ public class AutocompleteController extends FreeMarkerHttpServlet implements Sea
     
 
     private void doNoQuery(String templateName, Map<String, Object> map, Configuration config, HttpServletResponse response) {
-        ajaxWrite(templateName, map, config, response);
+        writeTemplate(templateName, map, config, response);
     }
 
     private void doFailedSearch(String templateName, Map<String, Object> map, Configuration config, HttpServletResponse response) {
-        ajaxWrite(templateName, map, config, response);
+        writeTemplate(templateName, map, config, response);
     }
  
     private void doSearchError(String templateName, Map<String, Object> map, Configuration config, HttpServletResponse response) {
         // For now, we are not sending an error message back to the client because with the default autocomplete configuration it
         // chokes.
-        ajaxWrite(templateName, map, config, response);
+        writeTemplate(templateName, map, config, response);
     }
 
     public static final int MAX_QUERY_LENGTH = 500;

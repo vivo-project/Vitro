@@ -33,10 +33,10 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 	private static final Log log = LogFactory.getLog(LoginTemplateHelper.class);
 
 	/** If they are logging in, show them this form. */
-	public static final String TEMPLATE_LOGIN = "login/login.ftl";
+	public static final String TEMPLATE_LOGIN = "login-form.ftl";
 
 	/** If they are changing their password on first login, show them this form. */
-	public static final String TEMPLATE_FORCE_PASSWORD_CHANGE = "login/forcedPasswordChange.ftl";
+	public static final String TEMPLATE_FORCE_PASSWORD_CHANGE = "login-forcedPasswordChange.ftl";
 
 	public static final String BODY_LOGIN_NAME = "loginName";
 	public static final String BODY_FORM_ACTION = "formAction";

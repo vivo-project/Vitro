@@ -26,13 +26,13 @@ public class ViewFinder {
     private static final Log log = LogFactory.getLog(ViewFinder.class.getName());
     
     public enum ClassView { 
-        DISPLAY("getCustomDisplayView", "/view/display"),
+        DISPLAY("getCustomDisplayView", "/view-display"),
         // NB this is not the value currently used for custom forms - we use the value on the object property
         FORM("getCustomEntryForm", "/form"), 
-        SEARCH("getCustomSearchView", "/view/search"),
-        SHORT("getCustomShortView", "/view/short"); 
+        SEARCH("getCustomSearchView", "/view-search"),
+        SHORT("getCustomShortView", "/view-short"); 
         
-        private static String TEMPLATE_PATH = "/templates/freemarker/body/partials/class";
+        private static String TEMPLATE_PATH = "/templates/freemarker";
         
         private Method method = null;
         private String path = null;
@@ -85,7 +85,7 @@ public class ViewFinder {
             try {
                 String v = (String) method.invoke(vc);
                 if (!StringUtils.isEmpty(v)) {
-                    String pathToView = context.getRealPath(view.getPath() + "/" + v);
+                    String pathToView = context.getRealPath(view.getPath() + "-" + v);
                     File viewFile = new File(pathToView);
                     if (viewFile.isFile() && viewFile.canRead()) {
                         viewName = v;

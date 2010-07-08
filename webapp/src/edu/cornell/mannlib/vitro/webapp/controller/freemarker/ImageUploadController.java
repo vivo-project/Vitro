@@ -72,9 +72,9 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	public static final String BODY_FORM_ACTION = "formAction";
 	public static final String BODY_ERROR_MESSAGE = "errorMessage";
 
-	public static final String TEMPLATE_NEW = "imageUpload/newImage.ftl";
-	public static final String TEMPLATE_REPLACE = "imageUpload/replaceImage.ftl";
-	public static final String TEMPLATE_CROP = "imageUpload/cropImage.ftl";
+	public static final String TEMPLATE_NEW = "imageUpload-newImage.ftl";
+	public static final String TEMPLATE_REPLACE = "imageUpload-replaceImage.ftl";
+	public static final String TEMPLATE_CROP = "imageUpload-cropImage.ftl";
 	public static final String TEMPLATE_ERROR = "error.ftl";
 
 	private static final String URL_HERE = UrlBuilder.getUrl("/uploadImages");

@@ -385,20 +385,12 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
     }
 
     protected String mergeBodyToTemplate(String templateName, Map<String, Object> map, Configuration config) {
-        templateName = "body/" + templateName;     // Remove once we flatten template directory
-    	String body = mergeToTemplate(templateName, map, config).toString();
-    	return body;
+    	return mergeToTemplate(templateName, map, config).toString();
     }
     
     protected void writePage(Map<String, Object> root, Configuration config, HttpServletResponse response) {
-        String templateName = "page/" + getPageTemplateName();     // Remove the directory once we flatten template directory
+        String templateName = getPageTemplateName();     
         writeTemplate(templateName, root, config, response);                   
-    }
-    
-    // Remove this method once we flatten template directory   
-    protected void ajaxWrite(String templateName, Map<String, Object> map, Configuration config, HttpServletResponse response) {
-        templateName = "ajax/" + templateName;
-        writeTemplate(templateName, map, config, response);                   
     }
     
     protected void writeTemplate(String templateName, Map<String, Object> map, Configuration config, HttpServletResponse response) {       
@@ -418,7 +410,7 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
     
     // Can be overridden by individual controllers to use a different basic page layout.
     protected String getPageTemplateName() {
-        return "default.ftl";
+        return "page.ftl";
     }
 
     // TEMPORARY method for transition from JSP to FreeMarker. 

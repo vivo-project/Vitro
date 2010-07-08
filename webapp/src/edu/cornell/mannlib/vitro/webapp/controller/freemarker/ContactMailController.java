@@ -81,7 +81,7 @@ public class ContactMailController extends FreeMarkerHttpServlet {
             body.put("errorMessage", 
                     "This application has not yet been configured to send mail. " +
                     "An smtp host has not been specified in the configuration properties file.");
-            bodyTemplate = "contactForm/error.ftl";
+            bodyTemplate = "contactForm-error.ftl";
         }
         
         else {
@@ -97,7 +97,7 @@ public class ContactMailController extends FreeMarkerHttpServlet {
                 // rjy7 We should reload the form, not go to the error page!
                 body.put("errorMessage", 
                         "Invalid submission");
-            	bodyTemplate = "contactForm/error.ftl";
+            	bodyTemplate = "contactForm-error.ftl";
             }
             
             else {
@@ -204,10 +204,10 @@ public class ContactMailController extends FreeMarkerHttpServlet {
                 
                 // Message was sent successfully
                 if (statusMsg == null && spamReason == null) {                  
-                    bodyTemplate = "contactForm/confirmation.ftl";
+                    bodyTemplate = "contactForm-confirmation.ftl";
                 } else {
                     body.put("errorMessage", statusMsg);
-                    bodyTemplate = "contactForm/error.ftl";
+                    bodyTemplate = "contactForm-error.ftl";
                 }   
             }
         }
@@ -230,7 +230,7 @@ public class ContactMailController extends FreeMarkerHttpServlet {
     							String originalReferer, String ipAddr, Configuration config) {
  
         Map<String, Object> email = new HashMap<String, Object>();
-        String template = "contactForm/email.ftl";
+        String template = "contactForm-email.ftl";
         
         email.put("subject", deliveryfrom);
         email.put("name", webusername);
@@ -248,7 +248,7 @@ public class ContactMailController extends FreeMarkerHttpServlet {
     		String spamReason, Configuration config) {
 
         Map<String, Object> backup = new HashMap<String, Object>();
-        String template = "contactForm/backup.ftl";
+        String template = "contactForm-backup.ftl";
         
     	Calendar cal = Calendar.getInstance();
     	backup.put("datetime", cal.getTime().toString());

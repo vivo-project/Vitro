@@ -43,8 +43,8 @@ public class FreeMarkerComponentGenerator extends FreeMarkerHttpServlet {
     }
 
     private String get(String templateName, Map<String, Object> root, Configuration config) {
-        String template = "page/partials/" + templateName + ".ftl";
-        return mergeToTemplate(template, root, config).toString();
+        templateName += ".ftl";
+        return mergeToTemplate(templateName, root, config).toString();
     }
     
     // RY We need the servlet context in getConfig(). For some reason using the method inherited from
