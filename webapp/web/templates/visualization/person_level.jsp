@@ -28,6 +28,8 @@
 
 .sparkline_wrapper_table {
 	display: inline;
+	vertical-align: bottom;
+	
 }
 
 .author_name {
@@ -46,11 +48,11 @@
 
 .sub_headings a {
 	font-size:0.7em;
+	font-weight:normal;
 }
 
 
 .inline_href {
-	display: inline;
 }
 
 #ego_profile {

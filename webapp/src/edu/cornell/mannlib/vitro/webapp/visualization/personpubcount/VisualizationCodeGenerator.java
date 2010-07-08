@@ -148,9 +148,9 @@ public class VisualizationCodeGenerator {
 										"    	border-spacing: 0;" +
 										"    	vertical-align: inherit;" +
 										"}" +
-										".sparkline_wrapper_table table{" +
+										/*".sparkline_wrapper_table table{" +
 										"    	vertical-align: bottom;" +
-										"}" +
+										"}" +*/
 										"td.sparkline_number { text-align:right; padding-right:5px; }" +
 										"td.sparkline_text   {text-align:left;}" +
 										/*"#sparkline_data_table {" +
@@ -379,8 +379,6 @@ public class VisualizationCodeGenerator {
 		
 		visualizationCode.append("$('#" + visDivNames.get("FULL_SPARK") + " td.sparkline_number').text('" + renderedFullSparks + "');");
 		
-		
-		
 		visualizationCode.append("var allSparksText = ''" +
 												 "+ ' papers with year from '" +
 												 "+ ' " + totalPublications + " '" +
@@ -388,7 +386,7 @@ public class VisualizationCodeGenerator {
 												"<span class=\"sparkline_range\">" +
 												"(" + minPubYearConsidered + " - " + currentYear + ")" +
 												"</span> '" +
-												"+ ' <a href='" + csvDownloadURL + "' class='inline_href'>(.CSV File)</a>';" +
+												"+ ' <a href='\"" + csvDownloadURL + "\"' class='inline_href'>(.CSV File)</a>';" +
 								"$('#" + visDivNames.get("FULL_SPARK") + " td.sparkline_text').html(allSparksText);");
 		
 		visualizationCode.append("}\n ");
@@ -514,7 +512,7 @@ public class VisualizationCodeGenerator {
 			
 		
 		String downloadURL = contextPath
-							 + "/admin/visQuery"
+//							 + "/admin/visQuery"
 							 + "?" + VisualizationFrameworkConstants.INDIVIDUAL_URI_URL_HANDLE 
 							 + "=" + URLEncoder.encode(individualURIParam, 
 									 				   VisualizationController.URL_ENCODING_SCHEME).toString() 
@@ -525,7 +523,7 @@ public class VisualizationCodeGenerator {
 							 + "&" + VisualizationFrameworkConstants.RENDER_MODE_URL_HANDLE 
 							 + "=" + URLEncoder.encode(VisualizationFrameworkConstants.DATA_RENDER_MODE_URL_VALUE, 
 					 				 				   VisualizationController.URL_ENCODING_SCHEME).toString();
-		
+		System.out.println(" ----- >>>> " + contextPath + " XX " + individualURIParam + " XX " + downloadURL);
 			return downloadURL;
 		} else {
 			return "#";
@@ -575,6 +573,8 @@ public class VisualizationCodeGenerator {
 		 				    + VisualizationFrameworkConstants.RENDER_MODE_URL_HANDLE
 							+ "=" + URLEncoder.encode(VisualizationFrameworkConstants.STANDALONE_RENDER_MODE_URL_VALUE, 
 					 				 VisualizationController.URL_ENCODING_SCHEME).toString();
+			
+			System.out.println("context parth full n/w " + contextPath);
 			
 			fullTimelineLink = "<a href='" + fullTimelineNetworkURL + "'>View full timeline and co-author network</a><br />";
 			
