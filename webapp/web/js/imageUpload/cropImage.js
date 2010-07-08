@@ -9,7 +9,6 @@
 			onSelect: showPreview,
 			setSelect:   [ 0, 0, 115, 115 ],
 			minSize: [115,115],
-			maxSize: [300,300],
 			aspectRatio: 1
 		});
 
