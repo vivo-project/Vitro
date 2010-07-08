@@ -3,7 +3,7 @@
 <#-- Log in template for accessing site admin -->
 
 ${stylesheets.addFromTheme("/login.css")}
-<noscript><p class="alertNoJavaScript"></p></noscript>
+<noscript><p class="alertNoJavaScript">JavaScript must be enabled in order for you to log in. However, it seems JavaScript is either disabled or not supported by your browser. Please enable JavaScript by changing your browser options.</p></noscript>
 
 <div id="formLogin" class="pageBodyGroup">
 
