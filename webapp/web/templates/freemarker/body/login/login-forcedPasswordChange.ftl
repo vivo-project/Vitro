@@ -17,6 +17,7 @@ ${stylesheets.addFromTheme("/login.css")}
        <form action="${formAction}" method="post" onsubmit="return isReasonableNewPassword(this)">
               <label for="newPassword">Password</label>
               <input type="password" name="newPassword"  />
+              <p class="passwordNote">Please enter a password with more than 5 characters</p>
               <label for="confirmPassword">Confirm Password</label>
               <input type="password" name="confirmPassword"  />
               <input name="passwordChangeForm" type="submit" class="submit" value="Save Changes"/>
