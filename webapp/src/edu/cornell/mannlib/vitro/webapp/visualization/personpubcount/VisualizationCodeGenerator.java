@@ -387,7 +387,7 @@ public class VisualizationCodeGenerator {
 												"<span class=\"sparkline_range\">" +
 												"(" + minPubYearConsidered + " - " + currentYear + ")" +
 												"</span> '" +
-												"+ ' <a href='\"" + csvDownloadURL + "\"' class='inline_href'>(.CSV File)</a>';" +
+												"+ ' <a href=\"" + csvDownloadURL + "\" class=\"inline_href\">(.CSV File)</a>';" +
 								"$('#" + visDivNames.get("FULL_SPARK") + " td.sparkline_text').html(allSparksText);");
 		
 		visualizationCode.append("}\n ");

@@ -374,13 +374,11 @@ public class VisualizationCodeGenerator {
 		visualizationCode.append("$('#" + visDivNames.get("FULL_SPARK") + " td.sparkline_number').text('" + renderedFullSparks + "');");
 		
 		visualizationCode.append("var allSparksText = ''" +
-												 "+ ' papers with year from '" +
-												 "+ ' " + totalPublications + " '" +
-												 "+ ' total " +
+												 "+ ' Unique co-authors '" +
 												"<span class=\"sparkline_range\">" +
 												"(" + minPubYearConsidered + " - " + currentYear + ")" +
 												"</span> '" +
-												"+ ' <a href='\"" + csvDownloadURL + "\"' class='inline_href'>(.CSV File)</a>';" +
+												"+ ' <a href=\"" + csvDownloadURL + "\" class=\"inline_href\">(.CSV File)</a>';" +
 								"$('#" + visDivNames.get("FULL_SPARK") + " td.sparkline_text').html(allSparksText);");
 		
 		visualizationCode.append("}\n ");
