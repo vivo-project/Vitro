@@ -40,8 +40,8 @@ ${stylesheets.addFromTheme("/jquery.Jcrop.css")}
                      <input type="hidden" name="w" value="" />
                      <input type="hidden" name="h" value="" />
                                           
-                     <input type="submit" value="Save photo">
-                     or <a href="${cancelUrl}">Cancel</a>
+                     <input  type="submit" value="Save photo">
+                     or <a class="cancelUpload"  href="${cancelUrl}">Cancel</a>
                      </form>
               </div>
        </div>
@@ -51,3 +51,4 @@ ${stylesheets.addFromTheme("/jquery.Jcrop.css")}
                    
        </div>
 </div>
+<div class="clear"></div>
