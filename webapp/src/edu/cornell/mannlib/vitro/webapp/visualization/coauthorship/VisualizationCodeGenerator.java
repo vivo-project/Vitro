@@ -1,4 +1,4 @@
-package edu.cornell.mannlib.vitro.webapp.visualization.personpubcount;
+package edu.cornell.mannlib.vitro.webapp.visualization.coauthorship;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -6,7 +6,6 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -17,7 +16,6 @@ import org.apache.commons.logging.Log;
 import edu.cornell.mannlib.vitro.webapp.controller.visualization.VisualizationController;
 import edu.cornell.mannlib.vitro.webapp.controller.visualization.VisualizationFrameworkConstants;
 import edu.cornell.mannlib.vitro.webapp.visualization.constants.VOConstants;
-import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.BiboDocument;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.SparklineVOContainer;
 
 
@@ -25,20 +23,20 @@ public class VisualizationCodeGenerator {
 
 	private final static Map<String, String> visDivNames = new HashMap<String, String>() {{
 
-		put("SHORT_SPARK", "pub_count_short_sparkline_vis");
-		put("FULL_SPARK", "pub_count_full_sparkline_vis");
+		put("SHORT_SPARK", "unique_coauthors_short_sparkline_vis");
+		put("FULL_SPARK", "unique_coauthors_full_sparkline_vis");
 
 	}};
 
 	private static final String visualizationStyleClass = "sparkline_style";
 	
-	private static final String defaultVisContainerDivID = "pub_count_vis_container";
+	private static final String defaultVisContainerDivID = "unique_coauthors_vis_container";
 	
 	public static final String SHORT_SPARKLINE_MODE_URL_HANDLE = "short";
 	
 	public static final String FULL_SPARKLINE_MODE_URL_HANDLE = "full";
 	
-	private Map<String, Integer> yearToPublicationCount;
+	private Map<String, Integer> yearToUniqueCoauthorsCount;
 
 	private Log log;
 
@@ -52,33 +50,29 @@ public class VisualizationCodeGenerator {
 									  String individualURIParam, 
 									  String visMode, 
 									  String visContainer, 
-									  List<BiboDocument> authorDocuments, 
-									  Map<String, Integer> yearToPublicationCount, 
+									  Map<String, Integer> yearToUniqueCoauthorsCount, 
 									  SparklineVOContainer valueObjectContainer, 
 									  Log log) {
 		
 		this.contextPath = contextPath;
 		this.individualURIParam = individualURIParam;
 		
-		this.yearToPublicationCount = yearToPublicationCount;
+		this.yearToUniqueCoauthorsCount = yearToUniqueCoauthorsCount;
 		this.valueObjectContainer = valueObjectContainer;
 		
 		this.log = log;
 		
 		
 		generateVisualizationCode(visMode, 
-				  visContainer, 
-				  authorDocuments);
+				  visContainer);
 		
 		
 	}
 	
 	private void generateVisualizationCode(String visMode,
-										   String visContainer, 
-										   List<BiboDocument> authorDocuments) {
+										   String visContainer) {
 		
-    	valueObjectContainer.setSparklineContent(getMainVisualizationCode(authorDocuments, 
-    																	  visMode, 
+    	valueObjectContainer.setSparklineContent(getMainVisualizationCode(visMode, 
     																	  visContainer));
     	
     	
@@ -86,8 +80,7 @@ public class VisualizationCodeGenerator {
     	
 	}
 
-	private String getMainVisualizationCode(List<BiboDocument> authorDocuments,
-										    String visMode, 
+	private String getMainVisualizationCode(String visMode,
 										    String providedVisContainerID) {
 
 		int numOfYearsToBeRendered = 0;
@@ -98,7 +91,7 @@ public class VisualizationCodeGenerator {
     	 * This is required because when deciding the range of years over which the vis
     	 * was rendered we dont want to be influenced by the "DEFAULT_PUBLICATION_YEAR".
     	 * */
-		Set<String> publishedYears = new HashSet(yearToPublicationCount.keySet());
+		Set<String> publishedYears = new HashSet(yearToUniqueCoauthorsCount.keySet());
     	publishedYears.remove(VOConstants.DEFAULT_PUBLICATION_YEAR);
 		
 		/*
@@ -113,14 +106,14 @@ public class VisualizationCodeGenerator {
 		StringBuilder visualizationCode = new StringBuilder();
 
 //		System.out.println(yearToPublicationCount);
-		if (yearToPublicationCount.size() > 0) {
+		if (yearToUniqueCoauthorsCount.size() > 0) {
 			try {
 				minPublishedYear = Integer.parseInt(Collections.min(publishedYears));
 				System.out.println("min pub year - " + minPublishedYear);
 			} catch (NoSuchElementException e1) {
-				log.debug("vis: " + e1.getMessage() + " error occurred for " + yearToPublicationCount.toString());
+				log.debug("vis: " + e1.getMessage() + " error occurred for " + yearToUniqueCoauthorsCount.toString());
 			} catch (NumberFormatException e2) {
-				log.debug("vis: " + e2.getMessage() + " error occurred for " + yearToPublicationCount.toString());
+				log.debug("vis: " + e2.getMessage() + " error occurred for " + yearToUniqueCoauthorsCount.toString());
 			}
 		}
 		
@@ -180,7 +173,7 @@ public class VisualizationCodeGenerator {
 		
 
 		visualizationCode.append("<script type=\"text/javascript\">\n" +
-								"function drawPubCountVisualization(providedSparklineImgTD) {\n" +
+								"function drawUniqueCoauthorCountVisualization(providedSparklineImgTD) {\n" +
 									"var data = new google.visualization.DataTable();\n" +
 									"data.addColumn('string', 'Year');\n" +
 									"data.addColumn('number', 'Publications');\n" +
@@ -194,7 +187,7 @@ public class VisualizationCodeGenerator {
 		for (int publicationYear = minPubYearConsidered; publicationYear <= currentYear; publicationYear++) {
 
 				String stringPublishedYear = String.valueOf(publicationYear);
-				Integer currentPublications = yearToPublicationCount.get(stringPublishedYear);
+				Integer currentPublications = yearToUniqueCoauthorsCount.get(stringPublishedYear);
 
 				if (currentPublications == null) {
 					currentPublications = 0;
@@ -226,8 +219,8 @@ public class VisualizationCodeGenerator {
 		 * Total publications will also consider publications that have no year associated with
 		 * it. Hence.
 		 * */
-		if (yearToPublicationCount.get(VOConstants.DEFAULT_PUBLICATION_YEAR) != null) {
-			totalPublications += yearToPublicationCount.get(VOConstants.DEFAULT_PUBLICATION_YEAR);
+		if (yearToUniqueCoauthorsCount.get(VOConstants.DEFAULT_PUBLICATION_YEAR) != null) {
+			totalPublications += yearToUniqueCoauthorsCount.get(VOConstants.DEFAULT_PUBLICATION_YEAR);
 		}
 
 		String sparklineDisplayOptions = "{width: 63, height: 21, showAxisLines: false, " +
@@ -350,7 +343,7 @@ public class VisualizationCodeGenerator {
 		
 		/*
 		 * Generate the code that will activate the visualization. It takes care of creating div elements to hold 
-		 * the actual sparkline image and then calling the drawPubCountVisualization function. 
+		 * the actual sparkline image and then calling the drawUniqueCoauthorCountVisualization function. 
 		 * */
 		visualizationCode.append(generateVisualizationActivator(visDivNames.get("SHORT_SPARK"), visContainerID));
 		
@@ -446,7 +439,7 @@ public class VisualizationCodeGenerator {
 										
 								"}" +
 								
-								"drawPubCountVisualization(sparklineImgTD);" +
+								"drawUniqueCoauthorCountVisualization(sparklineImgTD);" +
 								"});" +
 								"</script>\n";
 	}
@@ -479,7 +472,7 @@ public class VisualizationCodeGenerator {
 		try {
 			
 			String downloadFileCode;
-			if (yearToPublicationCount.size() > 0) {
+			if (yearToUniqueCoauthorsCount.size() > 0) {
 				
 				
 				String downloadURL = getCSVDownloadURL();
@@ -509,7 +502,7 @@ public class VisualizationCodeGenerator {
 	private String getCSVDownloadURL()
 			throws UnsupportedEncodingException {
 		
-		if (yearToPublicationCount.size() > 0) {
+		if (yearToUniqueCoauthorsCount.size() > 0) {
 			
 		
 		String downloadURL = contextPath
@@ -519,12 +512,17 @@ public class VisualizationCodeGenerator {
 									 				   VisualizationController.URL_ENCODING_SCHEME).toString() 
 							 + "&" + VisualizationFrameworkConstants.VIS_TYPE_URL_HANDLE 
 							 + "=" + URLEncoder.encode(VisualizationController
-									 						.PERSON_PUBLICATION_COUNT_VIS_URL_VALUE, 
+									 						.COAUTHORSHIP_VIS_URL_VALUE, 
 									 				   VisualizationController.URL_ENCODING_SCHEME).toString() 
+							 + "&" + VisualizationFrameworkConstants.VIS_MODE_URL_HANDLE
+							 + "=" + URLEncoder.encode("sparkline", 
+									 				   VisualizationController.URL_ENCODING_SCHEME).toString() 									 				   
 							 + "&" + VisualizationFrameworkConstants.RENDER_MODE_URL_HANDLE 
 							 + "=" + URLEncoder.encode(VisualizationFrameworkConstants.DATA_RENDER_MODE_URL_VALUE, 
 					 				 				   VisualizationController.URL_ENCODING_SCHEME).toString();
+		
 		System.out.println(" ----- >>>> " + contextPath + " XX " + individualURIParam + " XX " + downloadURL);
+		
 			return downloadURL;
 		} else {
 			return "#";
@@ -540,7 +538,7 @@ public class VisualizationCodeGenerator {
 		try {
 		
 		String fullTimelineLink;
-		if (yearToPublicationCount.size() > 0) {
+		if (yearToUniqueCoauthorsCount.size() > 0) {
 //			String fullTimelineNetworkURL = uri.toString() + "?" + 
 //										VisualizationFrameworkConstants.INDIVIDUAL_URI_URL_HANDLE + 
 //										 "=" + URLEncoder.encode(individualURI, 
@@ -603,16 +601,16 @@ public class VisualizationCodeGenerator {
 		StringBuilder dataTable = new StringBuilder();
 		
 		dataTable.append("<table id='sparkline_data_table'>" +
-								"<caption>Publications per year</caption>" +
+								"<caption>Unique Co-Authors per year</caption>" +
 								"<thead>" +
 										"<tr>" +
 											"<th>Year</th>" +
-											"<th>Publications</th>" +
+											"<th>Count</th>" +
 										"</tr>" +
 								"</thead>" +
 								"<tbody>");
 		
-		for (Entry<String, Integer> currentEntry : yearToPublicationCount.entrySet()) {
+		for (Entry<String, Integer> currentEntry : yearToUniqueCoauthorsCount.entrySet()) {
 			dataTable.append("<tr>" +
 								"<td>" + currentEntry.getKey() + "</td>" +
 								"<td>" + currentEntry.getValue() + "</td>" +

@@ -62,9 +62,13 @@ public class CoAuthorshipGraphMLWriter {
 
 		graphMLContent.append("\n<graph edgedefault=\"undirected\">\n");
 		
-		generateNodeSectionContent(visVOContainer, graphMLContent);
+		if (visVOContainer.getNodes() != null & visVOContainer.getNodes().size() > 0) {
+			generateNodeSectionContent(visVOContainer, graphMLContent);
+		}
 		
-		generateEdgeSectionContent(visVOContainer, graphMLContent);
+		if (visVOContainer.getEdges() != null & visVOContainer.getEdges().size() > 0) {
+			generateEdgeSectionContent(visVOContainer, graphMLContent);
+		}
 		
 		graphMLContent.append("</graph>\n");
 		  

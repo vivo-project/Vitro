@@ -1,4 +1,4 @@
-<%@ page import="edu.cornell.mannlib.vitro.webapp.visualization.personpubcount.VisVOContainer"%>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.SparklineVOContainer"%>
 
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
 
@@ -7,7 +7,11 @@
 <c:url var="visImageContextPath" value="/${themeDir}site_icons/visualization/" />
 <c:url var="loadingImageLink" value="/${themeDir}site_icons/visualization/ajax-loader.gif"></c:url>
 
-<c:set var='sparkline' value='${requestScope.sparklineVO}' />
+<c:set var='egoPubSparkline' value='${requestScope.egoPubSparklineVO}' />
+<c:set var='uniqueCoauthorsSparkline' value='${requestScope.uniqueCoauthorsSparklineVO}' />
+
+<c:set var='egoPubSparklineContainerID' value='${requestScope.egoPubSparklineContainerID}' />
+<c:set var='uniqueCoauthorsSparklineVisContainerID' value='${requestScope.uniqueCoauthorsSparklineVisContainerID}' />
 
 <c:url var="egoSparklineDataURL" value="/admin/visQuery">
 	<c:param name="render_mode" value="data" />
@@ -34,6 +38,11 @@
 
 .author_name {
 	color: #13968c;
+	font-weight: bold;
+}
+
+.neutral_author_name {
+	color: black;
 	font-weight: bold;
 }
 
@@ -114,12 +123,15 @@
 	
 	<%-- Sparkline --%>
 		<h2 class="sub_headings">General Statistics</h2>
-			<div id="ego_sparkline">
-			${sparkline.sparklineContent}
+			<div id="${egoPubSparklineContainerID}">
+				${egoPubSparkline.sparklineContent}
 			</div>
 			
+			<div id="${uniqueCoauthorsSparklineVisContainerID}">
+				${uniqueCoauthorsSparkline.sparklineContent}
+			</div>
 			
-		<h2 class="sub_headings">Ego-Centric Co-Author Network <a href="${coAuthorshipDownloadFile}">(.GraphML File)</a></h2>
+		<h2 class="sub_headings">Co-Author Network <a href="${coAuthorshipDownloadFile}">(.GraphML File)</a></h2>
 
 </div>
 
@@ -129,7 +141,7 @@
 <div id="bodyPannel" style="height: 900px;">
 	<br class="spacer" />
 	
-	<div id="visPanel" style="float: left; width: 610px;">
+	<div id="visPanel" style="float: left; width: 600px;">
 		<script language="JavaScript" type="text/javascript">
 			<!--
 			renderCoAuthorshipVisualization();
@@ -141,7 +153,7 @@
 		
 		<div id="profileImage"></div>
 		
-		<div class="bold"><strong><span id="authorName" class="author_name">&nbsp;</span></strong></div>
+		<div class="bold"><strong><span id="authorName" class="neutral_author_name">&nbsp;</span></strong></div>
 		
 		<div class="italicize"><span id="profileMoniker" class="author_moniker"></span></div>
 		<br />

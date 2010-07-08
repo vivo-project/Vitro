@@ -194,12 +194,24 @@ public class VisualizationRequestHandler {
 	
 	private void prepareVisualizationQuerySparklineDataResponse(VisVOContainer authorNodesAndEdges) {
 		
+		String outputFileName = "";
+		Map<String, Set<Node>> yearToCoauthors = new TreeMap<String, Set<Node>>();
 		
-		Map<String, Set<Node>> yearToCoauthors = getCoAuthorsStats(authorNodesAndEdges); 
+		if (authorNodesAndEdges.getNodes() == null || authorNodesAndEdges.getNodes().size() < 1 ) {
 			
-		String outputFileName = UtilityFunctions.slugify(authorNodesAndEdges.getEgoNode().getNodeName()) 
-										+ "-coauthors" + ".csv";
-
+			outputFileName = "no-coauthorship-net" + ".graphml";
+			
+		} else {
+			
+			outputFileName = UtilityFunctions.slugify(authorNodesAndEdges.getEgoNode().getNodeName()) 
+			+ "-coauthors" + ".csv";
+			
+			yearToCoauthors = getCoAuthorsStats(authorNodesAndEdges);
+			
+		}
+		
+		 
+			
 		response.setContentType("application/octet-stream");
 		response.setHeader("Content-Disposition", "attachment;filename=" + outputFileName);
 		

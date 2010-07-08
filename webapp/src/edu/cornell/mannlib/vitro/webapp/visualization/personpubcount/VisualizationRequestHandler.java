@@ -34,6 +34,7 @@ import edu.cornell.mannlib.vitro.webapp.visualization.constants.VisConstants;
 import edu.cornell.mannlib.vitro.webapp.visualization.exceptions.MalformedQueryParametersException;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.BiboDocument;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.Individual;
+import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.SparklineVOContainer;
 import edu.cornell.mannlib.vitro.webapp.visualization.visutils.UtilityFunctions;
 
 public class VisualizationRequestHandler {
@@ -110,7 +111,7 @@ public class VisualizationRequestHandler {
 	    	 * Computations required to generate HTML for the sparklines & related context.
 	    	 * */
 	    	
-	    	VisVOContainer valueObjectContainer = new VisVOContainer();
+	    	SparklineVOContainer valueObjectContainer = new SparklineVOContainer();
 
 	    	VisualizationCodeGenerator visualizationCodeGenerator = 
 	    		new VisualizationCodeGenerator(vitroRequest.getContextPath(),
@@ -290,7 +291,7 @@ public class VisualizationRequestHandler {
 
 	private void prepareVisualizationQueryStandaloneResponse(HttpServletRequest request,
 			HttpServletResponse response, VitroRequest vreq,
-			VisVOContainer valueObjectContainer) {
+			SparklineVOContainer valueObjectContainer) {
 
         Portal portal = vreq.getPortal();
 
@@ -304,7 +305,7 @@ public class VisualizationRequestHandler {
 	}
 
 	private void prepareVisualizationQueryDynamicResponse(HttpServletRequest request,
-			HttpServletResponse response, VitroRequest vreq, VisVOContainer valueObjectContainer) {
+			HttpServletResponse response, VitroRequest vreq, SparklineVOContainer valueObjectContainer) {
 
         Portal portal = vreq.getPortal();
 

@@ -1,6 +1,6 @@
-package edu.cornell.mannlib.vitro.webapp.visualization.personpubcount;
+package edu.cornell.mannlib.vitro.webapp.visualization.valueobjects;
 
-public class VisVOContainer {
+public class SparklineVOContainer {
 	
 	/*
 	 * For now sparklineNumPublicationsText & sparklinePublicationRangeText is left 
