@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
@@ -42,9 +43,11 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ModelMaker;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.sdb.SDBFactory;
 import com.hp.hpl.jena.sdb.Store;
 import com.hp.hpl.jena.sdb.StoreDesc;
@@ -59,6 +62,7 @@ import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SimpleOntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaModelMaker;
@@ -95,6 +99,7 @@ public class JenaIngestController extends BaseEditController {
 	private static final String EXECUTE_WORKFLOW_JSP = "/jenaIngest/executeWorkflow.jsp";
 	private static final String WORKFLOW_STEP_JSP = "/jenaIngest/workflowStep.jsp";
 	private static final String GENERATE_TBOX_JSP = "/jenaIngest/generateTBox.jsp";
+	private static final String PERMANENT_URI = "/jenaIngest/permanentURI.jsp";
 
 	private static final String SPARQL_CONSTRUCT_CLASS = "http://vitro.mannlib.cornell.edu/ns/vitro/0.7/sparql#SPARQLCONSTRUCTQuery";
 	private static final String SPARQL_QUERYSTR_PROP = "http://vitro.mannlib.cornell.edu/ns/vitro/0.7/sparql#queryStr";
@@ -397,7 +402,44 @@ public class JenaIngestController extends BaseEditController {
 				request.setAttribute("title","Generate TBox from Assertions Data");
 				request.setAttribute("bodyJsp",GENERATE_TBOX_JSP);
 			}			
-		} else {
+		}else if("permanentURI".equals(actionStr)){
+			  String modelName = vreq.getParameter("modelName");
+			  String oldModel = vreq.getParameter("oldModel");
+			  String newModel = vreq.getParameter("newModel");
+			  String oldNamespace = vreq.getParameter("oldNamespace");
+			  String newNamespace = vreq.getParameter("newNamespace");
+			  String dNamespace = vreq.getParameter("defaultNamespace");
+			  
+			  if(modelName!=null){
+			  Model m = maker.getModel(modelName);
+			  ArrayList namespaceList = new ArrayList();
+			  Iterator namespaceItr = m.listNameSpaces();
+			  
+			  if(namespaceItr!=null){
+          	while(namespaceItr.hasNext()){
+          		
+          		namespaceList.add(namespaceItr.next().toString());
+          		
+          	}
+          	}
+			  else {
+				  namespaceList.add("no resources present");
+			  }
+			  String defaultNamespace = getWebappDaoFactory().getDefaultNamespace();
+			  request.setAttribute("modelName", modelName);
+			  request.setAttribute("defaultNamespace", defaultNamespace);
+          	  request.setAttribute("namespaceList", namespaceList);
+			  request.setAttribute("title","Permanent URI");
+			  request.setAttribute("bodyJsp",PERMANENT_URI);
+			  }
+			  else if(oldModel!=null){
+				  doPermanentURI(oldModel,newModel,oldNamespace,newNamespace,dNamespace,maker,vreq);
+				  request.setAttribute("title","Ingest Menu");
+				  request.setAttribute("bodyJsp",INGEST_MENU_JSP);
+			  }
+			  
+			  
+		  } else {
 			request.setAttribute("title","Ingest Menu");
 			request.setAttribute("bodyJsp",INGEST_MENU_JSP);
 		}
@@ -865,6 +907,64 @@ public class JenaIngestController extends BaseEditController {
 		new JenaIngestWorkflowProcessor(jenaOntModel.getIndividual(workflowURI),getVitroJenaModelMaker(vreq)).run(jenaOntModel.getIndividual(workflowStepURI));
 	}
 
+	private void doPermanentURI(String oldModel,String newModel,String oldNamespace,
+			String newNamespace,String dNamespace,ModelMaker maker,VitroRequest vreq){
+			
+			
+		    WebappDaoFactory wdf = vreq.getWebappDaoFactory();
+			Model m = maker.getModel(oldModel);
+			Model saveModel = maker.getModel(newModel);
+			ResIterator rsItr = m.listResourcesWithProperty((Property)null);
+			
+			String uri = null;  
+			while(rsItr.hasNext()){
+				Resource res = rsItr.next();
+				if(oldNamespace.equals(res.getNameSpace())){
+					Resource newRes = null;
+					if(!newNamespace.equals("")){
+						uri = getUnusedURI(newNamespace);
+					}
+					else if(!dNamespace.equals("")){
+						try{
+				    		 uri = wdf.getIndividualDao().getUnusedURI(null);
+				        }catch(InsertException ex){
+				        	log.error("could not create uri");
+				        }     	  
+					}
+					newRes = saveModel.createResource(uri);
+					StmtIterator stmItr = m.listStatements(res, (Property)null, (RDFNode)null);
+					while(stmItr.hasNext()){
+						Statement stmt = stmItr.next();
+						Property prop = stmt.getPredicate();
+						RDFNode  node = stmt.getObject();
+						saveModel.add(newRes, prop, node);
+					}
+					res.removeAll((Property)null);
+					
+				}
+			}
+			
+		
+			
+		}
+		private String getUnusedURI(String newNamespace){
+			String uri = null;
+			SimpleOntModelSelector getModel = new SimpleOntModelSelector();
+			OntModel fullModel = getModel.getABoxModel();
+			Random random = new Random();
+			Resource res = null;
+			boolean check=true;
+			log.info("Going into loop");
+			do{
+			uri = newNamespace + "individual" + random.nextInt();
+			res = fullModel.getResource(uri);
+		    check = fullModel.containsResource(res);
+			}while(check==true);
+			log.info("url assigned");
+			res.removeAll((Property)null);
+			return uri;
+		}
+	
 	public void prepareSmush (VitroRequest vreq) {
 		String smushPropURI = vreq.getParameter("smushPropURI");
 	}
