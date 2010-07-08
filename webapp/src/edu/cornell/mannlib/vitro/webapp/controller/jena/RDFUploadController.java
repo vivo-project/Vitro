@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.jena;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
@@ -21,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.ModelMaker;
 import com.hp.hpl.jena.shared.JenaException;
 import com.hp.hpl.jena.shared.Lock;
 
@@ -30,12 +32,16 @@ import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaModelUtils;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSpecialModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest;
 
 public class RDFUploadController extends BaseEditController {
 	
     private static int maxFileSizeInBytes = 1024 * 1024 * 2000; //2000mb 
+    private static FileItem fileStream=null; 
+    private static final String INGEST_MENU_JSP = "/jenaIngest/ingestMenu.jsp";
+    private static final String LOAD_RDF_DATA_JSP = "/jenaIngest/loadRDFData.jsp";
 	
 	public void doPost(HttpServletRequest rawRequest,
 			HttpServletResponse response) throws ServletException, IOException {
@@ -69,7 +75,13 @@ public class RDFUploadController extends BaseEditController {
 		    forwardToFileUploadError(e.getLocalizedMessage(), req, response);
 			return;
 		}
-				
+		
+		String modelName = req.getParameter("modelName");
+		if(modelName!=null){
+			loadRDF(req,request,response);
+			return;
+		}	
+		
 		Portal currentPortal = request.getPortal();		
 	    			   
 		boolean remove = "remove".equals(request.getParameter("mode"));
@@ -171,7 +183,39 @@ public class RDFUploadController extends BaseEditController {
         }
     }
 
-    
+	public void loadRDF(FileUploadServletRequest req,
+			VitroRequest request,HttpServletResponse response) throws ServletException, IOException {
+		Map<String, List<FileItem>> fileStreams = req.getFiles();
+		String filePath = fileStreams.get("filePath").get(0).getName();
+		fileStream = fileStreams.get("filePath").get(0);
+		String modelName = req.getParameter("modelName");
+		String docLoc = req.getParameter("docLoc");
+		String languageStr = request.getParameter("language");
+		ModelMaker maker = getVitroJenaModelMaker(request);
+		
+		if (docLoc!=null && modelName != null) {
+			doLoadRDFData(modelName,docLoc,filePath,languageStr,maker);
+			request.setAttribute("title","Ingest Menu");
+			request.setAttribute("bodyJsp",INGEST_MENU_JSP);
+		} else {
+			request.setAttribute("title","Load RDF Data");
+			request.setAttribute("bodyJsp",LOAD_RDF_DATA_JSP);
+		}
+		Portal portal = request.getPortal();
+		RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);      
+        request.setAttribute("portalBean",portal);
+        request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+portal.getThemeDir()+"css/edit.css\"/>");
+
+        try {
+            rd.forward(request, response);
+        } catch (Exception e) {
+            System.out.println(this.getClass().getName()+" could not forward to view.");
+            System.out.println(e.getMessage());
+            System.out.println(e.getStackTrace());
+        }
+		
+	}
+	
     private long operateOnModel(OntModel mainModel, Model changesModel, boolean remove, boolean makeClassgroups, int[] portal,  String userURI) {
         mainModel.enterCriticalSection(Lock.WRITE);
         try {
@@ -201,6 +245,38 @@ public class RDFUploadController extends BaseEditController {
         return changesModel.size();        
     }
     
+    private void doLoadRDFData(String modelName, String docLoc, String filePath, String language, ModelMaker modelMaker) {
+		Model m = modelMaker.getModel(modelName);
+		m.enterCriticalSection(Lock.WRITE);
+		try {
+			if ( (docLoc != null) && (docLoc.length()>0) ) {
+				m.read(docLoc, language);
+			} else if ( (filePath != null) && (filePath.length()>0) ) {
+				File file = new File(filePath);
+				File[] files;
+				if (file.isDirectory()) {
+					files = file.listFiles();
+				} else {
+					files = new File[1];
+					files[0] = file;
+				}
+				for (int i=0; i<files.length; i++) {
+					File currentFile = files[i];
+					log.info("Reading file "+currentFile.getName());
+					
+					try {
+					
+						m.read(fileStream.getInputStream(), null, language);
+						fileStream.delete();
+					} catch (IOException ioe) {
+						throw new RuntimeException(ioe);
+					}
+				}
+			}
+		} finally { 
+			m.leaveCriticalSection();
+		}
+	}
     
      private void forwardToFileUploadError( String errrorMsg , HttpServletRequest req, HttpServletResponse response) throws ServletException{
          req.setAttribute("errors", errrorMsg);
@@ -213,6 +289,11 @@ public class RDFUploadController extends BaseEditController {
          return;
      }
      
+     private ModelMaker getVitroJenaModelMaker(HttpServletRequest request) {
+  		ModelMaker myVjmm = (ModelMaker) request.getSession().getAttribute("vitroJenaModelMaker");
+  		myVjmm = (myVjmm == null) ? (ModelMaker) getServletContext().getAttribute("vitroJenaModelMaker") : myVjmm;
+  		return new VitroJenaSpecialModelMaker(myVjmm, request);
+  	}
      
 	private static final Log log = LogFactory.getLog(RDFUploadController.class.getName());
 }
