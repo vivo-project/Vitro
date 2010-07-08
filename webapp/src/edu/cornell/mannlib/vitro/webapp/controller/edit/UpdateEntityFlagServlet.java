@@ -133,7 +133,7 @@ public class UpdateEntityFlagServlet extends VitroHttpServlet {
     private void updateSearchIndex(HttpServletRequest request){
         IndexBuilder builder = (IndexBuilder)getServletContext().getAttribute(IndexBuilder.class.getName());
         if( builder != null )
-            (new Thread(builder)).start();
+        	builder.doUpdateIndex();
     }
 }
 

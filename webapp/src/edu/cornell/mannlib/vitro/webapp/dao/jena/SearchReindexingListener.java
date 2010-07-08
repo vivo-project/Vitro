@@ -23,15 +23,13 @@ import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
  * This class is thread safe.  Notice that doAsyncIndexBuild() is frequently 
  * called because the inference system does not seem to send notifyEvents. 
  */
-public class SearchReindexingListener implements ModelChangedListener {					
-	private HashSet<String> changedUris;	
+public class SearchReindexingListener implements ModelChangedListener {						
 	private IndexBuilder indexBuilder;
 	
 	public SearchReindexingListener(IndexBuilder indexBuilder) {
 		if(indexBuilder == null )
 			throw new IllegalArgumentException("Constructor parameter indexBuilder must not be null");		
-		this.indexBuilder = indexBuilder;
-		this.changedUris = new HashSet<String>();		
+		this.indexBuilder = indexBuilder;		
 	}	
 
 	private synchronized void addChange(Statement stmt){
@@ -49,8 +47,8 @@ public class SearchReindexingListener implements ModelChangedListener {
 		}	
 	}
 
-	private void doAsyncIndexBuild(){
-		new Thread(indexBuilder).start();		
+	private void requestAsyncIndexUpdate(){
+		indexBuilder.doUpdateIndex();
 	}	
 	
 	@Override
@@ -59,7 +57,7 @@ public class SearchReindexingListener implements ModelChangedListener {
 			EditEvent editEvent = (EditEvent)arg1;
 			if( !editEvent.getBegin() ){// editEvent is the end of an edit				
 				log.debug("Doing search index build at end of EditEvent");				
-				doAsyncIndexBuild();
+				requestAsyncIndexUpdate();
 			}		
 		} else{
 			log.debug("ignoring event " + arg1.getClass().getName() + " "+ arg1 );
@@ -69,13 +67,13 @@ public class SearchReindexingListener implements ModelChangedListener {
 	@Override
 	public void addedStatement(Statement stmt) {
 		addChange(stmt);
-		doAsyncIndexBuild();
+		requestAsyncIndexUpdate();
 	}
 
 	@Override
 	public void removedStatement(Statement stmt){
 		addChange(stmt);
-		doAsyncIndexBuild();
+		requestAsyncIndexUpdate();
 	}
 	
 	private static final Log log = LogFactory.getLog(SearchReindexingListener.class.getName());
@@ -85,7 +83,7 @@ public class SearchReindexingListener implements ModelChangedListener {
 		for( Statement s: arg0){
 			addChange(s);
 		}
-		doAsyncIndexBuild();
+		requestAsyncIndexUpdate();
 	}
 
 	@Override
@@ -93,7 +91,7 @@ public class SearchReindexingListener implements ModelChangedListener {
 		for( Statement s: arg0){
 			addChange(s);
 		}
-		doAsyncIndexBuild();
+		requestAsyncIndexUpdate();
 	}
 
 	@Override
@@ -106,7 +104,7 @@ public class SearchReindexingListener implements ModelChangedListener {
 		}finally{
 			arg0.close();
 		}
-		doAsyncIndexBuild();		
+		requestAsyncIndexUpdate();		
 	}
 
 	@Override
@@ -122,7 +120,7 @@ public class SearchReindexingListener implements ModelChangedListener {
 			if( it != null ) it.close();
 			m.leaveCriticalSection();
 		}
-		doAsyncIndexBuild();
+		requestAsyncIndexUpdate();
 	}
 
 	@Override

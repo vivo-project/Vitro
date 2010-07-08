@@ -20,7 +20,7 @@ import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
 
 /**
- * Acepts requests to rebuild or update the search index.  It uses
+ * Accepts requests to rebuild or update the search index.  It uses
  * an IndexBuilder and finds that IndexBuilder from the servletContext using
  * the key "edu.cornel.mannlib.vitro.search.indexing.IndexBuilder"
  *
@@ -61,12 +61,8 @@ public class IndexController extends HttpServlet {
             IndexBuilder builder = (IndexBuilder)getServletContext().getAttribute(IndexBuilder.class.getName());
             if( request.getParameter("update") != null ){
                 builder.doUpdateIndex();
-            } 
-            
-            if (request.getParameter("clear") != null ) {
-                builder.clearIndex();   
             }else{
-                builder.doIndexBuild();
+                builder.doIndexRebuild();
             }
             
         } catch (IndexingException e) {

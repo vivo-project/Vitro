@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.search.lucene;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,6 +41,7 @@ public class LuceneIndexer implements IndexerIface {
     List<Searcher> searchers = null;
     IndexWriter writer = null;
     boolean indexing = false;
+    HashSet<String> urisIndexed;
 
     //JODA timedate library can use java date format strings.
     //http://java.sun.com/j2se/1.3/docs/api/java/text/SimpleDateFormat.html
@@ -136,6 +138,7 @@ public class LuceneIndexer implements IndexerIface {
                 writer =  
                     new IndexWriter(indexDir,analyzer,false, MAX_FIELD_LENGTH);
             indexing = true;
+            urisIndexed = new HashSet<String>();
         } catch(Throwable ioe){
             try{
                 makeNewIndex();
@@ -155,6 +158,7 @@ public class LuceneIndexer implements IndexerIface {
             return;
         }            
         try {
+        	urisIndexed = null;
             log.info("ending index");
             if( writer != null )
                 writer.optimize();
@@ -189,13 +193,21 @@ public class LuceneIndexer implements IndexerIface {
         if( writer == null )
             throw new IndexingException("LuceneIndexer: cannot build index," +
             		"IndexWriter is null.");
+        if( ind == null )
+        	log.debug("Individual to index was null, ignoring.");
         try {
+        	if( urisIndexed.contains(ind.getURI()) ){
+        		log.debug("already indexed " + ind.getURI() );
+        		return;
+        	}else
+        		urisIndexed.add(ind.getURI());
+        	
             Iterator<Obj2DocIface> it = getObj2DocList().iterator();
             while (it.hasNext()) {
                 Obj2DocIface obj2doc = (Obj2DocIface) it.next();
                 if (obj2doc.canTranslate(ind)) {
                 	Document d = (Document) obj2doc.translate(ind);
-                	if( d != null){
+                	if( d != null){                		                		                		
                 		if( !newDoc ){                    	                    		
                 			writer.updateDocument((Term)obj2doc.getIndexId(ind), d);
                 			log.debug("updated " + ind.getName() + " " + ind.getURI());

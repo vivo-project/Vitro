@@ -143,8 +143,10 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
         /**
          * Gets run when the webApp Context gets destroyed.
          */
-        public void contextDestroyed(ServletContextEvent sce) {
+        public void contextDestroyed(ServletContextEvent sce) {        
             log.info("**** Running "+this.getClass().getName()+".contextDestroyed()");
+        	IndexBuilder builder = (IndexBuilder)sce.getServletContext().getAttribute(IndexBuilder.class.getName());
+        	builder.killIndexingThread();
         }
 
         /**
