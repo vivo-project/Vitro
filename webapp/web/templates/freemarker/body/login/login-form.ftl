@@ -3,6 +3,7 @@
 <#-- Log in template for accessing site admin -->
 
 ${stylesheets.addFromTheme("/login.css")}
+<noscript><p class="alertNoJavaScript"></p></noscript>
 
 <div id="formLogin" class="pageBodyGroup">
 
