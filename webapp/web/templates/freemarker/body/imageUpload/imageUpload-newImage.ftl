@@ -2,11 +2,23 @@
 
 <#-- Upload a replacement main image for an Individual. -->
 
+${scripts.add("/js/jquery.js")}
+${scripts.add("/js/imageUpload/imageUploadUtils.js")}
 
-${scripts.add("/js/imageUpload/validateUpload.js")}
 
 
 ${stylesheets.addFromTheme("/uploadImages.css")}
+
+
+<noscript>
+	<div id="javascriptDisableWrapper">
+		<div id="javascriptDisableContent">
+			<img src="${urls.siteIcons}/iconAlertBig.png" alt="Alert Icon"/>
+			<p>In order to upload or edit a photo, you'll need to enable JavaScript.</p>
+		</div>
+	</div>
+</noscript>
+
 
 <#if errorMessage??>
    <script type="text/javascript">  
@@ -17,13 +29,13 @@ ${stylesheets.addFromTheme("/uploadImages.css")}
  	</script>
 </#if>
 
-<div id="photoUploadContainer">
+<div id="photoUploadContainer" class="hidden">
        <h2>Photo Upload</h2>
        <div id="photoUploadDefaultImageContainer">
               <h6>Current Photo</h6>
               <img src="${thumbnailUrl}" width="115" height="115" /> </div>
        <div id="photoUploadForm">
-              <form action="${formAction}" enctype="multipart/form-data" method="post" onSubmit="return validate_upload_file(this)">
+              <form action="${formAction}" enctype="multipart/form-data" method="post">
               
                      <label>Upload a photo <span> (JPEG, GIF or PNG)</span></label>
                      <input type="file" name="datafile" size="30">
