@@ -6,7 +6,7 @@
 
     <h1><a title="Home" href="${urls.home}">${siteName}</a></h1>
     
-    <#if siteTagline.has_content>
+    <#if siteTagline?has_content>
         <em>${siteTagline}</em>
     </#if>
     

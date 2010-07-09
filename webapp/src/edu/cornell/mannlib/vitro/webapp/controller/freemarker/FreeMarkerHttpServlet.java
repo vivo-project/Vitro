@@ -6,8 +6,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -158,18 +160,26 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
     protected final TemplateLoader getTemplateLoader(Configuration config, String themeDir) {
         
         ServletContext context = getServletContext();
-        String themeTemplateDir = context.getRealPath(themeDir) + "/templates";
-        String vitroTemplateDir = context.getRealPath("/templates/freemarker");
-
+        String themeTemplatePath = context.getRealPath(themeDir) + "/templates";
+        String vitroTemplatePath = context.getRealPath("/templates/freemarker");
+        
         try {
-            FileTemplateLoader themeFtl = new FileTemplateLoader(new File(themeTemplateDir));
-            FileTemplateLoader vitroFtl = new FileTemplateLoader(new File(vitroTemplateDir));
+            TemplateLoader[] loaders;
+            FileTemplateLoader vitroFtl = new FileTemplateLoader(new File(vitroTemplatePath));
             ClassTemplateLoader ctl = new ClassTemplateLoader(getClass(), "");
-            TemplateLoader[] loaders = new TemplateLoader[] { themeFtl, vitroFtl, ctl };
+            
+            File themeTemplateDir = new File(themeTemplatePath);
+            // Handle the case where there's no theme template directory gracefully
+            if (themeTemplateDir.exists()) {
+                FileTemplateLoader themeFtl = new FileTemplateLoader(themeTemplateDir);
+                loaders = new TemplateLoader[] { themeFtl, vitroFtl, ctl };
+            } else {
+                loaders = new TemplateLoader[] { vitroFtl, ctl };
+            }
             MultiTemplateLoader mtl = new MultiTemplateLoader(loaders);
             return mtl;
         } catch (IOException e) {
-            log.error("Error loading templates");
+            log.error("Error creating template loaders");
             return null;
         }
         
