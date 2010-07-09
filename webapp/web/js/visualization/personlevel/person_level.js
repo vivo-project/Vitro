@@ -176,7 +176,7 @@ function createTable(tableID, tableContainer, tableData) {
 	var table = $('<table>');
 	table.attr('id', tableID);
 	
-	table.append($('<caption>').html("Co-Authorships"));  
+	table.append($('<caption>').html("Co-Authors <a href=\"" + egoCoAuthorsListDataFileURL + "\">(.CSV File)</a>"));  
 	
 	var header = $('<thead>');
 	
@@ -280,7 +280,7 @@ function renderCoAuthorshipVisualization() {
 				"src", swfLink,
 				"flashVars", "graphmlUrl=" + egoCoAuthorshipDataFeederURL,			
 				"width", "600",
-				"height", "840",
+				"height", "790",
 				"align", "top",
 				"id", "CoAuthor",
 				"quality", "high",

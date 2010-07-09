@@ -176,11 +176,11 @@ public class VisualizationCodeGenerator {
 								"function drawUniqueCoauthorCountVisualization(providedSparklineImgTD) {\n" +
 									"var data = new google.visualization.DataTable();\n" +
 									"data.addColumn('string', 'Year');\n" +
-									"data.addColumn('number', 'Publications');\n" +
+									"data.addColumn('number', 'Unique co-authors');\n" +
 									"data.addRows(" + numOfYearsToBeRendered + ");\n");
 
-		int publicationCounter = 0;
-		int totalPublications = 0;
+		int uniqueCoAuthorCounter = 0;
+		int totalUniqueCoAuthors = 0;
 		int renderedFullSparks = 0;
 
 		
@@ -194,33 +194,33 @@ public class VisualizationCodeGenerator {
 				}
 
 				visualizationCode.append("data.setValue("
-												+ publicationCounter
+												+ uniqueCoAuthorCounter
 												+ ", 0, '"
 												+ stringPublishedYear
 												+ "');\n");
 
 				visualizationCode.append("data.setValue("
-												+ publicationCounter
+												+ uniqueCoAuthorCounter
 												+ ", 1, "
 												+ currentPublications
 												+ ");\n");
 
-				totalPublications += currentPublications;
-				publicationCounter++;
+				totalUniqueCoAuthors += currentPublications;
+				uniqueCoAuthorCounter++;
 		}
 
 		/*
 		 * Sparks that will be rendered in full mode will always be the one's which has any year
 		 * associated with it. Hence.
 		 * */
-		renderedFullSparks = totalPublications;
+		renderedFullSparks = totalUniqueCoAuthors;
 
 		/*
 		 * Total publications will also consider publications that have no year associated with
 		 * it. Hence.
 		 * */
 		if (yearToUniqueCoauthorsCount.get(VOConstants.DEFAULT_PUBLICATION_YEAR) != null) {
-			totalPublications += yearToUniqueCoauthorsCount.get(VOConstants.DEFAULT_PUBLICATION_YEAR);
+			totalUniqueCoAuthors += yearToUniqueCoauthorsCount.get(VOConstants.DEFAULT_PUBLICATION_YEAR);
 		}
 
 		String sparklineDisplayOptions = "{width: 63, height: 21, showAxisLines: false, " +
@@ -259,14 +259,14 @@ public class VisualizationCodeGenerator {
 													   shortSparkMinYear, 
 													   visContainerID, 
 													   visualizationCode,
-													   totalPublications, 
+													   totalUniqueCoAuthors, 
 													   sparklineDisplayOptions);	
 		} else {
 			generateFullSparklineVisualizationContent(currentYear,
 					   								  minPubYearConsidered,
 					   								  visContainerID,
 													  visualizationCode, 
-													  totalPublications, 
+													  totalUniqueCoAuthors, 
 													  renderedFullSparks,
 													  sparklineDisplayOptions);
 		}
@@ -285,7 +285,7 @@ public class VisualizationCodeGenerator {
 	
 	private void generateShortSparklineVisualizationContent(int currentYear,
 			int shortSparkMinYear, String visContainerID,
-			StringBuilder visualizationCode, int totalPublications,
+			StringBuilder visualizationCode, int totalUniqueCoAuthors,
 			String sparklineDisplayOptions) {
 		
 		/*
@@ -330,8 +330,8 @@ public class VisualizationCodeGenerator {
 		 * */
 		visualizationCode.append("$('#" + visDivNames.get("SHORT_SPARK") + " td.sparkline_number').text(renderedShortSparks);");
 		visualizationCode.append("var shortSparksText = ''" +
-														"+ ' Papers with year from '" +
-														"+ ' " + totalPublications + " '" +
+														"+ ' Unique co-authors with year from '" +
+														"+ ' " + totalUniqueCoAuthors + " '" +
 														"+ ' total " +
 														"<span class=\"sparkline_range\">" +
 														"(" + shortSparkMinYear + " - " + currentYear + ")" +
@@ -351,7 +351,7 @@ public class VisualizationCodeGenerator {
 	
 	private void generateFullSparklineVisualizationContent(
 			int currentYear, int minPubYearConsidered, String visContainerID, StringBuilder visualizationCode,
-			int totalPublications, int renderedFullSparks,
+			int totalUniqueCoAuthors, int renderedFullSparks,
 			String sparklineDisplayOptions) {
 		
 		String csvDownloadURL = ""; 
@@ -375,7 +375,7 @@ public class VisualizationCodeGenerator {
 		
 		visualizationCode.append("var allSparksText = ''" +
 												 "+ ' Unique co-authors '" +
-												"<span class=\"sparkline_range\">" +
+												 "+ ' <span class=\"sparkline_range\">" +
 												"(" + minPubYearConsidered + " - " + currentYear + ")" +
 												"</span> '" +
 												"+ ' <a href=\"" + csvDownloadURL + "\" class=\"inline_href\">(.CSV File)</a>';" +

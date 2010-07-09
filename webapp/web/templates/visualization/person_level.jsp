@@ -30,10 +30,13 @@
 
 <style type="text/css">
 
+#body h1 {
+	margin:0.0em;
+} 
+
 .sparkline_wrapper_table {
 	display: inline;
 	vertical-align: bottom;
-	
 }
 
 .author_name {
@@ -64,26 +67,31 @@
 .inline_href {
 }
 
+
 #ego_profile {
-	padding: 10px;
+	padding-left:10px;
+	padding-top:10px;
 	min-height: 100px;
 }
 
 #ego_label {
 	font-size:1.1em;
-	margin-left:100px;
+	/*margin-left:100px;
 	margin-top:9px;
-	position:absolute;
+	position:absolute;*/
 }
 
 #ego_moniker {
-	margin-left:100px;
+	/*margin-left:100px;
 	margin-top:27px;
-	position:absolute;
+	position:absolute;*/
 }
 
 #ego_profile_image {
-	width: 100px;
+	float:left;
+	padding-right: 5px;
+
+	/*width: 100px;*/
 }
 
 #ego_sparkline {
@@ -103,23 +111,34 @@
 	visibility:hidden;*/
 }
 
-.thumbnail {
-	width: 100px;
-}
-
 </style>
+
+<!--[if IE]>
+	<style type="text/css">
+	
+	#${egoPubSparklineContainerID},
+	#${uniqueCoauthorsSparklineVisContainerID} {
+		padding-bottom:15px;
+	}
+	
+	
+	</style>
+<![endif]-->
 
 <div id="ego_profile">
 
+	
+	<%-- Image --%>
+			<span id="ego_profile_image"></span>
+			
 	<%-- Label --%>
 			<h1><span id="ego_label" class="author_name"></span></h1>
 	
 	<%-- Moniker--%>
 			<span id="ego_moniker" class="author_moniker"></span>
-	
-	<%-- Image --%>
-			<span id="ego_profile_image" class="thumbnail"></span>
-	
+
+
+	<div style="clear:both;"></div>
 	
 	<%-- Sparkline --%>
 		<h2 class="sub_headings">General Statistics</h2>
@@ -133,13 +152,12 @@
 			
 		<h2 class="sub_headings">Co-Author Network <a href="${coAuthorshipDownloadFile}">(.GraphML File)</a></h2>
 
-</div>
+
+</div>	
 
 
-
-<div id="topShadow"></div>
-<div id="bodyPannel" style="height: 900px;">
-	<br class="spacer" />
+<div id="bodyPannel">
+	
 	
 	<div id="visPanel" style="float: left; width: 600px;">
 		<script language="JavaScript" type="text/javascript">
@@ -169,22 +187,16 @@
 		<br />
 		<div><a href="#" id="coAuthorshipVisUrl">Co-author network of <span id="coAuthorName"></span></a></div>
 	</div>
-	
-	<span class="no_href_styles"><a href="${coAuthorshipDownloadFile}">
- 		<img src="${visImageContextPath}download_graphml.png" width="91" height="25" /></a>
-	</span>
 
-	<br class="spacer">
 </div>
 
-<div class="vis-stats">
+<div class="vis_stats">
+
+<h2 class="sub_headings">Tables</h2>
 
 	<div class="vis-tables">
-		<p class="datatable">
-			${sparkline.table} 
-			<a href="${egoSparklineDataURL}" class="no_href_styles">
-				<img src="${visImageContextPath}download_csv.png" width="91" height="25" />
-			</a>
+		<p id="publications_table_container" class="datatable">
+			${egoPubSparkline.table} 
 		</p>
 	</div>
 
@@ -196,7 +208,6 @@
 
 
 </div>
-
 
 
 

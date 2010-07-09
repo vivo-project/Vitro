@@ -58,6 +58,8 @@ public class VisualizationRequestHandler {
         String renderMode = vitroRequest.getParameter(VisualizationFrameworkConstants.RENDER_MODE_URL_HANDLE);
         
         String visMode = vitroRequest.getParameter(VisualizationFrameworkConstants.VIS_MODE_URL_HANDLE);
+        
+        String coAuthorsListMode = "coauthors";
 
         String egoPubSparklineVisContainerID = "ego_pub_sparkline";
         String uniqueCoauthorsSparklineVisContainerID = "unique_coauthors_sparkline";
@@ -89,12 +91,29 @@ public class VisualizationRequestHandler {
 	    	 * */
 	    	if (VisualizationFrameworkConstants.DATA_RENDER_MODE_URL_VALUE.equalsIgnoreCase(renderMode)) { 
 			
-	    			/*
-	    			 * When just the graphML file is required - based on which actual visualization will 
-	    			 * be rendered.
-	    			 * */
-	    			prepareVisualizationQueryDataResponse(coAuthorshipVO);
-					return;
+					/* 
+			    	 * We will be using the same visualization package for providing data for both 
+			    	 * list of unique coauthors & network of coauthors (used in the flash vis). We will 
+			    	 * use "VIS_MODE_URL_HANDLE" as a modifier to differentiate between these two.
+			    	 * The defualt will be to provide data used to render the coauthorship network vis.
+			    	 * */ 
+					
+					if (coAuthorsListMode.equalsIgnoreCase(visMode)) { 
+		    			/*
+		    			 * When the csv file is required - containing the unique co-authors vs how many times
+		    			 * they have co-authored with the ego.
+		    			 * */
+							prepareVisualizationQueryListCoauthorsDataResponse(coAuthorshipVO);
+							return;
+			    		
+					} else {
+			    			/*
+			    			 * When the graphML file is required - based on which coauthorship network visualization 
+			    			 * will be rendered.
+			    			 * */
+			    			prepareVisualizationQueryNetworkDataResponse(coAuthorshipVO);
+							return;
+					}
 	    		
 	    		
 			}
@@ -227,13 +246,13 @@ public class VisualizationRequestHandler {
 		return yearToCoAuthors;
 	}
 
-	private void prepareVisualizationQueryDataResponse(VisVOContainer coAuthorsipVO) {
+	private void prepareVisualizationQueryNetworkDataResponse(VisVOContainer coAuthorsipVO) {
 
 		String outputFileName = "";
 		
 		if (coAuthorsipVO.getNodes() == null || coAuthorsipVO.getNodes().size() < 1) {
 			
-			outputFileName = "no-coauthorship-net" + ".graphml";
+			outputFileName = "no-coauthorship-net" + ".csv";
 			
 		} else {
 			
@@ -265,6 +284,82 @@ public class VisualizationRequestHandler {
 			e.printStackTrace();
 		}
 	}
+	
+	private void prepareVisualizationQueryListCoauthorsDataResponse(VisVOContainer coAuthorsipVO) {
+
+		String outputFileName = "";
+		Map<String, Integer> coAuthorsToCount = new TreeMap<String, Integer>();
+		
+		if (coAuthorsipVO.getNodes() == null || coAuthorsipVO.getNodes().size() < 1 ) {
+			
+			outputFileName = "no-coauthors-list" + ".csv";
+			
+		} else {
+			
+			outputFileName = UtilityFunctions.slugify(coAuthorsipVO.getEgoNode().getNodeName()) 
+										+ "-coauthors-list" + ".csv";
+			
+			coAuthorsToCount = getCoAuthorsList(coAuthorsipVO);
+			
+		}
+			
+		response.setContentType("application/octet-stream");
+		response.setHeader("Content-Disposition", "attachment;filename=" + outputFileName);
+		
+		try {
+		
+		PrintWriter responseWriter = response.getWriter();
+		
+		/*
+		 * We are side-effecting responseWriter since we are directly manipulating the response 
+		 * object of the servlet.
+		 * */
+		generateCsvFileBuffer(coAuthorsToCount, 
+							  responseWriter);
+
+		responseWriter.close();
+		
+		} catch (IOException e) {
+		e.printStackTrace();
+		}
+	}
+	
+	
+	private Map<String, Integer> getCoAuthorsList(VisVOContainer coAuthorsipVO) {
+		
+		Map<String, Integer> coAuthorsToCount = new TreeMap<String, Integer>();
+		
+		for (Node currNode : coAuthorsipVO.getNodes()) {
+			
+			/*
+			 * We have already printed the Ego Node info.
+			 * */
+			if (currNode != coAuthorsipVO.getEgoNode()) {
+				
+				coAuthorsToCount.put(currNode.getNodeName(), currNode.getNumOfAuthoredWorks());
+				
+			}
+			
+		}
+		
+		
+		return coAuthorsToCount;
+	}
+
+	private void generateCsvFileBuffer(Map<String, Integer> coAuthorsToCount, PrintWriter printWriter) {
+		
+	    	printWriter.append("\"Co-Author\", \"Count\"\n");
+			
+			for (Entry<String, Integer> currentEntry : coAuthorsToCount.entrySet()) {
+				
+				printWriter.append("\"" + currentEntry.getKey() + "\"," 
+								   + "\"" + currentEntry.getValue() + "\"\n"
+											  );
+			}
+			
+		printWriter.flush();
+	}
+	
 	
 	private void prepareVisualizationQueryStandaloneResponse(
 		String egoURIParam, 

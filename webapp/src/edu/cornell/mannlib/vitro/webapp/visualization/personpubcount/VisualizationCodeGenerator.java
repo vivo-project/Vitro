@@ -600,10 +600,18 @@ public class VisualizationCodeGenerator {
 	
 	private String generateDataTable() {
 		
+		String csvDownloadURL = ""; 
+		
+		try {
+			csvDownloadURL = getCSVDownloadURL();
+		} catch (UnsupportedEncodingException e) {
+			csvDownloadURL = "#";
+		}
+		
 		StringBuilder dataTable = new StringBuilder();
 		
 		dataTable.append("<table id='sparkline_data_table'>" +
-								"<caption>Publications per year</caption>" +
+								"<caption>Publications per year <a href=\"" + csvDownloadURL + "\">(.CSV File)</a></caption>" +
 								"<thead>" +
 										"<tr>" +
 											"<th>Year</th>" +

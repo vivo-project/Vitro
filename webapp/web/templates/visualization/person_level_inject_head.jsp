@@ -11,6 +11,13 @@
 	<c:param name="labelField" value="name" />
 </c:url>
 
+<c:url var="egoCoAuthorsListDataFileURL" value="/admin/visQuery">
+	<c:param name="vis" value="person_level" />
+	<c:param name="render_mode" value="data" />
+	<c:param name="vis_mode" value="coauthors" />
+	<c:param name="uri" value="${requestScope.egoURIParam}" />
+</c:url>
+
 <c:url var="swfLink" value="/${themeDir}site_icons/visualization/coauthorship/CoAuthor.swf" />
 
 <c:url var="jquery" value="/js/jquery.js"/>
@@ -37,6 +44,7 @@ var requiredRevision = 0;
 
 var swfLink = "${swfLink}";
 var egoCoAuthorshipDataFeederURL = "${egoCoAuthorshipDataFeederURL}";
+var egoCoAuthorsListDataFileURL = "${egoCoAuthorsListDataFileURL}";
 var contextPath = "${contextPath}";
 
 // -->

@@ -199,7 +199,7 @@ public class VisualizationRequestHandler {
 		
 		if (authorNodesAndEdges.getNodes() == null || authorNodesAndEdges.getNodes().size() < 1 ) {
 			
-			outputFileName = "no-coauthorship-net" + ".graphml";
+			outputFileName = "no-coauthors" + ".csv";
 			
 		} else {
 			
@@ -235,8 +235,6 @@ public class VisualizationRequestHandler {
 	
 	private void generateCsvFileBuffer(Map<String, Set<Node>> yearToCoauthors, PrintWriter printWriter) {
 		
-//        CSVWriter csvWriter = new SimpleWriter(printWriter);
-        
         	printWriter.append("\"Year\", \"Number of Co-Authors\", \"Co-Author(s)\"\n");
 			
 			for (Entry<String, Set<Node>> currentEntry : yearToCoauthors.entrySet()) {

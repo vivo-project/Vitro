@@ -6,6 +6,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.Map.Entry;
+
+import org.apache.commons.collections.BidiMap;
+import org.apache.commons.collections.MapIterator;
+import org.apache.commons.collections.bidimap.TreeBidiMap;
 
 import com.google.gson.Gson;
 import com.hp.hpl.jena.iri.IRIFactory;
@@ -44,17 +49,38 @@ public class TestJava {
 		System.out.println(sampleBlurns);
 		for (String blurb : sampleBlurns) {
 			
-			System.out.println(blurb.substring(0, 10));
+//			System.out.println(blurb.substring(0, 10));
 		}
 		Map<String, Integer> yearToPublicationCount = new TreeMap<String, Integer>();
 
 		yearToPublicationCount.put("2003", 5);
-		yearToPublicationCount.put("2001", 5);
-		yearToPublicationCount.put("2002", 5);
-		yearToPublicationCount.put("2090", 7);
+		yearToPublicationCount.put("2005", 3);
+		yearToPublicationCount.put("2002", 1);
+		yearToPublicationCount.put("2090", 5);
 		yearToPublicationCount.put("Unknown", 6);
 		
+		 BidiMap map1 = new TreeBidiMap(yearToPublicationCount);
+
+		
+		System.out.println(map1 + " ---  " + map1.inverseBidiMap());
+		
 		Node egoNode;
+		
+		
+		MapIterator mapIterator = map1.inverseBidiMap().mapIterator();
+
+		
+		while(mapIterator.hasNext()) {
+			
+			Object next = mapIterator.next();
+			
+			System.out.println(next + "  %%% " + next);
+			
+			
+		}
+		
+		
+		
 		
 		System.out.println();
 		

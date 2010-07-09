@@ -199,10 +199,6 @@ public class VisualizationRequestHandler {
 			 				    + VisualizationFrameworkConstants.VIS_TYPE_URL_HANDLE 
 								+ "=" + URLEncoder.encode("person_level", 
 						 				 VisualizationController.URL_ENCODING_SCHEME).toString()
-						 	    + "&"
-			 				    + VisualizationFrameworkConstants.VIS_CONTAINER_URL_HANDLE 
-								+ "=" + URLEncoder.encode("ego_sparkline", 
-						 				 VisualizationController.URL_ENCODING_SCHEME).toString()						 				 
 			 				    + "&"
 			 				    + VisualizationFrameworkConstants.RENDER_MODE_URL_HANDLE
 								+ "=" + URLEncoder.encode(VisualizationFrameworkConstants.STANDALONE_RENDER_MODE_URL_VALUE, 
