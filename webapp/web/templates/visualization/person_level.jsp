@@ -13,6 +13,10 @@
 <c:set var='egoPubSparklineContainerID' value='${requestScope.egoPubSparklineContainerID}' />
 <c:set var='uniqueCoauthorsSparklineVisContainerID' value='${requestScope.uniqueCoauthorsSparklineVisContainerID}' />
 
+<c:set var='numOfAuthors' value='${requestScope.numOfAuthors}' />
+<c:set var='numOfCoAuthorShips' value='${requestScope.numOfCoAuthorShips}' />
+
+
 <c:url var="egoSparklineDataURL" value="/admin/visQuery">
 	<c:param name="render_mode" value="data" />
 	<c:param name="vis" value="person_pub_count" />
@@ -150,11 +154,23 @@
 				${uniqueCoauthorsSparkline.sparklineContent}
 			</div>
 			
-		<h2 class="sub_headings">Co-Author Network <a href="${coAuthorshipDownloadFile}">(.GraphML File)</a></h2>
+		<h2 class="sub_headings">Co-Author Network 
+				<%-- A simple if/else condition --%>
+		<c:choose>
+		    <c:when test='${numOfCoAuthorShips > 0}'>
+		       <a href="${coAuthorshipDownloadFile}">(.GraphML File)</a></h2>
+		    </c:when>
+		    <c:otherwise>
+		        </h2>
+		        <span id="no_coauthorships">Currently there are no multi-author papers for <span id="no_coauthorships_person">this author</span> in the VIVO database.</span>
+		    </c:otherwise>
+		</c:choose>
+		
 
 
 </div>	
 
+<c:if test='${numOfCoAuthorShips > 0}'>
 
 <div id="bodyPannel">
 	
@@ -190,6 +206,8 @@
 
 </div>
 
+</c:if>
+
 <div class="vis_stats">
 
 <h2 class="sub_headings">Tables</h2>
@@ -199,10 +217,14 @@
 			${egoPubSparkline.table} 
 		</p>
 	</div>
+	
+	<c:if test='${numOfCoAuthorShips > 0}'>
 
-	<div class="vis-tables">
-		<p id="coauth_table_container" class="datatable"></p>
-	</div>
+		<div class="vis-tables">
+			<p id="coauth_table_container" class="datatable"></p>
+		</div>
+	
+	</c:if>
 
 </div>
 
@@ -214,12 +236,27 @@
 <script language="JavaScript" type="text/javascript">
 $(document).ready(function(){
 
-	$("#coauth_table_container").empty().html('<img id="loadingData" with="auto" src="${loadingImageLink}" />');
+	<c:choose>
+	    <c:when test='${numOfCoAuthorShips > 0}'>
+	    	$("#coauth_table_container").empty().html('<img id="loadingData" with="auto" src="${loadingImageLink}" />');
+	    </c:when>
+	    <c:otherwise>
+	    	setProfileName('no_coauthorships_person', $('#ego_label').text());
+	    </c:otherwise>
+	</c:choose>
 
+	
+	
 	processProfileInformation("ego_label", 
 							  "ego_moniker",
 							  "ego_profile_image",
 							  jQuery.parseJSON(getWellFormedURLs("${requestScope.egoURIParam}", "profile_info")));
+
+	
+
+	 
+
+	  
 
 });
 </script>

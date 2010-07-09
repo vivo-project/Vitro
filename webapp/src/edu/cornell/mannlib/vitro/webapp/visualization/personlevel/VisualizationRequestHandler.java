@@ -164,6 +164,7 @@ public class VisualizationRequestHandler {
 	    	prepareVisualizationQueryStandaloneResponse(egoURIParam, 
 	    												publicationSparklineVO,
 	    												uniqueCoauthorsSparklineVO,
+	    												coAuthorshipVO,
 	    												egoPubSparklineVisContainerID,
 	    												uniqueCoauthorsSparklineVisContainerID,
 	    												request, 
@@ -364,13 +365,26 @@ public class VisualizationRequestHandler {
 	private void prepareVisualizationQueryStandaloneResponse(
 		String egoURIParam, 
 		SparklineVOContainer egoPubSparklineVO, 
-		SparklineVOContainer uniqueCoauthorsSparklineVO, String egoPubSparklineVisContainer, String uniqueCoauthorsSparklineVisContainer, HttpServletRequest request,
+		SparklineVOContainer uniqueCoauthorsSparklineVO, 
+		VisVOContainer coAuthorshipVO, 
+		String egoPubSparklineVisContainer, 
+		String uniqueCoauthorsSparklineVisContainer, 
+		HttpServletRequest request,
 		HttpServletResponse response, 
 		VitroRequest vreq) {
 
         Portal portal = vreq.getPortal();
         
         request.setAttribute("egoURIParam", egoURIParam);
+        
+        if (coAuthorshipVO.getNodes() != null) {
+        	request.setAttribute("numOfAuthors", coAuthorshipVO.getNodes().size());
+		}
+		
+		if (coAuthorshipVO.getEdges() != null) {
+			request.setAttribute("numOfCoAuthorShips", coAuthorshipVO.getEdges().size());
+		}
+		
         
         request.setAttribute("egoPubSparklineVO", egoPubSparklineVO);
         request.setAttribute("uniqueCoauthorsSparklineVO", uniqueCoauthorsSparklineVO);
