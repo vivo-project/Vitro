@@ -182,8 +182,11 @@ function createTable(tableID, tableContainer, tableData) {
 	
 	var row = $('<tr>'); 
 
-	row.append($('<th>').html("Author"));  
-	row.append($('<th>').html("Count"));  
+	var authorTH = $('<th>');
+	authorTH.html("Author");
+	row.append(authorTH);
+	
+	row.append($('<th>').html("Publications with <br />" + $('#ego_label').text()));  
 
 	header.append(row);
 	

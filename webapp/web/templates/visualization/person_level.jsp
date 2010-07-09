@@ -119,6 +119,10 @@ table.sparkline_wrapper_table td, th {
 	visibility:hidden;*/
 }
 
+#coauthorships_table th {
+	vertical-align: top;
+}
+
 </style>
 
 <!--[if IE]>
@@ -129,7 +133,9 @@ table.sparkline_wrapper_table td, th {
 		padding-bottom:15px;
 	}
 	
-	
+	#ego_label {
+		margin-left:-3px;
+	}
 	</style>
 <![endif]-->
 
@@ -161,7 +167,7 @@ table.sparkline_wrapper_table td, th {
 		<h2 class="sub_headings">Co-Author Network 
 				<%-- A simple if/else condition --%>
 		<c:choose>
-		    <c:when test='${numOfCoAuthorShips > 0}'>
+		    <c:when test="${numOfCoAuthorShips > 0 || numOfAuthors > 0}">
 		       <a href="${coAuthorshipDownloadFile}">(.GraphML File)</a></h2>
 		    </c:when>
 		    <c:otherwise>
@@ -180,7 +186,7 @@ table.sparkline_wrapper_table td, th {
 
 </div>	
 
-<c:if test='${numOfCoAuthorShips > 0}'>
+<c:if test='${numOfCoAuthorShips > 0 || numOfAuthors > 0}'>
 
 <div id="bodyPannel">
 	
@@ -195,6 +201,8 @@ table.sparkline_wrapper_table td, th {
 	
 	<div id="dataPanel">
 		
+		<br />
+		<br />
 		<div id="profileImage"></div>
 		
 		<div class="bold"><strong><span id="authorName" class="neutral_author_name">&nbsp;</span></strong></div>
