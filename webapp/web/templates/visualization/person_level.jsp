@@ -59,7 +59,8 @@
 
 .sub_headings {
 	color: #121b3c;
-	padding-top: 5px;
+	padding-top: 10px;
+	margin-bottom: 0.3em;
 }
 
 .sub_headings a {
@@ -67,6 +68,9 @@
 	font-weight:normal;
 }
 
+table.sparkline_wrapper_table td, th {
+	vertical-align: bottom;
+}
 
 .inline_href {
 }
@@ -167,7 +171,8 @@
 		        	<c:set var='authorsText' value='multi-author' />
 		        </c:if>
 		        
-		        <span id="no_coauthorships">Currently there are no ${authorsText} papers for <span id="no_coauthorships_person" class="author_name">this author</span> in the VIVO database.</span>
+		        <span id="no_coauthorships">Currently there are no ${authorsText} papers for 
+		        	<span id="no_coauthorships_person" class="author_name">this author</span> in the VIVO database.</span>
 		    </c:otherwise>
 		</c:choose>
 		
@@ -195,6 +200,7 @@
 		<div class="bold"><strong><span id="authorName" class="neutral_author_name">&nbsp;</span></strong></div>
 		
 		<div class="italicize"><span id="profileMoniker" class="author_moniker"></span></div>
+		<div><a href="#" id="profileUrl">VIVO profile</a> | <a href="#" id="coAuthorshipVisUrl">Co-author network</a></div> 
 		<br />
 		<div class="works"><span class="numbers" style="width: 40px;" id="works"></span>&nbsp;&nbsp;<span class="title">Works</span></div>
 		<div class="works"><span class="numbers" style="width: 40px;" id="coAuthors"></span>&nbsp;&nbsp;<span>Co-author(s)</span></div>
@@ -202,11 +208,6 @@
 		<div class="works" id="fPub" style="visibility:hidden"><span class="numbers" style="width:40px;" id="firstPublication"></span>&nbsp;&nbsp;<span>First Publication</span></div>
 		<div class="works" id="lPub" style="visibility:hidden"><span class="numbers" style="width:40px;" id="lastPublication"></span>&nbsp;&nbsp;<span>Last Publication</span></div>
 		
-		<br /><br />
-		   
-		<div><a href="#" id="profileUrl">VIVO profile</a></div>
-		<br />
-		<div><a href="#" id="coAuthorshipVisUrl">Co-author network of <span id="coAuthorName"></span></a></div>
 	</div>
 
 </div>
@@ -232,6 +233,8 @@
 			</div>
 		
 		</c:if>
+		
+		<div style="clear:both;"></div>
 	
 	</div>
 </c:if>

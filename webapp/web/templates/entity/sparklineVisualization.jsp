@@ -83,7 +83,19 @@
 			position:absolute;
 			/*width:380px;*/
 		}
+		
 	</style>
+	
+	<!--[if IE]>
+	<style type="text/css">
+	
+	#vis_container {
+		padding-bottom:15px;
+	}
+	
+	
+	</style>
+<![endif]-->
 	
 	<script type="text/javascript">
 	<!--

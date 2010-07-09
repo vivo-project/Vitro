@@ -149,9 +149,12 @@ public class VisualizationCodeGenerator {
 										"    	border-spacing: 0;" +
 										"    	vertical-align: inherit;" +
 										"}" +
-										/*".sparkline_wrapper_table table{" +
-										"    	vertical-align: bottom;" +
-										"}" +*/
+										"table.sparkline_wrapper_table td, th {" +
+										"	vertical-align: bottom;" +
+										"}" +
+										".vis_link {" +
+										"	padding-top: 5px;" +
+										"}" +
 										"td.sparkline_number { text-align:right; padding-right:5px; }" +
 										"td.sparkline_text   {text-align:left;}" +
 										/*"#sparkline_data_table {" +
@@ -557,20 +560,6 @@ public class VisualizationCodeGenerator {
 		
 		String fullTimelineLink;
 		if (yearToPublicationCount.size() > 0) {
-//			String fullTimelineNetworkURL = uri.toString() + "?" + 
-//										VisualizationFrameworkConstants.INDIVIDUAL_URI_URL_HANDLE + 
-//										 "=" + URLEncoder.encode(individualURI, 
-//												 				 VisualizationController.URL_ENCODING_SCHEME).toString() +
-//										 "&" +
-//										 "vis" +
-//										 "=" + URLEncoder.encode(VisualizationController
-//												 						.PERSON_PUBLICATION_COUNT_VIS_URL_VALUE, 
-//												 				 VisualizationController.URL_ENCODING_SCHEME).toString() +
-//										 "&" +
-//										 VisualizationFrameworkConstants.RENDER_MODE_URL_HANDLE + 
-//										 "=" + URLEncoder.encode(VisualizationFrameworkConstants.STANDALONE_RENDER_MODE_URL_VALUE, 
-//								 				 				 VisualizationController.URL_ENCODING_SCHEME).toString();
-			
 			
 			String fullTimelineNetworkURL = contextPath
 							+ "/admin/visQuery"
@@ -599,7 +588,7 @@ public class VisualizationCodeGenerator {
 		
 		}
 		
-		divContextCode.append("<p>" + fullTimelineLink + "</p>");
+		divContextCode.append("<p class=\"vis_link\">" + fullTimelineLink + "</p>");
 		
 		} catch (UnsupportedEncodingException e) {
 		e.printStackTrace();
