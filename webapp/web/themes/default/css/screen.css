@@ -225,6 +225,18 @@ table#head{
 	margin:0;
 }
 
+#research_instance {
+	background-color:red;
+	color:white;
+	font-size:1.25em;
+	font-weight:bold;
+	text-align:center;
+}
+
+#research_instance a {
+	color:white;
+}
+
 /************** header search form *********************************/
 
 td#SearchArea {
