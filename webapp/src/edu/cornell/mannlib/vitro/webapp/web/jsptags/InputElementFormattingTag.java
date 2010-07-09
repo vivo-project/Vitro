@@ -246,28 +246,28 @@ public class InputElementFormattingTag extends TagSupport {
             Map<String, String> uris = null;
             if (editSub != null) { // are reloading a form after a validation error, look in editSub
                 literals = editSub.getLiteralsFromForm();
-                if( literals!= null && literals.containsKey(getId())){
-                    literal = literals.get(getId());
+                if( literals!= null && literals.containsKey(getName())){
+                    literal = literals.get(getName());
                     if( literal != null ) {
                         return literalToString(literal);
                     }
                 } else { //look for a uri
                     uris = editSub.getUrisFromForm();
                     if( uris != null )
-                        uri = uris.get(getId());
+                        uri = uris.get(getName());
                     if( uri != null ){
                         return uri;
                     }
                 }
             } else { // check in editConfig
                 literals = editConfig.getLiteralsInScope();
-                if( literals != null && literals.containsKey(getId()) ) { 
-                    literal = literals.get(getId());                    
+                if( literals != null && literals.containsKey(getName()) ) { 
+                    literal = literals.get(getName());                    
                     return literalToString(literal);                    
                 } else {
                     uris = editConfig.getUrisInScope();
-                    if( uris != null && uris.containsKey( getId() ) && uris.get( getId() ) != null  ) {
-                        return editConfig.getUrisInScope().get(getId());
+                    if( uris != null && uris.containsKey( getName() ) && uris.get( getName() ) != null  ) {
+                        return editConfig.getUrisInScope().get(getName());
                     }
                 }
             }
@@ -356,7 +356,7 @@ public class InputElementFormattingTag extends TagSupport {
         if( errors == null || errors.isEmpty())
             return "";
            
-        String val = errors.get(getId());
+        String val = errors.get(getName());
         if( val != null){
             return val;
         }
