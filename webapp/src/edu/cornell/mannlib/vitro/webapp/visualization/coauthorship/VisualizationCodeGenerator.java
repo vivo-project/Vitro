@@ -518,9 +518,14 @@ public class VisualizationCodeGenerator {
 		
 		if (yearToUniqueCoauthorsCount.size() > 0) {
 			
-		
+		String secondaryContextPath = "";
+		if (!contextPath.contains("/admin/visQuery")) {
+			secondaryContextPath = "/admin/visQuery";
+		}
+			
+			
 		String downloadURL = contextPath
-//							 + "/admin/visQuery"
+							 + secondaryContextPath
 							 + "?" + VisualizationFrameworkConstants.INDIVIDUAL_URI_URL_HANDLE 
 							 + "=" + URLEncoder.encode(individualURIParam, 
 									 				   VisualizationController.URL_ENCODING_SCHEME).toString() 
@@ -554,8 +559,13 @@ public class VisualizationCodeGenerator {
 		String fullTimelineLink;
 		if (yearToUniqueCoauthorsCount.size() > 0) {
 			
+			String secondaryContextPath = "";
+			if (!contextPath.contains("/admin/visQuery")) {
+				secondaryContextPath = "/admin/visQuery";
+			}
+			
 			String fullTimelineNetworkURL = contextPath
-							+ "/admin/visQuery"
+							+ secondaryContextPath
 							+ "?" 
 							+ VisualizationFrameworkConstants.INDIVIDUAL_URI_URL_HANDLE 
 							+ "=" + URLEncoder.encode(individualURIParam, 

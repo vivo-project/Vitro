@@ -60,7 +60,7 @@
 		<c:param name="uri" value="${entity.URI}"/>
 	</c:url>
 	
-	<!-- PDF Visualization URL
+	<%-- PDF Visualization URL
 	
 	For now we have disabled this.
 	             
@@ -72,30 +72,21 @@
 		<c:param name="uri" value="${entity.URI}"/>
 	</c:url>
 	
-	-->
+	--%>
 	
 	<style type="text/css">
 		#vis_container {
 			cursor:pointer;
-			height:36px;
+			/*height:36px;
 			margin-left:24%;
 			margin-top:-2%;
-			position:absolute;
+			position:absolute;*/
 			/*width:380px;*/
 		}
 		
 	</style>
 	
-	<!--[if IE]>
-	<style type="text/css">
-	
-	#vis_container {
-		padding-bottom:15px;
-	}
-	
-	
-	</style>
-<![endif]-->
+
 	
 	<script type="text/javascript">
 	<!--
@@ -129,7 +120,24 @@
 		${entity.URI}
 	</div>
 	
-	<!--  
+	
+		<!--[if IE]>
+	<style type="text/css">
+	
+	#vis_container a{
+		padding-bottom:5px;
+	}
+	
+	.vis_link a{
+		padding:10px;
+		display: block;
+	}
+	
+	
+	</style>
+<![endif]-->
+	
+	<%--  
 	
 	For now we have disabled PDF report vis.
 	
@@ -137,7 +145,7 @@
 		This is the <a href="${pdfURL}">link</a> to PDF report.
 	</div>
 	
-	-->
+	--%>
 	
 	<!-- END Visualization Code -->
 

@@ -124,13 +124,6 @@ public class VisualizationRequestHandler {
 	    									   log);
 	    	
 	    	
-			System.out.println("ft url - " + valueObjectContainer.getFullTimelineNetworkLink());
-			System.out.println("dnld fl - " + valueObjectContainer.getDownloadDataLink());
-			System.out.println("table - " + valueObjectContainer.getTable());
-			System.out.println("min - " + valueObjectContainer.getEarliestRenderedPublicationYear());
-			System.out.println("max - " + valueObjectContainer.getLatestRenderedPublicationYear());
-
-
 	    	/*
 	    	 * This is side-effecting because the response of this method is just to redirect to
 	    	 * a page with visualization on it.

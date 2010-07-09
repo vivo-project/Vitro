@@ -152,7 +152,7 @@ public class VisualizationCodeGenerator {
 										"table.sparkline_wrapper_table td, th {" +
 										"	vertical-align: bottom;" +
 										"}" +
-										".vis_link {" +
+										".vis_link a{" +
 										"	padding-top: 5px;" +
 										"}" +
 										"td.sparkline_number { text-align:right; padding-right:5px; }" +
@@ -530,9 +530,14 @@ public class VisualizationCodeGenerator {
 		
 		if (yearToPublicationCount.size() > 0) {
 			
-		
+			String secondaryContextPath = "";
+			if (!contextPath.contains("/admin/visQuery")) {
+				secondaryContextPath = "/admin/visQuery";
+			}
+			
+			
 		String downloadURL = contextPath
-//							 + "/admin/visQuery"
+							 + secondaryContextPath
 							 + "?" + VisualizationFrameworkConstants.INDIVIDUAL_URI_URL_HANDLE 
 							 + "=" + URLEncoder.encode(individualURIParam, 
 									 				   VisualizationController.URL_ENCODING_SCHEME).toString() 
@@ -561,8 +566,13 @@ public class VisualizationCodeGenerator {
 		String fullTimelineLink;
 		if (yearToPublicationCount.size() > 0) {
 			
+			String secondaryContextPath = "";
+			if (!contextPath.contains("/admin/visQuery")) {
+				secondaryContextPath = "/admin/visQuery";
+			}
+			
 			String fullTimelineNetworkURL = contextPath
-							+ "/admin/visQuery"
+							+ secondaryContextPath
 							+ "?" 
 							+ VisualizationFrameworkConstants.INDIVIDUAL_URI_URL_HANDLE 
 							+ "=" + URLEncoder.encode(individualURIParam, 
@@ -588,7 +598,7 @@ public class VisualizationCodeGenerator {
 		
 		}
 		
-		divContextCode.append("<p class=\"vis_link\">" + fullTimelineLink + "</p>");
+		divContextCode.append("<span class=\"vis_link\">" + fullTimelineLink + "</span>");
 		
 		} catch (UnsupportedEncodingException e) {
 		e.printStackTrace();
@@ -638,9 +648,6 @@ public class VisualizationCodeGenerator {
 		}
 										
 		dataTable.append("</tbody>\n" +
-//						"<tfoot>" +
-//								"<tr><td colspan='2'>*DNA - Data not available</td></tr>" +
-//						"</tfoot>\n" +
 						"</table>\n");
 		
 		

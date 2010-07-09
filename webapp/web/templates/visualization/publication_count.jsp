@@ -8,9 +8,8 @@
 <div class="staticPageBackground">
 
 
-<div id="vis_container">
+<div id="pub_count_vis_container">
 ${sparkline.sparklineContent}
-
 </div>
 ${sparkline.sparklineContext}
 </div>
