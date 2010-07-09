@@ -361,13 +361,23 @@ public class VisualizationCodeGenerator {
 			int totalPublications, int renderedFullSparks,
 			String sparklineDisplayOptions) {
 		
-		String csvDownloadURL = ""; 
+		String csvDownloadURLHref = ""; 
 		
 		try {
-			csvDownloadURL = getCSVDownloadURL();
+			if (getCSVDownloadURL() != null) {
+				
+				csvDownloadURLHref = "<a href=\"" + getCSVDownloadURL() + "\" class=\"inline_href\">(.CSV File)</a>";
+				
+			} else {
+				
+				csvDownloadURLHref = "";
+				
+			}
+
 		} catch (UnsupportedEncodingException e) {
-			csvDownloadURL = "#";
+			csvDownloadURLHref = "";
 		}
+		
 		
 		visualizationCode.append("var fullSparklineView = new google.visualization.DataView(data);\n" +
 								 "fullSparklineView.setColumns([1]);\n");
@@ -387,7 +397,7 @@ public class VisualizationCodeGenerator {
 												"<span class=\"sparkline_range\">" +
 												"(" + minPubYearConsidered + " - " + currentYear + ")" +
 												"</span> '" +
-												"+ ' <a href=\"" + csvDownloadURL + "\" class=\"inline_href\">(.CSV File)</a>';" +
+												"+ ' " + csvDownloadURLHref + " ';" +
 								"$('#" + visDivNames.get("FULL_SPARK") + " td.sparkline_text').html(allSparksText);");
 		
 		visualizationCode.append("}\n ");
@@ -476,31 +486,37 @@ public class VisualizationCodeGenerator {
 		
 		StringBuilder divContextCode = new StringBuilder();
 		
-		try {
+		String csvDownloadURLHref = ""; 
+		
+		if (yearToPublicationCount.size() > 0) {
 			
-			String downloadFileCode;
-			if (yearToPublicationCount.size() > 0) {
-				
-				
-				String downloadURL = getCSVDownloadURL();
-				
-				downloadFileCode = "Download data as <a href='" + downloadURL + "'>.csv</a> file.<br />";
-				
-				valueObjectContainer.setDownloadDataLink(downloadURL);
-			} else {
-				downloadFileCode = "No data available to export.<br />";
+			try {
+				if (getCSVDownloadURL() != null) {
+					
+					csvDownloadURLHref = "Download data as <a href='" + getCSVDownloadURL() + "'>.csv</a> file.<br />";
+					valueObjectContainer.setDownloadDataLink(getCSVDownloadURL());
+					
+				} else {
+					
+					csvDownloadURLHref = "";
+					
+				}
+
+			} catch (UnsupportedEncodingException e) {
+				csvDownloadURLHref = "";
 			}
 			
-			String tableCode = generateDataTable();
 			
-			divContextCode.append("<p>" + tableCode +
-								  downloadFileCode + "</p>");
-			
-			valueObjectContainer.setTable(tableCode);
-
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+		} else {
+			csvDownloadURLHref = "No data available to export.<br />";
 		}
+		
+		String tableCode = generateDataTable();
+		
+		divContextCode.append("<p>" + tableCode +
+					csvDownloadURLHref + "</p>");
+		
+		valueObjectContainer.setTable(tableCode);
 		
 		return divContextCode.toString();
 		
@@ -527,7 +543,7 @@ public class VisualizationCodeGenerator {
 		System.out.println(" ----- >>>> " + contextPath + " XX " + individualURIParam + " XX " + downloadURL);
 			return downloadURL;
 		} else {
-			return "#";
+			return null;
 		}
 		
 	}
@@ -566,10 +582,6 @@ public class VisualizationCodeGenerator {
 		 				    + VisualizationFrameworkConstants.VIS_TYPE_URL_HANDLE 
 							+ "=" + URLEncoder.encode("person_level", 
 					 				 VisualizationController.URL_ENCODING_SCHEME).toString()
-					 	    + "&"
-		 				    + VisualizationFrameworkConstants.VIS_CONTAINER_URL_HANDLE 
-							+ "=" + URLEncoder.encode("ego_sparkline", 
-					 				 VisualizationController.URL_ENCODING_SCHEME).toString()						 				 
 		 				    + "&"
 		 				    + VisualizationFrameworkConstants.RENDER_MODE_URL_HANDLE
 							+ "=" + URLEncoder.encode(VisualizationFrameworkConstants.STANDALONE_RENDER_MODE_URL_VALUE, 
@@ -600,18 +612,27 @@ public class VisualizationCodeGenerator {
 	
 	private String generateDataTable() {
 		
-		String csvDownloadURL = ""; 
+		String csvDownloadURLHref = ""; 
 		
 		try {
-			csvDownloadURL = getCSVDownloadURL();
+			if (getCSVDownloadURL() != null) {
+				
+				csvDownloadURLHref = "<a href=\"" + getCSVDownloadURL() + "\">(.CSV File)</a>";
+				
+			} else {
+				
+				csvDownloadURLHref = "";
+				
+			}
+
 		} catch (UnsupportedEncodingException e) {
-			csvDownloadURL = "#";
+			csvDownloadURLHref = "";
 		}
 		
 		StringBuilder dataTable = new StringBuilder();
 		
 		dataTable.append("<table id='sparkline_data_table'>" +
-								"<caption>Publications per year <a href=\"" + csvDownloadURL + "\">(.CSV File)</a></caption>" +
+								"<caption>Publications per year " + csvDownloadURLHref + "</caption>" +
 								"<thead>" +
 										"<tr>" +
 											"<th>Year</th>" +

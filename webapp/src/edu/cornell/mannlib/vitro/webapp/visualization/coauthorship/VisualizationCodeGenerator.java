@@ -354,13 +354,23 @@ public class VisualizationCodeGenerator {
 			int totalUniqueCoAuthors, int renderedFullSparks,
 			String sparklineDisplayOptions) {
 		
-		String csvDownloadURL = ""; 
+		String csvDownloadURLHref = ""; 
 		
 		try {
-			csvDownloadURL = getCSVDownloadURL();
+			if (getCSVDownloadURL() != null) {
+				
+				csvDownloadURLHref = "<a href=\"" + getCSVDownloadURL() + "\" class=\"inline_href\">(.CSV File)</a>";
+				
+			} else {
+				
+				csvDownloadURLHref = "";
+				
+			}
+
 		} catch (UnsupportedEncodingException e) {
-			csvDownloadURL = "#";
+			csvDownloadURLHref = "";
 		}
+		
 		
 		visualizationCode.append("var fullSparklineView = new google.visualization.DataView(data);\n" +
 								 "fullSparklineView.setColumns([1]);\n");
@@ -378,7 +388,7 @@ public class VisualizationCodeGenerator {
 												 "+ ' <span class=\"sparkline_range\">" +
 												"(" + minPubYearConsidered + " - " + currentYear + ")" +
 												"</span> '" +
-												"+ ' <a href=\"" + csvDownloadURL + "\" class=\"inline_href\">(.CSV File)</a>';" +
+												"+ ' " + csvDownloadURLHref + " ';" +
 								"$('#" + visDivNames.get("FULL_SPARK") + " td.sparkline_text').html(allSparksText);");
 		
 		visualizationCode.append("}\n ");
@@ -467,31 +477,37 @@ public class VisualizationCodeGenerator {
 		
 		StringBuilder divContextCode = new StringBuilder();
 		
-		try {
+		String csvDownloadURLHref = ""; 
+		
+		if (yearToUniqueCoauthorsCount.size() > 0) {
 			
-			String downloadFileCode;
-			if (yearToUniqueCoauthorsCount.size() > 0) {
-				
-				
-				String downloadURL = getCSVDownloadURL();
-				
-				downloadFileCode = "Download data as <a href='" + downloadURL + "'>.csv</a> file.<br />";
-				
-				valueObjectContainer.setDownloadDataLink(downloadURL);
-			} else {
-				downloadFileCode = "No data available to export.<br />";
+			try {
+				if (getCSVDownloadURL() != null) {
+					
+					csvDownloadURLHref = "Download data as <a href='" + getCSVDownloadURL() + "'>.csv</a> file.<br />";
+					valueObjectContainer.setDownloadDataLink(getCSVDownloadURL());
+					
+				} else {
+					
+					csvDownloadURLHref = "";
+					
+				}
+
+			} catch (UnsupportedEncodingException e) {
+				csvDownloadURLHref = "";
 			}
 			
-			String tableCode = generateDataTable();
 			
-			divContextCode.append("<p>" + tableCode +
-								  downloadFileCode + "</p>");
-			
-			valueObjectContainer.setTable(tableCode);
-
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+		} else {
+			csvDownloadURLHref = "No data available to export.<br />";
 		}
+		
+		String tableCode = generateDataTable();
+		
+		divContextCode.append("<p>" + tableCode +
+					csvDownloadURLHref + "</p>");
+		
+		valueObjectContainer.setTable(tableCode);
 		
 		return divContextCode.toString();
 		
@@ -523,7 +539,7 @@ public class VisualizationCodeGenerator {
 		
 			return downloadURL;
 		} else {
-			return "#";
+			return null;
 		}
 		
 	}
@@ -537,20 +553,6 @@ public class VisualizationCodeGenerator {
 		
 		String fullTimelineLink;
 		if (yearToUniqueCoauthorsCount.size() > 0) {
-//			String fullTimelineNetworkURL = uri.toString() + "?" + 
-//										VisualizationFrameworkConstants.INDIVIDUAL_URI_URL_HANDLE + 
-//										 "=" + URLEncoder.encode(individualURI, 
-//												 				 VisualizationController.URL_ENCODING_SCHEME).toString() +
-//										 "&" +
-//										 "vis" +
-//										 "=" + URLEncoder.encode(VisualizationController
-//												 						.PERSON_PUBLICATION_COUNT_VIS_URL_VALUE, 
-//												 				 VisualizationController.URL_ENCODING_SCHEME).toString() +
-//										 "&" +
-//										 VisualizationFrameworkConstants.RENDER_MODE_URL_HANDLE + 
-//										 "=" + URLEncoder.encode(VisualizationFrameworkConstants.STANDALONE_RENDER_MODE_URL_VALUE, 
-//								 				 				 VisualizationController.URL_ENCODING_SCHEME).toString();
-			
 			
 			String fullTimelineNetworkURL = contextPath
 							+ "/admin/visQuery"

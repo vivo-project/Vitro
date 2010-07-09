@@ -167,7 +167,7 @@
 		        	<c:set var='authorsText' value='multi-author' />
 		        </c:if>
 		        
-		        <span id="no_coauthorships">Currently there are no ${authorsText} papers for <span id="no_coauthorships_person">this author</span> in the VIVO database.</span>
+		        <span id="no_coauthorships">Currently there are no ${authorsText} papers for <span id="no_coauthorships_person" class="author_name">this author</span> in the VIVO database.</span>
 		    </c:otherwise>
 		</c:choose>
 		
@@ -251,7 +251,11 @@ $(document).ready(function(){
 							  jQuery.parseJSON(getWellFormedURLs("${requestScope.egoURIParam}", "profile_info")));
 
 	<c:if test='${numOfCoAuthorShips <= 0}'>
-		setProfileName('no_coauthorships_person', $('#ego_label').text());
+
+		if ($('#ego_label').text().length > 0) {
+			setProfileName('no_coauthorships_person', $('#ego_label').text());
+		}
+		
 	</c:if>	
 
 	
