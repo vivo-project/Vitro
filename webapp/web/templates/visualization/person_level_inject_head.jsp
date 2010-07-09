@@ -1,3 +1,5 @@
+<%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
+
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c" %>
 
 <c:set var="portalBean" value="${requestScope.portalBean}" />
