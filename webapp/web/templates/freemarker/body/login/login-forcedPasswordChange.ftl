@@ -9,13 +9,13 @@ ${stylesheets.addFromTheme("/login.css")}
        <h2>Create Your New Password</h2>
        
        <#if errorMessage??>
-           <div id="errorAlert"><img src="${alertImageUrl}" width="24" height="24" alert="Error alert icon"/>
+           <div id="errorAlert"><img src="${urls.siteIcons}/iconAlert.png" width="24" height="24" alert="Error alert icon"/>
                   <p>${errorMessage}</p>
            </div>
        </#if>
        
-       <form action="${formAction}" method="post" onsubmit="return isReasonableNewPassword(this)">
-              <label for="newPassword">Password</label>
+       <form action="${formAction}" method="post">
+              <label for="newPassword">New Password</label>
               <input type="password" name="newPassword"  />
               <p class="passwordNote">Please enter a password with more than 5 characters</p>
               <label for="confirmPassword">Confirm Password</label>

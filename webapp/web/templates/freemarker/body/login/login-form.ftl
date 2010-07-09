@@ -2,10 +2,19 @@
 
 <#-- Log in template for accessing site admin -->
 
-${stylesheets.addFromTheme("/login.css")}
-<noscript><p class="alertNoJavaScript">JavaScript must be enabled in order for you to log in. However, it seems JavaScript is either disabled or not supported by your browser. Please enable JavaScript by changing your browser options.</p></noscript>
 
-<div id="formLogin" class="pageBodyGroup">
+
+${stylesheets.addFromTheme("/login.css")}
+<noscript>
+	<div id="javascriptDisableWrapper">
+		<div id="javascriptDisableContent">
+			<img src="${urls.siteIcons}/iconAlertBig.png" alt="Alert Icon"/>
+			<p>In order to edit VIVO content, you'll need to enable JavaScript.</p>
+		</div>
+	</div>
+</noscript>
+
+<div id="formLogin" class="pageBodyGroup hidden" >
 
        <h2>Log in</h2>
        
@@ -14,12 +23,12 @@ ${stylesheets.addFromTheme("/login.css")}
        </#if>
        
        <#if errorMessage??>
-           <div id="errorAlert"><img src="${alertImageUrl}" width="24" height="24" alert="Error alert icon"/>
+           <div id="errorAlert"><img src="${urls.siteIcons}/iconAlert.png"  alert="Error alert icon"/>
                   <p>${errorMessage}</p>
            </div>
        </#if>
        
-       <form action="${formAction}" method="post" onsubmit="return isValidLogin(this)">
+       <form action="${formAction}" method="post">
               <label for="loginName">Email</label>
               <input name="loginName" type="text" value="${loginName}"  />
               <label for="loginPassword">Password</label>
@@ -27,4 +36,7 @@ ${stylesheets.addFromTheme("/login.css")}
               <input name="loginForm"  type="submit" class="submit" value="Log in"/>
        </form>
 </div>
+
+
+
 
