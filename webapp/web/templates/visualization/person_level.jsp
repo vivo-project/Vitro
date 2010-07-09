@@ -162,7 +162,12 @@
 		    </c:when>
 		    <c:otherwise>
 		        </h2>
-		        <span id="no_coauthorships">Currently there are no multi-author papers for <span id="no_coauthorships_person">this author</span> in the VIVO database.</span>
+		        
+		        <c:if test='${numOfAuthors > 0}'>
+		        	<c:set var='authorsText' value='multi-author' />
+		        </c:if>
+		        
+		        <span id="no_coauthorships">Currently there are no ${authorsText} papers for <span id="no_coauthorships_person">this author</span> in the VIVO database.</span>
 		    </c:otherwise>
 		</c:choose>
 		
@@ -208,53 +213,48 @@
 
 </c:if>
 
-<div class="vis_stats">
+<c:if test='${numOfAuthors > 0}'>
 
-<h2 class="sub_headings">Tables</h2>
-
-	<div class="vis-tables">
-		<p id="publications_table_container" class="datatable">
-			${egoPubSparkline.table} 
-		</p>
-	</div>
+	<div class="vis_stats">
 	
-	<c:if test='${numOfCoAuthorShips > 0}'>
-
+	<h2 class="sub_headings">Tables</h2>
+	
 		<div class="vis-tables">
-			<p id="coauth_table_container" class="datatable"></p>
+			<p id="publications_table_container" class="datatable">
+				${egoPubSparkline.table} 
+			</p>
 		</div>
+		
+		<c:if test='${numOfCoAuthorShips > 0}'>
 	
-	</c:if>
+			<div class="vis-tables">
+				<p id="coauth_table_container" class="datatable"></p>
+			</div>
+		
+		</c:if>
+	
+	</div>
+</c:if>
 
 </div>
-
-
-</div>
-
-
 
 <script language="JavaScript" type="text/javascript">
 $(document).ready(function(){
 
-	<c:choose>
-	    <c:when test='${numOfCoAuthorShips > 0}'>
+		<c:if test='${numOfCoAuthorShips > 0}'>
 	    	$("#coauth_table_container").empty().html('<img id="loadingData" with="auto" src="${loadingImageLink}" />');
-	    </c:when>
-	    <c:otherwise>
-	    	setProfileName('no_coauthorships_person', $('#ego_label').text());
-	    </c:otherwise>
-	</c:choose>
-
-	
-	
+	    </c:if>
+	    	
 	processProfileInformation("ego_label", 
 							  "ego_moniker",
 							  "ego_profile_image",
 							  jQuery.parseJSON(getWellFormedURLs("${requestScope.egoURIParam}", "profile_info")));
 
-	
+	<c:if test='${numOfCoAuthorShips <= 0}'>
+		setProfileName('no_coauthorships_person', $('#ego_label').text());
+	</c:if>	
 
-	 
+	
 
 	  
 

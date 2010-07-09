@@ -81,7 +81,7 @@
 			margin-left:24%;
 			margin-top:-2%;
 			position:absolute;
-			width:380px;
+			/*width:380px;*/
 		}
 	</style>
 	
