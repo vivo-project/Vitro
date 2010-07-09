@@ -261,6 +261,13 @@ $(document).ready(function(){
 							  "ego_profile_image",
 							  jQuery.parseJSON(getWellFormedURLs("${requestScope.egoURIParam}", "profile_info")));
 
+	/*
+	if ($('#profileMoniker').text().length > 30) {
+		//$('#profileMoniker').text($('#profileMoniker').text().substr(0, 30) + "...");
+		console.log("what");
+	}*/
+
+	
 	<c:if test='${numOfCoAuthorShips <= 0}'>
 
 		if ($('#ego_label').text().length > 0) {

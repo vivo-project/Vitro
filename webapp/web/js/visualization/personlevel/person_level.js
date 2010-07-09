@@ -104,13 +104,26 @@ function setProfileImage(imageContainerID, rawPath, contextPath) {
 
 }
 
-function setProfileMoniker(monikerContainerID, moniker) {
+function setProfileMoniker(monikerContainerID, moniker, doEllipsis) {
 
 	if (monikerContainerID == "") {
 		return;
 	}
 
-	$("#" + monikerContainerID).empty().text(moniker);
+	var finalDisplayMoniker;
+	
+	if (moniker.length > 30 && doEllipsis) {
+		
+		finalDisplayMoniker = moniker.substr(0,30) + "...";
+		
+	} else {
+		
+		finalDisplayMoniker = moniker;
+		
+	}
+	
+	$("#" + monikerContainerID).empty().text(finalDisplayMoniker);
+	$("#" + monikerContainerID).attr('title', moniker);
 
 }
 
@@ -128,7 +141,8 @@ function setProfileName(nameContainerID, name) {
 function processProfileInformation(nameContainerID,
 		monikerContainerID,
 		imageContainerID,
-		profileInfoJSON) {
+		profileInfoJSON,
+		doMonikerEllipsis) {
 
 
 	var name, imageRawPath, imageContextPath, moniker;
@@ -156,7 +170,7 @@ function processProfileInformation(nameContainerID,
 	});
 
 	setProfileName(nameContainerID, name);
-	setProfileMoniker(monikerContainerID, moniker);
+	setProfileMoniker(monikerContainerID, moniker, doMonikerEllipsis);
 	setProfileImage(imageContainerID, imageRawPath, imageContextPath);
 
 }
@@ -224,7 +238,8 @@ function nodeClickedJS(json){
 		processProfileInformation("", 
 				"profileMoniker",
 				"profileImage",
-				jQuery.parseJSON(getWellFormedURLs(obj.url, "profile_info")));
+				jQuery.parseJSON(getWellFormedURLs(obj.url, "profile_info")),
+				true);
 
 	} else{
 		$("#profileUrl").attr("href","#");
