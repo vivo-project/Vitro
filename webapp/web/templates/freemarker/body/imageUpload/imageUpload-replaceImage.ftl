@@ -22,7 +22,7 @@ ${stylesheets.addFromTheme("/uploadImages.css")}
        <h2>Photo Upload</h2>
        <div id="photoUploadDefaultImageContainer">
               <h6>Current Photo</h6>
-              <img src="${thumbnailUrl}" width="115" height="115" />
+              <img src="${thumbnailUrl}" width="115" />
        <a href='javascript:delete_photo("${deleteUrl}");'>Delete photo</a></div>
        <div id="photoUploadForm">
               <form action="${formAction}" enctype="multipart/form-data" method="post">
