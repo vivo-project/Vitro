@@ -47,6 +47,8 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         public static String MODTIME    = "modTime";
         /** Name of entity, tab or vclass */
         public static String NAME       = "name";
+        /** rdfs:label unanalyzed */
+        public static String NAMEUNANALYZED = "nameunanalyzed" ;
         /** Name of entity, unstemmed */
         public static String NAMEUNSTEMMED       = "nameunstemmed";
         /** Name of portal */
@@ -116,9 +118,13 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         doc.add( name );
         
         Field nameUn = new Field(term.NAMEUNSTEMMED, value, 
-        						Field.Store.YES, Field.Index.ANALYZED);        
+        						Field.Store.NO, Field.Index.ANALYZED);        
         nameUn.setBoost( NAME_BOOST );
         doc.add( nameUn );
+
+        Field nameUnanalyzed = new Field(term.NAMEUNANALYZED, value.toLowerCase(), 
+				Field.Store.NO, Field.Index.NOT_ANALYZED);        
+        doc.add( nameUnanalyzed );
 
         //boost for entity
         if( ent.getSearchBoost() != null && ent.getSearchBoost() != 0 )
