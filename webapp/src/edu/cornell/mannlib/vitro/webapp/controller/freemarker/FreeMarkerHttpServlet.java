@@ -105,6 +105,8 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         // load templates from. Thus configurations are associated with themes rather than portals.
         Map<String, Configuration> themeToConfigMap = (Map<String, Configuration>) (getServletContext().getAttribute("themeToConfigMap"));
         
+        if( themeToConfigMap == null )
+        	log.error("The templating system is not configured correctly. Make sure that you have the FreeMarkerSetup context listener in your web.xml");
         if (themeToConfigMap.containsKey(themeDir)) {
             return themeToConfigMap.get(themeDir);
         } else {

@@ -6,7 +6,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Thread that executes the methods in IndexBuilder.
+ * Thread that executes the methods in IndexBuilder.  
  * 
  * @author bdc34
  *
@@ -36,9 +36,11 @@ public class IndexBuilderThread extends Thread{
 					log.debug("full re-index requested");
 					indexBuilder.indexRebuild();
 				}else{
-					log.debug("updated requested");
-					Thread.sleep(250);
-					indexBuilder.updatedIndex();
+					if( indexBuilder != null && indexBuilder.isThereWorkToDo() ){						
+						Thread.sleep(250); //wait a bit to let a bit more work to come into the queue
+						log.debug("work found for IndexBuilder, starting update");
+						indexBuilder.updatedIndex();
+					}
 				}
 			}catch (Throwable e) {
 				log.error(e,e);

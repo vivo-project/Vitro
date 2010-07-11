@@ -124,6 +124,10 @@
     <listener-class> edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup </listener-class>
   </listener>
 
+  <listener>
+    <listener-class> edu.cornell.mannlib.vitro.webapp.auth.policy.setup.VivoPolicySetup</listener-class>
+  </listener>
+  
 	<listener>
 		<listener-class>
 	        edu.cornell.mannlib.vitro.webapp.auth.policy.setup.SelfEditingPolicySetup
@@ -150,7 +154,7 @@
     <listener-class> edu.cornell.mannlib.vitro.webapp.auth.policy.setup.DbAdminEditingPolicySetup
     </listener-class>
   </listener>
-
+ 
   <listener>
     <listener-class>
         edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreeMarkerSetup
