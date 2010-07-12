@@ -58,16 +58,23 @@ public class EditSubmission {
         this.urisFromForm = new HashMap<String,String>();
         for( String var: editConfig.getUrisOnform() ){     
             String[] valuesArray = queryParameters.get( var );
+            String uri = null;
             List<String> values = (valuesArray != null) ? Arrays.asList(valuesArray) : null;
             if( values != null && values.size() > 0){
                 if(  values.size() == 1 ) {
-                    urisFromForm.put(var,values.get(0));
+                	uri = values.get(0);                    
                 } else if( values.size() > 1 ){
-                    urisFromForm.put(var,values.get(0));
-                    log.error("Cannot yet handle multiple URIs for a single field, useing first URI on list");
+                	uri = values.get(0);
+                    log.error("Cannot yet handle multiple URIs for a single field, using first URI on list");
                 } 
+                urisFromForm.put(var,uri);
             } else {
                 log.debug("No value found for query parameter " + var);              
+            }
+            //check to see if a URI field from the form was blank but was intended to create a new URI
+            if( uri != null && uri.length() == 0 && editConfig.getNewResources().containsKey(var) ){
+            	log.debug("A new resource URI will be made for var " + var + " since it was blank on the form.");
+            	urisFromForm.remove(var);
             }
         }
         this.literalsFromForm =new HashMap<String,Literal>();        
