@@ -12,14 +12,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.ontology.OntProperty;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
@@ -27,9 +21,6 @@ import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
@@ -45,9 +36,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils;
  */
 public class OntologyUpdater {
 
-	
-	
-	private final Log log = LogFactory.getLog(OntologyUpdater.class);
+	//private final Log log = LogFactory.getLog(OntologyUpdater.class);
 	
 	private OntologyUpdateSettings settings;
 	private OntologyChangeLogger logger;
@@ -55,10 +44,8 @@ public class OntologyUpdater {
 	
 	public OntologyUpdater(OntologyUpdateSettings settings) {
 		this.settings = settings;
-		this.logger = new SimpleOntologyChangeLogger(settings.getLogFile(),
-													settings.getErrorLogFile());
-		this.record = new SimpleOntologyChangeRecord(
-				settings.getAddedDataFile(), settings.getRemovedDataFile());
+		this.logger = new SimpleOntologyChangeLogger(settings.getLogFile(),	settings.getErrorLogFile());
+		this.record = new SimpleOntologyChangeRecord(settings.getAddedDataFile(), settings.getRemovedDataFile());
 	}
 	
 	public boolean update() throws IOException {	
@@ -67,8 +54,14 @@ public class OntologyUpdater {
 		
 		boolean updateRequired = updateRequired();
 		if (updateRequired) {
-			performUpdate();
 			
+			try {
+			     performUpdate();
+			} catch (Exception e) {
+				 logger.logError(e.getMessage());
+				 e.printStackTrace();
+			}
+
 			if (!logger.errorsWritten()) {
 				// add assertions to the knowledge base showing that the 
 				// update was successful, so we don't need to run it again.
@@ -78,6 +71,7 @@ public class OntologyUpdater {
 			
 			record.writeChanges();
 			logger.closeLogs();
+
 		}
 		
 		return updateRequired;
@@ -86,20 +80,17 @@ public class OntologyUpdater {
 	
 	private void performUpdate() throws IOException {
 		
-		performSparqlConstructs(settings.getSparqlConstructsDir(),
-				                settings.getOntModelSelector().getABoxModel());
+		performSparqlConstructs(settings.getSparqlConstructsDir(), settings.getOntModelSelector().getABoxModel());
 		
 		List<AtomicOntologyChange> rawChanges = getAtomicOntologyChanges();
 		
-		AtomicOntologyChangeLists changes = 
-				new AtomicOntologyChangeLists(rawChanges, 
-						settings.getNewTBoxModel(), 
-						settings.getOldTBoxModel());
-		
-		//process the TBox before the ABox
-		updateTBoxAnnotations();
-		
-		updateABox(changes);
+		AtomicOntologyChangeLists changes = new AtomicOntologyChangeLists(rawChanges, 
+						                                                  settings.getNewTBoxModel(), 
+						                                                  settings.getOldTBoxModel());
+		   //process the TBox before the ABox
+	       updateTBoxAnnotations();
+
+    	   updateABox(changes);
 		
 	}
 	
@@ -195,7 +186,8 @@ public class OntologyUpdater {
 	
 	private void updateABox(AtomicOntologyChangeLists changes) 
 			throws IOException {
-		// TODO get models from somewhere
+		
+
 		OntModel oldTBoxModel = settings.getOldTBoxModel();
 		OntModel newTBoxModel = settings.getNewTBoxModel();
 		OntModel ABoxModel = settings.getOntModelSelector().getABoxModel();
@@ -204,7 +196,7 @@ public class OntologyUpdater {
 				settings.getNewTBoxAnnotationsModel(), logger, record);
 		aboxUpdater.processPropertyChanges(changes.getAtomicPropertyChanges());
 		aboxUpdater.processClassChanges(changes.getAtomicClassChanges());
-		// run additional SPARQL CONSTRUCTS 
+ 
 	}
 	
 	private void updateTBoxAnnotations() throws IOException {
@@ -255,6 +247,7 @@ public class OntologyUpdater {
 	
 	private void assertSuccess() throws FileNotFoundException, IOException {
 		try {
+			
 		    Model m = settings.getOntModelSelector().getApplicationMetadataModel();
 		    File successAssertionsFile = 
 		    	new File(settings.getSuccessAssertionsFile()); 
@@ -292,35 +285,33 @@ public class OntologyUpdater {
 				OntModel oldTboxModel) throws IOException {
 			
 			Iterator<AtomicOntologyChange> listItr = changeList.iterator();
-			while(listItr.hasNext()){
+			
+			while(listItr.hasNext()) {
 				AtomicOntologyChange changeObj = listItr.next();
-				if(changeObj.getSourceURI() != null){
-					if(oldTboxModel.getOntProperty(changeObj.
-							getSourceURI()) != null){
+				if (changeObj.getSourceURI() != null){
+			
+					if (oldTboxModel.getOntProperty(changeObj.getSourceURI()) != null){
 						atomicPropertyChanges.add(changeObj);
 					}
-					else if(oldTboxModel.getOntClass(changeObj.
-							getSourceURI()) != null) {
+					else if (oldTboxModel.getOntClass(changeObj.getSourceURI()) != null) {
 						atomicClassChanges.add(changeObj);
 					}
 					else{
 						logger.logError("Source URI is neither a Property" +
-								" nor a Class. " + "Change Object skipped");
+								" nor a Class. " + "Change Object skipped for sourceURI: " + changeObj.getSourceURI());
 					}
 					
 				}
 				else if(changeObj.getDestinationURI() != null){
-					if(newTboxModel.getOntProperty(changeObj.
-							getDestinationURI()) != null){
+					
+					if (newTboxModel.getOntProperty(changeObj.getDestinationURI()) != null) {
 						atomicPropertyChanges.add(changeObj);
-					}
-					else if(newTboxModel.getOntClass(changeObj.
-							getDestinationURI()) != null){
+					} else if(newTboxModel.getOntClass(changeObj.
+						getDestinationURI()) != null) {
 						atomicClassChanges.add(changeObj);
-					}
-					else{
+					} else{
 						logger.logError("Destination URI is neither a Property" +
-								" nor a Class. " + "Change Object skipped");
+								" nor a Class. " + "Change Object skipped for destinationURI: " + changeObj.getDestinationURI());
 					}
 				}
 				else{

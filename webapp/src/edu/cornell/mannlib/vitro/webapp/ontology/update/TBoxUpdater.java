@@ -22,8 +22,8 @@ import com.hp.hpl.jena.shared.Lock;
 */ 
 public class TBoxUpdater {
 
-	private OntModel oldTboxModel;
-	private OntModel newTboxModel;
+	private OntModel oldTboxAnnotationsModel;
+	private OntModel newTboxAnnotationsModel;
 	private OntModel siteModel;
 	private OntologyChangeLogger logger;  
 	private OntologyChangeRecord record;
@@ -32,8 +32,8 @@ public class TBoxUpdater {
 	 * 
 	 * Constructor 
 	 *  
-	 * @param   oldTboxModel - previous version of the ontology
-	 * @param   newTboxModel - new version of the ontology
+	 * @param   oldTboxAnnotationsModel - previous version of the annotations in the ontology
+	 * @param   newTboxAnnotationsModel - new version of the annotations in the ontology
 	 * @param   siteModel    - the knowledge base to be updated
 	 * @param   logger       - for writing to the change log
 	 *                         and the error log.
@@ -41,14 +41,14 @@ public class TBoxUpdater {
 	 *                         and the retractions model.
 	 *                    
 	 */
-	public TBoxUpdater(OntModel oldTboxModel,
-			           OntModel newTboxModel,
+	public TBoxUpdater(OntModel oldTboxAnnotationsModel,
+			           OntModel newTboxAnnotationsModel,
 			           OntModel siteModel,
 		               OntologyChangeLogger logger,
 		               OntologyChangeRecord record) {
 		
-		this.oldTboxModel = oldTboxModel;
-		this.newTboxModel = newTboxModel;
+		this.oldTboxAnnotationsModel = oldTboxAnnotationsModel;
+		this.newTboxAnnotationsModel = newTboxAnnotationsModel;
 		this.siteModel = siteModel;
 		this.logger = logger;
 		this.record = record;
@@ -56,12 +56,12 @@ public class TBoxUpdater {
 	
 	/**
 	 * 
-	 * Update a knowledge base to align with changes vitro annotation property default 
+	 * Update a knowledge base to align with changes to vitro annotation property default 
 	 * values in a new version of the ontology. The two versions of the ontology and the
 	 * knowledge base to be updated are provided in the class constructor and are
 	 * referenced via class level variables. 
 	 *                    
-	 * If the default value (i.e. the value that is provided in the vivo-core-
+	 * If the default value (i.e. the value that is provided in the vivo-core 
 	 * annotations files) of a vitro annotation property has been changed for a vivo
 	 * core class, and that default value has not been changed in the site knowledge
 	 * base, then update the value in the site knowledge base to be the new default.
@@ -76,7 +76,7 @@ public class TBoxUpdater {
 	 *  Writes to the change log file, the error log file, and the incremental change
 	 *  knowledge base.                  
 	 *  
-	 *  Note: as specified, this method for now assume that no new vitro annotation
+	 *  Note: as specified, this method for now assumes that no new vitro annotation
 	 *  properties have been introduced. This should be updated for future versions.
 	 */
 	public void updateVitroPropertyDefaultValues() throws IOException {
@@ -92,8 +92,8 @@ public class TBoxUpdater {
          //  if the default has changed in the new version of the ontology AND if 
          //  the site hasn't overidden the previous default in their knowledge base.
     		    
-		  StmtIterator iter = oldTboxModel.listStatements();
-		  
+		  StmtIterator iter = oldTboxAnnotationsModel.listStatements();
+		  		  
 		  int stmtCount = 0;
 		  
 		  while (iter.hasNext()) {
@@ -103,43 +103,53 @@ public class TBoxUpdater {
 			 Resource subject = stmt.getSubject();
 			 Property predicate = stmt.getPredicate();
 			 RDFNode oldObject = stmt.getObject();
+			 			 
+			 NodeIterator newObjects = newTboxAnnotationsModel.listObjectsOfProperty(subject, predicate);
 			 
-			 NodeIterator objects = newTboxModel.listObjectsOfProperty(subject, predicate);
-			 
-			 if ((objects == null) || (!objects.hasNext()) ) {
+			 if ((newObjects == null) || (!newObjects.hasNext()) ) {
 				 retractions.add(siteModel.listStatements(subject, predicate, (RDFNode) null));
-				 //logger.log("Error: found a statement for subject = " + subject.getURI() +
-				 //  	 " and property = "  + predicate.getURI() +
-				 //		 " in the old version but not the new version of the ontology.");
 				 continue;			 			 
 			 }
 			
-			 RDFNode newObject = objects.next();
-			 if (objects.hasNext()) {
-				 logger.logError("Error: found " + objects.toList().size() +
+			 RDFNode newObject = newObjects.next();
+			 
+			 int i = 1;
+			 while (newObjects.hasNext()) {
+                 i++;
+                 newObjects.next();
+             } 
+			 
+			 if (i > 1) {
+				 logger.log("WARNING: found " + i +
 						 " statements with subject = " + subject.getURI() + 
 						 " and property = " + predicate.getURI() +
-						 " in the new version of the ontology. (maximum of one is expected)");
+						 " in the new version of the annotations ontology. (maximum of one is expected)");
 				 continue; 
 			 }
-			 
+			 			 			 
 			 if (!newObject.equals(oldObject)) {
-				 objects = siteModel.listObjectsOfProperty(subject,predicate);
+				 NodeIterator siteObjects = siteModel.listObjectsOfProperty(subject,predicate);
 				 
-				 if (!objects.hasNext()) {
+				 if (siteObjects == null || !siteObjects.hasNext()) {
 					 continue;
 				 }
-				 
-				 RDFNode siteObject = objects.next();
-				 if (objects.hasNext()) {
-					 logger.logError("Warning: found " + objects.toList().size() +
+			
+				 RDFNode siteObject = siteObjects.next();
+
+		         i = 1;
+				 while (siteObjects.hasNext()) {
+					 i++; 
+					 siteObjects.next();
+				 } 
+
+				 if (i > 1) {
+					 logger.log("WARNING: found " + i +
 							 " statements with subject = " + subject.getURI() + 
 							 " and property = " + predicate.getURI() +
-							 " in the site model (maximum of one is expected). +" +
-							 " did not perform any update on this property");
-					 continue;					 
+							 " in the site annotations model. (maximum of one is expected). "); 
+					 continue; 
 				 }
-				 
+				 	 
 				 if (siteObject.equals(oldObject)) {
 	        	    try {
 	        	    	StmtIterator it = siteModel.listStatements(subject, predicate, (RDFNode)null);
@@ -169,7 +179,7 @@ public class TBoxUpdater {
 				 }
 			 }		  
 		   }
-		  
+		     
 		   Model actualAdditions = additions.difference(retractions);
 		   siteModel.add(actualAdditions);
 		   record.recordAdditions(actualAdditions);
@@ -180,7 +190,7 @@ public class TBoxUpdater {
 		   // log summary of changes
 		   if (actualAdditions.size() > 0) {
 	           logger.log("Updated the default vitro annotation value for " + 
-	        		   actualAdditions.size() + " statments in the knowledge base.");
+	        		   actualAdditions.size() + " statements in the knowledge base.");
 		   }
 		   
            long numRemoved = actualRetractions.size() - actualAdditions.size();
@@ -193,15 +203,22 @@ public class TBoxUpdater {
 		    //     into the site model.
 		    //		  
 
-			Model newAnnotationSettings = newTboxModel.difference(oldTboxModel);
+			Model newAnnotationSettings = newTboxAnnotationsModel.difference(oldTboxAnnotationsModel);
 			Model newAnnotationSettingsToAdd = ModelFactory.createDefaultModel();
 			StmtIterator newStmtIt = newAnnotationSettings.listStatements();
 			while (newStmtIt.hasNext()) {
 				Statement stmt = newStmtIt.next();
 				if (!siteModel.contains(stmt)) {
 					newAnnotationSettingsToAdd.add(stmt);
+					
+					// TODO remove this for production
+					logger.log( "adding Statement: subject = " + stmt.getSubject().getURI() +
+						    " property = " + stmt.getPredicate().getURI() +
+		                    " object = " + (stmt.getObject().isLiteral() ?  ((Literal)stmt.getObject()).getLexicalForm() 
+		                		                                          : ((Resource)stmt.getObject()).getURI()));	
 				}
 			}
+			
 			siteModel.add(newAnnotationSettingsToAdd);
 			record.recordAdditions(newAnnotationSettingsToAdd);
             
@@ -212,16 +229,6 @@ public class TBoxUpdater {
 	            logger.log("Added " + newAnnotationSettingsToAdd.size() + " new annotation property setting" + (plural ? "s" : "") + " to the knowledge base. This includes " +
 	                         "existing annotation properties applied to existing classes where they weren't applied before, or existing " +
 	                         "properties applied to new classes. No new annotation properties have been introduced.");
-			}
-            //details
-            
-			while (iter.hasNext()) {
-				Statement statement = iter.next();
-				
-				logger.log( "added Statement: subject = " + statement.getSubject().getURI() +
-						    " property = " + statement.getPredicate().getURI() +
-		                    " object = " + (statement.getObject().isLiteral() ? ((Resource)statement.getObject()).getURI() 
-		                		                                          : ((Literal)statement.getObject()).getLexicalForm()));	
 			}
 		   
 	} finally {

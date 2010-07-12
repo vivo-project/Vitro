@@ -110,7 +110,7 @@ public class ABoxUpdater {
 
 	/**
 	 * 
-	 * Update a knowledge based on a class rename in the ontology. All references to the
+	 * Update the knowledge base for a class rename in the ontology. All references to the
 	 * old class URI in either the subject or the object position of a statement are
 	 * changed to use the new class URI. 
 	 *  
@@ -212,7 +212,7 @@ public class ABoxUpdater {
 
 	/**
 	 * 
-	 * Examine a knowledge based on a class addition to the ontology and
+	 * Examine the knowledge base for a class addition to the ontology and
 	 * add messages to the change log indicating where manual review is 
 	 * recommended. If the added class has a direct parent in the new ontology
 	 * that is not OWL.Thing, and if the knowledge base contains individuals
@@ -275,6 +275,7 @@ public class ABoxUpdater {
 		}
 	}
 
+
 	/**
 	 * 
 	 * Update a knowledge base to account for a class deletion in the ontology.
@@ -327,6 +328,7 @@ public class ABoxUpdater {
 		AtomicOntologyChange chg = new AtomicOntologyChange(deletedClass.getURI(), replacementClass.getURI(), AtomicChangeType.RENAME);
 		renameClass(chg);		
 	}
+	
 	
 	public void processPropertyChanges(List<AtomicOntologyChange> changes) throws IOException {
 		Iterator<AtomicOntologyChange> propItr = changes.iterator();
@@ -452,7 +454,7 @@ public class ABoxUpdater {
 		record.recordRetractions(renamePropRetractModel);
 		
 		if (renamePropRetractModel.size() > 0) {
-			logger.log(renamePropRetractModel.size() + " statment" + 
+			logger.log(renamePropRetractModel.size() + " statement" + 
 					((renamePropRetractModel.size() > 1) ? "s" : "") +
 					" with predicate " + propObj.getSourceURI() + " " + 
 					((renamePropRetractModel.size() > 1) ? "were" : "was") 
