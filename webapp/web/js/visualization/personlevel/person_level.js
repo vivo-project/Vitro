@@ -17,7 +17,6 @@ function getWellFormedURLs(given_uri, type) {
 			dataType: "text",
 			async: false,
 			success:function(data){
-			// console.log("COA - " + data);
 		}
 		}).responseText;
 
@@ -71,18 +70,17 @@ function getWellFormedURLs(given_uri, type) {
 $.fn.image = function(src, successFunc, failureFunc){
 	return this.each(function(){ 
 		var profileImage = new Image();
-		profileImage.src = src;
-		profileImage.width = 90;
 		profileImage.onerror = failureFunc;
 		profileImage.onload = successFunc;
-
+		profileImage.src = src;
 
 		return profileImage;
 	});
 };
 
 function setProfileImage(imageContainerID, rawPath, contextPath) {
-
+	
+	console.log("<---- START IN " + imageContainerID + " +++ FOR +++ " + rawPath + " ------->");
 	
 	if (imageContainerID == "") {
 		return;
@@ -93,14 +91,18 @@ function setProfileImage(imageContainerID, rawPath, contextPath) {
 	var imageContainer = $("#" + imageContainerID);
 	imageContainer.image(imageLink, 
 			function(){
+		console.log("image LOAD FTW");
 		imageContainer.empty().append(this); 
 	},
 	function(){
 		// For performing any action on failure to
 		// find the image.
+		console.log("failed to load the dude's image");
 		imageContainer.empty();
 	}
 	);
+	
+	console.log("<---- END " + rawPath + " ------->");
 
 }
 

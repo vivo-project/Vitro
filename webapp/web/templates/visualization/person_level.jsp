@@ -34,6 +34,11 @@
 
 <style type="text/css">
 
+#profileImage img{
+	width: 90px;
+	height: auto;
+}
+
 #body h1 {
 	margin:0.0em;
 } 
@@ -98,8 +103,11 @@ table.sparkline_wrapper_table td, th {
 #ego_profile_image {
 	float:left;
 	padding-right: 5px;
+}
 
-	/*width: 100px;*/
+#ego_profile_image img{
+	width: 90px;
+	height: auto;
 }
 
 #ego_sparkline {
@@ -261,13 +269,6 @@ $(document).ready(function(){
 							  "ego_profile_image",
 							  jQuery.parseJSON(getWellFormedURLs("${requestScope.egoURIParam}", "profile_info")));
 
-	/*
-	if ($('#profileMoniker').text().length > 30) {
-		//$('#profileMoniker').text($('#profileMoniker').text().substr(0, 30) + "...");
-		console.log("what");
-	}*/
-
-	
 	<c:if test='${numOfCoAuthorShips <= 0}'>
 
 		if ($('#ego_label').text().length > 0) {
