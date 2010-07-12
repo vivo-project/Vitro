@@ -68,7 +68,6 @@ public class AutocompleteController extends FreeMarkerHttpServlet implements Sea
     private static final Log log = LogFactory.getLog(AutocompleteController.class);
 
     private static String QUERY_PARAMETER_NAME = "term";
-    private static String EXCLUDE_URI_PARAMETER_NAME = "excludeUri";
     
     private IndexSearcher searcher = null;
     String NORESULT_MSG = "";    
@@ -122,16 +121,7 @@ public class AutocompleteController extends FreeMarkerHttpServlet implements Sea
             String qtxt = vreq.getParameter(QUERY_PARAMETER_NAME);
             Analyzer analyzer = getAnalyzer(getServletContext());
             
-            // Get the list of individual uris that should be excluded from the search
-            String filters[] = vreq.getParameterValues(EXCLUDE_URI_PARAMETER_NAME);
-            List<String> urisToExclude = null; 
-            if (filters != null) {
-                urisToExclude = Arrays.asList(filters);
-            }
-            
-            //boolean tokenize = "true".equals(vreq.getParameter("tokenize"));
-            
-            Query query = getQuery(vreq, portalFlag, analyzer, indexDir, qtxt, urisToExclude);             
+            Query query = getQuery(vreq, portalFlag, analyzer, indexDir, qtxt);             
             log.debug("query for '" + qtxt +"' is " + query.toString());
 
             if (query == null ) {
@@ -215,7 +205,7 @@ public class AutocompleteController extends FreeMarkerHttpServlet implements Sea
     }
 
     private Query getQuery(VitroRequest request, PortalFlag portalState,
-                       Analyzer analyzer, String indexDir, String querystr, List<String> urisToExclude) throws SearchException{
+                       Analyzer analyzer, String indexDir, String querystr) throws SearchException{
         
         Query query = null;
         try {
@@ -242,18 +232,6 @@ public class AutocompleteController extends FreeMarkerHttpServlet implements Sea
                     BooleanClause.Occur.MUST);
                 boolQuery.add(query, BooleanClause.Occur.MUST);
                 query = boolQuery;
-            }
-            
-            // Uris that should be excluded from the results
-            if (urisToExclude != null) {
-                for (String uri : urisToExclude) {
-                    BooleanQuery boolQuery = new BooleanQuery();
-                    boolQuery.add( query, BooleanClause.Occur.MUST);
-                    boolQuery.add( new TermQuery(
-                        new Term(Entity2LuceneDoc.term.URI, uri)),
-                        BooleanClause.Occur.MUST_NOT);     
-                    query = boolQuery;       
-                }
             }
 
             //if we have a flag/portal query then we add
