@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Iterator;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -49,23 +48,19 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	private final String SUCCESS_ASSERTIONS_FILE = DATA_DIR + "success.n3";
 	private final String SUCCESS_RDF_FORMAT = "N3";
 	private final String DIFF_FILE = DATA_DIR + "diff.tab.txt";
-	private final String LOG_FILE = DATA_DIR + LOG_DIR + 
-									"knowledgeBaseUpdate.log";
-	private final String ERROR_LOG_FILE = DATA_DIR + LOG_DIR +
-									"knowledgeBaseUpdate.error.log";
-	private final String REMOVED_DATA_FILE = DATA_DIR + CHANGED_DATA_DIR +
-									"removedData.n3";
-	private final String ADDED_DATA_FILE = DATA_DIR + CHANGED_DATA_DIR +
-								    "addedData.n3";
+	private final String LOG_FILE = DATA_DIR + LOG_DIR + "knowledgeBaseUpdate.log";
+	private final String ERROR_LOG_FILE = DATA_DIR + LOG_DIR + 	"knowledgeBaseUpdate.error.log";
+	private final String REMOVED_DATA_FILE = DATA_DIR + CHANGED_DATA_DIR + 	"removedData.n3";
+	private final String ADDED_DATA_FILE = DATA_DIR + CHANGED_DATA_DIR + "addedData.n3";
 	private final String SPARQL_CONSTRUCTS_DIR = DATA_DIR + "sparqlConstructs/";
-	private final String MISC_REPLACEMENTS_FILE = DATA_DIR + "miscReplacements.rdf";
+//	private final String MISC_REPLACEMENTS_FILE = DATA_DIR + "miscReplacements.rdf";
 	private final String OLD_TBOX_MODEL_DIR = DATA_DIR + "oldVersion/";
 	private final String NEW_TBOX_MODEL_DIR = "/WEB-INF/submodels/";
 	private final String OLD_TBOX_ANNOTATIONS_DIR = DATA_DIR + "oldAnnotations/";
 	private final String NEW_TBOX_ANNOTATIONS_DIR = "/WEB-INF/ontologies/user";
 	
 	public void contextInitialized(ServletContextEvent sce) {
-		
+				
 		try {
 
 			ServletContext ctx = sce.getServletContext();
@@ -79,8 +74,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			settings.setDataDir(ctx.getRealPath(DATA_DIR));
 			settings.setSparqlConstructsDir(ctx.getRealPath(SPARQL_CONSTRUCTS_DIR));
 			settings.setDiffFile(ctx.getRealPath(DIFF_FILE));
-			settings.setSuccessAssertionsFile(
-					ctx.getRealPath(SUCCESS_ASSERTIONS_FILE));
+			settings.setSuccessAssertionsFile(ctx.getRealPath(SUCCESS_ASSERTIONS_FILE));
 			settings.setSuccessRDFFormat(SUCCESS_RDF_FORMAT);
 			settings.setLogFile(ctx.getRealPath(LOG_FILE));
 			settings.setErrorLogFile(ctx.getRealPath(ERROR_LOG_FILE));
@@ -88,7 +82,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			settings.setRemovedDataFile(ctx.getRealPath(REMOVED_DATA_FILE));
 			WebappDaoFactory wadf = (WebappDaoFactory) ctx.getAttribute("webappDaoFactory");
 			settings.setDefaultNamespace(wadf.getDefaultNamespace());
-			
+				
 			settings.setOntModelSelector(oms);
 			OntModel oldTBoxModel = loadModelFromDirectory(ctx.getRealPath(OLD_TBOX_MODEL_DIR));
 			settings.setOldTBoxModel(oldTBoxModel);
@@ -100,10 +94,9 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			settings.setNewTBoxAnnotationsModel(newTBoxAnnotationsModel);
 			
 			try {
-				boolean updateRequired = (new OntologyUpdater(settings)).update();
-				if (updateRequired) {
-					doMiscAppMetadataReplacements(ctx.getRealPath(MISC_REPLACEMENTS_FILE), oms);
-				}
+			  OntologyUpdater ontologyUpdater = new OntologyUpdater(settings);
+			  ontologyUpdater.update();
+				
 			} catch (IOException ioe) {
 				String errMsg = "IOException updating knowledge base " +
 					"for ontology changes: ";
@@ -163,6 +156,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	}
 	
 	private OntModel loadModelFromDirectory(String directoryPath) {
+		
 		OntModel om = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
 		File directory = new File(directoryPath);
 		if (!directory.isDirectory()) {
