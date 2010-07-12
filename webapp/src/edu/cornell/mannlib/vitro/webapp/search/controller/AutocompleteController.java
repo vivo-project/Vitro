@@ -277,6 +277,9 @@ public class AutocompleteController extends FreeMarkerHttpServlet implements Sea
         String stemParam = (String) request.getParameter("stem"); 
         boolean stem = "true".equals(stemParam);
         
+        String tokenizeParam = (String) request.getParameter("stem"); 
+        boolean tokenize = "true".equals(tokenizeParam);
+        
         // The search index is lowercased
         querystr = querystr.toLowerCase();
         
@@ -288,9 +291,13 @@ public class AutocompleteController extends FreeMarkerHttpServlet implements Sea
         Matcher m = p.matcher(querystr);
         boolean lastTermIsWildcard = !m.find();
         
-        // RY We might also have a tokenize param. Then if tokenize is false, call a different
-        // method. Not sure yet.
-        return makeTokenizedNameQuery(querystr, stem, lastTermIsWildcard);
+        // Stemming is only relevant if we are tokenizing. An untokenized name
+        // query will not stem.
+        if (tokenize) {
+            return makeTokenizedNameQuery(querystr, stem, lastTermIsWildcard);
+        } else {
+            return makeUntokenizedNameQuery(querystr);
+        }
     }
     
     private Query makeTokenizedNameQuery(String querystr, boolean stem, boolean lastTermIsWildcard) {
@@ -341,7 +348,19 @@ public class AutocompleteController extends FreeMarkerHttpServlet implements Sea
 
         return query;
     }
- 
+
+    private Query makeUntokenizedNameQuery(String querystr) {
+        
+        String termName = Entity2LuceneDoc.term.NAMEUNANALYZED;
+        BooleanQuery query = new BooleanQuery();
+        log.debug("Adding wildcard query on unanalyzed name");
+        query.add( 
+                new WildcardQuery(new Term(termName, querystr + "*")),
+                BooleanClause.Occur.MUST);   
+        
+        return query;
+    }
+            
     /**
      * Makes a flag based query clause.  This is where searches can filtered
      * by portal.
