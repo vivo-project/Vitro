@@ -17,6 +17,8 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
 
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+
 /**  
 * Performs knowledge base updates to the tbox to align with a new ontology version
 *   
@@ -104,6 +106,12 @@ public class TBoxUpdater {
 			 Resource subject = stmt.getSubject();
 			 Property predicate = stmt.getPredicate();
 			 RDFNode oldObject = stmt.getObject();
+			 
+			 if (VitroVocabulary.TAB_AUTOLINKEDTOTAB.equals(predicate.getURI())) {
+				 continue;
+				 // the tab autolinks are not like the other annotations
+				 // and should never be updated automatically
+			 }
 			 			 
 			 NodeIterator newObjects = newTboxAnnotationsModel.listObjectsOfProperty(subject, predicate);
 			 
