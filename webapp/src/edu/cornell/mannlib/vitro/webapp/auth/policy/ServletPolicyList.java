@@ -9,10 +9,8 @@ import javax.servlet.ServletContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.rdf.model.Model;
-
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.VisitingPolicyIface;
+
 
 /**
  * This is a PolicyList that can do isAuthorized and stashes a singleton
@@ -75,7 +73,7 @@ public class ServletPolicyList extends PolicyList {
         }
     }
     
-    /** 
+    /** import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.VisitingPolicyIface;
      * Replace first instance of policy found in policy list.  If no instance
      * is found in list add at end of the list.
      * 
@@ -93,7 +91,7 @@ public class ServletPolicyList extends PolicyList {
         ListIterator<PolicyIface> it = spl.listIterator();
         boolean replaced = false;
         while(it.hasNext()){
-            VisitingPolicyIface p = (VisitingPolicyIface)it.next();            
+            PolicyIface p = (PolicyIface)it.next();            
             if( clzz.isAssignableFrom(p.getClass()) ){
                 it.set( policy );
                 replaced = true;
