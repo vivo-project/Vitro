@@ -23,12 +23,12 @@ ${stylesheets.addFromTheme("/uploadImages.css")}
        <div id="photoUploadDefaultImageContainer">
               <h6>Current Photo</h6>
               <img src="${thumbnailUrl}" width="115" />
-       <a href='javascript:delete_photo("${deleteUrl}");'>Delete photo</a></div>
+       <a class="delete" href="${deleteUrl}" title="delete the current photo">Delete photo</a></div>
        <div id="photoUploadForm">
               <form action="${formAction}" enctype="multipart/form-data" method="post">
                      <label>Replace Photo <span> (JPEG, GIF or PNG)</span></label>
-                     <input  type="file" name="datafile" size="30">
-                     <input   type="submit" value="Upload photo"> or <a class="cancelUpload" href="${cancelUrl}">Cancel</a>
+                     <input type="file" name="datafile" size="30">
+                     <input type="submit" value="Upload photo"> or <a class="cancelUpload" href="${cancelUrl}">Cancel</a>
               </form>
        </div>
 </div>

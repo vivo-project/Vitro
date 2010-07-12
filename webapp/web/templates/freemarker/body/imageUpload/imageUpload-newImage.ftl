@@ -38,8 +38,8 @@ ${stylesheets.addFromTheme("/uploadImages.css")}
               <form action="${formAction}" enctype="multipart/form-data" method="post">
               
                      <label>Upload a photo <span> (JPEG, GIF or PNG)</span></label>
-                     <input type="file" name="datafile" size="30">
-                     <input  type="submit" value="Upload photo"> or <a class="cancelUpload"  href="${cancelUrl}">Cancel</a>
+                     <input id="datafile" type="file" name="datafile" size="30">
+                     <input type="submit" value="Upload photo"> or <a class="cancelUpload"  href="${cancelUrl}">Cancel</a>
               </form>
        </div>
 </div>
