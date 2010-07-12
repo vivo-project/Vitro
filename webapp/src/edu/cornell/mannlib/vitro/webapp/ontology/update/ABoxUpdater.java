@@ -163,6 +163,7 @@ public class ABoxUpdater {
 				   renameCount++;
 				   Statement newStatement = ResourceFactory.createStatement(newClass, oldStatement.getPredicate(), oldStatement.getObject());
 				   additions.add(newStatement);
+				   retractions.add(oldStatement);
 			   } else {
 				   removeCount++;
 				   retractions.add(oldStatement);

@@ -16,6 +16,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
+import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
@@ -106,6 +107,15 @@ public class TBoxUpdater {
 			 Resource subject = stmt.getSubject();
 			 Property predicate = stmt.getPredicate();
 			 RDFNode oldObject = stmt.getObject();
+			 
+			 if (! ( (RDFS.getURI().equals(predicate.getNameSpace())) || 
+					 (VitroVocabulary.vitroURI.equals(predicate.getNameSpace())) 
+					) ) {
+				 // this annotation updater is only concerned with properties
+				 // such as rdfs:comment and properties in the vitro application
+				 // namespace
+				 continue;
+			 }
 			 
 			 if (VitroVocabulary.TAB_AUTOLINKEDTOTAB.equals(predicate.getURI())) {
 				 continue;
