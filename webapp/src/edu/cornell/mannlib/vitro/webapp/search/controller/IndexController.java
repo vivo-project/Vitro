@@ -108,7 +108,7 @@ public class IndexController extends FreeMarkerHttpServlet {
         	return mergeBodyToTemplate("errorMessage.ftl", body, config);            
         }
         
-         body.put("message","Search index complete. Elapsed time " + (System.currentTimeMillis() - start) + " msec."); 
+         body.put("message","Rebuilding of index started."); 
         return mergeBodyToTemplate("message.ftl", body, config);
     }
 }
