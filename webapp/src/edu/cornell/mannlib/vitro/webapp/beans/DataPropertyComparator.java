@@ -4,9 +4,20 @@ package edu.cornell.mannlib.vitro.webapp.beans;
 
 import java.util.Comparator;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.hp.hpl.jena.vocabulary.XSD;
 
+import edu.cornell.mannlib.vitro.webapp.search.controller.AutocompleteController;
+
+/* This class is used to order authorships on the add author form. It should be removed in favor of using whatever 
+ * method is used to order authorships on the publication profile page instead. I've implemented this due to 
+ * time constraints.
+ */
 public class DataPropertyComparator implements Comparator<Individual> {
+
+    private static final Log log = LogFactory.getLog(DataPropertyComparator.class);
 
     private String dataPropertyUri = null;
     
@@ -30,18 +41,28 @@ public class DataPropertyComparator implements Comparator<Individual> {
         } else {
         
             String datatype = dps1.getDatatypeURI();
-
-            if (datatype.equals(XSD.xint.toString())) {
+            if (datatype == null) {
+                datatype = dps2.getDatatypeURI();
+            }
+            if (datatype == null) {
+                log.warn("Can't compare data property statements: no datatype specified.");
+                // Perhaps we should throw an error here, but for now we need it to return 0
+                return 0;
+            }
+            
+            if (XSD.xint.toString().equals(datatype)) {
                 int i1 = Integer.valueOf(dps1.getData());
                 int i2 = Integer.valueOf(dps2.getData());
                 result = ((Integer) i1).compareTo(i2);
             }
-            else if (datatype.equals(XSD.xstring.toString())) {
+            else if (XSD.xstring.toString().equals(datatype)) {
                 result = dps1.getData().compareTo(dps2.getData());            
             }
             // Fill in other types here
             else {
-                throw new ClassCastException("Unsupported datatype");
+                //throw new ClassCastException("Unsupported datatype");
+                log.warn("Can't compare data property statements: unsupported datatype.");
+                return 0;
             }
         }
         return result;

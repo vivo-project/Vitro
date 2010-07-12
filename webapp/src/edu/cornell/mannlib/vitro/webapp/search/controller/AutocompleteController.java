@@ -65,7 +65,7 @@ import freemarker.template.Configuration;
 public class AutocompleteController extends FreeMarkerHttpServlet implements Searcher{
 
     private static final long serialVersionUID = 1L;
-    private static final Log log = LogFactory.getLog(AutocompleteController.class.getName());
+    private static final Log log = LogFactory.getLog(AutocompleteController.class);
 
     private static String QUERY_PARAMETER_NAME = "term";
     private static String EXCLUDE_URI_PARAMETER_NAME = "excludeUri";
