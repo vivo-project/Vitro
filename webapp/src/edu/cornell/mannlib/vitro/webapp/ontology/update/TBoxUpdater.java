@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.ontology.update;
 
 import java.io.IOException;
+import java.util.List;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Literal;
@@ -107,8 +108,22 @@ public class TBoxUpdater {
 			 NodeIterator newObjects = newTboxAnnotationsModel.listObjectsOfProperty(subject, predicate);
 			 
 			 if ((newObjects == null) || (!newObjects.hasNext()) ) {
-				 retractions.add(siteModel.listStatements(subject, predicate, (RDFNode) null));
-				 continue;			 			 
+				 // first check to see if the site has a local value change
+				 // that should override the deletion
+				 List<RDFNode> siteObjects = siteModel.listObjectsOfProperty(subject, predicate).toList();
+				 if (siteObjects.size() > 1) {
+					 logger.logError("Error: found " + siteObjects.size() +
+							 " statements with subject = " + subject.getURI() + 
+							 " and property = " + predicate.getURI() +
+							 " in the site database. (maximum of one is expected)");
+				 }
+				 if (siteObjects.size() > 0) {
+					 RDFNode siteNode = siteObjects.get(0);
+					 if (siteNode.equals(oldObject)) {
+						 retractions.add(siteModel.listStatements(subject, predicate, (RDFNode) null));		 
+					 }
+				 }
+				 continue;				 			 
 			 }
 			
 			 RDFNode newObject = newObjects.next();
