@@ -34,11 +34,16 @@
             	predicateLocalName = prop.getLocalName();            	
             }                        
                         
-            if( editConfig.getEntityToReturnTo() != null && editConfig.getEntityToReturnTo().startsWith("?") ){
-            	resourceToRedirectTo = (String)request.getAttribute("entityToReturnTo");
+            if( editConfig.getEntityToReturnTo() != null && editConfig.getEntityToReturnTo().startsWith("?") ){            	
+            	resourceToRedirectTo = (String)request.getAttribute("entityToReturnTo");            
             }else{            
             	resourceToRedirectTo = editConfig.getEntityToReturnTo();
-            }              
+            }
+            
+        	//if there is no entity to return to it is likely a cancel
+        	if( resourceToRedirectTo == null || resourceToRedirectTo.length() == 0 )
+        		resourceToRedirectTo = editConfig.getSubjectUri();
+            
         }
         
         //set up base URL
