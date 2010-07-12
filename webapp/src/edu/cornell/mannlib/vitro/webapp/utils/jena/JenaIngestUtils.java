@@ -111,7 +111,7 @@ public class JenaIngestUtils {
 							}
 							if (stmt != null) {
 								Resource outRes = stmt.getSubject();
-								ResourceUtils.renameResource(outRes,namespaceEtc+random.nextInt());
+								ResourceUtils.renameResource(outRes,getNextURI(namespaceEtc, dedupUnionModel));
 								doneSet.add(res.getId().toString());
 							}
 						}
@@ -130,7 +130,7 @@ public class JenaIngestUtils {
 		String nextURI = null;
 		boolean duplicate = true;
 		while (duplicate) {
-			nextURI = namespaceEtc+random.nextInt();
+			nextURI = namespaceEtc+random.nextInt(9999999);
 			Resource res = ResourceFactory.createResource(nextURI);
 			duplicate = false;
 			ClosableIterator closeIt = model.listStatements(res, (Property)null, (RDFNode)null);
@@ -303,6 +303,7 @@ public class JenaIngestUtils {
 	 */
 	public Model smushResources(Model inModel, Property prop) { 
 		Model outModel = ModelFactory.createDefaultModel();
+		outModel.add(inModel);
 		inModel.enterCriticalSection(Lock.READ);
 		try {
 			ClosableIterator closeIt = inModel.listObjectsOfProperty(prop);
@@ -318,12 +319,25 @@ public class JenaIngestUtils {
 							if (first) {
 								smushToThisResource = subj;
 								first = false;
+								continue;
 							}
+							
 							ClosableIterator closgIt = inModel.listStatements(subj,(Property)null,(RDFNode)null);
 							try {
 								for (Iterator stmtIt = closgIt; stmtIt.hasNext();) {
 									Statement stmt = (Statement) stmtIt.next();
+									outModel.remove(stmt.getSubject(), stmt.getPredicate(), stmt.getObject());
 									outModel.add(smushToThisResource, stmt.getPredicate(), stmt.getObject());
+								}
+							} finally {
+								closgIt.close();
+							}
+							closgIt = inModel.listStatements((Resource) null, (Property)null, subj);
+							try {
+								for (Iterator stmtIt = closgIt; stmtIt.hasNext();) {
+									Statement stmt = (Statement) stmtIt.next();
+									outModel.remove(stmt.getSubject(), stmt.getPredicate(), stmt.getObject());
+									outModel.add(stmt.getSubject(), stmt.getPredicate(), smushToThisResource);
 								}
 							} finally {
 								closgIt.close();
