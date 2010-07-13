@@ -972,6 +972,7 @@ public class JenaIngestController extends BaseEditController {
 		Random random = new Random();
 		boolean resourcePresent=true;
 		OntModel vitroJenaModel = (OntModel) getServletContext().getAttribute("baseOntModel");
+		vitroJenaModel.enterCriticalSection(Lock.WRITE);
 		log.info("Going into loop");
 		Resource res = null;
 		do{
@@ -984,6 +985,7 @@ public class JenaIngestController extends BaseEditController {
 		}while(resourcePresent);
 		log.info("url assigned");
 		res.removeAll((Property)null);
+		vitroJenaModel.leaveCriticalSection();
 		return uri;
 	}
 	private String doMerge(String uri1, String uri2,HttpServletResponse response){
@@ -991,16 +993,19 @@ public class JenaIngestController extends BaseEditController {
 		Resource res1 = vitroJenaModel.getResource(uri1);
 		Resource res2 = vitroJenaModel.getResource(uri2);
 		String result = null;
+		vitroJenaModel.enterCriticalSection(Lock.WRITE);
 		StmtIterator stmtItr1 = vitroJenaModel.listStatements(res1,(Property)null,(RDFNode)null);
 		StmtIterator stmtItr2 = vitroJenaModel.listStatements(res2,(Property)null,(RDFNode)null);
 		if(!stmtItr1.hasNext()){
 			result = "resource 1 not present";
 			res1.removeAll((Property)null);
+			vitroJenaModel.leaveCriticalSection();
 			return result;
 		}
 		else if(!stmtItr2.hasNext()){
 			result = "resource 2 not present";
 			res2.removeAll((Property)null);
+			vitroJenaModel.leaveCriticalSection();
 			return result;
 		}
 		
@@ -1020,6 +1025,7 @@ public class JenaIngestController extends BaseEditController {
 		    }
 		}
 		res2.removeAll((Property)null);
+		vitroJenaModel.leaveCriticalSection();
 		response.setContentType("RDF/XML-ABBREV");
 		try{
 		OutputStream outStream = response.getOutputStream();
