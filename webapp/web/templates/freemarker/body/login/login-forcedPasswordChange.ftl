@@ -16,10 +16,10 @@ ${stylesheets.addFromTheme("/login.css")}
        
        <form action="${formAction}" method="post">
               <label for="newPassword">New Password</label>
-              <input type="password" name="newPassword"  />
-              <p class="passwordNote">Please enter a password with more than 5 characters</p>
+              <input id="newPassword" class="focus" type="password" name="newPassword"  />
+              <p class="passwordNote">Minimum of 6 characters in length.</p>
               <label for="confirmPassword">Confirm Password</label>
-              <input type="password" name="confirmPassword"  />
+              <input id="confirmPassword" type="password" name="confirmPassword"  />
               <input name="passwordChangeForm" type="submit" class="submit" value="Save Changes"/>
        </form>
 </div>

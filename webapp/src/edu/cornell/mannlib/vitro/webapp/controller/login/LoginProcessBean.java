@@ -44,7 +44,7 @@ public class LoginProcessBean {
 		MISMATCH_PASSWORD("The passwords entered do not match.", MLevel.ERROR),
 
 		PASSWORD_LENGTH(
-				"Please enter a password between {0} and {1} characters long",
+				"Please enter a password between {0} and {1} characters in length.",
 				MLevel.ERROR),
 
 		USING_OLD_PASSWORD("Please choose a different password from the "

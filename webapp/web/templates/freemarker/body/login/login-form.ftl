@@ -30,9 +30,9 @@ ${stylesheets.addFromTheme("/login.css")}
        
        <form action="${formAction}" method="post">
               <label for="loginName">Email</label>
-              <input name="loginName" type="text" value="${loginName}"  />
+              <input id="loginName" class="focus" name="loginName" type="text" value="${loginName}"  />
               <label for="loginPassword">Password</label>
-              <input type="password" name="loginPassword"  />
+              <input id="loginPassword" type="password" name="loginPassword"  />
               <input name="loginForm"  type="submit" class="submit" value="Log in"/>
        </form>
 </div>
