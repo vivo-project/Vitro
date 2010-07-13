@@ -37,13 +37,14 @@ class MultipartHttpServletRequest extends FileUploadServletRequest {
 
 	private final Map<String, List<String>> parameters;
 	private final Map<String, List<FileItem>> files;
+	private FileUploadException fileUploadException;
 
 	/**
 	 * Parse the multipart request. Store the info about the request parameters
 	 * and the uploaded files.
 	 */
 	public MultipartHttpServletRequest(HttpServletRequest request,
-			int maxFileSize) throws IOException, FileUploadException {
+			int maxFileSize) throws IOException {
 		super(request);
 
 		Map<String, List<String>> parameters = new HashMap<String, List<String>>();
@@ -54,20 +55,26 @@ class MultipartHttpServletRequest extends FileUploadServletRequest {
 
 		parseQueryString(request.getQueryString(), parameters);
 
-		List<FileItem> items = parseRequestIntoFileItems(request, upload);
-		for (FileItem item : items) {
-			// Process a regular form field
-			if (item.isFormField()) {
-				addToParameters(parameters, item.getFieldName(), item
-						.getString("UTF-8"));
-				log.debug("Form field (parameter) " + item.getFieldName() + "="
-						+ item.getString());
-			} else {
-				addToFileItems(files, item);
-				log
-						.debug("File " + item.getFieldName() + ": "
-								+ item.getName());
+		try {
+			List<FileItem> items = parseRequestIntoFileItems(request, upload);
+
+			for (FileItem item : items) {
+				// Process a regular form field
+				if (item.isFormField()) {
+					addToParameters(parameters, item.getFieldName(), item
+							.getString("UTF-8"));
+					log.debug("Form field (parameter) " + item.getFieldName()
+							+ "=" + item.getString());
+				} else {
+					addToFileItems(files, item);
+					log.debug("File " + item.getFieldName() + ": "
+							+ item.getName());
+				}
 			}
+		} catch (FileUploadException e) {
+			fileUploadException = e;
+			request.setAttribute(
+					FileUploadServletRequest.FILE_UPLOAD_EXCEPTION, e);
 		}
 
 		this.parameters = Collections.unmodifiableMap(parameters);
@@ -165,7 +172,8 @@ class MultipartHttpServletRequest extends FileUploadServletRequest {
 	}
 
 	// ----------------------------------------------------------------------
-	// This is a multipart request, so make the file info available.
+	// This is a multipart request, so make the file info available. If there
+	// was an exception during parsing, make that available too.
 	// ----------------------------------------------------------------------
 
 	@Override
@@ -199,6 +207,16 @@ class MultipartHttpServletRequest extends FileUploadServletRequest {
 		}
 
 		return null;
+	}
+
+	@Override
+	public FileUploadException getFileUploadException() {
+		return fileUploadException;
+	}
+
+	@Override
+	public boolean hasFileUploadException() {
+		return fileUploadException != null;
 	}
 
 	// ----------------------------------------------------------------------

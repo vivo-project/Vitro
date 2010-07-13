@@ -35,15 +35,25 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
  * uploaded in a given field, the length of the file will be 0.
  * </p>
  * <p>
- * Most methods are declared here, and simply delegate to the wrapped request.
- * Methods that have to do with parameters or files are handled differently for
- * simple requests and multipart request, and are implemented in the
- * sub-classes.
+ * If the uploaded file(s) would be larger than the <code>maxFileSize</code>,
+ * {@link #parseRequest(HttpServletRequest, int)} does not throw an Exception.
+ * Instead, it records the exception in a request attribute named by
+ * {@link #FILE_UPLOAD_EXCEPTION}. This attribute can be accessed directly, or
+ * indirectly via the methods {@link #hasFileUploadException()} and
+ * {@link #getFileUploadException()}. If there is an exception, the file item
+ * map (see above) will still be non-null, but it will be empty.
+ * </p>
+ * <p>
+ * Most methods are declared here simply delegate to the wrapped request.
+ * Methods that have to do with parameters, files, or parsing exceptions, are
+ * handled differently for simple requests and multipart request, and are
+ * implemented in the sub-classes.
  * </p>
  */
 @SuppressWarnings("deprecation")
 public abstract class FileUploadServletRequest implements HttpServletRequest {
 	public static final String FILE_ITEM_MAP = "file_item_map";
+	public static final String FILE_UPLOAD_EXCEPTION = "file_upload_exception";
 
 	// ----------------------------------------------------------------------
 	// The factory method
@@ -53,8 +63,7 @@ public abstract class FileUploadServletRequest implements HttpServletRequest {
 	 * Wrap this {@link HttpServletRequest} in an appropriate wrapper class.
 	 */
 	public static FileUploadServletRequest parseRequest(
-			HttpServletRequest request, int maxFileSize) throws IOException,
-			FileUploadException {
+			HttpServletRequest request, int maxFileSize) throws IOException {
 		boolean isMultipart = ServletFileUpload.isMultipartContent(request);
 		if (isMultipart) {
 			return new MultipartHttpServletRequest(request, maxFileSize);
@@ -96,6 +105,17 @@ public abstract class FileUploadServletRequest implements HttpServletRequest {
 	 *         non-empty items were found.
 	 */
 	public abstract FileItem getFileItem(String string);
+
+	/**
+	 * Was there an exception when uploading the file items?
+	 */
+	public abstract boolean hasFileUploadException();
+
+	/**
+	 * Get the exception that occurred when uploading the file items. If no such
+	 * exception, return <code>null</code>.
+	 */
+	public abstract FileUploadException getFileUploadException();
 
 	// ----------------------------------------------------------------------
 	// Delegated methods.

@@ -24,7 +24,6 @@ import net.sf.saxon.s9api.XsltExecutable;
 import net.sf.saxon.s9api.XsltTransformer;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -90,13 +89,10 @@ public class JenaXMLFileUpload  extends BaseEditController  {
 	 */
 	public void doPost(HttpServletRequest rawRequest, HttpServletResponse resp)
 	throws ServletException, IOException {
-		FileUploadServletRequest request = null;
-		try {
-			request = FileUploadServletRequest
-					.parseRequest(rawRequest, maxFileSize);
-		} catch (FileUploadException e) {
-            // TODO: forward to error message
-            throw new ServletException("Size limit exceeded: " + e.getLocalizedMessage());
+		FileUploadServletRequest request = FileUploadServletRequest.parseRequest(rawRequest, maxFileSize);
+		if (request.hasFileUploadException()) {
+			throw new ServletException("Size limit exceeded: "
+					+ request.getFileUploadException().getLocalizedMessage());
 		}
         if (request.isMultipart()) {
         	log.debug("multipart content detected");

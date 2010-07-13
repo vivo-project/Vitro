@@ -10,6 +10,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadException;
 
 /**
  * A wrapper for a servlet request that does not hold multipart content. Pass
@@ -24,7 +25,7 @@ class SimpleHttpServletRequestWrapper extends FileUploadServletRequest {
 	}
 
 	// ----------------------------------------------------------------------
-	// Not a multipart request, so there are no files.
+	// Not a multipart request, so there are no files or upload exceptions.
 	// ----------------------------------------------------------------------
 
 	@Override
@@ -40,6 +41,16 @@ class SimpleHttpServletRequestWrapper extends FileUploadServletRequest {
 	@Override
 	public FileItem getFileItem(String string) {
 		return null;
+	}
+
+	@Override
+	public FileUploadException getFileUploadException() {
+		return null;
+	}
+
+	@Override
+	public boolean hasFileUploadException() {
+		return false;
 	}
 
 	// ----------------------------------------------------------------------

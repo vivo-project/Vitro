@@ -20,7 +20,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
@@ -221,12 +220,9 @@ public class FedoraDatastreamController extends VitroHttpServlet implements Cons
     public void doPost(HttpServletRequest rawRequest, HttpServletResponse res)
     throws ServletException,IOException {
         try{          
-        	FileUploadServletRequest req = null;
-        	try {
-        		req = FileUploadServletRequest
-        		.parseRequest(rawRequest, maxFileSize);
-        	} catch (FileUploadException e) {
-        		throw new FdcException("Size limit exceeded: " + e.getLocalizedMessage());
+        	FileUploadServletRequest req = FileUploadServletRequest.parseRequest(rawRequest, maxFileSize);
+       		if (req.hasFileUploadException()) {
+        		throw new FdcException("Size limit exceeded: " + req.getFileUploadException().getLocalizedMessage());
         	}
         	if (!req.isMultipart()) {
         		throw new FdcException("Must POST a multipart encoded request");

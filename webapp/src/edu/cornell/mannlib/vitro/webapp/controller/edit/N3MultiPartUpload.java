@@ -19,7 +19,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -115,14 +114,11 @@ public class N3MultiPartUpload extends VitroHttpServlet {
             throws ServletException, IOException {
         log.debug("N3MultiPartProcess 0.01");
         
-		FileUploadServletRequest request = null;
-		try {
-			request = FileUploadServletRequest
-					.parseRequest(rawRequest, maxFileSize);
-		} catch (FileUploadException e) {
+		FileUploadServletRequest request = FileUploadServletRequest.parseRequest(rawRequest, maxFileSize);
+   		if (request.hasFileUploadException()) {
             // TODO: forward to error message
-            throw new ServletException("Size limit exceeded: " + e.getLocalizedMessage());
-		}
+            throw new ServletException("Size limit exceeded: " + request.getFileUploadException().getLocalizedMessage());
+       	}
         if (!request.isMultipart()) {
             // TODO: forward to error message
             throw new ServletException("Must POST a multipart encoded request");

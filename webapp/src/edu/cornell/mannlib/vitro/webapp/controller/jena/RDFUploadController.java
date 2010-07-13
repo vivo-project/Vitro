@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -45,12 +44,10 @@ public class RDFUploadController extends BaseEditController {
 	
 	public void doPost(HttpServletRequest rawRequest,
 			HttpServletResponse response) throws ServletException, IOException {
-		FileUploadServletRequest req = null;
-		try {
-			req = FileUploadServletRequest.parseRequest(rawRequest,
-					maxFileSizeInBytes);
-		} catch (FileUploadException e) {
-			forwardToFileUploadError(e.getLocalizedMessage(), req, response);
+		FileUploadServletRequest req = FileUploadServletRequest.parseRequest(rawRequest,
+				maxFileSizeInBytes);
+		if (req.hasFileUploadException()) {
+			forwardToFileUploadError(req.getFileUploadException().getLocalizedMessage(), req, response);
 			return;
 		}
 
