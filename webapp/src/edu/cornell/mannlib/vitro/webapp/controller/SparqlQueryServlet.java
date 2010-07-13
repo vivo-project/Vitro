@@ -114,7 +114,10 @@ public class SparqlQueryServlet extends BaseEditController {
             loginHandler = ((LoginFormBean)obj);
         if( loginHandler == null ||
             ! "authenticated".equalsIgnoreCase(loginHandler.getLoginStatus()) ||
-             Integer.parseInt(loginHandler.getLoginRole()) <= 5 ){       
+                // rjy7 Allows any editor (including self-editors) access to this servlet.
+                // This servlet is now requested via Ajax from some custom forms, so anyone
+                // using the custom form needs access rights.
+                Integer.parseInt(loginHandler.getLoginRole()) < LoginFormBean.NON_EDITOR ){       
             HttpSession session = request.getSession(true);
             
             session.setAttribute("postLoginRequest",
