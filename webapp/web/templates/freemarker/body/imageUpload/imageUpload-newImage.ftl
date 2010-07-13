@@ -20,23 +20,27 @@ ${stylesheets.addFromTheme("/uploadImages.css")}
 </noscript>
 
 
-<#if errorMessage??>
-   <script type="text/javascript">  
-    window.onload = load;  
-	function load(){  
- 		alert("${errorMessage}");
- 		}
- 	</script>
-</#if>
+
 
 <div id="photoUploadContainer" class="hidden">
        <h2>Photo Upload</h2>
+       
+       
+       <#if errorMessage??>
+ 		 <div id="errorAlert"><img src="${urls.siteIcons}/iconAlert.png"/>
+                  <p>${errorMessage}</p>
+           </div>
+		</#if>
+		 
+		
+		
        <div id="photoUploadDefaultImageContainer">
               <h6>Current Photo</h6>
               <img src="${thumbnailUrl}" width="115" height="115" /> </div>
-       <div id="photoUploadForm">
-              <form action="${formAction}" enctype="multipart/form-data" method="post">
               
+       <div id="photoUploadForm">
+       
+              <form action="${formAction}" enctype="multipart/form-data" method="post">
                      <label>Upload a photo <span> (JPEG, GIF or PNG)</span></label>
                      <input id="datafile" type="file" name="datafile" size="30">
                      <input type="submit" value="Upload photo"> or <a class="cancelUpload"  href="${cancelUrl}">Cancel</a>
