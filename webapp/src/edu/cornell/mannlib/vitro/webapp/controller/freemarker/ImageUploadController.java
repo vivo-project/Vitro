@@ -40,6 +40,8 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	private static final Log log = LogFactory
 			.getLog(ImageUploadController.class);
 
+	private static final String ATTRIBUTE_REFERRING_PAGE = "ImageUploadController.referringPage";
+
 	private static final String DEFAULT_NAMESPACE = ConfigurationProperties
 			.getProperty("Vitro.defaultNamespace");
 
@@ -224,13 +226,14 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 			} else if (ACTION_SAVE.equals(action)) {
 				return doCreateThumbnail(vreq, entity);
 			} else if (ACTION_DELETE.equals(action)) {
-				return doDeleteImage(entity);
+				return doDeleteImage(vreq, entity);
 			} else {
-				return doIntroScreen(entity);
+				captureReferringUrl(vreq);
+				return doIntroScreen(vreq, entity);
 			}
 		} catch (UserMistakeException e) {
 			// Can't find the entity? Complain.
-			return showAddImagePageWithError(null, e.getMessage());
+			return showAddImagePageWithError(vreq, null, e.getMessage());
 		} catch (Exception e) {
 			// We weren't expecting this - log it, and apologize to the user.
 			return new ExceptionResponseValues(e);
@@ -238,14 +241,28 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	}
 
 	/**
+	 * We are just starting the upload process. Record where we came from, so if
+	 * they hit "cancel" we know where to send them. If we have problems, just
+	 * clear it.
+	 */
+	private void captureReferringUrl(VitroRequest vreq) {
+		String referrer = vreq.getHeader("Referer");
+		if (referrer == null) {
+			vreq.getSession().removeAttribute(ATTRIBUTE_REFERRING_PAGE);
+		} else {
+			vreq.getSession().setAttribute(ATTRIBUTE_REFERRING_PAGE, referrer);
+		}
+	}
+
+	/**
 	 * Show the first screen in the upload process: Add or Replace.
 	 */
-	private ResponseValues doIntroScreen(Individual entity) {
+	private ResponseValues doIntroScreen(VitroRequest vreq, Individual entity) {
 		String thumbUrl = getThumbnailUrl(entity);
 		if (thumbUrl == null) {
-			return showAddImagePage(entity);
+			return showAddImagePage(vreq, entity);
 		} else {
-			return showReplaceImagePage(entity, thumbUrl);
+			return showReplaceImagePage(vreq, entity, thumbUrl);
 		}
 	}
 
@@ -265,9 +282,10 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 			String thumbUrl = getThumbnailUrl(entity);
 			String message = e.getMessage();
 			if (thumbUrl == null) {
-				return showAddImagePageWithError(entity, message);
+				return showAddImagePageWithError(vreq, entity, message);
 			} else {
-				return showReplaceImagePageWithError(entity, thumbUrl, message);
+				return showReplaceImagePageWithError(vreq, entity, thumbUrl,
+						message);
 			}
 		}
 
@@ -283,7 +301,8 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 		Dimensions mainImageSize = helper.getMainImageSize(entity);
 
 		// Go to the cropping page.
-		return showCropImagePage(entity, getMainImageUrl(entity), mainImageSize);
+		return showCropImagePage(vreq, entity, getMainImageUrl(entity),
+				mainImageSize);
 	}
 
 	/**
@@ -301,19 +320,19 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 		helper.removeExistingThumbnail(entity);
 		helper.generateThumbnailAndStore(entity, crop);
 
-		return showIndividualDisplayPage(entity);
+		return showExitPage(vreq, entity);
 	}
 
 	/**
 	 * Delete the main image and the thumbnail from the individual.
 	 */
-	private ResponseValues doDeleteImage(Individual entity) {
+	private ResponseValues doDeleteImage(VitroRequest vreq, Individual entity) {
 		ImageUploadHelper helper = new ImageUploadHelper(fileStorage,
 				getWebappDaoFactory());
 
 		helper.removeExistingImage(entity);
 
-		return showIndividualDisplayPage(entity);
+		return showExitPage(vreq, entity);
 	}
 
 	/**
@@ -402,10 +421,11 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	 * @param entity
 	 *            if this is null, then all URLs lead to the welcome page.
 	 */
-	private TemplateResponseValues showAddImagePage(Individual entity) {
+	private TemplateResponseValues showAddImagePage(VitroRequest vreq,
+			Individual entity) {
 		String formAction = (entity == null) ? "" : formAction(entity.getURI(),
 				ACTION_UPLOAD);
-		String cancelUrl = (entity == null) ? "" : displayPageUrl(entity
+		String cancelUrl = (entity == null) ? "" : exitPageUrl(vreq, entity
 				.getURI());
 
 		TemplateResponseValues rv = new TemplateResponseValues(TEMPLATE_NEW);
@@ -419,21 +439,21 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	/**
 	 * The individual has no image, but the user did something wrong.
 	 */
-	private TemplateResponseValues showAddImagePageWithError(Individual entity,
-			String message) {
-		return showAddImagePage(entity).put(BODY_ERROR_MESSAGE, message);
+	private TemplateResponseValues showAddImagePageWithError(VitroRequest vreq,
+			Individual entity, String message) {
+		return showAddImagePage(vreq, entity).put(BODY_ERROR_MESSAGE, message);
 	}
 
 	/**
 	 * The individual has an image - go to the Replace Image page.
 	 */
-	private TemplateResponseValues showReplaceImagePage(Individual entity,
-			String thumbUrl) {
+	private TemplateResponseValues showReplaceImagePage(VitroRequest vreq,
+			Individual entity, String thumbUrl) {
 		TemplateResponseValues rv = new TemplateResponseValues(TEMPLATE_REPLACE);
 		rv.put(BODY_THUMBNAIL_URL, UrlBuilder.getUrl(thumbUrl));
 		rv.put(BODY_DELETE_URL, formAction(entity.getURI(), ACTION_DELETE));
 		rv.put(BODY_FORM_ACTION, formAction(entity.getURI(), ACTION_UPLOAD));
-		rv.put(BODY_CANCEL_URL, displayPageUrl(entity.getURI()));
+		rv.put(BODY_CANCEL_URL, exitPageUrl(vreq, entity.getURI()));
 		rv.put(BODY_TITLE, "Replace image" + forName(entity));
 		return rv;
 	}
@@ -442,8 +462,9 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	 * The individual has an image, but the user did something wrong.
 	 */
 	private TemplateResponseValues showReplaceImagePageWithError(
-			Individual entity, String thumbUrl, String message) {
-		TemplateResponseValues rv = showReplaceImagePage(entity, thumbUrl);
+			VitroRequest vreq, Individual entity, String thumbUrl,
+			String message) {
+		TemplateResponseValues rv = showReplaceImagePage(vreq, entity, thumbUrl);
 		rv.put(BODY_ERROR_MESSAGE, message);
 		return rv;
 	}
@@ -451,14 +472,14 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	/**
 	 * We got their main image - go to the Crop Image page.
 	 */
-	private TemplateResponseValues showCropImagePage(Individual entity,
-			String imageUrl, Dimensions dimensions) {
+	private TemplateResponseValues showCropImagePage(VitroRequest vreq,
+			Individual entity, String imageUrl, Dimensions dimensions) {
 		TemplateResponseValues rv = new TemplateResponseValues(TEMPLATE_CROP);
 		rv.put(BODY_MAIN_IMAGE_URL, UrlBuilder.getUrl(imageUrl));
 		rv.put(BODY_MAIN_IMAGE_HEIGHT, dimensions.height);
 		rv.put(BODY_MAIN_IMAGE_WIDTH, dimensions.width);
 		rv.put(BODY_FORM_ACTION, formAction(entity.getURI(), ACTION_SAVE));
-		rv.put(BODY_CANCEL_URL, displayPageUrl(entity.getURI()));
+		rv.put(BODY_CANCEL_URL, exitPageUrl(vreq, entity.getURI()));
 		rv.put(BODY_TITLE, "Crop Photo" + forName(entity));
 		return rv;
 	}
@@ -466,15 +487,23 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	/**
 	 * All done - go to the individual display page.
 	 */
-	private ForwardResponseValues showIndividualDisplayPage(Individual entity) {
-		return new ForwardResponseValues(displayPageUrl(entity.getURI()));
+	private ForwardResponseValues showExitPage(VitroRequest vreq,
+			Individual entity) {
+		return new ForwardResponseValues(exitPageUrl(vreq, entity.getURI()));
 	}
 
 	/**
-	 * When we complete the process, by success or by cancellation, we go to the
-	 * individual display page.
+	 * When we complete the process, by success or by cancellation, go to the
+	 * initial referring page. If there wasn't one, go to the individual display
+	 * page,
 	 */
-	private String displayPageUrl(String entityUri) {
+	private String exitPageUrl(VitroRequest vreq, String entityUri) {
+		String referrer = (String) vreq.getSession().getAttribute(
+				ATTRIBUTE_REFERRING_PAGE);
+		if (referrer != null) {
+			return referrer;
+		}
+
 		if (DEFAULT_NAMESPACE == null) {
 			return "";
 		} else if (!entityUri.startsWith(DEFAULT_NAMESPACE)) {
