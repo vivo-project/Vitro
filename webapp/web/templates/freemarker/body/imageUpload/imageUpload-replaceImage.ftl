@@ -21,7 +21,7 @@ ${stylesheets.addFromTheme("/uploadImages.css")}
        <div id="photoUploadDefaultImageContainer">
               <h6>Current Photo</h6>
               <img src="${thumbnailUrl}" width="115" />
-       <a class="delete" href="${deleteUrl}">Delete photo</a></div>
+       <a class="thumbnail" href="${deleteUrl}">Delete photo</a></div>
        
        <div id="photoUploadForm">
               <form action="${formAction}" enctype="multipart/form-data" method="post">

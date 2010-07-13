@@ -6,7 +6,7 @@ $(document).ready(function(){
   $("#photoUploadContainer").removeClass("hidden");
 
   // Confirmation alert for photo deletion
-  $('a.delete').click(function(){
+  $('a.thumbnail').click(function(){
    var answer = confirm('Are you sure you want to delete your photo?');
     return answer;
   });
