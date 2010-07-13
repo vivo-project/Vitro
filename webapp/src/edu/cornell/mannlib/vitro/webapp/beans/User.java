@@ -7,8 +7,8 @@ import java.util.Date;
 
 public class User implements Comparable {
     
-    public final static int MIN_PASSWORD_LENGTH = 5;
-    public final static int MAX_PASSWORD_LENGTH = 99;
+    public final static int MIN_PASSWORD_LENGTH = 6;
+    public final static int MAX_PASSWORD_LENGTH = 12;
 
     private String URI = null;
     private String namespace = null;
