@@ -153,7 +153,7 @@ public class IndexBuilder {
     
     protected void indexRebuild() throws IndexingException {
     	setReindexRequested(false);
-        log.debug("performing indexRebuild()");
+        log.info("Rebuild of search index is starting.");
 
         Iterator<ObjectSourceIface> sources = sourceList.iterator();
         List listOfIterators = new LinkedList();
@@ -174,7 +174,7 @@ public class IndexBuilder {
         if( listOfIterators.size() == 0){ log.debug("Warning: no ObjectSources found.");}
         
         doBuild( listOfIterators, Collections.EMPTY_LIST, true, NEW_DOCS );
-        log.debug(this.getClass().getName() + ".doFullRebuildIndex() Done \n");        
+        log.info("Rebuild of search index is complete.");
     }
     
     protected void updatedIndex() throws IndexingException{
