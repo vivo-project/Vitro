@@ -2,9 +2,13 @@
 
 package edu.cornell.mannlib.vitro.webapp.search.lucene;
 
+import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.ALLTEXT;
+import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.ALLTEXTUNSTEMMED;
+import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.NAME;
+import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.NAMEUNSTEMMED;
+
 import java.io.File;
 import java.io.IOException;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -17,11 +21,9 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.KeywordAnalyzer;
 import org.apache.lucene.analysis.PerFieldAnalyzerWrapper;
-import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.search.BooleanQuery;
 
 import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.rdf.model.Model;
 
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
@@ -30,6 +32,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SearchReindexingListener;
+import edu.cornell.mannlib.vitro.webapp.search.beans.ObjectSourceIface;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.beans.Searcher;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
@@ -64,7 +67,6 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
         /**
          * Gets run to set up DataSource when the webapp servlet context gets created.
          */
-        @SuppressWarnings("unchecked")
         public void contextInitialized(ServletContextEvent sce) {
         	try {
 	            ServletContext context = sce.getServletContext();
@@ -76,9 +78,9 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 	            setBoolMax();
 	
 	            //these should really be set as annotation properties.
-	            HashSet dataPropertyBlacklist = new HashSet<String>();
+	            HashSet<String> dataPropertyBlacklist = new HashSet<String>();
 	            context.setAttribute(SEARCH_DATAPROPERTY_BLACKLIST, dataPropertyBlacklist);	            
-	            HashSet objectPropertyBlacklist = new HashSet<String>();
+	            HashSet<String> objectPropertyBlacklist = new HashSet<String>();
 	            objectPropertyBlacklist.add("http://www.w3.org/2002/07/owl#differentFrom");
 	            context.setAttribute(SEARCH_OBJECTPROPERTY_BLACKLIST, objectPropertyBlacklist);
 	            
@@ -94,7 +96,7 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 	            // the queries need to know the analyzer to use so that the same one can be used
 	            // to analyze the fields in the incoming user query terms.
 	            LuceneSearcher searcher = new LuceneSearcher(
-	                    new LuceneQueryFactory(getAnalyzer(), Entity2LuceneDoc.term.ALLTEXT),
+	                    new LuceneQueryFactory(getAnalyzer(), ALLTEXT),
 	                    indexDir);
 	            searcher.addObj2Doc(new Entity2LuceneDoc());
 	            context.setAttribute(Searcher.class.getName(), searcher);		           
@@ -109,7 +111,7 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 	                VitroFilterUtils.getDisplayFilterByRoleLevel(RoleLevel.PUBLIC, wadf); 
 	            wadf = new WebappDaoFactoryFiltering(wadf,vf);
 	            
-	            List sources = new ArrayList();
+	            List<ObjectSourceIface> sources = new ArrayList<ObjectSourceIface>();
 	            sources.add(wadf.getIndividualDao());
 	
 	            IndexBuilder builder = new IndexBuilder(context,indexer,sources);
@@ -203,10 +205,10 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
      */
     private Analyzer getAnalyzer() {
         PerFieldAnalyzerWrapper analyzer = new PerFieldAnalyzerWrapper( new KeywordAnalyzer());
-        analyzer.addAnalyzer(Entity2LuceneDoc.term.ALLTEXT, new HtmlLowerStopStemAnalyzer());
-        analyzer.addAnalyzer(Entity2LuceneDoc.term.NAME, new HtmlLowerStopStemAnalyzer());
-        analyzer.addAnalyzer(Entity2LuceneDoc.term.ALLTEXTUNSTEMMED, new HtmlLowerStopAnalyzer());
-        analyzer.addAnalyzer(Entity2LuceneDoc.term.NAMEUNSTEMMED, new HtmlLowerStopAnalyzer());        
+        analyzer.addAnalyzer(ALLTEXT, new HtmlLowerStopStemAnalyzer());
+        analyzer.addAnalyzer(NAME, new HtmlLowerStopStemAnalyzer());
+        analyzer.addAnalyzer(ALLTEXTUNSTEMMED, new HtmlLowerStopAnalyzer());
+        analyzer.addAnalyzer(NAMEUNSTEMMED, new HtmlLowerStopAnalyzer());        
         return analyzer;
     }
     
