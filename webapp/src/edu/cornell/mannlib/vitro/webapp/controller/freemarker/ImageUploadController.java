@@ -200,7 +200,14 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	 */
 	private void doForward(HttpServletRequest req, HttpServletResponse resp,
 			ResponseValues values) throws ServletException, IOException {
-		req.getRequestDispatcher(values.getForwardUrl()).forward(req, resp);
+		String forwardUrl = values.getForwardUrl();
+		if (forwardUrl.contains("://")) {
+			// It's a full URL, so redirect.
+			resp.sendRedirect(forwardUrl);
+		} else {
+			// It's a relative URL, so forward within the application.
+			req.getRequestDispatcher(forwardUrl).forward(req, resp);
+		}
 	}
 
 	/**
