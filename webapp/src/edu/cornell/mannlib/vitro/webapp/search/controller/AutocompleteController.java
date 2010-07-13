@@ -26,6 +26,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.queryParser.ParseException;
+import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
@@ -54,13 +56,13 @@ import freemarker.template.Configuration;
 
 /**
  * AutocompleteController is used to generate autocomplete and select element content
- * through a Lucene search. The search logic is copied from PagedSearchController.
+ * through a Lucene search. The search logic is copied from AutocompleteController.
  */
 
-/* rjy7 We should have a SearchController that is subclassed by both PagedSearchController 
+/* rjy7 We should have a SearchController that is subclassed by both AutocompleteController 
  * and AjaxSearchController, so the methods don't all have to be copied into both places.
  * The parent SearchController should extend FreeMarkerHttpServlet. Can only be done
- * once PagedSearchController has been moved to FreeMarker.
+ * once AutocompleteController has been moved to FreeMarker.
  */
 public class AutocompleteController extends FreeMarkerHttpServlet implements Searcher{
 
@@ -219,9 +221,8 @@ public class AutocompleteController extends FreeMarkerHttpServlet implements Sea
                 return null;
             } 
 
-            query = makeNameQuery(querystr, request);
+            query = makeNameQuery(querystr, analyzer, request);
             
-
             // Filter by type
             {
                 BooleanQuery boolQuery = new BooleanQuery(); 
@@ -251,45 +252,67 @@ public class AutocompleteController extends FreeMarkerHttpServlet implements Sea
         return query;
     }
     
-    private Query makeNameQuery(String querystr, HttpServletRequest request) {
-        String stemParam = (String) request.getParameter("stem"); 
-        boolean stem = "true".equals(stemParam);
-        
-        String tokenizeParam = (String) request.getParameter("stem"); 
+    private Query makeNameQuery(String querystr, Analyzer analyzer, HttpServletRequest request) {
+
+        String tokenizeParam = (String) request.getParameter("tokenize"); 
         boolean tokenize = "true".equals(tokenizeParam);
         
-        // The search index is lowercased
-        querystr = querystr.toLowerCase();
-        
-        // If the last token of the query string ends in a word-delimiting character
-        // it should not get a wildcard query term.
-        // E.g., "Dickens," should match "Dickens" but not "Dickenson"
-        // This test might need to be moved to makeNameQuery().
-        Pattern p = Pattern.compile("\\W$");
-        Matcher m = p.matcher(querystr);
-        boolean lastTermIsWildcard = !m.find();
-        
-        // Stemming is only relevant if we are tokenizing. An untokenized name
-        // query will not stem.
+        // Note: Stemming is only relevant if we are tokenizing: an untokenized name
+        // query will not be stemmed. So we don't look at the stem parameter until we get to
+        // makeTokenizedNameQuery().
         if (tokenize) {
-            return makeTokenizedNameQuery(querystr, stem, lastTermIsWildcard);
+            return makeTokenizedNameQuery(querystr, analyzer, request);
         } else {
             return makeUntokenizedNameQuery(querystr);
         }
     }
     
-    private Query makeTokenizedNameQuery(String querystr, boolean stem, boolean lastTermIsWildcard) {
-    
-        Query query = null;
-  
+    private Query makeTokenizedNameQuery(String querystr, Analyzer analyzer, HttpServletRequest request) {
+ 
+        String stemParam = (String) request.getParameter("stem"); 
+        boolean stem = "true".equals(stemParam);
         String termName = stem ? Entity2LuceneDoc.term.NAME : Entity2LuceneDoc.term.NAMEUNSTEMMED;
 
+        BooleanQuery boolQuery = new BooleanQuery();
+        
+        // Use the query parser to analyze the search term the same way the indexed text was analyzed.
+        // For example, text is lowercased, and function words are stripped out.
+        QueryParser parser = getQueryParser(termName, analyzer);
+        
+        // The wildcard query doesn't play well with stemming. Query term name:tales* doesn't match
+        // "tales", which is indexed as "tale", while query term name:tales does. Obviously we need 
+        // the wildcard for name:tal*, so the only way to get them all to match is use a disjunction 
+        // of wildcard and non-wildcard queries. The query will look have only an implicit disjunction
+        // operator: e.g., +(name:tales name:tales*)
+        try {
+            Query query = parser.parse(querystr);
+            log.debug("Adding non-wildcard query for " + querystr);
+            boolQuery.add(query, BooleanClause.Occur.SHOULD);
+
+            Query wildcardQuery = parser.parse(querystr + "*");
+            log.debug("Adding wildcard query for " + querystr);
+            boolQuery.add(wildcardQuery, BooleanClause.Occur.SHOULD);
+            
+            log.debug("Name query is: " + boolQuery.toString());
+;        } catch (ParseException e) {
+            log.error(e, e);
+        }
+        
+        
+        return boolQuery;
+        
+/*       
+        Query query = null;
+        
+        // The search index is lowercased
+        querystr = querystr.toLowerCase();
+        
         List<String> terms = Arrays.asList(querystr.split("[, ]+"));
         for (Iterator<String> i = terms.iterator(); i.hasNext(); ) {
             String term = (String) i.next();
+            BooleanQuery boolQuery = new BooleanQuery(); 
             // All items but last get a regular term query
-            if (i.hasNext()) {
-                BooleanQuery boolQuery = new BooleanQuery(); 
+            if (i.hasNext()) {                
                 boolQuery.add( 
                         new TermQuery(new Term(termName, term)),
                         BooleanClause.Occur.MUST);  
@@ -298,33 +321,34 @@ public class AutocompleteController extends FreeMarkerHttpServlet implements Sea
                 }
                 query = boolQuery;                          
             }
-            // Last item goes on to next block
+            // Last term
             else {
-                querystr = term;
+                // If the last token of the query string ends in a word-delimiting character
+                // it should not get a wildcard query term.
+                // E.g., "Dickens," should match "Dickens" but not "Dickenson"
+                Pattern p = Pattern.compile("\\W$");
+                Matcher m = p.matcher(querystr);
+                boolean lastTermIsWildcard = !m.find();
+                
+                if (lastTermIsWildcard) {
+                    log.debug("Adding wildcard query on last term");
+                    boolQuery.add( 
+                            new WildcardQuery(new Term(termName, term + "*")),
+                            BooleanClause.Occur.MUST);                 
+                } else {
+                    log.debug("Adding term query on last term");
+                    boolQuery.add( 
+                            new TermQuery(new Term(termName, term)),
+                            BooleanClause.Occur.MUST);                    
+                }
+                if (query != null) {
+                    boolQuery.add(query, BooleanClause.Occur.MUST); 
+                }
+                query = boolQuery;
             }
         }
- 
-        // Last term
-        {
-            BooleanQuery boolQuery = new BooleanQuery();            
-            if (lastTermIsWildcard) {
-                log.debug("Adding wildcard query on last term");
-                boolQuery.add( 
-                        new WildcardQuery(new Term(termName, querystr + "*")),
-                        BooleanClause.Occur.MUST);                 
-            } else {
-                log.debug("Adding term query on last term");
-                boolQuery.add( 
-                        new TermQuery(new Term(termName, querystr)),
-                        BooleanClause.Occur.MUST);                    
-            }
-            if (query != null) {
-                boolQuery.add(query, BooleanClause.Occur.MUST); 
-            }
-            query = boolQuery;
-        }
-
         return query;
+*/        
     }
 
     private Query makeUntokenizedNameQuery(String querystr) {
@@ -391,6 +415,17 @@ public class AutocompleteController extends FreeMarkerHttpServlet implements Sea
         }
     }
 
+    private QueryParser getQueryParser(String searchField, Analyzer analyzer){
+        // searchField indicates which field to search against when there is no term
+        // indicated in the query string.
+        // The analyzer is needed so that we use the same analyzer on the search queries as
+        // was used on the text that was indexed.
+        QueryParser qp = new QueryParser(searchField,analyzer);
+        //this sets the query parser to AND all of the query terms it finds.
+        qp.setDefaultOperator(QueryParser.AND_OPERATOR);
+        return qp;
+    }
+    
     private synchronized IndexSearcher getIndexSearcher(String indexDir) {
         if( searcher == null ){
             try {                
@@ -463,15 +498,15 @@ public class AutocompleteController extends FreeMarkerHttpServlet implements Sea
     }
 
     public VitroHighlighter getHighlighter(VitroQuery q) {
-        throw new Error("PagedSearchController.getHighlighter() is unimplemented");
+        throw new Error("AutocompleteController.getHighlighter() is unimplemented");
     }
 
     public VitroQueryFactory getQueryFactory() {
-        throw new Error("PagedSearchController.getQueryFactory() is unimplemented");
+        throw new Error("AutocompleteController.getQueryFactory() is unimplemented");
     }
 
     public List search(VitroQuery query) throws SearchException {
-        throw new Error("PagedSearchController.search() is unimplemented");
+        throw new Error("AutocompleteController.search() is unimplemented");
     }
 
 }
