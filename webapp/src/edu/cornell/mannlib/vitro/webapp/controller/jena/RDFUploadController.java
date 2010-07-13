@@ -224,7 +224,7 @@ public class RDFUploadController extends BaseEditController {
                         JenaModelUtils.makeClassGroupsFromRootClasses(webappDaoFactory, changesModel, changesModel);
                     mainModel.add(classgroupModel);
                 }                
-                if (portal != null && portal.length>0) {
+                if (!remove && portal != null && portal.length>0) {
                     for (int i=0; i<portal.length; i++) {
                         JenaModelUtils.checkAllIndividualsInModelIntoPortal(changesModel, changesModel, portal[i]);
                     }
