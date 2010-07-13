@@ -2,13 +2,12 @@
 
 $(document).ready(function(){
 
+  // upload form is hidden by default; use JavaScript to reveal
   $("#photoUploadContainer").removeClass("hidden");
 
-
+  // Confirmation alert for photo deletion
   $('a.delete').click(function(){
-   // var answer = confirm('Are you sure you want to '+ jQuery(this).attr('title') +'?' );
    var answer = confirm('Are you sure you want to delete your photo?');
-    // jQuery(this).attr('title') gets anchor title attribute
     return answer;
   });
 
