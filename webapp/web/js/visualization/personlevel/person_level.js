@@ -1,5 +1,3 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
-
 function getWellFormedURLs(given_uri, type) {
 
 	// general best practice is to put javascript code inside document.ready
@@ -231,6 +229,17 @@ function nodeClickedJS(json){
 	 * Here obj.url points to the uri of that individual
 	 */
 	if(obj.url){
+		
+		if (obj.url == egoURI) {
+			
+			$("#authorName").addClass('author_name').removeClass('neutral_author_name');
+			
+		} else {
+
+			$("#authorName").addClass('neutral_author_name').removeClass('author_name');
+			
+		}
+		
 		$("#profileUrl").attr("href", getWellFormedURLs(obj.url, "profile"));
 		$("#coAuthorshipVisUrl").attr("href", getWellFormedURLs(obj.url, "coauthorship"));
 		processProfileInformation("", 
@@ -238,6 +247,8 @@ function nodeClickedJS(json){
 				"profileImage",
 				jQuery.parseJSON(getWellFormedURLs(obj.url, "profile_info")),
 				true);
+		
+		
 
 	} else{
 		$("#profileUrl").attr("href","#");
