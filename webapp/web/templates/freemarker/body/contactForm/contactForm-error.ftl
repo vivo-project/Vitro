@@ -2,15 +2,17 @@
 
 <#-- Contact form processing errors -->
 
+
 <h2>${title}</h2>
 
-<img src="${urls.siteIcons}/bomb.gif" alt="email error"/>
-
-<p class="normal">An error occurred during the processing of your request.<br />
     <#if errorMessage?has_content>       
-        <strong>${errorMessage}</strong>
+
+        <div id="errorAlert"><img src="${urls.siteIcons}/iconAlert.png"/>
+                  <p>${errorMessage}</p>
+           </div>
+       
     </#if>
 </p> 
 
 
-<p>Return to the <a href="${urls.home}">home page</a>.</p> 
+<p class="contactUsReturnHome">Return to the <a href="${urls.home}">home page</a>.</p> 
