@@ -30,6 +30,7 @@ import com.hp.hpl.jena.db.DBConnection;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
+import com.hp.hpl.jena.ontology.OntProperty;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecException;
 import com.hp.hpl.jena.query.QueryExecution;
@@ -100,7 +101,8 @@ public class JenaIngestController extends BaseEditController {
 	private static final String WORKFLOW_STEP_JSP = "/jenaIngest/workflowStep.jsp";
 	private static final String GENERATE_TBOX_JSP = "/jenaIngest/generateTBox.jsp";
 	private static final String PERMANENT_URI = "/jenaIngest/permanentURI.jsp";
-
+	private static final String MERGE_INDIVIDUALS = "/jenaIngest/mergeIndividuals.jsp";
+	private static final String MERGE_RESULT = "/templates/edit/specific/merge_result.jsp";
 	private static final String SPARQL_CONSTRUCT_CLASS = "http://vitro.mannlib.cornell.edu/ns/vitro/0.7/sparql#SPARQLCONSTRUCTQuery";
 	private static final String SPARQL_QUERYSTR_PROP = "http://vitro.mannlib.cornell.edu/ns/vitro/0.7/sparql#queryStr";
 	
@@ -439,7 +441,25 @@ public class JenaIngestController extends BaseEditController {
 			  }
 			  
 			  
-		  } else {
+		  }
+		else if("mergeIndividuals".equals(actionStr)){
+			  String uri1 = vreq.getParameter("uri1");
+			  String uri2 = vreq.getParameter("uri2");
+			  if(uri1!=null){
+				  String result = doMerge(uri1,uri2,response);
+				  request.setAttribute("result",result);
+				  request.setAttribute("title","Merge Individuals");
+				  request.setAttribute("bodyJsp",MERGE_RESULT);
+				   
+			  }
+			  else{
+				  request.setAttribute("title","Merge Individuals");
+				  request.setAttribute("bodyJsp",MERGE_INDIVIDUALS);  
+			  }
+			   
+		  }
+		
+		else {
 			request.setAttribute("title","Ingest Menu");
 			request.setAttribute("bodyJsp",INGEST_MENU_JSP);
 		}
@@ -966,7 +986,55 @@ public class JenaIngestController extends BaseEditController {
 		res.removeAll((Property)null);
 		return uri;
 	}
-	
+	private String doMerge(String uri1, String uri2,HttpServletResponse response){
+		OntModel vitroJenaModel = (OntModel) getServletContext().getAttribute("baseOntModel");
+		Resource res1 = vitroJenaModel.getResource(uri1);
+		Resource res2 = vitroJenaModel.getResource(uri2);
+		String result = null;
+		StmtIterator stmtItr1 = vitroJenaModel.listStatements(res1,(Property)null,(RDFNode)null);
+		StmtIterator stmtItr2 = vitroJenaModel.listStatements(res2,(Property)null,(RDFNode)null);
+		if(!stmtItr1.hasNext()){
+			result = "resource 1 not present";
+			res1.removeAll((Property)null);
+			return result;
+		}
+		else if(!stmtItr2.hasNext()){
+			result = "resource 2 not present";
+			res2.removeAll((Property)null);
+			return result;
+		}
+		
+		int counter = 0;
+		Model leftoverModel = ModelFactory.createDefaultModel();
+		while(stmtItr2.hasNext()){
+		
+			Statement stmt = stmtItr2.next();
+			Property prop = stmt.getPredicate();
+			OntProperty oprop = vitroJenaModel.getOntProperty(prop.getURI());
+		    if(oprop!=null && oprop.isFunctionalProperty()){
+		    	leftoverModel.add(res2,stmt.getPredicate(),stmt.getObject());
+		    }
+		    else{
+		    vitroJenaModel.add(res1,stmt.getPredicate(),stmt.getObject()); 
+		    counter++;
+		    }
+		}
+		res2.removeAll((Property)null);
+		response.setContentType("RDF/XML-ABBREV");
+		try{
+		OutputStream outStream = response.getOutputStream();
+		outStream.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>".getBytes());
+		leftoverModel.write( outStream,"RDF/XML-ABBREV");
+		outStream.flush();
+		outStream.close();
+		}
+		catch(IOException ioe){
+			throw new RuntimeException(ioe);
+		}
+		result = "merging done for " + counter + " statements.";
+		return result;
+			
+	}
 	public void prepareSmush (VitroRequest vreq) {
 		String smushPropURI = vreq.getParameter("smushPropURI");
 	}
