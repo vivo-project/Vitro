@@ -947,23 +947,25 @@ public class JenaIngestController extends BaseEditController {
 		
 			
 		}
-		private String getUnusedURI(String newNamespace){
-			String uri = null;
-			SimpleOntModelSelector getModel = new SimpleOntModelSelector();
-			OntModel fullModel = getModel.getABoxModel();
-			Random random = new Random();
-			Resource res = null;
-			boolean check=true;
-			log.info("Going into loop");
-			do{
-			uri = newNamespace + "individual" + random.nextInt();
-			res = fullModel.getResource(uri);
-		    check = fullModel.containsResource(res);
-			}while(check==true);
-			log.info("url assigned");
-			res.removeAll((Property)null);
-			return uri;
+	private String getUnusedURI(String newNamespace){
+		String uri = null;
+		Random random = new Random();
+		boolean resourcePresent=true;
+		OntModel vitroJenaModel = (OntModel) getServletContext().getAttribute("baseOntModel");
+		log.info("Going into loop");
+		Resource res = null;
+		do{
+		uri = newNamespace + "individual" + random.nextInt();
+		res = vitroJenaModel.getResource(uri);
+		StmtIterator stmtItr1 = vitroJenaModel.listStatements(res,(Property)null,(RDFNode)null);
+		if(!stmtItr1.hasNext()){
+			resourcePresent=false;
 		}
+		}while(resourcePresent);
+		log.info("url assigned");
+		res.removeAll((Property)null);
+		return uri;
+	}
 	
 	public void prepareSmush (VitroRequest vreq) {
 		String smushPropURI = vreq.getParameter("smushPropURI");
