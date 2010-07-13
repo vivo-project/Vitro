@@ -80,8 +80,6 @@ $.fn.image = function(src, successFunc, failureFunc){
 
 function setProfileImage(imageContainerID, rawPath, contextPath) {
 	
-	console.log("<---- START IN " + imageContainerID + " +++ FOR +++ " + rawPath + " ------->");
-	
 	if (imageContainerID == "") {
 		return;
 	}
@@ -91,19 +89,15 @@ function setProfileImage(imageContainerID, rawPath, contextPath) {
 	var imageContainer = $("#" + imageContainerID);
 	imageContainer.image(imageLink, 
 			function(){
-		console.log("image LOAD FTW");
 		imageContainer.empty().append(this); 
 	},
 	function(){
 		// For performing any action on failure to
 		// find the image.
-		console.log("failed to load the dude's image");
 		imageContainer.empty();
 	}
 	);
 	
-	console.log("<---- END " + rawPath + " ------->");
-
 }
 
 function setProfileMoniker(monikerContainerID, moniker, doEllipsis) {
@@ -235,6 +229,17 @@ function nodeClickedJS(json){
 	 * Here obj.url points to the uri of that individual
 	 */
 	if(obj.url){
+		
+		if (obj.url == egoURI) {
+			
+			$("#authorName").addClass('author_name').removeClass('neutral_author_name');
+			
+		} else {
+
+			$("#authorName").addClass('neutral_author_name').removeClass('author_name');
+			
+		}
+		
 		$("#profileUrl").attr("href", getWellFormedURLs(obj.url, "profile"));
 		$("#coAuthorshipVisUrl").attr("href", getWellFormedURLs(obj.url, "coauthorship"));
 		processProfileInformation("", 
@@ -242,6 +247,8 @@ function nodeClickedJS(json){
 				"profileImage",
 				jQuery.parseJSON(getWellFormedURLs(obj.url, "profile_info")),
 				true);
+		
+		
 
 	} else{
 		$("#profileUrl").attr("href","#");

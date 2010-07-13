@@ -43,6 +43,7 @@ var requiredRevision = 0;
 
 
 var swfLink = "${swfLink}";
+var egoURI = "${requestScope.egoURIParam}";
 var egoCoAuthorshipDataFeederURL = "${egoCoAuthorshipDataFeederURL}";
 var egoCoAuthorsListDataFileURL = "${egoCoAuthorsListDataFileURL}";
 var contextPath = "${contextPath}";

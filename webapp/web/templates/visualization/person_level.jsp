@@ -89,15 +89,6 @@ table.sparkline_wrapper_table td, th {
 
 #ego_label {
 	font-size:1.1em;
-	/*margin-left:100px;
-	margin-top:9px;
-	position:absolute;*/
-}
-
-#ego_moniker {
-	/*margin-left:100px;
-	margin-top:27px;
-	position:absolute;*/
 }
 
 #ego_profile_image {
@@ -113,19 +104,9 @@ table.sparkline_wrapper_table td, th {
 #ego_sparkline {
 	cursor:pointer;
 	height:36px;
-	/*
-	margin-left:10px;
-	margin-top:69px;
-	position:absolute;*/
 	width:471px;
 }
 
-#dataPanel {
-	/*
-	float: left; 
-	width: 150px; 
-	visibility:hidden;*/
-}
 
 #coauthorships_table th {
 	vertical-align: top;
@@ -173,7 +154,6 @@ table.sparkline_wrapper_table td, th {
 			</div>
 			
 		<h2 class="sub_headings">Co-Author Network 
-				<%-- A simple if/else condition --%>
 		<c:choose>
 		    <c:when test="${numOfCoAuthorShips > 0 || numOfAuthors > 0}">
 		       <a href="${coAuthorshipDownloadFile}">(.GraphML File)</a></h2>
@@ -276,10 +256,6 @@ $(document).ready(function(){
 		}
 		
 	</c:if>	
-
-	
-
-	  
 
 });
 </script>
