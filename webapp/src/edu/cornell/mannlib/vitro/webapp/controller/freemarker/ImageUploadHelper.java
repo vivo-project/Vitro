@@ -407,14 +407,17 @@ public class ImageUploadHelper {
 		InputStream stream = null;
 		try {
 			stream = fileStorage.getInputStream(uri, filename);
-			BufferedImage image = ImageIO.read(stream);
-			return new Dimensions(image.getWidth(), image.getHeight());
+			BufferedImage i = ImageIO.read(stream);
+			Dimensions size = new Dimensions(i.getWidth(), i.getHeight());
+			log.debug("main image size is " + size);
+			return size;
 		} catch (FileNotFoundException e) {
-			log.warn("No main image file for '" + showUri(entity) + "'; name='"
-					+ filename + "', bytestreamUri='" + uri + "'", e);
+			log.error(
+					"No main image file for '" + showUri(entity) + "'; name='"
+							+ filename + "', bytestreamUri='" + uri + "'", e);
 			return new Dimensions(0, 0);
 		} catch (IOException e) {
-			log.warn(
+			log.error(
 					"Can't read main image file for '" + showUri(entity)
 							+ "'; name='" + filename + "', bytestreamUri='"
 							+ uri + "'", e);

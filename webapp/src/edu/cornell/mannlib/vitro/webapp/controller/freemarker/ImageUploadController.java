@@ -283,8 +283,18 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 
 		// Did they provide a file to upload? If not, show an error.
 		FileItem fileItem;
+		Dimensions mainImageSize;
 		try {
 			fileItem = helper.validateImageFromRequest(vreq);
+			mainImageSize = helper.getMainImageSize(entity);
+
+			if ((mainImageSize.height < THUMBNAIL_HEIGHT)
+					|| (mainImageSize.width < THUMBNAIL_WIDTH)) {
+				throw new UserMistakeException(
+						"The uploaded image should be at least "
+								+ THUMBNAIL_HEIGHT + " pixels high and "
+								+ THUMBNAIL_WIDTH + " pixels wide.");
+			}
 		} catch (UserMistakeException e) {
 			String thumbUrl = getThumbnailUrl(entity);
 			String message = e.getMessage();
@@ -304,8 +314,6 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 		String entityUri = entity.getURI();
 		entity = getWebappDaoFactory().getIndividualDao().getIndividualByURI(
 				entityUri);
-
-		Dimensions mainImageSize = helper.getMainImageSize(entity);
 
 		// Go to the cropping page.
 		return showCropImagePage(vreq, entity, getMainImageUrl(entity),
@@ -635,6 +643,11 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 		Dimensions(int width, int height) {
 			this.width = width;
 			this.height = height;
+		}
+
+		@Override
+		public String toString() {
+			return "Dimensions[width=" + width + ", height=" + height + "]";
 		}
 	}
 
