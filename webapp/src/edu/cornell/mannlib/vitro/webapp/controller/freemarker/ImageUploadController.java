@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -46,15 +45,20 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 
 	public static final String DUMMY_THUMBNAIL_URL = "/images/dummyImages/person.thumbnail.jpg";
 
-	/** Limit file size to 50 megabytes. */
-	public static final int MAXIMUM_FILE_SIZE = 50 * 1024 * 1024;
+	/** Limit file size to 6 megabytes. */
+	public static final int MAXIMUM_FILE_SIZE = 6 * 1024 * 1024;
 
 	/** Generated thumbnails will be this big. */
 	public static final int THUMBNAIL_HEIGHT = 115;
 	public static final int THUMBNAIL_WIDTH = 115;
 
+	/** The form field that tells what we are doing: uploading? deleting? */
 	public static final String PARAMETER_ACTION = "action";
+
+	/** The form field that identifies the Individual. */
 	public static final String PARAMETER_ENTITY_URI = "entityUri";
+
+	/** The form field of the uploaded file; use as a key to the FileItem map. */
 	public static final String PARAMETER_UPLOADED_FILE = "datafile";
 
 	public static final String ACTION_SAVE = "save";
@@ -133,21 +137,18 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 			throws IOException, ServletException {
 
 		try {
-			FileUploadServletRequest parsedRequest = FileUploadServletRequest
-					.parseRequest(request, MAXIMUM_FILE_SIZE);
+			// Parse the multi-part request.
+			request = FileUploadServletRequest.parseRequest(request,
+					MAXIMUM_FILE_SIZE);
 			if (log.isTraceEnabled()) {
-				dumpRequestDetails(parsedRequest);
+				dumpRequestDetails(request);
 			}
-		} catch (FileUploadException e) {
-			// Swallow the exception here. Test for FILE_ITEM_MAP later.
-			log.error("Failed to parse the multi-part HTTP request", e);
-		}
 
-		try {
-			// do setup defined in VitroHttpServlet
+			// Do setup defined in VitroHttpServlet
 			setup(request);
 
 			VitroRequest vreq = new VitroRequest(request);
+
 			ResponseValues values = buildTheResponse(vreq);
 
 			// They can't do this if they aren't logged in.
@@ -402,8 +403,8 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	 *            if this is null, then all URLs lead to the welcome page.
 	 */
 	private TemplateResponseValues showAddImagePage(Individual entity) {
-		String formAction = (entity == null) ? "" : formAction(
-				entity.getURI(), ACTION_UPLOAD);
+		String formAction = (entity == null) ? "" : formAction(entity.getURI(),
+				ACTION_UPLOAD);
 		String cancelUrl = (entity == null) ? "" : displayPageUrl(entity
 				.getURI());
 

@@ -2,9 +2,12 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
+import static edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadController.MAXIMUM_FILE_SIZE;
 import static edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadController.PARAMETER_UPLOADED_FILE;
 import static edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadController.THUMBNAIL_HEIGHT;
 import static edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadController.THUMBNAIL_WIDTH;
+import static edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest.FILE_ITEM_MAP;
+import static edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest.FILE_UPLOAD_EXCEPTION;
 
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
@@ -86,8 +89,16 @@ public class ImageUploadHelper {
 	@SuppressWarnings("unchecked")
 	FileItem validateImageFromRequest(HttpServletRequest request)
 			throws UserMistakeException {
+		Object exception = request.getAttribute(FILE_UPLOAD_EXCEPTION);
+		if (exception != null) {
+			int limit = MAXIMUM_FILE_SIZE / (1024 * 1024);
+			throw new UserMistakeException(
+					"Please upload an image smaller than " + limit
+							+ " megabytes");
+		}
+
 		Map<String, List<FileItem>> map = (Map<String, List<FileItem>>) request
-				.getAttribute(FileUploadServletRequest.FILE_ITEM_MAP);
+				.getAttribute(FILE_ITEM_MAP);
 		if (map == null) {
 			throw new IllegalStateException("Failed to parse the "
 					+ "multi-part request for uploading an image.");
