@@ -37,7 +37,6 @@ import edu.cornell.mannlib.vitro.webapp.visualization.visutils.UniqueIDGenerator
 
 
 /**
- * Very dumb name of the class. change it.
  * @author cdtank
  *
  */

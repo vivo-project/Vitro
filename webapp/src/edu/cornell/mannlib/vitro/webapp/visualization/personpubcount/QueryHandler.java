@@ -31,7 +31,6 @@ import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.Individual;
 
 
 /**
- * Very dumb name of the class. change it.
  * @author cdtank
  *
  */
