@@ -278,32 +278,16 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	 * image (and thumbnail), and attach the new main image.
 	 */
 	private ResponseValues doUploadImage(VitroRequest vreq, Individual entity) {
-		ImageUploadHelper helper = new ImageUploadHelper(fileStorage,
-				vreq.getFullWebappDaoFactory());
+		ImageUploadHelper helper = new ImageUploadHelper(fileStorage, vreq
+				.getFullWebappDaoFactory());
 
 		// Did they provide a file to upload? If not, show an error.
 		FileItem fileItem;
-		Dimensions mainImageSize;
 		try {
 			fileItem = helper.validateImageFromRequest(vreq);
-			mainImageSize = helper.getMainImageSize(entity);
 
-			if ((mainImageSize.height < THUMBNAIL_HEIGHT)
-					|| (mainImageSize.width < THUMBNAIL_WIDTH)) {
-				throw new UserMistakeException(
-						"The uploaded image should be at least "
-								+ THUMBNAIL_HEIGHT + " pixels high and "
-								+ THUMBNAIL_WIDTH + " pixels wide.");
-			}
 		} catch (UserMistakeException e) {
-			String thumbUrl = getThumbnailUrl(entity);
-			String message = e.getMessage();
-			if (thumbUrl == null) {
-				return showAddImagePageWithError(vreq, entity, message);
-			} else {
-				return showReplaceImagePageWithError(vreq, entity, thumbUrl,
-						message);
-			}
+			return showErrorMessage(vreq, entity, e.getMessage());
 		}
 
 		// Remove the old main image (if any) and store the new one.
@@ -312,12 +296,37 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 
 		// The entity Individual is stale - get another one;
 		String entityUri = entity.getURI();
-		entity = vreq.getFullWebappDaoFactory().getIndividualDao().getIndividualByURI(
-				entityUri);
+		entity = vreq.getFullWebappDaoFactory().getIndividualDao()
+				.getIndividualByURI(entityUri);
+
+		Dimensions mainImageSize = helper.getMainImageSize(entity);
+
+		if ((mainImageSize.height < THUMBNAIL_HEIGHT)
+				|| (mainImageSize.width < THUMBNAIL_WIDTH)) {
+			String message = "The uploaded image should be at least "
+					+ THUMBNAIL_HEIGHT + " pixels high and " + THUMBNAIL_WIDTH
+					+ " pixels wide.";
+			return showErrorMessage(vreq, entity, message);
+		}
 
 		// Go to the cropping page.
 		return showCropImagePage(vreq, entity, getMainImageUrl(entity),
 				mainImageSize);
+	}
+
+	/**
+	 * Are we writing the error message to the "Add" page or to the "Replace"
+	 * page?
+	 */
+	private ResponseValues showErrorMessage(VitroRequest vreq,
+			Individual entity, String message) {
+		String thumbUrl = getThumbnailUrl(entity);
+		if (thumbUrl == null) {
+			return showAddImagePageWithError(vreq, entity, message);
+		} else {
+			return showReplaceImagePageWithError(vreq, entity, thumbUrl,
+					message);
+		}
 	}
 
 	/**
@@ -326,8 +335,8 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	 */
 	private ResponseValues doCreateThumbnail(VitroRequest vreq,
 			Individual entity) {
-		ImageUploadHelper helper = new ImageUploadHelper(fileStorage,
-				vreq.getFullWebappDaoFactory());
+		ImageUploadHelper helper = new ImageUploadHelper(fileStorage, vreq
+				.getFullWebappDaoFactory());
 
 		validateMainImage(entity);
 		CropRectangle crop = validateCropCoordinates(vreq);
@@ -342,8 +351,8 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	 * Delete the main image and the thumbnail from the individual.
 	 */
 	private ResponseValues doDeleteImage(VitroRequest vreq, Individual entity) {
-		ImageUploadHelper helper = new ImageUploadHelper(fileStorage,
-				vreq.getFullWebappDaoFactory());
+		ImageUploadHelper helper = new ImageUploadHelper(fileStorage, vreq
+				.getFullWebappDaoFactory());
 
 		helper.removeExistingImage(entity);
 
