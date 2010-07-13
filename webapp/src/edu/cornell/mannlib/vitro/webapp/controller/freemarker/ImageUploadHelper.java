@@ -111,17 +111,14 @@ public class ImageUploadHelper {
 
 		FileItem file = list.get(0);
 		if (file.getSize() == 0) {
-			throw new UserMistakeException("No file was uploaded in '"
-					+ PARAMETER_UPLOADED_FILE + "'");
+			throw new UserMistakeException("Please browse and select a photo.");
 		}
 
 		String filename = getSimpleFilename(file);
 		String mimeType = getMimeType(file);
 		if (!RECOGNIZED_FILE_TYPES.containsValue(mimeType)) {
 			throw new UserMistakeException("'" + filename
-					+ "' is not a recognized image file type. "
-					+ "These are the recognized types: "
-					+ RECOGNIZED_FILE_TYPES);
+					+ "' is not a recognized image file type. Please upload JPEG, GIF, or PNG files only.");
 		}
 
 		return file;
