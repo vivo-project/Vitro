@@ -2,7 +2,6 @@
 
 <#-- Contact form processing errors -->
 
-
 <h2>${title}</h2>
 
     <#if errorMessage?has_content>       
