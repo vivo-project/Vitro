@@ -135,7 +135,7 @@ public class VisualizationRequestHandler {
 			if (VisualizationFrameworkConstants.DYNAMIC_RENDER_MODE_URL_VALUE.equalsIgnoreCase(renderMode)) {
 
 				prepareVisualizationQueryDynamicResponse(request, response, vitroRequest,
-						valueObjectContainer);
+						valueObjectContainer, yearToPublicationCount);
 		    	requestDispatcher = request.getRequestDispatcher("/templates/page/blankPage.jsp");
 
 			} else {
@@ -300,12 +300,19 @@ public class VisualizationRequestHandler {
 	}
 
 	private void prepareVisualizationQueryDynamicResponse(HttpServletRequest request,
-			HttpServletResponse response, VitroRequest vreq, SparklineVOContainer valueObjectContainer) {
+			HttpServletResponse response, VitroRequest vreq, SparklineVOContainer valueObjectContainer, 
+			Map<String, Integer> yearToPublicationCount) {
 
         Portal portal = vreq.getPortal();
 
         request.setAttribute("sparklineVO", valueObjectContainer);
 
+        if (yearToPublicationCount.size() > 0) {
+        	request.setAttribute("shouldVIVOrenderVis", true);
+        } else {
+        	request.setAttribute("shouldVIVOrenderVis", false);
+        }
+        
         request.setAttribute("portalBean", portal);
         request.setAttribute("bodyJsp", "/templates/visualization/ajax_vis_content.jsp");
 
