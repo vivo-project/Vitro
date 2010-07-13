@@ -72,11 +72,11 @@ public class PropertyRetryController extends BaseEditController {
             action = epo.getAction();
         }
 
-        ObjectPropertyDao propDao = getWebappDaoFactory().getObjectPropertyDao();
+        ObjectPropertyDao propDao = request.getFullWebappDaoFactory().getObjectPropertyDao();
         epo.setDataAccessObject(propDao);
-        OntologyDao ontDao = getWebappDaoFactory().getOntologyDao();
-        VClassDao vclassDao = getWebappDaoFactory().getVClassDao();
-        DataPropertyDao dpDao = getWebappDaoFactory().getDataPropertyDao();
+        OntologyDao ontDao = request.getFullWebappDaoFactory().getOntologyDao();
+        VClassDao vclassDao = request.getFullWebappDaoFactory().getVClassDao();
+        DataPropertyDao dpDao = request.getFullWebappDaoFactory().getDataPropertyDao();
 
         ObjectProperty propertyForEditing = null;
         if (!epo.getUseRecycledBean()){
@@ -151,10 +151,10 @@ public class PropertyRetryController extends BaseEditController {
         HashMap<String, List<Option>> optionMap = new HashMap<String, List<Option>>();
         try {
             List<Option> namespaceIdList = FormUtils.makeOptionListFromBeans(ontDao.getAllOntologies(),"URI","Name", ((propertyForEditing.getNamespace()==null) ? "" : propertyForEditing.getNamespace()), null, (propertyForEditing.getNamespace()!=null));
-	        namespaceIdList.add(new Option(getWebappDaoFactory().getDefaultNamespace(),"default"));
+	        namespaceIdList.add(new Option(request.getFullWebappDaoFactory().getDefaultNamespace(),"default"));
             optionMap.put("Namespace", namespaceIdList);
             List<Option> namespaceIdInverseList = FormUtils.makeOptionListFromBeans(ontDao.getAllOntologies(),"URI","Name",  ((propertyForEditing.getNamespaceInverse()==null) ? "" : propertyForEditing.getNamespaceInverse()), null, (propertyForEditing.getNamespaceInverse()!=null));
-	        namespaceIdInverseList.add(new Option(getWebappDaoFactory().getDefaultNamespace(),"default"));
+	        namespaceIdInverseList.add(new Option(request.getFullWebappDaoFactory().getDefaultNamespace(),"default"));
             optionMap.put("NamespaceInverse", namespaceIdInverseList);
             List<ObjectProperty> objPropList = propDao.getAllObjectProperties();
             Collections.sort(objPropList);
@@ -166,10 +166,10 @@ public class PropertyRetryController extends BaseEditController {
             List<Option> objectIndividualSortPropertyList = FormUtils.makeOptionListFromBeans(dpList,"URI","Name",propertyForEditing.getObjectIndividualSortPropertyURI(),null);
             objectIndividualSortPropertyList.add(0,new Option("","- select data property -"));
             optionMap.put("ObjectIndividualSortPropertyURI",objectIndividualSortPropertyList);       
-            List<Option> domainOptionList = FormUtils.makeVClassOptionList(getWebappDaoFactory(), propertyForEditing.getDomainVClassURI());
+            List<Option> domainOptionList = FormUtils.makeVClassOptionList(request.getFullWebappDaoFactory(), propertyForEditing.getDomainVClassURI());
             domainOptionList.add(0, new Option("","(none specified)"));
             optionMap.put("DomainVClassURI", domainOptionList);
-            List<Option> rangeOptionList = FormUtils.makeVClassOptionList(getWebappDaoFactory(), propertyForEditing.getRangeVClassURI());
+            List<Option> rangeOptionList = FormUtils.makeVClassOptionList(request.getFullWebappDaoFactory(), propertyForEditing.getRangeVClassURI());
             rangeOptionList.add(0, new Option("","(none specified)"));
             optionMap.put("RangeVClassURI", rangeOptionList);
         } catch (Exception e) {
@@ -179,7 +179,7 @@ public class PropertyRetryController extends BaseEditController {
         optionMap.put("HiddenFromDisplayBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getDisplayOptionsList(propertyForEditing));    
         optionMap.put("ProhibitedFromUpdateBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getUpdateOptionsList(propertyForEditing));
 
-        List groupOptList = FormUtils.makeOptionListFromBeans(getWebappDaoFactory().getPropertyGroupDao().getPublicGroups(true),"URI","Name", ((propertyForEditing.getGroupURI()==null) ? "" : propertyForEditing.getGroupURI()), null, (propertyForEditing.getGroupURI()!=null));
+        List groupOptList = FormUtils.makeOptionListFromBeans(request.getFullWebappDaoFactory().getPropertyGroupDao().getPublicGroups(true),"URI","Name", ((propertyForEditing.getGroupURI()==null) ? "" : propertyForEditing.getGroupURI()), null, (propertyForEditing.getGroupURI()!=null));
         groupOptList.add(0,new Option("","none"));
         optionMap.put("GroupURI", groupOptList);
         

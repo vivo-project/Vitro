@@ -105,8 +105,7 @@ public class MailUsersServlet extends VitroHttpServlet {
         int recipientCount = 0;
         String deliveryfrom = null;
         
-        
-        UserDao uDao = getWebappDaoFactory().getUserDao();
+        UserDao uDao = vreq.getFullWebappDaoFactory().getUserDao();
         
         // get Individuals that the User mayEditAs
         deliverToArray = uDao.getUserAccountEmails();

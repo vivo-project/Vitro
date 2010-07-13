@@ -80,7 +80,7 @@ public class CloneEntityServlet extends BaseEditController {
         }
         
         LoginFormBean loginBean = (LoginFormBean) request.getSession().getAttribute("loginHandler");
-		WebappDaoFactory myWebappDaoFactory = getWebappDaoFactory().getUserAwareDaoFactory(loginBean.getUserURI());
+		WebappDaoFactory myWebappDaoFactory = request.getFullWebappDaoFactory().getUserAwareDaoFactory(loginBean.getUserURI());
         IndividualDao individualDao = myWebappDaoFactory.getIndividualDao();
         PropertyInstanceDao propertyInstanceDao = myWebappDaoFactory.getPropertyInstanceDao();
 

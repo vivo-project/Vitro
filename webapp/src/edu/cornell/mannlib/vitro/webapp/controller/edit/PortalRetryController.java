@@ -55,9 +55,9 @@ public class PortalRetryController extends BaseEditController {
 
         String action = "insert";
 
-        PortalDao pDao = getWebappDaoFactory().getPortalDao();
+        PortalDao pDao = request.getFullWebappDaoFactory().getPortalDao();
         epo.setDataAccessObject(pDao);
-        TabDao tDao = getWebappDaoFactory().getTabDao();
+        TabDao tDao = request.getFullWebappDaoFactory().getTabDao();
 
         boolean creatingNewPortal = false; 
         Portal portalForEditing = null;
@@ -96,7 +96,8 @@ public class PortalRetryController extends BaseEditController {
         //set up any listeners
         List changeListenerList = new ArrayList();
         epo.setChangeListenerList(changeListenerList);
-        changeListenerList.add(new PortalPrefixUpdater(getServletContext(),getWebappDaoFactory().getPortalDao()));
+        changeListenerList.add(new PortalPrefixUpdater(getServletContext(), 
+        		request.getFullWebappDaoFactory().getPortalDao()));
         
         epo.setPostDeletePageForwarder(new PortalDeletionPageForwarder(getServletContext(),pDao));
 
@@ -139,7 +140,7 @@ public class PortalRetryController extends BaseEditController {
 
         String html = FormUtils.htmlFormFromBean(portalForEditing,action,foo,epo.getBadValueMap());
 
-        Boolean singlePortal = new Boolean(request.getWebappDaoFactory().getPortalDao().isSinglePortal());
+        Boolean singlePortal = new Boolean(request.getFullWebappDaoFactory().getPortalDao().isSinglePortal());
         request.setAttribute("singlePortal", singlePortal);
         request.setAttribute("creatingNewPortal", new Boolean(creatingNewPortal));
             

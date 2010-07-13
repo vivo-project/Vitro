@@ -52,7 +52,7 @@ public class Tabs2TabsRetryController extends BaseEditController {
 
         String action = "insert";
 
-        TabDao tDao = getWebappDaoFactory().getTabDao();
+        TabDao tDao = request.getFullWebappDaoFactory().getTabDao();
 
         Tab child = null;
         Tab parent = null;

@@ -33,7 +33,7 @@ public class PortalsListingController extends BaseEditController {
             t.printStackTrace();
         }
 
-        PortalDao dao = getWebappDaoFactory().getPortalDao();
+        PortalDao dao = vrequest.getFullWebappDaoFactory().getPortalDao();
 
         Collection portals = dao.getAllPortals();
 

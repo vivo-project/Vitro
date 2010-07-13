@@ -47,11 +47,12 @@ public class PropertyEditController extends BaseEditController {
             log.error("PropertyEditController caught exception calling doGet()");
         }
 
-        Portal portal = (new VitroRequest(request)).getPortal();
+        VitroRequest vreq = new VitroRequest(request);
+        Portal portal = vreq.getPortal();
         
-        ObjectPropertyDao propDao = getWebappDaoFactory().getObjectPropertyDao();
-        VClassDao vcDao = getWebappDaoFactory().getVClassDao();
-        PropertyGroupDao pgDao = getWebappDaoFactory().getPropertyGroupDao();
+        ObjectPropertyDao propDao = vreq.getFullWebappDaoFactory().getObjectPropertyDao();
+        VClassDao vcDao = vreq.getFullWebappDaoFactory().getVClassDao();
+        PropertyGroupDao pgDao = vreq.getFullWebappDaoFactory().getPropertyGroupDao();
         ObjectProperty p = (ObjectProperty)propDao.getObjectPropertyByURI(request.getParameter("uri"));
         request.setAttribute("property",p);
 
@@ -166,10 +167,10 @@ public class PropertyEditController extends BaseEditController {
         // superproperties and subproperties
         
         ObjectPropertyDao opDao;
-        if (getAssertionsWebappDaoFactory() != null) {
-        	opDao = getAssertionsWebappDaoFactory().getObjectPropertyDao();
+        if (vreq.getAssertionsWebappDaoFactory() != null) {
+        	opDao = vreq.getAssertionsWebappDaoFactory().getObjectPropertyDao();
         } else {
-        	opDao = getWebappDaoFactory().getObjectPropertyDao();
+        	opDao = vreq.getFullWebappDaoFactory().getObjectPropertyDao();
         }
         List superURIs = opDao.getSuperPropertyURIs(p.getURI(),false);
         List superProperties = new ArrayList();

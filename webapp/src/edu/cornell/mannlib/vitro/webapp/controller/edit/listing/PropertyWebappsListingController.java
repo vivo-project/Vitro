@@ -59,10 +59,10 @@ public class PropertyWebappsListingController extends BaseEditController {
 
         String ontologyUri = request.getParameter("ontologyUri");
 
-        ObjectPropertyDao dao = getWebappDaoFactory().getObjectPropertyDao();
-        PropertyInstanceDao piDao = getWebappDaoFactory().getPropertyInstanceDao();
-        VClassDao vcDao = getWebappDaoFactory().getVClassDao();
-        PropertyGroupDao pgDao = getWebappDaoFactory().getPropertyGroupDao();
+        ObjectPropertyDao dao = vrequest.getFullWebappDaoFactory().getObjectPropertyDao();
+        PropertyInstanceDao piDao = vrequest.getFullWebappDaoFactory().getPropertyInstanceDao();
+        VClassDao vcDao = vrequest.getFullWebappDaoFactory().getVClassDao();
+        PropertyGroupDao pgDao = vrequest.getFullWebappDaoFactory().getPropertyGroupDao();
 
         List props = new ArrayList();
         if (request.getParameter("propsForClass") != null) {
@@ -86,7 +86,7 @@ public class PropertyWebappsListingController extends BaseEditController {
             : dao.getAllObjectProperties();
         }
         
-        OntologyDao oDao=getWebappDaoFactory().getOntologyDao();
+        OntologyDao oDao = vrequest.getFullWebappDaoFactory().getOntologyDao();
         HashMap<String,String> ontologyHash = new HashMap<String,String>();
 
         Iterator propIt = props.iterator();

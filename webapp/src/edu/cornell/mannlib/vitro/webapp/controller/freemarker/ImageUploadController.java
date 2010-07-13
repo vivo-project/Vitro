@@ -279,7 +279,7 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	 */
 	private ResponseValues doUploadImage(VitroRequest vreq, Individual entity) {
 		ImageUploadHelper helper = new ImageUploadHelper(fileStorage,
-				getWebappDaoFactory());
+				vreq.getFullWebappDaoFactory());
 
 		// Did they provide a file to upload? If not, show an error.
 		FileItem fileItem;
@@ -312,7 +312,7 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 
 		// The entity Individual is stale - get another one;
 		String entityUri = entity.getURI();
-		entity = getWebappDaoFactory().getIndividualDao().getIndividualByURI(
+		entity = vreq.getFullWebappDaoFactory().getIndividualDao().getIndividualByURI(
 				entityUri);
 
 		// Go to the cropping page.
@@ -327,7 +327,7 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	private ResponseValues doCreateThumbnail(VitroRequest vreq,
 			Individual entity) {
 		ImageUploadHelper helper = new ImageUploadHelper(fileStorage,
-				getWebappDaoFactory());
+				vreq.getFullWebappDaoFactory());
 
 		validateMainImage(entity);
 		CropRectangle crop = validateCropCoordinates(vreq);
@@ -343,7 +343,7 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	 */
 	private ResponseValues doDeleteImage(VitroRequest vreq, Individual entity) {
 		ImageUploadHelper helper = new ImageUploadHelper(fileStorage,
-				getWebappDaoFactory());
+				vreq.getFullWebappDaoFactory());
 
 		helper.removeExistingImage(entity);
 
@@ -360,7 +360,7 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 			throw new UserMistakeException("No entity URI was provided");
 		}
 
-		Individual entity = getWebappDaoFactory().getIndividualDao()
+		Individual entity = vreq.getFullWebappDaoFactory().getIndividualDao()
 				.getIndividualByURI(entityUri);
 		if (entity == null) {
 			throw new UserMistakeException(

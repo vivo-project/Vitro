@@ -49,10 +49,10 @@ public class VClassWebappsListingController extends BaseEditController {
         List<VClass> classes = null;
         
         if (request.getParameter("showPropertyRestrictions") != null) {
-        	PropertyDao pdao = getWebappDaoFactory().getObjectPropertyDao();
+        	PropertyDao pdao = vrequest.getFullWebappDaoFactory().getObjectPropertyDao();
         	classes = pdao.getClassesWithRestrictionOnProperty(request.getParameter("propertyURI"));
         } else {
-        	VClassDao vcdao = getWebappDaoFactory().getVClassDao();
+        	VClassDao vcdao = vrequest.getFullWebappDaoFactory().getVClassDao();
         	
         	if (request.getParameter("iffRoot") != null) {
                 classes = vcdao.getRootClasses();
@@ -94,12 +94,12 @@ public class VClassWebappsListingController extends BaseEditController {
 	                String shortDef = (cls.getShortDef()==null) ? "" : cls.getShortDef();
 	                String example = (cls.getExample()==null) ? "" : cls.getExample();
 	                StringBuffer commSb = new StringBuffer();
-	                for (Iterator<String> commIt = getWebappDaoFactory().getCommentsForResource(cls.getURI()).iterator(); commIt.hasNext();) { 
+	                for (Iterator<String> commIt = vrequest.getFullWebappDaoFactory().getCommentsForResource(cls.getURI()).iterator(); commIt.hasNext();) { 
 	                	commSb.append(commIt.next()).append(" ");
 	                }
 	                
 	                // get group name
-	                WebappDaoFactory wadf = getWebappDaoFactory();
+	                WebappDaoFactory wadf = vrequest.getFullWebappDaoFactory();
 	                VClassGroupDao groupDao= wadf.getVClassGroupDao();
 	                String groupURI = cls.getGroupURI();                
 	                String groupName = "";

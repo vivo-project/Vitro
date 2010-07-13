@@ -30,6 +30,7 @@ import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaModelUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSpecialModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
@@ -96,7 +97,7 @@ public class RDFUploadController extends BaseEditController {
 		        portalArray[0] = currentPortal.getPortalId();
 		    } else if (individualCheckIn.equals("all")) {
 		        try {
-		            Collection<Portal> portalCollection = getWebappDaoFactory().getPortalDao().getAllPortals();
+		            Collection<Portal> portalCollection = request.getFullWebappDaoFactory().getPortalDao().getAllPortals();
 		            portalArray = new int[portalCollection.size()];
 		            int index = 0;
 		            for (Iterator<Portal> pit = portalCollection.iterator(); pit.hasNext(); ) { 
@@ -161,7 +162,7 @@ public class RDFUploadController extends BaseEditController {
 		        memModel = (OntModel) getServletContext().getAttribute("baseOntModel");
 		    }
 		    if (memModel != null) {
-		        stmtCount = operateOnModel(memModel,tempModel,remove,makeClassgroups,portalArray,loginBean.getUserURI());
+		        stmtCount = operateOnModel(request.getFullWebappDaoFactory(), memModel,tempModel,remove,makeClassgroups,portalArray,loginBean.getUserURI());
 		    }					
 		}
 			
@@ -213,14 +214,14 @@ public class RDFUploadController extends BaseEditController {
 		
 	}
 	
-    private long operateOnModel(OntModel mainModel, Model changesModel, boolean remove, boolean makeClassgroups, int[] portal,  String userURI) {
+    private long operateOnModel(WebappDaoFactory webappDaoFactory, OntModel mainModel, Model changesModel, boolean remove, boolean makeClassgroups, int[] portal,  String userURI) {
         mainModel.enterCriticalSection(Lock.WRITE);
         try {
             mainModel.getBaseModel().notifyEvent(new EditEvent(userURI,true));
             try {                
                 if (makeClassgroups) {
                     Model classgroupModel = 
-                        JenaModelUtils.makeClassGroupsFromRootClasses(getWebappDaoFactory(), changesModel, changesModel);
+                        JenaModelUtils.makeClassGroupsFromRootClasses(webappDaoFactory, changesModel, changesModel);
                     mainModel.add(classgroupModel);
                 }                
                 if (portal != null && portal.length>0) {

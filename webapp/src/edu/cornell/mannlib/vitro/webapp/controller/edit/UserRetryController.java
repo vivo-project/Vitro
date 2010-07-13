@@ -52,7 +52,7 @@ public class UserRetryController extends BaseEditController {
 
         //create an EditProcessObject for this and put it in the session
         EditProcessObject epo = super.createEpo(request);
-        epo.setDataAccessObject(getWebappDaoFactory().getVClassDao());
+        epo.setDataAccessObject(vreq.getFullWebappDaoFactory().getVClassDao());
 
         String action = null;
         if (epo.getAction() == null) {
@@ -62,7 +62,7 @@ public class UserRetryController extends BaseEditController {
             action = epo.getAction();
         }
 
-        UserDao uDao = getWebappDaoFactory().getUserDao();
+        UserDao uDao = vreq.getFullWebappDaoFactory().getUserDao();
         epo.setDataAccessObject(uDao);
 
         User userForEditing = null;

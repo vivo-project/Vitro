@@ -36,7 +36,7 @@ public class PrimitiveDelete extends PrimitiveRdfEdit {
             return;
         }
 
-        WebappDaoFactory wdf = vreq.getWebappDaoFactory();
+        WebappDaoFactory wdf = vreq.getFullWebappDaoFactory();
         IndividualDao idao = wdf.getIndividualDao();
         int result = idao.deleteIndividual(uriToDelete);
         if (result == 1) {

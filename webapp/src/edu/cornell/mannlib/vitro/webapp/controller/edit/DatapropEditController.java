@@ -35,6 +35,9 @@ public class DatapropEditController extends BaseEditController {
 	private static final Log log = LogFactory.getLog(DatapropEditController.class.getName());
 
     public void doPost (HttpServletRequest request, HttpServletResponse response) {
+    	
+    	VitroRequest vreq = new VitroRequest(request);
+    	
         final int NUM_COLS=15;
 
         if (!checkLoginStatus(request,response,(String)request.getAttribute("fetchURI")))
@@ -48,9 +51,9 @@ public class DatapropEditController extends BaseEditController {
 
         String datapropURI = request.getParameter("uri");
 
-        DataPropertyDao dpDao = getWebappDaoFactory().getDataPropertyDao();
+        DataPropertyDao dpDao = vreq.getFullWebappDaoFactory().getDataPropertyDao();
         DataProperty dp = dpDao.getDataPropertyByURI(datapropURI);
-        PropertyGroupDao pgDao = getWebappDaoFactory().getPropertyGroupDao();
+        PropertyGroupDao pgDao = vreq.getFullWebappDaoFactory().getPropertyGroupDao();
 
         ArrayList results = new ArrayList();
         results.add("Data Property");
@@ -76,7 +79,7 @@ public class DatapropEditController extends BaseEditController {
         results.add(dp.getLocalNameWithPrefix());
         String ontologyName = null;
         if (dp.getNamespace() != null) {
-            Ontology ont = getWebappDaoFactory().getOntologyDao().getOntologyByURI(dp.getNamespace());
+            Ontology ont = vreq.getFullWebappDaoFactory().getOntologyDao().getOntologyByURI(dp.getNamespace());
             if ( (ont != null) && (ont.getName() != null) ) {
                 ontologyName = ont.getName();
             }
@@ -134,9 +137,9 @@ public class DatapropEditController extends BaseEditController {
         foo.setOptionLists(OptionMap);
         epo.setFormObject(foo);
 
-        DataPropertyDao assertionsDpDao = (getAssertionsWebappDaoFactory() != null) 
-            ? getAssertionsWebappDaoFactory().getDataPropertyDao()
-            : getWebappDaoFactory().getDataPropertyDao();
+        DataPropertyDao assertionsDpDao = (vreq.getAssertionsWebappDaoFactory() != null) 
+            ? vreq.getAssertionsWebappDaoFactory().getDataPropertyDao()
+            : vreq.getFullWebappDaoFactory().getDataPropertyDao();
         
         List superURIs = assertionsDpDao.getSuperPropertyURIs(dp.getURI(),false);
         List superProperties = new ArrayList();

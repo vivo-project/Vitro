@@ -62,7 +62,7 @@ public class TabRetryController extends BaseEditController {
 
         String action = "insert";
 
-        TabDao tDao = getWebappDaoFactory().getTabDao();
+        TabDao tDao = request.getFullWebappDaoFactory().getTabDao();
         epo.setDataAccessObject(tDao);
 
         //set portal flag to current portal

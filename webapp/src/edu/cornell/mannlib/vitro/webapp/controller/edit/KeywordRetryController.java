@@ -55,9 +55,9 @@ public class KeywordRetryController extends BaseEditController {
         epo.setBeanClass(Keyword.class);
         epo.setBeanMask(testMask);
 
-        KeywordDao kDao = getWebappDaoFactory().getKeywordDao();
+        KeywordDao kDao = request.getFullWebappDaoFactory().getKeywordDao();
         epo.setDataAccessObject(kDao);
-        epo.getAdditionalDaoMap().put("KeywordIndividualRelationDao", getWebappDaoFactory().getKeys2EntsDao());
+        epo.getAdditionalDaoMap().put("KeywordIndividualRelationDao", request.getFullWebappDaoFactory().getKeys2EntsDao());
 
         String action="insert";
         

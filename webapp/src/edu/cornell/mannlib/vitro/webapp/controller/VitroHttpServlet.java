@@ -24,10 +24,6 @@ public class VitroHttpServlet extends HttpServlet
     protected static DateFormat publicDateFormat = new SimpleDateFormat("M/dd/yyyy");
 
     private static final Log log = LogFactory.getLog(VitroHttpServlet.class.getName());
-    
-    private WebappDaoFactory myWebappDaoFactory = null;
-    private WebappDaoFactory myAssertionsWebappDaoFactory = null;
-    private WebappDaoFactory myDeductionsWebappDaoFactory = null;
 
     public final static String XHTML_MIMETYPE ="application/xhtml+xml";
     public final static String HTML_MIMETYPE ="text/html";
@@ -49,21 +45,6 @@ public class VitroHttpServlet extends HttpServlet
 
     protected final void setup(HttpServletRequest request) {
         
-        if (request.getSession() != null) {
-            Object webappDaoFactoryAttr = request.getSession().getAttribute("webappDaoFactory");
-            if (webappDaoFactoryAttr != null && webappDaoFactoryAttr instanceof WebappDaoFactory) {
-                myWebappDaoFactory = (WebappDaoFactory) webappDaoFactoryAttr;
-            }
-            webappDaoFactoryAttr = request.getSession().getAttribute("assertionsWebappDaoFactory");
-            if (webappDaoFactoryAttr != null && webappDaoFactoryAttr instanceof WebappDaoFactory) {
-                myAssertionsWebappDaoFactory = (WebappDaoFactory) webappDaoFactoryAttr;
-            }
-            webappDaoFactoryAttr = request.getSession().getAttribute("deductionsWebappDaoFactory");
-            if (webappDaoFactoryAttr != null && webappDaoFactoryAttr instanceof WebappDaoFactory) {
-                myDeductionsWebappDaoFactory = (WebappDaoFactory) webappDaoFactoryAttr;
-            }
-        }
-        
         //check to see if VitroRequestPrep filter was run
         if( request.getAttribute("appBean") == null ||
             request.getAttribute("webappDaoFactory") == null ){
@@ -80,25 +61,6 @@ public class VitroHttpServlet extends HttpServlet
                            throws ServletException, IOException
     {
         doGet( request,response );
-    }
-
-
-    /** gets WebappDaoFactory with no filtering */
-    public WebappDaoFactory getWebappDaoFactory(){
-    	return (myWebappDaoFactory != null) ? myWebappDaoFactory :
-        (WebappDaoFactory) getServletContext().getAttribute("webappDaoFactory");
-    }
-    
-    /** gets assertions-only WebappDaoFactory with no filtering */
-    public WebappDaoFactory getAssertionsWebappDaoFactory() {
-    	return (myAssertionsWebappDaoFactory != null) ? myAssertionsWebappDaoFactory :
-    	(WebappDaoFactory) getServletContext().getAttribute("assertionsWebappDaoFactory");
-    }
-    
-    /** gets inferences-only WebappDaoFactory with no filtering */
-    public WebappDaoFactory getDeductionsWebappDaoFactory() {
-    	return (myDeductionsWebappDaoFactory != null) ? myDeductionsWebappDaoFactory :
-    	(WebappDaoFactory) getServletContext().getAttribute("deductionsWebappDaoFactory");
     }
 
 }

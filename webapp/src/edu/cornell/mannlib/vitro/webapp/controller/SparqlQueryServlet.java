@@ -325,7 +325,7 @@ public class SparqlQueryServlet extends BaseEditController {
             /* @author ass92 */
                   
             
-            OntologyDao daoObj = getWebappDaoFactory().getOntologyDao();
+            OntologyDao daoObj = vreq.getFullWebappDaoFactory().getOntologyDao();
             List ontologiesObj = daoObj.getAllOntologies();
             ArrayList prefixList = new ArrayList();
             

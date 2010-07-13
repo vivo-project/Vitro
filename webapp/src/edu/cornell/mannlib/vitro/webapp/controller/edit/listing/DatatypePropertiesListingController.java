@@ -52,10 +52,10 @@ public class DatatypePropertiesListingController extends BaseEditController {
 
         String ontologyUri = request.getParameter("ontologyUri");
 
-        DataPropertyDao dao = getWebappDaoFactory().getDataPropertyDao();
-        VClassDao vcDao = getWebappDaoFactory().getVClassDao();
-        DatatypeDao dDao = getWebappDaoFactory().getDatatypeDao();
-        PropertyGroupDao pgDao = getWebappDaoFactory().getPropertyGroupDao();
+        DataPropertyDao dao = vrequest.getFullWebappDaoFactory().getDataPropertyDao();
+        VClassDao vcDao = vrequest.getFullWebappDaoFactory().getVClassDao();
+        DatatypeDao dDao = vrequest.getFullWebappDaoFactory().getDatatypeDao();
+        PropertyGroupDao pgDao = vrequest.getFullWebappDaoFactory().getPropertyGroupDao();
 
         List props = new ArrayList();
 

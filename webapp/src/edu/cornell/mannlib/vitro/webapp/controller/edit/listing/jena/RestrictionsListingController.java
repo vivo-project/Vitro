@@ -62,8 +62,9 @@ public class RestrictionsListingController extends BaseEditController {
 
         OntModel ontModel = (OntModel) getServletContext().getAttribute("jenaOntModel");
         
-        ObjectPropertyDao opDao = getWebappDaoFactory().getObjectPropertyDao();
-        IndividualDao iDao = getWebappDaoFactory().getIndividualDao();
+        ObjectPropertyDao opDao = vrequest.getFullWebappDaoFactory().getObjectPropertyDao();
+        VClassDao vcDao = vrequest.getFullWebappDaoFactory().getVClassDao();
+        IndividualDao iDao = vrequest.getFullWebappDaoFactory().getIndividualDao();
         
         ArrayList results = new ArrayList();
         request.setAttribute("results",results);
@@ -84,7 +85,7 @@ public class RestrictionsListingController extends BaseEditController {
 	        		try {
 		        		for (Iterator i = superClassIt; i.hasNext(); ) {
 		        			OntClass superClass = (OntClass) i.next();
-		        			tryRestriction(superClass, opDao, iDao, results, vClassURI);
+		        			tryRestriction(superClass, vcDao, opDao, iDao, results, vClassURI);
 		        		}
 	        		} finally {
 	        			superClassIt.close();
@@ -93,7 +94,7 @@ public class RestrictionsListingController extends BaseEditController {
 	        		try {
 		        		for (Iterator i = equivClassIt; i.hasNext(); ) {
 		        			OntClass superClass = (OntClass) i.next();
-		        			tryRestriction(superClass, opDao, iDao, results, vClassURI);
+		        			tryRestriction(superClass, vcDao, opDao, iDao, results, vClassURI);
 		        		}
 	        		} finally {
 	        			equivClassIt.close();
@@ -126,7 +127,7 @@ public class RestrictionsListingController extends BaseEditController {
 
     }
     
-    private void tryRestriction(OntClass theClass, ObjectPropertyDao opDao, IndividualDao iDao, ArrayList results, String vClassURI) {
+    private void tryRestriction(OntClass theClass, VClassDao vcDao, ObjectPropertyDao opDao, IndividualDao iDao, ArrayList results, String vClassURI) {
 		if (theClass.isRestriction()) {
 			Restriction rest = (Restriction) theClass.as(Restriction.class);
 			try {
@@ -138,12 +139,12 @@ public class RestrictionsListingController extends BaseEditController {
 					results.add("all values from");
 					AllValuesFromRestriction avfrest = (AllValuesFromRestriction) rest.as(AllValuesFromRestriction.class);
 					Resource allValuesFrom = avfrest.getAllValuesFrom();
-					results.add(printAsClass(allValuesFrom));	        					
+					results.add(printAsClass(vcDao, allValuesFrom));	        					
 				} else if (rest.isSomeValuesFromRestriction()) {
 					results.add("some values from");
 					SomeValuesFromRestriction svfrest = (SomeValuesFromRestriction) rest.as(SomeValuesFromRestriction.class);
 					Resource someValuesFrom = svfrest.getSomeValuesFrom();
-					results.add(printAsClass(someValuesFrom));
+					results.add(printAsClass(vcDao, someValuesFrom));
 				} else if (rest.isHasValueRestriction()) {
 					results.add("has value");
 					HasValueRestriction hvrest = (HasValueRestriction) rest.as(HasValueRestriction.class);
@@ -191,9 +192,8 @@ public class RestrictionsListingController extends BaseEditController {
 		}	
     }
     
-    private String printAsClass(Resource res) {
+    private String printAsClass(VClassDao vcDao, Resource res) {
     	String UNKNOWN = "???";
-    	VClassDao vcDao = getWebappDaoFactory().getVClassDao();
     	try {
     		VClass vClass = vcDao.getVClassByURI(res.getURI());
     		return (vClass.getName() != null) ? vClass.getName() : UNKNOWN ;

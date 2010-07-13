@@ -35,6 +35,7 @@ import com.hp.hpl.jena.shared.Lock;
 import edu.cornell.mannlib.vedit.beans.LoginFormBean;
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration;
@@ -307,7 +308,7 @@ public class N3MultiPartUpload extends VitroHttpServlet {
         	//This is before the redirect occurs from postEditCleanUp
         	//Send out email confirmation here
         	try {
-        		sendUserEmail(session, uploadFileName);
+        		sendUserEmail(request, session, uploadFileName);
         	} catch(Exception ex) {
         		System.out.println("Problem with retrieving and/or sending email");
         	}
@@ -506,12 +507,12 @@ public class N3MultiPartUpload extends VitroHttpServlet {
         return out;
     }
     
-    public void sendUserEmail(HttpSession session, String uploadFileName) {
+    public void sendUserEmail(HttpServletRequest request, HttpSession session, String uploadFileName) {
 		LoginFormBean loginBean = (LoginFormBean) session.getAttribute("loginHandler");
         String userURI = loginBean.getUserURI();
         try{
 	        System.out.println("User URI is " + userURI);
-	        UserDao uDao = getWebappDaoFactory().getUserDao();
+	        UserDao uDao = (new VitroRequest(request)).getFullWebappDaoFactory().getUserDao();
 	        String email = uDao.getUserEmailAddress(userURI);
 	        String deliveryFrom = "hjk54@cornell.edu";//TO DO: replace with email address to be used
 	        //Now send message

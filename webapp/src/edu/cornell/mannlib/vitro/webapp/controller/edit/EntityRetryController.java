@@ -84,7 +84,7 @@ public class EntityRetryController extends BaseEditController {
             action = epo.getAction();
         }
 
-        WebappDaoFactory wadf = (getAssertionsWebappDaoFactory()!=null) ? getAssertionsWebappDaoFactory() : getWebappDaoFactory();
+        WebappDaoFactory wadf = (vreq.getAssertionsWebappDaoFactory()!=null) ? vreq.getAssertionsWebappDaoFactory() : vreq.getFullWebappDaoFactory();
         
         LoginFormBean loginBean = (LoginFormBean) request.getSession().getAttribute("loginHandler");
         WebappDaoFactory myWebappDaoFactory = wadf.getUserAwareDaoFactory(loginBean.getUserURI());
@@ -202,7 +202,7 @@ public class EntityRetryController extends BaseEditController {
         	vclasses = new ArrayList<VClass>();
         	if (individualForEditing.getVClassURI() != null) {
         		try {
-	        		VClass cls = getWebappDaoFactory().getVClassDao().getVClassByURI(individualForEditing.getVClassURI());
+	        		VClass cls = vreq.getFullWebappDaoFactory().getVClassDao().getVClassByURI(individualForEditing.getVClassURI());
 	        		if (cls != null) {
 	        			vclasses.add(cls);
 	        		}

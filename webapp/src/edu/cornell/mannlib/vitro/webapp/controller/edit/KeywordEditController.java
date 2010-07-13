@@ -40,7 +40,7 @@ public class KeywordEditController extends BaseEditController {
         String theKeywordId = linkwhereId.substring(15,linkwhereId.length()-1);
         int kwId = Integer.decode(theKeywordId);
 
-        Keyword k = vreq.getWebappDaoFactory().getKeywordDao().getKeywordById(kwId);
+        Keyword k = vreq.getFullWebappDaoFactory().getKeywordDao().getKeywordById(kwId);
 
         EditProcessObject epo = super.createEpo(request);
         FormObject foo = new FormObject();

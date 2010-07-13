@@ -30,11 +30,13 @@ public class AllClassGroupsListingController extends BaseEditController {
         } catch (Throwable t) {
             t.printStackTrace();
         }
-        Portal portal = (new VitroRequest(request)).getPortal();
+        
+        VitroRequest vreq = new VitroRequest(request);
+        Portal portal = vreq.getPortal();
 
         //need to figure out how to structure the results object to put the classes underneath
 
-        VClassGroupDao dao = getWebappDaoFactory().getVClassGroupDao();
+        VClassGroupDao dao = vreq.getFullWebappDaoFactory().getVClassGroupDao();
 
         List groups = dao.getPublicGroupsWithVClasses(); // uses an unfiltered dao so will see all classes
 

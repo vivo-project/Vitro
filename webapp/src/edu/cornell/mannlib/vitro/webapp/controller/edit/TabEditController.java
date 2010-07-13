@@ -55,11 +55,11 @@ public class TabEditController extends BaseEditController {
             }
         }
 
-        TabDao tDao = getWebappDaoFactory().getTabDao();
-        VClassDao vcDao = getWebappDaoFactory().getVClassDao();
-        VClassGroupDao vcgDao = getWebappDaoFactory().getVClassGroupDao();
-        IndividualDao eDao = getWebappDaoFactory().getIndividualDao();
-        Tab t = vreq.getWebappDaoFactory().getTabDao().getTab(tabId);
+        TabDao tDao = vreq.getFullWebappDaoFactory().getTabDao();
+        VClassDao vcDao = vreq.getFullWebappDaoFactory().getVClassDao();
+        VClassGroupDao vcgDao = vreq.getFullWebappDaoFactory().getVClassGroupDao();
+        IndividualDao eDao = vreq.getFullWebappDaoFactory().getIndividualDao();
+        Tab t = vreq.getFullWebappDaoFactory().getTabDao().getTab(tabId);
 
         request.setAttribute("tabId",tabId);
 
@@ -168,7 +168,7 @@ public class TabEditController extends BaseEditController {
         }
         request.setAttribute("affilTypes",types);
 
-        TabIndividualRelationDao tirDao = getWebappDaoFactory().getTabs2EntsDao();
+        TabIndividualRelationDao tirDao = vreq.getFullWebappDaoFactory().getTabs2EntsDao();
         List<TabIndividualRelation> tirs = tirDao.getTabIndividualRelationsByTabURI(((WebappDaoFactory)request.getSession().getServletContext().getAttribute("webappDaoFactory")).getDefaultNamespace()+"tab"+tabId);
         List checkboxList = new ArrayList();
         Iterator<TabIndividualRelation> tirsIt = tirs.iterator();

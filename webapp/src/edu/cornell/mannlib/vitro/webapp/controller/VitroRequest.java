@@ -58,11 +58,44 @@ public class VitroRequest implements HttpServletRequest {
         this._req = _req;
     }
 
-    public WebappDaoFactory getWebappDaoFactory(){
-        return( WebappDaoFactory) getAttribute("webappDaoFactory");
-    }
+    
     public void setWebappDaoFactory( WebappDaoFactory wdf){
         setAttribute("webappDaoFactory",wdf);
+    }
+    
+    /** gets WebappDaoFactory with appropriate filtering for the request */
+    public WebappDaoFactory getWebappDaoFactory(){
+    	return (WebappDaoFactory) getAttribute("webappDaoFactory");
+    }
+    
+    /** gets assertions + inferences WebappDaoFactory with no filtering **/
+    public WebappDaoFactory getFullWebappDaoFactory() {
+        Object webappDaoFactoryAttr = _req.getSession().getAttribute("webappDaoFactory");
+        if (webappDaoFactoryAttr instanceof WebappDaoFactory) {
+             return (WebappDaoFactory) webappDaoFactoryAttr;
+        } else {
+        	return (WebappDaoFactory) _req.getSession().getServletContext().getAttribute("webappDaoFactory");	
+        }	
+    }
+    
+    /** gets assertions-only WebappDaoFactory with no filtering */
+    public WebappDaoFactory getAssertionsWebappDaoFactory() {
+    	Object webappDaoFactoryAttr = _req.getSession().getAttribute("assertionsWebappDaoFactory");
+        if (webappDaoFactoryAttr instanceof WebappDaoFactory) {
+             return (WebappDaoFactory) webappDaoFactoryAttr;
+        } else {
+        	return (WebappDaoFactory) _req.getSession().getServletContext().getAttribute("assertionsWebappDaoFactory");	
+        }
+    }
+    
+    /** gets inferences-only WebappDaoFactory with no filtering */
+    public WebappDaoFactory getDeductionsWebappDaoFactory() {
+    	Object webappDaoFactoryAttr = _req.getSession().getAttribute("deductionsWebappDaoFactory");
+        if (webappDaoFactoryAttr instanceof WebappDaoFactory) {
+             return (WebappDaoFactory) webappDaoFactoryAttr;
+        } else {
+        	return (WebappDaoFactory) _req.getSession().getServletContext().getAttribute("deductionsWebappDaoFactory");	
+        }
     }
     
     public OntModel getJenaOntModel() {

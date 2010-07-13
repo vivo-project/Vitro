@@ -63,7 +63,7 @@ public class Tabs2TypesOperationController extends BaseEditController {
             return;
         }
 
-        TabVClassRelationDao dao = getWebappDaoFactory().getTabs2TypesDao();
+        TabVClassRelationDao dao = request.getFullWebappDaoFactory().getTabs2TypesDao();
 
         if (request.getParameter("_cancel") == null) {
 	        try {

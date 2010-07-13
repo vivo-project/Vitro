@@ -72,7 +72,7 @@ public class RestrictionOperationController extends BaseEditController {
 	            ontModel.enterCriticalSection(Lock.WRITE);
 	            try {
             		
-            		ontModel.getBaseModel().notifyEvent(new EditEvent(getWebappDaoFactory().getUserURI(),true));
+            		ontModel.getBaseModel().notifyEvent(new EditEvent(request.getFullWebappDaoFactory().getUserURI(),true));
             		
 	            	if ( request.getParameter("_action") != null && request.getParameter("_action").equals("delete") ) {
 	            		
@@ -180,7 +180,7 @@ public class RestrictionOperationController extends BaseEditController {
 	            	}
 	            	
 	            } finally {
-	            	ontModel.getBaseModel().notifyEvent(new EditEvent(getWebappDaoFactory().getUserURI(),false));
+	            	ontModel.getBaseModel().notifyEvent(new EditEvent(request.getFullWebappDaoFactory().getUserURI(),false));
 	            	ontModel.leaveCriticalSection();
 	            }
             

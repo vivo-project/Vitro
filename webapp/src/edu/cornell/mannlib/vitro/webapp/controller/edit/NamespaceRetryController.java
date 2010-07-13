@@ -49,9 +49,9 @@ public class NamespaceRetryController extends BaseEditController {
         epo.setBeanMask(testMask);
 
         String action = "insert";
-        if (getWebappDaoFactory() == null)
+        if (request.getFullWebappDaoFactory() == null)
             log.error("null CoreDaoFactory");
-        NamespaceDao namespaceDao = getWebappDaoFactory().getNamespaceDao();
+        NamespaceDao namespaceDao = request.getFullWebappDaoFactory().getNamespaceDao();
         //VitroFacade facade = getFacade();
         //epo.setFacade(facade);
 

@@ -43,7 +43,7 @@ public class UsersListingController extends BaseEditController {
             t.printStackTrace();
         }
 
-        UserDao dao = getWebappDaoFactory().getUserDao();
+        UserDao dao = vrequest.getFullWebappDaoFactory().getUserDao();
 
         List<User> users = dao.getAllUsers();
         Collections.sort(users);

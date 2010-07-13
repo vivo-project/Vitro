@@ -336,7 +336,7 @@ public class JenaIngestController extends BaseEditController {
 				jenaOntModel.leaveCriticalSection();
 			}
 			/*ass92*/
-			 OntologyDao daoObj = getWebappDaoFactory().getOntologyDao();
+			 OntologyDao daoObj = vreq.getFullWebappDaoFactory().getOntologyDao();
 	            List ontologiesObj = daoObj.getAllOntologies();
 	            ArrayList prefixList = new ArrayList();
 	            
@@ -427,7 +427,7 @@ public class JenaIngestController extends BaseEditController {
 			  else {
 				  namespaceList.add("no resources present");
 			  }
-			  String defaultNamespace = getWebappDaoFactory().getDefaultNamespace();
+			  String defaultNamespace = vreq.getFullWebappDaoFactory().getDefaultNamespace();
 			  request.setAttribute("modelName", modelName);
 			  request.setAttribute("defaultNamespace", defaultNamespace);
           	  request.setAttribute("namespaceList", namespaceList);
@@ -931,7 +931,7 @@ public class JenaIngestController extends BaseEditController {
 			String newNamespace,String dNamespace,ModelMaker maker,VitroRequest vreq){
 			
 			
-		    WebappDaoFactory wdf = vreq.getWebappDaoFactory();
+		    WebappDaoFactory wdf = vreq.getFullWebappDaoFactory();
 			Model m = maker.getModel(oldModel);
 			Model saveModel = maker.getModel(newModel);
 			ResIterator rsItr = m.listResourcesWithProperty((Property)null);

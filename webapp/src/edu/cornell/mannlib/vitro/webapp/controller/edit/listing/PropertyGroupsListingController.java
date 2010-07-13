@@ -36,11 +36,13 @@ public class PropertyGroupsListingController extends BaseEditController {
         } catch (Throwable t) {
             t.printStackTrace();
         }
-        Portal portal = (new VitroRequest(request)).getPortal();
+        
+        VitroRequest vrequest = new VitroRequest(request);
+        Portal portal = vrequest.getPortal();
 
         //need to figure out how to structure the results object to put the classes underneath
 
-        PropertyGroupDao dao = getWebappDaoFactory().getPropertyGroupDao();
+        PropertyGroupDao dao = vrequest.getFullWebappDaoFactory().getPropertyGroupDao();
 
         List groups = dao.getPublicGroups(true);
 

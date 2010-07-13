@@ -46,7 +46,7 @@ public class AllTabsForPortalListingController extends BaseEditController {
         types.put(26,"primary tab content");
         types.put(28,"primary tab");
 
-        TabDao dao = getWebappDaoFactory().getTabDao();
+        TabDao dao = vrequest.getFullWebappDaoFactory().getTabDao();
         List tabs = dao.getTabsForPortal(portal.getPortalId());
         Collections.sort(tabs, new TabComparator());
         

@@ -84,7 +84,7 @@ public class JSONServlet extends VitroHttpServlet {
         if( log.isDebugEnabled() )
             log.debug(" attempting to get option list for field '" + field + "'");            
         
-        Map<String,String> options = SelectListGenerator.getOptions(editConfig, field, getWebappDaoFactory());
+        Map<String,String> options = SelectListGenerator.getOptions(editConfig, field, (new VitroRequest(req)).getFullWebappDaoFactory());
         resp.setContentType("application/json");
         ServletOutputStream out = resp.getOutputStream();
         
@@ -187,7 +187,7 @@ public class JSONServlet extends VitroHttpServlet {
         log.debug("in getEntitiesByVClass()");
         VitroRequest vreq = new VitroRequest(req);
         String vclassURI = vreq.getParameter("vclassURI");
-        WebappDaoFactory daos = getWebappDaoFactory();
+        WebappDaoFactory daos = (new VitroRequest(req)).getFullWebappDaoFactory();
         resp.setCharacterEncoding("UTF-8");
         
         // ServletOutputStream doesn't support UTF-8
