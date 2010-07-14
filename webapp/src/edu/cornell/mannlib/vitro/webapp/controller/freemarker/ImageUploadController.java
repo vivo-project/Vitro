@@ -29,6 +29,7 @@ import edu.cornell.mannlib.vitro.webapp.filestorage.FileModelHelper;
 import edu.cornell.mannlib.vitro.webapp.filestorage.FileServingHelper;
 import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorage;
 import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup;
+import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
 import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest;
 import freemarker.template.Configuration;
 
@@ -281,37 +282,22 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 		ImageUploadHelper helper = new ImageUploadHelper(fileStorage, vreq
 				.getFullWebappDaoFactory());
 
-		// Did they provide a file to upload? If not, show an error.
-		FileItem fileItem;
 		try {
-			fileItem = helper.validateImageFromRequest(vreq);
+			// Did they provide a file to upload? If not, show an error.
+			FileItem fileItem = helper.validateImageFromRequest(vreq);
 
+			// Put it in the file system, and store a reference in the session.
+			FileInfo fileInfo = helper.storeNewImage(fileItem, vreq);
+
+			// How big is the new image? If not big enough, show an error.
+			Dimensions size = helper.getNewImageSize(fileInfo);
+
+			// Go to the cropping page.
+			return showCropImagePage(vreq, entity, fileInfo
+					.getBytestreamAliasUrl(), size);
 		} catch (UserMistakeException e) {
 			return showErrorMessage(vreq, entity, e.getMessage());
 		}
-
-		// Remove the old main image (if any) and store the new one.
-		helper.removeExistingImage(entity);
-		helper.storeMainImageFile(entity, fileItem);
-
-		// The entity Individual is stale - get another one;
-		String entityUri = entity.getURI();
-		entity = vreq.getFullWebappDaoFactory().getIndividualDao()
-				.getIndividualByURI(entityUri);
-
-		Dimensions mainImageSize = helper.getMainImageSize(entity);
-
-		if ((mainImageSize.height < THUMBNAIL_HEIGHT)
-				|| (mainImageSize.width < THUMBNAIL_WIDTH)) {
-			String message = "The uploaded image should be at least "
-					+ THUMBNAIL_HEIGHT + " pixels high and " + THUMBNAIL_WIDTH
-					+ " pixels wide.";
-			return showErrorMessage(vreq, entity, message);
-		}
-
-		// Go to the cropping page.
-		return showCropImagePage(vreq, entity, getMainImageUrl(entity),
-				mainImageSize);
 	}
 
 	/**
@@ -338,13 +324,18 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 		ImageUploadHelper helper = new ImageUploadHelper(fileStorage, vreq
 				.getFullWebappDaoFactory());
 
-		validateMainImage(entity);
-		CropRectangle crop = validateCropCoordinates(vreq);
+		try {
+			CropRectangle crop = validateCropCoordinates(vreq);
+			FileInfo newImage = helper.getNewImageInfo(vreq);
+			FileInfo thumbnail = helper.generateThumbnail(crop, newImage);
 
-		helper.removeExistingThumbnail(entity);
-		helper.generateThumbnailAndStore(entity, crop);
+			helper.removeExistingImage(entity);
+			helper.storeImageFiles(entity, newImage, thumbnail);
 
-		return showExitPage(vreq, entity);
+			return showExitPage(vreq, entity);
+		} catch (UserMistakeException e) {
+			return showErrorMessage(vreq, entity, e.getMessage());
+		}
 	}
 
 	/**
@@ -377,17 +368,6 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 							+ entityUri + "'");
 		}
 		return entity;
-	}
-
-	/**
-	 * We can't do a thumbnail if there is no main image.
-	 */
-	private void validateMainImage(Individual entity) {
-		if (entity.getMainImageUri() == null) {
-			throw new IllegalStateException("Can't store a thumbnail "
-					+ "on an individual with no main image: '"
-					+ showEntity(entity) + "'");
-		}
 	}
 
 	/**
@@ -550,19 +530,6 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 		UrlBuilder.Params params = new UrlBuilder.Params(PARAMETER_ENTITY_URI,
 				entityUri, PARAMETER_ACTION, action);
 		return UrlBuilder.getPath(URL_HERE, params);
-	}
-
-	/**
-	 * Format an entity for display in a message.
-	 */
-	private String showEntity(Individual entity) {
-		if (entity == null) {
-			return String.valueOf(null);
-		} else if (entity.getName() == null) {
-			return "'no name' (" + entity.getURI() + ")";
-		} else {
-			return "'" + entity.getName() + "' (" + entity.getURI() + ")";
-		}
 	}
 
 	/**

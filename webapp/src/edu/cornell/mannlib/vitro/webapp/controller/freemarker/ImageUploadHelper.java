@@ -31,13 +31,16 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadController.CropRectangle;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadController.Dimensions;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadController.UserMistakeException;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.filestorage.FileModelHelper;
+import edu.cornell.mannlib.vitro.webapp.filestorage.TempFileHolder;
 import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileAlreadyExistsException;
 import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorage;
+import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
 import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest;
 
 /**
@@ -45,6 +48,12 @@ import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServ
  */
 public class ImageUploadHelper {
 	private static final Log log = LogFactory.getLog(ImageUploadHelper.class);
+
+	/**
+	 * When they upload a new image, store it as this session attribute until
+	 * we're ready to attach it to the Individual.
+	 */
+	public static final String ATTRIBUTE_TEMP_FILE = "ImageUploadHelper.tempFile";
 
 	/**
 	 * If the main image is larger than this, it will be displayed at reduced
@@ -65,10 +74,12 @@ public class ImageUploadHelper {
 		return Collections.unmodifiableMap(map);
 	}
 
+	private final WebappDaoFactory webAppDaoFactory;
 	private final FileModelHelper fileModelHelper;
 	private final FileStorage fileStorage;
 
 	ImageUploadHelper(FileStorage fileStorage, WebappDaoFactory webAppDaoFactory) {
+		this.webAppDaoFactory = webAppDaoFactory;
 		this.fileModelHelper = new FileModelHelper(webAppDaoFactory);
 		this.fileStorage = fileStorage;
 	}
@@ -118,10 +129,156 @@ public class ImageUploadHelper {
 		String mimeType = getMimeType(file);
 		if (!RECOGNIZED_FILE_TYPES.containsValue(mimeType)) {
 			throw new UserMistakeException("'" + filename
-					+ "' is not a recognized image file type. Please upload JPEG, GIF, or PNG files only.");
+					+ "' is not a recognized image file type. "
+					+ "Please upload JPEG, GIF, or PNG files only.");
 		}
 
 		return file;
+	}
+
+	/**
+	 * The user has uploaded a new main image, but we're not ready to assign it
+	 * to them.
+	 * 
+	 * Put it into the file storage system, and attach it as a temp file on the
+	 * session until we need it.
+	 */
+	FileInfo storeNewImage(FileItem fileItem, VitroRequest vreq) {
+		InputStream inputStream = null;
+		try {
+			inputStream = fileItem.getInputStream();
+			String mimeType = getMimeType(fileItem);
+			String filename = getSimpleFilename(fileItem);
+			WebappDaoFactory wadf = vreq.getWebappDaoFactory();
+
+			FileInfo fileInfo = FileModelHelper.createFile(fileStorage, wadf,
+					filename, mimeType, inputStream);
+
+			TempFileHolder.attach(vreq.getSession(), ATTRIBUTE_TEMP_FILE,
+					fileInfo);
+
+			return fileInfo;
+		} catch (FileAlreadyExistsException e) {
+			throw new IllegalStateException("Can't create the new image file.",
+					e);
+		} catch (IOException e) {
+			throw new IllegalStateException("Can't create the new image file.",
+					e);
+		} finally {
+			if (inputStream != null) {
+				try {
+					inputStream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	/**
+	 * Find out how big this image is.
+	 * 
+	 * @throws UserMistakeException
+	 *             if the image is smaller than a thumbnail.
+	 */
+	Dimensions getNewImageSize(FileInfo fileInfo) throws UserMistakeException {
+		String uri = fileInfo.getBytestreamUri();
+		String filename = fileInfo.getFilename();
+
+		InputStream stream = null;
+		try {
+			stream = fileStorage.getInputStream(uri, filename);
+			BufferedImage i = ImageIO.read(stream);
+			Dimensions size = new Dimensions(i.getWidth(), i.getHeight());
+			log.debug("new image size is " + size);
+
+			if ((size.height < THUMBNAIL_HEIGHT)
+					|| (size.width < THUMBNAIL_WIDTH)) {
+				throw new UserMistakeException(
+						"The uploaded image should be at least "
+								+ THUMBNAIL_HEIGHT + " pixels high and "
+								+ THUMBNAIL_WIDTH + " pixels wide.");
+			}
+
+			return size;
+		} catch (FileNotFoundException e) {
+			throw new IllegalStateException("File not found: " + fileInfo, e);
+		} catch (IOException e) {
+			throw new IllegalStateException("Can't read image file: "
+					+ fileInfo, e);
+		} finally {
+			if (stream != null) {
+				try {
+					stream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	/**
+	 * Get the info for the new image, from where we stored it in the session.
+	 * 
+	 * @throws UserMistakeException
+	 *             if it isn't there.
+	 */
+	FileInfo getNewImageInfo(VitroRequest vreq) throws UserMistakeException {
+		FileInfo fileInfo = TempFileHolder.remove(vreq.getSession(),
+				ATTRIBUTE_TEMP_FILE);
+
+		if (fileInfo == null) {
+			throw new UserMistakeException(
+					"There is no image file to be cropped.");
+		}
+
+		return fileInfo;
+	}
+
+	/**
+	 * Crop the main image to create the thumbnail, and put it into the file
+	 * storage system.
+	 */
+	FileInfo generateThumbnail(CropRectangle crop, FileInfo newImage) {
+		InputStream mainStream = null;
+		InputStream thumbStream = null;
+		try {
+			String mainBytestreamUri = newImage.getBytestreamUri();
+			String mainFilename = newImage.getFilename();
+			mainStream = fileStorage.getInputStream(mainBytestreamUri,
+					mainFilename);
+
+			thumbStream = scaleImageForThumbnail(mainStream, crop);
+
+			String mimeType = RECOGNIZED_FILE_TYPES.get(".jpg");
+			String filename = createThumbnailFilename(mainFilename);
+
+			FileInfo fileInfo = FileModelHelper.createFile(fileStorage,
+					webAppDaoFactory, filename, mimeType, thumbStream);
+			log.debug("Created thumbnail: " + fileInfo);
+			return fileInfo;
+		} catch (FileAlreadyExistsException e) {
+			throw new IllegalStateException("Can't create the thumbnail file: "
+					+ e.getMessage(), e);
+		} catch (IOException e) {
+			throw new IllegalStateException("Can't create the thumbnail file",
+					e);
+		} finally {
+			if (mainStream != null) {
+				try {
+					mainStream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			if (thumbStream != null) {
+				try {
+					thumbStream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 
 	/**
@@ -151,47 +308,6 @@ public class ImageUploadHelper {
 				}
 			}
 			fileModelHelper.removeFileFromModel(mainImage);
-		}
-	}
-
-	/**
-	 * Store this image in the model and in the file storage system, and set it
-	 * as the main image for this person.
-	 */
-	void storeMainImageFile(Individual person, FileItem imageFileItem) {
-		InputStream inputStream = null;
-		try {
-			inputStream = imageFileItem.getInputStream();
-			String mimeType = getMimeType(imageFileItem);
-			String filename = getSimpleFilename(imageFileItem);
-
-			// Create the file individuals in the model
-			Individual byteStream = fileModelHelper
-					.createByteStreamIndividual();
-			Individual file = fileModelHelper.createFileIndividual(mimeType,
-					filename, byteStream);
-
-			// Store the file in the FileStorage system.
-			fileStorage.createFile(byteStream.getURI(), filename, inputStream);
-
-			// Set the file as the main image for the person.
-			fileModelHelper.setAsMainImageOnEntity(person, file);
-		} catch (FileAlreadyExistsException e) {
-			throw new IllegalStateException(
-					"Can't create the main image file for '" + person.getName()
-							+ "' (" + person.getURI() + ")" + e.getMessage(), e);
-		} catch (IOException e) {
-			throw new IllegalStateException(
-					"Can't create the main image file for '" + person.getName()
-							+ "' (" + person.getURI() + ")", e);
-		} finally {
-			if (inputStream != null) {
-				try {
-					inputStream.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
 		}
 	}
 
@@ -227,64 +343,12 @@ public class ImageUploadHelper {
 	}
 
 	/**
-	 * Generate a thumbnail from the main image from it, store it in the model
-	 * and in the file storage system, and set it as the thumbnail on the main
-	 * image.
+	 * Store the image on the entity, and the thumbnail on the image.
 	 */
-	void generateThumbnailAndStore(Individual person,
-			ImageUploadController.CropRectangle crop) {
-		String mainBytestreamUri = FileModelHelper
-				.getMainImageBytestreamUri(person);
-		String mainFilename = FileModelHelper.getMainImageFilename(person);
-		if (mainBytestreamUri == null) {
-			log.warn("Tried to generate a thumbnail on '" + person.getURI()
-					+ "', but there was no main image.");
-			return;
-		}
-
-		InputStream mainInputStream = null;
-		InputStream thumbInputStream = null;
-		try {
-			mainInputStream = fileStorage.getInputStream(mainBytestreamUri,
-					mainFilename);
-			thumbInputStream = scaleImageForThumbnail(mainInputStream, crop);
-			String mimeType = RECOGNIZED_FILE_TYPES.get(".jpg");
-			String filename = createThumbnailFilename(mainFilename);
-
-			// Create the file individuals in the model
-			Individual byteStream = fileModelHelper
-					.createByteStreamIndividual();
-			Individual file = fileModelHelper.createFileIndividual(mimeType,
-					filename, byteStream);
-
-			// Store the file in the FileStorage system.
-			fileStorage.createFile(byteStream.getURI(), filename,
-					thumbInputStream);
-
-			// Set the file as the thumbnail on the main image for the person.
-			fileModelHelper.setThumbnailOnIndividual(person, file);
-		} catch (FileAlreadyExistsException e) {
-			throw new IllegalStateException("Can't create the thumbnail file: "
-					+ e.getMessage(), e);
-		} catch (IOException e) {
-			throw new IllegalStateException("Can't create the thumbnail file",
-					e);
-		} finally {
-			if (mainInputStream != null) {
-				try {
-					mainInputStream.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-			if (thumbInputStream != null) {
-				try {
-					thumbInputStream.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
+	void storeImageFiles(Individual entity, FileInfo newImage,
+			FileInfo thumbnail) {
+		FileModelHelper.setImagesOnEntity(webAppDaoFactory, entity, newImage,
+				thumbnail);
 	}
 
 	/**
@@ -398,42 +462,4 @@ public class ImageUploadHelper {
 		return crop.unscale(displayScale);
 	}
 
-	/**
-	 * Find out how big the main image is.
-	 */
-	Dimensions getMainImageSize(Individual entity) {
-		String uri = FileModelHelper.getMainImageBytestreamUri(entity);
-		String filename = FileModelHelper.getMainImageFilename(entity);
-		InputStream stream = null;
-		try {
-			stream = fileStorage.getInputStream(uri, filename);
-			BufferedImage i = ImageIO.read(stream);
-			Dimensions size = new Dimensions(i.getWidth(), i.getHeight());
-			log.debug("main image size is " + size);
-			return size;
-		} catch (FileNotFoundException e) {
-			log.error(
-					"No main image file for '" + showUri(entity) + "'; name='"
-							+ filename + "', bytestreamUri='" + uri + "'", e);
-			return new Dimensions(0, 0);
-		} catch (IOException e) {
-			log.error(
-					"Can't read main image file for '" + showUri(entity)
-							+ "'; name='" + filename + "', bytestreamUri='"
-							+ uri + "'", e);
-			return new Dimensions(0, 0);
-		} finally {
-			if (stream != null) {
-				try {
-					stream.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
-
-	private String showUri(Individual entity) {
-		return (entity == null) ? "null" : entity.getURI();
-	}
 }

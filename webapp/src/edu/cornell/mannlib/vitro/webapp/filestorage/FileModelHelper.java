@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.filestorage;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -19,6 +21,9 @@ import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileAlreadyExistsException;
+import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorage;
+import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
 
 /**
  * <p>
@@ -30,9 +35,65 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
  * a parameter holds all necessary references for the operation. Other methods
  * require an instance, which is initialized with a {@link WebappDaoFactory}.
  * </p>
+ * <p>
+ * TODO: This should be based around FileInfo and ImageInfo, as much as
+ * possible.
+ * </p>
  */
 public class FileModelHelper {
 	private static final Log log = LogFactory.getLog(FileModelHelper.class);
+
+	// ----------------------------------------------------------------------
+	// Methods based around FileInfo
+	// ----------------------------------------------------------------------
+
+	public static FileInfo createFile(FileStorage fileStorage,
+			WebappDaoFactory wadf, String filename, String mimeType,
+			InputStream inputStream) throws FileAlreadyExistsException,
+			IOException {
+		FileModelHelper fmh = new FileModelHelper(wadf);
+
+		// Create the file individuals in the model
+		Individual byteStream = fmh.createByteStreamIndividual();
+		String bytestreamUri = byteStream.getURI();
+		Individual file = fmh.createFileIndividual(mimeType, filename,
+				byteStream);
+		String fileUri = file.getURI();
+
+		// Store the file in the FileStorage system.
+		fileStorage.createFile(bytestreamUri, filename, inputStream);
+
+		// Figure out the alias URL
+		String aliasUrl = FileServingHelper.getBytestreamAliasUrl(
+				bytestreamUri, filename);
+
+		// And wrap it all up in a tidy little package.
+		return new FileInfo.Builder().setFilename(filename).setMimeType(
+				mimeType).setUri(fileUri).setBytestreamUri(bytestreamUri)
+				.setBytestreamAliasUrl(aliasUrl).build();
+	}
+
+	/**
+	 * Record this image file and thumbnail on this entity. NOTE: after this
+	 * update, the entity object is stale.
+	 */
+	public static void setImagesOnEntity(WebappDaoFactory wadf,
+			Individual entity, FileInfo mainInfo, FileInfo thumbInfo) {
+		IndividualDao individualDao = wadf.getIndividualDao();
+
+		// Add the thumbnail file to the main image file.
+		ObjectPropertyStatementDao opsd = wadf.getObjectPropertyStatementDao();
+		opsd.insertNewObjectPropertyStatement(new ObjectPropertyStatementImpl(
+				mainInfo.getUri(), VitroVocabulary.FS_THUMBNAIL_IMAGE,
+				thumbInfo.getUri()));
+
+		// Add the main image file to the entity.
+		entity.setMainImageUri(mainInfo.getUri());
+		individualDao.updateIndividual(entity);
+
+		log.debug("Set images on '" + entity.getURI() + "': main=" + mainInfo
+				+ ", thumb=" + thumbInfo);
+	}
 
 	// ----------------------------------------------------------------------
 	// Static methods -- the Individual holds all necessary references.
