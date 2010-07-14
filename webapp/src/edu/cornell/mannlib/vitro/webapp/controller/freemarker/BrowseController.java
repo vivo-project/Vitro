@@ -9,6 +9,7 @@ import com.hp.hpl.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
+import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -19,6 +20,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
+import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
+import edu.cornell.mannlib.vitro.webapp.web.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassGroupTemplateModel;
 import freemarker.template.Configuration;
 import freemarker.template.SimpleSequence;
@@ -52,6 +55,7 @@ public class BrowseController extends FreeMarkerHttpServlet {
         OntModel model = (OntModel)sContext.getAttribute("jenaOntModel");
         OntModel baseModel = (OntModel)sContext.getAttribute("baseOntModel");
         OntModel infModel = (OntModel)sContext.getAttribute("inferenceOntModel");
+        
 	
         BrowseControllerChangeListener bccl = new BrowseControllerChangeListener(this);
         model.register(bccl);
@@ -116,12 +120,32 @@ public class BrowseController extends FreeMarkerHttpServlet {
             // now cull out the groups with no populated classes
             //removeUnpopulatedClasses( groups);
             vcgDao.removeUnpopulatedGroups(groups);
+            
+            removeClassesHiddenFromSearch(groups);
 
             _groupListMap.put(portalId, groups);
             return groups;
         } else {
             return grp;
         }
+    }
+    
+    private void removeClassesHiddenFromSearch(List<VClassGroup> groups) {
+    	OntModel displayOntModel = 
+    		    (OntModel) getServletConfig().getServletContext()
+    		    .getAttribute("displayOntModel");
+    	ProhibitedFromSearch pfs = new ProhibitedFromSearch(
+    			DisplayVocabulary.PRIMARY_LUCENE_INDEX_URI, displayOntModel);
+    	for (VClassGroup group : groups) {
+    		List<VClass> classList = new ArrayList<VClass>();
+    		for (VClass vclass : group.getVitroClassList()) {
+    			if (!pfs.isClassProhibited(vclass.getURI())) {
+    				classList.add(vclass);
+    			}
+    		}
+    		group.setVitroClassList(classList);
+    	}
+    	
     }
     
     private static boolean ORDER_BY_DISPLAYRANK = true;
