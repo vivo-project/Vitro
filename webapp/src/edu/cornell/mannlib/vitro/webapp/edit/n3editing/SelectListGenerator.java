@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -52,7 +53,7 @@ public class SelectListGenerator {
             return Collections.EMPTY_MAP;
         }
         // now create an empty HashMap to populate and return
-        HashMap <String,String> optionsMap = new HashMap<String,String>();
+        HashMap <String,String> optionsMap = new LinkedHashMap<String,String>();
         // for debugging, keep a count of the number of options populated
         int optionsCount=0;
 
