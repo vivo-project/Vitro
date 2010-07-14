@@ -446,7 +446,7 @@ public class JenaIngestController extends BaseEditController {
 			  String uri1 = vreq.getParameter("uri1");
 			  String uri2 = vreq.getParameter("uri2");
 			  if(uri1!=null){
-				  String result = doMerge(uri1,uri2,response);
+				  String result = doMerge(uri1,uri2,response,request);
 				  request.setAttribute("result",result);
 				  request.setAttribute("title","Merge Individuals");
 				  request.setAttribute("bodyJsp",MERGE_RESULT);
@@ -988,7 +988,7 @@ public class JenaIngestController extends BaseEditController {
 		vitroJenaModel.leaveCriticalSection();
 		return uri;
 	}
-	private String doMerge(String uri1, String uri2,HttpServletResponse response){
+	private String doMerge(String uri1, String uri2,HttpServletResponse response,HttpServletRequest request){
 		OntModel vitroJenaModel = (OntModel) getServletContext().getAttribute("baseOntModel");
 		Resource res1 = vitroJenaModel.getResource(uri1);
 		Resource res2 = vitroJenaModel.getResource(uri2);
@@ -1031,6 +1031,7 @@ public class JenaIngestController extends BaseEditController {
 		OutputStream outStream = response.getOutputStream();
 		outStream.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>".getBytes());
 		leftoverModel.write( outStream,"RDF/XML-ABBREV");
+		request.getSession().setAttribute("leftoverModel", leftoverModel);
 		outStream.flush();
 		outStream.close();
 		}
