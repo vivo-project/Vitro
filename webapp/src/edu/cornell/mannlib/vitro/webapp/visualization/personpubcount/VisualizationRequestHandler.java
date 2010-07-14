@@ -5,10 +5,8 @@ package edu.cornell.mannlib.vitro.webapp.visualization.personpubcount;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
 
 import javax.servlet.RequestDispatcher;
@@ -31,8 +29,6 @@ import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.visualization.VisualizationFrameworkConstants;
 import edu.cornell.mannlib.vitro.webapp.visualization.PDFDocument;
-import edu.cornell.mannlib.vitro.webapp.visualization.constants.VOConstants;
-import edu.cornell.mannlib.vitro.webapp.visualization.constants.VisConstants;
 import edu.cornell.mannlib.vitro.webapp.visualization.exceptions.MalformedQueryParametersException;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.BiboDocument;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.Individual;
@@ -135,7 +131,7 @@ public class VisualizationRequestHandler {
 			if (VisualizationFrameworkConstants.DYNAMIC_RENDER_MODE_URL_VALUE.equalsIgnoreCase(renderMode)) {
 
 				prepareVisualizationQueryDynamicResponse(request, response, vitroRequest,
-						valueObjectContainer);
+						valueObjectContainer, yearToPublicationCount);
 		    	requestDispatcher = request.getRequestDispatcher("/templates/page/blankPage.jsp");
 
 			} else {
@@ -300,12 +296,19 @@ public class VisualizationRequestHandler {
 	}
 
 	private void prepareVisualizationQueryDynamicResponse(HttpServletRequest request,
-			HttpServletResponse response, VitroRequest vreq, SparklineVOContainer valueObjectContainer) {
+			HttpServletResponse response, VitroRequest vreq, SparklineVOContainer valueObjectContainer, 
+			Map<String, Integer> yearToPublicationCount) {
 
         Portal portal = vreq.getPortal();
 
         request.setAttribute("sparklineVO", valueObjectContainer);
 
+        if (yearToPublicationCount.size() > 0) {
+        	request.setAttribute("shouldVIVOrenderVis", true);
+        } else {
+        	request.setAttribute("shouldVIVOrenderVis", false);
+        }
+        
         request.setAttribute("portalBean", portal);
         request.setAttribute("bodyJsp", "/templates/visualization/ajax_vis_content.jsp");
 

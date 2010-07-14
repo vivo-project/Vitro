@@ -4,6 +4,9 @@
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c" %>
 
 <c:set var='sparkline' value='${requestScope.sparklineVO}'/>
+<c:set var='shouldVIVOrenderVis' value='${requestScope.shouldVIVOrenderVis}'/>
 
-${sparkline.sparklineContent}
-${sparkline.sparklineContext}
+<c:if test="${shouldVIVOrenderVis}">
+	${sparkline.sparklineContent}
+	${sparkline.sparklineContext}
+</c:if>
