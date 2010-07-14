@@ -104,7 +104,7 @@ public class JenaIngestController extends BaseEditController {
 	private static final String GENERATE_TBOX_JSP = "/jenaIngest/generateTBox.jsp";
 	private static final String PERMANENT_URI = "/jenaIngest/permanentURI.jsp";
 	private static final String MERGE_INDIVIDUALS = "/jenaIngest/mergeIndividuals.jsp";
-	private static final String MERGE_RESULT = "/templates/edit/specific/merge_result.jsp";
+	private static final String MERGE_RESULT = "/jenaIngest/merge_result.jsp";
 	private static final String SPARQL_CONSTRUCT_CLASS = "http://vitro.mannlib.cornell.edu/ns/vitro/0.7/sparql#SPARQLCONSTRUCTQuery";
 	private static final String SPARQL_QUERYSTR_PROP = "http://vitro.mannlib.cornell.edu/ns/vitro/0.7/sparql#queryStr";
 	private static final String RENAME_RESOURCE = "/jenaIngest/renameResource.jsp";
@@ -478,6 +478,20 @@ public class JenaIngestController extends BaseEditController {
 			  }
 			  
 		  }
+		else if("mergeResult".equals(actionStr)){
+			Model lmodel = (Model)request.getSession().getAttribute("leftoverModel");
+			response.setContentType("RDF/XML-ABBREV");
+			try{
+			OutputStream outStream = response.getOutputStream();
+			outStream.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>".getBytes());
+			lmodel.write( outStream,"RDF/XML-ABBREV");
+			outStream.flush();
+			outStream.close();
+			}
+			catch(IOException ioe){
+				throw new RuntimeException(ioe);
+			}
+		}
 		
 		else {
 			request.setAttribute("title","Ingest Menu");
@@ -1042,18 +1056,18 @@ public class JenaIngestController extends BaseEditController {
 		}
 		res2.removeAll((Property)null);
 		vitroJenaModel.leaveCriticalSection();
-		response.setContentType("RDF/XML-ABBREV");
+		/*response.setContentType("RDF/XML-ABBREV");
 		try{
 		OutputStream outStream = response.getOutputStream();
 		outStream.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>".getBytes());
 		leftoverModel.write( outStream,"RDF/XML-ABBREV");
-		request.getSession().setAttribute("leftoverModel", leftoverModel);
 		outStream.flush();
 		outStream.close();
 		}
 		catch(IOException ioe){
 			throw new RuntimeException(ioe);
-		}
+		}*/
+		request.getSession().setAttribute("leftoverModel", leftoverModel);
 		result = "merging done for " + counter + " statements.";
 		return result;
 			
