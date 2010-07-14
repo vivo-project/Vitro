@@ -49,7 +49,8 @@ public class ContactFormController extends FreeMarkerHttpServlet {
         
         else if (StringUtils.isEmpty(portal.getContactMail())) {
             body.put("errorMessage", 
-                    "The site administrator has not configured an email address to receive the form submission.");
+            		"The feedback form is currently disabled. In order to activate the form, a site administrator must provide a contact email address in the <a href='editForm?home=1&amp;controller=Portal&amp;id=1'>Site Configuration</a>");
+            
             bodyTemplate = "contactForm-error.ftl";            
         }
         
