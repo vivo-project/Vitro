@@ -5,11 +5,12 @@
 	$(window).load(function(){
 
 		var jcrop_api = $.Jcrop('#cropbox',{
-			onChange: showPreview,
+			/*onChange: showPreview,*/
 			onSelect: showPreview,
 			setSelect:   [ 0, 0, 115, 115 ],
 			minSize: [ 115, 115 ],
 			aspectRatio: 1
+			
 		});
 
 		var bounds = jcrop_api.getBounds();
