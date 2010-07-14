@@ -57,6 +57,7 @@ import com.hp.hpl.jena.sdb.sql.SDBConnection;
 import com.hp.hpl.jena.sdb.store.DatabaseType;
 import com.hp.hpl.jena.sdb.store.LayoutType;
 import com.hp.hpl.jena.shared.Lock;
+import com.hp.hpl.jena.util.ResourceUtils;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
@@ -65,6 +66,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDao;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SimpleOntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSDBModelMaker;
@@ -105,7 +107,9 @@ public class JenaIngestController extends BaseEditController {
 	private static final String MERGE_RESULT = "/templates/edit/specific/merge_result.jsp";
 	private static final String SPARQL_CONSTRUCT_CLASS = "http://vitro.mannlib.cornell.edu/ns/vitro/0.7/sparql#SPARQLCONSTRUCTQuery";
 	private static final String SPARQL_QUERYSTR_PROP = "http://vitro.mannlib.cornell.edu/ns/vitro/0.7/sparql#queryStr";
-	
+	private static final String RENAME_RESOURCE = "/jenaIngest/renameResource.jsp";
+	private static final String RENAME_RESULT = "/jenaIngest/renameResult.jsp";
+
 	public void doGet (HttpServletRequest request, HttpServletResponse response) {
 
 		if (!checkLoginStatus(request,response)) {
@@ -457,6 +461,22 @@ public class JenaIngestController extends BaseEditController {
 				  request.setAttribute("bodyJsp",MERGE_INDIVIDUALS);  
 			  }
 			   
+		  }
+		else if("renameResource".equals(actionStr)){
+			  String uri1 = vreq.getParameter("uri1");
+			  String uri2 = vreq.getParameter("uri2");
+			  if(uri1!=null){
+				  String result = doRename(uri1,uri2,response);
+				  request.setAttribute("result",result);
+				  request.setAttribute("title","Rename Resources");
+				  request.setAttribute("bodyJsp",RENAME_RESULT);
+				   
+			  }
+			  else{
+				  request.setAttribute("title","Rename Resource");
+				  request.setAttribute("bodyJsp",RENAME_RESOURCE);  
+			  }
+			  
 		  }
 		
 		else {
@@ -972,8 +992,6 @@ public class JenaIngestController extends BaseEditController {
 		Random random = new Random();
 		boolean resourcePresent=true;
 		OntModel vitroJenaModel = (OntModel) getServletContext().getAttribute("baseOntModel");
-		vitroJenaModel.enterCriticalSection(Lock.WRITE);
-		log.info("Going into loop");
 		Resource res = null;
 		do{
 		uri = newNamespace + "individual" + random.nextInt();
@@ -981,11 +999,9 @@ public class JenaIngestController extends BaseEditController {
 		StmtIterator stmtItr1 = vitroJenaModel.listStatements(res,(Property)null,(RDFNode)null);
 		if(!stmtItr1.hasNext()){
 			resourcePresent=false;
+			res.removeAll((Property)null);
 		}
 		}while(resourcePresent);
-		log.info("url assigned");
-		res.removeAll((Property)null);
-		vitroJenaModel.leaveCriticalSection();
 		return uri;
 	}
 	private String doMerge(String uri1, String uri2,HttpServletResponse response,HttpServletRequest request){
@@ -1041,6 +1057,94 @@ public class JenaIngestController extends BaseEditController {
 		result = "merging done for " + counter + " statements.";
 		return result;
 			
+	}
+private String doRename(String uri1,String uri2,HttpServletResponse response){
+		
+		String userURI = null;
+		String uri = null;
+		String result = null;
+		Integer counter = 0;
+		Boolean namespacePresent = false;
+		OntModel baseOntModel = (OntModel)
+		getServletContext().getAttribute("baseOntModel");
+		OntModel ontModel = (OntModel)
+		getServletContext().getAttribute("jenaOntModel");
+		OntModel infOntModel = (OntModel)
+		getServletContext().getAttribute(JenaBaseDao.INFERENCE_ONT_MODEL_ATTRIBUTE_NAME);
+		WebappDaoFactory wdf =
+		(WebappDaoFactory)getServletContext().getAttribute("webappDaoFactory");
+		List<String> urisToChange = new LinkedList<String>();
+		
+		ontModel.enterCriticalSection(Lock.READ);
+		try {
+		Iterator<Individual> indIter = ontModel.listIndividuals();
+		while( indIter.hasNext()){
+		Individual ind = indIter.next();
+		String namespace = ind.getNameSpace();
+		if( namespace != null ){
+		if( uri1.equals(namespace) ){
+		uri = ind.getURI();	
+		urisToChange.add(uri);
+		namespacePresent = true;
+		}
+		}
+		}
+		}finally {
+		ontModel.leaveCriticalSection();
+		}
+		if(!namespacePresent){
+			result = "0 resource renamed";
+			return result;
+		}
+		
+		
+		for( String oldURIStr : urisToChange){
+		baseOntModel.enterCriticalSection(Lock.WRITE);
+		ontModel.enterCriticalSection(Lock.WRITE);
+		infOntModel.enterCriticalSection(Lock.WRITE);
+		try{
+		long time1 = System.currentTimeMillis();
+		Resource res = baseOntModel.getResource(oldURIStr);
+		Resource infRes = infOntModel.getResource(oldURIStr);
+		long time2 = System.currentTimeMillis();
+		String newURIStr=null;
+		newURIStr = getUnusedURI(uri2);
+		long time3 = System.currentTimeMillis();
+		System.out.println("time to get new uri: " + Long.toString(time3 - time2)
+		);
+		System.out.println("Renaming "+ oldURIStr + " to " + newURIStr);
+		ResourceUtils.renameResource(res,newURIStr);
+		ResourceUtils.renameResource(infRes,newURIStr);
+		long time4 = System.currentTimeMillis();
+		System.out.println(" time to rename : " + Long.toString( time4 - time3));
+		System.out.println(" time for one resource: " + Long.toString( time4 -
+		time1));
+		} finally {
+		infOntModel.leaveCriticalSection();
+		ontModel.leaveCriticalSection();
+		baseOntModel.leaveCriticalSection();
+		}
+		try {
+			Thread.currentThread().sleep(200);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		counter++;
+		}
+		
+		/*baseOntModel.enterCriticalSection(Lock.WRITE);
+		ontModel.enterCriticalSection(Lock.WRITE);
+		try{
+		baseOntModel.getBaseModel().notifyEvent(new EditEvent(null,true));
+		baseOntModel.getBaseModel().notifyEvent(new EditEvent(null,false));
+		} finally {
+		ontModel.leaveCriticalSection();
+		baseOntModel.leaveCriticalSection();
+		}*/
+		result = counter.toString() + " resources renamed";
+		return result;
+		
 	}
 	public void prepareSmush (VitroRequest vreq) {
 		String smushPropURI = vreq.getParameter("smushPropURI");
