@@ -71,7 +71,7 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 	public void contextInitialized(ServletContextEvent sce) {
 		try {
 			ServletContext context = sce.getServletContext();
-			log.info("**** Running " + this.getClass().getName() + ".contextInitialized()");
+			log.debug("**** Running " + this.getClass().getName() + ".contextInitialized()");
 
 			indexDir = getIndexDirName();
 			log.info("Directory of full text index: " + indexDir);
@@ -133,6 +133,9 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 				new ProhibitedFromSearch(DisplayVocabulary.PRIMARY_LUCENE_INDEX_URI, displayOntModel));
 
 			log.debug("**** End of " + this.getClass().getName() + ".contextInitialized()");
+			
+			// Start a rebuild each time the server starts.
+			builder.doIndexRebuild();
 		} catch (Throwable t) {
 			log.error("***** Error setting up Lucene search *****", t);
 		}
@@ -142,7 +145,7 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 	 * Gets run when the webApp Context gets destroyed.
 	 */
 	public void contextDestroyed(ServletContextEvent sce) {
-		log.info("**** Running " + this.getClass().getName() + ".contextDestroyed()");
+		log.debug("**** Running " + this.getClass().getName() + ".contextDestroyed()");
 		IndexBuilder builder = (IndexBuilder) sce.getServletContext().getAttribute(IndexBuilder.class.getName());
 		builder.killIndexingThread();
 	}
