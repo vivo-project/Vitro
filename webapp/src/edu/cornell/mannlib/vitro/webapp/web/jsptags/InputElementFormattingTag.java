@@ -454,7 +454,11 @@ public class InputElementFormattingTag extends TagSupport {
                     } else {
                         out.print("<select "+classStr+" id=\""+getId()+"\" name=\""+getName()+"\">");
                     }
-                    optionsMap = getSortedMap(optionsMap);
+                    
+                    Field thisField = editConfig.getField(getName());
+                    if (! thisField.getOptionsType().equals(Field.OptionsType.UNSORTED_LITERALS)) {
+                        optionsMap = getSortedMap(optionsMap);
+                    }
                     Iterator iter = optionsMap.keySet().iterator();
                     while (iter.hasNext()) {
                         String key = (String) iter.next();

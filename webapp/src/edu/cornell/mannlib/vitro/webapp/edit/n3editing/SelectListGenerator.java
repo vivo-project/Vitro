@@ -59,10 +59,11 @@ public class SelectListGenerator {
         Field.OptionsType optionsType = field.getOptionsType();
         String vclassUri = null;
         switch (optionsType){
+            case UNSORTED_LITERALS:  // deliberate fall-through case! Like LITERALS, but should not be sorted - order as specified 
             case LITERALS:
                 List<List<String>> literalOptions = field.getLiteralOptions();
                 if (literalOptions==null) {
-                    log.error("no literalOptions List found for field \""+fieldName+"\" in SelectListGenerator.getOptions() when OptionsType LITERAL specified");
+                    log.error("no literalOptions List found for field \""+fieldName+"\" in SelectListGenerator.getOptions() when OptionsType LITERALS or UNSORTED_LITERALS specified");
                     return new HashMap <String,String>();
                 }
                 for(Object obj: ((Iterable)literalOptions)){
