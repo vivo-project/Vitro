@@ -15,7 +15,7 @@
 <h2>Rename Resource</h2>
 <form id="takeuri" action="ingest" method="get">
 <input type="hidden" name="action" value="renameResource"/>
-<p>Individual URI1  <input id="uri1" type="text" size="52" name="uri1"/></p>
-<p>Individual URI2  <input id="uri2" type="text" size="52" name="uri2"/></p>
+<p>Old Namespace  <input id="uri1" type="text" size="52" name="uri1"/></p>
+<p>New Namespace  <input id="uri2" type="text" size="52" name="uri2"/></p>
 <p><input type="submit" name="submit" value="submit" /></p>
 </form>
