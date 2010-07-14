@@ -10,6 +10,7 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
+import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
@@ -204,14 +205,21 @@ public class BrowseController extends FreeMarkerHttpServlet {
     protected synchronized void rebuildCacheForPortal(Portal portal, ApplicationBean appBean, WebappDaoFactory wdFactory){
         VitroFilters vFilters = null;
         
-        if( portal.isFlag1Filtering() ){
+        boolean singlePortalApplication = wdFactory.getPortalDao().getAllPortals().size() == 1;
+        
+        if ( singlePortalApplication ) {
+        	if ( vFilters == null ) 
+        		vFilters = VitroFilterUtils.getDisplayFilterByRoleLevel(RoleLevel.PUBLIC, wdFactory);
+        } else if ( portal.isFlag1Filtering() ){
             PortalFlag pflag = new PortalFlag(portal.getPortalId());
             if( vFilters == null)
                 vFilters = VitroFilterUtils.getFilterFromPortalFlag(pflag);
             else
                 vFilters = vFilters.and( VitroFilterUtils.getFilterFromPortalFlag(pflag));
         }
+        
         WebappDaoFactory filteringDaoFactory ;
+        
         if( vFilters !=null ){
             filteringDaoFactory = new WebappDaoFactoryFiltering(wdFactory,vFilters);
         }else{
