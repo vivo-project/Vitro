@@ -96,9 +96,11 @@
 	$(document).ready(function() {
 	
 		function renderVisualization(visualizationURL) {
-	
+
+			<%--  
 			$("#vis_container").empty().html('<img src="${loadingImageLink}" />');
 	
+	--%>
 			   $.ajax({
 				   url: visualizationURL,
 				   dataType: "html",
