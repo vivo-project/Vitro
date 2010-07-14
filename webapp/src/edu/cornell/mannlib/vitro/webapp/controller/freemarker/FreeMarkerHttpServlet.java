@@ -121,7 +121,9 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
         Configuration config = new Configuration();
 
         String buildEnv = ConfigurationProperties.getProperty("Environment.build");
-        if (buildEnv != null && buildEnv.equals("development")) {
+        log.debug("Current build environment: " + buildEnv);
+        if ("development".equals(buildEnv)) {
+            log.debug("Disabling FreeMarker template caching in development build.");
             config.setTemplateUpdateDelay(0); // no template caching in development 
         }
 
