@@ -456,7 +456,7 @@ public class InputElementFormattingTag extends TagSupport {
                     }
                     
                     Field thisField = editConfig.getField(getName());
-                    if (! thisField.getOptionsType().equals(Field.OptionsType.UNSORTED_LITERALS)) {
+                    if (! thisField.getOptionsType().equals(Field.OptionsType.HARDCODED_LITERALS)) {
                         optionsMap = getSortedMap(optionsMap);
                     }
                     Iterator iter = optionsMap.keySet().iterator();

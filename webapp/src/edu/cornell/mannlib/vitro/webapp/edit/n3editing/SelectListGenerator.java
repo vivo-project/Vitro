@@ -59,11 +59,30 @@ public class SelectListGenerator {
         Field.OptionsType optionsType = field.getOptionsType();
         String vclassUri = null;
         switch (optionsType){
-            case UNSORTED_LITERALS:  // deliberate fall-through case! Like LITERALS, but should not be sorted - order as specified 
+            case HARDCODED_LITERALS:  // not auto-sorted, and empty values not removed or replaced
+                List<List<String>> hardcodedLiteralOptions = field.getLiteralOptions();
+                if (hardcodedLiteralOptions==null) {
+                    log.error("no literalOptions List found for field \""+fieldName+"\" in SelectListGenerator.getOptions() when OptionsType UNSORTED_LITERALS specified");
+                    return new HashMap <String,String>();
+                }
+                for(Object obj: ((Iterable)hardcodedLiteralOptions)){
+                    List<String> literalPair = (List)obj;
+                    String value=(String)literalPair.get(0);
+                    if( value != null){  // allow empty string as a value
+                        String label=(String)literalPair.get(1);
+                        if (label!=null && label.trim().length() > 0) {
+                            optionsMap.put(value,label);
+                        } else {
+                            optionsMap.put(value, value);
+                        }
+                        ++optionsCount;
+                    }
+                }
+                break;                
             case LITERALS:
                 List<List<String>> literalOptions = field.getLiteralOptions();
                 if (literalOptions==null) {
-                    log.error("no literalOptions List found for field \""+fieldName+"\" in SelectListGenerator.getOptions() when OptionsType LITERALS or UNSORTED_LITERALS specified");
+                    log.error("no literalOptions List found for field \""+fieldName+"\" in SelectListGenerator.getOptions() when OptionsType LITERALS specified");
                     return new HashMap <String,String>();
                 }
                 for(Object obj: ((Iterable)literalOptions)){

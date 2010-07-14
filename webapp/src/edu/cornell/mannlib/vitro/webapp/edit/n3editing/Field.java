@@ -18,7 +18,7 @@ public class Field {
 
     public enum OptionsType {
         LITERALS, 
-        UNSORTED_LITERALS,
+        HARDCODED_LITERALS,
         STRINGS_VIA_DATATYPE_PROPERTY, 
         INDIVIDUALS_VIA_OBJECT_PROPERTY, 
         INDIVIDUALS_VIA_VCLASS, 
@@ -205,8 +205,8 @@ public class Field {
     public void setOptionsType(String s) {
         if ("LITERALS".equals(s)) {
             setOptionsType(Field.OptionsType.LITERALS);
-        } else if ("UNSORTED_LITERALS".equals(s)) {
-            setOptionsType(Field.OptionsType.UNSORTED_LITERALS);
+        } else if ("HARDCODED_LITERALS".equals(s)) {
+            setOptionsType(Field.OptionsType.HARDCODED_LITERALS);
         } else if ("STRINGS_VIA_DATATYPE_PROPERTY".equalsIgnoreCase(s)) {
             setOptionsType(Field.OptionsType.STRINGS_VIA_DATATYPE_PROPERTY);
         } else if ("INDIVIDUALS_VIA_OBJECT_PROPERTY".equalsIgnoreCase(s)) {
