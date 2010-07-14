@@ -673,8 +673,12 @@ public class PropertyEditLinks extends TagSupport{
 			this.text = text;
 		}
 		
+		// Only a "delete" link gets the "thumbnail" class. 
+		// TODO Make this cleaner.
 		public String makeElement() {
-			String element = "<a class=\"image thumbnail " + type + "\" href=\"" + href + "\"";
+			String element = "<a class=\"image "
+					+ ("delete".equals(type) ? "thumbnail delete" : type)
+					+ "\" href=\"" + href + "\"";
 			element += " title=\"" + mouseoverText + "\">";
 			element += text;
 			element += "</a>\n";
@@ -687,16 +691,8 @@ public class PropertyEditLinks extends TagSupport{
 	private LinkStruct getImageLink(String subjectUri, String contextPath,
 			String action, String mouseOverText, String text) {
 		ImageLinkStruct ls = new ImageLinkStruct();
-		String url;
-		if (action == "delete") {
-			url = "javascript:delete_photo('"
-					+ makeRelativeHref(contextPath + "uploadImages",
-							"entityUri", subjectUri, "action", action) + "')";
-		} else {
-			url = makeRelativeHref(contextPath + "uploadImages", "entityUri",
-					subjectUri, "action", action);
-		}
-		ls.setHref(url);
+		ls.setHref(makeRelativeHref(contextPath + "uploadImages", "entityUri",
+				subjectUri, "action", action));
 		ls.setType(action);
 		ls.setMouseoverText(mouseOverText);
 		ls.setText(text);
