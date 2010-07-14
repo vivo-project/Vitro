@@ -37,7 +37,9 @@
 
 <%@ page import="org.apache.commons.logging.Log" %>
 <%@ page import="org.apache.commons.logging.LogFactory" %>
-<jsp:useBean id="loginHandler" class="edu.cornell.mannlib.vedit.beans.LoginFormBean" scope="session" />
+
+<%@page import="java.util.LinkedList"%>
+<%@page import="java.util.Set"%><jsp:useBean id="loginHandler" class="edu.cornell.mannlib.vedit.beans.LoginFormBean" scope="session" />
 <%! 
 public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.templates.entity.entityMergedPropsList.jsp");
 %>
@@ -354,25 +356,32 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 private String getCustomShortView(HttpServletRequest request, VClassDao vcDao) {
     String customShortView = null;
     Individual object = ((ObjectPropertyStatement)request.getAttribute("opStmt")).getObject();
-    List<VClass> vclasses = object.getVClasses();
-
+    List<VClass> vclasses = object.getVClasses(true); //get directly asserted vclasses
+    Set<String> superClasses = new HashSet<String>();
+    
+    // First try directly asserted classes, there is no useful decision mechanism for 
+    // the case where two directly asserted classes have a custom short view.
     vclassLoop: for (VClass vclass : vclasses) {
         // Use this class's custom short view, if there is one
         customShortView = vclass.getCustomShortView();
         if (customShortView != null) {
-            break;
+            return customShortView;
         }
-        // Otherwise, check for superclass custom short views
+        // Otherwise, add superclass to list of vclasses to check for custom short views
         String vclassUri = vclass.getURI();
-        List<String> superClassUris = vcDao.getAllSuperClassURIs(vclassUri);
-        for (String superClassUri : superClassUris) {
-            VClass vc = vcDao.getVClassByURI(superClassUri);
-            customShortView = vc.getCustomShortView();
-            if (customShortView != null) { 
-                break vclassLoop; 
-            }
+        superClasses.addAll( vcDao.getAllSuperClassURIs(vclassUri) );        
+    }    
+    
+    // Next try super classes.  There is no useful decision mechanism for 
+    // the case where two super classes have a custom short view.
+    for (String superClassUri : superClasses) {
+		VClass vc = vcDao.getVClassByURI(superClassUri);		
+        customShortView = vc.getCustomShortView();
+        if (customShortView != null) { 
+            return customShortView; 
         }
-    }  
-    return customShortView;
+	}    
+
+    return null;
 }
 %>
