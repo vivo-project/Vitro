@@ -143,6 +143,9 @@ public class VisualizationCodeGenerator {
 										"    	border-spacing: 0;" +
 										"    	vertical-align: inherit;" +
 										"}" +
+										".incomplete-data-holder {" +
+										"" +
+										"}" +
 										/*".sparkline_wrapper_table table{" +
 										"    	vertical-align: bottom;" +
 										"}" +*/
@@ -334,14 +337,20 @@ public class VisualizationCodeGenerator {
 		/*
 		 * Generate the text introducing the vis.
 		 * */
+		
+		String imcompleteDataText = "This information is based solely on publications which have been loaded into the VIVO system. " +
+		"This may only be a small sample of the person\\'s total work.";
+		
+		
 		visualizationCode.append("$('#" + visDivNames.get("SHORT_SPARK") + " td.sparkline_number').text(parseInt(renderedShortSparks) + parseInt(" + unknownYearCoauthors + "));");
 		visualizationCode.append("var shortSparksText = ''" +
-														"+ ' Unique co-author(s) with year from '" +
-														"+ ' " + totalUniqueCoAuthors + " '" +
+														"+ ' Unique co-author(s) within the last 10 years '" +
+														"<span class=\"incomplete-data-holder\" title=\"" + imcompleteDataText + "\">(incomplete data)</span>'" +
+														/*"+ ' " + totalUniqueCoAuthors + " '" +
 														"+ ' total " +
 														"<span class=\"sparkline_range\">" +
 														"(" + shortSparkMinYear + " - " + currentYear + ")" +
-														"</span>'" +
+														"</span>'" +*/
 														"+ '';" +
 								"$('#" + visDivNames.get("SHORT_SPARK") + " td.sparkline_text').html(shortSparksText);");
 

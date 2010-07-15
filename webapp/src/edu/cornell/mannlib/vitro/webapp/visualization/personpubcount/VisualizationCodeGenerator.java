@@ -158,6 +158,9 @@ public class VisualizationCodeGenerator {
 										"}" +
 										"td.sparkline_number { text-align:right; padding-right:5px; }" +
 										"td.sparkline_text   {text-align:left;}" +
+										".incomplete-data-holder {" +
+										"" +
+										"}" +
 										/*"#sparkline_data_table {" +
 												"width: auto;" +
 										"}" +
@@ -346,12 +349,12 @@ public class VisualizationCodeGenerator {
 		
 		
 		String imcompleteDataText = "This information is based solely on publications which have been loaded into the VIVO system. " +
-									"This may only be a small sample of the person's total work.";
+									"This may only be a small sample of the person\\'s total work.";
 		
 		visualizationCode.append("$('#" + visDivNames.get("SHORT_SPARK") + " td.sparkline_number').text(parseInt(renderedShortSparks) + parseInt(" + unknownYearPublications + "));");
 		visualizationCode.append("var shortSparksText = ''" +
-														"+ ' publications within the last 10 years " +
-														"<span title=\"" + imcompleteDataText + "\">(incomplete data)</span>'" +
+														"+ ' publication(s) within the last 10 years " +
+														"<span class=\"incomplete-data-holder\" title=\"" + imcompleteDataText + "\">(incomplete data)</span>'" +
 														/*"+ ' " + totalPublications + " '" +
 														"+ ' total " +
 														"<span class=\"sparkline_range\">" +
