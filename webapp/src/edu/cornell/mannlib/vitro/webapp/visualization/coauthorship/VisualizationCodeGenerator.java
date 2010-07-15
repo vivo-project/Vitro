@@ -332,7 +332,7 @@ public class VisualizationCodeGenerator {
 		 * */
 		visualizationCode.append("$('#" + visDivNames.get("SHORT_SPARK") + " td.sparkline_number').text(renderedShortSparks);");
 		visualizationCode.append("var shortSparksText = ''" +
-														"+ ' Unique co-authors with year from '" +
+														"+ ' Unique co-author(s) with year from '" +
 														"+ ' " + totalUniqueCoAuthors + " '" +
 														"+ ' total " +
 														"<span class=\"sparkline_range\">" +
@@ -386,9 +386,9 @@ public class VisualizationCodeGenerator {
 		visualizationCode.append("$('#" + visDivNames.get("FULL_SPARK") + " td.sparkline_number').text('" + renderedFullSparks + "');");
 		
 		visualizationCode.append("var allSparksText = ''" +
-												 "+ ' Unique co-authors '" +
+												 "+ ' Unique co-author(s) from '" +
 												 "+ ' <span class=\"sparkline_range\">" +
-												"(" + minPubYearConsidered + " - " + currentYear + ")" +
+												"" + minPubYearConsidered + " to " + currentYear + "" +
 												"</span> '" +
 												"+ ' " + csvDownloadURLHref + " ';" +
 								"$('#" + visDivNames.get("FULL_SPARK") + " td.sparkline_text').html(allSparksText);");

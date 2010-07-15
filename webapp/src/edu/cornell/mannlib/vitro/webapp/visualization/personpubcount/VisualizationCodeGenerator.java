@@ -398,9 +398,9 @@ public class VisualizationCodeGenerator {
 		visualizationCode.append("var allSparksText = ''" +
 												 "+ ' publications '" +
 												 /*"+ ' " + totalPublications + " '" +*/
-												 "+ ' between " +
+												 "+ ' from " +
 												"<span class=\"sparkline_range\">" +
-												"" + minPubYearConsidered + " & " + currentYear + "" +
+												"" + minPubYearConsidered + " to " + currentYear + "" +
 												"</span> '" +
 												"+ ' " + csvDownloadURLHref + " ';" +
 								"$('#" + visDivNames.get("FULL_SPARK") + " td.sparkline_text').html(allSparksText);");
