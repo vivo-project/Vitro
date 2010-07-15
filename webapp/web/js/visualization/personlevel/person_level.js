@@ -107,6 +107,11 @@ function setProfileMoniker(monikerContainerID, moniker, doEllipsis) {
 	if (monikerContainerID == "") {
 		return;
 	}
+	
+	if (!moniker) {
+		$("#" + monikerContainerID).empty();
+		return;
+	}
 
 	var finalDisplayMoniker;
 	
@@ -128,6 +133,11 @@ function setProfileMoniker(monikerContainerID, moniker, doEllipsis) {
 function setProfileName(nameContainerID, name) {
 
 	if (nameContainerID == "") {
+		return;
+	}
+	
+	if (!name) {
+		$("#" + nameContainerID).empty();
 		return;
 	}
 
