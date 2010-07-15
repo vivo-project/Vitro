@@ -41,10 +41,6 @@ public abstract class FileList extends BaseTemplateModel {
         for (String file : list) {
             tags += getTag(file);
         }
-//        Iterator<String> i = list.iterator();
-//        while (i.hasNext()) {
-//            tags += getTag(i.next());
-//        }
         return tags;
     }
     
