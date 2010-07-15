@@ -12,10 +12,18 @@
 
 <p><a href="ingest">Ingest Home</a></p>
 
-<h2>Rename Resource</h2>
+<h2>Change Namespace of Resources</h2>
+
+<p>This tool will change all resources in the supplied "old namespace" 
+to be in the "new namespace."  Additionally, the local names will be updated
+to follow the established "n" + random integer naming convention.</p>
+
+<p>This tool operates on the main web application model only, not on any 
+   of the additional Jena models.</p>
+
 <form id="takeuri" action="ingest" method="get">
 <input type="hidden" name="action" value="renameResource"/>
 <p>Old Namespace  <input id="uri1" type="text" size="52" name="uri1"/></p>
 <p>New Namespace  <input id="uri2" type="text" size="52" name="uri2"/></p>
-<p><input type="submit" name="submit" value="submit" /></p>
+<p><input type="submit" name="submit" value="Change namespace" /></p>
 </form>

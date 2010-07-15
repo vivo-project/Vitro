@@ -84,7 +84,7 @@
 			<form action="ingest" method="get"><input type="hidden"
 				name="action" value="permanentURI" /> <input type="hidden"
 				name="modelName" value="<%=modelName%>" /> <input type="submit"
-				name="submit" value="Permanent URI" /></form>
+				name="submit" value="generate permanent URIs" /></form>
 			</td>
             <td>&nbsp;</td>
             </tr>

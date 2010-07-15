@@ -17,12 +17,23 @@
 
 <p><a href="ingest">Ingest Home</a></p>
 
-<h2>Assign Permanent URI To Individuals</h2>
+<h2>Assign Permanent URIs To Resources</h2>
+
+<p>This tool will rename the resources in the selected model to with new
+randomly-generated URIs following the pattern used in the main application.  
+The tool will generate URIs that are not already in use in the main web 
+application model. Statements using the newly-renamed resources will be 
+written to the "model to save."</p> 
+
+<p>The permanent URIs may be generated in an arbitrary "new namespace for 
+resources."  Otherwise, the "use default namespace" option will generate
+URIs exactly of the form created through the GUI interface.</p>
+
 <form action="ingest" method="get" >
 <%String modelName = (String)request.getAttribute("modelName"); %>
 <input type="hidden" name="oldModel" value="<%=modelName%>"/>
 <input type="hidden" name="action" value="permanentURI" />
-<p>Namespace of resources  <select name=oldNamespace><%List namespaces = (List)request.getAttribute("namespaceList");
+<p>Current namespace of resources  <select name=oldNamespace><%List namespaces = (List)request.getAttribute("namespaceList");
 if(namespaces != null){
 	Iterator namespaceItr = namespaces.iterator();
 	Integer count = 0;
@@ -42,10 +53,10 @@ if(namespaces != null){
     }
 %>
 </select></p>
-<p>New Namespace for resources  <input type="text" name="newNamespace" /></p>
+<p>New namespace for resources  <input type="text" name="newNamespace" /></p>
 Or <%String defaultNamespace = (String)request.getAttribute("defaultNamespace");%>
-<p>Choose Default Namespace <%=defaultNamespace%>  <input type="checkbox" name="defaultNamespace" value ="<%=defaultNamespace%>"/>
+<p>Use default namespace <%=defaultNamespace%>  <input type="checkbox" name="defaultNamespace" value ="<%=defaultNamespace%>"/>
 </p>
 
-<p><input type="submit" name="submit" value="submit" /></p>
+<p><input type="submit" name="submit" value="Generate URIs" /></p>
 </form>

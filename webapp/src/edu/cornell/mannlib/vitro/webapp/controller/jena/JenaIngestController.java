@@ -1003,12 +1003,12 @@ public class JenaIngestController extends BaseEditController {
 		}
 	private String getUnusedURI(String newNamespace){
 		String uri = null;
-		Random random = new Random();
+		Random random = new Random(Integer.MAX_VALUE);
 		boolean resourcePresent=true;
 		OntModel vitroJenaModel = (OntModel) getServletContext().getAttribute("baseOntModel");
 		Resource res = null;
 		do{
-		uri = newNamespace + "individual" + random.nextInt();
+		uri = newNamespace + "n" + random.nextInt();
 		res = vitroJenaModel.getResource(uri);
 		StmtIterator stmtItr1 = vitroJenaModel.listStatements(res,(Property)null,(RDFNode)null);
 		if(!stmtItr1.hasNext()){

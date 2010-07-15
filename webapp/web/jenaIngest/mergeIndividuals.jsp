@@ -20,10 +20,25 @@
 <p><a href="ingest">Ingest Home</a></p>
 
 <h2>Merge Individuals</h2>
+
+<p>This tool allows two individuals with different URIs to be collapsed into a 
+   single URI.  Any statements using the "duplicate individual URI" will be 
+   rewritten using the "primary individual URI."  If there are multiple 
+   statements for a property that can have only a single value, the extra
+   statements will be retracted from the model and offered for download.</p>
+<p>This tool operates on the main web application model only, not on any 
+   of the additional Jena models.</p> 
+
 <form id="takeuri" action="ingest" method="get">
 <input type="hidden" name="action" value="mergeIndividuals"/>
-<p>Individual URI1  <input id="uri1" type="text" size="52" name="uri1"/></p>
-<p>Individual URI2  <input id="uri2" type="text" size="52" name="uri2"/></p>
-<p><input type="submit" name="submit" value="submit" /></p>
+<table>
+<tr>
+    <td>Primary individual URI</td><td><input id="uri1" type="text" size="52" name="uri1"/></td>
+</tr>
+<tr>
+    <td>Duplicate individual URI</td><td><input id="uri2" type="text" size="52" name="uri2"/></td>
+</tr>
+</table>
+<input type="submit" name="submit" value="Merge individuals" /></p>
 </form>
 
