@@ -39,6 +39,11 @@
 
 <style type="text/css">
 
+#incomplete-data {
+	background-color: activecaption;
+}
+
+
 #profileImage img{
 	width: 90px;
 	height: auto;
