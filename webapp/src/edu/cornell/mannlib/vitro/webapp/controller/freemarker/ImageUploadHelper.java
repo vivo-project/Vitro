@@ -9,9 +9,7 @@ import static edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUpload
 import static edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest.FILE_ITEM_MAP;
 import static edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest.FILE_UPLOAD_EXCEPTION;
 
-import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
+import java.awt.image.renderable.ParameterBlock;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
@@ -22,13 +20,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.imageio.ImageIO;
+import javax.media.jai.Interpolation;
+import javax.media.jai.JAI;
+import javax.media.jai.RenderedOp;
+import javax.media.jai.util.ImagingListener;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import com.sun.media.jai.codec.MemoryCacheSeekableStream;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -72,6 +75,15 @@ public class ImageUploadHelper {
 		map.put(".jpeg", "image/jpeg");
 		map.put(".jpe", "image/jpeg");
 		return Collections.unmodifiableMap(map);
+	}
+
+	/*
+	 * Prevent Java Advanced Imaging from complaining about the lack of
+	 * accelerator classes.
+	 */
+	static {
+		JAI.getDefaultInstance().setImagingListener(
+				new NonNoisyImagingListener());
 	}
 
 	private final WebappDaoFactory webAppDaoFactory;
@@ -182,14 +194,18 @@ public class ImageUploadHelper {
 	 *             if the image is smaller than a thumbnail.
 	 */
 	Dimensions getNewImageSize(FileInfo fileInfo) throws UserMistakeException {
-		String uri = fileInfo.getBytestreamUri();
-		String filename = fileInfo.getFilename();
-
-		InputStream stream = null;
+		InputStream source = null;
 		try {
-			stream = fileStorage.getInputStream(uri, filename);
-			BufferedImage i = ImageIO.read(stream);
-			Dimensions size = new Dimensions(i.getWidth(), i.getHeight());
+			String uri = fileInfo.getBytestreamUri();
+			String filename = fileInfo.getFilename();
+
+			source = fileStorage.getInputStream(uri, filename);
+			MemoryCacheSeekableStream stream = new MemoryCacheSeekableStream(
+					source);
+			RenderedOp image = JAI.create("stream", stream);
+
+			Dimensions size = new Dimensions(image.getWidth(), image
+					.getHeight());
 			log.debug("new image size is " + size);
 
 			if ((size.height < THUMBNAIL_HEIGHT)
@@ -207,9 +223,9 @@ public class ImageUploadHelper {
 			throw new IllegalStateException("Can't read image file: "
 					+ fileInfo, e);
 		} finally {
-			if (stream != null) {
+			if (source != null) {
 				try {
-					stream.close();
+					source.close();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -405,61 +421,117 @@ public class ImageUploadHelper {
 	 */
 	private InputStream scaleImageForThumbnail(InputStream source,
 			CropRectangle crop) throws IOException {
-		BufferedImage bsrc = ImageIO.read(source);
+		try {
+			// Read the main image.
+			MemoryCacheSeekableStream stream = new MemoryCacheSeekableStream(
+					source);
+			RenderedOp mainImage = JAI.create("stream", stream);
+			int imageWidth = mainImage.getWidth();
+			int imageHeight = mainImage.getHeight();
 
-		// If the image was displayed in reduced form, adjust the crop info.
-		crop = adjustForScaledImageDisplay(bsrc.getWidth(), crop);
+			// Adjust the crop rectangle, if needed, to compensate for scaling
+			// and to limit to the image size.
+			crop = adjustCropRectangle(crop, imageWidth, imageHeight);
 
-		// Insure that x and y fall within the image dimensions.
-		int x = Math.max(0, Math.min(bsrc.getWidth(), Math.abs(crop.x)));
-		int y = Math.max(0, Math.min(bsrc.getHeight(), Math.abs(crop.y)));
+			// Crop the image.
+			ParameterBlock cropParams = new ParameterBlock();
+			cropParams.addSource(mainImage);
+			cropParams.add((float) crop.x);
+			cropParams.add((float) crop.y);
+			cropParams.add((float) crop.width);
+			cropParams.add((float) crop.height);
+			RenderedOp croppedImage = JAI.create("crop", cropParams);
 
-		// Insure that width and height are reasonable.
-		int w = Math.max(5, Math.min(bsrc.getWidth() - x, crop.width));
-		int h = Math.max(5, Math.min(bsrc.getHeight() - y, crop.height));
+			// Figure the scales.
+			float scaleWidth = ((float) THUMBNAIL_WIDTH) / ((float) crop.width);
+			float scaleHeight = ((float) THUMBNAIL_HEIGHT)
+					/ ((float) crop.height);
+			log.debug("Generating a thumbnail, scales: " + scaleWidth + ", "
+					+ scaleHeight);
 
-		// Figure the scales.
-		double scaleWidth = ((double) THUMBNAIL_WIDTH) / ((double) w);
-		double scaleHeight = ((double) THUMBNAIL_HEIGHT) / ((double) h);
+			// Create the parameters for the scaling operation.
+			Interpolation interpolation = Interpolation
+					.getInstance(Interpolation.INTERP_BILINEAR);
+			ParameterBlock scaleParams = new ParameterBlock();
+			scaleParams.addSource(croppedImage);
+			scaleParams.add(scaleWidth); // x scale factor
+			scaleParams.add(scaleHeight); // y scale factor
+			scaleParams.add(0.0F); // x translate
+			scaleParams.add(0.0F); // y translate
+			scaleParams.add(interpolation);
+			RenderedOp image2 = JAI.create("scale", scaleParams);
 
-		log.debug("Generating a thumbnail, initial crop info: " + crop);
-		log.debug("Generating a thumbnail, bounded crop info: " + crop);
-		log.debug("Generating a thumbnail, scales: " + scaleWidth + ", "
-				+ scaleHeight);
-
-		// Create the transform.
-		AffineTransform at = new AffineTransform();
-		at.scale(scaleWidth, scaleHeight);
-		at.translate(-x, -y);
-
-		// Apply the transform.
-		BufferedImage bdest = new BufferedImage(THUMBNAIL_WIDTH,
-				THUMBNAIL_HEIGHT, BufferedImage.TYPE_INT_RGB);
-		Graphics2D g = bdest.createGraphics();
-		g.drawRenderedImage(bsrc, at);
-
-		// Get an input stream.
-		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-		ImageIO.write(bdest, "JPG", buffer);
-		return new ByteArrayInputStream(buffer.toByteArray());
+			ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+			JAI.create("encode", image2, bytes, "JPEG", null);
+			bytes.close();
+			return new ByteArrayInputStream(bytes.toByteArray());
+		} catch (Exception e) {
+			throw new IllegalStateException("Failed to scale the image", e);
+		}
 	}
 
 	/**
 	 * If the source image was too big to fit in the page, then it was displayed
-	 * at a reduced scale. The crop values must expand to apply to the
-	 * full-sized image.
+	 * at a reduced scale, and needs to be unscaled.
+	 * 
+	 * The bounds should be limited to the bounds of the image.
 	 */
-	private CropRectangle adjustForScaledImageDisplay(int imageWidth,
-			CropRectangle crop) {
+	private CropRectangle adjustCropRectangle(CropRectangle crop,
+			int imageWidth, int imageHeight) {
+		log.debug("Generating a thumbnail, initial crop info: " + crop);
+
+		CropRectangle adjusted;
 		if (imageWidth <= MAXIMUM_IMAGE_DISPLAY_WIDTH) {
-			return crop;
+			adjusted = crop;
+		} else {
+			float displayScale = ((float) MAXIMUM_IMAGE_DISPLAY_WIDTH)
+					/ ((float) imageWidth);
+			adjusted = crop.unscale(displayScale);
+			log.debug("Generating a thumbnail, unscaled crop info: " + adjusted
+					+ ", displayScale=" + displayScale);
 		}
 
-		float displayScale = ((float) MAXIMUM_IMAGE_DISPLAY_WIDTH)
-				/ ((float) imageWidth);
-		log.debug("Generating a thumbnail, unscaled crop info: " + crop
-				+ ", displayScale=" + displayScale);
-		return crop.unscale(displayScale);
+		// Insure that x and y fall within the image dimensions.
+		int x = Math.max(0, Math.min(imageWidth, Math.abs(adjusted.x)));
+		int y = Math.max(0, Math.min(imageHeight, Math.abs(adjusted.y)));
+
+		// Insure that width and height are reasonable.
+		int w = Math.max(5, Math.min(imageWidth - x, adjusted.width));
+		int h = Math.max(5, Math.min(imageHeight - y, adjusted.height));
+
+		CropRectangle bounded = new CropRectangle(x, y, h, w);
+		log.debug("Generating a thumbnail, bounded crop info: " + bounded);
+		return bounded;
 	}
 
+	/**
+	 * <p>
+	 * This {@link ImagingListener} means that Java Advanced Imaging won't dump
+	 * an exception log to {@link System#out}. It writes to the log, instead.
+	 * </p>
+	 * <p>
+	 * Further, since the lack of native accelerator classes isn't an error, it
+	 * is written as a simple log message.
+	 * </p>
+	 */
+	private static class NonNoisyImagingListener implements ImagingListener {
+		@Override
+		public boolean errorOccurred(String message, Throwable thrown,
+				Object where, boolean isRetryable) throws RuntimeException {
+			if (thrown instanceof RuntimeException) {
+				throw (RuntimeException) thrown;
+			}
+			if ((thrown instanceof NoClassDefFoundError)
+					&& (thrown.getMessage()
+							.contains("com/sun/medialib/mlib/Image"))) {
+				log.info("Java Advanced Imaging: Could not find mediaLib "
+						+ "accelerator wrapper classes. "
+						+ "Continuing in pure Java mode.");
+				return false;
+			}
+			log.error(thrown, thrown);
+			return false;
+		}
+
+	}
 }
