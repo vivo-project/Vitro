@@ -16,7 +16,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
@@ -68,10 +67,10 @@ public class IndexBuilder {
 
     public IndexBuilder(ServletContext context,
                 IndexerIface indexer,
-                List /*ObjectSourceIface*/ sources ){
+                List /*ObjectSourceIface*/ sources){
         this.indexer = indexer;
         this.sourceList = sources;
-        this.context = context;
+        this.context = context;    
         
         this.changedUris = new HashSet<String>();
         this.indexingThread = new IndexBuilderThread(this); 
@@ -341,14 +340,18 @@ public class IndexBuilder {
         	boolean prohibitedClass = false;
         	if(  classesProhibitedFromSearch != null ){
         		for( VClass vclass : ind.getVClasses() ){
-        			if( classesProhibitedFromSearch.isClassProhibited(vclass.getURI()) ){
+        			if( classesProhibitedFromSearch.isClassProhibited(vclass.getURI()) ){        			
         				prohibitedClass = true;
+        				log.debug("not indexing " + ind.getURI() + " because class " + vclass.getURI() + " is on prohibited list.");
         				break;
         			}        		
         		}
         	}
         	if( !prohibitedClass )
         		indexer.index(ind, newDoc);
+        	else
+        		indexer.removeFromIndex(ind);
+        	
         }catch(Throwable ex){            
             log.debug("IndexBuilder.indexItem() Error indexing "
                     + ind + "\n" +ex);
