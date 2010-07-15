@@ -29,7 +29,7 @@ ${stylesheets.addFromTheme("/login.css")}
        </#if>
        
        <form action="${formAction}" method="post">
-              <label for="loginName">Email</label>
+              <label for="loginName">Email or Username</label>
               <input id="loginName" class="focus" name="loginName" type="text" value="${loginName}"  />
               <label for="loginPassword">Password</label>
               <input id="loginPassword" type="password" name="loginPassword"  />
