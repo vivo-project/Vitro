@@ -82,8 +82,12 @@ $.fn.image = function(src, successFunc, failureFunc){
 
 function setProfileImage(imageContainerID, mainImageURL, contextPath) {
 	
-	if (imageContainerID == "" || !mainImageURL) {
+	if (imageContainerID == "") {
 		return;
+	}
+	
+	if (!mainImageURL) {
+		$("#" + imageContainerID).empty();
 	}
 	
 	var rawPath = getWellFormedURLs(mainImageURL, "image");

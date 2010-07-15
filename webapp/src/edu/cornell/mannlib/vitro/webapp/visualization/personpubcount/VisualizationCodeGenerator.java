@@ -342,12 +342,12 @@ public class VisualizationCodeGenerator {
 		 * */
 		visualizationCode.append("$('#" + visDivNames.get("SHORT_SPARK") + " td.sparkline_number').text(renderedShortSparks);");
 		visualizationCode.append("var shortSparksText = ''" +
-														"+ ' Papers with year from '" +
-														"+ ' " + totalPublications + " '" +
+														"+ ' publications within the last 10 years '" +
+														/*"+ ' " + totalPublications + " '" +
 														"+ ' total " +
 														"<span class=\"sparkline_range\">" +
 														"(" + shortSparkMinYear + " - " + currentYear + ")" +
-														"</span>'" +
+														"</span>'" +*/
 														"+ '';" +
 								"$('#" + visDivNames.get("SHORT_SPARK") + " td.sparkline_text').html(shortSparksText);");
 
@@ -396,11 +396,11 @@ public class VisualizationCodeGenerator {
 		visualizationCode.append("$('#" + visDivNames.get("FULL_SPARK") + " td.sparkline_number').text('" + renderedFullSparks + "');");
 		
 		visualizationCode.append("var allSparksText = ''" +
-												 "+ ' papers with year from '" +
-												 "+ ' " + totalPublications + " '" +
-												 "+ ' total " +
+												 "+ ' publications '" +
+												 /*"+ ' " + totalPublications + " '" +*/
+												 "+ ' between " +
 												"<span class=\"sparkline_range\">" +
-												"(" + minPubYearConsidered + " - " + currentYear + ")" +
+												"" + minPubYearConsidered + " & " + currentYear + "" +
 												"</span> '" +
 												"+ ' " + csvDownloadURLHref + " ';" +
 								"$('#" + visDivNames.get("FULL_SPARK") + " td.sparkline_text').html(allSparksText);");
@@ -590,7 +590,7 @@ public class VisualizationCodeGenerator {
 			
 			System.out.println("context parth full n/w " + contextPath);
 			
-			fullTimelineLink = "<a href='" + fullTimelineNetworkURL + "'>View full timeline and co-author network</a><br />";
+			fullTimelineLink = "<a href='" + fullTimelineNetworkURL + "'>View all publications over career and co-author network</a><br />";
 			
 			valueObjectContainer.setFullTimelineNetworkLink(fullTimelineNetworkURL);
 			
