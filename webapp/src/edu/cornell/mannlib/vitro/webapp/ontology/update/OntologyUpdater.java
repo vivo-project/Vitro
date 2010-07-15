@@ -138,7 +138,7 @@ public class OntologyUpdater {
 				} catch (Exception e) {
 					logger.logError(this.getClass().getName() + 
 							".performSparqlConstructs() unable to execute " +
-							"query at " + sparqlFile);
+							"query at " + sparqlFile + ". Error message is: " + e.getMessage());
 				}
 			} catch (FileNotFoundException fnfe) {
 				logger.logError(this.getClass().getName() + 

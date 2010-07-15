@@ -424,9 +424,13 @@ public class ABoxUpdater {
 		OntProperty oldProperty = oldTboxModel.getOntProperty(propObj.getSourceURI());
 		OntProperty newProperty = newTboxModel.getOntProperty(propObj.getDestinationURI());
 		
-		if (oldProperty == null || newProperty == null) {
-			logger.logError(" expects non-null old property and new property "
-					+ "URIs");
+		if (oldProperty == null) {
+			logger.logError("didn't find the " + propObj.getSourceURI() + " property in the old TBox");
+			return;
+		}
+		
+		if (newProperty == null) {
+			logger.logError("didn't find the " + propObj.getDestinationURI() + " property in the new TBox");
 			return;
 		}
 		
