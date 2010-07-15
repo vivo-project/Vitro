@@ -24,6 +24,7 @@ import edu.cornell.mannlib.vedit.forwarder.PageForwarder;
 import edu.cornell.mannlib.vedit.forwarder.impl.UrlForwarder;
 import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.JenaNetidPolicy.ContextSetup;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.setup.SelfEditingPolicySetup;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
@@ -114,23 +115,28 @@ public class UserRetryController extends BaseEditController {
         HashMap optionMap = new HashMap();
 
         LoginFormBean loginBean = (LoginFormBean) request.getSession().getAttribute("loginHandler");
+        List roleOptionList = new LinkedList();
         
-        /* has no impact on anything, so don't confuse by showing */
-        /* bdc34: Datastar needs non-backend-editing users for logging in non-Cornell people*/ 
+        /* bdc34: Datastar needs non-backend-editing users for logging in non-Cornell people*/
+        /* SelfEditingPolicySetup.SELF_EDITING_POLICY_WAS_SETUP is set by the SelfEditingPolicySetup context listener */
+        boolean selfEditing = (Boolean)getServletContext().getAttribute(SelfEditingPolicySetup.SELF_EDITING_POLICY_WAS_SETUP) == Boolean.TRUE;
         Option nonEditor = new Option(ROLE_PROTOCOL+loginBean.getNonEditor(), "self editor");
-        nonEditor.setSelected(userForEditing.getRoleURI().equals(nonEditor.getValue()));
+        /* self editing should be displayed if we are editing a user account that is already  
+         *  self-editing even if self editing is off. */
+        if( selfEditing || 
+        	( !"insert".equals(action) && userForEditing.getRoleURI().equals(nonEditor.getValue()) )){        	        	
+            nonEditor.setSelected(userForEditing.getRoleURI().equals(nonEditor.getValue()));
+            if (nonEditor.getSelected() || (Integer.decode(loginBean.getLoginRole()) >= loginBean.getNonEditor()))
+                roleOptionList.add(nonEditor); 
+        }
         
         Option editor = new Option(ROLE_PROTOCOL+loginBean.getEditor(), "editor");
         editor.setSelected(userForEditing.getRoleURI().equals(editor.getValue()));
         Option curator = new Option(ROLE_PROTOCOL+loginBean.getCurator(), "curator");
         curator.setSelected(userForEditing.getRoleURI().equals(curator.getValue()));
         Option administrator = new Option (ROLE_PROTOCOL+loginBean.getDba(), "system administrator");
-        administrator.setSelected(userForEditing.getRoleURI().equals(administrator.getValue()));
-
-        List roleOptionList = new LinkedList();
-
-        if (nonEditor.getSelected() || (Integer.decode(loginBean.getLoginRole()) >= loginBean.getNonEditor()))
-            roleOptionList.add(nonEditor); 
+        administrator.setSelected(userForEditing.getRoleURI().equals(administrator.getValue()));        
+        
         if (editor.getSelected() || (Integer.decode(loginBean.getLoginRole()) >= loginBean.getEditor()))
             roleOptionList.add(editor);
         if (curator.getSelected() || (Integer.decode(loginBean.getLoginRole()) >= loginBean.getCurator()))

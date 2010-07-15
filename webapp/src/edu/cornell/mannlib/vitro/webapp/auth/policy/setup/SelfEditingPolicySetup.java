@@ -49,7 +49,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
  */
 public class SelfEditingPolicySetup  implements ServletContextListener  {
     private static final Log log = LogFactory.getLog(SelfEditingPolicySetup.class.getName());
-   
+    public static final String SELF_EDITING_POLICY_WAS_SETUP= "selfEditingPolicyWasSetup";
+    
     public void contextInitialized(ServletContextEvent sce) {
         try{
             log.debug("Setting up SelfEditingPolicy");
@@ -60,7 +61,9 @@ public class SelfEditingPolicySetup  implements ServletContextListener  {
             
             SelfEditingIdentifierFactory niif =new SelfEditingIdentifierFactory();
             ServletIdentifierBundleFactory.addIdentifierBundleFactory(sce.getServletContext(), niif);
-
+            
+            sce.getServletContext().setAttribute(SELF_EDITING_POLICY_WAS_SETUP, Boolean.TRUE);
+            
             log.debug( "SelfEditingPolicy has been setup. " );            
         }catch(Exception e){
             log.error("could not run SelfEditingPolicySetup: " + e);
