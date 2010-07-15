@@ -208,6 +208,16 @@ public class QueryHandler {
 				biboDocument.setPublicationYear(publicationYearNode.toString());
 			}
 			
+			RDFNode publicationYearMonthNode = solution.get(QueryFieldLabels.DOCUMENT_PUBLICATION_YEAR_MONTH);
+			if (publicationYearMonthNode != null) {
+				biboDocument.setPublicationYearMonth(publicationYearMonthNode.toString());
+			}
+			
+			RDFNode publicationDateNode = solution.get(QueryFieldLabels.DOCUMENT_PUBLICATION_DATE);
+			if (publicationDateNode != null) {
+				biboDocument.setPublicationDate(publicationDateNode.toString());
+			}
+			
 			return biboDocument;
 	}
 	
@@ -319,48 +329,5 @@ public class QueryHandler {
 
 		return createJavaValueObjects(resultSet);
 	}
-
-	public Map<String, Integer> getYearToPublicationCount(
-			Set<BiboDocument> authorDocuments) {
-
-    	/*
-    	 * Create a map from the year to number of publications. Use the BiboDocument's
-    	 * parsedPublicationYear to populate the data.
-    	 * */
-    	Map<String, Integer> yearToPublicationCount = new TreeMap<String, Integer>();
-
-    	for (BiboDocument curr : authorDocuments) {
-
-    		/*
-    		 * Increment the count because there is an entry already available for
-    		 * that particular year.
-    		 * */
-    		String publicationYear;
-    		if (curr.getPublicationYear() != null 
-    				&& curr.getPublicationYear().length() != 0 
-    				&& curr.getPublicationYear().trim().length() != 0) {
-    			publicationYear = curr.getPublicationYear();
-    		} else {
-    			publicationYear = curr.getParsedPublicationYear();
-    		}
-    		
-			if (yearToPublicationCount.containsKey(publicationYear)) {
-    			yearToPublicationCount.put(publicationYear,
-    									   yearToPublicationCount
-    									   		.get(publicationYear) + 1);
-
-    		} else {
-    			yearToPublicationCount.put(publicationYear, 1);
-    		}
-
-    	}
-
-//    	System.out.println("****************************\n" + yearToPublicationCount);
-		return yearToPublicationCount;
-	}
-
-
-
-
 
 }

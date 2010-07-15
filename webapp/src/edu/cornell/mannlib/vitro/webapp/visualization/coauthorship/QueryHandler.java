@@ -37,9 +37,7 @@ import edu.cornell.mannlib.vitro.webapp.visualization.visutils.UniqueIDGenerator
 
 
 /**
- * Very dumb name of the class. change it.
  * @author cdtank
- *
  */
 public class QueryHandler {
 
@@ -306,6 +304,16 @@ public class QueryHandler {
 				biboDocument.setPublicationYear(publicationYearNode.toString());
 			}
 			
+			RDFNode publicationYearMonthNode = solution.get(QueryFieldLabels.DOCUMENT_PUBLICATION_YEAR_MONTH);
+			if (publicationYearMonthNode != null) {
+				biboDocument.setPublicationYearMonth(publicationYearMonthNode.toString());
+			}
+			
+			RDFNode publicationDateNode = solution.get(QueryFieldLabels.DOCUMENT_PUBLICATION_DATE);
+			if (publicationDateNode != null) {
+				biboDocument.setPublicationDate(publicationDateNode.toString());
+			}
+			
 			return biboDocument;
 	}
 	
@@ -351,13 +359,19 @@ public class QueryHandler {
 							+ "		(str(?documentMoniker) as ?" + QueryFieldLabels.DOCUMENT_MONIKER + ") "
 							+ "		(str(?documentBlurb) as ?" + QueryFieldLabels.DOCUMENT_BLURB + ") "
 							+ "		(str(?publicationYear) as ?" + QueryFieldLabels.DOCUMENT_PUBLICATION_YEAR + ") "
+							+ "		(str(?publicationYearMonth) as ?" + QueryFieldLabels.DOCUMENT_PUBLICATION_YEAR_MONTH + ") " 
+							+ "		(str(?publicationDate) as ?" + QueryFieldLabels.DOCUMENT_PUBLICATION_DATE + ") " 
 							+ "WHERE { "
-							+ "<" + queryURI + "> rdf:type foaf:Person ; vivo:authorOf ?document ; rdfs:label ?authorLabel.  "
+							+ "<" + queryURI + "> rdf:type foaf:Person ; rdfs:label ?authorLabel ; core:authorInAuthorship ?authorshipNode . "
+							+ "?authorshipNode rdf:type core:Authorship ; core:linkedInformationResource ?document . "
 							+ "?document rdf:type bibo:Document . " 
 							+ "?document rdfs:label ?documentLabel . " 
-							+ "?document vivo:hasAuthor ?coAuthorPerson . " 
-							+ "?coAuthorPerson rdfs:label ?coAuthorPersonLabel . "  
-							+ "OPTIONAL {  ?document vivo:publicationYear ?publicationYear } . " 
+							+ "?document core:informationResourceInAuthorship ?coAuthorshipNode . " 
+							+ "?coAuthorshipNode core:linkedAuthor ?coAuthorPerson . " 
+							+ "?coAuthorPerson rdfs:label ?coAuthorPersonLabel . "
+							+ "OPTIONAL {  ?document core:year ?publicationYear } . " 
+							+ "OPTIONAL {  ?document core:yearMonth ?publicationYearMonth } . " 
+							+ "OPTIONAL {  ?document core:date ?publicationDate } . "  
 							+ "OPTIONAL {  ?document vitro:moniker ?documentMoniker } . " 
 							+ "OPTIONAL {  ?document vitro:blurb ?documentBlurb } . " 
 							+ "OPTIONAL {  ?document vitro:description ?documentDescription } " 
@@ -403,7 +417,14 @@ public class QueryHandler {
     	/*
     	 * Create a map from the year to number of publications. Use the BiboDocument's
     	 * parsedPublicationYear to populate the data.
-    	 * */
+    	 * 
+    	 * I am pushing the logic to check for validity of year in "getPublicationYear" itself
+		 * because,
+		 * 	1. We will be using getPub... multiple times & this will save us duplication of code
+		 * 	2. If we change the logic of validity of a pub year we would not have to make changes
+		 * all throughout the codebase.
+		 * 	3. We are asking for a publication year & we should get a proper one or NOT at all.
+		 * */
     	Map<String, Integer> yearToPublicationCount = new TreeMap<String, Integer>();
 
     	for (BiboDocument curr : authorDocuments) {
@@ -413,9 +434,7 @@ public class QueryHandler {
     		 * that particular year.
     		 * */
     		String publicationYear;
-    		if (curr.getPublicationYear() != null 
-    				&& curr.getPublicationYear().length() != 0 
-    				&& curr.getPublicationYear().trim().length() != 0) {
+    		if (curr.getPublicationYear() != null) {
     			publicationYear = curr.getPublicationYear();
     		} else {
     			publicationYear = curr.getParsedPublicationYear();
@@ -432,7 +451,6 @@ public class QueryHandler {
 
     	}
 
-//    	System.out.println("****************************\n" + yearToPublicationCount);
 		return yearToPublicationCount;
 	}
 

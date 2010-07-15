@@ -27,11 +27,16 @@ public class UtilityFunctions {
     		/*
     		 * Increment the count because there is an entry already available for
     		 * that particular year.
+    		 * 
+    		 * I am pushing the logic to check for validity of year in "getPublicationYear" itself
+    		 * because,
+    		 * 	1. We will be using getPub... multiple times & this will save us duplication of code
+    		 * 	2. If we change the logic of validity of a pub year we would not have to make changes
+    		 * all throughout the codebase.
+    		 * 	3. We are asking for a publication year & we should get a proper one or NOT at all.
     		 * */
     		String publicationYear;
-    		if (curr.getPublicationYear() != null 
-    				&& curr.getPublicationYear().length() != 0 
-    				&& curr.getPublicationYear().trim().length() != 0) {
+    		if (curr.getPublicationYear() != null) { 
     			publicationYear = curr.getPublicationYear();
     		} else {
     			publicationYear = curr.getParsedPublicationYear();

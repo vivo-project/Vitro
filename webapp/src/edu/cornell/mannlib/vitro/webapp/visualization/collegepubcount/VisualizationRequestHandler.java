@@ -95,7 +95,7 @@ public class VisualizationRequestHandler {
 			for (VivoEmployee currentEmployee : employees) {
 				
 				Map<String, Integer> currentEmployeeYearToPublicationCount = 
-					queryManager.getYearToPublicationCount(currentEmployee.getAuthorDocuments());
+					UtilityFunctions.getYearToPublicationCount(currentEmployee.getAuthorDocuments());
 				
 				if (currentEmployeeYearToPublicationCount.size() > 0) {
 					
