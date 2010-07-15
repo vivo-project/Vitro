@@ -109,7 +109,15 @@ public class User implements Comparable {
 
     public int compareTo(Object o) {
         Collator collator = Collator.getInstance();
-        return collator.compare(this.getUsername(),((User)o).getUsername());
+        User other = ((User)o);
+        if( this.getUsername() == null && other.getUsername() == null )
+        	return 0;
+        else if( this.getUsername() == null )
+        	return -1;
+        else if( other.getUsername() == null)
+        	return 1;
+        else
+        	return collator.compare(this.getUsername(),((User)o).getUsername());
     }
 
 }
