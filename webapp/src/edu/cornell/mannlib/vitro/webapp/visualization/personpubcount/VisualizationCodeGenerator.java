@@ -118,7 +118,6 @@ public class VisualizationCodeGenerator {
 		if (yearToPublicationCount.size() > 0) {
 			try {
 				minPublishedYear = Integer.parseInt(Collections.min(publishedYears));
-				System.out.println("min pub year - " + minPublishedYear);
 			} catch (NoSuchElementException e1) {
 				log.debug("vis: " + e1.getMessage() + " error occurred for " + yearToPublicationCount.toString());
 			} catch (NumberFormatException e2) {
@@ -231,8 +230,10 @@ public class VisualizationCodeGenerator {
 		 * Total publications will also consider publications that have no year associated with
 		 * it. Hence.
 		 * */
+		Integer unknownYearPublications = 0;
 		if (yearToPublicationCount.get(VOConstants.DEFAULT_PUBLICATION_YEAR) != null) {
 			totalPublications += yearToPublicationCount.get(VOConstants.DEFAULT_PUBLICATION_YEAR);
+			unknownYearPublications = yearToPublicationCount.get(VOConstants.DEFAULT_PUBLICATION_YEAR);
 		}
 
 		String sparklineDisplayOptions = "{width: 63, height: 21, showAxisLines: false, " +
@@ -271,13 +272,15 @@ public class VisualizationCodeGenerator {
 													   shortSparkMinYear, 
 													   visContainerID, 
 													   visualizationCode,
+													   unknownYearPublications,
 													   totalPublications, 
 													   sparklineDisplayOptions);	
 		} else {
 			generateFullSparklineVisualizationContent(currentYear,
 					   								  minPubYearConsidered,
 					   								  visContainerID,
-													  visualizationCode, 
+													  visualizationCode,
+													  unknownYearPublications,
 													  totalPublications, 
 													  renderedFullSparks,
 													  sparklineDisplayOptions);
@@ -297,8 +300,8 @@ public class VisualizationCodeGenerator {
 	
 	private void generateShortSparklineVisualizationContent(int currentYear,
 			int shortSparkMinYear, String visContainerID,
-			StringBuilder visualizationCode, int totalPublications,
-			String sparklineDisplayOptions) {
+			StringBuilder visualizationCode, int unknownYearPublications,
+			int totalPublications, String sparklineDisplayOptions) {
 		
 		/*
 		 * Create a view of the data containing only the column pertaining to publication count.  
@@ -340,9 +343,15 @@ public class VisualizationCodeGenerator {
 		/*
 		 * Generate the text introducing the vis.
 		 * */
-		visualizationCode.append("$('#" + visDivNames.get("SHORT_SPARK") + " td.sparkline_number').text(renderedShortSparks);");
+		
+		
+		String imcompleteDataText = "This information is based solely on publications which have been loaded into the VIVO system. " +
+									"This may only be a small sample of the person's total work.";
+		
+		visualizationCode.append("$('#" + visDivNames.get("SHORT_SPARK") + " td.sparkline_number').text(parseInt(renderedShortSparks) + parseInt(" + unknownYearPublications + "));");
 		visualizationCode.append("var shortSparksText = ''" +
-														"+ ' publications within the last 10 years '" +
+														"+ ' publications within the last 10 years " +
+														"<span title=\"" + imcompleteDataText + "\">(incomplete data)</span>'" +
 														/*"+ ' " + totalPublications + " '" +
 														"+ ' total " +
 														"<span class=\"sparkline_range\">" +
@@ -362,7 +371,9 @@ public class VisualizationCodeGenerator {
 	}
 	
 	private void generateFullSparklineVisualizationContent(
-			int currentYear, int minPubYearConsidered, String visContainerID, StringBuilder visualizationCode,
+			int currentYear, int minPubYearConsidered, String visContainerID, 
+			StringBuilder visualizationCode,
+			int unknownYearPublications,
 			int totalPublications, int renderedFullSparks,
 			String sparklineDisplayOptions) {
 		
@@ -393,7 +404,7 @@ public class VisualizationCodeGenerator {
 								");\n" +
 								"full_spark.draw(fullSparklineView, " + sparklineDisplayOptions + ");\n");
 		
-		visualizationCode.append("$('#" + visDivNames.get("FULL_SPARK") + " td.sparkline_number').text('" + renderedFullSparks + "');");
+		visualizationCode.append("$('#" + visDivNames.get("FULL_SPARK") + " td.sparkline_number').text('" + (renderedFullSparks + unknownYearPublications) + "');");
 		
 		visualizationCode.append("var allSparksText = ''" +
 												 "+ ' publications '" +

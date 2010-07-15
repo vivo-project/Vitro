@@ -18,6 +18,9 @@
 <c:set var='numOfAuthors' value='${requestScope.numOfAuthors}' />
 <c:set var='numOfCoAuthorShips' value='${requestScope.numOfCoAuthorShips}' />
 
+<c:url var="egoVivoProfileURL" value="/individual">
+	<c:param name="uri" value="${requestScope.egoURIParam}" />
+</c:url>
 
 <c:url var="egoSparklineDataURL" value="/admin/visQuery">
 	<c:param name="render_mode" value="data" />
@@ -137,13 +140,16 @@ table.sparkline_wrapper_table td, th {
 			<span id="ego_profile_image"></span>
 			
 	<%-- Label --%>
-			<h1><span id="ego_label" class="author_name"></span></h1>
+			<a href="${egoVivoProfileURL}"><h1><span id="ego_label" class="author_name"></span></h1></a>
 	
 	<%-- Moniker--%>
 			<span id="ego_moniker" class="author_moniker"></span>
 
 
 	<div style="clear:both;"></div>
+	
+	<div id="incomplete-data">This information is based solely on publications which have been loaded into the VIVO system. 
+	This may only be a small sample of the person's total work. </div>
 	
 	<%-- Sparkline --%>
 		<h2 class="sub_headings">General Statistics</h2>

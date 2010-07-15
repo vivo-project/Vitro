@@ -111,7 +111,6 @@ public class VisualizationCodeGenerator {
 		if (yearToUniqueCoauthorsCount.size() > 0) {
 			try {
 				minPublishedYear = Integer.parseInt(Collections.min(publishedYears));
-				System.out.println("min pub year - " + minPublishedYear);
 			} catch (NoSuchElementException e1) {
 				log.debug("vis: " + e1.getMessage() + " error occurred for " + yearToUniqueCoauthorsCount.toString());
 			} catch (NumberFormatException e2) {
@@ -221,10 +220,13 @@ public class VisualizationCodeGenerator {
 		 * Total publications will also consider publications that have no year associated with
 		 * it. Hence.
 		 * */
+		Integer unknownYearCoauthors = 0;
 		if (yearToUniqueCoauthorsCount.get(VOConstants.DEFAULT_PUBLICATION_YEAR) != null) {
 			totalUniqueCoAuthors += yearToUniqueCoauthorsCount.get(VOConstants.DEFAULT_PUBLICATION_YEAR);
+			unknownYearCoauthors = yearToUniqueCoauthorsCount.get(VOConstants.DEFAULT_PUBLICATION_YEAR);
 		}
-
+		
+		
 		String sparklineDisplayOptions = "{width: 63, height: 21, showAxisLines: false, " +
 										  "showValueLabels: false, labelPosition: 'none'}";
 		
@@ -261,6 +263,7 @@ public class VisualizationCodeGenerator {
 													   shortSparkMinYear, 
 													   visContainerID, 
 													   visualizationCode,
+													   unknownYearCoauthors,
 													   totalUniqueCoAuthors, 
 													   sparklineDisplayOptions);	
 		} else {
@@ -268,6 +271,7 @@ public class VisualizationCodeGenerator {
 					   								  minPubYearConsidered,
 					   								  visContainerID,
 													  visualizationCode, 
+													  unknownYearCoauthors,
 													  totalUniqueCoAuthors, 
 													  renderedFullSparks,
 													  sparklineDisplayOptions);
@@ -287,8 +291,8 @@ public class VisualizationCodeGenerator {
 	
 	private void generateShortSparklineVisualizationContent(int currentYear,
 			int shortSparkMinYear, String visContainerID,
-			StringBuilder visualizationCode, int totalUniqueCoAuthors,
-			String sparklineDisplayOptions) {
+			StringBuilder visualizationCode, int unknownYearCoauthors,
+			int totalUniqueCoAuthors, String sparklineDisplayOptions) {
 		
 		/*
 		 * Create a view of the data containing only the column pertaining to publication count.  
@@ -330,7 +334,7 @@ public class VisualizationCodeGenerator {
 		/*
 		 * Generate the text introducing the vis.
 		 * */
-		visualizationCode.append("$('#" + visDivNames.get("SHORT_SPARK") + " td.sparkline_number').text(renderedShortSparks);");
+		visualizationCode.append("$('#" + visDivNames.get("SHORT_SPARK") + " td.sparkline_number').text(parseInt(renderedShortSparks) + parseInt(" + unknownYearCoauthors + "));");
 		visualizationCode.append("var shortSparksText = ''" +
 														"+ ' Unique co-author(s) with year from '" +
 														"+ ' " + totalUniqueCoAuthors + " '" +
@@ -353,7 +357,7 @@ public class VisualizationCodeGenerator {
 	
 	private void generateFullSparklineVisualizationContent(
 			int currentYear, int minPubYearConsidered, String visContainerID, StringBuilder visualizationCode,
-			int totalUniqueCoAuthors, int renderedFullSparks,
+			int unknownYearCoauthors, int totalUniqueCoAuthors, int renderedFullSparks,
 			String sparklineDisplayOptions) {
 		
 		String csvDownloadURLHref = ""; 
@@ -383,7 +387,7 @@ public class VisualizationCodeGenerator {
 								");\n" +
 								"full_spark.draw(fullSparklineView, " + sparklineDisplayOptions + ");\n");
 		
-		visualizationCode.append("$('#" + visDivNames.get("FULL_SPARK") + " td.sparkline_number').text('" + renderedFullSparks + "');");
+		visualizationCode.append("$('#" + visDivNames.get("FULL_SPARK") + " td.sparkline_number').text('" + (renderedFullSparks + unknownYearCoauthors) + "');");
 		
 		visualizationCode.append("var allSparksText = ''" +
 												 "+ ' Unique co-author(s) from '" +
