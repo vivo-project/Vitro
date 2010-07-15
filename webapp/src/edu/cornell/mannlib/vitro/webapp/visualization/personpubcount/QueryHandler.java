@@ -31,7 +31,6 @@ import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.Individual;
 
 
 /**
- * Very dumb name of the class. change it.
  * @author cdtank
  *
  */
@@ -57,16 +56,20 @@ public class QueryHandler {
 			"		(str(?documentLabel) as ?documentLabelLit) " +
 			"		(str(?documentBlurb) as ?documentBlurbLit) " +
 			"		(str(?publicationYear) as ?publicationYearLit) " +
+			"		(str(?publicationYearMonth) as ?publicationYearMonthLit) " +
+			"		(str(?publicationDate) as ?publicationDateLit) " +
 			"		(str(?documentDescription) as ?documentDescriptionLit) ";
 
 	private static final String SPARQL_QUERY_COMMON_WHERE_CLAUSE = "" +
 			"?document rdf:type bibo:Document ." +
 			"?document rdfs:label ?documentLabel ." +
-			"OPTIONAL {  ?document vivo:publicationYear ?publicationYear } ." +
+			"OPTIONAL {  ?document core:year ?publicationYear } ." +
+			"OPTIONAL {  ?document core:yearMonth ?publicationYearMonth } ." +
+			"OPTIONAL {  ?document core:date ?publicationDate } ." +
 			"OPTIONAL {  ?document vitro:moniker ?documentMoniker } ." +
 			"OPTIONAL {  ?document vitro:blurb ?documentBlurb } ." +
 			"OPTIONAL {  ?document vitro:description ?documentDescription }";
-
+	
 	public QueryHandler(String queryParam,
 			String resultFormatParam, String rdfResultFormatParam,
 			DataSource dataSource, Log log) {
@@ -113,6 +116,16 @@ public class QueryHandler {
 			RDFNode publicationYearNode = solution.get(QueryFieldLabels.DOCUMENT_PUBLICATION_YEAR);
 			if (publicationYearNode != null) {
 				biboDocument.setPublicationYear(publicationYearNode.toString());
+			}
+			
+			RDFNode publicationYearMonthNode = solution.get(QueryFieldLabels.DOCUMENT_PUBLICATION_YEAR_MONTH);
+			if (publicationYearMonthNode != null) {
+				biboDocument.setPublicationYearMonth(publicationYearMonthNode.toString());
+			}
+			
+			RDFNode publicationDateNode = solution.get(QueryFieldLabels.DOCUMENT_PUBLICATION_DATE);
+			if (publicationDateNode != null) {
+				biboDocument.setPublicationDate(publicationDateNode.toString());
 			}
 			
 			/*
@@ -168,11 +181,12 @@ public class QueryHandler {
 							+ SPARQL_QUERY_COMMON_SELECT_CLAUSE
 							+ "(str(<" + queryURI + ">) as ?authPersonLit) "
 							+ "WHERE { "
-							+ "<" + queryURI + "> rdf:type foaf:Person ; vivo:authorOf ?document ; rdfs:label ?authorLabel.  "
+							+ "<" + queryURI + "> rdf:type foaf:Person ; rdfs:label ?authorLabel ; core:authorInAuthorship ?authorshipNode .  " 
+							+ "	?authorshipNode rdf:type core:Authorship ; core:linkedInformationResource ?document . "
 							+  SPARQL_QUERY_COMMON_WHERE_CLAUSE
 							+ "}";
 
-		log.debug("SPARQL query for person pub count -> \n" + sparqlQuery);
+		System.out.println("SPARQL query for person pub count -> \n" + sparqlQuery);
 
 		return sparqlQuery;
 	}
@@ -195,8 +209,6 @@ public class QueryHandler {
                 throw new MalformedQueryParametersException("URI provided for an individual is malformed.");
             }
         }
-
-
 
 		ResultSet resultSet	= executeQuery(this.queryParam,
 										   this.resultFormatParam,
@@ -222,11 +234,16 @@ public class QueryHandler {
     		/*
     		 * Increment the count because there is an entry already available for
     		 * that particular year.
+    		 * 
+    		 * I am pushing the logic to check for validity of year in "getPublicationYear" itself
+    		 * because,
+    		 * 	1. We will be using getPub... multiple times & this will save us duplication of code
+    		 * 	2. If we change the logic of validity of a pub year we would not have to make changes
+    		 * all throughout the codebase.
+    		 * 	3. We are asking for a publication year & we should get a proper one or NOT at all.
     		 * */
     		String publicationYear;
-    		if (curr.getPublicationYear() != null 
-    				&& curr.getPublicationYear().length() != 0 
-    				&& curr.getPublicationYear().trim().length() != 0) {
+    		if (curr.getPublicationYear() != null) {
     			publicationYear = curr.getPublicationYear();
     		} else {
     			publicationYear = curr.getParsedPublicationYear();

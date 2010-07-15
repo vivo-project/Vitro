@@ -8,6 +8,10 @@ import java.util.regex.Pattern;
 
 import edu.cornell.mannlib.vitro.webapp.visualization.constants.VOConstants;
 
+/**
+ * @author cdtank
+ *
+ */
 public class BiboDocument extends Individual{
 
 	public static final int MINIMUM_PUBLICATION_YEAR = 1800;
@@ -17,6 +21,8 @@ public class BiboDocument extends Individual{
 	private String documentBlurb;
 	private String documentDescription;
 	private String publicationYear;
+	private String publicationYearMonth;
+	private String publicationDate;
 	private String parsedPublicationYear = VOConstants.DEFAULT_PUBLICATION_YEAR;
 
 	public BiboDocument(String documentURL) {
@@ -50,9 +56,9 @@ public class BiboDocument extends Individual{
 	public void setDocumentBlurb(String documentBlurb) {
 		this.documentBlurb = documentBlurb;
 
-		if (documentBlurb != null) {
-			this.setParsedPublicationYear(parsePublicationYear(documentBlurb));
-		}
+//		if (documentBlurb != null) {
+//			this.setParsedPublicationYear(parsePublicationYear(documentBlurb));
+//		}
 	}
 	
 	private String parsePublicationYear(String documentBlurb) {
@@ -96,15 +102,38 @@ public class BiboDocument extends Individual{
 		this.documentDescription = documentDescription;
 	}
 
-	/*
-	 * Only the
-	 * */
-	private void setParsedPublicationYear(String parsedPublicationYear) {
-		this.parsedPublicationYear = parsedPublicationYear;
-	}
-	
+	/**
+	 * This method will be called when there is no usable core:year value found
+	 * for the bibo:Document. It will first check & parse core:yearMonth failing
+	 * which it will try core:date
+	 * @return
+	 */
 	public String getParsedPublicationYear() {
-		return parsedPublicationYear;
+		
+		/*
+		 * We are assuming that core:yearMonth has "YYYY-MM" format. This is based 
+		 * off of http://www.w3.org/TR/xmlschema-2/#gYearMonth , which is what
+		 * core:yearMonth points to internally.
+		 * */
+		if (publicationYearMonth != null 
+				&& publicationYearMonth.length() >= 4
+				&& isValidPublicationYear(publicationYearMonth.substring(0, 4))) {
+			
+			return publicationYearMonth.substring(0, 4); 
+			
+		} 
+		
+		if (publicationDate != null 
+				&& publicationDate.length() >= 4
+				&& isValidPublicationYear(publicationDate.substring(0, 4))) {
+			
+			return publicationDate.substring(0, 4); 
+		}
+		
+		/*
+		 * If all else fails return default unknown year identifier
+		 * */
+		return VOConstants.DEFAULT_PUBLICATION_YEAR;
 	}
 
 	/*
@@ -112,11 +141,44 @@ public class BiboDocument extends Individual{
 	 * then use the parsedPublicationYear.
 	 * */
 	public String getPublicationYear() {
-		return publicationYear;
+		if (publicationYear != null && isValidPublicationYear(publicationYear)) {
+			return publicationYear;
+		} else {
+			return null;
+		}
+		
 	}
 
 	public void setPublicationYear(String publicationYear) {
 		this.publicationYear = publicationYear;
+	}
+
+	public String getPublicationYearMonth() {
+		return publicationYearMonth;
+	}
+
+	public void setPublicationYearMonth(String publicationYearMonth) {
+		this.publicationYearMonth = publicationYearMonth;
+	}
+
+	public String getPublicationDate() {
+		return publicationDate;
+	}
+
+	public void setPublicationDate(String publicationDate) {
+		this.publicationDate = publicationDate;
+	}
+	
+	private boolean isValidPublicationYear(String testPublicationYear) {
+		
+		if (testPublicationYear.length() != 0 
+				&& testPublicationYear.trim().length() == 4
+				&& testPublicationYear.matches("\\d+")
+				&& Integer.parseInt(testPublicationYear) >= MINIMUM_PUBLICATION_YEAR) {
+			return true;
+		}
+		
+		return false;
 	}
 
 }

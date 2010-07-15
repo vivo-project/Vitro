@@ -38,9 +38,10 @@ public class QueryConstants {
 			put("wos", "http://vivo.mannlib.cornell.edu/ns/ThomsonWOS/0.1#");
 			put("core", "http://vivoweb.org/ontology/core#");
 			put("vivo", "http://vivo.library.cornell.edu/ns/0.1#");
+			put("j.1", "http://aims.fao.org/aos/geopolitical.owl#");
+			put("j.2", "http://vitro.mannlib.cornell.edu/ns/vitro/public#");
 		
 	}};
-	
 	
 	public static String getSparqlPrefixQuery() {
 		
