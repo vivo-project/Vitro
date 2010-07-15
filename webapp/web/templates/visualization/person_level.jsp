@@ -39,11 +39,6 @@
 
 <style type="text/css">
 
-#incomplete-data {
-	background-color: activecaption;
-}
-
-
 #profileImage img{
 	width: 90px;
 	height: auto;
@@ -142,7 +137,7 @@ table.sparkline_wrapper_table td, th {
 
 	
 	<%-- Image --%>
-			<span id="ego_profile_image"></span>
+			<div id="ego_profile_image" class="thumbnail"></div>
 			
 	<%-- Label --%>
 			<a href="${egoVivoProfileURL}"><h1><span id="ego_label" class="author_name"></span></h1></a>
@@ -204,7 +199,7 @@ table.sparkline_wrapper_table td, th {
 		
 		<br />
 		<br />
-		<div id="profileImage"></div>
+		<div id="profileImage" class="thumbnail"></div>
 		
 		<div class="bold"><strong><span id="authorName" class="neutral_author_name">&nbsp;</span></strong></div>
 		
