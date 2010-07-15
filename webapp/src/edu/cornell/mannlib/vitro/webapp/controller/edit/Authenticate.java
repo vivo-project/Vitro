@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -53,6 +54,9 @@ public class Authenticate extends FreeMarkerHttpServlet {
 	/** The confirm password field on the password change form. */
 	private static final String PARAMETER_CONFIRM_PASSWORD = "confirmPassword";
 
+	/** If this parameter is "true" (ignoring case), cancel the login. */
+	private static final String PARAMETER_CANCEL = "cancel";
+
 	/** If they are logging in, show them this form. */
 	public static final String TEMPLATE_LOGIN = "login-form.ftl";
 
@@ -92,9 +96,13 @@ public class Authenticate extends FreeMarkerHttpServlet {
 				}
 				break;
 			case FORCED_PASSWORD_CHANGE:
-				user = checkChangeProgress(vreq);
-				if (user != null) {
-					recordSuccessfulPasswordChange(vreq, user);
+				if (checkCancel(vreq)) {
+					recordLoginCancelled(vreq);
+				} else {
+					user = checkChangeProgress(vreq);
+					if (user != null) {
+						recordSuccessfulPasswordChange(vreq, user);
+					}
 				}
 				break;
 			default:
@@ -108,6 +116,9 @@ public class Authenticate extends FreeMarkerHttpServlet {
 			switch (exitState) {
 			case LOGGED_IN:
 				redirectLoggedInUser(vreq, response);
+				break;
+			case CANCELLED:
+				redirectCancellingUser(vreq, response);
 				break;
 			default:
 				showLoginScreen(vreq, response);
@@ -174,6 +185,23 @@ public class Authenticate extends FreeMarkerHttpServlet {
 		} else {
 			recordLoginInfo(request, user.getUsername());
 		}
+	}
+
+	/**
+	 * Are they cancelling the login (cancelling the first-time password
+	 * change)? They are if the cancel parameter is "true" (ignoring case).
+	 */
+	private boolean checkCancel(HttpServletRequest request) {
+		String cancel = request.getParameter(PARAMETER_CANCEL);
+		log.trace("cancel=" + cancel);
+		return Boolean.valueOf(cancel);
+	}
+
+	/**
+	 * If they want to cancel the login, let them.
+	 */
+	private void recordLoginCancelled(HttpServletRequest request) {
+		getLoginProcessBean(request).setState(State.CANCELLED);
 	}
 
 	/**
@@ -249,7 +277,7 @@ public class Authenticate extends FreeMarkerHttpServlet {
 
 		// Get a fresh user object, so we know it's not stale.
 		User user = getUserDao(request).getUserByUsername(username);
-		
+
 		HttpSession session = request.getSession();
 
 		// Put the login info into the session.
@@ -299,6 +327,20 @@ public class Authenticate extends FreeMarkerHttpServlet {
 			throws IOException {
 		response.sendRedirect(getLoginScreenUrl(vreq));
 		return;
+	}
+
+	/**
+	 * User cancelled the login. Forget that they were logging in, and send them
+	 * to the home page.
+	 */
+	private void redirectCancellingUser(HttpServletRequest request,
+			HttpServletResponse response) throws IOException {
+		// Remove the login process info from the session.
+		request.getSession()
+				.removeAttribute(LoginProcessBean.SESSION_ATTRIBUTE);
+
+		log.debug("User cancelled the login. Redirect to site admin page.");
+		response.sendRedirect(getHomeUrl(request));
 	}
 
 	/**
@@ -462,6 +504,11 @@ public class Authenticate extends FreeMarkerHttpServlet {
 		return contextPath + Controllers.SITE_ADMIN + urlParams;
 	}
 
+	/** What's the URL for the home page? */
+	private String getHomeUrl(HttpServletRequest request) {
+		return request.getContextPath();
+	}
+
 	/**
 	 * What portal are we currently in?
 	 */
@@ -549,6 +596,12 @@ public class Authenticate extends FreeMarkerHttpServlet {
 		}
 
 		jenaOntModel.getBaseModel().notifyEvent(event);
+	}
+
+	@Override
+	public void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws IOException, ServletException {
+		doPost(request, response);
 	}
 
 }

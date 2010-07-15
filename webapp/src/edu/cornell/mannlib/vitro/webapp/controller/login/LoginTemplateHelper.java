@@ -43,6 +43,7 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 	public static final String BODY_INFO_MESSAGE = "infoMessage";
 	public static final String BODY_ERROR_MESSAGE = "errorMessage";
 	public static final String BODY_ALERT_ICON_URL = "alertImageUrl";
+	public static final String BODY_CANCEL_URL = "cancelUrl";
 
 	/** Use this icon for an info message. */
 	public static final String URL_INFO_ICON = "/images/iconAlert.png";
@@ -108,7 +109,7 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 
 	/**
 	 * The user has given the correct password, but now they are required to
-	 * change it.
+	 * change it (unless they cancel out).
 	 */
 	private TemplateResponseValues showPasswordChangeScreen(VitroRequest vreq) {
 		LoginProcessBean bean = getLoginProcessBean(vreq);
@@ -118,6 +119,7 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 		TemplateResponseValues trv = new TemplateResponseValues(
 				TEMPLATE_FORCE_PASSWORD_CHANGE);
 		trv.put(BODY_FORM_ACTION, getAuthenticateUrl(vreq));
+		trv.put(BODY_CANCEL_URL, getCancelUrl(vreq));
 
 		String errorMessage = bean.getErrorMessage();
 		if (!errorMessage.isEmpty()) {
@@ -186,6 +188,14 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 		return contextPath + "/authenticate" + urlParams;
 	}
 
+	/** What's the URL for this servlet, with the cancel parameter added? */
+	private String getCancelUrl(HttpServletRequest request) {
+		String contextPath = request.getContextPath();
+		String urlParams = "?home=" + getPortalIdString(request)
+		+ "&login=block&cancel=true";
+		return contextPath + "/authenticate" + urlParams;
+	}
+	
 	/**
 	 * What portal are we currently in?
 	 */

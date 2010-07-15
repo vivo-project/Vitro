@@ -16,7 +16,7 @@ public class LoginProcessBean {
 			.getName();
 
 	public enum State {
-		NOWHERE, LOGGING_IN, FORCED_PASSWORD_CHANGE, LOGGED_IN
+		NOWHERE, LOGGING_IN, FORCED_PASSWORD_CHANGE, CANCELLED, LOGGED_IN
 	}
 
 	private enum MLevel {

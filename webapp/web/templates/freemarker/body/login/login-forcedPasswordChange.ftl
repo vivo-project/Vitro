@@ -22,5 +22,6 @@ ${stylesheets.addFromTheme("/login.css")}
               <input id="confirmPassword" type="password" name="confirmPassword"  />
               <input name="passwordChangeForm" type="submit" class="submit" value="Save Changes"/>
        </form>
+       <a href="${cancelUrl}">Cancel</a>
 </div>
 
