@@ -114,6 +114,8 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	}	
 	
 	/**
+	 * Unused for the release 1.0 to 1.1 mirgration.
+	 * 
 	 * Replace any triple X P S in the application metadata model
 	 * with X P T where P and T are specified in the input file
 	 * @param filename containing replacement values
