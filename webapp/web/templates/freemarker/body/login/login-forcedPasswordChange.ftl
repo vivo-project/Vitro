@@ -2,8 +2,8 @@
 
 <#-- Log in template for accessing site admin -->
 
-
 ${stylesheets.addFromTheme("/login.css")}
+${stylesheets.addFromTheme("/formedit.css")}
 
 <div id="formLogin" class="pageBodyGroup">
        <h2>Create Your New Password</h2>
@@ -20,8 +20,6 @@ ${stylesheets.addFromTheme("/login.css")}
               <p class="passwordNote">Minimum of 6 characters in length.</p>
               <label for="confirmPassword">Confirm Password</label>
               <input id="confirmPassword" type="password" name="confirmPassword"  />
-              <input name="passwordChangeForm" type="submit" class="submit" value="Save Changes"/>
+              <input name="passwordChangeForm" type="submit" class="submit" value="Save Changes"/> or <a class="cancel" href="${cancelUrl}">Cancel</a>
        </form>
-       <a href="${cancelUrl}">Cancel</a>
 </div>
-
