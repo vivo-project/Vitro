@@ -16,7 +16,7 @@
 <%if(!result.equals("resource 1 not present") && !result.equals("resource 2 not present")){ %>
 <TR>
                 <br>
-                 <p>Download any statements that could not be merged.</p>
+                 <p>Download statements that could not be merged.</p>
                  <p><input type="submit" name="Download" value="Download" ></input></p>
                 <br>
   </TR>
