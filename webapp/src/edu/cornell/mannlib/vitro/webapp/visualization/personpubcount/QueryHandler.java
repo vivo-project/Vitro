@@ -186,7 +186,7 @@ public class QueryHandler {
 							+  SPARQL_QUERY_COMMON_WHERE_CLAUSE
 							+ "}";
 
-		System.out.println("SPARQL query for person pub count -> \n" + sparqlQuery);
+//		System.out.println("SPARQL query for person pub count -> \n" + sparqlQuery);
 
 		return sparqlQuery;
 	}

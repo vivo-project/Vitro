@@ -378,7 +378,7 @@ public class QueryHandler {
 //							+ "FILTER (<" + queryURI + "> != ?coAuthorPerson ) . "
 							+ "}";
 
-		System.out.println(sparqlQuery);
+//		System.out.println(sparqlQuery);
 		
 		return sparqlQuery;
 	}

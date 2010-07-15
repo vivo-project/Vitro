@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 import org.apache.commons.logging.Log;
 
@@ -278,7 +277,7 @@ public class QueryHandler {
 							+ "}"
 							+ "}";
 
-		System.out.println(sparqlQuery);
+//		System.out.println(sparqlQuery);
 		
 		return sparqlQuery;
 	}

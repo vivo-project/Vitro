@@ -564,7 +564,7 @@ public class VisualizationCodeGenerator {
 							 + "&" + VisualizationFrameworkConstants.RENDER_MODE_URL_HANDLE 
 							 + "=" + URLEncoder.encode(VisualizationFrameworkConstants.DATA_RENDER_MODE_URL_VALUE, 
 					 				 				   VisualizationController.URL_ENCODING_SCHEME).toString();
-		System.out.println(" ----- >>>> " + contextPath + " XX " + individualURIParam + " XX " + downloadURL);
+//		System.out.println(" ----- >>>> " + contextPath + " XX " + individualURIParam + " XX " + downloadURL);
 			return downloadURL;
 		} else {
 			return null;
