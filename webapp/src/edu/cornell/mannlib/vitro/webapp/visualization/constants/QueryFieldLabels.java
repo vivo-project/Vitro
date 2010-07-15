@@ -25,6 +25,12 @@ public class QueryFieldLabels {
 	
 	
 	/*
+	 * Image related field labels
+	 * */
+	public static final String THUMBNAIL_LOCATION_URL = "thumbnailDownloadLocationLit";
+	public static final String THUMBNAIL_FILENAME = "thumbnailFileNameLit";
+	
+	/*
 	 * Author related field labels
 	 * */
 	public static final String AUTHOR_URL = "authPersonLit";

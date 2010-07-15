@@ -80,11 +80,13 @@ $.fn.image = function(src, successFunc, failureFunc){
 	});
 };
 
-function setProfileImage(imageContainerID, rawPath, contextPath) {
+function setProfileImage(imageContainerID, mainImageURL, contextPath) {
 	
-	if (imageContainerID == "") {
+	if (imageContainerID == "" || !mainImageURL) {
 		return;
 	}
+	
+	var rawPath = getWellFormedURLs(mainImageURL, "image");
 
 	var imageLink =  contextPath + rawPath;
 
@@ -153,13 +155,13 @@ function processProfileInformation(nameContainerID,
 		doMonikerEllipsis) {
 
 
-	var name, imageRawPath, imageContextPath, moniker;
+	var name, mainImageURL, imageContextPath, moniker;
 
 	$.each(profileInfoJSON, function(key, set){
 
-		if (key.search(/imageThumb/i) > -1) {
+		if (key.search(/mainImage/i) > -1) {
 
-			imageRawPath = set[0];
+			mainImageURL = set[0];
 
 		} else if (key.search(/imageContextPath/i) > -1) {
 
@@ -179,7 +181,7 @@ function processProfileInformation(nameContainerID,
 
 	setProfileName(nameContainerID, name);
 	setProfileMoniker(monikerContainerID, moniker, doMonikerEllipsis);
-	setProfileImage(imageContainerID, imageRawPath, imageContextPath);
+	setProfileImage(imageContainerID, mainImageURL, imageContextPath);
 
 }
 

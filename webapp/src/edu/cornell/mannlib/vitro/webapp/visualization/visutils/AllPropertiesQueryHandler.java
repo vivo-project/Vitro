@@ -2,8 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.visualization.visutils;
 
-import java.util.Map;
-
 import org.apache.commons.logging.Log;
 
 import com.hp.hpl.jena.iri.IRI;
@@ -18,7 +16,6 @@ import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.util.tuple.TupleSet;
 
 import edu.cornell.mannlib.vitro.webapp.visualization.constants.QueryConstants;
 import edu.cornell.mannlib.vitro.webapp.visualization.constants.QueryFieldLabels;
@@ -28,38 +25,35 @@ import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.GenericQueryM
 
 
 /**
+ * Very dumb name of the class. change it.
  * @author cdtank
  *
  */
-public class GenericQueryHandler {
+public class AllPropertiesQueryHandler {
 
 	protected static final Syntax SYNTAX = Syntax.syntaxARQ;
 
-	private String whereClause, individualURLParam, resultFormatParam, rdfResultFormatParam;
+	private String filterRule, individualURLParam, resultFormatParam, rdfResultFormatParam;
 	private DataSource dataSource;
 
 	private Log log;
 
-	private Map<String, String> fieldLabelToOutputFieldLabel;
-
-	public GenericQueryHandler(String individualURLParam,
-							   Map<String, String> fieldLabelToOutputFieldLabel, 
-							   String whereClause,
+	public AllPropertiesQueryHandler(String individualURLParam,
+							   String filterRule,
 							   String resultFormatParam, 
 							   String rdfResultFormatParam,
 							   DataSource dataSource, 
 							   Log log) {
 
 		this.individualURLParam = individualURLParam;
-		this.fieldLabelToOutputFieldLabel = fieldLabelToOutputFieldLabel;
-		this.whereClause = whereClause;
+		this.filterRule = filterRule;
 		this.resultFormatParam = resultFormatParam;
 		this.rdfResultFormatParam = rdfResultFormatParam;
 		this.dataSource = dataSource;
 		this.log = log;
 		
 	}
-/*
+
 	private GenericQueryMap createJavaValueObjects(ResultSet resultSet) {
 		
 		GenericQueryMap queryResultVO = new GenericQueryMap();
@@ -76,24 +70,12 @@ public class GenericQueryHandler {
 									   objectNode.toString());
 			} 
 			
-			
-			for (String currentOutputFieldLabel : this.fieldLabelToOutputFieldLabel.values()) {
-				
-				RDFNode currentFieldNode = solution.get(currentOutputFieldLabel);
-				if (currentFieldNode != null) {
-//					biboDocument.setDocumentBlurb(currentFieldNode.toString());
-					
-					TupleSet
-				}
-				
-			}
-			
 		}
 		
 		return queryResultVO;
 	}
 
-	*/
+	
 	private ResultSet executeQuery(String queryText,
 								   String resultFormatParam, 
 								   String rdfResultFormatParam, 
@@ -122,35 +104,32 @@ public class GenericQueryHandler {
 		return null;
     }
 
-	private String generateGenericSparqlQuery() {
+	private String generateGenericSparqlQuery(String queryURI, String filterRule) {
 //		Resource uri1 = ResourceFactory.createResource(queryURI);
-
-		StringBuilder sparqlQuery = new StringBuilder();
-		sparqlQuery.append(QueryConstants.getSparqlPrefixQuery());
+		String filterClause;
 		
-		sparqlQuery.append("SELECT\n");
-		
-		for (Map.Entry<String, String> currentfieldLabelToOutputFieldLabel 
-				: this.fieldLabelToOutputFieldLabel.entrySet()) {
-			
-			sparqlQuery.append("\t(str(?" + currentfieldLabelToOutputFieldLabel.getKey() + ") as ?" 
-											+ currentfieldLabelToOutputFieldLabel.getValue() + ")\n");
-			
+		if (filterRule == null || filterRule.trim().isEmpty()) {
+			filterClause = "";
+		} else {
+			filterClause = "FILTER ( " + filterRule + " ) . ";
 		}
+
+		String sparqlQuery = QueryConstants.getSparqlPrefixQuery()
+							+ "SELECT "
+							+ "		(str(?predicate) as ?" + QueryFieldLabels.PREDICATE + ") " 
+							+ "		(str(?object) as ?" + QueryFieldLabels.OBJECT + ") "
+							+ "WHERE { "
+							+ "<" + queryURI + "> ?predicate ?object.  "
+							+ filterClause
+							+ "}";
+
+		System.out.println(sparqlQuery);
 		
-		sparqlQuery.append("WHERE {\n");
-		
-		sparqlQuery.append(this.whereClause);
-		
-		sparqlQuery.append("}\n");
-		
-		System.out.println("GENERIC QEURY >>>>> " + sparqlQuery);
-		
-		return sparqlQuery.toString();
+		return sparqlQuery;
 	}
 
 	
-	public ResultSet getResultSet()
+	public GenericQueryMap getJavaValueObjects()
 		throws MalformedQueryParametersException {
 
         if (this.individualURLParam == null || "".equals(individualURLParam)) {
@@ -169,12 +148,12 @@ public class GenericQueryHandler {
             }
         }
 
-		ResultSet resultSet	= executeQuery(generateGenericSparqlQuery(),
+		ResultSet resultSet	= executeQuery(generateGenericSparqlQuery(this.individualURLParam, this.filterRule),
 										   this.resultFormatParam,
 										   this.rdfResultFormatParam,
 										   this.dataSource);
 
-		return resultSet;
+		return createJavaValueObjects(resultSet);
 	}
 
 

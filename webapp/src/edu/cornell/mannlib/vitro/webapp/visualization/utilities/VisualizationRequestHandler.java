@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.RequestDispatcher;
@@ -18,15 +20,21 @@ import org.apache.commons.logging.Log;
 
 import com.google.gson.Gson;
 import com.hp.hpl.jena.query.DataSource;
+import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.visualization.VisualizationController;
 import edu.cornell.mannlib.vitro.webapp.controller.visualization.VisualizationFrameworkConstants;
+import edu.cornell.mannlib.vitro.webapp.filestorage.FileServingHelper;
 import edu.cornell.mannlib.vitro.webapp.visualization.constants.QueryConstants;
+import edu.cornell.mannlib.vitro.webapp.visualization.constants.QueryFieldLabels;
 import edu.cornell.mannlib.vitro.webapp.visualization.exceptions.MalformedQueryParametersException;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.GenericQueryMap;
+import edu.cornell.mannlib.vitro.webapp.visualization.visutils.AllPropertiesQueryHandler;
 import edu.cornell.mannlib.vitro.webapp.visualization.visutils.GenericQueryHandler;
 
 public class VisualizationRequestHandler {
@@ -74,8 +82,8 @@ public class VisualizationRequestHandler {
     		if (profileInfoMode.equalsIgnoreCase(visMode)) {
     			
     			
-    			String filterRule = "?predicate = vitro:imageThumb || ?predicate = vitro:moniker  || ?predicate = rdfs:label";
-    			GenericQueryHandler imageQueryHandler = new GenericQueryHandler(individualURIParam, 
+    			String filterRule = "?predicate = j.2:mainImage || ?predicate = vitro:moniker  || ?predicate = rdfs:label";
+    			AllPropertiesQueryHandler profileQueryHandler = new AllPropertiesQueryHandler(individualURIParam, 
     																			filterRule, 
     																			resultFormatParam, 
     																			rdfResultFormatParam, 
@@ -84,9 +92,9 @@ public class VisualizationRequestHandler {
     			
     			try {
     				
-    				GenericQueryMap profilePropertiesToValues = imageQueryHandler.getJavaValueObjects();
+    				GenericQueryMap profilePropertiesToValues = profileQueryHandler.getJavaValueObjects();
     				
-    				profilePropertiesToValues.addEntry("imageContextPath", request.getContextPath() + "/images/");
+    				profilePropertiesToValues.addEntry("imageContextPath", request.getContextPath());
     				
     				Gson profileInformation = new Gson();
     				
@@ -113,10 +121,18 @@ public class VisualizationRequestHandler {
         		 * to render an image & other info for a co-author OR ego for that matter.
         		 * */
     			
+    			Map<String, String> fieldLabelToOutputFieldLabel = new HashMap<String, String>();
+    			fieldLabelToOutputFieldLabel.put("downloadLocation", QueryFieldLabels.THUMBNAIL_LOCATION_URL);
+    			fieldLabelToOutputFieldLabel.put("fileName", QueryFieldLabels.THUMBNAIL_FILENAME);
     			
-    			String filterRule = "?predicate = vitro:imageThumb";
-    			GenericQueryHandler imageQueryHandler = new GenericQueryHandler(individualURIParam, 
-    																			filterRule, 
+    			String whereClause = "<" + individualURIParam + "> j.2:thumbnailImage ?thumbnailImage .  " 
+    									+ "?thumbnailImage j.2:downloadLocation ?downloadLocation ; j.2:filename ?fileName .";
+    			
+    			
+    			
+    			GenericQueryHandler imageQueryHandler = new GenericQueryHandler(individualURIParam,
+    																			fieldLabelToOutputFieldLabel,
+    																			whereClause,
     																			resultFormatParam, 
     																			rdfResultFormatParam, 
     																			dataSource, 
@@ -124,27 +140,12 @@ public class VisualizationRequestHandler {
     			
     			try {
     				
-    				GenericQueryMap imagePropertyToValues = imageQueryHandler.getJavaValueObjects();
+    				String thumbnailAccessURL = getThumnailInformation(
+    																imageQueryHandler.getResultSet(),
+    																fieldLabelToOutputFieldLabel);
     				
-    				String imagePath = "";
-
-    				if (imagePropertyToValues.size() > 0) {
-    					
-    					String vitroSparqlNamespace = QueryConstants.PREFIX_TO_NAMESPACE.get("vitro"); 
-    					String imageThumbProperty = vitroSparqlNamespace + "imageThumb";
-    					
-    					Set<String> personImageThumbPaths = imagePropertyToValues.get(imageThumbProperty);
-    					
-    					/*
-    					 * Although we know that there can be only one imagePath we are restricted by Java's
-    					 * expression power.
-    					 * */
-    					for (String providedImagePath : personImageThumbPaths) {
-    						imagePath = request.getContextPath() + "/images/" + providedImagePath;
-    					}
-    				} 
-    				
-    				prepareVisualizationQueryResponse(imagePath);
+    				System.out.println("thumnail access URL " + thumbnailAccessURL);
+    				prepareVisualizationQueryResponse(thumbnailAccessURL);
     				return;
     				
     				
@@ -229,6 +230,29 @@ public class VisualizationRequestHandler {
 
 	}
 
+	private String getThumnailInformation(ResultSet resultSet, 
+												   Map<String, String> fieldLabelToOutputFieldLabel) {
+		
+		String finalThumbNailLocation = "";
+		
+		while (resultSet.hasNext()) {
+			QuerySolution solution = resultSet.nextSolution();
+			
+			
+			RDFNode downloadLocationNode = solution.get(fieldLabelToOutputFieldLabel.get("downloadLocation"));
+			RDFNode fileNameNode = solution.get(fieldLabelToOutputFieldLabel.get("fileName"));
+			
+			if (downloadLocationNode != null && fileNameNode != null) {
+				finalThumbNailLocation = FileServingHelper
+												.getBytestreamAliasUrl(downloadLocationNode.toString(),
+																	   fileNameNode.toString());
+			}
+			
+		}
+		
+		return finalThumbNailLocation;
+	}
+	
 	private void prepareVisualizationQueryResponse(String preparedURL) {
 
 		response.setContentType("text/plain");

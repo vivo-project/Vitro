@@ -84,21 +84,6 @@ public class VisualizationRequestHandler {
 						     dataSource,
 						     log);
         
-        System.out.println("*****************************************");
-        
-        String thumbNailLocation;
-		try {
-			thumbNailLocation = URLEncoder.encode("http://vivo-trunk.indiana.edu/individual/n2188", 
-					   VisualizationController.URL_ENCODING_SCHEME).toString();
-	        System.out.println(FileServingHelper.getBytestreamAliasUrl(thumbNailLocation, "thumbnail_flyer-draft.jpg"));
-		} catch (UnsupportedEncodingException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		}
-        
-
-        
-
 		try {
 			
 			edu.cornell.mannlib.vitro.webapp.visualization.coauthorship.VisVOContainer coAuthorshipVO = 
