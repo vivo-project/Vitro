@@ -45,7 +45,7 @@
 </tr>
 </table>
 
-<c:if test="true"> <!-- test="${requestScope.user.roleURI == 1 }">  -->
+<c:if test="${application.selfEditingPolicyWasSetup}"> <!-- test="${requestScope.user.roleURI == 1 }">  -->
 
 <h3 class="associate">Associate user account with a person</h3>
 <table class="form-background" border="0" cellpadding="2" cellspacing="2">  

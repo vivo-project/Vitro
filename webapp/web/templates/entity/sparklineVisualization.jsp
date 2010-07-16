@@ -120,9 +120,7 @@
 	
 	//-->
 	</script>
-	<div id="vis_container">
-		${entity.URI}
-	</div>
+	<div id="vis_container"></div>
 	
 	
 		<!--[if IE]>
