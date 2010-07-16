@@ -57,6 +57,8 @@ var contextPath = "${contextPath}";
 
 <c:url var="coAuthorStyle" value="/${themeDir}css/visualization/personlevel/coauthor_style.css" />
 <c:url var="pageStyle" value="/${themeDir}css/visualization/personlevel/page.css" />
+<c:url var="vizStyle" value="/${themeDir}css/visualization/visualization.css" />
 
 <link href="${coAuthorStyle}" rel="stylesheet" type="text/css" />
 <link href="${pageStyle}" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="${vizStyle}" />
