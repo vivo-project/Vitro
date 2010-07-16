@@ -53,7 +53,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	private final String REMOVED_DATA_FILE = DATA_DIR + CHANGED_DATA_DIR + 	"removedData.n3";
 	private final String ADDED_DATA_FILE = DATA_DIR + CHANGED_DATA_DIR + "addedData.n3";
 	private final String SPARQL_CONSTRUCTS_DIR = DATA_DIR + "sparqlConstructs/";
-//	private final String MISC_REPLACEMENTS_FILE = DATA_DIR + "miscReplacements.rdf";
+	private final String MISC_REPLACEMENTS_FILE = DATA_DIR + "miscReplacements.rdf";
 	private final String OLD_TBOX_MODEL_DIR = DATA_DIR + "oldVersion/";
 	private final String NEW_TBOX_MODEL_DIR = "/WEB-INF/submodels/";
 	private final String OLD_TBOX_ANNOTATIONS_DIR = DATA_DIR + "oldAnnotations/";
@@ -94,7 +94,18 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			settings.setNewTBoxAnnotationsModel(newTBoxAnnotationsModel);
 			
 			try {
+				
 			  OntologyUpdater ontologyUpdater = new OntologyUpdater(settings);
+			  
+			  try {
+				  if (ontologyUpdater.updateRequired()) {
+					  doMiscAppMetadataReplacements(ctx.getRealPath(MISC_REPLACEMENTS_FILE), oms);
+					  System.out.println(ctx.getRealPath(MISC_REPLACEMENTS_FILE));
+				  }
+			  } catch (Throwable t){
+				  log.error("Unable to perform miscellaneous application metadata replacements", t);
+			  }
+			  
 			  ontologyUpdater.update();
 				
 			} catch (IOException ioe) {
@@ -114,10 +125,11 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	}	
 	
 	/**
-	 * Unused for the release 1.0 to 1.1 mirgration.
+	 * 
+	 * Behavior changed from 1.0
 	 * 
 	 * Replace any triple X P S in the application metadata model
-	 * with X P T where P and T are specified in the input file
+	 * with X P T where X, P, and T are specified in the input file
 	 * @param filename containing replacement values
 	 * @param OntModelSelector oms
 	 */
@@ -136,7 +148,8 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		    	try {
 		    		StmtIterator stmtIt = 
 		    			    applicationMetadataModel.listStatements( 
-		    			    		(Resource) null, replacement.getPredicate(),
+		    			    		replacement.getSubject(), 
+		    			    		replacement.getPredicate(),
 		    			    		(RDFNode) null);
 		    		while (stmtIt.hasNext()) {
 		    			Statement stmt = stmtIt.nextStatement();

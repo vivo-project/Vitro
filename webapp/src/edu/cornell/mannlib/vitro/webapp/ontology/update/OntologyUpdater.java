@@ -210,7 +210,7 @@ public class OntologyUpdater {
 	 * Executes a SPARQL ASK query to determine whether the knowledge base
 	 * needs to be updated to conform to a new ontology version
 	 */
-	private boolean updateRequired() throws IOException {
+	public boolean updateRequired() throws IOException {
 		String sparqlQueryStr = loadSparqlQuery(settings.getAskQueryFile());
 		if (sparqlQueryStr == null) {
 			return false;
