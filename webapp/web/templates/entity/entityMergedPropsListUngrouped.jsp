@@ -39,7 +39,8 @@
 <%@ page import="org.apache.commons.logging.LogFactory" %>
 
 <%@page import="java.util.LinkedList"%>
-<%@page import="java.util.Set"%><jsp:useBean id="loginHandler" class="edu.cornell.mannlib.vedit.beans.LoginFormBean" scope="session" />
+<%@page import="java.util.Set"%>
+<%@page import="edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils"%><jsp:useBean id="loginHandler" class="edu.cornell.mannlib.vedit.beans.LoginFormBean" scope="session" />
 <%! 
 public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.templates.entity.entityMergedPropsList.jsp");
 %>
@@ -191,7 +192,7 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 	               				<c:param name="uri" value="${objPropertyStmt.object.URI}"/>               			
 	           				</c:url>
 							<%
-							   String customShortView = getCustomShortView(request, vcDao); 
+							   String customShortView = MiscWebUtils.getCustomShortView(request); 
 							%>
 	         				<c:set var="altRenderJsp" value="<%= customShortView %>" />
 	         				<c:remove var="opStmt" scope="request"/>
@@ -346,42 +347,4 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 <%			}
 		} 
    } // end for (Property p : g.getPropertyList()
-%>
-
-<%!
-// Get custom short view from either the object's class or one of its superclasses.
-// This is needed because the inference update happens asynchronously, so when a new
-// property has been added and the page is reloaded, the custom short view from a
-// superclass may not have been inferred yet.
-private String getCustomShortView(HttpServletRequest request, VClassDao vcDao) {
-    String customShortView = null;
-    Individual object = ((ObjectPropertyStatement)request.getAttribute("opStmt")).getObject();
-    List<VClass> vclasses = object.getVClasses(true); //get directly asserted vclasses
-    Set<String> superClasses = new HashSet<String>();
-    
-    // First try directly asserted classes, there is no useful decision mechanism for 
-    // the case where two directly asserted classes have a custom short view.
-    vclassLoop: for (VClass vclass : vclasses) {
-        // Use this class's custom short view, if there is one
-        customShortView = vclass.getCustomShortView();
-        if (customShortView != null) {
-            return customShortView;
-        }
-        // Otherwise, add superclass to list of vclasses to check for custom short views
-        String vclassUri = vclass.getURI();
-        superClasses.addAll( vcDao.getAllSuperClassURIs(vclassUri) );        
-    }    
-    
-    // Next try super classes.  There is no useful decision mechanism for 
-    // the case where two super classes have a custom short view.
-    for (String superClassUri : superClasses) {
-		VClass vc = vcDao.getVClassByURI(superClassUri);		
-        customShortView = vc.getCustomShortView();
-        if (customShortView != null) { 
-            return customShortView; 
-        }
-	}    
-
-    return null;
-}
 %>
