@@ -354,7 +354,7 @@ public class VisualizationCodeGenerator {
 		visualizationCode.append("$('#" + visDivNames.get("SHORT_SPARK") + " td.sparkline_number').text(parseInt(renderedShortSparks) + parseInt(" + unknownYearPublications + "));");
 		visualizationCode.append("var shortSparksText = ''" +
 														"+ ' publication(s) within the last 10 years " +
-														"<span class=\"incomplete-data-holder\" title=\"" + imcompleteDataText + "\">(incomplete data)</span>'" +
+														"<span class=\"incomplete-data-holder\" title=\"" + imcompleteDataText + "\">incomplete data</span>'" +
 														/*"+ ' " + totalPublications + " '" +
 														"+ ' total " +
 														"<span class=\"sparkline_range\">" +
@@ -437,7 +437,7 @@ public class VisualizationCodeGenerator {
 				"sparklineImgTD.attr('class', '" + visualizationStyleClass + "');" +
 				"row.append(sparklineImgTD);" +
 				"var sparklineNumberTD = $('<td>');" +
-				"sparklineNumberTD.attr('width', '36');" +
+				"sparklineNumberTD.attr('width', '5');" +
 				"sparklineNumberTD.attr('align', 'right');" +
 				"sparklineNumberTD.attr('class', 'sparkline_number');" +
 				"row.append(sparklineNumberTD);" +
