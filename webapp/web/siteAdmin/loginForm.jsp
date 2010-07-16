@@ -9,7 +9,4 @@
    String themeDir = new VitroRequest(request).getPortal().getThemeDir().replaceAll("/$", "");
 %>
 
-<link rel="stylesheet" type="text/css" href="<%=themeDir%>/css/login.css"/>
-
 <%= new LoginTemplateHelper(request).showLoginPage(request) %>
-

@@ -2,8 +2,6 @@
 
 <#-- Log in template for accessing site admin -->
 
-${stylesheets.addFromTheme("/login.css")}
-${stylesheets.addFromTheme("/formedit.css")}
 
 <div id="formLogin" class="pageBodyGroup">
        <h2>Create Your New Password</h2>

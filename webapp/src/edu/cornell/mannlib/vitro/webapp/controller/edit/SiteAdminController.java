@@ -80,7 +80,7 @@ public class SiteAdminController extends BaseEditController {
         
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);        
         request.setAttribute("bodyJsp","/siteAdmin/siteAdminMain.jsp");
-        request.setAttribute("scripts","/siteAdmin/siteAdminScripts.jsp");
+        request.setAttribute("scripts","/siteAdmin/siteAdminHeadContent.jsp");
         request.setAttribute("title",((Portal)request.getAttribute("portalBean")).getAppName() + " Site Administration");
         request.setAttribute("epoKey",epo.getKey());
         try {
