@@ -52,7 +52,8 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	private final String ERROR_LOG_FILE = DATA_DIR + LOG_DIR + 	"knowledgeBaseUpdate.error.log";
 	private final String REMOVED_DATA_FILE = DATA_DIR + CHANGED_DATA_DIR + 	"removedData.n3";
 	private final String ADDED_DATA_FILE = DATA_DIR + CHANGED_DATA_DIR + "addedData.n3";
-	private final String SPARQL_CONSTRUCTS_DIR = DATA_DIR + "sparqlConstructs/";
+	private final String SPARQL_CONSTRUCT_ADDITIONS_DIR = DATA_DIR + "sparqlConstructs/additions/";
+	private final String SPARQL_CONSTRUCT_DELETIONS_DIR = DATA_DIR + "sparqlConstructs/deletions/";
 	private final String MISC_REPLACEMENTS_FILE = DATA_DIR + "miscReplacements.rdf";
 	private final String OLD_TBOX_MODEL_DIR = DATA_DIR + "oldVersion/";
 	private final String NEW_TBOX_MODEL_DIR = "/WEB-INF/submodels/";
@@ -72,7 +73,8 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			OntologyUpdateSettings settings = new OntologyUpdateSettings();
 			settings.setAskQueryFile(ctx.getRealPath(ASK_QUERY_FILE));
 			settings.setDataDir(ctx.getRealPath(DATA_DIR));
-			settings.setSparqlConstructsDir(ctx.getRealPath(SPARQL_CONSTRUCTS_DIR));
+			settings.setSparqlConstructAdditionsDir(ctx.getRealPath(SPARQL_CONSTRUCT_ADDITIONS_DIR));
+			settings.setSparqlConstructDeletionsDir(ctx.getRealPath(SPARQL_CONSTRUCT_DELETIONS_DIR));
 			settings.setDiffFile(ctx.getRealPath(DIFF_FILE));
 			settings.setSuccessAssertionsFile(ctx.getRealPath(SUCCESS_ASSERTIONS_FILE));
 			settings.setSuccessRDFFormat(SUCCESS_RDF_FORMAT);

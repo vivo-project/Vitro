@@ -80,7 +80,7 @@ public class OntologyUpdater {
 	
 	private void performUpdate() throws IOException {
 		
-		performSparqlConstructs(settings.getSparqlConstructsDir(), settings.getOntModelSelector().getABoxModel());
+		performSparqlConstructAdditions(settings.getSparqlConstructAdditionsDir(), settings.getOntModelSelector().getABoxModel());
 		
 		List<AtomicOntologyChange> rawChanges = getAtomicOntologyChanges();
 		
@@ -94,6 +94,44 @@ public class OntologyUpdater {
 		
 	}
 	
+	
+	private void performSparqlConstructAdditions(String sparqlConstructDir, OntModel aboxModel) throws IOException {
+		
+		Model anonModel = performSparqlConstructs(sparqlConstructDir, aboxModel);
+		
+		if (anonModel == null) {
+			return;
+		}
+		
+		aboxModel.enterCriticalSection(Lock.WRITE);
+		try {
+			JenaIngestUtils jiu = new JenaIngestUtils();
+			Model additions = jiu.renameBNodes(anonModel, settings.getDefaultNamespace() + "n", 
+					aboxModel);
+			Model actualAdditions = ModelFactory.createDefaultModel();
+			StmtIterator stmtIt = additions.listStatements();
+			while (stmtIt.hasNext()) {
+				Statement stmt = stmtIt.nextStatement();
+				if (!aboxModel.contains(stmt)) {
+					actualAdditions.add(stmt);
+				}
+			}
+			aboxModel.add(actualAdditions);
+			if (actualAdditions.size() > 0) {
+				logger.log("Constructed " + actualAdditions.size() + " new " +
+						   "statement" 
+						   + ((actualAdditions.size() > 1) ? "s" : "") + 
+						   " using SPARQL CONSTRUCT queries.");
+			}
+			record.recordAdditions(actualAdditions);
+		} finally {
+			aboxModel.leaveCriticalSection();
+		}
+		
+
+	}
+	
+	
 	/**
 	 * Performs a set of arbitrary SPARQL CONSTRUCT queries on the 
 	 * data, for changes that cannot be expressed as simple property
@@ -102,16 +140,18 @@ public class OntologyUpdater {
 	 * @param sparqlConstructDir
 	 * @param aboxModel
 	 */
-	private void performSparqlConstructs(String sparqlConstructDir, 
+	private Model performSparqlConstructs(String sparqlConstructDir, 
 			OntModel aboxModel) throws IOException {
+		
 		Model anonModel = ModelFactory.createDefaultModel();
 		File sparqlConstructDirectory = new File(sparqlConstructDir);
+		
 		if (!sparqlConstructDirectory.isDirectory()) {
 			logger.logError(this.getClass().getName() + 
 					"performSparqlConstructs() expected to find a directory " +
 					" at " + sparqlConstructDir + ". Unable to execute " +
 					" SPARQL CONSTRUCTS.");
-			return;
+			return null;
 		}
 		File[] sparqlFiles = sparqlConstructDirectory.listFiles();
 		for (int i = 0; i < sparqlFiles.length; i ++) {
@@ -147,32 +187,7 @@ public class OntologyUpdater {
 			}	
 		}
 		
-		aboxModel.enterCriticalSection(Lock.WRITE);
-		try {
-			JenaIngestUtils jiu = new JenaIngestUtils();
-			Model additions = jiu.renameBNodes(anonModel, settings.getDefaultNamespace() + "n", 
-					aboxModel);
-			Model actualAdditions = ModelFactory.createDefaultModel();
-			StmtIterator stmtIt = additions.listStatements();
-			while (stmtIt.hasNext()) {
-				Statement stmt = stmtIt.nextStatement();
-				if (!aboxModel.contains(stmt)) {
-					actualAdditions.add(stmt);
-				}
-			}
-			aboxModel.add(actualAdditions);
-			if (actualAdditions.size() > 0) {
-				logger.log("Constructed " + actualAdditions.size() + " new " +
-						   "statement" 
-						   + ((actualAdditions.size() > 1) ? "s" : "") + 
-						   " using SPARQL CONSTRUCT queries.");
-			}
-			record.recordAdditions(actualAdditions);
-		} finally {
-			aboxModel.leaveCriticalSection();
-		}
-		
-
+        return anonModel;
 	}
 	
 	
