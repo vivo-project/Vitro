@@ -1,0 +1,52 @@
+#!/usr/bin/perl
+
+use Getopt::Std;
+use FileHandle;
+use POSIX qw( strftime );
+use FindBin qw($Bin);
+
+autoflush STDOUT 1;
+
+getopts("d:D:vz");
+if(!$opt_d){
+    print STDERR "Use requires: -d in_dir_path. Optionally use: -D out_dir_path when different from in_dir_path.\n";
+    exit 1;
+}
+$datadir = $opt_d;
+$datadir = $opt_D if $opt_D;
+
+sub trim {
+    my($a) = @_;
+    $a =~ s/^\s*(\S+)\s*$/$1/;
+    $a =~ s/^\s*(\S.*\S)\s*$/$1/;
+    $a =~ s/(\s*)//;
+    return $a;
+}
+
+sub getXmlFiles {
+    my($d) = @_;
+    my(@xfiles) = qx(ls $d/*.xml);
+    my @res;
+    foreach my $xml (@xfiles){
+	chomp $xml;
+	next if -z $xml && !$opt_z;
+	my @comp = split /\//, $xml;
+	$xml = $comp[$#comp];
+	
+	push @res, $xml;
+    }
+    return @res;
+}
+
+@files = getXmlFiles($opt_d);
+
+print STDOUT "<?xml version='1.0'?>\n";
+
+print STDOUT "<collection>\n";
+
+foreach $f (@files){
+    print STDOUT "\t<doc href='$datadir/$f'/>\n";
+}
+print STDOUT "</collection>\n";
+
+

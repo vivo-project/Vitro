@@ -1,0 +1,24 @@
+<deployment xmlns="http://xml.apache.org/axis/wsdd/"
+    xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
+  <service name="VitroWs" provider="java:RPC">
+    <parameter name="className" value="edu.cornell.mannlib.vitro.webservices.VitroWs"/>
+    <parameter name="allowedMethods" value="getFullTab,getTabsForPortal,getFullEntityById"/>
+    
+    <beanMapping qname="myNS:Entity" xmlns:myNS="urn:edu.cornell.mannlib.vitro"
+                 languageSpecificType="java:edu.cornell.mannlib.vitro.beans.Entity"/>
+    <beanMapping qname="myNS:VClass" xmlns:myNS="urn:edu.cornell.mannlib.vitro"
+                 languageSpecificType="java:edu.cornell.mannlib.vitro.beans.VClass"/>
+    <beanMapping qname="myNS:Tab" xmlns:myNS="urn:edu.cornell.mannlib.vitro"
+                 languageSpecificType="java:edu.cornell.mannlib.vitro.beans.Tab"/>
+    <beanMapping qname="myNS:Ents2Ents" xmlns:myNS="urn:edu.cornell.mannlib.vitro"
+                 languageSpecificType="java:edu.cornell.mannlib.vitro.beans.Ents2Ents"/>
+    <beanMapping qname="myNS:Property" xmlns:myNS="urn:edu.cornell.mannlib.vitro"
+                 languageSpecificType="java:edu.cornell.mannlib.vitro.beans.Property"/>
+    <beanMapping qname="myNS:Link" xmlns:myNS="urn:edu.cornell.mannlib.vitro"
+                 languageSpecificType="java:edu.cornell.mannlib.vitro.beans.Link"/>
+    <beanMapping qname="myNS:PropertyInstance" xmlns:myNS="urn:edu.cornell.mannlib.vitro"
+                 languageSpecificType="java:edu.cornell.mannlib.vitro.beans.PropertyInstance"/>
+  </service>
+
+
+</deployment>
