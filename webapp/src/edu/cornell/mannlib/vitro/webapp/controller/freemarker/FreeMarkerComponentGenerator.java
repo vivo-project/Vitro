@@ -40,6 +40,7 @@ public class FreeMarkerComponentGenerator extends FreeMarkerHttpServlet {
         request.setAttribute("ftl_menu", get("menu", root, config));
         request.setAttribute("ftl_search", get("search", root, config));
         request.setAttribute("ftl_footer", get("footer", root, config));
+        request.setAttribute("ftl_googleAnalytics", get("googleAnalytics", root, config));
     }
 
     private String get(String templateName, Map<String, Object> root, Configuration config) {
