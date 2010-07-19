@@ -129,7 +129,7 @@ public class VisualizationRequestHandler {
 	    	Map<String, Integer> yearToPublicationCount = publicationQueryManager
 	    														.getYearToPublicationCount(authorDocuments);
 	    														
-	    	Map<String, Integer> yearToUniqueCoauthorCount = getUniqueCoauthorsCountPerYear(coAuthorshipVO);
+//	    	Map<String, Integer> yearToUniqueCoauthorCount = getUniqueCoauthorsCountPerYear(coAuthorshipVO);
 	    		
 	    														
 	    	/*
@@ -156,7 +156,7 @@ public class VisualizationRequestHandler {
 	    			egoURIParam,
 	    			VisualizationCodeGenerator.FULL_SPARKLINE_MODE_URL_HANDLE,
 	    			uniqueCoauthorsSparklineVisContainerID,
-	    			yearToUniqueCoauthorCount,
+	    			getUniqueCoAuthorsPerYear(coAuthorshipVO),
 	    			uniqueCoauthorsSparklineVO,
 	    			log);
 			
@@ -196,7 +196,7 @@ public class VisualizationRequestHandler {
 		}
 
 	}
-
+/*
 	private Map<String, Integer> getUniqueCoauthorsCountPerYear(
 			edu.cornell.mannlib.vitro.webapp.visualization.coauthorship.VisVOContainer coAuthorshipVO) {
 		Map<String, Integer> yearToUniqueCoauthorCount = new TreeMap<String, Integer>();
@@ -210,6 +210,7 @@ public class VisualizationRequestHandler {
 		}
 		return yearToUniqueCoauthorCount;
 	}
+	*/
 	
 	private Map<String, Set<Node>> getUniqueCoAuthorsPerYear(edu.cornell.mannlib.vitro.webapp.visualization.coauthorship.VisVOContainer authorNodesAndEdges) {
 

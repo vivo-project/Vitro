@@ -18,6 +18,7 @@ import org.apache.commons.logging.Log;
 import edu.cornell.mannlib.vitro.webapp.controller.visualization.VisualizationController;
 import edu.cornell.mannlib.vitro.webapp.controller.visualization.VisualizationFrameworkConstants;
 import edu.cornell.mannlib.vitro.webapp.visualization.constants.VOConstants;
+import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.Node;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.SparklineVOContainer;
 
 
@@ -38,7 +39,7 @@ public class VisualizationCodeGenerator {
 	
 	public static final String FULL_SPARKLINE_MODE_URL_HANDLE = "full";
 	
-	private Map<String, Integer> yearToUniqueCoauthorsCount;
+	private Map<String, Set<Node>> yearToUniqueCoauthors;
 
 	private Log log;
 
@@ -52,14 +53,14 @@ public class VisualizationCodeGenerator {
 									  String individualURIParam, 
 									  String visMode, 
 									  String visContainer, 
-									  Map<String, Integer> yearToUniqueCoauthorsCount, 
+									  Map<String, Set<Node>> yearToUniqueCoauthors, 
 									  SparklineVOContainer valueObjectContainer, 
 									  Log log) {
 		
 		this.contextPath = contextPath;
 		this.individualURIParam = individualURIParam;
 		
-		this.yearToUniqueCoauthorsCount = yearToUniqueCoauthorsCount;
+		this.yearToUniqueCoauthors = yearToUniqueCoauthors;
 		this.valueObjectContainer = valueObjectContainer;
 		
 		this.log = log;
@@ -93,7 +94,7 @@ public class VisualizationCodeGenerator {
     	 * This is required because when deciding the range of years over which the vis
     	 * was rendered we dont want to be influenced by the "DEFAULT_PUBLICATION_YEAR".
     	 * */
-		Set<String> publishedYears = new HashSet(yearToUniqueCoauthorsCount.keySet());
+		Set<String> publishedYears = new HashSet(yearToUniqueCoauthors.keySet());
     	publishedYears.remove(VOConstants.DEFAULT_PUBLICATION_YEAR);
 		
 		/*
@@ -108,13 +109,13 @@ public class VisualizationCodeGenerator {
 		StringBuilder visualizationCode = new StringBuilder();
 
 //		System.out.println(yearToPublicationCount);
-		if (yearToUniqueCoauthorsCount.size() > 0) {
+		if (yearToUniqueCoauthors.size() > 0) {
 			try {
 				minPublishedYear = Integer.parseInt(Collections.min(publishedYears));
 			} catch (NoSuchElementException e1) {
-				log.debug("vis: " + e1.getMessage() + " error occurred for " + yearToUniqueCoauthorsCount.toString());
+				log.debug("vis: " + e1.getMessage() + " error occurred for " + yearToUniqueCoauthors.toString());
 			} catch (NumberFormatException e2) {
-				log.debug("vis: " + e2.getMessage() + " error occurred for " + yearToUniqueCoauthorsCount.toString());
+				log.debug("vis: " + e2.getMessage() + " error occurred for " + yearToUniqueCoauthors.toString());
 			}
 		}
 		
@@ -186,15 +187,18 @@ public class VisualizationCodeGenerator {
 		int uniqueCoAuthorCounter = 0;
 		int totalUniqueCoAuthors = 0;
 		int renderedFullSparks = 0;
+		Set<Node> allCoAuthorsWithKnownAuthorshipYears = new HashSet<Node>();
 
 		
 		for (int publicationYear = minPubYearConsidered; publicationYear <= currentYear; publicationYear++) {
 
 				String stringPublishedYear = String.valueOf(publicationYear);
-				Integer currentPublications = yearToUniqueCoauthorsCount.get(stringPublishedYear);
+				Integer currentUniqueCoAuthors = yearToUniqueCoauthors.get(stringPublishedYear).size();
 
-				if (currentPublications == null) {
-					currentPublications = 0;
+				if (currentUniqueCoAuthors == null) {
+					currentUniqueCoAuthors = 0;
+				} else {
+					allCoAuthorsWithKnownAuthorshipYears.addAll(yearToUniqueCoauthors.get(stringPublishedYear)); 
 				}
 
 				visualizationCode.append("data.setValue("
@@ -206,13 +210,15 @@ public class VisualizationCodeGenerator {
 				visualizationCode.append("data.setValue("
 												+ uniqueCoAuthorCounter
 												+ ", 1, "
-												+ currentPublications
+												+ currentUniqueCoAuthors
 												+ ");\n");
-
-				totalUniqueCoAuthors += currentPublications;
+				
+				
 				uniqueCoAuthorCounter++;
 		}
 
+		totalUniqueCoAuthors = allCoAuthorsWithKnownAuthorshipYears.size();
+		
 		/*
 		 * Sparks that will be rendered in full mode will always be the one's which has any year
 		 * associated with it. Hence.
@@ -224,9 +230,9 @@ public class VisualizationCodeGenerator {
 		 * it. Hence.
 		 * */
 		Integer unknownYearCoauthors = 0;
-		if (yearToUniqueCoauthorsCount.get(VOConstants.DEFAULT_PUBLICATION_YEAR) != null) {
-			totalUniqueCoAuthors += yearToUniqueCoauthorsCount.get(VOConstants.DEFAULT_PUBLICATION_YEAR);
-			unknownYearCoauthors = yearToUniqueCoauthorsCount.get(VOConstants.DEFAULT_PUBLICATION_YEAR);
+		if (yearToUniqueCoauthors.get(VOConstants.DEFAULT_PUBLICATION_YEAR) != null) {
+			totalUniqueCoAuthors += yearToUniqueCoauthors.get(VOConstants.DEFAULT_PUBLICATION_YEAR).size();
+			unknownYearCoauthors = yearToUniqueCoauthors.get(VOConstants.DEFAULT_PUBLICATION_YEAR).size();
 		}
 		
 		
@@ -344,7 +350,7 @@ public class VisualizationCodeGenerator {
 		
 		visualizationCode.append("$('#" + visDivNames.get("SHORT_SPARK") + " td.sparkline_number').text(parseInt(renderedShortSparks) + parseInt(" + unknownYearCoauthors + "));");
 		visualizationCode.append("var shortSparksText = ''" +
-														"+ ' unique co-author(s) within the last 10 years '" +
+														"+ ' co-author(s) within the last 10 years '" +
 														"<span class=\"incomplete-data-holder\" title=\"" + imcompleteDataText + "\">incomplete data</span>'" +
 														/*"+ ' " + totalUniqueCoAuthors + " '" +
 														"+ ' total " +
@@ -391,7 +397,6 @@ public class VisualizationCodeGenerator {
 								 "fullSparklineView.setColumns([1]);\n");
 		
 		visualizationCode.append("var full_spark = new google.visualization.ImageSparkLine(" +
-//												"document.getElementById('" + visDivNames.get("FULL_SPARK") + "')" +
 														"providedSparklineImgTD[0]" +
 								");\n" +
 								"full_spark.draw(fullSparklineView, " + sparklineDisplayOptions + ");\n");
@@ -494,7 +499,7 @@ public class VisualizationCodeGenerator {
 		
 		String csvDownloadURLHref = ""; 
 		
-		if (yearToUniqueCoauthorsCount.size() > 0) {
+		if (yearToUniqueCoauthors.size() > 0) {
 			
 			try {
 				if (getCSVDownloadURL() != null) {
@@ -531,7 +536,7 @@ public class VisualizationCodeGenerator {
 	private String getCSVDownloadURL()
 			throws UnsupportedEncodingException {
 		
-		if (yearToUniqueCoauthorsCount.size() > 0) {
+		if (yearToUniqueCoauthors.size() > 0) {
 			
 		String secondaryContextPath = "";
 		if (!contextPath.contains("/admin/visQuery")) {
@@ -572,7 +577,7 @@ public class VisualizationCodeGenerator {
 		try {
 		
 		String fullTimelineLink;
-		if (yearToUniqueCoauthorsCount.size() > 0) {
+		if (yearToUniqueCoauthors.size() > 0) {
 			
 			String secondaryContextPath = "";
 			if (!contextPath.contains("/admin/visQuery")) {
@@ -635,10 +640,10 @@ public class VisualizationCodeGenerator {
 								"</thead>" +
 								"<tbody>");
 		
-		for (Entry<String, Integer> currentEntry : yearToUniqueCoauthorsCount.entrySet()) {
+		for (Entry<String, Set<Node>> currentEntry : yearToUniqueCoauthors.entrySet()) {
 			dataTable.append("<tr>" +
 								"<td>" + currentEntry.getKey() + "</td>" +
-								"<td>" + currentEntry.getValue() + "</td>" +
+								"<td>" + currentEntry.getValue().size() + "</td>" +
 							"</tr>");
 		}
 										
