@@ -267,7 +267,7 @@ public class ABoxUpdater {
 					
 					if (count > 0) {
 						//TODO - take out the detailed logging after our internal testing is completed.
-				        logger.log("There " + ((count > 1) ? "are" : "is") + " " + count + " individuals in the model that are of type " + parentOfAddedClass.getURI() + "," +
+				        logger.log("There " + ((count > 1) ? "are" : "is") + " " + count + " individual" + ((count > 1) ? "s" : "")  + " in the model that " + ((count > 1) ? "are" : "is") + " of type " + parentOfAddedClass.getURI() + "," +
 				        		    " and a new subclass of that class has been added: " + addedClass.getURI() + ". " +
 				        		    "Please review " + ((count > 1) ? "these" : "this") + " individual" + ((count > 1) ? "s" : "") + " to see whether " + ((count > 1) ? "they" : "it") + " should be of type: " +  addedClass.getURI() );
 					}

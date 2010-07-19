@@ -250,7 +250,7 @@ public class TBoxUpdater {
            long numRemoved = actualRetractions.size() - actualAdditions.size();
            if (numRemoved > 0) {
 	           logger.log("Removed " + numRemoved +
-	        		      " superfluous vitro annotation property setting" + ((numRemoved > 1) ? "s" : "") + " from the knowledge base.");
+	        		      " outdated vitro annotation property setting" + ((numRemoved > 1) ? "s" : "") + " from the knowledge base.");
            }
            
 		    //	   Copy annotation property settings that were introduced in the new ontology
@@ -266,10 +266,12 @@ public class TBoxUpdater {
 					newAnnotationSettingsToAdd.add(stmt);
 					
 					// TODO remove this for production
+					/*
 					logger.log( "adding Statement: subject = " + stmt.getSubject().getURI() +
 						    " property = " + stmt.getPredicate().getURI() +
 		                    " object = " + (stmt.getObject().isLiteral() ?  ((Literal)stmt.getObject()).getLexicalForm() 
 		                		                                          : ((Resource)stmt.getObject()).getURI()));	
+		           */
 				}
 			}
 			
