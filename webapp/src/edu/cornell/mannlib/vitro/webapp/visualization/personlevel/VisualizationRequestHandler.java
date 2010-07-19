@@ -260,7 +260,7 @@ public class VisualizationRequestHandler {
 		} else {
 			
 			outputFileName = UtilityFunctions.slugify(coAuthorsipVO.getEgoNode().getNodeName()) 
-			+ "-coauthor-net" + ".graphml";
+			+ "-coauthor-net" + ".xml";
 			
 		}
 		

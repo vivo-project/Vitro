@@ -164,7 +164,7 @@ table.sparkline_wrapper_table td, th {
 		<h2 class="sub_headings">Co-Author Network 
 		<c:choose>
 		    <c:when test="${numOfCoAuthorShips > 0 || numOfAuthors > 0}">
-		       <a href="${coAuthorshipDownloadFile}">(.GraphML File)</a></h2>
+		       <a href="${coAuthorshipDownloadFile}">(GraphML File)</a></h2>
 		    </c:when>
 		    <c:otherwise>
 		        </h2>
