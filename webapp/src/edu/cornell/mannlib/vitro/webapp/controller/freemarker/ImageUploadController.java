@@ -64,9 +64,17 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	/** The form field of the uploaded file; use as a key to the FileItem map. */
 	public static final String PARAMETER_UPLOADED_FILE = "datafile";
 
-	public static final String ACTION_SAVE = "save";
+	/** Here is the main image file. Hold on to it. */
 	public static final String ACTION_UPLOAD = "upload";
+
+	/** Here is the cropping info; we're ready to save the image. */
+	public static final String ACTION_SAVE = "save";
+
+	/** A request to delete the file and return to the referring page. */
 	public static final String ACTION_DELETE = "delete";
+
+	/** A request to delete the file and return to the "new image" screen. */
+	public static final String ACTION_DELETE_EDIT = "deleteEdit";
 
 	public static final String BODY_TITLE = "title";
 	public static final String BODY_ENTITY_NAME = "entityName";
@@ -235,6 +243,8 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 				return doCreateThumbnail(vreq, entity);
 			} else if (ACTION_DELETE.equals(action)) {
 				return doDeleteImage(vreq, entity);
+			} else if (ACTION_DELETE_EDIT.equals(action)) {
+				return doDeleteThenEdit(vreq, entity);
 			} else {
 				captureReferringUrl(vreq);
 				return doIntroScreen(vreq, entity);
@@ -339,7 +349,8 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	}
 
 	/**
-	 * Delete the main image and the thumbnail from the individual.
+	 * Delete the main image and the thumbnail, and go back to the referring
+	 * page.
 	 */
 	private ResponseValues doDeleteImage(VitroRequest vreq, Individual entity) {
 		ImageUploadHelper helper = new ImageUploadHelper(fileStorage, vreq
@@ -348,6 +359,19 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 		helper.removeExistingImage(entity);
 
 		return showExitPage(vreq, entity);
+	}
+
+	/**
+	 * Delete the main image and the thumbnail, and go to the "add image"
+	 * screen.
+	 */
+	private ResponseValues doDeleteThenEdit(VitroRequest vreq, Individual entity) {
+		ImageUploadHelper helper = new ImageUploadHelper(fileStorage, vreq
+				.getFullWebappDaoFactory());
+
+		helper.removeExistingImage(entity);
+
+		return showAddImagePage(vreq, entity);
 	}
 
 	/**
@@ -402,15 +426,6 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	}
 
 	/**
-	 * Get the URL that will serve this entity's main image, or null.
-	 */
-	private String getMainImageUrl(Individual entity) {
-		String imageUri = FileModelHelper.getMainImageBytestreamUri(entity);
-		String imageFilename = FileModelHelper.getMainImageFilename(entity);
-		return FileServingHelper.getBytestreamAliasUrl(imageUri, imageFilename);
-	}
-
-	/**
 	 * Get the URL that will serve this entity's thumbnail image, or null.
 	 */
 	private String getThumbnailUrl(Individual entity) {
@@ -455,7 +470,7 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 			Individual entity, String thumbUrl) {
 		TemplateResponseValues rv = new TemplateResponseValues(TEMPLATE_REPLACE);
 		rv.put(BODY_THUMBNAIL_URL, UrlBuilder.getUrl(thumbUrl));
-		rv.put(BODY_DELETE_URL, formAction(entity.getURI(), ACTION_DELETE));
+		rv.put(BODY_DELETE_URL, formAction(entity.getURI(), ACTION_DELETE_EDIT));
 		rv.put(BODY_FORM_ACTION, formAction(entity.getURI(), ACTION_UPLOAD));
 		rv.put(BODY_CANCEL_URL, exitPageUrl(vreq, entity.getURI()));
 		rv.put(BODY_TITLE, "Replace image" + forName(entity));
