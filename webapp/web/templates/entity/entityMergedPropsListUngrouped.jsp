@@ -26,6 +26,7 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.VClass" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep" %>
 <%@ page import="edu.cornell.mannlib.vedit.beans.LoginFormBean" %>
+<%@page import="edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils"%>
 
 <%@ page import="java.util.Collection" %>
 <%@ page import="java.util.Collections" %>
@@ -34,13 +35,14 @@
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.Iterator" %>
 <%@ page import="java.util.HashSet" %>
+<%@page import="java.util.LinkedList"%>
+<%@page import="java.util.Set"%>
 
 <%@ page import="org.apache.commons.logging.Log" %>
 <%@ page import="org.apache.commons.logging.LogFactory" %>
 
-<%@page import="java.util.LinkedList"%>
-<%@page import="java.util.Set"%>
-<%@page import="edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils"%><jsp:useBean id="loginHandler" class="edu.cornell.mannlib.vedit.beans.LoginFormBean" scope="session" />
+
+<jsp:useBean id="loginHandler" class="edu.cornell.mannlib.vedit.beans.LoginFormBean" scope="session" />
 <%! 
 public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.templates.entity.entityMergedPropsList.jsp");
 %>

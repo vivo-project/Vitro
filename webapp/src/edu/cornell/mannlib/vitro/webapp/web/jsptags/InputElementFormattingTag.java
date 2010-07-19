@@ -432,6 +432,12 @@ public class InputElementFormattingTag extends TagSupport {
                 out.print("<input "+classStr+" "+sizeStr+" type=\"text\" id=\""+getId()+"\" name=\""+getName()+"\" value=\""+valueStr+"\" />");
                 if (definitionTags) { out.print("</dd>"); }
                 out.println();
+            } else if( getType().equalsIgnoreCase("hidden")) {
+                String valueStr = doValue(editConfig, editSub);
+                if (definitionTags) { out.print("<dd>"); }
+                out.print("<input "+classStr+ "type=\"hidden\" id=\""+getId()+"\" name=\""+getName()+"\" value=\""+valueStr+"\" />");
+                if (definitionTags) { out.print("</dd>"); }
+                out.println();
             } else if (getType().equalsIgnoreCase("textarea")) {
                 String valueStr = doValue(editConfig, editSub);
                 String rowStr = doRows();

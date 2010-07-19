@@ -80,51 +80,55 @@ public class MiscWebUtils {
         return (String) contentObj;
     }
 
-	// Get custom short view from either the object's class or one of its
-	// superclasses.
-	// This is needed because the inference update happens asynchronously, so
-	// when a new
-	// property has been added and the page is reloaded, the custom short view
-	// from a
-	// superclass may not have been inferred yet.
 	public static String getCustomShortView(HttpServletRequest request) {
-		VitroRequest vreq = new VitroRequest(request);
-		VClassDao vcDao = vreq.getWebappDaoFactory().getVClassDao();
 		
-		String customShortView = null;
 		Individual object = ((ObjectPropertyStatement) request
 				.getAttribute("opStmt")).getObject();
-		List<VClass> vclasses = object.getVClasses(true); // get directly
-															// asserted vclasses
-		Set<String> superClasses = new HashSet<String>();
+		return getCustomShortView(object, request);
+	}
 
-		// First try directly asserted classes, there is no useful decision
-		// mechanism for
-		// the case where two directly asserted classes have a custom short
-		// view.
-		for (VClass vclass : vclasses) {
-			// Use this class's custom short view, if there is one
-			customShortView = vclass.getCustomShortView();
-			if (customShortView != null) {
-				return customShortView;
-			}
-			// Otherwise, add superclass to list of vclasses to check for custom
-			// short views
-			String vclassUri = vclass.getURI();
-			superClasses.addAll(vcDao.getAllSuperClassURIs(vclassUri));
-		}
+	// Get custom short view from either the object's class or one of its
+    // superclasses. This is needed because the inference update happens asynchronously, 
+    // so when a new property has been added and the page is reloaded, the custom short view
+    // from a superclass may not have been inferred yet.
 
-		// Next try super classes. There is no useful decision mechanism for
-		// the case where two super classes have a custom short view.
-		for (String superClassUri : superClasses) {
-			VClass vc = vcDao.getVClassByURI(superClassUri);
-			customShortView = vc.getCustomShortView();
-			if (customShortView != null) {
-				return customShortView;
-			}
-		}
+	public static String getCustomShortView(Individual individual, HttpServletRequest request) {
+        VitroRequest vreq = new VitroRequest(request);
+        VClassDao vcDao = vreq.getWebappDaoFactory().getVClassDao();
+        
+	    String customShortView = null;
+        List<VClass> vclasses = individual.getVClasses(true); // get directly
+        // asserted vclasses
+        Set<String> superClasses = new HashSet<String>();
+        
+        // First try directly asserted classes, there is no useful decision
+        // mechanism for the case where two directly asserted classes
+        // have a custom short view.
+        // RY If we're getting the custom short view with reference to an object property.
+        // should we use the property's getRangeVClass() method instead?
+        for (VClass vclass : vclasses) {
+            // Use this class's custom short view, if there is one
+            customShortView = vclass.getCustomShortView();
+            if (customShortView != null) {
+                return customShortView;
+            }
+            // Otherwise, add superclass to list of vclasses to check for custom
+            // short views
+            String vclassUri = vclass.getURI();
+            superClasses.addAll(vcDao.getAllSuperClassURIs(vclassUri));
+        }
+        
+        // Next try super classes. There is no useful decision mechanism for
+        // the case where two super classes have a custom short view.
+        for (String superClassUri : superClasses) {
+            VClass vc = vcDao.getVClassByURI(superClassUri);
+            customShortView = vc.getCustomShortView();
+            if (customShortView != null) {
+                return customShortView;
+            }
+        }
 
-		return null;
+        return null;	    
 	}
 	
     /**
