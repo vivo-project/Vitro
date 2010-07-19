@@ -164,7 +164,7 @@ table.sparkline_wrapper_table td, th {
 		<h2 class="sub_headings">Co-Author Network 
 		<c:choose>
 		    <c:when test="${numOfCoAuthorShips > 0 || numOfAuthors > 0}">
-		       <a href="${coAuthorshipDownloadFile}">(.GraphML File)</a></h2>
+		       <a href="${coAuthorshipDownloadFile}">(GraphML File)</a></h2>
 		    </c:when>
 		    <c:otherwise>
 		        </h2>
@@ -206,11 +206,11 @@ table.sparkline_wrapper_table td, th {
 		<div class="italicize"><span id="profileMoniker" class="author_moniker"></span></div>
 		<div><a href="#" id="profileUrl">VIVO profile</a> | <a href="#" id="coAuthorshipVisUrl">Co-author network</a></div> 
 		<br />
-		<div class="works"><span class="numbers" style="width: 40px;" id="works"></span>&nbsp;&nbsp;<span class="title">Work(s)</span></div>
-		<div class="works"><span class="numbers" style="width: 40px;" id="coAuthors"></span>&nbsp;&nbsp;<span>Co-author(s)</span></div>
+		<div class="author_stats" id="num_works"><span class="numbers" style="width: 40px;" id="works"></span>&nbsp;&nbsp;<span class="author_stats_text">Work(s)</span></div>
+		<div class="author_stats" id="num_authors"><span class="numbers" style="width: 40px;" id="coAuthors"></span>&nbsp;&nbsp;<span class="author_stats_text">Co-author(s)</span></div>
 		
-		<div class="works" id="fPub" style="visibility:hidden"><span class="numbers" style="width:40px;" id="firstPublication"></span>&nbsp;&nbsp;<span>First Publication</span></div>
-		<div class="works" id="lPub" style="visibility:hidden"><span class="numbers" style="width:40px;" id="lastPublication"></span>&nbsp;&nbsp;<span>Last Publication</span></div>
+		<div class="author_stats" id="fPub" style="visibility:hidden"><span class="numbers" style="width:40px;" id="firstPublication"></span>&nbsp;&nbsp;<span>First Publication</span></div>
+		<div class="author_stats" id="lPub" style="visibility:hidden"><span class="numbers" style="width:40px;" id="lastPublication"></span>&nbsp;&nbsp;<span>Last Publication</span></div>
 		
 	</div>
 

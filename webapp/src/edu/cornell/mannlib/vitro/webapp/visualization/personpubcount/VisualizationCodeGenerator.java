@@ -410,7 +410,7 @@ public class VisualizationCodeGenerator {
 		visualizationCode.append("$('#" + visDivNames.get("FULL_SPARK") + " td.sparkline_number').text('" + (renderedFullSparks + unknownYearPublications) + "');");
 		
 		visualizationCode.append("var allSparksText = ''" +
-												 "+ ' publications '" +
+												 "+ ' publication(s) '" +
 												 /*"+ ' " + totalPublications + " '" +*/
 												 "+ ' from " +
 												"<span class=\"sparkline_range\">" +
@@ -669,8 +669,4 @@ public class VisualizationCodeGenerator {
 		
 		return dataTable.toString();
 	}
-	
-	
-	
-
 }

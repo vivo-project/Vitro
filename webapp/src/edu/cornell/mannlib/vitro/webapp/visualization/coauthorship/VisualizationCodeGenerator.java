@@ -344,7 +344,7 @@ public class VisualizationCodeGenerator {
 		
 		visualizationCode.append("$('#" + visDivNames.get("SHORT_SPARK") + " td.sparkline_number').text(parseInt(renderedShortSparks) + parseInt(" + unknownYearCoauthors + "));");
 		visualizationCode.append("var shortSparksText = ''" +
-														"+ ' Unique co-author(s) within the last 10 years '" +
+														"+ ' unique co-author(s) within the last 10 years '" +
 														"<span class=\"incomplete-data-holder\" title=\"" + imcompleteDataText + "\">incomplete data</span>'" +
 														/*"+ ' " + totalUniqueCoAuthors + " '" +
 														"+ ' total " +
@@ -643,16 +643,10 @@ public class VisualizationCodeGenerator {
 		}
 										
 		dataTable.append("</tbody>\n" +
-//						"<tfoot>" +
-//								"<tr><td colspan='2'>*DNA - Data not available</td></tr>" +
-//						"</tfoot>\n" +
 						"</table>\n");
 		
 		
 		return dataTable.toString();
 	}
-	
-	
-	
 
 }
