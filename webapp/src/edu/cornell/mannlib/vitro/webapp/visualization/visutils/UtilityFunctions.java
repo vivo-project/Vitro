@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.apache.commons.lang.StringUtils;
+
 import edu.cornell.mannlib.vitro.webapp.visualization.constants.VisConstants;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.BiboDocument;
 
@@ -67,8 +69,10 @@ public class UtilityFunctions {
 	 * @return
 	 */
 	public static String slugify(String textToBeSlugified) {
-		return textToBeSlugified.toLowerCase().replaceAll("[^a-zA-Z0-9-]", "-")
-								.substring(0, VisConstants.MAX_NAME_TEXT_LENGTH);
+		return StringUtils.substring(textToBeSlugified.toLowerCase()
+											.replaceAll("[^a-zA-Z0-9-]+", "-"), 
+									 0, 
+									 VisConstants.MAX_NAME_TEXT_LENGTH);
 	}
 
 }
