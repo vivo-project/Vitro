@@ -79,7 +79,13 @@ public class ViewFinder {
          * same level of specificity, what should we do? Also, if we
          * are displaying a list of individuals belonging to a certain
          * class, we may want to use only a custom view defined for that 
-         * class and NOT a more specific one. See NIHVIVO-568.
+         * class and NOT a more specific one. See NIHVIVO-568. Similarly 
+         * when we're displaying an object property: if we are displaying
+         * #hasPrincipalInvestigatorRole, the object should be displayed
+         * as a PrincipalInvestigatorRole object rather than some other type.
+         * 
+         * RY 7/19/10 Use distinction between asserted and inferred vclasses
+         * as a starting point: see MiscWebUtils.getCustomShortView().
          */
         for (VClass vc : vclasses) {
             try {
