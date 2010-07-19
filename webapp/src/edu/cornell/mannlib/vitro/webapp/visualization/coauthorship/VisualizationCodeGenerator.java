@@ -405,7 +405,7 @@ public class VisualizationCodeGenerator {
 		visualizationCode.append("$('#" + visDivNames.get("FULL_SPARK") + " td.sparkline_number').text('" + (renderedFullSparks + unknownYearCoauthors) + "');");
 		
 		visualizationCode.append("var allSparksText = ''" +
-												 "+ ' Unique co-author(s) from '" +
+												 "+ ' co-author(s) from '" +
 												 "+ ' <span class=\"sparkline_range\">" +
 												"" + minPubYearConsidered + " to " + currentYear + "" +
 												"</span> '" +
