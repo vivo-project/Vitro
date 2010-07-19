@@ -159,14 +159,33 @@ public class TBoxUpdater {
 						 " in the new version of the annotations ontology. (maximum of one is expected)");
 				 continue; 
 			 }
+			 
+			 // If a subject-property pair occurs in the old annotation TBox and the new annotations 
+			 // TBox, but not in the site model, then it is considered an erroneous deletion and
+			 // the value from the new TBox is added into the site model.
+			 // sjm: 7-16-2010. We want this here now to add back in annotations mistakenly dropped
+			 // in the .9 to 1.0 migration, but I'm not sure we would want this here permanently.
+			 // Shouldn't a site be allowed to delete annotations if they want to?
+			 
+			 NodeIterator siteObjects = siteModel.listObjectsOfProperty(subject,predicate);
+			 
+			 if (siteObjects == null || !siteObjects.hasNext()) {
+	        	    try {
+	    				additions.add(subject, predicate, newObject);
+	    			
+	    				/* detailed logging here
+					    */
+					} catch (Exception e) {
+						logger.logError("Error trying to add statement with property " + predicate.getURI() +
+								" of class = " + subject.getURI() + " in the knowledge base:\n" + e.getMessage());
+					}				 
+				 
+				   continue;
+			 }
+			 
 			 			 			 
 			 if (!newObject.equals(oldObject)) {
-				 NodeIterator siteObjects = siteModel.listObjectsOfProperty(subject,predicate);
-				 
-				 if (siteObjects == null || !siteObjects.hasNext()) {
-					 continue;
-				 }
-			
+
 				 RDFNode siteObject = siteObjects.next();
 
 		         i = 1;
@@ -198,6 +217,7 @@ public class TBoxUpdater {
 	        	    try {
 	    				additions.add(subject, predicate, newObject);
 	    				
+	    				/*
 						logger.log("Changed the value of property "  + predicate.getURI() +
 								" of subject = " + subject.getURI() + 
 								" from " +
@@ -205,6 +225,7 @@ public class TBoxUpdater {
 								" to " + 
 								 (newObject.isResource() ? ((Resource)newObject).getURI() : ((Literal)newObject).getLexicalForm()) +
 								 " in the knowledge base:\n");
+						*/
 					} catch (Exception e) {
 						logger.logError("Error trying to change the value of property " + predicate.getURI() +
 								" of class = " + subject.getURI() + " in the knowledge base:\n" + e.getMessage());

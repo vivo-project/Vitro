@@ -81,6 +81,7 @@ public class OntologyUpdater {
 	private void performUpdate() throws IOException {
 		
 		performSparqlConstructAdditions(settings.getSparqlConstructAdditionsDir(), settings.getOntModelSelector().getABoxModel());
+		performSparqlConstructRetractions(settings.getSparqlConstructDeletionsDir(), settings.getOntModelSelector().getABoxModel());
 		
 		List<AtomicOntologyChange> rawChanges = getAtomicOntologyChanges();
 		
@@ -128,9 +129,38 @@ public class OntologyUpdater {
 			aboxModel.leaveCriticalSection();
 		}
 		
-
 	}
 	
+	private void performSparqlConstructRetractions(String sparqlConstructDir, OntModel aboxModel) throws IOException {
+		
+		Model retractions = performSparqlConstructs(sparqlConstructDir, aboxModel);
+		
+		if (retractions == null) {
+			return;
+		}
+		
+		aboxModel.enterCriticalSection(Lock.WRITE);
+		try {
+			Model actualRetractions = ModelFactory.createDefaultModel();
+			StmtIterator stmtIt = retractions.listStatements();
+			while (stmtIt.hasNext()) {
+				Statement stmt = stmtIt.nextStatement();
+				if (aboxModel.contains(stmt)) {
+					actualRetractions.add(stmt);
+				}
+			}
+			aboxModel.remove(actualRetractions);
+			if (actualRetractions.size() > 0) {
+				logger.log("Removed " + actualRetractions.size() + " statement" 
+						   + ((actualRetractions.size() > 1) ? "s" : "") + 
+						   " using SPARQL CONSTRUCT queries.");
+			}
+			record.recordRetractions(actualRetractions);
+		} finally {
+			aboxModel.leaveCriticalSection();
+		}
+		
+	}
 	
 	/**
 	 * Performs a set of arbitrary SPARQL CONSTRUCT queries on the 
