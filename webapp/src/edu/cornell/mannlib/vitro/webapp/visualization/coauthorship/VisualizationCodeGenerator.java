@@ -193,14 +193,17 @@ public class VisualizationCodeGenerator {
 		for (int publicationYear = minPubYearConsidered; publicationYear <= currentYear; publicationYear++) {
 
 				String stringPublishedYear = String.valueOf(publicationYear);
-				Integer currentUniqueCoAuthors = yearToUniqueCoauthors.get(stringPublishedYear).size();
-
-				if (currentUniqueCoAuthors == null) {
-					currentUniqueCoAuthors = 0;
+				Set<Node> currentCoAuthors = yearToUniqueCoauthors.get(stringPublishedYear);
+				
+				Integer currentUniqueCoAuthors = null;
+				
+				if (currentCoAuthors != null) {
+					currentUniqueCoAuthors = currentCoAuthors.size();
+					allCoAuthorsWithKnownAuthorshipYears.addAll(currentCoAuthors); 
 				} else {
-					allCoAuthorsWithKnownAuthorshipYears.addAll(yearToUniqueCoauthors.get(stringPublishedYear)); 
+					currentUniqueCoAuthors = 0;
 				}
-
+				
 				visualizationCode.append("data.setValue("
 												+ uniqueCoAuthorCounter
 												+ ", 0, '"
@@ -212,8 +215,6 @@ public class VisualizationCodeGenerator {
 												+ ", 1, "
 												+ currentUniqueCoAuthors
 												+ ");\n");
-				
-				
 				uniqueCoAuthorCounter++;
 		}
 
