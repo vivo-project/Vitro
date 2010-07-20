@@ -11,7 +11,7 @@
 	</div>
 </noscript>
 
-<div id="formLogin" class="pageBodyGroup invisible" >
+<div id="formLogin" class="pageBodyGroup hidden" >
 
        <h2>Log in</h2>
        
