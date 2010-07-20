@@ -132,10 +132,7 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 			builder.setClassesProhibitedFromSearch(
 				new ProhibitedFromSearch(DisplayVocabulary.PRIMARY_LUCENE_INDEX_URI, displayOntModel));
 
-			log.debug("**** End of " + this.getClass().getName() + ".contextInitialized()");
-			
-			// Start a rebuild each time the server starts.
-			builder.doIndexRebuild();
+			log.debug("**** End of " + this.getClass().getName() + ".contextInitialized()");			
 		} catch (Throwable t) {
 			log.error("***** Error setting up Lucene search *****", t);
 		}
