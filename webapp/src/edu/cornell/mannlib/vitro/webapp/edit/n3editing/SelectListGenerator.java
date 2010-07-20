@@ -11,6 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,6 +30,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
 
 public class SelectListGenerator {
     
@@ -203,12 +206,45 @@ public class SelectListGenerator {
                     // now populate the options                
                     if( wDaoFact == null ) log.error("could not get WebappDaoFactory from request in SelectListGenerator.getOptions().");
     
+                    // if reasoning isn't available, we will also need to add 
+                    // individuals asserted in subclasses
+                    boolean inferenceAvailable = false;
+                    if (wDaoFact instanceof WebappDaoFactoryJena) {
+                    	PelletListener pl = ((WebappDaoFactoryJena) wDaoFact)
+                    			.getPelletListener();
+                    	if (pl != null && pl.isConsistent() 
+                    	    && !pl.isInErrorState() 
+                    	    && !pl.isReasoning()) {
+                    		inferenceAvailable = true;
+                    	}
+                    }
+                    
                     VClass vclass = wDaoFact.getVClassDao().getVClassByURI( vclassUri );
                     if( vclass == null ) { 
                         log.error("Cannot find owl:Class " + vclassUri + " in the model" );
                         optionsMap.put("", "Could not find class " + vclassUri);
                     }else{                
-                        List<Individual> individuals = wDaoFact.getIndividualDao().getIndividualsByVClassURI(vclass.getURI(),-1,-1);                                   
+                        Map<String, Individual> individualMap = new HashMap<String, Individual>();
+                        for (Individual ind : wDaoFact.getIndividualDao().getIndividualsByVClassURI(vclass.getURI(),-1,-1)) {
+                        	if (ind.getURI() != null) {
+                        		individualMap.put(ind.getURI(), ind);
+                        	}
+                        }
+                        
+                        if (!inferenceAvailable) {
+                        	for (String subclassURI : wDaoFact.getVClassDao().getAllSubClassURIs(vclass.getURI())) {
+                        		 for (Individual ind : wDaoFact.getIndividualDao().getIndividualsByVClassURI(subclassURI,-1,-1)) {
+                                 	if (ind.getURI() != null) {
+                                 		individualMap.put(ind.getURI(), ind);
+                                 	}
+                                 }
+                        	}
+                        }
+                        
+                        List<Individual> individuals = new ArrayList<Individual>();
+                        individuals.addAll(individualMap.values());
+                        Collections.sort(individuals);
+                        
                         if (individuals.size()==0){ 
                             log.error("No individuals of type "+vclass.getName()+" to add to pick list in SelectListGenerator.getOptions(); check portal visibility");
                             optionsMap.put("", "No " + vclass.getName() + " found");
