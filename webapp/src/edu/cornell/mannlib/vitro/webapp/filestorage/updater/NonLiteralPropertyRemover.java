@@ -30,7 +30,7 @@ public class NonLiteralPropertyRemover extends FsuScanner {
 				+ "are not literals.");
 
 		removeNonLiterals(imageProperty, "image file");
-		removeNonLiterals(thumbProperty, "thumnail");
+		removeNonLiterals(thumbProperty, "thumbnail");
 	}
 
 	/**
