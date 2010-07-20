@@ -1,7 +1,11 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
 var vitro;
-if (!vitro) {
+
+// vitro == null: true
+// vitro === null: false (only true if undefined)
+// typeof vitro == 'undefined': true
+if (!vitro) { 
 	vitro = {};
 }
 
@@ -56,5 +60,5 @@ vitro.customFormUtils = {
 //    	}
 //    	
 //    	return foundErrors;
-    },
+    }
 }

@@ -2,9 +2,6 @@
 
 <#-- Log in template for accessing site admin -->
 
-
-
-${stylesheets.addFromTheme("/login.css")}
 <noscript>
 	<div id="javascriptDisableWrapper">
 		<div id="javascriptDisableContent">
@@ -14,7 +11,7 @@ ${stylesheets.addFromTheme("/login.css")}
 	</div>
 </noscript>
 
-<div id="formLogin" class="pageBodyGroup hidden" >
+<div id="formLogin" class="pageBodyGroup invisible" >
 
        <h2>Log in</h2>
        
