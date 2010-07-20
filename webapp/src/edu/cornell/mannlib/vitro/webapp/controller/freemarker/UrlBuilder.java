@@ -106,7 +106,8 @@ public class UrlBuilder {
     
     public String getHomeUrl() {
         String rootBreadCrumbUrl = portal.getRootBreadCrumbURL();
-        return StringUtils.isEmpty(rootBreadCrumbUrl) ? contextPath : rootBreadCrumbUrl;  
+        String path = StringUtils.isEmpty(rootBreadCrumbUrl) ? "" : rootBreadCrumbUrl;
+        return getUrl(path);
     }
     
     public String getLogoutUrl() {
@@ -155,10 +156,12 @@ public class UrlBuilder {
     /********** Static utility methods **********/
     
     public static String getUrl(String path) {
-        if ( ! path.startsWith("/") ) {
+    	
+        if ( !path.isEmpty() && !path.startsWith("/") ) {
             path = "/" + path;
         }
-        return contextPath + path;
+        path = contextPath + path;
+        return path.isEmpty() ? "/" : path;
     }
     
     public static String getUrl(String path, Params params) {
