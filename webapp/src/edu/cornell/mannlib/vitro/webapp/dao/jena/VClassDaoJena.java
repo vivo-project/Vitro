@@ -394,7 +394,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
 		//if ("true".equalsIgnoreCase(infersTypes)) {
 		
 		PelletListener pl = getWebappDaoFactory().getPelletListener();
-		if (pl != null && pl.isConsistent() && !pl.isInErrorState()) {	
+		if (pl != null && pl.isConsistent() && !pl.isInErrorState() && !pl.isReasoning()) {	
 			superclassURIs = new ArrayList<String>();
 			OntClass cls = getOntClass(getOntModel(),classURI);
 			StmtIterator superClassIt = getOntModel().listStatements(cls,RDFS.subClassOf,(RDFNode)null);
@@ -740,7 +740,9 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
 						String isInferencing = getWebappDaoFactory().getProperties().get("infersTypes");
 						// if this model infers types based on the taxonomy, adding the subclasses will only
 						// waste time for no benefit
-						if (isInferencing == null || "false".equalsIgnoreCase(isInferencing)) {
+						PelletListener pl = getWebappDaoFactory().getPelletListener();
+						if (pl == null || !pl.isConsistent() || pl.isInErrorState() || pl.isReasoning() 
+								|| isInferencing == null || "false".equalsIgnoreCase(isInferencing)) {
                         	Iterator classURIs = getAllSubClassURIs(getClassURIStr(superclass)).iterator();
                         	while (classURIs.hasNext()) {
                             	String classURI = (String) classURIs.next();
@@ -748,8 +750,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                             	if (vClass != null)
                             	    vClasses.add(vClass);
                         	}
-						} else {
-						}
+						} 
                     }
                 }
             }

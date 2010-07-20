@@ -80,6 +80,10 @@ public class PelletListener implements ModelChangedListener {
 		return this.inErrorState;
 	}
 	
+	public boolean isReasoning() {
+		return this.isReasoning;
+	}
+	
 	public void closePipe() {
 		pipeOpen = false;
 	}
