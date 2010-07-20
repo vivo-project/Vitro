@@ -31,6 +31,7 @@ public class TBoxUpdater {
 	private OntModel siteModel;
 	private OntologyChangeLogger logger;  
 	private OntologyChangeRecord record;
+	private boolean detailLogs = true;
 
 	/**
 	 * 
@@ -173,8 +174,12 @@ public class TBoxUpdater {
 	        	    try {
 	    				additions.add(subject, predicate, newObject);
 	    			
-	    				/* detailed logging here
-					    */
+						if (detailLogs) {
+							   logger.log( "adding Statement: subject = " + subject.getURI() +
+								           " property = " + predicate.getURI() +
+				                           " object = " + (newObject.isLiteral() ?  ((Literal)newObject).getLexicalForm() 
+				                		                                          : ((Resource)newObject).getURI()));	
+							}
 					} catch (Exception e) {
 						logger.logError("Error trying to add statement with property " + predicate.getURI() +
 								" of class = " + subject.getURI() + " in the knowledge base:\n" + e.getMessage());
@@ -217,15 +222,15 @@ public class TBoxUpdater {
 	        	    try {
 	    				additions.add(subject, predicate, newObject);
 	    				
-	    				/*
-						logger.log("Changed the value of property "  + predicate.getURI() +
+	    				if (detailLogs) {
+						   logger.log("Changed the value of property "  + predicate.getURI() +
 								" of subject = " + subject.getURI() + 
 								" from " +
 								 (oldObject.isResource() ? ((Resource)oldObject).getURI() : ((Literal)oldObject).getLexicalForm()) +								
 								" to " + 
 								 (newObject.isResource() ? ((Resource)newObject).getURI() : ((Literal)newObject).getLexicalForm()) +
 								 " in the knowledge base:\n");
-						*/
+	    				}
 					} catch (Exception e) {
 						logger.logError("Error trying to change the value of property " + predicate.getURI() +
 								" of class = " + subject.getURI() + " in the knowledge base:\n" + e.getMessage());
@@ -264,22 +269,20 @@ public class TBoxUpdater {
 				Statement stmt = newStmtIt.next();
 				if (!siteModel.contains(stmt)) {
 					newAnnotationSettingsToAdd.add(stmt);
-					
-					// TODO remove this for production
-					/*
-					logger.log( "adding Statement: subject = " + stmt.getSubject().getURI() +
-						    " property = " + stmt.getPredicate().getURI() +
-		                    " object = " + (stmt.getObject().isLiteral() ?  ((Literal)stmt.getObject()).getLexicalForm() 
+				
+					if (detailLogs) {
+					   logger.log( "adding Statement: subject = " + stmt.getSubject().getURI() +
+						           " property = " + stmt.getPredicate().getURI() +
+		                           " object = " + (stmt.getObject().isLiteral() ?  ((Literal)stmt.getObject()).getLexicalForm() 
 		                		                                          : ((Resource)stmt.getObject()).getURI()));	
-		           */
+					}
 				}
 			}
 			
 			siteModel.add(newAnnotationSettingsToAdd);
 			record.recordAdditions(newAnnotationSettingsToAdd);
             
-			// log the additions
-            //summary
+			// log the additions - summary
 			if (newAnnotationSettingsToAdd.size() > 0) {
 				boolean plural = (newAnnotationSettingsToAdd.size() > 1);
 	            logger.log("Added " + newAnnotationSettingsToAdd.size() + " new annotation property setting" + (plural ? "s" : "") + " to the knowledge base. This includes " +
