@@ -2,9 +2,6 @@
 
 <#-- Log in template for accessing site admin -->
 
-
-
-${stylesheets.addFromTheme("/login.css")}
 <noscript>
 	<div id="javascriptDisableWrapper">
 		<div id="javascriptDisableContent">
