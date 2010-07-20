@@ -311,6 +311,6 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
         
     </div> <!-- content -->
     
-<script type="text/javascript" src="/vivo/js/imageUpload/imageUploadUtils.js"></script>
+<script type="text/javascript" src="<c:url value="/js/imageUpload/imageUploadUtils.js"/>"></script>
 
 
