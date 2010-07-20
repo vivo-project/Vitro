@@ -492,7 +492,11 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
 						stmtsForClass.add(stmt);
 					}
 				}
-
+				
+				//bdc34: What do we do if a object individual is directly asserted to two different
+				//types?  For now we just show them in whichever type shows up first. related to NIHVIVO-876
+				orgStmtList.removeAll(stmtsForClass);				
+				
 				Collections.sort(stmtsForClass,
 						new Comparator<ObjectPropertyStatement>() {
 							public int compare(ObjectPropertyStatement o1,
