@@ -131,11 +131,19 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 			OntModel displayOntModel = (OntModel) sce.getServletContext().getAttribute("displayOntModel");
 			builder.setClassesProhibitedFromSearch(
 				new ProhibitedFromSearch(DisplayVocabulary.PRIMARY_LUCENE_INDEX_URI, displayOntModel));
-
-			log.debug("**** End of " + this.getClass().getName() + ".contextInitialized()");
+						
+			if( (Boolean)sce.getServletContext().getAttribute(INDEX_REBUILD_REQUESTED_AT_STARTUP) instanceof Boolean &&
+				(Boolean)sce.getServletContext().getAttribute(INDEX_REBUILD_REQUESTED_AT_STARTUP) ){
+				builder.doIndexRebuild();
+				log.info("Rebuild of search index required before startup.");
+				while( builder.isIndexing() ){
+					Thread.currentThread().sleep(200);					
+					log.info("Still rebulding search index");
+				}
+				log.info("Search index rebuild completed.");				
+			}
 			
-			// Start a rebuild each time the server starts.
-			builder.doIndexRebuild();
+			log.debug("**** End of " + this.getClass().getName() + ".contextInitialized()");			
 		} catch (Throwable t) {
 			log.error("***** Error setting up Lucene search *****", t);
 		}
@@ -210,7 +218,8 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
         analyzer.addAnalyzer(NAMEUNSTEMMED, new HtmlLowerStopAnalyzer());        
         return analyzer;
     }
-    
+        
+    public static final String INDEX_REBUILD_REQUESTED_AT_STARTUP = "LuceneSetup.indexRebuildRequestedAtStarup";
     public static final String ANALYZER= "lucene.analyzer";
     public static final String INDEX_DIR = "lucene.indexDir";
     public static final String SEARCH_DATAPROPERTY_BLACKLIST = 
