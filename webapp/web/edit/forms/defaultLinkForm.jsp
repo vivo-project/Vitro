@@ -131,7 +131,7 @@
     "fields" : {
       "url" : {
          "newResource"      : "false",
-         "validators"       : [ "nonempty", "datatype:${uriDatatypeUriJson}" ],
+         "validators"       : [ "nonempty", "datatype:${uriDatatypeUriJson}" , "httpUrl" ],
          "optionsType"      : "UNDEFINED",
          "literalOptions"   : [ ],
          "predicateUri"     : "",
