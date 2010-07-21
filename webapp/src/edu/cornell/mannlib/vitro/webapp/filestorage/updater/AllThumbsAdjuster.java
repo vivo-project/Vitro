@@ -12,11 +12,12 @@ import com.hp.hpl.jena.rdf.model.Resource;
  * Adjust any individual that has a thumbnail with no main image.
  */
 public class AllThumbsAdjuster extends FsuScanner {
-	protected final File imageDirectory;
+	private ImageDirectoryWithBackup imageDirectoryWithBackup;
 
 	public AllThumbsAdjuster(FSUController controller) {
 		super(controller);
-		this.imageDirectory = controller.getImageDirectory();
+		this.imageDirectoryWithBackup = controller
+				.getImageDirectoryWithBackup();
 	}
 
 	/**
@@ -56,8 +57,9 @@ public class AllThumbsAdjuster extends FsuScanner {
 				+ "' to match the thumbnail at '" + thumbFilename + "'");
 
 		try {
-			File thumbFile = new File(imageDirectory, thumbFilename);
-			File mainFile = new File(imageDirectory, mainFilename);
+			File thumbFile = imageDirectoryWithBackup
+					.getExistingFile(thumbFilename);
+			File mainFile = imageDirectoryWithBackup.getNewfile(mainFilename);
 			mainFile = checkNameConflicts(mainFile);
 			FileUtil.copyFile(thumbFile, mainFile);
 

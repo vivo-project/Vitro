@@ -17,11 +17,12 @@ import com.hp.hpl.jena.rdf.model.Resource;
  * Adjust any individual that has a main image but no thumbnail.
  */
 public class NoThumbsAdjuster extends FsuScanner {
-	protected final File imageDirectory;
+	private ImageDirectoryWithBackup imageDirectoryWithBackup;
 
 	public NoThumbsAdjuster(FSUController controller) {
 		super(controller);
-		this.imageDirectory = controller.getImageDirectory();
+		this.imageDirectoryWithBackup = controller
+				.getImageDirectoryWithBackup();
 	}
 
 	/**
@@ -59,8 +60,8 @@ public class NoThumbsAdjuster extends FsuScanner {
 		updateLog.log(resource, "creating a thumbnail at '" + thumbFilename
 				+ "' from the main image at '" + mainFilename + "'");
 
-		File mainFile = new File(imageDirectory, mainFilename);
-		File thumbFile = new File(imageDirectory, thumbFilename);
+		File mainFile = imageDirectoryWithBackup.getExistingFile(mainFilename);
+		File thumbFile = imageDirectoryWithBackup.getNewfile(thumbFilename);
 		thumbFile = checkNameConflicts(thumbFile);
 		try {
 			generateThumbnailImage(mainFile, thumbFile,

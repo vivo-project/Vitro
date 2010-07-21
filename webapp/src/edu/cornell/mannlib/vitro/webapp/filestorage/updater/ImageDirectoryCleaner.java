@@ -12,13 +12,15 @@ import java.util.Collection;
  * referenced.
  */
 public class ImageDirectoryCleaner extends FsuScanner {
-	protected final File imageDirectory;
+	private final ImageDirectoryWithBackup imageDirectoryWithBackup;
 	protected final File translatedDirectory;
 	protected final File unreferencedDirectory;
 
 	public ImageDirectoryCleaner(FSUController controller) {
 		super(controller);
-		this.imageDirectory = controller.getImageDirectory();
+		this.imageDirectoryWithBackup = controller
+				.getImageDirectoryWithBackup();
+
 		this.translatedDirectory = controller.getTranslatedDirectory();
 		this.unreferencedDirectory = controller.getUnreferencedDirectory();
 	}
@@ -33,7 +35,8 @@ public class ImageDirectoryCleaner extends FsuScanner {
 
 		updateLog.section("Cleaning the old image directory of "
 				+ "files that were not referenced.");
-		removeRemainingFiles(imageDirectory);
+		removeRemainingFiles(imageDirectoryWithBackup
+				.getPrimaryImageDirectory());
 	}
 
 	/**
@@ -41,15 +44,22 @@ public class ImageDirectoryCleaner extends FsuScanner {
 	 */
 	private void removeTranslatedFiles(Collection<String> translatedFiles) {
 		for (String path : translatedFiles) {
-			updateLog.log("moving image file '" + path
-					+ "' to the 'translated' directory.");
-			File oldFile = new File(imageDirectory, path);
-			File deletedFile = new File(translatedDirectory, path);
-			try {
-				FileUtil.moveFile(oldFile, deletedFile);
-			} catch (IOException e) {
-				updateLog.error("Failed to move translated file '"
-						+ oldFile.getAbsolutePath() + "'");
+			File oldFile = new File(
+					imageDirectoryWithBackup.getPrimaryImageDirectory(), path);
+			if (oldFile.exists()) {
+				updateLog.log("moving image file '" + path
+						+ "' to the 'translated' directory.");
+				File deletedFile = new File(translatedDirectory, path);
+				try {
+					FileUtil.moveFile(oldFile, deletedFile);
+				} catch (IOException e) {
+					updateLog.error("Failed to move translated file '"
+							+ oldFile.getAbsolutePath() + "'");
+				}
+			} else {
+				updateLog.log("Not moving image file '" + path
+						+ "' to the 'translated' directory -- "
+						+ "found it in the backup directory.");
 			}
 		}
 	}
@@ -73,8 +83,9 @@ public class ImageDirectoryCleaner extends FsuScanner {
 				}
 			}
 		} catch (IOException e) {
-			updateLog.error("Failed to clean images directory '"
-					+ directory.getAbsolutePath() + "'", e);
+			updateLog.error(
+					"Failed to clean images directory '"
+							+ directory.getAbsolutePath() + "'", e);
 		}
 	}
 
@@ -89,8 +100,9 @@ public class ImageDirectoryCleaner extends FsuScanner {
 			File newFile = new File(targetDirectory, file.getName());
 			FileUtil.moveFile(file, newFile);
 		} catch (IOException e) {
-			updateLog.error("Can't move unreferenced file '"
-					+ file.getAbsolutePath() + "'", e);
+			updateLog.error(
+					"Can't move unreferenced file '" + file.getAbsolutePath()
+							+ "'", e);
 		}
 	}
 
@@ -99,7 +111,8 @@ public class ImageDirectoryCleaner extends FsuScanner {
 	 * corresponding directory in the "unreferenced" area.
 	 */
 	private File makeCorrespondingDirectory(File directory) throws IOException {
-		String imagesPath = imageDirectory.getAbsolutePath();
+		String imagesPath = imageDirectoryWithBackup.getPrimaryImageDirectory()
+				.getAbsolutePath();
 		String thisPath = directory.getAbsolutePath();
 
 		if (!thisPath.startsWith(imagesPath)) {

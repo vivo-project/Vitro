@@ -16,11 +16,12 @@ import com.hp.hpl.jena.rdf.model.Statement;
  * don't actually exist.
  */
 public class DeadEndPropertyRemover extends FsuScanner {
-	protected final File imageDirectory;
+	private ImageDirectoryWithBackup imageDirectoryWithBackup;
 
 	public DeadEndPropertyRemover(FSUController controller) {
 		super(controller);
-		this.imageDirectory = controller.getImageDirectory();
+		this.imageDirectoryWithBackup = controller
+				.getImageDirectoryWithBackup();
 	}
 
 	/**
@@ -58,16 +59,18 @@ public class DeadEndPropertyRemover extends FsuScanner {
 		for (Statement stmt : getStatements(resource, prop)) {
 			RDFNode node = stmt.getObject();
 			if (node.isLiteral()) {
-				String filename = ((Literal)node).getString();
-				File file = new File(imageDirectory, filename);
+				String filename = ((Literal) node).getString();
+				File file = imageDirectoryWithBackup.getExistingFile(filename);
 				if (!file.exists()) {
-					updateLog.warn(resource, "removing link to " + label + " '"
-							+ filename + "': file does not exist at '"
-							+ file.getAbsolutePath() + "'.");
+					updateLog.warn(
+							resource,
+							"removing link to " + label + " '" + filename
+									+ "': file does not exist at '"
+									+ file.getAbsolutePath() + "'.");
 					model.remove(stmt);
 				}
 			}
 		}
 	}
-	
+
 }

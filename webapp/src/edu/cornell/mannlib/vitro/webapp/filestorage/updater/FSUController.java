@@ -20,8 +20,8 @@ public interface FSUController {
 	/** The update log. */
 	FSULog getUpdateLog();
 
-	/** The directory where the old-style images were stored. */
-	File getImageDirectory();
+	/** The place to find or to create image files. */
+	ImageDirectoryWithBackup getImageDirectoryWithBackup();
 
 	/** The file storage system. */
 	FileStorage getFileStorage();
