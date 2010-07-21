@@ -2,9 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
@@ -43,6 +40,12 @@ import org.apache.commons.logging.LogFactory;
 public class ConfigurationProperties {
 	private static final Log log = LogFactory
 			.getLog(ConfigurationProperties.class);
+
+	/**
+	 * If we don't find the path to the config properties from a JNDI mapping,
+	 * use this. Not final, so we can jigger it for unit tests.
+	 */
+	private static String DEFAULT_CONFIG_PATH = "deploy.properties";
 
 	/**
 	 * The JNDI naming context where Tomcat stores environment attributes.
@@ -152,75 +155,57 @@ public class ConfigurationProperties {
 	}
 
 	/**
-	 * Find the path to the Configuration properties file.
+	 * Find the path to the Configuration properties file. If we can't find it
+	 * by the JNDI mapping, use the default path.
 	 * 
 	 * @throws IllegalStateException
 	 *             If we can't find the path.
 	 */
 	private static String getConfigurationFilePath() {
-		String message = "";
 		try {
-			message = "JNDI Lookup on \"" + JNDI_BASE
-					+ "\" failed. Is the context file missing?";
 			Context envCtx = (Context) new InitialContext().lookup(JNDI_BASE);
 			if (envCtx == null) {
-				log.error(message);
-				throw new IllegalStateException(message);
+				log.warn("JNDI Lookup on \"" + JNDI_BASE
+						+ "\" failed. Is the context file missing?");
+				return DEFAULT_CONFIG_PATH;
 			}
 
 			// Get the name of the configuration properties file.
-			message = "Could not find a JNDI Environment naming for '"
-					+ PATH_CONFIGURATION
-					+ "'. Is the context file set up correctly?";
 			String configPath = (String) envCtx.lookup(PATH_CONFIGURATION);
 			if (configPath == null) {
-				log.error(message);
-				throw new IllegalStateException(message);
+				log.warn("Could not find a JNDI Environment naming for '"
+						+ PATH_CONFIGURATION
+						+ "'. Is the context file set up correctly?");
+				return DEFAULT_CONFIG_PATH;
 			}
 
 			return configPath;
 		} catch (NamingException e) {
-			throw new IllegalStateException(message, e);
+			log.warn("JNDI lookup failed. "
+					+ "Using default path for config properties.", e);
+			return DEFAULT_CONFIG_PATH;
 		}
 	}
 
 	/**
 	 * Find the Configuration properties file.
 	 * 
-	 * First try to interpret the path as a file path (like
-	 * /usr/local/config.props).
-	 * 
-	 * If that doesn't work, try it as a resource path (relative to
-	 * WEB-INF/classes).
+	 * Interpret the path as a resource path (relative to WEB-INF/classes).
 	 * 
 	 * @throws IllegalArgumentException
 	 *             If the path fails to locate a file or a resource.
 	 */
-	public static InputStream getConfigurationInputStream(String configPath) {
-		InputStream inStream = null;
+	private static InputStream getConfigurationInputStream(String configPath) {
+		InputStream inStream = ConfigurationProperties.class.getClassLoader()
+				.getResourceAsStream(configPath);
 
-		// Try to find this as a file.
-		File file = new File(configPath);
-		try {
-			inStream = new FileInputStream(file);
-		} catch (FileNotFoundException e) {
-			inStream = null;
+		if (inStream != null) {
+			return inStream;
 		}
 
-		// If no file, try to find it as a resource.
-		if (inStream == null) {
-			inStream = ConfigurationProperties.class.getClassLoader()
-					.getResourceAsStream(configPath);
-		}
-
-		// If neither file nor resource, give up.
-		if (inStream == null) {
-			throw new IllegalArgumentException(
-					"Failed to find a configuration properties file at '"
-							+ file.getAbsolutePath() + "', or a resource at '"
-							+ configPath + "'");
-		}
-		return inStream;
+		throw new IllegalArgumentException(
+				"Failed to find a configuration properties resource at '"
+						+ configPath + "'");
 	}
 
 }
