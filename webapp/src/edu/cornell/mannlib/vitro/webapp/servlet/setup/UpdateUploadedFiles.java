@@ -17,7 +17,6 @@ import com.hp.hpl.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDao;
 import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorage;
 import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup;
 import edu.cornell.mannlib.vitro.webapp.filestorage.updater.FileStorageUpdater;
@@ -97,8 +96,12 @@ public class UpdateUploadedFiles implements ServletContextListener {
 						+ "' does not exist.");
 			}
 
+			String webappImagePath = ctx.getRealPath("images");
+			File webappImageDirectory = (webappImagePath == null) ? null
+					: new File(webappImagePath);
+
 			FileStorageUpdater fsu = new FileStorageUpdater(wadf, jenaOntModel,
-					fileStorage, uploadDirectory);
+					fileStorage, uploadDirectory, webappImageDirectory);
 			fsu.update();
 		} catch (Exception e) {
 			log.error("Unknown problem", e);

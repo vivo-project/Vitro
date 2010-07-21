@@ -26,13 +26,14 @@ import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorage;
  * yet, in case someone else is referring to them also.
  */
 public class ImageSchemaTranslater extends FsuScanner {
-	protected final File imageDirectory;
+	private final ImageDirectoryWithBackup imageDirectoryWithBackup;
 	protected final FileModelHelper fileModelHelper;
 	protected final FileStorage fileStorage;
 
 	public ImageSchemaTranslater(FSUController controller) {
 		super(controller);
-		this.imageDirectory = controller.getImageDirectory();
+		this.imageDirectoryWithBackup = controller
+				.getImageDirectoryWithBackup();
 		this.fileStorage = controller.getFileStorage();
 		this.fileModelHelper = controller.getFileModelHelper();
 	}
@@ -126,7 +127,7 @@ public class ImageSchemaTranslater extends FsuScanner {
 	 */
 	private Individual translateFile(Resource resource, String path,
 			String label) {
-		File oldFile = new File(imageDirectory, path);
+		File oldFile = imageDirectoryWithBackup.getExistingFile(path);
 		String filename = getSimpleFilename(path);
 		String mimeType = guessMimeType(resource, filename);
 

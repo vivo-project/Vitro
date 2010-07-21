@@ -106,18 +106,21 @@ public class FileStorageUpdater implements FSUController {
 
 	private final FileStorage fileStorage;
 	private final FileModelHelper fileModelHelper;
-	private final File imageDirectory;
+	private final ImageDirectoryWithBackup imageDirectoryWithBackup;
 	private final File upgradeDirectory;
 
 	private FSULog updateLog;
 
 	public FileStorageUpdater(WebappDaoFactory wadf, Model model,
-			FileStorage fileStorage, File uploadDirectory) {
+			FileStorage fileStorage, File uploadDirectory,
+			File webappImageDirectory) {
 		this.model = model;
 		this.fileStorage = fileStorage;
 		this.fileModelHelper = new FileModelHelper(wadf);
-		this.imageDirectory = new File(uploadDirectory, "images");
 		this.upgradeDirectory = new File(uploadDirectory, "upgrade");
+
+		this.imageDirectoryWithBackup = new ImageDirectoryWithBackup(new File(
+				uploadDirectory, "images"), webappImageDirectory);
 	}
 
 	/**
@@ -176,7 +179,7 @@ public class FileStorageUpdater implements FSUController {
 			// Clean out the old image directory, separating into files which
 			// were translated, and files for which we found no reference.
 			new ImageDirectoryCleaner(this).clean(translatedFiles);
-			
+
 			updateLog.section("File Storage update is complete.");
 		} finally {
 			updateLog.close();
@@ -256,9 +259,8 @@ public class FileStorageUpdater implements FSUController {
 	}
 
 	@Override
-	public File getImageDirectory() {
-		return this.imageDirectory;
-
+	public ImageDirectoryWithBackup getImageDirectoryWithBackup() {
+		return this.imageDirectoryWithBackup;
 	}
 
 	@Override
