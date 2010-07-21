@@ -45,6 +45,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
 
 public class DataPropertyDaoJena extends PropertyDaoJena implements
@@ -96,6 +97,7 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
     	// TODO check if used as onProperty of restriction
     	ontModel.enterCriticalSection(Lock.WRITE);
     	try {
+    		getOntModel().getBaseModel().notifyEvent(new EditEvent(getWebappDaoFactory().getUserURI(),true));
 	        DatatypeProperty dp = ontModel.getDatatypeProperty(URI);
 	        if (dp != null) {
 	           	Iterator<Resource> restIt = ontModel.listSubjectsWithProperty(OWL.onProperty, dp);
@@ -109,6 +111,7 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
             	removeRulesMentioningResource(dp, ontModel);
                 dp.remove();
 	        }
+	        getOntModel().getBaseModel().notifyEvent(new EditEvent(getWebappDaoFactory().getUserURI(),false));
     	} finally {
     		ontModel.leaveCriticalSection();
     	}
@@ -509,6 +512,7 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
     public String insertDataProperty(DataProperty dtp, OntModel ontModel) throws InsertException {
         ontModel.enterCriticalSection(Lock.WRITE);
         try {
+        	getOntModel().getBaseModel().notifyEvent(new EditEvent(getWebappDaoFactory().getUserURI(),true));
         	String errMsgStr = getWebappDaoFactory().checkURI(dtp.getURI());
         	if (errMsgStr != null) {
         		throw new InsertException(errMsgStr);
@@ -565,6 +569,7 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
                 log.error("error linking data property "+dtp.getURI()+" to property group");
             }
             addPropertyStringValue(jDataprop,PROPERTY_CUSTOMENTRYFORMANNOT,dtp.getCustomEntryForm(),ontModel);
+            getOntModel().getBaseModel().notifyEvent(new EditEvent(getWebappDaoFactory().getUserURI(),false));
         } finally {
             ontModel.leaveCriticalSection();
         }
@@ -578,6 +583,7 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
     public void updateDataProperty(DataProperty dtp, OntModel ontModel) {
         ontModel.enterCriticalSection(Lock.WRITE);
         try {
+        	getOntModel().getBaseModel().notifyEvent(new EditEvent(getWebappDaoFactory().getUserURI(),true));
             com.hp.hpl.jena.ontology.DatatypeProperty jDataprop = ontModel.getDatatypeProperty(dtp.getURI());
             
             updateRDFSLabel(jDataprop, dtp.getPublicName());
@@ -614,6 +620,7 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
             }                        
                         
             updatePropertyStringValue(jDataprop,PROPERTY_CUSTOMENTRYFORMANNOT,dtp.getCustomEntryForm(),ontModel);
+            getOntModel().getBaseModel().notifyEvent(new EditEvent(getWebappDaoFactory().getUserURI(),false));
         } finally {
             ontModel.leaveCriticalSection();
         }
