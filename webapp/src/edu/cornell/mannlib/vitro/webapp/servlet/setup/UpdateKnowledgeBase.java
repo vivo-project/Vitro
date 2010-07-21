@@ -101,6 +101,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			  
 			  try {
 				  if (ontologyUpdater.updateRequired()) {
+					  ctx.setAttribute("UpdateKnowledgeBase.updateRequired", Boolean.TRUE);
 					  doMiscAppMetadataReplacements(ctx.getRealPath(MISC_REPLACEMENTS_FILE), oms);
 				  }
 			  } catch (Throwable t){
