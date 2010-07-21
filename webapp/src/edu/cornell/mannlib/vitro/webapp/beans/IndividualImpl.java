@@ -25,6 +25,7 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
 	protected static final String NOT_INITIALIZED = "__%NOT_INITIALIZED%__";
 
 	public String name = null;
+	protected String rdfsLabel = null;
     public String vClassURI = null;
     protected VClass vClass = null;
     protected List<VClass> directVClasses = null;
@@ -81,6 +82,9 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
     public String getName(){return name;}
     public void setName(String in){name=in;}
 
+    public String getRdfsLabel(){ return rdfsLabel; }
+    public void setRdfsLabel(String s){ rdfsLabel = s; }    	
+    
 //     private String modTime = null;
 //     public String getModtime(){return modTime;}
 //     public void setModtime(String in){modTime=in;}
