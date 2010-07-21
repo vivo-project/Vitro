@@ -102,7 +102,6 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			  try {
 				  if (ontologyUpdater.updateRequired()) {
 					  doMiscAppMetadataReplacements(ctx.getRealPath(MISC_REPLACEMENTS_FILE), oms);
-					  System.out.println(ctx.getRealPath(MISC_REPLACEMENTS_FILE));
 				  }
 			  } catch (Throwable t){
 				  log.error("Unable to perform miscellaneous application metadata replacements", t);
