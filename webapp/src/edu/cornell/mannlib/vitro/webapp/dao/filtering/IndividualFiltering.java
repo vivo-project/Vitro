@@ -292,6 +292,9 @@ public class IndividualFiltering implements Individual {
         return _innerIndividual.getName();
     }
 
+    public String getRdfsLabel(){
+    	return _innerIndividual.getRdfsLabel();
+    }
 
     public String getNamespace() {
         return _innerIndividual.getNamespace();

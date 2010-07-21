@@ -19,6 +19,13 @@ public interface Individual extends ResourceBean, VitroTimeWindowedResource, Com
     String getName();
     void setName(String in);
 
+    /** 
+     * Returns an rdfs:label if there is one on the individual.  Returns null
+     * if none can be found.  If more than one rdfs:label can be found for the individual
+     * one of the labels will be returned, which one is undefined.  
+     */
+    String getRdfsLabel();
+    
     String getVClassURI();
     void setVClassURI(String in);
 
