@@ -8,8 +8,8 @@
 <c:set var="contextPath"><c:out value="${pageContext.request.contextPath}" /></c:set>
 <c:set var="themeDir" value="${contextPath}/${portal.themeDir}"/>
 
-<link rel="stylesheet" type="text/css" href="${themeDir}css/login.css"/>
+<link rel="stylesheet" type="text/css" href="${contextPath}/css/login.css"/>
 <link rel="stylesheet" type="text/css" href="${themeDir}css/formedit.css"/>
 
-<script type="text/javascript" src="js/jquery.js"></script> 
-<script type="text/javascript" src="js/login/loginUtils.js"></script>
+<script type="text/javascript" src="${contextPath}/js/jquery.js"></script> 
+<script type="text/javascript" src="${contextPath}/js/login/loginUtils.js"></script>
