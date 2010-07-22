@@ -154,7 +154,9 @@
 	    </div>    
     </form>
   </c:if>
+  <c:set var="offerCancel" value="false"/>
   <c:if test="${requestScope.rangeOptionsExist == false }">
+  	<c:set var="offerCancel" value="true"/>
     <p>There are no entries in the system to select from.</p>
   </c:if>
 </c:if>
@@ -173,9 +175,12 @@
         <input type="hidden" value="${param.objectUri}" name="objectUri"/>        
 		<input type="hidden" value="create" name="cmd"/>        
 		<v:input type="typesForCreateNew" id="typeOfNew" />
-        <v:input type="submit" id="submit" value="add a new item to this list"/>
+        <v:input type="submit" id="submit" value="add a new item to this list" cancel="${offerCancel}"/>
 	</form>                            
 </c:if>
+
+
+  
 
 <c:if test="${(requestScope.predicate.offerCreateNewOption == false) && (requestScope.predicate.selectFromExisting == false)}">
  <p>This property is currently configured to prohibit editing. </p>
