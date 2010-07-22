@@ -62,7 +62,7 @@ public class EditSubmission {
             List<String> values = (valuesArray != null) ? Arrays.asList(valuesArray) : null;
             if( values != null && values.size() > 0){
                 if(  values.size() == 1 ) {
-                	uri = values.get(0);                    
+                	uri = values.get(0);                    	
                 } else if( values.size() > 1 ){
                 	uri = values.get(0);
                     log.error("Cannot yet handle multiple URIs for a single field, using first URI on list");
@@ -122,6 +122,15 @@ public class EditSubmission {
             }
         }
 
+        if( log.isDebugEnabled() ){        	
+        	for( String key : literalsFromForm.keySet() ){
+        		log.debug( key + " literal " + literalsFromForm.get(key) );
+        	}
+        	for( String key : urisFromForm.keySet() ){
+        		log.debug( key + " uri " + urisFromForm.get(key) );
+        	}
+        }
+        
         this.basicValidation = new BasicValidation(editConfig,this);
         Map<String,String> errors = basicValidation.validateUris( urisFromForm );
         if( errors != null ) {
