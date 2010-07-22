@@ -162,7 +162,7 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 		            		<c:set var="collateCurrentClassName" value="${objPropertyStmt.object.VClass.name}" />
 		            		<c:set var="collateClassesShownCount" value="${collateClassesShown + 1}"/>		            		
 		            		<li>
-		            		${collateCurrentClassName }
+		            		<h5 class="collate">${collateCurrentClassName}</h5>
 		            		<ul class='properties'><!-- collateClasses -->
 		            	</c:if>
 
@@ -222,7 +222,8 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 						<c:set var="stmtCounter" value="${stmtCounter+1}"/>
 					</c:forEach>
 					<c:if test="${objRows > 0}"></ul></c:if>
-					<c:if test="${ collateClassesShownCount > 0 }"></li><!-- collateClasses 2 --></c:if>										
+					<c:if test="${ collateClassesShownCount > 0 }"></li><!-- collateClasses 2 --></c:if>
+					<c:if test="${ collateByClass && collateClassesShownCount > 0 }"></ul><!-- collate end --></c:if>										
    					<c:if test="${ stmtCounter > displayLimit}">
    					</div><%-- navlinkblock --%>
    					</div><%-- extraEntities --%></c:if>
