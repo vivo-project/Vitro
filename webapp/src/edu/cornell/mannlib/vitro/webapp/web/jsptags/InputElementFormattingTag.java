@@ -30,6 +30,7 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDateTime;
+import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.vocabulary.XSD;
 
@@ -43,7 +44,9 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditSubmission;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.Field;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.SelectListGenerator;
+import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
+import edu.cornell.mannlib.vitro.webapp.web.DisplayVocabulary;
 
 /**
  * This tag will build an option list for individuals of a VClass.
@@ -406,6 +409,17 @@ public class InputElementFormattingTag extends TagSupport {
             }
             
             Field field = editConfig == null ? null : editConfig.getField(getId());
+            
+            // set ProhibitedFromSearch object so picklist doesn't show
+            // individuals from classes that should be hidden from list views
+        	OntModel displayOntModel = 
+    		    (OntModel) pageContext.getServletContext()
+    		        .getAttribute("displayOntModel");
+        	if (displayOntModel != null) {
+    	     	ProhibitedFromSearch pfs = new ProhibitedFromSearch(
+    				DisplayVocabulary.PRIMARY_LUCENE_INDEX_URI, displayOntModel);
+    	     	editConfig.setProhibitedFromSearch(pfs);
+        	}
            
             if( getType().equalsIgnoreCase("date") || 
                     (field != null && field.getRangeDatatypeUri() != null && field.getRangeDatatypeUri().equals(XSD.date.getURI())) ){

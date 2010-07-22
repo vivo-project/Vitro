@@ -32,6 +32,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
+import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 
 public class SelectListGenerator {
     
@@ -183,11 +184,26 @@ public class SelectListGenerator {
                         individuals = removeIndividualsAlreadyInRange(individuals,stmts,predicateUri,editConfig.getObject());
                         //Collections.sort(individuals,new compareIndividualsByName());
     
+                        ProhibitedFromSearch pfs = editConfig.getProhibitedFromSearch();
+                        
                         for( Individual ind : individuals ){
                             String uri = ind.getURI();
-                            if( uri != null ){                            
-                                optionsMap.put(uri,ind.getName().trim());                        
-                                ++optionsCount;
+                            if( uri != null ){   
+                            	boolean prohibited = false;
+                            	if (pfs != null) {
+                            		for (VClass vc : ind.getVClasses()) {
+                            			if (vc.getURI() != null) {
+                            				if (pfs.isClassProhibited(ind.getVClassURI())) {
+                            					prohibited = true;
+                            					break;
+                            				}
+                            			}
+                            		}
+                            	}
+                            	if (!prohibited) {
+                            		optionsMap.put(uri,ind.getName().trim());                        
+                            		++optionsCount;
+                            	}
                             }
                         }
                     }
@@ -225,9 +241,10 @@ public class SelectListGenerator {
                         optionsMap.put("", "Could not find class " + vclassUri);
                     }else{                
                         Map<String, Individual> individualMap = new HashMap<String, Individual>();
+                		
                         for (Individual ind : wDaoFact.getIndividualDao().getIndividualsByVClassURI(vclass.getURI(),-1,-1)) {
-                        	if (ind.getURI() != null) {
-                        		individualMap.put(ind.getURI(), ind);
+                        	if (ind.getURI() != null) {                        		
+                            	individualMap.put(ind.getURI(), ind);
                         	}
                         }
                         
@@ -248,12 +265,27 @@ public class SelectListGenerator {
                         if (individuals.size()==0){ 
                             log.error("No individuals of type "+vclass.getName()+" to add to pick list in SelectListGenerator.getOptions(); check portal visibility");
                             optionsMap.put("", "No " + vclass.getName() + " found");
-                        }else{                
+                        }else{
+                        	ProhibitedFromSearch pfs = editConfig.getProhibitedFromSearch();
                             for( Individual ind : individuals ) {
                                 String uri = ind.getURI();
-                                if( uri != null ) {                        
-                                    optionsMap.put(uri,ind.getName().trim());                        
-                                    ++optionsCount;
+                                if( uri != null ) {       
+                                	boolean prohibited = false;
+                                	if (pfs != null) {
+                                		for (VClass vc : ind.getVClasses()) {
+                                			if (vc.getURI() != null) {
+                                				if (pfs.isClassProhibited(ind.getVClassURI())) {
+                                					prohibited = true;
+                                					break;
+                                				}
+                                				
+                                			}
+                                		}
+                                	}
+                                	if(!prohibited) {
+                                		optionsMap.put(uri,ind.getName().trim());                        
+                                		++optionsCount;
+                                	}
                                 }
                             }
                         }
