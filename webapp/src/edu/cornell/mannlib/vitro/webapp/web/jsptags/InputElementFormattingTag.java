@@ -418,7 +418,8 @@ public class InputElementFormattingTag extends TagSupport {
         	if (displayOntModel != null) {
     	     	ProhibitedFromSearch pfs = new ProhibitedFromSearch(
     				DisplayVocabulary.PRIMARY_LUCENE_INDEX_URI, displayOntModel);
-    	     	editConfig.setProhibitedFromSearch(pfs);
+    	     	if( editConfig != null )
+    	     		editConfig.setProhibitedFromSearch(pfs);
         	}
            
             if( getType().equalsIgnoreCase("date") || 
