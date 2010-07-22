@@ -2,6 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.filestorage;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -42,7 +45,8 @@ public class FileServingHelper {
 	/**
 	 * <p>
 	 * Combine the URI and the filename to produce a relative URL for the file
-	 * (relative to the context of the webapp).
+	 * (relative to the context of the webapp). The filename will be URLEncoded
+	 * as needed.
 	 * </p>
 	 * <p>
 	 * This should involve stripping the default namespace from the front of the
@@ -66,6 +70,13 @@ public class FileServingHelper {
 			return uri;
 		}
 		String remainder = uri.substring(DEFAULT_NAMESPACE.length());
+
+		try {
+			filename = URLEncoder.encode(filename, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			log.error("No UTF-8 encoding?", e); // Can't happen.
+		}
+
 		String separator = remainder.endsWith("/") ? "" : "/";
 		return FILE_PATH + remainder + separator + filename;
 	}

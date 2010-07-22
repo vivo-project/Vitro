@@ -41,8 +41,8 @@
 				</c:forEach>
 				<c:if test="${!empty entity.thumbUrl}">
 				<div class="thumbnail">
-					<c:if test="${!empty entity.imageUrl}"><a target="_new" href="<c:url value='${entity.imageUrl}'/>"></c:if>
-					<img src="<c:url value='${entity.thumbUrl}'/>" title="click to view larger image in new window" width="150">
+					<c:if test="${!empty entity.imageUrl}"><a target="_new" href="${pageContext.request.contextPath}${entity.imageUrl}"></c:if>
+					<img src="${pageContext.request.contextPath}${entity.thumbUrl}" title="click to view larger image in new window" width="150">
 					<c:if test="${!empty entity.imageUrl}"></a></c:if>
 				</div>
 				</c:if>

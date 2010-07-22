@@ -49,7 +49,7 @@
 					<c:param name="uri" value="${ent.URI}"/>
 				</c:url>
 				<a class="image" href="<c:out value="${entityHref}"/>" >
-					<img width="${IMG_WIDTH}" src="<c:url value='${ent.thumbUrl}'/>" title="${ent.name}" alt="${ent.name}" />
+					<img width="${IMG_WIDTH}" src="${pageContext.request.contextPath}${ent.thumbUrl}" title="${ent.name}" alt="${ent.name}" />
 				</a>
 			</td>
 			</c:if>
