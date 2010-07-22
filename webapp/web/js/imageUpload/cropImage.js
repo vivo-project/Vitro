@@ -9,9 +9,13 @@
 			onSelect: showPreview,
 			setSelect:   [ 0, 0, 115, 115 ],
 			minSize: [ 115, 115 ],
+			boxWidth: 450,
 			aspectRatio: 1
 			
 		});
+		
+		
+		
 
 		var bounds = jcrop_api.getBounds();
 		var boundx = bounds[0];

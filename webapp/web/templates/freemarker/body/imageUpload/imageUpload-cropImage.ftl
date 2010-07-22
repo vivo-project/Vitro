@@ -16,11 +16,11 @@ ${stylesheets.add("/js/jquery_plugins/jcrop/jquery.Jcrop.css")}
 	the script below will reduce the width to 500 pixels and 
 	the height will be in proportion to the new height-->
 
-<#macro newImageSize>
+<#--<#macro newImageSize>
 <#if (imageWidth >= 500)>
 		width="500" height="${(500*imageHeight)/imageWidth}" 
 </#if>	   
-</#macro>
+</#macro>-->
 			
 
 <div id="photoCroppingContainer">
@@ -47,7 +47,7 @@ ${stylesheets.add("/js/jquery_plugins/jcrop/jquery.Jcrop.css")}
        </div>
        <div id="photoCropping">
              
-                     <img style="border:1px solid green;" src="${imageUrl}" <@newImageSize/> id="cropbox" />
+                     <img style="border:1px solid green;" src="${imageUrl}" <#--<@newImageSize/>--> id="cropbox" />
                    
        </div>
 </div>

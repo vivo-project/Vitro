@@ -11,7 +11,7 @@
 	</div>
 </noscript>
 
-<div id="formLogin" class="pageBodyGroup hidden" >
+<div id="formLogin" class="hidden" >
 
        <h2>Log in</h2>
        

@@ -10,19 +10,9 @@ ${scripts.add("/js/imageUpload/imageUploadUtils.js")}
 ${stylesheets.addFromTheme("/uploadImages.css")}
 
 
-<noscript>
-	<div id="javascriptDisableWrapper">
-		<div id="javascriptDisableContent">
-			<img src="${urls.siteIcons}/iconAlertBig.png" alt="Alert Icon"/>
-			<p>In order to upload or edit a photo, you'll need to enable JavaScript.</p>
-		</div>
-	</div>
-</noscript>
 
 
-
-
-<div id="photoUploadContainer" class="hidden">
+<div id="photoUploadContainer">
        <h2>Photo Upload</h2>
        
        
@@ -42,8 +32,10 @@ ${stylesheets.addFromTheme("/uploadImages.css")}
        
               <form action="${formAction}" enctype="multipart/form-data" method="post">
                      <label>Upload a photo <span> (JPEG, GIF or PNG)</span></label>
-                     <input id="datafile" type="file" name="datafile" size="30">
-                     <input type="submit" value="Upload photo"> or <a class="cancelUpload"  href="${cancelUrl}">Cancel</a>
+                     <input id="datafile" type="file" name="datafile" size="30" />
+                     <input type="submit" value="Upload photo"/> 
+                     <span class="or"> or 
+                     <a class="cancelUpload"  href="${cancelUrl}">Cancel</a></span>
               </form>
        </div>
 </div>
