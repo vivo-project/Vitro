@@ -379,6 +379,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
 	        doUpdate(prop,p,inv,ontModel);
 	        return 0;
         } finally {
+        	getOntModel().getBaseModel().notifyEvent(new EditEvent(getWebappDaoFactory().getUserURI(),false));
         	ontModel.leaveCriticalSection();
         }
     }

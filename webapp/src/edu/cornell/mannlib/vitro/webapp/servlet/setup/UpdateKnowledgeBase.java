@@ -104,7 +104,6 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 				  if (ontologyUpdater.updateRequired()) {
 					  ctx.setAttribute(LuceneSetup.INDEX_REBUILD_REQUESTED_AT_STARTUP, Boolean.TRUE);
 					  doMiscAppMetadataReplacements(ctx.getRealPath(MISC_REPLACEMENTS_FILE), oms);
-					  System.out.println(ctx.getRealPath(MISC_REPLACEMENTS_FILE));
 				  }
 			  } catch (Throwable t){
 				  log.error("Unable to perform miscellaneous application metadata replacements", t);

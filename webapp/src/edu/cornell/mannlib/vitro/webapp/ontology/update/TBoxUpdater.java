@@ -162,28 +162,29 @@ public class TBoxUpdater {
 			 			 			 
 			 if (!newObject.equals(oldObject)) {
 				 NodeIterator siteObjects = siteModel.listObjectsOfProperty(subject,predicate);
-				 
-				 if (siteObjects == null || !siteObjects.hasNext()) {
-					 continue;
-				 }
 			
-				 RDFNode siteObject = siteObjects.next();
-
-		         i = 1;
-				 while (siteObjects.hasNext()) {
-					 i++; 
-					 siteObjects.next();
-				 } 
-
-				 if (i > 1) {
-					 logger.log("WARNING: found " + i +
-							 " statements with subject = " + subject.getURI() + 
-							 " and property = " + predicate.getURI() +
-							 " in the site annotations model. (maximum of one is expected). "); 
-					 continue; 
+				 RDFNode siteObject = null;
+				
+				 if (siteObjects != null && siteObjects.hasNext()) {
+			
+					 siteObject = siteObjects.next();
+	
+			         i = 1;
+					 while (siteObjects.hasNext()) {
+						 i++; 
+						 siteObjects.next();
+					 } 
+	
+					 if (i > 1) {
+						 logger.log("WARNING: found " + i +
+								 " statements with subject = " + subject.getURI() + 
+								 " and property = " + predicate.getURI() +
+								 " in the site annotations model. (maximum of one is expected). "); 
+						 continue; 
+					 }
 				 }
 				 	 
-				 if (siteObject.equals(oldObject)) {
+				 if (siteObject == null || siteObject.equals(oldObject)) {
 	        	    try {
 	        	    	StmtIterator it = siteModel.listStatements(subject, predicate, (RDFNode)null);
 	        	    	while (it.hasNext()) {

@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
@@ -64,10 +65,28 @@ public class PropertyWebappsListingController extends BaseEditController {
         VClassDao vcDao = vrequest.getFullWebappDaoFactory().getVClassDao();
         PropertyGroupDao pgDao = vrequest.getFullWebappDaoFactory().getPropertyGroupDao();
 
+        String vclassURI = request.getParameter("vclassUri");
+        
         List props = new ArrayList();
         if (request.getParameter("propsForClass") != null) {
             noResultsMsgStr = "There are no properties that apply to this class.";
-            Collection propInsts = piDao.getAllPropInstByVClass(request.getParameter("vclassUri"));
+            
+            // incomplete list of classes to check, but better than before
+            List<String> superclassURIs = vcDao.getAllSuperClassURIs(vclassURI);
+            superclassURIs.add(vclassURI);
+            superclassURIs.addAll(vcDao.getEquivalentClassURIs(vclassURI));
+            
+            Map<String, PropertyInstance> propInstMap = new HashMap<String, PropertyInstance>();
+            for (String classURI : superclassURIs) {
+            	Collection<PropertyInstance> propInsts = piDao.getAllPropInstByVClass(classURI);
+            	for (PropertyInstance propInst : propInsts) {
+            		propInstMap.put(propInst.getPropertyURI(), propInst);
+            	}
+            }
+            List<PropertyInstance> propInsts = new ArrayList<PropertyInstance>();
+            propInsts.addAll(propInstMap.values());
+            Collections.sort(propInsts);
+            
             Iterator propInstIt = propInsts.iterator();
             HashSet propURIs = new HashSet();
             while (propInstIt.hasNext()) {

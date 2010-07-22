@@ -117,12 +117,14 @@ public class BrowseController extends FreeMarkerHttpServlet {
             // Get all classgroups, each populated with a list of their member vclasses
             List groups = vcgDao.getPublicGroupsWithVClasses(ORDER_BY_DISPLAYRANK, !INCLUDE_UNINSTANTIATED); 
 
+            // remove classes that have been configured to be hidden
+            // from search results
+            removeClassesHiddenFromSearch(groups);
+            
             // now cull out the groups with no populated classes
             //removeUnpopulatedClasses( groups);
             vcgDao.removeUnpopulatedGroups(groups);
             
-            removeClassesHiddenFromSearch(groups);
-
             _groupListMap.put(portalId, groups);
             return groups;
         } else {
