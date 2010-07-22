@@ -136,9 +136,11 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 				(Boolean)sce.getServletContext().getAttribute(INDEX_REBUILD_REQUESTED_AT_STARTUP) ){
 				builder.doIndexRebuild();
 				log.info("Rebuild of search index required before startup.");
+				int n = 0;
 				while( builder.isIndexing() ){
-					Thread.currentThread().sleep(200);					
-					log.info("Still rebulding search index");
+					Thread.currentThread().sleep(500);
+					if( n % 20 == 0 ) //output message every 10 sec. 
+					    log.info("Still rebulding search index");
 				}
 				log.info("Search index rebuild completed.");				
 			}
