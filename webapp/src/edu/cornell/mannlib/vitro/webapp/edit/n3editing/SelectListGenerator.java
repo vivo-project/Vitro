@@ -265,8 +265,6 @@ public class SelectListGenerator {
                         List<Individual> individuals = new ArrayList<Individual>();
                         individuals.addAll(individualMap.values());
                         Collections.sort(individuals);
-                        
-                        Map<String, Individual> individualMap = new HashMap<String, Individual>();
                 		
                         for (Individual ind : wDaoFact.getIndividualDao().getIndividualsByVClassURI(vclass.getURI(),-1,-1)) {
                         	if (ind.getURI() != null) {                        		
@@ -284,7 +282,6 @@ public class SelectListGenerator {
                         	}
                         }
                         
-                        List<Individual> individuals = new ArrayList<Individual>();
                         individuals.addAll(individualMap.values());
                         Collections.sort(individuals);
                         
