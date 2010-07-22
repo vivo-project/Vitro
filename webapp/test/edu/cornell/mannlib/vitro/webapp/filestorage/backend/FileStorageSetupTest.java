@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.filestorage.backend;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 import java.io.File;
@@ -57,8 +58,8 @@ public class FileStorageSetupTest extends AbstractTestClass {
 		System.setProperty(InitialContext.INITIAL_CONTEXT_FACTORY,
 				InitialContextFactoryStub.class.getName());
 		InitialContextStub.reset();
-		new InitialContext().bind("java:comp/env/path.configuration", propsFile
-				.getPath());
+		new InitialContext().bind("java:comp/env/path.configuration",
+				propsFile.getPath());
 	}
 
 	@Before
@@ -77,29 +78,37 @@ public class FileStorageSetupTest extends AbstractTestClass {
 	// tests
 	// ----------------------------------------------------------------------
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void baseDirectoryNotSpecified() {
 		setConfigurationProperties(null, "http://vivo.myDomain.edu/individual/");
 		fss.contextInitialized(sce);
+		assertNull("no base directory",
+				sc.getAttribute(FileStorageSetup.ATTRIBUTE_NAME));
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void baseDirectoryDoesntExist() throws IOException {
 		setConfigurationProperties("/bogus/Directory",
 				"http://vivo.myDomain.edu/individual/");
 		fss.contextInitialized(sce);
+		assertNull("no such directory",
+				sc.getAttribute(FileStorageSetup.ATTRIBUTE_NAME));
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void defaultNamespaceNotSpecified() {
 		setConfigurationProperties(tempDir.getPath(), null);
 		fss.contextInitialized(sce);
+		assertNull("no default namespace",
+				sc.getAttribute(FileStorageSetup.ATTRIBUTE_NAME));
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void defaultNamespaceIsBogus() throws IOException {
 		setConfigurationProperties(tempDir.getPath(), "namespace");
 		fss.contextInitialized(sce);
+		assertNull("default namespace is bogus",
+				sc.getAttribute(FileStorageSetup.ATTRIBUTE_NAME));
 	}
 
 	@Test
@@ -111,8 +120,8 @@ public class FileStorageSetupTest extends AbstractTestClass {
 		Object o = sc.getAttribute(FileStorageSetup.ATTRIBUTE_NAME);
 		FileStorage fs = (FileStorage) o;
 
-		assertEquals("implementation class", FileStorageImpl.class, fs
-				.getClass());
+		assertEquals("implementation class", FileStorageImpl.class,
+				fs.getClass());
 	}
 
 	// ----------------------------------------------------------------------

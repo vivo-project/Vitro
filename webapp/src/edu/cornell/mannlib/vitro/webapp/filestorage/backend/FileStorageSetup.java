@@ -3,13 +3,15 @@
 package edu.cornell.mannlib.vitro.webapp.filestorage.backend;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 
@@ -18,6 +20,8 @@ import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
  * context.
  */
 public class FileStorageSetup implements ServletContextListener {
+	private static final Log log = LogFactory.getLog(FileStorageSetup.class);
+
 	/**
 	 * The implementation of the {@link FileStorage} system will be stored in
 	 * the {@link ServletContext} as an attribute with this name.
@@ -43,18 +47,16 @@ public class FileStorageSetup implements ServletContextListener {
 	 */
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
-		FileStorage fs;
 		try {
 			File baseDirectory = figureBaseDir();
 			Collection<String> fileNamespace = confirmDefaultNamespace();
-			fs = new FileStorageImpl(baseDirectory, fileNamespace);
-		} catch (IOException e) {
-			throw new IllegalStateException(
-					"Failed to initialize the file system.", e);
-		}
+			FileStorage fs = new FileStorageImpl(baseDirectory, fileNamespace);
 
-		ServletContext sc = sce.getServletContext();
-		sc.setAttribute(ATTRIBUTE_NAME, fs);
+			ServletContext sc = sce.getServletContext();
+			sc.setAttribute(ATTRIBUTE_NAME, fs);
+		} catch (Exception e) {
+			log.fatal("Failed to initialize the file system.", e);
+		}
 	}
 
 	/**
