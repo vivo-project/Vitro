@@ -30,8 +30,12 @@
         if( editConfig != null ){
             String predicateUri = editConfig.getPredicateUri();            
             if( predicateUri != null ){
-            	Property prop = ResourceFactory.createProperty(predicateUri);
-            	predicateLocalName = prop.getLocalName();            	
+            	try{
+            		Property prop = ResourceFactory.createProperty(predicateUri);
+            		predicateLocalName = prop.getLocalName();
+            	}catch (com.hp.hpl.jena.shared.InvalidPropertyURIException e){            		
+            		log.debug("could not convert predicateUri into a valid URI",e);
+            	}            	            	
             }                        
                         
             if( editConfig.getEntityToReturnTo() != null && editConfig.getEntityToReturnTo().startsWith("?") ){            	
