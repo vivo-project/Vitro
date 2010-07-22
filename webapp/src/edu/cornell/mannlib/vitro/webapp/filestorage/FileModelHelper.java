@@ -448,7 +448,7 @@ public class FileModelHelper {
 	}
 
 	/**
-	 * Store this file surrogate as the thumnail on this entity.
+	 * Store this file surrogate as the thumbnail on this entity.
 	 */
 	public void setThumbnailOnIndividual(Individual entity,
 			Individual thumbnailSurrogate) {
