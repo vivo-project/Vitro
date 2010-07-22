@@ -1028,6 +1028,7 @@ public class JenaIngestController extends BaseEditController {
 		Resource res1 = vitroJenaModel.getResource(uri1);
 		Resource res2 = vitroJenaModel.getResource(uri2);
 		String result = null;
+		boolean functionalPresent = false;
 		vitroJenaModel.enterCriticalSection(Lock.WRITE);
 		StmtIterator stmtItr1 = vitroJenaModel.listStatements(res1,(Property)null,(RDFNode)null);
 		StmtIterator stmtItr2 = vitroJenaModel.listStatements(res2,(Property)null,(RDFNode)null);
@@ -1053,6 +1054,7 @@ public class JenaIngestController extends BaseEditController {
 			OntProperty oprop = vitroJenaModel.getOntProperty(prop.getURI());
 		    if(oprop!=null && oprop.isFunctionalProperty()){
 		    	leftoverModel.add(res2,stmt.getPredicate(),stmt.getObject());
+		    	functionalPresent = true;
 		    }
 		    else{
 		    vitroJenaModel.add(res1,stmt.getPredicate(),stmt.getObject()); 
@@ -1061,20 +1063,15 @@ public class JenaIngestController extends BaseEditController {
 		}
 		res2.removeAll((Property)null);
 		vitroJenaModel.leaveCriticalSection();
-		/*response.setContentType("RDF/XML-ABBREV");
-		try{
-		OutputStream outStream = response.getOutputStream();
-		outStream.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>".getBytes());
-		leftoverModel.write( outStream,"RDF/XML-ABBREV");
-		outStream.flush();
-		outStream.close();
-		}
-		catch(IOException ioe){
-			throw new RuntimeException(ioe);
-		}*/
 		request.getSession().setAttribute("leftoverModel", leftoverModel);
-		result = "merging done for " + counter + " statements.";
-		return result;
+		if(counter>0 && functionalPresent)
+			result = "merged " + counter + " statements. Some statements could not be merged.";
+			else if(counter>0 && !functionalPresent)
+			result = "merged " + counter + " statements.";	
+			else if(counter==0)
+			result = "No statements merged";
+			return result;
+		
 			
 	}
 private String doRename(String oldNamespace,String newNamespace,HttpServletResponse response){
