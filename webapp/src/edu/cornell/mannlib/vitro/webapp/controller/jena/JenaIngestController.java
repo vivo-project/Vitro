@@ -979,7 +979,7 @@ public class JenaIngestController extends BaseEditController {
 				if(oldNamespace.equals(res.getNameSpace())){
 					Resource newRes = null;
 					if(!newNamespace.equals("")){
-						uri = getUnusedURI(newNamespace);
+						uri = getUnusedURI(newNamespace,wdf);
 					}
 					else if(!dNamespace.equals("")){
 						try{
@@ -1004,21 +1004,23 @@ public class JenaIngestController extends BaseEditController {
 		
 			
 		}
-	private String getUnusedURI(String newNamespace){
+	private String getUnusedURI(String newNamespace,WebappDaoFactory wdf){
 		String uri = null;
-		Random random = new Random(Integer.MAX_VALUE);
-		boolean resourcePresent=true;
-		OntModel vitroJenaModel = (OntModel) getServletContext().getAttribute("baseOntModel");
-		Resource res = null;
-		do{
-		uri = newNamespace + "n" + random.nextInt();
-		res = vitroJenaModel.getResource(uri);
-		StmtIterator stmtItr1 = vitroJenaModel.listStatements(res,(Property)null,(RDFNode)null);
-		if(!stmtItr1.hasNext()){
-			resourcePresent=false;
-			res.removeAll((Property)null);
-		}
-		}while(resourcePresent);
+		String errMsg = null;
+		Random random = new Random();
+		boolean uriIsGood = false;
+        int attempts = 0;
+		
+        while( uriIsGood == false && attempts < 30 ){			
+        	uri = newNamespace + "n" + random.nextInt( Math.min(Integer.MAX_VALUE,(int)Math.pow(2,attempts + 13)) );			
+        	errMsg = wdf.checkURI(uri);
+			if(  errMsg != null)
+				uri = null;
+			else
+				uriIsGood = true;				
+			attempts++;
+		}   
+        
 		return uri;
 	}
 	private String doMerge(String uri1, String uri2,HttpServletResponse response,HttpServletRequest request){
