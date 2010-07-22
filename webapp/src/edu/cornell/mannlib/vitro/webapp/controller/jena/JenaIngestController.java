@@ -15,6 +15,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
@@ -1073,7 +1075,7 @@ public class JenaIngestController extends BaseEditController {
 		return result;
 			
 	}
-private String doRename(String uri1,String uri2,HttpServletResponse response){
+private String doRename(String oldNamespace,String newNamespace,HttpServletResponse response){
 		
 		String userURI = null;
 		String uri = null;
@@ -1097,7 +1099,7 @@ private String doRename(String uri1,String uri2,HttpServletResponse response){
 		Individual ind = indIter.next();
 		String namespace = ind.getNameSpace();
 		if( namespace != null ){
-		if( uri1.equals(namespace) ){
+		if( oldNamespace.equals(namespace) ){
 		uri = ind.getURI();	
 		urisToChange.add(uri);
 		namespacePresent = true;
@@ -1123,7 +1125,10 @@ private String doRename(String uri1,String uri2,HttpServletResponse response){
 		Resource infRes = infOntModel.getResource(oldURIStr);
 		long time2 = System.currentTimeMillis();
 		String newURIStr=null;
-		newURIStr = getUnusedURI(uri2);
+		Pattern p = Pattern.compile(oldNamespace);
+		String candidateString = res.getURI();
+		Matcher matcher = p.matcher(candidateString);
+		newURIStr = matcher.replaceFirst(newNamespace);
 		long time3 = System.currentTimeMillis();
 		System.out.println("time to get new uri: " + Long.toString(time3 - time2)
 		);
