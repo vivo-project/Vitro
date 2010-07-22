@@ -52,10 +52,9 @@ public class UpdateUploadedFiles implements ServletContextListener {
 						+ "The ServletContext does not contain an attribute "
 						+ "for '" + "webappDaoFactory" + "'. "
 						+ "Does the log contain a previous exception from "
-						+ "JenaDataSourceSetup? Have you looked in "
-						+ "localhost.log for such an exception? Is it "
-						+ "possible that web.xml is not set up to run "
-						+ "JenaDataSourceSetup before UpdateUploadedFiles?");
+						+ "JenaDataSourceSetup? Is it possible that web.xml "
+						+ "is not set up to run JenaDataSourceSetup before "
+						+ "UpdateUploadedFiles?");
 			}
 
 			OntModel jenaOntModel = (OntModel) ctx
@@ -65,10 +64,9 @@ public class UpdateUploadedFiles implements ServletContextListener {
 						+ "The ServletContext does not contain an attribute "
 						+ "for '" + JENA_ONT_MODEL_ATTRIBUTE_NAME + "'. "
 						+ "Does the log contain a previous exception from "
-						+ "JenaDataSourceSetup? Have you looked in "
-						+ "localhost.log for such an exception? Is it "
-						+ "possible that web.xml is not set up to run "
-						+ "JenaDataSourceSetup before UpdateUploadedFiles?");
+						+ "JenaDataSourceSetup? Is it possible that web.xml "
+						+ "is not set up to run JenaDataSourceSetup before "
+						+ "UpdateUploadedFiles?");
 			}
 
 			FileStorage fileStorage = (FileStorage) ctx
@@ -78,10 +76,9 @@ public class UpdateUploadedFiles implements ServletContextListener {
 						+ "The ServletContext does not contain an attribute "
 						+ "for '" + FileStorageSetup.ATTRIBUTE_NAME + "'. "
 						+ "Does the log contain a previous exception from "
-						+ "FileStorageSetup? Have you looked in "
-						+ "localhost.log for such an exception? Is it "
-						+ "possible that web.xml is not set up to run "
-						+ "FileStorageSetup before UpdateUploadedFiles?");
+						+ "FileStorageSetup? Is it possible that web.xml is "
+						+ "not set up to run FileStorageSetup before "
+						+ "UpdateUploadedFiles?");
 			}
 
 			String uploadDirectoryName = ConfigurationProperties
@@ -104,8 +101,7 @@ public class UpdateUploadedFiles implements ServletContextListener {
 					fileStorage, uploadDirectory, webappImageDirectory);
 			fsu.update();
 		} catch (Exception e) {
-			log.error("Unknown problem", e);
-			throw new RuntimeException(e);
+			log.fatal("Unknown problem", e);
 		}
 	}
 }
