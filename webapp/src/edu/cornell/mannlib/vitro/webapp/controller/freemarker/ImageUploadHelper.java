@@ -204,8 +204,8 @@ public class ImageUploadHelper {
 					source);
 			RenderedOp image = JAI.create("stream", stream);
 
-			Dimensions size = new Dimensions(image.getWidth(), image
-					.getHeight());
+			Dimensions size = new Dimensions(image.getWidth(),
+					image.getHeight());
 			log.debug("new image size is " + size);
 
 			if ((size.height < THUMBNAIL_HEIGHT)
@@ -471,33 +471,20 @@ public class ImageUploadHelper {
 	}
 
 	/**
-	 * If the source image was too big to fit in the page, then it was displayed
-	 * at a reduced scale, and needs to be unscaled.
-	 * 
-	 * The bounds should be limited to the bounds of the image.
+	 * The bounds of the cropping rectangle should be limited to the bounds of
+	 * the image.
 	 */
 	private CropRectangle adjustCropRectangle(CropRectangle crop,
 			int imageWidth, int imageHeight) {
 		log.debug("Generating a thumbnail, initial crop info: " + crop);
 
-		CropRectangle adjusted;
-		if (imageWidth <= MAXIMUM_IMAGE_DISPLAY_WIDTH) {
-			adjusted = crop;
-		} else {
-			float displayScale = ((float) MAXIMUM_IMAGE_DISPLAY_WIDTH)
-					/ ((float) imageWidth);
-			adjusted = crop.unscale(displayScale);
-			log.debug("Generating a thumbnail, unscaled crop info: " + adjusted
-					+ ", displayScale=" + displayScale);
-		}
-
 		// Insure that x and y fall within the image dimensions.
-		int x = Math.max(0, Math.min(imageWidth, Math.abs(adjusted.x)));
-		int y = Math.max(0, Math.min(imageHeight, Math.abs(adjusted.y)));
+		int x = Math.max(0, Math.min(imageWidth, Math.abs(crop.x)));
+		int y = Math.max(0, Math.min(imageHeight, Math.abs(crop.y)));
 
 		// Insure that width and height are reasonable.
-		int w = Math.max(5, Math.min(imageWidth - x, adjusted.width));
-		int h = Math.max(5, Math.min(imageHeight - y, adjusted.height));
+		int w = Math.max(5, Math.min(imageWidth - x, crop.width));
+		int h = Math.max(5, Math.min(imageHeight - y, crop.height));
 
 		CropRectangle bounded = new CropRectangle(x, y, h, w);
 		log.debug("Generating a thumbnail, bounded crop info: " + bounded);
