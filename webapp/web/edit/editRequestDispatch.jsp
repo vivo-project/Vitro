@@ -66,7 +66,7 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
    String typeOfNew = request.getParameter("typeOfNew");
   
    //If there is no specified editForm then the subjectURI and the predicate
-   //are needed to determin which form to use for this edit. 
+   //are needed to determine which form to use for this edit. 
    if (formParam == null || "".equals(formParam)) {
        if (subjectUri == null || subjectUri.trim().length() == 0)
            throw new Error(
@@ -114,9 +114,6 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 
    if( subjectUri != null ){
        Individual subject = wdf.getIndividualDao().getIndividualByURI(subjectUri);
-       //if (subject == null && formParam == null)
-       //     throw new Error("In editRequestDispatch.jsp, could not find subject in model: '"
-       //                     + subjectUri + "'");
        if( subject != null ){
            request.setAttribute("subject", subject);
        }
