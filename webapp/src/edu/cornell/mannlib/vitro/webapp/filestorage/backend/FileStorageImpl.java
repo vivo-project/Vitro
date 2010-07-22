@@ -17,11 +17,9 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -62,10 +60,15 @@ public class FileStorageImpl implements FileStorage {
 				FILE_STORAGE_NAMESPACES_PROPERTIES);
 
 		if (rootDir.exists() && namespaceFile.exists()) {
-			this.namespacesMap = confirmNamespaces(namespaces);
+			Map<Character, String> existingMap = readNamespaces();
+			this.namespacesMap = adjustNamespaces(existingMap, namespaces);
+			if (!namespacesMap.equals(existingMap)) {
+				initializeNamespacesFile();
+			}
 		} else if (!rootDir.exists() && !namespaceFile.exists()) {
 			this.namespacesMap = mapNamespaces(namespaces);
-			initializeStorage();
+			initializeRootDirectory();
+			initializeNamespacesFile();
 		} else if (rootDir.exists()) {
 			throw new IllegalStateException("Storage directory '"
 					+ baseDir.getPath() + "' has been partially initialized. '"
@@ -114,30 +117,16 @@ public class FileStorageImpl implements FileStorage {
 	 */
 	private Map<Character, String> mapNamespaces(Collection<String> namespaces) {
 		Map<Character, String> map = new HashMap<Character, String>();
-
-		char prefixChar = 'a';
 		for (String namespace : namespaces) {
-			map.put(prefixChar, namespace);
-			prefixChar++;
-			if (prefixChar > 'z') {
-				throw new IllegalArgumentException(
-						"Can't handle more than 26 namespaces.");
-			}
+			map.put(findAvailableKey(map), namespace);
 		}
 		return map;
 	}
 
 	/**
-	 * Create the root directory and the namespaces file. Write the namespaces
-	 * map to the namespaces file.
+	 * @throws FileNotFoundException
 	 */
-	private void initializeStorage() throws IOException {
-		boolean created = this.rootDir.mkdir();
-		if (!created) {
-			throw new IOException("Failed to create root directory '"
-					+ this.rootDir + "'");
-		}
-
+	private void initializeNamespacesFile() throws FileNotFoundException {
 		PrintWriter writer = null;
 		try {
 			writer = new PrintWriter(this.namespaceFile);
@@ -152,22 +141,34 @@ public class FileStorageImpl implements FileStorage {
 	}
 
 	/**
-	 * Confirm that the namespaces file contains mappings for these namespaces,
-	 * and only these namespaces.
+	 * Create the root directory. Check for success.
 	 */
-	private Map<Character, String> confirmNamespaces(
-			Collection<String> namespaces) throws IOException {
-		Map<Character, String> map;
+	private void initializeRootDirectory() throws IOException {
+		boolean created = this.rootDir.mkdir();
+		if (!created) {
+			throw new IOException("Failed to create root directory '"
+					+ this.rootDir + "'");
+		}
+	}
+
+	/**
+	 * Load the namespaces file from the disk. It's easy to load into a
+	 * {@link Properties}, but we need to convert it to a {@link Map}.
+	 */
+	private Map<Character, String> readNamespaces() throws IOException {
 		Reader reader = null;
 		try {
 			reader = new FileReader(this.namespaceFile);
 			Properties props = new Properties();
 			props.load(reader);
-			map = new HashMap<Character, String>();
+
+			Map<Character, String> map = new HashMap<Character, String>();
 			for (Object key : props.keySet()) {
 				char keyChar = key.toString().charAt(0);
 				map.put(keyChar, (String) props.get(key));
 			}
+
+			return map;
 		} catch (Exception e) {
 			throw new IOException("Problem loading the namespace file.");
 		} finally {
@@ -179,19 +180,40 @@ public class FileStorageImpl implements FileStorage {
 				}
 			}
 		}
+	}
 
-		Set<String> requestedNamespaces = new HashSet<String>(namespaces);
-		Set<String> previousNamespaces = new HashSet<String>(map.values());
-		if (!requestedNamespaces.equals(previousNamespaces)) {
-			throw new IllegalStateException(
-					"File storage was previously initialized with a "
-							+ "different set of namespaces than are found "
-							+ "in the current request. Previous: "
-							+ previousNamespaces + ", Requested: "
-							+ requestedNamespaces);
+	/**
+	 * If any of the requested aren't in the existing map, add them.
+	 */
+	private Map<Character, String> adjustNamespaces(
+			Map<Character, String> existingMap, Collection<String> namespaces) {
+		Map<Character, String> adjustedMap = new HashMap<Character, String>(
+				existingMap);
+
+		for (String namespace : namespaces) {
+			if (!existingMap.values().contains(namespace)) {
+				log.warn("Adding a new namespace to the file storage system: "
+						+ namespace);
+				Character key = findAvailableKey(adjustedMap);
+				adjustedMap.put(key, namespace);
+			}
 		}
 
-		return map;
+		return adjustedMap;
+	}
+
+	/**
+	 * Are there any characters that we're not using as prefixes? We only allow
+	 * a-z.
+	 */
+	private Character findAvailableKey(Map<Character, String> adjustedMap) {
+		for (char key = 'a'; key <= 'z'; key++) {
+			if (!adjustedMap.keySet().contains(key)) {
+				return key;
+			}
+		}
+		throw new IllegalArgumentException(
+				"Can't handle more than 26 namespaces.");
 	}
 
 	// ----------------------------------------------------------------------
