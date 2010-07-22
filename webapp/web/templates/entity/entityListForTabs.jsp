@@ -80,7 +80,7 @@
     						<c:param name="home" value="${sessionScope.currentPortalId}"/>
     						<c:param name="uri" value="${ent.URI}"/>
     					</c:url>
-                  <div class="tab-image"><a class="image" href="<c:out value="${imageHref}"/>"><img width="${IMG_WIDTH}" src="<c:url value='${ent.thumbUrl}'/>" title="${ent.name}" alt="" /></a></div>
+                  <div class="tab-image"><a class="image" href="<c:out value="${imageHref}"/>"><img width="${IMG_WIDTH}" src="${pageContext.request.contextPath}${ent.thumbUrl}" title="${ent.name}" alt="" /></a></div>
                   <c:if test="${not empty ent.blurb}"><div class='blurb'>${ent.blurb}</div></c:if>
             </c:when>
             <c:otherwise>

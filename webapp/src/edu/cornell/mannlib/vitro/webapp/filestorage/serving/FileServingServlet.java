@@ -9,6 +9,8 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -95,7 +97,8 @@ public class FileServingServlet extends VitroHttpServlet {
 			response.sendError(SC_NOT_FOUND, ("File not found: " + path));
 			return;
 		}
-		if (!actualFilename.equals(requestedFilename)) {
+		if (!actualFilename.equals(requestedFilename)
+				&& !actualFilename.equals(decode(requestedFilename))) {
 			log.warn("The requested filename does not match the "
 					+ "actual filename; request: '" + path + "', actual: '"
 					+ actualFilename + "'");
@@ -160,6 +163,18 @@ public class FileServingServlet extends VitroHttpServlet {
 			return path;
 		} else {
 			return path.substring(slashHere + 1);
+		}
+	}
+
+	/**
+	 * The filename may have been encoded for URL transfer.
+	 */
+	private String decode(String filename) {
+		try {
+			return URLDecoder.decode(filename, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			log.error("How did this happen?", e);
+			return filename;
 		}
 	}
 

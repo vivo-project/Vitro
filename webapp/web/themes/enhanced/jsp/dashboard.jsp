@@ -22,9 +22,9 @@
 <div id="dashboard"<c:if test="${showCuratorEdits}"> class="loggedIn"</c:if>>
     <c:if test="${!empty entity.thumbUrl}">
         <c:if test="${!empty entity.imageUrl}">
-            <a class="image" href="<c:url value='${entity.imageUrl}'/>">
+            <a class="image" href="${pageContext.request.contextPath}${entity.imageUrl}">
         </c:if>
-        <img class="headshot" src="<c:url value='${entity.thumbUrl}'/>" title="click to view larger image in new window" alt="" width="150"/>
+        <img class="headshot" src="${pageContext.request.contextPath}${entity.thumbUrl}" title="click to view larger image in new window" alt="" width="150"/>
         <c:if test="${!empty entity.imageUrl}"></a></c:if>        
     </c:if>
        
