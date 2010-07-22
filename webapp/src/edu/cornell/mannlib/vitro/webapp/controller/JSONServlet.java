@@ -22,11 +22,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.hp.hpl.jena.ontology.OntModel;
+
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.SelectListGenerator;
+import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
+import edu.cornell.mannlib.vitro.webapp.web.DisplayVocabulary;
 
 /**
  * This servlet is for servicing requests for JSON objects/data.
@@ -84,6 +88,17 @@ public class JSONServlet extends VitroHttpServlet {
         if( log.isDebugEnabled() )
             log.debug(" attempting to get option list for field '" + field + "'");            
         
+        // set ProhibitedFromSearch object so picklist doesn't show
+        // individuals from classes that should be hidden from list views
+    	OntModel displayOntModel = 
+		    (OntModel) getServletConfig().getServletContext()
+		    .getAttribute("displayOntModel");
+    	if (displayOntModel != null) {
+	     	ProhibitedFromSearch pfs = new ProhibitedFromSearch(
+				DisplayVocabulary.PRIMARY_LUCENE_INDEX_URI, displayOntModel);
+	     	editConfig.setProhibitedFromSearch(pfs);
+    	}
+	
         Map<String,String> options = SelectListGenerator.getOptions(editConfig, field, (new VitroRequest(req)).getFullWebappDaoFactory());
         resp.setContentType("application/json");
         ServletOutputStream out = resp.getOutputStream();

@@ -33,6 +33,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.identifier.ServletIdentifierBundleF
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.UserToIndIdentifierFactory;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
+import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 
 /**
  * Represents a set of fields on a form and how parameters from a from
@@ -92,6 +93,8 @@ public class EditConfiguration {
     private List<ModelChangePreprocessor> modelChangePreprocessors;
     
     private List<EditSubmissionPreprocessor> editSubmissionPreprocessors = null;
+    
+    private ProhibitedFromSearch prohibitedFromSearch;
 
     /** 
      * If true, then any dependent resources that are unlinked should be
@@ -831,6 +834,14 @@ public class EditConfiguration {
     
     public void addModelChangePreprocessor( ModelChangePreprocessor modelChangePreprocessor) {
     	this.modelChangePreprocessors.add( modelChangePreprocessor );
+    }
+    
+    public void setProhibitedFromSearch( ProhibitedFromSearch prohibitedFromSearch) {
+    	this.prohibitedFromSearch = prohibitedFromSearch;
+    }
+    
+    public ProhibitedFromSearch getProhibitedFromSearch() {
+    	return this.prohibitedFromSearch;
     }
     
     private void debugScope(String msg){
