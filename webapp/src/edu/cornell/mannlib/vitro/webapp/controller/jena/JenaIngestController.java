@@ -1024,54 +1024,86 @@ public class JenaIngestController extends BaseEditController {
 		return uri;
 	}
 	private String doMerge(String uri1, String uri2,HttpServletResponse response,HttpServletRequest request){
-		OntModel vitroJenaModel = (OntModel) getServletContext().getAttribute("baseOntModel");
-		Resource res1 = vitroJenaModel.getResource(uri1);
-		Resource res2 = vitroJenaModel.getResource(uri2);
-		String result = null;
+		OntModel baseOntModel = (OntModel) getServletContext().getAttribute("baseOntModel");
+		OntModel ontModel = (OntModel)
+		getServletContext().getAttribute("jenaOntModel");
+		OntModel infOntModel = (OntModel)
+		getServletContext().getAttribute(JenaBaseDao.INFERENCE_ONT_MODEL_ATTRIBUTE_NAME);
 		boolean functionalPresent = false;
-		vitroJenaModel.enterCriticalSection(Lock.WRITE);
-		StmtIterator stmtItr1 = vitroJenaModel.listStatements(res1,(Property)null,(RDFNode)null);
-		StmtIterator stmtItr2 = vitroJenaModel.listStatements(res2,(Property)null,(RDFNode)null);
+		Resource res1 = baseOntModel.getResource(uri1);
+		Resource res2 = baseOntModel.getResource(uri2);
+		String result = null;
+		baseOntModel.enterCriticalSection(Lock.WRITE);
+		
+		StmtIterator stmtItr1 = baseOntModel.listStatements(res1,(Property)null,(RDFNode)null);
+		StmtIterator stmtItr2 = baseOntModel.listStatements(res2,(Property)null,(RDFNode)null);
+		StmtIterator stmtItr3 = baseOntModel.listStatements((Resource)null,(Property)null,(RDFNode)res2);
+		
 		if(!stmtItr1.hasNext()){
 			result = "resource 1 not present";
 			res1.removeAll((Property)null);
-			vitroJenaModel.leaveCriticalSection();
+			baseOntModel.leaveCriticalSection();
 			return result;
 		}
 		else if(!stmtItr2.hasNext()){
 			result = "resource 2 not present";
 			res2.removeAll((Property)null);
-			vitroJenaModel.leaveCriticalSection();
+			baseOntModel.leaveCriticalSection();
 			return result;
 		}
-		
 		int counter = 0;
 		Model leftoverModel = ModelFactory.createDefaultModel();
+		ontModel.enterCriticalSection(Lock.WRITE);
+		infOntModel.enterCriticalSection(Lock.WRITE);
+		try{
+		
 		while(stmtItr2.hasNext()){
 		
 			Statement stmt = stmtItr2.next();
 			Property prop = stmt.getPredicate();
-			OntProperty oprop = vitroJenaModel.getOntProperty(prop.getURI());
+			OntProperty oprop = baseOntModel.getOntProperty(prop.getURI());
 		    if(oprop!=null && oprop.isFunctionalProperty()){
 		    	leftoverModel.add(res2,stmt.getPredicate(),stmt.getObject());
 		    	functionalPresent = true;
 		    }
 		    else{
-		    vitroJenaModel.add(res1,stmt.getPredicate(),stmt.getObject()); 
+		    baseOntModel.add(res1,stmt.getPredicate(),stmt.getObject()); 
+		    ontModel.add(res1,stmt.getPredicate(),stmt.getObject());
+		    infOntModel.add(res1,stmt.getPredicate(),stmt.getObject());
 		    counter++;
 		    }
 		}
+		  
+		while(stmtItr3.hasNext()){
+			Statement stmt = stmtItr3.nextStatement();
+			Resource sRes = stmt.getSubject();
+			Property sProp = stmt.getPredicate();
+			baseOntModel.add(sRes,sProp,res1);
+			ontModel.add(sRes,sProp,res1);
+			infOntModel.add(sRes,sProp,res1);
+		}
+		Resource ontRes = ontModel.getResource(res2.getURI());
+		Resource infRes = infOntModel.getResource(res2.getURI());
+		baseOntModel.removeAll((Resource)null,(Property)null,(RDFNode)res2);
+		ontModel.removeAll((Resource)null,(Property)null,(RDFNode)res2);
+		infOntModel.removeAll((Resource)null,(Property)null,(RDFNode)res2);
 		res2.removeAll((Property)null);
-		vitroJenaModel.leaveCriticalSection();
+		ontRes.removeAll((Property)null);
+		infRes.removeAll((Property)null);
+		}
+		finally{
+	    baseOntModel.leaveCriticalSection();
+	    infOntModel.leaveCriticalSection();
+		ontModel.leaveCriticalSection();
+		}
 		request.getSession().setAttribute("leftoverModel", leftoverModel);
 		if(counter>0 && functionalPresent)
-			result = "merged " + counter + " statements. Some statements could not be merged.";
-			else if(counter>0 && !functionalPresent)
-			result = "merged " + counter + " statements.";	
-			else if(counter==0)
-			result = "No statements merged";
-			return result;
-		
+		result = "merged " + counter + " statements. Some statements could not be merged.";
+		else if(counter>0 && !functionalPresent)
+		result = "merged " + counter + " statements.";	
+		else if(counter==0)
+		result = "No statements merged";
+		return result;
 			
 	}
 private String doRename(String oldNamespace,String newNamespace,HttpServletResponse response){
