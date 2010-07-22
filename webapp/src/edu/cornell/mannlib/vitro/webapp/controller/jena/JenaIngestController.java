@@ -419,13 +419,14 @@ public class JenaIngestController extends BaseEditController {
 			  if(modelName!=null){
 			  Model m = maker.getModel(modelName);
 			  ArrayList namespaceList = new ArrayList();
-			  Iterator namespaceItr = m.listNameSpaces();
+			  ResIterator resItr = m.listResourcesWithProperty((Property)null);
 			  
-			  if(namespaceItr!=null){
-          	while(namespaceItr.hasNext()){
-          		
-          		namespaceList.add(namespaceItr.next().toString());
-          		
+			  if(resItr!=null){
+          	while(resItr.hasNext()){
+          		String namespace = resItr.nextResource().getNameSpace();
+                if(!namespaceList.contains(namespace)){
+                	namespaceList.add(namespace);
+                }		
           	}
           	}
 			  else {
