@@ -10,19 +10,9 @@ ${scripts.add("/js/imageUpload/imageUploadUtils.js")}
 ${stylesheets.addFromTheme("/uploadImages.css")}
 
 
-<noscript>
-	<div id="javascriptDisableWrapper">
-		<div id="javascriptDisableContent">
-			<img src="${urls.siteIcons}/iconAlertBig.png" alt="Alert Icon"/>
-			<p>In order to upload or edit a photo, you'll need to enable JavaScript.</p>
-		</div>
-	</div>
-</noscript>
 
 
-
-
-<div id="photoUploadContainer" class="hidden">
+<div id="photoUploadContainer">
        <h2>Photo Upload</h2>
        
        
