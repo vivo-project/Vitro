@@ -8,6 +8,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.Tab;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
@@ -60,7 +61,12 @@ public class TabMenu extends MainMenu {
     
     private boolean isActiveItem(Tab tab) {
         String requestedTabId = vreq.getParameter(TAB_PARAM); 
-        return requestedTabId != null && Integer.parseInt(requestedTabId) == tab.getTabId();
+        int tabId = tab.getTabId();
+        if (requestedTabId == null) {
+        	return tabId == vreq.getPortal().getRootTabId() && "true".equals(vreq.getAttribute("homePageRequested"));
+        } else {
+        	return Integer.parseInt(requestedTabId) == tabId;
+        }
     }
 
 }
