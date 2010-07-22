@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Level;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -108,10 +109,21 @@ public class FileStorageImplTest extends AbstractTestClass {
 		createFileStorage("initializeTwiceTheSame", "ns2", "ns1");
 	}
 
-	@Test(expected = IllegalStateException.class)
-	public void initializedNamespacesDontMatch() throws IOException {
-		createFileStorage("initializeTwiceDifferent", "ns1", "ns2");
-		createFileStorage("initializeTwiceDifferent", "ns2");
+	@Test
+	public void namespaceDisappears() throws IOException {
+		createFileStorage("namespaceDisappears", "ns1", "ns2");
+		FileStorageImpl fs = createFileStorage("namespaceDisappears", "ns2");
+		assertEqualSets("namespaces", new String[] { "ns1", "ns2" }, fs
+				.getNamespaces().values());
+	}
+
+	@Test
+	public void namespaceChanged() throws IOException {
+		setLoggerLevel(FileStorageImpl.class, Level.ERROR);
+		createFileStorage("namespaceChanges", "ns1", "ns2");
+		FileStorageImpl fs = createFileStorage("namespaceChanges", "ns3", "ns1");
+		assertEqualSets("namespaces", new String[] { "ns1", "ns2", "ns3" }, fs
+				.getNamespaces().values());
 	}
 
 	@Test
@@ -187,8 +199,8 @@ public class FileStorageImplTest extends AbstractTestClass {
 		generalFs.createFile(id, filename, bytes);
 
 		assertFileContents(generalFs, id, filename, contents);
-		assertEquals("getInputStream", contents, readAll(generalFs
-				.getInputStream(id, filename)));
+		assertEquals("getInputStream", contents,
+				readAll(generalFs.getInputStream(id, filename)));
 	}
 
 	@Test(expected = FileNotFoundException.class)
@@ -226,8 +238,8 @@ public class FileStorageImplTest extends AbstractTestClass {
 
 		assertFileContents(generalFs, id, filename, contents);
 		assertEquals("filename", filename, generalFs.getFilename(id));
-		assertEquals("getInputStream", contents, readAll(generalFs
-				.getInputStream(id, filename)));
+		assertEquals("getInputStream", contents,
+				readAll(generalFs.getInputStream(id, filename)));
 	}
 
 	// ----------------------------------------------------------------------
@@ -265,8 +277,8 @@ public class FileStorageImplTest extends AbstractTestClass {
 	private void assertFileContents(FileStorageImpl fs, String id,
 			String filename, String expectedContents) throws IOException {
 		File rootDir = new File(fs.getBaseDir(), FileStorage.FILE_STORAGE_ROOT);
-		File path = FileStorageHelper.getFullPath(rootDir, id, filename, fs
-				.getNamespaces());
+		File path = FileStorageHelper.getFullPath(rootDir, id, filename,
+				fs.getNamespaces());
 
 		assertTrue("file exists: " + path, path.exists());
 
