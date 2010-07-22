@@ -16,6 +16,7 @@ import javax.naming.InitialContext;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 
+import org.apache.log4j.Level;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -80,6 +81,7 @@ public class FileStorageSetupTest extends AbstractTestClass {
 
 	@Test
 	public void baseDirectoryNotSpecified() {
+		setLoggerLevel(FileStorageSetup.class, Level.OFF);
 		setConfigurationProperties(null, "http://vivo.myDomain.edu/individual/");
 		fss.contextInitialized(sce);
 		assertNull("no base directory",
@@ -88,6 +90,7 @@ public class FileStorageSetupTest extends AbstractTestClass {
 
 	@Test
 	public void baseDirectoryDoesntExist() throws IOException {
+		setLoggerLevel(FileStorageSetup.class, Level.OFF);
 		setConfigurationProperties("/bogus/Directory",
 				"http://vivo.myDomain.edu/individual/");
 		fss.contextInitialized(sce);
@@ -97,6 +100,7 @@ public class FileStorageSetupTest extends AbstractTestClass {
 
 	@Test
 	public void defaultNamespaceNotSpecified() {
+		setLoggerLevel(FileStorageSetup.class, Level.OFF);
 		setConfigurationProperties(tempDir.getPath(), null);
 		fss.contextInitialized(sce);
 		assertNull("no default namespace",
@@ -105,6 +109,7 @@ public class FileStorageSetupTest extends AbstractTestClass {
 
 	@Test
 	public void defaultNamespaceIsBogus() throws IOException {
+		setLoggerLevel(FileStorageSetup.class, Level.OFF);
 		setConfigurationProperties(tempDir.getPath(), "namespace");
 		fss.contextInitialized(sce);
 		assertNull("default namespace is bogus",
