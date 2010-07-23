@@ -59,7 +59,7 @@ public class FiltersForTabsTest {
         tab.setPortalId(7);
 
         UnaryFunctor<Individual,Boolean> testFn =
-                FiltersForTabs.getFilterForTab(tab, new Portal());
+                FiltersForTabs.getFilterForTab(tab, new Portal(), false);
         Assert.assertTrue ( testFn!=null);
 
 
@@ -75,7 +75,7 @@ public class FiltersForTabsTest {
         Assert.assertTrue( testFn.fn( ind));
 
         tab.setFlag2Mode("OMIT");        
-        testFn = FiltersForTabs.getFilterForTab(tab, new Portal());
+        testFn = FiltersForTabs.getFilterForTab(tab, new Portal(), false);
 
         Assert.assertFalse( testFn.fn(ind));
 

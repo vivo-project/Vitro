@@ -22,15 +22,16 @@ public class ApplicationDaoJena extends JenaBaseDao implements ApplicationDao {
 	   
 	
 	public boolean isFlag1Active() {
+		boolean somePortalIsFiltering=false;		
 		if (portalCount == null) {
 			boolean active = false;
 			for (Portal p : getWebappDaoFactory().getPortalDao().getAllPortals()) {
 				if (p.isFlag1Filtering()) {
-					return true;
+					somePortalIsFiltering = true;
 				}
 			}
-		}
-		return false;
+		}		
+		return somePortalIsFiltering && getWebappDaoFactory().getPortalDao().getAllPortals().size() > 1;		
 	}
 
 	
