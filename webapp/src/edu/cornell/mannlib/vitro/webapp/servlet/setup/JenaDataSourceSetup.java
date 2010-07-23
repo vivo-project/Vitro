@@ -76,7 +76,7 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
             WebappDaoFactory wadf = new WebappDaoFactoryJena(unionOms, defaultNamespace, null, null);
             sce.getServletContext().setAttribute("webappDaoFactory",wadf);
             
-            ApplicationBean appBean = getApplicationBeanFromOntModel(memModel);
+            ApplicationBean appBean = getApplicationBeanFromOntModel(memModel,wadf);
             if (appBean != null) {
             	sce.getServletContext().setAttribute("applicationBean", appBean);
             }
@@ -114,7 +114,7 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
     public void contextDestroyed(ServletContextEvent sce) {
     }
 
-    private ApplicationBean getApplicationBeanFromOntModel(OntModel ontModel) {
+    private ApplicationBean getApplicationBeanFromOntModel(OntModel ontModel,WebappDaoFactory wadf) {
        ClosableIterator appIt = ontModel.listIndividuals(ResourceFactory.createResource(VitroVocabulary.APPLICATION));
         try {
               if (appIt.hasNext()) {
@@ -129,6 +129,9 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
                   try {
                      appBean.setMaxSharedPortalId(Integer.decode( ((Literal)appInd.getPropertyValue(ResourceFactory.createProperty(VitroVocabulary.APPLICATION_MAXSHAREDPORTALID))).getLexicalForm()));
                   } catch (Exception e) { /* ignore bad value */}
+                  if( ! wadf.getApplicationDao().isFlag1Active() ){
+                	  appBean.setMaxPortalId(1);
+                  }
                  return appBean;
              } else {
             	 return null;

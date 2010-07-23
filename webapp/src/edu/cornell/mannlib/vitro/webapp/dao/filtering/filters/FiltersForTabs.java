@@ -31,13 +31,14 @@ import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
  */
 public class FiltersForTabs {
     public static final UnaryFunctor<Individual,String> firstLetterOfName = new FirstLetterOfEnt();
-    public static UnaryFunctor<Individual,Boolean> getFilterForTab( final Tab tab, final Portal portalThatTabIsIn ){
+    public static UnaryFunctor<Individual,Boolean> getFilterForTab( final Tab tab, final Portal portalThatTabIsIn, final boolean isFlag1Filtering ){
 
         DateTime now = new DateTime();
         UnaryFunctor<Individual,Boolean> entFilter = getTimeFilter(tab, now);
         UnaryFunctor<Individual,Boolean> tabPortalFilter = getPortalFilter(tab);
-        
-        if( tabPortalFilter != null   &&
+                        
+        if( isFlag1Filtering &&
+        	tabPortalFilter != null   &&
             portalThatTabIsIn != null && 
             portalThatTabIsIn.isFlag1Filtering() )
                 entFilter = AdaptorFunctors.and( entFilter, tabPortalFilter );
