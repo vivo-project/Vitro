@@ -61,61 +61,66 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         	
         	ObjectPropertyDaoJena opDaoJena = new ObjectPropertyDaoJena(getWebappDaoFactory());
         	
-            Resource ind = getOntModel().getResource(entity.getURI());
-            List<ObjectPropertyStatement> objPropertyStmtList = new ArrayList<ObjectPropertyStatement>();
-            ClosableIterator<Statement> propIt = ind.listProperties();
-            try {
-                while (propIt.hasNext()) {
-                    Statement st = (Statement) propIt.next();
-                    
-                    if (st.getObject().isResource() && !(NONUSER_NAMESPACES.contains(st.getPredicate().getNameSpace()))) {
-                        try {
-                            ObjectPropertyStatement objPropertyStmt = new ObjectPropertyStatementImpl();
-                            objPropertyStmt.setSubjectURI(entity.getURI());
-                            objPropertyStmt.setSubject(entity);
-                            try {
-                                objPropertyStmt.setObjectURI(((Resource)st.getObject()).getURI());
-                            } catch (Throwable t) {
-                                t.printStackTrace();
-                            }
-                            objPropertyStmt.setPropertyURI(st.getPredicate().getURI());
-                            try {
-                                Property prop = st.getPredicate();
-                                if( uriToObjectProperty.containsKey(prop.getURI())){
-                                	objPropertyStmt.setProperty(uriToObjectProperty.get(prop.getURI()));
-                                }else{
-                                	ObjectProperty p = opDaoJena.propertyFromOntProperty(getOntModel().getObjectProperty(prop.getURI()));
-                                	if( p != null ){
-                                		uriToObjectProperty.put(prop.getURI(), p);
-                                		objPropertyStmt.setProperty(uriToObjectProperty.get(prop.getURI()));
-                                	}else{
-                                		//if ObjectProperty not found in ontology, skip it
-                                		continue;
-                                	}
-                                }                                
-                            } catch (Throwable g) {
-                                //do not add statement to list
-                            	log.debug("exception while trying to get object property for statement list, statement skipped.", g);
-                            	continue;                                                                
-                            }
-                            if (objPropertyStmt.getObjectURI() != null) {
-                                Individual objInd = getWebappDaoFactory().getIndividualDao().getIndividualByURI(objPropertyStmt.getObjectURI());
-                                objPropertyStmt.setObject(objInd);
-                            }
-
-                            //add object property statement to list for Individual
-                            if ((objPropertyStmt.getSubjectURI() != null) && (objPropertyStmt.getPropertyURI() != null) && (objPropertyStmt.getObject() != null)){
-                                objPropertyStmtList.add(objPropertyStmt);                           
-                            } 
-                        } catch (Throwable t) {
-                            t.printStackTrace();
-                        }
-                    }
-                }
-            } finally {
-                propIt.close();
-            }
-            entity.setObjectPropertyStatements(objPropertyStmtList);
+        	getOntModel().enterCriticalSection(Lock.READ);
+        	try {
+	            Resource ind = getOntModel().getResource(entity.getURI());
+	            List<ObjectPropertyStatement> objPropertyStmtList = new ArrayList<ObjectPropertyStatement>();
+	            ClosableIterator<Statement> propIt = ind.listProperties();
+	            try {
+	                while (propIt.hasNext()) {
+	                    Statement st = (Statement) propIt.next();
+	                    
+	                    if (st.getObject().isResource() && !(NONUSER_NAMESPACES.contains(st.getPredicate().getNameSpace()))) {
+	                        try {
+	                            ObjectPropertyStatement objPropertyStmt = new ObjectPropertyStatementImpl();
+	                            objPropertyStmt.setSubjectURI(entity.getURI());
+	                            objPropertyStmt.setSubject(entity);
+	                            try {
+	                                objPropertyStmt.setObjectURI(((Resource)st.getObject()).getURI());
+	                            } catch (Throwable t) {
+	                                t.printStackTrace();
+	                            }
+	                            objPropertyStmt.setPropertyURI(st.getPredicate().getURI());
+	                            try {
+	                                Property prop = st.getPredicate();
+	                                if( uriToObjectProperty.containsKey(prop.getURI())){
+	                                	objPropertyStmt.setProperty(uriToObjectProperty.get(prop.getURI()));
+	                                }else{
+	                                	ObjectProperty p = opDaoJena.propertyFromOntProperty(getOntModel().getObjectProperty(prop.getURI()));
+	                                	if( p != null ){
+	                                		uriToObjectProperty.put(prop.getURI(), p);
+	                                		objPropertyStmt.setProperty(uriToObjectProperty.get(prop.getURI()));
+	                                	}else{
+	                                		//if ObjectProperty not found in ontology, skip it
+	                                		continue;
+	                                	}
+	                                }                                
+	                            } catch (Throwable g) {
+	                                //do not add statement to list
+	                            	log.debug("exception while trying to get object property for statement list, statement skipped.", g);
+	                            	continue;                                                                
+	                            }
+	                            if (objPropertyStmt.getObjectURI() != null) {
+	                                Individual objInd = getWebappDaoFactory().getIndividualDao().getIndividualByURI(objPropertyStmt.getObjectURI());
+	                                objPropertyStmt.setObject(objInd);
+	                            }
+	
+	                            //add object property statement to list for Individual
+	                            if ((objPropertyStmt.getSubjectURI() != null) && (objPropertyStmt.getPropertyURI() != null) && (objPropertyStmt.getObject() != null)){
+	                                objPropertyStmtList.add(objPropertyStmt);                           
+	                            } 
+	                        } catch (Throwable t) {
+	                            t.printStackTrace();
+	                        }
+	                    }
+	                }
+	            } finally {
+	                propIt.close();
+	            }
+	            entity.setObjectPropertyStatements(objPropertyStmtList);
+        	} finally {
+        		getOntModel().leaveCriticalSection();
+        	}
             return entity;
         }
     }

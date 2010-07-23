@@ -638,13 +638,13 @@ public class IndividualJena extends IndividualImpl implements Individual {
         } else {
             try {
                 webappDaoFactory.getObjectPropertyStatementDao().fillExistingObjectPropertyStatements(this);
-                Iterator stmtIt = this.getObjectPropertyStatements().iterator();
-                while (stmtIt.hasNext()) {
-                    ObjectPropertyStatement stmt = (ObjectPropertyStatement) stmtIt.next();
-                    stmt.setObject(webappDaoFactory.getIndividualDao().getIndividualByURI(stmt.getObject().getURI()));
-                }
+                //Iterator stmtIt = this.getObjectPropertyStatements().iterator();
+                //while (stmtIt.hasNext()) {
+                //    ObjectPropertyStatement stmt = (ObjectPropertyStatement) stmtIt.next();
+                //    stmt.setObject(webappDaoFactory.getIndividualDao().getIndividualByURI(stmt.getObject().getURI()));
+                //}
             } catch (Exception e) {
-                log.error(this.getClass().getName()+" could not fill existing ObjectPropertyStatements for "+this.getURI());
+                log.error(this.getClass().getName()+" could not fill existing ObjectPropertyStatements for "+this.getURI(), e);
             }
             return this.objectPropertyStatements;
         }
