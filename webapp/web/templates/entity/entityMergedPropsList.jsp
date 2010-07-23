@@ -199,12 +199,10 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 	    						</c:if>
 	    						<c:set var="collateByClass" value="<%=op.getCollateBySubclass()%>"/>
         					<c:if test="${collateByClass}" >
-        					    <% System.out.println("doing collateByClass"); %>
         						<c:set var="collateClassesShownCount" value="0"/>
         						<c:set var="collateCurrentClass" value="_firstOne"/>        						        										
         					</c:if>
 					        <c:forEach items="${objProp.objectPropertyStatements}" var="objPropertyStmt">					        					        
-						        <% System.out.println("doing collateByClass"); %>
 						        <c:set var="sameClass" value="false"/>
 						        <c:forEach items="${objPropertyStmt.object.VClasses}" var="vclass">
 						           <c:if test="${ vclass.URI == collateCurrentClass }">
