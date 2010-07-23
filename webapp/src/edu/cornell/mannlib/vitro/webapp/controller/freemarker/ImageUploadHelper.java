@@ -31,6 +31,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.sun.media.jai.codec.JPEGEncodeParam;
 import com.sun.media.jai.codec.MemoryCacheSeekableStream;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -460,9 +461,12 @@ public class ImageUploadHelper {
 			scaleParams.add(0.0F); // y translate
 			scaleParams.add(interpolation);
 			RenderedOp image2 = JAI.create("scale", scaleParams);
+			
+			JPEGEncodeParam encodeParam = new JPEGEncodeParam();
+			encodeParam.setQuality(1.0F);
 
 			ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-			JAI.create("encode", image2, bytes, "JPEG", null);
+			JAI.create("encode", image2, bytes, "JPEG", encodeParam);
 			bytes.close();
 			return new ByteArrayInputStream(bytes.toByteArray());
 		} catch (Exception e) {
