@@ -199,21 +199,30 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 	    						</c:if>
 	    						<c:set var="collateByClass" value="<%=op.getCollateBySubclass()%>"/>
         					<c:if test="${collateByClass}" >
+        					    <% System.out.println("doing collateByClass"); %>
         						<c:set var="collateClassesShownCount" value="0"/>
-        						<c:set var="collateCurrentClass" value="_none"/>				
+        						<c:set var="collateCurrentClass" value="_firstOne"/>        						        										
         					</c:if>
-					        <c:forEach items="${objProp.objectPropertyStatements}" var="objPropertyStmt">
-					        <c:if test="${ collateByClass && collateCurrentClass!=objPropertyStmt.object.VClassURI}">						   
-		            		<c:if test="${ collateClassesShownCount > 0 }">
-		            			</ul></li><!-- collateClasses -->
-		            		</c:if>
-		            		<c:set var="collateCurrentClass" value="${objPropertyStmt.object.VClassURI}" />
-		            		<c:set var="collateCurrentClassName" value="${objPropertyStmt.object.VClass.name}" />
-		            		<c:set var="collateClassesShownCount" value="${collateClassesShown + 1}"/>		            		
-		            		<li>
-		            		<h5 class="collate">${collateCurrentClassName}</h5>
-		            		<ul class='properties'><!-- collateClasses -->
-      		        </c:if>
+					        <c:forEach items="${objProp.objectPropertyStatements}" var="objPropertyStmt">					        					        
+						        <% System.out.println("doing collateByClass"); %>
+						        <c:set var="sameClass" value="false"/>
+						        <c:forEach items="${objPropertyStmt.object.VClasses}" var="vclass">
+						           <c:if test="${ vclass.URI == collateCurrentClass }">
+										<c:set var="sameClass" value="true"/>										
+								   </c:if>					           
+					            </c:forEach>
+					        
+						        <c:if test="${ collateByClass && ( !sameClass || collateCurrentClass == '_firstOne') }">						   
+				            		<c:if test="${ collateClassesShownCount > 0 }">
+				            			</ul></li><!-- collateClasses -->
+				            		</c:if>
+				            		<c:set var="collateCurrentClass" value="${objPropertyStmt.object.VClassURI}" />				            			            
+				            		<c:set var="collateCurrentClassName" value="${objPropertyStmt.object.VClass.name}" />
+				            		<c:set var="collateClassesShownCount" value="${collateClassesShown + 1}"/>		            		
+				            		<li>
+				            		<h5 class="collate">${collateCurrentClassName}</h5>
+				            		<ul class='properties'><!-- collateClasses -->
+	      		                </c:if>
                                     <li><span class="statementWrap">
      								<c:set var="opStmt" value="${objPropertyStmt}" scope="request"/>
            							<c:url var="propertyLink" value="/entity">
@@ -245,9 +254,9 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
                            					  <c:if test="${empty editLinks}"><em class="nonEditable">(non-editable)</em></c:if>
           					                </c:if>
                                     </span></li>
-                                </c:forEach>
-                                <c:if test="${ collateByClass && collateClassesShownCount > 0 }"></ul></li><!-- collate end --></c:if>
-                                <c:if test="${objRows > 0}"></ul></c:if>
+							</c:forEach>
+                            <c:if test="${ collateByClass && collateClassesShownCount > 0 }"></ul></li><!-- collate end --></c:if>
+                            <c:if test="${objRows > 0}"></ul></c:if>
                             </div><!-- ${objProp.localName} -->
                         </c:if>
 <%                  } else if (p instanceof DataProperty) {
