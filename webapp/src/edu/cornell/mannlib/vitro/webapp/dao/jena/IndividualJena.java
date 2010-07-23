@@ -39,6 +39,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Link;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
+import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.filestorage.FileModelHelper;
 import edu.cornell.mannlib.vitro.webapp.filestorage.FileServingHelper;
@@ -798,6 +799,34 @@ public class IndividualJena extends IndividualImpl implements Individual {
 		return vClassList;
 	}
     
+	/**
+	 * The base method in {@link IndividualImpl} is adequate if the reasoner is
+	 * up to date. 
+	 * 
+	 * If the base method returns false, check directly to see if
+	 * any of the super classes of the direct classes will satisfy this request.
+	 */
+	@Override
+	public boolean isVClass(String uri) {
+    	if (uri == null) {
+    		return false;
+    	}
+
+		if (super.isVClass(uri)) {
+			return true;
+		}
+
+		VClassDao vclassDao = webappDaoFactory.getVClassDao();
+		for (VClass vClass : getVClasses(true)) {
+			for (String superClassUri: vclassDao.getAllSuperClassURIs(vClass.getURI())) {
+				if (uri.equals(superClassUri)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
     /**
      * Overriding the base method so that we can do the sorting by arbitrary property here.  An
      * IndividualJena has a reference back to the model; everything else is just a dumb bean (for now).
