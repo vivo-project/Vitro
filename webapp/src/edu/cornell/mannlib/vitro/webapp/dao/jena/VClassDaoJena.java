@@ -268,7 +268,6 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
     	getOntModel().enterCriticalSection(Lock.READ);
     	try {
 	    	OntClass ontClass = getOntClass(getOntModel(), classURI);
-	    	System.out.println(classURI);
 	    	ClosableIterator equivalentOntClassIt = ontClass.listEquivalentClasses();
 	    	try {
 	    		for (Iterator eqOntClassIt = equivalentOntClassIt; eqOntClassIt.hasNext(); ) {
