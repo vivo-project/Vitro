@@ -19,6 +19,5 @@
               <label for="confirmPassword">Confirm Password</label>
               <input id="confirmPassword" type="password" name="confirmPassword"  />
               <input name="passwordChangeForm" type="submit" class="submit" value="Save Changes"/> <span class="or">or <a class="cancel" href="${cancelUrl}">Cancel</a></span>
-
        </form>
 </div>
