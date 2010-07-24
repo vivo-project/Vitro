@@ -447,6 +447,7 @@ public class InputElementFormattingTag extends TagSupport {
                 out.print("<input "+classStr+" "+sizeStr+" type=\"text\" id=\""+getId()+"\" name=\""+getName()+"\" value=\""+valueStr+"\" />");
                 if (definitionTags) { out.print("</dd>"); }
                 out.println();
+            // Handle hidden inputs where Javascript writes a value that needs to be returned with an invalid submission.
             } else if( getType().equalsIgnoreCase("hidden")) {
                 String valueStr = doValue(editConfig, editSub);
                 if (definitionTags) { out.print("<dd>"); }
