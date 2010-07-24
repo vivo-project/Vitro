@@ -18,7 +18,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
 
 /**
- * Created by IntelliJ IDEA.
+ * This controls how portal filtering is set for request.  It should be refactored or deleted.
+ * 
  * User: bdc34
  * Date: Apr 5, 2007
  * Time: 10:50:55 AM
@@ -200,7 +201,9 @@ public class RequestToPortalFlag {
                 portalFlag.setFlag1Exclusive(false);
             }
             portalFlag.setFlag1DisplayStatus( PortalFlag.SHOW_NO_PORTALS );
-            if (appBean.getMaxPortalId()>1) {
+            if( wdf.getApplicationDao().isFlag1Active() == false)
+            	portalFlag.setFlag1DisplayStatus( PortalFlag.SHOW_ALL_PORTALS);
+            else if (appBean.getMaxPortalId()>1) {
                 portalFlag.setFlag1DisplayStatus(PortalFlag.SHOW_CURRENT_PORTAL);
                 String[] flag1ParameterValues=request.getParameterValues("flag1");
                 if (flag1ParameterValues==null) {
