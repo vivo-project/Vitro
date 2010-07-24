@@ -31,7 +31,7 @@ public class TBoxUpdater {
 	private OntModel siteModel;
 	private OntologyChangeLogger logger;  
 	private OntologyChangeRecord record;
-	private boolean detailLogs = true;
+	private boolean detailLogs = false;
 
 	/**
 	 * 
