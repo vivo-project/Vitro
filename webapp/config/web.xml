@@ -124,10 +124,6 @@
   <listener>
     <listener-class> edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup </listener-class>
   </listener>
-
-  <listener>
-    <listener-class> edu.cornell.mannlib.vitro.webapp.auth.policy.setup.VivoPolicySetup</listener-class>
-  </listener>
   
 	<!--<listener>
 		<listener-class>
@@ -184,8 +180,7 @@
         </listener-class>
     </listener>
 -->
-
-
+  
   <!-- Filters ********************************************************** -->
   <!-- in 2.4 spec, filter chain order is first by filter-mapping <url-pattern> order in web.xml,
 	 then filter-mapping <servlet-name> order in web.xml -->
