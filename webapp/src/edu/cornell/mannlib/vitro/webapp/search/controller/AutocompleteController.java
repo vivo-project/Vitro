@@ -56,14 +56,9 @@ import freemarker.template.Configuration;
 
 /**
  * AutocompleteController is used to generate autocomplete and select element content
- * through a Lucene search. The search logic is copied from AutocompleteController.
+ * through a Lucene search. 
  */
 
-/* rjy7 We should have a SearchController that is subclassed by both AutocompleteController 
- * and AjaxSearchController, so the methods don't all have to be copied into both places.
- * The parent SearchController should extend FreeMarkerHttpServlet. Can only be done
- * once AutocompleteController has been moved to FreeMarker.
- */
 public class AutocompleteController extends FreeMarkerHttpServlet implements Searcher{
 
     private static final long serialVersionUID = 1L;
