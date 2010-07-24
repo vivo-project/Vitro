@@ -232,13 +232,15 @@ public class AutocompleteController extends FreeMarkerHttpServlet implements Sea
 
             //if we have a flag/portal query then we add
             //it by making a BooelanQuery.
-            Query flagQuery = makeFlagQuery( portalState );
-            if( flagQuery != null ){
-                BooleanQuery boolQuery = new BooleanQuery();
-                boolQuery.add( query, BooleanClause.Occur.MUST);
-                boolQuery.add( flagQuery, BooleanClause.Occur.MUST);
-                query = boolQuery;
-            }
+            // RY 7/24/10 Temporarily commenting out for now because we're suddenly getting portal:2
+            // thrown onto the query. Will need to investigate post-launch of NIHVIVO 1.1.
+//            Query flagQuery = makeFlagQuery( portalState );
+//            if( flagQuery != null ){
+//                BooleanQuery boolQuery = new BooleanQuery();
+//                boolQuery.add( query, BooleanClause.Occur.MUST);
+//                boolQuery.add( flagQuery, BooleanClause.Occur.MUST);
+//                query = boolQuery;
+//            }
             
         } catch (Exception ex){
             throw new SearchException(ex.getMessage());
