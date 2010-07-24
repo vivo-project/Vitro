@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -77,7 +78,8 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
             if( obj == null || !(obj instanceof Individual))
                 throw new HelpException("EntityMergedPropertyListController requires request.attribute 'entity' to be of"
                         +" type " + Individual.class.getName() );
-            Individual subject =(Individual)obj;
+            Individual subject =(Individual)obj;            
+            subject = filterFromContext( subject );
             
             // determine whether are just displaying populated properties or also interleaving unpopulated ones
             boolean editMode = false;
@@ -113,11 +115,14 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
             
             List<Property> mergedPropertyList = new ArrayList<Property>();
             // now first get the properties this entity actually has, presumably populated with statements 
-            List<ObjectProperty> objectPropertyList = subject.getObjectPropertyList();
+            List<ObjectProperty> objectPropertyList = subject.getObjectPropertyList();                        
+            
             for (ObjectProperty op : objectPropertyList) {
             	if (!SUPPRESSED_OBJECT_PROPERTIES.contains(op)) {
                     op.setEditLabel(op.getDomainPublic());
                     mergedPropertyList.add(op);
+            	}else{
+            		log.debug("suppressed " + op.getURI());
             	}
             }
             
@@ -234,8 +239,10 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
             	if (entityPropertyListFilter != null) {
             		mergedPropertyList = entityPropertyListFilter.fn(mergedPropertyList);
             	}
+            	            	
                 req.setAttribute("mergedList",mergedPropertyList);
-            }
+            }            
+                                   
             req.setAttribute("entity",subject);
 
             RequestDispatcher rd = req.getRequestDispatcher(groupedMode ? Controllers.ENTITY_MERGED_PROP_LIST_GROUPED_JSP : Controllers.ENTITY_MERGED_PROP_LIST_UNGROUPED_JSP);
@@ -250,6 +257,8 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
             rd.include(req, res);
         }
     }
+
+
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException,IOException {
@@ -539,4 +548,34 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
 		return directClasses;
 	}
 
+	/**
+	 * Look for filter in servlet context and filter properties with it if there is one.
+	 * 
+	 * This allows a vitro instance to have specialized filtering for display.  It was originally
+	 * created to deal with problems caused by custom short views.
+	 * * 
+	 * @param objectPropertyList
+	 * @param wdf
+	 * @return
+	 */
+	private Individual filterFromContext(Individual ind ) {
+		try{
+			UnaryFunctor<Individual,Individual> filter = getMergedPropertyListFilter(getServletContext()); 
+			if( filter == null )
+				return ind;
+			else
+				return filter.fn(ind);			
+		}catch(Throwable t){
+			log.error(t,t);
+		}
+		return ind;
+	}
+	
+	public static void setMergedPropertyListFilter( UnaryFunctor<Individual,Individual>fn, ServletContext sc){
+		sc.setAttribute("EntityMergedPropertyListController.toFilteringIndividual", fn);	
+	}
+	
+	public static UnaryFunctor<Individual,Individual> getMergedPropertyListFilter(  ServletContext sc){
+		return(UnaryFunctor<Individual,Individual>)sc.getAttribute("EntityMergedPropertyListController.toFilteringIndividual");	
+	}
 }
