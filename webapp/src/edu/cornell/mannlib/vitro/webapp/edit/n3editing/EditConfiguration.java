@@ -45,6 +45,7 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
  * in preparation for N3. They may also be appended with a datatype or lang.
  */
 public class EditConfiguration {
+    
     List<String> n3Required;
     List<String> n3Optional;
     List<String> urisOnform;
@@ -254,15 +255,15 @@ public class EditConfiguration {
               UserToIndIdentifierFactory.getIndividualsForUser(ids);
                         
             if( userUris == null || userUris.size() == 0 ){
-            	System.out.println("Cound not find user ur for edit request");
+            	log.debug("Cound not find user ur for edit request");
                 log.error("Could not find a userUri for edit request, make " +
                         "sure that there is an IdentifierBundleFactory that " +
                 "produces userUri identifiers in the context.");
             } else if( userUris.size() > 1  ){
                 log.error("Found multiple userUris, using the first in list.");
-                System.out.println("Found multiple user uris");
+                log.debug("Found multiple user uris");
             }else {
-            	System.out.println("EditConfiguration.java - checking system value for User URI " + userUris.get(0));
+            	log.debug("EditConfiguration.java - checking system value for User URI " + userUris.get(0));
                 getUrisInScope().put("editingUser",userUris.get(0));
             }
         }   
@@ -304,24 +305,24 @@ public class EditConfiguration {
     public void prepareForObjPropUpdate( Model model ){
         if( model == null ) {
         	//Added parens and output
-        	System.out.println("Model is null and will be throwing an error");
+        	log.debug("Model is null and will be throwing an error");
         	throw new Error("EditConfiguration.prepareForObjPropUpdate() needs a Model");}
         if( !isObjectResource )
         {
         	//Added parens and output
-        	System.out.println("This is not an object resource? lacks dataprop ");
+        	log.debug("This is not an object resource? lacks dataprop ");
             throw new Error("This request does not appear to be for an update since it lacks a dataprop object or a dataProp hash key ");              
         }
             //find the variable for object, this anchors the paths to the existing values
         if( object == null || object.trim().length() == 0)
         {
         	//Added parens and output
-        	System.out.println("Object is null or object length is null");
+        	log.debug("Object is null or object length is null");
             throw new Error("This request does not appear to be for an update since it lacks an object");   
         }
                         
         getUrisInScope().put( varNameForObject, object);
-        System.out.println("Putting uris in scope - var name for ojbect " + varNameForObject + " and object is " + object);
+        log.debug("Putting uris in scope - var name for object " + varNameForObject + " and object is " + object);
         // run SPARQL, sub in values
         SparqlEvaluate sparqlEval = new SparqlEvaluate( model );
         runSparqlForAdditional( sparqlEval );

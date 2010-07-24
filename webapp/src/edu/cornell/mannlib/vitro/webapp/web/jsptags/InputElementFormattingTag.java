@@ -65,6 +65,7 @@ public class InputElementFormattingTag extends TagSupport {
     private String  cancelUrl;
     private String  cssClass;
     private String  labelClass;
+    private String  disabled;
     private String  value;
     private String  error;
     private int     size = 0;
@@ -122,14 +123,18 @@ public class InputElementFormattingTag extends TagSupport {
     public void setCssClass(String classStr) {
         this.cssClass = classStr;
     }
-    
     public String getLabelClass() {
         return labelClass;
     }
     public void setLabelClass(String labelClassStr) {
         this.labelClass = labelClassStr;
     }
-
+    public String getDisabled() {
+        return disabled;
+    }
+    public void setDisabled(String disabled) {
+        this.disabled = disabled;
+    }
     public String getValue() {
         return value;
     }
@@ -208,6 +213,15 @@ public class InputElementFormattingTag extends TagSupport {
         }
         return "";
     }
+    
+    private String doDisabled() {
+        /* only insert the disabled attribute if it has been populated */
+        String disabled = getDisabled();
+        if (!StringUtils.isEmpty(disabled)) {
+            return "disabled=\"disabled\"";
+        }
+        return "";
+    }
 
     private String doSize() {
         if (getSize()>0) {
@@ -282,7 +296,6 @@ public class InputElementFormattingTag extends TagSupport {
                 +" or editSub");
         return "";
     }
-
 
     private String literalToString(Literal lit){
             if( lit == null || lit.getValue() == null) return "";
@@ -394,6 +407,7 @@ public class InputElementFormattingTag extends TagSupport {
             
             /* populate the pieces */
             String classStr = doClass();
+            String disabledStr = doDisabled();
             String errorStr = getValidationErrors(editSub);
             JspWriter out = pageContext.getOut();
 
@@ -445,7 +459,7 @@ public class InputElementFormattingTag extends TagSupport {
                 String valueStr = doValue(editConfig, editSub);
                 String sizeStr  = doSize();
                 if (definitionTags) { out.print("<dd>"); }
-                out.print("<input "+classStr+" "+sizeStr+" type=\"text\" id=\""+getId()+"\" name=\""+getName()+"\" value=\""+valueStr+"\" />");
+                out.print("<input "+classStr+" "+sizeStr+" " + disabledStr + " type=\"text\" id=\""+getId()+"\" name=\""+getName()+"\" value=\""+valueStr+"\" />");
                 if (definitionTags) { out.print("</dd>"); }
                 out.println();
             // Handle hidden inputs where Javascript writes a value that needs to be returned with an invalid submission.
@@ -473,9 +487,9 @@ public class InputElementFormattingTag extends TagSupport {
                 if (optionsMap.size()>0) { // e.g., an Educational Background where may be no choices left after remove existing
                     if (definitionTags) { out.print("<dd>"); }
                     if (multiple!=null && !multiple.equals("")) {
-                        out.print("<select "+classStr+" id=\""+getId()+"\" name=\""+getName()+"\" multiple=\"multiple\" size=\""+(optionsMap.size() > 10? "10" : optionsMap.size())+"\">");
+                        out.print("<select "+ classStr+ " " + disabledStr + " id=\""+getId()+"\" name=\""+getName()+"\" multiple=\"multiple\" size=\""+(optionsMap.size() > 10? "10" : optionsMap.size())+"\">");
                     } else {
-                        out.print("<select "+classStr+" id=\""+getId()+"\" name=\""+getName()+"\">");
+                        out.print("<select "+classStr+ " " + disabledStr + " id=\""+getId()+"\" name=\""+getName()+"\">");
                     }
                     
                     Field thisField = editConfig.getField(getName());
