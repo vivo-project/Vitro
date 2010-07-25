@@ -971,39 +971,92 @@ public class JenaIngestController extends BaseEditController {
 		    WebappDaoFactory wdf = vreq.getFullWebappDaoFactory();
 			Model m = maker.getModel(oldModel);
 			Model saveModel = maker.getModel(newModel);
-			ResIterator rsItr = m.listResourcesWithProperty((Property)null);
+			Model tempModel = ModelFactory.createDefaultModel();
+			ResIterator rsItr = null;
+			ArrayList<String> urlCheck = new ArrayList<String>();
+			String changeNamespace = null;
+			boolean urlFound = false;
+			if(!oldModel.equals(newModel)){
+				StmtIterator stmtItr = m.listStatements();
+				while(stmtItr.hasNext()){
+					Statement stmt = stmtItr.nextStatement();
+					tempModel.add(stmt);
+				}
+				rsItr = tempModel.listResourcesWithProperty((Property)null);
+			}
+			else{
+				rsItr = m.listResourcesWithProperty((Property)null); 
+			}
 			
 			String uri = null;  
 			while(rsItr.hasNext()){
 				Resource res = rsItr.next();
 				if(oldNamespace.equals(res.getNameSpace())){
-					Resource newRes = null;
+					log.info("inside 1");
 					if(!newNamespace.equals("")){
+						do{
 						uri = getUnusedURI(newNamespace,wdf);
+						if(!urlCheck.contains(uri)){
+				    		 urlCheck.add(uri);
+				    		 urlFound = true;
+				    		 }
+				    		 }while(!urlFound);
+				    		 urlFound = false;
 					}
-					else if(!dNamespace.equals("")){
+					else if(dNamespace.equals("http://vivo.mydomain.edu/individual/")){
+						log.info("inside 2");
 						try{
-				    		 uri = wdf.getIndividualDao().getUnusedURI(null);
+				    		 do{
+				    			 uri = wdf.getIndividualDao().getUnusedURI(null);
+				    		 if(!urlCheck.contains(uri)){
+				    		 urlCheck.add(uri);
+				    		 urlFound = true;
+				    		 }
+				    		 }while(!urlFound);
+				    		 urlFound = false;
+				    		 log.info(uri);
 				        }catch(InsertException ex){
 				        	log.error("could not create uri");
 				        }     	  
 					}
-					newRes = saveModel.createResource(uri);
-					StmtIterator stmItr = m.listStatements(res, (Property)null, (RDFNode)null);
-					while(stmItr.hasNext()){
-						Statement stmt = stmItr.next();
-						Property prop = stmt.getPredicate();
-						RDFNode  node = stmt.getObject();
-						saveModel.add(newRes, prop, node);
-					}
-					res.removeAll((Property)null);
-					
+					ResourceUtils.renameResource(res, uri);					
 				}
+				
 			}
-			
+			boolean statementDone = false;
+			if(!newNamespace.equals("")){
+				changeNamespace = newNamespace;
+			}
+			else if(dNamespace.equals("http://vivo.mydomain.edu/individual/")){
+				changeNamespace = dNamespace;
+			}
+			if(!oldModel.equals(newModel)){
+			StmtIterator stmtItr = tempModel.listStatements();
+			while(stmtItr.hasNext()){
+				statementDone = false;
+				Statement stmt = stmtItr.nextStatement();
+				Resource sRes = stmt.getSubject();
+				Resource oRes = null;
+				if(sRes.getNameSpace().equals(changeNamespace)){
+					saveModel.add(stmt);
+					statementDone = true;
+					}
+				try{
+					oRes = (Resource)stmt.getObject();
+					if(oRes.getNameSpace().equals(changeNamespace) && !statementDone){
+						saveModel.add(stmt);
+						statementDone = true;
+						}	
+				}
+				catch(Exception e){
+					continue;
+				}
+				}
+				
+			}
+			}	
 		
-			
-		}
+	
 	private String getUnusedURI(String newNamespace,WebappDaoFactory wdf){
 		String uri = null;
 		String errMsg = null;
