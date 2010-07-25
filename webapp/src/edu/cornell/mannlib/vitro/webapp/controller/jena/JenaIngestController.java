@@ -992,7 +992,6 @@ public class JenaIngestController extends BaseEditController {
 			while(rsItr.hasNext()){
 				Resource res = rsItr.next();
 				if(oldNamespace.equals(res.getNameSpace())){
-					log.info("inside 1");
 					if(!newNamespace.equals("")){
 						do{
 						uri = getUnusedURI(newNamespace,wdf);
@@ -1004,7 +1003,6 @@ public class JenaIngestController extends BaseEditController {
 				    		 urlFound = false;
 					}
 					else if(dNamespace.equals("http://vivo.mydomain.edu/individual/")){
-						log.info("inside 2");
 						try{
 				    		 do{
 				    			 uri = wdf.getIndividualDao().getUnusedURI(null);
@@ -1014,7 +1012,6 @@ public class JenaIngestController extends BaseEditController {
 				    		 }
 				    		 }while(!urlFound);
 				    		 urlFound = false;
-				    		 log.info(uri);
 				        }catch(InsertException ex){
 				        	log.error("could not create uri");
 				        }     	  
