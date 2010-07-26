@@ -33,7 +33,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 public class PropertyGroupDaoJena extends JenaBaseDao implements PropertyGroupDao {
 
-    private static final Log log = LogFactory.getLog(TabDaoJena.class.getName());
+    private static final Log log = LogFactory.getLog(PropertyGroupDaoJena.class.getName());
 
     public PropertyGroupDaoJena(WebappDaoFactoryJena wadf) {
         super(wadf);
@@ -240,7 +240,7 @@ public class PropertyGroupDaoJena extends JenaBaseDao implements PropertyGroupDa
         try {
             group.setDisplayRank(Integer.decode(((Literal)(groupInd.getProperty(DISPLAY_RANK).getObject())).getString()).intValue());
         } catch (Exception e) {
-            log.error("error setting display rank in groupFromGroupIndividual() for "+groupInd.getURI());
+            log.debug("error setting display rank in groupFromGroupIndividual() for "+groupInd.getURI());
         }
         return group;
     }
