@@ -1002,7 +1002,7 @@ public class JenaIngestController extends BaseEditController {
 				    		 }while(!urlFound);
 				    		 urlFound = false;
 					}
-					else if(dNamespace.equals("http://vivo.mydomain.edu/individual/")){
+					else if(dNamespace.equals(vreq.getFullWebappDaoFactory().getDefaultNamespace())){
 						try{
 				    		 do{
 				    			 uri = wdf.getIndividualDao().getUnusedURI(null);
@@ -1024,7 +1024,7 @@ public class JenaIngestController extends BaseEditController {
 			if(!newNamespace.equals("")){
 				changeNamespace = newNamespace;
 			}
-			else if(dNamespace.equals("http://vivo.mydomain.edu/individual/")){
+			else if(dNamespace.equals(vreq.getFullWebappDaoFactory().getDefaultNamespace())){
 				changeNamespace = dNamespace;
 			}
 			if(!oldModel.equals(newModel)){
