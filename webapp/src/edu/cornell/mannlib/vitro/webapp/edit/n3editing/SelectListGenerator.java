@@ -71,7 +71,7 @@ public class SelectListGenerator {
             case HARDCODED_LITERALS:  // not auto-sorted, and empty values not removed or replaced
                 List<List<String>> hardcodedLiteralOptions = field.getLiteralOptions();
                 if (hardcodedLiteralOptions==null) {
-                    log.error("no literalOptions List found for field \""+fieldName+"\" in SelectListGenerator.getOptions() when OptionsType UNSORTED_LITERALS specified");
+                    log.error("no literalOptions List found for field \""+fieldName+"\" in SelectListGenerator.getOptions() when OptionsType HARDCODED_LITERALS specified");
                     return new HashMap <String,String>();
                 }
                 for(Object obj: ((Iterable)hardcodedLiteralOptions)){
@@ -79,7 +79,7 @@ public class SelectListGenerator {
                     String value=(String)literalPair.get(0);
                     if( value != null){  // allow empty string as a value
                         String label=(String)literalPair.get(1);
-                        if (label!=null && label.trim().length() > 0) {
+                        if (label!=null) { 
                             optionsMap.put(value,label);
                         } else {
                             optionsMap.put(value, value);
