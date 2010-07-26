@@ -223,6 +223,9 @@ public class ImageUploadHelper {
 		} catch (IOException e) {
 			throw new IllegalStateException("Can't read image file: "
 					+ fileInfo, e);
+		} catch (Exception e) {
+			throw new UserMistakeException("Sorry, we were unable to process "
+					+ "the photo you provided. Please try another photo.");
 		} finally {
 			if (source != null) {
 				try {
@@ -461,7 +464,7 @@ public class ImageUploadHelper {
 			scaleParams.add(0.0F); // y translate
 			scaleParams.add(interpolation);
 			RenderedOp image2 = JAI.create("scale", scaleParams);
-			
+
 			JPEGEncodeParam encodeParam = new JPEGEncodeParam();
 			encodeParam.setQuality(1.0F);
 
