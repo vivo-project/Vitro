@@ -215,9 +215,10 @@ public class InputElementFormattingTag extends TagSupport {
     }
     
     private String doDisabled() {
-        /* only insert the disabled attribute if it has been populated */
+        /* Only insert the disabled attribute if it has been populated. Support
+         * both "true" and "disabled" as values. */
         String disabled = getDisabled();
-        if (!StringUtils.isEmpty(disabled)) {
+        if ("true".equals(disabled) || "disabled".equals(disabled)) {
             return "disabled=\"disabled\"";
         }
         return "";
