@@ -360,11 +360,8 @@ are well formed.
             Field field = fields.get(fieldName);
 
             List<String> copyOfN3 = new ArrayList<String>();
-            List<String> assertions = field.getAssertions();
-            if (assertions != null) {
-                for( String str : field.getAssertions()){
-                    copyOfN3.add(str);
-                }               
+            for( String str : field.getAssertions()){
+                copyOfN3.add(str);
             }
             out.put( fieldName, copyOfN3 );
         }
@@ -377,11 +374,8 @@ are well formed.
             Field field = fields.get(fieldName);
 
             List<String> copyOfN3 = new ArrayList<String>();
-            List<String> retractions = field.getRetractions();
-            if (retractions != null) {
-                for( String str : field.getRetractions()){
-                    copyOfN3.add(str);
-                    }
+            for( String str : field.getRetractions()){
+                copyOfN3.add(str);
             }
             out.put( fieldName, copyOfN3 );
         }
