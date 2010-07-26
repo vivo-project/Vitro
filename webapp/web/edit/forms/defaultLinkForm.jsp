@@ -191,8 +191,8 @@
     	title = "Edit <em>" + linkCategory + " link</em> for " + subjectName;
         submitLabel = "Save changes";
     } else {
-        title = "Create a new <em>" + linkCategory + " link</em> for " + subjectName;
-        submitLabel = "Create new link";
+        title = "Create <em>" + linkCategory + " link</em> for " + subjectName;
+        submitLabel = "Create link";
     }
 
 %>

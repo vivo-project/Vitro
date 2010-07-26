@@ -235,8 +235,8 @@
         request.setAttribute("title", "Edit \""+propDomainPublic+"\" entry for " + subject.getName());
         submitButtonLabel = "Save changes";
     } else {
-        request.setAttribute("title","Create a new \""+propDomainPublic+"\" entry for " + subject.getName());
-        submitButtonLabel = "Create new \""+propDomainPublic+"\" entry";
+        request.setAttribute("title","Create \""+propDomainPublic+"\" entry for " + subject.getName());
+        submitButtonLabel = "Create \""+propDomainPublic+"\" entry";
     }
 
 %>
