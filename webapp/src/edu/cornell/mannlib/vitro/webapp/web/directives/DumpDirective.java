@@ -11,6 +11,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHelper;
 import freemarker.core.Environment;
 import freemarker.template.Configuration;
 import freemarker.template.SimpleDate;
+import freemarker.template.SimpleHash;
 import freemarker.template.SimpleScalar;
 import freemarker.template.SimpleSequence;
 import freemarker.template.TemplateBooleanModel;
@@ -66,7 +67,8 @@ public class DumpDirective implements TemplateDirectiveModel {
             type = "boolean";
         } else if (val instanceof SimpleSequence){
             includeTemplate = "dump-array.ftl";
-            type = "array";
+        } else if (val instanceof SimpleHash) {
+            includeTemplate = "dump-hash.ftl";
         } else {
             includeTemplate = "dump-string.ftl";
             value = value.toString();

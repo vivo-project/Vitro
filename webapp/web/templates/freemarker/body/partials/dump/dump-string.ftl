@@ -2,5 +2,6 @@
 
 <#-- Template for dumping string values -->
 
-${value}
+<strong>Type:</strong> ${type}<br />
+<strong>Value:</strong> ${value}<br />
 

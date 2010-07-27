@@ -2,16 +2,14 @@
 
 <#-- Template for dumping a template variable -->
 
-<hr />
+<hr /> <#-- turn these into borders once css is working -->
 <div class="dump">
 
-<h6>Freemarker template variable dump</h6>
-
-<strong>Variable <em>${var}</em>:</strong><br/ >
-<strong>Type:</strong> ${type}<br />
-<strong>Value:</strong>
-<#include includeTemplate />
+    <h6>Freemarker template variable dump</h6>
+    
+    <strong>Variable <em>${var}</em>:</strong><br/ >
+    <#include includeTemplate />
 
 </div>
 
-<hr />
+<hr /> <#-- turn these into borders once css is working -->
