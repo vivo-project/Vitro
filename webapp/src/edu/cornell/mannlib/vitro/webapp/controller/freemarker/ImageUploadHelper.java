@@ -223,6 +223,8 @@ public class ImageUploadHelper {
 		} catch (IOException e) {
 			throw new IllegalStateException("Can't read image file: "
 					+ fileInfo, e);
+		} catch (UserMistakeException e) {
+			throw e;
 		} catch (Exception e) {
 			throw new UserMistakeException("Sorry, we were unable to process "
 					+ "the photo you provided. Please try another photo.");
