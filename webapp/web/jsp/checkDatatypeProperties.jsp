@@ -1,5 +1,7 @@
 <%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
 
+<%-- used by RefactorOperationController.java --%>
+
 <%@ page import="java.util.*, java.lang.String.*"%>
 <%@ page import="edu.cornell.mannlib.vedit.beans.ButtonForm" %>
 

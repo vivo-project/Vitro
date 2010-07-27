@@ -382,15 +382,6 @@
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>SitemapIndexController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.SitemapIndexController</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>SitemapIndexController</servlet-name>
-    <url-pattern>/sitemap.xml</url-pattern>
-  </servlet-mapping>
-
-  <servlet>
     <servlet-name>RDFUploadFormController</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.jena.RDFUploadFormController</servlet-class>
   </servlet>
