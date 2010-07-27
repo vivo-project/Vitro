@@ -30,9 +30,21 @@ public abstract class FileList extends BaseTemplateModel {
         list.add(getUrl(path));
     }
     
+    public void add(String... paths) {
+        for (String path : paths) {
+            add(path);
+        }
+    }
+    
     public void addFromTheme(String path) {
         path = themeDir + getThemeSubDir() + path;
         add(path);
+    }
+    
+    public void addFromTheme(String... paths) {
+        for (String path : paths) {
+            addFromTheme(path);
+        }
     }
     
     public String getTags() {
