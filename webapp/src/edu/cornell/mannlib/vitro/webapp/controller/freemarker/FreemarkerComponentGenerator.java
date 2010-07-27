@@ -24,7 +24,7 @@ import freemarker.template.Configuration;
 public class FreemarkerComponentGenerator extends FreemarkerHttpServlet {
 
     private static final long serialVersionUID = 1L;
-    private static final Log log = LogFactory.getLog(FreemarkerHttpServlet.class.getName());
+    private static final Log log = LogFactory.getLog(FreemarkerComponentGenerator.class);
     
     private static ServletContext context = null;
     

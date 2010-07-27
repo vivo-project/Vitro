@@ -69,6 +69,9 @@ public class TestController extends FreemarkerHttpServlet {
         body.put("zoo1", zoo1);
         body.put("zoo2", zoo2);
         
+        body.put("trueStatement", true);
+        body.put("falseStatement", false);
+        
         getBerries(body);
         
         body.put("bookTitle", "Pride and Prejudice");

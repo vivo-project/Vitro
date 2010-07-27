@@ -50,7 +50,7 @@ import freemarker.template.TemplateModelException;
 public class FreemarkerHttpServlet extends VitroHttpServlet {
 
     private static final long serialVersionUID = 1L;
-    private static final Log log = LogFactory.getLog(FreemarkerHttpServlet.class.getName());
+    private static final Log log = LogFactory.getLog(FreemarkerHttpServlet.class);
     private static final int FILTER_SECURITY_LEVEL = LoginFormBean.EDITOR;
     
     public void doGet( HttpServletRequest request, HttpServletResponse response )
@@ -375,27 +375,9 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         return "";
     }
 
-    protected StringWriter mergeToTemplate(String templateName, Map<String, Object> map, Configuration config) {
-    	
-        Template template = null;
-        try {
-        	template = config.getTemplate(templateName);
-        } catch (IOException e) {
-        	log.error("Cannot get template " + templateName);
-        }
-        StringWriter sw = new StringWriter();
-        if (template != null) {	        
-            try {
-				template.process(map, sw);
-			} catch (TemplateException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}        	
-        }
-        return sw;
+    protected StringWriter mergeToTemplate(String templateName, Map<String, Object> map, Configuration config) {   	
+        FreemarkerHelper helper = new FreemarkerHelper();
+        return helper.mergeToTemplate(templateName, map, config);
     }
 
     protected String mergeBodyToTemplate(String templateName, Map<String, Object> map, Configuration config) {
