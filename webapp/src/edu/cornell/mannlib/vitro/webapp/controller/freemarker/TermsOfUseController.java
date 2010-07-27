@@ -13,7 +13,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 import freemarker.template.Configuration;
 
-public class TermsOfUseController extends FreeMarkerHttpServlet {
+public class TermsOfUseController extends FreemarkerHttpServlet {
     
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(TermsOfUseController.class.getName());

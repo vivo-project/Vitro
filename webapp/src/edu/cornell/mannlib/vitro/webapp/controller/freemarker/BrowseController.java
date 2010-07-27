@@ -35,7 +35,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class BrowseController extends FreeMarkerHttpServlet {
+public class BrowseController extends FreemarkerHttpServlet {
     static final long serialVersionUID=2006030721126L;
 
     private transient ConcurrentHashMap<Integer, List> _groupListMap

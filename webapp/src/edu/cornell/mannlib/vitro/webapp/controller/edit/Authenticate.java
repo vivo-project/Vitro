@@ -29,7 +29,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.RoleBasedPolicy.AuthRole;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreeMarkerHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.Message;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State;
@@ -38,7 +38,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.LoginEvent;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.LoginLogoutEvent;
 
-public class Authenticate extends FreeMarkerHttpServlet {
+public class Authenticate extends FreemarkerHttpServlet {
 	private static final Log log = LogFactory.getLog(Authenticate.class
 			.getName());
 

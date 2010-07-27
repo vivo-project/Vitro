@@ -30,7 +30,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import freemarker.template.Configuration;
 
-public class ContactMailController extends FreeMarkerHttpServlet {
+public class ContactMailController extends FreemarkerHttpServlet {
 	private static final Log log = LogFactory
 			.getLog(ContactMailController.class);
     private static final long serialVersionUID = 1L;

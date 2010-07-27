@@ -20,7 +20,7 @@ import freemarker.template.Configuration;
  * @author rjy7
  *
  */
-public class TestController extends FreeMarkerHttpServlet {
+public class TestController extends FreemarkerHttpServlet {
 
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(TestController.class);

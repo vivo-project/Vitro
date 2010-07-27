@@ -16,7 +16,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vedit.beans.LoginFormBean;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.edit.Authenticate;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreeMarkerHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State;
 import freemarker.template.Configuration;
@@ -27,7 +27,7 @@ import freemarker.template.Configuration;
  * 
  * This class contains stuff that I swiped from {@link Authenticate}. The base
  * class, {@link LoginTemplateHelperBase}, contains stuff that I swiped from
- * {@link FreeMarkerHttpServlet}.
+ * {@link FreemarkerHttpServlet}.
  */
 public class LoginTemplateHelper extends LoginTemplateHelperBase {
 	private static final Log log = LogFactory.getLog(LoginTemplateHelper.class);

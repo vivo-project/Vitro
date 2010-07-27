@@ -47,10 +47,10 @@ import freemarker.template.TemplateException;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
 
-public class FreeMarkerHttpServlet extends VitroHttpServlet {
+public class FreemarkerHttpServlet extends VitroHttpServlet {
 
     private static final long serialVersionUID = 1L;
-    private static final Log log = LogFactory.getLog(FreeMarkerHttpServlet.class.getName());
+    private static final Log log = LogFactory.getLog(FreemarkerHttpServlet.class.getName());
     private static final int FILTER_SECURITY_LEVEL = LoginFormBean.EDITOR;
     
     public void doGet( HttpServletRequest request, HttpServletResponse response )
@@ -429,10 +429,10 @@ public class FreeMarkerHttpServlet extends VitroHttpServlet {
 
     // TEMPORARY method for transition from JSP to FreeMarker. 
     // It's a static method because it needs to be called from JSPs that don't go through a servlet.
-    public static void getFreeMarkerComponentsForJsp(HttpServletRequest request) {
+    public static void getFreemarkerComponentsForJsp(HttpServletRequest request) {
         // We need to create a FreeMarkerHttpServlet object in order to call the instance methods
         // to set up the data model.
-        new FreeMarkerComponentGenerator(request);
+        new FreemarkerComponentGenerator(request);
     }
 
 }

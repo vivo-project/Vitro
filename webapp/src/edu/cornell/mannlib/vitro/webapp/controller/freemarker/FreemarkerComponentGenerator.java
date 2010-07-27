@@ -21,14 +21,14 @@ import freemarker.template.Configuration;
  * @author rjy7
  *
  */
-public class FreeMarkerComponentGenerator extends FreeMarkerHttpServlet {
+public class FreemarkerComponentGenerator extends FreemarkerHttpServlet {
 
     private static final long serialVersionUID = 1L;
-    private static final Log log = LogFactory.getLog(FreeMarkerHttpServlet.class.getName());
+    private static final Log log = LogFactory.getLog(FreemarkerHttpServlet.class.getName());
     
     private static ServletContext context = null;
     
-    FreeMarkerComponentGenerator(HttpServletRequest request) {
+    FreemarkerComponentGenerator(HttpServletRequest request) {
         VitroRequest vreq = new VitroRequest(request);
         Configuration config = getConfig(vreq);
 

@@ -26,7 +26,7 @@ import freemarker.template.Configuration;
  *  Controller for comments ("contact us") page
  *  * @author bjl23
  */
-public class ContactFormController extends FreeMarkerHttpServlet {
+public class ContactFormController extends FreemarkerHttpServlet {
 
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(ContactFormController.class.getName());

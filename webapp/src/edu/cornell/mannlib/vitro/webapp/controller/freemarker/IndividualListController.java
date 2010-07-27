@@ -21,7 +21,7 @@ import freemarker.template.Configuration;
 /** 
  * Generates a list of individuals for display in a template 
  */
-public class IndividualListController extends FreeMarkerHttpServlet {
+public class IndividualListController extends FreemarkerHttpServlet {
   
     private static final long serialVersionUID = 1L;   
     private static final Log log = LogFactory.getLog(IndividualListController.class.getName());

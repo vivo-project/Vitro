@@ -69,7 +69,7 @@ build up the list of actually rendered items first. Only then, if there are any,
 
 */
 
-public class IndividualController extends FreeMarkerHttpServlet {
+public class IndividualController extends FreemarkerHttpServlet {
     
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(IndividualController.class.getName());

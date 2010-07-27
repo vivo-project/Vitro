@@ -11,7 +11,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import freemarker.template.Configuration;
 
-public class AboutController extends FreeMarkerHttpServlet {
+public class AboutController extends FreemarkerHttpServlet {
 	
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(AboutController.class.getName());

@@ -36,7 +36,7 @@ import freemarker.template.Configuration;
 /**
  * Handle adding, replacing or deleting the main image on an Individual.
  */
-public class ImageUploadController extends FreeMarkerHttpServlet {
+public class ImageUploadController extends FreemarkerHttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final Log log = LogFactory
 			.getLog(ImageUploadController.class);

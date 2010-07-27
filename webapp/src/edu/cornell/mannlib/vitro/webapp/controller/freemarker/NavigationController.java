@@ -31,7 +31,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.web.DisplayVocabulary;
 import freemarker.template.Configuration;
 
-public class NavigationController extends FreeMarkerHttpServlet {
+public class NavigationController extends FreemarkerHttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final Log log = LogFactory.getLog(NavigationController.class.getName());
 	

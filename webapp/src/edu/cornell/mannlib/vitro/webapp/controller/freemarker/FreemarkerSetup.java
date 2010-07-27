@@ -14,16 +14,16 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 import freemarker.template.Configuration;
 
-public class FreeMarkerSetup implements ServletContextListener {
+public class FreemarkerSetup implements ServletContextListener {
     
-    private static final Log log = LogFactory.getLog(FreeMarkerSetup.class);
+    private static final Log log = LogFactory.getLog(FreemarkerSetup.class);
 
 	public void contextInitialized(ServletContextEvent event) {	
 
 		ServletContext sc = event.getServletContext();	
 		sc.setAttribute("themeToConfigMap", new HashMap<String, Configuration>());
         BaseTemplateModel.setServletContext(sc);
-        FreeMarkerComponentGenerator.setServletContext(sc);
+        FreemarkerComponentGenerator.setServletContext(sc);
 		UrlBuilder.contextPath = sc.getContextPath();
 	}
 

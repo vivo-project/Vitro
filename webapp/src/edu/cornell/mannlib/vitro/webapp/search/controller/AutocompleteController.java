@@ -40,7 +40,7 @@ import org.apache.lucene.store.FSDirectory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreeMarkerHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
 import edu.cornell.mannlib.vitro.webapp.search.SearchException;
@@ -59,7 +59,7 @@ import freemarker.template.Configuration;
  * through a Lucene search. 
  */
 
-public class AutocompleteController extends FreeMarkerHttpServlet implements Searcher{
+public class AutocompleteController extends FreemarkerHttpServlet implements Searcher{
 
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(AutocompleteController.class);

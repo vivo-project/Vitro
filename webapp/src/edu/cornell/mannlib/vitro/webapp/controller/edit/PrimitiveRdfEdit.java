@@ -27,7 +27,7 @@ import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vedit.beans.LoginFormBean;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreeMarkerHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DependentResourceDeleteJena;
@@ -35,7 +35,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditN3Utils;
 import freemarker.template.Configuration;
 
-public class PrimitiveRdfEdit extends FreeMarkerHttpServlet{
+public class PrimitiveRdfEdit extends FreemarkerHttpServlet{
 
     private static final long serialVersionUID = 1L;
 

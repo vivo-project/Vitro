@@ -15,7 +15,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vedit.beans.LoginFormBean;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreeMarkerHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
 import freemarker.template.Configuration;
@@ -33,7 +33,7 @@ import freemarker.template.Configuration;
  * @author bdc34
  *
  */
-public class IndexController extends FreeMarkerHttpServlet {
+public class IndexController extends FreemarkerHttpServlet {
 	
 	private static final Log log = LogFactory.getLog(IndexController.class.getName());
 	
