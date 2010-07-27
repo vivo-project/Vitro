@@ -498,9 +498,20 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
                     int rv = 0;
                     try {
                         if( val1 instanceof String ) {
-                            Collator collator = Collator.getInstance();
-                        	rv = collator.compare( ((String)val1) , ((String)val2) );
-                            //rv = ((String)val1).compareTo((String)val2);
+                        	
+                        	if (val1 == null && val2 == null) {
+                        		rv = 0;
+                        	} else if (val1 == null) {
+                        		rv = 1;
+                        	} else if (val2 == null) {
+                        		rv = -1;
+                        	} else {
+                               	
+                                Collator collator = Collator.getInstance();
+                            	rv = collator.compare( ((String)val1) , ((String)val2) );
+                                //rv = ((String)val1).compareTo((String)val2);                 		
+                        	}
+ 
                         } else if( val1 instanceof Date ) {
                             DateTime dt1 = new DateTime((Date)val1);
                             DateTime dt2 = new DateTime((Date)val2);
@@ -580,33 +591,31 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
                         log.debug( "PropertyWebapp.sortObjectPropertyStatementsForDisplay passed object property statement with no range entity.");
                     }
                     int rv = 0;
-                    try {
-                        if (val1==null) {
-                            rv = 1;
+                    try {	
+                    	if (val1 == null && val2 == null) {
+                    		 rv = 0;
+                    	} else if (val1==null) {
+                             rv = 1;
+                        } else if (val2==null) {
+                             rv = -1;
+                        }  else {                        
+	                           if( val1 instanceof String ) {
+	                              Collator collator = Collator.getInstance();
+	                              rv = collator.compare( ((String)val1) , ((String)val2) ); //was rv = ((String)val1).compareTo((String)val2);
+	                           } else if( val1 instanceof Date ) {
+	                              DateTime dt1 = new DateTime((Date)val1);
+	                              DateTime dt2 = new DateTime((Date)val2);
+	                              rv = dt1.compareTo(dt2);
+	                           } else if( val1 instanceof Integer) {
+	                        	  rv = ((Integer) val1) - ((Integer) val2);
+	                           } else{
+	                            rv = 0;
+	                           }
                         }
-                        if (val2==null) {
-                            rv = -1;
-                        }
-                        if( val1 instanceof String ) {
-                            Collator collator = Collator.getInstance();
-                            rv = collator.compare( ((String)val1) , ((String)val2) ); //was rv = ((String)val1).compareTo((String)val2);
-                        } else if( val1 instanceof Date ) {
-                            DateTime dt1 = new DateTime((Date)val1);
-                            DateTime dt2 = new DateTime((Date)val2);
-                            rv = dt1.compareTo(dt2);
-                        } else if( val1 instanceof Integer) {
-                        	rv = ((Integer) val1) - ((Integer) val2);
-                        }
-                        else
-                            rv = 0;
                     } catch (NullPointerException e) {
                         e.printStackTrace();
                     }
-                    
-                    //if( cAscending )
-                    //    return rv;
-                    //else
-                    //    return rv * -1;
+ 
                     
                     if ( !cAscending ) {
                     	rv = rv * -1;
