@@ -1,14 +1,14 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.web.templatemodels.filelist;
+package edu.cornell.mannlib.vitro.webapp.web.templatemodels.files;
 
-public class ScriptList extends FileList {
+public class Scripts extends Files {
     
     protected static final String THEME_SUBDIR = "/js";
 
-    public ScriptList() { }
+    public Scripts() { }
     
-    public ScriptList(String themeDir) {
+    public Scripts(String themeDir) {
         super(themeDir);
     }
 

@@ -1,28 +1,26 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.web.templatemodels.filelist;
+package edu.cornell.mannlib.vitro.webapp.web.templatemodels.files;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.LinkedHashSet;
 
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 
-public abstract class FileList extends BaseTemplateModel {
+public abstract class Files extends BaseTemplateModel {
     
-    protected List<String> list = null;
+    protected LinkedHashSet<String> list = null;
     private String themeDir = null;
     
-    public FileList() {
-        this.list = new ArrayList<String>();
+    public Files() {
+        this.list = new LinkedHashSet<String>();
     }
     
-    public FileList(String themeDir) {
+    public Files(String themeDir) {
         this();
         this.themeDir = themeDir;
     }
     
-    public FileList(List<String> list) {
+    public Files(LinkedHashSet<String> list) {
         this.list = list;
     }
     

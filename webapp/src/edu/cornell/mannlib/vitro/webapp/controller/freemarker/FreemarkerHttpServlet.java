@@ -32,8 +32,8 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 import edu.cornell.mannlib.vitro.webapp.web.BreadCrumbsUtil;
 import edu.cornell.mannlib.vitro.webapp.web.PortalWebUtil;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.filelist.ScriptList;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.filelist.StylesheetList;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.files.Scripts;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.files.Stylesheets;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu.TabMenu;
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.cache.FileTemplateLoader;
@@ -259,7 +259,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         BeansWrapper wrapper = new DefaultObjectWrapper();
         try {
             // Here themeDir SHOULD NOT have the context path already added to it.
-            return wrapper.wrap(new StylesheetList(themeDir));       
+            return wrapper.wrap(new Stylesheets(themeDir));       
         } catch (TemplateModelException e) {
             log.error("Error creating stylesheet TemplateModel");
             return null;
@@ -273,7 +273,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         // add stylesheets and scripts to the lists by calling their add() methods.
         BeansWrapper wrapper = new DefaultObjectWrapper();
         try {
-            return wrapper.wrap(new ScriptList(themeDir));       
+            return wrapper.wrap(new Scripts(themeDir));       
         } catch (TemplateModelException e) {
             log.error("Error creating script TemplateModel");
             return null;

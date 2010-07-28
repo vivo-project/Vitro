@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHelper;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.filelist.StylesheetList;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.files.Stylesheets;
 import freemarker.core.Environment;
 import freemarker.template.Configuration;
 import freemarker.template.SimpleDate;
