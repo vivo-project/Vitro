@@ -69,6 +69,13 @@ public class TestController extends FreemarkerHttpServlet {
         body.put("zoo1", zoo1);
         body.put("zoo2", zoo2);
         
+        // Test recursive dump - array of arrays
+//        String[] fruitArray = { "apples", "bananas", "strawberries" };
+//        String[] animalArray = { "cat", "dog", "mouse" };
+//        String[] dayArray = { "Monday", "Tuesday", "Wednesday" };
+//        String[][] arrays = { fruitArray, animalArray, dayArray };
+//        body.put("arrays", arrays);
+        
         body.put("trueStatement", true);
         body.put("falseStatement", false);
         

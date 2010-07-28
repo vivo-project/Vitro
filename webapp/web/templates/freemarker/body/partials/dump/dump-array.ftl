@@ -6,6 +6,9 @@
 <strong>Values:</strong><br />
 <ul>
 <#list value as item> 
-    <li>${item_index}: ${item}</li>   
+    <#-- Shallow (non-recursive) dump  -->
+    <li>${item_index}: ${item}</li> 
+    <#-- Deep (recursive) dump 
+    <li>${item_index}: <@dump var="${item}" /></li> -->
 </#list>
 </ul>

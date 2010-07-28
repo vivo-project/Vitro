@@ -54,7 +54,8 @@ public class DumpDirective implements TemplateDirectiveModel {
         String includeTemplate;
         Object value = val;
         String type = null;
-        
+        Writer out = env.getOut();
+
         if (val instanceof SimpleScalar) {
             includeTemplate = "dump-string.ftl"; 
             type = "string";
@@ -70,6 +71,10 @@ public class DumpDirective implements TemplateDirectiveModel {
             includeTemplate = "dump-array.ftl";
         } else if (val instanceof SimpleHash) {
             includeTemplate = "dump-hash.ftl";
+        // In recursive dump, we've gotten down to a raw string    
+//        } else if (val == null) {
+//            out.write(var);
+//            return;
         } else {
             includeTemplate = "dump-string.ftl";
             value = value.toString();
@@ -83,11 +88,11 @@ public class DumpDirective implements TemplateDirectiveModel {
         map.put("type", type);
         
         map.put("stylesheets", dataModel.get("stylesheets"));
+        //map.put("dump", this);
         
         FreemarkerHelper helper = new FreemarkerHelper();
         String output = helper.mergeMapToTemplate(templateName, map, config);      
-        
-        Writer out = env.getOut();
+
         out.write(output);
 
     }

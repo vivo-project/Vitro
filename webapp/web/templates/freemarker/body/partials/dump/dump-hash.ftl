@@ -7,6 +7,9 @@
 
 <ul>
     <#list value?keys as key> 
-        <li>${key} = ${value[key]}</li>   
+        <#-- Shallow (non-recursive) dump  -->
+        <li>${key} = ${value[key]}</li>
+        <#-- Deep (recursive) dump 
+        <li>${key} = <@dump var="${value[key]}" /></li> -->
     </#list>
 </ul>
