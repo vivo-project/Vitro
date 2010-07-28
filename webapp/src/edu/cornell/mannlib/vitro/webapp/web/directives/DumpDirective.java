@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHelper;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.filelist.StylesheetList;
 import freemarker.core.Environment;
 import freemarker.template.Configuration;
 import freemarker.template.SimpleDate;
@@ -80,6 +81,8 @@ public class DumpDirective implements TemplateDirectiveModel {
         map.put("value", value);
         map.put("includeTemplate", includeTemplate);
         map.put("type", type);
+        
+        map.put("stylesheets", dataModel.get("stylesheets"));
         
         FreemarkerHelper helper = new FreemarkerHelper();
         String output = helper.mergeMapToTemplate(templateName, map, config);      

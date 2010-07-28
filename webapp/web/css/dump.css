@@ -5,5 +5,6 @@
 .dump {
     border-top: 1px solid #ccc;
     border-bottom: 1px solid #ccc;
-    padding: 5em 0;
+    padding: 1em 0;
+    margin: 1em 0;
 }
