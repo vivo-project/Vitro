@@ -13,7 +13,7 @@ public class Scripts extends Files {
     }
 
     protected String getTag(String url) {
-        return "<script type=\"text/javascript\" src=\"" + url + "\"></script>";
+        return "<script type=\"text/javascript\" src=\"" + url + "\"></script>\n";
     }
 
     protected String getThemeSubDir() {

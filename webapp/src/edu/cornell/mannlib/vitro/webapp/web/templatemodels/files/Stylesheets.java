@@ -13,7 +13,7 @@ public class Stylesheets extends Files {
     }
     
     protected String getTag(String url) {
-        return "<link rel=\"stylesheet\" href=\"" + url + "\" />";
+        return "<link rel=\"stylesheet\" href=\"" + url + "\" />\n";
     }
     
     protected String getThemeSubDir() {
