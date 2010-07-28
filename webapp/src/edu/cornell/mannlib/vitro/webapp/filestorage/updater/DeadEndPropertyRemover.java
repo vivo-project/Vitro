@@ -7,7 +7,6 @@ import java.io.File;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 
@@ -39,14 +38,9 @@ public class DeadEndPropertyRemover extends FsuScanner {
 	 * Check all of the individuals that possess this property.
 	 */
 	private void removeDeadEndProperties(Property prop, String label) {
-		ResIterator resources = model.listResourcesWithProperty(prop);
-		try {
-			while (resources.hasNext()) {
-				Resource resource = resources.next();
-				removeDeadEndPropertiesFromResource(resource, prop, label);
-			}
-		} finally {
-			resources.close();
+		for (Resource resource : ModelWrapper.listResourcesWithProperty(model,
+				prop)) {
+			removeDeadEndPropertiesFromResource(resource, prop, label);
 		}
 	}
 
@@ -67,7 +61,8 @@ public class DeadEndPropertyRemover extends FsuScanner {
 							"removing link to " + label + " '" + filename
 									+ "': file does not exist at '"
 									+ file.getAbsolutePath() + "'.");
-					model.remove(stmt);
+
+					ModelWrapper.removeStatement(model, stmt);
 				}
 			}
 		}

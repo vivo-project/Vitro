@@ -81,7 +81,7 @@ public class ImageSchemaTranslater extends FsuScanner {
 
 		translateMainImage(resource, mainImages.get(0));
 		translated.add(mainImages.get(0));
-		resource.removeAll(imageProperty);
+		ResourceWrapper.removeAll(resource, imageProperty);
 
 		List<String> thumbnails = getValues(resource, thumbProperty);
 		if (thumbnails.size() != 1) {
@@ -92,7 +92,7 @@ public class ImageSchemaTranslater extends FsuScanner {
 
 		translateThumbnail(resource, thumbnails.get(0));
 		translated.add(thumbnails.get(0));
-		resource.removeAll(thumbProperty);
+		ResourceWrapper.removeAll(resource, thumbProperty);
 	}
 
 	/**
