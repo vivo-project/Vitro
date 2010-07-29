@@ -13,12 +13,10 @@ import java.util.TreeSet;
 
 import org.apache.commons.io.FilenameUtils;
 
-import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.filestorage.FileModelHelper;
 import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorage;
 
@@ -104,9 +102,7 @@ public class ImageSchemaTranslater extends FsuScanner {
 		Individual file = translateFile(resource, path, "main image");
 		Individual person = fileModelHelper.getIndividualByUri(resource
 				.getURI());
-		Property mainImageProperty = resource.getModel().getProperty(VitroVocabulary.IND_MAIN_IMAGE);
-		resource.addProperty(mainImageProperty, model.getResource(file.getURI()));
-//		fileModelHelper.setAsMainImageOnEntity(person, file);
+		fileModelHelper.setAsMainImageOnEntity(person, file);
 	}
 
 	/**
