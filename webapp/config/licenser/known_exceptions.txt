@@ -118,11 +118,20 @@ webapp/web/src/xml/*
 # Sample code from Google.
 webapp/web/templates/freemarker/page/partials/googleAnalytics.ftl
 
-# PROBLEM? Third-party tlds - where do they come from?
+# PROBLEM: requires an accompanying license text, as spelled out on 
+#     http://djpowell.net/blog/entries/sparqltag.html
+webapp/config/tlds/sparqltag.tld
+
+# PROBLEM: requires an accompanying copy of the Apache license, as spelled out
+#     in the distribution from http://jakarta.apache.org/site/downloads/downloads_taglibs-standard.cgi
 webapp/config/tlds/c.tld
 webapp/config/tlds/fn.tld
-webapp/config/tlds/sparqltag.tld
+
+# PROBLEM: requires an accompanying copy of the Apache license 1.1, as spelled out
+#     in the distribution from http://jakarta.apache.org/site/downloads/downloads_taglibs-mailer.cgi
 webapp/config/tlds/taglibs-mailer.tld
+
+# PROBLEM? Third-party tlds - where do they come from?
 webapp/config/tlds/taglibs-random.tld
 webapp/config/tlds/taglibs-string.tld
 
