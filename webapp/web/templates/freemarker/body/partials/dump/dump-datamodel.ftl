@@ -4,7 +4,7 @@
 
 <div class="dump datamodel">
 
-    <h4>Template data model dump</h6>
+    <h4>Data Model Dump for Template <em>${containingTemplate}</em></h6>
     
     <h5>Variables</h5>
     

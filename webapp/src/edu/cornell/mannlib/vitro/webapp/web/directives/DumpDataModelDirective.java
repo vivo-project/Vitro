@@ -72,7 +72,10 @@ public class DumpDataModelDirective implements TemplateDirectiveModel {
         map.put("stylesheets", dataModel.get("stylesheets"));
         map.put("dump", dataModel.get("dump"));
         // Put the current datamodel into the new datamodel so its values can be dumped with the dump directive
+        // RY Another way to do this would be to loop through the data model here, merging each variable with
+        // the dump-var.ftl template and adding it to the output string.
         map.put("datamodel", dataModel);
+        map.put("containingTemplate", env.getTemplate().getName());
 
         FreemarkerHelper helper = new FreemarkerHelper();
         String output = helper.mergeMapToTemplate(templateName, map, config);      
