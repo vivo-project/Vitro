@@ -1,8 +1,8 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
-<#-- Template for dumping array values -->
+<#-- Template for dumping sequence (list and array) values -->
 
-<strong>Type:</strong> array<br />
+<strong>Type:</strong> sequence (array/list)<br />
 <strong>Values:</strong><br />
 <ul>
 <#list value as item> 

@@ -46,12 +46,14 @@
 
 <p><strong>Berries: </strong>${berries}</p>
 
+<#--
 <@dump var="now" />
 <@dump var="urls" />
 <@dump var="fruit" />
 <@dump var="trueStatement" />
-<@dump var="falseStatement" />
+<@dump var="falseStatement" /> -->
 
+<@dump var="zoo1" />
 <@dumpDataModel />
 
 ${stylesheets.addFromTheme("/sstest.css", "/sstest2.css")}

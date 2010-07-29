@@ -7,24 +7,29 @@ import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHelper;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.files.Stylesheets;
 import freemarker.core.Environment;
 import freemarker.template.Configuration;
-import freemarker.template.SimpleDate;
-import freemarker.template.SimpleHash;
 import freemarker.template.SimpleScalar;
-import freemarker.template.SimpleSequence;
 import freemarker.template.TemplateBooleanModel;
+import freemarker.template.TemplateDateModel;
 import freemarker.template.TemplateDirectiveBody;
 import freemarker.template.TemplateDirectiveModel;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateHashModel;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
+import freemarker.template.TemplateNumberModel;
+import freemarker.template.TemplateScalarModel;
+import freemarker.template.TemplateSequenceModel;
 
 public class DumpDirective implements TemplateDirectiveModel {
 
+    private static final Log log = LogFactory.getLog(DumpDirective.class);
+    
     @SuppressWarnings("unchecked")
     @Override
     public void execute(Environment env, Map params, TemplateModel[] loopVars,
@@ -42,57 +47,72 @@ public class DumpDirective implements TemplateDirectiveModel {
         Object o = params.get("var");
         if ( !(o instanceof SimpleScalar)) {
             throw new TemplateModelException(
-               "Value of 'var' must be a string.");     
+               "Value of parameter 'var' must be a string.");     
         }
         String var = ((SimpleScalar)o).getAsString();
+        
+        Object r = params.get("dataModelDump");
+        boolean dataModelDump = false;
+        if (r != null) {
+            if ( !(r instanceof TemplateBooleanModel)) {
+                throw new TemplateModelException(
+                   "Value of parameter 'recursive' must be a boolean: true or false without quotation marks.");     
+            }
+            dataModelDump = ((TemplateBooleanModel) r).getAsBoolean(); 
+        }
 
         TemplateHashModel dataModel = env.getDataModel();
-        TemplateModel val = dataModel.get(var);  
+        if (dataModelDump) {
+            dataModel = (TemplateHashModel) dataModel.get("datamodel");
+        }
         
-        Configuration config = env.getConfiguration();
-        String templateName = "dump-var.ftl";
-        String includeTemplate;
-        Object value = val;
+        TemplateModel val =  null;
+        try {
+            val = dataModel.get(var);
+        } catch (TemplateModelException tme) {
+            log.error("Error getting value of template model " + var + " from data model.");
+        }
+        
+        // Just use this for now. Handles nested collections.
+        String value = val.toString(); 
         String type = null;
-        Writer out = env.getOut();
 
-        if (val instanceof SimpleScalar) {
-            includeTemplate = "dump-string.ftl"; 
+        if (val instanceof TemplateScalarModel) {
             type = "string";
-        } else if (val instanceof SimpleDate) {
-            includeTemplate = "dump-string.ftl"; 
-            value = value.toString();
+        } else if (val instanceof TemplateDateModel) { 
             type = "date";
+        } else if (val instanceof TemplateNumberModel) {
+            type = "number";
         } else if (val instanceof TemplateBooleanModel) {
-            includeTemplate = "dump-string.ftl"; 
             value =  ((TemplateBooleanModel) val).getAsBoolean() ? "true" : "false";
             type = "boolean";
-        } else if (val instanceof SimpleSequence){
-            includeTemplate = "dump-array.ftl";
-        } else if (val instanceof SimpleHash) {
-            includeTemplate = "dump-hash.ftl";
-        // In recursive dump, we've gotten down to a raw string    
+        } else if (val instanceof TemplateSequenceModel){
+            type = "sequence";
+        } else if (val instanceof TemplateHashModel) {
+            type = "hash";
+        // In recursive dump, we've gotten down to a raw string. Just output it.    
 //        } else if (val == null) {
 //            out.write(var);
 //            return;
+        // Add a case for BaseTemplateModel - our template model objects will have a dump() method.
         } else {
-            includeTemplate = "dump-string.ftl";
-            value = value.toString();
             type = "object";
         }
 
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("var", var);
         map.put("value", value);
-        map.put("includeTemplate", includeTemplate);
         map.put("type", type);
         
         map.put("stylesheets", dataModel.get("stylesheets"));
         //map.put("dump", this);
-        
+
+        Configuration config = env.getConfiguration();
+        String templateName = "dump-var.ftl";
         FreemarkerHelper helper = new FreemarkerHelper();
         String output = helper.mergeMapToTemplate(templateName, map, config);      
 
+        Writer out = env.getOut();
         out.write(output);
 
     }

@@ -6,7 +6,8 @@
     
     <h6>Dump of template variable <em>${var}</em>:</h6>
     
-    <#include includeTemplate />
+    <strong>Type:</strong> ${type}<br />
+    <strong>Value:</strong> ${value}<br />
 
 </div>
 

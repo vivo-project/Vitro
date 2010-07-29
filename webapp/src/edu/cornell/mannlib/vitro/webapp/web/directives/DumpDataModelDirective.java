@@ -6,12 +6,17 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHelper;
+
 import freemarker.core.Environment;
+import freemarker.template.Configuration;
 import freemarker.template.TemplateDirectiveBody;
 import freemarker.template.TemplateDirectiveModel;
 import freemarker.template.TemplateException;
@@ -22,49 +27,55 @@ import freemarker.template.utility.DeepUnwrap;
 
 public class DumpDataModelDirective implements TemplateDirectiveModel {
 
-    @SuppressWarnings({ "unchecked", "deprecation" })
+    private static final Log log = LogFactory.getLog(DumpDataModelDirective.class);
+    
+    @SuppressWarnings({ "unchecked" })
     @Override
     public void execute(Environment env, Map params, TemplateModel[] loopVars,
             TemplateDirectiveBody body) throws TemplateException, IOException {
 
         if (params.size() != 0) {
             throw new TemplateModelException(
-                "The dump directive doesn't allow parameters.");
+                "The dumpDataModel directive doesn't allow parameters.");
         }       
         if (loopVars.length != 0) {
             throw new TemplateModelException(
-                "The dump directive doesn't allow loop variables.");
+                "The dumpDataModel directive doesn't allow loop variables.");
         }
         if (body != null) {
             throw new TemplateModelException(
-                "The dump directive doesn't allow nested content.");
+                "The dumpDataModel directive doesn't allow nested content.");
         }
 
         TemplateHashModel dataModel = env.getDataModel();
-        List<String> models = new ArrayList<String>();
+        Map<String, Object> models = new HashMap<String, Object>();
         List<String> directives = new ArrayList<String>();
           
         Map<String, Object> dm = (Map<String, Object>) DeepUnwrap.permissiveUnwrap(dataModel);
-        Set varNames = dm.keySet();
-        for (Object varName : varNames) {
-            if (dm.get(varName) instanceof TemplateDirectiveModel) {
-                directives.add((String) varName);
+        List<String> varNames = new ArrayList(dm.keySet()); 
+        Collections.sort(varNames);
+        for (String var : varNames) {
+            Object value = dm.get(var);
+            if (value instanceof TemplateDirectiveModel) {
+                directives.add((String) var);
             } else {
-                models.add((String) varName);
+                models.put(var, value);
             }
         }
+        
+        Configuration config = env.getConfiguration();
+        String templateName = "dump-datamodel.ftl";
+        
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("models", models);
+        map.put("directives", directives);
+        map.put("stylesheets", dataModel.get("stylesheets"));
+        map.put("dump", dataModel.get("dump"));
+        // Put the current datamodel into the new datamodel so its values can be dumped with the dump directive
+        map.put("datamodel", dataModel);
 
-        Collections.sort(models);
-        Collections.sort(directives);
- 
-        // RY Improve by making presentation of various types more nuanced
-        // Also merge to a template for formatting
-        // get config from environment; get a template from config
-        // merge as in FreeMarkerHttpServlet.mergeToTemplate()
-        String modelNames = "<p><strong>Data model:</strong> " + StringUtils.join(models, ", ") + ".</p>";
-        String directiveNames = "<p><strong>Directives:</strong> " + StringUtils.join(directives, ", ") + ".</p>";
-
-        String output = modelNames + directiveNames;
+        FreemarkerHelper helper = new FreemarkerHelper();
+        String output = helper.mergeMapToTemplate(templateName, map, config);      
         Writer out = env.getOut();
         out.write(output);
 
