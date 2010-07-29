@@ -13,6 +13,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHelper;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 import freemarker.core.Environment;
 import freemarker.template.Configuration;
 import freemarker.template.SimpleScalar;
@@ -26,6 +27,7 @@ import freemarker.template.TemplateModelException;
 import freemarker.template.TemplateNumberModel;
 import freemarker.template.TemplateScalarModel;
 import freemarker.template.TemplateSequenceModel;
+import freemarker.template.utility.DeepUnwrap;
 
 public class DumpDirective extends BaseTemplateDirectiveModel {
 
@@ -77,8 +79,14 @@ public class DumpDirective extends BaseTemplateDirectiveModel {
         // Just use this for now. Handles nested collections.
         String value = val.toString(); 
         String type = null;
+        Object unwrappedModel = DeepUnwrap.permissiveUnwrap(val);
 
-        if (val instanceof TemplateScalarModel) {
+        // This case must precede the TemplateScalarModel case, because
+        // val is an instance of StringModel.
+        if (unwrappedModel instanceof BaseTemplateModel) {
+            type = unwrappedModel.getClass().getName(); 
+            value = ((BaseTemplateModel)unwrappedModel).dump();
+        } else if (val instanceof TemplateScalarModel) {
             type = "string";
         } else if (val instanceof TemplateDateModel) { 
             type = "date";

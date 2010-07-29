@@ -51,11 +51,12 @@
 <@dump var="urls" />
 <@dump var="fruit" />
 <@dump var="trueStatement" />
-<@dump var="falseStatement" /> -->
+<@dump var="falseStatement" /> 
+<@dump var="zoo1" /> -->
 
-<@dump var="zoo1" />
-<@dumpDataModel />
 
 ${stylesheets.addFromTheme("/sstest.css", "/sstest2.css")}
 ${scripts.addFromTheme("/jstest.js")}
 ${scripts.add("/js/script1.js", "/js/script2.js", "/js/script3.js")}
+
+<@dumpDataModel />

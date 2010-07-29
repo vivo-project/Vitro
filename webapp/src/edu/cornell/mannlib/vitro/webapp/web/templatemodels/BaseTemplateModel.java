@@ -33,6 +33,10 @@ public abstract class BaseTemplateModel {
     public static void setServletContext(ServletContext context) {
         BaseTemplateModel.servletContext = context;
     }
+    
+    public String dump() {
+        return "I'm a BaseTemplateModel object";
+    }
 
     /*
      * public static List<?> wrapList(List<?> list, Class cl) 
