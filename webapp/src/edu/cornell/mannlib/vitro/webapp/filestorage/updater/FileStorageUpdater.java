@@ -10,7 +10,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ResIterator;
 
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
@@ -193,26 +192,16 @@ public class FileStorageUpdater implements FSUController {
 	 * properties, we have work to do.
 	 */
 	private boolean isThereAnythingToDo() {
-		ResIterator haveImage = model.listResourcesWithProperty(model
-				.createProperty(IMAGEFILE));
-		try {
-			if (haveImage.hasNext()) {
-				return true;
-			}
-		} finally {
-			haveImage.close();
+		if (!ModelWrapper.listResourcesWithProperty(model,
+				model.createProperty(IMAGEFILE)).isEmpty()) {
+			return true;
 		}
 
-		ResIterator haveThumb = model.listResourcesWithProperty(model
-				.createProperty(IMAGETHUMB));
-		try {
-			if (haveThumb.hasNext()) {
-				return true;
-			}
-		} finally {
-			haveThumb.close();
+		if (!ModelWrapper.listResourcesWithProperty(model,
+				model.createProperty(IMAGETHUMB)).isEmpty()) {
+			return true;
 		}
-
+		
 		return false;
 	}
 
