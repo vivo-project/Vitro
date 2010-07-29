@@ -7,7 +7,6 @@ import java.util.List;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 
@@ -37,14 +36,9 @@ public class MultiplePropertyRemover extends FsuScanner {
 	 * Check each resource that has this property.
 	 */
 	public void removeExtraProperties(Property prop, String label) {
-		ResIterator resources = model.listResourcesWithProperty(prop);
-		try {
-			while (resources.hasNext()) {
-				Resource resource = resources.next();
-				removeExtraProperties(resource, prop, label);
-			}
-		} finally {
-			resources.close();
+		for (Resource resource : ModelWrapper.listResourcesWithProperty(model,
+				prop)) {
+			removeExtraProperties(resource, prop, label);
 		}
 	}
 
@@ -65,7 +59,7 @@ public class MultiplePropertyRemover extends FsuScanner {
 				updateLog.warn(resource, "removing extra " + label
 						+ " property: '" + node + "'");
 			}
-			model.remove(stmt);
+			ModelWrapper.removeStatement(model, stmt);
 		}
 	}
 }

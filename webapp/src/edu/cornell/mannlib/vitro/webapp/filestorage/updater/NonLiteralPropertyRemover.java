@@ -8,10 +8,9 @@ import java.util.List;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.shared.Lock;
 
 /**
  * All image properties should have literal values. Burn any that don't.
@@ -37,14 +36,9 @@ public class NonLiteralPropertyRemover extends FsuScanner {
 	 * Check all resources for bogus values on this property.
 	 */
 	private void removeNonLiterals(Property prop, String label) {
-		ResIterator resources = model.listResourcesWithProperty(prop);
-		try {
-			while (resources.hasNext()) {
-				Resource resource = resources.next();
-				removeNonLiterals(resource, prop, label);
-			}
-		} finally {
-			resources.close();
+		for (Resource resource : ModelWrapper.listResourcesWithProperty(model,
+				prop)) {
+			removeNonLiterals(resource, prop, label);
 		}
 	}
 
@@ -54,24 +48,23 @@ public class NonLiteralPropertyRemover extends FsuScanner {
 	private void removeNonLiterals(Resource resource, Property prop,
 			String label) {
 		List<RDFNode> bogusValues = new ArrayList<RDFNode>();
-		StmtIterator stmts = resource.listProperties(prop);
-		try {
-			while (stmts.hasNext()) {
-				Statement stmt = stmts.next();
-				RDFNode object = stmt.getObject();
-				if (!object.isLiteral()) {
-					bogusValues.add(object);
-				}
+		for (Statement stmt : ResourceWrapper.listProperties(resource, prop)) {
+			RDFNode object = stmt.getObject();
+			if (!object.isLiteral()) {
+				bogusValues.add(object);
 			}
-		} finally {
-			stmts.close();
 		}
 
 		for (RDFNode bogusValue : bogusValues) {
 			updateLog.warn(resource, "discarding " + label
 					+ " property with non-literal as object: '" + bogusValue
 					+ "'");
-			model.createStatement(resource, prop, bogusValue).remove();
+			model.enterCriticalSection(Lock.WRITE);
+			try {
+				model.createStatement(resource, prop, bogusValue).remove();
+			} finally {
+				model.leaveCriticalSection();
+			}
 		}
 	}
 

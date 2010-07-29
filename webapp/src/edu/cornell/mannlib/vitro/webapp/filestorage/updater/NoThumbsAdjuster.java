@@ -10,7 +10,6 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 
 /**
@@ -32,17 +31,11 @@ public class NoThumbsAdjuster extends FsuScanner {
 	public void adjust() {
 		updateLog.section("Creating thumbnails to match main images.");
 
-		ResIterator haveImage = model.listResourcesWithProperty(imageProperty);
-		try {
-			while (haveImage.hasNext()) {
-				Resource resource = haveImage.next();
-
-				if (resource.getProperty(thumbProperty) == null) {
-					createThumbnailFromMainImage(resource);
-				}
+		for (Resource resource : ModelWrapper.listResourcesWithProperty(model,
+				imageProperty)) {
+			if (resource.getProperty(thumbProperty) == null) {
+				createThumbnailFromMainImage(resource);
 			}
-		} finally {
-			haveImage.close();
 		}
 	}
 
@@ -67,8 +60,7 @@ public class NoThumbsAdjuster extends FsuScanner {
 			generateThumbnailImage(mainFile, thumbFile,
 					FileStorageUpdater.THUMBNAIL_WIDTH,
 					FileStorageUpdater.THUMBNAIL_HEIGHT);
-
-			resource.addProperty(thumbProperty, thumbFilename);
+			ResourceWrapper.addProperty(resource, thumbProperty, thumbFilename);
 		} catch (IOException e) {
 			updateLog.error(resource, "failed to create thumbnail file '"
 					+ thumbFilename + "'", e);

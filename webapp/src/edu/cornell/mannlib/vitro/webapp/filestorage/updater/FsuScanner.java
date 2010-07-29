@@ -13,6 +13,7 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.shared.Lock;
 
 /**
  * Base class for the tools that scan the model. Holds some useful fields and
@@ -66,6 +67,8 @@ public abstract class FsuScanner {
 	 */
 	protected List<Statement> getStatements(Resource resource, Property property) {
 		List<Statement> list = new ArrayList<Statement>();
+		
+		resource.getModel().enterCriticalSection(Lock.READ);
 		StmtIterator stmts = resource.listProperties(property);
 		try {
 			while (stmts.hasNext()) {
@@ -73,6 +76,7 @@ public abstract class FsuScanner {
 			}
 		} finally {
 			stmts.close();
+			resource.getModel().leaveCriticalSection();
 		}
 		return list;
 	}

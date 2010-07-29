@@ -5,7 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.filestorage.updater;
 import java.io.File;
 import java.io.IOException;
 
-import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 
 /**
@@ -28,17 +27,11 @@ public class AllThumbsAdjuster extends FsuScanner {
 		updateLog.section("Creating main images for thumbnails "
 				+ "that have none.");
 
-		ResIterator haveThumb = model.listResourcesWithProperty(thumbProperty);
-		try {
-			while (haveThumb.hasNext()) {
-				Resource resource = haveThumb.next();
-
-				if (resource.getProperty(imageProperty) == null) {
-					createMainImageFromThumbnail(resource);
-				}
+		for (Resource resource : ModelWrapper.listResourcesWithProperty(model,
+				thumbProperty)) {
+			if (ResourceWrapper.getProperty(resource, imageProperty) == null) {
+				createMainImageFromThumbnail(resource);
 			}
-		} finally {
-			haveThumb.close();
 		}
 	}
 
@@ -62,12 +55,10 @@ public class AllThumbsAdjuster extends FsuScanner {
 			File mainFile = imageDirectoryWithBackup.getNewfile(mainFilename);
 			mainFile = checkNameConflicts(mainFile);
 			FileUtil.copyFile(thumbFile, mainFile);
-
-			resource.addProperty(imageProperty, mainFilename);
+			ResourceWrapper.addProperty(resource, imageProperty, mainFilename);
 		} catch (IOException e) {
 			updateLog.error(resource, "failed to create main file '"
 					+ mainFilename + "'", e);
 		}
 	}
-
 }
