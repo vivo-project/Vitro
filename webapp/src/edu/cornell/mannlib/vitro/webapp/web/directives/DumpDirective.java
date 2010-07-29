@@ -27,7 +27,7 @@ import freemarker.template.TemplateNumberModel;
 import freemarker.template.TemplateScalarModel;
 import freemarker.template.TemplateSequenceModel;
 
-public class DumpDirective implements VitroTemplateDirectiveModel {
+public class DumpDirective extends BaseTemplateDirectiveModel {
 
     private static final Log log = LogFactory.getLog(DumpDirective.class);
     
@@ -116,6 +116,10 @@ public class DumpDirective implements VitroTemplateDirectiveModel {
     
     public String help(Configuration config) {
         Map<String, Object> map = new HashMap<String, Object>();
+        
+        String name = getDirectiveName();
+        map.put("name", name);
+        
         map.put("usage", "Dump the contents of a template variable.");
         
         map.put("comments", "Sequences (lists and arrays) are enclosed in square brackets. Hashes are enclosed in curly braces.");
@@ -125,10 +129,10 @@ public class DumpDirective implements VitroTemplateDirectiveModel {
         map.put("params", params);
         
         List<String> examples = new ArrayList<String>();
-        examples.add("<@dump var=\"urls\" />");
+        examples.add("<@" + name + " var=\"urls\" />");
         map.put("examples", examples);
         
-        return new FreemarkerHelper().mergeMapToTemplate("dump-directive-help.ftl", map, config);
+        return mergeToTemplate(map, config);
     }
 
 }

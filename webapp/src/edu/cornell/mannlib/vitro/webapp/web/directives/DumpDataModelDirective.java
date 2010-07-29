@@ -25,7 +25,7 @@ import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
 import freemarker.template.utility.DeepUnwrap;
 
-public class DumpDataModelDirective implements VitroTemplateDirectiveModel {
+public class DumpDataModelDirective extends BaseTemplateDirectiveModel {
 
     private static final Log log = LogFactory.getLog(DumpDataModelDirective.class);
     
@@ -61,8 +61,8 @@ public class DumpDataModelDirective implements VitroTemplateDirectiveModel {
             // Send the two lists of strings (variables and directives) to dump-datamodel.ftl.
             // That way, the directive dump won't be broken up into two pieces, for example.
             Object value = dm.get(var);
-            if (value instanceof VitroTemplateDirectiveModel) {
-                String help = ((VitroTemplateDirectiveModel) value).help(config);
+            if (value instanceof BaseTemplateDirectiveModel) {
+                String help = ((BaseTemplateDirectiveModel) value).help(config);
                 directives.put(var, help);
             } else {
                 models.put(var, value);
@@ -89,18 +89,22 @@ public class DumpDataModelDirective implements VitroTemplateDirectiveModel {
 
     }
 
-    @Override
+   @Override
     public String help(Configuration config) {
         Map<String, Object> map = new HashMap<String, Object>();
+        
+        String name = getDirectiveName();
+        map.put("name", name);
+        
         map.put("usage", "Dump the contents of the template data model.");
 
         map.put("comments", "Sequences (lists and arrays) are enclosed in square brackets. Hashes are enclosed in curly braces.");
         
         List<String> examples = new ArrayList<String>();
-        examples.add("<@dumpDataModel />");
+        examples.add("<@" + name + " />");
         map.put("examples", examples);
         
-        return new FreemarkerHelper().mergeMapToTemplate("dump-directive-help.ftl", map, config);
+        return mergeToTemplate(map, config);
     }
 
 }

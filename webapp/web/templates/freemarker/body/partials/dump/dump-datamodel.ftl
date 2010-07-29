@@ -15,12 +15,10 @@
     </ul>
     
     <h4>DIRECTIVES</h4>
+    
     <ul>
         <#list directives?keys as directive>
-            <li class="dump directive">
-                <p><strong>Directive name:</strong> ${directive}</p> 
-                ${directives[directive]!"no help available for this directive"}         
-            </li>
+            <li>${directives[directive]}</li>
         </#list> 
     </ul> 
       
