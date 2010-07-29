@@ -12,3 +12,7 @@
 .dump li {
     list-style-type: none;
 }
+
+.dump.directive h6 {
+    margin-top: 1em;
+}

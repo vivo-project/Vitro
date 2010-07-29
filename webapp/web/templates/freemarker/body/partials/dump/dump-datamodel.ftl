@@ -4,9 +4,9 @@
 
 <div class="dump datamodel">
 
-    <h4>Data Model Dump for Template <em>${containingTemplate}</em></h6>
+    <h3>Data Model Dump for Template <em>${containingTemplate}</em></h3>
     
-    <h5>Variables</h5>
+    <h4>VARIABLES</h4>
     
     <ul>
         <#list models?keys as key>
@@ -14,10 +14,13 @@
         </#list>
     </ul>
     
-    <h5>Directives</h5>
+    <h4>DIRECTIVES</h4>
     <ul>
-        <#list directives as directive>
-            <li>${directive}</li>
+        <#list directives?keys as directive>
+            <li class="dump directive">
+                <p><strong>Directive name:</strong> ${directive}</p> 
+                ${directives[directive]!"no help available for this directive"}         
+            </li>
         </#list> 
     </ul> 
       

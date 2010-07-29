@@ -25,7 +25,7 @@ import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
 import freemarker.template.utility.DeepUnwrap;
 
-public class DumpDataModelDirective implements TemplateDirectiveModel {
+public class DumpDataModelDirective implements VitroTemplateDirectiveModel {
 
     private static final Log log = LogFactory.getLog(DumpDataModelDirective.class);
     
@@ -47,23 +47,28 @@ public class DumpDataModelDirective implements TemplateDirectiveModel {
                 "The dumpDataModel directive doesn't allow nested content.");
         }
 
+        Configuration config = env.getConfiguration();
         TemplateHashModel dataModel = env.getDataModel();
         Map<String, Object> models = new HashMap<String, Object>();
-        List<String> directives = new ArrayList<String>();
+        Map<String, String> directives = new HashMap<String, String>();
           
         Map<String, Object> dm = (Map<String, Object>) DeepUnwrap.permissiveUnwrap(dataModel);
         List<String> varNames = new ArrayList(dm.keySet()); 
         Collections.sort(varNames);
         for (String var : varNames) {
+            // RY Instead, push each var/directive through the template and return a string.
+            // The meat of dumpDirective will go in a helper.
+            // Send the two lists of strings (variables and directives) to dump-datamodel.ftl.
+            // That way, the directive dump won't be broken up into two pieces, for example.
             Object value = dm.get(var);
-            if (value instanceof TemplateDirectiveModel) {
-                directives.add((String) var);
+            if (value instanceof VitroTemplateDirectiveModel) {
+                String help = ((VitroTemplateDirectiveModel) value).help(config);
+                directives.put(var, help);
             } else {
                 models.put(var, value);
             }
         }
-        
-        Configuration config = env.getConfiguration();
+
         String templateName = "dump-datamodel.ftl";
         
         Map<String, Object> map = new HashMap<String, Object>();
@@ -82,6 +87,20 @@ public class DumpDataModelDirective implements TemplateDirectiveModel {
         Writer out = env.getOut();
         out.write(output);
 
+    }
+
+    @Override
+    public String help(Configuration config) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("usage", "Dump the contents of the template data model.");
+
+        map.put("comments", "Sequences (lists and arrays) are enclosed in square brackets. Hashes are enclosed in curly braces.");
+        
+        List<String> examples = new ArrayList<String>();
+        examples.add("<@dumpDataModel />");
+        map.put("examples", examples);
+        
+        return new FreemarkerHelper().mergeMapToTemplate("dump-directive-help.ftl", map, config);
     }
 
 }

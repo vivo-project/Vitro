@@ -4,7 +4,9 @@ package edu.cornell.mannlib.vitro.webapp.web.directives;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -17,7 +19,6 @@ import freemarker.template.SimpleScalar;
 import freemarker.template.TemplateBooleanModel;
 import freemarker.template.TemplateDateModel;
 import freemarker.template.TemplateDirectiveBody;
-import freemarker.template.TemplateDirectiveModel;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateHashModel;
 import freemarker.template.TemplateModel;
@@ -26,7 +27,7 @@ import freemarker.template.TemplateNumberModel;
 import freemarker.template.TemplateScalarModel;
 import freemarker.template.TemplateSequenceModel;
 
-public class DumpDirective implements TemplateDirectiveModel {
+public class DumpDirective implements VitroTemplateDirectiveModel {
 
     private static final Log log = LogFactory.getLog(DumpDirective.class);
     
@@ -111,6 +112,23 @@ public class DumpDirective implements TemplateDirectiveModel {
         Writer out = env.getOut();
         out.write(output);
 
+    }
+    
+    public String help(Configuration config) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("usage", "Dump the contents of a template variable.");
+        
+        map.put("comments", "Sequences (lists and arrays) are enclosed in square brackets. Hashes are enclosed in curly braces.");
+        
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("var", "name of variable to dump");
+        map.put("params", params);
+        
+        List<String> examples = new ArrayList<String>();
+        examples.add("<@dump var=\"urls\" />");
+        map.put("examples", examples);
+        
+        return new FreemarkerHelper().mergeMapToTemplate("dump-directive-help.ftl", map, config);
     }
 
 }
