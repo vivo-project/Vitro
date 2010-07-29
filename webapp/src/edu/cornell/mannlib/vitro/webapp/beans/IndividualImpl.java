@@ -5,6 +5,8 @@ package edu.cornell.mannlib.vitro.webapp.beans;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+
 import java.lang.reflect.Method;
 import java.sql.Timestamp;
 import java.text.Collator;
@@ -14,7 +16,16 @@ import java.util.*;
  * Represents a single entity record.
 */
 public class IndividualImpl extends BaseResourceBean implements Individual, Comparable<Individual> {
-    public String name = null;
+	/**
+	 * This can be used as a "not initialized" indicator for a property that
+	 * could validly be set to <code>null</code>. If <code>get()</code> is
+	 * called on such a property, and the property has this value, the correct
+	 * value can be fetched and cached.
+	 */
+	protected static final String NOT_INITIALIZED = "__%NOT_INITIALIZED%__";
+
+	public String name = null;
+	protected String rdfsLabel = null;
     public String vClassURI = null;
     protected VClass vClass = null;
     protected List<VClass> directVClasses = null;
@@ -35,11 +46,11 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
     protected String moniker = null;
     protected String url = null;
     protected String description = null;
-    protected String imageFile = null;
     protected String anchor = null;
     protected String blurb = null;
-    protected String imageThumb = null;
-    protected String citation = null;
+    protected String mainImageUri = NOT_INITIALIZED;
+    protected String imageUrl;
+    protected String thumbUrl;
     protected int statusId = 0;
     protected String status = null;
     protected List <Link>linksList = null;
@@ -71,6 +82,9 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
     public String getName(){return name;}
     public void setName(String in){name=in;}
 
+    public String getRdfsLabel(){ return rdfsLabel; }
+    public void setRdfsLabel(String s){ rdfsLabel = s; }    	
+    
 //     private String modTime = null;
 //     public String getModtime(){return modTime;}
 //     public void setModtime(String in){modTime=in;}
@@ -125,8 +139,38 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
     public void setDataPropertyStatements(List <DataPropertyStatement>list) {
          dataPropertyStatements = list;
     }
-    public List <DataPropertyStatement>getDataPropertyStatements(){
+    public List<DataPropertyStatement> getDataPropertyStatements(){
         return dataPropertyStatements;
+    }
+    
+    public List<DataPropertyStatement> getDataPropertyStatements(String propertyUri) {
+        List<DataPropertyStatement> stmts = getDataPropertyStatements();
+        List<DataPropertyStatement> stmtsForProp = new ArrayList<DataPropertyStatement>();
+        for (DataPropertyStatement stmt : stmts) {
+            if (stmt.getDatapropURI().equals(propertyUri)) {
+                stmtsForProp.add(stmt);
+            }
+        }
+        return stmtsForProp;        
+    }
+
+    public DataPropertyStatement getDataPropertyStatement(String propertyUri) {
+        List<DataPropertyStatement> stmts = getDataPropertyStatements(propertyUri);
+        return stmts.isEmpty() ? null : stmts.get(0);       
+    }
+    
+    public List<String> getDataValues(String propertyUri) {     
+        List<DataPropertyStatement> stmts = getDataPropertyStatements(propertyUri);
+        List<String> dataValues = new ArrayList<String>(stmts.size());
+        for (DataPropertyStatement stmt : stmts) {
+            dataValues.add(stmt.getData());
+        }
+        return dataValues;
+    }
+ 
+    public String getDataValue(String propertyUri) {
+        List<DataPropertyStatement> stmts = getDataPropertyStatements(propertyUri);
+        return stmts.isEmpty() ? null : stmts.get(0).getData();
     }
 
     public VClass getVClass() {
@@ -140,7 +184,20 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
     	return allVClasses;
     }
     
-    public List<VClass> getVClasses(boolean direct) {
+    @Override
+	public boolean isVClass(String uri) {
+    	if (uri == null) {
+    		return false;
+    	}
+		for (VClass vClass : getVClasses()) {
+			if (uri.equals(vClass.getURI())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public List<VClass> getVClasses(boolean direct) {
     	if (direct) {
     		return directVClasses;
     	} else {
@@ -160,8 +217,33 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
          objectPropertyStatements = list;
     }
 
-    public List <ObjectPropertyStatement>getObjectPropertyStatements(){
+    public List <ObjectPropertyStatement> getObjectPropertyStatements(){
         return objectPropertyStatements;
+    }
+    
+    public List<ObjectPropertyStatement> getObjectPropertyStatements(String propertyUri) {
+        List<ObjectPropertyStatement> stmts = getObjectPropertyStatements();
+        List<ObjectPropertyStatement> stmtsForProp = new ArrayList<ObjectPropertyStatement>();
+        for (ObjectPropertyStatement stmt : stmts) {
+            if (stmt.getPropertyURI().equals(propertyUri)) {
+                stmtsForProp.add(stmt);
+            }
+        }
+        return stmtsForProp;
+    }
+    
+    public List<Individual> getRelatedIndividuals(String propertyUri) {
+        List<ObjectPropertyStatement> stmts = getObjectPropertyStatements(propertyUri);
+        List<Individual> relatedIndividuals = new ArrayList<Individual>(stmts.size());
+        for (ObjectPropertyStatement stmt : stmts) {
+            relatedIndividuals.add(stmt.getObject());
+        }
+        return relatedIndividuals;       
+    }
+    
+    public Individual getRelatedIndividual(String propertyUri) {
+        List<ObjectPropertyStatement> stmts = getObjectPropertyStatements(propertyUri);    
+        return stmts.isEmpty() ? null : stmts.get(0).getObject();
     }
 
     public List<DataPropertyStatement> getExternalIds(){
@@ -183,29 +265,37 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
 
     public String getBlurb(){return blurb;}
     public void setBlurb(String in){blurb=in;}
-
-    public String getCitation(){return citation;}
-    public void setCitation(String in){citation=in;}
-
+    
     public int getStatusId(){return statusId;}
     public void setStatusId(int in){statusId=in;}
 
     public String getStatus()         {return status;}
     public void   setStatus(String s) {status=s;     }
 
-    public String getImageFile() {
-        return imageFile;
-    }
-    public void setImageFile(String imageFile) {
-        this.imageFile = imageFile;
-    }
-    public String getImageThumb() {
-        return imageThumb;
-    }
-    public void setImageThumb(String imageThumb) {
-        this.imageThumb = imageThumb;
-    }
-    public String getUrl() {
+    
+	@Override
+	public String getMainImageUri() {
+		return (mainImageUri == NOT_INITIALIZED) ? null : mainImageUri;
+	}
+
+	@Override
+	public void setMainImageUri(String mainImageUri) {
+		this.mainImageUri = mainImageUri;
+		this.imageUrl = null;
+		this.thumbUrl = null;
+	}
+
+	@Override
+	public String getImageUrl() {
+		return "imageUrl";
+	}
+
+	@Override
+	public String getThumbUrl() {
+		return "thumbUrl";
+	}
+
+	public String getUrl() {
         return url;
     }
     public void setUrl(String url) {

@@ -124,7 +124,7 @@
                 <input type="hidden" name="y"            value="1"/>
                 <input type="hidden" name="cmd"          value="delete"/>
                 <input type="hidden" name="vitroNsProp"  value="${param.vitroNsProp}" /> 
-                <v:input type="submit" id="submit" value="Delete" cancel="${param.subjectUri}" />
+                <v:input type="submit" id="submit" value="Delete" cancel="true" />
             </form>
             <jsp:include page="${postForm}"/>
 <%      }

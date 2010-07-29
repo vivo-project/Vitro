@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.ontology.update;
 
-import com.hp.hpl.jena.ontology.OntModel;
 /**
  * 
  * We need to document what is in source and destinationURI for each

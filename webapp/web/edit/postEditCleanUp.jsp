@@ -3,6 +3,7 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditSubmission" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.utils.StringUtils" %>
 <%@page import="org.apache.commons.logging.Log"%>
 <%@page import="org.apache.commons.logging.LogFactory"%>
 <%@page import="com.hp.hpl.jena.rdf.model.ResourceFactory"%>
@@ -29,25 +30,45 @@
         if( editConfig != null ){
             String predicateUri = editConfig.getPredicateUri();            
             if( predicateUri != null ){
-            	Property prop = ResourceFactory.createProperty(predicateUri);
-            	predicateLocalName = prop.getLocalName();            	
+            	try{
+            		Property prop = ResourceFactory.createProperty(predicateUri);
+            		predicateLocalName = prop.getLocalName();
+            	}catch (com.hp.hpl.jena.shared.InvalidPropertyURIException e){            		
+            		log.debug("could not convert predicateUri into a valid URI",e);
+            	}            	            	
             }                        
                         
-            if( editConfig.getEntityToReturnTo() != null && editConfig.getEntityToReturnTo().startsWith("?") ){
-            	resourceToRedirectTo = (String)request.getAttribute("entityToReturnTo");
+            if( editConfig.getEntityToReturnTo() != null && editConfig.getEntityToReturnTo().startsWith("?") ){            	
+            	resourceToRedirectTo = (String)request.getAttribute("entityToReturnTo");            
             }else{            
             	resourceToRedirectTo = editConfig.getEntityToReturnTo();
-            }              
+            }
+            
+        	//if there is no entity to return to it is likely a cancel
+        	if( resourceToRedirectTo == null || resourceToRedirectTo.length() == 0 )
+        		resourceToRedirectTo = editConfig.getSubjectUri();
+            
         }
         
         //set up base URL
-        if( editConfig == null || editConfig.getUrlPatternToReturnTo() == null){
-        	urlPattern = "/individual";            
-        }else{
-        	urlPattern = editConfig.getUrlPatternToReturnTo();        	
+        String cancel = request.getParameter("cancel");
+        String urlPatternToReturnTo = null;
+        String urlPatternToCancelTo = null;
+        if (editConfig != null) {
+            urlPatternToReturnTo = editConfig.getUrlPatternToReturnTo();
+            urlPatternToCancelTo = request.getParameter("url");
+        }
+        // If a different cancel return path has been designated, use it. Otherwise, use the regular return path.
+        if (cancel != null && cancel.equals("true") && !StringUtils.isEmpty(urlPatternToCancelTo)) {
+            urlPattern = urlPatternToCancelTo;
+        }
+        else if (!StringUtils.isEmpty(urlPatternToReturnTo)) {
+        	urlPattern = urlPatternToReturnTo;       
+        } else {
+        	urlPattern = "/individual";       	
         }
         
-        //looks like a redirec to an profile page, try to add anchor for property that was just edited.
+        //looks like a redirect to a profile page, try to add anchor for property that was just edited.
         if( urlPattern.endsWith("individual") || urlPattern.endsWith("entity") ){        	
        		if( predicateLocalName != null && predicateLocalName.length() > 0){
        			predicateAnchor = "#" + predicateLocalName;
@@ -56,22 +77,12 @@
         }
     }
     
-    /* The parameter extra=true is just for ie6. */
-    if( resourceToRedirectTo != null ){    	
-    	  if( urlPattern != null && ( urlPattern.endsWith("entity") || urlPattern.endsWith("individual") )){  %>
-		      <%-- Here we're building the redirect URL to include an (unencoded) fragment identifier such as: #propertyName  --%>               
-		      <c:url context="/" var="encodedUrl" value="<%=urlPattern%>">
-			     <c:param name="uri" value="<%=resourceToRedirectTo%>" />
-			     <c:param name="extra" value="true"/> 
-              </c:url>
-		      <c:redirect url="${encodedUrl}${predicateAnchor}" />
-       <% } else { %>
-              <c:url context="/" var="encodedUrl" value="<%=urlPattern%>">              
-                 <c:param name="uri" value="<%=resourceToRedirectTo%>" />
-                 <c:param name="extra" value="true"/> 
-              </c:url>
-              <c:redirect url="${encodedUrl}${predicateAnchor}" />                    
-		<%} %>
+    if( resourceToRedirectTo != null ){ %>   	
+	    <c:url context="/" var="encodedUrl" value="<%=urlPattern%>">              
+	       <c:param name="uri" value="<%=resourceToRedirectTo%>" />
+	       <c:param name="extra" value="true"/>  <%--  For ie6 --%>
+	    </c:url>
+	    <c:redirect url="${encodedUrl}${predicateAnchor}" />                    
     <% } else { %>
         <c:redirect url="<%= Controllers.LOGIN %>" />
     <% } %>

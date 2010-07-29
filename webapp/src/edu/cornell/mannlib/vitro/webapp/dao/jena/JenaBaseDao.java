@@ -502,6 +502,9 @@ public class JenaBaseDao extends JenaBaseDaoCon {
      * convenience method for use with functional properties
      */
     protected void updatePropertyResourceURIValue(Resource res, Property prop, String uri, Model model) {
+		log.debug("updatePropertyResourceURIValue(), resource="
+				+ (res == null ? "null" : res.getURI()) + ", property="
+				+ (prop == null ? "null" : prop.getURI()) + ", uri=" + uri);
 
         if (prop != null) {
             if (uri == null || uri.length() == 0) { 

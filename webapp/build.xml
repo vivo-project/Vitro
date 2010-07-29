@@ -150,7 +150,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		       debug="true"
 		       deprecation="true"
 		       optimize="true"
-		       source="1.5">
+		       source="1.6">
 			<classpath refid="compile.classpath" />
 		</javac>
 	</target>
@@ -164,7 +164,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		       debug="true"
 		       deprecation="true"
 		       optimize="false"
-		       source="1.5">
+		       source="1.6">
 			<classpath refid="test.compile.classpath" />
 		</javac>
 
@@ -188,7 +188,16 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 					set this property and they will be skipped. 
 				-->
 				<exclude name="themes/**/*" if="skip.core.themes" />
+				<!--
+				    Don't copy the freemarker templates; we need to flatten them. 
+				-->
+				<exclude name="templates/freemarker/" />
 			</fileset>
+		</copy>
+		<!-- Flatten the freemarker templates and copy them. -->
+		<copy todir="${build.dir}/war/templates/freemarker" includeemptydirs="false">
+			<fileset dir="${webapp.dir}/web/templates/freemarker" />
+			<flattenmapper />
 		</copy>
 
 		<copy todir="${build.dir}/war/WEB-INF">
@@ -197,12 +206,22 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		</copy>
 
 		<copy todir="${build.dir}/war/WEB-INF">
+			<fileset dir="${webapp.dir}" includes="ontologies" />
 			<fileset dir="${webapp.dir}" includes="ontologies/**/*" />
+			<fileset dir="${webapp.dir}" includes="submodels" />
+			<fileset dir="${webapp.dir}" includes="submodels/**/*" />
 		</copy>
 
-		<copy file="${webapp.dir}/config/default.log4j.properties"
-		      tofile="${build.dir}/war/WEB-INF/classes/log4j.properties"
-		      filtering="true">
+		<!-- use the production Log4J properties, unless a debug version exists. -->
+		<available file="${webapp.dir}/config/debug.log4j.properties"
+		           property="debug.log4j.exists" />
+		<copy tofile="${build.dir}/war/WEB-INF/classes/log4j.properties"
+		      filtering="true"
+		      overwrite="true">
+			<fileset dir="${webapp.dir}/config">
+				<include name="default.log4j.properties" unless="debug.log4j.exists" />
+				<include name="debug.log4j.properties" if="debug.log4j.exists" />
+			</fileset>
 			<filterchain>
 				<expandproperties />
 			</filterchain>
@@ -254,14 +273,43 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		</copy>
 
 		<!-- Discard any ontology files from previous builds. -->
-		<sync todir="${webapp.deploy.home}/WEB-INF/ontologies" includeEmptyDirs="true">
+		<sync todir="${webapp.deploy.home}/WEB-INF/ontologies"
+		      includeEmptyDirs="true"
+		      failonerror="false">
 			<fileset dir="${build.dir}/war/WEB-INF/ontologies" includes="**/*" />
 		</sync>
 
 		<!-- Discard any submodel files from previous builds. -->
-		<sync todir="${webapp.deploy.home}/WEB-INF/submodels" includeemptydirs="true">
+		<sync todir="${webapp.deploy.home}/WEB-INF/submodels"
+		      includeemptydirs="true"
+		      failonerror="false">
 			<fileset dir="${build.dir}/war/WEB-INF/submodels" includes="**/*" />
 		</sync>
+
+		<!-- Discard any template files from previous builds. -->
+		<sync todir="${webapp.deploy.home}/themes" includeemptydirs="true" failonerror="false">
+			<fileset dir="${build.dir}/war/themes" includes="**/*" />
+		</sync>
+	</target>
+
+	<!-- ================================= 
+          target: licenser             
+          
+          In regular use, checks that all appropriate source files have license tags.
+          At release time, applies license text to source files.
+         ================================= -->
+	<target name="licenser" description="--> Check source files for licensing tags">
+		<property name="licenser.properties.file"
+		          location="${webapp.dir}/config/licenser/licenser.properties" />
+		<property name="licenser.label" value="Vitro core" />
+
+		<echo message="Checking license tags on ${licenser.label}" />
+
+		<exec executable="ruby" dir="${webapp.dir}/../utilities/licenser" failonerror="true">
+			<arg value="licenser.rb" />
+			<arg value="${licenser.properties.file}" />
+			<redirector outputproperty="licenser.test.output" alwayslog="true" />
+		</exec>
 	</target>
 
 </project>

@@ -60,10 +60,10 @@ public class Tabs2EntsRetryController extends BaseEditController {
 
         String action = "insert";
 
-        TabIndividualRelationDao t2eDao = getWebappDaoFactory().getTabs2EntsDao();
+        TabIndividualRelationDao t2eDao = request.getFullWebappDaoFactory().getTabs2EntsDao();
         epo.setDataAccessObject(t2eDao);
-        TabDao tDao = getWebappDaoFactory().getTabDao();
-        IndividualDao eDao = getWebappDaoFactory().getIndividualDao();
+        TabDao tDao = request.getFullWebappDaoFactory().getTabDao();
+        IndividualDao eDao = request.getFullWebappDaoFactory().getIndividualDao();
 
         TabIndividualRelation objectForEditing = null;
 

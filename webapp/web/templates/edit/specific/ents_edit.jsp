@@ -129,7 +129,7 @@
             	<input type="hidden" name="mode" value="renameResource"/>
             	<input type="hidden" name="controller" value="Refactor"/>
         	</form>
-        	<form action="uploadimages.jsp" method="get">
+        	<form action="uploadImages" method="get">
             	<input type="submit" class="form-button" value="Upload Image"/>
             	<input type="hidden" name="home" value="${portalBean.portalId}" />
             	<input type="hidden" name="entityUri" value="${individual.URI}"/>

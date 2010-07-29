@@ -40,7 +40,7 @@ public class SiteAdminController extends BaseEditController {
         FormObject foo = new FormObject();
         HashMap optionMap = new HashMap();
         
-        List classGroups = vreq.getWebappDaoFactory().getVClassGroupDao().getPublicGroupsWithVClasses(true,true,false); // order by displayRank, include uninstantiated classes, don't get the counts of individuals
+        List classGroups = vreq.getFullWebappDaoFactory().getVClassGroupDao().getPublicGroupsWithVClasses(true,true,false); // order by displayRank, include uninstantiated classes, don't get the counts of individuals
         
         Iterator classGroupIt = classGroups.iterator();
         ListOrderedMap optGroupMap = new ListOrderedMap();
@@ -53,9 +53,9 @@ public class SiteAdminController extends BaseEditController {
         foo.setOptionLists(optionMap);
         epo.setFormObject(foo);
 
-        if ( (200 <= getWebappDaoFactory().getLanguageProfile()) && (getWebappDaoFactory().getLanguageProfile() < 300) ) {
+        if ( (200 <= vreq.getFullWebappDaoFactory().getLanguageProfile()) && (vreq.getFullWebappDaoFactory().getLanguageProfile() < 300) ) {
             request.setAttribute("languageModeStr", "OWL Mode" );        	
-        } else if ( 100 == getWebappDaoFactory().getLanguageProfile() ) {
+        } else if ( 100 == vreq.getFullWebappDaoFactory().getLanguageProfile() ) {
             request.setAttribute("languageModeStr", "RDF Schema Mode" );        	
         } 
         
@@ -76,11 +76,11 @@ public class SiteAdminController extends BaseEditController {
             }
         }
         
-        request.setAttribute("singlePortal",new Boolean(vreq.getWebappDaoFactory().getPortalDao().isSinglePortal()));
+        request.setAttribute("singlePortal",new Boolean(vreq.getFullWebappDaoFactory().getPortalDao().isSinglePortal()));
         
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);        
         request.setAttribute("bodyJsp","/siteAdmin/siteAdminMain.jsp");
-        request.setAttribute("scripts","/siteAdmin/siteAdminScripts.jsp");
+        request.setAttribute("scripts","/siteAdmin/siteAdminHeadContent.jsp");
         request.setAttribute("title",((Portal)request.getAttribute("portalBean")).getAppName() + " Site Administration");
         request.setAttribute("epoKey",epo.getKey());
         try {

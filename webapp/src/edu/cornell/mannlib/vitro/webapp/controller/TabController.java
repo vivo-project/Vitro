@@ -52,8 +52,10 @@ public class TabController extends VitroHttpServlet {
 
             Portal portal = vreq.getPortal();
 
-            if (leadingTab.getTabId()==portal.getRootTabId())
+            if (leadingTab.getTabId()==portal.getRootTabId()) {
+            	request.setAttribute("homePageRequested", "true");
                 request.setAttribute("title",portal.getAppName());
+            }
             else
                 request.setAttribute("title",leadingTab.getTitle());
 

@@ -23,17 +23,16 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 /**
  * This class handles deletion of resources based on the annotation vitro:dependentResourceAnnot.
  * 
- * The vitro:dependentResourceAnnot 
- * 
  * For example, take a graph like:
  * 
  *   ex:bob  ex:hasPositionHistory ex:positionHistory23 .
  *   ex:positionHistory23 ex:hasTitle "position 23 was great" .
  *   ex:hasPositionHistory vitro.dependentResourceAnnot "true"^^xsd:boolean .
  *   
- * When the object property statement ex:bob ex:hasPositionHistory ex:positioinHisroty23 is
+ * When the statement ex:bob ex:hasPositionHistory ex:positioinHisroty23 is
  * deleted, then everything about ex:positionHistory23 should be deleted because  
- * ex:hasPositionHistory is a dependent resource property.
+ * ex:hasPositionHistory is a dependent resource property.  This will be done 
+ * recursively. 
  *  
  * @author bdc34
  *

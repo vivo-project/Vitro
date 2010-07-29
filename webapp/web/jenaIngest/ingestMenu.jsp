@@ -14,7 +14,9 @@
     <li><a href="ingest?action=executeSparql">Execute SPARQL CONSTRUCT</a></li>
     <li><a href="ingest?action=processStrings">Process Property Value Strings</a></li>
 	<li><a href="ingest?action=splitPropertyValues">Split Property Value Strings into Multiple Property Values</a></li>
-	<li><a href="ingest?action=executeWorkflow">Execute Workflow</a></li> 
+	<li><a href="ingest?action=executeWorkflow">Execute Workflow</a></li>
+	<li><a href="ingest?action=mergeIndividuals">Merge Individuals</a></li>
+	<li><a href="ingest?action=renameResource">Change Namespace of Resources</a></li> 
 </ul>
 
 

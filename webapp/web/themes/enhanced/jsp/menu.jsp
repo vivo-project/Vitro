@@ -40,7 +40,7 @@
      
      int tabId = TabWebUtil.getTabIdFromRequest(vreq); 
      int rootId = TabWebUtil.getRootTabId(vreq); 
-     List tabLevels = vreq.getWebappDaoFactory().getTabDao().getTabHierarcy(tabId,rootId);
+     List tabLevels = vreq.getWebappDaoFactory().getTabDao().getTabHierarchy(tabId,rootId);
      request.setAttribute("tabLevels", tabLevels);
 
      String uri = (String)request.getAttribute("javax.servlet.forward.request_uri");

@@ -19,17 +19,13 @@
 <c:set var='dashboardPropsListJsp' value='/dashboardPropList'/>
 <c:set var='portal' value='${currentPortalId}'/>
 <c:set var='portalBean' value='${currentPortal}'/>
-<c:set var='imageDir' value='images' />
 <div id="dashboard"<c:if test="${showCuratorEdits}"> class="loggedIn"</c:if>>
-    <c:if test="${!empty entity.imageThumb}">
-        <c:if test="${!empty entity.imageFile}">
-            <c:url var="imageUrl" value="${imageDir}/${entity.imageFile}" />
-            <a class="image" href="${imageUrl}">
+    <c:if test="${!empty entity.thumbUrl}">
+        <c:if test="${!empty entity.imageUrl}">
+            <a class="image" href="${pageContext.request.contextPath}${entity.imageUrl}">
         </c:if>
-        <c:url var="imageSrc" value='${imageDir}/${entity.imageThumb}'/>
-        <img class="headshot" src="<c:out value="${imageSrc}"/>" title="click to view larger image in new window" alt="" width="150"/>
-        <c:if test="${!empty entity.imageFile}"></a></c:if>
-        <c:if test="${!empty entity.citation}"><div class="citation">${entity.citation}</div></c:if>
+        <img class="headshot" src="${pageContext.request.contextPath}${entity.thumbUrl}" title="click to view larger image in new window" alt="" width="150"/>
+        <c:if test="${!empty entity.imageUrl}"></a></c:if>        
     </c:if>
        
     <ul class="profileLinks">

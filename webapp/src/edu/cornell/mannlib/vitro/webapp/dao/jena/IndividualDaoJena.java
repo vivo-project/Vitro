@@ -21,7 +21,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
 
-import com.hp.hpl.jena.ontology.DatatypeProperty;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntResource;
@@ -56,7 +55,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.KeywordDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.IndividualCreationEvent;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.IndividualDeletionEvent;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.IndividualUpdateEvent;
@@ -308,13 +306,14 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
                 addPropertyStringValue(ind,MONIKER,ent.getMoniker(),ontModel);
                 addPropertyStringValue(ind,BLURB,ent.getBlurb(),ontModel);
                 addPropertyStringValue(ind,DESCRIPTION,ent.getDescription(),ontModel);
-                addPropertyStringValue(ind,CITATION,ent.getCitation(),ontModel);
                 addPropertyDateTimeValue(ind,SUNRISE,ent.getSunrise(), ontModel);
                 addPropertyDateTimeValue(ind,SUNSET,ent.getSunset(), ontModel);
                 addPropertyDateTimeValue(ind,TIMEKEY,ent.getTimekey(), ontModel);
                 addPropertyDateTimeValue(ind,MODTIME,Calendar.getInstance().getTime(),ontModel);
-                addPropertyStringValue(ind,IMAGETHUMB,ent.getImageThumb(),ontModel);
-                addPropertyStringValue(ind,IMAGEFILE,ent.getImageFile(),ontModel);
+                if (ent.getMainImageUri() != null) {
+                	addPropertyResourceURIValue(ind, IND_MAIN_IMAGE, ent.getMainImageUri());
+                }
+                
                 if (ent.getAnchor()!= null && ent.getAnchor().length()>0 && LINK != null) {
                     com.hp.hpl.jena.ontology.Individual primaryLink = ontModel.createIndividual(entURI+"_primaryLink", LINK);
                     primaryLink.addProperty(RDF.type, LINK);
@@ -369,7 +368,6 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
     private void initInd(Individual ent) {
         ent.getAnchor();
         ent.getBlurb();
-        ent.getCitation();
         ent.getClass();
         ent.getVClasses(false);
         ent.getDataPropertyList();
@@ -379,8 +377,9 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
         ent.getFlag1Numeric();
         ent.getFlag1Set();
         ent.getFlag2Set();
-        ent.getImageFile();
-        ent.getImageThumb();
+        ent.getMainImageUri();
+        ent.getImageUrl();
+        ent.getThumbUrl();
         ent.getKeywords();
         ent.getKeywordString();
         ent.getLinksList();
@@ -467,14 +466,12 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
                 }
                 updatePropertyStringValue(ind,MONIKER,ent.getMoniker(),ontModel);
                 updatePropertyStringValue(ind,BLURB,ent.getBlurb(),ontModel);
-                updatePropertyStringValue(ind,DESCRIPTION,ent.getDescription(),ontModel);
-                updatePropertyStringValue(ind,CITATION,ent.getCitation(),ontModel);
+                updatePropertyStringValue(ind,DESCRIPTION,ent.getDescription(),ontModel);                
                 updatePropertyDateTimeValue(ind,SUNRISE,ent.getSunrise(), ontModel);
                 updatePropertyDateTimeValue(ind,SUNSET,ent.getSunset(), ontModel);
                 updatePropertyDateTimeValue(ind,TIMEKEY,ent.getTimekey(), ontModel);
-                updatePropertyStringValue(ind,IMAGETHUMB,ent.getImageThumb(),ontModel);
-                updatePropertyStringValue(ind,IMAGEFILE,ent.getImageFile(),ontModel);
                 updatePropertyDateTimeValue(ind,MODTIME,Calendar.getInstance().getTime(),ontModel);
+                updatePropertyResourceURIValue(ind, IND_MAIN_IMAGE, ent.getMainImageUri(), ontModel);
                 if (ent.getAnchor()!= null && ent.getAnchor().length()>0) {
                     if (LINK != null && PRIMARY_LINK != null) {
                         boolean updatedExisting = false;
@@ -986,19 +983,27 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
                     try {
                         while (typeIt.hasNext()) {
                             Resource typeRes = (Resource) typeIt.next();
+                            String type = typeRes.getURI();
                             // brute forcing this until we implement a better strategy
-                            if (VitroVocabulary.PORTAL.equals(typeRes.getURI()) || 
-                            	VitroVocabulary.TAB.equals(typeRes.getURI()) ||
-                            	VitroVocabulary.TAB_INDIVIDUALRELATION.equals(typeRes.getURI()) ||
-                            	VitroVocabulary.LINK.equals(typeRes.getURI()) ||
-                            	VitroVocabulary.KEYWORD.equals(typeRes.getURI()) ||
-                            	VitroVocabulary.KEYWORD_INDIVIDUALRELATION.equals(typeRes.getURI()) ||
-                            	VitroVocabulary.CLASSGROUP.equals(typeRes.getURI()) ||
-                            	VitroVocabulary.PROPERTYGROUP.equals(typeRes.getURI()) ||
-                            	VitroVocabulary.APPLICATION.equals(typeRes.getURI())) {    	
+                            if (VitroVocabulary.PORTAL.equals(type) || 
+                            	VitroVocabulary.TAB.equals(type) ||
+                            	VitroVocabulary.TAB_INDIVIDUALRELATION.equals(type) ||
+                            	VitroVocabulary.LINK.equals(type) ||
+                            	VitroVocabulary.KEYWORD.equals(type) ||
+                            	VitroVocabulary.KEYWORD_INDIVIDUALRELATION.equals(type) ||
+                            	VitroVocabulary.CLASSGROUP.equals(type) ||
+                            	VitroVocabulary.PROPERTYGROUP.equals(type) ||
+                            	VitroVocabulary.APPLICATION.equals(type)) {    	
                                 userVisible = false;
                                 break;
                             }
+                            if( OWL.ObjectProperty.getURI().equals(type) ||
+                            	OWL.DatatypeProperty.getURI().equals(type) ||
+                            	OWL.AnnotationProperty.getURI().equals(type) ||
+                            	RDF.type.getURI().equals(type) ){
+                            	userVisible = false;
+                            	break;
+                        	} 
                         }
                     } finally {
                         typeIt.close();

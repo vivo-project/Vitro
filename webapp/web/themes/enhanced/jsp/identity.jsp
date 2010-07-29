@@ -24,7 +24,7 @@
         securityLevel = Integer.parseInt(loginHandler.getLoginRole());
         loginName = loginHandler.getLoginName();
     }
-     
+     // VITRO FILE
     final Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.web.menu.jsp");
 
     VitroRequest vreq = new VitroRequest(request);

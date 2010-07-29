@@ -2,17 +2,13 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao;
 
-import java.util.Arrays;
-import java.util.List;
-
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.vocabulary.XSD;
-import com.hp.hpl.jena.ontology.AnnotationProperty;
 
 public class VitroVocabulary {
 
 	
     public static final String vitroURI = "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#";
+    
+    public static final String VITRO_PUBLIC = "http://vitro.mannlib.cornell.edu/ns/vitro/public#";
     
     
     /** BJL23 2008-02-25:
@@ -91,8 +87,6 @@ public class VitroVocabulary {
     public static final String DISPLAY_LIMIT = vitroURI+"displayLimitAnnot";
 
     public static final String CITATION = vitroURI+"citation";
-    public static final String IMAGEFILE = vitroURI+"imageFile";
-    public static final String IMAGETHUMB = vitroURI+"imageThumb";
     
     // ================== property related =================================
 
@@ -284,5 +278,18 @@ public class VitroVocabulary {
     
     public static final String ONTOLOGY_PREFIX_ANNOT = vitroURI + "ontologyPrefixAnnot";
   
+    // =============== file storage vocabulary ================================
+    
+    public static final String FS_FILE_CLASS = VITRO_PUBLIC + "File";
+    public static final String FS_BYTESTREAM_CLASS = VITRO_PUBLIC + "FileByteStream";
+    
+    public static final String FS_FILENAME = VITRO_PUBLIC + "filename";
+    public static final String FS_MIME_TYPE = VITRO_PUBLIC + "mimeType";
+    public static final String FS_ATTRIBUTION = VITRO_PUBLIC + "attribution";
+    public static final String FS_DOWNLOAD_LOCATION = VITRO_PUBLIC + "downloadLocation";
+    public static final String FS_THUMBNAIL_IMAGE = VITRO_PUBLIC + "thumbnailImage";
+    
+    public static final String IND_MAIN_IMAGE = VITRO_PUBLIC + "mainImage";
+    public static final String IND_IMAGE = VITRO_PUBLIC + "image";
 
 }

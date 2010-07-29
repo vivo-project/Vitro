@@ -19,6 +19,13 @@ public interface Individual extends ResourceBean, VitroTimeWindowedResource, Com
     String getName();
     void setName(String in);
 
+    /** 
+     * Returns an rdfs:label if there is one on the individual.  Returns null
+     * if none can be found.  If more than one rdfs:label can be found for the individual
+     * one of the labels will be returned, which one is undefined.  
+     */
+    String getRdfsLabel();
+    
     String getVClassURI();
     void setVClassURI(String in);
 
@@ -48,6 +55,11 @@ public interface Individual extends ResourceBean, VitroTimeWindowedResource, Com
     
     void setDataPropertyStatements(List<DataPropertyStatement> list);
     List<DataPropertyStatement> getDataPropertyStatements();
+    List<DataPropertyStatement> getDataPropertyStatements(String propertyUri);
+    DataPropertyStatement getDataPropertyStatement(String propertyUri);
+    
+    List<String> getDataValues(String propertyUri);
+    String getDataValue(String propertyUri);
 
     VClass getVClass();
     void setVClass(VClass class1);
@@ -56,9 +68,16 @@ public interface Individual extends ResourceBean, VitroTimeWindowedResource, Com
     
     List<VClass> getVClasses(boolean direct);
     void setVClasses(List<VClass> vClassList, boolean direct);
+    
+    /** Does the individual belong to this class? */
+    boolean isVClass(String uri);
 
     void setObjectPropertyStatements(List<ObjectPropertyStatement> list);
     List<ObjectPropertyStatement> getObjectPropertyStatements();
+    List<ObjectPropertyStatement> getObjectPropertyStatements(String propertyUri);
+    
+    List<Individual> getRelatedIndividuals(String propertyUri);
+    Individual getRelatedIndividual(String propertyUri);
 
     List<DataPropertyStatement> getExternalIds();
     void setExternalIds(List<DataPropertyStatement> externalIds);
@@ -75,20 +94,17 @@ public interface Individual extends ResourceBean, VitroTimeWindowedResource, Com
     String getBlurb();
     void setBlurb(String in);
 
-    String getCitation();
-    void setCitation(String in);
-
     int getStatusId();
     void setStatusId(int in);
 
     String getStatus();
     void setStatus(String s);
 
-    String getImageFile();
-    void setImageFile(String imageFile);
-
-    String getImageThumb();
-    void setImageThumb(String imageThumb);
+    void setMainImageUri(String mainImageUri);
+    String getMainImageUri();
+    
+    String getImageUrl();
+    String getThumbUrl();
 
     String getUrl();
     void setUrl(String url);

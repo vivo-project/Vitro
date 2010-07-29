@@ -56,7 +56,9 @@ public class LinkRetryController extends BaseEditController {
 
         String action = "insert";
 
-        WebappDaoFactory wadf = (getAssertionsWebappDaoFactory() != null) ? getAssertionsWebappDaoFactory() : getWebappDaoFactory();
+        WebappDaoFactory wadf = (request.getAssertionsWebappDaoFactory() != null) 
+        		? request.getAssertionsWebappDaoFactory() 
+        		: request.getFullWebappDaoFactory();
         
         LinksDao lDao = wadf.getLinksDao();
         epo.setDataAccessObject(lDao);

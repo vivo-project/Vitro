@@ -52,7 +52,7 @@ public class UserEditController extends BaseEditController {
         VitroRequest vreq = new VitroRequest(request);
         Portal portal = vreq.getPortal();
 
-        UserDao uDao = getWebappDaoFactory().getUserDao();
+        UserDao uDao = vreq.getFullWebappDaoFactory().getUserDao();
 
         String userURIStr = request.getParameter("uri");
         User u = null;
@@ -68,7 +68,7 @@ public class UserEditController extends BaseEditController {
         }
 
         ArrayList results = new ArrayList();
-        results.add("User");
+        results.add("Email address");
         results.add("first name");
         results.add("last name");
         results.add("login count");
@@ -97,7 +97,7 @@ public class UserEditController extends BaseEditController {
             List<ObjectPropertyStatement> mayEditAsStmts = 
                 new ArrayList<ObjectPropertyStatement>(mayEditAsUris.size());
             for(String objURI: mayEditAsUris){
-            	Individual editAs = getWebappDaoFactory().getIndividualDao().getIndividualByURI(objURI);
+            	Individual editAs = vreq.getFullWebappDaoFactory().getIndividualDao().getIndividualByURI(objURI);
                 ObjectPropertyStatement stmt = new ObjectPropertyStatementImpl();
                 stmt.setSubjectURI(u.getURI());
                 stmt.setPropertyURI(VitroVocabulary.MAY_EDIT_AS);

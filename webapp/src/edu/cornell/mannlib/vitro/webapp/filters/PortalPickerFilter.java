@@ -433,5 +433,9 @@ public class PortalPickerFilter implements Filter {
         prefix2portalid = null;
         filterConfig = null;
     }
+    
+    public static boolean isPortalPickingActive() {
+        return isPortalPickingActive;
+    }
 
 }

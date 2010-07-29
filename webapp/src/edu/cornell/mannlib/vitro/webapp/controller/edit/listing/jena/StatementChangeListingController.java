@@ -67,7 +67,7 @@ public class StatementChangeListingController extends BaseEditController {
         OntModel ontModel = (OntModel) getServletContext().getAttribute("jenaOntModel");
         Model auditModel = (Model) request.getSession().getServletContext().getAttribute("jenaAuditModel");
 
-        UserDao dao = getWebappDaoFactory().getUserDao();
+        UserDao dao = vrequest.getFullWebappDaoFactory().getUserDao();
 
         User user = dao.getUserByURI(userURI);
 

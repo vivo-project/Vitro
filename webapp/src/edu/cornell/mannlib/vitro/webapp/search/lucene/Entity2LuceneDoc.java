@@ -12,6 +12,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.Term;
 import org.joda.time.DateTime;
+import org.openrdf.model.vocabulary.OWL;
 
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -46,6 +47,10 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         public static String MODTIME    = "modTime";
         /** Name of entity, tab or vclass */
         public static String NAME       = "name";
+        /** rdfs:label unanalyzed */
+        public static String NAMEUNANALYZED = "nameunanalyzed" ;
+        /** Name of entity, unstemmed */
+        public static String NAMEUNSTEMMED       = "nameunstemmed";
         /** Name of portal */
         public static String PORTAL     = "portal";
         /** time of index in msec since epoc */
@@ -73,8 +78,8 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
 
     private static String entClassName = Individual.class.getName();
 
-    public boolean canTranslate(Object obj) {
-        return (obj != null && obj instanceof Individual);
+    public boolean canTranslate(Object obj) {    	
+        return (obj != null && obj instanceof Individual);        	
     }    
 
     @SuppressWarnings("static-access")
@@ -82,29 +87,23 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         if(!( obj instanceof Individual))
             return null;
         Individual ent = (Individual)obj;
-        
-        List<VClass> classes = ent.getVClasses();
-        for( VClass clazz : classes){
-        	if( VitroVocabulary.DEPENDENT_RESORUCE.equals(  clazz.getURI() ) ){
-        		return null;
-        	}
-        }
-        
-        
         String value;
         Document doc = new Document();
 
         //DocId
         String id = ent.getURI();
-        if( id == null )
+        if( id == null ){
+        	log.debug("cannot translate bnodes");
             throw new IndexingException("Not indexing bnodes");
+        }
         
         doc.add( new Field(term.DOCID, entClassName + id,
                             Field.Store.YES, Field.Index.NOT_ANALYZED));
 
         //vitro Id        
         doc.add(  new Field(term.URI, id, Field.Store.YES, Field.Index.NOT_ANALYZED));
-
+        log.debug( id );
+        
         //java class
         doc.add( new  Field(term.JCLASS, entClassName, Field.Store.YES, Field.Index.NOT_ANALYZED));
 
@@ -117,14 +116,25 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
                                Field.Store.YES, Field.Index.ANALYZED);
         name.setBoost( NAME_BOOST );
         doc.add( name );
+        
+        Field nameUn = new Field(term.NAMEUNSTEMMED, value, 
+        						Field.Store.NO, Field.Index.ANALYZED);        
+        nameUn.setBoost( NAME_BOOST );
+        doc.add( nameUn );
+
+        Field nameUnanalyzed = new Field(term.NAMEUNANALYZED, value.toLowerCase(), 
+				Field.Store.NO, Field.Index.NOT_ANALYZED);        
+        doc.add( nameUnanalyzed );
 
         //boost for entity
         if( ent.getSearchBoost() != null && ent.getSearchBoost() != 0 )
             doc.setBoost(ent.getSearchBoost());
 
         //rdf:type and ClassGroup
-        List<VClass> vclasses = ent.getVClasses();
+        List<VClass> vclasses = ent.getVClasses(false);
         for( VClass clz : vclasses){
+        	log.debug( id + " as type " + clz.getURI() );
+        	
             //document boost for given classes
             if( clz.getSearchBoost() != null )
                 doc.setBoost( doc.getBoost() + clz.getSearchBoost() );            
@@ -207,7 +217,6 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         value+= " "+ ( ((t=ent.getMoniker()) == null)?"":t );
         value+= " "+ ( ((t=ent.getDescription()) == null)?"":t );
         value+= " "+ ( ((t=ent.getBlurb()) == null)?"":t );
-        value+= " "+ ( ((t=ent.getCitation()) == null)?"":t );
         value+= " "+ getKeyterms(ent);
 
 

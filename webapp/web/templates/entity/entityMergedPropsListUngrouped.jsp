@@ -26,6 +26,7 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.VClass" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep" %>
 <%@ page import="edu.cornell.mannlib.vedit.beans.LoginFormBean" %>
+<%@page import="edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils"%>
 
 <%@ page import="java.util.Collection" %>
 <%@ page import="java.util.Collections" %>
@@ -34,9 +35,12 @@
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.Iterator" %>
 <%@ page import="java.util.HashSet" %>
+<%@page import="java.util.LinkedList"%>
+<%@page import="java.util.Set"%>
 
 <%@ page import="org.apache.commons.logging.Log" %>
 <%@ page import="org.apache.commons.logging.LogFactory" %>
+
 
 <jsp:useBean id="loginHandler" class="edu.cornell.mannlib.vedit.beans.LoginFormBean" scope="session" />
 <%! 
@@ -58,7 +62,6 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 	if (subject==null) {
     	throw new Error("Subject individual must be in request scope for dashboardPropsList.jsp");
 	}
-
 	// Nick wants not to use explicit parameters to trigger visibility of a div, but for now we don't just want to always show the 1st one
 	String openingGroupLocalName = (String) request.getParameter("curgroup");
     VitroRequest vreq = new VitroRequest(request);
@@ -159,7 +162,7 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 		            		<c:set var="collateCurrentClassName" value="${objPropertyStmt.object.VClass.name}" />
 		            		<c:set var="collateClassesShownCount" value="${collateClassesShown + 1}"/>		            		
 		            		<li>
-		            		${collateCurrentClassName }
+		            		<h5 class="collate">${collateCurrentClassName}</h5>
 		            		<ul class='properties'><!-- collateClasses -->
 		            	</c:if>
 
@@ -191,7 +194,7 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 	               				<c:param name="uri" value="${objPropertyStmt.object.URI}"/>               			
 	           				</c:url>
 							<%
-							   String customShortView = getCustomShortView(request, vcDao); 
+							   String customShortView = MiscWebUtils.getCustomShortView(request); 
 							%>
 	         				<c:set var="altRenderJsp" value="<%= customShortView %>" />
 	         				<c:remove var="opStmt" scope="request"/>
@@ -219,7 +222,8 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 						<c:set var="stmtCounter" value="${stmtCounter+1}"/>
 					</c:forEach>
 					<c:if test="${objRows > 0}"></ul></c:if>
-					<c:if test="${ collateClassesShownCount > 0 }"></li><!-- collateClasses 2 --></c:if>										
+					<c:if test="${ collateClassesShownCount > 0 }"></li><!-- collateClasses 2 --></c:if>
+					<c:if test="${ collateByClass && collateClassesShownCount > 0 }"></ul><!-- collate end --></c:if>										
    					<c:if test="${ stmtCounter > displayLimit}">
    					</div><%-- navlinkblock --%>
    					</div><%-- extraEntities --%></c:if>
@@ -346,35 +350,4 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 <%			}
 		} 
    } // end for (Property p : g.getPropertyList()
-%>
-
-<%!
-// Get custom short view from either the object's class or one of its superclasses.
-// This is needed because the inference update happens asynchronously, so when a new
-// property has been added and the page is reloaded, the custom short view from a
-// superclass may not have been inferred yet.
-private String getCustomShortView(HttpServletRequest request, VClassDao vcDao) {
-    String customShortView = null;
-    Individual object = ((ObjectPropertyStatement)request.getAttribute("opStmt")).getObject();
-    List<VClass> vclasses = object.getVClasses();
-
-    vclassLoop: for (VClass vclass : vclasses) {
-        // Use this class's custom short view, if there is one
-        customShortView = vclass.getCustomShortView();
-        if (customShortView != null) {
-            break;
-        }
-        // Otherwise, check for superclass custom short views
-        String vclassUri = vclass.getURI();
-        List<String> superClassUris = vcDao.getAllSuperClassURIs(vclassUri);
-        for (String superClassUri : superClassUris) {
-            VClass vc = vcDao.getVClassByURI(superClassUri);
-            customShortView = vc.getCustomShortView();
-            if (customShortView != null) { 
-                break vclassLoop; 
-            }
-        }
-    }  
-    return customShortView;
-}
 %>

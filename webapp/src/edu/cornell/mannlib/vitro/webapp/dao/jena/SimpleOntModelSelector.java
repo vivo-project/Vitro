@@ -21,6 +21,7 @@ public class SimpleOntModelSelector implements OntModelSelector {
 	private OntModel userAccountsModel;
 	
 	private OntModelSpec DEFAULT_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM;
+	private OntModel displayModel;
 	
 	/**
 	 * Construct an OntModelSelector with a bunch of empty models
@@ -116,4 +117,10 @@ public class SimpleOntModelSelector implements OntModelSelector {
 		this.userAccountsModel = userAccountsModel;
 	}
 
+	public void setDisplayModel(OntModel displayModel) {
+		this.displayModel = displayModel;		
+	}
+	public OntModel getDisplayModel(){
+		return this.displayModel;
+	}
 }

@@ -10,7 +10,7 @@ public class KeywordSearchReindexer implements ChangeListener {
 
     public void doInserted(Object newObj, EditProcessObject epo){
         IndexBuilder builder = (IndexBuilder)epo.getSession().getServletContext().getAttribute(IndexBuilder.class.getName());
-           (new Thread(builder)).start();
+        builder.doUpdateIndex();
     }
 
     public void doUpdated(Object oldObj, Object newObj, EditProcessObject epo){

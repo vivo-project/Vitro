@@ -60,10 +60,10 @@ public class DataPropertyHierarchyListingController extends BaseEditController {
             e.printStackTrace();
         }
 
-        dpDao = getWebappDaoFactory().getDataPropertyDao();
-        vcDao = getWebappDaoFactory().getVClassDao();
-        pgDao = getWebappDaoFactory().getPropertyGroupDao();
-        dDao = getWebappDaoFactory().getDatatypeDao();
+        dpDao = vrequest.getFullWebappDaoFactory().getDataPropertyDao();
+        vcDao = vrequest.getFullWebappDaoFactory().getVClassDao();
+        pgDao = vrequest.getFullWebappDaoFactory().getPropertyGroupDao();
+        dDao = vrequest.getFullWebappDaoFactory().getDatatypeDao();
 
         ArrayList results = new ArrayList();
         results.add("XX");            // column 1

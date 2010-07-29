@@ -17,12 +17,15 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.cjk.CJKAnalyzer;
 import org.apache.lucene.search.BooleanQuery;
 
+import com.hp.hpl.jena.ontology.OntModel;
+
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.SearchReindexingListener;
 import edu.cornell.mannlib.vitro.webapp.search.beans.Searcher;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
 
@@ -76,7 +79,7 @@ public class LuceneSetupCJK implements javax.servlet.ServletContextListener {
             // the queries need to know the analyzer to use so that the same one can be used
             // to analyze the fields in the incoming user query terms.
             LuceneSearcher searcher = new LuceneSearcher(
-                    new LuceneQueryFactory(getAnalyzer(), indexDir),
+                    new LuceneQueryFactory(getAnalyzer(), Entity2LuceneDoc.term.ALLTEXT),
                     indexDir);
             searcher.addObj2Doc(new Entity2LuceneDoc());
             context.setAttribute(Searcher.class.getName(), searcher);
@@ -105,6 +108,14 @@ public class LuceneSetupCJK implements javax.servlet.ServletContextListener {
             // here we add the IndexBuilder with the LuceneIndexer
             // to the servlet context so we can access it later in the webapp.
             context.setAttribute(IndexBuilder.class.getName(),builder);
+            
+            //set up listeners so search index builder is notified of changes to model            
+            OntModel baseOntModel = (OntModel)sce.getServletContext().getAttribute("baseOntModel");
+            OntModel jenaOntModel = (OntModel)sce.getServletContext().getAttribute("jenaOntModel");
+            SearchReindexingListener srl = new SearchReindexingListener( builder );
+            baseOntModel.getBaseModel().register(srl);
+        	jenaOntModel.getBaseModel().register(srl);
+        	
             }catch(Exception ex){
                 log.error("Could not setup lucene full text search." , ex);
             }
@@ -116,7 +127,10 @@ public class LuceneSetupCJK implements javax.servlet.ServletContextListener {
          * Gets run when the webApp Context gets destroyed.
          */
         public void contextDestroyed(ServletContextEvent sce) {
+        	
             log.info("**** Running "+this.getClass().getName()+".contextDestroyed()");
+            IndexBuilder builder = (IndexBuilder)sce.getServletContext().getAttribute(IndexBuilder.class.getName());
+        	builder.killIndexingThread();
         }
 
         /**

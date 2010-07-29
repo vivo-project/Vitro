@@ -98,19 +98,19 @@ public class ObjectPropertyStatementListingController extends
         
         ObjectPropertyStatementDao opsDao = null;
         if (assertedStatementsOnly){ // get only asserted, not inferred, object property statements
-            opsDao = getAssertionsWebappDaoFactory().getObjectPropertyStatementDao();
+            opsDao = vrequest.getAssertionsWebappDaoFactory().getObjectPropertyStatementDao();
         } else {
-            opsDao = getWebappDaoFactory().getObjectPropertyStatementDao();
+            opsDao = vrequest.getFullWebappDaoFactory().getObjectPropertyStatementDao();
         }
 
         // get all object properties -- no concept of asserted vs. inferred object properties
-        ObjectPropertyDao opDao = getWebappDaoFactory().getObjectPropertyDao();
+        ObjectPropertyDao opDao = vrequest.getFullWebappDaoFactory().getObjectPropertyDao();
         
         IndividualDao iDao = null;
         if (showVClasses) {
-            iDao = getAssertionsWebappDaoFactory().getIndividualDao();
+            iDao = vrequest.getAssertionsWebappDaoFactory().getIndividualDao();
         } else {
-            iDao = getWebappDaoFactory().getIndividualDao();
+            iDao = vrequest.getFullWebappDaoFactory().getIndividualDao();
         }
         
         String propURIStr = request.getParameter("propertyURI");

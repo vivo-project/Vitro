@@ -4,8 +4,8 @@ package edu.cornell.mannlib.vitro.webapp.dao;
 
 import java.util.List;
 
-import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
+import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 
 public interface PropertyDao {
 	
@@ -37,10 +37,12 @@ public interface PropertyDao {
 
     List <String> getAllSubPropertyURIs(String propertyURI);
 
-    List <String> getSuperPropertyURIs(String propertyURI);
+    List <String> getSuperPropertyURIs(String propertyURI, boolean direct);
 
     List <String> getAllSuperPropertyURIs(String propertyURI);
     
     List <String> getEquivalentPropertyURIs(String propertyURI);
+    
+    List <VClass> getClassesWithRestrictionOnProperty(String propertyURI);
     
 }

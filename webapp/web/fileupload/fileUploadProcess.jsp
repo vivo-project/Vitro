@@ -65,7 +65,6 @@ while( iter.hasNext()){
         out.write("fieldname: " + item.getFieldName() + " value: " + item.getString() );
         out.write("</p>");        
     }else{
-        System.out.println("fileUPloadProcess.jsp: attempting to upload a file" );
         out.write("<p>");        
         out.write("form field name: " + item.getFieldName()
                 +" filename: " + item.getName()

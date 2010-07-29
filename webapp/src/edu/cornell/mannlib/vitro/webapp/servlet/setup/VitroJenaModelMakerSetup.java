@@ -5,7 +5,8 @@ package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.db.DBConnection;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -15,8 +16,8 @@ import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaModelMaker;
 
 public class VitroJenaModelMakerSetup implements ServletContextListener {
-	private static final Logger LOG = Logger
-			.getLogger(VitroJenaModelMakerSetup.class);
+	private static final Log log = LogFactory
+			.getLog(VitroJenaModelMakerSetup.class);
 
 	protected final static String DB_TYPE = "MySQL";
 	
@@ -35,9 +36,9 @@ public class VitroJenaModelMakerSetup implements ServletContextListener {
 			ModelMaker mMaker = ModelFactory.createModelRDBMaker(dbConn);
 			VitroJenaModelMaker vjmm = new VitroJenaModelMaker(mMaker);
 			arg0.getServletContext().setAttribute("vitroJenaModelMaker", vjmm);
-			LOG.debug("VitroJenaModelMaker set up");
+			log.debug("VitroJenaModelMaker set up");
 		} catch (Throwable t) {
-			LOG.error("Unable to set up default VitroJenaModelMaker", t);
+			log.error("Unable to set up default VitroJenaModelMaker", t);
 		}
 
 	}

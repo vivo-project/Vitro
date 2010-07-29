@@ -2,6 +2,19 @@
 
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.hp.hpl.jena.datatypes.RDFDatatype;
 import com.hp.hpl.jena.datatypes.TypeMapper;
 import com.hp.hpl.jena.ontology.OntModelSpec;
@@ -11,13 +24,6 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import edu.cornell.mannlib.vitro.webapp.beans.Datatype;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DatatypeDaoJena;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
-
-import java.util.*;
-import java.util.regex.Pattern;
-
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * User: bdc34
@@ -120,7 +126,6 @@ public class BasicValidation {
         return errors;    
     }
     
-    
     private String validate(String validationType, List<FileItem> fileItems) {
         if( "nonempty".equalsIgnoreCase(validationType)){
             if( fileItems == null || fileItems.size() == 0 ){
@@ -147,7 +152,7 @@ public class BasicValidation {
                 return REQUIRED_FIELD_EMPTY_MSG;
         }
         // Format validation
-        if("isDate".equalsIgnoreCase(validationType)){
+        else if("isDate".equalsIgnoreCase(validationType)){
             if( isDate( value))
                 return SUCCESS;
             else
@@ -161,10 +166,16 @@ public class BasicValidation {
             } else {
                 return errorMsg;
             }
-        } 
-        
+        } else if ("httpUrl".equalsIgnoreCase(validationType)){ 
+        	//check if it has http or https, we could do more but for now this is all.
+        	if(! value.startsWith("http://") && ! value.startsWith("https://") ){
+        		return "This URL must start with http:// or https://"; 
+        	}else{
+        		return SUCCESS;        		
+        	}        	 
+        }
         //Date not past validation
-        if( "dateNotPast".equalsIgnoreCase(validationType)){
+        else if( "dateNotPast".equalsIgnoreCase(validationType)){
         	//if( ! past (value) )
         	// return "date must not be in the past";
         	//Current date
@@ -240,11 +251,16 @@ public class BasicValidation {
         return (value == null || value.trim().length() == 0); 
     }
 
+    
+    
+    private static Pattern urlRX = Pattern.compile("(([a-zA-Z][0-9a-zA-Z+\\-\\.]*:)/{0,2}[0-9a-zA-Z;/?:@&=+$\\.\\-_!~*'()%]+)(#[0-9a-zA-Z;/?:@&=+$\\.\\-_!~*'()%]+)?");
 
     /** we use null to indicate success */
     public final static String SUCCESS = null;
     public final static String REQUIRED_FIELD_EMPTY_MSG = "This field must not be empty.";
     public final static String DATE_NOT_PAST_MSG = "Please enter a future target date for publication (past dates are invalid).";
+    //public final static String MIN_FIELDS_NOT_POPULATED = "Please enter values for at least ";
+    //public final static String FORM_ERROR_FIELD_ID = "formannotationerrors";
     /** regex for strings like "12/31/2004" */
     private final String dateRegex = "((1[012])|([1-9]))/((3[10])|([12][0-9])|([1-9]))/[\\d]{4}";
     private final Pattern datePattern = Pattern.compile(dateRegex);
@@ -252,7 +268,7 @@ public class BasicValidation {
     static final List<String> basicValidations;
     static{
         basicValidations = Arrays.asList(
-        "nonempty","isDate","dateNotPast" );
+        "nonempty","isDate","dateNotPast","httpUrl" );
     }
 
     private Log log = LogFactory.getLog(BasicValidation.class);

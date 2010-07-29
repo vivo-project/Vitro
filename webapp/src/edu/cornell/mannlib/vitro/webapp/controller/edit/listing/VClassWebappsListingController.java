@@ -5,7 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.controller.edit.listing;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -23,6 +22,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
+import edu.cornell.mannlib.vitro.webapp.dao.PropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
@@ -43,20 +43,28 @@ public class VClassWebappsListingController extends BaseEditController {
         } catch (Throwable t) {
             t.printStackTrace();
         }
-
+       
         //need to figure out how to structure the results object to put the classes underneath
-
-        VClassDao dao = getWebappDaoFactory().getVClassDao();
-
-        List classes = (request.getParameter("iffRoot") != null)
-            ? dao.getRootClasses()
-            : dao.getAllVclasses();
+        
+        List<VClass> classes = null;
+        
+        if (request.getParameter("showPropertyRestrictions") != null) {
+        	PropertyDao pdao = vrequest.getFullWebappDaoFactory().getObjectPropertyDao();
+        	classes = pdao.getClassesWithRestrictionOnProperty(request.getParameter("propertyURI"));
+        } else {
+        	VClassDao vcdao = vrequest.getFullWebappDaoFactory().getVClassDao();
+        	
+        	if (request.getParameter("iffRoot") != null) {
+                classes = vcdao.getRootClasses();
+        	} else {
+        		classes = vcdao.getAllVclasses();
+        	}
+        	
+        }
 
         String ontologyURI = vrequest.getParameter("ontologyUri");
             
-        Collections.sort(classes);
-
-        ArrayList results = new ArrayList();
+        ArrayList<String> results = new ArrayList<String>();
         results.add("XX");
         results.add("Class");
         results.add("short definition");
@@ -68,7 +76,8 @@ public class VClassWebappsListingController extends BaseEditController {
         results.add("update level");        
 
         if (classes != null) {
-            Iterator classesIt = classes.iterator();
+            Collections.sort(classes);
+            Iterator<VClass> classesIt = classes.iterator();
             while (classesIt.hasNext()) {
                 VClass cls = (VClass) classesIt.next();
                 if ( (ontologyURI==null) || ( (ontologyURI != null) && (cls.getNamespace()!=null) && (ontologyURI.equals(cls.getNamespace())) ) ) {
@@ -85,12 +94,12 @@ public class VClassWebappsListingController extends BaseEditController {
 	                String shortDef = (cls.getShortDef()==null) ? "" : cls.getShortDef();
 	                String example = (cls.getExample()==null) ? "" : cls.getExample();
 	                StringBuffer commSb = new StringBuffer();
-	                for (Iterator<String> commIt = getWebappDaoFactory().getCommentsForResource(cls.getURI()).iterator(); commIt.hasNext();) { 
+	                for (Iterator<String> commIt = vrequest.getFullWebappDaoFactory().getCommentsForResource(cls.getURI()).iterator(); commIt.hasNext();) { 
 	                	commSb.append(commIt.next()).append(" ");
 	                }
 	                
 	                // get group name
-	                WebappDaoFactory wadf = getWebappDaoFactory();
+	                WebappDaoFactory wadf = vrequest.getFullWebappDaoFactory();
 	                VClassGroupDao groupDao= wadf.getVClassGroupDao();
 	                String groupURI = cls.getGroupURI();                
 	                String groupName = "";
@@ -157,7 +166,7 @@ public class VClassWebappsListingController extends BaseEditController {
         }
 
     }
-
+   	
     public void doPost(HttpServletRequest request, HttpServletResponse response) {
         doGet(request,response);
     }

@@ -37,7 +37,7 @@ public class OntologiesListingController extends BaseEditController {
 
 	    String noResultsMsgStr = "No ontologies found";
 
-        OntologyDao dao = getWebappDaoFactory().getOntologyDao();
+        OntologyDao dao = vrequest.getFullWebappDaoFactory().getOntologyDao();
 
         List onts = dao.getAllOntologies();
 

@@ -292,15 +292,17 @@ and set a flag in the request to indicate "back button confusion"
      
     DataPropertyStatement dps = new DataPropertyStatementImpl();
     Literal submitted = submission.getLiteralsFromForm().get(copy.getVarNameForObject());
-    dps.setIndividualURI( copy.getSubjectUri() );
-    dps.setDatapropURI( copy.getPredicateUri() );
-    dps.setDatatypeURI( submitted.getDatatypeURI());
-    dps.setLanguage( submitted.getLanguage() );
-    dps.setData( submitted.getLexicalForm() );
+    if( submitted != null ){
+    	dps.setIndividualURI( copy.getSubjectUri() );
+    	dps.setDatapropURI( copy.getPredicateUri() );
+    	dps.setDatatypeURI( submitted.getDatatypeURI());
+    	dps.setLanguage( submitted.getLanguage() );
+    	dps.setData( submitted.getLexicalForm() );
        
-    copy.prepareForDataPropUpdate(writeModel, dps);
-    copy.setDatapropKey( Integer.toString(RdfLiteralHash.makeRdfLiteralHash(dps)) );
-    EditConfiguration.putConfigInSession(copy,session);
+    	copy.prepareForDataPropUpdate(writeModel, dps);
+    	copy.setDatapropKey( Integer.toString(RdfLiteralHash.makeRdfLiteralHash(dps)) );
+    	EditConfiguration.putConfigInSession(copy,session);
+    }
 %>
 
 <jsp:forward page="postEditCleanUp.jsp"/>
@@ -404,8 +406,11 @@ and set a flag in the request to indicate "back button confusion"
             String onlyField = editConfig.getFields().keySet().iterator()
                     .next();
             Literal value = submission.getLiteralsFromForm().get(onlyField);
-            if ("".equals(value.getLexicalForm())) {
-                log.debug("Submission was a single field with an empty string");
+            if( value == null ){
+            	log.debug("No parameters found in submission for field \"" + onlyField +"\"");
+            	return true;
+            }else if( "".equals(value.getLexicalForm())) {
+                log.debug("Submission was a single field named \"" + onlyField + "\" with an empty string");
                 return true;
             }
         }

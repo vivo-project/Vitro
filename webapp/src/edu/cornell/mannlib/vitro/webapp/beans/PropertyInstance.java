@@ -9,7 +9,7 @@ import java.util.Date;
    from the entities, object property statements, properties, and ent2relationships tables
    bundled up in a usable object.
 */
-public class PropertyInstance implements PropertyInstanceIface {
+public class PropertyInstance implements PropertyInstanceIface, Comparable<PropertyInstance> {
 
     private String propertyURI = null;
     private String objectEntURI = null;
@@ -198,5 +198,19 @@ public class PropertyInstance implements PropertyInstanceIface {
             out = getDomainClassName() + "("+ getDomainClassURI() + ")";
         }
         return out;
+    }
+    
+    public int compareTo(PropertyInstance pi) {
+
+        try {
+            if (this.getDomainPublic().equals(pi.getDomainPublic())) {
+                return this.getRangeClassName().compareTo(pi.getRangeClassName());
+            } else {
+                return (this.getDomainPublic().compareTo(pi.getDomainPublic()));
+            }
+        } catch (NullPointerException npe) {
+            return -1;
+        }
+
     }
 }

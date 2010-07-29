@@ -40,7 +40,13 @@
 	    	<input type="hidden" name="home" value="${portalBean.portalId}" />
 	    	<input type="hidden" name="propertyUri" value="${property.URI}"/>
             <input type="submit" class="form-button" value="Show Hierarchy below This Property"/>
-        </form>
+        </form>      
+        <form action="listVClassWebapps" method="get">
+			<input type="hidden" name="home" value="${portalBean.portalId}" />
+			<input type="hidden" name="showPropertyRestrictions" value="true"/>
+			<input type="hidden" name="propertyURI" value="${property.URI}"/>
+			<input type="submit" class="form-button" value="Show Classes With a Restriction on This Property"/>
+		</form>
         <form action="listObjectPropertyStatements" method="get">
         	<input type="hidden" name="home" value="${portalBean.portalId}" />
         	<input type="hidden" name="propertyURI" value="${property.URI}"/>

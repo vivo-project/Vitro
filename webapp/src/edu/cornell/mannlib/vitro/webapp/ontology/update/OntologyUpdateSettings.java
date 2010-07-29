@@ -9,7 +9,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 public class OntologyUpdateSettings {
 
 	private String dataDir;
-	private String sparqlConstructsDir;
+	private String sparqlConstructAdditionsDir;
+	private String sparqlConstructDeletionsDir;
 	private String askQueryFile;
 	private String successAssertionsFile;
 	private String successRDFFormat = "N3";
@@ -31,11 +32,17 @@ public class OntologyUpdateSettings {
 	public void setDataDir(String dataDir) {
 		this.dataDir = dataDir;
 	}
-	public String getSparqlConstructsDir() {
-		return sparqlConstructsDir;
+	public String getSparqlConstructAdditionsDir() {
+		return sparqlConstructAdditionsDir;
 	}
-	public void setSparqlConstructsDir(String sparqlConstructsDir) {
-		this.sparqlConstructsDir = sparqlConstructsDir;
+	public void setSparqlConstructAdditionsDir(String sparqlConstructAdditionsDir) {
+		this.sparqlConstructAdditionsDir = sparqlConstructAdditionsDir;
+	}
+	public String getSparqlConstructDeletionsDir() {
+		return sparqlConstructDeletionsDir;
+	}
+	public void setSparqlConstructDeletionsDir(String sparqlConstructDeletionsDir) {
+		this.sparqlConstructDeletionsDir = sparqlConstructDeletionsDir;
 	}
 	public String getAskQueryFile() {
 		return askQueryFile;

@@ -7,8 +7,8 @@ import java.util.Date;
 
 public class User implements Comparable {
     
-    public final static int MIN_PASSWORD_LENGTH = 5;
-    public final static int MAX_PASSWORD_LENGTH = 99;
+    public final static int MIN_PASSWORD_LENGTH = 6;
+    public final static int MAX_PASSWORD_LENGTH = 12;
 
     private String URI = null;
     private String namespace = null;
@@ -109,7 +109,15 @@ public class User implements Comparable {
 
     public int compareTo(Object o) {
         Collator collator = Collator.getInstance();
-        return collator.compare(this.getUsername(),((User)o).getUsername());
+        User other = ((User)o);
+        if( this.getUsername() == null && other.getUsername() == null )
+        	return 0;
+        else if( this.getUsername() == null )
+        	return -1;
+        else if( other.getUsername() == null)
+        	return 1;
+        else
+        	return collator.compare(this.getUsername(),((User)o).getUsername());
     }
 
 }

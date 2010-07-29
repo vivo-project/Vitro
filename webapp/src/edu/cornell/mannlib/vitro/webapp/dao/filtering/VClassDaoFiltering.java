@@ -132,8 +132,8 @@ public class VClassDaoFiltering extends BaseFiltering implements VClassDao{
         return innerVClassDao.getSubClassURIs(classURI);
     }
 
-    public List<String> getSuperClassURIs(String classURI) {
-        return  innerVClassDao.getSuperClassURIs(classURI);
+    public List<String> getSuperClassURIs(String classURI, boolean direct) {
+        return  innerVClassDao.getSuperClassURIs(classURI, direct);
     }
 
     public VClass getVClassByURI(String URI) {

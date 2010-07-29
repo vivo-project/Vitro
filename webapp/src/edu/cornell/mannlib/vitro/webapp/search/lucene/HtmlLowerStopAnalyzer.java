@@ -100,10 +100,10 @@ public class HtmlLowerStopAnalyzer extends Analyzer {
 //        
         
         TokenStream result = new StandardTokenizer(arg0); 
-        result = new StandardFilter(result); 
-        result = new LowerCaseFilter(result); 
-        result = new StopFilter(result, _stopWords, IGNORE_CASE); 
-        result = new ISOLatin1AccentFilter(result); 
+        result = new StandardFilter(result);  //break into tokens
+        result = new LowerCaseFilter(result);  //lower case
+        result = new StopFilter(result, _stopWords, IGNORE_CASE);  //remove stop words
+        result = new ISOLatin1AccentFilter(result); //ISO-8859-1 accented chars are replace by unaccented 
         return result;
     
     }

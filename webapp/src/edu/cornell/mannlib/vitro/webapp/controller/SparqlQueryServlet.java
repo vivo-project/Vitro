@@ -114,7 +114,10 @@ public class SparqlQueryServlet extends BaseEditController {
             loginHandler = ((LoginFormBean)obj);
         if( loginHandler == null ||
             ! "authenticated".equalsIgnoreCase(loginHandler.getLoginStatus()) ||
-             Integer.parseInt(loginHandler.getLoginRole()) <= 5 ){       
+                // rjy7 Allows any editor (including self-editors) access to this servlet.
+                // This servlet is now requested via Ajax from some custom forms, so anyone
+                // using the custom form needs access rights.
+                Integer.parseInt(loginHandler.getLoginRole()) < LoginFormBean.NON_EDITOR ){       
             HttpSession session = request.getSession(true);
             
             session.setAttribute("postLoginRequest",
@@ -322,7 +325,7 @@ public class SparqlQueryServlet extends BaseEditController {
             /* @author ass92 */
                   
             
-            OntologyDao daoObj = getWebappDaoFactory().getOntologyDao();
+            OntologyDao daoObj = vreq.getFullWebappDaoFactory().getOntologyDao();
             List ontologiesObj = daoObj.getAllOntologies();
             ArrayList prefixList = new ArrayList();
             
@@ -417,7 +420,11 @@ public class SparqlQueryServlet extends BaseEditController {
         "PREFIX swrl:  <http://www.w3.org/2003/11/swrl#>\n" +
         "PREFIX swrlb: <http://www.w3.org/2003/11/swrlb#>\n" +
         "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#>\n"+
-        "PREFIX vivo:  <http://vivo.library.cornell.edu/ns/0.1#>\n"+
+        "PREFIX vivo:  <http://vivo.library.cornell.edu/ns/0.1#>\n" +
+        "PREFIX bibo: <http://purl.org/ontology/bibo/>\n" +
+        "PREFIX foaf: <http://xmlns.com/foaf/0.1/>\n" +
+        "PREFIX core: <http://vivoweb.org/ontology/core#>\n" +
+        "PREFIX aktp:  <http://www.aktors.org/ontology/portal#>\n"+
         "#\n" +
         "# This query gets all range entities labels and types of a person\n"+
         "# A query like this could be used to get enough info to create a display\n"+

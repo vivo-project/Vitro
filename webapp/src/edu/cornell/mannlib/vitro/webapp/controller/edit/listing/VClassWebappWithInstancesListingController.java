@@ -48,7 +48,7 @@ public class VClassWebappWithInstancesListingController extends BaseEditControll
 
         if(uriStr != null) {
 
-            VClassDao dao = getWebappDaoFactory().getVClassDao();
+            VClassDao dao = vrequest.getFullWebappDaoFactory().getVClassDao();
 
             results.add("XX");
             results.add("name");
@@ -72,7 +72,7 @@ public class VClassWebappWithInstancesListingController extends BaseEditControll
                 results.add(lastModifiedStr);
                 results.add("XX");
 
-                IndividualDao ewDao = getWebappDaoFactory().getIndividualDao();
+                IndividualDao ewDao = vrequest.getFullWebappDaoFactory().getIndividualDao();
 
                 List ents = ewDao.getIndividualsByVClassURI(vcw.getURI(), -2, -2);
                 if (ents != null && ents.size()>0) {

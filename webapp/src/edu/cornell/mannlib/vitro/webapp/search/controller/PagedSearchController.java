@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -69,13 +68,12 @@ import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneIndexer;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.SimpleLuceneHighlighter;
-import edu.cornell.mannlib.vitro.webapp.search.lucene.VitroQueryParser;
 import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.Html2Text;
 
 /**
  * PagedSearchController is the new search controller that interacts 
- * directly with the lucene API and returns paged, relivance ranked results.
+ * directly with the lucene API and returns paged, relevance ranked results.
  *  
  * @author bdc34
  *
@@ -114,7 +112,7 @@ public class PagedSearchController extends VitroHttpServlet implements Searcher{
             Portal portal = vreq.getPortal();
             PortalFlag portalFlag = vreq.getPortalFlag();
             
-            //make sure a IndividualDao is available 
+            //make sure an IndividualDao is available 
             if( vreq.getWebappDaoFactory() == null 
                     || vreq.getWebappDaoFactory().getIndividualDao() == null ){
                 log.error("makeUsableBeans() could not get IndividualDao ");
@@ -152,7 +150,7 @@ public class PagedSearchController extends VitroHttpServlet implements Searcher{
             
             String qtxt = vreq.getParameter(VitroQuery.QUERY_PARAMETER_NAME);
             Analyzer analyzer = getAnalyzer(getServletContext());
-            Query query = getQuery(vreq, portalFlag, analyzer, indexDir);             
+            Query query = getQuery(vreq, portalFlag, analyzer, indexDir, qtxt);             
             log.debug("query for '" + qtxt +"' is " + query.toString());
             
             if (query == null ) {
@@ -428,10 +426,10 @@ public class PagedSearchController extends VitroHttpServlet implements Searcher{
     }
 
     private Query getQuery(VitroRequest request, PortalFlag portalState,
-                       Analyzer analyzer, String indexDir ) throws SearchException{
+                       Analyzer analyzer, String indexDir, String querystr ) throws SearchException{
         Query query = null;
         try{
-            String querystr = request.getParameter(VitroQuery.QUERY_PARAMETER_NAME);
+            //String querystr = request.getParameter(VitroQuery.QUERY_PARAMETER_NAME);
             if( querystr == null){
                 log.error("There was no Parameter '"+VitroQuery.QUERY_PARAMETER_NAME            
                     +"' in the request.");                
@@ -487,6 +485,9 @@ public class PagedSearchController extends VitroHttpServlet implements Searcher{
                 boolQuery.add( flagQuery, BooleanClause.Occur.MUST);
                 query = boolQuery;
             }
+            
+            log.debug("Query: " + query);
+            
         }catch (Exception ex){
             throw new SearchException(ex.getMessage());
         }
@@ -500,13 +501,13 @@ public class PagedSearchController extends VitroHttpServlet implements Searcher{
         //indicated in the query string.
         //The analyzer is needed so that we use the same analyzer on the search queries as
         //was used on the text that was indexed.
-        VitroQueryParser qp = new VitroQueryParser(defaultSearchField,analyzer);
+        QueryParser qp = new QueryParser(defaultSearchField,analyzer);
         //this sets the query parser to AND all of the query terms it finds.
         qp.setDefaultOperator(QueryParser.AND_OPERATOR);
         //set up the map of stemmed field names -> unstemmed field names
-        HashMap<String,String> map = new HashMap<String, String>();
-        map.put(Entity2LuceneDoc.term.ALLTEXT,Entity2LuceneDoc.term.ALLTEXTUNSTEMMED);
-        qp.setStemmedToUnstemmed(map);
+//        HashMap<String,String> map = new HashMap<String, String>();
+//        map.put(Entity2LuceneDoc.term.ALLTEXT,Entity2LuceneDoc.term.ALLTEXTUNSTEMMED);
+//        qp.setStemmedToUnstemmed(map);
         return qp;
     }
  
@@ -618,9 +619,6 @@ public class PagedSearchController extends VitroHttpServlet implements Searcher{
 
             if(ent.getDescription() != null )
                 sb.append(ent.getDescription()).append(' ');
-
-            if(ent.getCitation() != null)
-                sb.append(ent.getCitation()).append(' ');
 
             if(ent.getDataPropertyList() != null) {
                 Iterator edIt = ent.getDataPropertyList().iterator();

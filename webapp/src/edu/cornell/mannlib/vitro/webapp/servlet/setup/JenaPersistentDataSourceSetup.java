@@ -104,6 +104,19 @@ public class JenaPersistentDataSourceSetup extends JenaDataSourceSetupBase imple
         	log.error("Unable to load user accounts model from DB", t);
         }
              
+        // display, editing and navigation Model 
+	    try {
+	    	Model appDbModel = makeDBModelFromConfigurationProperties(JENA_DISPLAY_METADATA_MODEL, DB_ONT_MODEL_SPEC);
+			if (appDbModel.size() == 0) 
+				readOntologyFilesInPathSet(APPPATH, sce.getServletContext(),appDbModel);			
+	    	OntModel appModel = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC);
+	    	appModel.add(appDbModel);
+	    	appModel.getBaseModel().register(new ModelSynchronizer(appDbModel));
+	    	sce.getServletContext().setAttribute("displayOntModel", appModel);
+	    } catch (Throwable t) {
+	    	log.error("Unable to load user application configuration model from DB", t);
+	    }
+	    
         sce.getServletContext().setAttribute("jenaOntModel", memModel);
        
 	}

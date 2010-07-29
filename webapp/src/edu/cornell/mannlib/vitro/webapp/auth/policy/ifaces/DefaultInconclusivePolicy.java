@@ -26,7 +26,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ontology.DefineObje
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ontology.RemoveOwlClass;
 
 /**
- * a policy where every type of action is authorized as INCONCLUSIVE
+ * A policy where every type of action is authorized as INCONCLUSIVE
  * by default.
  *
  * @author bdc34
@@ -46,5 +46,5 @@ public class DefaultInconclusivePolicy implements PolicyIface{
     }
     protected static PolicyDecision INCONCLUSIVE_DECISION = new BasicPolicyDecision(
             Authorization.INCONCLUSIVE,
-            "THis is the default decision defined in DefaultInconclusivePolicy");
+            "This is the default decision defined in DefaultInconclusivePolicy");
 }

@@ -8,14 +8,13 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.w3c.tidy.Tidy;
 
 public class MakeTidy {
-	private static final Logger log = Logger.getLogger(MakeTidy.class);
-	private static PrintWriter outFile = new PrintWriter(new LoggingWriter(log,
-			Level.INFO));
+	private static final Log log = LogFactory.getLog(MakeTidy.class);
+	private static PrintWriter outFile = new PrintWriter(new LoggingWriter(log));
 
 	public String process(String value) {
 		Tidy tidy = new Tidy(); // obtain a new Tidy instance
@@ -47,14 +46,15 @@ public class MakeTidy {
 		return outputStr;
 	}
 
+	/**
+	 * A {@link Writer} that sends its output to a log file, at INFO level.
+	 */
 	private static class LoggingWriter extends Writer {
-		private final Logger logger;
-		private final Level level;
+		private final Log logger;
 		private String buffer;
 
-		LoggingWriter(Logger logger, Level level) {
+		LoggingWriter(Log logger) {
 			this.logger = logger;
-			this.level = level;
 			this.buffer = "";
 		}
 
@@ -98,7 +98,7 @@ public class MakeTidy {
 				if (lineEnd == -1) {
 					return;
 				} else {
-					logger.log(level, buffer.substring(0, lineEnd).trim());
+					logger.info(buffer.substring(0, lineEnd).trim());
 					buffer = buffer.substring(lineEnd + 1);
 				}
 			}

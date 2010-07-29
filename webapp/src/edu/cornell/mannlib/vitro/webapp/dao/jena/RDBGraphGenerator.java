@@ -33,7 +33,7 @@ public class RDBGraphGenerator implements GraphGenerator {
     }
 
     public Graph generateGraph() {
-    	log.info(this.getClass().getName()+" regenerateGraph()");
+    	log.info("Regenerate the graph.");
         try {
         	if (log.isDebugEnabled()) {
         		log.debug(ds.getNumActive() + " active SQL connections");

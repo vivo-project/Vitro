@@ -58,10 +58,10 @@ public class Keys2EntsRetryController extends BaseEditController {
             isDashboardForm=true;
         }
 
-        KeywordIndividualRelationDao k2eDao = getWebappDaoFactory().getKeys2EntsDao();
+        KeywordIndividualRelationDao k2eDao = request.getFullWebappDaoFactory().getKeys2EntsDao();
         epo.setDataAccessObject(k2eDao);
-        KeywordDao kDao = getWebappDaoFactory().getKeywordDao();
-        IndividualDao eDao = getWebappDaoFactory().getIndividualDao();
+        KeywordDao kDao = request.getFullWebappDaoFactory().getKeywordDao();
+        IndividualDao eDao = request.getFullWebappDaoFactory().getIndividualDao();
 
         KeywordIndividualRelation objectForEditing = new KeywordIndividualRelation();
 
@@ -124,7 +124,7 @@ public class Keys2EntsRetryController extends BaseEditController {
 
         if (isDashboardForm && action.equals("delete")) {
             List<Option> existingKeywordRelations = new LinkedList();
-            KeywordIndividualRelationDao kirDao = getWebappDaoFactory().getKeys2EntsDao();
+            KeywordIndividualRelationDao kirDao = request.getFullWebappDaoFactory().getKeys2EntsDao();
             List kirs = kirDao.getKeywordIndividualRelationsByIndividualURI(ent.getURI());
             if (kirs != null) {
                 Iterator kirIt = kirs.iterator();

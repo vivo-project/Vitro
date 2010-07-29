@@ -60,31 +60,22 @@
 	    </script>
 <%	} %>
 
-    <script language="javascript" type="text/javascript" src="../js/extensions/String.js"></script>
-	<script language="javascript" type="text/javascript" src="../js/jquery.js"></script>
-	<script language="javascript" type="text/javascript" src="../js/jquery_plugins/jquery.bgiframe.pack.js"></script>
-	<script language="javascript" type="text/javascript" src="../js/jquery_plugins/thickbox/thickbox-compressed.js"></script>
-	<!-- <script language="javascript" type="text/javascript" src="../js/jquery_plugins/ui.datepicker.js"></script>	-->
-	<script language="javascript" type="text/javascript" src="../js/jquery_plugins/jquery-autocomplete/jquery.autocomplete.pack.js"></script>
+
 	
 <%	String useAutoComplete = (useAutoComplete=request.getParameter("useAutoComplete")) != null && !(useAutoComplete.equals("")) ? useAutoComplete : "false";
 	if (useAutoComplete.equalsIgnoreCase("true")) { %>
-	    <link rel="stylesheet" type="text/css" href="../js/jquery_plugins/jquery-autocomplete/jquery.autocomplete.css"/>	
+	    <link rel="stylesheet" type="text/css" href="<c:url value="/js/jquery_plugins/jquery-autocomplete/jquery.autocomplete.css"/>" />	
 <%	} %>
+   
 
-
-    <c:forEach var="jsFile" items="${customJs}">
-        <script type="text/javascript" src="${jsFile}"></script>
-    </c:forEach>     
-    
-    <link rel="stylesheet" type="text/css" href="../js/jquery_plugins/thickbox/thickbox.css"/>	
+    <c:forEach var="cssFile" items="${customCss}">
+        <link rel="stylesheet" type="text/css" href="<c:url value="${cssFile}"/>" media="screen"/>
+    </c:forEach>
+       
+    <link rel="stylesheet" type="text/css" href="<c:url value="/js/jquery_plugins/thickbox/thickbox.css"/>" />	
 	<link rel="stylesheet" type="text/css" href="<c:url value="/${themeDir}css/screen.css"/>" media="screen"/>	
 	<link rel="stylesheet" type="text/css" href="<c:url value="/${themeDir}css/formedit.css" />" media="screen"/>
 
-    <c:forEach var="cssFile" items="${customCss}">
-        <link rel="stylesheet" type="text/css" href="${cssFile}" media="screen"/>
-    </c:forEach>
-     
     <title>Edit</title>
 </head>
 <body class="formsEdit">

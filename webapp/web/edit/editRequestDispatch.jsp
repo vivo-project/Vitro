@@ -66,7 +66,7 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
    String typeOfNew = request.getParameter("typeOfNew");
   
    //If there is no specified editForm then the subjectURI and the predicate
-   //are needed to determin which form to use for this edit. 
+   //are needed to determine which form to use for this edit. 
    if (formParam == null || "".equals(formParam)) {
        if (subjectUri == null || subjectUri.trim().length() == 0)
            throw new Error(
@@ -81,7 +81,6 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
    }else{
        log.debug("Found editform in http parameters.");
    }
-
    request.setAttribute("subjectUri", subjectUri);
    request.setAttribute("subjectUriJson", MiscWebUtils.escape(subjectUri));
    if (predicateUri != null) {
@@ -94,13 +93,11 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
    } else {
        formParam = null;
    }
-
    String objectUri = request.getParameter("objectUri");
    if (objectUri != null) {
        request.setAttribute("objectUri", objectUri);
        request.setAttribute("objectUriJson", MiscWebUtils.escape(objectUri));            
    }
-
    if( typeOfNew != null )
 	   request.setAttribute("typeOfNew", typeOfNew);	   	     
    
@@ -117,9 +114,6 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 
    if( subjectUri != null ){
        Individual subject = wdf.getIndividualDao().getIndividualByURI(subjectUri);
-       //if (subject == null && formParam == null)
-       //     throw new Error("In editRequestDispatch.jsp, could not find subject in model: '"
-       //                     + subjectUri + "'");
        if( subject != null ){
            request.setAttribute("subject", subject);
        }
@@ -183,7 +177,6 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 	        boolean isForwardToCreateNew = 
 	            ( objectProp != null && objectProp.getOfferCreateNewOption() && objectProp.getSelectFromExisting() == false)
 	         || ( objectProp != null && objectProp.getOfferCreateNewOption() && "create".equals(command));   
-	                 
 	        if (isForwardToCreateNew) {
 	        	
 	        	request.setAttribute("isForwardToCreateNew", new Boolean(true));
@@ -230,7 +223,6 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
         //case where a form was passed as a http parameter
         form = formParam;
     }
-
     request.setAttribute("form", form);
 %>
 <jsp:forward page="/edit/forms/${form}" />

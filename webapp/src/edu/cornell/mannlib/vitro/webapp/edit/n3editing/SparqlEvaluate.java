@@ -121,7 +121,10 @@ public class SparqlEvaluate {
             queryStrings = editConfig.getN3Generator().subInLiterals(literalScope,queryStrings);
             String uriFromQuery = queryToUri(  queryStrings.get(0) );
             if( uriFromQuery != null )
-                varToUris.put(var, uriFromQuery);
+            {    
+            	//Added parens and output
+            	varToUris.put(var, uriFromQuery);
+            }
             else 
                 log.debug("sparqlEvaluateForUris(): for var " + var 
                         + " the following query evaluated to null:\n"+queryStrings.get(0)+"\n(end of query)\n");                            

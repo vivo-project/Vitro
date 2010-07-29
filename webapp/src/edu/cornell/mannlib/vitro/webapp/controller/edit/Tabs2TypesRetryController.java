@@ -59,10 +59,10 @@ public class Tabs2TypesRetryController extends BaseEditController {
 
         String action = "insert";
 
-        TabVClassRelationDao t2tDao = getWebappDaoFactory().getTabs2TypesDao();
+        TabVClassRelationDao t2tDao = request.getFullWebappDaoFactory().getTabs2TypesDao();
         epo.setDataAccessObject(t2tDao);
-        TabDao tDao = getWebappDaoFactory().getTabDao();
-        VClassGroupDao cgDao = getWebappDaoFactory().getVClassGroupDao();
+        TabDao tDao = request.getFullWebappDaoFactory().getTabDao();
+        VClassGroupDao cgDao = request.getFullWebappDaoFactory().getVClassGroupDao();
 
         TabVClassRelation objectForEditing = null;
 

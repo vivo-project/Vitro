@@ -185,7 +185,7 @@ public class TabMenu {
         List above = (List)vreq.getAttribute("tabsAboveCurrent");
         if( above == null ){
             int currentTab = TabWebUtil.getTabIdFromRequest(vreq);
-            above = vreq.getWebappDaoFactory().getTabDao().getTabHierarcy(currentTab, -1);
+            above = vreq.getWebappDaoFactory().getTabDao().getTabHierarchy(currentTab, -1);
             vreq.setAttribute("tabsAboveCurrent", above);
         }
         return above;

@@ -24,6 +24,7 @@ import edu.cornell.mannlib.vedit.forwarder.PageForwarder;
 import edu.cornell.mannlib.vedit.forwarder.impl.UrlForwarder;
 import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.JenaNetidPolicy.ContextSetup;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.setup.SelfEditingPolicySetup;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
@@ -52,7 +53,7 @@ public class UserRetryController extends BaseEditController {
 
         //create an EditProcessObject for this and put it in the session
         EditProcessObject epo = super.createEpo(request);
-        epo.setDataAccessObject(getWebappDaoFactory().getVClassDao());
+        epo.setDataAccessObject(vreq.getFullWebappDaoFactory().getVClassDao());
 
         String action = null;
         if (epo.getAction() == null) {
@@ -62,7 +63,7 @@ public class UserRetryController extends BaseEditController {
             action = epo.getAction();
         }
 
-        UserDao uDao = getWebappDaoFactory().getUserDao();
+        UserDao uDao = vreq.getFullWebappDaoFactory().getUserDao();
         epo.setDataAccessObject(uDao);
 
         User userForEditing = null;
@@ -114,28 +115,27 @@ public class UserRetryController extends BaseEditController {
         HashMap optionMap = new HashMap();
 
         LoginFormBean loginBean = (LoginFormBean) request.getSession().getAttribute("loginHandler");
+        List roleOptionList = new LinkedList();
         
-        /* This is being removed just for NIHVIVO release 1.0 because self editing is not going to be in that release. */
-        /* THIS CHANGE MUST NOT BE PROPAGATED TO THE TRUNK, datastar needs self editors */
-        /* see http://issues.library.cornell.edu/browse/NIHVIVO-335 */
+        /* bdc34: Datastar needs non-backend-editing users for logging in non-Cornell people*/
+        /* SelfEditingPolicySetup.SELF_EDITING_POLICY_WAS_SETUP is set by the SelfEditingPolicySetup context listener */
+        boolean selfEditing = (Boolean)getServletContext().getAttribute(SelfEditingPolicySetup.SELF_EDITING_POLICY_WAS_SETUP) == Boolean.TRUE;
         Option nonEditor = new Option(ROLE_PROTOCOL+loginBean.getNonEditor(), "self editor");
-        if( ! "insert".equals(action))
-        	nonEditor.setSelected(userForEditing.getRoleURI().equals(nonEditor.getValue()));
+        /* self editing should be displayed if we are editing a user account that is already  
+         *  self-editing even if self editing is off. */
+        if( selfEditing || 
+        	( !"insert".equals(action) && userForEditing.getRoleURI().equals(nonEditor.getValue()) )){        	        	
+            nonEditor.setSelected(userForEditing.getRoleURI().equals(nonEditor.getValue()));
+            if (nonEditor.getSelected() || (Integer.decode(loginBean.getLoginRole()) >= loginBean.getNonEditor()))
+                roleOptionList.add(nonEditor); 
+        }
         
         Option editor = new Option(ROLE_PROTOCOL+loginBean.getEditor(), "editor");
         editor.setSelected(userForEditing.getRoleURI().equals(editor.getValue()));
         Option curator = new Option(ROLE_PROTOCOL+loginBean.getCurator(), "curator");
         curator.setSelected(userForEditing.getRoleURI().equals(curator.getValue()));
         Option administrator = new Option (ROLE_PROTOCOL+loginBean.getDba(), "system administrator");
-        administrator.setSelected(userForEditing.getRoleURI().equals(administrator.getValue()));
-
-        List roleOptionList = new LinkedList();
-
-        /* This is being removed just for NIHVIVO release 1.0 because self editing is not going to be in that release. */
-        /* THIS CHANGE MUST NOT BE PROPIGATED TO THE TRUNK, datastar needs self editors */
-        /* see http://issues.library.cornell.edu/browse/NIHVIVO-335 */
-        if (nonEditor.getSelected() )
-            roleOptionList.add(nonEditor);
+        administrator.setSelected(userForEditing.getRoleURI().equals(administrator.getValue()));        
         
         if (editor.getSelected() || (Integer.decode(loginBean.getLoginRole()) >= loginBean.getEditor()))
             roleOptionList.add(editor);

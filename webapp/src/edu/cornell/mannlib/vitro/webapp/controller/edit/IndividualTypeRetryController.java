@@ -30,6 +30,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
@@ -52,8 +53,10 @@ public class IndividualTypeRetryController extends BaseEditController {
         //create an EditProcessObject for this and put it in the session
         EditProcessObject epo = super.createEpo(request);
 		
+        VitroRequest vreq = new VitroRequest(request);
+        
         WebappDaoFactory t;
-        WebappDaoFactory wadf = ((t = getAssertionsWebappDaoFactory()) != null) ? t : getWebappDaoFactory();
+        WebappDaoFactory wadf = ((t = vreq.getAssertionsWebappDaoFactory()) != null) ? t : vreq.getFullWebappDaoFactory();
         IndividualDao iDao = wadf.getIndividualDao();
         VClassDao vcDao = wadf.getVClassDao();
         

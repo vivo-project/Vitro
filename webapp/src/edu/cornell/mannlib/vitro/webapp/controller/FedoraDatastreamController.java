@@ -9,11 +9,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import javax.servlet.RequestDispatcher;
@@ -24,41 +20,35 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
 
-import com.hp.hpl.jena.datatypes.BaseDatatype;
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
-import com.hp.hpl.jena.datatypes.xsd.XSDDateTime;
 import com.hp.hpl.jena.ontology.DatatypeProperty;
 import com.hp.hpl.jena.ontology.ObjectProperty;
 import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.vocabulary.RDFS;
 import com.hp.hpl.jena.vocabulary.XSD;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.Resource;
 import com.ibm.icu.util.Calendar;
 
+import edu.cornell.mannlib.vedit.beans.LoginFormBean;
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest;
 import fedora.client.FedoraClient;
 import fedora.common.Constants;
 import fedora.server.management.FedoraAPIM;
 import fedora.server.types.gen.Datastream;
-import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
 
 
 /**
@@ -81,9 +71,7 @@ public class FedoraDatastreamController extends VitroHttpServlet implements Cons
     private boolean connected = false;
     
     private static final int DEFAULT_MAX_SIZE = 1024 * 1024 * 50;//Shoudl this be changed to 1 GB to be consistent
-    private static final String DEFAULT_FILE_URI_PREFIX = "http://vivo.library.cornell.edu/ns/0.1#individual";
     private static final String DEFAULT_BASE_DIR = "/usr/local/vitrofiles";
-    private static String fileUriPrefix = DEFAULT_FILE_URI_PREFIX;
     private static String baseDirectoryForFiles = DEFAULT_BASE_DIR;
     private static int maxFileSize = DEFAULT_MAX_SIZE;
     
@@ -229,53 +217,17 @@ public class FedoraDatastreamController extends VitroHttpServlet implements Cons
         }
     }
                 
-    public void doPost(HttpServletRequest req, HttpServletResponse res)
+    public void doPost(HttpServletRequest rawRequest, HttpServletResponse res)
     throws ServletException,IOException {
         try{          
-            /* the post parameters seem to get consumed by the parsing so we have to
-             * make a copy. */             
-            boolean isMultipart = ServletFileUpload.isMultipartContent(req);
-            if (!isMultipart) 
-                throw new FdcException("Must POST a multipart encoded request");            
-            
-            Iterator<FileItem> iter;
-            try { iter = getFileItemIterator(req);
-            } catch (FileUploadException e) {
-                e.printStackTrace();
-                throw new FdcException("There was an error processing the " +
-                		"parameters of your request.");
-            }
-            
-            // get files or parameter values
-            Map<String, List<String>> queryParameters =new HashMap<String, List<String>>();
-            Map<String, List<FileItem>> fileStreams = new HashMap<String, List<FileItem>>();
-            while (iter.hasNext()) {
-                FileItem item = (FileItem) iter.next();
-                String name = item.getFieldName();
-                if (item.isFormField()) {
-                    if (queryParameters.containsKey(name)) {
-                        String value = item.getString("UTF-8");
-                        queryParameters.get(name).add(value);
-                    } else {
-                        List<String> valueList = new ArrayList<String>(1);
-                        String value = item.getString("UTF-8");
-                        valueList.add(value);
-                        queryParameters.put(name, valueList);
-                    }
-                } else {
-                    if (fileStreams.containsKey(name)) {
-                        fileStreams.get(name).add(item);
-                        log.debug("File in multipart content request:  field "
-                                + name + " with file name " + item.getName()
-                                + " detected.");
-                    } else {
-                        List<FileItem> itemList = new ArrayList<FileItem>();
-                        itemList.add(item);
-                        fileStreams.put(name, itemList);
-                    }
-                }
-            }            
-
+        	FileUploadServletRequest req = FileUploadServletRequest.parseRequest(rawRequest, maxFileSize);
+       		if (req.hasFileUploadException()) {
+        		throw new FdcException("Size limit exceeded: " + req.getFileUploadException().getLocalizedMessage());
+        	}
+        	if (!req.isMultipart()) {
+        		throw new FdcException("Must POST a multipart encoded request");
+        	}
+        	
             //check if fedora is on line
             OntModel sessionOntModel = (OntModel)req.getSession().getAttribute("jenaOntModel");
             synchronized (FedoraDatastreamController.class) {
@@ -302,23 +254,12 @@ public class FedoraDatastreamController extends VitroHttpServlet implements Cons
             }
             
             //get the parameters from the request
-            String pId=null;
-            if( queryParameters.containsKey("pid") && queryParameters.get("pid") != null &&
-                    queryParameters.get("pid").size() > 0 ){
-                pId = queryParameters.get("pid").get(0);
-            }
-            String dsId=null;
-            if( queryParameters.containsKey("dsid") && queryParameters.get("dsid") != null &&
-                    queryParameters.get("dsid").size() > 0 ){
-                dsId = queryParameters.get("dsid").get(0);
-            }
-            String fileUri=null;
-            if( queryParameters.containsKey("fileUri") && queryParameters.get("fileUri") != null &&
-                    queryParameters.get("fileUri").size() > 0 ){
-                fileUri = queryParameters.get("fileUri").get(0);
-            }
+            String pId=req.getParameter("pid");
+            String dsId=req.getParameter("dsid");
+            String fileUri=req.getParameter("fileUri");
+
             boolean useNewName=false;
-            if( "true".equals(queryParameters.get("useNewName"))){System.out.println("Use new name parameter is true");
+            if( "true".equals(req.getParameter("useNewName"))){
                 useNewName = true;
             }
             if( pId == null || pId.length() == 0 ) 
@@ -331,9 +272,7 @@ public class FedoraDatastreamController extends VitroHttpServlet implements Cons
                 throw new FdcException("Your form submission did not contain " +
                         "enough information to complete your request.(Missing fileUri parameter)");
             
-            FileItem fileRes = null;
-            if( fileStreams.containsKey("fileRes") && fileStreams.get("fileRes").size()>0)
-                fileRes = fileStreams.get("fileRes").get(0);
+            FileItem fileRes = req.getFileItem("fileRes"); 
             if( fileRes == null ) 
                 throw new FdcException("Your form submission did not contain " +
                 "enough information to complete your request.(Missing fileRes)");
@@ -377,8 +316,6 @@ public class FedoraDatastreamController extends VitroHttpServlet implements Cons
             }
 
             File uploadedFile = new File(saveLocation);
-            //System.out.println("Uploaded file path " + uploadedFile.getPath() + " - get file?" + uploadedFile.getName());
-            String uploadedFileLocation = uploadedFile.getAbsolutePath();
             
             try {
                 fileRes.write(uploadedFile);
@@ -413,7 +350,6 @@ public class FedoraDatastreamController extends VitroHttpServlet implements Cons
             DataProperty contentType = wdf.getDataPropertyDao().getDataPropertyByURI(this.contentTypeProperty);
             if(contentType != null)
             {
-            	System.out.println("Setting content type to " + fileRes.getContentType());
             	wdf.getDataPropertyStatementDao().deleteDataPropertyStatementsForIndividualByDataProperty(fileEntity, contentType);            
 	            dps = new DataPropertyStatementImpl();
 	            dps.setIndividualURI(fileEntity.getURI());
@@ -462,29 +398,10 @@ public class FedoraDatastreamController extends VitroHttpServlet implements Cons
 	            } else {
 	            	//System.out.println("file name property is null");
 	            }
-	            
-	            //This doesn't seem to be settable as a data property - how else could we set this?
-	            /*
-	            DataProperty fileLocationProperty = wdf.getDataPropertyDao().getDataPropertyByURI(this.fileLocationProperty);
-	            if(fileLocationProperty != null) {
-	            	wdf.getDataPropertyStatementDao().deleteDataPropertyStatementsForIndividualByDataProperty(fileEntity, fileLocationProperty);            
-	            	dps = new DataPropertyStatementImpl();
-		            dps.setIndividualURI(fileEntity.getURI());
-		            dps.setDatapropURI(fileLocationProperty.getURI());
-		            dps.setData(saveLocation); //This follows the pattern of the original file upload - the name returned from the uploaded file object
-		            wdf.getDataPropertyStatementDao().insertNewDataPropertyStatement(dps);
-	            } else {
-	            	System.out.println("File location property is null");
-	            }
-	            */
-	            
+	            	            
 	            //Need to also update the check sum node - how would we do that
 	            //Find checksum node related to this particular file uri, then go ahead and update two specific fields
-	            //ObjectProperty checksumNode = wdf.getObjectPropertyDao().getObjectPropertyByURI(this.checksumNodeProperty);
-	            //if(checksumNode != null) {
-	            //	System.out.println("Check sum node is not equal to null");
-	            //	fileEntity.
-	            //}
+	            
 	            List<ObjectPropertyStatement >csNodeStatements = fileEntity.getObjectPropertyMap().get(this.checksumNodeProperty).getObjectPropertyStatements();
 	            if(csNodeStatements.size() == 0) {
 	            	System.out.println("No object property statements correspond to this property");
@@ -545,9 +462,9 @@ public class FedoraDatastreamController extends VitroHttpServlet implements Cons
             RequestDispatcher rd = req.getRequestDispatcher(Controllers.BASIC_JSP);
             rd.forward(req, res);
         }catch(FdcException ex){
-            req.setAttribute("errors", ex.getMessage());
-            RequestDispatcher rd = req.getRequestDispatcher("/edit/fileUploadError.jsp");
-            rd.forward(req, res);
+            rawRequest.setAttribute("errors", ex.getMessage());
+            RequestDispatcher rd = rawRequest.getRequestDispatcher("/edit/fileUploadError.jsp");
+            rd.forward(rawRequest, res);
             return;
         }
     }
@@ -635,8 +552,6 @@ public class FedoraDatastreamController extends VitroHttpServlet implements Cons
 	public void init() throws ServletException {
 		super.init();
 
-		fileUriPrefix = ConfigurationProperties.getProperty(
-				"n3.defaultUriPrefix", DEFAULT_FILE_URI_PREFIX);
 		baseDirectoryForFiles = ConfigurationProperties.getProperty(
 				"n3.baseDirectoryForFiles", DEFAULT_BASE_DIR);
 
@@ -650,7 +565,7 @@ public class FedoraDatastreamController extends VitroHttpServlet implements Cons
 		}
 	}
    
-    private void setup(OntModel model, ServletContext context) {
+    public void setup(OntModel model, ServletContext context) {
         this.configurationStatus = "";
         StringBuffer status = new StringBuffer("");
         
@@ -758,19 +673,6 @@ public class FedoraDatastreamController extends VitroHttpServlet implements Cons
             super(message);           
         }
     };
-    
-    private Iterator<FileItem> getFileItemIterator(HttpServletRequest request)
-    throws FileUploadException {
-        //Create a factory for disk-based file items
-        DiskFileItemFactory factory = new DiskFileItemFactory();
-        factory.setSizeThreshold(maxFileSize);
-        factory.setRepository(new File(baseDirectoryForFiles));
-
-        // Create a new file upload handler
-        ServletFileUpload upload = new ServletFileUpload(factory);
-        upload.setSizeMax(maxFileSize);
-        return upload.parseRequest(request).iterator();
-    }
     
     private static final String RELOAD_MSG = 
         "<p>The fedora configuartion file will be reloaded if " +

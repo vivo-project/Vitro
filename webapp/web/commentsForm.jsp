@@ -46,7 +46,7 @@
 
 		<form name = "contact_form" action="sendmail" method="post" onsubmit="return ValidateForm('contact_form');">
 		<input type="hidden" name="home" value="${portalId}"/>
-		<input type="hidden" name="RequiredFields" value="webusername,webuseremail,comments"/>
+		<input type="hidden" name="RequiredFields" value="webusername,webuseremail,s34gfd88p9x1"/>
 		<input type="hidden" name="RequiredFieldsNames" value="Name,Email address,Comments"/>
 		<input type="hidden" name="EmailFields" value="webuseremail"/>
 		<input type="hidden" name="EmailFieldsNames" value="emailaddress"/>

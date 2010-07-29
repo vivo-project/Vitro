@@ -3,18 +3,12 @@
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Random;
 
 import javax.servlet.RequestDispatcher;
@@ -25,9 +19,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -36,25 +27,23 @@ import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
-import com.hp.hpl.jena.vocabulary.RDF;
-import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vedit.beans.LoginFormBean;
-import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
-import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditN3Generator;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditN3Utils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditSubmission;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.Field;
+import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest;
 import edu.cornell.mannlib.vitro.webapp.utils.MailUtil;
 
 /**
@@ -122,82 +111,32 @@ public class N3MultiPartUpload extends VitroHttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse resp)
+    protected void doPost(HttpServletRequest rawRequest, HttpServletResponse resp)
             throws ServletException, IOException {
         log.debug("N3MultiPartProcess 0.01");
-
-        ServletContext application = getServletContext();
-        HttpSession session = request.getSession();
-        boolean isMultipart = ServletFileUpload.isMultipartContent(request);
-
-        /*
-         * the post parameters seem to get consumed by the parsing so we have to
-         * make a copy.
-         */
-        Map<String, List<String>> queryParameters = null;
-        Map<String, List<FileItem>> fileStreams = null;
-        if (!isMultipart) {
+        
+		FileUploadServletRequest request = FileUploadServletRequest.parseRequest(rawRequest, maxFileSize);
+   		if (request.hasFileUploadException()) {
+            // TODO: forward to error message
+            throw new ServletException("Size limit exceeded: " + request.getFileUploadException().getLocalizedMessage());
+       	}
+        if (!request.isMultipart()) {
             // TODO: forward to error message
             throw new ServletException("Must POST a multipart encoded request");
         }
 
-        log.debug("multipart content detected");
-        queryParameters = new HashMap<String, List<String>>();
-        fileStreams = new HashMap<String, List<FileItem>>();
+        log.debug("multipart content detected: " + request.isMultipart());
 
-        List<String> fileUploadErrors = new ArrayList<String>();
-        Iterator<FileItem> iter;
-        try {
-            iter = getFileItemIterator(request);
-        } catch (FileUploadException e) {
-            log.debug(e);                        
-            request.setAttribute("errors", e.getLocalizedMessage());
-            RequestDispatcher rd = request
-                    .getRequestDispatcher("/edit/fileUploadError.jsp");
-            rd.forward(request, resp);            
-            return;
-        }
-
-        // get files or parameter values
-        while (iter.hasNext()) {
-            FileItem item = (FileItem) iter.next();
-            String name = item.getFieldName();
-            if (item.isFormField()) {
-                if (queryParameters.containsKey(name)) {
-                    // String value = new
-                    // String(item.getString().getBytes("ISO-8859-1"), "UTF-8");
-                    String value = item.getString("UTF-8");
-                    queryParameters.get(name).add(value);
-                } else {
-                    List<String> valueList = new ArrayList<String>(1);
-                    // String value = new
-                    // String(item.getString().getBytes("ISO-8859-1"), "UTF-8");
-                    String value = item.getString("UTF-8");
-                    valueList.add(value);
-                    queryParameters.put(name, valueList);
-                }
-            } else {
-                if (fileStreams.containsKey(name)) {
-                    fileStreams.get(name).add(item);
-                    log.debug("File in multipart content request:  field "
-                            + name + " with file name " + item.getName()
-                            + " detected.");
-                } else {
-                    List<FileItem> itemList = new ArrayList<FileItem>();
-                    itemList.add(item);
-                    fileStreams.put(name, itemList);
-                }
-            }
-        }
+        ServletContext application = getServletContext();
+        HttpSession session = request.getSession();
 
         List<String> errorMessages = new ArrayList<String>();
         OntModel jenaOntModel = getJenaOntModel(request, application);
 
-        EditConfiguration editConfig = EditConfiguration.getConfigFromSession(
-                session, request, queryParameters);
-        putEditKeyInRequest(request, queryParameters);
+		EditConfiguration editConfig = EditConfiguration.getConfigFromSession(
+				session, request);
         EditSubmission submission = 
-            new EditSubmission(convertParams(queryParameters), editConfig, fileStreams);
+            new EditSubmission(request.getParameterMap(), editConfig, request.getFiles());
         EditN3Generator n3Subber = editConfig.getN3Generator();
 
         if (editConfig == null) {
@@ -235,7 +174,7 @@ public class N3MultiPartUpload extends VitroHttpServlet {
             Map<String, List<Model>> requiredFieldAssertions = new HashMap<String, List<Model>>();
 
             boolean saveFileToDiskSuccess = false;
-            for (String fileItemKey : fileStreams.keySet()) {
+            for (String fileItemKey : request.getFiles().keySet()) {
                 Field field = editConfig.getField(fileItemKey);
                 if (field.getOptionsType() != Field.OptionsType.FILE) {
                     log.debug("Field "
@@ -246,7 +185,7 @@ public class N3MultiPartUpload extends VitroHttpServlet {
                 }
 
                 /* build the models from the field assertions for each file */
-                for (FileItem fileItem : fileStreams.get(fileItemKey)) {
+                for (FileItem fileItem : request.getFiles().get(fileItemKey)) {
                     try {
                         requiredFieldAssertions.putAll(buildModelsForFileItem(
                                 fileItem, editConfig, submission, field
@@ -369,7 +308,7 @@ public class N3MultiPartUpload extends VitroHttpServlet {
         	//This is before the redirect occurs from postEditCleanUp
         	//Send out email confirmation here
         	try {
-        		sendUserEmail(session, uploadFileName);
+        		sendUserEmail(request, session, uploadFileName);
         	} catch(Exception ex) {
         		System.out.println("Problem with retrieving and/or sending email");
         	}
@@ -378,26 +317,6 @@ public class N3MultiPartUpload extends VitroHttpServlet {
                     .getRequestDispatcher("/edit/postEditCleanUp.jsp");
             rd.forward(request, resp);
         }
-    }
-
-    private Map<String, String[]> convertParams(
-            Map<String, List<String>> queryParameters) {
-        // TODO Auto-generated method stub
-        HashMap<String,String[]> out = new HashMap<String,String[]>();
-        for( String key : queryParameters.keySet()){
-            List item = queryParameters.get(key);            
-            out.put(key, (String[])item.toArray(new String[item.size()]));
-        }
-        return out;
-    }
-
-    /**
-     * Since the HTTP query parameters are consumed by the multipart parse we
-     * need to put the editKey in the request attributes.
-     */
-    private void putEditKeyInRequest(HttpServletRequest request,
-            Map<String, List<String>> queryParameters) {
-        request.setAttribute("editKey", queryParameters.get("editKey").get(0));
     }
 
     private Map<String, List<Model>> buildModelsForFileItem(FileItem fileItem,
@@ -416,10 +335,10 @@ public class N3MultiPartUpload extends VitroHttpServlet {
         /* **** Make a URI for the file that was just saved **** */
         String newFileUri = makeNewUri(editConfig.getNewResources().get(
                 "fileURI"), jenaOntModel);
-        assertions = n3Subber.subInUris("fileURI", newFileUri, assertions);
+        assertions = EditN3Generator.subInUris("fileURI", newFileUri, assertions);
 
         /* **** URIs and Literals on Form/Parameters ** */
-        assertions = n3Subber.subInUris(submission.getUrisFromForm(),
+        assertions = EditN3Generator.subInUris(submission.getUrisFromForm(),
                 assertions);
         assertions = n3Subber.subInLiterals(submission.getLiteralsFromForm(),
                 assertions);
@@ -427,7 +346,7 @@ public class N3MultiPartUpload extends VitroHttpServlet {
             log.debug("subsititued in literals from form: " + assertions);
 
         /* **** URIs and Literals in Scope ************ */
-        assertions = n3Subber
+        assertions = EditN3Generator
                 .subInUris(editConfig.getUrisInScope(), assertions);
         assertions = n3Subber.subInLiterals(editConfig.getLiteralsInScope(),
                 assertions);
@@ -456,8 +375,6 @@ public class N3MultiPartUpload extends VitroHttpServlet {
     private List<String> saveFileAndSubInFileInfo(FileItem fileItem,
             String dataDir, EditN3Generator n3generator, List<String> assertions)
             throws Exception {
-        String saveDir = dataDir;
-
         String originalName = fileItem.getName();
         String name = originalName.replaceAll("[,+\\\\/$%^&*#@!<>'\"~;]", "_");
         name = name.replace("..", "_");
@@ -519,19 +436,6 @@ public class N3MultiPartUpload extends VitroHttpServlet {
         return uri;
     }
 
-    private Iterator<FileItem> getFileItemIterator(HttpServletRequest request)
-            throws FileUploadException {
-        // Create a factory for disk-based file items
-        DiskFileItemFactory factory = new DiskFileItemFactory();
-        factory.setSizeThreshold(maxFileSize);
-        factory.setRepository(new File(baseDirectoryForFiles));
-
-        // Create a new file upload handler
-        ServletFileUpload upload = new ServletFileUpload(factory);
-        upload.setSizeMax(maxFileSize);
-        return upload.parseRequest(request).iterator();
-    }
-
     private OntModel getJenaOntModel(HttpServletRequest request,
             ServletContext application) {
         Object sessionOntModel = request.getSession().getAttribute(
@@ -547,9 +451,7 @@ public class N3MultiPartUpload extends VitroHttpServlet {
         String name = "edu.cornell.mannlib.datastar.DataStarPostUpload";
 
         try {
-            Class clazz = this.getClass();
-            ClassLoader cload = clazz.getClassLoader();
-            Class newClass = cload.loadClass(name);
+            Class<?> newClass = Class.forName(name);
             Object obj = newClass.newInstance();
             if (obj instanceof PostUpload) {
                 newPu = (PostUpload) obj;
@@ -605,12 +507,12 @@ public class N3MultiPartUpload extends VitroHttpServlet {
         return out;
     }
     
-    public void sendUserEmail(HttpSession session, String uploadFileName) {
+    public void sendUserEmail(HttpServletRequest request, HttpSession session, String uploadFileName) {
 		LoginFormBean loginBean = (LoginFormBean) session.getAttribute("loginHandler");
         String userURI = loginBean.getUserURI();
         try{
 	        System.out.println("User URI is " + userURI);
-	        UserDao uDao = getWebappDaoFactory().getUserDao();
+	        UserDao uDao = (new VitroRequest(request)).getFullWebappDaoFactory().getUserDao();
 	        String email = uDao.getUserEmailAddress(userURI);
 	        String deliveryFrom = "hjk54@cornell.edu";//TO DO: replace with email address to be used
 	        //Now send message
@@ -644,39 +546,17 @@ public class N3MultiPartUpload extends VitroHttpServlet {
         }
 	}
 
-    private boolean logAddRetract(String msg, Map<String, List<String>> add,
-            Map<String, List<String>> retract) {
-        log.debug(msg);
-        if (add != null)
-            log.debug("assertions: " + add.toString());
-        if (retract != null)
-            log.debug("retractions: " + retract.toString());
-        return true;
-    }
+//    private boolean logAddRetract(String msg, Map<String, List<String>> add,
+//            Map<String, List<String>> retract) {
+//        log.debug(msg);
+//        if (add != null)
+//            log.debug("assertions: " + add.toString());
+//        if (retract != null)
+//            log.debug("retractions: " + retract.toString());
+//        return true;
+//    }
 
     static Random random = new Random();
-
-    private static Property FILE_LOCATION_PROP = ResourceFactory
-            .createProperty(VitroVocabulary.FILE_LOCATION);
-
-    private static Property CONTENT_TYPE_PROP = ResourceFactory
-            .createProperty(VitroVocabulary.CONTENT_TYPE);
-
-    private static Property FILE_NAME_PROP = ResourceFactory
-            .createProperty(VitroVocabulary.FILE_NAME);
-
-    private static Property HAS_FILE_PROP = ResourceFactory
-            .createProperty(VitroVocabulary.HAS_FILE);
-
-    private static Property FILE_CLASS = ResourceFactory
-            .createProperty(VitroVocabulary.FILE_CLASS);
-
-    private static Property RDF_TYPE = RDF.type;
-
-    private static Property RDFS_LABEL = RDFS.label;
-
-    private static Property FILE_ERROR_UPLOADING = ResourceFactory
-            .createProperty(VitroVocabulary.vitroURI + "fileErrorUploading");
 
     Log log = LogFactory.getLog(N3MultiPartUpload.class);
 }

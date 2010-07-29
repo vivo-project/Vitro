@@ -9,6 +9,10 @@ import java.util.Collections;
 import javax.servlet.ServletContext;
 
 public class ThemeUtils {
+    
+    private ThemeUtils() {
+        throw new AssertionError();
+    }
 	
 	public static ArrayList<String> getThemes(ServletContext sc, boolean doSort) {
 

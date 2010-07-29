@@ -74,19 +74,33 @@
 
   <!-- Invokes process to perform updates to align with ontology changes if needed -->
   <!-- Needs to run before submodels are attached and Pellet is set up -->
-
+  
   <listener>
      <listener-class>edu.cornell.mannlib.vitro.webapp.servlet.setup.UpdateKnowledgeBase</listener-class>
   </listener>
-
+ 
+  <listener>
+    <listener-class>
+        edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup
+    </listener-class>
+  </listener> 
+  
+  <!-- Invokes a process to move any uploaded files into the new file storage system. -->
+  <!-- Needs to run after FileStorageSetup and JenaDataSourceSetup. -->
+  <!-- Should run before Pellet is set up. -->  
+  <listener>
+    <listener-class>
+        edu.cornell.mannlib.vitro.webapp.servlet.setup.UpdateUploadedFiles
+    </listener-class>
+  </listener> 
+  
   <!-- Attaching submodels permits extra RDF files to be made visible without storing the data in the DB. -->
-
   <listener>
      <listener-class>edu.cornell.mannlib.vitro.webapp.servlet.setup.AttachSubmodels</listener-class>
   </listener>
 
   <!-- Pellet setup enables reasoning.  Inferences are cached in a separate DB graph. -->
-  <!-- Changing the class name sets the kindss of inferences that are materialized. -->
+  <!-- Changing the class name sets the kinds of inferences that are materialized. -->
   <!-- See documentation for details. -->
   <!-- If used, must be run after JenaDataSourceSetup -->
 
@@ -110,12 +124,18 @@
   <listener>
     <listener-class> edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup </listener-class>
   </listener>
-
-	<listener>
+  
+	<!--<listener>
 		<listener-class>
 	        edu.cornell.mannlib.vitro.webapp.auth.policy.setup.SelfEditingPolicySetup
 		</listener-class>
-	</listener>    
+	</listener>  -->
+    
+    <listener>
+        <listener-class>
+            edu.cornell.mannlib.vitro.webapp.auth.identifier.UserToIndIdentifierFactorySetup
+        </listener-class>
+    </listener>
 
   <listener>
     <listener-class> edu.cornell.mannlib.vitro.webapp.auth.policy.setup.EditorEditingPolicySetup
@@ -131,7 +151,20 @@
     <listener-class> edu.cornell.mannlib.vitro.webapp.auth.policy.setup.DbAdminEditingPolicySetup
     </listener-class>
   </listener>
+ 
+  <listener>
+    <listener-class>
+        edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreeMarkerSetup
+    </listener-class>
+  </listener>
 
+  <!-- On shutdown, this will kill the background thread started by Apache Commons File Upload -->
+  <listener>
+    <listener-class>
+      org.apache.commons.fileupload.servlet.FileCleanerCleanup
+    </listener-class>
+  </listener>
+  
   <!--
     <listener>
         <listener-class>
@@ -147,7 +180,7 @@
         </listener-class>
     </listener>
 -->
-
+  
   <!-- Filters ********************************************************** -->
   <!-- in 2.4 spec, filter chain order is first by filter-mapping <url-pattern> order in web.xml,
 	 then filter-mapping <servlet-name> order in web.xml -->
@@ -206,7 +239,33 @@
         <url-pattern>/*</url-pattern>
   </filter-mapping-->
 
+  <!--  Spring setup ****************************************************  -->
+<!--
+  <context-param>
+	<param-name>contextConfigLocation</param-name>
+	<param-value>/WEB-INF/baseConfig/*.xml, /WEB-INF/localConfig/*.xml</param-value>
+  </context-param>
+  
+  <listener>
+    <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+  </listener>
 
+  <servlet>
+	<servlet-name>dispatcher</servlet-name>
+	<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+	 <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>/WEB-INF/baseConfig/dispatcher-servlet.xml, /WEB-INF/localConfig/dispatcher-servlet.xml</param-value>
+        </init-param>        
+	<load-on-startup>2</load-on-startup>	
+  </servlet>
+
+  <servlet-mapping>
+	<servlet-name>dispatcher</servlet-name>
+	<url-pattern>/spring</url-pattern>
+  </servlet-mapping>
+    
+    -->
   <!-- Servlets ********************************************************** -->
   <servlet>
     <!--adding only trimSpaces param to defaults to clean up html output-->
@@ -236,6 +295,18 @@
     <url-pattern>/SearchIndex</url-pattern>
   </servlet-mapping>
 
+<!-- This is the new navigation controller.  It is not ready for the 1.1 release
+     see http://issues.library.cornell.edu/browse/NIHVIVO-597  
+  <servlet>
+  	<servlet-name>NavigationController</servlet-name>
+  	<servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.NavigationController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+  	<servlet-name>NavigationController</servlet-name>
+  	<url-pattern>/nav/*</url-pattern>
+  </servlet-mapping>
+  -->
+  
   <servlet>
     <servlet-name>TestController</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.TestController</servlet-class>
@@ -254,11 +325,20 @@
 
   <servlet>
     <servlet-name>AboutController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.AboutController</servlet-class>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.AboutController</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>AboutController</servlet-name>
     <url-pattern>/about</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>FreeMarkerTestController</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.TestController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>FreeMarkerTestController</servlet-name>
+    <url-pattern>/freemarkertest</url-pattern>
   </servlet-mapping>
   
   <servlet>
@@ -285,15 +365,11 @@
 
   <servlet>
     <servlet-name>ImageUploadController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.ImageUploadController</servlet-class>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadController</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>ImageUploadController</servlet-name>
-    <url-pattern>/uploadimages</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>ImageUploadController</servlet-name>
-    <url-pattern>/uploadimages.jsp</url-pattern>
+    <url-pattern>/uploadImages</url-pattern>
   </servlet-mapping>
 
   <servlet>
@@ -774,7 +850,16 @@
     <servlet-name>EntityListController</servlet-name>
     <url-pattern>/entitylist</url-pattern>
   </servlet-mapping>
-
+  
+  <servlet>
+    <servlet-name>IndividualListController</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>IndividualListController</servlet-name>
+    <url-pattern>/individuallist</url-pattern>
+  </servlet-mapping>
+  
   <servlet>
     <servlet-name>SearchController</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.search.controller.PagedSearchController</servlet-class>
@@ -798,6 +883,19 @@
   </servlet-mapping>
 
   <servlet>
+    <servlet-name>AutocompleteController</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.search.controller.AutocompleteController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>AutocompleteController</servlet-name>
+    <url-pattern>/autocomplete</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>AutocompleteController</servlet-name>
+    <url-pattern>/populateselect</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
     <servlet-name>AdminController</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.AdminController</servlet-class>
   </servlet>
@@ -808,7 +906,7 @@
 
   <servlet>
     <servlet-name>TermsOfUseController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.TermsOfUseController</servlet-class>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.TermsOfUseController</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>TermsOfUseController</servlet-name>
@@ -816,14 +914,14 @@
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>CommentsController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.CommentsController</servlet-class>
+    <servlet-name>ContactFormController</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.ContactFormController</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>CommentsController</servlet-name>
-    <url-pattern>/comments</url-pattern>
+    <servlet-name>ContactFormController</servlet-name>
+    <url-pattern>/contact</url-pattern>
   </servlet-mapping>
-
+  
   <servlet>
     <servlet-name>JSON Service</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.JSONServlet</servlet-class>
@@ -899,11 +997,27 @@
     <url-pattern>/dwr/*</url-pattern>
   </servlet-mapping>
 
+  <!-- Deprecated servlet (still used in Datastar) - retain temporarily for testing and comparison. -->
   <servlet>
     <servlet-name>sendmail</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.ContactMailServlet</servlet-class>
     <load-on-startup>5</load-on-startup>
   </servlet>
+  <servlet-mapping>
+    <servlet-name>sendmail</servlet-name>
+    <url-pattern>/sendmail</url-pattern>
+  </servlet-mapping>
+  <!-- end deprecated servlet -->
+  
+  <servlet>
+   <servlet-name>sendMail</servlet-name>
+   <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.ContactMailController</servlet-class>
+   <load-on-startup>5</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>sendMail</servlet-name>
+    <url-pattern>/submitFeedback</url-pattern>
+  </servlet-mapping>
   
   <servlet>
     <servlet-name>mailusers</servlet-name>
@@ -938,10 +1052,14 @@
 
   <servlet>
     <servlet-name>browsecontroller</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.BrowseController</servlet-class>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.BrowseController</servlet-class>
     <load-on-startup>5</load-on-startup>
   </servlet>
-
+  <servlet-mapping>
+    <servlet-name>browsecontroller</servlet-name>
+    <url-pattern>/browse</url-pattern>
+  </servlet-mapping>
+  
   <servlet>
     <servlet-name>pubsbyorg</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.vclass.PubsByDepartmentServlet</servlet-class>
@@ -969,15 +1087,13 @@
   </servlet>
 
   <servlet>
-    <servlet-name>uploadImages</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.UploadImagesServlet</servlet-class>
-    <init-param>
-      <param-name>workspaceDir</param-name>
-      <!-- This is the source directory, so can't be automatically prepended with something like /usr/local/tomcat/webapps/vivo -->
-      <param-value>/usr/local/src/Vitro/dream/common/web</param-value>
-    </init-param>
-    <!--load-on-startup>2</load-on-startup-->
+    <servlet-name>serveFiles</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.filestorage.serving.FileServingServlet</servlet-class>
   </servlet>
+  <servlet-mapping>
+    <servlet-name>serveFiles</servlet-name>
+    <url-pattern>/file/*</url-pattern>
+  </servlet-mapping>
 
   <servlet>
     <servlet-name>generic_editprep</servlet-name>
@@ -1003,6 +1119,28 @@
     <servlet-name>SparqlQuery</servlet-name>
     <url-pattern>/admin/sparqlquery</url-pattern>
   </servlet-mapping>
+  
+  <!-- 
+  <servlet>
+    <servlet-name>DummyVisClient</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.visualization.DummyVisClientController</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>DummyVisClient</servlet-name>
+    <url-pattern>/admin/dummyVisClient</url-pattern>
+  </servlet-mapping>
+   -->
+   
+   <servlet>
+    <servlet-name>VisualizationController</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.visualization.VisualizationController</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>VisualizationController</servlet-name>
+    <url-pattern>/admin/visQuery</url-pattern>
+  </servlet-mapping>
 
   <servlet>
     <servlet-name>authtest</servlet-name>
@@ -1013,14 +1151,28 @@
     <url-pattern>/authtest</url-pattern>
   </servlet-mapping>
 
+  <servlet>
+  	<servlet-name>primitiveRdfEdit</servlet-name>
+  	<servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.PrimitiveRdfEdit</servlet-class>  	
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>primitiveRdfEdit</servlet-name>
+    <url-pattern>/edit/primitiveRdfEdit</url-pattern>    
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>primitiveDelete</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.PrimitiveDelete</servlet-class>    
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>primitiveDelete</servlet-name>
+    <url-pattern>/edit/primitiveDelete</url-pattern>    
+  </servlet-mapping>
+   
   <!-- ============================== servlet-mappings ======================== -->
   <servlet-mapping>
     <servlet-name>fetch</servlet-name>
     <url-pattern>/fetch</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>sendmail</servlet-name>
-    <url-pattern>/sendmail</url-pattern>
   </servlet-mapping>
    <servlet-mapping>
     <servlet-name>mailusers</servlet-name>
@@ -1055,20 +1207,12 @@
     <url-pattern>/logout</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
-    <servlet-name>browsecontroller</servlet-name>
-    <url-pattern>/browsecontroller</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
     <servlet-name>pubsbyorg</servlet-name>
     <url-pattern>/pubsbyorg</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>coauthors</servlet-name>
     <url-pattern>/coauthors</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>uploadImages</servlet-name>
-    <url-pattern>/uploadImages</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>generic_create</servlet-name>
@@ -1140,67 +1284,5 @@
   <!-- 	</error-page>
  -->
 
-  <!-- apache axis stuff -->
-  <!-- Axis is a library that allows java methods to be called as web services.
-     see http://ws.apache.org/axis/java/install.html -->
-
-  <listener>
-    <listener-class>org.apache.axis.transport.http.AxisHTTPSessionListener</listener-class>
-  </listener>
-
-  <servlet>
-    <servlet-name>AxisServlet</servlet-name>
-    <servlet-class> org.apache.axis.transport.http.AxisServlet </servlet-class>
-  </servlet>
-
-  <servlet>
-    <servlet-name>AxisAdminServlet</servlet-name>
-    <servlet-class> org.apache.axis.transport.http.AdminServlet </servlet-class>
-    <load-on-startup>100</load-on-startup>
-  </servlet>
-
-  <servlet>
-    <servlet-name>SOAPMonitorService</servlet-name>
-    <servlet-class> org.apache.axis.monitor.SOAPMonitorService </servlet-class>
-    <init-param>
-      <param-name>SOAPMonitorPort</param-name>
-      <param-value>5001</param-value>
-    </init-param>
-    <load-on-startup>100</load-on-startup>
-  </servlet>
-
-  <servlet-mapping>
-    <servlet-name>AxisAdminServlet</servlet-name>
-    <url-pattern>/AxisAdminServlet</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
-    <servlet-name>AxisServlet</servlet-name>
-    <url-pattern>/servlet/AxisServlet</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
-    <servlet-name>AxisServlet</servlet-name>
-    <url-pattern>*.jws</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
-    <servlet-name>AxisServlet</servlet-name>
-    <url-pattern>/services/*</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
-    <servlet-name>SOAPMonitorService</servlet-name>
-    <url-pattern>/SOAPMonitor</url-pattern>
-  </servlet-mapping>
-
-  <mime-mapping>
-    <extension>xsd</extension>
-    <mime-type>text/xml</mime-type>
-  </mime-mapping>
-  <mime-mapping>
-    <extension>wsdl</extension>
-    <mime-type>text/xml</mime-type>
-  </mime-mapping>
-
+  
 </web-app>

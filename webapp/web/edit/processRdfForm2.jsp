@@ -41,6 +41,8 @@
 <%@page import="edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.ModelChangePreprocessor"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
+<%@ page import="java.net.URLDecoder" %>
+
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
 
 <%-- 2nd prototype of processing.
@@ -73,15 +75,25 @@ are well formed.
      * we have to make a copy. */
     Map <String,String[]> queryParameters = null;        
     queryParameters = vreq.getParameterMap();        
-  
+ 
     List<String>  errorMessages = new ArrayList<String>();                   
     
-    EditConfiguration editConfig = EditConfiguration.getConfigFromSession(session,vreq,queryParameters);    
+    //this version has been removed from the updated code
+    //EditConfiguration editConfig = EditConfiguration.getConfigFromSession(session,vreq,queryParameters); 
+    EditConfiguration editConfig = EditConfiguration.getConfigFromSession(session, request);
     if( editConfig == null ){
         %><jsp:forward page="/edit/messages/noEditConfigFound.jsp"/><%
     }    
     EditN3Generator n3Subber = editConfig.getN3Generator();     
     EditSubmission submission = new EditSubmission(queryParameters,editConfig);
+    
+    // Preprocess the form submission
+    // RY clone() creates a shallow copy, not a deep copy. To do this, need to implement
+    // a custom clone() method for EditSubmission or a copy constructor.
+    //EditSubmission submission = submission.clone();
+    //for (EditSubmissionPreprocessor preprocessor : editConfig.getEditSubmissionPreprocessors()) {
+    //    preprocessor.preprocess(submission);
+    //}
            
     /* entity to return to may be a variable */
     List<String> entToReturnTo = new ArrayList<String>(1);
@@ -89,13 +101,16 @@ are well formed.
         entToReturnTo.add(" "+editConfig.getEntityToReturnTo()+" ");
     }    
     
-    Map<String,String> errors =  submission.getValidationErrors();
+    Map<String,String> errors = submission.getValidationErrors();
     EditSubmission.putEditSubmissionInSession(session,submission);
 
     if(  errors != null && ! errors.isEmpty() ){   
         String form = editConfig.getFormUrl();
         vreq.setAttribute("formUrl", form);
-        %><jsp:forward page="${formUrl}"/><%
+        vreq.setAttribute("view", vreq.getParameter("view"));
+        %>
+            <jsp:forward page="${formUrl}" />
+        <%
         return;
     }
 

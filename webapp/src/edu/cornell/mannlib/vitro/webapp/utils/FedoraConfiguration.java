@@ -24,7 +24,7 @@ public class FedoraConfiguration {
 
         private static String FEDORA_PROPERTIES = "/WEB-INF/fedora.properties";
         
-        private String fedoraUrl = null;
+        public String fedoraUrl = null;
         private String adminUser = null;
         private String adminPassword = null;
         private String pidNamespace = null;    
@@ -71,7 +71,6 @@ public class FedoraConfiguration {
                     adminUser = props.getProperty("adminUser");
                     adminPassword = props.getProperty("adminPassword");
                     pidNamespace = props.getProperty("pidNamespace");
-                    
                     if( fedoraUrl == null || adminUser == null || adminPassword == null ){
                         if( fedoraUrl == null ){
                             log.error("'fedoraUrl' not found in properties file");        
@@ -119,7 +118,7 @@ public class FedoraConfiguration {
             this.configurationStatus += status.toString();
         }
 
-        private boolean canConnectToFedoraServer( ){
+        public boolean canConnectToFedoraServer( ){
             try{
                 FedoraClient fc = new FedoraClient(fedoraUrl,adminUser, adminPassword);
                 String fedoraVersion = fc.getServerVersion();

@@ -10,9 +10,13 @@ import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
@@ -28,6 +32,7 @@ import com.hp.hpl.jena.db.DBConnection;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
+import com.hp.hpl.jena.ontology.OntProperty;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecException;
 import com.hp.hpl.jena.query.QueryExecution;
@@ -41,9 +46,11 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ModelMaker;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.sdb.SDBFactory;
 import com.hp.hpl.jena.sdb.Store;
 import com.hp.hpl.jena.sdb.StoreDesc;
@@ -52,13 +59,16 @@ import com.hp.hpl.jena.sdb.sql.SDBConnection;
 import com.hp.hpl.jena.sdb.store.DatabaseType;
 import com.hp.hpl.jena.sdb.store.LayoutType;
 import com.hp.hpl.jena.shared.Lock;
+import com.hp.hpl.jena.util.ResourceUtils;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDao;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SimpleOntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSDBModelMaker;
@@ -69,6 +79,9 @@ import edu.cornell.mannlib.vitro.webapp.utils.Csv2Rdf;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestWorkflowProcessor;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.WorkflowOntology;
+
+import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
+import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 
 public class JenaIngestController extends BaseEditController {
 
@@ -91,10 +104,14 @@ public class JenaIngestController extends BaseEditController {
 	private static final String EXECUTE_WORKFLOW_JSP = "/jenaIngest/executeWorkflow.jsp";
 	private static final String WORKFLOW_STEP_JSP = "/jenaIngest/workflowStep.jsp";
 	private static final String GENERATE_TBOX_JSP = "/jenaIngest/generateTBox.jsp";
-
+	private static final String PERMANENT_URI = "/jenaIngest/permanentURI.jsp";
+	private static final String MERGE_INDIVIDUALS = "/jenaIngest/mergeIndividuals.jsp";
+	private static final String MERGE_RESULT = "/jenaIngest/merge_result.jsp";
 	private static final String SPARQL_CONSTRUCT_CLASS = "http://vitro.mannlib.cornell.edu/ns/vitro/0.7/sparql#SPARQLCONSTRUCTQuery";
 	private static final String SPARQL_QUERYSTR_PROP = "http://vitro.mannlib.cornell.edu/ns/vitro/0.7/sparql#queryStr";
-	
+	private static final String RENAME_RESOURCE = "/jenaIngest/renameResource.jsp";
+	private static final String RENAME_RESULT = "/jenaIngest/renameResult.jsp";
+
 	public void doGet (HttpServletRequest request, HttpServletResponse response) {
 
 		if (!checkLoginStatus(request,response)) {
@@ -324,6 +341,28 @@ public class JenaIngestController extends BaseEditController {
 			} finally {
 				jenaOntModel.leaveCriticalSection();
 			}
+			/*ass92*/
+			 OntologyDao daoObj = vreq.getFullWebappDaoFactory().getOntologyDao();
+	            List ontologiesObj = daoObj.getAllOntologies();
+	            ArrayList prefixList = new ArrayList();
+	            
+	            if(ontologiesObj !=null && ontologiesObj.size()>0){
+	            	
+	            	Iterator ontItr = ontologiesObj.iterator();
+	            	while(ontItr.hasNext()){
+	            		Ontology ont = (Ontology) ontItr.next();
+	            		prefixList.add(ont.getPrefix() == null ? "(not yet specified)" : ont.getPrefix());
+	            		prefixList.add(ont.getURI() == null ? "" : ont.getURI());
+	            	}
+	            	
+	            }
+	            else{
+	            	prefixList.add("<strong>" + "No Ontologies added" + "</strong>");
+	            	prefixList.add("<strong>" + "Load Ontologies" + "</strong>");
+	            }
+	            
+	            request.setAttribute("prefixList", prefixList);
+	            /*complete*/
 			if (sparqlQueryStr != null) {
 				String validationMessage = "";
 				if (request.getParameterValues("sourceModelName") == null) {
@@ -371,7 +410,93 @@ public class JenaIngestController extends BaseEditController {
 				request.setAttribute("title","Generate TBox from Assertions Data");
 				request.setAttribute("bodyJsp",GENERATE_TBOX_JSP);
 			}			
-		} else {
+		}else if("permanentURI".equals(actionStr)){
+			  String modelName = vreq.getParameter("modelName");
+			  String oldModel = vreq.getParameter("oldModel");
+			  String newModel = vreq.getParameter("newModel");
+			  String oldNamespace = vreq.getParameter("oldNamespace");
+			  String newNamespace = vreq.getParameter("newNamespace");
+			  String dNamespace = vreq.getParameter("defaultNamespace");
+			  
+			  if(modelName!=null){
+			  Model m = maker.getModel(modelName);
+			  ArrayList namespaceList = new ArrayList();
+              ResIterator resItr = m.listResourcesWithProperty((Property)null);
+			  
+			  if(resItr!=null){
+          	    while(resItr.hasNext()){
+          		String namespace = resItr.nextResource().getNameSpace();
+                if(!namespaceList.contains(namespace)){
+                	namespaceList.add(namespace);
+                }		
+          	}
+          	}
+			  else {
+				  namespaceList.add("no resources present");
+			  }
+			  String defaultNamespace = vreq.getFullWebappDaoFactory().getDefaultNamespace();
+			  request.setAttribute("modelName", modelName);
+			  request.setAttribute("defaultNamespace", defaultNamespace);
+          	  request.setAttribute("namespaceList", namespaceList);
+			  request.setAttribute("title","Permanent URI");
+			  request.setAttribute("bodyJsp",PERMANENT_URI);
+			  }
+			  else if(oldModel!=null){
+				  doPermanentURI(oldModel,newModel,oldNamespace,newNamespace,dNamespace,maker,vreq);
+				  request.setAttribute("title","Ingest Menu");
+				  request.setAttribute("bodyJsp",INGEST_MENU_JSP);
+			  }
+			  
+			  
+		  }
+		else if("mergeIndividuals".equals(actionStr)){
+			  String uri1 = vreq.getParameter("uri1");
+			  String uri2 = vreq.getParameter("uri2");
+			  if(uri1!=null){
+				  String result = doMerge(uri1,uri2,response,request);
+				  request.setAttribute("result",result);
+				  request.setAttribute("title","Merge Individuals");
+				  request.setAttribute("bodyJsp",MERGE_RESULT);
+				   
+			  }
+			  else{
+				  request.setAttribute("title","Merge Individuals");
+				  request.setAttribute("bodyJsp",MERGE_INDIVIDUALS);  
+			  }
+			   
+		  }
+		else if("renameResource".equals(actionStr)){
+			  String uri1 = vreq.getParameter("uri1");
+			  String uri2 = vreq.getParameter("uri2");
+			  if(uri1!=null){
+				  String result = doRename(uri1,uri2,response);
+				  request.setAttribute("result",result);
+				  request.setAttribute("title","Rename Resources");
+				  request.setAttribute("bodyJsp",RENAME_RESULT);
+				   
+			  }
+			  else{
+				  request.setAttribute("title","Rename Resource");
+				  request.setAttribute("bodyJsp",RENAME_RESOURCE);  
+			  }
+			  
+		  }
+		else if("mergeResult".equals(actionStr)){
+			Model lmodel = (Model)request.getSession().getAttribute("leftoverModel");
+			response.setContentType("RDF/XML-ABBREV");
+			try{
+			OutputStream outStream = response.getOutputStream();
+			outStream.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>".getBytes());
+			lmodel.write( outStream,"RDF/XML-ABBREV");
+			outStream.flush();
+			outStream.close();
+			}
+			catch(IOException ioe){
+				throw new RuntimeException(ioe);
+			}
+		}
+		
+		else {
 			request.setAttribute("title","Ingest Menu");
 			request.setAttribute("bodyJsp",INGEST_MENU_JSP);
 		}
@@ -839,6 +964,287 @@ public class JenaIngestController extends BaseEditController {
 		new JenaIngestWorkflowProcessor(jenaOntModel.getIndividual(workflowURI),getVitroJenaModelMaker(vreq)).run(jenaOntModel.getIndividual(workflowStepURI));
 	}
 
+	private void doPermanentURI(String oldModel,String newModel,String oldNamespace,
+			String newNamespace,String dNamespace,ModelMaker maker,VitroRequest vreq){
+			
+			
+		    WebappDaoFactory wdf = vreq.getFullWebappDaoFactory();
+			Model m = maker.getModel(oldModel);
+			Model saveModel = maker.getModel(newModel);
+			Model tempModel = ModelFactory.createDefaultModel();
+			ResIterator rsItr = null;
+			ArrayList<String> urlCheck = new ArrayList<String>();
+			String changeNamespace = null;
+			boolean urlFound = false;
+			if(!oldModel.equals(newModel)){
+				StmtIterator stmtItr = m.listStatements();
+				while(stmtItr.hasNext()){
+					Statement stmt = stmtItr.nextStatement();
+					tempModel.add(stmt);
+				}
+				rsItr = tempModel.listResourcesWithProperty((Property)null);
+			}
+			else{
+				rsItr = m.listResourcesWithProperty((Property)null); 
+			}
+			
+			String uri = null;  
+			while(rsItr.hasNext()){
+				Resource res = rsItr.next();
+				if(oldNamespace.equals(res.getNameSpace())){
+					if(!newNamespace.equals("")){
+						do{
+						uri = getUnusedURI(newNamespace,wdf);
+						if(!urlCheck.contains(uri)){
+				    		 urlCheck.add(uri);
+				    		 urlFound = true;
+				    		 }
+				    		 }while(!urlFound);
+				    		 urlFound = false;
+					}
+					else if(dNamespace.equals(vreq.getFullWebappDaoFactory().getDefaultNamespace())){
+						try{
+				    		 do{
+				    			 uri = wdf.getIndividualDao().getUnusedURI(null);
+				    		 if(!urlCheck.contains(uri)){
+				    		 urlCheck.add(uri);
+				    		 urlFound = true;
+				    		 }
+				    		 }while(!urlFound);
+				    		 urlFound = false;
+				        }catch(InsertException ex){
+				        	log.error("could not create uri");
+				        }     	  
+					}
+					ResourceUtils.renameResource(res, uri);					
+				}
+				
+			}
+			boolean statementDone = false;
+			if(!newNamespace.equals("")){
+				changeNamespace = newNamespace;
+			}
+			else if(dNamespace.equals(vreq.getFullWebappDaoFactory().getDefaultNamespace())){
+				changeNamespace = dNamespace;
+			}
+			if(!oldModel.equals(newModel)){
+			StmtIterator stmtItr = tempModel.listStatements();
+			while(stmtItr.hasNext()){
+				statementDone = false;
+				Statement stmt = stmtItr.nextStatement();
+				Resource sRes = stmt.getSubject();
+				Resource oRes = null;
+				if(sRes.getNameSpace().equals(changeNamespace)){
+					saveModel.add(stmt);
+					statementDone = true;
+					}
+				try{
+					oRes = (Resource)stmt.getObject();
+					if(oRes.getNameSpace().equals(changeNamespace) && !statementDone){
+						saveModel.add(stmt);
+						statementDone = true;
+						}	
+				}
+				catch(Exception e){
+					continue;
+				}
+				}
+				
+			}
+			}	
+	private String getUnusedURI(String newNamespace,WebappDaoFactory wdf){
+		String uri = null;
+		String errMsg = null;
+		Random random = new Random();
+		boolean uriIsGood = false;
+        int attempts = 0;
+		
+        while( uriIsGood == false && attempts < 30 ){			
+        	uri = newNamespace + "n" + random.nextInt( Math.min(Integer.MAX_VALUE,(int)Math.pow(2,attempts + 13)) );			
+        	errMsg = wdf.checkURI(uri);
+			if(  errMsg != null)
+				uri = null;
+			else
+				uriIsGood = true;				
+			attempts++;
+		}   
+        
+		return uri;
+	}
+	private String doMerge(String uri1, String uri2,HttpServletResponse response,HttpServletRequest request){
+		OntModel baseOntModel = (OntModel) getServletContext().getAttribute("baseOntModel");
+		OntModel ontModel = (OntModel)
+		getServletContext().getAttribute("jenaOntModel");
+		OntModel infOntModel = (OntModel)
+		getServletContext().getAttribute(JenaBaseDao.INFERENCE_ONT_MODEL_ATTRIBUTE_NAME);
+		boolean functionalPresent = false;
+		Resource res1 = baseOntModel.getResource(uri1);
+		Resource res2 = baseOntModel.getResource(uri2);
+		String result = null;
+		baseOntModel.enterCriticalSection(Lock.WRITE);
+		
+		StmtIterator stmtItr1 = baseOntModel.listStatements(res1,(Property)null,(RDFNode)null);
+		StmtIterator stmtItr2 = baseOntModel.listStatements(res2,(Property)null,(RDFNode)null);
+		StmtIterator stmtItr3 = baseOntModel.listStatements((Resource)null,(Property)null,(RDFNode)res2);
+		
+		if(!stmtItr1.hasNext()){
+			result = "resource 1 not present";
+			res1.removeAll((Property)null);
+			baseOntModel.leaveCriticalSection();
+			return result;
+		}
+		else if(!stmtItr2.hasNext()){
+			result = "resource 2 not present";
+			res2.removeAll((Property)null);
+			baseOntModel.leaveCriticalSection();
+			return result;
+		}
+		int counter = 0;
+		Model leftoverModel = ModelFactory.createDefaultModel();
+		ontModel.enterCriticalSection(Lock.WRITE);
+		infOntModel.enterCriticalSection(Lock.WRITE);
+		try{
+		
+		while(stmtItr2.hasNext()){
+		
+			Statement stmt = stmtItr2.next();
+			Property prop = stmt.getPredicate();
+			OntProperty oprop = baseOntModel.getOntProperty(prop.getURI());
+		    if(oprop!=null && oprop.isFunctionalProperty()){
+		    	leftoverModel.add(res2,stmt.getPredicate(),stmt.getObject());
+		    	functionalPresent = true;
+		    }
+		    else{
+		    baseOntModel.add(res1,stmt.getPredicate(),stmt.getObject()); 
+		    ontModel.add(res1,stmt.getPredicate(),stmt.getObject());
+		    infOntModel.add(res1,stmt.getPredicate(),stmt.getObject());
+		    counter++;
+		    }
+		}
+		  
+		while(stmtItr3.hasNext()){
+			Statement stmt = stmtItr3.nextStatement();
+			Resource sRes = stmt.getSubject();
+			Property sProp = stmt.getPredicate();
+			baseOntModel.add(sRes,sProp,res1);
+			ontModel.add(sRes,sProp,res1);
+			infOntModel.add(sRes,sProp,res1);
+		}
+		Resource ontRes = ontModel.getResource(res2.getURI());
+		Resource infRes = infOntModel.getResource(res2.getURI());
+		baseOntModel.removeAll((Resource)null,(Property)null,(RDFNode)res2);
+		ontModel.removeAll((Resource)null,(Property)null,(RDFNode)res2);
+		infOntModel.removeAll((Resource)null,(Property)null,(RDFNode)res2);
+		res2.removeAll((Property)null);
+		ontRes.removeAll((Property)null);
+		infRes.removeAll((Property)null);
+		}
+		finally{
+	    baseOntModel.leaveCriticalSection();
+	    infOntModel.leaveCriticalSection();
+		ontModel.leaveCriticalSection();
+		}
+		request.getSession().setAttribute("leftoverModel", leftoverModel);
+		if(counter>0 && functionalPresent)
+		result = "merged " + counter + " statements. Some statements could not be merged.";
+		else if(counter>0 && !functionalPresent)
+		result = "merged " + counter + " statements.";	
+		else if(counter==0)
+		result = "No statements merged";
+		return result;
+			
+	}
+private String doRename(String oldNamespace,String newNamespace,HttpServletResponse response){
+		
+		String userURI = null;
+		String uri = null;
+		String result = null;
+		Integer counter = 0;
+		Boolean namespacePresent = false;
+		OntModel baseOntModel = (OntModel)
+		getServletContext().getAttribute("baseOntModel");
+		OntModel ontModel = (OntModel)
+		getServletContext().getAttribute("jenaOntModel");
+		OntModel infOntModel = (OntModel)
+		getServletContext().getAttribute(JenaBaseDao.INFERENCE_ONT_MODEL_ATTRIBUTE_NAME);
+		WebappDaoFactory wdf =
+		(WebappDaoFactory)getServletContext().getAttribute("webappDaoFactory");
+		List<String> urisToChange = new LinkedList<String>();
+		
+		ontModel.enterCriticalSection(Lock.READ);
+		try {
+		Iterator<Individual> indIter = ontModel.listIndividuals();
+		while( indIter.hasNext()){
+		Individual ind = indIter.next();
+		String namespace = ind.getNameSpace();
+		if( namespace != null ){
+		if( oldNamespace.equals(namespace) ){
+		uri = ind.getURI();	
+		urisToChange.add(uri);
+		namespacePresent = true;
+		}
+		}
+		}
+		}finally {
+		ontModel.leaveCriticalSection();
+		}
+		if(!namespacePresent){
+			result = "0 resource renamed";
+			return result;
+		}
+		
+		
+		for( String oldURIStr : urisToChange){
+		baseOntModel.enterCriticalSection(Lock.WRITE);
+		ontModel.enterCriticalSection(Lock.WRITE);
+		infOntModel.enterCriticalSection(Lock.WRITE);
+		try{
+		long time1 = System.currentTimeMillis();
+		Resource res = baseOntModel.getResource(oldURIStr);
+		Resource infRes = infOntModel.getResource(oldURIStr);
+		long time2 = System.currentTimeMillis();
+		String newURIStr=null;
+		Pattern p = Pattern.compile(oldNamespace);
+		String candidateString = res.getURI();
+		Matcher matcher = p.matcher(candidateString);
+		newURIStr = matcher.replaceFirst(newNamespace);
+		long time3 = System.currentTimeMillis();
+		System.out.println("time to get new uri: " + Long.toString(time3 - time2)
+		);
+		System.out.println("Renaming "+ oldURIStr + " to " + newURIStr);
+		ResourceUtils.renameResource(res,newURIStr);
+		ResourceUtils.renameResource(infRes,newURIStr);
+		long time4 = System.currentTimeMillis();
+		System.out.println(" time to rename : " + Long.toString( time4 - time3));
+		System.out.println(" time for one resource: " + Long.toString( time4 -
+		time1));
+		} finally {
+		infOntModel.leaveCriticalSection();
+		ontModel.leaveCriticalSection();
+		baseOntModel.leaveCriticalSection();
+		}
+		try {
+			Thread.currentThread().sleep(200);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		counter++;
+		}
+		
+		/*baseOntModel.enterCriticalSection(Lock.WRITE);
+		ontModel.enterCriticalSection(Lock.WRITE);
+		try{
+		baseOntModel.getBaseModel().notifyEvent(new EditEvent(null,true));
+		baseOntModel.getBaseModel().notifyEvent(new EditEvent(null,false));
+		} finally {
+		ontModel.leaveCriticalSection();
+		baseOntModel.leaveCriticalSection();
+		}*/
+		result = counter.toString() + " resources renamed";
+		return result;
+		
+	}
 	public void prepareSmush (VitroRequest vreq) {
 		String smushPropURI = vreq.getParameter("smushPropURI");
 	}

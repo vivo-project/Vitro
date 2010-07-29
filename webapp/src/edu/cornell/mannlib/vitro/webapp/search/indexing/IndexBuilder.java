@@ -2,7 +2,10 @@
 
 package edu.cornell.mannlib.vitro.webapp.search.indexing;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,22 +16,22 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ObjectSourceIface;
-import edu.cornell.mannlib.vitro.webapp.utils.EntityChangeListener;
+import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 
 /**
  * The IndexBuilder is used to rebuild or update a search index.
- * It uses an implementation of a backend through an object that
- * implements IndexerIface.  An example of a backend is LuceneIndexer.
+ * It uses an implementation of a back-end through an object that
+ * implements IndexerIface.  An example of a back-end is LuceneIndexer.
  *
- * The IndexBuilder implements the EntityChangeListener so it can
- * be registered for Entity changes from the GenericDB classes.
+ * See the class SearchReindexingListener for an example of how a model change
+ * listener can use an IndexBuilder to keep the full text index in sncy with 
+ * updates to a model.
  *
  * There should be an IndexBuilder in the servlet context, try:
  *
@@ -39,31 +42,39 @@ import edu.cornell.mannlib.vitro.webapp.utils.EntityChangeListener;
  * @author bdc34
  *
  */
-public class IndexBuilder implements Runnable, EntityChangeListener{
-    List<ObjectSourceIface> sourceList = new LinkedList<ObjectSourceIface>();
-    IndexerIface indexer = null;
-    ServletContext context = null;
+public class IndexBuilder {
+    private List<ObjectSourceIface> sourceList = new LinkedList<ObjectSourceIface>();
+    private IndexerIface indexer = null;
+    private ServletContext context = null;
+    private ProhibitedFromSearch classesProhibitedFromSearch = null;    
     
-    long lastRun = 0;
-    List<String> changedUris = null;         
+    private long lastRun = 0;
+     
+    private HashSet<String> changedUris = null;         
+    
+    private List<Individual> updatedInds = null;
+    private List<Individual> deletedInds = null;
+    
+    private IndexBuilderThread indexingThread = null;
+    
+    //shared with IndexBuilderThread
+    private boolean reindexRequested = false;
     
     public static final boolean UPDATE_DOCS = false;
     public static final boolean NEW_DOCS = true;
-    
-    private static final Log log = LogFactory.getLog(IndexBuilder.class.getName());
+     
+    private static final Log log = LogFactory.getLog(IndexBuilder.class);
 
     public IndexBuilder(ServletContext context,
                 IndexerIface indexer,
-                List /*ObjectSourceIface*/ sources ){
+                List /*ObjectSourceIface*/ sources){
         this.indexer = indexer;
         this.sourceList = sources;
-        this.context = context;
+        this.context = context;    
         
-        changedUris = new LinkedList<String>();        	
-       	
-        //add this to the context as a EntityChangeListener so that we can
-        //be notified of entity changes.
-        context.setAttribute(EntityChangeListener.class.getName(), this);
+        this.changedUris = new HashSet<String>();
+        this.indexingThread = new IndexBuilderThread(this); 
+        this.indexingThread.start();
     }
 
     public void addObjectSource(ObjectSourceIface osi) {    	
@@ -79,9 +90,69 @@ public class IndexBuilder implements Runnable, EntityChangeListener{
         return sourceList;
     }
 
-    public void doIndexBuild() throws IndexingException {
-        log.debug(this.getClass().getName()
-                + " performing doFullRebuildIndex()\n");
+    public void doIndexRebuild() throws IndexingException {
+    	//set up full index rebuild
+    	setReindexRequested( true );    	
+    	//wake up indexing thread
+    	synchronized (this.indexingThread) {					
+    		this.indexingThread.notifyAll();
+    	}
+    }
+
+    /**
+     * This will re-index Individuals that changed because of modtime or because they
+     * were added with addChangedUris(). 
+     */
+    public void doUpdateIndex() {        	    
+    	//wake up thread
+    	synchronized (this.indexingThread) {					
+    		this.indexingThread.notifyAll();
+    	}    	    
+    }
+   
+    public synchronized void addToChangedUris(String uri){
+    	changedUris.add(uri);
+    }
+        
+    public synchronized void addToChangedUris(Collection<String> uris){
+    	changedUris.addAll(uris);    	
+    }
+    
+	public synchronized boolean isReindexRequested() {
+		return reindexRequested;
+	}
+	
+	public synchronized boolean isThereWorkToDo(){
+		return isReindexRequested() || ! changedUris.isEmpty() ;
+	}
+	
+	public ProhibitedFromSearch getClassesProhibitedFromSearch() {
+		return classesProhibitedFromSearch;
+	}
+
+	public void setClassesProhibitedFromSearch(
+			ProhibitedFromSearch classesProhibitedFromSearch) {
+		this.classesProhibitedFromSearch = classesProhibitedFromSearch;
+	}	
+	
+	public void killIndexingThread() {
+		this.indexingThread.kill();		
+	}
+	/* ******************** non-public methods ************************* */
+	
+	private synchronized void setReindexRequested(boolean reindexRequested) {
+		this.reindexRequested = reindexRequested;
+	}
+	
+    private synchronized Collection<String> getAndEmptyChangedUris(){
+    	Collection<String> out = changedUris;     	    
+    	changedUris = new HashSet<String>();
+    	return out;
+    }
+    
+    protected void indexRebuild() throws IndexingException {
+    	setReindexRequested(false);
+        log.info("Rebuild of search index is starting.");
 
         Iterator<ObjectSourceIface> sources = sourceList.iterator();
         List listOfIterators = new LinkedList();
@@ -100,41 +171,68 @@ public class IndexBuilder implements Runnable, EntityChangeListener{
         getAndEmptyChangedUris();
         
         if( listOfIterators.size() == 0){ log.debug("Warning: no ObjectSources found.");}
-        doBuild( listOfIterators, true, NEW_DOCS );
-        log.debug(this.getClass().getName() + ".doFullRebuildIndex() Done \n");
-    }
-
-    public void run() {
-        doUpdateIndex();
-    }
-
-    public void doUpdateIndex() {        
-    	long since = indexer.getModified() - 60000;
-    		    		
-        Iterator<ObjectSourceIface> sources = sourceList.iterator();
-        List<Iterator<ObjectSourceIface>> listOfIterators = 
-            new LinkedList<Iterator<ObjectSourceIface>>();
-        while (sources.hasNext()) {
-            Object obj = sources.next();
-            if (obj != null && obj instanceof ObjectSourceIface)
-                listOfIterators.add((((ObjectSourceIface) obj)
-                        .getUpdatedSinceIterator(since)));
-            else
-                log.debug("\tskipping object of class "
-                        + obj.getClass().getName() + "\n"
-                        + "\tIt doesn not implement " + "ObjectSourceIface.\n");
-        }
-                     
-        List<Individual> changedInds = addDepResourceClasses(checkForDeletes(getAndEmptyChangedUris()));        
-        listOfIterators.add( (new IndexBuilder.BuilderObjectSource(changedInds)).getUpdatedSinceIterator(0) );
         
-        doBuild( listOfIterators, false,  UPDATE_DOCS );
+        doBuild( listOfIterators, Collections.EMPTY_LIST, true, NEW_DOCS );
+        log.info("Rebuild of search index is complete.");
     }
+    
+    protected void updatedIndex() throws IndexingException{
+    	log.debug("Starting updateIndex()");
+		long since = indexer.getModified() - 60000;
+			    		
+	    Iterator<ObjectSourceIface> sources = sourceList.iterator();
+	    
+	    List<Iterator<Individual>> listOfIterators = 
+	        new LinkedList<Iterator<Individual>>();
+	    
+	    while (sources.hasNext()) {
+	        Object obj = sources.next();
+	        if (obj != null && obj instanceof ObjectSourceIface)
+	            listOfIterators.add((((ObjectSourceIface) obj)
+	                    .getUpdatedSinceIterator(since)));
+	        else
+	            log.debug("\tskipping object of class "
+	                    + obj.getClass().getName() + "\n"
+	                    + "\tIt doesn not implement " + "ObjectSourceIface.\n");
+	    }
+	                 
+	    buildAddAndDeleteLists( getAndEmptyChangedUris());                   
+	    listOfIterators.add( (new IndexBuilder.BuilderObjectSource(updatedInds)).getUpdatedSinceIterator(0) );
+	    
+	    doBuild( listOfIterators, deletedInds, false,  UPDATE_DOCS );
+    }
+    
+	/**
+	 * Sets updatedUris and deletedUris.
+	 * @param changedUris
+	 */
+	private void buildAddAndDeleteLists( Collection<String> uris){	    
+		/* clear updateInds and deletedUris.  This is the only method that should set these. */
+		this.updatedInds = new ArrayList<Individual>();
+		this.deletedInds = new ArrayList<Individual>();
+		
+		WebappDaoFactory wdf = (WebappDaoFactory)context.getAttribute("webappDaoFactory");
+    	for( String uri: uris){
+    		if( uri != null ){
+    			Individual ind = wdf.getIndividualDao().getIndividualByURI(uri);
+    			if( ind != null)
+    				this.updatedInds.add(ind);
+    			else{
+    				log.debug("found delete in changed uris");
+    				this.deletedInds.add(ind);
+    			}
+    		}
+    	}
+    	
+	    this.updatedInds = addDepResourceClasses(updatedInds);	            	
+	}
+	
 
+    
     private List<Individual> addDepResourceClasses(List<Individual> inds) {
     	WebappDaoFactory wdf = (WebappDaoFactory)context.getAttribute("webappDaoFactory");
     	VClassDao vClassDao = wdf.getVClassDao();
-    	java.util.ListIterator<Individual> it = inds.listIterator();
+    	Iterator<Individual> it = inds.iterator();
     	VClass depResVClass = new VClass(VitroVocabulary.DEPENDENT_RESORUCE); 
     	while(it.hasNext()){
     		Individual ind = it.next();
@@ -166,14 +264,6 @@ public class IndexBuilder implements Runnable, EntityChangeListener{
     	}
     	return inds;
 	}
-
-	public void clearIndex(){
-        try {
-            indexer.clearIndex();
-        } catch (IndexingException e) {
-            log.error("error while clearing index", e);
-        }   
-    }
     
     /**
      * For each sourceIterator, get all of the objects and attempt to
@@ -189,12 +279,17 @@ public class IndexBuilder implements Runnable, EntityChangeListener{
      * to false, and a check is made before adding, it will work fine; but
      * checking if an object is on the index is slow.
      */
-    private void doBuild(List sourceIterators, boolean wipeIndexFirst, boolean newDocs ){
+    private void doBuild(List sourceIterators, Collection<Individual> deletes, boolean wipeIndexFirst, boolean newDocs ){
         try {
             indexer.startIndexing();
 
             if( wipeIndexFirst )
                 indexer.clearIndex();
+            else{
+            	for(Individual deleteMe : deletes ){
+            		indexer.removeFromIndex(deleteMe);
+            	}
+            }
 
             //get an iterator for all of the sources of indexable objects
             Iterator sourceIters = sourceIterators.iterator();
@@ -211,9 +306,9 @@ public class IndexBuilder implements Runnable, EntityChangeListener{
                 indexForSource((Iterator)obj, newDocs);
             }
         } catch (IndexingException ex) {
-            log.error("\t" + ex.getMessage(),ex);
+            log.error(ex,ex);
         } catch (Exception e) {
-            log.error("\t"+e.getMessage(),e);
+            log.error(e,e);
         } finally {
             indexer.endIndexing();
         }
@@ -224,28 +319,11 @@ public class IndexBuilder implements Runnable, EntityChangeListener{
      * @param items
      * @return
      */
-    protected void indexForSource(Iterator items , boolean newDocs){
-        if( items == null ) return;
-        while(items.hasNext()){
-            indexItem(items.next(), newDocs);
+    private void indexForSource(Iterator<Individual> individuals , boolean newDocs){
+        if( individuals == null ) return;
+        while(individuals.hasNext()){
+            indexItem(individuals.next(), newDocs);
         }
-    }
-
-    private List<Individual> checkForDeletes(List<String> uris){
-    	 WebappDaoFactory wdf = (WebappDaoFactory)context.getAttribute("webappDaoFactory");
-    	List<Individual> nonDeletes = new LinkedList<Individual>();
-    	for( String uri: uris){
-    		if( uri != null ){
-    			Individual ind = wdf.getIndividualDao().getIndividualByURI(uri);
-    			if( ind != null)
-    				nonDeletes.add(ind);
-    			else{
-    				log.debug("found delete in changed uris");
-    				entityDeleted(uri);
-    			}
-    		}
-    	}
-    	return nonDeletes;
     }
     
     /**
@@ -253,56 +331,33 @@ public class IndexBuilder implements Runnable, EntityChangeListener{
      * @param item
      * @return
      */
-    protected void indexItem( Object item, boolean newDoc){
+    private void indexItem( Individual ind, boolean newDoc){
         try{
-            indexer.index(item, newDoc);
+        	if( ind == null )
+        		return;
+        	if( ind.getVClasses() == null || ind.getVClasses().size() < 1 )
+        		return;
+        	boolean prohibitedClass = false;
+        	if(  classesProhibitedFromSearch != null ){
+        		for( VClass vclass : ind.getVClasses() ){
+        			if( classesProhibitedFromSearch.isClassProhibited(vclass.getURI()) ){        			
+        				prohibitedClass = true;
+        				log.debug("not indexing " + ind.getURI() + " because class " + vclass.getURI() + " is on prohibited list.");
+        				break;
+        			}        		
+        		}
+        	}
+        	if( !prohibitedClass )
+        		indexer.index(ind, newDoc);
+        	else
+        		indexer.removeFromIndex(ind);
+        	
         }catch(Throwable ex){            
             log.debug("IndexBuilder.indexItem() Error indexing "
-                    + item + "\n" +ex);
+                    + ind + "\n" +ex);
         }
         return ;
-    }
-
-    /* These methods are so that the IndexBuilder may register for entity changes */
-    public void entityAdded(String entityURI) {
-        if( log.isDebugEnabled()) 
-        	log.debug("IndexBuilder.entityAdded() " + entityURI);
-        addToChangedUris(entityURI);
-        (new Thread(this)).start();
-    }
-    
-    public void entityDeleted(String entityURI) {
-    	if( log.isDebugEnabled()) 
-    		log.debug("IndexBuilder.entityDeleted() " + entityURI);
-        Individual ent = new IndividualImpl(entityURI);
-        try {
-            indexer.removeFromIndex(ent);
-        } catch (IndexingException e) {
-            log.debug("IndexBuilder.entityDeleted failed: " + e);
-        }
-    }
-
-    public void entityUpdated(String entityURI) {
-    	if( log.isDebugEnabled()) 
-    		log.debug("IndexBuilder.entityUpdate() " + entityURI);
-    	addToChangedUris(entityURI);
-        (new Thread(this)).start();
-    }
-        
-    public synchronized void addToChangedUris(String uri){
-    	changedUris.add(uri);
-    }
-        
-    public synchronized void addToChangedUris(Collection<String> uris){
-    	changedUris.addAll(uris);    	
-    }
-    
-    private synchronized List<String> getAndEmptyChangedUris(){
-    	LinkedList<String> out = new LinkedList<String>(); 
-    	out.addAll( changedUris );    	
-    	changedUris = new LinkedList<String>();
-    	return out;
-    }
+    } 
     
     private class BuilderObjectSource implements ObjectSourceIface {
     	private final List<Individual> individuals; 
@@ -330,4 +385,8 @@ public class IndexBuilder implements Runnable, EntityChangeListener{
 			return getAllOfThisTypeIterator();
 		}
     }
+
+	
+
+
 }

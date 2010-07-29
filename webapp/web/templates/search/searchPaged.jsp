@@ -16,13 +16,16 @@
  request.parameters:
    None yet.
  ********************************************* */ 
+
  if (request.getAttribute("beans") == null) {
      String e = "searchBaisc.jsp expects that request attribute " +
              "'beans' be set to a List of Individuals to display.";
      throw new JspException(e);
  }
  Portal portal = (Portal) request.getAttribute("portalBean");
- String portalParm = "&amp;home=" + portal.getPortalId();  
+ String portalParm = "&amp;home=" + portal.getPortalId(); 
+ 
+
 
 %>
   <div id='content'><!--  searchPaged.jsp --> 

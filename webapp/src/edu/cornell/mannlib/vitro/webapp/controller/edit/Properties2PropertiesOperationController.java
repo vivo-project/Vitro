@@ -131,7 +131,7 @@ public class Properties2PropertiesOperationController extends
     }
     
     private void doEdit(String modeStr, boolean operation, VitroRequest request) {
-    	PropertyDao opDao = getWebappDaoFactory().getObjectPropertyDao();
+    	PropertyDao opDao = request.getFullWebappDaoFactory().getObjectPropertyDao();
    	 
         if (operation == REMOVE) {
             String[] subpropertyURIstrs = request.getParameterValues("SubpropertyURI");

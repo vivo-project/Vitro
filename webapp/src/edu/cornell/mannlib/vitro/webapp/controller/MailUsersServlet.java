@@ -55,7 +55,6 @@ public class MailUsersServlet extends VitroHttpServlet {
 	private String getSmtpHostFromProperties() {
 		String host = ConfigurationProperties.getProperty("Vitro.smtpHost");
 		if (host != null && !host.equals("")) {
-			System.out.println("Found Vitro.smtpHost value is " + host);
 			//LOG.info("Found Vitro.smtpHost value of " + host);
 		} else {
 			System.out.println("No Vitro.smtpHost specified");
@@ -75,9 +74,8 @@ public class MailUsersServlet extends VitroHttpServlet {
         if (smtpHost==null || smtpHost.equals("")){
             status = "This application has not yet been configured to send mail " +
             		"-- smtp host has not been identified in the Configuration Properties file.";
-            System.out.println("Status incorrect - would redirect otherwise");
-            //response.sendRedirect( "test?bodyJsp=" + errpage + "&ERR=" + status + "&home=" + portal.getPortalId() );
-            //return;
+            response.sendRedirect( "test?bodyJsp=" + errpage + "&ERR=" + status + "&home=" + portal.getPortalId() );
+            return;
         }
 
         String SPAM_MESSAGE = "Your message was flagged as spam.";
@@ -107,8 +105,7 @@ public class MailUsersServlet extends VitroHttpServlet {
         int recipientCount = 0;
         String deliveryfrom = null;
         
-        
-        UserDao uDao = getWebappDaoFactory().getUserDao();
+        UserDao uDao = vreq.getFullWebappDaoFactory().getUserDao();
         
         // get Individuals that the User mayEditAs
         deliverToArray = uDao.getUserAccountEmails();

@@ -42,13 +42,13 @@ public class OntologyEditController extends BaseEditController {
         EditProcessObject epo = super.createEpo(request);
         request.setAttribute("epoKey", epo.getKey());
 
-        OntologyDao oDao=getWebappDaoFactory().getOntologyDao();
-        Ontology o=null;
+        OntologyDao oDao = request.getFullWebappDaoFactory().getOntologyDao();
+        Ontology o = null;
         if (request.getParameter("uri")==null){
             log.error("doPost() expects non-null uri parameter");
         } else {
             o = (Ontology)oDao.getOntologyByURI(request.getParameter("uri"));
-            if (o==null){
+            if (o == null){
                 if (!VitroVocabulary.vitroURI.equals(request.getParameter("uri"))) {
                     log.debug("doPost(): no ontology object found for the namespace "+request.getParameter("uri"));
                 }

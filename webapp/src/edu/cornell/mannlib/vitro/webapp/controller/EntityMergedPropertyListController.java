@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -36,6 +38,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.PropertyMaskingSetup;
 
@@ -59,6 +62,11 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
     private static final Log log = LogFactory.getLog(EntityMergedPropertyListController.class.getName());
     private static final int MAX_GROUP_DISPLAY_RANK = 99;
     
+    /** Don't include these properties in the list. */
+	private static final Collection<String> SUPPRESSED_OBJECT_PROPERTIES = Collections
+			.unmodifiableCollection(Arrays
+					.asList(new String[] { VitroVocabulary.IND_MAIN_IMAGE }));
+
     public void doGet( HttpServletRequest request, HttpServletResponse res )
     throws IOException, ServletException {
     	
@@ -70,7 +78,8 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
             if( obj == null || !(obj instanceof Individual))
                 throw new HelpException("EntityMergedPropertyListController requires request.attribute 'entity' to be of"
                         +" type " + Individual.class.getName() );
-            Individual subject =(Individual)obj;
+            Individual subject =(Individual)obj;            
+            subject = filterFromContext( subject );
             
             // determine whether are just displaying populated properties or also interleaving unpopulated ones
             boolean editMode = false;
@@ -106,10 +115,15 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
             
             List<Property> mergedPropertyList = new ArrayList<Property>();
             // now first get the properties this entity actually has, presumably populated with statements 
-            List<ObjectProperty> objectPropertyList = subject.getObjectPropertyList();
+            List<ObjectProperty> objectPropertyList = subject.getObjectPropertyList();                        
+            
             for (ObjectProperty op : objectPropertyList) {
-                op.setEditLabel(op.getDomainPublic());
-                mergedPropertyList.add(op);
+            	if (!SUPPRESSED_OBJECT_PROPERTIES.contains(op)) {
+                    op.setEditLabel(op.getDomainPublic());
+                    mergedPropertyList.add(op);
+            	}else{
+            		log.debug("suppressed " + op.getURI());
+            	}
             }
             
             if (editMode) {
@@ -225,8 +239,10 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
             	if (entityPropertyListFilter != null) {
             		mergedPropertyList = entityPropertyListFilter.fn(mergedPropertyList);
             	}
+            	            	
                 req.setAttribute("mergedList",mergedPropertyList);
-            }
+            }            
+                                   
             req.setAttribute("entity",subject);
 
             RequestDispatcher rd = req.getRequestDispatcher(groupedMode ? Controllers.ENTITY_MERGED_PROP_LIST_GROUPED_JSP : Controllers.ENTITY_MERGED_PROP_LIST_UNGROUPED_JSP);
@@ -241,6 +257,8 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
             rd.include(req, res);
         }
     }
+
+
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException,IOException {
@@ -483,7 +501,11 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
 						stmtsForClass.add(stmt);
 					}
 				}
-
+				
+				//bdc34: What do we do if a object individual is directly asserted to two different
+				//types?  For now we just show them in whichever type shows up first. related to NIHVIVO-876
+				orgStmtList.removeAll(stmtsForClass);				
+				
 				Collections.sort(stmtsForClass,
 						new Comparator<ObjectPropertyStatement>() {
 							public int compare(ObjectPropertyStatement o1,
@@ -526,4 +548,34 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
 		return directClasses;
 	}
 
+	/**
+	 * Look for filter in servlet context and filter properties with it if there is one.
+	 * 
+	 * This allows a vitro instance to have specialized filtering for display.  It was originally
+	 * created to deal with problems caused by custom short views.
+	 * * 
+	 * @param objectPropertyList
+	 * @param wdf
+	 * @return
+	 */
+	private Individual filterFromContext(Individual ind ) {
+		try{
+			UnaryFunctor<Individual,Individual> filter = getMergedPropertyListFilter(getServletContext()); 
+			if( filter == null )
+				return ind;
+			else
+				return filter.fn(ind);			
+		}catch(Throwable t){
+			log.error(t,t);
+		}
+		return ind;
+	}
+	
+	public static void setMergedPropertyListFilter( UnaryFunctor<Individual,Individual>fn, ServletContext sc){
+		sc.setAttribute("EntityMergedPropertyListController.toFilteringIndividual", fn);	
+	}
+	
+	public static UnaryFunctor<Individual,Individual> getMergedPropertyListFilter(  ServletContext sc){
+		return(UnaryFunctor<Individual,Individual>)sc.getAttribute("EntityMergedPropertyListController.toFilteringIndividual");	
+	}
 }

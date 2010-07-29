@@ -58,16 +58,23 @@ public class EditSubmission {
         this.urisFromForm = new HashMap<String,String>();
         for( String var: editConfig.getUrisOnform() ){     
             String[] valuesArray = queryParameters.get( var );
+            String uri = null;
             List<String> values = (valuesArray != null) ? Arrays.asList(valuesArray) : null;
             if( values != null && values.size() > 0){
                 if(  values.size() == 1 ) {
-                    urisFromForm.put(var,values.get(0));
+                	uri = values.get(0);                    	
                 } else if( values.size() > 1 ){
-                    urisFromForm.put(var,values.get(0));
-                    log.error("Cannot yet handle multiple URIs for a single field, useing first URI on list");
+                	uri = values.get(0);
+                    log.error("Cannot yet handle multiple URIs for a single field, using first URI on list");
                 } 
+                urisFromForm.put(var,uri);
             } else {
                 log.debug("No value found for query parameter " + var);              
+            }
+            //check to see if a URI field from the form was blank but was intended to create a new URI
+            if( uri != null && uri.length() == 0 && editConfig.getNewResources().containsKey(var) ){
+            	log.debug("A new resource URI will be made for var " + var + " since it was blank on the form.");
+            	urisFromForm.remove(var);
             }
         }
         this.literalsFromForm =new HashMap<String,Literal>();        
@@ -115,6 +122,15 @@ public class EditSubmission {
             }
         }
 
+        if( log.isDebugEnabled() ){        	
+        	for( String key : literalsFromForm.keySet() ){
+        		log.debug( key + " literal " + literalsFromForm.get(key) );
+        	}
+        	for( String key : urisFromForm.keySet() ){
+        		log.debug( key + " uri " + urisFromForm.get(key) );
+        	}
+        }
+        
         this.basicValidation = new BasicValidation(editConfig,this);
         Map<String,String> errors = basicValidation.validateUris( urisFromForm );
         if( errors != null ) {
@@ -145,7 +161,7 @@ public class EditSubmission {
     	validationErrors.putAll(this.basicValidation.validateFiles( fileItems ) );
 	}
 
-	private Literal createLiteral(String value, String datatypeUri, String lang){
+	protected Literal createLiteral(String value, String datatypeUri, String lang){
         if( datatypeUri != null ){            
             if( "http://www.w3.org/2001/XMLSchema:anyURI".equals(datatypeUri) ){
                 try {
@@ -323,24 +339,6 @@ public class EditSubmission {
         try{
             dt = dateFormater.parseDateTime(year.get(0) +'-'+ month.get(0) +'-'+ day.get(0));
             String dateStr = dateFormater.print(dt);
-            
-            /*if(compareCurrentDate) {
-            	Calendar c = Calendar.getInstance();
-            	//Set to last year
-            	int currentYear = c.get(Calendar.YEAR);
-            	//?Set to time starting at 00 this morning?
-            	Calendar inputC = Calendar.getInstance();
-            	inputC.set(Integer.parseInt(yearParamStr), Integer.parseInt(monthParamStr) - 1, Integer.parseInt(dayParamStr));
-            	//if input time is more than a year ago
-            	if(inputC.before(c)) {
-            		errors += "Please enter a future target date for publication (past dates are invalid).";
-            		validationErrors.put( fieldName, errors);
-            		//Returning null makes the error message "field is empty" display instead
-            		//return null;
-            	}
-            	
-            }*/
-            
             return new EditLiteral(dateStr,DATE_URI, null );
         }catch(IllegalFieldValueException ifve){
             validationErrors.put( fieldName, ifve.getLocalizedMessage() );
@@ -422,7 +420,6 @@ public class EditSubmission {
         sess.removeAttribute("editSubmission");
     }
 
-
     public static Map<String, String[]> convertParams(
             Map<String, List<String>> queryParameters) {
         HashMap<String,String[]> out = new HashMap<String,String[]>();
@@ -432,6 +429,6 @@ public class EditSubmission {
         }
         return out;
     }     
-    
+
     private Log log = LogFactory.getLog(EditSubmission.class);
 }

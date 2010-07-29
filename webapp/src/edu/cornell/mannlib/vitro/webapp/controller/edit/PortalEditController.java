@@ -41,7 +41,7 @@ public class PortalEditController extends BaseEditController {
         int portalId = Integer.decode(thePortalId);
 
         VitroRequest vreq = (new VitroRequest(request));
-        Portal p = vreq.getWebappDaoFactory().getPortalDao().getPortal(portalId);
+        Portal p = vreq.getFullWebappDaoFactory().getPortalDao().getPortal(portalId);
 
         EditProcessObject epo = super.createEpo(request);
         FormObject foo = new FormObject();

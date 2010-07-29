@@ -55,7 +55,6 @@ public abstract class VitroHighlighter extends UnaryFunctor<String,String> {
         ent.setName( this.highlight(ent.getName()));
         ent.setMoniker( this.highlight(ent.getMoniker()));
         ent.setDescription( this.highlight(ent.getDescription()));
-        ent.setCitation(this.highlight(ent.getCitation()));
         Iterator edIt = ent.getDataPropertyStatements().iterator();
         while (edIt.hasNext()) {
             DataPropertyStatement dataPropertyStmt = (DataPropertyStatement)edIt.next();
@@ -97,10 +96,6 @@ public abstract class VitroHighlighter extends UnaryFunctor<String,String> {
         }
         if(ent.getDescription() != null ){
             sb.append(ent.getDescription());
-            sb.append(' ');
-        }
-        if(ent.getCitation() != null){
-            sb.append(ent.getCitation());
             sb.append(' ');
         }
         if(ent.getDataPropertyStatements() != null) {

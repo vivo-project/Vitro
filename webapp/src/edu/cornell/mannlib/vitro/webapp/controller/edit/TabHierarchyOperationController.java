@@ -24,7 +24,7 @@ public class TabHierarchyOperationController extends BaseEditController {
 
     	VitroRequest request = new VitroRequest(req);
     	String defaultLandingPage = getDefaultLandingPage(request);
-        TabDao tDao = getWebappDaoFactory().getTabDao();
+        TabDao tDao = request.getFullWebappDaoFactory().getTabDao();
 
         if (request.getParameter("_cancel") == null) {
         

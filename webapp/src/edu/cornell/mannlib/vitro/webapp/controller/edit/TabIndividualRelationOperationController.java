@@ -62,7 +62,7 @@ public class TabIndividualRelationOperationController extends
             return;
         }
 
-        TabIndividualRelationDao dao = getWebappDaoFactory().getTabs2EntsDao();
+        TabIndividualRelationDao dao = request.getFullWebappDaoFactory().getTabs2EntsDao();
 
         try {
             if (request.getParameter("operation").equals("remove")) {

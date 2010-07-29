@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.search.lucene;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,6 +21,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
+import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
 import edu.cornell.mannlib.vitro.webapp.search.beans.Searcher;
 import edu.cornell.mannlib.vitro.webapp.search.docbuilder.Obj2DocIface;
@@ -39,6 +41,7 @@ public class LuceneIndexer implements IndexerIface {
     List<Searcher> searchers = null;
     IndexWriter writer = null;
     boolean indexing = false;
+    HashSet<String> urisIndexed;
 
     //JODA timedate library can use java date format strings.
     //http://java.sun.com/j2se/1.3/docs/api/java/text/SimpleDateFormat.html
@@ -135,6 +138,7 @@ public class LuceneIndexer implements IndexerIface {
                 writer =  
                     new IndexWriter(indexDir,analyzer,false, MAX_FIELD_LENGTH);
             indexing = true;
+            urisIndexed = new HashSet<String>();
         } catch(Throwable ioe){
             try{
                 makeNewIndex();
@@ -154,6 +158,7 @@ public class LuceneIndexer implements IndexerIface {
             return;
         }            
         try {
+        	urisIndexed = null;
             log.info("ending index");
             if( writer != null )
                 writer.optimize();
@@ -181,25 +186,38 @@ public class LuceneIndexer implements IndexerIface {
      * to setup the modifier.
      *
      */
-    public synchronized void index(Object obj, boolean newDoc) 
-    throws IndexingException {
+    public void index(Individual ind, boolean newDoc) throws IndexingException {
         if( ! indexing )
             throw new IndexingException("LuceneIndexer: must call " +
             		"startIndexing() before index().");
         if( writer == null )
             throw new IndexingException("LuceneIndexer: cannot build index," +
             		"IndexWriter is null.");
+        if( ind == null )
+        	log.debug("Individual to index was null, ignoring.");
         try {
+        	if( urisIndexed.contains(ind.getURI()) ){
+        		log.debug("already indexed " + ind.getURI() );
+        		return;
+        	}else
+        		urisIndexed.add(ind.getURI());
+        	
             Iterator<Obj2DocIface> it = getObj2DocList().iterator();
             while (it.hasNext()) {
                 Obj2DocIface obj2doc = (Obj2DocIface) it.next();
-                if (obj2doc.canTranslate(obj)) {
-                    if( !newDoc ){
-                        writer.deleteDocuments((Term)obj2doc.getIndexId(obj));
+                if (obj2doc.canTranslate(ind)) {
+                	Document d = (Document) obj2doc.translate(ind);
+                	if( d != null){                		                		                		
+                		if( !newDoc ){                    	                    		
+                			writer.updateDocument((Term)obj2doc.getIndexId(ind), d);
+                			log.debug("updated " + ind.getName() + " " + ind.getURI());
+                		}else{                    	
+                    		writer.addDocument(d);
+                    		log.debug("added " + ind.getName() + " " + ind.getURI());
+                		}
+                    }else{
+                    	log.debug("could not translate " + ind.getURI());
                     }
-                    Document d = (Document) obj2doc.translate(obj);
-                    if( d != null)
-                        writer.addDocument(d);
                 }
             }
         } catch (IOException ex) {
@@ -210,9 +228,8 @@ public class LuceneIndexer implements IndexerIface {
     /**
      * Removes a single object from index. <code>obj</code> is translated
      * using the obj2DocList.
-     */
-    public synchronized void removeFromIndex(Object obj ) 
-    throws IndexingException{        
+     */    
+    public void removeFromIndex(Individual ind) throws IndexingException {
         if( writer == null )
             throw new IndexingException("LuceneIndexer: cannot delete from " +
             		"index, IndexWriter is null.");
@@ -220,8 +237,9 @@ public class LuceneIndexer implements IndexerIface {
             Iterator<Obj2DocIface> it = getObj2DocList().iterator();
             while (it.hasNext()) {
                 Obj2DocIface obj2doc = (Obj2DocIface) it.next();
-                if (obj2doc.canTranslate(obj)) {
-                    writer.deleteDocuments((Term)obj2doc.getIndexId(obj));
+                if (obj2doc.canTranslate(ind)) {
+                    writer.deleteDocuments((Term)obj2doc.getIndexId(ind));
+                    log.debug("deleted " + ind.getName() + " " + ind.getURI());
                 }
             }
         } catch (IOException ex) {            
@@ -311,4 +329,6 @@ public class LuceneIndexer implements IndexerIface {
         // The directory is now empty so delete it
         return dir.delete();
     }
+
+
 }

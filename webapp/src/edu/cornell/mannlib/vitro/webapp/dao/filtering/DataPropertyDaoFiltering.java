@@ -9,6 +9,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
+import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
@@ -132,8 +133,8 @@ class DataPropertyDaoFiltering extends BaseFiltering implements DataPropertyDao{
     	return innerDataPropertyDao.getAllSubPropertyURIs(propertyURI);
     }
 
-    public List <String> getSuperPropertyURIs(String propertyURI) {
-    	return innerDataPropertyDao.getSuperPropertyURIs(propertyURI);
+    public List <String> getSuperPropertyURIs(String propertyURI, boolean direct) {
+    	return innerDataPropertyDao.getSuperPropertyURIs(propertyURI, direct);
     }
 
     public List <String> getAllSuperPropertyURIs(String propertyURI) {
@@ -183,5 +184,9 @@ class DataPropertyDaoFiltering extends BaseFiltering implements DataPropertyDao{
 			Property equivalentProperty) {
 		innerDataPropertyDao.removeEquivalentProperty(property, equivalentProperty);
 	}
+	
+    public List <VClass> getClassesWithRestrictionOnProperty(String propertyURI) {
+    	return innerDataPropertyDao.getClassesWithRestrictionOnProperty(propertyURI);
+    }
 
 }

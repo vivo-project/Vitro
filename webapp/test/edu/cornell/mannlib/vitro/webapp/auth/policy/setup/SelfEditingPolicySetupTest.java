@@ -4,8 +4,9 @@ package edu.cornell.mannlib.vitro.webapp.auth.policy.setup;
 
 import java.io.InputStream;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,7 +26,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AddObjectPropStmt;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.EditDataPropStmt;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.EditObjPropStmt;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -33,8 +33,8 @@ import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 public class SelfEditingPolicySetupTest extends AbstractTestClass {
-	private static final Logger LOG = Logger
-			.getLogger(SelfEditingPolicySetupTest.class);
+	private static final Log log = LogFactory
+			.getLog(SelfEditingPolicySetupTest.class);
 
 	/** We may edit objects in this arbitrary namespace. */
 	private static final String SAFE_NS = "http://test.mannlib.cornell.edu/ns/01#";
@@ -272,7 +272,7 @@ public class SelfEditingPolicySetupTest extends AbstractTestClass {
 		AddObjectPropStmt whatToAuth = new AddObjectPropStmt(uriOfSub,
 				uriOfPred, uriOfObj);
 		PolicyDecision dec = policy.isAuthorized(ids, whatToAuth);
-		LOG.debug(dec);
+		log.debug(dec);
 		Assert.assertNotNull(dec);
 		Assert.assertEquals(expectedAuthorization, dec.getAuthorized());
 	}
@@ -286,7 +286,7 @@ public class SelfEditingPolicySetupTest extends AbstractTestClass {
 		EditObjPropStmt whatToAuth = new EditObjPropStmt(uriOfSub, uriOfPred,
 				uriOfObj);
 		PolicyDecision dec = policy.isAuthorized(ids, whatToAuth);
-		LOG.debug(dec);
+		log.debug(dec);
 		Assert.assertNotNull(dec);
 		Assert.assertEquals(expectedAuthorization, dec.getAuthorized());
 	}
@@ -304,7 +304,7 @@ public class SelfEditingPolicySetupTest extends AbstractTestClass {
 
 		EditDataPropStmt whatToAuth = new EditDataPropStmt(dps);
 		PolicyDecision dec = policy.isAuthorized(ids, whatToAuth);
-		LOG.debug(dec);
+		log.debug(dec);
 		Assert.assertNotNull(dec);
 		Assert.assertEquals(expectedAuthorization, dec.getAuthorized());
 	}

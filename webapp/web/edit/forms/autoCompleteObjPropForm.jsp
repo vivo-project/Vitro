@@ -171,7 +171,7 @@ $(document).ready(function() {
     	<p>${predicate.publicDescription}</p>
     </c:if>
     <v:input type="select" id="${objectVar}" size="80" />
-    <v:input type="submit" id="submit" value="<%=submitLabel%>" cancel="${param.subjectUri}"/>
+    <v:input type="submit" id="submit" value="<%=submitLabel%>" cancel="true"/>
     <c:if test="${predicate.offerCreateNewOption == true}">
         <p>If you don't find the appropriate entry on the selection list,
         <button type="button" onclick="javascript:document.location.href='${createNewUrl}'">add a new item to this list</button>

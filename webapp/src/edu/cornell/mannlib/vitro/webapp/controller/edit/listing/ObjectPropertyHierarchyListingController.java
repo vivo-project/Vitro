@@ -59,9 +59,9 @@ public class ObjectPropertyHierarchyListingController extends BaseEditController
             e.printStackTrace();
         }
 
-        opDao = getWebappDaoFactory().getObjectPropertyDao();
-        vcDao = getWebappDaoFactory().getVClassDao();
-        pgDao = getWebappDaoFactory().getPropertyGroupDao();
+        opDao = vrequest.getFullWebappDaoFactory().getObjectPropertyDao();
+        vcDao = vrequest.getFullWebappDaoFactory().getVClassDao();
+        pgDao = vrequest.getFullWebappDaoFactory().getPropertyGroupDao();
 
         ArrayList results = new ArrayList();
         results.add("XX");            // column 1

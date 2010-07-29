@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
@@ -142,14 +141,14 @@
 			<name>id</name>
 			<required>true</required>
 			<rtexprvalue>true</rtexprvalue>
-		</attribute>
+        </attribute>
+    	<attribute>
+    		<name>name</name>
+    		<required>false</required>
+    		<rtexprvalue>true</rtexprvalue>
+    	</attribute>
         <attribute>
 			<name>label</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
-        <attribute>
-			<name>cssClass</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
         </attribute>
@@ -157,7 +156,12 @@
     		<name>labelClass</name>
     		<required>false</required>
     		<rtexprvalue>true</rtexprvalue>
-    	</attribute>
+    	</attribute>    	
+        <attribute>
+			<name>cssClass</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+        </attribute>
 		<attribute>
 			<name>value</name>
 			<required>false</required>
@@ -197,7 +201,22 @@
 			<name>cancel</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
-		</attribute>
+        </attribute>
+    	<attribute>
+    		<name>cancelLabel</name>
+    		<required>false</required>
+    		<rtexprvalue>true</rtexprvalue>
+    	</attribute>
+    	<attribute>
+    		<name>cancelUrl</name>
+    		<required>false</required>
+    		<rtexprvalue>true</rtexprvalue>
+    	</attribute>
+    	<attribute>
+    		<name>disabled</name>
+    		<required>false</required>
+    		<rtexprvalue>true</rtexprvalue>
+    	</attribute>
     </tag>
     
 </taglib>

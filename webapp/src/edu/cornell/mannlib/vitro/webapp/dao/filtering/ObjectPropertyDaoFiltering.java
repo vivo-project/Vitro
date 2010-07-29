@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.filtering;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -12,6 +13,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
+import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
@@ -118,8 +120,8 @@ class ObjectPropertyDaoFiltering extends BaseFiltering implements ObjectProperty
     	return innerObjectPropertyDao.getAllSubPropertyURIs(propertyURI);
     }
 
-    public List <String> getSuperPropertyURIs(String propertyURI) {
-    	return innerObjectPropertyDao.getSuperPropertyURIs(propertyURI);
+    public List <String> getSuperPropertyURIs(String propertyURI, boolean direct) {
+    	return innerObjectPropertyDao.getSuperPropertyURIs(propertyURI, direct);
     }
 
     public List <String> getAllSuperPropertyURIs(String propertyURI) {
@@ -195,5 +197,9 @@ class ObjectPropertyDaoFiltering extends BaseFiltering implements ObjectProperty
 	public boolean skipEditForm(String predicateURI) {
 		return innerObjectPropertyDao.skipEditForm(predicateURI);
 	}
+	
+    public List <VClass> getClassesWithRestrictionOnProperty(String propertyURI) {
+    	return innerObjectPropertyDao.getClassesWithRestrictionOnProperty(propertyURI);
+    }
 	
 }

@@ -53,11 +53,12 @@ public class VclassEditController extends BaseEditController {
         EditProcessObject epo = super.createEpo(request, FORCE_NEW);
         request.setAttribute("epoKey", epo.getKey());
 
-        VClassDao vcwDao = getWebappDaoFactory().getVClassDao();
+        VClassDao vcwDao = request.getFullWebappDaoFactory().getVClassDao();
         VClass vcl = (VClass)vcwDao.getVClassByURI(request.getParameter("uri"));
         
         if (vcl == null) {
-        	if (VitroModelProperties.isRDFS(getWebappDaoFactory().getLanguageProfile()) && ( (RDF.getURI()+"Resource").equals(request.getParameter("uri")))) {
+        	if (VitroModelProperties.isRDFS(request.getFullWebappDaoFactory().getLanguageProfile()) 
+        			&& ( (RDF.getURI()+"Resource").equals(request.getParameter("uri")))) {
         		vcl = new VClass(RDF.getURI()+"Resource");
         	}
         }
@@ -84,7 +85,7 @@ public class VclassEditController extends BaseEditController {
         String example = (vcl.getExample()==null) ? "" : vcl.getExample();
         String description = (vcl.getDescription()==null) ? "" : vcl.getDescription();
         
-        WebappDaoFactory wadf = getWebappDaoFactory();
+        WebappDaoFactory wadf = request.getFullWebappDaoFactory();
 
         String groupURI = vcl.getGroupURI();
         String groupName = "none";
@@ -98,7 +99,7 @@ public class VclassEditController extends BaseEditController {
 
         boolean foundComment = false;
         StringBuffer commSb = null;
-        for (Iterator<String> commIt = getWebappDaoFactory().getCommentsForResource(vcl.getURI()).iterator(); commIt.hasNext();) { 
+        for (Iterator<String> commIt = request.getFullWebappDaoFactory().getCommentsForResource(vcl.getURI()).iterator(); commIt.hasNext();) { 
             if (commSb==null) {
                 commSb = new StringBuffer();
                 foundComment=true;
@@ -145,12 +146,12 @@ public class VclassEditController extends BaseEditController {
 
         // if supported, we want to show only the asserted superclasses and subclasses.  Don't want to see anonymous classes, restrictions, etc.
         VClassDao vcDao;
-        if (getAssertionsWebappDaoFactory() != null) {
-        	vcDao = getAssertionsWebappDaoFactory().getVClassDao();
+        if (request.getAssertionsWebappDaoFactory() != null) {
+        	vcDao = request.getAssertionsWebappDaoFactory().getVClassDao();
         } else {
-        	vcDao = getWebappDaoFactory().getVClassDao();
+        	vcDao = request.getFullWebappDaoFactory().getVClassDao();
         }
-        List superURIs = vcDao.getSuperClassURIs(vcl.getURI());
+        List superURIs = vcDao.getSuperClassURIs(vcl.getURI(),false);
         List superVClasses = new ArrayList();
         Iterator superURIit = superURIs.iterator();
         while (superURIit.hasNext()) {

@@ -18,12 +18,14 @@ public class Field {
 
     public enum OptionsType {
         LITERALS, 
+        HARDCODED_LITERALS,
         STRINGS_VIA_DATATYPE_PROPERTY, 
         INDIVIDUALS_VIA_OBJECT_PROPERTY, 
         INDIVIDUALS_VIA_VCLASS, 
         MONIKERS_VIA_VCLASS, 
         CHILD_VCLASSES, 
         CHILD_VCLASSES_WITH_PARENT,
+        VCLASSGROUP,
         FILE, 
         UNDEFINED, 
         DATETIME, 
@@ -203,6 +205,8 @@ public class Field {
     public void setOptionsType(String s) {
         if ("LITERALS".equals(s)) {
             setOptionsType(Field.OptionsType.LITERALS);
+        } else if ("HARDCODED_LITERALS".equals(s)) {
+            setOptionsType(Field.OptionsType.HARDCODED_LITERALS);
         } else if ("STRINGS_VIA_DATATYPE_PROPERTY".equalsIgnoreCase(s)) {
             setOptionsType(Field.OptionsType.STRINGS_VIA_DATATYPE_PROPERTY);
         } else if ("INDIVIDUALS_VIA_OBJECT_PROPERTY".equalsIgnoreCase(s)) {
@@ -216,7 +220,9 @@ public class Field {
         } else if ("CHILD_VCLASSES".equalsIgnoreCase(s)) {            
             setOptionsType(Field.OptionsType.CHILD_VCLASSES);
         } else if ("CHILD_VCLASSES_WITH_PARENT".equalsIgnoreCase(s)) {            
-            setOptionsType(Field.OptionsType.CHILD_VCLASSES_WITH_PARENT);            
+            setOptionsType(Field.OptionsType.CHILD_VCLASSES_WITH_PARENT);  
+        } else if ("VCLASSGROUP".equalsIgnoreCase(s)) {            
+            setOptionsType(Field.OptionsType.VCLASSGROUP);              
         } else if ("FILE".equalsIgnoreCase(s)) {
             setOptionsType(Field.OptionsType.FILE);            
         } else if ("DATE".equalsIgnoreCase(s)) {

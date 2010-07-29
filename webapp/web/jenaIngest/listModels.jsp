@@ -80,6 +80,12 @@
                 <input type="submit" name="submit" value="detach from webapp"/>
             </form>
             </td>
+            <td>
+			<form action="ingest" method="get"><input type="hidden"
+				name="action" value="permanentURI" /> <input type="hidden"
+				name="modelName" value="<%=modelName%>" /> <input type="submit"
+				name="submit" value="generate permanent URIs" /></form>
+			</td>
             <td>&nbsp;</td>
             </tr>
             </table>

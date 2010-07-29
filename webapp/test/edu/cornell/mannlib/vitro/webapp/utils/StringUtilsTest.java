@@ -15,6 +15,8 @@ public class StringUtilsTest extends AbstractTestClass {
     
     protected static List<String> stringList = new ArrayList<String>();
     protected static List<Integer> intList = new ArrayList<Integer>();
+    protected static List<String> stringListWithNulls = new ArrayList<String>();
+    protected static String[] stringArray = {"duck", "goose", "crow"};
     static {
         stringList.add("apple");
         stringList.add("banana");
@@ -23,6 +25,11 @@ public class StringUtilsTest extends AbstractTestClass {
         intList.add(1);
         intList.add(2);
         intList.add(3);
+
+        stringListWithNulls.add("rock");
+        stringListWithNulls.add("paper");
+        stringListWithNulls.add((String)null);
+        stringListWithNulls.add("scissors");        
     }
 
     @Test
@@ -55,15 +62,40 @@ public class StringUtilsTest extends AbstractTestClass {
     }
     
     @Test 
-    public void testJoinArgs() {
+    public void testJoinArgs() {             
         
+        // Three args
         Assert.assertEquals("apple:banana:orange", StringUtils.join(stringList, false, ":"));
         Assert.assertEquals("\"apple\"|\"banana\"|\"orange\"", StringUtils.join(stringList, true, "|"));
         Assert.assertEquals("\"apple\",\"banana\",\"orange\"", StringUtils.join(stringList, true, null));
         Assert.assertEquals("apple,banana,orange", StringUtils.join(stringList, false, null));
-        Assert.assertEquals("apple...banana...orange", StringUtils.join(stringList, false, "..."));
+        Assert.assertEquals("apple...banana...orange", StringUtils.join(stringList, false, "..."));  
         
+        // Two args
+        Assert.assertEquals("apple - banana - orange", StringUtils.join(stringList, " - "));
     }    
+    
+    @Test 
+    public void testJoinWithNulls() {
+        Assert.assertEquals("rock,paper,scissors", StringUtils.join(stringListWithNulls));      
+    }
+    
+    @Test
+    public void testJoinWithVarargs() {
+        Assert.assertEquals("apple,banana,orange", StringUtils.join((String)null, "apple", "banana", "orange"));
+        Assert.assertEquals("he/she/it", StringUtils.join("/", "he", "she", "it"));       
+    }
+    
+    @Test
+    public void testJoinWithEmptyString() {
+        Assert.assertEquals(" - 1990", StringUtils.join(" - ", "", "1990"));
+        Assert.assertEquals("1990 - ", StringUtils.join(" - ", "1990", ""));
+    }
+
+    @Test
+    public void testArrayJoin() {
+        Assert.assertEquals("duck,goose,crow", StringUtils.join(stringArray));
+    }
     
     @Test 
     public void testQuotedList() {
@@ -81,4 +113,11 @@ public class StringUtilsTest extends AbstractTestClass {
         Assert.assertFalse(StringUtils.equalsOneOf(s1, "dog", "mouse", "horse"));
         Assert.assertFalse(StringUtils.equalsOneOf(s1));       
     }
+    
+    @Test
+    public void testSetNullToEmptyString() {
+        Assert.assertEquals("", StringUtils.setNullToEmptyString((String)null));
+        Assert.assertEquals("cat", StringUtils.setNullToEmptyString("cat"));        
+    }
+    
 }

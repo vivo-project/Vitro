@@ -131,7 +131,7 @@ public class WebappDaoFactoryFiltering implements WebappDaoFactory {
     public TabDao getTabDao() {
         if( filteringTabDao == null)
             filteringTabDao =
-                new TabDaoFiltering(innerWebappDaoFactory.getTabDao(),innerWebappDaoFactory.getPortalDao(),filters);
+                new TabDaoFiltering(innerWebappDaoFactory.getTabDao(),innerWebappDaoFactory.getPortalDao(),innerWebappDaoFactory.getApplicationDao(),filters);
         return filteringTabDao;
     }
 

@@ -33,6 +33,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.identifier.ServletIdentifierBundleF
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.UserToIndIdentifierFactory;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
+import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 
 /**
  * Represents a set of fields on a form and how parameters from a from
@@ -44,6 +45,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
  * in preparation for N3. They may also be appended with a datatype or lang.
  */
 public class EditConfiguration {
+    
     List<String> n3Required;
     List<String> n3Optional;
     List<String> urisOnform;
@@ -91,6 +93,10 @@ public class EditConfiguration {
 
     private List<ModelChangePreprocessor> modelChangePreprocessors;
     
+    private List<EditSubmissionPreprocessor> editSubmissionPreprocessors = null;
+    
+    private ProhibitedFromSearch prohibitedFromSearch;
+
     /** 
      * If true, then any dependent resources that are unlinked should be
      * removed using DependentResourceDelete. 
@@ -249,15 +255,15 @@ public class EditConfiguration {
               UserToIndIdentifierFactory.getIndividualsForUser(ids);
                         
             if( userUris == null || userUris.size() == 0 ){
-            	System.out.println("Cound not find user ur for edit request");
+            	log.debug("Cound not find user ur for edit request");
                 log.error("Could not find a userUri for edit request, make " +
                         "sure that there is an IdentifierBundleFactory that " +
                 "produces userUri identifiers in the context.");
             } else if( userUris.size() > 1  ){
                 log.error("Found multiple userUris, using the first in list.");
-                System.out.println("Found multiple user uris");
+                log.debug("Found multiple user uris");
             }else {
-            	System.out.println("EditConfiguration.java - checking system value for User URI " + userUris.get(0));
+            	log.debug("EditConfiguration.java - checking system value for User URI " + userUris.get(0));
                 getUrisInScope().put("editingUser",userUris.get(0));
             }
         }   
@@ -297,15 +303,26 @@ public class EditConfiguration {
      * and return it.
      */
     public void prepareForObjPropUpdate( Model model ){
-        if( model == null ) throw new Error("EditConfiguration.prepareForObjPropUpdate() needs a Model");
+        if( model == null ) {
+        	//Added parens and output
+        	log.debug("Model is null and will be throwing an error");
+        	throw new Error("EditConfiguration.prepareForObjPropUpdate() needs a Model");}
         if( !isObjectResource )
+        {
+        	//Added parens and output
+        	log.debug("This is not an object resource? lacks dataprop ");
             throw new Error("This request does not appear to be for an update since it lacks a dataprop object or a dataProp hash key ");              
-        //find the variable for object, this anchors the paths to the existing values
+        }
+            //find the variable for object, this anchors the paths to the existing values
         if( object == null || object.trim().length() == 0)
-            throw new Error("This request does not appear to be for an update since it lacks an object");                   
+        {
+        	//Added parens and output
+        	log.debug("Object is null or object length is null");
+            throw new Error("This request does not appear to be for an update since it lacks an object");   
+        }
                         
         getUrisInScope().put( varNameForObject, object);
-        
+        log.debug("Putting uris in scope - var name for object " + varNameForObject + " and object is " + object);
         // run SPARQL, sub in values
         SparqlEvaluate sparqlEval = new SparqlEvaluate( model );
         runSparqlForAdditional( sparqlEval );
@@ -630,27 +647,6 @@ public class EditConfiguration {
         configs.put(ec.editKey , ec);
     }
 
-//    public static EditConfiguration getConfigFromSession( HttpSession sess, HttpServletRequest request, Map<String,List<String>> queryParameters){
-//        boolean isMultipart = ServletFileUpload.isMultipartContent(request);
-//        String key = null;
-//        if( isMultipart )
-//            key = getEditKey(request);
-//        else
-//            key = getEditKey(queryParameters, request);
-//        if( key == null )
-//            throw new Error("EditConfiguration: Cannot get a editKey from the request");
-//
-//        Map<String,EditConfiguration> configs = (Map<String,EditConfiguration>)sess.getAttribute("EditConfigurations");
-//        if( configs == null )
-//          return null;
-//
-//        EditConfiguration config = configs.get( key );
-//        if( config == null )
-//            return null;
-//        else
-//            return config;
-//    }
-
     public static EditConfiguration getConfigFromSession(HttpSession sess, String editKey){
         Map<String,EditConfiguration> configs = (Map<String,EditConfiguration>)sess.getAttribute("EditConfigurations");
         if( configs == null )
@@ -668,56 +664,13 @@ public class EditConfiguration {
      * request or session.  If the queryParams are supplied, look for the editKey
      * there first since multipart parsing might have cleared them from the request.
      */
-    public static EditConfiguration getConfigFromSession( HttpSession sess, HttpServletRequest request, Map queryParams){
-        
-        if( queryParams!= null && queryParams.containsKey("editKey") 
-                && queryParams.get("editKey") != null ){            
-            Object obj = queryParams.get("editKey");
-            String key = null;            
-            if( obj == null )
-                key = null;
-            else if( obj instanceof String[])
-                key= ((String[])obj)[0];            
-            else if( obj instanceof List)
-                key = (String)((List)obj).get(0);            
-                        
-            if( key == null )
-                return null;
-            else
-                return getConfigFromSession(sess, key);        
-        } else {
-            return getConfigFromSession(sess, request);
-        }        
-    }
-    
     public static EditConfiguration getConfigFromSession( HttpSession sess, HttpServletRequest request ){
-        String key = "";                   
-        key = getEditKey(request);
+        String key = getEditKey(request);
         
         if( key == null )
             return null;
         return getConfigFromSession(sess, key);
     }
-
-    /**
-     * The editKey can be a HTTP query parameter or it can be a request attribute.
-     */
-//    protected static String getEditKey(Map<String,List<String>> queryParameters, HttpServletRequest request){
-////        if( queryParameters == null )
-////            throw new Error("need to have a non-null set of queryParameters to get the editKey");
-//        Object obj = queryParameters.get("editKey");
-//        if( obj instanceof List ){
-//            List<String> keyList = (List<String>) obj;
-//            if( keyList  != null && keyList.size() == 1 ){
-//                return keyList.get(0);
-//            } else {
-//                return  getEditKey( request );
-//            }
-//        }else if( obj instanceof String){
-//            return (String)obj;
-//        }else
-//            return getEditKey(request);
-//    }
 
     /**
      * The editKey can be a HTTP query parameter or it can be a request attribute.
@@ -884,6 +837,14 @@ public class EditConfiguration {
     	this.modelChangePreprocessors.add( modelChangePreprocessor );
     }
     
+    public void setProhibitedFromSearch( ProhibitedFromSearch prohibitedFromSearch) {
+    	this.prohibitedFromSearch = prohibitedFromSearch;
+    }
+    
+    public ProhibitedFromSearch getProhibitedFromSearch() {
+    	return this.prohibitedFromSearch;
+    }
+    
     private void debugScope(String msg){
         if( log.isDebugEnabled()){
             log.debug(msg);
@@ -972,4 +933,14 @@ public class EditConfiguration {
     		this.validators = new ArrayList<N3Validator>();
     	this.validators.add(validator);    		
     }    
+
+    public void addEditSubmissionPreprocessor( EditSubmissionPreprocessor preprocessor){
+        if( editSubmissionPreprocessors == null )
+            editSubmissionPreprocessors = new ArrayList<EditSubmissionPreprocessor>();
+        editSubmissionPreprocessors.add(preprocessor);         
+    }  
+    
+    public List<EditSubmissionPreprocessor> getEditSubmissionPreprocessors() {
+        return editSubmissionPreprocessors;
+    }
 }

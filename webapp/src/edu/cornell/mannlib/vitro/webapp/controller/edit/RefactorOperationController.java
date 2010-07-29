@@ -211,7 +211,7 @@ public class RefactorOperationController extends BaseEditController {
 		// validateURI
 		String errorMsg = null;
 		try {
-			getWebappDaoFactory().checkURI(newURIStr);
+			request.getFullWebappDaoFactory().checkURI(newURIStr);
 		} catch (InvalidPropertyURIException ipue) {
 			// TODO We don't know if we're editing a property's URI or not here!
 		}

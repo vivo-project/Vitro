@@ -76,7 +76,7 @@ public interface TabDao {
 
     String getNameForTabId(int tabId);
 
-    List getTabHierarcy(int tabId, int rootTab);
+    List getTabHierarchy(int tabId, int rootTab);
 
     int getRootTabId(int portalId);
 

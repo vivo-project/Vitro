@@ -21,6 +21,7 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.utils.FrontEndEditingUtils" %>
 <%@ page import="com.hp.hpl.jena.rdf.model.Model" %>
+<%@page import="edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils"%>
 
 <%@ page import="java.util.List" %>
 
@@ -104,25 +105,18 @@ public WebappDaoFactory getUnfilteredDaoFactory() {
     if( object == null ) {
         //log.warn("Could not find object individual "+objectUri+" via wdf.getIndividualDao().getIndividualByURI(objectUri)");
         request.setAttribute("objectName","(name unspecified)");
-      } else if (FrontEndEditingUtils.isVitroNsObjProp(predicateUri)) {
+    } else if (FrontEndEditingUtils.isVitroNsObjProp(predicateUri)) {
           Model model = (Model)application.getAttribute("jenaOntModel");
           request.setAttribute("individual", object);
           request.setAttribute("objectName", FrontEndEditingUtils.getVitroNsObjDisplayName(predicateUri, object, model));
           log.debug("setting object name " + (String)request.getAttribute("objectName") + " for vitro namespace object property " + predicateUri);
     } else {
-        for (VClass clas : object.getVClasses()) { 
-            request.setAttribute("rangeClassName", clas.getName());
+        customShortView = MiscWebUtils.getCustomShortView(object, request); 
+        if (customShortView != null) {
             foundClass = true;
-            customShortView = clas.getCustomShortView();
-            
-    	    if (customShortView != null && customShortView.trim().length()>0) {
-    	        log.debug("setting object name from VClass custom short view");
-    	        request.setAttribute("customShortView",shortViewPrefix + customShortView.trim());
-    	        request.setAttribute("individual",object);
-            } else {
-                log.debug("No custom short view for class, so setting object name from object individual name");
-                request.setAttribute("objectName",object.getName());
-            }
+            log.debug("setting object name from VClass custom short view");
+            request.setAttribute("customShortView",shortViewPrefix + customShortView.trim());
+            request.setAttribute("individual",object);
         }
         if (!foundClass) {
             VClass clas = prop.getRangeVClass();
@@ -159,7 +153,7 @@ public WebappDaoFactory getUnfilteredDaoFactory() {
     <input type="hidden" name="objectUri"    value="${param.objectUri}"/>
     <input type="hidden" name="y"            value="1"/>
     <input type="hidden" name="cmd"          value="delete"/>
-    <p class="submit"><v:input type="submit" id="submit" value="Delete" cancel="${param.subjectUri}" /></p>
+    <p class="submit"><v:input type="submit" id="submit" value="Delete" cancel="true" /></p>
 	
 </form>
 

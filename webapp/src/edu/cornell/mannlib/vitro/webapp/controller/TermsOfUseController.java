@@ -16,7 +16,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Portal;
  * Controller for Terms of Use page
  * @author bjl23
  */
-public class TermsOfUseController  extends VitroHttpServlet{
+public class TermsOfUseController extends VitroHttpServlet{
     private static final long serialVersionUID = 1L;
 
     public void doPost(HttpServletRequest request, HttpServletResponse response)

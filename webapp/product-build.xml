@@ -47,12 +47,21 @@
 	<property name="product.modifications.dir" location="./modifications" />
 	<available property="product.modifications.exist" file="${product.modifications.dir}" />
 
+	<!-- If there is a WEB-INF/lib in the mods directory, it goes into the compile classpath -->
+	<!-- Otherwise, use a real directory but disable the "include" in the fileset -->
+	<available property="product.mods.lib.exists" file="${product.modifications.dir}/WEB-INF/lib" />
+	<condition property="product.mods.lib.dir"
+	           value="${product.modifications.dir}/WEB-INF/lib"
+	           else="${webapp.dir}/lib">
+		<available file="${product.modifications.dir}/WEB-INF/lib" />
+	</condition>
+
 	<path id="product.compile.classpath">
 		<pathelement location="${classes.dir}" />
 
 		<!-- These come before the core classpath, so our local mods can override -->
-		<fileset dir="${product.modifications.dir}/WEB-INF/lib">
-			<include name="**/*.jar" />
+		<fileset dir="${product.mods.lib.dir}">
+			<include name="**/*.jar" if="product.mods.lib.exists" />
 		</fileset>
 
 		<path refid="compile.classpath" />
@@ -174,5 +183,26 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		</java>
 	</target>
 
+	<!-- ================================= 
+          target: licenser             
+          
+          In regular use, checks that all appropriate source files have license tags.
+          At release time, applies license text to source files.
+          
+          NOTE: don't override licenser.properties.file from the command line.
+          Instead, override licenser.core.properties.file and licenser.product.properties.file
+         ================================= -->
+	<target name="licenser" description="--> Check source files for licensing tags">
+		<!-- Once for the product... -->
+		<antcall target="vitroCore.licenser">
+			<param name="licenser.properties.file" value="${licenser.product.properties.file}" />
+			<param name="licenser.label" value="${ant.project.name}" />
+		</antcall>
 
+		<!-- ...and once for the core. -->
+		<condition property="licenser.properties.file" value="${licenser.core.properties.file}">
+			<isset property="licenser.core.properties.file" />
+		</condition>
+		<antcall target="vitroCore.licenser" />
+	</target>
 </project>

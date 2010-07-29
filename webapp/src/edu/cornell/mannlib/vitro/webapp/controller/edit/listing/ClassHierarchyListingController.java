@@ -63,10 +63,10 @@ public class ClassHierarchyListingController extends BaseEditController {
 
         boolean inferred = (vrequest.getParameter("inferred") != null);
         
-        if (getAssertionsWebappDaoFactory() != null && !inferred) {
-        	vcDao = getAssertionsWebappDaoFactory().getVClassDao();
+        if (vrequest.getAssertionsWebappDaoFactory() != null && !inferred) {
+        	vcDao = vrequest.getAssertionsWebappDaoFactory().getVClassDao();
         } else {
-        	vcDao = getWebappDaoFactory().getVClassDao();
+        	vcDao = vrequest.getFullWebappDaoFactory().getVClassDao();
         }
 
         ArrayList results = new ArrayList();
@@ -94,7 +94,7 @@ public class ClassHierarchyListingController extends BaseEditController {
         	/* TODO: this needs more thinking */
         	if (false) { // (getWebappDaoFactory() instanceof WebappDaoFactoryJena) {
         		String topConceptURI = null;
-        		int langProfile = ((WebappDaoFactoryJena)getWebappDaoFactory()).getLanguageProfile();
+        		int langProfile = ((WebappDaoFactoryJena) vrequest.getFullWebappDaoFactory()).getLanguageProfile();
         		if (langProfile==WebappDaoFactoryJena.OWL_CONST) {
         			topConceptURI = OWL.Thing.getURI();
         		} else if (langProfile==WebappDaoFactoryJena.RDFS_CONST) {
@@ -115,9 +115,9 @@ public class ClassHierarchyListingController extends BaseEditController {
         // DEBUGGING
         if (roots == null) {
         	roots = new LinkedList<VClass>();
-        	if (VitroModelProperties.isOWL(getWebappDaoFactory().getLanguageProfile())) {
+        	if (VitroModelProperties.isOWL(vrequest.getFullWebappDaoFactory().getLanguageProfile())) {
         		roots.add(vcDao.getVClassByURI(OWL.Thing.getURI()));
-        	} else if (VitroModelProperties.isRDFS(getWebappDaoFactory().getLanguageProfile())) {
+        	} else if (VitroModelProperties.isRDFS(vrequest.getFullWebappDaoFactory().getLanguageProfile())) {
         		roots.add(new VClass(RDF.getURI()+"Resource"));
         	} 
         }
@@ -128,13 +128,13 @@ public class ClassHierarchyListingController extends BaseEditController {
         if (!rootIt.hasNext()) {
             VClass vcw = new VClass();
             vcw.setName("<strong>No classes found.</strong>");
-            results.addAll(addVClassDataToResultsList(vcw,0,ontologyUri));
+            results.addAll(addVClassDataToResultsList(vrequest.getFullWebappDaoFactory(), vcw,0,ontologyUri));
         } else {
             while (rootIt.hasNext()) {
                 VClass root = (VClass) rootIt.next();
 	            if (root != null) {
 	                ArrayList childResults = new ArrayList();
-	                addChildren(root, childResults, 0, ontologyUri);
+	                addChildren(vrequest.getFullWebappDaoFactory(), root, childResults, 0, ontologyUri);
 	                results.addAll(childResults);
                 }
             }
@@ -201,8 +201,8 @@ public class ClassHierarchyListingController extends BaseEditController {
 
     }
 
-    private void addChildren(VClass parent, ArrayList list, int position, String ontologyUri) {
-    	List rowElts = addVClassDataToResultsList(parent, position, ontologyUri);
+    private void addChildren(WebappDaoFactory wadf, VClass parent, ArrayList list, int position, String ontologyUri) {
+    	List rowElts = addVClassDataToResultsList(wadf, parent, position, ontologyUri);
     	int childShift = (rowElts.size() > 0) ? 1 : 0;  // if addVClassDataToResultsList filtered out the result, don't shift the children over 
         list.addAll(rowElts);
         List childURIstrs = vcDao.getSubClassURIs(parent.getURI());
@@ -222,13 +222,13 @@ public class ClassHierarchyListingController extends BaseEditController {
             Iterator childClassIt = childClasses.iterator();
             while (childClassIt.hasNext()) {
                 VClass child = (VClass) childClassIt.next();
-                addChildren(child, list, position + childShift, ontologyUri);
+                addChildren(wadf, child, list, position + childShift, ontologyUri);
             }
 
         }
     }
 
-    private List addVClassDataToResultsList(VClass vcw, int position, String ontologyUri) {
+    private List addVClassDataToResultsList(WebappDaoFactory wadf, VClass vcw, int position, String ontologyUri) {
         List results = new ArrayList();
         if (ontologyUri == null || ( (vcw.getNamespace()!=null) && (vcw.getNamespace().equals(ontologyUri)) ) ) {
             for (int i=0; i<position; i++) {
@@ -247,7 +247,6 @@ public class ClassHierarchyListingController extends BaseEditController {
             numCols = addColToResults(((vcw.getExample() == null) ? "" : vcw.getExample()), results, numCols); // column 4
             
             // Get group name if it exists
-            WebappDaoFactory wadf = getWebappDaoFactory();
             VClassGroupDao groupDao= wadf.getVClassGroupDao();
             String groupURI = vcw.getGroupURI();
             String groupName = null;

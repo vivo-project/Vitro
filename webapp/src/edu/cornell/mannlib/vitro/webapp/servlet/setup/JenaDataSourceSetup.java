@@ -8,7 +8,6 @@ import javax.servlet.ServletContextEvent;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Literal;
@@ -17,7 +16,6 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
-import com.hp.hpl.jena.vocabulary.OWL;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
@@ -61,6 +59,11 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
         	inferenceOms.setUserAccountsModel(userAccountsModel);
         	unionOms.setUserAccountsModel(userAccountsModel);       
             
+        	OntModel displayModel = ontModelFromContextAttribute(sce.getServletContext(),"displayOntModel");
+        	baseOms.setDisplayModel(displayModel);
+        	inferenceOms.setDisplayModel(displayModel);
+        	unionOms.setDisplayModel(displayModel);
+        			
             sce.getServletContext().setAttribute("baseOntModel", memModel);
             WebappDaoFactory baseWadf = new WebappDaoFactoryJena(baseOms, defaultNamespace, null, null);
             sce.getServletContext().setAttribute("assertionsWebappDaoFactory",baseWadf);
@@ -73,7 +76,7 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
             WebappDaoFactory wadf = new WebappDaoFactoryJena(unionOms, defaultNamespace, null, null);
             sce.getServletContext().setAttribute("webappDaoFactory",wadf);
             
-            ApplicationBean appBean = getApplicationBeanFromOntModel(memModel);
+            ApplicationBean appBean = getApplicationBeanFromOntModel(memModel,wadf);
             if (appBean != null) {
             	sce.getServletContext().setAttribute("applicationBean", appBean);
             }
@@ -87,13 +90,9 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
 	            if (userAccountsModel.size() == 0) {
 	            	createInitialAdminUser(userAccountsModel);
 	            }
-            }
+            }                        
             
-            ensureEssentialInterfaceData(memModel, sce, wadf);
-        
-            SearchReindexingListener srl = new SearchReindexingListener(memModel, sce.getServletContext());
-        	unionModel.getBaseModel().register(srl);
-        	memModel.getBaseModel().register(srl);
+            ensureEssentialInterfaceData(memModel, sce, wadf);        
             
         	NamespaceMapper namespaceMapper = new NamespaceMapperJena(unionModel, unionModel, defaultNamespace);
         	sce.getServletContext().setAttribute("NamespaceMapper", namespaceMapper);
@@ -115,7 +114,7 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
     public void contextDestroyed(ServletContextEvent sce) {
     }
 
-    private ApplicationBean getApplicationBeanFromOntModel(OntModel ontModel) {
+    private ApplicationBean getApplicationBeanFromOntModel(OntModel ontModel,WebappDaoFactory wadf) {
        ClosableIterator appIt = ontModel.listIndividuals(ResourceFactory.createResource(VitroVocabulary.APPLICATION));
         try {
               if (appIt.hasNext()) {
@@ -130,6 +129,9 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
                   try {
                      appBean.setMaxSharedPortalId(Integer.decode( ((Literal)appInd.getPropertyValue(ResourceFactory.createProperty(VitroVocabulary.APPLICATION_MAXSHAREDPORTALID))).getLexicalForm()));
                   } catch (Exception e) { /* ignore bad value */}
+                  if( ! wadf.getApplicationDao().isFlag1Active() ){
+                	  appBean.setMaxPortalId(1);
+                  }
                  return appBean;
              } else {
             	 return null;

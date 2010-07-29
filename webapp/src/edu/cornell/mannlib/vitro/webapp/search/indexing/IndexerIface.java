@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.search.indexing;
 
 import java.util.List;
 
+import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
 import edu.cornell.mannlib.vitro.webapp.search.docbuilder.Obj2DocIface;
 
@@ -21,7 +22,7 @@ import edu.cornell.mannlib.vitro.webapp.search.docbuilder.Obj2DocIface;
 public interface IndexerIface {
 
     public void addObj2Doc(Obj2DocIface o2d);
-    public List getObj2DocList();
+    public List<Obj2DocIface> getObj2DocList();
 
     /**
      * Check if indexing is currently running in a different thread.
@@ -37,7 +38,7 @@ public interface IndexerIface {
      * @param newDoc - if true, just insert doc, if false attempt to update.
      * @throws IndexingException
      */
-    public void index(Object doc, boolean newDoc)throws IndexingException;
+    public void index(Individual ind, boolean newDoc)throws IndexingException;
 
 
     /**
@@ -45,7 +46,7 @@ public interface IndexerIface {
      * @param obj
      * @throws IndexingException
      */
-    public void removeFromIndex(Object obj ) throws IndexingException;
+    public void removeFromIndex(Individual ind) throws IndexingException;
 
     /**
      * Removes all documents from the index.

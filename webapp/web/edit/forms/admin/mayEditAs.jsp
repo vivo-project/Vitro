@@ -29,6 +29,7 @@
     VClass rangeClass = wdf.getVClassDao().getVClassByURI( RANGE_CLASS );
     if( rangeClass == null ) log.debug("Cannot find class for range for property."
             + " Looking for " + RANGE_CLASS);
+  
     request.setAttribute("rangeClassUriJson", MiscWebUtils.escape(RANGE_CLASS));
     
     request.setAttribute("predicateUriJson", MiscWebUtils.escape(PREDICATE));
