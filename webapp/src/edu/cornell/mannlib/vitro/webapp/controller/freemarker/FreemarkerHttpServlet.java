@@ -169,7 +169,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         
         try {
             TemplateLoader[] loaders;
-            FileTemplateLoader vitroFtl = new FileTemplateLoader(new File(vitroTemplatePath));
+            FlatteningTemplateLoader vitroFtl = new FlatteningTemplateLoader(new File(vitroTemplatePath));
             ClassTemplateLoader ctl = new ClassTemplateLoader(getClass(), "");
             
             File themeTemplateDir = new File(themeTemplatePath);
