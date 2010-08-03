@@ -5,7 +5,7 @@
 <!-- ====================================================================== 
      Build script for the Vitro core webapp.
      
-     This can be used on its own, or included into a Product build script.
+     This can be used on its own, or invoked from a Product build script.
      ====================================================================== -->
 
 <project name="vitroCore" default="describe">
@@ -13,44 +13,40 @@
 	<!-- - - - - - - - - - - - - - - - - - 
           properties                      
          - - - - - - - - - - - - - - - - - -->
-	<!-- 
-		The build directory is located under the directory with the top-level
-		script, so if called from a Product build script, the build directory
-		will be in the Product directory.
-	-->
 	<property name="build.dir" location=".build" />
+	<property name="webapp.dir" location="." />
 
-	<!-- 
-		The webapp directory is based on this script, regardless of whether we 
-		run this script alone, or call it from a Product build script. 
-	 -->
-	<dirname property="vitroCore.basedir" file="${ant.file.vitroCore}" />
-	<property name="webapp.dir" location="${vitroCore.basedir}" />
+	<property name="war.dir" location="${build.dir}/war" />
+	<property name="war-webinf.dir" location="${war.dir}/WEB-INF" />
+	<property name="war-classes.dir" location="${war-webinf.dir}/classes" />
+	<property name="war-lib.dir" location="${war-webinf.dir}/lib" />
 
+	<property name="test-classes.dir" location="${build.dir}/testclasses" />
 
+	<property name="servletjars.dir" location="${build.dir}/servletjars" />
 
 	<!-- - - - - - - - - - - - - - - - - - 
           paths: for compiling and running                      
          - - - - - - - - - - - - - - - - - -->
 	<path id="compile.classpath">
-		<fileset dir="${webapp.dir}/lib">
+		<fileset dir="${war-lib.dir}">
+			<include name="**/*.jar" />
+		</fileset>
+		<fileset dir="${servletjars.dir}">
 			<include name="**/*.jar" />
 		</fileset>
 	</path>
 
 	<path id="test.compile.classpath">
-		<pathelement location="${build.dir}/war/WEB-INF/classes" />
+		<pathelement location="${war-classes.dir}" />
 		<path refid="compile.classpath" />
 	</path>
 
 	<path id="test.run.classpath">
-		<!-- 
-			To get the data files and the correct log4j.properties, 
-			this comes before the classes directory 
-		-->
+		<!-- This holds data files and a special log4j.properties -->
 		<pathelement location="${webapp.dir}/test" />
 
-		<pathelement location="${build.dir}/testclasses" />
+		<pathelement location="${test-classes.dir}" />
 		<path refid="test.compile.classpath" />
 	</path>
 
@@ -64,7 +60,6 @@ all      - Runs "clean", then "deploy".
 clean    - Delete all artifacts so the next build will be from scratch.
 compile  - Compile the Java source files.
 test     - Compile and run the JUnit tests.
-war      - Assemble everything into a deployable WAR file.
 deploy   - Deploy the application directly into the Tomcat webapps directory.
 	    </echo>
 	</target>
@@ -129,8 +124,90 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
          - - - - - - - - - - - - - - - - - -->
 	<target name="prepare" depends="properties">
 		<mkdir dir="${build.dir}" />
-		<mkdir dir="${build.dir}/war/WEB-INF/classes" />
-		<mkdir dir="${build.dir}/testclasses" />
+		<mkdir dir="${war-classes.dir}" />
+		<mkdir dir="${test-classes.dir}" />
+
+		<!-- copy the themes into the war directory. -->
+		<copy todir="${war.dir}">
+			<fileset dir="${webapp.dir}/web">
+				<!--
+					If a product doesn't want the core themes, it can
+					set this property and they will be skipped. 
+				-->
+				<exclude name="themes/**/*" if="skip.core.themes" />
+			</fileset>
+		</copy>
+
+		<!-- copy the config files into the war directory. -->
+		<copy todir="${war-webinf.dir}">
+			<fileset file="${webapp.dir}/config/web.xml" />
+			<fileset file="${webapp.dir}/config/dwr.xml" />
+		</copy>
+
+		<!-- copy the ontologies and the submodels into the war directory. -->
+		<copy todir="${war-webinf.dir}">
+			<fileset dir="${webapp.dir}" includes="ontologies" />
+			<fileset dir="${webapp.dir}" includes="ontologies/**/*" />
+			<fileset dir="${webapp.dir}" includes="submodels" />
+			<fileset dir="${webapp.dir}" includes="submodels/**/*" />
+		</copy>
+
+		<!-- use the production Log4J properties, unless a debug version exists. -->
+		<available file="${webapp.dir}/config/debug.log4j.properties"
+		           property="debug.log4j.exists" />
+		<copy tofile="${war-classes.dir}/log4j.properties" filtering="true" overwrite="true">
+			<fileset dir="${webapp.dir}/config">
+				<include name="default.log4j.properties" unless="debug.log4j.exists" />
+				<include name="debug.log4j.properties" if="debug.log4j.exists" />
+			</fileset>
+			<filterchain>
+				<expandproperties />
+			</filterchain>
+		</copy>
+
+		<!-- copy the deploy.properties into the war directory -->
+		<copy todir="${war-classes.dir}">
+			<fileset file="${deploy.properties.file}" />
+		</copy>
+
+		<!-- copy the custom tag libraries into the war directory -->
+		<copy todir="${war-webinf.dir}/tlds">
+			<fileset dir="${webapp.dir}/config/tlds" includes="**/*" excludes="*.LCK" />
+		</copy>
+
+		<!-- TODO Get rid of these webservices files -->
+		<copy todir="${war-webinf.dir}/lib">
+			<fileset dir="${webapp.dir}/../services/lib" includes="**/*" excludes="*.LCK" />
+		</copy>
+		<copy todir="${build.dir}/war">
+			<fileset dir="${webapp.dir}/../services/additions" includes="**/*" />
+		</copy>
+		<!-- TODO Get rid of these webservices files -->
+
+		<!-- copy any xml files from source tree to the war directory -->
+		<copy todir="${build.dir}/war/WEB-INF/classes">
+			<fileset dir="${webapp.dir}/src" includes="**/*.xml" />
+		</copy>
+
+		<!-- copy the JARs into the war directory -->
+		<copy todir="${war-lib.dir}">
+			<fileset dir="${webapp.dir}/lib">
+				<!-- these are already in Tomcat: we mustn't conflict. -->
+				<exclude name="jsp-api.jar" />
+				<exclude name="servlet-api.jar" />
+			</fileset>
+		</copy>
+
+		<!-- copy the servlet JARs into their own directory, to compile against. -->
+		<copy todir="${servletjars.dir}">
+			<fileset dir="${webapp.dir}/lib">
+				<include name="jsp-api.jar" />
+				<include name="servlet-api.jar" />
+			</fileset>
+		</copy>
+
+		<!-- copy the context file into the war directory -->
+		<copy file="${webapp.dir}/context.xml" tofile="${war.dir}/META-INF/context.xml" />
 	</target>
 
 	<!-- ================================= 
@@ -139,14 +216,14 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 	<target name="compile" depends="prepare" description="--> Compile Java sources">
 		<!-- deletes all files that depend on changed .java files -->
 		<depend srcdir="${webapp.dir}/src"
-		        destdir="${build.dir}/war/WEB-INF/classes"
+		        destdir="${war-classes.dir}"
 		        closure="false"
 		        cache="${build.dir}/.depcache">
 			<classpath refid="compile.classpath" />
 		</depend>
 
 		<javac srcdir="${webapp.dir}/src"
-		       destdir="${build.dir}/war/WEB-INF/classes"
+		       destdir="${war-classes.dir}"
 		       debug="true"
 		       deprecation="true"
 		       optimize="true"
@@ -160,7 +237,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
          ================================= -->
 	<target name="test" depends="compile" unless="skiptests" description="--> Run JUnit tests">
 		<javac srcdir="${webapp.dir}/test"
-		       destdir="${build.dir}/testclasses"
+		       destdir="${test-classes.dir}"
 		       debug="true"
 		       deprecation="true"
 		       optimize="false"
@@ -177,109 +254,16 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		</java>
 	</target>
 
-	<!-- - - - - - - - - - - - - - - - - - 
-          target: copyEtc                      
-         - - - - - - - - - - - - - - - - - -->
-	<target name="copyEtc" depends="test">
-		<copy todir="${build.dir}/war">
-			<fileset dir="${webapp.dir}/web">
-				<!--
-					If a product doesn't want the core themes, it can
-					set this property and they will be skipped. 
-				-->
-				<exclude name="themes/**/*" if="skip.core.themes" />
-			</fileset>
-		</copy>
-
-		<copy todir="${build.dir}/war/WEB-INF">
-			<fileset file="${webapp.dir}/config/web.xml" />
-			<fileset file="${webapp.dir}/config/dwr.xml" />
-		</copy>
-
-		<copy todir="${build.dir}/war/WEB-INF">
-			<fileset dir="${webapp.dir}" includes="ontologies" />
-			<fileset dir="${webapp.dir}" includes="ontologies/**/*" />
-			<fileset dir="${webapp.dir}" includes="submodels" />
-			<fileset dir="${webapp.dir}" includes="submodels/**/*" />
-		</copy>
-
-		<!-- use the production Log4J properties, unless a debug version exists. -->
-		<available file="${webapp.dir}/config/debug.log4j.properties"
-		           property="debug.log4j.exists" />
-		<copy tofile="${build.dir}/war/WEB-INF/classes/log4j.properties"
-		      filtering="true"
-		      overwrite="true">
-			<fileset dir="${webapp.dir}/config">
-				<include name="default.log4j.properties" unless="debug.log4j.exists" />
-				<include name="debug.log4j.properties" if="debug.log4j.exists" />
-			</fileset>
-			<filterchain>
-				<expandproperties />
-			</filterchain>
-		</copy>
-
-		<copy todir="${build.dir}/war/WEB-INF/classes">
-			<fileset file="${deploy.properties.file}" />
-		</copy>
-
-		<copy todir="${build.dir}/war/WEB-INF/tlds">
-			<fileset dir="${webapp.dir}/config/tlds" includes="**/*" excludes="*.LCK" />
-		</copy>
-
-		<!-- TODO Get rid of these webservices files -->
-		<copy todir="${build.dir}/war/WEB-INF/lib">
-			<fileset dir="${vitroCore.basedir}/../services/lib" includes="**/*" excludes="*.LCK" />
-		</copy>
-		<copy todir="${build.dir}/war">
-			<fileset dir="${vitroCore.basedir}/../services/additions" includes="**/*" />
-		</copy>
-		<!-- TODO Get rid of these webservices files -->
-
-		<!-- xml files from src tree -->
-		<copy todir="${build.dir}/war/WEB-INF/classes">
-			<fileset dir="${webapp.dir}/src" includes="**/*.xml" />
-		</copy>
-
-		<copy todir="${build.dir}/war/WEB-INF/lib">
-			<fileset dir="${webapp.dir}/lib">
-				<!-- these are already in Tomcat: we shouldn't conflict. -->
-				<exclude name="jsp-api.jar" />
-				<exclude name="servlet-api.jar" />
-			</fileset>
-		</copy>
-
-		<copy file="${webapp.dir}/context.xml" tofile="${build.dir}/war/META-INF/context.xml" />
-	</target>
-
 	<!-- ================================= 
           target: deploy              
          ================================= -->
-	<target name="deploy" depends="copyEtc" description="--> Build the app and install in Tomcat">
+	<target name="deploy" depends="test" description="--> Build the app and install in Tomcat">
 		<property name="webapp.deploy.home" value="${tomcat.home}/webapps/${webapp.name}" />
 
 		<mkdir dir="${webapp.deploy.home}" />
 
-		<copy todir="${webapp.deploy.home}">
+		<sync todir="${webapp.deploy.home}" includeemptydirs="true">
 			<fileset dir="${build.dir}/war" />
-		</copy>
-
-		<!-- Discard any ontology files from previous builds. -->
-		<sync todir="${webapp.deploy.home}/WEB-INF/ontologies"
-		      includeEmptyDirs="true"
-		      failonerror="false">
-			<fileset dir="${build.dir}/war/WEB-INF/ontologies" includes="**/*" />
-		</sync>
-
-		<!-- Discard any submodel files from previous builds. -->
-		<sync todir="${webapp.deploy.home}/WEB-INF/submodels"
-		      includeemptydirs="true"
-		      failonerror="false">
-			<fileset dir="${build.dir}/war/WEB-INF/submodels" includes="**/*" />
-		</sync>
-
-		<!-- Discard any template files from previous builds. -->
-		<sync todir="${webapp.deploy.home}/themes" includeemptydirs="true" failonerror="false">
-			<fileset dir="${build.dir}/war/themes" includes="**/*" />
 		</sync>
 	</target>
 
