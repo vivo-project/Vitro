@@ -7,11 +7,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHelper;
+import edu.cornell.mannlib.vitro.webapp.web.directives.dump.DumpDirective;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateDirectiveModel;
 
 public abstract class BaseTemplateDirectiveModel implements TemplateDirectiveModel {
+
+    private static final Log log = LogFactory.getLog(BaseTemplateDirectiveModel.class);
     
     public String help(Configuration config) {
         Map<String, Object> map = new HashMap<String, Object>();

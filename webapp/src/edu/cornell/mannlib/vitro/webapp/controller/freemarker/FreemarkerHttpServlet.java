@@ -282,8 +282,8 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     
     // Add any Java directives the templates should have access to
     private void addDirectives(Map<String, Object> map) {
-        map.put("dump", new edu.cornell.mannlib.vitro.webapp.web.directives.DumpDirective());
-        map.put("dumpAll", new edu.cornell.mannlib.vitro.webapp.web.directives.DumpAllDirective());       
+        map.put("dump", new edu.cornell.mannlib.vitro.webapp.web.directives.dump.DumpDirective());
+        map.put("dumpAll", new edu.cornell.mannlib.vitro.webapp.web.directives.dump.DumpAllDirective());       
     }
     
     // Add variables that should be available only to the page's root map, not to the body.

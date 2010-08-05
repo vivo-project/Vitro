@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.web.directives;
+package edu.cornell.mannlib.vitro.webapp.web.directives.dump;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -14,6 +14,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHelper;
+import edu.cornell.mannlib.vitro.webapp.web.directives.BaseTemplateDirectiveModel;
 
 import freemarker.core.Environment;
 import freemarker.template.Configuration;
@@ -46,46 +47,39 @@ public class DumpAllDirective extends BaseTemplateDirectiveModel {
             throw new TemplateModelException(
                 "The dumpAll directive doesn't allow nested content.");
         }
-
-        Configuration config = env.getConfiguration();
-        TemplateHashModel dataModel = env.getDataModel();
-        Map<String, Object> models = new HashMap<String, Object>();
-        Map<String, String> directives = new HashMap<String, String>();
-          
-        Map<String, Object> dm = (Map<String, Object>) DeepUnwrap.permissiveUnwrap(dataModel);
+       
+        TemplateHashModel dataModel = env.getDataModel();    
+        Map<String, Object> dm = (Map<String, Object>) DeepUnwrap.permissiveUnwrap(dataModel);        
         List<String> varNames = new ArrayList(dm.keySet()); 
         Collections.sort(varNames);
+        
+        DumpHelper helper = new DumpHelper(env);
+        Configuration config = env.getConfiguration();        
+        List<String> models = new ArrayList<String>();
+        List<String> directives = new ArrayList<String>();
+        
         for (String var : varNames) {
-            // RY Instead, push each var/directive through the template and return a string.
-            // The meat of dumpDirective will go in a helper.
-            // Send the two lists of strings (variables and directives) to dump-datamodel.ftl.
-            // That way, the directive dump won't be broken up into two pieces, for example.
             Object value = dm.get(var);
             if (value instanceof BaseTemplateDirectiveModel) {
                 String help = ((BaseTemplateDirectiveModel) value).help(config);
-                directives.put(var, help);
+                directives.add(help);
             } else {
-                models.put(var, value);
+                models.add(helper.getVariableDump(var));
             }
         }
 
-        String templateName = "dump-all.ftl";
-        
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("models", models);
         map.put("directives", directives);
-        map.put("stylesheets", dataModel.get("stylesheets"));
-        map.put("dump", dataModel.get("dump"));
-        // Put the current datamodel into the new datamodel so its values can be dumped with the dump directive
-        // RY Another way to do this would be to loop through the data model here, merging each variable with
-        // the dump-var.ftl template and adding it to the output string.
-        map.put("datamodel", dataModel);
         map.put("containingTemplate", env.getTemplate().getName());
 
-        FreemarkerHelper helper = new FreemarkerHelper(config);
-        String output = helper.mergeMapToTemplate(templateName, map);      
-        Writer out = env.getOut();
-        out.write(output);
+        try {
+            map.put("stylesheets", dataModel.get("stylesheets"));
+        } catch (TemplateModelException e) {
+            log.error("Error getting value of stylesheets variable from data model.");
+        }
+        
+        helper.writeDump("dumpAll.ftl", map, "template data model");
 
     }
 

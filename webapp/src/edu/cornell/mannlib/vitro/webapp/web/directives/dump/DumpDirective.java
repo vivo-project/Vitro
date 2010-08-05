@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.web.directives;
+package edu.cornell.mannlib.vitro.webapp.web.directives.dump;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -13,6 +13,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHelper;
+import edu.cornell.mannlib.vitro.webapp.web.directives.BaseTemplateDirectiveModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 import freemarker.core.Environment;
 import freemarker.template.Configuration;
@@ -52,75 +53,22 @@ public class DumpDirective extends BaseTemplateDirectiveModel {
             throw new TemplateModelException(
                "Value of parameter 'var' must be a string.");     
         }
-        String var = ((SimpleScalar)o).getAsString();
         
-        Object r = params.get("dataModelDump");
-        boolean dataModelDump = false;
-        if (r != null) {
-            if ( !(r instanceof TemplateBooleanModel)) {
-                throw new TemplateModelException(
-                   "Value of parameter 'recursive' must be a boolean: true or false without quotation marks.");     
-            }
-            dataModelDump = ((TemplateBooleanModel) r).getAsBoolean(); 
-        }
-
+        String var = ((SimpleScalar)o).getAsString();       
+        DumpHelper helper = new DumpHelper(env);        
+        Map<String, Object> map = helper.getVariableDumpData(var);       
+        map.put("var", helper.getVariableDump(var));
+        
         TemplateHashModel dataModel = env.getDataModel();
-        if (dataModelDump) {
-            dataModel = (TemplateHashModel) dataModel.get("datamodel");
-        }
-        
-        TemplateModel val =  null;
         try {
-            val = dataModel.get(var);
-        } catch (TemplateModelException tme) {
-            log.error("Error getting value of template model " + var + " from data model.");
-        }
-        
-        // Just use this for now. Handles nested collections.
-        String value = val.toString(); 
-        String type = null;
-        Object unwrappedModel = DeepUnwrap.permissiveUnwrap(val);
-
-        // This case must precede the TemplateScalarModel case, because
-        // val is an instance of StringModel.
-        if (unwrappedModel instanceof BaseTemplateModel) {
-            type = unwrappedModel.getClass().getName(); 
-            value = ((BaseTemplateModel)unwrappedModel).dump();
-        } else if (val instanceof TemplateScalarModel) {
-            type = "string";
-        } else if (val instanceof TemplateDateModel) { 
-            type = "date";
-        } else if (val instanceof TemplateNumberModel) {
-            type = "number";
-        } else if (val instanceof TemplateBooleanModel) {
-            value =  ((TemplateBooleanModel) val).getAsBoolean() ? "true" : "false";
-            type = "boolean";
-        } else if (val instanceof TemplateSequenceModel){
-            type = "sequence";
-        } else if (val instanceof TemplateHashModel) {
-            type = "hash";
-        // In recursive dump, we've gotten down to a raw string. Just output it.    
-//        } else if (val == null) {
-//            out.write(var);
-//            return;
-        // Add a case for BaseTemplateModel - our template model objects will have a dump() method.
-        } else {
-            type = "object";
+            map.put("stylesheets", dataModel.get("stylesheets"));
+        } catch (TemplateModelException e) {
+            log.error("Error getting value of stylesheets variable from data model.");
         }
 
-        Map<String, Object> map = new HashMap<String, Object>();
-        map.put("var", var);
-        map.put("value", value);
-        map.put("type", type);
-        
-        map.put("stylesheets", dataModel.get("stylesheets"));
-        //map.put("dump", this); // would need for recursive calls
-
-        String output = new FreemarkerHelper(env.getConfiguration()).mergeMapToTemplate("dump-var.ftl", map);
-        Writer out = env.getOut();
-        out.write(output);
-
+        helper.writeDump("dump.ftl", map, var);   
     }
+    
     
     public String help(Configuration config) {
         Map<String, Object> map = new HashMap<String, Object>();
