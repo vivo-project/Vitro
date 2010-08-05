@@ -38,7 +38,7 @@ public abstract class BaseTemplateDirectiveModel implements TemplateDirectiveMod
     }
     
     protected String mergeToTemplate(Map<String, Object> map, Configuration config) {
-        return new FreemarkerHelper(config).mergeMapToTemplate("directive-help.ftl", map); 
+        return new FreemarkerHelper(config).mergeMapToTemplate("help-directive.ftl", map); 
     }
 
 }
