@@ -16,8 +16,14 @@ import freemarker.template.TemplateException;
 public class FreemarkerHelper {
     
     private static final Log log = LogFactory.getLog(FreemarkerHelper.class);
+    
+    private Configuration config = null;
+    
+    public FreemarkerHelper(Configuration config) {
+        this.config = config;
+    }
 
-    public StringWriter mergeToTemplate(String templateName, Map<String, Object> map, Configuration config) {
+    public StringWriter mergeToTemplate(String templateName, Map<String, Object> map) {
         
         Template template = null;
         try {
@@ -40,8 +46,8 @@ public class FreemarkerHelper {
         return sw;
     }
 
-    public String mergeMapToTemplate(String templateName, Map<String, Object> map, Configuration config) {
-        return mergeToTemplate(templateName, map, config).toString();
+    public String mergeMapToTemplate(String templateName, Map<String, Object> map) {
+        return mergeToTemplate(templateName, map).toString();
     }
     
 }

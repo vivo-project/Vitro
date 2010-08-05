@@ -116,7 +116,7 @@ public class DumpDirective extends BaseTemplateDirectiveModel {
         map.put("stylesheets", dataModel.get("stylesheets"));
         //map.put("dump", this); // would need for recursive calls
 
-        String output = new FreemarkerHelper().mergeMapToTemplate("dump-var.ftl", map, env.getConfiguration());
+        String output = new FreemarkerHelper(env.getConfiguration()).mergeMapToTemplate("dump-var.ftl", map);
         Writer out = env.getOut();
         out.write(output);
 

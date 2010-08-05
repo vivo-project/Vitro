@@ -82,8 +82,8 @@ public class DumpAllDirective extends BaseTemplateDirectiveModel {
         map.put("datamodel", dataModel);
         map.put("containingTemplate", env.getTemplate().getName());
 
-        FreemarkerHelper helper = new FreemarkerHelper();
-        String output = helper.mergeMapToTemplate(templateName, map, config);      
+        FreemarkerHelper helper = new FreemarkerHelper(config);
+        String output = helper.mergeMapToTemplate(templateName, map);      
         Writer out = env.getOut();
         out.write(output);
 

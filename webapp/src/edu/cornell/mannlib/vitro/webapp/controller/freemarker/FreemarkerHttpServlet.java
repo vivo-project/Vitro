@@ -376,8 +376,8 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     }
 
     protected StringWriter mergeToTemplate(String templateName, Map<String, Object> map, Configuration config) {   	
-        FreemarkerHelper helper = new FreemarkerHelper();
-        return helper.mergeToTemplate(templateName, map, config);
+        FreemarkerHelper helper = new FreemarkerHelper(config);
+        return helper.mergeToTemplate(templateName, map);
     }
 
     protected String mergeBodyToTemplate(String templateName, Map<String, Object> map, Configuration config) {
