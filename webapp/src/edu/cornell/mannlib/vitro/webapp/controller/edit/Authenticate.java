@@ -491,16 +491,14 @@ public class Authenticate extends FreeMarkerHttpServlet {
 	/** What's the URL for the login screen? */
 	private String getLoginScreenUrl(HttpServletRequest request) {
 		String contextPath = request.getContextPath();
-		String urlParams = "?home=" + getPortalIdString(request)
-				+ "&login=block";
+		String urlParams = "?login=block";
 		return contextPath + Controllers.LOGIN + urlParams;
 	}
 
 	/** What's the URL for the site admin screen? */
 	private String getSiteAdminUrl(HttpServletRequest request) {
 		String contextPath = request.getContextPath();
-		String urlParams = "?home=" + getPortalIdString(request)
-				+ "&login=block";
+		String urlParams = "?login=block";
 		return contextPath + Controllers.SITE_ADMIN + urlParams;
 	}
 
