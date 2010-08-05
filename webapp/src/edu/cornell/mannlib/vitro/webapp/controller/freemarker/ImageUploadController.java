@@ -241,6 +241,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 			} else if (ACTION_SAVE.equals(action)) {
 				return doCreateThumbnail(vreq, entity);
 			} else if (ACTION_DELETE.equals(action)) {
+				captureReferringUrl(vreq);
 				return doDeleteImage(vreq, entity);
 			} else if (ACTION_DELETE_EDIT.equals(action)) {
 				return doDeleteThenEdit(vreq, entity);
