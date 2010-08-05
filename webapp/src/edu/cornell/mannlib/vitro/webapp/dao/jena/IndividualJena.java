@@ -22,6 +22,7 @@ import org.joda.time.DateTime;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntResource;
 import com.hp.hpl.jena.rdf.model.Literal;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
@@ -483,10 +484,12 @@ public class IndividualJena extends IndividualImpl implements Individual {
 		if (this.mainImageUri != NOT_INITIALIZED) {
 			return mainImageUri;
 		} else {
-			for (ObjectPropertyStatement stmt : getObjectPropertyStatements()) {
-				if (stmt.getPropertyURI()
-						.equals(VitroVocabulary.IND_MAIN_IMAGE)) {
-					mainImageUri = stmt.getObjectURI();
+			RDFNode value = ind.getPropertyValue(ind.getModel().getProperty(VitroVocabulary.IND_MAIN_IMAGE));
+			if (value.isResource()) {
+				Resource valueRes = (Resource) value;
+				String resUri = valueRes.getURI();
+				if (resUri != null) {
+					mainImageUri = resUri;
 					return mainImageUri;
 				}
 			}
@@ -901,10 +904,11 @@ public class IndividualJena extends IndividualImpl implements Individual {
 
                     int rv = 0;
                     try {
-                        if( val1 instanceof String )
+                        if( val1 instanceof String ) {
                         	rv = collator.compare( ((String)val1) , ((String)val2) );
+                            System.out.println("bjl23 " + rv);
                             //rv = ((String)val1).compareTo((String)val2);
-                        else if( val1 instanceof Date ) {
+                        } else if ( val1 instanceof Date ) {
                             DateTime dt1 = new DateTime((Date)val1);
                             DateTime dt2 = new DateTime((Date)val2);
                             rv = dt1.compareTo(dt2);
