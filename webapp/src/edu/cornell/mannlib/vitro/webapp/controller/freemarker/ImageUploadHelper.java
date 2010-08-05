@@ -40,8 +40,8 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadControl
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadController.Dimensions;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadController.UserMistakeException;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.filestorage.FileModelHelper;
 import edu.cornell.mannlib.vitro.webapp.filestorage.TempFileHolder;
+import edu.cornell.mannlib.vitro.webapp.filestorage.UploadedFileHelper;
 import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileAlreadyExistsException;
 import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorage;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
@@ -87,14 +87,13 @@ public class ImageUploadHelper {
 				new NonNoisyImagingListener());
 	}
 
-	private final WebappDaoFactory webAppDaoFactory;
-	private final FileModelHelper fileModelHelper;
 	private final FileStorage fileStorage;
+	private final UploadedFileHelper uploadedFileHelper;
 
 	ImageUploadHelper(FileStorage fileStorage, WebappDaoFactory webAppDaoFactory) {
-		this.webAppDaoFactory = webAppDaoFactory;
-		this.fileModelHelper = new FileModelHelper(webAppDaoFactory);
 		this.fileStorage = fileStorage;
+		this.uploadedFileHelper = new UploadedFileHelper(fileStorage,
+				webAppDaoFactory);
 	}
 
 	/**
@@ -162,10 +161,8 @@ public class ImageUploadHelper {
 			inputStream = fileItem.getInputStream();
 			String mimeType = getMimeType(fileItem);
 			String filename = getSimpleFilename(fileItem);
-			WebappDaoFactory wadf = vreq.getWebappDaoFactory();
-
-			FileInfo fileInfo = FileModelHelper.createFile(fileStorage, wadf,
-					filename, mimeType, inputStream);
+			FileInfo fileInfo = uploadedFileHelper.createFile(filename,
+					mimeType, inputStream);
 
 			TempFileHolder.attach(vreq.getSession(), ATTRIBUTE_TEMP_FILE,
 					fileInfo);
@@ -274,9 +271,9 @@ public class ImageUploadHelper {
 
 			String mimeType = RECOGNIZED_FILE_TYPES.get(".jpg");
 			String filename = createThumbnailFilename(mainFilename);
+			FileInfo fileInfo = uploadedFileHelper.createFile(filename,
+					mimeType, thumbStream);
 
-			FileInfo fileInfo = FileModelHelper.createFile(fileStorage,
-					webAppDaoFactory, filename, mimeType, thumbStream);
 			log.debug("Created thumbnail: " + fileInfo);
 			return fileInfo;
 		} catch (FileAlreadyExistsException e) {
@@ -304,64 +301,11 @@ public class ImageUploadHelper {
 	}
 
 	/**
-	 * If this entity already had a main image, remove the connection. If the
-	 * image and the thumbnail are no longer used by anyone, remove them from
-	 * the model, and from the file system.
+	 * If this entity already had a main image, remove it. If the image and the
+	 * thumbnail are no longer used by anyone, throw them away.
 	 */
 	void removeExistingImage(Individual person) {
-		Individual mainImage = fileModelHelper.removeMainImage(person);
-		if (mainImage == null) {
-			return;
-		}
-
-		removeExistingThumbnail(person);
-
-		if (!fileModelHelper.isFileReferenced(mainImage)) {
-			Individual bytes = FileModelHelper.getBytestreamForFile(mainImage);
-			if (bytes != null) {
-				try {
-					fileStorage.deleteFile(bytes.getURI());
-				} catch (IOException e) {
-					throw new IllegalStateException(
-							"Can't delete the main image file: '"
-									+ bytes.getURI() + "' for '"
-									+ person.getName() + "' ("
-									+ person.getURI() + ")", e);
-				}
-			}
-			fileModelHelper.removeFileFromModel(mainImage);
-		}
-	}
-
-	/**
-	 * If the entity already has a thumbnail, remove it. If there are no other
-	 * references to the thumbnail, delete it from the model and from the file
-	 * system.
-	 */
-	void removeExistingThumbnail(Individual person) {
-		Individual mainImage = FileModelHelper.getMainImage(person);
-		Individual thumbnail = FileModelHelper.getThumbnailForImage(mainImage);
-		if (thumbnail == null) {
-			return;
-		}
-
-		fileModelHelper.removeThumbnail(person);
-
-		if (!fileModelHelper.isFileReferenced(thumbnail)) {
-			Individual bytes = FileModelHelper.getBytestreamForFile(thumbnail);
-			if (bytes != null) {
-				try {
-					fileStorage.deleteFile(bytes.getURI());
-				} catch (IOException e) {
-					throw new IllegalStateException(
-							"Can't delete the thumbnail file: '"
-									+ bytes.getURI() + "' for '"
-									+ person.getName() + "' ("
-									+ person.getURI() + ")", e);
-				}
-			}
-			fileModelHelper.removeFileFromModel(thumbnail);
-		}
+		uploadedFileHelper.removeMainImage(person);
 	}
 
 	/**
@@ -369,7 +313,7 @@ public class ImageUploadHelper {
 	 */
 	void storeImageFiles(Individual entity, FileInfo newImage,
 			FileInfo thumbnail) {
-		FileModelHelper.setImagesOnEntity(webAppDaoFactory, entity, newImage,
+		uploadedFileHelper.setImagesOnEntity(entity.getURI(), newImage,
 				thumbnail);
 	}
 

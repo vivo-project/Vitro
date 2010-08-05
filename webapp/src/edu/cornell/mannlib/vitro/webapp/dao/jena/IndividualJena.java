@@ -41,8 +41,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.filestorage.FileModelHelper;
-import edu.cornell.mannlib.vitro.webapp.filestorage.FileServingHelper;
+import edu.cornell.mannlib.vitro.webapp.filestorage.model.ImageInfo;
 import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
 
 public class IndividualJena extends IndividualImpl implements Individual {
@@ -496,38 +495,33 @@ public class IndividualJena extends IndividualImpl implements Individual {
 
 	@Override
 	public String getImageUrl() {
-		if (this.imageUrl != null) {
-			log.debug("imageUrl was cached for " + getURI() + ": '"
-					+ this.imageUrl + "'");
-			return imageUrl;
-		} else {
-			String imageUri = FileModelHelper.getMainImageBytestreamUri(this);
-			String filename = FileModelHelper.getMainImageFilename(this);
-			imageUrl = FileServingHelper.getBytestreamAliasUrl(imageUri,
-					filename);
-			log.debug("figured imageUrl for " + getURI() + ": '"
-					+ this.imageUrl + "'");
-			return imageUrl;
+		if (this.imageInfo == null) {
+			this.imageInfo = ImageInfo.instanceFromEntityUri(webappDaoFactory, this);
+			log.trace("figured imageInfo for " + getURI() + ": '"
+					+ this.imageInfo + "'");
 		}
+		if (this.imageInfo == null) {
+			this.imageInfo = ImageInfo.EMPTY_IMAGE_INFO;
+			log.trace("imageInfo for " + getURI() + " is empty.");
+		}
+		return this.imageInfo.getMainImage().getBytestreamAliasUrl();
 	}
 
 	@Override
 	public String getThumbUrl() {
-		if (this.thumbUrl != null) {
-			log.debug("thumbUrl was cached for " + getURI() + ": '"
-					+ this.thumbUrl + "'");
-			return thumbUrl;
-		} else {
-			String imageUri = FileModelHelper.getThumbnailBytestreamUri(this);
-			String filename = FileModelHelper.getThumbnailFilename(this);
-			thumbUrl = FileServingHelper.getBytestreamAliasUrl(imageUri, filename);
-			log.debug("figured thumbUrl for " + getURI() + ": '"
-					+ this.thumbUrl + "'");
-			return thumbUrl;
+		if (this.imageInfo == null) {
+			this.imageInfo = ImageInfo.instanceFromEntityUri(webappDaoFactory, this);
+			log.trace("figured imageInfo for " + getURI() + ": '"
+					+ this.imageInfo + "'");
 		}
+		if (this.imageInfo == null) {
+			this.imageInfo = ImageInfo.EMPTY_IMAGE_INFO;
+			log.trace("imageInfo for " + getURI() + " is empty.");
+		}
+		return this.imageInfo.getThumbnail().getBytestreamAliasUrl();
 	}
 
-    public String getAnchor() {
+	public String getAnchor() {
         if (this.anchor != null) {
             return anchor;
         } else {

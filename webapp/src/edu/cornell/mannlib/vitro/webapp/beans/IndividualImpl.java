@@ -5,7 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.beans;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.filestorage.model.ImageInfo;
 
 import java.lang.reflect.Method;
 import java.sql.Timestamp;
@@ -49,8 +49,7 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
     protected String anchor = null;
     protected String blurb = null;
     protected String mainImageUri = NOT_INITIALIZED;
-    protected String imageUrl;
-    protected String thumbUrl;
+    protected ImageInfo imageInfo = null;
     protected int statusId = 0;
     protected String status = null;
     protected List <Link>linksList = null;
@@ -281,8 +280,7 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
 	@Override
 	public void setMainImageUri(String mainImageUri) {
 		this.mainImageUri = mainImageUri;
-		this.imageUrl = null;
-		this.thumbUrl = null;
+		this.imageInfo = null;
 	}
 
 	@Override

@@ -43,9 +43,10 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.RdfLiteralHash;
-import edu.cornell.mannlib.vitro.webapp.filestorage.FileModelHelper;
+import edu.cornell.mannlib.vitro.webapp.filestorage.model.ImageInfo;
 import edu.cornell.mannlib.vitro.webapp.utils.FrontEndEditingUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 
@@ -470,19 +471,22 @@ public class PropertyEditLinks extends TagSupport{
     
 	protected LinkStruct[] doImageLinks(Individual entity,
 			IdentifierBundle ids, PolicyIface policy, String contextPath) {
-		Individual mainImage = FileModelHelper.getMainImage(entity);
-		Individual thumbnail = FileModelHelper.getThumbnailForImage(mainImage);
+		VitroRequest vreq = new VitroRequest((HttpServletRequest) pageContext
+				.getRequest());
+		ImageInfo imageInfo = ImageInfo.instanceFromEntityUri(vreq
+				.getFullWebappDaoFactory(), entity);
 
 		String subjectUri = entity.getURI();
 		String predicateUri = VitroVocabulary.IND_MAIN_IMAGE;
 
-		if (thumbnail == null) {
+		if (imageInfo == null) {
 			EditLinkAccess[] accesses = policyToAccess(ids, policy, subjectUri,
 					predicateUri);
 
 			if (contains(accesses, EditLinkAccess.ADDNEW)) {
 				log.debug("permission to ADD main image to " + subjectUri);
-				boolean isPerson = entity.isVClass("http://xmlns.com/foaf/0.1/Person");
+				boolean isPerson = entity
+						.isVClass("http://xmlns.com/foaf/0.1/Person");
 				if (isPerson) {
 					return new LinkStruct[] { getImageLink(subjectUri,
 							contextPath, "edit", "upload an image", "add") };
@@ -496,7 +500,7 @@ public class PropertyEditLinks extends TagSupport{
 			}
 		} else {
 			ObjectPropertyStatement prop = new ObjectPropertyStatementImpl(
-					subjectUri, predicateUri, mainImage.getURI());
+					subjectUri, predicateUri, imageInfo.getMainImage().getUri());
 			EditLinkAccess[] allowedAccessTypeArray = policyToAccess(ids,
 					policy, prop);
 
@@ -520,8 +524,7 @@ public class PropertyEditLinks extends TagSupport{
 			}
 			return links.toArray(new LinkStruct[links.size()]);
 		}
-	}
-    
+	}    
 
     /* ********************* utility methods ********************************* */
     protected static String makeRelativeHref( String baseUrl, String ... queries ) {

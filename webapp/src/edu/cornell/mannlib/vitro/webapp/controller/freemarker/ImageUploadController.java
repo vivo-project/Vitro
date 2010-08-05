@@ -25,11 +25,10 @@ import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.filestorage.FileModelHelper;
-import edu.cornell.mannlib.vitro.webapp.filestorage.FileServingHelper;
 import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorage;
 import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
+import edu.cornell.mannlib.vitro.webapp.filestorage.model.ImageInfo;
 import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest;
 import freemarker.template.Configuration;
 
@@ -196,8 +195,8 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 
 		// Add the values that we got, and merge to the template.
 		body.putAll(values.getBodyMap());
-		root.put("body", mergeBodyToTemplate(values.getTemplateName(), body,
-				config));
+		root.put("body",
+				mergeBodyToTemplate(values.getTemplateName(), body, config));
 
 		// Continue to simulate FreeMarkerHttpServlet.doGet()
 		root.put("title", body.get("title"));
@@ -276,11 +275,12 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 * Show the first screen in the upload process: Add or Replace.
 	 */
 	private ResponseValues doIntroScreen(VitroRequest vreq, Individual entity) {
-		String thumbUrl = getThumbnailUrl(entity);
-		if (thumbUrl == null) {
+		ImageInfo imageInfo = ImageInfo.instanceFromEntityUri(
+				vreq.getFullWebappDaoFactory(), entity);
+		if (imageInfo == null) {
 			return showAddImagePage(vreq, entity);
 		} else {
-			return showReplaceImagePage(vreq, entity, thumbUrl);
+			return showReplaceImagePage(vreq, entity, imageInfo);
 		}
 	}
 
@@ -289,8 +289,8 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 * image (and thumbnail), and attach the new main image.
 	 */
 	private ResponseValues doUploadImage(VitroRequest vreq, Individual entity) {
-		ImageUploadHelper helper = new ImageUploadHelper(fileStorage, vreq
-				.getFullWebappDaoFactory());
+		ImageUploadHelper helper = new ImageUploadHelper(fileStorage,
+				vreq.getFullWebappDaoFactory());
 
 		try {
 			// Did they provide a file to upload? If not, show an error.
@@ -303,8 +303,8 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 			Dimensions size = helper.getNewImageSize(fileInfo);
 
 			// Go to the cropping page.
-			return showCropImagePage(vreq, entity, fileInfo
-					.getBytestreamAliasUrl(), size);
+			return showCropImagePage(vreq, entity,
+					fileInfo.getBytestreamAliasUrl(), size);
 		} catch (UserMistakeException e) {
 			return showErrorMessage(vreq, entity, e.getMessage());
 		}
@@ -316,11 +316,12 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 */
 	private ResponseValues showErrorMessage(VitroRequest vreq,
 			Individual entity, String message) {
-		String thumbUrl = getThumbnailUrl(entity);
-		if (thumbUrl == null) {
+		ImageInfo imageInfo = ImageInfo.instanceFromEntityUri(
+				vreq.getFullWebappDaoFactory(), entity);
+		if (imageInfo == null) {
 			return showAddImagePageWithError(vreq, entity, message);
 		} else {
-			return showReplaceImagePageWithError(vreq, entity, thumbUrl,
+			return showReplaceImagePageWithError(vreq, entity, imageInfo,
 					message);
 		}
 	}
@@ -331,8 +332,8 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 */
 	private ResponseValues doCreateThumbnail(VitroRequest vreq,
 			Individual entity) {
-		ImageUploadHelper helper = new ImageUploadHelper(fileStorage, vreq
-				.getFullWebappDaoFactory());
+		ImageUploadHelper helper = new ImageUploadHelper(fileStorage,
+				vreq.getFullWebappDaoFactory());
 
 		try {
 			CropRectangle crop = validateCropCoordinates(vreq);
@@ -353,8 +354,8 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 * page.
 	 */
 	private ResponseValues doDeleteImage(VitroRequest vreq, Individual entity) {
-		ImageUploadHelper helper = new ImageUploadHelper(fileStorage, vreq
-				.getFullWebappDaoFactory());
+		ImageUploadHelper helper = new ImageUploadHelper(fileStorage,
+				vreq.getFullWebappDaoFactory());
 
 		helper.removeExistingImage(entity);
 
@@ -366,8 +367,8 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 * screen.
 	 */
 	private ResponseValues doDeleteThenEdit(VitroRequest vreq, Individual entity) {
-		ImageUploadHelper helper = new ImageUploadHelper(fileStorage, vreq
-				.getFullWebappDaoFactory());
+		ImageUploadHelper helper = new ImageUploadHelper(fileStorage,
+				vreq.getFullWebappDaoFactory());
 
 		helper.removeExistingImage(entity);
 
@@ -426,15 +427,6 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	}
 
 	/**
-	 * Get the URL that will serve this entity's thumbnail image, or null.
-	 */
-	private String getThumbnailUrl(Individual entity) {
-		String thumbUri = FileModelHelper.getThumbnailBytestreamUri(entity);
-		String thumbFilename = FileModelHelper.getThumbnailFilename(entity);
-		return FileServingHelper.getBytestreamAliasUrl(thumbUri, thumbFilename);
-	}
-
-	/**
 	 * The individual has no image - go to the Add Image page.
 	 * 
 	 * @param entity
@@ -444,8 +436,8 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 			Individual entity) {
 		String formAction = (entity == null) ? "" : formAction(entity.getURI(),
 				ACTION_UPLOAD);
-		String cancelUrl = (entity == null) ? "" : exitPageUrl(vreq, entity
-				.getURI());
+		String cancelUrl = (entity == null) ? "" : exitPageUrl(vreq,
+				entity.getURI());
 
 		TemplateResponseValues rv = new TemplateResponseValues(TEMPLATE_NEW);
 		rv.put(BODY_THUMBNAIL_URL, UrlBuilder.getUrl(DUMMY_THUMBNAIL_URL));
@@ -467,10 +459,11 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 * The individual has an image - go to the Replace Image page.
 	 */
 	private TemplateResponseValues showReplaceImagePage(VitroRequest vreq,
-			Individual entity, String thumbUrl) {
+			Individual entity, ImageInfo imageInfo) {
 		TemplateResponseValues rv = new TemplateResponseValues(TEMPLATE_REPLACE);
-		rv.put(BODY_THUMBNAIL_URL, UrlBuilder.getUrl(thumbUrl));
-		rv.put(BODY_DELETE_URL, formAction(entity.getURI(), ACTION_DELETE_EDIT));
+		rv.put(BODY_THUMBNAIL_URL, UrlBuilder.getUrl(imageInfo.getThumbnail()
+				.getBytestreamAliasUrl()));
+		rv.put(BODY_DELETE_URL, formAction(entity.getURI(), ACTION_DELETE));
 		rv.put(BODY_FORM_ACTION, formAction(entity.getURI(), ACTION_UPLOAD));
 		rv.put(BODY_CANCEL_URL, exitPageUrl(vreq, entity.getURI()));
 		rv.put(BODY_TITLE, "Replace image" + forName(entity));
@@ -481,9 +474,10 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 * The individual has an image, but the user did something wrong.
 	 */
 	private TemplateResponseValues showReplaceImagePageWithError(
-			VitroRequest vreq, Individual entity, String thumbUrl,
+			VitroRequest vreq, Individual entity, ImageInfo imageInfo,
 			String message) {
-		TemplateResponseValues rv = showReplaceImagePage(vreq, entity, thumbUrl);
+		TemplateResponseValues rv = showReplaceImagePage(vreq, entity,
+				imageInfo);
 		rv.put(BODY_ERROR_MESSAGE, message);
 		return rv;
 	}

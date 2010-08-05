@@ -16,9 +16,9 @@ import org.apache.commons.io.FilenameUtils;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 
-import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.filestorage.FileModelHelper;
+import edu.cornell.mannlib.vitro.webapp.filestorage.UploadedFileHelper;
 import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorage;
+import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
 
 /**
  * Make copies of the main image and thumbnail in the new file storage system,
@@ -27,15 +27,15 @@ import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorage;
  */
 public class ImageSchemaTranslater extends FsuScanner {
 	private final ImageDirectoryWithBackup imageDirectoryWithBackup;
-	protected final FileModelHelper fileModelHelper;
 	protected final FileStorage fileStorage;
+	protected final UploadedFileHelper uploadedFileHelper;
 
 	public ImageSchemaTranslater(FSUController controller) {
 		super(controller);
 		this.imageDirectoryWithBackup = controller
 				.getImageDirectoryWithBackup();
 		this.fileStorage = controller.getFileStorage();
-		this.fileModelHelper = controller.getFileModelHelper();
+		this.uploadedFileHelper = controller.getUploadedFileHelper();
 	}
 
 	/**
@@ -79,10 +79,6 @@ public class ImageSchemaTranslater extends FsuScanner {
 			return;
 		}
 
-		translateMainImage(resource, mainImages.get(0));
-		translated.add(mainImages.get(0));
-		ResourceWrapper.removeAll(resource, imageProperty);
-
 		List<String> thumbnails = getValues(resource, thumbProperty);
 		if (thumbnails.size() != 1) {
 			updateLog.error(resource, "has " + thumbnails.size()
@@ -90,63 +86,47 @@ public class ImageSchemaTranslater extends FsuScanner {
 			return;
 		}
 
-		translateThumbnail(resource, thumbnails.get(0));
+		FileInfo main = translateFile(resource, mainImages.get(0), "main image");
+		FileInfo thumb = translateFile(resource, thumbnails.get(0), "thumbnail");
+		if ((main == null) || (thumb == null)) {
+			return;
+		}
+		uploadedFileHelper.setImagesOnEntity(resource.getURI(), main, thumb);
+
+		translated.add(mainImages.get(0));
+		ResourceWrapper.removeAll(resource, imageProperty);
+
 		translated.add(thumbnails.get(0));
 		ResourceWrapper.removeAll(resource, thumbProperty);
-	}
 
-	/**
-	 * Translate the main image into the new system
-	 */
-	private void translateMainImage(Resource resource, String path) {
-		Individual file = translateFile(resource, path, "main image");
-		Individual person = fileModelHelper.getIndividualByUri(resource
-				.getURI());
-		fileModelHelper.setAsMainImageOnEntity(person, file);
-	}
-
-	/**
-	 * Translate the thumbnail into the new system.
-	 */
-	private void translateThumbnail(Resource resource, String path) {
-		Individual file = translateFile(resource, path, "thumbnail");
-		Individual person = fileModelHelper.getIndividualByUri(resource
-				.getURI());
-		fileModelHelper.setThumbnailOnIndividual(person, file);
 	}
 
 	/**
 	 * Translate an image file into the new system
 	 * <ul>
-	 * <li>Create a new File, FileByteStream.</li>
 	 * <li>Attempt to infer MIME type.</li>
 	 * <li>Copy into the File system.</li>
+	 * <li>Create the File and Bytestream individuals in the model.</li>
 	 * </ul>
-	 * 
-	 * @return the new File surrogate.
 	 */
-	private Individual translateFile(Resource resource, String path,
-			String label) {
+	private FileInfo translateFile(Resource resource, String path, String label) {
 		File oldFile = imageDirectoryWithBackup.getExistingFile(path);
 		String filename = getSimpleFilename(path);
 		String mimeType = guessMimeType(resource, filename);
 
-		// Create the file individuals in the model
-		Individual byteStream = fileModelHelper.createByteStreamIndividual();
-		Individual file = fileModelHelper.createFileIndividual(mimeType,
-				filename, byteStream);
-
-		updateLog.log(resource, "translating " + label + " '" + path
-				+ "' into the file storage as '" + file.getURI() + "'");
-
 		InputStream inputStream = null;
 		try {
-			// Store the file in the FileStorage system.
 			inputStream = new FileInputStream(oldFile);
-			fileStorage.createFile(byteStream.getURI(), filename, inputStream);
+			// Create the file individuals in the model
+			FileInfo fileInfo = uploadedFileHelper.createFile(filename,
+					mimeType, inputStream);
+			updateLog.log(resource, "translating " + label + " '" + path
+					+ "' into the file storage as '" + fileInfo.getUri() + "'");
+			return fileInfo;
 		} catch (IOException e) {
 			updateLog.error(resource, "Can't create the " + label + " file. ",
 					e);
+			return null;
 		} finally {
 			if (inputStream != null) {
 				try {
@@ -156,8 +136,6 @@ public class ImageSchemaTranslater extends FsuScanner {
 				}
 			}
 		}
-
-		return file;
 	}
 
 	/**

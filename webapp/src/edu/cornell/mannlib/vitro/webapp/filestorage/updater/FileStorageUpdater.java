@@ -13,7 +13,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.filestorage.FileModelHelper;
+import edu.cornell.mannlib.vitro.webapp.filestorage.UploadedFileHelper;
 import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorage;
 
 /**
@@ -104,7 +104,7 @@ public class FileStorageUpdater implements FSUController {
 	private final Model model;
 
 	private final FileStorage fileStorage;
-	private final FileModelHelper fileModelHelper;
+	private final UploadedFileHelper uploadedFileHelper;
 	private final ImageDirectoryWithBackup imageDirectoryWithBackup;
 	private final File upgradeDirectory;
 
@@ -115,7 +115,7 @@ public class FileStorageUpdater implements FSUController {
 			File webappImageDirectory) {
 		this.model = model;
 		this.fileStorage = fileStorage;
-		this.fileModelHelper = new FileModelHelper(wadf);
+		this.uploadedFileHelper = new UploadedFileHelper(fileStorage, wadf);
 		this.upgradeDirectory = new File(uploadDirectory, "upgrade");
 
 		this.imageDirectoryWithBackup = new ImageDirectoryWithBackup(new File(
@@ -201,7 +201,7 @@ public class FileStorageUpdater implements FSUController {
 				model.createProperty(IMAGETHUMB)).isEmpty()) {
 			return true;
 		}
-		
+
 		return false;
 	}
 
@@ -238,8 +238,8 @@ public class FileStorageUpdater implements FSUController {
 	}
 
 	@Override
-	public FileModelHelper getFileModelHelper() {
-		return this.fileModelHelper;
+	public UploadedFileHelper getUploadedFileHelper() {
+		return this.uploadedFileHelper;
 	}
 
 	@Override
