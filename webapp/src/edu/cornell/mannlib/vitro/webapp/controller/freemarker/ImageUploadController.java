@@ -463,7 +463,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 		TemplateResponseValues rv = new TemplateResponseValues(TEMPLATE_REPLACE);
 		rv.put(BODY_THUMBNAIL_URL, UrlBuilder.getUrl(imageInfo.getThumbnail()
 				.getBytestreamAliasUrl()));
-		rv.put(BODY_DELETE_URL, formAction(entity.getURI(), ACTION_DELETE));
+		rv.put(BODY_DELETE_URL, formAction(entity.getURI(), ACTION_DELETE_EDIT));
 		rv.put(BODY_FORM_ACTION, formAction(entity.getURI(), ACTION_UPLOAD));
 		rv.put(BODY_CANCEL_URL, exitPageUrl(vreq, entity.getURI()));
 		rv.put(BODY_TITLE, "Replace image" + forName(entity));
