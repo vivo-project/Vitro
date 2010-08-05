@@ -485,7 +485,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
 			return mainImageUri;
 		} else {
 			RDFNode value = ind.getPropertyValue(ind.getModel().getProperty(VitroVocabulary.IND_MAIN_IMAGE));
-			if (value.isResource()) {
+			if (value != null && value.isResource()) {
 				Resource valueRes = (Resource) value;
 				String resUri = valueRes.getURI();
 				if (resUri != null) {
