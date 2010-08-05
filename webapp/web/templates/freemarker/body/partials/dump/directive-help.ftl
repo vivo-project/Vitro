@@ -5,8 +5,8 @@
 <div class="dump directive">
     <p><strong>Directive name:</strong> ${name}</p> 
     
-    <#if usage??>
-        <p><strong>Usage:</strong> ${usage}</p>
+    <#if effect??>
+        <p><strong>Effect:</strong> ${effect}</p>
         
         <#if comments??>
             <p><strong>Comments:</strong> ${comments}</p>     

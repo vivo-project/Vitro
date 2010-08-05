@@ -25,9 +25,9 @@ import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
 import freemarker.template.utility.DeepUnwrap;
 
-public class DumpDataModelDirective extends BaseTemplateDirectiveModel {
+public class DumpAllDirective extends BaseTemplateDirectiveModel {
 
-    private static final Log log = LogFactory.getLog(DumpDataModelDirective.class);
+    private static final Log log = LogFactory.getLog(DumpAllDirective.class);
     
     @SuppressWarnings({ "unchecked" })
     @Override
@@ -36,15 +36,15 @@ public class DumpDataModelDirective extends BaseTemplateDirectiveModel {
 
         if (params.size() != 0) {
             throw new TemplateModelException(
-                "The dumpDataModel directive doesn't allow parameters.");
+                "The dumpAll directive doesn't allow parameters.");
         }       
         if (loopVars.length != 0) {
             throw new TemplateModelException(
-                "The dumpDataModel directive doesn't allow loop variables.");
+                "The dumpAll directive doesn't allow loop variables.");
         }
         if (body != null) {
             throw new TemplateModelException(
-                "The dumpDataModel directive doesn't allow nested content.");
+                "The dumpAll directive doesn't allow nested content.");
         }
 
         Configuration config = env.getConfiguration();
@@ -69,7 +69,7 @@ public class DumpDataModelDirective extends BaseTemplateDirectiveModel {
             }
         }
 
-        String templateName = "dump-datamodel.ftl";
+        String templateName = "dump-all.ftl";
         
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("models", models);
@@ -96,7 +96,7 @@ public class DumpDataModelDirective extends BaseTemplateDirectiveModel {
         String name = getDirectiveName();
         map.put("name", name);
         
-        map.put("usage", "Dump the contents of the template data model.");
+        map.put("effect", "Dump the contents of the template data model.");
 
         map.put("comments", "Sequences (lists and arrays) are enclosed in square brackets. Hashes are enclosed in curly braces.");
         

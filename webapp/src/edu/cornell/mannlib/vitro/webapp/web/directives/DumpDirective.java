@@ -128,7 +128,7 @@ public class DumpDirective extends BaseTemplateDirectiveModel {
         String name = getDirectiveName();
         map.put("name", name);
         
-        map.put("usage", "Dump the contents of a template variable.");
+        map.put("effect", "Dump the contents of a template variable.");
         
         map.put("comments", "Sequences (lists and arrays) are enclosed in square brackets. Hashes are enclosed in curly braces.");
         
