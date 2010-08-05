@@ -285,6 +285,11 @@ public class FileStorageImpl implements FileStorage {
 
 	/**
 	 * {@inheritDoc}
+	 * 
+	 * <p>
+	 * If deleting this file leaves its parent directory empty, that directory
+	 * will be deleted. This repeats, up to (but not including) the root
+	 * directory.
 	 */
 	@Override
 	public boolean deleteFile(String id) throws IOException {
@@ -302,7 +307,52 @@ public class FileStorageImpl implements FileStorage {
 					+ "', file location '" + file + "'");
 		}
 
+		deleteEmptyParents(file);
+
 		return true;
+	}
+
+	/**
+	 * We have deleted this file. If the parent directory is now empty, delete
+	 * it. Then check its parent in turn. This continues until we find a parent
+	 * that we will not delete, either because it is not empty, or because it is
+	 * the file storage root.
+	 */
+	private void deleteEmptyParents(File file) {
+		File parent = file.getParentFile();
+		if (parent == null) {
+			log.warn("This is crazy. How can file '" + file.getAbsolutePath()
+					+ "' have no parent?");
+			return;
+		}
+
+		if (parent.equals(rootDir)) {
+			log.trace("Not deleting the root directory.");
+			return;
+		}
+
+		File[] children = parent.listFiles();
+		if (children == null) {
+			log.warn("This is crazy. How can file '" + parent.getAbsolutePath()
+					+ "' not be a directory?");
+			return;
+		}
+
+		if (children.length > 0) {
+			log.trace("Directory '" + parent.getAbsolutePath()
+					+ "' is not empty. Not deleting.");
+			return;
+		}
+
+		log.trace("Deleting empty directory '" + parent.getAbsolutePath() + "'");
+		parent.delete();
+		if (parent.exists()) {
+			log.warn("Failed to delete directory '" + parent.getAbsolutePath()
+					+ "'");
+			return;
+		}
+
+		deleteEmptyParents(parent);
 	}
 
 	/**
