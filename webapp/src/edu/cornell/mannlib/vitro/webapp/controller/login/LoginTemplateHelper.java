@@ -183,16 +183,14 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 	/** What's the URL for this servlet? */
 	private String getAuthenticateUrl(HttpServletRequest request) {
 		String contextPath = request.getContextPath();
-		String urlParams = "?home=" + getPortalIdString(request)
-				+ "&login=block";
+		String urlParams = "?login=block";
 		return contextPath + "/authenticate" + urlParams;
 	}
 
 	/** What's the URL for this servlet, with the cancel parameter added? */
 	private String getCancelUrl(HttpServletRequest request) {
 		String contextPath = request.getContextPath();
-		String urlParams = "?home=" + getPortalIdString(request)
-		+ "&login=block&cancel=true";
+		String urlParams = "?login=block&cancel=true";
 		return contextPath + "/authenticate" + urlParams;
 	}
 	

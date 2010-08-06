@@ -71,18 +71,20 @@ public class TabEntityFactoryAutoJena extends TabEntityFactoryJena implements Ta
                     Statement linkedToTab = (Statement)classIt.next();
                     OntClass linkedClass = getOntModel().getOntClass( linkedToTab.getSubject().getURI() );
 
-                    ClosableIterator entIt = getOntModel().listStatements(null, RDF.type, linkedClass);
-                    try{
-                        while(entIt.hasNext()){
-                            Statement entIsOfClass = (Statement)entIt.next();
-                            if( entIsOfClass.getSubject().canAs(com.hp.hpl.jena.ontology.Individual.class) ) {
-                            	com.hp.hpl.jena.ontology.Individual ind = (com.hp.hpl.jena.ontology.Individual) entIsOfClass.getSubject().as(com.hp.hpl.jena.ontology.Individual.class);
-                                Individual ent = new IndividualJena(ind, (WebappDaoFactoryJena)webappDaoFactory);
-                                ents.add(ent);
-                            }
-                        }
-                    }finally{
-                        entIt.close();
+                    if (linkedClass != null) {
+	                    ClosableIterator entIt = getOntModel().listStatements(null, RDF.type, linkedClass);
+	                    try{
+	                        while(entIt.hasNext()){
+	                            Statement entIsOfClass = (Statement)entIt.next();
+	                            if( entIsOfClass.getSubject().canAs(com.hp.hpl.jena.ontology.Individual.class) ) {
+	                            	com.hp.hpl.jena.ontology.Individual ind = (com.hp.hpl.jena.ontology.Individual) entIsOfClass.getSubject().as(com.hp.hpl.jena.ontology.Individual.class);
+	                                Individual ent = new IndividualJena(ind, (WebappDaoFactoryJena)webappDaoFactory);
+	                                ents.add(ent);
+	                            }
+	                        }
+	                    }finally{
+	                        entIt.close();
+	                    }
                     }
                 }
             }finally{
