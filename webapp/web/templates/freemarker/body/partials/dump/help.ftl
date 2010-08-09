@@ -2,9 +2,10 @@
 
 <#-- Template for displaying directive help -->
 
-
-<h3>Template directive help</h3>
-    
-${help}
+<div class="dump help">
+    <h3>Template directive help</h3>
+        
+    ${help}
+</div>
 
 ${stylesheets.add("/css/dump.css")}

@@ -51,7 +51,6 @@
 <@dump var="urls" />
 <@dump var="fruit" />
 <@dump var="trueStatement" />
-<@dump var="falseStatement" /> 
 <@dump var="zoo1" />
 
 
@@ -65,3 +64,4 @@ ${scripts.add("/js/script1.js", "/js/script2.js", "/js/script3.js")}
 <@help directive="dump" />
 
 <@describe var="stylesheets" />
+

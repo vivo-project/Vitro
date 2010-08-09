@@ -2,8 +2,10 @@
 
 <#-- Template for dump directive -->
 
-<h3>Template variable dump</h3>
+<div class="dump">
+    <h3>Template variable dump</h3>
     
-${var}
+    ${var}
+</div>
 
 ${stylesheets.add("/css/dump.css")}

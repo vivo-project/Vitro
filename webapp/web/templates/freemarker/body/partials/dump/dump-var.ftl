@@ -2,7 +2,7 @@
 
 <#-- Template for dumping a template variable -->
  
-<div class="dump"> 
+<div class="var"> 
 
     <h6>Variable name: <em>${var}</em></h6>
     <strong>Type:</strong> ${type}<br />

@@ -2,7 +2,7 @@
 
 <#-- Template for displaying directive help -->
 
-<div class="dump directive">
+<div class="directive">
     <p><strong>Directive name:</strong> ${name}</p> 
     
     <#if effect??>

@@ -3,7 +3,7 @@
 /* Styles for Freemarker template variable dump */
 
 .dump {
-    border-top: 1px solid #ccc;
+    border-top: 3px solid #ccc;
     border-bottom: 3px solid #ccc;
     padding: 1em 0;
     margin: 1em 0;
@@ -15,4 +15,10 @@
 
 .dump.directive h6 {
     margin-top: 1em;
+}
+
+.dump.datamodel .var, .dump.datamodel .directive {
+    border-bottom: 1px solid #ccc; 
+    padding: 1em 0;
+    margin: 1em 0;   
 }
