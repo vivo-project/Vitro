@@ -59,7 +59,7 @@ public class DumpHelper {
         }
 
         // This case must precede the TemplateScalarModel case, because
-        // tm is an instance of StringModel.
+        // tm is an instance of StringModel and thus a TemplateScalarModel.
         if (unwrappedModel instanceof BaseTemplateModel) {
             type = unwrappedModel.getClass().getName(); 
             value = ((BaseTemplateModel)unwrappedModel).dump();

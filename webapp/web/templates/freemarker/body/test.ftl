@@ -63,3 +63,5 @@ ${scripts.add("/js/script1.js", "/js/script2.js", "/js/script3.js")}
 <@dumpAll />
 
 <@help directive="dump" />
+
+<@describe var="stylesheets" />

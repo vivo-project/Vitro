@@ -2,16 +2,13 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.directives;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHelper;
-import edu.cornell.mannlib.vitro.webapp.web.directives.dump.DumpDirective;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateDirectiveModel;
 

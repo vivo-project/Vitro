@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.web.directives.dump;
 
 import java.io.IOException;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,13 +12,10 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHelper;
 import edu.cornell.mannlib.vitro.webapp.web.directives.BaseTemplateDirectiveModel;
-
 import freemarker.core.Environment;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateDirectiveBody;
-import freemarker.template.TemplateDirectiveModel;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateHashModel;
 import freemarker.template.TemplateModel;
