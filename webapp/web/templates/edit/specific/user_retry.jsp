@@ -43,7 +43,8 @@
           <tr class="editformcell">
               <td valign="bottom" colspan="2">
                       <b>Confirm password</b><br/>
-                      <input type="password" name="passwordConfirmation" value="" size="64" maxlength="128"/>
+                      <input type="password" name="passwordConfirmation" value="${formValue['passwordConfirmation']}" size="64" maxlength="128"/>
+                      <span class="warning"><form:error name="passwordConfirmation"/></span>
               </td>
           </tr>
         </c:if>
