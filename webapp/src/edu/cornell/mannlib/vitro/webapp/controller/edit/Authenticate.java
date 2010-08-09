@@ -536,11 +536,15 @@ public class Authenticate extends FreemarkerHttpServlet {
 		return bean;
 	}
 
+	// ----------------------------------------------------------------------
+	// Public utility methods.
+	// ----------------------------------------------------------------------
+
 	/**
 	 * Encode this password for storage in the database. Apply an MD5 encoding,
 	 * and store the result as a string of hex digits.
 	 */
-	private String applyMd5Encoding(String password) {
+	public static String applyMd5Encoding(String password) {
 		try {
 			MessageDigest md = MessageDigest.getInstance("MD5");
 			byte[] digest = md.digest(password.getBytes());
@@ -551,11 +555,7 @@ public class Authenticate extends FreemarkerHttpServlet {
 			throw new RuntimeException(e);
 		}
 	}
-
-	// ----------------------------------------------------------------------
-	// Public utility methods.
-	// ----------------------------------------------------------------------
-
+	
 	/**
 	 * The servlet context should contain a map from User URIs to
 	 * {@link HttpSession}s. Get a reference to it, creating it if necessary.
