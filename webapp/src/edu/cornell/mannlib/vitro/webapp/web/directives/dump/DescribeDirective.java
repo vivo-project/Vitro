@@ -116,11 +116,12 @@ public class DescribeDirective extends BaseTemplateDirectiveModel {
     }
     
     private List<Method> getPublicMethods(Class<?> cls) {
+        List<Method> methods = new ArrayList<Method>();
 
-        List<Method> methods = getDeclaredPublicMethods(cls);
-        // Don't get methods for classes higher in the class hierarchy than BaseTemplateModel.
+        // Go up the class hierarchy only until we get to the immediate subclass of BaseTemplateModel
         if (! cls.getName().equals("edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel")) {
-            methods.addAll(getPublicMethods(cls.getSuperclass()));            
+            methods = getDeclaredPublicMethods(cls);
+            methods.addAll(getPublicMethods(cls.getSuperclass()));
         }
         
         return methods;
