@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,8 +23,10 @@ import edu.cornell.mannlib.vedit.beans.Option;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vedit.forwarder.PageForwarder;
 import edu.cornell.mannlib.vedit.forwarder.impl.UrlForwarder;
+import edu.cornell.mannlib.vedit.listener.EditPreProcessor;
 import edu.cornell.mannlib.vedit.util.FormUtils;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.JenaNetidPolicy.ContextSetup;
+import edu.cornell.mannlib.vedit.validator.ValidationObject;
+import edu.cornell.mannlib.vedit.validator.Validator;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.setup.SelfEditingPolicySetup;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
@@ -89,7 +92,16 @@ public class UserRetryController extends BaseEditController {
         populateBeanFromParams(userForEditing, vreq);
 
         //validators
+        Validator v = new PairedPasswordValidator();
+        HashMap<String, List<Validator>> validatorMap = new HashMap<String, List<Validator>>();
+        List<Validator> vList = Collections.singletonList(v);
+		validatorMap.put("Md5password", vList);
+		validatorMap.put("passwordConfirmation", vList);
+        epo.setValidatorMap(validatorMap);
 
+        //preprocessors
+        epo.setPreProcessorList(Collections.singletonList(new UserPasswordPreProcessor()));
+        
         //set up any listeners
 
         //set portal flag to current portal
@@ -160,7 +172,7 @@ public class UserRetryController extends BaseEditController {
         request.setAttribute("user",userForEditing);
         request.setAttribute("bodyJsp","/templates/edit/formBasic.jsp");
         if (userForEditing.getMd5password()==null || userForEditing.getMd5password().equals("")) {
-            request.setAttribute("formOnSubmit", "return hashPw(this);");
+            request.setAttribute("formOnSubmit", "return validatePw(this);");
             request.setAttribute("formOnCancel", "forceCancel(this.form);");
         }
         request.setAttribute("formJsp","/templates/edit/specific/user_retry.jsp");
@@ -206,5 +218,85 @@ public class UserRetryController extends BaseEditController {
             }
         }
     }
+
+    /**
+     * Create one of these and assign it to both password fields.
+     */
+    class PairedPasswordValidator implements Validator {
+    	private String otherValue;
+    	
+		/**
+		 * Validate the length of this password, and stash it for the other
+		 * validator to compare to.
+		 * 
+		 * This relies on the fact that {@link #validate(Object)} will be called
+		 * once for each of the password fields.
+		 */
+		@Override
+		public ValidationObject validate(Object value)
+				throws IllegalArgumentException {
+			log.trace("validate password pair: " + value + ", " + otherValue);
+
+			// Must be a non-null String
+			if (!(value instanceof String)) {
+				log.trace("not a string: " + value);
+				return ValidationObject.failure(value, "Please enter a value");
+			}
+
+			// Must be within the length limits.
+			String string = (String) value;
+			if ((string.length() < User.MIN_PASSWORD_LENGTH)
+					|| (string.length() > User.MAX_PASSWORD_LENGTH)) {
+				log.trace("bad length: " + value);
+				return ValidationObject.failure(value,
+						"Please enter a password between "
+								+ User.MIN_PASSWORD_LENGTH + " and "
+								+ User.MAX_PASSWORD_LENGTH
+								+ " characters long.");
+			}
+
+			// If we haven't validate the other yet, just store this value.
+			if (otherValue == null) {
+				log.trace("first of the pair: " + value);
+				otherValue = string;
+				return ValidationObject.success(value);
+			}
+
+			// Compare this value to the stored one.
+			String otherString = otherValue;
+			otherValue = null;
+			if (string.equals(otherString)) {
+				log.trace("values are equal: " + value);
+				return ValidationObject.success(value);
+			} else {
+				log.trace("values are not equal: " + value + ", " + otherValue);
+				return ValidationObject.failure(value,
+						"The passwords do not match.");
+			}
+		}
+    }
+    
+	/**
+	 * The "Md5password" field from the form is actually in clear text. Pull the
+	 * raw version from the {@link User} and replce it with an encoded one.
+	 */
+	class UserPasswordPreProcessor implements EditPreProcessor {
+		@Override
+		public void process(Object o, EditProcessObject epo) {
+			if (!(o instanceof User)) {
+				log.error("Can't apply password encoding without a User object: "
+						+ o);
+				return;
+			}
+			User user = (User) o;
+			String rawPassword = user.getMd5password();
+
+			String encodedPassword = Authenticate.applyMd5Encoding(rawPassword);
+
+			log.trace("Raw password '" + rawPassword + "', encoded '"
+					+ encodedPassword + "'");
+			user.setMd5password(encodedPassword);
+		}
+	}
 
 }
