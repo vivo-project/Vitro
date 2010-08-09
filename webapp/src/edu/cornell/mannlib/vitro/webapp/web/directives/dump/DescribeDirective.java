@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +14,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 import edu.cornell.mannlib.vitro.webapp.web.directives.BaseTemplateDirectiveModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 import freemarker.core.Environment;
@@ -78,6 +79,7 @@ public class DescribeDirective extends BaseTemplateDirectiveModel {
         for (Method m : methods) {
             methodDescriptions.add(getMethodDescription(m));
         }
+        Collections.sort(methodDescriptions);
         
         Map<String, Object> map = new HashMap<String, Object>(); 
         map.put("var", varName);
@@ -118,7 +120,7 @@ public class DescribeDirective extends BaseTemplateDirectiveModel {
     private List<Method> getPublicMethods(Class<?> cls) {
         List<Method> methods = new ArrayList<Method>();
 
-        // Go up the class hierarchy only until we get to the immediate subclass of BaseTemplateModel
+        // Go up the class hierarchy only as far as the immediate subclass of BaseTemplateModel
         if (! cls.getName().equals("edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel")) {
             methods = getDeclaredPublicMethods(cls);
             methods.addAll(getPublicMethods(cls.getSuperclass()));
@@ -142,7 +144,28 @@ public class DescribeDirective extends BaseTemplateDirectiveModel {
    
     
     private String getMethodDescription(Method method) {
-        return method.toString();
+        
+        String methodName = method.getName();
+        methodName = methodName.replaceAll("^(get|is)", "");
+        methodName = methodName.substring(0, 1).toLowerCase() + methodName.substring(1);
+
+        Class<?>[] paramTypes = method.getParameterTypes();
+        String paramList = "";
+        if (paramTypes.length > 0) {
+            List<String> paramTypeList = new ArrayList<String>(paramTypes.length);
+            for (Class<?> cls : paramTypes) {
+                String name = cls.getName();
+                String[] nameParts = name.split("\\.");
+                String typeName = nameParts[nameParts.length-1];
+                typeName = typeName.replaceAll(";", "s");
+                typeName = typeName.substring(0,1).toLowerCase() + typeName.substring(1);
+                paramTypeList.add(typeName);
+            }
+            paramList = "(" + StringUtils.join(paramTypeList) + ")";
+        }
+        
+        return methodName + paramList;
+
     }
 
 }

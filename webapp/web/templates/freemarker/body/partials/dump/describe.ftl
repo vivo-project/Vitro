@@ -2,9 +2,9 @@
 
 <#-- Template for displaying directive describe -->
 
-<h3>Methods available to variable <em>${var}</em></h3>
-    
 <div class="dump">
+    <h3>Methods available to variable <em>${var}</em></h3>
+
     <#list methods as method>
         ${method}<br />
     </#list>
