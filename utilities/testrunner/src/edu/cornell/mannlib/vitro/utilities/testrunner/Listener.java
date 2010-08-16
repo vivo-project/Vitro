@@ -25,7 +25,7 @@ public class Listener {
 	private final Writer writer;
 
 	// ----------------------------------------------------------------------
-	// Listener methods
+	// Constructors
 	// ----------------------------------------------------------------------
 
 	public Listener(PrintStream out) {
@@ -39,6 +39,14 @@ public class Listener {
 	// ----------------------------------------------------------------------
 	// Listener methods
 	// ----------------------------------------------------------------------
+
+	public void suiteIgnored(File suite) {
+		log("Suite '" + suite.getName() + "' ignored.");
+	}
+
+	public void suiteAdded(File suite) {
+		log("Suite '" + suite.getName() + "' added.");
+	}
 
 	public void runStarted() {
 		log("Run started.");
@@ -56,7 +64,7 @@ public class Listener {
 	public void runStopped() {
 		log("Run stopped.");
 	}
-	
+
 	public void cleanOutputStart(File outputDirectory) {
 		log("Output area cleaning started: " + outputDirectory.getPath());
 	}

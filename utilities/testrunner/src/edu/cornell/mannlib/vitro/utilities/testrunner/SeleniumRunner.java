@@ -52,6 +52,17 @@ public class SeleniumRunner {
 				}
 				listener.suiteStopped(suiteDir);
 			}
+
+			// If we've been starting and stopping Tomcat,
+			// stop it one more time.
+			if (parms.isCleanModel()) {
+				try {
+					modelCleaner.stopTheWebapp();
+				} catch (CommandRunnerException e) {
+					throw new FatalException(e);
+				}
+			}
+
 			listener.runEndTime();
 			Status status = outputManager.summarizeOutput();
 			success = (status == Status.OK);
@@ -69,9 +80,19 @@ public class SeleniumRunner {
 	}
 
 	private static void selectAllSuites(SeleniumRunnerParameters parms) {
+		Listener listener = parms.getListener();
+		IgnoredTests ignored = parms.getIgnoredTests();
 		List<File> suites = new ArrayList<File>();
 		for (File parentDir : parms.getSuiteParentDirectories()) {
-			suites.addAll(parms.findSuiteDirs(parentDir));
+			for (File suite : parms.findSuiteDirs(parentDir)) {
+				String suiteName = suite.getName();
+				if (ignored.isIgnored(suiteName)) {
+					listener.suiteIgnored(suite);
+				} else {
+					listener.suiteAdded(suite);
+					suites.add(suite);
+				}
+			}
 		}
 		parms.setSelectedSuites(suites);
 	}
@@ -126,7 +147,7 @@ public class SeleniumRunner {
 			SeleniumRunner runner = new SeleniumRunner(parms);
 			success = runner.runSelectedSuites();
 		}
-
+		System.out.println("Exiting SeleniumRunner");
 		System.exit(success ? 0 : -1);
 	}
 

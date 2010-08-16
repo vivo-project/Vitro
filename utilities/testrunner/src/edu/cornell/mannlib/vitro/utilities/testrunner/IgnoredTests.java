@@ -32,6 +32,10 @@ public class IgnoredTests {
 	 * name, a comma (with optional space), the test name (with optional space)
 	 * and optionally a comment, starting with a '#'.
 	 * </p>
+	 * If the test name is an asterisk '*', then the entire suite will be
+	 * ignored.
+	 * <p>
+	 * </p>
 	 */
 	public IgnoredTests(File file) {
 		this.file = file;
@@ -77,11 +81,30 @@ public class IgnoredTests {
 	}
 
 	/**
+	 * Package access -- only used in unit tests.
+	 */
+	List<IgnoredTestInfo> getList() {
+		return new ArrayList<IgnoredTestInfo>(tests);
+	}
+
+	/**
 	 * Is this test ignored or not?
 	 */
 	public boolean isIgnored(String suiteName, String testName) {
 		for (IgnoredTestInfo test : tests) {
 			if (test.matches(suiteName, testName)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Is this entire suite ignored?
+	 */
+	public boolean isIgnored(String suiteName) {
+		for (IgnoredTestInfo test : tests) {
+			if (test.matchesEntireSuite(suiteName)) {
 				return true;
 			}
 		}
@@ -101,6 +124,19 @@ public class IgnoredTests {
 		return "";
 	}
 
+	/**
+	 * If this suite is ignored, what is the reason? If not, return an empty
+	 * string.
+	 */
+	public String getReasonForIgnoring(String suiteName) {
+		for (IgnoredTestInfo test : tests) {
+			if (test.matchesEntireSuite(suiteName)) {
+				return test.comment;
+			}
+		}
+		return "";
+	}
+
 	public String toString() {
 		String s = "  ignored tests from " + file.getPath() + "\n";
 		for (IgnoredTestInfo test : tests) {
@@ -109,7 +145,10 @@ public class IgnoredTests {
 		return s;
 	}
 
-	private static class IgnoredTestInfo {
+	/**
+	 * Package access so it can be used in unit tests.
+	 */
+	static class IgnoredTestInfo {
 		final String suiteName;
 		final String testName;
 		final String comment;
@@ -122,7 +161,42 @@ public class IgnoredTests {
 
 		public boolean matches(String suiteName, String testName) {
 			return this.suiteName.equals(suiteName)
-					&& this.testName.equals(testName);
+					&& (this.testName.equals(testName) || this.testName
+							.equals("*"));
+		}
+
+		public boolean matchesEntireSuite(String suiteName) {
+			return this.suiteName.equals(suiteName)
+					&& this.testName.equals("*");
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (obj == this) {
+				return true;
+			}
+			if (obj == null) {
+				return false;
+			}
+			if (!obj.getClass().equals(this.getClass())) {
+				return false;
+			}
+			IgnoredTestInfo that = (IgnoredTestInfo) obj;
+			return this.suiteName.equals(that.suiteName)
+					&& this.testName.equals(that.testName)
+					&& this.comment.equals(that.comment);
+		}
+
+		@Override
+		public int hashCode() {
+			return suiteName.hashCode() ^ testName.hashCode()
+					^ comment.hashCode();
+		}
+
+		@Override
+		public String toString() {
+			return "IgnoredTestInfo['" + suiteName + "', '" + testName + "', '"
+					+ comment + "']";
 		}
 
 	}

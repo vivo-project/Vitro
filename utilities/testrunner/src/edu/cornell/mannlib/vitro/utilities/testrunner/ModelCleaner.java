@@ -51,7 +51,7 @@ public class ModelCleaner {
 	/**
 	 * Stop Tomcat and wait the prescribed number of seconds for it to clean up.
 	 */
-	private void stopTheWebapp() throws CommandRunnerException {
+	public void stopTheWebapp() throws CommandRunnerException {
 		String tomcatStopCommand = properties.getTomcatStopCommand();
 		int tomcatStopDelay = properties.getTomcatStopDelay();
 
