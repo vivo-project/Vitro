@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.utilities.testrunner;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.text.SimpleDateFormat;
@@ -76,13 +77,20 @@ public class OutputSummaryFormatter {
 	 * Copy the CSS file into the output directory.
 	 */
 	private void copyCssFile() {
-		File cssSource = parms.getSummaryCssFile();
-		File cssTarget = new File(parms.getOutputDirectory(),
+		InputStream cssStream = this.getClass().getResourceAsStream(
 				SUMMARY_CSS_FILENAME);
-		try {
-			FileHelper.copy(cssSource, cssTarget);
-		} catch (IOException e) {
-			e.printStackTrace();
+		if (cssStream == null) {
+			System.out.println("Couldn't find the CSS file: '"
+					+ SUMMARY_CSS_FILENAME + "'");
+		} else {
+			File cssTarget = new File(parms.getOutputDirectory(),
+					SUMMARY_CSS_FILENAME);
+			try {
+				FileHelper.copy(cssStream, cssTarget);
+				cssStream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -200,8 +208,7 @@ public class OutputSummaryFormatter {
 		writer.println("  <table cellspacing=\"0\">");
 
 		if ((!log.hasErrors()) && (!log.hasWarnings())) {
-			writer
-					.println("      <tr><td colspan=\"2\">No errors or warnings</td></tr>");
+			writer.println("      <tr><td colspan=\"2\">No errors or warnings</td></tr>");
 		} else {
 			for (String e : log.getErrors()) {
 				writer.println("      <tr class=\"" + errorClass

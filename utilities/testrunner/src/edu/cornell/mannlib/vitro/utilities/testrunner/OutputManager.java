@@ -59,7 +59,7 @@ public class OutputManager {
 	 */
 	public Status summarizeOutput() {
 		LogStats log = LogStats.parse(parms.getLogFile());
-		
+
 		List<SuiteStats> suites = new ArrayList<SuiteStats>();
 		for (File outputFile : parms.getOutputDirectory().listFiles(
 				new HtmlFileFilter())) {
@@ -68,7 +68,7 @@ public class OutputManager {
 				suites.add(suite);
 			}
 		}
-		
+
 		OutputSummaryFormatter formatter = new OutputSummaryFormatter(parms);
 		formatter.format(log, suites);
 		return formatter.figureOverallStatus(log, suites);

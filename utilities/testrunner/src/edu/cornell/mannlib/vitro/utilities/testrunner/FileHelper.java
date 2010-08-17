@@ -97,17 +97,11 @@ public class FileHelper {
 	 */
 	public static void copy(File source, File target) throws IOException {
 		InputStream input = null;
-		OutputStream output = null;
 
 		try {
 			input = new FileInputStream(source);
-			output = new FileOutputStream(target);
-			int howMany;
-			byte[] buffer = new byte[4096];
-			while (-1 != (howMany = input.read(buffer))) {
-				output.write(buffer, 0, howMany);
-			}
-		}finally {
+			copy(input, target);
+		} finally {
 			if (input != null) {
 				try {
 					input.close();
@@ -115,6 +109,24 @@ public class FileHelper {
 					e1.printStackTrace();
 				}
 			}
+		}
+	}
+
+	/**
+	 * Copy the contents of an InputStream to a file. If the target file already
+	 * exists, it will be over-written. Doesn't close the input stream.
+	 */
+	public static void copy(InputStream input, File target) throws IOException {
+		OutputStream output = null;
+
+		try {
+			output = new FileOutputStream(target);
+			int howMany;
+			byte[] buffer = new byte[4096];
+			while (-1 != (howMany = input.read(buffer))) {
+				output.write(buffer, 0, howMany);
+			}
+		} finally {
 			if (output != null) {
 				try {
 					output.close();

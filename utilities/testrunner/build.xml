@@ -117,7 +117,10 @@ run      - Run the tester.
 		      fork="yes"
 		      dir="${acceptance.dir}"
 		      failonerror="true">
-			<classpath location="${build.dir}" />
+			<classpath >
+				<pathelement location="${build.dir}"/>
+				<pathelement location="${source.dir}"/>
+			</classpath>
 			<arg file="${acceptance.properties.file}" />
 			<arg value="${acceptance.interactive.arg}" />
 		</java>

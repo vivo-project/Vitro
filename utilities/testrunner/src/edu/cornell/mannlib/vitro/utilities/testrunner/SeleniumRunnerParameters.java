@@ -44,7 +44,6 @@ public class SeleniumRunnerParameters {
 	private final Collection<File> suiteParentDirectories;
 	private final ModelCleanerProperties modelCleanerProperties;
 	private final IgnoredTests ignoredTests;
-	private final File summaryCssFile;
 
 	private Collection<File> selectedSuites = Collections.emptySet();
 	private boolean cleanModel = true;
@@ -69,8 +68,6 @@ public class SeleniumRunnerParameters {
 		this.seleniumJarPath = checkReadableFile(props, PROP_SELENIUM_JAR_PATH);
 		this.uploadDirectory = checkReadWriteDirectory(props,
 				PROP_UPLOAD_DIRECTORY);
-
-		this.summaryCssFile = checkSummaryCssFile(props);
 
 		this.outputDirectory = checkOutputDirectory(props);
 		this.logFile = new File(this.outputDirectory, LOGFILE_NAME);
@@ -114,16 +111,6 @@ public class SeleniumRunnerParameters {
 				}
 			}
 		}
-	}
-
-	/**
-	 * The CSS file must be specified, must exist, and must be readable.
-	 */
-	private File checkSummaryCssFile(Properties props) {
-		String summaryCssPath = getRequiredProperty(props, PROP_SUMMARY_CSS);
-		File cssFile = new File(summaryCssPath);
-		FileHelper.checkReadableFile(cssFile, "File '" + summaryCssPath + "'");
-		return cssFile;
 	}
 
 	/**
@@ -359,10 +346,6 @@ public class SeleniumRunnerParameters {
 
 	public File getLogFile() {
 		return logFile;
-	}
-
-	public File getSummaryCssFile() {
-		return summaryCssFile;
 	}
 
 	public Collection<File> getSuiteParentDirectories() {
