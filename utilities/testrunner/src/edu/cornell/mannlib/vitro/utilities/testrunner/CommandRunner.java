@@ -28,7 +28,7 @@ import java.util.Map;
  */
 public class CommandRunner {
 
-	private int returnCode;
+	private Integer returnCode;
 	private String stdOut = "";
 	private String stdErr = "";
 	private File workingDirectory;
@@ -121,10 +121,8 @@ public class CommandRunner {
 			}
 
 			Process process = builder.start();
-			StreamEater outputEater = new StreamEater(process.getInputStream(),
-					false);
-			StreamEater errorEater = new StreamEater(process.getErrorStream(),
-					true);
+			new StreamEater(process.getInputStream(), false);
+			new StreamEater(process.getErrorStream(), true);
 
 		} catch (IOException e) {
 			throw new CommandRunnerException(
@@ -133,6 +131,9 @@ public class CommandRunner {
 	}
 
 	public int getReturnCode() {
+		if (returnCode == null) {
+			throw new IllegalStateException("Return code is not available.");
+		}
 		return returnCode;
 	}
 
