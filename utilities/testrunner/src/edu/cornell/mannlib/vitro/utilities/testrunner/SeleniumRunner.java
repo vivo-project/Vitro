@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.cornell.mannlib.vitro.utilities.testrunner.listener.Listener;
+import edu.cornell.mannlib.vitro.utilities.testrunner.output.OutputManager;
 
 /**
  * Run the Selenium test suites. Provide the properties file and perhaps an

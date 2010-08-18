@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.utilities.testrunner;
+package edu.cornell.mannlib.vitro.utilities.testrunner.output;
 
 import java.io.File;
 import java.io.FileReader;
@@ -13,6 +13,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import edu.cornell.mannlib.vitro.utilities.testrunner.FileHelper;
+import edu.cornell.mannlib.vitro.utilities.testrunner.LogStats;
+import edu.cornell.mannlib.vitro.utilities.testrunner.SeleniumRunnerParameters;
+import edu.cornell.mannlib.vitro.utilities.testrunner.Status;
+import edu.cornell.mannlib.vitro.utilities.testrunner.SuiteStats;
 import edu.cornell.mannlib.vitro.utilities.testrunner.SuiteStats.TestInfo;
 
 /**
@@ -27,6 +32,7 @@ public class OutputSummaryFormatter {
 
 	private LogStats log;
 	private List<SuiteStats> suites;
+	private OutputDataModel dataModel;
 	private Status runStatus;
 	private List<TestInfo> allTests = new ArrayList<TestInfo>();
 	private int passingTestCount;
@@ -41,9 +47,11 @@ public class OutputSummaryFormatter {
 	 * Create a summary HTML file from the info contained in this log file and
 	 * these suite outputs.
 	 */
-	public void format(LogStats log, List<SuiteStats> suites) {
+	public void format(LogStats log, List<SuiteStats> suites,
+			OutputDataModel dataModel) {
 		this.log = log;
 		this.suites = suites;
+		this.dataModel = dataModel;
 		this.runStatus = figureOverallStatus(log, suites);
 		tallyTests();
 
@@ -134,7 +142,7 @@ public class OutputSummaryFormatter {
 	}
 
 	private void writeHeader(PrintWriter writer) {
-		String startString = formatDateTime(log.getStartTime());
+		String startString = formatDateTime(dataModel.getStartTime());
 
 		writer.println("<html>");
 		writer.println("<head>");
@@ -159,9 +167,9 @@ public class OutputSummaryFormatter {
 		String ignoreClass = this.ignoredTests.isEmpty() ? "" : Status.WARN
 				.getHtmlClass();
 
-		String start = formatDateTime(log.getStartTime());
-		String end = formatDateTime(log.getEndTime());
-		String elapsed = formatElapsedTime(log.getElapsedTime());
+		String start = formatDateTime(dataModel.getStartTime());
+		String end = formatDateTime(dataModel.getEndTime());
+		String elapsed = formatElapsedTime(dataModel.getElapsedTime());
 
 		writer.println("  <div class=\"section\">Summary</div>");
 		writer.println();
@@ -338,6 +346,10 @@ public class OutputSummaryFormatter {
 	}
 
 	private String formatElapsedTime(long elapsed) {
+		if (elapsed == 0) {
+			return "---";
+		}
+
 		long elapsedSeconds = elapsed / 1000L;
 		long seconds = elapsedSeconds % 60L;
 		long elapsedMinutes = elapsedSeconds / 60L;
@@ -357,6 +369,10 @@ public class OutputSummaryFormatter {
 	}
 
 	private String formatDateTime(long dateTime) {
+		if (dateTime == 0) {
+			return "---";
+		}
+
 		return dateFormat.format(new Date(dateTime));
 	}
 
