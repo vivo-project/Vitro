@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.cornell.mannlib.vitro.utilities.testrunner.listener.Listener;
+
 /**
  * Manages the contents of the output area. Removes old files prior to a run.
  * Creates a unified summary of the test suite outputs.

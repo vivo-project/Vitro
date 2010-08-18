@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.cornell.mannlib.vitro.utilities.testrunner.listener.Listener;
+
 /**
  * Run the Selenium test suites. Provide the properties file and perhaps an
  * "interactive" flag.

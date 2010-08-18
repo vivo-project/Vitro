@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.utilities.testrunner;
+package edu.cornell.mannlib.vitro.utilities.testrunner.listener;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -18,7 +18,7 @@ import java.util.List;
  * implementation, each event is simply formatted and written to a log file or
  * {@link PrintStream}.
  */
-public class Listener {
+public class LoggingListener implements Listener {
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(
 			"yyyy-MM-dd HH:mm:ss.SSS");
 
@@ -28,11 +28,11 @@ public class Listener {
 	// Constructors
 	// ----------------------------------------------------------------------
 
-	public Listener(PrintStream out) {
+	public LoggingListener(PrintStream out) {
 		this.writer = new OutputStreamWriter(out);
 	}
 
-	public Listener(File logFile) throws IOException {
+	public LoggingListener(File logFile) throws IOException {
 		this.writer = new FileWriter(logFile);
 	}
 
@@ -40,159 +40,197 @@ public class Listener {
 	// Listener methods
 	// ----------------------------------------------------------------------
 
+	@Override
 	public void suiteIgnored(File suite) {
 		log("Suite '" + suite.getName() + "' ignored.");
 	}
 
+	@Override
 	public void suiteAdded(File suite) {
 		log("Suite '" + suite.getName() + "' added.");
 	}
 
+	@Override
 	public void runStarted() {
 		log("Run started.");
 	}
 
+	@Override
 	public void runFailed(Exception e) {
 		log("Run failed - fatal error");
 		log(e);
 	}
 
+	@Override
 	public void runEndTime() {
 		log("Testing complete.");
 	}
 
+	@Override
 	public void runStopped() {
 		log("Run stopped.");
 	}
 
+	@Override
 	public void cleanOutputStart(File outputDirectory) {
 		log("Output area cleaning started: " + outputDirectory.getPath());
 	}
 
+	@Override
 	public void cleanOutputFailed(File outputDirectory, IOException e) {
 		log("Output area cleaning failed: " + outputDirectory.getPath());
 		log(e);
 	}
 
+	@Override
 	public void cleanOutputStop(File outputDirectory) {
 		log("Output area cleaning stopped: " + outputDirectory.getPath());
 	}
 
+	@Override
 	public void webappStopping(String tomcatStopCommand) {
 		log("Stopping tomcat: " + tomcatStopCommand);
 	}
 
+	@Override
 	public void webappStopFailed(int returnCode) {
 		log("Failed to stop tomcat; return code was " + returnCode);
 	}
 
+	@Override
 	public void webappWaitingForStop(int tomcatStopDelay) {
 		log("Waiting " + tomcatStopDelay + " seconds for tomcat to stop.");
 	}
 
+	@Override
 	public void webappStopped() {
 		log("Tomcat stopped.");
 	}
 
+	@Override
 	public void dropDatabaseStarting(String statement) {
 		log("Dropping database: " + statement);
 	}
 
+	@Override
 	public void dropDatabaseFailed(int returnCode) {
 		log("Failed to drop the database; return code was " + returnCode);
 	}
 
+	@Override
 	public void dropDatabaseComplete() {
 		log("Dropped database.");
 	}
 
+	@Override
 	public void loadDatabaseStarting(String statement) {
 		log("Loading the database: " + statement);
 	}
 
+	@Override
 	public void loadDatabaseFailed(int returnCode) {
 		log("Failed to load the database; return code was " + returnCode);
 	}
 
+	@Override
 	public void loadDatabaseComplete() {
 		log("Loaded the database.");
 	}
 
+	@Override
 	public void webappStarting(String tomcatStartCommand) {
 		log("Starting tomcat: " + tomcatStartCommand);
 	}
 
+	@Override
 	public void webappStartFailed(int returnCode) {
 		log("Failed to start tomcat; return code was " + returnCode);
 	}
 
+	@Override
 	public void webappWaitingForStart(int tomcatStartDelay) {
 		log("Waiting " + tomcatStartDelay + " seconds for tomcat to start.");
 	}
 
+	@Override
 	public void webappStarted() {
 		log("Tomcat started.");
 	}
 
+	@Override
 	public void subProcessStart(List<String> command) {
 		log("Subprocess started: " + command);
 	}
 
+	@Override
 	public void subProcessStartInBackground(List<String> command) {
 		log("Subprocess started in background: " + command);
 	}
 
+	@Override
 	public void subProcessStdout(String string) {
 		logRawText(string);
 	}
 
+	@Override
 	public void subProcessErrout(String string) {
 		logRawText(string);
 	}
 
+	@Override
 	public void subProcessStop(List<String> command) {
 		log("Subprocess stopped: " + command);
 	}
 
+	@Override
 	public void suiteStarted(File suiteDir) {
 		log("Suite started: " + suiteDir.getName());
 	}
 
+	@Override
 	public void suiteTestingStarted(File suiteDir) {
 		log("Suite testing started: " + suiteDir.getName());
 	}
 
+	@Override
 	public void suiteFailed(File suiteDir, int returnCode) {
 		log("Suite failed: " + suiteDir.getName() + ", returnCode="
 				+ returnCode);
 	}
 
+	@Override
 	public void suiteFailed(File suiteDir, Exception e) {
 		log("Suite failed: " + suiteDir.getName());
 		log(e);
 	}
 
+	@Override
 	public void suiteTestingStopped(File suiteDir) {
 		log("Suite testing stopped: " + suiteDir.getName());
 	}
 
+	@Override
 	public void suiteStopped(File suiteDir) {
 		log("Suite stopped: " + suiteDir.getName());
 	}
 
+	@Override
 	public void cleanUploadStart(File uploadDirectory) {
 		log("Upload cleaning started: " + uploadDirectory.getPath());
 	}
 
+	@Override
 	public void cleanUploadFailed(File uploadDirectory, IOException e) {
 		log("Upload cleaning failed: " + uploadDirectory.getPath());
 		log(e);
 	}
 
+	@Override
 	public void cleanUploadStop(File uploadDirectory) {
 		log("Upload cleaning stopped: " + uploadDirectory.getPath());
 	}
-	
+
+	@Override
 	public void logWarning(String message) {
 		log("WARNING: " + message);
 	}

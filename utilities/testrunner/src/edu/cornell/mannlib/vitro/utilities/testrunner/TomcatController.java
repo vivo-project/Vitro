@@ -5,6 +5,8 @@ package edu.cornell.mannlib.vitro.utilities.testrunner;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.cornell.mannlib.vitro.utilities.testrunner.listener.Listener;
+
 /**
  * Start and stop the webapp, so we can clean the database.
  */

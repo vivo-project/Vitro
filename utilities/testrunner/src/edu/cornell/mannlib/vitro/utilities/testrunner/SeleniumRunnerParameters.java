@@ -15,6 +15,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
+import edu.cornell.mannlib.vitro.utilities.testrunner.listener.Listener;
+import edu.cornell.mannlib.vitro.utilities.testrunner.listener.LoggingListener;
+import edu.cornell.mannlib.vitro.utilities.testrunner.listener.MulticastListener;
+
 /**
  * Holds the runtime parameters that are read from the properties file, perhaps
  * with modifications from the GUI if we are running interactively.
@@ -48,7 +52,10 @@ public class SeleniumRunnerParameters {
 	private Collection<File> selectedSuites = Collections.emptySet();
 	private boolean cleanModel = true;
 	private boolean cleanUploads = true;
-	private Listener listener = new Listener(System.out);
+
+	// If we fail during the parameter parsing, we'll still write the log
+	// somewhere.
+	private Listener listener = new LoggingListener(System.out);
 
 	/**
 	 * Read the required properties from the property file, and do some checks
@@ -71,7 +78,8 @@ public class SeleniumRunnerParameters {
 
 		this.outputDirectory = checkOutputDirectory(props);
 		this.logFile = new File(this.outputDirectory, LOGFILE_NAME);
-		this.listener = new Listener(this.logFile);
+		this.listener = new MulticastListener();
+		addListener(new LoggingListener(this.logFile));
 
 		this.suiteParentDirectories = checkSuiteParentDirectories(props);
 
@@ -326,6 +334,15 @@ public class SeleniumRunnerParameters {
 
 	public File getSeleniumJarPath() {
 		return seleniumJarPath;
+	}
+
+	public void addListener(Listener l) {
+		if (listener instanceof MulticastListener) {
+			((MulticastListener) listener).addListener(l);
+		} else {
+			throw new IllegalStateException("Listener is not a multi-cast -- "
+					+ "can't add new listeners.");
+		}
 	}
 
 	public Listener getListener() {
