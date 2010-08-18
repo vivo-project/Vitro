@@ -5,14 +5,13 @@ package edu.cornell.mannlib.vitro.utilities.testrunner.output;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import edu.cornell.mannlib.vitro.utilities.testrunner.FileHelper;
 import edu.cornell.mannlib.vitro.utilities.testrunner.LogStats;
 import edu.cornell.mannlib.vitro.utilities.testrunner.SeleniumRunnerParameters;
 import edu.cornell.mannlib.vitro.utilities.testrunner.Status;
-import edu.cornell.mannlib.vitro.utilities.testrunner.SuiteStats;
 
 /**
  * Manages the contents of the output area. Removes old files prior to a run.
@@ -67,12 +66,12 @@ public class OutputManager {
 	public Status summarizeOutput() {
 		LogStats log = LogStats.parse(parms.getLogFile());
 
-		List<SuiteStats> suites = new ArrayList<SuiteStats>();
+		Map<String, SuiteResults> suites = new HashMap<String, SuiteResults>();
 		for (File outputFile : parms.getOutputDirectory().listFiles(
 				new HtmlFileFilter())) {
-			SuiteStats suite = SuiteStats.parse(parms, outputFile);
+			SuiteResults suite = SuiteResults.parse(parms, outputFile);
 			if (suite != null) {
-				suites.add(suite);
+				suites.put(suite.getName(), suite);
 			}
 		}
 

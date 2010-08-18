@@ -12,13 +12,13 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import edu.cornell.mannlib.vitro.utilities.testrunner.FileHelper;
 import edu.cornell.mannlib.vitro.utilities.testrunner.LogStats;
 import edu.cornell.mannlib.vitro.utilities.testrunner.SeleniumRunnerParameters;
 import edu.cornell.mannlib.vitro.utilities.testrunner.Status;
-import edu.cornell.mannlib.vitro.utilities.testrunner.SuiteStats;
-import edu.cornell.mannlib.vitro.utilities.testrunner.SuiteStats.TestInfo;
+import edu.cornell.mannlib.vitro.utilities.testrunner.output.SuiteResults.TestResults;
 
 /**
  * Creates the summary HTML file.
@@ -31,13 +31,17 @@ public class OutputSummaryFormatter {
 	private final SeleniumRunnerParameters parms;
 
 	private LogStats log;
-	private List<SuiteStats> suites;
+	private Map<String, SuiteResults> suites;
 	private OutputDataModel dataModel;
 	private Status runStatus;
-	private List<TestInfo> allTests = new ArrayList<TestInfo>();
+	private List<TestResults> allTests = new ArrayList<TestResults>();
 	private int passingTestCount;
-	private List<TestInfo> failingTests = new ArrayList<TestInfo>();
-	private List<TestInfo> ignoredTests = new ArrayList<TestInfo>();
+	private List<TestResults> failingTests = new ArrayList<TestResults>();
+	private List<TestResults> ignoredTests = new ArrayList<TestResults>();
+	private List<String> passingSuites = new ArrayList<String>();
+	private List<String> failingSuites = new ArrayList<String>();
+	private List<String> ignoredSuites = new ArrayList<String>();
+	private List<String> remainingSuites = new ArrayList<String>();
 
 	public OutputSummaryFormatter(SeleniumRunnerParameters parms) {
 		this.parms = parms;
@@ -47,13 +51,14 @@ public class OutputSummaryFormatter {
 	 * Create a summary HTML file from the info contained in this log file and
 	 * these suite outputs.
 	 */
-	public void format(LogStats log, List<SuiteStats> suites,
+	public void format(LogStats log, Map<String, SuiteResults> suites,
 			OutputDataModel dataModel) {
 		this.log = log;
 		this.suites = suites;
 		this.dataModel = dataModel;
 		this.runStatus = figureOverallStatus(log, suites);
 		tallyTests();
+		tallySuites();
 
 		PrintWriter writer = null;
 		try {
@@ -105,13 +110,14 @@ public class OutputSummaryFormatter {
 	/**
 	 * The overall status for the run is the worst status of any component.
 	 */
-	public Status figureOverallStatus(LogStats log, List<SuiteStats> suites) {
+	public Status figureOverallStatus(LogStats log,
+			Map<String, SuiteResults> suites) {
 		if (log.hasErrors()) {
 			return Status.ERROR;
 		}
 		boolean hasWarnings = log.hasWarnings();
 
-		for (SuiteStats s : suites) {
+		for (SuiteResults s : suites.values()) {
 			if (s.getStatus() == Status.ERROR) {
 				return Status.ERROR;
 			} else if (s.getStatus() == Status.WARN) {
@@ -127,8 +133,8 @@ public class OutputSummaryFormatter {
 	}
 
 	private void tallyTests() {
-		for (SuiteStats s : suites) {
-			for (TestInfo t : s.getTests()) {
+		for (SuiteResults s : suites.values()) {
+			for (TestResults t : s.getTests()) {
 				this.allTests.add(t);
 				if (t.getStatus() == Status.OK) {
 					this.passingTestCount++;
@@ -136,6 +142,25 @@ public class OutputSummaryFormatter {
 					this.ignoredTests.add(t);
 				} else {
 					this.failingTests.add(t);
+				}
+			}
+		}
+	}
+
+	private void tallySuites() {
+		List<String> ignoredSuiteNames = dataModel.getIgnoredSuiteNames();
+
+		for (String name : dataModel.getSuiteNames()) {
+			if (ignoredSuiteNames.contains(name)) {
+				this.ignoredSuites.add(name);
+			} else if (!suites.containsKey(name)) {
+				this.remainingSuites.add(name);
+			} else {
+				SuiteResults s = suites.get(name);
+				if (s.getStatus() == Status.ERROR) {
+					this.failingSuites.add(name);
+				} else {
+					this.passingSuites.add(name);
 				}
 			}
 		}
@@ -187,19 +212,22 @@ public class OutputSummaryFormatter {
 		writer.println("      </td>");
 		writer.println("      <td>");
 		writer.println("        <table cellspacing=\"0\">");
-		writer.println("  	      <tr><td>Suites</td><td>" + this.suites.size()
-				+ "</td></tr>");
-		writer.println("  	      <tr><td>Total tests</td><td>"
-				+ this.allTests.size() + "</td></tr>");
-		writer.println("  	      <tr class=\"" + passClass
-				+ "\"><td>Passing tests</td><td>" + this.passingTestCount
-				+ "</td></tr>");
-		writer.println("  	      <tr class=\"" + failClass
-				+ "\"><td>Failing tests</td><td>" + this.failingTests.size()
-				+ "</td></tr>");
-		writer.println("  	      <tr class=\"" + ignoreClass
-				+ "\"><td>Ignored tests</td><td>" + this.ignoredTests.size()
-				+ "</td></tr>");
+		writer.println("          <tr><th>&nbsp;</th><th>Suites</th><th>Tests</th>");
+		writer.println("          <tr><th>Total</th><td>" + "</td><td>"
+				+ "</td>");
+		writer.println("          <tr class=\"" + passClass
+				+ "\"><th>Passed</th><td>" + this.passingSuites.size()
+				+ "</td><td>" + this.passingTestCount + "</td>");
+		writer.println("          <tr class=\"" + failClass
+				+ "\"><th>Failed</th><td>" + this.failingSuites.size()
+				+ "</td><td>" + this.failingTests.size() + "</td>");
+		writer.println("          <tr class=\"" + ignoreClass
+				+ "\"><th>Ignored</th><td>" + this.ignoredSuites.size()
+				+ "</td><td>" + this.ignoredTests.size() + "</td>");
+		if (!this.remainingSuites.isEmpty()) {
+			writer.println("          <tr><th>Remaining</th><td>"
+					+ this.remainingSuites.size() + "</td><td>?</td>");
+		}
 		writer.println("  	    </table>");
 		writer.println("      </td>");
 		writer.println("    </tr>");
@@ -242,7 +270,7 @@ public class OutputSummaryFormatter {
 			writer.println("    <tr><td colspan=\"2\">No tests failed.</td>"
 					+ "</tr>");
 		} else {
-			for (TestInfo t : failingTests) {
+			for (TestResults t : failingTests) {
 				writer.println("    <tr class=\"" + errorClass + "\">");
 				writer.println("      <td>" + t.getSuiteName() + "</td>");
 				writer.println("      <td><a href=\"" + t.getOutputLink()
@@ -266,7 +294,7 @@ public class OutputSummaryFormatter {
 			writer.println("    <tr><td colspan=\"3\">No tests ignored.</td>"
 					+ "</tr>");
 		} else {
-			for (TestInfo t : ignoredTests) {
+			for (TestResults t : ignoredTests) {
 				writer.println("    <tr class=\"" + warnClass + "\">");
 				writer.println("      <td>" + t.getSuiteName() + "</td>");
 				writer.println("      <td><a href=\"" + t.getOutputLink()
@@ -285,7 +313,7 @@ public class OutputSummaryFormatter {
 		writer.println();
 		writer.println("  <table cellspacing=\"0\">");
 
-		for (SuiteStats s : suites) {
+		for (SuiteResults s : suites.values()) {
 			writer.println("    <tr class=\"" + s.getStatus().getHtmlClass()
 					+ "\">");
 			writer.println("      <td><a href=\"" + s.getOutputLink() + "\">"
@@ -303,7 +331,7 @@ public class OutputSummaryFormatter {
 		writer.println("  <table cellspacing=\"0\">");
 
 		writer.println("    <tr><th>Suite name</th><th>Test name</th></tr>\n");
-		for (TestInfo t : allTests) {
+		for (TestResults t : allTests) {
 			writer.println("    <tr class=\"" + t.getStatus().getHtmlClass()
 					+ "\">");
 			writer.println("      <td>" + t.getSuiteName() + "</td>");

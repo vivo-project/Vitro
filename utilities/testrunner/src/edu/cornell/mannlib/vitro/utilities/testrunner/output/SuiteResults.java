@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.utilities.testrunner;
+package edu.cornell.mannlib.vitro.utilities.testrunner.output;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -13,11 +13,16 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import edu.cornell.mannlib.vitro.utilities.testrunner.FileHelper;
+import edu.cornell.mannlib.vitro.utilities.testrunner.IgnoredTests;
+import edu.cornell.mannlib.vitro.utilities.testrunner.SeleniumRunnerParameters;
+import edu.cornell.mannlib.vitro.utilities.testrunner.Status;
+
 /**
  * Extract any summary information from an HTML output file, produced by a test
  * suite.
  */
-public class SuiteStats {
+public class SuiteResults{
 	/**
 	 * If the file doesn't contain a line that includes this pattern, it is not
 	 * a suite output file.
@@ -39,17 +44,17 @@ public class SuiteStats {
 
 	/**
 	 * Parse the fields from this file and attempt to produce a
-	 * {@link SuiteStats} object. If this is not an appropriate file, just
+	 * {@link SuiteResults} object. If this is not an appropriate file, just
 	 * return null.
 	 */
-	public static SuiteStats parse(SeleniumRunnerParameters parms,
+	public static SuiteResults parse(SeleniumRunnerParameters parms,
 			File outputFile) {
 		IgnoredTests ignoredTests = parms.getIgnoredTests();
 
 		boolean isSuiteOutputFile = false;
 		Status status = Status.ERROR;
 
-		List<TestInfo> tests = new ArrayList<TestInfo>();
+		List<TestResults> tests = new ArrayList<TestResults>();
 		String suiteName = FileHelper.baseName(outputFile);
 		String outputLink = outputFile.getName();
 
@@ -82,13 +87,13 @@ public class SuiteStats {
 						reasonForIgnoring = "";
 					}
 
-					tests.add(new TestInfo(testName, suiteName, testLink,
+					tests.add(new TestResults(testName, suiteName, testLink,
 							testStatus, reasonForIgnoring));
 				}
 			}
 
 			status = Status.OK;
-			for (TestInfo t : tests) {
+			for (TestResults t : tests) {
 				if (t.status == Status.ERROR) {
 					status = Status.ERROR;
 				} else if ((t.status == Status.WARN) && (status == Status.OK)) {
@@ -97,7 +102,7 @@ public class SuiteStats {
 			}
 
 			if (isSuiteOutputFile) {
-				return new SuiteStats(suiteName, outputLink, tests, status);
+				return new SuiteResults(suiteName, outputLink, tests, status);
 			} else {
 				return null;
 			}
@@ -119,11 +124,11 @@ public class SuiteStats {
 
 	private final String suiteName;
 	private final String outputLink;
-	private final List<TestInfo> tests;
+	private final List<TestResults> tests;
 	private final Status status;
 
-	public SuiteStats(String suiteName, String outputLink,
-			List<TestInfo> tests, Status status) {
+	public SuiteResults(String suiteName, String outputLink,
+			List<TestResults> tests, Status status) {
 		this.suiteName = suiteName;
 		this.outputLink = outputLink;
 		this.tests = tests;
@@ -142,18 +147,18 @@ public class SuiteStats {
 		return outputLink;
 	}
 
-	public Collection<TestInfo> getTests() {
+	public Collection<TestResults> getTests() {
 		return Collections.unmodifiableCollection(tests);
 	}
 
-	public static class TestInfo {
+	public static class TestResults {
 		private final String name;
 		private final String suite;
 		private final String outputLink;
 		private final Status status;
 		private final String reasonForIgnoring;
 
-		public TestInfo(String name, String suite, String outputLink,
+		public TestResults(String name, String suite, String outputLink,
 				Status status, String reasonForIgnoring) {
 			this.name = name;
 			this.suite = suite;

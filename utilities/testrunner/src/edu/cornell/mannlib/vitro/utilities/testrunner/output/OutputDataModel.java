@@ -1,16 +1,22 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
 package edu.cornell.mannlib.vitro.utilities.testrunner.output;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import edu.cornell.mannlib.vitro.utilities.testrunner.FileHelper;
 import edu.cornell.mannlib.vitro.utilities.testrunner.listener.Listener;
 
 public class OutputDataModel implements Listener {
 	private boolean runCompleted;
 	private long startTime;
 	private long endTime;
+	private final List<String> suiteNames = new ArrayList<String>();
+	private final List<String> ignoredSuiteNames = new ArrayList<String>();
 
 	// ----------------------------------------------------------------------
 	// Listener methods that affect the data model
@@ -29,6 +35,17 @@ public class OutputDataModel implements Listener {
 	@Override
 	public void runStopped() {
 		runCompleted = true;
+	}
+
+	@Override
+	public void suiteIgnored(File suite) {
+		suiteNames.add(FileHelper.baseName(suite));
+		ignoredSuiteNames.add(FileHelper.baseName(suite));
+	}
+
+	@Override
+	public void suiteAdded(File suite) {
+		suiteNames.add(FileHelper.baseName(suite));
 	}
 
 	// ----------------------------------------------------------------------
@@ -55,17 +72,17 @@ public class OutputDataModel implements Listener {
 		}
 	}
 
+	public List<String> getSuiteNames() {
+		return suiteNames;
+	}
+
+	public List<String> getIgnoredSuiteNames() {
+		return ignoredSuiteNames;
+	}
+
 	// ----------------------------------------------------------------------
 	// Listener methods that don't affect the data model
 	// ----------------------------------------------------------------------
-
-	@Override
-	public void suiteIgnored(File suite) {
-	}
-
-	@Override
-	public void suiteAdded(File suite) {
-	}
 
 	@Override
 	public void runFailed(Exception e) {
