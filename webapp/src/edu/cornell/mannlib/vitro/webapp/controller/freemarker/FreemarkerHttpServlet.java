@@ -6,10 +6,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -42,7 +40,6 @@ import freemarker.cache.TemplateLoader;
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
-import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
@@ -62,7 +59,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
 	        VitroRequest vreq = new VitroRequest(request);
 	        Configuration config = getConfig(vreq);
 	        
-	        // We can't use shared variables in the FreeMarker configuration to store anything 
+	        // We can't use shared variables in the Freemarker configuration to store anything 
 	        // except theme-specific data, because multiple portals or apps might share the same theme. So instead
 	        // just put the shared variables in both root and body.
 	        Map<String, Object> sharedVariables = getSharedVariables(vreq); // start by getting the title here
@@ -106,7 +103,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         Map<String, Configuration> themeToConfigMap = (Map<String, Configuration>) (getServletContext().getAttribute("themeToConfigMap"));
         
         if( themeToConfigMap == null )
-        	log.error("The templating system is not configured correctly. Make sure that you have the FreeMarkerSetup context listener in your web.xml");
+        	log.error("The templating system is not configured correctly. Make sure that you have the FreemarkerSetup context listener in your web.xml");
         if (themeToConfigMap.containsKey(themeDir)) {
             return themeToConfigMap.get(themeDir);
         } else {
@@ -123,7 +120,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         String buildEnv = ConfigurationProperties.getProperty("Environment.build");
         log.debug("Current build environment: " + buildEnv);
         if ("development".equals(buildEnv)) {
-            log.debug("Disabling FreeMarker template caching in development build.");
+            log.debug("Disabling Freemarker template caching in development build.");
             config.setTemplateUpdateDelay(0); // no template caching in development 
         }
 
@@ -189,7 +186,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         
     }
 
-    // We can't use shared variables in the FreeMarker configuration to store anything 
+    // We can't use shared variables in the Freemarker configuration to store anything 
     // except theme-specific data, because multiple portals or apps might share the same theme. So instead
     // we'll get all the shared variables here, and put them in both root and body maps.
     protected Map<String, Object> getSharedVariables(VitroRequest vreq) {
@@ -411,7 +408,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         return "page.ftl";
     }
 
-    // TEMPORARY method for transition from JSP to FreeMarker. 
+    // TEMPORARY method for transition from JSP to Freemarker. 
     // It's a static method because it needs to be called from JSPs that don't go through a servlet.
     public static void getFreemarkerComponentsForJsp(HttpServletRequest request) {
         // We need to create a FreeMarkerHttpServlet object in order to call the instance methods
