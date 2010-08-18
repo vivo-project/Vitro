@@ -11,7 +11,7 @@ import org.junit.Test;
 /**
  * TODO
  */
-public class ModelCleanerTest {
+public class TomcatControllerTest {
 
 	// ----------------------------------------------------------------------
 	// Tests for parseCommandLine()
@@ -45,7 +45,7 @@ public class ModelCleanerTest {
 
 	private void assertExpectedParsing(String commandLine,
 			String... expectedPieces) {
-		assertEquals("parse", Arrays.asList(expectedPieces), ModelCleaner
-				.parseCommandLine(commandLine));
+		assertEquals("parse", Arrays.asList(expectedPieces),
+				TomcatController.parseCommandLine(commandLine));
 	}
 }

@@ -17,7 +17,7 @@ public class ModelCleanerProperties {
 	public static final String PROP_MYSQL_USERNAME = "mysql_username";
 	public static final String PROP_MYSQL_PASSWORD = "mysql_password";
 	public static final String PROP_MYSQL_DB_NAME = "mysql_db_name";
-	public static final String PROP_MYSQL_DUMPFILE = "mysql_dumpfile";
+	public static final String PROP_WEBAPP_DIRECTORY = "vivo_webapp_directory";
 
 	private final String tomcatStartCommand;
 	private final int tomcatStartDelay;
@@ -26,7 +26,7 @@ public class ModelCleanerProperties {
 	private final String mysqlUsername;
 	private final String mysqlPassword;
 	private final String mysqlDbName;
-	private final File mysqlDumpfile;
+	private final File webappDirectory;
 
 	/**
 	 * Confirm that we have the expected properties, and that their values seem
@@ -47,7 +47,7 @@ public class ModelCleanerProperties {
 		this.mysqlPassword = getRequiredProperty(props, PROP_MYSQL_PASSWORD);
 		this.mysqlDbName = getRequiredProperty(props, PROP_MYSQL_DB_NAME);
 
-		this.mysqlDumpfile = confirmDumpfile(props);
+		this.webappDirectory = confirmWebappDirectory(props);
 	}
 
 	public String getTomcatStartCommand() {
@@ -78,8 +78,8 @@ public class ModelCleanerProperties {
 		return mysqlDbName;
 	}
 
-	public File getMysqlDumpfile() {
-		return mysqlDumpfile;
+	public File getWebappDirectory() {
+		return webappDirectory;
 	}
 
 	/**
@@ -106,33 +106,38 @@ public class ModelCleanerProperties {
 	}
 
 	/**
-	 * The dumpfile parameter must point to an existing file.
+	 * The dumpfile parameter must point to an existing directory.
 	 */
-	private File confirmDumpfile(Properties props) {
-		String filename = getRequiredProperty(props, PROP_MYSQL_DUMPFILE);
-		File dumpfile = new File(filename);
-		if (!dumpfile.exists()) {
+	private File confirmWebappDirectory(Properties props) {
+		String filename = getRequiredProperty(props, PROP_WEBAPP_DIRECTORY);
+		File webappDirectory = new File(filename);
+		if (!webappDirectory.exists()) {
 			throw new IllegalArgumentException("Invalid value for '"
-					+ PROP_MYSQL_DUMPFILE + "': file '" + filename
+					+ PROP_WEBAPP_DIRECTORY + "': directory '" + filename
 					+ "' does not exist.");
 		}
-		if (!dumpfile.isFile()) {
+		if (!webappDirectory.isDirectory()) {
 			throw new IllegalArgumentException("Invalid value for '"
-					+ PROP_MYSQL_DUMPFILE + "': '" + filename
-					+ "' is not a file.");
+					+ PROP_WEBAPP_DIRECTORY + "': '" + filename
+					+ "' is not a directory.");
 		}
-		if (!dumpfile.canRead()) {
+		if (!webappDirectory.canWrite()) {
 			throw new IllegalArgumentException("Invalid value for '"
-					+ PROP_MYSQL_DUMPFILE + "': file '" + filename
-					+ "' is not readable.");
+					+ PROP_WEBAPP_DIRECTORY + "': directory '" + filename
+					+ "' is not writeable.");
 		}
-		return dumpfile;
+		return webappDirectory;
 	}
 
 	public String toString() {
 		return "\n      tomcatStartCommand: " + tomcatStartCommand
 				+ "\n      tomcatStartDelay: " + tomcatStartDelay
 				+ "\n      tomcatStopCommand: " + tomcatStopCommand
-				+ "\n      tomcatStopDelay: " + tomcatStopDelay;
+				+ "\n      tomcatStopDelay: " + tomcatStopDelay
+				+ "\n      mysqlUsername: " + mysqlUsername
+				+ "\n      mysqlPassword: " + mysqlPassword
+				+ "\n      mysqlDbName: " + mysqlDbName
+				+ "\n      webappDirectory: " + webappDirectory;
 	}
+
 }

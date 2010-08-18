@@ -192,6 +192,10 @@ public class Listener {
 	public void cleanUploadStop(File uploadDirectory) {
 		log("Upload cleaning stopped: " + uploadDirectory.getPath());
 	}
+	
+	public void logWarning(String message) {
+		log("WARNING: " + message);
+	}
 
 	// ----------------------------------------------------------------------
 	// Helper methods

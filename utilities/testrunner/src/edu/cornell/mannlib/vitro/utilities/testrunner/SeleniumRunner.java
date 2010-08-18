@@ -17,6 +17,7 @@ public class SeleniumRunner {
 	private final SeleniumRunnerParameters parms;
 	private final Listener listener;
 	private final UploadAreaCleaner uploadCleaner;
+	private final TomcatController tomcatController;
 	private final ModelCleaner modelCleaner;
 	private final SuiteRunner suiteRunner;
 	private final OutputManager outputManager;
@@ -25,43 +26,27 @@ public class SeleniumRunner {
 		this.parms = parms;
 		this.listener = parms.getListener();
 		this.uploadCleaner = new UploadAreaCleaner(parms);
-		this.modelCleaner = new ModelCleaner(parms);
+		this.tomcatController = new TomcatController(parms);
+		this.modelCleaner = new ModelCleaner(parms, this.tomcatController);
 		this.suiteRunner = new SuiteRunner(parms);
 		this.outputManager = new OutputManager(parms);
+		
 	}
 
-	public boolean runSelectedSuites() {
+	/**
+	 * Set up the run, run the selected suites, summarize the output, and clean
+	 * up afterwards.
+	 * 
+	 * @return <code>true</code> iff all tests passed.
+	 */
+	public boolean run() {
 		boolean success;
 		try {
 			listener.runStarted();
 			outputManager.cleanOutputDirectory();
-			for (File suiteDir : parms.getSelectedSuites()) {
-				listener.suiteStarted(suiteDir);
-				try {
-					if (parms.isCleanModel()) {
-						modelCleaner.clean();
-					}
-					if (parms.isCleanUploads()) {
-						uploadCleaner.clean();
-					}
-					suiteRunner.runSuite(suiteDir);
-				} catch (IOException e) {
-					listener.suiteFailed(suiteDir, e);
-				} catch (CommandRunnerException e) {
-					listener.suiteFailed(suiteDir, e);
-				}
-				listener.suiteStopped(suiteDir);
-			}
 
-			// If we've been starting and stopping Tomcat,
-			// stop it one more time.
-			if (parms.isCleanModel()) {
-				try {
-					modelCleaner.stopTheWebapp();
-				} catch (CommandRunnerException e) {
-					throw new FatalException(e);
-				}
-			}
+			runSelectedSuites();
+			tomcatController.cleanup();
 
 			listener.runEndTime();
 			Status status = outputManager.summarizeOutput();
@@ -77,6 +62,26 @@ public class SeleniumRunner {
 		}
 		listener.runStopped();
 		return success;
+	}
+
+	public void runSelectedSuites() {
+		for (File suiteDir : parms.getSelectedSuites()) {
+			listener.suiteStarted(suiteDir);
+			try {
+				if (parms.isCleanModel()) {
+					modelCleaner.clean();
+				}
+				if (parms.isCleanUploads()) {
+					uploadCleaner.clean();
+				}
+				suiteRunner.runSuite(suiteDir);
+			} catch (IOException e) {
+				listener.suiteFailed(suiteDir, e);
+			} catch (CommandRunnerException e) {
+				listener.suiteFailed(suiteDir, e);
+			}
+			listener.suiteStopped(suiteDir);
+		}
 	}
 
 	private static void selectAllSuites(SeleniumRunnerParameters parms) {
@@ -145,7 +150,7 @@ public class SeleniumRunner {
 			System.out.println(parms);
 
 			SeleniumRunner runner = new SeleniumRunner(parms);
-			success = runner.runSelectedSuites();
+			success = runner.run();
 		}
 		System.out.println("Exiting SeleniumRunner");
 		System.exit(success ? 0 : -1);
