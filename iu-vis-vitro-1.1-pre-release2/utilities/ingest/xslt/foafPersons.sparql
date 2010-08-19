@@ -1,0 +1,12 @@
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+
+
+SELECT ?s ?fn ?mn ?ln
+WHERE
+{
+  ?s rdf:type foaf:Person .
+  optional { ?s foaf:firstName ?fn } .
+  optional { ?s foaf:middleName ?mn } .
+  optional { ?s foaf:lastName ?ln } .
+}
+order by ?ln

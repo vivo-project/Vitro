@@ -1,0 +1,521 @@
+@prefix dc:      <http://purl.org/dc/elements/1.1/> .
+@prefix afn:     <http://jena.hpl.hp.com/ARQ/function#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix swrl:    <http://www.w3.org/2003/11/swrl#> .
+@prefix vitro:   <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
+@prefix swrlb:   <http://www.w3.org/2003/11/swrlb#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix vivo:    <http://vivo.library.cornell.edu/ns/0.1#> .
+
+<http://vivoweb.org/activity-insight#Intellcont>
+      rdf:type owl:Class ;
+      rdfs:label "Intellectual Contribution"@en-US ;
+      vitro:displayLimitAnnot
+              "-1"^^xsd:int ;
+      vitro:displayRankAnnot
+              "-1"^^xsd:int ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:inClassGroup <http://vivoweb.org/ontology#vitroClassGroupactivities> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:shortDef "This class is parent class of the Intellectual Contribution type in Activity Insight"^^xsd:string .
+
+<http://vivoweb.org/activity-insight#ConferenceProceeding>
+      rdf:type owl:Class ;
+      rdfs:label "Conference Proceeding"@en-US ;
+      rdfs:subClassOf <http://vivoweb.org/activity-insight#Intellcont> , <http://purl.org/ontology/bibo/Proceedings> ;
+      vitro:displayLimitAnnot
+              "-1"^^xsd:int ;
+      vitro:displayRankAnnot
+              "-1"^^xsd:int ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:inClassGroup <http://vivoweb.org/ontology#vitroClassGroupactivities> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:shortDef "Contributing to a Conference Proceeding"^^xsd:string .
+
+<http://vivoweb.org/activity-insight#Internet>
+      rdf:type owl:Class ;
+      rdfs:label "Internet"@en-US ;
+      rdfs:subClassOf <http://vivoweb.org/activity-insight#Intellcont> , <http://purl.org/ontology/bibo/Webpage> ;
+      vitro:displayLimitAnnot
+              "-1"^^xsd:int ;
+      vitro:displayRankAnnot
+              "-1"^^xsd:int ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:inClassGroup <http://vivoweb.org/ontology#vitroClassGroupactivities> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:shortDef "Contributing Internet content"^^xsd:string .
+
+<http://vivoweb.org/activity-insight#Software>
+      rdf:type owl:Class ;
+      rdfs:label "Software"@en-US ;
+      rdfs:subClassOf <http://vivoweb.org/activity-insight#Intellcont> , <http://vivoweb.org/ontology/core#Software> ;
+      vitro:displayLimitAnnot
+              "-1"^^xsd:int ;
+      vitro:displayRankAnnot
+              "-1"^^xsd:int ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:inClassGroup <http://vivoweb.org/ontology#vitroClassGroupactivities> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:shortDef "Contributing to or authoring Software"^^xsd:string .
+
+<http://vivoweb.org/activity-insight#InstructorsManual>
+      rdf:type owl:Class ;
+      rdfs:label "Instructors Manual"@en-US ;
+      rdfs:subClassOf <http://vivoweb.org/activity-insight#Intellcont> , <http://purl.org/ontology/bibo/Manual> ;
+      vitro:displayLimitAnnot
+              "-1"^^xsd:int ;
+      vitro:displayRankAnnot
+              "-1"^^xsd:int ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:inClassGroup <http://vivoweb.org/ontology#vitroClassGroupactivities> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:shortDef "Authoring an Instructor's Manual"^^xsd:string .
+
+<http://vivoweb.org/activity-insight#Magazine>
+      rdf:type owl:Class ;
+      rdfs:label "Magazine"@en-US ;
+      rdfs:subClassOf <http://vivoweb.org/activity-insight#Intellcont> , <http://purl.org/ontology/bibo/Article> ;
+      vitro:displayLimitAnnot
+              "-1"^^xsd:int ;
+      vitro:displayRankAnnot
+              "-1"^^xsd:int ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:inClassGroup <http://vivoweb.org/ontology#vitroClassGroupactivities> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:shortDef "Contributing a magazine article"^^xsd:string .
+
+<http://vivoweb.org/activity-insight#lastModified>
+      rdf:type owl:DatatypeProperty ;
+      rdfs:label "Last Modified"@en-US ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
+
+<http://vivoweb.org/activity-insight#WrittenCase>
+      rdf:type owl:Class ;
+      rdfs:label "Written Case"@en-US ;
+      rdfs:subClassOf <http://vivoweb.org/ontology/core#CaseStudy> , <http://vivoweb.org/activity-insight#Intellcont> ;
+      vitro:displayLimitAnnot
+              "-1"^^xsd:int ;
+      vitro:displayRankAnnot
+              "-1"^^xsd:int ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:inClassGroup <http://vivoweb.org/ontology#vitroClassGroupactivities> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:shortDef "A written Case Study"^^xsd:string .
+
+<http://vivoweb.org/activity-insight#Radio>
+      rdf:type owl:Class ;
+      rdfs:label "Radio"@en-US ;
+      rdfs:subClassOf <http://vivoweb.org/activity-insight#Intellcont> , <http://purl.org/ontology/bibo/AudioDocument> ;
+      vitro:displayLimitAnnot
+              "-1"^^xsd:int ;
+      vitro:displayRankAnnot
+              "-1"^^xsd:int ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:inClassGroup <http://vivoweb.org/ontology#vitroClassGroupactivities> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:shortDef "A radio presentation"^^xsd:string .
+
+<http://vivoweb.org/activity-insight#BookReview>
+      rdf:type owl:Class ;
+      rdfs:label "Book Review"@en-US ;
+      rdfs:subClassOf <http://vivoweb.org/activity-insight#Intellcont> , <http://purl.org/ontology/bibo/Article> ;
+      vitro:displayLimitAnnot
+              "-1"^^xsd:int ;
+      vitro:displayRankAnnot
+              "-1"^^xsd:int ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:inClassGroup <http://vivoweb.org/ontology#vitroClassGroupactivities> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:shortDef "Authoring a Book Review"^^xsd:string .
+
+<http://vivoweb.org/activity-insight#CitedResearch>
+      rdf:type owl:Class ;
+      rdfs:label "Cited Research"@en-US ;
+      rdfs:subClassOf <http://vivoweb.org/activity-insight#Intellcont> , <http://vivoweb.org/ontology/core#InformationResource> ;
+      vitro:displayLimitAnnot
+              "-1"^^xsd:int ;
+      vitro:displayRankAnnot
+              "-1"^^xsd:int ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:inClassGroup <http://vivoweb.org/ontology#vitroClassGroupactivities> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:shortDef "Contributing to another author's writing by citation"^^xsd:string .
+
+<http://vivoweb.org/activity-insight#BookSection>
+      rdf:type owl:Class ;
+      rdfs:label "Book Section"@en-US ;
+      rdfs:subClassOf <http://vivoweb.org/activity-insight#Intellcont> , <http://purl.org/ontology/bibo/BookSection> ;
+      vitro:displayLimitAnnot
+              "-1"^^xsd:int ;
+      vitro:displayRankAnnot
+              "-1"^^xsd:int ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:inClassGroup <http://vivoweb.org/ontology#vitroClassGroupactivities> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:shortDef "Authoring a Book Section"^^xsd:string .
+
+<http://vivoweb.org/activity-insight#TradePublication>
+      rdf:type owl:Class ;
+      rdfs:label "Trade Publication"@en-US ;
+      rdfs:subClassOf <http://vivoweb.org/activity-insight#Intellcont> , <http://purl.org/ontology/bibo/Article> ;
+      vitro:displayLimitAnnot
+              "-1"^^xsd:int ;
+      vitro:displayRankAnnot
+              "-1"^^xsd:int ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:inClassGroup <http://vivoweb.org/ontology#vitroClassGroupactivities> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:shortDef "Contributing to or authoring a trade publication article"^^xsd:string .
+
+<http://vivoweb.org/activity-insight#Monograph>
+      rdf:type owl:Class ;
+      rdfs:label "Monograph"@en-US ;
+      rdfs:subClassOf <http://vivoweb.org/activity-insight#Intellcont> , <http://purl.org/ontology/bibo/Book> ;
+      vitro:displayLimitAnnot
+              "-1"^^xsd:int ;
+      vitro:displayRankAnnot
+              "-1"^^xsd:int ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:inClassGroup <http://vivoweb.org/ontology#vitroClassGroupactivities> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:shortDef "Authoring a Monograph"^^xsd:string .
+
+<http://vivoweb.org/activity-insight#Abstract>
+      rdf:type owl:Class ;
+      rdfs:label "Abstract"@en-US ;
+      rdfs:subClassOf <http://vivoweb.org/activity-insight#Intellcont> ;
+      vitro:displayLimitAnnot
+              "-1"^^xsd:int ;
+      vitro:displayRankAnnot
+              "-1"^^xsd:int ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:inClassGroup <http://vivoweb.org/ontology#vitroClassGroupactivities> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:shortDef "Authoring an Abstract"^^xsd:string .
+
+<http://vivoweb.org/activity-insight#ISBNISSN>
+      rdf:type owl:DatatypeProperty ;
+      rdfs:label "ISBNISSN"@en-US ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
+
+<http://vivoweb.org/activity-insight#TrainingManual>
+      rdf:type owl:Class ;
+      rdfs:label "Training Manual"@en-US ;
+      rdfs:subClassOf <http://vivoweb.org/activity-insight#Intellcont> , <http://purl.org/ontology/bibo/Manual> ;
+      vitro:displayLimitAnnot
+              "-1"^^xsd:int ;
+      vitro:displayRankAnnot
+              "-1"^^xsd:int ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:inClassGroup <http://vivoweb.org/ontology#vitroClassGroupactivities> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:shortDef "Contributing to or authoring a Training Manual"^^xsd:string .
+
+<http://vivoweb.org/activity-insight#studentLevel>
+      rdf:type owl:DatatypeProperty ;
+      rdfs:label "Student Level"@en-US ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
+
+<http://vivoweb.org/activity-insight#publicAvail>
+      rdf:type owl:DatatypeProperty ;
+      rdfs:label "Publically Available"@en-US ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
+
+<http://vivoweb.org/activity-insight#pubcntry>
+      rdf:type owl:DatatypeProperty ;
+      rdfs:label "Publication Country"@en-US ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
+
+<http://vivoweb.org/activity-insight#BookChapter>
+      rdf:type owl:Class ;
+      rdfs:label "Book Chapter"@en-US ;
+      rdfs:subClassOf <http://purl.org/ontology/bibo/Chapter> , <http://vivoweb.org/activity-insight#Intellcont> ;
+      vitro:displayLimitAnnot
+              "-1"^^xsd:int ;
+      vitro:displayRankAnnot
+              "-1"^^xsd:int ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:inClassGroup <http://vivoweb.org/ontology#vitroClassGroupactivities> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:shortDef "Authoring a Book Chapter"^^xsd:string .
+
+<http://vivoweb.org/activity-insight#netid>
+      rdf:type owl:FunctionalProperty , owl:DatatypeProperty ;
+      rdfs:label "netid"@en-US ;
+      vitro:descriptionAnnot
+              "cornell netid"^^xsd:string ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
+
+<http://vivoweb.org/activity-insight#Newsletter>
+      rdf:type owl:Class ;
+      rdfs:label "Newsletter"@en-US ;
+      rdfs:subClassOf <http://vivoweb.org/activity-insight#Intellcont> , <http://purl.org/ontology/bibo/Article> ;
+      vitro:displayLimitAnnot
+              "-1"^^xsd:int ;
+      vitro:displayRankAnnot
+              "-1"^^xsd:int ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:inClassGroup <http://vivoweb.org/ontology#vitroClassGroupactivities> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:shortDef "Contributing to a Newsletter"^^xsd:string .
+
+<http://vivoweb.org/activity-insight#Television>
+      rdf:type owl:Class ;
+      rdfs:label "Television"@en-US ;
+      rdfs:subClassOf <http://vivoweb.org/activity-insight#Intellcont> , <http://purl.org/ontology/bibo/AudioVisualDocument> ;
+      vitro:displayLimitAnnot
+              "-1"^^xsd:int ;
+      vitro:displayRankAnnot
+              "-1"^^xsd:int ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:inClassGroup <http://vivoweb.org/ontology#vitroClassGroupactivities> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:shortDef "Contributing to or authoring a television presentation"^^xsd:string .
+
+<http://vivoweb.org/activity-insight#JournalArticle>
+      rdf:type owl:Class ;
+      rdfs:label "Journal Article"@en-US ;
+      rdfs:subClassOf <http://purl.org/ontology/bibo/AcademicArticle> , <http://vivoweb.org/activity-insight#Intellcont> ;
+      vitro:displayLimitAnnot
+              "-1"^^xsd:int ;
+      vitro:displayRankAnnot
+              "-1"^^xsd:int ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:inClassGroup <http://vivoweb.org/ontology#vitroClassGroupactivities> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:shortDef "Contributing an Academic Article to a Journal"^^xsd:string .
+
+<http://vivoweb.org/activity-insight#Newspaper>
+      rdf:type owl:Class ;
+      rdfs:label "Newspaper"@en-US ;
+      rdfs:subClassOf <http://vivoweb.org/activity-insight#Intellcont> , <http://purl.org/ontology/bibo/Article> ;
+      vitro:displayLimitAnnot
+              "-1"^^xsd:int ;
+      vitro:displayRankAnnot
+              "-1"^^xsd:int ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:inClassGroup <http://vivoweb.org/ontology#vitroClassGroupactivities> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:shortDef "Contributing a newspaper article"^^xsd:string .
+
+<http://vivoweb.org/activity-insight#TchnicalReport>
+      rdf:type owl:Class ;
+      rdfs:label "Technical Report"@en-US ;
+      rdfs:subClassOf <http://vivoweb.org/activity-insight#Intellcont> , <http://purl.org/ontology/bibo/Report> ;
+      vitro:displayLimitAnnot
+              "-1"^^xsd:int ;
+      vitro:displayRankAnnot
+              "-1"^^xsd:int ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:inClassGroup <http://vivoweb.org/ontology#vitroClassGroupactivities> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:shortDef "Contributing to or authoring a Technical Report"^^xsd:string .
+
+<http://vivoweb.org/activity-insight#Other>
+      rdf:type owl:Class ;
+      rdfs:label "Other"@en-US ;
+      rdfs:subClassOf <http://vivoweb.org/activity-insight#Intellcont> , <http://vivoweb.org/ontology/core#InformationResource> ;
+      vitro:displayLimitAnnot
+              "-1"^^xsd:int ;
+      vitro:displayRankAnnot
+              "-1"^^xsd:int ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:inClassGroup <http://vivoweb.org/ontology#vitroClassGroupactivities> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:shortDef "Catch All"^^xsd:string .
+
+<http://vivoweb.org/activity-insight#classification>
+      rdf:type owl:DatatypeProperty ;
+      rdfs:label "Classification"@en-US ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
+
+<http://vivoweb.org/activity-insight#comments>
+      rdf:type owl:DatatypeProperty ;
+      rdfs:label "comments"@en-US ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
+
+<http://vivoweb.org/activity-insight#Translation>
+      rdf:type owl:Class ;
+      rdfs:label "Translation"@en-US ;
+      rdfs:subClassOf <http://vivoweb.org/activity-insight#Intellcont> , <http://vivoweb.org/ontology/core#Translation> ;
+      vitro:displayLimitAnnot
+              "-1"^^xsd:int ;
+      vitro:displayRankAnnot
+              "-1"^^xsd:int ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:inClassGroup <http://vivoweb.org/ontology#vitroClassGroupactivities> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:shortDef "Contributing to or translating a work from one language to another"^^xsd:string .
+
+<http://vivoweb.org/activity-insight#CornellEcourse>
+      rdf:type owl:Class ;
+      rdfs:label "eCornell Course"@en-US ;
+      rdfs:subClassOf <http://vivoweb.org/activity-insight#Intellcont> , <http://purl.org/ontology/bibo/Website> ;
+      vitro:displayLimitAnnot
+              "-1"^^xsd:int ;
+      vitro:displayRankAnnot
+              "-1"^^xsd:int ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:inClassGroup <http://vivoweb.org/ontology#vitroClassGroupactivities> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:shortDef "Contributing to or creating a Internet Course"^^xsd:string .
+
+<http://vivoweb.org/activity-insight#conarea>
+      rdf:type owl:FunctionalProperty , owl:DatatypeProperty ;
+      rdfs:domain <http://vivoweb.org/activity-insight#Intellcont> ;
+      rdfs:label "Contribution Area"@en-US ;
+      rdfs:range xsd:string ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
+
+<http://vivoweb.org/activity-insight#ScholarlyBook>
+      rdf:type owl:Class ;
+      rdfs:label "Scholarly Book"@en-US ;
+      rdfs:subClassOf <http://vivoweb.org/activity-insight#Intellcont> , <http://purl.org/ontology/bibo/Book> ;
+      vitro:displayLimitAnnot
+              "-1"^^xsd:int ;
+      vitro:displayRankAnnot
+              "-1"^^xsd:int ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:inClassGroup <http://vivoweb.org/ontology#vitroClassGroupactivities> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:shortDef "Authoring a Scholarly Book"^^xsd:string .
+
+<http://vivoweb.org/activity-insight#Poster>
+      rdf:type owl:Class ;
+      rdfs:label "Poster"@en-US ;
+      rdfs:subClassOf <http://vivoweb.org/activity-insight#Intellcont> , <http://vivoweb.org/ontology/core#ConferencePoster> ;
+      vitro:displayLimitAnnot
+              "-1"^^xsd:int ;
+      vitro:displayRankAnnot
+              "-1"^^xsd:int ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:inClassGroup <http://vivoweb.org/ontology#vitroClassGroupactivities> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:shortDef "Contributing to or creating a Conference Poster"^^xsd:string .
+
+<http://vivoweb.org/activity-insight#PolicyReport>
+      rdf:type owl:Class ;
+      rdfs:label "Policy Report"@en-US ;
+      rdfs:subClassOf <http://vivoweb.org/activity-insight#Intellcont> , <http://purl.org/ontology/bibo/Report> ;
+      vitro:displayLimitAnnot
+              "-1"^^xsd:int ;
+      vitro:displayRankAnnot
+              "-1"^^xsd:int ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:inClassGroup <http://vivoweb.org/ontology#vitroClassGroupactivities> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:shortDef "Contributing to or authoring a Policy Report"^^xsd:string .
+
+<http://vivoweb.org/activity-insight#fullText>
+      rdf:type owl:DatatypeProperty ;
+      rdfs:label "Full Text"@en-US ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
+
+<http://vivoweb.org/activity-insight#ResearchReport>
+      rdf:type owl:Class ;
+      rdfs:label "Research Report"@en-US ;
+      rdfs:subClassOf <http://vivoweb.org/activity-insight#Intellcont> , <http://purl.org/ontology/bibo/Report> ;
+      vitro:displayLimitAnnot
+              "-1"^^xsd:int ;
+      vitro:displayRankAnnot
+              "-1"^^xsd:int ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:inClassGroup <http://vivoweb.org/ontology#vitroClassGroupactivities> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:shortDef "Contributing to or authoring a Research Report"^^xsd:string .
+
+<http://vivoweb.org/activity-insight#audience>
+      rdf:type owl:DatatypeProperty ;
+      rdfs:label "Audience"@en-US ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .

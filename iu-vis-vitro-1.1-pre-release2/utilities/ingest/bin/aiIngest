@@ -1,0 +1,1255 @@
+#!/usr/bin/perl
+use FindBin qw($Bin);
+use lib $Bin;
+use Getopt::Long;
+use FileHandle;
+use POSIX qw( strftime );
+use Term::ReadKey;
+@av = @ARGV;
+$g_STARTED_AT = strftime("%Y\%m%d%H\%M\%S", localtime());
+
+if(scalar(@ARGV) == 0 || $op_usage){
+    Usage();
+}
+$g_cwd = $ENV{'PWD'};
+sub trim {
+    my($a) = @_;
+    $a =~ s/^\s*(\S+)\s*$/$1/;
+    $a =~ s/^\s*(\S.*\S)\s*$/$1/;
+    $a =~ s/(\s*)//;
+    return $a;
+}
+
+sub doit {
+    my($cmd, $flag, $pw, $resp) = @_;
+    #print "$cmd, $flag, $pw, $resp\n";
+    print STDOUT "$cmd\n" if $flag =~ /V/;
+    $cmd =~ s/_PW_/$pw/ if $pw;
+    if($flag =~ /L/ && $resp){
+	@$resp = qx($cmd);
+	my $r = ($? >> 8);
+	return $r;
+    } elsif($flag =~ /L/){
+	qx($cmd);
+	my $r = ($? >> 8);
+	return $r;
+    }
+    return 0;
+}
+
+GetOptions('step=s' => \@Steps,
+	   'steps=s' => \@Steps,
+           'jopts=s' => \@JavaOpts,
+           'workdir=s' => \$op_workdir,
+	   'bindir=s' => \$op_bindir,
+	   'xmldir=s' => \$op_xmldir,
+	   'xsltdir=s' => \$op_xslts,
+	   'rawp=s' => \$op_rawpath,
+	   'aiicp=s' => \$op_aiicpath,
+	   'aiisp=s' => \$op_aiispath,
+	   'raw=s' => \$op_raw,
+	   'aiic=s' => \$op_aiic,
+	   'aiis=s' => \$op_aiis,
+	   'newrun' => \$op_newrun,
+           'md5' => \$op_md5,
+	   'logdir=s' => \$op_logdir,
+	   'tmp=s' => \$op_tmp,
+           'L' => \$op_Live,
+	   'log' => \$op_log,
+	   'xchain=s' => \$op_chain,
+	   'is_xchain=s' => \$op_is_chain,
+	   'uts' => \$op_use_timestamp,
+	   'tsr=s' => \$op_tsr,
+           'u' => \$op_usage,
+           'v' => \$op_verb);
+
+$g_TSR = strftime("\%Y\%m\%d\%H\%M\%S", localtime());
+if($op_tsr){
+    if($op_tsr =~ /^day/i){
+	$g_TSR = strftime("\%Y\%m\%d", localtime());
+    } elsif ($op_tsr =~ /^hour/i){
+	$g_TSR = strftime("\%Y\%m\%d\%H", localtime());
+    } elsif ($op_tsr =~ /^min/){
+	$g_TSR = strftime("\%Y\%m\%d\%H\%M", localtime());
+    } else {
+	$g_TSR = strftime("\%Y\%m\%d\%H\%M\%S", localtime());
+    }
+    $op_use_timestamp = 1;
+}
+
+sub Usage {
+    print STDERR "Usage:\naiIngest\n";
+    print STDERR "\t--step[s] steplist   comma separated non-empty subset of\n";
+    print STDERR "\t                     { GU,GX,IC,LM,CA,CJ,CIA,CIP,AR,JR,\n";
+    print STDERR "\t                       ICAR,ICPR,IS,CINV,CCE,CFO,\n";
+    print STDERR "\t                       CGEO,CPA,\n";
+    print STDERR "\t                       TR, TX }\n";
+    print STDERR "\t--bindir  path       path to bin dir containing\n";
+    print STDERR "\t                     support scripts\n";
+    print STDERR "\t--workdir path       path to work dir i.e. base directory\n";
+    print STDERR "\t                     default: current directory '.' \n";
+    print STDERR "\t--logdir  path       path to log dir. default \n";
+    print STDERR "\t                     {workdir}/log\n";
+    print STDERR "\t--log                enable logging\n";
+    print STDERR "\t--xmldir  path       path to raw and processed xmls\n";
+    print STDERR "\t                     default: {workdir}/AIXMLS\n";
+    print STDERR "\t--xsltdir path       path to xslt directory containing\n";
+    print STDERR "\t                     supporting .xsl files, etc\n";
+    print STDERR "\t                     normally {workdir}/xslt\n";
+    print STDERR "\t--rawp    path       use this to directly identify raw dir\n";
+    print STDERR "\t                     don't use other mechanisms\n";
+    print STDERR "\t--aiicp   path       use this to directly identify aiic dir\n";
+    print STDERR "\t--aiisp   path       use this to directly identify aiis dir\n";
+    print STDERR "\t                     don't use other mechanisms\n";
+    print STDERR "\t--tmp     path       path to process tmp store.\n";
+    print STDERR "\t                     default: /tmp\n";
+    print STDERR "\t--raw     prefix     a prefix string for raw xml dir\n";
+    print STDERR "\t                     name. A subdirectory of {xmldir} \n";
+    print STDERR "\t                     default: AIRAW\n";
+    print STDERR "\t--aiic    prefix     a prefix string for Intellcont dir\n";
+    print STDERR "\t                     of processed xmls. A subdirectory\n";
+    print STDERR "\t                     of {xmldir}. default: AIIC\n";
+    print STDERR "\t--aiis    prefix     a prefix string for Impact Stmt dir\n";
+    print STDERR "\t                     of processed xmls. A subdirectory\n";
+    print STDERR "\t                     of {xmldir}. default: AIIS\n";
+    print STDERR "\t--uts                use timestamp when naming xml\n";
+    print STDERR "\t                     subdirectories. e.g \n";
+    print STDERR "\t                         AIRAW_20100610120510 or\n";
+    print STDERR "\t                         AII[CS]_20100610120510\n";
+    print STDERR "\t--tsr     unit       unit 1of {day,hour,min}\n";
+    print STDERR "\t--xchain  name       name of a file in {xsltdir} \n";
+    print STDERR "\t                     listing a sequence of xslts to be\n";
+    print STDERR "\t                     applied to all raw xmls\n";
+    print STDERR "\t--is_xchain name     name of a file in {xsltdir} \n";
+    print STDERR "\t                     listing a sequence of xslts to be\n";
+    print STDERR "\t                     applied to all raw xmls\n";
+    print STDERR "\t                     default: aiis-chain.xslc\n";
+    print STDERR "\t--jopts   'opts'     java options e.g. -Xmx2048m \n";
+    print STDERR "\t                     -XX:MaxPermSize=100m Use quotes\n";
+    print STDERR "\t                     for multiple options\n";
+    print STDERR "\t--newrun             make new raw and aiic directories\n";
+    print STDERR "\t--L                  Live run. Actually execute\n";
+    print STDERR "\t                     don't just list actions\n";
+    print STDERR "\t--u                  show this usage info\n";
+    print STDERR "\t--v                  verbose mode\n";
+    print STDERR "\t\nExamples:\n";
+    print STDERR "\taiIngest --L --v --uts --steps GU,GX,IC,LM,CA,CJ,CIA,AR,JR\n";
+    print STDERR "\tpresumes that the current directory is the working\n";
+    print STDERR "\tdirectory, this ia a live verbose run and timestamp\n";
+    print STDERR "\textensions are to be used when naming the xml directories\n";
+    print STDERR "\t\n";
+    print STDERR "\taiIngest --L --v --uts --log --steps GU,GX\n"; 
+    print STDERR "\tlike the first only it includes a log and only does\n";
+    print STDERR "\tthe first two steps.\n"; 
+    print STDERR "\t\n";
+    print STDERR "\taiIngest --L --v --aiic IC --steps GU,GX,IC,LM,CA,CJ,CIA,AR,JR,TR,TX --log\n"; 
+    print STDERR "\t         --jopts '-Xmx2048m -XX:MaxPermSize=100m'\n";
+
+    exit 0;
+
+} 
+
+# to maintain a way to write to
+# good old stdout after this process
+# redirects STDOUT to a log file
+open CONSOLE, ">&STDOUT";
+autoflush CONSOLE 1;
+
+
+$g_javaopts = " -Xmx1024m -Xms1024m ";
+if(scalar(@JavaOpts) > 0){
+    @JavaOpts = split(/[,;]/,join(',',@JavaOpts));
+    $g_javaopts = ' ' . join(' ', @JavaOpts) . ' ';
+} 
+
+@Steps = split(/[,;]/,join(',',@Steps));
+if(scalar(@Steps) == 0){
+    $g_all = 'y';
+} else {
+    $g_all = '';
+}
+
+%Phases = ();
+foreach my $item (@Steps){
+    if($item =~ /^-/){
+	$item =~ s/^-//;
+	$Phases{uc($item)} = -1;
+    } else {
+	$Phases{uc($item)} = 1;
+    }
+}
+$op_log = 0 if !$op_log;
+$op_log = 1 if $op_logdir;
+$op_workdir = $g_cwd if !$op_workdir;
+$op_logdir = "$op_workdir/log" if !$op_logdir;
+
+$op_tmp = '/tmp' if !$op_tmp;
+
+$op_xmldir = "$op_workdir/AIXMLS" if !$op_xmldir;
+$op_xslts = "$op_workdir/xslt" if !$op_xslts;
+$op_bindir = "$op_workdir/bin" if !$op_bindir;
+$op_raw = "AIRAW" if !$op_raw;
+$g_raw = $op_raw;
+
+$op_aiic = "AIIC" if !$op_aiic;
+$g_aiic = $op_aiic;
+
+$op_aiis = "AIIS" if !$op_aiis;
+$g_aiis = $op_aiis;
+
+$op_chain = "aiic-chain.xslc" if !$op_chain;
+$g_chain = $op_chain;
+
+$op_is_chain = "aiis-chain.xslc" if !$op_is_chain;
+$g_is_chain = $op_is_chain;
+
+$op_use_timestamp = "no" if ! $op_use_timestamp;
+
+$g_tmp = $op_tmp;
+
+$g_exef = "L" if $op_Live;
+$g_exef .= "V" if $op_verb;
+
+############################################
+#
+# working directory
+if( ! -e $op_workdir ){
+    doit("mkdir $op_workdir", "LV");
+}
+if( !(-e $op_workdir && -w _ && -d _)){
+    print STDERR "Can't create or use working directory $op_workdir.\n";
+    exit 1;
+}
+# make path absolute if not already
+$g_work=$op_workdir;
+$g_work = $g_cwd . '/' . $g_work if $g_work !~ /^\//;
+
+############################################
+#
+# log directory
+if($op_log){
+    if( !(-e $op_logdir)){
+	doit("mkdir $op_logdir",  "LV");
+    }
+    if( !(-e $op_logdir && -w _ && -d _)){
+	print STDERR "Can't create or use log directory $op_logdir.\n";
+	exit 1;
+    }
+# make path absolute if not already
+    $g_log = $op_logdir;
+    $g_log = $g_cwd . '/' . $g_log if $g_log !~ /^\//;
+    
+}
+############################################
+#
+# xml parent directory
+# make path absolute if not already
+$g_xmls = $op_xmldir;
+$g_xmls = $g_cwd . '/' . $g_xmls if $g_xmls  !~ /^\//;
+
+if( ! -e $g_xmls ){
+    doit("mkdir $g_xmls","LV" );
+}
+if( !(-e $g_xmls && -w _ && -d _)){
+    print STDERR "Can't create or use xml directory $g_xmls.\n";
+    exit 1;
+}
+
+############################################
+#
+# xml raw in directory
+my @lnk = qx(readlink "$g_xmls/cur-raw");
+my $curRaw = trim($lnk[0]);
+
+if($op_rawpath){
+    $g_xmls_raw = $op_rawpath;
+} elsif($op_newrun || $curRaw  eq ''){
+    $g_xmls_raw = "$g_xmls/$op_raw";
+    $g_xmls_raw .= "_" . $g_TSR  if $op_use_timestamp;
+} else {
+    $g_xmls_raw = $curRaw;
+}
+if( ! -e  $g_xmls_raw){
+    doit("mkdir $g_xmls_raw", "LV");
+    if( -e "$g_xmls/cur-raw"){
+	doit("mv $g_xmls/cur-raw $g_xmls/prev-raw",  "LV");
+    }
+    doit("ln -s $g_xmls_raw $g_xmls/cur-raw", "LV");
+
+}
+if( !(-e $g_xmls_raw && -w _ && -d _)){
+    print STDERR "Can't create or use raw xml in directory $g_xmls_raw.\n";
+    exit 1;
+}
+# make path absolute if not already
+$g_xmls_raw = $g_cwd . '/' . $g_xmls_raw if  $g_xmls_raw !~ /^\//;
+
+############################################
+#
+# xml out directory finished process
+@lnk = qx(readlink "$g_xmls/cur-aiic");
+my $curOut = trim($lnk[0]);
+
+if($op_aiicpath){
+    $g_xmls_out = $op_aiicpath;
+} elsif($op_newrun || $curOut  eq ''){
+    $g_xmls_out = "$g_xmls/$op_aiic";
+    $g_xmls_out .= "_" . $g_TSR  if $op_use_timestamp;
+} else {
+    $g_xmls_out = $curOut;
+}
+
+if( ! -e $g_xmls_out){
+    doit("mkdir $g_xmls_out", "LV");
+    if( -e "$g_xmls/cur-aiic"){
+	doit("mv $g_xmls/cur-aiic $g_xmls/prev-aiic",  "LV");
+    }
+    doit("ln -s $g_xmls_out $g_xmls/cur-aiic", "LV");
+}
+if( !(-e $g_xmls_out && -w _ && -d _)){
+    print STDERR "Can't create or use xml out directory $g_xmls_out.\n";
+    exit 1;
+}
+# make path absolute if not already
+$g_xmls_out = $g_cwd . '/' . $g_xmls_out if  $g_xmls_out !~ /^\//;
+
+############################################
+#
+# xml out directory finished process
+@lnk = qx(readlink "$g_xmls/cur-aiis");
+my $curOut = trim($lnk[0]);
+
+if($op_aiispath){
+    $g_is_xmls_out = $op_aiispath;
+} elsif($op_newrun || $curOut  eq ''){
+    $g_is_xmls_out = "$g_xmls/$op_aiis";
+    $g_is_xmls_out .= "_" . $g_TSR  if $op_use_timestamp;
+} else {
+    $g_is_xmls_out = $curOut;
+}
+
+if( ! -e $g_is_xmls_out){
+    doit("mkdir $g_is_xmls_out", "LV");
+    if( -e "$g_xmls/cur-aiis"){
+	doit("mv $g_xmls/cur-aiis $g_xmls/prev-aiis",  "LV");
+    }
+    doit("ln -s $g_is_xmls_out $g_xmls/cur-aiis", "LV");
+}
+if( !(-e $g_is_xmls_out && -w _ && -d _)){
+    print STDERR "Can't create or use xml out directory $g_is_xmls_out.\n";
+    exit 1;
+}
+# make path absolute if not already
+$g_is_xmls_out = $g_cwd . '/' . $g_is_xmls_out if  $g_is_xmls_out !~ /^\//;
+
+############################################
+#
+# gotta be able to read xslts
+if( !(-e $op_xslts && -r _ && -d _)){
+    print STDERR "Can't find xslt directory $op_xslts.\n";
+    print STDERR "Provide a path to an xslt directory using --xsltdir option\n";
+    exit 1;
+}
+# make path absolute if not already
+$g_xslts = $op_xslts;
+$g_xslts = $g_cwd . '/' . $g_xslts if  $g_xslts !~ /^\//;
+
+############################################
+#
+#gotta have an empty.xml in xslts directory
+if( !(-e "$op_xslts/empty.xml" && -r _ )){
+    print STDERR "Can't find empty.xml in xslt directory $op_xslts.\n";
+    print STDERR "Provide such a file.\n";
+    exit 1;
+}
+
+############################################
+#
+#gotta have saxon jar in xslts directory
+if( !(-e "$op_xslts/saxon9he.jar" && -r _ )){
+    print STDERR "Can't find saxon9he.jar in xslt directory $op_xslts.\n";
+    print STDERR "Provide such a file.\n";
+    exit 1;
+}
+
+############################################
+#
+# gotta be able to read bin 
+if( !(-e $op_bindir && -r _ && -d _)){
+    print STDERR "Can't find bin directory $op_bindir.\n";
+    print STDERR "Provide a path to a bin directory using --bindir option\n";
+    exit 1;
+}
+
+# make path absolute if not already
+$g_bin = $op_bindir;
+$g_bin = $g_cwd . '/' . $g_bin if $g_bin !~ /^\//;
+
+############################################
+#
+# gotta be able to read/write tmp dir
+if( ! -e $op_tmp){
+    doit("mkdir $op_tmp", "LV");
+}
+if( !(-e $op_tmp && -r _ && -d _ && -w _)){
+    print STDERR "Can't create or use tmp directory $op_tmp.\n";
+    exit 1;
+}
+# make path absolute if not already
+$g_tmp = $g_cwd . '/' . $g_tmp if $g_tmp !~ /^\//;
+
+############################################
+$g_log_path = "";
+if($op_log) {
+    my $flag = 0;
+    if($g_log){
+	$flag = open LOG, ">$g_log/aiIngest_$$\_$g_STARTED_AT";
+	$g_log_path = "$g_log/aiIngest_$$\_$g_STARTED_AT";
+    } else {
+	$flag = open LOG, ">$g_log/log/aiIngest_$$\_$g_STARTED_AT";
+	$g_log_path = "$g_log/log/aiIngest_$$\_$g_STARTED_AT";
+    }
+    
+    if($flag){
+	autoflush LOG 1;
+	open(STDOUT,">&LOG");
+	open(STDERR,">&LOG");
+	print "Starting at $g_STARTED_AT\n";
+	print "aiIngest " . join(' ',@av) . "\n";
+    } else {
+	# write to display
+	print "can't open $g_log\n";
+	$g_log_path = "";
+    }
+}
+print "\$op_newrun\t= $op_newrun\n";
+print "\$g_work\t\t= $g_work\n";
+print "\$g_log\t\t= $g_log\n" if $op_log;
+print "\$g_xmls\t\t= $g_xmls\n";
+print "\$g_xmls_raw\t= $g_xmls_raw\n";
+print "\$g_xmls_out\t= $g_xmls_out\n";
+print "\$g_is_xmls_out\t= $g_is_xmls_out\n";
+print "\$g_xslts\t= $g_xslts\n";
+print "\$g_bin\t\t= $g_bin\n";
+print "\$g_tmp\t\t= $g_tmp\n";
+print "\$op_rawp\t= $op_rawpath\n";
+print "\$op_aiicp\t= $op_aiicpath\n";
+print "\$op_aiisp\t= $op_aiispath\n";
+print "\$op_raw\t\t= $op_raw \n";
+print "\$op_aiic\t= $op_aiic\n";
+print "\$op_aiis\t= $op_aiis\n";
+print "\$op_chain\t= $op_chain\n";
+print "\$op_is_chain\t= $op_is_chain\n";
+print "\$op_use_timestamp = $op_use_timestamp\n";
+print "\$op_tsr\t\t= $op_tsr\n";
+print "\$g_TSR\t\t= $g_TSR\n";
+print "\$g_javaopts\t= $g_javaopts\n";
+print "\$g_exef\t\t= $g_exef\n";
+print "\$op_Live\t= ". ($op_Live?"yes":"no") . "\n";
+print "\$g_cwd\t\t= $g_cwd\n";
+print "\$op_verb\t= $op_verb\n";
+print "\$op_log\t\t= $op_log\n";
+print "\$op_logdir\t= $op_logdir\n";
+############################################
+foreach my $i (@Steps){
+    $i =~ s/^-//;
+    print "$i -> $Phases{$i}\n";
+}
+#print CONSOLE $g_javaopts . "\n";
+
+
+############################################
+############################################
+#
+# These two steps require a password 
+#
+if($Phases{'GU'}>0 || $Phases{'GX'}>0 || $g_all){
+#
+# get password
+#
+    print  CONSOLE "Password: ";
+    ReadMode 'noecho';
+    $g_pw = ReadLine(0);
+    print  CONSOLE "\n";
+    chomp($g_pw);
+    $g_pw =~ s/\$/\\\$/g;
+    ReadMode 'normal';
+    #print CONSOLE $g_pw . "\n";
+}
+############################################
+#
+# Get a User.xml from DM
+#
+if($Phases{'GU'}>0 || $g_all){
+    print "\nPhase = GU\n";
+#
+# have password by this point
+#
+    print "Get Users list from Digital Measures...\n";
+    my $cmd = "wget -O - --http-user cornell/fac_reports --http-passwd ";
+    $cmd .= "_PW_ https://www.digitalmeasures.com/login/service/v4/User ";
+    $cmd .= " > $g_tmp/Users.xml ";
+    my $r;
+    $r = doit($cmd, $g_exef, $g_pw);
+    exit(1) if($r);
+    print "\nExtract netids from $g_tmp/Users.xml ...\n";
+    $cmd = "$g_bin/xtract_netids $g_tmp/Users.xml  | sort | uniq  ";
+    $cmd .= " > $g_tmp/ai_users.txt ";
+    $r = doit($cmd, $g_exef);
+    exit(1) if($r);
+
+}
+############################################
+#
+# Get all the user xmls from DM and put them 
+# in $g_xml_raw
+#
+if($Phases{'GX'}>0 || $g_all){
+    print "\nPhase = GX\n";
+#
+# have password by this point
+#
+# depends on $g_tmp/ai_users.txt from GU
+
+    print "\nGet xml for each netid and put them in $g_xmls_raw ...\n";
+    my $cmd = "";
+    $cmd .= "$g_bin/waiget -M -U $g_tmp/ai_users.txt -b $g_work -o $g_xmls_raw ";
+    $cmd .= " -p _PW_ -m raw$g_TSR.md5 ";
+    $cmd .= " -L $g_log_path " if $g_log_path ne '';
+    my $r;
+    $r = doit($cmd, $g_exef, $g_pw);
+    exit(1) if($r);
+    md5check() if $op_md5;
+}
+############################################
+#
+# Extract IntellCont, Journal Articles add author index, summarize 
+# authorships etc on a per netid basis
+#
+if($Phases{'IC'}>0 || $g_all){
+    print "\nPhase = IC\n";
+#
+# depends on $g_xmls_raw e,r and $g_xmls_out e,r,w
+# $g_xslts/$g_chain and $g_log_path
+# xslt/aiic-Filter.xsl, xslt/aiic-addIndex.xsl
+# xslt/aiic-addAuthSummary.xsl, xslt/aiic-addIntellContPromulgators.xsl
+
+
+    print "\nBegin integration process using $g_xslts/$g_chain ...\n";
+    my $prefix = $g_aiic . "_";
+    my $cmd = "";
+    $cmd .= "$g_bin/xsltseq -I $g_xmls_raw -O $g_xmls_out ";
+    $cmd .= " -X $g_xslts/$g_chain -x $g_xslts -p $prefix ";
+    $cmd .= " -T $g_tmp ";
+    $cmd .= " -L $g_log_path " if $g_log_path ne '';
+    my $r;
+    $r = doit($cmd, $g_exef, $g_pw);
+    exit(1) if($r);
+}
+############################################
+#
+# Construct a list of netid xml paths and a mapping of AIID <-> NETID
+# this is needed in the next 'Collect Authors' step
+#
+if($Phases{'LM'}>0 || $g_all){
+    print "\nPhase = LM\n";
+# depends on $g_xmls_raw e,r and $g_xmls_out e,r,w
+# $g_xslts/empty.xml, $g_xslts/aiid2netid.xsl and prior GX, IC
+
+    print "\nConstruct a list of xmls by netids in $g_tmp/aiiclist.xml ...\n";
+    my $cmd = "";
+    $cmd .= "$g_bin/mklist -d $g_xmls_out -D $g_xmls_out > $g_tmp/aiiclist.xml";
+    my $r;
+    $r = doit($cmd, $g_exef, $g_pw);
+    exit(1) if($r);
+
+    print "\nConstruct a mapping of activity insight id to";
+    print " netid (for cornell authors) ...\n";
+    $cmd = "";
+    $cmd .= "java $g_javaopts -jar $g_xslts/saxon9he.jar $g_xslts/empty.xml ";
+    $cmd .= " $g_xslts/aiid2netid.xsl ";
+    $cmd .= " listxml=$g_tmp/aiiclist.xml > $g_tmp/aiid-netid.xml ";
+    $r = doit($cmd, $g_exef, $g_pw);
+    exit(1) if($r);
+}
+############################################
+#
+# Accumulate all articles by author by combining data
+# from all xmls
+#
+if($Phases{'CA'}>0 || $g_all){
+    print "\nPhase = CA\n";
+#
+#depends on $g_xslts/empty.xml, $g_tmp/aiiclist.xml, $g_tmp/aiid-netid.xml
+# $g_xslts/collectByAuthor.xsl, $g_xslts/groupAuthorsArticles.xsl
+# $g_xslts/aiicsort.xsl    prior GX, IC and LM
+#
+    print "\nCollect all articles for each author from all $g_aiic xmls ...\n";
+    my $cmd = "";
+    $cmd .= "java $g_javaopts -jar $g_xslts/saxon9he.jar $g_xslts/empty.xml ";
+    $cmd .= " $g_xslts/collectByAuthor.xsl listxml=$g_tmp/aiiclist.xml ";
+    $cmd .= " aiid2netid=$g_tmp/aiid-netid.xml > $g_tmp/ca.xml ";
+    my $r;
+    $r = doit($cmd, $g_exef);
+    exit(1) if($r);
+
+    print "\nIdentify articles mentioned in multiple AIIC xmls ...\n";
+    $cmd = "";
+    $cmd .= "java $g_javaopts -jar $g_xslts/saxon9he.jar $g_tmp/ca.xml ";
+    $cmd .= " $g_xslts/groupAuthorsArticles.xsl > $g_tmp/cad.xml";
+    $r = doit($cmd, $g_exef);
+    exit(1) if($r);
+
+    $cmd = "";
+    print "\nSort an author's articles by Activity Insight id ...\n";
+    $cmd .= "java $g_javaopts -jar $g_xslts/saxon9he.jar $g_tmp/cad.xml ";
+    $cmd .= " $g_xslts/aiicsort.xsl > $g_tmp/cads.xml";
+    $r = doit($cmd, $g_exef);
+    exit(1) if($r);
+}
+############################################
+#
+# Accumulate and group all articles by journal by combining data
+# from all xmls
+#
+if($Phases{'CJ'}>0 || $g_all){
+    print "\nPhase = CJ\n";
+#
+#depends on $g_tmp/aiiclist.xml  $g_xslts/empty.xml $g_tmp/aiiclist.xml
+# $g_xslts/collectByJournals.xsl $g_xslts/groupJournalsArticles.xsl
+# $g_xslts/aiicsort.xsl
+# prior GX, IC and LM
+#
+    print "\nCollect all articles for each journal from all $g_aiic xmls ...\n";
+    my $cmd = "";
+    $cmd .= "java $g_javaopts -jar $g_xslts/saxon9he.jar $g_xslts/empty.xml ";
+    $cmd .= " $g_xslts/collectByJournals.xsl listxml=$g_tmp/aiiclist.xml ";
+    $cmd .= " > $g_tmp/cj.xml ";
+    my $r;
+    $r = doit($cmd, $g_exef);
+    exit(1) if($r);
+
+    print "\nIdentify articles mentioned in multiple AIIC xmls ...\n";
+    $cmd = "";
+    $cmd .= "java $g_javaopts -jar $g_xslts/saxon9he.jar $g_tmp/cj.xml ";
+    $cmd .= " $g_xslts/groupJournalsArticles.xsl ";
+    $cmd .= " > $g_tmp/cjd.xml";
+    $r = doit($cmd, $g_exef);
+
+    exit(1) if($r);
+    
+    print "\nSort an journal's articles by Activity Insight id ...\n";
+    $cmd = "";
+    $cmd .= "java $g_javaopts -jar $g_xslts/saxon9he.jar $g_tmp/cjd.xml ";
+    $cmd .= " $g_xslts/aiicsort.xsl > $g_tmp/cjds.xml";
+    $r = doit($cmd, $g_exef);
+    exit(1) if($r);
+}
+############################################
+#
+# Accumulate and group all IntellCont Authors
+#
+if($Phases{'CIA'}>0 || $g_all){
+    print "\nPhase = CIA\n";
+#
+#depends on $g_xslts/empty.xml $g_tmp/aiiclist.xml $g_tmp/aiid-netid.xml
+# $g_xslts/collectByIntellcontAuthors.xsl $g_xslts/groupAuthorsIntellconts.xsl
+# prior GX, IC and LM
+
+    print "\nCollect all intellcont for each author, from all $g_aiic xmls ...\n";
+    my $cmd = "";
+    $cmd .= "java $g_javaopts -jar $g_xslts/saxon9he.jar $g_xslts/empty.xml ";
+    $cmd .= " $g_xslts/collectByIntellcontAuthors.xsl listxml=$g_tmp/aiiclist.xml ";
+    $cmd .= " aiid2netid=$g_tmp/aiid-netid.xml > $g_tmp/cica.xml ";
+    my $r;
+    $r = doit($cmd, $g_exef);
+    exit(1) if($r);
+
+    print "\nIdentify Intellconts mentioned in multiple AIIC xmls ...\n";
+    $cmd = "";
+    $cmd .= "java $g_javaopts -jar $g_xslts/saxon9he.jar $g_tmp/cica.xml ";
+    $cmd .= " $g_xslts/groupAuthorsIntellconts.xsl > $g_tmp/cicad.xml";
+    $r = doit($cmd, $g_exef);
+    exit(1) if($r);
+}
+############################################
+#
+# Accumulate and group IntellCont Promulgators
+#
+if($Phases{'CIP'}>0 || $g_all){
+    print "\nPhase = CIP\n";
+    print "\nCollect all intellcont for each promulgator, from all $g_aiic xmls ...\n";
+# java -Xmx2048m -XX:MaxPermSize=100m -jar xslt/saxon9he.jar xslt/empty.xml xslt/collectIntellcontPromulgators.xsl listxml=/tmp/aiiclist.xml > foo.xml
+#
+# depends on  $g_xslts/empty.xml, $g_tmp/aiiclist.xml
+# $g_xslts/collectByIntellcontPromulgators.xsl
+# $g_xslts/groupPromulgatorsIntellconts.xsl
+# prior GX, IC and LM
+
+    $cmd = "";
+    $cmd .= "java $g_javaopts -jar $g_xslts/saxon9he.jar $g_xslts/empty.xml ";
+    $cmd .= " $g_xslts/collectByIntellcontPromulgators.xsl listxml=$g_tmp/aiiclist.xml ";
+    $cmd .= " >  $g_tmp/cicp.xml ";
+    my $r;
+    $r = doit($cmd, $g_exef);
+    exit(1) if($r);
+#java -Xmx2048m -XX:MaxPermSize=100m -jar xslt/saxon9he.jar foo.xml xslt/groupPromulgatorsIntellconts.xsl > food.xml
+    print "\nIdentify Intellconts mentioned in multiple AIIC xmls ...\n";
+    $cmd = "";
+    $cmd .= "java $g_javaopts -jar $g_xslts/saxon9he.jar $g_tmp/cicp.xml ";
+    $cmd .= " $g_xslts/groupPromulgatorsIntellconts.xsl > $g_tmp/cicpd.xml";
+    $r = doit($cmd, $g_exef);
+    exit(1) if($r);
+
+}
+
+############################################
+#
+# Construct rdf for journal article authors
+#
+if($Phases{'AR'}>0 || $g_all){
+    print "\nPhase = AR\n";
+    print "\nConstruct a (sufficiently) large number of unique ";
+    print "strings for journal article author rdf process\n";
+#
+# depends on $g_tmp/cad.xml, $g_tmp/cads.xml, $g_tmp/cjds.xml
+# $g_tmp/unomap.xml $g_xslts/mkrdf.xsl $g_xslts/rdfsort.xsl
+# $g_tmp/P0.xml
+# prior GX, IC, LM, CA, !!-> CJ <-!!
+# 
+#
+    my $cmd = "grep counter $g_tmp/cad.xml | wc -l ";
+
+    my $r;
+    my @res = ();
+    $r = doit($cmd, $g_exef, undef, \@res);
+    exit(1) if($r);
+    my $ans = trim($res[0]);
+    ($ans)=split /\s/, $ans;
+
+    #print "\n\n";
+    $cmd = "nuno -X -n $ans -t AI-  > $g_tmp/unomap.xml";
+    $r = doit($cmd, $g_exef);
+    exit(1) if($r);
+
+    print "\nConstruct the rdf for authors and articles\n";
+
+    $cmd = "";
+    $cmd .= "java $g_javaopts -jar $g_xslts/saxon9he.jar ";
+    $cmd .= " -o $g_tmp/icjabya.rdf $g_tmp/cads.xml ";
+    $cmd .= "  $g_xslts/mkrdf.xsl abyjFile=$g_tmp/cjds.xml ";
+    $cmd .= " unoMapFile=$g_tmp/unomap.xml ";
+    $cmd .= "  aiicXmlPath=$g_xmls_out aiicPrefix=$g_aiic\_ ";
+    $cmd .= " extPerIn=$g_tmp/P0.xml ";
+    $cmd .= " extPerOut=$g_tmp/P1.xml ";
+
+    $r = doit($cmd, $g_exef);
+    exit(1) if($r);
+
+    print "\nSort results ...\n";
+    $cmd = "";
+    $cmd .= "java $g_javaopts -jar $g_xslts/saxon9he.jar $g_tmp/icjabya.rdf ";
+    $cmd .= " $g_xslts/rdfsort.xsl > $g_work/sicjabya.rdf ";
+
+    $r = doit($cmd, $g_exef);
+    exit(1) if($r);
+}
+############################################
+#
+# Construct rdf for journals
+#
+if($Phases{'JR'}>0 || $g_all){
+    print "\nPhase = JR\n";
+    print "\nConstruct a (sufficiently) large number of unique";
+    print " strings for journal rdf process\n";
+#
+#depends on $g_tmp/cjd.xml $g_tmp/cjds.xml $g_xslts/mkjrdf.xsl
+# prior GX, IC, LM, CJ
+#
+    my $cmd = "grep JOURNAL_NAME $g_tmp/cjd.xml | wc -l ";
+
+    my $r;
+    my @res = ();
+    $r = doit($cmd, $g_exef, undef, \@res);
+    exit(1) if($r);
+    my $ans = trim($res[0]);
+    ($ans)=split /\s/, $ans;
+
+    #print "\n\n";
+    $cmd = "nuno -X -n $ans -t AI-  > $g_tmp/ajnunos.xml";
+    $r = doit($cmd, $g_exef);
+    exit(1) if($r);
+
+    print "\nConstruct the rdf for journals and articles\n";
+
+    $cmd = "";
+    $cmd .= "java $g_javaopts -jar $g_xslts/saxon9he.jar $g_tmp/cjds.xml ";
+    $cmd .= "  $g_xslts/mkjrdf.xsl unoMapFile=$g_tmp/ajnunos.xml";
+    $cmd .= " > $g_work/cj.rdf ";
+
+    $r = doit($cmd, $g_exef);
+    exit(1) if($r);
+}
+############################################
+#
+# Construct rdf for IntellCont Authors
+#
+if($Phases{'ICAR'}>0 || $g_all){
+    print "\nPhase = ICAR\n";
+    print "\nConstruct a (sufficiently) large number of unique ";
+    print "strings for intellcont author rdf process\n";
+#
+# depends on  $g_tmp/cicad.xml, $g_tmp/cicpd.xml, $g_xslts/mkicardf.xsl
+# $g_xslts/rdfsort.xsl
+# prior GX, IC, LM, CIA, -> CIP <-
+
+#grep counter  /tmp/cicad.xml | wc -l
+    my $cmd = "grep counter $g_tmp/cicad.xml | wc -l ";
+    my $r;
+    my @res = ();
+    $r = doit($cmd, $g_exef, undef, \@res);
+    exit(1) if($r);
+    my $ans = trim($res[0]);
+    ($ans)=split /\s/, $ans;
+#nuno -X -n 17954 -t AI- > ica_unomap.xml
+    $cmd = "nuno -X -n $ans -t AI-  > $g_tmp/ica_unomap.xml";
+    $r = doit($cmd, $g_exef);
+    exit(1) if($r);
+
+    print "\nConstruct the rdf for authors and intellconts\n";
+#java -Xmx2048m -XX:MaxPermSize=100m -jar xslt/saxon9he.jar /tmp/cicad.xml xslt/mkicardf.xsl   unoMapFile=../ica_unomap.xml abypFile=../cicpd.xml aiicXmlPath=/home/jrm424/aiwork/AIXMLS/cur-aiic aiicPrefix=IC_ > icbya.rdf
+#java -Xmx1024m -jar xslt/saxon9he.jar -o icbya.rdf store/cicad.xml xslt/mkicardf.xsl unoMapFile=../store/ica_unomap.xml aiicXmlPath=../AIXMLS/cur-aiic aiicPrefix=IC_ extPerIn=../store/curPersons.xml abypFile=../store/cicpd.xml
+    $cmd = "";
+    $cmd .= "java $g_javaopts -jar $g_xslts/saxon9he.jar ";
+    $cmd .= " -o $g_tmp/icbya.rdf $g_tmp/cicad.xml ";
+    $cmd .= "  $g_xslts/mkicardf.xsl abypFile=$g_tmp/cicpd.xml ";
+    $cmd .= " unoMapFile=$g_tmp/ica_unomap.xml ";
+    $cmd .= "  aiicXmlPath=$g_xmls_out aiicPrefix=$g_aiic\_ ";
+    $cmd .= " extPerIn=$g_tmp/P1.xml ";
+    $cmd .= " extPerOut=$g_tmp/P2.xml ";
+    $r = doit($cmd, $g_exef);
+    exit(1) if($r);
+#java -Xmx2048m -XX:MaxPermSize=100m -jar xslt/saxon9he.jar icbya.rdf xslt/rdfsort.xsl >sicbya.rdf
+    print "\nSort results ...\n";
+    $cmd = "";
+    $cmd .= "java $g_javaopts -jar $g_xslts/saxon9he.jar $g_tmp/icbya.rdf ";
+    $cmd .= " $g_xslts/rdfsort.xsl > $g_work/sicbya.rdf ";
+
+    $r = doit($cmd, $g_exef);
+    exit(1) if($r);
+}
+
+############################################
+#
+# Construct rdf for IntellCont Promulgators
+#
+if($Phases{'ICPR'}>0 || $g_all){
+#
+# depends on $g_tmp/cicpd.xml $g_xslts/mkprdf.xsl
+# prior GX, IC, LM, CIP
+#
+    print "\nPhase = ICPR\n";
+    print "\nConstruct a (sufficiently) large number of unique";
+    print " strings for promulgator rdf process\n";
+
+    my $cmd = "grep INTELLCONT_PROMULGATOR_NAME $g_tmp/cicpd.xml | wc -l ";
+    my $r;
+    my @res = ();
+    $r = doit($cmd, $g_exef, undef, \@res);
+    exit(1) if($r);
+    my $ans = trim($res[0]);
+    ($ans)=split /\s/, $ans;
+
+    $cmd = "nuno -X -n $ans -t AI-  > $g_tmp/icp_nunos.xml";
+    $r = doit($cmd, $g_exef);
+    exit(1) if($r);
+
+#nuno -X -n 12564 -t AI- > icp_unomap.xml
+
+#java -Xmx2048m -XX:MaxPermSize=100m -jar xslt/saxon9he.jar cicpd.xml xslt/mkprdf.xsl unoMapFile=../icp_unomap.xml  > icbp.rdf
+
+    print "\nConstruct the rdf for promulgators and intellconts\n";
+
+    $cmd = "";
+    $cmd .= "java $g_javaopts -jar $g_xslts/saxon9he.jar $g_tmp/cicpd.xml ";
+    $cmd .= "  $g_xslts/mkprdf.xsl unoMapFile=$g_tmp/icp_nunos.xml";
+    $cmd .= " > $g_work/icbyp.rdf ";
+
+    $r = doit($cmd, $g_exef);
+    exit(1) if($r);
+}
+############################################
+#
+# Extract Impact Statements, add collaborator index, summarize impact stmts by
+# funding orgs, collaborative entities/investigators, geo areas, emphasis etc
+#
+# Also create an xml listing the xmls in $g_is_xmls_out
+#
+if($Phases{'IS'}>0 || $g_all){
+    print "\nPhase = IS\n";
+#
+# depends on $g_xmls_raw e,r and $g_is_xmls_out e,r,w
+# $g_xslts/$g_is_chain and $g_log_path
+# $g_tmp/Users.xml
+# xslt/impact-stmt-Filter.xsl, xslt/impact-stmt-addIndex.xsl
+# xslt/impact-stmt-addAuthSummary.xsl
+
+
+    print "\nBegin integration process using $g_xslts/$g_is_chain ...\n";
+    my $prefix = $g_aiis . "_";
+    my $cmd = "";
+    $cmd .= "$g_bin/xsltseq -I $g_xmls_raw -O $g_is_xmls_out ";
+    $cmd .= " -X $g_xslts/$g_is_chain -x $g_xslts -p $prefix ";
+    $cmd .= " -T $g_tmp ";
+    $cmd .= " -L $g_log_path " if $g_log_path ne '';
+    my $r;
+    $r = doit($cmd, $g_exef, $g_pw);
+    exit(1) if($r);
+
+    print "\nConstruct a list of xmls by netids in $g_tmp/aiislist.xml ...\n";
+    $cmd = "";
+    $cmd .= "$g_bin/mklist -d $g_is_xmls_out > $g_tmp/aiislist.xml";
+    $r = doit($cmd, $g_exef, $g_pw);
+    exit(1) if($r);
+
+    print "\nConstruct a list mapping of netids to/from ai ids in $g_tmp/all-aiid-netid.xml ...\n";
+    $cmd = "";
+    $cmd .= "java $g_javaopts -jar $g_xslts/saxon9he.jar $g_tmp/Users.xml ";
+    $cmd .= " $g_xslts/uidmap.xsl | $g_bin/nzsxml -d $g_xmls_raw ";
+    $cmd .= " > $g_tmp/all-aiid-netid.xml ";
+    $r = doit($cmd, $g_exef, $g_pw);
+    exit(1) if($r);
+}
+
+############################################
+#
+# Accumulate and group all Impact Stmts by Investigator by combining data
+# from all xmls
+#
+if($Phases{'CINV'}>0 || $g_all){
+    print "\nPhase = CINV\n";
+#
+#depends on $g_xslts/empty.xml, $g_tmp/aiiclist.xml, $g_tmp/all-aiid-netid.xml
+# $g_xslts/collectByInvestigators.xsl, 
+# $g_xslts/groupInvestigatorsImpactStmts.xsl
+# $g_xslts/aiicsort.xsl    prior GX, IS
+#
+    print "\nCollect all Impact Stmts for each Investigator from all $g_aiis xmls ...\n";
+    my $cmd = "";
+    $cmd .= "java $g_javaopts -jar $g_xslts/saxon9he.jar $g_xslts/empty.xml ";
+    $cmd .= " $g_xslts/collectByInvestigators.xsl listxml=$g_tmp/aiislist.xml ";
+    $cmd .= " aiid2netid=$g_tmp/all-aiid-netid.xml > $g_tmp/ci.xml ";
+    my $r;
+    $r = doit($cmd, $g_exef);
+    exit(1) if($r);
+
+    print "\nIdentify impact stmts mentioned in multiple AIIS xmls ...\n";
+    $cmd = "";
+    $cmd .= "java $g_javaopts -jar $g_xslts/saxon9he.jar $g_tmp/ci.xml ";
+    $cmd .= " $g_xslts/groupInvestigatorsImpactStmts.xsl > $g_tmp/cid.xml";
+    $r = doit($cmd, $g_exef);
+    exit(1) if($r);
+
+    $cmd = "";
+    print "\nSort impact stmts by Activity Insight id ...\n";
+    $cmd .= "java $g_javaopts -jar $g_xslts/saxon9he.jar $g_tmp/cid.xml ";
+    $cmd .= " $g_xslts/aiicsort.xsl > $g_tmp/cids.xml";
+    $r = doit($cmd, $g_exef);
+    exit(1) if($r);
+}
+
+############################################
+#
+# Accumulate and group all Impact Stmts by Collaborative Entitiy by 
+# combining data from all xmls
+#
+if($Phases{'CCE'}>0 || $g_all){
+    print "\nPhase = CCE\n";
+#
+#depends on $g_xslts/empty.xml, $g_tmp/aiislist.xml, $g_tmp/all-aiid-netid.xml
+# $g_xslts/collectByCollaborativeEntity.xsl, 
+# $g_xslts/groupCollaborativeEntitysImpactStmts.xsl
+# $g_xslts/aiicsort.xsl    prior GX, IS
+#
+    print "\nCollect all Impact Stmts for each collaborative entity from all $g_aiis xmls ...\n";
+    my $cmd = "";
+    $cmd .= "java $g_javaopts -jar $g_xslts/saxon9he.jar $g_xslts/empty.xml ";
+    $cmd .= " $g_xslts/collectByCollaborativeEntity.xsl listxml=$g_tmp/aiislist.xml ";
+    $cmd .= " aiid2netid=$g_tmp/all-aiid-netid.xml > $g_tmp/cce.xml ";
+    my $r;
+    $r = doit($cmd, $g_exef);
+    exit(1) if($r);
+
+    print "\nIdentify impact stmts mentioned in multiple AIIS xmls ...\n";
+    $cmd = "";
+    $cmd .= "java $g_javaopts -jar $g_xslts/saxon9he.jar $g_tmp/cce.xml ";
+    $cmd .= " $g_xslts/groupCollaborativeEntitysImpactStmts.xsl > $g_tmp/cced.xml";
+    $r = doit($cmd, $g_exef);
+    exit(1) if($r);
+
+    $cmd = "";
+    print "\nSort impact stmts by Activity Insight id ...\n";
+    $cmd .= "java $g_javaopts -jar $g_xslts/saxon9he.jar $g_tmp/cced.xml ";
+    $cmd .= " $g_xslts/aiicsort.xsl > $g_tmp/cceds.xml";
+    $r = doit($cmd, $g_exef);
+    exit(1) if($r);
+}
+
+############################################
+#
+# Accumulate and group all Impact Stmts by Funding Org by 
+# combining data from all xmls
+#
+if($Phases{'CFO'}>0 || $g_all){
+    print "\nPhase = CFO\n";
+#
+#depends on $g_xslts/empty.xml, $g_tmp/aiislist.xml, $g_tmp/all-aiid-netid.xml
+# $g_xslts/collectByFundingOrg.xsl, 
+# $g_xslts/groupFundingOrgsImpactStmts.xsl
+# $g_xslts/aiicsort.xsl    prior GX, IS
+#
+    print "\nCollect all Impact Stmts for each funding org from all $g_aiis xmls ...\n";
+    my $cmd = "";
+    $cmd .= "java $g_javaopts -jar $g_xslts/saxon9he.jar $g_xslts/empty.xml ";
+    $cmd .= " $g_xslts/collectByFundingOrg.xsl listxml=$g_tmp/aiislist.xml ";
+    $cmd .= " aiid2netid=$g_tmp/all-aiid-netid.xml > $g_tmp/cfo.xml ";
+    my $r;
+    $r = doit($cmd, $g_exef);
+    exit(1) if($r);
+
+    print "\nIdentify impact stmts mentioned in multiple AIIS xmls ...\n";
+    $cmd = "";
+    $cmd .= "java $g_javaopts -jar $g_xslts/saxon9he.jar $g_tmp/cfo.xml ";
+    $cmd .= " $g_xslts/groupFundingOrgsImpactStmts.xsl > $g_tmp/cfod.xml";
+    $r = doit($cmd, $g_exef);
+    exit(1) if($r);
+
+    $cmd = "";
+    print "\nSort impact stmts by Activity Insight id ...\n";
+    $cmd .= "java $g_javaopts -jar $g_xslts/saxon9he.jar $g_tmp/cfod.xml ";
+    $cmd .= " $g_xslts/aiicsort.xsl > $g_tmp/cfods.xml";
+    $r = doit($cmd, $g_exef);
+    exit(1) if($r);
+}
+
+############################################
+#
+# Accumulate and group all Impact Stmts by Geo Location by 
+# combining data from all xmls
+#
+if($Phases{'CFO'}>0 || $g_all){
+    print "\nPhase = CFO\n";
+#
+#depends on $g_xslts/empty.xml, $g_tmp/aiislist.xml, $g_tmp/all-aiid-netid.xml
+# $g_xslts/collectByGeoLocation.xsl, 
+# $g_xslts/groupGeoLocationImpactStmts.xsl
+# $g_xslts/aiicsort.xsl    prior GX, IS
+#
+    print "\nCollect all Impact Stmts for each Geo location from all $g_aiis xmls ...\n";
+    my $cmd = "";
+    $cmd .= "java $g_javaopts -jar $g_xslts/saxon9he.jar $g_xslts/empty.xml ";
+    $cmd .= " $g_xslts/collectByGeoLocation.xsl listxml=$g_tmp/aiislist.xml ";
+    $cmd .= " aiid2netid=$g_tmp/all-aiid-netid.xml > $g_tmp/cgeo.xml ";
+    my $r;
+    $r = doit($cmd, $g_exef);
+    exit(1) if($r);
+
+    print "\nIdentify impact stmts mentioned in multiple AIIS xmls ...\n";
+    $cmd = "";
+    $cmd .= "java $g_javaopts -jar $g_xslts/saxon9he.jar $g_tmp/cgeo.xml ";
+    $cmd .= " $g_xslts/groupGeoLocationImpactStmts.xsl > $g_tmp/cgeod.xml";
+    $r = doit($cmd, $g_exef);
+    exit(1) if($r);
+
+    $cmd = "";
+    print "\nSort impact stmts by Activity Insight id ...\n";
+    $cmd .= "java $g_javaopts -jar $g_xslts/saxon9he.jar $g_tmp/cgeod.xml ";
+    $cmd .= " $g_xslts/aiicsort.xsl > $g_tmp/cgeods.xml";
+    $r = doit($cmd, $g_exef);
+    exit(1) if($r);
+}
+
+############################################
+#
+# Accumulate and group all Impact Stmts by Priority Area by 
+# combining data from all xmls
+#
+if($Phases{'CPA'}>0 || $g_all){
+    print "\nPhase = CPA\n";
+#
+#depends on $g_xslts/empty.xml, $g_tmp/aiislist.xml, $g_tmp/all-aiid-netid.xml
+# $g_xslts/collectByPriorityArea.xsl, 
+# $g_xslts/groupPriorityAreaImpactStmts.xsl
+# $g_xslts/aiicsort.xsl    prior GX, IS
+#
+    print "\nCollect all Impact Stmts for each Priority Area from all $g_aiis xmls ...\n";
+    my $cmd = "";
+    $cmd .= "java $g_javaopts -jar $g_xslts/saxon9he.jar $g_xslts/empty.xml ";
+    $cmd .= " $g_xslts/collectByPriorityArea.xsl listxml=$g_tmp/aiislist.xml ";
+    $cmd .= " aiid2netid=$g_tmp/all-aiid-netid.xml > $g_tmp/cpa.xml ";
+    my $r;
+    $r = doit($cmd, $g_exef);
+    exit(1) if($r);
+
+    print "\nIdentify impact stmts mentioned in multiple AIIS xmls ...\n";
+    $cmd = "";
+    $cmd .= "java $g_javaopts -jar $g_xslts/saxon9he.jar $g_tmp/cpa.xml ";
+    $cmd .= " $g_xslts/groupPriorityAreaImpactStmts.xsl > $g_tmp/cpad.xml";
+    $r = doit($cmd, $g_exef);
+    exit(1) if($r);
+
+    $cmd = "";
+    print "\nSort impact stmts by Activity Insight id ...\n";
+    $cmd .= "java $g_javaopts -jar $g_xslts/saxon9he.jar $g_tmp/cpad.xml ";
+    $cmd .= " $g_xslts/aiicsort.xsl > $g_tmp/cpads.xml";
+    $r = doit($cmd, $g_exef);
+    exit(1) if($r);
+}
+
+
+$now = strftime("%Y\%m%d%H\%M\%S", localtime());
+############################################
+if($Phases{'TR'}>0 || $g_all){
+    print "\nPhase = TR\n";
+    print "\nCreate a tar file of the resulting summary xmls and rdfs ... \n";
+   
+    
+    my $cmd = "";
+    $cmd .= " mkdir $g_work/sum; cp *.rdf $g_work/sum; cd $g_tmp; ";
+    $cmd .= " cp Users.xml ai_users.txt ";
+    $cmd .= " aiiclist.xml aiid-netid.xml ";
+    $cmd .= " ca.xml cad.xml cads.xml  ";
+    $cmd .= " cj.xml cjd.xml cjds.xml ";
+    $cmd .= " cica.xml cicad.xml ";
+    $cmd .= " unomap.xml ";
+    $cmd .= " ajnunos.xml $g_work/sum; cd $g_work ;";
+    $cmd .= " tar cvf ingest$now.tar sum ;";
+    $cmd .= " gzip ingest$now.tar ; /bin/rm -r sum";
+    $r = doit($cmd, $g_exef);
+    exit(1) if($r);  
+}
+############################################
+if($Phases{'TX'}>0 || $g_all){
+    print "\nPhase = TX\n";
+    print "\nCreate  tar files of the raw and processed xmls ... \n";
+    my $d = mostRecentDirectory($g_xmls,$g_raw);
+    my $cmd = "";
+    if($d){
+	$cmd .= " cd $g_xmls; tar cvf $d.tar $d ; ";
+	$cmd .= " gzip -f $d.tar ";
+	$r = doit($cmd, $g_exef);
+	exit(1) if($r);
+    }
+    $cmd = "";
+    $d = mostRecentDirectory($g_xmls,$g_aiic);
+    if($d){
+	$cmd .= "  cd $g_xmls; tar cvf $d.tar $d ; ";
+	$cmd .= " gzip -f $d.tar ";
+	$r = doit($cmd, $g_exef);
+	exit(1) if($r); 
+    }
+}
+
+
+sub mostRecentDirectory {
+    my($dir,$prefix) = @_;
+    $prefix .= "*";
+    my @res = qx(cd $dir; ls -t1d $prefix); 
+    foreach my $f (@res){
+	chomp($f);
+	if( -d "$dir/$f" ){
+	    return $f;
+	}
+    }
+    return '';
+}
+
+sub md5check {
+    # get new md5 file and fix it if need be
+    # cp to last raw dir
+    qx(cp $g_xmls_raw/raw$g_TSR.md5 $g_xmls/prev-raw);
+    
+
+    # run md5sum --check 
+    my @res = qx(cd $g_xmls/prev-raw; md5sum -c raw$g_TSR.md5);
+    foreach my $rec (@res){
+	# CASES to handle:
+	# 'OK' - no change so drop new file
+	# 'FAILED open or read' (expected a file to check)
+	#        so this is an addition so keep new file
+	# 'FAILED' - file changed (checksum changed)
+	#        so this is an addition so keep new file
+	my($f,$r) = map { trim($_); } split /:/, $rec;
+	if($r eq 'OK'){
+	    print STDOUT "qx(/bin/rm -f $g_xmls_raw/$f);\n";
+	} elsif($r eq 'FAILED open or read'){
+	    print STDOUT "# $g_xmls_raw/$f is new\n";
+	} elsif($r eq 'FAILED'){
+	    print STDOUT "# $g_xmls/prev-raw/$f has changed.\n" ;
+	} else {
+	    ;
+	}
+    }
+    #
+}
+
+sub md5fix {
+    my($p,$w) = @_;
+    my $r = open INF, $p;
+    if(!$r){
+	print "Cannot open $p for read\n";
+	return 0;
+    }
+    $r = open OUT, ">$w";
+    if(!$r){
+	print "Cannot open $w for write\n";
+	return 0;
+    }
+    while( my $in = <INF> ){
+	my(@parts,@comps);
+	chomp($in);
+	@parts = split /\s+/, $in;
+	@comps = split /\//, $parts[1];
+	#print "$in $parts[1]\n";
+	if($parts[0] =~ /\*$/){
+	    print OUT "$parts[0] $comps[$#comps]\n";
+	} else {
+	    print OUT "$parts[0]  $comps[$#comps]\n";
+	}
+    }
+    close INF;
+    close OUT;
+    return 1;
+}
+
+sub clean {
+    my $cmd = "";
+    $cmd .= "cd $g_tmp; tar cvf $g_work/tmp$g_TSR.tar T[123]-*.xml ";
+    $cmd .= " Users.xml ai_users.txt ";
+    $cmd .= " aiiclist.xml aiid-netid.xml ";
+    $cmd .= " ca.xml cad.xml cads.xml  ";
+    $cmd .= " cj.xml cjd.xml cjds.xml ";
+    $cmd .= " cica.xml cicad.xml ";
+    $cmd .= " unomap.xml ";
+    $cmd .= " ajnunos.xml ";
+    qx($cmd);
+    $cmd = "";
+    $cmd .= "cd $g_tmp; /bin/rm -f T[123]-*.xml";
+    qx($cmd);
+    
+}
+
+sub depends {
+    my(@files)=@_;
+    my @res = ();
+    foreach my $f (@files){
+	chomp $f;
+	next if( -e $f && -w _ & -r _);
+	push @res, $f;
+    }
+    return @res;
+}
+########################
+
+#java -Xmx1024m -jar xslt/saxon9he.jar store/cicad.xml xslt/mkicardf.xsl unoMapFile=../store/ica_unomap.xml aiicXmlPath=../AIXMLS/cur-aiic aiicPrefix=IC_ extantPersonsFile=../store/curPersons.xml abypFile=../store/cicpd.xml > icbya.rdf 
+#java -Xmx1024m -jar xslt/saxon9he.jar ./icbya.rdf xslt/rdfsort.xsl > sicbya.rdf
