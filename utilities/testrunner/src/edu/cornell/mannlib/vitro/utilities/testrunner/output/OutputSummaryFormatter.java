@@ -9,15 +9,14 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 import edu.cornell.mannlib.vitro.utilities.testrunner.FileHelper;
 import edu.cornell.mannlib.vitro.utilities.testrunner.LogStats;
 import edu.cornell.mannlib.vitro.utilities.testrunner.SeleniumRunnerParameters;
 import edu.cornell.mannlib.vitro.utilities.testrunner.Status;
+import edu.cornell.mannlib.vitro.utilities.testrunner.datamodel.DataModel;
 import edu.cornell.mannlib.vitro.utilities.testrunner.output.SuiteResults.TestResults;
 
 /**
@@ -31,17 +30,7 @@ public class OutputSummaryFormatter {
 	private final SeleniumRunnerParameters parms;
 
 	private LogStats logStats;
-	private Map<String, SuiteResults> suites;
-	private OutputDataListener dataListener;
-	private Status runStatus;
-	private List<TestResults> allTests = new ArrayList<TestResults>();
-	private int passingTestCount;
-	private List<TestResults> failingTests = new ArrayList<TestResults>();
-	private List<TestResults> ignoredTests = new ArrayList<TestResults>();
-	private List<String> passingSuites = new ArrayList<String>();
-	private List<String> failingSuites = new ArrayList<String>();
-	private List<String> ignoredSuites = new ArrayList<String>();
-	private List<String> remainingSuites = new ArrayList<String>();
+	private DataModel dataModel;
 
 	public OutputSummaryFormatter(SeleniumRunnerParameters parms) {
 		this.parms = parms;
@@ -51,14 +40,9 @@ public class OutputSummaryFormatter {
 	 * Create a summary HTML file from the info contained in this log file and
 	 * these suite outputs.
 	 */
-	public void format(LogStats logStats, Map<String, SuiteResults> suites,
-			OutputDataListener dataListener) {
+	public void format(LogStats logStats, DataModel dataModel) {
 		this.logStats = logStats;
-		this.suites = suites;
-		this.dataListener = dataListener;
-		this.runStatus = figureOverallStatus(logStats, suites);
-		tallyTests();
-		tallySuites();
+		this.dataModel = dataModel;
 
 		PrintWriter writer = null;
 		try {
@@ -107,67 +91,9 @@ public class OutputSummaryFormatter {
 		}
 	}
 
-	/**
-	 * The overall status for the run is the worst status of any component.
-	 */
-	public Status figureOverallStatus(LogStats log,
-			Map<String, SuiteResults> suites) {
-		if (log.hasErrors()) {
-			return Status.ERROR;
-		}
-		boolean hasWarnings = log.hasWarnings();
-
-		for (SuiteResults s : suites.values()) {
-			if (s.getStatus() == Status.ERROR) {
-				return Status.ERROR;
-			} else if (s.getStatus() == Status.WARN) {
-				hasWarnings = true;
-			}
-		}
-
-		if (hasWarnings) {
-			return Status.WARN;
-		} else {
-			return Status.OK;
-		}
-	}
-
-	private void tallyTests() {
-		for (SuiteResults s : suites.values()) {
-			for (TestResults t : s.getTests()) {
-				this.allTests.add(t);
-				if (t.getStatus() == Status.OK) {
-					this.passingTestCount++;
-				} else if (t.getStatus() == Status.WARN) {
-					this.ignoredTests.add(t);
-				} else {
-					this.failingTests.add(t);
-				}
-			}
-		}
-	}
-
-	private void tallySuites() {
-		List<String> ignoredSuiteNames = dataListener.getIgnoredSuiteNames();
-
-		for (String name : dataListener.getSuiteNames()) {
-			if (ignoredSuiteNames.contains(name)) {
-				this.ignoredSuites.add(name);
-			} else if (!suites.containsKey(name)) {
-				this.remainingSuites.add(name);
-			} else {
-				SuiteResults s = suites.get(name);
-				if (s.getStatus() == Status.ERROR) {
-					this.failingSuites.add(name);
-				} else {
-					this.passingSuites.add(name);
-				}
-			}
-		}
-	}
-
 	private void writeHeader(PrintWriter writer) {
-		String startString = formatDateTime(dataListener.getStartTime());
+		Status runStatus = dataModel.getRunStatus();
+		String startString = formatDateTime(dataModel.getStartTime());
 
 		writer.println("<html>");
 		writer.println("<head>");
@@ -180,21 +106,22 @@ public class OutputSummaryFormatter {
 		writer.println();
 		writer.println("  <div class=\"heading\">");
 		writer.println("    Acceptance test results: " + startString);
-		writer.println("    <div class=\"" + this.runStatus.getHtmlClass()
-				+ " one-word\">" + this.runStatus + "</div>");
+		writer.println("    <div class=\"" + runStatus.getHtmlClass()
+				+ " one-word\">" + runStatus + "</div>");
 		writer.println("  </div>");
 	}
 
 	private void writeStatsSection(PrintWriter writer) {
-		String passClass = Status.OK.getHtmlClass();
-		String failClass = this.failingTests.isEmpty() ? "" : Status.ERROR
-				.getHtmlClass();
-		String ignoreClass = this.ignoredTests.isEmpty() ? "" : Status.WARN
-				.getHtmlClass();
+		String passClass = dataModel.isAnyPasses() ? Status.OK.getHtmlClass()
+				: "";
+		String failClass = dataModel.isAnyFailures() ? Status.ERROR
+				.getHtmlClass() : "";
+		String ignoreClass = dataModel.isAnyIgnores() ? Status.WARN
+				.getHtmlClass() : "";
 
-		String start = formatDateTime(dataListener.getStartTime());
-		String end = formatDateTime(dataListener.getEndTime());
-		String elapsed = formatElapsedTime(dataListener.getElapsedTime());
+		String start = formatDateTime(dataModel.getStartTime());
+		String end = formatDateTime(dataModel.getEndTime());
+		String elapsed = formatElapsedTime(dataModel.getElapsedTime());
 
 		writer.println("  <div class=\"section\">Summary</div>");
 		writer.println();
@@ -211,28 +138,24 @@ public class OutputSummaryFormatter {
 		writer.println("  	    </table>");
 		writer.println("      </td>");
 		writer.println("      <td>");
-		writer.println("        <table cellspacing=\"0\">");
+		writer.println("        <table class=\"tallys\" cellspacing=\"0\">");
 		writer.println("          <tr><th>&nbsp;</th><th>Suites</th><th>Tests</th>");
-		writer.println("          <tr><th>Total</th><td>"
-				+ (this.passingSuites.size() + this.failingSuites.size()
-						+ this.ignoredSuites.size() + this.remainingSuites
-						.size())
-				+ "</td><td>"
-				+ (this.passingTestCount + this.failingTests.size() + this.ignoredTests
-						.size()) + "</td>");
 		writer.println("          <tr class=\"" + passClass
-				+ "\"><th>Passed</th><td>" + this.passingSuites.size()
-				+ "</td><td>" + this.passingTestCount + "</td>");
+				+ "\"><td>Passed</td><td>" + dataModel.getPassingSuiteCount()
+				+ "</td><td>" + dataModel.getPassingTestCount() + "</td>");
 		writer.println("          <tr class=\"" + failClass
-				+ "\"><th>Failed</th><td>" + this.failingSuites.size()
-				+ "</td><td>" + this.failingTests.size() + "</td>");
+				+ "\"><td>Failed</td><td>" + dataModel.getFailingSuiteCount()
+				+ "</td><td>" + dataModel.getFailingTestCount() + "</td>");
 		writer.println("          <tr class=\"" + ignoreClass
-				+ "\"><th>Ignored</th><td>" + this.ignoredSuites.size()
-				+ "</td><td>" + this.ignoredTests.size() + "</td>");
-		if (!this.remainingSuites.isEmpty()) {
-			writer.println("          <tr><th>Remaining</th><td>"
-					+ this.remainingSuites.size() + "</td><td>?</td>");
+				+ "\"><td>Ignored</td><td>" + dataModel.getIgnoredSuiteCount()
+				+ "</td><td>" + dataModel.getIgnoredTestCount() + "</td>");
+		if (dataModel.isAnyPending()) {
+			writer.println("          <tr><td>Pending</td><td>"
+					+ dataModel.getPendingSuitesCount() + "</td><td>?</td>");
 		}
+		writer.println("          <tr><td class=\"total\">Total</td><td>"
+				+ dataModel.getTotalSuiteCount() + "</td><td>"
+				+ dataModel.getTotalTestCount() + "</td>");
 		writer.println("  	    </table>");
 		writer.println("      </td>");
 		writer.println("    </tr>");
@@ -266,6 +189,7 @@ public class OutputSummaryFormatter {
 
 	private void writeFailureSection(PrintWriter writer) {
 		String errorClass = Status.ERROR.getHtmlClass();
+		Collection<TestResults> failingTests = dataModel.getFailingTests();
 
 		writer.println("  <div class=section>Failing tests</div>");
 		writer.println();
@@ -289,6 +213,7 @@ public class OutputSummaryFormatter {
 
 	private void writeIgnoreSection(PrintWriter writer) {
 		String warnClass = Status.WARN.getHtmlClass();
+		Collection<TestResults> ignoredTests = dataModel.getIgnoredTests();
 
 		writer.println("  <div class=section>Ignored tests</div>");
 		writer.println();
@@ -318,7 +243,7 @@ public class OutputSummaryFormatter {
 		writer.println();
 		writer.println("  <table cellspacing=\"0\">");
 
-		for (SuiteResults s : suites.values()) {
+		for (SuiteResults s : dataModel.getSuiteResults()) {
 			writer.println("    <tr class=\"" + s.getStatus().getHtmlClass()
 					+ "\">");
 			writer.println("      <td><a href=\"" + s.getOutputLink() + "\">"
@@ -331,6 +256,8 @@ public class OutputSummaryFormatter {
 	}
 
 	private void writeAllTestsSection(PrintWriter writer) {
+		Collection<TestResults> allTests = dataModel.getAllTests();
+
 		writer.println("  <div class=section>All tests</div>");
 		writer.println();
 		writer.println("  <table cellspacing=\"0\">");

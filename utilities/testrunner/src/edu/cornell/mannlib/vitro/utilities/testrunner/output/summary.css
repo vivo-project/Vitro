@@ -40,6 +40,14 @@ table.summary td {
 	vertical-align: top;
 }
 
+table.tallys td {
+	align: right;
+}
+
+table.tallys td.total {
+	font.weight: bold;
+}
+
 .section {
 	background: rgb(70%, 85%, 85%);
 	font-size: larger;

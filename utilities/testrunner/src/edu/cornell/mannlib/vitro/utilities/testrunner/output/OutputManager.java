@@ -5,13 +5,13 @@ package edu.cornell.mannlib.vitro.utilities.testrunner.output;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 import edu.cornell.mannlib.vitro.utilities.testrunner.FileHelper;
 import edu.cornell.mannlib.vitro.utilities.testrunner.LogStats;
 import edu.cornell.mannlib.vitro.utilities.testrunner.SeleniumRunnerParameters;
-import edu.cornell.mannlib.vitro.utilities.testrunner.Status;
+import edu.cornell.mannlib.vitro.utilities.testrunner.datamodel.DataModel;
 
 /**
  * Manages the contents of the output area. Removes old files prior to a run.
@@ -63,21 +63,23 @@ public class OutputManager {
 	 * Parse each of the output files from the test suites, and create a unified
 	 * output file.
 	 */
-	public Status summarizeOutput() {
+	public void summarizeOutput(DataModel dataModel) {
 		LogStats log = LogStats.parse(parms.getLogFile());
 
-		Map<String, SuiteResults> suites = new HashMap<String, SuiteResults>();
+		List<SuiteResults> suiteResults = new ArrayList<SuiteResults>();
 		for (File outputFile : parms.getOutputDirectory().listFiles(
 				new HtmlFileFilter())) {
 			SuiteResults suite = SuiteResults.parse(parms, outputFile);
 			if (suite != null) {
-				suites.put(suite.getName(), suite);
+				suiteResults.add(suite);
 			}
 		}
 
+		dataModel.setSuiteResults(suiteResults);
+		dataModel.captureDataListener(dataListener);
+
 		OutputSummaryFormatter formatter = new OutputSummaryFormatter(parms);
-		formatter.format(log, suites, dataListener);
-		return formatter.figureOverallStatus(log, suites);
+		formatter.format(log, dataModel);
 	}
 
 	private static class HtmlFileFilter implements FileFilter {

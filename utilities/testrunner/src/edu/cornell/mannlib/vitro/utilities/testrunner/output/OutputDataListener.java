@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.utilities.testrunner.output;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -50,35 +51,74 @@ public class OutputDataListener implements Listener {
 	}
 
 	// ----------------------------------------------------------------------
-	// Accessor methods
+	// A class that holds a snapshot of the data.
 	// ----------------------------------------------------------------------
 
-	public boolean isRunCompleted() {
-		return runCompleted;
-	}
+	/**
+	 * A snapshot of the data that the listener has accumulated so far.
+	 */
+	public static class Info {
+		public static Info EMPTY_INFO = new Info();
 
-	public long getStartTime() {
-		return startTime;
-	}
+		private final boolean runCompleted;
+		private final long startTime;
+		private final long endTime;
+		private final List<String> suiteNames;
+		private final List<String> ignoredSuiteNames;
 
-	public long getEndTime() {
-		return endTime;
-	}
+		Info() {
+			this.runCompleted = false;
+			this.startTime = 0;
+			this.endTime = 0;
+			this.suiteNames = Collections.emptyList();
+			this.ignoredSuiteNames = Collections.emptyList();
+		}
 
-	public long getElapsedTime() {
-		if ((startTime == 0) || (endTime == 0)) {
-			return 0;
-		} else {
-			return endTime - startTime;
+		Info(OutputDataListener parent) {
+			this.runCompleted = parent.runCompleted;
+			this.startTime = parent.startTime;
+			this.endTime = parent.endTime;
+			this.suiteNames = Collections
+					.unmodifiableList(new ArrayList<String>(parent.suiteNames));
+			this.ignoredSuiteNames = Collections
+					.unmodifiableList(new ArrayList<String>(
+							parent.ignoredSuiteNames));
+		}
+
+		public boolean isRunCompleted() {
+			return runCompleted;
+		}
+
+		public long getStartTime() {
+			return startTime;
+		}
+
+		public long getEndTime() {
+			return endTime;
+		}
+
+		public long getElapsedTime() {
+			if ((startTime == 0) || (endTime == 0)) {
+				return 0;
+			} else {
+				return endTime - startTime;
+			}
+		}
+
+		public List<String> getSuiteNames() {
+			return suiteNames;
+		}
+
+		public List<String> getIgnoredSuiteNames() {
+			return ignoredSuiteNames;
 		}
 	}
 
-	public List<String> getSuiteNames() {
-		return suiteNames;
-	}
-
-	public List<String> getIgnoredSuiteNames() {
-		return ignoredSuiteNames;
+	/**
+	 * Get a snapshot of the data.
+	 */
+	public Info getInfo() {
+		return new Info(this);
 	}
 
 	// ----------------------------------------------------------------------

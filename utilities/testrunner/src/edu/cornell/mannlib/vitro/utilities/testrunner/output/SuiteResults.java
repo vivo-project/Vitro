@@ -22,7 +22,7 @@ import edu.cornell.mannlib.vitro.utilities.testrunner.Status;
  * Extract any summary information from an HTML output file, produced by a test
  * suite.
  */
-public class SuiteResults{
+public class SuiteResults {
 	/**
 	 * If the file doesn't contain a line that includes this pattern, it is not
 	 * a suite output file.
@@ -94,11 +94,7 @@ public class SuiteResults{
 
 			status = Status.OK;
 			for (TestResults t : tests) {
-				if (t.status == Status.ERROR) {
-					status = Status.ERROR;
-				} else if ((t.status == Status.WARN) && (status == Status.OK)) {
-					status = Status.WARN;
-				}
+				status = Status.combine(status, t.status);
 			}
 
 			if (isSuiteOutputFile) {

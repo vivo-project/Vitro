@@ -10,6 +10,11 @@ public enum Status {
 	OK("good"),
 
 	/**
+	 * One or more tests have not been run yet.
+	 */
+	PENDING(""),
+
+	/**
 	 * Any test failure was ignored, and any messages were no worse than
 	 * warnings.
 	 */
@@ -20,14 +25,23 @@ public enum Status {
 	 * generated.
 	 */
 	ERROR("bad");
-	
+
 	private final String htmlClass;
-	
+
 	private Status(String htmlClass) {
 		this.htmlClass = htmlClass;
 	}
-	
+
 	public String getHtmlClass() {
 		return this.htmlClass;
+	}
+
+	/** When combined, the more severe status (defined later) takes precedence. */
+	public static Status combine(Status s1, Status s2) {
+		if (s1.compareTo(s2) > 0) {
+			return s1;
+		} else {
+			return s2;
+		}
 	}
 }

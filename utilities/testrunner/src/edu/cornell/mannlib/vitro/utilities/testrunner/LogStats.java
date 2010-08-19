@@ -17,6 +17,8 @@ import java.util.regex.Pattern;
  * Extract any summary information from the log file.
  */
 public class LogStats {
+	public static LogStats EMPTY_LOG_STATS = new LogStats();
+
 	private static final Pattern SUITE_NAME_PATTERN = Pattern
 			.compile("Running suite (.*)");
 	private static final Pattern ERROR_PATTERN = Pattern
@@ -34,6 +36,10 @@ public class LogStats {
 	private final List<String> suiteNames = new ArrayList<String>();
 	private final List<String> errors = new ArrayList<String>();
 	private final List<String> warnings = new ArrayList<String>();
+
+	private LogStats() {
+		// Nothing to initialize for empty instance.
+	}
 
 	private LogStats(File logFile) {
 

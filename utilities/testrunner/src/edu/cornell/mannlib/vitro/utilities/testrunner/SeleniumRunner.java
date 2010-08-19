@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.cornell.mannlib.vitro.utilities.testrunner.datamodel.DataModel;
 import edu.cornell.mannlib.vitro.utilities.testrunner.listener.Listener;
 import edu.cornell.mannlib.vitro.utilities.testrunner.output.OutputManager;
 
@@ -24,8 +25,7 @@ public class SeleniumRunner {
 	private final ModelCleaner modelCleaner;
 	private final SuiteRunner suiteRunner;
 	private final OutputManager outputManager;
-
-	private final List<File> selectedSuites = new ArrayList<File>();
+	private final DataModel dataModel;
 
 	public SeleniumRunner(SeleniumRunnerParameters parms) {
 		this.parms = parms;
@@ -35,6 +35,7 @@ public class SeleniumRunner {
 		this.modelCleaner = new ModelCleaner(parms, this.tomcatController);
 		this.suiteRunner = new SuiteRunner(parms);
 		this.outputManager = new OutputManager(parms);
+		this.dataModel = new DataModel();
 
 	}
 
@@ -45,7 +46,7 @@ public class SeleniumRunner {
 		Listener listener = parms.getListener();
 		IgnoredTests ignored = parms.getIgnoredTests();
 
-		this.selectedSuites.clear();
+		List<File> suites = new ArrayList<File>();
 
 		for (File parentDir : parms.getSuiteParentDirectories()) {
 			for (File suite : parms.findSuiteDirs(parentDir)) {
@@ -54,10 +55,12 @@ public class SeleniumRunner {
 					listener.suiteIgnored(suite);
 				} else {
 					listener.suiteAdded(suite);
-					this.selectedSuites.add(suite);
+					suites.add(suite);
 				}
 			}
 		}
+
+		dataModel.setSelectedSuites(suites);
 	}
 
 	/**
@@ -76,8 +79,8 @@ public class SeleniumRunner {
 			tomcatController.cleanup();
 
 			listener.runEndTime();
-			Status status = outputManager.summarizeOutput();
-			success = (status == Status.OK);
+			outputManager.summarizeOutput(dataModel);
+			success = (dataModel.getRunStatus() == Status.OK);
 		} catch (IOException e) {
 			listener.runFailed(e);
 			success = false;
@@ -92,7 +95,8 @@ public class SeleniumRunner {
 	}
 
 	public void runSelectedSuites() {
-		for (File suiteDir : this.selectedSuites) {
+		for (File suiteDir : dataModel.getSelectedSuites()) {
+			outputManager.summarizeOutput(dataModel);
 			listener.suiteStarted(suiteDir);
 			try {
 				if (parms.isCleanModel()) {
