@@ -1,0 +1,60 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+/****************************************
+ * Albert R. Mann Library 
+ * Cornell University
+ * Ithaca, NY 14853
+ ****************************************/
+
+/*
+Title:		Faculty Reporting Demo  
+Updated:	February 5, 2008
+*/
+
+/* Resetting from 2-column layout */
+#content.full { width: 100%; margin-top: 40px; }
+#dashboard { display: none; }
+
+
+div#header a.manage, div#header a.logout {display: block; float: right; margin-right: 15px;}
+div#header a.image img {display: block;}
+
+form * {
+	margin-top:0.8ex;
+	margin-bottom:0.8ex;	
+}
+
+form {
+	padding-bottom: 20px;
+}
+
+form textarea {
+	width: 60%;
+}
+
+form a:link.cancel, form a:visited.cancel {
+	color: #f00;
+	border-color: #f00;
+}
+
+form select option{
+	padding-right: 5px;
+}
+
+form a:hover.cancel {
+	color: #fff;
+	background: #f00;
+}
+
+form dl {
+	margin-bottom: 20px;
+}
+
+form dl dt, form dl dd {
+	padding-top: 15px;
+}
+
+.validationError {
+    font-weight:bold;
+    color:red;
+}

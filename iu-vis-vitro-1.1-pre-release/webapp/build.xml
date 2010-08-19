@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+
+<!-- ====================================================================== 
+     Build script for the Vitro core webapp.
+     
+     This can be used on its own, or included into a Product build script.
+     ====================================================================== -->
+
+<project name="vitroCore" default="describe">
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          properties                      
+         - - - - - - - - - - - - - - - - - -->
+	<!-- 
+		The build directory is located under the directory with the top-level
+		script, so if called from a Product build script, the build directory
+		will be in the Product directory.
+	-->
+	<property name="build.dir" location=".build" />
+
+	<!-- 
+		The webapp directory is based on this script, regardless of whether we 
+		run this script alone, or call it from a Product build script. 
+	 -->
+	<dirname property="vitroCore.basedir" file="${ant.file.vitroCore}" />
+	<property name="webapp.dir" location="${vitroCore.basedir}" />
+
+
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          paths: for compiling and running                      
+         - - - - - - - - - - - - - - - - - -->
+	<path id="compile.classpath">
+		<fileset dir="${webapp.dir}/lib">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<path id="test.compile.classpath">
+		<pathelement location="${build.dir}/war/WEB-INF/classes" />
+		<path refid="compile.classpath" />
+	</path>
+
+	<path id="test.run.classpath">
+		<!-- 
+			To get the data files and the correct log4j.properties, 
+			this comes before the classes directory 
+		-->
+		<pathelement location="${webapp.dir}/test" />
+
+		<pathelement location="${build.dir}/testclasses" />
+		<path refid="test.compile.classpath" />
+	</path>
+
+
+	<!-- ================================= 
+          target: describe              
+         ================================= -->
+	<target name="describe" description="--> Describe the targets (this is the default).">
+		<echo>
+all      - Runs "clean", then "deploy".
+clean    - Delete all artifacts so the next build will be from scratch.
+compile  - Compile the Java source files.
+test     - Compile and run the JUnit tests.
+war      - Assemble everything into a deployable WAR file.
+deploy   - Deploy the application directly into the Tomcat webapps directory.
+	    </echo>
+	</target>
+
+	<!-- ================================= 
+          target: all              
+         ================================= -->
+	<target name="all" depends="clean, deploy" description="--> Run 'clean', then 'deploy'" />
+
+	<!-- ================================= 
+          target: clean              
+         ================================= -->
+	<target name="clean" description="--> Delete all artifacts.">
+		<delete dir="${build.dir}" />
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: properties                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="properties">
+		<!--
+			If calling from a Product build script, then this property
+			already points to the deploy.properties file of the Product. 
+		-->
+		<property name="deploy.properties.file" location="config/deploy.properties" />
+
+		<fail message="You must create a &quot;${deploy.properties.file}&quot; file.">
+			<condition>
+				<not>
+					<available file="${deploy.properties.file}" />
+				</not>
+			</condition>
+		</fail>
+
+		<property file="${deploy.properties.file}" />
+
+		<fail unless="tomcat.home"
+		      message="${deploy.properties.file} must contain a value for tomcat.home" />
+		<fail unless="webapp.name"
+		      message="${deploy.properties.file} must contain a value for webapp.name" />
+		<fail unless="upload.directory"
+		      message="${deploy.properties.file} must contain a value for upload.directory" />
+		<fail unless="LuceneSetup.indexDir"
+		      message="${deploy.properties.file} must contain a value for LuceneSetup.indexDir" />
+		<fail unless="Vitro.defaultNamespace"
+		      message="${deploy.properties.file} must contain a value for Vitro.defaultNamespace" />
+		<fail unless="Vitro.smtpHost"
+		      message="${deploy.properties.file} must contain a value for Vitro.smtpHost (may be empty)" />
+		<fail unless="VitroConnection.DataSource.url"
+		      message="${deploy.properties.file} must contain a value for VitroConnection.DataSource.url" />
+		<fail unless="VitroConnection.DataSource.username"
+		      message="${deploy.properties.file} must contain a value for VitroConnection.DataSource.username" />
+		<fail unless="VitroConnection.DataSource.password"
+		      message="${deploy.properties.file} must contain a value for VitroConnection.DataSource.password" />
+		<fail unless="initialAdminUser"
+		      message="${deploy.properties.file} must contain a value for initialAdminUser" />
+
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: prepare                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="prepare" depends="properties">
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${build.dir}/war/WEB-INF/classes" />
+		<mkdir dir="${build.dir}/testclasses" />
+	</target>
+
+	<!-- ================================= 
+          target: compile              
+         ================================= -->
+	<target name="compile" depends="prepare" description="--> Compile Java sources">
+		<!-- deletes all files that depend on changed .java files -->
+		<depend srcdir="${webapp.dir}/src"
+		        destdir="${build.dir}/war/WEB-INF/classes"
+		        closure="false"
+		        cache="${build.dir}/.depcache">
+			<classpath refid="compile.classpath" />
+		</depend>
+
+		<javac srcdir="${webapp.dir}/src"
+		       destdir="${build.dir}/war/WEB-INF/classes"
+		       debug="true"
+		       deprecation="true"
+		       optimize="true"
+		       source="1.6">
+			<classpath refid="compile.classpath" />
+		</javac>
+	</target>
+
+	<!-- ================================= 
+          target: test              
+         ================================= -->
+	<target name="test" depends="compile" unless="skiptests" description="--> Run JUnit tests">
+		<javac srcdir="${webapp.dir}/test"
+		       destdir="${build.dir}/testclasses"
+		       debug="true"
+		       deprecation="true"
+		       optimize="false"
+		       source="1.6">
+			<classpath refid="test.compile.classpath" />
+		</javac>
+
+		<java classname="edu.cornell.mannlib.vitro.testing.VitroTestRunner"
+		      fork="yes"
+		      failonerror="true">
+			<classpath refid="test.run.classpath" />
+			<arg file="${webapp.dir}/test" />
+			<arg value="${testlevel}" />
+		</java>
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: copyEtc                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="copyEtc" depends="test">
+		<copy todir="${build.dir}/war">
+			<fileset dir="${webapp.dir}/web">
+				<!--
+					If a product doesn't want the core themes, it can
+					set this property and they will be skipped. 
+				-->
+				<exclude name="themes/**/*" if="skip.core.themes" />
+			</fileset>
+		</copy>
+
+		<copy todir="${build.dir}/war/WEB-INF">
+			<fileset file="${webapp.dir}/config/web.xml" />
+			<fileset file="${webapp.dir}/config/dwr.xml" />
+		</copy>
+
+		<copy todir="${build.dir}/war/WEB-INF">
+			<fileset dir="${webapp.dir}" includes="ontologies" />
+			<fileset dir="${webapp.dir}" includes="ontologies/**/*" />
+			<fileset dir="${webapp.dir}" includes="submodels" />
+			<fileset dir="${webapp.dir}" includes="submodels/**/*" />
+		</copy>
+
+		<!-- use the production Log4J properties, unless a debug version exists. -->
+		<available file="${webapp.dir}/config/debug.log4j.properties"
+		           property="debug.log4j.exists" />
+		<copy tofile="${build.dir}/war/WEB-INF/classes/log4j.properties"
+		      filtering="true"
+		      overwrite="true">
+			<fileset dir="${webapp.dir}/config">
+				<include name="default.log4j.properties" unless="debug.log4j.exists" />
+				<include name="debug.log4j.properties" if="debug.log4j.exists" />
+			</fileset>
+			<filterchain>
+				<expandproperties />
+			</filterchain>
+		</copy>
+
+		<copy todir="${build.dir}/war/WEB-INF/classes">
+			<fileset file="${deploy.properties.file}" />
+		</copy>
+
+		<copy todir="${build.dir}/war/WEB-INF/tlds">
+			<fileset dir="${webapp.dir}/config/tlds" includes="**/*" excludes="*.LCK" />
+		</copy>
+
+		<!-- TODO Get rid of these webservices files -->
+		<copy todir="${build.dir}/war/WEB-INF/lib">
+			<fileset dir="${vitroCore.basedir}/../services/lib" includes="**/*" excludes="*.LCK" />
+		</copy>
+		<copy todir="${build.dir}/war">
+			<fileset dir="${vitroCore.basedir}/../services/additions" includes="**/*" />
+		</copy>
+		<!-- TODO Get rid of these webservices files -->
+
+		<!-- xml files from src tree -->
+		<copy todir="${build.dir}/war/WEB-INF/classes">
+			<fileset dir="${webapp.dir}/src" includes="**/*.xml" />
+		</copy>
+
+		<copy todir="${build.dir}/war/WEB-INF/lib">
+			<fileset dir="${webapp.dir}/lib">
+				<!-- these are already in Tomcat: we shouldn't conflict. -->
+				<exclude name="jsp-api.jar" />
+				<exclude name="servlet-api.jar" />
+			</fileset>
+		</copy>
+
+		<copy file="${webapp.dir}/context.xml" tofile="${build.dir}/war/META-INF/context.xml" />
+	</target>
+
+	<!-- ================================= 
+          target: deploy              
+         ================================= -->
+	<target name="deploy" depends="copyEtc" description="--> Build the app and install in Tomcat">
+		<property name="webapp.deploy.home" value="${tomcat.home}/webapps/${webapp.name}" />
+
+		<mkdir dir="${webapp.deploy.home}" />
+
+		<copy todir="${webapp.deploy.home}">
+			<fileset dir="${build.dir}/war" />
+		</copy>
+
+		<!-- Discard any ontology files from previous builds. -->
+		<sync todir="${webapp.deploy.home}/WEB-INF/ontologies"
+		      includeEmptyDirs="true"
+		      failonerror="false">
+			<fileset dir="${build.dir}/war/WEB-INF/ontologies" includes="**/*" />
+		</sync>
+
+		<!-- Discard any submodel files from previous builds. -->
+		<sync todir="${webapp.deploy.home}/WEB-INF/submodels"
+		      includeemptydirs="true"
+		      failonerror="false">
+			<fileset dir="${build.dir}/war/WEB-INF/submodels" includes="**/*" />
+		</sync>
+
+		<!-- Discard any template files from previous builds. -->
+		<sync todir="${webapp.deploy.home}/themes" includeemptydirs="true" failonerror="false">
+			<fileset dir="${build.dir}/war/themes" includes="**/*" />
+		</sync>
+	</target>
+
+	<!-- ================================= 
+          target: licenser             
+          
+          In regular use, checks that all appropriate source files have license tags.
+          At release time, applies license text to source files.
+         ================================= -->
+	<target name="licenser" description="--> Check source files for licensing tags">
+		<property name="licenser.properties.file"
+		          location="${webapp.dir}/config/licenser/licenser.properties" />
+		<property name="licenser.label" value="Vitro core" />
+
+		<echo message="Checking license tags on ${licenser.label}" />
+
+		<exec executable="ruby" dir="${webapp.dir}/../utilities/licenser" failonerror="true">
+			<arg value="licenser.rb" />
+			<arg value="${licenser.properties.file}" />
+			<redirector outputproperty="licenser.test.output" alwayslog="true" />
+		</exec>
+	</target>
+
+</project>

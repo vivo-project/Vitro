@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE taglib PUBLIC "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.1//EN" "http://java.sun.com/j2ee/dtds/web-jsptaglibrary_1_1.dtd">
+<taglib>
+  <tlibversion>1.0.2</tlibversion>
+  <jspversion>1.1</jspversion>
+  <shortname>random</shortname>
+  <uri>http://jakarta.apache.org/taglibs/random-1.0</uri>
+  <info>
+     The Random tag library creates random strings and random numbers. You may 
+     specify a set of allowable characters as well as the length for randomly 
+     generated strings. You may specify a range of allowable integers or a 
+     random floating point number between zero and one for randomly generated 
+     numbers.  </info>
+  <tag>
+    <name>string</name>
+    <tagclass>org.apache.taglibs.random.RandomStrgTag</tagclass>
+    <teiclass>org.apache.taglibs.random.RandomStrgTEI</teiclass>
+    <bodycontent>Empty</bodycontent>
+    <attribute>
+      <name>id</name>
+      <required>yes</required>
+      <rtexprvalue>no</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>length</name>
+      <required>no</required>
+      <rtexprvalue>no</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>map</name>
+      <required>no</required>
+      <rtexprvalue>no</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>charset</name>
+      <required>no</required>
+      <rtexprvalue>no</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>algorithm</name>
+      <required>no</required>
+      <rtexprvalue>no</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>provider</name>
+      <required>no</required>
+      <rtexprvalue>no</rtexprvalue>
+    </attribute>
+  </tag>
+  <tag>
+    <name>number</name>
+    <tagclass>org.apache.taglibs.random.RandomNumTag</tagclass>
+    <teiclass>org.apache.taglibs.random.RandomNumTEI</teiclass>
+    <bodycontent>Empty</bodycontent>
+    <attribute>
+      <name>id</name>
+      <required>yes</required>
+      <rtexprvalue>no</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>range</name>
+      <required>no</required>
+      <rtexprvalue>no</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>algorithm</name>
+      <required>no</required>
+      <rtexprvalue>no</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>provider</name>
+      <required>no</required>
+      <rtexprvalue>no</rtexprvalue>
+    </attribute>
+  </tag>
+</taglib>
+
+
+
+
+
+
+
+
+       
+
+

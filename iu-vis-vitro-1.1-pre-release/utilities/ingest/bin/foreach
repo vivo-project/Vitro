@@ -1,0 +1,46 @@
+#!/usr/bin/perl
+
+use Getopt::Std;
+use FileHandle;
+use POSIX qw( strftime );
+use FindBin qw($Bin);
+
+autoflush STDOUT 1;
+
+getopts("c:d:e:v");
+
+sub trim {
+    my($a) = @_;
+    $a =~ s/^\s*(\S+)\s*$/$1/;
+    $a =~ s/^\s*(\S.*\S)\s*$/$1/;
+    $a =~ s/(\s*)//;
+    return $a;
+}
+
+sub getXmlFiles {
+    my($d) = @_;
+    my(@xfiles) = qx(ls $d/*.$opt_e);
+    my @res;
+    foreach my $f (@xfiles){
+	chomp $f;
+	my @comp = split /\//, $f;
+	$f = $comp[$#comp];
+	
+	push @res, $f;
+    }
+    return @res;
+}
+
+@files = getXmlFiles($opt_d);
+
+
+foreach $f (@files){
+    my $cmd = $opt_c;
+    $cmd =~ s/__zxzx__/$f/;
+    print STDOUT "$cmd \n";
+    print STDOUT qx($cmd);
+    print STDOUT "\n=================================\n";
+}
+
+
+

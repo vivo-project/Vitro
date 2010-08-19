@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE taglib PUBLIC "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.1//EN" "http://java.sun.com/j2ee/dtds/web-jsptaglibrary_1_1.dtd">
+<taglib>
+  <tlibversion>1.1</tlibversion>
+  <jspversion>1.1</jspversion>
+  <shortname>mailer</shortname>
+  <uri>http://jakarta.apache.org/taglibs/mailer-1.1</uri>
+  <info>This custom tag library is used to send e-mail.E-mail can be sent in three ways.  The first way requires the name of the 
+     SMTP host to use. The second requires the name of a JNDI Resource for a 
+     JavaMail Session.  The third requires the name of a JNDI Resource for a 
+     JavaMail MimePartDataSource.  Refer to your servlet container documentation
+     to determine which of these three methods you should use. During the 
+     creation of an e-mail message, the addresses are checked for the correct 
+     format.  After the e-mail message has been created the send tag spawns a 
+     thread to send the message in the background so that the user does not have
+     to wait for the SMTP host if it is busy.
+   
+&lt;!-- Create a message by entering the name of the SMTP host. --&gt;
+&lt;!-- The default for this attribute is localhost; for a host other --&gt;
+&lt;!-- than localhost supply it's name with the server attribute --&gt;
+&lt;!-- as in the example below.  The body of the e-mail is supplied in the --&gt;
+&lt;!-- message tag. The send tag is necessary to send the message. --&gt;
+&lt;mt:mail server="home.net" to="foo@home.net"
+from="bar@home.net" subject="mail taglib"&gt;
+    &lt;mt:message&gt;[body of message]&lt;/mt:message&gt;
+    &lt;mt:send/&gt;
+&lt;/mt:mail&gt;
+
+&lt;!-- Using a JNDI named JavaMail Session object defined by the --&gt;
+&lt;!-- session attribute. --&gt;
+&lt;mt:mail session="java:/comp/env/session" to="foo@home.net"
+from="bar@home.net" subject="mail taglib"&gt;
+    &lt;mt:message&gt;[body of message]&lt;/mt:message&gt;
+    &lt;mt:send/&gt;
+&lt;/mt:mail&gt;
+
+&lt;!-- Or using a JNDI named JavaMail MimePartDataSource object --&gt;
+&lt;!--  defined by mimeMessage attribute. --&gt;
+&lt;mt:mail mimeMessage="java:/comp/env/message" to="foo@home.net"
+from="bar@home.net" subject="mail taglib"&gt;
+    &lt;mt:message&gt;[body of message]&lt;/mt:message&gt;
+    &lt;mt:send/&gt;
+&lt;/mt:mail&gt;
+How e-mail is delivered depends on the JavaMail SMTP host settings.  The 
+     JavaMail SMTP host can be configured by your Servlet Container so that 
+     bounced or undeliverable e-mails are returned to the sender by setting the 
+     folowing properties.NameTypeDescriptionmail.smtp.dsn.notifyStringProperty determines if the user will be notified of undeliverable mail.
+        Either NEVER, or some combination of SUCCESS, FAILURE, and DELAY 
+        (separated by commas).
+     mail.smtp.dsn.retStringDetermines what part of the undeliverable message will be returned in 
+        the message to the sender.  Either FULL or HDRS.
+     mail.smtp.sendpartialboolean
+       If set to true, and a message has some valid and some invalid addresses,
+       send the message anyway, reporting the partial failure with a
+       SendFailedException.  If set to false (the default), the message is not
+       sent to any of the recipients if there is an invalid recipient address.
+     </info>
+  <tag>
+    <name>mail</name>
+    <tagclass>org.apache.taglibs.mailer.MailTag</tagclass>
+    <bodycontent>JSP</bodycontent>
+    <attribute>
+      <name>server</name>
+      <required>no</required>
+      <rtexprvalue>yes</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>session</name>
+      <required>no</required>
+      <rtexprvalue>no</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>mimeMessage</name>
+      <required>no</required>
+      <rtexprvalue>no</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>authenticate</name>
+      <required>no</required>
+      <rtexprvalue>no</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>user</name>
+      <required>no</required>
+      <rtexprvalue>yes</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>password</name>
+      <required>no</required>
+      <rtexprvalue>yes</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>to</name>
+      <required>no</required>
+      <rtexprvalue>no</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>replyTo</name>
+      <required>no</required>
+      <rtexprvalue>no</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>from</name>
+      <required>no</required>
+      <rtexprvalue>no</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>cc</name>
+      <required>no</required>
+      <rtexprvalue>no</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>bcc</name>
+      <required>no</required>
+      <rtexprvalue>no</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>subject</name>
+      <required>no</required>
+      <rtexprvalue>no</rtexprvalue>
+    </attribute>
+  </tag>
+  <tag>
+    <name>server</name>
+    <tagclass>org.apache.taglibs.mailer.ServerTag</tagclass>
+    <bodycontent>JSP</bodycontent>
+  </tag>
+  <tag>
+    <name>message</name>
+    <tagclass>org.apache.taglibs.mailer.MessageTag</tagclass>
+    <bodycontent>JSP</bodycontent>
+    <attribute>
+      <name>type</name>
+      <required>no</required>
+      <rtexprvalue>no</rtexprvalue>
+    </attribute>
+  </tag>
+  <tag>
+    <name>header</name>
+    <tagclass>org.apache.taglibs.mailer.HeaderTag</tagclass>
+    <bodycontent>JSP</bodycontent>
+    <attribute>
+      <name>name</name>
+      <required>yes</required>
+      <rtexprvalue>no</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>value</name>
+      <required>no</required>
+      <rtexprvalue>no</rtexprvalue>
+    </attribute>
+  </tag>
+  <tag>
+    <name>setrecipient</name>
+    <tagclass>org.apache.taglibs.mailer.SetRecipientTag</tagclass>
+    <bodycontent>JSP</bodycontent>
+    <attribute>
+      <name>type</name>
+      <required>yes</required>
+      <rtexprvalue>no</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>address</name>
+      <required>no</required>
+      <rtexprvalue>no</rtexprvalue>
+    </attribute>
+  </tag>
+  <tag>
+    <name>addrecipient</name>
+    <tagclass>org.apache.taglibs.mailer.AddRecipientTag</tagclass>
+    <bodycontent>JSP</bodycontent>
+    <attribute>
+      <name>type</name>
+      <required>yes</required>
+      <rtexprvalue>no</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>address</name>
+      <required>no</required>
+      <rtexprvalue>no</rtexprvalue>
+    </attribute>
+  </tag>
+  <tag>
+    <name>replyto</name>
+    <tagclass>org.apache.taglibs.mailer.ReplyToTag</tagclass>
+    <bodycontent>JSP</bodycontent>
+  </tag>
+  <tag>
+    <name>from</name>
+    <tagclass>org.apache.taglibs.mailer.FromTag</tagclass>
+    <bodycontent>JSP</bodycontent>
+  </tag>
+  <tag>
+    <name>attach</name>
+    <tagclass>org.apache.taglibs.mailer.AttachTag</tagclass>
+    <bodycontent>JSP</bodycontent>
+    <attribute>
+      <name>file</name>
+      <required>no</required>
+      <rtexprvalue>no</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>url</name>
+      <required>no</required>
+      <rtexprvalue>no</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>type</name>
+      <required>no</required>
+      <rtexprvalue>no</rtexprvalue>
+    </attribute>
+  </tag>
+  <tag>
+    <name>subject</name>
+    <tagclass>org.apache.taglibs.mailer.SubjectTag</tagclass>
+    <bodycontent>JSP</bodycontent>
+  </tag>
+  <tag>
+    <name>send</name>
+    <tagclass>org.apache.taglibs.mailer.SendTag</tagclass>
+    <bodycontent>JSP</bodycontent>
+  </tag>
+  <tag>
+    <name>error</name>
+    <tagclass>org.apache.taglibs.mailer.ErrorTag</tagclass>
+    <teiclass>org.apache.taglibs.mailer.ErrorTEI</teiclass>
+    <bodycontent>JSP</bodycontent>
+    <attribute>
+      <name>id</name>
+      <required>yes</required>
+      <rtexprvalue>no</rtexprvalue>
+    </attribute>
+  </tag>
+</taglib>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+       
+
+

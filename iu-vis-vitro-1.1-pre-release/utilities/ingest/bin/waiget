@@ -1,0 +1,254 @@
+#!/usr/bin/perl
+use Getopt::Std;
+use FileHandle;
+use POSIX qw( strftime );
+use Term::ReadKey;
+
+if(scalar(@ARGV) == 0) { Usage() }
+
+getopts("b:c:L:MN:o:stU:u:v");
+
+sub Usage {
+    print STDOUT "waiget \n";
+    print STDOUT " -b dpath    base dir\n";
+    print STDOUT " -c dpath    check md5s against files at path\n";
+    print STDOUT " -L path     log to file at path\n";
+    print STDOUT " -M          calculate md5sum(s)\n";
+    print STDOUT " -N int      for debug typically 5\n";
+    print STDOUT " -o          out dir\n";
+    print STDOUT " -s          silent\n";
+    print STDOUT " -U path     to file of netids one per line\n";
+    print STDOUT " -u netid    GET USER using netid\n";
+    print STDOUT " -v          verbose\n";
+    print STDOUT "Example:\n\twaiget -o . -U ../ai_users.txt -b . -M\n";
+    exit 0;
+}
+#
+# get password
+#
+print "Password: ";
+ReadMode 'noecho';
+my $pw = ReadLine(0);
+print "\n";
+chomp($pw);
+ReadMode 'normal';
+
+#
+# set up globals
+#
+$g_STARTED_AT = strftime("%Y\%m%d%H\%M\%S", localtime());
+# GLOBALS
+#
+$g_BASE_DIR = ($opt_b?$opt_b:"/home/jrm424");
+$g_CMD_PREFIX = "wget -O - --http-user \'cornell/fac_reports\' --http-passwd \'$pw\' ";
+$g_CMD_PREFIX_ALT = "wget -O - --http-user \'cornell/fac_reports\' --http-passwd \'********\'  ";
+$g_URL_PREFIX = "https://www.digitalmeasures.com/login/service/v4";
+$g_GET_USER =  "/SchemaData/INDIVIDUAL-ACTIVITIES-University/USERNAME:";
+
+# set up out directory - a subdirectory of the base directory
+
+$g_USER_OUT_DIR = ($opt_o? "$g_BASE_DIR/$opt_o":"$g_BASE_DIR/AIXMLS/AIRAW_$g_STARTED_AT");
+$g_USER_OUT_DIR =~ s/\.\/\./\./;
+
+if($opt_o){
+    if(!( -e $g_USER_OUT_DIR && -w _ && -d _)) {
+	#
+	# user supplied directory has problems
+	#
+	print STDERR "Out directory $g_USER_OUT_DIR  does not exist or is inaccessable\n";
+	exit 0;
+    }
+} else {
+    qx(mkdir $g_USER_OUT_DIR);
+    if(! -e $g_USER_OUT_DIR){
+	#
+	# constructed directory has a problem
+	#
+	print STDERR "Out directory $g_USER_OUT_DIR does not exist or is inaccessable\n";
+	exit 0;
+    }
+}
+#print STDERR $g_USER_OUT_DIR."\n";
+
+
+$g_ERROR_TEST_STRING = "<HEAD><TITLE>An Error Occurred</TITLE></HEAD>";
+
+
+sub trim {
+    my($a) = @_;
+    $a =~ s/^\s*(\S+)\s*$/$1/;
+    $a =~ s/^\s*(\S.*\S)\s*$/$1/;
+    $a =~ s/(\s*)//;
+    return $a;
+}
+
+# set up logging
+
+$g_log = $opt_L;
+if(!$opt_L){
+    $g_log = "$g_BASE_DIR/log/WAIGET_$$\_$g_STARTED_AT";
+    if( !(-e "$g_BASE_DIR/log" && -w _ && -d _) ){
+	if( ! -e _){
+	    qx(mkdir "$g_BASE_DIR/log");
+	    if( ! -e "$g_BASE_DIR/log"){
+		print STDERR "No log dir.";
+		exit 1;
+	    }
+	}
+    }
+}
+
+# to maintain a way to write to
+# good old stdout after this process
+# redirects STDOUT to a log file
+open CONSOLE, ">&STDOUT";
+autoflush CONSOLE 1;
+
+my $flag = open(LOG,">$g_log") if  defined($g_log);
+
+if($flag){
+    # redirect everything to log file
+    autoflush LOG 1;
+    open(STDOUT,">&LOG");
+    open(STDERR,">&LOG");
+} else {
+    # write to display
+    print "can't open $g_log\n";
+}
+
+autoflush LOG 1;
+
+# define msg -> log function
+#
+sub logit {
+    my($msg) = @_;
+    chomp $msg;
+    my $now = strftime("%Y:\%m:%d:%H:\%M:\%S", localtime());
+    print LOG "$now - $msg\n";
+}
+
+# open trouble file
+open TROUBLE, "$g_BASE_DIR/log/WAIGET_TROUBLE_$$\_$g_STARTED_AT";
+
+@list = ();
+
+
+if($opt_U ){
+    # using std file
+    open (INF, $opt_U);
+    @list = <INF>;
+} elsif($opt_u ne ''){
+    # single netid provided
+    push @list, $opt_u;
+} else {
+    print CONSOLE "No netids\n";
+    exit 0;
+}
+
+@g_Good = ();
+@_Bad = ();
+$g_NGOOD = 0;
+$g_NBAD = 0;
+
+
+# debug limit
+$g_NN = 0;
+if($opt_N){
+    $g_NN = $opt_N;
+}
+
+@g_MD5SUM =();
+logit("Run Start");
+foreach my $line (@list){
+    last if $opt_N && $g_NN-- <= 0; # quit after a few
+    next if $line =~ /^\s*\#/;
+    #remove extraneous stuff - if present.
+    #example line:
+    #"gsa1","Abawi, George S: gsa1","blah blah blah"
+    #
+    #we are only interested in 'gsa1' (without the single quotes)
+    #fragment each line to get the part we need i.e. $parts[0].
+    #The token is '","' including the " characters
+
+    my @parts = map { trim($_) } split /","/, $line; 
+    # now strip out the remaining " characters
+    @parts = map { $_ =~ s/\"//g; $_; } @parts;
+    $parts[0] = trim($parts[0]);
+    next if $parts[0] eq "";
+
+    my @res;
+
+    my $cmd =$g_CMD_PREFIX . $g_URL_PREFIX;
+    my $cmd_alt =$g_CMD_PREFIX_ALT . $g_URL_PREFIX;
+    # if get user case
+    if($opt_U || $opt_u){
+	# append user url path to cmd
+	$cmd .= $g_GET_USER;
+	$cmd_alt .= $g_GET_USER;
+
+	# add output path 
+	my $outfile = "$g_USER_OUT_DIR/$parts[0].xml";
+	$cmd .= $parts[0] . " > $outfile ";
+	$cmd_alt .= $parts[0] . " > $outfile ";
+
+	# print sub process cmd unless not silent  AND verbose
+	print $cmd_alt . "\n" if ! $opt_s && $opt_v;
+	logit( $cmd_alt . "\n" );
+
+	# execute cmd in sub process
+	qx($cmd);
+	
+	# check for an error response from AI
+	
+	@res = qx(grep -i '$g_ERROR_TEST_STRING' $outfile);
+	if($#res > 0){
+	    my $msg = "Problem with $parts[0]. ";
+	    $msg .= "See $outfile\n";
+	    print STDERR $msg  if ! $opt_s;
+	    $g_NBAD++;
+	    push @g_Bad, $parts[0];
+	} else {
+	    $g_NGOOD++;
+	    if($opt_M){
+		my ($md5rec) = qx(md5sum $outfile);
+		my ($md5) = split /\s/, $md5rec;
+		print CONSOLE "$md5rec\n" if $opt_v;
+		push @g_MD5SUM, $md5rec;
+	    }
+	    push @g_GOOD,$parts[0];
+	}
+
+    }
+
+}
+if($opt_M){
+    open MD5, ">$g_USER_OUT_DIR/waiget$g_STARTED_AT.md5";
+    print MD5 join('',@g_MD5SUM) ;
+    close MD5;
+    if($opt_c) {
+	my $md5f = "waiget$g_STARTED_AT.md5";
+	qx(cp $g_USER_OUT_DIR/$md5f $opt_c);
+	my @res = qx(cd $opt_c; md5sum -c $opt_c/$md5f);
+	foreach my $rec (@res){
+	    # CASES to handle:
+	    # 'OK' - no change so drop new file
+	    # 'FAILED open or read' (expected a file to check)
+	    #        so this is an addition so keep new file
+	    # 'FAILED' - file changed (checksum changed)
+	    #        so this is an addition so keep new file
+	    my($f,$r) = map { trim($_); } split /:/, $rec;
+	    if($r eq 'OK'){
+		print STDOUT "qx(/bin/rm -f $g_USER_OUT_DIR/$f);\n";
+	    } elsif($r eq 'FAILED open or read'){
+		print STDOUT "$g_USER_OUT_DIR/$f is new\n"
+	    } elsif($r eq 'FAILED'){
+		print STDOUT "$f has changed.\n" ;
+	    } else {
+		;
+	    }
+	}
+    }
+}
+
+logit("$g_NGOOD Good; $g_NBAD bad.");
+logit("Run End");

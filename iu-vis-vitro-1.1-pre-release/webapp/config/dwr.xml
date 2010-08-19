@@ -1,0 +1,51 @@
+<!DOCTYPE dwr PUBLIC "-//GetAhead Limited//DTD Direct Web Remoting 2.0//EN"
+        "http://getahead.org/dwr//dwr20.dtd">
+
+<dwr>
+  <allow>
+
+    <!-- create blocks define how the java object on the server gets created, -->
+    <!-- long it lives, what java class and what name in javascript. -->
+    <!-- creator: "new" "scripted" "spring"  -->
+    <!-- scope: "application" "session" "request" "page" -->
+    <!-- that the "request" scope is only useful for static methods -->
+  
+      <create creator="new" javascript="PropertyDWR" scope="page">
+          <param name="class" value="edu.cornell.mannlib.vitro.webapp.dwr.PropertyDWR"/>
+      </create>
+      
+      <create creator="new" javascript="EntityDWR" scope="page">
+          <param name="class" value="edu.cornell.mannlib.vitro.webapp.dwr.EntityDWR" />
+      </create>         
+
+      <create creator="new" javascript="VClassDWR" scope="page">
+          <param name="class" value="edu.cornell.mannlib.vitro.webapp.dwr.VClassDWR"/>
+      </create>
+      
+    <!-- Convert blocks define how a types are moved between java 
+         land and java script land -->    
+
+    <convert converter="bean" match="edu.cornell.mannlib.vitro.webapp.beans.VClass">
+        <param name="include" value="name,URI,groupURI,hidden,shortDef,hiddenFromPublicDisplay,hiddenFromEditDisplay"/>
+    </convert>
+                                           
+    <convert converter="bean" match="edu.cornell.mannlib.vitro.webapp.beans.Individual">
+        <param name="include" value="name,moniker,URI,vClassURI"/>
+    </convert>
+    
+    <convert converter="bean" match="edu.cornell.mannlib.vitro.webapp.beans.PropertyInstance"/>
+
+    <!--<convert converter="object" match="edu.cornell.mannlib.vitro.beans.Entity">-->
+      <!--<param name="include" value="id, name, moniker, vClassId"/>-->
+    <!--</convert>-->
+
+    <!--<convert converter="object" match="edu.cornell.mannlib.vitro.webapp.beans.IndividualWebapp">-->
+      <!--<param name="force" value="true"/>-->
+      <!--<param name="include" value="URI, namespace, localName, name, moniker, vclassURI"/>-->
+    <!--</convert>-->
+
+	<convert converter="bean" match="Date"/>
+  </allow>
+
+
+</dwr>
