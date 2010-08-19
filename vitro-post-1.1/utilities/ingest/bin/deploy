@@ -1,0 +1,213 @@
+#!/usr/bin/perl
+
+use Getopt::Std;
+use FileHandle;
+use POSIX qw( strftime );
+use FindBin qw($Bin);
+$g_STARTED_AT = strftime("%Y\%m%d%H\%M", localtime());
+autoflush STDOUT 1;
+if(scalar(@ARGV) == 0){
+    print STDOUT "deploy \n";
+    print STDOUT "-a         all\n";
+    print STDOUT "-b         bin dir\n";
+    print STDOUT "-B         make tar ball\n";
+    print STDOUT "-x         xslt dir\n";
+    print STDOUT "-c         create dest dir tree\n";
+    print STDOUT "           when no -I option\n";
+    print STDOUT "-d path    destination\n";
+    print STDOUT "           default /home/jrm424/ActInsight/work\n";
+    print STDOUT "-s path    source. normally eclipse i.e. from\n";
+    print STDOUT "           /home/jrm424/workspace/AI Ingest\n";
+    print STDOUT "-I         to eclipse; normally from eclipse\n";
+    print STDOUT "-L         live\n";
+    print STDOUT "-o         ontology dir\n";
+    print STDOUT "-v         verbose\n";
+    print STDOUT "\n";
+    print STDOUT "Example:\n";
+    print STDOUT "deploy -x -d /home/jrm424/ActInsight/work/test -Lv\n";
+    print STDOUT "or\n";
+    print STDOUT "cd /home/jrm424/ActInsight/work/test\n";
+    print STDOUT "deploy -x -d . -Lv\n";
+}
+getopts("abBcD:d:ILos:Sxv");
+
+
+
+$g_exef = "L" if $opt_L;
+$g_exef .= "V" if $opt_v;
+$g_cwd = $ENV{'PWD'};
+$g_eclipse_ws = "/home/jrm424/workspace/AI\\ Ingest";
+$src = "/home/jrm424/workspace/AI\\ Ingest";
+$src = $opt_s if $opt_s;
+$dst = "/home/jrm424/ActInsight/work";
+$dst = $opt_d if $opt_d;
+
+if($opt_I){
+    print "Are you sure? ";
+    my $in = <STDIN>;
+    exit 1 if $in !~ /^[yY]/;
+    my $t = $src;
+    $src = $dst;
+    $dst = $t;
+}
+
+$src =~ s/^(\.|\.\/)//;
+$dst =~ s/^(\.|\.\/)//;
+
+$src = $g_cwd . '/' . $src if $src !~ /^\//;
+$dst = $g_cwd . '/' . $dst if $dst !~ /^\//;
+
+$src =~ s/\/$//;
+$dst =~ s/\/$//;
+if(!$opt_I && $opt_c){
+    if(! -e "$dst/bin"){
+	my $cmd = "";
+	$cmd .= "mkdir $dst/bin";
+	my $r;
+	$r = doit($cmd, $g_exef);
+	exit(1) if($r);
+	$cmd = "cd $dst/bin; ln -s $g_eclipse_ws/bin ebin";
+	$r = doit($cmd, $g_exef);
+	exit(1) if($r);
+    }
+    if(! -e "$dst/xslt"){
+	my $cmd = "";
+	$cmd .= "mkdir $dst/xslt";
+	my $r;
+	$r = doit($cmd, $g_exef);
+	exit(1) if($r);
+	$cmd = "cd $dst/xslt; ln -s $g_eclipse_ws/xslt exsl";
+	$r = doit($cmd, $g_exef);
+	exit(1) if($r);
+    }
+    if(! -e "$dst/log"){
+	my $cmd = "";
+	$cmd .= "mkdir $dst/log";
+	my $r;
+	$r = doit($cmd, $g_exef);
+	exit(1) if($r);
+    }
+    if(! -e "$dst/store"){
+	my $cmd = "";
+	$cmd .= "mkdir $dst/store";
+	my $r;
+	$r = doit($cmd, $g_exef);
+	exit(1) if($r);
+    }
+    if(! -e "$dst/AIXMLS"){
+	my $cmd = "";
+	$cmd .= "mkdir $dst/AIXMLS";
+	my $r;
+	$r = doit($cmd, $g_exef);
+	exit(1) if($r);
+    }
+    if(! -e "$dst/ontology"){
+        my $cmd = "";
+        $cmd .= "mkdir $dst/ontology";
+        my $r;
+        $r = doit($cmd, $g_exef);
+        exit(1) if($r);
+    } 
+}
+
+sub doit {
+    my($cmd, $flag, $pw, $resp) = @_;
+    #print "$cmd, $flag, $pw, $resp\n";
+    print STDOUT "$cmd\n" if $flag =~ /V/;
+    $cmd =~ s/_PW_/$pw/ if $pw;
+    if($flag =~ /L/ && $resp){
+	@$resp = qx($cmd);
+	my $r = ($? >> 8);
+	return $r;
+    } elsif($flag =~ /L/){
+	qx($cmd);
+	my $r = ($? >> 8);
+	return $r;
+    }
+    return 0;
+}
+
+sub trim {
+    my($a) = @_;
+    $a =~ s/^\s*(\S+)\s*$/$1/;
+    $a =~ s/^\s*(\S.*\S)\s*$/$1/;
+    $a =~ s/(\s*)//;
+    return $a;
+}
+
+sub main {
+
+    if($opt_a || $opt_b || $opt_c){
+	my $cmd = "";
+	$cmd .= "cd $src/bin; ";
+	$cmd .= " cp nzsxml aiIngest fixuri mklist nuno waiget xsltseq xtract_netids ";
+	$cmd .= " Setup.pm Utils.pm GetXmls.pm IntellConts.pm ImpactStmts.pm ";
+	$cmd .= " Awards.pm Grants.pm ";
+	$cmd .= " $dst/bin ";
+	my $r;
+	$r = doit($cmd, $g_exef);
+	exit(1) if($r);
+	if(!$opt_I){
+	    $cmd = "";
+	    $cmd .= "cd $dst/bin; chmod 0755 *";
+	    $r = doit($cmd, $g_exef);
+	    exit(1) if($r);
+	}
+    }
+
+    if($opt_a || $opt_x || $opt_c){
+	my $cmd = "";
+	$cmd .= "cd $src/xslt; ";
+	$cmd .= " cp *.xsl *.xslc empty.xml ";
+	$cmd .= " saxon9he.jar *.sparql ";
+	$cmd .= " $dst/xslt ";
+	my $r;
+	$r = doit($cmd, $g_exef);
+	exit(1) if($r);
+	if(!$opt_I && $opt_c) {
+	    $cmd = "";
+	    $cmd .= "cp $src/xslt/saxon9he.jar $dst/xslt";
+	    $r = doit($cmd, $g_exef);
+	    exit(1) if($r);
+	}
+    }
+    if($opt_a || $opt_o || $opt_c){
+        my $cmd = "";
+        $cmd .= "cd $src/ontology; ";
+        $cmd .= " cp *.owl *.n3 *.ttl ";
+        $cmd .= " $dst/ontology ";
+        my $r;
+        $r = doit($cmd, $g_exef);
+        exit(1) if($r);
+    }
+    if($opt_a || $opt_S || $opt_c){
+        my $cmd = "";
+        $cmd .= "cd $src/auxmls; ";
+        $cmd .= " cp * ";
+        $cmd .= " $dst/store ";
+        my $r;
+        $r = doit($cmd, $g_exef);
+        exit(1) if($r);
+    }
+}
+main();
+
+if($opt_B){
+    my $dir = "/tmp/aiw$g_STARTED_AT";
+    if(! -e $dir ){
+	qx(mkdir $dir; cd $dir; mkdir bin xslt ontology store);
+    }
+    
+    $dst = $dir;
+    $opt_I = 0;
+    $opt_a = 1;
+    $g_exef = "L";
+    main();
+    if($opt_D){
+	my $d = ($opt_D eq "." || $opt_D eq "./")?$g_cwd:$opt_D;
+	qx(cd /tmp/aiw$g_STARTED_AT; tar cvf aiw$g_STARTED_AT.tar bin xslt ontology store );
+	qx(cd /tmp/aiw$g_STARTED_AT; mv aiw$g_STARTED_AT.tar $d);
+    } else {
+	qx(cd /tmp; tar cvf aiw$g_STARTED_AT.tar aiw$g_STARTED_AT);
+    }
+}

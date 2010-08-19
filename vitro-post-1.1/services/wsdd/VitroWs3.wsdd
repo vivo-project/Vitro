@@ -1,0 +1,52 @@
+<deployment 
+    xmlns="http://xml.apache.org/axis/wsdd/"
+    xmlns:myNS="http://vivo.cornell.edu/vitro/webservices/axis1/1.0"
+    xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
+  <service name="VitroWs3" provider="java:RPC">
+  	<parameter name="scope" value="application"/>
+    <parameter name="sendMultiRefs" value="false"/>
+    <parameter name="className" value="edu.cornell.mannlib.vitro.webservices.VitroWs"/>
+    <parameter name="allowedMethods" value="getFullTab,getTabsForPortal,getFullEntityById"/>
+    
+<!--     <beanMapping qname="myNS:Entity" xmlns:myNS="urn:edu.cornell.mannlib.vitro" -->
+<!--                  languageSpecificType="java:edu.cornell.mannlib.vitro.beans.Entity"/> -->
+
+
+    <typeMapping qname="myNS:Entity" xmlns:myNS="urn:edu.cornell.mannlib.vitro"
+                 languageSpecificType="java:edu.cornell.mannlib.vitro.webapp.beans.Individual"
+                 serializer="edu.cornell.mannlib.vitro.webservices.serializers.EntitySerFactory"
+                 deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+                 encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+
+    <typeMapping qname="myNS:Ents2Ents" xmlns:myNS="urn:edu.cornell.mannlib.vitro"
+                 languageSpecificType="java:edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement"
+                 serializer="edu.cornell.mannlib.vitro.webservices.serializers.Ents2EntsSerFactory"
+                 deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+                 encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+
+    <beanMapping qname="myNS:VClass" xmlns:myNS="urn:edu.cornell.mannlib.vitro"
+                 languageSpecificType="java:edu.cornell.mannlib.vitro.webapp.beans.VClass"/>
+                             
+	<typeMapping qname="myNS:Property" xmlns:myNS="urn:edu.cornell.mannlib.vitro"
+                 languageSpecificType="java:edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty"
+                 serializer="edu.cornell.mannlib.vitro.webservices.serializers.EshipRetroObjectPropertySerFactory"
+                 deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+                 encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+                 				 
+	<!-- 
+	<beanMapping qname="myNS:Property" xmlns:myNS="urn:edu.cornell.mannlib.vitro"
+                 languageSpecificType="java:edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty"/>
+                 -->
+
+    <beanMapping qname="myNS:PropertyInstance" xmlns:myNS="urn:edu.cornell.mannlib.vitro"
+                   languageSpecificType="java:edu.cornell.mannlib.vitro.webapp.beans.PropertyInstance"/>
+
+    <beanMapping qname="myNS:Tab" xmlns:myNS="urn:edu.cornell.mannlib.vitro"
+                 languageSpecificType="java:edu.cornell.mannlib.vitro.webapp.beans.Tab"/>      
+
+    <beanMapping qname="myNS:Link" xmlns:myNS="urn:edu.cornell.mannlib.vitro"
+                 languageSpecificType="java:edu.cornell.mannlib.vitro.webapp.beans.Link"/>
+  </service>
+
+
+</deployment>

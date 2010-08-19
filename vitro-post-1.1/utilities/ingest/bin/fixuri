@@ -1,0 +1,13 @@
+#!/usr/bin/perl
+use FindBin qw($Bin);
+use lib $Bin;
+use Getopt::Long;
+use FileHandle;
+
+while(my $line = <>){
+    if($line =~ /\s*<uri>/){
+	$line =~ s/\.library//;
+	$line =~ s/\/ns\/0.1\#/\/individual\//;
+    }
+    print $line;
+}

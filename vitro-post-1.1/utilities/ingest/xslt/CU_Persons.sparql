@@ -1,0 +1,70 @@
+PREFIX rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd:   <http://www.w3.org/2001/XMLSchema#>
+PREFIX owl:   <http://www.w3.org/2002/07/owl#>
+PREFIX swrl:  <http://www.w3.org/2003/11/swrl#>
+PREFIX swrlb: <http://www.w3.org/2003/11/swrlb#>
+PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#>
+PREFIX far: <http://vitro.mannlib.cornell.edu/ns/reporting#>
+PREFIX ai: <http://vitro.mannlib.cornell.edu/ns/hotel#>
+PREFIX aktp: <http://www.aktors.org/ontology/portal#>
+PREFIX akts: <http://www.aktors.org/ontology/support#>
+PREFIX bibo: <http://purl.org/ontology/bibo/>
+PREFIX hr: <http://vivo.cornell.edu/ns/hr/0.9/hr.owl#>
+PREFIX dcelem: <http://purl.org/dc/elements/1.1/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX event: <http://purl.org/NET/c4dm/event.owl#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX j.1: <http://aims.fao.org/aos/geopolitical.owl#>
+PREFIX mann: <http://vivo.cornell.edu/ns/mannadditions/0.1#>
+PREFIX pubmed: <http://vitro.mannlib.cornell.edu/ns/pubmed#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rdfsyn: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX socsci: <http://vivo.library.cornell.edu/ns/vivo/socsci/0.1#>
+PREFIX stars: <http://vitro.mannlib.cornell.edu/ns/cornell/stars/classes#>
+PREFIX temp: <http://vitro.mannlib.cornell.edu/ns/temp#>
+PREFIX wos: <http://vivo.mannlib.cornell.edu/ns/ThomsonWOS/0.1#>
+PREFIX j.2: <http://vitro.mannlib.cornell.edu/ns/vitro/public#>
+PREFIX core: <http://vivoweb.org/ontology/core#>
+PREFIX vivo: <http://vivo.library.cornell.edu/ns/0.1#>
+
+
+# 
+# This query finds all Cornell Persons 
+# and returns URI, person label (name string) and email string
+# with name parts from HR namespace
+# notes: 
+# add FILTER to omit individuals with no emails
+
+SELECT DISTINCT ?uriPerson ?stringPerson ?lastName ?firstName ?plainEmail
+WHERE  
+{   
+    ?uriPerson rdf:type vivo:CornellAffiliatedPerson .
+    
+    OPTIONAL {
+        {?uriPerson rdfs:label ?personLabel } .
+        LET (?stringPerson := str(?personLabel)) 
+    }
+
+    OPTIONAL { 
+        { ?uriPerson hr:LastName ?lastNamelabel } .
+        LET (?lastName := str(?lastNamelabel))  
+    } 
+
+    # note: MiddleName is not supplied in HR namespace
+   
+    OPTIONAL { 
+        { ?uriPerson hr:FirstName ?firstNamelabel } .
+        LET (?firstName := str(?firstNamelabel))  
+    } 
+    
+    OPTIONAL { 
+        { ?uriPerson vivo:CornellemailnetId ?email } UNION { ?uriPerson vivo:nonCornellemail ?email } .
+        LET (?plainEmail := str(?email))
+    }
+
+# FILTER ( ?email || "")
+}
+ORDER BY ?stringPerson
+LIMIT 30000

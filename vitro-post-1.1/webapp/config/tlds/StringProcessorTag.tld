@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+<taglib 
+    xmlns="http://java.sun.com/xml/ns/j2ee" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd" 
+    version="2.0">
+         
+     <tlib-version>1.0</tlib-version>
+     <uri>http://vitro.mannlib.cornell.edu/vitro/tags/StringProcessorTag</uri>
+     
+<!--
+		This taglib is for processing the output using a UnaryFunctor<String,String>
+		found in the request scope.
+-->
+
+	<tag>
+		<name>process</name>
+		<tag-class>edu.cornell.mannlib.vitro.webapp.web.jsptags.StringProcessorTag</tag-class>		
+        <display-name>String Processor</display-name>
+        <description>
+            Processes output using "StringProcessor" from request.
+        </description>
+        
+		<body-content>scriptless</body-content>
+    </tag>
+    
+</taglib>

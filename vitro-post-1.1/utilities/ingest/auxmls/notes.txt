@@ -1,0 +1,317 @@
+
+
+mklist -d /home/jrm424/aiw/AIXMLS/AIRAW_20100610120510 -D /home/jrm424/aiw/AIXMLS/AIRAW_20100610120510 > ../test/store/all-aiiclist.xml
+
+========================================
+java  -Xmx1024m -Xms1024m  -jar /home/jrm424/aiw/test/xslt/saxon9he.jar /home/jrm424/aiw/test/xslt/empty.xml  /home/jrm424/aiw/test/xslt/all-aiid2netid.xsl  listxml=/home/jrm424/aiw/test/store/all-aiiclist.xml > /home/jrm424/aiw/test/store/all-aiid-netid.xml
+
+java  -Xmx1024m -Xms1024m  -jar /home/jrm424/aiw/test/xslt/saxon9he.jar /home/jrm424/aiw/test/xslt/empty.xml  /home/jrm424/aiw/test/xslt/collectByInvestigators.xsl listxml=/home/jrm424/aiw/test/store/aiislist.xml aiid2netid=/home/jrm424/aiw/test/store/all-aiid-netid.xml > /home/jrm424/aiw/test/store/ci.xml
+
+========================================
+
+java  -Xmx1024m -Xms1024m  -jar /home/jrm424/aiw/test/xslt/saxon9he.jar /home/jrm424/aiw/test/store/ci.xml  /home/jrm424/aiw/test/xslt/groupInvestigatorsImpactStmts.xsl > /home/jrm424/aiw/test/store/cid.xml
+
+java  -Xmx1024m -Xms1024m  -jar /home/jrm424/aiw/test/xslt/saxon9he.jar /home/jrm424/aiw/test/store/cid.xml  /home/jrm424/aiw/test/xslt/aiicsort.xsl > /home/jrm424/aiw/test/store/cids.xml
+
+========================================
+
+java  -Xmx1024m -Xms1024m  -jar /home/jrm424/aiw/test/xslt/saxon9he.jar /home/jrm424/aiw/test/xslt/empty.xml  /home/jrm424/aiw/test/xslt/collectByCollaborativeEntity.xsl listxml=/home/jrm424/aiw/test/store/aiislist.xml aiid2netid=/home/jrm424/aiw/test/store/all-aiid-netid.xml > /home/jrm424/aiw/test/store/cce.xml
+
+java  -Xmx1024m -Xms1024m  -jar /home/jrm424/aiw/test/xslt/saxon9he.jar /home/jrm424/aiw/test/store/cce.xml  /home/jrm424/aiw/test/xslt/groupCollaborativeEntitysImpactStmts.xsl > /home/jrm424/aiw/test/store/cced.xml
+
+========================================
+
+java  -Xmx1024m -Xms1024m  -jar /home/jrm424/aiw/test/xslt/saxon9he.jar /home/jrm424/aiw/test/xslt/empty.xml  /home/jrm424/aiw/test/xslt/collectByFundingOrg.xsl listxml=/home/jrm424/aiw/test/store/aiislist.xml aiid2netid=/home/jrm424/aiw/test/store/all-aiid-netid.xml > /home/jrm424/aiw/test/store/cfo.xml
+
+java  -Xmx1024m -Xms1024m  -jar /home/jrm424/aiw/test/xslt/saxon9he.jar /home/jrm424/aiw/test/store/cfo.xml  /home/jrm424/aiw/test/xslt/groupFundingOrgsImpactStmts.xsl > /home/jrm424/aiw/test/store/cfod.xml
+
+java  -Xmx1024m -Xms1024m  -jar /home/jrm424/aiw/test/xslt/saxon9he.jar /home/jrm424/aiw/test/store/cfod.xml  /home/jrm424/aiw/test/xslt/aiicsort.xsl > /home/jrm424/aiw/test/store/cfods.xml
+
+========================================
+
+java  -Xmx1024m -Xms1024m  -jar /home/jrm424/aiw/test/xslt/saxon9he.jar /home/jrm424/aiw/test/xslt/empty.xml  /home/jrm424/aiw/test/xslt/collectByGeoLocation.xsl listxml=/home/jrm424/aiw/test/store/aiislist.xml aiid2netid=/home/jrm424/aiw/test/store/all-aiid-netid.xml > /home/jrm424/aiw/test/store/cgeo.xml
+
+java  -Xmx1024m -Xms1024m  -jar /home/jrm424/aiw/test/xslt/saxon9he.jar /home/jrm424/aiw/test/store/cgeo.xml  /home/jrm424/aiw/test/xslt/groupGeoLocationImpactStmts.xsl > /home/jrm424/aiw/test/store/cgeod.xml
+
+java  -Xmx1024m -Xms1024m  -jar /home/jrm424/aiw/test/xslt/saxon9he.jar /home/jrm424/aiw/test/store/cgeod.xml  /home/jrm424/aiw/test/xslt/aiicsort.xsl > /home/jrm424/aiw/test/store/cgeods.xml
+
+========================================
+
+java  -Xmx1024m -Xms1024m  -jar /home/jrm424/aiw/test/xslt/saxon9he.jar /home/jrm424/aiw/test/xslt/empty.xml  /home/jrm424/aiw/test/xslt/collectByPriorityArea.xsl listxml=/home/jrm424/aiw/test/store/aiislist.xml aiid2netid=/home/jrm424/aiw/test/store/all-aiid-netid.xml > /home/jrm424/aiw/test/store/cpe.xml
+
+java  -Xmx1024m -Xms1024m  -jar /home/jrm424/aiw/test/xslt/saxon9he.jar /home/jrm424/aiw/test/store/cpe.xml  /home/jrm424/aiw/test/xslt/groupPriorityAreaImpactStmts.xsl > /home/jrm424/aiw/test/store/cped.xml
+
+ java  -Xmx1024m -Xms1024m  -jar /home/jrm424/aiw/test/xslt/saxon9he.jar /home/jrm424/aiw/test/store/cped.xml  /home/jrm424/aiw/test/xslt/aiicsort.xsl > /home/jrm424/aiw/test/store/cpeds.xml
+
+========================================
+
+java -jar xslt/saxon9he.jar store/User.xml xslt/uidmap.xsl | bin/nzsxml 
+
+========================================
+java -jar xslt/saxon9he.jar store/cids.xml xslt/all-ImpactStmts.xsl 
+
+grep '<aiis:IMPACT_STMT_INFO ' cids.xml  | grep -P "AI-[0-9]+" -o | sort | uniq > iis.txt
+
+grep '<aiis:IMPACT_STMT_INFO ' cceds.xml  | grep -P "AI-[0-9]+" -o | sort | uniq > ceis.txt
+
+========================================
+
+java -jar xslt/saxon9he.jar store/cids.xml xslt/all-ImpactStmts.xsl > store/all-impactsByInvest.xml
+
+========================================
+grep counter store/cids.xml  | wc -l
+
+nuno -X -n 298 -t AI-  > store/impstmt-unomap.xml
+
+
+java  -Xmx1024m -Xms1024m  -jar xslt/saxon9he.jar -o store/isbyinv.rdf store/cids.xml xslt/mkInvestRdf.xsl isByInvFile=../store/all-impactsByInvest.xml unoMapFile=../store/impstmt-unomap.xml aiisPrefix=IMPSTMT_ extPerIn=../store/curPersons.xml extPerOut=../store/nextPersons.xml aiisXmlPath=../AIXMLS/cur-aiis
+
+java  -Xmx1024m -Xms1024m  -jar xslt/saxon9he.jar -o store/isbyinv.rdf store/cids.xml xslt/mkInvestRdf.xsl isByInvFile=../store/all-impactsByInvest.xml unoMapFile=../store/impstmt-unomap.xml aiisPrefix=IMPSTMT_ extPerIn=../store/all-curPersons.xml extPerOut=../store/nextPersons.xml aiisXmlPath=../AIXMLS/cur-aiis
+
+========================================
+cd ~
+java -jar bin/saxon9he.jar sparqlquery.xml foafSimplify.xsl > all-curPersons.xml
+========================================
+
+grep counter store/cceds.xml | wc -l
+218
+nuno -X -n 218  -t AI-  > store/ceis-unomap.xml
+
+java  -Xmx1024m -Xms1024m  -jar xslt/saxon9he.jar -o store/isbyce.rdf store/cceds.xml xslt/mkCollabEntityRdf.xsl unoMapFile=../store/ceis-unomap.xml aiisPrefix=IMPSTMT_ extOrgIn=../store/all-curOrgs.xml extOrgOut=nextOrgs.xml aiisXmlPath=../AIXMLS/cur-aiis
+
+
+========================================
+
+grep counter cfods.xml | wc -l
+61
+nuno -X -n 61  -t AI-  > store/fois-unomap.xml
+
+java  -Xmx1024m -Xms1024m  -jar xslt/saxon9he.jar -o store/isbyfo.rdf store/cfods.xml xslt/mkFundingOrgRdf.xsl unoMapFile=../store/fois-unomap.xml aiisPrefix=IMPSTMT_ extFOrgIn=../store/all-curFOrgs.xml extFOrgOut=nextFOrgs.xml aiisXmlPath=../AIXMLS/cur-aiis
+
+========================================
+
+grep counter store/cgeods.xml  | wc -l
+201
+nuno -X -n 201  -t AI-  > store/geois-unomap.xml
+
+
+java  -Xmx1024m -Xms1024m  -jar xslt/saxon9he.jar -o store/isbygeo.rdf store/cgeods.xml xslt/mkGeoLocRdf.xsl unoMapFile=../store/geois-unomap.xml aiisPrefix=IMPSTMT_ extGeoIn=../store/all-curGeoLocs.xml extGeoOut=nextGeos.xml aiisXmlPath=../AIXMLS/cur-aiis
+
+========================================
+
+
+grep counter store/cpads.xml | wc -l
+8
+nuno -X -n 8 -t AI- > store/emph-unomap.xml
+
+
+ java  -Xmx1024m -Xms1024m  -jar xslt/saxon9he.jar -o store/isbypa.rdf store/cpads.xml xslt/mkPriorityAreaRdf.xsl unoMapFile=../store/emph-unomap.xml aiisPrefix=IMPSTMT_ extEmphIn=../store/all-curEmphs.xml extEmphOut=newEmphs.xml aiisXmlPath=../AIXMLS/cur-aiis
+
+
+/etc/init.d/iptables restart
+
+ bin/aiIngest --L --v --aiic IC --steps IC,LM,CA,CJ,CIA,AR,JR  --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --store ./store
+
+in aiw/alt:
+ bin/aiIngest --L --v --log --rawp AIXMLS/TSTRAW --steps IS,CINV,CCE,CFO,CGEO,CPA
+ bin/aiIngest --L --v --log --rawp AIXMLS/TSTRAW --steps MIR,MCER,MFOR,MGR,MPAR
+
+bin/aiIngest --L --v --log --rawp AIXMLS/TSTRAW --steps IS,CUS,CCA
+
+
+
+bin/aiIngest --L --v --log --rawp AIXMLS/TSTRAW --steps CUS,CCA
+bin/aiIngest --L --v --log --rawp AIXMLS/TSTRAW --steps CUA,MUAR
+bin/aiIngest --L --v --log --rawp AIXMLS/TSTRAW --steps CCA,MCAR
+
+
+bin/aiIngest --L --v --log --rawp AIXMLS/TSTRAW --steps IS,CINV,CCE,CFO,CGEO,CPA,CUS,CCA
+
+bin/aiIngest --L --v --log --rawp AIXMLS/TSTRAW --steps MIR,MCER,MFOR,MGR,MPAR,MUAR,MCAR
+
+java  -Xmx1024m -Xms1024m  -jar /home/jrm424/aiw/alt/xslt/saxon9he.jar /home/jrm424/aiw/alt/xslt/empty.xml  /home/jrm424/aiw/alt/xslt/isid2creator.xsl  listxml=/home/jrm424/aiw/alt/store/aiislist.xml  aiid2netid=/home/jrm424/aiw/alt/store/all-aiid-netid.xml | more
+
+bin/aiIngest --L --v --aiic IC --steps IC,LM,CA,CJ,CIA,CIP  --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --store ./store --xmldir=AIXMLS
+
+ java -jar xslt/saxon9he.jar xslt/empty.xml xslt/jaid2creator.xsl listxml=../store/aiiclistnew.xml aiid2netid=/home/jrm424/aiw/test/store/aiid-netid.xml 
+
+| grep '<aiis:INTELLCONT_JOURNAL_CREATOR ' | grep -o '".*"' | cut -f 1 -d ' ' | uniq | grep -P '\d+' -o | uniq 
+
+grep '<INTELLCONT_JOURNAL ' *.xml | grep -o '".*"' | cut -f 1 -d ' ' | uniq | grep -P '\d+' -o | uniq | wc
+
+ bin/aiIngest --L --v --aiic IC --steps CIA,CIP  --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --store ./store --xmldir=AIXMLS
+
+java  -Xmx1024m -Xms1024m  -jar /home/jrm424/aiwork/xslt/saxon9he.jar /home/jrm424/aiwork/xslt/empty.xml  /home/jrm424/aiwork/xslt/jaid2creator.xsl  listxml=/home/jrm424/aiwork/store/aiiclist.xml  aiid2netid=/home/jrm424/aiwork/store/aiid-netid.xml > store/ja-creators.xml
+
+grep '<aiis:INTELLCONT_JOURNAL_CREATOR ' store/ja-creators.xml | wc 
+= 38815
+
+java  -Xmx1024m -Xms1024m  -jar /home/jrm424/aiwork/xslt/saxon9he.jar /home/jrm424/aiwork/xslt/empty.xml  /home/jrm424/aiwork/xslt/isid2creator.xsl  listxml=/home/jrm424/aiwork/store/aiislist.xml  aiid2netid=/home/jrm424/aiwork/store/all-aiid-netid.xml > store/is-creators.xml
+
+ grep '<aiis:IMPACT_STMT_CREATOR ' store/is-creators.xml | wc 
+= 1199
+ 
+
+java -jar `aiw xslt`/saxon9he.jar adjPersonsAtTimeZero.xml merge.xsl doc2=Per1.xml > Per2.xml
+
+
+../bin/fixuri < adjPersonsAtTimeZero.xml | grep '<uri>' | wc
+
+./mklist -d /home/jrm424/aiw/test/AIXMLS/TSTRAW > ../store/allnzraw.xml
+
+ bin/aiIngest --L --v --aiic IC --steps JR  --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --store ./store --xmldir=AIXMLS
+
+java -jar xslt/saxon9he.jar xslt/empty.xml xslt/award.xsl listxml=../store/allnzraw.xml > store/cawards.xml
+
+java -jar xslt/saxon9he.jar xslt/empty.xml xslt/awardRecipient.xsl listxml=../store/allnzraw.xml > store/cawardrecip.xml
+
+java -jar xslt/saxon9he.jar xslt/empty.xml xslt/awardOrg.xsl listxml=../store/allnzraw.xml > store/cawardorg.xml
+
+---------------------------------------------
+grep counter store/cawardorg.xml | wc -l
+nuno -X -n 250 -t AI- > store/awardOrg-unomap.xml
+
+java -jar xslt/saxon9he.jar -o store/awardOrg.rdf store/cawardorg.xml xslt/mkAwardOrgRdf.xsl unoMapFile=../store/awardOrg-unomap.xml extOrgIn=../store/all-curOrgs.xml extOrgOut=../store/more-curOrgs.xml
+
+---------------------------------------------
+
+grep counter store/cawardrecip.xml | wc -l
+nuno -X -n 100 -t AI- > store/awardRecipient-unomap.xml
+
+java -jar xslt/saxon9he.jar -o store/awardRecipient.rdf store/cawardrecip.xml xslt/mkAwardRecipientRdf.xsl unoMapFile=../store/awardRecipient-unomap.xml extPerIn=../store/Per0.xml extPerOut=../store/more-peeps.xml rawXmlPath=../AIXMLS/cur-raw
+
+---------------------------------------------
+
+grep '<aiah:AWARD ' store/cawards.xml | wc -l
+nuno -X -n 450  -t AI- > store/awards-unomap.xml
+
+java -jar xslt/saxon9he.jar -o store/awards.rdf store/cawards.xml xslt/mkAwardRdf.xsl unoMapFile=../store/awards-unomap.xml
+
+---------------------------------------------
+
+bin/aiIngest --L --v --aiic IC --steps IC,CA,CJ,CIA,CIP  --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --store ./store --xmldir=AIXMLS
+
+bin/aiIngest --L --v --aiic IC --steps AR,JR,ICAR,ICPR  --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --store ./store --xmldir=AIXMLS
+
+bin/aiIngest --L --v --log --rawp AIXMLS/TSTRAW --steps IS,CINV,CCE,CFO,CGEO,CPA,CUA,CCA
+
+bin/aiIngest --L --v --log --rawp AIXMLS/TSTRAW --steps MIR,MCER,MFOR,MGR,MPAR,MUAR,MCAR --feedback
+
+bin/aiIngest --v --L --steps CAW,MAWR --log  --rawp AIXMLS/TSTRAW
+
+
+bin/aiIngest --L --v --log --aiic IC --steps AR,JR,ICAR,ICPR,MIR,MCER,MFOR,MGR,MPAR,MUAR,MCAR,MAWR
+
+---------------------------------------------
+---------------------------------------------
+
+/integrate --set-type GRANTING_ORG --prefix aigrant --xpath dm:Record/dm:CONGRANT --match dm:SPONORG --name-tag dm:SPONORG --member-type GRANT --ons xmlns:dm=http://www.digitalmeasures.com/schema/data 
+
+ ./integrate --set-type GRANT_COST --prefix aigrant --xpath dm:Record/dm:CONGRANT --match ./dm:CONGRANT/@id --name-tag dm:YR_CALENDAR --member-type GRANT --ons xmlns:dm=http://www.digitalmeasures.com/schema/data
+
+
+
+java -jar xslt/saxon9he.jar xslt/empty.xml xslt/grantOrg.xsl listxml=~/nzraw.xml
+java -jar xslt/saxon9he.jar xslt/empty.xml xslt/grantInvestigator.xsl listxml=~/nzraw.xml aiid2netid=../store/IS-AGGREGATED/all-aiid-netid.xml > store/grantinv.xml
+
+java -jar xslt/saxon9he.jar xslt/empty.xml xslt/grantCost.xsl listxml=~/nzraw.xml aiid2netid=../store/IS-AGGREGATED/all-aiid-netid.xml
+
+java -jar xslt/saxon9he.jar xslt/empty.xml xslt/grantPlannedEffort.xsl listxml=~/nzraw.xml aiid2netid=../store/IS-AGGREGATED/all-aiid-netid.xml
+
+java -jar xslt/saxon9he.jar xslt/empty.xml xslt/grantCost.xsl listxml=~/nzraw.xml aiid2netid=../store/IS-AGGREGATED/all-aiid-netid.xml
+
+java -jar xslt/saxon9he.jar xslt/empty.xml xslt/grantPreviousAgency.xsl listxml=~/nzraw.xml aiid2netid=../store/IS-AGGREGATED/all-aiid-netid.xml
+
+java -jar xslt/saxon9he.jar xslt/empty.xml xslt/grantSubAgency.xsl listxml=~/nzraw.xml aiid2netid=../store/IS-AGGREGATED/all-aiid-netid.xml
+---------------------------------------------
+---------------------------------------------
+
+mklist -d /home/jrm424/aiw/test/AIXMLS/cur-raw > nzraw.xml
+
+ java -jar xslt/saxon9he.jar xslt/empty.xml xslt/grant.xsl listxml=~/nzraw.xml > store/cgrants.xml
+
+ grep 'index=' store/cgrants.xml | wc
+ nuno -X -n 250 -t AI- > store/grant-unomap.xml
+
+java -jar xslt/saxon9he.jar store/cgrants.xml xslt/mkGrantRdf.xsl unoMapFile=../store/grant-unomap.xml rawXmlPath=/home/jrm424/aiw/test/AIXMLS/cur-raw
+
+---------------------------------------------
+---------------------------------------------
+
+
+
+java -jar xslt/saxon9he.jar store/grantinv.xml xslt/mkGrantInvestRdf.xsl unoMapFile=../store/grantinv-unomap.xml rawXmlPath=/home/jrm424/aiw/test/AIXMLS/cur-raw extPerIn=../store/FEEDBACK/basePersons.xml extPerOut=../store/FEEDBACK/basePersons1.xml
+
+java -jar xslt/saxon9he.jar xslt/empty.xml xslt/grantSponsorOrg.xsl listxml=../nzraw.xml > store/cgrantsponsororg.xml
+
+grep 'index=' store/cgrantsponsororg.xml | wc -l = 250
+nuno -X -n 250 -t AI- > store/grantsponsororg-unomap.xml
+
+java -jar xslt/saxon9he.jar store/cgrantsponsororg.xml xslt/mkGrantSponsorOrgRdf.xsl unoMapFile=../store/grantsponsororg-unomap.xml rawXmlPath=/home/jrm424/aiw/test/AIXMLS/cur-raw extOrgIn=../store/FEEDBACK/baseOrgs.xml extOrgOut=../store/FEEDBACK/baseOrgs1.xml
+
+nuno -X -n 250 -t AI- > store/grantagencyrecvsub-unomap.xml
+
+java -jar xslt/saxon9he.jar store/cgrantsubagency.xml xslt/mkGrantAgencyRecvSubRdf.xsl unoMapFile=../store/grantagencyrecvsub-unomap.xml rawXmlPath=/home/jrm424/aiw/test/AIXMLS/cur-raw extOrgIn=../store/FEEDBACK/baseOrgs.xml extOrgOut=../store/FEEDBACK/baseOrgs1.xml
+
+java -jar xslt/saxon9he.jar xslt/empty.xml xslt/grantPreviousAgency.xsl listxml=../nzraw.xml > store/cgrantprevagency.xml
+
+java -jar xslt/saxon9he.jar store/cgrantprevagency.xml xslt/mkGrantPrevAgencyRdf.xsl unoMapFile=../store/grantprevagency-unomap.xml rawXmlPath=/home/jrm424/aiw/test/AIXMLS/cur-raw extOrgIn=../store/FEEDBACK/baseOrgs.xml extOrgOut=../store/FEEDBACK/baseOrgs1.xml
+
+java -jar xslt/saxon9he.jar xslt/empty.xml xslt/grantPlannedEffort.xsl listxml=../nzraw.xml > store/cgrentplannedeffort.xml
+
+
+java -jar xslt/saxon9he.jar store/cgrantplannedeffort.xml xslt/mkGrantPlannedEffortRdf.xsl unoMapFile=../store/grantprevagency-unomap.xml rawXmlPath=/home/jrm424/aiw/test/AIXMLS/cur-raw
+
+
+
+java -jar xslt/saxon9he.jar xslt/empty.xml xslt/grantComment.xsl listxml=../nzraw.xml > store/cgrantcomment.xml
+
+
+java -jar xslt/saxon9he.jar store/cgrantcomment.xml xslt/mkGrantCommentRdf.xsl unoMapFile=../store/grantprevagency-unomap.xml rawXmlPath=/home/jrm424/aiw/test/AIXMLS/cur-raw
+
+
+
+-----------------------------------------------------
+
+
+
+
+aiIngest --L --v --log --aiic IC --steps AR,JR,ICAR,ICPR,MIR,MCER,MFOR,MGR,MPAR,MUAR,MCAR,MAWR
+
+aiIngest --L --v --log --aiic IC --steps GRNT,GRNT_INV,GRNT_SPON,GRNT_ARS,GRNT_PFA,GRNT_PE,GRNT_COST,GRNT_COMM
+
+ aiIngest --L --v --log --aiic IC --steps MGRNT,MGRNT_INV,MGRNT_SPON,MGRNT_ARS,MGRNT_PFA,MGRNT_PE,MGRNT_COST,MGRNT_COMM --feedback
+
+
+
+---------------------------------------------------------------------
+Integration Operations
+
+bin/aiIngest --L --v --log --aiic IC --rawp AIXMLS/TSTRAW --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps IC,CA,CJ,CIA,CIP
+
+bin/aiIngest --L --v --log --aiis IS --rawp AIXMLS/TSTRAW --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps IS,CINV,CCE,CFO,CGEO,CPA,CUA,CCA 
+
+bin/aiIngest --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps GRNT,GRNT_INV,GRNT_SPON,GRNT_ARS,GRNT_PFA,GRNT_PE,GRNT_COST,GRNT_COMM 
+
+bin/aiIngest --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps CAW 
+
+RDF Generation Operations
+
+tuti:
+bin/aiIngest --L --v --log --aiic IC --aiis IS --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps AR,JR,ICAR,ICPR,MIR,MCER,MFOR,MGR,MPAR,MUAR,MCAR,MAWR,MGRNT,MGRNT_INV,MGRNT_SPON,MGRNT_ARS,MGRNT_PFA,MGRNT_PE,MGRNT_COST,MGRNT_COMM  
+
+
+bin/aiIngest --L --v --log --aiic IC --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps AR,JR,ICAR,ICPR
+bin/aiIngest --L --v --log --aiis IS --jopts '-Xmx2048m -XX:MaxPermSize=100m' --feedback --steps MIR,MCER,MFOR,MGR,MPAR,MUAR,MCAR,MAWR
+bin/aiIngest --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --feedback --steps MGRNT,MGRNT_INV,MGRNT_SPON,MGRNT_ARS,MGRNT_PFA,MGRNT_PE,MGRNT_COST,MGRNT_COMM  
+
+
+
+ java -jar /home/jrm424/aiw/test/xslt/saxon9he.jar `pwd`/Per0-ICAR-At20100812131122.xml /home/jrm424/aiw/test/xslt/merge.xsl doc2=`pwd`/Per1-ICAR-At20100812131122.xml > foo.xml
+
+java -jar /home/jrm424/aiw/test/xslt/saxon9he.jar  foo.xml  /home/jrm424/aiw/test/xslt/noname.xsl | wc
+
+java -jar /home/jrm424/aiw/test/xslt/saxon9he.jar `pwd`/Per1-ICAR-At20100812131122.xml /home/jrm424/aiw/test/xslt/merge.xsl doc2=`pwd`/Per0-ICAR-At20100812131122.xml > foo.xml
+
+
+

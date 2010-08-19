@@ -1,0 +1,182 @@
+@prefix afn:     <http://jena.hpl.hp.com/ARQ/function#> .
+@prefix vann:    <http://purl.org/vocab/vann/> .
+@prefix owl2:    <http://www.w3.org/2006/12/owl2-xml#> .
+@prefix dcterms:  <http://purl.org/dc/terms/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix swrl:    <http://www.w3.org/2003/11/swrl#> .
+@prefix vitro:   <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
+@prefix event:   <http://purl.org/NET/c4dm/event.owl#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix swvs:    <http://www.w3.org/2003/06/sw-vocab-status/ns#> .
+@prefix dcelem:  <http://purl.org/dc/elements/1.1/> .
+@prefix vivo:    <http://vivoweb.org/ontology/core#> .
+@prefix dc:      <http://purl.org/dc/elements/1.1/> .
+@prefix geo:     <http://aims.fao.org/aos/geopolitical.owl#> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix skco:    <http://www.w3.org/2004/02/skos/core#> .
+@prefix bibo:    <http://purl.org/ontology/bibo/> .
+@prefix swrlb:   <http://www.w3.org/2003/11/swrlb#> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix core:    <http://vivoweb.org/ontology/core#> .
+@prefix skos:    <http://www.w3.org/2004/02/skos/core#> .
+
+<http://vivoweb.org/activity-insight#collaboratorRank>
+      a       owl:DatatypeProperty ;
+      rdfs:label "collaborator rank"@en-US ;
+      rdfs:range xsd:integer ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
+
+<http://vivoweb.org/activity-insight#contributionArea>
+      a       owl:DatatypeProperty ;
+      rdfs:label "contribution area"@en-US ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
+
+<http://vivoweb.org/activity-insight#impactStatementIssue>
+      a       owl:DatatypeProperty ;
+      rdfs:label "impact statement issue"@en-US ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
+
+<http://vivoweb.org/activity-insight#fundingType>
+      a       owl:DatatypeProperty ;
+      rdfs:label "funding type"@en-US ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
+
+<http://vivoweb.org/activity-insight#PartnerRole>
+      a       owl:Class ;
+      rdfs:label "Partner Role"@en-US ;
+      vitro:displayLimitAnnot
+              "-1"^^xsd:int ;
+      vitro:displayRankAnnot
+              "-1"^^xsd:int ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:inClassGroup <http://vivoweb.org/ontology#vitroClassGrouporganizations> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
+
+<http://vivoweb.org/activity-insight#partnerRoleOf>
+      a       owl:ObjectProperty ;
+      rdfs:domain <http://vivoweb.org/activity-insight#PartnerRole> ;
+      rdfs:label "partner role of"@en-US ;
+      rdfs:range foaf:Organization ;
+      vitro:displayLimitAnnot
+              "5"^^xsd:int ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:selectFromExistingAnnot
+              "true"^^xsd:boolean ;
+      owl:inverseOf <http://vivoweb.org/activity-insight#hasPartnerRole> .
+
+<http://vivoweb.org/activity-insight#hasPriorityArea>
+      a       owl:ObjectProperty ;
+      rdfs:domain <http://vivoweb.org/activity-insight#ImpactProject> ;
+      rdfs:label "has academic priority"@en-US ;
+      rdfs:range <http://vivoweb.org/activity-insight#PriorityArea> ;
+      vitro:displayLimitAnnot
+              "5"^^xsd:int ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:selectFromExistingAnnot
+              "true"^^xsd:boolean ;
+      owl:inverseOf <http://vivoweb.org/activity-insight#priorityAreaOf> .
+
+<http://vivoweb.org/activity-insight#involvedAreaIlk>
+      a       owl:DatatypeProperty ;
+      rdfs:label "kind of involved area"@en-US ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
+
+<http://vivoweb.org/activity-insight#priorityAreaOf>
+      a       owl:ObjectProperty ;
+      rdfs:domain <http://vivoweb.org/activity-insight#PriorityArea> ;
+      rdfs:label "academic priority of"@en-US ;
+      rdfs:range <http://vivoweb.org/activity-insight#ImpactProject> ;
+      vitro:displayLimitAnnot
+              "5"^^xsd:int ;
+      owl:inverseOf <http://vivoweb.org/activity-insight#hasPriorityArea> .
+
+<http://vivoweb.org/activity-insight#usdaAreas>
+      a       owl:DatatypeProperty ;
+      rdfs:label "USDA areas"@en-US ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
+
+<http://vivoweb.org/activity-insight#impactStatementSummary>
+      a       owl:DatatypeProperty ;
+      rdfs:label "impact statement summary"@en-US ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
+
+<http://vivoweb.org/activity-insight#PriorityArea>
+      a       owl:Class ;
+      rdfs:label "Priority Area"@en-US ;
+      vitro:displayLimitAnnot
+              "-1"^^xsd:int ;
+      vitro:displayRankAnnot
+              "-1"^^xsd:int ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:inClassGroup <http://vivoweb.org/ontology#vitroClassGrouptopics> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
+
+<http://vivoweb.org/activity-insight#hasPartnerRole>
+      a       owl:ObjectProperty ;
+      rdfs:domain foaf:Organization ;
+      rdfs:label "has partner role"@en-US ;
+      rdfs:range <http://vivoweb.org/activity-insight#PartnerRole> ;
+      vitro:displayLimitAnnot
+              "5"^^xsd:int ;
+      owl:inverseOf <http://vivoweb.org/activity-insight#partnerRoleOf> .
+
+<http://vivoweb.org/activity-insight#impactStatementResponse>
+      a       owl:DatatypeProperty ;
+      rdfs:label "impact statement response"@en-US ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
+
+<http://vivoweb.org/activity-insight#ImpactProject>
+      a       owl:Class ;
+      rdfs:label "Impact Project"@en-US ;
+      vitro:displayLimitAnnot
+              "-1"^^xsd:int ;
+      vitro:displayRankAnnot
+              "-1"^^xsd:int ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:inClassGroup <http://vivoweb.org/ontology#vitroClassGroupactivities> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
+
+<http://vivoweb.org/activity-insight#impactStatementImpact>
+      a       owl:DatatypeProperty ;
+      rdfs:label "impact statement impact"@en-US ;
+      vitro:hiddenFromDisplayBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .

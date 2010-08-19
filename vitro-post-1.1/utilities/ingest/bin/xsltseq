@@ -1,0 +1,215 @@
+#!/usr/bin/perl
+use Getopt::Std;
+use FileHandle;
+use POSIX qw( strftime );
+use FindBin qw($Bin);
+
+autoflush STDOUT 1;
+
+if($#ARGV == -1){
+    Usage();
+}
+
+sub Usage(){
+    print STDOUT "\nUsage: xsltseq -B basedir -I indir -O outdir -T tmpdir -L logdir \n";
+    print STDOUT "               -v -X seqpath [xslt1 ...]\n";
+    print STDOUT "-B basdir    specify a base directory - see below for defaults\n";
+    print STDOUT "-I indir     specify a directory of files to transform\n";
+    print STDOUT "-O outdir    specify where to put the transformed files\n";
+    print STDOUT "-p outprefix outfile prefix\n";
+    print STDOUT "-T tmpdir    specify a temporary directory - default /tmp\n";
+    print STDOUT "-L logpath   specify a path in which to write logs\n";
+    print STDOUT "-v           verbose mode\n";
+    print STDOUT "-X seqpath   path to sequence file\n";
+    print STDOUT "\n";
+    print STDOUT "Defaults: Let BIN be the directory in which 'xsltseq' (this script) resides.\n";
+    print STDOUT "[-B] The default base directory is then 'BIN/..' \n";   
+    print STDOUT "[-I] The default location of the files to transform is 'BIN/../Raw_XMLs'\n";
+    print STDOUT "[-O] The default location of the resulting files is 'BIN/../Out_XMLs'\n";
+    print STDOUT "[-L] The default location of the log file is 'BIN/../log'\n";
+    print STDOUT "\n";
+    print STDOUT "Xslt File Format:\n";
+    print STDOUT "    One xsl file path per line. A line starting with # is a  \n";
+    print STDOUT "    comment line.\n";
+    print STDOUT "\n";
+
+    print STDOUT "Example:\n";
+    print STDOUT "  xsltseq -v -X /home/vivo/xslts/ai.xsltc first.xsl\n";
+    print STDOUT "\n";
+#    print STDOUT "\n";
+#    print STDOUT "\n";
+}
+sub trim {
+    my($a) = @_;
+    $a =~ s/^\s*(\S+)\s*$/$1/;
+    $a =~ s/^\s*(\S.*\S)\s*$/$1/;
+    $a =~ s/(\s*)//;
+    return $a;
+}
+
+getopts("B:I:i:L:N:O:p:sT:t:vX:x:");
+
+
+$g_PREFIX = $opt_p?$opt_p:"Out_";
+$g_BASE_DIR = $opt_B?$opt_B:"$Bin/..";
+$g_RAW_XML_DIR = $opt_I?$opt_I:"$g_BASE_DIR/Raw_XMLs";
+$g_OUT_XML_DIR = $opt_O?$opt_O:"$g_BASE_DIR/Out_XMLs";
+$g_TMP_DIR = $opt_T?$opt_T:"/tmp";
+
+$g_JAVA_SAXON_JAR = "java -jar $g_BASE_DIR/bin/saxon9he.jar ";
+$g_JAVA_SAXON_JAR = "java -jar $opt_x/saxon9he.jar " if $opt_x;
+$g_ifn = "T";
+$g_ifn = $opt_t if $opt_t;
+@g_XSLTS = ();
+#
+# xsl files from the cmd line
+#
+while (my $x = shift){
+    $x = trim($x);
+    push @g_XSLTS, "$x\n";
+}
+print join("", @g_XSLTS) . "\n" if $opt_v;
+
+open XSLTS, $opt_X;
+
+push @g_XSLTS, <XSLTS>; # append xslt chain
+close XSLT;
+
+if($#g_XSLTS < 0){
+    print "Nothing to process with.\n";
+    exit 0;
+}
+print join("", @g_XSLTS) . "\n" if $opt_v;
+
+# set up logging
+$g_STARTED_AT = strftime("%Y\%m%d%H\%M\%S", localtime());
+
+if($opt_L){
+    if(-e $opt_L && -d _ && -w _ ){
+	open LOG, ">$opt_L";
+    } else {
+	open(LOG,">&STDOUT");
+    }
+} else {
+    if(-e "$g_BASE_DIR/log/XsltSeq_$$\_$g_STARTED_AT" && -d _ && -w _ ){
+	open LOG, ">$g_BASE_DIR/log/XsltSeq_$$\_$g_STARTED_AT";
+    } else {
+	open(LOG,">&STDOUT");
+    }
+}
+autoflush LOG 1;
+
+# define msg -> log function
+#
+sub logit {
+    my($msg) = @_;
+    chomp $msg;
+    my $now = strftime("%Y:\%m:%d:%H:\%M:\%S", localtime());
+    print LOG "$now - $msg\n";
+}
+
+# open trouble file
+$g_TFlag = 0;
+
+sub trouble {
+    my($msg) = @_;
+    if($g_TFlag == 0){
+	my $res = open TROUBLE, ">$g_BASE_DIR/log/XSLTSEQ_TROUBLE_$$\_$g_STARTED_AT";
+	$g_TFlag = 1;
+	autoflush TROUBLE 1;
+
+    }
+    chomp $msg;
+    my $now = strftime("%Y:\%m:%d:%H:\%M:\%S", localtime());
+    print TROUBLE "$now - $msg\n";
+}
+
+#@g_xmlfiles = qx(ls $g_RAW_XML_DIR/*.xml);
+@g_fids =();
+#
+# read directory and extract root name
+# e.g. /home/vivi/fubar.xml -> fubar
+#
+sub getXmlNames {
+    my($d) = @_;
+    my(@xfiles) = qx(ls $d/*.xml);
+    my @res;
+    foreach my $xml (@xfiles){
+	chomp $xml;
+	next if -z $xml;
+	my @comp = split /\//, $xml;
+	$xml = $comp[$#comp];
+	$xml =~ s/\.xml//;
+	push @res, $xml;
+    }
+    return @res;
+}
+
+if($opt_i){
+    my @parts = split /\//, $opt_i;
+    my $file = $parts[$#parts];
+    $file =~ s/\.xml//;
+    @g_fids = ($file);
+} else {
+    @g_fids = getXmlNames($g_RAW_XML_DIR);
+}
+
+#print join("\n", @g_fids) . "\n";
+open(XMLNAMES, ">$g_OUT_XML_DIR/XML_NAMES.txt");
+print XMLNAMES join("\n", @g_fids) . "\n";
+close XMLNAMES;
+
+$g_anyFault = 0;
+foreach my $fid (@g_fids){
+    #
+    # get a xml
+    #
+    my $baseDir = $g_RAW_XML_DIR;
+    $N=1;
+    my $infile = "$baseDir/$fid.xml";
+    my $outfile = "$g_TMP_DIR/$g_ifn"."1-$fid.xml";
+    #print "$infile $outfile\n";
+    my $fault = 0;
+    #
+    # apply each transform
+    #
+    foreach $xslt (@g_XSLTS){
+	chomp $xslt;
+	next if $xslt =~ /\s*\#/; # skip any comments
+	#
+	# setuup java cmd line
+	my $cmd = "$g_JAVA_SAXON_JAR  $infile ";
+	$cmd .= " $xslt ";
+	$cmd .= " > $outfile ";
+	$cmd .= " 2>&1 ";
+	#
+	# execute command
+
+	qx($cmd);
+	#
+	# see if it succeeded
+	my $r = ($? >> 8);
+	if($r != 0){
+	    trouble("$xslt failed on $infile; check $outfile for more info.\n");
+	    $g_anyFault = $fault = 1;
+	    last; #quit on fault for this file
+	}
+	print $cmd . "\n"  if $opt_v;
+	#
+	# output becomes input to next transform
+	$infile = $outfile;
+	$N++;
+	$outfile = "$g_TMP_DIR/$g_ifn"."$N-$fid.xml";
+    }
+    #
+    # move last out (= lastest in) to out dir
+    # no unnecessary moves 
+    qx(mv $infile $g_OUT_XML_DIR/$g_PREFIX$fid.xml) if $N != 1; 
+    my $msg = ($fault)?"process failed":"fully processed";
+    logit("$baseDir/$fid.xml $msg");
+
+}
+$rmsg = $g_anyFault?", with trouble":".";
+logit("All xmls fully processed$rmsg");
+close TROUBLE;
+close LOG;

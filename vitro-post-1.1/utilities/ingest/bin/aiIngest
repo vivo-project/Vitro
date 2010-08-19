@@ -1,0 +1,24 @@
+#!/usr/bin/perl
+use FindBin qw($Bin);
+use lib $Bin;
+use Getopt::Long;
+use FileHandle;
+use POSIX qw( strftime );
+use Term::ReadKey;
+
+$g_error_msg ="";
+
+use Utils;
+use Setup;
+use GetXmls;
+use IntellConts;
+use ImpactStmts;
+use Awards;
+use Grants;
+use EditChair;
+use Education;
+use MedCont;
+use Admin;
+
+
+

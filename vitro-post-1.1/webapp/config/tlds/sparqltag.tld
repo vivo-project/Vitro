@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!-- $Id: sparql.tld,v 1.2 2006/08/06 19:50:30 Dave Exp $ -->
+
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd" version="2.0">
+  <description></description>
+  <display-name>SPARQL JSP taglib</display-name>	
+  <tlib-version>1.0</tlib-version>
+  <short-name>sparql</short-name>
+  <uri>http://djpowell.net/tmp/sparql-tag/0.1/</uri>
+  
+  <!-- <sparql:sparql> -->
+  
+  <tag>
+    <description>
+      <![CDATA[
+      <p><b>SPARQL container tag.</b></p>
+      <p>This tag must be placed around sparql:select tags to
+      ensure that the live ResultSet's gets closed,
+      when this tag goes out of scope.
+      ]]>
+    </description>
+    <display-name>SPARQL container tag</display-name>
+    <name>sparql</name>
+    <tag-class>net.djpowell.sparqltag.SparqlTag</tag-class>
+    <body-content>scriptless</body-content>
+  </tag>
+
+  <!-- <sparql:lock> -->
+
+  <tag>
+    <description>
+      Obtains a lock or transaction on a model until the tag is closed.
+    </description>
+    <display-name>SPARQL lock tag</display-name>
+    <name>lock</name>    
+    <tag-class>net.djpowell.sparqltag.LockTag</tag-class>
+    <tei-class>net.djpowell.sparqltag.LockTagInfo</tei-class>
+    <body-content>scriptless</body-content>
+    
+    <attribute>
+      <description>The model to lock, or execute in a transaction</description>
+      <name>model</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+      <type>com.hp.hpl.jena.rdf.model.Model</type>
+    </attribute>
+
+    <attribute>
+      <description>
+        Indicates whether transactions should be used instead of
+        critical sections.
+      </description>
+      <name>transactions</name>
+      <!-- default is false -->
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <type>java.lang.String</type>
+    </attribute>
+
+    <attribute>
+      <description>
+        If critical sections are being used, indicates whether a
+        read lock is sufficient, or whether a write-lock is required.
+        The default is true, meaning a read-lock.
+      </description>
+      <name>readonly</name>
+      <!-- default is true-->
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <type>java.lang.String</type>
+    </attribute>
+
+  </tag>
+
+  <!-- <sparql:load> -->
+
+  <tag>
+    <description>SPARQL load tag.  Convenience tag for creating a new model from an RDF/XML URI.</description>
+    <display-name>SPARQL load tag</display-name>
+    <name>load</name>
+    <tag-class>net.djpowell.sparqltag.LoadTag</tag-class>
+    <tei-class>net.djpowell.sparqltag.LoadTagInfo</tei-class>
+    <body-content>empty</body-content>
+
+    <variable>
+      <name-from-attribute>var</name-from-attribute>
+      <variable-class>com.hp.hpl.jena.rdf.model.Model</variable-class>
+      <scope>AT_END</scope>
+    </variable>
+
+    <attribute>
+      <description></description>
+      <name>var</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+      <type>java.lang.String</type>
+    </attribute>
+
+    <attribute>
+      <description></description>
+      <name>uri</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+      <type>java.lang.String</type>
+    </attribute>
+
+  </tag>
+
+  <!-- <sparql:ask> -->
+  
+  <tag>
+    <description>SPARQL ask tag.  (Must be nested inside sparql:sparql)</description>
+    <display-name>SPARQL ask tag</display-name>
+    <name>ask</name>
+    <tag-class>net.djpowell.sparqltag.AskTag</tag-class>
+    <body-content>tagdependent</body-content>
+    
+    <variable>
+      <description></description>
+      <name-from-attribute>var</name-from-attribute>
+      <variable-class>java.lang.Boolean</variable-class>
+      <scope>AT_END</scope>
+    </variable>
+
+    <attribute>
+      <description></description>
+      <name>model</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+      <type>com.hp.hpl.jena.rdf.model.Model</type>
+    </attribute>
+    
+    <attribute>
+      <description></description>
+      <name>var</name>
+      <required>true</required>
+      <rtexprvalue>false</rtexprvalue>
+      <type>java.lang.String</type>
+    </attribute>
+
+    <dynamic-attributes>true</dynamic-attributes>
+    
+    <example>
+      
+    </example>
+    
+  </tag>       
+
+
+  <!-- <sparql:construct> -->
+
+  <tag>
+    <description>SPARQL construct tag.  (Must be nested inside sparql:sparql)</description>
+    <display-name>SPARQL construct tag</display-name>
+    <name>construct</name>
+    <tag-class>net.djpowell.sparqltag.ConstructTag</tag-class>
+    <body-content>tagdependent</body-content>
+
+    <variable>
+      <name-from-attribute>var</name-from-attribute>
+      <variable-class>com.hp.hpl.jena.rdf.model.Model</variable-class>
+      <scope>AT_END</scope>
+    </variable>
+
+    <attribute>
+      <description></description>
+      <name>model</name>
+      <required>true</required>
+      <rtexprvalue>false</rtexprvalue>
+      <type>com.hp.hpl.jena.rdf.model.Model</type>
+    </attribute>
+    
+    <attribute>
+      <description></description>
+      <name>var</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+      <type>java.lang.String</type>
+    </attribute>
+
+    <dynamic-attributes>true</dynamic-attributes>
+
+    <example>
+      
+    </example>
+    
+  </tag>       
+
+
+  <!-- <sparql:describe> -->
+  <tag>
+    <description>SPARQL describe tag.  (Must be nested inside sparql:sparql)</description>
+    <display-name>SPARQL describe tag</display-name>
+    <name>describe</name>
+    <tag-class>net.djpowell.sparqltag.DescribeTag</tag-class>
+    <body-content>tagdependent</body-content>
+
+    <variable>
+      <name-from-attribute>var</name-from-attribute>
+      <variable-class>com.hp.hpl.jena.rdf.model.Model</variable-class>
+      <scope>AT_END</scope>
+    </variable>
+
+    <attribute>
+      <description></description>
+      <name>model</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+      <type>com.hp.hpl.jena.rdf.model.Model</type>
+    </attribute>
+    
+    <attribute>
+      <description></description>
+      <name>var</name>
+      <required>true</required>
+      <rtexprvalue>false</rtexprvalue>
+      <type>java.lang.String</type>
+    </attribute>
+    
+    <dynamic-attributes>true</dynamic-attributes>
+
+    <example>
+      
+    </example>
+    
+  </tag>       
+
+
+  <!-- <sparql:select> -->
+
+  <tag>
+    <description>SPARQL select tag.  (Must be nested inside sparql:sparql)</description>
+    <display-name>SPARQL select tag</display-name>
+    <name>select</name>
+    <tag-class>net.djpowell.sparqltag.SelectTag</tag-class>
+    <body-content>tagdependent</body-content>
+    
+    <variable>
+      <name-from-attribute>var</name-from-attribute>
+      <variable-class>net.djpowell.sparqltag.SelectTag.RSWrapper</variable-class>
+      <!-- .rows = is an Iterator of QuerySolution -->
+      <scope>AT_END</scope>
+    </variable>
+
+    <attribute>
+      <description></description>
+      <name>model</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+      <type>com.hp.hpl.jena.rdf.model.Model</type>
+    </attribute>
+    
+    <attribute>
+      <description></description>
+      <name>var</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+      <type>java.lang.String</type>
+    </attribute>
+
+    <dynamic-attributes>true</dynamic-attributes>
+
+    <example>
+      
+    </example>
+    
+  </tag>       
+
+</taglib>
+
+<!--
+Revision history
+$Log: sparql.tld,v $
+Revision 1.2  2006/08/06 19:50:30  Dave
+Tidied up build
+
+
+-->
