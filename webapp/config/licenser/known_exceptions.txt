@@ -37,7 +37,7 @@ services/additions/admin/axis/SOAPMonitorApplet.java
 
 # JQuery from jquery.com
 webapp/web/js/jquery.js
-webapp/web/js/jquery-ui-1.8.4/*
+webapp/web/js/jquery-ui/*
 webapp/web/js/jquery_plugins/*
 
 # From pajhome.org.uk
