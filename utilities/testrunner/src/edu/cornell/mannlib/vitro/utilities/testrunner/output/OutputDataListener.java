@@ -11,7 +11,7 @@ import java.util.List;
 import edu.cornell.mannlib.vitro.utilities.testrunner.FileHelper;
 import edu.cornell.mannlib.vitro.utilities.testrunner.listener.Listener;
 
-public class OutputDataModel implements Listener {
+public class OutputDataListener implements Listener {
 	private boolean runCompleted;
 	private long startTime;
 	private long endTime;
@@ -24,6 +24,7 @@ public class OutputDataModel implements Listener {
 
 	@Override
 	public void runStarted() {
+		System.out.println("run started");
 		startTime = new Date().getTime();
 	}
 

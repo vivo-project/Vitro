@@ -19,12 +19,12 @@ import edu.cornell.mannlib.vitro.utilities.testrunner.Status;
  */
 public class OutputManager {
 	private final SeleniumRunnerParameters parms;
-	private final OutputDataModel dataModel;
+	private final OutputDataListener dataListener;
 
 	public OutputManager(SeleniumRunnerParameters parms) {
 		this.parms = parms;
-		this.dataModel = new OutputDataModel();
-		parms.addListener(this.dataModel);
+		this.dataListener = new OutputDataListener();
+		parms.addListener(this.dataListener);
 	}
 
 	/**
@@ -76,7 +76,7 @@ public class OutputManager {
 		}
 
 		OutputSummaryFormatter formatter = new OutputSummaryFormatter(parms);
-		formatter.format(log, suites, dataModel);
+		formatter.format(log, suites, dataListener);
 		return formatter.figureOverallStatus(log, suites);
 	}
 

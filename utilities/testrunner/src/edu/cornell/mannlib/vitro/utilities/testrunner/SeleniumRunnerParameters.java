@@ -49,7 +49,6 @@ public class SeleniumRunnerParameters {
 	private final ModelCleanerProperties modelCleanerProperties;
 	private final IgnoredTests ignoredTests;
 
-	private Collection<File> selectedSuites = Collections.emptySet();
 	private boolean cleanModel = true;
 	private boolean cleanUploads = true;
 
@@ -377,14 +376,6 @@ public class SeleniumRunnerParameters {
 		return ignoredTests;
 	}
 
-	public void setSelectedSuites(Collection<File> selectedSuites) {
-		this.selectedSuites = selectedSuites;
-	}
-
-	public Collection<File> getSelectedSuites() {
-		return new ArrayList<File>(this.selectedSuites);
-	}
-
 	public boolean isCleanModel() {
 		return cleanModel;
 	}
@@ -411,17 +402,8 @@ public class SeleniumRunnerParameters {
 				+ "\n  outputDirectory: " + outputDirectory
 				+ "\n  suiteParentDirectories: " + suiteParentDirectories
 				+ "\n  modelCleanerProperties: " + modelCleanerProperties
-				+ "\n" + ignoredTests + "\n\n  selectedSuites: "
-				+ showSelectedSuites() + "\n  cleanModel: " + cleanModel
+				+ "\n" + ignoredTests + "\n  cleanModel: " + cleanModel
 				+ "\n  cleanUploads: " + cleanUploads;
-	}
-
-	private String showSelectedSuites() {
-		StringBuilder buffer = new StringBuilder();
-		for (File suite : selectedSuites) {
-			buffer.append("\n      ").append(suite.getPath());
-		}
-		return buffer.toString();
 	}
 
 	/**

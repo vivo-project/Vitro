@@ -25,6 +25,8 @@ public class SeleniumRunner {
 	private final SuiteRunner suiteRunner;
 	private final OutputManager outputManager;
 
+	private final List<File> selectedSuites = new ArrayList<File>();
+
 	public SeleniumRunner(SeleniumRunnerParameters parms) {
 		this.parms = parms;
 		this.listener = parms.getListener();
@@ -33,7 +35,29 @@ public class SeleniumRunner {
 		this.modelCleaner = new ModelCleaner(parms, this.tomcatController);
 		this.suiteRunner = new SuiteRunner(parms);
 		this.outputManager = new OutputManager(parms);
-		
+
+	}
+
+	/**
+	 * Select all test suites which aren't explicitly ignored.
+	 */
+	public void selectSuites() {
+		Listener listener = parms.getListener();
+		IgnoredTests ignored = parms.getIgnoredTests();
+
+		this.selectedSuites.clear();
+
+		for (File parentDir : parms.getSuiteParentDirectories()) {
+			for (File suite : parms.findSuiteDirs(parentDir)) {
+				String suiteName = suite.getName();
+				if (ignored.isIgnored(suiteName)) {
+					listener.suiteIgnored(suite);
+				} else {
+					listener.suiteAdded(suite);
+					this.selectedSuites.add(suite);
+				}
+			}
+		}
 	}
 
 	/**
@@ -68,7 +92,7 @@ public class SeleniumRunner {
 	}
 
 	public void runSelectedSuites() {
-		for (File suiteDir : parms.getSelectedSuites()) {
+		for (File suiteDir : this.selectedSuites) {
 			listener.suiteStarted(suiteDir);
 			try {
 				if (parms.isCleanModel()) {
@@ -85,24 +109,6 @@ public class SeleniumRunner {
 			}
 			listener.suiteStopped(suiteDir);
 		}
-	}
-
-	private static void selectAllSuites(SeleniumRunnerParameters parms) {
-		Listener listener = parms.getListener();
-		IgnoredTests ignored = parms.getIgnoredTests();
-		List<File> suites = new ArrayList<File>();
-		for (File parentDir : parms.getSuiteParentDirectories()) {
-			for (File suite : parms.findSuiteDirs(parentDir)) {
-				String suiteName = suite.getName();
-				if (ignored.isIgnored(suiteName)) {
-					listener.suiteIgnored(suite);
-				} else {
-					listener.suiteAdded(suite);
-					suites.add(suite);
-				}
-			}
-		}
-		parms.setSelectedSuites(suites);
 	}
 
 	private static void usage(String message) {
@@ -137,23 +143,31 @@ public class SeleniumRunner {
 			usage("Can't read properties file: " + e.getMessage());
 		}
 
-		if (interactive) {
-			// TODO hook up the GUI.
-			throw new RuntimeException("interactive mode not implemented.");
-		} else {
-			File logFile = new File(parms.getOutputDirectory(), LOGFILE_NAME);
-			System.out.println("Log file is '" + logFile.getPath() + "'");
+		try {
+			if (interactive) {
+				// TODO hook up the GUI.
+				throw new RuntimeException("interactive mode not implemented.");
+			} else {
+				File logFile = new File(parms.getOutputDirectory(),
+						LOGFILE_NAME);
+				System.out.println("Log file is '" + logFile.getPath() + "'");
 
-			// Run all of the suites.
-			// For each suite, clean the model and the upload area.
-			selectAllSuites(parms);
-			parms.setCleanModel(true);
-			parms.setCleanUploads(true);
+				// Run all of the suites.
+				// For each suite, clean the model and the upload area.
+				parms.setCleanModel(true);
+				parms.setCleanUploads(true);
 
-			System.out.println(parms);
+				System.out.println(parms);
 
-			SeleniumRunner runner = new SeleniumRunner(parms);
-			success = runner.run();
+				SeleniumRunner runner = new SeleniumRunner(parms);
+				runner.selectSuites();
+				success = runner.run();
+			}
+		} catch (FatalException e) {
+			System.err.println("\n\n-----------------\n"
+					+ "|  FATAL ERROR  |   " + e.getMessage()
+					+ "\n-----------------\n\n");
+			e.printStackTrace();
 		}
 		System.out.println("Exiting SeleniumRunner");
 		System.exit(success ? 0 : -1);

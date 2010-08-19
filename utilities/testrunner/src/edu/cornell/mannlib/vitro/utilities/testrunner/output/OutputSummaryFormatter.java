@@ -30,9 +30,9 @@ public class OutputSummaryFormatter {
 			"yyyy-MM-dd HH:mm:ss");
 	private final SeleniumRunnerParameters parms;
 
-	private LogStats log;
+	private LogStats logStats;
 	private Map<String, SuiteResults> suites;
-	private OutputDataModel dataModel;
+	private OutputDataListener dataListener;
 	private Status runStatus;
 	private List<TestResults> allTests = new ArrayList<TestResults>();
 	private int passingTestCount;
@@ -51,12 +51,12 @@ public class OutputSummaryFormatter {
 	 * Create a summary HTML file from the info contained in this log file and
 	 * these suite outputs.
 	 */
-	public void format(LogStats log, Map<String, SuiteResults> suites,
-			OutputDataModel dataModel) {
-		this.log = log;
+	public void format(LogStats logStats, Map<String, SuiteResults> suites,
+			OutputDataListener dataListener) {
+		this.logStats = logStats;
 		this.suites = suites;
-		this.dataModel = dataModel;
-		this.runStatus = figureOverallStatus(log, suites);
+		this.dataListener = dataListener;
+		this.runStatus = figureOverallStatus(logStats, suites);
 		tallyTests();
 		tallySuites();
 
@@ -148,9 +148,9 @@ public class OutputSummaryFormatter {
 	}
 
 	private void tallySuites() {
-		List<String> ignoredSuiteNames = dataModel.getIgnoredSuiteNames();
+		List<String> ignoredSuiteNames = dataListener.getIgnoredSuiteNames();
 
-		for (String name : dataModel.getSuiteNames()) {
+		for (String name : dataListener.getSuiteNames()) {
 			if (ignoredSuiteNames.contains(name)) {
 				this.ignoredSuites.add(name);
 			} else if (!suites.containsKey(name)) {
@@ -167,7 +167,7 @@ public class OutputSummaryFormatter {
 	}
 
 	private void writeHeader(PrintWriter writer) {
-		String startString = formatDateTime(dataModel.getStartTime());
+		String startString = formatDateTime(dataListener.getStartTime());
 
 		writer.println("<html>");
 		writer.println("<head>");
@@ -192,9 +192,9 @@ public class OutputSummaryFormatter {
 		String ignoreClass = this.ignoredTests.isEmpty() ? "" : Status.WARN
 				.getHtmlClass();
 
-		String start = formatDateTime(dataModel.getStartTime());
-		String end = formatDateTime(dataModel.getEndTime());
-		String elapsed = formatElapsedTime(dataModel.getElapsedTime());
+		String start = formatDateTime(dataListener.getStartTime());
+		String end = formatDateTime(dataListener.getEndTime());
+		String elapsed = formatElapsedTime(dataListener.getElapsedTime());
 
 		writer.println("  <div class=\"section\">Summary</div>");
 		writer.println();
@@ -213,8 +213,13 @@ public class OutputSummaryFormatter {
 		writer.println("      <td>");
 		writer.println("        <table cellspacing=\"0\">");
 		writer.println("          <tr><th>&nbsp;</th><th>Suites</th><th>Tests</th>");
-		writer.println("          <tr><th>Total</th><td>" + "</td><td>"
-				+ "</td>");
+		writer.println("          <tr><th>Total</th><td>"
+				+ (this.passingSuites.size() + this.failingSuites.size()
+						+ this.ignoredSuites.size() + this.remainingSuites
+						.size())
+				+ "</td><td>"
+				+ (this.passingTestCount + this.failingTests.size() + this.ignoredTests
+						.size()) + "</td>");
 		writer.println("          <tr class=\"" + passClass
 				+ "\"><th>Passed</th><td>" + this.passingSuites.size()
 				+ "</td><td>" + this.passingTestCount + "</td>");
@@ -243,14 +248,14 @@ public class OutputSummaryFormatter {
 		writer.println();
 		writer.println("  <table cellspacing=\"0\">");
 
-		if ((!log.hasErrors()) && (!log.hasWarnings())) {
+		if ((!logStats.hasErrors()) && (!logStats.hasWarnings())) {
 			writer.println("      <tr><td colspan=\"2\">No errors or warnings</td></tr>");
 		} else {
-			for (String e : log.getErrors()) {
+			for (String e : logStats.getErrors()) {
 				writer.println("      <tr class=\"" + errorClass
 						+ "\"><td>ERROR</td><td>" + e + "</td></tr>");
 			}
-			for (String w : log.getWarnings()) {
+			for (String w : logStats.getWarnings()) {
 				writer.println("      <tr class=\"" + warnClass
 						+ "\"><td>ERROR</td><td>" + w + "</td></tr>");
 			}
