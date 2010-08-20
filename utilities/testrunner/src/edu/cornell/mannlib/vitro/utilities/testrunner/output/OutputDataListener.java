@@ -4,10 +4,11 @@ package edu.cornell.mannlib.vitro.utilities.testrunner.output;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import edu.cornell.mannlib.vitro.utilities.testrunner.FileHelper;
 import edu.cornell.mannlib.vitro.utilities.testrunner.listener.Listener;
@@ -16,8 +17,9 @@ public class OutputDataListener implements Listener {
 	private boolean runCompleted;
 	private long startTime;
 	private long endTime;
-	private final List<String> suiteNames = new ArrayList<String>();
-	private final List<String> ignoredSuiteNames = new ArrayList<String>();
+
+	private ProcessOutput currentSuiteOutput = new ProcessOutput("");
+	private Map<String, ProcessOutput> failureMessages = new HashMap<String, ProcessOutput>();
 
 	// ----------------------------------------------------------------------
 	// Listener methods that affect the data model
@@ -40,14 +42,27 @@ public class OutputDataListener implements Listener {
 	}
 
 	@Override
-	public void suiteIgnored(File suite) {
-		suiteNames.add(FileHelper.baseName(suite));
-		ignoredSuiteNames.add(FileHelper.baseName(suite));
+	public void suiteStarted(File suiteDir) {
+		currentSuiteOutput = new ProcessOutput(FileHelper.baseName(suiteDir));
 	}
 
 	@Override
-	public void suiteAdded(File suite) {
-		suiteNames.add(FileHelper.baseName(suite));
+	public void suiteStopped(File suiteDir) {
+		if (currentSuiteOutput.isSuiteFailure()) {
+			failureMessages.put(currentSuiteOutput.suiteName,
+					currentSuiteOutput);
+		}
+		currentSuiteOutput = new ProcessOutput("");
+	}
+
+	@Override
+	public void subProcessStdout(String string) {
+		currentSuiteOutput.addStdout(string);
+	}
+
+	@Override
+	public void subProcessErrout(String string) {
+		currentSuiteOutput.addErrout(string);
 	}
 
 	// ----------------------------------------------------------------------
@@ -63,26 +78,22 @@ public class OutputDataListener implements Listener {
 		private final boolean runCompleted;
 		private final long startTime;
 		private final long endTime;
-		private final List<String> suiteNames;
-		private final List<String> ignoredSuiteNames;
+		private final Map<String, ProcessOutput> failureMessages;
 
 		Info() {
 			this.runCompleted = false;
 			this.startTime = 0;
 			this.endTime = 0;
-			this.suiteNames = Collections.emptyList();
-			this.ignoredSuiteNames = Collections.emptyList();
+			this.failureMessages = Collections.emptyMap();
 		}
 
 		Info(OutputDataListener parent) {
 			this.runCompleted = parent.runCompleted;
 			this.startTime = parent.startTime;
 			this.endTime = parent.endTime;
-			this.suiteNames = Collections
-					.unmodifiableList(new ArrayList<String>(parent.suiteNames));
-			this.ignoredSuiteNames = Collections
-					.unmodifiableList(new ArrayList<String>(
-							parent.ignoredSuiteNames));
+			this.failureMessages = Collections
+					.unmodifiableMap(new HashMap<String, ProcessOutput>(
+							parent.failureMessages));
 		}
 
 		public boolean isRunCompleted() {
@@ -105,13 +116,10 @@ public class OutputDataListener implements Listener {
 			}
 		}
 
-		public List<String> getSuiteNames() {
-			return suiteNames;
+		public Map<String, ProcessOutput> getFailureMessages() {
+			return failureMessages;
 		}
 
-		public List<String> getIgnoredSuiteNames() {
-			return ignoredSuiteNames;
-		}
 	}
 
 	/**
@@ -122,8 +130,59 @@ public class OutputDataListener implements Listener {
 	}
 
 	// ----------------------------------------------------------------------
+	// A class that summarized the sub-process output from a test suite.
+	// ----------------------------------------------------------------------
+
+	/**
+	 * The output from a subprocess that runs a test suite. It's only
+	 * interesting if it indicates a suite failure.
+	 */
+	public static class ProcessOutput {
+		private final String suiteName;
+		private final StringBuilder stdout = new StringBuilder();
+		private final StringBuilder errout = new StringBuilder();
+
+		public ProcessOutput(String suiteName) {
+			this.suiteName = suiteName;
+		}
+
+		public void addStdout(String string) {
+			stdout.append(string);
+		}
+
+		public void addErrout(String string) {
+			errout.append(string);
+		}
+
+		public String getSuiteName() {
+			return suiteName;
+		}
+
+		public String getStdout() {
+			return stdout.toString();
+		}
+
+		public String getErrout() {
+			return errout.toString();
+		}
+
+		public boolean isSuiteFailure() {
+			return errout.length() > 0;
+		}
+
+	}
+
+	// ----------------------------------------------------------------------
 	// Listener methods that don't affect the data model
 	// ----------------------------------------------------------------------
+
+	@Override
+	public void suiteAdded(File suite) {
+	}
+
+	@Override
+	public void suiteIgnored(File suite) {
+	}
 
 	@Override
 	public void runFailed(Exception e) {
@@ -206,19 +265,7 @@ public class OutputDataListener implements Listener {
 	}
 
 	@Override
-	public void subProcessStdout(String string) {
-	}
-
-	@Override
-	public void subProcessErrout(String string) {
-	}
-
-	@Override
 	public void subProcessStop(List<String> command) {
-	}
-
-	@Override
-	public void suiteStarted(File suiteDir) {
 	}
 
 	@Override
@@ -235,10 +282,6 @@ public class OutputDataListener implements Listener {
 
 	@Override
 	public void suiteTestingStopped(File suiteDir) {
-	}
-
-	@Override
-	public void suiteStopped(File suiteDir) {
 	}
 
 	@Override

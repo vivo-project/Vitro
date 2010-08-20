@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.Date;
 
 import edu.cornell.mannlib.vitro.utilities.testrunner.FileHelper;
+import edu.cornell.mannlib.vitro.utilities.testrunner.IgnoredTests.IgnoredTestInfo;
 import edu.cornell.mannlib.vitro.utilities.testrunner.LogStats;
 import edu.cornell.mannlib.vitro.utilities.testrunner.SeleniumRunnerParameters;
 import edu.cornell.mannlib.vitro.utilities.testrunner.Status;
@@ -93,6 +94,8 @@ public class OutputSummaryFormatter {
 
 	private void writeHeader(PrintWriter writer) {
 		Status runStatus = dataModel.getRunStatus();
+		String statusString = (runStatus == Status.PENDING) ? "IN PROGRESS"
+				: runStatus.toString();
 		String startString = formatDateTime(dataModel.getStartTime());
 
 		writer.println("<html>");
@@ -107,7 +110,7 @@ public class OutputSummaryFormatter {
 		writer.println("  <div class=\"heading\">");
 		writer.println("    Acceptance test results: " + startString);
 		writer.println("    <div class=\"" + runStatus.getHtmlClass()
-				+ " one-word\">" + runStatus + "</div>");
+				+ " one-word\">" + statusString + "</div>");
 		writer.println("  </div>");
 	}
 
@@ -214,7 +217,8 @@ public class OutputSummaryFormatter {
 
 	private void writeIgnoreSection(PrintWriter writer) {
 		String warnClass = Status.WARN.getHtmlClass();
-		Collection<TestResults> ignoredTests = dataModel.getIgnoredTests();
+		Collection<IgnoredTestInfo> ignoredTests = dataModel
+				.getIgnoredTestInfo();
 
 		writer.println("  <div class=section>Ignored tests</div>");
 		writer.println();
@@ -225,13 +229,22 @@ public class OutputSummaryFormatter {
 			writer.println("    <tr><td colspan=\"3\">No tests ignored.</td>"
 					+ "</tr>");
 		} else {
-			for (TestResults t : ignoredTests) {
+			for (IgnoredTestInfo info : ignoredTests) {
+				String suiteName = info.suiteName;
+				String testName = info.testName;
+				String link = dataModel.getOutputLink(suiteName, testName);
+				String reason = dataModel.getReasonForIgnoring(suiteName,
+						testName);
+
 				writer.println("    <tr class=\"" + warnClass + "\">");
-				writer.println("      <td>" + t.getSuiteName() + "</td>");
-				writer.println("      <td><a href=\"" + t.getOutputLink()
-						+ "\">" + t.getTestName() + "</a></td>");
-				writer.println("      <td>" + t.getReasonForIgnoring()
-						+ "</td>");
+				writer.println("      <td>" + suiteName + "</td>");
+				if (link.isEmpty()) {
+					writer.println("      <td>" + testName + "</td>");
+				} else {
+					writer.println("      <td><a href=\"" + link + "\">"
+							+ testName + "</a></td>");
+				}
+				writer.println("      <td>" + reason + "</td>");
 				writer.println("    </tr>");
 			}
 		}

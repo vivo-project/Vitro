@@ -9,7 +9,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -120,15 +122,20 @@ public class SuiteResults {
 
 	private final String suiteName;
 	private final String outputLink;
-	private final List<TestResults> tests;
+	private final Map<String, TestResults> testMap;
 	private final Status status;
 
 	public SuiteResults(String suiteName, String outputLink,
 			List<TestResults> tests, Status status) {
 		this.suiteName = suiteName;
 		this.outputLink = outputLink;
-		this.tests = tests;
 		this.status = status;
+
+		Map<String, TestResults> map = new HashMap<String, TestResults>();
+		for (TestResults t : tests) {
+			map.put(t.getTestName(), t);
+		}
+		testMap = Collections.unmodifiableMap(map);
 	}
 
 	public String getName() {
@@ -144,7 +151,11 @@ public class SuiteResults {
 	}
 
 	public Collection<TestResults> getTests() {
-		return Collections.unmodifiableCollection(tests);
+		return Collections.unmodifiableCollection(testMap.values());
+	}
+
+	public TestResults getTest(String testName) {
+		return testMap.get(testName);
 	}
 
 	public static class TestResults {

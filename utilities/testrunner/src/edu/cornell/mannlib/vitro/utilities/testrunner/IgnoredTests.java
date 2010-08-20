@@ -17,8 +17,18 @@ import java.util.regex.Pattern;
  * is logged with a warning, not an error.
  */
 public class IgnoredTests {
-	private final File file;
+	public static final IgnoredTests EMPTY_LIST = new IgnoredTests();
+
+	private final String filePath;
 	private final List<IgnoredTestInfo> tests;
+
+	/**
+	 * Create an empty instance.
+	 */
+	private IgnoredTests() {
+		this.filePath = "NO FILE";
+		this.tests = Collections.emptyList();
+	}
 
 	/**
 	 * <p>
@@ -38,7 +48,8 @@ public class IgnoredTests {
 	 * </p>
 	 */
 	public IgnoredTests(File file) {
-		this.file = file;
+		this.filePath = file.getAbsolutePath();
+
 		List<IgnoredTestInfo> tests = new ArrayList<IgnoredTestInfo>();
 
 		BufferedReader reader = null;
@@ -81,9 +92,9 @@ public class IgnoredTests {
 	}
 
 	/**
-	 * Package access -- only used in unit tests.
+	 * Get a copy of the whole list.
 	 */
-	List<IgnoredTestInfo> getList() {
+	public List<IgnoredTestInfo> getList() {
 		return new ArrayList<IgnoredTestInfo>(tests);
 	}
 
@@ -138,7 +149,7 @@ public class IgnoredTests {
 	}
 
 	public String toString() {
-		String s = "  ignored tests from " + file.getPath() + "\n";
+		String s = "  ignored tests from " + this.filePath + "\n";
 		for (IgnoredTestInfo test : tests) {
 			s += "      " + test.suiteName + ", " + test.testName + "\n";
 		}
@@ -146,12 +157,13 @@ public class IgnoredTests {
 	}
 
 	/**
-	 * Package access so it can be used in unit tests.
+	 * Encapsulates a line from the file with suite name, test name, and
+	 * comment.
 	 */
-	static class IgnoredTestInfo {
-		final String suiteName;
-		final String testName;
-		final String comment;
+	public static class IgnoredTestInfo {
+		public final String suiteName;
+		public final String testName;
+		public final String comment;
 
 		public IgnoredTestInfo(String suiteName, String testName, String comment) {
 			this.suiteName = suiteName.trim();

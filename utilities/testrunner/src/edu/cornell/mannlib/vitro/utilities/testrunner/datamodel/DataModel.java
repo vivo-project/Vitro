@@ -9,10 +9,15 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
+import edu.cornell.mannlib.vitro.utilities.testrunner.IgnoredTests;
+import edu.cornell.mannlib.vitro.utilities.testrunner.IgnoredTests.IgnoredTestInfo;
 import edu.cornell.mannlib.vitro.utilities.testrunner.LogStats;
 import edu.cornell.mannlib.vitro.utilities.testrunner.Status;
 import edu.cornell.mannlib.vitro.utilities.testrunner.output.OutputDataListener;
+import edu.cornell.mannlib.vitro.utilities.testrunner.output.OutputDataListener.ProcessOutput;
 import edu.cornell.mannlib.vitro.utilities.testrunner.output.SuiteResults;
 import edu.cornell.mannlib.vitro.utilities.testrunner.output.SuiteResults.TestResults;
 
@@ -26,12 +31,13 @@ public class DataModel {
 	private Collection<File> selectedSuites = Collections.emptyList();
 	private Collection<SuiteResults> suiteResults = Collections.emptyList();
 	private OutputDataListener.Info dataListenerInfo = OutputDataListener.Info.EMPTY_INFO;
+	private IgnoredTests ignoredTestList = IgnoredTests.EMPTY_LIST;
 	private LogStats logStats = LogStats.EMPTY_LOG_STATS; // TODO
 
 	/* derived data */
 	private Status runStatus = Status.PENDING;
 
-	private final List<SuiteData> allSuiteData = new ArrayList<SuiteData>();
+	private final SortedMap<String, SuiteData> suiteDataMap = new TreeMap<String, SuiteData>();
 	private final List<SuiteData> pendingSuites = new ArrayList<SuiteData>();
 	private final List<SuiteData> passingSuites = new ArrayList<SuiteData>();
 	private final List<SuiteData> failingSuites = new ArrayList<SuiteData>();
@@ -79,6 +85,11 @@ public class DataModel {
 		calculate();
 	}
 
+	public void setIgnoredTestList(IgnoredTests ignoredTestList) {
+		this.ignoredTestList = ignoredTestList;
+		calculate();
+	}
+
 	public void setLogStats(LogStats logStats) { // TODO
 		this.logStats = logStats;
 		calculate();
@@ -95,7 +106,8 @@ public class DataModel {
 		// Clear all derived data.
 		runStatus = Status.OK;
 
-		allSuiteData.clear();
+		suiteDataMap.clear();
+
 		ignoredSuites.clear();
 		pendingSuites.clear();
 		failingSuites.clear();
@@ -119,34 +131,58 @@ public class DataModel {
 			contentsMap.put(contents.getName(), contents);
 		}
 
-		for (String name : dataListenerInfo.getSuiteNames()) {
-			SuiteContents contents = contentsMap.get(name);
+		for (SuiteContents contents : suiteContents) {
+			String name = contents.getName();
 			SuiteResults result = resultsMap.get(name);
-			boolean ignored = dataListenerInfo.getIgnoredSuiteNames().contains(
-					name);
-			allSuiteData.add(new SuiteData(name, ignored, contents, result));
+			boolean ignored = ignoredTestList.isIgnored(name);
+			ProcessOutput failureMessages = dataListenerInfo
+					.getFailureMessages().get(name);
+			suiteDataMap.put(name, new SuiteData(name, ignored, contents,
+					result, failureMessages));
 		}
 
 		/*
 		 * Tallys of suites and tests.
 		 */
-		for (SuiteData sd : allSuiteData) {
-			SuiteContents contents = sd.getContents();
-			SuiteResults result = sd.getResults();
-			if (result != null) {
-				tallyTestResults(result);
-			} else if (contents != null) {
+		for (SuiteData sd : suiteDataMap.values()) {
+			switch (sd.getSuiteStatus()) {
+			case ERROR:
+				failingSuites.add(sd);
+				break;
+			case PENDING:
+				pendingSuites.add(sd);
+				break;
+			case WARN:
+				ignoredSuites.add(sd);
+				break;
+			default: // Status.OK
+				passingSuites.add(sd);
+				break;
+			}
+		}
+
+		for (SuiteData sd : suiteDataMap.values()) {
+			SuiteResults sResult = sd.getResults();
+			if (sResult != null) {
+				tallyTestResults(sResult);
+			} else if (sd.getContents() != null) {
 				tallyTestContents(sd);
 			}
-
-			if (sd.isIgnored()) {
-				ignoredSuites.add(sd);
-			} else if (result == null) {
-				pendingSuites.add(sd);
-			} else if (result.getStatus() == Status.ERROR) {
-				failingSuites.add(sd);
-			} else {
-				passingSuites.add(sd);
+		}
+		for (TestResults tResult : allTests) {
+			switch (tResult.getStatus()) {
+			case OK:
+				passingTests.add(tResult);
+				break;
+			case PENDING:
+				pendingTests.add(tResult);
+				break;
+			case WARN:
+				ignoredTests.add(tResult);
+				break;
+			default: // Status.ERROR
+				failingTests.add(tResult);
+				break;
 			}
 		}
 
@@ -175,41 +211,19 @@ public class DataModel {
 	private void tallyTestResults(SuiteResults sResult) {
 		for (TestResults tResult : sResult.getTests()) {
 			allTests.add(tResult);
-			switch (tResult.getStatus()) {
-			case OK:
-				passingTests.add(tResult);
-				break;
-			case PENDING:
-				pendingTests.add(tResult);
-				break;
-			case WARN:
-				ignoredTests.add(tResult);
-				break;
-			default: // Status.ERROR
-				failingTests.add(tResult);
-				break;
-			}
 		}
 	}
 
 	/**
-	 * Categorize all tests for which we have no results.
+	 * Populate {@link #allTests} with the tests for which we have no results.
 	 */
 	private void tallyTestContents(SuiteData suiteData) {
-		SuiteContents contents = suiteData.getContents();
+		Status suiteStatus = suiteData.getSuiteStatus();
 
-		for (String testName : contents.getTestNames()) {
-			if (suiteData.isIgnored()) {
-				TestResults t = new TestResults(testName, suiteData.getName(),
-						"", Status.WARN, "");
-				allTests.add(t);
-				ignoredTests.add(t);
-			} else {
-				TestResults t = new TestResults(testName, suiteData.getName(),
-						"", Status.PENDING, "");
-				allTests.add(t);
-				pendingTests.add(t);
-			}
+		for (String testName : suiteData.getContents().getTestNames()) {
+			TestResults t = new TestResults(testName, suiteData.getName(), "",
+					suiteStatus, "");
+			allTests.add(t);
 		}
 	}
 
@@ -250,7 +264,7 @@ public class DataModel {
 	}
 
 	public int getTotalSuiteCount() {
-		return allSuiteData.size();
+		return suiteDataMap.size();
 	}
 
 	public int getPassingSuiteCount() {
@@ -303,6 +317,32 @@ public class DataModel {
 
 	public Collection<TestResults> getIgnoredTests() {
 		return Collections.unmodifiableCollection(ignoredTests);
+	}
+
+	public Collection<IgnoredTestInfo> getIgnoredTestInfo() {
+		return ignoredTestList.getList();
+	}
+
+	public String getOutputLink(String suiteName, String testName) {
+		SuiteData sd = suiteDataMap.get(suiteName);
+		if (sd != null) {
+			SuiteResults s = sd.getResults();
+			if (s != null) {
+				if (testName.equals("*")) {
+					return s.getOutputLink();
+				} else {
+					TestResults t = s.getTest(testName);
+					if (t != null) {
+						return t.getOutputLink();
+					}
+				}
+			}
+		}
+		return "";
+	}
+
+	public String getReasonForIgnoring(String suiteName, String testName) {
+		return ignoredTestList.getReasonForIgnoring(suiteName, testName);
 	}
 
 }

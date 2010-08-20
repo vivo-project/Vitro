@@ -36,8 +36,9 @@ public class SeleniumRunner {
 		this.modelCleaner = new ModelCleaner(parms, this.tomcatController);
 		this.suiteRunner = new SuiteRunner(parms);
 		this.outputManager = new OutputManager(parms);
-		this.dataModel = new DataModel();
 
+		this.dataModel = new DataModel();
+		this.dataModel.setIgnoredTestList(parms.getIgnoredTests());
 	}
 
 	/**
