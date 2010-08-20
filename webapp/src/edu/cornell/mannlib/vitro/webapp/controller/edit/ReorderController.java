@@ -2,19 +2,14 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
-import java.io.IOException;
-
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
-import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
@@ -73,14 +68,6 @@ public class ReorderController extends PrimitiveRdfEdit {
             doError(response, errorMsg, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             return;
         }  
-        
-        DataPropertyDao dpDao = wadf.getDataPropertyDao();  
-        if( dpDao == null) {
-            errorMsg = "No DataPropertyDao available";
-            log.error(errorMsg);
-            doError(response, errorMsg, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            return;
-        }  
 
         //check permissions     
         //TODO: (bdc34)This is not yet implemented, must check the IDs against the policies for permissons before doing an edit!
@@ -91,10 +78,7 @@ public class ReorderController extends PrimitiveRdfEdit {
             doError(response,"Insufficent permissions", HttpStatus.SC_UNAUTHORIZED);
             return;
         }
-        
-        DataProperty dprop = dpDao.getDataPropertyByURI(rankPredicate);
-        String rangeDatatype = dprop.getRangeDatatypeURI();
-        
+
         // This may not be the most efficient way. Should we instead build up a Model of retractions and additions, so
         // we only hit the database once?
         int counter = 1;
@@ -102,10 +86,9 @@ public class ReorderController extends PrimitiveRdfEdit {
             // Retract all existing rank statements for this individual
             dpsDao.deleteDataPropertyStatementsForIndividualByDataProperty(individualUri, rankPredicate);
         
-            // Then add the new rank statement for this individuals
-            DataPropertyStatement dps = new DataPropertyStatementImpl(individualUri, rankPredicate, String.valueOf(counter));
-            dps.setDatatypeURI(rangeDatatype);
-            dpsDao.insertNewDataPropertyStatement(dps);
+            // Then add the new rank statement for this individual
+            // insertNewDataPropertyStatement will insert the rangeDatatype of the property, so we don't need to set that here.
+            dpsDao.insertNewDataPropertyStatement(new DataPropertyStatementImpl(individualUri, rankPredicate, String.valueOf(counter)));
             
             counter++;
         }
