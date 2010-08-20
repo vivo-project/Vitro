@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.cornell.mannlib.vitro.utilities.testrunner.datamodel.DataModel;
+import edu.cornell.mannlib.vitro.utilities.testrunner.datamodel.SuiteContents;
 import edu.cornell.mannlib.vitro.utilities.testrunner.listener.Listener;
 import edu.cornell.mannlib.vitro.utilities.testrunner.output.OutputManager;
 
@@ -40,6 +41,56 @@ public class SeleniumRunner {
 	}
 
 	/**
+	 * Set up the run, run the selected suites, summarize the output, and clean
+	 * up afterwards.
+	 * 
+	 * @return <code>true</code> iff all tests passed.
+	 */
+	public boolean run() {
+		boolean success;
+		try {
+			listener.runStarted();
+			outputManager.cleanOutputDirectory();
+
+			parseSuites();
+			selectSuites();
+
+			runSelectedSuites();
+			tomcatController.cleanup();
+
+			listener.runEndTime();
+			outputManager.summarizeOutput(dataModel);
+			success = (dataModel.getRunStatus() == Status.OK);
+		} catch (IOException e) {
+			listener.runFailed(e);
+			success = false;
+			e.printStackTrace();
+		} catch (FatalException e) {
+			listener.runFailed(e);
+			success = false;
+			e.printStackTrace();
+		}
+		listener.runStopped();
+		return success;
+	}
+
+	/**
+	 * Scan the suite directories in the suite files.
+	 */
+	public void parseSuites() {
+		List<SuiteContents> allContents = new ArrayList<SuiteContents>();
+		for (File parentDir : parms.getSuiteParentDirectories()) {
+			for (File suiteDir : parms.findSuiteDirs(parentDir)) {
+				SuiteContents contents = SuiteContents.parse(suiteDir);
+				if (contents != null) {
+					allContents.add(contents);
+				}
+			}
+		}
+		dataModel.setSuiteContents(allContents);
+	}
+
+	/**
 	 * Select all test suites which aren't explicitly ignored.
 	 */
 	public void selectSuites() {
@@ -61,37 +112,6 @@ public class SeleniumRunner {
 		}
 
 		dataModel.setSelectedSuites(suites);
-	}
-
-	/**
-	 * Set up the run, run the selected suites, summarize the output, and clean
-	 * up afterwards.
-	 * 
-	 * @return <code>true</code> iff all tests passed.
-	 */
-	public boolean run() {
-		boolean success;
-		try {
-			listener.runStarted();
-			outputManager.cleanOutputDirectory();
-
-			runSelectedSuites();
-			tomcatController.cleanup();
-
-			listener.runEndTime();
-			outputManager.summarizeOutput(dataModel);
-			success = (dataModel.getRunStatus() == Status.OK);
-		} catch (IOException e) {
-			listener.runFailed(e);
-			success = false;
-			e.printStackTrace();
-		} catch (FatalException e) {
-			listener.runFailed(e);
-			success = false;
-			e.printStackTrace();
-		}
-		listener.runStopped();
-		return success;
 	}
 
 	public void runSelectedSuites() {
@@ -163,9 +183,7 @@ public class SeleniumRunner {
 
 				System.out.println(parms);
 
-				SeleniumRunner runner = new SeleniumRunner(parms);
-				runner.selectSuites();
-				success = runner.run();
+				success = new SeleniumRunner(parms).run();
 			}
 		} catch (FatalException e) {
 			System.err.println("\n\n-----------------\n"

@@ -22,6 +22,7 @@ import edu.cornell.mannlib.vitro.utilities.testrunner.output.SuiteResults.TestRe
 public class DataModel {
 
 	/* base data */
+	private Collection<SuiteContents> suiteContents = Collections.emptyList();
 	private Collection<File> selectedSuites = Collections.emptyList();
 	private Collection<SuiteResults> suiteResults = Collections.emptyList();
 	private OutputDataListener.Info dataListenerInfo = OutputDataListener.Info.EMPTY_INFO;
@@ -53,6 +54,11 @@ public class DataModel {
 	// ----------------------------------------------------------------------
 	// Update the base data.
 	// ----------------------------------------------------------------------
+
+	public void setSuiteContents(Collection<SuiteContents> suiteContents) {
+		this.suiteContents = new ArrayList<SuiteContents>(suiteContents);
+		calculate();
+	}
 
 	public void setSelectedSuites(Collection<File> selectedSuites) {
 		this.selectedSuites = new ArrayList<File>(selectedSuites);
@@ -108,25 +114,29 @@ public class DataModel {
 		for (SuiteResults result : suiteResults) {
 			resultsMap.put(result.getName(), result);
 		}
+		Map<String, SuiteContents> contentsMap = new HashMap<String, SuiteContents>();
+		for (SuiteContents contents : suiteContents) {
+			contentsMap.put(contents.getName(), contents);
+		}
 
 		for (String name : dataListenerInfo.getSuiteNames()) {
-			if (dataListenerInfo.getIgnoredSuiteNames().contains(name)) {
-				allSuiteData.add(new SuiteData(name, true, null));
-			} else if (resultsMap.containsKey(name)) {
-				allSuiteData.add(new SuiteData(name, false, resultsMap
-						.get(name)));
-			} else {
-				allSuiteData.add(new SuiteData(name, false, null));
-			}
+			SuiteContents contents = contentsMap.get(name);
+			SuiteResults result = resultsMap.get(name);
+			boolean ignored = dataListenerInfo.getIgnoredSuiteNames().contains(
+					name);
+			allSuiteData.add(new SuiteData(name, ignored, contents, result));
 		}
 
 		/*
 		 * Tallys of suites and tests.
 		 */
 		for (SuiteData sd : allSuiteData) {
+			SuiteContents contents = sd.getContents();
 			SuiteResults result = sd.getResults();
 			if (result != null) {
-				tallyTests(result);
+				tallyTestResults(result);
+			} else if (contents != null) {
+				tallyTestContents(sd);
 			}
 
 			if (sd.isIgnored()) {
@@ -162,7 +172,7 @@ public class DataModel {
 	/**
 	 * Categorize all test results according to status.
 	 */
-	private void tallyTests(SuiteResults sResult) {
+	private void tallyTestResults(SuiteResults sResult) {
 		for (TestResults tResult : sResult.getTests()) {
 			allTests.add(tResult);
 			switch (tResult.getStatus()) {
@@ -178,6 +188,27 @@ public class DataModel {
 			default: // Status.ERROR
 				failingTests.add(tResult);
 				break;
+			}
+		}
+	}
+
+	/**
+	 * Categorize all tests for which we have no results.
+	 */
+	private void tallyTestContents(SuiteData suiteData) {
+		SuiteContents contents = suiteData.getContents();
+
+		for (String testName : contents.getTestNames()) {
+			if (suiteData.isIgnored()) {
+				TestResults t = new TestResults(testName, suiteData.getName(),
+						"", Status.WARN, "");
+				allTests.add(t);
+				ignoredTests.add(t);
+			} else {
+				TestResults t = new TestResults(testName, suiteData.getName(),
+						"", Status.PENDING, "");
+				allTests.add(t);
+				pendingTests.add(t);
 			}
 		}
 	}
@@ -256,6 +287,10 @@ public class DataModel {
 
 	public int getIgnoredTestCount() {
 		return ignoredTests.size();
+	}
+
+	public int getPendingTestsCount() {
+		return pendingTests.size();
 	}
 
 	public Collection<TestResults> getAllTests() {

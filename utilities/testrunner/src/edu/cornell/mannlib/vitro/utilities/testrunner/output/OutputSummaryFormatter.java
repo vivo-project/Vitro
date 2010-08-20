@@ -151,7 +151,8 @@ public class OutputSummaryFormatter {
 				+ "</td><td>" + dataModel.getIgnoredTestCount() + "</td>");
 		if (dataModel.isAnyPending()) {
 			writer.println("          <tr><td>Pending</td><td>"
-					+ dataModel.getPendingSuitesCount() + "</td><td>?</td>");
+					+ dataModel.getPendingSuitesCount() + "</td><td>"
+					+ dataModel.getPendingTestsCount() + "</td>");
 		}
 		writer.println("          <tr><td class=\"total\">Total</td><td>"
 				+ dataModel.getTotalSuiteCount() + "</td><td>"

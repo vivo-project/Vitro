@@ -10,11 +10,13 @@ import edu.cornell.mannlib.vitro.utilities.testrunner.output.SuiteResults;
 public class SuiteData {
 	private final String name;
 	private final boolean ignored;
+	private final SuiteContents contents;
 	private final SuiteResults results;
 
-	public SuiteData(String name, boolean ignored, SuiteResults results) {
+	public SuiteData(String name, boolean ignored, SuiteContents contents, SuiteResults results) {
 		this.name = name;
 		this.ignored = ignored;
+		this.contents = contents;
 		this.results = results;
 	}
 
@@ -24,6 +26,10 @@ public class SuiteData {
 
 	public boolean isIgnored() {
 		return ignored;
+	}
+
+	public SuiteContents getContents() {
+		return contents;
 	}
 
 	public SuiteResults getResults() {
