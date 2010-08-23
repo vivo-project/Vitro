@@ -116,25 +116,27 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     private Configuration getNewConfig(String themeDir) {
         
         Configuration config = new Configuration();
-
+        
         String buildEnv = ConfigurationProperties.getProperty("Environment.build");
         log.debug("Current build environment: " + buildEnv);
-        if ("development".equals(buildEnv)) {
+        if ("development".equals(buildEnv)) { // Set Environment.build = development in deploy.properties
             log.debug("Disabling Freemarker template caching in development build.");
             config.setTemplateUpdateDelay(0); // no template caching in development 
+        } else {
+            log.debug("Setting Freemarker template cache update delay.");            
+            config.setTemplateUpdateDelay(60); // in seconds; Freemarker default is 5
         }
 
         // Specify how templates will see the data-model. 
         // The default wrapper exposes set methods unless exposure level is set.
         // By default we want to block exposure of set methods. 
-        // config.setObjectWrapper(new DefaultObjectWrapper());
         BeansWrapper wrapper = new DefaultObjectWrapper();
         wrapper.setExposureLevel(BeansWrapper.EXPOSE_PROPERTIES_ONLY);
         config.setObjectWrapper(wrapper);
 
         // Set some formatting defaults. These can be overridden at the template
         // or environment (template-processing) level, or for an individual
-        // instance by using built-ins.
+        // token by using built-ins.
         config.setLocale(java.util.Locale.US);
         
         String dateFormat = "M/d/yyyy";
