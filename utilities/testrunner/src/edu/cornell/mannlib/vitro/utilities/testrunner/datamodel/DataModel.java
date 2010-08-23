@@ -6,6 +6,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,10 +17,10 @@ import edu.cornell.mannlib.vitro.utilities.testrunner.IgnoredTests;
 import edu.cornell.mannlib.vitro.utilities.testrunner.IgnoredTests.IgnoredTestInfo;
 import edu.cornell.mannlib.vitro.utilities.testrunner.LogStats;
 import edu.cornell.mannlib.vitro.utilities.testrunner.Status;
+import edu.cornell.mannlib.vitro.utilities.testrunner.datamodel.SuiteData.TestData;
 import edu.cornell.mannlib.vitro.utilities.testrunner.output.OutputDataListener;
 import edu.cornell.mannlib.vitro.utilities.testrunner.output.OutputDataListener.ProcessOutput;
 import edu.cornell.mannlib.vitro.utilities.testrunner.output.SuiteResults;
-import edu.cornell.mannlib.vitro.utilities.testrunner.output.SuiteResults.TestResults;
 
 /**
  * Collect all that we know about suites, tests, and their current status.
@@ -38,16 +39,12 @@ public class DataModel {
 	private Status runStatus = Status.PENDING;
 
 	private final SortedMap<String, SuiteData> suiteDataMap = new TreeMap<String, SuiteData>();
-	private final List<SuiteData> pendingSuites = new ArrayList<SuiteData>();
-	private final List<SuiteData> passingSuites = new ArrayList<SuiteData>();
-	private final List<SuiteData> failingSuites = new ArrayList<SuiteData>();
-	private final List<SuiteData> ignoredSuites = new ArrayList<SuiteData>();
+	private final EnumMap<Status, List<SuiteData>> suiteMapByStatus = new EnumMap<Status, List<SuiteData>>(
+			Status.class);
 
-	private final List<TestResults> allTests = new ArrayList<TestResults>();
-	private final List<TestResults> pendingTests = new ArrayList<TestResults>();
-	private final List<TestResults> passingTests = new ArrayList<TestResults>();
-	private final List<TestResults> failingTests = new ArrayList<TestResults>();
-	private final List<TestResults> ignoredTests = new ArrayList<TestResults>();
+	private final List<TestData> allTests = new ArrayList<TestData>();
+	private final EnumMap<Status, List<TestData>> testMapByStatus = new EnumMap<Status, List<TestData>>(
+			Status.class);
 
 	// ----------------------------------------------------------------------
 	// Constructor
@@ -107,20 +104,19 @@ public class DataModel {
 		runStatus = Status.OK;
 
 		suiteDataMap.clear();
-
-		ignoredSuites.clear();
-		pendingSuites.clear();
-		failingSuites.clear();
-		passingSuites.clear();
+		suiteMapByStatus.clear();
+		for (Status s : Status.values()) {
+			suiteMapByStatus.put(s, new ArrayList<SuiteData>());
+		}
 
 		allTests.clear();
-		ignoredTests.clear();
-		pendingTests.clear();
-		failingTests.clear();
-		passingTests.clear();
+		testMapByStatus.clear();
+		for (Status s : Status.values()) {
+			testMapByStatus.put(s, new ArrayList<TestData>());
+		}
 
 		/*
-		 * Suite data.
+		 * Populate the Suite map with all Suites.
 		 */
 		Map<String, SuiteResults> resultsMap = new HashMap<String, SuiteResults>();
 		for (SuiteResults result : suiteResults) {
@@ -142,88 +138,28 @@ public class DataModel {
 		}
 
 		/*
-		 * Tallys of suites and tests.
+		 * Map the Suites by status.
 		 */
-		for (SuiteData sd : suiteDataMap.values()) {
-			switch (sd.getSuiteStatus()) {
-			case ERROR:
-				failingSuites.add(sd);
-				break;
-			case PENDING:
-				pendingSuites.add(sd);
-				break;
-			case WARN:
-				ignoredSuites.add(sd);
-				break;
-			default: // Status.OK
-				passingSuites.add(sd);
-				break;
+		for (SuiteData s : suiteDataMap.values()) {
+			getSuites(s.getStatus()).add(s);
+		}
+
+		/**
+		 * Populate the Test map with all Tests, and map by status.
+		 */
+		for (SuiteData s : suiteDataMap.values()) {
+			for (TestData t : s.getTestMap().values()) {
+				allTests.add(t);
+				getTests(t.getStatus()).add(t);
 			}
 		}
 
-		for (SuiteData sd : suiteDataMap.values()) {
-			SuiteResults sResult = sd.getResults();
-			if (sResult != null) {
-				tallyTestResults(sResult);
-			} else if (sd.getContents() != null) {
-				tallyTestContents(sd);
-			}
-		}
-		for (TestResults tResult : allTests) {
-			switch (tResult.getStatus()) {
-			case OK:
-				passingTests.add(tResult);
-				break;
-			case PENDING:
-				pendingTests.add(tResult);
-				break;
-			case WARN:
-				ignoredTests.add(tResult);
-				break;
-			default: // Status.ERROR
-				failingTests.add(tResult);
-				break;
-			}
-		}
-
-		/*
-		 * Overall status. Warnings in the log are scary, but ignored tests are
-		 * OK.
-		 */
-		if (logStats.hasErrors() || !failingSuites.isEmpty()) {
+		if (logStats.hasErrors() || !getSuites(Status.ERROR).isEmpty()) {
 			runStatus = Status.ERROR;
+		} else if (!getSuites(Status.PENDING).isEmpty()) {
+			runStatus = Status.PENDING;
 		} else {
-			if (logStats.hasWarnings()) {
-				runStatus = Status.WARN;
-			} else {
-				if (!pendingSuites.isEmpty()) {
-					runStatus = Status.PENDING;
-				} else {
-					runStatus = Status.OK;
-				}
-			}
-		}
-	}
-
-	/**
-	 * Categorize all test results according to status.
-	 */
-	private void tallyTestResults(SuiteResults sResult) {
-		for (TestResults tResult : sResult.getTests()) {
-			allTests.add(tResult);
-		}
-	}
-
-	/**
-	 * Populate {@link #allTests} with the tests for which we have no results.
-	 */
-	private void tallyTestContents(SuiteData suiteData) {
-		Status suiteStatus = suiteData.getSuiteStatus();
-
-		for (String testName : suiteData.getContents().getTestNames()) {
-			TestResults t = new TestResults(testName, suiteData.getName(), "",
-					suiteStatus, "");
-			allTests.add(t);
+			runStatus = Status.OK;
 		}
 	}
 
@@ -248,19 +184,19 @@ public class DataModel {
 	}
 
 	public boolean isAnyPasses() {
-		return !(passingSuites.isEmpty() && passingTests.isEmpty());
+		return !getTests(Status.OK).isEmpty();
 	}
 
 	public boolean isAnyFailures() {
-		return !(failingSuites.isEmpty() && failingTests.isEmpty());
+		return !getTests(Status.ERROR).isEmpty();
 	}
 
 	public boolean isAnyIgnores() {
-		return !(ignoredSuites.isEmpty() && ignoredTests.isEmpty());
+		return !getTests(Status.IGNORED).isEmpty();
 	}
 
 	public boolean isAnyPending() {
-		return !pendingSuites.isEmpty();
+		return !getTests(Status.PENDING).isEmpty();
 	}
 
 	public int getTotalSuiteCount() {
@@ -268,23 +204,33 @@ public class DataModel {
 	}
 
 	public int getPassingSuiteCount() {
-		return passingSuites.size();
+		return getSuites(Status.OK).size();
 	}
 
 	public int getFailingSuiteCount() {
-		return failingSuites.size();
+		return getSuites(Status.ERROR).size();
 	}
 
 	public int getIgnoredSuiteCount() {
-		return ignoredSuites.size();
+		return getSuites(Status.IGNORED).size();
 	}
 
-	public int getPendingSuitesCount() {
-		return pendingSuites.size();
+	public int getPendingSuiteCount() {
+		return getSuites(Status.PENDING).size();
 	}
 
-	public Collection<SuiteResults> getSuiteResults() {
-		return Collections.unmodifiableCollection(suiteResults);
+	public Collection<SuiteData> getAllSuites() {
+		return suiteDataMap.values();
+	}
+
+	public Map<String, SuiteData> getSuitesWithFailureMessages() {
+		Map<String, SuiteData> map = new TreeMap<String, SuiteData>();
+		for (SuiteData s : suiteDataMap.values()) {
+			if (s.getFailureMessages() != null) {
+				map.put(s.getName(), s);
+			}
+		}
+		return map;
 	}
 
 	public int getTotalTestCount() {
@@ -292,57 +238,57 @@ public class DataModel {
 	}
 
 	public int getPassingTestCount() {
-		return passingTests.size();
+		return getTests(Status.OK).size();
 	}
 
 	public int getFailingTestCount() {
-		return failingTests.size();
+		return getTests(Status.ERROR).size();
 	}
 
 	public int getIgnoredTestCount() {
-		return ignoredTests.size();
+		return getTests(Status.IGNORED).size();
 	}
 
-	public int getPendingTestsCount() {
-		return pendingTests.size();
+	public int getPendingTestCount() {
+		return getTests(Status.PENDING).size();
 	}
 
-	public Collection<TestResults> getAllTests() {
+	public Collection<TestData> getAllTests() {
 		return Collections.unmodifiableCollection(allTests);
 	}
 
-	public Collection<TestResults> getFailingTests() {
-		return Collections.unmodifiableCollection(failingTests);
+	public Collection<TestData> getFailingTests() {
+		return Collections.unmodifiableCollection(getTests(Status.ERROR));
 	}
 
-	public Collection<TestResults> getIgnoredTests() {
-		return Collections.unmodifiableCollection(ignoredTests);
+	public Collection<TestData> getIgnoredTests() {
+		return Collections.unmodifiableCollection(getTests(Status.IGNORED));
 	}
 
 	public Collection<IgnoredTestInfo> getIgnoredTestInfo() {
 		return ignoredTestList.getList();
 	}
 
-	public String getOutputLink(String suiteName, String testName) {
-		SuiteData sd = suiteDataMap.get(suiteName);
-		if (sd != null) {
-			SuiteResults s = sd.getResults();
-			if (s != null) {
-				if (testName.equals("*")) {
-					return s.getOutputLink();
-				} else {
-					TestResults t = s.getTest(testName);
-					if (t != null) {
-						return t.getOutputLink();
-					}
-				}
-			}
-		}
-		return "";
-	}
-
 	public String getReasonForIgnoring(String suiteName, String testName) {
 		return ignoredTestList.getReasonForIgnoring(suiteName, testName);
+	}
+
+	// ----------------------------------------------------------------------
+	// Helper methods
+	// ----------------------------------------------------------------------
+
+	/**
+	 * Get the list of suites that have this status.
+	 */
+	private List<SuiteData> getSuites(Status st) {
+		return suiteMapByStatus.get(st);
+	}
+
+	/**
+	 * Get the list of tests that have this status.
+	 */
+	private List<TestData> getTests(Status st) {
+		return testMapByStatus.get(st);
 	}
 
 }

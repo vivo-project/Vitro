@@ -11,7 +11,6 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -411,7 +410,6 @@ public class SeleniumRunnerParameters {
 	 * recognize a suite directory because it contains a file named Suite.html.
 	 */
 	public Collection<File> findSuiteDirs(File parentDir) {
-		System.out.println("parentDir: " + parentDir);
 		return Arrays.asList(parentDir.listFiles(new FileFilter() {
 			public boolean accept(File pathname) {
 				if (!pathname.isDirectory()) {

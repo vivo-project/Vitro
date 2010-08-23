@@ -9,6 +9,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import edu.cornell.mannlib.vitro.utilities.testrunner.FileHelper;
 import edu.cornell.mannlib.vitro.utilities.testrunner.listener.Listener;
@@ -138,6 +140,7 @@ public class OutputDataListener implements Listener {
 	 * interesting if it indicates a suite failure.
 	 */
 	public static class ProcessOutput {
+		private static final String SUITE_FAILURE_PATTERN = "exception|error(?i)";
 		private final String suiteName;
 		private final StringBuilder stdout = new StringBuilder();
 		private final StringBuilder errout = new StringBuilder();
@@ -167,7 +170,9 @@ public class OutputDataListener implements Listener {
 		}
 
 		public boolean isSuiteFailure() {
-			return errout.length() > 0;
+			Pattern p = Pattern.compile(SUITE_FAILURE_PATTERN);
+			Matcher m = p.matcher(errout);
+			return m.find();
 		}
 
 	}

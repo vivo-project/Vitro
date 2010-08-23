@@ -76,21 +76,16 @@ public class SuiteResults {
 					String testLink = outputLink + m.group(2);
 
 					Status testStatus;
-					String reasonForIgnoring;
 					if ("status_passed".equals(m.group(1))) {
 						testStatus = Status.OK;
-						reasonForIgnoring = "";
 					} else if (ignoredTests.isIgnored(suiteName, testName)) {
-						testStatus = Status.WARN;
-						reasonForIgnoring = ignoredTests.getReasonForIgnoring(
-								suiteName, testName);
+						testStatus = Status.IGNORED;
 					} else {
 						testStatus = Status.ERROR;
-						reasonForIgnoring = "";
 					}
 
 					tests.add(new TestResults(testName, suiteName, testLink,
-							testStatus, reasonForIgnoring));
+							testStatus));
 				}
 			}
 
@@ -163,15 +158,13 @@ public class SuiteResults {
 		private final String suite;
 		private final String outputLink;
 		private final Status status;
-		private final String reasonForIgnoring;
 
 		public TestResults(String name, String suite, String outputLink,
-				Status status, String reasonForIgnoring) {
+				Status status) {
 			this.name = name;
 			this.suite = suite;
 			this.outputLink = outputLink;
 			this.status = status;
-			this.reasonForIgnoring = reasonForIgnoring;
 		}
 
 		public Status getStatus() {
@@ -190,9 +183,6 @@ public class SuiteResults {
 			return outputLink;
 		}
 
-		public String getReasonForIgnoring() {
-			return reasonForIgnoring;
-		}
 	}
 
 }

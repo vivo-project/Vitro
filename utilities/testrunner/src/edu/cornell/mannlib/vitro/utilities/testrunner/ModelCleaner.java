@@ -29,6 +29,13 @@ public class ModelCleaner {
 		this.tomcatController = tomcatController;
 
 		sanityCheck();
+		try {
+			tomcatController.stopTheWebapp();
+			tomcatController.startTheWebapp();
+		} catch (CommandRunnerException e) {
+			throw new FatalException(
+					"sanityCheck: Failed to stop and start Tomcat.", e);
+		}
 	}
 
 	private void sanityCheck() {

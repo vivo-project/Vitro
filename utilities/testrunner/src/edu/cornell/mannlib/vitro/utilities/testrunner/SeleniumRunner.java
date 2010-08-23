@@ -61,7 +61,7 @@ public class SeleniumRunner {
 
 			listener.runEndTime();
 			outputManager.summarizeOutput(dataModel);
-			success = (dataModel.getRunStatus() == Status.OK);
+			success = Status.isSuccess(dataModel.getRunStatus());
 		} catch (IOException e) {
 			listener.runFailed(e);
 			success = false;
