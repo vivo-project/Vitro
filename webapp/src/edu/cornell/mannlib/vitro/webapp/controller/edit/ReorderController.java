@@ -92,6 +92,51 @@ public class ReorderController extends PrimitiveRdfEdit {
             
             counter++;
         }
+
+//        // Alternate implementation: build up a model of additions and retractions, use only one db write
+//        DataPropertyDao dpDao = wadf.getDataPropertyDao();  
+//        if( dpDao == null) {
+//            errorMsg = "No DataPropertyDao available";
+//            log.error(errorMsg);
+//            doError(response, errorMsg, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+//            return;
+//        }      
+//        DataProperty dp = dpDao.getDataPropertyByURI(rankPredicate);
+//        String rangeDatatypeUri = dp.getRangeDatatypeURI();
+//        
+//        Model additions = com.hp.hpl.jena.rdf.model.ModelFactory.createDefaultModel();        
+//        Model retractions = com.hp.hpl.jena.rdf.model.ModelFactory.createDefaultModel();        
+//        OntModel model = getQueryModel(vreq);
+//        
+//        int counter = 1;
+//        for (String individualUri : individualUris) {
+//            Resource resource = model.createResource(individualUri);
+//            Property property = model.getProperty(rankPredicate);
+//            // Remove all existing rank statements for this individual and predicate
+//            StmtIterator stmts = model.listStatements(resource, property, (RDFNode) null);  
+//            retractions.add(stmts);
+//            
+//            Literal lit = null;
+//            if (rangeDatatypeUri != null) {
+//                lit = model.createTypedLiteral(counter, rangeDatatypeUri);
+//            } else {
+//                lit = model.createLiteral(String.valueOf(counter));
+//                // or: lit = model.createTypedLiteral(count) ?
+//            }
+//            Statement stmt = model.createStatement(resource, property, lit);
+//            additions.add(stmt);
+//            
+//            counter++;
+//        }
+//        ServletContext sc = getServletContext();
+//        String editorUri = EditN3Utils.getEditorUri(vreq, vreq.getSession(false), sc);           
+//        try {
+//            processChanges( additions, retractions, getWriteModel(vreq), getQueryModel(vreq), editorUri);
+//        } catch (Exception e) {
+//            doError(response,e.getMessage(),HttpStatus.SC_INTERNAL_SERVER_ERROR);
+//            return;
+//        }          
+//        // end alternate implementation
         
         response.setStatus(HttpServletResponse.SC_OK);
         
