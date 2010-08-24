@@ -114,7 +114,7 @@ public class DescribeDirective extends BaseTemplateDirectiveModel {
         examples.add("<@" + name + " var=\"stylesheets\" />");
         map.put("examples", examples);
         
-        return mergeToTemplate(map, config);
+        return mergeToHelpTemplate(map, config);
     }
     
     private List<Method> getPublicMethods(Class<?> cls) {

@@ -79,7 +79,7 @@ public class DumpDirective extends BaseTemplateDirectiveModel {
         examples.add("<@" + name + " var=\"urls\" />");
         map.put("examples", examples);
         
-        return mergeToTemplate(map, config);
+        return mergeToHelpTemplate(map, config);
     }
 
 }
