@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.utilities.testrunner;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
@@ -9,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Reader;
 
 /**
  * Some utility methods for dealing with files and directories.
@@ -135,6 +137,26 @@ public class FileHelper {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Suck all the data from a {@link Reader} into a {@link String}.
+	 */
+	public static String readAll(Reader reader) throws IOException {
+		StringBuilder result = new StringBuilder();
+		BufferedReader buffered = new BufferedReader(reader);
+		char[] chunk = new char[4096];
+		int howMany;
+
+		try {
+			while (-1 != (howMany = buffered.read(chunk))) {
+				result.append(chunk, 0, howMany);
+			}
+		} finally {
+			reader.close();
+		}
+
+		return result.toString();
 	}
 
 	/** No need to instantiate this, since all methods are static. */

@@ -10,19 +10,17 @@ import java.util.Properties;
  * model.
  */
 public class ModelCleanerProperties {
-	public static final String PROP_TOMCAT_START_COMMAND = "tomcat_start_command";
-	public static final String PROP_TOMCAT_START_DELAY = "tomcat_start_delay";
-	public static final String PROP_TOMCAT_STOP_COMMAND = "tomcat_stop_command";
-	public static final String PROP_TOMCAT_STOP_DELAY = "tomcat_stop_delay";
+	public static final String PROP_VIVO_WEBAPP_NAME = "vivo_webapp_name";
+	public static final String PROP_TOMCAT_MANAGER_USERNAME = "tomcat_manager_username";
+	public static final String PROP_TOMCAT_MANAGER_PASSWORD = "tomcat_manager_password";
 	public static final String PROP_MYSQL_USERNAME = "mysql_username";
 	public static final String PROP_MYSQL_PASSWORD = "mysql_password";
 	public static final String PROP_MYSQL_DB_NAME = "mysql_db_name";
 	public static final String PROP_WEBAPP_DIRECTORY = "vivo_webapp_directory";
 
-	private final String tomcatStartCommand;
-	private final int tomcatStartDelay;
-	private final String tomcatStopCommand;
-	private final int tomcatStopDelay;
+	private final String vivoWebappName;
+	private final String tomcatManagerUsername;
+	private final String tomcatManagerPassword;
 	private final String mysqlUsername;
 	private final String mysqlPassword;
 	private final String mysqlDbName;
@@ -33,37 +31,17 @@ public class ModelCleanerProperties {
 	 * reasonable.
 	 */
 	public ModelCleanerProperties(Properties props) {
-		this.tomcatStartCommand = getRequiredProperty(props,
-				PROP_TOMCAT_START_COMMAND);
-		this.tomcatStartDelay = getRequiredIntegerProperty(props,
-				PROP_TOMCAT_START_DELAY);
-
-		this.tomcatStopCommand = getRequiredProperty(props,
-				PROP_TOMCAT_STOP_COMMAND);
-		this.tomcatStopDelay = getRequiredIntegerProperty(props,
-				PROP_TOMCAT_STOP_DELAY);
+		this.vivoWebappName = checkWebappName(props);
+		this.tomcatManagerUsername = getRequiredProperty(props,
+				PROP_TOMCAT_MANAGER_USERNAME);
+		this.tomcatManagerPassword = getRequiredProperty(props,
+				PROP_TOMCAT_MANAGER_PASSWORD);
 
 		this.mysqlUsername = getRequiredProperty(props, PROP_MYSQL_USERNAME);
 		this.mysqlPassword = getRequiredProperty(props, PROP_MYSQL_PASSWORD);
 		this.mysqlDbName = getRequiredProperty(props, PROP_MYSQL_DB_NAME);
 
 		this.webappDirectory = confirmWebappDirectory(props);
-	}
-
-	public String getTomcatStartCommand() {
-		return tomcatStartCommand;
-	}
-
-	public int getTomcatStartDelay() {
-		return tomcatStartDelay;
-	}
-
-	public String getTomcatStopCommand() {
-		return tomcatStopCommand;
-	}
-
-	public int getTomcatStopDelay() {
-		return tomcatStopDelay;
 	}
 
 	public String getMysqlUsername() {
@@ -82,6 +60,18 @@ public class ModelCleanerProperties {
 		return webappDirectory;
 	}
 
+	public String getVivoWebappName() {
+		return vivoWebappName;
+	}
+
+	public String getTomcatManagerUsername() {
+		return tomcatManagerUsername;
+	}
+
+	public String getTomcatManagerPassword() {
+		return tomcatManagerPassword;
+	}
+
 	/**
 	 * Get the value for this property. If there isn't one, or if it's empty,
 	 * complain.
@@ -95,14 +85,19 @@ public class ModelCleanerProperties {
 		return value;
 	}
 
-	private int getRequiredIntegerProperty(Properties props, String key) {
-		String value = getRequiredProperty(props, key);
-		try {
-			return Integer.parseInt(value.trim());
-		} catch (NumberFormatException e) {
-			throw new IllegalArgumentException("Property value for '" + key
-					+ "' is not a valid integer: " + value);
+	/**
+	 * The website URL must end with the webapp name.
+	 */
+	private String checkWebappName(Properties props) {
+		String websiteUrl = getRequiredProperty(props,
+				SeleniumRunnerParameters.PROP_WEBSITE_URL);
+		String webappName = getRequiredProperty(props, PROP_VIVO_WEBAPP_NAME);
+		if (!websiteUrl.endsWith(webappName)) {
+			throw new IllegalArgumentException("The " + PROP_VIVO_WEBAPP_NAME
+					+ " must be the last item in the "
+					+ SeleniumRunnerParameters.PROP_WEBSITE_URL);
 		}
+		return webappName;
 	}
 
 	/**
@@ -130,10 +125,9 @@ public class ModelCleanerProperties {
 	}
 
 	public String toString() {
-		return "\n      tomcatStartCommand: " + tomcatStartCommand
-				+ "\n      tomcatStartDelay: " + tomcatStartDelay
-				+ "\n      tomcatStopCommand: " + tomcatStopCommand
-				+ "\n      tomcatStopDelay: " + tomcatStopDelay
+		return "\n      vivoWebappName: " + vivoWebappName
+				+ "\n      tomcatManagerUsername: " + tomcatManagerUsername
+				+ "\n      tomcatManagerPassword: " + tomcatManagerPassword
 				+ "\n      mysqlUsername: " + mysqlUsername
 				+ "\n      mysqlPassword: " + mysqlPassword
 				+ "\n      mysqlDbName: " + mysqlDbName
