@@ -7,6 +7,7 @@ import javax.servlet.ServletContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Params;
 
@@ -15,6 +16,7 @@ public abstract class BaseTemplateModel {
     private static final Log log = LogFactory.getLog(BaseTemplateModel.class.getName());
     
     protected static ServletContext servletContext = null;
+    protected static VitroRequest vreq = null;
 
     // Wrap UrlBuilder method so templates can call ${item.url}
     public String getUrl(String path) {
@@ -31,28 +33,19 @@ public abstract class BaseTemplateModel {
     }
 
     public static void setServletContext(ServletContext context) {
-        BaseTemplateModel.servletContext = context;
+        servletContext = context;
+    }
+    
+    public static VitroRequest getVitroRequest() {
+        return vreq;
+    }
+
+    public static void setVitroRequest(VitroRequest vrequest) {
+        vreq = vrequest;
     }
     
     public String dump() {
         return "I'm a BaseTemplateModel object";
     }
-
-    /*
-     * public static List<?> wrapList(List<?> list, Class cl) 
-     * throw error if cl not a child of ViewObject
-     * This block of code is going to be repeated a lot:
-            List<VClassGroup> groups = // code to get the data
-            List<VClassGroupView> vcgroups = new ArrayList<VClassGroupView>(groups.size());
-            Iterator<VClassGroup> i = groups.iterator();
-            while (i.hasNext()) {
-                vcgroups.add(new VClassGroupView(i.next()));
-            }
-            body.put("classGroups", vcgroups);
-    Can we generalize it to a generic method of ViewObject - wrapList() ? 
-    static method of ViewObject
-    Params: groups, VClassGroupView (the name of the class) - but must be a child of ViewObject
-    Return: List<viewObjectType>
-     */
 
 }

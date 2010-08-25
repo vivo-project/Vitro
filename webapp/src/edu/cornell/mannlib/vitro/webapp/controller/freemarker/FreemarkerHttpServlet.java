@@ -30,6 +30,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 import edu.cornell.mannlib.vitro.webapp.web.BreadCrumbsUtil;
 import edu.cornell.mannlib.vitro.webapp.web.PortalWebUtil;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.files.Scripts;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.files.Stylesheets;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu.TabMenu;
@@ -57,7 +58,10 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         
     	try {
 	        VitroRequest vreq = new VitroRequest(request);
+	        BaseTemplateModel.setVitroRequest(vreq);
+	        
 	        Configuration config = getConfig(vreq);
+	        vreq.setAttribute("freemarkerConfig", config);
 	        
 	        // We can't use shared variables in the Freemarker configuration to store anything 
 	        // except theme-specific data, because multiple portals or apps might share the same theme. So instead
@@ -127,7 +131,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
             config.setTemplateUpdateDelay(60); // in seconds; Freemarker default is 5
         }
 
-        // Specify how templates will see the data-model. 
+        // Specify how templates will see the data model. 
         // The default wrapper exposes set methods unless exposure level is set.
         // By default we want to block exposure of set methods. 
         BeansWrapper wrapper = new DefaultObjectWrapper();

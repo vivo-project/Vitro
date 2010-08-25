@@ -2,7 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.web;
 
-import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -14,7 +14,10 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
+import freemarker.cache.TemplateLoader;
+import freemarker.template.Configuration;
 
 /**
  * Class to find custom class views for individuals
@@ -23,23 +26,22 @@ import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
  */
 public class ViewFinder {
     
-    private static final Log log = LogFactory.getLog(ViewFinder.class.getName());
+    private static final Log log = LogFactory.getLog(ViewFinder.class);
     
     public enum ClassView { 
-        DISPLAY("getCustomDisplayView", "/view-display"),
-        // NB this is not the value currently used for custom forms - we use the value on the object property
-        FORM("getCustomEntryForm", "/form"), 
-        SEARCH("getCustomSearchView", "/view-search"),
-        SHORT("getCustomShortView", "/view-short"); 
-        
-        private static String TEMPLATE_PATH = "/templates/freemarker";
+        DISPLAY("getCustomDisplayView", "view-display-default.ftl"),
+        // NB this is not the value currently used for custom forms - we use the value on the object property.
+        // This value is specifiable from the backend editor, however.
+        FORM("getCustomEntryForm", "form-default.ftl"), 
+        SEARCH("getCustomSearchView", "view-search-default.ftl"),
+        SHORT("getCustomShortView", "view-short-default.ftl"); 
         
         private Method method = null;
-        private String path = null;
+        private String defaultTemplate = null;
         
-        ClassView(String methodName, String path) {
+        ClassView(String methodName, String defaultTemplate) {
             Class<VClass> vc = VClass.class;
-            this.path = path;
+            this.defaultTemplate = defaultTemplate;
             try {
                 method = vc.getMethod(methodName);
             } catch (SecurityException e) {
@@ -53,9 +55,9 @@ public class ViewFinder {
             return method;
         }
         
-        protected String getPath() {
-            return TEMPLATE_PATH + path;
-        }
+        protected String getDefaultTemplate() {
+            return defaultTemplate;
+        }        
 
     }
     
@@ -65,10 +67,11 @@ public class ViewFinder {
         this.view = view;
     }
     
-    public String findClassView(Individual individual, ServletContext context) {
-        String viewName = "default.ftl"; 
-        List<VClass> vclasses = individual.getVClasses();
+    public String findClassView(Individual individual, ServletContext context, VitroRequest vreq) {
+        String templateName = view.getDefaultTemplate();
         Method method = view.getMethod();
+        TemplateLoader templateLoader = ((Configuration) vreq.getAttribute("freemarkerConfig")).getTemplateLoader();
+
         /* RY The logic here is incorrect. The vclasses are
          * returned in a random order, whereas we need to
          * traverse the class hierarchy and find the most
@@ -87,27 +90,56 @@ public class ViewFinder {
          * RY 7/19/10 Use distinction between asserted and inferred vclasses
          * as a starting point: see MiscWebUtils.getCustomShortView().
          */
+        List<VClass> vclasses = individual.getVClasses();
+        String customTemplate = null;
         for (VClass vc : vclasses) {
-            try {
-                String v = (String) method.invoke(vc);
-                if (!StringUtils.isEmpty(v)) {
-                    String pathToView = context.getRealPath(view.getPath() + "-" + v);
-                    File viewFile = new File(pathToView);
-                    if (viewFile.isFile() && viewFile.canRead()) {
-                        viewName = v;
-                        break;
-                    }
-                }
-            } catch (IllegalArgumentException e) {
-                log.error("Incorrect arguments passed to method " + method.getName() + " in findView().");
-            } catch (IllegalAccessException e) {
-                log.error("Method " + method.getName() + " cannot be accessed in findView().");
-            } catch (InvocationTargetException e) {
-                log.error("Exception thrown by method " + method.getName() + " in findView().");
+            customTemplate = findCustomTemplateForVClass(vc, method, templateLoader);
+            if (customTemplate != null) {
+                templateName = customTemplate;
+                break;
             }
-
         }
-        return viewName;
+        log.debug("Using template " + templateName + " for individual " + individual.getName());
+        return templateName;
+    }
+    
+    private String findCustomTemplateForVClass(VClass vclass, Method method, TemplateLoader templateLoader) {
+        String customTemplate = null;
+        String vClassCustomTemplate = null;
+        
+        try {
+            vClassCustomTemplate = (String) method.invoke(vclass);
+        } catch (IllegalArgumentException e) {
+            log.error("Incorrect arguments passed to method " + method.getName() + " in findCustomTemplateForVClass().");
+        } catch (IllegalAccessException e) {
+            log.error("Method " + method.getName() + " cannot be accessed in findCustomTemplateForVClass().");
+        } catch (InvocationTargetException e) {
+            log.error("Exception thrown by method " + method.getName() + " in findCustomTemplateForVClass().");
+        }
+        
+        if (!StringUtils.isEmpty(vClassCustomTemplate)) {
+            log.debug("Custom template " + vClassCustomTemplate + " defined for class " + vclass.getName());
+            try {
+                // Make sure the template exists
+                if (templateLoader.findTemplateSource(vClassCustomTemplate) != null) {
+                    log.debug("Found defined custom template " + vClassCustomTemplate + " for class " + vclass.getName());
+                    customTemplate = vClassCustomTemplate;
+                } else {
+                    log.warn("Custom template " + vClassCustomTemplate + " for class " + vclass.getName() + " defined but does not exist.");
+                }
+            } catch (IOException e) {
+                log.error("IOException looking for source for template " + vClassCustomTemplate);
+            }                   
+        }
+        
+        if (log.isDebugEnabled()) {
+            if (customTemplate != null) {
+                log.debug("Using custom template " + customTemplate + " for class " + vclass.getName());
+            } else {
+                log.debug("No custom template found for class " + vclass.getName());
+            }
+        }
+        return customTemplate;
     }
 
 }
