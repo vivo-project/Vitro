@@ -58,7 +58,7 @@ public class IndividualTemplateModel extends BaseTemplateModel {
     
     private String getView(ClassView view) {
         ViewFinder vf = new ViewFinder(view);
-        return vf.findClassView(individual, servletContext, vreq);
+        return vf.findClassView(individual, vreq);
     }
     
     public Link getPrimaryLink() {

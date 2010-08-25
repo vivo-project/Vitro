@@ -5,7 +5,9 @@ package edu.cornell.mannlib.vitro.webapp.web;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.ServletContext;
 
@@ -15,6 +17,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 import freemarker.cache.TemplateLoader;
 import freemarker.template.Configuration;
@@ -67,8 +70,18 @@ public class ViewFinder {
         this.view = view;
     }
     
-    public String findClassView(Individual individual, ServletContext context, VitroRequest vreq) {
+    public String findClassView(Individual individual, VitroRequest vreq) {
         String templateName = view.getDefaultTemplate();
+        String customTemplate = findCustomTemplateByVClasses(individual, vreq);
+        if (customTemplate != null) {
+            templateName = customTemplate;
+        }
+        log.debug("Using template " + templateName + " for individual " + individual.getName());
+        return templateName;
+    }
+    
+    private String findCustomTemplateByVClasses(Individual individual, VitroRequest vreq) {
+        
         Method method = view.getMethod();
         TemplateLoader templateLoader = ((Configuration) vreq.getAttribute("freemarkerConfig")).getTemplateLoader();
 
@@ -87,20 +100,43 @@ public class ViewFinder {
          * #hasPrincipalInvestigatorRole, the object should be displayed
          * as a PrincipalInvestigatorRole object rather than some other type.
          * 
-         * RY 7/19/10 Use distinction between asserted and inferred vclasses
-         * as a starting point: see MiscWebUtils.getCustomShortView().
+         * For now, iterate first through asserted classes, and if no custom view
+         * found there, iterate through inferred classes. Modeled on MiscWebUtils.getCustomShortView().
          */
-        List<VClass> vclasses = individual.getVClasses();
         String customTemplate = null;
-        for (VClass vc : vclasses) {
+        VClassDao vcDao = vreq.getWebappDaoFactory().getVClassDao();
+        List<VClass> vclasses = individual.getVClasses(true); // get directly asserted vclasses
+        Set<String> superClasses = new HashSet<String>();
+
+        // First try directly asserted classes. There is no useful decision
+        // mechanism for the case where two directly asserted classes
+        // define a custom template.
+        // RY If we're getting the custom short view with reference to an object property.
+        // should we use the property's getRangeVClass() method instead?
+        for (VClass vclass : vclasses) {
+            // Use this class's custom template, if there is one
+            customTemplate = findCustomTemplateForVClass(vclass, method, templateLoader);
+            if (customTemplate != null) {
+               return customTemplate;
+            }
+            // Otherwise, add superclass to list of vclasses to check for custom
+            // templates.
+            String vclassUri = vclass.getURI();
+            superClasses.addAll(vcDao.getAllSuperClassURIs(vclassUri));
+        }
+        
+        // Next try superclasses. There is no useful decision mechanism for
+        // the case where two superclasses have a custom template defined.
+        for (String superClassUri : superClasses) {
+            VClass vc = vcDao.getVClassByURI(superClassUri);
             customTemplate = findCustomTemplateForVClass(vc, method, templateLoader);
             if (customTemplate != null) {
-                templateName = customTemplate;
-                break;
+                return customTemplate;
             }
         }
-        log.debug("Using template " + templateName + " for individual " + individual.getName());
-        return templateName;
+
+        return null;
+        
     }
     
     private String findCustomTemplateForVClass(VClass vclass, Method method, TemplateLoader templateLoader) {
