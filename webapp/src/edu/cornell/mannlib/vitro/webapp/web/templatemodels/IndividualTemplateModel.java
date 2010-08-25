@@ -7,11 +7,13 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openrdf.model.URI;
+import org.openrdf.model.impl.URIImpl;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Link;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Params;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
-import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 import edu.cornell.mannlib.vitro.webapp.web.ViewFinder;
 import edu.cornell.mannlib.vitro.webapp.web.ViewFinder.ClassView;
 
@@ -39,9 +41,22 @@ public class IndividualTemplateModel extends BaseTemplateModel {
     // There may be other urls associated with the individual. E.g., we might need 
     // getEditUrl(), getDeleteUrl() to return the links computed by PropertyEditLinks.
     // RY **** Need to account for everything in URLRewritingHttpServlet
-    // Currently this is incorrect for individuals that are not in the default namespace (e.g., geographic individuals).
     public String getProfileUrl() {
-        return getUrl(PATH + "/" + individual.getLocalName());
+        String profileUrl = null;
+        String individualUri = individual.getURI();
+        
+        URI uri = new URIImpl(individualUri);
+        String namespace = uri.getNamespace();
+        String defaultNamespace = vreq.getWebappDaoFactory().getDefaultNamespace();
+        
+        if (defaultNamespace.equals(namespace)) {
+            profileUrl = getUrl(PATH + "/" + individual.getLocalName());
+        } else {
+            Params params = new Params("uri", individualUri);
+            profileUrl = getUrl("/individual", params);
+        }
+        
+        return profileUrl;
     }
         
     public String getSearchView() {        
