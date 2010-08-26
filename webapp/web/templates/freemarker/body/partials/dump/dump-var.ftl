@@ -5,8 +5,12 @@
 <div class="var"> 
 
     <h6>Variable name: <em>${var}</em></h6>
-    <strong>Type:</strong> ${type}<br />
-    <strong>Value:</strong> ${value}<br />
+    <#if value??>
+        <strong>Type:</strong> ${type}<br />
+        <strong>Value:</strong> ${value}<br />
+    <#else>
+        Variable is undefined in the data model
+    </#if>
     
 </div>
 
