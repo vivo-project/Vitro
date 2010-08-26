@@ -127,6 +127,10 @@ webapp/config/tlds/sparqltag.tld
 webapp/config/tlds/c.tld
 webapp/config/tlds/fn.tld
 
+# PROBLEM: appears to be a modified version of some Sun code, which means that we need to
+#     distribute the original source as well as the modified source (plus the license, of course)
+webapp/config/tlds/database.tld
+
 # PROBLEM: requires an accompanying copy of the Apache license 1.1, as spelled out
 #     in the distribution from http://jakarta.apache.org/site/downloads/downloads_taglibs-mailer.cgi
 webapp/config/tlds/taglibs-mailer.tld
