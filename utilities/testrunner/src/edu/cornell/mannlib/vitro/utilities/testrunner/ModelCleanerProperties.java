@@ -92,7 +92,8 @@ public class ModelCleanerProperties {
 		String websiteUrl = getRequiredProperty(props,
 				SeleniumRunnerParameters.PROP_WEBSITE_URL);
 		String webappName = getRequiredProperty(props, PROP_VIVO_WEBAPP_NAME);
-		if (!websiteUrl.endsWith(webappName)) {
+		if ((!websiteUrl.endsWith(webappName))
+				&& (!websiteUrl.endsWith(webappName + "/"))) {
 			throw new IllegalArgumentException("The " + PROP_VIVO_WEBAPP_NAME
 					+ " must be the last item in the "
 					+ SeleniumRunnerParameters.PROP_WEBSITE_URL);

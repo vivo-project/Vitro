@@ -44,7 +44,8 @@ public class TomcatController {
 
 	private String figureBaseUrl() {
 		String url = parms.getWebsiteUrl();
-		return url.substring(0, url.length() - webappName.length());
+		int end = url.lastIndexOf(webappName);
+		return url.substring(0, end);
 	}
 
 	/**
