@@ -77,3 +77,30 @@ table.tallys td.total {
 	margin: 15px 0px 0px 0px;
 	border: 1px solid black;
 }
+
+table.condensed td {
+	border: 1px solid grey;
+	padding: 10px 5px 10px 5px;
+}
+
+table.condensed div.suite {
+	font-size: 85%;
+	font-weight: bold;
+	padding: 3px 3px 3px 3px;
+}
+
+table.condensed div.reason {
+	font-size: 70%;
+	font-style: italic;
+	padding: 3px 3px 3px 30px;
+}
+
+table.condensed div.test {
+	font-size: 70%;
+	padding: 3px 3px 3px 15px;
+}
+
+table.condensed div.test div.tReason{
+	font-style: italic;
+	padding: 3px 3px 3px 10px;
+}

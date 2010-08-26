@@ -59,10 +59,8 @@ public class OutputSummaryFormatter {
 			writeHeader(writer);
 			writeStatsSection(writer);
 			writeErrorMessagesSection(writer);
-			writeFailureSection(writer);
+			writeCondensedTable(writer);
 			writeIgnoreSection(writer);
-			writeSuitesSection(writer);
-			writeAllTestsSection(writer);
 			writeSuiteErrorMessagesSection(writer);
 			writeFooter(writer);
 		} catch (IOException e) {
@@ -190,102 +188,47 @@ public class OutputSummaryFormatter {
 		w.println();
 	}
 
-	private void writeFailureSection(PrintWriter w) {
-		String errorClass = Status.ERROR.getHtmlClass();
-		Collection<TestData> failingTests = dataModel.getFailingTests();
-
-		w.println("  <div class=section>Failures</div>");
+	private void writeCondensedTable(PrintWriter w) {
+		w.println("  <div class=section>Condensed List</div>");
 		w.println();
-		w.println("  <table cellspacing=\"0\">");
-		w.println("    <tr><th>Suite name</th><th>Test name</th></tr>\n");
-		if (failingTests.isEmpty()) {
-			w.println("    <tr><td colspan=\"2\">No tests failed.</td>"
-					+ "</tr>");
-		} else {
-			Map<String, SuiteData> failedSuiteMap = dataModel
-					.getSuitesWithFailureMessages();
-			for (SuiteData s : failedSuiteMap.values()) {
-				w.println("    <tr class=\"" + errorClass + "\">");
-				w.println("      <td>" + s.getName() + "</td>");
-				w.println("      <td>" + outputLink(s) + "</td>");
-				w.println("    </tr>");
+		w.println("  <table class=\"condensed\" cellspacing=\"0\">");
+		for (SuiteData s : dataModel.getAllSuites()) {
+			String sReason = "";
+			if (s.getStatus() == Status.IGNORED) {
+				sReason = dataModel.getReasonForIgnoring(s.getName(), "*");
+			} else if (s.getFailureMessages() != null) {
+				sReason = s.getFailureMessages().getErrout();
+			} else if (s.getStatus() == Status.PENDING) {
+				sReason = Status.PENDING.toString();
 			}
-			for (TestData t : failingTests) {
-				if (!failedSuiteMap.containsKey(t.getSuiteName())) {
-					w.println("    <tr class=\"" + errorClass + "\">");
-					w.println("      <td>" + t.getSuiteName() + "</td>");
-					w.println("      <td>" + outputLink(t) + "</td>");
-					w.println("    </tr>");
+
+			w.println("    <tr>");
+			w.println("      <td class=\"" + s.getStatus().getHtmlClass()
+					+ "\">");
+			w.println("        <div class=\"suite\">" + outputLink(s)
+					+ "</div>");
+			if (!sReason.isEmpty()) {
+				// The entire class is either failed or pending or ignored.
+				w.println("        <div class=\"reason\">" + sReason + "</div>");
+			} else {
+				// Show the individual tests.
+				for (TestData t : s.getTestMap().values()) {
+					String tClass = t.getStatus().getHtmlClass();
+					String tReason = dataModel.getReasonForIgnoring(
+							s.getName(), t.getTestName());
+
+					w.println("        <div class=\"test " + tClass + "\">");
+					w.println("          " + outputLink(t));
+					if (!tReason.isEmpty()) {
+						w.println("          <div class=\"tReason\">" + tReason
+								+ "</div>");
+					}
+					w.println("        </div>");
 				}
 			}
-		}
-		w.println("  </table>");
-		w.println();
-	}
-
-	private void writeIgnoreSection(PrintWriter w) {
-		String warnClass = Status.IGNORED.getHtmlClass();
-		Collection<IgnoredTestInfo> ignoredTests = dataModel
-				.getIgnoredTestInfo();
-
-		w.println("  <div class=section>Ignored</div>");
-		w.println();
-		w.println("  <table cellspacing=\"0\">");
-		w.println("    <tr><th>Suite name</th><th>Test name</th>"
-				+ "<th>Reason for ignoring</th></tr>\n");
-		if (ignoredTests.isEmpty()) {
-			w.println("    <tr><td colspan=\"3\">No tests ignored.</td>"
-					+ "</tr>");
-		} else {
-			for (IgnoredTestInfo info : ignoredTests) {
-				String suiteName = info.suiteName;
-				String testName = info.testName;
-				String reason = dataModel.getReasonForIgnoring(suiteName,
-						testName);
-
-				w.println("    <tr class=\"" + warnClass + "\">");
-				w.println("      <td>" + suiteName + "</td>");
-				w.println("      <td>" + testName + "</td>");
-				w.println("      <td>" + reason + "</td>");
-				w.println("    </tr>");
-			}
-		}
-		w.println("  </table>");
-		w.println();
-	}
-
-	private void writeSuitesSection(PrintWriter w) {
-		w.println("  <div class=section>Suites Summary</div>");
-		w.println();
-		w.println("  <table cellspacing=\"0\">");
-
-		for (SuiteData s : dataModel.getAllSuites()) {
-			w.println("    <tr class=\"" + s.getStatus().getHtmlClass() + "\">");
-			w.println("      <td>" + outputLink(s) + "</td>");
-			w.println("      <td>" + s.getStatus() + "</td>");
+			w.println("      </td>");
 			w.println("    </tr>");
 		}
-
-		w.println("  </table>");
-		w.println();
-	}
-
-	private void writeAllTestsSection(PrintWriter w) {
-		Collection<TestData> allTests = dataModel.getAllTests();
-
-		w.println("  <div class=section>All tests</div>");
-		w.println();
-		w.println("  <table cellspacing=\"0\">");
-
-		w.println("    <tr><th>Suite name</th><th>Test name</th><th>&nbsp;</th></tr>\n");
-		for (TestData t : allTests) {
-			w.println("    <tr class=\"" + t.getStatus().getHtmlClass() + "\">");
-			w.println("      <td>" + t.getSuiteName() + "</td>");
-			w.println("      <td>" + outputLink(t) + "</td>");
-			w.println("      <td>" + t.getStatus() + "</td>");
-			w.println("    </tr>");
-		}
-
 		w.println("  </table>");
 		w.println();
 	}
@@ -319,6 +262,37 @@ public class OutputSummaryFormatter {
 			w.println("<br/>&nbsp;<br/>");
 			w.println();
 		}
+	}
+
+	private void writeIgnoreSection(PrintWriter w) {
+		String warnClass = Status.IGNORED.getHtmlClass();
+		Collection<IgnoredTestInfo> ignoredTests = dataModel
+				.getIgnoredTestInfo();
+
+		w.println("  <div class=section>Ignored</div>");
+		w.println();
+		w.println("  <table cellspacing=\"0\">");
+		w.println("    <tr><th>Suite name</th><th>Test name</th>"
+				+ "<th>Reason for ignoring</th></tr>\n");
+		if (ignoredTests.isEmpty()) {
+			w.println("    <tr><td colspan=\"3\">No tests ignored.</td>"
+					+ "</tr>");
+		} else {
+			for (IgnoredTestInfo info : ignoredTests) {
+				String suiteName = info.suiteName;
+				String testName = info.testName;
+				String reason = dataModel.getReasonForIgnoring(suiteName,
+						testName);
+
+				w.println("    <tr class=\"" + warnClass + "\">");
+				w.println("      <td>" + suiteName + "</td>");
+				w.println("      <td>" + testName + "</td>");
+				w.println("      <td>" + reason + "</td>");
+				w.println("    </tr>");
+			}
+		}
+		w.println("  </table>");
+		w.println();
 	}
 
 	private void writeFooter(PrintWriter w) {
