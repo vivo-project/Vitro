@@ -2,14 +2,9 @@
 
 <#-- Default individual search view -->
 
-<#import "listMacros.ftl" as l>
-
 <a href="${individual.profileUrl}">${individual.name}</a>
-<ul class="individualData">
-    <@l.firstLastList>
-        <#if individual.moniker??><li>${individual.moniker}</li>,</#if>
-        <#list individual.links as link>
-            <li><a class="externalLink" href="${link.url}">${link.anchor}</a></li>,            
-        </#list>
-    </@l.firstLastList>
-</ul>
+<#if individual.moniker?has_content> | ${individual.moniker}</#if>
+
+<#if individual.description?has_content>
+    <div class="searchFragment">${individual.description}</div>
+</#if>

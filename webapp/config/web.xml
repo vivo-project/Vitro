@@ -843,7 +843,7 @@
   
   <servlet>
     <servlet-name>SearchController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.search.controller.PagedSearchController</servlet-class>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.search.controller.FreemarkerPagedSearchController</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>SearchController</servlet-name>
@@ -875,7 +875,16 @@
     <servlet-name>AutocompleteController</servlet-name>
     <url-pattern>/populateselect</url-pattern>
   </servlet-mapping>
-  
+
+  <servlet>
+    <servlet-name>ReorderController</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.ReorderController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ReorderController</servlet-name>
+    <url-pattern>/edit/reorder</url-pattern>
+  </servlet-mapping>
+    
   <servlet>
     <servlet-name>AdminController</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.AdminController</servlet-class>

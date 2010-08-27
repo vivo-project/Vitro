@@ -89,7 +89,7 @@ public class IndexController extends FreemarkerHttpServlet {
             ! "authenticated".equalsIgnoreCase(loginHandler.getLoginStatus()) ||
              Integer.parseInt(loginHandler.getLoginRole()) <= 5 ){       
             
-            body.put("message","You must login to rebuild the search index."); 
+            body.put("message","You must log in to rebuild the search index."); 
             return mergeBodyToTemplate("message.ftl", body, config);
         }
         
@@ -108,7 +108,7 @@ public class IndexController extends FreemarkerHttpServlet {
         	return mergeBodyToTemplate("errorMessage.ftl", body, config);            
         }
         
-         body.put("message","Rebuilding of index started."); 
+        body.put("message","Rebuilding of index started."); 
         return mergeBodyToTemplate("message.ftl", body, config);
     }
 }

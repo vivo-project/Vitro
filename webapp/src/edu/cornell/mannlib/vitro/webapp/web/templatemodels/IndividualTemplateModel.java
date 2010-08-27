@@ -19,7 +19,7 @@ import edu.cornell.mannlib.vitro.webapp.web.ViewFinder.ClassView;
 
 public class IndividualTemplateModel extends BaseTemplateModel {
     
-    private static final Log log = LogFactory.getLog(IndividualTemplateModel.class.getName());
+    private static final Log log = LogFactory.getLog(IndividualTemplateModel.class);
     
     private static final String PATH = Route.INDIVIDUAL.path();
     

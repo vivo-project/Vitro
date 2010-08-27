@@ -251,6 +251,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         urls.put("siteAdmin", urlBuilder.getPortalUrl(Route.LOGIN));  
 
         urls.put("siteIcons", urlBuilder.getPortalUrl(themeDir + "/site_icons"));
+
         return urls;
     }
     

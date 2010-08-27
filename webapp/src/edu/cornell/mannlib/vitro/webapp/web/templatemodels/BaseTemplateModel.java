@@ -2,6 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.ServletContext;
 
 import org.apache.commons.logging.Log;
@@ -13,7 +16,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Params;
 
 public abstract class BaseTemplateModel {
 
-    private static final Log log = LogFactory.getLog(BaseTemplateModel.class.getName());
+    private static final Log log = LogFactory.getLog(BaseTemplateModel.class);
     
     protected static ServletContext servletContext = null;
     protected static VitroRequest vreq = null;
@@ -23,8 +26,13 @@ public abstract class BaseTemplateModel {
         return UrlBuilder.getUrl(path);
     }
 
-    // Wrap UrlBuilder method so templates can call ${item.url}
-    public String getUrl(String path, Params params) {
+    // Convenience method so subclasses can call getUrl(path, params)
+    protected String getUrl(String path, Params params) {
+        return UrlBuilder.getUrl(path, params);
+    }
+    
+    // Convenience method so subclasses can call getUrl(path, params)
+    protected String getUrl(String path, String... params) {
         return UrlBuilder.getUrl(path, params);
     }
 

@@ -6,6 +6,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -143,14 +144,19 @@ public class UrlBuilder {
         public Params() { }
         
         public Params(String...strings) {
-            this();
             int stringCount = strings.length;
             for (int i = 0; i < stringCount; i=i+2) {
                 // Skip the last item if there's an odd number
                 if (i == stringCount-1) { break; }
+                // Skip a param with a null value
+                if (strings[i+1] == null) { continue; }
                 this.put(strings[i], strings[i+1]);
             }
-        }       
+        } 
+        
+        public Params(Map<String, String> map) {
+            this.putAll(map);
+        }
     }
     
     /********** Static utility methods **********/
@@ -162,6 +168,11 @@ public class UrlBuilder {
         }
         path = contextPath + path;
         return path.isEmpty() ? "/" : path;
+    }
+    
+    public static String getUrl(String path, String...params) {
+        Params urlParams = new Params(params);
+        return getUrl(path, urlParams);
     }
     
     public static String getUrl(String path, Params params) {

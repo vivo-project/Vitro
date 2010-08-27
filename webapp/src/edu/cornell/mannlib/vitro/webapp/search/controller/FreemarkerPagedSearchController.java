@@ -3,16 +3,17 @@
 package edu.cornell.mannlib.vitro.webapp.search.controller;
 
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.RequestDispatcher;
@@ -50,8 +51,9 @@ import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
-import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Params;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
@@ -70,17 +72,25 @@ import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.SimpleLuceneHighlighter;
 import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.Html2Text;
+import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.IndividualTemplateModel;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.LinkTemplateModel;
+import freemarker.template.Configuration;
 
 /**
  * PagedSearchController is the new search controller that interacts 
  * directly with the lucene API and returns paged, relevance ranked results.
  *  
  * @author bdc34
+ * 
+ * Rewritten to use Freemarker: rjy7
  *
  */
-public class PagedSearchController extends VitroHttpServlet implements Searcher{
+public class FreemarkerPagedSearchController extends FreemarkerHttpServlet implements Searcher {
+
+    private static final long serialVersionUID = 1L;
     private IndexSearcher searcher = null;
-    private static final Log log = LogFactory.getLog(PagedSearchController.class.getName());
+    private static final Log log = LogFactory.getLog(FreemarkerPagedSearchController.class.getName());
     String NORESULT_MSG = "The search returned no results.";    
     private int defaultHitsPerPage = 25;
     private int defaultMaxSearchSize= 1000;   
@@ -99,16 +109,9 @@ public class PagedSearchController extends VitroHttpServlet implements Searcher{
         }                                           
     }
 
-    public void doPost(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-        doGet(request, response);
-    }
-
-    public void doGet(HttpServletRequest request, HttpServletResponse response)
-    throws IOException, ServletException {
+    protected String getBody(VitroRequest vreq, Map<String, Object> body, Configuration config) {  
         try {
-            super.doGet(request,response);
-            VitroRequest vreq = new VitroRequest(request);
+
             Portal portal = vreq.getPortal();
             PortalFlag portalFlag = vreq.getPortalFlag();
             
@@ -116,8 +119,8 @@ public class PagedSearchController extends VitroHttpServlet implements Searcher{
             if( vreq.getWebappDaoFactory() == null 
                     || vreq.getWebappDaoFactory().getIndividualDao() == null ){
                 log.error("makeUsableBeans() could not get IndividualDao ");
-                doSearchError(request, response, "Could not access Model", portalFlag);
-                return;
+                //doSearchError(request, response, "Could not access Model", portalFlag);
+                //return;
             }
             IndividualDao iDao = vreq.getWebappDaoFactory().getIndividualDao();
             VClassGroupDao grpDao = vreq.getWebappDaoFactory().getVClassGroupDao();
@@ -126,14 +129,14 @@ public class PagedSearchController extends VitroHttpServlet implements Searcher{
             
             int startIndex = 0;
             try{ 
-                startIndex = Integer.parseInt(request.getParameter("startIndex")); 
+                startIndex = Integer.parseInt(vreq.getParameter("startIndex")); 
             }catch (Throwable e) { 
                 startIndex = 0; 
             }            
             
             int hitsPerPage = defaultHitsPerPage;
             try{ 
-                hitsPerPage = Integer.parseInt(request.getParameter("hitsPerPage")); 
+                hitsPerPage = Integer.parseInt(vreq.getParameter("hitsPerPage")); 
             } catch (Throwable e) { 
                 hitsPerPage = defaultHitsPerPage; 
             }                        
@@ -154,8 +157,8 @@ public class PagedSearchController extends VitroHttpServlet implements Searcher{
             log.debug("query for '" + qtxt +"' is " + query.toString());
             
             if (query == null ) {
-                doNoQuery(request, response);
-                return;
+                //doNoQuery(vreq, response);
+                //return;
             }
             
             IndexSearcher searcherForRequest = getIndexSearcher(indexDir);
@@ -173,31 +176,32 @@ public class PagedSearchController extends VitroHttpServlet implements Searcher{
                     log.error(ex);
                     String msg = makeBadSearchMessage(qtxt,ex.getMessage());
                     if(msg == null ) msg = "<p>The search request contained errors.</p>";
-                    doFailedSearch(request, response, msg, qtxt);
-                    return;
+                    //doFailedSearch(vreq, response, msg, qtxt);
+                    //return;
                 }
             }
 
             if( topDocs == null || topDocs.scoreDocs == null){
                 log.error("topDocs for a search was null");                
                 String msg = "<p>The search request contained errors.</p>";
-                doFailedSearch(request, response, msg, qtxt);
-                return;
+                //doFailedSearch(request, response, msg, qtxt);
+                //return;
             }
             
             int hitsLength = topDocs.scoreDocs.length;
             if ( hitsLength < 1 ){                
-                doFailedSearch(request, response, NORESULT_MSG, qtxt);
-                return;
+                //doFailedSearch(request, response, NORESULT_MSG, qtxt);
+                //return;
             }            
             log.debug("found "+hitsLength+" hits");
 
             int lastHitToShow = 0;
-            if((startIndex + hitsPerPage) > hitsLength )
+            if((startIndex + hitsPerPage) > hitsLength ) {
                 lastHitToShow = hitsLength;
-            else
+            } else {
                 lastHitToShow = startIndex + hitsPerPage - 1;
-                    
+            }
+            
             List<Individual> beans = new LinkedList<Individual>();                        
             for(int i=startIndex; i<topDocs.scoreDocs.length ;i++){
                 try{
@@ -215,73 +219,78 @@ public class PagedSearchController extends VitroHttpServlet implements Searcher{
                             "hits" + e.getMessage());
                 }
             }            
-            
-            //search request for no classgroup and no type so add classgroup search refinement links.
-            if( request.getParameter("classgroup") == null && request.getParameter("type") == null){            
-                request.setAttribute("classgroups",
-                        getClassGroups(grpDao, topDocs, searcherForRequest));
-                request.setAttribute("refinement", "");
-            }else{
-                
-                //search request for a classgroup so add rdf:type search refinement links
-                //but try to filter out classes that are subclasses
-                if( request.getParameter("classgroup") != null && request.getParameter("type") == null ){  
-                    request.setAttribute("types", 
-                            getVClasses(vclassDao,topDocs,searcherForRequest));
-                    request.setAttribute("refinement", "&classgroup=" 
-                            + URLEncoder.encode(request.getParameter("classgroup"),"UTF-8"));
-                }else{                    
-                    if( alphaFilter != null && !"".equals(alphaFilter)){
-                        request.setAttribute("alphas", getAlphas(topDocs, searcherForRequest));
-                        alphaSortIndividuals(beans);
-                    }else{                     
-                        request.setAttribute("refinement", "&type=" 
-                                + URLEncoder.encode(request.getParameter("type"),"UTF-8"));
-                    }
-                }
-            }            
-                                   
-            beans = highlightBeans( beans , 
-                    vreq.getWebappDaoFactory().getDataPropertyDao(),
-                    vreq.getWebappDaoFactory().getObjectPropertyDao(),
-                    new SimpleLuceneHighlighter(query,analyzer) );            
+  
+            Params pagingLinkParams = new Params();
+            pagingLinkParams.put("querytext", qtxt);
 
-            //stick the results in the requestScope and prepare to forward to JSP
-            request.setAttribute("beans", beans);            
+            String classGroupParam = vreq.getParameter("classgroup");
+            String typeParam = vreq.getParameter("type");
             
-            request.setAttribute("title", qtxt+" - "+portal.getAppName()+" Search Results" );
-            request.setAttribute("bodyJsp", Controllers.SEARCH_PAGED_JSP);            
-            request.setAttribute("querytext", qtxt);            
-            request.setAttribute("startIndex", startIndex);
-            request.setAttribute("hitsPerPage", hitsPerPage);
-            request.setAttribute("hitsLength", hitsLength);
-            request.setAttribute("maxHitSize", maxHitSize);
-            String param = request.getParameter("classgroup");
-            if(param != null && !"".equals(param)){
-                VClassGroup grp = grpDao.getGroupByURI(param);
+            // Search request includes no classgroup and no type, so add classgroup search refinement links.
+            if ( classGroupParam == null && typeParam == null) { 
+                List<VClassGroup> classgroups = getClassGroups(grpDao, topDocs, searcherForRequest);
+                List<VClassGroupSearchLink> classGroupLinks = new ArrayList<VClassGroupSearchLink>(classgroups.size());
+                for (VClassGroup vcg : classgroups) {
+                    classGroupLinks.add(new VClassGroupSearchLink(qtxt, vcg));
+                }
+                body.put("classGroupLinks", classGroupLinks);                       
+ 
+            // Search request is for a classgroup, so add rdf:type search refinement links
+            // but try to filter out classes that are subclasses
+            } else if ( classGroupParam != null && typeParam == null ) {  
+                List<VClass> vClasses = getVClasses(vclassDao,topDocs,searcherForRequest);
+                List<VClassSearchLink> vClassLinks = new ArrayList<VClassSearchLink>(vClasses.size());
+                for (VClass vc : vClasses) {
+                    vClassLinks.add(new VClassSearchLink(qtxt, vc));
+                }
+                body.put("classLinks", vClassLinks);                       
+                pagingLinkParams.put("classgroup", classGroupParam);
+                
+            // This case is never displayed
+            } else if ( !StringUtils.isEmpty(alphaFilter) ) {                    
+                body.put("alphas", getAlphas(topDocs, searcherForRequest));
+                alphaSortIndividuals(beans);
+                
+            } else {
+                pagingLinkParams.put("type", typeParam);
+            }   
+            
+          beans = highlightBeans( beans , 
+              vreq.getWebappDaoFactory().getDataPropertyDao(),
+              vreq.getWebappDaoFactory().getObjectPropertyDao(),
+              new SimpleLuceneHighlighter(query,analyzer) );            
+
+            // Convert search result individuals to template model objects
+            List<IndividualTemplateModel> individuals = new ArrayList<IndividualTemplateModel>(beans.size());
+            for (Individual i : beans) {
+              individuals.add(new IndividualTemplateModel(i));
+            }
+            body.put("individuals", individuals);            
+            
+            body.put("querytext", qtxt);
+            body.put("title", qtxt+" - "+portal.getAppName()+" Search Results" );
+
+            if ( !StringUtils.isEmpty(classGroupParam) ) {
+                VClassGroup grp = grpDao.getGroupByURI(classGroupParam);
                 if( grp != null && grp.getPublicName() != null )
-                    request.setAttribute("classgroupName", grp.getPublicName());
+                    body.put("classgroupName", grp.getPublicName());
             }
-            param = request.getParameter("type");
-            if(param != null && !"".equals(param)){
-                VClass type = vclassDao.getVClassByURI(param);
+            
+            if ( !StringUtils.isEmpty(typeParam) ) {
+                VClass type = vclassDao.getVClassByURI(typeParam);
                 if( type != null && type.getName() != null )
-                    request.setAttribute("typeName", type.getName());
+                    body.put("typeName", type.getName());
             }
             
-//            VitroQueryWrapper queryWrapper =
-//                new VitroQueryWrapper(query,
-//                        (VitroHighlighter)searcher.getHighlighter(query),
-//                        2, time);
-//            request.getSession(true).setAttribute("LastQuery", queryWrapper);
-//            log.debug("query wrapper created");
-            
-            request.getRequestDispatcher(Controllers.BASIC_JSP).forward(request,response);            
+            body.put("pagingLinks", getPagingLinks(startIndex, hitsPerPage,  hitsLength,  maxHitSize, vreq.getServletPath(), pagingLinkParams));
+             
         } catch (Throwable e) {
-            log.error("SearchController.doGet(): " + e);            
-            doSearchError(request, response, e.getMessage(), null);
-            return;
+            log.error(e, e);            
+            //doSearchError(request, response, e.getMessage(), null);
+            //return;
         }
+        
+        return mergeBodyToTemplate("pagedSearchResults.ftl", body, config);
     }
 
     private void alphaSortIndividuals(List<Individual> beans) {
@@ -357,10 +366,75 @@ public class PagedSearchController extends VitroHttpServlet implements Searcher{
                 }
             }          
         }        
-        grpDao.sortGroupList(classgroups);        
+        grpDao.sortGroupList(classgroups);     
+                
         return classgroups;
     }
 
+    private class VClassGroupSearchLink extends LinkTemplateModel {
+ 
+        VClassGroupSearchLink(String querytext, VClassGroup classgroup) {
+            super(classgroup.getPublicName(), "/search", "querytext", querytext, "classgroup", classgroup.getURI());
+        }
+    }
+    
+    private class VClassSearchLink extends LinkTemplateModel {
+        
+        VClassSearchLink(String querytext, VClass type) {
+            super(type.getName(), "/search", "querytext", querytext, "type", type.getURI());
+        }
+    }
+    
+    private List<PagingLink> getPagingLinks(int startIndex, int hitsPerPage, int hitsLength, int maxHitSize, String baseUrl, Params params) {
+
+        List<PagingLink> pagingLinks = new ArrayList<PagingLink>();
+        
+        // No paging links if only one page of results
+        if (hitsLength <= hitsPerPage) {
+            return pagingLinks;
+        }
+        
+        int pageNumber;
+
+        params.put("hitsPerPage", String.valueOf(hitsPerPage));
+        
+        for (int i = 0; i < hitsLength; i += hitsPerPage) {
+            params.put("startIndex", String.valueOf(i));
+            if ( i < maxHitSize - hitsPerPage) {
+                pageNumber = i/hitsPerPage + 1;
+                if (i >= startIndex && i < (startIndex + hitsPerPage)) {
+                    pagingLinks.add(new PagingLink(pageNumber));
+                } else {
+                    pagingLinks.add(new PagingLink(pageNumber, baseUrl, params));
+                }
+            } else {
+                pagingLinks.add(new PagingLink("more...", baseUrl, params));
+            }
+        }   
+        
+        return pagingLinks;
+    }
+    
+    private class PagingLink extends LinkTemplateModel {
+        
+        PagingLink(int pageNumber, String baseUrl, Params params) {
+            super(String.valueOf(pageNumber), baseUrl, params);
+        }
+        
+        // Constructor for current page item: not a link, so no url value.
+        PagingLink(int pageNumber) {
+            setText(String.valueOf(pageNumber));
+        }
+        
+        // Constructor for "more..." item
+        PagingLink(String text, String baseUrl, Params params) {
+            super(text, baseUrl, params);
+        }
+        
+
+
+    }
+   
     private List<VClass> getVClasses(VClassDao vclassDao, TopDocs topDocs,
             IndexSearcher searherForRequest){        
         HashSet<String> typesInHits = getVClassUrisForHits(topDocs,searherForRequest);                                
@@ -633,7 +707,7 @@ public class PagedSearchController extends VitroHttpServlet implements Searcher{
                     }    
                     }catch(Throwable e){
                         log.debug("Error highlighting data property statment " +
-                        		"for individual "+ent.getURI());
+                                "for individual "+ent.getURI());
                     }
                 }
             }
@@ -654,7 +728,7 @@ public class PagedSearchController extends VitroHttpServlet implements Searcher{
                         }
                     } catch (Throwable e) {
                         log.debug("Error highlighting object property " +
-                        		"statement for individual "+ent.getURI());
+                                "statement for individual "+ent.getURI());
                     }
                 }
             }
