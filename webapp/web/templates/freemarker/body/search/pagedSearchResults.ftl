@@ -42,15 +42,15 @@
     <#if (pagingLinks?size > 0)>
         <div class="searchpages">
         Pages: 
-            <#if prevPage??><a class="pagingLink prev" href="${prevPage}">Previous</a></#if>
+            <#if prevPage??><a class="prev" href="${prevPage}">Previous</a></#if>
             <#list pagingLinks as link>
                 <#if link.url??>
-                    <a class="pagingLink" href="${link.url}">${link.text}</a>
+                    <a href="${link.url}">${link.text}</a>
                 <#else>
-                    ${link.text} <#-- no link if current page -->
+                    <span>${link.text}</span> <#-- no link if current page -->
                 </#if>
             </#list>
-            <#if nextPage??><a class="pagingLink next" href="${nextPage}">Next</a></#if>
+            <#if nextPage??><a class="next" href="${nextPage}">Next</a></#if>
         </div>
     </#if>
 
