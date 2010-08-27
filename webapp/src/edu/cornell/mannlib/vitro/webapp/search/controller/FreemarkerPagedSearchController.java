@@ -16,12 +16,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -50,9 +47,9 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
-import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Params;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
@@ -92,7 +89,7 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
     private IndexSearcher searcher = null;
     private static final Log log = LogFactory.getLog(FreemarkerPagedSearchController.class.getName());
     String NORESULT_MSG = "The search returned no results.";    
-    private int defaultHitsPerPage = 25;
+    private int defaultHitsPerPage = 2; //25;
     private int defaultMaxSearchSize= 1000;   
 
     public void init(ServletConfig config) throws ServletException {
@@ -219,6 +216,7 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
   
             Params pagingLinkParams = new Params();
             pagingLinkParams.put("querytext", qtxt);
+            pagingLinkParams.put("hitsPerPage", String.valueOf(hitsPerPage));
 
             String classGroupParam = vreq.getParameter("classgroup");
             String typeParam = vreq.getParameter("type");
@@ -279,7 +277,14 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
                     body.put("typeName", type.getName());
             }
             
-            body.put("pagingLinks", getPagingLinks(startIndex, hitsPerPage,  hitsLength,  maxHitSize, vreq.getServletPath(), pagingLinkParams));
+            body.put("pagingLinks", getPagingLinks(startIndex, hitsPerPage, hitsLength, maxHitSize, vreq.getServletPath(), pagingLinkParams));
+            
+            if (startIndex != 0) {
+                body.put("prevPage", getPreviousPageLink(startIndex, hitsPerPage, vreq.getServletPath(), pagingLinkParams));
+            }
+            if (startIndex < (hitsLength - hitsPerPage)) {
+                body.put("nextPage", getNextPageLink(startIndex, hitsPerPage, vreq.getServletPath(), pagingLinkParams));
+            }
              
         } catch (Throwable e) {
             log.error(e, e);  
@@ -390,14 +395,10 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
             return pagingLinks;
         }
         
-        int pageNumber;
-
-        params.put("hitsPerPage", String.valueOf(hitsPerPage));
-        
         for (int i = 0; i < hitsLength; i += hitsPerPage) {
             params.put("startIndex", String.valueOf(i));
             if ( i < maxHitSize - hitsPerPage) {
-                pageNumber = i/hitsPerPage + 1;
+                int pageNumber = i/hitsPerPage + 1;
                 if (i >= startIndex && i < (startIndex + hitsPerPage)) {
                     pagingLinks.add(new PagingLink(pageNumber));
                 } else {
@@ -409,6 +410,18 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
         }   
         
         return pagingLinks;
+    }
+    
+    private String getPreviousPageLink(int startIndex, int hitsPerPage, String baseUrl, Params params) {
+        params.put("startIndex", String.valueOf(startIndex-hitsPerPage));
+        //return new PagingLink("Previous", baseUrl, params);
+        return UrlBuilder.getUrl(baseUrl, params);
+    }
+    
+    private String getNextPageLink(int startIndex, int hitsPerPage, String baseUrl, Params params) {
+        params.put("startIndex", String.valueOf(startIndex+hitsPerPage));
+        //return new PagingLink("Next", baseUrl, params);
+        return UrlBuilder.getUrl(baseUrl, params);
     }
     
     private class PagingLink extends LinkTemplateModel {
@@ -426,9 +439,6 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
         PagingLink(String text, String baseUrl, Params params) {
             super(text, baseUrl, params);
         }
-        
-
-
     }
    
     private List<VClass> getVClasses(VClassDao vclassDao, TopDocs topDocs,

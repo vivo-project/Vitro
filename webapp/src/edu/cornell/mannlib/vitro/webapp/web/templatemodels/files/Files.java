@@ -35,6 +35,9 @@ public abstract class Files extends BaseTemplateModel {
     }
     
     public void addFromTheme(String path) {
+        if (!path.startsWith("/")) {
+            path = "/" + path;
+        }
         path = themeDir + getThemeSubDir() + path;
         add(path);
     }
