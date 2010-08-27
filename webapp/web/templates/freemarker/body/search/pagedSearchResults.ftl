@@ -4,7 +4,7 @@
 
 <h2>
     Search Results for '${querytext}'
-    <#if classgroupName?has_content>limited to type '${classgroupName}'</#if>
+    <#if classgroupName?has_content>limited to type '${classGroupName}'</#if>
     <#if typeName?has_content>limited to type '${typeName}'</#if>
 </h2>
 

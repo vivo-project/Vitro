@@ -119,8 +119,7 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
             if( vreq.getWebappDaoFactory() == null 
                     || vreq.getWebappDaoFactory().getIndividualDao() == null ){
                 log.error("makeUsableBeans() could not get IndividualDao ");
-                //doSearchError(request, response, "Could not access Model", portalFlag);
-                //return;
+                return doSearchError("Could not access Model.", config);
             }
             IndividualDao iDao = vreq.getWebappDaoFactory().getIndividualDao();
             VClassGroupDao grpDao = vreq.getWebappDaoFactory().getVClassGroupDao();
@@ -155,10 +154,9 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
             Analyzer analyzer = getAnalyzer(getServletContext());
             Query query = getQuery(vreq, portalFlag, analyzer, indexDir, qtxt);             
             log.debug("query for '" + qtxt +"' is " + query.toString());
-            
+
             if (query == null ) {
-                //doNoQuery(vreq, response);
-                //return;
+                return doNoQuery(config, portal);
             }
             
             IndexSearcher searcherForRequest = getIndexSearcher(indexDir);
@@ -175,23 +173,22 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
                 }catch (Exception ex){
                     log.error(ex);
                     String msg = makeBadSearchMessage(qtxt,ex.getMessage());
-                    if(msg == null ) msg = "<p>The search request contained errors.</p>";
-                    //doFailedSearch(vreq, response, msg, qtxt);
-                    //return;
+                    if (msg == null) {
+                        msg = "The search request contained errors.";
+                    }
+                    return doFailedSearch(msg, qtxt, config);
                 }
             }
 
             if( topDocs == null || topDocs.scoreDocs == null){
                 log.error("topDocs for a search was null");                
-                String msg = "<p>The search request contained errors.</p>";
-                //doFailedSearch(request, response, msg, qtxt);
-                //return;
+                String msg = "The search request contained errors.";
+                return doFailedSearch(msg, qtxt, config);
             }
             
             int hitsLength = topDocs.scoreDocs.length;
             if ( hitsLength < 1 ){                
-                //doFailedSearch(request, response, NORESULT_MSG, qtxt);
-                //return;
+                return doNoHits(qtxt, config);
             }            
             log.debug("found "+hitsLength+" hits");
 
@@ -273,7 +270,7 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
             if ( !StringUtils.isEmpty(classGroupParam) ) {
                 VClassGroup grp = grpDao.getGroupByURI(classGroupParam);
                 if( grp != null && grp.getPublicName() != null )
-                    body.put("classgroupName", grp.getPublicName());
+                    body.put("classGroupName", grp.getPublicName());
             }
             
             if ( !StringUtils.isEmpty(typeParam) ) {
@@ -285,9 +282,8 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
             body.put("pagingLinks", getPagingLinks(startIndex, hitsPerPage,  hitsLength,  maxHitSize, vreq.getServletPath(), pagingLinkParams));
              
         } catch (Throwable e) {
-            log.error(e, e);            
-            //doSearchError(request, response, e.getMessage(), null);
-            //return;
+            log.error(e, e);  
+            return doSearchError(e.getMessage(), config);
         }
         
         return mergeBodyToTemplate("pagedSearchResults.ftl", body, config);
@@ -742,38 +738,36 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
             log.debug("could not hightlight for entity " + ent.getURI(),th);
         }
     }        
+
+    private String doSearchError(String message, Configuration config) {
+        Map<String, Object> body = new HashMap<String, Object>();
+        body.put("message", "Search failed: " + message);
+        return mergeBodyToTemplate("searchError.ftl", body, config);
+    }
     
-    private void doNoQuery(HttpServletRequest request,
-            HttpServletResponse response)
-    throws ServletException, IOException {
-        Portal portal = (new VitroRequest(request)).getPortal();
-        request.setAttribute("title", "Search "+portal.getAppName());
-        request.setAttribute("bodyJsp", Controllers.SEARCH_FORM_JSP);
-
-        RequestDispatcher rd = request
-        .getRequestDispatcher(Controllers.BASIC_JSP);
-        rd.forward(request, response);
+    private String doNoQuery(Configuration config, Portal portal) {
+        Map<String, Object> body = new HashMap<String, Object>();
+        body.put("title", "Search " + portal.getAppName());
+        body.put("message", "No query entered.");
+        return mergeBodyToTemplate("searchError.ftl", body, config);
+    }
+    
+    private String doFailedSearch(String message, String querytext, Configuration config) {
+        Map<String, Object> body = new HashMap<String, Object>();       
+        body.put("title", "Search for '" + querytext + "'");        
+        if ( StringUtils.isEmpty(message) ) {
+            message = "Search failed.";
+        }        
+        body.put("message", message);
+        return mergeBodyToTemplate("searchError.ftl", body, config);
     }
 
-    private void doFailedSearch(HttpServletRequest request,
-            HttpServletResponse response, String message, String querytext)
-    throws ServletException, IOException {
-        Portal portal = (new VitroRequest(request)).getPortal();
-        if( querytext != null ){            
-            request.setAttribute("querytext", querytext);
-            request.setAttribute("title", querytext+" - "+portal.getAppName()+" Search" );
-        }else{
-            request.setAttribute("title", portal.getAppName()+" Search" );
-            request.setAttribute("querytext", "");
-        }
-        if( message != null && message.length() > 0)
-            request.setAttribute("message", message);
-
-        request.setAttribute("bodyJsp", Controllers.SEARCH_FAILED_JSP);
-        RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
-        rd.forward(request, response);
+    private String doNoHits(String querytext, Configuration config) {
+        Map<String, Object> body = new HashMap<String, Object>();       
+        body.put("title", "Search for '" + querytext + "'");        
+        body.put("message", "No matching results.");     
+        return mergeBodyToTemplate("searchError.ftl", body, config);
     }
-
 
     /**
      * Makes a message to display to user for a bad search term.
@@ -831,15 +825,7 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
         return opBlacklist;        
     }
     
-    private void doSearchError(HttpServletRequest request,
-            HttpServletResponse response, String message, Object object)         
-    throws ServletException, IOException {
-        Portal portal = (new VitroRequest(request)).getPortal();            
-
-        request.setAttribute("bodyJsp", Controllers.SEARCH_ERROR_JSP);
-        RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
-        rd.forward(request, response);
-    }
+    
     private final String defaultSearchField = "ALLTEXT";
     public static final int MAX_QUERY_LENGTH = 500;
 
