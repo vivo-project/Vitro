@@ -89,7 +89,7 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
     private IndexSearcher searcher = null;
     private static final Log log = LogFactory.getLog(FreemarkerPagedSearchController.class.getName());
     String NORESULT_MSG = "The search returned no results.";    
-    private int defaultHitsPerPage = 2; //25;
+    private int defaultHitsPerPage = 25;
     private int defaultMaxSearchSize= 1000;   
 
     public void init(ServletConfig config) throws ServletException {
