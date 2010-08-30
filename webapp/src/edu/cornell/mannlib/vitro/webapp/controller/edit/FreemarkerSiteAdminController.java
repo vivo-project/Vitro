@@ -8,17 +8,16 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.collections.map.ListOrderedMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginFormBean;
-import edu.cornell.mannlib.vedit.beans.Option;
 import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Params;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginTemplateHelper;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import freemarker.template.Configuration;
@@ -42,21 +41,21 @@ public class FreemarkerSiteAdminController extends FreemarkerHttpServlet {
             loginStatus = loginHandler.getLoginStatus();
         }
         
-        // Not logged in: just show login form
+        // NOT LOGGED IN: just show login form
         if (loginHandler == null || !"authenticated".equals(loginStatus)) {
             body.put("loginPanel", new LoginTemplateHelper(vreq).showLoginPage(vreq, body, config));
             return mergeBodyToTemplate("siteAdmin-main.ftl", body, config);           
         } 
         
-        // Logged in: show editing options based on user role
+        // LOGGED IN: show editing options based on user role
         int securityLevel = Integer.parseInt( loginHandler.getLoginRole() );
         
         WebappDaoFactory wadf = vreq.getFullWebappDaoFactory();
         
-        // Data input
+        // DATA INPUT
         if (securityLevel >= LoginFormBean.EDITOR) {
-            Map<String, Object> dataInputMap = new HashMap<String, Object>();
-            dataInputMap.put("formAction", UrlBuilder.getUrl("/edit/editRequestDispatch.jsp"));
+            Map<String, Object> dataInputData = new HashMap<String, Object>();
+            dataInputData.put("formAction", UrlBuilder.getUrl("/edit/editRequestDispatch.jsp"));
             
             // Create map for data input entry form options list
             List classGroups = wadf.getVClassGroupDao().getPublicGroupsWithVClasses(true,true,false); // order by displayRank, include uninstantiated classes, don't get the counts of individuals        
@@ -67,11 +66,41 @@ public class FreemarkerSiteAdminController extends FreemarkerHttpServlet {
                 List classes = group.getVitroClassList();
                 orderedClassGroups.put(group.getPublicName(),FormUtils.makeOptionListFromBeans(classes,"URI","PickListName",null,null,false));
             }
-            dataInputMap.put("classGroupOptions", orderedClassGroups);
+            dataInputData.put("classGroupOptions", orderedClassGroups);
             
-            body.put("dataInput", dataInputMap);
+            body.put("dataInput", dataInputData);
         }
-                
+
+        // SITE CONFIGURATION
+        if (securityLevel >= loginHandler.CURATOR) {
+            Map<String, Object> siteConfigData = new HashMap<String, Object>();
+            
+            boolean singlePortal = new Boolean(vreq.getFullWebappDaoFactory().getPortalDao().isSinglePortal());
+            body.put("singlePortal", singlePortal);
+            
+            Params params = new Params();
+            int portalId = vreq.getPortal().getPortalId();
+            params.put("home", portalId);
+
+            siteConfigData.put("tabManagementUrl", UrlBuilder.getUrl("/listTabs", params));
+            
+            if (securityLevel >= loginHandler.DBA) {                
+                siteConfigData.put("userManagementUrl", UrlBuilder.getUrl("/listUsers", params));
+            }
+ 
+            if (!singlePortal) {
+                siteConfigData.put("listPortalsUrl", UrlBuilder.getUrl("/listPortals", params));
+            }
+            
+            params.put("controller", "Portal");
+            params.put("id", portalId);        
+            siteConfigData.put("siteInfoUrl", UrlBuilder.getUrl("/editForm", params));
+
+            body.put("siteConfig", siteConfigData);
+        }
+        
+        // ONTOLOGY EDITOR
+
         if (securityLevel >= LoginFormBean.CURATOR) {
             String verbose = vreq.getParameter("verbose");
             if( "true".equals(verbose)) {
@@ -79,10 +108,16 @@ public class FreemarkerSiteAdminController extends FreemarkerHttpServlet {
             } else if( "false".equals(verbose)) {
                 vreq.getSession().setAttribute(VERBOSE, Boolean.FALSE);
             }
-        }        
+        }    
+        
+        // ADVANCED DATA TOOLS
+        
+        // CUSTOM REPORTS
+                
+    
 
 
-        body.put("singlePortal", new Boolean(vreq.getFullWebappDaoFactory().getPortalDao().isSinglePortal()));
+
         
 
         

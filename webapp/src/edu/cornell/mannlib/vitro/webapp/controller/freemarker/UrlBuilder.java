@@ -155,7 +155,11 @@ public class UrlBuilder {
         } 
         
         public Params(Map<String, String> map) {
-            this.putAll(map);
+            putAll(map);
+        }
+        
+        public void put(String key, int value) {
+            put(key, String.valueOf(value));
         }
     }
     
