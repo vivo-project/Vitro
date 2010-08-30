@@ -58,6 +58,7 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 		super(req);
 	}
 
+	/** Version for JSP page */
 	public String showLoginPage(HttpServletRequest request) {
 		try {
 			VitroRequest vreq = new VitroRequest(request);
@@ -79,6 +80,28 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 		}
 	}
 
+	/** Version for Freemarker page */
+	public String showLoginPage(VitroRequest vreq, Map<String, Object> body, Configuration config) {
+	    try {
+
+            State state = getCurrentLoginState(vreq);
+            log.debug("State on exit: " + state);
+
+            switch (state) {
+            case LOGGED_IN:
+                return "";
+            case FORCED_PASSWORD_CHANGE:
+                return doTemplate(vreq, showPasswordChangeScreen(vreq), body, config);
+            default:
+                return doTemplate(vreq, showLoginScreen(vreq), body, config);
+            }
+        } catch (Exception e) {
+            log.error(e);
+            return "<h2>Internal server error:<br/>" + e + "</h2>";
+        }
+    }
+
+	   
 	/**
 	 * User is just starting the login process. Be sure that we have a
 	 * {@link LoginProcessBean} with the correct status. Show them the login
@@ -131,6 +154,7 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 
 	/**
 	 * We processed a response, and want to show a template.
+	 * Version for JSP page.
 	 */
 	private String doTemplate(VitroRequest vreq, TemplateResponseValues values) {
 		// Set it up like FreeMarkerHttpServlet.doGet() would do.
@@ -144,6 +168,17 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 		body.putAll(values.getBodyMap());
 		return mergeBodyToTemplate(values.getTemplateName(), body, config);
 	}
+	
+    /**
+     * We processed a response, and want to show a template.
+     * Version for Freemarker page.
+     */
+    private String doTemplate(VitroRequest vreq, TemplateResponseValues values, Map<String, Object> body, Configuration config) {
+
+        // Add the values that we got, and merge to the template.
+        body.putAll(values.getBodyMap());
+        return mergeBodyToTemplate(values.getTemplateName(), body, config);
+    }
 
 	/**
 	 * Where are we in the process? Logged in? Not? Somewhere in between?

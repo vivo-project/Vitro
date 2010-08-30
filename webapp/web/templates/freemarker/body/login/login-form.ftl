@@ -1,6 +1,6 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
-<#-- Log in template for accessing site admin -->
+<#-- Template for login form -->
 
 <noscript>
 	<div id="javascriptDisableWrapper">
@@ -33,6 +33,8 @@
               <input name="loginForm"  type="submit" class="submit" value="Log in"/>
        </form>
 </div>
+    
+
 
 
 

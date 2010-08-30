@@ -2,7 +2,6 @@
 
 <#-- Log in template for accessing site admin -->
 
-
 <div id="formLogin">
        <h2>Create Your New Password</h2>
        
