@@ -2,7 +2,7 @@
 
 <#-- List individual members of a class. -->
 
-<#import "listMacros.ftl" as l>
+<#import "lib-list.ftl" as l>
 
 <div class="contents">
     <div class="individualList">

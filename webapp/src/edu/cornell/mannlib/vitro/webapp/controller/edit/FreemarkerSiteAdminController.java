@@ -2,7 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -11,10 +13,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginFormBean;
+import edu.cornell.mannlib.vedit.beans.Option;
 import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginTemplateHelper;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import freemarker.template.Configuration;
@@ -44,7 +48,29 @@ public class FreemarkerSiteAdminController extends FreemarkerHttpServlet {
             return mergeBodyToTemplate("siteAdmin-main.ftl", body, config);           
         } 
         
+        // Logged in: show editing options based on user role
         int securityLevel = Integer.parseInt( loginHandler.getLoginRole() );
+        
+        WebappDaoFactory wadf = vreq.getFullWebappDaoFactory();
+        
+        // Data input
+        if (securityLevel >= LoginFormBean.EDITOR) {
+            Map<String, Object> dataInputMap = new HashMap<String, Object>();
+            dataInputMap.put("formAction", UrlBuilder.getUrl("/edit/editRequestDispatch.jsp"));
+            
+            // Create map for data input entry form options list
+            List classGroups = wadf.getVClassGroupDao().getPublicGroupsWithVClasses(true,true,false); // order by displayRank, include uninstantiated classes, don't get the counts of individuals        
+            Iterator classGroupIt = classGroups.iterator();
+            LinkedHashMap<String, List> orderedClassGroups = new LinkedHashMap<String, List>(classGroups.size());
+            while (classGroupIt.hasNext()) {
+                VClassGroup group = (VClassGroup)classGroupIt.next();
+                List classes = group.getVitroClassList();
+                orderedClassGroups.put(group.getPublicName(),FormUtils.makeOptionListFromBeans(classes,"URI","PickListName",null,null,false));
+            }
+            dataInputMap.put("classGroupOptions", orderedClassGroups);
+            
+            body.put("dataInput", dataInputMap);
+        }
                 
         if (securityLevel >= LoginFormBean.CURATOR) {
             String verbose = vreq.getParameter("verbose");
@@ -58,7 +84,7 @@ public class FreemarkerSiteAdminController extends FreemarkerHttpServlet {
 
         body.put("singlePortal", new Boolean(vreq.getFullWebappDaoFactory().getPortalDao().isSinglePortal()));
         
-        WebappDaoFactory wadf = vreq.getFullWebappDaoFactory();
+
         
 // Not used
 //        int languageProfile = wadf.getLanguageProfile();
@@ -71,19 +97,8 @@ public class FreemarkerSiteAdminController extends FreemarkerHttpServlet {
 //        body.put("languageModeStr",  languageMode);       
         
 
-        // Create map for data input entry form
-        List classGroups = wadf.getVClassGroupDao().getPublicGroupsWithVClasses(true,true,false); // order by displayRank, include uninstantiated classes, don't get the counts of individuals        
-        Iterator classGroupIt = classGroups.iterator();
-        ListOrderedMap optGroupMap = new ListOrderedMap();
-        while (classGroupIt.hasNext()) {
-            VClassGroup group = (VClassGroup)classGroupIt.next();
-            List classes = group.getVitroClassList();
-            optGroupMap.put(group.getPublicName(),FormUtils.makeOptionListFromBeans(classes,"URI","PickListName",null,null,false));
-        }
-        body.put("VClassIdOptions", optGroupMap);
 
 
-        
         return mergeBodyToTemplate("siteAdmin-main.ftl", body, config);
         
     }

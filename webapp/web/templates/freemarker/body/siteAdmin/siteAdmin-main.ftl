@@ -7,9 +7,10 @@
 </div>
 
 <div id="adminDashboard">
-
-    <#if loginPanel??>
-        <#include "login-main.ftl">
-    </#if>
-
+    <#include "login-main.ftl">
+    <#include "siteAdmin-dataInput.ftl">
+    <#include "siteAdmin-siteConfiguration.ftl">
+    <#include "siteAdmin-ontologyEditor.ftl">
+    <#include "siteAdmin-advancedDataTools.ftl">
+    <#include "siteAdmin-customReports.ftl">
 </div>
