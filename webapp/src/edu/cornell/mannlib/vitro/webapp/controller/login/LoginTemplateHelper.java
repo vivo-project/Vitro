@@ -37,19 +37,15 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 
 	/** If they are changing their password on first login, show them this form. */
 	public static final String TEMPLATE_FORCE_PASSWORD_CHANGE = "login-forcedPasswordChange.ftl";
+	
+    /** Show error message */
+    public static final String TEMPLATE_SERVER_ERROR = "errorMessage.ftl";
 
 	public static final String BODY_LOGIN_NAME = "loginName";
 	public static final String BODY_FORM_ACTION = "formAction";
 	public static final String BODY_INFO_MESSAGE = "infoMessage";
 	public static final String BODY_ERROR_MESSAGE = "errorMessage";
-	public static final String BODY_ALERT_ICON_URL = "alertImageUrl";
 	public static final String BODY_CANCEL_URL = "cancelUrl";
-
-	/** Use this icon for an info message. */
-	public static final String URL_INFO_ICON = "/images/iconAlert.png";
-
-	/** Use this icon for an error message. */
-	public static final String URL_ERROR_ICON = "/images/iconAlert.png";
 
 	/** If no portal is specified in the request, use this one. */
 	private static final int DEFAULT_PORTAL_ID = 1;
@@ -60,9 +56,9 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 
 	/** Version for JSP page */
 	public String showLoginPage(HttpServletRequest request) {
+	    VitroRequest vreq = new VitroRequest(request);
 		try {
-			VitroRequest vreq = new VitroRequest(request);
-
+			
 			State state = getCurrentLoginState(vreq);
 			log.debug("State on exit: " + state);
 
@@ -76,7 +72,7 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 			}
 		} catch (Exception e) {
 			log.error(e);
-			return "<h2>Internal server error:<br/>" + e + "</h2>";
+			return doTemplate(vreq, showError(request, e));
 		}
 	}
 
@@ -97,7 +93,7 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
             }
         } catch (Exception e) {
             log.error(e);
-            return "<h2>Internal server error:<br/>" + e + "</h2>";
+            return doTemplate(vreq, showError(vreq, e), body, config);
         }
     }
 
@@ -120,12 +116,10 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 		String infoMessage = bean.getInfoMessage();
 		if (!infoMessage.isEmpty()) {
 			trv.put(BODY_INFO_MESSAGE, infoMessage);
-			trv.put(BODY_ALERT_ICON_URL, UrlBuilder.getUrl(URL_INFO_ICON));
 		}
 		String errorMessage = bean.getErrorMessage();
 		if (!errorMessage.isEmpty()) {
 			trv.put(BODY_ERROR_MESSAGE, errorMessage);
-			trv.put(BODY_ALERT_ICON_URL, UrlBuilder.getUrl(URL_ERROR_ICON));
 		}
 		return trv;
 	}
@@ -147,9 +141,15 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 		String errorMessage = bean.getErrorMessage();
 		if (!errorMessage.isEmpty()) {
 			trv.put(BODY_ERROR_MESSAGE, errorMessage);
-			trv.put(BODY_ALERT_ICON_URL, UrlBuilder.getUrl(URL_ERROR_ICON));
 		}
 		return trv;
+	}
+	
+	private TemplateResponseValues showError(HttpServletRequest request, Exception e) {
+        TemplateResponseValues trv = new TemplateResponseValues(
+                TEMPLATE_SERVER_ERROR);	    
+        trv.put(BODY_ERROR_MESSAGE, "Internal server error:<br /> " + e);
+        return trv;
 	}
 
 	/**

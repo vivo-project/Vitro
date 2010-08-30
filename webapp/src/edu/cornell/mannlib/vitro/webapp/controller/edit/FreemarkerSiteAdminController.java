@@ -40,10 +40,8 @@ public class FreemarkerSiteAdminController extends FreemarkerHttpServlet {
         
         // Not logged in: just show login form
         if (loginHandler == null || !"authenticated".equals(loginStatus)) {
-            //return new LoginTemplateHelper(vreq).showLoginPage(vreq, body, config);
             body.put("loginPanel", new LoginTemplateHelper(vreq).showLoginPage(vreq, body, config));
-            return mergeBodyToTemplate("siteAdmin-main.ftl", body, config);
-            
+            return mergeBodyToTemplate("siteAdmin-main.ftl", body, config);           
         } 
         
         int securityLevel = Integer.parseInt( loginHandler.getLoginRole() );
