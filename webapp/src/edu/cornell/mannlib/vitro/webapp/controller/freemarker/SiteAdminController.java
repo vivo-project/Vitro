@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.controller.edit;
+package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -15,21 +15,16 @@ import edu.cornell.mannlib.vedit.beans.LoginFormBean;
 import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginTemplateHelper;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
 import freemarker.template.Configuration;
 
-public class FreemarkerSiteAdminController extends FreemarkerHttpServlet {
+public class SiteAdminController extends FreemarkerHttpServlet {
 	
-	private static final Log log = LogFactory.getLog(FreemarkerSiteAdminController.class);
+    private static final long serialVersionUID = 1L;
+    private static final Log log = LogFactory.getLog(SiteAdminController.class);
 
-
-    
 	public String getTitle(String siteName) {
         return siteName + " Site Administration";
 	}

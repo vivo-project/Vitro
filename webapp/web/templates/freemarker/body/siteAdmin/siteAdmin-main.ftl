@@ -7,7 +7,6 @@
 </div>
 
 <div id="adminDashboard">
-
     <#include "login-main.ftl">
     <#include "siteAdmin-dataInput.ftl">
     <#include "siteAdmin-siteConfiguration.ftl">
