@@ -63,7 +63,7 @@ public class FreemarkerSiteAdminController extends FreemarkerHttpServlet {
                     body.put("ontologyEditor", getOntologyEditorData(vreq, urlBuilder));
                     
                     if (securityLevel >= LoginFormBean.DBA) {
-                        body.put("dataTools", getDataToolsData(vreq));
+                        body.put("dataTools", getDataToolsData(vreq, urlBuilder));
                         
                         // Only for DataStar. Should handle without needing a DataStar-specific version of this controller.
                         //body.put("customReports", getCustomReportsData(vreq));
@@ -180,9 +180,17 @@ public class FreemarkerSiteAdminController extends FreemarkerHttpServlet {
         return map;
     }
 
-    private Map<String, Object> getDataToolsData(VitroRequest vreq) {
+    private Map<String, Object> getDataToolsData(VitroRequest vreq, UrlBuilder urlBuilder) {
 
         Map<String, Object> map = new HashMap<String, Object>();
+        
+        Map<String, String> urls = new HashMap<String, String>();
+        urls.put("ingest", urlBuilder.getUrl("/ingest"));
+        urls.put("rdfData", urlBuilder.getPortalUrl("/uploadRDFForm"));
+        urls.put("rdfExport", urlBuilder.getPortalUrl("/export"));
+        urls.put("sparqlQuery", urlBuilder.getUrl("/admin/sparqlquery"));        
+        map.put("urls", urls);
+        
         return map;
     }
 

@@ -8,10 +8,12 @@
         <h3>Ontology Editor</h3>
         
         <#if ontologyEditor.pellet??>
-            <p>${ontologyEditor.pellet.error}</p>
-            <#if ontologyEditor.pellet.explanation??>
-                <p>${ontologyEditor.pellet.explanation}</p>
-            </#if>
+            <div class="notice">
+                <p>${ontologyEditor.pellet.error}</p>
+                <#if ontologyEditor.pellet.explanation??>
+                    <p>Cause: ${ontologyEditor.pellet.explanation}</p>
+                </#if>
+            </div>
         </#if>
         
         <ul>
