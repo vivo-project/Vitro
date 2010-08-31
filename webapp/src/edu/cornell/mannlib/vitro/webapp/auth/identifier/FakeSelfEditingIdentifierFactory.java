@@ -9,7 +9,6 @@ import javax.servlet.http.HttpSession;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory.NetId;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.RoleBasedPolicy;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 /** 
@@ -57,4 +56,13 @@ public class FakeSelfEditingIdentifierFactory implements IdentifierBundleFactory
     public static void clearFakeIdInSession( HttpSession session){        
         session.removeAttribute(FAKE_SELF_EDIT_NETID);
     }
+    
+	public static String getFakeIdFromSession(HttpSession session) {
+		Object netid = session.getAttribute(FAKE_SELF_EDIT_NETID);
+		if (netid instanceof String) {
+			return (String) netid;
+		} else {
+			return null;
+		}
+	}
 }
