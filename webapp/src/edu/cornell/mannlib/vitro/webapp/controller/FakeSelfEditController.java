@@ -39,8 +39,11 @@ public class FakeSelfEditController extends VitroHttpServlet {
 				// Logged in as site admin: Form to use netid
 				VitroRequestPrep.forceToSelfEditing(request);
 				String id = request.getParameter("netid");
-				FakeSelfEditingIdentifierFactory.clearFakeIdInSession(session);
 				FakeSelfEditingIdentifierFactory.putFakeIdInSession(id, session);
+
+				// Remove the login bean - so we are ONLY self-editing
+				session.removeAttribute("loginHandler");
+				
 				response.sendRedirect(request.getContextPath()
 						+ Controllers.ENTITY + "?netid=" + id);
 			} else if (request.getParameter("stopfaking") != null) {
