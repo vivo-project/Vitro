@@ -104,3 +104,12 @@ table.condensed div.test div.tReason{
 	font-style: italic;
 	padding: 3px 3px 3px 10px;
 }
+
+table.ignored td {
+	font-size: 80%;
+}
+
+pre.log {
+	font-family: monospace;
+	font-size: 80%;
+}

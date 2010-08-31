@@ -33,8 +33,6 @@ public interface Listener {
 
 	void webappStopFailed(int returnCode);
 
-	void webappWaitingForStop(int tomcatStopDelay);
-
 	void webappStopped();
 
 	void dropDatabaseStarting(String statement);
@@ -49,11 +47,15 @@ public interface Listener {
 
 	void loadDatabaseComplete();
 
-	void webappStarting(String tomcatStartCommand);
+	void webappCheckingReady(String command);
+
+	void webappCheckReadyFailed(int returnCode);
+
+	void webappCheckedReady();
+
+	void webappStarting(String command);
 
 	void webappStartFailed(int returnCode);
-
-	void webappWaitingForStart(int tomcatStartDelay);
 
 	void webappStarted();
 

@@ -65,13 +65,16 @@ public class SeleniumRunner {
 		} catch (IOException e) {
 			listener.runFailed(e);
 			success = false;
-			e.printStackTrace();
+			throw new FatalException(e);
 		} catch (FatalException e) {
 			listener.runFailed(e);
 			success = false;
-			e.printStackTrace();
+			throw e;
+		} finally {
+			listener.runStopped();
+			outputManager.summarizeOutput(dataModel);
 		}
-		listener.runStopped();
+
 		return success;
 	}
 
@@ -163,15 +166,18 @@ public class SeleniumRunner {
 		}
 
 		try {
-			parms = new SeleniumRunnerParameters(args[0]);
-		} catch (IOException e) {
-			usage("Can't read properties file: " + e.getMessage());
-		}
+			try {
+				parms = new SeleniumRunnerParameters(args[0]);
+			} catch (IOException e) {
+				usage("Can't read properties file: " + e.getMessage());
+			} catch (IllegalArgumentException e) {
+				throw new FatalException(e);
+			}
 
-		try {
 			if (interactive) {
 				// TODO hook up the GUI.
-				throw new RuntimeException("interactive mode not implemented.");
+				throw new FatalException("interactive mode not implemented. "
+						+ "use 'ant acceptance -Dacceptance.batch=true'");
 			} else {
 				File logFile = new File(parms.getOutputDirectory(),
 						LOGFILE_NAME);

@@ -10,38 +10,39 @@ import java.util.Properties;
  * model.
  */
 public class ModelCleanerProperties {
-	public static final String PROP_VIVO_WEBAPP_NAME = "vivo_webapp_name";
-	public static final String PROP_TOMCAT_MANAGER_USERNAME = "tomcat_manager_username";
-	public static final String PROP_TOMCAT_MANAGER_PASSWORD = "tomcat_manager_password";
 	public static final String PROP_MYSQL_USERNAME = "mysql_username";
 	public static final String PROP_MYSQL_PASSWORD = "mysql_password";
 	public static final String PROP_MYSQL_DB_NAME = "mysql_db_name";
 	public static final String PROP_WEBAPP_DIRECTORY = "vivo_webapp_directory";
+	public static final String PROP_TOMCAT_CHECK_READY_COMMAND = "tomcat_check_ready_command";
+	public static final String PROP_TOMCAT_STOP_COMMAND = "tomcat_stop_command";
+	public static final String PROP_TOMCAT_START_COMMAND = "tomcat_start_command";
 
-	private final String vivoWebappName;
-	private final String tomcatManagerUsername;
-	private final String tomcatManagerPassword;
 	private final String mysqlUsername;
 	private final String mysqlPassword;
 	private final String mysqlDbName;
 	private final File webappDirectory;
+	private final String tomcatCheckReadyCommand;
+	private final String tomcatStopCommand;
+	private final String tomcatStartCommand;
 
 	/**
 	 * Confirm that we have the expected properties, and that their values seem
 	 * reasonable.
 	 */
 	public ModelCleanerProperties(Properties props) {
-		this.vivoWebappName = checkWebappName(props);
-		this.tomcatManagerUsername = getRequiredProperty(props,
-				PROP_TOMCAT_MANAGER_USERNAME);
-		this.tomcatManagerPassword = getRequiredProperty(props,
-				PROP_TOMCAT_MANAGER_PASSWORD);
-
 		this.mysqlUsername = getRequiredProperty(props, PROP_MYSQL_USERNAME);
 		this.mysqlPassword = getRequiredProperty(props, PROP_MYSQL_PASSWORD);
 		this.mysqlDbName = getRequiredProperty(props, PROP_MYSQL_DB_NAME);
 
 		this.webappDirectory = confirmWebappDirectory(props);
+
+		this.tomcatCheckReadyCommand = getRequiredProperty(props,
+				PROP_TOMCAT_CHECK_READY_COMMAND);
+		this.tomcatStopCommand = getRequiredProperty(props,
+				PROP_TOMCAT_STOP_COMMAND);
+		this.tomcatStartCommand = getRequiredProperty(props,
+				PROP_TOMCAT_START_COMMAND);
 	}
 
 	public String getMysqlUsername() {
@@ -60,16 +61,16 @@ public class ModelCleanerProperties {
 		return webappDirectory;
 	}
 
-	public String getVivoWebappName() {
-		return vivoWebappName;
+	public String getTomcatCheckReadyCommand() {
+		return tomcatCheckReadyCommand;
 	}
 
-	public String getTomcatManagerUsername() {
-		return tomcatManagerUsername;
+	public String getTomcatStopCommand() {
+		return tomcatStopCommand;
 	}
 
-	public String getTomcatManagerPassword() {
-		return tomcatManagerPassword;
+	public String getTomcatStartCommand() {
+		return tomcatStartCommand;
 	}
 
 	/**
@@ -83,22 +84,6 @@ public class ModelCleanerProperties {
 					"Property file must provide a value for '" + key + "'");
 		}
 		return value;
-	}
-
-	/**
-	 * The website URL must end with the webapp name.
-	 */
-	private String checkWebappName(Properties props) {
-		String websiteUrl = getRequiredProperty(props,
-				SeleniumRunnerParameters.PROP_WEBSITE_URL);
-		String webappName = getRequiredProperty(props, PROP_VIVO_WEBAPP_NAME);
-		if ((!websiteUrl.endsWith(webappName))
-				&& (!websiteUrl.endsWith(webappName + "/"))) {
-			throw new IllegalArgumentException("The " + PROP_VIVO_WEBAPP_NAME
-					+ " must be the last item in the "
-					+ SeleniumRunnerParameters.PROP_WEBSITE_URL);
-		}
-		return webappName;
 	}
 
 	/**
@@ -126,10 +111,7 @@ public class ModelCleanerProperties {
 	}
 
 	public String toString() {
-		return "\n      vivoWebappName: " + vivoWebappName
-				+ "\n      tomcatManagerUsername: " + tomcatManagerUsername
-				+ "\n      tomcatManagerPassword: " + tomcatManagerPassword
-				+ "\n      mysqlUsername: " + mysqlUsername
+		return "\n      mysqlUsername: " + mysqlUsername
 				+ "\n      mysqlPassword: " + mysqlPassword
 				+ "\n      mysqlDbName: " + mysqlDbName
 				+ "\n      webappDirectory: " + webappDirectory;

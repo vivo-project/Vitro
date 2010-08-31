@@ -64,22 +64,28 @@ public class OutputManager {
 	 * output file.
 	 */
 	public void summarizeOutput(DataModel dataModel) {
-		LogStats log = LogStats.parse(parms.getLogFile());
+		try {
+			LogStats log = LogStats.parse(parms.getLogFile());
 
-		List<SuiteResults> suiteResults = new ArrayList<SuiteResults>();
-		for (File outputFile : parms.getOutputDirectory().listFiles(
-				new HtmlFileFilter())) {
-			SuiteResults suite = SuiteResults.parse(parms, outputFile);
-			if (suite != null) {
-				suiteResults.add(suite);
+			List<SuiteResults> suiteResults = new ArrayList<SuiteResults>();
+			for (File outputFile : parms.getOutputDirectory().listFiles(
+					new HtmlFileFilter())) {
+				SuiteResults suite = SuiteResults.parse(parms, outputFile);
+				if (suite != null) {
+					suiteResults.add(suite);
+				}
 			}
+
+			dataModel.setSuiteResults(suiteResults);
+			dataModel.captureDataListener(dataListener);
+
+			OutputSummaryFormatter formatter = new OutputSummaryFormatter(parms);
+			formatter.format(log, dataModel);
+		} catch (Exception e) {
+			// It must be impossible to throw an exception from here, so just
+			// print it to sysout.
+			e.printStackTrace();
 		}
-
-		dataModel.setSuiteResults(suiteResults);
-		dataModel.captureDataListener(dataListener);
-
-		OutputSummaryFormatter formatter = new OutputSummaryFormatter(parms);
-		formatter.format(log, dataModel);
 	}
 
 	private static class HtmlFileFilter implements FileFilter {

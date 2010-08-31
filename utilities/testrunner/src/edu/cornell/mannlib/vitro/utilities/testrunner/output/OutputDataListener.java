@@ -206,15 +206,23 @@ public class OutputDataListener implements Listener {
 	}
 
 	@Override
+	public void webappCheckingReady(String command) {
+	}
+
+	@Override
+	public void webappCheckReadyFailed(int returnCode) {
+	}
+
+	@Override
+	public void webappCheckedReady() {
+	}
+
+	@Override
 	public void webappStopping(String tomcatStopCommand) {
 	}
 
 	@Override
 	public void webappStopFailed(int returnCode) {
-	}
-
-	@Override
-	public void webappWaitingForStop(int tomcatStopDelay) {
 	}
 
 	@Override
@@ -251,10 +259,6 @@ public class OutputDataListener implements Listener {
 
 	@Override
 	public void webappStartFailed(int returnCode) {
-	}
-
-	@Override
-	public void webappWaitingForStart(int tomcatStartDelay) {
 	}
 
 	@Override

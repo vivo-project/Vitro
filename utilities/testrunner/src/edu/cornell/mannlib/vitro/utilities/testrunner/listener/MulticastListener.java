@@ -100,13 +100,6 @@ public class MulticastListener implements Listener {
 	}
 
 	@Override
-	public void webappWaitingForStop(int tomcatStopDelay) {
-		for (Listener l : listeners) {
-			l.webappWaitingForStop(tomcatStopDelay);
-		}
-	}
-
-	@Override
 	public void webappStopped() {
 		for (Listener l : listeners) {
 			l.webappStopped();
@@ -156,6 +149,27 @@ public class MulticastListener implements Listener {
 	}
 
 	@Override
+	public void webappCheckingReady(String command) {
+		for (Listener l : listeners) {
+			l.webappCheckingReady(command);
+		}
+	}
+
+	@Override
+	public void webappCheckReadyFailed(int returnCode) {
+		for (Listener l : listeners) {
+			l.webappCheckReadyFailed(returnCode);
+		}
+	}
+
+	@Override
+	public void webappCheckedReady() {
+		for (Listener l : listeners) {
+			l.webappCheckedReady();
+		}
+	}
+
+	@Override
 	public void webappStarting(String tomcatStartCommand) {
 		for (Listener l : listeners) {
 			l.webappStarting(tomcatStartCommand);
@@ -166,13 +180,6 @@ public class MulticastListener implements Listener {
 	public void webappStartFailed(int returnCode) {
 		for (Listener l : listeners) {
 			l.webappStartFailed(returnCode);
-		}
-	}
-
-	@Override
-	public void webappWaitingForStart(int tomcatStartDelay) {
-		for (Listener l : listeners) {
-			l.webappWaitingForStart(tomcatStartDelay);
 		}
 	}
 

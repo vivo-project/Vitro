@@ -271,7 +271,7 @@ public class OutputSummaryFormatter {
 
 		w.println("  <div class=section>Ignored</div>");
 		w.println();
-		w.println("  <table cellspacing=\"0\">");
+		w.println("  <table class=\"ignored\" cellspacing=\"0\">");
 		w.println("    <tr><th>Suite name</th><th>Test name</th>"
 				+ "<th>Reason for ignoring</th></tr>\n");
 		if (ignoredTests.isEmpty()) {
@@ -297,7 +297,7 @@ public class OutputSummaryFormatter {
 
 	private void writeFooter(PrintWriter w) {
 		w.println("  <div class=section>Log</div>");
-		w.println("  <pre>");
+		w.println("  <pre class=\"log\">");
 
 		Reader reader = null;
 		try {
