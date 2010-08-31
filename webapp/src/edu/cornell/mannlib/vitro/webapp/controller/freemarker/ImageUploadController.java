@@ -11,10 +11,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.logging.Log;
@@ -22,14 +24,30 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginFormBean;
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.ArrayIdentifierBundle;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.ServletIdentifierBundleFactory;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyList;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.RequestPolicyList;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AddDataPropStmt;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.DropObjectPropStmt;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.EditObjPropStmt;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorage;
 import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.ImageInfo;
 import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest;
+import edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep;
 import freemarker.template.Configuration;
 
 /**
@@ -159,11 +177,14 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 
 			VitroRequest vreq = new VitroRequest(request);
 
-			ResponseValues values = buildTheResponse(vreq);
-
-			// They can't do this if they aren't logged in.
-			if (!checkLoginStatus(request, response))
+			// If they aren't authorized to do this, send them to login.
+			if (!checkAuthorized(vreq)) {
+				String loginPage = request.getContextPath() + Controllers.LOGIN;
+				response.sendRedirect(loginPage);
 				return;
+			}
+
+			ResponseValues values = buildTheResponse(vreq);
 
 			switch (values.getType()) {
 			case FORWARD:
@@ -768,24 +789,98 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 
 	}
 
-	protected boolean checkLoginStatus(HttpServletRequest request,
-			HttpServletResponse response) {
-		LoginFormBean loginBean = (LoginFormBean) request.getSession()
-				.getAttribute("loginHandler");
-		String loginPage = request.getContextPath() + Controllers.LOGIN;
-		request.getSession().setAttribute("postLoginRequest",
-				request.getRequestURI() + "?" + request.getQueryString());
-		if ((loginBean == null)
-				|| (!loginBean.getLoginStatus().equals("authenticated"))) {
-			try {
-				response.sendRedirect(loginPage);
-				return false;
-			} catch (IOException ioe) {
-				log.error("could not redirect to login page", ioe);
-				return false;
+	/**
+	 * If they are logged in as an Editor or better, they can do whatever they
+	 * want.
+	 * 
+	 * Otherwise, they will need to be self-editing, and will need to have
+	 * authorization for this specific operation they are requesting.
+	 */
+	private boolean checkAuthorized(VitroRequest vreq)
+			throws UserMistakeException {
+		if (LoginFormBean.loggedIn(vreq, LoginFormBean.EDITOR)) {
+			log.debug("Authorized because logged in as Editor");
+			return true;
+		}
+
+		if (!VitroRequestPrep.isSelfEditing(vreq)) {
+			log.debug("Not Authorized because not self-editing");
+			return false;
+		}
+
+		String action = vreq.getParameter(PARAMETER_ACTION);
+		Individual entity = validateEntityUri(vreq);
+		String imageUri = entity.getMainImageUri();
+
+		// What are we trying to do? Check if authorized.
+		RequestedAction ra;
+		if (ACTION_DELETE.equals(action) || ACTION_DELETE_EDIT.equals(action)) {
+			ra = new DropObjectPropStmt(entity.getURI(),
+					VitroVocabulary.IND_MAIN_IMAGE, imageUri);
+		} else if (imageUri != null) {
+			ra = new EditObjPropStmt(entity.getURI(),
+					VitroVocabulary.IND_MAIN_IMAGE, imageUri);
+		} else {
+			ra = new AddDataPropStmt(entity.getURI(),
+					VitroVocabulary.IND_MAIN_IMAGE,
+					RequestActionConstants.SOME_LITERAL, null, null);
+		}
+		return checkAuthorizedForRequestedAction(vreq, ra);
+	}
+
+	private boolean checkAuthorizedForRequestedAction(VitroRequest vreq,
+			RequestedAction action) {
+		PolicyIface policy = getPolicies(vreq);
+		PolicyDecision dec = policy.isAuthorized(getIdentifiers(vreq), action);
+		if (dec != null && dec.getAuthorized() == Authorization.AUTHORIZED) {
+			log.debug("Authorized because self-editing.");
+			return true;
+		} else {
+			log.debug("Not Authorized even though self-editing: "
+					+ ((dec == null) ? "null" : dec.getMessage() + ", "
+							+ dec.getDebuggingInfo()));
+			return false;
+		}
+	}
+
+	/**
+	 * Get the policy from the request, or from the servlet context.
+	 */
+	private PolicyIface getPolicies(VitroRequest vreq) {
+		ServletContext servletContext = vreq.getSession().getServletContext();
+
+		PolicyIface policy = RequestPolicyList.getPolicies(vreq);
+		if (isEmptyPolicy(policy)) {
+			policy = ServletPolicyList.getPolicies(servletContext);
+			if (isEmptyPolicy(policy)) {
+				log.error("No policy found in request at "
+						+ RequestPolicyList.POLICY_LIST);
+				policy = new PolicyList();
 			}
 		}
-		return true;
+
+		return policy;
+	}
+
+	/**
+	 * Is there actually a policy here?
+	 */
+	private boolean isEmptyPolicy(PolicyIface policy) {
+		return policy == null
+				|| (policy instanceof PolicyList && ((PolicyList) policy)
+						.size() == 0);
+	}
+
+	private IdentifierBundle getIdentifiers(VitroRequest vreq) {
+		HttpSession session = vreq.getSession();
+		ServletContext context = session.getServletContext();
+		IdentifierBundle ids = ServletIdentifierBundleFactory
+				.getIdBundleForRequest(vreq, session, context);
+		if (ids == null) {
+			return new ArrayIdentifierBundle();
+		} else {
+			return ids;
+		}
 	}
 
 }
