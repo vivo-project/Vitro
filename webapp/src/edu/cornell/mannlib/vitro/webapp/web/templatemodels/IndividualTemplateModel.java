@@ -12,7 +12,7 @@ import org.openrdf.model.impl.URIImpl;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Link;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Params;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.web.ViewFinder;
 import edu.cornell.mannlib.vitro.webapp.web.ViewFinder.ClassView;
@@ -52,7 +52,7 @@ public class IndividualTemplateModel extends BaseTemplateModel {
         if (defaultNamespace.equals(namespace)) {
             profileUrl = getUrl(PATH + "/" + individual.getLocalName());
         } else {
-            Params params = new Params("uri", individualUri);
+            ParamMap params = new ParamMap("uri", individualUri);
             profileUrl = getUrl("/individual", params);
         }
         

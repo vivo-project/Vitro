@@ -50,7 +50,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Params;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
@@ -214,7 +214,7 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
                 }
             }            
   
-            Params pagingLinkParams = new Params();
+            ParamMap pagingLinkParams = new ParamMap();
             pagingLinkParams.put("querytext", qtxt);
             pagingLinkParams.put("hitsPerPage", String.valueOf(hitsPerPage));
 
@@ -386,7 +386,7 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
         }
     }
     
-    private List<PagingLink> getPagingLinks(int startIndex, int hitsPerPage, int hitsLength, int maxHitSize, String baseUrl, Params params) {
+    private List<PagingLink> getPagingLinks(int startIndex, int hitsPerPage, int hitsLength, int maxHitSize, String baseUrl, ParamMap params) {
 
         List<PagingLink> pagingLinks = new ArrayList<PagingLink>();
         
@@ -412,13 +412,13 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
         return pagingLinks;
     }
     
-    private String getPreviousPageLink(int startIndex, int hitsPerPage, String baseUrl, Params params) {
+    private String getPreviousPageLink(int startIndex, int hitsPerPage, String baseUrl, ParamMap params) {
         params.put("startIndex", String.valueOf(startIndex-hitsPerPage));
         //return new PagingLink("Previous", baseUrl, params);
         return UrlBuilder.getUrl(baseUrl, params);
     }
     
-    private String getNextPageLink(int startIndex, int hitsPerPage, String baseUrl, Params params) {
+    private String getNextPageLink(int startIndex, int hitsPerPage, String baseUrl, ParamMap params) {
         params.put("startIndex", String.valueOf(startIndex+hitsPerPage));
         //return new PagingLink("Next", baseUrl, params);
         return UrlBuilder.getUrl(baseUrl, params);
@@ -426,7 +426,7 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
     
     private class PagingLink extends LinkTemplateModel {
         
-        PagingLink(int pageNumber, String baseUrl, Params params) {
+        PagingLink(int pageNumber, String baseUrl, ParamMap params) {
             super(String.valueOf(pageNumber), baseUrl, params);
         }
         
@@ -436,7 +436,7 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
         }
         
         // Constructor for "more..." item
-        PagingLink(String text, String baseUrl, Params params) {
+        PagingLink(String text, String baseUrl, ParamMap params) {
             super(text, baseUrl, params);
         }
     }

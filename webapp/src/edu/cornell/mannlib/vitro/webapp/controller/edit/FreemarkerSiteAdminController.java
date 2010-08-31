@@ -17,16 +17,18 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Params;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginTemplateHelper;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
 import freemarker.template.Configuration;
 
 public class FreemarkerSiteAdminController extends FreemarkerHttpServlet {
 	
 	private static final Log log = LogFactory.getLog(FreemarkerSiteAdminController.class);
 
-    public static final String VERBOSE = "verbosePropertyListing";
+
     
 	public String getTitle(String siteName) {
         return siteName + " Site Administration";
@@ -44,82 +46,31 @@ public class FreemarkerSiteAdminController extends FreemarkerHttpServlet {
         // NOT LOGGED IN: just show login form
         if (loginHandler == null || !"authenticated".equals(loginStatus)) {
             body.put("loginPanel", new LoginTemplateHelper(vreq).showLoginPage(vreq, body, config));
-            return mergeBodyToTemplate("siteAdmin-main.ftl", body, config);           
-        } 
-        
+         
         // LOGGED IN: show editing options based on user role
-        int securityLevel = Integer.parseInt( loginHandler.getLoginRole() );
+        } else {
         
-        WebappDaoFactory wadf = vreq.getFullWebappDaoFactory();
-        
-        // DATA INPUT
-        if (securityLevel >= LoginFormBean.EDITOR) {
-            Map<String, Object> dataInputData = new HashMap<String, Object>();
-            dataInputData.put("formAction", UrlBuilder.getUrl("/edit/editRequestDispatch.jsp"));
+            int securityLevel = Integer.parseInt( loginHandler.getLoginRole() );
             
-            // Create map for data input entry form options list
-            List classGroups = wadf.getVClassGroupDao().getPublicGroupsWithVClasses(true,true,false); // order by displayRank, include uninstantiated classes, don't get the counts of individuals        
-            Iterator classGroupIt = classGroups.iterator();
-            LinkedHashMap<String, List> orderedClassGroups = new LinkedHashMap<String, List>(classGroups.size());
-            while (classGroupIt.hasNext()) {
-                VClassGroup group = (VClassGroup)classGroupIt.next();
-                List classes = group.getVitroClassList();
-                orderedClassGroups.put(group.getPublicName(),FormUtils.makeOptionListFromBeans(classes,"URI","PickListName",null,null,false));
-            }
-            dataInputData.put("classGroupOptions", orderedClassGroups);
-            
-            body.put("dataInput", dataInputData);
-        }
+            if (securityLevel >= LoginFormBean.EDITOR) {
 
-        // SITE CONFIGURATION
-        if (securityLevel >= loginHandler.CURATOR) {
-            Map<String, Object> siteConfigData = new HashMap<String, Object>();
-            
-            boolean singlePortal = new Boolean(vreq.getFullWebappDaoFactory().getPortalDao().isSinglePortal());
-            body.put("singlePortal", singlePortal);
-            
-            Params params = new Params();
-            int portalId = vreq.getPortal().getPortalId();
-            params.put("home", portalId);
-
-            siteConfigData.put("tabManagementUrl", UrlBuilder.getUrl("/listTabs", params));
-            
-            if (securityLevel >= loginHandler.DBA) {                
-                siteConfigData.put("userManagementUrl", UrlBuilder.getUrl("/listUsers", params));
-            }
- 
-            if (!singlePortal) {
-                siteConfigData.put("listPortalsUrl", UrlBuilder.getUrl("/listPortals", params));
-            }
-            
-            params.put("controller", "Portal");
-            params.put("id", portalId);        
-            siteConfigData.put("siteInfoUrl", UrlBuilder.getUrl("/editForm", params));
-
-            body.put("siteConfig", siteConfigData);
-        }
-        
-        // ONTOLOGY EDITOR
-
-        if (securityLevel >= LoginFormBean.CURATOR) {
-            String verbose = vreq.getParameter("verbose");
-            if( "true".equals(verbose)) {
-                vreq.getSession().setAttribute(VERBOSE, Boolean.TRUE);
-            } else if( "false".equals(verbose)) {
-                vreq.getSession().setAttribute(VERBOSE, Boolean.FALSE);
-            }
-        }    
-        
-        // ADVANCED DATA TOOLS
-        
-        // CUSTOM REPORTS
+                UrlBuilder urlBuilder = new UrlBuilder(vreq.getPortal());
                 
-    
-
-
-
+                body.put("dataInput", getDataInputData(vreq));
         
-
+                if (securityLevel >= LoginFormBean.CURATOR) {
+                    body.put("siteConfig", getSiteConfigurationData(vreq, securityLevel, urlBuilder));
+                    body.put("ontologyEditor", getOntologyEditorData(vreq, urlBuilder));
+                    
+                    if (securityLevel >= LoginFormBean.DBA) {
+                        body.put("dataTools", getDataToolsData(vreq));
+                        
+                        // Only for DataStar. Should handle without needing a DataStar-specific version of this controller.
+                        //body.put("customReports", getCustomReportsData(vreq));
+                    }
+                }
+            }
+        }
         
 // Not used
 //        int languageProfile = wadf.getLanguageProfile();
@@ -131,11 +82,108 @@ public class FreemarkerSiteAdminController extends FreemarkerHttpServlet {
 //        } 
 //        body.put("languageModeStr",  languageMode);       
         
-
-
-
         return mergeBodyToTemplate("siteAdmin-main.ftl", body, config);
         
+    }
+
+    private Map<String, Object> getDataInputData(VitroRequest vreq) {
+    
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("formAction", UrlBuilder.getUrl("/edit/editRequestDispatch.jsp"));
+        
+        WebappDaoFactory wadf = vreq.getFullWebappDaoFactory();
+        
+        // Create map for data input entry form options list
+        List classGroups = wadf.getVClassGroupDao().getPublicGroupsWithVClasses(true,true,false); // order by displayRank, include uninstantiated classes, don't get the counts of individuals        
+        Iterator classGroupIt = classGroups.iterator();
+        LinkedHashMap<String, List> orderedClassGroups = new LinkedHashMap<String, List>(classGroups.size());
+        while (classGroupIt.hasNext()) {
+            VClassGroup group = (VClassGroup)classGroupIt.next();
+            List classes = group.getVitroClassList();
+            orderedClassGroups.put(group.getPublicName(),FormUtils.makeOptionListFromBeans(classes,"URI","PickListName",null,null,false));
+        }
+        
+        map.put("groupedClassOptions", orderedClassGroups);
+        return map;
+    }
+    
+    private Map<String, Object> getSiteConfigurationData(VitroRequest vreq, int securityLevel, UrlBuilder urlBuilder) {
+
+        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, String> urls = new HashMap<String, String>();
+
+        urls.put("tabs", urlBuilder.getPortalUrl("/listTabs"));
+        
+        if (securityLevel >= LoginFormBean.DBA) {                
+            urls.put("users", urlBuilder.getPortalUrl("/listUsers"));
+        }
+
+        if (!vreq.getFullWebappDaoFactory().getPortalDao().isSinglePortal()) {
+            urls.put("portals", urlBuilder.getPortalUrl("/listPortals"));
+        }
+ 
+        urls.put("siteInfo", urlBuilder.getPortalUrl("/editForm", new ParamMap("controller", "Portal", "id", String.valueOf(urlBuilder.getPortalId()))));  
+        
+        map.put("urls", urls);
+        
+        return map;
+    }
+    
+    private Map<String, Object> getOntologyEditorData(VitroRequest vreq, UrlBuilder urlBuilder) {
+
+        Map<String, Object> map = new HashMap<String, Object>();
+ 
+        String pelletError = null;
+        String pelletExplanation = null;
+        Object plObj = getServletContext().getAttribute("pelletListener");
+        if ( (plObj != null) && (plObj instanceof PelletListener) ) {
+            PelletListener pelletListener = (PelletListener) plObj;
+            if (!pelletListener.isConsistent()) {
+                pelletError = "INCONSISTENT ONTOLOGY: reasoning halted.";
+                pelletExplanation = pelletListener.getExplanation();
+            } else if ( pelletListener.isInErrorState() ) {
+                pelletError = "An error occurred during reasoning. Reasoning has been halted. See error log for details.";
+            }
+        }
+
+        if (pelletError != null) {
+            Map<String, String> pellet = new HashMap<String, String>();
+            pellet.put("error", pelletError);
+            if (pelletExplanation != null) {
+                pellet.put("explanation", pelletExplanation);
+            }
+            map.put("pellet", pellet);
+        }
+                
+        Map<String, String> urls = new HashMap<String, String>();
+        
+        urls.put("ontologies", urlBuilder.getPortalUrl("/listOntologies"));
+        urls.put("classHierarchy", urlBuilder.getPortalUrl("/showClassHierarchy"));
+        urls.put("classGroups", urlBuilder.getPortalUrl("/listGroups"));
+        urls.put("dataPropertyHierarchy", urlBuilder.getPortalUrl("/showDataPropertyHierarchy"));
+        urls.put("propertyGroups", urlBuilder.getPortalUrl("/listPropertyGroups"));            
+        urls.put("objectPropertyHierarchy", urlBuilder.getPortalUrl("/showObjectPropertyHierarchy", new ParamMap("iffRoot", "true")));
+        map.put("urls", urls);
+        
+        // RY Make sure this works for true, false, and undefined values of the param
+        String verbose = vreq.getParameter("verbose");
+        boolean verbosePropertyValue = "true".equals(verbose) ? true : false;
+        vreq.getSession().setAttribute("verbosePropertyListing", verbosePropertyValue);
+        
+        Map<String, Object> verbosePropertyForm = new HashMap<String, Object>();
+        verbosePropertyForm.put("verboseFieldValue", String.valueOf(!verbosePropertyValue)); // the form toggles the current value
+        verbosePropertyForm.put("action", urlBuilder.getPortalUrl(Route.SITE_ADMIN));
+        verbosePropertyForm.put("currentValue", verbosePropertyValue ? "on" : "off");
+        verbosePropertyForm.put("newValue", verbosePropertyValue ? "off" : "on");
+        map.put("verbosePropertyForm", verbosePropertyForm);
+        
+        return map;
+    }
+
+    private Map<String, Object> getDataToolsData(VitroRequest vreq) {
+
+        Map<String, Object> map = new HashMap<String, Object>();
+        return map;
     }
 
 }

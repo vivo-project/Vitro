@@ -7,7 +7,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Params;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 
 public class UrlBuilderTest extends AbstractTestClass {
     
@@ -34,7 +34,7 @@ public class UrlBuilderTest extends AbstractTestClass {
     public void testGetUrlWithParams() {
         UrlBuilder.contextPath = "/vivo";
         String path = "/individual";
-        Params params = new Params();
+        ParamMap params = new ParamMap();
         int portalId = 1;
         params.put("home", "" + portalId);
         params.put("name", "Tom");
@@ -45,7 +45,7 @@ public class UrlBuilderTest extends AbstractTestClass {
     public void testEncodeUrl() {
         UrlBuilder.contextPath = "/vivo";
         String path = "/individuallist";
-        Params params = new Params();
+        ParamMap params = new ParamMap();
         String vClassUri = "http://vivoweb.org/ontology/core#FacultyMember";
         params.put("vclassId", vClassUri);
         Assert.assertEquals("/vivo/individuallist?vclassId=http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23FacultyMember", UrlBuilder.getUrl(path, params));    

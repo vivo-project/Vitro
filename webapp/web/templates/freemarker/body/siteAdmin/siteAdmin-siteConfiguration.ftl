@@ -8,17 +8,17 @@
         <h3>Site Configuration</h3>
         
         <ul>
-            <#if siteConfig.listPortalsUrl??>
-                <li><a href="${siteConfig.siteInfoUrl}">Current portal information</a></li>
-                <li><a href="${siteConfig.listPortalsUrl}">List all portals</a></li>
+            <#if siteConfig.urls.portals??>
+                <li><a href="${siteConfig.urls.siteInfo}">Current portal information</a></li>
+                <li><a href="${siteConfig.urls.portals}">List all portals</a></li>
             <#else>
-                <li><a href="${siteConfig.siteInfoUrl}">Site information</a></li>
+                <li><a href="${siteConfig.urls.siteInfo}">Site information</a></li>
             </#if>
             
-            <li><a href="${siteConfig.tabManagementUrl}">Tab management</a></li>
+            <li><a href="${siteConfig.urls.tabs}">Tab management</a></li>
             
-            <#if siteConfig.userManagementUrl??>
-                <li><a href="${siteConfig.userManagementUrl}">User accounts</a></li>  
+            <#if siteConfig.urls.users??>
+                <li><a href="${siteConfig.urls.users}">User accounts</a></li>  
             </#if>
         
         </ul>

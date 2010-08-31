@@ -52,7 +52,7 @@ public class UrlBuilder {
             return getUrl(path);
         }
         
-        public String url(Params params) {
+        public String url(ParamMap params) {
             return getUrl(path, params);
         }
         
@@ -105,6 +105,10 @@ public class UrlBuilder {
         this.portal = portal;
     }
     
+    public int getPortalId() {
+        return portal.getPortalId();
+    }
+    
     public String getHomeUrl() {
         String rootBreadCrumbUrl = portal.getRootBreadCrumbURL();
         String path = StringUtils.isEmpty(rootBreadCrumbUrl) ? "" : rootBreadCrumbUrl;
@@ -112,18 +116,18 @@ public class UrlBuilder {
     }
     
     public String getLogoutUrl() {
-        return getPortalUrl(Route.LOGOUT.path(), new Params("loginSubmitMode", "Log Out"));
+        return getPortalUrl(Route.LOGOUT, new ParamMap("loginSubmitMode", "Log Out"));
     }
     
-    public Params getPortalParam() {
-        return new Params("home", "" + portal.getPortalId());    
+    public ParamMap getPortalParam() {
+        return new ParamMap("home", "" + portal.getPortalId());    
     }
 
     public String getPortalUrl(String path) {
         return addPortalParam ? getUrl(path, getPortalParam()) : getUrl(path);
     }
     
-    public String getPortalUrl(String path, Params params) {
+    public String getPortalUrl(String path, ParamMap params) {
         if (addPortalParam) {
             params.putAll(getPortalParam());
         }
@@ -134,16 +138,16 @@ public class UrlBuilder {
         return getPortalUrl(route.path());
     }
     
-    public String getPortalUrl(Route route, Params params) {
+    public String getPortalUrl(Route route, ParamMap params) {
         return getPortalUrl(route.path(), params);
     }
     
-    public static class Params extends HashMap<String, String> { 
+    public static class ParamMap extends HashMap<String, String> { 
         private static final long serialVersionUID = 1L;
         
-        public Params() { }
+        public ParamMap() { }
         
-        public Params(String...strings) {
+        public ParamMap(String...strings) {
             int stringCount = strings.length;
             for (int i = 0; i < stringCount; i=i+2) {
                 // Skip the last item if there's an odd number
@@ -154,13 +158,18 @@ public class UrlBuilder {
             }
         } 
         
-        public Params(Map<String, String> map) {
+        public ParamMap(Map<String, String> map) {
             putAll(map);
         }
         
         public void put(String key, int value) {
             put(key, String.valueOf(value));
         }
+        
+        public void put(String key, boolean value) {
+            put(key, String.valueOf(value));
+        }
+        
     }
     
     /********** Static utility methods **********/
@@ -174,23 +183,39 @@ public class UrlBuilder {
         return path.isEmpty() ? "/" : path;
     }
     
+    public static String getUrl(Route route) {
+        return getUrl(route.path());
+    }
+    
     public static String getUrl(String path, String...params) {
-        Params urlParams = new Params(params);
+        ParamMap urlParams = new ParamMap(params);
         return getUrl(path, urlParams);
     }
     
-    public static String getUrl(String path, Params params) {
+    public static String getUrl(Route route, String...params) {
+        return getUrl(route.path(), params);
+    }
+    
+    public static String getUrl(String path, ParamMap params) {
         path = getPath(path, params);
         return getUrl(path);       
     }
+
+    public static String getUrl(Route route, ParamMap params) {
+        return getUrl(route.path(), params);
+    }
     
-    public static String getPath(String path, Params params) {
+    public static String getPath(String path, ParamMap params) {
         String glue = "?";
         for (String key : params.keySet()) {
             path += glue + key + "=" + urlEncode(params.get(key));
             glue = "&";
         }
         return path;       
+    }
+    
+    public static String getPath(Route route, ParamMap params) {
+        return getPath(route.path(), params);
     }
 
     public static String urlEncode(String url) {

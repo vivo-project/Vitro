@@ -11,7 +11,7 @@
 
         <form action="${dataInput.formAction}" method="get">
             <select id="VClassURI" name="typeOfNew" class="form-item">
-                <@form.optionGroups groups=dataInput.classGroupOptions />
+                <@form.optionGroups groups=dataInput.groupedClassOptions />
             </select>
             <input type="hidden" name="editform" value="newIndividualForm.jsp"/>
             <input type="submit" class="add-action-button" value="Add individual of this class"/>

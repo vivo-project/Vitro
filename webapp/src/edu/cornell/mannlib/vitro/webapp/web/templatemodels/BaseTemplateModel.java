@@ -12,7 +12,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Params;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 
 public abstract class BaseTemplateModel {
 
@@ -27,7 +27,7 @@ public abstract class BaseTemplateModel {
     }
 
     // Convenience method so subclasses can call getUrl(path, params)
-    protected String getUrl(String path, Params params) {
+    protected String getUrl(String path, ParamMap params) {
         return UrlBuilder.getUrl(path, params);
     }
     

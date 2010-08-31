@@ -537,7 +537,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 * URI.
 	 */
 	private String formAction(String entityUri, String action) {
-		UrlBuilder.Params params = new UrlBuilder.Params(PARAMETER_ENTITY_URI,
+		UrlBuilder.ParamMap params = new UrlBuilder.ParamMap(PARAMETER_ENTITY_URI,
 				entityUri, PARAMETER_ACTION, action);
 		return UrlBuilder.getPath(URL_HERE, params);
 	}

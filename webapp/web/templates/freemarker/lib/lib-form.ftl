@@ -7,7 +7,7 @@
     
     Output a sequence of option groups with options.
     
-    Input is a map of option groups to a list of Option objects.
+    Input is a map of option groups to lists of Option objects.
     
     Usage: <@optionGroups groups=myOptionGroups />
 -->
