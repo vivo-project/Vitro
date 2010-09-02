@@ -10,7 +10,6 @@ import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
-import javax.servlet.ServletContextListener;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -22,9 +21,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
+import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.edit.Authenticate;
 import edu.cornell.mannlib.vitro.webapp.dao.PortalDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
@@ -402,6 +402,7 @@ public class VitroRequestPrep implements Filter {
 
     public static void forceToSelfEditing(HttpServletRequest request){
         HttpSession sess = request.getSession(true);
+        sess.setMaxInactiveInterval(Authenticate.LOGGED_IN_TIMEOUT_INTERVAL);
         sess.setAttribute("inSelfEditing","true");
     }
     public static void forceOutOfSelfEditing(HttpServletRequest request){
