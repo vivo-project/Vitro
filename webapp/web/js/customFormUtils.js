@@ -30,7 +30,7 @@ vitro.customFormUtils = {
     // Clear data from form elements in element el
     clearFields: function(el) {
     	el.find(':input[type!="hidden"][type!="submit"][type!="button"]').each(function() {
-            $(this).val();
+            $(this).val('');
             // Remove a validation error associated with this element.
             // For now we can remove the error elements. Later we may include them in
             // the markup, for customized positioning, in which case we will empty them
