@@ -39,9 +39,12 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.LoginEvent;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.LoginLogoutEvent;
 
 public class Authenticate extends FreemarkerHttpServlet {
-	/** Maximum inactive interval for a ordinary logged in user session, in seconds. */
+	/**
+	 * Maximum inactive interval for a ordinary logged in user session, in
+	 * seconds.
+	 */
 	public static final int LOGGED_IN_TIMEOUT_INTERVAL = 300;
-	
+
 	/** Maximum inactive interval for a editor (or better) session, in seconds. */
 	public static final int PRIVILEGED_TIMEOUT_INTERVAL = 32000;
 
@@ -72,9 +75,6 @@ public class Authenticate extends FreemarkerHttpServlet {
 	public static final String BODY_LOGIN_NAME = "loginName";
 	public static final String BODY_FORM_ACTION = "formAction";
 	public static final String BODY_ERROR_MESSAGE = "errorMessage";
-
-	/** If no portal is specified in the request, use this one. */
-	private static final int DEFAULT_PORTAL_ID = 1;
 
 	/** Where do we find the User/Session map in the servlet context? */
 	public static final String USER_SESSION_MAP_ATTR = "userURISessionMap";
@@ -307,7 +307,9 @@ public class Authenticate extends FreemarkerHttpServlet {
 		getUserDao(request).updateUser(user);
 
 		// Set the timeout limit on the session - editors, etc, get more.
-		session.setMaxInactiveInterval(LOGGED_IN_TIMEOUT_INTERVAL); // seconds, not milliseconds
+		session.setMaxInactiveInterval(LOGGED_IN_TIMEOUT_INTERVAL); // seconds,
+																	// not
+																	// milliseconds
 		try {
 			if ((int) Integer.decode(lfb.getLoginRole()) > 1) {
 				session.setMaxInactiveInterval(PRIVILEGED_TIMEOUT_INTERVAL);
@@ -513,33 +515,9 @@ public class Authenticate extends FreemarkerHttpServlet {
 		return request.getContextPath();
 	}
 
-	/**
-	 * What portal are we currently in?
-	 */
-	private String getPortalIdString(HttpServletRequest request) {
-		String portalIdParameter = request.getParameter("home");
-		if (portalIdParameter == null) {
-			return String.valueOf(DEFAULT_PORTAL_ID);
-		} else {
-			return portalIdParameter;
-		}
-	}
-
-	/**
-	 * How is the login process coming along?
-	 */
+	/** Where do we stand in the login process? */
 	private LoginProcessBean getLoginProcessBean(HttpServletRequest request) {
-		HttpSession session = request.getSession();
-
-		LoginProcessBean bean = (LoginProcessBean) session
-				.getAttribute(LoginProcessBean.SESSION_ATTRIBUTE);
-
-		if (bean == null) {
-			bean = new LoginProcessBean();
-			session.setAttribute(LoginProcessBean.SESSION_ATTRIBUTE, bean);
-		}
-
-		return bean;
+		return LoginProcessBean.getBeanFromSession(request);
 	}
 
 	// ----------------------------------------------------------------------
@@ -561,7 +539,7 @@ public class Authenticate extends FreemarkerHttpServlet {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	/**
 	 * The servlet context should contain a map from User URIs to
 	 * {@link HttpSession}s. Get a reference to it, creating it if necessary.

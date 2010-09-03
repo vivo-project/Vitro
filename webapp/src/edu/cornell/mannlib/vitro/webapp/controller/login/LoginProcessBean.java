@@ -5,6 +5,9 @@ package edu.cornell.mannlib.vitro.webapp.controller.login;
 import java.text.MessageFormat;
 import java.util.Arrays;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 /**
  * Where are we in the process of logging on? What message should we show to the
  * user?
@@ -14,6 +17,21 @@ public class LoginProcessBean {
 
 	public static final String SESSION_ATTRIBUTE = LoginProcessBean.class
 			.getName();
+
+	/**
+	 * Get the login process bean from the session. If there is none, create
+	 * one.
+	 */
+	public static LoginProcessBean getBeanFromSession(HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		LoginProcessBean bean = (LoginProcessBean) session
+				.getAttribute(SESSION_ATTRIBUTE);
+		if (bean == null) {
+			bean = new LoginProcessBean();
+			session.setAttribute(SESSION_ATTRIBUTE, bean);
+		}
+		return bean;
+	}
 
 	public enum State {
 		NOWHERE, LOGGING_IN, FORCED_PASSWORD_CHANGE, CANCELLED, LOGGED_IN

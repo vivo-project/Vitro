@@ -34,6 +34,7 @@ public class Controllers {
 
     public static final String SITE_ADMIN = "/siteAdmin";
     public static final String LOGIN = "/siteAdmin";
+    public static final String AUTHENTICATE = "/authenticate";
     
     public static final String EXPORT_RDF = "/export";
     

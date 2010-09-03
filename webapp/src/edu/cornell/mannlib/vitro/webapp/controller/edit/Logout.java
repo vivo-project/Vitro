@@ -17,7 +17,10 @@ import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.LogoutEvent;
 
-public class Logout extends HttpServlet /* implements SingleThreadModel */{
+/**
+ * Provide a means for programmatic logout.
+ */
+public class Logout extends HttpServlet {
 
 	private static final Log log = LogFactory.getLog(Logout.class.getName());
 
