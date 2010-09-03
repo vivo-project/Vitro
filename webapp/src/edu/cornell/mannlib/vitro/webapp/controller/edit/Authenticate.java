@@ -39,6 +39,12 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.LoginEvent;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.LoginLogoutEvent;
 
 public class Authenticate extends FreeMarkerHttpServlet {
+	/** Maximum inactive interval for a ordinary logged in user session, in seconds. */
+	public static final int LOGGED_IN_TIMEOUT_INTERVAL = 300;
+	
+	/** Maximum inactive interval for a editor (or better) session, in seconds. */
+	public static final int PRIVILEGED_TIMEOUT_INTERVAL = 32000;
+
 	private static final Log log = LogFactory.getLog(Authenticate.class
 			.getName());
 
@@ -301,10 +307,10 @@ public class Authenticate extends FreeMarkerHttpServlet {
 		getUserDao(request).updateUser(user);
 
 		// Set the timeout limit on the session - editors, etc, get more.
-		session.setMaxInactiveInterval(300); // seconds, not milliseconds
+		session.setMaxInactiveInterval(LOGGED_IN_TIMEOUT_INTERVAL); // seconds, not milliseconds
 		try {
 			if ((int) Integer.decode(lfb.getLoginRole()) > 1) {
-				session.setMaxInactiveInterval(32000);
+				session.setMaxInactiveInterval(PRIVILEGED_TIMEOUT_INTERVAL);
 			}
 		} catch (NumberFormatException e) {
 			// No problem - leave it at the default.
