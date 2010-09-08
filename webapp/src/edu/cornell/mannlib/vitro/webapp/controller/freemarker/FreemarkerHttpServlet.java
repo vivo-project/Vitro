@@ -220,6 +220,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
 
         map.put("stylesheets", getStylesheetList(themeDir));
         map.put("scripts", getScriptList(themeDir));
+        map.put("headScripts", getScriptList(themeDir));
   
         addDirectives(map);
         

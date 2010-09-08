@@ -25,7 +25,9 @@ public abstract class Files extends BaseTemplateModel {
     }
     
     public void add(String path) {
-        list.add(getUrl(path));
+    	// Allow for an external url
+    	String url = path.startsWith("http://") ? path : getUrl(path);
+        list.add(url);
     }
     
     public void add(String... paths) {

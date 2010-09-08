@@ -6,10 +6,13 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.mail.Session;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -43,6 +46,8 @@ import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditSubmission;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
 import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQuery;
 import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQueryWrapper;
@@ -50,6 +55,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapper;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapperFactory;
 import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 import edu.cornell.mannlib.vitro.webapp.web.jsptags.StringProcessorTag;
+import freemarker.template.Configuration;
 
 /**
  * Handles requests for entity information.
@@ -58,77 +64,83 @@ import edu.cornell.mannlib.vitro.webapp.web.jsptags.StringProcessorTag;
  * @author bdc34
  *
  */
-
-/* IMPLEMENTATION NOTES
-
-- See NIHVIVO-512:
-build up the list of actually rendered items first. Only then, if there are any, add the label on top. 
-
-*/
-
 public class IndividualController extends FreemarkerHttpServlet {
-    
-    private static final long serialVersionUID = 1L;
-    private static final Log log = LogFactory.getLog(IndividualController.class.getName());
+    private static final Log log = LogFactory.getLog(IndividualController.class);
 
     private String default_jsp      = Controllers.BASIC_JSP;
     private String default_body_jsp = Controllers.ENTITY_JSP;
     private ApplicationBean appBean;
+
     
-    public void doGet( HttpServletRequest req, HttpServletResponse res )
-    throws IOException, ServletException {
-        try {
-            super.doGet(req, res);            
-
-            VitroRequest vreq = new VitroRequest(req);
-            //get URL without hostname or servlet context
-            String url = req.getRequestURI().substring(req.getContextPath().length());            
-            
-            //Check to see if the request is for a non-information resource, redirect if it is.
-            String redirectURL = checkForRedirect ( url, req.getHeader("accept") );
-            if( redirectURL != null ){
-            	doRedirect( req, res, redirectURL );
-            	return;
-            }            	           
-
-            ContentType rdfFormat = checkForLinkedDataRequest(url,req.getHeader("accept"));
-            if( rdfFormat != null ){
-            	doRdf( vreq, res, rdfFormat );
-            	return;
-            }                                 
-
-            Individual indiv = null;
-            try{
-                indiv = getEntityFromRequest( vreq);
-            }catch(Throwable th){
-                doHelp(res);
-                return;
-            }
-            
-            if( indiv == null || checkForHidden(vreq, indiv) || checkForSunset(vreq, indiv)){
-            	doNotFound(vreq, res);
-            	return;
-            }
-            
-            // If this is an uploaded file, redirect to its "alias URL".
-            String aliasUrl = getAliasUrlForBytestreamIndividual(req, indiv);
-            if (aliasUrl != null) {
-            	res.sendRedirect(req.getContextPath() + aliasUrl);
-            	return;
-            }
-
-            doHtml( vreq, res , indiv);                    
-            return;
-            
-        } catch (Throwable e) {
-            log.error(e);
-            req.setAttribute("javax.servlet.jsp.jspException",e);
-            RequestDispatcher rd = req.getRequestDispatcher("/error.jsp");
-            rd.forward(req, res);
-        }
+    protected String getBody(VitroRequest vreq, Map<String, Object> body, Configuration config) {
+    	try {
+    		
+    		cleanUpSession(vreq);
+    	    
+	        // get URL without hostname or servlet context
+	        String url = vreq.getRequestURI().substring(vreq.getContextPath().length());   
+	        
+	        // Title = individual label
+	
+	        //Check to see if the request is for a non-information resource, redirect if it is.
+	        String redirectURL = checkForRedirect ( url, vreq.getHeader("accept") );
+	        if( redirectURL != null ){
+	        	//doRedirect( vreq, res, redirectURL );
+	        	return "";
+	        }            	           
+	
+	        ContentType rdfFormat = checkForLinkedDataRequest(url,vreq.getHeader("accept"));
+	        if( rdfFormat != null ){
+	        	//doRdf( vreq, res, rdfFormat );
+	        	return "";
+	        }                                 
+	
+	        Individual indiv = null;
+	        try{
+	            indiv = getEntityFromRequest( vreq);
+	        }catch(Throwable th){
+	            //doHelp(res);
+	            return "";
+	        }
+	        
+	        if( indiv == null || checkForHidden(vreq, indiv) || checkForSunset(vreq, indiv)){
+	        	//doNotFound(vreq, res);
+	        	return "";
+	        }
+	
+	        // If this is an uploaded file, redirect to its "alias URL".
+	        String aliasUrl = getAliasUrlForBytestreamIndividual(vreq, indiv);
+	        if (aliasUrl != null) {
+	        	//res.sendRedirect(vreq.getContextPath() + aliasUrl);
+	        	return "";
+	        }
+	        
+	        body.put("individual", getIndividualData( vreq, indiv));                    
+	        body.put("title", indiv.getName());
+	        
+	        String bodyTemplate = "individual.ftl";             
+	        return mergeBodyToTemplate(bodyTemplate, body, config);
+        
+	    } catch (Throwable e) {
+	        log.error(e);
+	        //vreq.setAttribute("javax.servlet.jsp.jspException",e);
+	        // RequestDispatcher rd = vreq.getRequestDispatcher("/error.jsp");
+	        //rd.forward(vreq, res);
+	        return "";
+	    }
     }
 
-	private void doHtml(VitroRequest vreq, HttpServletResponse res, Individual indiv) throws ServletException, IOException {
+    private void cleanUpSession(HttpServletRequest request) {
+		// Session cleanup: anytime we are at an entity page we shouldn't have an editing config or submission
+	    HttpSession session = request.getSession();
+	    session.removeAttribute("editjson");
+	    EditConfiguration.clearAllConfigsInSession(session);
+	    EditSubmission.clearAllEditSubmissionsInSession(session);
+    }
+    
+	private Map<String, Object> getIndividualData(VitroRequest vreq, Individual indiv) throws ServletException, IOException {
+		Map<String, Object> data = new HashMap<String, Object>();
+		
     	IndividualDao iwDao = vreq.getWebappDaoFactory().getIndividualDao();
         ObjectPropertyDao opDao = vreq.getWebappDaoFactory().getObjectPropertyDao();
         
@@ -140,14 +152,14 @@ public class IndividualController extends FreemarkerHttpServlet {
         if (relatedSubjectUri != null) {
         	Individual relatedSubjectInd = iwDao.getIndividualByURI(relatedSubjectUri);
         	if (relatedSubjectInd != null) {
-        		vreq.setAttribute("relatedSubject", relatedSubjectInd);
+        		data.put("relatedSubject", relatedSubjectInd);
         	}
         }
         String relatingPredicateUri = vreq.getParameter("relatingPredicateUri");
         if (relatingPredicateUri != null) {
         	ObjectProperty relatingPredicateProp = opDao.getObjectPropertyByURI(relatingPredicateUri);
         	if (relatingPredicateProp != null) {
-        		vreq.setAttribute("relatingPredicate", relatingPredicateProp);
+        		data.put("relatingPredicate", relatingPredicateProp);
         	}
         }
 
@@ -156,7 +168,7 @@ public class IndividualController extends FreemarkerHttpServlet {
 
         String vclassName = "unknown";
         String customView = null;
-        String customCss = null;
+
         if( indiv.getVClass() != null ){
             vclassName = indiv.getVClass().getName();
             List<VClass> clasList = indiv.getVClasses(true);
@@ -196,48 +208,36 @@ public class IndividualController extends FreemarkerHttpServlet {
         }
         String netid = iwDao.getNetId(indiv.getURI());
         
-        vreq.setAttribute("netid", netid);
-        vreq.setAttribute("vclassName", vclassName);
-        vreq.setAttribute("entity",indiv);
+        data.put("netid", netid);
+        data.put("vclassName", vclassName);
+        data.put("entity",indiv);
         Portal portal = vreq.getPortal();
-        vreq.setAttribute("portal",String.valueOf(portal));
+        data.put("portal",String.valueOf(portal));
         String view= getViewFromRequest(vreq);
         if( view == null){
             if (customView == null) {
                 view = default_jsp;
-                vreq.setAttribute("bodyJsp","/"+Controllers.ENTITY_JSP);
+                data.put("bodyJsp","/"+Controllers.ENTITY_JSP);
                 log.debug("no custom view and no view parameter in request for rendering "+indiv.getName());
             } else {
                 view = default_jsp;
                 log.debug("setting custom view templates/entity/"+ customView + " for rendering "+indiv.getName());
-                vreq.setAttribute("bodyJsp", "/templates/entity/"+customView);
+                data.put("bodyJsp", "/templates/entity/"+customView);
             }
-            vreq.setAttribute("entityPropsListJsp",Controllers.ENTITY_PROP_LIST_JSP);
-            vreq.setAttribute("entityDatapropsListJsp",Controllers.ENTITY_DATAPROP_LIST_JSP);
-            vreq.setAttribute("entityMergedPropsListJsp",Controllers.ENTITY_MERGED_PROP_LIST_GROUPED_JSP);
-            vreq.setAttribute("entityKeywordsListJsp",Controllers.ENTITY_KEYWORDS_LIST_JSP);
+            data.put("entityPropsListJsp",Controllers.ENTITY_PROP_LIST_JSP);
+            data.put("entityDatapropsListJsp",Controllers.ENTITY_DATAPROP_LIST_JSP);
+            data.put("entityMergedPropsListJsp",Controllers.ENTITY_MERGED_PROP_LIST_GROUPED_JSP);
+            data.put("entityKeywordsListJsp",Controllers.ENTITY_KEYWORDS_LIST_JSP);
         } else {
             log.debug("Found view parameter "+view+" in request for rendering "+indiv.getName());
         }
-        //set title before we do the highlighting so we don't get markup in it.
-        vreq.setAttribute("title",indiv.getName());
+
         //setup highlighter for search terms
         checkForSearch(vreq, indiv);
 
-		// set CSS and script elements
-        String contextPath = "";
-        if (vreq.getContextPath().length()>1) {
-        	contextPath = vreq.getContextPath();
-        }
-        String css = "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\" href=\""
-		+ contextPath + "/" + portal.getThemeDir() + "css/entity.css\"/>\n"
-		+ "<script language='JavaScript' type='text/javascript' src='"+contextPath+"/js/toggle.js'></script> \n";
-        if (customCss!=null) {
-            css += customCss;
-        }
 
         if(  indiv.getURI().startsWith( vreq.getWebappDaoFactory().getDefaultNamespace() )){        	
-        	vreq.setAttribute("entityLinkedDataURL", indiv.getURI() + "/" + indiv.getLocalName() + ".rdf");	
+        	data.put("entityLinkedDataURL", indiv.getURI() + "/" + indiv.getLocalName() + ".rdf");	
         }
         
         
@@ -247,11 +247,11 @@ public class IndividualController extends FreemarkerHttpServlet {
         // String individualToRDF = "http://"+vreq.getServerName()+":"+vreq.getServerPort()+vreq.getContextPath()+"/entity?home=1&uri="+forURL(entity.getURI())+"&view=rdf.rdf"; 
         //css += "<link rel='alternate' type='application/rdf+xml' title='"+entity.getName()+"' href='"+individualToRDF+"' />";
 
-        vreq.setAttribute("css",css);
-        vreq.setAttribute("scripts", "/templates/entity/entity_inject_head.jsp");
 
-        RequestDispatcher rd = vreq.getRequestDispatcher( view );
-        rd.forward(vreq,res);		
+        //RequestDispatcher rd = vreq.getRequestDispatcher( view );
+        //rd.forward(vreq,res);	
+        
+        return data;
 	}
 
 	private void doRdf(VitroRequest vreq, HttpServletResponse res,
@@ -294,8 +294,8 @@ public class IndividualController extends FreemarkerHttpServlet {
 	}
 
 
-	private static Pattern LINKED_DATA_URL = Pattern.compile("^/individual/([^/]*)$");		
-	private static Pattern NS_PREFIX_URL = Pattern.compile("^/individual/([^/]*)/([^/]*)$");
+	private static Pattern LINKED_DATA_URL = Pattern.compile("^/individualfm/([^/]*)$");		
+	private static Pattern NS_PREFIX_URL = Pattern.compile("^/individualfm/([^/]*)/([^/]*)$");
 	
     /**
         Gets the entity id from the request.
@@ -408,7 +408,7 @@ public class IndividualController extends FreemarkerHttpServlet {
     }
  
 	
-	private static Pattern URI_PATTERN = Pattern.compile("^/individual/([^/]*)$");
+	private static Pattern URI_PATTERN = Pattern.compile("^/individualfm/([^/]*)$");
     //Redirect if the request is for http://hostname/individual/localname
     // if accept is nothing or text/html redirect to ???
     // if accept is some RDF thing redirect to the URL for RDF
@@ -433,16 +433,16 @@ public class IndividualController extends FreemarkerHttpServlet {
 		}
 	}
 
-	private static Pattern RDF_REQUEST = Pattern.compile("^/individual/([^/]*)/\\1.rdf$");
-    private static Pattern N3_REQUEST = Pattern.compile("^/individual/([^/]*)/\\1.n3$");
-    private static Pattern TTL_REQUEST = Pattern.compile("^/individual/([^/]*)/\\1.ttl$");
-    private static Pattern HTML_REQUEST = Pattern.compile("^/display/([^/]*)$");
+	private static Pattern RDF_REQUEST = Pattern.compile("^/individualfm/([^/]*)/\\1.rdf$");
+    private static Pattern N3_REQUEST = Pattern.compile("^/individualfm/([^/]*)/\\1.n3$");
+    private static Pattern TTL_REQUEST = Pattern.compile("^/individualfm/([^/]*)/\\1.ttl$");
+    private static Pattern HTML_REQUEST = Pattern.compile("^/displayfm/([^/]*)$");
     
     /**  
      * @return null if this is not a linked data request, returns content type if it is a 
      * linked data request.
      */
-	private ContentType checkForLinkedDataRequest(String url, String acceptHeader) {		
+	protected ContentType checkForLinkedDataRequest(String url, String acceptHeader) {		
 		try {
 			//check the accept header			
 			if (acceptHeader != null) {
@@ -495,15 +495,14 @@ public class IndividualController extends FreemarkerHttpServlet {
         // TODO Auto-generated method stub
         return false;
     }
- 
-    /**
+    
+	/**
 	 * If this entity represents a File Bytestream, get its alias URL so we can
 	 * properly serve the file contents.
 	 */
-	private String getAliasUrlForBytestreamIndividual(HttpServletRequest req, Individual entity)
+	private String getAliasUrlForBytestreamIndividual(VitroRequest vreq, Individual entity)
 			throws IOException {
-		FileInfo fileInfo = FileInfo.instanceFromBytestreamUri(new VitroRequest(
-				req).getWebappDaoFactory(), entity.getURI());
+		FileInfo fileInfo = FileInfo.instanceFromBytestreamUri(vreq.getWebappDaoFactory(), entity.getURI());
 		if (fileInfo == null) {
 			log.trace("Entity '" + entity.getURI() + "' is not a bytestream.");
 			return null;
@@ -615,7 +614,7 @@ public class IndividualController extends FreemarkerHttpServlet {
         out.println("<p>id is the id of the entity to query for. netid also works.</p>");
         out.println("</body></html>");
     }
-
+    
     private void doNotFound(HttpServletRequest req, HttpServletResponse res)
     throws IOException, ServletException {
         VitroRequest vreq = new VitroRequest(req);
@@ -702,16 +701,14 @@ public class IndividualController extends FreemarkerHttpServlet {
         rd.forward(req,res);
     }
     
-    private String forURL(String frag)
-    {
-            String result = null;
-            try 
-            {
-                    result = URLEncoder.encode(frag, "UTF-8");
+    private String forURL(String frag) {
+    	String result = null;
+        try {
+        	result = URLEncoder.encode(frag, "UTF-8");
         } catch (UnsupportedEncodingException ex) {
             throw new RuntimeException("UTF-8 not supported", ex);
         }
-            return result;
+        return result;
     }
     
     private class HelpException extends Throwable{}
