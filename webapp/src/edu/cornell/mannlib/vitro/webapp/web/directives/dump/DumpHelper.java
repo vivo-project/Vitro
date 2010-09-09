@@ -51,11 +51,8 @@ public class DumpHelper {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("var", varName);
         
-        if (tm != null) {
-
-            // Just use toString() method for now. Handles nested collections. Could make more sophisticated later.
+        if (tm != null) {            
             String type = null;
-            String value = tm.toString();
             Object unwrappedModel = null;
 
             try {
@@ -63,7 +60,12 @@ public class DumpHelper {
             } catch (TemplateModelException e) {
                 log.error("Cannot unwrap template model  " + varName + ".");
             }
-    
+            
+            // Just use toString() method for now. Handles nested collections. Could make more sophisticated later.
+            // tm.toString() gives wrong results in the case of, e.g., a boolean value in a hash. tm.toString() may
+            // return a TemplateBooleanModel object, while unwrappedModel.toString() returns "true" or "false."
+            String value = unwrappedModel.toString(); // tm.toString();  
+            
             // This case must precede the TemplateScalarModel case, because
             // tm is an instance of StringModel and thus a TemplateScalarModel.
             if (unwrappedModel instanceof BaseTemplateModel) {
