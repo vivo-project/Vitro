@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.mail.Session;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -35,6 +34,7 @@ import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
+import edu.cornell.mannlib.vedit.beans.LoginFormBean;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -49,12 +49,14 @@ import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditSubmission;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
+import edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep;
 import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQuery;
 import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQueryWrapper;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapper;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapperFactory;
 import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 import edu.cornell.mannlib.vitro.webapp.web.jsptags.StringProcessorTag;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.IndividualTemplateModel;
 import freemarker.template.Configuration;
 
 /**
@@ -74,9 +76,13 @@ public class IndividualController extends FreemarkerHttpServlet {
     
     protected String getBody(VitroRequest vreq, Map<String, Object> body, Configuration config) {
     	try {
+
+	        HttpSession session = vreq.getSession();
+	        
+    		cleanUpSession(session);
     		
-    		cleanUpSession(vreq);
-    	    
+
+    		
 	        // get URL without hostname or servlet context
 	        String url = vreq.getRequestURI().substring(vreq.getContextPath().length());   
 	        
@@ -95,28 +101,33 @@ public class IndividualController extends FreemarkerHttpServlet {
 	        	return "";
 	        }                                 
 	
-	        Individual indiv = null;
+	        Individual individual = null;
 	        try{
-	            indiv = getEntityFromRequest( vreq);
+	            individual = getEntityFromRequest( vreq);
 	        }catch(Throwable th){
 	            //doHelp(res);
 	            return "";
 	        }
 	        
-	        if( indiv == null || checkForHidden(vreq, indiv) || checkForSunset(vreq, indiv)){
+	        if( individual == null || checkForHidden(vreq, individual) || checkForSunset(vreq, individual)){
 	        	//doNotFound(vreq, res);
 	        	return "";
 	        }
 	
 	        // If this is an uploaded file, redirect to its "alias URL".
-	        String aliasUrl = getAliasUrlForBytestreamIndividual(vreq, indiv);
+	        String aliasUrl = getAliasUrlForBytestreamIndividual(vreq, individual);
 	        if (aliasUrl != null) {
 	        	//res.sendRedirect(vreq.getContextPath() + aliasUrl);
 	        	return "";
 	        }
-	        
-	        body.put("individual", getIndividualData( vreq, indiv));                    
-	        body.put("title", indiv.getName());
+
+
+	        int securityLevel = getSecurityLevel(session);
+	        UrlBuilder urlBuilder = new UrlBuilder(vreq.getPortal());
+    		body.put("editStatus", getEditingData(vreq, securityLevel, individual, urlBuilder));
+    		body.put("visualization", getVisualizationData(vreq, individual));
+	        body.putAll(getIndividualData( vreq, individual));                    
+	        body.put("title", individual.getName());
 	        
 	        String bodyTemplate = "individual.ftl";             
 	        return mergeBodyToTemplate(bodyTemplate, body, config);
@@ -130,114 +141,166 @@ public class IndividualController extends FreemarkerHttpServlet {
 	    }
     }
 
-    private void cleanUpSession(HttpServletRequest request) {
+    private void cleanUpSession(HttpSession session) {
 		// Session cleanup: anytime we are at an entity page we shouldn't have an editing config or submission
-	    HttpSession session = request.getSession();
 	    session.removeAttribute("editjson");
 	    EditConfiguration.clearAllConfigsInSession(session);
 	    EditSubmission.clearAllEditSubmissionsInSession(session);
     }
     
-	private Map<String, Object> getIndividualData(VitroRequest vreq, Individual indiv) throws ServletException, IOException {
-		Map<String, Object> data = new HashMap<String, Object>();
+    private int getSecurityLevel(HttpSession session) {
+    	String loginStatus = null;
+    	int securityLevel = LoginFormBean.ANYBODY;
+    	LoginFormBean loginHandler = (LoginFormBean)session.getAttribute("loginHandler");
+    	if (loginHandler != null) {
+			loginStatus = loginHandler.getLoginStatus();
+			if  ("authenticated".equals(loginStatus)) {
+				securityLevel = Integer.parseInt(loginHandler.getLoginRole());  
+			}
+    	}
+    	return securityLevel;
+    	
+    }
+
+    private Map<String, Object> getEditingData(VitroRequest vreq, int securityLevel, Individual individual, UrlBuilder urlBuilder) {
+		// Set values related to access privileges
+    	Map<String, Object> editingData = new HashMap<String, Object>();
+
+		editingData.put("showEditLinks", VitroRequestPrep.isSelfEditing(vreq) || securityLevel >= LoginFormBean.NON_EDITOR);	
+		
+		boolean showAdminPanel = securityLevel >= LoginFormBean.EDITOR;
+		editingData.put("showAdminPanel", showAdminPanel);
+		if (showAdminPanel) {
+			
+			editingData.put("editingUrl", urlBuilder.getPortalUrl("/entityEdit", "uri", individual.getURI()));
+		}
+
+		return editingData;
+		
+    }
+    
+    private Map<String, Object> getVisualizationData(VitroRequest vreq, Individual individual) {
+    	Map<String, Object> map = new HashMap<String, Object>();
+
+    	// RY We should not have references to a specific ontology in the vitro code!
+    	if (individual.isVClass("http://xmlns.com/foaf/0.1/Person")) {
+
+    		String visualizationUrl = UrlBuilder.getUrl("/visualization", 
+    				                                    "render_mode", "dynamic", 
+    				                                    "vis", "person_pub_count",
+    				                                    "vis_mode", "short",
+    				                                    "uri", individual.getURI());
+    		map.put("url", visualizationUrl);
+    	}
+    	return map;
+    }
+    
+	private Map<String, Object> getIndividualData(VitroRequest vreq, Individual individual) throws ServletException, IOException {
+		Map<String, Object> map = new HashMap<String, Object>();
 		
     	IndividualDao iwDao = vreq.getWebappDaoFactory().getIndividualDao();
         ObjectPropertyDao opDao = vreq.getWebappDaoFactory().getObjectPropertyDao();
         
-        //Check if a "relatedSubjectUri" parameter has been supplied, and,
-        //if so, retrieve the related individual.t
-        //Some individuals make little sense standing alone and should
-        //be displayed in the context of their relationship to another.
+        // Check if a "relatedSubjectUri" parameter has been supplied, and,
+        // if so, retrieve the related individual.
+        // Some individuals make little sense standing alone and should
+        // be displayed in the context of their relationship to another.
         String relatedSubjectUri = vreq.getParameter("relatedSubjectUri"); 
         if (relatedSubjectUri != null) {
         	Individual relatedSubjectInd = iwDao.getIndividualByURI(relatedSubjectUri);
         	if (relatedSubjectInd != null) {
-        		data.put("relatedSubject", relatedSubjectInd);
+        		Map<String, Object> relatedSubject = new HashMap<String, Object>();
+        		relatedSubject.put("name", relatedSubjectInd.getName());
+        		relatedSubject.put("url", (new IndividualTemplateModel(relatedSubjectInd)).getProfileUrl());
+                String relatingPredicateUri = vreq.getParameter("relatingPredicateUri");
+                if (relatingPredicateUri != null) {
+                	ObjectProperty relatingPredicateProp = opDao.getObjectPropertyByURI(relatingPredicateUri);
+                	if (relatingPredicateProp != null) {
+                		relatedSubject.put("relatingPredicateDomainPublic", relatingPredicateProp.getDomainPublic());
+                	}
+                }
+                map.put("relatedSubject", relatedSubject);
         	}
         }
-        String relatingPredicateUri = vreq.getParameter("relatingPredicateUri");
-        if (relatingPredicateUri != null) {
-        	ObjectProperty relatingPredicateProp = opDao.getObjectPropertyByURI(relatingPredicateUri);
-        	if (relatingPredicateProp != null) {
-        		data.put("relatingPredicate", relatingPredicateProp);
-        	}
-        }
 
-        indiv.setKeywords(iwDao.getKeywordsForIndividualByMode(indiv.getURI(),"visible"));
-        indiv.sortForDisplay();
+        individual.setKeywords(iwDao.getKeywordsForIndividualByMode(individual.getURI(),"visible"));
+        individual.sortForDisplay();
 
-        String vclassName = "unknown";
-        String customView = null;
-
-        if( indiv.getVClass() != null ){
-            vclassName = indiv.getVClass().getName();
-            List<VClass> clasList = indiv.getVClasses(true);
-            for (VClass clas : clasList) {
-                customView = clas.getCustomDisplayView();
-                if (customView != null) {
-                    if (customView.length()>0) {
-                        vclassName = clas.getName(); // reset entity vclassname to name of class where a custom view
-                        log.debug("Found direct class ["+clas.getName()+"] with custom view "+customView+"; resetting entity vclassName to this class");
-                        break;
-                    } else {
-                        customView = null;
-                    }
-                }
-            }
-            if (customView == null) { //still
-                clasList = indiv.getVClasses(false);
-                for (VClass clas : clasList) {
-                    customView = clas.getCustomDisplayView();
-                    if (customView != null) {
-                        if (customView.length()>0) {
-                            // note that NOT changing entity vclassName here yet
-                            log.debug("Found inferred class ["+clas.getName()+"] with custom view "+customView);
-                            break;
-                        } else {
-                            customView = null;
-                        }
-                    }
-                }
-            }
-        } else {
-            log.error("Entity " + indiv.getURI() + " with vclass URI " +
-                    indiv.getVClassURI() + ", no vclass with that URI exists");
-        }
-        if (customView!=null) {
-            // insert test for whether a css files of the same name exists, and populate the customCss string for use when construction the header
-        }
-        String netid = iwDao.getNetId(indiv.getURI());
+//        String vclassName = "unknown";
+//        String customView = null;
+//
+//        if( indiv.getVClass() != null ){
+//            vclassName = indiv.getVClass().getName();
+//            List<VClass> clasList = indiv.getVClasses(true);
+//            for (VClass clas : clasList) {
+//                customView = clas.getCustomDisplayView();
+//                if (customView != null) {
+//                    if (customView.length()>0) {
+//                        vclassName = clas.getName(); // reset entity vclassname to name of class where a custom view
+//                        log.debug("Found direct class ["+clas.getName()+"] with custom view "+customView+"; resetting entity vclassName to this class");
+//                        break;
+//                    } else {
+//                        customView = null;
+//                    }
+//                }
+//            }
+//            if (customView == null) { //still
+//                clasList = indiv.getVClasses(false);
+//                for (VClass clas : clasList) {
+//                    customView = clas.getCustomDisplayView();
+//                    if (customView != null) {
+//                        if (customView.length()>0) {
+//                            // note that NOT changing entity vclassName here yet
+//                            log.debug("Found inferred class ["+clas.getName()+"] with custom view "+customView);
+//                            break;
+//                        } else {
+//                            customView = null;
+//                        }
+//                    }
+//                }
+//            }
+//        } else {
+//            log.error("Entity " + indiv.getURI() + " with vclass URI " +
+//                    indiv.getVClassURI() + ", no vclass with that URI exists");
+//        }
+//        if (customView!=null) {
+//            // insert test for whether a css files of the same name exists, and populate the customCss string for use when construction the header
+//        }
+        //String netid = iwDao.getNetId(indiv.getURI());
         
-        data.put("netid", netid);
-        data.put("vclassName", vclassName);
-        data.put("entity",indiv);
-        Portal portal = vreq.getPortal();
-        data.put("portal",String.valueOf(portal));
-        String view= getViewFromRequest(vreq);
-        if( view == null){
-            if (customView == null) {
-                view = default_jsp;
-                data.put("bodyJsp","/"+Controllers.ENTITY_JSP);
-                log.debug("no custom view and no view parameter in request for rendering "+indiv.getName());
-            } else {
-                view = default_jsp;
-                log.debug("setting custom view templates/entity/"+ customView + " for rendering "+indiv.getName());
-                data.put("bodyJsp", "/templates/entity/"+customView);
-            }
-            data.put("entityPropsListJsp",Controllers.ENTITY_PROP_LIST_JSP);
-            data.put("entityDatapropsListJsp",Controllers.ENTITY_DATAPROP_LIST_JSP);
-            data.put("entityMergedPropsListJsp",Controllers.ENTITY_MERGED_PROP_LIST_GROUPED_JSP);
-            data.put("entityKeywordsListJsp",Controllers.ENTITY_KEYWORDS_LIST_JSP);
-        } else {
-            log.debug("Found view parameter "+view+" in request for rendering "+indiv.getName());
-        }
+        //data.put("netid", netid);
+        //data.put("vclassName", vclassName);
+        
+        // RY Would like to use IndividualTemplateModel object, but may just end up copying all methods. Since object is put in template
+        // with a read-only wrapper, it should be restrictive enough.
+        map.put("individual",individual); //data.put("individual", new IndividualTemplateModel(indiv)); 
+        //Portal portal = vreq.getPortal();
+        //data.put("portal",String.valueOf(portal));
+//        String view= getViewFromRequest(vreq);
+//        if( view == null){
+//            if (customView == null) {
+//                view = default_jsp;
+//                data.put("bodyJsp","/"+Controllers.ENTITY_JSP);
+//                log.debug("no custom view and no view parameter in request for rendering "+indiv.getName());
+//            } else {
+//                view = default_jsp;
+//                log.debug("setting custom view templates/entity/"+ customView + " for rendering "+indiv.getName());
+//                data.put("bodyJsp", "/templates/entity/"+customView);
+//            }
+//            data.put("entityPropsListJsp",Controllers.ENTITY_PROP_LIST_JSP);
+//            data.put("entityDatapropsListJsp",Controllers.ENTITY_DATAPROP_LIST_JSP);
+//            data.put("entityMergedPropsListJsp",Controllers.ENTITY_MERGED_PROP_LIST_GROUPED_JSP);
+//            data.put("entityKeywordsListJsp",Controllers.ENTITY_KEYWORDS_LIST_JSP);
+//        } else {
+//            log.debug("Found view parameter "+view+" in request for rendering "+indiv.getName());
+//        }
 
         //setup highlighter for search terms
-        checkForSearch(vreq, indiv);
+        checkForSearch(vreq, individual);
 
 
-        if(  indiv.getURI().startsWith( vreq.getWebappDaoFactory().getDefaultNamespace() )){        	
-        	data.put("entityLinkedDataURL", indiv.getURI() + "/" + indiv.getLocalName() + ".rdf");	
+        if(  individual.getURI().startsWith( vreq.getWebappDaoFactory().getDefaultNamespace() )){        	
+        	map.put("entityLinkedDataURL", individual.getURI() + "/" + individual.getLocalName() + ".rdf");	
         }
         
         
@@ -251,7 +314,7 @@ public class IndividualController extends FreemarkerHttpServlet {
         //RequestDispatcher rd = vreq.getRequestDispatcher( view );
         //rd.forward(vreq,res);	
         
-        return data;
+        return map;
 	}
 
 	private void doRdf(VitroRequest vreq, HttpServletResponse res,

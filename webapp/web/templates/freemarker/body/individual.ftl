@@ -2,12 +2,48 @@
 
 <#-- Template for individual profile page -->
 
-<h2>${title}</h2>
+<div id="personWrap">
+    <#if editStatus.showAdminPanel>
+        <#include "individual-adminPanel.ftl">
+    </#if>
+    
+    <div class="contents entity <#if editStatus.showEditLinks>editing</#if>">
+        <div id="labelAndMoniker">
+            
+            <#if relatedSubject??>
+                <h2>${relatedSubject.relatingPredicateDomainPublic} for ${relatedSubject.name}</h2>
+                <p><a href="${relatedSubject.url}">&larr; return to ${relatedSubject.name}</a></p>                
+            <#else>
+                <#-- Label -->
+                <div class="datatypePropertyValue" id="label">    
+                    <div class="statementWrap">
+                        <h2>${individual.name}</h2>
+                        <#if editStatus.showEditLinks>                        
+                        </#if>
+                    </div>
+                </div>
+                
+                <#-- Moniker -->
+                <#if individual.moniker?has_content>
+                    <div class="datatypeProperties">
+                        <div class="datatypePropertyValue" id="moniker">
+                            <div class="statementWrap">
+                                <em class="moniker">${individual.moniker}</em>               
+                            </div>
+                        </div>
+                    </div>                    
+                </#if>
+            </#if>
+        </div> <!-- labelAndMoniker -->
 
-test
+       <#include "individual-sparklineVisualization.ftl">
 
-${stylesheets.addFromTheme("/css/entity.css", 
-                           "/css/visualization/visualization.css")}
+    </div> <!-- #contents -->
+
+</div> <!-- #personWrap -->
+
+
+${stylesheets.addFromTheme("/entity.css")}
                            
 <#-- RY Figure out which of these scripts really need to go into the head, and which are needed at all (e.g., tinyMCE??) -->
 ${headScripts.add("/js/jquery.js",

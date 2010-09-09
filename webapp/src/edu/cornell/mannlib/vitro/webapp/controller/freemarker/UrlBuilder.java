@@ -133,6 +133,11 @@ public class UrlBuilder {
         }
         return getUrl(path, params);
     }
+
+    public String getPortalUrl(String path, String...params) {
+        ParamMap urlParams = new ParamMap(params);
+        return getPortalUrl(path, urlParams);
+    }
     
     public String getPortalUrl(Route route) {
         return getPortalUrl(route.path());
