@@ -125,8 +125,7 @@ public class IndividualController extends FreemarkerHttpServlet {
 	        int securityLevel = getSecurityLevel(session);
 	        UrlBuilder urlBuilder = new UrlBuilder(vreq.getPortal());
     		body.put("editStatus", getEditingData(vreq, securityLevel, individual, urlBuilder));
-    		body.put("visualization", getVisualizationData(vreq, individual));
-	        body.putAll(getIndividualData( vreq, individual));                    
+	        body.putAll(getIndividualData(vreq, individual));                    
 	        body.put("title", individual.getName());
 	        
 	        String bodyTemplate = "individual.ftl";             
@@ -177,22 +176,6 @@ public class IndividualController extends FreemarkerHttpServlet {
 
 		return editingData;
 		
-    }
-    
-    private Map<String, Object> getVisualizationData(VitroRequest vreq, Individual individual) {
-    	Map<String, Object> map = new HashMap<String, Object>();
-
-    	// RY We should not have references to a specific ontology in the vitro code!
-    	if (individual.isVClass("http://xmlns.com/foaf/0.1/Person")) {
-
-    		String visualizationUrl = UrlBuilder.getUrl("/visualization", 
-    				                                    "render_mode", "dynamic", 
-    				                                    "vis", "person_pub_count",
-    				                                    "vis_mode", "short",
-    				                                    "uri", individual.getURI());
-    		map.put("url", visualizationUrl);
-    	}
-    	return map;
     }
     
 	private Map<String, Object> getIndividualData(VitroRequest vreq, Individual individual) throws ServletException, IOException {
@@ -270,6 +253,14 @@ public class IndividualController extends FreemarkerHttpServlet {
         
         //data.put("netid", netid);
         //data.put("vclassName", vclassName);
+
+    	// RY We should not have references to a specific ontology in the vitro code!
+        boolean isPerson = individual.isVClass("http://xmlns.com/foaf/0.1/Person");
+        map.put("isPerson", isPerson);
+        if (isPerson) {
+        	map.put("visualizationUrl", UrlBuilder.getUrl("/visualization", 
+        			                                      "uri", individual.getURI()));
+        }
         
         // RY Would like to use IndividualTemplateModel object, but may just end up copying all methods. Since object is put in template
         // with a read-only wrapper, it should be restrictive enough.
