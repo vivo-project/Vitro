@@ -132,28 +132,28 @@ public class UserRetryController extends BaseEditController {
         /* bdc34: Datastar needs non-backend-editing users for logging in non-Cornell people*/
         /* SelfEditingPolicySetup.SELF_EDITING_POLICY_WAS_SETUP is set by the SelfEditingPolicySetup context listener */
         boolean selfEditing = (Boolean)getServletContext().getAttribute(SelfEditingPolicySetup.SELF_EDITING_POLICY_WAS_SETUP) == Boolean.TRUE;
-        Option nonEditor = new Option(ROLE_PROTOCOL+loginBean.getNonEditor(), "self editor");
+        Option nonEditor = new Option(ROLE_PROTOCOL+loginBean.NON_EDITOR, "self editor");
         /* self editing should be displayed if we are editing a user account that is already  
          *  self-editing even if self editing is off. */
         if( selfEditing || 
         	( !"insert".equals(action) && userForEditing.getRoleURI().equals(nonEditor.getValue()) )){        	        	
             nonEditor.setSelected(userForEditing.getRoleURI().equals(nonEditor.getValue()));
-            if (nonEditor.getSelected() || (Integer.decode(loginBean.getLoginRole()) >= loginBean.getNonEditor()))
+            if (nonEditor.getSelected() || (Integer.decode(loginBean.getLoginRole()) >= loginBean.NON_EDITOR))
                 roleOptionList.add(nonEditor); 
         }
         
-        Option editor = new Option(ROLE_PROTOCOL+loginBean.getEditor(), "editor");
+        Option editor = new Option(ROLE_PROTOCOL+loginBean.EDITOR, "editor");
         editor.setSelected(userForEditing.getRoleURI().equals(editor.getValue()));
-        Option curator = new Option(ROLE_PROTOCOL+loginBean.getCurator(), "curator");
+        Option curator = new Option(ROLE_PROTOCOL+loginBean.CURATOR, "curator");
         curator.setSelected(userForEditing.getRoleURI().equals(curator.getValue()));
-        Option administrator = new Option (ROLE_PROTOCOL+loginBean.getDba(), "system administrator");
+        Option administrator = new Option (ROLE_PROTOCOL+loginBean.DBA, "system administrator");
         administrator.setSelected(userForEditing.getRoleURI().equals(administrator.getValue()));        
         
-        if (editor.getSelected() || (Integer.decode(loginBean.getLoginRole()) >= loginBean.getEditor()))
+        if (editor.getSelected() || (Integer.decode(loginBean.getLoginRole()) >= loginBean.EDITOR))
             roleOptionList.add(editor);
-        if (curator.getSelected() || (Integer.decode(loginBean.getLoginRole()) >= loginBean.getCurator()))
+        if (curator.getSelected() || (Integer.decode(loginBean.getLoginRole()) >= loginBean.CURATOR))
             roleOptionList.add(curator);
-        if (administrator.getSelected() || (Integer.decode(loginBean.getLoginRole()) >= loginBean.getDba()))
+        if (administrator.getSelected() || (Integer.decode(loginBean.getLoginRole()) >= loginBean.DBA))
             roleOptionList.add(administrator);
 
         optionMap.put("Role", roleOptionList);
