@@ -53,7 +53,7 @@ public abstract class BaseTemplateModel {
     }
     
     public String dump() {
-        return "I'm a BaseTemplateModel object";
+        return toString(); // fallback when subclass doesn't define a class-specific dump()
     }
 
 }

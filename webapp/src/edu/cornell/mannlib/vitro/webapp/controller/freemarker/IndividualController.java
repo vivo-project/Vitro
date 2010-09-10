@@ -255,6 +255,7 @@ public class IndividualController extends FreemarkerHttpServlet {
         //data.put("vclassName", vclassName);
 
     	// RY We should not have references to a specific ontology in the vitro code!
+        // Figure out how to move this out of here.
         boolean isPerson = individual.isVClass("http://xmlns.com/foaf/0.1/Person");
         map.put("isPerson", isPerson);
         if (isPerson) {
