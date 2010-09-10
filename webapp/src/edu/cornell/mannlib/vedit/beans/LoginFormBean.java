@@ -19,23 +19,17 @@ public class LoginFormBean {
 
 	private String userURI;
 	private String sessionId;
-	private String loginBrowser;
 	private String loginRemoteAddr;
 	private String loginName;
 	private String loginStatus;
-	private int loginUserId;
 	private String loginRole;
-	private String emailAddress;
 
 	public LoginFormBean() {
 		sessionId = "";
-		loginBrowser = "";
 		loginRemoteAddr = "";
 		loginName = "";
 		loginStatus = "none";
-		loginUserId = 0;
 		loginRole = "1";
-		emailAddress = "";
 	}
 
 	public String toString() {
@@ -96,10 +90,6 @@ public class LoginFormBean {
 		return sessionId;
 	}
 
-	public String getLoginBrowser() {
-		return loginBrowser;
-	}
-
 	public String getLoginRemoteAddr() {
 		return loginRemoteAddr;
 	}
@@ -112,16 +102,8 @@ public class LoginFormBean {
 		return loginStatus;
 	}
 
-	public int getLoginUserId() {
-		return loginUserId;
-	}
-
 	public String getLoginRole() {
 		return loginRole;
-	}
-
-	public String getEmailAddress() {
-		return emailAddress;
 	}
 
 	/********************** SET METHODS *********************/
@@ -132,10 +114,6 @@ public class LoginFormBean {
 
 	public void setSessionId(String id) {
 		sessionId = id;
-	}
-
-	public void setLoginBrowser(String b) {
-		loginBrowser = b;
 	}
 
 	public void setLoginRemoteAddr(String ra) {
@@ -150,16 +128,8 @@ public class LoginFormBean {
 		loginStatus = ls;
 	}
 
-	public void setLoginUserId(int int_val) {
-		loginUserId = int_val;
-	}
-
 	public void setLoginRole(String lr) {
 		loginRole = lr;
-	}
-
-	public void setEmailAddress(String ea) {
-		emailAddress = ea;
 	}
 
 }
