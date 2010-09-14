@@ -2,8 +2,8 @@
 
 <#-- Main template for the login panel -->
 
-<#if loginPanel??>
-    ${loginPanel}
+<#if loginTemplate??>
+    <#include loginTemplate>
     
     ${stylesheets.add("/css/login.css")}
     ${stylesheets.addFromTheme("/css/formedit.css")}
