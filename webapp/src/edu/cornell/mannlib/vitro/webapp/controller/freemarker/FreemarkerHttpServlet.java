@@ -245,7 +245,10 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     }
 
     protected void doException(VitroRequest vreq, HttpServletResponse response, ResponseValues values) {
-        
+        // Log the error, and display an error message on the page.        
+        log.error(values.getException(), values.getException());      
+        TemplateResponseValues trv = new TemplateResponseValues(values.getTemplateName(), values.getMap());
+        doTemplate(vreq, response, trv);
     }
 
     // We can't use shared variables in the Freemarker configuration to store anything 
@@ -503,7 +506,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     protected static class TemplateResponseValues implements ResponseValues {
         private final String templateName;
         private final Map<String, Object> map;
-
+        
         public TemplateResponseValues(String templateName) {
             this.templateName = templateName;
             this.map = new HashMap<String, Object>();
@@ -640,10 +643,22 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
 
     }
 
-    protected static class ExceptionResponseValues implements ResponseValues {
+    protected static class ExceptionResponseValues extends TemplateResponseValues {
+        private final static String DEFAULT_TEMPLATE_NAME = "error.ftl";
         private final Throwable cause;
 
         public ExceptionResponseValues(Throwable cause) {
+            super(DEFAULT_TEMPLATE_NAME);
+            this.cause = cause;
+        }
+        
+        public ExceptionResponseValues(String templateName, Throwable cause) {
+            super(templateName);
+            this.cause = cause;
+        }
+        
+        public ExceptionResponseValues(String templateName, Map<String, Object> map, Throwable cause) {
+            super(templateName, map);
             this.cause = cause;
         }
 

@@ -13,6 +13,8 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet.ResponseValues;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
@@ -68,14 +70,16 @@ public class BrowseController extends FreemarkerHttpServlet {
         _cacheRebuildThread.start();
         _cacheRebuildThread.informOfQueueChange();
     }
-      
+     
+    @Override
     protected String getTitle(String siteName) {
     	return "Index to " + siteName + " Contents";
     }
 
-    protected String getBody(VitroRequest vreq, Map<String, Object> body, Configuration config) {
+    @Override
+    protected ResponseValues processRequest(VitroRequest vreq) {
 
-        String bodyTemplate = "classGroups.ftl"; 
+        Map<String, Object> body = new HashMap<String, Object>();
         String message = null;
         
     	if( vreq.getParameter("clearcache") != null ) //mainly for debugging
@@ -103,7 +107,7 @@ public class BrowseController extends FreemarkerHttpServlet {
     	    body.put("message", message);
     	} 
     	
-        return mergeMapToTemplate(bodyTemplate, body, config);
+        return new TemplateResponseValues("classGroups.ftl", body);
     }
 
     public void destroy(){
