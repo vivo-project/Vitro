@@ -291,7 +291,7 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
             return doSearchError(e.getMessage(), config);
         }
         
-        return mergeBodyToTemplate("search-pagedResults.ftl", body, config);
+        return mergeMapToTemplate("search-pagedResults.ftl", body, config);
     }
 
     private void alphaSortIndividuals(List<Individual> beans) {
@@ -752,14 +752,14 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
     private String doSearchError(String message, Configuration config) {
         Map<String, Object> body = new HashMap<String, Object>();
         body.put("message", "Search failed: " + message);
-        return mergeBodyToTemplate("search-error.ftl", body, config);
+        return mergeMapToTemplate("search-error.ftl", body, config);
     }
     
     private String doNoQuery(Configuration config, Portal portal) {
         Map<String, Object> body = new HashMap<String, Object>();
         body.put("title", "Search " + portal.getAppName());
         body.put("message", "No query entered.");
-        return mergeBodyToTemplate("search-error.ftl", body, config);
+        return mergeMapToTemplate("search-error.ftl", body, config);
     }
     
     private String doFailedSearch(String message, String querytext, Configuration config) {
@@ -769,14 +769,14 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
             message = "Search failed.";
         }        
         body.put("message", message);
-        return mergeBodyToTemplate("search-error.ftl", body, config);
+        return mergeMapToTemplate("search-error.ftl", body, config);
     }
 
     private String doNoHits(String querytext, Configuration config) {
         Map<String, Object> body = new HashMap<String, Object>();       
         body.put("title", "Search for '" + querytext + "'");        
         body.put("message", "No matching results.");     
-        return mergeBodyToTemplate("search-error.ftl", body, config);
+        return mergeMapToTemplate("search-error.ftl", body, config);
     }
 
     /**

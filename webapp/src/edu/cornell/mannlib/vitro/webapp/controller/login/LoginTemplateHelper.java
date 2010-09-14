@@ -166,7 +166,7 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 
 		// Add the values that we got, and merge to the template.
 		body.putAll(values.getBodyMap());
-		return mergeBodyToTemplate(values.getTemplateName(), body, config);
+		return mergeMapToTemplate(values.getTemplateName(), body, config);
 	}
 	
     /**
@@ -177,7 +177,7 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 
         // Add the values that we got, and merge to the template.
         body.putAll(values.getBodyMap());
-        return mergeBodyToTemplate(values.getTemplateName(), body, config);
+        return mergeMapToTemplate(values.getTemplateName(), body, config);
     }
 
 	/**

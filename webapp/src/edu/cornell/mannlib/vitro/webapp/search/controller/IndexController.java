@@ -90,7 +90,7 @@ public class IndexController extends FreemarkerHttpServlet {
              Integer.parseInt(loginHandler.getLoginRole()) <= 5 ){       
             
             body.put("message","You must log in to rebuild the search index."); 
-            return mergeBodyToTemplate("message.ftl", body, config);
+            return mergeMapToTemplate("message.ftl", body, config);
         }
         
         long start = System.currentTimeMillis();
@@ -105,10 +105,10 @@ public class IndexController extends FreemarkerHttpServlet {
         } catch (IndexingException e) {
         	log.error("Error rebuilding search index",e);
         	body.put("errorMessage", "There was an error while rebuilding the search index. " + e.getMessage());
-        	return mergeBodyToTemplate("errorMessage.ftl", body, config);            
+        	return mergeMapToTemplate("errorMessage.ftl", body, config);            
         }
         
         body.put("message","Rebuilding of index started."); 
-        return mergeBodyToTemplate("message.ftl", body, config);
+        return mergeMapToTemplate("message.ftl", body, config);
     }
 }

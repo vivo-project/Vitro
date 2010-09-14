@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -63,25 +64,8 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
 	        Configuration config = getConfig(vreq);
 	        vreq.setAttribute("freemarkerConfig", config);
 	        
-	        // We can't use shared variables in the Freemarker configuration to store anything 
-	        // except theme-specific data, because multiple portals or apps might share the same theme. So instead
-	        // just put the shared variables in both root and body.
-	        Map<String, Object> sharedVariables = getSharedVariables(vreq); // start by getting the title here
-
-	        // root is the map used to create the page shell - header, footer, menus, etc.
-	        Map<String, Object> root = new HashMap<String, Object>(sharedVariables);
-
-	        // body is the map used to create the page body
-	        Map<String, Object> body = new HashMap<String, Object>(sharedVariables);
-	        
-	        setUpRoot(vreq, root); 	        
-	        root.put("body", getBody(vreq, body, config)); // need config to get and process template
-	        
-	        // getBody() may have changed the title, so put the new value in the root map. (E.g., the title may
-	        // include an individual's name, which is only discovered when processing the body.)
-	        root.put("title", body.get("title"));
-	        
-	        writePage(root, config, response);
+	        ResponseValues responseValues = processRequest(vreq);
+	        doResponse(vreq, response, responseValues);	        
        
 	    } catch (Throwable e) {
 	        log.error("FreeMarkerHttpServlet could not forward to view.", e);
@@ -93,8 +77,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         doGet(request, response);
     }
    
-    protected Configuration getConfig(VitroRequest vreq) {
-        
+    protected Configuration getConfig(VitroRequest vreq) {       
         String themeDir = getThemeDir(vreq.getPortal());        
         return getConfigForTheme(themeDir);
     }
@@ -106,9 +89,10 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         // load templates from. Thus configurations are associated with themes rather than portals.
         Map<String, Configuration> themeToConfigMap = (Map<String, Configuration>) (getServletContext().getAttribute("themeToConfigMap"));
         
-        if( themeToConfigMap == null )
-        	log.error("The templating system is not configured correctly. Make sure that you have the FreemarkerSetup context listener in your web.xml");
-        if (themeToConfigMap.containsKey(themeDir)) {
+        if( themeToConfigMap == null ) {
+        	log.error("The templating system is not configured correctly. Make sure that you have the FreemarkerSetup context listener in your web.xml.");
+        	return null; // RY should we throw an error here instead?        	
+        } else if (themeToConfigMap.containsKey(themeDir)) {
             return themeToConfigMap.get(themeDir);
         } else {
             Configuration config = getNewConfig(themeDir);
@@ -189,6 +173,78 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
             log.error("Error creating template loaders");
             return null;
         }
+        
+    }
+    
+    // Subclasses will override
+    protected ResponseValues processRequest(VitroRequest vreq) {
+        return null;
+    }
+       
+    protected void doResponse(VitroRequest vreq, HttpServletResponse response, ResponseValues values) {
+        try {
+            switch (values.getType()) {
+            case TEMPLATE:
+                doTemplate(vreq, response, values);
+                break;
+            case REDIRECT:
+                doRedirect(vreq, response, values);
+                break;
+            case FORWARD:
+                doForward(vreq, response, values);
+                break;
+            case EXCEPTION:
+                doException(vreq, response, values);
+                break;
+            }               
+        } catch (ServletException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+     
+    }
+
+    // RY *** A lot of this is shared with doException(). Factor out shared parts.
+    protected void doTemplate(VitroRequest vreq, HttpServletResponse response, ResponseValues values) {
+     
+        Configuration config = getConfig(vreq);
+        
+        // We can't use shared variables in the Freemarker configuration to store anything 
+        // except theme-specific data, because multiple portals or apps might share the same theme. So instead
+        // just put the shared variables in both root and body.
+        Map<String, Object> sharedVariables = getSharedVariables(vreq);
+        
+        // root is the map used to create the page shell - header, footer, menus, etc.
+        Map<String, Object> root = new HashMap<String, Object>(sharedVariables);
+        
+        // body is the map used to create the page body
+        Map<String, Object> body = new HashMap<String, Object>(sharedVariables);
+        setUpRoot(vreq, root);
+
+        // Add the values that we got, and merge to the template.
+        body.putAll(values.getMap());
+        root.put("body", mergeMapToTemplate(values.getTemplateName(), body, config));
+        
+        // Subclass processing may have changed the title, so put the new value in the root map. (E.g., the title may
+        // include an individual's name, which is only discovered when processing the body.)
+        root.put("title", body.get("title")); 
+        
+        writePage(root, config, response);       
+    }
+    
+    protected void doRedirect(HttpServletRequest request, HttpServletResponse response, ResponseValues values) 
+        throws ServletException, IOException {      
+        
+    }
+    
+    protected void doForward(HttpServletRequest request, HttpServletResponse response, ResponseValues values) 
+        throws ServletException, IOException {        
+    }
+
+    protected void doException(VitroRequest vreq, HttpServletResponse response, ResponseValues values) {
         
     }
 
@@ -376,24 +432,26 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     protected String getTitle(String siteName) {        
         return siteName;
     }
-        
-    // Most subclasses will override. Some (e.g., ajax controllers) don't need to define a page body.
-    protected String getBody(VitroRequest vreq, Map<String, Object> body, Configuration config) {
-        return "";
-    }
 
     protected StringWriter mergeToTemplate(String templateName, Map<String, Object> map, Configuration config) {   	
         FreemarkerHelper helper = new FreemarkerHelper(config);
         return helper.mergeToTemplate(templateName, map);
     }
+    
+    protected StringWriter mergeToTemplate(ResponseValues values, Configuration config) {
+        return mergeToTemplate(values.getTemplateName(), values.getMap(), config);
+    }
 
-    protected String mergeBodyToTemplate(String templateName, Map<String, Object> map, Configuration config) {
+    protected String mergeMapToTemplate(String templateName, Map<String, Object> map, Configuration config) {
     	return mergeToTemplate(templateName, map, config).toString();
     }
     
-    protected void writePage(Map<String, Object> root, Configuration config, HttpServletResponse response) {
-        String templateName = getPageTemplateName();     
-        writeTemplate(templateName, root, config, response);                   
+    protected String mergeResponseValuesToTemplate(ResponseValues values, Configuration config) {
+        return mergeMapToTemplate(values.getTemplateName(), values.getMap(), config);
+    }
+    
+    protected void writePage(Map<String, Object> root, Configuration config, HttpServletResponse response) {   
+        writeTemplate(getPageTemplateName(), root, config, response);                   
     }
     
     protected void writeTemplate(String templateName, Map<String, Object> map, Configuration config, HttpServletResponse response) {       
@@ -424,4 +482,203 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         new FreemarkerComponentGenerator(request);
     }
 
+    protected static interface ResponseValues {
+        enum ResponseType {
+            TEMPLATE, REDIRECT, FORWARD, EXCEPTION
+        }
+
+        ResponseType getType();
+
+        String getTemplateName();
+
+        Map<String, Object> getMap();
+        
+        String getRedirectUrl();
+
+        String getForwardUrl();
+
+        Throwable getException();
+    }
+
+    protected static class TemplateResponseValues implements ResponseValues {
+        private final String templateName;
+        private final Map<String, Object> map;
+
+        public TemplateResponseValues(String templateName) {
+            this.templateName = templateName;
+            this.map = new HashMap<String, Object>();
+        }
+
+        public TemplateResponseValues(String templateName, Map<String, Object> map) {
+            this.templateName = templateName;
+            this.map = map;
+        }
+        
+        public TemplateResponseValues put(String key, Object value) {
+            this.map.put(key, value);
+            return this;
+        }
+
+        @Override
+        public ResponseType getType() {
+            return ResponseType.TEMPLATE;
+        }
+
+        @Override
+        public Map<String, Object> getMap() {
+            return Collections.unmodifiableMap(this.map);
+        }
+
+        @Override
+        public String getTemplateName() {
+            return this.templateName;
+        }
+
+        @Override
+        public String getRedirectUrl() {
+            throw new UnsupportedOperationException(
+                    "This is not a redirect response.");
+        }
+        
+        @Override
+        public String getForwardUrl() {
+            throw new UnsupportedOperationException(
+                    "This is not a forwarding response.");
+        }
+        
+        @Override
+        public Throwable getException() {
+            throw new UnsupportedOperationException(
+                    "This is not an exception response.");
+        }
+
+    }
+
+    protected static class RedirectResponseValues implements ResponseValues {
+        private final String redirectUrl;
+
+        public RedirectResponseValues(String redirectUrl) {
+            this.redirectUrl = redirectUrl;
+        }
+
+        @Override
+        public ResponseType getType() {
+            return ResponseType.REDIRECT;
+        }
+
+        @Override
+        public String getRedirectUrl() {
+            return this.redirectUrl;
+        }
+
+        @Override
+        public String getTemplateName() {
+            throw new UnsupportedOperationException(
+                    "This is not a template response.");
+        }
+
+        @Override
+        public Map<String, Object> getMap() {
+            throw new UnsupportedOperationException(
+                    "This is not a template response.");
+        }
+
+        @Override
+        public String getForwardUrl() {
+            throw new UnsupportedOperationException(
+                    "This is not a forwarding response.");
+        }
+        
+        @Override
+        public Throwable getException() {
+            throw new UnsupportedOperationException(
+                    "This is not an exception response.");
+        }
+
+    }
+
+    protected static class ForwardResponseValues implements ResponseValues {
+        private final String forwardUrl;
+
+        public ForwardResponseValues(String forwardUrl) {
+            this.forwardUrl = forwardUrl;
+        }
+
+        @Override
+        public ResponseType getType() {
+            return ResponseType.FORWARD;
+        }
+
+        @Override
+        public String getForwardUrl() {
+            return this.forwardUrl;
+        }
+
+        @Override
+        public String getTemplateName() {
+            throw new UnsupportedOperationException(
+                    "This is not a template response.");
+        }
+
+        @Override
+        public Map<String, Object> getMap() {
+            throw new UnsupportedOperationException(
+                    "This is not a template response.");
+        }
+
+        @Override
+        public String getRedirectUrl() {
+            throw new UnsupportedOperationException(
+                    "This is not a redirect response.");
+        }
+        
+        @Override
+        public Throwable getException() {
+            throw new UnsupportedOperationException(
+                    "This is not an exception response.");
+        }
+
+    }
+
+    protected static class ExceptionResponseValues implements ResponseValues {
+        private final Throwable cause;
+
+        public ExceptionResponseValues(Throwable cause) {
+            this.cause = cause;
+        }
+
+        @Override
+        public ResponseType getType() {
+            return ResponseType.EXCEPTION;
+        }
+
+        @Override
+        public Throwable getException() {
+            return cause;
+        }
+
+        @Override
+        public String getTemplateName() {
+            throw new UnsupportedOperationException(
+                    "This is not a template response.");
+        }
+
+        @Override
+        public Map<String, Object> getMap() {
+            throw new IllegalStateException("This is not a template response.");
+        }
+
+        @Override
+        public String getRedirectUrl() {
+            throw new UnsupportedOperationException(
+                    "This is not a redirect response.");
+        }
+        
+        @Override
+        public String getForwardUrl() {
+            throw new UnsupportedOperationException(
+                    "This is not a forwarding response.");
+        }
+
+    }
 }

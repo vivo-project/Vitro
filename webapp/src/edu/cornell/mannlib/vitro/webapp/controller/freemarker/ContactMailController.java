@@ -212,7 +212,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
             }
         }
         
-        return mergeBodyToTemplate(bodyTemplate, body, config);
+        return mergeMapToTemplate(bodyTemplate, body, config);
 
     }
     
@@ -241,7 +241,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
             email.put("referrer", UrlBuilder.urlDecode(originalReferer));
         }
     	
-        return mergeBodyToTemplate(template, email, config);
+        return mergeMapToTemplate(template, email, config);
     }
     
     private void writeBackupCopy(PrintWriter outFile, String msgText, 
@@ -259,7 +259,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
         
         backup.put("msgText", msgText);
 
-        String backupText = mergeBodyToTemplate(template, backup, config);
+        String backupText = mergeMapToTemplate(template, backup, config);
         outFile.print(backupText);
         outFile.flush();
         //outFile.close(); 

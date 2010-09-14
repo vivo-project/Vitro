@@ -46,7 +46,6 @@ public class NavigationController extends FreemarkerHttpServlet {
 		displayOntModel.getBaseModel().register( urlPatterns );
 	}
 	
-	@Override
 	protected String getBody(VitroRequest vreq, Map<String, Object> body, Configuration config) {		
 		OntModel displayOntModel = (OntModel)getServletContext().getAttribute("displayOntModel");
 		OntModel jenaOntModel = (OntModel)getServletContext().getAttribute("jenaOntModel");
@@ -56,7 +55,7 @@ public class NavigationController extends FreemarkerHttpServlet {
 		Map<String,Object> values = getValues(ind, displayOntModel,jenaOntModel, getValuesFromRequest(/*?*/) );		
 		String template = getTemplate(ind, displayOntModel);		
 		
-		return mergeBodyToTemplate(template, values, config);
+		return mergeMapToTemplate(template, values, config);
 	}
 	
 	private Map<String,Object>getValuesFromRequest(){

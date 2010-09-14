@@ -79,7 +79,7 @@ public class SiteAdminController extends FreemarkerHttpServlet {
 //        } 
 //        body.put("languageModeStr",  languageMode);       
         
-        return mergeBodyToTemplate("siteAdmin-main.ftl", body, config);
+        return mergeMapToTemplate("siteAdmin-main.ftl", body, config);
         
     }
 

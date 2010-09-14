@@ -39,14 +39,13 @@ public class PrimitiveRdfEdit extends FreemarkerHttpServlet{
 
     private static final long serialVersionUID = 1L;
 
-    @Override
     protected String getBody(VitroRequest vreq, Map<String, Object> body, Configuration config) {
 //      boolean loggedIn = checkLoginStatus(request, response);
 //      if( !loggedIn){
 //          doError(response,"You must be logged in to use this servlet.",HttpStatus.SC_UNAUTHORIZED);
 //          return;
 //      }
-        return mergeBodyToTemplate("primitiveRdfEdit.ftl",new HashMap<String, Object>(), config);
+        return mergeMapToTemplate("primitiveRdfEdit.ftl",new HashMap<String, Object>(), config);
     }
 
     @Override

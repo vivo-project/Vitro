@@ -45,6 +45,7 @@ public class FreemarkerHelper {
         }
         return sw;
     }
+   
 
     public String mergeMapToTemplate(String templateName, Map<String, Object> map) {
         return mergeToTemplate(templateName, map).toString();

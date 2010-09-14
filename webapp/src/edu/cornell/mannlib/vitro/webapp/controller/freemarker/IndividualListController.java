@@ -100,7 +100,7 @@ public class IndividualListController extends FreemarkerHttpServlet {
             body.put("message", message);
         }
     
-        return mergeBodyToTemplate(bodyTemplate, body, config);
+        return mergeMapToTemplate(bodyTemplate, body, config);
     }
       
     private class HelpException extends Throwable {

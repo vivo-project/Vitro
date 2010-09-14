@@ -87,6 +87,6 @@ public class ContactFormController extends FreemarkerHttpServlet {
             bodyTemplate = "contactForm-form.ftl";
         }
         
-        return mergeBodyToTemplate(bodyTemplate, body, config);
+        return mergeMapToTemplate(bodyTemplate, body, config);
     }
 }

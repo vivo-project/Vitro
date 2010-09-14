@@ -129,7 +129,7 @@ public class IndividualController extends FreemarkerHttpServlet {
 	        body.put("title", individual.getName());
 	        
 	        String bodyTemplate = "individual.ftl";             
-	        return mergeBodyToTemplate(bodyTemplate, body, config);
+	        return mergeMapToTemplate(bodyTemplate, body, config);
         
 	    } catch (Throwable e) {
 	        log.error(e);

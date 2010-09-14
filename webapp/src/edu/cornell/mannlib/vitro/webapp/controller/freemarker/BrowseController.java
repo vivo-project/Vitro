@@ -103,7 +103,7 @@ public class BrowseController extends FreemarkerHttpServlet {
     	    body.put("message", message);
     	} 
     	
-        return mergeBodyToTemplate(bodyTemplate, body, config);
+        return mergeMapToTemplate(bodyTemplate, body, config);
     }
 
     public void destroy(){

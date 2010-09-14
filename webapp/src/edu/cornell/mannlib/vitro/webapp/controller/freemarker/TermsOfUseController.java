@@ -33,6 +33,6 @@ public class TermsOfUseController extends FreemarkerHttpServlet {
         body.put("copyrightAnchor", portal.getCopyrightAnchor());
         
         String bodyTemplate = "termsOfUse.ftl";             
-        return mergeBodyToTemplate(bodyTemplate, body, config);
+        return mergeMapToTemplate(bodyTemplate, body, config);
     }
 }

@@ -88,7 +88,7 @@ public class TestController extends FreemarkerHttpServlet {
           
         // Create the template to see the examples live.
         String bodyTemplate = "test.ftl";             
-        return mergeBodyToTemplate(bodyTemplate, body, config);
+        return mergeMapToTemplate(bodyTemplate, body, config);
 
     }
     
