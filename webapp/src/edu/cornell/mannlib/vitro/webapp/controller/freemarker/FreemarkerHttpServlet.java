@@ -509,7 +509,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         new FreemarkerComponentGenerator(request);
     }
 
-    protected static interface ResponseValues {
+    public static interface ResponseValues {
 //        enum ResponseType {
 //            TEMPLATE, REDIRECT, FORWARD, EXCEPTION
 //        }
