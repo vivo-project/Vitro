@@ -183,20 +183,35 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
        
     protected void doResponse(VitroRequest vreq, HttpServletResponse response, ResponseValues values) {
         try {
-            switch (values.getType()) {
-            case TEMPLATE:
-                doTemplate(vreq, response, values);
-                break;
-            case REDIRECT:
-                doRedirect(vreq, response, values);
-                break;
-            case FORWARD:
-                doForward(vreq, response, values);
-                break;
-            case EXCEPTION:
+//            switch (values.getType()) {
+//            case TEMPLATE:
+//                doTemplate(vreq, response, values);
+//                break;
+//            case REDIRECT:
+//                doRedirect(vreq, response, values);
+//                break;
+//            case FORWARD:
+//                doForward(vreq, response, values);
+//                break;
+//            case EXCEPTION:
+//                doException(vreq, response, values);
+//                break;
+//            }  
+            
+            // RY Discuss with Jim - doing this instead of the switch allows us to get rid of the
+            // type field. We could also cast the values to the appropriate type: e.g.,
+            // doException(vreq, response, (ExceptionResponseValues) values
+            // then method signature is doException(VitroRequest vreq, HttpServletResponse response, ExceptionResponseValues values)
+            // which seems to make more sense
+            if (values instanceof ExceptionResponseValues) {
                 doException(vreq, response, values);
-                break;
-            }               
+            } else if (values instanceof TemplateResponseValues) {
+                doTemplate(vreq, response, values);
+            } else if (values instanceof RedirectResponseValues) {
+                doRedirect(vreq, response, values);
+            } else if (values instanceof ForwardResponseValues) {
+                doForward(vreq, response, values);
+            }
         } catch (ServletException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -495,11 +510,11 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     }
 
     protected static interface ResponseValues {
-        enum ResponseType {
-            TEMPLATE, REDIRECT, FORWARD, EXCEPTION
-        }
-
-        ResponseType getType();
+//        enum ResponseType {
+//            TEMPLATE, REDIRECT, FORWARD, EXCEPTION
+//        }
+//
+//        ResponseType getType();
 
         String getTemplateName();
 
@@ -531,10 +546,10 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
             return this;
         }
 
-        @Override
-        public ResponseType getType() {
-            return ResponseType.TEMPLATE;
-        }
+//        @Override
+//        public ResponseType getType() {
+//            return ResponseType.TEMPLATE;
+//        }
 
         @Override
         public Map<String, Object> getMap() {
@@ -573,10 +588,10 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
             this.redirectUrl = redirectUrl;
         }
 
-        @Override
-        public ResponseType getType() {
-            return ResponseType.REDIRECT;
-        }
+//        @Override
+//        public ResponseType getType() {
+//            return ResponseType.REDIRECT;
+//        }
 
         @Override
         public String getRedirectUrl() {
@@ -616,10 +631,10 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
             this.forwardUrl = forwardUrl;
         }
 
-        @Override
-        public ResponseType getType() {
-            return ResponseType.FORWARD;
-        }
+//        @Override
+//        public ResponseType getType() {
+//            return ResponseType.FORWARD;
+//        }
 
         @Override
         public String getForwardUrl() {
@@ -671,10 +686,10 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
             this.cause = cause;
         }
 
-        @Override
-        public ResponseType getType() {
-            return ResponseType.EXCEPTION;
-        }
+//        @Override
+//        public ResponseType getType() {
+//            return ResponseType.EXCEPTION;
+//        }
 
         @Override
         public Throwable getException() {
