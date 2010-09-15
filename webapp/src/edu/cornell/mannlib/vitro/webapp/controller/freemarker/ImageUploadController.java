@@ -43,6 +43,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadHelper;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorage;
 import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup;
@@ -162,94 +163,31 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 * </ul>
 	 * </p>
 	 */
-	@Override
-	public void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws IOException, ServletException {
-
-		try {
-			// Parse the multi-part request.
-			request = FileUploadServletRequest.parseRequest(request,
-					MAXIMUM_FILE_SIZE);
-			if (log.isTraceEnabled()) {
-				dumpRequestDetails(request);
-			}
-
-			// Do setup defined in VitroHttpServlet
-			setup(request);
-
-			VitroRequest vreq = new VitroRequest(request);
-
-			// If they aren't authorized to do this, send them to login.
-			if (!checkAuthorized(vreq)) {
-				String loginPage = request.getContextPath() + Controllers.LOGIN;
-				response.sendRedirect(loginPage);
-				return;
-			}
-
-			ResponseValues values = buildTheResponse(vreq);
-
-			switch (values.getType()) {
-			case FORWARD:
-				doForward(vreq, response, values);
-				break;
-			case TEMPLATE:
-				doTemplate(vreq, response, values);
-				break;
-			case EXCEPTION:
-				doException(vreq, response, values);
-				break;
-			}
-		} catch (Exception e) {
-			log.error("Could not produce response page", e);
-		}
-	}
-
-	/**
-	 * We processed a response, and want to show a template.
-	 */
-	protected void doTemplate(VitroRequest vreq, HttpServletResponse response,
-			ResponseValues values) {
-		// Set it up like FreeMarkerHttpServlet.doGet() would do.
-		Configuration config = getConfig(vreq);
-		Map<String, Object> sharedVariables = getSharedVariables(vreq);
-		Map<String, Object> root = new HashMap<String, Object>(sharedVariables);
-		Map<String, Object> body = new HashMap<String, Object>(sharedVariables);
-		setUpRoot(vreq, root);
-
-		// Add the values that we got, and merge to the template.
-		body.putAll(values.getMap());
-		root.put("body",
-				mergeMapToTemplate(values.getTemplateName(), body, config));
-
-		// Continue to simulate FreeMarkerHttpServlet.doGet()
-		root.put("title", body.get("title"));
-		writePage(root, config, response);
-	}
-
-	/**
-	 * We processsed a response, and want to forward to another page.
-	 */
-	protected void doForward(HttpServletRequest req, HttpServletResponse resp,
-			ResponseValues values) throws ServletException, IOException {
-		String forwardUrl = values.getForwardUrl();
-		if (forwardUrl.contains("://")) {
-			// It's a full URL, so redirect.
-			resp.sendRedirect(forwardUrl);
-		} else {
-			// It's a relative URL, so forward within the application.
-			req.getRequestDispatcher(forwardUrl).forward(req, resp);
-		}
-	}
-
-	/**
-	 * We processed a response, and need to display an internal exception.
-	 */
-	protected void doException(VitroRequest vreq, HttpServletResponse resp,
-			ResponseValues values) {
-		log.error(values.getException(), values.getException());
-		doTemplate(vreq, resp, new TemplateResponseValues(TEMPLATE_ERROR));
-	}
-
+	
+    @Override
+    protected ResponseValues processRequest(VitroRequest vreq) {
+        try {
+            // Parse the multi-part request.
+            FileUploadServletRequest request = FileUploadServletRequest.parseRequest(vreq,
+                    MAXIMUM_FILE_SIZE);
+            if (log.isTraceEnabled()) {
+                dumpRequestDetails(vreq);
+            }  
+            
+            // If they aren't authorized to do this, send them to login.
+            if (!checkAuthorized(vreq)) {
+                String loginPage = request.getContextPath() + Controllers.LOGIN;
+                return new RedirectResponseValues(loginPage);
+            }
+            
+            return buildTheResponse(vreq);
+            
+        } catch (Exception e) {
+            //log.error("Could not produce response page", e);
+            return new ExceptionResponseValues(e);
+        }
+    }
+    
 	/**
 	 * Handle the different actions. If not specified, the default action is to
 	 * show the intro screen.

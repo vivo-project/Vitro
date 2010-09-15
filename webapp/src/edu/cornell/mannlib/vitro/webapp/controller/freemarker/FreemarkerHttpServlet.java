@@ -236,12 +236,21 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     }
     
     protected void doRedirect(HttpServletRequest request, HttpServletResponse response, ResponseValues values) 
-        throws ServletException, IOException {      
-        
+        throws ServletException, IOException { 
+        String redirectUrl = values.getRedirectUrl();
+        response.sendRedirect(redirectUrl);        
     }
     
     protected void doForward(HttpServletRequest request, HttpServletResponse response, ResponseValues values) 
         throws ServletException, IOException {        
+        String forwardUrl = values.getForwardUrl();
+        if (forwardUrl.contains("://")) {
+            // It's a full URL, so redirect.
+            response.sendRedirect(forwardUrl);
+        } else {
+            // It's a relative URL, so forward within the application.
+            request.getRequestDispatcher(forwardUrl).forward(request, response);
+        }
     }
 
     protected void doException(VitroRequest vreq, HttpServletResponse response, ResponseValues values) {
