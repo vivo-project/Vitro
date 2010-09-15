@@ -15,6 +15,7 @@ import edu.cornell.mannlib.vedit.beans.LoginFormBean;
 import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginTemplateHelper;
@@ -27,11 +28,13 @@ public class SiteAdminController extends FreemarkerHttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(SiteAdminController.class);
 
+    @Override
 	public String getTitle(String siteName) {
         return siteName + " Site Administration";
 	}
 
-    public String getBody(VitroRequest vreq, Map<String, Object> body, Configuration config) {
+    @Override
+    protected ResponseValues processRequest(VitroRequest vreq) {
 
         String loginStatus = null;
         
@@ -40,10 +43,14 @@ public class SiteAdminController extends FreemarkerHttpServlet {
             loginStatus = loginHandler.getLoginStatus();
         }
         
+        Map<String, Object> body = new HashMap<String, Object>();
+        
         // NOT LOGGED IN: just show login form
         if (loginHandler == null || !"authenticated".equals(loginStatus)) {
-            body.put("loginPanel", new LoginTemplateHelper(vreq).showLoginPage(vreq, body, config));
-         
+            // Unlike the other panels on this page, we put the data directly in the body, because the templates are also used
+            // by the JSP version, where the data is placed directly in the body map.
+            body.putAll(getLoginPanelData(vreq));
+        
         // LOGGED IN: show editing options based on user role
         } else {
         
@@ -79,10 +86,24 @@ public class SiteAdminController extends FreemarkerHttpServlet {
 //        } 
 //        body.put("languageModeStr",  languageMode);       
         
-        return mergeBodyToTemplate("siteAdmin-main.ftl", body, config);
+        return new TemplateResponseValues("siteAdmin-main.ftl", body);
         
     }
 
+    private Map<String, Object> getLoginPanelData(VitroRequest vreq) {
+        Map<String, Object> map = null;
+        // This is somewhat awkward, because we are trying to use the login code with as few modifications as possible
+        // as it was set up for the JSP version as well. We have to unpack the TemplateResponseValues
+        // object and put everything in a map.
+        TemplateResponseValues trv = new LoginTemplateHelper(vreq).showLoginPanel(vreq);
+        if (trv != null) {
+            map = new HashMap<String, Object>();
+            map.putAll(trv.getMap());
+            map.put("loginTemplate", trv.getTemplateName());            
+        } 
+        return  map;
+    }
+    
     private Map<String, Object> getDataInputData(VitroRequest vreq) {
     
         Map<String, Object> map = new HashMap<String, Object>();

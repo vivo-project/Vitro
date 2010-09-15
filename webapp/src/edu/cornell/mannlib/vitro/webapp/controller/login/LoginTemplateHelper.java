@@ -77,23 +77,26 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 	}
 
 	/** Version for Freemarker page */
-	public String showLoginPage(VitroRequest vreq, Map<String, Object> body, Configuration config) {
+	public TemplateResponseValues showLoginPanel(VitroRequest vreq) {
 	    try {
 
             State state = getCurrentLoginState(vreq);
             log.debug("State on exit: " + state);
-
+            
             switch (state) {
+            // RY Why does this case exist? We don't call this method if a user is logged in.
             case LOGGED_IN:
-                return "";
+                return null;
             case FORCED_PASSWORD_CHANGE:
-                return doTemplate(vreq, showPasswordChangeScreen(vreq), body, config);
+                //return doTemplate(vreq, showPasswordChangeScreen(vreq), body, config);
+                return showPasswordChangeScreen(vreq);
             default:
-                return doTemplate(vreq, showLoginScreen(vreq), body, config);
+                //return doTemplate(vreq, showLoginScreen(vreq), body, config);
+                return showLoginScreen(vreq);
             }
         } catch (Exception e) {
             log.error(e);
-            return doTemplate(vreq, showError(vreq, e), body, config);
+            return showError(vreq, e);
         }
     }
 
@@ -121,6 +124,7 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 		if (!errorMessage.isEmpty()) {
 			trv.put(BODY_ERROR_MESSAGE, errorMessage);
 		}
+		
 		return trv;
 	}
 
@@ -165,20 +169,10 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 		setUpRoot(vreq, root);
 
 		// Add the values that we got, and merge to the template.
-		body.putAll(values.getBodyMap());
-		return mergeBodyToTemplate(values.getTemplateName(), body, config);
+		body.putAll(values.getMap());
+		return mergeMapToTemplate(values.getTemplateName(), body, config);
 	}
-	
-    /**
-     * We processed a response, and want to show a template.
-     * Version for Freemarker page.
-     */
-    private String doTemplate(VitroRequest vreq, TemplateResponseValues values, Map<String, Object> body, Configuration config) {
 
-        // Add the values that we got, and merge to the template.
-        body.putAll(values.getBodyMap());
-        return mergeBodyToTemplate(values.getTemplateName(), body, config);
-    }
 
 	/**
 	 * Where are we in the process? Logged in? Not? Somewhere in between?
@@ -238,31 +232,6 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 			return String.valueOf(DEFAULT_PORTAL_ID);
 		} else {
 			return portalIdParameter;
-		}
-	}
-
-	/**
-	 * Holds the name of the template and the map of values.
-	 */
-	private static class TemplateResponseValues {
-		private final String templateName;
-		private final Map<String, Object> bodyMap = new HashMap<String, Object>();
-
-		public TemplateResponseValues(String templateName) {
-			this.templateName = templateName;
-		}
-
-		public TemplateResponseValues put(String key, Object value) {
-			this.bodyMap.put(key, value);
-			return this;
-		}
-
-		public Map<? extends String, ? extends Object> getBodyMap() {
-			return Collections.unmodifiableMap(this.bodyMap);
-		}
-
-		public String getTemplateName() {
-			return this.templateName;
 		}
 	}
 }

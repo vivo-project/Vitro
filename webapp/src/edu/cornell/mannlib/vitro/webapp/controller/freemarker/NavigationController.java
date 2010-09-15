@@ -28,6 +28,7 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.web.DisplayVocabulary;
 import freemarker.template.Configuration;
 
@@ -46,8 +47,8 @@ public class NavigationController extends FreemarkerHttpServlet {
 		displayOntModel.getBaseModel().register( urlPatterns );
 	}
 	
-	@Override
-	protected String getBody(VitroRequest vreq, Map<String, Object> body, Configuration config) {		
+    @Override
+    protected ResponseValues processRequest(VitroRequest vreq) {		
 		OntModel displayOntModel = (OntModel)getServletContext().getAttribute("displayOntModel");
 		OntModel jenaOntModel = (OntModel)getServletContext().getAttribute("jenaOntModel");
 				
@@ -56,7 +57,7 @@ public class NavigationController extends FreemarkerHttpServlet {
 		Map<String,Object> values = getValues(ind, displayOntModel,jenaOntModel, getValuesFromRequest(/*?*/) );		
 		String template = getTemplate(ind, displayOntModel);		
 		
-		return mergeBodyToTemplate(template, values, config);
+		return new TemplateResponseValues(template, values);
 	}
 	
 	private Map<String,Object>getValuesFromRequest(){

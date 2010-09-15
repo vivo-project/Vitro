@@ -28,6 +28,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet.ResponseValues;
 import freemarker.template.Configuration;
 
 public class ContactMailController extends FreemarkerHttpServlet {
@@ -66,14 +67,18 @@ public class ContactMailController extends FreemarkerHttpServlet {
 		return (host != null && host.length() > 0) ? host : null;
 	}
 	
+	@Override
     protected String getTitle(String siteName) {
         return siteName + " Feedback Form";
     }
     
-    protected String getBody(VitroRequest vreq, Map<String, Object> body, Configuration config) {
+
+    @Override
+    protected ResponseValues processRequest(VitroRequest vreq) {
     	
         Portal portal = vreq.getPortal();
-        String bodyTemplate = null;
+        String templateName = null;
+        Map<String, Object> body = new HashMap<String, Object>();
         
         String statusMsg = null; // holds the error status
         
@@ -81,7 +86,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
             body.put("errorMessage", 
                     "This application has not yet been configured to send mail. " +
                     "An smtp host has not been specified in the configuration properties file.");
-            bodyTemplate = "contactForm-error.ftl";
+            templateName = "contactForm-error.ftl";
         }
         
         else {
@@ -97,7 +102,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
                 // rjy7 We should reload the form, not go to the error page!
                 body.put("errorMessage", 
                         "Invalid submission");
-            	bodyTemplate = "contactForm-error.ftl";
+            	templateName = "contactForm-error.ftl";
             }
             
             else {
@@ -158,7 +163,8 @@ public class ContactMailController extends FreemarkerHttpServlet {
                             "To establish the Contact Us mail capability the system administrators must  "
                             + "specify at least one email address in the current portal.");
                 }
-        
+                
+                Configuration config = (Configuration) vreq.getAttribute("freemarkerConfig");
                 String msgText = composeEmail(webusername, webuseremail, comments, 
                 		deliveryfrom, originalReferer, vreq.getRemoteAddr(), config);
                 
@@ -204,15 +210,15 @@ public class ContactMailController extends FreemarkerHttpServlet {
                 
                 // Message was sent successfully
                 if (statusMsg == null && spamReason == null) {                  
-                    bodyTemplate = "contactForm-confirmation.ftl";
+                    templateName = "contactForm-confirmation.ftl";
                 } else {
                     body.put("errorMessage", statusMsg);
-                    bodyTemplate = "contactForm-error.ftl";
+                    templateName = "contactForm-error.ftl";
                 }   
             }
         }
         
-        return mergeBodyToTemplate(bodyTemplate, body, config);
+        return new TemplateResponseValues(templateName, body);
 
     }
     
@@ -241,7 +247,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
             email.put("referrer", UrlBuilder.urlDecode(originalReferer));
         }
     	
-        return mergeBodyToTemplate(template, email, config);
+        return mergeMapToTemplate(template, email, config);
     }
     
     private void writeBackupCopy(PrintWriter outFile, String msgText, 
@@ -259,7 +265,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
         
         backup.put("msgText", msgText);
 
-        String backupText = mergeBodyToTemplate(template, backup, config);
+        String backupText = mergeMapToTemplate(template, backup, config);
         outFile.print(backupText);
         outFile.flush();
         //outFile.close(); 

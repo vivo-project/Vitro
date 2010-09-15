@@ -44,6 +44,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration;
@@ -74,7 +75,8 @@ public class IndividualController extends FreemarkerHttpServlet {
     private ApplicationBean appBean;
 
     
-    protected String getBody(VitroRequest vreq, Map<String, Object> body, Configuration config) {
+    @Override
+    protected ResponseValues processRequest(VitroRequest vreq) {
     	try {
 
 	        HttpSession session = vreq.getSession();
@@ -92,13 +94,13 @@ public class IndividualController extends FreemarkerHttpServlet {
 	        String redirectURL = checkForRedirect ( url, vreq.getHeader("accept") );
 	        if( redirectURL != null ){
 	        	//doRedirect( vreq, res, redirectURL );
-	        	return "";
+	        	return null;
 	        }            	           
 	
 	        ContentType rdfFormat = checkForLinkedDataRequest(url,vreq.getHeader("accept"));
 	        if( rdfFormat != null ){
 	        	//doRdf( vreq, res, rdfFormat );
-	        	return "";
+	        	return null;
 	        }                                 
 	
 	        Individual individual = null;
@@ -106,37 +108,34 @@ public class IndividualController extends FreemarkerHttpServlet {
 	            individual = getEntityFromRequest( vreq);
 	        }catch(Throwable th){
 	            //doHelp(res);
-	            return "";
+	            return null;
 	        }
 	        
 	        if( individual == null || checkForHidden(vreq, individual) || checkForSunset(vreq, individual)){
 	        	//doNotFound(vreq, res);
-	        	return "";
+	        	return null;
 	        }
 	
 	        // If this is an uploaded file, redirect to its "alias URL".
 	        String aliasUrl = getAliasUrlForBytestreamIndividual(vreq, individual);
 	        if (aliasUrl != null) {
 	        	//res.sendRedirect(vreq.getContextPath() + aliasUrl);
-	        	return "";
+	        	return null;
 	        }
 
-
+	        Map<String, Object> body = new HashMap<String, Object>();
+	        
 	        int securityLevel = getSecurityLevel(session);
 	        UrlBuilder urlBuilder = new UrlBuilder(vreq.getPortal());
     		body.put("editStatus", getEditingData(vreq, securityLevel, individual, urlBuilder));
 	        body.putAll(getIndividualData(vreq, individual));                    
 	        body.put("title", individual.getName());
-	        
-	        String bodyTemplate = "individual.ftl";             
-	        return mergeBodyToTemplate(bodyTemplate, body, config);
+	                
+	        return new TemplateResponseValues("individual.ftl", body);
         
 	    } catch (Throwable e) {
 	        log.error(e);
-	        //vreq.setAttribute("javax.servlet.jsp.jspException",e);
-	        // RequestDispatcher rd = vreq.getRequestDispatcher("/error.jsp");
-	        //rd.forward(vreq, res);
-	        return "";
+	        return new ExceptionResponseValues(e);
 	    }
     }
 

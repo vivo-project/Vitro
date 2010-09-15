@@ -106,7 +106,11 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
         }                                           
     }
 
-    protected String getBody(VitroRequest vreq, Map<String, Object> body, Configuration config) {  
+    @Override
+    protected ResponseValues processRequest(VitroRequest vreq) { 
+        
+        Map<String, Object> body = new HashMap<String, Object>();
+        
         try {
 
             Portal portal = vreq.getPortal();
@@ -116,7 +120,7 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
             if( vreq.getWebappDaoFactory() == null 
                     || vreq.getWebappDaoFactory().getIndividualDao() == null ){
                 log.error("makeUsableBeans() could not get IndividualDao ");
-                return doSearchError("Could not access Model.", config);
+                return doSearchError("Could not access Model.");
             }
             IndividualDao iDao = vreq.getWebappDaoFactory().getIndividualDao();
             VClassGroupDao grpDao = vreq.getWebappDaoFactory().getVClassGroupDao();
@@ -153,7 +157,7 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
             log.debug("query for '" + qtxt +"' is " + query.toString());
 
             if (query == null ) {
-                return doNoQuery(config, portal);
+                return doNoQuery(portal);
             }
             
             IndexSearcher searcherForRequest = getIndexSearcher(indexDir);
@@ -173,19 +177,19 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
                     if (msg == null) {
                         msg = "The search request contained errors.";
                     }
-                    return doFailedSearch(msg, qtxt, config);
+                    return doFailedSearch(msg, qtxt);
                 }
             }
 
             if( topDocs == null || topDocs.scoreDocs == null){
                 log.error("topDocs for a search was null");                
                 String msg = "The search request contained errors.";
-                return doFailedSearch(msg, qtxt, config);
+                return doFailedSearch(msg, qtxt);
             }
             
             int hitsLength = topDocs.scoreDocs.length;
             if ( hitsLength < 1 ){                
-                return doNoHits(qtxt, config);
+                return doNoHits(qtxt);
             }            
             log.debug("found "+hitsLength+" hits");
 
@@ -286,12 +290,11 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
                 body.put("nextPage", getNextPageLink(startIndex, hitsPerPage, vreq.getServletPath(), pagingLinkParams));
             }
              
-        } catch (Throwable e) {
-            log.error(e, e);  
-            return doSearchError(e.getMessage(), config);
+        } catch (Throwable e) { 
+            return doSearchError(e);
         }
         
-        return mergeBodyToTemplate("search-pagedResults.ftl", body, config);
+        return new TemplateResponseValues("search-pagedResults.ftl", body);
     }
 
     private void alphaSortIndividuals(List<Individual> beans) {
@@ -749,34 +752,40 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
         }
     }        
 
-    private String doSearchError(String message, Configuration config) {
+    private TemplateResponseValues doSearchError(String message) {
         Map<String, Object> body = new HashMap<String, Object>();
         body.put("message", "Search failed: " + message);
-        return mergeBodyToTemplate("search-error.ftl", body, config);
+        return new TemplateResponseValues("search-error.ftl", body);
     }
     
-    private String doNoQuery(Configuration config, Portal portal) {
+    private ExceptionResponseValues doSearchError(Throwable e) {
+        Map<String, Object> body = new HashMap<String, Object>();
+        body.put("message", "Search failed: " + e.getMessage());  
+        return new ExceptionResponseValues("search-error.ftl", body, e);
+    }
+    
+    private TemplateResponseValues doNoQuery(Portal portal) {
         Map<String, Object> body = new HashMap<String, Object>();
         body.put("title", "Search " + portal.getAppName());
         body.put("message", "No query entered.");
-        return mergeBodyToTemplate("search-error.ftl", body, config);
+        return new TemplateResponseValues("search-error.ftl", body);
     }
     
-    private String doFailedSearch(String message, String querytext, Configuration config) {
+    private TemplateResponseValues doFailedSearch(String message, String querytext) {
         Map<String, Object> body = new HashMap<String, Object>();       
         body.put("title", "Search for '" + querytext + "'");        
         if ( StringUtils.isEmpty(message) ) {
             message = "Search failed.";
         }        
         body.put("message", message);
-        return mergeBodyToTemplate("search-error.ftl", body, config);
+        return new TemplateResponseValues("search-error.ftl", body);
     }
 
-    private String doNoHits(String querytext, Configuration config) {
+    private TemplateResponseValues doNoHits(String querytext) {
         Map<String, Object> body = new HashMap<String, Object>();       
         body.put("title", "Search for '" + querytext + "'");        
         body.put("message", "No matching results.");     
-        return mergeBodyToTemplate("search-error.ftl", body, config);
+        return new TemplateResponseValues("search-error.ftl", body);
     }
 
     /**

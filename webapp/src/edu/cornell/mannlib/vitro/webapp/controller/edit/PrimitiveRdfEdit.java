@@ -4,10 +4,8 @@ package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -28,26 +26,15 @@ import com.hp.hpl.jena.shared.Lock;
 import edu.cornell.mannlib.vedit.beans.LoginFormBean;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
-import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DependentResourceDeleteJena;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditN3Utils;
-import freemarker.template.Configuration;
 
 public class PrimitiveRdfEdit extends FreemarkerHttpServlet{
 
     private static final long serialVersionUID = 1L;
-
-    @Override
-    protected String getBody(VitroRequest vreq, Map<String, Object> body, Configuration config) {
-//      boolean loggedIn = checkLoginStatus(request, response);
-//      if( !loggedIn){
-//          doError(response,"You must be logged in to use this servlet.",HttpStatus.SC_UNAUTHORIZED);
-//          return;
-//      }
-        return mergeBodyToTemplate("primitiveRdfEdit.ftl",new HashMap<String, Object>(), config);
-    }
 
     @Override
     protected String getTitle(String siteName) {
@@ -55,11 +42,21 @@ public class PrimitiveRdfEdit extends FreemarkerHttpServlet{
     }
 
     @Override
+    protected ResponseValues processRequest(VitroRequest vreq) {
+        boolean loggedIn = checkLoginStatus(vreq);
+        if( !loggedIn){
+            return new RedirectResponseValues(UrlBuilder.getUrl(Route.LOGIN));
+        }
+        
+        return new TemplateResponseValues("primitiveRdfEdit.ftl");
+    }
+    
+    @Override
     public void doPost(HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException {
         
         VitroRequest vreq = new VitroRequest(request);
-        boolean loggedIn = checkLoginStatus(request, response);
+        boolean loggedIn = checkLoginStatus(request);
         if( !loggedIn){
             doError(response,"You must be logged in to use this servlet.",HttpStatus.SC_UNAUTHORIZED);
             return;
@@ -238,7 +235,7 @@ public class PrimitiveRdfEdit extends FreemarkerHttpServlet{
     Log log = LogFactory.getLog(PrimitiveRdfEdit.class.getName());
 
 
-    static public boolean checkLoginStatus(HttpServletRequest request, HttpServletResponse response){
+    static public boolean checkLoginStatus(HttpServletRequest request){
         LoginFormBean loginBean = (LoginFormBean) request.getSession().getAttribute("loginHandler");        
         if (loginBean == null){            
             return false;            

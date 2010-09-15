@@ -4,7 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -41,6 +40,10 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAct
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadHelper;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorage;
 import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup;
@@ -160,94 +163,31 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 * </ul>
 	 * </p>
 	 */
-	@Override
-	public void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws IOException, ServletException {
-
-		try {
-			// Parse the multi-part request.
-			request = FileUploadServletRequest.parseRequest(request,
-					MAXIMUM_FILE_SIZE);
-			if (log.isTraceEnabled()) {
-				dumpRequestDetails(request);
-			}
-
-			// Do setup defined in VitroHttpServlet
-			setup(request);
-
-			VitroRequest vreq = new VitroRequest(request);
-
-			// If they aren't authorized to do this, send them to login.
-			if (!checkAuthorized(vreq)) {
-				String loginPage = request.getContextPath() + Controllers.LOGIN;
-				response.sendRedirect(loginPage);
-				return;
-			}
-
-			ResponseValues values = buildTheResponse(vreq);
-
-			switch (values.getType()) {
-			case FORWARD:
-				doForward(vreq, response, values);
-				break;
-			case TEMPLATE:
-				doTemplate(vreq, response, values);
-				break;
-			case EXCEPTION:
-				doException(vreq, response, values);
-				break;
-			}
-		} catch (Exception e) {
-			log.error("Could not produce response page", e);
-		}
-	}
-
-	/**
-	 * We processed a response, and want to show a template.
-	 */
-	private void doTemplate(VitroRequest vreq, HttpServletResponse response,
-			ResponseValues values) {
-		// Set it up like FreeMarkerHttpServlet.doGet() would do.
-		Configuration config = getConfig(vreq);
-		Map<String, Object> sharedVariables = getSharedVariables(vreq);
-		Map<String, Object> root = new HashMap<String, Object>(sharedVariables);
-		Map<String, Object> body = new HashMap<String, Object>(sharedVariables);
-		setUpRoot(vreq, root);
-
-		// Add the values that we got, and merge to the template.
-		body.putAll(values.getBodyMap());
-		root.put("body",
-				mergeBodyToTemplate(values.getTemplateName(), body, config));
-
-		// Continue to simulate FreeMarkerHttpServlet.doGet()
-		root.put("title", body.get("title"));
-		writePage(root, config, response);
-	}
-
-	/**
-	 * We processsed a response, and want to forward to another page.
-	 */
-	private void doForward(HttpServletRequest req, HttpServletResponse resp,
-			ResponseValues values) throws ServletException, IOException {
-		String forwardUrl = values.getForwardUrl();
-		if (forwardUrl.contains("://")) {
-			// It's a full URL, so redirect.
-			resp.sendRedirect(forwardUrl);
-		} else {
-			// It's a relative URL, so forward within the application.
-			req.getRequestDispatcher(forwardUrl).forward(req, resp);
-		}
-	}
-
-	/**
-	 * We processed a response, and need to display an internal exception.
-	 */
-	private void doException(VitroRequest vreq, HttpServletResponse resp,
-			ResponseValues values) {
-		log.error(values.getException(), values.getException());
-		doTemplate(vreq, resp, new TemplateResponseValues(TEMPLATE_ERROR));
-	}
-
+	
+    @Override
+    protected ResponseValues processRequest(VitroRequest vreq) {
+        try {
+            // Parse the multi-part request.
+            FileUploadServletRequest request = FileUploadServletRequest.parseRequest(vreq,
+                    MAXIMUM_FILE_SIZE);
+            if (log.isTraceEnabled()) {
+                dumpRequestDetails(vreq);
+            }  
+            
+            // If they aren't authorized to do this, send them to login.
+            if (!checkAuthorized(vreq)) {
+                String loginPage = request.getContextPath() + Controllers.LOGIN;
+                return new RedirectResponseValues(loginPage);
+            }
+            
+            return buildTheResponse(vreq);
+            
+        } catch (Exception e) {
+            //log.error("Could not produce response page", e);
+            return new ExceptionResponseValues(e);
+        }
+    }
+    
 	/**
 	 * Handle the different actions. If not specified, the default action is to
 	 * show the intro screen.
@@ -658,136 +598,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 		}
 	}
 
-	private static interface ResponseValues {
-		enum ResponseType {
-			TEMPLATE, FORWARD, EXCEPTION
-		}
 
-		ResponseType getType();
-
-		String getTemplateName();
-
-		Map<? extends String, ? extends Object> getBodyMap();
-
-		String getForwardUrl();
-
-		Throwable getException();
-	}
-
-	private static class TemplateResponseValues implements ResponseValues {
-		private final String templateName;
-		private final Map<String, Object> bodyMap = new HashMap<String, Object>();
-
-		public TemplateResponseValues(String templateName) {
-			this.templateName = templateName;
-		}
-
-		public TemplateResponseValues put(String key, Object value) {
-			this.bodyMap.put(key, value);
-			return this;
-		}
-
-		@Override
-		public ResponseType getType() {
-			return ResponseType.TEMPLATE;
-		}
-
-		@Override
-		public Map<? extends String, ? extends Object> getBodyMap() {
-			return Collections.unmodifiableMap(this.bodyMap);
-		}
-
-		@Override
-		public String getTemplateName() {
-			return this.templateName;
-		}
-
-		@Override
-		public Throwable getException() {
-			throw new UnsupportedOperationException(
-					"This is not an exception response.");
-		}
-
-		@Override
-		public String getForwardUrl() {
-			throw new UnsupportedOperationException(
-					"This is not a forwarding response.");
-		}
-
-	}
-
-	private static class ForwardResponseValues implements ResponseValues {
-		private final String forwardUrl;
-
-		public ForwardResponseValues(String forwardUrl) {
-			this.forwardUrl = forwardUrl;
-		}
-
-		@Override
-		public ResponseType getType() {
-			return ResponseType.FORWARD;
-		}
-
-		@Override
-		public String getForwardUrl() {
-			return this.forwardUrl;
-		}
-
-		@Override
-		public String getTemplateName() {
-			throw new UnsupportedOperationException(
-					"This is not a template response.");
-		}
-
-		@Override
-		public Map<? extends String, ? extends Object> getBodyMap() {
-			throw new UnsupportedOperationException(
-					"This is not a template response.");
-		}
-
-		@Override
-		public Throwable getException() {
-			throw new UnsupportedOperationException(
-					"This is not an exception response.");
-		}
-
-	}
-
-	private static class ExceptionResponseValues implements ResponseValues {
-		private final Throwable cause;
-
-		public ExceptionResponseValues(Throwable cause) {
-			this.cause = cause;
-		}
-
-		@Override
-		public ResponseType getType() {
-			return ResponseType.EXCEPTION;
-		}
-
-		@Override
-		public Throwable getException() {
-			return cause;
-		}
-
-		@Override
-		public String getTemplateName() {
-			throw new UnsupportedOperationException(
-					"This is not a template response.");
-		}
-
-		@Override
-		public Map<? extends String, ? extends Object> getBodyMap() {
-			throw new IllegalStateException("This is not a template response.");
-		}
-
-		@Override
-		public String getForwardUrl() {
-			throw new UnsupportedOperationException(
-					"This is not a forwarding response.");
-		}
-
-	}
 
 	/**
 	 * If they are logged in as an Editor or better, they can do whatever they

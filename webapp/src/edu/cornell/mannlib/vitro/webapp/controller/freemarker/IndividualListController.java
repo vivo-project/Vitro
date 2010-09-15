@@ -14,6 +14,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.IndividualTemplateModel;
 import freemarker.template.Configuration;
@@ -28,9 +29,11 @@ public class IndividualListController extends FreemarkerHttpServlet {
 //    private VClass vclass = null;
 //    private String title = null;
 
-    protected String getBody(VitroRequest vreq, Map<String, Object> body, Configuration config) {
+    @Override
+    protected ResponseValues processRequest(VitroRequest vreq) {
  
-        String bodyTemplate = "individualList.ftl";
+        String templateName = "individualList.ftl";
+        Map<String, Object> body = new HashMap<String, Object>();
         String errorMessage = null;
         String message = null;
         
@@ -90,17 +93,17 @@ public class IndividualListController extends FreemarkerHttpServlet {
         } catch (HelpException help){
             errorMessage = "Request attribute 'vclass' or request parameter 'vclassId' must be set before calling. Its value must be a class uri."; 
         } catch (Throwable e) {
-            bodyTemplate = "error.ftl";
+            return new ExceptionResponseValues(e);
         }
 
         if (errorMessage != null) {
-            bodyTemplate = "errorMessage.ftl";
+            templateName = "errorMessage.ftl";
             body.put("errorMessage", errorMessage);
         } else if (message != null) {
             body.put("message", message);
         }
     
-        return mergeBodyToTemplate(bodyTemplate, body, config);
+        return new TemplateResponseValues(templateName, body);
     }
       
     private class HelpException extends Throwable {
