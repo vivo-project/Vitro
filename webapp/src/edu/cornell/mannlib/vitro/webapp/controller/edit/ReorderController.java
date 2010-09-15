@@ -29,6 +29,7 @@ public class ReorderController extends PrimitiveRdfEdit {
     private static String RANK_PREDICATE_PARAMETER_NAME = "predicate";
     private static String INDIVIDUAL_PREDICATE_PARAMETER_NAME = "individuals";
     
+    @Override
     protected void processRequest(VitroRequest vreq, HttpServletResponse response) {
 
         //String templateName = "autocompleteResults.ftl";
