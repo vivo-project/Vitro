@@ -13,6 +13,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Keyword;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ObjectSourceIface;
+import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 
 public interface IndividualDao extends ObjectSourceIface {
 

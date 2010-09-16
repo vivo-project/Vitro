@@ -768,7 +768,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
 
         @Deprecated
         public void addVClassesToGroup(VClassGroup group, boolean includeUninstantiatedClasses) {
-            addVClassesToGroup(group, includeUninstantiatedClasses, true);
+            addVClassesToGroup(group, includeUninstantiatedClasses, false);
         }
 
         @Deprecated

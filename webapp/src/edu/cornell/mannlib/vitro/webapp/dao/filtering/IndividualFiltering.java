@@ -27,6 +27,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
+import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 
 /**
  * A Individual object that will delegate to an inner Individual
@@ -517,7 +518,11 @@ public class IndividualFiltering implements Individual {
     	return _innerIndividual.isVClass(uri);
 	}
 
-
+    @Override
+    public boolean isMemberOfClassProhibitedFromSearch(ProhibitedFromSearch pfs) {
+    	return _innerIndividual.isMemberOfClassProhibitedFromSearch(pfs);
+    }
+    
 	public void setDataPropertyMap(Map<String, DataProperty> propertyMap) {
         _innerIndividual.setDataPropertyMap(propertyMap);
     }

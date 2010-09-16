@@ -114,17 +114,17 @@ public class VClassDaoFiltering extends BaseFiltering implements VClassDao{
         if(list == null )
             return null;
         filter(list,filters.getClassFilter());
-        correctVClassCounts(list);
+        //correctVClassCounts(list);
         return list;
     }
 
     public List<VClass> getOntologyRootClasses(String ontologyURI) {
-        return (List<VClass>)correctVClassCounts(innerVClassDao.getOntologyRootClasses(ontologyURI));
+        return innerVClassDao.getOntologyRootClasses(ontologyURI);
     }
 
 
     public List <VClass>getRootClasses() {
-        return correctVClassCounts(innerVClassDao.getRootClasses());
+        return innerVClassDao.getRootClasses();
     }
 
 
@@ -142,13 +142,13 @@ public class VClassDaoFiltering extends BaseFiltering implements VClassDao{
 
 
     public List<VClass> getVClassesForProperty(String propertyURI, boolean domainSide) {
-        List<VClass> list = innerVClassDao.getVClassesForProperty(propertyURI, domainSide);
-        return correctVClassCounts(filter(list,filters.getClassFilter()));
+        return innerVClassDao.getVClassesForProperty(propertyURI, domainSide);
+        //return correctVClassCounts(filter(list,filters.getClassFilter()));
     }
     
     public List<VClass> getVClassesForProperty(String vclassURI, String propertyURI) {
-    	List<VClass> list = innerVClassDao.getVClassesForProperty(vclassURI, propertyURI);
-    	return correctVClassCounts(filter(list,filters.getClassFilter()));
+    	return innerVClassDao.getVClassesForProperty(vclassURI, propertyURI);
+    	//return correctVClassCounts(filter(list,filters.getClassFilter()));
     }
 
     public void insertNewVClass(VClass cls) throws InsertException {
@@ -167,7 +167,7 @@ public class VClassDaoFiltering extends BaseFiltering implements VClassDao{
     }
 
     public void addVClassesToGroup(VClassGroup group, boolean includeUninstantiatedClasses) {
-        this.addVClassesToGroup(group, includeUninstantiatedClasses, true);
+        this.addVClassesToGroup(group, includeUninstantiatedClasses, false);
     }
 
     public void addVClassesToGroup(VClassGroup group,

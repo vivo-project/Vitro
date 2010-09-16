@@ -80,8 +80,7 @@ public class MiscWebUtils {
         return (String) contentObj;
     }
 
-	public static String getCustomShortView(HttpServletRequest request) {
-		
+	public static String getCustomShortView(HttpServletRequest request) {	
 		Individual object = ((ObjectPropertyStatement) request
 				.getAttribute("opStmt")).getObject();
 		return getCustomShortView(object, request);
