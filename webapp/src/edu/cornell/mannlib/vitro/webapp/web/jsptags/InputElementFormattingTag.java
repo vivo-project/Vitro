@@ -479,7 +479,10 @@ public class InputElementFormattingTag extends TagSupport {
             } else if( getType().equalsIgnoreCase("select")) {
                 String valueStr = doValue(editConfig, editSub);
                 //String sizeStr = getSize(); //"style=\"width:"+getSize()+"%;\"";
-                Map <String,String> optionsMap = SelectListGenerator.getOptions(editConfig,getName(), wdf);
+                Map<String,String> optionsMap = (Map<String,String>) pageContext.getRequest().getAttribute("rangeOptions." + getId());
+                if (optionsMap == null) {
+                	optionsMap = SelectListGenerator.getOptions(editConfig,getName(), wdf);
+                }
                 if (optionsMap==null){
                     log.error("Error in InputElementFormattingTag.doStartTag(): null optionsMap returned from getOptions()");
                 }
@@ -513,7 +516,10 @@ public class InputElementFormattingTag extends TagSupport {
             } else if( getType().equalsIgnoreCase("checkbox")) {
                 String valueStr = doValue(editConfig, editSub);
                 if (definitionTags) { out.print("<dd>"); }
-                Map <String,String> optionsMap = SelectListGenerator.getOptions(editConfig,getName(),wdf);
+                Map<String,String> optionsMap = (Map<String,String>) pageContext.getRequest().getAttribute("rangeOptions." + getId());
+                if (optionsMap == null) {
+                    optionsMap = SelectListGenerator.getOptions(editConfig,getName(),wdf);
+                }
                 if (optionsMap==null){
                     log.error("Error in InputElementFormattingTag.doStartTag(): null optionsMap returned from getOptions()");
                 }
@@ -532,7 +538,10 @@ public class InputElementFormattingTag extends TagSupport {
             } else if( getType().equalsIgnoreCase("radio")) {
                 String valueStr = doValue(editConfig, editSub);
                 if (definitionTags) { out.print("<dd>"); }
-                Map <String,String> optionsMap = SelectListGenerator.getOptions(editConfig,getName(),wdf);
+                Map<String,String> optionsMap = (Map<String,String>) pageContext.getRequest().getAttribute("rangeOptions." + getId());
+                if (optionsMap == null) {
+                    optionsMap = SelectListGenerator.getOptions(editConfig,getName(),wdf);
+                }
                 if (optionsMap==null){
                     log.error("Error in InputElementFormattingTag.doStartTag(): null optionsMap returned from getOptions()");
                 }

@@ -24,7 +24,10 @@
 %>
 
 <%@page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.SelectListGenerator"%>
-<%@page import="java.util.Map"%><v:jsonset var="queryForInverse" >
+<%@page import="java.util.Map"%>
+<%@page import="com.hp.hpl.jena.ontology.OntModel"%>
+<%@page import="edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch"%>
+<%@page import="edu.cornell.mannlib.vitro.webapp.web.DisplayVocabulary"%><v:jsonset var="queryForInverse" >
     PREFIX owl:  <http://www.w3.org/2002/07/owl#>
     SELECT ?inverse_property
     WHERE {
@@ -131,11 +134,24 @@
     }
     
     if( prop.getSelectFromExisting() ){
+    	// set ProhibitedFromSearch object so picklist doesn't show
+        // individuals from classes that should be hidden from list views
+        OntModel displayOntModel = 
+            (OntModel) pageContext.getServletContext()
+                .getAttribute("displayOntModel");
+        if (displayOntModel != null) {
+            ProhibitedFromSearch pfs = new ProhibitedFromSearch(
+                DisplayVocabulary.PRIMARY_LUCENE_INDEX_URI, displayOntModel);
+            if( editConfig != null )
+                editConfig.setProhibitedFromSearch(pfs);
+        }
     	Map<String,String> rangeOptions = SelectListGenerator.getOptions(editConfig, "objectVar" , wdf);    	
-    	if( rangeOptions != null && rangeOptions.size() > 0 )
+    	if( rangeOptions != null && rangeOptions.size() > 0 ) {
     		request.setAttribute("rangeOptionsExist", true);
-    	else 
+    	    request.setAttribute("rangeOptions.objectVar", rangeOptions);
+    	} else { 
     		request.setAttribute("rangeOptionsExist",false);
+    	}
     }
 %>
 <jsp:include page="${preForm}"/>
@@ -150,7 +166,7 @@
 	    </c:if>
 	    <v:input type="select" id="objectVar" size="80" />
 	    <div style="margin-top: 1em">
-	        <v:input type="submit" id="submit" value="<%=submitLabel%>" cancel="true"/>
+ 	        <v:input type="submit" id="submit" value="<%=submitLabel%>" cancel="true"/>
 	    </div>    
     </form>
   </c:if>

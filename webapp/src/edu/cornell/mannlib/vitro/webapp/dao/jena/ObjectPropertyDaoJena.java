@@ -410,7 +410,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
 		            	  p.setInverseOf(inv);
 		            	}
 	            } catch (Exception e) {
-	                   System.out.println("Couldn't set "+prop.getURIInverse()+" as inverse");
+	                   log.debug("Couldn't set "+prop.getURIInverse()+" as inverse");
 				       // BJL: What we really want to do here is create a new property as inverse
 			    }      
 	        }

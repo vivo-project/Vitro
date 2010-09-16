@@ -140,54 +140,36 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
     }
 
     public List getIndividualsByVClassURI(String vclassURI, int offset, int quantity ) {
-        if (vclassURI==null) {
+
+    	if (vclassURI==null) {
             return null;
         }
+        
         List ents = new ArrayList();
-        Resource theClass = null;
+        
+        Resource theClass = (vclassURI.indexOf(PSEUDO_BNODE_NS) == 0) 
+            ? getOntModel().createResource(new AnonId(vclassURI.split("#")[1]))
+            : ResourceFactory.createResource(vclassURI);
+    
         getOntModel().enterCriticalSection(Lock.READ);
         try {
-            if (vclassURI.indexOf(PSEUDO_BNODE_NS)==0) {
-                ClosableIterator closeIt = getOntModel().listClasses();
-                try {
-                    for (Iterator clsIt = closeIt ; clsIt.hasNext();) {
-                        OntClass cls = (OntClass) clsIt.next();
-                        if (cls.isAnon() && cls.getId().toString().equals(vclassURI.split("#")[1])) {
-                            theClass = cls;
-                            break;
-                        }
-                    }
-                } finally {
-                    closeIt.close();
-                }
-            } else {
-                theClass = getOntModel().getOntClass(vclassURI);
-            }
-        } finally {
-            getOntModel().leaveCriticalSection();
-        }
-
-        if (theClass == null) {
-            theClass = ResourceFactory.createResource(vclassURI);
-        }
-
-        getOntModel().enterCriticalSection(Lock.READ);
-        try {
-            ClosableIterator indIt = getOntModel().listIndividuals(theClass);
+            StmtIterator stmtIt = getOntModel().listStatements((Resource) null, RDF.type, theClass);
             try {
-                while (indIt.hasNext()) {
-                    com.hp.hpl.jena.ontology.Individual ind = (com.hp.hpl.jena.ontology.Individual) indIt.next();
+                while (stmtIt.hasNext()) {
+                    Statement stmt = stmtIt.nextStatement();
+                    OntResource ind = (OntResource) stmt.getSubject().as(OntResource.class);
                     ents.add(new IndividualJena(ind, (WebappDaoFactoryJena) getWebappDaoFactory()));
                 }
             } finally {
-                indIt.close();
+                stmtIt.close();
             }
         } finally {
             getOntModel().leaveCriticalSection();
         }
-       java.util.Collections.sort(ents);
 
-       return ents;
+        java.util.Collections.sort(ents);
+
+        return ents;
 
     }
 
