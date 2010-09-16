@@ -163,10 +163,10 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 	private String doTemplate(VitroRequest vreq, TemplateResponseValues values) {
 		// Set it up like FreeMarkerHttpServlet.doGet() would do.
 		Configuration config = getConfig(vreq);
-		Map<String, Object> sharedVariables = getSharedVariables(vreq);
+		Map<String, Object> sharedVariables = getSharedVariables(vreq, new HashMap<String, Object>());
 		Map<String, Object> root = new HashMap<String, Object>(sharedVariables);
 		Map<String, Object> body = new HashMap<String, Object>(sharedVariables);
-		setUpRoot(vreq, root);
+        root.putAll(getRootValues(vreq));
 
 		// Add the values that we got, and merge to the template.
 		body.putAll(values.getMap());

@@ -82,16 +82,18 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         return getConfigForTheme(themeDir);
     }
 
-    @SuppressWarnings("unchecked")
     protected Configuration getConfigForTheme(String themeDir) {
         
         // The template loader is theme-specific because it specifies the theme template directory as a location to
         // load templates from. Thus configurations are associated with themes rather than portals.
+        @SuppressWarnings("unchecked")
         Map<String, Configuration> themeToConfigMap = (Map<String, Configuration>) (getServletContext().getAttribute("themeToConfigMap"));
         
         if( themeToConfigMap == null ) {
         	log.error("The templating system is not configured correctly. Make sure that you have the FreemarkerSetup context listener in your web.xml.");
-        	return null; // RY should we throw an error here instead?        	
+        	// We'll end up with a blank page as well as errors in the log, which is probably fine. 
+        	// Doesn't seem like we should throw a checked exception in this case.
+        	return null;   	
         } else if (themeToConfigMap.containsKey(themeDir)) {
             return themeToConfigMap.get(themeDir);
         } else {
@@ -226,26 +228,23 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     protected void doTemplate(VitroRequest vreq, HttpServletResponse response, ResponseValues values) {
      
         Configuration config = getConfig(vreq);
+        Map<String, Object> bodyMap = values.getMap();
         
         // We can't use shared variables in the Freemarker configuration to store anything 
         // except theme-specific data, because multiple portals or apps might share the same theme. So instead
         // just put the shared variables in both root and body.
-        Map<String, Object> sharedVariables = getSharedVariables(vreq);
+        Map<String, Object> sharedVariables = getSharedVariables(vreq, bodyMap);
         
         // root is the map used to create the page shell - header, footer, menus, etc.
         Map<String, Object> root = new HashMap<String, Object>(sharedVariables);
         
         // body is the map used to create the page body
         Map<String, Object> body = new HashMap<String, Object>(sharedVariables);
-        setUpRoot(vreq, root);
+        root.putAll(getRootValues(vreq));
 
         // Add the values that we got, and merge to the template.
-        body.putAll(values.getMap());
-        root.put("body", mergeMapToTemplate(values.getTemplateName(), body, config));
-        
-        // Subclass processing may have changed the title, so put the new value in the root map. (E.g., the title may
-        // include an individual's name, which is only discovered when processing the body.)
-        root.put("title", body.get("title")); 
+        body.putAll(bodyMap);
+        root.put("body", mergeMapToTemplate(values.getTemplateName(), body, config)); 
         
         writePage(root, config, response);       
     }
@@ -278,7 +277,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     // We can't use shared variables in the Freemarker configuration to store anything 
     // except theme-specific data, because multiple portals or apps might share the same theme. So instead
     // we'll get all the shared variables here, and put them in both root and body maps.
-    protected Map<String, Object> getSharedVariables(VitroRequest vreq) {
+    protected Map<String, Object> getSharedVariables(VitroRequest vreq, Map<String, Object> bodyMap) {
         
         Map<String, Object> map = new HashMap<String, Object>();
         
@@ -289,7 +288,16 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         
         String siteName = portal.getAppName();
         map.put("siteName", siteName);
-        map.put("title", getTitle(siteName));
+        
+        // In some cases the title is determined during the subclass processRequest() method; e.g., 
+        // for an Individual profile page, the title should be the Individual's label. In that case,
+        // put that title in the sharedVariables map because it's needed by the page root map as well
+        // to generate the <title> element. Otherwise, use the getTitle() method to generate the title.
+        String title = (String) bodyMap.get("title");
+        if (StringUtils.isEmpty(title)) {
+            title = getTitle(siteName);
+        }
+        map.put("title", title);
 
         String themeDir = getThemeDir(portal);
         UrlBuilder urlBuilder = new UrlBuilder(portal);
@@ -305,7 +313,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         map.put("scripts", getScriptList(themeDir));
         map.put("headScripts", getScriptList(themeDir));
   
-        addDirectives(map);
+        map.putAll(getDirectives());
         
         return  map;
     }
@@ -369,18 +377,21 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     }
     
     // Add any Java directives the templates should have access to
-    private void addDirectives(Map<String, Object> map) {
+    private Map<String, Object> getDirectives() {
+        Map<String, Object> map = new HashMap<String, Object>();
         map.put("describe", new edu.cornell.mannlib.vitro.webapp.web.directives.dump.DescribeDirective());
         map.put("dump", new edu.cornell.mannlib.vitro.webapp.web.directives.dump.DumpDirective());
         map.put("dumpAll", new edu.cornell.mannlib.vitro.webapp.web.directives.dump.DumpAllDirective());  
         map.put("help", new edu.cornell.mannlib.vitro.webapp.web.directives.dump.HelpDirective()); 
+        return map;
     }
     
     // Add variables that should be available only to the page's root map, not to the body.
     // RY This is protected instead of private so FreeMarkerComponentGenerator can access.
     // Once we don't need that (i.e., jsps have been eliminated) we can make it private.
-    protected void setUpRoot(VitroRequest vreq, Map<String, Object> root) {
+    protected Map<String, Object> getRootValues(VitroRequest vreq) {
         
+        Map<String, Object> root = new HashMap<String, Object>();
         root.put("tabMenu", getTabMenu(vreq));
 
         Portal portal = vreq.getPortal();
@@ -389,7 +400,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         PortalWebUtil.populateSearchOptions(portal, appBean, vreq.getWebappDaoFactory().getPortalDao());
         PortalWebUtil.populateNavigationChoices(portal, vreq, appBean, vreq.getWebappDaoFactory().getPortalDao()); 
         
-        addLoginInfo(vreq, root);      
+        root.putAll(getLoginValues(vreq));      
         
         root.put("copyright", getCopyrightInfo(portal));
     
@@ -406,6 +417,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
             root.put("bannerImage", UrlBuilder.getUrl(themeDir + "site_icons/" + bannerImage));
         }
         
+        return root;        
     }   
 
     private TabMenu getTabMenu(VitroRequest vreq) {
@@ -415,7 +427,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         return new TabMenu(vreq, portalId);
     }
 
-    private final void addLoginInfo(VitroRequest vreq, Map<String, Object> root) {
+    private final Map<String, Object> getLoginValues(VitroRequest vreq) {
         
         String loginName = null;
         int securityLevel;
@@ -425,18 +437,23 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         if (loginBean != null && loginBean.testSessionLevel(vreq) > -1) {
             loginName = loginBean.getLoginName();
             securityLevel = Integer.parseInt(loginBean.getLoginRole());
-        }   
+        } 
+        
+        Map<String, Object> map = new HashMap<String, Object>();
+        
         if (loginName != null) {
-            root.put("loginName", loginName);
+            map.put("loginName", loginName);
 
             securityLevel = Integer.parseInt(loginBean.getLoginRole());
             if (securityLevel >= FILTER_SECURITY_LEVEL) {
                 ApplicationBean appBean = vreq.getAppBean();
                 if (appBean.isFlag1Active()) {
-                    root.put("showFlag1SearchField", true);
+                    map.put("showFlag1SearchField", true);
                 }
             }           
-        }       
+        }  
+        
+        return map;
     }   
     
     private final Map<String, Object> getCopyrightInfo(Portal portal) {
@@ -509,7 +526,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         new FreemarkerComponentGenerator(request);
     }
 
-    public static interface ResponseValues {
+    protected static interface ResponseValues {
 //        enum ResponseType {
 //            TEMPLATE, REDIRECT, FORWARD, EXCEPTION
 //        }
