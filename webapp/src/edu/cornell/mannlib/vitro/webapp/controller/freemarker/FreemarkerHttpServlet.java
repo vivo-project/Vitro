@@ -185,6 +185,12 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
        
     protected void doResponse(VitroRequest vreq, HttpServletResponse response, ResponseValues values) {
         try {
+            
+            int statusCode = values.getStatusCode();
+            if (statusCode > 0) {
+                response.setStatus(statusCode);
+            }
+            
 //            switch (values.getType()) {
 //            case TEMPLATE:
 //                doTemplate(vreq, response, values);
@@ -535,6 +541,10 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
 
         String getTemplateName();
 
+        int getStatusCode();
+
+        void setStatusCode(int statusCode);
+
         Map<String, Object> getMap();
         
         String getRedirectUrl();
@@ -543,8 +553,26 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
 
         Throwable getException();
     }
+    
+    protected static abstract class BaseResponseValues implements ResponseValues {
+        private int statusCode = 0;
+        
+        BaseResponseValues() { }
+        
+        BaseResponseValues(int statusCode) {
+            this.statusCode = statusCode;
+        }
+        
+        public int getStatusCode() {
+            return statusCode;
+        }
+        
+        public void setStatusCode(int statusCode) {
+            this.statusCode = statusCode;
+        }
+    }
 
-    protected static class TemplateResponseValues implements ResponseValues {
+    protected static class TemplateResponseValues extends BaseResponseValues {
         private final String templateName;
         private final Map<String, Object> map;
         
@@ -553,7 +581,19 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
             this.map = new HashMap<String, Object>();
         }
 
+        public TemplateResponseValues(String templateName, int statusCode) {
+            super(statusCode);
+            this.templateName = templateName;
+            this.map = new HashMap<String, Object>();
+        }
+        
         public TemplateResponseValues(String templateName, Map<String, Object> map) {
+            this.templateName = templateName;
+            this.map = map;
+        }
+
+        public TemplateResponseValues(String templateName, Map<String, Object> map, int statusCode) {
+            super(statusCode);
             this.templateName = templateName;
             this.map = map;
         }
@@ -598,13 +638,18 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
 
     }
 
-    protected static class RedirectResponseValues implements ResponseValues {
+    protected static class RedirectResponseValues extends BaseResponseValues {
         private final String redirectUrl;
 
         public RedirectResponseValues(String redirectUrl) {
             this.redirectUrl = redirectUrl;
         }
 
+        public RedirectResponseValues(String redirectUrl, int statusCode) {
+            super(statusCode);
+            this.redirectUrl = redirectUrl;
+        }
+        
 //        @Override
 //        public ResponseType getType() {
 //            return ResponseType.REDIRECT;
@@ -641,13 +686,18 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
 
     }
 
-    protected static class ForwardResponseValues implements ResponseValues {
+    protected static class ForwardResponseValues extends BaseResponseValues {
         private final String forwardUrl;
 
         public ForwardResponseValues(String forwardUrl) {
             this.forwardUrl = forwardUrl;
         }
 
+        public ForwardResponseValues(String forwardUrl, int statusCode) {
+            super(statusCode);
+            this.forwardUrl = forwardUrl;
+        }
+        
 //        @Override
 //        public ResponseType getType() {
 //            return ResponseType.FORWARD;
@@ -692,9 +742,19 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
             super(DEFAULT_TEMPLATE_NAME);
             this.cause = cause;
         }
+
+        public ExceptionResponseValues(Throwable cause, int statusCode) {
+            super(DEFAULT_TEMPLATE_NAME, statusCode);
+            this.cause = cause;
+        }
         
         public ExceptionResponseValues(String templateName, Throwable cause) {
             super(templateName);
+            this.cause = cause;
+        }
+
+        public ExceptionResponseValues(String templateName, Throwable cause, int statusCode) {
+            super(templateName, statusCode);
             this.cause = cause;
         }
         
@@ -703,6 +763,11 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
             this.cause = cause;
         }
 
+        public ExceptionResponseValues(String templateName, Map<String, Object> map, Throwable cause, int statusCode) {
+            super(templateName, map, statusCode);
+            this.cause = cause;
+        }
+        
 //        @Override
 //        public ResponseType getType() {
 //            return ResponseType.EXCEPTION;
