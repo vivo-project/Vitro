@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.search.lucene;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -38,10 +39,11 @@ public class LuceneIndexer implements IndexerIface {
     LinkedList<Obj2DocIface> obj2DocList = new LinkedList<Obj2DocIface>();
     String indexDir = null;
     Analyzer analyzer = null;
-    List<Searcher> searchers = null;
+    List<Searcher> searchers = Collections.EMPTY_LIST;
     IndexWriter writer = null;
     boolean indexing = false;
     HashSet<String> urisIndexed;
+    private LuceneIndexFactory luceneIndexFactory;
 
     //JODA timedate library can use java date format strings.
     //http://java.sun.com/j2se/1.3/docs/api/java/text/SimpleDateFormat.html
@@ -71,7 +73,8 @@ public class LuceneIndexer implements IndexerIface {
     public LuceneIndexer(String indexDir, List<Searcher> searchers, Analyzer analyzer ) throws IOException{
         this.indexDir = indexDir;
         this.analyzer = analyzer;
-        this.searchers = searchers;
+        if( searchers != null )
+            this.searchers = searchers;
         makeIndexIfNone();
     }
     
@@ -330,5 +333,8 @@ public class LuceneIndexer implements IndexerIface {
         return dir.delete();
     }
 
+    public void setLuceneIndexFactory(LuceneIndexFactory lif) {
+        luceneIndexFactory = lif;    
+    }
 
 }

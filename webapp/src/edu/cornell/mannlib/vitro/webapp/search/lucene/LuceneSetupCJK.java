@@ -74,23 +74,18 @@ public class LuceneSetupCJK implements javax.servlet.ServletContextListener {
             HashSet objectPropertyBlacklist = new HashSet<String>();
             objectPropertyBlacklist.add("http://www.w3.org/2002/07/owl#differentFrom");
             context.setAttribute(LuceneSetup.SEARCH_OBJECTPROPERTY_BLACKLIST, objectPropertyBlacklist);
-
-            //Here we want to put the LuceneSearcher in the application scope.
-            // the queries need to know the analyzer to use so that the same one can be used
-            // to analyze the fields in the incoming user query terms.
-            LuceneSearcher searcher = new LuceneSearcher(
-                    new LuceneQueryFactory(getAnalyzer(), Entity2LuceneDoc.term.ALLTEXT),
-                    indexDir);
-            searcher.addObj2Doc(new Entity2LuceneDoc());
-            context.setAttribute(Searcher.class.getName(), searcher);
-
+            
             //here we want to put the LuceneIndex object into the application scope
-            LuceneIndexer indexer = new LuceneIndexer(indexDir, null, getAnalyzer());
-            indexer.addSearcher(searcher);
+            LuceneIndexer indexer = new LuceneIndexer(indexDir, null, getAnalyzer());            
             context.setAttribute(LuceneSetup.ANALYZER, getAnalyzer());
             context.setAttribute(LuceneSetup.INDEX_DIR, indexDir);
             indexer.addObj2Doc(new Entity2LuceneDoc());
 
+            //This is where to get a LucenIndex from.  The indexer will
+            //need to reference this to notify it of updates to the index           
+            LuceneIndexFactory lif = LuceneIndexFactory.getLuceneIndexFactoryFromContext(context);
+            indexer.setLuceneIndexFactory(lif);
+            
             //This is where the builder gets the list of places to try to 
             //get objects to index. It is filtered so that non-public text
             //does not get into the search index.            

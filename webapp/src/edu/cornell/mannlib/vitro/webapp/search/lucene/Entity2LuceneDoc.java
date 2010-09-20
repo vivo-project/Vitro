@@ -123,7 +123,7 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         doc.add( nameUn );
 
         Field nameUnanalyzed = new Field(term.NAMEUNANALYZED, value.toLowerCase(), 
-				Field.Store.NO, Field.Index.NOT_ANALYZED);        
+				Field.Store.YES, Field.Index.NOT_ANALYZED);        
         doc.add( nameUnanalyzed );
 
         //boost for entity

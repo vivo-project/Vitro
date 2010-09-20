@@ -33,16 +33,23 @@
         }
         /**************************************************/
 %>
-
 <c:set var="portalId" value="<%=portalId%>" />
-
-<c:if test="${requestScope.alpha != 'none'}">
+<c:if test="${ requestScope.showAlpha == 1 }">
 <div class='alphaIndex'>
     <c:forEach items='${requestScope.letters}' var='letter'>
-        <a <c:if test="${letter == requestScope.alpha}">class='selected' </c:if> href='<c:url value=".${requestScope.servlet}?home=${portalId}&amp;alpha=${letter}&amp;${requestScope.tabParam}"/>'>${letter} </a> 
-    </c:forEach>        
-    <c:if test='${not empty requestScope.count}'>
-        (${requestScope.count})
-    </c:if>
+        <c:if test="${letter == requestScope.alpha}"> ${requestScope.alpha }&nbsp;</c:if>
+        <c:if test="${letter != requestScope.alpha}"> 
+            <a href='<c:url value=".${requestScope.servlet}?&amp;alpha=${letter}&amp;${requestScope.tabParam}"/>'>${letter} </a>
+         </c:if> 
+    </c:forEach> 
+    
+    <%  if( request.getAttribute("alpha") != null && ! "all".equalsIgnoreCase((String)request.getAttribute("alpha"))) {  %>         
+        <a href='<c:url value=".${requestScope.servlet}?&amp;alpha=all&amp;${requestScope.tabParam}"/>'>all </a>
+        <c:if test='${not empty requestScope.count }'>
+            (${requestScope.count} that start with ${requestScope.alpha })
+        </c:if>    
+     <% }else{ %>
+        (${requestScope.count})      
+     <% } %>             
 </div>
 </c:if>
