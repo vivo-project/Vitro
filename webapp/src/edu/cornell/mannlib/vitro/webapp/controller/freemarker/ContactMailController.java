@@ -43,6 +43,11 @@ public class ContactMailController extends FreemarkerHttpServlet {
     private final static String WEB_USEREMAIL_PARAM = "webuseremail";
     private final static String COMMENTS_PARAM      = "s34gfd88p9x1";
 	
+    private final static String TEMPLATE_CONFIRMATION = "contactForm-confirmation.ftl";
+    private final static String TEMPLATE_EMAIL = "contactForm-email.ftl";
+    private final static String TEMPLATE_BACKUP = "contactForm-backup.ftl";
+    private final static String TEMPLATE_ERROR = "contactForm-error.ftl";
+    
     private static String smtpHost = null;
 
     public void init(ServletConfig servletConfig) throws javax.servlet.ServletException {
@@ -86,7 +91,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
             body.put("errorMessage", 
                     "This application has not yet been configured to send mail. " +
                     "An smtp host has not been specified in the configuration properties file.");
-            templateName = "contactForm-error.ftl";
+            templateName = TEMPLATE_ERROR; 
         }
         
         else {
@@ -102,7 +107,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
                 // rjy7 We should reload the form, not go to the error page!
                 body.put("errorMessage", 
                         "Invalid submission");
-            	templateName = "contactForm-error.ftl";
+            	templateName = TEMPLATE_ERROR;
             }
             
             else {
@@ -210,10 +215,10 @@ public class ContactMailController extends FreemarkerHttpServlet {
                 
                 // Message was sent successfully
                 if (statusMsg == null && spamReason == null) {                  
-                    templateName = "contactForm-confirmation.ftl";
+                    templateName = TEMPLATE_CONFIRMATION; 
                 } else {
                     body.put("errorMessage", statusMsg);
-                    templateName = "contactForm-error.ftl";
+                    templateName = TEMPLATE_ERROR;
                 }   
             }
         }
@@ -236,7 +241,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
     							String originalReferer, String ipAddr, Configuration config) {
  
         Map<String, Object> email = new HashMap<String, Object>();
-        String template = "contactForm-email.ftl";
+        String template = TEMPLATE_EMAIL; 
         
         email.put("subject", deliveryfrom);
         email.put("name", webusername);
@@ -254,7 +259,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
     		String spamReason, Configuration config) {
 
         Map<String, Object> backup = new HashMap<String, Object>();
-        String template = "contactForm-backup.ftl";
+        String template = TEMPLATE_BACKUP; 
         
     	Calendar cal = Calendar.getInstance();
     	backup.put("datetime", cal.getTime().toString());

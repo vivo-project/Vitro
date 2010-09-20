@@ -26,13 +26,13 @@ public class IndividualListController extends FreemarkerHttpServlet {
   
     private static final long serialVersionUID = 1L;   
     private static final Log log = LogFactory.getLog(IndividualListController.class.getName());
-//    private VClass vclass = null;
-//    private String title = null;
+
+    private static final String TEMPLATE_DEFAULT = "individualList.ftl";
 
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
  
-        String templateName = "individualList.ftl";
+        String templateName = TEMPLATE_DEFAULT;
         Map<String, Object> body = new HashMap<String, Object>();
         String errorMessage = null;
         String message = null;
@@ -97,7 +97,7 @@ public class IndividualListController extends FreemarkerHttpServlet {
         }
 
         if (errorMessage != null) {
-            templateName = "errorMessage.ftl";
+            templateName = Template.ERROR_MESSAGE.toString();
             body.put("errorMessage", errorMessage);
         } else if (message != null) {
             body.put("message", message);

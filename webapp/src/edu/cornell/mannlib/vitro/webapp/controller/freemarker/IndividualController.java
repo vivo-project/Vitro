@@ -73,7 +73,9 @@ public class IndividualController extends FreemarkerHttpServlet {
     private String default_jsp      = Controllers.BASIC_JSP;
     private String default_body_jsp = Controllers.ENTITY_JSP;
     private ApplicationBean appBean;
-
+    
+    private static final String TEMPLATE_INDIVIDUAL = "individual.ftl";
+    private static final String TEMPLATE_HELP = "individual-help.ftl";
     
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
@@ -82,45 +84,36 @@ public class IndividualController extends FreemarkerHttpServlet {
 	        HttpSession session = vreq.getSession();
 	        
     		cleanUpSession(session);
-    		
 
-    		
 	        // get URL without hostname or servlet context
-	        String url = vreq.getRequestURI().substring(vreq.getContextPath().length());   
-	        
-	        // Title = individual label
+	        String url = vreq.getRequestURI().substring(vreq.getContextPath().length()); 
 	
-	        //Check to see if the request is for a non-information resource, redirect if it is.
+	        // Check to see if the request is for a non-information resource, redirect if it is.
 	        String redirectURL = checkForRedirect ( url, vreq.getHeader("accept") );
 	        if( redirectURL != null ){
-	        	//doRedirect( vreq, res, redirectURL );
-	        	return null;
-	        }            	           
-	
-	        ContentType rdfFormat = checkForLinkedDataRequest(url,vreq.getHeader("accept"));
-	        if( rdfFormat != null ){
-	        	//doRdf( vreq, res, rdfFormat );
-	        	return null;
-	        }                                 
+	            return new RedirectResponseValues(redirectURL);
+	        }            	                                         
 	
 	        Individual individual = null;
-	        try{
-	            individual = getEntityFromRequest( vreq);
-	        }catch(Throwable th){
-	            //doHelp(res);
-	            return null;
+	        try {
+	            individual = getEntityFromRequest(vreq);
+	        } catch (Throwable th) {
+	            return doHelp();
 	        }
 	        
 	        if( individual == null || checkForHidden(vreq, individual) || checkForSunset(vreq, individual)){
-	        	//doNotFound(vreq, res);
-	        	return null;
+	        	return doNotFound(vreq);
 	        }
-	
+
+            ContentType rdfFormat = checkForLinkedDataRequest(url,vreq.getHeader("accept"));
+            if( rdfFormat != null ){
+                return doRdf(vreq, individual, rdfFormat);
+            }   
+	            
 	        // If this is an uploaded file, redirect to its "alias URL".
 	        String aliasUrl = getAliasUrlForBytestreamIndividual(vreq, individual);
 	        if (aliasUrl != null) {
-	        	//res.sendRedirect(vreq.getContextPath() + aliasUrl);
-	        	return null;
+	        	return new RedirectResponseValues(UrlBuilder.getUrl(vreq.getContextPath() + aliasUrl));
 	        }
 
 	        Map<String, Object> body = new HashMap<String, Object>();
@@ -128,10 +121,10 @@ public class IndividualController extends FreemarkerHttpServlet {
 	        int securityLevel = getSecurityLevel(session);
 	        UrlBuilder urlBuilder = new UrlBuilder(vreq.getPortal());
     		body.put("editStatus", getEditingData(vreq, securityLevel, individual, urlBuilder));
-	        body.putAll(getIndividualData(vreq, individual));                    
-	        body.put("title", individual.getName());
+    		body.put("title", individual.getName());
+	        body.putAll(getIndividualData(vreq, individual));                    	        
 	                
-	        return new TemplateResponseValues("individual.ftl", body);
+	        return new TemplateResponseValues(TEMPLATE_INDIVIDUAL, body);
         
 	    } catch (Throwable e) {
 	        log.error(e);
@@ -308,14 +301,8 @@ public class IndividualController extends FreemarkerHttpServlet {
         return map;
 	}
 
-	private void doRdf(VitroRequest vreq, HttpServletResponse res,
+	private ResponseValues doRdf(VitroRequest vreq, Individual individual,
 			ContentType rdfFormat) throws IOException, ServletException {    	
-
-		Individual indiv = getEntityFromRequest(vreq);		
-		if( indiv == null ){
-			doNotFound(vreq, res);
-			return;
-		}
 				
 		OntModel ontModel = null;
 		HttpSession session = vreq.getSession(false);
@@ -324,19 +311,9 @@ public class IndividualController extends FreemarkerHttpServlet {
 		if( ontModel == null)
 			ontModel = (OntModel)getServletContext().getAttribute("jenaOntModel");
 			
-		Model newModel;
-		newModel = getRDF(indiv, ontModel, ModelFactory.createDefaultModel(), 0);		
+		Model newModel = getRDF(individual, ontModel, ModelFactory.createDefaultModel(), 0);		
 		
-		res.setContentType(rdfFormat.getMediaType());
-		String format = ""; 
-		if ( RDFXML_MIMETYPE.equals(rdfFormat.getMediaType()))
-			format = "RDF/XML";
-		else if( N3_MIMETYPE.equals(rdfFormat.getMediaType()))
-			format = "N3";
-		else if ( TTL_MIMETYPE.equals(rdfFormat.getMediaType()))
-			format ="TTL";
-		
-		newModel.write( res.getOutputStream(), format );		
+		return new RdfResponseValues(rdfFormat, newModel);
 	}
 
 	private void doRedirect(HttpServletRequest req, HttpServletResponse res,
@@ -660,18 +637,11 @@ public class IndividualController extends FreemarkerHttpServlet {
         doGet(request, response);
     }
 
-    private void doHelp(HttpServletResponse res)
-    throws IOException, ServletException {
-        ServletOutputStream out = res.getOutputStream();
-        res.setContentType("text/html; charset=UTF-8");
-        out.println("<html><body><h2>Quick Notes on using entity:</h2>");
-        out.println("<p>id is the id of the entity to query for. netid also works.</p>");
-        out.println("</body></html>");
+    private ResponseValues doHelp() throws IOException, ServletException {
+        return new TemplateResponseValues(TEMPLATE_HELP);
     }
     
-    private void doNotFound(HttpServletRequest req, HttpServletResponse res)
-    throws IOException, ServletException {
-        VitroRequest vreq = new VitroRequest(req);
+    private ResponseValues doNotFound(VitroRequest vreq) throws IOException, ServletException {
         Portal portal = vreq.getPortal();
         ApplicationBean appBean = ApplicationBean.getAppBean(getServletContext());
         int allPortalId = appBean.getAllPortalFlagNumeric();
@@ -697,7 +667,7 @@ public class IndividualController extends FreemarkerHttpServlet {
                 else
                     portalParam = "home=" + allPortalId; 
                                         
-                String queryStr = req.getQueryString();
+                String queryStr = vreq.getQueryString();
                 if( queryStr == null && portalParam != null && !"".equals(portalParam)){
                     queryStr = portalParam;
                 } else {                
@@ -708,14 +678,14 @@ public class IndividualController extends FreemarkerHttpServlet {
                     queryStr = "?" + queryStr;
                            
                 StringBuilder url = new StringBuilder();
-                url.append( req.getContextPath() );                                
-                if( req.getContextPath() != null && !req.getContextPath().endsWith("/"))
+                url.append( vreq.getContextPath() );                                
+                if( vreq.getContextPath() != null && !vreq.getContextPath().endsWith("/"))
                     url.append('/');
                 
                 if( portalPrefix != null && !"".equals(portalPrefix)) 
                     url.append( portalPrefix ).append('/');            
                     
-                String servletPath = req.getServletPath();
+                String servletPath = vreq.getServletPath();
                 String spath = "";
                 if( servletPath != null ){ 
                     if( servletPath.startsWith("/") )
@@ -727,32 +697,24 @@ public class IndividualController extends FreemarkerHttpServlet {
                 if( spath != null && !"".equals(spath))
                     url.append( spath );
                 
-                if( req.getPathInfo() != null )
-                    url.append( req.getPathInfo() );
+                if( vreq.getPathInfo() != null )
+                    url.append( vreq.getPathInfo() );
                 
                 if( queryStr != null && !"".equals(queryStr ))
                     url.append( queryStr );
                 
-                res.sendRedirect(url.toString());
-                return;
+                return new RedirectResponseValues(url.toString());
             }
         }catch(Throwable th){
             log.error("could not do a redirect", th);
         }
 
         //set title before we do the highlighting so we don't get markup in it.
-        req.setAttribute("title","not found");
-        res.setStatus(HttpServletResponse.SC_NOT_FOUND);
-
-        String css = "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\" href=\""
-            + portal.getThemeDir() + "css/entity.css\"/>"
-            + "<script language='JavaScript' type='text/javascript' src='js/toggle.js'></script>";
-        req.setAttribute("css",css);
-
-        req.setAttribute("bodyJsp","/"+Controllers.ENTITY_NOT_FOUND_JSP);
-
-        RequestDispatcher rd = req.getRequestDispatcher(Controllers.BASIC_JSP);
-        rd.forward(req,res);
+        Map<String, Object> body = new HashMap<String, Object>();
+        body.put("title","Individual Not Found");
+        body.put("errorMessage", "The individual was not found in the system.");
+        
+        return new TemplateResponseValues(Template.TITLED_ERROR_MESSAGE.toString(), body, HttpServletResponse.SC_NOT_FOUND);
     }
     
     private String forURL(String frag) {

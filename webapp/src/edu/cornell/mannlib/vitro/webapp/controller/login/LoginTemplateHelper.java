@@ -39,7 +39,7 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 	public static final String TEMPLATE_FORCE_PASSWORD_CHANGE = "login-forcedPasswordChange.ftl";
 	
     /** Show error message */
-    public static final String TEMPLATE_SERVER_ERROR = "errorMessage.ftl";
+    public static final String TEMPLATE_SERVER_ERROR = Template.ERROR_MESSAGE.toString(); 
 
 	public static final String BODY_LOGIN_NAME = "loginName";
 	public static final String BODY_FORM_ACTION = "formAction";

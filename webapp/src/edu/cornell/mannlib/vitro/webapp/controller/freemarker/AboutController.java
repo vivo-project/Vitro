@@ -16,6 +16,7 @@ public class AboutController extends FreemarkerHttpServlet {
 	
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(AboutController.class);
+    private static final String TEMPLATE_DEFAULT = "about.ftl";
     
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
@@ -25,7 +26,7 @@ public class AboutController extends FreemarkerHttpServlet {
         body.put("aboutText", portal.getAboutText());
         body.put("acknowledgeText", portal.getAcknowledgeText());
         
-        return new TemplateResponseValues("about.ftl", body);
+        return new TemplateResponseValues(TEMPLATE_DEFAULT, body);
     }
 
     @Override

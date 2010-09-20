@@ -86,9 +86,14 @@ import freemarker.template.Configuration;
 public class FreemarkerPagedSearchController extends FreemarkerHttpServlet implements Searcher {
 
     private static final long serialVersionUID = 1L;
-    private IndexSearcher searcher = null;
     private static final Log log = LogFactory.getLog(FreemarkerPagedSearchController.class.getName());
-    String NORESULT_MSG = "The search returned no results.";    
+    
+    private static final String TEMPLATE_SEARCH_RESULTS = "search-pagedResults.ftl";
+    private static final String TEMPLATE_ERROR = "search-error.ftl";
+        
+    String NORESULT_MSG = "The search returned no results.";  
+    
+    private IndexSearcher searcher = null;
     private int defaultHitsPerPage = 25;
     private int defaultMaxSearchSize= 1000;   
 
@@ -294,7 +299,7 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
             return doSearchError(e);
         }
         
-        return new TemplateResponseValues("search-pagedResults.ftl", body);
+        return new TemplateResponseValues(TEMPLATE_SEARCH_RESULTS, body);
     }
 
     private void alphaSortIndividuals(List<Individual> beans) {
@@ -755,20 +760,20 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
     private TemplateResponseValues doSearchError(String message) {
         Map<String, Object> body = new HashMap<String, Object>();
         body.put("message", "Search failed: " + message);
-        return new TemplateResponseValues("search-error.ftl", body);
+        return new TemplateResponseValues(TEMPLATE_ERROR, body);
     }
     
     private ExceptionResponseValues doSearchError(Throwable e) {
         Map<String, Object> body = new HashMap<String, Object>();
         body.put("message", "Search failed: " + e.getMessage());  
-        return new ExceptionResponseValues("search-error.ftl", body, e);
+        return new ExceptionResponseValues(TEMPLATE_ERROR, body, e);
     }
     
     private TemplateResponseValues doNoQuery(Portal portal) {
         Map<String, Object> body = new HashMap<String, Object>();
         body.put("title", "Search " + portal.getAppName());
         body.put("message", "No query entered.");
-        return new TemplateResponseValues("search-error.ftl", body);
+        return new TemplateResponseValues(TEMPLATE_ERROR, body);
     }
     
     private TemplateResponseValues doFailedSearch(String message, String querytext) {
@@ -778,14 +783,14 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
             message = "Search failed.";
         }        
         body.put("message", message);
-        return new TemplateResponseValues("search-error.ftl", body);
+        return new TemplateResponseValues(TEMPLATE_ERROR, body);
     }
 
     private TemplateResponseValues doNoHits(String querytext) {
         Map<String, Object> body = new HashMap<String, Object>();       
         body.put("title", "Search for '" + querytext + "'");        
         body.put("message", "No matching results.");     
-        return new TemplateResponseValues("search-error.ftl", body);
+        return new TemplateResponseValues(TEMPLATE_ERROR, body);
     }
 
     /**

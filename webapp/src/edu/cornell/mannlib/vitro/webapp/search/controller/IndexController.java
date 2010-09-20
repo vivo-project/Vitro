@@ -31,7 +31,7 @@ import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
  */
 public class IndexController extends FreemarkerHttpServlet {
 	
-	private static final Log log = LogFactory.getLog(IndexController.class.getName());
+	private static final Log log = LogFactory.getLog(IndexController.class);
 	
 //    public void doPost(HttpServletRequest request, HttpServletResponse response)
 //    throws ServletException,IOException {
@@ -103,10 +103,10 @@ public class IndexController extends FreemarkerHttpServlet {
         } catch (IndexingException e) {
         	log.error("Error rebuilding search index",e);
         	body.put("errorMessage", "There was an error while rebuilding the search index. " + e.getMessage());
-        	return new ExceptionResponseValues("errorMessage.ftl", body, e);            
+        	return new ExceptionResponseValues(Template.ERROR_MESSAGE.toString(), body, e);            
         }
         
         body.put("message","Rebuilding of index started."); 
-        return new TemplateResponseValues("message.ftl", body);
+        return new TemplateResponseValues(Template.MESSAGE.toString(), body);
     }
 }

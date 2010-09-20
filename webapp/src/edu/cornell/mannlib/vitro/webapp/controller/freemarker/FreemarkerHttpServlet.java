@@ -20,6 +20,8 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.rdf.model.Model;
+
 import edu.cornell.mannlib.vedit.beans.LoginFormBean;
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
@@ -30,6 +32,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 import edu.cornell.mannlib.vitro.webapp.web.BreadCrumbsUtil;
+import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 import edu.cornell.mannlib.vitro.webapp.web.PortalWebUtil;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.files.Scripts;
@@ -51,6 +54,24 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(FreemarkerHttpServlet.class);
     private static final int FILTER_SECURITY_LEVEL = LoginFormBean.EDITOR;
+
+    protected enum Template {
+        STANDARD_ERROR("error-standard.ftl"),
+        ERROR_MESSAGE("error-message.ftl"),
+        TITLED_ERROR_MESSAGE("error-titledMessage.ftl"),
+        MESSAGE("message.ftl"),
+        PAGE_DEFAULT("page.ftl");
+        
+        private final String filename;
+        
+        Template(String filename) {
+            this.filename = filename;
+        }
+
+        public String toString() {
+            return filename;
+        }
+    }
     
     public void doGet( HttpServletRequest request, HttpServletResponse response )
 		throws IOException, ServletException {
@@ -219,6 +240,8 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
                 doRedirect(vreq, response, values);
             } else if (values instanceof ForwardResponseValues) {
                 doForward(vreq, response, values);
+            } else if (values instanceof RdfResponseValues) {
+                doRdf(vreq, response, values);
             }
         } catch (ServletException e) {
             // TODO Auto-generated catch block
@@ -271,6 +294,24 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
             // It's a relative URL, so forward within the application.
             request.getRequestDispatcher(forwardUrl).forward(request, response);
         }
+    }
+    
+    protected void doRdf(HttpServletRequest request, HttpServletResponse response, ResponseValues values) 
+        throws IOException {
+        
+        String mediaType = values.getContentType().getMediaType();
+        response.setContentType(mediaType);
+        
+        String format = ""; 
+        if ( RDFXML_MIMETYPE.equals(mediaType)) {
+            format = "RDF/XML";
+        } else if( N3_MIMETYPE.equals(mediaType)) {
+            format = "N3";
+        } else if ( TTL_MIMETYPE.equals(mediaType)) {
+            format ="TTL";
+        }
+        
+        values.getModel().write( response.getOutputStream(), format );      
     }
 
     protected void doException(VitroRequest vreq, HttpServletResponse response, ResponseValues values) {
@@ -521,7 +562,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     
     // Can be overridden by individual controllers to use a different basic page layout.
     protected String getPageTemplateName() {
-        return "page.ftl";
+        return Template.PAGE_DEFAULT.toString();
     }
 
     // TEMPORARY method for transition from JSP to Freemarker. 
@@ -552,15 +593,24 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         String getForwardUrl();
 
         Throwable getException();
+        
+        ContentType getContentType();
+        
+        Model getModel();
     }
     
     protected static abstract class BaseResponseValues implements ResponseValues {
         private int statusCode = 0;
+        private ContentType contentType = null;
         
         BaseResponseValues() { }
         
         BaseResponseValues(int statusCode) {
             this.statusCode = statusCode;
+        }
+
+        BaseResponseValues(ContentType contentType) {
+            this.contentType = contentType;
         }
         
         public int getStatusCode() {
@@ -569,6 +619,14 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         
         public void setStatusCode(int statusCode) {
             this.statusCode = statusCode;
+        }
+
+        public ContentType getContentType() {
+            return contentType;
+        }
+
+        public void setContentType(ContentType contentType) {
+            this.contentType = contentType;
         }
     }
 
@@ -636,6 +694,12 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
                     "This is not an exception response.");
         }
 
+        @Override
+        public Model getModel() {
+            throw new UnsupportedOperationException(
+                    "This is not an RDF response.");
+        }
+        
     }
 
     protected static class RedirectResponseValues extends BaseResponseValues {
@@ -684,6 +748,11 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
                     "This is not an exception response.");
         }
 
+        @Override
+        public Model getModel() {
+            throw new UnsupportedOperationException(
+                    "This is not an RDF response.");
+        }
     }
 
     protected static class ForwardResponseValues extends BaseResponseValues {
@@ -732,10 +801,15 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
                     "This is not an exception response.");
         }
 
+        @Override
+        public Model getModel() {
+            throw new UnsupportedOperationException(
+                    "This is not an RDF response.");
+        }
     }
 
     protected static class ExceptionResponseValues extends TemplateResponseValues {
-        private final static String DEFAULT_TEMPLATE_NAME = "error.ftl";
+        private final static String DEFAULT_TEMPLATE_NAME = "error-standard.ftl";
         private final Throwable cause;
 
         public ExceptionResponseValues(Throwable cause) {
@@ -800,6 +874,67 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
             throw new UnsupportedOperationException(
                     "This is not a forwarding response.");
         }
+        
+        @Override
+        public Model getModel() {
+            throw new UnsupportedOperationException(
+                    "This is not an RDF response.");
+        }        
+    }
+    
+    protected static class RdfResponseValues extends BaseResponseValues {
+        private final Model model;
+        
+        RdfResponseValues(ContentType contentType, Model model) {
+            super(contentType);
+            this.model = model;
+        }
 
+        @Override
+        public String getTemplateName() {
+            throw new UnsupportedOperationException(
+                "This is not a template response.");
+        }
+
+        @Override
+        public int getStatusCode() {
+            throw new UnsupportedOperationException(
+                "This is not a BaseResponseValues response.");
+        }
+
+        @Override
+        public void setStatusCode(int statusCode) {
+            throw new UnsupportedOperationException(
+                "This is not a BaseResponseValues response.");           
+        }
+
+        @Override
+        public Map<String, Object> getMap() {
+            throw new UnsupportedOperationException(
+                "This is not a template response.");
+        }
+
+        @Override
+        public String getRedirectUrl() {
+            throw new UnsupportedOperationException(
+                "This is not a redirect response.");
+        }
+
+        @Override
+        public String getForwardUrl() {
+            throw new UnsupportedOperationException(
+                "This is not a forwarding response.");
+        }
+
+        @Override
+        public Throwable getException() {
+            throw new UnsupportedOperationException(
+                "This is not an exception response.");
+        }
+        
+        @Override
+        public Model getModel() {
+           return model;
+        }
     }
 }

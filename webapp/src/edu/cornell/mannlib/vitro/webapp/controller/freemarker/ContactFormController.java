@@ -33,6 +33,9 @@ public class ContactFormController extends FreemarkerHttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(ContactFormController.class.getName());
     
+    private static final String TEMPLATE_DEFAULT = "contactForm-form.ftl";
+    private static final String TEMPLATE_ERROR = "contactForm-error.ftl";
+    
     @Override
     protected String getTitle(String siteName) {
         return siteName + " Feedback Form";
@@ -49,14 +52,14 @@ public class ContactFormController extends FreemarkerHttpServlet {
             body.put("errorMessage", 
                      "This application has not yet been configured to send mail. " +
                      "An smtp host has not been specified in the configuration properties file.");
-            templateName = "contactForm-error.ftl";
+            templateName = TEMPLATE_ERROR;
         }
         
         else if (StringUtils.isEmpty(portal.getContactMail())) {
             body.put("errorMessage", 
             		"The feedback form is currently disabled. In order to activate the form, a site administrator must provide a contact email address in the <a href='editForm?home=1&amp;controller=Portal&amp;id=1'>Site Configuration</a>");
             
-            templateName = "contactForm-error.ftl";            
+            templateName = TEMPLATE_ERROR;          
         }
         
         else {
@@ -89,7 +92,7 @@ public class ContactFormController extends FreemarkerHttpServlet {
                 vreq.getSession().setAttribute("contactFormReferer",vreq.getHeader("Referer"));
             }
            
-            templateName = "contactForm-form.ftl";
+            templateName = TEMPLATE_DEFAULT;
         }
         
         return new TemplateResponseValues(templateName, body);

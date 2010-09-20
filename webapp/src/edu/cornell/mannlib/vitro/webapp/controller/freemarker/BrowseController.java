@@ -46,7 +46,9 @@ public class BrowseController extends FreemarkerHttpServlet {
             = new ConcurrentLinkedQueue<String>();
     private RebuildGroupCacheThread _cacheRebuildThread;
 
-    private static final Log log = LogFactory.getLog(BrowseController.class.getName());
+    private static final Log log = LogFactory.getLog(BrowseController.class);
+    
+    private static final String TEMPLATE_DEFAULT = "classGroups.ftl";
 
     public void init(javax.servlet.ServletConfig servletConfig)
             throws javax.servlet.ServletException {
@@ -107,7 +109,7 @@ public class BrowseController extends FreemarkerHttpServlet {
     	    body.put("message", message);
     	} 
     	
-        return new TemplateResponseValues("classGroups.ftl", body);
+        return new TemplateResponseValues(TEMPLATE_DEFAULT, body);
     }
 
     public void destroy(){

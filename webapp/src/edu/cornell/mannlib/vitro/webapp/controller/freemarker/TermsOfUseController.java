@@ -19,6 +19,7 @@ public class TermsOfUseController extends FreemarkerHttpServlet {
     
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(TermsOfUseController.class);
+    private static final String TEMPLATE_DEFAULT = "termsOfUse.ftl";
 
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
@@ -32,7 +33,7 @@ public class TermsOfUseController extends FreemarkerHttpServlet {
         
         body.put("copyrightAnchor", portal.getCopyrightAnchor());
         
-        return new TemplateResponseValues("termsOfUse.ftl", body);
+        return new TemplateResponseValues(TEMPLATE_DEFAULT, body);
     }
     
     @Override

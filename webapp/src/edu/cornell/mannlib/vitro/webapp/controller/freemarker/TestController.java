@@ -27,6 +27,7 @@ public class TestController extends FreemarkerHttpServlet {
 
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(TestController.class);
+    private static final String TEMPLATE_DEFAULT = "test.ftl";
 
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
@@ -88,7 +89,7 @@ public class TestController extends FreemarkerHttpServlet {
         
         body.put("title", "VIVO Test");
         
-        return new TemplateResponseValues("test.ftl", body);
+        return new TemplateResponseValues(TEMPLATE_DEFAULT, body);
     }
     
     @Override

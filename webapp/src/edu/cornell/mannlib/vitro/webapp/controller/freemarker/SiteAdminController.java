@@ -28,6 +28,7 @@ public class SiteAdminController extends FreemarkerHttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(SiteAdminController.class);
 
+    private static final String TEMPLATE_DEFAULT = "siteAdmin-main.ftl";
     @Override
 	public String getTitle(String siteName) {
         return siteName + " Site Administration";
@@ -86,7 +87,7 @@ public class SiteAdminController extends FreemarkerHttpServlet {
 //        } 
 //        body.put("languageModeStr",  languageMode);       
         
-        return new TemplateResponseValues("siteAdmin-main.ftl", body);
+        return new TemplateResponseValues(TEMPLATE_DEFAULT, body);
         
     }
 
