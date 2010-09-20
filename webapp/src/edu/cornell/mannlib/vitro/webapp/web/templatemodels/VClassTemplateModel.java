@@ -11,7 +11,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 
 public class VClassTemplateModel extends BaseTemplateModel {
     
-    private static final Log log = LogFactory.getLog(VClassTemplateModel.class.getName());
+    private static final Log log = LogFactory.getLog(VClassTemplateModel.class);
     private static final String PATH = Route.INDIVIDUAL_LIST.path();
     
     private VClass vclass;

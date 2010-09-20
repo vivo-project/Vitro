@@ -2,10 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -14,7 +12,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.fileupload.FileItem;
@@ -23,6 +20,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginFormBean;
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.auth.AuthorizationHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.ArrayIdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.ServletIdentifierBundleFactory;
@@ -40,10 +38,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAct
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadHelper;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorage;
 import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup;
@@ -51,7 +45,6 @@ import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.ImageInfo;
 import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest;
 import edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep;
-import freemarker.template.Configuration;
 
 /**
  * Handle adding, replacing or deleting the main image on an Individual.
@@ -636,62 +629,9 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 					VitroVocabulary.IND_MAIN_IMAGE,
 					RequestActionConstants.SOME_LITERAL, null, null);
 		}
-		return checkAuthorizedForRequestedAction(vreq, ra);
-	}
-
-	private boolean checkAuthorizedForRequestedAction(VitroRequest vreq,
-			RequestedAction action) {
-		PolicyIface policy = getPolicies(vreq);
-		PolicyDecision dec = policy.isAuthorized(getIdentifiers(vreq), action);
-		if (dec != null && dec.getAuthorized() == Authorization.AUTHORIZED) {
-			log.debug("Authorized because self-editing.");
-			return true;
-		} else {
-			log.debug("Not Authorized even though self-editing: "
-					+ ((dec == null) ? "null" : dec.getMessage() + ", "
-							+ dec.getDebuggingInfo()));
-			return false;
-		}
-	}
-
-	/**
-	 * Get the policy from the request, or from the servlet context.
-	 */
-	private PolicyIface getPolicies(VitroRequest vreq) {
-		ServletContext servletContext = vreq.getSession().getServletContext();
-
-		PolicyIface policy = RequestPolicyList.getPolicies(vreq);
-		if (isEmptyPolicy(policy)) {
-			policy = ServletPolicyList.getPolicies(servletContext);
-			if (isEmptyPolicy(policy)) {
-				log.error("No policy found in request at "
-						+ RequestPolicyList.POLICY_LIST);
-				policy = new PolicyList();
-			}
-		}
-
-		return policy;
-	}
-
-	/**
-	 * Is there actually a policy here?
-	 */
-	private boolean isEmptyPolicy(PolicyIface policy) {
-		return policy == null
-				|| (policy instanceof PolicyList && ((PolicyList) policy)
-						.size() == 0);
-	}
-
-	private IdentifierBundle getIdentifiers(VitroRequest vreq) {
-		HttpSession session = vreq.getSession();
-		ServletContext context = session.getServletContext();
-		IdentifierBundle ids = ServletIdentifierBundleFactory
-				.getIdBundleForRequest(vreq, session, context);
-		if (ids == null) {
-			return new ArrayIdentifierBundle();
-		} else {
-			return ids;
-		}
+		
+		AuthorizationHelper helper = new AuthorizationHelper(vreq);
+		return helper.isAuthorizedForRequestedAction(ra);
 	}
 
 }

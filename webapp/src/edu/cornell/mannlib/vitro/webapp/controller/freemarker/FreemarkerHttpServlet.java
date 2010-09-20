@@ -58,8 +58,9 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     protected enum Template {
         STANDARD_ERROR("error-standard.ftl"),
         ERROR_MESSAGE("error-message.ftl"),
-        TITLED_ERROR_MESSAGE("error-titledMessage.ftl"),
+        TITLED_ERROR_MESSAGE("error-titled.ftl"),
         MESSAGE("message.ftl"),
+        TITLED_MESSAGE("message-titled.ftl"),
         PAGE_DEFAULT("page.ftl");
         
         private final String filename;

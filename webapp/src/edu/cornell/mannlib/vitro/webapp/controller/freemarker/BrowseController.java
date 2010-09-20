@@ -83,6 +83,7 @@ public class BrowseController extends FreemarkerHttpServlet {
 
         Map<String, Object> body = new HashMap<String, Object>();
         String message = null;
+        String templateName = TEMPLATE_DEFAULT;
         
     	if( vreq.getParameter("clearcache") != null ) //mainly for debugging
     		clearGroupCache();
@@ -94,22 +95,20 @@ public class BrowseController extends FreemarkerHttpServlet {
     	if (groups == null || groups.isEmpty()) {
     		message = "There are not yet any items in the system.";
     	}
-    	else {
-    	    // FreeMarker will wrap vcgroups in a SimpleSequence. So do we want to create the SimpleSequence directly?
-    	    // But, makes code less portable to another system.
-    	    // SimpleSequence vcgroups = new SimpleSequence(groups.size());   	    
+    	else {  	    
     	    List<VClassGroupTemplateModel> vcgroups = new ArrayList<VClassGroupTemplateModel>(groups.size());   	    
-    		for (VClassGroup g: groups) {
-    		    vcgroups.add(new VClassGroupTemplateModel(g));
+    		for (VClassGroup group : groups) {
+    		    vcgroups.add(new VClassGroupTemplateModel(group));
     		}
     		body.put("classGroups", vcgroups);
     	} 
     	
     	if (message != null) {
     	    body.put("message", message);
+    	    templateName = Template.TITLED_MESSAGE.toString();
     	} 
     	
-        return new TemplateResponseValues(TEMPLATE_DEFAULT, body);
+        return new TemplateResponseValues(templateName, body);
     }
 
     public void destroy(){
