@@ -21,18 +21,22 @@ import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.RangeQuery;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopFieldDocs;
+import org.joda.time.DateTime;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Tab;
+import edu.cornell.mannlib.vitro.webapp.controller.edit.KeywordRetryController.newKeywordToEntityLinker;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.TabDao;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneIndexFactory;
+import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneIndexer;
 import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
 import edu.cornell.mannlib.vitro.webapp.web.TabWebUtil;
 
@@ -84,9 +88,9 @@ public void doGet( HttpServletRequest req, HttpServletResponse response )
         super.doGet(req,response);
         
         try{
-              VitroRequest request = new VitroRequest(req);
-              TabDao tabDao = request.getWebappDaoFactory().getTabDao();                
-                    
+             VitroRequest request = new VitroRequest(req);
+             TabDao tabDao = request.getWebappDaoFactory().getTabDao();                
+                          
              int depth = getTabDepth(request);                      
              if( depth >= TAB_DEPTH_CUTOFF){
                  String tabId = request.getParameter("tabId");
@@ -106,6 +110,7 @@ public void doGet( HttpServletRequest req, HttpServletResponse response )
                  +"It should have been placed there by a call to TabWebUtil.stashTabsInRequest in tabPrimary.jsp";
                  throw new ServletException(e);
              }                 
+             req.setAttribute("tabId", tab.getTabId());
              
              String alpha = request.getParameter("alpha");
              boolean doAlphaFilter = false;
@@ -128,7 +133,7 @@ public void doGet( HttpServletRequest req, HttpServletResponse response )
              
              //try to get the URIs of the required individuals from the lucene index
              IndexSearcher index = LuceneIndexFactory.getIndexSearcher(getServletContext());             
-             Query query = null;
+             BooleanQuery query = null;
              if( tab.isAutoLinked() ){
                  query = getQuery(tab, 
                          request.getWebappDaoFactory().getTabDao().getTabAutoLinkedVClassURIs(tab.getTabId()),
@@ -148,16 +153,29 @@ public void doGet( HttpServletRequest req, HttpServletResponse response )
              }else{
                 log.error("Tab " + tab.getTabId() + " is neither manually, auto nor mixed. ");   
              }
-                          
+               
+             if( tab.getDayLimit() > 0  ){
+                 query = addDayLimit( query, tab );
+             }
+             
+             
              int page = getPage(request);
              int entsPerTab = getSizeForNonGalleryTab(tab, showPaged);
              IndividualDao indDao = request.getWebappDaoFactory().getIndividualDao();
              int size = 0;
              
              try {
-                TopFieldDocs docs = index.search(query, null, MAX_RESULTS,
-                        new Sort(new SortField(
-                                Entity2LuceneDoc.term.NAMEUNANALYZED)));
+                 String sortField = tab.getEntitySortField();
+                 Sort sort = null;
+                 if(  sortField != null && sortField.equalsIgnoreCase("timekey") ){
+                     sort =     new Sort(new SortField(
+                             Entity2LuceneDoc.term.TIMEKEY));
+                 }else{
+                     sort =     new Sort(new SortField(
+                             Entity2LuceneDoc.term.NAMEUNANALYZED));
+                 }
+                 
+                TopFieldDocs docs = index.search(query, null, MAX_RESULTS, sort);
                 if( docs == null ){
                     log.error("Search of lucene index returned null");
                     return;
@@ -221,6 +239,14 @@ public void doGet( HttpServletRequest req, HttpServletResponse response )
         }
     }
 
+    private BooleanQuery addDayLimit(BooleanQuery query, Tab tab) {
+        DateTime now = new DateTime();
+        String end = now.toString(LuceneIndexer.DATE_FORMAT);
+        String start = now.minusDays( tab.getDayLimit() ).toString(LuceneIndexer.DATE_FORMAT);
+        query.add( new RangeQuery(new Term(Entity2LuceneDoc.term.TIMEKEY,start),new Term(Entity2LuceneDoc.term.TIMEKEY,end), true) , BooleanClause.Occur.MUST);
+        return query;
+    }
+
     private void doAlphaFiltered(String alpha, Tab tab,
             VitroRequest request, HttpServletResponse response, TabDao tabDao, int size)
     throws ServletException, IOException {
@@ -273,7 +299,7 @@ public void doGet( HttpServletRequest req, HttpServletResponse response )
      * get their individuals using lucene, see doManual(). 
      * 
      */
-    private Query getQuery(Tab tab, List<String> vclassUris, List<String> manualUris, String alpha , boolean isSinglePortal){
+    private BooleanQuery getQuery(Tab tab, List<String> vclassUris, List<String> manualUris, String alpha , boolean isSinglePortal){
         BooleanQuery query = new BooleanQuery();
         try{
             
@@ -421,13 +447,15 @@ public void doGet( HttpServletRequest req, HttpServletResponse response )
             records.add( new PageRecord( "page="+ endPage+1, Integer.toString(endPage+1), "more...", false));
         }else if ( requiredPages > MAX_PAGES && selectedPage > requiredPages - MAX_PAGES ){
             //the selected page is in the end of the list 
-            int startPage = requiredPages - MAX_PAGES;                         
-            for(int page = startPage; page < count /pageSize ; page++ ){
+            int startPage = requiredPages - MAX_PAGES;      
+            double max = Math.ceil(count/pageSize);
+            for(int page = startPage; page <= max; page++ ){
                 records.add( new PageRecord( "page=" + page, Integer.toString(page), Integer.toString(page), selectedPage == page ) );            
             }          
         }else{
             //there are fewer than maxPages pages.
-            for(int i = 1; i < count / pageSize ; i++ ){
+            double max = Math.ceil(count/pageSize);
+            for(int i = 1; i <= max; i++ ){
                 records.add( new PageRecord( "page=" + i, Integer.toString(i), Integer.toString(i), selectedPage == i ) );            
             }    
         }                

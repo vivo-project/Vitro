@@ -55,7 +55,9 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         public static String PORTAL     = "portal";
         /** time of index in msec since epoc */
         public static String INDEXEDTIME= "indexedTime";
-        /** time of sunset/end of entity */
+        /** timekey of entity in yyyymmddhhmm  */
+        public static String TIMEKEY="TIMEKEY";
+        /** time of sunset/end of entity in yyyymmddhhmm  */
         public static String SUNSET="SUNSET";
         /** time of sunrise/start of entity in yyyymmddhhmm  */
         public static String SUNRISE="SUNRISE";
@@ -66,6 +68,8 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         public static String ALLTEXTUNSTEMMED = "ALLTEXTUNSTEMMED";
         /** keywords */
         public static final String KEYWORDS = "KEYWORDS";
+        /** Does the individual have a thumbnail image? 1=yes 0=no */
+        public static final String THUMBNAIL = "THUMBNAIL";        
     }
 
     private static final Log log = LogFactory.getLog(Entity2LuceneDoc.class.getName());
@@ -200,6 +204,26 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
             doc.add(new Field(term.SUNSET, latestTime, Field.Store.YES, Field.Index.NOT_ANALYZED));
         }
 
+        try{
+            value = null;
+            if( ent.getTimekey() != null ){
+                value = (new DateTime(ent.getTimekey().getTime())).toString(LuceneIndexer.DATE_FORMAT);
+                doc.add(new Field(term.TIMEKEY, value, Field.Store.YES, Field.Index.NOT_ANALYZED));
+            }
+        }catch(Exception ex){            
+            log.error("could not save timekey " + ex);            
+        }        
+        
+        try{
+            value = null;
+            if( ent.getThumbUrl() != null )
+                doc.add(new Field(term.THUMBNAIL, "1", Field.Store.YES, Field.Index.NOT_ANALYZED));
+            else
+                doc.add(new Field(term.THUMBNAIL, "0", Field.Store.YES, Field.Index.NOT_ANALYZED));
+        }catch(Exception ex){
+            log.debug("could not index thumbnail: " + ex);
+        }
+        
         //time of index in millis past epoc
         Object anon[] =  { new Long((new DateTime() ).getMillis())  };
         doc.add(  new Field(term.INDEXEDTIME, String.format( "%019d", anon ),

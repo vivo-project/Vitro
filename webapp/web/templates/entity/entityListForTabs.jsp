@@ -105,9 +105,11 @@ if( request.getAttribute("alpha") != null && ! "all".equalsIgnoreCase((String)re
     Pages:
 	<c:forEach items='${requestScope.pages }' var='page'>
 	   <c:url var='pageUrl' value=".${requestScope.servlet}">
-	     <c:param name="page">${page.index}</c:param>	     
-	     <c:param name="alpha">${requestScope.pageAlpha}</c:param>
 	     <c:param name ="primary">${requestScope.tabId}</c:param>
+	     <c:param name="page">${page.index}</c:param>	     
+	     <c:if test="${not empty requestScope.pageAlpha}">	     
+	       <c:param name="alpha">${requestScope.pageAlpha}</c:param>
+          </c:if>
 	   </c:url>
 	   <c:if test="${ page.selected }">
 	     ${page.text}
