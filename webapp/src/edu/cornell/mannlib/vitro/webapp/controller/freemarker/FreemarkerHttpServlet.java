@@ -431,6 +431,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         map.put("dump", new edu.cornell.mannlib.vitro.webapp.web.directives.dump.DumpDirective());
         map.put("dumpAll", new edu.cornell.mannlib.vitro.webapp.web.directives.dump.DumpAllDirective());  
         map.put("help", new edu.cornell.mannlib.vitro.webapp.web.directives.dump.HelpDirective()); 
+        map.put("url", new edu.cornell.mannlib.vitro.webapp.web.directives.UrlDirective()); 
         return map;
     }
     
@@ -895,18 +896,6 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         public String getTemplateName() {
             throw new UnsupportedOperationException(
                 "This is not a template response.");
-        }
-
-        @Override
-        public int getStatusCode() {
-            throw new UnsupportedOperationException(
-                "This is not a BaseResponseValues response.");
-        }
-
-        @Override
-        public void setStatusCode(int statusCode) {
-            throw new UnsupportedOperationException(
-                "This is not a BaseResponseValues response.");           
         }
 
         @Override

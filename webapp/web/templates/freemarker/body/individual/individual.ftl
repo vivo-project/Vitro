@@ -2,12 +2,18 @@
 
 <#-- Template for individual profile page -->
 
+<#import "lib-property.ftl" as p>
+
+<#assign editingClass>
+    <#if editStatus.showEditLinks>editing<#else></#if>
+</#assign>
+
 <div id="personWrap">
     <#if editStatus.showAdminPanel>
         <#include "individual-adminPanel.ftl">
     </#if>
     
-    <div class="contents entity <#if editStatus.showEditLinks>editing</#if>">
+    <div class="contents entity ${editingClass}">
         <div id="labelAndMoniker">
             
             <#if relatedSubject??>
@@ -15,33 +21,43 @@
                 <p><a href="${relatedSubject.url}">&larr; return to ${relatedSubject.name}</a></p>                
             <#else>
                 <#-- Label -->
-                <div class="datatypePropertyValue" id="label">    
-                    <div class="statementWrap">
-                        <h2>${individual.name}</h2>
-                        <#if editStatus.showEditLinks>                        
-                        </#if>
-                    </div>
-                </div>
+                <@p.dataPropWrapper id="label">
+                    <h2>${individual.name}</h2>
+                </@p.dataPropWrapper>
                 
                 <#-- Moniker -->
                 <#if individual.moniker?has_content>
-                    <div class="datatypeProperties">
-                        <div class="datatypePropertyValue" id="moniker">
-                            <div class="statementWrap">
-                                <em class="moniker">${individual.moniker}</em>               
-                            </div>
-                        </div>
-                    </div>                    
+                    <@p.dataPropsWrapper id="moniker">
+                        <em class="moniker">${individual.moniker}</em>
+                    </@p.dataPropsWrapper>                   
                 </#if>
             </#if>
         </div> <!-- labelAndMoniker -->
 
-       <#include "individual-sparklineVisualization.ftl">
-
+        <#include "individual-sparklineVisualization.ftl">
+       
+        <div id="dprop-vitro-image" class="propsItem ${editingClass}"> 
+            <#if individual.thumbUrl??>
+                <@p.dataPropsWrapper id="thumbnail">
+                    <a class="image" href="${individual.imageUrl}">
+                        <img src="${individual.thumbUrl}" 
+                             title="click to view larger image" 
+                             alt="${individual.name}" width="115" />
+                    </a>
+                </@p.dataPropsWrapper> 
+            <#elseif individual.person>
+                <@p.dataPropsWrapper id="thumbnail">
+                    <img src="<@url path='/images/dummyImages/person.thumbnail.jpg' />" "                         
+                         alt="placeholder image" width="115" />
+                </@p.dataPropsWrapper>             
+            </#if>
+        </div>
+        
+ 
+       
     </div> <!-- #contents -->
 
 </div> <!-- #personWrap -->
-
 
 ${stylesheets.addFromTheme("/entity.css")}
                            

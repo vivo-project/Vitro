@@ -14,6 +14,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Link;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
+import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 import edu.cornell.mannlib.vitro.webapp.web.ViewFinder;
 import edu.cornell.mannlib.vitro.webapp.web.ViewFinder.ClassView;
 
@@ -58,6 +59,29 @@ public class IndividualTemplateModel extends BaseTemplateModel {
         
         return profileUrl;
     }
+    
+    public String getVisualizationUrl() {
+        return isPerson() ? getUrl(Route.VISUALIZATION.path(), "uri", getUri()) : null;
+    }
+
+    // RY We should not have references to a specific ontology in the vitro code!
+    // Figure out how to move this out of here.
+    // We could subclass IndividualTemplateModel in the VIVO code and add the isPerson()
+    // and getVisualizationUrl() methods there, but we still need to know whether to
+    // instantiate the IndividualTemplateModel or the VivoIndividualTemplateModel class.
+    public boolean isPerson() {
+        return individual.isVClass("http://xmlns.com/foaf/0.1/Person");        
+    }
+
+    public String getImageUrl() {
+        String imageUrl = individual.getImageUrl();
+        return imageUrl == null ? null : getUrl(imageUrl);
+    }
+    
+    public String getThumbUrl() {
+        String thumbUrl = individual.getThumbUrl();
+        return thumbUrl == null ? null : getUrl(thumbUrl);
+    } 
         
     public String getSearchView() {        
         return getView(ClassView.SEARCH);
@@ -126,11 +150,4 @@ public class IndividualTemplateModel extends BaseTemplateModel {
         return individual.getKeywords();
     }
     
-    public String getImageUrl() {
-        return individual.getImageUrl();
-    }
-    
-    public String getThumbUrl() {
-        return individual.getThumbUrl();
-    }
 }

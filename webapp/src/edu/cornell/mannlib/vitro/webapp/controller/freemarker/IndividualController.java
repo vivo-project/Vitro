@@ -241,62 +241,16 @@ public class IndividualController extends FreemarkerHttpServlet {
 //        if (customView!=null) {
 //            // insert test for whether a css files of the same name exists, and populate the customCss string for use when construction the header
 //        }
-        //String netid = iwDao.getNetId(indiv.getURI());
-        
-        //data.put("netid", netid);
-        //data.put("vclassName", vclassName);
 
-    	// RY We should not have references to a specific ontology in the vitro code!
-        // Figure out how to move this out of here.
-        boolean isPerson = individual.isVClass("http://xmlns.com/foaf/0.1/Person");
-        map.put("isPerson", isPerson);
-        if (isPerson) {
-        	map.put("visualizationUrl", UrlBuilder.getUrl("/visualization", 
-        			                                      "uri", individual.getURI()));
-        }
-        
-        // RY Would like to use IndividualTemplateModel object, but may just end up copying all methods. Since object is put in template
-        // with a read-only wrapper, it should be restrictive enough.
-        map.put("individual",individual); //data.put("individual", new IndividualTemplateModel(indiv)); 
-        //Portal portal = vreq.getPortal();
-        //data.put("portal",String.valueOf(portal));
-//        String view= getViewFromRequest(vreq);
-//        if( view == null){
-//            if (customView == null) {
-//                view = default_jsp;
-//                data.put("bodyJsp","/"+Controllers.ENTITY_JSP);
-//                log.debug("no custom view and no view parameter in request for rendering "+indiv.getName());
-//            } else {
-//                view = default_jsp;
-//                log.debug("setting custom view templates/entity/"+ customView + " for rendering "+indiv.getName());
-//                data.put("bodyJsp", "/templates/entity/"+customView);
-//            }
-//            data.put("entityPropsListJsp",Controllers.ENTITY_PROP_LIST_JSP);
-//            data.put("entityDatapropsListJsp",Controllers.ENTITY_DATAPROP_LIST_JSP);
-//            data.put("entityMergedPropsListJsp",Controllers.ENTITY_MERGED_PROP_LIST_GROUPED_JSP);
-//            data.put("entityKeywordsListJsp",Controllers.ENTITY_KEYWORDS_LIST_JSP);
-//        } else {
-//            log.debug("Found view parameter "+view+" in request for rendering "+indiv.getName());
-//        }
+        map.put("individual", new IndividualTemplateModel(individual));
 
         //setup highlighter for search terms
-        checkForSearch(vreq, individual);
+        //checkForSearch(vreq, individual);
 
 
         if(  individual.getURI().startsWith( vreq.getWebappDaoFactory().getDefaultNamespace() )){        	
         	map.put("entityLinkedDataURL", individual.getURI() + "/" + individual.getLocalName() + ".rdf");	
         }
-        
-        
-		// generate link to RDF representation for semantic web clients like Piggy Bank
-		// BJL 2008-07-16: I'm temporarily commenting this out because I forgot we need to make sure it filters out the hidden properties
-        // generate url for this entity
-        // String individualToRDF = "http://"+vreq.getServerName()+":"+vreq.getServerPort()+vreq.getContextPath()+"/entity?home=1&uri="+forURL(entity.getURI())+"&view=rdf.rdf"; 
-        //css += "<link rel='alternate' type='application/rdf+xml' title='"+entity.getName()+"' href='"+individualToRDF+"' />";
-
-
-        //RequestDispatcher rd = vreq.getRequestDispatcher( view );
-        //rd.forward(vreq,res);	
         
         return map;
 	}

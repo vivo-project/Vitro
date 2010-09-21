@@ -63,7 +63,9 @@ public class AutocompleteController extends FreemarkerHttpServlet implements Sea
 
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(AutocompleteController.class);
-
+    
+    private static final String TEMPLATE_DEFAULT = "autocompleteResults.ftl";
+    
     private static String QUERY_PARAMETER_NAME = "term";
     
     private IndexSearcher searcher = null;
@@ -92,8 +94,6 @@ public class AutocompleteController extends FreemarkerHttpServlet implements Sea
     public void doGet(HttpServletRequest request, HttpServletResponse response)
     throws IOException, ServletException {
         
-        // String templateName = request.getServletPath().equals("/autocomplete") ? "autocompleteResults.ftl" : "selectResults.ftl";  
-        String templateName = "autocompleteResults.ftl";
         Map<String, Object> map = new HashMap<String, Object>();
 
         VitroRequest vreq = new VitroRequest(request);
@@ -106,7 +106,7 @@ public class AutocompleteController extends FreemarkerHttpServlet implements Sea
             if( vreq.getWebappDaoFactory() == null 
                     || vreq.getWebappDaoFactory().getIndividualDao() == null ){
                 log.error("makeUsableBeans() could not get IndividualDao ");
-                doSearchError(templateName, map, config, response);
+                doSearchError(map, config, response);
                 return;
             }
             IndividualDao iDao = vreq.getWebappDaoFactory().getIndividualDao();                       
@@ -122,7 +122,7 @@ public class AutocompleteController extends FreemarkerHttpServlet implements Sea
             log.debug("query for '" + qtxt +"' is " + query.toString());
 
             if (query == null ) {
-                doNoQuery(templateName, map, config, response);
+                doNoQuery(map, config, response);
                 return;
             }
             
@@ -139,20 +139,20 @@ public class AutocompleteController extends FreemarkerHttpServlet implements Sea
                     topDocs = searcherForRequest.search(query,null,maxHitSize);
                 }catch (Exception ex){
                     log.error(ex);
-                    doFailedSearch(templateName, map, config, response);
+                    doFailedSearch(map, config, response);
                     return;
                 }
             }
 
             if( topDocs == null || topDocs.scoreDocs == null){
                 log.error("topDocs for a search was null");                
-                doFailedSearch(templateName, map, config, response);
+                doFailedSearch(map, config, response);
                 return;
             }
             
             int hitsLength = topDocs.scoreDocs.length;
             if ( hitsLength < 1 ){                
-                doFailedSearch(templateName, map, config, response);
+                doFailedSearch(map, config, response);
                 return;
             }            
             log.debug("found "+hitsLength+" hits"); 
@@ -176,11 +176,11 @@ public class AutocompleteController extends FreemarkerHttpServlet implements Sea
 
             Collections.sort(results);
             map.put("results", results);
-            writeTemplate(templateName, map, config, response);
+            writeTemplate(TEMPLATE_DEFAULT, map, config, response);
    
         } catch (Throwable e) {
             log.error("AutocompleteController(): " + e);            
-            doSearchError(templateName, map, config, response);
+            doSearchError(map, config, response);
             return;
         }
     }
@@ -441,18 +441,18 @@ public class AutocompleteController extends FreemarkerHttpServlet implements Sea
     }
     
 
-    private void doNoQuery(String templateName, Map<String, Object> map, Configuration config, HttpServletResponse response) {
-        writeTemplate(templateName, map, config, response);
+    private void doNoQuery(Map<String, Object> map, Configuration config, HttpServletResponse response) {
+        writeTemplate(TEMPLATE_DEFAULT, map, config, response);
     }
 
-    private void doFailedSearch(String templateName, Map<String, Object> map, Configuration config, HttpServletResponse response) {
-        writeTemplate(templateName, map, config, response);
+    private void doFailedSearch(Map<String, Object> map, Configuration config, HttpServletResponse response) {
+        writeTemplate(TEMPLATE_DEFAULT, map, config, response);
     }
  
-    private void doSearchError(String templateName, Map<String, Object> map, Configuration config, HttpServletResponse response) {
+    private void doSearchError(Map<String, Object> map, Configuration config, HttpServletResponse response) {
         // For now, we are not sending an error message back to the client because with the default autocomplete configuration it
         // chokes.
-        writeTemplate(templateName, map, config, response);
+        writeTemplate(TEMPLATE_DEFAULT, map, config, response);
     }
 
     public static final int MAX_QUERY_LENGTH = 500;

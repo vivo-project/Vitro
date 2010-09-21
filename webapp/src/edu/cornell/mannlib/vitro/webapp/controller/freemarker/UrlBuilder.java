@@ -29,15 +29,14 @@ public class UrlBuilder {
         BROWSE("/browse"),
         CONTACT("/contact"),
         INDIVIDUAL("/individual"),
-        INDIVIDUAL_LIST("/individuallist"), 
-        SEARCH("/search"),
-        TERMS_OF_USE("/termsOfUse"),
-        
-        // RY put these under /admin/
+        INDIVIDUAL_LIST("/individuallist"),
         LOGIN("/siteAdmin"),
         LOGOUT("/login_process.jsp"),
-        SITE_ADMIN("/siteAdmin");
-        
+        SEARCH("/search"),
+        SITE_ADMIN("/siteAdmin"),
+        TERMS_OF_USE("/termsOfUse"),
+        VISUALIZATION("/visualization");
+
         private final String path;
         
         Route(String path) {

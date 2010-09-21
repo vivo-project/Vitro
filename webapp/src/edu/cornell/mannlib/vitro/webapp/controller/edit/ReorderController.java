@@ -32,11 +32,6 @@ public class ReorderController extends PrimitiveRdfEdit {
     @Override
     protected void processRequest(VitroRequest vreq, HttpServletResponse response) {
 
-        //String templateName = "autocompleteResults.ftl";
-        //Map<String, Object> map = new HashMap<String, Object>();
-        //Configuration config = getConfig(vreq);
-        //PortalFlag portalFlag = vreq.getPortalFlag();
-
         String errorMsg = null;
         String rankPredicate = vreq.getParameter(RANK_PREDICATE_PARAMETER_NAME);
         if (rankPredicate == null) {
@@ -45,7 +40,7 @@ public class ReorderController extends PrimitiveRdfEdit {
             doError(response, errorMsg, HttpServletResponse.SC_BAD_REQUEST );
             return;
         }
-        
+
         String[] individualUris = vreq.getParameterValues(INDIVIDUAL_PREDICATE_PARAMETER_NAME);
         if (individualUris == null || individualUris.length == 0) {
             errorMsg = "No individuals specified";

@@ -15,7 +15,7 @@
             <li>apples</li>
             <li>bananas</li>
             <li>oranges</li>
-        <@firstLastList>
+        </@firstLastList>
 
     RY Consider rewriting in Java. Probably designers won't want to modify this. That would allow us to support
     nested <li> elements.
@@ -51,13 +51,13 @@
             <li>apples</li>,
             <li>bananas</li>,
             <li>oranges</li>
-        <@firstLastListNested>
+        </@firstLastListNested>
         
         <@firstLastListNested delim="??">
             <li>apples, oranges</li>??
             <li>bananas, lemons</li>??
             <li>grapefruit, limes</li>
-        <@firstLastListNested>
+        </@firstLastListNested>
         
         <@firstLastListNested delim="??">
             <li>Books
@@ -72,7 +72,7 @@
                     <li>Time</li>
                 </ul>
             </li>
-        <@firstLastListNested>
+        </@firstLastListNested>
 
     RY Consider rewriting in Java. Probably designers won't want to modify this.
 -->
