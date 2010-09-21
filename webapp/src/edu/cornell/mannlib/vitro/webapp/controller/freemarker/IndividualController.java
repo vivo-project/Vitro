@@ -12,9 +12,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -44,7 +42,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration;
@@ -58,7 +55,6 @@ import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapperFactory;
 import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 import edu.cornell.mannlib.vitro.webapp.web.jsptags.StringProcessorTag;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.IndividualTemplateModel;
-import freemarker.template.Configuration;
 
 /**
  * Handles requests for entity information.
@@ -243,7 +239,7 @@ public class IndividualController extends FreemarkerHttpServlet {
 //        }
 
         map.put("individual", new IndividualTemplateModel(individual));
-
+         
         //setup highlighter for search terms
         //checkForSearch(vreq, individual);
 

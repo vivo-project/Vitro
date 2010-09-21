@@ -38,10 +38,6 @@ public class IndividualTemplateModel extends BaseTemplateModel {
 //        return StringUtils.isEmpty(tagline) ? individual.getVClass().getName() : tagline;
 //    }
     
-    // Return link to individual's profile page.
-    // There may be other urls associated with the individual. E.g., we might need 
-    // getEditUrl(), getDeleteUrl() to return the links computed by PropertyEditLinks.
-    // RY **** Need to account for everything in URLRewritingHttpServlet
     public String getProfileUrl() {
         String profileUrl = null;
         String individualUri = individual.getURI();
@@ -125,7 +121,10 @@ public class IndividualTemplateModel extends BaseTemplateModel {
 
     /* These methods simply forward to the Individual methods. It would be desirable to implement a scheme
        for proxying or delegation so that the methods don't need to be simply listed here. 
-       A Ruby-style method missing method would be ideal. */
+       A Ruby-style method missing method would be ideal. 
+       Update: DynamicProxy doesn't work because the proxied object is of type Individual, so we cannot
+       declare new methods here that are not declared in the Individual interface. 
+    */
     public String getName() {
         return individual.getName();
     }

@@ -3,6 +3,7 @@
 <#-- Template for individual profile page -->
 
 <#import "lib-property.ftl" as p>
+<#import "lib-list.ftl" as l>
 
 <#assign editingClass>
     <#if editStatus.showEditLinks>editing<#else></#if>
@@ -36,6 +37,7 @@
 
         <#include "individual-sparklineVisualization.ftl">
        
+        <#-- Thumbnail -->
         <div id="dprop-vitro-image" class="propsItem ${editingClass}"> 
             <#if individual.thumbUrl??>
                 <@p.dataPropsWrapper id="thumbnail">
@@ -47,14 +49,28 @@
                 </@p.dataPropsWrapper> 
             <#elseif individual.person>
                 <@p.dataPropsWrapper id="thumbnail">
-                    <img src="${urls.images}/dummyImages/person.thumbnail.jpg"                         
-                         alt="placeholder image" width="115" />
+                    <img src="${urls.images}/dummyImages/person.thumbnail.jpg"
+                         title = "no image" alt="placeholder image" width="115" />                                                 
                 </@p.dataPropsWrapper>             
             </#if>
         </div>
         
- 
-       
+        <#-- Links -->
+        <#if individual.links?has_content>
+            <div id="dprop-vitro-links" class="propsItem ${editingClass}">
+                <ul class="externalLinks properties">
+                    <#list individual.links as link>
+                        <@l.firstLastList>
+                            <li>                                
+                                <span class="statementWrap">
+                                    <a class="externalLink" href="${link.url}">${link.anchor}</a>
+                                </span>
+                            </li>
+                        </@l.firstLastList>
+                    </#list>
+                </ul>
+            </div>
+       </#if>
     </div> <!-- #contents -->
 
 </div> <!-- #personWrap -->
