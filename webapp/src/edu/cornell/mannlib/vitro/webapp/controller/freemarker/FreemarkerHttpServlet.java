@@ -391,6 +391,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         urls.put("siteAdmin", urlBuilder.getPortalUrl(Route.LOGIN));  
 
         urls.put("siteIcons", urlBuilder.getPortalUrl(themeDir + "/site_icons"));
+        urls.put("images", urlBuilder.getUrl("/images"));
 
         return urls;
     }
@@ -431,7 +432,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         map.put("dump", new edu.cornell.mannlib.vitro.webapp.web.directives.dump.DumpDirective());
         map.put("dumpAll", new edu.cornell.mannlib.vitro.webapp.web.directives.dump.DumpAllDirective());  
         map.put("help", new edu.cornell.mannlib.vitro.webapp.web.directives.dump.HelpDirective()); 
-        map.put("url", new edu.cornell.mannlib.vitro.webapp.web.directives.UrlDirective()); 
+        //map.put("url", new edu.cornell.mannlib.vitro.webapp.web.directives.UrlDirective()); 
         return map;
     }
     

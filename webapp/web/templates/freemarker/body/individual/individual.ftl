@@ -47,7 +47,7 @@
                 </@p.dataPropsWrapper> 
             <#elseif individual.person>
                 <@p.dataPropsWrapper id="thumbnail">
-                    <img src="<@url path='/images/dummyImages/person.thumbnail.jpg' />" "                         
+                    <img src="${urls.images}/dummyImages/person.thumbnail.jpg"                         
                          alt="placeholder image" width="115" />
                 </@p.dataPropsWrapper>             
             </#if>
