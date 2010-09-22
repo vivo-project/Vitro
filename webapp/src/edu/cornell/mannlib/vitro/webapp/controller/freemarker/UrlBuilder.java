@@ -29,6 +29,7 @@ public class UrlBuilder {
         BROWSE("/browse"),
         CONTACT("/contact"),
         INDIVIDUAL("/individual"),
+        INDIVIDUAL_EDIT("/entityEdit"),
         INDIVIDUAL_LIST("/individuallist"),
         LOGIN("/siteAdmin"),
         LOGOUT("/login_process.jsp"),
@@ -143,6 +144,10 @@ public class UrlBuilder {
     }
     
     public String getPortalUrl(Route route, ParamMap params) {
+        return getPortalUrl(route.path(), params);
+    }
+
+    public String getPortalUrl(Route route, String...params) {
         return getPortalUrl(route.path(), params);
     }
     

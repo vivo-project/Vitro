@@ -5,7 +5,7 @@
 <div class="admin top">
     <h3 class="toggle">Admin Panel</h3>
     <div class="panelContents">
-      <a href="${editStatus.editingUrl}"> edit this individual</a> 
+      <a href="${individual.editUrl}"> edit this individual</a> 
       <p>Resource URI: ${individual.uri}</p>
     </div>
 </div>

@@ -76,10 +76,7 @@ public class IndividualController extends FreemarkerHttpServlet {
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
     	try {
-
-	        HttpSession session = vreq.getSession();
-	        
-    		cleanUpSession(session);
+    		cleanUpSession(vreq);
 
 	        // get URL without hostname or servlet context
 	        String url = vreq.getRequestURI().substring(vreq.getContextPath().length()); 
@@ -114,11 +111,13 @@ public class IndividualController extends FreemarkerHttpServlet {
 
 	        Map<String, Object> body = new HashMap<String, Object>();
 	        
-	        int securityLevel = getSecurityLevel(session);
-	        UrlBuilder urlBuilder = new UrlBuilder(vreq.getPortal());
-    		body.put("editStatus", getEditingData(vreq, securityLevel, individual, urlBuilder));
-    		body.put("title", individual.getName());
-	        body.putAll(getIndividualData(vreq, individual));                    	        
+    		body.put("editStatus", getEditingData(vreq));
+
+            body.put("title", individual.getName());
+            
+    		body.put("relatedSubject", getRelatedSubject(vreq));
+    		
+	        body.put("individual", getIndividualTemplateModel(vreq, individual));             	        
 	                
 	        return new TemplateResponseValues(TEMPLATE_INDIVIDUAL, body);
         
@@ -128,8 +127,9 @@ public class IndividualController extends FreemarkerHttpServlet {
 	    }
     }
 
-    private void cleanUpSession(HttpSession session) {
+    private void cleanUpSession(VitroRequest vreq) {
 		// Session cleanup: anytime we are at an entity page we shouldn't have an editing config or submission
+        HttpSession session = vreq.getSession();
 	    session.removeAttribute("editjson");
 	    EditConfiguration.clearAllConfigsInSession(session);
 	    EditSubmission.clearAllEditSubmissionsInSession(session);
@@ -149,27 +149,31 @@ public class IndividualController extends FreemarkerHttpServlet {
     	
     }
 
-    private Map<String, Object> getEditingData(VitroRequest vreq, int securityLevel, Individual individual, UrlBuilder urlBuilder) {
-		// Set values related to access privileges
+    // Set template values related to access privileges
+    // RY We may want to define an EditingIndividualTemplateModel class, with methods like getAdminPanel() and
+    // getEditLinks(property). The constructor would take an individual and a loginFormBean object, both of which
+    // are needed to generate property edit links. Another idea is to subclass IndividualTemplateModel with 
+    // EditableIndividualTemplateModel, and define editing-related methods there. However, that means in the 
+    // template we will have expressions like individual.adminPanel or individual.editingLinks(property), 
+    // which might seem opaque to template authors.
+    private Map<String, Object> getEditingData(VitroRequest vreq) {
+  
+        int securityLevel = getSecurityLevel(vreq.getSession());
+        
     	Map<String, Object> editingData = new HashMap<String, Object>();
 
 		editingData.put("showEditLinks", VitroRequestPrep.isSelfEditing(vreq) || securityLevel >= LoginFormBean.NON_EDITOR);	
 		
 		boolean showAdminPanel = securityLevel >= LoginFormBean.EDITOR;
 		editingData.put("showAdminPanel", showAdminPanel);
-		if (showAdminPanel) {
-			
-			editingData.put("editingUrl", urlBuilder.getPortalUrl("/entityEdit", "uri", individual.getURI()));
-		}
 
-		return editingData;
-		
+		return editingData;		
     }
     
-	private Map<String, Object> getIndividualData(VitroRequest vreq, Individual individual) throws ServletException, IOException {
-		Map<String, Object> map = new HashMap<String, Object>();
-		
-    	IndividualDao iwDao = vreq.getWebappDaoFactory().getIndividualDao();
+    private Map<String, Object> getRelatedSubject(VitroRequest vreq) {
+        Map<String, Object> map = null;
+        
+        IndividualDao iwDao = vreq.getWebappDaoFactory().getIndividualDao();
         ObjectPropertyDao opDao = vreq.getWebappDaoFactory().getObjectPropertyDao();
         
         // Check if a "relatedSubjectUri" parameter has been supplied, and,
@@ -178,22 +182,30 @@ public class IndividualController extends FreemarkerHttpServlet {
         // be displayed in the context of their relationship to another.
         String relatedSubjectUri = vreq.getParameter("relatedSubjectUri"); 
         if (relatedSubjectUri != null) {
-        	Individual relatedSubjectInd = iwDao.getIndividualByURI(relatedSubjectUri);
-        	if (relatedSubjectInd != null) {
-        		Map<String, Object> relatedSubject = new HashMap<String, Object>();
-        		relatedSubject.put("name", relatedSubjectInd.getName());
-        		relatedSubject.put("url", (new IndividualTemplateModel(relatedSubjectInd)).getProfileUrl());
+            Individual relatedSubjectInd = iwDao.getIndividualByURI(relatedSubjectUri);
+            if (relatedSubjectInd != null) {
+                map = new HashMap<String, Object>();
+                map.put("name", relatedSubjectInd.getName());
+                map.put("url", (new IndividualTemplateModel(relatedSubjectInd, vreq)).getProfileUrl());
                 String relatingPredicateUri = vreq.getParameter("relatingPredicateUri");
                 if (relatingPredicateUri != null) {
-                	ObjectProperty relatingPredicateProp = opDao.getObjectPropertyByURI(relatingPredicateUri);
-                	if (relatingPredicateProp != null) {
-                		relatedSubject.put("relatingPredicateDomainPublic", relatingPredicateProp.getDomainPublic());
-                	}
+                    ObjectProperty relatingPredicateProp = opDao.getObjectPropertyByURI(relatingPredicateUri);
+                    if (relatingPredicateProp != null) {
+                        map.put("relatingPredicateDomainPublic", relatingPredicateProp.getDomainPublic());
+                    }
                 }
-                map.put("relatedSubject", relatedSubject);
-        	}
+            }
         }
-
+        return map;
+    }
+    
+	private IndividualTemplateModel getIndividualTemplateModel(VitroRequest vreq, Individual individual) 
+	    throws ServletException, IOException {
+		
+    	IndividualDao iwDao = vreq.getWebappDaoFactory().getIndividualDao();
+        
+        int securityLevel = getSecurityLevel(vreq.getSession());
+        
         individual.setKeywords(iwDao.getKeywordsForIndividualByMode(individual.getURI(),"visible"));
         individual.sortForDisplay();
 
@@ -237,18 +249,11 @@ public class IndividualController extends FreemarkerHttpServlet {
 //        if (customView!=null) {
 //            // insert test for whether a css files of the same name exists, and populate the customCss string for use when construction the header
 //        }
-
-        map.put("individual", new IndividualTemplateModel(individual));
          
         //setup highlighter for search terms
         //checkForSearch(vreq, individual);
 
-
-        if(  individual.getURI().startsWith( vreq.getWebappDaoFactory().getDefaultNamespace() )){        	
-        	map.put("entityLinkedDataURL", individual.getURI() + "/" + individual.getLocalName() + ".rdf");	
-        }
-        
-        return map;
+        return new IndividualTemplateModel(individual, vreq);
 	}
 
 	private ResponseValues doRdf(VitroRequest vreq, Individual individual,
@@ -265,15 +270,6 @@ public class IndividualController extends FreemarkerHttpServlet {
 		
 		return new RdfResponseValues(rdfFormat, newModel);
 	}
-
-	private void doRedirect(HttpServletRequest req, HttpServletResponse res,
-			String redirectURL) {	
-		// It seems like there must be a better way to do this
-		String hn = req.getHeader("Host");		
-    	res.setHeader("Location", res.encodeURL( "http://" + hn + req.getContextPath() + redirectURL ));
-    	res.setStatus(res.SC_SEE_OTHER);		
-	}
-
 
 	private static Pattern LINKED_DATA_URL = Pattern.compile("^/individualfm/([^/]*)$");		
 	private static Pattern NS_PREFIX_URL = Pattern.compile("^/individualfm/([^/]*)/([^/]*)$");
@@ -666,17 +662,5 @@ public class IndividualController extends FreemarkerHttpServlet {
         
         return new TemplateResponseValues(Template.TITLED_ERROR_MESSAGE.toString(), body, HttpServletResponse.SC_NOT_FOUND);
     }
-    
-    private String forURL(String frag) {
-    	String result = null;
-        try {
-        	result = URLEncoder.encode(frag, "UTF-8");
-        } catch (UnsupportedEncodingException ex) {
-            throw new RuntimeException("UTF-8 not supported", ex);
-        }
-        return result;
-    }
-    
-    private class HelpException extends Throwable{}
-    private class EntityNotFoundException extends Throwable{}
+
 }

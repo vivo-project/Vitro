@@ -81,7 +81,6 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         
     	try {
 	        VitroRequest vreq = new VitroRequest(request);
-	        BaseTemplateModel.setVitroRequest(vreq);
 	        
 	        Configuration config = getConfig(vreq);
 	        vreq.setAttribute("freemarkerConfig", config);

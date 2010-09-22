@@ -59,18 +59,23 @@
         <#if individual.links?has_content>
             <div id="dprop-vitro-links" class="propsItem ${editingClass}">
                 <ul class="externalLinks properties">
-                    <#list individual.links as link>
-                        <@l.firstLastList>
-                            <li>                                
+                    <@l.firstLastList>
+                        <#list individual.links as link>                        
+                            <li>
                                 <span class="statementWrap">
                                     <a class="externalLink" href="${link.url}">${link.anchor}</a>
                                 </span>
-                            </li>
-                        </@l.firstLastList>
-                    </#list>
+                            </li>                                                        
+                        </#list>
+                    </@l.firstLastList>
                 </ul>
             </div>
-       </#if>
+        </#if>
+       
+        <#-- Keywords -->
+        <#if individual.keywords?has_content>
+            <p id="keywords">Keywords: ${individual.keywordString}</p>
+        </#if>
     </div> <!-- #contents -->
 
 </div> <!-- #personWrap -->

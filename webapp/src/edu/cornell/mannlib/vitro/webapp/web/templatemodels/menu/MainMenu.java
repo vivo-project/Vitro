@@ -15,7 +15,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 public class MainMenu extends Menu {
 
     private static final long serialVersionUID = 1L;
-    private static final Log log = LogFactory.getLog(MainMenu.class.getName());
+    private static final Log log = LogFactory.getLog(MainMenu.class);
     
     protected VitroRequest vreq;
     

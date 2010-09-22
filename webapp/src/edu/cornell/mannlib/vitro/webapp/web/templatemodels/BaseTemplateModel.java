@@ -19,7 +19,6 @@ public abstract class BaseTemplateModel {
     private static final Log log = LogFactory.getLog(BaseTemplateModel.class);
     
     protected static ServletContext servletContext = null;
-    protected static VitroRequest vreq = null;
 
     // Wrap UrlBuilder method so templates can call ${item.url}
     public String getUrl(String path) {
@@ -42,14 +41,6 @@ public abstract class BaseTemplateModel {
 
     public static void setServletContext(ServletContext context) {
         servletContext = context;
-    }
-    
-    public static VitroRequest getVitroRequest() {
-        return vreq;
-    }
-
-    public static void setVitroRequest(VitroRequest vrequest) {
-        vreq = vrequest;
     }
     
     public String dump() {

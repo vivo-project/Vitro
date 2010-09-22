@@ -265,11 +265,7 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
               new SimpleLuceneHighlighter(query,analyzer) );            
 
             // Convert search result individuals to template model objects
-            List<IndividualTemplateModel> individuals = new ArrayList<IndividualTemplateModel>(beans.size());
-            for (Individual i : beans) {
-              individuals.add(new IndividualTemplateModel(i));
-            }
-            body.put("individuals", individuals);            
+            body.put("individuals", IndividualTemplateModel.getIndividualTemplateModelList(beans, vreq));
             
             body.put("querytext", qtxt);
             body.put("title", qtxt+" - "+portal.getAppName()+" Search Results" );

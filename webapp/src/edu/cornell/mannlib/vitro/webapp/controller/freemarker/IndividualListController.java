@@ -64,16 +64,13 @@ public class IndividualListController extends FreemarkerHttpServlet {
             if (vclass != null) {
                 // Create list of individual view objects
                 List<Individual> individualList = vreq.getWebappDaoFactory().getIndividualDao().getIndividualsByVClass(vclass);
-                List<IndividualTemplateModel> individuals = new ArrayList<IndividualTemplateModel>(individualList.size());
 
                 if (individualList == null) {
                     // RY Is this really an error? 
                     log.error("individuals list is null");
                     message = "No individuals to display.";
                 } else {            
-                    for (Individual i: individualList) {
-                        individuals.add(new IndividualTemplateModel(i));
-                    }                   
+                    body.put("individuals", IndividualTemplateModel.getIndividualTemplateModelList(individualList, vreq));
                 }
 
                 // Set title and subtitle. Title will be retrieved later in getTitle().   
@@ -85,9 +82,8 @@ public class IndividualListController extends FreemarkerHttpServlet {
                     title = classGroup.getPublicName();
                     body.put("subtitle", vclass.getName());
                 }
-                body.put("title", title);
+                body.put("title", title);                
                 
-                body.put("individuals", individuals);
             }   
             
         } catch (HelpException help){
