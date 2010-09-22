@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Random;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -26,12 +27,11 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.search.TopFieldDocs;
+import org.apache.lucene.search.TopDocs;
 import org.joda.time.DateTime;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Tab;
-import edu.cornell.mannlib.vitro.webapp.controller.edit.KeywordRetryController.newKeywordToEntityLinker;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.TabDao;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc;
@@ -55,6 +55,7 @@ public class TabEntitiesController extends VitroHttpServlet {
     public static int DEFAULT_NUMBER_INDIVIDUALS_ON_TAB = 8;
     private static int MAX_RESULTS=40000;
     private static int NON_PAGED_LIMIT=1000;
+    private static Random random = new Random();
     
     public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -119,6 +120,8 @@ public void doGet( HttpServletRequest req, HttpServletResponse response )
                  request.setAttribute("alpha", alpha.toUpperCase()); 
              }
              
+             boolean doPagedFilter = request.getParameter("page") != null;
+             
              boolean showFiltering = false;
              boolean showPaged = false;
              if( tab.getGalleryRows() > 1 ){
@@ -157,7 +160,10 @@ public void doGet( HttpServletRequest req, HttpServletResponse response )
              if( tab.getDayLimit() > 0  ){
                  query = addDayLimit( query, tab );
              }
-             
+             boolean onlyWithThumbImg = false;
+             if( depth > 1 && tab.getImageWidth() > 0 ){
+                 onlyWithThumbImg = true;
+             }
              
              int page = getPage(request);
              int entsPerTab = getSizeForNonGalleryTab(tab, showPaged);
@@ -167,15 +173,35 @@ public void doGet( HttpServletRequest req, HttpServletResponse response )
              try {
                  String sortField = tab.getEntitySortField();
                  Sort sort = null;
-                 if(  sortField != null && sortField.equalsIgnoreCase("timekey") ){
-                     sort =     new Sort(new SortField(
-                             Entity2LuceneDoc.term.TIMEKEY));
-                 }else{
+                 if( sortField != null && !doAlphaFilter && !doPagedFilter ){
+                     if( sortField.equalsIgnoreCase("timekey") ){
+                         sort =     new Sort(new SortField(
+                                 Entity2LuceneDoc.term.TIMEKEY));
+                     }else if( sortField.equalsIgnoreCase("sunrise") ){
+                         sort =     new Sort(new SortField(
+                                 Entity2LuceneDoc.term.SUNRISE));
+                     }else if( sortField.equalsIgnoreCase("sunset") ){
+                         sort =     new Sort(new SortField(
+                                 Entity2LuceneDoc.term.SUNSET));
+                     }else{
+                         sort =  new Sort(new SortField(
+                                 Entity2LuceneDoc.term.NAMEUNANALYZED));
+                     }
+                 } else {
                      sort =     new Sort(new SortField(
                              Entity2LuceneDoc.term.NAMEUNANALYZED));
                  }
                  
-                TopFieldDocs docs = index.search(query, null, MAX_RESULTS, sort);
+                 if( depth > 1 && sortField.equalsIgnoreCase("rand()") ){
+                         sort = null;                     
+                 }
+                                  
+                 TopDocs docs;
+                 if( sort != null )
+                     docs = index.search(query, null, MAX_RESULTS, sort);                     
+                 else
+                     docs = index.search(query, null, MAX_RESULTS);
+                 
                 if( docs == null ){
                     log.error("Search of lucene index returned null");
                     return;
@@ -184,24 +210,42 @@ public void doGet( HttpServletRequest req, HttpServletResponse response )
                 size = docs.totalHits;
                 // don't get all the results, only get results for the requestedSize
                 List<Individual> results = new ArrayList<Individual>(entsPerTab);
-                for (int i = (page-1) * entsPerTab; i < ((page-1) * entsPerTab)+ entsPerTab && i < docs.scoreDocs.length; i++) {
-                    ScoreDoc hit = docs.scoreDocs[i];
+                int entsAddedToTab = 0;
+                int ii = (page-1)*entsPerTab;
+                boolean doingRandom = false;
+                if(   !doAlphaFilter && !doPagedFilter && depth > 1 && "rand()".equalsIgnoreCase(tab.getEntitySortField())){
+                    doingRandom = true;
+                    ii = random.nextInt( size );
+                }
+                boolean looped = false;
+                while( entsAddedToTab < entsPerTab && ii < docs.scoreDocs.length ){
+                    ScoreDoc hit = docs.scoreDocs[ii];
                     if (hit != null) {
                         Document doc = index.doc(hit.doc);
                         if (doc != null) {
-                            String uri = doc.getField(Entity2LuceneDoc.term.URI).stringValue();
-                            Individual ind = indDao.getIndividualByURI( uri );
-                            //ind.setName(doc.getField(Entity2LuceneDoc.term.NAMEUNANALYZED).stringValue());
-                            results.add( ind );
+                            if( onlyWithThumbImg && "0".equals(doc.getField(Entity2LuceneDoc.term.THUMBNAIL).stringValue()) ){
+                                //do Nothing                                                
+                            }else{
+                                String uri = doc.getField(Entity2LuceneDoc.term.URI).stringValue();
+                                Individual ind = indDao.getIndividualByURI( uri );                                
+                                results.add( ind );                         
+                                entsAddedToTab++;
+                            }
                         } else {
                             log.warn("no document found for lucene doc id " + hit.doc);
                         }
                     } else {
                         log.debug("hit was null");
+                    }  
+                    if( doingRandom && ii >= docs.scoreDocs.length && ! looped){
+                        ii=0;
+                        looped = true;
+                    }else{                        
+                        ii++;
                     }
-                }
-                tab.setRelatedEntityList(results);
+                }   
                 
+                tab.setRelatedEntityList(results);                
              }catch(IOException ex){
                  log.warn(ex,ex);
              }
