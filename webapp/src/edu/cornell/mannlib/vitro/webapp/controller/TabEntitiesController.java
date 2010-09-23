@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
@@ -381,6 +382,23 @@ public void doGet( HttpServletRequest req, HttpServletResponse response )
                            }
                            typeQuery.add(tabQueries,BooleanClause.Occur.MUST);
                        }
+                   }
+                   
+                   String flag2Set = tab.getFlag2Set();
+                   if( tab.getFlag2Set() != null && ! tab.getFlag2Set().isEmpty()){                                              
+                       if( flag2Set != null && ! "".equals(flag2Set)){
+                           BooleanQuery flag2Query = new BooleanQuery();
+                           for( String flag2Value : flag2Set.split(",")){
+                               if( flag2Value != null ){
+                                   String value = flag2Value.replace(",", "");
+                                   if(!value.isEmpty()){
+                                       flag2Query.add(new TermQuery(new Term(Entity2LuceneDoc.term.FLAG2,value)),
+                                               BooleanClause.Occur.SHOULD);
+                                   }                                      
+                               }                
+                           }
+                           typeQuery.add(flag2Query, BooleanClause.Occur.MUST);
+                       }                       
                    }
             }
            

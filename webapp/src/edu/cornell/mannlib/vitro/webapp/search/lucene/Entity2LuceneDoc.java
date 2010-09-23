@@ -51,8 +51,10 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         public static String NAMEUNANALYZED = "nameunanalyzed" ;
         /** Name of entity, unstemmed */
         public static String NAMEUNSTEMMED       = "nameunstemmed";
-        /** Name of portal */
+        /** portal ( 2 ^ portalId ) */
         public static String PORTAL     = "portal";
+        /** Flag 2 (legacy, only used at Cornell) */
+        public static String FLAG2 = "FLAG2";
         /** time of index in msec since epoc */
         public static String INDEXEDTIME= "indexedTime";
         /** timekey of entity in yyyymmddhhmm  */
@@ -232,7 +234,9 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         //portal Flags
         doPortalFlags(ent, doc);
 
-
+        //do flag 2 legacy, only used at Cornell
+        doFlag2( ent, doc );
+        
         //ALLTEXT, all of the 'full text'
         String t=null;
         value ="";
@@ -276,6 +280,23 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         return doc;
     }
        
+    /**
+     * Flag two is a legacy field that is used only by Cornell.
+     * It is related to the old portal filtering.
+     */
+    private void doFlag2(Individual ent, Document doc) {
+        String flag2Set = ent.getFlag2Set();
+        if( flag2Set != null && ! "".equals(flag2Set)){
+            for( String flag2Value : flag2Set.split(",")){
+                if( flag2Value != null ){
+                    String value = flag2Value.replace(",", "");
+                    if(!value.isEmpty())
+                        doc.add( new Field(term.FLAG2, value, Field.Store.NO, Field.Index.ANALYZED));
+                }                
+            }
+        }
+    }
+
     /**
      * Splits up the entity's flag1 value into portal id and then
      * adds the id to the doc.
