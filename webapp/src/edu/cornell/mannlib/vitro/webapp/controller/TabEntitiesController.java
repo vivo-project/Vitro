@@ -123,8 +123,8 @@ public void doGet( HttpServletRequest req, HttpServletResponse response )
              boolean doPagedFilter = request.getParameter("page") != null;
              
              boolean showFiltering = false;
-             boolean showPaged = false;
-             if( tab.getGalleryRows() > 1 ){
+             boolean showPaged = true;
+             if( tab.getGalleryRows() != 1 ){
                  /* bjl23 20061006:
                   * The tab.getGalleryRows()>1 is a hack to use this field as
                   * a switch to turn on alpha filter display in
@@ -157,7 +157,7 @@ public void doGet( HttpServletRequest req, HttpServletResponse response )
                 log.error("Tab " + tab.getTabId() + " is neither manually, auto nor mixed. ");   
              }
                
-             if( tab.getDayLimit() > 0  ){
+             if( tab.getDayLimit() != 0  ){
                  query = addDayLimit( query, tab );
              }
              boolean onlyWithThumbImg = false;
@@ -174,25 +174,20 @@ public void doGet( HttpServletRequest req, HttpServletResponse response )
                  String sortField = tab.getEntitySortField();
                  Sort sort = null;
                  if( sortField != null && !doAlphaFilter && !doPagedFilter ){
-                     if( sortField.equalsIgnoreCase("timekey") ){
-                         sort =     new Sort(new SortField(
-                                 Entity2LuceneDoc.term.TIMEKEY));
-                     }else if( sortField.equalsIgnoreCase("sunrise") ){
-                         sort =     new Sort(new SortField(
-                                 Entity2LuceneDoc.term.SUNRISE));
+                     if( sortField.equalsIgnoreCase("timekey") || tab.getDayLimit() > 0){
+                         sort =     new Sort(Entity2LuceneDoc.term.TIMEKEY);
+                     }else if( sortField.equalsIgnoreCase("sunrise") || tab.getDayLimit() < 0 ){
+                         sort =     new Sort(Entity2LuceneDoc.term.SUNRISE, true);
                      }else if( sortField.equalsIgnoreCase("sunset") ){
-                         sort =     new Sort(new SortField(
-                                 Entity2LuceneDoc.term.SUNSET));
+                         sort =     new Sort(Entity2LuceneDoc.term.SUNSET);
                      }else{
-                         sort =  new Sort(new SortField(
-                                 Entity2LuceneDoc.term.NAMEUNANALYZED));
+                         sort =  new Sort(Entity2LuceneDoc.term.NAMEUNANALYZED);
                      }
                  } else {
-                     sort =     new Sort(new SortField(
-                             Entity2LuceneDoc.term.NAMEUNANALYZED));
+                     sort =     new Sort(Entity2LuceneDoc.term.NAMEUNANALYZED);
                  }
                  
-                 if( depth > 1 && sortField.equalsIgnoreCase("rand()") ){
+                 if( depth > 1 && "rand()".equalsIgnoreCase(sortField) ){
                          sort = null;                     
                  }
                                   
@@ -285,9 +280,15 @@ public void doGet( HttpServletRequest req, HttpServletResponse response )
 
     private BooleanQuery addDayLimit(BooleanQuery query, Tab tab) {
         DateTime now = new DateTime();
-        String end = now.toString(LuceneIndexer.DATE_FORMAT);
-        String start = now.minusDays( tab.getDayLimit() ).toString(LuceneIndexer.DATE_FORMAT);
-        query.add( new RangeQuery(new Term(Entity2LuceneDoc.term.TIMEKEY,start),new Term(Entity2LuceneDoc.term.TIMEKEY,end), true) , BooleanClause.Occur.MUST);
+        if( tab.getDayLimit() > 0 ){
+            String start = now.toString(LuceneIndexer.DATE_FORMAT);
+            String future = now.plusDays( tab.getDayLimit() ).toString(LuceneIndexer.DATE_FORMAT);
+            query.add( new RangeQuery(new Term(Entity2LuceneDoc.term.TIMEKEY,start),new Term(Entity2LuceneDoc.term.TIMEKEY,future), true) , BooleanClause.Occur.MUST);
+        }else{
+            String end = now.toString(LuceneIndexer.DATE_FORMAT);
+            String past = now.minusDays( tab.getDayLimit() ).toString(LuceneIndexer.DATE_FORMAT);
+            query.add( new RangeQuery(new Term(Entity2LuceneDoc.term.SUNRISE,past),new Term(Entity2LuceneDoc.term.SUNRISE,end), true) , BooleanClause.Occur.MUST);
+        }
         return query;
     }
 
@@ -367,14 +368,15 @@ public void doGet( HttpServletRequest req, HttpServletResponse response )
                        int tabPortal = tab.getPortalId();
                        if( tabPortal < 16 ){ //could be a combined portal
                            typeQuery.add(
-                                   new TermQuery( new Term(Entity2LuceneDoc.term.PORTAL, Integer.toString(tab.getPortalId()))),
+                                   new TermQuery( new Term(Entity2LuceneDoc.term.PORTAL, Integer.toString(1 << tab.getPortalId() ))),
                                    BooleanClause.Occur.MUST);
                        }else{ //could be a normal portal
                            BooleanQuery tabQueries = new BooleanQuery();
                            Long[] ids= FlagMathUtils.numeric2numerics(tabPortal);
                            for( Long id : ids){
+                               
                                tabQueries.add(
-                                       new TermQuery( new Term(Entity2LuceneDoc.term.PORTAL, id.toString())),
+                                       new TermQuery( new Term(Entity2LuceneDoc.term.PORTAL,id.toString()) ),
                                        BooleanClause.Occur.SHOULD);
                            }
                            typeQuery.add(tabQueries,BooleanClause.Occur.MUST);
@@ -384,20 +386,26 @@ public void doGet( HttpServletRequest req, HttpServletResponse response )
            
             //make query for manually linked individuals
             BooleanQuery manualQuery = null;
+            boolean foundManual = false;
             if( tab.isManualLinked() || tab.isMixedLinked()){
                 manualQuery = new BooleanQuery();
-                BooleanQuery queryForManual = new BooleanQuery();
+                BooleanQuery queryForManual = new BooleanQuery();                
                 for( String indURI : manualUris){
-                    queryForManual.add( 
-                            new TermQuery( new Term(Entity2LuceneDoc.term.URI, indURI)),
-                            BooleanClause.Occur.SHOULD );
+                    if( indURI != null ){
+                        queryForManual.add( 
+                                new TermQuery( new Term(Entity2LuceneDoc.term.URI, indURI)),
+                                BooleanClause.Occur.SHOULD );
+                        foundManual = true;
+                    }
+                    
                 }
-                manualQuery.add( queryForManual, BooleanClause.Occur.MUST);
+                if( foundManual )
+                    manualQuery.add( queryForManual, BooleanClause.Occur.MUST);
             }
             
        
             
-           if( tab.isAutoLinked() ){
+           if( tab.isAutoLinked() || !foundManual ){
                query = typeQuery;
            }else if ( tab.isManualLinked() ){
                query =  manualQuery;
