@@ -19,10 +19,11 @@ import com.hp.hpl.jena.rdf.model.Resource;
 
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDaoCon;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDBGraphGenerator;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RegeneratingGraph;
 
-public class JenaDataSourceSetupBase {
+public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
 	private static final Log log = LogFactory.getLog(JenaDataSourceSetupBase.class);
 
 	protected final static int DEFAULT_MAXWAIT = 10000, // ms
