@@ -18,32 +18,32 @@ public class VClass extends BaseResourceBean implements Comparable<VClass>
     /**
      * What this VClass is called
      */
-    private String myName = null;
+    protected String myName = null;
     public  String getName()              { return myName; }
     public  void   setName( String name ) { myName = name; }
 
     /**
      * An example member of this VClass
      */
-    private String myExample = null;
+    protected String myExample = null;
     public  String getExample()                 { return myExample; }
     public  void   setExample( String example ) { myExample = example; }
 
     /**
      * Information about the type of information expected of a member of this VClass
      */
-    private String myDescription = null;
+    protected String myDescription = null;
     public  String getDescription()               { return myDescription; }
     public  void   setDescription( String descr ) { myDescription = descr; }
 
-    private String myShortDefinition = null;
+    protected String myShortDefinition = null;
     public  String getShortDef()            { return myShortDefinition; }
     public  void   setShortDef( String sd ) { myShortDefinition = sd; }
 
     // TODO: [kwg8-08/01/07] What is this for?  It seems an entity count is the number of entities of
     // this type in the database.  Is this the case?
     // [bjl23 2007-08-12] Yep.  A count of individuals in the class.
-    private int  myEntityCount = -1;
+    protected int  myEntityCount = -1;
     
     // rjy7 Removing deprecation since currently we have no other means to get this value.
     // @Deprecated
@@ -51,39 +51,39 @@ public class VClass extends BaseResourceBean implements Comparable<VClass>
     
     public  void setEntityCount( int ec ) { myEntityCount = ec; }
 
-    private int  displayLimit = -1;
-    public  int  getDisplayLimit() { return displayLimit; }
+    protected Integer  displayLimit = null;
+    public  int  getDisplayLimit()  { return (displayLimit == null ? -1 : displayLimit); }
     public  void setDisplayLimit(int displayLimit) { this.displayLimit = displayLimit; }
 
-    private String quickEditJsp = null;
+    protected String quickEditJsp = null;
     public  String getQuickEditJsp()                    { return quickEditJsp; }
     public  void   setQuickEditJsp(String quickEditJsp) { this.quickEditJsp = quickEditJsp; }
 
-    private int  displayRank = -1;
-    public  int  getDisplayRank()                { return displayRank; }
+    protected Integer  displayRank = null;
+    public  int  getDisplayRank()                { return (displayLimit == null ? -1 : displayLimit); }
     public  void setDisplayRank(int displayRank) { this.displayRank = displayRank; }
 
-    private String  groupURI = null;
+    protected String  groupURI = null;
     public  String  getGroupURI()            { return groupURI; }
     public  void    setGroupURI(String groupURI) { this.groupURI = groupURI; }
 
-    private VClassGroup group=null;
+    protected VClassGroup group=null;
     public  VClassGroup getGroup()                { return group; }
     public  void        setGroup(VClassGroup vcg) { group = vcg;  }
 
-    private String customEntryForm = null;
+    protected String customEntryForm = null;
     public  String getCustomEntryForm()         { return customEntryForm; }
     public  void   setCustomEntryForm(String s) { this.customEntryForm = s; }
     
-    private String customDisplayView = null;
+    protected String customDisplayView = null;
     public  String getCustomDisplayView()         { return customDisplayView; }
     public  void   setCustomDisplayView(String s) { this.customDisplayView = s; }
     
-    private String customShortView = null;
+    protected String customShortView = null;
     public  String getCustomShortView()         { return customShortView; }
     public  void   setCustomShortView(String s) { this.customShortView = s; }
     
-    private String customSearchView = null;
+    protected String customSearchView = null;
     public  String getCustomSearchView()         { return customSearchView; }
     public  void   setCustomSearchView(String s) { this.customSearchView = s; }    
 
