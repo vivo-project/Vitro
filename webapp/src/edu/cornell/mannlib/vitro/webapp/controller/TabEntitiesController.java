@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.controller;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -121,142 +122,52 @@ public void doGet( HttpServletRequest req, HttpServletResponse response )
                  request.setAttribute("alpha", alpha.toUpperCase()); 
              }
              
-             boolean doPagedFilter = request.getParameter("page") != null;
-             
-             boolean showFiltering = false;
+             boolean doPagedFilter = request.getParameter("page") != null;                          
              boolean showPaged = true;
              if( tab.getGalleryRows() != 1 ){
-                 /* bjl23 20061006:
-                  * The tab.getGalleryRows()>1 is a hack to use this field as
-                  * a switch to turn on alpha filter display in
-                  * non-gallery tabs.  We need to add a db field for this. */
-                 request.setAttribute("showAlpha","1");
-                 showFiltering = true;
+                 /* bjl23 20061006: The tab.getGalleryRows()>1 is a hack to use this field as a switch to turn on 
+                  * alpha filter display in non-gallery tabs. We need to add a db field for this. */
+                 request.setAttribute("showAlpha","1");                 
                  showPaged = true;
              }            
              
-             //try to get the URIs of the required individuals from the lucene index
-             IndexSearcher index = LuceneIndexFactory.getIndexSearcher(getServletContext());             
-             BooleanQuery query = null;
-             if( tab.isAutoLinked() ){
-                 query = getQuery(tab, 
-                         request.getWebappDaoFactory().getTabDao().getTabAutoLinkedVClassURIs(tab.getTabId()),
-                         null, 
-                         alpha, 
-                         request.getWebappDaoFactory().getPortalDao().isSinglePortal() );
-             }else if (tab.isManualLinked() ){
-                 query = getQuery(tab, 
-                         null,
-                         request.getWebappDaoFactory().getTabDao().getTabManuallyLinkedEntityURIs(tab.getTabId()), 
-                         alpha, request.getWebappDaoFactory().getPortalDao().isSinglePortal() );
-             }else if ( tab.isMixedLinked() ){
-                 query = getQuery(tab, 
-                         request.getWebappDaoFactory().getTabDao().getTabAutoLinkedVClassURIs(tab.getTabId()),
-                         request.getWebappDaoFactory().getTabDao().getTabManuallyLinkedEntityURIs(tab.getTabId()),
-                         alpha, request.getWebappDaoFactory().getPortalDao().isSinglePortal() );
-             }else{
-                log.error("Tab " + tab.getTabId() + " is neither manually, auto nor mixed. ");   
-             }
-               
-             if( tab.getDayLimit() != 0  ){
-                 query = addDayLimit( query, tab );
-             }
-             boolean onlyWithThumbImg = false;
-             if( depth > 1 && tab.getImageWidth() > 0 ){
-                 onlyWithThumbImg = true;
+             List<String> manuallyLinkedUris = Collections.emptyList();
+             List<String> autoLinkedUris = Collections.emptyList();
+             if( tab.isAutoLinked() || tab.isMixedLinked())
+                 autoLinkedUris = request.getWebappDaoFactory().getTabDao().getTabAutoLinkedVClassURIs(tab.getTabId());
+             if( tab.isManualLinked() || tab.isMixedLinked())
+                 manuallyLinkedUris = request.getWebappDaoFactory().getTabDao().getTabManuallyLinkedEntityURIs(tab.getTabId());
+             
+             //If a tab is not linked to any types or individuals, don't show alpha or page filter links
+             boolean tabNotLinked =  tabNotLinked( tab, autoLinkedUris, manuallyLinkedUris); 
+             if( tabNotLinked ){
+                 request.setAttribute("showAlpha", "0");
+                 showPaged = false;
              }
              
              int page = getPage(request);
              int entsPerTab = getSizeForNonGalleryTab(tab, showPaged);
-             IndividualDao indDao = request.getWebappDaoFactory().getIndividualDao();
-             int size = 0;
              
-             try {
-                 String sortField = tab.getEntitySortField();
-                 Sort sort = null;
-                 if( sortField != null && !doAlphaFilter && !doPagedFilter ){
-                     if( sortField.equalsIgnoreCase("timekey") || tab.getDayLimit() > 0){
-                         sort =     new Sort(Entity2LuceneDoc.term.TIMEKEY);
-                     }else if( sortField.equalsIgnoreCase("sunrise") || tab.getDayLimit() < 0 ){
-                         sort =     new Sort(Entity2LuceneDoc.term.SUNRISE, true);
-                     }else if( sortField.equalsIgnoreCase("sunset") ){
-                         sort =     new Sort(Entity2LuceneDoc.term.SUNSET);
-                     }else{
-                         sort =  new Sort(Entity2LuceneDoc.term.NAMEUNANALYZED);
-                     }
-                 } else {
-                     sort =     new Sort(Entity2LuceneDoc.term.NAMEUNANALYZED);
+             int size = 0;
+             if( ! tabNotLinked ){
+                 try{
+                     //a lot of the work happens in this next line
+                     size = addLinkedIndividualsForTab (tab,request, autoLinkedUris, manuallyLinkedUris, 
+                             alpha, page, entsPerTab, depth, doAlphaFilter, doPagedFilter);
+                 }catch(Exception e){
+                     log.warn(e,e);
                  }
-                 
-                 if( depth > 1 && "rand()".equalsIgnoreCase(sortField) ){
-                         sort = null;                     
-                 }
-                                  
-                 TopDocs docs;
-                 if( sort != null )
-                     docs = index.search(query, null, MAX_RESULTS, sort);                     
-                 else
-                     docs = index.search(query, null, MAX_RESULTS);
-                 
-                if( docs == null ){
-                    log.error("Search of lucene index returned null");
-                    return;
-                }
-                
-                size = docs.totalHits;
-                // don't get all the results, only get results for the requestedSize
-                List<Individual> results = new ArrayList<Individual>(entsPerTab);
-                int entsAddedToTab = 0;
-                int ii = (page-1)*entsPerTab;
-                boolean doingRandom = false;
-                if(   !doAlphaFilter && !doPagedFilter && depth > 1 && "rand()".equalsIgnoreCase(tab.getEntitySortField())){
-                    doingRandom = true;
-                    ii = random.nextInt( size );
-                }
-                boolean looped = false;
-                while( entsAddedToTab < entsPerTab && ii < docs.scoreDocs.length ){
-                    ScoreDoc hit = docs.scoreDocs[ii];
-                    if (hit != null) {
-                        Document doc = index.doc(hit.doc);
-                        if (doc != null) {
-                            if( onlyWithThumbImg && "0".equals(doc.getField(Entity2LuceneDoc.term.THUMBNAIL).stringValue()) ){
-                                //do Nothing                                                
-                            }else{
-                                String uri = doc.getField(Entity2LuceneDoc.term.URI).stringValue();
-                                Individual ind = indDao.getIndividualByURI( uri );                                
-                                results.add( ind );                         
-                                entsAddedToTab++;
-                            }
-                        } else {
-                            log.warn("no document found for lucene doc id " + hit.doc);
-                        }
-                    } else {
-                        log.debug("hit was null");
-                    }  
-                    if( doingRandom && ii >= docs.scoreDocs.length && ! looped){
-                        ii=0;
-                        looped = true;
-                    }else{                        
-                        ii++;
-                    }
-                }   
-                
-                tab.setRelatedEntityList(results);                
-             }catch(IOException ex){
-                 log.warn(ex,ex);
              }
-              
+             
              //only show page list when the tab is depth 1.
-             if( depth == 1 && size > entsPerTab ){ 
+             if( showPaged && depth == 1 && size > 0 && size > entsPerTab ){ 
                  request.setAttribute("showPages",Boolean.TRUE);
                  //make a data structure to hold information about paged tabs
-                 request.setAttribute("pages", makePagesList(size, entsPerTab, page ));
-                 
+                 request.setAttribute("pages", makePagesList(size, entsPerTab, page ));                 
              }else{
                  request.setAttribute("showPages",Boolean.FALSE);
              }
-             
-           
+                        
              if( tab.isAutoLinked() || tab.isGallery() ){
                  if( doAlphaFilter ){
                      doAlphaFiltered(alpha, tab, request, response, tabDao, size);
@@ -268,8 +179,7 @@ public void doGet( HttpServletRequest req, HttpServletResponse response )
                  doAutoLinked(tab,request,response,tabDao,size);
              }else{
                  log.debug("TabEntitiesController: doing none for tabtypeid: "
-                         + tab.getTabtypeId() +" and link mode: "  
-                         + tab.getEntityLinkMethod());
+                         + tab.getTabtypeId() +" and link mode: " + tab.getEntityLinkMethod());
              }
              
         } catch (Throwable e) {            
@@ -277,6 +187,141 @@ public void doGet( HttpServletRequest req, HttpServletResponse response )
             RequestDispatcher rd = req.getRequestDispatcher("/error.jsp");
             rd.include(req, response);
         }
+    }
+
+    /**
+     * This build a lucene query for the tab, runs the query, gets individuals for that query,
+     * and adds the individuals to the tab.
+     * 
+     * @param tab - this parameter is mutated by this method
+     * @param request
+     * @param autoLinkedUris
+     * @param manuallyLinkedUris
+     * @param alpha - letter for alpha filtering
+     * @param page - page for page filtering
+     * @param entsPerTab 
+     * @param depth
+     * @param doAlphaFilter
+     * @param doPagedFilter
+     * @return total number of ents associated with tab regardless of filtering
+     */
+    private int addLinkedIndividualsForTab(Tab tab, VitroRequest request, 
+            List<String> autoLinkedUris, List<String> manuallyLinkedUris, 
+            String alpha, int page, int entsPerTab, int depth, 
+            boolean doAlphaFilter , boolean doPagedFilter) {
+
+        //try to get the URIs of the required individuals from the lucene index
+        IndexSearcher index = LuceneIndexFactory.getIndexSearcher(getServletContext());
+        boolean isSinglePortal = request.getWebappDaoFactory().getPortalDao().isSinglePortal();
+        BooleanQuery query = null;
+        if( tab.isAutoLinked() ){
+            query = getQuery(tab, autoLinkedUris, null, alpha, isSinglePortal);
+        }else if (tab.isManualLinked() ){
+            query = getQuery(tab, null, manuallyLinkedUris, alpha, isSinglePortal);
+        }else if ( tab.isMixedLinked() ){
+            query = getQuery(tab, autoLinkedUris, manuallyLinkedUris, alpha, isSinglePortal);
+        }else{
+           log.error("Tab " + tab.getTabId() + " is neither manually, auto nor mixed. ");   
+        }
+          
+        if( tab.getDayLimit() != 0  ){
+            query = addDayLimit( query, tab );
+        }
+        boolean onlyWithThumbImg = false;
+        if( depth > 1 && tab.getImageWidth() > 0 ){
+            onlyWithThumbImg = true;
+        }       
+        
+        IndividualDao indDao = request.getWebappDaoFactory().getIndividualDao();
+        int size = 0;
+        
+        try {
+            String sortField = tab.getEntitySortField();
+            Sort sort = null;
+            if( sortField != null && !doAlphaFilter && !doPagedFilter ){
+                if( sortField.equalsIgnoreCase("timekey") || tab.getDayLimit() > 0){
+                    sort =     new Sort(Entity2LuceneDoc.term.TIMEKEY);
+                }else if( sortField.equalsIgnoreCase("sunrise") || tab.getDayLimit() < 0 ){
+                    sort =     new Sort(Entity2LuceneDoc.term.SUNRISE, true);
+                }else if( sortField.equalsIgnoreCase("sunset") ){
+                    sort =     new Sort(Entity2LuceneDoc.term.SUNSET);
+                }else{
+                    sort =  new Sort(Entity2LuceneDoc.term.NAMEUNANALYZED);
+                }
+            } else {
+                sort =     new Sort(Entity2LuceneDoc.term.NAMEUNANALYZED);
+            }
+            
+            if( depth > 1 && "rand()".equalsIgnoreCase(sortField) ){
+                    sort = null;                     
+            }
+                             
+            TopDocs docs;
+            if( sort != null )
+                docs = index.search(query, null, MAX_RESULTS, sort);                     
+            else
+                docs = index.search(query, null, MAX_RESULTS);
+            
+           if( docs == null ){
+               log.error("Search of lucene index returned null");
+               return 0;
+           }
+           
+           size = docs.totalHits;
+           // don't get all the results, only get results for the requestedSize
+           List<Individual> results = new ArrayList<Individual>(entsPerTab);
+           int entsAddedToTab = 0;
+           int ii = (page-1)*entsPerTab;
+           boolean doingRandom = false;
+           if(   !doAlphaFilter && !doPagedFilter && depth > 1 && "rand()".equalsIgnoreCase(tab.getEntitySortField())){
+               doingRandom = true;
+               ii = random.nextInt( size );
+           }
+           boolean looped = false;
+           while( entsAddedToTab < entsPerTab && ii < docs.scoreDocs.length ){
+               ScoreDoc hit = docs.scoreDocs[ii];
+               if (hit != null) {
+                   Document doc = index.doc(hit.doc);
+                   if (doc != null) {
+                       if( onlyWithThumbImg && "0".equals(doc.getField(Entity2LuceneDoc.term.THUMBNAIL).stringValue()) ){
+                           //do Nothing                                                
+                       }else{
+                           String uri = doc.getField(Entity2LuceneDoc.term.URI).stringValue();
+                           Individual ind = indDao.getIndividualByURI( uri );                                
+                           results.add( ind );                         
+                           entsAddedToTab++;
+                       }
+                   } else {
+                       log.warn("no document found for lucene doc id " + hit.doc);
+                   }
+               } else {
+                   log.debug("hit was null");
+               }  
+               if( doingRandom && ii >= docs.scoreDocs.length && ! looped){
+                   ii=0;
+                   looped = true;
+               }else{                        
+                   ii++;
+               }
+           }   
+           
+           //mutate state of tab
+           tab.setRelatedEntityList(results);                
+        }catch(IOException ex){
+            log.warn(ex,ex);
+            return size;
+        }         
+        return size;
+    }
+
+    private boolean tabNotLinked(Tab tab, List<String> autoLinkedUris,
+            List<String> manuallyLinkedUris) {
+        if( tab.isManualLinked() )
+            return manuallyLinkedUris.isEmpty();
+        else if( tab.isAutoLinked() )
+            return autoLinkedUris.isEmpty();
+        else
+            return autoLinkedUris.isEmpty() && manuallyLinkedUris.isEmpty();        
     }
 
     private BooleanQuery addDayLimit(BooleanQuery query, Tab tab) {
@@ -450,21 +495,6 @@ public void doGet( HttpServletRequest req, HttpServletResponse response )
            return new BooleanQuery();        
        }        
     }    
-
-	private void doManual(Tab tab, VitroRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-	    log.debug("in doManual");
-        Collection ents = tab.getRelatedEntityList(null);
-        if( ents != null && ents.size() > 0 )   {
-            request.setAttribute("entities", ents);
-            String jsp = Controllers.ENTITY_LIST_FOR_TABS_JSP;
-            RequestDispatcher rd =
-                request.getRequestDispatcher(jsp);
-            rd.include(request, response);
-        }else{
-            //no entities, do nothing
-        }
-    }
 
 	private int getSizeForGalleryTab(Tab tab){
         int rows = tab.getGalleryRows() != 0 ? tab.getGalleryRows() : 8;
