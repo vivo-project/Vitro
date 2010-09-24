@@ -216,9 +216,21 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
                                     for (Property p : g.getPropertyList()) {
                                         if (p instanceof ObjectProperty) {
                                             ObjectProperty op = (ObjectProperty)p;
-                                            if (op.getObjectPropertyStatements()!=null && op.getObjectPropertyStatements().size()>0) {
-                                                statementCount += op.getObjectPropertyStatements().size();
+                                            List<ObjectPropertyStatement> opStmts = op.getObjectPropertyStatements();
+                                            if (op.getObjectPropertyStatements()!=null && opStmts.size()>0) {
+                                                statementCount += opStmts.size();
+                                                
+                                                // If not collated, we still need to apply custom sorting. This includes
+                                                // the case where the ontology doesn't specify collating, as well as the case
+                                                // where we don't collate because only one subclass is populated.
+                                                if (!op.getCollateBySubclass()) {
+                                                    if (applyCustomSort(op, opStmts)) {
+                                                        op.setObjectPropertyStatements(opStmts);
+                                                    }
+                                                }
                                             }
+
+
                                         }
                                     }
                                 }
@@ -440,10 +452,17 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
     
     private List<Property> collateBySubclass(List<Property> mergedPropertyList) {
     	for( Property prop : mergedPropertyList){
-    		if( prop instanceof ObjectProperty && ((ObjectProperty)prop).getCollateBySubclass() ){    			
-    			collateBySubclass((ObjectProperty)prop);
+    		if( prop instanceof ObjectProperty ) {
+    		    ObjectProperty op = (ObjectProperty) prop;
+    		    if (op.getCollateBySubclass() ){ 
+    		        log.debug("Collating property " + prop.getURI() + " by subclass");
+    		        collateBySubclass(op);
+    		    } else {
+    		        
+    		    }
     		}
-    	}    	
+    	}    
+        
     	return mergedPropertyList;
 	}
     
@@ -457,13 +476,14 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
 	private void collateBySubclass(ObjectProperty prop) {
 		List<ObjectPropertyStatement> orgStmtList = prop.getObjectPropertyStatements();
 		if( orgStmtList == null )
-			return;
+			return;        
 		Map<String,VClass> directClasses = getDirectClasses( getObjectsFromStmts( orgStmtList ) );
 		//don't do collateBySubclass if there is only one class
-		if( directClasses.size() < 2 )
-			prop.setCollateBySubclass(false); //this overrides the value from the model
+		if( directClasses.size() < 2 ) {
+			prop.setCollateBySubclass(false); //this overrides the value from the model			
+		}
 		else{
-			System.out.println("statements for object property: " + orgStmtList.size());
+			log.debug("statements for object property: " + orgStmtList.size());			
 			//get list of direct classes and sort them 
 			List<VClass> vclasses = new LinkedList<VClass>(directClasses.values());
 			Collections.sort(
@@ -480,7 +500,7 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
 				// get all obj prop stmts with objects of this class
 				List<ObjectPropertyStatement> stmtsForClass = new ArrayList<ObjectPropertyStatement>();
 				
-				System.out.println("statements for object property: " + orgStmtList.size());
+				log.debug("statements for object property: " + orgStmtList.size());
 				Iterator<ObjectPropertyStatement> it = orgStmtList.iterator();
 				while( it.hasNext()){
 					ObjectPropertyStatement stmt = it.next();
@@ -489,13 +509,13 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
 					Individual obj = stmt.getObject();
 					List<VClass> vclassesForObj = obj.getVClasses(true);					
 					if (vclassesForObj != null && vclassesForObj.contains(clazz)) {
-						System.out.println("adding " + stmt + " to class "
+						log.debug("adding " + stmt + " to class "
 								+ clazz.getURI());
-						System.out.println("subjectURI " + stmt.getSubjectURI()
+						log.debug("subjectURI " + stmt.getSubjectURI()
 								+ " objectURI" + stmt.getObject().getURI());
-						System.out.println("stmtsForclass size: "
+						log.debug("stmtsForclass size: "
 								+ stmtsForClass.size());						
-						System.out.println("stmtsForclass size: "
+						log.debug("stmtsForclass size: "
 								+ stmtsForClass.size());
 						
 						stmtsForClass.add(stmt);
@@ -504,22 +524,18 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
 				
 				//bdc34: What do we do if a object individual is directly asserted to two different
 				//types?  For now we just show them in whichever type shows up first. related to NIHVIVO-876
-				orgStmtList.removeAll(stmtsForClass);				
+				orgStmtList.removeAll(stmtsForClass);	
 				
-				Collections.sort(stmtsForClass,
-						new Comparator<ObjectPropertyStatement>() {
-							public int compare(ObjectPropertyStatement o1,
-									ObjectPropertyStatement o2) {
-								return o1.getObject().getName().compareTo(
-										o2.getObject().getName());
-							}
-						});
-				System.out.println("stmtsForclass size after sort: "
+				sortStatements(prop, stmtsForClass);
+				
+				log.debug("stmtsForclass size after sort: "
 						+ stmtsForClass.size());
-				System.out.println("sortedStmtList size before add: "
+				log.debug("sortedStmtList size before add: "
 						+ sortedStmtList.size());
+				
 				sortedStmtList.addAll(stmtsForClass);
-				System.out.println("sortedStmtList size after add: "
+				
+				log.debug("sortedStmtList size after add: "
 						+ sortedStmtList.size());
 			}
 			prop.setObjectPropertyStatements(sortedStmtList);
@@ -527,7 +543,85 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
 			
 	}
 
-
+    // rjy7 Quick and dirty fix to achieve custom sorting for specific properties in the VIVO ontology.
+    // See NIHVIVO-426, NIHVIVO-1158, NIHVIVO-1160. Some of these involve sorting on data properties of an 
+    // individual two graph edges away from the individual being displayed, for which there is currently
+    // no provision. A better strategy will be designed and implemented in a later version, in particular 
+    // one that does not involve hard-coded references to the VIVO ontology in the Vitro core.
+    private void sortStatements(ObjectProperty prop, List<ObjectPropertyStatement> statements) {
+        
+        if (!applyCustomSort(prop, statements)) {
+            Collections.sort(statements,
+                    new Comparator<ObjectPropertyStatement>() {
+                        public int compare(ObjectPropertyStatement o1,
+                                ObjectPropertyStatement o2) {
+                            return o1.getObject().getName().compareTo(
+                                    o2.getObject().getName());
+                        }
+                    });            
+        }
+    }
+    
+    private boolean applyCustomSort(ObjectProperty prop, List<ObjectPropertyStatement> statements) {
+        
+        String vivoCoreOntology = "http://vivoweb.org/ontology/core#";
+        String propertyUri = prop.getURI();
+        
+        // Positions in an organization
+        if (propertyUri.equals(vivoCoreOntology + "organizationForPosition")) {            
+            sortByRelatedIndividualNames(statements, vivoCoreOntology + "positionForPerson");
+            return true;
+        }    
+//        // Person's positions
+//       if (propertyUri.equals(vivoCoreOntology + "personInPosition")) {
+//            sortReverseChron(statements, vivoCoreOntology + "endYear", vivoCoreOntology + "startYear");
+//              return true;
+//            
+//        // Person's publications
+//       if (propertyUri.equals(vivoCoreOntology + "authorInAuthorship")) {
+//            sortByReverseChronAndRelatedIndividualName(statements, vivoCoreOntology + " ", vivoCoreOntology + " ");
+//              return true;
+            
+        return false;
+    }
+    
+//    private void sortReverseChron(List<ObjectPropertyStatement> statements, String endDatePredicate, String startDatePredicate) {
+//        // 1. Sort by end date descending, null dates first
+//        // 2. Then by start date descending, null dates last
+//        // 3. No sorting for entries with no start or end date - just put at the bottom in random order
+//
+//    }
+//    
+//    private void sortByReverseChronAndRelatedIndividualName(List<ObjectPropertyStatement> statements, 
+//            String datePredicate, String relatedIndividualPredicate) {
+//        
+//    }
+    
+    private void sortByRelatedIndividualNames(List<ObjectPropertyStatement> statements, String predicateUri) {
+        
+        log.debug("In sortByRelatedIndividualNames(), before sorting");
+        if (log.isDebugEnabled()) {
+            for (ObjectPropertyStatement ops : statements) {
+                log.debug(ops.getObject().getRelatedIndividual(predicateUri).getName());
+            }
+        }
+        
+        final String propertyUri = predicateUri;
+        Collections.sort(statements, new Comparator<ObjectPropertyStatement>() { 
+            public int compare(ObjectPropertyStatement left, ObjectPropertyStatement right) {
+                Individual indLeft = left.getObject().getRelatedIndividual(propertyUri);
+                Individual indRight = right.getObject().getRelatedIndividual(propertyUri);
+                return indLeft.getName().compareTo(indRight.getName()); 
+            } 
+        }); 
+        
+        log.debug("In sortByRelatedIndividualNames(), after sorting");
+        if (log.isDebugEnabled()) {
+            for (ObjectPropertyStatement ops : statements) {
+                log.debug(ops.getObject().getRelatedIndividual(predicateUri).getName());
+            }
+        }
+    }
 
 	private List<Individual> getObjectsFromStmts(List<ObjectPropertyStatement> orgStmtList) {
 		List<Individual> individuals = new LinkedList<Individual>();
