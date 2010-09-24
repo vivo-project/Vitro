@@ -438,7 +438,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                     try {
                         OntClass cls = (OntClass) classIt.next();
                         if (!cls.isAnon() && !(NONUSER_NAMESPACES.contains(cls.getNameSpace()))) {
-                            classes.add(vClassWebappFromOntClass(cls));
+                            classes.add(new VClassJena(cls,getWebappDaoFactory()));
                         }
                     } catch (ClassCastException cce) {
                         cce.printStackTrace();
@@ -536,7 +536,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                     try {
                         OntClass cls = (OntClass) rootIt.next();
                         if (!cls.isAnon() && cls.getNameSpace() != null && !(NONUSER_NAMESPACES.contains(cls.getNameSpace()))) {
-                            rootClasses.add(vClassWebappFromOntClass(cls));
+                            rootClasses.add(new VClassJena(cls,getWebappDaoFactory()));
                         }
                     } catch (ClassCastException e) {}
                 }
@@ -578,7 +578,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
     					superStmtIt.close();
     				}
     				if (root) {
-    					ontologyRootClasses.add(this.vClassWebappFromOntClass(ontClass));
+    					ontologyRootClasses.add(new VClassJena(ontClass,getWebappDaoFactory()));
     				}
     			}
     		}
@@ -662,7 +662,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
         try {
         	OntClass cls = getOntClass(getOntModel(),URIStr);
             if (cls != null) {
-                return vClassWebappFromOntClass(cls);
+                return new VClassJena(cls,getWebappDaoFactory());
             } else {
             	return null;
             }
@@ -940,102 +940,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                 ontModel.leaveCriticalSection();
             }
         }
-
-
-        private VClass vClassWebappFromOntClass(OntClass cls) {
-            VClass vcw = new VClass();
-            getOntModel().enterCriticalSection(Lock.READ);
-    		vcw.setName(getLabelForClass(cls,false,false));
-    		vcw.setLocalNameWithPrefix(getLabelForClass(cls,true,false));
-    		vcw.setPickListName(getLabelForClass(cls,false,true));
-            try {
-            	if (cls.isAnon()) {
-            		vcw.setNamespace(PSEUDO_BNODE_NS);
-            		vcw.setLocalName(cls.getId().toString());
-            		log.debug("setting local name with prefix to: " + vcw.getLocalNameWithPrefix());
-            	} else {
-	                if (vcw.getName() == null)
-	                    vcw.setName("[null]");
-	                vcw.setURI(cls.getURI());
-	                vcw.setNamespace(cls.getNameSpace());
-	                vcw.setLocalName(cls.getLocalName());
-            	}
-                try {
-                    Resource groupRes = (Resource) cls.getPropertyValue(IN_CLASSGROUP);
-                    if (groupRes != null) {
-                        vcw.setGroupURI(groupRes.getURI());
-                    }
-                } catch (Exception e) {
-                    log.error("error retrieving vitro:inClassGroup property value for "+cls.getURI());
-                    log.trace(e);
-                }
-                vcw.setShortDef(getPropertyStringValue(cls,SHORTDEF));
-                vcw.setExample(getPropertyStringValue(cls,EXAMPLE_ANNOT));
-                vcw.setDescription(getPropertyStringValue(cls,DESCRIPTION_ANNOT));
-                vcw.setDisplayLimit(getPropertyNonNegativeIntValue(cls,DISPLAY_LIMIT));
-                vcw.setDisplayRank(getPropertyNonNegativeIntValue(cls,DISPLAY_RANK_ANNOT));
-                vcw.setCustomEntryForm(getPropertyStringValue(cls,PROPERTY_CUSTOMENTRYFORMANNOT));
-                vcw.setCustomDisplayView(getPropertyStringValue(cls,PROPERTY_CUSTOMDISPLAYVIEWANNOT));
-                vcw.setCustomShortView(getPropertyStringValue(cls,PROPERTY_CUSTOMSHORTVIEWANNOT));
-                vcw.setCustomSearchView(getPropertyStringValue(cls,PROPERTY_CUSTOMSEARCHVIEWANNOT));
-                vcw.setSearchBoost(getPropertyFloatValue(cls,SEARCH_BOOST_ANNOT));
-                
-                //There might be multiple HIDDEN_FROM_EDIT_DISPLAY_ANNOT properties, only use the highest
-                StmtIterator it = cls.listProperties(HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT);
-                BaseResourceBean.RoleLevel hiddenRoleLevel = null;
-                while( it.hasNext() ){
-                    Statement stmt = it.nextStatement();
-                    RDFNode obj;
-                    if( stmt != null && (obj = stmt.getObject()) != null && obj.isURIResource() ){
-                        Resource res = (Resource)obj.as(Resource.class);
-                        if( res != null && res.getURI() != null ){
-                            BaseResourceBean.RoleLevel roleFromModel = BaseResourceBean.RoleLevel.getRoleByUri(res.getURI());
-                            if( roleFromModel != null && 
-                                (hiddenRoleLevel == null || roleFromModel.compareTo(hiddenRoleLevel) > 0 )){
-                                hiddenRoleLevel = roleFromModel;                            
-                            }
-                        }
-                    }
-                }            
-                vcw.setHiddenFromDisplayBelowRoleLevel(hiddenRoleLevel);//this might get set to null
-
-                //There might be multiple PROHIBITED_FROM_UPDATE_DISPLAY_ANNOT properties, only use the highest
-                it = cls.listProperties(PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT);
-                BaseResourceBean.RoleLevel prohibitedRoleLevel = null;
-                while( it.hasNext() ){
-                    Statement stmt = it.nextStatement();
-                    RDFNode obj;
-                    if( stmt != null && (obj = stmt.getObject()) != null && obj.isURIResource() ){
-                        Resource res = (Resource)obj.as(Resource.class);
-                        if( res != null && res.getURI() != null ){
-                            BaseResourceBean.RoleLevel roleFromModel = BaseResourceBean.RoleLevel.getRoleByUri(res.getURI());
-                            if( roleFromModel != null && 
-                                (prohibitedRoleLevel == null || roleFromModel.compareTo(prohibitedRoleLevel) > 0 )){
-                                prohibitedRoleLevel = roleFromModel;                            
-                            }
-                        }
-                    }
-                }            
-                vcw.setProhibitedFromUpdateBelowRoleLevel(prohibitedRoleLevel);//this might get set to null
-
-                // We need a better way of caching the counts.  For now I'm only setting 0 for the empty classes, to hide them from the DWR editing
-                /*
-                ClosableIterator typeIt = getOntModel().listStatements(null,RDF.type,cls);
-                try {
-	                if (!typeIt.hasNext()) {
-	                	vcw.setEntityCount(0);
-	                }
-                } finally {
-                	typeIt.close();
-                }
-                */
-                
-            } finally {
-                getOntModel().leaveCriticalSection();
-            }
-            return vcw;
-        }
-
+ 
     public boolean isSubClassOf(VClass vc1, VClass vc2) {
     	if (vc1 == null || vc2 == null) {
     		return false;
