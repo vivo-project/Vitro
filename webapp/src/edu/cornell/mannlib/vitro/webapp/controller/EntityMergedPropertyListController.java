@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -507,21 +506,14 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
 				//types?  For now we just show them in whichever type shows up first. related to NIHVIVO-876
 				orgStmtList.removeAll(stmtsForClass);				
 				
-				// rjy7 Fix for NIHVIVO-426 Sort people in organization listing by name, rather than by the position name.
-				// This is an ugly hack and we should not refer to ontology properties here. Need a better fix in the long term.
-				if (prop.getURI().equals("http://vivoweb.org/ontology/core#organizationForPosition")) {
-					sortByRelatedIndividualNames(stmtsForClass, "http://vivoweb.org/ontology/core#positionForPerson");
-				} else {
-					Collections.sort(stmtsForClass,
-							new Comparator<ObjectPropertyStatement>() {
-								public int compare(ObjectPropertyStatement o1,
-										ObjectPropertyStatement o2) {
-									return o1.getObject().getName().compareTo(
-											o2.getObject().getName());
-								}
-							});
-				}
-				
+				Collections.sort(stmtsForClass,
+						new Comparator<ObjectPropertyStatement>() {
+							public int compare(ObjectPropertyStatement o1,
+									ObjectPropertyStatement o2) {
+								return o1.getObject().getName().compareTo(
+										o2.getObject().getName());
+							}
+						});
 				System.out.println("stmtsForclass size after sort: "
 						+ stmtsForClass.size());
 				System.out.println("sortedStmtList size before add: "
@@ -535,21 +527,7 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
 			
 	}
 
-	private void sortByRelatedIndividualNames(List<ObjectPropertyStatement> opStmts, String predicateUri) {
-		
-        final LinkedHashMap<ObjectPropertyStatement, String> stmtsToNames = new LinkedHashMap<ObjectPropertyStatement, String>(opStmts.size());
-        for (ObjectPropertyStatement stmt : opStmts) {
-            Individual relatedIndividual = stmt.getObject().getRelatedIndividual(predicateUri);
-        	String relatedIndividualName = relatedIndividual != null ? relatedIndividual.getName() : "";
-            stmtsToNames.put(stmt, relatedIndividualName);
-        }
-        // Sort the object property statements by the names
-        Collections.sort(opStmts, new Comparator<ObjectPropertyStatement>() { 
-            public int compare(ObjectPropertyStatement left, ObjectPropertyStatement right) { 
-                return stmtsToNames.get(left).compareTo(stmtsToNames.get(right)); 
-            } 
-        });	
-	}
+
 
 	private List<Individual> getObjectsFromStmts(List<ObjectPropertyStatement> orgStmtList) {
 		List<Individual> individuals = new LinkedList<Individual>();
