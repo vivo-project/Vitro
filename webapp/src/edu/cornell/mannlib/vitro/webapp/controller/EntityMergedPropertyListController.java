@@ -220,14 +220,8 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
                                             if (op.getObjectPropertyStatements()!=null && opStmts.size()>0) {
                                                 statementCount += opStmts.size();
                                                 
-                                                // If not collated, we still need to apply custom sorting. This includes
-                                                // the case where the ontology doesn't specify collating, as well as the case
-                                                // where we don't collate because only one subclass is populated.
-                                                if (!op.getCollateBySubclass()) {
-                                                    if (applyCustomSort(op, opStmts)) {
-                                                        op.setObjectPropertyStatements(opStmts);
-                                                    }
-                                                }
+                                                // If not collated, we need to apply custom sorting now. 
+                                                applyCustomSortToUncollatedProperty(op, opStmts);
                                             }
 
 
@@ -241,6 +235,14 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
                         log.error("Exception on trying to prune groups list with properties: "+ex.getMessage());
                     }
                     mergedPropertyList.clear();
+                    
+                } else { // ungrouped mode
+                    for (Property p : mergedPropertyList) {
+                        if (p instanceof ObjectProperty) {
+                            ObjectProperty op = (ObjectProperty)p;
+                            applyCustomSortToUncollatedProperty(op, op.getObjectPropertyStatements());                           
+                        }
+                    }
                 }
             }
             
@@ -543,11 +545,6 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
 			
 	}
 
-    // rjy7 Quick and dirty fix to achieve custom sorting for specific properties in the VIVO ontology.
-    // See NIHVIVO-426, NIHVIVO-1158, NIHVIVO-1160. Some of these involve sorting on data properties of an 
-    // individual two graph edges away from the individual being displayed, for which there is currently
-    // no provision. A better strategy will be designed and implemented in a later version, in particular 
-    // one that does not involve hard-coded references to the VIVO ontology in the Vitro core.
     private void sortStatements(ObjectProperty prop, List<ObjectPropertyStatement> statements) {
         
         if (!applyCustomSort(prop, statements)) {
@@ -561,7 +558,12 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
                     });            
         }
     }
-    
+
+    // rjy7 Quick and dirty fix to achieve custom sorting for specific properties in the VIVO ontology.
+    // See NIHVIVO-426, NIHVIVO-1158, NIHVIVO-1160. Some of these involve sorting on data properties of an 
+    // individual two graph edges away from the individual being displayed, for which there is currently
+    // no provision. A better strategy will be designed and implemented in a later version, in particular 
+    // one that does not involve hard-coded references to the VIVO ontology in the Vitro core.
     private boolean applyCustomSort(ObjectProperty prop, List<ObjectPropertyStatement> statements) {
         
         String vivoCoreOntology = "http://vivoweb.org/ontology/core#";
@@ -584,6 +586,19 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
             
         return false;
     }
+
+    // Apply custom sorting to an uncollated property. If the property is collated, the custom sorting has already
+    // been applied to each subclass listing individually.
+    private void applyCustomSortToUncollatedProperty(ObjectProperty op, List<ObjectPropertyStatement> opStmts) {
+        // This includes the case where the ontology doesn't specify collating, as well as the case
+        // where we don't collate because only one subclass is populated, since then we've set
+        // the collation value to false.
+        if (!op.getCollateBySubclass()) {
+            if (applyCustomSort(op, opStmts)) {
+                op.setObjectPropertyStatements(opStmts);
+            }
+        }
+    }
     
 //    private void sortReverseChron(List<ObjectPropertyStatement> statements, String endDatePredicate, String startDatePredicate) {
 //        // 1. Sort by end date descending, null dates first
@@ -597,6 +612,7 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
 //        
 //    }
     
+    // Sort statements by the name of the individual on the other side of the context node.
     private void sortByRelatedIndividualNames(List<ObjectPropertyStatement> statements, String predicateUri) {
         
         log.debug("In sortByRelatedIndividualNames(), before sorting");
