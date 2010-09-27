@@ -571,7 +571,7 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
         
         // Positions in an organization
         if (propertyUri.equals(vivoCoreOntology + "organizationForPosition")) {            
-            sortByRelatedIndividualNames(statements, vivoCoreOntology + "positionForPerson");
+            sortByRelatedIndividualName(statements, vivoCoreOntology + "positionForPerson");
             return true;
         } 
   
@@ -583,7 +583,7 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
        
         // Person's publications
         if (propertyUri.equals(vivoCoreOntology + "authorInAuthorship")) {
-            sortByReverseChronAndRelatedIndividualName(statements, vivoCoreOntology + "year", vivoCoreOntology + "linkedInformationResource");
+            sortByRelatedIndividualYearAndName(statements, vivoCoreOntology + "year", vivoCoreOntology + "linkedInformationResource");
             return true;
         }
     
@@ -662,10 +662,11 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
         }); 
     }
     
-    private void sortByReverseChronAndRelatedIndividualName(List<ObjectPropertyStatement> statements, 
+    private void sortByRelatedIndividualYearAndName(List<ObjectPropertyStatement> statements, 
             String yearPredicate, String relatedIndividualPredicate) {
+        // Sort statements by the name of the individual on the other side of the context node.
         // 1. Sort by year descending, nulls at end
-        // 2. If years are the same, sort by related individual (in the case of authorships, publication) name 
+        // 2. If years are the same, sort by name 
         final String yearProperty = yearPredicate;
         final String relatedIndividualProperty = relatedIndividualPredicate;
         Collections.sort(statements, new Comparator<ObjectPropertyStatement>() { 
@@ -703,7 +704,7 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
     }
     
     // Sort statements by the name of the individual on the other side of the context node.
-    private void sortByRelatedIndividualNames(List<ObjectPropertyStatement> statements, String predicateUri) {
+    private void sortByRelatedIndividualName(List<ObjectPropertyStatement> statements, String predicateUri) {
         
         final String propertyUri = predicateUri;
         Collections.sort(statements, new Comparator<ObjectPropertyStatement>() { 
