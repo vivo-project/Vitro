@@ -675,6 +675,13 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
                 Individual indLeft = left.getObject().getRelatedIndividual(relatedIndividualProperty);
                 Individual indRight = right.getObject().getRelatedIndividual(relatedIndividualProperty);
                 
+                if (indLeft == null) {
+                    return indRight == null ? 0 : 1;
+                }
+                if (indRight == null) {
+                    return -1;
+                }
+                
                 String leftYearValue = indLeft.getDataValue(yearProperty);                
                 Integer leftYear = leftYearValue == null ? null : Integer.valueOf(leftYearValue);
                 
@@ -709,9 +716,18 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
         final String propertyUri = predicateUri;
         Collections.sort(statements, new Comparator<ObjectPropertyStatement>() { 
             public int compare(ObjectPropertyStatement left, ObjectPropertyStatement right) {
+                
                 Individual indLeft = left.getObject().getRelatedIndividual(propertyUri);
                 Individual indRight = right.getObject().getRelatedIndividual(propertyUri);
-                return indLeft.getName().compareTo(indRight.getName()); 
+                
+                if (indLeft == null) {
+                    return indRight == null ? 0 : 1;
+                }
+                if (indRight == null) {
+                    return -1;
+                }
+                
+                return indLeft.getName().compareTo(indRight.getName());  
             } 
         }); 
     }
