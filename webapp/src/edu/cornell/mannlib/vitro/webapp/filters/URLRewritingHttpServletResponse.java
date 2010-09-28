@@ -27,6 +27,7 @@ import org.openrdf.model.URI;
 import org.openrdf.model.impl.URIImpl;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
+import edu.cornell.mannlib.vitro.webapp.dao.ApplicationDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapper;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapperFactory;
@@ -152,11 +153,12 @@ public class URLRewritingHttpServletResponse implements HttpServletResponse {
 						NamespaceMapper nsMap = NamespaceMapperFactory.getNamespaceMapper(_context);
 						try {
 							URI uri = new URIImpl(keyAndValue[1]);
-							if ( (uri.getNamespace() != null) && (uri.getLocalName() != null) ) { 
-								String prefix = nsMap.getPrefixForNamespace(uri.getNamespace());
-								String localName = uri.getLocalName();
+							String namespace = uri.getNamespace();
+							String localName = uri.getLocalName();
+							if ( (namespace != null) && (localName != null) ) { 
+								String prefix = nsMap.getPrefixForNamespace(namespace);
 								if (wadf.getDefaultNamespace().
-										equals(uri.getNamespace())
+										equals(namespace)
 										&& prefix == null) {
 									// make a URI that matches the URI
 									// of the resource to support
@@ -164,6 +166,21 @@ public class URLRewritingHttpServletResponse implements HttpServletResponse {
 									url.pathParts.add(localName);
 									// remove the ugly uri parameter
 									indexToRemove = qpIndex;
+								} else if (isExternallyLinkedNamespace(namespace)) {
+								    namespace = removeFinalSlash(namespace);
+								    log.debug("Found externally linked namespace " + namespace);
+								    // Use the externally linked namespace in the url
+								    url.pathParts = new ArrayList<String>();								    
+								    url.pathParts.add(namespace);
+								    url.pathParts.add(localName);
+								    // remove the ugly uri parameter
+								    indexToRemove = qpIndex;
+								    // remove protocol, host, and port, since the external namespace
+								    // includes these elements
+								    url.protocol = null;
+								    url.host = null;
+								    url.port = null;
+								    url.pathBeginsWithSlash = false;
 								} else if (prefix != null) {
 									// add the pretty path parts
 									url.pathParts.add(prefix);
@@ -449,9 +466,17 @@ public class URLRewritingHttpServletResponse implements HttpServletResponse {
 				str = StringEscapeUtils.escapeXml(str);
 			}
 			return str;
-		}
-		
+		}		
 	}
 	
+	private boolean isExternallyLinkedNamespace(String namespace) {
+	    namespace = removeFinalSlash(namespace);
+	    List<String> externallyLinkedNamespaces = wadf.getApplicationDao().getExternallyLinkedNamespaces();
+	    return externallyLinkedNamespaces.contains(namespace);
+	}
+	
+	private String removeFinalSlash(String str) {
+	    return str.replaceAll("/$", "");
+	}
 	
 }

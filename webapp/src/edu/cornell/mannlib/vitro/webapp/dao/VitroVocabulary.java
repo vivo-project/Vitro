@@ -34,6 +34,8 @@ public class VitroVocabulary {
     
     // an OWL DL-compatible surrogate for rdf:value for use with boxing idiom
     public static final String value = vitroURI + "value";
+    
+    public static final String DISPLAY = "http://vitro.mannlib.cornell.edu/ontologies/display/1.1#";
 
     // properties found on the beans
 

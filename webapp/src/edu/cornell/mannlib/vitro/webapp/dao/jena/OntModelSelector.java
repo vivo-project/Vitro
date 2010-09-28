@@ -42,4 +42,6 @@ public interface OntModelSelector {
 	 */
 	public OntModel getTBoxModel(String ontologyURI);
 	
+	public OntModel getDisplayModel();
+	
 }
