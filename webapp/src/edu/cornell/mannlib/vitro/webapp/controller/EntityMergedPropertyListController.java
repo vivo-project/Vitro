@@ -61,6 +61,7 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
     
     private static final Log log = LogFactory.getLog(EntityMergedPropertyListController.class.getName());
     private static final int MAX_GROUP_DISPLAY_RANK = 99;
+    private static final String VIVO_CORE_NAMESPACE = "http://vivoweb.org/ontology/core#";
     
     /** Don't include these properties in the list. */
     private static final Collection<String> SUPPRESSED_OBJECT_PROPERTIES = Collections
@@ -450,8 +451,7 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
             return 0;
         }
     }
-    
-    
+        
     private List<Property> collateBySubclass(List<Property> mergedPropertyList) {
         for( Property prop : mergedPropertyList){
             if( prop instanceof ObjectProperty ) {
@@ -463,8 +463,7 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
                     
                 }
             }
-        }    
-        
+        }            
         return mergedPropertyList;
     }
     
@@ -476,9 +475,13 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
      * asserted classes are used.
      */
     private void collateBySubclass(ObjectProperty prop) {
-        List<ObjectPropertyStatement> orgStmtList = prop.getObjectPropertyStatements();
-        if( orgStmtList == null )
-            return;        
+        
+        List<ObjectPropertyStatement> orgStmtList = getStatementsToCollate(prop);
+        
+        if( orgStmtList == null ) {
+            return;     
+        }
+        
         Map<String,VClass> directClasses = getDirectClasses( getObjectsFromStmts( orgStmtList ) );
         //don't do collateBySubclass if there is only one class
         if( directClasses.size() < 2 ) {
@@ -545,17 +548,47 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
             
     }
 
+    private List<ObjectPropertyStatement> getStatementsToCollate(ObjectProperty prop) {
+        List<ObjectPropertyStatement> statements = prop.getObjectPropertyStatements();
+
+        if (statements != null) {
+            String propertyUri = prop.getURI();
+            
+            if (propertyUri.equals(VIVO_CORE_NAMESPACE + "authorInAuthorship")) {
+                return getStatementsForRelatedIndividuals(statements, VIVO_CORE_NAMESPACE + "linkedInformationResource");
+            } 
+        }
+        return statements;        
+    }
+
+    private List<ObjectPropertyStatement> getStatementsForRelatedIndividuals(List<ObjectPropertyStatement> statements, String op) {
+        
+        List<ObjectPropertyStatement> relatedStatements = new ArrayList<ObjectPropertyStatement>(statements.size());
+
+        for (ObjectPropertyStatement statement : statements) {
+            Individual object = statement.getObject();
+            relatedStatements.add(object.getObjectPropertyStatements(op).get(0));
+        }
+
+        return relatedStatements;
+    }
+    
     private void sortStatements(ObjectProperty prop, List<ObjectPropertyStatement> statements) {
+        
+        if (statements.size() < 2) {
+            return;
+        }
         
         if (!applyCustomSort(prop, statements)) {
             Collections.sort(statements,
-                    new Comparator<ObjectPropertyStatement>() {
-                        public int compare(ObjectPropertyStatement o1,
-                                ObjectPropertyStatement o2) {
+                new Comparator<ObjectPropertyStatement>() {
+                    public int compare(ObjectPropertyStatement o1,
+                        ObjectPropertyStatement o2) {
                             return o1.getObject().getName().compareTo(
-                                    o2.getObject().getName());
+                                o2.getObject().getName());
                         }
-                    });            
+                }
+            );            
         }
     }
 
@@ -566,24 +599,25 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
     // one that does not involve hard-coded references to the VIVO ontology in the Vitro core.
     private boolean applyCustomSort(ObjectProperty prop, List<ObjectPropertyStatement> statements) {
         
-        String vivoCoreOntology = "http://vivoweb.org/ontology/core#";
         String propertyUri = prop.getURI();
         
         // Positions in an organization
-        if (propertyUri.equals(vivoCoreOntology + "organizationForPosition")) {            
-            sortByRelatedIndividualNames(statements, vivoCoreOntology + "positionForPerson");
+        if (propertyUri.equals(VIVO_CORE_NAMESPACE + "organizationForPosition")) {            
+            sortByRelatedIndividualName(statements, VIVO_CORE_NAMESPACE + "positionForPerson");
             return true;
         } 
   
         // Person's positions
-        if (propertyUri.equals(vivoCoreOntology + "personInPosition")) {
-            sortReverseChron(statements, vivoCoreOntology + "endYear", vivoCoreOntology + "startYear");
+        if (propertyUri.equals(VIVO_CORE_NAMESPACE + "personInPosition")) {
+            sortReverseChron(statements, VIVO_CORE_NAMESPACE + "endYear", VIVO_CORE_NAMESPACE + "startYear");
             return true;
         }    
        
         // Person's publications
-        if (propertyUri.equals(vivoCoreOntology + "authorInAuthorship")) {
-            sortByReverseChronAndRelatedIndividualName(statements, vivoCoreOntology + "year", vivoCoreOntology + "linkedInformationResource");
+        // Note that, due to the custom collation, the object property statements actually have predicate
+        // linkedInformationResource. The property being sorted is still authorInAuthorship, however.
+        if (propertyUri.equals(VIVO_CORE_NAMESPACE + "authorInAuthorship")) {
+            sortByYearAndName(statements, VIVO_CORE_NAMESPACE + "year");
             return true;
         }
     
@@ -611,16 +645,21 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
         final String startYearProperty = startYearPredicate;
         Collections.sort(statements, new Comparator<ObjectPropertyStatement>() { 
             public int compare(ObjectPropertyStatement left, ObjectPropertyStatement right) {
-                String endLeftValue = left.getObject().getDataValue(endYearProperty);                
+                
+                Individual objLeft = left.getObject();
+                
+                String endLeftValue = objLeft.getDataValue(endYearProperty);                
                 Integer endLeft = endLeftValue == null ? null : Integer.valueOf(endLeftValue);
 
-                String startLeftValue = left.getObject().getDataValue(startYearProperty);                
+                String startLeftValue = objLeft.getDataValue(startYearProperty);                
                 Integer startLeft = startLeftValue == null ? null : Integer.valueOf(startLeftValue);
                 
-                String endRightValue = right.getObject().getDataValue(endYearProperty);                
+                Individual objRight = right.getObject();
+                
+                String endRightValue = objRight.getDataValue(endYearProperty);                
                 Integer endRight = endRightValue == null ? null : Integer.valueOf(endRightValue);
 
-                String startRightValue = right.getObject().getDataValue(startYearProperty);                
+                String startRightValue = objRight.getDataValue(startYearProperty);                
                 Integer startRight = startRightValue == null ? null : Integer.valueOf(startRightValue);               
                 
                 // No sorting for entries with no start or end year - just put at the bottom in random order
@@ -662,26 +701,23 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
         }); 
     }
     
-    private void sortByReverseChronAndRelatedIndividualName(List<ObjectPropertyStatement> statements, 
-            String yearPredicate, String relatedIndividualPredicate) {
+    private void sortByYearAndName(List<ObjectPropertyStatement> statements, String yearPredicate) {
         // 1. Sort by year descending, nulls at end
-        // 2. If years are the same, sort by related individual (in the case of authorships, publication) name 
+        // 2. If years are the same, sort by name 
         final String yearProperty = yearPredicate;
-        final String relatedIndividualProperty = relatedIndividualPredicate;
         Collections.sort(statements, new Comparator<ObjectPropertyStatement>() { 
             public int compare(ObjectPropertyStatement left, ObjectPropertyStatement right) {        
 
-                Individual indLeft = left.getObject().getRelatedIndividual(relatedIndividualProperty);
-                Individual indRight = right.getObject().getRelatedIndividual(relatedIndividualProperty);
-                
+                Individual indLeft = left.getObject();
                 String leftYearValue = indLeft.getDataValue(yearProperty);                
                 Integer leftYear = leftYearValue == null ? null : Integer.valueOf(leftYearValue);
                 
+                Individual indRight = right.getObject();
                 String rightYearValue = indRight.getDataValue(yearProperty);                
                 Integer rightYear = rightYearValue == null ? null : Integer.valueOf(rightYearValue);
                 
                 // First sort by year, nulls at end
-                // But if both null, sort by publication name
+                // But if both null, sort by name
                 if ( ! (leftYear == null && rightYear == null) ) {
                     if (leftYear == null) {
                         return 1;
@@ -703,13 +739,22 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
     }
     
     // Sort statements by the name of the individual on the other side of the context node.
-    private void sortByRelatedIndividualNames(List<ObjectPropertyStatement> statements, String predicateUri) {
+    private void sortByRelatedIndividualName(List<ObjectPropertyStatement> statements, String predicateUri) {
         
         final String propertyUri = predicateUri;
         Collections.sort(statements, new Comparator<ObjectPropertyStatement>() { 
             public int compare(ObjectPropertyStatement left, ObjectPropertyStatement right) {
+                
                 Individual indLeft = left.getObject().getRelatedIndividual(propertyUri);
                 Individual indRight = right.getObject().getRelatedIndividual(propertyUri);
+                
+                if (indLeft == null) {
+                    return indRight == null ? 0 : 1;
+                }
+                if (indRight == null) {
+                    return -1;
+                }
+                
                 return indLeft.getName().compareTo(indRight.getName()); 
             } 
         }); 
