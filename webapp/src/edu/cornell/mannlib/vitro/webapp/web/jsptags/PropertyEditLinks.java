@@ -122,22 +122,9 @@ public class PropertyEditLinks extends TagSupport{
             contextPath = "/" + contextPath;
         
         if( item instanceof ObjectPropertyStatement ){
-            ObjectPropertyStatement prop = (ObjectPropertyStatement)item;    
-            
-            // rjy7 Another ugly hack to support collation of authorships by publication subclasses
-            // (NIHVIVO-1158). To display authorships this way, we've replaced the person-to-authorship
-            // statements with authorship-to-publication statements. Now we have to hack the edit links
-            // to edit the authorInAuthorship property statement rather than the linkedInformationResource 
-            // statement.
-            String propertyUri = prop.getPropertyURI();
-            if (propertyUri.equals("http://vivoweb.org/ontology/core#linkedInformationResource")) { 
-                String objectUri = prop.getSubjectURI();
-                String predicateUri = "http://vivoweb.org/ontology/core#authorInAuthorship";
-                String subjectUri = ((Individual)pageContext.getRequest().getAttribute("entity")).getURI();
-                prop = new ObjectPropertyStatementImpl(subjectUri, predicateUri, objectUri);                
-            }
-            
-            links = doObjPropStmt( prop, policyToAccess(ids, policy, prop), contextPath );  
+            ObjectPropertyStatement ops = (ObjectPropertyStatement)item;                
+            ops = getObjectPropertyStatementForCustomLinks(ops);            
+            links = doObjPropStmt( ops, policyToAccess(ids, policy, ops), contextPath );  
             
         } else if( item instanceof DataPropertyStatement ){
             DataPropertyStatement prop = (DataPropertyStatement)item;
@@ -210,6 +197,22 @@ public class PropertyEditLinks extends TagSupport{
         return SKIP_BODY;
     }
 
+    private ObjectPropertyStatement getObjectPropertyStatementForCustomLinks(ObjectPropertyStatement ops) {
+        // rjy7 Another ugly hack to support collation of authorships by publication subclasses
+        // (NIHVIVO-1158). To display authorships this way, we've replaced the person-to-authorship
+        // statements with authorship-to-publication statements. Now we have to hack the edit links
+        // to edit the authorInAuthorship property statement rather than the linkedInformationResource 
+        // statement.
+        String propertyUri = ops.getPropertyURI();
+        if (propertyUri.equals("http://vivoweb.org/ontology/core#linkedInformationResource")) { 
+            String objectUri = ops.getSubjectURI();
+            String predicateUri = "http://vivoweb.org/ontology/core#authorInAuthorship";
+            String subjectUri = ((Individual)pageContext.getRequest().getAttribute("entity")).getURI();
+            ops = new ObjectPropertyStatementImpl(subjectUri, predicateUri, objectUri);                
+        }
+        return ops;
+    }
+    
     protected LinkStruct[] doDataProp(DataProperty dprop, Individual entity, EditLinkAccess[] allowedAccessTypeArray, String contextPath) {
         if( allowedAccessTypeArray == null || dprop == null || allowedAccessTypeArray.length == 0 ) {
             log.debug("null or empty access type array in doDataProp for dprop "+dprop.getPublicName()+"; most likely just a property prohibited from editing");
