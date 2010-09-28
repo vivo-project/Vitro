@@ -65,3 +65,7 @@ ${scripts.add("/js/script1.js", "/js/script2.js", "/js/script3.js")}
 
 <@describe var="stylesheets" />
 
+<@describe var="scripts" />
+
+
+
