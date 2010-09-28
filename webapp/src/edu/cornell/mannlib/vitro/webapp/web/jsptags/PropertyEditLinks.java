@@ -43,7 +43,10 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.RdfLiteralHash;
 import edu.cornell.mannlib.vitro.webapp.filestorage.FileModelHelper;
 import edu.cornell.mannlib.vitro.webapp.utils.FrontEndEditingUtils;
@@ -119,7 +122,21 @@ public class PropertyEditLinks extends TagSupport{
             contextPath = "/" + contextPath;
         
         if( item instanceof ObjectPropertyStatement ){
-            ObjectPropertyStatement prop = (ObjectPropertyStatement)item;           
+            ObjectPropertyStatement prop = (ObjectPropertyStatement)item;    
+            
+            // rjy7 Another ugly hack to support collation of authorships by publication subclasses
+            // (NIHVIVO-1158). To display authorships this way, we've replaced the person-to-authorship
+            // statements with authorship-to-publication statements. Now we have to hack the edit links
+            // to edit the authorInAuthorship property statement rather than the linkedInformationResource 
+            // statement.
+            String propertyUri = prop.getPropertyURI();
+            if (propertyUri.equals("http://vivoweb.org/ontology/core#linkedInformationResource")) { 
+                String objectUri = prop.getSubjectURI();
+                String predicateUri = "http://vivoweb.org/ontology/core#authorInAuthorship";
+                String subjectUri = ((Individual)pageContext.getRequest().getAttribute("entity")).getURI();
+                prop = new ObjectPropertyStatementImpl(subjectUri, predicateUri, objectUri);                
+            }
+            
             links = doObjPropStmt( prop, policyToAccess(ids, policy, prop), contextPath );  
             
         } else if( item instanceof DataPropertyStatement ){
