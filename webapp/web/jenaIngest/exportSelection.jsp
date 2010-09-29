@@ -1,5 +1,13 @@
 <%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
 
+<%@ page import="java.util.List"%>
+<%@ page import="java.util.Iterator"%>
+<%@ page import="java.util.ArrayList"%>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.controller.VitroRequest"%>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Ontology"%>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.dao.OntologyDao"%>
+
+
 <div class="staticPageBackground">
 
 <h2> Export to RDF </h2>
@@ -10,10 +18,17 @@
     <li style="list-style-type:none;"><input type="radio" name="subgraph" checked="checked" value="full"/> Export entire RDF model (including application metadata)</li>
     <li style="list-style-type:none;"><input type="radio" name="subgraph" value="tbox"/> Export ontology/ontologies (TBox)</li>
     <li style="list-style-type:none;"><input type="radio" name="subgraph" value="abox"/> Export instance data (ABox)</li>
+    <%VitroRequest vreq = new VitroRequest(request);
+    OntologyDao daoObj = vreq.getFullWebappDaoFactory().getOntologyDao();
+    List ontologiesObj = daoObj.getAllOntologies();  
+    if(ontologiesObj !=null && ontologiesObj.size()>0){
+    	Iterator ontItr = ontologiesObj.iterator();
+    	while(ontItr.hasNext()){
+    		Ontology ont = (Ontology) ontItr.next();%>
+    		<li style="list-style-type:none;"><input type="radio" name="subgraph" value=<%=ont.getURI()%>/> <%=ont.getName()%></li>
+    	<%}}%> 
 </ul>
-
 <hr/>
-
 <ul>
     <li style="list-style-type:none;"><input type="radio" name="assertedOrInferred" checked="checked" value="asserted"/> Export only asserted statements </li>
     <li style="list-style-type:none;"><input type="radio" name="assertedOrInferred" value="inferred"/> Export only inferred statements </li>
