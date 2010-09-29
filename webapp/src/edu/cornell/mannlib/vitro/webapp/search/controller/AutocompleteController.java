@@ -4,18 +4,13 @@ package edu.cornell.mannlib.vitro.webapp.search.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -35,8 +30,6 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.WildcardQuery;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -44,13 +37,8 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreeMarkerHttpServ
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
 import edu.cornell.mannlib.vitro.webapp.search.SearchException;
-import edu.cornell.mannlib.vitro.webapp.search.beans.Searcher;
-import edu.cornell.mannlib.vitro.webapp.search.beans.VitroHighlighter;
-import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQuery;
-import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQueryFactory;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneIndexFactory;
-import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneIndexer;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup;
 import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
 import freemarker.template.Configuration;

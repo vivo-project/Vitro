@@ -593,7 +593,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
             try {
                 webappDaoFactory.getLinksDao().addLinksToIndividual( this );
             } catch (Exception e) {
-                log.error(this.getClass().getName()+" could not addLinksToIndividual for "+this.getURI());
+                log.debug(this.getClass().getName()+" could not addLinksToIndividual for "+this.getURI());
             }
             return this.linksList;
         }
@@ -606,7 +606,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
             try {
                 webappDaoFactory.getLinksDao().addPrimaryLinkToIndividual( this );
             } catch (Exception e) {
-                log.error(this.getClass().getName()+" could not addPrimaryLinkToIndividual for "+this.getURI());
+                log.debug(this.getClass().getName()+" could not addPrimaryLinkToIndividual for "+this.getURI());
             }
             return this.primaryLink;
         }
@@ -620,7 +620,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
             try {
                 this.setKeywords(webappDaoFactory.getIndividualDao().getKeywordsForIndividual(this.getURI()));
             } catch (Exception e) {
-                log.error(this.getClass().getName()+" could not getKeywords for "+this.getURI());
+                log.debug(this.getClass().getName()+" could not getKeywords for "+this.getURI());
             }
             return this.keywords;
         }

@@ -273,7 +273,7 @@ public void doGet( HttpServletRequest req, HttpServletResponse response )
            int entsAddedToTab = 0;
            int ii = (page-1)*entsPerTab;
            boolean doingRandom = false;
-           if(   !doAlphaFilter && !doPagedFilter && depth > 1 && "rand()".equalsIgnoreCase(tab.getEntitySortField())){
+           if(   !doAlphaFilter && !doPagedFilter && depth > 1 && size > 1 && "rand()".equalsIgnoreCase(tab.getEntitySortField())){
                doingRandom = true;
                ii = random.nextInt( size );
            }
@@ -530,15 +530,19 @@ public void doGet( HttpServletRequest req, HttpServletResponse response )
     private List<PageRecord> makePagesList( int count, int pageSize,  int selectedPage){        
         
         List<PageRecord> records = new ArrayList<PageRecord>( MAX_PAGES + 1 );
-        int requiredPages = count/pageSize ; //this might need to be a float or use Math.ceil()
-        if( selectedPage < MAX_PAGES && count/pageSize > MAX_PAGES ){
+        int requiredPages = count/pageSize ;
+        int remainder = count % pageSize ; 
+        if( remainder > 0 )
+            requiredPages++;
+        
+        if( selectedPage < MAX_PAGES && requiredPages > MAX_PAGES ){
             //the selected pages is within the first maxPages, just show the normal pages up to maxPages.
             for(int page = 1; page < requiredPages && page <= MAX_PAGES ; page++ ){
                 records.add( new PageRecord( "page=" + page, Integer.toString(page), Integer.toString(page), selectedPage == page ) );            
             }
             records.add( new PageRecord( "page="+ MAX_PAGES+1, Integer.toString(MAX_PAGES+1), "more...", false));
         }else if( requiredPages > MAX_PAGES && selectedPage+1 > MAX_PAGES && selectedPage < requiredPages - MAX_PAGES){
-          //the selected pages is in the middle of the list of page
+            //the selected pages is in the middle of the list of page
             int startPage = selectedPage - MAX_PAGES / 2;
             int endPage = selectedPage + MAX_PAGES / 2;            
             for(int page = startPage; page <= endPage ; page++ ){
@@ -553,9 +557,8 @@ public void doGet( HttpServletRequest req, HttpServletResponse response )
                 records.add( new PageRecord( "page=" + page, Integer.toString(page), Integer.toString(page), selectedPage == page ) );            
             }          
         }else{
-            //there are fewer than maxPages pages.
-            double max = Math.ceil(count/pageSize);
-            for(int i = 1; i <= max; i++ ){
+            //there are fewer than maxPages pages.            
+            for(int i = 1; i <= requiredPages; i++ ){
                 records.add( new PageRecord( "page=" + i, Integer.toString(i), Integer.toString(i), selectedPage == i ) );            
             }    
         }                

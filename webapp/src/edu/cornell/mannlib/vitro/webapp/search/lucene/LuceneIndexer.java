@@ -165,11 +165,14 @@ public class LuceneIndexer implements IndexerIface {
             log.info("ending index");
             if( writer != null )
                 writer.optimize();
-            
+                                    
             //close the searcher so it will find the newly indexed documents
             for( Searcher s : searchers){
                 s.close();
             }
+            //this is the call that replaces Searcher.close()
+            luceneIndexFactory.forceNewIndexSearcher();
+            
         } catch (IOException e) {
             log.error("LuceneIndexer.endIndexing() - "
                     + "unable to optimize lucene index: \n" + e);
@@ -254,23 +257,18 @@ public class LuceneIndexer implements IndexerIface {
      * clear the index by deleting the directory and make a new empty index.
      */
     public synchronized void clearIndex() throws IndexingException{
-//        if( indexing )
-//            throw new IndexingException("Cannot clear search index because an" +
-//            		"index rebuild in in progress.");        
+        
         log.debug("Clearing the index at "+indexDir);
         closeModifier();
         deleteDir(new File(indexDir));
-        
-        //might not be thread safe since searchers can try to open a new index
-//        for(LuceneSearcher s : searchers){
-//            s.close();
-//        }
         
         try {
             makeNewIndex();
             for(Searcher s : searchers){
                 s.close();
-            }            
+            }
+            //this is the call that replaces Searcher.close()
+            luceneIndexFactory.forceNewIndexSearcher();
         } catch (IOException e) {
             throw new IndexingException(e.getMessage());
         }

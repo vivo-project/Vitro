@@ -100,7 +100,8 @@ public class PagedSearchController extends VitroHttpServlet {
                 startIndex = Integer.parseInt(request.getParameter("startIndex")); 
             }catch (Throwable e) { 
                 startIndex = 0; 
-            }            
+            }      
+            log.debug("startIndex is " + startIndex);
             
             int hitsPerPage = defaultHitsPerPage;
             try{ 
@@ -108,6 +109,7 @@ public class PagedSearchController extends VitroHttpServlet {
             } catch (Throwable e) { 
                 hitsPerPage = defaultHitsPerPage; 
             }                        
+            log.debug("hitsPerPage is " + hitsPerPage);
             
             int maxHitSize = defaultMaxSearchSize;
             if( startIndex >= defaultMaxSearchSize - hitsPerPage )
@@ -116,6 +118,7 @@ public class PagedSearchController extends VitroHttpServlet {
                 maxHitSize = maxHitSize * 2;
                 hitsPerPage = maxHitSize;
             }
+            log.debug("maxHitSize is " + maxHitSize);
                         
             String qtxt = vreq.getParameter(VitroQuery.QUERY_PARAMETER_NAME);
             Analyzer analyzer = getAnalyzer(getServletContext());
@@ -145,7 +148,7 @@ public class PagedSearchController extends VitroHttpServlet {
                     doFailedSearch(request, response, msg, qtxt);
                     return;
                 }
-            }
+            }            
 
             if( topDocs == null || topDocs.scoreDocs == null){
                 log.error("topDocs for a search was null");                
@@ -173,11 +176,13 @@ public class PagedSearchController extends VitroHttpServlet {
                     if( (i >= startIndex) && (i <= lastHitToShow) ){                        
                         Document doc = searcherForRequest.doc(topDocs.scoreDocs[i].doc);                    
                         String uri = doc.get(Entity2LuceneDoc.term.URI);
-                        Individual ent = new IndividualImpl();
-                        ent.setURI(uri);
-                        ent = iDao.getIndividualByURI(uri);
-                        if(ent!=null)
+                        Individual ent = iDao.getIndividualByURI(uri);
+                        if(ent!=null){
                             beans.add(ent);
+                            log.debug("found individual for search hit in model" + uri );
+                        }else{
+                            log.debug("could not find individual for search hit in model " + uri);
+                        }
                     }
                 }catch(Exception e){
                     log.error("problem getting usable Individuals from search " +

@@ -2,7 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.search.lucene;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -12,15 +14,12 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.Term;
 import org.joda.time.DateTime;
-import org.openrdf.model.vocabulary.OWL;
 
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
-import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
-import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
 import edu.cornell.mannlib.vitro.webapp.search.docbuilder.Obj2DocIface;
 import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
@@ -327,18 +326,21 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         Long[] portalIds = FlagMathUtils.numeric2numerics( ent.getFlag1Numeric() );
         if( portalIds == null || portalIds.length == 0)
             return;
+                
+        log.debug("Flag 1 numeric: " + ent.getFlag1Numeric() + " for " + ent.getURI());
 
-//      System.out.print('\n'+"numeric: " + ent.getFlag1Numeric()
-//              + " " + Arrays.toString(portalIds) +" = ");
-//
         long id = -1;
         for( Long idLong : portalIds){
-            id = idLong.longValue();
-            String numericPortal = Long.toString(id);
-            doc.add( new Field(term.PORTAL,numericPortal,
-                    Field.Store.NO, Field.Index.NOT_ANALYZED));
-//          System.out.print(numericPortal+" ");
-        }/* end of portal id code */
+            if( idLong != null ){
+                id = idLong.longValue();
+                String numericPortal = Long.toString(id);
+                if( numericPortal != null ){
+                    doc.add( new Field(term.PORTAL,numericPortal,                    
+                            Field.Store.NO, Field.Index.NOT_ANALYZED));
+                    log.debug("adding portal " + numericPortal + " to " + ent.getURI());  
+                }
+            }
+        }                
     }
 
     @SuppressWarnings("static-access")
