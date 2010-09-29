@@ -178,9 +178,9 @@ public class EntityController extends VitroHttpServlet {
                     }
                 }
             }
-        } else {
-            log.error("Entity " + indiv.getURI() + " with vclass URI " +
-                    indiv.getVClassURI() + ", no vclass with that URI exists");
+        } else if (indiv.getVClassURI() != null) {
+            log.debug("Individual " + indiv.getURI() + " with class URI " +
+                    indiv.getVClassURI() + ": no class found with that URI");
         }
         if (customView!=null) {
             // insert test for whether a css files of the same name exists, and populate the customCss string for use when construction the header
