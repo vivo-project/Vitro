@@ -241,7 +241,7 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
                     for (Property p : mergedPropertyList) {
                         if (p instanceof ObjectProperty) {
                             ObjectProperty op = (ObjectProperty)p;
-                            applyCustomSortToUncollatedProperty(op, op.getObjectPropertyStatements());                           
+                            applyCustomSortToUncollatedProperty(op, op.getObjectPropertyStatements()); 
                         }
                     }
                 }
@@ -483,67 +483,73 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
         }
         
         Map<String,VClass> directClasses = getDirectClasses( getObjectsFromStmts( orgStmtList ) );
+        
         //don't do collateBySubclass if there is only one class
         if( directClasses.size() < 2 ) {
-            prop.setCollateBySubclass(false); //this overrides the value from the model         
-        }
-        else{
+            // rjy7 Removed this, so we still get the heading for the single populated subclass
+            //prop.setCollateBySubclass(false); //this overrides the value from the model 
+            // Still need to apply custom sort. Since we no longer set collateBySubclass to false,
+            // we won't know in applyCustomSortToUncollatedProperty whether the statements have
+            // been sorted or not, so we must do that now.
+            applyCustomSortToUncollatedStatements(prop, orgStmtList);
+        } else {
+
             log.debug("statements for object property: " + orgStmtList.size());         
             //get list of direct classes and sort them 
             List<VClass> vclasses = new LinkedList<VClass>(directClasses.values());
             Collections.sort(
-                    vclasses, 
-                    new Comparator<VClass>(){
-                        public int compare(VClass o1, VClass o2) {
-                            return o1.getName().compareTo(o2.getName());
-                        }
-                    });
-            
+                vclasses, 
+                new Comparator<VClass>(){
+                    public int compare(VClass o1, VClass o2) {
+                        return o1.getName().compareTo(o2.getName());
+                    }
+                });
+        
             //order object property statements by sorted direct class list
             List<ObjectPropertyStatement> sortedStmtList = new LinkedList<ObjectPropertyStatement>();
             for (VClass clazz : vclasses) {
                 // get all obj prop stmts with objects of this class
                 List<ObjectPropertyStatement> stmtsForClass = new ArrayList<ObjectPropertyStatement>();
-                
+            
                 log.debug("statements for object property: " + orgStmtList.size());
                 Iterator<ObjectPropertyStatement> it = orgStmtList.iterator();
                 while( it.hasNext()){
                     ObjectPropertyStatement stmt = it.next();
                     //if (stmt.getObject().getVClasses(true).contains(clazz)) {
-                    
+                
                     Individual obj = stmt.getObject();
                     List<VClass> vclassesForObj = obj.getVClasses(true);                    
                     if (vclassesForObj != null && vclassesForObj.contains(clazz)) {
                         log.debug("adding " + stmt + " to class "
-                                + clazz.getURI());
+                            + clazz.getURI());
                         log.debug("subjectURI " + stmt.getSubjectURI()
-                                + " objectURI" + stmt.getObject().getURI());
+                            + " objectURI" + stmt.getObject().getURI());
                         log.debug("stmtsForclass size: "
-                                + stmtsForClass.size());                        
+                            + stmtsForClass.size());                        
                         log.debug("stmtsForclass size: "
-                                + stmtsForClass.size());
-                        
+                            + stmtsForClass.size());
+                    
                         stmtsForClass.add(stmt);
                     }
                 }
-                
+            
                 //bdc34: What do we do if a object individual is directly asserted to two different
                 //types?  For now we just show them in whichever type shows up first. related to NIHVIVO-876
                 orgStmtList.removeAll(stmtsForClass);   
-                
+            
                 sortStatements(prop, stmtsForClass);
-                
+            
                 log.debug("stmtsForclass size after sort: "
-                        + stmtsForClass.size());
+                    + stmtsForClass.size());
                 log.debug("sortedStmtList size before add: "
-                        + sortedStmtList.size());
-                
+                    + sortedStmtList.size());
+            
                 sortedStmtList.addAll(stmtsForClass);
-                
+            
                 log.debug("sortedStmtList size after add: "
-                        + sortedStmtList.size());
+                    + sortedStmtList.size());
             }
-            prop.setObjectPropertyStatements(sortedStmtList);
+            prop.setObjectPropertyStatements(sortedStmtList);       
         }
             
     }
@@ -623,17 +629,18 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
     
         return false;
     }
+    
+    private void applyCustomSortToUncollatedProperty(ObjectProperty op, List<ObjectPropertyStatement> opStmts) {
+        if (!op.getCollateBySubclass()) {
+            applyCustomSortToUncollatedStatements(op, opStmts);
+        }        
+    }
 
     // Apply custom sorting to an uncollated property. If the property is collated, the custom sorting has already
     // been applied to each subclass listing individually.
-    private void applyCustomSortToUncollatedProperty(ObjectProperty op, List<ObjectPropertyStatement> opStmts) {
-        // This includes the case where the ontology doesn't specify collating, as well as the case
-        // where we don't collate because only one subclass is populated, since then we've set
-        // the collation value to false.
-        if (!op.getCollateBySubclass()) {
-            if (applyCustomSort(op, opStmts)) {
-                op.setObjectPropertyStatements(opStmts);
-            }
+    private void applyCustomSortToUncollatedStatements(ObjectProperty op, List<ObjectPropertyStatement> opStmts) {
+        if (applyCustomSort(op, opStmts)) {
+            op.setObjectPropertyStatements(opStmts);
         }
     }
     
