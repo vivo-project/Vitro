@@ -45,7 +45,7 @@ public class ApplicationDaoJena extends JenaBaseDao implements ApplicationDao {
 
 
     public List<String> getExternallyLinkedNamespaces() {
-        //if (externallyLinkedNamespaces == null) {            
+        if (externallyLinkedNamespaces == null) {            
             externallyLinkedNamespaces = new ArrayList<String>();
             OntModel ontModel = getOntModelSelector().getDisplayModel();
             Property linkedNamespaceProp = ontModel.getProperty(VitroVocabulary.DISPLAY + "linkedNamespace");
@@ -57,7 +57,7 @@ public class ApplicationDaoJena extends JenaBaseDao implements ApplicationDao {
                     externallyLinkedNamespaces.add(namespace);
                 }
             }
-       // }
+        }
         return externallyLinkedNamespaces;
     }
     
