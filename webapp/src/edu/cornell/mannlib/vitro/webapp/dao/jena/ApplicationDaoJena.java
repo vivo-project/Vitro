@@ -2,19 +2,23 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
-import java.util.Collection;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.rdf.model.Literal;
+import com.hp.hpl.jena.rdf.model.NodeIterator;
+import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.dao.ApplicationDao;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 public class ApplicationDaoJena extends JenaBaseDao implements ApplicationDao {
 
 	Integer portalCount = null;
+	List<String> externallyLinkedNamespaces = null;
 	
     public ApplicationDaoJena(WebappDaoFactoryJena wadf) {
         super(wadf);
@@ -39,4 +43,22 @@ public class ApplicationDaoJena extends JenaBaseDao implements ApplicationDao {
 		return (getFlag2ValueMap().isEmpty()) ? false : true;
 	}
 
+
+    public List<String> getExternallyLinkedNamespaces() {
+        if (externallyLinkedNamespaces == null) {            
+            externallyLinkedNamespaces = new ArrayList<String>();
+            OntModel ontModel = getOntModelSelector().getDisplayModel();
+            Property linkedNamespaceProp = ontModel.getProperty(VitroVocabulary.DISPLAY + "linkedNamespace");
+            NodeIterator nodes = ontModel.listObjectsOfProperty(linkedNamespaceProp);
+            while (nodes.hasNext()) {
+                RDFNode node = nodes.next();
+                if (node.isLiteral()) {
+                    String namespace = ((Literal)node).getLexicalForm();
+                    externallyLinkedNamespaces.add(namespace);
+                }
+            }
+        }
+        return externallyLinkedNamespaces;
+    }
+    
 }
