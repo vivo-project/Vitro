@@ -406,14 +406,6 @@ public class PagedSearchController extends VitroHttpServlet {
                 return null;
             }               
             QueryParser parser = getQueryParser(analyzer);
-            
-            // Prevent org.apache.lucene.queryParser.ParseException: 
-            // Cannot parse 'mary *': '*' or '?' not allowed as first character in WildcardQuery     
-            // The * is redundant in this case anyway, so just remove it.
-            log.debug("Query string is '" + querystr + "'");
-            querystr = querystr.replaceAll("([\\s^])[?*]", "$1");
-            log.debug("Cleaned query string is '" + querystr + "'");
-            
             query = parser.parse(querystr);
 
             String alpha = request.getParameter("alpha");
