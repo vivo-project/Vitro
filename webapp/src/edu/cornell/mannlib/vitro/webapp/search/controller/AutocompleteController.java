@@ -255,16 +255,23 @@ public class AutocompleteController extends FreeMarkerHttpServlet{
         // of wildcard and non-wildcard queries. The query will look have only an implicit disjunction
         // operator: e.g., +(name:tales name:tales*)
         try {
-            Query query = parser.parse(querystr);
+            // Prevent org.apache.lucene.queryParser.ParseException: 
+            // Cannot parse 'mary *': '*' or '?' not allowed as first character in WildcardQuery     
+            // The * is redundant in this case anyway, so just remove it.
+            log.debug("Query string is '" + querystr + "'");
+            querystr = querystr.replaceAll("([\\s^])[?*]", "$1");
+            log.debug("Cleaned query string is '" + querystr + "'");
+
             log.debug("Adding non-wildcard query for " + querystr);
+            Query query = parser.parse(querystr);  
             boolQuery.add(query, BooleanClause.Occur.SHOULD);
 
-            Query wildcardQuery = parser.parse(querystr + "*");
             log.debug("Adding wildcard query for " + querystr);
+            Query wildcardQuery = parser.parse(querystr + "*");            
             boolQuery.add(wildcardQuery, BooleanClause.Occur.SHOULD);
             
             log.debug("Name query is: " + boolQuery.toString());
-;        } catch (ParseException e) {
+        } catch (ParseException e) {
             log.error(e, e);
         }
         
