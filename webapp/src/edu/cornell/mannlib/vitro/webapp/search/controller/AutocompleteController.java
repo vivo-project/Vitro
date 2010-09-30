@@ -296,7 +296,7 @@ public class AutocompleteController extends FreemarkerHttpServlet implements Sea
             
             log.debug("Name query is: " + boolQuery.toString());
         } catch (ParseException e) {
-            log.error(e, e);
+            log.warn(e);
         }
         
         
