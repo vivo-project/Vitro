@@ -288,9 +288,13 @@ public class AutocompleteController extends BaseSearchController implements Sear
             Query query = parser.parse(querystr);  
             boolQuery.add(query, BooleanClause.Occur.SHOULD);
 
-            log.debug("Adding wildcard query for " + querystr);
-            Query wildcardQuery = parser.parse(querystr + "*");            
-            boolQuery.add(wildcardQuery, BooleanClause.Occur.SHOULD);
+            // Prevent ParseException here when adding * after a space.
+            // If there's a space at the end, we don't need the wildcard query.
+            if (! querystr.endsWith(" ")) {
+                log.debug("Adding wildcard query for " + querystr);
+                Query wildcardQuery = parser.parse(querystr + "*");            
+                boolQuery.add(wildcardQuery, BooleanClause.Occur.SHOULD);
+            }
             
             log.debug("Name query is: " + boolQuery.toString());
         } catch (ParseException e) {
