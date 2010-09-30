@@ -59,7 +59,7 @@ import freemarker.template.Configuration;
  * through a Lucene search. 
  */
 
-public class AutocompleteController extends BaseSearchController implements Searcher{
+public class AutocompleteController extends FreemarkerHttpServlet implements Searcher{
 
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(AutocompleteController.class);
@@ -282,8 +282,6 @@ public class AutocompleteController extends BaseSearchController implements Sear
         // of wildcard and non-wildcard queries. The query will look have only an implicit disjunction
         // operator: e.g., +(name:tales name:tales*)
         try {
-            querystr = cleanQueryString(querystr);
-
             log.debug("Adding non-wildcard query for " + querystr);
             Query query = parser.parse(querystr);  
             boolQuery.add(query, BooleanClause.Occur.SHOULD);
