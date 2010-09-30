@@ -59,7 +59,7 @@ import freemarker.template.Configuration;
  * through a Lucene search. 
  */
 
-public class AutocompleteController extends FreemarkerHttpServlet implements Searcher{
+public class AutocompleteController extends BaseSearchController implements Searcher{
 
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(AutocompleteController.class);
@@ -282,12 +282,7 @@ public class AutocompleteController extends FreemarkerHttpServlet implements Sea
         // of wildcard and non-wildcard queries. The query will look have only an implicit disjunction
         // operator: e.g., +(name:tales name:tales*)
         try {
-            // Prevent org.apache.lucene.queryParser.ParseException: 
-            // Cannot parse 'mary *': '*' or '?' not allowed as first character in WildcardQuery     
-            // The * is redundant in this case anyway, so just remove it.
-            log.debug("Query string is '" + querystr + "'");
-            querystr = querystr.replaceAll("([\\s^])[?*]", "$1");
-            log.debug("Cleaned query string is '" + querystr + "'");
+            querystr = cleanQueryString(querystr);
 
             log.debug("Adding non-wildcard query for " + querystr);
             Query query = parser.parse(querystr);  

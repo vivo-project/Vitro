@@ -83,7 +83,7 @@ import freemarker.template.Configuration;
  * Rewritten to use Freemarker: rjy7
  *
  */
-public class FreemarkerPagedSearchController extends FreemarkerHttpServlet implements Searcher {
+public class FreemarkerPagedSearchController extends BaseSearchController implements Searcher {
 
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(FreemarkerPagedSearchController.class.getName());
@@ -524,6 +524,8 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
                 return null;
             }               
             QueryParser parser = getQueryParser(analyzer);
+            
+            querystr = cleanQueryString(querystr);
             query = parser.parse(querystr);
 
             String alpha = request.getParameter("alpha");
