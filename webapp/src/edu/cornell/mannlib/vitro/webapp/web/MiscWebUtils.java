@@ -42,7 +42,7 @@ public class MiscWebUtils {
     //         try{
     //             current.store(System.out,"header from store");
     //         }catch( Exception ex){
-    //             System.out.println("exception in utilBean");
+    //             log.debug("exception in utilBean");
     //         }
 
             Enumeration names = req.getParameterNames();
@@ -50,10 +50,10 @@ public class MiscWebUtils {
             String name = null;
             while( names.hasMoreElements() ){
                 name = (String)names.nextElement();
-    //             System.out.println("parameter name: " + name);
+    //             log.debug("parameter name: " + name);
                 value = req.getParameter( name );
                 if( value != null ){
-    //                 System.out.println("*** current set " + name + " to " + value );
+    //                 log.debug("*** current set " + name + " to " + value );
                         current.setProperty(name,value);
                 }
 
@@ -92,10 +92,13 @@ public class MiscWebUtils {
     // from a superclass may not have been inferred yet.
 
 	public static String getCustomShortView(Individual individual, HttpServletRequest request) {
+	if( individual == null ) return null;
+
         VitroRequest vreq = new VitroRequest(request);
-        VClassDao vcDao = vreq.getWebappDaoFactory().getVClassDao();
-        
-	    String customShortView = null;
+        VClassDao vcDao = vreq.getWebappDaoFactory().getVClassDao();	
+       log.debug("searching for custom short view for " + individual.getURI()); 
+
+	String customShortView = null;
         List<VClass> vclasses = individual.getVClasses(true); // get directly
         // asserted vclasses
         Set<String> superClasses = new HashSet<String>();
@@ -106,9 +109,11 @@ public class MiscWebUtils {
         // RY If we're getting the custom short view with reference to an object property.
         // should we use the property's getRangeVClass() method instead?
         for (VClass vclass : vclasses) {
+	    log.debug( vclass.getURI() );
             // Use this class's custom short view, if there is one
             customShortView = vclass.getCustomShortView();
             if (customShortView != null) {
+		log.debug( customShortView );
                 return customShortView;
             }
             // Otherwise, add superclass to list of vclasses to check for custom
@@ -119,10 +124,13 @@ public class MiscWebUtils {
         
         // Next try super classes. There is no useful decision mechanism for
         // the case where two super classes have a custom short view.
+	log.debug("checking superclasses for custom short view");
         for (String superClassUri : superClasses) {
             VClass vc = vcDao.getVClassByURI(superClassUri);
             customShortView = vc.getCustomShortView();
+		log.debug(vc.getURI());
             if (customShortView != null) {
+		log.debug(customShortView);
                 return customShortView;
             }
         }
@@ -233,17 +241,17 @@ public class MiscWebUtils {
 	    Enumeration hnames = req.getHeaderNames();
 	    while( hnames.hasMoreElements() ){
 	    	String name = (String) hnames.nextElement();
-	    	System.out.println("header " + name);
+	    	log.debug("header " + name);
 	    	String value = req.getHeader(name);
-	    	System.out.println("    " + value);
+	    	log.debug("    " + value);
 	    	Enumeration values = req.getHeaders(name);
 	    	if( values == null ){
-	    		System.out.println("    enumeration was null");            		
+	    		log.debug("    enumeration was null");            		
 	    	}else{
-	    		System.out.println("    enumeration values");
+	    		log.debug("    enumeration values");
 	    		while( values.hasMoreElements() ){
 	    			String val = (String) values.nextElement();
-	    			System.out.println("    " + value);
+	    			log.debug("    " + value);
 	    		}
 	    	}            
 	    }
