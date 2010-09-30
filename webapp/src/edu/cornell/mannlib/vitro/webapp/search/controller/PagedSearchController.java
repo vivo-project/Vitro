@@ -169,17 +169,22 @@ public class PagedSearchController extends VitroHttpServlet {
                 lastHitToShow = hitsLength;
             else
                 lastHitToShow = startIndex + hitsPerPage - 1;
-                    
+            
             List<Individual> beans = new LinkedList<Individual>();                        
-            for(int i=startIndex; i<topDocs.scoreDocs.length ;i++){
+            for(int i=startIndex; i<topDocs.scoreDocs.length ;i++){            
                 try{
                     if( (i >= startIndex) && (i <= lastHitToShow) ){                        
                         Document doc = searcherForRequest.doc(topDocs.scoreDocs[i].doc);                    
                         String uri = doc.get(Entity2LuceneDoc.term.URI);
                         Individual ent = iDao.getIndividualByURI(uri);
-                        if(ent!=null){
-                            beans.add(ent);
-                            log.debug("found individual for search hit in model" + uri );
+                        if(ent != null ){
+                            List<VClass>vcs = ent.getVClasses() ;
+                            if( vcs != null && !vcs.isEmpty() ){
+                                beans.add(ent);                                
+                                log.debug("found individual for search hit in model" + uri );
+                            }else{
+                                log.debug("filtered out classless individual from search results" + uri);
+                            }
                         }else{
                             log.debug("could not find individual for search hit in model " + uri);
                         }
