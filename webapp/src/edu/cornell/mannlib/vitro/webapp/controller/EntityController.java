@@ -41,10 +41,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
-import edu.cornell.mannlib.vitro.webapp.filestorage.FileModelHelper;
-import edu.cornell.mannlib.vitro.webapp.filestorage.FileServingHelper;
-import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorage;
-import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup;
+import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
 import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQuery;
 import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQueryWrapper;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapper;
@@ -102,7 +99,7 @@ public class EntityController extends VitroHttpServlet {
             }
 
             // If this is an uploaded file, redirect to its "alias URL".
-            String aliasUrl = getAliasUrlForBytestreamIndividual(indiv);
+            String aliasUrl = getAliasUrlForBytestreamIndividual(req, indiv);
             if (aliasUrl != null) {
             	res.sendRedirect(req.getContextPath() + aliasUrl);
             	return;
@@ -230,7 +227,7 @@ public class EntityController extends VitroHttpServlet {
         if(  indiv.getURI().startsWith( vreq.getWebappDaoFactory().getDefaultNamespace() )){        	
         	vreq.setAttribute("entityLinkedDataURL", indiv.getURI() + "/" + indiv.getLocalName() + ".rdf");	
         }
-
+        
         vreq.setAttribute("css",css);
         vreq.setAttribute("scripts", "/templates/entity/entity_inject_head.jsp");
 
@@ -269,21 +266,14 @@ public class EntityController extends VitroHttpServlet {
 		newModel.write( res.getOutputStream(), format );		
 	}
 
-    private void doRedirect(HttpServletRequest req, HttpServletResponse res,
-            String redirectURL) {
-        //It seems like there must be a more standard way to do a redirect in tomcat.
-        String hn = req.getHeader("Host");
-        if (req.isSecure()) {
-            res.setHeader("Location", res.encodeURL("https://" + hn
-                    + req.getContextPath() + redirectURL));
-            log.info("doRedirect by using HTTPS");
-        } else {
-            res.setHeader("Location", res.encodeURL("http://" + hn
-                    + req.getContextPath() + redirectURL));
-            log.info("doRedirect by using HTTP");
-        }
-        res.setStatus(res.SC_SEE_OTHER);
-    }
+	private void doRedirect(HttpServletRequest req, HttpServletResponse res,
+			String redirectURL) {	
+		// It seems like there must be a better way to do this
+		String hn = req.getHeader("Host");		
+    	res.setHeader("Location", res.encodeURL( "http://" + hn + req.getContextPath() + redirectURL ));
+    	res.setStatus(res.SC_SEE_OTHER);		
+	}
+
 
 	private static Pattern LINKED_DATA_URL = Pattern.compile("^/individual/([^/]*)$");		
 	private static Pattern NS_PREFIX_URL = Pattern.compile("^/individual/([^/]*)/([^/]*)$");
@@ -491,39 +481,16 @@ public class EntityController extends VitroHttpServlet {
 	 * If this entity represents a File Bytestream, get its alias URL so we can
 	 * properly serve the file contents.
 	 */
-	private String getAliasUrlForBytestreamIndividual(Individual entity)
+	private String getAliasUrlForBytestreamIndividual(HttpServletRequest req, Individual entity)
 			throws IOException {
-		if (!FileModelHelper.isFileBytestream(entity)) {
-			log.debug("Entity at '" + entity.getURI()
-					+ "' is not recognized as a FileByteStream.");
+		FileInfo fileInfo = FileInfo.instanceFromBytestreamUri(new VitroRequest(
+				req).getWebappDaoFactory(), entity.getURI());
+		if (fileInfo == null) {
+			log.trace("Entity '" + entity.getURI() + "' is not a bytestream.");
 			return null;
 		}
 
-		FileStorage fs = (FileStorage) getServletContext().getAttribute(
-				FileStorageSetup.ATTRIBUTE_NAME);
-		if (fs == null) {
-			log.error("Servlet context does not contain file storage at '"
-					+ FileStorageSetup.ATTRIBUTE_NAME + "'");
-			return null;
-		}
-
-		String filename = fs.getFilename(entity.getURI());
-		if (filename == null) {
-			log.error("Entity at '" + entity.getURI()
-					+ "' is recognized as a FileByteStream, "
-					+ "but the file system does not recognize it.");
-			return null;
-		}
-
-		String url = FileServingHelper.getBytestreamAliasUrl(entity.getURI(),
-				filename);
-		if (url.equals(entity.getURI())) {
-			log.error("Entity at '" + entity.getURI()
-					+ "' is recognized as a FileByteStream, "
-					+ "but can't be translated to an alias URL.");
-			return null;
-		}
-
+		String url = fileInfo.getBytestreamAliasUrl();
 		log.debug("Alias URL for '" + entity.getURI() + "' is '" + url + "'");
 		return url;
 	}
