@@ -39,7 +39,6 @@ import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
-import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Classes2Classes;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
@@ -64,8 +63,8 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
     
     /* ************************************************** */
     
-    private String getLabelForClass(OntClass cls,boolean withPrefix,boolean forPickList) {
-    	getOntModel().enterCriticalSection(Lock.READ);
+    public String getLabelForClass(OntClass cls,boolean withPrefix,boolean forPickList) {
+    	cls.getModel().enterCriticalSection(Lock.READ);
     	try {
 	    	if (cls.isAnon()) {
 		    	if (cls.isRestriction()) {	    		
@@ -171,7 +170,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
     	} catch (Exception e) {
     		return "???";
     	} finally {
-    		getOntModel().leaveCriticalSection();
+    		cls.getModel().leaveCriticalSection();
     	}
     }
 

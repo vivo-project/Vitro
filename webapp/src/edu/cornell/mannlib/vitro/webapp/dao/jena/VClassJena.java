@@ -14,6 +14,7 @@ import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
+import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 /**
@@ -44,6 +45,7 @@ public class VClassJena extends VClass {
     /**
      * What this VClass is called
      */
+    @Override
     public String getName() {
     	
         if (this.myName != null) {
@@ -51,20 +53,74 @@ public class VClassJena extends VClass {
         } else {
             cls.getOntModel().enterCriticalSection(Lock.READ);
             try {
-                this.myName = webappDaoFactory.getJenaBaseDao().getLabelOrId(cls);
-                if (this.myName == null) {
-                    this.myName = "[null]";
+                VClassDao vClassDao = webappDaoFactory.getVClassDao();
+                
+                if (vClassDao instanceof VClassDaoJena) {
+                	this.myName = ((VClassDaoJena) vClassDao).getLabelForClass(cls,false,false);
+                } else {
+                    log.error("WebappDaoFactory returned a type of " + vClassDao.getClass().getName() + ". Expected  VClassDaoJena");
+                    this.myName = webappDaoFactory.getJenaBaseDao().getLabelOrId(cls);
                 }
+                         
                 return this.myName;
             } finally {
                 cls.getOntModel().leaveCriticalSection();
             }
         }
     }
-     
+    
+    @Override
+    public String getLocalNameWithPrefix() {
+    	
+        if (this.localNameWithPrefix != null) {
+            return localNameWithPrefix;
+        } else {
+            cls.getOntModel().enterCriticalSection(Lock.READ);
+            try {
+                VClassDao vClassDao = webappDaoFactory.getVClassDao();
+                
+                if (vClassDao instanceof VClassDaoJena) {
+                	this.localNameWithPrefix = ((VClassDaoJena) vClassDao).getLabelForClass(cls,true,false);
+                } else {
+                    log.error("WebappDaoFactory returned a type of " + vClassDao.getClass().getName() + ". Expected  VClassDaoJena");
+                    this.localNameWithPrefix = webappDaoFactory.getJenaBaseDao().getLabelOrId(cls);
+                }
+                      
+                return this.localNameWithPrefix;
+            } finally {
+                cls.getOntModel().leaveCriticalSection();
+            }
+        }
+    }
+    
+    @Override
+    public String getPickListName() {
+    	
+        if (this.pickListName != null) {
+            return pickListName;
+        } else {
+            cls.getOntModel().enterCriticalSection(Lock.READ);
+            try {
+                VClassDao vClassDao = webappDaoFactory.getVClassDao();
+                
+                if (vClassDao instanceof VClassDaoJena) {
+                	this.pickListName = ((VClassDaoJena) vClassDao).getLabelForClass(cls,false,true);
+                } else {
+                    log.error("WebappDaoFactory returned a type of " + vClassDao.getClass().getName() + ". Expected  VClassDaoJena");
+                    this.pickListName = webappDaoFactory.getJenaBaseDao().getLabelOrId(cls);
+                }
+                                      
+                return this.pickListName;
+            } finally {
+                cls.getOntModel().leaveCriticalSection();
+            }
+        }
+    }
+
     /**
      * An example member of this VClass
      */
+    @Override
     public  String getExample()  {
     	
         if (this.myExample != null) {
@@ -83,6 +139,7 @@ public class VClassJena extends VClass {
     /**
      * Information about the type of information expected of a member of this VClass
      */
+    @Override
     public  String getDescription()  {
     	
         if (this.myDescription != null) {
@@ -98,6 +155,7 @@ public class VClassJena extends VClass {
         }
     }
    
+    @Override
     public  String getShortDef()  {
     	
         if (this.myShortDefinition != null) {
@@ -113,6 +171,7 @@ public class VClassJena extends VClass {
         }		
     }
        
+    @Override
     public  int  getDisplayLimit() {
     	
         if (this.displayLimit != null) {
@@ -128,6 +187,7 @@ public class VClassJena extends VClass {
         }		 	 	
     }
    
+    @Override
     public  int  getDisplayRank()  {
     	
         if (this.displayRank != null) {
@@ -143,6 +203,7 @@ public class VClassJena extends VClass {
         }		 	    
     }
    
+    @Override
     public String  getGroupURI()  {
     	
         if (this.groupURI != null) {
@@ -167,6 +228,7 @@ public class VClassJena extends VClass {
         }		 	         
     }
     
+    @Override
     public  String getCustomEntryForm()  {
     	
         if (this.customEntryForm != null) {
@@ -182,6 +244,7 @@ public class VClassJena extends VClass {
         }		       
     }
     
+    @Override
     public  String getCustomDisplayView()  {
     	
         if (this.customDisplayView != null) {
@@ -197,6 +260,7 @@ public class VClassJena extends VClass {
         }		        	
     }
     
+    @Override
     public  String getCustomShortView() { 
     	
         if (this.customShortView != null) {
@@ -212,6 +276,7 @@ public class VClassJena extends VClass {
         }		        	   		
     }
     
+    @Override
     public  String getCustomSearchView() {
     	
         if (this.customSearchView != null) {
@@ -227,6 +292,7 @@ public class VClassJena extends VClass {
         }		        	   		
     }
         
+    @Override
     public Float getSearchBoost() {
     	
         if (this.searchBoost != null) {
@@ -242,6 +308,7 @@ public class VClassJena extends VClass {
         }		 	    
     } 
     
+    @Override
     public RoleLevel getHiddenFromDisplayBelowRoleLevel() {
        
         if (this.hiddenFromDisplayBelowRoleLevel != null) {
@@ -276,6 +343,7 @@ public class VClassJena extends VClass {
         }		 	               
     }
     
+    @Override
     public RoleLevel getProhibitedFromUpdateBelowRoleLevel() {
         
         if (this.prohibitedFromUpdateBelowRoleLevel != null) {
