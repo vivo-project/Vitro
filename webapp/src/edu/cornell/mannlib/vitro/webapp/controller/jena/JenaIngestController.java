@@ -736,10 +736,8 @@ public class JenaIngestController extends BaseEditController {
         	VitroJenaSDBModelMaker vjmm = new VitroJenaSDBModelMaker(store);
         	vreq.getSession().setAttribute("vitroJenaModelMaker",vjmm);
 		} else {
-			DBConnection dbConn = new DBConnection(jdbcUrl,username,password,dbType);
 			System.out.println("Connecting to DB at "+jdbcUrl);
-	        ModelMaker mMaker = ModelFactory.createModelRDBMaker(dbConn);
-	        VitroJenaModelMaker vjmm = new VitroJenaModelMaker(mMaker);
+	        VitroJenaModelMaker vjmm = new VitroJenaModelMaker(jdbcUrl, username, password, dbType);
 	        vreq.getSession().setAttribute("vitroJenaModelMaker",vjmm);
 		}
 	}

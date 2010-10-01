@@ -80,7 +80,7 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
 	   return makeDBModel(ds, jenaDbModelName, jenaDbOntModelSpec);
    }
 
-   protected BasicDataSource makeBasicDataSource(String dbDriverClassname, String jdbcUrl, String username, String password) {
+   public static BasicDataSource makeBasicDataSource(String dbDriverClassname, String jdbcUrl, String username, String password) {
 	   log.debug("makeBasicDataSource('" + dbDriverClassname + "', '"
 				+ jdbcUrl + "', '" + username + "', '" + password + "')");
 	   BasicDataSource ds = new BasicDataSource();

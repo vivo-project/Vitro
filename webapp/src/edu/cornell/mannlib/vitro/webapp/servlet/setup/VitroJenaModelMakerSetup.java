@@ -33,8 +33,8 @@ public class VitroJenaModelMakerSetup implements ServletContextListener {
 			String password = ConfigurationProperties.getProperty("VitroConnection.DataSource.password");
 				
 			DBConnection dbConn = new DBConnection(jdbcUrl, username, password, DB_TYPE);
-			ModelMaker mMaker = ModelFactory.createModelRDBMaker(dbConn);
-			VitroJenaModelMaker vjmm = new VitroJenaModelMaker(mMaker);
+			;
+			VitroJenaModelMaker vjmm = new VitroJenaModelMaker(jdbcUrl, username, password, DB_TYPE);
 			arg0.getServletContext().setAttribute("vitroJenaModelMaker", vjmm);
 			log.debug("VitroJenaModelMaker set up");
 		} catch (Throwable t) {
