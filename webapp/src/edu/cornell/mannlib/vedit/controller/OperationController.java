@@ -174,14 +174,17 @@ public class OperationController extends BaseEditController {
     }
     
     private void retry(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String referer = request.getHeader("Referer");
-        int epoKeyIndex = referer.indexOf("_epoKey");
-        if (epoKeyIndex<0)
-            response.sendRedirect(referer+"&_epoKey="+request.getParameter("_epoKey"));
-        else{
-            String url = referer.substring(0,epoKeyIndex) + "_epoKey="+request.getParameter("_epoKey");
-            response.sendRedirect(url);
+        String referer = request.getHeader("Referer");        
+        
+        if( referer != null ){
+            int epoKeyIndex = referer.indexOf("_epoKey");
+            if (epoKeyIndex >= 0){
+                String url = referer.substring(0,epoKeyIndex) + "_epoKey="+request.getParameter("_epoKey");
+                response.sendRedirect(url);
+                return;
+            }
         }
+        response.sendRedirect(referer+"&_epoKey="+request.getParameter("_epoKey"));        
         return;
     }
     

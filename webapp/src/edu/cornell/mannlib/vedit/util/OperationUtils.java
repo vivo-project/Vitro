@@ -54,9 +54,9 @@ public class OperationUtils{
         try {
             setterMethod.invoke(newObj,arglist);
         } catch (Exception e) {
-            System.out.println("Couldn't invoke method");
-            System.out.println(e.getMessage());
-            System.out.println(field+" "+arglist[0]);
+            log.error("Couldn't invoke method");
+            log.error(e.getMessage());
+            log.error(field+" "+arglist[0]);
         }
     }
 
@@ -97,18 +97,18 @@ public class OperationUtils{
                                 setArgs[0] = fieldVal;
                                 setterMethod.invoke(newBean,setArgs);
                             } catch (IllegalAccessException iae) {
-                                System.out.println("edu.cornell.mannlib.vitro.edit.utils.OperationUtils encountered IllegalAccessException invoking "+setterMethod.getName());
+                                log.error("edu.cornell.mannlib.vitro.edit.utils.OperationUtils encountered IllegalAccessException invoking "+setterMethod.getName());
                             } catch (InvocationTargetException ite) {
-                                System.out.println("edu.cornell.mannlib.vitro.edit.utils.OperationUtils encountered InvocationTargetException invoking "+setterMethod.getName());
-                                System.out.println(ite.getTargetException().getClass().toString());
+                                log.error("edu.cornell.mannlib.vitro.edit.utils.OperationUtils encountered InvocationTargetException invoking "+setterMethod.getName());
+                                log.error(ite.getTargetException().getClass().toString());
                             }
                         } catch (IllegalAccessException iae) {
-                            System.out.println(OperationUtils.class.getName()+" encountered IllegalAccessException invoking "+beanMeths[i].getName());
+                            log.error(OperationUtils.class.getName()+" encountered IllegalAccessException invoking "+beanMeths[i].getName());
                         } catch (InvocationTargetException ite) {
-                            System.out.println(OperationUtils.class.getName()+" encountered InvocationTargetException invoking "+beanMeths[i].getName());
-                            System.out.println(ite.getTargetException().getClass().toString());
+                            log.error(OperationUtils.class.getName()+" encountered InvocationTargetException invoking "+beanMeths[i].getName());
+                            log.error(ite.getTargetException().getClass().toString());
                         } catch (IllegalArgumentException iae) {
-                            // System.out.println(OperationUtils.class.getName()+" found that "+beanMeths[i].getName()+" requires one or more arguments. Skipping.");
+                            // log.error(OperationUtils.class.getName()+" found that "+beanMeths[i].getName()+" requires one or more arguments. Skipping.");
                         }
                     } catch (NoSuchMethodException nsme){
                         // ignore this field because there is no setter method
@@ -116,11 +116,11 @@ public class OperationUtils{
                 }
             }
         } catch (InstantiationException ie){
-            System.out.println("edu.cornell.mannlib.vitro.edit.utils.OperationUtils.cloneBean("+bean.getClass().toString()+") could not instantiate new instance of bean.");
-            System.out.println(ie.getStackTrace());
+            log.error("edu.cornell.mannlib.vitro.edit.utils.OperationUtils.cloneBean("+bean.getClass().toString()+") could not instantiate new instance of bean.");
+            log.error(ie.getStackTrace());
         } catch (IllegalAccessException iae){
-            System.out.println("edu.cornell.mannlib.vitro.edit.utils.OperationUtils.cloneBean("+bean.getClass().toString()+") encountered illegal access exception instantiating new bean.");
-            System.out.println(iae.getStackTrace());
+            log.error("edu.cornell.mannlib.vitro.edit.utils.OperationUtils.cloneBean("+bean.getClass().toString()+") encountered illegal access exception instantiating new bean.");
+            log.error(iae.getStackTrace());
         }
         return newBean;
     }
