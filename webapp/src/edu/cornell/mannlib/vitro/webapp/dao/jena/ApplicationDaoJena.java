@@ -54,6 +54,12 @@ public class ApplicationDaoJena extends JenaBaseDao implements ApplicationDao {
                 RDFNode node = nodes.next();
                 if (node.isLiteral()) {
                     String namespace = ((Literal)node).getLexicalForm();
+                    // org.openrdf.model.impl.URIImpl.URIImpl.getNamespace() returns a 
+                    // namespace with a final slash, so this makes matching easier.
+                    // It also accords with the way the default namespace is defined.
+                    if (!namespace.endsWith("/")) {
+                        namespace = namespace + "/";
+                    }
                     externallyLinkedNamespaces.add(namespace);
                 }
             }

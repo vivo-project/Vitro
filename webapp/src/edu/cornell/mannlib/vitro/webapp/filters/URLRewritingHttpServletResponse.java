@@ -167,11 +167,11 @@ public class URLRewritingHttpServletResponse implements HttpServletResponse {
 									// remove the ugly uri parameter
 									indexToRemove = qpIndex;
 								} else if (isExternallyLinkedNamespace(namespace)) {
-								    namespace = removeFinalSlash(namespace);
 								    log.debug("Found externally linked namespace " + namespace);
 								    // Use the externally linked namespace in the url
-								    url.pathParts = new ArrayList<String>();								    
-								    url.pathParts.add(namespace);
+								    url.pathParts = new ArrayList<String>();
+								    // toString() will join elements with a slash, so remove this one.
+								    url.pathParts.add(namespace.replaceAll("/$", ""));
 								    url.pathParts.add(localName);
 								    // remove the ugly uri parameter
 								    indexToRemove = qpIndex;
@@ -470,13 +470,8 @@ public class URLRewritingHttpServletResponse implements HttpServletResponse {
 	}
 	
 	private boolean isExternallyLinkedNamespace(String namespace) {
-	    namespace = removeFinalSlash(namespace);
 	    List<String> externallyLinkedNamespaces = wadf.getApplicationDao().getExternallyLinkedNamespaces();
 	    return externallyLinkedNamespaces.contains(namespace);
-	}
-	
-	private String removeFinalSlash(String str) {
-	    return str.replaceAll("/$", "");
 	}
 	
 }
