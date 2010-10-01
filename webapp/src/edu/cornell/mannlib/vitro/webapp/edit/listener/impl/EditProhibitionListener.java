@@ -7,7 +7,7 @@ import javax.servlet.ServletContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.listener.ChangeListener;
@@ -28,7 +28,7 @@ public class EditProhibitionListener implements ChangeListener {
 
     public void doDeleted(Object oldObj, EditProcessObject epo) {
         Property p = (Property) oldObj;
-        Model model = (Model) context.getAttribute("jenaOntModel");
+        OntModel model = (OntModel) context.getAttribute("jenaOntModel");
         BaseResourceBean.RoleLevel oldRoleLevel = p.getProhibitedFromUpdateBelowRoleLevel();
         if (oldRoleLevel != null) {
             log.debug("replacing all edit prohibition policies after deletion");
@@ -57,7 +57,7 @@ public class EditProhibitionListener implements ChangeListener {
 
     public void doInserted(Object newObj, EditProcessObject epo) {
         Property p = (Property) newObj;
-        Model model = (Model) context.getAttribute("jenaOntModel");
+        OntModel model = (OntModel) context.getAttribute("jenaOntModel");
         BaseResourceBean.RoleLevel newRoleLevel = p.getProhibitedFromUpdateBelowRoleLevel();
         if (newRoleLevel != null) { // note have to replace even at same level since may have been unspecified
             if (newRoleLevel.compareTo(BaseResourceBean.RoleLevel.SELF)==0) {
@@ -91,7 +91,7 @@ public class EditProhibitionListener implements ChangeListener {
     public void doUpdated(Object oldObj, Object newObj, EditProcessObject epo) {
         Property oldP = (Property) oldObj;
         Property newP = (Property) newObj;
-        Model model = (Model) context.getAttribute("jenaOntModel");
+        OntModel model = (OntModel) context.getAttribute("jenaOntModel");
         BaseResourceBean.RoleLevel oldRoleLevel = oldP.getProhibitedFromUpdateBelowRoleLevel();
         BaseResourceBean.RoleLevel newRoleLevel = newP.getProhibitedFromUpdateBelowRoleLevel();
         if (newRoleLevel != null) { // will always be true since select box has no non-empty choices

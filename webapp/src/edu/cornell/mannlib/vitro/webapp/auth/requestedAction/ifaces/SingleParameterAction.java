@@ -13,4 +13,7 @@ public abstract class SingleParameterAction implements RequestedAction {
         this.subjectUri = subjectUri;
     }
 
+    public String toString(){
+        return this.getClass().getName() + " <"+subjectUri+">"; 
+    }
 }

@@ -89,7 +89,7 @@ public class SelfEditingIdentifierFactory implements IdentifierBundleFactory {
             if( ind != null ){
                 String blacklisted = checkForBlacklisted(ind, context);
                 
-                selfE = new SelfEditing( ind ,blacklisted );                
+                selfE = new SelfEditing( ind ,blacklisted , false);                
                 idb.add(  selfE );
                 log.debug("Found an Individual for netId " + cuwebauthUser + " URI: " + ind.getURI() );
             }else{
@@ -264,12 +264,18 @@ public class SelfEditingIdentifierFactory implements IdentifierBundleFactory {
     public static class SelfEditing implements Identifier{        
         final Individual individual;
         final String blacklisted;        
+        final boolean faked; //if this is true it was setup by FakeSeflEditingIdentifierFactory 
+                        
+        public SelfEditing ( Individual individual, String blacklisted ){
+          this(individual,blacklisted,false);   
+        }
         
-        public SelfEditing ( Individual individual, String blacklisted){
+        public SelfEditing ( Individual individual, String blacklisted, boolean faked){
             if( individual == null )
                 throw new IllegalArgumentException("Individual must not be null");            
             this.individual = individual;
             this.blacklisted = blacklisted;            
+            this.faked = faked;
         }
         public String getValue(){
             return individual.getURI();
@@ -283,6 +289,9 @@ public class SelfEditingIdentifierFactory implements IdentifierBundleFactory {
         public String toString(){
             return "SelfEditing as " + getValue() +
             (getBlacklisted()!=null?  " blacklisted by via " + getBlacklisted():"");
+        }
+        public boolean isFake() {
+            return faked;
         }
     }
     

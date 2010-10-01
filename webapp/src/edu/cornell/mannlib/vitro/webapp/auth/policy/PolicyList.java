@@ -53,6 +53,7 @@ public class PolicyList extends ArrayList<PolicyIface> implements PolicyIface{
                 log.error("ignoring exception in policy " + policy.toString(), th );
             }
         }
+        log.debug("decision " + pd + " for " + whatToAuth);
         return pd;
     }
 
