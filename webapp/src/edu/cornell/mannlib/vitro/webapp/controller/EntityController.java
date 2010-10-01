@@ -227,10 +227,9 @@ public class EntityController extends VitroHttpServlet {
             css += customCss;
         }
 
-        if(  indiv.getURI().startsWith( vreq.getWebappDaoFactory().getDefaultNamespace() )){
-        	String entityLinkedDataURL = indiv.getURI() + "/" + indiv.getLocalName() + ".rdf";
-        	vreq.setAttribute("entityLinkedDataURL", entityLinkedDataURL);
-        }   
+        if(  indiv.getURI().startsWith( vreq.getWebappDaoFactory().getDefaultNamespace() )){        	
+        	vreq.setAttribute("entityLinkedDataURL", indiv.getURI() + "/" + indiv.getLocalName() + ".rdf");	
+        }
 
         vreq.setAttribute("css",css);
         vreq.setAttribute("scripts", "/templates/entity/entity_inject_head.jsp");
