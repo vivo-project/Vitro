@@ -41,7 +41,7 @@
     <#-- Paging controls -->
     <#if (pagingLinks?size > 0)>
         <div class="searchpages">
-        Pages: 
+            Pages: 
             <#if prevPage??><a class="prev" href="${prevPage}">Previous</a></#if>
             <#list pagingLinks as link>
                 <#if link.url??>
@@ -56,4 +56,4 @@
 
 </div> <!-- end contentsBrowseGroup -->
 
-${stylesheets.addFromTheme("search.css")}
+${stylesheets.addFromTheme("/css/search.css")}

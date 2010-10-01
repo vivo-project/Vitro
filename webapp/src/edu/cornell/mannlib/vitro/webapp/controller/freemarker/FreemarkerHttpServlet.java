@@ -351,10 +351,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         
         map.put("urls", getUrls(themeDir, urlBuilder)); 
 
-        // This value will be available to any template as a path for adding a new stylesheet.
-        // It does not contain the context path, because the methods to generate the href
-        // attribute from the string passed in by the template automatically add the context path.
-        map.put("themeStylesheetDir", themeDir + "/css");
+        map.put("themeDir", themeDir);
 
         map.put("stylesheets", getStylesheetList(themeDir));
         map.put("scripts", getScriptList(themeDir));

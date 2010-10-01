@@ -41,8 +41,8 @@
 Three ways to add a stylesheet:
 
 A. In theme directory:
-${stylesheets.addFromTheme("/sample.css")}
-${stylesheets.add(themeStylesheetDir + "/sample.css")}
+${stylesheets.addFromTheme("/css/sample.css")}
+${stylesheets.add(themeDir + "/css/sample.css")}
 
 B. Any location
 ${stylesheets.add("/edit/forms/css/sample.css)"}
@@ -50,7 +50,7 @@ ${stylesheets.add("/edit/forms/css/sample.css)"}
 To add a script: 
 
 A. In theme directory:
-${scripts.addFromTheme("/sample.js")}
+${scripts.addFromTheme("/css/sample.js")}
 
 B. Any location
 ${scripts("/edit/forms/js/sample.js)"}

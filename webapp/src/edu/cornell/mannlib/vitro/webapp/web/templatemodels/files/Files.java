@@ -40,7 +40,7 @@ public abstract class Files extends BaseTemplateModel {
         if (!path.startsWith("/")) {
             path = "/" + path;
         }
-        path = themeDir + getThemeSubDir() + path;
+        path = themeDir + path;
         add(path);
     }
     
@@ -62,8 +62,7 @@ public abstract class Files extends BaseTemplateModel {
     public String dump() {
         return list.toString();
     }
-    
-    protected abstract String getThemeSubDir();
+
     protected abstract String getTag(String url);
     
 }

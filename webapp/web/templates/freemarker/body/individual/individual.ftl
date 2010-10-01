@@ -80,7 +80,7 @@
 
 </div> <!-- #personWrap -->
 
-${stylesheets.addFromTheme("/entity.css")}
+${stylesheets.addFromTheme("/css/entity.css")}
                            
 <#-- RY Figure out which of these scripts really need to go into the head, and which are needed at all (e.g., tinyMCE??) -->
 ${headScripts.add("/js/jquery.js",

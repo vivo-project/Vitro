@@ -6,6 +6,5 @@
     <#include loginTemplate>
     
     ${stylesheets.add("/css/login.css")}
-    ${stylesheets.addFromTheme("/css/formedit.css")}
     ${scripts.add("/js/jquery.js", "/js/login/loginUtils.js")}
 </#if>
