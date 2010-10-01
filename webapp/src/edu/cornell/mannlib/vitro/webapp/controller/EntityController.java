@@ -41,7 +41,10 @@ import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
-import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
+import edu.cornell.mannlib.vitro.webapp.filestorage.FileModelHelper;
+import edu.cornell.mannlib.vitro.webapp.filestorage.FileServingHelper;
+import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorage;
+import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup;
 import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQuery;
 import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQueryWrapper;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapper;
@@ -99,7 +102,7 @@ public class EntityController extends VitroHttpServlet {
             }
 
             // If this is an uploaded file, redirect to its "alias URL".
-            String aliasUrl = getAliasUrlForBytestreamIndividual(req, indiv);
+            String aliasUrl = getAliasUrlForBytestreamIndividual(indiv);
             if (aliasUrl != null) {
             	res.sendRedirect(req.getContextPath() + aliasUrl);
             	return;
@@ -175,9 +178,9 @@ public class EntityController extends VitroHttpServlet {
                     }
                 }
             }
-        } else {
-            log.error("Entity " + indiv.getURI() + " with vclass URI " +
-                    indiv.getVClassURI() + ", no vclass with that URI exists");
+        } else if (indiv.getVClassURI() != null) {
+            log.debug("Individual " + indiv.getURI() + " with class URI " +
+                    indiv.getVClassURI() + ": no class found with that URI");
         }
         if (customView!=null) {
             // insert test for whether a css files of the same name exists, and populate the customCss string for use when construction the header
@@ -224,16 +227,10 @@ public class EntityController extends VitroHttpServlet {
             css += customCss;
         }
 
-        if(  indiv.getURI().startsWith( vreq.getWebappDaoFactory().getDefaultNamespace() )){        	
-        	vreq.setAttribute("entityLinkedDataURL", indiv.getURI() + "/" + indiv.getLocalName() + ".rdf");	
-        }
-        
-        
-		// generate link to RDF representation for semantic web clients like Piggy Bank
-		// BJL 2008-07-16: I'm temporarily commenting this out because I forgot we need to make sure it filters out the hidden properties
-        // generate url for this entity
-        // String individualToRDF = "http://"+vreq.getServerName()+":"+vreq.getServerPort()+vreq.getContextPath()+"/entity?home=1&uri="+forURL(entity.getURI())+"&view=rdf.rdf"; 
-        //css += "<link rel='alternate' type='application/rdf+xml' title='"+entity.getName()+"' href='"+individualToRDF+"' />";
+        if(  indiv.getURI().startsWith( vreq.getWebappDaoFactory().getDefaultNamespace() )){
+        	String entityLinkedDataURL = indiv.getURI() + "/" + indiv.getLocalName() + ".rdf";
+        	vreq.setAttribute("entityLinkedDataURL", entityLinkedDataURL);
+        }   
 
         vreq.setAttribute("css",css);
         vreq.setAttribute("scripts", "/templates/entity/entity_inject_head.jsp");
@@ -273,14 +270,21 @@ public class EntityController extends VitroHttpServlet {
 		newModel.write( res.getOutputStream(), format );		
 	}
 
-	private void doRedirect(HttpServletRequest req, HttpServletResponse res,
-			String redirectURL) {	
-		// It seems like there must be a better way to do this
-		String hn = req.getHeader("Host");		
-    	res.setHeader("Location", res.encodeURL( "http://" + hn + req.getContextPath() + redirectURL ));
-    	res.setStatus(res.SC_SEE_OTHER);		
-	}
-
+    private void doRedirect(HttpServletRequest req, HttpServletResponse res,
+            String redirectURL) {
+        //It seems like there must be a more standard way to do a redirect in tomcat.
+        String hn = req.getHeader("Host");
+        if (req.isSecure()) {
+            res.setHeader("Location", res.encodeURL("https://" + hn
+                    + req.getContextPath() + redirectURL));
+            log.info("doRedirect by using HTTPS");
+        } else {
+            res.setHeader("Location", res.encodeURL("http://" + hn
+                    + req.getContextPath() + redirectURL));
+            log.info("doRedirect by using HTTP");
+        }
+        res.setStatus(res.SC_SEE_OTHER);
+    }
 
 	private static Pattern LINKED_DATA_URL = Pattern.compile("^/individual/([^/]*)$");		
 	private static Pattern NS_PREFIX_URL = Pattern.compile("^/individual/([^/]*)/([^/]*)$");
@@ -488,16 +492,39 @@ public class EntityController extends VitroHttpServlet {
 	 * If this entity represents a File Bytestream, get its alias URL so we can
 	 * properly serve the file contents.
 	 */
-	private String getAliasUrlForBytestreamIndividual(HttpServletRequest req, Individual entity)
+	private String getAliasUrlForBytestreamIndividual(Individual entity)
 			throws IOException {
-		FileInfo fileInfo = FileInfo.instanceFromBytestreamUri(new VitroRequest(
-				req).getWebappDaoFactory(), entity.getURI());
-		if (fileInfo == null) {
-			log.trace("Entity '" + entity.getURI() + "' is not a bytestream.");
+		if (!FileModelHelper.isFileBytestream(entity)) {
+			log.debug("Entity at '" + entity.getURI()
+					+ "' is not recognized as a FileByteStream.");
 			return null;
 		}
 
-		String url = fileInfo.getBytestreamAliasUrl();
+		FileStorage fs = (FileStorage) getServletContext().getAttribute(
+				FileStorageSetup.ATTRIBUTE_NAME);
+		if (fs == null) {
+			log.error("Servlet context does not contain file storage at '"
+					+ FileStorageSetup.ATTRIBUTE_NAME + "'");
+			return null;
+		}
+
+		String filename = fs.getFilename(entity.getURI());
+		if (filename == null) {
+			log.error("Entity at '" + entity.getURI()
+					+ "' is recognized as a FileByteStream, "
+					+ "but the file system does not recognize it.");
+			return null;
+		}
+
+		String url = FileServingHelper.getBytestreamAliasUrl(entity.getURI(),
+				filename);
+		if (url.equals(entity.getURI())) {
+			log.error("Entity at '" + entity.getURI()
+					+ "' is recognized as a FileByteStream, "
+					+ "but can't be translated to an alias URL.");
+			return null;
+		}
+
 		log.debug("Alias URL for '" + entity.getURI() + "' is '" + url + "'");
 		return url;
 	}
