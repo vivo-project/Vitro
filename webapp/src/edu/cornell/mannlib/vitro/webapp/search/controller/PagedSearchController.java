@@ -29,6 +29,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
@@ -150,13 +151,17 @@ public class PagedSearchController extends VitroHttpServlet implements Searcher{
             
             String qtxt = vreq.getParameter(VitroQuery.QUERY_PARAMETER_NAME);
             Analyzer analyzer = getAnalyzer(getServletContext());
-            Query query = getQuery(vreq, portalFlag, analyzer, indexDir, qtxt);             
-            log.debug("query for '" + qtxt +"' is " + query.toString());
-            
-            if (query == null ) {
-                doNoQuery(request, response);
+
+            Query query = null;
+            try {
+                query = getQuery(vreq, portalFlag, analyzer, indexDir, qtxt);
+            } catch (ParseException e) {
+                log.warn("Query parse exception: " + e);
+                doBadQuery(qtxt, request, response);
                 return;
-            }
+            } 
+            
+            log.debug("query for '" + qtxt +"' is " + query.toString());
             
             IndexSearcher searcherForRequest = getIndexSearcher(indexDir);
                                                 
@@ -426,7 +431,7 @@ public class PagedSearchController extends VitroHttpServlet implements Searcher{
     }
 
     private Query getQuery(VitroRequest request, PortalFlag portalState,
-                       Analyzer analyzer, String indexDir, String querystr ) throws SearchException{
+                       Analyzer analyzer, String indexDir, String querystr ) throws SearchException, ParseException {
         Query query = null;
         try{
             //String querystr = request.getParameter(VitroQuery.QUERY_PARAMETER_NAME);
@@ -495,8 +500,10 @@ public class PagedSearchController extends VitroHttpServlet implements Searcher{
             }
             
             log.debug("Query: " + query);
-            
-        }catch (Exception ex){
+
+        } catch (ParseException e) {
+            throw new ParseException(e.getMessage());
+        } catch (Exception ex){
             throw new SearchException(ex.getMessage());
         }
 
@@ -677,12 +684,13 @@ public class PagedSearchController extends VitroHttpServlet implements Searcher{
         }
     }        
     
-    private void doNoQuery(HttpServletRequest request,
+    private void doBadQuery(String queryStr, HttpServletRequest request,
             HttpServletResponse response)
     throws ServletException, IOException {
         Portal portal = (new VitroRequest(request)).getPortal();
         request.setAttribute("title", "Search "+portal.getAppName());
-        request.setAttribute("bodyJsp", Controllers.SEARCH_FORM_JSP);
+        request.setAttribute("bodyJsp", Controllers.SEARCH_BAD_QUERY_JSP);
+        request.setAttribute("queryStr", queryStr);
 
         RequestDispatcher rd = request
         .getRequestDispatcher(Controllers.BASIC_JSP);

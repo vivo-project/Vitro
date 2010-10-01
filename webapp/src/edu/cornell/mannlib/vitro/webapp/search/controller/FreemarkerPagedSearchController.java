@@ -27,6 +27,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
@@ -72,7 +73,6 @@ import edu.cornell.mannlib.vitro.webapp.utils.Html2Text;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.IndividualTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.LinkTemplateModel;
-import freemarker.template.Configuration;
 
 /**
  * PagedSearchController is the new search controller that interacts 
@@ -88,14 +88,26 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(FreemarkerPagedSearchController.class.getName());
     
-    private static final String TEMPLATE_SEARCH_RESULTS = "search-pagedResults.ftl";
-    private static final String TEMPLATE_ERROR = "search-error.ftl";
-        
-    String NORESULT_MSG = "The search returned no results.";  
-    
     private IndexSearcher searcher = null;
     private int defaultHitsPerPage = 25;
     private int defaultMaxSearchSize= 1000;   
+    
+    protected enum SearchTemplate {
+        PAGED_RESULTS("search-pagedResults.ftl"),
+        FORM("search-form.ftl"),
+        ERROR("search-error.ftl"),
+        BAD_QUERY("search-badQuery.ftl");
+        
+        private final String filename;
+        
+        SearchTemplate(String filename) {
+            this.filename = filename;
+        }
+
+        public String toString() {
+            return filename;
+        }
+    }
 
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
@@ -158,13 +170,15 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
             
             String qtxt = vreq.getParameter(VitroQuery.QUERY_PARAMETER_NAME);
             Analyzer analyzer = getAnalyzer(getServletContext());
-            Query query = getQuery(vreq, portalFlag, analyzer, indexDir, qtxt);             
-            log.debug("query for '" + qtxt +"' is " + query.toString());
-
-            if (query == null ) {
-                return doNoQuery(portal);
-            }
             
+            Query query = null;
+            try {
+                query = getQuery(vreq, portalFlag, analyzer, indexDir, qtxt);
+                log.debug("query for '" + qtxt +"' is " + query.toString());
+            } catch (ParseException e) {
+                return doBadQuery(portal, qtxt);
+            } 
+
             IndexSearcher searcherForRequest = getIndexSearcher(indexDir);
                                                 
             TopDocs topDocs = null;
@@ -295,7 +309,7 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
             return doSearchError(e);
         }
         
-        return new TemplateResponseValues(TEMPLATE_SEARCH_RESULTS, body);
+        return new TemplateResponseValues(SearchTemplate.PAGED_RESULTS.toString(), body);
     }
 
     private void alphaSortIndividuals(List<Individual> beans) {
@@ -510,7 +524,7 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
     }
 
     private Query getQuery(VitroRequest request, PortalFlag portalState,
-                       Analyzer analyzer, String indexDir, String querystr ) throws SearchException{
+                       Analyzer analyzer, String indexDir, String querystr ) throws SearchException, ParseException {
         Query query = null;
         try{
             //String querystr = request.getParameter(VitroQuery.QUERY_PARAMETER_NAME);
@@ -572,7 +586,9 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
             
             log.debug("Query: " + query);
             
-        }catch (Exception ex){
+        } catch (ParseException e) {
+            throw new ParseException(e.getMessage());
+        } catch (Exception ex){
             throw new SearchException(ex.getMessage());
         }
 
@@ -756,20 +772,20 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
     private TemplateResponseValues doSearchError(String message) {
         Map<String, Object> body = new HashMap<String, Object>();
         body.put("message", "Search failed: " + message);
-        return new TemplateResponseValues(TEMPLATE_ERROR, body);
+        return new TemplateResponseValues(SearchTemplate.ERROR.toString(), body);
     }
     
     private ExceptionResponseValues doSearchError(Throwable e) {
         Map<String, Object> body = new HashMap<String, Object>();
         body.put("message", "Search failed: " + e.getMessage());  
-        return new ExceptionResponseValues(TEMPLATE_ERROR, body, e);
+        return new ExceptionResponseValues(SearchTemplate.ERROR.toString(), body, e);
     }
     
-    private TemplateResponseValues doNoQuery(Portal portal) {
+    private TemplateResponseValues doBadQuery(Portal portal, String query) {
         Map<String, Object> body = new HashMap<String, Object>();
         body.put("title", "Search " + portal.getAppName());
-        body.put("message", "No query entered.");
-        return new TemplateResponseValues(TEMPLATE_ERROR, body);
+        body.put("query", query);
+        return new TemplateResponseValues(SearchTemplate.BAD_QUERY.toString(), body);
     }
     
     private TemplateResponseValues doFailedSearch(String message, String querytext) {
@@ -779,14 +795,14 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
             message = "Search failed.";
         }        
         body.put("message", message);
-        return new TemplateResponseValues(TEMPLATE_ERROR, body);
+        return new TemplateResponseValues(SearchTemplate.ERROR.toString(), body);
     }
 
     private TemplateResponseValues doNoHits(String querytext) {
         Map<String, Object> body = new HashMap<String, Object>();       
         body.put("title", "Search for '" + querytext + "'");        
         body.put("message", "No matching results.");     
-        return new TemplateResponseValues(TEMPLATE_ERROR, body);
+        return new TemplateResponseValues(SearchTemplate.ERROR.toString(), body);
     }
 
     /**
