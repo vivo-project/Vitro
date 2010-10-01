@@ -22,6 +22,8 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.query.DataSource;
 import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.query.Query;
@@ -34,6 +36,7 @@ import com.hp.hpl.jena.query.ResultSetFormatter;
 import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ModelMaker;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.sparql.resultset.ResultSetFormat;
@@ -161,13 +164,20 @@ public class SparqlQueryServlet extends BaseEditController {
         boolean someModelSet = false;        
         String models[] = request.getParameterValues("sourceModelName");        
         if( models != null && models.length > 0 ){
+        	OntModel ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
             for( String modelName : models ){
                 Model modelNamed = maker.getModel(modelName);
                 if( modelNamed != null ){
                     dataSource.addNamedModel(modelName, modelNamed) ;
+                	// For now, people expect to query these graphs without using 
+                	// FROM NAMED, so we'll also add to the background
+                	ontModel.addSubModel(modelNamed);
                     someModelSet = true;
                 }
             }         
+            if (someModelSet) {
+            	dataSource.setDefaultModel(ontModel);
+            }
         }
         
         if( ! someModelSet )
