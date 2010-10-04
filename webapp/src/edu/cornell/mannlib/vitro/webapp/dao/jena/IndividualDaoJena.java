@@ -24,6 +24,7 @@ import org.joda.time.DateTime;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntResource;
+import com.hp.hpl.jena.ontology.UnionClass;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
@@ -153,15 +154,23 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
     
         getOntModel().enterCriticalSection(Lock.READ);
         try {
-            StmtIterator stmtIt = getOntModel().listStatements((Resource) null, RDF.type, theClass);
-            try {
-                while (stmtIt.hasNext()) {
-                    Statement stmt = stmtIt.nextStatement();
-                    OntResource ind = (OntResource) stmt.getSubject().as(OntResource.class);
-                    ents.add(new IndividualJena(ind, (WebappDaoFactoryJena) getWebappDaoFactory()));
-                }
-            } finally {
-                stmtIt.close();
+            if (theClass.isAnon() && theClass.canAs(UnionClass.class)) {
+            	UnionClass u = (UnionClass) theClass.as(UnionClass.class);
+            	for (OntClass operand : u.listOperands().toList()) {
+            		VClass vc = new VClassJena(operand, getWebappDaoFactory());
+            		ents.addAll(getIndividualsByVClass(vc));
+            	}
+            } else {
+	            StmtIterator stmtIt = getOntModel().listStatements((Resource) null, RDF.type, theClass);
+	            try {
+	                while (stmtIt.hasNext()) {
+	                    Statement stmt = stmtIt.nextStatement();
+	                    OntResource ind = (OntResource) stmt.getSubject().as(OntResource.class);
+	                    ents.add(new IndividualJena(ind, (WebappDaoFactoryJena) getWebappDaoFactory()));
+	                }
+	            } finally {
+	                stmtIt.close();
+	            }
             }
         } finally {
             getOntModel().leaveCriticalSection();
