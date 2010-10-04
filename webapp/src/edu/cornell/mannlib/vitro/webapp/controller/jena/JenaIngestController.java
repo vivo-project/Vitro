@@ -631,7 +631,7 @@ public class JenaIngestController extends BaseEditController {
 		JenaIngestUtils utils = new JenaIngestUtils();
 		destination.enterCriticalSection(Lock.WRITE);
 		try {
-			destination.add(utils.renameBNodes(source, namespaceEtc));
+			destination.add(utils.renameBNodes(source, namespaceEtc, vreq.getJenaOntModel()));
 		} finally {
 			destination.leaveCriticalSection();
 		}
