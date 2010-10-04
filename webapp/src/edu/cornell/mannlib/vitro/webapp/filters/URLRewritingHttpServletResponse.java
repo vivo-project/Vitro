@@ -166,11 +166,13 @@ public class URLRewritingHttpServletResponse implements HttpServletResponse {
 									url.pathParts.add(localName);
 									// remove the ugly uri parameter
 									indexToRemove = qpIndex;
+							    // namespace returned from URIImpl.getNamespace() ends in a slash, so will 
+							    // match externally linked namespaces, which also end in a slash
 								} else if (isExternallyLinkedNamespace(namespace)) {
 								    log.debug("Found externally linked namespace " + namespace);
 								    // Use the externally linked namespace in the url
 								    url.pathParts = new ArrayList<String>();
-								    // toString() will join elements with a slash, so remove this one.
+								    // toString() will join pathParts with a slash, so remove this one.
 								    url.pathParts.add(namespace.replaceAll("/$", ""));
 								    url.pathParts.add(localName);
 								    // remove the ugly uri parameter
