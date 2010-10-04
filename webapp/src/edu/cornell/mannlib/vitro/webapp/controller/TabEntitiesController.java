@@ -3,8 +3,8 @@
 package edu.cornell.mannlib.vitro.webapp.controller;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
@@ -27,7 +26,6 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.RangeQuery;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.joda.time.DateTime;
@@ -114,6 +112,7 @@ public void doGet( HttpServletRequest req, HttpServletResponse response )
                  throw new ServletException(e);
              }                 
              req.setAttribute("tabId", tab.getTabId());
+             request.setAttribute("controllerParam","primary=" + tab.getTabId());
              
              String alpha = request.getParameter("alpha");
              boolean doAlphaFilter = false;
@@ -412,15 +411,14 @@ public void doGet( HttpServletRequest req, HttpServletResponse response )
                    //check for portal filtering only on auto linked queries
                    if( ! isSinglePortal ){
                        int tabPortal = tab.getPortalId();
-                       if( tabPortal < 16 ){ //could be a combined portal
+                       if( tabPortal < 16 ){ //could be a normal portal
                            typeQuery.add(
                                    new TermQuery( new Term(Entity2LuceneDoc.term.PORTAL, Integer.toString(1 << tab.getPortalId() ))),
                                    BooleanClause.Occur.MUST);
-                       }else{ //could be a normal portal
+                       }else{ //could be a combined portal
                            BooleanQuery tabQueries = new BooleanQuery();
                            Long[] ids= FlagMathUtils.numeric2numerics(tabPortal);
-                           for( Long id : ids){
-                               
+                           for( Long id : ids){                               
                                tabQueries.add(
                                        new TermQuery( new Term(Entity2LuceneDoc.term.PORTAL,id.toString()) ),
                                        BooleanClause.Occur.SHOULD);
@@ -479,7 +477,7 @@ public void doGet( HttpServletRequest req, HttpServletResponse response )
                query.add( orQuery, BooleanClause.Occur.MUST);
            }
            
-           //Add alpha filter is needed
+           //Add alpha filter if it is needed
            Query alphaQuery = null;
            if( alpha != null && !"".equals(alpha) && alpha.length() == 1){      
                alphaQuery =    
@@ -527,7 +525,7 @@ public void doGet( HttpServletRequest req, HttpServletResponse response )
         }
     }
     
-    private List<PageRecord> makePagesList( int count, int pageSize,  int selectedPage){        
+    public static List<PageRecord> makePagesList( int count, int pageSize,  int selectedPage){        
         
         List<PageRecord> records = new ArrayList<PageRecord>( MAX_PAGES + 1 );
         int requiredPages = count/pageSize ;
@@ -565,7 +563,7 @@ public void doGet( HttpServletRequest req, HttpServletResponse response )
         return records;
     }
     
-    public class PageRecord {
+    public static class PageRecord {
         public PageRecord(String param, String index, String text, boolean selected) {            
             this.param = param;
             this.index = index;

@@ -37,6 +37,7 @@
 
 <% /* <p>${pageTime} milliseconds</p> */ %>
 
+<jsp:include page="/templates/alpha/alphaIndex.jsp"/>
 <ul>
 	<c:forEach items='${entities}' var='ent'>
 		<li>
@@ -100,6 +101,8 @@
 <c:if test="${!empty requestScope.suppText}">
 	${requestScope.suppText}
 </c:if>
+
+<jsp:include page="/templates/entity/entityListPages.jsp"/>
 
 </div> <!--end contents-->
 </div><!-- end content -->
