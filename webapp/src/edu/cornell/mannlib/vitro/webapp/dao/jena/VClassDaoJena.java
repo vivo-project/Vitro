@@ -787,7 +787,11 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                                     VClass vcw = (VClass) getVClassByURI(cls.getURI());
                                     if (vcw != null) {
                                         boolean classIsInstantiated = false;
-                                        if (includeUninstantiatedClasses == false) {
+                                        if (getIndividualCount) {
+                                        	int count = getOntModel().listStatements(null,RDF.type,cls).toList().size();
+                                        	vcw.setEntityCount(count);
+                                        	classIsInstantiated = (count > 0);
+                                        } else if (includeUninstantiatedClasses == false) {
 	                                        // Note: to support SDB models, may want to do this with 
 	                                        // SPARQL and LIMIT 1 if SDB can take advantage of it
 	                                        ClosableIterator countIt = getOntModel().listStatements(null,RDF.type,cls);
@@ -799,7 +803,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
 	                                            countIt.close();
 	                                        }
                                         }
-                                        //vcw.setEntityCount(count);
+                                        
                                         if (includeUninstantiatedClasses || classIsInstantiated) {
                                             group.add(vcw);
                                         }
