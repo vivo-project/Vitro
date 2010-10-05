@@ -34,9 +34,9 @@ if( request.getParameter("uri") != null ){
 <% /* BJL23 put this is in a catch block because it seems to fail ungracefully for 
       some clones */ %>
 <c:catch>
-    <jsp:include page="/${themeDir}jsp/identity.jsp" flush="true"/>
+    <jsp:include page="/templates/page/freemarkerTransition/identity.jsp" flush="true"/>
     <div id="contentwrap">
-        <jsp:include page="/${themeDir}jsp/menu.jsp" flush="true"/>
+        <jsp:include page="/templates/page/freemarkerTransition/menu.jsp" flush="true"/>
         <!-- end of formPrefix.jsp -->
 </c:catch>
 
