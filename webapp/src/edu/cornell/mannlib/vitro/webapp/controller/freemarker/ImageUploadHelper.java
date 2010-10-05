@@ -68,6 +68,9 @@ public class ImageUploadHelper {
 	/** Recognized file extensions mapped to MIME-types. */
 	private static final Map<String, String> RECOGNIZED_FILE_TYPES = createFileTypesMap();
 
+	/** Browser-specific MIME-types mapped to recognized MIME-types. */
+	private static final Map<String, String> NON_STANDARD_MIME_TYPES = createNonStandardMimeTypesMap();
+
 	private static Map<String, String> createFileTypesMap() {
 		Map<String, String> map = new HashMap<String, String>();
 		map.put(".gif", "image/gif");
@@ -75,6 +78,18 @@ public class ImageUploadHelper {
 		map.put(".jpg", "image/jpeg");
 		map.put(".jpeg", "image/jpeg");
 		map.put(".jpe", "image/jpeg");
+		return Collections.unmodifiableMap(map);
+	}
+
+	/**
+	 * Internet Explorer can tell us that an image has a funky
+	 * Microsoft-specific MIME-type, and we can replace it with one that
+	 * everyone recognizes. This table records those types.
+	 */
+	private static Map<String, String> createNonStandardMimeTypesMap() {
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("image/x-png", "image/png");
+		map.put("image/pjpeg", "image/jpeg");
 		return Collections.unmodifiableMap(map);
 	}
 
@@ -141,6 +156,7 @@ public class ImageUploadHelper {
 		String filename = getSimpleFilename(file);
 		String mimeType = getMimeType(file);
 		if (!RECOGNIZED_FILE_TYPES.containsValue(mimeType)) {
+			log.debug("Unrecognized MIME type: '" + mimeType + "'");
 			throw new UserMistakeException("'" + filename
 					+ "' is not a recognized image file type. "
 					+ "Please upload JPEG, GIF, or PNG files only.");
@@ -393,6 +409,11 @@ public class ImageUploadHelper {
 	private String getMimeType(FileItem file) {
 		String mimeType = file.getContentType();
 		if (mimeType != null) {
+			// If the browser supplied the MIME type, we may need to
+			// replace it with the standard value.
+			if (NON_STANDARD_MIME_TYPES.containsKey(mimeType)) {
+				mimeType = NON_STANDARD_MIME_TYPES.get(mimeType);
+			}
 			return mimeType;
 		}
 
