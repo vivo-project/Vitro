@@ -60,7 +60,7 @@ public class VClass extends BaseResourceBean implements Comparable<VClass>
     public  void   setQuickEditJsp(String quickEditJsp) { this.quickEditJsp = quickEditJsp; }
 
     protected Integer  displayRank = null;
-    public  int  getDisplayRank()                { return (displayLimit == null ? -1 : displayLimit); }
+    public  int  getDisplayRank()                { return (displayRank == null ? -1 : displayRank); }
     public  void setDisplayRank(int displayRank) { this.displayRank = displayRank; }
 
     protected String  groupURI = null;
