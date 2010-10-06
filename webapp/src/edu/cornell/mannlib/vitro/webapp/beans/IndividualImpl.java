@@ -480,4 +480,11 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
        }
    }
 
+   public String toString(){
+       if( getURI() == null ){
+           return "uninitialized, null URI";
+       }else{
+           return getURI() + " " + getName();
+       }
+   }
 }

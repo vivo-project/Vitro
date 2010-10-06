@@ -206,7 +206,7 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 						        <c:set var="sameClass" value="false"/>
 						        <c:forEach items="${objPropertyStmt.object.VClasses}" var="vclass">
 						           <c:if test="${ vclass.URI == collateCurrentClass }">
-										<c:set var="sameClass" value="true"/>										
+										<c:set var="sameClass" value="true"/>																			
 								   </c:if>					           
 					            </c:forEach>
 					        
@@ -221,6 +221,7 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 				            		<h5 class="collate">${collateCurrentClassName}</h5>
 				            		<ul class='properties'><!-- collateClasses -->
 	      		                </c:if>
+	      		                
                                     <li><span class="statementWrap">
      								<c:set var="opStmt" value="${objPropertyStmt}" scope="request"/>
            							<c:url var="propertyLink" value="/entity">
