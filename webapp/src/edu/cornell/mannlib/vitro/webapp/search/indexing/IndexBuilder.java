@@ -200,6 +200,7 @@ public class IndexBuilder {
 	    listOfIterators.add( (new IndexBuilder.BuilderObjectSource(updatedInds)).getUpdatedSinceIterator(0) );
 	    
 	    doBuild( listOfIterators, deletedInds, false,  UPDATE_DOCS );
+	    log.debug("Ending updateIndex()");
     }
     
 	/**
@@ -342,15 +343,17 @@ public class IndexBuilder {
         		for( VClass vclass : ind.getVClasses() ){
         			if( classesProhibitedFromSearch.isClassProhibited(vclass.getURI()) ){        			
         				prohibitedClass = true;
-        				log.debug("not indexing " + ind.getURI() + " because class " + vclass.getURI() + " is on prohibited list.");
+        				log.debug("removing " + ind.getURI() + " from index because class " + vclass.getURI() + " is on prohibited list.");
         				break;
         			}        		
         		}
         	}
-        	if( !prohibitedClass )
+        	if( !prohibitedClass ){
+        	    log.debug("Indexing '" + ind.getName() + "' URI: " + ind.getURI());
         		indexer.index(ind, newDoc);
-        	else
+        	}else{        	    
         		indexer.removeFromIndex(ind);
+        	}
         	
         }catch(Throwable ex){            
             log.debug("IndexBuilder.indexItem() Error indexing "

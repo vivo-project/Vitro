@@ -4,16 +4,12 @@ package edu.cornell.mannlib.vitro.webapp.search.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -35,8 +31,6 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.WildcardQuery;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -44,12 +38,9 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServ
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
 import edu.cornell.mannlib.vitro.webapp.search.SearchException;
-import edu.cornell.mannlib.vitro.webapp.search.beans.Searcher;
-import edu.cornell.mannlib.vitro.webapp.search.beans.VitroHighlighter;
-import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQuery;
-import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQueryFactory;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneIndexer;
+import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneIndexFactory;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup;
 import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
 import freemarker.template.Configuration;
@@ -59,7 +50,7 @@ import freemarker.template.Configuration;
  * through a Lucene search. 
  */
 
-public class AutocompleteController extends FreemarkerHttpServlet implements Searcher{
+public class AutocompleteController extends FreemarkerHttpServlet{
 
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(AutocompleteController.class);
@@ -68,23 +59,8 @@ public class AutocompleteController extends FreemarkerHttpServlet implements Sea
     
     private static String QUERY_PARAMETER_NAME = "term";
     
-    private IndexSearcher searcher = null;
     String NORESULT_MSG = "";    
     private int defaultMaxSearchSize= 1000;
-
-    public void init(ServletConfig config) throws ServletException {
-        super.init(config);
-        LuceneIndexer indexer=(LuceneIndexer)getServletContext()
-        .getAttribute(LuceneIndexer.class.getName());
-        indexer.addSearcher(this);
-
-        try{
-            String indexDir = getIndexDir(getServletContext());        
-            getIndexSearcher(indexDir);
-        }catch(Exception ex){
-
-        }                                           
-    }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
@@ -125,9 +101,9 @@ public class AutocompleteController extends FreemarkerHttpServlet implements Sea
                 doNoQuery(map, config, response);
                 return;
             }
+                        
+            IndexSearcher searcherForRequest = LuceneIndexFactory.getIndexSearcher(getServletContext());
             
-            IndexSearcher searcherForRequest = getIndexSearcher(indexDir);
-                                                
             TopDocs topDocs = null;
             try{
                 topDocs = searcherForRequest.search(query,null,maxHitSize);
@@ -428,21 +404,6 @@ public class AutocompleteController extends FreemarkerHttpServlet implements Sea
         return qp;
     }
     
-    private synchronized IndexSearcher getIndexSearcher(String indexDir) {
-        if( searcher == null ){
-            try {                
-                Directory fsDir = FSDirectory.getDirectory(indexDir);
-                searcher = new IndexSearcher(fsDir);
-            } catch (IOException e) {
-                log.error("LuceneSearcher: could not make indexSearcher "+e);
-                log.error("It is likely that you have not made a directory for the lucene index.  "+
-                          "Create the directory indicated in the error and set permissions/ownership so"+
-                          " that the tomcat server can read/write to it.");
-                //The index directory is created by LuceneIndexer.makeNewIndex()
-            }
-        }
-        return searcher;
-    }
     
 
     private void doNoQuery(Map<String, Object> map, Configuration config, HttpServletResponse response) {
@@ -491,24 +452,6 @@ public class AutocompleteController extends FreemarkerHttpServlet implements Sea
         }
     }
     
-    
-    /**
-     * Need to accept notification from indexer that the index has been changed.
-     */
-    public void close() {
-        searcher = null;        
-    }
 
-    public VitroHighlighter getHighlighter(VitroQuery q) {
-        throw new Error("AutocompleteController.getHighlighter() is unimplemented");
-    }
-
-    public VitroQueryFactory getQueryFactory() {
-        throw new Error("AutocompleteController.getQueryFactory() is unimplemented");
-    }
-
-    public List search(VitroQuery query) throws SearchException {
-        throw new Error("AutocompleteController.search() is unimplemented");
-    }
 
 }
