@@ -395,7 +395,7 @@ public class Authenticate extends FreemarkerHttpServlet {
 
 		// If the user is a self-editor, send them to their home page.
 		User user = getLoggedInUser(request);
-		if (AuthRole.USER.roleUri().equals(user.getRoleURI())) {
+		if ( Integer.toString(AuthRole.USER.level()) == user.getRoleURI() ) {
 			UserDao userDao = getUserDao(request);
 			if (userDao != null) {
 				List<String> uris = userDao.getIndividualsUserMayEditAs(user
