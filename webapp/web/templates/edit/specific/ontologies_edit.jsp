@@ -19,21 +19,21 @@
 	<td>
 		<form action="listOntologies" method="get">
 			<input type="hidden" name="home" value="${portalBean.portalId}" />
-			<input type="submit" class="form-button" value="Show All Ontologies"/>
+			<input type="submit" class="form-button" value="All Ontologies"/>
 		</form>
 		<form action="showClassHierarchy" method="get">
                         <input type="hidden" name="home" value="${portalBean.portalId}" />
-                        <input type="submit" class="form-button" value="Show This Ontology's Class Hierarchy" />
+                        <input type="submit" class="form-button" value="Hierarchy of Classes Defined in This Namespace" />
                         <input type="hidden" name="ontologyUri" value="${Ontology.URI}" />
                 </form>
 		<form action="listPropertyWebapps" method="get">
                         <input type="hidden" name="home" value="${portalBean.portalId}" />
-                        <input type="submit" class="form-button" value="Show This Ontology's Object Properties" />
+                        <input type="submit" class="form-button" value="Object Properties Defined in This Namespace" />
                         <input type="hidden" name="ontologyUri" value="${Ontology.URI}" />
                 </form>
 		<form action="listDatatypeProperties" method="get">
                         <input type="hidden" name="home" value="${portalBean.portalId}" />
-                        <input type="submit" class="form-button" value="Show This Ontology's Datatype Properties" />
+                        <input type="submit" class="form-button" value="Datatype Properties Defined in This Namespace" />
                         <input type="hidden" name="ontologyUri" value="${Ontology.URI}" />
                 </form>
 	</td>
@@ -64,7 +64,7 @@
                 <input type="hidden" name="subgraph" value="tbox"/>
                 <input type="hidden" name="assertedOrInferred" value="asserted"/>
                 <input type="hidden" name="ontologyURI" value="${Ontology.URI}"/>
-                <input type="submit" class="form-button" name="submit" value="export ontology to RDF"/>
+                <input type="submit" class="form-button" name="submit" value="Export Ontology Entities Defined in This Namespace to RDF"/>
                 <div style="padding:0;margin-top:0.3em;white-space:nowrap;">
 	                <input type="radio" name="format" value="RDF/XML-ABBREV" checked="checked" selected="selected"/> RDF/XML abbreviated
 	                <input type="radio" name="format" value="RDF/XML"/> RDF/XML
