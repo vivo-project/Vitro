@@ -303,7 +303,7 @@ public class PropertyEditLinks extends TagSupport{
 
     protected LinkStruct[] doDataPropStmt(DataPropertyStatement dpropStmt, EditLinkAccess[] allowedAccessTypeArray, String contextPath) {
         if( allowedAccessTypeArray == null || dpropStmt == null || allowedAccessTypeArray.length == 0 ) {
-            log.info("null or empty access type array in doDataPropStmt for "+dpropStmt.getDatapropURI());
+            log.debug("null or empty access type array in doDataPropStmt for "+dpropStmt.getDatapropURI());
             return empty_array;
         }
         LinkStruct[] links = new LinkStruct[2];
@@ -432,7 +432,7 @@ public class PropertyEditLinks extends TagSupport{
 
     protected LinkStruct[] doObjPropStmt(ObjectPropertyStatement opropStmt, EditLinkAccess[] allowedAccessTypeArray, String contextPath) {
         if( allowedAccessTypeArray == null || opropStmt == null || allowedAccessTypeArray.length == 0 ) {
-            log.info("null or empty access type array in doObjPropStmt for "+opropStmt.getPropertyURI());
+            log.debug("null or empty access type array in doObjPropStmt for "+opropStmt.getPropertyURI());
             return empty_array;
         }
         

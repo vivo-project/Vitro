@@ -9,7 +9,14 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.ontology.Individual;
+import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.rdf.model.NodeIterator;
+import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.impl.Util;
+import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.Identifier;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
@@ -50,10 +57,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 public class SelfEditingPolicy implements VisitingPolicyIface {
     protected static Log log = LogFactory.getLog( SelfEditingPolicy.class );
 
-    /** regex for extracting a namespace from a URI */
-    // Do not use this; use Jena's splitNamespace() util instead.
-    //private Pattern ns = Pattern.compile("([^#]*#)[^#]*");
-
     /**
      * Namespaces from which Self Editors should not be able to use resources.
      */
@@ -65,19 +68,26 @@ public class SelfEditingPolicy implements VisitingPolicyIface {
     /** URIs of resources that SelfEditors should not be able to use in statements*/
     protected  Set<String>prohibitedResources;
 
+    /** URIs of properties from prohibited namespaces that Self Editors need to be
+     * able to edit */
+    protected  Set<String> editableVitroUris;       
+    
+    protected OntModel model;
+    
     /** Indicates which Authorization to use when the user isn't explicitly authorized. */
     private static Authorization defaultFailure = Authorization.INCONCLUSIVE;
 
-    /** URIs of properties from prohibited namespaces that Self Editors need to be
-     * able to edit */
-    protected  Set<String> editableVitroUris;
+    
+
 
     public SelfEditingPolicy(
             Set<String>prohibitedProperties,
             Set<String>prohibitedResources,
             Set<String>prohibitedNamespaces,
-            Set<String> editableVitroUris ){
-
+            Set<String> editableVitroUris ,
+            OntModel model){
+        this.model = model;
+        
         if( prohibitedProperties != null )
             this.prohibitedProperties = prohibitedProperties;
         else
@@ -161,7 +171,7 @@ public class SelfEditingPolicy implements VisitingPolicyIface {
             if (id instanceof SelfEditing) {
                 SelfEditing seu = (SelfEditing) id;
                 uriStr = seu.getValue();
-                log.debug("found SelfEditingUri" + uriStr);
+                log.debug("found SelfEditingUri " + uriStr);
                 break;
             }
         }
@@ -389,6 +399,10 @@ public class SelfEditingPolicy implements VisitingPolicyIface {
         if( ids == null || action == null )
             return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy, null action or ids");
 
+        if( "http://vivoweb.org/ontology/core#informationResourceInAuthorship".equals( action.getUriOfPredicate() ) ){
+            return canEditAuthorship(ids, action, model);            
+        }
+        
         //cannot edit resources related to system
         if( !canModifyResource( action.uriOfObject ) )
             return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy does not grant access to admin resources; " +
@@ -462,6 +476,45 @@ public class SelfEditingPolicy implements VisitingPolicyIface {
         return new BasicPolicyDecision(Authorization.INCONCLUSIVE,"SelfEditingPolicy does not authorize administrative modifications");
     }
 
+
+    private PolicyDecision canEditAuthorship(IdentifierBundle ids, EditObjPropStmt action, OntModel model2) {        
+        PolicyDecision pd = null;
+        String selfEditorUri = SelfEditingIdentifierFactory.getSelfEditingUri(ids);
+        if( selfEditorUri == null || selfEditorUri.isEmpty() )
+            return pd;
+                
+        model2.enterCriticalSection(Lock.READ);
+        try{
+            if( action != null && action.getUriOfObject() != null ){
+                Individual authorship = model2.getIndividual(action.getUriOfObject());
+                if( authorship != null ){                    
+                    NodeIterator authors = authorship.listPropertyValues(LINKED_AUTHOR_PROPERTY );
+                    try{
+                        while(authors.hasNext()){
+                            Resource author = (Resource)authors.nextNode();
+                            if( author != null && selfEditorUri.equals( author.getURI() ) ){
+                                pd = new BasicPolicyDecision(Authorization.AUTHORIZED, "SelfEditingPolicy, may edit because SelfEditor is author");
+                                
+                            }                        
+                        }
+                    }finally{
+                        if( authors != null)
+                            authors.close();
+                    }                    
+                }
+            }
+        }finally{
+            model2.leaveCriticalSection();
+        }
+        if( pd == null )
+            return new BasicPolicyDecision(Authorization.INCONCLUSIVE,
+            "SelfEditingPolicy from canEditAuthorship");
+        else
+            return pd;
+    }
+
+    private static Property LINKED_AUTHOR_PROPERTY = ResourceFactory.createProperty("http://vivoweb.org/ontology/core#linkedAuthor");
+    
     public String toString(){
         return "SelfEditingPolicy " + hashCode()
         + " nspaces: " + prohibitedNs.size() + " prohibited Props: "
@@ -472,4 +525,6 @@ public class SelfEditingPolicy implements VisitingPolicyIface {
     public static void setDefaultFailure( Authorization defaultFail){
         SelfEditingPolicy.defaultFailure = defaultFail;       
     }
+    
+    
 }

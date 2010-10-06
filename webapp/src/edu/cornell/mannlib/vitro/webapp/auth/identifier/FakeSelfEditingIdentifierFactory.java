@@ -40,9 +40,9 @@ public class FakeSelfEditingIdentifierFactory implements IdentifierBundleFactory
                 if( ind != null ){        
                     String causeOfBlacklist = SelfEditingIdentifierFactory.checkForBlacklisted(ind, context);
                     if( causeOfBlacklist == SelfEditingIdentifierFactory.NOT_BLACKLISTED )
-                        ib.add( new SelfEditingIdentifierFactory.SelfEditing( ind, SelfEditingIdentifierFactory.NOT_BLACKLISTED ) );
+                        ib.add( new SelfEditingIdentifierFactory.SelfEditing( ind, SelfEditingIdentifierFactory.NOT_BLACKLISTED, true ) );
                     else
-                        ib.add( new SelfEditingIdentifierFactory.SelfEditing( ind, causeOfBlacklist ) );
+                        ib.add( new SelfEditingIdentifierFactory.SelfEditing( ind, causeOfBlacklist, true) );
                 }
             }
         }

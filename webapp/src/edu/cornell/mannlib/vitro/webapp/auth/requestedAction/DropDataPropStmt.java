@@ -44,6 +44,10 @@ public class DropDataPropStmt implements RequestedAction {
         return RequestActionConstants.actionNamespace + this.getClass().getName();
     }
 
+    public String toString(){ 
+        return "DropDataPropStmt <"+dataPropStmt.getIndividualURI()+"> <"+dataPropStmt.getDatapropURI()+">" ;
+    }
+    
     /*
      * TODO: needs to be fixed to work with lang/datatype literals
      */
