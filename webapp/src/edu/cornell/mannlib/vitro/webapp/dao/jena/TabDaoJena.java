@@ -29,6 +29,7 @@ import com.hp.hpl.jena.util.iterator.ClosableIterator;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Tab;
+import edu.cornell.mannlib.vitro.webapp.beans.TabIndividualRelation;
 import edu.cornell.mannlib.vitro.webapp.dao.TabDao;
 import edu.cornell.mannlib.vitro.webapp.dao.TabEntityFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
@@ -262,30 +263,16 @@ public class TabDaoJena extends JenaBaseDao implements TabDao {
     /**
      * returns a list of URI strings of Entities manually linked to tab (tabId)
      */
-    public List<String> getTabManuallyLinkedEntityURIs(int tabId) {
+    public List<String> getTabManuallyLinkedEntityURIs(int tab_id) {
         List<String> entityURIs = new LinkedList<String>();
-//        getOntModel().enterCriticalSection(Lock.READ);
-//        try {
-//            Resource tab = getOntModel().getResource(DEFAULT_NAMESPACE+"tab"+tabId);
-//            if (tab != null && TAB_LINKEDENTITY != null) {
-//                ClosableIterator entityIt = getOntModel().listStatements(tab, TAB_LINKEDENTITY, (Resource)null);
-//                try {
-//                    while (entityIt.hasNext()) {
-//                        Statement st = (Statement) entityIt.next();
-//                        Resource entity = (Resource) st.getObject();
-//                        if (entity != null) {
-//                            entityURIs.add(entity.getURI());
-//                        }
-//                    }
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                } finally {
-//                    entityIt.close();
-//                }
-//            }
-//        } finally {
-//            getOntModel().leaveCriticalSection();
-//        }
+        TabIndividualRelationDaoJena tabToIndDao = new TabIndividualRelationDaoJena( getWebappDaoFactory() );
+        List<TabIndividualRelation> tabsToInd = tabToIndDao.getTabIndividualRelationsByTabURI( DEFAULT_NAMESPACE+"tab"+tab_id );
+        if( tabsToInd != null ){
+            for( TabIndividualRelation rel : tabsToInd){
+                if( rel != null && rel.getEntURI() != null)
+                    entityURIs.add( rel.getEntURI() );
+            }
+        }        
         return entityURIs;
     }
 

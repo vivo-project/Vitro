@@ -19,6 +19,7 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQueryFactory;
  *
  * @author bdc34
  *
+ *@deprecated Use LuceneIndexFactory instead
  */
 public interface Searcher {
 
