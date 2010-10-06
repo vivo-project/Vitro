@@ -25,6 +25,7 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vedit.beans.LoginFormBean;
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.RoleBasedPolicy.AuthRole;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
@@ -287,6 +288,7 @@ public class Authenticate extends FreemarkerHttpServlet {
 		HttpSession session = request.getSession();
 
 		// Put the login info into the session.
+		// TODO the LoginFormBean is being phased out.
 		LoginFormBean lfb = new LoginFormBean();
 		lfb.setUserURI(user.getURI());
 		lfb.setLoginStatus("authenticated");
@@ -295,6 +297,11 @@ public class Authenticate extends FreemarkerHttpServlet {
 		lfb.setLoginRemoteAddr(request.getRemoteAddr());
 		lfb.setLoginName(user.getUsername());
 		session.setAttribute("loginHandler", lfb);
+		// TODO this should eventually replace the LoginFormBean.
+		LoginStatusBean lsb = new LoginStatusBean(user.getURI(),
+				user.getUsername(), parseUserSecurityLevel(user));
+		LoginStatusBean.setBean(session, lsb);
+		log.info("Adding status bean: " + lsb);
 
 		// Remove the login process info from the session.
 		session.removeAttribute(LoginProcessBean.SESSION_ATTRIBUTE);
@@ -307,15 +314,10 @@ public class Authenticate extends FreemarkerHttpServlet {
 		getUserDao(request).updateUser(user);
 
 		// Set the timeout limit on the session - editors, etc, get more.
-		session.setMaxInactiveInterval(LOGGED_IN_TIMEOUT_INTERVAL); // seconds,
-																	// not
-																	// milliseconds
-		try {
-			if ((int) Integer.decode(lfb.getLoginRole()) > 1) {
-				session.setMaxInactiveInterval(PRIVILEGED_TIMEOUT_INTERVAL);
-			}
-		} catch (NumberFormatException e) {
-			// No problem - leave it at the default.
+		if (lsb.isLoggedInAtLeast(LoginStatusBean.EDITOR)) {
+			session.setMaxInactiveInterval(PRIVILEGED_TIMEOUT_INTERVAL);
+		} else {
+			session.setMaxInactiveInterval(LOGGED_IN_TIMEOUT_INTERVAL);
 		}
 
 		// Record the user in the user/Session map.
@@ -437,10 +439,8 @@ public class Authenticate extends FreemarkerHttpServlet {
 		if (session == null) {
 			return State.NOWHERE;
 		}
-
-		LoginFormBean lfb = (LoginFormBean) session
-				.getAttribute("loginHandler");
-		if ((lfb != null) && (lfb.getLoginStatus().equals("authenticated"))) {
+		
+		if (LoginStatusBean.getBean(request).isLoggedIn()) {
 			return State.LOGGED_IN;
 		}
 
@@ -456,19 +456,13 @@ public class Authenticate extends FreemarkerHttpServlet {
 			return null;
 		}
 
-		HttpSession session = request.getSession(false);
-		if (session == null) {
-			return null;
-		}
-
-		LoginFormBean lfb = (LoginFormBean) session
-				.getAttribute("loginHandler");
-		if (lfb == null) {
+		LoginStatusBean lsb = LoginStatusBean.getBean(request);
+		if (!lsb.isLoggedIn()) {
 			log.debug("getLoggedInUser: not logged in");
 			return null;
 		}
 
-		return userDao.getUserByUsername(lfb.getLoginName());
+		return userDao.getUserByUsername(lsb.getUsername());
 	}
 
 	/**
@@ -518,6 +512,19 @@ public class Authenticate extends FreemarkerHttpServlet {
 	/** Where do we stand in the login process? */
 	private LoginProcessBean getLoginProcessBean(HttpServletRequest request) {
 		return LoginProcessBean.getBeanFromSession(request);
+	}
+
+	/**
+	 * Parse the role URI from User. Don't crash if it is not valid.
+	 */
+	private int parseUserSecurityLevel(User user) {
+		try {
+			return Integer.parseInt(user.getRoleURI());
+		} catch (NumberFormatException e) {
+			log.warn("Invalid RoleURI '" + user.getRoleURI() + "' for user '"
+					+ user.getURI() + "'");
+			return 1;
+		}
 	}
 
 	// ----------------------------------------------------------------------
