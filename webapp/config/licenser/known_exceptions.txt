@@ -165,5 +165,4 @@ webapp/web/js/html5.js
 webapp/web/js/selectivizr.js
 
 # Supersleight jQuery Plugin for Transparent PNGs in IE6. allinthehead.com/retro/338/supersleight-jquery-plugin
-webapp/web/js/supersleight.js
-webapp/web/js/supersleightUtils.js
+webapp/web/js/jquery_plugins/supersleight.js
