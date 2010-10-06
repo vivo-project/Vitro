@@ -15,9 +15,9 @@
 <form action="" method="get">
 
 <ul>
-    <li style="list-style-type:none;"><input type="radio" name="subgraph" checked="checked" value="full"/> Export entire RDF model (including application metadata)</li>
-    <li style="list-style-type:none;"><input type="radio" name="subgraph" value="tbox"/> Export ontology/ontologies (TBox)</li>
-    <li style="list-style-type:none;"><input type="radio" name="subgraph" value="abox"/> Export instance data (ABox)</li>
+    <li style="list-style-type:none;"><input type="radio" name="subgraph" checked="checked" value="full"/> Entire RDF model for the VIVO application (TBox and ABox, including application metadata)</li>
+    <li style="list-style-type:none;"><input type="radio" name="subgraph" value="tbox"/> Entire ontology (TBox) for the VIVO application</li>
+    <li style="list-style-type:none;"><input type="radio" name="subgraph" value="abox"/> All Instance data (ABox) for the VIVO application</li>
     <%VitroRequest vreq = new VitroRequest(request);
     OntologyDao daoObj = vreq.getFullWebappDaoFactory().getOntologyDao();
     List ontologiesObj = daoObj.getAllOntologies();  
@@ -25,7 +25,7 @@
     	Iterator ontItr = ontologiesObj.iterator();
     	while(ontItr.hasNext()){
     		Ontology ont = (Ontology) ontItr.next();%>
-    		<li style="list-style-type:none;"><input type="radio" name="subgraph" value=<%=ont.getURI()%>/> <%=ont.getName()%></li>
+    		<li style="list-style-type:none;"><input type="radio" name="subgraph" value=<%=ont.getURI()%>/> <%=ont.getName()%> (TBox)</li>
     	<%}}%> 
 </ul>
 <hr/>
