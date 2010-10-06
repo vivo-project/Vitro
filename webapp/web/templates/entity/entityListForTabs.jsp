@@ -89,10 +89,6 @@
             </c:choose>
         </li>
     </c:forEach>
-<<<<<<< HEAD:webapp/web/templates/entity/entityListForTabs.jsp
-</ul>
-
-=======
 </ul>
 
 <%-- Show pages to select from --%>
@@ -124,5 +120,6 @@ if( request.getAttribute("alpha") != null && ! "all".equalsIgnoreCase((String)re
 	</c:forEach>
     </div>
 </c:if>
->>>>>>> c91e65e... Fixing page index on lucene based tabs. NIHVIVO-1143:webapp/web/templates/entity/entityListForTabs.jsp
+
+<jsp:include page="/templates/entity/entityListPages.jsp"/>
 

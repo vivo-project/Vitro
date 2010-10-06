@@ -4,6 +4,7 @@
 package edu.cornell.mannlib.vitro.webapp.controller;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
