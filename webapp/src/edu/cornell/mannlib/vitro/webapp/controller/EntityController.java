@@ -266,14 +266,21 @@ public class EntityController extends VitroHttpServlet {
 		newModel.write( res.getOutputStream(), format );		
 	}
 
-	private void doRedirect(HttpServletRequest req, HttpServletResponse res,
-			String redirectURL) {	
-		// It seems like there must be a better way to do this
-		String hn = req.getHeader("Host");		
-    	res.setHeader("Location", res.encodeURL( "http://" + hn + req.getContextPath() + redirectURL ));
-    	res.setStatus(res.SC_SEE_OTHER);		
-	}
-
+    private void doRedirect(HttpServletRequest req, HttpServletResponse res,
+            String redirectURL) {
+        //It seems like there must be a more standard way to do a redirect in tomcat.
+        String hn = req.getHeader("Host");
+        if (req.isSecure()) {
+            res.setHeader("Location", res.encodeURL("https://" + hn
+                    + req.getContextPath() + redirectURL));
+            log.info("doRedirect by using HTTPS");
+        } else {
+            res.setHeader("Location", res.encodeURL("http://" + hn
+                    + req.getContextPath() + redirectURL));
+            log.info("doRedirect by using HTTP");
+        }
+        res.setStatus(res.SC_SEE_OTHER);
+    }
 
 	private static Pattern LINKED_DATA_URL = Pattern.compile("^/individual/([^/]*)$");		
 	private static Pattern NS_PREFIX_URL = Pattern.compile("^/individual/([^/]*)/([^/]*)$");
