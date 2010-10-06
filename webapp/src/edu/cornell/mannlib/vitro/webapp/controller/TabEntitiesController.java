@@ -1,9 +1,9 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
+
 package edu.cornell.mannlib.vitro.webapp.controller;
 
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -180,6 +180,7 @@ public void doGet( HttpServletRequest req, HttpServletResponse response )
                  log.debug("TabEntitiesController: doing none for tabtypeid: "
                          + tab.getTabtypeId() +" and link mode: " + tab.getEntityLinkMethod());
              }
+
              
         } catch (Throwable e) {            
             req.setAttribute("javax.servlet.jsp.jspException",e);
@@ -370,7 +371,6 @@ public void doGet( HttpServletRequest req, HttpServletResponse response )
             rd.include(request, response);        
     }
 
-
     private int getPage(VitroRequest request) {
         String p = request.getParameter("page") ;
         if( p == null )
@@ -494,20 +494,20 @@ public void doGet( HttpServletRequest req, HttpServletResponse response )
        }        
     }    
 
-	private int getSizeForGalleryTab(Tab tab){
+    private int getSizeForGalleryTab(Tab tab){
         int rows = tab.getGalleryRows() != 0 ? tab.getGalleryRows() : 8;
         int col = tab.getGalleryCols() != 0 ? tab.getGalleryCols() : 8;
         return rows  * col;        
-	}
-	
-	private int getSizeForNonGalleryTab(Tab tab, boolean showPaged ){  
-	    if( showPaged )
-	        if( tab.getGalleryCols() == 0 || tab.getGalleryRows() == 0 )
-	            return 8;
-	        else 
-	            return getSizeForGalleryTab(tab);	        
-	    else
-	        return NON_PAGED_LIMIT;	    
+    }
+    
+    private int getSizeForNonGalleryTab(Tab tab, boolean showPaged ){  
+        if( showPaged )
+            if( tab.getGalleryCols() == 0 || tab.getGalleryRows() == 0 )
+                return 8;
+            else 
+                return getSizeForGalleryTab(tab);           
+        else
+            return NON_PAGED_LIMIT;     
     }
 
     private int getTabDepth(VitroRequest request){

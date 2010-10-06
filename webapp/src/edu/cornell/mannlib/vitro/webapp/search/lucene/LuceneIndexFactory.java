@@ -55,9 +55,12 @@ public class LuceneIndexFactory {
         
     /**
      * This method can be used to force the LuceneIndexFactory to return a new IndexSearcher.
+     * This will force a re-opening of the search index.
+     * 
      * This could be useful if the index was rebult in a different directory on the file system.
      */
     public synchronized void forceNewIndexSearcher(){
+        log.debug("forcing the re-opening of the search index");
         searcher = null;
     }
     
