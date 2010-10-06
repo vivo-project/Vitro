@@ -112,11 +112,13 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         //java class
         doc.add( new  Field(term.JCLASS, entClassName, Field.Store.YES, Field.Index.NOT_ANALYZED));
 
-        //Entity Name
-        if( ent.getName() != null )
-            value=ent.getName();
-        else
-            value="";
+        //Entity Name        
+        if( ent.getRdfsLabel() != null )
+            value=ent.getRdfsLabel();
+        else{
+            log.debug("Skipping individual without rdfs:label " + ent.getURI());
+            return null;
+        }
         Field name =new Field(term.NAME, value, 
                                Field.Store.YES, Field.Index.ANALYZED);
         name.setBoost( NAME_BOOST );
