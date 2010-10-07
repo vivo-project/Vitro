@@ -121,7 +121,7 @@ public class LoginStatusBean {
 		return securityLevel > ANYBODY;
 	}
 
-	public boolean isLoggedInAs(int level) {
+	public boolean isLoggedInExactly(int level) {
 		return securityLevel == level;
 	}
 

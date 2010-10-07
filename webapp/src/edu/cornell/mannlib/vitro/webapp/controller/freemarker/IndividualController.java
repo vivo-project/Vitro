@@ -32,7 +32,7 @@ import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -135,20 +135,6 @@ public class IndividualController extends FreemarkerHttpServlet {
 	    EditSubmission.clearAllEditSubmissionsInSession(session);
     }
     
-    private int getSecurityLevel(HttpSession session) {
-    	String loginStatus = null;
-    	int securityLevel = LoginFormBean.ANYBODY;
-    	LoginFormBean loginHandler = (LoginFormBean)session.getAttribute("loginHandler");
-    	if (loginHandler != null) {
-			loginStatus = loginHandler.getLoginStatus();
-			if  ("authenticated".equals(loginStatus)) {
-				securityLevel = Integer.parseInt(loginHandler.getLoginRole());  
-			}
-    	}
-    	return securityLevel;
-    	
-    }
-
     // Set template values related to access privileges
     // RY We may want to define an EditingIndividualTemplateModel class, with methods like getAdminPanel() and
     // getEditLinks(property). The constructor would take an individual and a loginFormBean object, both of which
@@ -158,13 +144,13 @@ public class IndividualController extends FreemarkerHttpServlet {
     // which might seem opaque to template authors.
     private Map<String, Object> getEditingData(VitroRequest vreq) {
   
-        int securityLevel = getSecurityLevel(vreq.getSession());
+        LoginStatusBean loginBean = LoginStatusBean.getBean(vreq);
         
     	Map<String, Object> editingData = new HashMap<String, Object>();
 
-		editingData.put("showEditLinks", VitroRequestPrep.isSelfEditing(vreq) || securityLevel >= LoginFormBean.NON_EDITOR);	
+		editingData.put("showEditLinks", VitroRequestPrep.isSelfEditing(vreq) || loginBean.isLoggedInAtLeast(LoginStatusBean.NON_EDITOR));	
 		
-		boolean showAdminPanel = securityLevel >= LoginFormBean.EDITOR;
+		boolean showAdminPanel = loginBean.isLoggedInAtLeast(LoginStatusBean.EDITOR);
 		editingData.put("showAdminPanel", showAdminPanel);
 
 		return editingData;		
@@ -203,8 +189,6 @@ public class IndividualController extends FreemarkerHttpServlet {
 	    throws ServletException, IOException {
 		
     	IndividualDao iwDao = vreq.getWebappDaoFactory().getIndividualDao();
-        
-        int securityLevel = getSecurityLevel(vreq.getSession());
         
         individual.setKeywords(iwDao.getKeywordsForIndividualByMode(individual.getURI(),"visible"));
         individual.sortForDisplay();

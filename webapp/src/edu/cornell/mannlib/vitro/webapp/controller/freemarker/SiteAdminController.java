@@ -11,7 +11,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -37,17 +37,12 @@ public class SiteAdminController extends FreemarkerHttpServlet {
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
 
-        String loginStatus = null;
-        
-        LoginFormBean loginHandler = (LoginFormBean)vreq.getSession().getAttribute("loginHandler");
-        if (loginHandler != null) {
-            loginStatus = loginHandler.getLoginStatus();
-        }
-        
+    	LoginStatusBean loginBean = LoginStatusBean.getBean(vreq);
+    	
         Map<String, Object> body = new HashMap<String, Object>();
         
         // NOT LOGGED IN: just show login form
-        if (loginHandler == null || !"authenticated".equals(loginStatus)) {
+        if (!loginBean.isLoggedIn()) {
             // Unlike the other panels on this page, we put the data directly in the body, because the templates are also used
             // by the JSP version, where the data is placed directly in the body map.
             body.putAll(getLoginPanelData(vreq));
@@ -55,19 +50,17 @@ public class SiteAdminController extends FreemarkerHttpServlet {
         // LOGGED IN: show editing options based on user role
         } else {
         
-            int securityLevel = Integer.parseInt( loginHandler.getLoginRole() );
-            
-            if (securityLevel >= LoginFormBean.EDITOR) {
+            if (loginBean.isLoggedInAtLeast(LoginStatusBean.EDITOR)) {
 
                 UrlBuilder urlBuilder = new UrlBuilder(vreq.getPortal());
                 
                 body.put("dataInput", getDataInputData(vreq));
         
-                if (securityLevel >= LoginFormBean.CURATOR) {
-                    body.put("siteConfig", getSiteConfigurationData(vreq, securityLevel, urlBuilder));
+                if (loginBean.isLoggedInAtLeast(LoginStatusBean.CURATOR)) {
+                    body.put("siteConfig", getSiteConfigurationData(vreq, urlBuilder));
                     body.put("ontologyEditor", getOntologyEditorData(vreq, urlBuilder));
                     
-                    if (securityLevel >= LoginFormBean.DBA) {
+                    if (loginBean.isLoggedInAtLeast(LoginStatusBean.DBA)) {
                         body.put("dataTools", getDataToolsData(vreq, urlBuilder));
                         
                         // Only for DataStar. Should handle without needing a DataStar-specific version of this controller.
@@ -126,14 +119,14 @@ public class SiteAdminController extends FreemarkerHttpServlet {
         return map;
     }
     
-    private Map<String, Object> getSiteConfigurationData(VitroRequest vreq, int securityLevel, UrlBuilder urlBuilder) {
+    private Map<String, Object> getSiteConfigurationData(VitroRequest vreq, UrlBuilder urlBuilder) {
 
         Map<String, Object> map = new HashMap<String, Object>();
         Map<String, String> urls = new HashMap<String, String>();
 
         urls.put("tabs", urlBuilder.getPortalUrl("/listTabs"));
         
-        if (securityLevel >= LoginFormBean.DBA) {                
+        if (LoginStatusBean.getBean(vreq).isLoggedInAtLeast(LoginStatusBean.DBA)) {                
             urls.put("users", urlBuilder.getPortalUrl("/listUsers"));
         }
 

@@ -8,28 +8,17 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.auth.AuthorizationHelper;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.ArrayIdentifierBundle;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.ServletIdentifierBundleFactory;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyList;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.RequestPolicyList;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AddDataPropStmt;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.DropObjectPropStmt;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.EditObjPropStmt;
@@ -602,7 +591,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 */
 	private boolean checkAuthorized(VitroRequest vreq)
 			throws UserMistakeException {
-		if (LoginFormBean.loggedIn(vreq, LoginFormBean.EDITOR)) {
+		if (LoginStatusBean.getBean(vreq).isLoggedInAtLeast(LoginStatusBean.EDITOR)) {
 			log.debug("Authorized because logged in as Editor");
 			return true;
 		}

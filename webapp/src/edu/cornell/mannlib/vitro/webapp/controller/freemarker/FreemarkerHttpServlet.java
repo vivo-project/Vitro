@@ -15,14 +15,13 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.rdf.model.Model;
 
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
@@ -53,7 +52,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
 
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(FreemarkerHttpServlet.class);
-    private static final int FILTER_SECURITY_LEVEL = LoginFormBean.EDITOR;
+    private static final int FILTER_SECURITY_LEVEL = LoginStatusBean.EDITOR;
 
     protected enum Template {
         STANDARD_ERROR("error-standard.ftl"),
@@ -476,24 +475,13 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     }
 
     private final Map<String, Object> getLoginValues(VitroRequest vreq) {
-        
-        String loginName = null;
-        int securityLevel;
-        
-        HttpSession session = vreq.getSession();
-        LoginFormBean loginBean = (LoginFormBean) session.getAttribute("loginHandler");
-        if (loginBean != null && loginBean.testSessionLevel(vreq) > -1) {
-            loginName = loginBean.getLoginName();
-            securityLevel = Integer.parseInt(loginBean.getLoginRole());
-        } 
-        
         Map<String, Object> map = new HashMap<String, Object>();
         
-        if (loginName != null) {
-            map.put("loginName", loginName);
+        LoginStatusBean loginBean = LoginStatusBean.getBean(vreq);
+        if (loginBean.isLoggedIn()) {
+            map.put("loginName", loginBean.getUsername());
 
-            securityLevel = Integer.parseInt(loginBean.getLoginRole());
-            if (securityLevel >= FILTER_SECURITY_LEVEL) {
+            if (loginBean.isLoggedInAtLeast(FILTER_SECURITY_LEVEL)) {
                 ApplicationBean appBean = vreq.getAppBean();
                 if (appBean.isFlag1Active()) {
                     map.put("showFlag1SearchField", true);
