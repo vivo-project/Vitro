@@ -242,6 +242,7 @@ public class ImageUploadHelper {
 		} catch (UserMistakeException e) {
 			throw e;
 		} catch (Exception e) {
+			log.warn("Unexpected exception in image handling", e);
 			throw new UserMistakeException("Sorry, we were unable to process "
 					+ "the photo you provided. Please try another photo.");
 		} finally {
