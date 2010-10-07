@@ -145,31 +145,31 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 * </ul>
 	 * </p>
 	 */
-	
-    @Override
-    protected ResponseValues processRequest(VitroRequest vreq) {
-        try {
-            // Parse the multi-part request.
-            FileUploadServletRequest request = FileUploadServletRequest.parseRequest(vreq,
-                    MAXIMUM_FILE_SIZE);
-            if (log.isTraceEnabled()) {
-                dumpRequestDetails(vreq);
-            }  
-            
-            // If they aren't authorized to do this, send them to login.
-            if (!checkAuthorized(vreq)) {
-                String loginPage = request.getContextPath() + Controllers.LOGIN;
-                return new RedirectResponseValues(loginPage);
-            }
-            
-            return buildTheResponse(vreq);
-            
-        } catch (Exception e) {
-            //log.error("Could not produce response page", e);
-            return new ExceptionResponseValues(e);
-        }
-    }
-    
+
+	@Override
+	protected ResponseValues processRequest(VitroRequest vreq) {
+		try {
+			// Parse the multi-part request.
+			FileUploadServletRequest request = FileUploadServletRequest
+					.parseRequest(vreq, MAXIMUM_FILE_SIZE);
+			if (log.isTraceEnabled()) {
+				dumpRequestDetails(vreq);
+			}
+
+			// If they aren't authorized to do this, send them to login.
+			if (!checkAuthorized(vreq)) {
+				String loginPage = request.getContextPath() + Controllers.LOGIN;
+				return new RedirectResponseValues(loginPage);
+			}
+
+			return buildTheResponse(vreq);
+
+		} catch (Exception e) {
+			// log.error("Could not produce response page", e);
+			return new ExceptionResponseValues(e);
+		}
+	}
+
 	/**
 	 * Handle the different actions. If not specified, the default action is to
 	 * show the intro screen.
@@ -480,8 +480,8 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 * URI.
 	 */
 	private String formAction(String entityUri, String action) {
-		UrlBuilder.ParamMap params = new UrlBuilder.ParamMap(PARAMETER_ENTITY_URI,
-				entityUri, PARAMETER_ACTION, action);
+		UrlBuilder.ParamMap params = new UrlBuilder.ParamMap(
+				PARAMETER_ENTITY_URI, entityUri, PARAMETER_ACTION, action);
 		return UrlBuilder.getPath(URL_HERE, params);
 	}
 
@@ -580,8 +580,6 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 		}
 	}
 
-
-
 	/**
 	 * If they are logged in as an Editor or better, they can do whatever they
 	 * want.
@@ -591,7 +589,8 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 */
 	private boolean checkAuthorized(VitroRequest vreq)
 			throws UserMistakeException {
-		if (LoginStatusBean.getBean(vreq).isLoggedInAtLeast(LoginStatusBean.EDITOR)) {
+		if (LoginStatusBean.getBean(vreq).isLoggedInAtLeast(
+				LoginStatusBean.EDITOR)) {
 			log.debug("Authorized because logged in as Editor");
 			return true;
 		}
@@ -618,9 +617,12 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 					VitroVocabulary.IND_MAIN_IMAGE,
 					RequestActionConstants.SOME_LITERAL, null, null);
 		}
-		
+
 		AuthorizationHelper helper = new AuthorizationHelper(vreq);
-		return helper.isAuthorizedForRequestedAction(ra);
+		boolean authorized = helper.isAuthorizedForRequestedAction(ra);
+		log.debug((authorized ? "" : "Not ") + "Authorized for '" + action
+				+ "' as self-editor;  requested action = " + ra);
+		return authorized;
 	}
 
 }
