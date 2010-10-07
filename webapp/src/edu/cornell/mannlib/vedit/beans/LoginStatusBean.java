@@ -45,7 +45,7 @@ public class LoginStatusBean {
 	// ----------------------------------------------------------------------
 
 	/**
-	 * Attach this bean to the session.
+	 * Attach this bean to the session - this means you are logged in.
 	 */
 	public static void setBean(HttpSession session, LoginStatusBean lsb) {
 		session.setAttribute(ATTRIBUTE_NAME, lsb);
