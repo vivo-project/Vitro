@@ -2,13 +2,13 @@
 
 <%@page import="edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
-<%@page import="edu.cornell.mannlib.vedit.beans.LoginFormBean"%>
+<%@page import="edu.cornell.mannlib.vedit.beans.LoginStatusBean"%>
 
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
 
 <%
 
-if (session == null || !LoginFormBean.loggedIn(request, LoginFormBean.DBA)) {
+if (!LoginStatusBean.getBean(request).isLoggedInAtLeast(LoginStatusBean.DBA)) {
     %><c:redirect url="<%= Controllers.LOGIN %>" /><%
 }
 

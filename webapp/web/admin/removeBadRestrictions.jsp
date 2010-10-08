@@ -2,11 +2,11 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
 
-<%@ page import="edu.cornell.mannlib.vedit.beans.LoginFormBean" %>
+<%@ page import="edu.cornell.mannlib.vedit.beans.LoginStatusBean" %>
 
 
 <%
-    if(session == null || !LoginFormBean.loggedIn(request, LoginFormBean.CURATOR)) {
+	if (!LoginStatusBean.getBean(request).isLoggedInAtLeast(LoginStatusBean.CURATOR)) {
         %><c:redirect url="/siteAdmin"></c:redirect><%
     }
   

@@ -9,7 +9,7 @@
 <%@page import="edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDao"%>
 <%@page import="java.io.InputStream"%>
 <%@page import="java.util.Properties"%>
-<%@page import="edu.cornell.mannlib.vedit.beans.LoginFormBean"%>
+<%@page import="edu.cornell.mannlib.vedit.beans.LoginStatusBean"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
@@ -32,8 +32,7 @@
 %>
 
 <%
-
-	if(session == null || !LoginFormBean.loggedIn(request, LoginFormBean.DBA)) {
+	if (!LoginStatusBean.getBean(request).isLoggedInAtLeast(LoginStatusBean.DBA)) {
 	    %>
         <c:redirect url="<%= Controllers.LOGIN %>" />
         <%

@@ -1,6 +1,6 @@
 <%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
 
-<%@ page import="edu.cornell.mannlib.vedit.beans.LoginFormBean" %>
+<%@ page import="edu.cornell.mannlib.vedit.beans.LoginStatusBean" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
 <%@ page import="org.apache.log4j.*" %>
 <%@ page import="java.util.*" %>
@@ -15,7 +15,7 @@
   based on work by Volker Mentzner. --%>
 
 <%
-if (session == null || !LoginFormBean.loggedIn(request, LoginFormBean.DBA)) {
+if (!LoginStatusBean.getBean(request).isLoggedInAtLeast(LoginStatusBean.DBA)) {
     %><c:redirect url="<%= Controllers.LOGIN %>" /><%
 }
 

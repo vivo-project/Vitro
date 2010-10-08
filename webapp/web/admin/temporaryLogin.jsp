@@ -1,6 +1,6 @@
 <%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
 
-<%@ page import="edu.cornell.mannlib.vedit.beans.LoginFormBean" %>
+<%@ page import="edu.cornell.mannlib.vedit.beans.LoginStatusBean" %>
 
 <%@ page import="com.hp.hpl.jena.rdf.model.*" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep" %>
@@ -11,7 +11,7 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
 
-<%  if(session == null || !LoginFormBean.loggedIn(request, LoginFormBean.CURATOR)) {
+<%  if (!LoginStatusBean.getBean(request).isLoggedInAtLeast(LoginStatusBean.CURATOR)) {
         %><c:redirect url="<%= Controllers.LOGIN %>" /><%
     }
 
@@ -22,7 +22,7 @@
         FakeSelfEditingIdentifierFactory.clearFakeIdInSession( session );
         FakeSelfEditingIdentifierFactory.putFakeIdInSession( netid , session );
         // don't want to do this because would affect the whole session
-        // if(LoginFormBean.loggedIn(request, LoginFormBean.CURATOR)) {
+        // if (!LoginStatusBean.getBean(request).isLoggedInAtLeast(LoginStatusBean.CURATOR)) {
         //	   CuratorEditingPolicySetup.removeAllCuratorEditingPolicies(getServletConfig().getServletContext());
         //} %>
         <jsp:forward page="/edit/login.jsp"/>                   
@@ -32,7 +32,7 @@
         VitroRequestPrep.forceOutOfSelfEditing(request);
         FakeSelfEditingIdentifierFactory.clearFakeIdInSession( session );        
      	// don't want to do this because would affect the whole session
-        // if(LoginFormBean.loggedIn(request, LoginFormBean.CURATOR)) {
+        // if (!LoginStatusBean.getBean(request).isLoggedInAtLeast(LoginStatusBean.CURATOR)) {
         //	   CuratorEditingPolicySetup.replaceCuratorEditing(getServletConfig().getServletContext(),(Model)application.getAttribute("jenaOntModel"));
         //}
         %><c:redirect url="/"></c:redirect><%
