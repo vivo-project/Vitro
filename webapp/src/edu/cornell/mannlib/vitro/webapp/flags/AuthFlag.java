@@ -2,10 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.flags;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
 
 public class AuthFlag {
     private boolean filterByAuthLevel = true;
