@@ -39,6 +39,12 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.LoginEvent;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.LoginLogoutEvent;
 
 public class Authenticate extends FreeMarkerHttpServlet {
+	/** Maximum inactive interval for a ordinary logged in user session, in seconds. */
+	public static final int LOGGED_IN_TIMEOUT_INTERVAL = 300;
+	
+	/** Maximum inactive interval for a editor (or better) session, in seconds. */
+	public static final int PRIVILEGED_TIMEOUT_INTERVAL = 32000;
+
 	private static final Log log = LogFactory.getLog(Authenticate.class
 			.getName());
 
@@ -301,10 +307,10 @@ public class Authenticate extends FreeMarkerHttpServlet {
 		getUserDao(request).updateUser(user);
 
 		// Set the timeout limit on the session - editors, etc, get more.
-		session.setMaxInactiveInterval(300); // seconds, not milliseconds
+		session.setMaxInactiveInterval(LOGGED_IN_TIMEOUT_INTERVAL); // seconds, not milliseconds
 		try {
 			if ((int) Integer.decode(lfb.getLoginRole()) > 1) {
-				session.setMaxInactiveInterval(32000);
+				session.setMaxInactiveInterval(PRIVILEGED_TIMEOUT_INTERVAL);
 			}
 		} catch (NumberFormatException e) {
 			// No problem - leave it at the default.
@@ -385,7 +391,7 @@ public class Authenticate extends FreeMarkerHttpServlet {
 
 		// If the user is a self-editor, send them to their home page.
 		User user = getLoggedInUser(request);
-		if (AuthRole.USER.roleUri().equals(user.getRoleURI())) {
+		if ( user != null && user.getRoleURI() != null && user.getRoleURI().equals( Integer.toString(AuthRole.USER.level()) )){
 			UserDao userDao = getUserDao(request);
 			if (userDao != null) {
 				List<String> uris = userDao.getIndividualsUserMayEditAs(user
@@ -491,16 +497,14 @@ public class Authenticate extends FreeMarkerHttpServlet {
 	/** What's the URL for the login screen? */
 	private String getLoginScreenUrl(HttpServletRequest request) {
 		String contextPath = request.getContextPath();
-		String urlParams = "?home=" + getPortalIdString(request)
-				+ "&login=block";
+		String urlParams = "?login=block";
 		return contextPath + Controllers.LOGIN + urlParams;
 	}
 
 	/** What's the URL for the site admin screen? */
 	private String getSiteAdminUrl(HttpServletRequest request) {
 		String contextPath = request.getContextPath();
-		String urlParams = "?home=" + getPortalIdString(request)
-				+ "&login=block";
+		String urlParams = "?login=block";
 		return contextPath + Controllers.SITE_ADMIN + urlParams;
 	}
 

@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Set;
 
 import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -29,6 +28,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
@@ -37,13 +37,10 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.WildcardQuery;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
@@ -60,12 +57,10 @@ import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
 import edu.cornell.mannlib.vitro.webapp.search.SearchException;
-import edu.cornell.mannlib.vitro.webapp.search.beans.Searcher;
 import edu.cornell.mannlib.vitro.webapp.search.beans.VitroHighlighter;
 import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQuery;
-import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQueryFactory;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc;
-import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneIndexer;
+import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneIndexFactory;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.SimpleLuceneHighlighter;
 import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
@@ -78,26 +73,11 @@ import edu.cornell.mannlib.vitro.webapp.utils.Html2Text;
  * @author bdc34
  *
  */
-public class PagedSearchController extends VitroHttpServlet implements Searcher{
-    private IndexSearcher searcher = null;
+public class PagedSearchController extends VitroHttpServlet {
     private static final Log log = LogFactory.getLog(PagedSearchController.class.getName());
     String NORESULT_MSG = "The search returned no results.";    
     private int defaultHitsPerPage = 25;
     private int defaultMaxSearchSize= 1000;   
-
-    public void init(ServletConfig config) throws ServletException {
-        super.init(config);
-        LuceneIndexer indexer=(LuceneIndexer)getServletContext()
-        .getAttribute(LuceneIndexer.class.getName());
-        indexer.addSearcher(this);
-
-        try{
-            String indexDir = getIndexDir(getServletContext());        
-            getIndexSearcher(indexDir);
-        }catch(Exception ex){
-
-        }                                           
-    }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
@@ -129,7 +109,8 @@ public class PagedSearchController extends VitroHttpServlet implements Searcher{
                 startIndex = Integer.parseInt(request.getParameter("startIndex")); 
             }catch (Throwable e) { 
                 startIndex = 0; 
-            }            
+            }      
+            log.debug("startIndex is " + startIndex);
             
             int hitsPerPage = defaultHitsPerPage;
             try{ 
@@ -137,6 +118,7 @@ public class PagedSearchController extends VitroHttpServlet implements Searcher{
             } catch (Throwable e) { 
                 hitsPerPage = defaultHitsPerPage; 
             }                        
+            log.debug("hitsPerPage is " + hitsPerPage);
             
             int maxHitSize = defaultMaxSearchSize;
             if( startIndex >= defaultMaxSearchSize - hitsPerPage )
@@ -145,20 +127,23 @@ public class PagedSearchController extends VitroHttpServlet implements Searcher{
                 maxHitSize = maxHitSize * 2;
                 hitsPerPage = maxHitSize;
             }
-            
-            String indexDir = getIndexDir(getServletContext());
-            
+            log.debug("maxHitSize is " + maxHitSize);
+                        
             String qtxt = vreq.getParameter(VitroQuery.QUERY_PARAMETER_NAME);
             Analyzer analyzer = getAnalyzer(getServletContext());
-            Query query = getQuery(vreq, portalFlag, analyzer, indexDir, qtxt);             
+
+            Query query = null;
+            try {
+                query = getQuery(vreq, portalFlag, analyzer, qtxt);
+            } catch (ParseException e) {
+                log.warn("Query parse exception: " + e);
+                doBadQuery(qtxt, request, response);
+                return;
+            } 
+            
             log.debug("query for '" + qtxt +"' is " + query.toString());
             
-            if (query == null ) {
-                doNoQuery(request, response);
-                return;
-            }
-            
-            IndexSearcher searcherForRequest = getIndexSearcher(indexDir);
+            IndexSearcher searcherForRequest = LuceneIndexFactory.getIndexSearcher(getServletContext());
                                                 
             TopDocs topDocs = null;
             try{
@@ -176,7 +161,7 @@ public class PagedSearchController extends VitroHttpServlet implements Searcher{
                     doFailedSearch(request, response, msg, qtxt);
                     return;
                 }
-            }
+            }            
 
             if( topDocs == null || topDocs.scoreDocs == null){
                 log.error("topDocs for a search was null");                
@@ -197,18 +182,25 @@ public class PagedSearchController extends VitroHttpServlet implements Searcher{
                 lastHitToShow = hitsLength;
             else
                 lastHitToShow = startIndex + hitsPerPage - 1;
-                    
+            
             List<Individual> beans = new LinkedList<Individual>();                        
-            for(int i=startIndex; i<topDocs.scoreDocs.length ;i++){
+            for(int i=startIndex; i<topDocs.scoreDocs.length ;i++){            
                 try{
                     if( (i >= startIndex) && (i <= lastHitToShow) ){                        
                         Document doc = searcherForRequest.doc(topDocs.scoreDocs[i].doc);                    
                         String uri = doc.get(Entity2LuceneDoc.term.URI);
-                        Individual ent = new IndividualImpl();
-                        ent.setURI(uri);
-                        ent = iDao.getIndividualByURI(uri);
-                        if(ent!=null)
-                            beans.add(ent);
+                        Individual ent = iDao.getIndividualByURI(uri);
+                        if(ent != null ){
+                            List<VClass>vcs = ent.getVClasses() ;
+                            if( vcs != null && !vcs.isEmpty() ){
+                                beans.add(ent);                                
+                                log.debug("found individual for search hit in model" + uri );
+                            }else{
+                                log.debug("filtered out classless individual from search results" + uri);
+                            }
+                        }else{
+                            log.debug("could not find individual for search hit in model " + uri);
+                        }
                     }
                 }catch(Exception e){
                     log.error("problem getting usable Individuals from search " +
@@ -239,13 +231,13 @@ public class PagedSearchController extends VitroHttpServlet implements Searcher{
                                 + URLEncoder.encode(request.getParameter("type"),"UTF-8"));
                     }
                 }
-            }            
-                                   
+            }                                                           
+
             beans = highlightBeans( beans , 
                     vreq.getWebappDaoFactory().getDataPropertyDao(),
                     vreq.getWebappDaoFactory().getObjectPropertyDao(),
-                    new SimpleLuceneHighlighter(query,analyzer) );            
-
+                    new SimpleLuceneHighlighter(query,analyzer) );   
+            
             //stick the results in the requestScope and prepare to forward to JSP
             request.setAttribute("beans", beans);            
             
@@ -278,7 +270,7 @@ public class PagedSearchController extends VitroHttpServlet implements Searcher{
             
             request.getRequestDispatcher(Controllers.BASIC_JSP).forward(request,response);            
         } catch (Throwable e) {
-            log.error("SearchController.doGet(): " + e);            
+            log.error("PagedSearchController.doGet(): " + e, e);            
             doSearchError(request, response, e.getMessage(), null);
             return;
         }
@@ -407,15 +399,7 @@ public class PagedSearchController extends VitroHttpServlet implements Searcher{
             }
         }
         return typesInHits;
-    }
-    
-    private String getIndexDir(ServletContext servletContext) throws SearchException {
-        Object obj = servletContext.getAttribute(LuceneSetup.INDEX_DIR);
-        if( obj == null || !(obj instanceof String) )
-            throw new SearchException("Could not get IndexDir for luecene index");
-        else
-            return (String)obj;
-    }
+    }   
 
     private Analyzer getAnalyzer(ServletContext servletContext) throws SearchException {
         Object obj = servletContext.getAttribute(LuceneSetup.ANALYZER);
@@ -426,7 +410,7 @@ public class PagedSearchController extends VitroHttpServlet implements Searcher{
     }
 
     private Query getQuery(VitroRequest request, PortalFlag portalState,
-                       Analyzer analyzer, String indexDir, String querystr ) throws SearchException{
+                       Analyzer analyzer,  String querystr ) throws SearchException, ParseException {
         Query query = null;
         try{
             //String querystr = request.getParameter(VitroQuery.QUERY_PARAMETER_NAME);
@@ -440,6 +424,7 @@ public class PagedSearchController extends VitroHttpServlet implements Searcher{
                 return null;
             }               
             QueryParser parser = getQueryParser(analyzer);
+
             query = parser.parse(querystr);
 
             String alpha = request.getParameter("alpha");
@@ -487,8 +472,10 @@ public class PagedSearchController extends VitroHttpServlet implements Searcher{
             }
             
             log.debug("Query: " + query);
-            
-        }catch (Exception ex){
+
+        } catch (ParseException e) {
+            throw new ParseException(e.getMessage());
+        } catch (Exception ex){
             throw new SearchException(ex.getMessage());
         }
 
@@ -561,120 +548,15 @@ public class PagedSearchController extends VitroHttpServlet implements Searcher{
             //we have no flags set, so no flag filtering
             return null;
         }
-    }
-
-    private synchronized IndexSearcher getIndexSearcher(String indexDir) {
-        if( searcher == null ){
-            try {                
-                Directory fsDir = FSDirectory.getDirectory(indexDir);
-                searcher = new IndexSearcher(fsDir);
-            } catch (IOException e) {
-                log.error("LuceneSearcher: could not make indexSearcher "+e);
-                log.error("It is likely that you have not made a directory for the lucene index.  "+
-                          "Create the directory indicated in the error and set permissions/ownership so"+
-                          " that the tomcat server can read/write to it.");
-                //The index directory is created by LuceneIndexer.makeNewIndex()
-            }
-        }
-        return searcher;
-    }
+    } 
     
-    private List<Individual> highlightBeans(List<Individual> beans, 
-            DataPropertyDao dpDao, ObjectPropertyDao opDao, VitroHighlighter highlighter) {
-        if( beans == null ){
-            log.debug("List of beans passed to highlightBeans() was null");
-            return Collections.EMPTY_LIST;
-        }else if( highlighter == null ){
-            log.debug("Null highlighter passed to highlightBeans()");
-            return beans;
-        }            
-        Iterator<Individual> it = beans.iterator();
-        while(it.hasNext()){
-            Individual ent = it.next();
-            try{
-                dpDao.fillDataPropertiesForIndividual(ent);
-                opDao.fillObjectPropertiesForIndividual(ent);
-                fragmentHighlight(ent, highlighter);
-            }catch( Exception ex ){
-                log.debug("Error while doing search highlighting" , ex);
-            }            
-        }
-        return beans;
-    }  
-    
-    /**
-     * Highlights the name and then replaces the description with
-     * highlighted fragments.
-     * @param ent
-     * @param highlighter 
-     */
-    public void fragmentHighlight(Individual ent, VitroHighlighter hl){
-        try{
-            if( ent == null ) return;
-
-            Html2Text h2t = new Html2Text();        
-            StringBuffer sb = new StringBuffer("");
-            if(ent.getBlurb() != null)
-                sb.append(ent.getBlurb()).append(' ');
-
-            if(ent.getDescription() != null )
-                sb.append(ent.getDescription()).append(' ');
-
-            if(ent.getDataPropertyList() != null) {
-                Iterator edIt = ent.getDataPropertyList().iterator();
-                while (edIt.hasNext()) {
-                    try{
-                    DataProperty dp = (DataProperty)edIt.next();                    
-                    if( getDataPropertyBlacklist().contains(dp.getURI()))
-                        continue;
-                    for(DataPropertyStatement dps : dp.getDataPropertyStatements()){
-                        sb.append(dp.getPublicName()).append(' ')
-                          .append(dps.getData()).append(' ');    
-                    }    
-                    }catch(Throwable e){
-                        log.debug("Error highlighting data property statment " +
-                        		"for individual "+ent.getURI());
-                    }
-                }
-            }
-
-            if(ent.getObjectPropertyList() != null) {
-                Iterator edIt = ent.getObjectPropertyList().iterator();
-                String t = null;
-                while (edIt.hasNext()) {
-                    try {                
-                        ObjectProperty op = (ObjectProperty)edIt.next();
-                        if( getObjectPropertyBlacklist().contains(op.getURI()))
-                            continue;
-                        for( ObjectPropertyStatement stmt : op.getObjectPropertyStatements()){                                            
-                            sb.append( ( (t = op.getDomainPublic()) != null) ? t : "" );
-                            sb.append(' ');
-                            sb.append( ( (t = stmt.getObject().getName()) != null) ? t : "" );
-                            sb.append(' ');
-                        }
-                    } catch (Throwable e) {
-                        log.debug("Error highlighting object property " +
-                        		"statement for individual "+ent.getURI());
-                    }
-                }
-            }
-
-            String keywords = ent.getKeywordString();
-            if( keywords != null )
-                sb.append(keywords);
-
-            ent.setDescription(hl.getHighlightFragments(  h2t.stripHtml( sb.toString() )));
-        }catch(Throwable th){
-            log.debug("could not hightlight for entity " + ent.getURI(),th);
-        }
-    }        
-    
-    private void doNoQuery(HttpServletRequest request,
+    private void doBadQuery(String queryStr, HttpServletRequest request,
             HttpServletResponse response)
     throws ServletException, IOException {
         Portal portal = (new VitroRequest(request)).getPortal();
         request.setAttribute("title", "Search "+portal.getAppName());
-        request.setAttribute("bodyJsp", Controllers.SEARCH_FORM_JSP);
+        request.setAttribute("bodyJsp", Controllers.SEARCH_BAD_QUERY_JSP);
+        request.setAttribute("queryStr", queryStr);
 
         RequestDispatcher rd = request
         .getRequestDispatcher(Controllers.BASIC_JSP);
@@ -743,6 +625,98 @@ public class PagedSearchController extends VitroHttpServlet implements Searcher{
         return rv;
     }
     
+
+    private List<Individual> highlightBeans(List<Individual> beans, 
+            DataPropertyDao dpDao, ObjectPropertyDao opDao, VitroHighlighter highlighter) {
+        if( beans == null ){
+            log.debug("List of beans passed to highlightBeans() was null");
+            return Collections.EMPTY_LIST;
+        }else if( highlighter == null ){
+            log.debug("Null highlighter passed to highlightBeans()");
+            return beans;
+        }            
+        Iterator<Individual> it = beans.iterator();
+        while(it.hasNext()){
+            Individual ent = it.next();
+            try{
+                dpDao.fillDataPropertiesForIndividual(ent);
+                opDao.fillObjectPropertiesForIndividual(ent);
+                fragmentHighlight(ent, highlighter);
+            }catch( Exception ex ){
+                log.debug("Error while doing search highlighting" , ex);
+            }            
+        }
+        return beans;
+    }  
+    
+    /**
+     * Highlights the name and then replaces the description with
+     * highlighted fragments.
+     * @param ent
+     * @param highlighter 
+     */
+    public void fragmentHighlight(Individual ent, VitroHighlighter hl){
+        try{
+            if( ent == null ) return;
+
+            Html2Text h2t = new Html2Text();        
+            StringBuffer sb = new StringBuffer("");
+            if(ent.getBlurb() != null)
+                sb.append(ent.getBlurb()).append(' ');
+
+            if(ent.getDescription() != null )
+                sb.append(ent.getDescription()).append(' ');
+
+            if(ent.getDataPropertyList() != null) {
+                Iterator edIt = ent.getDataPropertyList().iterator();
+                while (edIt.hasNext()) {
+                    try{
+                    DataProperty dp = (DataProperty)edIt.next();                    
+                    if( getDataPropertyBlacklist().contains(dp.getURI()))
+                        continue;
+                    for(DataPropertyStatement dps : dp.getDataPropertyStatements()){
+                        sb.append(dp.getPublicName()).append(' ')
+                          .append(dps.getData()).append(' ');    
+                    }    
+                    }catch(Throwable e){
+                        log.debug("Error highlighting data property statment " +
+                                "for individual "+ent.getURI());
+                    }
+                }
+            }
+
+            if(ent.getObjectPropertyList() != null) {
+                Iterator edIt = ent.getObjectPropertyList().iterator();
+                String t = null;
+                while (edIt.hasNext()) {
+                    try {                
+                        ObjectProperty op = (ObjectProperty)edIt.next();
+                        if( getObjectPropertyBlacklist().contains(op.getURI()))
+                            continue;
+                        for( ObjectPropertyStatement stmt : op.getObjectPropertyStatements()){                                            
+                            sb.append( ( (t = op.getDomainPublic()) != null) ? t : "" );
+                            sb.append(' ');
+                            sb.append( ( (t = stmt.getObject().getName()) != null) ? t : "" );
+                            sb.append(' ');
+                        }
+                    } catch (Throwable e) {
+                        log.debug("Error highlighting object property " +
+                                "statement for individual "+ent.getURI());
+                    }
+                }
+            }
+
+            String keywords = ent.getKeywordString();
+            if( keywords != null )
+                sb.append(keywords);
+
+            ent.setDescription(hl.getHighlightFragments(  h2t.stripHtml( sb.toString() )));
+        }catch(Throwable th){
+            log.debug("could not hightlight for entity " + ent.getURI(),th);
+        }
+    }        
+    
+    
     @SuppressWarnings("unchecked")
     private HashSet<String> getDataPropertyBlacklist(){
         HashSet<String>dpBlacklist = (HashSet<String>)
@@ -768,25 +742,5 @@ public class PagedSearchController extends VitroHttpServlet implements Searcher{
     }
     private final String defaultSearchField = "ALLTEXT";
     public static final int MAX_QUERY_LENGTH = 500;
-
-    
-    /**
-     * Need to accept notification from indexer that the index has been changed.
-     */
-    public void close() {
-        searcher = null;        
-    }
-
-    public VitroHighlighter getHighlighter(VitroQuery q) {
-        throw new Error("PagedSearchController.getHighlighter() is unimplemented");
-    }
-
-    public VitroQueryFactory getQueryFactory() {
-        throw new Error("PagedSearchController.getQueryFactory() is unimplemented");
-    }
-
-    public List search(VitroQuery query) throws SearchException {
-        throw new Error("PagedSearchController.search() is unimplemented");
-    }
 
 }

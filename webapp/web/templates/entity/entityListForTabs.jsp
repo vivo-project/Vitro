@@ -91,4 +91,4 @@
     </c:forEach>
 </ul>
 
-
+<jsp:include page="/templates/entity/entityListPages.jsp"/>

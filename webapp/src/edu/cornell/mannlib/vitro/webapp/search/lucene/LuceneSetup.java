@@ -93,15 +93,11 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 			indexer.addObj2Doc(new Entity2LuceneDoc());
 			context.setAttribute(LuceneIndexer.class.getName(), indexer);
 
-			// Here we want to put the LuceneSearcher in the application scope.
-			//  the queries need to know the analyzer to use so that the same one can be used
-			//  to analyze the fields in the incoming user query terms.
-			LuceneSearcher searcher = new LuceneSearcher(
-				new LuceneQueryFactory(getAnalyzer(), ALLTEXT), indexDir);
-			searcher.addObj2Doc(new Entity2LuceneDoc());
-			context.setAttribute(Searcher.class.getName(), searcher);
-			indexer.addSearcher(searcher);
-
+			//This is where to get a LucenIndex from.  The indexer will
+			//need to reference this to notify it of updates to the index 			
+			LuceneIndexFactory lif = LuceneIndexFactory.getLuceneIndexFactoryFromContext(context);
+			indexer.setLuceneIndexFactory(lif);
+			
 			// This is where the builder gets the list of places to try to
 			// get objects to index. It is filtered so that non-public text
 			// does not get into the search index.

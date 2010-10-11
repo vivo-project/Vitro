@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.search.lucene;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -38,10 +39,11 @@ public class LuceneIndexer implements IndexerIface {
     LinkedList<Obj2DocIface> obj2DocList = new LinkedList<Obj2DocIface>();
     String indexDir = null;
     Analyzer analyzer = null;
-    List<Searcher> searchers = null;
+    List<Searcher> searchers = Collections.EMPTY_LIST;
     IndexWriter writer = null;
     boolean indexing = false;
     HashSet<String> urisIndexed;
+    private LuceneIndexFactory luceneIndexFactory;
 
     //JODA timedate library can use java date format strings.
     //http://java.sun.com/j2se/1.3/docs/api/java/text/SimpleDateFormat.html
@@ -71,7 +73,8 @@ public class LuceneIndexer implements IndexerIface {
     public LuceneIndexer(String indexDir, List<Searcher> searchers, Analyzer analyzer ) throws IOException{
         this.indexDir = indexDir;
         this.analyzer = analyzer;
-        this.searchers = searchers;
+        if( searchers != null )
+            this.searchers = searchers;
         makeIndexIfNone();
     }
     
@@ -162,11 +165,14 @@ public class LuceneIndexer implements IndexerIface {
             log.info("ending index");
             if( writer != null )
                 writer.optimize();
-            
+                                    
             //close the searcher so it will find the newly indexed documents
             for( Searcher s : searchers){
                 s.close();
             }
+            //this is the call that replaces Searcher.close()
+            luceneIndexFactory.forceNewIndexSearcher();
+            
         } catch (IOException e) {
             log.error("LuceneIndexer.endIndexing() - "
                     + "unable to optimize lucene index: \n" + e);
@@ -216,7 +222,8 @@ public class LuceneIndexer implements IndexerIface {
                     		log.debug("added " + ind.getName() + " " + ind.getURI());
                 		}
                     }else{
-                    	log.debug("could not translate " + ind.getURI());
+                    	log.debug("could not translate, removing from index " + ind.getURI());
+                    	writer.deleteDocuments((Term)obj2doc.getIndexId(ind));
                     }
                 }
             }
@@ -251,23 +258,18 @@ public class LuceneIndexer implements IndexerIface {
      * clear the index by deleting the directory and make a new empty index.
      */
     public synchronized void clearIndex() throws IndexingException{
-//        if( indexing )
-//            throw new IndexingException("Cannot clear search index because an" +
-//            		"index rebuild in in progress.");        
+        
         log.debug("Clearing the index at "+indexDir);
         closeModifier();
         deleteDir(new File(indexDir));
-        
-        //might not be thread safe since searchers can try to open a new index
-//        for(LuceneSearcher s : searchers){
-//            s.close();
-//        }
         
         try {
             makeNewIndex();
             for(Searcher s : searchers){
                 s.close();
-            }            
+            }
+            //this is the call that replaces Searcher.close()
+            luceneIndexFactory.forceNewIndexSearcher();
         } catch (IOException e) {
             throw new IndexingException(e.getMessage());
         }
@@ -330,5 +332,8 @@ public class LuceneIndexer implements IndexerIface {
         return dir.delete();
     }
 
+    public void setLuceneIndexFactory(LuceneIndexFactory lif) {
+        luceneIndexFactory = lif;    
+    }
 
 }

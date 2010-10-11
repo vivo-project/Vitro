@@ -54,7 +54,7 @@ public class SelfEditingPolicyTest extends AbstractTestClass {
     
     @Before
     public void setUp() throws Exception {
-        policy = new SelfEditingPolicy(null,null,null,null);
+        policy = new SelfEditingPolicy(null,null,null,null,null);
         
         
         ids = new ArrayIdentifierBundle();
@@ -92,7 +92,7 @@ public class SelfEditingPolicyTest extends AbstractTestClass {
         badProps.add("http://mannlib.cornell.edu/bad#prp333");
         badProps.add("http://mannlib.cornell.edu/bad#prp777");
         badProps.add("http://mannlib.cornell.edu/bad#prp0020");
-        SelfEditingPolicy badPropPolicy = new SelfEditingPolicy(badProps,null,null,null);
+        SelfEditingPolicy badPropPolicy = new SelfEditingPolicy(badProps,null,null,null,null);
         
         RequestedAction whatToAuth = new AddObjectPropStmt(
                 SELFEDITOR_URI,"http://mannlib.cornell.edu/bad#prp234" ,SAFE_RESOURCE);                
@@ -184,7 +184,7 @@ public class SelfEditingPolicyTest extends AbstractTestClass {
     public void testForbiddenMoniker(){
     	  Set<String> badProps = new HashSet<String>();
           badProps.add(VitroVocabulary.MONIKER);          
-          SelfEditingPolicy badPropPolicy = new SelfEditingPolicy(badProps,null,null,null);
+          SelfEditingPolicy badPropPolicy = new SelfEditingPolicy(badProps,null,null,null,null);
           
           RequestedAction whatToAuth = null;
           
@@ -212,7 +212,7 @@ public class SelfEditingPolicyTest extends AbstractTestClass {
           
           //try where moniker is permitted
           badProps = new HashSet<String>();                   
-          badPropPolicy = new SelfEditingPolicy(badProps,null,null,null);                    
+          badPropPolicy = new SelfEditingPolicy(badProps,null,null,null,null);                    
           
           whatToAuth = new AddDataPropStmt(
                   SELFEDITOR_URI, VitroVocabulary.MONIKER ,"somevalue", null, null);                

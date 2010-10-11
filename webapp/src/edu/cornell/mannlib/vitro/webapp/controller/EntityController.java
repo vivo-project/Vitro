@@ -178,9 +178,9 @@ public class EntityController extends VitroHttpServlet {
                     }
                 }
             }
-        } else {
-            log.error("Entity " + indiv.getURI() + " with vclass URI " +
-                    indiv.getVClassURI() + ", no vclass with that URI exists");
+        } else if (indiv.getVClassURI() != null) {
+            log.debug("Individual " + indiv.getURI() + " with class URI " +
+                    indiv.getVClassURI() + ": no class found with that URI");
         }
         if (customView!=null) {
             // insert test for whether a css files of the same name exists, and populate the customCss string for use when construction the header
@@ -227,16 +227,10 @@ public class EntityController extends VitroHttpServlet {
             css += customCss;
         }
 
-        if(  indiv.getURI().startsWith( vreq.getWebappDaoFactory().getDefaultNamespace() )){        	
-        	vreq.setAttribute("entityLinkedDataURL", indiv.getURI() + "/" + indiv.getLocalName() + ".rdf");	
-        }
-        
-        
-		// generate link to RDF representation for semantic web clients like Piggy Bank
-		// BJL 2008-07-16: I'm temporarily commenting this out because I forgot we need to make sure it filters out the hidden properties
-        // generate url for this entity
-        // String individualToRDF = "http://"+vreq.getServerName()+":"+vreq.getServerPort()+vreq.getContextPath()+"/entity?home=1&uri="+forURL(entity.getURI())+"&view=rdf.rdf"; 
-        //css += "<link rel='alternate' type='application/rdf+xml' title='"+entity.getName()+"' href='"+individualToRDF+"' />";
+        if(  indiv.getURI().startsWith( vreq.getWebappDaoFactory().getDefaultNamespace() )){
+        	String entityLinkedDataURL = indiv.getURI() + "/" + indiv.getLocalName() + ".rdf";
+        	vreq.setAttribute("entityLinkedDataURL", entityLinkedDataURL);
+        }   
 
         vreq.setAttribute("css",css);
         vreq.setAttribute("scripts", "/templates/entity/entity_inject_head.jsp");
@@ -276,14 +270,21 @@ public class EntityController extends VitroHttpServlet {
 		newModel.write( res.getOutputStream(), format );		
 	}
 
-	private void doRedirect(HttpServletRequest req, HttpServletResponse res,
-			String redirectURL) {	
-		// It seems like there must be a better way to do this
-		String hn = req.getHeader("Host");		
-    	res.setHeader("Location", res.encodeURL( "http://" + hn + req.getContextPath() + redirectURL ));
-    	res.setStatus(res.SC_SEE_OTHER);		
-	}
-
+    private void doRedirect(HttpServletRequest req, HttpServletResponse res,
+            String redirectURL) {
+        //It seems like there must be a more standard way to do a redirect in tomcat.
+        String hn = req.getHeader("Host");
+        if (req.isSecure()) {
+            res.setHeader("Location", res.encodeURL("https://" + hn
+                    + req.getContextPath() + redirectURL));
+            log.info("doRedirect by using HTTPS");
+        } else {
+            res.setHeader("Location", res.encodeURL("http://" + hn
+                    + req.getContextPath() + redirectURL));
+            log.info("doRedirect by using HTTP");
+        }
+        res.setStatus(res.SC_SEE_OTHER);
+    }
 
 	private static Pattern LINKED_DATA_URL = Pattern.compile("^/individual/([^/]*)$");		
 	private static Pattern NS_PREFIX_URL = Pattern.compile("^/individual/([^/]*)/([^/]*)$");

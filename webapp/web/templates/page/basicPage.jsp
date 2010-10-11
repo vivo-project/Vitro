@@ -21,28 +21,28 @@
             "scripts" - optional name of file containing <script> elements to be included in the page
             "bodyAttr" - optional attributes for the <body> tag, e.g. 'onload': use leading space
             "portalBean" - PortalBean object for request.
-                     
+            
           Consider sticking < % = MiscWebUtils.getReqInfo(request) % > in the html output
           for debugging info.
                  
-         bdc34 2006-02-03 created        
+         bdc34 2006-02-03 created
         **********************************************/
         /*
         String e = "";
         if (request.getAttribute("bodyJsp") == null){
-            e+="basicPage.jsp expects that request parameter 'bodyJsp' be set to the jsp to display as the page body.\n";           
-        }         
+            e+="basicPage.jsp expects that request parameter 'bodyJsp' be set to the jsp to display as the page body.\n";
+        }
         if (request.getAttribute("title") == null){
-            e+="basicPage.jsp expects that request parameter 'title' be set to the title to use for page.\n";           
-        }         
+            e+="basicPage.jsp expects that request parameter 'title' be set to the title to use for page.\n";
+        }
         if (request.getAttribute("css") == null){
-            e+="basicPage.jsp expects that request parameter 'css' be set to css to include in page.\n";            
-        }         
+            e+="basicPage.jsp expects that request parameter 'css' be set to css to include in page.\n";
+        }
         if( request.getAttribute("portalBean") == null){
-            e+="basicPage.jsp expects that request attribute 'portalBean' be set.\n";           
+            e+="basicPage.jsp expects that request attribute 'portalBean' be set.\n";
         }
         if( request.getAttribute("appBean") == null){
-            e+="basicPage.jsp expects that request attribute 'appBean' be set.\n";          
+            e+="basicPage.jsp expects that request attribute 'appBean' be set.\n";
         }
         if( e.length() > 0 ){
             throw new JspException(e);
@@ -56,21 +56,20 @@
 <c:set var="bodyJsp"><c:out value="${requestScope.bodyJsp}" default="/debug.jsp"/></c:set>
         
 <jsp:include page="doctype.jsp"/>
-<head>
-  <jsp:include page="headContent.jsp"/>
-</head>
-<body ${requestScope.bodyAttr}>
-<div id="wrap" class="container">
-  <div id="header">
-    <jsp:include page="/${themeDir}jsp/identity.jsp" flush="true"/>
-    <jsp:include page="/${themeDir}jsp/menu.jsp" flush="true"/>
-  </div><!--header-->
-    <hr class="hidden" />
-    <div id="contentwrap">
-        
-        <c:import url="${bodyJsp}"/>
-    </div> <!-- contentwrap -->
-    <jsp:include page="/${themeDir}jsp/footer.jsp" flush="true"/>
-</div> <!-- wrap -->
-</body>
+    <head>
+        <jsp:include page="headContent.jsp"/>
+    </head>
+    <body ${requestScope.bodyAttr}>
+        <div id="wrap" class="container">
+            <div id="header">
+                <jsp:include page="/templates/page/freemarkerTransition/identity.jsp" flush="true"/>
+                <jsp:include page="/templates/page/freemarkerTransition/menu.jsp" flush="true"/>
+            </div><!-- #header -->
+            <hr class="hidden" />
+            <div id="contentwrap">
+                <c:import url="${bodyJsp}"/>
+            </div> <!-- #contentwrap -->
+            <jsp:include page="/templates/page/freemarkerTransition/footer.jsp" flush="true"/>
+        </div> <!-- #wrap -->
+    </body>
 </html>

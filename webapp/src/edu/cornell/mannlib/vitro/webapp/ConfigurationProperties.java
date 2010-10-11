@@ -179,6 +179,7 @@ public class ConfigurationProperties {
 				return DEFAULT_CONFIG_PATH;
 			}
 
+			log.info("deploy.property as specified by JNDI: " + configPath);
 			return configPath;
 		} catch (NamingException e) {
 			log.warn("JNDI lookup failed. "

@@ -59,7 +59,7 @@ public class VClassGroupDaoFiltering extends BaseFiltering implements VClassGrou
         return this.getPublicGroupsWithVClasses(displayOrder,true);
     }
     public List getPublicGroupsWithVClasses(boolean displayOrder, boolean includeUninstantiatedClasses) {
-        return this.getPublicGroupsWithVClasses(displayOrder,includeUninstantiatedClasses,true);
+        return this.getPublicGroupsWithVClasses(displayOrder,includeUninstantiatedClasses,false);
     }
     /** filter both vclassgroups and their vclasses */
     public List getPublicGroupsWithVClasses(boolean displayOrder, boolean includeUninstantiatedClasses,

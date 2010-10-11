@@ -120,7 +120,7 @@ public class BrowseController extends VitroHttpServlet {
         if( grp == null ){
             log.debug("needed to build vclassGroups for portal " + portalId);
             // Get all classgroups, each populated with a list of their member vclasses
-            List groups = vcgDao.getPublicGroupsWithVClasses(ORDER_BY_DISPLAYRANK, !INCLUDE_UNINSTANTIATED); 
+            List groups = vcgDao.getPublicGroupsWithVClasses(ORDER_BY_DISPLAYRANK, !INCLUDE_UNINSTANTIATED, INCLUDE_ENTITY_COUNT); 
 
             // now cull out the groups with no populated classes
             //removeUnpopulatedClasses( groups);
@@ -135,6 +135,7 @@ public class BrowseController extends VitroHttpServlet {
     
     private static boolean ORDER_BY_DISPLAYRANK = true;
     private static boolean INCLUDE_UNINSTANTIATED = true;
+    private static boolean INCLUDE_ENTITY_COUNT = true;
 
 //  private void removeUnpopulatedClasses( List<VClassGroup> groups){
 //          if( groups == null || groups.size() == 0 ) return;

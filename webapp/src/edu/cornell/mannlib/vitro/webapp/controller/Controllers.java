@@ -26,7 +26,7 @@ public class Controllers {
     
     public static final String ENTITY = "/entity";
     public static final String ENTITY_PROP_LIST = "/entityPropList";
-    public static final String ENTITY_LIST = "/EntityList";
+    public static final String ENTITY_LIST = "/entitylist";
 
     public static final String BROWSE_CONTROLLER = "browsecontroller";
     public static final String RETRY_URL = "editForm";
@@ -77,6 +77,7 @@ public class Controllers {
     public static final String SEARCH_FAILED_JSP = "/templates/search/searchFailed.jsp";
     public static final String SEARCH_GROUP_JSP = "/templates/search/searchGroup.jsp";
     public static final Object SEARCH_FORM_JSP = "/templates/search/searchForm.jsp";
+    public static final Object SEARCH_BAD_QUERY_JSP = "/templates/search/searchBadQuery.jsp";
 
     public static final String BROWSE_GROUP_JSP = "/templates/browse/browseGroup.jsp";
 

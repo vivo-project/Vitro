@@ -2,7 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.search.lucene;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -12,15 +14,12 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.Term;
 import org.joda.time.DateTime;
-import org.openrdf.model.vocabulary.OWL;
 
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
-import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
-import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
 import edu.cornell.mannlib.vitro.webapp.search.docbuilder.Obj2DocIface;
 import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
@@ -51,11 +50,15 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         public static String NAMEUNANALYZED = "nameunanalyzed" ;
         /** Name of entity, unstemmed */
         public static String NAMEUNSTEMMED       = "nameunstemmed";
-        /** Name of portal */
+        /** portal ( 2 ^ portalId ) */
         public static String PORTAL     = "portal";
+        /** Flag 2 (legacy, only used at Cornell) */
+        public static String FLAG2 = "FLAG2";
         /** time of index in msec since epoc */
         public static String INDEXEDTIME= "indexedTime";
-        /** time of sunset/end of entity */
+        /** timekey of entity in yyyymmddhhmm  */
+        public static String TIMEKEY="TIMEKEY";
+        /** time of sunset/end of entity in yyyymmddhhmm  */
         public static String SUNSET="SUNSET";
         /** time of sunrise/start of entity in yyyymmddhhmm  */
         public static String SUNRISE="SUNRISE";
@@ -66,6 +69,8 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         public static String ALLTEXTUNSTEMMED = "ALLTEXTUNSTEMMED";
         /** keywords */
         public static final String KEYWORDS = "KEYWORDS";
+        /** Does the individual have a thumbnail image? 1=yes 0=no */
+        public static final String THUMBNAIL = "THUMBNAIL";        
     }
 
     private static final Log log = LogFactory.getLog(Entity2LuceneDoc.class.getName());
@@ -107,11 +112,13 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         //java class
         doc.add( new  Field(term.JCLASS, entClassName, Field.Store.YES, Field.Index.NOT_ANALYZED));
 
-        //Entity Name
-        if( ent.getName() != null )
-            value=ent.getName();
-        else
-            value="";
+        //Entity Name        
+        if( ent.getRdfsLabel() != null )
+            value=ent.getRdfsLabel();
+        else{
+            log.debug("Skipping individual without rdfs:label " + ent.getURI());
+            return null;
+        }
         Field name =new Field(term.NAME, value, 
                                Field.Store.YES, Field.Index.ANALYZED);
         name.setBoost( NAME_BOOST );
@@ -123,7 +130,7 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         doc.add( nameUn );
 
         Field nameUnanalyzed = new Field(term.NAMEUNANALYZED, value.toLowerCase(), 
-				Field.Store.NO, Field.Index.NOT_ANALYZED);        
+				Field.Store.YES, Field.Index.NOT_ANALYZED);        
         doc.add( nameUnanalyzed );
 
         //boost for entity
@@ -200,6 +207,26 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
             doc.add(new Field(term.SUNSET, latestTime, Field.Store.YES, Field.Index.NOT_ANALYZED));
         }
 
+        try{
+            value = null;
+            if( ent.getTimekey() != null ){
+                value = (new DateTime(ent.getTimekey().getTime())).toString(LuceneIndexer.DATE_FORMAT);
+                doc.add(new Field(term.TIMEKEY, value, Field.Store.YES, Field.Index.NOT_ANALYZED));
+            }
+        }catch(Exception ex){            
+            log.error("could not save timekey " + ex);            
+        }        
+        
+        try{
+            value = null;
+            if( ent.getThumbUrl() != null )
+                doc.add(new Field(term.THUMBNAIL, "1", Field.Store.YES, Field.Index.NOT_ANALYZED));
+            else
+                doc.add(new Field(term.THUMBNAIL, "0", Field.Store.YES, Field.Index.NOT_ANALYZED));
+        }catch(Exception ex){
+            log.debug("could not index thumbnail: " + ex);
+        }
+        
         //time of index in millis past epoc
         Object anon[] =  { new Long((new DateTime() ).getMillis())  };
         doc.add(  new Field(term.INDEXEDTIME, String.format( "%019d", anon ),
@@ -208,7 +235,9 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         //portal Flags
         doPortalFlags(ent, doc);
 
-
+        //do flag 2 legacy, only used at Cornell
+        doFlag2( ent, doc );
+        
         //ALLTEXT, all of the 'full text'
         String t=null;
         value ="";
@@ -253,6 +282,23 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
     }
        
     /**
+     * Flag two is a legacy field that is used only by Cornell.
+     * It is related to the old portal filtering.
+     */
+    private void doFlag2(Individual ent, Document doc) {
+        String flag2Set = ent.getFlag2Set();
+        if( flag2Set != null && ! "".equals(flag2Set)){
+            for( String flag2Value : flag2Set.split(",")){
+                if( flag2Value != null ){
+                    String value = flag2Value.replace(",", "");
+                    if(!value.isEmpty())
+                        doc.add( new Field(term.FLAG2, value, Field.Store.NO, Field.Index.ANALYZED));
+                }                
+            }
+        }
+    }
+
+    /**
      * Splits up the entity's flag1 value into portal id and then
      * adds the id to the doc.
      *
@@ -282,18 +328,21 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         Long[] portalIds = FlagMathUtils.numeric2numerics( ent.getFlag1Numeric() );
         if( portalIds == null || portalIds.length == 0)
             return;
+                
+        log.debug("Flag 1 numeric: " + ent.getFlag1Numeric() + " for " + ent.getURI());
 
-//      System.out.print('\n'+"numeric: " + ent.getFlag1Numeric()
-//              + " " + Arrays.toString(portalIds) +" = ");
-//
         long id = -1;
         for( Long idLong : portalIds){
-            id = idLong.longValue();
-            String numericPortal = Long.toString(id);
-            doc.add( new Field(term.PORTAL,numericPortal,
-                    Field.Store.NO, Field.Index.NOT_ANALYZED));
-//          System.out.print(numericPortal+" ");
-        }/* end of portal id code */
+            if( idLong != null ){
+                id = idLong.longValue();
+                String numericPortal = Long.toString(id);
+                if( numericPortal != null ){
+                    doc.add( new Field(term.PORTAL,numericPortal,                    
+                            Field.Store.NO, Field.Index.NOT_ANALYZED));
+                    log.debug("adding portal " + numericPortal + " to " + ent.getURI());  
+                }
+            }
+        }                
     }
 
     @SuppressWarnings("static-access")

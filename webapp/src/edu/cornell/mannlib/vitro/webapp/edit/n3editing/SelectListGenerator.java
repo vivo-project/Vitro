@@ -168,15 +168,17 @@ public class SelectListGenerator {
                         if( vclasses.size() == 0 )
                             log.error("no owl:Class found for predicate " + predicateUri );
                         
-                        HashMap<String,Individual> indMap = new HashMap<String,Individual>();
+                        List<Individual> individuals = new ArrayList<Individual>();
+                        HashSet<String> uriSet = new HashSet<String>();
+                        long startTime = System.currentTimeMillis();
                         for ( VClass vclass :  vclasses){
                             for( Individual ind : wDaoFact.getIndividualDao().getIndividualsByVClassURI(vclass.getURI(),-1,-1)) {
-                                if( !indMap.containsKey(ind.getURI())) {
-                                    indMap.put(ind.getURI(),ind);
+                                if( !uriSet.contains(ind.getURI())) {
+                                    uriSet.add(ind.getURI());
+                                    individuals.add(ind);
                                 }
                             }
                         }
-                        List<Individual> individuals = new ArrayList<Individual>(indMap.values());
     
                         List<ObjectPropertyStatement> stmts = subject.getObjectPropertyStatements();
                                                         if( stmts == null ) log.error("object properties for subject were null in SelectListGenerator.getOptions()");
@@ -188,24 +190,12 @@ public class SelectListGenerator {
                         
                         for( Individual ind : individuals ){
                             String uri = ind.getURI();
-                            if( uri != null ){   
-                            	boolean prohibited = false;
-                            	if (pfs != null) {
-                            		for (VClass vc : ind.getVClasses()) {
-                            			if (vc.getURI() != null) {
-                            				if (pfs.isClassProhibited(ind.getVClassURI())) {
-                            					prohibited = true;
-                            					break;
-                            				}
-                            			}
-                            		}
-                            	}
-                            	if (!prohibited) {
-                            		optionsMap.put(uri,ind.getName().trim());                        
-                            		++optionsCount;
-                            	}
+                            if( uri != null && (pfs == null || !ind.isMemberOfClassProhibitedFromSearch(pfs)) ){              
+                        		optionsMap.put(uri,ind.getName().trim());                        
+                        		++optionsCount;             	
                             }
                         }
+                        
                     }
                 }
                 break;
@@ -269,23 +259,9 @@ public class SelectListGenerator {
                         	ProhibitedFromSearch pfs = editConfig.getProhibitedFromSearch();
                             for( Individual ind : individuals ) {
                                 String uri = ind.getURI();
-                                if( uri != null ) {       
-                                	boolean prohibited = false;
-                                	if (pfs != null) {
-                                		for (VClass vc : ind.getVClasses()) {
-                                			if (vc.getURI() != null) {
-                                				if (pfs.isClassProhibited(ind.getVClassURI())) {
-                                					prohibited = true;
-                                					break;
-                                				}
-                                				
-                                			}
-                                		}
-                                	}
-                                	if(!prohibited) {
-                                		optionsMap.put(uri,ind.getName().trim());                        
-                                		++optionsCount;
-                                	}
+                                if( uri != null && (pfs == null || !ind.isMemberOfClassProhibitedFromSearch(pfs)) ) {       
+                                	optionsMap.put(uri,ind.getName().trim());                        
+                            		++optionsCount;
                                 }
                             }
                         }

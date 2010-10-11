@@ -112,7 +112,7 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
     }
 
     public List getPublicGroupsWithVClasses(boolean displayOrder, boolean includeUninstantiatedClasses) {
-        return getPublicGroupsWithVClasses(displayOrder, includeUninstantiatedClasses, true);
+        return getPublicGroupsWithVClasses(displayOrder, includeUninstantiatedClasses, false);
     }
 
     public List getPublicGroupsWithVClasses(boolean displayOrder, boolean includeUninstantiatedClasses,

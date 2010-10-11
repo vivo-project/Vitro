@@ -115,7 +115,7 @@ public class BrowseController extends FreeMarkerHttpServlet {
         if( grp == null ){
             log.debug("needed to build vclassGroups for portal " + portalId);
             // Get all classgroups, each populated with a list of their member vclasses
-            List groups = vcgDao.getPublicGroupsWithVClasses(ORDER_BY_DISPLAYRANK, !INCLUDE_UNINSTANTIATED); 
+            List groups = vcgDao.getPublicGroupsWithVClasses(ORDER_BY_DISPLAYRANK, !INCLUDE_UNINSTANTIATED, INCLUDE_INDIVIDUAL_COUNT); 
 
             // remove classes that have been configured to be hidden
             // from search results
@@ -152,6 +152,7 @@ public class BrowseController extends FreeMarkerHttpServlet {
     
     private static boolean ORDER_BY_DISPLAYRANK = true;
     private static boolean INCLUDE_UNINSTANTIATED = true;
+    private static boolean INCLUDE_INDIVIDUAL_COUNT = true;
 
 //  private void removeUnpopulatedClasses( List<VClassGroup> groups){
 //          if( groups == null || groups.size() == 0 ) return;

@@ -28,6 +28,7 @@ import edu.cornell.mannlib.vedit.validator.impl.XMLNameValidator;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.JenaNetidPolicy.ContextSetup;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Classes2Classes;
+import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
@@ -62,6 +63,7 @@ public class VclassRetryController extends BaseEditController {
         /*for testing*/
         VClass testMask = new VClass();
         epo.setBeanClass(VClass.class);
+        epo.setImplementationClass(VClass.class);
         epo.setBeanMask(testMask);
 
         String action = null;

@@ -26,6 +26,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
  *
  * @author bdc34
  *
+ * @deprecated there is no replacement 
  */
 public abstract class VitroHighlighter extends UnaryFunctor<String,String> {
 	

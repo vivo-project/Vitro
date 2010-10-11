@@ -20,6 +20,8 @@ public class IndexBuilderThread extends Thread{
 	
 	public IndexBuilderThread(IndexBuilder ib){
 		super("IndexBuilderThread");
+		if( ib == null )
+		    log.error("IndexBuilderThread needs an IndexBuilder, search is not configured.");
 		this.indexBuilder = ib;
 	}
 	
@@ -31,8 +33,11 @@ public class IndexBuilderThread extends Thread{
 				return;
 			}
 			
+			if( indexBuilder == null )
+			    log.warn("IndexBuilderThread needs a IndexBuilder, search may not be configured.");
+			
 			try{
-				if( indexBuilder.isReindexRequested() ){
+				if( indexBuilder != null && indexBuilder.isReindexRequested() ){
 					log.debug("full re-index requested");
 					indexBuilder.indexRebuild();
 				}else{

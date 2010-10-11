@@ -2,21 +2,32 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
+import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.db.DBConnection;
+import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.graph.GraphMaker;
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ModelMaker;
 import com.hp.hpl.jena.rdf.model.ModelReader;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
+import com.hp.hpl.jena.util.iterator.NiceIterator;
+import com.hp.hpl.jena.util.iterator.WrappedIterator;
+
+import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 
 /**
  * This is a bit of a nutty idea but we'll see if it works.  This can wrap an RDBModelMaker and return a memory model 
@@ -30,41 +41,52 @@ import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 public class VitroJenaModelMaker implements ModelMaker {
 	
 	private static final Log log = LogFactory.getLog(VitroJenaModelMaker.class);
-
-	private ModelMaker innerModelMaker = null;
-	private HashMap<String,Model> modelCache = null;
+	private static final String DEFAULT_DRIVER = "com.mysql.jdbc.Driver";
+	
+	private String jdbcUrl;
+	private String username;
+	private String password;
+	private String dbTypeStr;
+	private BasicDataSource dataSource;
+	private HashMap<String,Model> modelCache;
 	private HttpServletRequest request = null;
 	
-	public VitroJenaModelMaker(ModelMaker mm) {
-		this.innerModelMaker = mm;
+	public VitroJenaModelMaker(String jdbcUrl, String username, String password, String dbTypeStr) {
+		this.jdbcUrl = jdbcUrl;
+		this.username = username;
+		this.password = password;
+		this.dbTypeStr = dbTypeStr;
+		String driverName = ConfigurationProperties
+			.getProperty("VitroConnection.DataSource.driver");
+		// This property is no longer used?
+		// We'll change it all around in 1.2 anyway.
+		if(driverName == null) {
+			driverName = DEFAULT_DRIVER;
+		}
+		this.dataSource = JenaDataSourceSetupBase.makeBasicDataSource(
+				driverName,
+					jdbcUrl, username, password);
 		modelCache = new HashMap<String,Model>();
 	}
 	
-	public VitroJenaModelMaker(ModelMaker mm,  HttpServletRequest request) {
-		this.innerModelMaker = mm;
-		if (mm instanceof VitroJenaModelMaker) { 
-			log.debug("Using cache from inner model maker ");
-			this.modelCache = ((VitroJenaModelMaker)mm).getCache();
-		} else {
-			log.debug("Creating new cache");
-			this.modelCache = new HashMap<String,Model>();
-		}
-		this.request = request;
-	}
-	
-	public ModelMaker getInnerModelMaker() {
-		return this.innerModelMaker;
-	}
+//	public VitroJenaModelMaker(ModelMaker mm,  HttpServletRequest request) {
+//		this.innerModelMaker = mm;
+//		if (mm instanceof VitroJenaModelMaker) { 
+//			log.debug("Using cache from inner model maker ");
+//			this.modelCache = ((VitroJenaModelMaker)mm).getCache();
+//		} else {
+//			log.debug("Creating new cache");
+//			this.modelCache = new HashMap<String,Model>();
+//		}
+//		this.request = request;
+//	}
+//	
+//	public ModelMaker getInnerModelMaker() {
+//		return this.innerModelMaker;
+//	}
 	
 	protected HashMap<String,Model> getCache() {
 		return this.modelCache;
-	}
-	
-	private Model copyModelIntoMem(Model underlyingModel) {
-		Model memModel = ModelFactory.createDefaultModel();
-		memModel.add(underlyingModel);
-		memModel.register(new ModelSynchronizer(underlyingModel));
-		return memModel;
 	}
 	
 	public void close() {
@@ -81,7 +103,7 @@ public class VitroJenaModelMaker implements ModelMaker {
 			log.debug("Returning "+arg0+" ("+cachedModel.hashCode()+") from cache");
 			return cachedModel;
 		} else {
-			 Model newModel = copyModelIntoMem(innerModelMaker.createModel(arg0));
+			 Model newModel = makeDBModel(arg0);
 			 modelCache.put(arg0,newModel);
 			 log.debug("Returning "+arg0+" ("+newModel.hashCode()+") from cache");
 			 return newModel;
@@ -95,22 +117,42 @@ public class VitroJenaModelMaker implements ModelMaker {
 		if (cachedModel != null) {
 			return cachedModel;
 		} else {
-			 Model newModel = copyModelIntoMem(innerModelMaker.createModel(arg0,arg1));
+			 Model newModel = makeDBModel(arg0);
 			 modelCache.put(arg0,newModel);
 			 return newModel;
 		}
 	}
 	
 	public GraphMaker getGraphMaker() {
-		return innerModelMaker.getGraphMaker();
+		throw new UnsupportedOperationException(this.getClass().getName() +
+				" does not support getGraphMaker()"); 
 	}
 
 	public boolean hasModel(String arg0) {
-		return innerModelMaker.hasModel(arg0);
+		DBConnection conn = new DBConnection(jdbcUrl, username, password, dbTypeStr);
+		try {
+			return ModelFactory.createModelRDBMaker(conn).hasModel(arg0);
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException sqle) {
+				throw new RuntimeException(sqle);
+			}
+		}
 	}
 
 	public ExtendedIterator listModels() {
-		return innerModelMaker.listModels();
+		DBConnection conn = new DBConnection(jdbcUrl, username, password, dbTypeStr);
+		try {
+			List<String> modelList = ModelFactory.createModelRDBMaker(conn).listModels().toList();
+			return WrappedIterator.create(modelList.iterator());
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException sqle) {
+				throw new RuntimeException(sqle);
+			}
+		}
 	}
 
 	public Model openModel(String arg0, boolean arg1) {
@@ -120,7 +162,7 @@ public class VitroJenaModelMaker implements ModelMaker {
 		if (cachedModel != null) {
 			return cachedModel;
 		} else {
-			 Model newModel = copyModelIntoMem(innerModelMaker.openModel(arg0,arg1));
+			 Model newModel = makeDBModel(arg0);
 			 modelCache.put(arg0,newModel);
 			 return newModel;
 		}
@@ -132,7 +174,16 @@ public class VitroJenaModelMaker implements ModelMaker {
 			m.close();
 			modelCache.remove(arg0);
 		}
-		innerModelMaker.removeModel(arg0);
+		DBConnection conn = new DBConnection(jdbcUrl, username, password, dbTypeStr);
+		try {
+			ModelFactory.createModelRDBMaker(conn).removeModel(arg0);
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException sqle) {
+				throw new RuntimeException(sqle);
+			}
+		}
 	}
 
 	
@@ -160,13 +211,14 @@ public class VitroJenaModelMaker implements ModelMaker {
 	}
 	
 	public Model createDefaultModel() {
-		return innerModelMaker.createDefaultModel();
+		throw new UnsupportedOperationException(this.getClass().getName() +
+				" does not support createDefaultModel()");
 	}
 
 	
 	public Model createFreshModel() {
-		return innerModelMaker.createFreshModel();
-	}
+		throw new UnsupportedOperationException(this.getClass().getName() +
+				" does not support createFreshModel()");	}
 
 	@Deprecated
 	public Model createModel() {
@@ -188,7 +240,7 @@ public class VitroJenaModelMaker implements ModelMaker {
 		if (cachedModel != null) {
 			return cachedModel;
 		} else {
-			 Model newModel = copyModelIntoMem(innerModelMaker.openModel(arg0));
+			 Model newModel = makeDBModel(arg0);
 			 modelCache.put(arg0,newModel);
 			 return newModel;
 		}
@@ -202,7 +254,7 @@ public class VitroJenaModelMaker implements ModelMaker {
 		if (cachedModel != null) {
 			return cachedModel;
 		} else {
-			 Model newModel = copyModelIntoMem(innerModelMaker.openModelIfPresent(arg0));
+			 Model newModel = makeDBModel(arg0);
 			 modelCache.put(arg0,newModel);
 			 return newModel;
 		}
@@ -216,7 +268,7 @@ public class VitroJenaModelMaker implements ModelMaker {
 		if (cachedModel != null) {
 			return cachedModel;
 		} else {
-			 Model newModel = copyModelIntoMem(innerModelMaker.getModel(arg0));
+			 Model newModel = makeDBModel(arg0);
 			 modelCache.put(arg0,newModel);
 			 return newModel;
 		}
@@ -230,7 +282,7 @@ public class VitroJenaModelMaker implements ModelMaker {
 		if (cachedModel != null) {
 			return cachedModel;
 		} else {
-			 Model newModel = copyModelIntoMem(innerModelMaker.getModel(arg0));
+			 Model newModel = makeDBModel(arg0);
 			 modelCache.put(arg0,newModel);
 			 return newModel;
 		}
@@ -273,5 +325,22 @@ public class VitroJenaModelMaker implements ModelMaker {
 		}
 		return null;
 	}
+	
+	private OntModel makeDBModel(String jenaDbModelName) {
+    	OntModel memCache = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+        RDBGraphGenerator gen = new RDBGraphGenerator(dataSource, dbTypeStr, jenaDbModelName);
+        Graph g = gen.generateGraph();
+        Model m = ModelFactory.createModelForGraph(g);	
+        memCache.add(m);
+        memCache.register(new MemToRDBModelSynchronizer(gen));
+        m.close();
+        try {
+            gen.getConnection().close();
+        } catch (SQLException e) {
+        	log.warn("Unable to close connection for graph", e);
+        }
+        // This next piece is so that we return a fresh model object each time so we don't get cross-contamination of extra listeners, etc.
+        return ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, ModelFactory.createUnion(memCache, ModelFactory.createDefaultModel()));
+    }
 
 }
