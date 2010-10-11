@@ -9,9 +9,6 @@ import static edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUpload
 import static edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest.FILE_ITEM_MAP;
 import static edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest.FILE_UPLOAD_EXCEPTION;
 
-import java.awt.image.renderable.ParameterBlock;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.media.jai.Interpolation;
 import javax.media.jai.JAI;
 import javax.media.jai.RenderedOp;
 import javax.media.jai.util.ImagingListener;
@@ -31,9 +27,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.sun.media.jai.codec.JPEGEncodeParam;
 import com.sun.media.jai.codec.MemoryCacheSeekableStream;
-import com.sun.media.jai.codec.PNGDecodeParam;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -285,7 +279,8 @@ public class ImageUploadHelper {
 			mainStream = fileStorage.getInputStream(mainBytestreamUri,
 					mainFilename);
 
-			thumbStream = scaleImageForThumbnail(mainStream, crop, newImage);
+			thumbStream = new ImageUploadThumbnailer(THUMBNAIL_HEIGHT,
+					THUMBNAIL_WIDTH).cropAndScale(mainStream, crop);
 
 			String mimeType = RECOGNIZED_FILE_TYPES.get(".jpg");
 			String filename = createThumbnailFilename(mainFilename);
@@ -386,106 +381,6 @@ public class ImageUploadHelper {
 		} else {
 			return prefix + filename.substring(0, periodHere) + extension;
 		}
-	}
-
-	/**
-	 * Create a thumbnail from a source image, given a cropping rectangle (x, y,
-	 * width, height).
-	 */
-	private InputStream scaleImageForThumbnail(InputStream source,
-			CropRectangle crop, FileInfo newImage) throws IOException {
-		try {
-			// Read the main image.
-			MemoryCacheSeekableStream stream = new MemoryCacheSeekableStream(
-					source);
-
-			ParameterBlock streamParams = new ParameterBlock();
-			streamParams.add(stream);
-			addDecodeParametersAsNeeded(newImage, streamParams);
-			RenderedOp mainImage = JAI.create("stream", streamParams);
-
-			int imageWidth = mainImage.getWidth();
-			int imageHeight = mainImage.getHeight();
-
-			// Adjust the crop rectangle, if needed, to compensate for scaling
-			// and to limit to the image size.
-			crop = adjustCropRectangle(crop, imageWidth, imageHeight);
-
-			// Crop the image.
-			ParameterBlock cropParams = new ParameterBlock();
-			cropParams.addSource(mainImage);
-			cropParams.add((float) crop.x);
-			cropParams.add((float) crop.y);
-			cropParams.add((float) crop.width);
-			cropParams.add((float) crop.height);
-			RenderedOp croppedImage = JAI.create("crop", cropParams);
-
-			// Figure the scales.
-			float scaleWidth = ((float) THUMBNAIL_WIDTH) / ((float) crop.width);
-			float scaleHeight = ((float) THUMBNAIL_HEIGHT)
-					/ ((float) crop.height);
-			log.debug("Generating a thumbnail, scales: " + scaleWidth + ", "
-					+ scaleHeight);
-
-			// Create the parameters for the scaling operation.
-			Interpolation interpolation = Interpolation
-					.getInstance(Interpolation.INTERP_BILINEAR);
-			ParameterBlock scaleParams = new ParameterBlock();
-			scaleParams.addSource(croppedImage);
-			scaleParams.add(scaleWidth); // x scale factor
-			scaleParams.add(scaleHeight); // y scale factor
-			scaleParams.add(0.0F); // x translate
-			scaleParams.add(0.0F); // y translate
-			scaleParams.add(interpolation);
-			RenderedOp image2 = JAI.create("scale", scaleParams);
-
-			JPEGEncodeParam encodeParam = new JPEGEncodeParam();
-			encodeParam.setQuality(1.0F);
-
-			ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-			JAI.create("encode", image2, bytes, "JPEG", encodeParam);
-			bytes.close();
-			return new ByteArrayInputStream(bytes.toByteArray());
-		} catch (Exception e) {
-			throw new IllegalStateException("Failed to scale the image", e);
-		}
-	}
-
-	/**
-	 * The JAI 1.1.3 package has a known bug writing JPEG images from sources
-	 * that have transparency (alpha channel) enabled.
-	 * 
-	 * For PNG images, we can add a parameter that will disable the alpha
-	 * channel.
-	 */
-	private void addDecodeParametersAsNeeded(FileInfo newImage,
-			ParameterBlock streamParams) {
-		if ("image/png".equals(newImage.getMimeType())) {
-			PNGDecodeParam pdp = new PNGDecodeParam();
-			pdp.setSuppressAlpha(true);
-			streamParams.add(pdp);
-		}
-	}
-
-	/**
-	 * The bounds of the cropping rectangle should be limited to the bounds of
-	 * the image.
-	 */
-	private CropRectangle adjustCropRectangle(CropRectangle crop,
-			int imageWidth, int imageHeight) {
-		log.debug("Generating a thumbnail, initial crop info: " + crop);
-
-		// Insure that x and y fall within the image dimensions.
-		int x = Math.max(0, Math.min(imageWidth, Math.abs(crop.x)));
-		int y = Math.max(0, Math.min(imageHeight, Math.abs(crop.y)));
-
-		// Insure that width and height are reasonable.
-		int w = Math.max(5, Math.min(imageWidth - x, crop.width));
-		int h = Math.max(5, Math.min(imageHeight - y, crop.height));
-
-		CropRectangle bounded = new CropRectangle(x, y, h, w);
-		log.debug("Generating a thumbnail, bounded crop info: " + bounded);
-		return bounded;
 	}
 
 	/**
