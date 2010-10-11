@@ -316,7 +316,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     protected void doException(VitroRequest vreq, HttpServletResponse response, ResponseValues values) {
         // Log the error, and display an error message on the page.        
         log.error(values.getException(), values.getException());      
-        TemplateResponseValues trv = new TemplateResponseValues(values.getTemplateName(), values.getMap());
+        TemplateResponseValues trv = new TemplateResponseValues(Template.STANDARD_ERROR.toString());
         doTemplate(vreq, response, trv);
     }
 
