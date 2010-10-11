@@ -33,6 +33,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.sun.media.jai.codec.JPEGEncodeParam;
 import com.sun.media.jai.codec.MemoryCacheSeekableStream;
+import com.sun.media.jai.codec.PNGDecodeParam;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -284,7 +285,7 @@ public class ImageUploadHelper {
 			mainStream = fileStorage.getInputStream(mainBytestreamUri,
 					mainFilename);
 
-			thumbStream = scaleImageForThumbnail(mainStream, crop);
+			thumbStream = scaleImageForThumbnail(mainStream, crop, newImage);
 
 			String mimeType = RECOGNIZED_FILE_TYPES.get(".jpg");
 			String filename = createThumbnailFilename(mainFilename);
@@ -392,12 +393,17 @@ public class ImageUploadHelper {
 	 * width, height).
 	 */
 	private InputStream scaleImageForThumbnail(InputStream source,
-			CropRectangle crop) throws IOException {
+			CropRectangle crop, FileInfo newImage) throws IOException {
 		try {
 			// Read the main image.
 			MemoryCacheSeekableStream stream = new MemoryCacheSeekableStream(
 					source);
-			RenderedOp mainImage = JAI.create("stream", stream);
+
+			ParameterBlock streamParams = new ParameterBlock();
+			streamParams.add(stream);
+			addDecodeParametersAsNeeded(newImage, streamParams);
+			RenderedOp mainImage = JAI.create("stream", streamParams);
+
 			int imageWidth = mainImage.getWidth();
 			int imageHeight = mainImage.getHeight();
 
@@ -442,6 +448,22 @@ public class ImageUploadHelper {
 			return new ByteArrayInputStream(bytes.toByteArray());
 		} catch (Exception e) {
 			throw new IllegalStateException("Failed to scale the image", e);
+		}
+	}
+
+	/**
+	 * The JAI 1.1.3 package has a known bug writing JPEG images from sources
+	 * that have transparency (alpha channel) enabled.
+	 * 
+	 * For PNG images, we can add a parameter that will disable the alpha
+	 * channel.
+	 */
+	private void addDecodeParametersAsNeeded(FileInfo newImage,
+			ParameterBlock streamParams) {
+		if ("image/png".equals(newImage.getMimeType())) {
+			PNGDecodeParam pdp = new PNGDecodeParam();
+			pdp.setSuppressAlpha(true);
+			streamParams.add(pdp);
 		}
 	}
 
