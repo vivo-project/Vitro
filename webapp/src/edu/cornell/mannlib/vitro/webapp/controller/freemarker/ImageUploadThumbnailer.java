@@ -7,7 +7,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 
 import javax.media.jai.InterpolationBilinear;
 import javax.media.jai.RenderedOp;
@@ -28,8 +27,15 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadControl
 /**
  * Crop the main image as specified, and scale it to the correct size for a
  * thumbnail.
+ * 
+ * The JAI library has a problem when writing a JPEG from a source image with an
+ * alpha channel (transparency). The colors come out inverted. We throw in a
+ * step that will remove transparency from a PNG, but it won't touch a GIF.
  */
 public class ImageUploadThumbnailer {
+	/** If an image has 3 color bands and 1 alpha band, we want these. */
+	private static final int[] COLOR_BAND_INDEXES = new int[] { 0, 1, 2 };
+
 	private static final Log log = LogFactory
 			.getLog(ImageUploadThumbnailer.class);
 
@@ -69,11 +75,20 @@ public class ImageUploadThumbnailer {
 
 	private RenderedOp makeImageOpaque(RenderedOp image) {
 		ColorModel colorModel = image.getColorModel();
+
 		if (!colorModel.hasAlpha()) {
+			// The image is already opaque.
 			return image;
 		}
-		return BandSelectDescriptor.create(image, figureBandIndices(image),
-				null);
+
+		if (image.getNumBands() == 4) {
+			// The image has a separate alpha channel. Drop the alpha channel.
+			return BandSelectDescriptor.create(image, COLOR_BAND_INDEXES, null);
+		}
+
+		// Don't know how to handle it. Probably a GIF with a transparent
+		// background. Give up.
+		return image;
 	}
 
 	private RenderedOp cropImage(RenderedOp image, CropRectangle crop) {
@@ -102,18 +117,6 @@ public class ImageUploadThumbnailer {
 		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
 		EncodeDescriptor.create(image, bytes, "JPEG", encodeParam, null);
 		return bytes.toByteArray();
-	}
-
-	/** Build an array holding the indexes of the color bands in this image. */
-	private int[] figureBandIndices(RenderedOp image) {
-		int howMany = Math.min(image.getColorModel().getNumColorComponents(),
-				image.getNumBands());
-		int[] bandIndices = new int[howMany];
-		for (int i = 0; i < bandIndices.length; i++) {
-			bandIndices[i] = i;
-		}
-		log.debug("Selecting these bands: " + Arrays.toString(bandIndices));
-		return bandIndices;
 	}
 
 	private CropRectangle limitCropRectangleToImageBounds(RenderedOp image,
