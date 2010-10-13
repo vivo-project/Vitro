@@ -6,7 +6,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpSession;
 
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.RoleBasedPolicy;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.RoleBasedPolicy.AuthRole;
 
@@ -17,15 +17,12 @@ public class DbAdminEditingIdentifierFactory implements IdentifierBundleFactory{
         IdentifierBundle ib = new ArrayIdentifierBundle();
         ib.add( RoleBasedPolicy.AuthRole.ANYBODY);
         
-        if( session != null ){
-            LoginFormBean f = (LoginFormBean) session.getAttribute( "loginHandler" );
-            try{
-                if( f != null && Integer.parseInt( f.getLoginRole() ) >=  LoginFormBean.DBA){
-                    ib.add(new DbAdminEditingId(f.getLoginRole(),f.getUserURI()));
-                    ib.add(AuthRole.DBA);
-                }            
-            }catch(NumberFormatException th){}            
-        }
+		LoginStatusBean loginBean = LoginStatusBean.getBean(session);
+		if (loginBean.isLoggedInAtLeast(LoginStatusBean.DBA)) {
+			String loginRole = String.valueOf(loginBean.getSecurityLevel());
+			ib.add(new DbAdminEditingId(loginRole, loginBean.getUserURI()));
+			ib.add(AuthRole.DBA);
+		}
 
         return ib;        
     }

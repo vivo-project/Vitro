@@ -17,7 +17,6 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -42,13 +41,9 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.sparql.resultset.ResultSetFormat;
 import com.hp.hpl.jena.vocabulary.XSD;
 
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
-
-/* @author ass92 */
-
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
+import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 
 
@@ -106,31 +101,17 @@ public class SparqlQueryServlet extends BaseEditController {
     throws ServletException, IOException
     {    	    	   	
         super.doGet(request, response);
+        // rjy7 Allows any editor (including self-editors) access to this servlet.
+        // This servlet is now requested via Ajax from some custom forms, so anyone
+        // using the custom form needs access rights.
+
+        // TODO Actually, this only allows someone who is logged in to use this servlet.
+        // If a self-editor is not logged in, they will not have access. -- jb
         if( !checkLoginStatus(request, response) )
         	return;
         
         VitroRequest vreq = new VitroRequest(request);
 
-        Object obj = vreq.getSession().getAttribute("loginHandler");        
-        LoginFormBean loginHandler = null;
-        if( obj != null && obj instanceof LoginFormBean )
-            loginHandler = ((LoginFormBean)obj);
-        if( loginHandler == null ||
-            ! "authenticated".equalsIgnoreCase(loginHandler.getLoginStatus()) ||
-                // rjy7 Allows any editor (including self-editors) access to this servlet.
-                // This servlet is now requested via Ajax from some custom forms, so anyone
-                // using the custom form needs access rights.
-                Integer.parseInt(loginHandler.getLoginRole()) < LoginFormBean.NON_EDITOR ){       
-            HttpSession session = request.getSession(true);
-            
-            session.setAttribute("postLoginRequest",
-                    vreq.getRequestURI()+( vreq.getQueryString()!=null?('?' + vreq.getQueryString()):"" ));
-            String redirectURL=request.getContextPath() + Controllers.SITE_ADMIN + "?login=block";
-            response.sendRedirect(redirectURL);
-            return;
-        }
-        
-        
         Model model = vreq.getJenaOntModel(); // getModel()
         if( model == null ){
             doNoModelInContext(request,response);
