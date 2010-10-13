@@ -30,7 +30,7 @@ public class OntologyEditController extends BaseEditController {
     public void doPost (HttpServletRequest req, HttpServletResponse response) {
 
     	VitroRequest request = new VitroRequest(req);
-        if (!checkLoginStatus(request,response,(String)request.getAttribute("fetchURI")))
+        if (!checkLoginStatus(request,response))
             return;
 
         try {
