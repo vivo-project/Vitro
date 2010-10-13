@@ -8,13 +8,20 @@
           version="2.0"> */ %> 
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
 <%@ taglib prefix="form" uri="http://vitro.mannlib.cornell.edu/edit/tags" %>
+<%@ page import="edu.cornell.mannlib.vedit.beans.LoginStatusBean" %>
+
+<%
+	if (LoginStatusBean.getBean(request).isLoggedInAtLeast(LoginStatusBean.EDITOR)) {
+		request.setAttribute("isEditor", Boolean.TRUE);
+	}
+%>
 
 <c:set var="singlePortal" value="${requestScope.singlePortal}"/>
 <div name="anybody" class="editingForm">
 <jsp:include page="/templates/edit/fetch/vertical.jsp"/>
 <c:set var='individual' value='${requestScope.entityWebapp}'/>
-<jsp:useBean id="loginHandler" class="edu.cornell.mannlib.vedit.beans.LoginFormBean" scope="session" />
-<c:if test="${loginHandler.loginRole >= 4}">
+
+<c:if test="${isEditor}">
 	<div name="authorized" align="center">
 	<table class="form-background" border="0" cellpadding="2" cellspacing="2" width="100%">
     	<tr valign="top" align="center">

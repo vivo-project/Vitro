@@ -72,7 +72,7 @@ public class BaseResourceBean implements ResourceBean {
             if( level == LoginStatusBean.ANYBODY)    // 0
                 return PUBLIC;
             if( level == LoginStatusBean.NON_EDITOR) // 1
-                return PUBLIC; // no correspondence with self-editing, which does not authorize through the LoginFormBean
+                return PUBLIC; // no correspondence with self-editing, which does not authorize through the LoginStatusBean
             if( level == LoginStatusBean.EDITOR )    // 4
                 return EDITOR;
             if( level == LoginStatusBean.CURATOR )   // 5
