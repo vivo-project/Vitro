@@ -8,14 +8,13 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.Identifier;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.DefaultInconclusivePolicy;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.VisitingPolicyIface;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AddDataPropStmt;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AddObjectPropStmt;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AddResource;
@@ -146,11 +145,11 @@ public class RoleBasedPolicy extends DefaultInconclusivePolicy  implements Polic
 //        CURATOR("http://vitro.mannlib.cornell.edu/authRole#curator",3),
 //        DBA("http://vitro.mannlib.cornell.edu/authRole#dba",50);
 
-        ANYBODY( "role:/0" ,LoginFormBean.ANYBODY),
-        USER(    "role:/1" ,LoginFormBean.NON_EDITOR),
-        EDITOR(  "role:/4" ,LoginFormBean.EDITOR),
-        CURATOR( "role:/5" ,LoginFormBean.CURATOR),
-        DBA(     "role:/50",LoginFormBean.DBA);
+        ANYBODY( "role:/0" ,LoginStatusBean.ANYBODY),
+        USER(    "role:/1" ,LoginStatusBean.NON_EDITOR),
+        EDITOR(  "role:/4" ,LoginStatusBean.EDITOR),
+        CURATOR( "role:/5" ,LoginStatusBean.CURATOR),
+        DBA(     "role:/50",LoginStatusBean.DBA);
 
         private final String roleUri;
         private final int level;

@@ -5,15 +5,13 @@ package edu.cornell.mannlib.vitro.webapp.auth.policy;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.rdf.model.impl.Util;
 
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.EditorEditingIdentifierFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.Identifier;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
@@ -137,7 +135,7 @@ public class EditorEditingPolicy implements VisitingPolicyIface{
             return pd.setMessage("Unable to get a role for the editor from IdBundle");
         
         try{
-            if( Integer.parseInt( roleStr ) /*<*/ != LoginFormBean.EDITOR)
+            if( Integer.parseInt( roleStr ) /*<*/ != LoginStatusBean.EDITOR)
                 return pd.setMessage("EditorEditingPolicy found role of "+roleStr+" but only authorizes for users logged in as EDITOR or higher");            
         }catch(NumberFormatException nef){}
                  

@@ -11,7 +11,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.rdf.model.impl.Util;
 
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.DbAdminEditingIdentifierFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.Identifier;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
@@ -137,7 +137,7 @@ public class DbAdminEditingPolicy implements VisitingPolicyIface {
             return pd.setMessage("Unable to get a role for the dbAdmin from IdBundle");
         
         try{
-            if( Integer.parseInt( roleStr ) /*<*/ != LoginFormBean.DBA) {
+            if( Integer.parseInt( roleStr ) /*<*/ != LoginStatusBean.DBA) {
                 return pd.setMessage("DbAdminEditingPolicy found role of "+roleStr+" and only authorizes for users logged in as DB_ADMIN");
             }
         } catch(NumberFormatException nef){

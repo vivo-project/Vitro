@@ -6,7 +6,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openrdf.model.impl.URIImpl;
 
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.flags.AuthFlag;
 
@@ -69,15 +69,15 @@ public class BaseResourceBean implements ResourceBean {
         
         public static RoleLevel getRoleFromAuth(AuthFlag ar){
             int level = ar.getUserSecurityLevel();
-            if( level == LoginFormBean.ANYBODY)    // 0
+            if( level == LoginStatusBean.ANYBODY)    // 0
                 return PUBLIC;
-            if( level == LoginFormBean.NON_EDITOR) // 1
+            if( level == LoginStatusBean.NON_EDITOR) // 1
                 return PUBLIC; // no correspondence with self-editing, which does not authorize through the LoginFormBean
-            if( level == LoginFormBean.EDITOR )    // 4
+            if( level == LoginStatusBean.EDITOR )    // 4
                 return EDITOR;
-            if( level == LoginFormBean.CURATOR )   // 5
+            if( level == LoginStatusBean.CURATOR )   // 5
                 return CURATOR;
-            if( level == LoginFormBean.DBA )       // 50
+            if( level == LoginStatusBean.DBA )       // 50
                 return DB_ADMIN;
             else
                 return null;

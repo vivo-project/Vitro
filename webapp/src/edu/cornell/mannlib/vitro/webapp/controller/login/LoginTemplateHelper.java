@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.controller.login;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,11 +12,10 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.edit.Authenticate;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State;
 import freemarker.template.Configuration;
 
@@ -178,18 +176,11 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 	 * Where are we in the process? Logged in? Not? Somewhere in between?
 	 */
 	private State getCurrentLoginState(HttpServletRequest request) {
-		HttpSession session = request.getSession(false);
-		if (session == null) {
-			return State.NOWHERE;
-		}
-
-		LoginFormBean lfb = (LoginFormBean) session
-				.getAttribute("loginHandler");
-		if ((lfb != null) && (lfb.getLoginStatus().equals("authenticated"))) {
+		if (LoginStatusBean.getBean(request).isLoggedIn()) {
 			return State.LOGGED_IN;
+		} else {
+			return getLoginProcessBean(request).getState();
 		}
-
-		return getLoginProcessBean(request).getState();
 	}
 
 	/**

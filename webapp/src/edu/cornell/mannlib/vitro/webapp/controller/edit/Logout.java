@@ -10,7 +10,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
@@ -32,12 +32,12 @@ public class Logout extends HttpServlet {
 				UserDao userDao = ((WebappDaoFactory) session
 						.getServletContext().getAttribute("webappDaoFactory"))
 						.getUserDao();
-				LoginFormBean f = (LoginFormBean) session
-						.getAttribute("loginHandler");
-				if (f != null) {
-					User user = userDao.getUserByUsername(f.getLoginName());
+
+				LoginStatusBean loginBean = LoginStatusBean.getBean(session);
+				if (loginBean.isLoggedIn()) {
+					User user = userDao.getUserByUsername(loginBean.getUsername());
 					if (user == null) {
-						log.error("Unable to retrieve user " + f.getLoginName()
+						log.error("Unable to retrieve user " + loginBean.getUsername()
 								+ " from model");
 					} else {
 						Authenticate.sendLoginNotifyEvent(
