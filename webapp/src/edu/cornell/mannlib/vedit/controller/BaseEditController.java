@@ -115,7 +115,12 @@ public class BaseEditController extends VitroHttpServlet {
      */
 	protected boolean checkLoginStatus(HttpServletRequest request,
 			HttpServletResponse response) {
-		return checkLoginStatus(request, response, LoginStatusBean.ANYBODY);
+		if (LoginStatusBean.getBean(request).isLoggedIn()) {
+			return true;
+		} else {
+			redirectToLoginPage(request, response);
+			return false;
+		}
 	}
 
 	/**
@@ -125,8 +130,18 @@ public class BaseEditController extends VitroHttpServlet {
 			HttpServletResponse response, int minimumLevel) {
 		if (LoginStatusBean.getBean(request).isLoggedInAtLeast(minimumLevel)) {
 			return true;
+		} else {
+			redirectToLoginPage(request, response);
+			return false;
 		}
-		
+	}
+
+	/**
+	 * Not adequately logged in. Send them to the login page, and then back to
+	 * the page that invoked this.
+	 */
+	private void redirectToLoginPage(HttpServletRequest request,
+			HttpServletResponse response) {
 		request.getSession().setAttribute("postLoginRequest",
 				request.getRequestURI() + "?" + request.getQueryString());
 		try {
@@ -135,7 +150,6 @@ public class BaseEditController extends VitroHttpServlet {
 		} catch (IOException ioe) {
 			log.error("checkLoginStatus() could not redirect to login page");
 		}
-		return false;
 	}
 	
     protected void setRequestAttributes(HttpServletRequest request, EditProcessObject epo){

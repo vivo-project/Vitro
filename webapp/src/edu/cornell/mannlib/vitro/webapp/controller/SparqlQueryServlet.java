@@ -107,8 +107,9 @@ public class SparqlQueryServlet extends BaseEditController {
 
         // TODO Actually, this only allows someone who is logged in to use this servlet.
         // If a self-editor is not logged in, they will not have access. -- jb
-        if( !checkLoginStatus(request, response) )
+        if( !checkLoginStatus(request, response) ) {
         	return;
+        }
         
         VitroRequest vreq = new VitroRequest(request);
 

@@ -16,7 +16,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.beans.FormObject;
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
@@ -59,22 +59,14 @@ public class SiteAdminController extends BaseEditController {
             request.setAttribute("languageModeStr", "RDF Schema Mode" );        	
         } 
         
-        
-        LoginFormBean loginHandler = (LoginFormBean)request.getSession().getAttribute("loginHandler");
-        if( loginHandler != null ){
-            String status = loginHandler.getLoginStatus();
-            if ( "authenticated".equals(status) ) {
-                int securityLevel = Integer.parseInt( loginHandler.getLoginRole() );
-                if(securityLevel >= loginHandler.CURATOR ){
-                    String verbose = request.getParameter("verbose");
-                    if( "true".equals(verbose)) {
-                        request.getSession().setAttribute(VERBOSE, Boolean.TRUE);
-                    } else if( "false".equals(verbose)) {
-                        request.getSession().setAttribute(VERBOSE, Boolean.FALSE);
-                    }
-                }
-            }
-        }
+		if (LoginStatusBean.getBean(vreq).isLoggedInAtLeast(LoginStatusBean.CURATOR)) {
+			String verbose = request.getParameter("verbose");
+			if ("true".equals(verbose)) {
+				request.getSession().setAttribute(VERBOSE, Boolean.TRUE);
+			} else if ("false".equals(verbose)) {
+				request.getSession().setAttribute(VERBOSE, Boolean.FALSE);
+			}
+		}
         
         request.setAttribute("singlePortal",new Boolean(vreq.getFullWebappDaoFactory().getPortalDao().isSinglePortal()));
         

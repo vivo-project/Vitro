@@ -28,7 +28,7 @@ import edu.cornell.mannlib.vedit.beans.DynamicField;
 import edu.cornell.mannlib.vedit.beans.DynamicFieldRow;
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.beans.FormObject;
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.beans.Option;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vedit.forwarder.PageForwarder;
@@ -86,7 +86,7 @@ public class EntityRetryController extends BaseEditController {
 
         WebappDaoFactory wadf = (vreq.getAssertionsWebappDaoFactory()!=null) ? vreq.getAssertionsWebappDaoFactory() : vreq.getFullWebappDaoFactory();
         
-        LoginFormBean loginBean = (LoginFormBean) request.getSession().getAttribute("loginHandler");
+        LoginStatusBean loginBean = LoginStatusBean.getBean(request);
         WebappDaoFactory myWebappDaoFactory = wadf.getUserAwareDaoFactory(loginBean.getUserURI());
 
         IndividualDao ewDao = myWebappDaoFactory.getIndividualDao();

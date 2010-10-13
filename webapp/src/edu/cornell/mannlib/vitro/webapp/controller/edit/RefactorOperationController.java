@@ -16,11 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
-import com.hp.hpl.jena.iri.IRI;
-import com.hp.hpl.jena.iri.IRIFactory;
-import com.hp.hpl.jena.iri.Violation;
 import com.hp.hpl.jena.ontology.DatatypeProperty;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntProperty;
@@ -42,11 +38,9 @@ import com.hp.hpl.jena.util.iterator.ClosableIterator;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
 
-
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.JenaNetidPolicy.ContextSetup;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -58,13 +52,6 @@ public class RefactorOperationController extends BaseEditController {
 	
 	private String doFixDataTypes(HttpServletRequest request, HttpServletResponse response)
 	{
-		
-		String userURI = null;
-		LoginFormBean loginBean = (LoginFormBean) request.getSession().getAttribute("loginHandler");
-		if (loginBean != null) {
-			userURI = loginBean.getUserURI();
-		}
-		
 		try {
             super.doGet(request,response);
         } catch (Exception e) {
@@ -196,12 +183,7 @@ public class RefactorOperationController extends BaseEditController {
 	}
 
 	private String doRenameResource(VitroRequest request, HttpServletResponse response, EditProcessObject epo) {
-		
-		String userURI = null;
-		LoginFormBean loginBean = (LoginFormBean) request.getSession().getAttribute("loginHandler");
-		if (loginBean != null) {
-			userURI = loginBean.getUserURI();
-		}
+		String userURI = LoginStatusBean.getBean(request).getUserURI();
 		
 		OntModel ontModel = (OntModel) getServletContext().getAttribute("baseOntModel");
 		
@@ -296,11 +278,7 @@ public class RefactorOperationController extends BaseEditController {
 	}
 	
 	private void doMovePropertyStatements(VitroRequest request, HttpServletResponse response, EditProcessObject epo) {
-		String userURI = null;
-		LoginFormBean loginBean = (LoginFormBean) request.getSession().getAttribute("loginHandler");
-		if (loginBean != null) {
-			userURI = loginBean.getUserURI();
-		}
+		String userURI = LoginStatusBean.getBean(request).getUserURI();
 		
 		OntModel ontModel = (OntModel) getServletContext().getAttribute("jenaOntModel");
 		
@@ -379,11 +357,7 @@ public class RefactorOperationController extends BaseEditController {
 	}
 	
 	private void doMoveInstances(VitroRequest request, HttpServletResponse response, EditProcessObject epo) {
-		String userURI = null;
-		LoginFormBean loginBean = (LoginFormBean) request.getSession().getAttribute("loginHandler");
-		if (loginBean != null) {
-			userURI = loginBean.getUserURI();
-		}
+		String userURI = LoginStatusBean.getBean(request).getUserURI();
 		
 		OntModel ontModel = (OntModel) getServletContext().getAttribute("baseOntModel");
 		if (ontModel==null) {

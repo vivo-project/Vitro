@@ -4,9 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
@@ -23,7 +21,7 @@ import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.shared.Lock;
 
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
@@ -236,12 +234,7 @@ public class PrimitiveRdfEdit extends FreemarkerHttpServlet{
 
 
     static public boolean checkLoginStatus(HttpServletRequest request){
-        LoginFormBean loginBean = (LoginFormBean) request.getSession().getAttribute("loginHandler");        
-        if (loginBean == null){            
-            return false;            
-        } else {                        
-            return true;
-        }
+    	return LoginStatusBean.getBean(request).isLoggedIn();
     }
 
 

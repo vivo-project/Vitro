@@ -8,7 +8,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
@@ -40,15 +40,7 @@ public class IndexController extends FreemarkerHttpServlet {
 //
 //    public void doGet( HttpServletRequest request, HttpServletResponse response )
 //    throws IOException, ServletException {
-//        
-//        Object obj = request.getSession().getAttribute("loginHandler");        
-//        LoginFormBean loginHandler = null;
-//        if( obj != null && obj instanceof LoginFormBean )
-//            loginHandler = ((LoginFormBean)obj);
-//        if( loginHandler == null ||
-//            ! "authenticated".equalsIgnoreCase(loginHandler.getLoginStatus()) ||
-//             Integer.parseInt(loginHandler.getLoginRole()) <= 5 ){       
-//            
+//        if (!LoginStatusBean.getBean(vreq).isLoggedInAtLeast(LoginStatusBean.DBA)) {
 //            String redirectURL=request.getContextPath() + Controllers.SITE_ADMIN + "?login=block";
 //            response.sendRedirect(redirectURL);
 //            return;
@@ -76,20 +68,12 @@ public class IndexController extends FreemarkerHttpServlet {
     }
     
     @Override
-    protected ResponseValues processRequest(VitroRequest vreq) {      
-        
-        Object obj = vreq.getSession().getAttribute("loginHandler");      
-        Map<String, Object> body = new HashMap<String, Object>();
-        
-        LoginFormBean loginHandler = null;
-        if( obj != null && obj instanceof LoginFormBean )
-            loginHandler = ((LoginFormBean)obj);
-        if( loginHandler == null ||
-            ! "authenticated".equalsIgnoreCase(loginHandler.getLoginStatus()) ||
-             Integer.parseInt(loginHandler.getLoginRole()) <= LoginFormBean.CURATOR ){       
-            
+    protected ResponseValues processRequest(VitroRequest vreq) {   
+        if (!LoginStatusBean.getBean(vreq).isLoggedInAtLeast(LoginStatusBean.DBA)) {
             return new RedirectResponseValues(UrlBuilder.getUrl(Route.LOGIN));
         }
+        
+        Map<String, Object> body = new HashMap<String, Object>();
         
         // long start = System.currentTimeMillis();
         try {

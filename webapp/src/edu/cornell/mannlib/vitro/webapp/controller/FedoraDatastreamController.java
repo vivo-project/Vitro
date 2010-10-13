@@ -17,7 +17,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.logging.Log;
@@ -34,7 +33,7 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 import com.hp.hpl.jena.vocabulary.XSD;
 import com.ibm.icu.util.Calendar;
 
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
@@ -483,9 +482,7 @@ public class FedoraDatastreamController extends VitroHttpServlet implements Cons
     	//System.out.println("Delete event name is " +deleteEventName + " - delete time is " + formattedDeleteDate);
     	
     	//Get current user
-    	HttpSession session = req.getSession(true);
-    	LoginFormBean loginBean = (LoginFormBean) session.getAttribute("loginHandler");
-        String userURI = loginBean.getUserURI();
+    	String userURI = LoginStatusBean.getBean(req).getUserURI();
         //System.out.println("Current logged in user uri is " + userURI); 
        
         //Update model
