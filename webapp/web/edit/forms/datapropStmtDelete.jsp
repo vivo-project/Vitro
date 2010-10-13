@@ -5,7 +5,7 @@
 <%@ page import="com.hp.hpl.jena.rdf.model.Literal" %>
 <%@ page import="com.hp.hpl.jena.rdf.model.Property" %>
 
-<%@ page import="edu.cornell.mannlib.vedit.beans.LoginFormBean" %>
+<%@ page import="edu.cornell.mannlib.vedit.beans.LoginStatusBean" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.DataProperty" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement" %>
 <%@page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditN3Utils"%>
@@ -23,9 +23,7 @@
 <%
     org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger("edu.cornell.mannlib.vitro.jsp.edit.forms.datapropStmtDelete");
 
-    if( session == null)
-        throw new Error("need to have session");
-    if (!VitroRequestPrep.isSelfEditing(request) && !LoginFormBean.loggedIn(request, LoginFormBean.NON_EDITOR)) {%>
+    if (!VitroRequestPrep.isSelfEditing(request) && !LoginStatusBean.getBean(request).isLoggedInAtLeast(LoginStatusBean.NON_EDITOR)) {%>
         
 <%@page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.StandardModelSelector"%>
 <%@page import="com.hp.hpl.jena.shared.Lock"%>

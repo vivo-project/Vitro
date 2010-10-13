@@ -7,7 +7,7 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep" %>
-<%@ page import="edu.cornell.mannlib.vedit.beans.LoginFormBean" %>
+<%@ page import="edu.cornell.mannlib.vedit.beans.LoginStatusBean" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Portal" %>
 <%@ page import="java.util.HashMap" %>
@@ -40,10 +40,8 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
     final String DEFAULT_ERROR_FORM = "error.jsp";
     final String DEFAULT_ADD_INDIVIDUAL = "defaultAddMissingIndividualForm.jsp";
 
-    request.getSession(true);
-
    if (!VitroRequestPrep.isSelfEditing(request)
-            && !LoginFormBean.loggedIn(request, LoginFormBean.NON_EDITOR)) {
+            && !LoginStatusBean.getBean(request).isLoggedInAtLeast(LoginStatusBean.NON_EDITOR)) {
             %> <c:redirect url="<%= Controllers.LOGIN %>" /> <%
    }
 

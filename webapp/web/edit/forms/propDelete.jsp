@@ -7,7 +7,7 @@
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.identifier.RoleIdentifier"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditN3Utils"%>
-<%@ page import="edu.cornell.mannlib.vedit.beans.LoginFormBean" %>
+<%@ page import="edu.cornell.mannlib.vedit.beans.LoginStatusBean" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Individual" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty"%>
@@ -48,11 +48,9 @@ public WebappDaoFactory getUnfilteredDaoFactory() {
     </c:url>
 
 <%  
-    if( session == null) {
-        throw new Error("need to have session");
-    }
     boolean selfEditing = VitroRequestPrep.isSelfEditing(request);
-    if (!selfEditing && !LoginFormBean.loggedIn(request, LoginFormBean.NON_EDITOR)) {%>
+    boolean isLoggedIn = LoginStatusBean.getBean(request).isLoggedInAtLeast(LoginStatusBean.NON_EDITOR);
+    if (!selfEditing && !isLoggedIn) {%>
         <c:redirect url="<%= Controllers.LOGIN %>" />       
 <%  }
 

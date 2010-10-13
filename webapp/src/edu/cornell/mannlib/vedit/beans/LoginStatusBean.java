@@ -53,7 +53,7 @@ public class LoginStatusBean {
 
 	/**
 	 * Get the bean from this request, or a dummy bean if the user is not logged
-	 * in.
+	 * in. Never returns null.
 	 */
 	public static LoginStatusBean getBean(HttpServletRequest request) {
 		if (request == null) {
@@ -70,7 +70,7 @@ public class LoginStatusBean {
 
 	/**
 	 * Get the bean from this session, or a dummy bean if the user is not logged
-	 * in.
+	 * in. Never returns null.
 	 */
 	public static LoginStatusBean getBean(HttpSession session) {
 		if (session == null) {
