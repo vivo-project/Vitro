@@ -40,7 +40,7 @@ public class UserEditController extends BaseEditController {
 
     public void doPost (HttpServletRequest request, HttpServletResponse response) throws ServletException {
 
-        if (!checkLoginStatus(request,response,(String)request.getAttribute("fetchURI")))
+        if (!checkLoginStatus(request,response))
             return;
 
         try {

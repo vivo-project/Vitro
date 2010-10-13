@@ -41,7 +41,7 @@ public class VclassEditController extends BaseEditController {
     	
     	VitroRequest request = new VitroRequest(req);
 
-        if (!checkLoginStatus(request,response,(String)request.getAttribute("fetchURI")))
+        if (!checkLoginStatus(request,response))
             return;
 
         try {

@@ -30,7 +30,7 @@ public class TabEditController extends BaseEditController {
 
     public void doPost (HttpServletRequest request, HttpServletResponse response) {
 
-        if (!checkLoginStatus(request,response,(String)request.getAttribute("fetchURI")))
+        if (!checkLoginStatus(request,response))
             return;
 
         try {

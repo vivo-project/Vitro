@@ -393,7 +393,7 @@ public class ImageUploadHelper {
 	 * is written as a simple log message.
 	 * </p>
 	 */
-	private static class NonNoisyImagingListener implements ImagingListener {
+	static class NonNoisyImagingListener implements ImagingListener {
 		@Override
 		public boolean errorOccurred(String message, Throwable thrown,
 				Object where, boolean isRetryable) throws RuntimeException {

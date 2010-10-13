@@ -8,7 +8,7 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.RdfLiteralHash" %>
-<%@ page import="edu.cornell.mannlib.vedit.beans.LoginFormBean" %>
+<%@ page import="edu.cornell.mannlib.vedit.beans.LoginStatusBean" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
@@ -39,7 +39,7 @@
     final String DEFAULT_VITRO_NS_FORM = "defaultVitroNsDataPropForm.jsp";
     final String DEFAULT_ERROR_FORM = "error.jsp";
     
-    if (!VitroRequestPrep.isSelfEditing(request) && !LoginFormBean.loggedIn(request, LoginFormBean.NON_EDITOR)) {        
+    if (!VitroRequestPrep.isSelfEditing(request) && !LoginStatusBean.getBean(request).isLoggedInAtLeast(LoginStatusBean.NON_EDITOR)) {        
         %> <c:redirect url="<%= Controllers.LOGIN %>" /> <%  
     }
 

@@ -5,7 +5,7 @@
 <%@ page import="com.hp.hpl.jena.shared.Lock" %>
 <%@ page import="com.thoughtworks.xstream.XStream" %>
 <%@ page import="com.thoughtworks.xstream.io.xml.DomDriver" %>
-<%@ page import="edu.cornell.mannlib.vedit.beans.LoginFormBean" %>
+<%@ page import="edu.cornell.mannlib.vedit.beans.LoginStatusBean" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Individual" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.VitroRequest" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory" %>
@@ -40,12 +40,9 @@ and set a flag in the request to indicate "back button confusion"
 %>
 <%
     log.debug("Starting datapropertyBackButtonProblems.jsp");
-
-    if( session == null)
-        throw new Error("need to have session");
 %>
 <%
-    if (!VitroRequestPrep.isSelfEditing(request) && !LoginFormBean.loggedIn(request, LoginFormBean.CURATOR)) {
+    if (!VitroRequestPrep.isSelfEditing(request) && !LoginStatusBean.getBean(request).isLoggedInAtLeast(LoginStatusBean.CURATOR)) {
         %><c:redirect url="<%= Controllers.LOGIN %>" /><%
     }
 

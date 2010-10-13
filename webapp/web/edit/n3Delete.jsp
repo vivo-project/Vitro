@@ -9,7 +9,7 @@
 <%@ page import="com.hp.hpl.jena.shared.Lock" %>
 <%@ page import="com.thoughtworks.xstream.XStream" %>
 <%@ page import="com.thoughtworks.xstream.io.xml.DomDriver" %>
-<%@ page import="edu.cornell.mannlib.vedit.beans.LoginFormBean" %>
+<%@ page import="edu.cornell.mannlib.vedit.beans.LoginStatusBean" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditN3Generator" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditSubmission" %>
@@ -49,10 +49,9 @@
  
 --%>
 <%    
-    if( session == null)
-        throw new Error("need to have session");
     boolean selfEditing = VitroRequestPrep.isSelfEditing(request);
-    if (!selfEditing && !LoginFormBean.loggedIn(request, LoginFormBean.NON_EDITOR)) {
+    boolean isLoggedIn = LoginStatusBean.getBean(request).isLoggedInAtLeast(LoginStatusBean.NON_EDITOR);
+    if (!selfEditing && !isLoggedIn) {
         %><c:redirect url="<%= Controllers.LOGIN %>" /><%
     }
     
