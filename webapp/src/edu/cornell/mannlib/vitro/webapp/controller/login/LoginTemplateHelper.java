@@ -35,9 +35,9 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 
 	/** If they are changing their password on first login, show them this form. */
 	public static final String TEMPLATE_FORCE_PASSWORD_CHANGE = "login-forcedPasswordChange.ftl";
-	
-    /** Show error message */
-    public static final String TEMPLATE_SERVER_ERROR = Template.ERROR_MESSAGE.toString(); 
+
+	/** Show error message */
+	public static final String TEMPLATE_SERVER_ERROR = Template.ERROR_MESSAGE.toString();
 
 	public static final String BODY_LOGIN_NAME = "loginName";
 	public static final String BODY_FORM_ACTION = "formAction";
@@ -45,18 +45,14 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 	public static final String BODY_ERROR_MESSAGE = "errorMessage";
 	public static final String BODY_CANCEL_URL = "cancelUrl";
 
-	/** If no portal is specified in the request, use this one. */
-	private static final int DEFAULT_PORTAL_ID = 1;
-
 	public LoginTemplateHelper(HttpServletRequest req) {
 		super(req);
 	}
 
 	/** Version for JSP page */
 	public String showLoginPage(HttpServletRequest request) {
-	    VitroRequest vreq = new VitroRequest(request);
+		VitroRequest vreq = new VitroRequest(request);
 		try {
-			
 			State state = getCurrentLoginState(vreq);
 			log.debug("State on exit: " + state);
 
@@ -70,35 +66,34 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 			}
 		} catch (Exception e) {
 			log.error(e);
-			return doTemplate(vreq, showError(request, e));
+			return doTemplate(vreq, showError(e));
 		}
 	}
 
 	/** Version for Freemarker page */
 	public TemplateResponseValues showLoginPanel(VitroRequest vreq) {
-	    try {
+		try {
 
-            State state = getCurrentLoginState(vreq);
-            log.debug("State on exit: " + state);
-            
-            switch (state) {
-            // RY Why does this case exist? We don't call this method if a user is logged in.
-            case LOGGED_IN:
-                return null;
-            case FORCED_PASSWORD_CHANGE:
-                //return doTemplate(vreq, showPasswordChangeScreen(vreq), body, config);
-                return showPasswordChangeScreen(vreq);
-            default:
-                //return doTemplate(vreq, showLoginScreen(vreq), body, config);
-                return showLoginScreen(vreq);
-            }
-        } catch (Exception e) {
-            log.error(e);
-            return showError(vreq, e);
-        }
-    }
+			State state = getCurrentLoginState(vreq);
+			log.debug("State on exit: " + state);
 
-	   
+			switch (state) {
+			// RY Why does this case exist? We don't call this method if a user is logged in.
+			case LOGGED_IN:
+				return null;
+			case FORCED_PASSWORD_CHANGE:
+				// return doTemplate(vreq, showPasswordChangeScreen(vreq), body, config);
+				return showPasswordChangeScreen(vreq);
+			default:
+				// return doTemplate(vreq, showLoginScreen(vreq), body, config);
+				return showLoginScreen(vreq);
+			}
+		} catch (Exception e) {
+			log.error(e);
+			return showError(e);
+		}
+	}
+
 	/**
 	 * User is just starting the login process. Be sure that we have a
 	 * {@link LoginProcessBean} with the correct status. Show them the login
@@ -122,7 +117,7 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 		if (!errorMessage.isEmpty()) {
 			trv.put(BODY_ERROR_MESSAGE, errorMessage);
 		}
-		
+
 		return trv;
 	}
 
@@ -146,17 +141,17 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 		}
 		return trv;
 	}
-	
-	private TemplateResponseValues showError(HttpServletRequest request, Exception e) {
-        TemplateResponseValues trv = new TemplateResponseValues(
-                TEMPLATE_SERVER_ERROR);	    
-        trv.put(BODY_ERROR_MESSAGE, "Internal server error:<br /> " + e);
-        return trv;
+
+	private TemplateResponseValues showError(Exception e) {
+		TemplateResponseValues trv = new TemplateResponseValues(
+				TEMPLATE_SERVER_ERROR);
+		trv.put(BODY_ERROR_MESSAGE, "Internal server error:<br /> " + e);
+		return trv;
 	}
 
 	/**
-	 * We processed a response, and want to show a template.
-	 * Version for JSP page.
+	 * We processed a response, and want to show a template. Version for JSP
+	 * page.
 	 */
 	private String doTemplate(VitroRequest vreq, TemplateResponseValues values) {
 		// Set it up like FreeMarkerHttpServlet.doGet() would do.
@@ -164,13 +159,12 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 		Map<String, Object> sharedVariables = getSharedVariables(vreq, new HashMap<String, Object>());
 		Map<String, Object> root = new HashMap<String, Object>(sharedVariables);
 		Map<String, Object> body = new HashMap<String, Object>(sharedVariables);
-        root.putAll(getRootValues(vreq));
+		root.putAll(getRootValues(vreq));
 
 		// Add the values that we got, and merge to the template.
 		body.putAll(values.getMap());
 		return mergeMapToTemplate(values.getTemplateName(), body, config);
 	}
-
 
 	/**
 	 * Where are we in the process? Logged in? Not? Somewhere in between?
@@ -212,17 +206,5 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 		String contextPath = request.getContextPath();
 		String urlParams = "?login=block&cancel=true";
 		return contextPath + "/authenticate" + urlParams;
-	}
-	
-	/**
-	 * What portal are we currently in?
-	 */
-	private String getPortalIdString(HttpServletRequest request) {
-		String portalIdParameter = request.getParameter("home");
-		if (portalIdParameter == null) {
-			return String.valueOf(DEFAULT_PORTAL_ID);
-		} else {
-			return portalIdParameter;
-		}
 	}
 }
