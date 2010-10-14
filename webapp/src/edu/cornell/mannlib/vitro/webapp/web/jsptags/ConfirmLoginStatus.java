@@ -14,6 +14,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep;
 
 /**
  * JSP tag to generate the HTML of links for edit, delete or add of a Property.
@@ -27,7 +28,8 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 public class ConfirmLoginStatus extends BodyTagSupport {
 	private static final Log log = LogFactory.getLog(ConfirmLoginStatus.class);
 
-	int level;
+	int level = LoginStatusBean.NON_EDITOR;
+	boolean allowSelfEditing;
 	String beanAttributeName;
 
 	public String getLevel() {
@@ -49,6 +51,14 @@ public class ConfirmLoginStatus extends BodyTagSupport {
 		}
 	}
 
+	public void setAllowSelfEditing(boolean allowSelfEditing) {
+		this.allowSelfEditing = allowSelfEditing;
+	}
+
+	public boolean getAllowSelfEditing() {
+		return this.allowSelfEditing;
+	}
+
 	public String getBean() {
 		return this.beanAttributeName;
 	}
@@ -60,11 +70,22 @@ public class ConfirmLoginStatus extends BodyTagSupport {
 	@Override
 	public int doEndTag() throws JspException {
 		LoginStatusBean loginBean = LoginStatusBean.getBean(getRequest());
-		if (loginBean.isLoggedInAtLeast(level)) {
+		boolean isLoggedIn = loginBean.isLoggedInAtLeast(level);
+
+		boolean isSelfEditing = VitroRequestPrep.isSelfEditing(getRequest());
+
+		log.debug("loginLevel=" + loginBean.getSecurityLevel()
+				+ ", requiredLevel=" + level + ", selfEditingAllowed="
+				+ allowSelfEditing + ", isSelfEditing=" + isSelfEditing);
+
+		if (isLoggedIn || (allowSelfEditing && isSelfEditing)) {
+			log.debug("Login status confirmed.");
 			return setBeanAndReturn(loginBean);
 		} else {
+			log.debug("Login status not confirmed.");
 			return redirectAndSkipPage();
 		}
+
 	}
 
 	private int setBeanAndReturn(LoginStatusBean loginBean) {

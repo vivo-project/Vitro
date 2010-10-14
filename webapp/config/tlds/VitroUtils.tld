@@ -38,6 +38,11 @@
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>   
 		<attribute>
+			<name>allowSelfEditing</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>   
+		<attribute>
 			<name>bean</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
