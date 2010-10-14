@@ -2,14 +2,13 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
 
-<%@ page import="edu.cornell.mannlib.vedit.beans.LoginStatusBean" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
 
+<%@ taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
+
+<vitro:confirmLoginStatus level="CURATOR" />
+
 <%
-	if (!LoginStatusBean.getBean(request).isLoggedInAtLeast(LoginStatusBean.CURATOR)) {
-        %><c:redirect url="<%= Controllers.LOGIN %>" /><%
-    }
-  
     String conceptIdStr = request.getParameter("conceptId");
     if (conceptIdStr != null) {
     	

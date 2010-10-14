@@ -1,7 +1,5 @@
 <%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
 
-<%@ page import="edu.cornell.mannlib.vedit.beans.LoginStatusBean" %>
-
 <%@ page import="com.hp.hpl.jena.rdf.model.*" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep" %>
 <%@ page import="java.util.Enumeration" %>
@@ -10,11 +8,12 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
+<%@ taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
 
-<%  if (!LoginStatusBean.getBean(request).isLoggedInAtLeast(LoginStatusBean.CURATOR)) {
-        %><c:redirect url="<%= Controllers.LOGIN %>" /><%
-    }
+<vitro:confirmLoginStatus level="CURATOR" />
 
+
+<%
     if(  request.getParameter("force") != null ){        
         VitroRequestPrep.forceToSelfEditing(request);
         String netid = request.getParameter("netid");

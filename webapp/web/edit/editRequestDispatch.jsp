@@ -7,7 +7,6 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep" %>
-<%@ page import="edu.cornell.mannlib.vedit.beans.LoginStatusBean" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Portal" %>
 <%@ page import="java.util.HashMap" %>
@@ -15,10 +14,14 @@
 <%@ page import="org.apache.commons.logging.LogFactory" %>
 <%@ page errorPage="/error.jsp" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"  %>
+<%@ taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
 
 <%! 
 public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.edit.editRequestDispatch.jsp");
 %>
+
+<vitro:confirmLoginStatus allowSelfEditing="true" />
+
 <%
     /*
     Decide which form to forward to, set subjectUri, subjectUriJson, predicateUri, and predicateUriJson in request.
@@ -39,11 +42,6 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
     final String DEFAULT_OBJ_FORM = "defaultObjPropForm.jsp";
     final String DEFAULT_ERROR_FORM = "error.jsp";
     final String DEFAULT_ADD_INDIVIDUAL = "defaultAddMissingIndividualForm.jsp";
-
-   if (!VitroRequestPrep.isSelfEditing(request)
-            && !LoginStatusBean.getBean(request).isLoggedInAtLeast(LoginStatusBean.NON_EDITOR)) {
-            %> <c:redirect url="<%= Controllers.LOGIN %>" /> <%
-   }
 
    String editKey = (EditConfiguration.getEditKey(request) == null) 
        ? EditConfiguration.newEditKey(session)

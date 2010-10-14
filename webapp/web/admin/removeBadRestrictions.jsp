@@ -1,15 +1,11 @@
 <%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
+<%@ taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
 
-<%@ page import="edu.cornell.mannlib.vedit.beans.LoginStatusBean" %>
-
+<vitro:confirmLoginStatus level="CURATOR" />
 
 <%
-	if (!LoginStatusBean.getBean(request).isLoggedInAtLeast(LoginStatusBean.CURATOR)) {
-        %><c:redirect url="/siteAdmin"></c:redirect><%
-    }
-  
     if (request.getParameter("execute") != null) {
     	OntModel ontModel = (OntModel) getServletContext().getAttribute(JenaBaseDao.ASSERTIONS_ONT_MODEL_ATTRIBUTE_NAME);
     	int results = doRemoval(ontModel);

@@ -7,7 +7,6 @@
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.identifier.RoleIdentifier"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditN3Utils"%>
-<%@ page import="edu.cornell.mannlib.vedit.beans.LoginStatusBean" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Individual" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty"%>
@@ -31,6 +30,9 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
 <%@ taglib prefix="v" uri="http://vitro.mannlib.cornell.edu/vitro/tags" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jstl/functions" %>
+<%@ taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
+
+<vitro:confirmLoginStatus allowSelfEditing="true" />
 
 <%! 
 public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.edit.forms.propDelete.jsp");
@@ -48,12 +50,6 @@ public WebappDaoFactory getUnfilteredDaoFactory() {
     </c:url>
 
 <%  
-    boolean selfEditing = VitroRequestPrep.isSelfEditing(request);
-    boolean isLoggedIn = LoginStatusBean.getBean(request).isLoggedInAtLeast(LoginStatusBean.NON_EDITOR);
-    if (!selfEditing && !isLoggedIn) {%>
-        <c:redirect url="<%= Controllers.LOGIN %>" />       
-<%  }
-
     String subjectUri   = request.getParameter("subjectUri");
     String predicateUri = request.getParameter("predicateUri");
     String objectUri    = request.getParameter("objectUri");
