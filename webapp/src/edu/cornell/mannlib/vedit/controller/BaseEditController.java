@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vedit.controller;
 
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -15,7 +14,6 @@ import java.util.Random;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -23,7 +21,6 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
-import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
@@ -44,7 +41,6 @@ public class BaseEditController extends VitroHttpServlet {
     private final String EPO_KEYLIST_ATTR = "epoKeylist";
     private final int MAX_EPOS = 5;
     private final Calendar cal = Calendar.getInstance();
-    private final Random rand = new Random(cal.getTimeInMillis());
 
     /* EPO is reused if the controller is passed an epoKey, e.g.
       if a previous form submission failed validation, or the edit is a multistage process. */
@@ -110,48 +106,6 @@ public class BaseEditController extends VitroHttpServlet {
         return Long.toHexString(cal.getTimeInMillis());
     }
 
-    /**
-     * If not logged in, send them to the login page.
-     */
-	protected boolean checkLoginStatus(HttpServletRequest request,
-			HttpServletResponse response) {
-		if (LoginStatusBean.getBean(request).isLoggedIn()) {
-			return true;
-		} else {
-			redirectToLoginPage(request, response);
-			return false;
-		}
-	}
-
-	/**
-	 * If not logged in at the minimum level or higher, send them to the login page.
-	 */
-	protected boolean checkLoginStatus(HttpServletRequest request,
-			HttpServletResponse response, int minimumLevel) {
-		if (LoginStatusBean.getBean(request).isLoggedInAtLeast(minimumLevel)) {
-			return true;
-		} else {
-			redirectToLoginPage(request, response);
-			return false;
-		}
-	}
-
-	/**
-	 * Not adequately logged in. Send them to the login page, and then back to
-	 * the page that invoked this.
-	 */
-	private void redirectToLoginPage(HttpServletRequest request,
-			HttpServletResponse response) {
-		request.getSession().setAttribute("postLoginRequest",
-				request.getRequestURI() + "?" + request.getQueryString());
-		try {
-			String loginPage = request.getContextPath() + Controllers.LOGIN;
-			response.sendRedirect(loginPage);
-		} catch (IOException ioe) {
-			log.error("checkLoginStatus() could not redirect to login page");
-		}
-	}
-	
     protected void setRequestAttributes(HttpServletRequest request, EditProcessObject epo){
         Portal portal = (Portal)request.getAttribute("portalBean");
         request.setAttribute("epoKey",epo.getKey());
