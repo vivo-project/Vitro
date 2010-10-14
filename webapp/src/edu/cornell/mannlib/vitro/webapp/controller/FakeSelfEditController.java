@@ -31,7 +31,7 @@ public class FakeSelfEditController extends VitroHttpServlet {
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws IOException, ServletException {
-
+		
 		try {
 			super.doGet(request, response);
 			
@@ -39,7 +39,7 @@ public class FakeSelfEditController extends VitroHttpServlet {
 			HttpSession session = request.getSession();
 
 			if (!isAuthorized(session)) {
-				sendToLogin(vreq, response);
+				redirectToLoginPage(request, response);
 			} else if (vreq.getParameter("force") != null) {
 				startFaking(vreq, response);
 			} else if (vreq.getParameter("stopfaking") != null) {
@@ -57,14 +57,6 @@ public class FakeSelfEditController extends VitroHttpServlet {
 		boolean isFakingAlready = (session.getAttribute(ATTRIBUTE_LOGIN_STATUS_SAVE) != null);
 		boolean isAdmin = LoginStatusBean.getBean(session).isLoggedInAtLeast(LoginStatusBean.CURATOR);
 		return isAdmin || isFakingAlready;
-	}
-
-	private void sendToLogin(VitroRequest vreq, HttpServletResponse response)
-			throws IOException {
-		HttpSession session = vreq.getSession();
-		session.setAttribute("postLoginRequest", vreq.getRequestURI());
-		response.sendRedirect(vreq.getContextPath() + Controllers.LOGIN
-				+ "?login=block");
 	}
 
 	private void startFaking(VitroRequest vreq, HttpServletResponse response)
