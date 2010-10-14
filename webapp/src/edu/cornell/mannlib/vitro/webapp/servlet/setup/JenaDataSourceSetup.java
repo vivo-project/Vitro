@@ -10,17 +10,27 @@ import java.util.List;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 
+import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import com.hp.hpl.jena.sdb.SDBFactory;
+import com.hp.hpl.jena.sdb.Store;
+import com.hp.hpl.jena.sdb.StoreDesc;
+import com.hp.hpl.jena.sdb.sql.SDBConnection;
+import com.hp.hpl.jena.sdb.store.DatabaseType;
+import com.hp.hpl.jena.sdb.store.LayoutType;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
+import com.hp.hpl.jena.vocabulary.OWL;
+import com.hp.hpl.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
@@ -31,6 +41,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDaoCon;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaModelUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SearchReindexingListener;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SimpleOntModelSelector;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSDBModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapper;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.InitialJenaModelUtils;
@@ -59,9 +70,13 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
             
             OntModel unionModel = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC,ModelFactory.createUnion(memModel, inferenceModel));
 
-            SimpleOntModelSelector baseOms = new SimpleOntModelSelector(memModel);
+            SimpleOntModelSelector baseOms = new SimpleOntModelSelector();
+            baseOms.setApplicationMetadataModel(memModel);
+            baseOms.setTBoxModel(memModel);
             SimpleOntModelSelector inferenceOms = new SimpleOntModelSelector(inferenceModel);
-            SimpleOntModelSelector unionOms = new SimpleOntModelSelector(unionModel);                  
+            SimpleOntModelSelector unionOms = new SimpleOntModelSelector();
+            unionOms.setApplicationMetadataModel(unionModel);
+            unionOms.setTBoxModel(unionModel);
         	baseOms.setUserAccountsModel(userAccountsModel);
         	inferenceOms.setUserAccountsModel(userAccountsModel);
         	unionOms.setUserAccountsModel(userAccountsModel);       
@@ -106,6 +121,26 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
         	NamespaceMapper namespaceMapper = new NamespaceMapperJena(unionModel, unionModel, defaultNamespace);
         	sce.getServletContext().setAttribute("NamespaceMapper", namespaceMapper);
         	memModel.getBaseModel().register(namespaceMapper);
+        	
+        	// SDB testing
+			StoreDesc storeDesc = new StoreDesc(LayoutType.LayoutTripleNodesHash, DatabaseType.MySQL) ;
+			BasicDataSource bds = makeDataSourceFromConfigurationProperties();
+        	this.setApplicationDataSource(bds, sce.getServletContext());
+        	SDBConnection conn = new SDBConnection(bds.getConnection()) ; 
+        	Store store = SDBFactory.connectStore(conn, storeDesc);
+        	try {
+        		// a random test query to see if the store is formatted
+        		SDBFactory.connectDefaultModel(store).contains(OWL.Thing, RDF.type, OWL.Nothing); 
+        	} catch (Exception e) { // unformatted store
+        		System.out.println("Setting up SDB store");
+    			store.getTableFormatter().create();
+            	store.getTableFormatter().truncate();
+            	Model sdbAbox = SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_DB_MODEL);
+            	sdbAbox.add(unionOms.getABoxModel());
+        	}
+        	Model sdbAbox = SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_DB_MODEL);
+        	baseOms.setABoxModel(ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, sdbAbox));
+        	unionOms.setABoxModel(ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, sdbAbox));
         	
         } catch (Throwable t) {
             log.error("Throwable in " + this.getClass().getName(), t);

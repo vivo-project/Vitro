@@ -79,6 +79,30 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
        jenaDbOntModelSpec = (jenaDbOntModelSpec != null) ? jenaDbOntModelSpec : DB_ONT_MODEL_SPEC;
        return makeDBModel(ds, jenaDbModelName, jenaDbOntModelSpec);
    }
+   
+   /**
+    * Sets up a BasicDataSource using values from
+    * a properties file.
+    */
+   public final BasicDataSource makeDataSourceFromConfigurationProperties(){
+       String dbDriverClassname = ConfigurationProperties.getProperty("VitroConnection.DataSource.driver", DB_DRIVER_CLASS_NAME);
+       String jdbcUrl = ConfigurationProperties.getProperty("VitroConnection.DataSource.url") + "?useUnicode=yes&characterEncoding=utf8";
+       String username = ConfigurationProperties.getProperty("VitroConnection.DataSource.username");
+       String password = ConfigurationProperties.getProperty("VitroConnection.DataSource.password");
+       return makeBasicDataSource(dbDriverClassname, jdbcUrl, username, password);
+   }
+   
+   public void setApplicationDataSource(BasicDataSource bds, ServletContext ctx) {
+	   ctx.setAttribute(getDataSourceAttributeName(), bds);
+   }
+   
+   public BasicDataSource getApplicationDataSource(ServletContext ctx) {
+	   return (BasicDataSource) ctx.getAttribute(getDataSourceAttributeName());
+   }
+   
+   private String getDataSourceAttributeName() {
+	   return this.getClass().getName() + ".dataSource";
+   }
 
    public static BasicDataSource makeBasicDataSource(String dbDriverClassname, String jdbcUrl, String username, String password) {
        log.debug("makeBasicDataSource('" + dbDriverClassname + "', '"
