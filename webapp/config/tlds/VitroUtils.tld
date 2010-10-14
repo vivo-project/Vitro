@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+
+<taglib
+    xmlns="http://java.sun.com/xml/ns/j2ee" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd" 
+    version="2.0">
+
+     <display-name>Vitro Utilities taglib</display-name>
+     <tlib-version>1.0</tlib-version>
+
+    <short-name>Library of JSP utility tags for Vitro</short-name>
+<!--
+		This library has an assortment of tags for tasks that are common to many Vitro pages.
+-->
+
+	<tag>
+		<name>confirmLoginStatus</name>
+        <display-name>Confirm that the user is logged in as required</display-name>
+        <description>
+            Check to see that the user is logged in (optionally at a certain minimum level).
+            If not, then redirect them to the login page, with the current request stored as
+            a post-login destination.
+            
+            If "level" is specified, then the user must be logged in at least at that level
+            in order to avoid being redirected. "level" may be a String like "DBA" or "EDITOR",
+            or it may be an integer like 50 or 4.
+            
+            If "bean" is specified, it is taken as the name of a request attribute where the
+            LoginStatusBean will be stored. 
+        </description>
+        <tag-class>edu.cornell.mannlib.vitro.webapp.web.jsptags.ConfirmLoginStatus</tag-class>
+		<body-content>empty</body-content>
+		<attribute>
+			<name>level</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>   
+		<attribute>
+			<name>bean</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>   
+	</tag>
+
+</taglib>
