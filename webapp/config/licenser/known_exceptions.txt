@@ -40,9 +40,6 @@ webapp/web/js/jquery.js
 webapp/web/js/jquery-ui/*
 webapp/web/js/jquery_plugins/*
 
-# From pajhome.org.uk
-webapp/web/js/md5.js
-
 # From dojotoolkit.org
 webapp/web/dojo.js
 webapp/web/src/AdapterRegistry.js
@@ -54,8 +51,6 @@ webapp/web/src/bootstrap2.js
 webapp/web/src/browser_debug.js
 webapp/web/src/collections/*
 webapp/web/src/compat/*
-webapp/web/src/crypto/*
-webapp/web/src/crypto.js
 webapp/web/src/data/*
 webapp/web/src/data.js
 webapp/web/src/date.js
