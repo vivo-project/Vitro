@@ -27,8 +27,8 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     private static final Log log = LogFactory.getLog(JenaDataSourceSetupBase.class);
 
     protected final static int DEFAULT_MAXWAIT = 10000, // ms
-            DEFAULT_MAXACTIVE = 40,
-            DEFAULT_MAXIDLE = 10,
+            DEFAULT_MAXACTIVE = 300,
+            DEFAULT_MAXIDLE = 84,
             DEFAULT_TIMEBETWEENEVICTIONS = 30 * 60 * 1000, // ms
             DEFAULT_TESTSPEREVICTION = 3,
             DEFAULT_MINEVICTIONIDLETIME = 1000 * 60 * 30; // ms
