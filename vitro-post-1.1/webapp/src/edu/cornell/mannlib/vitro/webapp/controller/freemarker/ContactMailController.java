@@ -28,6 +28,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet.ResponseValues;
 import freemarker.template.Configuration;
 
 public class ContactMailController extends FreemarkerHttpServlet {
@@ -42,6 +43,11 @@ public class ContactMailController extends FreemarkerHttpServlet {
     private final static String WEB_USEREMAIL_PARAM = "webuseremail";
     private final static String COMMENTS_PARAM      = "s34gfd88p9x1";
 	
+    private final static String TEMPLATE_CONFIRMATION = "contactForm-confirmation.ftl";
+    private final static String TEMPLATE_EMAIL = "contactForm-email.ftl";
+    private final static String TEMPLATE_BACKUP = "contactForm-backup.ftl";
+    private final static String TEMPLATE_ERROR = "contactForm-error.ftl";
+    
     private static String smtpHost = null;
 
     public void init(ServletConfig servletConfig) throws javax.servlet.ServletException {
@@ -66,14 +72,18 @@ public class ContactMailController extends FreemarkerHttpServlet {
 		return (host != null && host.length() > 0) ? host : null;
 	}
 	
+	@Override
     protected String getTitle(String siteName) {
         return siteName + " Feedback Form";
     }
     
-    protected String getBody(VitroRequest vreq, Map<String, Object> body, Configuration config) {
+
+    @Override
+    protected ResponseValues processRequest(VitroRequest vreq) {
     	
         Portal portal = vreq.getPortal();
-        String bodyTemplate = null;
+        String templateName = null;
+        Map<String, Object> body = new HashMap<String, Object>();
         
         String statusMsg = null; // holds the error status
         
@@ -81,7 +91,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
             body.put("errorMessage", 
                     "This application has not yet been configured to send mail. " +
                     "An smtp host has not been specified in the configuration properties file.");
-            bodyTemplate = "contactForm-error.ftl";
+            templateName = TEMPLATE_ERROR; 
         }
         
         else {
@@ -97,7 +107,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
                 // rjy7 We should reload the form, not go to the error page!
                 body.put("errorMessage", 
                         "Invalid submission");
-            	bodyTemplate = "contactForm-error.ftl";
+            	templateName = TEMPLATE_ERROR;
             }
             
             else {
@@ -158,7 +168,8 @@ public class ContactMailController extends FreemarkerHttpServlet {
                             "To establish the Contact Us mail capability the system administrators must  "
                             + "specify at least one email address in the current portal.");
                 }
-        
+                
+                Configuration config = (Configuration) vreq.getAttribute("freemarkerConfig");
                 String msgText = composeEmail(webusername, webuseremail, comments, 
                 		deliveryfrom, originalReferer, vreq.getRemoteAddr(), config);
                 
@@ -204,15 +215,15 @@ public class ContactMailController extends FreemarkerHttpServlet {
                 
                 // Message was sent successfully
                 if (statusMsg == null && spamReason == null) {                  
-                    bodyTemplate = "contactForm-confirmation.ftl";
+                    templateName = TEMPLATE_CONFIRMATION; 
                 } else {
                     body.put("errorMessage", statusMsg);
-                    bodyTemplate = "contactForm-error.ftl";
+                    templateName = TEMPLATE_ERROR;
                 }   
             }
         }
         
-        return mergeBodyToTemplate(bodyTemplate, body, config);
+        return new TemplateResponseValues(templateName, body);
 
     }
     
@@ -230,7 +241,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
     							String originalReferer, String ipAddr, Configuration config) {
  
         Map<String, Object> email = new HashMap<String, Object>();
-        String template = "contactForm-email.ftl";
+        String template = TEMPLATE_EMAIL; 
         
         email.put("subject", deliveryfrom);
         email.put("name", webusername);
@@ -241,14 +252,14 @@ public class ContactMailController extends FreemarkerHttpServlet {
             email.put("referrer", UrlBuilder.urlDecode(originalReferer));
         }
     	
-        return mergeBodyToTemplate(template, email, config);
+        return mergeMapToTemplate(template, email, config);
     }
     
     private void writeBackupCopy(PrintWriter outFile, String msgText, 
     		String spamReason, Configuration config) {
 
         Map<String, Object> backup = new HashMap<String, Object>();
-        String template = "contactForm-backup.ftl";
+        String template = TEMPLATE_BACKUP; 
         
     	Calendar cal = Calendar.getInstance();
     	backup.put("datetime", cal.getTime().toString());
@@ -259,7 +270,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
         
         backup.put("msgText", msgText);
 
-        String backupText = mergeBodyToTemplate(template, backup, config);
+        String backupText = mergeMapToTemplate(template, backup, config);
         outFile.print(backupText);
         outFile.flush();
         //outFile.close(); 

@@ -10,60 +10,39 @@ import java.util.Properties;
  * model.
  */
 public class ModelCleanerProperties {
-	public static final String PROP_TOMCAT_START_COMMAND = "tomcat_start_command";
-	public static final String PROP_TOMCAT_START_DELAY = "tomcat_start_delay";
-	public static final String PROP_TOMCAT_STOP_COMMAND = "tomcat_stop_command";
-	public static final String PROP_TOMCAT_STOP_DELAY = "tomcat_stop_delay";
 	public static final String PROP_MYSQL_USERNAME = "mysql_username";
 	public static final String PROP_MYSQL_PASSWORD = "mysql_password";
 	public static final String PROP_MYSQL_DB_NAME = "mysql_db_name";
 	public static final String PROP_WEBAPP_DIRECTORY = "vivo_webapp_directory";
+	public static final String PROP_TOMCAT_CHECK_READY_COMMAND = "tomcat_check_ready_command";
+	public static final String PROP_TOMCAT_STOP_COMMAND = "tomcat_stop_command";
+	public static final String PROP_TOMCAT_START_COMMAND = "tomcat_start_command";
 
-	private final String tomcatStartCommand;
-	private final int tomcatStartDelay;
-	private final String tomcatStopCommand;
-	private final int tomcatStopDelay;
 	private final String mysqlUsername;
 	private final String mysqlPassword;
 	private final String mysqlDbName;
 	private final File webappDirectory;
+	private final String tomcatCheckReadyCommand;
+	private final String tomcatStopCommand;
+	private final String tomcatStartCommand;
 
 	/**
 	 * Confirm that we have the expected properties, and that their values seem
 	 * reasonable.
 	 */
 	public ModelCleanerProperties(Properties props) {
-		this.tomcatStartCommand = getRequiredProperty(props,
-				PROP_TOMCAT_START_COMMAND);
-		this.tomcatStartDelay = getRequiredIntegerProperty(props,
-				PROP_TOMCAT_START_DELAY);
-
-		this.tomcatStopCommand = getRequiredProperty(props,
-				PROP_TOMCAT_STOP_COMMAND);
-		this.tomcatStopDelay = getRequiredIntegerProperty(props,
-				PROP_TOMCAT_STOP_DELAY);
-
 		this.mysqlUsername = getRequiredProperty(props, PROP_MYSQL_USERNAME);
 		this.mysqlPassword = getRequiredProperty(props, PROP_MYSQL_PASSWORD);
 		this.mysqlDbName = getRequiredProperty(props, PROP_MYSQL_DB_NAME);
 
 		this.webappDirectory = confirmWebappDirectory(props);
-	}
 
-	public String getTomcatStartCommand() {
-		return tomcatStartCommand;
-	}
-
-	public int getTomcatStartDelay() {
-		return tomcatStartDelay;
-	}
-
-	public String getTomcatStopCommand() {
-		return tomcatStopCommand;
-	}
-
-	public int getTomcatStopDelay() {
-		return tomcatStopDelay;
+		this.tomcatCheckReadyCommand = getRequiredProperty(props,
+				PROP_TOMCAT_CHECK_READY_COMMAND);
+		this.tomcatStopCommand = getRequiredProperty(props,
+				PROP_TOMCAT_STOP_COMMAND);
+		this.tomcatStartCommand = getRequiredProperty(props,
+				PROP_TOMCAT_START_COMMAND);
 	}
 
 	public String getMysqlUsername() {
@@ -82,6 +61,18 @@ public class ModelCleanerProperties {
 		return webappDirectory;
 	}
 
+	public String getTomcatCheckReadyCommand() {
+		return tomcatCheckReadyCommand;
+	}
+
+	public String getTomcatStopCommand() {
+		return tomcatStopCommand;
+	}
+
+	public String getTomcatStartCommand() {
+		return tomcatStartCommand;
+	}
+
 	/**
 	 * Get the value for this property. If there isn't one, or if it's empty,
 	 * complain.
@@ -93,16 +84,6 @@ public class ModelCleanerProperties {
 					"Property file must provide a value for '" + key + "'");
 		}
 		return value;
-	}
-
-	private int getRequiredIntegerProperty(Properties props, String key) {
-		String value = getRequiredProperty(props, key);
-		try {
-			return Integer.parseInt(value.trim());
-		} catch (NumberFormatException e) {
-			throw new IllegalArgumentException("Property value for '" + key
-					+ "' is not a valid integer: " + value);
-		}
 	}
 
 	/**
@@ -130,11 +111,7 @@ public class ModelCleanerProperties {
 	}
 
 	public String toString() {
-		return "\n      tomcatStartCommand: " + tomcatStartCommand
-				+ "\n      tomcatStartDelay: " + tomcatStartDelay
-				+ "\n      tomcatStopCommand: " + tomcatStopCommand
-				+ "\n      tomcatStopDelay: " + tomcatStopDelay
-				+ "\n      mysqlUsername: " + mysqlUsername
+		return "\n      mysqlUsername: " + mysqlUsername
 				+ "\n      mysqlPassword: " + mysqlPassword
 				+ "\n      mysqlDbName: " + mysqlDbName
 				+ "\n      webappDirectory: " + webappDirectory;

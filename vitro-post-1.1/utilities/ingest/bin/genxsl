@@ -1,0 +1,90 @@
+#!/usr/bin/perl
+use FindBin qw($Bin);
+use lib $Bin;
+use Getopt::Long;
+use FileHandle;
+use POSIX qw( strftime );
+
+@av = @ARGV;
+
+
+$g_t0 = time();
+$g_STARTED_AT = strftime("%Y\%m%d%H\%M\%S", localtime($g_t0) );
+
+if(scalar(@ARGV) == 0 || $op_usage){
+    Usage();
+    exit 1;
+}
+$g_cwd = $ENV{'PWD'};
+
+GetOptions('abrv=s'      => \$op_abrv,
+	   'accum'       => \$op_collect,
+	   'class=s'     => \$op_class,
+           'collab'      => \$op_collab,
+	   'filen=s'     => \$op_filename,
+	   'from=s'      => \$op_from,
+	   'grpby=s'     => \$op_grpby,	   
+	   'mkrdf'       => \$op_make,
+	   'nsp=s'       => \$op_nsp,	   
+	   'per'         => \$op_per,
+	   'public-only' => \$op_public,
+	   'peeptag=s'   => \$op_peep,
+	   'obj=s'       => \$op_obj,
+	   'ont=s'       => \$op_ont,
+	   'org'         => \$op_org,
+	   'orgtag=s'    => \$op_orgtag,
+	   'role=s'      => \$op_role,
+	   'solo'        => \$op_solo,
+	   'to=s'        => \$op_to,
+	   'type=s'      => \$op_type
+	);
+
+if($op_solo && $op_collab){
+    print STDERR "\n";
+    exit 1;
+}
+if($op_accum && $op_make){
+    print STDERR "\n";
+    exit 1;
+}
+
+if($op_accum){
+    
+    if($op_type eq "obj" && $op_solo){
+
+    } elsif($op_type eq "per" && $op_solo){
+
+    } elsif($op_type eq "org" && $op_solo){
+
+    } elsif($op_type eq "obj" && $op_collab){
+
+    } elsif($op_type eq "per" && $op_collab){
+
+    } else {
+	print STDERR "\n";
+	exit 1;
+    }
+
+} elsif($op_make){
+
+    if($op_type eq "obj" && $op_solo){
+
+    } elsif($op_type eq "per" && $op_solo){
+
+    } elsif($op_type eq "org" && $op_solo){
+
+    } elsif($op_type eq "obj" && $op_collab){
+
+    } elsif($op_type eq "per" && $op_collab){
+
+    } else {
+	print STDERR "\n";
+	exit 1;
+    }
+
+
+} else {
+    print STDERR "Choose one --mkrdf or --accum \n";
+    exit 1;
+}
+

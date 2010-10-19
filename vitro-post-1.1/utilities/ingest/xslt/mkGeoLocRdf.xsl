@@ -7,9 +7,9 @@
         xmlns:bibo="http://purl.org/ontology/bibo/"
         xmlns:foaf="http://xmlns.com/foaf/0.1/"
         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-	xmlns:aiis="http://vivoweb.org/activity-insight"
-	xmlns:acti="http://vivoweb.org/activity-insight#"
-        xmlns="http://vivoweb.org/activity-insight"
+	xmlns:aiis="http://vivoweb.org/ontology/activity-insight"
+	xmlns:acti="http://vivoweb.org/ontology/activity-insight#"
+        xmlns="http://vivoweb.org/ontology/activity-insight"
 	xmlns:dm="http://www.digitalmeasures.com/schema/data"	
 	xmlns:vfx='http://vivoweb.org/ext/functions'
 	exclude-result-prefixes='xs vfx'
@@ -53,18 +53,25 @@ OR use an old one -->
 <!-- =================================================== -->
 <!-- Declare a core:GeographicLocation (use extant geo loc if it exists) -->
 
-<xsl:variable name='knownUri' select='vfx:knownGeoUri(aiis:GEO_PLACE_NAME, $extantGeos)'/>
+<xsl:variable name='knownUri' 
+	select='vfx:knownGeoUri(aiis:GEO_PLACE_NAME, $extantGeos)'/>
 
-<xsl:variable name='geouri' select="if($knownUri != '') then $knownUri else concat($g_instance,$uno)"/>
+<xsl:variable name='geouri' 
+	select="if($knownUri != '') then 
+		$knownUri else concat($g_instance,$uno)"/>
 
-<!-- xsl:comment><xsl:value-of select='$geouri'/> - <xsl:value-of select='$knownUri'/></xsl:comment -->
+<!-- xsl:comment>
+<xsl:value-of select='$geouri'/> - 
+<xsl:value-of select='$knownUri'/></xsl:comment -->
 
 <xsl:if test='$knownUri = ""'>
 <rdf:Description rdf:about="{$geouri}">
 
-<rdf:type rdf:resource='http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing'/>
+<rdf:type rdf:resource=
+	'http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing'/>
 
-<rdf:type rdf:resource='http://vivoweb.org/ontology/core#GeographicLocation'/>
+<rdf:type rdf:resource=
+	'http://vivoweb.org/ontology/core#GeographicLocation'/>
 
 <rdfs:label>
 <xsl:value-of select='vfx:trim(aiis:GEO_PLACE_NAME)'/>
@@ -99,14 +106,17 @@ OR use an old one -->
  and their uri's to save in the extant geo locs Out xml file
 -->
 <xsl:result-document href='{$extGeoOut}'>
-<xsl:element name='ExtantGeos' namespace=''>
+<xsl:element name='ExtantGeoLocs' namespace=''>
 <xsl:for-each select='aiis:IMPACT_STMTS_BY_GEO_PLACE'>
 
 <xsl:variable name='ctr'  select='@counter'/>
 <xsl:variable name='uno' select='$unomap/map[position()=$ctr]/@nuno'/>
-<xsl:variable name='knownUri' select='vfx:knownGeoUri(aiis:GEO_PLACE_NAME, $extantGeos)'/>
+<xsl:variable name='knownUri' 
+select='vfx:knownGeoUri(aiis:GEO_PLACE_NAME, $extantGeos)'/>
 
-<xsl:variable name='geouri' select="if($knownUri != '') then $knownUri else concat($g_instance,$uno)"/>
+<xsl:variable name='geouri' 
+select="if($knownUri != '') then 
+	$knownUri else concat($g_instance,$uno)"/>
 
 
 <xsl:element name='geo' namespace=''>
@@ -173,18 +183,23 @@ core:GeographicLocation -->
 <xsl:choose>
 <xsl:when test=' $ilk = "COUNTRY"  and $name != "United States" '>
 <!-- 2 -->
-<core:geographicFocusOf rdf:resource="{concat($g_instance,$aiid)}"/>
+<core:internationalGeographicFocusOf 
+	rdf:resource="{concat($g_instance,$aiid)}"/>
 <rdf:type rdf:resource='http://vivoweb.org/ontology/core#Country'/>
 </xsl:when>
 <xsl:when test=' $ilk = "STATE" '>
 <!-- 4 -->
-<core:domesticGeographicFocusOf rdf:resource="{concat($g_instance,$aiid)}"/>
-<rdf:type rdf:resource='http://vivoweb.org/ontology/core#StateOrProvence'/>
+<core:domesticGeographicFocusOf 
+	rdf:resource="{concat($g_instance,$aiid)}"/>
+<rdf:type 
+	rdf:resource='http://vivoweb.org/ontology/core#StateOrProvence'/>
 </xsl:when>
 <xsl:otherwise>
 <!-- 4 -->
-<core:domesticGeographicFocusOf rdf:resource="{concat($g_instance,$aiid)}"/>
-<rdf:type rdf:resource='http://vivoweb.org/ontology/core#County'/>
+<core:domesticGeographicFocusOf 
+	rdf:resource="{concat($g_instance,$aiid)}"/>
+<rdf:type 
+	rdf:resource='http://vivoweb.org/ontology/core#County'/>
 </xsl:otherwise>
 </xsl:choose>
 </xsl:for-each>

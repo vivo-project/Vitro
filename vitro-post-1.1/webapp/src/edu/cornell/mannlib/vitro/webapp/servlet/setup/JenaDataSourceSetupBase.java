@@ -19,22 +19,23 @@ import com.hp.hpl.jena.rdf.model.Resource;
 
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDaoCon;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDBGraphGenerator;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RegeneratingGraph;
 
-public class JenaDataSourceSetupBase {
-	private static final Log log = LogFactory.getLog(JenaDataSourceSetupBase.class);
+public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
+    private static final Log log = LogFactory.getLog(JenaDataSourceSetupBase.class);
 
-	protected final static int DEFAULT_MAXWAIT = 10000, // ms
-			DEFAULT_MAXACTIVE = 40,
-			DEFAULT_MAXIDLE = 10,
-			DEFAULT_TIMEBETWEENEVICTIONS = 30 * 60 * 1000, // ms
-			DEFAULT_TESTSPEREVICTION = 3,
-			DEFAULT_MINEVICTIONIDLETIME = 1000 * 60 * 30; // ms
+    protected final static int DEFAULT_MAXWAIT = 10000, // ms
+            DEFAULT_MAXACTIVE = 40,
+            DEFAULT_MAXIDLE = 10,
+            DEFAULT_TIMEBETWEENEVICTIONS = 30 * 60 * 1000, // ms
+            DEFAULT_TESTSPEREVICTION = 3,
+            DEFAULT_MINEVICTIONIDLETIME = 1000 * 60 * 30; // ms
 
     protected final static String DEFAULT_VALIDATIONQUERY = "SELECT 1";
-	protected final static boolean DEFAULT_TESTONBORROW = true,
-			DEFAULT_TESTONRETURN = true, DEFAULT_TESTWHILEIDLE = true;
+    protected final static boolean DEFAULT_TESTONBORROW = true,
+            DEFAULT_TESTONRETURN = true, DEFAULT_TESTWHILEIDLE = true;
 
    protected static String BASE = "/WEB-INF/ontologies/";
    protected static String USERPATH = BASE+"user/";
@@ -67,22 +68,22 @@ public class JenaDataSourceSetupBase {
     */
    public final Model makeDBModelFromConfigurationProperties(String jenaDbModelName, OntModelSpec jenaDbOntModelSpec){
        String dbDriverClassname = ConfigurationProperties.getProperty("VitroConnection.DataSource.driver", DB_DRIVER_CLASS_NAME);
-	   String jdbcUrl = ConfigurationProperties.getProperty("VitroConnection.DataSource.url") + "?useUnicode=yes&characterEncoding=utf8";
-	   String username = ConfigurationProperties.getProperty("VitroConnection.DataSource.username");
-	   String password = ConfigurationProperties.getProperty("VitroConnection.DataSource.password");
-	   BasicDataSource ds = makeBasicDataSource(dbDriverClassname, jdbcUrl, username, password);
-	
+       String jdbcUrl = ConfigurationProperties.getProperty("VitroConnection.DataSource.url") + "?useUnicode=yes&characterEncoding=utf8";
+       String username = ConfigurationProperties.getProperty("VitroConnection.DataSource.username");
+       String password = ConfigurationProperties.getProperty("VitroConnection.DataSource.password");
+       BasicDataSource ds = makeBasicDataSource(dbDriverClassname, jdbcUrl, username, password);
+    
        String dns = ConfigurationProperties.getProperty("Vitro.defaultNamespace");
        defaultNamespace = (dns != null && dns.length()>0) ? dns : null;
        
        jenaDbOntModelSpec = (jenaDbOntModelSpec != null) ? jenaDbOntModelSpec : DB_ONT_MODEL_SPEC;
-	   return makeDBModel(ds, jenaDbModelName, jenaDbOntModelSpec);
+       return makeDBModel(ds, jenaDbModelName, jenaDbOntModelSpec);
    }
 
-   protected BasicDataSource makeBasicDataSource(String dbDriverClassname, String jdbcUrl, String username, String password) {
-	   log.debug("makeBasicDataSource('" + dbDriverClassname + "', '"
-				+ jdbcUrl + "', '" + username + "', '" + password + "')");
-	   BasicDataSource ds = new BasicDataSource();
+   public static BasicDataSource makeBasicDataSource(String dbDriverClassname, String jdbcUrl, String username, String password) {
+       log.debug("makeBasicDataSource('" + dbDriverClassname + "', '"
+                + jdbcUrl + "', '" + username + "', '" + password + "')");
+       BasicDataSource ds = new BasicDataSource();
        ds.setDriverClassName(dbDriverClassname);
        ds.setUrl(jdbcUrl);
        ds.setUsername(username);
@@ -111,15 +112,15 @@ public class JenaDataSourceSetupBase {
        try {
            //  open the db model
             try {
-            	Graph g = new RegeneratingGraph(new RDBGraphGenerator(ds, DB, jenaDbModelName));
-            	Model m = ModelFactory.createModelForGraph(g);
-            	dbModel = m;
+                Graph g = new RegeneratingGraph(new RDBGraphGenerator(ds, DB, jenaDbModelName));
+                Model m = ModelFactory.createModelForGraph(g);
+                dbModel = m;
                 //dbModel = ModelFactory.createOntologyModel(jenaDbOntModelSpec,m);
                
                //Graph g = maker.openGraph(JENA_DB_MODEL,false);
                //dbModel = ModelFactory.createModelForGraph(g);
                //maker.openModel(JENA_DB_MODEL);
-            	log.debug("Using database at "+ds.getUrl());
+                log.debug("Using database at "+ds.getUrl());
             } catch (Throwable t) {
                 t.printStackTrace();
             }
@@ -130,66 +131,66 @@ public class JenaDataSourceSetupBase {
        return dbModel;
    }
 
-	public static void readOntologyFilesInPathSet(String path,
-			ServletContext ctx, Model model) {
-		log.debug("Reading ontology files from '" + path + "'");
-		Set<String> paths = ctx.getResourcePaths(path);
-		if (paths != null) {
-			for (String p : paths) {
-				String format = getRdfFormat(p);
-				log.info("Loading ontology file at " + p + " as format " + format);
-				InputStream ontologyInputStream = ctx.getResourceAsStream(p);
-				try {
-					model.read(ontologyInputStream, null, format);
-					log.debug("...successful");
-				} catch (Throwable t) {
-					log.error("Failed to load ontology file at '" + p + "' as format " + format, t);
-				}
-			}
-		}
-	}
+    public static void readOntologyFilesInPathSet(String path,
+            ServletContext ctx, Model model) {
+        log.debug("Reading ontology files from '" + path + "'");
+        Set<String> paths = ctx.getResourcePaths(path);
+        if (paths != null) {
+            for (String p : paths) {
+                String format = getRdfFormat(p);
+                log.info("Loading ontology file at " + p + " as format " + format);
+                InputStream ontologyInputStream = ctx.getResourceAsStream(p);
+                try {
+                    model.read(ontologyInputStream, null, format);
+                    log.debug("...successful");
+                } catch (Throwable t) {
+                    log.error("Failed to load ontology file at '" + p + "' as format " + format, t);
+                }
+            }
+        }
+    }
    
-	private static String getRdfFormat(String filename){
-		String defaultformat = "RDF/XML";
-		if( filename == null )
-			return defaultformat;
-		else if( filename.endsWith("n3") )
-			return "N3";
-		else if( filename.endsWith("ttl") )
-			return "TURTLE";
-		else 
-			return defaultformat;
-	}
-	/**
-	 * If the {@link ConfigurationProperties} has a name for the initial admin
-	 * user, create the user and add it to the model.
-	 */
-	protected void createInitialAdminUser(Model model) {
-		String initialAdminUsername = ConfigurationProperties
-				.getProperty("initialAdminUser");
-		if (initialAdminUsername == null) {
-			return;
-		}
+    private static String getRdfFormat(String filename){
+        String defaultformat = "RDF/XML";
+        if( filename == null )
+            return defaultformat;
+        else if( filename.endsWith("n3") )
+            return "N3";
+        else if( filename.endsWith("ttl") )
+            return "TURTLE";
+        else 
+            return defaultformat;
+    }
+    /**
+     * If the {@link ConfigurationProperties} has a name for the initial admin
+     * user, create the user and add it to the model.
+     */
+    protected void createInitialAdminUser(Model model) {
+        String initialAdminUsername = ConfigurationProperties
+                .getProperty("initialAdminUser");
+        if (initialAdminUsername == null) {
+            return;
+        }
 
-		// A hard-coded MD5 encryption of "defaultAdmin"
-		String initialAdminPassword = "22BA075EC8951A70960A0A95C0BC2294";
+        // A hard-coded MD5 encryption of "defaultAdmin"
+        String initialAdminPassword = "22BA075EC8951A70960A0A95C0BC2294";
 
-		String vitroDefaultNs = "http://vitro.mannlib.cornell.edu/ns/vitro/default#";
+        String vitroDefaultNs = "http://vitro.mannlib.cornell.edu/ns/vitro/default#";
 
-		Resource user = model.createResource(vitroDefaultNs
-				+ "defaultAdminUser");
-		model.add(model.createStatement(user, model
-				.createProperty(VitroVocabulary.RDF_TYPE), model
-				.getResource(VitroVocabulary.USER)));
-		model.add(model.createStatement(user, model
-				.createProperty(VitroVocabulary.USER_USERNAME), model
-				.createTypedLiteral(initialAdminUsername)));
-		model.add(model.createStatement(user, model
-				.createProperty(VitroVocabulary.USER_MD5PASSWORD), model
-				.createTypedLiteral(initialAdminPassword)));
-		model.add(model.createStatement(user, model
-				.createProperty(VitroVocabulary.USER_ROLE), model
-				.createTypedLiteral("role:/50")));
-	}
+        Resource user = model.createResource(vitroDefaultNs
+                + "defaultAdminUser");
+        model.add(model.createStatement(user, model
+                .createProperty(VitroVocabulary.RDF_TYPE), model
+                .getResource(VitroVocabulary.USER)));
+        model.add(model.createStatement(user, model
+                .createProperty(VitroVocabulary.USER_USERNAME), model
+                .createTypedLiteral(initialAdminUsername)));
+        model.add(model.createStatement(user, model
+                .createProperty(VitroVocabulary.USER_MD5PASSWORD), model
+                .createTypedLiteral(initialAdminPassword)));
+        model.add(model.createStatement(user, model
+                .createProperty(VitroVocabulary.USER_ROLE), model
+                .createTypedLiteral("role:/50")));
+    }
 
 }

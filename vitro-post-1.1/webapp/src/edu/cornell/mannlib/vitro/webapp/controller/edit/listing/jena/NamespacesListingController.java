@@ -18,7 +18,6 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
@@ -40,8 +39,6 @@ public class NamespacesListingController extends BaseEditController {
             t.printStackTrace();
         }
                
-        LoginFormBean loginBean = (LoginFormBean) request.getSession().getAttribute("loginHandler");
-
         OntModel ontModel = (OntModel) getServletContext().getAttribute("jenaOntModel");
                
         ArrayList results = new ArrayList();

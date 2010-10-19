@@ -56,7 +56,7 @@ public class EntityEditController extends BaseEditController {
 
     public void doGet (HttpServletRequest request, HttpServletResponse response) {
 
-        if (!checkLoginStatus(request,response,(String)request.getAttribute("fetchURI")))
+        if (!checkLoginStatus(request,response))
             return;
 
         try {

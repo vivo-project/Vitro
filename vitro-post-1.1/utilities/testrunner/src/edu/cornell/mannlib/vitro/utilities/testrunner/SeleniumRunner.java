@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.cornell.mannlib.vitro.utilities.testrunner.datamodel.DataModel;
+import edu.cornell.mannlib.vitro.utilities.testrunner.datamodel.SuiteContents;
 import edu.cornell.mannlib.vitro.utilities.testrunner.listener.Listener;
 import edu.cornell.mannlib.vitro.utilities.testrunner.output.OutputManager;
 
@@ -35,8 +36,62 @@ public class SeleniumRunner {
 		this.modelCleaner = new ModelCleaner(parms, this.tomcatController);
 		this.suiteRunner = new SuiteRunner(parms);
 		this.outputManager = new OutputManager(parms);
-		this.dataModel = new DataModel();
 
+		this.dataModel = new DataModel();
+		this.dataModel.setIgnoredTestList(parms.getIgnoredTests());
+	}
+
+	/**
+	 * Set up the run, run the selected suites, summarize the output, and clean
+	 * up afterwards.
+	 * 
+	 * @return <code>true</code> iff all tests passed.
+	 */
+	public boolean run() {
+		boolean success;
+		try {
+			listener.runStarted();
+			outputManager.cleanOutputDirectory();
+
+			parseSuites();
+			selectSuites();
+
+			runSelectedSuites();
+			tomcatController.cleanup();
+
+			listener.runEndTime();
+			outputManager.summarizeOutput(dataModel);
+			success = Status.isSuccess(dataModel.getRunStatus());
+		} catch (IOException e) {
+			listener.runFailed(e);
+			success = false;
+			throw new FatalException(e);
+		} catch (FatalException e) {
+			listener.runFailed(e);
+			success = false;
+			throw e;
+		} finally {
+			listener.runStopped();
+			outputManager.summarizeOutput(dataModel);
+		}
+
+		return success;
+	}
+
+	/**
+	 * Scan the suite directories in the suite files.
+	 */
+	public void parseSuites() {
+		List<SuiteContents> allContents = new ArrayList<SuiteContents>();
+		for (File parentDir : parms.getSuiteParentDirectories()) {
+			for (File suiteDir : parms.findSuiteDirs(parentDir)) {
+				SuiteContents contents = SuiteContents.parse(suiteDir);
+				if (contents != null) {
+					allContents.add(contents);
+				}
+			}
+		}
+		dataModel.setSuiteContents(allContents);
 	}
 
 	/**
@@ -61,37 +116,6 @@ public class SeleniumRunner {
 		}
 
 		dataModel.setSelectedSuites(suites);
-	}
-
-	/**
-	 * Set up the run, run the selected suites, summarize the output, and clean
-	 * up afterwards.
-	 * 
-	 * @return <code>true</code> iff all tests passed.
-	 */
-	public boolean run() {
-		boolean success;
-		try {
-			listener.runStarted();
-			outputManager.cleanOutputDirectory();
-
-			runSelectedSuites();
-			tomcatController.cleanup();
-
-			listener.runEndTime();
-			outputManager.summarizeOutput(dataModel);
-			success = (dataModel.getRunStatus() == Status.OK);
-		} catch (IOException e) {
-			listener.runFailed(e);
-			success = false;
-			e.printStackTrace();
-		} catch (FatalException e) {
-			listener.runFailed(e);
-			success = false;
-			e.printStackTrace();
-		}
-		listener.runStopped();
-		return success;
 	}
 
 	public void runSelectedSuites() {
@@ -142,15 +166,18 @@ public class SeleniumRunner {
 		}
 
 		try {
-			parms = new SeleniumRunnerParameters(args[0]);
-		} catch (IOException e) {
-			usage("Can't read properties file: " + e.getMessage());
-		}
+			try {
+				parms = new SeleniumRunnerParameters(args[0]);
+			} catch (IOException e) {
+				usage("Can't read properties file: " + e.getMessage());
+			} catch (IllegalArgumentException e) {
+				throw new FatalException(e);
+			}
 
-		try {
 			if (interactive) {
 				// TODO hook up the GUI.
-				throw new RuntimeException("interactive mode not implemented.");
+				throw new FatalException("interactive mode not implemented. "
+						+ "use 'ant acceptance -Dacceptance.batch=true'");
 			} else {
 				File logFile = new File(parms.getOutputDirectory(),
 						LOGFILE_NAME);
@@ -163,9 +190,7 @@ public class SeleniumRunner {
 
 				System.out.println(parms);
 
-				SeleniumRunner runner = new SeleniumRunner(parms);
-				runner.selectSuites();
-				success = runner.run();
+				success = new SeleniumRunner(parms).run();
 			}
 		} catch (FatalException e) {
 			System.err.println("\n\n-----------------\n"

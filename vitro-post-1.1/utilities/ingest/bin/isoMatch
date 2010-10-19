@@ -1,0 +1,256 @@
+#!/usr/bin/perl
+
+use Getopt::Std;
+use FileHandle;
+use POSIX qw( strftime );
+use FindBin qw($Bin);
+sub score(\@\@$$);
+autoflush STDOUT 1;
+if(scalar(@ARGV) == 0){
+    Usage();
+    exit 0;
+
+}
+sub Usage {
+    print "isoMatch\n";
+    print "-b basedir     - parent of xslt, store etc.\n";
+    print "-c number      - low cutoff\n";
+    print "-e number      - empty short mismatch\n";
+    print "-E number      - empty long mismatch\n";
+    print "-p path        - path to extant persons file\n";
+    print "-s             - sort extant persons by last name\n";
+    print "-w number      - middle name weight\n";
+    print "-W number      - first name weight\n";
+    print "-v             - verbose\n";
+}
+getopts("b:c:e:E;p:sw:W:v");
+
+if(!$opt_p || (!$opt_b && $opt_s)){
+    print "-p required, -s requires -p and -b \n";
+    Usage();
+    exit 1;
+}
+$wFullFullMatch           =  1.00;
+$wFullFullMisMatch        = -1.00;
+$wEmptyEmptyMatch         =  1.00;
+$wEmptyNonEmptyMisMatch   = -0.55;
+$wEmptyShortMisMatch      = -0.55;
+$wEmptyLongMisMatch       = -0.55;
+$wPartialNonEmptyMisMatch = -0.75;
+$wPartialNonEmptyMatch    =  0.50;
+
+$wEmptyShortMisMatch = $opt_e if $opt_e ne '';
+$wEmptyLongMisMatch = $opt_E  if $opt_E ne '';
+
+$lowcut = .33;
+$lowcut = $opt_c  if $opt_c  ne '';
+
+$w1 = 2.0;
+$w2 = 1.0;
+$w1 = $opt_W if $opt_W  ne '';
+$w2 = $opt_w if $opt_w  ne '';
+$wt = $w1+$w2;
+
+sub trim {
+    my($a) = @_;
+    $a =~ s/^\s*(\S+)\s*$/$1/;
+    $a =~ s/^\s*(\S.*\S)\s*$/$1/;
+    $a =~ s/(\s*)//;
+    return $a;
+}
+
+sub uniqPush (\@@) {
+    my $ara = shift;
+    my @items = @_;
+
+    my($i,$k,$x);
+    for($k=0;$k<=$#items;$k++){
+        $x = $items[$k];
+        for($i = 0; $i<=$#$ara; $i++){
+            if($x eq $$ara[$i]){
+                last;
+            }
+        }
+        push(@$ara,$x) if $i > $#$ara ;
+
+    }
+    return $#$ara;
+}
+
+sub score(\@\@$$) {
+    my $np = shift;
+    my $Np = shift;
+    my ($w1,$w2) = @_;
+    #print scalar(@n);
+    my @cn = clean($np);
+    my @cN = clean($Np);
+    #print STDERR join("foo",@cn) . "\n";
+    if($cn[2] ne $cN[2]){
+	return -1.0;
+    }
+    if("$cn[0]|$cn[1]" eq "$cN[0]|$cN[1]"){
+	return 1.00;
+    }
+    my $fc = conf($cn[0],$cN[0]);
+    my $mc = conf($cn[1],$cN[1]);
+    
+    return ($fc * $w1 + $mc * $w2) / ($w1 + $w2);
+}
+
+sub conf {
+    my($s1,$s2)=@_;
+    if(length($s1) >= 1 && length($s2) >= 1){
+	if(length($s1) > 1 && length($s2) > 1){
+	    if($s1 eq $s2){
+		return $wFullFullMatch;
+	    } else {
+		return $wFullFullMisMatch;
+	    }
+	} else {
+	    #print STDERR "msg " . substr($s1,0,1) . "\n";
+	    #print STDERR "msg " . substr($s2,0,1) . "\n";
+	    if(substr($s1,0,1) eq substr($s2,0,1)){
+		return $wPartialNonEmptyMatch;
+	    } else {
+		return $wPartialNonEmptyMisMatch;
+	    }
+	}
+    } elsif(length($s1) == 0 && length($s2) > 1){ # E L
+	return $wEmptyLongMisMatch;
+    } elsif(length($s1) > 1 && length($s2) == 0){ # L E
+	return $wEmptyLongMisMatch;
+    } elsif(length($s1) == 0 && length($s2) == 1){ # E S
+	return $wEmptyShortMisMatch;
+    } elsif(length($s1) == 1 && length($s2) == 0){ # S E
+	return $wEmptyShortMisMatch;
+    } else {
+	return $wEmptyEmptyMatch;
+    }
+}
+
+
+sub clean {
+    my($arap) = @_;
+    my @res = ();
+    #print scalar(@$arap);
+    for(my $i=0;$i<scalar(@$arap);$i++){
+	my $item = $$arap[$i];
+	$item =~ s/[\-,.;\"\']/ /g;
+	$item =~ s/\s+/ /g;
+	$item = trim($item);
+	$res[$i] = $item;
+    }
+    return @res;
+}
+sub clean1{
+    my($item) = @_;
+    $item =~ s/[\-,.;\"\']/ /g;
+    $item =~ s/\s+/ /g;
+    $item = trim($item);
+    return $item;
+} 
+
+sub trim {
+    my($a) = @_;
+    $a =~ s/^\s*(\S+)\s*$/$1/;
+    $a =~ s/^\s*(\S.*\S)\s*$/$1/;
+    $a =~ s/(\s*)//;
+    return $a;
+}
+$g_javaopts = " -Xmx1024m -Xms1024m ";
+$extper = $opt_p;
+if($opt_s){
+    
+    my $cmd = "java $g_javaopts -jar $opt_b/xslt/saxon9he.jar ";
+    $cmd .= " $opt_p $opt_b/xslt/persort.xsl > /tmp/sort$$.xml";
+    my @res = qx($cmd);
+    my $r = ($? >> 8);
+    if($r){
+	print join("", @res);
+	exit(1);
+    }
+    $extper = "/tmp/sort$$.xml";
+}
+
+%N = ();
+$lctr= 0;
+open INF, $extper;
+while (!eof(INF)){
+    my $line = <INF>;
+    $line = trim($line);
+    next if $line !~ /<person/;
+    my $parts = {};
+
+    while(!eof(INF)){
+	$line = <INF>;
+	$line = trim($line);
+	last if (($line =~ /<person\/>/) || ($line =~ /<\/person>/));
+
+	if($line =~ /^<fname>(.*?)<\/fname>$/){
+	    $parts->{'fn'} = clean1($1);
+	}
+	if($line =~ /^<mname>(.*?)<\/mname>$/){
+	    $parts->{'mn'} = clean1($1);
+	}
+	if($line =~ /^<lname>(.*?)<\/lname>$/){
+	    my $ln = $1;
+	    $parts->{'ln'} = clean1($1);
+
+	}  
+	if($line =~ /^<netid>(.*?)<\/netid>$/){
+	    my $nid = $1;
+	    $parts->{'nid'} = clean1($1);
+
+	}
+    }
+    if($parts->{'fn'} && $parts->{'ln'}){
+	my $ln = $parts->{'ln'};
+	if(defined($N{clean1($ln)})){
+	    push @{$N{clean1($ln)}}, 
+	    "$parts->{'fn'}|$parts->{'mn'}|$parts->{'nid'}";
+	    #print "$ln, $parts->{'fn'}|$parts->{'mn'}\n";
+	} else {
+	    $N{clean1($ln)} = 
+		["$parts->{'fn'}|$parts->{'mn'}|$parts->{'nid'}"];
+	    #print "$ln, $parts->{'fn'}|$parts->{'mn'}\n";
+	}
+	
+    }
+    
+}
+
+foreach $name (sort (keys(%N))){
+
+    if(scalar(@{$N{$name}})>0){
+
+	for(my $i=1;$i < scalar(@{$N{$name}}); $i++){
+	    my $n = $N{$name}[0];
+
+	    my($f,$m,$nid) = split /\|/, $n;
+	    my @n = ( $f, $m, $name);
+
+	    my $N = $N{$name}[$i];
+	    my($f1,$m1,$nid1) = split /\|/, $N;
+	    my @N = ($f1, $m1, $name);
+
+
+	    my $score;
+	    if($nid && $nid1 && uc($nid) eq uc($nid1)){
+		$score = $wFullFullMatch;
+	    } else {
+		$score = score(@n,@N,$w1,$w2);
+	    }
+	       
+	    
+	    next if $score < $lowcut || $score > .99999;
+	    printf("%-30s\tvs\t%-30s\t%6.3f\n", 
+		   $name . ", " . $f . " " . $m , 
+                   $name . ", " . $f1 . " " .$m1,
+		   $score);
+
+	}
+    }
+}
+print "\n$opt_p sorted and analyzed.\n" if $opt_s;
+print "\n$opt_p analyzed.\n" if !$opt_s;
+#print "\nlowcut = $lowcut\n";

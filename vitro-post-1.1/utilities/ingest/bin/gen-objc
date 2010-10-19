@@ -79,6 +79,13 @@ sub mkTransform{
 <xsl:value-of select='\$NL'/>
 </xsl:template>
 </xsl:stylesheet>
+
+<!-- ================================== -->
+
+
+<xsl:include href='vivofuncs.xsl'/>
+
+
 __STYLESHEET__
 
     return $transform;

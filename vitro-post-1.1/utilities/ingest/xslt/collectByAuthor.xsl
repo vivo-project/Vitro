@@ -2,9 +2,9 @@
 <xsl:stylesheet version='2.0'
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 	xmlns:ai="http://www.digitalmeasures.com/schema/data"
-	xmlns:aiic="http://vivoweb.org/activity-insight"
-	xmlns:mapid="http://vivoweb.org/activity-insight"
-	xmlns="http://vivoweb.org/activity-insight"
+	xmlns:aiic="http://vivoweb.org/ontology/activity-insight"
+	xmlns:mapid="http://vivoweb.org/ontology/activity-insight"
+	xmlns="http://vivoweb.org/ontology/activity-insight"
 	xmlns:dm="http://www.digitalmeasures.com/schema/data"
 	xmlns:xs='http://www.w3.org/2001/XMLSchema'
 	xmlns:vfx='http://vivoweb.org/ext/functions'	
@@ -35,7 +35,7 @@
 
 <!-- begin wrapper element -->
 <xsl:element name="aiic:AUTHOR_LIST" 
-	namespace="http://vivoweb.org/activity-insight">
+	namespace="http://vivoweb.org/ontology/activity-insight">
 
 <!-- =============== -->
 <!-- 
@@ -43,8 +43,12 @@
  by uppercased constructed name
 -->
 <xsl:for-each-group select='$docs/dm:Data/ai:AUTHORSHIP/ai:AUTHOR' 
-	group-by='vfx:collapse(concat(ai:LNAME, ", ", ai:FNAME, " ", ai:MNAME))'>
-<xsl:sort select='vfx:collapse(concat(ai:LNAME, ", ", ai:FNAME, " ", ai:MNAME))'/>
+	group-by='vfx:collapse(concat(ai:LNAME, "|", 
+				      ai:FNAME, "|", 
+ 				      ai:MNAME))'>
+<xsl:sort select='vfx:collapse(concat(ai:LNAME, "|", 
+				      ai:FNAME, "|", 
+				      ai:MNAME))'/>
 
 <xsl:variable name='cur_netid' select='../../dm:Record/dm:username'/>
 <xsl:variable name='cur_aiid' select='../../dm:Record/dm:userId'/>
@@ -64,7 +68,9 @@
      <xsl:attribute name='cu_coauthors'>
        <xsl:value-of select='count(current-group())'/></xsl:attribute>
   
-     <xsl:value-of select='vfx:trim(concat(ai:LNAME, ", ", ai:FNAME, " ", ai:MNAME))'/>
+     <xsl:value-of select='vfx:trim(concat(ai:LNAME, ", ", 
+					   ai:FNAME, " ", 
+                                           ai:MNAME))'/>
     
    </xsl:element>
 
@@ -98,7 +104,8 @@
       <xsl:for-each select='current-group()'>
       <xsl:variable name='ref_netid' select="../../dm:Record/dm:username"/>
 
-          <xsl:for-each select='ai:ARTICLE_LIST_WITH_AUTHORSHIP_ORDERING/ai:ARTICLE_AUTHORSHIP_ORDER'>
+          <xsl:for-each select=
+		'ai:ARTICLE_LIST_WITH_AUTHORSHIP_ORDERING/ai:ARTICLE_AUTHORSHIP_ORDER'>
           <xsl:sort select='ai:ARTICLE_ID'/>
 
           <xsl:element name='aiic:ARTICLE_INFO'>
@@ -107,6 +114,7 @@
              <xsl:value-of select='../../ai:FACULTY_NAME'/></xsl:attribute>
             <xsl:attribute name='authorRank'><xsl:value-of select='ai:AUTHORSHIP_POSITION'/></xsl:attribute>
             <xsl:attribute name='public'><xsl:value-of select='ai:PUBLIC'/></xsl:attribute>
+	    <xsl:attribute name='hasTitle' select='ai:ARTICLE_ID/@hasTitle'/>
              <xsl:text>AI-</xsl:text>
              <xsl:value-of select='ai:ARTICLE_ID'/>
           </xsl:element>

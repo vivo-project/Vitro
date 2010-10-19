@@ -7,8 +7,8 @@
         xmlns:bibo="http://purl.org/ontology/bibo/"
         xmlns:foaf="http://xmlns.com/foaf/0.1/"
         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-	xmlns:aiadm="http://vivoweb.org/activity-insight"
-	xmlns:acti="http://vivoweb.org/activity-insight#"
+	xmlns:aiadm="http://vivoweb.org/ontology/activity-insight"
+	xmlns:acti="http://vivoweb.org/ontology/activity-insight#"
 	xmlns:dm="http://www.digitalmeasures.com/schema/data"	
 	xmlns:vfx='http://vivoweb.org/ext/functions'
 	exclude-result-prefixes='xs vfx dm'
@@ -37,7 +37,7 @@ select="concat($rawXmlPath,'/',aiadm:netid, '.xml')"/>
 <xsl:if test='$ref/dm:PUBLIC_VIEW="Yes" and $ref/dm:AC_YEAR = "2008-2009"'>
 <rdf:Description rdf:about="{concat($g_instance,@id)}" >
 <rdf:type 
-rdf:resource='http://vivoweb.org/activity-insight#Admin'/>
+rdf:resource='http://vivoweb.org/ontology/activity-insight#Admin'/>
 <rdf:type 
 rdf:resource='http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing'/>
 

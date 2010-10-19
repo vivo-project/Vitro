@@ -62,20 +62,22 @@ sub mkTransform{
 <xsl:for-each-group select='\$docs//dm:$_OBJ' 
 	group-by='\@id'>
 <xsl:sort select='\@id'/>
-
+<xsl:if test='dm:USER_REFERENCE_CREATOR = "Yes"'>
 <$_nsp:$_OBJ>
+
 <xsl:attribute name='index' select='position()'/>
 <xsl:for-each select='current-group()'>
 <xsl:sort select='\@id'/>
-<xsl:if test='dm:USER_REFERENCE_CREATOR = "Yes"'>
 <$_nsp:netid><xsl:value-of select='../../dm:Record/\@username'/></$_nsp:netid>
+
 <$_nsp:$_OBJ\_ID><xsl:value-of select='\@id'/></$_nsp:$_OBJ\_ID>
 
 <!-- other stuff may go here -->
 
 </xsl:for-each>
-</$_nsp:$_OBJ>
 
+</$_nsp:$_OBJ>
+</xsl:if>
 </xsl:for-each-group>
 </$_nsp:$_OBJ\_LIST>
 

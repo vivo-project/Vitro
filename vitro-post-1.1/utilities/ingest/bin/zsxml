@@ -1,0 +1,57 @@
+#!/usr/bin/perl
+use FindBin qw($Bin);
+use lib $Bin;
+use Getopt::Std;
+use FileHandle;
+use POSIX qw( strftime );
+
+#
+# this script process the output of the uidmap.xsl
+# transform to find the xmls referred to by
+# the netid tags don't exist or have zero size
+#
+
+getopts("d:");
+$g_dir = "/home/jrm424/aiw/AIXMLS/cur-raw";
+$g_dir = $opt_d if $opt_d;
+
+# while there is something to read
+while(!eof()){
+    my $line = <>;
+    if($line !~  /^\s*<mapid:mapterm>/ ){
+	# pass thru unchanged
+	print $line;
+	next;
+    }
+    # save for possible output
+    my $firstline = $line;
+    while(!eof()){
+
+	$line = <>;
+	if($line =~ /^\s*<mapid:netid>(.*?)<\/mapid:netid>/){
+	    my $netid = $1;
+	    # file MUST exist and have NON-ZERO size
+	    if(-e "$g_dir/$netid".".xml" && ! -z _){
+		#
+		# skip sub-xml
+		#
+		while(!eof()){
+		    $line = <>;
+		    next if $line !~ /^\s*<\/mapid:mapterm>/;
+		    last;
+		}
+	       
+	    } else {
+		print $firstline; # open tag and 
+		print $line; #netid tag
+	    }
+	    
+	}
+	last;
+    }
+ 
+
+
+
+}
+print "\n";

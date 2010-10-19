@@ -66,7 +66,9 @@
 <!-- ================================================= -->
 
      
-    <xsl:template mode="topLevel" match="dm:INTELLCONT_JOURNAL">
+    <xsl:template mode="topLevel" 
+	match="dm:INTELLCONT_JOURNAL[dm:STATUS='Published' and 
+               dm:PUBLIC_VIEW='Yes' ]">
 
         <dm:INTELLCONT_JOURNAL xmlns="http://www.digitalmeasures.com/schema/data">
 	   <xsl:attribute name='id'>
@@ -119,7 +121,8 @@
 <!-- ================================================= -->
 
  
-    <xsl:template mode="topLevel" match="dm:INTELLCONT">
+    <xsl:template mode="topLevel" 
+	match="dm:INTELLCONT[dm:STATUS='Published' and dm:PUBLIC_VIEW='Yes']">
 
         <dm:INTELLCONT  xmlns="http://www.digitalmeasures.com/schema/data"> 
 	  <xsl:attribute name='id'>

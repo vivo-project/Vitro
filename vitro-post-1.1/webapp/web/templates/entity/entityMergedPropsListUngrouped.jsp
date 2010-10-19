@@ -25,7 +25,7 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.VClassDao" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.VClass" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep" %>
-<%@ page import="edu.cornell.mannlib.vedit.beans.LoginFormBean" %>
+<%@ page import="edu.cornell.mannlib.vedit.beans.LoginStatusBean" %>
 <%@page import="edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils"%>
 
 <%@ page import="java.util.Collection" %>
@@ -41,8 +41,6 @@
 <%@ page import="org.apache.commons.logging.Log" %>
 <%@ page import="org.apache.commons.logging.LogFactory" %>
 
-
-<jsp:useBean id="loginHandler" class="edu.cornell.mannlib.vedit.beans.LoginFormBean" scope="session" />
 <%! 
 public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.templates.entity.entityMergedPropsList.jsp");
 %>
@@ -51,7 +49,7 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
         log.debug("setting showSelfEdits true");%>
         <c:set var="showSelfEdits" value="${true}"/>
 <%  }
-    if (loginHandler!=null && loginHandler.getLoginStatus()=="authenticated" && Integer.parseInt(loginHandler.getLoginRole())>=loginHandler.getNonEditor()) {
+	if (LoginStatusBean.getBean(request).isLoggedIn()) {
 	    log.debug("setting showCuratorEdits true");%>
 	    <c:set var="showCuratorEdits" value="${true}"/>
 <%  }%>
@@ -153,8 +151,16 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 						<c:set var="collateClassesShownCount" value="0"/>
 						<c:set var="collateCurrentClass" value="_none"/>				
 					</c:if>
-					<c:forEach items="${objProp.objectPropertyStatements}" var="objPropertyStmt">															
-						<c:if test="${ collateByClass && collateCurrentClass!=objPropertyStmt.object.VClassURI}">						   
+					<c:forEach items="${objProp.objectPropertyStatements}" var="objPropertyStmt">
+										
+					    <c:set var="sameClass" value="false"/>
+                        <c:forEach items="${objPropertyStmt.object.VClasses}" var="vclass">
+                            <c:if test="${ vclass.URI == collateCurrentClass }">
+                                <c:set var="sameClass" value="true"/>                                                                           
+                            </c:if>                             
+                        </c:forEach>
+																				
+						<c:if test="${ collateByClass && ( !sameClass || collateCurrentClass == '_firstOne') }">						   
 		            		<c:if test="${ collateClassesShownCount > 0 }">
 		            			</ul></li><!-- collateClasses -->
 		            		</c:if>
@@ -166,26 +172,6 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 		            		<ul class='properties'><!-- collateClasses -->
 		            	</c:if>
 
-						<c:if test="${stmtCounter == displayLimit}"><!-- set up toggle div and expandable continuation div -->
-							<c:if test="${ collateByClass }"> </ul></li></c:if>
-							<c:if test="${ ! collateByClass }"> </ul></c:if>  							
-  		                	<c:set var="hiddenDivCount" value="${hiddenDivCount+1}"/>
-							<c:url var="themePath" value="/${themeDir}site_icons" />
-									
-			               <div class="navlinkblock ">
-			                 <span class="entityMoreSpan">
-			                   <c:out value='${objRows - stmtCounter}' />
-			                   <c:choose>
-			                       <c:when test='${displayLimit==0}'> entries</c:when>
-			                       <c:otherwise> more</c:otherwise>
-			                   </c:choose>
-			                 </span>
-			               
-			                 <div class="extraEntities">
-			                 <c:if test="${ collateByClass }"> <li></c:if>
-							 <ul class="properties">
-			              		 
-						</c:if>
      					<li>
 	     					<span class="statementWrap">
 	     					<c:set var="opStmt" value="${objPropertyStmt}" scope="request"/>
@@ -223,10 +209,7 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 					</c:forEach>
 					<c:if test="${objRows > 0}"></ul></c:if>
 					<c:if test="${ collateClassesShownCount > 0 }"></li><!-- collateClasses 2 --></c:if>
-					<c:if test="${ collateByClass && collateClassesShownCount > 0 }"></ul><!-- collate end --></c:if>										
-   					<c:if test="${ stmtCounter > displayLimit}">
-   					</div><%-- navlinkblock --%>
-   					</div><%-- extraEntities --%></c:if>
+					<c:if test="${ collateByClass && collateClassesShownCount > 0 }"></ul><!-- collate end --></c:if>										   					   					   				
  				</div><!-- ${objProp.localNameWithPrefix} -->
  			</c:if>
 <%		} else if (p instanceof DataProperty) {

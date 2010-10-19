@@ -10,6 +10,8 @@ import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
+
 /**
  * User: bdc34
  * Date: Oct 18, 2007
@@ -71,6 +73,8 @@ public interface Individual extends ResourceBean, VitroTimeWindowedResource, Com
     
     /** Does the individual belong to this class? */
     boolean isVClass(String uri);
+    
+    public boolean isMemberOfClassProhibitedFromSearch(ProhibitedFromSearch pfs);
 
     void setObjectPropertyStatements(List<ObjectPropertyStatement> list);
     List<ObjectPropertyStatement> getObjectPropertyStatements();

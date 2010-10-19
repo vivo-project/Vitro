@@ -2,7 +2,7 @@
 
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener"%>
 
-<% if (securityLevel >= loginHandler.CURATOR) { %>
+<% if (loginBean.isLoggedInAtLeast(LoginStatusBean.CURATOR)) { %>
     
         <div class="pageBodyGroup">
     

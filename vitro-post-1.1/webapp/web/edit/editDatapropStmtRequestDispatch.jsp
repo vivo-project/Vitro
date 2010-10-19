@@ -8,7 +8,6 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.RdfLiteralHash" %>
-<%@ page import="edu.cornell.mannlib.vedit.beans.LoginFormBean" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
@@ -16,11 +15,15 @@
 <%@ page import="java.util.HashMap" %>
 <%@ page import="org.apache.commons.logging.Log" %>
 <%@ page import="org.apache.commons.logging.LogFactory" %>
+<%@ taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
 
 <%
     //org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.edit.editDatapropStmtRequestDispatch.jsp");
     final Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.edit.editDatapropStmtRequestDispatch.jsp");
 %>
+
+<vitro:confirmLoginStatus allowSelfEditing="true" />
+
 <%
     // Decide which form to forward to, set subjectUri, subjectUriJson, predicateUri, predicateUriJson in request
     // Also get the Individual for the subjectUri and put it in the request scope
@@ -39,10 +42,6 @@
     final String DEFAULT_VITRO_NS_FORM = "defaultVitroNsDataPropForm.jsp";
     final String DEFAULT_ERROR_FORM = "error.jsp";
     
-    if (!VitroRequestPrep.isSelfEditing(request) && !LoginFormBean.loggedIn(request, LoginFormBean.NON_EDITOR)) {        
-        %> <c:redirect url="<%= Controllers.LOGIN %>" /> <%  
-    }
-
     VitroRequest vreq = new VitroRequest(request);
     if( EditConfiguration.getEditKey( vreq ) == null ){
         vreq.setAttribute("editKey",EditConfiguration.newEditKey(session));

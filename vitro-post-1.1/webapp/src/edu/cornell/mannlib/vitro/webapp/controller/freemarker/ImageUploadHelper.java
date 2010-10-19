@@ -9,9 +9,6 @@ import static edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUpload
 import static edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest.FILE_ITEM_MAP;
 import static edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest.FILE_UPLOAD_EXCEPTION;
 
-import java.awt.image.renderable.ParameterBlock;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.media.jai.Interpolation;
 import javax.media.jai.JAI;
 import javax.media.jai.RenderedOp;
 import javax.media.jai.util.ImagingListener;
@@ -31,7 +27,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.sun.media.jai.codec.JPEGEncodeParam;
 import com.sun.media.jai.codec.MemoryCacheSeekableStream;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -68,6 +63,9 @@ public class ImageUploadHelper {
 	/** Recognized file extensions mapped to MIME-types. */
 	private static final Map<String, String> RECOGNIZED_FILE_TYPES = createFileTypesMap();
 
+	/** Browser-specific MIME-types mapped to recognized MIME-types. */
+	private static final Map<String, String> NON_STANDARD_MIME_TYPES = createNonStandardMimeTypesMap();
+
 	private static Map<String, String> createFileTypesMap() {
 		Map<String, String> map = new HashMap<String, String>();
 		map.put(".gif", "image/gif");
@@ -75,6 +73,18 @@ public class ImageUploadHelper {
 		map.put(".jpg", "image/jpeg");
 		map.put(".jpeg", "image/jpeg");
 		map.put(".jpe", "image/jpeg");
+		return Collections.unmodifiableMap(map);
+	}
+
+	/**
+	 * Internet Explorer can tell us that an image has a funky
+	 * Microsoft-specific MIME-type, and we can replace it with one that
+	 * everyone recognizes. This table records those types.
+	 */
+	private static Map<String, String> createNonStandardMimeTypesMap() {
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("image/x-png", "image/png");
+		map.put("image/pjpeg", "image/jpeg");
 		return Collections.unmodifiableMap(map);
 	}
 
@@ -140,6 +150,7 @@ public class ImageUploadHelper {
 		String filename = getSimpleFilename(file);
 		String mimeType = getMimeType(file);
 		if (!RECOGNIZED_FILE_TYPES.containsValue(mimeType)) {
+			log.debug("Unrecognized MIME type: '" + mimeType + "'");
 			throw new UserMistakeException("'" + filename
 					+ "' is not a recognized image file type. "
 					+ "Please upload JPEG, GIF, or PNG files only.");
@@ -223,6 +234,7 @@ public class ImageUploadHelper {
 		} catch (UserMistakeException e) {
 			throw e;
 		} catch (Exception e) {
+			log.warn("Unexpected exception in image handling", e);
 			throw new UserMistakeException("Sorry, we were unable to process "
 					+ "the photo you provided. Please try another photo.");
 		} finally {
@@ -267,7 +279,8 @@ public class ImageUploadHelper {
 			mainStream = fileStorage.getInputStream(mainBytestreamUri,
 					mainFilename);
 
-			thumbStream = scaleImageForThumbnail(mainStream, crop);
+			thumbStream = new ImageUploadThumbnailer(THUMBNAIL_HEIGHT,
+					THUMBNAIL_WIDTH).cropAndScale(mainStream, crop);
 
 			String mimeType = RECOGNIZED_FILE_TYPES.get(".jpg");
 			String filename = createThumbnailFilename(mainFilename);
@@ -337,6 +350,11 @@ public class ImageUploadHelper {
 	private String getMimeType(FileItem file) {
 		String mimeType = file.getContentType();
 		if (mimeType != null) {
+			// If the browser supplied the MIME type, we may need to
+			// replace it with the standard value.
+			if (NON_STANDARD_MIME_TYPES.containsKey(mimeType)) {
+				mimeType = NON_STANDARD_MIME_TYPES.get(mimeType);
+			}
 			return mimeType;
 		}
 
@@ -366,85 +384,6 @@ public class ImageUploadHelper {
 	}
 
 	/**
-	 * Create a thumbnail from a source image, given a cropping rectangle (x, y,
-	 * width, height).
-	 */
-	private InputStream scaleImageForThumbnail(InputStream source,
-			CropRectangle crop) throws IOException {
-		try {
-			// Read the main image.
-			MemoryCacheSeekableStream stream = new MemoryCacheSeekableStream(
-					source);
-			RenderedOp mainImage = JAI.create("stream", stream);
-			int imageWidth = mainImage.getWidth();
-			int imageHeight = mainImage.getHeight();
-
-			// Adjust the crop rectangle, if needed, to compensate for scaling
-			// and to limit to the image size.
-			crop = adjustCropRectangle(crop, imageWidth, imageHeight);
-
-			// Crop the image.
-			ParameterBlock cropParams = new ParameterBlock();
-			cropParams.addSource(mainImage);
-			cropParams.add((float) crop.x);
-			cropParams.add((float) crop.y);
-			cropParams.add((float) crop.width);
-			cropParams.add((float) crop.height);
-			RenderedOp croppedImage = JAI.create("crop", cropParams);
-
-			// Figure the scales.
-			float scaleWidth = ((float) THUMBNAIL_WIDTH) / ((float) crop.width);
-			float scaleHeight = ((float) THUMBNAIL_HEIGHT)
-					/ ((float) crop.height);
-			log.debug("Generating a thumbnail, scales: " + scaleWidth + ", "
-					+ scaleHeight);
-
-			// Create the parameters for the scaling operation.
-			Interpolation interpolation = Interpolation
-					.getInstance(Interpolation.INTERP_BILINEAR);
-			ParameterBlock scaleParams = new ParameterBlock();
-			scaleParams.addSource(croppedImage);
-			scaleParams.add(scaleWidth); // x scale factor
-			scaleParams.add(scaleHeight); // y scale factor
-			scaleParams.add(0.0F); // x translate
-			scaleParams.add(0.0F); // y translate
-			scaleParams.add(interpolation);
-			RenderedOp image2 = JAI.create("scale", scaleParams);
-
-			JPEGEncodeParam encodeParam = new JPEGEncodeParam();
-			encodeParam.setQuality(1.0F);
-
-			ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-			JAI.create("encode", image2, bytes, "JPEG", encodeParam);
-			bytes.close();
-			return new ByteArrayInputStream(bytes.toByteArray());
-		} catch (Exception e) {
-			throw new IllegalStateException("Failed to scale the image", e);
-		}
-	}
-
-	/**
-	 * The bounds of the cropping rectangle should be limited to the bounds of
-	 * the image.
-	 */
-	private CropRectangle adjustCropRectangle(CropRectangle crop,
-			int imageWidth, int imageHeight) {
-		log.debug("Generating a thumbnail, initial crop info: " + crop);
-
-		// Insure that x and y fall within the image dimensions.
-		int x = Math.max(0, Math.min(imageWidth, Math.abs(crop.x)));
-		int y = Math.max(0, Math.min(imageHeight, Math.abs(crop.y)));
-
-		// Insure that width and height are reasonable.
-		int w = Math.max(5, Math.min(imageWidth - x, crop.width));
-		int h = Math.max(5, Math.min(imageHeight - y, crop.height));
-
-		CropRectangle bounded = new CropRectangle(x, y, h, w);
-		log.debug("Generating a thumbnail, bounded crop info: " + bounded);
-		return bounded;
-	}
-
-	/**
 	 * <p>
 	 * This {@link ImagingListener} means that Java Advanced Imaging won't dump
 	 * an exception log to {@link System#out}. It writes to the log, instead.
@@ -454,7 +393,7 @@ public class ImageUploadHelper {
 	 * is written as a simple log message.
 	 * </p>
 	 */
-	private static class NonNoisyImagingListener implements ImagingListener {
+	static class NonNoisyImagingListener implements ImagingListener {
 		@Override
 		public boolean errorOccurred(String message, Throwable thrown,
 				Object where, boolean isRetryable) throws RuntimeException {

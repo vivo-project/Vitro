@@ -61,12 +61,12 @@ sub mkTransform{
 
 <$_nsp:$_OBJ\_PERSON_LIST>
 
-<xsl:for-each-group select='$docs//dm:Record' 
+<xsl:for-each-group select='\$docs//dm:Record' 
 group-by='vfx:collapse(concat(dm:PCI/dm:LNAME, ", ",
-dm:PCI/dm:FNAME , " ", dm:PCI/dm:LNAME))'>
+dm:PCI/dm:FNAME , " ", dm:PCI/dm:MNAME))'>
 <xsl:sort 
 select='vfx:collapse(concat(dm:PCI/dm:LNAME, ", ",
-dm:PCI/dm:FNAME , " ", dm:PCI/dm:LNAME))'/>
+dm:PCI/dm:FNAME , " ", dm:PCI/dm:MNAME))'/>
 
 <xsl:variable name='rec' select='.'/>
 <xsl:variable name='cur_netid' select='\$rec/\@username'/>
@@ -77,18 +77,18 @@ dm:PCI/dm:FNAME , " ", dm:PCI/dm:LNAME))'/>
 <$_nsp:uid><xsl:value-of select='\$cur_aiid'/></$_nsp:uid>
 
 <$_nsp:fname>
-<xsl:value-of select='normalize-space($rec/dm:PCI/dm:FNAME)'/>
+<xsl:value-of select='normalize-space(\$rec/dm:PCI/dm:FNAME)'/>
 </$_nsp:fname>
 <$_nsp:mname>
-<xsl:value-of select='normalize-space($rec/dm:PCI/dm:MNAME)'/>
+<xsl:value-of select='normalize-space(\$rec/dm:PCI/dm:MNAME)'/>
 </$_nsp:mname>
 <$_nsp:lname>
-<xsl:value-of select='normalize-space($rec/dm:PCI/dm:LNAME)'/>
+<xsl:value-of select='normalize-space(\$rec/dm:PCI/dm:LNAME)'/>
 </$_nsp:lname>
 <$_nsp:fullname><xsl:value-of 
-select='normalize-space(concat(normalize-space($rec/dm:PCI/dm:LNAME),", ",
-normalize-space($rec/dm:PCI/dm:FNAME), " ", 
-normalize-space($rec/dm:PCI/dm:MNAME)))'/></$_nsp:fullname>
+select='normalize-space(concat(normalize-space(\$rec/dm:PCI/dm:LNAME),", ",
+normalize-space(\$rec/dm:PCI/dm:FNAME), " ", 
+normalize-space(\$rec/dm:PCI/dm:MNAME)))'/></$_nsp:fullname>
 
 
 <$_nsp:$_OBJ\_LIST>

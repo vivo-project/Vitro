@@ -47,8 +47,10 @@ sub trim {
     return $a;
 }
 
-getopts("B:I:i:L:N:O:p:sT:t:vX:x:");
+getopts("B:e:fI:i:L:N:O:p:s:T:t:vX:x:");
 
+$g_saxon = "saxon9he.jar";
+$g_saxon = $opt_s if  $opt_s ne '';
 
 $g_PREFIX = $opt_p?$opt_p:"Out_";
 $g_BASE_DIR = $opt_B?$opt_B:"$Bin/..";
@@ -56,8 +58,19 @@ $g_RAW_XML_DIR = $opt_I?$opt_I:"$g_BASE_DIR/Raw_XMLs";
 $g_OUT_XML_DIR = $opt_O?$opt_O:"$g_BASE_DIR/Out_XMLs";
 $g_TMP_DIR = $opt_T?$opt_T:"/tmp";
 
-$g_JAVA_SAXON_JAR = "java -jar $g_BASE_DIR/bin/saxon9he.jar ";
-$g_JAVA_SAXON_JAR = "java -jar $opt_x/saxon9he.jar " if $opt_x;
+my $d = ($opt_x ne '')?$opt_x:"$g_BASE_DIR/xslt";
+
+if($opt_e ne ''){
+    $g_JAVA_SAXON_JAR = 
+	"java -cp $opt_e:$d/$g_saxon com.saxonica.Transform ";	
+} else {
+    $g_JAVA_SAXON_JAR = "java -jar $d/$g_saxon ";
+}
+
+#$g_JAVA_SAXON_JAR = "java -jar $g_BASE_DIR/bin/$g_saxon ";
+#$g_JAVA_SAXON_JAR = "java -jar $opt_x/$g_saxon " if $opt_x;
+
+
 $g_ifn = "T";
 $g_ifn = $opt_t if $opt_t;
 @g_XSLTS = ();
@@ -132,6 +145,21 @@ sub trouble {
 #
 sub getXmlNames {
     my($d) = @_;
+    opendir DIR, $d or die "Required Op failed: $!";
+    my(@xfiles) =  grep /\.xml$/, readdir DIR;
+    close DIR;
+    my @res;
+    foreach my $xml (@xfiles){
+	chomp $xml;
+	next if -z "$d/$xml";
+	$xml =~ s/\.xml//;
+	push @res, $xml;
+    }
+    return @res;
+}
+
+sub OLDgetXmlNames {
+    my($d) = @_;
     my(@xfiles) = qx(ls $d/*.xml);
     my @res;
     foreach my $xml (@xfiles){
@@ -192,6 +220,7 @@ foreach my $fid (@g_fids){
 	if($r != 0){
 	    trouble("$xslt failed on $infile; check $outfile for more info.\n");
 	    $g_anyFault = $fault = 1;
+	    exit 1 if $opt_f; #quit on fault for all files
 	    last; #quit on fault for this file
 	}
 	print $cmd . "\n"  if $opt_v;

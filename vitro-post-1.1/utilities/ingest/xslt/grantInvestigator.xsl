@@ -2,9 +2,9 @@
 <xsl:stylesheet version='2.0'
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 	xmlns:ai="http://www.digitalmeasures.com/schema/data"
-	xmlns:aigrant="http://vivoweb.org/activity-insight"
-	xmlns:mapid="http://vivoweb.org/activity-insight"
-	xmlns="http://vivoweb.org/activity-insight"
+	xmlns:aigrant="http://vivoweb.org/ontology/activity-insight"
+	xmlns:mapid="http://vivoweb.org/ontology/activity-insight"
+	xmlns="http://vivoweb.org/ontology/activity-insight"
 	xmlns:dm="http://www.digitalmeasures.com/schema/data"
 	xmlns:xs='http://www.w3.org/2001/XMLSchema'
 	xmlns:vfx='http://vivoweb.org/ext/functions'	
@@ -34,7 +34,7 @@
 
 <!-- begin wrapper element -->
 <xsl:element name="aigrant:INVESTIGATOR_LIST" 
-	namespace="http://vivoweb.org/activity-insight">
+	namespace="http://vivoweb.org/ontology/activity-insight">
 
 <!-- =============== -->
 <!-- 
@@ -42,8 +42,8 @@
  by uppercased constructed name
 -->
 <xsl:for-each-group select='$docs//dm:Record//dm:CONGRANT_INVEST'
-	group-by='vfx:collapse(concat(dm:LNAME, ", ", dm:FNAME, " ", dm:MNAME))'>
-<xsl:sort select='vfx:collapse(concat(dm:LNAME, ", ", dm:FNAME, " ", dm:MNAME))'/>
+	group-by='vfx:collapse(concat(dm:LNAME, "|", dm:FNAME, "|", dm:MNAME))'>
+<xsl:sort select='vfx:collapse(concat(dm:LNAME, "|", dm:FNAME, "|", dm:MNAME))'/>
 
 <xsl:variable name='cur_netid' select='../../dm:Record/username'/>
 <xsl:variable name='cur_aiid' select='../../dm:Record/userId'/>
@@ -97,8 +97,30 @@
 
 
    <xsl:element name='aigrant:NetId'>
-    <xsl:value-of 
+   <xsl:choose>
+  	<xsl:when test='$invest/dm:FACULTY_NAME'>
+	<xsl:value-of 
 	select='$aiid_netid[mapid:aiid=$invest/dm:FACULTY_NAME]/mapid:netid'/>
+  	</xsl:when>
+	<xsl:when test='$invest/dm:NET_ID'>
+	<xsl:variable name='real'>
+		<xsl:value-of select='vfx:realNetid($invest/dm:NET_ID,aigrant:NetId)'/>
+	</xsl:variable>
+	<xsl:choose>
+  		<xsl:when test='$real = "_void_"'>
+			<xsl:value-of select='""'/>
+  		</xsl:when>
+  		<xsl:otherwise>
+			<xsl:value-of select='$real'/>
+  		</xsl:otherwise>
+	</xsl:choose>
+	
+  	</xsl:when>
+  	<xsl:otherwise>
+	<xsl:value-of select='""'/>
+  	</xsl:otherwise>
+  </xsl:choose>
+    
    </xsl:element>	
 
    <xsl:text>&#xA;</xsl:text>
@@ -110,6 +132,7 @@
       <xsl:for-each select='current-group()'>
  
 	<xsl:if test='../dm:USER_REFERENCE_CREATOR = "Yes"'>
+	<xsl:if test='../dm:STATUS = "Award Signed By All Parties"'>
           <xsl:element name='aigrant:GRANT_INFO'>
             <xsl:attribute name='ref_netid'><xsl:value-of select='../../../dm:Record/@username'/></xsl:attribute>
             <xsl:attribute name='ai_userid'>
@@ -118,6 +141,7 @@
              <xsl:text>AI-</xsl:text>
              <xsl:value-of select='../@id'/>
           </xsl:element>
+       </xsl:if>
        </xsl:if>
 
       </xsl:for-each>

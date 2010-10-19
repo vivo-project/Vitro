@@ -5,13 +5,13 @@ package edu.cornell.mannlib.vitro.webapp.auth.policy;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
+import com.hp.hpl.jena.rdf.model.impl.Util;
+
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.CuratorEditingIdentifierFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.Identifier;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
@@ -41,7 +41,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ontology.DefineData
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ontology.DefineObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ontology.RemoveOwlClass;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import com.hp.hpl.jena.rdf.model.impl.Util;
 
 /**
  * Policy to use for Vivo Curator-Editing for use at Cornell.
@@ -136,7 +135,7 @@ public class CuratorEditingPolicy implements VisitingPolicyIface {
             return pd.setMessage("Unable to get a role for the curator from IdBundle");
         
         try{
-            if( Integer.parseInt( roleStr ) /*<*/ != LoginFormBean.CURATOR)
+            if( Integer.parseInt( roleStr ) /*<*/ != LoginStatusBean.CURATOR)
                 return pd.setMessage("CuratorEditingPolicy found role of "+roleStr+" but only authorizes for users logged in as CURATOR or higher");            
         }catch(NumberFormatException nef){}
                  

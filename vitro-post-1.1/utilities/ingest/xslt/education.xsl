@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <xsl:stylesheet version='2.0'
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-	xmlns:aiedu="http://vivoweb.org/activity-insight"
+	xmlns:aiedu="http://vivoweb.org/ontology/activity-insight"
 	xmlns:dm="http://www.digitalmeasures.com/schema/data"
 	xmlns:xs='http://www.w3.org/2001/XMLSchema'
 	xmlns:vfx='http://vivoweb.org/ext/functions'	
@@ -28,11 +28,12 @@
 <xsl:for-each-group select='$docs//dm:EDUCATION' 
 	group-by='@id'>
 <xsl:sort select='@id'/>
-
+<xsl:variable name='pos' select='position()'/>
 <xsl:for-each select='current-group()'>
 
 <aiedu:EDUCATION>
 <xsl:attribute name='id' select='@id'/>
+<xsl:attribute name='index' select='$pos'/>
 <aiedu:netid><xsl:value-of select='../../dm:Record/@username'/></aiedu:netid>
 <aiedu:uid><xsl:value-of select='../../dm:Record/@userId'/></aiedu:uid>
 

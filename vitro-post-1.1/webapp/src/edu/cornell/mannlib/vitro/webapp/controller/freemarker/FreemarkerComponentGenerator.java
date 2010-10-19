@@ -2,11 +2,11 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,8 +33,8 @@ public class FreemarkerComponentGenerator extends FreemarkerHttpServlet {
         Configuration config = getConfig(vreq);
 
         // root is the map used to create the page shell - header, footer, menus, etc.
-        Map<String, Object> root = getSharedVariables(vreq); 
-        setUpRoot(vreq, root);  
+        Map<String, Object> root = getSharedVariables(vreq, new HashMap<String, Object>()); 
+        root.putAll(getRootValues(vreq));  
         
         request.setAttribute("ftl_identity", get("identity", root, config));
         request.setAttribute("ftl_menu", get("menu", root, config));

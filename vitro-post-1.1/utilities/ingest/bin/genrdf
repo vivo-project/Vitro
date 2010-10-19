@@ -1,0 +1,148 @@
+#!/usr/bin/perl
+use sigtrap qw(die INT QUIT);
+use sigtrap qw(die untrapped normal-signals stack-trace any error-signals);
+use Getopt::Std;
+use FileHandle;
+use POSIX qw( strftime );
+use FindBin qw($Bin);
+
+autoflush STDOUT 1;
+if(scalar(@ARGV) == 0){
+    print "-b base-dir \n";
+    print "-e extdir\t directory of java extension for saxon\n";
+    print "-g group \t i.e. 1of {aw,ic,is,ed,gr,rs,all}\n";
+    print "-r       \t for revert\n";
+    print "-R       \t for reuse All feedback files as is.\n";
+    print "-L       \t for live operation\n";
+    print "-S jar   \t saxon jar i.e. saxon9he.jar or saxon9ee.jar \n";
+    print "-T       \t to choose time zero\n";
+    print "-U file  \t to choose uno file\n";
+    print "-u hex   \t to initialize uno file\n";
+    exit 0;
+}
+
+getopts("b:e:g:LrRS:Tvu:U:");
+
+sub trim {
+    my($a) = @_;
+    $a =~ s/^\s*(\S+)\s*$/$1/;
+    $a =~ s/^\s*(\S.*\S)\s*$/$1/;
+    $a =~ s/(\s*)//;
+    return $a;
+}
+
+if(!$opt_g){
+    print "-g option required to specify what to generate\n";
+    print "choose from {aw,ic,is,ed,gr,rs,all}.\n";
+    exit 1;
+}
+if($opt_T && $opt_R){
+    print "-T (time zero) and -R (reuse all) are incompatable\n";
+    exit 1;
+}
+
+$unoparms = "";
+if($opt_u ne '' || $opt_U ne ''){
+    $unoparms = " --uno $opt_U " if($opt_U ne '');
+    $unoparms .= " --uset $opt_u " if($opt_u ne '');
+}
+
+$grp = lc($opt_g);
+@grp = split /[,;]/, $grp;
+
+
+$wdir = "/home/jrm424/aiwork";
+$wdir = $opt_b if $opt_b;
+chdir $wdir;
+$r ="";
+$r .= " --revert " if $opt_r;
+$r .= " --reuseAll " if $opt_R;
+$t = "";
+$t = "--t0" if $opt_T;
+
+
+$ext = " --jext $opt_e " if $opt_e ne '' ;
+$saxon = " --saxon $opt_S " if $opt_S ne '';
+
+if(!(-e "bin/aiIngest" && -x _ && -r _)){
+    print "$wdir/bin/aiIngest must exist and be executable\n";
+    exit 1;
+}
+%TODO = ( "gr" => ['GRR','GRIR','GRSPR'],
+	  "ic" => ['ICAR','ICJR','ICIAR','ICIPR'],
+	  "is" => ['ISIR','ISCER','ISFOR','ISGEOR','ISPAR','ISUAR','ISCAR'],
+	  "ed" => ['EDR','EDPR','EDOR'],
+	  "rs" => ['RSR'],
+	  "aw" => ['AWR'] 
+	  );
+
+if(scalar(@grp) > 1){
+    my $steps = "";
+    foreach $grp (@grp){
+	$steps .= "," if $steps ne '';
+	$steps .= join(',',@{$TODO{$grp}});
+    } 
+    print "bin/aiIngest $unoparms --L --v --log --aiic IC --aiis IS --rawp AIXMLS/cur-raw --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps $steps  $r $t $ext $saxon\n";
+    @res = qx(bin/aiIngest $unoparms --L --v --log --aiic IC --aiis IS --rawp AIXMLS/cur-raw --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps $steps  $r $t $ext $saxon) if $opt_L;
+    
+    my $r = ($? >> 8);
+    print join('', @res) . "\n";
+    exit 1 if $r;
+} else {
+    $grp = $grp[0];
+    if($grp eq "gr"){
+
+	print "bin/aiIngest $unoparms --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps GRR,GRIR,GRSPR $r $t $ext  $saxon\n";
+	@res = qx(bin/aiIngest $unoparms --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps GRR,GRIR,GRSPR $r $t $ext $saxon ) if $opt_L;
+	my $r = ($? >> 8);
+	print join('', @res) . "\n";
+	exit 1 if $r;
+	
+    } elsif($grp eq "ic"){
+	
+	print "bin/aiIngest $unoparms --L --v --log --aiic IC  --rawp AIXMLS/cur-raw --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps ICAR,ICJR,ICIAR,ICIPR $r $t $ext $saxon \n";
+	@res = qx(bin/aiIngest $unoparms --L --v --log --aiic IC  --rawp AIXMLS/cur-raw --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps ICAR,ICJR,ICIAR,ICIPR $r $t $ext $saxon) if $opt_L;
+	my $r = ($? >> 8);
+	print join('', @res) . "\n";
+	exit 1 if $r;
+    } elsif($grp eq "is"){
+	
+	print "bin/aiIngest $unoparms --L --v --log --aiis IS  --rawp AIXMLS/cur-raw --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps ISIR,ISCER,ISFOR,ISGEOR,ISPAR,ISUAR,ISCAR $r $t $ext  $saxon\n";
+	@res = qx(bin/aiIngest $unoparms --L --v --log --aiis IS  --rawp AIXMLS/cur-raw --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps ISIR,ISCER,ISFOR,ISGEOR,ISPAR,ISUAR,ISCAR $r $t $ext $saxon ) if $opt_L;
+	my $r = ($? >> 8);
+	print join('', @res) . "\n";
+	exit 1 if $r;
+    } elsif($grp eq "ed"){
+	
+	print "bin/aiIngest $unoparms --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps EDR,EDPR,EDOR $r $t $ext $saxon\n";
+	@res = qx(bin/aiIngest $unoparms --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps EDR,EDPR,EDOR $r $t $ext $saxon) if $opt_L;
+	my $r = ($? >> 8);
+	print join('', @res) . "\n";
+	exit 1 if $r;
+    } elsif($grp eq "aw"){
+	
+	print "bin/aiIngest $unoparms --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps AWR $r $t $ext $saxon\n";
+	@res = qx(bin/aiIngest $unoparms --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps AWR $r $t $ext $saxon) if $opt_L;
+	my $r = ($? >> 8);
+	print join('', @res) . "\n";
+	exit 1 if $r;
+    } elsif($grp eq "rs"){
+	
+	print "bin/aiIngest $unoparms --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps RSR  $r $t $ext  $saxon\n";
+	@res = qx(bin/aiIngest $unoparms --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps RSR $r $t $ext $saxon) if $opt_L;
+	my $r = ($? >> 8);
+	print join('', @res) . "\n";
+	exit 1 if $r;
+    } elsif($grp eq "all"){
+	
+	print "bin/aiIngest $unoparms --L --v --log --aiic IC --aiis IS --rawp AIXMLS/cur-raw --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps ICAR,ICJR,ICIAR,ICIPR,ISIR,ISCER,ISFOR,ISGEOR,ISPAR,ISUAR,ISCAR,EDR,EDPR,EDOR,RSR,AWR $r $t $ext $saxon\n";
+	@res = qx(bin/aiIngest $unoparms --L --v --log --aiic IC --aiis IS --rawp AIXMLS/cur-raw --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps ICAR,ICJR,ICIAR,ICIPR,ISIR,ISCER,ISFOR,ISGEOR,ISPAR,ISUAR,ISCAR,EDR,EDPR,EDOR,RSR,AWR $r $t $ext $saxon) if $opt_L;
+	my $r = ($? >> 8);
+	print join('', @res) . "\n";
+	exit 1 if $r;
+    } else {
+	print "Unknown group: $grp.\n";
+	last;
+    }
+
+}

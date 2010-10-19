@@ -7,24 +7,40 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openrdf.model.URI;
+import org.openrdf.model.impl.URIImpl;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Link;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
-import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 import edu.cornell.mannlib.vitro.webapp.web.ViewFinder;
 import edu.cornell.mannlib.vitro.webapp.web.ViewFinder.ClassView;
 
 public class IndividualTemplateModel extends BaseTemplateModel {
     
-    private static final Log log = LogFactory.getLog(IndividualTemplateModel.class.getName());
+    private static final Log log = LogFactory.getLog(IndividualTemplateModel.class);
     
     private static final String PATH = Route.INDIVIDUAL.path();
     
-    private Individual individual;
+    protected Individual individual;
+    protected VitroRequest vreq;
+    protected UrlBuilder urlBuilder;
     
-    public IndividualTemplateModel(Individual individual) {
+    // private PropertyListTemplateModel propertyList;
+    
+    // RY The IndividualTemplateModel object needs access to the request object.
+    // The only other template model that does is MainMenu. We could provide an 
+    // interface for RequestAware template models, but they still wouldn't share any code.
+    // If they both derive from a common RequestAwareTemplateModel class, we might be 
+    // locking ourselves in too tightly to that class hierarchy. 
+    public IndividualTemplateModel(Individual individual, VitroRequest vreq) {
         this.individual = individual;
+        this.vreq = vreq;
+        // Needed for getting portal-sensitive urls. Remove if multi-portal support is removed.
+        this.urlBuilder = new UrlBuilder(vreq.getPortal());
     }
     
     /* These methods perform some manipulation of the data returned by the Individual methods */
@@ -35,15 +51,57 @@ public class IndividualTemplateModel extends BaseTemplateModel {
 //        return StringUtils.isEmpty(tagline) ? individual.getVClass().getName() : tagline;
 //    }
     
-    // Return link to individual's profile page.
-    // There may be other urls associated with the individual. E.g., we might need 
-    // getEditUrl(), getDeleteUrl() to return the links computed by PropertyEditLinks.
-    // RY **** Need to account for everything in URLRewritingHttpServlet
-    // Currently this is incorrect for individuals that are not in the default namespace (e.g., geographic individuals).
     public String getProfileUrl() {
-        return getUrl(PATH + "/" + individual.getLocalName());
-    }
+        String profileUrl = null;
+        String individualUri = individual.getURI();
         
+        URI uri = new URIImpl(individualUri);
+        String namespace = uri.getNamespace();
+        String defaultNamespace = vreq.getWebappDaoFactory().getDefaultNamespace();
+        
+        if (defaultNamespace.equals(namespace)) {
+            profileUrl = getUrl(PATH + "/" + individual.getLocalName());
+        } else {
+            ParamMap params = new ParamMap("uri", individualUri);
+            profileUrl = getUrl("/individual", params);
+        }
+        
+        return profileUrl;
+    }
+    
+    public String getVisualizationUrl() {
+        return isPerson() ? getUrl(Route.VISUALIZATION.path(), "uri", getUri()) : null;
+    }
+
+    public String getImageUrl() {
+        String imageUrl = individual.getImageUrl();
+        return imageUrl == null ? null : getUrl(imageUrl);
+    }
+    
+    public String getThumbUrl() {
+        String thumbUrl = individual.getThumbUrl();
+        return thumbUrl == null ? null : getUrl(thumbUrl);
+    } 
+    
+    public String getLinkedDataUrl() {
+        String defaultNamespace = vreq.getWebappDaoFactory().getDefaultNamespace();
+        String uri = getUri();
+        return uri.startsWith(defaultNamespace) ? uri + "/" + getLocalName() + ".rdf" : null;
+    }
+    
+    public String getEditUrl() {
+        return urlBuilder.getPortalUrl(Route.INDIVIDUAL_EDIT, "uri", getUri());
+    }
+
+    // RY We should not have references to a specific ontology in the vitro code!
+    // Figure out how to move this out of here.
+    // We could subclass IndividualTemplateModel in the VIVO code and add the isPerson()
+    // and getVisualizationUrl() methods there, but we still need to know whether to
+    // instantiate the IndividualTemplateModel or the VivoIndividualTemplateModel class.
+    public boolean isPerson() {
+        return individual.isVClass("http://xmlns.com/foaf/0.1/Person");        
+    }
+    
     public String getSearchView() {        
         return getView(ClassView.SEARCH);
     }
@@ -58,7 +116,7 @@ public class IndividualTemplateModel extends BaseTemplateModel {
     
     private String getView(ClassView view) {
         ViewFinder vf = new ViewFinder(view);
-        return vf.findClassView(individual, servletContext);
+        return vf.findClassView(individual, vreq);
     }
     
     public Link getPrimaryLink() {
@@ -86,7 +144,10 @@ public class IndividualTemplateModel extends BaseTemplateModel {
 
     /* These methods simply forward to the Individual methods. It would be desirable to implement a scheme
        for proxying or delegation so that the methods don't need to be simply listed here. 
-       A Ruby-style method missing method would be ideal. */
+       A Ruby-style method missing method would be ideal. 
+       Update: DynamicProxy doesn't work because the proxied object is of type Individual, so we cannot
+       declare new methods here that are not declared in the Individual interface. 
+    */
     public String getName() {
         return individual.getName();
     }
@@ -111,11 +172,21 @@ public class IndividualTemplateModel extends BaseTemplateModel {
         return individual.getKeywords();
     }
     
-    public String getImageUrl() {
-        return individual.getImageUrl();
+    public String getKeywordString() {
+        // Since this is a display method, the implementation should be moved out of IndividualImpl to here.
+        return individual.getKeywordString();
     }
     
-    public String getThumbUrl() {
-        return individual.getThumbUrl();
+    public String getLocalName() {
+        return individual.getLocalName();
     }
+    
+    public static List<IndividualTemplateModel> getIndividualTemplateModelList(List<Individual> individuals, VitroRequest vreq) {
+        List<IndividualTemplateModel> models = new ArrayList<IndividualTemplateModel>(individuals.size());
+        for (Individual individual : individuals) {
+          models.add(new IndividualTemplateModel(individual, vreq));
+        }  
+        return models;
+    }
+    
 }

@@ -1,6 +1,6 @@
 <%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
 
-<% if (securityLevel >= loginHandler.CURATOR) { %>
+<% if (loginBean.isLoggedInAtLeast(LoginStatusBean.CURATOR) { %>
     <div class="pageBodyGroup">
     
         <h3>Site Configuration</h3>
@@ -16,7 +16,7 @@
         
             <li><a href="listTabs?home=<%=portal.getPortalId()%>">Tab management</a></li>
             
-<%          if (securityLevel >= loginHandler.DBA) { %>
+<%          if (loginBean.isLoggedInAtLeast(LoginStatusBean.DBA) { %>
                 <li><a href="listUsers?home=<%=portal.getPortalId()%>">User accounts</a></li>    
 <%          } %>      
         </ul>

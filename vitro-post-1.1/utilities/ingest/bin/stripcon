@@ -1,0 +1,17 @@
+#!/usr/bin/perl
+
+use Getopt::Std;
+use FileHandle;
+use POSIX qw( strftime );
+use FindBin qw($Bin);
+
+autoflush STDOUT 1;
+
+while($line = <>){
+    @values = split /value=\"/, $line;
+    for($i=0;$i<scalar(@values);$i++){
+	$out = $values[$i];
+	$out =~ s/^(.*?)\".*$/$1/;
+	print $out . "\n";
+    }
+}

@@ -8,7 +8,7 @@ use POSIX qw( strftime );
 use Fcntl qw/:DEFAULT :flock/;
 use English;
 
-getopts('cn:t:X');
+getopts('cCn:t:Xs:');
 #DOCSTART
 #
 #  %Z%%M%  $Revision: %I%, %G% %U% $
@@ -21,6 +21,38 @@ getopts('cn:t:X');
 #
 #
 #DOCEND
+
+@hexchars = split //,"0123456789ABCDEF";
+
+
+sub hexcheck{
+    my($s) = @_;
+    my @tidbits = split //, $s;
+    if(scalar(@tidbits) > 8){
+	print "$s is too long, 8 hex chars expected.\n";
+	return "_ERROR_";
+    }
+    for(my $n=0;$n < scalar(@tidbits);$n++){
+	my $ok = 0;
+	for(my $m=0; $m < 16; $m++){
+	    if(uc($tidbits[$n]) eq $hexchars[$m]){
+		$ok = 1;
+		last;
+	    }
+	}
+	if($ok != 1){
+	    print "$s is not a hex string, 8 hex chars expected.\n";
+	    return "_ERROR_";
+	}
+    }
+    # pad with leading zeros
+    if(scalar(@tidbits) < 8){
+	$s = "0"x(8-scalar(@tidbits)) . $s;
+    }
+    return uc($s);
+
+}
+
 $twist = $opt_t?$opt_t:'';
 
 $f = shift;
@@ -30,10 +62,18 @@ $N = $opt_n?$opt_n:1;
 $inode = myinode($f);
 
 $prefix = $twist . sprintf("%04lX",$REAL_USER_ID) . $inode;
-
-if($opt_c){
+if($opt_s ne ''){
+    my $s = hexcheck($opt_s);
+    exit 1 if($s eq "_ERROR_");
+    setUno($f,$s);
+    printf("%s\n",$s);
+} elsif($opt_c){
     my $next .= curUno($f);
-    print $prefix . $next . "\n";
+    if($opt_C){
+	print $next . "\n";
+    } else {
+	print $prefix . $next . "\n";
+    }
 } else {
     print "<?xml version='1.0'?>\n<Mapping>\n" if $opt_X;
     for(my $i=1;$i<=$N;$i++){
@@ -86,6 +126,18 @@ sub nextUno {
     printf CTR "%08lX",$n;
     close CTR;
     return sprintf("%08lX",$m);
+}
+sub setUno {
+    my($file,$n) = @_;
+    my($res);
+    if(!defined($file)){
+        $file = "./.Uno";
+    }
+    sysopen(CTR,$file, O_RDWR | O_CREAT);
+    autoflush CTR 1;
+    flock(CTR, LOCK_EX);
+    print CTR $n;
+    close CTR;
 }
 sub curUno {
     my($file) = @_;

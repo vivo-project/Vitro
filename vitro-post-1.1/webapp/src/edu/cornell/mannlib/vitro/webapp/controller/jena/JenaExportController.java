@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.jena;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -84,6 +85,15 @@ public class JenaExportController extends BaseEditController {
 		
 		boolean limitToInferred = false;
 		Model inferenceModel = null;
+		
+		if(!subgraphParam.equalsIgnoreCase("tbox") && !subgraphParam.equalsIgnoreCase("abox") && !subgraphParam.equalsIgnoreCase("full")){
+			ontologyURI = subgraphParam;
+			subgraphParam = "tbox";
+			char[] uri =  ontologyURI.toCharArray();
+			ontologyURI="";
+			for(int i =0; i < uri.length-1;i++)
+				ontologyURI = ontologyURI + uri[i];
+		}
 		if ( "inferred".equals(assertedOrInferredParam) ) {
 			limitToInferred = true;
 			inferenceModel = getOntModelFromAttribute( INFERENCES_ONT_MODEL_ATTR, vreq );

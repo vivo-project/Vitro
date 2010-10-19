@@ -7,9 +7,9 @@
         xmlns:bibo="http://purl.org/ontology/bibo/"
         xmlns:foaf="http://xmlns.com/foaf/0.1/"
         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-	xmlns:aiah="http://vivoweb.org/activity-insight"
-	xmlns:acti="http://vivoweb.org/activity-insight#"
-        xmlns="http://vivoweb.org/activity-insight"
+	xmlns:aiah="http://vivoweb.org/ontology/activity-insight"
+	xmlns:acti="http://vivoweb.org/ontology/activity-insight#"
+        xmlns="http://vivoweb.org/ontology/activity-insight"
 xmlns:dm="http://www.digitalmeasures.com/schema/data"	
 	xmlns:vfx='http://vivoweb.org/ext/functions'
 	exclude-result-prefixes='xs vfx'
@@ -38,7 +38,9 @@ xmlns:dm="http://www.digitalmeasures.com/schema/data"
 <rdfs:label>
 <xsl:value-of select="vfx:trim(aiah:award_name)"/>
 </rdfs:label>
-<core:year><xsl:value-of select="aiah:year"/></core:year>
+<xsl:if test='vfx:simple-trim(aiah:year) !=""'>
+<core:year rdf:datatype='http://www.w3.org/2001/XMLSchema#gYear'><xsl:value-of select="aiah:year"/></core:year>
+</xsl:if>
 </rdf:Description>
 
 </xsl:for-each>

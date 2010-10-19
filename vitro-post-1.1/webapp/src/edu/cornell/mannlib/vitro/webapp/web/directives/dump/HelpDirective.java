@@ -90,7 +90,7 @@ public class HelpDirective extends BaseTemplateDirectiveModel {
         examples.add("<@" + name + " directive=\"dump\" />");
         map.put("examples", examples);
         
-        return mergeToTemplate(map, config);
+        return mergeToHelpTemplate(map, config);
     }
 
 }

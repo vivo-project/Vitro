@@ -6,12 +6,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Params;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 
 public class VClassTemplateModel extends BaseTemplateModel {
     
-    private static final Log log = LogFactory.getLog(VClassTemplateModel.class.getName());
+    private static final Log log = LogFactory.getLog(VClassTemplateModel.class);
     private static final String PATH = Route.INDIVIDUAL_LIST.path();
     
     private VClass vclass;
@@ -25,7 +25,7 @@ public class VClassTemplateModel extends BaseTemplateModel {
     }
     
     public String getUrl() {
-        return getUrl(PATH, new Params("vclassId", vclass.getURI()));
+        return getUrl(PATH, new ParamMap("vclassId", vclass.getURI()));
     }
     
     public int getIndividualCount() {

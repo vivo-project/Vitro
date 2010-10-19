@@ -8,6 +8,7 @@ if(scalar(@ARGV) == 0 || $op_usage){
     Usage();
 }
 $g_cwd = $ENV{'PWD'};
+$g_saxonJar = "saxon9he.jar";
 
 GetOptions(
 	   'aiic=s'      => \$op_aiic,
@@ -15,28 +16,35 @@ GetOptions(
 	   'aiis=s'      => \$op_aiis,
 	   'aiisp=s'     => \$op_aiispath,
 	   'bindir=s'    => \$op_bindir,
+	   'clear=s'     => \@Clear,
 	   'debug'       => \$op_debug,
 	   'ic_xchain=s' => \$op_chain,
 	   'is_xchain=s' => \$op_is_chain,
            'jopts=s'     => \@JavaOpts,
+	   'jext=s'      => \$op_jext,
            'L'           => \$op_Live,
 	   'log'         => \$op_log,
 	   'logdir=s'    => \$op_logdir,
      	   'md5'         => \$op_md5,
-	   'newrun'      => \$op_newrun,  
+	   'newraw'      => \$op_newraw,
+	   'nz'          => \$op_nzonly,
 	   'raw=s'       => \$op_raw,
 	   'rawp=s'      => \$op_rawpath,
+	   'reget'       => \$op_reget,
 	   'reuse=s'     => \@UsePrev,
 	   'reuseAll'    => \$op_reuseAll,
+	   'revert'      => \$op_revert,
 	   'step=s'      => \@Steps,
 	   'steps=s'     => \@Steps,
 	   'store=s'     => \$opt_store,
 	   'sparql'      => \$op_sparql,
+           'saxon=s'     => \$g_saxonJar,
 	   'tmp=s'       => \$op_store,
 	   'tsr=s'       => \$op_tsr,
 	   't0'          => \$op_timeZero,
            'u'           => \$op_usage,
 	   'uno=s'       => \$op_uno,
+	   'uset=s'      => \$op_uset,
 	   'uts'         => \$op_use_timestamp,
            'v'           => \$op_verb,
            'workdir=s'   => \$op_workdir,
@@ -71,18 +79,70 @@ autoflush CONSOLE 1;
 
 END {
     my $err = $?;
-    if($?){
-	print CONSOLE "An Error has occurred.\n";
-	print STDOUT "An Error has occurred.\n";
+    print STDOUT 
+	"First uno available in next run " . qx($g_bin/nuno -cC $op_uno);
+    if($err){
+	print CONSOLE 
+	    "\n\t\t>>>>>------> An Error has occurred! <------<<<<<\n\n";
+	print STDOUT  
+	    "\n\t\t>>>>>------> An Error has occurred! <------<<<<<\n";
+	if($op_revert){
+	    if( -e "$g_fb/REVERT_Per0.xml"){
+		print STDOUT "\nreverting $g_fb/Per0.xml\n";
+		qx(mv $g_fb/REVERT_Per0.xml  $g_fb/Per0.xml );
+	    }
+	    if( -e "$g_fb/REVERT_Org0.xml"){
+		print STDOUT "\nreverting $g_fb/Org0.xml\n";
+		qx(mv $g_fb/REVERT_Org0.xml  $g_fb/Org0.xml );
+	    }
+	} else {
+	    if( -e "$g_fb/REVERT_ON_FAULT_Per0.xml"){
+		print STDOUT "\nFault reverting $g_fb/Per0.xml\n";
+		qx(mv $g_fb/REVERT_ON_FAULT_Per0.xml  $g_fb/Per0.xml );
+	    }
+	    if( -e "$g_fb/REVERT_ON_FAULT_Org0.xml"){
+		print STDOUT "\nFault reverting $g_fb/Org0.xml\n";
+		qx(mv $g_fb/REVERT_ON_FAULT_Org0.xml  $g_fb/Org0.xml );
+	    }
+	}
+	qx($g_bin/nuno -s $g_unoMark $op_uno);
+	print STDOUT 
+	  "Restoring uno to $g_unoMark the value at the start of $g_curPhase.";
+	if($op_verb){
+	    my @res = qx(tail -15 $g_log_path);
+	    print CONSOLE join("",@res) . "\n";
+	    print CONSOLE "\nvi $g_log_path\n";
+	}
     } else {
 	print CONSOLE "No Error has occurred.\n";
 	print STDOUT "No Error has occurred.\n";
+	if($op_revert){
+	    if( -e "$g_fb/REVERT_Per0.xml"){
+		print STDOUT "\nreverting $g_fb/Per0.xml\n";
+		qx(mv $g_fb/REVERT_Per0.xml  $g_fb/Per0.xml );
+	    }
+	    if( -e "$g_fb/REVERT_Org0.xml"){
+		print STDOUT "\nreverting $g_fb/Org0.xml\n";
+		qx(mv $g_fb/REVERT_Org0.xml  $g_fb/Org0.xml );
+	    }
+	    qx($g_bin/nuno -s $g_unot0 $op_uno);
+	} 
+	if( -e "$g_fb/REVERT_Per0.xml"){
+	    qx(/bin/rm -f $g_fb/REVERT_Per0.xml );
+	}
+	if( -e "$g_fb/REVERT_Org0.xml"){
+	    qx(/bin/rm -f $g_fb/REVERT_Org0.xml);
+	}
+	
     }
     my $elapsed = time() - $g_T0;
 
     my $t1 = strftime("%Y\%m%d%H\%M\%S", localtime(time()));
     print STDOUT "Last phase attempted: $g_curPhase\n";
+    print CONSOLE "Last phase attempted: $g_curPhase\n";
+    
     print STDOUT "\nEnding at $t1. $elapsed seconds;\n";
+    print CONSOLE "\nEnding at $t1. $elapsed seconds;\n";
     $? = $err;
 }
 
@@ -109,6 +169,7 @@ foreach my $item (@UsePrev){
 	$ReuseOutFiles{uc($item)} = 1;
     }
 }
+@Clear = split(/[,;]/,join(',',@Clear));
 
 $g_curPhase = "";
 %Phases = ();
@@ -206,7 +267,7 @@ my $curRaw = trim($lnk[0]);
 
 if($op_rawpath){
     $g_xmls_raw = $op_rawpath;
-} elsif($op_newrun || $curRaw  eq ''){
+} elsif($op_reget || $curRaw  eq ''){
     $g_xmls_raw = "$g_xmls/$op_raw";
     $g_xmls_raw .= "_" . $g_TSR  if $op_use_timestamp;
 } else {
@@ -217,8 +278,11 @@ if($op_rawpath){
 $g_xmls_raw = $g_cwd . '/' . $g_xmls_raw if  $g_xmls_raw !~ /^\//;
 
 if( !(-e $g_xmls_raw && -w _ && -d _)){
-    print STDERR "Can't create or use raw xml in directory $g_xmls_raw.\n";
-    exit 1;
+    doit("mkdir $g_xmls_raw", "LV");
+    if( !(-e $g_xmls_raw && -w _ && -d _)){
+	print STDERR "Can't create or use raw xml in directory $g_xmls_raw.\n";
+	exit 1;
+    }
 }
 if( ! -e  "$g_xmls/cur-raw"){
     doit("cd $g_xmls; ln -s $g_xmls_raw cur-raw", "LV");
@@ -232,7 +296,7 @@ my $curOut = trim($lnk[0]);
 
 if($op_aiicpath){
     $g_xmls_out = $op_aiicpath;
-} elsif($op_newrun || $curOut  eq ''){
+} elsif($op_reget || $curOut  eq ''){
     $g_xmls_out = "$g_xmls/$op_aiic";
     $g_xmls_out .= "_" . $g_TSR  if $op_use_timestamp;
 } else {
@@ -243,8 +307,11 @@ if($op_aiicpath){
 $g_xmls_out = $g_cwd . '/' . $g_xmls_out if  $g_xmls_out !~ /^\//;
 
 if( !(-e $g_xmls_out && -w _ && -d _)){
-    print STDERR "Can't create or use xml out directory $g_xmls_out.\n";
-    exit 1;
+    doit("mkdir $g_xmls_out", "LV");
+    if( !(-e $g_xmls_out && -w _ && -d _)){
+	print STDERR "Can't create or use xml out directory $g_xmls_out.\n";
+	exit 1;
+    }
 }
 if( ! -e "$g_xmls/cur-aiic" && -e $g_xmls_out){
     doit("cd $g_xmls; ln -s $g_xmls_out cur-aiic", "LV");
@@ -259,7 +326,7 @@ $curOut = trim($lnk[0]);
 
 if($op_aiispath){
     $g_is_xmls_out = $op_aiispath;
-} elsif($op_newrun || $curOut  eq ''){
+} elsif($op_reget || $curOut  eq ''){
     $g_is_xmls_out = "$g_xmls/$op_aiis";
     $g_is_xmls_out .= "_" . $g_TSR  if $op_use_timestamp;
 } else {
@@ -270,8 +337,11 @@ if($op_aiispath){
 $g_is_xmls_out = $g_cwd . '/' . $g_is_xmls_out if  $g_is_xmls_out !~ /^\//;
 
 if( !(-e $g_is_xmls_out && -w _ && -d _)){
-    print STDERR "Can't create or use xml out directory $g_is_xmls_out.\n";
-    exit 1;
+    doit("mkdir $g_is_xmls_out", "LV");
+    if( !(-e $g_is_xmls_out && -w _ && -d _)){
+	print STDERR "Can't create or use xml out directory $g_is_xmls_out.\n";
+	exit 1;
+    }
 }
 
 if( ! -e "$g_xmls/cur-aiis" && -e $g_is_xmls_out){
@@ -284,7 +354,8 @@ if( ! -e "$g_xmls/cur-aiis" && -e $g_is_xmls_out){
 # gotta be able to read xslts
 if( !(-e $op_xslts && -r _ && -d _)){
     print STDERR "Can't find xslt directory $op_xslts.\n";
-    print STDERR "Provide a path to an xslt directory using --xsltdir option\n";
+    print STDERR 
+	"Provide a path to an xslt directory using --xsltdir option\n";
     exit 1;
 }
 # make path absolute if not already
@@ -303,8 +374,8 @@ if( !(-e "$op_xslts/empty.xml" && -r _ )){
 ############################################
 #
 #gotta have saxon jar in xslts directory
-if( !(-e "$op_xslts/saxon9he.jar" && -r _ )){
-    print STDERR "Can't find saxon9he.jar in xslt directory $op_xslts.\n";
+if( !(-e "$op_xslts/$g_saxonJar" && -r _ )){
+    print STDERR "Can't find $g_saxonJar in xslt directory $op_xslts.\n";
     print STDERR "Provide such a file.\n";
     exit 1;
 }
@@ -360,14 +431,14 @@ if($op_log) {
 	open(STDERR,">&LOG");
 	print "Starting at $g_STARTED_AT\n";
 	print "aiIngest " . join(' ',@av) . "\n";
-autoflush STDOUT 1;
+	autoflush STDOUT 1;
     } else {
 	# write to display
 	print "can't open $g_log\n";
 	$g_log_path = "";
     }
 }
-print "\$op_newrun\t= $op_newrun\n";
+print "\$op_reget\t= $op_reget\n";
 print "\$g_work\t\t= $g_work\n";
 print "\$g_log\t\t= $g_log\n" if $op_log;
 print "\$g_xmls\t\t= $g_xmls\n";
@@ -395,6 +466,8 @@ print "\$g_cwd\t\t= $g_cwd\n";
 print "\$op_verb\t= $op_verb\n";
 print "\$op_log\t\t= $op_log\n";
 print "\$op_logdir\t= $op_logdir\n";
+print "\$op_nzonly\t= $op_nzonly\n";
+print "\$op_revert\t= $op_revert\n";
 ############################################
 foreach my $i (@Steps){
     $i =~ s/^-//;
@@ -412,11 +485,17 @@ exit 1 if(mkDirAsNeeded("$g_store/edt-aggregated"));
 exit 1 if(mkDirAsNeeded("$g_store/edu-aggregated"));
 exit 1 if(mkDirAsNeeded("$g_store/med-aggregated"));
 exit 1 if(mkDirAsNeeded("$g_store/adm-aggregated"));
+exit 1 if(mkDirAsNeeded("$g_store/restmt-aggregated"));
+exit 1 if(mkDirAsNeeded("$g_store/pres-aggregated"));
+exit 1 if(mkDirAsNeeded("$g_store/chres-aggregated"));
+exit 1 if(mkDirAsNeeded("$g_store/svcpr-aggregated"));
+exit 1 if(mkDirAsNeeded("$g_store/svcst-aggregated"));
+exit 1 if(mkDirAsNeeded("$g_store/teach-aggregated"));
 
 
 exit 1 if(mkDirAsNeeded("$g_store/ic-digest"));
 exit 1 if(mkDirAsNeeded("$g_store/is-digest"));
-exit 1 if(mkDirAsNeeded("$g_store/aw-digest"));
+
 
 
 
@@ -437,5 +516,63 @@ $g_edt = "$g_store/edt-aggregated";
 $g_edu = "$g_store/edu-aggregated";
 $g_med = "$g_store/med-aggregated";
 $g_adm = "$g_store/adm-aggregated";
+$g_restmt = "$g_store/restmt-aggregated";
+$g_pres = "$g_store/pres-aggregated";
+$g_chres  = "$g_store/chres-aggregated";
+$g_svcpr = "$g_store/svcpr-aggregated";
+$g_svcst = "$g_store/svcst-aggregated";
+$g_teach = "$g_store/teach-aggregated";
+
+
+if( -e "$g_fb/REVERT_Per0.xml"){
+    qx(/bin/rm -f $g_fb/REVERT_Per0.xml );
+}
+if( -e "$g_fb/REVERT_Org0.xml"){
+    qx(/bin/rm -f $g_fb/REVERT_Org0.xml);
+}
+if( -e "$g_fb/REVERT_Per0.xml"){
+    qx(/bin/rm -f $g_fb/REVERT_ON_FAULT_Per0.xml );
+}
+if( -e "$g_fb/REVERT_Org0.xml"){
+    qx(/bin/rm -f $g_fb/REVERT_ON_FAULT_Org0.xml);
+}
+
+qx(/bin/rm -f $g_fb/uri-maps/AT_END_*);
+
+# clear what was specified
+clearFeedbackFilesToTimeZero();
+
+
+# DEAL WITH UNO ISSUES
+#
+#
+$g_unot0 = qx($g_bin/nuno -cC $op_uno);
+if($? >> 8){
+    print STDOUT ">>>> ERROR !!! $g_bin/nuno -cC  $op_uno failed.\n";
+    exit(1);
+}
+print STDOUT "Initial Uno = $g_unot0\n";
+chomp $g_unot0;
+$g_unot_ORIG = $g_unoMark = $g_unot0;
+if($op_uset){
+    my $res = qx($g_bin/nuno -s $op_uset $op_uno);
+    my $r = ($? >> 8);
+    chomp $res;
+    if($res ne $op_uset || $r){
+	print STDOUT 
+	    ">>>> ERROR !!! $g_bin/nuno -s $op_uset $op_uno failed.\n";
+	exit 1;
+    }
+    print STDOUT "Initial Uno $g_unot_ORIG changed to $op_uset\n";
+    $g_unot0 = $op_uset;
+}
+
+if($op_jext eq ''){
+    $g_saxonCmdSequence = " -jar $g_xslts/$g_saxonJar  ";
+} else {
+    $g_saxonCmdSequence = 
+	" -cp $op_jext:$g_xslts/$g_saxonJar com.saxonica.Transform ";
+}
+
 
 1;

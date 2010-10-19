@@ -1,0 +1,293 @@
+#!/usr/bin/perl
+
+use Getopt::Std;
+use FileHandle;
+use POSIX qw( strftime );
+use FindBin qw($Bin);
+autoflush STDOUT 1;
+if(scalar(@ARGV) == 0){
+    Usage();
+    exit 0;
+
+}
+sub Usage {
+    print "isotest\n";
+    print "-b basedir     - parent of xslt, store etc.\n";
+    print "-C number      - match cutoff\n";
+    print "-e number      - empty short mismatch\n";
+    print "-E number      - empty long mismatch\n";
+    print "-p             - Perl mode\n";
+    print "-w number      - middle name weight\n";
+    print "-W number      - first name weight\n";
+    print "-v             - verbose\n";
+}
+getopts("b:C:e:E:pw:W:");
+
+
+$p = "";
+$p = " -p " if $opt_p;
+
+$w1 = 2.0;
+$w2 = 1.0;
+$w1 = $opt_W if $opt_W ne '';
+$w2 = $opt_w if $opt_w  ne '';
+$wt = $w1+$w2;
+
+$wFullFullMatch           =  1.00;
+$wFullFullMisMatch        = -1.00;
+$wEmptyEmptyMatch         =  1.00;
+$wEmptyNonEmptyMisMatch   = -0.55;
+$wEmptyShortMisMatch      = -0.55;
+$wEmptyLongMisMatch       = -0.55;
+$wPartialNonEmptyMisMatch = -0.75;
+$wPartialNonEmptyMatch    =  0.50;
+
+$wEmptyShortMisMatch = $opt_e if $opt_e ne '';
+$wEmptyLongMisMatch = $opt_E if $opt_E ne '';
+
+
+$cutoff = .50;
+$cutoff = $opt_C if $opt_C ne '';
+
+
+sub uniqPush (\@@);
+@testNames = (
+	      ['','','Diehl'],
+	      ['','G','Diehl'],
+	      ['','P','Diehl'],
+	      ['','Grant','Diehl'],
+	      ['','Peter','Diehl'],
+	      ['A','','Diehl'],
+	      ['A','G','Diehl'],
+	      ['A','P','Diehl'],
+	      ['A','Grant','Diehl'],
+	      ['A','Peter','Diehl'],
+	      ['Alan','','Diehl'],
+	      ['Alan','G','Diehl'],
+	      ['Alan','P','Diehl'],
+	      ['Alan','Grant','Diehl'],
+	      ['Alan','Peter','Diehl'],
+	      ['B','','Diehl'],
+	      ['B','G','Diehl'],
+	      ['B','P','Diehl'],
+	      ['B','Grant','Diehl'],
+	      ['B','Peter','Diehl'],
+	      ['Bill','','Diehl'],
+	      ['Bill','G','Diehl'],
+	      ['Bill','P','Diehl'],
+	      ['Bill','Grant','Diehl'],
+	      ['Bill','Peter','Diehl'],
+             );
+
+print "Proposed Name Matching Algorithm\n\n";
+print "Assumptions:\n";
+print " 1. Last names must match\n";
+print " 2. name parts have normalized space\n";
+print " 3. the chrs '\"-.; are removed\n";
+print " 4. alpha chrs are shifted to upper case\n";
+print "\n";
+print "Name match scores are in [-1,1];\n";
+print " -1.00 ~ least confidence,\n";
+print "  0.00 ~ neutral,\n";
+print "  1.00 ~ most confidence.\n";
+print "\n";
+print "\n";
+print "In the MATCH TABLE below\n";
+print "P1, P2 are name parts - both first names or \n";
+print "both middle names. E, S, L are part types:\n";
+print "E ~ empty, S ~ short (1 chr), L ~ long ( >2 chrs)\n";
+print "C  M -  confidence given a match \n";
+print "C ~M -  confidence given no match\n";
+print "Note: DEFAULT VALUES are shown in this table!\n";
+print "\n";
+print "       (W*Cf + w*Cm)\n";
+print "  Cc  = -----------\n";
+print "           W + w\n";
+print "\n";
+print "Cf, Cm, Cc are first name, middle name and\n";
+print "combined confidences respectively.\n";
+print "W = $w1, w = $w2 \n";
+print "\n";
+print "  MATCH  TABLE\n";
+print "------------------\n";
+print "P1 P2  C  M   C ~M\n";
+print "------------------\n";
+print "E  E   1.00   0.00\n";
+print "E  S   0.00  -0.55\n";
+print "S  E   0.00  -0.55\n";
+print "E  L   0.00  -0.55\n";
+print "L  E   0.00  -0.55\n";
+print "S  S   0.50  -0.75\n";
+print "S  L   0.50  -0.75\n";
+print "L  S   0.50  -0.75\n";
+print "L  L   1.00  -1.00\n";
+print "\n";
+print "\n";
+print "E vs E Match             =$wEmptyEmptyMatch\n";
+print "E vs S, S vs E MisMatch  =$wEmptyShortMisMatch\n";
+print "E vs L, L vs E MisMatch  =$wEmptyLongMisMatch\n";
+print "L vs L Match             =$wFullFullMatch\n";
+print "L vs L MisMatch          =$wFullFullMisMatch \n";
+print "\n";
+print "Cutoff = $cutoff\n";
+print "------------------------------\n";
+for(my $i=0;$i<scalar(@testNames);$i++){
+    my $n = join(',',@{$testNames[$i]});
+    for(my $j=0;$j<scalar(@testNames);$j++){
+	my $N = join(',',@{$testNames[$j]});
+	my @res=();
+	if($opt_p){
+	    @n = split /[,;| ]/,$n;
+	    if(scalar(@n) == 0){
+		Usage();
+		exit 1;
+	    } elsif(scalar(@n) == 1){
+		$n[2] = $n[0];
+		$n[0] = $n[1] = '';
+	    } elsif(scalar(@n) == 2){
+		$n[2] = $n[1];
+		$n[1] = '';
+	    }
+	    @N = split /[,;| ]/,$N;
+	    if(scalar(@N) == 0){
+		Usage();
+		exit 1;
+	    } elsif(scalar(@N) == 1){
+		$N[2] = $N[0];
+		$N[0] = $N[1] = '';
+	    } elsif(scalar(@N) == 2){
+		$N[2] = $N[1];
+		$N[1] = '';
+	    }
+	    @res[0] = score($w1,$w2);
+	} else {
+	    @res = qx(score $p -b . -n $n -N $N);
+	}
+	printf("%-20s\tvs\t%-20s\t", $n , $N);
+	for(my $k = 0; $k < scalar(@res); $k++){
+	    if($opt_p){
+		printf("%6.3f",$res[0]);
+		$H{$n ." vs " .$N} = $res[0] if $res[0] >= $cutoff;
+	    } else {
+		if($res[$k] =~ /<Ans>(.*?)<\/Ans>/){
+		    printf("%6.2f",$1);
+		} 
+	    }
+	}
+	print "\n";
+    }
+    print "------------------------------\n";
+}
+print "\nAll matches (i.e. score >= $cutoff)\n";
+print "------------------------------\n";
+@NN=@nn=();
+
+foreach $k (keys %H){
+
+    my($n,$N) = map { trim($_); } split(/vs/,$k);
+    printf("%-20s\tvs\t%-20s\t%6.3f\n", $n , $N, $H{$k});
+    uniqPush @NN , $N;
+    uniqPush @nn , $n;
+}
+print "\n===============================\n";
+foreach my $n (sort @nn){
+    my $line = $n . " ";
+    my @eq=();
+    foreach my $N (sort @NN){
+	uniqPush(@eq,$N) if defined $H{$n ." vs " .$N};
+    }
+    print "$line: " . join(", ",@eq) . "\n";
+}
+
+sub score {
+    my ($w1,$w2) = @_;
+    #print scalar(@n);
+    my @cn = clean(\@n);
+    my @cN = clean(\@N);
+    #print STDERR join("foo",@cn) . "\n";
+    if($cn[2] ne $cN[2]){
+	return -1.0;
+    }
+    if("$cn[0]|$cn[1]" eq "$cN[0]|$cN[1]"){
+	return 1.00;
+    }
+    my $fc = conf($cn[0],$cN[0]);
+    my $mc = conf($cn[1],$cN[1]);
+    
+    return ($fc * $w1 + $mc * $w2) / ($w1 + $w2);
+}
+
+sub conf {
+    my($s1,$s2)=@_;
+    if(length($s1) >= 1 && length($s2) >= 1){
+	if(length($s1) > 1 && length($s2) > 1){
+	    if($s1 eq $s2){
+		return $wFullFullMatch;
+	    } else {
+		return $wFullFullMisMatch;
+	    }
+	} else {
+	    #print STDERR "msg " . substr($s1,0,1) . "\n";
+	    #print STDERR "msg " . substr($s2,0,1) . "\n";
+	    if(substr($s1,0,1) eq substr($s2,0,1)){
+		return $wPartialNonEmptyMatch;
+	    } else {
+		return $wPartialNonEmptyMisMatch;
+	    }
+	}
+    } elsif(length($s1) == 0 && length($s2) > 1){ # E L
+	return $wEmptyLongMisMatch;
+    } elsif(length($s1) > 1 && length($s2) == 0){ # L E
+	return $wEmptyLongMisMatch;
+    } elsif(length($s1) == 0 && length($s2) == 1){ # E S
+	return $wEmptyShortMisMatch;
+    } elsif(length($s1) == 1 && length($s2) == 0){ # S E
+	return $wEmptyShortMisMatch;
+    } else {
+	return $wEmptyEmptyMatch;
+    }
+}
+sub uniqPush (\@@) {
+    my $ara = shift;
+    my @items = @_;
+
+    my($i,$k,$x);
+    for($k=0;$k<=$#items;$k++){
+        $x = $items[$k];
+        for($i = 0; $i<=$#$ara; $i++){
+            if($x eq $$ara[$i]){
+                last;
+            }
+        }
+        push(@$ara,$x) if $i > $#$ara ;
+
+    }
+    return $#$ara;
+}
+
+
+sub clean {
+    my($arap) = @_;
+    my @res = ();
+    #print scalar(@$arap);
+    for(my $i=0;$i<scalar(@$arap);$i++){
+	my $item = $$arap[$i];
+	$item =~ s/[\-,.;\"\']/ /g;
+	$item =~ s/\s+/ /g;
+	$item = trim($item);
+	$res[$i] = $item;
+    }
+    return @res;
+}
+
+sub trim {
+    my($a) = @_;
+    $a =~ s/^\s*(\S+)\s*$/$1/;
+    $a =~ s/^\s*(\S.*\S)\s*$/$1/;
+    $a =~ s/(\s*)//;
+    return $a;
+}
+
+
+
+ #score -b . -n Alan,G.,Diehl -N Alan,P,Diehl

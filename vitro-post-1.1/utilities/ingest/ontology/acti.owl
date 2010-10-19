@@ -15,263 +15,453 @@
     xmlns:swvs="http://www.w3.org/2003/06/sw-vocab-status/ns#"
     xmlns:owl="http://www.w3.org/2002/07/owl#"
     xmlns:dcterms="http://purl.org/dc/terms/"
-    xmlns:acti="http://vivoweb.org/activity-insight#"
+    xmlns:acti="http://vivoweb.org/ontology/activity-insight#"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
     xmlns:swrl="http://www.w3.org/2003/11/swrl#"
-    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" > 
-  <rdf:Description rdf:about="http://vivoweb.org/activity-insight#USDAAreaOf">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
-    <owl:inverseOf rdf:resource="http://vivoweb.org/activity-insight#hasUSDAArea"/>
-    <rdfs:label xml:lang="en-US">USDA Area of</rdfs:label>
-    <rdfs:range rdf:resource="http://vivoweb.org/activity-insight#ImpactProject"/>
-    <rdfs:domain rdf:resource="http://vivoweb.org/activity-insight#USDAArea"/>
-    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">5</j.1:displayLimitAnnot>
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+
+
+
+  <owl:Class rdf:about="http://vivoweb.org/ontology/activity-insight#Intellcont">
+    <rdfs:label xml:lang="en-US">Intellectual Contribution</rdfs:label>
+    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >-1</j.1:displayLimitAnnot>
+    <j.1:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >-1</j.1:displayRankAnnot>
     <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
     <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
-    <j.1:selectFromExistingAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</j.1:selectFromExistingAnnot>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://vivoweb.org/activity-insight#impactStatementIssue">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </owl:Class>
+  <owl:Class rdf:about="http://vivoweb.org/ontology/activity-insight#CommentOnGrant">
+    <rdfs:label xml:lang="en-US">Comment on Grant</rdfs:label>
+    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >-1</j.1:displayLimitAnnot>
+    <j.1:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >-1</j.1:displayRankAnnot>
     <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
     <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
-    <rdfs:label xml:lang="en-US">impact statement issue</rdfs:label>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://vivoweb.org/activity-insight#PartnerRole">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+  </owl:Class>
+  <owl:Class rdf:about="http://vivoweb.org/ontology/activity-insight#PriorityArea">
+    <rdfs:label xml:lang="en-US">Priority Area</rdfs:label>
+    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >-1</j.1:displayLimitAnnot>
+    <j.1:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >-1</j.1:displayRankAnnot>
+    <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
+    <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
+    <rdfs:subClassOf rdf:resource="http://vivoweb.org/ontology/core#SubjectArea"/>
+    <j.1:inClassGroup rdf:resource="http://vivoweb.org/ontology#vitroClassGroupactivities"/>
+  </owl:Class>
+  <owl:Class rdf:about="http://vivoweb.org/ontology/activity-insight#PlannedEffort">
+    <rdfs:label xml:lang="en-US">Planned Effort</rdfs:label>
+    <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
+    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >-1</j.1:displayLimitAnnot>
+    <j.1:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >-1</j.1:displayRankAnnot>
+    <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
+    <j.1:inClassGroup rdf:resource="http://vivoweb.org/ontology#vitroClassGroupactivities"/>
+  </owl:Class>
+  <owl:Class rdf:about="http://vivoweb.org/ontology/activity-insight#ImpactProject">
+    <rdfs:label xml:lang="en-US">Impact Project</rdfs:label>
+    <j.1:inClassGroup rdf:resource="http://vivoweb.org/ontology#vitroClassGroupactivities"/>
+    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >-1</j.1:displayLimitAnnot>
+    <j.1:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >-1</j.1:displayRankAnnot>
+    <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
+    <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
+  </owl:Class>
+  <owl:Class rdf:about="http://vivoweb.org/ontology/activity-insight#PartnerRole">
     <rdfs:label xml:lang="en-US">Partner Role</rdfs:label>
-    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.1:displayLimitAnnot>
-    <j.1:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.1:displayRankAnnot>
+    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >-1</j.1:displayLimitAnnot>
+    <j.1:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >-1</j.1:displayRankAnnot>
     <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
     <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
-    <j.1:customShortViewAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">researcherRoleShortView.jsp</j.1:customShortViewAnnot>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://vivoweb.org/activity-insight#otherPrivateFunding">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
-    <rdfs:label xml:lang="en-US">Other private funding</rdfs:label>
+    <j.1:customShortViewAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >researcherRoleShortView.jsp</j.1:customShortViewAnnot>
+    <rdfs:subClassOf rdf:resource="http://vivoweb.org/ontology/core#Role"/>
+  </owl:Class>
+  <owl:Class rdf:about="http://vivoweb.org/ontology/activity-insight#GrantCostForYear">
+    <rdfs:label xml:lang="en-US">Grant Cost For Year</rdfs:label>
+    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >-1</j.1:displayLimitAnnot>
+    <j.1:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >-1</j.1:displayRankAnnot>
     <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
     <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
-    <rdfs:subPropertyOf rdf:resource="http://vivoweb.org/ontology/core#freetextKeyword"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://vivoweb.org/activity-insight#usdaAreaIlk">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
-    <rdfs:label xml:lang="en-US">USDA Area kind</rdfs:label>
+  </owl:Class>
+  <owl:Class rdf:about="http://vivoweb.org/ontology/activity-insight#ContributionArea">
+    <rdfs:label xml:lang="en-US">Contribution Area</rdfs:label>
+    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >-1</j.1:displayLimitAnnot>
+    <j.1:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >-1</j.1:displayRankAnnot>
     <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
     <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://vivoweb.org/activity-insight#priorityAreaOf">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
-    <owl:inverseOf rdf:resource="http://vivoweb.org/activity-insight#hasPriorityArea"/>
-    <rdfs:label xml:lang="en-US">academic priority of</rdfs:label>
-    <rdfs:range rdf:resource="http://vivoweb.org/activity-insight#ImpactProject"/>
-    <rdfs:domain rdf:resource="http://vivoweb.org/activity-insight#PriorityArea"/>
-    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">5</j.1:displayLimitAnnot>
+    <rdfs:subClassOf rdf:resource="http://vivoweb.org/ontology/core#SubjectArea"/>
+    <j.1:inClassGroup rdf:resource="http://vivoweb.org/ontology#vitroClassGrouptopics"/>
+  </owl:Class>
+  <owl:Class rdf:about="http://vivoweb.org/ontology/activity-insight#ConcentrationArea">
+    <rdfs:label xml:lang="en-US">Concentration Area</rdfs:label>
+    <j.1:inClassGroup rdf:resource="http://vivoweb.org/ontology#vitroClassGroupactivities"/>
+    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >-1</j.1:displayLimitAnnot>
+    <j.1:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >-1</j.1:displayRankAnnot>
     <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
     <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
-    <j.1:selectFromExistingAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</j.1:selectFromExistingAnnot>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://vivoweb.org/activity-insight#hasUSDAArea">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
-    <owl:inverseOf rdf:resource="http://vivoweb.org/activity-insight#USDAAreaOf"/>
-    <rdfs:label xml:lang="en-US">has USDA Area</rdfs:label>
-    <rdfs:domain rdf:resource="http://vivoweb.org/activity-insight#ImpactProject"/>
-    <rdfs:range rdf:resource="http://vivoweb.org/activity-insight#USDAArea"/>
-    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">5</j.1:displayLimitAnnot>
+  </owl:Class>
+  <owl:Class rdf:about="http://vivoweb.org/ontology/activity-insight#ActivityInsightPerson">
+    <rdfs:label xml:lang="en-US">Activity Insight Person</rdfs:label>
+    <j.1:inClassGroup rdf:resource="http://vivoweb.org/ontology#vitroClassGrouppeople"/>
+    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >-1</j.1:displayLimitAnnot>
+    <j.1:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >-1</j.1:displayRankAnnot>
     <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
     <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
-    <j.1:selectFromExistingAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</j.1:selectFromExistingAnnot>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://vivoweb.org/activity-insight#fundingIlk">
-    <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
-    <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
-    <rdfs:label xml:lang="en-US">funding ilk</rdfs:label>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://vivoweb.org/activity-insight#otherFedExtensionFunding">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
-    <rdfs:label xml:lang="en-US">Other federal extension funding</rdfs:label>
-    <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
-    <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
-    <rdfs:subPropertyOf rdf:resource="http://vivoweb.org/ontology/core#freetextKeyword"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://vivoweb.org/activity-insight#usdaAreas">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
-    <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
-    <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
-    <rdfs:label xml:lang="en-US">USDA areas</rdfs:label>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://vivoweb.org/activity-insight#USDAArea">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:subClassOf rdf:resource="http://xmlns.com/foaf/0.1/Person"/>
+  </owl:Class>
+  <owl:Class rdf:about="http://vivoweb.org/ontology/activity-insight#USDAArea">
     <rdfs:label xml:lang="en-US">USDA Area</rdfs:label>
-    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.1:displayLimitAnnot>
-    <j.1:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.1:displayRankAnnot>
+    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >-1</j.1:displayLimitAnnot>
+    <j.1:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >-1</j.1:displayRankAnnot>
     <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
     <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
     <rdfs:subClassOf rdf:resource="http://vivoweb.org/ontology/core#SubjectArea"/>
     <j.1:inClassGroup rdf:resource="http://vivoweb.org/ontology#vitroClassGrouptopics"/>
     <j.1:autoLinkedToTab rdf:resource="http://vivo.mydomain.edu/individual/tab2017536944"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://vivoweb.org/activity-insight#PriorityArea">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:label xml:lang="en-US">Priority Area</rdfs:label>
-    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.1:displayLimitAnnot>
-    <j.1:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.1:displayRankAnnot>
+  </owl:Class>
+  <owl:ObjectProperty rdf:about="http://vivoweb.org/ontology/activity-insight#USDAAreaOf">
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://vivoweb.org/ontology/activity-insight#hasUSDAArea"/>
+    </owl:inverseOf>
+    <rdfs:label xml:lang="en-US">USDA Area of</rdfs:label>
+    <rdfs:range rdf:resource="http://vivoweb.org/ontology/activity-insight#ImpactProject"/>
+    <rdfs:domain rdf:resource="http://vivoweb.org/ontology/activity-insight#USDAArea"/>
+    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >5</j.1:displayLimitAnnot>
     <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
     <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
-    <rdfs:subClassOf rdf:resource="http://vivoweb.org/ontology/core#SubjectArea"/>
-    <j.1:inClassGroup rdf:resource="http://vivoweb.org/ontology#vitroClassGroupactivities"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://vivoweb.org/activity-insight#otherFederalFunding">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <j.1:selectFromExistingAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >true</j.1:selectFromExistingAnnot>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://vivoweb.org/ontology/activity-insight#hasYearlyCost">
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://vivoweb.org/ontology/activity-insight#yearlyCostFor"/>
+    </owl:inverseOf>
+    <rdfs:label xml:lang="en-US">has yearly cost</rdfs:label>
+    <rdfs:domain rdf:resource="http://vivoweb.org/ontology/core#Grant"/>
+    <rdfs:range rdf:resource="http://vivoweb.org/ontology/activity-insight#GrantCostForYear"/>
+    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >5</j.1:displayLimitAnnot>
     <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
     <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
-    <rdfs:subPropertyOf rdf:resource="http://vivoweb.org/ontology/core#freetextKeyword"/>
-    <rdfs:label xml:lang="en-US">Other federal funding</rdfs:label>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://vivoweb.org/activity-insight#impactStatementImpact">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <j.1:selectFromExistingAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >true</j.1:selectFromExistingAnnot>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://vivoweb.org/ontology/activity-insight#concentrationSubjectOf">
+    <rdfs:label xml:lang="en-US">concentration subject area</rdfs:label>
+    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >5</j.1:displayLimitAnnot>
     <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
     <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
-    <rdfs:label xml:lang="en-US">impact statement impact</rdfs:label>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://vivoweb.org/activity-insight#collaboratorRank">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <j.1:selectFromExistingAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >true</j.1:selectFromExistingAnnot>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://vivoweb.org/ontology/activity-insight#plannedEffortFor">
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://vivoweb.org/ontology/activity-insight#hasPlannedEffort"/>
+    </owl:inverseOf>
+    <rdfs:label xml:lang="en-US">planned effort for</rdfs:label>
+    <rdfs:range rdf:resource="http://vivoweb.org/ontology/core#Grant"/>
+    <rdfs:domain rdf:resource="http://vivoweb.org/ontology/activity-insight#PlannedEffort"/>
+    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >5</j.1:displayLimitAnnot>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://vivoweb.org/ontology/activity-insight#hasComment">
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://vivoweb.org/ontology/activity-insight#commentsOn"/>
+    </owl:inverseOf>
+    <rdfs:label xml:lang="en-US">has comment</rdfs:label>
+    <rdfs:domain rdf:resource="http://vivoweb.org/ontology/core#Grant"/>
+    <rdfs:range rdf:resource="http://vivoweb.org/ontology/activity-insight#CommentOnGrant"/>
+    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >5</j.1:displayLimitAnnot>
+    <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
+    <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
+    <j.1:selectFromExistingAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >true</j.1:selectFromExistingAnnot>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://vivoweb.org/ontology/activity-insight#partnerRoleOf">
+    <rdfs:label xml:lang="en-US">partner role of</rdfs:label>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://vivoweb.org/ontology/activity-insight#hasPartnerRole"/>
+    </owl:inverseOf>
+    <rdfs:subPropertyOf rdf:resource="http://vivoweb.org/ontology/core#roleOf"/>
+    <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
+    <rdfs:domain rdf:resource="http://vivoweb.org/ontology/activity-insight#PartnerRole"/>
+    <rdfs:range rdf:resource="http://xmlns.com/foaf/0.1/Organization"/>
+    <j.1:selectFromExistingAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >true</j.1:selectFromExistingAnnot>
+    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >5</j.1:displayLimitAnnot>
+    <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://vivoweb.org/ontology/activity-insight#hasPriorityArea">
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://vivoweb.org/ontology/activity-insight#priorityAreaOf"/>
+    </owl:inverseOf>
+    <rdfs:label xml:lang="en-US">has academic priority</rdfs:label>
+    <rdfs:domain rdf:resource="http://vivoweb.org/ontology/activity-insight#ImpactProject"/>
+    <rdfs:range rdf:resource="http://vivoweb.org/ontology/activity-insight#PriorityArea"/>
+    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >5</j.1:displayLimitAnnot>
+    <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
+    <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
+    <j.1:selectFromExistingAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >true</j.1:selectFromExistingAnnot>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://vivoweb.org/ontology/activity-insight#priorityAreaOf">
+    <owl:inverseOf rdf:resource="http://vivoweb.org/ontology/activity-insight#hasPriorityArea"/>
+    <rdfs:label xml:lang="en-US">academic priority of</rdfs:label>
+    <rdfs:range rdf:resource="http://vivoweb.org/ontology/activity-insight#ImpactProject"/>
+    <rdfs:domain rdf:resource="http://vivoweb.org/ontology/activity-insight#PriorityArea"/>
+    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >5</j.1:displayLimitAnnot>
+    <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
+    <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
+    <j.1:selectFromExistingAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >true</j.1:selectFromExistingAnnot>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://vivoweb.org/ontology/activity-insight#hasUSDAArea">
+    <owl:inverseOf rdf:resource="http://vivoweb.org/ontology/activity-insight#USDAAreaOf"/>
+    <rdfs:label xml:lang="en-US">has USDA Area</rdfs:label>
+    <rdfs:domain rdf:resource="http://vivoweb.org/ontology/activity-insight#ImpactProject"/>
+    <rdfs:range rdf:resource="http://vivoweb.org/ontology/activity-insight#USDAArea"/>
+    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >5</j.1:displayLimitAnnot>
+    <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
+    <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
+    <j.1:selectFromExistingAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >true</j.1:selectFromExistingAnnot>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://vivoweb.org/ontology/activity-insight#contributionAreaOf">
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://vivoweb.org/ontology/activity-insight#hasContributionArea"/>
+    </owl:inverseOf>
+    <rdfs:label xml:lang="en-US">contribution area of</rdfs:label>
+    <rdfs:range rdf:resource="http://vivoweb.org/ontology/activity-insight#ImpactProject"/>
+    <rdfs:domain rdf:resource="http://vivoweb.org/ontology/activity-insight#ContributionArea"/>
+    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >5</j.1:displayLimitAnnot>
+    <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
+    <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
+    <j.1:selectFromExistingAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >true</j.1:selectFromExistingAnnot>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://vivoweb.org/ontology/activity-insight#commentsOn">
+    <owl:inverseOf rdf:resource="http://vivoweb.org/ontology/activity-insight#hasComment"/>
+    <rdfs:label xml:lang="en-US">comments on</rdfs:label>
+    <rdfs:range rdf:resource="http://vivoweb.org/ontology/core#Grant"/>
+    <rdfs:domain rdf:resource="http://vivoweb.org/ontology/activity-insight#CommentOnGrant"/>
+    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >5</j.1:displayLimitAnnot>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://vivoweb.org/ontology/activity-insight#hasConcentrationSubjectArea">
+    <rdfs:label xml:lang="en-US">has concentration subject area</rdfs:label>
+    <rdfs:subPropertyOf rdf:resource="http://vivoweb.org/ontology/core#hasSubjectArea"/>
+    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >5</j.1:displayLimitAnnot>
+    <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
+    <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
+    <j.1:selectFromExistingAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >true</j.1:selectFromExistingAnnot>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://vivoweb.org/ontology/activity-insight#previouslyFunded">
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://vivoweb.org/ontology/activity-insight#previouslyFundedBy"/>
+    </owl:inverseOf>
+    <rdfs:label xml:lang="en-US">previously funded</rdfs:label>
+    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >5</j.1:displayLimitAnnot>
+    <rdfs:range rdf:resource="http://vivoweb.org/ontology/core#Grant"/>
+    <rdfs:domain rdf:resource="http://xmlns.com/foaf/0.1/Organization"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://vivoweb.org/ontology/activity-insight#submissionReceivedBy">
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://vivoweb.org/ontology/activity-insight#receivedSubmission"/>
+    </owl:inverseOf>
+    <rdfs:label xml:lang="en-US">submission received by</rdfs:label>
+    <rdfs:domain rdf:resource="http://vivoweb.org/ontology/core#Grant"/>
+    <rdfs:range rdf:resource="http://xmlns.com/foaf/0.1/Organization"/>
+    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >5</j.1:displayLimitAnnot>
+    <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
+    <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
+    <j.1:selectFromExistingAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >true</j.1:selectFromExistingAnnot>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://vivoweb.org/ontology/activity-insight#hasPartnerRole">
+    <rdfs:range rdf:resource="http://vivoweb.org/ontology/activity-insight#PartnerRole"/>
+    <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
+    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >5</j.1:displayLimitAnnot>
+    <rdfs:domain rdf:resource="http://xmlns.com/foaf/0.1/Organization"/>
+    <rdfs:subPropertyOf rdf:resource="http://vivoweb.org/ontology/core#hasRole"/>
+    <j.1:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >2</j.1:displayRankAnnot>
+    <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
+    <rdfs:label xml:lang="en-US">has partner role</rdfs:label>
+    <owl:inverseOf rdf:resource="http://vivoweb.org/ontology/activity-insight#partnerRoleOf"/>
+    <j.1:selectFromExistingAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >true</j.1:selectFromExistingAnnot>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://vivoweb.org/ontology/activity-insight#previouslyFundedBy">
+    <owl:inverseOf rdf:resource="http://vivoweb.org/ontology/activity-insight#previouslyFunded"/>
+    <rdfs:label xml:lang="en-US">previously funded by</rdfs:label>
+    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >5</j.1:displayLimitAnnot>
+    <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
+    <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
+    <j.1:selectFromExistingAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >true</j.1:selectFromExistingAnnot>
+    <rdfs:domain rdf:resource="http://vivoweb.org/ontology/core#Grant"/>
+    <rdfs:range rdf:resource="http://xmlns.com/foaf/0.1/Organization"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://vivoweb.org/ontology/activity-insight#hasPlannedEffort">
+    <owl:inverseOf rdf:resource="http://vivoweb.org/ontology/activity-insight#plannedEffortFor"/>
+    <rdfs:label xml:lang="en-US">has planned effort</rdfs:label>
+    <rdfs:domain rdf:resource="http://vivoweb.org/ontology/core#Grant"/>
+    <rdfs:range rdf:resource="http://vivoweb.org/ontology/activity-insight#PlannedEffort"/>
+    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >5</j.1:displayLimitAnnot>
+    <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
+    <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
+    <j.1:selectFromExistingAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >true</j.1:selectFromExistingAnnot>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://vivoweb.org/ontology/activity-insight#yearlyCostFor">
+    <owl:inverseOf rdf:resource="http://vivoweb.org/ontology/activity-insight#hasYearlyCost"/>
+    <rdfs:label xml:lang="en-US">yearly cost for</rdfs:label>
+    <rdfs:range rdf:resource="http://vivoweb.org/ontology/core#Grant"/>
+    <rdfs:domain rdf:resource="http://vivoweb.org/ontology/activity-insight#GrantCostForYear"/>
+    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >5</j.1:displayLimitAnnot>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://vivoweb.org/ontology/activity-insight#receivedSubmission">
+    <owl:inverseOf rdf:resource="http://vivoweb.org/ontology/activity-insight#submissionReceivedBy"/>
+    <rdfs:label xml:lang="en-US">received submission</rdfs:label>
+    <rdfs:range rdf:resource="http://vivoweb.org/ontology/core#Grant"/>
+    <rdfs:domain rdf:resource="http://xmlns.com/foaf/0.1/Organization"/>
+    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >5</j.1:displayLimitAnnot>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://vivoweb.org/ontology/activity-insight#hasContributionArea">
+    <owl:inverseOf rdf:resource="http://vivoweb.org/ontology/activity-insight#contributionAreaOf"/>
+    <rdfs:label xml:lang="en-US">has contribution area</rdfs:label>
+    <rdfs:domain rdf:resource="http://vivoweb.org/ontology/activity-insight#ImpactProject"/>
+    <rdfs:range rdf:resource="http://vivoweb.org/ontology/activity-insight#ContributionArea"/>
+    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >5</j.1:displayLimitAnnot>
+    <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
+    <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
+    <j.1:selectFromExistingAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >true</j.1:selectFromExistingAnnot>
+  </owl:ObjectProperty>
+  <owl:DatatypeProperty rdf:about="http://vivoweb.org/ontology/activity-insight#collaboratorRank">
     <rdfs:label xml:lang="en-US">collaborator rank</rdfs:label>
     <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
     <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
     <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://vivoweb.org/activity-insight#fundingType">
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://vivoweb.org/ontology/activity-insight#impactStatementIssue">
+    <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
+    <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
+    <rdfs:label xml:lang="en-US">impact statement issue</rdfs:label>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://vivoweb.org/ontology/activity-insight#fundingType">
     <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
     <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
     <rdfs:label xml:lang="en-US">funding type</rdfs:label>
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://vivoweb.org/activity-insight#partnerRoleOf">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
-    <owl:inverseOf rdf:resource="http://vivoweb.org/activity-insight#hasPartnerRole"/>
-    <rdfs:label xml:lang="en-US">partner role of</rdfs:label>
-    <rdfs:domain rdf:resource="http://vivoweb.org/activity-insight#PartnerRole"/>
-    <rdfs:range rdf:resource="http://xmlns.com/foaf/0.1/Organization"/>
-    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">5</j.1:displayLimitAnnot>
-    <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
-    <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
-    <j.1:selectFromExistingAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</j.1:selectFromExistingAnnot>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://vivoweb.org/activity-insight#hasPriorityArea">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
-    <owl:inverseOf rdf:resource="http://vivoweb.org/activity-insight#priorityAreaOf"/>
-    <rdfs:label xml:lang="en-US">has academic priority</rdfs:label>
-    <rdfs:domain rdf:resource="http://vivoweb.org/activity-insight#ImpactProject"/>
-    <rdfs:range rdf:resource="http://vivoweb.org/activity-insight#PriorityArea"/>
-    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">5</j.1:displayLimitAnnot>
-    <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
-    <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
-    <j.1:selectFromExistingAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</j.1:selectFromExistingAnnot>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://vivoweb.org/activity-insight#involvedAreaIlk">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://vivoweb.org/ontology/activity-insight#involvedAreaIlk">
     <rdfs:label xml:lang="en-US">kind of involved area</rdfs:label>
     <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
     <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://vivoweb.org/activity-insight#otherFedResearchFunding">
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://vivoweb.org/ontology/activity-insight#usdaAreaIlk">
+    <rdfs:label xml:lang="en-US">USDA Area kind</rdfs:label>
     <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
     <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://vivoweb.org/ontology/activity-insight#otherPrivateFunding">
+    <rdfs:label xml:lang="en-US">Other private funding</rdfs:label>
+    <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
+    <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
+    <rdfs:subPropertyOf rdf:resource="http://vivoweb.org/ontology/core#freetextKeyword"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://vivoweb.org/ontology/activity-insight#otherFedResearchFunding">
+    <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
+    <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
     <rdfs:subPropertyOf rdf:resource="http://vivoweb.org/ontology/core#freetextKeyword"/>
     <rdfs:label xml:lang="en-US">Other federal research funding</rdfs:label>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://vivoweb.org/activity-insight#otherAcademicFunding">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://vivoweb.org/ontology/activity-insight#otherAcademicFunding">
     <rdfs:label xml:lang="en-US">Other academic funding</rdfs:label>
     <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
     <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
     <rdfs:subPropertyOf rdf:resource="http://vivoweb.org/ontology/core#freetextKeyword"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://vivoweb.org/activity-insight#contributionAreaOf">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
-    <owl:inverseOf rdf:resource="http://vivoweb.org/activity-insight#hasContributionArea"/>
-    <rdfs:label xml:lang="en-US">contribution area of</rdfs:label>
-    <rdfs:range rdf:resource="http://vivoweb.org/activity-insight#ImpactProject"/>
-    <rdfs:domain rdf:resource="http://vivoweb.org/activity-insight#ContributionArea"/>
-    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">5</j.1:displayLimitAnnot>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://vivoweb.org/ontology/activity-insight#fundingIlk">
+    <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
+    <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
+    <rdfs:label xml:lang="en-US">funding ilk</rdfs:label>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://vivoweb.org/ontology/activity-insight#otherFedExtensionFunding">
+    <rdfs:label xml:lang="en-US">Other federal extension funding</rdfs:label>
     <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
     <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
-    <j.1:selectFromExistingAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</j.1:selectFromExistingAnnot>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://vivoweb.org/activity-insight#ContributionArea">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:label xml:lang="en-US">Contribution Area</rdfs:label>
-    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.1:displayLimitAnnot>
-    <j.1:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.1:displayRankAnnot>
-    <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
-    <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
-    <rdfs:subClassOf rdf:resource="http://vivoweb.org/ontology/core#SubjectArea"/>
-    <j.1:inClassGroup rdf:resource="http://vivoweb.org/ontology#vitroClassGrouptopics"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://vivoweb.org/activity-insight#ActivityInsightPerson">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:label xml:lang="en-US">Activity Insight Person</rdfs:label>
-    <j.1:inClassGroup rdf:resource="http://vivoweb.org/ontology#vitroClassGrouppeople"/>
-    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.1:displayLimitAnnot>
-    <j.1:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.1:displayRankAnnot>
-    <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
-    <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
-    <rdfs:subClassOf rdf:resource="http://xmlns.com/foaf/0.1/Person"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://vivoweb.org/activity-insight#researchType">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:subPropertyOf rdf:resource="http://vivoweb.org/ontology/core#freetextKeyword"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://vivoweb.org/ontology/activity-insight#researchType">
     <rdfs:label xml:lang="en-US">research type</rdfs:label>
     <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
     <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://vivoweb.org/activity-insight#impactStatementSummary">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://vivoweb.org/ontology/activity-insight#usdaAreas">
+    <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
+    <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
+    <rdfs:label xml:lang="en-US">USDA areas</rdfs:label>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://vivoweb.org/ontology/activity-insight#impactStatementSummary">
     <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
     <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
     <rdfs:label xml:lang="en-US">impact statement summary</rdfs:label>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://vivoweb.org/activity-insight#investigatorDepartment">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://vivoweb.org/ontology/activity-insight#investigatorDepartment">
     <rdfs:label xml:lang="en-US">investigator department</rdfs:label>
     <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
     <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://vivoweb.org/activity-insight#hasPartnerRole">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
-    <owl:inverseOf rdf:resource="http://vivoweb.org/activity-insight#partnerRoleOf"/>
-    <rdfs:label xml:lang="en-US">has partner role</rdfs:label>
-    <rdfs:range rdf:resource="http://vivoweb.org/activity-insight#PartnerRole"/>
-    <rdfs:domain rdf:resource="http://xmlns.com/foaf/0.1/Organization"/>
-    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">5</j.1:displayLimitAnnot>
-    <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
-    <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
-    <j.1:selectFromExistingAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</j.1:selectFromExistingAnnot>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://vivoweb.org/activity-insight#impactStatementResponse">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://vivoweb.org/ontology/activity-insight#impactStatementResponse">
     <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
     <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
     <rdfs:label xml:lang="en-US">impact statement response</rdfs:label>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://vivoweb.org/activity-insight#ImpactProject">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-    <rdfs:label xml:lang="en-US">Impact Project</rdfs:label>
-    <j.1:inClassGroup rdf:resource="http://vivoweb.org/ontology#vitroClassGroupactivities"/>
-    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.1:displayLimitAnnot>
-    <j.1:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.1:displayRankAnnot>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://vivoweb.org/ontology/activity-insight#otherFederalFunding">
     <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
     <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://vivoweb.org/activity-insight#hasContributionArea">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
-    <owl:inverseOf rdf:resource="http://vivoweb.org/activity-insight#contributionAreaOf"/>
-    <rdfs:label xml:lang="en-US">has contribution area</rdfs:label>
-    <rdfs:domain rdf:resource="http://vivoweb.org/activity-insight#ImpactProject"/>
-    <rdfs:range rdf:resource="http://vivoweb.org/activity-insight#ContributionArea"/>
-    <j.1:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">5</j.1:displayLimitAnnot>
+    <rdfs:subPropertyOf rdf:resource="http://vivoweb.org/ontology/core#freetextKeyword"/>
+    <rdfs:label xml:lang="en-US">Other federal funding</rdfs:label>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://vivoweb.org/ontology/activity-insight#impactStatementImpact">
     <j.1:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
     <j.1:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public"/>
-    <j.1:selectFromExistingAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</j.1:selectFromExistingAnnot>
-  </rdf:Description>
+    <rdfs:label xml:lang="en-US">impact statement impact</rdfs:label>
+  </owl:DatatypeProperty>
 </rdf:RDF>

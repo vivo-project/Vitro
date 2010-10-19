@@ -6,7 +6,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpSession;
 
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.RoleBasedPolicy;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.RoleBasedPolicy.AuthRole;
 
@@ -16,15 +16,14 @@ public class EditorEditingIdentifierFactory implements IdentifierBundleFactory{
             HttpSession session, ServletContext context) {
         IdentifierBundle ib = new ArrayIdentifierBundle();
         ib.add( RoleBasedPolicy.AuthRole.ANYBODY);
-        if( session != null ){
-            LoginFormBean f = (LoginFormBean) session.getAttribute( "loginHandler" );
-            try{
-                if( f != null && Integer.parseInt( f.getLoginRole() ) >=  LoginFormBean.EDITOR){
-                    ib.add(new EditorEditingId(f.getLoginRole(), f.getUserURI()));
-                    ib.add(AuthRole.EDITOR);
-                }
-            }catch(NumberFormatException th){ }
-        }
+        
+		LoginStatusBean loginBean = LoginStatusBean.getBean(session);
+		if (loginBean.isLoggedInAtLeast(LoginStatusBean.EDITOR)) {
+			String loginRole = String.valueOf(loginBean.getSecurityLevel());
+            ib.add(new EditorEditingId(loginRole, loginBean.getUserURI()));
+            ib.add(AuthRole.EDITOR);
+		}
+
         return ib;        
     }
 

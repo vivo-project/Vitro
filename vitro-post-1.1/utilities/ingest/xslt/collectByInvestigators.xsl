@@ -2,9 +2,9 @@
 <xsl:stylesheet version='2.0'
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 	xmlns:ai="http://www.digitalmeasures.com/schema/data"
-	xmlns:aiis="http://vivoweb.org/activity-insight"
-	xmlns:mapid="http://vivoweb.org/activity-insight"
-	xmlns="http://vivoweb.org/activity-insight"
+	xmlns:aiis="http://vivoweb.org/ontology/activity-insight"
+	xmlns:mapid="http://vivoweb.org/ontology/activity-insight"
+	xmlns="http://vivoweb.org/ontology/activity-insight"
 	xmlns:dm="http://www.digitalmeasures.com/schema/data"
 	xmlns:xs='http://www.w3.org/2001/XMLSchema'
 	xmlns:vfx='http://vivoweb.org/ext/functions'	
@@ -34,7 +34,7 @@
 
 <!-- begin wrapper element -->
 <xsl:element name="aiis:INVESTIGATOR_LIST" 
-	namespace="http://vivoweb.org/activity-insight">
+	namespace="http://vivoweb.org/ontology/activity-insight">
 
 <!-- =============== -->
 <!-- 
@@ -42,8 +42,8 @@
  by uppercased constructed name
 -->
 <xsl:for-each-group select='$docs/Data/LOCAL_COLLABORATOR_LIST/COLLABORATOR[@ilk="invest"]' 
-	group-by='vfx:collapse(concat(LNAME, ", ", FNAME, " ", MNAME))'>
-<xsl:sort select='vfx:collapse(concat(LNAME, ", ", FNAME, " ", MNAME))'/>
+	group-by='vfx:collapse(concat(LNAME, "|", FNAME, "|", MNAME))'>
+<xsl:sort select='vfx:collapse(concat(LNAME, "|", FNAME, "|", MNAME))'/>
 
 <xsl:variable name='cur_netid' select='../../Record/username'/>
 <xsl:variable name='cur_aiid' select='../../Record/userId'/>

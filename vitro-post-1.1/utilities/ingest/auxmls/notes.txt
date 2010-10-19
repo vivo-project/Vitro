@@ -315,3 +315,275 @@ java -jar /home/jrm424/aiw/test/xslt/saxon9he.jar `pwd`/Per1-ICAR-At201008121311
 
 
 
+bin/aiIngest --L --v --log --aiic IC --aiis IS --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps AR,JR,ICAR,ICPR,MIR,MCER,MFOR,MGR,MPAR,MUAR,MCAR,MAWR,MGRNT,MGRNT_INV,MGRNT_SPON,MGRNT_ARS,MGRNT_PFA,MGRNT_PE,MGRNT_COST,MGRNT_COMM
+
+
+====================================================
+
+java -jar xslt/saxon9he.jar xslt/empty.xml xslt/editChair.xsl listxml=../store/gr-aggregated/nzraw.xml > store/ceditchair.xml
+
+grep '<aiec:EDITCHAIR ' store/ceditchair.xml | wc -l
+bin/nuno -X -n 655 -t AI- > store/ec-unomap.xml
+
+java -jar xslt/saxon9he.jar store/ceditchair.xml xslt/mkEditChairRdf.xsl unoMapFile=../store/ec-unomap.xml.xml rawXmlPath=/home/jrm424/aiw/test/AIXMLS/cur-raw 
+
+------------
+java -jar xslt/saxon9he.jar xslt/empty.xml xslt/editChairPerson.xsl listxml=../store/gr-aggregated/nzraw.xml > store/ceditchairperson.xml
+
+grep '<aiec:EDITCHAIR ' store/ceditchairperson.xml | wc -l
+bin/nuno -X -n 655 -t AI- > store/ecper-unomap.xml
+
+java -jar xslt/saxon9he.jar store/ceditchairperson.xml xslt/mkEditChairPersonRdf.xsl unoMapFile=../store/ecper-unomap.xml rawXmlPath=/home/jrm424/aiw/test/AIXMLS/cur-raw extPerIn=../store/feedback/Per0.xml extPerOut=../store/foo.xml
+
+-----------
+
+ java -jar xslt/saxon9he.jar xslt/empty.xml xslt/education.xsl  listxml=../store/gr-aggregated/nzraw.xml > store/ceducation.xml
+
+
+grep '<aiedu:EDUCATION ' store/ceducation.xml | wc -l
+bin/nuno -X -n 226  -t AI- > store/edu-unomap.xml
+
+java -jar xslt/saxon9he.jar store/ceducation.xml xslt/mkEducationRdf.xsl unoMapFile=../store/edu-unomap.xml rawXmlPath=/home/jrm424/aiw/test/AIXMLS/cur-raw 
+
+-----------
+
+java -jar xslt/saxon9he.jar xslt/empty.xml xslt/educationPerson.xsl listxml=../store/gr-aggregated/nzraw.xml > store/ceducationperson.xml
+
+grep 'counter' store/ceducationperson.xml | wc -l
+bin/nuno -X -n 100  -t AI- > store/eduper-unomap.xml
+
+java -jar xslt/saxon9he.jar store/ceducationperson.xml xslt/mkEducationPersonRdf.xsl unoMapFile=../store/eduper-unomap.xml rawXmlPath=/home/jrm424/aiw/test/AIXMLS/cur-raw extPerIn=../store/feedback/Per0.xml extPerOut=../store/foo.xml
+
+-----------
+
+ java -jar xslt/saxon9he.jar xslt/empty.xml xslt/medcont.xsl  listxml=../store/gr-aggregated/nzraw.xml > store/cmedcont.xml
+
+
+grep '<aimc:MEDCONT ' store/cmedcont.xml | wc -l
+bin/nuno -X -n 226  -t AI- > store/medcont-unomap.xml
+
+java -jar xslt/saxon9he.jar store/cmedcont.xml xslt/mkMedcontRdf.xsl unoMapFile=../store/medcont-unomap.xml rawXmlPath=/home/jrm424/aiw/test/AIXMLS/cur-raw 
+
+-----------
+
+java -jar xslt/saxon9he.jar xslt/empty.xml xslt/medcontPerson.xsl listxml=../store/gr-aggregated/nzraw.xml > store/cmedcontperson.xml
+
+grep 'counter' store/cmedcontperson.xml | wc -l
+bin/nuno -X -n 100  -t AI- > store/medper-unomap.xml
+
+java -jar xslt/saxon9he.jar store/cemedcontperson.xml xslt/mkMedcontPersonRdf.xsl unoMapFile=../store/medper-unomap.xml rawXmlPath=/home/jrm424/aiw/test/AIXMLS/cur-raw extPerIn=../store/feedback/Per0.xml extPerOut=../store/foo.xml
+
+-----------
+
+ java -jar xslt/saxon9he.jar xslt/empty.xml xslt/admin.xsl listxml=../store/nzraw.xml > store/cadmin.xml
+
+ 
+ grep '<aiadm:ADMIN '  store/cadmin.xml | wc -l
+ bin/nuno -X -n 500  -t AI- > store/adm-unomap.xml
+
+ java -jar xslt/saxon9he.jar store/cadmin.xml xslt/mkAdminRdf.xsl unoMapFile=../store/adm-unomap.xml  rawXmlPath=/home/jrm424/aiw/test/AIXMLS/cur-raw 
+
+
+-----------
+java -jar xslt/saxon9he.jar xslt/empty.xml xslt/chResearchPerson.xsl listxml=../store/nzraw.xml aiid2netid=../store/ic-aggregated/aiid-netid.xml > store/chresearchperson.xml
+
+grep 'counter' store/chresearchperson.xml | wc -l
+ bin/nuno -X -n 10  -t AI- > store/chr-unomap.xml
+
+java -jar xslt/saxon9he.jar -o store/rdf/chResearchPerson.rdf store/chresearchperson.xml  xslt/mkCHResearchPerson.xsl  unoMapFile=../store/chr-unomap.xml rawXmlPath=/home/jrm424/aiw/test/AIXMLS/cur-raw extPerIn=../store/feedback/Per0.xml extPerOut=../store/foo.xml
+====================================================
+
+
+
+
+java -jar xslt/saxon9he.jar xslt/empty.xml xslt/chResearchPerson.xsl listxml=../store/nzraw.xml aiid2netid=../store/ic-aggregated/aiid-netid.xml > store/chresearchperson.xml
+
+grep 'counter' store/chresearchperson.xml | wc -l
+bin/nuno -X -n 10  -t AI- > store/chrp-unomap.xml
+
+java -jar xslt/saxon9he.jar -o store/rdf/chResearchPerson.rdf store/chresearchperson.xml  xslt/mkCHResearchPerson.xsl  unoMapFile=../store/chrp-unomap.xml rawXmlPath=/home/jrm424/aiw/test/AIXMLS/cur-raw extPerIn=../store/feedback/Per0.xml extPerOut=../store/foo.xml
+
+----------------
+
+java -jar xslt/saxon9he.jar xslt/empty.xml xslt/chResearch.xsl listxml=../store/nzraw.xml > store/chresearch.xml
+
+grep 'counter' store/chresearch.xml | wc -l
+bin/nuno -X -n 10  -t AI- > store/chr-unomap.xml
+
+java -jar xslt/saxon9he.jar store/chresearch.xml xslt/mkCHResearch.xsl  unoMapFile=../store/chr-unomap.xml rawXmlPath=/home/jrm424/aiw/test/AIXMLS/cur-raw
+
+----------------
+
+
+
+java -jar xslt/saxon9he.jar xslt/empty.xml xslt/cPresentation.xsl listxml=../store/nzraw.xml > store/cpresentation.xml
+
+java -jar xslt/saxon9he.jar  store/cpresentation.xml xslt/mkPresentation.xsl unoMapFile=../store/pres-unomap.xml rawXmlPath=/home/jrm424/aiw/test/AIXMLS/cur-raw > store/rdf/presentation.rdf
+
+java -jar xslt/saxon9he.jar xslt/empty.xml xslt/cPresentationPerson.xsl listxml=../store/nzraw.xml aiid2netid=../store/raw-aiid-netid.xml  > store/cpresentationperson.xml
+
+java -jar xslt/saxon9he.jar -o store/rdf/presentationPerson.rdf store/cpresentationperson.xml  xslt/mkPresentationPerson.xsl  unoMapFile=../store/presp-unomap.xml rawXmlPath=/home/jrm424/aiw/test/AIXMLS/cur-raw extPerIn=../store/feedback/Per0.xml extPerOut=../store/foo.xml
+
+
+java -jar xslt/saxon9he.jar xslt/empty.xml xslt/cPresentationOrg.xsl listxml=../store/nzraw.xml aiid2netid=../store/raw-aiid-netid.xml > store/cpresentationorg.xml
+
+grep index store/cpresentationorg.xml | wc -l
+bin/nuno -Xn 700 -t AI- > store/preso-unomap.xml
+
+java -jar xslt/saxon9he.jar -o store/rdf/presentationOrg.rdf store/cpresentationorg.xml  xslt/mkPresentationOrg.xsl  unoMapFile=../store/preso-unomap.xml rawXmlPath=/home/jrm424/aiw/test/AIXMLS/cur-raw extOrgIn=../store/feedback/Org0.xml extOrgOut=../store/foo.xml
+
+
+java -jar xslt/saxon9he.jar xslt/empty.xml xslt/education.xsl listxml=../store/nzraw.xml > store/ceducation.xml
+
+ grep '<aiedu:EDUCATION ' store/ceducation.xml | wc -l
+bin/nuno -Xn 226 -t AI- > store/ced-unomap.xml
+ java -jar xslt/saxon9he.jar store/ceducation.xml xslt/mkEducationRdf.xsl  unoMapFile=../store/ced-unomap.xml  rawXmlPath=/home/jrm424/aiw/test/AIXMLS/cur-raw > store/rdf/education.rdf
+
+java -jar xslt/saxon9he.jar xslt/empty.xml xslt/educationPerson.xsl  listxml=../store/nzraw.xml aiid2netid=../store/raw-aiid-netid.xml > store/educationPerson.xml
+
+grep index store/educationPerson.xml | wc -l
+bin/nuno -Xn 100 -t AI- > store/edup-unomap.xml
+
+java -jar xslt/saxon9he.jar -o store/rdf/educationPerson.rdf store/educationPerson.xml  xslt/mkEducationPersonRdf.xsl  unoMapFile=../store/edup-unomap.xml rawXmlPath=/home/jrm424/aiw/test/AIXMLS/cur-raw extPerIn=../store/feedback/Per0.xml extPerOut=../store/foo.xml
+
+java -jar xslt/saxon9he.jar xslt/empty.xml xslt/chResearch.xsl listxml=../store/nzraw.xml > store/chresearch.xml
+
+java -jar xslt/saxon9he.jar store/chresearch.xml xslt/mkCHResearch.xsl  unoMapFile=../store/chr-unomap.xml rawXmlPath=/home/jrm424/aiw/test/AIXMLS/cur-raw > store/rdf/CHResearch.rdf
+
+////////////////////////////////////////
+
+gen-objc --obj ADMIN --nsp aiadm  > admin.xsl
+gen-perc --obj ADMIN --nsp aiadm  > adminPerson.xsl
+gen-mkor --obj ADMIN --nsp aiadm --class Admin > mkAdminRdf.xsl
+gen-mkpr --obj ADMIN --nsp aiadm --class Admin --to acti --from acti > mkAdminPersonRdf.xsl
+
+
+gen-obj-collabc --obj PRESENT --nsp aipres >cPresentation.xsl
+gen-orgc --obj PRESENT --nsp aipres --grpby ORG --orgtag ORG > cPresentationOrg.xsl
+gen-per-collabc --obj PRESENT --nsp aipres --peeptag PRESENT_AUTH > cPresentationPerson.xsl
+gen-mkor-collab --obj PRESENT --nsp aipres --class Presentation --ont core > mkPresentation.xsl
+gen-mkpr-collab --obj PRESENT --nsp aipres --abrv PRES --role Presenter > mkPresentationPerson.xsl
+gen-mkorgr --obj PRESENT --nsp aipres --class Presentation --to core --from core > mkPresentationOrg.xsl
+
+gen-obj-collabc --obj CHRESEARCH --nsp aichr > chResearch.xsl
+gen-per-collabc --obj CHRESEARCH --nsp aichr --peeptag CHRESEARCH_AUTH > chResearchPerson.xsl
+gen-mkpr-collab --obj CHRESEARCH --nsp aichr --abrv CHR --role Researcher > mkCHResearchPerson.xsl
+gen-mkor-collab --obj CHRESEARCH --nsp aichr --class CHResearch > mkCHResearch.xsl
+
+
+
+////////////////////////////////////////
+
+
+ bin/aiIngest --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --aiic IC --aiis IS --steps IC,CA,CJ,CIA,CIP,CAW --uts
+
+////////////////////////////////////////
+
+java -jar xslt/saxon9he.jar -o store/rdf/researchStmt.rdf store/cresearchStmtPerson.xml  xslt/mkResearchStmtPersonRdf.xsl  unoMapFile=../store/rsp-unomap.xml rawXmlPath=/home/jrm424/aiw/test/AIXMLS/cur-raw extPerIn=../store/feedback/Per0.xml extPerOut=../store/foo.xml 
+concentrationIn=../store/cresearchStmtConcentration.xml collaborationIn=../store/cresearchStmtArea.xml
+
+
+
+ java -jar xslt/saxon9he.jar -o store/rdf/researchStmt.rdf store/cresearchStmtPerson.xml  xslt/mkResearchStmtPersonRdf.xsl  unoMapFile=../store/rsp-unomap.xml rawXmlPath=/home/jrm424/aiw/test/AIXMLS/cur-raw extPerIn=../store/feedback/Per0.xml extPerOut=../store/foo.xml concentrationIn=../store/ConcentrationArea.xml collaborationIn=../store/cresearchStmtArea.xml
+
+
+[jrm424@joe-dev2 ~]$ mkConXml adjConcentrationChoices.txt
+
+ cp ConcentrationArea.xml `aiw test/store`
+
+
+ java -jar xslt/saxon9he.jar -o store/rdf/researchStmt.rdf store/cresearchStmtPerson.xml  xslt/mkResearchStmtRdf.xsl  unoMapFile=../store/rsp-unomap.xml rawXmlPath=/home/jrm424/aiw/test/AIXMLS/cur-raw extPerIn=../store/feedback/Per0.xml extPerOut=../store/foo.xml concentrationIn=../store/ConcentrationArea.xml
+
+ vi store/rdf/researchStmt.rdf
+
+-----------------------------------------------
+
+java -jar xslt/saxon9he.jar xslt/empty.xml xslt/svcprof.xsl listxml=../store/nzraw.xml > store/csvcprof.xml
+
+
+ java -jar xslt/saxon9he.jar xslt/empty.xml xslt/svcproforg.xsl listxml=../store/nzraw.xml > store/csvcproforg.xml
+
+
+ java -jar xslt/saxon9he.jar xslt/empty.xml xslt/svcprofper.xsl listxml=../store/nzraw.xml > store/csvcprofper.xml
+
+
+grep index store/csvcprof.xml | wc
+nuno -X -n 500 -t AI- > store/svcprof-unomap.xml
+
+ java -jar xslt/saxon9he.jar -o store/rdf/svcProf.rdf store/csvcprof.xml  xslt/mkSvcProfRdf.xsl  unoMapFile=../store/svcprof-unomap.xml rawXmlPath=/home/jrm424/aiw/test/AIXMLS/cur-raw 
+
+grep counter store/csvcprofper.xml | wc
+nuno -X -n 100  -t AI- > store/svcprofper-unomap.xml
+
+java -jar xslt/saxon9he.jar -o store/rdf/svcProfPer.rdf store/csvcprofper.xml  xslt/mkSvcProfPerRdf.xsl  unoMapFile=../store/svcprofper-unomap.xml rawXmlPath=/home/jrm424/aiw/test/AIXMLS/cur-raw extPerIn=../store/feedback/Per0.xml extPerOut=../store/feedback/foo.xml 
+
+
+
+grep index store/csvcproforg.xml | wc
+nuno -X -n 500  -t AI- > store/svcproforg-unomap.xml
+java -jar xslt/saxon9he.jar -o store/rdf/svcProfOrg.rdf store/csvcproforg.xml  xslt/mkSvcProfOrgRdf.xsl  unoMapFile=../store/svcproforg-unomap.xml rawXmlPath=/home/jrm424/aiw/test/AIXMLS/cur-raw extOrgIn=../store/feedback/Per0.xml extOrgOut=../store/feedback/foo.xml 
+---------------------------
+~/xsltgen/gen-objc --obj SERVICE_PROFESSIONAL --nsp aisvcprof > svcprof.xsl
+~/xsltgen/gen-orgc --obj SERVICE_PROFESSIONAL --nsp aisvcprof --grpby ORG > svcproforg.xsl
+~/xsltgen/gen-perc --obj SERVICE_PROFESSIONAL --nsp aisvcprof  > svcprofper.xsl
+
+ ~/xsltgen/gen-mkor --obj SERVICE_PROFESSIONAL --nsp aisvcprof --ont http://vivoweb.org/ontology/core# --class ServiceProviderRole > mkSvcProf.xsl
+
+~/xsltgen/gen-mkorgr --obj SERVICE_PROFESSIONAL --nsp aisvcprof --ont http://vivoweb.org/ontology/core# --class ServiceProviderRole --to acti --from acti > mkSvcProfOrgRdf.xsl
+
+~/xsltgen/gen-mkpr --obj SERVICE_PROFESSIONAL --nsp aisvcprof --ont http://vivoweb.org/ontology/core# --class ServiceProviderRole --to acti --from acti > mkSvcProfPerRdf.xsl
+ 
+---------------------------
+
+~/xsltgen/gen-perc --obj SERVICE_STATEMENT  --nsp aisvcstmt > svcstmt.xsl
+
+~/xsltgen/gen-mkpr --obj SERVICE_STATEMENT --nsp aisvcstmt --class ??? > mkSvcStmtRdf.xsl
+
+---------------------------
+
+ java -jar xslt/saxon9he.jar xslt/empty.xml xslt/teachstmt.xsl listxml=../store/nzraw.xml > store/cteachstmt.xml
+ nuno -X -n 1808   -t AI- > store/teachStmt-unomap.xml
+ java -jar xslt/saxon9he.jar -o store/rdf/teachStmt.rdf store/cteachstmt.xml  xslt/mkTeachStmtRdf.xsl  unoMapFile=../store/teachStmt-unomap.xml rawXmlPath=/home/jrm424/aiw/test/AIXMLS/cur-raw extPerIn=../store/feedback/Per0.xml extPerOut=../store/feedback/foo.xml 
+
+ java -jar xslt/saxon9he.jar xslt/empty.xml xslt/svcprofevent.xsl listxml=../store/nzraw.xml > store/csvcprofevent.xml
+
+ava -jar xslt/saxon9he.jar -o store/rdf/svcProfEvent.rdf store/csvcprofevent.xml xslt/mkSvcProfEventRdf.xsl unoMapFile=../store/svcproevnt-unomap.xml rawXmlPath=/home/jrm424/aiw/test/AIXMLS/cur-raw
+
+-------------------------------------------------
+to make/fake presence of cu vivo persons
+aiw test
+java -jar xslt/saxon9he.jar store/Users.xml xslt/aicuv-users.xsl fpx=../store/feedback/personsAtTimeZero.xml > foo.xml
+
+java -jar xslt/saxon9he.jar foo.xml xslt/mkMiddleNameRdf.xsl > cuvpfoaf.rdf
+
+
+-------------------------------------------------
+
+java -jar xslt/saxon9he.jar xslt/empty.xml xslt/education.xsl listxml=../store/nzraw.xml > store/ceducation.xml
+
+ java -jar xslt/saxon9he.jar store/ceducation.xml xslt/mkEducationRdf.xsl  unoMapFile=../store/ced-unomap.xml  rawXmlPath=/home/jrm424/aiw/test/AIXMLS/cur-raw knownDegrees=../store/KnownVivoDegrees.xml 
+
+
+java -jar xslt/saxon9he.jar xslt/empty.xml xslt/educationOrg.xsl listxml=../store/nzraw.xml > store/ceducationOrg.xml
+
+grep index store/ceducationOrg.xml | wc
+nuno -X -n 124 -t AI- > store/eduorg-unomap.xml
+
+java -jar xslt/saxon9he.jar -o store/rdf/educationOrg.rdf store/ceducationorg.xml  xslt/mkEducationOrg.xsl  unoMapFile=../store/eduorg-unomap.xml rawXmlPath=/home/jrm424/aiw/test/AIXMLS/cur-raw extOrgIn=../store/feedback/Org0.xml extOrgOut=../store/foo.xml
+
+
+ java -jar xslt/saxon9he.jar xslt/empty.xml xslt/educationPerson.xsl listxml=../store/nzraw.xml > store/ceducationPerson.xml
+
+ java -jar xslt/saxon9he.jar -o store/rdf/educationPerson.rdf store/educationPerson.xml  xslt/mkEducationPersonRdf.xsl  unoMapFile=../store/edup-unomap.xml rawXmlPath=/home/jrm424/aiw/test/AIXMLS/cur-raw extPerIn=../store/feedback/Per0.xml extPerOut=../store/foo.xml
+
+
+-------------------------------------------------
+
+bin/aiIngest --L --v --log --aiic IC --aiis IS --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps AR,JR,ICAR,ICPR,MIR,MCER,MFOR,MGR,MPAR,MUAR,MCAR,MAWR,MGRNT,MGRNT_INV,MGRNT_SPON,MEDU,MEDUP,MEDUO
+
+
+cprdf -b . -d `vivo submodels` -Lv
+
+bin/aiIngest --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps MGRNT,MGRNT_INV,MGRNT_SPON --revert --reuseAll
+
+aiIngest  --L --v --log  --steps GU,GX --reget --uts -aiic IC -aiis IS

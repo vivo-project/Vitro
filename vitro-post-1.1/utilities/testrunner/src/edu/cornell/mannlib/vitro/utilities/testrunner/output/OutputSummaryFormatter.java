@@ -11,13 +11,17 @@ import java.io.Reader;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Map;
 
 import edu.cornell.mannlib.vitro.utilities.testrunner.FileHelper;
+import edu.cornell.mannlib.vitro.utilities.testrunner.IgnoredTests.IgnoredTestInfo;
 import edu.cornell.mannlib.vitro.utilities.testrunner.LogStats;
 import edu.cornell.mannlib.vitro.utilities.testrunner.SeleniumRunnerParameters;
 import edu.cornell.mannlib.vitro.utilities.testrunner.Status;
 import edu.cornell.mannlib.vitro.utilities.testrunner.datamodel.DataModel;
-import edu.cornell.mannlib.vitro.utilities.testrunner.output.SuiteResults.TestResults;
+import edu.cornell.mannlib.vitro.utilities.testrunner.datamodel.SuiteData;
+import edu.cornell.mannlib.vitro.utilities.testrunner.datamodel.SuiteData.TestData;
+import edu.cornell.mannlib.vitro.utilities.testrunner.output.OutputDataListener.ProcessOutput;
 
 /**
  * Creates the summary HTML file.
@@ -55,10 +59,9 @@ public class OutputSummaryFormatter {
 			writeHeader(writer);
 			writeStatsSection(writer);
 			writeErrorMessagesSection(writer);
-			writeFailureSection(writer);
+			writeCondensedTable(writer);
 			writeIgnoreSection(writer);
-			writeSuitesSection(writer);
-			writeAllTestsSection(writer);
+			writeSuiteErrorMessagesSection(writer);
 			writeFooter(writer);
 		} catch (IOException e) {
 			// There is no appeal for any problems here. Just report them.
@@ -91,194 +94,210 @@ public class OutputSummaryFormatter {
 		}
 	}
 
-	private void writeHeader(PrintWriter writer) {
+	private void writeHeader(PrintWriter w) {
 		Status runStatus = dataModel.getRunStatus();
+		String statusString = (runStatus == Status.PENDING) ? "IN PROGRESS"
+				: runStatus.toString();
 		String startString = formatDateTime(dataModel.getStartTime());
 
-		writer.println("<html>");
-		writer.println("<head>");
-		writer.println("  <title>Summary of Acceptance Tests " + startString
+		w.println("<html>");
+		w.println("<head>");
+		w.println("  <title>Summary of Acceptance Tests " + startString
 				+ "</title>");
-		writer.println("  <link rel=\"stylesheet\" type=\"text/css\" "
+		w.println("  <link rel=\"stylesheet\" type=\"text/css\" "
 				+ "href=\"summary.css\">");
-		writer.println("</head>");
-		writer.println("<body>");
-		writer.println();
-		writer.println("  <div class=\"heading\">");
-		writer.println("    Acceptance test results: " + startString);
-		writer.println("    <div class=\"" + runStatus.getHtmlClass()
-				+ " one-word\">" + runStatus + "</div>");
-		writer.println("  </div>");
+		w.println("</head>");
+		w.println("<body>");
+		w.println();
+		w.println("  <div class=\"heading\">");
+		w.println("    Acceptance test results: " + startString);
+		w.println("    <div class=\"" + runStatus.getHtmlClass()
+				+ " one-word\">" + statusString + "</div>");
+		w.println("  </div>");
 	}
 
-	private void writeStatsSection(PrintWriter writer) {
+	private void writeStatsSection(PrintWriter w) {
 		String passClass = dataModel.isAnyPasses() ? Status.OK.getHtmlClass()
 				: "";
 		String failClass = dataModel.isAnyFailures() ? Status.ERROR
 				.getHtmlClass() : "";
-		String ignoreClass = dataModel.isAnyIgnores() ? Status.WARN
+		String ignoreClass = dataModel.isAnyIgnores() ? Status.IGNORED
 				.getHtmlClass() : "";
 
 		String start = formatDateTime(dataModel.getStartTime());
 		String end = formatDateTime(dataModel.getEndTime());
 		String elapsed = formatElapsedTime(dataModel.getElapsedTime());
 
-		writer.println("  <div class=\"section\">Summary</div>");
-		writer.println();
-		writer.println("  <table class=\"summary\" cellspacing=\"0\">");
-		writer.println("    <tr>");
-		writer.println("      <td>");
-		writer.println("        <table cellspacing=\"0\">");
-		writer.println("  	      <tr><td>Start time:</td><td>" + start
+		w.println("  <div class=\"section\">Summary</div>");
+		w.println();
+		w.println("  <table class=\"summary\" cellspacing=\"0\">");
+		w.println("    <tr>");
+		w.println("      <td>");
+		w.println("        <table cellspacing=\"0\">");
+		w.println("  	      <tr><td>Start time:</td><td>" + start
 				+ "</td></tr>");
-		writer.println("  	      <tr><td>End time:</td><td>" + end
+		w.println("  	      <tr><td>End time:</td><td>" + end + "</td></tr>");
+		w.println("  	      <tr><td>Elapsed time</td><td>" + elapsed
 				+ "</td></tr>");
-		writer.println("  	      <tr><td>Elapsed time</td><td>" + elapsed
-				+ "</td></tr>");
-		writer.println("  	    </table>");
-		writer.println("      </td>");
-		writer.println("      <td>");
-		writer.println("        <table class=\"tallys\" cellspacing=\"0\">");
-		writer.println("          <tr><th>&nbsp;</th><th>Suites</th><th>Tests</th>");
-		writer.println("          <tr class=\"" + passClass
+		w.println("  	    </table>");
+		w.println("      </td>");
+		w.println("      <td>");
+		w.println("        <table class=\"tallys\" cellspacing=\"0\">");
+		w.println("          <tr><th>&nbsp;</th><th>Suites</th><th>Tests</th>");
+		w.println("          <tr class=\"" + passClass
 				+ "\"><td>Passed</td><td>" + dataModel.getPassingSuiteCount()
 				+ "</td><td>" + dataModel.getPassingTestCount() + "</td>");
-		writer.println("          <tr class=\"" + failClass
+		w.println("          <tr class=\"" + failClass
 				+ "\"><td>Failed</td><td>" + dataModel.getFailingSuiteCount()
 				+ "</td><td>" + dataModel.getFailingTestCount() + "</td>");
-		writer.println("          <tr class=\"" + ignoreClass
+		w.println("          <tr class=\"" + ignoreClass
 				+ "\"><td>Ignored</td><td>" + dataModel.getIgnoredSuiteCount()
 				+ "</td><td>" + dataModel.getIgnoredTestCount() + "</td>");
 		if (dataModel.isAnyPending()) {
-			writer.println("          <tr><td>Pending</td><td>"
-					+ dataModel.getPendingSuitesCount() + "</td><td>?</td>");
+			w.println("          <tr class=\"" + Status.PENDING.getHtmlClass()
+					+ "\"><td>Pending</td><td>"
+					+ dataModel.getPendingSuiteCount() + "</td><td>"
+					+ dataModel.getPendingTestCount() + "</td>");
 		}
-		writer.println("          <tr><td class=\"total\">Total</td><td>"
+		w.println("          <tr><td class=\"total\">Total</td><td>"
 				+ dataModel.getTotalSuiteCount() + "</td><td>"
 				+ dataModel.getTotalTestCount() + "</td>");
-		writer.println("  	    </table>");
-		writer.println("      </td>");
-		writer.println("    </tr>");
-		writer.println("  </table>");
-		writer.println();
+		w.println("  	    </table>");
+		w.println("      </td>");
+		w.println("    </tr>");
+		w.println("  </table>");
+		w.println();
 	}
 
-	private void writeErrorMessagesSection(PrintWriter writer) {
+	private void writeErrorMessagesSection(PrintWriter w) {
 		String errorClass = Status.ERROR.getHtmlClass();
-		String warnClass = Status.WARN.getHtmlClass();
 
-		writer.println("  <div class=section>Errors and warnings</div>");
-		writer.println();
-		writer.println("  <table cellspacing=\"0\">");
+		w.println("  <div class=section>Errors and warnings</div>");
+		w.println();
+		w.println("  <table cellspacing=\"0\">");
 
 		if ((!logStats.hasErrors()) && (!logStats.hasWarnings())) {
-			writer.println("      <tr><td colspan=\"2\">No errors or warnings</td></tr>");
+			w.println("      <tr><td colspan=\"2\">No errors or warnings</td></tr>");
 		} else {
 			for (String e : logStats.getErrors()) {
-				writer.println("      <tr class=\"" + errorClass
+				w.println("      <tr class=\"" + errorClass
 						+ "\"><td>ERROR</td><td>" + e + "</td></tr>");
 			}
-			for (String w : logStats.getWarnings()) {
-				writer.println("      <tr class=\"" + warnClass
-						+ "\"><td>ERROR</td><td>" + w + "</td></tr>");
-			}
 		}
-		writer.println("    </table>");
-		writer.println();
+		w.println("    </table>");
+		w.println();
 	}
 
-	private void writeFailureSection(PrintWriter writer) {
-		String errorClass = Status.ERROR.getHtmlClass();
-		Collection<TestResults> failingTests = dataModel.getFailingTests();
-
-		writer.println("  <div class=section>Failing tests</div>");
-		writer.println();
-		writer.println("  <table cellspacing=\"0\">");
-		writer.println("    <tr><th>Suite name</th><th>Test name</th></tr>\n");
-		if (failingTests.isEmpty()) {
-			writer.println("    <tr><td colspan=\"2\">No tests failed.</td>"
-					+ "</tr>");
-		} else {
-			for (TestResults t : failingTests) {
-				writer.println("    <tr class=\"" + errorClass + "\">");
-				writer.println("      <td>" + t.getSuiteName() + "</td>");
-				writer.println("      <td><a href=\"" + t.getOutputLink()
-						+ "\">" + t.getTestName() + "</a></td>");
-				writer.println("    </tr>");
+	private void writeCondensedTable(PrintWriter w) {
+		w.println("  <div class=section>Condensed List</div>");
+		w.println();
+		w.println("  <table class=\"condensed\" cellspacing=\"0\">");
+		for (SuiteData s : dataModel.getAllSuites()) {
+			String sReason = "";
+			if (s.getStatus() == Status.IGNORED) {
+				sReason = dataModel.getReasonForIgnoring(s.getName(), "*");
+			} else if (s.getFailureMessages() != null) {
+				sReason = s.getFailureMessages().getErrout();
+			} else if (s.getStatus() == Status.PENDING) {
+				sReason = Status.PENDING.toString();
 			}
+
+			w.println("    <tr>");
+			w.println("      <td class=\"" + s.getStatus().getHtmlClass()
+					+ "\">");
+			w.println("        <div class=\"suite\">" + outputLink(s)
+					+ "</div>");
+			if (!sReason.isEmpty()) {
+				// The entire class is either failed or pending or ignored.
+				w.println("        <div class=\"reason\">" + sReason + "</div>");
+			} else {
+				// Show the individual tests.
+				for (TestData t : s.getTestMap().values()) {
+					String tClass = t.getStatus().getHtmlClass();
+					String tReason = dataModel.getReasonForIgnoring(
+							s.getName(), t.getTestName());
+
+					w.println("        <div class=\"test " + tClass + "\">");
+					w.println("          " + outputLink(t));
+					if (!tReason.isEmpty()) {
+						w.println("          <div class=\"tReason\">" + tReason
+								+ "</div>");
+					}
+					w.println("        </div>");
+				}
+			}
+			w.println("      </td>");
+			w.println("    </tr>");
 		}
-		writer.println("  </table>");
-		writer.println();
+		w.println("  </table>");
+		w.println();
 	}
 
-	private void writeIgnoreSection(PrintWriter writer) {
-		String warnClass = Status.WARN.getHtmlClass();
-		Collection<TestResults> ignoredTests = dataModel.getIgnoredTests();
+	private void writeSuiteErrorMessagesSection(PrintWriter w) {
+		Map<String, SuiteData> failedSuiteMap = dataModel
+				.getSuitesWithFailureMessages();
+		if (failedSuiteMap.isEmpty()) {
+			return;
+		}
 
-		writer.println("  <div class=section>Ignored tests</div>");
-		writer.println();
-		writer.println("  <table cellspacing=\"0\">");
-		writer.println("    <tr><th>Suite name</th><th>Test name</th>"
+		w.println("  <div class=section>All tests</div>");
+		w.println();
+		for (SuiteData s : failedSuiteMap.values()) {
+			ProcessOutput output = s.getFailureMessages();
+
+			w.println("  <a name=\"" + SuiteData.failureMessageAnchor(s)
+					+ "\">");
+			w.println("  <table cellspacing=\"0\">");
+			w.println("    <tr><th>Standard Output</th></tr>\n");
+			w.println("    <tr><td><pre>" + output.getStdout()
+					+ "</pre></td></tr>\n");
+			w.println("  </table>");
+			w.println("<br/>&nbsp;<br/>");
+
+			w.println("  <table cellspacing=\"0\">");
+			w.println("    <tr><th>Error Output</th></tr>\n");
+			w.println("    <tr><td><pre>" + output.getErrout()
+					+ "</pre></td></tr>\n");
+			w.println("  </table>");
+			w.println("<br/>&nbsp;<br/>");
+			w.println();
+		}
+	}
+
+	private void writeIgnoreSection(PrintWriter w) {
+		String warnClass = Status.IGNORED.getHtmlClass();
+		Collection<IgnoredTestInfo> ignoredTests = dataModel
+				.getIgnoredTestInfo();
+
+		w.println("  <div class=section>Ignored</div>");
+		w.println();
+		w.println("  <table class=\"ignored\" cellspacing=\"0\">");
+		w.println("    <tr><th>Suite name</th><th>Test name</th>"
 				+ "<th>Reason for ignoring</th></tr>\n");
 		if (ignoredTests.isEmpty()) {
-			writer.println("    <tr><td colspan=\"3\">No tests ignored.</td>"
+			w.println("    <tr><td colspan=\"3\">No tests ignored.</td>"
 					+ "</tr>");
 		} else {
-			for (TestResults t : ignoredTests) {
-				writer.println("    <tr class=\"" + warnClass + "\">");
-				writer.println("      <td>" + t.getSuiteName() + "</td>");
-				writer.println("      <td><a href=\"" + t.getOutputLink()
-						+ "\">" + t.getTestName() + "</a></td>");
-				writer.println("      <td>" + t.getReasonForIgnoring()
-						+ "</td>");
-				writer.println("    </tr>");
+			for (IgnoredTestInfo info : ignoredTests) {
+				String suiteName = info.suiteName;
+				String testName = info.testName;
+				String reason = dataModel.getReasonForIgnoring(suiteName,
+						testName);
+
+				w.println("    <tr class=\"" + warnClass + "\">");
+				w.println("      <td>" + suiteName + "</td>");
+				w.println("      <td>" + testName + "</td>");
+				w.println("      <td>" + reason + "</td>");
+				w.println("    </tr>");
 			}
 		}
-		writer.println("  </table>");
-		writer.println();
+		w.println("  </table>");
+		w.println();
 	}
 
-	private void writeSuitesSection(PrintWriter writer) {
-		writer.println("  <div class=section>Suites</div>");
-		writer.println();
-		writer.println("  <table cellspacing=\"0\">");
-
-		for (SuiteResults s : dataModel.getSuiteResults()) {
-			writer.println("    <tr class=\"" + s.getStatus().getHtmlClass()
-					+ "\">");
-			writer.println("      <td><a href=\"" + s.getOutputLink() + "\">"
-					+ s.getName() + "</a></td>");
-			writer.println("    </tr>");
-		}
-
-		writer.println("  </table>");
-		writer.println();
-	}
-
-	private void writeAllTestsSection(PrintWriter writer) {
-		Collection<TestResults> allTests = dataModel.getAllTests();
-
-		writer.println("  <div class=section>All tests</div>");
-		writer.println();
-		writer.println("  <table cellspacing=\"0\">");
-
-		writer.println("    <tr><th>Suite name</th><th>Test name</th></tr>\n");
-		for (TestResults t : allTests) {
-			writer.println("    <tr class=\"" + t.getStatus().getHtmlClass()
-					+ "\">");
-			writer.println("      <td>" + t.getSuiteName() + "</td>");
-			writer.println("      <td><a href=\"" + t.getOutputLink() + "\">"
-					+ t.getTestName() + "</a></td>");
-			writer.println("    </tr>");
-		}
-
-		writer.println("  </table>");
-		writer.println();
-	}
-
-	private void writeFooter(PrintWriter writer) {
-		writer.println("  <div class=section>Log</div>");
-		writer.println("  <pre>");
+	private void writeFooter(PrintWriter w) {
+		w.println("  <div class=section>Log</div>");
+		w.println("  <pre class=\"log\">");
 
 		Reader reader = null;
 		try {
@@ -286,7 +305,7 @@ public class OutputSummaryFormatter {
 			char[] buffer = new char[4096];
 			int howMany;
 			while (-1 != (howMany = reader.read(buffer))) {
-				writer.write(buffer, 0, howMany);
+				w.write(buffer, 0, howMany);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -300,9 +319,9 @@ public class OutputSummaryFormatter {
 			}
 		}
 
-		writer.println("  </pre>");
-		writer.println("</body>");
-		writer.println("</html>");
+		w.println("  </pre>");
+		w.println("</body>");
+		w.println("</html>");
 	}
 
 	private String formatElapsedTime(long elapsed) {
@@ -336,4 +355,21 @@ public class OutputSummaryFormatter {
 		return dateFormat.format(new Date(dateTime));
 	}
 
+	private String outputLink(SuiteData s) {
+		if (s.getOutputLink() == null) {
+			return s.getName();
+		} else {
+			return "<a href=\"" + s.getOutputLink() + "\">" + s.getName()
+					+ "</a>";
+		}
+	}
+
+	private String outputLink(TestData t) {
+		if (t.getOutputLink() == null) {
+			return t.getTestName();
+		} else {
+			return "<a href=\"" + t.getOutputLink() + "\">" + t.getTestName()
+					+ "</a>";
+		}
+	}
 }

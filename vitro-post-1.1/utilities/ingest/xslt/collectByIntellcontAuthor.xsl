@@ -2,9 +2,9 @@
 <xsl:stylesheet version='2.0'
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 	xmlns:ai="http://www.digitalmeasures.com/schema/data"
-	xmlns:aiic="http://vivoweb.org/activity-insight"
-	xmlns:mapid="http://vivoweb.org/activity-insight"
-	xmlns="http://vivoweb.org/activity-insight"
+	xmlns:aiic="http://vivoweb.org/ontology/activity-insight"
+	xmlns:mapid="http://vivoweb.org/ontology/activity-insight"
+	xmlns="http://vivoweb.org/ontology/activity-insight"
 	xmlns:dm="http://www.digitalmeasures.com/schema/data"
 	xmlns:xs='http://www.w3.org/2001/XMLSchema'
 	xmlns:vfx='http://vivoweb.org/ext/functions'	
@@ -35,16 +35,20 @@
 
 <!-- begin wrapper element -->
 <xsl:element name="aiic:INTELLCONT_AUTHOR_LIST" 
-	namespace="http://vivoweb.org/activity-insight">
+	namespace="http://vivoweb.org/ontology/activity-insight">
 
 <!-- =============== -->
 <!-- 
  gather all AUTHOR sub-xmls for a given name and sort group collection
  by uppercased constructed name
--->
+
 <xsl:for-each-group select='$docs/dm:Data/ai:INTELLCONT_AUTHORSHIP/ai:AUTHOR' 
-	group-by='vfx:collapse(concat(ai:LNAME, ", ", ai:FNAME))'>
-<xsl:sort select='vfx:collapse(concat(ai:LNAME, ", ", ai:FNAME))'/>
+	group-by='vfx:collapse(concat(ai:LNAME, "|", ai:FNAME, "|",ai:MNAME))'>
+<xsl:sort select='vfx:collapse(concat(ai:LNAME, "|", ai:FNAME, "|",ai:MNAME))'/>-->
+
+<xsl:for-each-group select='$docs/dm:Data/ai:INTELLCONT_AUTHORSHIP/ai:AUTHOR' 
+	group-by='vfx:collectByName(ai:LNAME, ai:FNAME, ai:MNAME)'>
+<xsl:sort select='vfx:collectByName(ai:LNAME, ai:FNAME, ai:MNAME)'/>
 
 <xsl:variable name='cur_netid' select='../../dm:Record/dm:username'/>
 <xsl:variable name='cur_aiid' select='../../dm:Record/dm:userId'/>
@@ -64,20 +68,20 @@
      <xsl:attribute name='cu_coauthors'>
        <xsl:value-of select='count(current-group())'/></xsl:attribute>
   
-     <xsl:value-of select='vfx:trim(concat(ai:LNAME, ", ", ai:FNAME))'/>
+     <xsl:value-of select='vfx:trim(concat(ai:LNAME, ", ", ai:FNAME, " ", ai:MNAME))'/>
     
    </xsl:element>
 
    <xsl:element name='aiic:LastName'>
-    <xsl:value-of select='$auth/ai:LNAME'/>
+    <xsl:value-of select='normalize-space($auth/ai:LNAME)'/>
    </xsl:element>
 
    <xsl:element name='aiic:FirstName'>
-    <xsl:value-of select='$auth/ai:FNAME'/>
+    <xsl:value-of select='normalize-space($auth/ai:FNAME)'/>
    </xsl:element>
 
    <xsl:element name='aiic:MiddleName'>
-    <xsl:value-of select='$auth/ai:MNAME'/>
+    <xsl:value-of select='normalize-space($auth/ai:MNAME)'/>
    </xsl:element>
 
    <xsl:element name='aiic:AiUserId'>
@@ -107,6 +111,8 @@
              <xsl:value-of select='../../ai:FACULTY_NAME'/></xsl:attribute>
             <xsl:attribute name='authorRank'><xsl:value-of select='ai:AUTHORSHIP_POSITION'/></xsl:attribute>
             <xsl:attribute name='public'><xsl:value-of select='ai:PUBLIC'/></xsl:attribute>
+            <xsl:attribute name='hasTitle' select='./ai:INTELLCONT_ID/@hasTitle'/>
+	    <xsl:attribute name='hasGoodAuthor' select='./ai:INTELLCONT_ID/@hasGoodAuthor'/>
              <xsl:text>AI-</xsl:text>
              <xsl:value-of select='ai:INTELLCONT_ID'/>
           </xsl:element>

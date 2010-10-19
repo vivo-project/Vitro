@@ -5,34 +5,30 @@
 <%@ page import="com.hp.hpl.jena.rdf.model.Literal" %>
 <%@ page import="com.hp.hpl.jena.rdf.model.Property" %>
 
-<%@ page import="edu.cornell.mannlib.vedit.beans.LoginFormBean" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.DataProperty" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement" %>
-<%@page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditN3Utils"%>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditN3Utils"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Individual" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.VitroRequest"%>
-<%@page import="edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory"%>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.RdfLiteralHash" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.StandardModelSelector"%>
+<%@ page import="com.hp.hpl.jena.shared.Lock"%>
+<%@ page import="com.hp.hpl.jena.ontology.OntModel"%>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent"%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jstl/functions" %>
 <%@ taglib prefix="v" uri="http://vitro.mannlib.cornell.edu/vitro/tags" %>
+<%@ taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
+
+<vitro:confirmLoginStatus allowSelfEditing="true" />
 
 <%
     org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger("edu.cornell.mannlib.vitro.jsp.edit.forms.datapropStmtDelete");
 
-    if( session == null)
-        throw new Error("need to have session");
-    if (!VitroRequestPrep.isSelfEditing(request) && !LoginFormBean.loggedIn(request, LoginFormBean.NON_EDITOR)) {%>
-        
-<%@page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.StandardModelSelector"%>
-<%@page import="com.hp.hpl.jena.shared.Lock"%>
-<%@page import="com.hp.hpl.jena.ontology.OntModel"%>
-<%@page import="edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent"%><c:redirect url="<%= Controllers.LOGIN %>" />
-<%  }
-    
     String subjectUri   = request.getParameter("subjectUri");
     String predicateUri = request.getParameter("predicateUri");
     String datapropKeyStr  = request.getParameter("datapropKey");

@@ -1,0 +1,66 @@
+#!/usr/bin/perl
+
+use Getopt::Std;
+use FileHandle;
+use POSIX qw( strftime );
+use FindBin qw($Bin);
+
+autoflush STDOUT 1;
+
+%LCD = ();
+%CD=();
+%FD=();
+
+while($line = <>){
+    next if $line !~ /<lname>(.*?)<\/lname>/;
+    my $n = $1;
+    my $len = length($n);
+    $FD{$len}++;
+    print "$n\n" if $len <3;
+    my @chars = split //, $n;
+    my %uniqc = ();
+    foreach $c (@chars) {
+	$uniqc{$c} = 1;
+    }
+    my $cc = scalar(keys %uniqc);
+    $CD{length($n)-$cc}++;
+    if(length($n)-$cc > 4){
+	#print $n . "\n";
+    }
+    $LCD{$len}{length($n)-$cc}++;
+}
+
+$sum = 0;
+$ssum = 0;
+$num = 0;
+$nnum = 0;
+$NNUM = 0;
+print "\nLength  Count   Difference Distribution [diff count]\n";
+print "====================================================\n";
+foreach $len (sort { $a <=> $b } (keys %FD)){
+    print "$len\t$FD{$len}\t";
+    %h = %{$LCD{$len}};
+    $num += $len * $FD{$len};
+    $ssum = 0;
+    $nnum = 0;
+    foreach $d (sort { $a <=> $b } (keys %h)){
+	printf("%-9s","[$d $LCD{$len}{$d}]");
+	$ssum += $LCD{$len}{$d};
+	$nnum += $d * $LCD{$len}{$d};
+    }
+    print "  <<avg = ". sprintf("%3.2f",($nnum/$ssum)). ">>\n";
+    $sum += $FD{$len};
+    $NNUM += $nnum;
+}
+
+print "<<Total = $sum, avg = " . sprintf("%3.2f",($num/$sum)). ">>\n\n";
+ 
+$sum = 0;
+print "Diff    Count\n";
+foreach $len ( sort { $a <=> $b } (keys %CD)){
+    print "$len\t$CD{$len}\n";
+    $sum += $CD{$len};
+}
+
+print "<<Total = $sum, avg = " . sprintf("%3.2f",($NNUM/$sum)). ">>\n";;
+

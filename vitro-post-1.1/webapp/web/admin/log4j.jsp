@@ -1,10 +1,9 @@
 <%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
 
-<%@ page import="edu.cornell.mannlib.vedit.beans.LoginFormBean" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
 <%@ page import="org.apache.log4j.*" %>
 <%@ page import="java.util.*" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
+<%@ taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
 
  <%--
   This JSP will display all the log4j Logger objects, their
@@ -14,11 +13,9 @@
   Brian Cauros bdc34@cornell.edu
   based on work by Volker Mentzner. --%>
 
-<%
-if (session == null || !LoginFormBean.loggedIn(request, LoginFormBean.DBA)) {
-    %><c:redirect url="<%= Controllers.LOGIN %>" /><%
-}
+<vitro:confirmLoginStatus level="DBA" bean="loginBean" />
 
+<%
 try {
     String name;
     Level[] levels =  new Level[]

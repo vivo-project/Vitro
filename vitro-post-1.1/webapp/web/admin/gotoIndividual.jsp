@@ -2,17 +2,13 @@
 
 <%@page import="edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
-<%@page import="edu.cornell.mannlib.vedit.beans.LoginFormBean"%>
 
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
+<%@ taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
+
+<vitro:confirmLoginStatus level="DBA" />
 
 <%
-
-if (session == null || !LoginFormBean.loggedIn(request, LoginFormBean.DBA)) {
-    %><c:redirect url="<%= Controllers.LOGIN %>" /><%
-}
-
-
 if( request.getParameter("uri") != null ){
     %> <c:redirect url="/entity"><c:param name="uri" value="${param.uri}"/></c:redirect> <%
     return;
@@ -34,9 +30,9 @@ if( request.getParameter("uri") != null ){
 <% /* BJL23 put this is in a catch block because it seems to fail ungracefully for 
       some clones */ %>
 <c:catch>
-    <jsp:include page="/${themeDir}jsp/identity.jsp" flush="true"/>
+    <jsp:include page="/templates/page/freemarkerTransition/identity.jsp" flush="true"/>
     <div id="contentwrap">
-        <jsp:include page="/${themeDir}jsp/menu.jsp" flush="true"/>
+        <jsp:include page="/templates/page/freemarkerTransition/menu.jsp" flush="true"/>
         <!-- end of formPrefix.jsp -->
 </c:catch>
 

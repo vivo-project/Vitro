@@ -40,9 +40,6 @@ webapp/web/js/jquery.js
 webapp/web/js/jquery-ui/*
 webapp/web/js/jquery_plugins/*
 
-# From pajhome.org.uk
-webapp/web/js/md5.js
-
 # From dojotoolkit.org
 webapp/web/dojo.js
 webapp/web/src/AdapterRegistry.js
@@ -54,8 +51,6 @@ webapp/web/src/bootstrap2.js
 webapp/web/src/browser_debug.js
 webapp/web/src/collections/*
 webapp/web/src/compat/*
-webapp/web/src/crypto/*
-webapp/web/src/crypto.js
 webapp/web/src/data/*
 webapp/web/src/data.js
 webapp/web/src/date.js
@@ -127,6 +122,10 @@ webapp/config/tlds/sparqltag.tld
 webapp/config/tlds/c.tld
 webapp/config/tlds/fn.tld
 
+# PROBLEM: appears to be a modified version of some Sun code, which means that we need to
+#     distribute the original source as well as the modified source (plus the license, of course)
+webapp/config/tlds/database.tld
+
 # PROBLEM: requires an accompanying copy of the Apache license 1.1, as spelled out
 #     in the distribution from http://jakarta.apache.org/site/downloads/downloads_taglibs-mailer.cgi
 webapp/config/tlds/taglibs-mailer.tld
@@ -151,3 +150,14 @@ webapp/web/js/detect.js
 # PROBLEM? perhaps from www.dannyg.com, but what are the license restrictions?
 webapp/web/toggle.js
 webapp/web/js/toggle.js
+
+
+# Script for enabling new HTML5 semantic markup in IE browsers. 
+# remysharp.com/2009/01/07/html5-enabling-script/
+webapp/web/js/html5.js
+
+# selectivizr is a JavaScript utility that emulates CSS3 pseudo-classes and attribute selectors in Internet Explorer 6-8. selectivizr.com
+webapp/web/js/selectivizr.js
+
+# Supersleight jQuery Plugin for Transparent PNGs in IE6. allinthehead.com/retro/338/supersleight-jquery-plugin
+webapp/web/js/jquery_plugins/supersleight.js

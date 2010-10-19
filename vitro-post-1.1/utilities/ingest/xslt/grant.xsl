@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <xsl:stylesheet version='2.0'
 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-xmlns:aigrant="http://vivoweb.org/activity-insight"
-xmlns="http://vivoweb.org/activity-insight"
+xmlns:aigrant="http://vivoweb.org/ontology/activity-insight"
+xmlns="http://vivoweb.org/ontology/activity-insight"
 xmlns:dm='http://www.digitalmeasures.com/schema/data'
 xmlns:xs='http://www.w3.org/2001/XMLSchema'
 xmlns:vfx='http://vivoweb.org/ext/functions'	
@@ -28,11 +28,11 @@ exclude-result-prefixes='vfx xs'
 <aigrant:GRANT_LIST>
 
 <xsl:for-each-group select='$docs//dm:Record/dm:CONGRANT' 
-	group-by='vfx:collapse(@id)'>
-<xsl:sort select='vfx:collapse(@id)'/>
+	group-by='@id'>
+<xsl:sort select='@id'/>
 
 <!-- define variables here -->
-
+<xsl:if test='dm:STATUS = "Award Signed By All Parties"'>
 <aigrant:GRANT>
 <xsl:attribute name='index' select='position()'/>
 
@@ -47,7 +47,7 @@ exclude-result-prefixes='vfx xs'
 </xsl:for-each>
 
 </aigrant:GRANT>
-
+</xsl:if>
 </xsl:for-each-group>
 
 </aigrant:GRANT_LIST>

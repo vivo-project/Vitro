@@ -19,14 +19,38 @@ public class TomcatController {
 		this.parms = parms;
 		this.properties = parms.getModelCleanerProperties();
 		this.listener = parms.getListener();
+
+		try {
+			checkThatTomcatIsReady();
+		} catch (CommandRunnerException e) {
+			throw new FatalException(e);
+		}
 	}
 
 	/**
-	 * Stop Tomcat and wait the prescribed number of seconds for it to clean up.
+	 * Insure that Tomcat is ready and that we can start and stop VIVO.
 	 */
+	private void checkThatTomcatIsReady() throws CommandRunnerException {
+		String tomcatCheckReadyCommand = properties
+				.getTomcatCheckReadyCommand();
+
+		CommandRunner runner = new CommandRunner(parms);
+
+		listener.webappCheckingReady(tomcatCheckReadyCommand);
+		runner.run(parseCommandLine(tomcatCheckReadyCommand));
+
+		int returnCode = runner.getReturnCode();
+		if (returnCode != 0) {
+			listener.webappCheckReadyFailed(returnCode);
+			throw new CommandRunnerException("Tomcat is not ready: code="
+					+ returnCode);
+		}
+
+		listener.webappCheckedReady();
+	}
+
 	public void stopTheWebapp() throws CommandRunnerException {
 		String tomcatStopCommand = properties.getTomcatStopCommand();
-		int tomcatStopDelay = properties.getTomcatStopDelay();
 
 		CommandRunner runner = new CommandRunner(parms);
 
@@ -36,14 +60,8 @@ public class TomcatController {
 		int returnCode = runner.getReturnCode();
 		if (returnCode != 0) {
 			listener.webappStopFailed(returnCode);
-			// Throw no exception - this can happen if Tomcat isn't running.
-		}
-
-		listener.webappWaitingForStop(tomcatStopDelay);
-		try {
-			Thread.sleep(tomcatStopDelay * 1000L);
-		} catch (InterruptedException e) {
-			// Just continue.
+			throw new CommandRunnerException("Failed to stop Tomcat: code="
+					+ returnCode);
 		}
 
 		listener.webappStopped();
@@ -52,26 +70,25 @@ public class TomcatController {
 	/**
 	 * Start Tomcat and wait for it to initialize.
 	 */
-	public void startTheWebapp() {
+	public void startTheWebapp() throws CommandRunnerException {
 		String tomcatStartCommand = properties.getTomcatStartCommand();
-		int tomcatStartDelay = properties.getTomcatStartDelay();
 
 		CommandRunner runner = new CommandRunner(parms);
 
 		listener.webappStarting(tomcatStartCommand);
 		try {
-			runner.runAsBackground(parseCommandLine(tomcatStartCommand));
+			// Stupid Windows won't allow us to start Tomcat as an independent
+			// process (except if its installed as a service).
+			runner.run(parseCommandLine(tomcatStartCommand));
 		} catch (CommandRunnerException e) {
 			throw new FatalException(e);
 		}
 
-		// Can't check the return code because the process shouldn't end.
-		
-		listener.webappWaitingForStart(tomcatStartDelay);
-		try {
-			Thread.sleep(tomcatStartDelay * 1000L);
-		} catch (InterruptedException e) {
-			// Just continue.
+		int returnCode = runner.getReturnCode();
+		if (returnCode != 0) {
+			listener.webappStartFailed(returnCode);
+			throw new CommandRunnerException("Failed to start Tomcat: code="
+					+ returnCode);
 		}
 
 		listener.webappStarted();
@@ -126,6 +143,8 @@ public class TomcatController {
 	 * The run is finished. Do we need to do anything?
 	 */
 	public void cleanup() {
+		// Don't need to do anything.
+
 		// If we've been starting and stopping Tomcat,
 		// stop it one more time.
 		if (parms.isCleanModel()) {

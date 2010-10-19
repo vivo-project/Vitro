@@ -4,16 +4,12 @@ package edu.cornell.mannlib.vitro.webapp.search.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -35,8 +31,6 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.WildcardQuery;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -44,12 +38,9 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServ
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
 import edu.cornell.mannlib.vitro.webapp.search.SearchException;
-import edu.cornell.mannlib.vitro.webapp.search.beans.Searcher;
-import edu.cornell.mannlib.vitro.webapp.search.beans.VitroHighlighter;
-import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQuery;
-import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQueryFactory;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneIndexer;
+import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneIndexFactory;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup;
 import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
 import freemarker.template.Configuration;
@@ -59,30 +50,17 @@ import freemarker.template.Configuration;
  * through a Lucene search. 
  */
 
-public class AutocompleteController extends FreemarkerHttpServlet implements Searcher{
+public class AutocompleteController extends FreemarkerHttpServlet{
 
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(AutocompleteController.class);
-
+    
+    private static final String TEMPLATE_DEFAULT = "autocompleteResults.ftl";
+    
     private static String QUERY_PARAMETER_NAME = "term";
     
-    private IndexSearcher searcher = null;
     String NORESULT_MSG = "";    
     private int defaultMaxSearchSize= 1000;
-
-    public void init(ServletConfig config) throws ServletException {
-        super.init(config);
-        LuceneIndexer indexer=(LuceneIndexer)getServletContext()
-        .getAttribute(LuceneIndexer.class.getName());
-        indexer.addSearcher(this);
-
-        try{
-            String indexDir = getIndexDir(getServletContext());        
-            getIndexSearcher(indexDir);
-        }catch(Exception ex){
-
-        }                                           
-    }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
@@ -92,8 +70,6 @@ public class AutocompleteController extends FreemarkerHttpServlet implements Sea
     public void doGet(HttpServletRequest request, HttpServletResponse response)
     throws IOException, ServletException {
         
-        // String templateName = request.getServletPath().equals("/autocomplete") ? "autocompleteResults.ftl" : "selectResults.ftl";  
-        String templateName = "autocompleteResults.ftl";
         Map<String, Object> map = new HashMap<String, Object>();
 
         VitroRequest vreq = new VitroRequest(request);
@@ -106,7 +82,7 @@ public class AutocompleteController extends FreemarkerHttpServlet implements Sea
             if( vreq.getWebappDaoFactory() == null 
                     || vreq.getWebappDaoFactory().getIndividualDao() == null ){
                 log.error("makeUsableBeans() could not get IndividualDao ");
-                doSearchError(templateName, map, config, response);
+                doSearchError(map, config, response);
                 return;
             }
             IndividualDao iDao = vreq.getWebappDaoFactory().getIndividualDao();                       
@@ -122,12 +98,12 @@ public class AutocompleteController extends FreemarkerHttpServlet implements Sea
             log.debug("query for '" + qtxt +"' is " + query.toString());
 
             if (query == null ) {
-                doNoQuery(templateName, map, config, response);
+                doNoQuery(map, config, response);
                 return;
             }
+                        
+            IndexSearcher searcherForRequest = LuceneIndexFactory.getIndexSearcher(getServletContext());
             
-            IndexSearcher searcherForRequest = getIndexSearcher(indexDir);
-                                                
             TopDocs topDocs = null;
             try{
                 topDocs = searcherForRequest.search(query,null,maxHitSize);
@@ -139,20 +115,20 @@ public class AutocompleteController extends FreemarkerHttpServlet implements Sea
                     topDocs = searcherForRequest.search(query,null,maxHitSize);
                 }catch (Exception ex){
                     log.error(ex);
-                    doFailedSearch(templateName, map, config, response);
+                    doFailedSearch(map, config, response);
                     return;
                 }
             }
 
             if( topDocs == null || topDocs.scoreDocs == null){
                 log.error("topDocs for a search was null");                
-                doFailedSearch(templateName, map, config, response);
+                doFailedSearch(map, config, response);
                 return;
             }
             
             int hitsLength = topDocs.scoreDocs.length;
             if ( hitsLength < 1 ){                
-                doFailedSearch(templateName, map, config, response);
+                doFailedSearch(map, config, response);
                 return;
             }            
             log.debug("found "+hitsLength+" hits"); 
@@ -176,11 +152,11 @@ public class AutocompleteController extends FreemarkerHttpServlet implements Sea
 
             Collections.sort(results);
             map.put("results", results);
-            writeTemplate(templateName, map, config, response);
+            writeTemplate(TEMPLATE_DEFAULT, map, config, response);
    
         } catch (Throwable e) {
             log.error("AutocompleteController(): " + e);            
-            doSearchError(templateName, map, config, response);
+            doSearchError(map, config, response);
             return;
         }
     }
@@ -282,17 +258,21 @@ public class AutocompleteController extends FreemarkerHttpServlet implements Sea
         // of wildcard and non-wildcard queries. The query will look have only an implicit disjunction
         // operator: e.g., +(name:tales name:tales*)
         try {
-            Query query = parser.parse(querystr);
             log.debug("Adding non-wildcard query for " + querystr);
+            Query query = parser.parse(querystr);  
             boolQuery.add(query, BooleanClause.Occur.SHOULD);
 
-            Query wildcardQuery = parser.parse(querystr + "*");
-            log.debug("Adding wildcard query for " + querystr);
-            boolQuery.add(wildcardQuery, BooleanClause.Occur.SHOULD);
+            // Prevent ParseException here when adding * after a space.
+            // If there's a space at the end, we don't need the wildcard query.
+            if (! querystr.endsWith(" ")) {
+                log.debug("Adding wildcard query for " + querystr);
+                Query wildcardQuery = parser.parse(querystr + "*");            
+                boolQuery.add(wildcardQuery, BooleanClause.Occur.SHOULD);
+            }
             
             log.debug("Name query is: " + boolQuery.toString());
-;        } catch (ParseException e) {
-            log.error(e, e);
+        } catch (ParseException e) {
+            log.warn(e);
         }
         
         
@@ -424,35 +404,20 @@ public class AutocompleteController extends FreemarkerHttpServlet implements Sea
         return qp;
     }
     
-    private synchronized IndexSearcher getIndexSearcher(String indexDir) {
-        if( searcher == null ){
-            try {                
-                Directory fsDir = FSDirectory.getDirectory(indexDir);
-                searcher = new IndexSearcher(fsDir);
-            } catch (IOException e) {
-                log.error("LuceneSearcher: could not make indexSearcher "+e);
-                log.error("It is likely that you have not made a directory for the lucene index.  "+
-                          "Create the directory indicated in the error and set permissions/ownership so"+
-                          " that the tomcat server can read/write to it.");
-                //The index directory is created by LuceneIndexer.makeNewIndex()
-            }
-        }
-        return searcher;
-    }
     
 
-    private void doNoQuery(String templateName, Map<String, Object> map, Configuration config, HttpServletResponse response) {
-        writeTemplate(templateName, map, config, response);
+    private void doNoQuery(Map<String, Object> map, Configuration config, HttpServletResponse response) {
+        writeTemplate(TEMPLATE_DEFAULT, map, config, response);
     }
 
-    private void doFailedSearch(String templateName, Map<String, Object> map, Configuration config, HttpServletResponse response) {
-        writeTemplate(templateName, map, config, response);
+    private void doFailedSearch(Map<String, Object> map, Configuration config, HttpServletResponse response) {
+        writeTemplate(TEMPLATE_DEFAULT, map, config, response);
     }
  
-    private void doSearchError(String templateName, Map<String, Object> map, Configuration config, HttpServletResponse response) {
+    private void doSearchError(Map<String, Object> map, Configuration config, HttpServletResponse response) {
         // For now, we are not sending an error message back to the client because with the default autocomplete configuration it
         // chokes.
-        writeTemplate(templateName, map, config, response);
+        writeTemplate(TEMPLATE_DEFAULT, map, config, response);
     }
 
     public static final int MAX_QUERY_LENGTH = 500;
@@ -487,24 +452,6 @@ public class AutocompleteController extends FreemarkerHttpServlet implements Sea
         }
     }
     
-    
-    /**
-     * Need to accept notification from indexer that the index has been changed.
-     */
-    public void close() {
-        searcher = null;        
-    }
 
-    public VitroHighlighter getHighlighter(VitroQuery q) {
-        throw new Error("AutocompleteController.getHighlighter() is unimplemented");
-    }
-
-    public VitroQueryFactory getQueryFactory() {
-        throw new Error("AutocompleteController.getQueryFactory() is unimplemented");
-    }
-
-    public List search(VitroQuery query) throws SearchException {
-        throw new Error("AutocompleteController.search() is unimplemented");
-    }
 
 }

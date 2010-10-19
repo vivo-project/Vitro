@@ -5,22 +5,20 @@ package edu.cornell.mannlib.vitro.webapp.auth.policy;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.rdf.model.impl.Util;
 
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.DbAdminEditingIdentifierFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.Identifier;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.DbAdminEditingIdentifierFactory.DbAdminEditingId;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory.SelfEditing;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.VisitingPolicyIface;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AddDataPropStmt;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AddObjectPropStmt;
@@ -127,30 +125,41 @@ public class DbAdminEditingPolicy implements VisitingPolicyIface {
         }
     }
 
-    public PolicyDecision isAuthorized(IdentifierBundle whomToAuth, RequestedAction whatToAuth) {
+    public PolicyDecision isAuthorized(IdentifierBundle whoToAuth, RequestedAction whatToAuth) {
         BasicPolicyDecision pd = new BasicPolicyDecision(this.defaultFailure,"not yet set");
-        if( whomToAuth == null )
+        if( whoToAuth == null )
             return pd.setMessage("whomToAuth was null");
         if(whatToAuth == null)
             return pd.setMessage("whatToAuth was null");
-        
-        String roleStr = getRoleOf(whomToAuth);
+                
+        String roleStr = getRoleOf(whoToAuth);
         if (roleStr == null)
             return pd.setMessage("Unable to get a role for the dbAdmin from IdBundle");
         
         try{
-            if( Integer.parseInt( roleStr ) /*<*/ != LoginFormBean.DBA) {
+            if( Integer.parseInt( roleStr ) /*<*/ != LoginStatusBean.DBA) {
                 return pd.setMessage("DbAdminEditingPolicy found role of "+roleStr+" and only authorizes for users logged in as DB_ADMIN");
             }
-        } catch(NumberFormatException nef){}
-                 
+        } catch(NumberFormatException nef){
+            log.debug(nef,nef);
+        }
+        
+        try{
+            SelfEditing sei = SelfEditingIdentifierFactory.getSelfEditingIdentifier(whoToAuth);
+            if( sei != null && sei.isFake() ){
+                return pd.setMessage("DbAdminEditingPolicy will not authorize actions for a fake self editor");                
+            }
+        }catch( Exception e ){
+            log.debug(e,e);
+        }
+        
         if (whatToAuth instanceof OntoRequestedAction)
             return pd.setMessage("DbAdminEditingPolicy doesn't authorize OntoRequestedActions");
         if (whatToAuth instanceof AdminRequestedAction)
             return pd.setMessage("DbAdminEditingPolicy doesn't authorize AdminRequestedActions");
 
         //kick off the visitor pattern
-        return whatToAuth.accept(this, whomToAuth);
+        return whatToAuth.accept(this, whoToAuth);
     }
 
     

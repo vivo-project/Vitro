@@ -1,0 +1,50 @@
+#!/usr/bin/perl
+
+use Getopt::Std;
+use FileHandle;
+use POSIX qw( strftime );
+use FindBin qw($Bin);
+
+autoflush STDOUT 1;
+
+$xmlH = <>;
+$rootTag = <>;
+chomp($rootTag);
+if($rootTag =~ /\s*<\w+\/>/){
+    while($line = <>){
+	chomp $line;
+	next if $line =~ /^\s*$/;
+	print STDOUT $line ."\n";
+    }
+} else {
+    $rootTag =~ s/^\s*<(\w+)\s*.*/<$1>/;
+    my $tag = $1;
+    $rootTagClopen = "<$tag/>";
+    $rootTagClose ="</$tag>";
+    $rootTag .= "\n";
+    print STDOUT $xmlH;
+    print STDOUT $rootTag ;
+    print STDERR "msg ".$rootTag ;
+    print STDERR "msg ".$rootTagClose . "\n";
+    print STDERR "msg ".$rootTagClopen ."\n";
+    $flag = 0;
+    
+    while($line = <>){
+	next if($line eq $xmlH || $line eq $rootTag );
+        if($line eq $rootTagClopen || $line eq $rootTagClopen . "\n"){
+            print $rootTagClose . "\n";
+	    last;
+        }
+	if( $line eq $rootTagClose || $line eq $rootTagClose . "\n"){
+	    next if( $flag++ < 1);
+	}
+	chomp $line;
+	print STDOUT $line ."\n";
+	
+    }
+
+
+}
+
+
+exit 0;

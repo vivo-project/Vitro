@@ -22,9 +22,12 @@ import org.joda.time.DateTime;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntResource;
 import com.hp.hpl.jena.rdf.model.Literal;
+import com.hp.hpl.jena.rdf.model.NodeIterator;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 import com.hp.hpl.jena.vocabulary.OWL;
@@ -38,10 +41,12 @@ import edu.cornell.mannlib.vitro.webapp.beans.Keyword;
 import edu.cornell.mannlib.vitro.webapp.beans.Link;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.ImageInfo;
+import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
 
 public class IndividualJena extends IndividualImpl implements Individual {
@@ -580,7 +585,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
             try {
                 webappDaoFactory.getLinksDao().addLinksToIndividual( this );
             } catch (Exception e) {
-                log.error(this.getClass().getName()+" could not addLinksToIndividual for "+this.getURI());
+                log.debug(this.getClass().getName()+" could not addLinksToIndividual for "+this.getURI());
             }
             return this.linksList;
         }
@@ -593,7 +598,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
             try {
                 webappDaoFactory.getLinksDao().addPrimaryLinkToIndividual( this );
             } catch (Exception e) {
-                log.error(this.getClass().getName()+" could not addPrimaryLinkToIndividual for "+this.getURI());
+                log.debug(this.getClass().getName()+" could not addPrimaryLinkToIndividual for "+this.getURI());
             }
             return this.primaryLink;
         }
@@ -607,7 +612,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
             try {
                 this.setKeywords(webappDaoFactory.getIndividualDao().getKeywordsForIndividual(this.getURI()));
             } catch (Exception e) {
-                log.error(this.getClass().getName()+" could not getKeywords for "+this.getURI());
+                log.debug(this.getClass().getName()+" could not getKeywords for "+this.getURI());
             }
             return this.keywords;
         }
@@ -643,7 +648,81 @@ public class IndividualJena extends IndividualImpl implements Individual {
             return this.objectPropertyStatements;
         }
     }
+    
+    @Override
+    public List<ObjectPropertyStatement> getObjectPropertyStatements(String propertyURI) {
+    	if (propertyURI == null) {
+    		return null;
+    	}
+    	List<ObjectPropertyStatement> objectPropertyStatements = new ArrayList<ObjectPropertyStatement>();
+    	ind.getOntModel().enterCriticalSection(Lock.READ);
+    	try {
+    		StmtIterator sit = ind.listProperties(ind.getModel().getProperty(propertyURI));
+    		while (sit.hasNext()) {
+    			Statement s = sit.nextStatement();
+    			if (!s.getSubject().canAs(OntResource.class) || !s.getObject().canAs(OntResource.class)) {
+    			    continue;	
+    			}
+    			Individual subj = new IndividualJena((OntResource) s.getSubject().as(OntResource.class), webappDaoFactory);
+    			Individual obj = new IndividualJena((OntResource) s.getObject().as(OntResource.class), webappDaoFactory);
+    			ObjectProperty op = webappDaoFactory.getObjectPropertyDao().getObjectPropertyByURI(s.getPredicate().getURI());
+    			if (subj != null && obj != null && op != null) {
+    				ObjectPropertyStatement ops = new ObjectPropertyStatementImpl();
+    				ops.setSubject(subj);
+    				ops.setSubjectURI(subj.getURI());
+    				ops.setObject(obj);
+    				ops.setObjectURI(obj.getURI());
+    				ops.setProperty(op);
+    				ops.setPropertyURI(op.getURI());
+    				objectPropertyStatements.add(ops);
+    			}
+    		}
+     	} finally {
+    		ind.getOntModel().leaveCriticalSection();
+    	}
+     	return objectPropertyStatements;
+    }
 
+    @Override
+    public List<Individual> getRelatedIndividuals(String propertyURI) {
+    	if (propertyURI == null) {
+    		return null;
+    	}
+    	List<Individual> relatedIndividuals = new ArrayList<Individual>();
+    	ind.getOntModel().enterCriticalSection(Lock.READ);
+    	try {
+    	    NodeIterator values = ind.listPropertyValues(ind.getModel().getProperty(propertyURI));
+    	    while (values.hasNext()) {
+    	    	RDFNode value = values.nextNode();
+    	    	if (value.canAs(OntResource.class)) {
+        	    	relatedIndividuals.add(
+        	    		new IndividualJena((OntResource) value.as(OntResource.class), webappDaoFactory) );  
+        	    } 
+    	    }
+    	} finally {
+    		ind.getOntModel().leaveCriticalSection();
+    	}
+    	return relatedIndividuals;
+    }
+    
+    @Override
+    public Individual getRelatedIndividual(String propertyURI) {
+    	if (propertyURI == null) {
+    		return null;
+    	}
+    	ind.getOntModel().enterCriticalSection(Lock.READ);
+    	try {
+    	    RDFNode value = ind.getPropertyValue(ind.getModel().getProperty(propertyURI));
+    	    if (value != null && value.canAs(OntResource.class)) {
+    	    	return new IndividualJena((OntResource) value.as(OntResource.class), webappDaoFactory);  
+    	    } else {
+    	    	return null;
+    	    }
+    	} finally {
+    		ind.getOntModel().leaveCriticalSection();
+    	}
+    }
+    
     public List<ObjectProperty> getObjectPropertyList() {
         if (this.propertyList != null) {
             return this.propertyList;
@@ -819,6 +898,30 @@ public class IndividualJena extends IndividualImpl implements Individual {
 			}
 		}
 		return false;
+	}
+	
+	@Override
+	public boolean isMemberOfClassProhibitedFromSearch(ProhibitedFromSearch pfs) {
+		ind.getModel().enterCriticalSection(Lock.READ);
+		try {
+			StmtIterator stmtIt = ind.listProperties(RDF.type);
+			try {
+				while(stmtIt.hasNext()) {
+					Statement stmt = stmtIt.nextStatement();
+					if (stmt.getObject().isURIResource()) {
+						String typeURI = ((Resource)stmt.getObject()).getURI();
+						if (pfs.isClassProhibited(typeURI)) {
+							return false;
+						}
+					}
+				}
+			} finally {
+				stmtIt.close();
+			}
+			return false;
+		} finally {
+			ind.getModel().leaveCriticalSection();
+		}
 	}
 
     /**

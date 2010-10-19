@@ -23,13 +23,16 @@ sub Usage {
     print STDERR "\t--jopts   'opts'     java options e.g. -Xmx2048m \n";
     print STDERR "\t                     -XX:MaxPermSize=100m Use quotes\n";
     print STDERR "\t                     for multiple options\n";
+    print STDERR "\t--jext classdir      the class dir of java extensions,\n";
+    print STDERR "\t                     if any\n";
     print STDERR "\t--L                  Live run. Actually execute\n";
     print STDERR "\t                     don't just list actions\n";
     print STDERR "\t--log                enable logging\n";
     print STDERR "\t--logdir  path       path to log dir. default \n";
     print STDERR "\t                     {workdir}/log\n";
+
 #    print STDERR "\t--md5\n";
-    print STDERR "\t--newrun             make new raw and aiic directories\n";
+    print STDERR "\t--reget              make new raw and aiic directories\n";
     print STDERR "\t--                   used inconjunction with\n";
     print STDERR "\t--raw     prefix     a prefix string for raw xml dir\n";
     print STDERR "\t                     name. A subdirectory of {xmldir} \n";
@@ -67,6 +70,7 @@ sub Usage {
     print STDERR "\t--u                  show this usage info\n";
     print STDERR "\t--uno file           use file as uno repository\n";
     print STDERR "\t                     store/.Uno is default name.\n";
+    print STDERR "\t--uset hex           set uno counter to hex value.\n";
     print STDERR "\t--uts                use timestamp when naming xml\n";
     print STDERR "\t                     subdirectories. e.g \n";
     print STDERR "\t                         AIRAW_20100610120510 or\n";
@@ -137,11 +141,53 @@ sub doit {
     return 0;
 }
 
-%TimeZero = ( 'Per' => 'personsAtTimeZero.xml' ,
-	      'Org' => 'orgsAtTimeZero.xml'
+# Per   - persons
+# Org   - organizations
+# Ceo   - collaborative entities
+# Geo   - geographical locations
+# Parea - priority areas
+# Carea - contribution area
+# Uarea - USDA area
+
+%TimeZero = ( 'Per'   => 'personsAtTimeZero.xml',
+	      'Org'   => 'orgsAtTimeZero.xml',
+	      'Ceo'   => 'ceosAtTimeZero.xml',
+	      'Geo'   => 'geosAtTimeZero.xml',
+	      'Parea' => 'pareasAtTimeZero.xml',
+	      'Carea' => 'careasAtTimeZero.xml',
+	      'Uarea' => 'uareasAtTimeZero.xml',
+	      'Jour'  => 'journalsAtTimeZero.xml'
 	      );
 
-%FeedbackFlags = ('Per' => 0, 'Org' => 0 );
+%FeedbackFlags = ('Per'   => 0, 'Org'   => 0, 
+		  'Ceo'   => 0, 'Geo'   => 0,
+		  'Parea' => 0, 'Jour'  => 0,
+		  'Carea' => 0, 'Parea' => 0);
+
+%ElementToStepsAndFeedbackTypes = 
+    ( 
+      "gr" => ['MGRNT','MGRNT_INV|Per','MGRNT_SPON|Org'],
+      "ic" => ['AR|Per','JR|Jour','ICAR|Per','ICPR'],
+      "is" => ['MIR|Per','MCER|Ceo','MFOR|Org',
+	       'MGR|Geo','MPAR|Parea','MUAR|Uarea','MCAR|Carea'],
+      "ed" => ['MEDU','MEDUP|Per','MEDUO|Org'],
+      "rs" => ['MRESRCH|Per'],
+      "aw" => ['MAWR|Per|Org'],
+      "ad" => ['MADM','MADM|Per'],
+      "ec" => ['MEDT','MEDTP|Per']
+      );
+
+sub clearFeedbackFilesToTimeZero {
+    foreach my $fn (@Clear){
+	next if !defined($TimeZero{$fn});
+	my $first = $TimeZero{$fn};
+	my $file = $fn . "0.xml";
+	my $cmd = "";
+	$cmd .= "cp $g_fb/$first $g_fb/$file";
+	my $r = doit($cmd, $g_exef);
+	exit(1) if($r);
+    }
+}
 
 sub initFeedbackFile{
     my($fn,$reuse)=@_;
@@ -149,9 +195,18 @@ sub initFeedbackFile{
     my $file = $fn . "0.xml";
 
     #
-    print STDOUT "\nInitializing $g_fb/$file ....\n";
-    
-    return if( -e  "$g_fb/$file" && $op_reuseAll);
+    print STDOUT "\nInitializing/protecting $g_fb/$file ....\n";
+
+   
+    if( -e "$g_fb/$file" && $op_reuseAll){
+	if(! -e "$g_fb/REVERT_$file"){
+	    my $cmd = "cp $g_fb/$file $g_fb/REVERT_$file; ";
+	    $cmd .= " cp $g_fb/$file $g_fb/REVERT_ON_FAULT_$file ";
+	    my $r = doit($cmd, $g_exef);
+	    exit(1) if($r);
+	}
+	return ;
+    }
 
     # e.g. if Per0.xml does not exist init Per0.xml or
     # if age of Per0.xml is newer than script start time
@@ -159,11 +214,8 @@ sub initFeedbackFile{
     #
     # NOTE: this will have to change for incremental updates
     if(($op_timeZero && ($FeedbackFlags{$fn} == 0)) || 
-       ! -e "$g_fb/$file" || 
-	(((stat("$g_fb/$file"))[9] < $g_T0) && 
-	 ( $ReuseOutFiles{$reuse} <= 0 ))) {
+       ! -e "$g_fb/$file" || $op_sparql) {
 
-	
 	if($op_sparql && !$op_timeZero){
 	    # nothing for now
 	    ;
@@ -174,14 +226,16 @@ sub initFeedbackFile{
 	    my $r = doit($cmd, $g_exef);
 	    exit(1) if($r);
 	}
+	$FeedbackFlags{$fn} = 1 if $op_timeZero;
     }
-    # backup file on first use
-    if( -e "$g_fb/$file" && $FeedbackFlags{$fn} == 0){
+    # backup file on first use for possible reverts
+    if( -e "$g_fb/$file" && ! -e "$g_fb/REVERT_$file"){
 	print STDOUT "Saving initial version $g_fb/$file\n";
-	my $tag = "AT_START_OF_RUN";
-	my $dst =  "$g_fb/uri-maps/$fn"."0-$tag"."-$g_STARTED_AT.xml";
-	qx(cp "$g_fb/$file" $dst);
-	$FeedbackFlags{$fn} = 1;
+	my $cmd = "";
+	$cmd .= "cp $g_fb/$file $g_fb/REVERT_$file; ";
+	$cmd .= " cp $g_fb/$file $g_fb/REVERT_ON_FAULT_$file ";
+	my $r = doit($cmd, $g_exef);
+	exit(1) if($r);
     }
 }
 
@@ -190,6 +244,7 @@ sub updateFeedbackFile {
     my $f0 = $fn . "0.xml";
     my $f1 = $fn . "1.xml";
     my $f2 = $fn . "2.xml";
+    my $merge = lc($fn) . "-merge.xsl";
     print STDOUT "\nUpdating $g_fb/$f0 ....\n";
     
     # e.g.
@@ -203,11 +258,36 @@ sub updateFeedbackFile {
     print "\nMerge $f1 with $f0 to make $f2\n";
     my $cmd = "";
 
-    $cmd .= "java $g_javaopts -jar $g_xslts/saxon9he.jar $g_fb/$f1 ";
-    $cmd .= " $g_xslts/merge.xsl doc2=$g_fb/$f0 > $g_fb/$f2";
+    #$cmd .= "java $g_javaopts $g_saxonCmdSequence $g_fb/$f1 ";
+    #$cmd .= " $g_xslts/$merge doc2=$g_fb/$f0 > $g_fb/$f2";
+
+    $cmd .= "$g_bin/crudeMerge  $g_fb/$f1 $g_fb/$f0  > $g_fb/$f2";
 
     my $r = doit($cmd, $g_exef);
     exit(1) if($r);
+
+    # get rid of nasty namespace crud
+
+    $cmd = "";
+    $cmd .= "java $g_javaopts $g_saxonCmdSequence $g_fb/$f2 ";
+    $cmd .= " $g_xslts/noname.xsl > $g_fb/tmp-$ilk.xml ";
+    $r = doit($cmd, $g_exef);
+    exit(1) if($r);
+
+    $cmd = "";
+    $cmd .= " mv $g_fb/tmp-$ilk.xml $g_fb/$f2 ";
+
+    $r = doit($cmd, $g_exef);
+    exit(1) if($r);
+
+    # keep a record of new entries
+    $cmd = "";
+    $cmd .= "java $g_javaopts $g_saxonCmdSequence $g_fb/$f1 ";
+    $cmd .= " $g_xslts/noname.xsl > $g_fb/uri-maps/AT_END_NEW_ENTRIES_$g_curPhase"."_$f1";
+    $r = doit($cmd, $g_exef);
+    exit(1) if($r);
+
+
 
     print STDOUT "\nSaving $g_fb/$file etc ....\n";
     #
@@ -219,6 +299,14 @@ sub updateFeedbackFile {
 	$cmd .= " cp $g_fb/$f0 $g_fb/uri-maps/$fn"."0-$ilk\-At$now.xml; ";
     }
     $cmd .= " mv $g_fb/$f2 $g_fb/$f0";
+    $r = doit($cmd, $g_exef);
+    exit(1) if($r);
+
+    $cmd = " cp $g_fb/$f0 $g_fb/uri-maps/AT_END_$g_curPhase"."_$f0";
+    $r = doit($cmd, $g_exef);
+    exit(1) if($r);
+
+    $cmd = "cp $g_fb/$f0 $g_fb/REVERT_ON_FAULT_$f0";
     $r = doit($cmd, $g_exef);
     exit(1) if($r);
 }
@@ -238,13 +326,23 @@ sub mkUnoFile {
 	print STDOUT ">>>> ERROR !!!\nResult: $out will be empty!\n";
 	exit 1;
     }
-    $cmd = "$g_bin/nuno -X -n $ans -t AI-  > $out ";
+    $g_unoMark = qx($g_bin/nuno -cC $op_uno);
+    
+    print STDOUT 
+	"Uno at start of $g_curPhase = $g_unoMark";
+    chomp $g_unoMark;
+
+    $cmd = "$g_bin/nuno -X -n $ans -t AI- $op_uno > $out ";
     $r = doit($cmd, $g_exef);
     exit(1) if($r);
+    print STDOUT 
+	"Next Uno at end of $g_curPhase = " . qx($g_bin/nuno -cC $op_uno);
 }
 
 sub mkListAllRaw {
-    if(!-e "$g_store/nzraw.xml"){
+    my($doit) = @_;
+    if(!-e "$g_store/nzraw.xml" || $doit eq 'y' 
+       || ($op_nzonly && (stat("$g_store/nzraw.xml"))[9] < $g_T0)){
 	my $cmd = "";
 	$cmd .= "$g_bin/mklist -d $g_xmls_raw > $g_store/nzraw.xml";
 	my $r = doit($cmd, $g_exef, $g_pw);
@@ -252,6 +350,36 @@ sub mkListAllRaw {
     }
 }
 
+sub mkRawAiid2NetidMap {
+    my($doit) = @_;
+    if(! -e "$g_store/raw-aiid-netid.xml" || $doit eq 'y'){
+	print "\nConstruct a list mapping of netids to/from ai ids for AI users  with non-empty xmls in $g_store/raw-aiid-netid.xml ...\n";
+	my $cmd = "";
+	$cmd .= "java $g_javaopts $g_saxonCmdSequence $g_store/Users.xml ";
+	$cmd .= " $g_xslts/uidmap.xsl | $g_bin/nzsxml -d $g_xmls_raw ";
+	$cmd .= " > $g_store/raw-aiid-netid.xml ";
+	my$r = doit($cmd, $g_exef, $g_pw);
+	exit(1) if($r);
+    }
+    if(! -e "$g_store/zraw-aiid-netid.xml" || $doit eq 'y'){
+	print "\nConstruct a list mapping of netids to/from ai ids for AI users  with empty xmls in $g_store/zraw-aiid-netid.xml ...\n";
+	my $cmd = "";
+	$cmd .= "java $g_javaopts $g_saxonCmdSequence $g_store/Users.xml ";
+	$cmd .= " $g_xslts/uidmap.xsl | $g_bin/zsxml -d $g_xmls_raw ";
+	$cmd .= " > $g_store/zraw-aiid-netid.xml ";
+	my$r = doit($cmd, $g_exef, $g_pw);
+	exit(1) if($r);
+    }
+    if(! -e "$g_store/all-raw-aiid-netid.xml" || $doit eq 'y'){
+	print "\nConstruct a list mapping of netids to/from ai ids for all AI users in $g_store/all-raw-aiid-netid.xml ...\n";
+	my $cmd = "";
+	$cmd .= "java $g_javaopts $g_saxonCmdSequence $g_store/Users.xml ";
+	$cmd .= " $g_xslts/uidmap.xsl ";
+	$cmd .= " > $g_store/all-raw-aiid-netid.xml ";
+	my$r = doit($cmd, $g_exef, $g_pw);
+	exit(1) if($r);
+    }
+}
 
 sub mkDirAsNeeded {
     my($d) = @_;

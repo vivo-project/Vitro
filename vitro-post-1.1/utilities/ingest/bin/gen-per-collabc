@@ -66,17 +66,15 @@ sub mkTransform{
 
 <xsl:element name='$_nsp:$_OBJ\_PERSON_LIST'>
 
-<xsl:for-each-group select='\$docs//dm:Record//dm:$_PEEPTAG' 
-group-by='vfx:collapse(concat(dm:LNAME, ", ",dm:FNAME , " ", dm:LNAME))'>
+<xsl:for-each-group select='\$docs//dm:Record//dm:$_PEEPTAG\[./dm:LNAME != "" or ./dm:FNAME != "" or  ./dm:MNAME != ""\]' 
+group-by='vfx:collapse(concat(dm:LNAME, ", ",dm:FNAME , " ", dm:MNAME))'>
 <xsl:sort 
-select='vfx:collapse(concat(dm:LNAME, ", ",dm:FNAME , " ", dm:LNAME))'/>
+select='vfx:collapse(concat(dm:LNAME, ", ",dm:FNAME , " ", dm:MNAME))'/>
 
 <xsl:variable name='rec' select='.'/>
-<xsl:variable name='cur_netid' select='../../../\@username'/>
-<xsl:variable name='cur_aiid' select='../../../\@userId'/>
 
 <xsl:element name="$_nsp:$_OBJ\_BY_PERSON" >
-<xsl:attribute name='counter' select='position()'/>
+<xsl:attribute name='index' select='position()'/>
 
 <xsl:element name='$_nsp:PERSON_NAME'>
 <xsl:attribute name='cu_collabs'>
@@ -86,9 +84,6 @@ select='vfx:collapse(concat(dm:LNAME, ", ",dm:FNAME , " ", dm:LNAME))'/>
 </xsl:element>
 
 
-
-<$_nsp:netid><xsl:value-of select='\$cur_netid'/></$_nsp:netid>
-<$_nsp:uid><xsl:value-of select='\$cur_aiid'/></$_nsp:uid>
 
    <xsl:element name='$_nsp:LastName'>
     <xsl:value-of select='\$rec/dm:LNAME'/>

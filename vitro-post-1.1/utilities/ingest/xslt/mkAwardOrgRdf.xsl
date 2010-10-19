@@ -7,9 +7,9 @@
         xmlns:bibo="http://purl.org/ontology/bibo/"
         xmlns:foaf="http://xmlns.com/foaf/0.1/"
         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-	xmlns:aiah="http://vivoweb.org/activity-insight"
-	xmlns:acti="http://vivoweb.org/activity-insight#"
-        xmlns="http://vivoweb.org/activity-insight"
+	xmlns:aiah="http://vivoweb.org/ontology/activity-insight"
+	xmlns:acti="http://vivoweb.org/ontology/activity-insight#"
+        xmlns="http://vivoweb.org/ontology/activity-insight"
 xmlns:dm="http://www.digitalmeasures.com/schema/data"	
 	xmlns:vfx='http://vivoweb.org/ext/functions'
 	exclude-result-prefixes='xs vfx dm'
@@ -44,7 +44,8 @@ xmlns:dm="http://www.digitalmeasures.com/schema/data"
 
 <xsl:variable name='knownUri' select='vfx:knownOrgUri(aiah:org_name, $extantOrgs)'/>
 
-<xsl:variable name='orguri' select="if($knownUri != '') then $knownUri else concat($g_instance,$uno)"/>
+<xsl:variable name='orguri' 
+select="if($knownUri != '') then $knownUri else concat($g_instance,$uno)"/>
 
 <xsl:if test='$knownUri = ""'>
 <rdf:Description rdf:about="{$orguri}">
@@ -76,14 +77,15 @@ xmlns:dm="http://www.digitalmeasures.com/schema/data"
 <xsl:variable name='uno' select='$unomap/map[position()=$ctr]/@nuno'/>
 <xsl:variable name='knownUri' select='vfx:knownOrgUri(aiah:org_name, $extantOrgs)'/>
 
-<xsl:variable name='orguri' select="if($knownUri != '') then $knownUri else concat($g_instance,$uno)"/>
+<xsl:variable name='orguri' 
+select="if($knownUri != '') then $knownUri else concat($g_instance,$uno)"/>
 
 <xsl:element name='org' namespace=''>
 <xsl:element name='uri' namespace=''>
 <xsl:value-of select='$orguri'/>
 </xsl:element>
 <xsl:element name='name' namespace=''>
-<xsl:value-of select='aiah:orgname'/>
+<xsl:value-of select='aiah:org_name'/>
 </xsl:element>
 </xsl:element>
 </xsl:for-each>

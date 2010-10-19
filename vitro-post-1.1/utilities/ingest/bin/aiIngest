@@ -1,6 +1,9 @@
 #!/usr/bin/perl
 use FindBin qw($Bin);
 use lib $Bin;
+use sigtrap qw(die INT QUIT);
+#$SIG{PIPE} = 'IGNORE';
+use sigtrap qw(die untrapped normal-signals stack-trace any error-signals);
 use Getopt::Long;
 use FileHandle;
 use POSIX qw( strftime );
@@ -19,6 +22,7 @@ use EditChair;
 use Education;
 use MedCont;
 use Admin;
+use ResearchStmt;
 
 
 

@@ -1,0 +1,126 @@
+#!/usr/bin/perl
+use FindBin qw($Bin);
+use lib $Bin;
+use Getopt::Long;
+use FileHandle;
+use POSIX qw( strftime );
+
+@av = @ARGV;
+
+
+$g_t0 = time();
+$g_STARTED_AT = strftime("%Y\%m%d%H\%M\%S", localtime($g_t0) );
+
+if(scalar(@ARGV) == 0 || $op_usage){
+    Usage();
+    exit 1;
+}
+$g_cwd = $ENV{'PWD'};
+
+GetOptions('obj=s'    => \$op_obj,
+	   'nsp=s'    => \$op_nsp,
+	   'grpby=s'  => \$op_grpby,
+	   'orgtag=s' => \$op_orgtag
+	);
+
+if(!$op_obj || !$op_nsp || !$op_grpby){
+    print STDERR "--grpby, --class, --obj and --nsp must all be supplied\n";
+    exit 1;
+}
+
+
+$_OBJ = $op_obj;
+$_nsp = $op_nsp;
+$_GRPBY = $op_grpby;
+$_ORGTAG = $op_orgtag?$op_orgtag:"ORG";
+
+sub mkTransform{
+        my $transform=<<"__STYLESHEET__";
+<?xml version="1.0"?>
+<xsl:stylesheet version='2.0'
+xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+xmlns:$_nsp="http://vivoweb.org/activity-insight"
+xmlns:dm='http://www.digitalmeasures.com/schema/data'
+xmlns:xs='http://www.w3.org/2001/XMLSchema'
+xmlns:vfx='http://vivoweb.org/ext/functions'	
+exclude-result-prefixes='vfx xs dm $_nsp'
+>
+
+
+<xsl:param name='listxml' required='yes'/>
+<xsl:output method='xml' indent='yes'/>
+<xsl:strip-space elements="*"/>
+<xsl:variable name='NL'>
+<xsl:text>
+</xsl:text>
+</xsl:variable>
+
+<!-- define global variables here -->
+
+<xsl:template match='/'>
+
+<xsl:variable name='docs' as='node()*'
+	select='collection(\$listxml)'/>
+
+<$_nsp:$_OBJ\_ORG_LIST>
+
+<xsl:for-each-group select='\$docs//dm:Record/dm:$_OBJ' 
+	group-by='vfx:collapse(dm:$_GRPBY)'>
+<xsl:sort select='vfx:collapse(dm:$_GRPBY)'/>
+
+<!-- define variables here -->
+
+<$_nsp:$_OBJ\_ORG>
+<xsl:attribute name='index' select='position()'/>
+
+<$_nsp:$_OBJ\_ORG_NAME>
+<xsl:variable name='gen_orgname' select='vfx:trim(dm:$_ORGTAG)'/>
+<xsl:choose>
+  <xsl:when test='\$gen_orgname != ""'>
+  <xsl:value-of select='\$gen_orgname'/>
+  </xsl:when>
+  <xsl:otherwise>
+  <xsl:value-of select='"Unspecified"'/>
+  </xsl:otherwise>
+</xsl:choose>
+
+</$_nsp:$_OBJ\_ORG_NAME>
+
+<$_nsp:$_OBJ\_LIST>
+
+<xsl:for-each select='current-group()'>
+<xsl:sort select='\@id'/>
+<xsl:if test='dm:USER_REFERENCE_CREATOR = "Yes"'>
+<$_nsp:$_OBJ\_INFO>
+<!-- define member attributes here -->
+
+<xsl:attribute name='id' select='\@id'/>
+<xsl:attribute name='ref_netid'>
+<xsl:value-of select='../../dm:Record/\@username'/></xsl:attribute>
+<!-- define member property sub tags here -->
+
+</$_nsp:$_OBJ\_INFO>
+</xsl:if>
+
+</xsl:for-each>
+
+</$_nsp:$_OBJ\_LIST>
+</$_nsp:$_OBJ\_ORG>
+
+</xsl:for-each-group>
+
+</$_nsp:$_OBJ\_ORG_LIST>
+<xsl:value-of select='\$NL'/>
+</xsl:template>
+
+<!-- ================================== -->
+
+
+<xsl:include href='vivofuncs.xsl'/>
+
+</xsl:stylesheet>
+__STYLESHEET__
+
+    return $transform;
+}
+print mkTransform();

@@ -7,10 +7,9 @@
         xmlns:bibo="http://purl.org/ontology/bibo/"
         xmlns:foaf="http://xmlns.com/foaf/0.1/"
         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-	xmlns:aiis="http://vivoweb.org/activity-insight"
-	xmlns:acti="http://vivoweb.org/activity-insight#"
-        xmlns="http://vivoweb.org/activity-insight"
-xmlns:dm="http://www.digitalmeasures.com/schema/data"	
+	xmlns:aiis="http://vivoweb.org/ontology/activity-insight"
+	xmlns:acti="http://vivoweb.org/ontology/activity-insight#"
+	xmlns:dm="http://www.digitalmeasures.com/schema/data"	
 	xmlns:vfx='http://vivoweb.org/ext/functions'
 	exclude-result-prefixes='xs vfx'
 	>
@@ -39,10 +38,78 @@ xmlns:dm="http://www.digitalmeasures.com/schema/data"
 <xsl:template match='/aiis:INVESTIGATOR_LIST'>
 <rdf:RDF>
 
+<!-- =================================== -->
+
+<xsl:variable name='prenewps'>
+<xsl:element name='ExtantPersons' inherit-namespaces='no'>
+<xsl:for-each select='aiis:IMPACT_STMTS_BY_INVESTIGATOR'>
+
+<xsl:if test='vfx:goodName(aiis:FirstName, 
+	                   aiis:MiddleName, 
+                           aiis:LastName)'>
+
+<xsl:variable name='ctr'  select='@counter'/>
+<xsl:variable name='uno' select='$unomap/map[position()=$ctr]/@nuno'/>
+<!-- xsl:comment><xsl:value-of 
+select='concat(aiic:FirstName,"|",
+	aiis:MiddleName,"|",
+	aiis:LastName,"|"
+	,aiis:Netid)'/></xsl:comment -->
+<xsl:variable name='kUri' 
+	select='vfx:knownUriByNetidOrName(aiis:FirstName, 
+	                       		aiis:MiddleName, 
+                               		aiis:LastName,
+					aiis:Netid, 
+                               		$extantPersons)'/>
+<xsl:comment><xsl:value-of select='$kUri'/></xsl:comment>
+<xsl:variable name='furi' 
+select="if($kUri != '') then $kUri 
+                            else concat($g_instance,$uno)"/>
+
+
+<xsl:if test='$kUri = ""'>
+
+<xsl:element name='person' inherit-namespaces='no'>
+<xsl:element name='uri' inherit-namespaces='no'>
+<xsl:value-of select='concat("NEW-",$furi)'/></xsl:element>
+<xsl:element name='fname' inherit-namespaces='no'>
+<xsl:value-of select='aiis:FirstName'/></xsl:element>
+<xsl:element name='mname' inherit-namespaces='no'>
+<xsl:value-of select='aiis:MiddleName'/></xsl:element>
+<xsl:element name='lname' inherit-namespaces='no'>
+<xsl:value-of select='aiis:LastName'/></xsl:element>
+<xsl:element name='netid' inherit-namespaces='no'>
+<xsl:value-of select='aiis:Netid'/></xsl:element>
+</xsl:element>
+</xsl:if>
+</xsl:if>
+</xsl:for-each>
+</xsl:element>
+</xsl:variable>
+
+
+
+<xsl:variable name='newps'>
+<xsl:call-template name='newPeople'>
+<xsl:with-param name='knowns' select='$prenewps/ExtantPersons'/>
+</xsl:call-template>
+</xsl:variable>
+
+<!-- =================================== -->
+<!--
+<xsl:call-template name='saveNewPeople'>
+<xsl:with-param name='file' 
+select='"/home/jrm424/aiw/test/store/feedback/Pbar1.xml"'/>
+<xsl:with-param name='newpeople' select='$newps'/>
+</xsl:call-template>
+-->
+
 <xsl:call-template name='mkImpactProjects'/>
 
 <xsl:for-each select='aiis:IMPACT_STMTS_BY_INVESTIGATOR'>
-
+<xsl:if test='vfx:goodName(aiis:FirstName, 
+	                   aiis:MiddleName, 
+                           aiis:LastName)'>
 <!-- create a foaf:person for this investigator  
 OR use one from VIVO-Cornell -->
 
@@ -56,57 +123,77 @@ OR use one from VIVO-Cornell -->
 <!-- =================================================== -->
 <!-- Declare a foaf:Person (use extant person if foaf exists) -->
 
-<xsl:variable name='knownUri' select='vfx:knownUri(aiis:FirstName, aiis:MiddleName, aiis:LastName, $extantPersons)'/>
 
-<xsl:variable name='foafuri' select="if($knownUri != '') then $knownUri else concat($g_instance,$uno)"/>
+<xsl:variable name='known' 
+select='vfx:knownPersonByNetidOrName(aiis:FirstName, 
+                     		aiis:MiddleName, 
+                     		aiis:LastName, 
+				aiis:Netid,
+                     		$extantPersons union 
+                     		$prenewps/ExtantPersons)'/>
 
-<!-- xsl:comment><xsl:value-of select='$foafuri'/> - <xsl:value-of select='$knownUri'/></xsl:comment -->
+<xsl:variable name='foafuri' 
+select='if(starts-with($known/uri,"NEW-")) then 
+        substring-after($known/uri,"NEW-") else 
+        $known/uri'/>
 
-<xsl:if test='$knownUri != "" and aiis:NetId != ""'>
+<!--xsl:comment><xsl:value-of select='$knownUri'/></xsl:comment-->
+
+
+
+<xsl:if test='starts-with($known/uri,"NEW-")'>
+<xsl:if test='
+not(vfx:hasIsoMatchInvestigator(., 
+		preceding-sibling::aiis:IMPACT_STMTS_BY_INVESTIGATOR))'>
 <rdf:Description rdf:about="{$foafuri}">
-<rdf:type rdf:resource='http://vivoweb.org/activity-insight#ActivityInsightPerson'/>
-</rdf:Description>
-</xsl:if>
 
-<xsl:if test='$knownUri = ""'>
-<rdf:Description rdf:about="{$foafuri}">
-<rdf:type rdf:resource='http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing'/>
+<rdf:type 
+rdf:resource='http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing'/>
 <rdf:type rdf:resource='http://xmlns.com/foaf/0.1/Person'/>
-<xsl:if test='aiis:NetId != ""'>
-<rdf:type rdf:resource='http://vivoweb.org/activity-insight#ActivityInsightPerson'/>
+
+<xsl:if test='$known/netid != ""'>
+<rdf:type rdf:resource=
+'http://vivoweb.org/ontology/activity-insight#ActivityInsightPerson'/>
 </xsl:if>
+
 <rdfs:label>
-<xsl:value-of select='vfx:trim(aiis:INVESTIGATOR_NAME)'/>
+<xsl:value-of select='concat(vfx:simple-trim($known/lname),", ",
+               vfx:simple-trim($known/fname)," ", 
+               vfx:simple-trim($known/mname))'/>
 </rdfs:label>
 
-<core:middleName><xsl:value-of select='aiis:MiddleName'/></core:middleName>
-<core:firstName><xsl:value-of select='aiis:FirstName'/></core:firstName>
-<foaf:firstName><xsl:value-of select='aiis:FirstName'/></foaf:firstName>
-<core:lastName><xsl:value-of select='aiis:LastName'/></core:lastName>
-<foaf:lastName><xsl:value-of select='aiis:LastName'/></foaf:lastName>
+<core:middleName><xsl:value-of select='$known/mname'/></core:middleName>
+<core:firstName><xsl:value-of select='$known/fname'/></core:firstName>
+<foaf:firstName><xsl:value-of select='$known/fname'/></foaf:firstName>
+<core:lastName><xsl:value-of select='$known/lname'/></core:lastName>
+<foaf:lastName><xsl:value-of select='$known/lname'/></foaf:lastName>
 
-<xsl:if test='aiis:NetId != ""'>
+<xsl:if test='$known/netid != ""'>
 
-<xsl:variable name='nidxml' select="concat($aiisXmlPath,'/',$aiisPrefix,aiis:NetId , '.xml')"/>
+<xsl:variable name='nidxml' 
+select="concat($aiisXmlPath,'/',$aiisPrefix,$known/netid , '.xml')"/>
 
 <!-- do not bother with these if file is not available -->
+
 <xsl:if test='doc-available($nidxml)'>
 <xsl:variable name='pci' select="document($nidxml)//dm:PCI"/>
 <core:workEmail><xsl:value-of select='$pci/dm:EMAIL'/></core:workEmail>
 <bibo:prefixName><xsl:value-of select='$pci/dm:PREFIX'/> </bibo:prefixName>
 <core:workFax>
-<xsl:value-of select='$pci/dm:FAX1'/>-<xsl:value-of select='$pci/dm:FAX2'/>-<xsl:value-of select='$pci/dm:FAX3'/>
+<xsl:value-of select='$pci/dm:FAX1'/>-
+<xsl:value-of select='$pci/dm:FAX2'/>-
+<xsl:value-of select='$pci/dm:FAX3'/>
 </core:workFax>
 <core:workPhone>
-<xsl:value-of select='$pci/dm:OPHONE1'/>-<xsl:value-of select='$pci/dm:OPHONE2'/>-<xsl:value-of select='$pci/dm:OPHONE3'/>
+<xsl:value-of select='$pci/dm:OPHONE1'/>-
+<xsl:value-of select='$pci/dm:OPHONE2'/>-
+<xsl:value-of select='$pci/dm:OPHONE3'/>
 </core:workPhone>
 </xsl:if>
-
 </xsl:if>
-
 </rdf:Description>
 </xsl:if>
-
+</xsl:if>
 <!-- =================================================== -->
 <!-- now process the impact stmts attributed to this investigator -->
 
@@ -115,46 +202,21 @@ OR use one from VIVO-Cornell -->
 <xsl:with-param name='foafref' select="$foafuri"/>
 <xsl:with-param name='dep' select="aiis:Department"/>
 </xsl:call-template>
-
+</xsl:if>
 </xsl:for-each>
 
 <!-- =================================================== 
- at this point we re-run part of the last for loop to get a new list of persons 
+ at this point we re-run part of the last for loop to 
+ get a new list of persons 
  and their uri's to save in the extant Persons Out xml file
 -->
-<xsl:result-document href='{$extPerOut}'>
-<xsl:element name='ExtantPersons' namespace=''>
-<xsl:for-each select='aiis:IMPACT_STMTS_BY_INVESTIGATOR'>
-
-<xsl:variable name='ctr'  select='@counter'/>
-<xsl:variable name='uno' select='$unomap/map[position()=$ctr]/@nuno'/>
-<xsl:variable name='knownUri' select='vfx:knownUri(aiis:FirstName, aiis:MiddleName, aiis:LastName, $extantPersons)'/>
-
-<xsl:variable name='foafuri' select="if($knownUri != '') then $knownUri else concat($g_instance,$uno)"/>
-
-<!-- must prevent duplicates -->
-<xsl:if test="$knownUri = ''">
-<xsl:element name='person' namespace=''>
-<xsl:element name='uri'  namespace=''>
-<xsl:value-of select='$foafuri'/>
-</xsl:element>
-<xsl:element name='fname' namespace=''>
-<xsl:value-of select='aiis:FirstName'/>
-</xsl:element>
-<xsl:element name='mname' namespace=''>
-<xsl:value-of select='aiis:MiddleName'/>
-</xsl:element>
-<xsl:element name='lname' namespace=''>
-<xsl:value-of select='aiis:LastName'/>
-</xsl:element>
-</xsl:element>
-</xsl:if>
-
-</xsl:for-each>
-</xsl:element>
-</xsl:result-document>
+<xsl:call-template name='NewPeopleOut'>
+<xsl:with-param name='file' select='$extPerOut'/>
+<xsl:with-param name='newpeople' select='$newps'/>
+</xsl:call-template>
 
 </rdf:RDF>
+<xsl:value-of select='$NL'/>
 </xsl:template>
 
 <!-- =================================================== -->
@@ -182,13 +244,21 @@ OR use one from VIVO-Cornell -->
 <rdf:Description rdf:about="{concat($g_instance,$aiid,'-CI-',$rank)}">
 
 <rdfs:label>
-<xsl:value-of select='concat( "Investigator (",vfx:trim(../../aiis:INVESTIGATOR_NAME), ")")'/>
+<!-- xsl:value-of select=
+'concat( "Investigator (",
+	vfx:simple-trim(../../aiis:INVESTIGATOR_NAME), ")")'/ -->
 
+<xsl:value-of select='Investigator'/>
 </rdfs:label>
+
+<acti:investigatorNameAsListed>  
+<xsl:value-of select='vfx:simple-trim(../../aiis:INVESTIGATOR_NAME)'/>
+</acti:investigatorNameAsListed> 
 
 <rdf:type rdf:resource='http://vivoweb.org/ontology/core#ResearcherRole'/>
 
-<rdf:type rdf:resource='http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing'/>
+<rdf:type rdf:resource='
+http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing'/>
 <acti:investigatorDepartment>
 <xsl:value-of select='$dep'/>
 </acti:investigatorDepartment>
@@ -210,7 +280,8 @@ OR use one from VIVO-Cornell -->
 
 <rdf:Description rdf:about="{$foafref}">
 <!-- 15 -->
-<core:hasResearcherRole rdf:resource="{concat($g_instance,$aiid,'-CI-',$rank)}"/>
+<core:hasResearcherRole rdf:resource=
+		"{concat($g_instance,$aiid,'-CI-',$rank)}"/>
 </rdf:Description>
 
 </xsl:for-each>
@@ -235,8 +306,10 @@ OR use one from VIVO-Cornell -->
 <xsl:variable name='rawaiid' select='substring($aiid,$pfxlen)'/>
 <xsl:variable name='rid' select='./@ref_netid'/>
 
-<xsl:variable name='path' select="concat($aiisXmlPath,'/',$aiisPrefix, $rid, '.xml')"/>
-<xsl:variable name='ijpath' select="document($path)//IMPACT_STATEMENT[@id=$rawaiid]"/>
+<xsl:variable name='path' 
+	select="concat($aiisXmlPath,'/',$aiisPrefix, $rid, '.xml')"/>
+<xsl:variable name='ijpath' 
+	select="document($path)//IMPACT_STATEMENT[@id=$rawaiid]"/>
 <!-- xsl:comment>
 <xsl:value-of select='$path'/> - <xsl:value-of select='$ijpath'/>
 </xsl:comment -->
@@ -256,17 +329,30 @@ OR use one from VIVO-Cornell -->
 <xsl:param name='rid'/>
 
 <rdf:Description rdf:about="{concat($g_instance,$aiid)}" >
-<rdf:type rdf:resource='http://vivoweb.org/activity-insight#ImpactProject'/>
+<rdf:type rdf:resource=
+	'http://vivoweb.org/ontology/activity-insight#ImpactProject'/>
 <rdfs:label>
 <xsl:value-of select="$ijp/TITLE"/>
 </rdfs:label>
 
-<core:startDate><xsl:value-of select="$ijp/START_START"/></core:startDate>
-<core:endDate><xsl:value-of select="$ijp/END_END"/></core:endDate>
-<acti:impactStatementSummary><xsl:value-of select="$ijp/SUMMARY"/></acti:impactStatementSummary>
-<acti:impactStatementIssue><xsl:value-of select="$ijp/ISSUE"/></acti:impactStatementIssue>
-<acti:impactStatementResponse><xsl:value-of select="$ijp/RESPONSE"/></acti:impactStatementResponse>
-<acti:impactStatementImpact><xsl:value-of select="$ijp/IMPACT"/></acti:impactStatementImpact>
+<xsl:if test='$ijp/START_START != ""'>
+<core:startDate rdf:datatype='http://www.w3.org/2001/XMLSchema#date'>
+<xsl:value-of select="$ijp/START_START"/></core:startDate>
+</xsl:if>
+
+<xsl:if test='$ijp/END_END != ""'>
+<core:endDate rdf:datatype='http://www.w3.org/2001/XMLSchema#date'>
+<xsl:value-of select="$ijp/END_END"/></core:endDate>
+</xsl:if>
+
+<acti:impactStatementSummary>
+<xsl:value-of select="$ijp/SUMMARY"/></acti:impactStatementSummary>
+<acti:impactStatementIssue>
+<xsl:value-of select="$ijp/ISSUE"/></acti:impactStatementIssue>
+<acti:impactStatementResponse>
+<xsl:value-of select="$ijp/RESPONSE"/></acti:impactStatementResponse>
+<acti:impactStatementImpact>
+<xsl:value-of select="$ijp/IMPACT"/></acti:impactStatementImpact>
 
 <acti:researchType>
 <xsl:choose>
@@ -301,6 +387,40 @@ Neither Basic Research nor Applied Research
 
 </xsl:template>
 
+
+<xsl:template name='hasIsoMatchInvestigator'>
+<xsl:param name='n'/>
+<xsl:param name='nlist'/>
+<xsl:param name='res' select='false()'/>
+<xsl:choose>
+<xsl:when test='$nlist and not($res)'>
+<xsl:variable name='comp' select='vfx:isoName($n/aiis:FirstName,
+						$n/aiis:MiddleName,
+						$n/aiis:LastName,
+						$nlist[1]/aiis:FirstName,
+						$nlist[1]/aiis:MiddleName,
+						$nlist[1]/aiis:LastName)'/>
+
+<xsl:call-template name='hasIsoMatchInvestigator'>
+<xsl:with-param name='n' select='$n'/>
+<xsl:with-param name='nlist' select='$nlist[position()>1]'/>
+<xsl:with-param name='res' select='$res or $comp'/>
+</xsl:call-template>
+</xsl:when>
+<xsl:otherwise>
+<xsl:value-of select='$res'/>
+</xsl:otherwise>
+</xsl:choose>
+</xsl:template>
+
+<xsl:function name='vfx:hasIsoMatchInvestigator' as='xs:boolean'>
+<xsl:param name='n'/>
+<xsl:param name='nlist'/>
+<xsl:call-template name='hasIsoMatchInvestigator'>
+<xsl:with-param name='n' select='$n'/>
+<xsl:with-param name='nlist' select='$nlist'/>
+</xsl:call-template>
+</xsl:function>
 
 
 <!-- ================================== -->

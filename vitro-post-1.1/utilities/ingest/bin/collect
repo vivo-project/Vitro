@@ -1,0 +1,70 @@
+#!/usr/bin/perl
+
+use Getopt::Std;
+use FileHandle;
+use POSIX qw( strftime );
+use FindBin qw($Bin);
+
+autoflush STDOUT 1;
+if(scalar(@ARGV) == 0){
+    print "-b base-dir \n";
+    print "-g group i.e. 1of {'aw','ic','is','ed','gr','rs','all'}\n";
+    print "use -L to run live\n";
+    print "use -z to skip creating store/nzraw.xml\n";
+    exit 0;
+}
+
+getopts("b:g:Lvz");
+
+sub trim {
+    my($a) = @_;
+    $a =~ s/^\s*(\S+)\s*$/$1/;
+    $a =~ s/^\s*(\S.*\S)\s*$/$1/;
+    $a =~ s/(\s*)//;
+    return $a;
+}
+
+if(!$opt_g){
+    print "-g option required to specify what to collect\n";
+    print "choose from 'aw','ic','is','ed','gr','rs'.\n";
+    exit 1;
+}
+$grp = lc($opt_g);
+
+$wdir = "/home/jrm424/aiw";
+$wdir = $opt_b if $opt_b;
+chdir $wdir;
+$nz = " --nz ";
+$nz = "" if ! $opt_z;
+
+if(!(-e "bin/aiIngest" && -x _ && -r _)){
+    print "$wdir/bin/aiIngest must exist and be executable\n";
+    exit 1;
+}
+
+if($grp eq "gr"){
+    print "bin/aiIngest $nz --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps GRC,GRIC,GRSPC\n";
+    qx(bin/aiIngest $nz --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps GRC,GRIC,GRSPC) if $opt_L;
+
+} elsif($grp eq "ic"){
+    print "bin/aiIngest $nz --L --v --log --aiic IC  --rawp AIXMLS/cur-raw --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps ICIC,ICAC,ICJC,ICIAC,ICIPC\n";
+    qx(bin/aiIngest $nz --L --v --log --aiic IC  --rawp AIXMLS/cur-raw --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps ICIC,ICAC,ICJC,CIAC,ICIPC) if $opt_L;
+
+} elsif($grp eq "is"){
+    print "bin/aiIngest $nz --L --v --log --aiis IS  --rawp AIXMLS/cur-raw --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps ISIS,ISIC,ISCEC,ISFOC,ISGEOC,ISPAC,ISUAC,ISCAC\n";
+    qx(bin/aiIngest $nz --L --v --log --aiis IS  --rawp AIXMLS/cur-raw --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps ISIS,ISIC,ISCEC,ISFOC,ISGEOC,ISPAC,ISUAC,ISCAC) if $opt_L;
+} elsif($grp eq "ed"){
+    print "bin/aiIngest $nz --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps  EDC,EDPC,EDOC\n";
+    qx(bin/aiIngest $nz --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps  EDC,EDPC,EDOC) if $opt_L;
+} elsif($grp eq "aw"){
+    print "bin/aiIngest $nz --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps AWC\n";
+    qx(bin/aiIngest $nz --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps AWC) if $opt_L;
+}  elsif($grp eq "rs"){
+    print "bin/aiIngest $nz --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps RRC\n";
+    qx(bin/aiIngest $nz --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps RRC) if $opt_L;
+} elsif($grp eq "all"){
+    print "bin/aiIngest $nz --L --v --log --aiic IC --aiis IS --rawp AIXMLS/cur-raw --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps  ICIC,ICAC,ICJC,ICAC,ICIPC,ISIS,ISIC,ISCEC,ISFOC,ISGEOC,ISPAC,ISUAC,ISCAC,EDC,EDPC,EDOC,AWC,RRC\n";
+    qx(bin/aiIngest $nz --L --v --log --aiic IC --aiis IS --rawp AIXMLS/cur-raw --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps ICIC,ICAC,ICJC,ICAC,ICIPC,ISIS,ISIC,ISCEC,ISFOC,ISGEOC,ISPAC,ISUAC,ISCAC,EDC,EDPC,EDOC,AWC,RRC) if $opt_L;
+} else {
+    print "Unknown group.\n";
+}

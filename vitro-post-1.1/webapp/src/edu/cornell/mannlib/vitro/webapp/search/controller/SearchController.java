@@ -79,7 +79,9 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQueryWrapper;
  * are different ways of doing this. We will just get an object out
  * of the application scope. This object was set when the context
  * started up and can be set in the web.xml. See LuceneSetup.java
- * for an exmple.
+ * for an example.
+ * 
+ * @deprecated Use PagedSearchController instead.
  */
 public class SearchController extends VitroHttpServlet{
     private static final Log log = LogFactory.getLog(SearchController.class.getName());

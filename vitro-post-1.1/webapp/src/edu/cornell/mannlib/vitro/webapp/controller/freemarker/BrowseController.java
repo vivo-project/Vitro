@@ -13,6 +13,8 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet.ResponseValues;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
@@ -44,7 +46,9 @@ public class BrowseController extends FreemarkerHttpServlet {
             = new ConcurrentLinkedQueue<String>();
     private RebuildGroupCacheThread _cacheRebuildThread;
 
-    private static final Log log = LogFactory.getLog(BrowseController.class.getName());
+    private static final Log log = LogFactory.getLog(BrowseController.class);
+    
+    private static final String TEMPLATE_DEFAULT = "classGroups.ftl";
 
     public void init(javax.servlet.ServletConfig servletConfig)
             throws javax.servlet.ServletException {
@@ -68,15 +72,18 @@ public class BrowseController extends FreemarkerHttpServlet {
         _cacheRebuildThread.start();
         _cacheRebuildThread.informOfQueueChange();
     }
-      
+     
+    @Override
     protected String getTitle(String siteName) {
     	return "Index to " + siteName + " Contents";
     }
 
-    protected String getBody(VitroRequest vreq, Map<String, Object> body, Configuration config) {
+    @Override
+    protected ResponseValues processRequest(VitroRequest vreq) {
 
-        String bodyTemplate = "classGroups.ftl"; 
+        Map<String, Object> body = new HashMap<String, Object>();
         String message = null;
+        String templateName = TEMPLATE_DEFAULT;
         
     	if( vreq.getParameter("clearcache") != null ) //mainly for debugging
     		clearGroupCache();
@@ -88,22 +95,20 @@ public class BrowseController extends FreemarkerHttpServlet {
     	if (groups == null || groups.isEmpty()) {
     		message = "There are not yet any items in the system.";
     	}
-    	else {
-    	    // FreeMarker will wrap vcgroups in a SimpleSequence. So do we want to create the SimpleSequence directly?
-    	    // But, makes code less portable to another system.
-    	    // SimpleSequence vcgroups = new SimpleSequence(groups.size());   	    
+    	else {  	    
     	    List<VClassGroupTemplateModel> vcgroups = new ArrayList<VClassGroupTemplateModel>(groups.size());   	    
-    		for (VClassGroup g: groups) {
-    		    vcgroups.add(new VClassGroupTemplateModel(g));
+    		for (VClassGroup group : groups) {
+    		    vcgroups.add(new VClassGroupTemplateModel(group));
     		}
     		body.put("classGroups", vcgroups);
     	} 
     	
     	if (message != null) {
     	    body.put("message", message);
+    	    templateName = Template.TITLED_MESSAGE.toString();
     	} 
     	
-        return mergeBodyToTemplate(bodyTemplate, body, config);
+        return new TemplateResponseValues(templateName, body);
     }
 
     public void destroy(){
@@ -115,7 +120,7 @@ public class BrowseController extends FreemarkerHttpServlet {
         if( grp == null ){
             log.debug("needed to build vclassGroups for portal " + portalId);
             // Get all classgroups, each populated with a list of their member vclasses
-            List groups = vcgDao.getPublicGroupsWithVClasses(ORDER_BY_DISPLAYRANK, !INCLUDE_UNINSTANTIATED); 
+            List groups = vcgDao.getPublicGroupsWithVClasses(ORDER_BY_DISPLAYRANK, !INCLUDE_UNINSTANTIATED, INCLUDE_INDIVIDUAL_COUNT); 
 
             // remove classes that have been configured to be hidden
             // from search results
@@ -152,6 +157,7 @@ public class BrowseController extends FreemarkerHttpServlet {
     
     private static boolean ORDER_BY_DISPLAYRANK = true;
     private static boolean INCLUDE_UNINSTANTIATED = true;
+    private static boolean INCLUDE_INDIVIDUAL_COUNT = true;
 
 //  private void removeUnpopulatedClasses( List<VClassGroup> groups){
 //          if( groups == null || groups.size() == 0 ) return;

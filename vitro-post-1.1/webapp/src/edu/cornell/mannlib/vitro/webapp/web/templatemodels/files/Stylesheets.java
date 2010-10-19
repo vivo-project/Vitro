@@ -3,8 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.files;
 
 public class Stylesheets extends Files {
- 
-    protected static final String THEME_SUBDIR = "/css";
     
     public Stylesheets() { }
     
@@ -14,10 +12,6 @@ public class Stylesheets extends Files {
     
     protected String getTag(String url) {
         return "<link rel=\"stylesheet\" href=\"" + url + "\" />\n";
-    }
-    
-    protected String getThemeSubDir() {
-        return THEME_SUBDIR;
     }
 
 }

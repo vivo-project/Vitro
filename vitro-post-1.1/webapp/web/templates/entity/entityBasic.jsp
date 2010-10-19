@@ -4,7 +4,7 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.VClass" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditSubmission" %>
-<%@ page import="edu.cornell.mannlib.vedit.beans.LoginFormBean" %>
+<%@ page import="edu.cornell.mannlib.vedit.beans.LoginStatusBean" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.VitroRequest"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary" %>
@@ -51,16 +51,13 @@ if (entity == null){
     throw new JspException(e);
 }
 
-if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, LoginFormBean.NON_EDITOR) /* minimum level*/) {
-    request.setAttribute("showSelfEdits",Boolean.TRUE);
-}%>
-<c:if test="${sessionScope.loginHandler != null &&
-              sessionScope.loginHandler.loginStatus == 'authenticated' &&
-              sessionScope.loginHandler.loginRole >= LoginFormBean.NON_EDITOR}">
-    <c:set var="showCuratorEdits" value="${true}"/>
-</c:if>
+boolean showSelfEdits = VitroRequestPrep.isSelfEditing(request);
+boolean showCuratorEdits = LoginStatusBean.getBean(request).isLoggedInAtLeast(LoginStatusBean.CURATOR);
+if (showSelfEdits || showCuratorEdits) {
+    request.setAttribute("showEdits",Boolean.TRUE);
+}
+%>
 
-<c:set var="showEdits" value="${showSelfEdits || showCuratorEdits}" scope="request"/>
 <c:set var="editingClass" value="${showEdits ? 'editing' : ''}" scope="request"/>
 
 <c:set var="themeDir"><c:out value="${portalBean.themeDir}" /></c:set>
@@ -193,9 +190,10 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
                         </c:choose>
                         <edLnk:editLinks item="${addUrlPredicate}" icons="false" />
                     </c:if>
-                    <c:if test="${!empty entity.anchor}"> 
+                    
                     <ul class="externalLinks properties">
-                        <%-- Primary link --%>                             
+                        <%-- Primary link --%>
+                        <c:if test="${!empty entity.anchor}">                          
                             <c:choose>
                                 <c:when test="${!empty entity.url}">
                                     <c:url var="entityUrl" value="${entity.url}" />
@@ -214,8 +212,8 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
                                     <%--  RY For now, not providing editing links for anchor text with no url. Should fix. --%>
                                     <li class="primary"><span class="externalLink"><p:process>${entity.anchor}</p:process></span></li>
                                 </c:otherwise>
-                            </c:choose>
-                        
+                            </c:choose>                        
+                        </c:if> 
                         
                         <%-- Additional links --%>
                         <c:if test="${!empty entity.linksList }">
@@ -236,8 +234,7 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
                                 </li>                                          
                             </c:forEach>
                         </c:if>
-                    </ul>
-                    </c:if>                   
+                    </ul>                                       
                 </div> <!-- end dprop-vitro-links  -->
             </c:if>
 
@@ -315,3 +312,4 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
     </div> <!-- content -->
     
 <script type="text/javascript" src="<c:url value="/js/imageUpload/imageUploadUtils.js"/>"></script>
+

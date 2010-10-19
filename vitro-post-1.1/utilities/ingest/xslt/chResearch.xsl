@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <xsl:stylesheet version='2.0'
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-	xmlns:aichr="http://vivoweb.org/activity-insight"
+	xmlns:aichr="http://vivoweb.org/ontology/activity-insight"
 	xmlns:dm="http://www.digitalmeasures.com/schema/data"
 	xmlns:xs='http://www.w3.org/2001/XMLSchema'
 	xmlns:vfx='http://vivoweb.org/ext/functions'	
@@ -27,20 +27,22 @@
 <xsl:for-each-group select='$docs//dm:CHRESEARCH' 
 	group-by='@id'>
 <xsl:sort select='@id'/>
-
+<xsl:if test='dm:USER_REFERENCE_CREATOR = "Yes"'>
 <aichr:CHRESEARCH>
+
 <xsl:attribute name='index' select='position()'/>
 <xsl:for-each select='current-group()'>
 <xsl:sort select='@id'/>
-<xsl:if test='dm:USER_REFERENCE_CREATOR = "Yes"'>
 <aichr:netid><xsl:value-of select='../../dm:Record/@username'/></aichr:netid>
+
 <aichr:CHRESEARCH_ID><xsl:value-of select='@id'/></aichr:CHRESEARCH_ID>
 
 <!-- other stuff may go here -->
 
 </xsl:for-each>
-</aichr:CHRESEARCH>
 
+</aichr:CHRESEARCH>
+</xsl:if>
 </xsl:for-each-group>
 </aichr:CHRESEARCH_LIST>
 

@@ -2,8 +2,8 @@
 <xsl:stylesheet version='2.0'
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 	xmlns:ai="http://www.digitalmeasures.com/schema/data"
-	xmlns:aiic="http://vivoweb.org/activity-insight"
-	xmlns="http://vivoweb.org/activity-insight"
+	xmlns:aiic="http://vivoweb.org/ontology/activity-insight"
+	xmlns="http://vivoweb.org/ontology/activity-insight"
 	xmlns:dm="http://www.digitalmeasures.com/schema/data"
 	xmlns:xs='http://www.w3.org/2001/XMLSchema'
 	xmlns:vfx='http://vivoweb.org/ext/functions'	
@@ -23,7 +23,8 @@
 <xsl:variable name='docs' as='node()*'
 	select='collection($listxml)'/>
 
-<xsl:element name="aiic:INTELLCONT_PROMULGATOR_LIST" namespace="http://vivoweb.org/activity-insight">
+<xsl:element name="aiic:INTELLCONT_PROMULGATOR_LIST" 
+namespace="http://vivoweb.org/ontology/activity-insight">
 
 <xsl:for-each-group select='$docs/dm:Data/ai:INTELLCONT_PROMULGATORS/ai:PROMULGATOR' 
 	group-by='vfx:collapse(concat(ai:ILK,ai:INTELLCONT_PROMULGATOR_NAME))'>
@@ -57,7 +58,11 @@
 <xsl:for-each select='ai:INTELLCONT_ID'>
 <xsl:sort select='.'/>
 <xsl:element name='aiic:INTELLCONT_INFO'>
-<xsl:attribute name='ref_netid'><xsl:value-of select='$ref_netid'/></xsl:attribute>AI-<xsl:value-of select='.'/>
+<xsl:attribute name='ref_netid'>
+<xsl:value-of select='$ref_netid'/>
+</xsl:attribute>
+<xsl:attribute name='hasTitle' select='./@hasTitle'/>
+<xsl:attribute name='hasGoodAuthor' select='./@hasGoodAuthor'/>AI-<xsl:value-of select='.'/>
 
 </xsl:element>
 </xsl:for-each>

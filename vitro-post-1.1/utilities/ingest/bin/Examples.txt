@@ -9,8 +9,7 @@ This is a live verbose run with logging. GU=Get Users, GX=Get Xmls
 
 Process Intellectual Contributions:
 
-    bin/aiIngest --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m'
-    --aiic IC --steps IC,CA,CJ,CIA,CIP
+    bin/aiIngest --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --aiic IC --steps IC,CA,CJ,CIA,CIP
 
 This is a live, verbose run with logging and 2GB heap. 'IC' will be used as a prefix to
 processed xmls. IC=Initial Collection phase that creates local summaries of xmls
@@ -19,8 +18,7 @@ CIP=Collect IntellCont Promulgators.
 
 Construct RDF from collections:
 
-    bin/aiIngest --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' 
-    --aiic IC --steps AR,JR,ICAR,ICPR
+    bin/aiIngest --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --aiic IC --steps AR,JR,ICAR,ICPR
 
 AR=Author RDF, JR=Journal RDF, ICAR=IntellCont Author RDF, 
 ICPR=IntellCont Promulgator RDF
@@ -29,48 +27,41 @@ ICPR=IntellCont Promulgator RDF
 
 Gather and collect Impact Statement info:
 
-    bin/aiIngest --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' 
-    --aiis IS --steps IS,CINV,CCE,CFO,CGEO,CPA,CUA,CCA
+    bin/aiIngest --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --aiis IS --steps IS,CINV,CCE,CFO,CGEO,CPA,CUA,CCA
 
 Construct RDF from collections:
 
-    bin/aiIngest --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' 
-    --aiic IC --steps MIR,MCER,MFOR,MGR,MPAR,MUAR,MCAR 
-    --reuseAll
+    bin/aiIngest --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --aiis IS --steps MIR,MCER,MFOR,MGR,MPAR,MUAR,MCAR --reuseAll
 
 ==================================
 
 Gather and collect Award info:
-    bin/aiIngest --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' 
-    --step CAW
+    bin/aiIngest --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --step CAW
 
 Construct RDF from collections:
 
-    bin/aiIngest --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' 
-    --step MAWR --reuseAll
+    bin/aiIngest --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --step MAWR --reuseAll
 
 ==================================
 
 Gather and collect Grant info:
-    bin/aiIngest --L --v --log  --jopts '-Xmx2048m -XX:MaxPermSize=100m' 
-    --steps GRNT,GRNT_INV,GRNT_SPON,GRNT_ARS,
-    --steps GRNT_PFA,GRNT_PE,GRNT_COST,GRNT_COMM    
+    bin/aiIngest --L --v --log  --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps GRNT,GRNT_INV,GRNT_SPON,GRNT_ARS,GRNT_PFA,GRNT_PE,GRNT_COST,GRNT_COMM    
 
 Construct RDF from collections:
 
-    bin/aiIngest --L --v --log  --jopts '-Xmx2048m -XX:MaxPermSize=100m'
-    --steps MGRNT,MGRNT_INV,MGRNT_SPON,MGRNT_ARS,
-    --steps MGRNT_PFA,MGRNT_PE,MGRNT_COST,MGRNT_COMM 
-    --reuseAll
+    bin/aiIngest --L --v --log  --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps MGRNT,MGRNT_INV,MGRNT_SPON,MGRNT_ARS,MGRNT_PFA,MGRNT_PE,MGRNT_COST,MGRNT_COMM --reuseAll
 
 ==================================
 
+Gather and collect everything:
+    bin/aiIngest --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --aiic IC --aiis IS --steps IC,CA,CJ,CIA,CIP,CAW --uts
+
+    bin/aiIngest --L --v --log  --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps GRNT,GRNT_INV,GRNT_SPON,GRNT_ARS,GRNT_PFA,GRNT_PE,GRNT_COST,GRNT_COMM
+
+
+==================================
 Construct RDF from ALL collections:
 
-    bin/aiIngest --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m'  
-    --aiic IC --aiis IS 
-    --steps AR,JR,ICAR,ICPR,MIR,MCER,MFOR,MGR,MPAR,MUAR,MCAR
-    --steps MAWR,MGRNT,MGRNT_INV,MGRNT_SPON,MGRNT_ARS,MGRNT_PFA
-    --steps MGRNT_PE,MGRNT_COST,MGRNT_COMM
+    bin/aiIngest --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --aiic IC --aiis IS --steps AR,JR,ICAR,ICPR,MIR,MCER,MFOR,MGR,MPAR,MUAR,MCAR,MAWR,MGRNT,MGRNT_INV,MGRNT_SPON,MGRNT_ARS,MGRNT_PFA,MGRNT_PE,MGRNT_COST,MGRNT_COMM
 
 

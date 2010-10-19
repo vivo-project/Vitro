@@ -73,10 +73,10 @@ public class SelfEditingPolicySetup  implements ServletContextListener  {
     
     public void contextDestroyed(ServletContextEvent sce) { /*nothing*/  }
     
-    public static SelfEditingPolicy makeSelfEditPolicyFromModel( Model model ){
+    public static SelfEditingPolicy makeSelfEditPolicyFromModel( OntModel model ){
         SelfEditingPolicy pol = null;
         if( model == null )
-            pol = new SelfEditingPolicy(null,null,null,null);
+            pol = new SelfEditingPolicy(null,null,null,null, null);
         else{
             Set<String> prohibitedProps = new HashSet<String>();
             //ResIterator it = model.listSubjectsWithProperty( model.createProperty( VitroVocabulary.PROPERTY_SELFEDITPROHIBITEDANNOT ) );
@@ -92,13 +92,13 @@ public class SelfEditingPolicySetup  implements ServletContextListener  {
                     }
                 }
             }
-            pol = new SelfEditingPolicy(prohibitedProps,null,null,null);
+            pol = new SelfEditingPolicy(prohibitedProps,null,null,null,model);
         }               
         return pol;
     }
         
     
-    public static void replaceSelfEditing( ServletContext sc, Model model ){
+    public static void replaceSelfEditing( ServletContext sc, OntModel model ){
         ServletPolicyList.replacePolicy(sc, makeSelfEditPolicyFromModel(model));
     }    
 }

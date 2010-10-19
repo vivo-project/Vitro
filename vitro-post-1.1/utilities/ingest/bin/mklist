@@ -22,10 +22,27 @@ sub trim {
     $a =~ s/(\s*)//;
     return $a;
 }
-
 sub getXmlFiles {
     my($d) = @_;
+    opendir DIR, $d or die "Required Op failed: $!";
+    
+    my(@xfiles) = grep /\.xml$/, readdir DIR; #qx(ls $d/*.xml);
+    close DIR;
+    @xfiles = sort @xfiles;
+    my @res;
+    foreach my $xml (@xfiles){
+	chomp $xml;
+	next if -z "$d/$xml" && !$opt_z;
+	push @res, $xml;
+    }
+    return @res;
+}
+
+sub OldGetXmlFiles {
+    my($d) = @_;
+
     my(@xfiles) = qx(ls $d/*.xml);
+
     my @res;
     foreach my $xml (@xfiles){
 	chomp $xml;

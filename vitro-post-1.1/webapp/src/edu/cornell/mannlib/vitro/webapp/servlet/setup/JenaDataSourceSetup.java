@@ -2,6 +2,11 @@
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 
@@ -17,7 +22,9 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 
+import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
+import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDaoCon;
@@ -64,6 +71,8 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
         	inferenceOms.setDisplayModel(displayModel);
         	unionOms.setDisplayModel(displayModel);
         			
+        	checkForNamespaceMismatch( memModel, defaultNamespace );
+        	
             sce.getServletContext().setAttribute("baseOntModel", memModel);
             WebappDaoFactory baseWadf = new WebappDaoFactoryJena(baseOms, defaultNamespace, null, null);
             sce.getServletContext().setAttribute("assertionsWebappDaoFactory",baseWadf);
@@ -108,6 +117,37 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
     } 
 
     
+    private void checkForNamespaceMismatch(OntModel model, String defaultNamespace) {
+        String defaultNamespaceFromDeployProperites = ConfigurationProperties.getProperty("Vitro.defaultNamespace");
+        if( defaultNamespaceFromDeployProperites == null ){            
+            log.error("Could not get namespace from deploy.properties.");
+        }               
+        
+        List<String> portalURIs = new ArrayList<String>();
+        try {
+            model.enterCriticalSection(Lock.READ);
+            Iterator portalIt = model.listIndividuals(PORTAL);
+            while (portalIt.hasNext()) {
+                portalURIs.add( ((Individual)portalIt.next()).getURI() );                
+            }
+        } finally {
+            model.leaveCriticalSection();
+        }
+        if( portalURIs.size() > 0 ){
+            for( String portalUri : portalURIs){
+                if( portalUri != null && ! portalUri.startsWith(defaultNamespaceFromDeployProperites)){
+                    log.error("Namespace mismatch between db and deploy.properties.");
+                    log.error("Vivo will not start up correctly because the default namespace specified in deploy.properties does not match the namespace of " +
+                    		"a portal in the database. Namespace from deploy.properties: \"" + defaultNamespaceFromDeployProperites + 
+                            "\" Namespace from an existing portal: \"" + portalUri + "\" To get the application to start with this " +
+                            "database change the default namespace in deploy.properties " + portalUri.substring(0, portalUri.lastIndexOf("/")+1) + 
+                            "  Another possibility is that deploy.properties does not specify the intended database.");
+                }
+            }
+        }
+    }
+
+
     /* ====================================================================== */
     
     

@@ -48,50 +48,56 @@ public class DumpHelper {
             log.error("Error getting value of template model " + varName + " from data model.");
         }
 
-        // Just use toString() method for now. Handles nested collections. Could make more sophisticated later.
-        String value = tm.toString(); 
-        String type = null;
-        Object unwrappedModel = null;
-        try {
-            unwrappedModel = DeepUnwrap.permissiveUnwrap(tm);
-        } catch (TemplateModelException e) {
-            log.error("Cannot unwrap template model  " + varName + ".");
-        }
-
-        // This case must precede the TemplateScalarModel case, because
-        // tm is an instance of StringModel and thus a TemplateScalarModel.
-        if (unwrappedModel instanceof BaseTemplateModel) {
-            type = unwrappedModel.getClass().getName(); 
-            value = ((BaseTemplateModel)unwrappedModel).dump();
-        } else if (tm instanceof TemplateScalarModel) {
-            type = "string";
-        } else if (tm instanceof TemplateDateModel) { 
-            type = "date";
-        } else if (tm instanceof TemplateNumberModel) {
-            type = "number";
-        } else if (tm instanceof TemplateBooleanModel) {
-            type = "boolean";
-            try {
-                value =  ((TemplateBooleanModel) tm).getAsBoolean() ? "true" : "false";
-            } catch (TemplateModelException e) {
-                log.error("Error getting boolean value for " + varName + ".");
-            }
-        } else if (tm instanceof TemplateSequenceModel){
-            type = "sequence";
-        } else if (tm instanceof TemplateHashModel) {
-            type = "hash";
-        // In recursive dump, we've gotten down to a raw string. Just output it.    
-//        } else if (val == null) {
-//            out.write(var);
-//            return;
-        } else {
-            type = "object";
-        }
-
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("var", varName);
-        map.put("value", value);
-        map.put("type", type);
+        
+        if (tm != null) {            
+            String type = null;
+            Object unwrappedModel = null;
+
+            try {
+                unwrappedModel = DeepUnwrap.permissiveUnwrap(tm);
+            } catch (TemplateModelException e) {
+                log.error("Cannot unwrap template model  " + varName + ".");
+            }
+            
+            // Just use toString() method for now. Handles nested collections. Could make more sophisticated later.
+            // tm.toString() gives wrong results in the case of, e.g., a boolean value in a hash. tm.toString() may
+            // return a TemplateBooleanModel object, while unwrappedModel.toString() returns "true" or "false."
+            String value = unwrappedModel.toString(); // tm.toString();  
+            
+            // This case must precede the TemplateScalarModel case, because
+            // tm is an instance of StringModel and thus a TemplateScalarModel.
+            if (unwrappedModel instanceof BaseTemplateModel) {
+                type = unwrappedModel.getClass().getName(); 
+                value = ((BaseTemplateModel)unwrappedModel).dump();
+            } else if (tm instanceof TemplateScalarModel) {
+                type = "string";
+            } else if (tm instanceof TemplateDateModel) { 
+                type = "date";
+            } else if (tm instanceof TemplateNumberModel) {
+                type = "number";
+            } else if (tm instanceof TemplateBooleanModel) {
+                type = "boolean";
+                try {
+                    value =  ((TemplateBooleanModel) tm).getAsBoolean() ? "true" : "false";
+                } catch (TemplateModelException e) {
+                    log.error("Error getting boolean value for " + varName + ".");
+                }
+            } else if (tm instanceof TemplateSequenceModel){
+                type = "sequence";
+            } else if (tm instanceof TemplateHashModel) {
+                type = "hash";
+            // In recursive dump, we've gotten down to a raw string. Just output it.    
+            //  } else if (val == null) {
+            //    out.write(var);
+            //    return;
+            } else {
+                type = "object";
+            }
+            map.put("value", value);
+            map.put("type", type);
+        }
 
         return map;
     }

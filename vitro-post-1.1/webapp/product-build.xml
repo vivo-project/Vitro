@@ -147,7 +147,7 @@
 	<!-- ================================= 
           target: test              
          ================================= -->
-	<target name="test" unless="skiptests" description="--> Run JUnit tests">
+	<target name="test" description="--> Run JUnit tests">
 		<innercall target="test" />
 		<antcall target="productTest" />
 	</target>

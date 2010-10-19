@@ -25,6 +25,7 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vedit.beans.LoginFormBean;
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.RoleBasedPolicy.AuthRole;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
@@ -39,6 +40,15 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.LoginEvent;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.LoginLogoutEvent;
 
 public class Authenticate extends FreemarkerHttpServlet {
+	/**
+	 * Maximum inactive interval for a ordinary logged in user session, in
+	 * seconds.
+	 */
+	public static final int LOGGED_IN_TIMEOUT_INTERVAL = 300;
+
+	/** Maximum inactive interval for a editor (or better) session, in seconds. */
+	public static final int PRIVILEGED_TIMEOUT_INTERVAL = 32000;
+
 	private static final Log log = LogFactory.getLog(Authenticate.class
 			.getName());
 
@@ -66,9 +76,6 @@ public class Authenticate extends FreemarkerHttpServlet {
 	public static final String BODY_LOGIN_NAME = "loginName";
 	public static final String BODY_FORM_ACTION = "formAction";
 	public static final String BODY_ERROR_MESSAGE = "errorMessage";
-
-	/** If no portal is specified in the request, use this one. */
-	private static final int DEFAULT_PORTAL_ID = 1;
 
 	/** Where do we find the User/Session map in the servlet context? */
 	public static final String USER_SESSION_MAP_ATTR = "userURISessionMap";
@@ -281,6 +288,7 @@ public class Authenticate extends FreemarkerHttpServlet {
 		HttpSession session = request.getSession();
 
 		// Put the login info into the session.
+		// TODO the LoginFormBean is being phased out.
 		LoginFormBean lfb = new LoginFormBean();
 		lfb.setUserURI(user.getURI());
 		lfb.setLoginStatus("authenticated");
@@ -289,6 +297,11 @@ public class Authenticate extends FreemarkerHttpServlet {
 		lfb.setLoginRemoteAddr(request.getRemoteAddr());
 		lfb.setLoginName(user.getUsername());
 		session.setAttribute("loginHandler", lfb);
+		// TODO this should eventually replace the LoginFormBean.
+		LoginStatusBean lsb = new LoginStatusBean(user.getURI(),
+				user.getUsername(), parseUserSecurityLevel(user));
+		LoginStatusBean.setBean(session, lsb);
+		log.info("Adding status bean: " + lsb);
 
 		// Remove the login process info from the session.
 		session.removeAttribute(LoginProcessBean.SESSION_ATTRIBUTE);
@@ -301,13 +314,10 @@ public class Authenticate extends FreemarkerHttpServlet {
 		getUserDao(request).updateUser(user);
 
 		// Set the timeout limit on the session - editors, etc, get more.
-		session.setMaxInactiveInterval(300); // seconds, not milliseconds
-		try {
-			if ((int) Integer.decode(lfb.getLoginRole()) > 1) {
-				session.setMaxInactiveInterval(32000);
-			}
-		} catch (NumberFormatException e) {
-			// No problem - leave it at the default.
+		if (lsb.isLoggedInAtLeast(LoginStatusBean.EDITOR)) {
+			session.setMaxInactiveInterval(PRIVILEGED_TIMEOUT_INTERVAL);
+		} else {
+			session.setMaxInactiveInterval(LOGGED_IN_TIMEOUT_INTERVAL);
 		}
 
 		// Record the user in the user/Session map.
@@ -385,7 +395,7 @@ public class Authenticate extends FreemarkerHttpServlet {
 
 		// If the user is a self-editor, send them to their home page.
 		User user = getLoggedInUser(request);
-		if (AuthRole.USER.roleUri().equals(user.getRoleURI())) {
+		if ( user != null && user.getRoleURI() != null && user.getRoleURI().equals( Integer.toString(AuthRole.USER.level()) )){
 			UserDao userDao = getUserDao(request);
 			if (userDao != null) {
 				List<String> uris = userDao.getIndividualsUserMayEditAs(user
@@ -429,10 +439,8 @@ public class Authenticate extends FreemarkerHttpServlet {
 		if (session == null) {
 			return State.NOWHERE;
 		}
-
-		LoginFormBean lfb = (LoginFormBean) session
-				.getAttribute("loginHandler");
-		if ((lfb != null) && (lfb.getLoginStatus().equals("authenticated"))) {
+		
+		if (LoginStatusBean.getBean(request).isLoggedIn()) {
 			return State.LOGGED_IN;
 		}
 
@@ -448,19 +456,13 @@ public class Authenticate extends FreemarkerHttpServlet {
 			return null;
 		}
 
-		HttpSession session = request.getSession(false);
-		if (session == null) {
-			return null;
-		}
-
-		LoginFormBean lfb = (LoginFormBean) session
-				.getAttribute("loginHandler");
-		if (lfb == null) {
+		LoginStatusBean lsb = LoginStatusBean.getBean(request);
+		if (!lsb.isLoggedIn()) {
 			log.debug("getLoggedInUser: not logged in");
 			return null;
 		}
 
-		return userDao.getUserByUsername(lfb.getLoginName());
+		return userDao.getUserByUsername(lsb.getUsername());
 	}
 
 	/**
@@ -507,33 +509,22 @@ public class Authenticate extends FreemarkerHttpServlet {
 		return request.getContextPath();
 	}
 
-	/**
-	 * What portal are we currently in?
-	 */
-	private String getPortalIdString(HttpServletRequest request) {
-		String portalIdParameter = request.getParameter("home");
-		if (portalIdParameter == null) {
-			return String.valueOf(DEFAULT_PORTAL_ID);
-		} else {
-			return portalIdParameter;
-		}
+	/** Where do we stand in the login process? */
+	private LoginProcessBean getLoginProcessBean(HttpServletRequest request) {
+		return LoginProcessBean.getBeanFromSession(request);
 	}
 
 	/**
-	 * How is the login process coming along?
+	 * Parse the role URI from User. Don't crash if it is not valid.
 	 */
-	private LoginProcessBean getLoginProcessBean(HttpServletRequest request) {
-		HttpSession session = request.getSession();
-
-		LoginProcessBean bean = (LoginProcessBean) session
-				.getAttribute(LoginProcessBean.SESSION_ATTRIBUTE);
-
-		if (bean == null) {
-			bean = new LoginProcessBean();
-			session.setAttribute(LoginProcessBean.SESSION_ATTRIBUTE, bean);
+	private int parseUserSecurityLevel(User user) {
+		try {
+			return Integer.parseInt(user.getRoleURI());
+		} catch (NumberFormatException e) {
+			log.warn("Invalid RoleURI '" + user.getRoleURI() + "' for user '"
+					+ user.getURI() + "'");
+			return 1;
 		}
-
-		return bean;
 	}
 
 	// ----------------------------------------------------------------------
@@ -555,7 +546,7 @@ public class Authenticate extends FreemarkerHttpServlet {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	/**
 	 * The servlet context should contain a map from User URIs to
 	 * {@link HttpSession}s. Get a reference to it, creating it if necessary.

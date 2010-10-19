@@ -113,6 +113,11 @@ exclude-result-prefixes='vfx xs'
 </xsl:element>
 
 <xsl:element name='IMPACT_STMT_ID' namespace='{namespace-uri()}'>
+<xsl:attribute name='hasTitle' select=
+		'if(./dm:TITLE = "") then "No" else "Yes"'/>
+<xsl:attribute name='hasGoodName' select=
+		'if(vfx:hasOneGoodName(../dm:INTELLCONT_AUTH)) 
+			then "Yes" else "No"'/>
 <xsl:value-of select='../@id'/>
 </xsl:element>
 

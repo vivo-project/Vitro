@@ -1,0 +1,70 @@
+#!/usr/bin/perl
+
+use Getopt::Std;
+use FileHandle;
+use POSIX qw( strftime );
+use FindBin qw($Bin);
+autoflush STDOUT 1;
+
+if(scalar(@ARGV) == 0){
+    print "cprdf b:d:g:i:L\n";
+    print "-b base-dir \n";
+    print "-d dest-dir \n";
+    print "-g store-dir\n";
+    print "-i [IC|IS|AW|GR|ED]\n";
+    print "use -L for live operation\n";
+    exit 0;
+}
+
+getopts("b:d:g:i:Lv");
+
+
+if(!$opt_b){
+    print STDERR "Use requires: -b base_dir_path.\n";
+    exit 1;
+}
+@g_Ilks = ('IC','IS','AW','GR','ED');
+if($opt_i){
+   @g_Ilks = split /[,;]/, $opt_i;
+}
+$opt_b =~ s=/$==;
+$g_store = "$opt_b/store";
+$g_store = $opt_g if $opt_g;
+#print $g_store . "\n";
+$g_store =~ s=^(\./|\.)==;
+#print $g_store . "\n";
+$g_cwd = $ENV{'PWD'};
+$g_store = $g_cwd . '/' . $g_store if $g_store !~ /^\//;
+
+sub trim {
+    my($a) = @_;
+    $a =~ s/^\s*(\S+)\s*$/$1/;
+    $a =~ s/^\s*(\S.*\S)\s*$/$1/;
+    $a =~ s/(\s*)//;
+    return $a;
+}
+
+$g_RDF{'AW'} = ['awards.rdf','awardRecipients.rdf','awardOrganizations.rdf'];
+
+$g_RDF{'IC'} = ['sicjabya.rdf','cj.rdf','sicbya.rdf','icbyp.rdf'];
+
+$g_RDF{'IS'} = ['sisbyca.rdf','sisbyce.rdf','sisbyfo.rdf','sisbygeo.rdf','sisbyinv.rdf','sisbypa.rdf','sisbyua.rdf'];
+
+$g_RDF{'GR'} = ['grantInv.rdf','grantSponsorOrg.rdf','grants.rdf'];
+
+$g_RDF{'ED'} = ['education.rdf','educationPerson.rdf','educationOrg.rdf'];
+
+foreach $ilk (@g_Ilks){
+    my $rdfs = $g_RDF{$ilk};
+    for(my $i=0; $i<scalar(@$rdfs);$i++){
+	print "qx(cp $g_store/rdf/$rdfs->[$i] $opt_d)\n";
+	if($opt_L){
+	    my @res =qx(cp $g_store/rdf/$rdfs->[$i] $opt_d);
+	    my  $r = ($? >> 8);
+	    if($r){
+		print STDOUT "Fault: " . join("", @res) . "\n";
+		exit 1;
+	    }
+	}
+    }
+}

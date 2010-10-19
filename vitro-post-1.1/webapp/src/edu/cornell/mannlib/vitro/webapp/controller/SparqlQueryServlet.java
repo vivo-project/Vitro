@@ -17,11 +17,12 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.query.DataSource;
 import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.query.Query;
@@ -34,18 +35,15 @@ import com.hp.hpl.jena.query.ResultSetFormatter;
 import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ModelMaker;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.sparql.resultset.ResultSetFormat;
 import com.hp.hpl.jena.vocabulary.XSD;
 
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
-
-/* @author ass92 */
-
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
+import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 
 
@@ -103,31 +101,18 @@ public class SparqlQueryServlet extends BaseEditController {
     throws ServletException, IOException
     {    	    	   	
         super.doGet(request, response);
-        if( !checkLoginStatus(request, response) )
+        // rjy7 Allows any editor (including self-editors) access to this servlet.
+        // This servlet is now requested via Ajax from some custom forms, so anyone
+        // using the custom form needs access rights.
+
+        // TODO Actually, this only allows someone who is logged in to use this servlet.
+        // If a self-editor is not logged in, they will not have access. -- jb
+        if( !checkLoginStatus(request, response) ) {
         	return;
+        }
         
         VitroRequest vreq = new VitroRequest(request);
 
-        Object obj = vreq.getSession().getAttribute("loginHandler");        
-        LoginFormBean loginHandler = null;
-        if( obj != null && obj instanceof LoginFormBean )
-            loginHandler = ((LoginFormBean)obj);
-        if( loginHandler == null ||
-            ! "authenticated".equalsIgnoreCase(loginHandler.getLoginStatus()) ||
-                // rjy7 Allows any editor (including self-editors) access to this servlet.
-                // This servlet is now requested via Ajax from some custom forms, so anyone
-                // using the custom form needs access rights.
-                Integer.parseInt(loginHandler.getLoginRole()) < LoginFormBean.NON_EDITOR ){       
-            HttpSession session = request.getSession(true);
-            
-            session.setAttribute("postLoginRequest",
-                    vreq.getRequestURI()+( vreq.getQueryString()!=null?('?' + vreq.getQueryString()):"" ));
-            String redirectURL=request.getContextPath() + Controllers.SITE_ADMIN + "?login=block";
-            response.sendRedirect(redirectURL);
-            return;
-        }
-        
-        
         Model model = vreq.getJenaOntModel(); // getModel()
         if( model == null ){
             doNoModelInContext(request,response);
@@ -161,13 +146,20 @@ public class SparqlQueryServlet extends BaseEditController {
         boolean someModelSet = false;        
         String models[] = request.getParameterValues("sourceModelName");        
         if( models != null && models.length > 0 ){
+        	OntModel ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
             for( String modelName : models ){
                 Model modelNamed = maker.getModel(modelName);
                 if( modelNamed != null ){
                     dataSource.addNamedModel(modelName, modelNamed) ;
+                	// For now, people expect to query these graphs without using 
+                	// FROM NAMED, so we'll also add to the background
+                	ontModel.addSubModel(modelNamed);
                     someModelSet = true;
                 }
             }         
+            if (someModelSet) {
+            	dataSource.setDefaultModel(ontModel);
+            }
         }
         
         if( ! someModelSet )

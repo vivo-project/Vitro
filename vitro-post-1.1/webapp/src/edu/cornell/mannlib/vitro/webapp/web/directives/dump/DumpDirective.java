@@ -47,7 +47,7 @@ public class DumpDirective extends BaseTemplateDirectiveModel {
         
         String var = ((SimpleScalar)o).getAsString();       
         DumpHelper helper = new DumpHelper(env);        
-        Map<String, Object> map = helper.getVariableDumpData(var);       
+        Map<String, Object> map = new HashMap<String, Object>();      
         map.put("var", helper.getVariableDump(var));
         
         TemplateHashModel dataModel = env.getDataModel();
@@ -79,7 +79,7 @@ public class DumpDirective extends BaseTemplateDirectiveModel {
         examples.add("<@" + name + " var=\"urls\" />");
         map.put("examples", examples);
         
-        return mergeToTemplate(map, config);
+        return mergeToHelpTemplate(map, config);
     }
 
 }

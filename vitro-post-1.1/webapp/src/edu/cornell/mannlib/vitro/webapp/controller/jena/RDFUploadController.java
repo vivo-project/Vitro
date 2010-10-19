@@ -19,13 +19,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ModelMaker;
 import com.hp.hpl.jena.shared.JenaException;
 import com.hp.hpl.jena.shared.Lock;
 
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
@@ -65,7 +66,7 @@ public class RDFUploadController extends BaseEditController {
 		    return;
 		}		
 		
-		LoginFormBean loginBean = (LoginFormBean) request.getSession().getAttribute("loginHandler");
+		LoginStatusBean loginBean = LoginStatusBean.getBean(request);
 		
 		try {
 			super.doGet(request,response);
@@ -113,12 +114,11 @@ public class RDFUploadController extends BaseEditController {
           
 		String uploadDesc ="";		
 		
-		Model tempModel = null;
+		OntModel tempModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
 		
 		/* ********************* GET RDF by URL ********************** */
 		String RDFUrlStr =  request.getParameter("rdfUrl");
 		if (RDFUrlStr != null && RDFUrlStr.length() > 0) {
-			tempModel = ModelFactory.createDefaultModel();
 			try {
 				tempModel.read(RDFUrlStr, languageStr); // languageStr may be null and default would be RDF/XML
 				uploadDesc = verb + " RDF from " + RDFUrlStr;				
@@ -133,7 +133,6 @@ public class RDFUploadController extends BaseEditController {
 		    /* **************** upload RDF from POST ********************* */
 		    if( fileStreams.get("rdfStream") != null && fileStreams.get("rdfStream").size() > 0 ){
 		        FileItem rdfStream = fileStreams.get("rdfStream").get(0);
-		        tempModel = ModelFactory.createDefaultModel();
 		        try {
 		            tempModel.read( rdfStream.getInputStream(), null, languageStr);
 		            uploadDesc = verb + " RDF from file " + rdfStream.getName();                

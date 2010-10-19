@@ -7,8 +7,8 @@
         xmlns:bibo="http://purl.org/ontology/bibo/"
         xmlns:foaf="http://xmlns.com/foaf/0.1/"
         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-	xmlns:aigrant="http://vivoweb.org/activity-insight"
-	xmlns:acti="http://vivoweb.org/activity-insight#"
+	xmlns:aigrant="http://vivoweb.org/ontology/activity-insight"
+	xmlns:acti="http://vivoweb.org/ontology/activity-insight#"
 	xmlns:dm="http://www.digitalmeasures.com/schema/data"	
 	xmlns:vfx='http://vivoweb.org/ext/functions'
 	exclude-result-prefixes='xs vfx dm'
@@ -36,7 +36,7 @@
 select='aigrant:GRANTS_LIST/aigrant:GRANT_INFO/@ref-netid'/>
 <rdf:Description 
 rdf:about="{concat($g_instance,'AI-GCOM-',$grid)}" >
-<rdf:type rdf:resource='http://vivoweb.org/activity-insight#GrantComment'/>
+<rdf:type rdf:resource='http://vivoweb.org/ontology/activity-insight#GrantComment'/>
 <rdfs:label>
 <xsl:value-of select="aigrant:COMMENT"/>
 </rdfs:label>
@@ -61,12 +61,12 @@ rdf:about="{concat($g_instance,'AI-GCOM-',$grid)}" >
 <rdf:Description 
 rdf:about="{concat($g_instance,'AI-GCOM-',$grid)}" >
 <acti:commentsOn
-	rdf:resource="{concat('AI-',$grid)}"/>
+	rdf:resource="{concat($g_instance,'AI-',$grid)}"/>
 </rdf:Description>
 <!-- =================================================== -->
 <!-- Declare property from  core:Grant to acti:CommentOnGrant  -->
 <!-- 5 -->
-<rdf:Description rdf:about="{concat('AI-',$grid)}">
+<rdf:Description rdf:about="{concat($g_instance,'AI-',$grid)}">
 <acti:hasComment
 rdf:resource="{concat($g_instance,'AI-GCOM-',$grid)}"/>
 </rdf:Description>

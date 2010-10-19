@@ -79,6 +79,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.Csv2Rdf;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestWorkflowProcessor;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.WorkflowOntology;
+
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 
@@ -420,10 +421,10 @@ public class JenaIngestController extends BaseEditController {
 			  if(modelName!=null){
 			  Model m = maker.getModel(modelName);
 			  ArrayList namespaceList = new ArrayList();
-			  ResIterator resItr = m.listResourcesWithProperty((Property)null);
+              ResIterator resItr = m.listResourcesWithProperty((Property)null);
 			  
 			  if(resItr!=null){
-          	while(resItr.hasNext()){
+          	    while(resItr.hasNext()){
           		String namespace = resItr.nextResource().getNameSpace();
                 if(!namespaceList.contains(namespace)){
                 	namespaceList.add(namespace);
@@ -442,7 +443,6 @@ public class JenaIngestController extends BaseEditController {
 			  }
 			  else if(oldModel!=null){
 				  doPermanentURI(oldModel,newModel,oldNamespace,newNamespace,dNamespace,maker,vreq);
-		
 				  request.setAttribute("title","Ingest Menu");
 				  request.setAttribute("bodyJsp",INGEST_MENU_JSP);
 			  }
@@ -631,7 +631,7 @@ public class JenaIngestController extends BaseEditController {
 		JenaIngestUtils utils = new JenaIngestUtils();
 		destination.enterCriticalSection(Lock.WRITE);
 		try {
-			destination.add(utils.renameBNodes(source, namespaceEtc));
+			destination.add(utils.renameBNodes(source, namespaceEtc, vreq.getJenaOntModel()));
 		} finally {
 			destination.leaveCriticalSection();
 		}
@@ -736,10 +736,8 @@ public class JenaIngestController extends BaseEditController {
         	VitroJenaSDBModelMaker vjmm = new VitroJenaSDBModelMaker(store);
         	vreq.getSession().setAttribute("vitroJenaModelMaker",vjmm);
 		} else {
-			DBConnection dbConn = new DBConnection(jdbcUrl,username,password,dbType);
 			System.out.println("Connecting to DB at "+jdbcUrl);
-	        ModelMaker mMaker = ModelFactory.createModelRDBMaker(dbConn);
-	        VitroJenaModelMaker vjmm = new VitroJenaModelMaker(mMaker);
+	        VitroJenaModelMaker vjmm = new VitroJenaModelMaker(jdbcUrl, username, password, dbType);
 	        vreq.getSession().setAttribute("vitroJenaModelMaker",vjmm);
 		}
 	}
@@ -1052,8 +1050,6 @@ public class JenaIngestController extends BaseEditController {
 				
 			}
 			}	
-		
-	
 	private String getUnusedURI(String newNamespace,WebappDaoFactory wdf){
 		String uri = null;
 		String errMsg = null;

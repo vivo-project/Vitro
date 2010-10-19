@@ -13,7 +13,10 @@ exclude-result-prefixes='vfx xs'
 <xsl:variable name='aiuid'>
 <xsl:value-of select='//dm:Record/@userId'/>
 </xsl:variable>
-
+<xsl:variable name='NL'>
+<xsl:text>
+</xsl:text>
+</xsl:variable>
 <!-- ============================================================= -->
 
 <xsl:template match="node()| @*">
@@ -72,6 +75,9 @@ exclude-result-prefixes='vfx xs'
 </xsl:element>
 
 <xsl:element name='ARTICLE_ID' namespace='{namespace-uri()}'>
+<xsl:attribute name='hasTitle' select=
+		'if(../dm:TITLE = "") then "No" else "Yes"'/>
+
 <xsl:value-of select='../@id'/>
 </xsl:element>
 
@@ -124,11 +130,17 @@ exclude-result-prefixes='vfx xs'
 </xsl:element>
 
 <xsl:element name='INTELLCONT_ID' namespace='{namespace-uri()}'>
+<xsl:attribute name='hasTitle' select=
+		'if(../dm:TITLE = "") then "No" else "Yes"'/>
+<xsl:attribute name='hasGoodAuthor' select=
+		'if(vfx:hasOneGoodName(../dm:INTELLCONT_AUTH)) 
+			then "Yes" else "No"'/>
+<!--xsl:comment><xsl:value-of select='../dm:INTELLCONT_AUTH' separator=' | '/></xsl:comment -->
 <xsl:value-of select='../@id'/>
 </xsl:element>
 
 <xsl:element name='PUBLIC' namespace='{namespace-uri()}'>
-<xsl:value-of select='../PUBLIC_VIEW'/>
+<xsl:value-of select='./PUBLIC_VIEW'/>
 </xsl:element>
 
 </xsl:element>
@@ -155,4 +167,10 @@ exclude-result-prefixes='vfx xs'
 </xsl:choose>
 
 </xsl:function>
+
+
+
+
+<xsl:include href='vivofuncs.xsl'/>
+
 </xsl:stylesheet>

@@ -7,9 +7,9 @@
         xmlns:bibo="http://purl.org/ontology/bibo/"
         xmlns:foaf="http://xmlns.com/foaf/0.1/"
         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-	xmlns:aiis="http://vivoweb.org/activity-insight"
-	xmlns:acti="http://vivoweb.org/activity-insight#"
-        xmlns="http://vivoweb.org/activity-insight"
+	xmlns:aiis="http://vivoweb.org/ontology/activity-insight"
+	xmlns:acti="http://vivoweb.org/ontology/activity-insight#"
+        xmlns="http://vivoweb.org/ontology/activity-insight"
 	xmlns:dm="http://www.digitalmeasures.com/schema/data"	
 	xmlns:vfx='http://vivoweb.org/ext/functions'
 	exclude-result-prefixes='xs vfx'
@@ -51,14 +51,20 @@
 <!-- =================================================== -->
 <!-- Declare a acti:USDA_Area (use extant USDA Area if it exists) -->
 <!-- but do not create one if in the 'OTHER' case -->
-<xsl:variable name='knownUri' select='vfx:knownUaUri(aiis:USDA_AREA_NAME, $extantUsdaAreas)'/>
+<xsl:variable name='knownUri' 
+	select='vfx:knownUaUri(aiis:USDA_AREA_NAME, $extantUsdaAreas)'/>
 
-<xsl:variable name='uauri' select="if($knownUri != '') then $knownUri else concat($g_instance,$uno)"/>
+<xsl:variable name='uauri' 
+	select="if($knownUri != '') then 
+		$knownUri else 
+		concat($g_instance,$uno)"/>
 
 <xsl:if test='$knownUri = "" and not(contains($ilk,"OTHER"))'>
 <rdf:Description rdf:about="{$uauri}">
-<rdf:type rdf:resource='http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing'/>
-<rdf:type rdf:resource='http://vivoweb.org/activity-insight#USDA_Area'/>
+<rdf:type rdf:resource=
+	'http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing'/>
+<rdf:type rdf:resource=
+	'http://vivoweb.org/ontology/activity-insight#USDA_Area'/>
 
 <rdfs:label>
 <xsl:value-of select='vfx:trim(aiis:USDA_AREA_NAME)'/>
@@ -84,18 +90,23 @@
 </xsl:for-each>
 
 <!-- =================================================== 
- at this point we re-run part of the last for loop to make a new list of usda area
+ at this point we re-run part of the last for loop to make a
+ new list of usda area
  and their uri's to save in the extant priority area Out xml file
 -->
 <xsl:result-document href='{$extUsdaAreasOut}'>
-<xsl:element name='ExtantUsdaArea' namespace=''>
+<xsl:element name='ExtantUsdaAreas' namespace=''>
 <xsl:for-each select='aiis:IMPACT_STMTS_BY_USDA_AREA'>
 <xsl:variable name='ilk' select='@ilk'/>
 <xsl:variable name='ctr'  select='@counter'/>
 <xsl:variable name='uno' select='$unomap/map[position()=$ctr]/@nuno'/>
-<xsl:variable name='knownUri' select='vfx:knownUaUri(aiis:USDA_AREA_NAME, $extantUsdaAreas)'/>
+<xsl:variable name='knownUri' 
+	select='vfx:knownUaUri(aiis:USDA_AREA_NAME, $extantUsdaAreas)'/>
 
-<xsl:variable name='uauri' select="if($knownUri != '') then $knownUri else concat($g_instance,$uno)"/>
+<xsl:variable name='uauri' 
+	select="if($knownUri != '') then 
+	        $knownUri else 
+		concat($g_instance,$uno)"/>
 
 <xsl:if test='not(contains($ilk,"OTHER"))'>
 <xsl:element name='area' namespace=''>

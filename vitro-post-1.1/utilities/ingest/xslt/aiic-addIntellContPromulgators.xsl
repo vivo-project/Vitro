@@ -12,6 +12,10 @@ exclude-result-prefixes='vfx xs'
 
 <xsl:output method="xml" indent="yes"/> 
 
+<xsl:variable name='NL'>
+<xsl:text>
+</xsl:text>
+</xsl:variable>
 <!-- ============================================================= -->
 <xsl:template match='*'>
 
@@ -21,8 +25,7 @@ exclude-result-prefixes='vfx xs'
 
 <xsl:variable name='props'>
 
-<!-- xsl:for-each select='//dm:INTELLCONT[ not(./dm:BOOK_TITLE = preceding::dm:BOOK_TITLE)]' -->
-<!-- xsl:for-each select='//dm:INTELLCONT[ not(vfx:hasMatch(./dm:BOOK_TITLE,preceding::dm:BOOK_TITLE))]' -->
+
 
 <xsl:for-each select='//dm:INTELLCONT[ not(vfx:hasMatch(./dm:PROMULGATED_BY,preceding::dm:PROMULGATED_BY))]'>
 <!--xsl:comment><xsl:value-of select='./dm:CONTYPE'/></xsl:comment-->
@@ -70,6 +73,13 @@ exclude-result-prefixes='vfx xs'
 <xsl:value-of select='$name'/>
 </ai:INTELLCONT_PROMULGATOR_NAME>
 <ai:INTELLCONT_ID>
+<xsl:attribute name='hasTitle' select=
+		'if($n/dm:TITLE = "") then "No" else "Yes"'/>
+<xsl:attribute name='public' select=
+		'if($n/dm:PUBLIC_VIEW = "Yes") then "Yes" else "No"'/>
+<xsl:attribute name='hasGoodAuthor' select=
+		'if(vfx:hasOneGoodName($n/dm:NON_JOURNAL_AUTHORLIST))
+		 then "Yes" else "No"'/>
 <xsl:value-of select='$id'/>
 </ai:INTELLCONT_ID>
 
@@ -78,9 +88,16 @@ exclude-result-prefixes='vfx xs'
 <xsl:if test='following::dm:INTELLCONT'>
   <xsl:for-each select='following::dm:INTELLCONT'>
 
-    <xsl:if test=' $name = normalize-space(./dm:PROMULGATED_BY)'>
+    <xsl:if test=' vfx:collapse($name) = vfx:collapse(./dm:PROMULGATED_BY)'>
 
       	<ai:INTELLCONT_ID>
+		<xsl:attribute name='hasTitle' select=
+		'if(./dm:TITLE = "") then "No" else "Yes"'/>
+		<xsl:attribute name='public' select=
+		'if(./dm:PUBLIC_VIEW = "Yes") then "Yes" else "No"'/>
+		<xsl:attribute name='hasGoodAuthor' select=
+		'if(vfx:hasOneGoodName(./dm:NON_JOURNAL_AUTHORLIST))
+		 then "Yes" else "No"'/>
 	<xsl:value-of select='./@id'/>
 	</ai:INTELLCONT_ID>
 
@@ -101,28 +118,28 @@ exclude-result-prefixes='vfx xs'
 <xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "ABSTRACT"'>
 <xsl:value-of select='xs:boolean(1)'/>
 </xsl:when>
-<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "BOOKCHAPTER"'>
+<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "BOOK CHAPTER"'>
 <xsl:value-of select='xs:boolean(1)'/>
 </xsl:when>
-<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "BOOKREVIEW"'>
+<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "BOOK REVIEW"'>
 <xsl:value-of select='xs:boolean(1)'/>
 </xsl:when>
-<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "BOOKSECTION"'>
+<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "BOOK SECTION"'>
 <xsl:value-of select='xs:boolean(1)'/>
 </xsl:when>
-<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "BOOKSCHOLARLY"'>
+<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "BOOK SCHOLARLY"'>
 <xsl:value-of select='xs:boolean(1)'/>
 </xsl:when>
-<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "BOOKTEXTBOOK"'>
+<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "BOOK TEXTBOOK"'>
 <xsl:value-of select='xs:boolean(1)'/>
 </xsl:when>
-<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "CITEDRESEARCH"'>
+<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "CITED RESEARCH"'>
 <xsl:value-of select='xs:boolean(1)'/>
 </xsl:when>
-<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "CONFERENCEPROCEEDING"'>
+<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "CONFERENCE PROCEEDING"'>
 <xsl:value-of select='xs:boolean(1)'/>
 </xsl:when>
-<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "INSTRUCTORSMANUAL"'>
+<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "INSTRUCTORS MANUAL"'>
 <xsl:value-of select='xs:boolean(1)'/>
 </xsl:when>
 <xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "INTERNET"'>
@@ -144,7 +161,7 @@ exclude-result-prefixes='vfx xs'
 <xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "OTHER"'>
 <xsl:value-of select='xs:boolean(1)'/>
 </xsl:when>
-<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "POLICYREPORT"'>
+<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "POLICY REPORT"'>
 <xsl:value-of select='xs:boolean(1)'/>
 </xsl:when>
 <xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "POSTER"'>
@@ -153,7 +170,7 @@ exclude-result-prefixes='vfx xs'
 <xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "RADIO"'>
 <xsl:value-of select='xs:boolean(1)'/>
 </xsl:when>
-<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "RESEARCHREPORT"'>
+<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "RESEARCH REPORT"'>
 <xsl:value-of select='xs:boolean(1)'/>
 </xsl:when>
 <xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "SOFTWARE"'>
@@ -162,13 +179,13 @@ exclude-result-prefixes='vfx xs'
 <xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "TV"'>
 <xsl:value-of select='xs:boolean(1)'/>
 </xsl:when>
-<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "TECHNICALREPORT"'>
+<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "TECHNICAL REPORT"'>
 <xsl:value-of select='xs:boolean(1)'/>
 </xsl:when>
-<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "TRADEPUBLICATION"'>
+<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "TRADE PUBLICATION"'>
 <xsl:value-of select='xs:boolean(1)'/>
 </xsl:when>
-<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "TRAININGMANUAL"'>
+<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "TRAINING MANUAL"'>
 <xsl:value-of select='xs:boolean(1)'/>
 </xsl:when>
 <xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "TRANSLATION"'>
@@ -195,31 +212,31 @@ exclude-result-prefixes='vfx xs'
 <xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "ABSTRACT"'>
 <xsl:value-of select='"bibo:DocumentPart"'/>
 </xsl:when>
-<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "BOOKCHAPTER"'>
+<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "BOOK CHAPTER"'>
 <xsl:value-of select='"bibo:BookChapter"'/>
 </xsl:when>
-<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "BOOKREVIEW"'>
+<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "BOOK REVIEW"'>
 <xsl:value-of select='"core:Review"'/>
 </xsl:when>
 
-<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "BOOKSECTION"'>
+<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "BOOK SECTION"'>
 <xsl:value-of select='"bibo:BookSection"'/>
 </xsl:when>
-<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "BOOKSCHOLARLY"'>
+<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "BOOK SCHOLARLY"'>
 <xsl:value-of select='"bibo:Book"'/>
 </xsl:when>
-<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "BOOKTEXTBOOK"'>
+<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "BOOK TEXTBOOK"'>
 <xsl:value-of select='"bibo:Book"'/>
 </xsl:when>
-<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "CITEDRESEARCH"'>
+<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "CITED RESEARCH"'>
 <xsl:value-of select='"core:informationResource"'/>
 </xsl:when>
 
-<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "CONFERENCEPROCEEDING"'>
+<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "CONFERENCE PROCEEDING"'>
 <xsl:value-of select='"core:ConferencePaper"'/>
 </xsl:when>
 
-<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "INSTRUCTORSMANUAL"'>
+<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "INSTRUCTORS MANUAL"'>
 <xsl:value-of select='"bibo:Manual"'/>
 </xsl:when>
 <xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "INTERNET"'>
@@ -240,7 +257,7 @@ exclude-result-prefixes='vfx xs'
 <xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "OTHER"'>
 <xsl:value-of select='"core:InformationResource"'/>
 </xsl:when>
-<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "POLICYREPORT"'>
+<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "POLICY REPORT"'>
 <xsl:value-of select='"bibo:Report"'/>
 </xsl:when>
 
@@ -250,7 +267,7 @@ exclude-result-prefixes='vfx xs'
 <xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "RADIO"'>
 <xsl:value-of select='"bibo:AudioDocument"'/>
 </xsl:when>
-<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "RESEARCHREPORT"'>
+<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "RESEARCH REPORT"'>
 <xsl:value-of select='"bibo:Report"'/>
 </xsl:when>
 <xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "SOFTWARE"'>
@@ -259,13 +276,13 @@ exclude-result-prefixes='vfx xs'
 <xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "TV"'>
 <xsl:value-of select='"bibo:AudioVisualDocument"'/>
 </xsl:when>
-<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "TECHNICALREPORT"'>
+<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "TECHNICAL REPORT"'>
 <xsl:value-of select='"bibo:Report"'/>
 </xsl:when>
-<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "TRADEPUBLICATION"'>
+<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "TRADE PUBLICATION"'>
 <xsl:value-of select='"bibo:Article"'/>
 </xsl:when>
-<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "TRAININGMANUAL"'>
+<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "TRAINING MANUAL"'>
 <xsl:value-of select='"bibo:Manual"'/>
 </xsl:when>
 
@@ -277,7 +294,7 @@ exclude-result-prefixes='vfx xs'
 <xsl:value-of select='"core:CaseStudy"'/>
 </xsl:when>
 
-<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "eCORNELLCOURSE"'>
+<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "ECORNELL COURSE"'>
 <xsl:value-of select='"bibo:AudioVisualDocument"'/>
 </xsl:when>
 <xsl:otherwise>
@@ -295,31 +312,31 @@ exclude-result-prefixes='vfx xs'
 <xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "ABSTRACT"'>
 <xsl:value-of select='"nil"'/>
 </xsl:when>
-<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "BOOKCHAPTER"'>
+<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "BOOK CHAPTER"'>
 <xsl:value-of select='"bibo:Book"'/>
 </xsl:when>
-<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "BOOKREVIEW"'>
+<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "BOOK REVIEW"'>
 <xsl:value-of select='"nil"'/>
 </xsl:when>
 
-<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "BOOKSECTION"'>
+<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "BOOK SECTION"'>
 <xsl:value-of select='"bibo:Book"'/>
 </xsl:when>
-<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "BOOKSCHOLARLY"'>
+<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "BOOK SCHOLARLY"'>
 <xsl:value-of select='"nil"'/>
 </xsl:when>
-<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "BOOKTEXTBOOK"'>
+<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "BOOK TEXTBOOK"'>
 <xsl:value-of select='"nil"'/>
 </xsl:when>
-<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "CITEDRESEARCH"'>
+<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "CITED RESEARCH"'>
 <xsl:value-of select='"nil"'/>
 </xsl:when>
 
-<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "CONFERENCEPROCEEDING"'>
+<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "CONFERENCE PROCEEDING"'>
 <xsl:value-of select='"bibo:Proceedings"'/>
 </xsl:when>
 
-<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "INSTRUCTORSMANUAL"'>
+<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "INSTRUCTORS MANUAL"'>
 <xsl:value-of select='"nil"'/>
 </xsl:when>
 <xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "INTERNET"'>
@@ -340,7 +357,7 @@ exclude-result-prefixes='vfx xs'
 <xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "OTHER"'>
 <xsl:value-of select='"nil"'/>
 </xsl:when>
-<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "POLICYREPORT"'>
+<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "POLICY REPORT"'>
 <xsl:value-of select='"nil"'/>
 </xsl:when>
 
@@ -350,7 +367,7 @@ exclude-result-prefixes='vfx xs'
 <xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "RADIO"'>
 <xsl:value-of select='"nil"'/>
 </xsl:when>
-<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "RESEARCHREPORT"'>
+<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "RESEARCH REPORT"'>
 <xsl:value-of select='"nil"'/>
 </xsl:when>
 <xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "SOFTWARE"'>
@@ -359,13 +376,13 @@ exclude-result-prefixes='vfx xs'
 <xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "TV"'>
 <xsl:value-of select='"nil"'/>
 </xsl:when>
-<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "TECHNICALREPORT"'>
+<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "TECHNICAL REPORT"'>
 <xsl:value-of select='"nil"'/>
 </xsl:when>
-<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "TRADEPUBLICATION"'>
+<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "TRADE PUBLICATION"'>
 <xsl:value-of select='"bibo:Periodical"'/>
 </xsl:when>
-<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "TRAININGMANUAL"'>
+<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "TRAINING MANUAL"'>
 <xsl:value-of select='"nil"'/>
 </xsl:when>
 
@@ -373,11 +390,11 @@ exclude-result-prefixes='vfx xs'
 <xsl:value-of select='"nil"'/>
 </xsl:when>
 
-<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "WRITTENCASE"'>
+<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "WRITTEN CASE"'>
 <xsl:value-of select='"nil"'/>
 </xsl:when>
 
-<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "eCORNELLCOURSE"'>
+<xsl:when test='vfx:collapse( $n/dm:CONTYPE )  = "ECORNELL COURSE"'>
 <xsl:value-of select='"nil"'/>
 </xsl:when>
 <xsl:otherwise>
@@ -385,6 +402,7 @@ exclude-result-prefixes='vfx xs'
 </xsl:otherwise>
 </xsl:choose>
 </xsl:function>
+
 
 <xsl:include href='vivofuncs.xsl'/>
 

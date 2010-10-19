@@ -55,7 +55,7 @@ sub mkTransform{
 	xmlns:acti="http://vivoweb.org/activity-insight#"
 	xmlns:dm="http://www.digitalmeasures.com/schema/data"	
 	xmlns:vfx='http://vivoweb.org/ext/functions'
-	exclude-result-prefixes='xs vfx dm aimc'
+	exclude-result-prefixes='xs vfx dm $_nsp'
 	>
 
 <xsl:param name='unoMapFile'  required='yes'/>
@@ -86,9 +86,9 @@ sub mkTransform{
 select='vfx:knownUri($_nsp:fname, $_nsp:mname, $_nsp:lname, \$extantPersons)'/>
 
 <xsl:variable name='peruri' 
-select="if($knownUri != '') then $knownUri else concat(\$g_instance,$uno)"/>
+select="if(\$knownUri != '') then \$knownUri else concat(\$g_instance,\$uno)"/>
 
-<xsl:if test='$knownUri != "" and $_nsp:netid != ""'>
+<xsl:if test='\$knownUri != "" and $_nsp:netid != ""'>
 
 <rdf:Description rdf:about="\{\$peruri\}">
 <rdf:type 
@@ -153,7 +153,7 @@ rdf:resource='http://vivoweb.org/activity-insight#ActivityInsightPerson'/>
 select='vfx:knownUri($_nsp:fname, $_nsp:mname, $_nsp:lname, \$extantPersons)'/>
 
 <xsl:variable name='peruri' 
-select="if(\$knownUri != '') then $knownUri else concat(\$g_instance,\$uno)"/>
+select="if(\$knownUri != '') then \$knownUri else concat(\$g_instance,\$uno)"/>
 
 <!-- must prevent duplicates -->
 <xsl:if test="\$knownUri = ''">

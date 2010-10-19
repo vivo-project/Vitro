@@ -11,7 +11,10 @@ exclude-result-prefixes='vfx xs'
  version="2.0">   
 
 <xsl:output method="xml" indent="yes"/> 
-
+<xsl:variable name='NL'>
+<xsl:text>
+</xsl:text>
+</xsl:variable>
 <!-- ============================================================= -->
 <xsl:template match='*'>
 
@@ -96,6 +99,13 @@ exclude-result-prefixes='vfx xs'
 <xsl:value-of select='$jname'/>
 </ai:INTELLCONT_JOURNAL_NAME>
 <ai:INTELLCONT_JOURNAL_ID>
+<xsl:attribute name='hasTitle' select=
+		'if(./dm:TITLE = "") then "No" else "Yes"'/>
+<xsl:attribute name='public' select=
+		'if(./dm:PUBLIC_VIEW = "Yes") then "Yes" else "No"'/>
+<xsl:attribute name='hasGoodAuthor' select=
+		'if(vfx:hasOneGoodName(./dm:AuthorList/dm:INTELLCONT_JOURNAL_AUTH))
+		 then "Yes" else "No"'/>
 <xsl:value-of select='$id'/>
 </ai:INTELLCONT_JOURNAL_ID>
 
@@ -107,6 +117,14 @@ exclude-result-prefixes='vfx xs'
     <xsl:if test=' vfx:collapse($jname) = vfx:collapse(./dm:JOURNAL_NAME)'>
 
       	<ai:INTELLCONT_JOURNAL_ID>
+	<xsl:attribute name='hasTitle' select=
+		'if(./dm:TITLE = "") then "No" else "Yes"'/>
+	<xsl:attribute name='public' select=
+		'if(./dm:PUBLIC_VIEW = "No") then "No" else "Yes"'/>
+	
+	<xsl:attribute name='hasGoodAuthor' select=
+		'if(vfx:hasOneGoodName(./dm:AuthorList/dm:INTELLCONT_JOURNAL_AUTH))
+		 then "Yes" else "No"'/>
 	<xsl:value-of select='./@id'/>
 	</ai:INTELLCONT_JOURNAL_ID>
 
@@ -146,6 +164,9 @@ exclude-result-prefixes='vfx xs'
 
 </xsl:element>
 </xsl:template>
+
+
+
 
 <xsl:include href='vivofuncs.xsl'/>
 

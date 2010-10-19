@@ -2,17 +2,21 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.ServletContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Params;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 
 public abstract class BaseTemplateModel {
 
-    private static final Log log = LogFactory.getLog(BaseTemplateModel.class.getName());
+    private static final Log log = LogFactory.getLog(BaseTemplateModel.class);
     
     protected static ServletContext servletContext = null;
 
@@ -21,8 +25,13 @@ public abstract class BaseTemplateModel {
         return UrlBuilder.getUrl(path);
     }
 
-    // Wrap UrlBuilder method so templates can call ${item.url}
-    public String getUrl(String path, Params params) {
+    // Convenience method so subclasses can call getUrl(path, params)
+    protected String getUrl(String path, ParamMap params) {
+        return UrlBuilder.getUrl(path, params);
+    }
+    
+    // Convenience method so subclasses can call getUrl(path, params)
+    protected String getUrl(String path, String... params) {
         return UrlBuilder.getUrl(path, params);
     }
 
@@ -31,28 +40,11 @@ public abstract class BaseTemplateModel {
     }
 
     public static void setServletContext(ServletContext context) {
-        BaseTemplateModel.servletContext = context;
+        servletContext = context;
     }
     
     public String dump() {
-        return "I'm a BaseTemplateModel object";
+        return toString(); // fallback when subclass doesn't define a class-specific dump()
     }
-
-    /*
-     * public static List<?> wrapList(List<?> list, Class cl) 
-     * throw error if cl not a child of ViewObject
-     * This block of code is going to be repeated a lot:
-            List<VClassGroup> groups = // code to get the data
-            List<VClassGroupView> vcgroups = new ArrayList<VClassGroupView>(groups.size());
-            Iterator<VClassGroup> i = groups.iterator();
-            while (i.hasNext()) {
-                vcgroups.add(new VClassGroupView(i.next()));
-            }
-            body.put("classGroups", vcgroups);
-    Can we generalize it to a generic method of ViewObject - wrapList() ? 
-    static method of ViewObject
-    Params: groups, VClassGroupView (the name of the class) - but must be a child of ViewObject
-    Return: List<viewObjectType>
-     */
 
 }

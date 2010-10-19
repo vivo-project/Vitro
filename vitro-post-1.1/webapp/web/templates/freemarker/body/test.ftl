@@ -54,8 +54,8 @@
 <@dump var="zoo1" />
 
 
-${stylesheets.addFromTheme("/sstest.css", "/sstest2.css")}
-${scripts.addFromTheme("/jstest.js")}
+${stylesheets.addFromTheme("/css/sstest.css", "/css/sstest2.css")}
+${scripts.addFromTheme("/js/jstest.js")}
 ${scripts.add("/js/script1.js", "/js/script2.js", "/js/script3.js")}
 
 
@@ -64,4 +64,8 @@ ${scripts.add("/js/script1.js", "/js/script2.js", "/js/script3.js")}
 <@help directive="dump" />
 
 <@describe var="stylesheets" />
+
+<@describe var="scripts" />
+
+
 

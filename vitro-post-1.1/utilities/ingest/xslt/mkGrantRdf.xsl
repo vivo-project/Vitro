@@ -7,9 +7,9 @@
         xmlns:bibo="http://purl.org/ontology/bibo/"
         xmlns:foaf="http://xmlns.com/foaf/0.1/"
         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-	xmlns:aigrant="http://vivoweb.org/activity-insight"
-	xmlns:acti="http://vivoweb.org/activity-insight#"
-        xmlns="http://vivoweb.org/activity-insight"
+	xmlns:aigrant="http://vivoweb.org/ontology/activity-insight"
+	xmlns:acti="http://vivoweb.org/ontology/activity-insight#"
+        xmlns="http://vivoweb.org/ontology/activity-insight"
 	xmlns:dm="http://www.digitalmeasures.com/schema/data"	
 	xmlns:vfx='http://vivoweb.org/ext/functions'
 	exclude-result-prefixes='xs vfx'
@@ -49,12 +49,15 @@
 <acti:ospStart><xsl:value-of select ='$gr/dm:OSP_START'/></acti:ospStart>
 <acti:ospEnd><xsl:value-of select ='$gr/dm:OSP_END'/></acti:ospEnd>
 <acti:ospLink><xsl:value-of select ='$gr/dm:WEBSITE'/></acti:ospLink>
-<acti:sentStart><xsl:value-of select ='$gr/dm:SENT_START'/></acti:sentStart>
-<acti:level><xsl:value-of select ='$gr/dm:LEVEL'/></acti:level>
+<acti:sponsorProjectId>
+<xsl:value-of select ='$gr/dm:SPONSOR_ID'/>
+</acti:sponsorProjectId>
+<acti:sponsorFundSource>
+<xsl:value-of select ='$gr/dm:SPONSOR_FUND_SOURCE'/>
+</acti:sponsorFundSource>
+
 <acti:status><xsl:value-of select ='$gr/dm:STATUS'/></acti:status>
-<acti:amount><xsl:value-of select ='$gr/dm:AMOUNT'/></acti:amount>
-<acti:college><xsl:value-of select ='$gr/dm:COLLEGE'/></acti:college>
-<acti:dept><xsl:value-of select ='$gr/dm:DEP'/></acti:dept>
+
 <acti:abstract><xsl:value-of select ='$gr/dm:ABSTRACT'/></acti:abstract>
 <acti:function><xsl:value-of select ='$gr/dm:FUNCTION'/></acti:function>
 <acti:type><xsl:value-of select ='$gr/dm:TYPE'/></acti:type>

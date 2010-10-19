@@ -7,9 +7,9 @@
         xmlns:bibo="http://purl.org/ontology/bibo/"
         xmlns:foaf="http://xmlns.com/foaf/0.1/"
         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-	xmlns:aiis="http://vivoweb.org/activity-insight"
-	xmlns:acti="http://vivoweb.org/activity-insight#"
-        xmlns="http://vivoweb.org/activity-insight"
+	xmlns:aiis="http://vivoweb.org/ontology/activity-insight"
+	xmlns:acti="http://vivoweb.org/ontology/activity-insight#"
+        xmlns="http://vivoweb.org/ontology/activity-insight"
 	xmlns:dm="http://www.digitalmeasures.com/schema/data"	
 	xmlns:vfx='http://vivoweb.org/ext/functions'
 	exclude-result-prefixes='xs vfx'
@@ -91,7 +91,7 @@ for loop to get a new list of persons
  and their uri's to save in the extant Orgs Out xml file
 -->
 <xsl:result-document href='{$extOrgOut}'>
-<xsl:element name='ExtantOrgs' namespace=''>
+<xsl:element name='ExtantCEOrgs' namespace=''>
 <xsl:for-each select='aiis:IMPACT_STMTS_BY_COLLAB_ENTITY'>
 
 <xsl:variable name='ctr'  select='@counter'/>
@@ -155,7 +155,7 @@ concat($g_instance,$uno)"/>
 <xsl:value-of select='concat("Partner (",vfx:trim(../../aiis:Name),")" )'/>
 </rdfs:label>
 
-<rdf:type rdf:resource='http://vivoweb.org/activity-insight#PartnerRole'/>
+<rdf:type rdf:resource='http://vivoweb.org/ontology/activity-insight#PartnerRole'/>
 
 <rdf:type rdf:resource='http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing'/>
 <!-- 12 -->

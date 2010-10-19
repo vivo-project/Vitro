@@ -61,11 +61,13 @@
 
      
     <xsl:template  match="dm:IMPACT_STATEMENT">
+	<xsl:if test='count(./dm:IMPACT_STATEMENT_INVEST)>0'>
 	<xsl:element name='{local-name()}' namespace='{namespace-uri()}'>
 		<xsl:attribute name='id' select='./@id'/>
 		<xsl:attribute name='lastModified' select='./@dmd:lastModified'/>
 	<xsl:copy-of select='*'  copy-namespaces='no'/>
 	</xsl:element>
+	</xsl:if>
     </xsl:template>
 
  

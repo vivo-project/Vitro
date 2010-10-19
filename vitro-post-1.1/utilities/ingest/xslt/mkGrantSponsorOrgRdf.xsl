@@ -7,8 +7,8 @@ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 xmlns:bibo="http://purl.org/ontology/bibo/"
 xmlns:foaf="http://xmlns.com/foaf/0.1/"
 xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-xmlns:aigrant="http://vivoweb.org/activity-insight"
-xmlns:acti="http://vivoweb.org/activity-insight#"
+xmlns:aigrant="http://vivoweb.org/ontology/activity-insight"
+xmlns:acti="http://vivoweb.org/ontology/activity-insight#"
 xmlns:dm="http://www.digitalmeasures.com/schema/data"	
 xmlns:vfx='http://vivoweb.org/ext/functions'
 exclude-result-prefixes='xs vfx dm'
@@ -33,7 +33,8 @@ exclude-result-prefixes='xs vfx dm'
 <xsl:template match='/aigrant:SPONSOR_ORG_LIST'>
 <rdf:RDF>
 <xsl:for-each select='aigrant:SPONSOR_ORG'>
-
+<xsl:comment><xsl:value-of select='count(./aigrant:GRANTS_LIST/aigrant:GRANT_INFO[@grid != ""])'/></xsl:comment>
+<xsl:if test='count(./aigrant:GRANTS_LIST/aigrant:GRANT_INFO[@grid != ""])>0'>
 <xsl:variable name='ctr'  select='@index'/>
 <xsl:variable name='uno' select='$unomap/map[position()=$ctr]/@nuno'/>
 
@@ -52,6 +53,7 @@ concat($g_instance,$uno)"/>
 <rdf:type 
 rdf:resource='http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing'/>
 <rdf:type rdf:resource='http://xmlns.com/foaf/0.1/Organization'/>
+<rdf:type rdf:resource='http://vivoweb.org/ontology/core#FundingOrganization'/>
 <rdfs:label>
 <xsl:value-of select='vfx:trim(aigrant:SPONSOR_ORG_NAME)'/>
 </rdfs:label>
@@ -63,7 +65,7 @@ rdf:resource='http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing'/>
 <xsl:with-param name='list' select='aigrant:GRANTS_LIST'/>
 <xsl:with-param name='objref' select="$orguri"/>
 </xsl:call-template>
-
+</xsl:if>
 </xsl:for-each>
 
 <!-- =================================================== 
@@ -74,6 +76,7 @@ rdf:resource='http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing'/>
 <xsl:result-document href='{$extOrgOut}'>
 <xsl:element name='ExtantOrgs' namespace=''>
 <xsl:for-each select='aigrant:SPONSOR_ORG'>
+<xsl:if test='count(./aigrant:GRANTS_LIST/aigrant:GRANT_INFO[@grid != ""])>0'>
 <xsl:variable name='ctr'  select='@index'/>
 <xsl:variable name='uno' select='$unomap/map[position()=$ctr]/@nuno'/>
 <xsl:variable name='knownUri' 
@@ -93,6 +96,7 @@ concat($g_instance,$uno)"/>
 </xsl:element>
 </xsl:element>
 </xsl:if>
+</xsl:if>
 </xsl:for-each>
 </xsl:element>
 </xsl:result-document>
@@ -104,6 +108,7 @@ concat($g_instance,$uno)"/>
 <xsl:param name='list'/>
 <xsl:param name='objref'/>
 <xsl:for-each select='$list/aigrant:GRANT_INFO'>
+
 <xsl:variable name='grid' select='@grid'/>
 <!-- =================================================== -->
 <!-- Declare property mapping core:Grant to foaf:Organization -->
@@ -121,6 +126,7 @@ rdf:about="{concat($g_instance,'AI-',$grid)}" >
 <core:awardsGrant
 rdf:resource="{concat($g_instance,'AI-',$grid)}"/>
 </rdf:Description>
+
 </xsl:for-each>
 </xsl:template>
 

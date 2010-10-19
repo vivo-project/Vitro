@@ -12,13 +12,13 @@ public enum Status {
 	/**
 	 * One or more tests have not been run yet.
 	 */
-	PENDING(""),
+	PENDING("pending"),
 
 	/**
-	 * Any test failure was ignored, and any messages were no worse than
-	 * warnings.
+	 * Will not run because it is ignored, or has run and failed but the failure
+	 * is ignored.
 	 */
-	WARN("fair"),
+	IGNORED("fair"),
 
 	/**
 	 * A test failed and could not be ignored, or an error message was
@@ -43,5 +43,10 @@ public enum Status {
 		} else {
 			return s2;
 		}
+	}
+
+	/** Anything except ERROR is considered to be a success. */
+	public static boolean isSuccess(Status status) {
+		return status != Status.ERROR;
 	}
 }

@@ -1,6 +1,6 @@
 <%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
 
-<% if (securityLevel >= loginHandler.DBA) { %>
+<% if (loginBean.isLoggedInAtLeast(LoginStatusBean.DBA)) { %>
     <div class="pageBodyGroup">
     
         <h3>Advanced Data Tools</h3>

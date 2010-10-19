@@ -7,9 +7,9 @@
         xmlns:bibo="http://purl.org/ontology/bibo/"
         xmlns:foaf="http://xmlns.com/foaf/0.1/"
         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-	xmlns:aiis="http://vivoweb.org/activity-insight"
-	xmlns:acti="http://vivoweb.org/activity-insight#"
-        xmlns="http://vivoweb.org/activity-insight"
+	xmlns:aiis="http://vivoweb.org/ontology/activity-insight"
+	xmlns:acti="http://vivoweb.org/ontology/activity-insight#"
+        xmlns="http://vivoweb.org/ontology/activity-insight"
 	xmlns:dm="http://www.digitalmeasures.com/schema/data"	
 	xmlns:vfx='http://vivoweb.org/ext/functions'
 	exclude-result-prefixes='xs vfx'
@@ -61,7 +61,7 @@
 <xsl:if test='$knownUri = ""'>
 <rdf:Description rdf:about="{$emphuri}">
 <rdf:type rdf:resource='http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing'/>
-<rdf:type rdf:resource='http://vivoweb.org/activity-insight#PriorityArea'/>
+<rdf:type rdf:resource='http://vivoweb.org/ontology/activity-insight#PriorityArea'/>
 
 <rdfs:label>
 <xsl:value-of select='vfx:trim(aiis:EMPHASIS_NAME)'/>

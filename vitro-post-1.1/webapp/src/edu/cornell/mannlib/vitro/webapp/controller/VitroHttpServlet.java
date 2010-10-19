@@ -14,50 +14,111 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class VitroHttpServlet extends HttpServlet
-{
-    private static final long serialVersionUID = 1L;
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 
-    protected static DateFormat publicDateFormat = new SimpleDateFormat("M/dd/yyyy");
+public class VitroHttpServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
 
-    private static final Log log = LogFactory.getLog(VitroHttpServlet.class.getName());
+	protected static DateFormat publicDateFormat = new SimpleDateFormat(
+			"M/dd/yyyy");
 
-    public final static String XHTML_MIMETYPE ="application/xhtml+xml";
-    public final static String HTML_MIMETYPE ="text/html";
-    
-    public final static String RDFXML_MIMETYPE ="application/rdf+xml";
-    public final static String N3_MIMETYPE ="text/n3"; //unofficial and unregistered
-    public final static String TTL_MIMETYPE = "text/turtle"; //unofficial and unregistered
-    
-    /**
-     * Setup the auth flag, portal flag and portal bean objects.
-     * Put them in the request attributes.
-     */
-    @Override
-    protected void doGet( HttpServletRequest request, HttpServletResponse response )
-                          throws ServletException, IOException
-    {
-        setup(request);
-    }
+	private static final Log log = LogFactory.getLog(VitroHttpServlet.class
+			.getName());
 
-    protected final void setup(HttpServletRequest request) {
-        
-        //check to see if VitroRequestPrep filter was run
-        if( request.getAttribute("appBean") == null ||
-            request.getAttribute("webappDaoFactory") == null ){
-            log.warn("request scope was not prepared by VitroRequestPrep");
-        }        
-    }
-   
+	public final static String XHTML_MIMETYPE = "application/xhtml+xml";
+	public final static String HTML_MIMETYPE = "text/html";
 
-    /**
-     * doPost does the same thing as the doGet method
-     */
-    @Override
-    protected void doPost( HttpServletRequest request, HttpServletResponse response )
-                           throws ServletException, IOException
-    {
-        doGet( request,response );
-    }
+	public final static String RDFXML_MIMETYPE = "application/rdf+xml";
+	public final static String N3_MIMETYPE = "text/n3"; // unofficial and
+														// unregistered
+	public final static String TTL_MIMETYPE = "text/turtle"; // unofficial and
+																// unregistered
+
+	/**
+	 * Setup the auth flag, portal flag and portal bean objects. Put them in the
+	 * request attributes.
+	 */
+	@Override
+	protected void doGet(HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException {
+		setup(request);
+	}
+
+	protected final void setup(HttpServletRequest request) {
+
+		// check to see if VitroRequestPrep filter was run
+		if (request.getAttribute("appBean") == null
+				|| request.getAttribute("webappDaoFactory") == null) {
+			log.warn("request scope was not prepared by VitroRequestPrep");
+		}
+	}
+
+	/**
+	 * doPost does the same thing as the doGet method
+	 */
+	@Override
+	protected void doPost(HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException {
+		doGet(request, response);
+	}
+
+	// ----------------------------------------------------------------------
+	// static utility methods for all Vitro servlets
+	// ----------------------------------------------------------------------
+
+	/**
+	 * If not logged in, send them to the login page.
+	 */
+	public static boolean checkLoginStatus(HttpServletRequest request,
+			HttpServletResponse response) {
+		if (LoginStatusBean.getBean(request).isLoggedIn()) {
+			return true;
+		} else {
+			try {
+				redirectToLoginPage(request, response);
+			} catch (IOException ioe) {
+				log.error("checkLoginStatus() could not redirect to login page");
+			}
+			return false;
+		}
+	}
+
+	/**
+	 * If not logged in at the minimum level or higher, send them to the login
+	 * page.
+	 */
+	public static boolean checkLoginStatus(HttpServletRequest request,
+			HttpServletResponse response, int minimumLevel) {
+		if (LoginStatusBean.getBean(request).isLoggedInAtLeast(minimumLevel)) {
+			return true;
+		} else {
+			try {
+				redirectToLoginPage(request, response);
+			} catch (IOException ioe) {
+				log.error("checkLoginStatus() could not redirect to login page");
+			}
+			return false;
+		}
+	}
+
+	/**
+	 * Not adequately logged in. Send them to the login page, and then back to
+	 * the page that invoked this.
+	 */
+	public static void redirectToLoginPage(HttpServletRequest request,
+			HttpServletResponse response) throws IOException {
+		String postLoginRequest;
+
+		String queryString = request.getQueryString();
+		if ((queryString == null) || queryString.isEmpty()) {
+			postLoginRequest = request.getRequestURI();
+		} else {
+			postLoginRequest = request.getRequestURI() + "?" + queryString;
+		}
+
+		request.getSession().setAttribute("postLoginRequest", postLoginRequest);
+		String loginPage = request.getContextPath() + Controllers.LOGIN;
+		response.sendRedirect(loginPage);
+	}
 
 }

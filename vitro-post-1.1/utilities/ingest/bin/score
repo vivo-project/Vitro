@@ -1,0 +1,152 @@
+#!/usr/bin/perl
+use Getopt::Std;
+use FileHandle;
+use POSIX qw( strftime );
+use FindBin qw($Bin);
+autoflush STDOUT 1;
+if(scalar(@ARGV) == 0){
+    Usage();
+    exit 0;
+
+}
+sub Usage {
+    print "score\n";
+    print "-b basedir\n";
+    print "-e number      - empty short mismatch\n";
+    print "-E number      - empty long mismatch\n";
+    print "-n fn,mn,ln    - name required\n";
+    print "-N fn,mn,ln    - name required\n";
+    print "-p             - perl mode\n";
+    print "-v             - verbose\n";
+}
+getopts("b:e:E:n:N:pw:W:");
+
+$b = "$Bin/..";
+$b = $opt_b if $opt_b;
+$w1 = 2.0;
+$w2 = 1.0;
+$w1 = $opt_W if $opt_W ne '';
+$w2 = $opt_w if $opt_w ne '';
+$wt = $w1+$w2;
+
+$wFullFullMatch           =  1.00;
+$wFullFullMisMatch        = -1.00;
+$wEmptyEmptyMatch         =  1.00;
+$wEmptyNonEmptyMisMatch   = -0.55;
+$wEmptyShortMisMatch      = -0.55;
+$wEmptyLongMisMatch       = -0.55;
+$wPartialNonEmptyMisMatch = -0.75;
+$wPartialNonEmptyMatch    =  0.50;
+
+$wEmptyShortMisMatch = $opt_e if $opt_e ne '' ;
+$wEmptyLongMisMatch = $opt_E if $opt_E ne '';
+
+
+@n = split /[,;| ]/,$opt_n;
+if(scalar(@n) == 0){
+    Usage();
+    exit 1;
+} elsif(scalar(@n) == 1){
+    $n[2] = $n[0];
+    $n[0] = $n[1] = '';
+} elsif(scalar(@n) == 2){
+    $n[2] = $n[1];
+    $n[1] = '';
+}
+@N = split /[,;| ]/,$opt_N;
+if(scalar(@N) == 0){
+    Usage();
+    exit 1;
+} elsif(scalar(@N) == 1){
+    $N[2] = $N[0];
+    $N[0] = $N[1] = '';
+} elsif(scalar(@N) == 2){
+    $N[2] = $N[1];
+    $N[1] = '';
+}
+if(!$opt_p){
+    $cmd = "";
+    $cmd .= "java -jar xslt/saxon9he.jar $b/xslt/empty.xml ";
+    $cmd .= "xslt/score.xsl fn1=$n[0] mn1=$n[1] ln1=$n[2] ";
+    $cmd .= "fn2=$N[0] mn2=$N[1] ln2=$N[2] ";
+    @res = qx($cmd);
+    print $cmd . "\n" if $opt_v;
+    print  "\n" .join("",@res) . "\n";
+} else {
+    $r = score($w1,$w2);
+    print "$r\n";
+
+}
+
+
+sub score {
+    my ($w1,$w2) = @_;
+    #print scalar(@n);
+    my @cn = clean(\@n);
+    my @cN = clean(\@N);
+    #print STDERR join("foo",@cn) . "\n";
+    if($cn[2] ne $cN[2]){
+	return -1.0;
+    }
+    if("$cn[0]|$cn[1]" eq "$cN[0]|$cN[1]"){
+	return 1.00;
+    }
+    my $fc = conf($cn[0],$cN[0]);
+    my $mc = conf($cn[1],$cN[1]);
+    
+    return sprintf("%6.3f",($fc * $w1 + $mc * $w2) / ($w1 + $w2));
+}
+
+sub conf {
+    my($s1,$s2)=@_;
+    if(length($s1) >= 1 && length($s2) >= 1){
+	if(length($s1) > 1 && length($s2) > 1){
+	    if($s1 eq $s2){
+		return $wFullFullMatch;
+	    } else {
+		return $wFullFullMisMatch;
+	    }
+	} else {
+	    #print STDERR "msg " . substr($s1,0,1) . "\n";
+	    #print STDERR "msg " . substr($s2,0,1) . "\n";
+	    if(substr($s1,0,1) eq substr($s2,0,1)){
+		return $wPartialNonEmptyMatch;
+	    } else {
+		return $wPartialNonEmptyMisMatch;
+	    }
+	}
+    } elsif(length($s1) == 0 && length($s2) > 1){ # E L
+	return $wEmptyLongMisMatch;
+    } elsif(length($s1) > 1 && length($s2) == 0){ # L E
+	return $wEmptyLongMisMatch;
+    } elsif(length($s1) == 0 && length($s2) == 1){ # E S
+	return $wEmptyShortMisMatch;
+    } elsif(length($s1) == 1 && length($s2) == 0){ # S E
+	return $wEmptyShortMisMatch;
+    } else {
+	return $wEmptyEmptyMatch;
+    }
+}
+
+
+sub clean {
+    my($arap) = @_;
+    my @res = ();
+    #print scalar(@$arap);
+    for(my $i=0;$i<scalar(@$arap);$i++){
+	my $item = $$arap[$i];
+	$item =~ s/[\-,.;\"\']/ /g;
+	$item =~ s/\s+/ /g;
+	$item = trim($item);
+	$res[$i] = uc($item);
+    }
+    return @res;
+}
+
+sub trim {
+    my($a) = @_;
+    $a =~ s/^\s*(\S+)\s*$/$1/;
+    $a =~ s/^\s*(\S.*\S)\s*$/$1/;
+    $a =~ s/(\s*)//;
+    return $a;
+}

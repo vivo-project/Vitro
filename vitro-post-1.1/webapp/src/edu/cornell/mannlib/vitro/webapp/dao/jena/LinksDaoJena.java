@@ -13,6 +13,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.ObjectProperty;
@@ -33,6 +36,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 public class LinksDaoJena extends JenaBaseDao implements LinksDao {
 
+    protected static final Log log = LogFactory.getLog(LinksDaoJena.class.getName());
+    
     public LinksDaoJena(WebappDaoFactoryJena wadf) {
         super(wadf);
     }
@@ -329,7 +334,7 @@ public class LinksDaoJena extends JenaBaseDao implements LinksDao {
                             } else if (l.getDatatype()==XSDDatatype.XSDstring) {
                                 link.setDisplayRank(l.getString());
                             } else {
-                                log.error("unexpected literal datatype; saved as displayRank 10");
+                                log.debug("unexpected literal datatype; saved as displayRank 10");
                                 link.setDisplayRank("10");
                             }
                         }

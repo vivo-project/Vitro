@@ -1,0 +1,99 @@
+#!/usr/bin/perl
+
+use Getopt::Std;
+use FileHandle;
+use POSIX qw( strftime );
+use FindBin qw($Bin);
+autoflush STDOUT 1;
+
+getopts("d:g:Lvz");
+
+if(!$opt_d){
+    print STDERR "Use requires: -d base_dir_path.\n";
+    exit 1;
+}
+$opt_d =~ s=/$==;
+$g_store = "$opt_d/store";
+$g_store = $opt_g if $opt_g;
+#print $g_store . "\n";
+$g_store =~ s=^(\./|\.)==;
+#print $g_store . "\n";
+$g_cwd = $ENV{'PWD'};
+$g_store = $g_cwd . '/' . $g_store if $g_store !~ /^\//;
+
+sub trim {
+    my($a) = @_;
+    $a =~ s/^\s*(\S+)\s*$/$1/;
+    $a =~ s/^\s*(\S.*\S)\s*$/$1/;
+    $a =~ s/(\s*)//;
+    return $a;
+}
+sub checkOrMakeDir {
+    my($d, $live) = @_;
+    print STDOUT "Checking $d: ";
+    if(-e $d && -w _ && -r _){
+	print STDOUT "exists.\n";
+	return 0;
+    }
+    if($live){
+	my @res;
+	@res = qx(mkdir $d);
+	my  $r = ($? >> 8);
+	if($r){
+	    print STDOUT "Fault: " . join("", @res) . "\n";
+	} else {
+	    print STDOUT "created.\n";
+	}
+	return $r;
+    } else {
+	print STDOUT "does not exist.\n";
+	return 0;
+    }
+}
+
+
+# sine qua non
+$g_sum = 0;
+$g_sum++ if(checkOrMakeDir("$g_store",$opt_L));
+$g_sum++ if(checkOrMakeDir("$g_store/ic-aggregated",$opt_L));
+$g_sum++ if(checkOrMakeDir("$g_store/is-aggregated",$opt_L));
+$g_sum++ if(checkOrMakeDir("$g_store/aw-aggregated",$opt_L));
+$g_sum++ if(checkOrMakeDir("$g_store/gr-aggregated",$opt_L));
+$g_sum++ if(checkOrMakeDir("$g_store/edt-aggregated",$opt_L));
+$g_sum++ if(checkOrMakeDir("$g_store/edu-aggregated",$opt_L));
+$g_sum++ if(checkOrMakeDir("$g_store/med-aggregated",$opt_L));
+$g_sum++ if(checkOrMakeDir("$g_store/adm-aggregated",$opt_L));
+
+
+$g_sum++ if(checkOrMakeDir("$g_store/ic-digest",$opt_L));
+$g_sum++ if(checkOrMakeDir("$g_store/is-digest",$opt_L));
+$g_sum++ if(checkOrMakeDir("$g_store/aw-digest",$opt_L));
+
+
+
+$g_sum++ if(checkOrMakeDir("$g_store/rdf",$opt_L));
+$g_sum++ if(checkOrMakeDir("$g_store/feedback",$opt_L));
+$g_sum++ if(checkOrMakeDir("$g_store/uri-maps",$opt_L));
+
+print STDOUT "\nAll needed directories checked. $g_sum problems found.\n\n";
+
+print STDOUT "Looking for $g_store/Users.xml \n";
+if( !-e "$g_store/Users.xml"){
+    print STDOUT "$g_store/Users.xml not found.\n";
+} else {
+    print STDOUT "Found $g_store/Users.xml \n";
+}
+
+print STDOUT "Looking for $g_store/raw-aiid-netid.xml \n";
+if( !-e "$g_store/raw-aiid-netid.xml"){
+    print STDOUT "$g_store/raw-aiid-netid.xml not found.\n";
+} else {
+    print STDOUT "Found $g_store/raw-aiid-netid.xml \n";
+}
+print STDOUT "Looking for $g_store/nzraw.xml \n";
+if( !-e "$g_store/nzraw.xml"){
+    print STDOUT "$g_store/nzraw.xml not found.\n";
+} else {
+    print STDOUT "Found $g_store/nzraw.xml \n";
+}
+

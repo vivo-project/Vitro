@@ -7,8 +7,8 @@
         xmlns:bibo="http://purl.org/ontology/bibo/"
         xmlns:foaf="http://xmlns.com/foaf/0.1/"
         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-	xmlns:aied="http://vivoweb.org/activity-insight"
-	xmlns:acti="http://vivoweb.org/activity-insight#"
+	xmlns:aied="http://vivoweb.org/ontology/activity-insight"
+	xmlns:acti="http://vivoweb.org/ontology/activity-insight#"
 	xmlns:dm="http://www.digitalmeasures.com/schema/data"	
 	xmlns:vfx='http://vivoweb.org/ext/functions'
 	exclude-result-prefixes='xs vfx dm aied'
@@ -35,7 +35,7 @@
 <rdf:RDF>
 <xsl:for-each select='aied:PERSON'>
 
-<xsl:variable name='ctr'  select='@counter'/>
+<xsl:variable name='ctr'  select='@index'/>
 <xsl:variable name='uno' select='$unomap/map[position()=$ctr]/@nuno'/>
 
 <xsl:variable name='knownUri' 
@@ -48,7 +48,7 @@ select="if($knownUri != '') then $knownUri else concat($g_instance,$uno)"/>
 
 <rdf:Description rdf:about="{$peruri}">
 <rdf:type 
-rdf:resource='http://vivoweb.org/activity-insight#ActivityInsightPerson'/>
+rdf:resource='http://vivoweb.org/ontology/activity-insight#ActivityInsightPerson'/>
 </rdf:Description>
 </xsl:if>
 
@@ -59,7 +59,7 @@ rdf:resource='http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing'/>
 <rdf:type rdf:resource='http://xmlns.com/foaf/0.1/Person'/>
 <xsl:if test='aied:netid != ""'>
 <rdf:type 
-rdf:resource='http://vivoweb.org/activity-insight#ActivityInsightPerson'/>
+rdf:resource='http://vivoweb.org/ontology/activity-insight#ActivityInsightPerson'/>
 </xsl:if>
 <rdfs:label>
 <xsl:value-of select='vfx:trim(aied:fullname)'/>
@@ -103,7 +103,7 @@ rdf:resource='http://vivoweb.org/activity-insight#ActivityInsightPerson'/>
 <xsl:element name='ExtantPersons' namespace=''>
 <xsl:for-each select='aied:EDUCATION'>
 
-<xsl:variable name='ctr'  select='@counter'/>
+<xsl:variable name='ctr'  select='@index'/>
 <xsl:variable name='uno' select='$unomap/map[position()=$ctr]/@nuno'/>
 <xsl:variable name='knownUri' 
 select='vfx:knownUri(aied:fname, aied:mname, aied:lname, $extantPersons)'/>
@@ -148,14 +148,14 @@ select="if($knownUri != '') then $knownUri else concat($g_instance,$uno)"/>
 <!-- 1 -->
 <xsl:variable name='edid' select='@id'/>
 <rdf:Description rdf:about="{concat($g_instance,'AI-',$edid)}" >
-<acti:educationalAttainmentFor rdf:resource="{$objref}"/>
+<core:educationalTrainingOf rdf:resource="{$objref}"/>
 </rdf:Description>
 <!-- =================================================== -->
 <!-- Declare property mapping foaf:Person to acti:Education -->
 <!-- 2 -->
 
 <rdf:Description rdf:about="{$objref}">
-<core:hasEducationalAttainment 
+<core:educationalTraining
 rdf:resource="{concat($g_instance,'AI-',$edid)}" />
 </rdf:Description>
 

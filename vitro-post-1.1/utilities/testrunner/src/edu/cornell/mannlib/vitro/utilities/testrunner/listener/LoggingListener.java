@@ -88,18 +88,28 @@ public class LoggingListener implements Listener {
 	}
 
 	@Override
-	public void webappStopping(String tomcatStopCommand) {
-		log("Stopping tomcat: " + tomcatStopCommand);
+	public void webappCheckingReady(String command) {
+		log("Checking if Tomcat is ready: " + command);
+	}
+
+	@Override
+	public void webappCheckReadyFailed(int returnCode) {
+		log("Tomcat is not ready: " + returnCode);
+	}
+
+	@Override
+	public void webappCheckedReady() {
+		log("Checked that Tomcat is ready.");
+	}
+
+	@Override
+	public void webappStopping(String command) {
+		log("Stopping tomcat: " + command);
 	}
 
 	@Override
 	public void webappStopFailed(int returnCode) {
 		log("Failed to stop tomcat; return code was " + returnCode);
-	}
-
-	@Override
-	public void webappWaitingForStop(int tomcatStopDelay) {
-		log("Waiting " + tomcatStopDelay + " seconds for tomcat to stop.");
 	}
 
 	@Override
@@ -145,11 +155,6 @@ public class LoggingListener implements Listener {
 	@Override
 	public void webappStartFailed(int returnCode) {
 		log("Failed to start tomcat; return code was " + returnCode);
-	}
-
-	@Override
-	public void webappWaitingForStart(int tomcatStartDelay) {
-		log("Waiting " + tomcatStartDelay + " seconds for tomcat to start.");
 	}
 
 	@Override

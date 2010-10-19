@@ -12,7 +12,10 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet.ResponseValues;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet.TemplateResponseValues;
 import freemarker.template.Configuration;
 
 /**
@@ -24,13 +27,13 @@ public class TestController extends FreemarkerHttpServlet {
 
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(TestController.class);
+    private static final String TEMPLATE_DEFAULT = "test.ftl";
 
-    protected String getTitle() {
-        return "Test";
-    }
-    
-    protected String getBody(VitroRequest vreq, Map<String, Object> body, Configuration config) {
+    @Override
+    protected ResponseValues processRequest(VitroRequest vreq) {
+        Portal portal = vreq.getPortal();
         
+        Map<String, Object> body = new HashMap<String, Object>();
         // Test of #list directive in template on undefined, null, and empty values.
         // Basic idea: empty list okay, null or undefined value not okay.
         List<String> apples = new ArrayList<String>();  // no error
@@ -85,10 +88,22 @@ public class TestController extends FreemarkerHttpServlet {
         body.put("bookTitle", "Persuasion");
         
         body.put("title", "VIVO Test");
+        
+        return new TemplateResponseValues(TEMPLATE_DEFAULT, body);
+    }
+    
+    @Override
+    protected String getTitle(String siteName) {
+        return "Test";
+    }
+    
+    protected String getBody(VitroRequest vreq, Map<String, Object> body, Configuration config) {
+        
+
           
         // Create the template to see the examples live.
         String bodyTemplate = "test.ftl";             
-        return mergeBodyToTemplate(bodyTemplate, body, config);
+        return mergeMapToTemplate(bodyTemplate, body, config);
 
     }
     

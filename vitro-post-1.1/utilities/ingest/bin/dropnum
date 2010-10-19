@@ -1,0 +1,13 @@
+#!/usr/bin/perl
+
+use Getopt::Std;
+use FileHandle;
+use POSIX qw( strftime );
+use FindBin qw($Bin);
+autoflush STDOUT 1;
+
+while($x = <>){
+    #chomp $x;
+    $x =~ s/^(.*?)\s+\d+\s*$/$1/;
+    print $x . "\n";
+}

@@ -1,0 +1,74 @@
+#!/usr/bin/perl
+
+use Getopt::Std;
+use FileHandle;
+use POSIX qw( strftime );
+use FindBin qw($Bin);
+
+$base = "http://vivoweb.org/individual/AI-CON-";
+sub trim {
+    my($a) = @_;
+    $a =~ s/^\s*(\S+)\s*$/$1/;
+    $a =~ s/^\s*(\S.*\S)\s*$/$1/;
+    $a =~ s/(\s*)//;
+    return $a;
+}
+
+autoflush STDOUT 1;
+open XML, ">ConcentrationArea.xml";
+
+print  XML "<?xml version=\"1.0\"?>\n";
+print  XML "<CONCENTRATION_AREA_LIST>\n";
+$n=1;
+@lines = <>;
+$count = scalar(@lines);
+@uris = ();
+@res = qx(nuno -n $count /home/jrm424/aiw/test/.Uno);
+foreach $line (@lines){
+
+    chomp $line;
+    print  XML "  <AREA index='$n'>\n";
+    print  XML "  \t<TITLE>$line";
+    print XML "</TITLE>\n";
+    $uri = "$base$res[$n-1]";
+    chomp $uri;
+    push(@uris,$uri);
+    print XML "  \t<URI>$uri";
+    print XML "</URI>\n";
+    
+    print XML "  </AREA>\n";
+    $n++;
+
+}
+print XML "</CONCENTRATION_AREA_LIST>\n";
+close XML;
+
+open RDFOUT , ">ConcentrationArea.rdf";
+$rdf = <<"RDF";
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF xmlns:aiic="http://vivoweb.org/activity-insight"
+         xmlns:acti="http://vivoweb.org/activity-insight#"
+         xmlns:dm="http://www.digitalmeasures.com/schema/data"
+         xmlns:core="http://vivoweb.org/ontology/core#"
+         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:bibo="http://purl.org/ontology/bibo/"
+         xmlns="http://vivoweb.org/activity-insight"
+         xmlns:foaf="http://xmlns.com/foaf/0.1/"
+         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+RDF
+
+print RDFOUT  "$rdf<rdf:RDF>\n";
+$n=0;
+foreach $line (@lines){
+
+    chomp $line;
+    $uri = $uris[$n++];
+    print RDFOUT "  <rdf:Description about='$uri'>\n";
+    print RDFOUT "    <rdf:type rdf:resource=\"http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing\"/>\n";
+    print RDFOUT "    <rdf:type rdf:resource=\"http://http://vivoweb.org/activity-insight#ConcentrationArea\"/>\n";
+    print RDFOUT "    <rdfs:label>$line";
+    print RDFOUT "</rdfs:label>\n";
+    print RDFOUT "  </rdf:Description>\n";
+}
+print RDFOUT "</rdf:RDF>\n";
+

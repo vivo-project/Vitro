@@ -14,5 +14,4 @@
 <xsl:text>http://vivoweb.org/individual/</xsl:text>
 </xsl:variable>
 
-
 </xsl:stylesheet>

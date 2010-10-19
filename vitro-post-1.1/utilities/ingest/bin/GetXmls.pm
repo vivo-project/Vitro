@@ -68,4 +68,15 @@ if($Phases{'GX'}>0 || $g_all){
     md5check() if $op_md5;
 }
 
+if($Phases{'INIT'}>0 || $Phases{'GX'}>0 || $g_all){
+    print "\nPhase = INIT ================================\n";
+    $g_curPhase = 'INIT';
+
+    mkListAllRaw('y');
+
+    mkRawAiid2NetidMap('y');
+
+} 
+
+
 1;

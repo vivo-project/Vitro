@@ -75,7 +75,7 @@ select="concat(\$rawXmlPath,'/',$_nsp:netid, '.xml')"/>
 
 <xsl:variable name='ref' select='document(\$nidxml)//dm:$_OBJ\[\@id = \$objid\]' />
 <xsl:if test='\$ref/dm:PUBLIC_VIEW="Yes"'>
-<rdf:Description rdf:about="{concat(\$g_instance,\@id)}" >
+<rdf:Description rdf:about="{concat(\$g_instance,'AI-',\@id)}" >
 <rdf:type 
 rdf:resource='$_ONT$_CLASS'/>
 <rdf:type 

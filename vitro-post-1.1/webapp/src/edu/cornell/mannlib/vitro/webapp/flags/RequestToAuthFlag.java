@@ -2,11 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.flags;
 
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
-import edu.cornell.mannlib.vitro.webapp.flags.AuthFlag;
-
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 
 /**
  * Created by IntelliJ IDEA.
@@ -18,23 +16,7 @@ import javax.servlet.http.HttpSession;
 public class RequestToAuthFlag {
     public static AuthFlag makeAuthFlag(HttpServletRequest request){
         AuthFlag authFlag = new AuthFlag();
-        authFlag.setUserSecurityLevel(0);
-
-        HttpSession currentSession = request.getSession();
-        if( currentSession == null )
-            return authFlag;
-
-        LoginFormBean f = (LoginFormBean) currentSession.getAttribute( "loginHandler" );
-        if (f!=null) {
-            if (f.getLoginStatus().equals("authenticated")) { // test if session is still valid
-                if (currentSession.getId().equals(f.getSessionId())) {
-                    if (request.getRemoteAddr().equals(f.getLoginRemoteAddr())) {
-                        authFlag.setUserSecurityLevel(Integer.parseInt(f.getLoginRole()));
-                    }
-                }
-            }
-        }
-
+        authFlag.setUserSecurityLevel(LoginStatusBean.getBean(request).getSecurityLevel());
         return authFlag;
     }
 }

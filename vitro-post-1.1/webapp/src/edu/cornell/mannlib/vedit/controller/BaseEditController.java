@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vedit.controller;
 
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -15,7 +14,6 @@ import java.util.Random;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -23,12 +21,10 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
 import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
-import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 
 public class BaseEditController extends VitroHttpServlet {
 
@@ -45,7 +41,6 @@ public class BaseEditController extends VitroHttpServlet {
     private final String EPO_KEYLIST_ATTR = "epoKeylist";
     private final int MAX_EPOS = 5;
     private final Calendar cal = Calendar.getInstance();
-    private final Random rand = new Random(cal.getTimeInMillis());
 
     /* EPO is reused if the controller is passed an epoKey, e.g.
       if a previous form submission failed validation, or the edit is a multistage process. */
@@ -109,39 +104,6 @@ public class BaseEditController extends VitroHttpServlet {
 
     private String createEpoKey(){
         return Long.toHexString(cal.getTimeInMillis());
-    }
-
-    protected boolean checkLoginStatus(HttpServletRequest request, HttpServletResponse response){
-        return checkLoginStatus(request, response, null);
-    }
-
-    protected boolean checkLoginStatus(HttpServletRequest request, HttpServletResponse response, String postLoginRedirectURI){
-        LoginFormBean loginBean = (LoginFormBean) request.getSession().getAttribute("loginHandler");
-        String loginPage = request.getContextPath() + Controllers.LOGIN;
-        if (loginBean == null){
-            try{
-                if (postLoginRedirectURI == null)
-                    request.getSession().setAttribute("postLoginRequest",request.getRequestURI()+"?"+request.getQueryString());
-                else
-                    request.getSession().setAttribute("postLoginRequest",postLoginRedirectURI+"?"+request.getQueryString());
-                response.sendRedirect(loginPage);
-                return false;
-            } catch (IOException ioe) {
-                log.error("checkLoginStatus() could not redirect to login page");
-                return false;
-            }
-        } else {
-            if (!loginBean.getLoginStatus().equals("authenticated")) {
-                try{
-                    response.sendRedirect(loginPage);
-                    return false;
-                } catch (IOException ioe) {
-                    log.error("checkLoginStatus() could not redirect to login page");
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 
     protected void setRequestAttributes(HttpServletRequest request, EditProcessObject epo){

@@ -5,7 +5,6 @@
 <%@ page import="com.hp.hpl.jena.shared.Lock" %>
 <%@ page import="com.thoughtworks.xstream.XStream" %>
 <%@ page import="com.thoughtworks.xstream.io.xml.DomDriver" %>
-<%@ page import="edu.cornell.mannlib.vedit.beans.LoginFormBean" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Individual" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.VitroRequest" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory" %>

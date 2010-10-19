@@ -3,4 +3,5 @@
 <head>
     <#include "title.ftl">
     <#include "stylesheets.ftl">
+    <#include "headScripts.ftl">
 </head>

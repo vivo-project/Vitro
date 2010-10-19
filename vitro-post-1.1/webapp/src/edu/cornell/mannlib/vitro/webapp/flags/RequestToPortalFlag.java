@@ -10,7 +10,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -180,16 +180,7 @@ public class RequestToPortalFlag {
         if (authFlag!=null) {
             currentUserSecurityLevel=authFlag.getUserSecurityLevel();
         } else {
-            LoginFormBean f = (LoginFormBean) currentSession.getAttribute( "loginHandler" );
-            if (f!=null) {
-                if (f.getLoginStatus().equals("authenticated")) { // test if session is still valid
-                    if (currentSession.getId().equals(f.getSessionId())) {
-                        if (request.getRemoteAddr().equals(f.getLoginRemoteAddr())) {
-                            currentUserSecurityLevel=Integer.parseInt(f.getLoginRole());
-                        }
-                    }
-                }
-            }
+        	currentUserSecurityLevel=LoginStatusBean.getBean(request).getSecurityLevel();
         }
 
         if (portalFlag.isFilteringActive() ){

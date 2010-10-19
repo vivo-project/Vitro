@@ -1,6 +1,6 @@
 <%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
 
-<% if (securityLevel >= loginHandler.EDITOR) { %>
+<% if (loginBean.isLoggedInAtLeast(LoginStatusBean.EDITOR) { %>
     <div class="pageBodyGroup">
     
 	    <h3>Data Input</h3>

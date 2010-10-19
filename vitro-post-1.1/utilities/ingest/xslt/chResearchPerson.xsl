@@ -2,9 +2,9 @@
 <xsl:stylesheet version='2.0'
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 	xmlns:ai="http://www.digitalmeasures.com/schema/data"
-	xmlns:mapid="http://vivoweb.org/activity-insight"
-	xmlns:aichr="http://vivoweb.org/activity-insight"
-	xmlns="http://vivoweb.org/activity-insight"
+	xmlns:mapid="http://vivoweb.org/ontology/activity-insight"
+	xmlns:aichr="http://vivoweb.org/ontology/activity-insight"
+	xmlns="http://vivoweb.org/ontology/activity-insight"
 	xmlns:dm="http://www.digitalmeasures.com/schema/data"
 	xmlns:xs='http://www.w3.org/2001/XMLSchema'
 	xmlns:vfx='http://vivoweb.org/ext/functions'	
@@ -31,9 +31,9 @@
 <xsl:element name='aichr:CHRESEARCH_PERSON_LIST'>
 
 <xsl:for-each-group select='$docs//dm:Record//dm:CHRESEARCH_AUTH' 
-group-by='vfx:collapse(concat(dm:LNAME, ", ",dm:FNAME , " ", dm:LNAME))'>
+group-by='vfx:collapse(concat(dm:LNAME, "|",dm:FNAME , "|", dm:MNAME))'>
 <xsl:sort 
-select='vfx:collapse(concat(dm:LNAME, ", ",dm:FNAME , " ", dm:LNAME))'/>
+select='vfx:collapse(concat(dm:LNAME, "|",dm:FNAME , "|", dm:MNAME))'/>
 
 <xsl:variable name='rec' select='.'/>
 <xsl:variable name='cur_netid' select='../../../@username'/>

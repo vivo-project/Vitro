@@ -2,8 +2,8 @@
 <xsl:stylesheet version='2.0'
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 	xmlns:ai="http://www.digitalmeasures.com/schema/data"
-	xmlns:aiedu="http://vivoweb.org/activity-insight"
-	xmlns="http://vivoweb.org/activity-insight"
+	xmlns:aiedu="http://vivoweb.org/ontology/activity-insight"
+	xmlns="http://vivoweb.org/ontology/activity-insight"
 	xmlns:dm="http://www.digitalmeasures.com/schema/data"
 	xmlns:xs='http://www.w3.org/2001/XMLSchema'
 	xmlns:vfx='http://vivoweb.org/ext/functions'	
@@ -28,11 +28,11 @@
 <aiedu:MEDCONT_PERSON_LIST>
 
 <xsl:for-each-group select='$docs//dm:Record' 
-group-by='vfx:collapse(concat(dm:PCI/dm:LNAME, ", ",
-dm:PCI/dm:FNAME , " ", dm:PCI/dm:LNAME))'>
+group-by='vfx:collapse(concat(dm:PCI/dm:LNAME, "|",
+dm:PCI/dm:FNAME , "|", dm:PCI/dm:MNAME))'>
 <xsl:sort 
-select='vfx:collapse(concat(dm:PCI/dm:LNAME, ", ",
-dm:PCI/dm:FNAME , " ", dm:PCI/dm:LNAME))'/>
+select='vfx:collapse(concat(dm:PCI/dm:LNAME, "|",
+dm:PCI/dm:FNAME , "|", dm:PCI/dm:MNAME))'/>
 
 
 <xsl:variable name='rec' select='.'/>

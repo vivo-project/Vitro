@@ -94,7 +94,7 @@ public class DumpAllDirective extends BaseTemplateDirectiveModel {
         examples.add("<@" + name + " />");
         map.put("examples", examples);
         
-        return mergeToTemplate(map, config);
+        return mergeToHelpTemplate(map, config);
     }
 
 }
