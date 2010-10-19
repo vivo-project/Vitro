@@ -16,12 +16,16 @@ import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.sdb.StoreDesc;
+import com.hp.hpl.jena.sdb.store.DatabaseType;
+import com.hp.hpl.jena.sdb.store.LayoutType;
 
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDaoCon;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDBGraphGenerator;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RegeneratingGraph;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.SDBGraphGenerator;
 
 public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     private static final Log log = LogFactory.getLog(JenaDataSourceSetupBase.class);
@@ -131,19 +135,29 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
        return ds;
    }
    
-   private Model makeDBModel(BasicDataSource ds, String jenaDbModelName, OntModelSpec jenaDbOntModelSpec) {
+   public enum TripleStoreType {
+	   RDB, SDB
+   }
+   
+   protected Model makeDBModel(BasicDataSource ds, String jenaDbModelname, OntModelSpec jenaDbOntModelSpec) {
+	   return makeDBModel(ds, jenaDbModelname, jenaDbOntModelSpec, TripleStoreType.RDB);
+   }
+   
+   protected Model makeDBModel(BasicDataSource ds, String jenaDbModelName, OntModelSpec jenaDbOntModelSpec, TripleStoreType storeType) {
        Model dbModel = null;
        try {
            //  open the db model
             try {
-                Graph g = new RegeneratingGraph(new RDBGraphGenerator(ds, DB, jenaDbModelName));
-                Model m = ModelFactory.createModelForGraph(g);
-                dbModel = m;
-                //dbModel = ModelFactory.createOntologyModel(jenaDbOntModelSpec,m);
-               
-               //Graph g = maker.openGraph(JENA_DB_MODEL,false);
-               //dbModel = ModelFactory.createModelForGraph(g);
-               //maker.openModel(JENA_DB_MODEL);
+                Graph g = null;
+                switch (storeType) {
+                	case RDB:
+                		g = new RegeneratingGraph(new RDBGraphGenerator(ds, DB, jenaDbModelName)); break;
+                	case SDB:
+                		StoreDesc desc = new StoreDesc(LayoutType.LayoutTripleNodesHash, DatabaseType.MySQL);
+                    	g = new RegeneratingGraph(new SDBGraphGenerator(ds, desc, jenaDbModelName)); break;
+                	default: throw new RuntimeException ("Unsupported store type " + storeType); 
+                }
+                dbModel = ModelFactory.createModelForGraph(g);
                 log.debug("Using database at "+ds.getUrl());
             } catch (Throwable t) {
                 t.printStackTrace();
@@ -151,7 +165,6 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
        } catch (Throwable t) {
            t.printStackTrace();
        }
-
        return dbModel;
    }
 

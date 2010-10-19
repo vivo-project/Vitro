@@ -140,9 +140,10 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
             	Model sdbAbox = SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_DB_MODEL);
             	sdbAbox.add(unionOms.getABoxModel());
         	}
-        	Model sdbAbox = SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_DB_MODEL);
-        	baseOms.setABoxModel(ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, sdbAbox));
-        	unionOms.setABoxModel(ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, sdbAbox));
+        	Model sdbAbox = makeDBModel(bds, JenaDataSourceSetupBase.JENA_DB_MODEL, DB_ONT_MODEL_SPEC, TripleStoreType.SDB);
+        	Model listenableAbox = ModelFactory.createUnion(sdbAbox, ModelFactory.createDefaultModel());
+        	baseOms.setABoxModel(ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, listenableAbox));
+        	unionOms.setABoxModel(ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, listenableAbox));
         	
         } catch (Throwable t) {
             log.error("Throwable in " + this.getClass().getName(), t);
