@@ -2,10 +2,11 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao;
 
+import java.util.List;
+
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Link;
-
-import java.util.List;
+import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 
 public interface LinksDao {
 
@@ -26,6 +27,6 @@ public interface LinksDao {
     
     public abstract void addPrimaryLinkToIndividual(Individual entity);
 
-    public abstract void addLinksToIndividualsInObjectPropertyStatement(List /* of ObjectPropertyStatement*/objPropertyStmts);
+    public abstract void addLinksToIndividualsInObjectPropertyStatement(List<ObjectPropertyStatement> objPropertyStmts);
 
 }
