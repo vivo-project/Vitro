@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- $This file is distributed under the terms of the license in /doc/license.txt$-->
+<!-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
 <!-- ====================================================================== 
      Build script for the Vivo Products.
@@ -134,14 +134,22 @@
           target: productCompile                      
          - - - - - - - - - - - - - - - - - -->
 	<target name="productCompile" depends="productPrepare" if="product.sources.exist">
+		<property name="product.classes.dir" value="${build.dir}/${ant.project.name}/classes" />
+		<mkdir dir="${product.classes.dir}" />
 		<javac srcdir="${product.source.dir}"
-		       destdir="${build.dir}/war/WEB-INF/classes"
+		       destdir="${product.classes.dir}"
 		       debug="true"
 		       deprecation="true"
 		       optimize="true"
 		       source="1.6">
-			<classpath refid="compile.classpath" />
+			<classpath>
+				<path refid="compile.classpath" />
+				<pathelement location="${build.dir}/war/WEB-INF/classes"/>
+			</classpath>
 		</javac>
+		<copy todir="${build.dir}/war/WEB-INF/classes" overwrite="true">
+			<fileset dir="${product.classes.dir}" />
+		</copy>
 	</target>
 
 	<!-- ================================= 
