@@ -33,9 +33,9 @@ public class SimpleReasoner extends StatementListener {
 	 * @param baseModel - input.  This model contains asserted ABox statements
 	 * @param inferenceModel - output. This is the model in which inferred (materialized) ABox statements are maintained (added or retracted).
  	 */
-	public SimpleReasoner(OntModel fullModel, OntModel baseModel, Model inferenceModel) {
+	public SimpleReasoner(OntModel fullModel, OntModel abox, Model inferenceModel) {
 		this.fullModel = fullModel;
-		this.abox = baseModel;
+		this.abox = abox;
 		this.inferenceModel = inferenceModel;
 	}
 	
