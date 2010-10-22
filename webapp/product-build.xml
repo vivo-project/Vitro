@@ -181,20 +181,47 @@
 			<arg value="${testlevel}" />
 		</java>
 	</target>
+<!-- ================================= 
+          target: revisionInfo              
+         ================================= -->
+    <target name="revisionInfo" description="--> Store revision info in build">
+        <innercall target="revisionInfo" />
+    	<antcall target="productRevisionInfo" />
+    </target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: productRevisionInfo                      
+         - - - - - - - - - - - - - - - - - -->
+    <target name="productRevisionInfo">
+		<property name="revisionInfo.product.dir" location="${ant.file}/.." />
+		<property name="revisionInfo.build.file" location="${war-classes.dir}/revisionInfo.txt" />
+
+		<java classname="edu.cornell.mannlib.vitro.utilities.revisioninfo.RevisionInfoBuilder"
+		      fork="no"
+		      failonerror="true"
+		      logerror="true"
+		      outputproperty="revisionInfo.outputLine">
+			<classpath refid="test.run.classpath" />
+			<arg value="${ant.project.name}" />
+			<arg file="${revisionInfo.product.dir}" />
+		</java>
+		<echo file="${revisionInfo.build.file}" append="true">${revisionInfo.outputLine}
+</echo>
+    </target>
 
 	<!-- ================================= 
           target: deploy              
          ================================= -->
 	<target name="deploy" description="--> Build the app and install in Tomcat">
 		<!-- the inner "deploy" would just do a sync that will be done by productDeploy -->
-		<innercall target="test" />
+		<innercall target="revisionInfo" />
 		<antcall target="productDeploy" />
 	</target>
 
 	<!-- - - - - - - - - - - - - - - - - - 
           target: productDeploy                      
          - - - - - - - - - - - - - - - - - -->
-	<target name="productDeploy" depends="productTest">
+	<target name="productDeploy" depends="productRevisionInfo">
 		<property name="webapp.deploy.home" value="${tomcat.home}/webapps/${webapp.name}" />
 
 		<mkdir dir="${webapp.deploy.home}" />

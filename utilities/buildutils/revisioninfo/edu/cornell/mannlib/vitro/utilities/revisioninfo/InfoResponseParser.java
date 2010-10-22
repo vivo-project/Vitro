@@ -87,7 +87,7 @@ public class InfoResponseParser {
 	}
 
 	private boolean isTrunkPath() {
-		return path.equals(TRUNK_PREFIX);
+		return path.startsWith(TRUNK_PREFIX);
 	}
 
 	private boolean isTagPath() {
@@ -95,7 +95,7 @@ public class InfoResponseParser {
 	}
 
 	private String getTagName() {
-		return path.substring(TAGS_PREFIX.length());
+		return getFirstLevel(discardPrefix(path, TAGS_PREFIX));
 	}
 
 	private boolean isBranchPath() {
@@ -103,7 +103,24 @@ public class InfoResponseParser {
 	}
 
 	private String getBranchName() {
-		return path.substring(BRANCHES_PREFIX.length());
+		return getFirstLevel(discardPrefix(path, BRANCHES_PREFIX));
+	}
+
+	private String discardPrefix(String string, String prefix) {
+		if (string.length() < prefix.length()) {
+			return "";
+		} else {
+			return string.substring(prefix.length());
+		}
+	}
+
+	private String getFirstLevel(String string) {
+		int slashHere = string.indexOf('/');
+		if (slashHere == -1) {
+			return string;
+		} else {
+			return string.substring(0, slashHere);
+		}
 	}
 
 }
