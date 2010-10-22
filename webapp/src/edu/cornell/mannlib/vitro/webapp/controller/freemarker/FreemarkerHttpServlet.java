@@ -272,8 +272,17 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         root.putAll(getRootValues(vreq));
 
         // Add the values that we got, and merge to the template.
-        body.putAll(bodyMap);
-        root.put("body", mergeMapToTemplate(values.getTemplateName(), body, config)); 
+        String bodyTemplate = values.getTemplateName();
+        String bodyString;
+        if (bodyTemplate != null) {
+            body.putAll(bodyMap);
+            bodyString = mergeMapToTemplate(bodyTemplate, body, config);            
+        } else {
+            // The subcontroller has not defined a body template. All markup for the page 
+            // is specified in the main page template.
+            bodyString = "";
+        }
+        root.put("body", bodyString);
         
         writePage(root, config, response);       
     }
