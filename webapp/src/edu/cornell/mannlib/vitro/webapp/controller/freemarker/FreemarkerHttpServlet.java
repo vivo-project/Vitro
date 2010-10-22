@@ -133,8 +133,9 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
             log.debug("Disabling Freemarker template caching in development build.");
             config.setTemplateUpdateDelay(0); // no template caching in development 
         } else {
-            log.debug("Setting Freemarker template cache update delay.");            
-            config.setTemplateUpdateDelay(60); // in seconds; Freemarker default is 5
+            int delay = 60;
+            log.debug("Setting Freemarker template cache update delay to " + delay + ".");            
+            config.setTemplateUpdateDelay(delay); // in seconds; Freemarker default is 5
         }
 
         // Specify how templates will see the data model. 
@@ -839,17 +840,6 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         @Override
         public Throwable getException() {
             return cause;
-        }
-
-        @Override
-        public String getTemplateName() {
-            throw new UnsupportedOperationException(
-                    "This is not a template response.");
-        }
-
-        @Override
-        public Map<String, Object> getMap() {
-            throw new IllegalStateException("This is not a template response.");
         }
 
         @Override
