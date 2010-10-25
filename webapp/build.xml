@@ -19,6 +19,7 @@
 	<property name="war.dir" location="${build.dir}/war" />
 	<property name="war-webinf.dir" location="${war.dir}/WEB-INF" />
 	<property name="war-classes.dir" location="${war-webinf.dir}/classes" />
+	<property name="war-resources.dir" location="${war-webinf.dir}/resources" />
 	<property name="war-lib.dir" location="${war-webinf.dir}/lib" />
 
 	<property name="test-classes.dir" location="${build.dir}/testclasses" />
@@ -125,6 +126,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 	<target name="prepare" depends="properties">
 		<mkdir dir="${build.dir}" />
 		<mkdir dir="${war-classes.dir}" />
+		<mkdir dir="${war-resources.dir}" />
 		<mkdir dir="${test-classes.dir}" />
 
 		<!-- copy the themes into the war directory. -->
@@ -259,7 +261,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
          ================================= -->
 	<target name="revisionInfo" depends="test" description="--> Store revision info in build">
 		<property name="revisionInfo.product.dir" location="${ant.file.vitroCore}/.." />
-		<property name="revisionInfo.build.file" location="${war-classes.dir}/revisionInfo.txt" />
+		<property name="revisionInfo.build.file" location="${war-resources.dir}/revisionInfo.txt" />
 
 		<delete file="${revisionInfo.build.file}" />
 

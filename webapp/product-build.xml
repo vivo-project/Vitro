@@ -32,6 +32,7 @@
 	<property name="war.dir" location="${build.dir}/war" />
 	<property name="war-webinf.dir" location="${war.dir}/WEB-INF" />
 	<property name="war-classes.dir" location="${war-webinf.dir}/classes" />
+	<property name="war-resources.dir" location="${war-webinf.dir}/resources" />
 	<property name="war-lib.dir" location="${war-webinf.dir}/lib" />
 	<property name="test-classes.dir" location="${build.dir}/testclasses" />
 	<property name="servletjars.dir" location="${build.dir}/servletjars" />
@@ -194,7 +195,7 @@
          - - - - - - - - - - - - - - - - - -->
     <target name="productRevisionInfo" depends="productTest">
 		<property name="revisionInfo.product.dir" location="${ant.file}/.." />
-		<property name="revisionInfo.build.file" location="${war-classes.dir}/revisionInfo.txt" />
+		<property name="revisionInfo.build.file" location="${war-resources.dir}/revisionInfo.txt" />
 
 		<java classname="edu.cornell.mannlib.vitro.utilities.revisioninfo.RevisionInfoBuilder"
 		      fork="no"
