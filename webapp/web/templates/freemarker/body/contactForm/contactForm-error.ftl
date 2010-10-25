@@ -11,7 +11,6 @@
            </div>
        
     </#if>
-</p> 
 
 
 <p class="contactUsReturnHome">Return to the <a href="${urls.home}">home page</a>.</p> 
