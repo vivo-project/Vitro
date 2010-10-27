@@ -25,6 +25,7 @@ import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
+import edu.cornell.mannlib.vitro.webapp.config.RevisionInfoBean;
 import edu.cornell.mannlib.vitro.webapp.controller.ContactMailServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -435,7 +436,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
             map.put("bannerImage", UrlBuilder.getUrl(themeDir + "site_icons/" + bannerImage));
         }
         
-        map.put("version", getVersionInfo());
+        map.put("version", getVersionInfo(urlBuilder));
         
         return map;        
     }   
@@ -479,12 +480,13 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         return copyright;
     }
     
-    private final Map<String, Object>  getVersionInfo() {
-        Map<String, Object> version = new HashMap<String, Object>();
-        // Add revision info here
-        version.put("number", "1.2"); // test code - to be removed
-        return version;
-    }
+	private final Map<String, Object> getVersionInfo(UrlBuilder urlBuilder) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("label", RevisionInfoBean.getBean(getServletContext())
+				.getReleaseLabel());
+		map.put("moreInfoUrl", urlBuilder.getPortalUrl("/revisionInfo"));
+		return map;
+	}
 
     // Subclasses may override. This serves as a default.
     protected String getTitle(String siteName) {        
