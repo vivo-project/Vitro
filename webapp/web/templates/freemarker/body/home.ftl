@@ -1,5 +1,5 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
-<#-- Page template for home page -->
+<#-- Template for home page body contents -->
 
-<#include "page.ftl">
+<p>This is the Vitro home page.</p>

@@ -32,9 +32,7 @@ public class FreemarkerComponentGenerator extends FreemarkerHttpServlet {
         VitroRequest vreq = new VitroRequest(request);
         Configuration config = getConfig(vreq);
 
-        // root is the map used to create the page shell - header, footer, menus, etc.
-        Map<String, Object> root = getSharedVariables(vreq, new HashMap<String, Object>()); 
-        root.putAll(getRootValues(vreq));  
+        Map<String, Object> root = getPageValues(vreq, new HashMap<String, Object>()); 
         
         request.setAttribute("ftl_identity", get("identity", root, config));
         request.setAttribute("ftl_menu", get("menu", root, config));

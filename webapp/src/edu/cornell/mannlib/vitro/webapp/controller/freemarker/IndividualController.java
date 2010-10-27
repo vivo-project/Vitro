@@ -3,8 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +38,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
-import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
@@ -64,13 +61,11 @@ import edu.cornell.mannlib.vitro.webapp.web.templatemodels.IndividualTemplateMod
  *
  */
 public class IndividualController extends FreemarkerHttpServlet {
-    private static final Log log = LogFactory.getLog(IndividualController.class);
 
-    private String default_jsp      = Controllers.BASIC_JSP;
-    private String default_body_jsp = Controllers.ENTITY_JSP;
-    private ApplicationBean appBean;
+    private static final long serialVersionUID = 1L;
+    private static final Log log = LogFactory.getLog(IndividualController.class);
     
-    private static final String TEMPLATE_INDIVIDUAL = "individual.ftl";
+    private static final String TEMPLATE_INDIVIDUAL_DEFAULT = "individual.ftl";
     private static final String TEMPLATE_HELP = "individual-help.ftl";
     
     @Override
@@ -117,9 +112,10 @@ public class IndividualController extends FreemarkerHttpServlet {
             
     		body.put("relatedSubject", getRelatedSubject(vreq));
     		
-	        body.put("individual", getIndividualTemplateModel(vreq, individual));             	        
+    		IndividualTemplateModel ind = getIndividualTemplateModel(vreq, individual); 
+	        body.put("individual", ind);         	        
 	                
-	        return new TemplateResponseValues(TEMPLATE_INDIVIDUAL, body);
+	        return new TemplateResponseValues(TEMPLATE_INDIVIDUAL_DEFAULT, body);
         
 	    } catch (Throwable e) {
 	        log.error(e);
@@ -195,10 +191,10 @@ public class IndividualController extends FreemarkerHttpServlet {
 
 //        String vclassName = "unknown";
 //        String customView = null;
-//
-//        if( indiv.getVClass() != null ){
-//            vclassName = indiv.getVClass().getName();
-//            List<VClass> clasList = indiv.getVClasses(true);
+//        String customCss = null;
+//        if( individual.getVClass() != null ){
+//            vclassName = individual.getVClass().getName();
+//            List<VClass> clasList = individual.getVClasses(true);
 //            for (VClass clas : clasList) {
 //                customView = clas.getCustomDisplayView();
 //                if (customView != null) {
@@ -212,7 +208,7 @@ public class IndividualController extends FreemarkerHttpServlet {
 //                }
 //            }
 //            if (customView == null) { //still
-//                clasList = indiv.getVClasses(false);
+//                clasList = individual.getVClasses(false);
 //                for (VClass clas : clasList) {
 //                    customView = clas.getCustomDisplayView();
 //                    if (customView != null) {
@@ -226,9 +222,9 @@ public class IndividualController extends FreemarkerHttpServlet {
 //                    }
 //                }
 //            }
-//        } else {
-//            log.error("Entity " + indiv.getURI() + " with vclass URI " +
-//                    indiv.getVClassURI() + ", no vclass with that URI exists");
+//        } else if (individual.getVClassURI() != null) {
+//            log.debug("Individual " + individual.getURI() + " with class URI " +
+//                    individual.getVClassURI() + ": no class found with that URI");
 //        }
 //        if (customView!=null) {
 //            // insert test for whether a css files of the same name exists, and populate the customCss string for use when construction the header
@@ -246,7 +242,7 @@ public class IndividualController extends FreemarkerHttpServlet {
 		OntModel ontModel = null;
 		HttpSession session = vreq.getSession(false);
 		if( session != null )
-			ontModel =(OntModel)session.getAttribute("jenaOntModel");		
+			ontModel = (OntModel)session.getAttribute("jenaOntModel");		
 		if( ontModel == null)
 			ontModel = (OntModel)getServletContext().getAttribute("jenaOntModel");
 			

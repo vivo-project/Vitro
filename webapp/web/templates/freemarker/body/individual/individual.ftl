@@ -71,7 +71,9 @@
                 </ul>
             </div>
         </#if>
-       
+        
+        <#include "individual-properties.ftl">
+        
         <#-- Keywords -->
         <#if individual.keywords?has_content>
             <p id="keywords">Keywords: ${individual.keywordString}</p>

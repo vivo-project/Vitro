@@ -253,38 +253,19 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
      
     }
 
-    // RY *** A lot of this is shared with doException(). Factor out shared parts.
     protected void doTemplate(VitroRequest vreq, HttpServletResponse response, ResponseValues values) {
      
         Configuration config = getConfig(vreq);
         Map<String, Object> bodyMap = values.getMap();
         
-        // We can't use shared variables in the Freemarker configuration to store anything 
-        // except theme-specific data, because multiple portals or apps might share the same theme. So instead
-        // just put the shared variables in both root and body.
-        Map<String, Object> sharedVariables = getSharedVariables(vreq, bodyMap);
-        
-        // root is the map used to create the page shell - header, footer, menus, etc.
-        Map<String, Object> root = new HashMap<String, Object>(sharedVariables);
-        
-        // body is the map used to create the page body
-        Map<String, Object> body = new HashMap<String, Object>(sharedVariables);
-        root.putAll(getRootValues(vreq));
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.putAll(getPageValues(vreq, bodyMap));
 
-        // Add the values that we got, and merge to the template.
-        String bodyTemplate = values.getTemplateName();
-        String bodyString;
-        if (bodyTemplate != null) {
-            body.putAll(bodyMap);
-            bodyString = mergeMapToTemplate(bodyTemplate, body, config);            
-        } else {
-            // The subcontroller has not defined a body template. All markup for the page 
-            // is specified in the main page template.
-            bodyString = "";
-        }
-        root.put("body", bodyString);
+        // Add the values from the subcontroller.
+        map.putAll(bodyMap);
+        map.put("bodyTemplate", values.getTemplateName());
         
-        writePage(root, config, response);       
+        writePage(map, config, response);       
     }
     
     protected void doRedirect(HttpServletRequest request, HttpServletResponse response, ResponseValues values) 
@@ -328,49 +309,6 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         log.error(values.getException(), values.getException());      
         TemplateResponseValues trv = new TemplateResponseValues(values.getTemplateName(), values.getMap());
         doTemplate(vreq, response, trv);
-    }
-
-    // We can't use shared variables in the Freemarker configuration to store anything 
-    // except theme-specific data, because multiple portals or apps might share the same theme. So instead
-    // we'll get all the shared variables here, and put them in both root and body maps.
-    protected Map<String, Object> getSharedVariables(VitroRequest vreq, Map<String, Object> bodyMap) {
-        
-        Map<String, Object> map = new HashMap<String, Object>();
-        
-        Portal portal = vreq.getPortal();
-        // Ideally, templates wouldn't need portal id. Currently used as a hidden input value
-        // in the site search box, so needed for now.
-        map.put("portalId", portal.getPortalId());
-        
-        String siteName = portal.getAppName();
-        map.put("siteName", siteName);
-        
-        // In some cases the title is determined during the subclass processRequest() method; e.g., 
-        // for an Individual profile page, the title should be the Individual's label. In that case,
-        // put that title in the sharedVariables map because it's needed by the page root map as well
-        // to generate the <title> element. Otherwise, use the getTitle() method to generate the title.
-        String title = (String) bodyMap.get("title");
-        if (StringUtils.isEmpty(title)) {
-            title = getTitle(siteName);
-        }
-        map.put("title", title);
-
-        String themeDir = getThemeDir(portal);
-        UrlBuilder urlBuilder = new UrlBuilder(portal);
-        
-        map.put("urls", getUrls(themeDir, urlBuilder)); 
-
-        map.put("themeDir", themeDir);
-
-        map.put("themeDir", themeDir);
-
-        map.put("stylesheets", getStylesheetList(themeDir));
-        map.put("scripts", getScriptList(themeDir));
-        map.put("headScripts", getScriptList(themeDir));
-  
-        map.putAll(getDirectives());
-        
-        return  map;
     }
 
     public String getThemeDir(Portal portal) {
@@ -443,43 +381,64 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         return map;
     }
     
-    // Add variables that should be available only to the page's root map, not to the body.
+    // Values needed to generate the page frame - header, footer, menus, etc. Some may also be used in the 
+    // page body.
     // RY This is protected instead of private so FreeMarkerComponentGenerator can access.
     // Once we don't need that (i.e., jsps have been eliminated) we can make it private.
-    protected Map<String, Object> getRootValues(VitroRequest vreq) {
+    protected Map<String, Object> getPageValues(VitroRequest vreq, Map<String, Object> bodyMap) {
         
-        Map<String, Object> root = new HashMap<String, Object>();
-        root.put("tabMenu", getTabMenu(vreq));
-
+        Map<String, Object> map = new HashMap<String, Object>();
+        
         Portal portal = vreq.getPortal();
+        // Ideally, templates wouldn't need portal id. Currently used as a hidden input value
+        // in the site search box, so needed for now.
+        map.put("portalId", portal.getPortalId());
         
+        String siteName = portal.getAppName();
+        map.put("siteName", siteName);
+        
+        // In some cases the title is determined during the subclass processRequest() method; e.g., 
+        // for an Individual profile page, the title should be the Individual's label. In that case,
+        // put that title in the sharedVariables map because it's needed by the page root map as well
+        // to generate the <title> element. Otherwise, use the getTitle() method to generate the title.
+        String title = (String) bodyMap.get("title");
+        if (StringUtils.isEmpty(title)) {
+            title = getTitle(siteName);
+        }
+        map.put("title", title);
+
+        String themeDir = getThemeDir(portal);
+        UrlBuilder urlBuilder = new UrlBuilder(portal);        
+        map.put("urls", getUrls(themeDir, urlBuilder)); 
+        map.put("themeDir", themeDir);
+        map.put("stylesheets", getStylesheetList(themeDir));
+        map.put("scripts", getScriptList(themeDir));
+        map.put("headScripts", getScriptList(themeDir));  
+        map.putAll(getDirectives());        
+        map.put("tabMenu", getTabMenu(vreq));
+
         ApplicationBean appBean = vreq.getAppBean();
         PortalWebUtil.populateSearchOptions(portal, appBean, vreq.getWebappDaoFactory().getPortalDao());
         PortalWebUtil.populateNavigationChoices(portal, vreq, appBean, vreq.getWebappDaoFactory().getPortalDao()); 
         
-        root.putAll(getLoginValues(vreq));      
+        map.putAll(getLoginValues(vreq));      
         
-        root.put("copyright", getCopyrightInfo(portal));
-    
-        root.put("siteTagline", portal.getShortHand());
-        root.put("breadcrumbs", BreadCrumbsUtil.getBreadCrumbsDiv(vreq));
-    
-        String themeDir = getThemeDir(portal);
+        map.put("copyright", getCopyrightInfo(portal));    
+        map.put("siteTagline", portal.getShortHand());
+        map.put("breadcrumbs", BreadCrumbsUtil.getBreadCrumbsDiv(vreq));
 
         // This value is used only in stylesheets.ftl and already contains the context path.
-        root.put("stylesheetPath", UrlBuilder.getUrl(themeDir + "/css"));  
+        map.put("stylesheetPath", UrlBuilder.getUrl(themeDir + "/css"));  
 
         String bannerImage = portal.getBannerImage();  
         if ( ! StringUtils.isEmpty(bannerImage)) {
-            root.put("bannerImage", UrlBuilder.getUrl(themeDir + "site_icons/" + bannerImage));
+            map.put("bannerImage", UrlBuilder.getUrl(themeDir + "site_icons/" + bannerImage));
         }
         
-        return root;        
+        return map;        
     }   
 
     private TabMenu getTabMenu(VitroRequest vreq) {
-        // RY There's a vreq.getPortalId() method, but not sure if it returns
-        // same value as this.
         int portalId = vreq.getPortal().getPortalId();
         return new TabMenu(vreq, portalId);
     }

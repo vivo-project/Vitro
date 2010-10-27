@@ -19,13 +19,15 @@ public class HomePageController extends FreemarkerHttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(HomePageController.class);
     private static final String PAGE_TEMPLATE = "page-home.ftl";
-//    private static final String BODY_TEMPLATE = "home.ftl";
+    private static final String BODY_TEMPLATE = "home.ftl";
 
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {       
-        Map<String, Object> body = new HashMap<String, Object>();      
-//        return new TemplateResponseValues(BODY_TEMPLATE, body);
-        return new TemplateResponseValues(null, body);
+        Map<String, Object> body = new HashMap<String, Object>();
+        
+        // Add home page data to body here 
+        
+        return new TemplateResponseValues(BODY_TEMPLATE, body);
     }
 
     @Override
