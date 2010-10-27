@@ -39,7 +39,7 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 	/** Show error message */
 	public static final String TEMPLATE_SERVER_ERROR = Template.ERROR_MESSAGE.toString();
 
-	public static final String BODY_LOGIN_NAME = "loginName";
+	public static final String BODY_LOGIN_NAME = "username";
 	public static final String BODY_FORM_ACTION = "formAction";
 	public static final String BODY_INFO_MESSAGE = "infoMessage";
 	public static final String BODY_ERROR_MESSAGE = "errorMessage";

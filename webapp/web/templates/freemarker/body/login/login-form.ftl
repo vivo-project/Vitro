@@ -27,7 +27,7 @@
        
        <form action="${formAction}" method="post">
               <label for="loginName">Email or Username</label>
-              <input id="loginName" class="focus" name="loginName" type="text" value="${loginName}"  />
+              <input id="loginName" class="focus" name="loginName" type="text" value="${username}"  />
               <label for="loginPassword">Password</label>
               <input id="loginPassword" type="password" name="loginPassword"  />
               <input name="loginForm"  type="submit" class="submit" value="Log in"/>
