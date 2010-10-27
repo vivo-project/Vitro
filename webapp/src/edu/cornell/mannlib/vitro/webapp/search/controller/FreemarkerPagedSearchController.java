@@ -65,6 +65,7 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.VitroHighlighter;
 import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQuery;
 import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQueryFactory;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc;
+import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneIndexFactory;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneIndexer;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.SimpleLuceneHighlighter;
@@ -109,20 +110,6 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
         }
     }
 
-    public void init(ServletConfig config) throws ServletException {
-        super.init(config);
-        LuceneIndexer indexer=(LuceneIndexer)getServletContext()
-        .getAttribute(LuceneIndexer.class.getName());
-        indexer.addSearcher(this);
-
-        try{
-            String indexDir = getIndexDir(getServletContext());        
-            getIndexSearcher(indexDir);
-        }catch(Exception ex){
-
-        }                                           
-    }
-
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) { 
         
@@ -150,6 +137,7 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
             }catch (Throwable e) { 
                 startIndex = 0; 
             }            
+            log.debug("startIndex is " + startIndex);
             
             int hitsPerPage = defaultHitsPerPage;
             try{ 
@@ -157,6 +145,7 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
             } catch (Throwable e) { 
                 hitsPerPage = defaultHitsPerPage; 
             }                        
+            log.debug("hitsPerPage is " + hitsPerPage);
             
             int maxHitSize = defaultMaxSearchSize;
             if( startIndex >= defaultMaxSearchSize - hitsPerPage )
@@ -165,21 +154,20 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
                 maxHitSize = maxHitSize * 2;
                 hitsPerPage = maxHitSize;
             }
-            
-            String indexDir = getIndexDir(getServletContext());
-            
+            log.debug("maxHitSize is " + maxHitSize);
+
             String qtxt = vreq.getParameter(VitroQuery.QUERY_PARAMETER_NAME);
             Analyzer analyzer = getAnalyzer(getServletContext());
             
             Query query = null;
             try {
-                query = getQuery(vreq, portalFlag, analyzer, indexDir, qtxt);
+                query = getQuery(vreq, portalFlag, analyzer, qtxt);
                 log.debug("query for '" + qtxt +"' is " + query.toString());
             } catch (ParseException e) {
                 return doBadQuery(portal, qtxt);
             } 
 
-            IndexSearcher searcherForRequest = getIndexSearcher(indexDir);
+            IndexSearcher searcherForRequest = LuceneIndexFactory.getIndexSearcher(getServletContext());
                                                 
             TopDocs topDocs = null;
             try{
@@ -524,7 +512,7 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
     }
 
     private Query getQuery(VitroRequest request, PortalFlag portalState,
-                       Analyzer analyzer, String indexDir, String querystr ) throws SearchException, ParseException {
+                       Analyzer analyzer, String querystr ) throws SearchException, ParseException {
         Query query = null;
         try{
             //String querystr = request.getParameter(VitroQuery.QUERY_PARAMETER_NAME);
