@@ -7,7 +7,6 @@ import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntProperty;
 import com.hp.hpl.jena.rdf.listeners.StatementListener;
-import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
@@ -17,9 +16,9 @@ import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
 
 /**
- * Allows for instant incremental materialization (or retraction) of RDFS-
- * style class-and-property-subsumption-based ABox inferences as statements
- * are added to (or removed from) the knowledge base.
+ * Allows for instant incremental materialization or retraction of RDFS-
+ * style class and property subsumption based ABox inferences as statements
+ * are added to or removed from the knowledge base.
  *  
  */
 
@@ -46,50 +45,54 @@ public class SimpleReasoner extends StatementListener {
 	@Override
 	public void addedStatement(Statement stmt) {
 
-		log.debug("stmt = " + stmt.toString());
-		
-		if (stmt == null || stmt.getSubject() == null || stmt.getPredicate() == null || stmt.getObject() == null) { 
-		    return;
+		try {
+			log.debug("stmt = " + stmt.toString());
+			
+			if (stmt.getPredicate().equals(RDF.type)) {
+			   materializeTypes(stmt);
+			}
+			
+			//TODO: make a configuration option controlling whether properties are materialized
+			//materializeProperties(stmt);
+		} catch (Exception e) {
+			// don't stop the edit if there's an exception
+			log.error("Exception while adding incremental inferences: ", e);
 		}
-		
-		if (stmt.getPredicate().equals(RDF.type)) {
-		   materializeTypes(stmt);
-		}
-		
-		//TODO: should this be left commented out? materializeProperties(stmt);
 	}
 	
 	@Override
 	public void removedStatement(Statement stmt) {
-
-		log.debug("Removed statement: " + stmt.toString());
-		retractTypes(stmt);
-		//TODO: should this be left commented out? retractProperties(stmt);
-	}
-
-	public void materializeTypes(Statement stmt) {
-		
-		// TODO: is it ok to check RDF.type against this property instead of the one by the same
-		// name in the TBox?
-		// would there be statements with subject or predicate of null? Original code was checking
-		// getPredicate for null but not checking getObject for null?
-		// What if the class (object) is a restriction?
-		
-		if (stmt == null || stmt.getSubject() == null || stmt.getPredicate() == null || stmt.getObject() == null ||
-			!stmt.getPredicate().equals(RDF.type)) {  
-			  return;
+	
+		try {
+			log.debug("stmt = " + stmt.toString());
+			
+			if (stmt.getPredicate().equals(RDF.type)) {
+			   retractTypes(stmt);
+			}
+			
+			//TODO: make a configuration option controlling whether properties are materialized
+			//retractProperties(stmt);
+		} catch (Exception e) {
+			// don't stop the edit if there's an exception
+			log.error("Exception while retracting inferences: ", e);
 		}
-		
+	}
+	
+	public void materializeTypes(Statement stmt) {
+				
 		tboxModel.enterCriticalSection(Lock.READ);
 		
 		try {
-			// Assuming the object is a resource and not a literal. The catch clause below will catch it if not.
-			OntClass cls = tboxModel.getOntClass(((Resource)stmt.getObject()).getURI());
+			OntClass cls = tboxModel.getOntClass(((Resource)stmt.getObject()).getURI()); 
+			
 			if (cls != null) {
 				ExtendedIterator<OntClass> superIt = cls.listSuperClasses(false);
 				while (superIt.hasNext()) {
-					OntClass parentCls = superIt.next();
-					Statement infStmt = ResourceFactory.createStatement(stmt.getSubject(), RDF.type, parentCls);
+					OntClass parentClass = superIt.next();
+					
+					if (parentClass.isAnon()) continue;
+					
+					Statement infStmt = ResourceFactory.createStatement(stmt.getSubject(), RDF.type, parentClass);
 					inferenceModel.enterCriticalSection(Lock.WRITE);
 					try {
 						if (!inferenceModel.contains(infStmt)) {
@@ -98,14 +101,12 @@ public class SimpleReasoner extends StatementListener {
 						}
 					} finally {
 						inferenceModel.leaveCriticalSection();
-					}
+					}	
 				}
 			} else {
-				log.debug("Didn't find Class of the added rdf.TYPE statement in the TBox: " + ((Resource)stmt.getObject()).getURI());
+				//TODO: I could even take out this check and let it go to the exception, if you think it's better
+				log.debug("Didn't find target class (the object of the added rdf:type statement) in the TBox: " + ((Resource)stmt.getObject()).getURI());
 			}
-		} catch (Exception e) {
-			// don't stop the edit if an exception is thrown
-			log.error("Exception wihle adding incremental inferences: ", e);
 		} finally {
 			tboxModel.leaveCriticalSection();
 		}
@@ -116,65 +117,66 @@ public class SimpleReasoner extends StatementListener {
 		tboxModel.enterCriticalSection(Lock.READ);
 		
 		try {
-			if(stmt != null && stmt.getPredicate() != null) {
-				OntProperty prop = tboxModel.getOntProperty(stmt.getPredicate().getURI());
-				if (prop != null) {
-					
-					ExtendedIterator<? extends OntProperty> superIt = prop.listSuperProperties(false);
-					while (superIt.hasNext()) {
-						OntProperty parentProp = superIt.next();
-						log.debug("parentProp uri is " + parentProp.getURI());
-						Statement infStmt = ResourceFactory.createStatement(stmt.getSubject(), parentProp, stmt.getObject());
-						inferenceModel.enterCriticalSection(Lock.WRITE);
-						try {
-							if (!inferenceModel.contains(infStmt)) {
-								log.debug("Materializing property statement: " + infStmt.toString() + " - " + infStmt.getSubject().toString() + " - " + infStmt.getPredicate().toString() + " - " + infStmt.getObject().toString());
-								inferenceModel.add(infStmt);
-							}
-						} finally {
-							inferenceModel.leaveCriticalSection();
+			OntProperty prop = tboxModel.getOntProperty(stmt.getPredicate().getURI());
+			
+			if (prop != null) {	
+				ExtendedIterator<? extends OntProperty> superIt = prop.listSuperProperties(false);
+			
+				while (superIt.hasNext()) {
+					OntProperty parentProp = superIt.next();
+					Statement infStmt = ResourceFactory.createStatement(stmt.getSubject(), parentProp, stmt.getObject());
+					inferenceModel.enterCriticalSection(Lock.WRITE);
+					try {
+						if (!inferenceModel.contains(infStmt)) {
+							log.debug("Adding inferred statement: " + infStmt.toString() + " - " + infStmt.getSubject().toString() + " - " + infStmt.getPredicate().toString() + " - " + infStmt.getObject().toString());
+							inferenceModel.add(infStmt);
 						}
+					} finally {
+						inferenceModel.leaveCriticalSection();
 					}
-				} else {
-					log.debug("Didn't find predicate of the added statement in the TBox: " + stmt.getPredicate().getURI());
 				}
+				
+			} else {
+				log.debug("Didn't find predicate of the added statement in the TBox: " + stmt.getPredicate().getURI());
 			}
-		} catch (Exception e) {
-			// don't stop the edit if an exception is thrown
-			log.error("Exception while adding incremental inferences: ", e);
 		} finally {
 			tboxModel.leaveCriticalSection();
 		}
 	}
 	
 	public void retractTypes(Statement stmt) {
-	
+		
 		tboxModel.enterCriticalSection(Lock.READ);
+		
 		try {
-			OntProperty prop = tboxModel.getOntProperty(stmt.getPredicate().getURI());
-			if(prop != null) {
-				ExtendedIterator<? extends OntProperty> superIt = prop.listSuperProperties(false);
+			OntClass cls = tboxModel.getOntClass(((Resource)stmt.getObject()).getURI()); 
+			
+			if (cls != null) {
+				ExtendedIterator<OntClass> superIt = cls.listSuperClasses(false);
 				while (superIt.hasNext()) {
-					OntProperty ontProp = superIt.next();
-					Statement infStmt = ResourceFactory.createStatement(
-							stmt.getSubject(), ontProp, stmt.getObject());
+					OntClass parentClass = superIt.next();
+					
+					if (parentClass.isAnon()) continue;  
+					
+					if (entailedType(stmt.getSubject(),parentClass)) continue;          // if a type is still entailed without the
+					                                                                    // removed statement, then don't remove it
+					                                                                    // from the inferences
+					
+					Statement infStmt = ResourceFactory.createStatement(stmt.getSubject(), RDF.type, parentClass);
+						
 					inferenceModel.enterCriticalSection(Lock.WRITE);
 					try {
 						if (inferenceModel.contains(infStmt)) {
-							log.debug("RemovedStmt:Inference model contains statement and will no remove");
+							log.debug("Removing this inferred statement:  " + infStmt.toString() + " - " + infStmt.getSubject().toString() + " - " + infStmt.getPredicate().toString() + " - " + infStmt.getObject().toString());
 							inferenceModel.remove(infStmt);
 						}
 					} finally {
 						inferenceModel.leaveCriticalSection();
-					}
+					}	
 				}
 			} else {
-				log.debug("Prop for " + stmt.getPredicate().getURI() + " is null so didn't execute removal");
+				log.debug("Didn't find target class (the object of the removed rdf:type statement) in the TBox: " + ((Resource)stmt.getObject()).getURI());
 			}
-		} catch (Exception e) {
-			// don't stop the edit if an exception is thrown
-			log.error("Removed stmt: Error removing trivial inferences: ", e);
-			log.debug(e.getMessage());
 		} finally {
 			tboxModel.leaveCriticalSection();
 		}
@@ -182,35 +184,31 @@ public class SimpleReasoner extends StatementListener {
 
 	public void retractProperties(Statement stmt) {
 		
-		tboxModel.enterCriticalSection(Lock.READ);
-		try {
-			OntProperty prop = tboxModel.getOntProperty(stmt.getPredicate().getURI());
-			if(prop != null) {
-				ExtendedIterator<? extends OntProperty> superIt = prop.listSuperProperties(false);
-				while (superIt.hasNext()) {
-					OntProperty ontProp = superIt.next();
-					Statement infStmt = ResourceFactory.createStatement(
-							stmt.getSubject(), ontProp, stmt.getObject());
-					inferenceModel.enterCriticalSection(Lock.WRITE);
-					try {
-						if (inferenceModel.contains(infStmt)) {
-							log.debug("RemovedStmt:Inference model contains statement and will no remove");
-							inferenceModel.remove(infStmt);
-						}
-					} finally {
-						inferenceModel.leaveCriticalSection();
-					}
-				}
-			} else {
-				log.debug("Prop for " + stmt.getPredicate().getURI() + " is null so didn't execute removal");
-			}
-		} catch (Exception e) {
-			// don't stop the edit if an exception is thrown
-			log.error("Removed stmt: Error removing trivial inferences: ", e);
-			log.debug(e.getMessage());
-		} finally {
-			tboxModel.leaveCriticalSection();
-		}
 	}
 
+	//TODO:  should I move this out of this method to be just inline code, for performance reasons?
+	//TODO:  by the time removedStatement is called, can I assume that that statement will not be
+	//       found in the ABox when I query it? (the "contains" below).
+	//TODO:  will cls be in the list of child classes returned? If so, I have to check for it.
+	public boolean entailedType(Resource subject, OntClass cls) {
+		
+		// Returns true if it is entailed by class subsumption that
+		// subject is of type cls.
+		
+		aboxModel.enterCriticalSection(Lock.READ);
+		
+		try {
+			ExtendedIterator<OntClass> iter = cls.listSubClasses(false);
+			while (iter.hasNext()) {
+				
+				OntClass childClass = iter.next();
+				Statement stmt = ResourceFactory.createStatement(subject, RDF.type, childClass);
+				if (aboxModel.contains(stmt)) return true;
+			}
+			
+			return false;
+		} finally {
+			aboxModel.leaveCriticalSection();
+		}	
+	}
 }
