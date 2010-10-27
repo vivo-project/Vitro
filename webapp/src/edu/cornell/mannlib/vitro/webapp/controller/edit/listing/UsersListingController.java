@@ -48,7 +48,7 @@ public class UsersListingController extends BaseEditController {
         List<User> users = dao.getAllUsers();
         Collections.sort(users);
 
-        ArrayList results = new ArrayList();
+        ArrayList<String> results = new ArrayList<String>();
         results.add("XX");
         results.add("User");
         results.add("first name");
