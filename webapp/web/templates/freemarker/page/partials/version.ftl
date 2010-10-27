@@ -2,6 +2,7 @@
 
 <#-- Template for version/revision information -->
 
+<#-- Only show version info if user is logged in -->
 <#if loginName??>
     <div id="version">
         Version ${version.number}
