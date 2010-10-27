@@ -435,6 +435,8 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
             map.put("bannerImage", UrlBuilder.getUrl(themeDir + "site_icons/" + bannerImage));
         }
         
+        map.put("version", getVersionInfo());
+        
         return map;        
     }   
 
@@ -475,6 +477,13 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
             copyright.put("url", portal.getCopyrightURL());
         } 
         return copyright;
+    }
+    
+    private final Map<String, Object>  getVersionInfo() {
+        Map<String, Object> version = new HashMap<String, Object>();
+        // Add revision info here
+        version.put("number", "1.2"); // test code - to be removed
+        return version;
     }
 
     // Subclasses may override. This serves as a default.
