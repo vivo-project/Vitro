@@ -71,6 +71,8 @@ public class RevisionInfoBuilder {
 
 		String release = assembleReleaseNameFromSubversion();
 		String revision = obtainRevisionLevelFromSubversion();
+		System.err.println("release=" + release); // TODO
+		System.err.println("revision=" + revision); // TODO
 		return buildLine(release, revision);
 	}
 
@@ -139,6 +141,12 @@ public class RevisionInfoBuilder {
 	}
 
 	private String buildLine(String release, String revision) {
+		if (release == null) {
+			release = "unknown";
+		}
+		if (revision == null) {
+			revision = "unknown";
+		}
 		return productName + INFO_LINE_DELIMITER + release.trim()
 				+ INFO_LINE_DELIMITER + revision.trim();
 	}

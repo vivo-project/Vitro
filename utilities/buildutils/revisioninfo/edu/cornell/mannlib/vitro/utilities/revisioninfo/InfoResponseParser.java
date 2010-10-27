@@ -29,6 +29,7 @@ public class InfoResponseParser {
 	public String parse() {
 		try {
 			path = figurePath();
+			System.err.println("path=" + path); // TODO
 
 			if (isTrunkPath()) {
 				return "trunk";
@@ -52,6 +53,8 @@ public class InfoResponseParser {
 
 		String url = getUrlFromResponse();
 		String root = getRootFromResponse();
+		System.err.println("url=" + url); // TODO
+		System.err.println("root=" + root); // TODO
 
 		if (!url.startsWith(root)) {
 			throw new Exception("url doesn't start with root.");
