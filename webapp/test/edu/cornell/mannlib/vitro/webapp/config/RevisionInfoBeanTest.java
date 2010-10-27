@@ -9,6 +9,8 @@ import static junit.framework.Assert.assertEquals;
 import java.util.Arrays;
 import java.util.Date;
 
+import javax.servlet.http.HttpSession;
+
 import org.apache.log4j.Level;
 import org.junit.Before;
 import org.junit.Test;
@@ -75,7 +77,8 @@ public class RevisionInfoBeanTest extends AbstractTestClass {
 	public void getBeanNoSession() {
 		setLoggerLevel(RevisionInfoBean.class, Level.ERROR);
 
-		assertEquals("noBean", DUMMY_BEAN, RevisionInfoBean.getBean(null));
+		assertEquals("noBean", DUMMY_BEAN,
+				RevisionInfoBean.getBean((HttpSession) null));
 	}
 
 	@Test
@@ -102,7 +105,7 @@ public class RevisionInfoBeanTest extends AbstractTestClass {
 				RevisionInfoBean.getBean(session));
 
 		setLoggerLevel(RevisionInfoBean.class, Level.ERROR);
-		
+
 		RevisionInfoBean.removeBean(context);
 		assertEquals("dummy bean", DUMMY_BEAN,
 				RevisionInfoBean.getBean(session));
