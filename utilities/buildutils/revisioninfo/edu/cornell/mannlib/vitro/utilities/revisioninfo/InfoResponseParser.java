@@ -24,6 +24,8 @@ public class InfoResponseParser {
 
 	public InfoResponseParser(String infoResponse) {
 		this.infoResponse = infoResponse;
+		System.err.println("response from svn info: '"
+				+ infoResponse.replace("\n", "\\n") + "'");
 	}
 
 	public String parse() {
@@ -41,7 +43,7 @@ public class InfoResponseParser {
 				return null;
 			}
 		} catch (Exception e) {
-			System.err.println(e); 
+			System.err.println(e);
 			return null;
 		}
 	}
