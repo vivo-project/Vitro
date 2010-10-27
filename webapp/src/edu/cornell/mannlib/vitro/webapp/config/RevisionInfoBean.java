@@ -62,7 +62,16 @@ public class RevisionInfoBean {
 			return DUMMY_BEAN;
 		}
 
-		Object o = session.getServletContext().getAttribute(ATTRIBUTE_NAME);
+		return getBean(session.getServletContext());
+	}
+
+	public static RevisionInfoBean getBean(ServletContext context) {
+		if (context == null) {
+			log.warn("Tried to get revision info bean from a null context");
+			return DUMMY_BEAN;
+		}
+
+		Object o = context.getAttribute(ATTRIBUTE_NAME);
 		if (o == null) {
 			log.warn("Tried to get revision info bean, but didn't find any.");
 			return DUMMY_BEAN;
@@ -88,8 +97,7 @@ public class RevisionInfoBean {
 	private final long buildDate;
 	private final List<LevelRevisionInfo> levelInfos;
 
-	public RevisionInfoBean(Date buildDate,
-			Collection<LevelRevisionInfo> levelInfos) {
+	RevisionInfoBean(Date buildDate, Collection<LevelRevisionInfo> levelInfos) {
 		this.buildDate = buildDate.getTime();
 		this.levelInfos = Collections
 				.unmodifiableList(new ArrayList<LevelRevisionInfo>(levelInfos));
