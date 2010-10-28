@@ -22,7 +22,7 @@ public class HomePageController extends FreemarkerHttpServlet {
     private static final String BODY_TEMPLATE = "home.ftl";
 
     @Override
-    protected ResponseValues processRequest(VitroRequest vreq) {       
+    protected ResponseValues processRequest(VitroRequest vreq) { 
         Map<String, Object> body = new HashMap<String, Object>();
         
         // Add home page data to body here 

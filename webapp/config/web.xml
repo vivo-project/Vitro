@@ -343,9 +343,9 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>HomePageController</servlet-name>
-    <url-pattern>/index.jsp</url-pattern>
+    <url-pattern>/home</url-pattern>
   </servlet-mapping>
-    
+        
   <servlet>
     <servlet-name>FreemarkerTestController</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.TestController</servlet-class>

@@ -54,7 +54,11 @@ public class TabController extends VitroHttpServlet {
 
             if (leadingTab.getTabId()==portal.getRootTabId()) {
             	request.setAttribute("homePageRequested", "true");
-                request.setAttribute("title",portal.getAppName());
+                request.setAttribute("title", portal.getAppName());
+                // This will break Datastar, but this may be gone by the time Datastar integrates new Vitro code
+                RequestDispatcher rd = request.getRequestDispatcher("/home");
+                rd.forward(request, response);
+                return;
             }
             else
                 request.setAttribute("title",leadingTab.getTitle());

@@ -436,7 +436,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
             map.put("bannerImage", UrlBuilder.getUrl(themeDir + "site_icons/" + bannerImage));
         }
         
-        map.put("version", getVersionInfo(urlBuilder));
+        map.put("version", getRevisionInfo(urlBuilder));
         
         return map;        
     }   
@@ -480,7 +480,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         return copyright;
     }
     
-	private final Map<String, Object> getVersionInfo(UrlBuilder urlBuilder) {
+	private final Map<String, Object> getRevisionInfo(UrlBuilder urlBuilder) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("label", RevisionInfoBean.getBean(getServletContext())
 				.getReleaseLabel());
