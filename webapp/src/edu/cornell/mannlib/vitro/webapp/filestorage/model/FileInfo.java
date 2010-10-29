@@ -103,21 +103,15 @@ public class FileInfo {
 			log.debug("mimeType for '" + uri + "' was '" + mimeType + "'");
 		}
 
-		String bytestreamUri;
 		Individual byteStream = surrogate
 				.getRelatedIndividual(VitroVocabulary.FS_DOWNLOAD_LOCATION);
 		if (byteStream == null) {
-			bytestreamUri = null;
 			log.error("File surrogate '" + uri
 					+ "' had no associated bytestream.");
-		} else {
-			bytestreamUri = byteStream.getURI();
-			log.debug("File surroage'" + uri + "' had associated bytestream: '"
-					+ byteStream.getURI() + "'");
 		}
 
-		String bytestreamAliasUrl = FileServingHelper.getBytestreamAliasUrl(
-				bytestreamUri, filename);
+		String bytestreamUri = findBytestreamUri(byteStream, uri);
+		String bytestreamAliasUrl = findBytestreamAliasUrl(byteStream, uri);
 
 		return new FileInfo.Builder().setUri(uri).setFilename(filename)
 				.setMimeType(mimeType).setBytestreamUri(bytestreamUri)
@@ -152,6 +146,40 @@ public class FileInfo {
 		}
 		log.debug("Entity '" + entity.getURI() + "' is not a file surrogate");
 		return false;
+	}
+
+	/**
+	 * Get the URI of the bytestream, or null if there is none.
+	 */
+	private static String findBytestreamUri(Individual byteStream,
+			String surrogateUri) {
+		if (byteStream == null) {
+			return null;
+		}
+
+		String bytestreamUri = byteStream.getURI();
+		log.debug("File surrogate'" + surrogateUri
+				+ "' had associated bytestream: '" + byteStream.getURI() + "'");
+		return bytestreamUri;
+	}
+
+	/**
+	 * Get the alias URL from the bytestream, or null if there is none.
+	 */
+	private static String findBytestreamAliasUrl(Individual byteStream,
+			String surrogateUri) {
+		if (byteStream == null) {
+			return null;
+		}
+
+		String aliasUrl = byteStream.getDataValue(VitroVocabulary.FS_ALIAS_URL);
+		if (aliasUrl == null) {
+			log.error("File had no aliasUrl: '" + surrogateUri + "'");
+		} else {
+			log.debug("aliasUrl for '" + surrogateUri + "' was '" + aliasUrl
+					+ "'");
+		}
+		return aliasUrl;
 	}
 
 	// ----------------------------------------------------------------------
