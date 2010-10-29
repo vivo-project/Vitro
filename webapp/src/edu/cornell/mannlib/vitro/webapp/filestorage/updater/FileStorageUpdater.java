@@ -211,7 +211,8 @@ public class FileStorageUpdater implements FSUController {
 	private void setup() {
 		try {
 			this.upgradeDirectory.mkdirs();
-			updateLog = new FSULog(this.upgradeDirectory);
+			updateLog = new FSULog(this.upgradeDirectory,
+					"FileStorageUpdater-log");
 			log.info("Updating pre-1.1 file references. Log file is "
 					+ updateLog.getFilename());
 		} catch (IOException e) {

@@ -18,11 +18,18 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDao;
 import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorage;
 import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup;
+import edu.cornell.mannlib.vitro.webapp.filestorage.updater.FileStorageAliasAdder;
 import edu.cornell.mannlib.vitro.webapp.filestorage.updater.FileStorageUpdater;
 
 /**
  * Check that the conditions are met for updating uploaded files. If everything
- * is in place, call the updater.
+ * is in place, call the two updaters.
+ * 
+ * The first updater converts from old-style (pre 1.0) to new-style (post 1.0)
+ * file storage.
+ * 
+ * The second updater insures that all bytestreams store their own alias URLs
+ * (post 1.1.1).
  */
 public class UpdateUploadedFiles implements ServletContextListener {
 	private static final Log log = LogFactory.getLog(UpdateUploadedFiles.class);
@@ -94,13 +101,29 @@ public class UpdateUploadedFiles implements ServletContextListener {
 						+ "' does not exist.");
 			}
 
+			String vivoDefaultNamespace = ConfigurationProperties
+					.getProperty(FileStorageSetup.PROPERTY_DEFAULT_NAMESPACE);
+			if (vivoDefaultNamespace == null) {
+				throw new IllegalStateException("Default namespace is null.");
+			}
+
 			String webappImagePath = ctx.getRealPath("images");
 			File webappImageDirectory = (webappImagePath == null) ? null
 					: new File(webappImagePath);
 
+			/*
+			 * Update from old-style storage to new-style storage.
+			 */
 			FileStorageUpdater fsu = new FileStorageUpdater(wadf, jenaOntModel,
 					fileStorage, uploadDirectory, webappImageDirectory);
 			fsu.update();
+
+			/*
+			 * Insure that every FileByteStream object has an alias URL.
+			 */
+			FileStorageAliasAdder fsaa = new FileStorageAliasAdder(
+					jenaOntModel, uploadDirectory, vivoDefaultNamespace);
+			fsaa.update();
 		} catch (Exception e) {
 			log.fatal("Unknown problem", e);
 		}
