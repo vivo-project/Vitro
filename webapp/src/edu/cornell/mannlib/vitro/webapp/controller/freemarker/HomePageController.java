@@ -23,10 +23,8 @@ public class HomePageController extends FreemarkerHttpServlet {
 
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) { 
-        Map<String, Object> body = new HashMap<String, Object>();
-        
-        // Add home page data to body here 
-        
+        Map<String, Object> body = new HashMap<String, Object>();        
+        // Add home page data to body here         
         return new TemplateResponseValues(BODY_TEMPLATE, body);
     }
 

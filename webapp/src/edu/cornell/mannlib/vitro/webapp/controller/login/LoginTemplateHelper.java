@@ -39,7 +39,7 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 	/** Show error message */
 	public static final String TEMPLATE_SERVER_ERROR = Template.ERROR_MESSAGE.toString();
 
-	public static final String BODY_LOGIN_NAME = "username";
+	public static final String BODY_LOGIN_NAME = "loginName";
 	public static final String BODY_FORM_ACTION = "formAction";
 	public static final String BODY_INFO_MESSAGE = "infoMessage";
 	public static final String BODY_ERROR_MESSAGE = "errorMessage";
@@ -156,11 +156,14 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 	private String doTemplate(VitroRequest vreq, TemplateResponseValues values) {
 		// Set it up like FreeMarkerHttpServlet.doGet() would do.
 		Configuration config = getConfig(vreq);
-        Map<String, Object> root = getPageValues(vreq, new HashMap<String, Object>());
+		Map<String, Object> sharedVariables = getSharedVariables(vreq, new HashMap<String, Object>());
+		Map<String, Object> root = new HashMap<String, Object>(sharedVariables);
+		Map<String, Object> body = new HashMap<String, Object>(sharedVariables);
+		root.putAll(getRootValues(vreq));
 
-		// Add the TemplateResponseValues
-		root.putAll(values.getMap());
-		return mergeMapToTemplate(values.getTemplateName(), root, config);
+		// Add the values that we got, and merge to the template.
+		body.putAll(values.getMap());
+		return mergeMapToTemplate(values.getTemplateName(), body, config);
 	}
 
 	/**

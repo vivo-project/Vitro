@@ -23,7 +23,7 @@
 
         <div id="contentwrap">      
             <div id="content">                      
-                <#include bodyTemplate> 
+                ${body}
             </div> <!-- content -->
         </div> <!-- contentwrap -->
     
