@@ -290,6 +290,7 @@ public class VitroVocabulary {
     public static final String FS_ATTRIBUTION = VITRO_PUBLIC + "attribution";
     public static final String FS_DOWNLOAD_LOCATION = VITRO_PUBLIC + "downloadLocation";
     public static final String FS_THUMBNAIL_IMAGE = VITRO_PUBLIC + "thumbnailImage";
+    public static final String FS_ALIAS_URL = VITRO_PUBLIC + "directDownloadUrl";
     
     public static final String IND_MAIN_IMAGE = VITRO_PUBLIC + "mainImage";
     public static final String IND_IMAGE = VITRO_PUBLIC + "image";

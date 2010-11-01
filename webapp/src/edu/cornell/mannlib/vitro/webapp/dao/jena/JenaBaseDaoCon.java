@@ -188,6 +188,7 @@ public class JenaBaseDaoCon {
     protected  DatatypeProperty   FS_FILENAME = _constModel.createDatatypeProperty(VitroVocabulary.FS_FILENAME);
     protected  DatatypeProperty   FS_MIME_TYPE = _constModel.createDatatypeProperty(VitroVocabulary.FS_MIME_TYPE);
     protected  DatatypeProperty   FS_ATTRIBUTION = _constModel.createDatatypeProperty(VitroVocabulary.FS_ATTRIBUTION);
+    protected  DatatypeProperty   FS_ALIAS_URL = _constModel.createDatatypeProperty(VitroVocabulary.FS_ALIAS_URL);
 
     protected  ObjectProperty     IND_MAIN_IMAGE = _constModel.createObjectProperty(VitroVocabulary.IND_MAIN_IMAGE);
     protected  ObjectProperty     IND_IMAGE = _constModel.createObjectProperty(VitroVocabulary.IND_IMAGE);
