@@ -132,7 +132,7 @@ public class ImageSchemaTranslater extends FsuScanner {
 		String mimeType = guessMimeType(resource, filename);
 
 		// Create the file individuals in the model
-		Individual byteStream = fileModelHelper.createByteStreamIndividual();
+		Individual byteStream = fileModelHelper.createByteStreamIndividual(filename);
 		Individual file = fileModelHelper.createFileIndividual(mimeType,
 				filename, byteStream);
 

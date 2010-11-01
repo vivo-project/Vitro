@@ -54,7 +54,7 @@ public class FileModelHelper {
 		FileModelHelper fmh = new FileModelHelper(wadf);
 
 		// Create the file individuals in the model
-		Individual byteStream = fmh.createByteStreamIndividual();
+		Individual byteStream = fmh.createByteStreamIndividual(filename);
 		String bytestreamUri = byteStream.getURI();
 		Individual file = fmh.createFileIndividual(mimeType, filename,
 				byteStream);
@@ -388,7 +388,7 @@ public class FileModelHelper {
 	/**
 	 * Create a bytestream individual in the model.
 	 */
-	public Individual createByteStreamIndividual() {
+	public Individual createByteStreamIndividual(String filename) {
 		Individual byteStream = new IndividualImpl();
 		byteStream.setVClassURI(VitroVocabulary.FS_BYTESTREAM_CLASS);
 
@@ -399,6 +399,11 @@ public class FileModelHelper {
 			throw new IllegalStateException(
 					"Failed to create the bytestream individual.", e);
 		}
+
+		dataPropertyStatementDao
+		.insertNewDataPropertyStatement(new DataPropertyStatementImpl(
+				uri, VitroVocabulary.FS_ALIAS_URL, FileServingHelper
+						.getBytestreamAliasUrl(uri, filename)));
 
 		return individualDao.getIndividualByURI(uri);
 	}
