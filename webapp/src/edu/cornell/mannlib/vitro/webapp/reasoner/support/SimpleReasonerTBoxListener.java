@@ -9,7 +9,9 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasoner;
 
 /**
- * Route notification of changes to TBox to the incremental reasoner
+ * Route notification of changes to TBox to the incremental ABox reasoner.
+ * The incremental ABox reasoner needs to handle only subclass, superclass
+ * and equivalent class axioms.
  *  
  */
 
@@ -28,7 +30,7 @@ public class SimpleReasonerTBoxListener extends StatementListener {
 
 		try {
 			log.debug("stmt = " + stmt.toString());
-
+            // call method in SimpleReasoner
 		} catch (Exception e) {
 			// don't stop the edit if there's an exception
 			log.error("Exception while adding incremental inferences: ", e);
@@ -40,6 +42,7 @@ public class SimpleReasonerTBoxListener extends StatementListener {
 	
 		try {
 			log.debug("stmt = " + stmt.toString());
+			// call method in SimpleReasoner
 			
 		} catch (Exception e) {
 			// don't stop the edit if there's an exception
