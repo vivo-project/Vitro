@@ -19,7 +19,7 @@ import com.hp.hpl.jena.vocabulary.RDF;
 /**
  * Allows for instant incremental materialization or retraction of RDFS-
  * style class and property subsumption based ABox inferences as statements
- * are added to or removed from the knowledge base.
+ * are added to or removed from the (ABox or TBox) knowledge base.
  *  
  */
 
@@ -48,6 +48,7 @@ public class SimpleReasoner extends StatementListener {
 
 		try {
 			log.debug("stmt = " + stmt.toString());
+			System.out.println("stmt = " + stmt.toString());
 			
 			if (stmt.getPredicate().equals(RDF.type)) {
 			   materializeTypes(stmt);
@@ -84,16 +85,21 @@ public class SimpleReasoner extends StatementListener {
 			
 			if (cls != null) {
 				ExtendedIterator<OntClass> superIt = cls.listSuperClasses(false);
+				
 				while (superIt.hasNext()) {
 					OntClass parentClass = superIt.next();
 					
+					// VIVO doesn't materialize statements that assert anonymous types
+					// for individuals. Also, sharing an identical anonymous node is
+					// not allowed in owl-dl. picklist population code looks at qualities
+					// of classes not individuals.
 					if (parentClass.isAnon()) continue;
 					
 					Statement infStmt = ResourceFactory.createStatement(stmt.getSubject(), RDF.type, parentClass);
 					inferenceModel.enterCriticalSection(Lock.WRITE);
 					try {
 						if (!inferenceModel.contains(infStmt)) {
-							log.debug("Adding this inferred statement:  " + infStmt.toString() + " - " + infStmt.getSubject().toString() + " - " + infStmt.getPredicate().toString() + " - " + infStmt.getObject().toString());
+							log.debug("Adding this inferred statement:  " + infStmt.toString() );
 							inferenceModel.add(infStmt);
 						}
 					} finally {
@@ -121,6 +127,10 @@ public class SimpleReasoner extends StatementListener {
 				while (superIt.hasNext()) {
 					OntClass parentClass = superIt.next();
 					
+					// VIVO doesn't materialize statements that assert anonymous types
+					// for individuals. Also, sharing an identical anonymous node is
+					// not allowed in owl-dl. picklist population code looks at qualities
+					// of classes not individuals.
 					if (parentClass.isAnon()) continue;  
 					
 					if (entailedType(stmt.getSubject(),parentClass)) continue;    // if a type is still entailed without the

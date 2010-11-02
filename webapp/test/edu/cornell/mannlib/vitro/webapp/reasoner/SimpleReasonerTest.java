@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.reasoner;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.mindswap.pellet.jena.PelletReasonerFactory;
 
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
@@ -22,9 +23,9 @@ public class SimpleReasonerTest {
 	@Test
 	public void addTypes(){
 	
-		//  create a Tbox with a simple class hierarchy. D and E are subclases of C. B and C are subclasses of A.
-		
-		OntModel tBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
+		// Create a Tbox with a simple class hierarchy. D and E are subclasses of C. B and C are subclasses of A.
+		// Pellet will compute TBox inferences
+		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
 		
 		OntClass classA = tBox.createClass("http://test.vivo/A");
 	    classA.setLabel("class A", "en-US");
@@ -47,17 +48,16 @@ public class SimpleReasonerTest {
         classA.addSubClass(classB);
         classA.addSubClass(classC);
         
-		// create an Abox with a statement that individual x is of type E.
-		
+        // this is the model to receive ABox inferences
+        Model inf = ModelFactory.createDefaultModel();
+        
+		// create an Abox and register the SimpleReasoner listener with it
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
+		aBox.register(new SimpleReasoner(tBox, aBox, inf));
+		
+        // add a statement to the ABox that individual x is of type E.
 		Resource ind_x = aBox.createResource("http://test.vivo/x");
-		Statement xise = ResourceFactory.createStatement(ind_x, RDF.type, classE);
-		aBox.add(xise);
-				
-		// Reason
-		Model inf = ModelFactory.createDefaultModel();
-		SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
-		simpleReasoner.addedStatement(xise);
+		aBox.add(ind_x, RDF.type, classE);		
 
 		// Verify that "x is of type C" was inferred
 		Statement xisc = ResourceFactory.createStatement(ind_x, RDF.type, classC);	
