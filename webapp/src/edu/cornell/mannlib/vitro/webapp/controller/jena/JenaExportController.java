@@ -146,7 +146,10 @@ public class JenaExportController extends BaseEditController {
 			if ( formatParam.startsWith("RDF/XML") ) {
 				outStream.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>".getBytes());
 			}
-			model.write( outStream, formatParam );
+			// 2010-11-02 workaround for the fact that ARP now always seems to 
+			// try to parse N3 using strict Turtle rules.  Avoiding headaches
+			// by always serializing out as Turtle instead of using N3 sugar.
+			model.write( outStream, "N3".equals(formatParam) ? "TTL" : formatParam );
 			outStream.flush();
 			outStream.close();
 		} catch (IOException ioe) {
