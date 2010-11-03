@@ -266,16 +266,22 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         
         // root is the map used to create the page shell - header, footer, menus, etc.
         Map<String, Object> root = new HashMap<String, Object>(sharedVariables);
-        
-        // body is the map used to create the page body
-        Map<String, Object> body = new HashMap<String, Object>(sharedVariables);
-        root.putAll(getRootValues(vreq));
+        root.putAll(getPageTemplateValues(vreq));
+        // Tell the template and any directives it uses that we're processing a page template.
+        root.put("templateType", "page");
 
         // Add the values that we got, and merge to the template.
         String bodyTemplate = values.getTemplateName();
         String bodyString;
         if (bodyTemplate != null) {
+            // body is the map used to create the page body
+            // Adding sharedVariables before bodyMap values is important. If the body
+            // processing has changed a shared value such as title, we want to get that 
+            // value.
+            Map<String, Object> body = new HashMap<String, Object>(sharedVariables);
             body.putAll(bodyMap);
+            // Tell the template and any directives it uses that we're processing a body template.
+            body.put("templateType", "body");
             bodyString = mergeMapToTemplate(bodyTemplate, body, config);            
         } else {
             // The subcontroller has not defined a body template. All markup for the page 
@@ -447,10 +453,10 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     // Add variables that should be available only to the page's root map, not to the body.
     // RY This is protected instead of private so FreeMarkerComponentGenerator can access.
     // Once we don't need that (i.e., jsps have been eliminated) we can make it private.
-    protected Map<String, Object> getRootValues(VitroRequest vreq) {
+    protected Map<String, Object> getPageTemplateValues(VitroRequest vreq) {
         
-        Map<String, Object> root = new HashMap<String, Object>();
-        root.put("tabMenu", getTabMenu(vreq));
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("tabMenu", getTabMenu(vreq));
 
         Portal portal = vreq.getPortal();
         
@@ -458,26 +464,26 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         PortalWebUtil.populateSearchOptions(portal, appBean, vreq.getWebappDaoFactory().getPortalDao());
         PortalWebUtil.populateNavigationChoices(portal, vreq, appBean, vreq.getWebappDaoFactory().getPortalDao()); 
         
-        root.putAll(getLoginValues(vreq));  
+        map.putAll(getLoginValues(vreq));  
         
         UrlBuilder urlBuilder = new UrlBuilder(portal); 
-        root.put("version", getRevisionInfo(urlBuilder));
+        map.put("version", getRevisionInfo(urlBuilder));
         
-        root.put("copyright", getCopyrightInfo(portal));    
-        root.put("siteTagline", portal.getShortHand());
-        root.put("breadcrumbs", BreadCrumbsUtil.getBreadCrumbsDiv(vreq));
+        map.put("copyright", getCopyrightInfo(portal));    
+        map.put("siteTagline", portal.getShortHand());
+        map.put("breadcrumbs", BreadCrumbsUtil.getBreadCrumbsDiv(vreq));
     
         String themeDir = getThemeDir(portal);
 
         // This value is used only in stylesheets.ftl and already contains the context path.
-        root.put("stylesheetPath", UrlBuilder.getUrl(themeDir + "/css"));  
+        map.put("stylesheetPath", UrlBuilder.getUrl(themeDir + "/css"));  
 
         String bannerImage = portal.getBannerImage();  
         if ( ! StringUtils.isEmpty(bannerImage)) {
-            root.put("bannerImage", UrlBuilder.getUrl(themeDir + "site_icons/" + bannerImage));
+            map.put("bannerImage", UrlBuilder.getUrl(themeDir + "site_icons/" + bannerImage));
         }
         
-        return root;        
+        return map;        
     }   
 
 

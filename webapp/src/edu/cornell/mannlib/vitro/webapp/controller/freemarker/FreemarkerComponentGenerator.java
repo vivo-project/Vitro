@@ -34,7 +34,7 @@ public class FreemarkerComponentGenerator extends FreemarkerHttpServlet {
 
         // root is the map used to create the page shell - header, footer, menus, etc.
         Map<String, Object> root = getSharedVariables(vreq, new HashMap<String, Object>()); 
-        root.putAll(getRootValues(vreq));  
+        root.putAll(getPageTemplateValues(vreq));  
         
         request.setAttribute("ftl_identity", get("identity", root, config));
         request.setAttribute("ftl_menu", get("menu", root, config));

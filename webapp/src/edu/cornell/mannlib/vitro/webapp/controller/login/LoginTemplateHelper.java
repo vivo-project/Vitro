@@ -159,7 +159,7 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 		Map<String, Object> sharedVariables = getSharedVariables(vreq, new HashMap<String, Object>());
 		Map<String, Object> root = new HashMap<String, Object>(sharedVariables);
 		Map<String, Object> body = new HashMap<String, Object>(sharedVariables);
-		root.putAll(getRootValues(vreq));
+		root.putAll(getPageTemplateValues(vreq));
 
 		// Add the values that we got, and merge to the template.
 		body.putAll(values.getMap());
