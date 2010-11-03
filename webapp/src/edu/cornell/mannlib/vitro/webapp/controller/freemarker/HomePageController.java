@@ -8,7 +8,6 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet.ResponseValues;
@@ -24,13 +23,6 @@ public class HomePageController extends FreemarkerHttpServlet {
 
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) { 
-        
-        // This is a temporary hack to get the login form to work directly from the
-        // home page, without redirecting to the dedicated login page (NIHVIVO-1296). 
-        // We should either eliminate the need for this, or if it cannot be eliminated, 
-        // move it to the  login widget controller so that any page that includes the 
-        // login widget will also get the necessary code.
-        vreq.getSession(false); 
         
         Map<String, Object> body = new HashMap<String, Object>();        
         // Add home page data to body here         
