@@ -2,18 +2,12 @@
 
 <#-- Login widget -->
 
-<#-- Question for Nick and Manolo: can we use this in Vitro, where html 5 is not being used, or should it be moved
-to the wilma theme? Please do whatever's appropriate. -->
-
-<#macro styles>
+<#macro assets>
     <#if ! loginName??>
         ${stylesheets.add("/css/login.css")}
-    </#if>
-</#macro>
-
-<#macro scripts>
-    <#if ! loginName??>
-        <#-- define any js files needed for the login widget -->
+        <#-- define any js files needed for the login widget 
+        ${scripts.add("")}
+        ${headScripts.add("")} -->
     </#if>
 </#macro>
 
