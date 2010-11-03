@@ -17,6 +17,11 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
+import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -26,6 +31,7 @@ import com.hp.hpl.jena.sdb.Store;
 import com.hp.hpl.jena.sdb.StoreDesc;
 import com.hp.hpl.jena.sdb.sql.SDBConnection;
 import com.hp.hpl.jena.sdb.store.DatabaseType;
+import com.hp.hpl.jena.sdb.store.DatasetStore;
 import com.hp.hpl.jena.sdb.store.LayoutType;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
@@ -43,6 +49,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.SearchReindexingListener;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SimpleOntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSDBModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapper;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.InitialJenaModelUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.NamespaceMapperJena;
@@ -87,17 +94,40 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
         	unionOms.setDisplayModel(displayModel);
         			
         	checkForNamespaceMismatch( memModel, defaultNamespace );
+
+        	// SDB testing
+			StoreDesc storeDesc = new StoreDesc(LayoutType.LayoutTripleNodesHash, DatabaseType.MySQL) ;
+			BasicDataSource bds = makeDataSourceFromConfigurationProperties();
+        	this.setApplicationDataSource(bds, sce.getServletContext());
+        	SDBConnection conn = new SDBConnection(bds.getConnection()) ; 
+        	Store store = SDBFactory.connectStore(conn, storeDesc);
+        	try {
+        		// a random test query to see if the store is formatted
+        		SDBFactory.connectDefaultModel(store).contains(OWL.Thing, RDF.type, OWL.Nothing); 
+        	} catch (Exception e) { // unformatted store
+        		System.out.println("Setting up SDB store");
+    			store.getTableFormatter().create();
+            	store.getTableFormatter().truncate();
+            	Model sdbAbox = SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_DB_MODEL);
+            	sdbAbox.add(unionOms.getABoxModel());
+        	}
+        	Dataset dataset = DatasetStore.create(store);
+        	//String queryStr = "CONSTRUCT { ?s ?p ?o } \n" +
+        	//                  "WHERE { GRAPH ?g { ?s ?p ?o } } ";
+        	//Query query = QueryFactory.create(queryStr);
+        	//QueryExecution qe = QueryExecutionFactory.create(query, dataset);
+        	//log.info("Test query returned " + qe.execConstruct().size() + " statements");
         	
             sce.getServletContext().setAttribute("baseOntModel", memModel);
-            WebappDaoFactory baseWadf = new WebappDaoFactoryJena(baseOms, defaultNamespace, null, null);
+            WebappDaoFactory baseWadf = new WebappDaoFactorySDB(baseOms, dataset, defaultNamespace, null, null);
             sce.getServletContext().setAttribute("assertionsWebappDaoFactory",baseWadf);
             
             sce.getServletContext().setAttribute("inferenceOntModel", inferenceModel);
-            WebappDaoFactory infWadf = new WebappDaoFactoryJena(inferenceOms, defaultNamespace, null, null);
+            WebappDaoFactory infWadf = new WebappDaoFactorySDB(inferenceOms, dataset, defaultNamespace, null, null);
             sce.getServletContext().setAttribute("deductionsWebappDaoFactory", infWadf);
             
             sce.getServletContext().setAttribute("jenaOntModel", unionModel);  
-            WebappDaoFactory wadf = new WebappDaoFactoryJena(unionOms, defaultNamespace, null, null);
+            WebappDaoFactory wadf = new WebappDaoFactorySDB(unionOms, dataset, defaultNamespace, null, null);
             sce.getServletContext().setAttribute("webappDaoFactory",wadf);
             
             sce.getServletContext().setAttribute("unionOntModelSelector", unionOms);
@@ -124,22 +154,6 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
         	sce.getServletContext().setAttribute("NamespaceMapper", namespaceMapper);
         	memModel.getBaseModel().register(namespaceMapper);
         	
-        	// SDB testing
-			StoreDesc storeDesc = new StoreDesc(LayoutType.LayoutTripleNodesHash, DatabaseType.MySQL) ;
-			BasicDataSource bds = makeDataSourceFromConfigurationProperties();
-        	this.setApplicationDataSource(bds, sce.getServletContext());
-        	SDBConnection conn = new SDBConnection(bds.getConnection()) ; 
-        	Store store = SDBFactory.connectStore(conn, storeDesc);
-        	try {
-        		// a random test query to see if the store is formatted
-        		SDBFactory.connectDefaultModel(store).contains(OWL.Thing, RDF.type, OWL.Nothing); 
-        	} catch (Exception e) { // unformatted store
-        		System.out.println("Setting up SDB store");
-    			store.getTableFormatter().create();
-            	store.getTableFormatter().truncate();
-            	Model sdbAbox = SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_DB_MODEL);
-            	sdbAbox.add(unionOms.getABoxModel());
-        	}
         	Model sdbAbox = makeDBModel(bds, JenaDataSourceSetupBase.JENA_DB_MODEL, DB_ONT_MODEL_SPEC, TripleStoreType.SDB);
         	Model listenableAbox = ModelFactory.createUnion(sdbAbox, ModelFactory.createDefaultModel());
         	baseOms.setABoxModel(ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, listenableAbox));

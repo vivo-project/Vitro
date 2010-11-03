@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
 
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.ontology.OntResource;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
@@ -70,31 +71,36 @@ public class IndividualSDB2 extends IndividualImpl implements Individual {
     	this.dataset.getLock().enterCriticalSection(Lock.READ);
     	String getStatements = 
     		"CONSTRUCT " +
-    		"{ <"+individualURI+">  ?p ?o ." +
-    		   "?s ?pp <"+individualURI+"> . }" +
-    		 "WHERE" +
-    		 "{<"+individualURI+">  ?p ?o ." +
-    		 "?s ?pp <"+individualURI+"> . }";
+    		"{ <"+individualURI+">  ?p ?o . \n" +
+    		   "?s ?pp <"+individualURI+"> . } \n" +
+    		 "WHERE { GRAPH ?g { \n" +
+    		 "  {<"+individualURI+">  ?p ?o . \n" +
+    		 "  ?s ?pp <"+individualURI+"> . } \n" +
+    		 "} } \n";
     	
     	model = QueryExecutionFactory.create(QueryFactory.create(getStatements), dataset).execConstruct();
     	
     	this.dataset.getLock().leaveCriticalSection();
     	
-    	OntModel ontModel = ModelFactory.createOntologyModel();
-    	ontModel.add(model.listStatements());
+    	OntModel ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, model);
     	
     	this.ind = ontModel.getOntResource(individualURI);
+    	if (ind != null) {
+	        if (ind.isAnon()) {
+	        	
+	        	this.setNamespace(VitroVocabulary.PSEUDO_BNODE_NS);
+	        	this.setLocalName(ind.getId().toString());
+	        } else {
+	        
+	        	this.URI = ind.getURI();
+	        	this.namespace = ind.getNameSpace();
+	        	this.localName = ind.getLocalName();
+	        }
+    	} else if (individualURI != null) {
+    		log.warn("Null individual returned for URI " + individualURI);
+    		this.ind = ontModel.createOntResource(individualURI);
+    	}
         
-        if (ind.isAnon()) {
-        	
-        	this.setNamespace(VitroVocabulary.PSEUDO_BNODE_NS);
-        	this.setLocalName(ind.getId().toString());
-        } else {
-        
-        	this.URI = ind.getURI();
-        	this.namespace = ind.getNameSpace();
-        	this.localName = ind.getLocalName();
-        }
         this.webappDaoFactory = wadf;
     }
 
@@ -104,6 +110,11 @@ public class IndividualSDB2 extends IndividualImpl implements Individual {
         } else {
             ind.getOntModel().enterCriticalSection(Lock.READ);
             try {
+            	if (webappDaoFactory == null) {
+            		throw new RuntimeException ("null webappDaoFactory");
+            	} else if (webappDaoFactory.getJenaBaseDao() == null) {
+            		throw new RuntimeException ("null JenaBaseDao");
+            	}
                 this.name = webappDaoFactory.getJenaBaseDao().getLabelOrId(ind);
                 if (this.name == null) {
                     this.name = "[null]";

@@ -70,7 +70,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     private String individualURI = null; 
     private Model model = null;
     
-    public IndividualSDB(String individualURI, Dataset dataset, WebappDaoFactoryJena wadf) { 
+    public IndividualSDB(String individualURI, Dataset dataset, WebappDaoFactoryJena wadf) {
     	this.individualURI = individualURI;
     	this.dataset = dataset;
     	this.dataset.getLock().enterCriticalSection(Lock.READ);
@@ -89,18 +89,20 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	OntModel ontModel = ModelFactory.createOntologyModel();
     	ontModel.add(model.listStatements());
     	
-    	this.ind = ontModel.getOntResource(individualURI);
-        
-        if (ind.isAnon()) {
-        	
-        	this.setNamespace(VitroVocabulary.PSEUDO_BNODE_NS);
-        	this.setLocalName(ind.getId().toString());
-        } else {
-        
-        	this.URI = ind.getURI();
-        	this.namespace = ind.getNameSpace();
-        	this.localName = ind.getLocalName();
-        }
+    	this.ind = ontModel.getOntResource(individualURI);  
+    	
+    	if (ind != null) {
+	        if (ind.isAnon()) {
+	        	this.setNamespace(VitroVocabulary.PSEUDO_BNODE_NS);
+	        	this.setLocalName(ind.getId().toString());
+	        } else {
+	        	this.URI = ind.getURI();
+	        	this.namespace = ind.getNameSpace();
+	        	this.localName = ind.getLocalName();
+	        }
+    	} else if (individualURI != null) {
+    		log.warn("Null individual returned for URI " + individualURI);
+    	}
         this.webappDaoFactory = wadf;
     }
 
