@@ -19,7 +19,7 @@
 		</ul>
 	</nav>
 	
-	<section id="generic-class-graph"> <img src="${urls.home}/images/visual-graph-generic-class.jpg" width="500" height="283" /> </section>
+	<section id="generic-class-graph"> <img src="${urls.home}/images/menupage/visual-graph-generic-class.jpg" width="500" height="283" /> </section>
 </section>
 
 <section id="browse-by">
