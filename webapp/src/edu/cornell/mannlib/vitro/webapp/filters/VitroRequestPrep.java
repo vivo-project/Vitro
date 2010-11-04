@@ -24,7 +24,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.edit.Authenticate;
+import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
 import edu.cornell.mannlib.vitro.webapp.dao.PortalDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
@@ -402,7 +402,7 @@ public class VitroRequestPrep implements Filter {
 
     public static void forceToSelfEditing(HttpServletRequest request){
         HttpSession sess = request.getSession(true);
-        sess.setMaxInactiveInterval(Authenticate.LOGGED_IN_TIMEOUT_INTERVAL);
+        sess.setMaxInactiveInterval(Authenticator.LOGGED_IN_TIMEOUT_INTERVAL);
         sess.setAttribute("inSelfEditing","true");
     }
     public static void forceOutOfSelfEditing(HttpServletRequest request){
