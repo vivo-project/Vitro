@@ -1,25 +1,25 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
 <section id="content-generic-class">
-	<nav>
-		<h3>Organizations</h3>
-		
-		<h4>Visual Graph</h4>
-		
-		<ul id="class-generic-childClasses">
-			<li><a href="#">class:generic<span class="count-classes"> (280)</span></a></li>
-			<li><a href="#">class:generic<span class="count-classes"> (280)</span></a></li>
-			<li><a href="#">class:generic<span class="count-classes"> (280)</span></a></li>
-			<li><a  class="selected"  href="#">class:generic<span class="count-classes"> (280)</span></a></li>
-			<li><a href="#">class:generic<span class="count-classes"> (280)</span></a></li>
-			<li><a href="#">class:generic<span class="count-classes"> (280)</span></a></li>
-			<li><a href="#">class:generic<span class="count-classes"> (280)</span></a></li>
-			<li><a href="#">class:generic<span class="count-classes"> (280)</span></a></li>
-			<li><a href="#">class:generic<span class="count-classes"> (280)</span></a></li>
-		</ul>
-	</nav>
-	
-	<section id="generic-class-graph"> <img src="${urls.home}/images/menupage/visual-graph-generic-class.jpg" width="500" height="283" /> </section>
+    <nav>
+        <h3>Organizations</h3>
+        
+        <h4>Visual Graph</h4>
+        
+        <ul id="class-generic-childClasses">
+            <li><a href="#">class:generic<span class="count-classes"> (280)</span></a></li>
+            <li><a href="#">class:generic<span class="count-classes"> (280)</span></a></li>
+            <li><a href="#">class:generic<span class="count-classes"> (280)</span></a></li>
+            <li><a  class="selected"  href="#">class:generic<span class="count-classes"> (280)</span></a></li>
+            <li><a href="#">class:generic<span class="count-classes"> (280)</span></a></li>
+            <li><a href="#">class:generic<span class="count-classes"> (280)</span></a></li>
+            <li><a href="#">class:generic<span class="count-classes"> (280)</span></a></li>
+            <li><a href="#">class:generic<span class="count-classes"> (280)</span></a></li>
+            <li><a href="#">class:generic<span class="count-classes"> (280)</span></a></li>
+        </ul>
+    </nav>
+    
+    <section id="generic-class-graph"> <img src="${urls.home}/images/menupage/visual-graph-generic-class.jpg" width="500" height="283" /> </section>
 </section>
 
 <section id="browse-by">
