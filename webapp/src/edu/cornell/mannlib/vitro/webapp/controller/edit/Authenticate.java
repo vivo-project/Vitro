@@ -7,7 +7,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,31 +23,19 @@ import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
 
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.RoleBasedPolicy.AuthRole;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.Message;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State;
-import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.LoginEvent;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.LoginLogoutEvent;
 
 public class Authenticate extends FreemarkerHttpServlet {
-	/**
-	 * Maximum inactive interval for a ordinary logged in user session, in
-	 * seconds.
-	 */
-	public static final int LOGGED_IN_TIMEOUT_INTERVAL = 300;
-
-	/** Maximum inactive interval for a editor (or better) session, in seconds. */
-	public static final int PRIVILEGED_TIMEOUT_INTERVAL = 32000;
-
 	private static final Log log = LogFactory.getLog(Authenticate.class
 			.getName());
 
@@ -155,7 +142,7 @@ public class Authenticate extends FreemarkerHttpServlet {
 			bean.setUsername(username);
 		}
 
-		User user = getUserDao(request).getUserByUsername(username);
+		User user = getAuthenticator(request).getUserByUsername(username);
 		log.trace("User is " + (user == null ? "null" : user.getURI()));
 
 		if (user == null) {
@@ -168,11 +155,7 @@ public class Authenticate extends FreemarkerHttpServlet {
 			return null;
 		}
 
-		String md5Password = applyMd5Encoding(password);
-
-		if (!md5Password.equals(user.getMd5password())) {
-			log.trace("Encoded passwords don't match: right="
-					+ user.getMd5password() + ", wrong=" + md5Password);
+		if (!getAuthenticator(request).isCurrentPassword(username, password)) {
 			bean.setMessage(Message.INCORRECT_PASSWORD);
 			return null;
 		}
@@ -239,24 +222,15 @@ public class Authenticate extends FreemarkerHttpServlet {
 			return null;
 		}
 
-		User user = getUserDao(request).getUserByUsername(bean.getUsername());
-		log.trace("User is " + (user == null ? "null" : user.getURI()));
-
-		if (user == null) {
-			throw new IllegalStateException(
-					"Changing password but bean has no user: '"
-							+ bean.getUsername() + "'");
-		}
-
-		String md5NewPassword = applyMd5Encoding(newPassword);
-		log.trace("Old password: " + user.getMd5password() + ", new password: "
-				+ md5NewPassword);
-
-		if (md5NewPassword.equals(user.getMd5password())) {
+		String username = bean.getUsername();
+		
+		if (getAuthenticator(request).isCurrentPassword(username, newPassword)) {
 			bean.setMessage(Message.USING_OLD_PASSWORD);
 			return null;
 		}
 
+		User user = getAuthenticator(request).getUserByUsername(username);
+		log.trace("User is " + (user == null ? "null" : user.getURI()));
 		return user;
 	}
 
@@ -266,10 +240,7 @@ public class Authenticate extends FreemarkerHttpServlet {
 	private void recordSuccessfulPasswordChange(HttpServletRequest request,
 			User user) {
 		String newPassword = request.getParameter(PARAMETER_NEW_PASSWORD);
-		String md5NewPassword = applyMd5Encoding(newPassword);
-		user.setOldPassword(user.getMd5password());
-		user.setMd5password(md5NewPassword);
-		getUserDao(request).updateUser(user);
+		getAuthenticator(request).recordNewPassword(user, newPassword);
 		log.debug("Completed first-time password change.");
 
 		recordLoginInfo(request, user.getUsername());
@@ -282,52 +253,16 @@ public class Authenticate extends FreemarkerHttpServlet {
 	private void recordLoginInfo(HttpServletRequest request, String username) {
 		log.debug("Completed login.");
 
-		// Get a fresh user object, so we know it's not stale.
-		User user = getUserDao(request).getUserByUsername(username);
+		// Record the login on the user record (start with a fresh copy).
+		User user = getAuthenticator(request).getUserByUsername(username);
+		getAuthenticator(request).recordSuccessfulLogin(user);
 
-		HttpSession session = request.getSession();
-
-		// Put the login info into the session.
-		// TODO the LoginFormBean is being phased out.
-		LoginFormBean lfb = new LoginFormBean();
-		lfb.setUserURI(user.getURI());
-		lfb.setLoginStatus("authenticated");
-		lfb.setSessionId(session.getId());
-		lfb.setLoginRole(user.getRoleURI());
-		lfb.setLoginRemoteAddr(request.getRemoteAddr());
-		lfb.setLoginName(user.getUsername());
-		session.setAttribute("loginHandler", lfb);
-		// TODO this should eventually replace the LoginFormBean.
-		LoginStatusBean lsb = new LoginStatusBean(user.getURI(),
-				user.getUsername(), parseUserSecurityLevel(user));
-		LoginStatusBean.setBean(session, lsb);
-		log.info("Adding status bean: " + lsb);
+		// Record that a new user has logged in to this session.
+		getAuthenticator(request).setLoggedIn(user);
 
 		// Remove the login process info from the session.
+		HttpSession session = request.getSession();
 		session.removeAttribute(LoginProcessBean.SESSION_ATTRIBUTE);
-
-		// Record the login on the user.
-		user.setLoginCount(user.getLoginCount() + 1);
-		if (user.getFirstTime() == null) { // first login
-			user.setFirstTime(new Date());
-		}
-		getUserDao(request).updateUser(user);
-
-		// Set the timeout limit on the session - editors, etc, get more.
-		if (lsb.isLoggedInAtLeast(LoginStatusBean.EDITOR)) {
-			session.setMaxInactiveInterval(PRIVILEGED_TIMEOUT_INTERVAL);
-		} else {
-			session.setMaxInactiveInterval(LOGGED_IN_TIMEOUT_INTERVAL);
-		}
-
-		// Record the user in the user/Session map.
-		Map<String, HttpSession> userURISessionMap = getUserURISessionMapFromContext(getServletContext());
-		userURISessionMap.put(user.getURI(), request.getSession());
-
-		// Notify the other users of this model.
-		sendLoginNotifyEvent(new LoginEvent(user.getURI()),
-				getServletContext(), session);
-
 	}
 
 	/**
@@ -395,29 +330,32 @@ public class Authenticate extends FreemarkerHttpServlet {
 
 		// If the user is a self-editor, send them to their home page.
 		User user = getLoggedInUser(request);
-		if (user != null
-				&& user.getRoleURI() != null
-				&& user.getRoleURI().equals(
-						Integer.toString(AuthRole.USER.level()))) {
-			UserDao userDao = getUserDao(request);
-			if (userDao != null) {
-				List<String> uris = userDao.getIndividualsUserMayEditAs(user
-						.getURI());
-				if (uris != null && uris.size() > 0) {
-					String userHomePage = request.getContextPath()
-							+ "/individual?uri="
-							+ URLEncoder.encode(uris.get(0), "UTF-8");
-					log.debug("User is logged in. Redirect as self-editor to "
-							+ userHomePage);
-					response.sendRedirect(userHomePage);
-					return;
-				}
+		if (userIsANonEditor(user)) {
+			List<String> uris = getAuthenticator(request).asWhomMayThisUserEdit(
+					user);
+			if (uris != null && uris.size() > 0) {
+				String userHomePage = request.getContextPath()
+						+ "/individual?uri="
+						+ URLEncoder.encode(uris.get(0), "UTF-8");
+				log.debug("User is logged in. Redirect as self-editor to "
+						+ userHomePage);
+				response.sendRedirect(userHomePage);
+				return;
 			}
 		}
 
 		// If nothing else applies, send them to the Site Admin page.
 		log.debug("User is logged in. Redirect to site admin page.");
 		response.sendRedirect(getSiteAdminUrl(request));
+	}
+
+	/** Is the logged in user an AuthRole.USER? */
+	private boolean userIsANonEditor(User user) {
+		if (user == null) {
+			return false;
+		}
+		String nonEditorRoleUri = Integer.toString(AuthRole.USER.level());
+		return nonEditorRoleUri.equals(user.getRoleURI());
 	}
 
 	/**
@@ -452,43 +390,18 @@ public class Authenticate extends FreemarkerHttpServlet {
 	 * What user are we logged in as?
 	 */
 	private User getLoggedInUser(HttpServletRequest request) {
-		UserDao userDao = getUserDao(request);
-		if (userDao == null) {
-			return null;
-		}
-
 		LoginStatusBean lsb = LoginStatusBean.getBean(request);
 		if (!lsb.isLoggedIn()) {
 			log.debug("getLoggedInUser: not logged in");
 			return null;
 		}
 
-		return userDao.getUserByUsername(lsb.getUsername());
+		return getAuthenticator(request).getUserByUsername(lsb.getUsername());
 	}
 
-	/**
-	 * Get a reference to the {@link UserDao}, or <code>null</code>.
-	 */
-	private UserDao getUserDao(HttpServletRequest request) {
-		HttpSession session = request.getSession(false);
-		if (session == null) {
-			return null;
-		}
-
-		ServletContext servletContext = session.getServletContext();
-		WebappDaoFactory wadf = (WebappDaoFactory) servletContext
-				.getAttribute("webappDaoFactory");
-		if (wadf == null) {
-			log.error("getUserDao: no WebappDaoFactory");
-			return null;
-		}
-
-		UserDao userDao = wadf.getUserDao();
-		if (userDao == null) {
-			log.error("getUserDao: no UserDao");
-		}
-
-		return userDao;
+	/** Get a reference to the Authenticator. */
+	private Authenticator getAuthenticator(HttpServletRequest request) {
+		return Authenticator.getInstance(request);
 	}
 
 	/** What's the URL for the login screen? */
@@ -513,19 +426,6 @@ public class Authenticate extends FreemarkerHttpServlet {
 	/** Where do we stand in the login process? */
 	private LoginProcessBean getLoginProcessBean(HttpServletRequest request) {
 		return LoginProcessBean.getBeanFromSession(request);
-	}
-
-	/**
-	 * Parse the role URI from User. Don't crash if it is not valid.
-	 */
-	private int parseUserSecurityLevel(User user) {
-		try {
-			return Integer.parseInt(user.getRoleURI());
-		} catch (NumberFormatException e) {
-			log.warn("Invalid RoleURI '" + user.getRoleURI() + "' for user '"
-					+ user.getURI() + "'");
-			return 1;
-		}
 	}
 
 	// ----------------------------------------------------------------------
