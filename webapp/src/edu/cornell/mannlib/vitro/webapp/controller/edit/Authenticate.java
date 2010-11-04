@@ -401,13 +401,11 @@ public class Authenticate extends FreemarkerHttpServlet {
 				List<String> uris = userDao.getIndividualsUserMayEditAs(user
 						.getURI());
 				if (uris != null && uris.size() > 0) {
-					log.debug("User is logged in. Redirect as self-editor to "
-							+ sessionRedirect);
 					String userHomePage = request.getContextPath()
 							+ "/individual?uri="
 							+ URLEncoder.encode(uris.get(0), "UTF-8");
 					log.debug("User is logged in. Redirect as self-editor to "
-							+ sessionRedirect);
+							+ userHomePage);
 					response.sendRedirect(userHomePage);
 					return;
 				}
@@ -423,7 +421,7 @@ public class Authenticate extends FreemarkerHttpServlet {
 	 * There has been an unexpected exception. Complain mightily.
 	 */
 	private void showSystemError(Exception e, HttpServletResponse response) {
-		log.error("Unexpected error in login process" + e);
+		log.error("Unexpected error in login process", e);
 		try {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		} catch (IOException e1) {
