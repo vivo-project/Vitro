@@ -6,14 +6,15 @@ import static edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean
 import static edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State.LOGGING_IN;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
-import java.net.MalformedURLException;
+import java.lang.reflect.Field;
 import java.net.URL;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.Date;
-
-import javax.servlet.ServletException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -27,11 +28,13 @@ import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
+import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
+import edu.cornell.mannlib.vitro.webapp.controller.authenticate.AuthenticatorStub;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State;
 
 /**
- * TODO
+ * Test the Authentate class.
  */
 public class AuthenticateTest extends AbstractTestClass {
 	private static final String USER_DBA_NAME = "dbaName";
@@ -56,11 +59,7 @@ public class AuthenticateTest extends AbstractTestClass {
 	private static final LoginStatusBean LOGIN_STATUS_DBA = new LoginStatusBean(
 			USER_DBA_URI, USER_DBA_NAME, LoginStatusBean.DBA);
 
-	private static final LoginStatusBean LOGIN_STATUS_OLDHAND = new LoginStatusBean(
-			USER_OLDHAND_URI, USER_OLDHAND_NAME, LoginStatusBean.NON_EDITOR);
-
-	private UserDaoStub userDao;
-	private WebappDaoFactoryStub webappDaoFactory;
+	private AuthenticatorStub authenticator;
 	private ServletContextStub servletContext;
 	private ServletConfigStub servletConfig;
 	private HttpSessionStub session;
@@ -69,33 +68,13 @@ public class AuthenticateTest extends AbstractTestClass {
 	private Authenticate auth;
 
 	@Before
-	public void setup() throws MalformedURLException, ServletException {
-		User dbaUser = new User();
-		dbaUser.setUsername(USER_DBA_NAME);
-		dbaUser.setURI(USER_DBA_URI);
-		dbaUser.setRoleURI("50");
-		dbaUser.setMd5password(Authenticate.applyMd5Encoding(USER_DBA_PASSWORD));
-		dbaUser.setFirstTime(null);
-		dbaUser.setLoginCount(0);
+	public void setup() throws Exception {
+		authenticator = AuthenticatorStub.setup();
 
-		User ohUser = new User();
-		ohUser.setUsername(USER_OLDHAND_NAME);
-		ohUser.setURI(USER_OLDHAND_URI);
-		ohUser.setRoleURI("1");
-		ohUser.setMd5password(Authenticate
-				.applyMd5Encoding(USER_OLDHAND_PASSWORD));
-		ohUser.setLoginCount(USER_OLDHAND_LOGIN_COUNT);
-		ohUser.setFirstTime(new Date(0));
-
-		userDao = new UserDaoStub();
-		userDao.addUser(dbaUser);
-		userDao.addUser(ohUser);
-
-		webappDaoFactory = new WebappDaoFactoryStub();
-		webappDaoFactory.setUserDao(userDao);
+		authenticator.addUser(createNewDbaUser());
+		authenticator.addUser(createOldHandUser());
 
 		servletContext = new ServletContextStub();
-		servletContext.setAttribute("webappDaoFactory", webappDaoFactory);
 
 		servletConfig = new ServletConfigStub();
 		servletConfig.setServletContext(servletContext);
@@ -114,6 +93,33 @@ public class AuthenticateTest extends AbstractTestClass {
 		auth.init(servletConfig);
 	}
 
+	private User createNewDbaUser() {
+		User dbaUser = new User();
+		dbaUser.setUsername(USER_DBA_NAME);
+		dbaUser.setURI(USER_DBA_URI);
+		dbaUser.setRoleURI("50");
+		dbaUser.setMd5password(Authenticate.applyMd5Encoding(USER_DBA_PASSWORD));
+		dbaUser.setFirstTime(null);
+		dbaUser.setLoginCount(0);
+		return dbaUser;
+	}
+
+	private User createOldHandUser() {
+		User ohUser = new User();
+		ohUser.setUsername(USER_OLDHAND_NAME);
+		ohUser.setURI(USER_OLDHAND_URI);
+		ohUser.setRoleURI("1");
+		ohUser.setMd5password(Authenticate
+				.applyMd5Encoding(USER_OLDHAND_PASSWORD));
+		ohUser.setLoginCount(USER_OLDHAND_LOGIN_COUNT);
+		ohUser.setFirstTime(new Date(0));
+		return ohUser;
+	}
+
+	// ----------------------------------------------------------------------
+	// the tests
+	// ----------------------------------------------------------------------
+
 	@Test
 	public void alreadyLoggedIn() {
 		LoginStatusBean.setBean(session, LOGIN_STATUS_DBA);
@@ -122,8 +128,7 @@ public class AuthenticateTest extends AbstractTestClass {
 
 		assertExpectedRedirect(URL_LOGIN_PAGE);
 		assertNoProcessBean();
-		assertExpectedStatusBean(LOGIN_STATUS_DBA);
-		assertExpectedUserValues(USER_DBA_NAME, USER_DBA_PASSWORD, 0, false);
+		assertExpectedLoginSessions();
 	}
 
 	@Test
@@ -131,16 +136,8 @@ public class AuthenticateTest extends AbstractTestClass {
 		auth.doPost(request, response);
 
 		assertExpectedRedirect(URL_LOGIN_PAGE);
-		assertNoStatusBean();
-
-		// TODO Surprise! if no session, we get this:
-		// assertNoLoginProcessBean();
-
-		// TODO Surprise! if there is a session, we would have expected this:
-		// assertExpectedLoginProcessBean(LOGGING_IN, "", "", "");
-
-		// TODO Surprise! but we get this:
-		assertExpectedProcessBean(State.NOWHERE, "", "", "");
+		assertExpectedLoginSessions();
+		assertNoProcessBean();
 	}
 
 	@Test
@@ -150,7 +147,7 @@ public class AuthenticateTest extends AbstractTestClass {
 		auth.doPost(request, response);
 
 		assertExpectedRedirect(URL_LOGIN_PAGE);
-		assertNoStatusBean();
+		assertExpectedLoginSessions();
 		assertExpectedProcessBean(LOGGING_IN, "", "",
 				"Please enter your email address.");
 	}
@@ -163,7 +160,7 @@ public class AuthenticateTest extends AbstractTestClass {
 		auth.doPost(request, response);
 
 		assertExpectedRedirect(URL_LOGIN_PAGE);
-		assertNoStatusBean();
+		assertExpectedLoginSessions();
 		assertExpectedProcessBean(LOGGING_IN, "unknownBozo", "",
 				"The email or password you entered is incorrect.");
 	}
@@ -176,7 +173,7 @@ public class AuthenticateTest extends AbstractTestClass {
 		auth.doPost(request, response);
 
 		assertExpectedRedirect(URL_LOGIN_PAGE);
-		assertNoStatusBean();
+		assertExpectedLoginSessions();
 		assertExpectedProcessBean(LOGGING_IN, USER_DBA_NAME, "",
 				"Please enter your password.");
 	}
@@ -189,7 +186,7 @@ public class AuthenticateTest extends AbstractTestClass {
 		auth.doPost(request, response);
 
 		assertExpectedRedirect(URL_LOGIN_PAGE);
-		assertNoStatusBean();
+		assertExpectedLoginSessions();
 		assertExpectedProcessBean(LOGGING_IN, USER_DBA_NAME, "",
 				"The email or password you entered is incorrect.");
 	}
@@ -201,11 +198,9 @@ public class AuthenticateTest extends AbstractTestClass {
 
 		auth.doPost(request, response);
 
-		assertExpectedRedirect(URL_LOGIN_PAGE);
-		assertExpectedStatusBean(LOGIN_STATUS_OLDHAND);
 		assertNoProcessBean();
-		assertExpectedUserValues(USER_OLDHAND_NAME, USER_OLDHAND_PASSWORD,
-				USER_OLDHAND_LOGIN_COUNT + 1, true);
+		assertExpectedRedirect(URL_LOGIN_PAGE);
+		assertExpectedLoginSessions(USER_OLDHAND_NAME);
 	}
 
 	// ----------------------------------------------------------------------
@@ -220,9 +215,8 @@ public class AuthenticateTest extends AbstractTestClass {
 		auth.doPost(request, response);
 
 		assertExpectedRedirect(URL_LOGIN_PAGE);
-		assertNoStatusBean();
+		assertExpectedLoginSessions();
 		assertExpectedProcessBean(FORCED_PASSWORD_CHANGE, USER_DBA_NAME, "", "");
-		assertExpectedUserValues(USER_DBA_NAME, USER_DBA_PASSWORD, 0, false);
 	}
 
 	@Test
@@ -233,9 +227,8 @@ public class AuthenticateTest extends AbstractTestClass {
 		auth.doPost(request, response);
 
 		assertExpectedRedirect(URL_HOME_PAGE);
-		assertNoStatusBean();
+		assertExpectedLoginSessions();
 		assertNoProcessBean();
-		assertExpectedUserValues(USER_DBA_NAME, USER_DBA_PASSWORD, 0, false);
 	}
 
 	@Test
@@ -246,10 +239,9 @@ public class AuthenticateTest extends AbstractTestClass {
 		auth.doPost(request, response);
 
 		assertExpectedRedirect(URL_LOGIN_PAGE);
-		assertNoStatusBean();
+		assertExpectedLoginSessions();
 		assertExpectedProcessBean(FORCED_PASSWORD_CHANGE, USER_DBA_NAME, "",
 				"Please enter a password between 6 and 12 characters in length.");
-		assertExpectedUserValues(USER_DBA_NAME, USER_DBA_PASSWORD, 0, false);
 	}
 
 	@Test
@@ -260,10 +252,9 @@ public class AuthenticateTest extends AbstractTestClass {
 		auth.doPost(request, response);
 
 		assertExpectedRedirect(URL_LOGIN_PAGE);
-		assertNoStatusBean();
+		assertExpectedLoginSessions();
 		assertExpectedProcessBean(FORCED_PASSWORD_CHANGE, USER_DBA_NAME, "",
 				"The passwords entered do not match.");
-		assertExpectedUserValues(USER_DBA_NAME, USER_DBA_PASSWORD, 0, false);
 	}
 
 	@Test
@@ -274,11 +265,10 @@ public class AuthenticateTest extends AbstractTestClass {
 		auth.doPost(request, response);
 
 		assertExpectedRedirect(URL_LOGIN_PAGE);
-		assertNoStatusBean();
+		assertExpectedLoginSessions();
 		assertExpectedProcessBean(FORCED_PASSWORD_CHANGE, USER_DBA_NAME, "",
 				"Please choose a different password from the "
 						+ "temporary one provided initially.");
-		assertExpectedUserValues(USER_DBA_NAME, USER_DBA_PASSWORD, 0, false);
 	}
 
 	@Test
@@ -288,10 +278,10 @@ public class AuthenticateTest extends AbstractTestClass {
 
 		auth.doPost(request, response);
 
-		assertExpectedRedirect(URL_LOGIN_PAGE);
-		assertExpectedStatusBean(LOGIN_STATUS_DBA);
 		assertNoProcessBean();
-		assertExpectedUserValues(USER_DBA_NAME, "NewPassword", 1, true);
+		assertExpectedRedirect(URL_LOGIN_PAGE);
+		assertExpectedLoginSessions(USER_DBA_NAME);
+		assertExpectedPasswordChanges(USER_DBA_NAME, "NewPassword");
 	}
 
 	// ----------------------------------------------------------------------
@@ -323,8 +313,7 @@ public class AuthenticateTest extends AbstractTestClass {
 
 	@Test
 	public void redirectSelfEditor() {
-		userDao.setIndividualsUserMayEditAs(USER_OLDHAND_URI,
-				Collections.singletonList("selfEditorURI"));
+		authenticator.addEditingPermission(USER_OLDHAND_URI, "selfEditorURI");
 		loginNotFirstTime();
 		assertExpectedRedirect(URL_SELF_EDITOR_PAGE);
 	}
@@ -374,7 +363,8 @@ public class AuthenticateTest extends AbstractTestClass {
 	}
 
 	private void assertNoProcessBean() {
-		assertNull(session.getAttribute(LoginProcessBean.SESSION_ATTRIBUTE));
+		assertEquals("null process bean", null,
+				session.getAttribute(LoginProcessBean.SESSION_ATTRIBUTE));
 	}
 
 	private void assertExpectedProcessBean(State state, String username,
@@ -388,30 +378,32 @@ public class AuthenticateTest extends AbstractTestClass {
 		assertEquals("username", username, bean.getUsername());
 	}
 
-	private void assertNoStatusBean() {
-		assertNull(session.getAttribute("loginStatus"));
+	private void assertExpectedPasswordChanges(String... strings) {
+		if ((strings.length % 2) != 0) {
+			throw new RuntimeException(
+					"supply even number of args: username and password");
+		}
+
+		Map<String, String> expected = new HashMap<String, String>();
+		for (int i = 0; i < strings.length; i += 2) {
+			expected.put(strings[i], strings[i + 1]);
+		}
+
+		assertEquals("password changes", expected,
+				authenticator.getNewPasswordMap());
 	}
 
-	private void assertExpectedStatusBean(LoginStatusBean expected) {
-		LoginStatusBean bean = (LoginStatusBean) session
-				.getAttribute("loginStatus");
-		assertNotNull("login status bean", bean);
-		assertEquals("user URI", expected.getUserURI(), bean.getUserURI());
-		assertEquals("user name", expected.getUsername(), bean.getUsername());
-		assertEquals("security level", expected.getSecurityLevel(),
-				bean.getSecurityLevel());
-	}
+	/** How many folks logged in? */
+	private void assertExpectedLoginSessions(String... usernames) {
+		Set<String> expected = new HashSet<String>(Arrays.asList(usernames));
 
-	/** Check that this user looks like we expected. */
-	private void assertExpectedUserValues(String username, String password,
-			int loginCount, boolean firstTimeIsSet) {
-		User user = userDao.getUserByUsername(username);
-		assertEquals("user " + username + " password",
-				Authenticate.applyMd5Encoding(password), user.getMd5password());
-		assertEquals("user " + username + " login count", loginCount,
-				user.getLoginCount());
-		assertEquals("user " + username + " firstTimeIsSet", firstTimeIsSet,
-				user.getFirstTime() != null);
+		Set<String> actualRecorded = new HashSet<String>(
+				authenticator.getRecordedLoginUsernames());
+		assertEquals("login recorded on user", expected, actualRecorded);
+
+		Set<String> actualSessions = new HashSet<String>(
+				authenticator.getLoginSessions());
+		assertEquals("login sessions", expected, actualSessions);
 	}
 
 	/** Boilerplate login process for the rediret tests. */
@@ -421,10 +413,8 @@ public class AuthenticateTest extends AbstractTestClass {
 
 		auth.doPost(request, response);
 
-		assertExpectedStatusBean(LOGIN_STATUS_OLDHAND);
+		assertExpectedLoginSessions(USER_OLDHAND_NAME);
 		assertNoProcessBean();
-		assertExpectedUserValues(USER_OLDHAND_NAME, USER_OLDHAND_PASSWORD,
-				USER_OLDHAND_LOGIN_COUNT + 1, true);
 	}
 
 	@SuppressWarnings("unused")

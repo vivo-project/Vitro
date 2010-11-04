@@ -223,7 +223,7 @@ public class Authenticate extends FreemarkerHttpServlet {
 		}
 
 		String username = bean.getUsername();
-		
+
 		if (getAuthenticator(request).isCurrentPassword(username, newPassword)) {
 			bean.setMessage(Message.USING_OLD_PASSWORD);
 			return null;
@@ -261,8 +261,8 @@ public class Authenticate extends FreemarkerHttpServlet {
 		getAuthenticator(request).setLoggedIn(user);
 
 		// Remove the login process info from the session.
-		HttpSession session = request.getSession();
-		session.removeAttribute(LoginProcessBean.SESSION_ATTRIBUTE);
+		request.getSession()
+				.removeAttribute(LoginProcessBean.SESSION_ATTRIBUTE);
 	}
 
 	/**
@@ -280,7 +280,6 @@ public class Authenticate extends FreemarkerHttpServlet {
 	 */
 	private void redirectCancellingUser(HttpServletRequest request,
 			HttpServletResponse response) throws IOException {
-		// Remove the login process info from the session.
 		request.getSession()
 				.removeAttribute(LoginProcessBean.SESSION_ATTRIBUTE);
 
@@ -331,8 +330,8 @@ public class Authenticate extends FreemarkerHttpServlet {
 		// If the user is a self-editor, send them to their home page.
 		User user = getLoggedInUser(request);
 		if (userIsANonEditor(user)) {
-			List<String> uris = getAuthenticator(request).asWhomMayThisUserEdit(
-					user);
+			List<String> uris = getAuthenticator(request)
+					.asWhomMayThisUserEdit(user);
 			if (uris != null && uris.size() > 0) {
 				String userHomePage = request.getContextPath()
 						+ "/individual?uri="
@@ -376,14 +375,24 @@ public class Authenticate extends FreemarkerHttpServlet {
 	private State getCurrentLoginState(HttpServletRequest request) {
 		HttpSession session = request.getSession(false);
 		if (session == null) {
+			log.debug("no session: current state is NOWHERE");
 			return State.NOWHERE;
 		}
 
 		if (LoginStatusBean.getBean(request).isLoggedIn()) {
+			log.debug("found a LoginStatusBean: current state is LOGGED IN");
 			return State.LOGGED_IN;
 		}
 
-		return getLoginProcessBean(request).getState();
+		if (session.getAttribute(LoginProcessBean.SESSION_ATTRIBUTE) == null) {
+			log.debug("no LoginSessionBean, no LoginProcessBean: "
+					+ "current state is NOWHERE");
+			return State.NOWHERE;
+		}
+
+		State state = getLoginProcessBean(request).getState();
+		log.debug("state from LoginProcessBean is " + state);
+		return state;
 	}
 
 	/**
