@@ -2986,4 +2986,13 @@ public class RegeneratingModel implements OntModel {
 		}		
 	}
 
+	public Resource wrapAsResource(Node arg0) {
+		try {
+			return model.wrapAsResource(arg0);
+		} catch (Exception e) {
+			regenerate();
+			return model.wrapAsResource(arg0);
+		}
+	}
+
 }
