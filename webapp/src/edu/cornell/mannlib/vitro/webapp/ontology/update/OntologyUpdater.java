@@ -91,6 +91,9 @@ public class OntologyUpdater {
 		   //process the TBox before the ABox
 	       updateTBoxAnnotations();
 
+	       // instantiate a new class here and call a method that will do the date/time migration.
+	       // we will delete this class after this release. 
+	       
     	   updateABox(changes);
 		
 	}
