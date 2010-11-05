@@ -48,7 +48,7 @@ public class SimpleReasonerTest {
         classA.addSubClass(classB);
         classA.addSubClass(classC);
         
-        // this is the model to receive ABox inferences
+        // this is the model to receive inferences
         Model inf = ModelFactory.createDefaultModel();
         
 		// create an Abox and register the SimpleReasoner listener with it
@@ -68,6 +68,48 @@ public class SimpleReasonerTest {
 		Assert.assertTrue(inf.contains(xisa));	
 	}
 
+	
+	@Test
+	public void removeTypes(){
+	
+		// Create a Tbox with a simple class hierarchy. C is a subclass of B and B is a subclass of A.
+		// Pellet will compute TBox inferences
+		
+		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
+		
+		OntClass classA = tBox.createClass("http://test.vivo/A");
+	    classA.setLabel("class A", "en-US");
+
+		OntClass classB = tBox.createClass("http://test.vivo/B");
+	    classB.setLabel("class B", "en-US");
+
+		OntClass classC = tBox.createClass("http://test.vivo/C");
+	    classA.setLabel("class C", "en-US");
+	    
+	    classB.addSubClass(classC);
+	    classA.addSubClass(classB);
+        
+        // this is the model to receive inferences
+        Model inf = ModelFactory.createDefaultModel();
+        
+		// create an Abox and register the SimpleReasoner listener with it
+		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
+		aBox.register(new SimpleReasoner(tBox, aBox, inf));
+		
+        // add a statement to the ABox that individual x is of type C.
+		Resource ind_x = aBox.createResource("http://test.vivo/x");
+		aBox.add(ind_x, RDF.type, classC);		
+
+        // add a statement to the ABox that individual x is of type B.
+		aBox.add(ind_x, RDF.type, classB);		
+
+		// remove the statement that individual x is of type C
+		aBox.remove(ind_x, RDF.type, classC);
+		
+		// Verify that the inference graph contains the statement that x is of type A.
+		Statement xisa = ResourceFactory.createStatement(ind_x, RDF.type, classA);	
+		Assert.assertTrue(inf.contains(xisa));	
+	}
 	
 	// To help in debugging the unit test
 	void printModels(OntModel ontModel) {
