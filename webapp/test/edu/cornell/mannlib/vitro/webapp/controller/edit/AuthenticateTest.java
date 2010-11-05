@@ -400,11 +400,7 @@ public class AuthenticateTest extends AbstractTestClass {
 
 		Set<String> actualRecorded = new HashSet<String>(
 				authenticator.getRecordedLoginUsernames());
-		assertEquals("login recorded on user", expected, actualRecorded);
-
-		Set<String> actualSessions = new HashSet<String>(
-				authenticator.getLoginSessions());
-		assertEquals("login sessions", expected, actualSessions);
+		assertEquals("recorded logins", expected, actualRecorded);
 	}
 
 	/** Boilerplate login process for the rediret tests. */

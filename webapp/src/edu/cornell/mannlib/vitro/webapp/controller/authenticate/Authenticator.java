@@ -62,23 +62,26 @@ public abstract class Authenticator {
 	public abstract User getUserByUsername(String username);
 
 	/**
-	 * Return a list of URIs of the people that this user is allowed to edit.
+	 * Get a list of URIs of the people that this user is allowed to edit.
 	 */
 	public abstract List<String> asWhomMayThisUserEdit(User user);
 
 	/**
 	 * Record a new password for the user.
 	 */
-	public abstract void recordNewPassword(User user,
+	public abstract void recordNewPassword(String username,
 			String newClearTextPassword);
 
 	/**
-	 * Record that the user has logged in.
+	 * <pre>
+	 * Record that the user has logged in, with all of the housekeeping that 
+	 * goes with it:
+	 * - updating the user record
+	 * - setting login status and timeout limit in the session
+	 * - record the user in the session map
+	 * - notify other users of the model
+	 * </pre>
 	 */
-	public abstract void recordSuccessfulLogin(User user);
+	public abstract void recordUserIsLoggedIn(String username);
 
-	/**
-	 * Set the login status in the session.
-	 */
-	public abstract void setLoggedIn(User user);
 }

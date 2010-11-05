@@ -4,7 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.controller.authenticate;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -72,7 +71,6 @@ public class AuthenticatorStub extends Authenticator {
 	private final Map<String, User> usersByName = new HashMap<String, User>();
 	private final Map<String, List<String>> editingPermissions = new HashMap<String, List<String>>();
 	private final List<String> recordedLogins = new ArrayList<String>();
-	private final List<String> loginSessions = new ArrayList<String>();
 	private final Map<String, String> newPasswords = new HashMap<String, String>();
 
 	private HttpServletRequest request;
@@ -100,10 +98,6 @@ public class AuthenticatorStub extends Authenticator {
 		return newPasswords;
 	}
 
-	public Collection<? extends String> getLoginSessions() {
-		return loginSessions;
-	}
-
 	// ----------------------------------------------------------------------
 	// Stub methods
 	// ----------------------------------------------------------------------
@@ -129,8 +123,8 @@ public class AuthenticatorStub extends Authenticator {
 	}
 
 	@Override
-	public void recordNewPassword(User user, String newClearTextPassword) {
-		newPasswords.put(user.getUsername(), newClearTextPassword);
+	public void recordNewPassword(String username, String newClearTextPassword) {
+		newPasswords.put(username, newClearTextPassword);
 	}
 
 	@Override
@@ -144,17 +138,13 @@ public class AuthenticatorStub extends Authenticator {
 	}
 
 	@Override
-	public void recordSuccessfulLogin(User user) {
-		recordedLogins.add(user.getUsername());
-	}
+	public void recordUserIsLoggedIn(String username) {
+		recordedLogins.add(username);
 
-	@Override
-	public void setLoggedIn(User user) {
-		LoginStatusBean lsb = new LoginStatusBean(user.getURI(),
-				user.getUsername(), parseUserSecurityLevel(user.getRoleURI()));
+		User user = getUserByUsername(username);
+		LoginStatusBean lsb = new LoginStatusBean(user.getURI(), username,
+				parseUserSecurityLevel(user.getRoleURI()));
 		LoginStatusBean.setBean(request.getSession(), lsb);
-
-		loginSessions.add(user.getUsername());
 	}
 
 	private static final String ROLE_NAMESPACE = "role:/";

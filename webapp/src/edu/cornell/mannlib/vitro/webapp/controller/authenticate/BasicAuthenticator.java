@@ -66,29 +66,46 @@ public class BasicAuthenticator extends Authenticator {
 	}
 
 	@Override
-	public void recordNewPassword(User user, String newClearTextPassword) {
+	public void recordNewPassword(String username, String newClearTextPassword) {
+		User user = getUserByUsername(username);
+		if (user == null) {
+			log.error("Trying to change password on non-existent user: "
+					+ username);
+			return;
+		}
 		user.setOldPassword(user.getMd5password());
 		user.setMd5password(Authenticate.applyMd5Encoding(newClearTextPassword));
 		getUserDao(request).updateUser(user);
 	}
 
 	@Override
-	public void recordSuccessfulLogin(User user) {
-		user.setLoginCount(user.getLoginCount() + 1);
-		if (user.getFirstTime() == null) { // first login
-			user.setFirstTime(new Date());
+	public void recordUserIsLoggedIn(String username) {
+		User user = getUserByUsername(username);
+		if (user == null) {
+			log.error("Trying to change password on non-existent user: "
+					+ username);
+			return;
 		}
-		getUserDao(request).updateUser(user);
-	}
 
-	@Override
-	public void setLoggedIn(User user) {
 		HttpSession session = request.getSession();
+		
+		recordLoginOnUserRecord(user);
 		createLoginFormBean(user, session);
 		createLoginStatusBean(user, session);
 		setSessionTimeoutLimit(session);
 		recordInUserSessionMap(user, session);
 		notifyOtherUsers(user, session);
+	}
+
+	/**
+	 * Update the user record to record the login.
+	 */
+	private void recordLoginOnUserRecord(User user) {
+		user.setLoginCount(user.getLoginCount() + 1);
+		if (user.getFirstTime() == null) { // first login
+			user.setFirstTime(new Date());
+		}
+		getUserDao(request).updateUser(user);
 	}
 
 	/**

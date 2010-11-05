@@ -261,6 +261,7 @@ public class Authenticate extends FreemarkerHttpServlet {
 	/**
 	 * They are already logged in. There's nothing to do; no transition.
 	 */
+	@SuppressWarnings("unused")
 	private void processInputLoggedIn(HttpServletRequest request) {
 	}
 
@@ -298,16 +299,7 @@ public class Authenticate extends FreemarkerHttpServlet {
 	private void transitionToLoggedIn(HttpServletRequest request,
 			String username) {
 		log.debug("Completed login: " + username);
-
-		// Record the login on the user record (start with a fresh copy).
-		// TODO All this should be a single call to Authenticator.
-		User user = getAuthenticator(request).getUserByUsername(username);
-		getAuthenticator(request).recordSuccessfulLogin(user);
-
-		// Record that a new user has logged in to this session.
-		getAuthenticator(request).setLoggedIn(user);
-
-		// Remove the login process info from the session.
+		getAuthenticator(request).recordUserIsLoggedIn(username);
 		LoginProcessBean.removeBean(request);
 	}
 
@@ -318,12 +310,9 @@ public class Authenticate extends FreemarkerHttpServlet {
 	private void transitionToLoggedIn(HttpServletRequest request,
 			String username, String newPassword) {
 		log.debug("Completed login: " + username + ", password changed.");
-
-		// TODO these should be a single call to Authenticator.
-		User user = getAuthenticator(request).getUserByUsername(username);
-		getAuthenticator(request).recordNewPassword(user, newPassword);
-
-		transitionToLoggedIn(request, username);
+		getAuthenticator(request).recordNewPassword(username, newPassword);
+		getAuthenticator(request).recordUserIsLoggedIn(username);
+		LoginProcessBean.removeBean(request);
 	}
 
 	/**
