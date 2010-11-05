@@ -135,7 +135,7 @@ public class AuthenticateTest extends AbstractTestClass {
 
 		assertExpectedRedirect(URL_LOGIN_PAGE);
 		assertExpectedLoginSessions();
-		assertNoProcessBean();
+		assertExpectedProcessBean(LOGGING_IN, "", "", "");
 	}
 
 	@Test
