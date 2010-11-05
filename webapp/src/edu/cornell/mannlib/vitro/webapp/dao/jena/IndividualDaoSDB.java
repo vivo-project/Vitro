@@ -58,7 +58,8 @@ public class IndividualDaoSDB extends IndividualDaoJena {
     }
     
     protected Individual makeIndividual(String individualURI) {
-    	return new IndividualSDB2(individualURI, getDataset(), getWebappDaoFactory());
+    	//return new IndividualSDB2(individualURI, getDataset(), getWebappDaoFactory());
+    	return new IndividualSDB(individualURI, getDataset(), getWebappDaoFactory());
     }
 
     private static final Log log = LogFactory.getLog(IndividualDaoSDB.class.getName());
