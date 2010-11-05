@@ -4,11 +4,15 @@ package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
@@ -147,6 +151,7 @@ public class PropertyRetryController extends BaseEditController {
 
         FormObject foo = new FormObject();
         foo.setErrorMap(epo.getErrMsgMap());
+       
 
         HashMap<String, List<Option>> optionMap = new HashMap<String, List<Option>>();
         try {
@@ -159,6 +164,8 @@ public class PropertyRetryController extends BaseEditController {
             List<ObjectProperty> objPropList = propDao.getAllObjectProperties();
             Collections.sort(objPropList);
             List<Option> parentIdList = FormUtils.makeOptionListFromBeans(objPropList,"URI","PickListName",propertyForEditing.getParentURI(),null);
+            HashMap<String,Option> hashMap = new HashMap<String,Option>();
+            parentIdList = getSortedList(hashMap,parentIdList);
             parentIdList.add(0,new Option("-1","none (root property)", false));
             optionMap.put("ParentURI", parentIdList);
             List<DataProperty> dpList = dpDao.getAllDataProperties();
@@ -180,6 +187,8 @@ public class PropertyRetryController extends BaseEditController {
         optionMap.put("ProhibitedFromUpdateBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getUpdateOptionsList(propertyForEditing));
 
         List groupOptList = FormUtils.makeOptionListFromBeans(request.getFullWebappDaoFactory().getPropertyGroupDao().getPublicGroups(true),"URI","Name", ((propertyForEditing.getGroupURI()==null) ? "" : propertyForEditing.getGroupURI()), null, (propertyForEditing.getGroupURI()!=null));
+        HashMap<String,Option> hashMap = new HashMap<String,Option>();
+        groupOptList = getSortedList(hashMap,groupOptList);
         groupOptList.add(0,new Option("","none"));
         optionMap.put("GroupURI", groupOptList);
         
@@ -268,4 +277,34 @@ public class PropertyRetryController extends BaseEditController {
             }
         }
     }
+    
+    public List<Option> getSortedList(HashMap<String,Option> hashMap, List<Option> optionList){
+    	
+      	 class ListComparator implements Comparator<String>{
+   			@Override
+   			public int compare(String str1, String str2) {
+   				// TODO Auto-generated method stub
+   				Collator collator = Collator.getInstance();
+   				return collator.compare(str1, str2);
+   			}
+           	
+           }
+
+      	List<String> bodyVal = new ArrayList<String>();
+      	List<Option> options = new ArrayList<Option>();
+      	Iterator<Option> itr = optionList.iterator();
+      	 while(itr.hasNext()){
+           	Option option = itr.next();
+           	hashMap.put(option.getBody(),option);
+              bodyVal.add(option.getBody());
+           }
+           
+                   
+          Collections.sort(bodyVal, new ListComparator());
+          ListIterator<String> itrStr = bodyVal.listIterator();
+          while(itrStr.hasNext()){
+          	options.add(hashMap.get(itrStr.next()));
+          }
+          return options;
+      }
 }
