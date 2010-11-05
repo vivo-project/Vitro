@@ -2,9 +2,14 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
+import java.text.Collator;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
@@ -15,6 +20,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.beans.FormObject;
+import edu.cornell.mannlib.vedit.beans.Option;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vitro.webapp.beans.Classes2Classes;
@@ -63,12 +69,19 @@ public class Properties2PropertiesRetryController extends BaseEditController {
         
     	Collections.sort(propList);
     	
-        String superpropertyURIstr = request.getParameter("SuperpropertyURI");
-        String subpropertyURIstr = request.getParameter("SubpropertyURI");
+    	 String superpropertyURIstr = request.getParameter("SuperpropertyURI");
+         String subpropertyURIstr = request.getParameter("SubpropertyURI");
+         
         
-        HashMap hash = new HashMap();
-    	hash.put("SuperpropertyURI", FormUtils.makeOptionListFromBeans(propList,"URI","LocalNameWithPrefix",superpropertyURIstr,null));
-        hash.put("SubpropertyURI", FormUtils.makeOptionListFromBeans(propList,"URI","LocalNameWithPrefix",subpropertyURIstr,null));
+         HashMap<String,Option> hashMap = new HashMap<String,Option>();
+         List<Option> optionList = FormUtils.makeOptionListFromBeans(propList,"URI","LocalNameWithPrefix",superpropertyURIstr,null);
+         List<Option> superPropertyOptions = getSortedList(hashMap,optionList);
+         optionList = FormUtils.makeOptionListFromBeans(propList,"URI","LocalNameWithPrefix",subpropertyURIstr,null);
+         List<Option> subPropertyOptions = getSortedList(hashMap, optionList);
+         
+         HashMap hash = new HashMap();
+     	 hash.put("SuperpropertyURI", superPropertyOptions);
+         hash.put("SubpropertyURI", subPropertyOptions);
         
         FormObject foo = new FormObject();
         foo.setOptionLists(hash);
@@ -100,5 +113,35 @@ public class Properties2PropertiesRetryController extends BaseEditController {
         }
 
     }
+    
+    public List<Option> getSortedList(HashMap<String,Option> hashMap, List<Option> optionList){
+    	
+   	 class ListComparator implements Comparator<String>{
+			@Override
+			public int compare(String str1, String str2) {
+				// TODO Auto-generated method stub
+				Collator collator = Collator.getInstance();
+				return collator.compare(str1, str2);
+			}
+        	
+        }
+
+   	List<String> bodyVal = new ArrayList<String>();
+   	List<Option> options = new ArrayList<Option>();
+   	Iterator<Option> itr = optionList.iterator();
+   	 while(itr.hasNext()){
+        	Option option = itr.next();
+        	hashMap.put(option.getBody(),option);
+           bodyVal.add(option.getBody());
+        }
+        
+                
+       Collections.sort(bodyVal, new ListComparator());
+       ListIterator<String> itrStr = bodyVal.listIterator();
+       while(itrStr.hasNext()){
+       	options.add(hashMap.get(itrStr.next()));
+       }
+       return options;
+   }
 	
 }
