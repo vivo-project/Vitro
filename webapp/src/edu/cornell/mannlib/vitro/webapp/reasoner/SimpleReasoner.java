@@ -12,9 +12,11 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.vocabulary.RDFS;
 
 /**
  * Allows for instant incremental materialization or retraction of RDFS-
@@ -43,15 +45,20 @@ public class SimpleReasoner extends StatementListener {
 		this.inferenceModel = inferenceModel;
 	}
 	
+	/*
+	 * Performs incremental selected ABox reasoning based
+	 * on a new type assertion (assertion that an individual
+	 * is of a certain type) added to the ABox.
+	 * 
+	 */
 	@Override
 	public void addedStatement(Statement stmt) {
 
 		try {
 			log.debug("stmt = " + stmt.toString());
-			System.out.println("stmt = " + stmt.toString());
 			
 			if (stmt.getPredicate().equals(RDF.type)) {
-			   materializeTypes(stmt);
+			   addedType(stmt);
 			}
 
 		} catch (Exception e) {
@@ -60,6 +67,13 @@ public class SimpleReasoner extends StatementListener {
 		}
 	}
 	
+	
+	/*
+	 * Performs incremental selected ABox reasoning based
+	 * on a removed type assertion (assertion that an individual
+	 * is of a certain type) from the ABox.
+	 * 
+	 */
 	@Override
 	public void removedStatement(Statement stmt) {
 	
@@ -67,7 +81,7 @@ public class SimpleReasoner extends StatementListener {
 			log.debug("stmt = " + stmt.toString());
 			
 			if (stmt.getPredicate().equals(RDF.type)) {
-			   retractTypes(stmt);
+			   removedType(stmt);
 			}
 
 		} catch (Exception e) {
@@ -76,7 +90,77 @@ public class SimpleReasoner extends StatementListener {
 		}
 	}
 	
-	public void materializeTypes(Statement stmt) {
+	/*
+	 * Performs incremental selected ABox reasoning based
+	 * on changes to the class hierarchy.
+	 * 
+	 * Handles subclassOf and equivalentClass assertions
+	 * 
+	 */
+	public void addedTBoxStatement(Statement stmt) {
+
+		try {
+			
+			if ( !(stmt.getPredicate().equals(RDFS.subClassOf) || stmt.getPredicate().equals(RDFS.subClassOf) ) ) return;
+			  
+			log.debug("stmt = " + stmt.toString());
+			
+			OntClass subject = tboxModel.getOntClass((stmt.getSubject()).getURI());
+			OntClass object = tboxModel.getOntClass(((Resource)stmt.getObject()).getURI()); 
+			
+			if (stmt.getPredicate().equals(RDFS.subClassOf)) {
+			   addedSubClass(subject,object);
+			} else {
+				// equivalent class is the same as subclass in both directions
+			   addedSubClass(subject,object);
+			   addedSubClass(object,subject);
+			}
+
+		} catch (Exception e) {
+			// don't stop the edit if there's an exception
+			log.error("Exception while adding incremental inferences: ", e);
+		}
+	}
+
+	/*
+	 * Performs incremental selected ABox reasoning based
+	 * on changes to the class hierarchy.
+	 * 
+	 * Handles subclassOf and equivalentClass assertions
+	 * 
+	 */
+	public void removedTBoxStatement(Statement stmt) {
+	
+		try {
+			
+			if ( !(stmt.getPredicate().equals(RDFS.subClassOf) || stmt.getPredicate().equals(RDFS.subClassOf) ) ) return;
+			  
+			log.debug("stmt = " + stmt.toString());
+			
+			OntClass subject = tboxModel.getOntClass((stmt.getSubject()).getURI());
+			OntClass object = tboxModel.getOntClass(((Resource)stmt.getObject()).getURI()); 
+			
+			if (stmt.getPredicate().equals(RDFS.subClassOf)) {
+			   removedSubClass(subject,object);
+			} else {
+				// equivalent class is the same as subclass in both directions
+			   removedSubClass(subject,object);
+			   removedSubClass(object,subject);
+			}
+
+		} catch (Exception e) {
+			// don't stop the edit if there's an exception
+			log.error("Exception while adding incremental inferences: ", e);
+		}
+	}
+	
+	
+	/*
+	 * If it is added that B is of type A, then for each superclass of
+	 * A assert that B is of that type.
+	 * 
+	 */
+	public void addedType(Statement stmt) {
 				
 		tboxModel.enterCriticalSection(Lock.READ);
 		
@@ -114,8 +198,13 @@ public class SimpleReasoner extends StatementListener {
 		}
 	}
 
-	
-	public void retractTypes(Statement stmt) {
+	/*
+	 * If it is removed that B is of type A, then for each superclass of A remove
+	 * the inferred statement that B is of that type UNLESS it is otherwise entailed
+	 * that B is of that type.
+	 * 
+	 */
+	public void removedType(Statement stmt) {
 		
 		tboxModel.enterCriticalSection(Lock.READ);
 		
@@ -157,8 +246,114 @@ public class SimpleReasoner extends StatementListener {
 		}
 	}
 
-	// The following two methods aren't called currently; current default behavior of VIVO is to not materialize such inferences.
-	public void materializeProperties(Statement stmt) {
+
+	// Returns true if it is entailed by class subsumption that subject is
+	// of type cls; otherwise returns false.
+	public boolean entailedType(Resource subject, OntClass cls) {
+		
+		aboxModel.enterCriticalSection(Lock.READ);
+		
+		try {
+			ExtendedIterator<OntClass> iter = cls.listSubClasses(false);
+			while (iter.hasNext()) {
+				
+				OntClass childClass = iter.next();
+				
+				//TODO: do I need this?
+				if (childClass.equals(cls)) continue;
+				
+				Statement stmt = ResourceFactory.createStatement(subject, RDF.type, childClass);
+				if (aboxModel.contains(stmt)) return true;
+			}
+			
+			return false;
+		} finally {
+			aboxModel.leaveCriticalSection();
+		}	
+	}
+	
+	/*
+	 * If added that B is a subclass of A, then find all individuals
+	 * who are typed as B and assert that they are of type A.
+	 * 
+	 */
+	public void addedSubClass(OntClass subClass, OntClass superClass) {
+		
+		aboxModel.enterCriticalSection(Lock.READ);
+						
+		try {
+				
+			StmtIterator iter = aboxModel.listStatements((Resource) null, RDF.type, subClass);
+
+			while (iter.hasNext()) {
+				
+				Statement stmt = iter.next();
+				
+				OntClass subject = tboxModel.getOntClass((stmt.getSubject()).getURI());
+								
+				Statement infStmt = ResourceFactory.createStatement(subject, RDF.type, superClass);
+				inferenceModel.enterCriticalSection(Lock.WRITE);
+				
+				try {
+					if (!inferenceModel.contains(infStmt)) {
+						log.debug("Adding this inferred statement:  " + infStmt.toString() );
+						inferenceModel.add(infStmt);
+					}
+				} finally {
+					inferenceModel.leaveCriticalSection();
+				}	
+			}
+		} finally {
+			aboxModel.leaveCriticalSection();
+		}
+	}
+
+	
+	/*
+	 * If removed that B is a subclass of A, then for each individual
+	 * that is of type B, remove the (inferred) assertion that it is
+	 * of type A, UNLESS the individual is of some type C that is 
+	 * a subClass of A.
+	 * 
+	 */
+	public void removedSubClass(OntClass subClass, OntClass superClass) {
+		
+		aboxModel.enterCriticalSection(Lock.READ);
+						
+		try {
+				
+			StmtIterator iter = aboxModel.listStatements((Resource) null, RDF.type, subClass);
+
+			while (iter.hasNext()) {
+				
+				Statement stmt = iter.next();
+				
+				OntClass subject = tboxModel.getOntClass((stmt.getSubject()).getURI());
+								
+				
+				if (entailedType(subject,superClass)) {
+					continue;
+				}
+				
+				Statement infStmt = ResourceFactory.createStatement(subject, RDF.type, superClass);
+				inferenceModel.enterCriticalSection(Lock.WRITE);
+				
+				try {
+					if (inferenceModel.contains(infStmt)) {
+						log.debug("Adding this inferred statement:  " + infStmt.toString() );
+						inferenceModel.remove(infStmt);
+					}
+				} finally {
+					inferenceModel.leaveCriticalSection();
+				}	
+			}
+		} finally {
+			aboxModel.leaveCriticalSection();
+		}
+	}
+
+	// The following three methods aren't currently called; the default behavior of VIVO is to not materialize such inferences.
+	public void addedProperty(Statement stmt) {
 
 		tboxModel.enterCriticalSection(Lock.READ);
 		
@@ -189,7 +384,8 @@ public class SimpleReasoner extends StatementListener {
 			tboxModel.leaveCriticalSection();
 		}
 	}
-	public void retractProperties(Statement stmt) {
+	
+	public void removedProperty(Statement stmt) {
 		
 		tboxModel.enterCriticalSection(Lock.READ);
 		
@@ -202,7 +398,7 @@ public class SimpleReasoner extends StatementListener {
 				while (superIt.hasNext()) {
 					OntProperty parentProp = superIt.next();
 					
-					if (entailed(stmt.getSubject(),parentProp,stmt.getObject() )) continue;    // if the statement is still entailed 
+					if (entailedStmt(stmt.getSubject(),parentProp,stmt.getObject() )) continue;    // if the statement is still entailed 
 					                                                                           // don't remove it from the inference graph.
                                                                                 
 					Statement infStmt = ResourceFactory.createStatement(stmt.getSubject(), parentProp, stmt.getObject());
@@ -225,34 +421,9 @@ public class SimpleReasoner extends StatementListener {
 			tboxModel.leaveCriticalSection();
 		}	
 	}
-
-	// Returns true if it is entailed by class subsumption that subject is
-	// of type cls; otherwise returns false.
-	public boolean entailedType(Resource subject, OntClass cls) {
-		
-		aboxModel.enterCriticalSection(Lock.READ);
-		
-		try {
-			ExtendedIterator<OntClass> iter = cls.listSubClasses(false);
-			while (iter.hasNext()) {
-				
-				OntClass childClass = iter.next();
-				
-				//TODO: do I need this?
-				if (childClass.equals(cls)) continue;
-				
-				Statement stmt = ResourceFactory.createStatement(subject, RDF.type, childClass);
-				if (aboxModel.contains(stmt)) return true;
-			}
-			
-			return false;
-		} finally {
-			aboxModel.leaveCriticalSection();
-		}	
-	}
 	
 	// Returns true if the statement is entailed by property subsumption 
-	public boolean entailed(Resource subject, OntProperty prop, RDFNode object) {
+	public boolean entailedStmt(Resource subject, OntProperty prop, RDFNode object) {
 		
 		aboxModel.enterCriticalSection(Lock.READ);
 		
@@ -276,4 +447,4 @@ public class SimpleReasoner extends StatementListener {
 			aboxModel.leaveCriticalSection();
 		}	
 	}
-}
+  }
