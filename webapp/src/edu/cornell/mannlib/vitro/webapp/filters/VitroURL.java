@@ -20,6 +20,8 @@ import org.apache.commons.logging.LogFactory;
  * Brian Caruso with changes contributed by David Cliff, 2010-11-03
  * Before 2010-11 this was a private class of URLRewritingHttpServletResponse.java.
  * 
+ * Useful reference:
+ * http://labs.apache.org/webarch/uri/rfc/rfc3986.html
  */
 class VitroURL {
     // this is to get away from some of the 
@@ -35,10 +37,17 @@ class VitroURL {
     public List<String[]> queryParams;
     public String fragment;
     
+    /**
+     * Pattern to get the path and query of a relative URL
+     * ex.
+     *   /entity -> /entity 
+     *   /entity?query=abc -> /entity query=abc
+     */
+    private Pattern pathPattern = Pattern.compile("([^\\?]*)\\??(.*)");
+    
     private Pattern commaPattern = Pattern.compile("/");
     private Pattern equalsSignPattern = Pattern.compile("=");
-    private Pattern ampersandPattern = Pattern.compile("&");
-    private Pattern questionMarkPattern = Pattern.compile("\\?");
+    private Pattern ampersandPattern = Pattern.compile("&");          
     public  boolean pathBeginsWithSlash = false;
     public  boolean pathEndsInSlash = false;
     public  boolean wasXMLEscaped = false;
@@ -65,9 +74,18 @@ class VitroURL {
             // Under normal circumstances, this is because the urlStr is relative
             // We'll assume that we just have a path and possibly a query string.
             // This is likely to be a bad assumption, but let's roll with it.
-            String[] urlParts = questionMarkPattern.split(urlStr);
+            Matcher m = pathPattern.matcher(urlStr);
+            String[] urlParts = new String[2];
+            if( m.matches() ){
+                urlParts[0]= m.group(1);
+                if( m.groupCount() == 2 )
+                    urlParts[1] = m.group(2);
+            }else{
+                //???
+            }
+                         
             try {
-                this.pathParts = splitPath(URLDecoder.decode(urlParts[0],characterEncoding));
+                this.pathParts = splitPath(URLDecoder.decode(getPath(urlStr),characterEncoding));
                 this.pathBeginsWithSlash = beginsWithSlash(urlParts[0]);
                 this.pathEndsInSlash = endsInSlash(urlParts[0]);
                 if (urlParts.length>1) {
@@ -78,6 +96,15 @@ class VitroURL {
             }
         }
     }
+    
+    private String getPath(String urlStr){
+        Matcher m = pathPattern.matcher(urlStr);
+        if( m.matches() )
+            return m.group(1);
+        else
+            return "";
+    }
+    
     
     private List<String> splitPath(String pathStr) {
         String[] splitStr = commaPattern.split(pathStr);
@@ -123,17 +150,92 @@ class VitroURL {
         return (pathStr.charAt(pathStr.length()-1) == '/');
     }
     
-    private List<String[]> parseQueryParams(String queryStr) {
+  
+    /**
+     * This is attempting to parse query parameters that might not be URLEncoded.
+     * This seems like a huge problem.  We will only correctly handle odd things 
+     * as a query parameter 'uri' in the last position.
+     *  
+     * @param queryStr
+     * @return
+     */    
+    protected List<String[]> parseQueryParams(String queryStr) {
         List<String[]> queryParamList = new ArrayList<String[]>();
         if (queryStr == null) {
             return queryParamList;
         }
-        String[] keyValuePairs = ampersandPattern.split(queryStr);
-        for (int i=0; i<keyValuePairs.length; i++) {
-            String[] pairParts = equalsSignPattern.split(keyValuePairs[i]);
-            queryParamList.add(pairParts);
+      
+        while ( queryStr.length() > 0 ){
+            //remove leading & if there was one
+            if( queryStr.startsWith("&"))
+                queryStr = queryStr.substring(1);
+            
+            String[] simplepair = getSimpleQueryMatch(queryStr);
+            if( simplepair != null ){
+                if( simplepair[1].contains("?") ){
+                    //must be odd final pair
+                    String[] finalPair = getFinalPairQueryMatch(queryStr);
+                    if( finalPair != null){
+                        queryParamList.add(finalPair);
+                        queryStr="";
+                    }else{
+                        throw new Error("Cannot parse query string for URL " +
+                        		"queryParams: \"" + queryStr + "\" this only accepts " +
+                        	    "complex parameters in the final position with the key 'uri'."); 
+                    }
+                }else{
+                    queryParamList.add(simplepair);
+                    // remove found simple key vaule pair from query str
+                    queryStr = queryStr.substring(
+                        simplepair[0].length()+simplepair[1].length()+1);
+                }
+            }else{
+                //maybe there is an odd final pair
+                String[] finalPair = getFinalPairQueryMatch(queryStr);
+                if( finalPair != null){
+                    queryParamList.add(finalPair);
+                    queryStr="";
+                }
+            }
         }
         return queryParamList;
+    }
+    
+    /** Query for simple query param at start of string. */
+    private Pattern simpleQueryParamPattern = Pattern.compile("^([^\\=]*)=([^\\&]*)");
+
+    /**
+     * Check for a simple match in a queryParam.
+     * May return null.     
+     */
+    protected String[] getSimpleQueryMatch(String querystr){
+        Matcher simpleMatch = simpleQueryParamPattern.matcher(querystr);
+        if( simpleMatch.find() ){
+            String[] rv = new String[2];
+            rv[0]=simpleMatch.group(1);
+            rv[1]=simpleMatch.group(2);
+            return rv;
+        }else{
+            return null;
+        }
+    }
+    
+    private Pattern finalQueryParamPattern = Pattern.compile("^(uri)=(.*)");
+    /**
+     * Checks only for uri=.* as the last match of the queryParams.
+     * May return null.
+     */
+    protected String[] getFinalPairQueryMatch(String querystr){
+        Matcher finalMatch = finalQueryParamPattern.matcher(querystr);
+        if( finalMatch.find() ){
+            String[] rv = new String[2];
+            rv[0]=finalMatch.group(1);
+            rv[1]=finalMatch.group(2);
+            return rv;
+        }else{
+            return null;
+        }
+        
     }
     
     public String toString() {
