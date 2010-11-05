@@ -53,7 +53,7 @@ public class Login extends HttpServlet {
 		 * Otherwise, set up as if they had filled in the login form, and send
 		 * them to authenticate it.
 		 */
-		LoginProcessBean bean = LoginProcessBean.getBeanFromSession(request);
+		LoginProcessBean bean = LoginProcessBean.getBean(request);
 		bean.setState(LoginProcessBean.State.LOGGING_IN);
 		request.getRequestDispatcher(Controllers.AUTHENTICATE).forward(request,
 				response);

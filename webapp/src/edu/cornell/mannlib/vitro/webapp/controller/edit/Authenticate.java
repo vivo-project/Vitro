@@ -130,7 +130,7 @@ public class Authenticate extends FreemarkerHttpServlet {
 		String username = request.getParameter(PARAMETER_USERNAME);
 		String password = request.getParameter(PARAMETER_PASSWORD);
 
-		LoginProcessBean bean = getLoginProcessBean(request);
+		LoginProcessBean bean = LoginProcessBean.getBean(request);
 		bean.clearMessage();
 		log.trace("username=" + username + ", password=" + password + ", bean="
 				+ bean);
@@ -170,7 +170,7 @@ public class Authenticate extends FreemarkerHttpServlet {
 	private void whatNextForThisGuy(HttpServletRequest request, User user) {
 		if (user.getLoginCount() == 0) {
 			log.debug("Forcing first-time password change");
-			LoginProcessBean bean = getLoginProcessBean(request);
+			LoginProcessBean bean = LoginProcessBean.getBean(request);
 			bean.setState(State.FORCED_PASSWORD_CHANGE);
 		} else {
 			recordLoginInfo(request, user.getUsername());
@@ -191,7 +191,7 @@ public class Authenticate extends FreemarkerHttpServlet {
 	 * If they want to cancel the login, let them.
 	 */
 	private void recordLoginCancelled(HttpServletRequest request) {
-		getLoginProcessBean(request).setState(State.CANCELLED);
+		LoginProcessBean.getBean(request).setState(State.CANCELLED);
 	}
 
 	/**
@@ -200,7 +200,7 @@ public class Authenticate extends FreemarkerHttpServlet {
 	private User checkChangeProgress(HttpServletRequest request) {
 		String newPassword = request.getParameter(PARAMETER_NEW_PASSWORD);
 		String confirm = request.getParameter(PARAMETER_CONFIRM_PASSWORD);
-		LoginProcessBean bean = getLoginProcessBean(request);
+		LoginProcessBean bean = LoginProcessBean.getBean(request);
 		bean.clearMessage();
 		log.trace("newPassword=" + newPassword + ", confirm=" + confirm
 				+ ", bean=" + bean);
@@ -261,8 +261,7 @@ public class Authenticate extends FreemarkerHttpServlet {
 		getAuthenticator(request).setLoggedIn(user);
 
 		// Remove the login process info from the session.
-		request.getSession()
-				.removeAttribute(LoginProcessBean.SESSION_ATTRIBUTE);
+		LoginProcessBean.removeBean(request);
 	}
 
 	/**
@@ -280,10 +279,8 @@ public class Authenticate extends FreemarkerHttpServlet {
 	 */
 	private void redirectCancellingUser(HttpServletRequest request,
 			HttpServletResponse response) throws IOException {
-		request.getSession()
-				.removeAttribute(LoginProcessBean.SESSION_ATTRIBUTE);
-
 		log.debug("User cancelled the login. Redirect to site admin page.");
+		LoginProcessBean.removeBean(request);
 		response.sendRedirect(getHomeUrl(request));
 	}
 
@@ -384,15 +381,15 @@ public class Authenticate extends FreemarkerHttpServlet {
 			return State.LOGGED_IN;
 		}
 
-		if (session.getAttribute(LoginProcessBean.SESSION_ATTRIBUTE) == null) {
+		if (LoginProcessBean.isBean(request)) {
+			State state = LoginProcessBean.getBean(request).getState();
+			log.debug("state from LoginProcessBean is " + state);
+			return state;
+		} else {
 			log.debug("no LoginSessionBean, no LoginProcessBean: "
 					+ "current state is NOWHERE");
 			return State.NOWHERE;
 		}
-
-		State state = getLoginProcessBean(request).getState();
-		log.debug("state from LoginProcessBean is " + state);
-		return state;
 	}
 
 	/**
@@ -430,11 +427,6 @@ public class Authenticate extends FreemarkerHttpServlet {
 	/** What's the URL for the home page? */
 	private String getHomeUrl(HttpServletRequest request) {
 		return request.getContextPath();
-	}
-
-	/** Where do we stand in the login process? */
-	private LoginProcessBean getLoginProcessBean(HttpServletRequest request) {
-		return LoginProcessBean.getBeanFromSession(request);
 	}
 
 	// ----------------------------------------------------------------------

@@ -8,30 +8,90 @@ import java.util.Arrays;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Where are we in the process of logging on? What message should we show to the
  * user?
  */
 public class LoginProcessBean {
+	private static final Log log = LogFactory.getLog(LoginProcessBean.class);
+
 	private static Object[] NO_ARGUMENTS = new Object[0];
 
-	public static final String SESSION_ATTRIBUTE = LoginProcessBean.class
+	private static final String SESSION_ATTRIBUTE = LoginProcessBean.class
 			.getName();
 
+	// ----------------------------------------------------------------------
+	// static methods
+	// ----------------------------------------------------------------------
+
 	/**
-	 * Get the login process bean from the session. If there is none, create
+	 * Is there currently a login process bean in the session?
+	 */
+	public static boolean isBean(HttpServletRequest request) {
+		return (null != getBeanFromSession(request));
+	}
+
+	/**
+	 * Get the login process bean from the session. If there is no bean, create
 	 * one.
 	 */
-	public static LoginProcessBean getBeanFromSession(HttpServletRequest request) {
-		HttpSession session = request.getSession();
-		LoginProcessBean bean = (LoginProcessBean) session
-				.getAttribute(SESSION_ATTRIBUTE);
-		if (bean == null) {
-			bean = new LoginProcessBean();
-			session.setAttribute(SESSION_ATTRIBUTE, bean);
+	public static LoginProcessBean getBean(HttpServletRequest request) {
+		if (isBean(request)) {
+			return getBeanFromSession(request);
+		} else {
+			setBean(request, new LoginProcessBean());
+			return getBeanFromSession(request);
 		}
-		return bean;
 	}
+
+	/**
+	 * Store this login process bean in the session.
+	 */
+	public static void setBean(HttpServletRequest request, LoginProcessBean bean) {
+		HttpSession session = request.getSession();
+		session.setAttribute(SESSION_ATTRIBUTE, bean);
+	}
+
+	/**
+	 * Remove the login process bean from the session. If there is no bean, do
+	 * nothing.
+	 */
+	public static void removeBean(HttpServletRequest request) {
+		if (isBean(request)) {
+			request.getSession().removeAttribute(SESSION_ATTRIBUTE);
+		}
+	}
+
+	/**
+	 * Get the bean from the session, or null if there is no bean.
+	 */
+	private static LoginProcessBean getBeanFromSession(
+			HttpServletRequest request) {
+		HttpSession session = request.getSession(false);
+		if (session == null) {
+			return null;
+		}
+
+		Object bean = session.getAttribute(SESSION_ATTRIBUTE);
+		if (bean == null) {
+			return null;
+		}
+
+		if (!(bean instanceof LoginProcessBean)) {
+			log.warn("Tried to get login process bean, but found an instance of "
+					+ bean.getClass().getName() + ": " + bean);
+			return null;
+		}
+
+		return (LoginProcessBean) bean;
+	}
+
+	// ----------------------------------------------------------------------
+	// helper classes
+	// ----------------------------------------------------------------------
 
 	public enum State {
 		NOWHERE, LOGGING_IN, FORCED_PASSWORD_CHANGE, CANCELLED, LOGGED_IN
@@ -88,6 +148,10 @@ public class LoginProcessBean {
 			return new MessageFormat(this.format).format(args);
 		}
 	}
+
+	// ----------------------------------------------------------------------
+	// the bean
+	// ----------------------------------------------------------------------
 
 	/** Where are we in the process? */
 	private State currentState = State.NOWHERE;

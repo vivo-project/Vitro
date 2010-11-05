@@ -5,9 +5,8 @@ package edu.cornell.mannlib.vitro.webapp.controller.edit;
 import static edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State.FORCED_PASSWORD_CHANGE;
 import static edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State.LOGGING_IN;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
-import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Date;
@@ -28,7 +27,6 @@ import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
-import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.AuthenticatorStub;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State;
@@ -331,14 +329,14 @@ public class AuthenticateTest extends AbstractTestClass {
 	private void setProcessBean(State state) {
 		LoginProcessBean processBean = new LoginProcessBean();
 		processBean.setState(state);
-		session.setAttribute(LoginProcessBean.SESSION_ATTRIBUTE, processBean);
+		LoginProcessBean.setBean(request, processBean);
 	}
 
 	private void setProcessBean(State state, String username) {
 		LoginProcessBean processBean = new LoginProcessBean();
 		processBean.setState(state);
 		processBean.setUsername(username);
-		session.setAttribute(LoginProcessBean.SESSION_ATTRIBUTE, processBean);
+		LoginProcessBean.setBean(request, processBean);
 	}
 
 	private void setLoginNameAndPassword(String loginName, String password) {
@@ -363,15 +361,18 @@ public class AuthenticateTest extends AbstractTestClass {
 	}
 
 	private void assertNoProcessBean() {
-		assertEquals("null process bean", null,
-				session.getAttribute(LoginProcessBean.SESSION_ATTRIBUTE));
+		if (LoginProcessBean.isBean(request)) {
+			fail("Process bean: expected <null>, but was <"
+					+ LoginProcessBean.getBean(request) + ">");
+		}
 	}
 
 	private void assertExpectedProcessBean(State state, String username,
 			String infoMessage, String errorMessage) {
-		LoginProcessBean bean = (LoginProcessBean) session
-				.getAttribute(LoginProcessBean.SESSION_ATTRIBUTE);
-		assertNotNull("login process bean", bean);
+		if (!LoginProcessBean.isBean(request)) {
+			fail("login process bean is null");
+		}
+		LoginProcessBean bean = LoginProcessBean.getBean(request);
 		assertEquals("state", state, bean.getState());
 		assertEquals("info message", infoMessage, bean.getInfoMessage());
 		assertEquals("error message", errorMessage, bean.getErrorMessage());
@@ -419,9 +420,10 @@ public class AuthenticateTest extends AbstractTestClass {
 
 	@SuppressWarnings("unused")
 	private void showBeans() {
-		LoginProcessBean processBean = (LoginProcessBean) session
-				.getAttribute(LoginProcessBean.SESSION_ATTRIBUTE);
+		LoginProcessBean processBean = (LoginProcessBean.isBean(request)) ? LoginProcessBean
+				.getBean(request) : null;
 		System.out.println("LoginProcessBean=" + processBean);
+
 		LoginStatusBean statusBean = (LoginStatusBean) session
 				.getAttribute("loginStatus");
 		System.out.println("LoginStatusBean=" + statusBean);
