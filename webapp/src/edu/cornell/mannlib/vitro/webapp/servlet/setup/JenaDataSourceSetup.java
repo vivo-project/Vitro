@@ -45,6 +45,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDaoCon;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaModelUtils;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelectorImpl;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SearchReindexingListener;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SimpleOntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSDBModelMaker;
@@ -77,13 +78,18 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
             
             OntModel unionModel = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC,ModelFactory.createUnion(memModel, inferenceModel));
 
-            SimpleOntModelSelector baseOms = new SimpleOntModelSelector();
+            OntModelSelectorImpl baseOms = new OntModelSelectorImpl();
             baseOms.setApplicationMetadataModel(memModel);
             baseOms.setTBoxModel(memModel);
-            SimpleOntModelSelector inferenceOms = new SimpleOntModelSelector(inferenceModel);
-            SimpleOntModelSelector unionOms = new SimpleOntModelSelector();
+            baseOms.setFullModel(memModel);
+            OntModelSelectorImpl inferenceOms = new OntModelSelectorImpl();
+            inferenceOms.setABoxModel(inferenceModel);
+            inferenceOms.setTBoxModel(inferenceModel);
+            inferenceOms.setFullModel(inferenceModel);
+            OntModelSelectorImpl unionOms = new OntModelSelectorImpl();
             unionOms.setApplicationMetadataModel(unionModel);
             unionOms.setTBoxModel(unionModel);
+            unionOms.setFullModel(unionModel);
         	baseOms.setUserAccountsModel(userAccountsModel);
         	inferenceOms.setUserAccountsModel(userAccountsModel);
         	unionOms.setUserAccountsModel(userAccountsModel);       
@@ -120,14 +126,17 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
         	
             sce.getServletContext().setAttribute("baseOntModel", memModel);
             WebappDaoFactory baseWadf = new WebappDaoFactorySDB(baseOms, dataset, defaultNamespace, null, null);
+            //WebappDaoFactory baseWadf = new WebappDaoFactoryJena(baseOms, defaultNamespace, null, null);
             sce.getServletContext().setAttribute("assertionsWebappDaoFactory",baseWadf);
             
             sce.getServletContext().setAttribute("inferenceOntModel", inferenceModel);
             WebappDaoFactory infWadf = new WebappDaoFactorySDB(inferenceOms, dataset, defaultNamespace, null, null);
+            //WebappDaoFactory infWadf = new WebappDaoFactoryJena(inferenceOms, defaultNamespace, null, null);
             sce.getServletContext().setAttribute("deductionsWebappDaoFactory", infWadf);
             
             sce.getServletContext().setAttribute("jenaOntModel", unionModel);  
             WebappDaoFactory wadf = new WebappDaoFactorySDB(unionOms, dataset, defaultNamespace, null, null);
+            //WebappDaoFactory wadf = new WebappDaoFactoryJena(unionOms, defaultNamespace, null, null);
             sce.getServletContext().setAttribute("webappDaoFactory",wadf);
             
             sce.getServletContext().setAttribute("unionOntModelSelector", unionOms);

@@ -15,6 +15,7 @@ import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
 
 import com.hp.hpl.jena.ontology.OntClass;
+import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntResource;
 import com.hp.hpl.jena.ontology.UnionClass;
 import com.hp.hpl.jena.query.Dataset;
@@ -77,16 +78,17 @@ public class IndividualDaoSDB extends IndividualDaoJena {
             ? getOntModel().createResource(new AnonId(vclassURI.split("#")[1]))
             : ResourceFactory.createResource(vclassURI);
     
-        getOntModel().enterCriticalSection(Lock.READ);
-        try {
-            if (theClass.isAnon() && theClass.canAs(UnionClass.class)) {
-            	UnionClass u = (UnionClass) theClass.as(UnionClass.class);
-            	for (OntClass operand : u.listOperands().toList()) {
-            		VClass vc = new VClassJena(operand, getWebappDaoFactory());
-            		ents.addAll(getIndividualsByVClass(vc));
-            	}
-            } else {
-	            StmtIterator stmtIt = getOntModel().listStatements((Resource) null, RDF.type, theClass);
+        if (theClass.isAnon() && theClass.canAs(UnionClass.class)) {
+        	UnionClass u = (UnionClass) theClass.as(UnionClass.class);
+        	for (OntClass operand : u.listOperands().toList()) {
+        		VClass vc = new VClassJena(operand, getWebappDaoFactory());
+        		ents.addAll(getIndividualsByVClass(vc));
+        	}
+        } else {
+        	OntModel ontModel = getOntModelSelector().getABoxModel();
+        	ontModel.enterCriticalSection(Lock.READ);
+        	try {
+	            StmtIterator stmtIt = ontModel.listStatements((Resource) null, RDF.type, theClass);
 	            try {
 	                while (stmtIt.hasNext()) {
 	                    Statement stmt = stmtIt.nextStatement();
@@ -96,10 +98,11 @@ public class IndividualDaoSDB extends IndividualDaoJena {
 	            } finally {
 	                stmtIt.close();
 	            }
-            }
-        } finally {
-            getOntModel().leaveCriticalSection();
+        	} finally {
+        		ontModel.leaveCriticalSection();
+        	}
         }
+     
 
         java.util.Collections.sort(ents);
 

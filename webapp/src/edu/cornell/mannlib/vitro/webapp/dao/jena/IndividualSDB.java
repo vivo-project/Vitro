@@ -63,7 +63,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
 
 public class IndividualSDB extends IndividualImpl implements Individual {
 
-    private static final Log log = LogFactory.getLog(IndividualJena.class.getName());
+    private static final Log log = LogFactory.getLog(IndividualSDB.class.getName());
     private OntResource ind = null;
     private WebappDaoFactoryJena webappDaoFactory = null;
     private Float _searchBoostJena = null;
@@ -368,7 +368,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	
         dataset.getLock().enterCriticalSection(Lock.READ);
         Model tempModel = ModelFactory.createDefaultModel();
-        OntModel ontModel = ModelFactory.createOntologyModel();
+        OntModel ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
         try {
         	ClosableIterator typeIt = null;
             int portalNumeric = 0;
@@ -413,7 +413,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	String getObjects = null;
     	dataset.getLock().enterCriticalSection(Lock.READ);
     	Model tempModel = ModelFactory.createDefaultModel();
-        OntModel ontModel = ModelFactory.createOntologyModel();
+        OntModel ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
         try {
             ClosableIterator typeIt=null;
             String flagSet = "";
@@ -744,7 +744,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
       
     	this.dataset.getLock().enterCriticalSection(Lock.READ);
     	Model tempModel = ModelFactory.createDefaultModel();
-    	OntModel ontModel = ModelFactory.createOntologyModel();
+    	OntModel ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
         try {
             if (webappDaoFactory.getJenaBaseDao().PRIMARY_LINK != null) {
             	String listPropertyValues =
@@ -865,7 +865,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	
     	dataset.getLock().enterCriticalSection(Lock.READ);
     	Model tempModel = ModelFactory.createDefaultModel();
-    	OntModel ontModel = ModelFactory.createOntologyModel();
+    	OntModel ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
     	try {
     		
     		String valuesOfProperty = 
@@ -873,15 +873,15 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     			"WHERE{ GRAPH ?g { <" + this.individualURI + "> <" + propertyURI + "> ?object} }";
     	    tempModel = QueryExecutionFactory.create(QueryFactory.create(valuesOfProperty), dataset).execConstruct();
     	    ontModel.add(tempModel.listStatements());
-    	    OntResource ontRes = ontModel.getOntResource(this.individualURI);
+    	    Resource ontRes = ontModel.getResource(this.individualURI);
     	    StmtIterator sit = ontRes.listProperties(ontRes.getModel().getProperty(propertyURI));
     	    while (sit.hasNext()) {
     			Statement s = sit.nextStatement();
     			if (!s.getSubject().canAs(OntResource.class) || !s.getObject().canAs(OntResource.class)) {
     			    continue;	
     			}
-    			Individual subj = new IndividualJena((OntResource) s.getSubject().as(OntResource.class), webappDaoFactory);
-    			Individual obj = new IndividualJena((OntResource) s.getObject().as(OntResource.class), webappDaoFactory);
+    			Individual subj = new IndividualSDB(((OntResource) s.getSubject().as(OntResource.class)).getURI(), dataset, webappDaoFactory);
+    			Individual obj = new IndividualSDB(((OntResource) s.getObject().as(OntResource.class)).getURI(), dataset, webappDaoFactory);
     			ObjectProperty op = webappDaoFactory.getObjectPropertyDao().getObjectPropertyByURI(s.getPredicate().getURI());
     			if (subj != null && obj != null && op != null) {
     				ObjectPropertyStatement ops = new ObjectPropertyStatementImpl();
@@ -911,7 +911,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	
     	dataset.getLock().enterCriticalSection(Lock.READ);
     	Model tempModel = ModelFactory.createDefaultModel();
-    	OntModel ontModel = ModelFactory.createOntologyModel();
+    	OntModel ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
     	try {
     		String valuesOfProperty = 
     			"CONSTRUCT{<" + this.individualURI + "> <" + propertyURI + "> ?object}" +
@@ -924,7 +924,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	    	RDFNode value = values.nextNode();
     	    	if (value.canAs(OntResource.class)) {
         	    	relatedIndividuals.add(
-        	    		new IndividualJena((OntResource) value.as(OntResource.class), webappDaoFactory) );  
+        	    		new IndividualSDB(((OntResource) value.as(OntResource.class)).getURI(), dataset, webappDaoFactory) );  
         	    } 
     	    }
     	} finally {
@@ -943,7 +943,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	
     	dataset.getLock().enterCriticalSection(Lock.READ);
     	Model tempModel = ModelFactory.createDefaultModel();
-    	OntModel ontModel = ModelFactory.createOntologyModel();
+    	OntModel ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
     	try {
     		String valueOfProperty = 
     			"CONSTRUCT{<" + this.individualURI + "> <" + propertyURI + "> ?object}" +
@@ -953,7 +953,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	    OntResource ontRes = ontModel.getOntResource(this.individualURI);
     	    RDFNode value = ontRes.getPropertyValue(ontRes.getModel().getProperty(propertyURI));
     	    if (value != null && value.canAs(OntResource.class)) {
-    	    	return new IndividualJena((OntResource) value.as(OntResource.class), webappDaoFactory);  
+    	    	return new IndividualSDB(((OntResource) value.as(OntResource.class)).getURI(), dataset, webappDaoFactory);  
     	    } else {
     	    	return null;
     	    }
@@ -1100,7 +1100,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         		list.add(stmtItr.next().getObject().toString());
         	}
         	Iterator<String> itr = null;
-        	VClassDaoJena checkSubClass = new VClassDaoJena(this.webappDaoFactory);
+        	VClassDao checkSubClass = this.webappDaoFactory.getVClassDao();
         	boolean directTypes = false;
         	String currentType = null;
     	    ArrayList<String> done = new ArrayList<String>();
@@ -1194,7 +1194,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
 	public boolean isMemberOfClassProhibitedFromSearch(ProhibitedFromSearch pfs) {  
 		this.dataset.getLock().enterCriticalSection(Lock.READ);
 		Model tempModel = ModelFactory.createDefaultModel();
-		OntModel ontModel = ModelFactory.createOntologyModel();
+		OntModel ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
 		try {
 			String getTypes = 
 	    		"CONSTRUCT{ <" + this.individualURI + "> <" + RDF.type + "> ?types }\n" +
@@ -1227,7 +1227,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
 
     /**
      * Overriding the base method so that we can do the sorting by arbitrary property here.  An
-     * IndividualJena has a reference back to the model; everything else is just a dumb bean (for now).
+     * IndividualSDB has a reference back to the model; everything else is just a dumb bean (for now).
      */
     @Override
     protected void sortEnts2EntsForDisplay(){ 
@@ -1280,7 +1280,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
                         	val1 = "";
                         }
                     } else {
-                        log.warn( "IndividualJena.sortObjectPropertiesForDisplay passed object property statement with no range entity.");
+                        log.warn( "IndividualSDB.sortObjectPropertiesForDisplay passed object property statement with no range entity.");
                     }
 
                     if( e2 != null ){
@@ -1294,7 +1294,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
                         	val2 = "";
                         }
                     } else {
-                        log.warn( "IndividualJena.sortObjectPropertyStatementsForDisplay() was passed an object property statement with no range entity.");
+                        log.warn( "IndividualSDB.sortObjectPropertyStatementsForDisplay() was passed an object property statement with no range entity.");
                     }
 
                     int rv = 0;

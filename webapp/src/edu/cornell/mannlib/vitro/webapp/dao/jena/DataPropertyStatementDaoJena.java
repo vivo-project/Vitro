@@ -66,9 +66,10 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
         }
         else
         {
-            getOntModel().enterCriticalSection(Lock.READ);
+        	OntModel ontModel = getOntModelSelector().getABoxModel();
+            ontModel.enterCriticalSection(Lock.READ);
             try {
-                Resource ind = getOntModel().getResource(entity.getURI());
+                Resource ind = ontModel.getResource(entity.getURI());
                 List<DataPropertyStatement> edList = new ArrayList<DataPropertyStatement>();
                 StmtIterator stmtIt = ind.listProperties();
                 while( stmtIt.hasNext() )
@@ -103,7 +104,7 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
                 entity.setDataPropertyStatements(edList);
                 return entity;
             } finally {
-                getOntModel().leaveCriticalSection();
+                ontModel.leaveCriticalSection();
             }
         }
     }
