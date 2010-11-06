@@ -21,7 +21,7 @@ import edu.cornell.mannlib.vitro.webapp.reasoner.support.SimpleReasonerTBoxListe
 
 
 public class SimpleReasonerTest {
-	
+
 	@Test
 	public void addTypes(){
 	
@@ -114,8 +114,11 @@ public class SimpleReasonerTest {
 	}
 	
 
-	// this tests added TBox subClassOf and equivalentClass statements.
-	public void addSubClass(){
+	// This tests added TBox subClassOf and equivalentClass statements.
+	// The ABox data that will be the basis for the inference will
+	// be in the ABox graph.
+	@Test
+	public void addSubClass1(){
 				
 		// Create TBox, ABox and Inference models and register
 		// the ABox reasoner listeners with the ABox and TBox
@@ -165,8 +168,57 @@ public class SimpleReasonerTest {
 		
 	}
 
+	
+	// this tests added TBox subClassOf and equivalentClass statements.
+	// The ABox data that is the basis for the inference will be
+	// in the inferred graph
 	@Test
-	// this tests removed TBox subClassOf and equivalentClass statements.
+	public void addSubClass2(){
+				
+		// Create TBox, ABox and Inference models and register
+		// the ABox reasoner listeners with the ABox and TBox
+		// Pellet will compute TBox inferences
+		
+		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
+		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
+        Model inf = ModelFactory.createDefaultModel();
+		
+        SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
+		aBox.register(simpleReasoner);
+		tBox.register(new SimpleReasonerTBoxListener(simpleReasoner));
+
+		// Add classes classes A, B, C and D to the TBox
+	    // D is a subclass of C
+		
+		OntClass classA = tBox.createClass("http://test.vivo/A");
+	    classA.setLabel("class A", "en-US");
+
+		OntClass classB = tBox.createClass("http://test.vivo/B");
+	    classB.setLabel("class B", "en-US");
+
+		OntClass classC = tBox.createClass("http://test.vivo/C");
+	    classC.setLabel("class C", "en-US");
+
+	    OntClass classD = tBox.createClass("http://test.vivo/D");
+	    classD.setLabel("class D", "en-US");
+	    	   
+	    classC.addSubClass(classD);
+	    
+        // Add a statement that individual x is of type D to the ABox
+		Resource ind_x = aBox.createResource("http://test.vivo/x");
+		aBox.add(ind_x, RDF.type, classD);		
+	    
+        // Add a statement that C is a subclass of A to the TBox	
+	    classA.addSubClass(classC);
+		
+		// Verify that "x is of type A" was inferred
+		Statement xisa = ResourceFactory.createStatement(ind_x, RDF.type, classA);	
+		Assert.assertTrue(inf.contains(xisa));		
+	}
+	
+	@Test
+	// this tests incremental reasoning as a result of the removal of a subClassOf 
+	// or equivalentClass statement from the TBox.
 	public void removeSubClass(){
 		// Create TBox, ABox and Inference models and register
 		// the ABox reasoner listeners with the ABox and TBox
@@ -180,7 +232,7 @@ public class SimpleReasonerTest {
 		aBox.register(simpleReasoner);
 		tBox.register(new SimpleReasonerTBoxListener(simpleReasoner));
 
-		// Add classes classes A, B, C, D, E, F, G and H to the TBox.
+		// Add classes A, B, C, D, E, F, G and H to the TBox.
 		// B, C and D are subclasses of A.
 		// E is a subclass of B.
 		// F and G are subclasses of C.
@@ -227,8 +279,9 @@ public class SimpleReasonerTest {
 		
 		// Verify that "x is of type A" is not in the inference graph
 		Statement xisa = ResourceFactory.createStatement(ind_x, RDF.type, classA);	
-		//Assert.assertFalse(inf.contains(xisa));
+		Assert.assertFalse(inf.contains(xisa));
 
+		
 		// Verify that "x is of type B" is in the inference graph
 		Statement xisb = ResourceFactory.createStatement(ind_x, RDF.type, classB);	
 		Assert.assertTrue(inf.contains(xisb));	
@@ -243,10 +296,11 @@ public class SimpleReasonerTest {
 
 		// Verify that "y is of type A" is in the inference graph
 		Statement yisa = ResourceFactory.createStatement(ind_y, RDF.type, classA);	
-		Assert.assertTrue(inf.contains(yisa));		
+		Assert.assertTrue(inf.contains(yisa));
+				
 	}
 	
-
+	
 	// To help in debugging the unit test
 	void printModels(OntModel ontModel) {
 	    
@@ -254,6 +308,5 @@ public class SimpleReasonerTest {
 		System.out.println("---------------------------------------------------");
 		ontModel.writeAll(System.out,"N3",null);
 		
-	}
-	
+	}	
 }

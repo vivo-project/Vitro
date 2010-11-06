@@ -5,9 +5,11 @@ import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.ontology.OntProperty;
 import com.hp.hpl.jena.rdf.listeners.StatementListener;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
@@ -28,6 +30,7 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 public class SimpleReasoner extends StatementListener {
 
 	private static final Log log = LogFactory.getLog(SimpleReasoner.class);
+	//private static final MyTempLogger log = new MyTempLogger();
 	
 	private OntModel tboxModel;
 	private OntModel aboxModel;
@@ -55,7 +58,6 @@ public class SimpleReasoner extends StatementListener {
 	public void addedStatement(Statement stmt) {
 
 		try {
-			log.debug("stmt = " + stmt.toString());
 			
 			if (stmt.getPredicate().equals(RDF.type)) {
 			   addedType(stmt);
@@ -67,7 +69,6 @@ public class SimpleReasoner extends StatementListener {
 		}
 	}
 	
-	
 	/*
 	 * Performs incremental selected ABox reasoning based
 	 * on a removed type assertion (assertion that an individual
@@ -78,7 +79,6 @@ public class SimpleReasoner extends StatementListener {
 	public void removedStatement(Statement stmt) {
 	
 		try {
-			log.debug("stmt = " + stmt.toString());
 			
 			if (stmt.getPredicate().equals(RDF.type)) {
 			   removedType(stmt);
@@ -150,7 +150,7 @@ public class SimpleReasoner extends StatementListener {
 
 		} catch (Exception e) {
 			// don't stop the edit if there's an exception
-			log.error("Exception while adding incremental inferences: ", e);
+			log.error("Exception while removing incremental inferences: ", e);
 		}
 	}
 	
@@ -161,7 +161,9 @@ public class SimpleReasoner extends StatementListener {
 	 * 
 	 */
 	public void addedType(Statement stmt) {
-				
+
+		log.debug("stmt = " + stmt.toString());
+		
 		tboxModel.enterCriticalSection(Lock.READ);
 		
 		try {
@@ -205,6 +207,8 @@ public class SimpleReasoner extends StatementListener {
 	 * 
 	 */
 	public void removedType(Statement stmt) {
+		
+		log.debug("stmt = " + stmt.toString());
 		
 		tboxModel.enterCriticalSection(Lock.READ);
 		
@@ -251,17 +255,16 @@ public class SimpleReasoner extends StatementListener {
 	// of type cls; otherwise returns false.
 	public boolean entailedType(Resource subject, OntClass cls) {
 		
+		log.debug("subject = " + subject.getURI() + " class = " + cls.getURI());
+		
 		aboxModel.enterCriticalSection(Lock.READ);
+		tboxModel.enterCriticalSection(Lock.READ);
 		
 		try {
 			ExtendedIterator<OntClass> iter = cls.listSubClasses(false);
 			while (iter.hasNext()) {
 				
 				OntClass childClass = iter.next();
-				
-				//TODO: do I need this?
-				if (childClass.equals(cls)) continue;
-				
 				Statement stmt = ResourceFactory.createStatement(subject, RDF.type, childClass);
 				if (aboxModel.contains(stmt)) return true;
 			}
@@ -269,86 +272,89 @@ public class SimpleReasoner extends StatementListener {
 			return false;
 		} finally {
 			aboxModel.leaveCriticalSection();
+			tboxModel.leaveCriticalSection();
 		}	
 	}
 	
 	/*
 	 * If added that B is a subclass of A, then find all individuals
-	 * who are typed as B and assert that they are of type A.
-	 * 
+	 * that are typed as B, either in the ABox or in the inferred model
+	 * and assert that they are of type A.
 	 */
 	public void addedSubClass(OntClass subClass, OntClass superClass) {
 		
+		log.debug("subClass = " + subClass.getURI() + " superClass = " + superClass.getURI());
+		
 		aboxModel.enterCriticalSection(Lock.READ);
-						
+		inferenceModel.enterCriticalSection(Lock.WRITE);
+		
 		try {
-				
-			StmtIterator iter = aboxModel.listStatements((Resource) null, RDF.type, subClass);
-
+			OntModel unionModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
+			unionModel.add(aboxModel);
+			unionModel.add(inferenceModel);
+					
+			StmtIterator iter = unionModel.listStatements((Resource) null, RDF.type, subClass);
+	
 			while (iter.hasNext()) {
 				
 				Statement stmt = iter.next();
+				Resource ind = unionModel.getResource(stmt.getSubject().getURI());
+				Statement infStmt = ResourceFactory.createStatement(ind, RDF.type, superClass);
 				
-				OntClass subject = tboxModel.getOntClass((stmt.getSubject()).getURI());
-								
-				Statement infStmt = ResourceFactory.createStatement(subject, RDF.type, superClass);
 				inferenceModel.enterCriticalSection(Lock.WRITE);
 				
-				try {
-					if (!inferenceModel.contains(infStmt)) {
-						log.debug("Adding this inferred statement:  " + infStmt.toString() );
-						inferenceModel.add(infStmt);
-					}
-				} finally {
-					inferenceModel.leaveCriticalSection();
-				}	
+				if (!inferenceModel.contains(infStmt)) {
+					log.debug("Adding this inferred statement:  " + infStmt.toString() );
+					inferenceModel.add(infStmt);
+				} 
 			}
 		} finally {
 			aboxModel.leaveCriticalSection();
+			inferenceModel.leaveCriticalSection();
 		}
 	}
-
 	
 	/*
 	 * If removed that B is a subclass of A, then for each individual
-	 * that is of type B, remove the (inferred) assertion that it is
-	 * of type A, UNLESS the individual is of some type C that is 
-	 * a subClass of A.
+	 * that is of type B, either inferred or in the ABox, then
+	 * remove the inferred assertion that it is of type A,
+	 * UNLESS the individual is of some type C that is 
+	 * a subClass of A (including A itself)
 	 * 
 	 */
 	public void removedSubClass(OntClass subClass, OntClass superClass) {
 		
-		aboxModel.enterCriticalSection(Lock.READ);
-						
-		try {
-				
-			StmtIterator iter = aboxModel.listStatements((Resource) null, RDF.type, subClass);
+		log.debug("subClass = " + subClass.getURI() + ". superClass = " + superClass.getURI());
 
+		aboxModel.enterCriticalSection(Lock.READ);
+		inferenceModel.enterCriticalSection(Lock.WRITE);
+		
+		try {
+			OntModel unionModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
+			unionModel.add(aboxModel);
+			unionModel.add(inferenceModel);
+					
+			StmtIterator iter = unionModel.listStatements((Resource) null, RDF.type, subClass);
+	
 			while (iter.hasNext()) {
 				
 				Statement stmt = iter.next();
+				Resource ind = unionModel.getResource(stmt.getSubject().getURI());
 				
-				OntClass subject = tboxModel.getOntClass((stmt.getSubject()).getURI());
-								
+				if (entailedType(ind,superClass)) continue;
 				
-				if (entailedType(subject,superClass)) {
-					continue;
-				}
+				Statement infStmt = ResourceFactory.createStatement(ind, RDF.type, superClass);
 				
-				Statement infStmt = ResourceFactory.createStatement(subject, RDF.type, superClass);
 				inferenceModel.enterCriticalSection(Lock.WRITE);
 				
-				try {
-					if (inferenceModel.contains(infStmt)) {
-						log.debug("Adding this inferred statement:  " + infStmt.toString() );
-						inferenceModel.remove(infStmt);
-					}
-				} finally {
-					inferenceModel.leaveCriticalSection();
-				}	
+				if (inferenceModel.contains(infStmt)) {
+					log.debug("Removing this inferred statement:  " + infStmt.toString() );
+					inferenceModel.remove(infStmt);
+				} 
 			}
 		} finally {
 			aboxModel.leaveCriticalSection();
+			inferenceModel.leaveCriticalSection();
 		}
 	}
 
@@ -434,9 +440,6 @@ public class SimpleReasoner extends StatementListener {
 			while (iter.hasNext()) {
 				
 				OntProperty childProp = iter.next();
-				
-				//TODO: do I need this?
-				if (childProp.equals(prop)) continue;
 				
 				Statement stmt = ResourceFactory.createStatement(subject, childProp, object);
 				if (aboxModel.contains(stmt)) return true;
