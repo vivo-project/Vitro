@@ -39,6 +39,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerConfigurationLoader;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditSubmission;
@@ -47,6 +48,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.SelectListGenerator;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 import edu.cornell.mannlib.vitro.webapp.web.DisplayVocabulary;
+import freemarker.template.Configuration;
 
 /**
  * This tag will build an option list for individuals of a VClass.
@@ -390,21 +392,25 @@ public class InputElementFormattingTag extends TagSupport {
             if (getId()==null || getId().equals("")){
                 log.error("Error in doStartTag: input element id is blank or not specified.");
             }
-
             
             HttpSession session = pageContext.getSession();
             EditConfiguration editConfig = EditConfiguration.getConfigFromSession(session,(HttpServletRequest) pageContext.getRequest());
             EditSubmission editSub = EditSubmission.getEditSubmissionFromSession(session,editConfig);
             
+            VitroRequest vreq = new VitroRequest((HttpServletRequest)pageContext.getRequest());
             WebappDaoFactory wdf;
             if (editConfig != null) { 
             	wdf = editConfig.getWdfSelectorForOptons().getWdf(
                         (HttpServletRequest)pageContext.getRequest(),
                                             pageContext.getServletContext());
-            } else {
-                VitroRequest vreq = new VitroRequest((HttpServletRequest)pageContext.getRequest());
+            } else {                
                 wdf = vreq.getWebappDaoFactory();
             }
+            
+            //get freemarker Configuration
+            FreemarkerConfigurationLoader fConfigLoader 
+                = FreemarkerConfigurationLoader.getFreemarkerConfigurationLoader(pageContext.getServletContext());            
+            Configuration fmConfig = fConfigLoader.getConfig(vreq);
             
             /* populate the pieces */
             String classStr = doClass();
@@ -423,8 +429,16 @@ public class InputElementFormattingTag extends TagSupport {
                 if (definitionTags) { out.println("</dt>"); }
             }
             
+   
+            // bdc34 2010-11-08 field may be null
             Field field = editConfig == null ? null : editConfig.getField(getId());
-
+            
+              /* bdc34 2010-11-08 : this is odd, I'm having problems with the submit on this next line because
+               * it is not a field in the editConfig.  This wasn't happening before.  */
+//            if( field == null ){
+//                log.error("could not get field for id " + getId());
+//                return SKIP_BODY;
+//            }
             
             // set ProhibitedFromSearch object so picklist doesn't show
             // individuals from classes that should be hidden from list views
@@ -438,14 +452,14 @@ public class InputElementFormattingTag extends TagSupport {
     	     		editConfig.setProhibitedFromSearch(pfs);
         	}
            
-            if( getType().equalsIgnoreCase("date") || 
+        	if( field != null && field.getEditElement() != null ){
+        	    out.print( field.getEditElement().draw(getId(), editConfig, editSub, fmConfig));
+        	}else if( getType().equalsIgnoreCase("date") || 
                     (field != null && field.getRangeDatatypeUri() != null && field.getRangeDatatypeUri().equals(XSD.date.getURI())) ){
                 //if its a dataprop that should be a string override type and use date picker    
                 if (definitionTags) { out.print("<dg>"); }
                 out.print(  generateHtmlForDate(getId(),editConfig,editSub)  );
-                if (definitionTags) { out.print("</dg>"); }
-                
-                
+                if (definitionTags) { out.print("</dg>"); }                                
             } else if ( getType().equalsIgnoreCase("time") || 
             		(field != null && field.getRangeDatatypeUri() != null && field.getRangeDatatypeUri().equals(XSD.time.getURI()))  ) {
             	if (definitionTags) { out.print("<dd>"); }
@@ -622,6 +636,10 @@ public class InputElementFormattingTag extends TagSupport {
         }
         return SKIP_BODY;
     }
+    
+
+    
+  
     
     private Map<String, String> getTypesForCreateNew(
 			EditConfiguration editConfig, WebappDaoFactory wdf) {    	    

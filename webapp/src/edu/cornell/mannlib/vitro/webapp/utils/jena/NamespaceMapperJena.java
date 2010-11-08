@@ -210,4 +210,7 @@ public class NamespaceMapperJena extends StatementListener implements
 		return namespaceToPrefixMap.get(namespace);
 	}
 	
+	public String toString(){
+	    return namespaceToPrefixMap.toString();
+	}
 }

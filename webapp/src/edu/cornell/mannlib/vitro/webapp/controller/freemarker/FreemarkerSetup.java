@@ -26,6 +26,8 @@ public class FreemarkerSetup implements ServletContextListener {
         FreemarkerComponentGenerator.setServletContext(sc);
 		UrlBuilder.contextPath = sc.getContextPath();
 		
+		FreemarkerConfigurationLoader loader = new FreemarkerConfigurationLoader(sc);
+		
 		log.info("Freemarker templating system initialized.");
 	}
 

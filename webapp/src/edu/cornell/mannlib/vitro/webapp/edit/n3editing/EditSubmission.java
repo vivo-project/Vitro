@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Calendar;
 
 import javax.servlet.http.HttpSession;
 
@@ -28,6 +27,7 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.vocabulary.XSD;
 
 import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
+import edu.cornell.mannlib.vitro.webapp.edit.elements.EditElement;
 
 public class EditSubmission {
     private String editKey;
@@ -108,7 +108,9 @@ public class EditSubmission {
             	} else {
             		log.debug("time fields for parameter " + var + " were not on form" );
             	}
-        	} else {
+        	} else if( field.getEditElement() != null ){        	    
+        	    literalsFromForm.putAll( getLiteralForField(var,editConfig,queryParameters));
+            }else{
             	String[] valuesArray = queryParameters.get(var); 
                 List<String> valueList = (valuesArray != null) ? Arrays.asList(valuesArray) : null;                
                 if( valueList != null && valueList.size() > 0 ) {
@@ -152,6 +154,21 @@ public class EditSubmission {
         	}
         }
         
+    }
+
+    /**
+     * Get the literals for the field using the field's special editElement.
+     * @param var
+     * @param editConfig
+     * @param queryParameters
+     * @return
+     */
+    private Map<? extends String, ? extends Literal> getLiteralForField(
+            String var, EditConfiguration editConfig,
+            Map<String, String[]> queryParameters) {
+        Field field = editConfig.getField(var);
+        EditElement ee = field.getEditElement();
+        return ee.getLiterals(var, editConfig, queryParameters);
     }
 
     public EditSubmission(Map<String, String[]> queryParameters, EditConfiguration editConfig, 

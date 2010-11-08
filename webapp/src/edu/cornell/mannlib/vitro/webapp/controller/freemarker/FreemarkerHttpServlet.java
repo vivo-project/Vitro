@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -11,7 +10,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,7 +20,6 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.rdf.model.Model;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
-import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.config.RevisionInfoBean;
@@ -37,15 +34,10 @@ import edu.cornell.mannlib.vitro.webapp.web.PortalWebUtil;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.files.Scripts;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.files.Stylesheets;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu.TabMenu;
-import freemarker.cache.ClassTemplateLoader;
-import freemarker.cache.FileTemplateLoader;
-import freemarker.cache.MultiTemplateLoader;
-import freemarker.cache.TemplateLoader;
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.ext.servlet.AllHttpScopesHashModel;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
-import freemarker.template.TemplateException;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
 
@@ -75,7 +67,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     }
     
     public void doGet( HttpServletRequest request, HttpServletResponse response )
-		throws IOException, ServletException {
+        throws IOException, ServletException {
         
         super.doGet(request,response);   
         
@@ -95,116 +87,20 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
 
 	        doResponse(vreq, response, responseValues);	        
        
-	    } catch (Throwable e) {
-	        log.error("FreeMarkerHttpServlet could not forward to view.", e);
-	    }
-	}
+        } catch (Throwable e) {
+            log.error("FreeMarkerHttpServlet could not forward to view.", e);
+        }
+    }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         doGet(request, response);
     }
    
-    protected Configuration getConfig(VitroRequest vreq) {       
-        String themeDir = getThemeDir(vreq.getPortal());        
-        return getConfigForTheme(themeDir);
-    }
-
-    protected Configuration getConfigForTheme(String themeDir) {
-        
-        // The template loader is theme-specific because it specifies the theme template directory as a location to
-        // load templates from. Thus configurations are associated with themes rather than portals.
-        @SuppressWarnings("unchecked")
-        Map<String, Configuration> themeToConfigMap = (Map<String, Configuration>) (getServletContext().getAttribute("themeToConfigMap"));
-        
-        if( themeToConfigMap == null ) {
-        	log.error("The templating system is not configured correctly. Make sure that you have the FreemarkerSetup context listener in your web.xml.");
-        	// We'll end up with a blank page as well as errors in the log, which is probably fine. 
-        	// Doesn't seem like we should throw a checked exception in this case.
-        	return null;   	
-        } else if (themeToConfigMap.containsKey(themeDir)) {
-            return themeToConfigMap.get(themeDir);
-        } else {
-            Configuration config = getNewConfig(themeDir);
-            themeToConfigMap.put(themeDir, config);
-            return config;
-        }
-    }
-    
-    private Configuration getNewConfig(String themeDir) {
-        
-        Configuration config = new Configuration();
-        
-        String buildEnv = ConfigurationProperties.getProperty("Environment.build");
-        log.debug("Current build environment: " + buildEnv);
-        if ("development".equals(buildEnv)) { // Set Environment.build = development in deploy.properties
-            log.debug("Disabling Freemarker template caching in development build.");
-            config.setTemplateUpdateDelay(0); // no template caching in development 
-        } else {
-            int delay = 60;
-            log.debug("Setting Freemarker template cache update delay to " + delay + ".");            
-            config.setTemplateUpdateDelay(delay); // in seconds; Freemarker default is 5
-        }
-
-        // Specify how templates will see the data model. 
-        // The default wrapper exposes set methods unless exposure level is set.
-        // By default we want to block exposure of set methods. 
-        BeansWrapper wrapper = new DefaultObjectWrapper();
-        wrapper.setExposureLevel(BeansWrapper.EXPOSE_PROPERTIES_ONLY);
-        config.setObjectWrapper(wrapper);
-
-        // Set some formatting defaults. These can be overridden at the template
-        // or environment (template-processing) level, or for an individual
-        // token by using built-ins.
-        config.setLocale(java.util.Locale.US);
-        
-        String dateFormat = "M/d/yyyy";
-        config.setDateFormat(dateFormat);
-        String timeFormat = "hh:mm a";
-        config.setTimeFormat(timeFormat);
-        config.setDateTimeFormat(dateFormat + " " + timeFormat);
-        
-        //config.setNumberFormat("#,##0.##");
-        
-        try {
-            config.setSetting("url_escaping_charset", "ISO-8859-1");
-        } catch (TemplateException e) {
-            log.error("Error setting value for url_escaping_charset.");
-        }
-        
-        config.setTemplateLoader(getTemplateLoader(config, themeDir));
-        
-        return config;
-    }
-
-    // Define template locations. Template loader will look first in the theme-specific
-    // location, then in the vitro location.
-    protected final TemplateLoader getTemplateLoader(Configuration config, String themeDir) {
-        
-        ServletContext context = getServletContext();
-        String themeTemplatePath = context.getRealPath(themeDir) + "/templates";
-        String vitroTemplatePath = context.getRealPath("/templates/freemarker");
-        
-        try {
-            TemplateLoader[] loaders;
-            FlatteningTemplateLoader vitroFtl = new FlatteningTemplateLoader(new File(vitroTemplatePath));
-            ClassTemplateLoader ctl = new ClassTemplateLoader(getClass(), "");
-            
-            File themeTemplateDir = new File(themeTemplatePath);
-            // Handle the case where there's no theme template directory gracefully
-            if (themeTemplateDir.exists()) {
-                FileTemplateLoader themeFtl = new FileTemplateLoader(themeTemplateDir);
-                loaders = new TemplateLoader[] { themeFtl, vitroFtl, ctl };
-            } else {
-                loaders = new TemplateLoader[] { vitroFtl, ctl };
-            }
-            MultiTemplateLoader mtl = new MultiTemplateLoader(loaders);
-            return mtl;
-        } catch (IOException e) {
-            log.error("Error creating template loaders");
-            return null;
-        }
-        
+    protected Configuration getConfig(VitroRequest vreq) {               
+        FreemarkerConfigurationLoader loader = 
+            FreemarkerConfigurationLoader.getFreemarkerConfigurationLoader(getServletContext());
+        return loader.getConfig(vreq);
     }
     
     protected boolean requiresLogin() {
@@ -357,7 +253,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     // We can't use shared variables in the Freemarker configuration to store anything 
     // except theme-specific data, because multiple portals or apps might share the same theme. So instead
     // we'll get all the shared variables here, and put them in both root and body maps.
-    protected Map<String, Object> getSharedVariables(VitroRequest vreq, Map<String, Object> bodyMap) {
+    public Map<String, Object> getSharedVariables(VitroRequest vreq, Map<String, Object> bodyMap) {
         
         Map<String, Object> map = new HashMap<String, Object>();
         
@@ -544,20 +440,20 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         return copyright;
     }
     
-	private final Map<String, Object> getRevisionInfo(UrlBuilder urlBuilder) {
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("label", RevisionInfoBean.getBean(getServletContext())
-				.getReleaseLabel());
-		map.put("moreInfoUrl", urlBuilder.getPortalUrl("/revisionInfo"));
-		return map;
-	}
+    private final Map<String, Object> getRevisionInfo(UrlBuilder urlBuilder) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("label", RevisionInfoBean.getBean(getServletContext())
+                .getReleaseLabel());
+        map.put("moreInfoUrl", urlBuilder.getPortalUrl("/revisionInfo"));
+        return map;
+    }
 
     // Subclasses may override. This serves as a default.
     protected String getTitle(String siteName) {        
         return siteName;
     }
 
-    protected StringWriter mergeToTemplate(String templateName, Map<String, Object> map, Configuration config) {   	
+    protected StringWriter mergeToTemplate(String templateName, Map<String, Object> map, Configuration config) {    
         FreemarkerHelper helper = new FreemarkerHelper(config);
         return helper.mergeToTemplate(templateName, map);
     }
@@ -567,7 +463,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     }
 
     protected String mergeMapToTemplate(String templateName, Map<String, Object> map, Configuration config) {
-    	return mergeToTemplate(templateName, map, config).toString();
+        return mergeToTemplate(templateName, map, config).toString();
     }
     
     protected String mergeResponseValuesToTemplate(ResponseValues values, Configuration config) {
