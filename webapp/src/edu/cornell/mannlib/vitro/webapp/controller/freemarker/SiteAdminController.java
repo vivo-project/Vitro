@@ -27,13 +27,15 @@ public class SiteAdminController extends FreemarkerHttpServlet {
 	
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(SiteAdminController.class);
-
     private static final String TEMPLATE_DEFAULT = "siteAdmin-main.ftl";
+    
     @Override
 	public String getTitle(String siteName) {
         return siteName + " Site Administration";
 	}
 
+    // Uncomment this once the login page has been separated from the site admin page.
+    // You also need to change UrlBuilder.Route.LOGIN path to "/login".
 //    @Override
 //    protected boolean requiresLogin() {
 //        // User must be logged in to view this page.

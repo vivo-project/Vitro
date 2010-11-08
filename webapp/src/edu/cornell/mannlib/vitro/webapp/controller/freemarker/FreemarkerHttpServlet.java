@@ -76,10 +76,6 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     
     public void doGet( HttpServletRequest request, HttpServletResponse response )
 		throws IOException, ServletException {
-  
-        if (requiresLogin() && !checkLoginStatus(request, response)) {
-            return;
-        }
         
         super.doGet(request,response);   
         
@@ -89,7 +85,14 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
 	        Configuration config = getConfig(vreq);
 	        vreq.setAttribute("freemarkerConfig", config);
 	        
-	        ResponseValues responseValues = processRequest(vreq);
+	        ResponseValues responseValues;
+	        
+	        if (requiresLogin() && !checkLoginStatus(request, response)) {
+	            responseValues = new RedirectResponseValues(UrlBuilder.Route.LOGIN.path());
+	        } else {
+	            responseValues = processRequest(vreq);
+	        }
+
 	        doResponse(vreq, response, responseValues);	        
        
 	    } catch (Throwable e) {
@@ -207,6 +210,9 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     protected boolean requiresLogin() {
         // By default, user does not need to be logged in to view pages.
         // Subclasses that require login to process their page will override to return true.
+        // NB This method can't be static, because then the superclass method gets called rather than
+        // the subclass method. For the same reason, it can't refer to a static or instance field
+        // REQUIRES_LOGIN which is overridden in the subclass.
         return false;
     }
     
