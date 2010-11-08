@@ -34,6 +34,12 @@ public class SiteAdminController extends FreemarkerHttpServlet {
         return siteName + " Site Administration";
 	}
 
+//    @Override
+//    protected boolean requiresLogin() {
+//        // User must be logged in to view this page.
+//        return true;
+//    }
+    
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
 

@@ -34,7 +34,6 @@ import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 import edu.cornell.mannlib.vitro.webapp.web.BreadCrumbsUtil;
 import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 import edu.cornell.mannlib.vitro.webapp.web.PortalWebUtil;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.files.Scripts;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.files.Stylesheets;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu.TabMenu;
@@ -43,6 +42,7 @@ import freemarker.cache.FileTemplateLoader;
 import freemarker.cache.MultiTemplateLoader;
 import freemarker.cache.TemplateLoader;
 import freemarker.ext.beans.BeansWrapper;
+import freemarker.ext.servlet.AllHttpScopesHashModel;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.TemplateException;
@@ -77,6 +77,10 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     public void doGet( HttpServletRequest request, HttpServletResponse response )
 		throws IOException, ServletException {
   
+        if (requiresLogin() && !checkLoginStatus(request, response)) {
+            return;
+        }
+        
         super.doGet(request,response);   
         
     	try {
@@ -200,6 +204,12 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         
     }
     
+    protected boolean requiresLogin() {
+        // By default, user does not need to be logged in to view pages.
+        // Subclasses that require login to process their page will override to return true.
+        return false;
+    }
+    
     // Subclasses will override
     protected ResponseValues processRequest(VitroRequest vreq) {
         return null;
@@ -266,6 +276,8 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         
         // root is the map used to create the page shell - header, footer, menus, etc.
         Map<String, Object> root = new HashMap<String, Object>(sharedVariables);
+        //AllHttpScopesHashModel root = new AllHttpScopesHashModel(null, null, vreq);
+        
         root.putAll(getPageTemplateValues(vreq));
         // Tell the template and any directives it uses that we're processing a page template.
         root.put("templateType", "page");
@@ -589,11 +601,6 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     }
 
     protected static interface ResponseValues {
-//        enum ResponseType {
-//            TEMPLATE, REDIRECT, FORWARD, EXCEPTION
-//        }
-//
-//        ResponseType getType();
 
         String getTemplateName();
 
@@ -676,11 +683,6 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
             return this;
         }
 
-//        @Override
-//        public ResponseType getType() {
-//            return ResponseType.TEMPLATE;
-//        }
-
         @Override
         public Map<String, Object> getMap() {
             return Collections.unmodifiableMap(this.map);
@@ -729,11 +731,6 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
             this.redirectUrl = redirectUrl;
         }
         
-//        @Override
-//        public ResponseType getType() {
-//            return ResponseType.REDIRECT;
-//        }
-
         @Override
         public String getRedirectUrl() {
             return this.redirectUrl;
@@ -781,11 +778,6 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
             super(statusCode);
             this.forwardUrl = forwardUrl;
         }
-        
-//        @Override
-//        public ResponseType getType() {
-//            return ResponseType.FORWARD;
-//        }
 
         @Override
         public String getForwardUrl() {
@@ -856,11 +848,6 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
             super(templateName, map, statusCode);
             this.cause = cause;
         }
-        
-//        @Override
-//        public ResponseType getType() {
-//            return ResponseType.EXCEPTION;
-//        }
 
         @Override
         public Throwable getException() {
