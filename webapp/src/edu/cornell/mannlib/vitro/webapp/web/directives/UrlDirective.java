@@ -60,7 +60,7 @@ public class UrlDirective extends BaseTemplateDirectiveModel {
         out.write(url);
     }
 
-    public String help(Configuration config) {
+    public String help(Environment env) {
         Map<String, Object> map = new HashMap<String, Object>();
         
         String name = getDirectiveName();
@@ -78,7 +78,7 @@ public class UrlDirective extends BaseTemplateDirectiveModel {
         examples.add("<@" + name + " path=\"/images/dummyImages/person.thumbnail.jpg\" />");
         map.put("examples", examples);
         
-        return mergeToHelpTemplate(map, config);
+        return mergeToHelpTemplate(map, env);
     }
 
     

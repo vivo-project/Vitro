@@ -97,16 +97,6 @@ public class TestController extends FreemarkerHttpServlet {
         return "Test";
     }
     
-    protected String getBody(VitroRequest vreq, Map<String, Object> body, Configuration config) {
-        
-
-          
-        // Create the template to see the examples live.
-        String bodyTemplate = "test.ftl";             
-        return mergeMapToTemplate(bodyTemplate, body, config);
-
-    }
-    
     private void getBerries(Map<String, Object> body) {
         body.put("berries", "strawberries, raspberries, blueberries");
     }

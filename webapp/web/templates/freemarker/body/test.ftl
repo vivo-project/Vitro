@@ -46,13 +46,11 @@
 
 <p><strong>Berries: </strong>${berries}</p>
 
-
 <@dump var="now" />
 <@dump var="urls" />
 <@dump var="fruit" />
 <@dump var="trueStatement" />
 <@dump var="zoo1" />
-
 
 ${stylesheets.addFromTheme("/css/sstest.css", "/css/sstest2.css")}
 ${scripts.addFromTheme("/js/jstest.js")}
@@ -67,5 +65,5 @@ ${scripts.add("/js/script1.js", "/js/script2.js", "/js/script3.js")}
 
 <@describe var="scripts" />
 
-
+<@describe var="headScripts" />
 

@@ -162,7 +162,7 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 
 		// Add the values that we got, and merge to the template.
 		body.putAll(values.getMap());
-		return mergeMapToTemplate(values.getTemplateName(), body, config);
+		return processTemplateToString(values.getTemplateName(), body, config, vreq);
 	}
 
 	/**

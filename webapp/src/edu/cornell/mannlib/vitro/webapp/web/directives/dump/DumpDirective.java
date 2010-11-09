@@ -61,7 +61,7 @@ public class DumpDirective extends BaseTemplateDirectiveModel {
     }
     
     
-    public String help(Configuration config) {
+    public String help(Environment env) {
         Map<String, Object> map = new HashMap<String, Object>();
         
         String name = getDirectiveName();
@@ -79,7 +79,7 @@ public class DumpDirective extends BaseTemplateDirectiveModel {
         examples.add("<@" + name + " var=\"urls\" />");
         map.put("examples", examples);
         
-        return mergeToHelpTemplate(map, config);
+        return mergeToHelpTemplate(map, env);
     }
 
 }

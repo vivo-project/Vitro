@@ -124,27 +124,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
             if (statusCode > 0) {
                 response.setStatus(statusCode);
             }
-            
-//            switch (values.getType()) {
-//            case TEMPLATE:
-//                doTemplate(vreq, response, values);
-//                break;
-//            case REDIRECT:
-//                doRedirect(vreq, response, values);
-//                break;
-//            case FORWARD:
-//                doForward(vreq, response, values);
-//                break;
-//            case EXCEPTION:
-//                doException(vreq, response, values);
-//                break;
-//            }  
-            
-            // RY Discuss with Jim - doing this instead of the switch allows us to get rid of the
-            // type field. We could also cast the values to the appropriate type: e.g.,
-            // doException(vreq, response, (ExceptionResponseValues) values
-            // then method signature is doException(VitroRequest vreq, HttpServletResponse response, ExceptionResponseValues values)
-            // which seems to make more sense
+
             if (values instanceof ExceptionResponseValues) {
                 doException(vreq, response, values);
             } else if (values instanceof TemplateResponseValues) {
@@ -157,11 +137,9 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
                 doRdf(vreq, response, values);
             }
         } catch (ServletException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            log.error("ServletException in doResponse()", e);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            log.error("IOException in doResponse()", e);
         }
      
     }
@@ -178,7 +156,6 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         
         // root is the map used to create the page shell - header, footer, menus, etc.
         Map<String, Object> root = new HashMap<String, Object>(sharedVariables);
-        //AllHttpScopesHashModel root = new AllHttpScopesHashModel(null, null, vreq);
         
         root.putAll(getPageTemplateValues(vreq));
         // Tell the template and any directives it uses that we're processing a page template.
@@ -196,7 +173,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
             body.putAll(bodyMap);
             // Tell the template and any directives it uses that we're processing a body template.
             body.put("templateType", "body");
-            bodyString = mergeMapToTemplate(bodyTemplate, body, config);            
+            bodyString = processTemplateToString(bodyTemplate, body, config, vreq); 
         } else {
             // The subcontroller has not defined a body template. All markup for the page 
             // is specified in the main page template.
@@ -204,7 +181,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         }
         root.put("body", bodyString);
         
-        writePage(root, config, response);       
+        writePage(root, config, vreq, response);       
     }
     
     protected void doRedirect(HttpServletRequest request, HttpServletResponse response, ResponseValues values) 
@@ -361,6 +338,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         map.put("dumpAll", new edu.cornell.mannlib.vitro.webapp.web.directives.dump.DumpAllDirective());  
         map.put("help", new edu.cornell.mannlib.vitro.webapp.web.directives.dump.HelpDirective()); 
         //map.put("url", new edu.cornell.mannlib.vitro.webapp.web.directives.UrlDirective()); 
+        map.put("widget", new edu.cornell.mannlib.vitro.webapp.web.directives.widgets.BaseWidgetDirective());
         return map;
     }
     
@@ -453,29 +431,33 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         return siteName;
     }
 
-    protected StringWriter mergeToTemplate(String templateName, Map<String, Object> map, Configuration config) {    
-        FreemarkerHelper helper = new FreemarkerHelper(config);
-        return helper.mergeToTemplate(templateName, map);
+    protected StringWriter processTemplate(String templateName, Map<String, Object> map, Configuration config, 
+            HttpServletRequest request) {    
+        FreemarkerHelper helper = new FreemarkerHelper(config, request, getServletContext());
+        return helper.processTemplate(templateName, map);
     }
     
-    protected StringWriter mergeToTemplate(ResponseValues values, Configuration config) {
-        return mergeToTemplate(values.getTemplateName(), values.getMap(), config);
-    }
-
-    protected String mergeMapToTemplate(String templateName, Map<String, Object> map, Configuration config) {
-        return mergeToTemplate(templateName, map, config).toString();
+    protected StringWriter processTemplate(ResponseValues values, Configuration config, HttpServletRequest request) {
+        return processTemplate(values.getTemplateName(), values.getMap(), config, request);
     }
     
-    protected String mergeResponseValuesToTemplate(ResponseValues values, Configuration config) {
-        return mergeMapToTemplate(values.getTemplateName(), values.getMap(), config);
+    // In fact, we can put StringWriter objects directly into the data model, so perhaps we should eliminate the processTemplateToString() methods.
+    protected String processTemplateToString(String templateName, Map<String, Object> map, Configuration config, 
+            HttpServletRequest request) {
+        return processTemplate(templateName, map, config, request).toString();
+    }
+  
+    protected String processTemplateToString(ResponseValues values, Configuration config, HttpServletRequest request) {
+        return processTemplate(values, config, request).toString();
     }
     
-    protected void writePage(Map<String, Object> root, Configuration config, HttpServletResponse response) {   
-        writeTemplate(getPageTemplateName(), root, config, response);                   
+    protected void writePage(Map<String, Object> root, Configuration config, HttpServletRequest request, HttpServletResponse response) {   
+        writeTemplate(getPageTemplateName(), root, config, request, response);                   
     }
     
-    protected void writeTemplate(String templateName, Map<String, Object> map, Configuration config, HttpServletResponse response) {       
-        StringWriter sw = mergeToTemplate(templateName, map, config);          
+    protected void writeTemplate(String templateName, Map<String, Object> map, Configuration config, 
+            HttpServletRequest request, HttpServletResponse response) {       
+        StringWriter sw = processTemplate(templateName, map, config, request);          
         write(sw, response);
     }
     

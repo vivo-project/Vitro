@@ -36,16 +36,16 @@ public class FreemarkerComponentGenerator extends FreemarkerHttpServlet {
         Map<String, Object> root = getSharedVariables(vreq, new HashMap<String, Object>()); 
         root.putAll(getPageTemplateValues(vreq));  
         
-        request.setAttribute("ftl_identity", get("identity", root, config));
-        request.setAttribute("ftl_menu", get("menu", root, config));
-        request.setAttribute("ftl_search", get("search", root, config));
-        request.setAttribute("ftl_footer", get("footer", root, config));
-        request.setAttribute("ftl_googleAnalytics", get("googleAnalytics", root, config));
+        request.setAttribute("ftl_identity", get("identity", root, config, vreq));
+        request.setAttribute("ftl_menu", get("menu", root, config, vreq));
+        request.setAttribute("ftl_search", get("search", root, config, vreq));
+        request.setAttribute("ftl_footer", get("footer", root, config, vreq));
+        request.setAttribute("ftl_googleAnalytics", get("googleAnalytics", root, config, vreq));
     }
 
-    private String get(String templateName, Map<String, Object> root, Configuration config) {
+    private String get(String templateName, Map<String, Object> root, Configuration config, HttpServletRequest request) {
         templateName += ".ftl";
-        return mergeToTemplate(templateName, root, config).toString();
+        return processTemplate(templateName, root, config, request).toString();
     }
     
     // RY We need the servlet context in getConfig(). For some reason using the method inherited from
@@ -57,7 +57,5 @@ public class FreemarkerComponentGenerator extends FreemarkerHttpServlet {
     protected static void setServletContext(ServletContext sc) {
         context = sc;
     }
-  
-
 
 }

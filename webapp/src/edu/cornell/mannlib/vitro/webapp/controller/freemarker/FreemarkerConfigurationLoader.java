@@ -28,7 +28,7 @@ public class FreemarkerConfigurationLoader {
 
     private ServletContext context;
     
-    public FreemarkerConfigurationLoader( ServletContext context){
+    public FreemarkerConfigurationLoader(ServletContext context){
         this.context = context;
         context.setAttribute("FreemarkerConfigurationLoader", this);
     }
