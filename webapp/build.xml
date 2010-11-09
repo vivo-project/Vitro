@@ -259,7 +259,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 	<!-- ================================= 
           target: revisionInfo              
          ================================= -->
-	<target name="revisionInfo" depends="test" description="--> Store revision info in build">
+	<target name="revisionInfo" depends="test" unless="skipinfo" description="--> Store revision info in build">
 		<property name="revisionInfo.product.dir" location="${ant.file.vitroCore}/.." />
 		<property name="revisionInfo.build.file" location="${war-resources.dir}/revisionInfo.txt" />
 

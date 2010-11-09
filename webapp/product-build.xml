@@ -193,7 +193,7 @@
 	<!-- - - - - - - - - - - - - - - - - - 
           target: productRevisionInfo                      
          - - - - - - - - - - - - - - - - - -->
-    <target name="productRevisionInfo" depends="productTest">
+    <target name="productRevisionInfo" depends="productTest" unless="skipinfo">
 		<property name="revisionInfo.product.dir" location="${ant.file}/.." />
 		<property name="revisionInfo.build.file" location="${war-resources.dir}/revisionInfo.txt" />
 
