@@ -72,6 +72,44 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     private String individualURI = null; 
     private Model model = null;
     
+    public IndividualSDB(String individualURI, Dataset dataset, WebappDaoFactoryJena wadf, Model initModel) {
+    	this.individualURI = individualURI;
+    	this.dataset = dataset;
+      
+    	try {
+	    	initModel.getLock().enterCriticalSection(Lock.READ);
+	    	String getStatements = 
+	    		"CONSTRUCT " +
+	    		"{ <"+individualURI+">  <" + RDFS.label.getURI() + "> ?ooo. \n" +
+	    		   "<"+individualURI+">  a ?type }" +
+	    		 "WHERE {" +
+	    		 "{ \n" +
+	    		 	"<"+individualURI+">  <" + RDFS.label.getURI() + "> ?ooo }  \n" +
+	    		 	" UNION { <"+individualURI+"> a ?type } \n" +
+	    		 "}"; 
+    		this.model = QueryExecutionFactory.create(QueryFactory.create(getStatements), initModel).execConstruct();
+    	} finally {
+    		initModel.getLock().leaveCriticalSection();
+    	}
+    	
+    	OntModel ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, model);
+    	this.ind = ontModel.createOntResource(individualURI);  
+    	
+    	if (ind != null) {
+	        if (ind.isAnon()) {
+	        	this.setNamespace(VitroVocabulary.PSEUDO_BNODE_NS);
+	        	this.setLocalName(ind.getId().toString());
+	        } else {
+	        	this.URI = ind.getURI();
+	        	this.namespace = ind.getNameSpace();
+	        	this.localName = ind.getLocalName();
+	        }
+    	} else if (individualURI != null) {
+    		log.warn("Null individual returned for URI " + individualURI);
+    	}
+        this.webappDaoFactory = wadf;
+    }
+    
     public IndividualSDB(String individualURI, Dataset dataset, WebappDaoFactoryJena wadf) {
     	this.individualURI = individualURI;
     	this.dataset = dataset;
@@ -80,20 +118,19 @@ public class IndividualSDB extends IndividualImpl implements Individual {
 	    	this.dataset.getLock().enterCriticalSection(Lock.READ);
 	    	String getStatements = 
 	    		"CONSTRUCT " +
-	    		"{ <"+individualURI+">  <" + RDFS.label.getURI() + "> ?o }" +
-	    		 "WHERE" +
-	    		 "{ GRAPH ?g { <"+individualURI+">  <" + RDFS.label.getURI() + "> ?o } }"; 
+	    		"{ <"+individualURI+">  <" + RDFS.label.getURI() + "> ?ooo. \n" +
+	    		   "<"+individualURI+">  a ?type }" +
+	    		 "WHERE {" +
+	    		 "{ GRAPH ?g { \n" +
+	    		 	"<"+individualURI+">  <" + RDFS.label.getURI() + "> ?ooo } } \n" +
+	    		 	" UNION { GRAPH <http://vitro.mannlib.cornell.edu/default/vitro-kb-2> { <"+individualURI+"> a ?type } } \n" +
+	    		 "}"; 
     		model = QueryExecutionFactory.create(QueryFactory.create(getStatements), dataset).execConstruct();
     	} finally {
     		this.dataset.getLock().leaveCriticalSection();
     	}
     	
-    	if (model == null) {
-    		model = ModelFactory.createDefaultModel();
-    	}
-    	
     	OntModel ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, model);
-    	ontModel.add(model.listStatements());
     	
     	this.ind = ontModel.createOntResource(individualURI);  
     	
@@ -156,8 +193,9 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         if (this.vClassURI != null) {
             return vClassURI;
         } else {
-        	
-        	this.dataset.getLock().enterCriticalSection(Lock.READ);
+        	List<VClass> clist = getVClasses(true);
+        	if (true) { return (clist.size() > 0) ? clist.get(0).getURI() : null; }
+        	//this.dataset.getLock().enterCriticalSection(Lock.READ);
         	
         	String getTypes = 
         		"CONSTRUCT{ <" + this.individualURI + "> <" + RDF.type + "> ?types }\n" +
@@ -223,8 +261,8 @@ public class IndividualSDB extends IndividualImpl implements Individual {
                 }
         	} finally {
         		
-        		this.dataset.getLock().leaveCriticalSection();
-        		tempModel.close();
+        		//this.dataset.getLock().leaveCriticalSection();
+        		//tempModel.close();
         	}
         	return this.vClassURI;
         }
@@ -234,7 +272,8 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         if (this.vClass != null) {
             return this.vClass;
         } else {
-        	 
+        	List<VClass> clist = getVClasses(true);
+        	if (true) { return (clist.size() > 0) ? clist.get(0) : null ; } 
         	this.dataset.getLock().enterCriticalSection(Lock.READ);
         	String getTypes = 
         		"CONSTRUCT{ <" + this.individualURI + "> <" + RDF.type + "> ?types }\n" +
@@ -379,7 +418,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         			"WHERE{ GRAPH ?g { <" + this.individualURI + "> <" + RDF.type + "> ?object} }";
         		tempModel = QueryExecutionFactory.create(QueryFactory.create(getObjects), dataset).execConstruct();
         		ontModel.add(tempModel.listStatements());
-        	    OntResource ontRes = ontModel.getOntResource(this.individualURI);
+        	    OntResource ontRes = ontModel.createOntResource(this.individualURI);
         	    typeIt = ontRes.getOntModel().listStatements(ontRes, RDF.type ,(String) null);
         	    while (typeIt.hasNext()) {
                     Statement stmt = (Statement) typeIt.next();
@@ -423,7 +462,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         			"WHERE{ GRAPH ?g { <" + this.individualURI + "> <" + RDF.type + "> ?object} }";
         		tempModel = QueryExecutionFactory.create(QueryFactory.create(getObjects), dataset).execConstruct();
         		ontModel.add(tempModel.listStatements());
-        	    OntResource ontRes = ontModel.getOntResource(this.individualURI);
+        	    OntResource ontRes = ontModel.createOntResource(this.individualURI);
         	    typeIt = ontRes.getOntModel().listStatements(ontRes, RDF.type ,(String) null);
         	    while (typeIt.hasNext()) {
                     Statement stmt = (Statement) typeIt.next();
@@ -522,7 +561,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         if (moniker != null) {
             return moniker;
         } else {
-          
+            if (true) return "";          
         	ind.getOntModel().enterCriticalSection(Lock.READ);
             try {
                 moniker = webappDaoFactory.getJenaBaseDao().getPropertyStringValue(ind,webappDaoFactory.getJenaBaseDao().MONIKER);
@@ -752,7 +791,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
             		"WHERE{ GRAPH ?g { <" + this.individualURI + "> <" + webappDaoFactory.getJenaBaseDao().PRIMARY_LINK + "> ?values} }";
             	tempModel = QueryExecutionFactory.create(QueryFactory.create(listPropertyValues), dataset).execConstruct();
             	ontModel.add(tempModel.listStatements());
-            	OntResource res = ontModel.getOntResource(this.individualURI);
+            	OntResource res = ontModel.createOntResource(this.individualURI);
             	Iterator links = res.listPropertyValues(webappDaoFactory.getJenaBaseDao().PRIMARY_LINK);
                 if (links.hasNext()) {
                     try {
@@ -918,7 +957,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     			"WHERE{ GRAPH ?g { <" + this.individualURI + "> <" + propertyURI + "> ?object} }";
     		tempModel = QueryExecutionFactory.create(QueryFactory.create(valuesOfProperty), dataset).execConstruct();
     		ontModel.add(tempModel.listStatements());
-    	    OntResource ontRes = ontModel.getOntResource(this.individualURI);
+    	    OntResource ontRes = ontModel.createOntResource(this.individualURI);
     	    NodeIterator values = ontRes.listPropertyValues(ontRes.getModel().getProperty(propertyURI));
     	    while (values.hasNext()) {
     	    	RDFNode value = values.nextNode();
@@ -950,7 +989,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     			"WHERE{ GRAPH ?g { <" + this.individualURI + "> <" + propertyURI + "> ?object} }";
     		tempModel = QueryExecutionFactory.create(QueryFactory.create(valueOfProperty), dataset).execConstruct();
     		ontModel.add(tempModel.listStatements());
-    	    OntResource ontRes = ontModel.getOntResource(this.individualURI);
+    	    OntResource ontRes = ontModel.createOntResource(this.individualURI);
     	    RDFNode value = ontRes.getPropertyValue(ontRes.getModel().getProperty(propertyURI));
     	    if (value != null && value.canAs(OntResource.class)) {
     	    	return new IndividualSDB(((OntResource) value.as(OntResource.class)).getURI(), dataset, webappDaoFactory);  
@@ -1065,7 +1104,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     }
     
     @Override
-    public List<VClass> getVClasses(boolean direct) { 
+    public List<VClass> getVClasses(boolean direct) {
     	if (direct) {
     		if (directVClasses != null) {
     			return directVClasses;
@@ -1084,20 +1123,27 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     }
     
     private List<VClass> getMyVClasses(boolean direct) {
+        long mstart = System.currentTimeMillis();
 		List<VClass> vClassList = new ArrayList<VClass>(); 
-		this.dataset.getLock().enterCriticalSection(Lock.READ);
-		Model tempModel = ModelFactory.createDefaultModel();
-		try {
-			String getTypes = 
-        		"CONSTRUCT{ <" + this.individualURI + "> <" + RDF.type + "> ?types }\n" +
-        		"WHERE{ GRAPH ?g { <" + this.individualURI +"> <" +RDF.type+ "> ?types \n" +
-        				"} } \n";
-        	
-        	tempModel = QueryExecutionFactory.create(QueryFactory.create(getTypes), dataset).execConstruct();
-        	StmtIterator stmtItr = tempModel.listStatements();
+		//this.dataset.getLock().enterCriticalSection(Lock.READ);
+		//Model tempModel = ModelFactory.createDefaultModel();
+		Model tempModel = ind.getModel();
+		//try {
+			//String getTypes = 
+        	//	"CONSTRUCT{ <" + this.individualURI + "> <" + RDF.type + "> ?types }\n" +
+        	//	"WHERE{ GRAPH " + ((true) ? "<http://vitro.mannlib.cornell.edu/default/vitro-kb-2>" : "?g") 
+        	//	+ " { <" + this.individualURI +"> <" +RDF.type+ "> ?types \n" +
+        	//			"} } \n";
+        	//long startTime = System.currentTimeMillis();
+        	//tempModel = QueryExecutionFactory.create(QueryFactory.create(getTypes), dataset).execConstruct();
+        	//System.out.println((System.currentTimeMillis() - startTime));
+        	StmtIterator stmtItr = tempModel.listStatements((Resource) null, RDF.type, (RDFNode) null);
         	LinkedList<String> list = new LinkedList<String>();
         	while(stmtItr.hasNext()){
-        		list.add(stmtItr.next().getObject().toString());
+        		Statement stmt = stmtItr.nextStatement();
+        		if (stmt.getObject().isResource() && !stmt.getObject().isAnon()) {
+        			list.add(((Resource) stmt.getObject()).getURI());
+        		}
         	}
         	Iterator<String> itr = null;
         	VClassDao checkSubClass = this.webappDaoFactory.getVClassDao();
@@ -1106,7 +1152,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	    ArrayList<String> done = new ArrayList<String>();
     	    
     	    /* Loop for comparing starts here */
-    	    if(direct){
+    	    if(false && direct){
         	while(!directTypes){
         		 itr = list.listIterator();
         		 
@@ -1139,26 +1185,28 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	    Iterator<String> typeIt = list.iterator();
 			try {
 				for (Iterator it = typeIt; it.hasNext();) {
-					Resource type = ResourceFactory.createResource(it.next().toString());
-					String typeURI = (!type.isAnon()) ? type.getURI() : VitroVocabulary.PSEUDO_BNODE_NS + type.getId().toString();
-					if (type.getNameSpace() == null || (!webappDaoFactory.getNonuserNamespaces().contains(type.getNameSpace())) ) {
-						VClass vc = webappDaoFactory.getVClassDao().getVClassByURI(typeURI);
+//					Resource type = ResourceFactory.createResource(it.next().toString());
+//					String typeURI = (!type.isAnon()) ? type.getURI() : VitroVocabulary.PSEUDO_BNODE_NS + type.getId().toString();
+//					if (type.getNameSpace() == null || (!webappDaoFactory.getNonuserNamespaces().contains(type.getNameSpace())) ) {
+						VClass vc = webappDaoFactory.getVClassDao().getVClassByURI(typeIt.next());
 						if (vc != null) {
 							vClassList.add(vc);
 						}
-					}
+//					}
 					
 				}
 			} finally {
 				//typeIt.close();
 			}
-		} finally {
-			tempModel.close();
-			this.dataset.getLock().leaveCriticalSection();
-		}
+		//} finally {
+		//	tempModel.close();
+		//	this.dataset.getLock().leaveCriticalSection();
+		//}
 		try {
 			Collections.sort(vClassList);
 		} catch (Exception e) {}
+		
+		//System.out.println("Overall: " + (System.currentTimeMillis() - mstart));
 		return vClassList;
 	}
     
@@ -1202,7 +1250,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
 	    				"} } \n";
 			tempModel = QueryExecutionFactory.create(QueryFactory.create(getTypes), dataset).execConstruct();
     		ontModel.add(tempModel.listStatements());
-    	    OntResource ontRes = ontModel.getOntResource(this.individualURI);
+    	    OntResource ontRes = ontModel.createOntResource(this.individualURI);
     	    StmtIterator stmtIt = ontRes.listProperties(RDF.type);
     	    try {
 				while(stmtIt.hasNext()) {

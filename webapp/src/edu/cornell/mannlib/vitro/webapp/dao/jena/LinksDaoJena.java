@@ -22,6 +22,7 @@ import com.hp.hpl.jena.ontology.ObjectProperty;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
@@ -51,7 +52,7 @@ public class LinksDaoJena extends JenaBaseDao implements LinksDao {
         List linksList = new ArrayList<Link>();
         getOntModel().enterCriticalSection(Lock.READ);
         try {
-            com.hp.hpl.jena.ontology.Individual entInd = getOntModel().getIndividual(individual.getURI());
+            Resource entInd = ResourceFactory.createResource(individual.getURI());
             if (ADDITIONAL_LINK != null) {
                 ClosableIterator links = getOntModel().listStatements(entInd,ADDITIONAL_LINK,(Resource)null);
                 try {

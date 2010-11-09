@@ -74,7 +74,7 @@ public class IndividualSDB2 extends IndividualImpl implements Individual {
     		"{ <"+individualURI+">  ?p ?o . \n" +
     		   "?s ?pp <"+individualURI+"> . } \n" +
     		 "WHERE { GRAPH ?g { \n" +
-    		 "  {<"+individualURI+">  ?p ?o . \n" +
+    		 "  {<"+individualURI+">  ?p ?o . } UNION { \n" +
     		 "  ?s ?pp <"+individualURI+"> . } \n" +
     		 "} } \n";
     	
@@ -980,7 +980,7 @@ public class IndividualSDB2 extends IndividualImpl implements Individual {
 		OntModel ontModel = ind.getOntModel();
 		ontModel.enterCriticalSection(Lock.READ);
 		try {
-			ClosableIterator typeIt = ind.listRDFTypes(direct); 
+			ClosableIterator typeIt = ind.listRDFTypes(false && direct); 
 			try {
 				for (Iterator it = typeIt; it.hasNext();) {
 					Resource type = (Resource) typeIt.next();
