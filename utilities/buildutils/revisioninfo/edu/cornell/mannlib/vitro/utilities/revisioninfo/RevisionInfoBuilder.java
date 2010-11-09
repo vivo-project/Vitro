@@ -137,7 +137,7 @@ public class RevisionInfoBuilder {
 	}
 
 	private String buildDummyInfo() {
-		return buildLine("unknown", "unknown");
+		return buildLine(null, null);
 	}
 
 	private String buildLine(String release, String revision) {
