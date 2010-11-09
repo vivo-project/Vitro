@@ -141,6 +141,15 @@ public class JenaExportController extends BaseEditController {
 		}
 		
 		response.setContentType( mime );
+		if(mime.equals("application/rdf+xml"))
+			response.setHeader("content-disposition", "attachment; filename=" + "export.rdf");
+		else if(mime.equals("text/n3"))
+			response.setHeader("content-disposition", "attachment; filename=" + "export.n3");
+		else if(mime.equals("text/plain"))
+			response.setHeader("content-disposition", "attachment; filename=" + "export.txt");
+		else if(mime.equals("application/x-turtle"))
+			response.setHeader("content-disposition", "attachment; filename=" + "export.ttl");
+			
 		try {
 			OutputStream outStream = response.getOutputStream();
 			if ( formatParam.startsWith("RDF/XML") ) {
