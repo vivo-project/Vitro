@@ -139,6 +139,9 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
             	// model is maintained in memory, in the DB, or both, while the application
             	// is running.
         	}
+
+            //store.getTableFormatter().dropIndexes();
+            //store.getTableFormatter().addIndexes();
         	       	
         	// Populate the three OntModelSelectors (BaseOntModel=assertions, InferenceOntModel=inferences
         	// and JenaOntModel=union of assertions and inferences) with the post-SDB-conversion models.
@@ -155,7 +158,7 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
 
         	// TBox assertions
             try {
-            	Model tboxAssertionsDB = makeDBModelFromConfigurationProperties(JENA_TBOX_ASSERTIONS_MODEL, DB_ONT_MODEL_SPEC);
+            	Model tboxAssertionsDB = makeDBModel(bds, JENA_TBOX_ASSERTIONS_MODEL, DB_ONT_MODEL_SPEC, TripleStoreType.SDB);
             	OntModel tboxAssertions = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC);
             	
             	if (tboxAssertionsDB != null) {
@@ -174,7 +177,7 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
         	
         	// TBox inferences
             try {
-            	Model tboxInferencesDB = makeDBModelFromConfigurationProperties(JENA_TBOX_INF_MODEL, DB_ONT_MODEL_SPEC);
+            	Model tboxInferencesDB = makeDBModel(bds, JENA_TBOX_INF_MODEL, DB_ONT_MODEL_SPEC, TripleStoreType.SDB);
             	OntModel tboxInferences = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC);
             	
             	if (tboxInferencesDB != null) {
