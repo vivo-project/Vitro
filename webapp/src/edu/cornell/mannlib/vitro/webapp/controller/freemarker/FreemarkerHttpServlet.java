@@ -330,8 +330,13 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         }        
     }
     
-    // Add any Java directives the templates should have access to
-    private Map<String, Object> getDirectives() {
+    /**
+     *  Add any Java directives the templates should have access to.
+     *  This is public and static so that these may be used by other classes during
+     *  the transition from JSP to Freemarker.
+     * @return
+     */    
+    public static Map<String, Object> getDirectives() {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("describe", new edu.cornell.mannlib.vitro.webapp.web.directives.dump.DescribeDirective());
         map.put("dump", new edu.cornell.mannlib.vitro.webapp.web.directives.dump.DumpDirective());

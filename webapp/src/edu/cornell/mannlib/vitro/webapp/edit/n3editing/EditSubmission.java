@@ -109,7 +109,7 @@ public class EditSubmission {
             		log.debug("time fields for parameter " + var + " were not on form" );
             	}
         	} else if( field.getEditElement() != null ){        	    
-        	    literalsFromForm.putAll( getLiteralForField(var,editConfig,queryParameters));
+        	    log.debug("skipping field with edit element, it should not be in literals on form list");
             }else{
             	String[] valuesArray = queryParameters.get(var); 
                 List<String> valueList = (valuesArray != null) ? Arrays.asList(valuesArray) : null;                
@@ -154,23 +154,39 @@ public class EditSubmission {
         	}
         }
         
+        processEditElementFields(editConfig,queryParameters);
+        
+        if( log.isDebugEnabled() )
+            log.debug( this.toString() );
     }
 
-    /**
-     * Get the literals for the field using the field's special editElement.
-     * @param var
-     * @param editConfig
-     * @param queryParameters
-     * @return
-     */
-    private Map<? extends String, ? extends Literal> getLiteralForField(
-            String var, EditConfiguration editConfig,
-            Map<String, String[]> queryParameters) {
-        Field field = editConfig.getField(var);
-        EditElement ee = field.getEditElement();
-        return ee.getLiterals(var, editConfig, queryParameters);
+    protected void processEditElementFields(EditConfiguration editConfig, Map<String,String[]> queryParameters ){
+        for( String fieldName : editConfig.getFields().keySet()){
+            Field field = editConfig.getFields().get(fieldName);
+            if( field != null && field.getEditElement() != null ){
+                EditElement element = field.getEditElement();                
+                log.debug("Checking EditElement for field " + fieldName + " type: " + element.getClass().getName());
+                
+                //check for validation error messages
+                Map<String,String> errMsgs = 
+                    element.getValidationMessages(fieldName, editConfig, queryParameters);
+                validationErrors.putAll(errMsgs);
+                                
+                if( errMsgs == null || errMsgs.isEmpty()){                    
+                    //only check for uris and literals when element has no validation errors
+                    Map<String,String> urisFromElement = element.getURIs(fieldName, editConfig, queryParameters);
+                    if( urisFromElement != null )
+                        urisFromForm.putAll(urisFromElement);
+                    Map<String,Literal> literalsFromElement = element.getLiterals(fieldName, editConfig, queryParameters);
+                    if( literalsFromElement != null )
+                        literalsFromForm.putAll(literalsFromElement);
+                }else{
+                    log.debug("got validation errors for field " + fieldName + " not processing field for literals or URIs");
+                }
+            }            
+        }        
     }
-
+    
     public EditSubmission(Map<String, String[]> queryParameters, EditConfiguration editConfig, 
     		Map<String, List<FileItem>> fileItems) {
     	this(queryParameters,editConfig);    	

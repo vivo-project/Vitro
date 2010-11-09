@@ -134,7 +134,7 @@
 		<body-content>empty</body-content>
 		<attribute>
 			<name>type</name>
-			<required>true</required>
+			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
         <attribute>

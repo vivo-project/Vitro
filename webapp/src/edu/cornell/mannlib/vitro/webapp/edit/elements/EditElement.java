@@ -21,6 +21,18 @@ public interface EditElement {
         getLiterals(String fieldName, EditConfiguration editConfig, Map<String,String[]> queryParameters );
     
     /**
+     * This is a method to get a map of variable name to URI value from the submitted form. 
+     */
+    public Map<String,String> 
+        getURIs(String fieldName, EditConfiguration editConfig, Map<String,String[]> queryParameters );
+    
+    /**
+     * Gets validation error messages.  Returns an empty list if there are no errors.
+     */
+    public Map<String,String>
+        getValidationMessages(String fieldName, EditConfiguration editConfig, Map<String,String[]> queryParameters);
+    
+    /**
      * This is a method to generate the HTML output for a form element.  It should use a freemarker template
      * to produce the output.  
      */
