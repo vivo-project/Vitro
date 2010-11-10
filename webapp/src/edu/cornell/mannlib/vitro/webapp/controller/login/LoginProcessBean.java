@@ -97,54 +97,56 @@ public class LoginProcessBean {
 		NOWHERE, LOGGING_IN, FORCED_PASSWORD_CHANGE, LOGGED_IN
 	}
 
-	private enum MLevel {
+	public enum MLevel {
 		NONE, INFO, ERROR
 	}
 
-	public enum Message {
-		NO_MESSAGE("", MLevel.NONE),
+	public static class Message {
+		public static final Message NO_MESSAGE = new Message("", MLevel.NONE);
 
-		PASSWORD_CHANGE_SAVED("Your password has been saved.<br/>"
-				+ "Please log in.", MLevel.INFO),
+		public static final Message PASSWORD_CHANGE_SAVED = new Message(
+				"Your password has been saved.<br/>" + "Please log in.",
+				MLevel.INFO);
 
-		NO_USERNAME("Please enter your email address.", MLevel.ERROR),
+		public static final Message NO_USERNAME = new Message(
+				"Please enter your email address.", MLevel.ERROR);
 
-		NO_PASSWORD("Please enter your password.", MLevel.ERROR),
+		public static final Message NO_PASSWORD = new Message(
+				"Please enter your password.", MLevel.ERROR);
 
-		UNKNOWN_USERNAME("The email or password you entered is incorrect.",
-				MLevel.ERROR),
+		public static final Message UNKNOWN_USERNAME = new Message(
+				"The email or password you entered is incorrect.", MLevel.ERROR);
 
-		INCORRECT_PASSWORD("The email or password you entered is incorrect.",
-				MLevel.ERROR),
+		public static final Message INCORRECT_PASSWORD = new Message(
+				"The email or password you entered is incorrect.", MLevel.ERROR);
 
-		NO_NEW_PASSWORD("Please enter your new password.", MLevel.ERROR),
+		public static final Message NO_NEW_PASSWORD = new Message(
+				"Please enter your new password.", MLevel.ERROR);
 
-		MISMATCH_PASSWORD("The passwords entered do not match.", MLevel.ERROR),
+		public static final Message MISMATCH_PASSWORD = new Message(
+				"The passwords entered do not match.", MLevel.ERROR);
 
-		PASSWORD_LENGTH(
+		public static final Message PASSWORD_LENGTH = new Message(
 				"Please enter a password between {0} and {1} characters in length.",
-				MLevel.ERROR),
+				MLevel.ERROR);
 
-		USING_OLD_PASSWORD("Please choose a different password from the "
-				+ "temporary one provided initially.", MLevel.ERROR);
+		public static final Message USING_OLD_PASSWORD = new Message(
+				"Please choose a different password from the "
+						+ "temporary one provided initially.", MLevel.ERROR);
 
 		private final String format;
 		private final MLevel messageLevel;
 
-		Message(String format, MLevel messageLevel) {
+		public Message(String format, MLevel messageLevel) {
 			this.format = format;
 			this.messageLevel = messageLevel;
 		}
 
-		String getFormat() {
-			return this.format;
-		}
-
-		MLevel getMessageLevel() {
+		public MLevel getMessageLevel() {
 			return this.messageLevel;
 		}
 
-		String formatMessage(Object[] args) {
+		public String formatMessage(Object[] args) {
 			return new MessageFormat(this.format).format(args);
 		}
 	}
