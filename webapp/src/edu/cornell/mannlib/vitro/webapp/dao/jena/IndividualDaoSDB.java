@@ -27,6 +27,7 @@ import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.AnonId;
 import com.hp.hpl.jena.rdf.model.Literal;
+import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -85,27 +86,42 @@ public class IndividualDaoSDB extends IndividualDaoJena {
         		ents.addAll(getIndividualsByVClass(vc));
         	}
         } else {
-        	OntModel ontModel = getOntModelSelector().getABoxModel();
-        	ontModel.enterCriticalSection(Lock.READ);
+        	Model model;
+        	dataset.getLock().enterCriticalSection(Lock.READ);
         	try {
-	            StmtIterator stmtIt = ontModel.listStatements((Resource) null, RDF.type, theClass);
-	            try {
-	                while (stmtIt.hasNext()) {
-	                    Statement stmt = stmtIt.nextStatement();
-	                    OntResource ind = (OntResource) stmt.getSubject().as(OntResource.class);
-	                    ents.add(makeIndividual(ind.getURI()));
-	                }
-	            } finally {
-	                stmtIt.close();
-	            }
+        		String query = 
+    	    		"CONSTRUCT " +
+    	    		"{ ?ind  <" + RDFS.label.getURI() + "> ?ooo. \n" +
+    	    		   "?ind  a <" + theClass.getURI() + "> . \n" +
+    	    		   "?ind  <" + VitroVocabulary.MONIKER + "> ?moniker \n" +
+    	    		 "} WHERE " +
+    	    		 "{ GRAPH ?g { \n" +
+    	    		    " ?ind a <" + theClass.getURI() + ">  \n" +
+    	    		 	"OPTIONAL { ?ind  <" + RDFS.label.getURI() + "> ?ooo } \n" +
+    	    		 	"OPTIONAL { ?ind  <" + VitroVocabulary.MONIKER + "> ?moniker } \n" +
+    	    		 	"} \n" +
+    	    		 "}";
+        		model = QueryExecutionFactory.create(QueryFactory.create(query), dataset).execConstruct();
         	} finally {
-        		ontModel.leaveCriticalSection();
+        		dataset.getLock().leaveCriticalSection();
         	}
+            StmtIterator stmtIt = model.listStatements((Resource) null, RDF.type, theClass);
+            try {
+                while (stmtIt.hasNext()) {
+                    Statement stmt = stmtIt.nextStatement();
+                    Resource ind = stmt.getSubject();
+                    if (!ind.isAnon()) {
+                    	ents.add(new IndividualSDB(ind.getURI(), dataset, getWebappDaoFactory(), model));
+                    }
+                }
+            } finally {
+                stmtIt.close();
+            }	
         }
      
 
         java.util.Collections.sort(ents);
-
+        
         return ents;
 
     }
