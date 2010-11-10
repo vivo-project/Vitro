@@ -79,14 +79,16 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	try {
 	    	initModel.getLock().enterCriticalSection(Lock.READ);
 	    	String getStatements = 
-	    		"CONSTRUCT " +
+	    		"CONSTRUCT \n" +
 	    		"{ <"+individualURI+">  <" + RDFS.label.getURI() + "> ?ooo. \n" +
-	    		   "<"+individualURI+">  a ?type }" +
-	    		 "WHERE {" +
-	    		 "{ \n" +
-	    		 	"<"+individualURI+">  <" + RDFS.label.getURI() + "> ?ooo }  \n" +
+	    		   "<"+individualURI+">  a ?type . \n" +
+	    		   "<"+individualURI+"> <" + VitroVocabulary.MONIKER + "> ?moniker \n" +
+	    		 "} \n" +
+	    		 "WHERE { \n" +
+	    		 	"{ <"+individualURI+">  <" + RDFS.label.getURI() + "> ?ooo }  \n" +
 	    		 	" UNION { <"+individualURI+"> a ?type } \n" +
-	    		 "}"; 
+	    		 	" UNION { <"+individualURI+"> <" + VitroVocabulary.MONIKER + "> ?moniker } \n" +
+	    		 "} "; 
     		this.model = QueryExecutionFactory.create(QueryFactory.create(getStatements), initModel).execConstruct();
     	} finally {
     		initModel.getLock().leaveCriticalSection();
@@ -119,12 +121,15 @@ public class IndividualSDB extends IndividualImpl implements Individual {
 	    	String getStatements = 
 	    		"CONSTRUCT " +
 	    		"{ <"+individualURI+">  <" + RDFS.label.getURI() + "> ?ooo. \n" +
-	    		   "<"+individualURI+">  a ?type }" +
-	    		 "WHERE {" +
+	    		   "<"+individualURI+">  a ?type . \n" +
+	    		   "<"+individualURI+">  <" + VitroVocabulary.MONIKER + "> ?moniker \n" +
+	    		 "} WHERE {" +
 	    		 "{ GRAPH ?g { \n" +
-	    		 	"<"+individualURI+">  <" + RDFS.label.getURI() + "> ?ooo } } \n" +
-	    		 	" UNION { GRAPH <http://vitro.mannlib.cornell.edu/default/vitro-kb-2> { <"+individualURI+"> a ?type } } \n" +
-	    		 "}"; 
+	    		 	"{ <"+individualURI+">  <" + RDFS.label.getURI() + "> ?ooo } \n" +
+	    		 	"UNION { <"+individualURI+">  <" + VitroVocabulary.MONIKER + "> ?moniker } \n" +
+	    		 	"} \n" +
+	    		 	"} UNION { GRAPH <http://vitro.mannlib.cornell.edu/default/vitro-kb-2> { <"+individualURI+"> a ?type } } \n" +
+	    		 "}";
     		model = QueryExecutionFactory.create(QueryFactory.create(getStatements), dataset).execConstruct();
     	} finally {
     		this.dataset.getLock().leaveCriticalSection();
@@ -188,83 +193,12 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         }
     }
     
-    @SuppressWarnings("unchecked")
 	public String getVClassURI() { 
         if (this.vClassURI != null) {
             return vClassURI;
         } else {
         	List<VClass> clist = getVClasses(true);
-        	if (true) { return (clist.size() > 0) ? clist.get(0).getURI() : null; }
-        	//this.dataset.getLock().enterCriticalSection(Lock.READ);
-        	
-        	String getTypes = 
-        		"CONSTRUCT{ <" + this.individualURI + "> <" + RDF.type + "> ?types }\n" +
-        		"WHERE{ GRAPH ?g { <" + this.individualURI +"> <" +RDF.type+ "> ?types \n" +
-        				"} } \n";
-        	
-        	Model tempModel = QueryExecutionFactory.create(QueryFactory.create(getTypes), dataset).execConstruct();
-        	StmtIterator stmtItr = tempModel.listStatements();
-        	LinkedList<String> list = new LinkedList<String>();
-        	while(stmtItr.hasNext()){
-        		list.add(stmtItr.next().getObject().toString());
-        	}
-        	Iterator<String> itr = null;
-        	VClassDaoJena checkSubClass = new VClassDaoJena(this.webappDaoFactory);
-        	boolean directTypes = false;
-        	String currentType = null;
-    	    ArrayList<String> done = new ArrayList<String>();
-    	    
-    	    /* Loop for comparing starts here */
-    	    
-        	while(!directTypes){
-        		 itr = list.listIterator();
-        		 
-        		do{
-        			if(itr.hasNext()){
-        		 currentType = itr.next();}
-        			else{
-        				directTypes = true; // get next element for comparison
-        			 break;}
-        		}while(done.contains(currentType));
-        		
-        		if(directTypes)
-        			break;                 // check to see if its all over otherwise start comparing
-        		else
-        	    itr = list.listIterator();	
-        		
-        	while(itr.hasNext()){
-        		String nextType = itr.next();
-        	    if(checkSubClass.isSubClassOf(currentType, nextType) && !currentType.equalsIgnoreCase(nextType)){
-        	    	//System.out.println(currentType + " is subClassOf " + nextType);
-        	    	itr.remove();
-        	    }
-        	}
-        	
-        	done.add(currentType);  // add the uri to done list. 
-        	}
-        	
-        	/* Loop for comparing ends here */
-        	
-        	try {
-        		
-                Iterator<String> typeIt = list.iterator();
-                try {
-	                while (typeIt.hasNext()) {
-	                    Resource type = ResourceFactory.createResource(typeIt.next());
-	                    if (type.getNameSpace()!=null && (!webappDaoFactory.getJenaBaseDao().NONUSER_NAMESPACES.contains(type.getNameSpace()) || type.getURI().equals(OWL.Thing.getURI())) ) {
-	                    	this.vClassURI=type.getURI();
-	                        break;
-	                    }
-	                }
-                } finally {
-                	//typeIt.close();
-                }
-        	} finally {
-        		
-        		//this.dataset.getLock().leaveCriticalSection();
-        		//tempModel.close();
-        	}
-        	return this.vClassURI;
+        	return (clist.size() > 0) ? clist.get(0).getURI() : null; 
         }
     }
 
@@ -273,76 +207,8 @@ public class IndividualSDB extends IndividualImpl implements Individual {
             return this.vClass;
         } else {
         	List<VClass> clist = getVClasses(true);
-        	if (true) { return (clist.size() > 0) ? clist.get(0) : null ; } 
-        	this.dataset.getLock().enterCriticalSection(Lock.READ);
-        	String getTypes = 
-        		"CONSTRUCT{ <" + this.individualURI + "> <" + RDF.type + "> ?types }\n" +
-        		"WHERE{ GRAPH ?g { <" + this.individualURI +"> <" +RDF.type+ "> ?types \n" +
-        				"} } \n";
-        	Model tempModel = QueryExecutionFactory.create(QueryFactory.create(getTypes), dataset).execConstruct();
-        	StmtIterator stmtItr = tempModel.listStatements();
-        	LinkedList<String> list = new LinkedList<String>();
-        	while(stmtItr.hasNext()){
-        		list.add(stmtItr.next().getObject().toString());
-        	}
-        	
-        	Iterator<String> itr = null;
-        	VClassDaoJena checkSubClass = new VClassDaoJena(this.webappDaoFactory);
-        	boolean directTypes = false;
-        	String currentType = null;
-    	    ArrayList<String> done = new ArrayList<String>();
-    	    
-    	    /* Loop for comparing starts here */
-    	    
-        	while(!directTypes){
-        		 itr = list.listIterator();
-        		 
-        		do{
-        			if(itr.hasNext()){
-        		 currentType = itr.next();}
-        			else{
-        				directTypes = true; // get next element for comparison
-        			 break;}
-        		}while(done.contains(currentType));
-        		
-        		if(directTypes)
-        			break;                 // check to see if its all over otherwise start comparing
-        		else
-        	    itr = list.listIterator();	
-        		
-        	while(itr.hasNext()){
-        		String nextType = itr.next();
-        	    if(checkSubClass.isSubClassOf(currentType, nextType) && !currentType.equalsIgnoreCase(nextType)){
-        	    	//System.out.println(currentType + " is subClassOf " + nextType);
-        	    	itr.remove();
-        	    }
-        	}
-        	
-        	done.add(currentType);  // add the uri to done list. 
-        	}
-        	
-        	/* Loop for comparing ends here */
-        	
-             try {
-            	 Iterator<String> typeIt = list.iterator();
-                 try {
- 	                while (typeIt.hasNext()) {
- 	                	Resource type = ResourceFactory.createResource(typeIt.next());
- 	                    if (type.getNameSpace()!=null && (!webappDaoFactory.getJenaBaseDao().NONUSER_NAMESPACES.contains(type.getNameSpace()) || type.getURI().equals(OWL.Thing.getURI())) ) {
- 	                    	this.vClassURI=type.getURI();
- 	                        this.vClass = webappDaoFactory.getVClassDao().getVClassByURI(this.vClassURI);
- 	                        break;
- 	                    }
- 	                }
-                 } finally {
-                 	//typeIt.close();
-                 }
-                 return this.vClass;
-             } finally {
-                
-            	 this.dataset.getLock().leaveCriticalSection();
-             }
-        }
+            return (clist.size() > 0) ? clist.get(0) : null ; 
+        } 
     }
 
     public int getFlag1Numeric() { 
@@ -560,8 +426,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     public String getMoniker() { 
         if (moniker != null) {
             return moniker;
-        } else {
-            if (true) return "";          
+        } else {         
         	ind.getOntModel().enterCriticalSection(Lock.READ);
             try {
                 moniker = webappDaoFactory.getJenaBaseDao().getPropertyStringValue(ind,webappDaoFactory.getJenaBaseDao().MONIKER);
@@ -584,7 +449,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
                                 // no basis for selecting a preferred class name to use
                                 moniker = null; // was this.getVClass().getName();
                             } else {
-                                moniker = preferredClass.getName();
+                                 preferredClass.getName();
                             }
                         }
                 	} catch (Exception e) {}
@@ -1152,7 +1017,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	    ArrayList<String> done = new ArrayList<String>();
     	    
     	    /* Loop for comparing starts here */
-    	    if(false && direct){
+    	    if(direct){
         	while(!directTypes){
         		 itr = list.listIterator();
         		 
@@ -1185,14 +1050,14 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	    Iterator<String> typeIt = list.iterator();
 			try {
 				for (Iterator it = typeIt; it.hasNext();) {
-//					Resource type = ResourceFactory.createResource(it.next().toString());
-//					String typeURI = (!type.isAnon()) ? type.getURI() : VitroVocabulary.PSEUDO_BNODE_NS + type.getId().toString();
-//					if (type.getNameSpace() == null || (!webappDaoFactory.getNonuserNamespaces().contains(type.getNameSpace())) ) {
-						VClass vc = webappDaoFactory.getVClassDao().getVClassByURI(typeIt.next());
+					Resource type = ResourceFactory.createResource(it.next().toString());
+					String typeURI = (!type.isAnon()) ? type.getURI() : VitroVocabulary.PSEUDO_BNODE_NS + type.getId().toString();
+					if (type.getNameSpace() == null || (!webappDaoFactory.getNonuserNamespaces().contains(type.getNameSpace())) ) {
+						VClass vc = webappDaoFactory.getVClassDao().getVClassByURI(type.getURI());
 						if (vc != null) {
 							vClassList.add(vc);
 						}
-//					}
+					}
 					
 				}
 			} finally {

@@ -24,6 +24,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 public class ObjectPropertyStatementDaoSDB extends
 		ObjectPropertyStatementDaoJena implements ObjectPropertyStatementDao {
@@ -44,11 +45,13 @@ public class ObjectPropertyStatementDaoSDB extends
         	String query = "CONSTRUCT { \n" +
         			       "   <" + entity.getURI() + "> ?p ?o . \n" +
         			       "   ?o a ?oType . \n" +
-        			       "   ?o <" + RDFS.label.getURI() + "> ?oLabel  \n" +
+        			       "   ?o <" + RDFS.label.getURI() + "> ?oLabel .  \n" +
+        			       "   ?o <" + VitroVocabulary.MONIKER + "> ?oMoniker  \n" +
         			       "} WHERE { GRAPH ?g { \n" +
         			       "   <" + entity.getURI() + "> ?p ?o . \n" +
         			       "   ?o a ?oType \n" +
         			       "   OPTIONAL { ?o <" + RDFS.label.getURI() + "> ?oLabel }  \n" +
+        			       "   OPTIONAL { ?o <" + VitroVocabulary.MONIKER + "> ?oMoniker }  \n" +
                            "} }";
         	long startTime = System.currentTimeMillis();
         	dataset.getLock().enterCriticalSection(Lock.READ);
@@ -58,10 +61,12 @@ public class ObjectPropertyStatementDaoSDB extends
         	} finally {
         		dataset.getLock().leaveCriticalSection();
         	}
-        	System.out.println("Propquery: " + (System.currentTimeMillis() - startTime));
-        	if (System.currentTimeMillis() - startTime > 1000) {
-        		System.out.println(query);
-        		System.out.println("Results: " + m.size());
+        	if (log.isDebugEnabled()) {
+	        	log.debug("Time (ms) to query for related individuals: " + (System.currentTimeMillis() - startTime));
+	        	if (System.currentTimeMillis() - startTime > 1000) {
+	        		//log.debug(query);
+	        		log.debug("Results size (statements): " + m.size());
+	        	}
         	}
             ObjectPropertyDaoJena opDaoJena = new ObjectPropertyDaoJena(getWebappDaoFactory());
         	
