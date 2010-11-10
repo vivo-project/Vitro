@@ -8,12 +8,9 @@ import static edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean
 import static edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State.NOWHERE;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -29,18 +26,18 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.RoleBasedPolicy.AuthRole;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LoginRedirector;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.Message;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.LoginLogoutEvent;
 
-public class Authenticate extends FreemarkerHttpServlet {
+public class Authenticate extends VitroHttpServlet {
 	private static final Log log = LogFactory.getLog(Authenticate.class
 			.getName());
 
@@ -71,6 +68,8 @@ public class Authenticate extends FreemarkerHttpServlet {
 
 	/** Where do we find the User/Session map in the servlet context? */
 	public static final String USER_SESSION_MAP_ATTR = "userURISessionMap";
+
+	private final LoginRedirector loginRedirector = new LoginRedirector();
 
 	/**
 	 * Find out where they are in the login process, process any input, record
@@ -117,7 +116,7 @@ public class Authenticate extends FreemarkerHttpServlet {
 				showLoginScreen(vreq, response);
 				break;
 			default: // LOGGED_IN:
-				redirectLoggedInUser(vreq, response);
+				loginRedirector.redirectLoggedInUser(vreq, response);
 				break;
 			}
 		} catch (Exception e) {
@@ -355,89 +354,6 @@ public class Authenticate extends FreemarkerHttpServlet {
 		response.sendRedirect(getHomeUrl(request));
 	}
 
-	/**
-	 * <pre>
-	 * Exit: the user is logged in. They might go to:
-	 * - A one-time redirect, stored in the session, if they had tried to
-	 *     bookmark to a page that requires login.
-	 * - An application-wide redirect, stored in the servlet context.
-	 * - Their home page, if they are a self-editor.
-	 * - The site admin page.
-	 * </pre>
-	 */
-	private void redirectLoggedInUser(HttpServletRequest request,
-			HttpServletResponse response) throws IOException,
-			UnsupportedEncodingException {
-		// Did they have a one-time redirect stored on the session?
-		String sessionRedirect = (String) request.getSession().getAttribute(
-				"postLoginRequest");
-		if (sessionRedirect != null) {
-			request.getSession().removeAttribute("postLoginRequest");
-			log.debug("User is logged in. Redirect by session to "
-					+ sessionRedirect);
-			response.sendRedirect(sessionRedirect);
-			return;
-		}
-
-		// Is there a login-redirect stored in the application as a whole?
-		// It could lead to another page in this app, or to any random URL.
-		String contextRedirect = (String) getServletContext().getAttribute(
-				"postLoginRequest");
-		if (contextRedirect != null) {
-			log.debug("User is logged in. Redirect by application to "
-					+ contextRedirect);
-			if (contextRedirect.indexOf(":") == -1) {
-				response.sendRedirect(request.getContextPath()
-						+ contextRedirect);
-			} else {
-				response.sendRedirect(contextRedirect);
-			}
-			return;
-		}
-
-		// If the user is a self-editor, send them to their home page.
-		User user = getLoggedInUser(request);
-		if (userIsANonEditor(user)) {
-			List<String> uris = getAuthenticator(request)
-					.asWhomMayThisUserEdit(user);
-			if (uris != null && uris.size() > 0) {
-				String userHomePage = request.getContextPath()
-						+ "/individual?uri="
-						+ URLEncoder.encode(uris.get(0), "UTF-8");
-				log.debug("User is logged in. Redirect as self-editor to "
-						+ userHomePage);
-				response.sendRedirect(userHomePage);
-				return;
-			}
-		}
-
-		// If nothing else applies, send them to the Site Admin page.
-		log.debug("User is logged in. Redirect to site admin page.");
-		response.sendRedirect(getSiteAdminUrl(request));
-	}
-
-	/** Is the logged in user an AuthRole.USER? */
-	private boolean userIsANonEditor(User user) {
-		if (user == null) {
-			return false;
-		}
-		String nonEditorRoleUri = Integer.toString(AuthRole.USER.level());
-		return nonEditorRoleUri.equals(user.getRoleURI());
-	}
-
-	/**
-	 * What user are we logged in as?
-	 */
-	private User getLoggedInUser(HttpServletRequest request) {
-		LoginStatusBean lsb = LoginStatusBean.getBean(request);
-		if (!lsb.isLoggedIn()) {
-			log.debug("getLoggedInUser: not logged in");
-			return null;
-		}
-
-		return getAuthenticator(request).getUserByUsername(lsb.getUsername());
-	}
-
 	/** Get a reference to the Authenticator. */
 	private Authenticator getAuthenticator(HttpServletRequest request) {
 		return Authenticator.getInstance(request);
@@ -448,13 +364,6 @@ public class Authenticate extends FreemarkerHttpServlet {
 		String contextPath = request.getContextPath();
 		String urlParams = "?login=block";
 		return contextPath + Controllers.LOGIN + urlParams;
-	}
-
-	/** What's the URL for the site admin screen? */
-	private String getSiteAdminUrl(HttpServletRequest request) {
-		String contextPath = request.getContextPath();
-		String urlParams = "?login=block";
-		return contextPath + Controllers.SITE_ADMIN + urlParams;
 	}
 
 	/** What's the URL for the home page? */
