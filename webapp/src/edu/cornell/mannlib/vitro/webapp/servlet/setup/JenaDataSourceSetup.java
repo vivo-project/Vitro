@@ -156,6 +156,9 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
         	Model listenableAboxInferences = ModelFactory.createUnion(aboxInferences, ModelFactory.createDefaultModel());
         	inferenceOms.setABoxModel(ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, listenableAboxInferences));
 
+        	
+        	// Since the TBox models are in memory, they do not have time out issues like the
+        	// ABox models do (and so don't need the extra step to make them listenable).
         	// TBox assertions
             try {
             	Model tboxAssertionsDB = makeDBModel(bds, JENA_TBOX_ASSERTIONS_MODEL, DB_ONT_MODEL_SPEC, TripleStoreType.SDB);
@@ -168,7 +171,6 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
             		System.out.println((System.currentTimeMillis()-startTime)/1000+" seconds to load tbox assertions");
             	}
 
-            	//TODO: do tboxAssertions and tboxInferences need to be listenable?
             	tboxAssertions.getBaseModel().register(new ModelSynchronizer(tboxAssertionsDB));
                 baseOms.setTBoxModel(tboxAssertions);
             } catch (Throwable e) {
@@ -224,6 +226,7 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
             sce.getServletContext().setAttribute("webappDaoFactory",wadf);
             
             sce.getServletContext().setAttribute("unionOntModelSelector", unionOms);
+            sce.getServletContext().setAttribute("baseOntModelSelector", baseOms);
             
             ApplicationBean appBean = getApplicationBeanFromOntModel(memModel,wadf);
             if (appBean != null) {
