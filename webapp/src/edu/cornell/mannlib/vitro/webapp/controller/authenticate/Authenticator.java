@@ -11,6 +11,10 @@ import edu.cornell.mannlib.vitro.webapp.beans.User;
 /**
  * The tool that a login process will use to interface with the user records in
  * the model (or wherever).
+ * 
+ * This needs to be based on a HttpSession, because things like the UserDAO are
+ * tied to the session. It seemed easier to base it on a HttpServletRequest,
+ * which we can use to get the session.
  */
 public abstract class Authenticator {
 	// ----------------------------------------------------------------------
