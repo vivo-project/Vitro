@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.servlet.ServletContextEvent;
@@ -16,6 +17,7 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.sdb.Store;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelectorImpl;
 
@@ -34,24 +36,25 @@ public class FileGraphSetup implements ServletContextListener {
 		
 		try {
 			OntModelSelectorImpl baseOms = (OntModelSelectorImpl) sce.getServletContext().getAttribute("baseOms");
+			Store kbStore = (Store) sce.getServletContext().getAttribute("kbStore");
 			
 			Set<String> pathSet = sce.getServletContext().getResourcePaths(PATH_ROOT + ABOX);
-			cleanupDB(pathSet, ABOX);
+			cleanupDB(kbStore, pathSet, ABOX);
 			
 			if (pathSet != null) {
  			   OntModel aboxBaseModel = baseOms.getABoxModel();
-			   readGraphs(sce, pathSet, ABOX, aboxBaseModel);		
+			   readGraphs(sce, pathSet, kbStore, ABOX, aboxBaseModel);		
 			}
 			
 			pathSet = sce.getServletContext().getResourcePaths(PATH_ROOT + TBOX);
-			cleanupDB(pathSet,TBOX);
+			cleanupDB(kbStore, pathSet,TBOX);
 			
 			if (pathSet != null) {
 			   OntModel tboxBaseModel = baseOms.getTBoxModel();
-			   readGraphs(sce, pathSet, TBOX, tboxBaseModel);
+			   readGraphs(sce, pathSet, kbStore, TBOX, tboxBaseModel);
 			}
 		} catch (ClassCastException cce) {
-			String errMsg = "Unable to cast servlet context attribute baseOms to " + OntModelSelectorImpl.class.getName();
+			String errMsg = "Unable to cast servlet context attribute to the appropriate type " + cce.getLocalizedMessage();
 			log.error(errMsg);
 			throw new ClassCastException(errMsg);
 		} catch (Throwable t) {
@@ -65,14 +68,12 @@ public class FileGraphSetup implements ServletContextListener {
 	 * Reads the graphs stored as files in sub-directories of 
 	 * FileGraphSetup.PATH_ROOT and for each graph:
 	 *   1. updates the SDB store to reflect the current contents of the graph.
-	 *   2. adds the graph as an in-memory submodel of the appropriate base in-memory
-	 *      graph 
+	 *   2. adds the graph as an in-memory submodel of the base in-memory graph 
 	 *      
 	 * Note: no connection needs to be maintained between the in-memory copy of the
 	 * graph and the DB copy.
 	 */
-	public void readGraphs(ServletContextEvent sce, Set<String> pathSet, String type, OntModel baseModel) {
-		try {
+	public void readGraphs(ServletContextEvent sce, Set<String> pathSet, Store kbStore, String type, OntModel baseModel) {
 			
 			int count = 0;
 			
@@ -96,16 +97,14 @@ public class FileGraphSetup implements ServletContextListener {
 						}
 						
 						if ( !model.isEmpty() ) {							
-							 //TODO: update contents of SDB
-							 //to decide whether to replace a DB table, check whether graph therein is isomorphic to graph just read.
 							 baseModel.addSubModel(model);
-							 log.info("Read graph from file " + p);
-						} else {
-							 //TODO: remove from DB
-							 log.info("Found empty file graph " + p);
-						}
+							 log.info("Attached file graph as " + type + " submodel " + p);
+						} 
+						
+						updateGraphInDB(kbStore, model, p);
+						
 					} catch (Exception ioe) {
-						fis.close();
+						//TODO: code had fis.close() - is that important?
 						log.error("Unable to process file graph " + p, ioe);
 						System.out.println("Unable to process file graph " + p);
 						ioe.printStackTrace();
@@ -118,11 +117,23 @@ public class FileGraphSetup implements ServletContextListener {
 			} // end - for
 			
 			System.out.println("Read " + count + " "  + type + " file graph" + ((count == 1) ? "" : "s") + " from " + PATH_ROOT + type);
-		} catch (Throwable t) {
-			System.out.println("Throwable in listener " + this.getClass().getName());
-			log.error(t);
-			t.printStackTrace();
-		}	
+		
+		return;
+	}
+	
+	
+	/*
+	 * If a graph with the given doesn't exist in the DB then add it.
+	 * 
+	 * Otherwise, if a graph with the given name is in the DB and is isomorphic with
+	 * the graph that was read from the files system, then do nothing.
+	 * 
+	 * Otherwise, if a graph with the given name is in the DB and is not isomorphic with
+	 * the graph that was read from the file system then replace the graph
+	 * in the DB with the one read from the file system.
+	 */
+	public void updateGraphInDB(Store kbStore, Model graph, String filegraph) {
+			
 		
 		return;
 	}
@@ -131,7 +142,17 @@ public class FileGraphSetup implements ServletContextListener {
 	 * Deletes any file graphs of a given type (ABox or TBox) from the DB that
 	 * are no longer present in the file system.
 	 */
-	public void cleanupDB(Set<String> pathSet, String type) {
+	public void cleanupDB(Store kbStore, Set<String> pathSet, String type) {
+		
+		int count = 0; 
+		
+		if (pathSet == null) {
+			//create an empty set so the same logic below can be used in all cases
+			pathSet = new HashSet<String>();
+		}
+
+		
+		
 
 		
 		return;

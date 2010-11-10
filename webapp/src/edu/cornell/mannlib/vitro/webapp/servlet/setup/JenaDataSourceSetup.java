@@ -140,6 +140,9 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
             	// is running.
         	}
 
+        	
+            sce.getServletContext().setAttribute("kbStore", store);
+            
             //store.getTableFormatter().dropIndexes();
             //store.getTableFormatter().addIndexes();
         	       	
