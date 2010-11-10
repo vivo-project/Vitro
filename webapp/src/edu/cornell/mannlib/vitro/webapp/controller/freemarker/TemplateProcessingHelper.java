@@ -18,15 +18,15 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
-public class FreemarkerHelper {
+public class TemplateProcessingHelper {
     
-    private static final Log log = LogFactory.getLog(FreemarkerHelper.class);
+    private static final Log log = LogFactory.getLog(TemplateProcessingHelper.class);
     
     private Configuration config = null;
     private HttpServletRequest request = null;
     private ServletContext context = null;
     
-    public FreemarkerHelper(Configuration config, HttpServletRequest request, ServletContext context) {
+    public TemplateProcessingHelper(Configuration config, HttpServletRequest request, ServletContext context) {
         this.config = config;
         this.request = request;
         this.context = context;
@@ -65,7 +65,7 @@ public class FreemarkerHelper {
 //        return processTemplate(templateName, map).toString();
 //    }
     
-    private Template getTemplate(String templateName) {
+    public Template getTemplate(String templateName) {
         Template template = null;
         try {
             template = config.getTemplate(templateName);

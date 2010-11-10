@@ -1,9 +1,5 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
-<#-- FreeMarker test cases -->
+<p>This is the test widget.</p>
 
-<h2>${title}</h2>
-
-<@widget name="test" />
-
-
+<p>${fruit}</p>

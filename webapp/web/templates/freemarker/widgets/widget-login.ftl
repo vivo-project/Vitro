@@ -4,7 +4,7 @@
 
 <#macro assets>
     <#if ! loginName??>
-        ${stylesheets.add("/css/login.css")}
+        ${stylesheets.add("/css/login.css")} 
         <#-- define any js files needed for the login widget 
         ${scripts.add("")}
         ${headScripts.add("")} -->

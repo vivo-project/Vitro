@@ -354,7 +354,16 @@
     <servlet-name>FreemarkerTestController</servlet-name>
     <url-pattern>/freemarkertest</url-pattern>
   </servlet-mapping>
-  
+
+  <servlet>
+    <servlet-name>FreemarkerSamplesController</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.SamplesController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>FreemarkerSamplesController</servlet-name>
+    <url-pattern>/freemarkersamples</url-pattern>
+  </servlet-mapping>
+    
   <servlet>
     <servlet-name>FakeSelfEditController</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.FakeSelfEditController</servlet-class>

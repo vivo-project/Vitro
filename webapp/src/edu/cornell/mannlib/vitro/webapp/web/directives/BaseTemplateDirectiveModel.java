@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHelper;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper;
 import freemarker.core.Environment;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateDirectiveModel;
@@ -39,17 +39,17 @@ public abstract class BaseTemplateDirectiveModel implements TemplateDirectiveMod
     }
     
     protected String mergeToHelpTemplate(Map<String, Object> map, Environment environment) {
-        FreemarkerHelper helper = getFreemarkerHelper(environment);
+        TemplateProcessingHelper helper = getFreemarkerHelper(environment);
         return helper.processTemplateToString("help-directive.ftl", map); 
     }
     
-    public static FreemarkerHelper getFreemarkerHelper(Environment env) {
+    public static TemplateProcessingHelper getFreemarkerHelper(Environment env) {
         Configuration config = env.getConfiguration();
         // In a directive, custom attributes for request and context are available in the Environment.
         // They are put there when the enclosing template is processed.
         HttpServletRequest request = (HttpServletRequest) env.getCustomAttribute("request");
         ServletContext context = (ServletContext) env.getCustomAttribute("context");
-        return new FreemarkerHelper(config, request, context);
+        return new TemplateProcessingHelper(config, request, context);
     }
 
 }

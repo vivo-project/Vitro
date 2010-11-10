@@ -46,6 +46,9 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(FreemarkerHttpServlet.class);
     private static final int FILTER_SECURITY_LEVEL = LoginStatusBean.EDITOR;
+    
+    public static final String PAGE_TEMPLATE_TYPE = "page";
+    public static final String BODY_TEMPLATE_TYPE = "body";
 
     protected enum Template {
         STANDARD_ERROR("error-standard.ftl"),
@@ -159,7 +162,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         
         root.putAll(getPageTemplateValues(vreq));
         // Tell the template and any directives it uses that we're processing a page template.
-        root.put("templateType", "page");
+        root.put("templateType", PAGE_TEMPLATE_TYPE);
 
         // Add the values that we got, and merge to the template.
         String bodyTemplate = values.getTemplateName();
@@ -172,7 +175,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
             Map<String, Object> body = new HashMap<String, Object>(sharedVariables);
             body.putAll(bodyMap);
             // Tell the template and any directives it uses that we're processing a body template.
-            body.put("templateType", "body");
+            body.put("templateType", BODY_TEMPLATE_TYPE);
             bodyString = processTemplateToString(bodyTemplate, body, config, vreq); 
         } else {
             // The subcontroller has not defined a body template. All markup for the page 
@@ -343,7 +346,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         map.put("dumpAll", new edu.cornell.mannlib.vitro.webapp.web.directives.dump.DumpAllDirective());  
         map.put("help", new edu.cornell.mannlib.vitro.webapp.web.directives.dump.HelpDirective()); 
         //map.put("url", new edu.cornell.mannlib.vitro.webapp.web.directives.UrlDirective()); 
-        map.put("widget", new edu.cornell.mannlib.vitro.webapp.web.directives.widgets.BaseWidgetDirective());
+        map.put("widget", new edu.cornell.mannlib.vitro.webapp.web.directives.WidgetDirective());
         return map;
     }
     
@@ -438,7 +441,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
 
     protected StringWriter processTemplate(String templateName, Map<String, Object> map, Configuration config, 
             HttpServletRequest request) {    
-        FreemarkerHelper helper = new FreemarkerHelper(config, request, getServletContext());
+        TemplateProcessingHelper helper = new TemplateProcessingHelper(config, request, getServletContext());
         return helper.processTemplate(templateName, map);
     }
     
