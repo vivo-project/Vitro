@@ -143,12 +143,12 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
 	   ctx.setAttribute(getDataSourceAttributeName(), bds);
    }
    
-   public BasicDataSource getApplicationDataSource(ServletContext ctx) {
+   public static BasicDataSource getApplicationDataSource(ServletContext ctx) {
 	   return (BasicDataSource) ctx.getAttribute(getDataSourceAttributeName());
    }
    
-   private String getDataSourceAttributeName() {
-	   return this.getClass().getName() + ".dataSource";
+   private static String getDataSourceAttributeName() {
+	   return JenaDataSourceSetupBase.class.getName() + ".dataSource";
    }
 
    public static BasicDataSource makeBasicDataSource(String dbDriverClassname, String jdbcUrl, String username, String password) {

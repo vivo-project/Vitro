@@ -68,14 +68,23 @@ public class VitroRequest implements HttpServletRequest {
     	return (WebappDaoFactory) getAttribute("webappDaoFactory");
     }
     
+    public void setFullWebappDaoFactory(WebappDaoFactory wdf) {
+    	setAttribute("fullWebappDaoFactory", wdf);
+    }
+    
     /** gets assertions + inferences WebappDaoFactory with no filtering **/
     public WebappDaoFactory getFullWebappDaoFactory() {
-        Object webappDaoFactoryAttr = _req.getSession().getAttribute("webappDaoFactory");
-        if (webappDaoFactoryAttr instanceof WebappDaoFactory) {
-             return (WebappDaoFactory) webappDaoFactoryAttr;
-        } else {
-        	return (WebappDaoFactory) _req.getSession().getServletContext().getAttribute("webappDaoFactory");	
-        }	
+    	Object webappDaoFactoryAttr = _req.getAttribute("fullWebappDaoFactory");
+    	if (webappDaoFactoryAttr instanceof WebappDaoFactory) {
+    		return (WebappDaoFactory) webappDaoFactoryAttr;
+    	} else {
+	        webappDaoFactoryAttr = _req.getSession().getAttribute("webappDaoFactory");
+	        if (webappDaoFactoryAttr instanceof WebappDaoFactory) {
+	             return (WebappDaoFactory) webappDaoFactoryAttr;
+	        } else {
+	        	return (WebappDaoFactory) _req.getSession().getServletContext().getAttribute("webappDaoFactory");	
+	        }
+    	}
     }
     
     /** gets assertions-only WebappDaoFactory with no filtering */

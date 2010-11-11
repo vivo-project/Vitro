@@ -99,6 +99,7 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
 
         	// SDB initialization
 			StoreDesc storeDesc = new StoreDesc(LayoutType.LayoutTripleNodesHash, DatabaseType.MySQL) ;
+			sce.getServletContext().setAttribute("storeDesc", storeDesc);
 			BasicDataSource bds = makeDataSourceFromConfigurationProperties();
         	this.setApplicationDataSource(bds, sce.getServletContext());
         	SDBConnection conn = new SDBConnection(bds.getConnection()) ; 
@@ -252,6 +253,8 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
         	NamespaceMapper namespaceMapper = new NamespaceMapperJena(unionModel, unionModel, defaultNamespace);
         	sce.getServletContext().setAttribute("NamespaceMapper", namespaceMapper);
         	memModel.getBaseModel().register(namespaceMapper);
+        	
+        	sce.getServletContext().setAttribute("defaultNamespace", defaultNamespace);
         	       	
         } catch (Throwable t) {
             log.error("Throwable in " + this.getClass().getName(), t);
