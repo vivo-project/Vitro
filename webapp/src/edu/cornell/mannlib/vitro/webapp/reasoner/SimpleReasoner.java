@@ -35,9 +35,22 @@ public class SimpleReasoner extends StatementListener {
 	private OntModel tboxModel;
 	private OntModel aboxModel;
 	private Model inferenceModel;
-
+	private Model inferenceRebuildModel;
+	
 	/**
-	 * 
+	 * @param tboxModel - input.  This model contains both asserted and inferred TBox axioms
+	 * @param aboxModel - input.  This model contains asserted ABox statements
+	 * @param inferenceModel - output. This is the model in which inferred (materialized) ABox statements are maintained (added or retracted).
+	 * @param inferenceRebuildModel - output. This the model temporarily used when the whole ABox inference model is rebuilt
+ 	 */
+	public SimpleReasoner(OntModel tboxModel, OntModel aboxModel, Model inferenceModel, Model inferenceRebuildModel) {
+		this.tboxModel = tboxModel;
+		this.aboxModel = aboxModel; 
+		this.inferenceModel = inferenceModel;
+		this.inferenceRebuildModel = inferenceRebuildModel;
+	}
+	
+	/**
 	 * @param tboxModel - input.  This model contains both asserted and inferred TBox axioms
 	 * @param aboxModel - input.  This model contains asserted ABox statements
 	 * @param inferenceModel - output. This is the model in which inferred (materialized) ABox statements are maintained (added or retracted).
@@ -46,6 +59,7 @@ public class SimpleReasoner extends StatementListener {
 		this.tboxModel = tboxModel;
 		this.aboxModel = aboxModel; 
 		this.inferenceModel = inferenceModel;
+		this.inferenceRebuildModel = ModelFactory.createDefaultModel();
 	}
 	
 	/*
@@ -60,7 +74,7 @@ public class SimpleReasoner extends StatementListener {
 		try {
 			
 			if (stmt.getPredicate().equals(RDF.type)) {
-			   addedType(stmt);
+			   addedType(stmt, inferenceModel);
 			}
 
 		} catch (Exception e) {
@@ -160,7 +174,7 @@ public class SimpleReasoner extends StatementListener {
 	 * A assert that B is of that type.
 	 * 
 	 */
-	public void addedType(Statement stmt) {
+	public void addedType(Statement stmt, Model inferenceModel) {
 
 		log.debug("stmt = " + stmt.toString());
 		
@@ -249,7 +263,6 @@ public class SimpleReasoner extends StatementListener {
 			tboxModel.leaveCriticalSection();
 		}
 	}
-
 
 	// Returns true if it is entailed by class subsumption that subject is
 	// of type cls; otherwise returns false.
@@ -358,6 +371,71 @@ public class SimpleReasoner extends StatementListener {
 		}
 	}
 
+	/*
+	 * Recompute the entire ABox inference graph. The new 
+	 * inference graph is built up in a separate model and
+	 * then reconciled with the inference graph used by the
+	 * application. The model reconciliation must be done
+	 * without reading the whole inference models into 
+	 * memory since we are supporting very large ABox 
+	 * inference models.	  
+	 */
+	public void recompute(OntClass subClass, OntClass superClass) {
+	
+		inferenceRebuildModel.enterCriticalSection(Lock.WRITE);
+		inferenceRebuildModel.removeAll();
+	
+		aboxModel.enterCriticalSection(Lock.READ);
+		
+		try {
+			StmtIterator iter = aboxModel.listStatements((Resource) null, RDF.type, (RDFNode) null);
+			
+			while (iter.hasNext()) {				
+				Statement stmt = iter.next();
+				addedType(stmt, inferenceRebuildModel);
+			}
+		} catch (Exception e) {
+			 log.error("Exception while recomputing ABox inference model", e);
+		} finally {
+			aboxModel.leaveCriticalSection();
+			inferenceModel.leaveCriticalSection();
+		}			
+		
+		inferenceModel.enterCriticalSection(Lock.WRITE);
+		inferenceRebuildModel.enterCriticalSection(Lock.WRITE);
+		
+		try {
+			// Remove everything from the current inference model that is not
+			//in the recomputed inference model
+			
+			StmtIterator iter = inferenceModel.listStatements();
+			
+			while (iter.hasNext()) {				
+				Statement stmt = iter.next();
+				if (!inferenceRebuildModel.contains(stmt)) {
+					inferenceModel.remove(stmt);
+				}
+			}
+			
+			// Add everything from the recomputed inference model that is not already
+			// in the current inference model to the current inference model.
+			
+		    iter = inferenceRebuildModel.listStatements();
+			
+			while (iter.hasNext()) {				
+				Statement stmt = iter.next();
+				if (!inferenceModel.contains(stmt)) {
+					inferenceModel.add(stmt);
+				}
+			}
+		} catch (Exception e) {		
+			log.error("Exception while recomputing ABox inference model", e);
+		} finally {
+			inferenceModel.leaveCriticalSection();
+			inferenceRebuildModel.leaveCriticalSection();			
+		}
+	}
+		
 	// The following three methods aren't currently called; the default behavior of VIVO is to not materialize such inferences.
 	public void addedProperty(Statement stmt) {
 
