@@ -382,12 +382,11 @@ public class SimpleReasoner extends StatementListener {
 	 */
 	public void recompute(OntClass subClass, OntClass superClass) {
 	
-		inferenceRebuildModel.enterCriticalSection(Lock.WRITE);
-		inferenceRebuildModel.removeAll();
-	
+		inferenceRebuildModel.enterCriticalSection(Lock.WRITE);	
 		aboxModel.enterCriticalSection(Lock.READ);
 		
 		try {
+			inferenceRebuildModel.removeAll();
 			StmtIterator iter = aboxModel.listStatements((Resource) null, RDF.type, (RDFNode) null);
 			
 			while (iter.hasNext()) {				
@@ -398,40 +397,53 @@ public class SimpleReasoner extends StatementListener {
 			 log.error("Exception while recomputing ABox inference model", e);
 		} finally {
 			aboxModel.leaveCriticalSection();
-			inferenceModel.leaveCriticalSection();
+			inferenceRebuildModel.leaveCriticalSection();
 		}			
 		
-		inferenceModel.enterCriticalSection(Lock.WRITE);
-		inferenceRebuildModel.enterCriticalSection(Lock.WRITE);
+		// Remove everything from the current inference model that is not
+		// in the recomputed inference model
+		inferenceRebuildModel.enterCriticalSection(Lock.READ);
+		//inferenceModel.enter
 		
 		try {
-			// Remove everything from the current inference model that is not
-			//in the recomputed inference model
-			
 			StmtIterator iter = inferenceModel.listStatements();
 			
 			while (iter.hasNext()) {				
 				Statement stmt = iter.next();
 				if (!inferenceRebuildModel.contains(stmt)) {
-					inferenceModel.remove(stmt);
+					Thread.sleep(1);
+					inferenceModel.enterCriticalSection(Lock.WRITE);
+					try {
+					    inferenceModel.remove(stmt);
+					} finally {
+					    inferenceModel.leaveCriticalSection();
+					}
 				}
 			}
+		} catch (Exception e) {
+			log.error("Exception while reconciling the current and recomputed ABox inference models", e);
+		} 
 			
-			// Add everything from the recomputed inference model that is not already
-			// in the current inference model to the current inference model.
-			
-		    iter = inferenceRebuildModel.listStatements();
+		// Add everything from the recomputed inference model that is not already
+		// in the current inference model to the current inference model.
+		try {
+			StmtIterator iter = inferenceRebuildModel.listStatements();
 			
 			while (iter.hasNext()) {				
 				Statement stmt = iter.next();
 				if (!inferenceModel.contains(stmt)) {
-					inferenceModel.add(stmt);
+					Thread.sleep(1);
+					inferenceModel.enterCriticalSection(Lock.WRITE);
+					try {
+					    inferenceModel.add(stmt);
+					} finally {
+					    inferenceModel.leaveCriticalSection();
+					}
 				}
 			}
 		} catch (Exception e) {		
-			log.error("Exception while recomputing ABox inference model", e);
+			log.error("Exception while reconciling the current and recomputed ABox inference models", e);
 		} finally {
-			inferenceModel.leaveCriticalSection();
 			inferenceRebuildModel.leaveCriticalSection();			
 		}
 	}
