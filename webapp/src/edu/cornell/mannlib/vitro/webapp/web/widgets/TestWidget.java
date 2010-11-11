@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.web.widgets;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet.TemplateResponseValues;
 import freemarker.core.Environment;
 
 public class TestWidget extends Widget {
@@ -14,10 +15,10 @@ public class TestWidget extends Widget {
     }
 
     @Override
-    protected Map<String, Object> getDataModel() {
+    protected TemplateResponseValues getTemplateResponseValues() {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("fruit", "bananas");
-        return map;
+        return new TemplateResponseValues (markupTemplateName(), map);
     }
 
 }

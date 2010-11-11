@@ -8,6 +8,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet.TemplateResponseValues;
 import freemarker.core.Environment;
 
 public class LoginWidget extends Widget {
@@ -19,10 +20,10 @@ public class LoginWidget extends Widget {
     }
 
     @Override
-    protected Map<String, Object> getDataModel() {
+    protected TemplateResponseValues getTemplateResponseValues() {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("fruit", "bananas");
-        return map;
+        return new TemplateResponseValues (markupTemplateName(), map);
     }
 
 }

@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet.ResponseValues;
 import freemarker.core.Environment;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -33,11 +34,17 @@ public class TemplateProcessingHelper {
     }
 
     public StringWriter processTemplate(String templateName, Map<String, Object> map) {
-
         Template template = getTemplate(templateName);
         StringWriter sw = new StringWriter();        
         processTemplate(template, map, sw);
         return sw;
+    }
+    
+    public StringWriter processTemplate(ResponseValues values) {
+        if (values == null) {
+            return null;
+        }
+        return processTemplate(values.getTemplateName(), values.getMap());
     }
 
     public void processTemplate(Template template, Map<String, Object> map, Writer writer) {
@@ -61,9 +68,9 @@ public class TemplateProcessingHelper {
         return processTemplate(templateName, map).toString();
     }
 
-//    public String processTemplateToString(String templateName, Map<String, Object> map) {
-//        return processTemplate(templateName, map).toString();
-//    }
+    public String processTemplateToString(ResponseValues values) {
+        return processTemplate(values).toString();
+    }
     
     public Template getTemplate(String templateName) {
         Template template = null;

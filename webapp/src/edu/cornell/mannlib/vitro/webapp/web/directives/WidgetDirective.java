@@ -12,17 +12,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 import edu.cornell.mannlib.vitro.webapp.web.widgets.Widget;
 import freemarker.core.Environment;
 import freemarker.template.SimpleScalar;
 import freemarker.template.TemplateDirectiveBody;
-import freemarker.template.TemplateDirectiveModel;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
-import freemarker.template.TemplateScalarModel;
 
 public class WidgetDirective extends BaseTemplateDirectiveModel {
 
@@ -73,9 +71,13 @@ public class WidgetDirective extends BaseTemplateDirectiveModel {
             Constructor<?> widgetConstructor = widgetClass.getConstructor(new Class[]{Environment.class, String.class});
             Widget widget = (Widget) widgetConstructor.newInstance(env, widgetName);              
             Method method = widgetClass.getMethod(methodName);
+            
+            // Right now it seems to me that we will always be producing a string for the widget calls. If we need greater
+            // flexibility, we can return a ResponseValues object and deal with different types here.
             String output = (String) method.invoke(widget);
+            
             String templateType = env.getDataModel().get("templateType").toString();
-            // If we're in the body template, automatically invoke the doAssets method, so it
+            // If we're in the body template, automatically invoke the doAssets() method, so it
             // doesn't need to be called explicitly.
             if ("doMarkup".equals(methodName) && FreemarkerHttpServlet.BODY_TEMPLATE_TYPE.equals(templateType)) {
                 output += widgetClass.getMethod("doAssets").invoke(widget);

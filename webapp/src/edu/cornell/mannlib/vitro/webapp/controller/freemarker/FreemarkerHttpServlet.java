@@ -544,7 +544,8 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         }
     }
 
-    protected static class TemplateResponseValues extends BaseResponseValues {
+    // This class is also used by WidgetDirective, so is public.
+    public static class TemplateResponseValues extends BaseResponseValues {
         private final String templateName;
         private final Map<String, Object> map;
         

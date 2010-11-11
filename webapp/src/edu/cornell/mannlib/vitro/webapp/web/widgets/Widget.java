@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper;
 import freemarker.cache.TemplateLoader;
 import freemarker.core.Environment;
@@ -47,8 +48,8 @@ public abstract class Widget {
     }
     
     public String doAssets() {
-        String templateName = "widget-" + name + "-assets.ftl";
-        
+        String templateName = assetsTemplateName();
+
         // Allow the assets template to be absent without generating an error.
         TemplateLoader templateLoader = env.getConfiguration().getTemplateLoader();
         try {
@@ -59,8 +60,8 @@ public abstract class Widget {
             log.error("Error finding template source", e);
         }
         
-        Map<String, Object> map = new HashMap<String, Object>();
-        TemplateHashModel dataModel = env.getDataModel();
+        TemplateHashModel dataModel = env.getDataModel();  
+        Map<String, Object> map = new HashMap<String, Object>(); 
         
         try {
             map.put("stylesheets", dataModel.get("stylesheets"));
@@ -70,19 +71,29 @@ public abstract class Widget {
             log.error("Error getting asset values from data model.");
         }
         
-        return helper.processTemplateToString(templateName, map);        
+        return helper.processTemplateToString(templateName, map);  
     }
     
+    // Default assets template name. Can be overridden by subclasses.
+    protected String assetsTemplateName() {
+        return "widget-" + name + "-assets.ftl";
+    }
+  
     public String doMarkup() {
-        String templateName = "widget-" + name + "-markup.ftl";
-        Map<String, Object> map = getDataModel();
-        return helper.processTemplateToString(templateName, map);
+        TemplateResponseValues values = getTemplateResponseValues();
+        return helper.processTemplateToString(values);
     }
 
+    // Default markup template name. Can be overridden in subclasses, or assigned
+    // differently in the subclass doMarkup() method. For example, LoginWidget will
+    // select a template according to login processing status.
+    protected String markupTemplateName() {
+        return "widget-" + name + "-markup.ftl";
+    }
     
+    protected abstract TemplateResponseValues getTemplateResponseValues();
 
-    protected abstract Map<String, Object> getDataModel();
-    
-//    # You can capture the output of an arbitrary part of the template into a context variable.
-//    # You can interpret arbitrary context variable as if it were a template definition.   
 }
+
+//# You can capture the output of an arbitrary part of the template into a context variable.
+//# You can interpret arbitrary context variable as if it were a template definition. 
