@@ -6,4 +6,4 @@
 
 <@widget name="test" />
 
-
+${stylesheets.add("/css/testfrombody.css")}

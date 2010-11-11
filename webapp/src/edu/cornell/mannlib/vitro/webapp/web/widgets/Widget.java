@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.widgets;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,6 +13,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper;
+import freemarker.cache.TemplateLoader;
 import freemarker.core.Environment;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateHashModel;
@@ -46,8 +48,20 @@ public abstract class Widget {
     
     public String doAssets() {
         String templateName = "widget-" + name + "-assets.ftl";
+        
+        // Allow the assets template to be absent without generating an error.
+        TemplateLoader templateLoader = env.getConfiguration().getTemplateLoader();
+        try {
+            if ( templateLoader.findTemplateSource(templateName) == null ) {
+                return "";
+            }
+        } catch (IOException e) {
+            log.error("Error finding template source", e);
+        }
+        
         Map<String, Object> map = new HashMap<String, Object>();
         TemplateHashModel dataModel = env.getDataModel();
+        
         try {
             map.put("stylesheets", dataModel.get("stylesheets"));
             map.put("scripts", dataModel.get("scripts"));
@@ -55,6 +69,7 @@ public abstract class Widget {
         } catch (TemplateModelException e) {
             log.error("Error getting asset values from data model.");
         }
+        
         return helper.processTemplateToString(templateName, map);        
     }
     
