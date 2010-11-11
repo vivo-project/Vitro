@@ -37,7 +37,8 @@ public class FileGraphSetup implements ServletContextListener {
 	private static String URI_ROOT = "http://vitro.mannlib.cornell.edu/filegraph/";
 	
 	private static final Log log = LogFactory.getLog(FileGraphSetup.class);
-		
+	
+	//TODO: test whether submodels need to be explicitly attached to the union model	
 	public void contextInitialized(ServletContextEvent sce) {
 		
 		try {
@@ -114,7 +115,7 @@ public class FileGraphSetup implements ServletContextListener {
 					updateGraphInDB(kbStore, model, type, p);
 					
 				} catch (Exception ioe) {
-					//TODO: code had fis.close() - is that important?
+					//TODO: fis.close();  // put this in a finally
 					log.error("Unable to process file graph " + p, ioe);
 					System.out.println("Unable to process file graph " + p);
 					ioe.printStackTrace();
@@ -158,12 +159,13 @@ public class FileGraphSetup implements ServletContextListener {
 	}
 	
 	/*
+	 * TODO: update these comments
 	 * Deletes any file graphs that are  no longer present in the file system
 	 * from the DB.
 	 */
-	public void cleanupDB(Store kbStore, Set<String> nameSet, String type) {
+	public void cleanupDB(Store kbStore, Set<String> uriSet, String type) {
 		
-		Pattern graphURIPat = Pattern.compile(URI_ROOT + type + "/(.*?)");   
+		Pattern graphURIPat = Pattern.compile("^" + URI_ROOT + type);   
 		 
 	    Iterator<Node> iter = StoreUtils.storeGraphNames(kbStore);	
 	    
@@ -172,9 +174,7 @@ public class FileGraphSetup implements ServletContextListener {
             Matcher matcher = graphURIPat.matcher(node.getURI());
 		    
             if (matcher.find()) {
-		    	String graphName = matcher.group(1);
-		    	
-		    	if (!nameSet.contains(graphName)) {
+		    	if (!uriSet.contains(node.getURI())) {
 		    		 Model model = SDBFactory.connectNamedModel(kbStore, node.getURI());
 		    		 model.removeAll(); // delete the graph from the DB
 					 log.info("Removed " + type + " file graph " + node.getURI() + " from the DB store because the file no longer exists in the file system");
@@ -207,7 +207,7 @@ public class FileGraphSetup implements ServletContextListener {
 	 * Takes a path name for a file graph and returns a uri for the graph
 	 */
 	public String pathToURI (String path, String type) {
-		
+		// TODO redo this to create a file and get file name
 		String uri = null;
 		
 	    if (path != null) {
