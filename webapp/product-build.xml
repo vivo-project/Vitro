@@ -67,6 +67,7 @@
 	</path>
 
 	<path id="test.compile.classpath">
+                <pathelement location="${product.test.dir}"/>
 		<pathelement location="${war-classes.dir}" />
 		<path refid="compile.classpath" />
 	</path>
@@ -166,7 +167,7 @@
          - - - - - - - - - - - - - - - - - -->
 	<target name="productTest" depends="productCompile" if="product.tests.exist" unless="skiptests">
 		<javac srcdir="${product.test.dir}"
-		       destdir="${test.classes.dir}"
+		       destdir="${test-classes.dir}"
 		       debug="true"
 		       deprecation="true"
 		       optimize="false"
