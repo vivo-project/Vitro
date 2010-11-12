@@ -384,11 +384,9 @@ public class SimpleReasoner extends StatementListener {
 	 * memory since we are supporting very large ABox 
 	 * inference models.	  
 	 */
-	
-	//TODO: how about passing in the extra 2 models as arguments to
-	// method instead of having them be in the constructor?
 	public void recompute(OntClass subClass, OntClass superClass) {
 	
+		// recompute the inferences 
 		inferenceRebuildModel.enterCriticalSection(Lock.WRITE);	
 		aboxModel.enterCriticalSection(Lock.READ);
 		
@@ -407,74 +405,73 @@ public class SimpleReasoner extends StatementListener {
 			inferenceRebuildModel.leaveCriticalSection();
 		}			
 		
-		// Remove everything from the current inference model that is not
-		// in the recomputed inference model
-		inferenceModel.enterCriticalSection(Lock.READ);
+		
+		// reflect the recomputed inferences into the application inference
+		// model.
 		inferenceRebuildModel.enterCriticalSection(Lock.READ);
 		scratchpadModel.enterCriticalSection(Lock.WRITE);
 		
 		try {
-			scratchpadModel.removeAll();
-			StmtIterator iter = inferenceModel.listStatements();
+			// Remove everything from the current inference model that is not
+			// in the recomputed inference model		
+			inferenceModel.enterCriticalSection(Lock.READ);
 			
-			while (iter.hasNext()) {				
-				Statement stmt = iter.next();
-				if (!inferenceRebuildModel.contains(stmt)) {
-				   scratchpadModel.add(stmt);
+			try {
+				scratchpadModel.removeAll();
+				StmtIterator iter = inferenceModel.listStatements();
+				
+				while (iter.hasNext()) {				
+					Statement stmt = iter.next();
+					if (!inferenceRebuildModel.contains(stmt)) {
+					   scratchpadModel.add(stmt);
+					}
 				}
+			} catch (Exception e) {
+				log.error("Exception while reconciling the current and recomputed ABox inference models", e);
+			} finally {
+	            inferenceModel.leaveCriticalSection();
 			}
-		} catch (Exception e) {
-			log.error("Exception while reconciling the current and recomputed ABox inference models", e);
-		} finally {
-            inferenceModel.leaveCriticalSection();
-            // TODO: note this read lock is removed in the final finally of this method. Is that ok?
-            // inferenceRebuildModel.leaveCriticalSection();
-            //scratchpadModel.leaveCriticalSection(); - need its contents below
-		}
-		
-		//TODO: should I remove everything from the retractionsTempModel at the end of this method?
-		// can this code be moved inside the other try after the while?
-		// is it ok to not release the retractions lock in the first finally
-		// and do it in the one below instead?
-		inferenceModel.enterCriticalSection(Lock.WRITE);
-		try {
-			inferenceModel.remove(scratchpadModel);
-		} catch (Exception e){
-			log.error("Exception while reconciling the current and recomputed ABox inference models", e);
-		} finally {
-			inferenceModel.leaveCriticalSection();
-			scratchpadModel.leaveCriticalSection();
-		}
-		
-		// Add everything from the recomputed inference model that is not already
-		// in the current inference model to the current inference model.
-		scratchpadModel.enterCriticalSection(Lock.WRITE);
-		inferenceModel.enterCriticalSection(Lock.READ);
-		try {
-			StmtIterator iter = inferenceRebuildModel.listStatements();
-			scratchpadModel.removeAll();
 			
-			while (iter.hasNext()) {				
-				Statement stmt = iter.next();
-				if (!inferenceModel.contains(stmt)) {
-				   scratchpadModel.add(stmt);
-				}
+			inferenceModel.enterCriticalSection(Lock.WRITE);
+			try {
+				inferenceModel.remove(scratchpadModel);
+			} catch (Exception e){
+				log.error("Exception while reconciling the current and recomputed ABox inference models", e);
+			} finally {
+				inferenceModel.leaveCriticalSection();
 			}
-		} catch (Exception e) {		
-			log.error("Exception while reconciling the current and recomputed ABox inference models", e);
+			
+			// Add everything from the recomputed inference model that is not already
+			// in the current inference model to the current inference model.
+			inferenceModel.enterCriticalSection(Lock.READ);
+			
+			try {
+				scratchpadModel.removeAll();
+				StmtIterator iter = inferenceRebuildModel.listStatements();
+				
+				while (iter.hasNext()) {				
+					Statement stmt = iter.next();
+					if (!inferenceModel.contains(stmt)) {
+					   scratchpadModel.add(stmt);
+					}
+				}
+			} catch (Exception e) {		
+				log.error("Exception while reconciling the current and recomputed ABox inference models", e);
+			} finally {
+				inferenceModel.leaveCriticalSection();			
+			}
+			
+			inferenceModel.enterCriticalSection(Lock.WRITE);
+			try {
+				inferenceModel.add(scratchpadModel);
+			} catch (Exception e){
+				log.error("Exception while reconciling the current and recomputed ABox inference models", e);
+			} finally {
+				inferenceModel.leaveCriticalSection();
+			}
 		} finally {
-			inferenceModel.leaveCriticalSection();
-			inferenceRebuildModel.leaveCriticalSection();			
-		}
-		
-		inferenceModel.enterCriticalSection(Lock.WRITE);
-		try {
-			inferenceModel.add(scratchpadModel);
-		} catch (Exception e){
-			log.error("Exception while reconciling the current and recomputed ABox inference models", e);
-		} finally {
-			inferenceModel.leaveCriticalSection();
-			scratchpadModel.leaveCriticalSection();
+			inferenceRebuildModel.leaveCriticalSection();
+			scratchpadModel.leaveCriticalSection();			
 		}
 	}
 		
