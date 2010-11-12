@@ -43,6 +43,7 @@ public class SimpleReasoner extends StatementListener {
 	 * @param aboxModel - input.  This model contains asserted ABox statements
 	 * @param inferenceModel - output. This is the model in which inferred (materialized) ABox statements are maintained (added or retracted).
 	 * @param inferenceRebuildModel - output. This the model temporarily used when the whole ABox inference model is rebuilt
+	 * @param inferenceScratchpadModel - output. This the model temporarily used when the whole ABox inference model is rebuilt
  	 */
 	public SimpleReasoner(OntModel tboxModel, OntModel aboxModel, Model inferenceModel,
 			              Model inferenceRebuildModel, Model scratchpadModel) {
@@ -51,6 +52,8 @@ public class SimpleReasoner extends StatementListener {
 		this.inferenceModel = inferenceModel;
 		this.inferenceRebuildModel = inferenceRebuildModel;
 		this.scratchpadModel = scratchpadModel;
+		
+	    aboxModel.register(this);
 	}
 	
 	/**

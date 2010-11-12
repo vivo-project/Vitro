@@ -135,7 +135,7 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
             	
             	Model tboxInferences = SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_TBOX_INF_MODEL);
             	tboxInferences.add(modelUtils.extractTBox(inferenceOms.getABoxModel())); 
-            	 
+            	            	 
             	// The code below, which sets up the OntModelSelectors, controls whether each
             	// model is maintained in memory, in the DB, or both, while the application
             	// is running.
