@@ -42,7 +42,7 @@ public class FileGraphSetup implements ServletContextListener {
 	public void contextInitialized(ServletContextEvent sce) {
 		
 		try {
-			OntModelSelectorImpl baseOms = (OntModelSelectorImpl) sce.getServletContext().getAttribute("baseOms");
+			OntModelSelectorImpl baseOms = (OntModelSelectorImpl) sce.getServletContext().getAttribute("baseOntModelSelector");
 			Store kbStore = (Store) sce.getServletContext().getAttribute("kbStore");
 			
 			// ABox files
