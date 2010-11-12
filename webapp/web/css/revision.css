@@ -1,0 +1,34 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+/* Styles for Freemarker template revisionInfo */
+
+#revision-build-date{
+    width:475px;
+    float:right;
+    border-left:1px solid #DFE6E6;
+    padding-left:35px;
+    height:200px;
+}
+#revision-levels{
+    width:375px;
+    float:left;
+
+   
+}
+#revision-levels caption{
+    padding: 10px 0 12px 0;
+    margin:0;
+    font-size: 18px;
+    color: #2485ae;
+    text-align: left;
+}
+#revision-levels th{
+    font-weight:bold;
+    padding:15px 20px 15px 20px;
+    border:1px solid #DFE6E6;
+}
+#revision-levels td{
+    padding:8px 20px 8px 20px;
+    border:1px solid #DFE6E6;
+    text-align:center;
+}

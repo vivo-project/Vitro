@@ -2,27 +2,34 @@
 
 <#-- Template for the Revision Information page. -->
 
-<div>
-    <h1>Revision Information</h1>
+${stylesheets.add("/css/revision.css")} 
+
+<section  role="region">
+    <h2>Revision Information</h2>
     
-    <h2>Build date:</h2>
-    <div>
-    	${revisionInfoBean.buildDate?datetime?string.full}
-    </div>
+    <section id="revision-levels"  role="region">
+        
+        <table summary = "This table shows revision levels">
+            <caption>Levels:</caption>
+            
+            <tr>
+                <th>name</th>
+                <th>release</th>
+                <th>revision</th>
+            </tr>
+            <#list revisionInfoBean.levelInfos as level>
+                <tr>
+                    <td>${level.name}</td>
+                    <td>${level.release}</td>
+                    <td>${level.revision}</td>
+                </tr>
+            </#list>
+        </table>
+    </section>
     
-    <h2>Levels:</h2>
-    <table>
-    	<tr>
-    		<th>name</th>
-    		<th>release</th>
-    		<th>revision</th>
-    	</tr>
-	    <#list revisionInfoBean.levelInfos as level>
-	    	<tr>
-	    		<td>${level.name}</td>
-	    		<td>${level.release}</td>
-	    		<td>${level.revision}</td>
-	    	</tr>
-		</#list>
-	</table>
-</div>
+    <section id="revision-build-date" role="region">
+        <h3>Build date:</h3>
+    
+        <p>${revisionInfoBean.buildDate?datetime?string.full}</p>
+    </section>
+</section>
