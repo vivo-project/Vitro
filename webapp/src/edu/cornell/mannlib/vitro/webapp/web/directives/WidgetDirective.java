@@ -4,7 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.web.directives;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Map;
 
@@ -12,7 +11,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 import edu.cornell.mannlib.vitro.webapp.web.widgets.Widget;
 import freemarker.core.Environment;
@@ -65,22 +63,18 @@ public class WidgetDirective extends BaseTemplateDirectiveModel {
         try {       
             String widgetClassName = WIDGET_PACKAGE + "." + StringUtils.capitalize(widgetName) + "Widget";
             Class<?> widgetClass = Class.forName(widgetClassName); 
-            // Use Constructor.newInstance() rather than Class.newInstance() so we can pass arguments 
-            // to the constructor.
-            // Widget widget = (Widget) widgetClass.newInstance();
-            Constructor<?> widgetConstructor = widgetClass.getConstructor(new Class[]{Environment.class, String.class});
-            Widget widget = (Widget) widgetConstructor.newInstance(env, widgetName);              
-            Method method = widgetClass.getMethod(methodName);
+            Widget widget = (Widget) widgetClass.newInstance();             
+            Method method = widgetClass.getMethod(methodName, Environment.class, Map.class);
             
             // Right now it seems to me that we will always be producing a string for the widget calls. If we need greater
             // flexibility, we can return a ResponseValues object and deal with different types here.
-            String output = (String) method.invoke(widget);
-            
-            String templateType = env.getDataModel().get("templateType").toString();
+            String output = (String) method.invoke(widget, env, params);
+
             // If we're in the body template, automatically invoke the doAssets() method, so it
-            // doesn't need to be called explicitly.
+            // doesn't need to be called explicitly from the enclosing template.
+            String templateType = env.getDataModel().get("templateType").toString();
             if ("doMarkup".equals(methodName) && FreemarkerHttpServlet.BODY_TEMPLATE_TYPE.equals(templateType)) {
-                output += widgetClass.getMethod("doAssets").invoke(widget);
+                output += widgetClass.getMethod("doAssets", Environment.class, Map.class).invoke(widget, env, params);
             }
               
             Writer out = env.getOut();

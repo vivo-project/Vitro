@@ -3,6 +3,8 @@
 package edu.cornell.mannlib.vitro.webapp.web.widgets;
 
 import java.io.IOException;
+import java.io.StringWriter;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,11 +14,10 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet.TemplateResponseValues;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper;
 import freemarker.cache.TemplateLoader;
 import freemarker.core.Environment;
 import freemarker.template.Configuration;
+import freemarker.template.Template;
 import freemarker.template.TemplateHashModel;
 import freemarker.template.TemplateModelException;
 
@@ -24,31 +25,13 @@ public abstract class Widget {
 
     private static final Log log = LogFactory.getLog(Widget.class);
     
-    protected Environment env = null;
-    private TemplateProcessingHelper helper = null;
-    private String name = null;
- 
-//    protected TemplateDirectiveModel directive = null;
-//    protected Macro markupMacro = null;
-//    protected Macro assetsMacro = null;
+    /* Widget implementations don't get any state when they get constructed so that they 
+     * can be reused. */
+    public Widget() { }
     
-    public Widget(Environment env, String name) {
-       this.env = env; 
-       this.name = name;
-       Configuration config = env.getConfiguration();
-       HttpServletRequest request = (HttpServletRequest) env.getCustomAttribute("request");
-       ServletContext context = (ServletContext) env.getCustomAttribute("context");
-       this.helper = new TemplateProcessingHelper(config, request, context);
-       
-       //this.directive = directive;
-       //Template template = getTemplate();
-       //Map templateMacros = template.getMacros();
-       //markupMacro = (Macro) templateMacros.get("markup");
-       //assetsMacro = (Macro) templateMacros.get("assets");
-    }
-    
-    public String doAssets() {
-        String templateName = assetsTemplateName();
+    public String doAssets(Environment env, Map params) {
+        String widgetName = params.get("name").toString(); //getWidgetName();
+        String templateName = getAssetsTemplateName(widgetName);
 
         // Allow the assets template to be absent without generating an error.
         TemplateLoader templateLoader = env.getConfiguration().getTemplateLoader();
@@ -71,29 +54,79 @@ public abstract class Widget {
             log.error("Error getting asset values from data model.");
         }
         
-        return helper.processTemplateToString(templateName, map);  
+        return processTemplateToString(widgetName, env, templateName, map);
+ 
     }
     
+    public String doMarkup(Environment env, Map params) {
+        HttpServletRequest request = (HttpServletRequest) env.getCustomAttribute("request");
+        ServletContext context = (ServletContext) env.getCustomAttribute("context");
+        String widgetName = params.get("name").toString(); // getWidgetName();
+        WidgetTemplateValues values = process(env, params, widgetName, request, context);        
+        return processTemplateToString(widgetName, env, values);
+    }
+
     // Default assets template name. Can be overridden by subclasses.
-    protected String assetsTemplateName() {
-        return "widget-" + name + "-assets.ftl";
+    protected String getAssetsTemplateName(String widgetName) {
+        return "widget-" + widgetName + "-assets.ftl";
     }
   
-    public String doMarkup() {
-        TemplateResponseValues values = getTemplateResponseValues();
-        return helper.processTemplateToString(values);
-    }
-
     // Default markup template name. Can be overridden in subclasses, or assigned
-    // differently in the subclass doMarkup() method. For example, LoginWidget will
+    // differently in the subclass process() method. For example, LoginWidget will
     // select a template according to login processing status.
-    protected String markupTemplateName() {
-        return "widget-" + name + "-markup.ftl";
+    protected String getMarkupTemplateName(String widgetName) {
+        return "widget-" + widgetName + "-markup.ftl";
     }
     
-    protected abstract TemplateResponseValues getTemplateResponseValues();
+//    private String getWidgetName() {
+//        String name = this.getClass().getName();
+//        name= name.replaceAll(".*\\.", "");
+//        name = name.replaceAll("Widget$", "");
+//        name = name.substring(0, 1).toLowerCase() + name.substring(1);
+//        return name;
+//    }
+
+    protected abstract WidgetTemplateValues process(Environment env, Map params, String widgetName, HttpServletRequest request, ServletContext context);
+    
+    private String processTemplateToString(String widgetName, Environment env, String templateName, Map<String, Object> map) {
+        StringWriter out = new StringWriter();
+        Configuration config = env.getConfiguration();
+        try {
+            Template template = config.getTemplate(templateName);
+            template.process(map, out);
+        } catch (Throwable th) {
+            log.error("Could not process widget " + widgetName, th);
+        }
+        return out.toString();        
+    }
+    
+    private String processTemplateToString(String widgetName, Environment env, WidgetTemplateValues values) {
+        return processTemplateToString(widgetName, env, values.getTemplateName(), values.getMap());
+    }
+   
+    
+    protected static class WidgetTemplateValues {
+        private final String templateName;
+        private final Map<String, Object> map;
+        
+        public WidgetTemplateValues(String templateName, Map<String, Object> map) {
+            this.templateName = templateName;
+            this.map = map;
+        }
+
+        public WidgetTemplateValues put(String key, Object value) {
+            this.map.put(key, value);
+            return this;
+        }
+
+        public Map<String, Object> getMap() {
+            return Collections.unmodifiableMap(this.map);
+        }
+
+        public String getTemplateName() {
+            return this.templateName;
+        }
+ 
+    }
 
 }
-
-//# You can capture the output of an arbitrary part of the template into a context variable.
-//# You can interpret arbitrary context variable as if it were a template definition. 
