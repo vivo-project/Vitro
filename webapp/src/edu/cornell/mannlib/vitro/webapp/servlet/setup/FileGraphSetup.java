@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -37,8 +38,7 @@ public class FileGraphSetup implements ServletContextListener {
 	private static String URI_ROOT = "http://vitro.mannlib.cornell.edu/filegraph/";
 	
 	private static final Log log = LogFactory.getLog(FileGraphSetup.class);
-	
-	//TODO: test whether submodels need to be explicitly attached to the union model	
+		
 	public void contextInitialized(ServletContextEvent sce) {
 		
 		try {
@@ -115,15 +115,19 @@ public class FileGraphSetup implements ServletContextListener {
 					updateGraphInDB(kbStore, model, type, p);
 					
 				} catch (Exception ioe) {
-					//TODO: fis.close();  // put this in a finally
 					log.error("Unable to process file graph " + p, ioe);
 					System.out.println("Unable to process file graph " + p);
 					ioe.printStackTrace();
+				} finally {
+					fis.close();
 				}
 			} catch (FileNotFoundException fnfe) {
 				log.warn(p + " not found. Unable to process file graph" + 
 						((fnfe.getLocalizedMessage() != null) ? 
 						fnfe.getLocalizedMessage() : "") );
+			} catch (IOException ioe) {
+				// this is for the fis.close() above.
+				log.warn("Exception while trying to close file graph file: " + p,ioe);
 			}
 		} // end - for
 		
@@ -132,16 +136,15 @@ public class FileGraphSetup implements ServletContextListener {
 		return;
 	}
 	
-	
 	/*
 	 * If a graph with the given name doesn't exist in the DB then add it.
-	 * 
-	 * Otherwise, if a graph with the given name is in the DB and is isomorphic with
-	 * the graph that was read from the files system, then do nothing.
-	 * 
+     *
 	 * Otherwise, if a graph with the given name is in the DB and is not isomorphic with
 	 * the graph that was read from the file system then replace the graph
 	 * in the DB with the one read from the file system.
+	 * 
+	 * Otherwise, if a graph with the given name is in the DB and is isomorphic with
+	 * the graph that was read from the files system, then do nothing. 
 	 */
 	public void updateGraphInDB(Store kbStore, Model fileModel, String type, String path) {
 			
@@ -159,9 +162,14 @@ public class FileGraphSetup implements ServletContextListener {
 	}
 	
 	/*
-	 * TODO: update these comments
 	 * Deletes any file graphs that are  no longer present in the file system
-	 * from the DB.
+	 * from the DB. 
+	 * 
+	 * @param uriSet (input)   - a set of graph URIs representing the file
+	 *                           graphs (of the given type) in the file
+	 *                           system.
+	 * @param type (input)     - abox or tbox.
+	 * @param kbStore (output) - the SDB store for the application                        
 	 */
 	public void cleanupDB(Store kbStore, Set<String> uriSet, String type) {
 		
@@ -204,16 +212,16 @@ public class FileGraphSetup implements ServletContextListener {
 	}
 
 	/*
-	 * Takes a path name for a file graph and returns a uri for the graph
+	 * Takes a path name for a file graph and returns the corresponding SDB URI
+	 * for the graph. The correspondence is by defined convention.
 	 */
-	public String pathToURI (String path, String type) {
-		// TODO redo this to create a file and get file name
+	public String pathToURI(String path, String type) {
+	
 		String uri = null;
 		
 	    if (path != null) {
-			String[] pathParts = path.split("/");
-			String fileName = pathParts[pathParts.length-1].substring(0, pathParts[pathParts.length-1].lastIndexOf('.'));
-			uri = URI_ROOT + type + "/" + fileName; 
+	    	File file = new File(path);
+			uri = URI_ROOT + type + "/" + file.getName(); 
 	    }
 		
 		return uri;
@@ -222,5 +230,4 @@ public class FileGraphSetup implements ServletContextListener {
 	public void contextDestroyed( ServletContextEvent sce ) {
 		// nothing to do
 	}
-	
 }
