@@ -94,7 +94,7 @@ public class WebappDaoFactorySDBPrep implements Filter {
 					new WebappDaoFactorySDB(_oms, dataset, _defaultNamespace, null, null);
 				vreq.setWebappDaoFactory(wadf);
 				vreq.setFullWebappDaoFactory(wadf);
-				System.out.println(dataset.hashCode());
+				vreq.setDataset(dataset);
 			}
 		}
 		} catch (Throwable t) {

@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.query.Dataset;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
@@ -70,6 +71,14 @@ public class VitroRequest implements HttpServletRequest {
     
     public void setFullWebappDaoFactory(WebappDaoFactory wdf) {
     	setAttribute("fullWebappDaoFactory", wdf);
+    }
+    
+    public Dataset getDataset() {
+    	return (Dataset) getAttribute("dataset");
+    }
+    
+    public void setDataset(Dataset dataset) {
+    	setAttribute("dataset", dataset);
     }
     
     /** gets assertions + inferences WebappDaoFactory with no filtering **/
