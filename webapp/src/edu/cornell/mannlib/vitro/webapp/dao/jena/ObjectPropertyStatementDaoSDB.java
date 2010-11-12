@@ -68,7 +68,6 @@ public class ObjectPropertyStatementDaoSDB extends
 	        		log.debug("Results size (statements): " + m.size());
 	        	}
         	}
-            ObjectPropertyDaoJena opDaoJena = new ObjectPropertyDaoJena(getWebappDaoFactory());
         	
         	OntModel ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m);
         	ontModel.enterCriticalSection(Lock.READ);

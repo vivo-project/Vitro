@@ -6,6 +6,7 @@ import java.util.HashSet;
 
 import com.hp.hpl.jena.query.Dataset;
 
+import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 
@@ -30,6 +31,14 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
         else
             return entityWebappDao = new IndividualDaoSDB(dataset, this);
     }
+	
+	@Override
+	public DataPropertyStatementDao getDataPropertyStatementDao() {
+		if (dataPropertyStatementDao != null) 
+			return dataPropertyStatementDao;
+		else
+			return dataPropertyStatementDao = new DataPropertyStatementDaoSDB(dataset, this);
+	}
 	
 	@Override
 	public ObjectPropertyStatementDao getObjectPropertyStatementDao() {
