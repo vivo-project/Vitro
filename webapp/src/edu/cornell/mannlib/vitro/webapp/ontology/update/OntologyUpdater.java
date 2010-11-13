@@ -80,6 +80,9 @@ public class OntologyUpdater {
 	
 	private void performUpdate() throws IOException {
 		
+		DateTimeMigration dtMigration = new DateTimeMigration(settings.getOntModelSelector().getABoxModel(), logger, record);
+        dtMigration.updateABox();
+		
 		performSparqlConstructAdditions(settings.getSparqlConstructAdditionsDir(), settings.getOntModelSelector().getABoxModel());
 		performSparqlConstructRetractions(settings.getSparqlConstructDeletionsDir(), settings.getOntModelSelector().getABoxModel());
 		
