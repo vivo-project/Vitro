@@ -215,6 +215,10 @@ public class SelfEditingIdentifierFactory implements IdentifierBundleFactory {
     }
 
     private IdentifierBundle getFromSession(ServletRequest req, HttpSession session ){
+    	if (session == null) {
+    		return null;
+    	}
+    	
         NetId netid = (NetId)session.getAttribute(NETID_IN_SESSION);
         SelfEditing sed = (SelfEditing)session.getAttribute(URI_IN_SESSION);
         
