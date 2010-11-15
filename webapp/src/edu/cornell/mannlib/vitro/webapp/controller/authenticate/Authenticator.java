@@ -88,4 +88,10 @@ public abstract class Authenticator {
 	 */
 	public abstract void recordUserIsLoggedIn(String username);
 
+	/**
+	 * Record that the current user has logged out:
+	 * - notify other users of the model.
+	 * - invalidate the session.
+	 */
+	public abstract void recordUserIsLoggedOut();
 }

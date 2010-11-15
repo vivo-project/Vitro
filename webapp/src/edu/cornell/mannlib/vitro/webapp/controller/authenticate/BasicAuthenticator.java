@@ -21,6 +21,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.edit.Authenticate;
 import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.LoginEvent;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.LogoutEvent;
 
 /**
  * The "standard" implementation of Authenticator.
@@ -88,7 +89,7 @@ public class BasicAuthenticator extends Authenticator {
 		}
 
 		HttpSession session = request.getSession();
-		
+
 		recordLoginOnUserRecord(user);
 		createLoginFormBean(user, session);
 		createLoginStatusBean(user, session);
@@ -185,6 +186,35 @@ public class BasicAuthenticator extends Authenticator {
 		}
 
 		return userDao.getIndividualsUserMayEditAs(userUri);
+	}
+
+	@Override
+	public void recordUserIsLoggedOut() {
+		HttpSession session = request.getSession();
+		notifyOtherUsersOfLogout(session);
+		session.invalidate();
+	}
+
+	private void notifyOtherUsersOfLogout(HttpSession session) {
+		LoginStatusBean loginBean = LoginStatusBean.getBean(session);
+		if (!loginBean.isLoggedIn()) {
+			return;
+		}
+
+		UserDao userDao = getUserDao(request);
+		if (userDao == null) {
+			return;
+		}
+
+		String username = loginBean.getUsername();
+		User user = userDao.getUserByUsername(username);
+		if (user == null) {
+			log.error("Unable to retrieve user " + username + " from model");
+			return;
+		}
+
+		Authenticate.sendLoginNotifyEvent(new LogoutEvent(user.getURI()),
+				session.getServletContext(), session);
 	}
 
 	/**

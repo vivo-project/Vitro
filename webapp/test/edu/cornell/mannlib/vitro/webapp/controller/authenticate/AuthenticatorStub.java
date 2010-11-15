@@ -169,4 +169,10 @@ public class AuthenticatorStub extends Authenticator {
 	// Un-implemented methods
 	// ----------------------------------------------------------------------
 
+	@Override
+	public void recordUserIsLoggedOut() {
+		throw new RuntimeException(
+				"AuthenticatorStub.recordUserIsLoggedOut() not implemented.");
+	}
+
 }
