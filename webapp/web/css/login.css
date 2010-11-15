@@ -133,12 +133,8 @@
   color:#900;
 }
 
-/* In IE6/7, .hidden defined in screen.css doesn't override
- * display: inline-block defined for #adminDashboard .pageBodyGroup,
- * so define again with context selector here.
- */
-#adminDashboard .pageBodyGroup.hidden {
-  display: none !important;
+#loginFormAndLinks {
+  display: none;
 }
 
 p.passwordNote {

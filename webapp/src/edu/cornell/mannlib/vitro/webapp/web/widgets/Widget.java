@@ -56,6 +56,11 @@ public abstract class Widget {
         ServletContext context = (ServletContext) env.getCustomAttribute("context");
         
         WidgetTemplateValues values = process(env, params, request, context); 
+        // The widget process() method may determine that nothing should display for the widget:
+        // for example, the login widget doesn't display if the user is already logged in.
+        if (values == null) {
+            return "";
+        }
         String widgetName = params.get("name").toString(); // getWidgetName();
         return processMacroToString(env, widgetName, values);
     }
@@ -106,7 +111,9 @@ public abstract class Widget {
         } catch (Throwable th) {
             log.error("Could not process widget " + widgetName, th);
         }
-        return out.toString();       
+        String output = out.toString(); 
+        log.debug("Macro output: " + output);
+        return output;       
     }
     
     private String processMacroToString(Environment env, String widgetName, String macroName, Map<String, Object> map) {
@@ -134,9 +141,14 @@ public abstract class Widget {
     protected static class WidgetTemplateValues {
         private final String macroName;
         private final Map<String, Object> map;
+
+        public WidgetTemplateValues(String macroName) {
+            this.macroName = macroName;
+            this.map = new HashMap<String, Object>();            
+        }
         
-        public WidgetTemplateValues(String templateName, Map<String, Object> map) {
-            this.macroName = templateName;
+        public WidgetTemplateValues(String macroName, Map<String, Object> map) {
+            this.macroName = macroName;
             this.map = map;
         }
 

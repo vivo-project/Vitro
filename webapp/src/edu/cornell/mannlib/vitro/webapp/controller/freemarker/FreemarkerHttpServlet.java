@@ -233,6 +233,9 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     // We can't use shared variables in the Freemarker configuration to store anything 
     // except theme-specific data, because multiple portals or apps might share the same theme. So instead
     // we'll get all the shared variables here, and put them in both root and body maps.
+    // If we can eliminate this use case and use shared variables, it would simplify the implementation greatly.
+    // See also directives, where since there are no shared variables we have to manually put elements
+    // of the data model into the directive template model. 
     public Map<String, Object> getSharedVariables(VitroRequest vreq, Map<String, Object> bodyMap) {
         
         Map<String, Object> map = new HashMap<String, Object>();
