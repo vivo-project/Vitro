@@ -56,6 +56,7 @@ public class FakeSelfEditController extends VitroHttpServlet {
 	private boolean isAuthorized(HttpSession session) {
 		boolean isFakingAlready = (session.getAttribute(ATTRIBUTE_LOGIN_STATUS_SAVE) != null);
 		boolean isAdmin = LoginStatusBean.getBean(session).isLoggedInAtLeast(LoginStatusBean.CURATOR);
+		log.debug("isFakingAlready: " + isFakingAlready + ", isAdmin: "	+ isAdmin);
 		return isAdmin || isFakingAlready;
 	}
 
@@ -72,6 +73,7 @@ public class FakeSelfEditController extends VitroHttpServlet {
 		moveAttribute(session, ATTRIBUTE_LOGIN_STATUS_BEAN,
 				ATTRIBUTE_LOGIN_STATUS_SAVE);
 
+		log.debug("Start faking as " + id);
 		response.sendRedirect(vreq.getContextPath() + Controllers.ENTITY
 				+ "?netid=" + id);
 	}
@@ -87,6 +89,7 @@ public class FakeSelfEditController extends VitroHttpServlet {
 		restoreAttribute(session, ATTRIBUTE_LOGIN_STATUS_BEAN,
 				ATTRIBUTE_LOGIN_STATUS_SAVE);
 
+		log.debug("Stop faking.");
 		response.sendRedirect(request.getContextPath() + "/");
 	}
 
