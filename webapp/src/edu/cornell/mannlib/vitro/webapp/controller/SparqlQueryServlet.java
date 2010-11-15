@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.query.DataSource;
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
@@ -57,8 +58,10 @@ import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 public class SparqlQueryServlet extends BaseEditController {
 
     private static final Log log = LogFactory.getLog(SparqlQueryServlet.class.getName());
+    private static final String kb2 = "http://vitro.mannlib.cornell.edu/default/vitro-kb-2";
 
     protected static final Syntax SYNTAX = Syntax.syntaxARQ;
+    
     
     protected static HashMap<String,ResultSetFormat>formatSymbols = new HashMap<String,ResultSetFormat>();
     static{
@@ -140,6 +143,7 @@ public class SparqlQueryServlet extends BaseEditController {
         }
         
         DataSource dataSource = DatasetFactory.create() ;
+        Dataset dataset = null;
         ModelMaker maker = (ModelMaker) getServletContext().getAttribute("vitroJenaModelMaker");
 
         boolean someModelSet = false;        
@@ -155,21 +159,27 @@ public class SparqlQueryServlet extends BaseEditController {
                 	ontModel.addSubModel(modelNamed);
                     someModelSet = true;
                 }
-            }         
+            }     
+           
             if (someModelSet) {
+            	
             	dataSource.setDefaultModel(ontModel);
             }
+           
         }
         
-        if( ! someModelSet )
-            dataSource.setDefaultModel(model) ;
-        
-        executeQuery(request, response, resultFormatParam, rdfResultFormatParam, queryParam, dataSource); 
+        if( ! someModelSet ){
+            dataset = vreq.getDataset();
+            if(dataset==null){
+            	dataSource.setDefaultModel(model) ;
+            }
+        }
+        executeQuery(request, response, resultFormatParam, rdfResultFormatParam, queryParam, (dataset != null) ? dataset : dataSource); 
         return;
     }
     
     private void executeQuery(HttpServletRequest req,
-            HttpServletResponse response, String resultFormatParam, String rdfResultFormatParam, String queryParam, DataSource dataSource ) throws IOException {
+            HttpServletResponse response, String resultFormatParam, String rdfResultFormatParam, String queryParam, Dataset dataset ) throws IOException {
         
     	ResultSetFormat rsf = null;
     	/* BJL23 2008-11-06
@@ -187,7 +197,7 @@ public class SparqlQueryServlet extends BaseEditController {
         QueryExecution qe = null;
         try{
             Query query = QueryFactory.create(queryParam, SYNTAX);
-            qe = QueryExecutionFactory.create(query, dataSource);
+            qe = QueryExecutionFactory.create(query, dataset);
             if( query.isSelectType() ){
                 ResultSet results = null;
                 results = qe.execSelect();
