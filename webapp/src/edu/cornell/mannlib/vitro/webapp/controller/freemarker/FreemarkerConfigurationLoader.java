@@ -4,6 +4,8 @@ package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -132,29 +134,32 @@ public class FreemarkerConfigurationLoader {
     // Define template locations. Template loader will look first in the theme-specific
     // location, then in the vitro location.
     protected final TemplateLoader getTemplateLoader(Configuration config, String themeDir) {
-        
-        String themeTemplatePath = context.getRealPath(themeDir) + "/templates";
-        String vitroTemplatePath = context.getRealPath("/templates/freemarker");
-        
+
+        List<TemplateLoader> loaders = new ArrayList<TemplateLoader>();
+        MultiTemplateLoader mtl = null;
         try {
-            TemplateLoader[] loaders;
-            FlatteningTemplateLoader vitroFtl = new FlatteningTemplateLoader(new File(vitroTemplatePath));
-            ClassTemplateLoader ctl = new ClassTemplateLoader(getClass(), "");
-            
-            File themeTemplateDir = new File(themeTemplatePath);
+            // Theme template loader
+            String themeTemplatePath = context.getRealPath(themeDir) + "/templates";
+            File themeTemplateDir = new File(themeTemplatePath);    
             // Handle the case where there's no theme template directory gracefully
             if (themeTemplateDir.exists()) {
                 FileTemplateLoader themeFtl = new FileTemplateLoader(themeTemplateDir);
-                loaders = new TemplateLoader[] { themeFtl, vitroFtl, ctl };
-            } else {
-                loaders = new TemplateLoader[] { vitroFtl, ctl };
-            }
-            MultiTemplateLoader mtl = new MultiTemplateLoader(loaders);
-            return mtl;
+                loaders.add(themeFtl);
+            } 
+            
+            // Vitro template loader
+            String vitroTemplatePath = context.getRealPath("/templates/freemarker");
+            loaders.add(new FlatteningTemplateLoader(new File(vitroTemplatePath)));
+            
+            loaders.add(new ClassTemplateLoader(getClass(), ""));
+            
+            TemplateLoader[] loaderArray = loaders.toArray(new TemplateLoader[loaders.size()]);
+            mtl = new MultiTemplateLoader(loaderArray);
+            
         } catch (IOException e) {
             log.error("Error creating template loaders");
-            return null;
         }
+        return mtl;
         
     }
     
