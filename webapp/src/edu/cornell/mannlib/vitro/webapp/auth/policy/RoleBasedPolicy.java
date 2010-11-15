@@ -57,7 +57,7 @@ public class RoleBasedPolicy extends DefaultInconclusivePolicy  implements Polic
     /**
      * What is the minimum AuthRole needed to perform a given action?
      */
-    private static Map<Class,AuthRole> actionToMinRole = new HashMap<Class,AuthRole>();
+    private static Map<Class<?>,AuthRole> actionToMinRole = new HashMap<Class<?>,AuthRole>();
     static{
         //anybody actions
         //view resources?
@@ -103,7 +103,7 @@ public class RoleBasedPolicy extends DefaultInconclusivePolicy  implements Polic
 
         //We need to find the class of the RequestedAction since that
         //encodes what type of action is being requested.
-        Class requesetClass = whatToAuth.getClass();
+        Class<?> requesetClass = whatToAuth.getClass();
         AuthRole minmumRoleForAction = actionToMinRole.get(requesetClass);
 
         if( minmumRoleForAction == null ){
@@ -118,33 +118,14 @@ public class RoleBasedPolicy extends DefaultInconclusivePolicy  implements Polic
             return new BasicPolicyDecision(Authorization.UNAUTHORIZED,"not authorized for role");
     }
 
-    /**
-     * Because it extends AbstractPolicySetup and implements this method, RoleBasedPolicy
-     * can be used as a ServletContextListener that puts its self on the ServletPolicyList
-     * at servlet context initialization.
-     *
-     * Notice that this method also setups the IdentifierBundleFactory that it needs.
-     */
-//    @Override
-//    public List<PolicyIface> createPolicies(ServletContextEvent sce) {
-//        List<PolicyIface> list = new ArrayList<PolicyIface>(1);
-//        list.add(new RoleBasedPolicy());
-//
-//        //notice that the idBundleFactory gets created here,
-//        JenaRoleIdentifierBundleFactory jibf = new JenaRoleIdentifierBundleFactory(userModelUri);
-//        ServletIdentifierBundleFactory.addIdentifierBundleFactory(sce.getServletContext(),jibf);
-//
-//        return list;
-//    }
+    @Override
+	public String toString() {
+    	return "RoleBasedPolicy";
+	}
 
-    /********************** Roles *****************************************/
+
+	/********************** Roles *****************************************/
     public static enum AuthRole implements Identifier {
-//        ANYBODY("http://vitro.mannlib.cornell.edu/authRole#anybody",0),
-//        USER("http://vitro.mannlib.cornell.edu/authRole#user",1),
-//        EDITOR("http://vitro.mannlib.cornell.edu/authRole#editor",2),
-//        CURATOR("http://vitro.mannlib.cornell.edu/authRole#curator",3),
-//        DBA("http://vitro.mannlib.cornell.edu/authRole#dba",50);
-
         ANYBODY( "role:/0" ,LoginStatusBean.ANYBODY),
         USER(    "role:/1" ,LoginStatusBean.NON_EDITOR),
         EDITOR(  "role:/4" ,LoginStatusBean.EDITOR),
@@ -181,5 +162,10 @@ public class RoleBasedPolicy extends DefaultInconclusivePolicy  implements Polic
             }
             return false;
         }
+
+		@Override
+		public String toString() {
+			return "AuthRole: " + name();
+		}
     }/* end of enum AuthRole */
 }/* end of class RoleBasedPolicy */
