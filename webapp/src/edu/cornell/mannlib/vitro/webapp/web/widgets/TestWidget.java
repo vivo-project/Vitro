@@ -8,6 +8,7 @@ import java.util.Map;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import freemarker.core.Environment;
 
 public class TestWidget extends Widget {
@@ -16,8 +17,15 @@ public class TestWidget extends Widget {
     protected WidgetTemplateValues process(Environment env, Map params,
             HttpServletRequest request, ServletContext context) {
         Map<String, Object> map = new HashMap<String, Object>();
-        map.put("fruit", "bananas");
-        return new WidgetTemplateValues (getMarkupMacroName(), map);
+        String macroName;
+        if (LoginStatusBean.getBean(request).isLoggedIn()) {
+            map.put("status", "logged in");
+            macroName = "loggedIn";
+        } else {
+            map.put("status", "not logged in");
+            macroName = "notLoggedIn";
+        }
+        return new WidgetTemplateValues (macroName, map);
     }
 
 }

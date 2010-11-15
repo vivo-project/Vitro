@@ -8,17 +8,16 @@
     ${headScripts.add("/js/testheadscript.js")} 
 </#macro>
 
-<#macro markup>
-<#import "lib-list.ftl" as l>
+<#macro loggedIn>
     <div class="testWidget">
-        <h4>This is the test widget using macros.</h4>    
-        <p>I like ${fruit}.</p>
+        <h4>This is the test widget for logged-in users.</h4>    
+        <p>Login status: ${status}.</p>
     </div>
 </#macro>
 
-<#macro altMarkup>
+<#macro notLoggedIn>
     <div class="testWidget">
-        <h4>This is the alternate version of the test widget.</h4>    
-        <p>I hate ${fruit}.</p>
+        <h4>This is the test widget for non-logged-in users.</h4>    
+        <p>Login status: ${status}.</p>
     </div>
 </#macro>
