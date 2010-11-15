@@ -11,11 +11,11 @@
     <li> elements. An <li> element may span multiple lines.
     
     Usage:
-        <@firstLastList>
+        <@firstLastList />
             <li>apples</li>
             <li>bananas</li>
             <li>oranges</li>
-        </@firstLastList>
+        </@firstLastList />
 
     RY Consider rewriting in Java. Probably designers won't want to modify this. That would allow us to support
     nested <li> elements.
@@ -47,19 +47,19 @@
     indicate how to split the text.
     
     Usage:
-        <@firstLastListNested>
+        <@firstLastListNested />
             <li>apples</li>,
             <li>bananas</li>,
             <li>oranges</li>
-        </@firstLastListNested>
+        </@firstLastListNested />
         
-        <@firstLastListNested delim="??">
+        <@firstLastListNested delim="??" />
             <li>apples, oranges</li>??
             <li>bananas, lemons</li>??
             <li>grapefruit, limes</li>
-        </@firstLastListNested>
+        </@firstLastListNested />
         
-        <@firstLastListNested delim="??">
+        <@firstLastListNested delim="??" />
             <li>Books
                 <ul>
                     <li>Persuasion</li>
@@ -72,7 +72,7 @@
                     <li>Time</li>
                 </ul>
             </li>
-        </@firstLastListNested>
+        </@firstLastListNested />
 
     RY Consider rewriting in Java. Probably designers won't want to modify this.
 -->

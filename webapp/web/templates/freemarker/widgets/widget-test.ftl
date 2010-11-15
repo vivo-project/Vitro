@@ -9,8 +9,16 @@
 </#macro>
 
 <#macro markup>
+<#import "lib-list.ftl" as l>
     <div class="testWidget">
-        <h4>This is the test widget.</h4>    
+        <h4>This is the test widget using macros.</h4>    
         <p>I like ${fruit}.</p>
+    </div>
+</#macro>
+
+<#macro altMarkup>
+    <div class="testWidget">
+        <h4>This is the alternate version of the test widget.</h4>    
+        <p>I hate ${fruit}.</p>
     </div>
 </#macro>

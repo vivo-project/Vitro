@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.web.widgets;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Collections;
 import java.util.HashMap;
@@ -14,9 +15,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import freemarker.cache.TemplateLoader;
 import freemarker.core.Environment;
-import freemarker.template.Configuration;
+import freemarker.core.Macro;
 import freemarker.template.Template;
 import freemarker.template.TemplateHashModel;
 import freemarker.template.TemplateModelException;
@@ -31,18 +31,12 @@ public abstract class Widget {
     
     public String doAssets(Environment env, Map params) {
         String widgetName = params.get("name").toString(); //getWidgetName();
-        String templateName = getAssetsTemplateName(widgetName);
-
-        // Allow the assets template to be absent without generating an error.
-        TemplateLoader templateLoader = env.getConfiguration().getTemplateLoader();
-        try {
-            if ( templateLoader.findTemplateSource(templateName) == null ) {
-                return "";
-            }
-        } catch (IOException e) {
-            log.error("Error finding template source", e);
-        }
+        Macro assetsMacro = getMacroFromTemplate(getAssetsMacroName(), widgetName, env);
         
+        // Allow there to be no assets macro in the template
+        if (assetsMacro == null) {
+            return "";
+        }
         TemplateHashModel dataModel = env.getDataModel();  
         Map<String, Object> map = new HashMap<String, Object>(); 
         
@@ -54,30 +48,36 @@ public abstract class Widget {
             log.error("Error getting asset values from data model.");
         }
         
-        return processTemplateToString(widgetName, env, templateName, map);
- 
+        return processMacroToString(env, widgetName, assetsMacro, map); 
     }
     
     public String doMarkup(Environment env, Map params) {
         HttpServletRequest request = (HttpServletRequest) env.getCustomAttribute("request");
         ServletContext context = (ServletContext) env.getCustomAttribute("context");
+        
+        WidgetTemplateValues values = process(env, params, request, context); 
         String widgetName = params.get("name").toString(); // getWidgetName();
-        WidgetTemplateValues values = process(env, params, widgetName, request, context);        
-        return processTemplateToString(widgetName, env, values);
+        return processMacroToString(env, widgetName, values);
     }
 
-    // Default assets template name. Can be overridden by subclasses.
-    protected String getAssetsTemplateName(String widgetName) {
-        return "widget-" + widgetName + "-assets.ftl";
-    }
-  
-    // Default markup template name. Can be overridden in subclasses, or assigned
-    // differently in the subclass process() method. For example, LoginWidget will
-    // select a template according to login processing status.
-    protected String getMarkupTemplateName(String widgetName) {
-        return "widget-" + widgetName + "-markup.ftl";
+    // Default  template name. Can be overridden by subclasses.
+    protected String getTemplateName(String widgetName) {
+        return "widget-" + widgetName + ".ftl";
     }
     
+    // Default assets macro name. Can be overridden by subclasses.
+    protected String getAssetsMacroName() {
+        return "assets";
+    }
+    
+    // Default markup macro name. Can be overridden by subclasses, or
+    // subclass process() method can select from various markup macros
+    // based on widget state. For example, the login widget markup macro will
+    // differ depending on login processing state.
+    protected String getMarkupMacroName() {
+        return "markup";
+    }
+ 
 //    private String getWidgetName() {
 //        String name = this.getClass().getName();
 //        name= name.replaceAll(".*\\.", "");
@@ -86,31 +86,57 @@ public abstract class Widget {
 //        return name;
 //    }
 
-    protected abstract WidgetTemplateValues process(Environment env, Map params, String widgetName, HttpServletRequest request, ServletContext context);
+    protected abstract WidgetTemplateValues process(Environment env, Map params, 
+            HttpServletRequest request, ServletContext context);
     
-    private String processTemplateToString(String widgetName, Environment env, String templateName, Map<String, Object> map) {
+    private String processMacroToString(Environment env, String widgetName, Macro macro, Map<String, Object> map) {   
         StringWriter out = new StringWriter();
-        Configuration config = env.getConfiguration();
         try {
-            Template template = config.getTemplate(templateName);
+            String templateString = macro.getChildNodes().get(0).toString();
+            // NB Using this method of creating a template from a string does not allow the widget template to import
+            // other templates (but it can include other templates). We'd need to use a StringTemplateLoader
+            // in the config instead. See StringTemplateLoader API doc.
+            // The problem is that the StringTemplateLoader has to be added to the config's MultiTemplateLoader.
+            // Then to support multi-threading, we can't just add the widget here to the StringTemplateLoader with
+            // the same key, e.g., "widgetTemplate", since one putTemplate() call will clobber a previous one.
+            // We need to give each widget macro template a unique key in the StringTemplateLoader, and check 
+            // if it's already there or else add it. Leave this for later.
+            Template template = new Template("widget", new StringReader(templateString), env.getConfiguration());          
             template.process(map, out);
         } catch (Throwable th) {
             log.error("Could not process widget " + widgetName, th);
         }
-        return out.toString();        
+        return out.toString();       
     }
     
-    private String processTemplateToString(String widgetName, Environment env, WidgetTemplateValues values) {
-        return processTemplateToString(widgetName, env, values.getTemplateName(), values.getMap());
+    private String processMacroToString(Environment env, String widgetName, String macroName, Map<String, Object> map) {
+        Macro macro = getMacroFromTemplate(macroName, widgetName, env);
+        return processMacroToString(env, widgetName, macro, map);
     }
-   
+    
+    private String processMacroToString(Environment env, String widgetName, WidgetTemplateValues values) {
+        return processMacroToString(env, widgetName, values.getMacroName(), values.getMap());
+    }
+    
+    private Macro getMacroFromTemplate(String macroName, String widgetName, Environment env) {
+        String templateName = getTemplateName(widgetName);
+        Template template = null;
+        Macro macro = null;
+        try {
+            template = env.getConfiguration().getTemplate(templateName);
+            macro = (Macro)template.getMacros().get(macroName);
+        } catch (IOException e) {
+            log.error("Cannot get template " + templateName);
+        }  
+        return macro;
+    }
     
     protected static class WidgetTemplateValues {
-        private final String templateName;
+        private final String macroName;
         private final Map<String, Object> map;
         
         public WidgetTemplateValues(String templateName, Map<String, Object> map) {
-            this.templateName = templateName;
+            this.macroName = templateName;
             this.map = map;
         }
 
@@ -123,8 +149,8 @@ public abstract class Widget {
             return Collections.unmodifiableMap(this.map);
         }
 
-        public String getTemplateName() {
-            return this.templateName;
+        public String getMacroName() {
+            return this.macroName;
         }
  
     }

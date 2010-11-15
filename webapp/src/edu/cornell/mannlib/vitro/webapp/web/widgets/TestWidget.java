@@ -13,10 +13,11 @@ import freemarker.core.Environment;
 public class TestWidget extends Widget {
 
     @Override
-    protected WidgetTemplateValues process(Environment env, Map params, String widgetName, HttpServletRequest request, ServletContext context) {
+    protected WidgetTemplateValues process(Environment env, Map params,
+            HttpServletRequest request, ServletContext context) {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("fruit", "bananas");
-        return new WidgetTemplateValues (getMarkupTemplateName(widgetName), map);
+        return new WidgetTemplateValues (getMarkupMacroName(), map);
     }
 
 }
