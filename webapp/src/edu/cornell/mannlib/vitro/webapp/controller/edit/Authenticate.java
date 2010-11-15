@@ -27,7 +27,6 @@ import com.hp.hpl.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
-import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
@@ -335,12 +334,18 @@ public class Authenticate extends VitroHttpServlet {
 	}
 
 	/**
-	 * Exit: user is logging in, so show them the login screen.
+	 * Exit: user is still logging in, so go back to the page they were on.
 	 */
 	private void showLoginScreen(VitroRequest vreq, HttpServletResponse response)
 			throws IOException {
 		log.debug("logging in.");
-		response.sendRedirect(getLoginScreenUrl(vreq));
+		
+		String referringPage = vreq.getHeader("referer");
+		if (referringPage == null) {
+			log.warn("No referring page on the request");
+			referringPage = getHomeUrl(vreq); 
+		}
+		response.sendRedirect(referringPage);
 		return;
 	}
 
@@ -357,13 +362,6 @@ public class Authenticate extends VitroHttpServlet {
 	/** Get a reference to the Authenticator. */
 	private Authenticator getAuthenticator(HttpServletRequest request) {
 		return Authenticator.getInstance(request);
-	}
-
-	/** What's the URL for the login screen? */
-	private String getLoginScreenUrl(HttpServletRequest request) {
-		String contextPath = request.getContextPath();
-		String urlParams = "?login=block";
-		return contextPath + Controllers.LOGIN + urlParams;
 	}
 
 	/** What's the URL for the home page? */

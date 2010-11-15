@@ -36,10 +36,12 @@ public class HttpServletRequestStub implements HttpServletRequest {
 	private HttpSession session;
 	private final Map<String, List<String>> parameters;
 	private final Map<String, Object> attributes;
+	private final Map<String, List<String>> headers;
 
 	public HttpServletRequestStub() {
 		parameters = new HashMap<String, List<String>>();
 		attributes = new HashMap<String, Object>();
+		headers = new HashMap<String, List<String>>();
 	}
 
 	public HttpServletRequestStub(Map<String, List<String>> parameters,
@@ -60,6 +62,14 @@ public class HttpServletRequestStub implements HttpServletRequest {
 
 	public void setRemoteAddr(String remoteAddr) {
 		this.remoteAddr = remoteAddr;
+	}
+	
+	public void setHeader(String name, String value) {
+		name = name.toLowerCase();
+		if (!headers.containsKey(name)) {
+			headers.put(name, new ArrayList<String>());
+		}
+		headers.get(name).add(value);
 	}
 
 	public void addParameter(String name, String value) {
@@ -163,6 +173,30 @@ public class HttpServletRequestStub implements HttpServletRequest {
 		attributes.put(name, value);
 	}
 
+	@SuppressWarnings("rawtypes")
+	public Enumeration getHeaderNames() {
+		return Collections.enumeration(headers.keySet());
+	}
+
+	public String getHeader(String name) {
+		name = name.toLowerCase();
+		if (headers.containsKey(name)) {
+			return headers.get(name).get(0);
+		} else {
+			return null;
+		}
+	}
+
+	@SuppressWarnings("rawtypes")
+	public Enumeration getHeaders(String name) {
+		name = name.toLowerCase();
+		if (headers.containsKey(name)) {
+			return Collections.enumeration(headers.get(name));
+		} else {
+			return Collections.enumeration(Collections.emptyList());
+		}
+	}
+
 	// ----------------------------------------------------------------------
 	// Un-implemented methods
 	// ----------------------------------------------------------------------
@@ -180,23 +214,6 @@ public class HttpServletRequestStub implements HttpServletRequest {
 	public long getDateHeader(String arg0) {
 		throw new RuntimeException(
 				"HttpServletRequestStub.getDateHeader() not implemented.");
-	}
-
-	public String getHeader(String arg0) {
-		throw new RuntimeException(
-				"HttpServletRequestStub.getHeader() not implemented.");
-	}
-
-	@SuppressWarnings("rawtypes")
-	public Enumeration getHeaderNames() {
-		throw new RuntimeException(
-				"HttpServletRequestStub.getHeaderNames() not implemented.");
-	}
-
-	@SuppressWarnings("rawtypes")
-	public Enumeration getHeaders(String arg0) {
-		throw new RuntimeException(
-				"HttpServletRequestStub.getHeaders() not implemented.");
 	}
 
 	public int getIntHeader(String arg0) {

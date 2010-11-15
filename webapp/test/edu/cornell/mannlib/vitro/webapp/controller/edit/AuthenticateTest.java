@@ -44,8 +44,8 @@ public class AuthenticateTest extends AbstractTestClass {
 	private static final String USER_OLDHAND_PASSWORD = "oldHandPassword";
 	private static final int USER_OLDHAND_LOGIN_COUNT = 100;
 
-	private static final String URL_LOGIN_PAGE = Controllers.LOGIN
-			+ "?login=block";
+	private static final String URL_LOGIN_PAGE = "http://my.local.site/vivo/"
+			+ Controllers.LOGIN;
 	private static final String URL_SITE_ADMIN_PAGE = Controllers.SITE_ADMIN
 			+ "?login=block";
 	private static final String URL_HOME_PAGE = "";
@@ -84,6 +84,7 @@ public class AuthenticateTest extends AbstractTestClass {
 		request.setSession(session);
 		request.setRequestUrl(new URL("http://this.that/vivo/siteAdmin"));
 		request.setMethod("POST");
+		request.setHeader("referer", URL_LOGIN_PAGE);
 
 		response = new HttpServletResponseStub();
 
@@ -124,7 +125,7 @@ public class AuthenticateTest extends AbstractTestClass {
 
 		auth.doPost(request, response);
 
-		assertExpectedRedirect(URL_LOGIN_PAGE);
+		assertExpectedRedirect(URL_SITE_ADMIN_PAGE);
 		assertNoProcessBean();
 		assertExpectedLoginSessions();
 	}
@@ -197,7 +198,7 @@ public class AuthenticateTest extends AbstractTestClass {
 		auth.doPost(request, response);
 
 		assertNoProcessBean();
-		assertExpectedRedirect(URL_LOGIN_PAGE);
+		assertExpectedRedirect(URL_SITE_ADMIN_PAGE);
 		assertExpectedLoginSessions(USER_OLDHAND_NAME);
 	}
 
@@ -277,7 +278,7 @@ public class AuthenticateTest extends AbstractTestClass {
 		auth.doPost(request, response);
 
 		assertNoProcessBean();
-		assertExpectedRedirect(URL_LOGIN_PAGE);
+		assertExpectedRedirect(URL_SITE_ADMIN_PAGE);
 		assertExpectedLoginSessions(USER_DBA_NAME);
 		assertExpectedPasswordChanges(USER_DBA_NAME, "NewPassword");
 	}
@@ -351,8 +352,13 @@ public class AuthenticateTest extends AbstractTestClass {
 	}
 
 	private void assertExpectedRedirect(String path) {
-		assertEquals("redirect", request.getContextPath() + path,
-				response.getRedirectLocation());
+		if (path.startsWith("http://")) {
+			assertEquals("absolute redirect", path,
+					response.getRedirectLocation());
+		} else {
+			assertEquals("relative redirect", request.getContextPath() + path,
+					response.getRedirectLocation());
+		}
 	}
 
 	/** This is for explicit redirect URLs that already include context. */
