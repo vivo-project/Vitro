@@ -59,8 +59,7 @@ public class DumpDirective extends BaseTemplateDirectiveModel {
 
         helper.writeDump("dump.ftl", map, var);   
     }
-    
-    
+        
     public String help(Environment env) {
         Map<String, Object> map = new HashMap<String, Object>();
         
