@@ -20,7 +20,7 @@
 <xsl:include href='commonvars.xsl'/>
 <xsl:template match='/AI-Users'>
 <rdf:RDF>
-<xsl:for-each select='person[@same="Yes"]'>
+<xsl:for-each select='person[@same="Yes" or aiid != ""]'>
 
 <rdf:Description rdf:about="{./uri}">
 <rdf:type rdf:resource='http://xmlns.com/foaf/0.1/Person'/>

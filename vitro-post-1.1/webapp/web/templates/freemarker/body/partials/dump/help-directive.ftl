@@ -12,7 +12,7 @@
             <p><strong>Comments:</strong> ${comments}</p>     
         </#if>      
         
-        <h6>Parameters:</h6>
+        <p><strong>Parameters:</strong></p>
         <#if params?? && params?keys?has_content>
             <ul>
                 <#list params?keys as param>
@@ -22,8 +22,9 @@
         <#else>
             <p>none</p>
         </#if>
+        <br />
         
-        <h6>Examples:</h6>
+        <p><strong>Examples:</strong></p>
         <#if examples??>
             <ul>
                 <#list examples as example>

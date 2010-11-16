@@ -3,7 +3,6 @@
 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 xmlns:dm="http://www.digitalmeasures.com/schema/data"
 xmlns:dmd="http://www.digitalmeasures.com/schema/data-metadata"
-xmlns="http://www.digitalmeasures.com/schema/data"
 xmlns:ai="http://www.digitalmeasures.com/schema/data"
 xmlns:xs='http://www.w3.org/2001/XMLSchema'
 xmlns:vfx='http://vivoweb.org/ext/functions'	
@@ -184,6 +183,7 @@ removes leading and trailing whitespace from the argument string
 
 </xsl:function>
 <!-- ================================== -->
+
 <xsl:function name='vfx:knownUriByNetidOrName'>
 <xsl:param name='fn'/>
 <xsl:param name='mn'/>
@@ -249,6 +249,184 @@ removes leading and trailing whitespace from the argument string
 
 </xsl:function>
 
+
+
+
+<xsl:function name='vfx:knownUriByNetidOrNameKeyed'>
+<xsl:param name='fn'/>
+<xsl:param name='mn'/>
+<xsl:param name='ln'/>
+<xsl:param name='nid'/>
+<xsl:param name='ep'/>
+<xsl:choose>
+<xsl:when test='$ep'>
+<xsl:variable name='nfn' select='normalize-space($fn)'/>
+<xsl:variable name='nmn' select='normalize-space($mn)'/>
+<xsl:variable name='nln' select='normalize-space($ln)'/>
+<xsl:variable name='unid' select='upper-case($nid)'/>
+
+
+
+  <xsl:choose>
+  <xsl:when test='$nid'>
+	<xsl:variable name='plist' 
+		select='$ep[netid != "" and $unid != "" and
+			           upper-case(netid) = $unid]/uri'/>
+	<xsl:choose>
+	<xsl:when test='$plist[1] != ""'>
+	<xsl:value-of select='$plist[1]'/>
+	</xsl:when>
+	<xsl:otherwise>
+<!-- xsl:comment> boo </xsl:comment -->
+	<xsl:variable name='results' 
+		select='$ep[upper-case(normalize-space(lname)) = 
+		            upper-case($nln) and 
+        		    vfx:isoName(fname,mname,lname,$fn,$mn,$ln)]/uri'/>
+<!-- xsl:comment> foo </xsl:comment -->
+	<xsl:choose>
+	<xsl:when test='$results[1]'>
+	<xsl:value-of select='$results[1]'/>
+	</xsl:when>
+	<xsl:otherwise>
+	<xsl:value-of select='""'/>
+	</xsl:otherwise>
+	</xsl:choose>
+	</xsl:otherwise>
+	</xsl:choose>
+  </xsl:when>
+  <xsl:otherwise>
+<!-- xsl:comment> bar </xsl:comment -->
+	<xsl:variable name='results' 
+		select='$ep[upper-case(normalize-space(lname)) = 
+		            upper-case($nln) and 
+        		    vfx:isoName(fname,mname,lname,$fn,$mn,$ln)]/uri'/>
+
+	<xsl:choose>
+	<xsl:when test='$results[1] != ""'>
+	<xsl:value-of select='$results[1]'/>
+	</xsl:when>
+	<xsl:otherwise>
+	<xsl:value-of select='""'/>
+	</xsl:otherwise>
+	</xsl:choose>
+  </xsl:otherwise>
+  </xsl:choose>
+</xsl:when>
+<xsl:otherwise>
+<xsl:value-of select='""'/>
+</xsl:otherwise>
+</xsl:choose>
+
+</xsl:function>
+
+<!-- ================================== -->
+<xsl:function name='vfx:knownPersonByNetidOrNameKeyed'>
+<xsl:param name='fn'/>
+<xsl:param name='mn'/>
+<xsl:param name='ln'/>
+<xsl:param name='nid'/>
+<xsl:param name='ep'/>
+<xsl:choose>
+<xsl:when test='$ep'>
+<xsl:variable name='nfn' select='normalize-space($fn)'/>
+<xsl:variable name='nmn' select='normalize-space($mn)'/>
+<xsl:variable name='nln' select='normalize-space($ln)'/>
+<xsl:variable name='unid' select='upper-case($nid)'/>
+
+  <xsl:choose>
+  <xsl:when test='$nid'>
+	<xsl:variable name='plist' 
+		select='$ep[netid != "" and $unid != "" and
+			           upper-case(netid) = $unid]'/>
+	<xsl:choose>
+	<xsl:when test='$plist[1] != ""'>
+	<xsl:copy-of select='$plist[1]'/>
+	</xsl:when>
+	<xsl:otherwise>
+<!-- =============================== -->
+	<xsl:variable name='results' 
+		select='$ep[upper-case(normalize-space(lname)) = 
+			upper-case($nln) and 
+        		vfx:isoName(fname,mname,lname,$fn,$mn,$ln)]'/>
+
+	<xsl:choose>
+	<xsl:when test='count($results)>0'>
+
+	<xsl:variable name='longest' 
+  		select='vfx:maxNameLength($results)' as='xs:integer'/>
+	<xsl:variable name='res' as='node()*' 
+		select='$results[string-length(concat(normalize-space(./lname),"|",
+                                           normalize-space(./fname),"|",
+                                           normalize-space(./mname)))
+                      = $longest]'/>
+
+
+	<xsl:copy-of select='$res[1]'/> 
+
+	</xsl:when>
+	<xsl:otherwise>
+	<xsl:value-of select='""'/>
+	</xsl:otherwise>
+	</xsl:choose>
+<!-- =============================== <xsl:value-of select='""'/> -->
+
+	</xsl:otherwise>
+	</xsl:choose>
+  </xsl:when>
+  <xsl:otherwise>
+
+<!-- =============================== -->
+	<xsl:variable name='results' 
+		select='$ep[upper-case(normalize-space(lname)) = 
+			upper-case($nln) and 
+        		vfx:isoName(fname,mname,lname,$fn,$mn,$ln)]'/>
+
+	<xsl:choose>
+	<xsl:when test='count($results)>0'>
+
+	<xsl:variable name='longest' 
+  		select='vfx:maxNameLength($results)' as='xs:integer'/>
+	<xsl:variable name='res' as='node()*' 
+	select='$results[string-length(concat(normalize-space(./lname),"|",
+                                           normalize-space(./fname),"|",
+                                           normalize-space(./mname)))
+                      = $longest]'/>
+
+
+	<xsl:copy-of select='$res[1]'/> 
+
+	</xsl:when>
+	<xsl:otherwise>
+	<xsl:value-of select='""'/>
+	</xsl:otherwise>
+	</xsl:choose>
+<!-- =============================== -->
+
+  </xsl:otherwise>
+  </xsl:choose>
+</xsl:when>
+<xsl:otherwise>
+<xsl:value-of select='""'/>
+</xsl:otherwise>
+</xsl:choose>
+
+</xsl:function>
+<!--  ================================= -->
+<xsl:function name='vfx:bestChoices' as='node()*' >
+<xsl:param name='nlist'/>
+
+<xsl:variable name='longest' 
+  select='vfx:maxNameLength($nlist)' as='xs:integer'/>
+
+
+<xsl:sequence
+	select='$nlist[
+            string-length(concat(normalize-space(./lname),"|",
+                                 normalize-space(./fname),"|",
+                                 normalize-space(./mname))) = $longest]' />
+
+</xsl:function>
+
 <!-- ================================== -->
 <xsl:function name='vfx:knownPersonByNetidOrName'>
 <xsl:param name='fn'/>
@@ -266,10 +444,10 @@ removes leading and trailing whitespace from the argument string
   <xsl:choose>
   <xsl:when test='$nid'>
 	<xsl:variable name='plist' 
-		select='$ep/person[netid != "" and
+		select='$ep/person[netid != "" and $unid != "" and
 			           upper-case(netid) = $unid]'/>
 	<xsl:choose>
-	<xsl:when test='$plist[1]'>
+	<xsl:when test='$plist[1] != ""'>
 	<xsl:copy-of select='$plist[1]'/>
 	</xsl:when>
 	<xsl:otherwise>
@@ -313,11 +491,7 @@ removes leading and trailing whitespace from the argument string
 
 	<xsl:choose>
 	<xsl:when test='count($results)>0'>
-<!--
-	<xsl:comment>foo<xsl:value-of select='count($results)'/>
-<xsl:value-of select='$results'/>
-</xsl:comment>
--->
+
 	<xsl:variable name='longest' 
   		select='vfx:maxNameLength($results)' as='xs:integer'/>
 	<xsl:variable name='res' as='node()*' 
@@ -326,18 +500,9 @@ removes leading and trailing whitespace from the argument string
                                            normalize-space(./mname)))
                       = $longest]'/>
 
-<!--<xsl:comment> plus <xsl:value-of select='$res'/></xsl:comment>
-	<xsl:variable name='res' as='node()*'
-		select='vfx:bestChoices($results)'/>
--->
-<!--
-<xsl:comment>bar<xsl:value-of select='$longest'/></xsl:comment>
--->
+
 	<xsl:copy-of select='$res[1]'/> 
 
-	<!--
-	<xsl:copy-of select='$results[1]'/> 
-	 -->
 	</xsl:when>
 	<xsl:otherwise>
 	<xsl:value-of select='""'/>
@@ -352,21 +517,6 @@ removes leading and trailing whitespace from the argument string
 <xsl:value-of select='""'/>
 </xsl:otherwise>
 </xsl:choose>
-
-</xsl:function>
-<!--  ================================= -->
-<xsl:function name='vfx:bestChoices' as='node()*' >
-<xsl:param name='nlist'/>
-
-<xsl:variable name='longest' 
-  select='vfx:maxNameLength($nlist)' as='xs:integer'/>
-
-
-<xsl:sequence
-	select='$nlist[
-            string-length(concat(normalize-space(./lname),"|",
-                                 normalize-space(./fname),"|",
-                                 normalize-space(./mname))) = $longest]' />
 
 </xsl:function>
 <!-- ================================== -->
@@ -520,7 +670,9 @@ select='$ep/person[normalize-space(lname) = $nln and vfx:isoName(fname,mname,lna
 <xsl:param name='ep'/>
 <xsl:choose>
 <xsl:when test='$ep'>
-<xsl:value-of select='$ep/person[name=$n and stateCountry = $sc]/uri'/>
+<xsl:variable name='results' 
+	select='$ep/person[name=$n and stateCountry = $sc]'/>
+<xsl:value-of select='$results/uri'/>
 </xsl:when>
 <xsl:otherwise>
 <xsl:value-of select='""'/>
@@ -533,15 +685,8 @@ select='$ep/person[normalize-space(lname) = $nln and vfx:isoName(fname,mname,lna
 <xsl:param name='ep'/>
 <xsl:choose>
 <xsl:when test='$ep'>
-<xsl:variable name='results' select='$ep/org[name=$n]/uri'/>
-	<xsl:choose>
-	<xsl:when test='$results[1]'>
-	<xsl:value-of select='$results[1]'/>
-	</xsl:when>
-	<xsl:otherwise>
-	<xsl:value-of select='""'/>
-	</xsl:otherwise>
-	</xsl:choose>
+<xsl:variable name='results' select='$ep/org[name=$n][1]'/>
+<xsl:value-of select='$results/uri'/>
 </xsl:when>
 <xsl:otherwise>
 <xsl:value-of select='""'/>
@@ -554,7 +699,8 @@ select='$ep/person[normalize-space(lname) = $nln and vfx:isoName(fname,mname,lna
 <xsl:param name='ep'/>
 <xsl:choose>
 <xsl:when test='$ep'>
-<xsl:value-of select='$ep/geo[title=$n]/uri'/>
+<xsl:variable name='results' select='$ep/geo[title=$n][1]'/>
+<xsl:value-of select='$results/uri'/>
 </xsl:when>
 <xsl:otherwise>
 <xsl:value-of select='""'/>
@@ -567,7 +713,8 @@ select='$ep/person[normalize-space(lname) = $nln and vfx:isoName(fname,mname,lna
 <xsl:param name='ep'/>
 <xsl:choose>
 <xsl:when test='$ep'>
-<xsl:value-of select='$ep/emphasis[title=$n]/uri'/>
+<xsl:variable name='results' select='$ep/emph[name=$n][1]'/>
+<xsl:value-of select='$results/uri'/>
 </xsl:when>
 <xsl:otherwise>
 <xsl:value-of select='""'/>
@@ -580,7 +727,8 @@ select='$ep/person[normalize-space(lname) = $nln and vfx:isoName(fname,mname,lna
 <xsl:param name='ep'/>
 <xsl:choose>
 <xsl:when test='$ep'>
-<xsl:value-of select='$ep/area[name=$n]/uri'/>
+<xsl:variable name='results' select='$ep/area[name=$n][1]'/>
+<xsl:value-of select='$results/uri'/>
 </xsl:when>
 <xsl:otherwise>
 <xsl:value-of select='""'/>
@@ -593,7 +741,8 @@ select='$ep/person[normalize-space(lname) = $nln and vfx:isoName(fname,mname,lna
 <xsl:param name='ep'/>
 <xsl:choose>
 <xsl:when test='$ep'>
-<xsl:value-of select='$ep/conarea[name=$n]/uri'/>
+<xsl:variable name='results' select='$ep/conarea[title=$n][1]'/>
+<xsl:value-of select='$results/uri'/>
 </xsl:when>
 <xsl:otherwise>
 <xsl:value-of select='""'/>
@@ -834,6 +983,36 @@ select='contains($nn,"COMMITTEE") or contains($nn,"COUNCIL")'/>
 </xsl:function>
 
 <!-- ================================== -->
+<xsl:function name='vfx:isoName' as='xs:boolean'>
+<xsl:param name='fn1'/>
+<xsl:param name='mn1'/>
+<xsl:param name='ln1'/>
+<xsl:param name='fn2'/>
+<xsl:param name='mn2'/>
+<xsl:param name='ln2'/>
+<xsl:value-of select='vfx:isoNameMatch($fn1,$mn1,$ln1,$fn2,$mn2,$ln2)'/>
+</xsl:function>
+
+
+<!-- ================================== -->
+<xsl:function name='vfx:isoNameStrict' as='xs:boolean'>
+<xsl:param name='fn1'/>
+<xsl:param name='mn1'/>
+<xsl:param name='ln1'/>
+<xsl:param name='fn2'/>
+<xsl:param name='mn2'/>
+<xsl:param name='ln2'/>
+<xsl:variable name='ln2t' select='vfx:clean($ln2)'/>
+<xsl:variable name='ln1t' select='vfx:clean($ln1)'/>
+<xsl:variable name='fn2t' select='vfx:clean($fn2)'/>
+<xsl:variable name='fn1t' select='vfx:clean($fn1)'/>
+<xsl:variable name='mn2t' select='vfx:clean($mn2)'/>
+<xsl:variable name='mn1t' select='vfx:clean($mn1)'/>
+<xsl:value-of select='($ln1t = $ln2t) and ($fn1t = $fn2t) and ($mn1t = $mn2t)'/>
+</xsl:function>
+
+
+
 <xsl:function name='vfx:isoNameJava' as='xs:boolean'>
 <xsl:param name='fn1'/>
 <xsl:param name='mn1'/>
@@ -847,7 +1026,7 @@ select='contains($nn,"COMMITTEE") or contains($nn,"COUNCIL")'/>
 -->
 </xsl:function>
 
-<xsl:function name='vfx:isoName' as='xs:boolean'>
+<xsl:function name='vfx:isoNameMatch' as='xs:boolean'>
 <xsl:param name='fn1'/>
 <xsl:param name='mn1'/>
 <xsl:param name='ln1'/>
@@ -880,7 +1059,7 @@ select='contains($nn,"COMMITTEE") or contains($nn,"COUNCIL")'/>
 select='($fweight*$wFirstName + $mweight*$wMiddleName) div $wFM'/>
 <!--xsl:comment><xsl:value-of select='$conf'/></xsl:comment-->
 <xsl:choose>
-  	<xsl:when test='$conf >= $cutoff' >
+  	<xsl:when test='$conf > $cutoff' >
 		<xsl:value-of select='true()'/>
   	</xsl:when>
   	<xsl:otherwise>
@@ -1029,6 +1208,53 @@ select='$knowns/person[vfx:isoName(fname,mname,lname,$fn,$mn,$ln)]'/>
 </xsl:element>
 </xsl:template>
 
+<xsl:template name='NewOrgs'>
+<xsl:param name='knowns'/>
+<xsl:element name='ExtantOrgs' namespace=''>
+<xsl:comment><xsl:value-of select='count($knowns/org)'/> </xsl:comment>
+<xsl:value-of select='$MyNL'/>
+<xsl:for-each 
+select='$knowns/org[not(name = preceding-sibling::org/name)]'>
+<!--xsl:comment>
+<xsl:value-of select='./name' separator=' | '/> 
+</xsl:comment-->
+<xsl:copy-of select='.'/>
+<xsl:value-of select='$MyNL'/>
+</xsl:for-each>
+</xsl:element>
+</xsl:template>
+
+<xsl:template name='NewCEOrgs'>
+<xsl:param name='knowns'/>
+<xsl:element name='ExtantCEOrgs' namespace=''>
+<xsl:comment><xsl:value-of select='count($knowns/org)'/> </xsl:comment>
+<xsl:value-of select='$MyNL'/>
+<xsl:for-each 
+select='$knowns/org[not(name = preceding-sibling::org/name) and 
+		   not(stateCountry = preceding-sibling::org/stateCountry)]'>
+
+<xsl:copy-of select='.'/>
+<xsl:value-of select='$MyNL'/>
+</xsl:for-each>
+</xsl:element>
+</xsl:template>
+
+<xsl:template name='NewUsdaAreas'>
+<xsl:param name='knowns'/>
+<xsl:element name='ExtantUsdaAreas' namespace=''>
+<xsl:comment><xsl:value-of select='count($knowns/area)'/> </xsl:comment>
+<xsl:value-of select='$MyNL'/>
+<xsl:for-each
+select='$knowns/area[not(name = preceding-sibling::area/name)]'>
+<!--xsl:comment>
+<xsl:value-of select='./area' separator=' | '/>
+</xsl:comment-->
+<xsl:copy-of select='.'/>
+<xsl:value-of select='$MyNL'/>
+</xsl:for-each>
+</xsl:element>
+</xsl:template>
+
 <xsl:template name='NewJournals'>
 <xsl:param name='knowns'/>
 <xsl:element name='ExtantJournals' namespace=''>
@@ -1037,6 +1263,54 @@ select='$knowns/person[vfx:isoName(fname,mname,lname,$fn,$mn,$ln)]'/>
 <xsl:for-each 
 select='$knowns/journal[not(name = preceding-sibling::journal/name)]'>
 <xsl:comment><xsl:value-of select='./name' separator=' | '/> </xsl:comment>
+<xsl:copy-of select='.'/>
+<xsl:value-of select='$MyNL'/>
+</xsl:for-each>
+</xsl:element>
+</xsl:template>
+
+<xsl:template name='NewGeos'>
+<xsl:param name='knowns'/>
+<xsl:element name='ExtantGeoLocs' namespace=''>
+<xsl:comment><xsl:value-of select='count($knowns/geo)'/> </xsl:comment>
+<xsl:value-of select='$MyNL'/>
+<xsl:for-each 
+select='$knowns/geo[not(title = preceding-sibling::geo/title)]'>
+<!--xsl:comment>
+<xsl:value-of select='./title' separator=' | '/> 
+</xsl:comment-->
+<xsl:copy-of select='.'/>
+<xsl:value-of select='$MyNL'/>
+</xsl:for-each>
+</xsl:element>
+</xsl:template>
+
+<xsl:template name='NewConAreas'>
+<xsl:param name='knowns'/>
+<xsl:element name='ExtantConAreas' namespace=''>
+<xsl:comment><xsl:value-of select='count($knowns/conarea)'/> </xsl:comment>
+<xsl:value-of select='$MyNL'/>
+<xsl:for-each 
+select='$knowns/conarea[not(title = preceding-sibling::conarea/title)]'>
+<xsl:comment>
+<xsl:value-of select='./title' separator=' | '/> 
+</xsl:comment>
+<xsl:copy-of select='.'/>
+<xsl:value-of select='$MyNL'/>
+</xsl:for-each>
+</xsl:element>
+</xsl:template>
+
+<xsl:template name='NewEmphs'>
+<xsl:param name='knowns'/>
+<xsl:element name='ExtantEmphs' namespace=''>
+<xsl:comment><xsl:value-of select='count($knowns/emph)'/> </xsl:comment>
+<xsl:value-of select='$MyNL'/>
+<xsl:for-each 
+select='$knowns/emph[not(name = preceding-sibling::emph/name)]'>
+<!--xsl:comment>
+<xsl:value-of select='./name' separator=' | '/> 
+</xsl:comment-->
 <xsl:copy-of select='.'/>
 <xsl:value-of select='$MyNL'/>
 </xsl:for-each>
@@ -1106,7 +1380,16 @@ select='$knowns/journal[not(name = preceding-sibling::journal/name)]'>
 <xsl:variable name='res' select='$list[vfx:goodName(dm:FNAME,
 						    dm:MNAME,
 						    dm:LNAME)][1]'/>
-<xsl:value-of select='if($res) then true() else false()'/>
+<xsl:value-of select='if($res != "") then true() else false()'/>
+
+</xsl:function>
+
+<xsl:function name='vfx:IS-hasOneGoodName' as='xs:boolean'>
+<xsl:param name='list'/>
+<xsl:variable name='res' select='$list[vfx:goodName(FNAME,
+						    MNAME,
+						    LNAME)][1]'/>
+<xsl:value-of select='if($res != "") then true() else false()'/>
 
 </xsl:function>
 </xsl:stylesheet>

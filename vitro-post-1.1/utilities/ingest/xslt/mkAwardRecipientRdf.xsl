@@ -9,7 +9,6 @@
         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
 	xmlns:aiah="http://vivoweb.org/ontology/activity-insight"
 	xmlns:acti="http://vivoweb.org/ontology/activity-insight#"
-        xmlns="http://vivoweb.org/ontology/activity-insight"
 	xmlns:dm="http://www.digitalmeasures.com/schema/data"	
 	xmlns:vfx='http://vivoweb.org/ext/functions'
 	exclude-result-prefixes='xs vfx'
@@ -40,6 +39,9 @@
 <xsl:variable name='prenewps'>
 <xsl:element name='ExtantPersons' inherit-namespaces='no'>
 <xsl:for-each select='aiah:RECIPIENT'>
+<xsl:if test='vfx:goodName(aiah:fname, 
+	                   aiah:mname, 
+                           aiah:lname)'>
 <xsl:variable name='ctr'  select='@counter'/>
 <xsl:variable name='uno' select='$unomap/map[position()=$ctr]/@nuno'/>
 
@@ -69,34 +71,21 @@ select="if($kUri != '') then $kUri
 <xsl:element name='netid' inherit-namespaces='no'>
 <xsl:value-of select='aiah:netid'/></xsl:element>
 </xsl:element>
-
+</xsl:if>
 </xsl:if>
 </xsl:for-each>
 </xsl:element>
 </xsl:variable>
 
-<!--
-<xsl:call-template name='saveNewPeople'>
-<xsl:with-param name='file' 
-select='"/home/jrm424/aiw/test/store/feedback/Pbar0.xml"'/>
-<xsl:with-param name='newpeople' select='$prenewps'/>
-</xsl:call-template>
--->
+
 <xsl:variable name='newps'>
 <xsl:call-template name='newPeople'>
-<!-- xsl:with-param name='list' select='aiah:RECIPIENT'/-->
 <xsl:with-param name='knowns' select='$prenewps/ExtantPersons'/>
 </xsl:call-template>
 </xsl:variable>
 
 <!-- =================================== -->
-<!--
-<xsl:call-template name='saveNewPeople'>
-<xsl:with-param name='file' 
-select='"/home/jrm424/aiw/test/store/feedback/Pbar1.xml"'/>
-<xsl:with-param name='newpeople' select='$newps'/>
-</xsl:call-template>
--->
+
 <xsl:for-each select='aiah:RECIPIENT'>
 
 <xsl:variable name='ctr'  select='@counter'/>
@@ -192,6 +181,7 @@ select="concat($rawXmlPath,'/',$known/netid , '.xml')"/>
 
 
 </rdf:RDF>
+<xsl:value-of select='$NL'/>
 </xsl:template>
 
 <!-- =================================================== -->
@@ -225,12 +215,12 @@ select="concat($rawXmlPath,'/',$known/netid , '.xml')"/>
 <xsl:param name='res' select='false()'/>
 <xsl:choose>
 <xsl:when test='$nlist and not($res)'>
-<xsl:variable name='comp' select='vfx:isoName($n/aiah:FirstName,
-						$n/aiah:MiddleName,
-						$n/aiah:LastName,
-						$nlist[1]/aiah:FirstName,
-						$nlist[1]/aiah:MiddleName,
-						$nlist[1]/aiah:LastName)'/>
+<xsl:variable name='comp' select='vfx:isoName($n/aiah:fname,
+						$n/aiah:mname,
+						$n/aiah:fname,
+						$nlist[1]/aiah:fname,
+						$nlist[1]/aiah:mname,
+						$nlist[1]/aiah:lname)'/>
 
 <xsl:call-template name='hasIsoMatchRecipient'>
 <xsl:with-param name='n' select='$n'/>

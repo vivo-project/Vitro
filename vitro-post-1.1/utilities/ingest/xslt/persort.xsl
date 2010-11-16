@@ -19,7 +19,7 @@
 <xsl:template match='ExtantPersons'>
 <ExtantPersons>
 <xsl:for-each select='person'>
-<xsl:sort select='lname'/>
+<xsl:sort select='concat(normalize-space(lname),"|",normalize-space(fname)'/>
 <xsl:copy-of select='.' copy-namespaces='no'/><xsl:value-of select='$NL'/>
 </xsl:for-each>
 </ExtantPersons>

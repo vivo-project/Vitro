@@ -33,6 +33,52 @@
 
 <xsl:template match='/aiteachstmt:TEACHING_STATEMENT_PERSON_LIST'>
 <rdf:RDF>
+
+<xsl:variable name='prenewps'>
+<xsl:element name='ExtantPersons' inherit-namespaces='no'>
+<xsl:for-each select='aiteachstmt:PERSON'>
+<xsl:if test='vfx:goodName(aiteachstmt:fname, aiteachstmt:mname, aiteachstmt:lname)'>
+<xsl:variable name='ctr'  select='@counter'/>
+<xsl:variable name='uno' select='$unomap/map[position()=$ctr]/@nuno'/>
+<xsl:variable name='kUri' 
+	select='vfx:knownUriByNetidOrName(aiteachstmt:fname, 
+					  aiteachstmt:mname, 
+					  aiteachstmt:lname,
+					  aiteachstmt:netid,
+					  $extantPersons)'/>
+<xsl:variable name='furi' 
+select="if($kUri != '') then $kUri 
+                            else concat($g_instance,$uno)"/>
+
+
+<xsl:if test='$kUri = ""'>
+<xsl:element name='person' inherit-namespaces='no'>
+<xsl:element name='uri' inherit-namespaces='no'>
+<xsl:value-of select='concat("NEW-",$furi)'/></xsl:element>
+<xsl:element name='fname' inherit-namespaces='no'>
+<xsl:value-of select='aiteachstmt:fname'/></xsl:element>
+<xsl:element name='mname' inherit-namespaces='no'>
+<xsl:value-of select='aiteachstmt:mname'/></xsl:element>
+<xsl:element name='lname' inherit-namespaces='no'>
+<xsl:value-of select='aiteachstmt:lname'/></xsl:element>
+<xsl:element name='netid' inherit-namespaces='no'>
+<xsl:value-of select='aiteachstmt:netid'/></xsl:element>
+</xsl:element>
+
+</xsl:if>
+</xsl:if>
+</xsl:for-each>
+</xsl:element>
+</xsl:variable>
+
+<xsl:variable name='newps'>
+<xsl:call-template name='newPeople'>
+<xsl:with-param name='knowns' select='$prenewps/ExtantPersons'/>
+</xsl:call-template>
+</xsl:variable>
+
+
+
 <xsl:for-each select='aiteachstmt:PERSON'>
 
 <xsl:variable name='ctr'  select='@counter'/>
@@ -47,19 +93,19 @@ select="if($knownUri != '') then $knownUri else concat($g_instance,$uno)"/>
 <xsl:if test='$knownUri != "" and aiteachstmt:netid != ""'>
 
 <rdf:Description rdf:about="{$peruri}">
-<rdf:type 
-rdf:resource='http://vivoweb.org/ontology/activity-insight#ActivityInsightPerson'/>
+<rdf:type rdf:resource=
+	'http://vivoweb.org/ontology/activity-insight#ActivityInsightPerson'/>
 </rdf:Description>
 </xsl:if>
 
 <xsl:if test='$knownUri = ""'>
 <rdf:Description rdf:about="{$peruri}">
-<rdf:type 
-rdf:resource='http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing'/>
+<rdf:type rdf:resource=
+	'http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing'/>
 <rdf:type rdf:resource='http://xmlns.com/foaf/0.1/Person'/>
 <xsl:if test='aiteachstmt:netid != ""'>
-<rdf:type 
-rdf:resource='http://vivoweb.org/ontology/activity-insight#ActivityInsightPerson'/>
+<rdf:type rdf:resource=
+	'http://vivoweb.org/ontology/activity-insight#ActivityInsightPerson'/>
 </xsl:if>
 <rdfs:label>
 <xsl:value-of select='vfx:trim(aiteachstmt:fullname)'/>
@@ -73,7 +119,9 @@ rdf:resource='http://vivoweb.org/ontology/activity-insight#ActivityInsightPerson
 
 <xsl:if test='aiteachstmt:netid != ""'>
 
-<xsl:variable name='nidxml' select="concat($rawXmlPath,'/',aiteachstmt:netid , '.xml')"/>
+<xsl:variable name='nidxml' 
+	select="concat($rawXmlPath,'/',
+			aiteachstmt:netid , '.xml')"/>
 
 <!-- do not bother with these if file is not available -->
 <xsl:if test='doc-available($nidxml)'>
@@ -155,16 +203,19 @@ select="if($knownUri != '') then $knownUri else concat($g_instance,$uno)"/>
 
 <rdf:Description rdf:about="{$objref}">
 <xsl:for-each 
-select='document($nidxml)//dm:TEACHING_STATEMENT[@id = $objid]/dm:TEACHING_STATEMENT_KEYWORD'>
+select='document($nidxml)//dm:TEACHING_STATEMENT[
+			@id = $objid]/dm:TEACHING_STATEMENT_KEYWORD'>
 <xsl:if test='vfx:simple-trim(./dm:KEYWORD) != ""'>
 <acti:teachingKeyword>
 <xsl:value-of select='vfx:simple-trim(./dm:KEYWORD)'/>
 </acti:teachingKeyword>
 </xsl:if>
 </xsl:for-each>
-<xsl:if test='document($nidxml)//dm:TEACHING_STATEMENT[@id = $objid]/dm:INTERESTS != ""'>
+<xsl:if test='document($nidxml)//dm:TEACHING_STATEMENT[
+				@id = $objid]/dm:INTERESTS != ""'>
 <core:teachingOverview>
-<xsl:value-of select='document($nidxml)//dm:TEACHING_STATEMENT[@id = $objid]/dm:INTERESTS'/> 
+<xsl:value-of select='document($nidxml)//dm:TEACHING_STATEMENT[
+				@id = $objid]/dm:INTERESTS'/> 
 </core:teachingOverview>
 </xsl:if>
 </rdf:Description>

@@ -80,8 +80,12 @@
           <xsl:sort select='IMPACT_STMT_ID'/>
 
           <xsl:element name='aiis:IMPACT_STMT_ID'>
-            <xsl:attribute name='ref_netid'><xsl:value-of select='$ref_netid'/></xsl:attribute>
-            
+            <xsl:attribute name='ref_netid'>
+		<xsl:value-of select='$ref_netid'/></xsl:attribute>
+ 	    <xsl:attribute name='hasTitle' 
+		select='./@hasTitle'/>
+            <xsl:attribute name='hasGoodAuthor' 
+		select='./@hasGoodAuthor'/>           
            
              <xsl:text>AI-</xsl:text>
              <xsl:value-of select='.'/>

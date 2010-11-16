@@ -29,10 +29,12 @@
 
 <xsl:for-each-group select='$docs//dm:Record' 
 group-by='vfx:collapse(concat(dm:PCI/dm:LNAME, ", ",
-dm:PCI/dm:FNAME , " ", dm:PCI/dm:MNAME))'>
+			      dm:PCI/dm:FNAME, " ", 
+                              dm:PCI/dm:MNAME))'>
 <xsl:sort 
 select='vfx:collapse(concat(dm:PCI/dm:LNAME, ", ",
-dm:PCI/dm:FNAME , " ", dm:PCI/dm:MNAME))'/>
+			    dm:PCI/dm:FNAME, " ", 
+			    dm:PCI/dm:MNAME))'/>
 
 
 <xsl:variable name='rec' select='.'/>

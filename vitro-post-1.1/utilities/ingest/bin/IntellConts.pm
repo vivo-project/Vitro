@@ -18,7 +18,7 @@ if($Phases{'ICIC'}>0 || $g_all){
     print "\nBegin integration process using $g_xslts/$g_chain ...\n";
     my $prefix = $g_aiic . "_";
     my $cmd = "";
-    $cmd .= "$g_bin/xsltseq -I $g_xmls_raw -O $g_xmls_out ";
+    $cmd .= "$g_bin/xsltseq -f -I $g_xmls_raw -O $g_xmls_out ";
     $cmd .= " -X $g_xslts/$g_chain -x $g_xslts -p $prefix ";
     $cmd .= " -T $g_icd -t 'IC' -s $g_saxonJar $ext ";
     $cmd .= " -L $g_log_path " if $g_log_path ne '';
@@ -124,6 +124,31 @@ if($Phases{'ICJC'}>0 || $g_all){
     exit(1) if($r);
 }
 ############################################
+
+if($Phases{'PEEPS'}>0 || $g_all){
+    print "\nPhase = PEEPS ================================\n";
+    print "\nConstruct a (sufficiently) large number of unique ";
+    print "strings for academic article author rdf process\n";
+    $g_curPhase = 'PEEPS';
+    mkUnoFile("$g_ic/cad.xml","counter",
+	      "$g_ic/peeps-unomap.xml","AI-PICAR-","$g_store/.Person");
+
+    my $cmd = "";
+    $cmd .= "java $g_javaopts $g_saxonCmdSequence ";
+    $cmd .= " -o $g_icjapf $g_ic/cads.xml ";
+    $cmd .= " $g_xslts/extractAcademicArticleAuthors.xsl ";
+    $cmd .= "  abyjFile=$g_ic/cjds.xml ";
+    $cmd .= " unoMapFile=$g_ic/peeps-unomap.xml ";
+    $cmd .= " aiicXmlPath=$g_xmls_out aiicPrefix=$g_aiic\_ ";
+    $cmd .= " extPerIn=$g_fb/personsAtTimeZero.xml ";
+    my $r = doit($cmd, $g_exef);
+    exit(1) if($r);
+
+
+#java  -Xmx8192m -Xms8192m -XX:MaxPermSize=100m   -cp extensions:/home/jrm424/aiw/test/xslt/saxon9ee.jar com.saxonica.Transform   -o /home/jrm424/aiw/test/store/feedback/NewPer.xml /home/jrm424/aiw/test/store/ic-aggregated/cads.xml  /home/jrm424/aiw/test/xslt/addPeeps.xsl abyjFile=/home/jrm424/aiw/test/store/ic-aggregated/cjds.xml  unoMapFile=/home/jrm424/aiw/test/store/ic-aggregated/unomap.xml  extPerIn=/home/jrm424/aiw/test/store/feedback/personsAtTimeZero.xml
+}
+
+############################################
 #
 # Construct rdf for journal article authors
 # formerly AR
@@ -139,7 +164,8 @@ if($Phases{'ICAR'}>0 || $g_all){
 # prior GX, IC, CA, !!-> CJ <-!!
 # 
 #
-    mkUnoFile("$g_ic/cad.xml","counter","$g_ic/icar-unomap.xml");
+    mkUnoFile("$g_ic/cad.xml","counter",
+	      "$g_ic/icar-unomap.xml","AI-ICAR-","$g_store/.Person");
 
     initFeedbackFile('Per','ICAR');
 
@@ -181,7 +207,8 @@ if($Phases{'ICJR'}>0 || $g_all){
 #depends on $g_ic/cjd.xml $g_ic/cjds.xml $g_xslts/mkjrdf.xsl
 # prior GX, IC, CJ
 #
-    mkUnoFile("$g_ic/cjd.xml","JOURNAL_NAME","$g_ic/icjr-unomap.xml");
+    mkUnoFile("$g_ic/cjd.xml","JOURNAL_NAME",
+	      "$g_ic/icjr-unomap.xml","AI-ICJR-","$g_store/.Journal");
     initFeedbackFile('Jour','ICJR');
 
     print "\nConstruct the rdf for journals and articles\n";
@@ -272,7 +299,8 @@ if($Phases{'ICIAR'}>0 || $g_all){
 # $g_xslts/rdfsort.xsl
 # prior GX, IC, CIA, -> CIP <-
 
-    mkUnoFile("$g_ic/cicad.xml","counter","$g_ic/iciar_unomap.xml");
+    mkUnoFile("$g_ic/cicad.xml","counter",
+	      "$g_ic/iciar_unomap.xml","AI-ICIAR-","$g_store/.Person");
 
     initFeedbackFile('Per','ICIAR');
 
@@ -316,7 +344,8 @@ if($Phases{'ICIPR'}>0 || $g_all){
     $g_curPhase = 'ICIPR';
     mkUnoFile("$g_ic/cicpd.xml",
 	      "INTELLCONT_PROMULGATOR_NAME",
-	      "$g_ic/icipr_nunos.xml");
+	      "$g_ic/icipr_nunos.xml",
+	      "AI-ICIPR-",$op_uno);
 
     print "\nConstruct the rdf for promulgators and intellconts\n";
 

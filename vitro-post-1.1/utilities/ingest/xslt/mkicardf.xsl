@@ -107,7 +107,9 @@ select="if($kUri != '') then $kUri
                      		aiic:MiddleName, 
                      		aiic:LastName)'/></xsl:comment>
 -->
-
+<xsl:if test='vfx:goodName(aiic:FirstName, 
+	                   aiic:MiddleName, 
+                           aiic:LastName)'>
 <!-- =================================================== -->
 <!-- Declare a foaf:Person (or use extant person if foaf exists) -->
 <xsl:variable name='known' 
@@ -152,6 +154,9 @@ not(vfx:hasIsoMatchAuthor(.,
 
 <xsl:variable name='nidxml' 
 select="concat($aiicXmlPath,'/',$aiicPrefix,$known/netid , '.xml')"/>
+<xsl:if test='doc-available($nidxml)'>
+<rdf:type rdf:resource=
+	'http://vivoweb.org/ontology/activity-insight#ActivityInsightPerson'/>
 <xsl:variable name='pci' select="document($nidxml)//dm:PCI"/>
 <core:workEmail><xsl:value-of select='$pci/dm:EMAIL'/></core:workEmail>
 <bibo:prefixName><xsl:value-of select='$pci/dm:PREFIX'/> </bibo:prefixName>
@@ -166,6 +171,7 @@ select="concat($aiicXmlPath,'/',$aiicPrefix,$known/netid , '.xml')"/>
 <xsl:value-of select='$pci/dm:OPHONE3'/>
 </core:workPhone>
 </xsl:if>
+</xsl:if>
 </rdf:Description>
 </xsl:if>
 </xsl:if>
@@ -177,7 +183,7 @@ select="concat($aiicXmlPath,'/',$aiicPrefix,$known/netid , '.xml')"/>
 <xsl:with-param name='abya' select='aiic:INTELLCONT_LIST'/>
 <xsl:with-param name='foafref' select="$foafuri"/>
 </xsl:call-template>
-
+</xsl:if>
 </xsl:for-each>
 <!-- =================================================== 
  at this point we re-run part of the last for loop to get 

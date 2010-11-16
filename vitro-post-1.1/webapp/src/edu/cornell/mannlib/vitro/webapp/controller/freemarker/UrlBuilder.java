@@ -31,7 +31,7 @@ public class UrlBuilder {
         INDIVIDUAL("/individual"),
         INDIVIDUAL_EDIT("/entityEdit"),
         INDIVIDUAL_LIST("/individuallist"),
-        LOGIN("/siteAdmin"),
+        LOGIN("/login"), 
         LOGOUT("/login_process.jsp"),
         SEARCH("/search"),
         SITE_ADMIN("/siteAdmin"),

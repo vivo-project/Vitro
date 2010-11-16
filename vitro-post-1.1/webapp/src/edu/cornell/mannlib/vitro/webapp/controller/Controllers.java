@@ -33,7 +33,7 @@ public class Controllers {
     public static final String TAB_ENTITIES = "/TabEntitiesController";  
 
     public static final String SITE_ADMIN = "/siteAdmin";
-    public static final String LOGIN = "/siteAdmin";
+    public static final String LOGIN = "/login";
     public static final String AUTHENTICATE = "/authenticate";
     
     public static final String EXPORT_RDF = "/export";

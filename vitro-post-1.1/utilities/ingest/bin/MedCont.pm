@@ -9,7 +9,7 @@ if($Phases{'MCC'}>0 || $g_all){
     mkListAllRaw();
     my $cmd = "";
     $cmd .= "java $g_saxonCmdSequence $g_xslts/empty.xml ";
-    $cmd .= " $g_xslts/admin.xsl listxml=$g_store/nzraw.xml ";
+    $cmd .= " $g_xslts/medcont.xsl listxml=$g_store/nzraw.xml ";
     $cmd .= " > $g_med/cmedcont.xml ";
     my $r = doit($cmd, $g_exef, $g_pw);
     exit(1) if($r);
@@ -20,7 +20,9 @@ if($Phases{'MCC'}>0 || $g_all){
 if($Phases{'MCR'}>0 || $g_all){
     print "\nPhase = MCR ================================\n";
     $g_curPhase = 'MCR';
-    mkUnoFile("$g_med/cmedcont.xml", "index", "$g_med/mcr-unomap.xml");
+    mkUnoFile("$g_med/cmedcont.xml", "id", 
+	      "$g_med/mcr-unomap.xml",
+	      "AI-MCR-",$op_uno);
     my $cmd = "";
     $cmd .= "java $g_saxonCmdSequence $g_med/cmedcont.xml ";
     $cmd .= "$g_xslts/mkMedcontRdf.xsl unoMapFile=$g_med/mcr-unomap.xml ";
@@ -53,7 +55,8 @@ if($Phases{'MCPR'}>0 || $g_all){
     print "\nPhase = MCPR ================================\n";
     $g_curPhase = 'MCPR';
     mkUnoFile("$g_med/cmedcontperson.xml", 
-	      "index", "$g_med/mcpr-unomap.xml");
+	      "counter", "$g_med/mcpr-unomap.xml",
+	      "AI-MCPR-","$g_store/.Person");
     my $cmd = "";
     $cmd .= "java $g_saxonCmdSequence ";
     $cmd .= " -o $g_rdf/medcontPerson.rdf ";

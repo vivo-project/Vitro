@@ -5,7 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.beans;
 import java.text.Collator;
 import java.util.Date;
 
-public class User implements Comparable {
+public class User implements Comparable<User> {
     
     public final static int MIN_PASSWORD_LENGTH = 6;
     public final static int MAX_PASSWORD_LENGTH = 12;
@@ -107,9 +107,8 @@ public class User implements Comparable {
         this.firstName = firstName;
     }
 
-    public int compareTo(Object o) {
+    public int compareTo(User other) {
         Collator collator = Collator.getInstance();
-        User other = ((User)o);
         if( this.getUsername() == null && other.getUsername() == null )
         	return 0;
         else if( this.getUsername() == null )
@@ -117,7 +116,7 @@ public class User implements Comparable {
         else if( other.getUsername() == null)
         	return 1;
         else
-        	return collator.compare(this.getUsername(),((User)o).getUsername());
+        	return collator.compare(this.getUsername(),other.getUsername());
     }
 
 }

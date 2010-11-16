@@ -35,9 +35,12 @@
 <xsl:for-each select='aiedu:EDUCATION'>
 <xsl:if test='aiedu:netid != ""'>
 <xsl:variable name='edid' select='@id'/>
-<xsl:variable name='nidxml' select="concat($rawXmlPath,'/',aiedu:netid, '.xml')"/>
+<xsl:variable name='nidxml' select="concat($rawXmlPath,'/',
+					   aiedu:netid, 
+					   '.xml')"/>
 
-<xsl:variable name='ed' select='document($nidxml)//dm:EDUCATION[@id = $edid]' />
+<xsl:variable name='ed' select=
+	'document($nidxml)//dm:EDUCATION[@id = $edid]' />
 <xsl:variable name='lmd' select='$ed/@dmd:lastModified'/>
 <xsl:variable name='degree'>
 <xsl:choose>
@@ -55,14 +58,17 @@
 
 
 <rdf:Description rdf:about="{concat($g_instance,'AI-',@id)}" >
-<rdf:type rdf:resource='http://vivoweb.org/ontology/core#EducationalTraining'/>
-<rdf:type rdf:resource='http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing'/>
+<rdf:type rdf:resource=
+	'http://vivoweb.org/ontology/core#EducationalTraining'/>
+<rdf:type rdf:resource=
+	'http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing'/>
 
 <xsl:comment><xsl:value-of select='$degree'/></xsl:comment>
 <xsl:choose>
   <xsl:when test='$knownDegs/degree[ai-abbrev = $degree]/uri != ""'>
 
-	<core:degreeEarned rdf:resource="{$knownDegs/degree[ai-abbrev = $degree]/uri}"/>
+	<core:degreeEarned rdf:resource=
+		"{$knownDegs/degree[ai-abbrev = $degree]/uri}"/>
 
   </xsl:when>
   <xsl:otherwise>

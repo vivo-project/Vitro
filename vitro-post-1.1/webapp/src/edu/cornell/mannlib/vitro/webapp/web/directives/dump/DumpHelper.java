@@ -10,7 +10,8 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHelper;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper;
+import edu.cornell.mannlib.vitro.webapp.web.directives.BaseTemplateDirectiveModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 import freemarker.core.Environment;
 import freemarker.template.TemplateBooleanModel;
@@ -35,7 +36,8 @@ public class DumpHelper {
 
     public String getVariableDump(String varName) {
         Map<String, Object> map = getVariableDumpData(varName);
-        return new FreemarkerHelper(environment.getConfiguration()).mergeMapToTemplate("dump-var.ftl", map);
+        TemplateProcessingHelper helper = BaseTemplateDirectiveModel.getFreemarkerHelper(environment);
+        return helper.processTemplateToString("dump-var.ftl", map);
     }
 
     public Map<String, Object> getVariableDumpData(String varName) {
@@ -104,8 +106,8 @@ public class DumpHelper {
     
     public void writeDump(String templateName, Map<String, Object> map, String modelName) {
 
-        FreemarkerHelper helper = new FreemarkerHelper(environment.getConfiguration());
-        String output = helper.mergeMapToTemplate(templateName, map);      
+        TemplateProcessingHelper helper = BaseTemplateDirectiveModel.getFreemarkerHelper(environment);
+        String output = helper.processTemplateToString(templateName, map);      
         Writer out = environment.getOut();
         try {
             out.write(output);

@@ -77,7 +77,9 @@ exclude-result-prefixes='vfx xs'
 <xsl:element name='ARTICLE_ID' namespace='{namespace-uri()}'>
 <xsl:attribute name='hasTitle' select=
 		'if(../dm:TITLE = "") then "No" else "Yes"'/>
-
+<xsl:attribute name='hasGoodAuthor' select=
+	'if(vfx:hasOneGoodName(../dm:INTELLCONT_JOURNAL_AUTH)) 
+			then "Yes" else "No"'/>
 <xsl:value-of select='../@id'/>
 </xsl:element>
 

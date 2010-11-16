@@ -10,10 +10,13 @@ autoflush STDOUT 1;
 if(scalar(@ARGV) == 0){
     print "-b base-dir \n";
     print "-e extdir\t directory of java extension for saxon\n";
-    print "-g group \t i.e. 1of {aw,ic,is,ed,gr,rs,all}\n";
+    print "-g group \t i.e. listof  {aw,ic,is,ec,ed,gr,rs,mc,pr,all,np}\n";
+    print "-h size  \t e.g. heap size = 2048m\n";
+    print "-m mark  \t include mark in file names\n";
     print "-r       \t for revert\n";
     print "-R       \t for reuse All feedback files as is.\n";
     print "-L       \t for live operation\n";
+    print "-p size  \t e.g. perm size = 100m\n";
     print "-S jar   \t saxon jar i.e. saxon9he.jar or saxon9ee.jar \n";
     print "-T       \t to choose time zero\n";
     print "-U file  \t to choose uno file\n";
@@ -21,7 +24,7 @@ if(scalar(@ARGV) == 0){
     exit 0;
 }
 
-getopts("b:e:g:LrRS:Tvu:U:");
+getopts("b:e:g:h:Lm:p:rRS:Tvu:U:");
 
 sub trim {
     my($a) = @_;
@@ -33,7 +36,7 @@ sub trim {
 
 if(!$opt_g){
     print "-g option required to specify what to generate\n";
-    print "choose from {aw,ic,is,ed,gr,rs,all}.\n";
+    print "choose from {aw,ic,is,ec,ed,gr,rs,mc,pr,all,np}.\n";
     exit 1;
 }
 if($opt_T && $opt_R){
@@ -50,6 +53,13 @@ if($opt_u ne '' || $opt_U ne ''){
 $grp = lc($opt_g);
 @grp = split /[,;]/, $grp;
 
+$heap='2048m';
+$heap=$opt_h if $opt_h ne '';
+
+$perm='100m';
+$perm=$opt_p if $opt_p ne '';
+
+$jopts = " -Xmx$heap -Xms$heap -XX:MaxPermSize=$perm ";
 
 $wdir = "/home/jrm424/aiwork";
 $wdir = $opt_b if $opt_b;
@@ -64,6 +74,9 @@ $t = "--t0" if $opt_T;
 $ext = " --jext $opt_e " if $opt_e ne '' ;
 $saxon = " --saxon $opt_S " if $opt_S ne '';
 
+$mark = '';
+$mark = " --token $opt_m " if $opt_m ne '';
+
 if(!(-e "bin/aiIngest" && -x _ && -r _)){
     print "$wdir/bin/aiIngest must exist and be executable\n";
     exit 1;
@@ -71,9 +84,14 @@ if(!(-e "bin/aiIngest" && -x _ && -r _)){
 %TODO = ( "gr" => ['GRR','GRIR','GRSPR'],
 	  "ic" => ['ICAR','ICJR','ICIAR','ICIPR'],
 	  "is" => ['ISIR','ISCER','ISFOR','ISGEOR','ISPAR','ISUAR','ISCAR'],
+	  "ec" => ['ECR','ECPR'],
 	  "ed" => ['EDR','EDPR','EDOR'],
 	  "rs" => ['RSR'],
-	  "aw" => ['AWR'] 
+	  "aw" => ['AWR','AWOR','AWPR'],
+	  "mc" => ['MCR','MCPR'],
+	  "pr" => ['PRR','PROR','PRPR'],
+	  "np" => ['PEEPS']
+	  
 	  );
 
 if(scalar(@grp) > 1){
@@ -82,8 +100,8 @@ if(scalar(@grp) > 1){
 	$steps .= "," if $steps ne '';
 	$steps .= join(',',@{$TODO{$grp}});
     } 
-    print "bin/aiIngest $unoparms --L --v --log --aiic IC --aiis IS --rawp AIXMLS/cur-raw --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps $steps  $r $t $ext $saxon\n";
-    @res = qx(bin/aiIngest $unoparms --L --v --log --aiic IC --aiis IS --rawp AIXMLS/cur-raw --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps $steps  $r $t $ext $saxon) if $opt_L;
+    print "bin/aiIngest $mark $unoparms --L --v --log --aiic IC --aiis IS --rawp AIXMLS/cur-raw --jopts '$jopts' --steps $steps  $r $t $ext $saxon\n";
+    @res = qx(bin/aiIngest $mark $unoparms --L --v --log --aiic IC --aiis IS --rawp AIXMLS/cur-raw --jopts '$jopts' --steps $steps  $r $t $ext $saxon) if $opt_L;
     
     my $r = ($? >> 8);
     print join('', @res) . "\n";
@@ -92,51 +110,86 @@ if(scalar(@grp) > 1){
     $grp = $grp[0];
     if($grp eq "gr"){
 
-	print "bin/aiIngest $unoparms --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps GRR,GRIR,GRSPR $r $t $ext  $saxon\n";
-	@res = qx(bin/aiIngest $unoparms --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps GRR,GRIR,GRSPR $r $t $ext $saxon ) if $opt_L;
+	print "bin/aiIngest $mark $unoparms --L --v --log --jopts '$jopts' --steps GRR,GRIR,GRSPR $r $t $ext  $saxon\n";
+	@res = qx(bin/aiIngest $mark $unoparms --L --v --log --jopts '$jopts' --steps GRR,GRIR,GRSPR $r $t $ext $saxon ) if $opt_L;
 	my $r = ($? >> 8);
 	print join('', @res) . "\n";
 	exit 1 if $r;
 	
     } elsif($grp eq "ic"){
 	
-	print "bin/aiIngest $unoparms --L --v --log --aiic IC  --rawp AIXMLS/cur-raw --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps ICAR,ICJR,ICIAR,ICIPR $r $t $ext $saxon \n";
-	@res = qx(bin/aiIngest $unoparms --L --v --log --aiic IC  --rawp AIXMLS/cur-raw --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps ICAR,ICJR,ICIAR,ICIPR $r $t $ext $saxon) if $opt_L;
+	print "bin/aiIngest $mark $unoparms --L --v --log --aiic IC  --rawp AIXMLS/cur-raw --jopts '$jopts' --steps ICAR,ICJR,ICIAR,ICIPR $r $t $ext $saxon \n";
+	@res = qx(bin/aiIngest $mark $unoparms --L --v --log --aiic IC  --rawp AIXMLS/cur-raw --jopts '$jopts' --steps ICAR,ICJR,ICIAR,ICIPR $r $t $ext $saxon) if $opt_L;
 	my $r = ($? >> 8);
 	print join('', @res) . "\n";
 	exit 1 if $r;
     } elsif($grp eq "is"){
 	
-	print "bin/aiIngest $unoparms --L --v --log --aiis IS  --rawp AIXMLS/cur-raw --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps ISIR,ISCER,ISFOR,ISGEOR,ISPAR,ISUAR,ISCAR $r $t $ext  $saxon\n";
-	@res = qx(bin/aiIngest $unoparms --L --v --log --aiis IS  --rawp AIXMLS/cur-raw --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps ISIR,ISCER,ISFOR,ISGEOR,ISPAR,ISUAR,ISCAR $r $t $ext $saxon ) if $opt_L;
+	print "bin/aiIngest $mark $unoparms --L --v --log --aiis IS  --rawp AIXMLS/cur-raw --jopts '$jopts' --steps ISIR,ISCER,ISFOR,ISGEOR,ISPAR,ISUAR,ISCAR $r $t $ext  $saxon\n";
+	@res = qx(bin/aiIngest $mark $unoparms --L --v --log --aiis IS  --rawp AIXMLS/cur-raw --jopts '$jopts' --steps ISIR,ISCER,ISFOR,ISGEOR,ISPAR,ISUAR,ISCAR $r $t $ext $saxon ) if $opt_L;
 	my $r = ($? >> 8);
 	print join('', @res) . "\n";
 	exit 1 if $r;
-    } elsif($grp eq "ed"){
+    } elsif($grp eq "ec"){
 	
-	print "bin/aiIngest $unoparms --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps EDR,EDPR,EDOR $r $t $ext $saxon\n";
-	@res = qx(bin/aiIngest $unoparms --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps EDR,EDPR,EDOR $r $t $ext $saxon) if $opt_L;
+	print "bin/aiIngest $mark $unoparms --L --v --log --jopts '$jopts' --steps ECR,ECPR $r $t $ext $saxon\n";
+	@res = qx(bin/aiIngest $mark $unoparms --L --v --log --jopts '$jopts' --steps ECR,ECPR $r $t $ext $saxon) if $opt_L;
 	my $r = ($? >> 8);
 	print join('', @res) . "\n";
 	exit 1 if $r;
-    } elsif($grp eq "aw"){
+    }  elsif($grp eq "ed"){
 	
-	print "bin/aiIngest $unoparms --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps AWR $r $t $ext $saxon\n";
-	@res = qx(bin/aiIngest $unoparms --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps AWR $r $t $ext $saxon) if $opt_L;
+	print "bin/aiIngest $mark $unoparms --L --v --log --jopts '$jopts' --steps EDR,EDPR,EDOR $r $t $ext $saxon\n";
+	@res = qx(bin/aiIngest $mark $unoparms --L --v --log --jopts '$jopts' --steps EDR,EDPR,EDOR $r $t $ext $saxon) if $opt_L;
+	my $r = ($? >> 8);
+	print join('', @res) . "\n";
+	exit 1 if $r;
+    }elsif($grp eq "aw"){
+	
+	print "bin/aiIngest $mark $unoparms --L --v --log --jopts '$jopts' --steps AWR $r $t $ext $saxon\n";
+	@res = qx(bin/aiIngest $mark $unoparms --L --v --log --jopts '$jopts' --steps AWR $r $t $ext $saxon) if $opt_L;
 	my $r = ($? >> 8);
 	print join('', @res) . "\n";
 	exit 1 if $r;
     } elsif($grp eq "rs"){
 	
-	print "bin/aiIngest $unoparms --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps RSR  $r $t $ext  $saxon\n";
-	@res = qx(bin/aiIngest $unoparms --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps RSR $r $t $ext $saxon) if $opt_L;
+	print "bin/aiIngest $mark $unoparms --L --v --log --jopts '$jopts' --steps RSR  $r $t $ext  $saxon\n";
+	@res = qx(bin/aiIngest $mark $unoparms --L --v --log --jopts '$jopts' --steps RSR $r $t $ext $saxon) if $opt_L;
+	my $r = ($? >> 8);
+	print join('', @res) . "\n";
+	exit 1 if $r;
+    } elsif($grp eq "mc"){
+	
+	print "bin/aiIngest $mark $unoparms --L --v --log --jopts '$jopts' --steps MCR,MCPR  $r $t $ext  $saxon\n";
+	@res = qx(bin/aiIngest $mark $unoparms --L --v --log --jopts '$jopts' --steps MCR,MCPR $r $t $ext $saxon) if $opt_L;
+	my $r = ($? >> 8);
+	print join('', @res) . "\n";
+	exit 1 if $r;
+    } elsif($grp eq "pr"){
+	
+	print "bin/aiIngest $mark $unoparms --L --v --log --jopts '$jopts' --steps PRR,PRPR,PROR  $r $t $ext  $saxon\n";
+	@res = qx(bin/aiIngest $mark $unoparms --L --v --log --jopts '$jopts' --steps PRR,PRPR,PROR $r $t $ext $saxon) if $opt_L;
 	my $r = ($? >> 8);
 	print join('', @res) . "\n";
 	exit 1 if $r;
     } elsif($grp eq "all"){
 	
-	print "bin/aiIngest $unoparms --L --v --log --aiic IC --aiis IS --rawp AIXMLS/cur-raw --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps ICAR,ICJR,ICIAR,ICIPR,ISIR,ISCER,ISFOR,ISGEOR,ISPAR,ISUAR,ISCAR,EDR,EDPR,EDOR,RSR,AWR $r $t $ext $saxon\n";
-	@res = qx(bin/aiIngest $unoparms --L --v --log --aiic IC --aiis IS --rawp AIXMLS/cur-raw --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps ICAR,ICJR,ICIAR,ICIPR,ISIR,ISCER,ISFOR,ISGEOR,ISPAR,ISUAR,ISCAR,EDR,EDPR,EDOR,RSR,AWR $r $t $ext $saxon) if $opt_L;
+	print "bin/aiIngest $mark $unoparms --L --v --log --aiic IC --aiis IS --rawp AIXMLS/cur-raw --jopts '$jopts' --steps ICAR,ICJR,ICIAR,ICIPR,ISIR,ISCER,ISFOR,ISGEOR,ISPAR,ISUAR,ISCAR,EDR,EDPR,EDOR,RSR,AWR $r $t $ext $saxon\n";
+	@res = qx(bin/aiIngest $mark $unoparms --L --v --log --aiic IC --aiis IS --rawp AIXMLS/cur-raw --jopts '$jopts' --steps ICAR,ICJR,ICIAR,ICIPR,ISIR,ISCER,ISFOR,ISGEOR,ISPAR,ISUAR,ISCAR,EDR,EDPR,EDOR,RSR,AWR $r $t $ext $saxon) if $opt_L;
+	my $r = ($? >> 8);
+	print join('', @res) . "\n";
+	exit 1 if $r;
+    } elsif($grp eq "icis"){
+	print "bin/aiIngest $mark $unoparms --L --v --log --aiic IC --aiis IS --rawp AIXMLS/cur-raw --jopts '$jopts' --steps ICAR,ICJR,ICIAR,ICIPR,ISIR,ISCER,ISFOR,ISGEOR,ISPAR,ISUAR,ISCAR $r $t $ext $saxon\n";
+	@res = qx(bin/aiIngest $mark $unoparms --L --v --log --aiic IC --aiis IS --rawp AIXMLS/cur-raw --jopts '$jopts' --steps ICAR,ICJR,ICIAR,ICIPR,ISIR,ISCER,ISFOR,ISGEOR,ISPAR,ISUAR,ISCAR $r $t $ext $saxon) if $opt_L;
+	my $r = ($? >> 8);
+	print join('', @res) . "\n";
+	exit 1 if $r;
+
+    } elsif($grp eq "np"){
+	
+	print "bin/aiIngest $mark $unoparms --L --v --log --aiic IC  --rawp AIXMLS/cur-raw --jopts '$jopts' --steps PEEPS $r $t $ext $saxon \n";
+	@res = qx(bin/aiIngest $mark $unoparms --L --v --log --aiic IC  --rawp AIXMLS/cur-raw --jopts '$jopts' --steps PEEPS $r $t $ext $saxon) if $opt_L;
 	my $r = ($? >> 8);
 	print join('', @res) . "\n";
 	exit 1 if $r;

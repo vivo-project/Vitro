@@ -40,12 +40,12 @@ public class PrimitiveRdfEdit extends FreemarkerHttpServlet{
     }
 
     @Override
+    protected int requiresLoginLevel() {
+        return LoginStatusBean.EDITOR;
+    }
+    
+    @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
-        boolean loggedIn = checkLoginStatus(vreq);
-        if( !loggedIn){
-            return new RedirectResponseValues(UrlBuilder.getUrl(Route.LOGIN));
-        }
-        
         return new TemplateResponseValues("primitiveRdfEdit.ftl");
     }
     

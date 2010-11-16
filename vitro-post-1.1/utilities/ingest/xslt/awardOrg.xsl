@@ -38,7 +38,7 @@
 <xsl:variable name='cur_aiid' select='$auth/@userId'/>
 <aiah:ORG>
 <xsl:attribute name='counter' select='position()'/>
-<aiah:org_name><xsl:value-of select='dm:ORG'/></aiah:org_name>
+<aiah:org_name><xsl:value-of select='normalize-space(dm:ORG)'/></aiah:org_name>
 <aiah:AWARD_LIST>
 
 <xsl:for-each select='current-group()'>

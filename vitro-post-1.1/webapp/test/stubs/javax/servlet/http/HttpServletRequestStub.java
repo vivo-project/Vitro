@@ -5,8 +5,10 @@ package stubs.javax.servlet.http;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -20,17 +22,27 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 /**
- * 
- * @author jeb228
+ * A simple stub for HttpServletRequest
  */
-@SuppressWarnings("deprecation")
 public class HttpServletRequestStub implements HttpServletRequest {
 	// ----------------------------------------------------------------------
 	// Stub infrastructure
 	// ----------------------------------------------------------------------
 
+	private URL requestUrl;
+	private String httpMethodType = "GET";
+	private String remoteAddr = "127.0.0.1";
+
+	private HttpSession session;
 	private final Map<String, List<String>> parameters;
 	private final Map<String, Object> attributes;
+	private final Map<String, List<String>> headers;
+
+	public HttpServletRequestStub() {
+		parameters = new HashMap<String, List<String>>();
+		attributes = new HashMap<String, Object>();
+		headers = new HashMap<String, List<String>>();
+	}
 
 	public HttpServletRequestStub(Map<String, List<String>> parameters,
 			Map<String, Object> attributes) {
@@ -39,9 +51,25 @@ public class HttpServletRequestStub implements HttpServletRequest {
 		this.attributes.putAll(attributes);
 	}
 
-	public HttpServletRequestStub() {
-		parameters = new HashMap<String, List<String>>();
-		attributes = new HashMap<String, Object>();
+	public void setRequestUrl(URL url) {
+		this.requestUrl = url;
+	}
+
+	/** Set to "GET" or "POST", etc. */
+	public void setMethod(String method) {
+		this.httpMethodType = method;
+	}
+
+	public void setRemoteAddr(String remoteAddr) {
+		this.remoteAddr = remoteAddr;
+	}
+	
+	public void setHeader(String name, String value) {
+		name = name.toLowerCase();
+		if (!headers.containsKey(name)) {
+			headers.put(name, new ArrayList<String>());
+		}
+		headers.get(name).add(value);
 	}
 
 	public void addParameter(String name, String value) {
@@ -56,9 +84,59 @@ public class HttpServletRequestStub implements HttpServletRequest {
 		parameters.remove(name);
 	}
 
+	public void setSession(HttpSession session) {
+		this.session = session;
+	}
+
 	// ----------------------------------------------------------------------
 	// Stub methods
 	// ----------------------------------------------------------------------
+
+	public HttpSession getSession() {
+		return getSession(true);
+	}
+
+	public HttpSession getSession(boolean create) {
+		if (create && (session == null)) {
+			session = new HttpSessionStub();
+		}
+		return session;
+	}
+
+	public String getContextPath() {
+		String path = requestUrl.getPath();
+		if (path.isEmpty()) {
+			return "";
+		}
+		int secondSlash = path.indexOf("/", 1);
+		if (secondSlash == -1) {
+			return "";
+		} else {
+			return path.substring(0, secondSlash);
+		}
+	}
+
+	public String getMethod() {
+		return httpMethodType;
+	}
+
+	public String getRemoteAddr() {
+		return remoteAddr;
+	}
+
+	@SuppressWarnings("rawtypes")
+	public Enumeration getParameterNames() {
+		return Collections.enumeration(parameters.keySet());
+	}
+
+	@SuppressWarnings("rawtypes")
+	public Map getParameterMap() {
+		Map<String, String[]> map = new HashMap<String, String[]>();
+		for (String key : parameters.keySet()) {
+			map.put(key, parameters.get(key).toArray(new String[0]));
+		}
+		return map;
+	}
 
 	public String getParameter(String name) {
 		if (!parameters.containsKey(name)) {
@@ -67,12 +145,56 @@ public class HttpServletRequestStub implements HttpServletRequest {
 		return parameters.get(name).get(0);
 	}
 
-	public Map getParameterMap() {
-		Map<String, String[]> map = new HashMap<String, String[]>();
-		for (String key : parameters.keySet()) {
-			map.put(key, parameters.get(key).toArray(new String[0]));
+	public String[] getParameterValues(String name) {
+		if (!parameters.containsKey(name)) {
+			return null;
 		}
-		return map;
+		List<String> list = parameters.get(name);
+		return list.toArray(new String[list.size()]);
+	}
+
+	public Object getAttribute(String name) {
+		return attributes.get(name);
+	}
+
+	@SuppressWarnings("rawtypes")
+	public Enumeration getAttributeNames() {
+		return Collections.enumeration(attributes.keySet());
+	}
+
+	public void removeAttribute(String name) {
+		attributes.remove(name);
+	}
+
+	public void setAttribute(String name, Object value) {
+		if (value == null) {
+			removeAttribute(name);
+		}
+		attributes.put(name, value);
+	}
+
+	@SuppressWarnings("rawtypes")
+	public Enumeration getHeaderNames() {
+		return Collections.enumeration(headers.keySet());
+	}
+
+	public String getHeader(String name) {
+		name = name.toLowerCase();
+		if (headers.containsKey(name)) {
+			return headers.get(name).get(0);
+		} else {
+			return null;
+		}
+	}
+
+	@SuppressWarnings("rawtypes")
+	public Enumeration getHeaders(String name) {
+		name = name.toLowerCase();
+		if (headers.containsKey(name)) {
+			return Collections.enumeration(headers.get(name));
+		} else {
+			return Collections.enumeration(Collections.emptyList());
+		}
 	}
 
 	// ----------------------------------------------------------------------
@@ -82,11 +204,6 @@ public class HttpServletRequestStub implements HttpServletRequest {
 	public String getAuthType() {
 		throw new RuntimeException(
 				"HttpServletRequestStub.getAuthType() not implemented.");
-	}
-
-	public String getContextPath() {
-		throw new RuntimeException(
-				"HttpServletRequestStub.getContextPath() not implemented.");
 	}
 
 	public Cookie[] getCookies() {
@@ -99,29 +216,9 @@ public class HttpServletRequestStub implements HttpServletRequest {
 				"HttpServletRequestStub.getDateHeader() not implemented.");
 	}
 
-	public String getHeader(String arg0) {
-		throw new RuntimeException(
-				"HttpServletRequestStub.getHeader() not implemented.");
-	}
-
-	public Enumeration getHeaderNames() {
-		throw new RuntimeException(
-				"HttpServletRequestStub.getHeaderNames() not implemented.");
-	}
-
-	public Enumeration getHeaders(String arg0) {
-		throw new RuntimeException(
-				"HttpServletRequestStub.getHeaders() not implemented.");
-	}
-
 	public int getIntHeader(String arg0) {
 		throw new RuntimeException(
 				"HttpServletRequestStub.getIntHeader() not implemented.");
-	}
-
-	public String getMethod() {
-		throw new RuntimeException(
-				"HttpServletRequestStub.getMethod() not implemented.");
 	}
 
 	public String getPathInfo() {
@@ -164,16 +261,6 @@ public class HttpServletRequestStub implements HttpServletRequest {
 				"HttpServletRequestStub.getServletPath() not implemented.");
 	}
 
-	public HttpSession getSession() {
-		throw new RuntimeException(
-				"HttpServletRequestStub.getSession() not implemented.");
-	}
-
-	public HttpSession getSession(boolean arg0) {
-		throw new RuntimeException(
-				"HttpServletRequestStub.getSession() not implemented.");
-	}
-
 	public Principal getUserPrincipal() {
 		throw new RuntimeException(
 				"HttpServletRequestStub.getUserPrincipal() not implemented.");
@@ -202,16 +289,6 @@ public class HttpServletRequestStub implements HttpServletRequest {
 	public boolean isUserInRole(String arg0) {
 		throw new RuntimeException(
 				"HttpServletRequestStub.isUserInRole() not implemented.");
-	}
-
-	public Object getAttribute(String arg0) {
-		throw new RuntimeException(
-				"HttpServletRequestStub.getAttribute() not implemented.");
-	}
-
-	public Enumeration getAttributeNames() {
-		throw new RuntimeException(
-				"HttpServletRequestStub.getAttributeNames() not implemented.");
 	}
 
 	public String getCharacterEncoding() {
@@ -254,19 +331,10 @@ public class HttpServletRequestStub implements HttpServletRequest {
 				"HttpServletRequestStub.getLocale() not implemented.");
 	}
 
+	@SuppressWarnings("rawtypes")
 	public Enumeration getLocales() {
 		throw new RuntimeException(
 				"HttpServletRequestStub.getLocales() not implemented.");
-	}
-
-	public Enumeration getParameterNames() {
-		throw new RuntimeException(
-				"HttpServletRequestStub.getParameterNames() not implemented.");
-	}
-
-	public String[] getParameterValues(String arg0) {
-		throw new RuntimeException(
-				"HttpServletRequestStub.getParameterValues() not implemented.");
 	}
 
 	public String getProtocol() {
@@ -282,11 +350,6 @@ public class HttpServletRequestStub implements HttpServletRequest {
 	public String getRealPath(String arg0) {
 		throw new RuntimeException(
 				"HttpServletRequestStub.getRealPath() not implemented.");
-	}
-
-	public String getRemoteAddr() {
-		throw new RuntimeException(
-				"HttpServletRequestStub.getRemoteAddr() not implemented.");
 	}
 
 	public String getRemoteHost() {
@@ -322,16 +385,6 @@ public class HttpServletRequestStub implements HttpServletRequest {
 	public boolean isSecure() {
 		throw new RuntimeException(
 				"HttpServletRequestStub.isSecure() not implemented.");
-	}
-
-	public void removeAttribute(String arg0) {
-		throw new RuntimeException(
-				"HttpServletRequestStub.removeAttribute() not implemented.");
-	}
-
-	public void setAttribute(String arg0, Object arg1) {
-		throw new RuntimeException(
-				"HttpServletRequestStub.setAttribute() not implemented.");
 	}
 
 	public void setCharacterEncoding(String arg0)

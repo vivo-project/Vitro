@@ -16,6 +16,8 @@ sub Usage {
     print STDERR "\t--ic_xchain name     name of a file in {xsltdir} \n";
     print STDERR "\t                     listing a sequence of xslts to be\n";
     print STDERR "\t                     applied to all raw xmls\n";
+    print STDERR "\t--icjapf  path       journal article people file\n";
+    print STDERR "\t                     produced by the PEEPS step.\n";
     print STDERR "\t--is_xchain name     name of a file in {xsltdir} \n";
     print STDERR "\t                     listing a sequence of xslts to be\n";
     print STDERR "\t                     applied to all raw xmls\n";
@@ -162,20 +164,9 @@ sub doit {
 %FeedbackFlags = ('Per'   => 0, 'Org'   => 0, 
 		  'Ceo'   => 0, 'Geo'   => 0,
 		  'Parea' => 0, 'Jour'  => 0,
-		  'Carea' => 0, 'Parea' => 0);
+		  'Carea' => 0, 'Uarea' => 0);
 
-%ElementToStepsAndFeedbackTypes = 
-    ( 
-      "gr" => ['MGRNT','MGRNT_INV|Per','MGRNT_SPON|Org'],
-      "ic" => ['AR|Per','JR|Jour','ICAR|Per','ICPR'],
-      "is" => ['MIR|Per','MCER|Ceo','MFOR|Org',
-	       'MGR|Geo','MPAR|Parea','MUAR|Uarea','MCAR|Carea'],
-      "ed" => ['MEDU','MEDUP|Per','MEDUO|Org'],
-      "rs" => ['MRESRCH|Per'],
-      "aw" => ['MAWR|Per|Org'],
-      "ad" => ['MADM','MADM|Per'],
-      "ec" => ['MEDT','MEDTP|Per']
-      );
+
 
 sub clearFeedbackFilesToTimeZero {
     foreach my $fn (@Clear){
@@ -196,8 +187,11 @@ sub initFeedbackFile{
 
     #
     print STDOUT "\nInitializing/protecting $g_fb/$file ....\n";
-
-   
+    my $cmd .= " cp $g_fb/$file $g_fb/uri-maps/$g_ltoken";
+    $cmd .= "AT_START_$g_curPhase\_$file ";
+    my $r = doit($cmd, $g_exef);
+    exit(1) if($r);
+    
     if( -e "$g_fb/$file" && $op_reuseAll){
 	if(! -e "$g_fb/REVERT_$file"){
 	    my $cmd = "cp $g_fb/$file $g_fb/REVERT_$file; ";
@@ -283,7 +277,8 @@ sub updateFeedbackFile {
     # keep a record of new entries
     $cmd = "";
     $cmd .= "java $g_javaopts $g_saxonCmdSequence $g_fb/$f1 ";
-    $cmd .= " $g_xslts/noname.xsl > $g_fb/uri-maps/AT_END_NEW_ENTRIES_$g_curPhase"."_$f1";
+    $cmd .= " $g_xslts/noname.xsl > $g_fb/uri-maps/$g_ltoken";
+    $cmd .= "NEW_ENTRIES_$g_curPhase"."_$f1";
     $r = doit($cmd, $g_exef);
     exit(1) if($r);
 
@@ -302,7 +297,7 @@ sub updateFeedbackFile {
     $r = doit($cmd, $g_exef);
     exit(1) if($r);
 
-    $cmd = " cp $g_fb/$f0 $g_fb/uri-maps/AT_END_$g_curPhase"."_$f0";
+    $cmd = " cp $g_fb/$f0 $g_fb/uri-maps/$g_ltoken"."AT_END_$g_curPhase"."_$f0";
     $r = doit($cmd, $g_exef);
     exit(1) if($r);
 
@@ -313,9 +308,10 @@ sub updateFeedbackFile {
 
 
 sub mkUnoFile {
-    my($collection,$str,$out)=@_;
+    my($collection,$str,$out,$tag,$unof)=@_;
     my $cmd = "grep $str $collection | wc -l ";
-
+    my $uf = ($unof eq '')?$op_uno:$unof;
+    my $tg = ($tag eq '')?"AI-":$tag;
     my $r;
     my @res = ();
     $r = doit($cmd, $g_exef, undef, \@res);
@@ -326,17 +322,28 @@ sub mkUnoFile {
 	print STDOUT ">>>> ERROR !!!\nResult: $out will be empty!\n";
 	exit 1;
     }
-    $g_unoMark = qx($g_bin/nuno -cC $op_uno);
-    
+    # conditionally set nuno ctr to option value
+    my $ctrval = $g_InitCtrs{$unof};
+    if($unof ne '' && $ctrval eq ''){
+	print STDOUT ".... NO change to counter: $unof requested.\n";
+    } elsif($unof ne '' && $ctrval ne '') {
+	if($ctrval ne '__DONE__') {
+	    print STDOUT "Setting nuno counter: $unof to $ctrval\n";
+	    qx($g_bin/nuno -s $ctrval $uf);
+	}
+	$g_InitCtrs{$unof} = "__DONE__";
+    }
+    $g_unoMark = qx($g_bin/nuno -cC $uf);
+    $g_curUnoFile = $uf;
     print STDOUT 
-	"Uno at start of $g_curPhase = $g_unoMark";
+	"Uno in $uf at start of $g_curPhase = $g_unoMark";
     chomp $g_unoMark;
 
-    $cmd = "$g_bin/nuno -X -n $ans -t AI- $op_uno > $out ";
+    $cmd = "$g_bin/nuno -X -n $ans -t $tg $uf > $out ";
     $r = doit($cmd, $g_exef);
     exit(1) if($r);
     print STDOUT 
-	"Next Uno at end of $g_curPhase = " . qx($g_bin/nuno -cC $op_uno);
+	"Next Uno in $uf at end of $g_curPhase = " . qx($g_bin/nuno -cC $uf);
 }
 
 sub mkListAllRaw {

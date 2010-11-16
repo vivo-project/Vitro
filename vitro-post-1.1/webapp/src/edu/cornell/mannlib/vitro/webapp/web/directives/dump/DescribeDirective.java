@@ -96,7 +96,7 @@ public class DescribeDirective extends BaseTemplateDirectiveModel {
     }
     
     
-    public String help(Configuration config) {
+    public String help(Environment env) {
         Map<String, Object> map = new HashMap<String, Object>();
         
         String name = getDirectiveName();
@@ -114,7 +114,7 @@ public class DescribeDirective extends BaseTemplateDirectiveModel {
         examples.add("<@" + name + " var=\"stylesheets\" />");
         map.put("examples", examples);
         
-        return mergeToHelpTemplate(map, config);
+        return mergeToHelpTemplate(map, env);
     }
     
     private List<Method> getPublicMethods(Class<?> cls) {

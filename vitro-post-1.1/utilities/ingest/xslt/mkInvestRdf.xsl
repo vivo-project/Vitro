@@ -50,11 +50,7 @@
 
 <xsl:variable name='ctr'  select='@counter'/>
 <xsl:variable name='uno' select='$unomap/map[position()=$ctr]/@nuno'/>
-<!-- xsl:comment><xsl:value-of 
-select='concat(aiic:FirstName,"|",
-	aiis:MiddleName,"|",
-	aiis:LastName,"|"
-	,aiis:Netid)'/></xsl:comment -->
+
 <xsl:variable name='kUri' 
 	select='vfx:knownUriByNetidOrName(aiis:FirstName, 
 	                       		aiis:MiddleName, 
@@ -96,13 +92,6 @@ select="if($kUri != '') then $kUri
 </xsl:variable>
 
 <!-- =================================== -->
-<!--
-<xsl:call-template name='saveNewPeople'>
-<xsl:with-param name='file' 
-select='"/home/jrm424/aiw/test/store/feedback/Pbar1.xml"'/>
-<xsl:with-param name='newpeople' select='$newps'/>
-</xsl:call-template>
--->
 
 <xsl:call-template name='mkImpactProjects'/>
 
@@ -111,7 +100,7 @@ select='"/home/jrm424/aiw/test/store/feedback/Pbar1.xml"'/>
 	                   aiis:MiddleName, 
                            aiis:LastName)'>
 <!-- create a foaf:person for this investigator  
-OR use one from VIVO-Cornell -->
+OR use one from before -->
 
 
 <xsl:variable name='ctr'  select='@counter'/>
@@ -151,10 +140,6 @@ not(vfx:hasIsoMatchInvestigator(.,
 rdf:resource='http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing'/>
 <rdf:type rdf:resource='http://xmlns.com/foaf/0.1/Person'/>
 
-<xsl:if test='$known/netid != ""'>
-<rdf:type rdf:resource=
-'http://vivoweb.org/ontology/activity-insight#ActivityInsightPerson'/>
-</xsl:if>
 
 <rdfs:label>
 <xsl:value-of select='concat(vfx:simple-trim($known/lname),", ",
@@ -176,6 +161,8 @@ select="concat($aiisXmlPath,'/',$aiisPrefix,$known/netid , '.xml')"/>
 <!-- do not bother with these if file is not available -->
 
 <xsl:if test='doc-available($nidxml)'>
+<rdf:type rdf:resource=
+'http://vivoweb.org/ontology/activity-insight#ActivityInsightPerson'/>
 <xsl:variable name='pci' select="document($nidxml)//dm:PCI"/>
 <core:workEmail><xsl:value-of select='$pci/dm:EMAIL'/></core:workEmail>
 <bibo:prefixName><xsl:value-of select='$pci/dm:PREFIX'/> </bibo:prefixName>
@@ -206,9 +193,7 @@ select="concat($aiisXmlPath,'/',$aiisPrefix,$known/netid , '.xml')"/>
 </xsl:for-each>
 
 <!-- =================================================== 
- at this point we re-run part of the last for loop to 
- get a new list of persons 
- and their uri's to save in the extant Persons Out xml file
+ at this point we save the new persons in the extant Persons Out xml file
 -->
 <xsl:call-template name='NewPeopleOut'>
 <xsl:with-param name='file' select='$extPerOut'/>
@@ -226,6 +211,7 @@ select="concat($aiisXmlPath,'/',$aiisPrefix,$known/netid , '.xml')"/>
 <xsl:param name='foafref'/>
 <xsl:param name='dep'/>
 <xsl:for-each select='$isbyi/aiis:IMPACT_STMT_INFO'>
+<xsl:if test='./@hasTitle = "Yes"'>
 <xsl:variable name='aiid' select='.'/>
 <xsl:variable name='rank' select='@collabRank'/>
 
@@ -257,8 +243,8 @@ select="concat($aiisXmlPath,'/',$aiisPrefix,$known/netid , '.xml')"/>
 
 <rdf:type rdf:resource='http://vivoweb.org/ontology/core#ResearcherRole'/>
 
-<rdf:type rdf:resource='
-http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing'/>
+<rdf:type rdf:resource=
+'http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing'/>
 <acti:investigatorDepartment>
 <xsl:value-of select='$dep'/>
 </acti:investigatorDepartment>
@@ -284,6 +270,7 @@ http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing'/>
 		"{concat($g_instance,$aiid,'-CI-',$rank)}"/>
 </rdf:Description>
 
+</xsl:if>
 </xsl:for-each>
 
 </xsl:template>
@@ -301,7 +288,7 @@ http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing'/>
 <xsl:template name='mkImpactProjects'>
 
 <xsl:for-each select='$islist'>
-
+<xsl:if test='./@hasTitle = "Yes" and ./@hasGoodAuthor = "Yes"'>
 <xsl:variable name='aiid' select='.'/>
 <xsl:variable name='rawaiid' select='substring($aiid,$pfxlen)'/>
 <xsl:variable name='rid' select='./@ref_netid'/>
@@ -318,7 +305,7 @@ http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing'/>
 <xsl:with-param name='aiid' select='$aiid'/>
 <xsl:with-param name='rid' select='$rid'/>
 </xsl:call-template>
-
+</xsl:if>
 </xsl:for-each>
 </xsl:template>
 

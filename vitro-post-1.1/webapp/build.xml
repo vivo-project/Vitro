@@ -19,6 +19,7 @@
 	<property name="war.dir" location="${build.dir}/war" />
 	<property name="war-webinf.dir" location="${war.dir}/WEB-INF" />
 	<property name="war-classes.dir" location="${war-webinf.dir}/classes" />
+	<property name="war-resources.dir" location="${war-webinf.dir}/resources" />
 	<property name="war-lib.dir" location="${war-webinf.dir}/lib" />
 
 	<property name="test-classes.dir" location="${build.dir}/testclasses" />
@@ -125,6 +126,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 	<target name="prepare" depends="properties">
 		<mkdir dir="${build.dir}" />
 		<mkdir dir="${war-classes.dir}" />
+		<mkdir dir="${war-resources.dir}" />
 		<mkdir dir="${test-classes.dir}" />
 
 		<!-- copy the themes into the war directory. -->
@@ -255,9 +257,47 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 	</target>
 
 	<!-- ================================= 
+          target: revisionInfo              
+         ================================= -->
+	<target name="revisionInfo" depends="test" unless="skipinfo" description="--> Store revision info in build">
+		<property name="revisionInfo.product.dir" location="${ant.file.vitroCore}/.." />
+		<property name="revisionInfo.build.file" location="${war-resources.dir}/revisionInfo.txt" />
+
+		<delete file="${revisionInfo.build.file}" />
+
+		<tstamp>
+			<format property="revisionInfo.timestamp" pattern="yyyy-MM-dd HH:mm:ss" />
+		</tstamp>
+		<echo file="${revisionInfo.build.file}">${revisionInfo.timestamp}
+</echo>
+
+		<javac srcdir="${webapp.dir}/../utilities/buildutils/revisioninfo"
+		       destdir="${test-classes.dir}"
+		       debug="true"
+		       deprecation="true"
+		       optimize="false"
+		       source="1.6">
+		</javac>
+
+		<java classname="edu.cornell.mannlib.vitro.utilities.revisioninfo.RevisionInfoBuilder"
+		      fork="no"
+		      failonerror="true"
+		      logerror="true"
+		      outputproperty="revisionInfo.outputLine">
+			<classpath refid="test.run.classpath" />
+			<arg value="${ant.project.name}" />
+			<arg file="${revisionInfo.product.dir}" />
+		</java>
+		<echo file="${revisionInfo.build.file}" append="true">${revisionInfo.outputLine}
+</echo>
+	</target>
+
+	<!-- ================================= 
           target: deploy              
          ================================= -->
-	<target name="deploy" depends="test" description="--> Build the app and install in Tomcat">
+	<target name="deploy"
+	        depends="revisionInfo"
+	        description="--> Build the app and install in Tomcat">
 		<property name="webapp.deploy.home" value="${tomcat.home}/webapps/${webapp.name}" />
 
 		<mkdir dir="${webapp.deploy.home}" />

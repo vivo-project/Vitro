@@ -36,20 +36,39 @@
 
 <aiah:AWARD>
 <xsl:attribute name='isid' select='@id'/>
-<aiah:org><xsl:value-of select='dm:ORG'/></aiah:org>
-<aiah:year><xsl:value-of select='dm:DTY_END'/></aiah:year>
-<aiah:award_name><xsl:value-of select='dm:NAME'/></aiah:award_name>
+<aiah:org>
+	<xsl:value-of select='normalize-space(dm:ORG)'/>
+</aiah:org>
+<aiah:year>
+	<xsl:value-of select='dm:DTY_END'/></aiah:year>
+<aiah:award_name>
+	<xsl:value-of select='normalize-space(dm:NAME)'/>
+</aiah:award_name>
 <aiah:display><xsl:value-of select='dm:PUBLIC_VIEW'/></aiah:display>
 <aiah:recipient>
 
 <aiah:netid><xsl:value-of select='../../dm:Record/@username'/></aiah:netid>
 <aiah:uid><xsl:value-of select='../../dm:Record/@userId'/></aiah:uid>
 
-<aiah:fname><xsl:value-of select='../../dm:Record/dm:PCI/dm:FNAME'/></aiah:fname>
-<aiah:mname><xsl:value-of select='../../dm:Record/dm:PCI/dm:MNAME'/></aiah:mname>
-<aiah:lname><xsl:value-of select='../../dm:Record/dm:PCI/dm:LNAME'/></aiah:lname>
-<aiah:fullname><xsl:value-of select='concat(../../dm:Record/dm:PCI/dm:LNAME,", ",
-../../dm:Record/dm:PCI/dm:FNAME, " ", ../../dm:Record/dm:PCI/dm:MNAME)'/></aiah:fullname>
+<aiah:fname>
+<xsl:value-of 
+	select='normalize-space(../../dm:Record/dm:PCI/dm:FNAME)'/>
+</aiah:fname>
+<aiah:mname>
+<xsl:value-of 
+	select='normalize-space(../../dm:Record/dm:PCI/dm:MNAME)'/>
+</aiah:mname>
+<aiah:lname>
+<xsl:value-of 
+	select='normalize-space(../../dm:Record/dm:PCI/dm:LNAME)'/>
+</aiah:lname>
+<aiah:fullname>
+<xsl:value-of 
+	select='concat(
+		normalize-space(../../dm:Record/dm:PCI/dm:LNAME),", ",
+		normalize-space(../../dm:Record/dm:PCI/dm:FNAME), " ", 
+		normalize-space(../../dm:Record/dm:PCI/dm:MNAME))'/>
+</aiah:fullname>
 
 </aiah:recipient>
 </aiah:AWARD>

@@ -9,7 +9,6 @@
         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
 	xmlns:aiis="http://vivoweb.org/ontology/activity-insight"
 	xmlns:acti="http://vivoweb.org/ontology/activity-insight#"
-        xmlns="http://vivoweb.org/ontology/activity-insight"
 	xmlns:dm="http://www.digitalmeasures.com/schema/data"	
 	xmlns:vfx='http://vivoweb.org/ext/functions'
 	exclude-result-prefixes='xs vfx'
@@ -31,10 +30,51 @@
 	select="document($unoMapFile)/Mapping"/>
 
 <xsl:variable name='extantFOrgs'
-	select="document($extFOrgIn)/ExtantFOrgs"/>
+	select="document($extFOrgIn)/ExtantOrgs"/>
 <!-- ================================== -->
 <xsl:template match='/aiis:FUNDING_ORG_LIST'>
 <rdf:RDF>
+<xsl:variable name='rawNewFundOrgs'>
+<xsl:element name='ExtantOrgs' inherit-namespaces='no'>
+<xsl:for-each select='aiis:IMPACT_STMTS_BY_FUNDING_ORG'>
+<xsl:variable name='name' select='vfx:simple-trim(aiis:FUNDING_ORG_NAME)'/>
+<xsl:variable name='ilk' select='@ilk'/>
+<xsl:variable name='ctr'  select='@counter'/>
+<xsl:variable name='uno' select='$unomap/map[position()=$ctr]/@nuno'/>
+
+<xsl:if test='not(contains($ilk,"OTHER"))'>
+
+<xsl:variable name='knownUri'
+select='vfx:knownOrgUri(aiis:FUNDING_ORG_NAME, $extantFOrgs)'/>
+<xsl:variable name='forguri'
+	select="if($knownUri != '') then 
+			$knownUri else 
+			concat($g_instance,$uno)"/>
+<xsl:if test='$knownUri= ""'>
+
+<xsl:element name='org' namespace=''>
+
+<xsl:element name='uri' namespace=''>
+<xsl:value-of select='concat("NEW-",$forguri)'/>
+</xsl:element>
+
+<xsl:element name='name' namespace=''>
+<xsl:value-of select='aiis:FUNDING_ORG_NAME'/>
+</xsl:element>
+
+</xsl:element>
+
+</xsl:if>
+</xsl:if>
+</xsl:for-each>
+</xsl:element>
+</xsl:variable>
+
+<xsl:variable name='uniqueNewFundOrgs'>
+<xsl:call-template name='NewOrgs'>
+<xsl:with-param name='knowns' select='$rawNewFundOrgs/ExtantOrgs'/>
+</xsl:call-template>
+</xsl:variable>
 
 
 <xsl:for-each select='aiis:IMPACT_STMTS_BY_FUNDING_ORG'>
@@ -53,16 +93,26 @@ OR use an old one -->
 <!-- =================================================== -->
 <!-- Declare a core:FundingOrganization (use extant org if it exists) -->
 <!-- do not create one if in the 'OTHER' case -->
-<xsl:variable name='knownUri' select='vfx:knownOrgUri(aiis:FUNDING_ORG_NAME, $extantFOrgs)'/>
+<xsl:variable name='knownUri' 
+	select='vfx:knownOrgUri(aiis:FUNDING_ORG_NAME, 
+			$extantFOrgs union
+			$rawNewFundOrgs/ExtantOrgs)'/>
 
-<xsl:variable name='forguri' select="if($knownUri != '') then $knownUri else concat($g_instance,$uno)"/>
+<xsl:variable name='forguri' 
+	select='if(starts-with($knownUri,"NEW-")) then 
+		substring-after($knownUri,"NEW-") else 
+		$knownUri'/>
 
 <!-- xsl:comment><xsl:value-of select='$forguri'/> - <xsl:value-of select='$knownUri'/></xsl:comment -->
 
-<xsl:if test='$knownUri = "" and not(contains($ilk,"OTHER"))'>
+<xsl:if test='starts-with($knownUri,"NEW-") and 
+		not(contains($ilk,"OTHER"))'>
+
 <rdf:Description rdf:about="{$forguri}">
-<rdf:type rdf:resource='http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing'/>
-<rdf:type rdf:resource='http://vivoweb.org/ontology/core#FundingOrganization'/>
+<rdf:type rdf:resource=
+	'http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing'/>
+<rdf:type rdf:resource=
+	'http://vivoweb.org/ontology/core#FundingOrganization'/>
 
 <rdfs:label>
 <xsl:value-of select='vfx:trim(aiis:FUNDING_ORG_NAME)'/>
@@ -70,7 +120,8 @@ OR use an old one -->
 <core:description>
 <xsl:value-of select='vfx:trim(aiis:FUNDING_ORG_NAME)'/>
 </core:description>
-<acti:fundingIlk><xsl:value-of select='concat("FUNDING_",$ilk)'/> </acti:fundingIlk>
+<acti:fundingIlk>
+<xsl:value-of select='concat("FUNDING_",$ilk)'/> </acti:fundingIlk>
 </rdf:Description>
 </xsl:if>
 
@@ -87,42 +138,34 @@ OR use an old one -->
 </xsl:for-each>
 
 <!-- =================================================== 
- at this point we re-run part of the last for loop to get a new list of
- funding orgs
- and their uri's to save in the extant Orgs Out xml file
+save new orgs
 -->
 <xsl:result-document href='{$extFOrgOut}'>
 <xsl:element name='ExtantOrgs' namespace=''>
-<xsl:for-each select='aiis:IMPACT_STMTS_BY_FUNDING_ORG'>
-<xsl:variable name='ilk' select='@ilk'/>
-<xsl:variable name='ctr'  select='@counter'/>
-<xsl:variable name='uno' select='$unomap/map[position()=$ctr]/@nuno'/>
-<xsl:variable name='knownUri' select='vfx:knownOrgUri(aiis:FUNDING_ORG_NAME, $extantFOrgs)'/>
+<xsl:for-each select='$uniqueNewFundOrgs//org'>
 
-<xsl:variable name='forguri' select="if($knownUri != '') then $knownUri else concat($g_instance,$uno)"/>
-
-<xsl:if test='not(contains($ilk,"OTHER"))'>
-<!-- must prevent duplicates -->
-<xsl:if test="$knownUri = ''">
 <xsl:element name='org' namespace=''>
 
 <xsl:element name='uri' namespace=''>
-<xsl:value-of select='$forguri'/>
+<xsl:value-of select=
+	'if(starts-with(uri,"NEW-")) then 
+		substring-after(uri,"NEW-") else uri'/>
 </xsl:element>
 
 <xsl:element name='name' namespace=''>
-<xsl:value-of select='aiis:FUNDING_ORG_NAME'/>
+<xsl:value-of select='name'/>
 </xsl:element>
 
 </xsl:element>
-</xsl:if>
-</xsl:if>
+
 
 </xsl:for-each>
 </xsl:element>
+<xsl:value-of select='$NL'/>
 </xsl:result-document>
-
 </rdf:RDF>
+<xsl:value-of select='$NL'/>
+
 </xsl:template>
 
 <!-- =================================================== -->
@@ -133,6 +176,7 @@ OR use an old one -->
 <xsl:param name='ilk'/>
 <xsl:param name='name'/>
 <xsl:for-each select='$isbyfo/aiis:IMPACT_STMT_ID'>
+<xsl:if test='./@hasTitle = "Yes" and ./@hasGoodAuthor = "Yes"'>
 <xsl:variable name='aiid' select='.'/>
 
 <!-- =================================================== -->
@@ -191,7 +235,7 @@ core:FundingOrganization -->
 </rdf:Description>
 
 
-
+</xsl:if>
 </xsl:for-each>
 
 </xsl:template>

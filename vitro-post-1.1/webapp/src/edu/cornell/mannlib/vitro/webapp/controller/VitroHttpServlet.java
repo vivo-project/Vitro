@@ -5,8 +5,14 @@ package edu.cornell.mannlib.vitro.webapp.controller;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.List;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -119,6 +125,31 @@ public class VitroHttpServlet extends HttpServlet {
 		request.getSession().setAttribute("postLoginRequest", postLoginRequest);
 		String loginPage = request.getContextPath() + Controllers.LOGIN;
 		response.sendRedirect(loginPage);
+	}
+
+	/** Don't dump the contents of these headers, even if log.trace is enabled. */
+	private static final List<String> BORING_HEADERS = new ArrayList<String>(
+			Arrays.asList(new String[] { "host", "user-agent", "accept",
+					"accept-language", "accept-encoding", "accept-charset",
+					"keep-alive", "connection" }));
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public void service(ServletRequest req, ServletResponse resp)
+			throws ServletException, IOException {
+		if (log.isTraceEnabled()) {
+			HttpServletRequest request = (HttpServletRequest) req;
+			Enumeration<String> names = request.getHeaderNames();
+			log.trace("----------------------request:" + request.getRequestURL());
+			while (names.hasMoreElements()) {
+				String name = names.nextElement();
+				if (!BORING_HEADERS.contains(name)) {
+					log.trace(name + "=" + request.getHeader(name));
+				}
+			}
+		}
+
+		super.service(req, resp);
 	}
 
 }

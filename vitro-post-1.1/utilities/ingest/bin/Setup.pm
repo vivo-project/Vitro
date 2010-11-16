@@ -16,9 +16,11 @@ GetOptions(
 	   'aiis=s'      => \$op_aiis,
 	   'aiisp=s'     => \$op_aiispath,
 	   'bindir=s'    => \$op_bindir,
+	   'clean=s'     => \$op_clean,
 	   'clear=s'     => \@Clear,
 	   'debug'       => \$op_debug,
 	   'ic_xchain=s' => \$op_chain,
+	   'icjapf=s'    => \$op_icjapf,
 	   'is_xchain=s' => \$op_is_chain,
            'jopts=s'     => \@JavaOpts,
 	   'jext=s'      => \$op_jext,
@@ -34,12 +36,15 @@ GetOptions(
 	   'reuse=s'     => \@UsePrev,
 	   'reuseAll'    => \$op_reuseAll,
 	   'revert'      => \$op_revert,
+	   'setuno=s'    => \@SetCtrs,
+	   'setunos=s'   => \@SetCtrs,
 	   'step=s'      => \@Steps,
 	   'steps=s'     => \@Steps,
 	   'store=s'     => \$opt_store,
 	   'sparql'      => \$op_sparql,
            'saxon=s'     => \$g_saxonJar,
 	   'tmp=s'       => \$op_store,
+           'token=s'     => \$op_token,
 	   'tsr=s'       => \$op_tsr,
 	   't0'          => \$op_timeZero,
            'u'           => \$op_usage,
@@ -52,7 +57,13 @@ GetOptions(
 	   'xmldir=s'    => \$op_xmldir,
 	   'xsltdir=s'   => \$op_xslts
 );
+$g_rtoken = $g_ltoken = $g_mtoken ='';
 
+if($op_token ne ''){
+    $g_rtoken = "_$op_token";
+    $g_ltoken = "$op_token\_";
+    $g_mtoken = "_$op_token\_";
+}
 $g_TSR = strftime("\%Y\%m\%d\%H\%M\%S", localtime());
 if($op_tsr){
     if($op_tsr =~ /^day/i){
@@ -76,11 +87,45 @@ if($op_tsr){
 autoflush STDOUT 1;
 open CONSOLE, ">&STDOUT";
 autoflush CONSOLE 1;
+############################################
+
+
+qx(touch "/tmp/.aiIngestAlreadyRunning");
+
+@procs = qx(/sbin/fuser /tmp/.aiIngestAlreadyRunning);
+if(scalar(@procs)>0){
+    print CONSOLE "An instance of aiIngest is already running. Consider:\n";
+    print CONSOLE "kill -9 " . join (' ', @procs) . "\n";
+    exit 1;
+}
+open BLOCK, "/tmp/.aiIngestAlreadyRunning";
+
+############################################
+
+@g_UnoFileList = (".Person",".Org",".CollaborativeEntity",".Journal",
+		  ".Geo",".PriorityArea",".ConcentrationArea",".USDA_Area");
+
+%g_UnoTokenList = ('P' => ".Person",
+		   'O' => ".Org",
+		   'C' => ".CollaborativeEntity",
+		   'G' => ".Geo",
+		   'J' => ".Journal",
+		   'PA'=> ".PriorityArea",
+		   'CA'=> ".ConcentrationArea",
+		   'UA'=> ".USDA_Area");
+
 
 END {
     my $err = $?;
     print STDOUT 
-	"First uno available in next run " . qx($g_bin/nuno -cC $op_uno);
+	"First uno in $op_uno available in next run " . 
+	qx($g_bin/nuno -cC $op_uno);
+    for(my $f=0;$f < scalar(@g_UnoFileList); $f++){
+	my $path = "$g_store/$g_UnoFileList[$f]";
+	print STDOUT
+	  "First uno in $path available in next run " . 
+	   qx($g_bin/nuno -cC $path);
+    }
     if($err){
 	print CONSOLE 
 	    "\n\t\t>>>>>------> An Error has occurred! <------<<<<<\n\n";
@@ -105,11 +150,13 @@ END {
 		qx(mv $g_fb/REVERT_ON_FAULT_Org0.xml  $g_fb/Org0.xml );
 	    }
 	}
-	qx($g_bin/nuno -s $g_unoMark $op_uno);
+	qx($g_bin/nuno -s $g_unoMark $g_curUnoFile);
 	print STDOUT 
-	  "Restoring uno to $g_unoMark the value at the start of $g_curPhase.";
+	  "Restoring uno in $g_curUnoFile to $g_unoMark,";
+	print STDOUT 
+	  " the value at the start of $g_curPhase.\n";
 	if($op_verb){
-	    my @res = qx(tail -15 $g_log_path);
+	    my @res = qx(tail -25 $g_log_path);
 	    print CONSOLE join("",@res) . "\n";
 	    print CONSOLE "\nvi $g_log_path\n";
 	}
@@ -144,6 +191,7 @@ END {
     print STDOUT "\nEnding at $t1. $elapsed seconds;\n";
     print CONSOLE "\nEnding at $t1. $elapsed seconds;\n";
     $? = $err;
+    close BLOCK;
 }
 
 $g_javaopts = " -Xmx1024m -Xms1024m ";
@@ -154,10 +202,11 @@ if(scalar(@JavaOpts) > 0){
 
 @Steps = split(/[,;]/,join(',',@Steps));
 if(scalar(@Steps) == 0){
-    $g_all = 'y';
+    $g_all = '';
 } else {
     $g_all = '';
 }
+
 
 @UsePrev = split(/[,;]/,join(',',@UsePrev));
 %ReuseOutFiles = ();
@@ -418,11 +467,11 @@ $g_log_path = "";
 if($op_log) {
     my $flag = 0;
     if($g_log){
-	$flag = open LOG, ">$g_log/aiIngest_$$\_$g_STARTED_AT";
-	$g_log_path = "$g_log/aiIngest_$$\_$g_STARTED_AT";
+	$flag = open LOG, ">$g_log/aiIngest_$g_STARTED_AT\_$$"."$g_rtoken";
+	$g_log_path = "$g_log/aiIngest_$g_STARTED_AT\_$$"."$g_rtoken";
     } else {
-	$flag = open LOG, ">$g_log/log/aiIngest_$$\_$g_STARTED_AT";
-	$g_log_path = "$g_log/log/aiIngest_$$\_$g_STARTED_AT";
+	$flag = open LOG, ">$g_log/log/aiIngest_$g_STARTED_AT\_$$"."$g_rtoken";
+	$g_log_path = "$g_log/log/aiIngest_$g_STARTED_AT\_$$"."$g_rtoken";
     }
     
     if($flag){
@@ -468,6 +517,9 @@ print "\$op_log\t\t= $op_log\n";
 print "\$op_logdir\t= $op_logdir\n";
 print "\$op_nzonly\t= $op_nzonly\n";
 print "\$op_revert\t= $op_revert\n";
+
+
+
 ############################################
 foreach my $i (@Steps){
     $i =~ s/^-//;
@@ -537,7 +589,11 @@ if( -e "$g_fb/REVERT_Org0.xml"){
     qx(/bin/rm -f $g_fb/REVERT_ON_FAULT_Org0.xml);
 }
 
-qx(/bin/rm -f $g_fb/uri-maps/AT_END_*);
+if($op_clean){
+    qx(/bin/rm -f $g_fb/uri-maps/AT_END_*)      if $op_clean =~ /(e|a)/;
+    qx(/bin/rm -f $g_fb/uri-maps/AT_START_*)    if $op_clean =~ /(s|a)/;
+    qx(/bin/rm -f $g_fb/uri-maps/NEW_ENTRIES_*) if $op_clean =~ /(n|a)/;
+}
 
 # clear what was specified
 clearFeedbackFilesToTimeZero();
@@ -546,6 +602,10 @@ clearFeedbackFilesToTimeZero();
 # DEAL WITH UNO ISSUES
 #
 #
+if($op_uno eq ''){
+    $op_uno = "$g_store/.Uno";
+}
+
 $g_unot0 = qx($g_bin/nuno -cC $op_uno);
 if($? >> 8){
     print STDOUT ">>>> ERROR !!! $g_bin/nuno -cC  $op_uno failed.\n";
@@ -572,6 +632,28 @@ if($op_jext eq ''){
 } else {
     $g_saxonCmdSequence = 
 	" -cp $op_jext:$g_xslts/$g_saxonJar com.saxonica.Transform ";
+}
+
+if($op_icjapf ne ''){
+    $g_icjapf = $g_fb . '/' . $op_icjapf if $op_icjapf !~ /\//;
+} else {
+    $g_icjapf = "$g_fb/AiAcademicArticleAuthors.xml";
+}
+
+#@SetCtrs = map { trim($_); } @SetCtrs;
+@SetCtrs = split(/[,;]/,join(',',@SetCtrs));
+
+%g_InitCtrs = ();
+foreach my $item (@SetCtrs){
+    my @parts = map { trim($_); } split(/:/,$item);
+    if(scalar(@parts) == 2 && $parts[0] ne ''){
+	$g_InitCtrs{"$g_store/$g_UnoTokenList{uc($parts[0])}"} = $parts[1];
+    } elsif(scalar(@parts) == 1 && $parts[0] ne ''){
+	$g_InitCtrs{"$g_store/$g_UnoTokenList{uc($parts[0])}"} = '00000000';
+    }
+}
+foreach my $k ( sort keys (%g_InitCtrs)){
+    print STDOUT "$k -> $g_InitCtrs{$k}\n";
 }
 
 

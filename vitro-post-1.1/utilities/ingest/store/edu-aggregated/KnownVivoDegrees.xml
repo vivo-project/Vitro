@@ -1,199 +1,199 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <KnownVivoDegrees>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree1</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree1</uri>
       <name>A.B. Bachelor of Arts</name>
       <abbrev>A.B.</abbrev>
       <ai-abbrev>AB</ai-abbrev>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree3</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree3</uri>
       <name>A.M.T. Master of Arts in Teaching</name>
       <abbrev>A.M.T.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree2</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree2</uri>
       <name>AeEng. Aeronautical Engineer</name>
       <abbrev>AeEng.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree4</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree4</uri>
       <name>B.A. Bachelor of Arts</name>
       <abbrev>B.A.</abbrev>
       <ai-abbrev>BA</ai-abbrev>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree7</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree7</uri>
       <name>B.A.E. Aeronautical Engineering</name>
       <abbrev>B.A.E.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree8</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree8</uri>
       <name>B.A.E. Agricultural Engineering</name>
       <abbrev>B.A.E.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree9</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree9</uri>
       <name>B.A.E. Architectural Engineering</name>
       <abbrev>B.A.E.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree6</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree6</uri>
       <name>B.A.E. Bachelor of Art Education</name>
       <abbrev>B.A.E.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree5</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree5</uri>
       <name>B.A.E. Bachelor of Arts in Education</name>
       <abbrev>B.A.E.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree11</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree11</uri>
       <name>B.A.M. Bachelor of Applied Mathematics</name>
       <abbrev>B.A.M.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree10</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree10</uri>
       <name>B.Ag. Bachelor of Agriculture</name>
       <abbrev>B.Ag.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree12</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree12</uri>
       <name>B.Arch. Bachelor of Architecture</name>
       <abbrev>B.Arch.</abbrev>
       <ai-abbrev>BArch</ai-abbrev>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree13</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree13</uri>
       <name>B.B.A. Bachelor of Business Administration</name>
       <abbrev>B.B.A.</abbrev>
       <ai-abbrev>BBA</ai-abbrev>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree14</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree14</uri>
       <name>B.C.E. Bachelor of Civil Engineering</name>
       <abbrev>B.C.E.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree16</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree16</uri>
       <name>B.C.L. Bachelor of Canon Law</name>
       <abbrev>B.C.L.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree15</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree15</uri>
       <name>B.Ch.E Bachelor of Chemical Engineering</name>
       <abbrev>B.Ch.E</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree17</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree17</uri>
       <name>B.D. Bachelor of Divinity</name>
       <abbrev>B.D.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree18</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree18</uri>
       <name>B.E. Bachelor of Education</name>
       <abbrev>B.E.</abbrev>
       <ai-abbrev>BE</ai-abbrev>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree19</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree19</uri>
       <name>B.E. Bachelor of Engineering</name>
       <abbrev>B.E.</abbrev>
       <ai-abbrev>BEng</ai-abbrev>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree20</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree20</uri>
       <name>B.E.E. Bachelor of Electrical Engineering</name>
       <abbrev>B.E.E.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree21</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree21</uri>
       <name>B.F. Bachelor of Forestry</name>
       <abbrev>B.F.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree22</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree22</uri>
       <name>B.F.A. Bachelor of Fine Arts</name>
       <abbrev>B.F.A.</abbrev>
       <ai-abbrev>BFA</ai-abbrev>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree23</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree23</uri>
       <name>B.J. Bachelor of Journalism</name>
       <abbrev>B.J.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree24</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree24</uri>
       <name>B.L.S. Bachelor of Liberal Studies</name>
       <abbrev>B.L.S.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree25</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree25</uri>
       <name>B.L.S. Bachelor of Library Science</name>
       <abbrev>B.L.S.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree26</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree26</uri>
       <name>B.Lit. Bachelor of Literature</name>
       <abbrev>B.Lit.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree27</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree27</uri>
       <name>B.M. Bachelor of Medicine</name>
       <abbrev>B.M.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree28</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree28</uri>
       <name>B.M. Bachelor of Music</name>
       <abbrev>B.M.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree29</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree29</uri>
       <name>B.M.S. Bachelor of Marine Science</name>
       <abbrev>B.M.S.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree30</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree30</uri>
       <name>B.N. Bachelor of Nursing</name>
       <abbrev>B.N.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree31</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree31</uri>
       <name>B.Pharm. Bachelor of Pharmacy</name>
       <abbrev>B.Pharm.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree32</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree32</uri>
       <name>B.R.E. Bachelor of Religious Education</name>
       <abbrev>B.R.E.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree33</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree33</uri>
       <name>B.S. Bachelor of Science</name>
       <abbrev>B.S.</abbrev>
       <ai-abbrev>BS</ai-abbrev>
@@ -201,349 +201,349 @@
       <ai-abbrev>B.Sc.</ai-abbrev>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree34</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree34</uri>
       <name>B.S.Ed. Bachelor of Science in Education</name>
       <abbrev>B.S.Ed.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree35</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree35</uri>
       <name>C.E. Civil Engineer</name>
       <abbrev>C.E.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree36</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree36</uri>
       <name>Ch.E. Chemical Engineer</name>
       <abbrev>Ch.E.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree37</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree37</uri>
       <name>D.A. Doctor of Arts</name>
       <abbrev>D.A.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree38</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree38</uri>
       <name>D.A.S. Doctor of Applied Science</name>
       <abbrev>D.A.S.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree39</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree39</uri>
       <name>D.B.A. Doctor of Business Administration</name>
       <abbrev>D.B.A.</abbrev>
       <ai-abbrev>DBA</ai-abbrev>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree40</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree40</uri>
       <name>D.C. Doctor of Chiropractic</name>
       <abbrev>D.C.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree41</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree41</uri>
       <name>D.D. Doctor of Divinity</name>
       <abbrev>D.D.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree43</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree43</uri>
       <name>D.D.S. Doctor of Dental Science</name>
       <abbrev>D.D.S.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree42</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree42</uri>
       <name>D.D.S. Doctor of Dental Surgery</name>
       <abbrev>D.D.S.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree44</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree44</uri>
       <name>D.Ed. Doctor of Education</name>
       <abbrev>D.Ed.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree45</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree45</uri>
       <name>D.L.S. Doctor of Library Science</name>
       <abbrev>D.L.S.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree46</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree46</uri>
       <name>D.M.D. Doctor of Dental Medicine</name>
       <abbrev>D.M.D.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree48</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree48</uri>
       <name>D.M.S. Doctor of Medical Science</name>
       <abbrev>D.M.S.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree47</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree47</uri>
       <name>D.O. Doctor of Osteopathic Medicine</name>
       <abbrev>D.O.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree49</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree49</uri>
       <name>D.P.A. Doctor of Public Administration</name>
       <abbrev>D.P.A.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree50</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree50</uri>
       <name>D.P.H. Doctor of Public Health</name>
       <abbrev>D.P.H.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree51</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree51</uri>
       <name>D.R.E. Doctor of Religious Education</name>
       <abbrev>D.R.E.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree52</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree52</uri>
       <name>D.S.W. Doctor of Social Welfare</name>
       <abbrev>D.S.W.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree53</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree53</uri>
       <name>D.S.W. Doctor of Social Work</name>
       <abbrev>D.S.W.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree54</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree54</uri>
       <name>D.Sc. Doctor of Science</name>
       <abbrev>D.Sc.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree55</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree55</uri>
       <name>D.V.M. Doctor of Veterinary Medicine</name>
       <abbrev>D.V.M.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree58</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree58</uri>
       <name>E.E. Electrical Engineer</name>
       <abbrev>E.E.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree59</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree59</uri>
       <name>E.M. Engineer of Mines</name>
       <abbrev>E.M.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree60</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree60</uri>
       <name>E.Met. Engineer of Metallurgy</name>
       <abbrev>E.Met.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree56</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree56</uri>
       <name>Ed.D. Doctor of Education</name>
       <abbrev>Ed.D.</abbrev>
       <ai-abbrev>EDD</ai-abbrev>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree57</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree57</uri>
       <name>Ed.S. Education Specialist</name>
       <abbrev>Ed.S.</abbrev>
       <ai-abbrev>EDS</ai-abbrev>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree61</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree61</uri>
       <name>I.E. Industrial Engineer</name>
       <abbrev>I.E.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree62</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree62</uri>
       <name>I.E. Industrial Engineering</name>
       <abbrev>I.E.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree63</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree63</uri>
       <name>J.D. Doctor of Laws</name>
       <abbrev>J.D.</abbrev>
       <ai-abbrev>JD</ai-abbrev>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree64</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree64</uri>
       <name>J.S.D. Doctor of Juristic Science</name>
       <abbrev>J.S.D.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree65</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree65</uri>
       <name>L.H.D. Doctor of Humane Letters</name>
       <abbrev>L.H.D.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree68</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree68</uri>
       <name>LL.B. Bachelor of Laws</name>
       <abbrev>LL.B.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree69</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree69</uri>
       <name>LL.D. Doctor of Laws</name>
       <abbrev>LL.D.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree70</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree70</uri>
       <name>LL.M. Master of Laws</name>
       <abbrev>LL.M.</abbrev>
       <ai-abbrev>LLM</ai-abbrev>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree66</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree66</uri>
       <name>Litt.B. Bachelor of Letters</name>
       <abbrev>Litt.B.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree67</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree67</uri>
       <name>Litt.M. Master of Letters</name>
       <abbrev>Litt.M.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree71</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree71</uri>
       <name>M.A. Master of Arts</name>
       <abbrev>M.A.</abbrev>
       <ai-abbrev>MA</ai-abbrev>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree72</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree72</uri>
       <name>M.Aero.E. Master of Aeronautical Engineering</name>
       <abbrev>M.Aero.E.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree73</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree73</uri>
       <name>M.B.A. Master of Business Administration</name>
       <abbrev>M.B.A.</abbrev>
       <ai-abbrev>MBA</ai-abbrev>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree74</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree74</uri>
       <name>M.C.E. Master of Christian Education</name>
       <abbrev>M.C.E.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree75</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree75</uri>
       <name>M.C.E. Master of Civil Engineering</name>
       <abbrev>M.C.E.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree76</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree76</uri>
       <name>M.C.S. Master of Computer Science</name>
       <abbrev>M.C.S.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree77</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree77</uri>
       <name>M.D. Doctor of Medicine</name>
       <abbrev>M.D.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree78</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree78</uri>
       <name>M.Div. Master of Divinity</name>
       <abbrev>M.Div.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree79</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree79</uri>
       <name>M.E. Master of Engineering</name>
       <abbrev>M.E.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree80</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree80</uri>
       <name>M.Ed. Master of Education</name>
       <abbrev>M.Ed.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree81</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree81</uri>
       <name>M.Eng. Master of Engineering</name>
       <abbrev>M.Eng.</abbrev>
       <ai-abbrev>MEng</ai-abbrev>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree82</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree82</uri>
       <name>M.F.A. Master of Fine Arts</name>
       <abbrev>M.F.A.</abbrev>
       <ai-abbrev>MFA</ai-abbrev>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree83</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree83</uri>
       <name>M.H.A. Master of Hospital Administration</name>
       <abbrev>M.H.A.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree84</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree84</uri>
       <name>M.L.S. Master of Library Science</name>
       <abbrev>M.L.S.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree85</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree85</uri>
       <name>M.M. Master of Music</name>
       <abbrev>M.M.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree86</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree86</uri>
       <name>M.M.E. Master of Mechanical Engineering</name>
       <abbrev>M.M.E.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree87</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree87</uri>
       <name>M.M.E. Master of Music Education</name>
       <abbrev>M.M.E.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree88</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree88</uri>
       <name>M.Mus. Master of Music</name>
       <abbrev>M.Mus.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree89</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree89</uri>
       <name>M.N. Master of Nursing</name>
       <abbrev>M.N.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree90</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree90</uri>
       <name>M.R.E. Master of Religious Education</name>
       <abbrev>M.R.E.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree91</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree91</uri>
       <name>M.S. Master of Science</name>
       <abbrev>M.S.</abbrev>
       <ai-abbrev>MS</ai-abbrev>
@@ -551,109 +551,109 @@
       <ai-abbrev>M.Sc.</ai-abbrev>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree92</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree92</uri>
       <name>M.S.W. Master of Social Work</name>
       <abbrev>M.S.W.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree93</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree93</uri>
       <name>M.Th. Master of Theology</name>
       <abbrev>M.Th.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree94</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree94</uri>
       <name>Nuc.E. Nuclear Engineer</name>
       <abbrev>Nuc.E.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree95</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree95</uri>
       <name>O.D. Doctor of Optometry</name>
       <abbrev>O.D.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree97</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree97</uri>
       <name>Ph.B. Bachelor of Philosophy</name>
       <abbrev>Ph.B.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree98</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree98</uri>
       <name>Ph.D. Doctor of Philosophy</name>
       <abbrev>Ph.D.</abbrev>
       <ai-abbrev>Ph D</ai-abbrev>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree96</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree96</uri>
       <name>Pharm.D. Doctor of Pharmacy</name>
       <abbrev>Pharm.D.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree99</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree99</uri>
       <name>S.B. Bachelor of Science</name>
       <abbrev>S.B.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree101</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree101</uri>
       <name>S.J.D. Doctor of Juridical Science</name>
       <abbrev>S.J.D.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree102</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree102</uri>
       <name>S.J.D. Doctor of the Science of Law</name>
       <abbrev>S.J.D.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree103</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree103</uri>
       <name>S.Sc.D. Doctor of Social Science</name>
       <abbrev>S.Sc.D.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree104</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree104</uri>
       <name>S.T.B. Bachelor of Sacred Theology</name>
       <abbrev>S.T.B.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree105</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree105</uri>
       <name>S.T.D. Doctor of Sacred Theology</name>
       <abbrev>S.T.D.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree106</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree106</uri>
       <name>S.T.M. Master of Sacred Theology</name>
       <abbrev>S.T.M.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree100</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree100</uri>
       <name>Sc.D. Doctor of Science</name>
       <abbrev>Sc.D.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree107</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree107</uri>
       <name>Th.B. Bachelor of Theology</name>
       <abbrev>Th.B.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree108</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree108</uri>
       <name>Th.D. Doctor of Theology</name>
       <abbrev>Th.D.</abbrev>
       <ai-abbrev/>
    </degree>
    <degree>
-      <uri>http://vivoweb.org/ontology/degree/academicDegree109</uri>
+      <uri>http://vivo.cornell.edu/ontology/degree/academicDegree109</uri>
       <name>Th.M. Master of Theology</name>
       <abbrev>Th.M.</abbrev>
       <ai-abbrev/>

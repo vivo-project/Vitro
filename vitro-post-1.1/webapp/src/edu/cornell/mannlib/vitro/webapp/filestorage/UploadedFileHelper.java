@@ -66,23 +66,24 @@ public class UploadedFileHelper {
 		}
 
 		// Create the file individuals in the model
-		Individual byteStream = createByteStreamIndividual();
+		Individual byteStream = createByteStreamIndividual(filename);
 		String bytestreamUri = byteStream.getURI();
+		String aliasUrl = byteStream.getDataValue(VitroVocabulary.FS_ALIAS_URL);
+
 		Individual file = createFileIndividual(mimeType, filename, byteStream);
 		String fileUri = file.getURI();
 
 		// Store the file in the FileStorage system.
 		fileStorage.createFile(bytestreamUri, filename, inputStream);
 
-		// Figure out the alias URL
-		String aliasUrl = FileServingHelper.getBytestreamAliasUrl(
-				bytestreamUri, filename);
-
 		// And wrap it all up in a tidy little package.
-		return new FileInfo.Builder().setFilename(filename)
-				.setMimeType(mimeType).setUri(fileUri)
-				.setBytestreamUri(bytestreamUri)
-				.setBytestreamAliasUrl(aliasUrl).build();
+		FileInfo.Builder builder = new FileInfo.Builder();
+		builder.setFilename(filename);
+		builder.setMimeType(mimeType);
+		builder.setUri(fileUri);
+		builder.setBytestreamUri(bytestreamUri);
+		builder.setBytestreamAliasUrl(aliasUrl);
+		return builder.build();
 	}
 
 	/**
@@ -151,10 +152,10 @@ public class UploadedFileHelper {
 	}
 
 	/**
-	 * Create a bytestream individual in the model. It's just a naked individual
-	 * with no properties.
+	 * Create a bytestream individual in the model. The only property is the
+	 * alias URL
 	 */
-	private Individual createByteStreamIndividual() {
+	private Individual createByteStreamIndividual(String filename) {
 		Individual byteStream = new IndividualImpl();
 		byteStream.setVClassURI(VitroVocabulary.FS_BYTESTREAM_CLASS);
 
@@ -165,6 +166,11 @@ public class UploadedFileHelper {
 			throw new IllegalStateException(
 					"Failed to create the bytestream individual.", e);
 		}
+
+		dataPropertyStatementDao
+				.insertNewDataPropertyStatement(new DataPropertyStatementImpl(
+						uri, VitroVocabulary.FS_ALIAS_URL, FileServingHelper
+								.getBytestreamAliasUrl(uri, filename)));
 
 		return individualDao.getIndividualByURI(uri);
 	}

@@ -33,22 +33,19 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 /**
  * Pulls a netId out of the CUWebAuth REMOTE_USER header.
  *
- *
  * @author bdc34
- *
  */
 public class SelfEditingIdentifierFactory implements IdentifierBundleFactory {
     public final static String httpHeaderForNetId = "REMOTE_USER";
 
     private static final Log log = LogFactory.getLog(SelfEditingIdentifierFactory.class.getName());
 
-
     public IdentifierBundle getIdentifierBundle(ServletRequest request, HttpSession session, ServletContext context) {
        IdentifierBundle idb = getFromCUWebAuthHeader(request,session,context);       
        if( idb != null )
            return idb;
        else
-           return getFromSession(request,session);       
+           return getFromSession(session);       
     }
 
     private IdentifierBundle getFromCUWebAuthHeader(ServletRequest request, HttpSession session,ServletContext context){
@@ -100,7 +97,6 @@ public class SelfEditingIdentifierFactory implements IdentifierBundleFactory {
         }        
         putNetIdInSession(session, selfE, netid);            
         return idb;
-
     }
     
     /**
@@ -139,7 +135,7 @@ public class SelfEditingIdentifierFactory implements IdentifierBundleFactory {
                     break;
             }catch(RuntimeException ex){
                 log.error("Could not run blacklist check query for file " +
-                        file.getAbsolutePath() + file.separatorChar + file.getName(),
+                        file.getAbsolutePath() + File.separatorChar + file.getName(),
                         ex);                
             }
         }
@@ -214,7 +210,11 @@ public class SelfEditingIdentifierFactory implements IdentifierBundleFactory {
         return null;
     }
 
-    private IdentifierBundle getFromSession(ServletRequest req, HttpSession session ){
+    private IdentifierBundle getFromSession( HttpSession session ){
+    	if (session == null) {
+    		return null;
+    	}
+    	
         NetId netid = (NetId)session.getAttribute(NETID_IN_SESSION);
         SelfEditing sed = (SelfEditing)session.getAttribute(URI_IN_SESSION);
         
@@ -254,7 +254,7 @@ public class SelfEditingIdentifierFactory implements IdentifierBundleFactory {
             this.value = value;
         }
         public String getValue(){return value;}
-        public String toString(){ return value;}
+        public String toString(){ return "NetID: " + value;}
     }
     
     

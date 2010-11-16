@@ -67,15 +67,20 @@ public class IndexController extends FreemarkerHttpServlet {
         return "Full Search Index Rebuild";
     }
     
+//    @Override
+//    protected int requiresLoginLevel() {
+//        // User must be logged in to view this page.
+//        return LoginStatusBean.DBA;
+//    }
+    
     @Override
-    protected ResponseValues processRequest(VitroRequest vreq) {   
+    protected ResponseValues processRequest(VitroRequest vreq) { 
+        // Due to requiresLoginLevel(), we don't get here unless logged in as DBA
         if (!LoginStatusBean.getBean(vreq).isLoggedInAtLeast(LoginStatusBean.DBA)) {
             return new RedirectResponseValues(UrlBuilder.getUrl(Route.LOGIN));
         }
-        
         Map<String, Object> body = new HashMap<String, Object>();
         
-        // long start = System.currentTimeMillis();
         try {
             IndexBuilder builder = (IndexBuilder)getServletContext().getAttribute(IndexBuilder.class.getName());
             if( vreq.getParameter("update") != null ){

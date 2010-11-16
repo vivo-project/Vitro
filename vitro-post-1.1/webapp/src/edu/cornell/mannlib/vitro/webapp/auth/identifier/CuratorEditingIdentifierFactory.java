@@ -40,6 +40,6 @@ public class CuratorEditingIdentifierFactory implements IdentifierBundleFactory{
         
         public String getUri(){ return uri; }
         
-        public String toString(){ return uri; }
+        public String toString(){ return "CuratorEditingId: " + uri; }
     }
 }

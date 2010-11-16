@@ -392,7 +392,7 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 			</div><!-- class="propsCategory" -->
 		</c:if>
 			<c:if test="${showSelfEdits || showCuratorEdits}">
-		    	<a class="backToTop" href="#wrap" title="jump to top of the page">back to top</a>
+		    	<a class="backToTop" href="#content" title="jump to top of the page">back to top</a>
 			</c:if>
 <%		} // end for (PropertyGroup g : groupsList)
     } else {

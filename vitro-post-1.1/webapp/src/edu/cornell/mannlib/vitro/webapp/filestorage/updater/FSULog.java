@@ -29,8 +29,8 @@ public class FSULog {
 	private final PrintWriter writer;
 	private boolean open;
 
-	FSULog(File logDirectory) throws IOException {
-		this.logFile = generateTimestampedFilename(logDirectory);
+	FSULog(File logDirectory, String prefix) throws IOException {
+		this.logFile = generateTimestampedFilename(logDirectory, prefix);
 		this.writer = new PrintWriter(this.logFile);
 		open = true;
 	}
@@ -39,9 +39,10 @@ public class FSULog {
 	 * Create a filename for the log file that contains a timestamp, so if we
 	 * run the process more than once, we will see multiple files.
 	 */
-	private File generateTimestampedFilename(File upgradeDirectory) {
+	private File generateTimestampedFilename(File upgradeDirectory,
+			String prefix) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH-mm-sss");
-		String filename = "upgradeLog." + sdf.format(new Date()) + ".txt";
+		String filename = prefix + "." + sdf.format(new Date()) + ".txt";
 		return new File(upgradeDirectory, filename);
 	}
 

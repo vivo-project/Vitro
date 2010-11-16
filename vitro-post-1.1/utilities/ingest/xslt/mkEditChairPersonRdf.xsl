@@ -41,11 +41,7 @@
 <xsl:for-each select='aiec:PERSON'>
 <xsl:variable name='ctr'  select='@counter'/>
 <xsl:variable name='uno' select='$unomap/map[position()=$ctr]/@nuno'/>
-<!-- xsl:comment><xsl:value-of 
-select='concat(aiec:fname,"|",
-	aiec:mname,"|",
-	aiec:lname,"|"
-	,aiec:netid)'/></xsl:comment -->
+
 <xsl:variable name='kUri' 
 	select='vfx:knownUriByNetidOrName(aiec:fname, 
 	                       		aiec:mname, 
@@ -105,15 +101,15 @@ select="if($kUri != '') then $kUri
 <xsl:if test='not(starts-with($known/uri,"NEW-")) and $known/netid != ""'>
 
 <rdf:Description rdf:about="{$peruri}">
-<rdf:type 
-rdf:resource='http://vivoweb.org/ontology/activity-insight#ActivityInsightPerson'/>
+<rdf:type rdf:resource=
+'http://vivoweb.org/ontology/activity-insight#ActivityInsightPerson'/>
 </rdf:Description>
 </xsl:if>
 
 <xsl:if test='starts-with($known/uri,"NEW-")'>
 
 <xsl:if test='
-not(vfx:hasIsoMatchRecipient(., 
+not(vfx:hasIsoMatchEcPerson(., 
 			  preceding-sibling::aiec:PERSON))'>
 
 <rdf:Description rdf:about="{$peruri}">
@@ -127,7 +123,7 @@ not(vfx:hasIsoMatchRecipient(.,
 </xsl:if>
 
 <rdfs:label>
-<xsl:value-ofselect='concat(vfx:simple-trim($known/lname),", ",
+<xsl:value-of select='concat(vfx:simple-trim($known/lname),", ",
                vfx:simple-trim($known/fname)," ", 
                vfx:simple-trim($known/mname))'/>
 </rdfs:label>
@@ -139,7 +135,8 @@ not(vfx:hasIsoMatchRecipient(.,
 
 <xsl:if test='$known/netid != ""'>
 
-<xsl:variable name='nidxml' select="concat($rawXmlPath,'/',$known/netid , '.xml')"/>
+<xsl:variable name='nidxml' select="concat($rawXmlPath,'/',
+					$known/netid , '.xml')"/>
 
 <!-- do not bother with these if file is not available -->
 <xsl:if test='doc-available($nidxml)'>
@@ -176,6 +173,7 @@ not(vfx:hasIsoMatchRecipient(.,
 </xsl:call-template>
 
 </rdf:RDF>
+<xsl:value-of select='$NL'/>
 </xsl:template>
 
 <!-- =================================================== -->
@@ -204,6 +202,39 @@ not(vfx:hasIsoMatchRecipient(.,
 </xsl:template>
 
 <!-- ================================== -->
+<xsl:template name='hasIsoMatchEcPerson'>
+<xsl:param name='n'/>
+<xsl:param name='nlist'/>
+<xsl:param name='res' select='false()'/>
+<xsl:choose>
+<xsl:when test='$nlist and not($res)'>
+<xsl:variable name='comp' select='vfx:isoName($n/aiec:fname,
+						$n/aiec:mname,
+						$n/aiec:lname,
+						$nlist[1]/aiec:fname,
+						$nlist[1]/aiec:mname,
+						$nlist[1]/aiec:lname)'/>
+
+<xsl:call-template name='hasIsoMatchEcPerson'>
+<xsl:with-param name='n' select='$n'/>
+<xsl:with-param name='nlist' select='$nlist[position()>1]'/>
+<xsl:with-param name='res' select='$res or $comp'/>
+</xsl:call-template>
+</xsl:when>
+<xsl:otherwise>
+<xsl:value-of select='$res'/>
+</xsl:otherwise>
+</xsl:choose>
+</xsl:template>
+
+<xsl:function name='vfx:hasIsoMatchEcPerson' as='xs:boolean'>
+<xsl:param name='n'/>
+<xsl:param name='nlist'/>
+<xsl:call-template name='hasIsoMatchEcPerson'>
+<xsl:with-param name='n' select='$n'/>
+<xsl:with-param name='nlist' select='$nlist'/>
+</xsl:call-template>
+</xsl:function>
 
 
 <xsl:include href='vivofuncs.xsl'/>

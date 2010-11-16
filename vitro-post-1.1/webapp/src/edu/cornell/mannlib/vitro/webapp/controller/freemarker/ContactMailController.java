@@ -21,6 +21,7 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.ServletConfig;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,7 +29,6 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet.ResponseValues;
 import freemarker.template.Configuration;
 
 public class ContactMailController extends FreemarkerHttpServlet {
@@ -171,13 +171,13 @@ public class ContactMailController extends FreemarkerHttpServlet {
                 
                 Configuration config = (Configuration) vreq.getAttribute("freemarkerConfig");
                 String msgText = composeEmail(webusername, webuseremail, comments, 
-                		deliveryfrom, originalReferer, vreq.getRemoteAddr(), config);
+                		deliveryfrom, originalReferer, vreq.getRemoteAddr(), config, vreq);
                 
                 // Write the email to a backup file
                 try {
                     FileWriter fw = new FileWriter(getServletContext().getRealPath(EMAIL_BACKUP_FILE_PATH),true);
                     PrintWriter outFile = new PrintWriter(fw); 
-                    writeBackupCopy(outFile, msgText, spamReason, config);
+                    writeBackupCopy(outFile, msgText, spamReason, config, vreq);
        
                     // Set the smtp host
                     Properties props = System.getProperties();
@@ -238,7 +238,8 @@ public class ContactMailController extends FreemarkerHttpServlet {
     
     private String composeEmail(String webusername, String webuseremail,
     							String comments, String deliveryfrom,
-    							String originalReferer, String ipAddr, Configuration config) {
+    							String originalReferer, String ipAddr, Configuration config,
+    							HttpServletRequest request) {
  
         Map<String, Object> email = new HashMap<String, Object>();
         String template = TEMPLATE_EMAIL; 
@@ -252,11 +253,11 @@ public class ContactMailController extends FreemarkerHttpServlet {
             email.put("referrer", UrlBuilder.urlDecode(originalReferer));
         }
     	
-        return mergeMapToTemplate(template, email, config);
+        return processTemplateToString(template, email, config, request);
     }
     
     private void writeBackupCopy(PrintWriter outFile, String msgText, 
-    		String spamReason, Configuration config) {
+    		String spamReason, Configuration config, HttpServletRequest request) {
 
         Map<String, Object> backup = new HashMap<String, Object>();
         String template = TEMPLATE_BACKUP; 
@@ -270,7 +271,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
         
         backup.put("msgText", msgText);
 
-        String backupText = mergeMapToTemplate(template, backup, config);
+        String backupText = processTemplateToString(template, backup, config, request);
         outFile.print(backupText);
         outFile.flush();
         //outFile.close(); 

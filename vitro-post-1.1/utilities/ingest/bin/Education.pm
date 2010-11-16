@@ -20,7 +20,8 @@ if($Phases{'EDC'}>0 || $g_all){
 if($Phases{'EDR'}>0 || $g_all){
     print "\nPhase = EDR ================================\n";
     $g_curPhase = 'EDR';
-    mkUnoFile("$g_edu/ceducation.xml", "index", "$g_edu/edr-unomap.xml");
+    mkUnoFile("$g_edu/ceducation.xml", "index", 
+	      "$g_edu/edr-unomap.xml","AI-EDR-",$op_uno);
     my $cmd = "";
     $cmd .= "java $g_saxonCmdSequence $g_edu/ceducation.xml ";
     $cmd .= "$g_xslts/mkEducationRdf.xsl unoMapFile=$g_edu/edr-unomap.xml ";
@@ -55,7 +56,8 @@ if($Phases{'EDPR'}>0 || $g_all){
     $g_curPhase = 'EDPR';
     initFeedbackFile('Per','PEDPR');
     mkUnoFile("$g_edu/ceducationPerson.xml", 
-	      "index", "$g_edu/edpr-unomap.xml");
+	      "index", "$g_edu/edpr-unomap.xml",
+	      "AI-EDPR-","$g_store/.Person");
     my $cmd = "";
     $cmd .= "java $g_saxonCmdSequence ";
     $cmd .= " -o $g_rdf/educationPerson.rdf ";
@@ -94,7 +96,8 @@ if($Phases{'EDOR'}>0 || $g_all){
     print "\nPhase = EDOR ================================\n";
     $g_curPhase = 'EDOR';
     mkUnoFile("$g_edu/ceducationOrg.xml", 
-	      "index", "$g_edu/edor-unomap.xml");
+	      "index", "$g_edu/edor-unomap.xml",
+	      "AI-EDOR-","$g_store/.Org");
     initFeedbackFile('Org','OEDOR');
     my $cmd = "";
     $cmd .= "java $g_saxonCmdSequence ";

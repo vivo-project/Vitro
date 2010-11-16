@@ -27,75 +27,45 @@ public class SiteAdminController extends FreemarkerHttpServlet {
 	
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(SiteAdminController.class);
-
     private static final String TEMPLATE_DEFAULT = "siteAdmin-main.ftl";
+    
     @Override
 	public String getTitle(String siteName) {
         return siteName + " Site Administration";
 	}
 
     @Override
+    protected int requiresLoginLevel() {
+        // User must be logged in to view this page.
+        return LoginStatusBean.EDITOR;
+    }
+    
+    @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
-
+        // Note that we don't get here unless logged in at least at editor level, due
+        // to requiresLoginLevel().
     	LoginStatusBean loginBean = LoginStatusBean.getBean(vreq);
     	
-        Map<String, Object> body = new HashMap<String, Object>();
-        
-        // NOT LOGGED IN: just show login form
-        if (!loginBean.isLoggedIn()) {
-            // Unlike the other panels on this page, we put the data directly in the body, because the templates are also used
-            // by the JSP version, where the data is placed directly in the body map.
-            body.putAll(getLoginPanelData(vreq));
-        
-        // LOGGED IN: show editing options based on user role
-        } else {
-        
-            if (loginBean.isLoggedInAtLeast(LoginStatusBean.EDITOR)) {
+        Map<String, Object> body = new HashMap<String, Object>();        
 
-                UrlBuilder urlBuilder = new UrlBuilder(vreq.getPortal());
-                
-                body.put("dataInput", getDataInputData(vreq));
+        UrlBuilder urlBuilder = new UrlBuilder(vreq.getPortal());
         
-                if (loginBean.isLoggedInAtLeast(LoginStatusBean.CURATOR)) {
-                    body.put("siteConfig", getSiteConfigurationData(vreq, urlBuilder));
-                    body.put("ontologyEditor", getOntologyEditorData(vreq, urlBuilder));
-                    
-                    if (loginBean.isLoggedInAtLeast(LoginStatusBean.DBA)) {
-                        body.put("dataTools", getDataToolsData(vreq, urlBuilder));
-                        
-                        // Only for DataStar. Should handle without needing a DataStar-specific version of this controller.
-                        //body.put("customReports", getCustomReportsData(vreq));
-                    }
-                }
+        body.put("dataInput", getDataInputData(vreq));
+
+        if (loginBean.isLoggedInAtLeast(LoginStatusBean.CURATOR)) {
+            body.put("siteConfig", getSiteConfigurationData(vreq, urlBuilder));
+            body.put("ontologyEditor", getOntologyEditorData(vreq, urlBuilder));
+            
+            if (loginBean.isLoggedInAtLeast(LoginStatusBean.DBA)) {
+                body.put("dataTools", getDataToolsData(vreq, urlBuilder));
+                
+                // Only for DataStar. Should handle without needing a DataStar-specific version of this controller.
+                //body.put("customReports", getCustomReportsData(vreq));
             }
         }
         
-// Not used
-//        int languageProfile = wadf.getLanguageProfile();
-//        String languageMode = null;
-//        if ( 200 <= languageProfile && languageProfile < 300 ) {
-//            languageMode = "OWL Mode";        	
-//        } else if ( 100 == languageProfile ) {
-//            languageMode = "RDF Schema Mode";
-//        } 
-//        body.put("languageModeStr",  languageMode);       
-        
         return new TemplateResponseValues(TEMPLATE_DEFAULT, body);
-        
-    }
-
-    private Map<String, Object> getLoginPanelData(VitroRequest vreq) {
-        Map<String, Object> map = null;
-        // This is somewhat awkward, because we are trying to use the login code with as few modifications as possible
-        // as it was set up for the JSP version as well. We have to unpack the TemplateResponseValues
-        // object and put everything in a map.
-        TemplateResponseValues trv = new LoginTemplateHelper(vreq).showLoginPanel(vreq);
-        if (trv != null) {
-            map = new HashMap<String, Object>();
-            map.putAll(trv.getMap());
-            map.put("loginTemplate", trv.getTemplateName());            
-        } 
-        return  map;
+ 
     }
     
     private Map<String, Object> getDataInputData(VitroRequest vreq) {

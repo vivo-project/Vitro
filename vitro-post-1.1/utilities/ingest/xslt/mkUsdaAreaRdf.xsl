@@ -9,7 +9,6 @@
         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
 	xmlns:aiis="http://vivoweb.org/ontology/activity-insight"
 	xmlns:acti="http://vivoweb.org/ontology/activity-insight#"
-        xmlns="http://vivoweb.org/ontology/activity-insight"
 	xmlns:dm="http://www.digitalmeasures.com/schema/data"	
 	xmlns:vfx='http://vivoweb.org/ext/functions'
 	exclude-result-prefixes='xs vfx'
@@ -35,12 +34,58 @@
 <xsl:template match='/aiis:USDA_LIST'>
 <rdf:RDF>
 
+<xsl:variable name='rawNewUsdaAreas'>
+<xsl:element name='ExtantUsdaAreas' inherit-namespaces='no'>
+
+<xsl:for-each select='aiis:IMPACT_STMTS_BY_USDA_AREA'>
+
+<xsl:variable name='name' select='vfx:simple-trim(aiis:USDA_AREA_NAME)'/>
+<xsl:if test='$name != ""'>
+
+<xsl:variable name='ilk' select='@ilk'/>
+<xsl:variable name='ctr'  select='@counter'/>
+<xsl:variable name='uno' select='$unomap/map[position()=$ctr]/@nuno'/>
+
+<xsl:variable name='knownUri'
+select='vfx:knownUaUri($name, $extantUsdaAreas)'/>
+<xsl:variable name='uauri'
+        select="if($knownUri != '') then
+                        $knownUri else
+                        concat($g_instance,$uno)"/>
+
+<xsl:if test='$knownUri= ""'>
+<xsl:element name='area' namespace=''>
+
+<xsl:element name='uri' namespace=''>
+<xsl:value-of select='concat("NEW-",$uauri)'/>
+</xsl:element>
+
+<xsl:element name='name' namespace=''>
+<xsl:value-of select='$name'/>
+</xsl:element>
+
+</xsl:element>
+</xsl:if>
+</xsl:if>
+</xsl:for-each>
+</xsl:element>
+</xsl:variable>
+
+
+<xsl:variable name='uniqueNewUsdaAreas'>
+<xsl:call-template name='NewUsdaAreas'>
+<xsl:with-param name='knowns' select='$rawNewUsdaAreas/ExtantUsdaAreas'/>
+</xsl:call-template>
+</xsl:variable>
+
 
 <xsl:for-each select='aiis:IMPACT_STMTS_BY_USDA_AREA'>
 
 <!-- create an acti:USDA_Area -->
 
-<xsl:variable name='name' select='vfx:trim(aiis:USDA_AREA_NAME)'/>
+<xsl:variable name='name' select='vfx:simple-trim(aiis:USDA_AREA_NAME)'/>
+<xsl:if test='$name != ""'>
+
 <xsl:variable name='ilk' select='@ilk'/>
 <xsl:variable name='ctr'  select='@counter'/>
 <xsl:variable name='uno' select='$unomap/map[position()=$ctr]/@nuno'/>
@@ -52,26 +97,32 @@
 <!-- Declare a acti:USDA_Area (use extant USDA Area if it exists) -->
 <!-- but do not create one if in the 'OTHER' case -->
 <xsl:variable name='knownUri' 
-	select='vfx:knownUaUri(aiis:USDA_AREA_NAME, $extantUsdaAreas)'/>
+	select='vfx:knownUaUri($name,
+                               $extantUsdaAreas union
+			       $rawNewUsdaAreas/ExtantUsdaAreas)'/>
 
 <xsl:variable name='uauri' 
-	select="if($knownUri != '') then 
-		$knownUri else 
-		concat($g_instance,$uno)"/>
+        select='if(starts-with($knownUri,"NEW-")) then
+                substring-after($knownUri,"NEW-") else
+                $knownUri'/>
 
-<xsl:if test='$knownUri = "" and not(contains($ilk,"OTHER"))'>
+<xsl:if test='not(contains($ilk,"OTHER"))'>
 <rdf:Description rdf:about="{$uauri}">
+
+<xsl:if test='starts-with($knownUri,"NEW-")'>
 <rdf:type rdf:resource=
 	'http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing'/>
 <rdf:type rdf:resource=
 	'http://vivoweb.org/ontology/activity-insight#USDA_Area'/>
 
 <rdfs:label>
-<xsl:value-of select='vfx:trim(aiis:USDA_AREA_NAME)'/>
+<xsl:value-of select='vfx:simple-trim(aiis:USDA_AREA_NAME)'/>
 </rdfs:label>
 <core:description>
-<xsl:value-of select='vfx:trim(aiis:USDA_AREA_NAME)'/>
+<xsl:value-of select='vfx:simple-trim(aiis:USDA_AREA_NAME)'/>
 </core:description>
+</xsl:if>
+
 <acti:usdaAreaIlk><xsl:value-of select='$ilk'/> </acti:usdaAreaIlk>
 
 </rdf:Description>
@@ -87,46 +138,37 @@
 <xsl:with-param name='name' select='$name'/>
 </xsl:call-template>
 
+</xsl:if>
 </xsl:for-each>
 
 <!-- =================================================== 
- at this point we re-run part of the last for loop to make a
- new list of usda area
- and their uri's to save in the extant priority area Out xml file
 -->
 <xsl:result-document href='{$extUsdaAreasOut}'>
 <xsl:element name='ExtantUsdaAreas' namespace=''>
-<xsl:for-each select='aiis:IMPACT_STMTS_BY_USDA_AREA'>
-<xsl:variable name='ilk' select='@ilk'/>
-<xsl:variable name='ctr'  select='@counter'/>
-<xsl:variable name='uno' select='$unomap/map[position()=$ctr]/@nuno'/>
-<xsl:variable name='knownUri' 
-	select='vfx:knownUaUri(aiis:USDA_AREA_NAME, $extantUsdaAreas)'/>
-
-<xsl:variable name='uauri' 
-	select="if($knownUri != '') then 
-	        $knownUri else 
-		concat($g_instance,$uno)"/>
-
-<xsl:if test='not(contains($ilk,"OTHER"))'>
+<xsl:for-each select='$uniqueNewUsdaAreas//area'>
 <xsl:element name='area' namespace=''>
 
 <xsl:element name='uri' namespace=''>
-<xsl:value-of select='$uauri'/>
+<xsl:value-of select=
+        'if(starts-with(uri,"NEW-")) then
+                substring-after(uri,"NEW-") else uri'/>
 </xsl:element>
 
 <xsl:element name='name' namespace=''>
-<xsl:value-of select='aiis:USDA_AREA_NAME'/>
+<xsl:value-of select='name'/>
 </xsl:element>
 
 </xsl:element>
-</xsl:if>
 
 </xsl:for-each>
 </xsl:element>
+<xsl:value-of select='$NL'/>
+
 </xsl:result-document>
 
 </rdf:RDF>
+<xsl:value-of select='$NL'/>
+
 </xsl:template>
 
 <!-- =================================================== -->
@@ -137,6 +179,7 @@
 <xsl:param name='ilk'/>
 <xsl:param name='name'/>
 <xsl:for-each select='$isbyua/aiis:IMPACT_STMT_ID'>
+<xsl:if test='./@hasTitle = "Yes" and ./@hasGoodAuthor = "Yes"'>
 <xsl:variable name='aiid' select='.'/>
 
 <!-- =================================================== -->
@@ -159,7 +202,7 @@
 <acti:USDAAreaOf
 	rdf:resource="{concat($g_instance,$aiid)}"/>
 </rdf:Description>
-
+</xsl:if>
 </xsl:for-each>
 
 </xsl:template>

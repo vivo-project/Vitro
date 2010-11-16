@@ -32,67 +32,112 @@ exclude-result-prefixes='xs vfx dm '
 
 <xsl:template match='/aipres:PRESENT_ORG_LIST'>
 <rdf:RDF>
+<xsl:variable name='rawNewPROrgs'>
+<xsl:element name='ExtantOrgs' inherit-namespaces='no'>
 <xsl:for-each select='aipres:PRESENT_ORG'>
 
+<xsl:variable name='name' 
+	select='vfx:simple-trim(aipres:PRESENT_ORG_NAME)'/>
+<xsl:variable name='ctr'  select='@index'/>
+<xsl:variable name='uno' select='$unomap/map[position()=$ctr]/@nuno'/>
+
+<xsl:if test='$name !=""'>
+<xsl:variable name='knownUri'
+	select='vfx:knownOrgUri($name,$extantOrgs)'/>
+
+<xsl:variable name='orguri'
+	select="if($knownUri != '') then 
+			$knownUri else 
+			concat($g_instance,$uno)"/>
+<xsl:if test='$knownUri= ""'>
+
+<xsl:element name='org' namespace=''>
+
+<xsl:element name='uri' namespace=''>
+<xsl:value-of select='concat("NEW-",$orguri)'/>
+</xsl:element>
+
+<xsl:element name='name' namespace=''>
+<xsl:value-of select='$name'/>
+</xsl:element>
+
+</xsl:element>
+</xsl:if>
+</xsl:if>
+
+</xsl:for-each>
+</xsl:element>
+</xsl:variable>
+
+<xsl:variable name='uniqueNewPROrgs'>
+<xsl:call-template name='NewOrgs'>
+<xsl:with-param name='knowns' select='$rawNewPROrgs/ExtantOrgs'/>
+</xsl:call-template>
+</xsl:variable>
+
+<xsl:for-each select='aipres:PRESENT_ORG'>
+<xsl:variable name='name' 
+	select='vfx:simple-trim(aipres:PRESENT_ORG_NAME)'/>
 <xsl:variable name='ctr'  select='@index'/>
 <xsl:variable name='uno' select='$unomap/map[position()=$ctr]/@nuno'/>
 
 <!-- =================================================== -->
 <!-- Declare a foaf:Organization (use extant org if it exists) -->
+<xsl:if test='$name != ""'>
 
 <xsl:variable name='knownUri' 
-select='vfx:knownOrgUri(vfx:trim(aipres:PRESENT_ORG_NAME), $extantOrgs)'/>
+	select='vfx:knownOrgUri($name, $extantOrgs union
+			$rawNewPROrgs/ExtantOrgs)'/>
 
 <xsl:variable name='orguri' 
-select="if($knownUri != '') then $knownUri else 
-concat($g_instance,$uno)"/>
+	select='if(starts-with($knownUri,"NEW-")) then 
+		substring-after($knownUri,"NEW-") else 
+		$knownUri'/>
 
-<xsl:if test='$knownUri = ""'>
+<xsl:if test='starts-with($knownUri,"NEW-")'>
+<xsl:if test=
+	'not(preceding-sibling::aipres:PRESENT_ORG[
+					vfx:clean(aipres:PRESENT_ORG_NAME) = 
+					vfx:clean($name)])'>
 <rdf:Description rdf:about="{$orguri}">
-<rdf:type 
-rdf:resource='http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing'/>
+<rdf:type rdf:resource=
+	'http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing'/>
 <rdf:type rdf:resource='http://xmlns.com/foaf/0.1/Organization'/>
 <rdfs:label>
-<xsl:value-of select='vfx:trim(aipres:PRESENT_ORG_NAME)'/>
+<xsl:value-of select='vfx:simple-trim(aipres:PRESENT_ORG_NAME)'/>
 </rdfs:label>
 </rdf:Description>
 </xsl:if>
-
+</xsl:if>
 <!-- now process the PRESENT attributed to this org -->
 <xsl:call-template name='process-org'>
 <xsl:with-param name='list' select='aipres:PRESENT_LIST'/>
 <xsl:with-param name='objref' select="$orguri"/>
 </xsl:call-template>
-
+</xsl:if>
 </xsl:for-each>
 
 <!-- =================================================== 
- at this point we re-run part of the last for loop to get a new list of
- orgs
- and their uri's to save in the extant Orgs Out xml file
+ 	save new orgs
 -->
 <xsl:result-document href='{$extOrgOut}'>
 <xsl:element name='ExtantOrgs' namespace=''>
-<xsl:for-each select='aipres:PRESENT_ORG'>
-<xsl:variable name='ctr'  select='@index'/>
-<xsl:variable name='uno' select='$unomap/map[position()=$ctr]/@nuno'/>
-<xsl:variable name='knownUri' 
-select='vfx:knownOrgUri(vfx:trim(aipres:PRESENT_ORG_NAME), $extantOrgs)'/>
+<xsl:for-each select='$uniqueNewPROrgs//org'>
 
-<xsl:variable name='orguri' 
-select="if($knownUri != '') then $knownUri else 
-concat($g_instance,$uno)"/>
-<!-- must prevent duplicates -->
-<xsl:if test="$knownUri = ''">
 <xsl:element name='org' namespace=''>
+
 <xsl:element name='uri' namespace=''>
-<xsl:value-of select='$orguri'/>
+<xsl:value-of select=
+	'if(starts-with(uri,"NEW-")) then 
+		substring-after(uri,"NEW-") else uri'/>
 </xsl:element>
+
 <xsl:element name='name' namespace=''>
-<xsl:value-of select='vfx:trim(aipres:PRESENT_ORG_NAME)'/>
+<xsl:value-of select='name'/>
 </xsl:element>
+
 </xsl:element>
-</xsl:if>
+
 </xsl:for-each>
 </xsl:element>
 </xsl:result-document>

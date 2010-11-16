@@ -5,7 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -22,12 +21,12 @@ import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
+import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
 
@@ -58,12 +57,12 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
         }
     }
 
-    public LinkedHashMap getClassGroupMap() {
+    public LinkedHashMap<String, VClassGroup> getClassGroupMap() {
         getOntModel().enterCriticalSection(Lock.READ);
         try {
-            LinkedHashMap map = new LinkedHashMap();
-            List groups = new ArrayList();
-            ClosableIterator groupIt = getOntModel().listIndividuals(CLASSGROUP);
+            LinkedHashMap<String, VClassGroup> map = new LinkedHashMap<String, VClassGroup>();
+            List<VClassGroup> groups = new ArrayList<VClassGroup>();
+            ClosableIterator<Individual> groupIt = getOntModel().listIndividuals(CLASSGROUP);
             try {
                 while (groupIt.hasNext()) {
                     Individual groupInd = (Individual) groupIt.next();
@@ -76,7 +75,7 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
                 groupIt.close();
             }
             Collections.sort(groups);
-            Iterator groupsIt = groups.iterator();
+            Iterator<VClassGroup> groupsIt = groups.iterator();
             while (groupsIt.hasNext()) {
                 VClassGroup group = (VClassGroup) groupsIt.next();
                 map.put(group.getPublicName(), group);
@@ -103,25 +102,25 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
     }
 
 
-    public List getPublicGroupsWithVClasses() {
+    public List<VClassGroup> getPublicGroupsWithVClasses() {
         return getPublicGroupsWithVClasses(false);
     }
 
-    public List getPublicGroupsWithVClasses(boolean displayOrder) {
+    public List<VClassGroup> getPublicGroupsWithVClasses(boolean displayOrder) {
         return getPublicGroupsWithVClasses(displayOrder, true);
     }
 
-    public List getPublicGroupsWithVClasses(boolean displayOrder, boolean includeUninstantiatedClasses) {
+    public List<VClassGroup> getPublicGroupsWithVClasses(boolean displayOrder, boolean includeUninstantiatedClasses) {
         return getPublicGroupsWithVClasses(displayOrder, includeUninstantiatedClasses, false);
     }
 
-    public List getPublicGroupsWithVClasses(boolean displayOrder, boolean includeUninstantiatedClasses,
+    public List<VClassGroup> getPublicGroupsWithVClasses(boolean displayOrder, boolean includeUninstantiatedClasses,
             boolean getIndividualCount) {
         VClassDao classDao = getWebappDaoFactory().getVClassDao();
         getOntModel().enterCriticalSection(Lock.READ);
         try {
-            List groups = new ArrayList();
-            ClosableIterator groupIt = getOntModel().listIndividuals(CLASSGROUP);
+            List<VClassGroup> groups = new ArrayList<VClassGroup>();
+            ClosableIterator<Individual> groupIt = getOntModel().listIndividuals(CLASSGROUP);
             try {
                 while (groupIt.hasNext()) {
                     Individual grp = (Individual) groupIt.next();
@@ -230,14 +229,14 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
         
     }
 
-    public int removeUnpopulatedGroups(List groups) {
+    public int removeUnpopulatedGroups(List<VClassGroup> groups) {
         if (groups==null || groups.size()==0)
             return 0;
         int removedGroupsCount = 0;
-        ListIterator it = groups.listIterator();
+        ListIterator<VClassGroup> it = groups.listIterator();
         while(it.hasNext()){
             VClassGroup group = (VClassGroup) it.next();
-            List classes = group.getVitroClassList();
+            List<VClass> classes = group.getVitroClassList();
             if( classes == null || classes.size() < 1 ){
                 removedGroupsCount++;
                 it.remove();
@@ -246,11 +245,9 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
         return removedGroupsCount;
     }
 
-    public void sortGroupList(List groupList) {
-        Collections.sort(groupList, new Comparator() {
-            public int compare(Object obj1, Object obj2) {
-                VClassGroup first  = (VClassGroup) obj1;
-                VClassGroup second = (VClassGroup) obj2;
+    public void sortGroupList(List<VClassGroup> groupList) {
+        Collections.sort(groupList, new Comparator<VClassGroup>() {
+            public int compare(VClassGroup first, VClassGroup second) {
                 if (first!=null) {
                     if (second!=null) {
                         return (first.getDisplayRank()-second.getDisplayRank());

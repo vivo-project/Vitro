@@ -82,7 +82,7 @@ public class AutocompleteController extends FreemarkerHttpServlet{
             if( vreq.getWebappDaoFactory() == null 
                     || vreq.getWebappDaoFactory().getIndividualDao() == null ){
                 log.error("makeUsableBeans() could not get IndividualDao ");
-                doSearchError(map, config, response);
+                doSearchError(map, config, request, response);
                 return;
             }
             IndividualDao iDao = vreq.getWebappDaoFactory().getIndividualDao();                       
@@ -98,7 +98,7 @@ public class AutocompleteController extends FreemarkerHttpServlet{
             log.debug("query for '" + qtxt +"' is " + query.toString());
 
             if (query == null ) {
-                doNoQuery(map, config, response);
+                doNoQuery(map, config, request, response);
                 return;
             }
                         
@@ -115,20 +115,20 @@ public class AutocompleteController extends FreemarkerHttpServlet{
                     topDocs = searcherForRequest.search(query,null,maxHitSize);
                 }catch (Exception ex){
                     log.error(ex);
-                    doFailedSearch(map, config, response);
+                    doFailedSearch(map, config, request, response);
                     return;
                 }
             }
 
             if( topDocs == null || topDocs.scoreDocs == null){
                 log.error("topDocs for a search was null");                
-                doFailedSearch(map, config, response);
+                doFailedSearch(map, config, request, response);
                 return;
             }
             
             int hitsLength = topDocs.scoreDocs.length;
             if ( hitsLength < 1 ){                
-                doFailedSearch(map, config, response);
+                doFailedSearch(map, config, request, response);
                 return;
             }            
             log.debug("found "+hitsLength+" hits"); 
@@ -152,11 +152,11 @@ public class AutocompleteController extends FreemarkerHttpServlet{
 
             Collections.sort(results);
             map.put("results", results);
-            writeTemplate(TEMPLATE_DEFAULT, map, config, response);
+            writeTemplate(TEMPLATE_DEFAULT, map, config, request, response);
    
         } catch (Throwable e) {
             log.error("AutocompleteController(): " + e);            
-            doSearchError(map, config, response);
+            doSearchError(map, config, request, response);
             return;
         }
     }
@@ -403,21 +403,19 @@ public class AutocompleteController extends FreemarkerHttpServlet{
         qp.setDefaultOperator(QueryParser.AND_OPERATOR);
         return qp;
     }
-    
-    
 
-    private void doNoQuery(Map<String, Object> map, Configuration config, HttpServletResponse response) {
-        writeTemplate(TEMPLATE_DEFAULT, map, config, response);
+    private void doNoQuery(Map<String, Object> map, Configuration config, HttpServletRequest request, HttpServletResponse response) {
+        writeTemplate(TEMPLATE_DEFAULT, map, config, request, response);
     }
 
-    private void doFailedSearch(Map<String, Object> map, Configuration config, HttpServletResponse response) {
-        writeTemplate(TEMPLATE_DEFAULT, map, config, response);
+    private void doFailedSearch(Map<String, Object> map, Configuration config, HttpServletRequest request, HttpServletResponse response) {
+        writeTemplate(TEMPLATE_DEFAULT, map, config, request, response);
     }
  
-    private void doSearchError(Map<String, Object> map, Configuration config, HttpServletResponse response) {
+    private void doSearchError(Map<String, Object> map, Configuration config, HttpServletRequest request, HttpServletResponse response) {
         // For now, we are not sending an error message back to the client because with the default autocomplete configuration it
         // chokes.
-        writeTemplate(TEMPLATE_DEFAULT, map, config, response);
+        writeTemplate(TEMPLATE_DEFAULT, map, config, request, response);
     }
 
     public static final int MAX_QUERY_LENGTH = 500;

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- $This file is distributed under the terms of the license in /doc/license.txt$-->
+<!-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
 <!-- ====================================================================== 
      Build script for the Vivo Products.
@@ -32,6 +32,7 @@
 	<property name="war.dir" location="${build.dir}/war" />
 	<property name="war-webinf.dir" location="${war.dir}/WEB-INF" />
 	<property name="war-classes.dir" location="${war-webinf.dir}/classes" />
+	<property name="war-resources.dir" location="${war-webinf.dir}/resources" />
 	<property name="war-lib.dir" location="${war-webinf.dir}/lib" />
 	<property name="test-classes.dir" location="${build.dir}/testclasses" />
 	<property name="servletjars.dir" location="${build.dir}/servletjars" />
@@ -66,6 +67,7 @@
 	</path>
 
 	<path id="test.compile.classpath">
+                <pathelement location="${product.test.dir}"/>
 		<pathelement location="${war-classes.dir}" />
 		<path refid="compile.classpath" />
 	</path>
@@ -134,14 +136,22 @@
           target: productCompile                      
          - - - - - - - - - - - - - - - - - -->
 	<target name="productCompile" depends="productPrepare" if="product.sources.exist">
+		<property name="product.classes.dir" value="${build.dir}/${ant.project.name}/classes" />
+		<mkdir dir="${product.classes.dir}" />
 		<javac srcdir="${product.source.dir}"
-		       destdir="${build.dir}/war/WEB-INF/classes"
+		       destdir="${product.classes.dir}"
 		       debug="true"
 		       deprecation="true"
 		       optimize="true"
 		       source="1.6">
-			<classpath refid="compile.classpath" />
+			<classpath>
+				<path refid="compile.classpath" />
+				<pathelement location="${build.dir}/war/WEB-INF/classes"/>
+			</classpath>
 		</javac>
+		<copy todir="${build.dir}/war/WEB-INF/classes" overwrite="true">
+			<fileset dir="${product.classes.dir}" />
+		</copy>
 	</target>
 
 	<!-- ================================= 
@@ -157,7 +167,7 @@
          - - - - - - - - - - - - - - - - - -->
 	<target name="productTest" depends="productCompile" if="product.tests.exist" unless="skiptests">
 		<javac srcdir="${product.test.dir}"
-		       destdir="${test.classes.dir}"
+		       destdir="${test-classes.dir}"
 		       debug="true"
 		       deprecation="true"
 		       optimize="false"
@@ -173,20 +183,47 @@
 			<arg value="${testlevel}" />
 		</java>
 	</target>
+<!-- ================================= 
+          target: revisionInfo              
+         ================================= -->
+    <target name="revisionInfo" description="--> Store revision info in build">
+        <innercall target="revisionInfo" />
+    	<antcall target="productRevisionInfo" />
+    </target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: productRevisionInfo                      
+         - - - - - - - - - - - - - - - - - -->
+    <target name="productRevisionInfo" depends="productTest" unless="skipinfo">
+		<property name="revisionInfo.product.dir" location="${ant.file}/.." />
+		<property name="revisionInfo.build.file" location="${war-resources.dir}/revisionInfo.txt" />
+
+		<java classname="edu.cornell.mannlib.vitro.utilities.revisioninfo.RevisionInfoBuilder"
+		      fork="no"
+		      failonerror="true"
+		      logerror="true"
+		      outputproperty="revisionInfo.outputLine">
+			<classpath refid="test.run.classpath" />
+			<arg value="${ant.project.name}" />
+			<arg file="${revisionInfo.product.dir}" />
+		</java>
+		<echo file="${revisionInfo.build.file}" append="true">${revisionInfo.outputLine}
+</echo>
+    </target>
 
 	<!-- ================================= 
           target: deploy              
          ================================= -->
 	<target name="deploy" description="--> Build the app and install in Tomcat">
 		<!-- the inner "deploy" would just do a sync that will be done by productDeploy -->
-		<innercall target="test" />
+		<innercall target="revisionInfo" />
 		<antcall target="productDeploy" />
 	</target>
 
 	<!-- - - - - - - - - - - - - - - - - - 
           target: productDeploy                      
          - - - - - - - - - - - - - - - - - -->
-	<target name="productDeploy" depends="productTest">
+	<target name="productDeploy" depends="productRevisionInfo">
 		<property name="webapp.deploy.home" value="${tomcat.home}/webapps/${webapp.name}" />
 
 		<mkdir dir="${webapp.deploy.home}" />

@@ -3,8 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +38,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
-import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
@@ -64,13 +61,11 @@ import edu.cornell.mannlib.vitro.webapp.web.templatemodels.IndividualTemplateMod
  *
  */
 public class IndividualController extends FreemarkerHttpServlet {
-    private static final Log log = LogFactory.getLog(IndividualController.class);
 
-    private String default_jsp      = Controllers.BASIC_JSP;
-    private String default_body_jsp = Controllers.ENTITY_JSP;
-    private ApplicationBean appBean;
+    private static final long serialVersionUID = 1L;
+    private static final Log log = LogFactory.getLog(IndividualController.class);
     
-    private static final String TEMPLATE_INDIVIDUAL = "individual.ftl";
+    private static final String TEMPLATE_INDIVIDUAL_DEFAULT = "individual.ftl";
     private static final String TEMPLATE_HELP = "individual-help.ftl";
     
     @Override
@@ -117,9 +112,12 @@ public class IndividualController extends FreemarkerHttpServlet {
             
     		body.put("relatedSubject", getRelatedSubject(vreq));
     		
-	        body.put("individual", getIndividualTemplateModel(vreq, individual));             	        
+    		IndividualTemplateModel ind = getIndividualTemplateModel(vreq, individual); 
+	        body.put("individual", ind); 
+	        
+	        String template = getIndividualTemplate(individual);
 	                
-	        return new TemplateResponseValues(TEMPLATE_INDIVIDUAL, body);
+	        return new TemplateResponseValues(template, body);
         
 	    } catch (Throwable e) {
 	        log.error(e);
@@ -128,7 +126,7 @@ public class IndividualController extends FreemarkerHttpServlet {
     }
 
     private void cleanUpSession(VitroRequest vreq) {
-		// Session cleanup: anytime we are at an entity page we shouldn't have an editing config or submission
+		// Session cleanup: any time we are at an entity page we shouldn't have an editing config or submission
         HttpSession session = vreq.getSession();
 	    session.removeAttribute("editjson");
 	    EditConfiguration.clearAllConfigsInSession(session);
@@ -193,51 +191,56 @@ public class IndividualController extends FreemarkerHttpServlet {
         individual.setKeywords(iwDao.getKeywordsForIndividualByMode(individual.getURI(),"visible"));
         individual.sortForDisplay();
 
-//        String vclassName = "unknown";
-//        String customView = null;
-//
-//        if( indiv.getVClass() != null ){
-//            vclassName = indiv.getVClass().getName();
-//            List<VClass> clasList = indiv.getVClasses(true);
-//            for (VClass clas : clasList) {
-//                customView = clas.getCustomDisplayView();
-//                if (customView != null) {
-//                    if (customView.length()>0) {
-//                        vclassName = clas.getName(); // reset entity vclassname to name of class where a custom view
-//                        log.debug("Found direct class ["+clas.getName()+"] with custom view "+customView+"; resetting entity vclassName to this class");
-//                        break;
-//                    } else {
-//                        customView = null;
-//                    }
-//                }
-//            }
-//            if (customView == null) { //still
-//                clasList = indiv.getVClasses(false);
-//                for (VClass clas : clasList) {
-//                    customView = clas.getCustomDisplayView();
-//                    if (customView != null) {
-//                        if (customView.length()>0) {
-//                            // note that NOT changing entity vclassName here yet
-//                            log.debug("Found inferred class ["+clas.getName()+"] with custom view "+customView);
-//                            break;
-//                        } else {
-//                            customView = null;
-//                        }
-//                    }
-//                }
-//            }
-//        } else {
-//            log.error("Entity " + indiv.getURI() + " with vclass URI " +
-//                    indiv.getVClassURI() + ", no vclass with that URI exists");
-//        }
-//        if (customView!=null) {
-//            // insert test for whether a css files of the same name exists, and populate the customCss string for use when construction the header
-//        }
-         
         //setup highlighter for search terms
         //checkForSearch(vreq, individual);
-
+        
         return new IndividualTemplateModel(individual, vreq);
+	}
+	
+	// Determine whether the individual has a custom display template based on its class membership.
+	// If not, return the default individual template.
+	private String getIndividualTemplate(Individual individual) {
+	    
+        String vclassName = "unknown";
+        String customTemplate = null;
+
+        if( individual.getVClass() != null ){
+            vclassName = individual.getVClass().getName();
+            List<VClass> clasList = individual.getVClasses(true);
+            for (VClass clas : clasList) {
+                customTemplate = clas.getCustomDisplayView();
+                if (customTemplate != null) {
+                    if (customTemplate.length()>0) {
+                        vclassName = clas.getName(); // reset entity vclassname to name of class where a custom view
+                        log.debug("Found direct class ["+clas.getName()+"] with custom view "+customTemplate+"; resetting entity vclassName to this class");
+                        break;
+                    } else {
+                        customTemplate = null;
+                    }
+                }
+            }
+            if (customTemplate == null) { //still
+                clasList = individual.getVClasses(false);
+                for (VClass clas : clasList) {
+                    customTemplate = clas.getCustomDisplayView();
+                    if (customTemplate != null) {
+                        if (customTemplate.length()>0) {
+                            // note that NOT changing entity vclassName here yet
+                            log.debug("Found inferred class ["+clas.getName()+"] with custom view "+customTemplate);
+                            break;
+                        } else {
+                            customTemplate = null;
+                        }
+                    }
+                }
+            }
+        } else if (individual.getVClassURI() != null) {
+            log.debug("Individual " + individual.getURI() + " with class URI " +
+                    individual.getVClassURI() + ": no class found with that URI");
+        }
+        
+        return customTemplate != null ? customTemplate : TEMPLATE_INDIVIDUAL_DEFAULT;
+        
 	}
 
 	private ResponseValues doRdf(VitroRequest vreq, Individual individual,
@@ -246,7 +249,7 @@ public class IndividualController extends FreemarkerHttpServlet {
 		OntModel ontModel = null;
 		HttpSession session = vreq.getSession(false);
 		if( session != null )
-			ontModel =(OntModel)session.getAttribute("jenaOntModel");		
+			ontModel = (OntModel)session.getAttribute("jenaOntModel");		
 		if( ontModel == null)
 			ontModel = (OntModel)getServletContext().getAttribute("jenaOntModel");
 			
@@ -255,6 +258,7 @@ public class IndividualController extends FreemarkerHttpServlet {
 		return new RdfResponseValues(rdfFormat, newModel);
 	}
 
+	// RY **** Remove "fm" from the patterns when switching web.xml to this controller.
 	private static Pattern LINKED_DATA_URL = Pattern.compile("^/individualfm/([^/]*)$");		
 	private static Pattern NS_PREFIX_URL = Pattern.compile("^/individualfm/([^/]*)/([^/]*)$");
 	

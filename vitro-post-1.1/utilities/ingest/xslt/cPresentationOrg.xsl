@@ -31,15 +31,24 @@ exclude-result-prefixes='vfx xs dm aipres'
 <xsl:sort select='vfx:collapse(dm:ORG)'/>
 
 <!-- define variables here -->
-
 <aipres:PRESENT_ORG>
+
 <xsl:attribute name='index' select='position()'/>
 
+<xsl:variable name='name' 
+	select='vfx:simple-trim(dm:ORG)'/>
 <aipres:PRESENT_ORG_NAME>
-<xsl:variable name='gen_orgname' select='vfx:trim(dm:ORG)'/>
 <xsl:choose>
-  <xsl:when test='$gen_orgname != ""'>
-  <xsl:value-of select='$gen_orgname'/>
+  <xsl:when test='$name != ""'>
+
+  <xsl:value-of select='replace($name,"^\(.*?\)$",
+				substring($name,
+					  2,
+					  string-length($name)-2))'/>
+
+<!--
+  <xsl:value-of select='$name'/>	
+-->
   </xsl:when>
   <xsl:otherwise>
   <xsl:value-of select='"Unspecified"'/>
@@ -56,10 +65,26 @@ exclude-result-prefixes='vfx xs dm aipres'
 <aipres:PRESENT_INFO>
 <!-- define member attributes here -->
 
-<xsl:attribute name='id' select='@id'/>
+<xsl:attribute name='public'>
+       <xsl:value-of select='../dm:PUBLIC_VIEW'/>
+</xsl:attribute>
+
 <xsl:attribute name='ref_netid'>
-<xsl:value-of select='../../dm:Record/@username'/></xsl:attribute>
-<!-- define member property sub tags here -->
+<xsl:value-of select='../../dm:Record/@username'/>
+</xsl:attribute>
+
+<xsl:attribute name='hasGoodAuthor' 
+select='if(vfx:hasOneGoodName(dm:PRESENT_AUTH)) then "Yes" else "No"'/>
+<xsl:attribute name='hasTitle' 
+select='if(normalize-space(dm:TITLE) = "") then "No" else "Yes"'/>
+
+<xsl:attribute name='hasConf' 
+select='if(normalize-space(dm:NAME) = "") then "No" else "Yes"'/>
+
+<xsl:attribute name='public' select='dm:PUBLIC_VIEW'/>
+
+
+<xsl:value-of select='@id'/>
 
 </aipres:PRESENT_INFO>
 </xsl:if>

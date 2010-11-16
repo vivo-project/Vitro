@@ -4,10 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.filters;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -20,14 +16,12 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.URIImpl;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
-import edu.cornell.mannlib.vitro.webapp.dao.ApplicationDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapper;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapperFactory;
@@ -37,7 +31,6 @@ public class URLRewritingHttpServletResponse implements HttpServletResponse {
 	private final static Log log = LogFactory.getLog(URLRewritingHttpServletResponse.class);
 	
 	private HttpServletResponse _response;
-	private HttpServletRequest _request;
 	private ServletContext _context;
 	private WebappDaoFactory wadf;
 	private int contextPathDepth;
@@ -50,6 +43,11 @@ public class URLRewritingHttpServletResponse implements HttpServletResponse {
 		this.contextPathDepth = slashPattern.split(request.getContextPath()).length-1;
 	}
 
+	/**
+	 * For use in testing only.
+	 */
+	protected URLRewritingHttpServletResponse(){ }
+	
 	public void addCookie(Cookie arg0) {
 		_response.addCookie(arg0);
 	}
@@ -89,22 +87,73 @@ public class URLRewritingHttpServletResponse implements HttpServletResponse {
 	}
 
 	public String encodeURL(String inUrl) {
+	    List<String> externallyLinkedNamespaces = wadf.getApplicationDao().getExternallyLinkedNamespaces();
+        NamespaceMapper nsMap = NamespaceMapperFactory.getNamespaceMapper(_context);
+
+        if( log.isDebugEnabled() ){
+            log.debug("START");
+            log.debug("charEncoding: "  + this.getCharacterEncoding() );
+            log.debug("PortalPickerFilter.getPortalPickerFilter(this._context)," + PortalPickerFilter.getPortalPickerFilter(this._context));
+            log.debug("wadf.getPortalDao().isSinglePortal(), " + wadf.getPortalDao().isSinglePortal());
+            log.debug("contextPathDepth," + contextPathDepth);
+            log.debug("nsMap," + nsMap);
+            log.debug("wadf.getDefaultNamespace(), " + wadf.getDefaultNamespace());
+            log.debug("externallyLinkedNamespaces " + externallyLinkedNamespaces);
+            log.debug( inUrl );
+        }
+        
+	    String encodedUrl = encodeForVitro(
+	            inUrl,
+	            this.getCharacterEncoding(),
+	            PortalPickerFilter.getPortalPickerFilter(this._context),
+	            wadf.getPortalDao().isSinglePortal(),
+	            contextPathDepth,
+	            nsMap,
+	            wadf.getDefaultNamespace(),
+	            externallyLinkedNamespaces
+	            );
+	    
+	    log.debug(encodedUrl);
+	    log.debug("END");
+	    return encodedUrl;
+	}
+	
+	/**
+	 * bdc34: Isolating this method for unit 
+	 * testing purposes.  This method should not use 
+	 * any object properties, only objects passed into method. 
+	 */
+	protected String encodeForVitro(
+	        String inUrl, 
+	        String characterEncoding , 
+	        PortalPickerFilter portalPickerFilter,
+	        Boolean isSInglePortal,
+	        int contextPathDepth,
+	        NamespaceMapper nsMap,
+	        String defaultNamespace,
+	        List<String> externalNamespaces) {
 		try {
-			
-			VitroURL url = new VitroURL(inUrl,this.getCharacterEncoding());
+			if( log.isDebugEnabled() ){
+			    log.debug("Incomming URL '" + inUrl + "'");
+			}
+			VitroURL url = new VitroURL(inUrl,characterEncoding);
 			if (url.host != null) {
 				// if it's not an in-context URL, we don't want to mess with it
 				// It looks like encodeURL isn't even called for external URLs
-				return _response.encodeURL(inUrl);
+			    //String rv = _response.encodeURL(inUrl); 
+	            String rv = inUrl;
+			    if( log.isDebugEnabled()){
+			        log.debug("Encoded as  '"+rv+"'");
+			    }
+				return rv;
 			}
 			
 			// rewrite home parameters as portal prefixes or remove
 			// if there is only one portal
 			if ( url.pathBeginsWithSlash && 
-					(PortalPickerFilter.isPortalPickingActive ||
-						wadf.getPortalDao().isSinglePortal()) ) {
-				PortalPickerFilter ppf = PortalPickerFilter.getPortalPickerFilter(this._context);
-				if ( (ppf != null) && (url.queryParams != null) ) {
+					(PortalPickerFilter.isPortalPickingActive || isSInglePortal) ) {
+				
+				if ( (portalPickerFilter != null) && (url.queryParams != null) ) {
 					Iterator<String[]> qpIt = url.queryParams.iterator();
 					int qpIndex = -1;
 					int indexToRemove = -1;
@@ -117,7 +166,7 @@ public class URLRewritingHttpServletResponse implements HttpServletResponse {
 								if ((Portal.DEFAULT_PORTAL_ID == portalId)) {
 									indexToRemove = qpIndex;
 								} else {
-									String prefix = ppf.getPortalId2PrefixMap().get(portalId);
+									String prefix = portalPickerFilter.getPortalId2PrefixMap().get(portalId);
 									if ( (prefix != null) && (!prefix.equals(url.pathParts.get(contextPathDepth))) ) {		
 										url.pathParts.add(contextPathDepth,prefix);									
 										url.pathBeginsWithSlash = true;
@@ -125,7 +174,7 @@ public class URLRewritingHttpServletResponse implements HttpServletResponse {
 									}
 								}
 							} catch (NumberFormatException nfe) {
-								log.error("Invalid portal id string: "+keyAndValue[1], nfe);
+								log.info("Invalid portal id string: "+keyAndValue[1], nfe);
 							}
 						}
 					}
@@ -150,16 +199,13 @@ public class URLRewritingHttpServletResponse implements HttpServletResponse {
 					String[] keyAndValue = qpIt.next();
 					qpIndex++;
 					if ( ("uri".equals(keyAndValue[0])) && (keyAndValue.length>1) && (keyAndValue[1] != null) ) {
-						NamespaceMapper nsMap = NamespaceMapperFactory.getNamespaceMapper(_context);
 						try {
 							URI uri = new URIImpl(keyAndValue[1]);
 							String namespace = uri.getNamespace();
 							String localName = uri.getLocalName();
 							if ( (namespace != null) && (localName != null) ) { 
 								String prefix = nsMap.getPrefixForNamespace(namespace);
-								if (wadf.getDefaultNamespace().
-										equals(namespace)
-										&& prefix == null) {
+								if (defaultNamespace.equals(namespace) && prefix == null) {
 									// make a URI that matches the URI
 									// of the resource to support
 									// linked data request
@@ -168,7 +214,7 @@ public class URLRewritingHttpServletResponse implements HttpServletResponse {
 									indexToRemove = qpIndex;
 							    // namespace returned from URIImpl.getNamespace() ends in a slash, so will 
 							    // match externally linked namespaces, which also end in a slash
-								} else if (isExternallyLinkedNamespace(namespace)) {
+								} else if (isExternallyLinkedNamespace(namespace,externalNamespaces)) {
 								    log.debug("Found externally linked namespace " + namespace);
 								    // Use the externally linked namespace in the url
 								    url.pathParts = new ArrayList<String>();
@@ -192,7 +238,10 @@ public class URLRewritingHttpServletResponse implements HttpServletResponse {
 								}
 							}
 						} catch (Exception e) {
-							log.error("Invalid URI "+keyAndValue[1], e);
+						    if( keyAndValue.length > 0 )
+						        log.debug("Invalid URI: '"+keyAndValue[1] + "'");
+						    else
+						        log.debug("empty URI");
 						}
 					}
 				}
@@ -201,10 +250,18 @@ public class URLRewritingHttpServletResponse implements HttpServletResponse {
 				}
 	
 			}
-			return _response.encodeURL(_response.encodeURL(url.toString()));
-		} catch (Exception e) {
-			e.printStackTrace();
-			return _response.encodeURL(inUrl);
+			//String rv = _response.encodeURL(_response.encodeURL(url.toString()));
+	         String rv = url.toString();
+			if( log.isDebugEnabled()){
+			    log.debug("Encoded as  '" + rv + "'");
+			}
+			return rv;
+		} catch (Exception e) {			
+			log.error(e,e);			
+            //String rv =  _response.encodeURL(inUrl);
+			String rv =  inUrl;
+            log.error("Encoded as  '"+rv+"'");
+			return rv;
 		}
 	}
 
@@ -301,178 +358,9 @@ public class URLRewritingHttpServletResponse implements HttpServletResponse {
 
 	public void setStatus(int arg0) {
 		_response.setStatus(arg0);
-	}
+	}		
 	
-	private class VitroURL {
-		// this is to get away from some of the 
-		// annoyingness of java.net.URL
-		// and to handle general weirdness
-		
-		private String characterEncoding;
-		
-		public String protocol;
-		public String host;
-		public String port;
-		public List<String> pathParts;
-		public List<String[]> queryParams;
-		public String fragment;
-		
-		private Pattern commaPattern = Pattern.compile("/");
-		private Pattern equalsSignPattern = Pattern.compile("=");
-		private Pattern ampersandPattern = Pattern.compile("&");
-		private Pattern questionMarkPattern = Pattern.compile("\\?");
-		public  boolean pathBeginsWithSlash = false;
-		public  boolean pathEndsInSlash = false;
-		public  boolean wasXMLEscaped = false;
-		
-		public VitroURL(String urlStr, String characterEncoding) {
-			this.characterEncoding = characterEncoding;
-			if (urlStr.indexOf("&amp;")>-1) {
-				wasXMLEscaped = true;
-				urlStr = StringEscapeUtils.unescapeXml(urlStr);
-			}
-			try {
-				URL url = new URL(urlStr);
-				this.protocol = url.getProtocol();
-				this.host = url.getHost();
-				this.port = Integer.toString(url.getPort());
-				this.pathParts = splitPath(url.getPath());
-				this.pathBeginsWithSlash = beginsWithSlash(url.getPath());
-				this.pathEndsInSlash = endsInSlash(url.getPath());
-				this.queryParams = parseQueryParams(url.getQuery());
-				this.fragment = url.getRef();
-			} catch (Exception e) { 
-				// Under normal circumstances, this is because the urlStr is relative
-				// We'll assume that we just have a path and possibly a query string.
-				// This is likely to be a bad assumption, but let's roll with it.
-				String[] urlParts = questionMarkPattern.split(urlStr);
-				try {
-					this.pathParts = splitPath(URLDecoder.decode(urlParts[0],characterEncoding));
-					this.pathBeginsWithSlash = beginsWithSlash(urlParts[0]);
-					this.pathEndsInSlash = endsInSlash(urlParts[0]);
-					if (urlParts.length>1) {
-						this.queryParams = parseQueryParams(URLDecoder.decode(urlParts[1],characterEncoding));
-					}
-				} catch (UnsupportedEncodingException uee) {
-					log.error("Unable to use character encoding "+characterEncoding, uee);
-				}
-			}
-		}
-		
-		private List<String> splitPath(String pathStr) {
-			String[] splitStr = commaPattern.split(pathStr);
-			if (splitStr.length>0) {
-				int len = splitStr.length;
-				if (splitStr[0].equals("")) {
-					len--;
-				}
-				if (splitStr[splitStr.length-1].equals("")) {
-					len--;
-				}
-				if (len>0) {
-					String[] temp = new String[len];
-					int tempI = 0;
-					for (int i=0; i<splitStr.length; i++) {
-						if (!splitStr[i].equals("")) {
-							temp[tempI] = splitStr[i];
-							tempI++;
-						}
-					}
-					splitStr = temp;
-				}
-			}
-			// TODO: rewrite the chunk above with lists in mind. 
-			List<String> strList = new ArrayList<String>();
-			for (int i=0; i<splitStr.length; i++) {
-				strList.add(splitStr[i]);
-			}
-			return strList;
-		}	
-		
-		public boolean beginsWithSlash(String pathStr) {
-			if (pathStr.length() == 0) {
-				return false;
-			}
-			return (pathStr.charAt(0) == '/');
-		}
-		
-		public boolean endsInSlash(String pathStr) {
-			if (pathStr.length() == 0) {
-				return false;
-			}
-			return (pathStr.charAt(pathStr.length()-1) == '/');
-		}
-		
-		private List<String[]> parseQueryParams(String queryStr) {
-			List<String[]> queryParamList = new ArrayList<String[]>();
-			if (queryStr == null) {
-				return queryParamList;
-			}
-			String[] keyValuePairs = ampersandPattern.split(queryStr);
-			for (int i=0; i<keyValuePairs.length; i++) {
-				String[] pairParts = equalsSignPattern.split(keyValuePairs[i]);
-				queryParamList.add(pairParts);
-			}
-			return queryParamList;
-		}
-		
-		public String toString() {
-			StringBuffer out = new StringBuffer();
-				try {
-				if (this.protocol != null) {
-					out.append(this.protocol);
-				}
-				if (this.host != null) {
-					out.append(this.host);
-				}
-				if (this.port != null) {
-					out.append(":").append(this.port);
-				}
-				if (this.pathParts != null) {
-					if (this.pathBeginsWithSlash) {
-						out.append("/");
-					}
-					Iterator<String> pathIt = pathParts.iterator();
-					while(pathIt.hasNext()) {
-						String part = pathIt.next();
-						out.append(part);
-						if (pathIt.hasNext()) {
-							out.append("/");
-						}
-					}
-					if (this.pathEndsInSlash) {
-						out.append("/");
-					}
-				}
-				if (this.queryParams != null) {
-					Iterator<String[]> qpIt = queryParams.iterator();
-					if (qpIt.hasNext()) {
-						out.append("?");
-					}
-					while (qpIt.hasNext()) {
-						String[] keyAndValue = qpIt.next();
-						out.append(URLEncoder.encode(keyAndValue[0],characterEncoding)).append("=");
-						if (keyAndValue.length>1) {
-							out.append(URLEncoder.encode(keyAndValue[1],characterEncoding));
-						}
-						if (qpIt.hasNext()) { 
-							out.append("&");
-						}
-					}
-				}
-			} catch (UnsupportedEncodingException uee) {
-				log.error("Unable to use encoding "+characterEncoding, uee);
-			}
-			String str = out.toString();
-			if (this.wasXMLEscaped) {
-				str = StringEscapeUtils.escapeXml(str);
-			}
-			return str;
-		}		
-	}
-	
-	private boolean isExternallyLinkedNamespace(String namespace) {
-	    List<String> externallyLinkedNamespaces = wadf.getApplicationDao().getExternallyLinkedNamespaces();
+	private boolean isExternallyLinkedNamespace(String namespace,List<String> externallyLinkedNamespaces) {	    
 	    return externallyLinkedNamespaces.contains(namespace);
 	}
 	

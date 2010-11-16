@@ -188,5 +188,8 @@ public class IndividualTemplateModel extends BaseTemplateModel {
         }  
         return models;
     }
+
+    // public Map< > getPropertyList
     
+    // public Map< > getPropertyGroupList
 }

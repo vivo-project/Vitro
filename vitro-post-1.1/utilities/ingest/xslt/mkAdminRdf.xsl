@@ -22,8 +22,6 @@
 
 <xsl:include href='commonvars.xsl'/>
 
-<xsl:variable name='unomap'
-	select="document($unoMapFile)/Mapping"/>
 
 <xsl:template match='/aiadm:ADMIN_LIST'>
 <rdf:RDF>

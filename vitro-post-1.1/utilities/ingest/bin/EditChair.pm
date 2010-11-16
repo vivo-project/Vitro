@@ -20,7 +20,8 @@ if($Phases{'ECC'}>0 || $g_all){
 if($Phases{'ECR'}>0 || $g_all){
     print "\nPhase = ECR ================================\n";
     $g_curPhase = 'ECR';
-    mkUnoFile("$g_edt/ceditchair.xml", "index", "$g_edt/ecr-unomap.xml");
+    mkUnoFile("$g_edt/ceditchair.xml", "'<aiec:EDITCHAIR '", 
+	      "$g_edt/ecr-unomap.xml","AI-ECR-",$op_uno);
     my $cmd = "";
     $cmd .= "java $g_saxonCmdSequence $g_edt/ceditchair.xml ";
     $cmd .= "$g_xslts/mkEditChairRdf.xsl unoMapFile=$g_edt/ecr-unomap.xml ";
@@ -53,7 +54,8 @@ if($Phases{'ECPR'}>0 || $g_all){
     print "\nPhase = ECPR ================================\n";
     $g_curPhase = 'ECPR';
     mkUnoFile("$g_edt/ceditchairperson.xml", 
-	      "index", "$g_edt/ecpr-unomap.xml");
+	      "counter", "$g_edt/ecpr-unomap.xml",
+	      "AI-ECPR-","$g_store/.Person");
     my $cmd = "";
     $cmd .= "java $g_saxonCmdSequence ";
     $cmd .= " -o $g_rdf/editChairPerson.rdf ";

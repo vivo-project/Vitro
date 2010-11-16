@@ -28,83 +28,86 @@
 <xsl:variable name='docs' as='node()*'
 	select='collection($listxml)'/>
 
-<xsl:element name='aipres:PRESENT_PERSON_LIST'>
+<aipres:PRESENT_PERSON_LIST>
 
 <xsl:for-each-group 
-	select='$docs//dm:Record//dm:PRESENT_AUTH[./dm:LNAME != "" or 
-						  ./dm:FNAME != "" or  
-                                                  ./dm:MNAME != ""]' 
-group-by='vfx:collapse(concat(dm:LNAME, "|",dm:FNAME , "|", dm:MNAME))'>
+	select='$docs//dm:Record//dm:PRESENT_AUTH' 
+	group-by='vfx:collapse(concat(dm:LNAME, "|",
+					dm:FNAME , "|", 
+					dm:MNAME))'>
 <xsl:sort 
-select='vfx:collapse(concat(dm:LNAME, "|",dm:FNAME , "|", dm:MNAME))'/>
+	select='vfx:collapse(concat(dm:LNAME, "|",
+					dm:FNAME , "|", 
+					dm:MNAME))'/>
 
 <xsl:variable name='rec' select='.'/>
 <xsl:variable name='cur_netid' select='../../../dm:Record/@username'/>
 <xsl:variable name='cur_aiid' select='../../../dm:Record/@userId'/>
 
-<xsl:element name="aipres:PRESENT_BY_PERSON" >
+<aipres:PRESENT_BY_PERSON>
 <xsl:attribute name='index' select='position()'/>
 
-<xsl:element name='aipres:PERSON_NAME'>
+<aipres:PERSON_NAME>
 <xsl:attribute name='cu_collabs'>
     <xsl:value-of select='count(current-group())'/>
 </xsl:attribute>
     <xsl:value-of select='
 	vfx:trim(concat(dm:LNAME, ", ", dm:FNAME, " ", dm:MNAME))'/>
-</xsl:element>
+</aipres:PERSON_NAME>
 
 
 
-   <xsl:element name='aipres:LastName'>
-    <xsl:value-of select='$rec/dm:LNAME'/>
-   </xsl:element>
+   <aipres:LastName>
+    <xsl:value-of select='normalize-space($rec/dm:LNAME)'/>
+   </aipres:LastName>
 
-   <xsl:element name='aipres:FirstName'>
-    <xsl:value-of select='$rec/dm:FNAME'/>
-   </xsl:element>
+   <aipres:FirstName>
+    <xsl:value-of select='normalize-space($rec/dm:FNAME)'/>
+   </aipres:FirstName>
 
-   <xsl:element name='aipres:MiddleName'>
-    <xsl:value-of select='$rec/dm:MNAME'/>
-   </xsl:element>
+   <aipres:MiddleName>
+    <xsl:value-of select='normalize-space($rec/dm:MNAME)'/>
+   </aipres:MiddleName>
 
    <xsl:element name='aipres:AiUserId'>
     <xsl:value-of select='$rec/dm:FACULTY_NAME'/>
    </xsl:element>
 
-   <xsl:element name='aipres:NetId'>
+   <aipres:NetId>
     <xsl:value-of 
 	select='$aiid_netid[mapid:aiid=$rec/dm:FACULTY_NAME]/mapid:netid'/>
-   </xsl:element>	
+   </aipres:NetId>
 
    <!-- other stuff might be needed here -->
 
-   <xsl:text>&#xA;</xsl:text>
 
-
-<xsl:element name='aipres:PRESENT_LIST'>
+<aipres:PRESENT_LIST>
 <xsl:for-each select='current-group()'>
+
 <xsl:if test='../dm:USER_REFERENCE_CREATOR = "Yes"'>
-   <xsl:element name='aipres:PRESENT_INFO'>
-       <xsl:attribute name='ref_netid'>
-          <xsl:value-of select='../../../dm:Record/@username'/>
-       </xsl:attribute>
-   <xsl:attribute name='collabRank'>
-       <xsl:value-of select='count(preceding-sibling::dm:PRESENT_AUTH)+1'/>
-   </xsl:attribute>
-   <xsl:attribute name='public'>
-       <xsl:value-of select='../dm:PUBLIC_VIEW'/>
-   </xsl:attribute>
-       <xsl:text>AI-</xsl:text><xsl:value-of select='../@id'/>
-   </xsl:element>
+   <aipres:PRESENT_INFO>
+   <xsl:attribute name='ref_netid'
+        select='../../../dm:Record/@username'/>
+   <xsl:attribute name='public' select='../dm:PUBLIC_VIEW'/>
+   <xsl:attribute name='hasOrg' 
+      select='if(normalize-space(../dm:ORG) = "") then "No" else "Yes"'/>
+   <xsl:attribute name='hasTitle'  
+      select='if(normalize-space(../dm:TITLE) = "") then "No" else "Yes"'/>
+   <xsl:attribute name='hasConf' 
+	select='if(normalize-space(../dm:NAME) = "") then "No" else "Yes"'/>
+
+
+    <xsl:value-of select='../@id'/>
+   </aipres:PRESENT_INFO>
 </xsl:if>
 </xsl:for-each>
-<!-- aipres:PRESENT_LIST -->
-</xsl:element> 
-<!-- aipres:_BY_PERSON -->
-</xsl:element>
+</aipres:PRESENT_LIST>
+
+
+</aipres:PRESENT_BY_PERSON>
 </xsl:for-each-group>
-<!-- aipres:PERSON_LIST -->
-</xsl:element> 
+</aipres:PRESENT_PERSON_LIST>
+
 
 
 

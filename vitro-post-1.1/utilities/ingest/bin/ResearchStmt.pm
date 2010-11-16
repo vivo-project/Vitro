@@ -22,7 +22,8 @@ if($Phases{'RSR'}>0 || $g_all){
     print "\nPhase = RSR ================================\n";
     $g_curPhase = 'RSR';
     mkUnoFile("$g_restmt/cresearchStmtPerson.xml", 
-	      "counter", "$g_restmt/rsr-unomap.xml");
+	      "counter", "$g_restmt/rsr-unomap.xml",
+	      "AI-RSR-","$g_store/.Person");
     initFeedbackFile('Per','PRSR');
     my $cmd = "";
     $cmd .= "java $g_saxonCmdSequence ";

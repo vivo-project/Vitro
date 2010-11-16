@@ -3,8 +3,8 @@
 <#-- Template for displaying paged search results -->
 
 <h2>
-    Search Results for '${querytext}'
-    <#if classgroupName?has_content>limited to type '${classGroupName}'</#if>
+    Search results for '${querytext}'
+    <#if classGroupName?has_content>limited to type '${classGroupName}'</#if>
     <#if typeName?has_content>limited to type '${typeName}'</#if>
 </h2>
 

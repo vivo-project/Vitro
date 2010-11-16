@@ -18,7 +18,8 @@ if($Phases{'GRC'}>0 || $g_all){
 if($Phases{'GRR'}>0 || $g_all){
     print "\nPhase = GRR ================================\n";
     $g_curPhase = 'GRR';
-    mkUnoFile("$g_gr/cgrants.xml", "index", "$g_gr/grr-unomap.xml");
+    mkUnoFile("$g_gr/cgrants.xml", "index", 
+	      "$g_gr/grr-unomap.xml","AI-GRR-",$op_uno);
     my $cmd = "";
     $cmd .= "java $g_saxonCmdSequence $g_gr/cgrants.xml ";
     $cmd .= "$g_xslts/mkGrantRdf.xsl unoMapFile=$g_gr/grr-unomap.xml ";
@@ -49,7 +50,8 @@ if($Phases{'GRIC'}>0 || $g_all){
 if($Phases{'GRIR'}>0 || $g_all){
     print "\nPhase = GRIR ================================\n";
     $g_curPhase = 'GRIR';
-    mkUnoFile("$g_gr/cgrantInvs.xml", "index", "$g_gr/grir-unomap.xml");
+    mkUnoFile("$g_gr/cgrantInvs.xml", "index", 
+	      "$g_gr/grir-unomap.xml","AI-GRIR-","$g_store/.Person");
     initFeedbackFile('Per','PGRIR');
 
     my $cmd = "";
@@ -90,7 +92,7 @@ if($Phases{'GRSPR'}>0 || $g_all){
     print "\nPhase = GRSPR ================================\n";
     $g_curPhase = 'GRSPR';
     mkUnoFile("$g_gr/cgrantSponsorOrg.xml", "index", 
-	      "$g_gr/grspr-unomap.xml");
+	      "$g_gr/grspr-unomap.xml","AI-GRSPR-","$g_store/.Org");
     initFeedbackFile('Org','OGRSPR');
 
     my $cmd = "";

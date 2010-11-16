@@ -8,13 +8,15 @@ use FindBin qw($Bin);
 autoflush STDOUT 1;
 if(scalar(@ARGV) == 0){
     print "-b base-dir \n";
-    print "-g group i.e. 1of {'aw','ic','is','ed','gr','rs','all'}\n";
+    print "-g group i.e. 1of {aw,ic,is,ec,ed,gr,rs,mc,pr,all}\n";
+    print "-h size  \t e.g. heap size = 2048m\n";
+    print "-p size  \t e.g. perm size = 100m\n";
     print "use -L to run live\n";
     print "use -z to skip creating store/nzraw.xml\n";
     exit 0;
 }
 
-getopts("b:g:Lvz");
+getopts("b:g:h:Lp:vz");
 
 sub trim {
     my($a) = @_;
@@ -26,10 +28,11 @@ sub trim {
 
 if(!$opt_g){
     print "-g option required to specify what to collect\n";
-    print "choose from 'aw','ic','is','ed','gr','rs'.\n";
+    print "choose from aw,ic,is,ec,ed,gr,rs,mc,pr.\n";
     exit 1;
 }
 $grp = lc($opt_g);
+@grp = split /[,;]/, $grp;
 
 $wdir = "/home/jrm424/aiw";
 $wdir = $opt_b if $opt_b;
@@ -37,34 +40,56 @@ chdir $wdir;
 $nz = " --nz ";
 $nz = "" if ! $opt_z;
 
+$heap='2048m';
+$heap=$opt_h if $opt_h ne '';
+
+$perm='100m';
+$perm=$opt_p if $opt_p ne '';
+
+$jopts = " -Xmx$heap -Xms$heap -XX:MaxPermSize=$perm ";
+
+
+
 if(!(-e "bin/aiIngest" && -x _ && -r _)){
     print "$wdir/bin/aiIngest must exist and be executable\n";
     exit 1;
 }
 
 if($grp eq "gr"){
-    print "bin/aiIngest $nz --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps GRC,GRIC,GRSPC\n";
-    qx(bin/aiIngest $nz --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps GRC,GRIC,GRSPC) if $opt_L;
+    print "bin/aiIngest $nz --L --v --log --jopts '$jopts' --steps GRC,GRIC,GRSPC\n";
+    qx(bin/aiIngest $nz --L --v --log --jopts '$jopts' --steps GRC,GRIC,GRSPC) if $opt_L;
 
 } elsif($grp eq "ic"){
-    print "bin/aiIngest $nz --L --v --log --aiic IC  --rawp AIXMLS/cur-raw --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps ICIC,ICAC,ICJC,ICIAC,ICIPC\n";
-    qx(bin/aiIngest $nz --L --v --log --aiic IC  --rawp AIXMLS/cur-raw --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps ICIC,ICAC,ICJC,CIAC,ICIPC) if $opt_L;
+    print "bin/aiIngest $nz --L --v --log --aiic IC  --rawp AIXMLS/cur-raw --jopts '$jopts' --steps ICIC,ICAC,ICJC,ICIAC,ICIPC\n";
+    qx(bin/aiIngest $nz --L --v --log --aiic IC  --rawp AIXMLS/cur-raw --jopts '$jopts' --steps ICIC,ICAC,ICJC,CIAC,ICIPC) if $opt_L;
 
 } elsif($grp eq "is"){
-    print "bin/aiIngest $nz --L --v --log --aiis IS  --rawp AIXMLS/cur-raw --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps ISIS,ISIC,ISCEC,ISFOC,ISGEOC,ISPAC,ISUAC,ISCAC\n";
-    qx(bin/aiIngest $nz --L --v --log --aiis IS  --rawp AIXMLS/cur-raw --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps ISIS,ISIC,ISCEC,ISFOC,ISGEOC,ISPAC,ISUAC,ISCAC) if $opt_L;
+    print "bin/aiIngest $nz --L --v --log --aiis IS  --rawp AIXMLS/cur-raw --jopts '$jopts' --steps ISIS,ISIC,ISCEC,ISFOC,ISGEOC,ISPAC,ISUAC,ISCAC\n";
+    qx(bin/aiIngest $nz --L --v --log --aiis IS  --rawp AIXMLS/cur-raw --jopts '$jopts' --steps ISIS,ISIC,ISCEC,ISFOC,ISGEOC,ISPAC,ISUAC,ISCAC) if $opt_L;
+} elsif($grp eq "ec"){
+    print "bin/aiIngest $nz --L --v --log --jopts '$jopts' --steps  ECC,ECPC\n";
+    qx(bin/aiIngest $nz --L --v --log --jopts '$jopts' --steps  ECC,ECPC) if $opt_L;
 } elsif($grp eq "ed"){
-    print "bin/aiIngest $nz --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps  EDC,EDPC,EDOC\n";
-    qx(bin/aiIngest $nz --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps  EDC,EDPC,EDOC) if $opt_L;
+    print "bin/aiIngest $nz --L --v --log --jopts '$jopts' --steps  EDC,EDPC,EDOC\n";
+    qx(bin/aiIngest $nz --L --v --log --jopts '$jopts' --steps  EDC,EDPC,EDOC) if $opt_L;
+} elsif($grp eq "pr"){
+    print "bin/aiIngest $nz --L --v --log --jopts '$jopts' --steps  PRPRC,PRCC,PRPC,PROC\n";
+    qx(bin/aiIngest $nz --L --v --log --jopts '$jopts' --steps  PRPRC,PRCC,PRPC,PROC) if $opt_L;
 } elsif($grp eq "aw"){
-    print "bin/aiIngest $nz --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps AWC\n";
-    qx(bin/aiIngest $nz --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps AWC) if $opt_L;
+    print "bin/aiIngest $nz --L --v --log --jopts '$jopts' --steps AWC\n";
+    qx(bin/aiIngest $nz --L --v --log --jopts '$jopts' --steps AWC) if $opt_L;
 }  elsif($grp eq "rs"){
-    print "bin/aiIngest $nz --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps RRC\n";
-    qx(bin/aiIngest $nz --L --v --log --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps RRC) if $opt_L;
+    print "bin/aiIngest $nz --L --v --log --jopts '$jopts' --steps RSC\n";
+    qx(bin/aiIngest $nz --L --v --log --jopts '$jopts' --steps RSC) if $opt_L;
 } elsif($grp eq "all"){
-    print "bin/aiIngest $nz --L --v --log --aiic IC --aiis IS --rawp AIXMLS/cur-raw --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps  ICIC,ICAC,ICJC,ICAC,ICIPC,ISIS,ISIC,ISCEC,ISFOC,ISGEOC,ISPAC,ISUAC,ISCAC,EDC,EDPC,EDOC,AWC,RRC\n";
-    qx(bin/aiIngest $nz --L --v --log --aiic IC --aiis IS --rawp AIXMLS/cur-raw --jopts '-Xmx2048m -XX:MaxPermSize=100m' --steps ICIC,ICAC,ICJC,ICAC,ICIPC,ISIS,ISIC,ISCEC,ISFOC,ISGEOC,ISPAC,ISUAC,ISCAC,EDC,EDPC,EDOC,AWC,RRC) if $opt_L;
-} else {
+    print "bin/aiIngest $nz --L --v --log --aiic IC --aiis IS --rawp AIXMLS/cur-raw --jopts '$jopts' --steps  ICIC,ICAC,ICJC,ICIAC,ICIPC,ISIS,ISIC,ISCEC,ISFOC,ISGEOC,ISPAC,ISUAC,ISCAC,ECC,ECPC,EDC,EDPC,EDOC,AWC,RSC\n";
+    qx(bin/aiIngest $nz --L --v --log --aiic IC --aiis IS --rawp AIXMLS/cur-raw --jopts '$jopts' --steps ICIC,ICAC,ICJC,ICIAC,ICIPC,ISIS,ISIC,ISCEC,ISFOC,ISGEOC,ISPAC,ISUAC,ISCAC,ECC,ECPC,EDC,EDPC,EDOC,AWC,RSC) if $opt_L;
+} elsif($grp eq "icis"){
+    print "bin/aiIngest $nz --L --v --log --aiic IC --aiis IS --rawp AIXMLS/cur-raw --jopts '$jopts' --steps  ICIC,ICAC,ICJC,ICAC,ICIPC,ISIS,ISIC,ISCEC,ISFOC,ISGEOC,ISPAC,ISUAC,ISCAC\n";
+    qx(bin/aiIngest $nz --L --v --log --aiic IC --aiis IS --rawp AIXMLS/cur-raw --jopts '$jopts' --steps ICIC,ICAC,ICJC,ICIAC,ICIPC,ISIS,ISIC,ISCEC,ISFOC,ISGEOC,ISPAC,ISUAC,ISCAC) if $opt_L;
+} elsif($grp eq "mc"){
+    print "bin/aiIngest $nz --L --v --log --jopts '$jopts' --steps  MCC,MCPC\n";
+    qx(bin/aiIngest $nz --L --v --log --jopts '$jopts' --steps  MCC,MCPC) if $opt_L;
+}else {
     print "Unknown group.\n";
 }

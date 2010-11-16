@@ -27,30 +27,35 @@
 
 <xsl:template match='/aipres:PRESENT_LIST'>
 <rdf:RDF>
+<xsl:value-of select='$NL'/>
+<xsl:comment>
+<xsl:value-of select='count(aipres:PRESENT)'/>
+</xsl:comment>
+<xsl:value-of select='$NL'/>
+
 <xsl:for-each select='aipres:PRESENT'>
+
+
 <xsl:if test='aipres:netid != ""'>
-<xsl:variable name='objid' select='./aipres:PRESENT_ID'/>
+<xsl:variable name='objid' select='aipres:PRESENT_ID'/>
 <xsl:variable name='nidxml' 
 select="concat($rawXmlPath,'/',aipres:netid, '.xml')"/>
 
 <xsl:variable name='ref' 
 select='document($nidxml)//dm:PRESENT[@id = $objid]' />
 <xsl:if test='$ref/dm:PUBLIC_VIEW!=""'>
-<rdf:Description rdf:about="{concat($g_instance,$objid)}" >
-<rdf:type 
-rdf:resource='core:Presentation'/>
-<rdf:type 
-rdf:resource='http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing'/>
+<rdf:Description rdf:about="{concat($g_instance,'AI-',$objid)}" >
+<rdf:type rdf:resource=
+	'http://vivoweb.org/ontology/core#:Presentation'/>
+<rdf:type rdf:resource=
+	'http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing'/>
 
 <rdfs:label>
-<!-- e.g.
 <xsl:value-of select="$ref/dm:TITLE"/>
--->
 </rdfs:label>
-
 <!-- 
 
-  put other data proerties here 
+  put other data properties here 
 
 -->
 

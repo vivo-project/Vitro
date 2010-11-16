@@ -31,7 +31,7 @@ $wt = $w1+$w2;
 
 $wFullFullMatch           =  1.00;
 $wFullFullMisMatch        = -1.00;
-$wEmptyEmptyMatch         =  1.00;
+$wEmptyEmptyMatch         =  0.00;
 $wEmptyNonEmptyMisMatch   = -0.55;
 $wEmptyShortMisMatch      = -0.55;
 $wEmptyLongMisMatch       = -0.55;

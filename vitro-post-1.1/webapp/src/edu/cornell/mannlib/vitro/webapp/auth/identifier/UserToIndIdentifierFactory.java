@@ -86,6 +86,11 @@ public class UserToIndIdentifierFactory implements IdentifierBundleFactory {
         }
         public List<String> getMayEditAsURIs() {
             return mayEditAsURIs;
-        }        
+        }
+		@Override
+		public String toString() {
+			return "UserIdentifier: " + userURI;
+		}        
+        
     }
 }

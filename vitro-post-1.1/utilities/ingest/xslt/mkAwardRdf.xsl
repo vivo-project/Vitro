@@ -15,16 +15,12 @@ xmlns:dm="http://www.digitalmeasures.com/schema/data"
 	exclude-result-prefixes='xs vfx'
 	>
 
-<xsl:param name='unoMapFile'  required='yes'/>
 
 
 <xsl:output method='xml' indent='yes'/>
 <xsl:strip-space elements="*"/>
 
 <xsl:include href='commonvars.xsl'/>
-
-<xsl:variable name='unomap'
-	select="document($unoMapFile)/Mapping"/>
 
 
 
@@ -34,12 +30,16 @@ xmlns:dm="http://www.digitalmeasures.com/schema/data"
 <!-- award processing -->
 <rdf:Description rdf:about="{concat($g_instance,'AI-',@isid)}" >
 <rdf:type rdf:resource='http://vivoweb.org/ontology/core#AwardOrHonor'/>
-<rdf:type rdf:resource='http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing'/>
+<rdf:type rdf:resource=
+	'http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing'/>
 <rdfs:label>
 <xsl:value-of select="vfx:trim(aiah:award_name)"/>
 </rdfs:label>
 <xsl:if test='vfx:simple-trim(aiah:year) !=""'>
-<core:year rdf:datatype='http://www.w3.org/2001/XMLSchema#gYear'><xsl:value-of select="aiah:year"/></core:year>
+<core:year rdf:datatype=
+	'http://www.w3.org/2001/XMLSchema#gYear'>
+	<xsl:value-of select="aiah:year"/>
+</core:year>
 </xsl:if>
 </rdf:Description>
 

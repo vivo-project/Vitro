@@ -43,7 +43,7 @@ public class DbAdminEditingIdentifierFactory implements IdentifierBundleFactory{
         public String getUri(){ return uri; }
         
         public String toString(){
-            return "DbAdmin role of " + getRole();
+            return "DbAdminEditingId: role of " + getRole();
         }
     }
 }

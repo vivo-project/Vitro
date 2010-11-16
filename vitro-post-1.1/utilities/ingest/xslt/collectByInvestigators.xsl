@@ -104,10 +104,18 @@
           <xsl:sort select='IMPACT_STMT_ID'/>
 
           <xsl:element name='aiis:IMPACT_STMT_INFO'>
-            <xsl:attribute name='ref_netid'><xsl:value-of select='$ref_netid'/></xsl:attribute>
+            <xsl:attribute name='ref_netid'>
+		<xsl:value-of select='$ref_netid'/>
+	    </xsl:attribute>
             <xsl:attribute name='ai_userid'>
              <xsl:value-of select='../../FACULTY_NAME'/></xsl:attribute>
-            <xsl:attribute name='collabRank'><xsl:value-of select='COLLABORATION_POSITION'/></xsl:attribute>
+            <xsl:attribute name='collabRank'>
+		<xsl:value-of select='COLLABORATION_POSITION'/>
+	    </xsl:attribute>
+	    <xsl:attribute name='hasTitle' 
+		select='./IMPACT_STMT_ID/@hasTitle'/>
+            <xsl:attribute name='hasGoodAuthor' 
+		select='./IMPACT_STMT_ID/@hasGoodAuthor'/>
              <xsl:text>AI-</xsl:text>
              <xsl:value-of select='IMPACT_STMT_ID'/>
           </xsl:element>

@@ -1,0 +1,190 @@
+#!/usr/bin/perl
+use sigtrap qw(die INT QUIT);
+use sigtrap qw(die untrapped normal-signals stack-trace any error-signals);
+use Getopt::Std;
+use FileHandle;
+use POSIX qw( strftime );
+use FindBin qw($Bin);
+
+autoflush STDOUT 1;
+
+if(scalar(@ARGV) == 0){
+    print "-a acc   \t acc listof {P,O,C,G,F,J,PA,CA,UA, all} \n";
+    print "-b base-dir \n";
+    print "-d destdir \n";
+    print "-e extdir\t directory of java extension for saxon\n";
+    print "-f feedbackdir\n";
+    print "-h size  \t e.g. heap size = 2048m\n";
+    print "-L       \t for live operation\n";
+    print "-m mark  \t include mark in file names\n"; 
+    print "-p size  \t e.g. perm size = 100m\n";
+    print "-r rdfdir\n";
+    print "-S jar   \t saxon jar i.e. saxon9he.jar or saxon9ee.jar \n";
+    print "-x xsltdir\n";
+    print "-X xsltarglist    e.g. -X P:zaiid2netid=../store/zraw-aiid-netid.xml,P:allaiid2netid=../store/all-raw-aiid-netid.xml,P:makeCUVNames=Yes\n";
+    exit 0;
+}
+
+getopts("a:b:e:f:h:Lm:p:Pr:s:S:vx:X:");
+
+sub trim {
+    my($a) = @_;
+    $a =~ s/^\s*(\S+)\s*$/$1/;
+    $a =~ s/^\s*(\S.*\S)\s*$/$1/;
+    $a =~ s/(\s*)//;
+    return $a;
+}
+if(!$opt_a){
+    print "-a option required to specify what to generate\n";
+    print "choose from {P,O,C,G,F,J,PA,CA,UA,all}.\n";
+    exit 1;
+}
+$g_cwd = $ENV{'PWD'};
+%g_TokenFileList =('P' => "Per0.xml",
+		   'O' => "Org0.xml",
+		   'C' => "Ceo0.xml",
+		   'G' => "Geo0.xml",
+		   'F' => "Org0.xml",
+		   'J' => "Jour0.xml",
+		   'PA'=> "Parea0.xml",
+		   'CA'=> "Carea0.xml",
+		   'UA'=> "Uarea0.xml");
+
+%g_TokenXslList = ('P' => "mkAccPeopleRdf.xsl",
+		   'O' => "mkAccOrgRdf.xsl",
+		   'C' => "mkAccCeoRdf.xsl",
+		   'G' => "mkAccGeoRdf.xsl",
+		   'F' => "mkAccFundOrgRdf.xsl",
+		   'J' => "mkAccJourRdf.xsl",
+		   'PA'=> "mkAccPareaRdf.xsl",
+		   'CA'=> "mkAccCareaRdf.xsl",
+		   'UA'=> "mkAccUareaRdf.xsl");
+
+%g_RdfFileList  = ('P' => "AccumulatorOfPeopleRdf.rdf",
+		   'O' => "AccumulatorOfOrgRdf.rdf",
+		   'C' => "AccumulatorOfCeoRdf.rdf",
+		   'G' => "AccumulatorOfGeoRdf.rdf",
+		   'F' => "AccumulatorOfFOrgRdf.xml",
+		   'J' => "AccumulatorOfJourRdf.rdf",
+		   'PA'=> "AccumulatorOfPareaRdf.rdf",
+		   'CA'=> "AccumulatorOfCareaRdf.rdf",
+		   'UA'=> "AccumulatorOfUareaRdf.rdf");
+
+%g_XmlFileList  = ('P' => "AccumulatorOfPeople.xml",
+		   'O' => "AccumulatorOfOrg.xml",
+		   'C' => "AccumulatorOfCeo.xml",
+		   'G' => "AccumulatorOfGeo.xml",
+		   'F' => "is-aggregated/cfods.xml",
+		   'J' => "AccumulatorOfJour.xml",
+		   'PA'=> "AccumulatorOfParea.xml",
+		   'CA'=> "AccumulatorOfCarea.xml",
+		   'UA'=> "AccumulatorOfUarea.xml");
+
+$acc = $opt_a;
+if($acc =~ /ALL/i){
+    $acc = "P,O,C,G,J,PA,CA,UA";
+}
+
+@acc = split /[,;]/, $acc;
+
+$heap='2048m';
+$heap=$opt_h if $opt_h ne '';
+
+$perm='100m';
+$perm=$opt_p if $opt_p ne '';
+
+$jopts = " -Xmx$heap -Xms$heap -XX:MaxPermSize=$perm ";
+
+$wdir = "/home/jrm424/aiwork";
+$wdir = $opt_b if $opt_b ne '';
+$wdir = $g_cwd . '/' . $wdir if $wdir !~ /^\//;
+chdir $wdir;
+print "wdir=$wdir\n" if $opt_v;
+
+$xslt = "$wdir/xslt";
+$xslt =  $opt_x if $opt_x ne '';
+$xslt = $g_cwd . '/' . $xslt if $xslt !~ /^\//;
+$xslt =~ s/\/\.\//\//g;
+print "xslt=$xslt\n" if $opt_v;
+
+$rdf = "$wdir/store/rdf";
+$rdf = $opt_r if $opt_r ne '';
+
+$destdir = $rdf;
+$destdir =  $opt_d if $opt_d ne '';
+$destdir = $g_cwd . '/' . $destdir if $destdir !~ /^\//;
+$destdir =~ s/\/\.\//\//g;
+print "destdir=$destdir\n" if $opt_v;
+
+$ext = " --jext $opt_e " if $opt_e ne '' ;
+
+$saxon = "$xslt/saxon9he.jar";
+$saxon = $opt_S if $opt_S ne '';
+$saxon = $g_cwd . '/xslt/' . $saxon if $saxon !~ /^\//;
+$saxon = " -jar $saxon ";
+print "saxon=$saxon\n" if $opt_v;
+$mark = '';
+$mark = "$opt_m\_" if $opt_m ne '';
+
+$fb = "$wdir/store/feedback";
+$fb = $opt_f if $opt_f ne '';
+$fb = $g_cwd . "$wdir/store/$fb" if $fb !~ /^\//;
+$fb =~ s/\/\.\//\//g;
+print "fb=$fb\n" if $opt_v;
+%xsltargs = ();
+
+$xsltargs{'P'} = "zaiid2netid=../store/zraw-aiid-netid.xml ";
+$xsltargs{'P'} .= "allaiid2netid=../store/all-raw-aiid-netid.xml ";
+$xsltargs{'P'} .= "makeCUVNames=Yes " if $opt_P;
+@xsltargs = ();
+@xsltargs = split /[,;]/, $opt_X if $opt_X ne '';
+foreach my $x (@xsltargs){
+    my @p = split /:/,$x;
+    next if scalar(@p) < 2;
+    $xsltargs{$p[0]} .= " $p[1] ";
+}
+
+foreach my $acc (@acc){
+    my $src;
+    my $cmd;
+    if($acc eq 'F'){
+	$src = "$wdir/store/$g_XmlFileList{'F'}";
+	$src =~ s/\/\.\//\//g;
+	$cmd = "java $jopts $saxon $src $xslt/$g_TokenXslList{'F'} ";
+	$cmd .= "extFOrgIn=$fb/$g_TokenFileList{$acc}  > $destdir/$mark$cuv$g_RdfFileList{'F'} ";
+    } else {
+	if($acc =~ /:/){
+	    my @parts = map { trim($_) } split /:/, $acc;
+	    $src = $parts[1];
+	    if($src !~ /^\//){
+		$src = "$fb/$src";
+	    } 
+	    $acc = uc((split /:/, $acc)[0]);
+	} else {
+	    $src = "$fb/$g_TokenFileList{$acc}";
+	}
+	$src =~ s/\/\.\//\//g;
+	$cuv = "NoCUVfoaf_" if ($acc eq 'P' && !$opt_P);
+	$cmd = "java $jopts $saxon $src $xslt/$g_TokenXslList{$acc}";
+	$cmd .= " $xsltargs{$acc} " if $xsltargs{$acc} ne '';
+	$cmd .= " > $destdir/$mark$cuv$g_RdfFileList{$acc} ";
+    }
+    print $cmd . "\n";
+    if($opt_L){
+	my @res = qx($cmd);
+	my $r = ($? >> 8);
+	print join('', @res) . "\n";
+	exit 1 if $r;
+    }
+    if($acc ne 'F'){
+	$cmd = "cp $src $fb/$mark$g_XmlFileList{$acc} ";
+	print $cmd . "\n---------------------------------\n";
+	if($opt_L){
+	    my @res = qx($cmd);
+	    my $r = ($? >> 8);
+	    print join('', @res) . "\n";
+	    exit 1 if $r;
+	}
+    }
+    
+} 

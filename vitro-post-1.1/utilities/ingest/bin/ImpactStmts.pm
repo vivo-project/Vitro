@@ -20,7 +20,7 @@ if($Phases{'ISIS'}>0 || $g_all){
     print "\nBegin integration process using $g_xslts/$g_is_chain ...\n";
     my $prefix = $g_aiis . "_";
     my $cmd = "";
-    $cmd .= "$g_bin/xsltseq -I $g_xmls_raw -O $g_is_xmls_out ";
+    $cmd .= "$g_bin/xsltseq -f -I $g_xmls_raw -O $g_is_xmls_out ";
     $cmd .= " -X $g_xslts/$g_is_chain -x $g_xslts -p $prefix ";
     $cmd .= " -T $g_isd -t 'IS' -s $g_saxonJar $ext ";
     $cmd .= " -L $g_log_path " if $g_log_path ne '';
@@ -103,7 +103,9 @@ if($Phases{'ISIR'}>0 || $g_all){
 # 
 # 
 #
-    mkUnoFile("$g_is/cids.xml","counter","$g_is/isir-unomap.xml");
+    mkUnoFile("$g_is/cids.xml","counter",
+	      "$g_is/isir-unomap.xml",
+	      "AI-ISIR-", "$g_store/.Person");
 
     initFeedbackFile('Per','ISIR');
     print "\nConstruct the rdf for investigators and impact stmts\n";
@@ -182,7 +184,10 @@ if($Phases{'ISCER'}>0 || $g_all){
 # 
 # 
 #
-    mkUnoFile("$g_is/cceds.xml","counter","$g_is/iscer-unomap.xml");
+    mkUnoFile("$g_is/cceds.xml","counter",
+	      "$g_is/iscer-unomap.xml","AI-ISCER-",
+	      "$g_store/.CollaborativeEntity");
+
     initFeedbackFile('Ceo','ISCER');
     print "\nConstruct the rdf for collaborative entities and impact stmts\n";
 
@@ -258,7 +263,8 @@ if($Phases{'ISFOR'}>0 || $g_all){
 # 
 # 
 #
-    mkUnoFile("$g_is/cfods.xml","counter","$g_is/isfor-unomap.xml");
+    mkUnoFile("$g_is/cfods.xml","counter",
+	      "$g_is/isfor-unomap.xml","AI-ISFOR-","$g_store/.Org");
 
 
     initFeedbackFile('Org','ISFOR');
@@ -339,7 +345,8 @@ if($Phases{'ISGEOR'}>0 || $g_all){
 # 
 # 
 #
-    mkUnoFile("$g_is/cgeods.xml","counter","$g_is/isgeor-unomap.xml");
+    mkUnoFile("$g_is/cgeods.xml","counter",
+	      "$g_is/isgeor-unomap.xml","AI-ISGEOR-","$g_store/.Geo");
     initFeedbackFile('Geo','ISGEOR');
     print "\nConstruct the rdf for geo locations and impact stmts\n";
 
@@ -416,7 +423,8 @@ if($Phases{'ISPAR'}>0 || $g_all){
 # 
 # 
 #
-    mkUnoFile("$g_is/cpads.xml","counter","$g_is/ispar-unomap.xml");
+    mkUnoFile("$g_is/cpads.xml","counter",
+	      "$g_is/ispar-unomap.xml","AI-ISPAR-","$g_store/.PriorityArea");
     initFeedbackFile('Parea','ISPAR');
     print "\nConstruct the rdf for priority areas and impact stmts\n";
 
@@ -493,7 +501,8 @@ if($Phases{'ISCAR'}>0 || $g_all){
 # 
 # 
 #
-    mkUnoFile("$g_is/ccads.xml","counter","$g_is/iscar-unomap.xml");
+    mkUnoFile("$g_is/ccads.xml","counter",
+	      "$g_is/iscar-unomap.xml","AI-ISCAR-","$g_store/.ConcentrationArea");
     initFeedbackFile('Carea','ISCAR');
     print "\nConstruct the rdf for conareas and impact stmts\n";
 
@@ -571,7 +580,8 @@ if($Phases{'ISUAR'}>0 || $g_all){
 # 
 # 
 #
-    mkUnoFile("$g_is/cuads.xml","counter","$g_is/isuar-unomap.xml");
+    mkUnoFile("$g_is/cuads.xml","counter",
+	      "$g_is/isuar-unomap.xml","AI-ISUAR-","$g_store/.USDA_Area");
     initFeedbackFile('Uarea','ISUAR');
     print "\nConstruct the rdf for geo locations and impact stmts\n";
 

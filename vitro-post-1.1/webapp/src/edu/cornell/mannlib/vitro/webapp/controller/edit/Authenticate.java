@@ -2,14 +2,15 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
+import static edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State.FORCED_PASSWORD_CHANGE;
+import static edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State.LOGGED_IN;
+import static edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State.LOGGING_IN;
+import static edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State.NOWHERE;
+
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -24,31 +25,18 @@ import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
 
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.RoleBasedPolicy.AuthRole;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
-import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
+import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LoginRedirector;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.Message;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State;
-import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.LoginEvent;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.LoginLogoutEvent;
 
-public class Authenticate extends FreemarkerHttpServlet {
-	/**
-	 * Maximum inactive interval for a ordinary logged in user session, in
-	 * seconds.
-	 */
-	public static final int LOGGED_IN_TIMEOUT_INTERVAL = 300;
-
-	/** Maximum inactive interval for a editor (or better) session, in seconds. */
-	public static final int PRIVILEGED_TIMEOUT_INTERVAL = 32000;
-
+public class Authenticate extends VitroHttpServlet {
 	private static final Log log = LogFactory.getLog(Authenticate.class
 			.getName());
 
@@ -67,368 +55,63 @@ public class Authenticate extends FreemarkerHttpServlet {
 	/** If this parameter is "true" (ignoring case), cancel the login. */
 	private static final String PARAMETER_CANCEL = "cancel";
 
-	/** If they are logging in, show them this form. */
-	public static final String TEMPLATE_LOGIN = "login-form.ftl";
-
-	/** If they are changing their password on first login, show them this form. */
-	public static final String TEMPLATE_FORCE_PASSWORD_CHANGE = "login-forcedPasswordChange.ftl";
-
-	public static final String BODY_LOGIN_NAME = "loginName";
-	public static final String BODY_FORM_ACTION = "formAction";
-	public static final String BODY_ERROR_MESSAGE = "errorMessage";
-
 	/** Where do we find the User/Session map in the servlet context? */
 	public static final String USER_SESSION_MAP_ATTR = "userURISessionMap";
 
+	private final LoginRedirector loginRedirector = new LoginRedirector();
+
 	/**
-	 * Find out where they are in the login process, and check for progress. If
-	 * they succeed in logging in, record the information. Show the next page.
+	 * Find out where they are in the login process, process any input, record
+	 * the new state, and show the next page.
 	 */
 	public void doPost(HttpServletRequest request, HttpServletResponse response) {
 
 		VitroRequest vreq = new VitroRequest(request);
 
-		User user = null;
-
 		try {
-			// Process any input from the login form.
+			// Where do we stand in the process?
 			State entryState = getCurrentLoginState(vreq);
 			log.debug("State on entry: " + entryState);
 
+			// Act on any input.
 			switch (entryState) {
+			case NOWHERE:
+				processInputNowhere(vreq);
+				break;
 			case LOGGING_IN:
-				user = checkLoginProgress(vreq);
-				if (user != null) {
-					whatNextForThisGuy(vreq, user);
-				}
+				processInputLoggingIn(vreq);
 				break;
 			case FORCED_PASSWORD_CHANGE:
-				if (checkCancel(vreq)) {
-					recordLoginCancelled(vreq);
-				} else {
-					user = checkChangeProgress(vreq);
-					if (user != null) {
-						recordSuccessfulPasswordChange(vreq, user);
-					}
-				}
+				processInputChangePassword(vreq);
 				break;
-			default:
+			default: // LOGGED_IN:
+				processInputLoggedIn(vreq);
 				break;
 			}
 
-			// Figure out where they should be, and redirect.
+			// Now where do we stand?
 			State exitState = getCurrentLoginState(vreq);
 			log.debug("State on exit: " + exitState);
 
+			// Send them on their way.
 			switch (exitState) {
-			case LOGGED_IN:
-				redirectLoggedInUser(vreq, response);
-				break;
-			case CANCELLED:
+			case NOWHERE:
 				redirectCancellingUser(vreq, response);
 				break;
-			default:
+			case LOGGING_IN:
 				showLoginScreen(vreq, response);
+				break;
+			case FORCED_PASSWORD_CHANGE:
+				showLoginScreen(vreq, response);
+				break;
+			default: // LOGGED_IN:
+				loginRedirector.redirectLoggedInUser(vreq, response);
 				break;
 			}
 		} catch (Exception e) {
 			showSystemError(e, response);
 		}
-	}
 
-	/**
-	 * They are logging in. Are they successful?
-	 */
-	private User checkLoginProgress(HttpServletRequest request) {
-		String username = request.getParameter(PARAMETER_USERNAME);
-		String password = request.getParameter(PARAMETER_PASSWORD);
-
-		LoginProcessBean bean = getLoginProcessBean(request);
-		bean.clearMessage();
-		log.trace("username=" + username + ", password=" + password + ", bean="
-				+ bean);
-
-		if ((username == null) || username.isEmpty()) {
-			bean.setMessage(Message.NO_USERNAME);
-			return null;
-		} else {
-			bean.setUsername(username);
-		}
-
-		User user = getUserDao(request).getUserByUsername(username);
-		log.trace("User is " + (user == null ? "null" : user.getURI()));
-
-		if (user == null) {
-			bean.setMessage(Message.UNKNOWN_USERNAME, username);
-			return null;
-		}
-
-		if ((password == null) || password.isEmpty()) {
-			bean.setMessage(Message.NO_PASSWORD);
-			return null;
-		}
-
-		String md5Password = applyMd5Encoding(password);
-
-		if (!md5Password.equals(user.getMd5password())) {
-			log.trace("Encoded passwords don't match: right="
-					+ user.getMd5password() + ", wrong=" + md5Password);
-			bean.setMessage(Message.INCORRECT_PASSWORD);
-			return null;
-		}
-
-		return user;
-	}
-
-	/**
-	 * Successfully applied username and password. Are we forcing a password
-	 * change, or is this guy logged in?
-	 */
-	private void whatNextForThisGuy(HttpServletRequest request, User user) {
-		if (user.getLoginCount() == 0) {
-			log.debug("Forcing first-time password change");
-			LoginProcessBean bean = getLoginProcessBean(request);
-			bean.setState(State.FORCED_PASSWORD_CHANGE);
-		} else {
-			recordLoginInfo(request, user.getUsername());
-		}
-	}
-
-	/**
-	 * Are they cancelling the login (cancelling the first-time password
-	 * change)? They are if the cancel parameter is "true" (ignoring case).
-	 */
-	private boolean checkCancel(HttpServletRequest request) {
-		String cancel = request.getParameter(PARAMETER_CANCEL);
-		log.trace("cancel=" + cancel);
-		return Boolean.valueOf(cancel);
-	}
-
-	/**
-	 * If they want to cancel the login, let them.
-	 */
-	private void recordLoginCancelled(HttpServletRequest request) {
-		getLoginProcessBean(request).setState(State.CANCELLED);
-	}
-
-	/**
-	 * They are changing password. Are they successful?
-	 */
-	private User checkChangeProgress(HttpServletRequest request) {
-		String newPassword = request.getParameter(PARAMETER_NEW_PASSWORD);
-		String confirm = request.getParameter(PARAMETER_CONFIRM_PASSWORD);
-		LoginProcessBean bean = getLoginProcessBean(request);
-		bean.clearMessage();
-		log.trace("newPassword=" + newPassword + ", confirm=" + confirm
-				+ ", bean=" + bean);
-
-		if ((newPassword == null) || newPassword.isEmpty()) {
-			bean.setMessage(Message.NO_NEW_PASSWORD);
-			return null;
-		}
-
-		if (!newPassword.equals(confirm)) {
-			bean.setMessage(Message.MISMATCH_PASSWORD);
-			return null;
-		}
-
-		if ((newPassword.length() < User.MIN_PASSWORD_LENGTH)
-				|| (newPassword.length() > User.MAX_PASSWORD_LENGTH)) {
-			bean.setMessage(Message.PASSWORD_LENGTH, User.MIN_PASSWORD_LENGTH,
-					User.MAX_PASSWORD_LENGTH);
-			return null;
-		}
-
-		User user = getUserDao(request).getUserByUsername(bean.getUsername());
-		log.trace("User is " + (user == null ? "null" : user.getURI()));
-
-		if (user == null) {
-			throw new IllegalStateException(
-					"Changing password but bean has no user: '"
-							+ bean.getUsername() + "'");
-		}
-
-		String md5NewPassword = applyMd5Encoding(newPassword);
-		log.trace("Old password: " + user.getMd5password() + ", new password: "
-				+ md5NewPassword);
-
-		if (md5NewPassword.equals(user.getMd5password())) {
-			bean.setMessage(Message.USING_OLD_PASSWORD);
-			return null;
-		}
-
-		return user;
-	}
-
-	/**
-	 * Store the changed password. They are logged in.
-	 */
-	private void recordSuccessfulPasswordChange(HttpServletRequest request,
-			User user) {
-		String newPassword = request.getParameter(PARAMETER_NEW_PASSWORD);
-		String md5NewPassword = applyMd5Encoding(newPassword);
-		user.setOldPassword(user.getMd5password());
-		user.setMd5password(md5NewPassword);
-		getUserDao(request).updateUser(user);
-		log.debug("Completed first-time password change.");
-
-		recordLoginInfo(request, user.getUsername());
-	}
-
-	/**
-	 * The user provided the correct information, and changed the password if
-	 * that was required. Record that they have logged in.
-	 */
-	private void recordLoginInfo(HttpServletRequest request, String username) {
-		log.debug("Completed login.");
-
-		// Get a fresh user object, so we know it's not stale.
-		User user = getUserDao(request).getUserByUsername(username);
-
-		HttpSession session = request.getSession();
-
-		// Put the login info into the session.
-		// TODO the LoginFormBean is being phased out.
-		LoginFormBean lfb = new LoginFormBean();
-		lfb.setUserURI(user.getURI());
-		lfb.setLoginStatus("authenticated");
-		lfb.setSessionId(session.getId());
-		lfb.setLoginRole(user.getRoleURI());
-		lfb.setLoginRemoteAddr(request.getRemoteAddr());
-		lfb.setLoginName(user.getUsername());
-		session.setAttribute("loginHandler", lfb);
-		// TODO this should eventually replace the LoginFormBean.
-		LoginStatusBean lsb = new LoginStatusBean(user.getURI(),
-				user.getUsername(), parseUserSecurityLevel(user));
-		LoginStatusBean.setBean(session, lsb);
-		log.info("Adding status bean: " + lsb);
-
-		// Remove the login process info from the session.
-		session.removeAttribute(LoginProcessBean.SESSION_ATTRIBUTE);
-
-		// Record the login on the user.
-		user.setLoginCount(user.getLoginCount() + 1);
-		if (user.getFirstTime() == null) { // first login
-			user.setFirstTime(new Date());
-		}
-		getUserDao(request).updateUser(user);
-
-		// Set the timeout limit on the session - editors, etc, get more.
-		if (lsb.isLoggedInAtLeast(LoginStatusBean.EDITOR)) {
-			session.setMaxInactiveInterval(PRIVILEGED_TIMEOUT_INTERVAL);
-		} else {
-			session.setMaxInactiveInterval(LOGGED_IN_TIMEOUT_INTERVAL);
-		}
-
-		// Record the user in the user/Session map.
-		Map<String, HttpSession> userURISessionMap = getUserURISessionMapFromContext(getServletContext());
-		userURISessionMap.put(user.getURI(), request.getSession());
-
-		// Notify the other users of this model.
-		sendLoginNotifyEvent(new LoginEvent(user.getURI()),
-				getServletContext(), session);
-
-	}
-
-	/**
-	 * User is in the login process. Show them the login screen.
-	 */
-	private void showLoginScreen(VitroRequest vreq, HttpServletResponse response)
-			throws IOException {
-		response.sendRedirect(getLoginScreenUrl(vreq));
-		return;
-	}
-
-	/**
-	 * User cancelled the login. Forget that they were logging in, and send them
-	 * to the home page.
-	 */
-	private void redirectCancellingUser(HttpServletRequest request,
-			HttpServletResponse response) throws IOException {
-		// Remove the login process info from the session.
-		request.getSession()
-				.removeAttribute(LoginProcessBean.SESSION_ATTRIBUTE);
-
-		log.debug("User cancelled the login. Redirect to site admin page.");
-		response.sendRedirect(getHomeUrl(request));
-	}
-
-	/**
-	 * User is logged in. They might go to:
-	 * <ul>
-	 * <li>A one-time redirect, stored in the session, if they had tried to
-	 * bookmark to a page that requires login.</li>
-	 * <li>An application-wide redirect, stored in the servlet context.</li>
-	 * <li>Their home page, if they are a self-editor.</li>
-	 * <li>The site admin page.</li>
-	 * </ul>
-	 */
-	private void redirectLoggedInUser(HttpServletRequest request,
-			HttpServletResponse response) throws IOException,
-			UnsupportedEncodingException {
-		// Did they have a one-time redirect stored on the session?
-		String sessionRedirect = (String) request.getSession().getAttribute(
-				"postLoginRequest");
-		if (sessionRedirect != null) {
-			request.getSession().removeAttribute("postLoginRequest");
-			log.debug("User is logged in. Redirect by session to "
-					+ sessionRedirect);
-			response.sendRedirect(sessionRedirect);
-			return;
-		}
-
-		// Is there a login-redirect stored in the application as a whole?
-		// It could lead to another page in this app, or to any random URL.
-		String contextRedirect = (String) getServletContext().getAttribute(
-				"postLoginRequest");
-		if (contextRedirect != null) {
-			log.debug("User is logged in. Redirect by application to "
-					+ contextRedirect);
-			if (contextRedirect.indexOf(":") == -1) {
-				response.sendRedirect(request.getContextPath()
-						+ contextRedirect);
-			} else {
-				response.sendRedirect(contextRedirect);
-			}
-			return;
-		}
-
-		// If the user is a self-editor, send them to their home page.
-		User user = getLoggedInUser(request);
-		if ( user != null && user.getRoleURI() != null && user.getRoleURI().equals( Integer.toString(AuthRole.USER.level()) )){
-			UserDao userDao = getUserDao(request);
-			if (userDao != null) {
-				List<String> uris = userDao.getIndividualsUserMayEditAs(user
-						.getURI());
-				if (uris != null && uris.size() > 0) {
-					log.debug("User is logged in. Redirect as self-editor to "
-							+ sessionRedirect);
-					String userHomePage = request.getContextPath()
-							+ "/individual?uri="
-							+ URLEncoder.encode(uris.get(0), "UTF-8");
-					log.debug("User is logged in. Redirect as self-editor to "
-							+ sessionRedirect);
-					response.sendRedirect(userHomePage);
-					return;
-				}
-			}
-		}
-
-		// If nothing else applies, send them to the Site Admin page.
-		log.debug("User is logged in. Redirect to site admin page.");
-		response.sendRedirect(getSiteAdminUrl(request));
-	}
-
-	/**
-	 * There has been an unexpected exception. Complain mightily.
-	 */
-	private void showSystemError(Exception e, HttpServletResponse response) {
-		log.error("Unexpected error in login process" + e);
-		try {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		} catch (IOException e1) {
-			log.error(e1, e1);
-		}
 	}
 
 	/**
@@ -437,94 +120,243 @@ public class Authenticate extends FreemarkerHttpServlet {
 	private State getCurrentLoginState(HttpServletRequest request) {
 		HttpSession session = request.getSession(false);
 		if (session == null) {
-			return State.NOWHERE;
+			log.debug("no session: current state is NOWHERE");
+			return NOWHERE;
 		}
-		
+
 		if (LoginStatusBean.getBean(request).isLoggedIn()) {
-			return State.LOGGED_IN;
+			log.debug("found a LoginStatusBean: current state is LOGGED IN");
+			return LOGGED_IN;
 		}
 
-		return getLoginProcessBean(request).getState();
+		if (LoginProcessBean.isBean(request)) {
+			State state = LoginProcessBean.getBean(request).getState();
+			log.debug("state from LoginProcessBean is " + state);
+			return state;
+		} else {
+			log.debug("no LoginSessionBean, no LoginProcessBean: "
+					+ "current state is NOWHERE");
+			return NOWHERE;
+		}
 	}
 
 	/**
-	 * What user are we logged in as?
+	 * They just got here. Start the process.
 	 */
-	private User getLoggedInUser(HttpServletRequest request) {
-		UserDao userDao = getUserDao(request);
-		if (userDao == null) {
-			return null;
-		}
-
-		LoginStatusBean lsb = LoginStatusBean.getBean(request);
-		if (!lsb.isLoggedIn()) {
-			log.debug("getLoggedInUser: not logged in");
-			return null;
-		}
-
-		return userDao.getUserByUsername(lsb.getUsername());
+	private void processInputNowhere(HttpServletRequest request) {
+		transitionToLoggingIn(request);
 	}
 
 	/**
-	 * Get a reference to the {@link UserDao}, or <code>null</code>.
+	 * They are logging in. If they get it wrong, let them know. If they get it
+	 * right, record it.
 	 */
-	private UserDao getUserDao(HttpServletRequest request) {
-		HttpSession session = request.getSession(false);
-		if (session == null) {
-			return null;
+	private void processInputLoggingIn(HttpServletRequest request) {
+		String username = request.getParameter(PARAMETER_USERNAME);
+		String password = request.getParameter(PARAMETER_PASSWORD);
+
+		LoginProcessBean bean = LoginProcessBean.getBean(request);
+		bean.clearMessage();
+		log.trace("username=" + username + ", password=" + password + ", bean="
+				+ bean);
+
+		if ((username == null) || username.isEmpty()) {
+			bean.setMessage(Message.NO_USERNAME);
+			return;
+		} else {
+			bean.setUsername(username);
 		}
 
-		ServletContext servletContext = session.getServletContext();
-		WebappDaoFactory wadf = (WebappDaoFactory) servletContext
-				.getAttribute("webappDaoFactory");
-		if (wadf == null) {
-			log.error("getUserDao: no WebappDaoFactory");
-			return null;
+		User user = getAuthenticator(request).getUserByUsername(username);
+		log.trace("User is " + (user == null ? "null" : user.getURI()));
+
+		if (user == null) {
+			bean.setMessage(Message.UNKNOWN_USERNAME, username);
+			return;
 		}
 
-		UserDao userDao = wadf.getUserDao();
-		if (userDao == null) {
-			log.error("getUserDao: no UserDao");
+		if ((password == null) || password.isEmpty()) {
+			bean.setMessage(Message.NO_PASSWORD);
+			return;
 		}
 
-		return userDao;
+		if (!getAuthenticator(request).isCurrentPassword(username, password)) {
+			bean.setMessage(Message.INCORRECT_PASSWORD);
+			return;
+		}
+
+		// Username and password are correct. What next?
+		if (isFirstTimeLogin(user)) {
+			transitionToForcedPasswordChange(request);
+		} else {
+			transitionToLoggedIn(request, username);
+		}
 	}
 
-	/** What's the URL for the login screen? */
-	private String getLoginScreenUrl(HttpServletRequest request) {
-		String contextPath = request.getContextPath();
-		String urlParams = "?login=block";
-		return contextPath + Controllers.LOGIN + urlParams;
+	/**
+	 * <pre>
+	 * They are changing passwords. 
+	 * - If they cancel, let them out without checking for problems. 
+	 * - Otherwise, 
+	 *   - If they get it wrong, let them know. 
+	 *   - If they get it right, record it.
+	 * </pre>
+	 */
+	private void processInputChangePassword(HttpServletRequest request) {
+		String newPassword = request.getParameter(PARAMETER_NEW_PASSWORD);
+		String confirm = request.getParameter(PARAMETER_CONFIRM_PASSWORD);
+		String cancel = request.getParameter(PARAMETER_CANCEL);
+
+		if (Boolean.valueOf(cancel)) {
+			// It's over, man. Let them go.
+			transitionToNowhere(request);
+			return;
+		}
+
+		LoginProcessBean bean = LoginProcessBean.getBean(request);
+		bean.clearMessage();
+		log.trace("newPassword=" + newPassword + ", confirm=" + confirm
+				+ ", bean=" + bean);
+
+		if ((newPassword == null) || newPassword.isEmpty()) {
+			bean.setMessage(Message.NO_NEW_PASSWORD);
+			return;
+		}
+
+		if (!newPassword.equals(confirm)) {
+			bean.setMessage(Message.MISMATCH_PASSWORD);
+			return;
+		}
+
+		if ((newPassword.length() < User.MIN_PASSWORD_LENGTH)
+				|| (newPassword.length() > User.MAX_PASSWORD_LENGTH)) {
+			bean.setMessage(Message.PASSWORD_LENGTH, User.MIN_PASSWORD_LENGTH,
+					User.MAX_PASSWORD_LENGTH);
+			return;
+		}
+
+		String username = bean.getUsername();
+
+		if (getAuthenticator(request).isCurrentPassword(username, newPassword)) {
+			bean.setMessage(Message.USING_OLD_PASSWORD);
+			return;
+		}
+
+		// New password is acceptable. Store it and go on.
+		transitionToLoggedIn(request, username, newPassword);
 	}
 
-	/** What's the URL for the site admin screen? */
-	private String getSiteAdminUrl(HttpServletRequest request) {
-		String contextPath = request.getContextPath();
-		String urlParams = "?login=block";
-		return contextPath + Controllers.SITE_ADMIN + urlParams;
+	/**
+	 * They are already logged in. There's nothing to do; no transition.
+	 */
+	@SuppressWarnings("unused")
+	private void processInputLoggedIn(HttpServletRequest request) {
+	}
+
+	/**
+	 * Has this user ever logged in before?
+	 */
+	private boolean isFirstTimeLogin(User user) {
+		if (user.getLoginCount() == 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * State change: they are starting the login process.
+	 */
+	private void transitionToLoggingIn(HttpServletRequest request) {
+		log.debug("Starting the login process.");
+		LoginProcessBean.getBean(request).setState(LOGGING_IN);
+	}
+
+	/**
+	 * State change: username and password were correct, but now we require a
+	 * new password.
+	 */
+	private void transitionToForcedPasswordChange(HttpServletRequest request) {
+		log.debug("Forcing first-time password change");
+		LoginProcessBean.getBean(request).setState(FORCED_PASSWORD_CHANGE);
+	}
+
+	/**
+	 * State change: all requirements are satisfied. Log them in.
+	 */
+	private void transitionToLoggedIn(HttpServletRequest request,
+			String username) {
+		log.debug("Completed login: " + username);
+		getAuthenticator(request).recordUserIsLoggedIn(username);
+		LoginProcessBean.removeBean(request);
+	}
+
+	/**
+	 * State change: all requirements are satisfied. Change their password and
+	 * log them in.
+	 */
+	private void transitionToLoggedIn(HttpServletRequest request,
+			String username, String newPassword) {
+		log.debug("Completed login: " + username + ", password changed.");
+		getAuthenticator(request).recordNewPassword(username, newPassword);
+		getAuthenticator(request).recordUserIsLoggedIn(username);
+		LoginProcessBean.removeBean(request);
+	}
+
+	/**
+	 * State change: they decided to cancel the login.
+	 */
+	private void transitionToNowhere(HttpServletRequest request) {
+		log.debug("Cancelling login.");
+		LoginProcessBean.removeBean(request);
+	}
+
+	/**
+	 * Exit: there has been an unexpected exception, so show it.
+	 */
+	private void showSystemError(Exception e, HttpServletResponse response) {
+		log.error("Unexpected error in login process", e);
+		try {
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		} catch (IOException e1) {
+			log.error(e1, e1);
+		}
+	}
+
+	/**
+	 * Exit: user is still logging in, so go back to the page they were on.
+	 */
+	private void showLoginScreen(VitroRequest vreq, HttpServletResponse response)
+			throws IOException {
+		log.debug("logging in.");
+		
+		String referringPage = vreq.getHeader("referer");
+		if (referringPage == null) {
+			log.warn("No referring page on the request");
+			referringPage = getHomeUrl(vreq); 
+		}
+		response.sendRedirect(referringPage);
+		return;
+	}
+
+	/**
+	 * Exit: user cancelled the login, so show them the home page.
+	 */
+	private void redirectCancellingUser(HttpServletRequest request,
+			HttpServletResponse response) throws IOException {
+		log.debug("User cancelled the login. Redirect to site admin page.");
+		LoginProcessBean.removeBean(request);
+		response.sendRedirect(getHomeUrl(request));
+	}
+
+	/** Get a reference to the Authenticator. */
+	private Authenticator getAuthenticator(HttpServletRequest request) {
+		return Authenticator.getInstance(request);
 	}
 
 	/** What's the URL for the home page? */
 	private String getHomeUrl(HttpServletRequest request) {
 		return request.getContextPath();
-	}
-
-	/** Where do we stand in the login process? */
-	private LoginProcessBean getLoginProcessBean(HttpServletRequest request) {
-		return LoginProcessBean.getBeanFromSession(request);
-	}
-
-	/**
-	 * Parse the role URI from User. Don't crash if it is not valid.
-	 */
-	private int parseUserSecurityLevel(User user) {
-		try {
-			return Integer.parseInt(user.getRoleURI());
-		} catch (NumberFormatException e) {
-			log.warn("Invalid RoleURI '" + user.getRoleURI() + "' for user '"
-					+ user.getURI() + "'");
-			return 1;
-		}
 	}
 
 	// ----------------------------------------------------------------------

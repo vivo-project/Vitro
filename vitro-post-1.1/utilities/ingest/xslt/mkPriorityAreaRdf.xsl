@@ -9,7 +9,6 @@
         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
 	xmlns:aiis="http://vivoweb.org/ontology/activity-insight"
 	xmlns:acti="http://vivoweb.org/ontology/activity-insight#"
-        xmlns="http://vivoweb.org/ontology/activity-insight"
 	xmlns:dm="http://www.digitalmeasures.com/schema/data"	
 	xmlns:vfx='http://vivoweb.org/ext/functions'
 	exclude-result-prefixes='xs vfx'
@@ -36,12 +35,54 @@
 <!-- ================================== -->
 <xsl:template match='/aiis:EMPHASIS_LIST'>
 <rdf:RDF>
+<xsl:variable name='rawNewEmphs'>
+<xsl:element name='ExtantEmphs' inherit-namespaces='no'>
+<xsl:for-each select='aiis:IMPACT_STMTS_BY_EMPHASIS'>
+
+<xsl:variable name='name' select='vfx:simple-trim(aiis:EMPHASIS_NAME)'/>
+<xsl:if test='$name != ""'>
+<xsl:variable name='ctr'  select='@counter'/>
+<xsl:variable name='uno' select='$unomap/map[position()=$ctr]/@nuno'/>
+
+<xsl:variable name='knownUri' 
+	select='vfx:knownEmphUri($name, $extantEmphs)'/>
+
+<xsl:variable name='emphuri' 
+	select="if($knownUri != '') then 
+		   $knownUri else 
+		   concat($g_instance,$uno)"/>
+
+<xsl:if test='$knownUri= ""'>
+<xsl:element name='emph' namespace=''>
+
+<xsl:element name='uri' namespace=''>
+<xsl:value-of select='concat("NEW-",$emphuri)'/>
+</xsl:element>
+
+<xsl:element name='name' namespace=''>
+<xsl:value-of select='$name'/>
+</xsl:element>
+
+</xsl:element>
+</xsl:if>
+</xsl:if>
+</xsl:for-each>
+</xsl:element>
+</xsl:variable>
+
+<xsl:variable name='uniqueNewEmphs'>
+<xsl:call-template name='NewEmphs'>
+<xsl:with-param name='knowns' select='$rawNewEmphs/ExtantEmphs'/>
+</xsl:call-template>
+</xsl:variable>
+
 
 
 <xsl:for-each select='aiis:IMPACT_STMTS_BY_EMPHASIS'>
 
 <!-- create an acti:PriorityArea -->
 
+<xsl:variable name='name' select='vfx:simple-trim(aiis:EMPHASIS_NAME)'/>
 
 <xsl:variable name='ctr'  select='@counter'/>
 <xsl:variable name='uno' select='$unomap/map[position()=$ctr]/@nuno'/>
@@ -51,26 +92,35 @@
 
 <!-- =================================================== -->
 <!-- Declare a acti:PriorityArea (use extant PA if it exists) -->
+<xsl:if test='$name'>
+<xsl:variable name='knownUri' 
+	select='vfx:knownEmphUri($name, 
+				$extantEmphs union
+				$rawNewEmphs/ExtantEmphs)'/>
 
-<xsl:variable name='knownUri' select='vfx:knownEmphUri(aiis:EMPHASIS_NAME, $extantEmphs)'/>
+<xsl:variable name='emphuri'
+	select='if(starts-with($knownUri,"NEW-")) then 
+		substring-after($knownUri,"NEW-") else 
+		$knownUri'/>
 
-<xsl:variable name='emphuri' select="if($knownUri != '') then $knownUri else concat($g_instance,$uno)"/>
+<xsl:comment><xsl:value-of select='$emphuri'/> - 
+<xsl:value-of select='$knownUri'/></xsl:comment>
 
-<!-- xsl:comment><xsl:value-of select='$emphuri'/> - <xsl:value-of select='$knownUri'/></xsl:comment -->
 
-<xsl:if test='$knownUri = ""'>
 <rdf:Description rdf:about="{$emphuri}">
-<rdf:type rdf:resource='http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing'/>
-<rdf:type rdf:resource='http://vivoweb.org/ontology/activity-insight#PriorityArea'/>
+<rdf:type rdf:resource=
+	'http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing'/>
+<rdf:type rdf:resource=
+	'http://vivoweb.org/ontology/activity-insight#PriorityArea'/>
 
 <rdfs:label>
-<xsl:value-of select='vfx:trim(aiis:EMPHASIS_NAME)'/>
+<xsl:value-of select='$name'/>
 </rdfs:label>
 <core:description>
-<xsl:value-of select='vfx:trim(aiis:EMPHASIS_NAME)'/>
+<xsl:value-of select='$name'/>
 </core:description>
 </rdf:Description>
-</xsl:if>
+
 
 <!-- =================================================== -->
 <!-- now process the impact stmts attributed to this priority area -->
@@ -79,33 +129,32 @@
 <xsl:with-param name='isbyemph' select='aiis:IMPACT_STMT_ID_LIST'/>
 <xsl:with-param name='emphref' select="$emphuri"/>
 </xsl:call-template>
+</xsl:if>
 
 </xsl:for-each>
 
 <!-- =================================================== 
- at this point we re-run part of the last for loop to make a new list of
-priority area
- and their uri's to save in the extant priority area Out xml file
+
 -->
 <xsl:result-document href='{$extEmphOut}'>
 <xsl:element name='ExtantEmphs' namespace=''>
-<xsl:for-each select='aiis:IMPACT_STMTS_BY_EMPHASIS'>
-
-<xsl:variable name='ctr'  select='@counter'/>
-<xsl:variable name='uno' select='$unomap/map[position()=$ctr]/@nuno'/>
-<xsl:variable name='knownUri' select='vfx:knownEmphUri(aiis:EMPHASIS_NAME, $extantEmphs)'/>
-
-<xsl:variable name='emphuri' select="if($knownUri != '') then $knownUri else concat($g_instance,$uno)"/>
-
+<xsl:value-of select='$NL'/>
+<xsl:comment>
+<xsl:value-of select='count($uniqueNewEmphs//emph)'/>
+</xsl:comment>
+<xsl:value-of select='$NL'/>
+<xsl:for-each select='$uniqueNewEmphs//emph'>
 
 <xsl:element name='emph' namespace=''>
 
 <xsl:element name='uri' namespace=''>
-<xsl:value-of select='$emphuri'/>
+<xsl:value-of select=
+	'if(starts-with(uri,"NEW-")) then 
+		substring-after(uri,"NEW-") else uri'/>
 </xsl:element>
 
 <xsl:element name='name' namespace=''>
-<xsl:value-of select='aiis:EMPHASIS_NAME'/>
+<xsl:value-of select='name'/>
 </xsl:element>
 
 </xsl:element>
@@ -113,9 +162,11 @@ priority area
 
 </xsl:for-each>
 </xsl:element>
+<xsl:value-of select='$NL'/>
 </xsl:result-document>
 
 </rdf:RDF>
+<xsl:value-of select='$NL'/>
 </xsl:template>
 
 <!-- =================================================== -->
@@ -125,6 +176,7 @@ priority area
 <xsl:param name='emphref'/>
 
 <xsl:for-each select='$isbyemph/aiis:IMPACT_STMT_ID'>
+<xsl:if test='./@hasTitle = "Yes" and ./@hasGoodAuthor = "Yes"'>
 <xsl:variable name='aiid' select='.'/>
 
 <!-- =================================================== -->
@@ -139,7 +191,7 @@ priority area
 <acti:priorityAreaOf
 	rdf:resource="{concat($g_instance,$aiid)}"/>
 </rdf:Description>
-
+</xsl:if>
 </xsl:for-each>
 
 </xsl:template>

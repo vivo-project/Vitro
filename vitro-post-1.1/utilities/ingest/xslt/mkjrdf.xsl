@@ -63,13 +63,16 @@ select='vfx:knownJournalUri(aiic:JOURNAL_NAME, $extantJournals)'/>
 </xsl:for-each>
 </xsl:element>
 </xsl:variable>
-<!-- xsl:comment><xsl:value-of select='$prenewJournals/ExtantJournals' separator='|'/> </xsl:comment-->
+<!-- xsl:comment>
+<xsl:value-of select='$prenewJournals/ExtantJournals' separator='|'/> </xsl:comment-->
 <xsl:variable name='newJournals'>
 <xsl:call-template name='NewJournals'>
 <xsl:with-param name='knowns' select='$prenewJournals/ExtantJournals'/>
 </xsl:call-template>
 </xsl:variable>
-<xsl:comment><xsl:value-of select='concat("count=",count($prenewJournals//journal))' separator=' | '/> </xsl:comment>
+<xsl:comment>
+<xsl:value-of select='concat("count=",count($prenewJournals//journal))' separator=' | '/> 
+</xsl:comment>
 
 
 
@@ -82,7 +85,8 @@ select='vfx:knownJournalUri(aiic:JOURNAL_NAME, $extantJournals)'/>
 
 <xsl:variable name='knownUri' 
 select='vfx:knownJournalUri(aiic:JOURNAL_NAME, 
-			    $extantJournals union $prenewJournals/ExtantJournals)'/>
+			    $extantJournals union 
+				$prenewJournals/ExtantJournals)'/>
 
 <xsl:variable name='juri' 
 	select='if(starts-with($knownUri,"NEW-")) then 
@@ -91,7 +95,8 @@ select='vfx:knownJournalUri(aiic:JOURNAL_NAME,
 
 
 <rdf:Description rdf:about="{$juri}">
-<rdf:type rdf:resource='http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing'/>
+<rdf:type rdf:resource=
+	'http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing'/>
 <rdf:type rdf:resource='http://purl.org/ontology/bibo/Journal'/>
 <rdfs:label>
 <xsl:value-of select='vfx:trim(aiic:JOURNAL_NAME)'/>
@@ -120,16 +125,20 @@ rdf:resource='{concat($g_instance,.)}'/>
 <xsl:result-document href='{$extJournalOut}'>
 <xsl:element name='ExtantJournals' namespace=''>
 <xsl:value-of select='$NL'/>
+<xsl:if test='count($newJournals//journal)>0'>
 <xsl:comment>
 <xsl:value-of select='count($newJournals//journal)'/>
 </xsl:comment>
+</xsl:if>
+
 <xsl:for-each select='$newJournals//journal'>
 
 <xsl:element name='journal' namespace=''>
 
 <xsl:element name='uri' namespace=''>
 <xsl:value-of select=
-	'if(starts-with(uri,"NEW-")) then substring-after(uri,"NEW-") else url'/>
+	'if(starts-with(uri,"NEW-")) then 
+		substring-after(uri,"NEW-") else uri'/>
 </xsl:element>
 
 <xsl:element name='name' namespace=''>

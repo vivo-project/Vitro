@@ -9,7 +9,6 @@
         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
 	xmlns:aimc="http://vivoweb.org/ontology/activity-insight"
 	xmlns:acti="http://vivoweb.org/ontology/activity-insight#"
-        xmlns="http://vivoweb.org/ontology/activity-insight"
 	xmlns:dm="http://www.digitalmeasures.com/schema/data"	
 	xmlns:vfx='http://vivoweb.org/ext/functions'
 	exclude-result-prefixes='xs vfx dm'
@@ -28,22 +27,27 @@
 
 <xsl:template match='/aimc:MEDCONT_LIST'>
 <rdf:RDF>
+
 <xsl:for-each select='aimc:MEDCONT'>
 <xsl:if test='aimc:netid != ""'>
+
 <xsl:variable name='mcid' select='@id'/>
 <xsl:variable name='nidxml' 
-select="concat($rawXmlPath,'/',aimc:netid, '.xml')"/>
+	select="concat($rawXmlPath,'/',aimc:netid, '.xml')"/>
 
 <xsl:variable name='mc' select='document($nidxml)//dm:MEDCONT[@id = $mcid]' />
-<xsl:if test='$mc/dm:PUBLIC_VIEW="Yes"'>
-<rdf:Description rdf:about="{concat($g_instance,@id)}" >
-<rdf:type 
-rdf:resource='http://vivoweb.org/ontology/activity-insight#MediaContribution'/>
-<rdf:type 
-rdf:resource='http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing'/>
 
+<xsl:if test='$mc/dm:PUBLIC_VIEW="Yes"'>
+<rdf:Description rdf:about="{concat($g_instance,'AI-',@id)}" >
+<rdf:type 
+	rdf:resource='http://vivoweb.org/ontology/activity-insight#MediaContribution'/>
+<rdf:type 
+	rdf:resource='http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing'/>
+<xsl:variable name='ilk' select="$mc/dm:TYPE"/>
 <rdfs:label>
-<xsl:value-of select="$mc/dm:TYPE"/>
+	<xsl:value-of select="if($ilk = 'Other') then 
+				'Media other than Print, Broadcast and Internet' 
+				else $ilk"/>
 </rdfs:label>
 
 <acti:contributionArea>

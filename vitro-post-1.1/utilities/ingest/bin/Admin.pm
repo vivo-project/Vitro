@@ -20,7 +20,8 @@ if($Phases{'ADC'}>0 || $g_all){
 if($Phases{'ADR'}>0 || $g_all){
     print "\nPhase = ADR ================================\n";
     $g_curPhase = 'ADR';
-    mkUnoFile("$g_adm/cadmin.xml", "index", "$g_adm/adr-unomap.xml");
+    mkUnoFile("$g_adm/cadmin.xml", "index", 
+	      "$g_adm/adr-unomap.xml","AI-ADR-",$op_uno);
     my $cmd = "";
     $cmd .= "java $g_saxonCmdSequence $g_adm/cadmin.xml ";
     $cmd .= "$g_xslts/mkAdminRdf.xsl unoMapFile=$g_adm/adr-unomap.xml ";
@@ -53,7 +54,8 @@ if($Phases{'ADPR'}>0 || $g_all){
     print "\nPhase = ADPR ================================\n";
     $g_curPhase = 'ADPR';
     mkUnoFile("$g_adm/cadminperson.xml", 
-	      "index", "$g_adm/adpr-unomap.xml");
+	      "index", "$g_adm/adpr-unomap.xml",
+	      "AI-ADPR-","$g_store/.Person");
     #initFeedbackFile('Per','ADPR');
     my $cmd = "";
     $cmd .= "java $g_saxonCmdSequence ";

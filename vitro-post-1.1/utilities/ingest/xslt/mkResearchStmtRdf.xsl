@@ -39,11 +39,14 @@
 
 
 <xsl:variable name='prenewps'>
+
 <xsl:element name='ExtantPersons' inherit-namespaces='no'>
 <xsl:for-each select='airstmt:PERSON'>
 <xsl:variable name='ctr'  select='@counter'/>
 <xsl:variable name='uno' select='$unomap/map[position()=$ctr]/@nuno'/>
-
+<xsl:if test='vfx:goodName(airstmt:fname,
+	                   airstmt:mname,
+                           airstmt:lname)'>
 <xsl:variable name='kUri' 
 	select='vfx:knownUriByNetidOrName(airstmt:fname,
 	                       		airstmt:mname,
@@ -70,7 +73,7 @@ select="if($kUri != '') then $kUri
 <xsl:element name='netid' inherit-namespaces='no'>
 <xsl:value-of select='airstmt:netid'/></xsl:element>
 </xsl:element>
-
+</xsl:if>
 </xsl:if>
 </xsl:for-each>
 </xsl:element>
@@ -201,7 +204,9 @@ select="concat($rawXmlPath,'/',$known/netid , '.xml')"/>
 <!-- =================================================== -->
 <xsl:variable name='objid' select='@id'/>
 <xsl:variable name='nidxml' 
-	select="concat($rawXmlPath,'/',vfx:realNetid($nid,$rawXmlPath) , '.xml')"/>
+	select="concat($rawXmlPath,'/',
+		      vfx:realNetid($nid,$rawXmlPath) , 
+		      '.xml')"/>
 
 <!-- CONCENTRATION CONCENTRATION CONCENTRATION -->
 <xsl:if test='doc-available($nidxml)'>

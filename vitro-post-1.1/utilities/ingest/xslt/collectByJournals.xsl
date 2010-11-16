@@ -55,6 +55,7 @@
 <xsl:value-of select='$ref_netid'/>
 </xsl:attribute>
 <xsl:attribute name='hasTitle' select='./@hasTitle'/>
+<xsl:attribute name='hasGoodAuthor' select='./@hasGoodAuthor'/>
 <xsl:attribute name='public'>
 <xsl:value-of select='./@public'/>
 </xsl:attribute>AI-<xsl:value-of select='.'/>

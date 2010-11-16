@@ -21,11 +21,15 @@
 
         <hr class="hidden" />
 
-        <div id="contentwrap">      
-            <div id="content">
-                <#-- We don't do title here because some pages don't get a title, or it may not be the same as the <title> text.
-                <h2>${title}</h2> -->                            
-                ${body} 
+        <div id="contentwrap"> 
+            <#if flash?has_content>
+                <div id="flash-message">
+                    ${flash}
+                </div>
+            </#if>
+            
+            <div id="content">                      
+                ${body}
             </div> <!-- content -->
         </div> <!-- contentwrap -->
     

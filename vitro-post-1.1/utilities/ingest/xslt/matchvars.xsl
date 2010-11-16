@@ -14,7 +14,7 @@
 
 <xsl:variable name='wFullFullMatch' select='1.0'/>
 <xsl:variable name='wFullFullMisMatch' select='-1.0'/>
-<xsl:variable name='wEmptyEmptyMatch' select='1.0'/>
+<xsl:variable name='wEmptyEmptyMatch' select='0.0'/>
 <xsl:variable name='wEmptyNonEmptyMisMatch' select='-.55'/>
 <xsl:variable name='wPartialNonEmptyMisMatch' select='-.75'/>
 <xsl:variable name='wPartialNonEmptyMatch' select='.50'/>

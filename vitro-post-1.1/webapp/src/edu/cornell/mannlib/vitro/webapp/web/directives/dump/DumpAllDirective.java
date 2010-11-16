@@ -57,7 +57,7 @@ public class DumpAllDirective extends BaseTemplateDirectiveModel {
         for (String var : varNames) {
             Object value = dm.get(var);
             if (value instanceof BaseTemplateDirectiveModel) {
-                String help = ((BaseTemplateDirectiveModel) value).help(config);
+                String help = ((BaseTemplateDirectiveModel) value).help(env);
                 directives.add(help);
             } else {
                 models.add(helper.getVariableDump(var));
@@ -80,7 +80,7 @@ public class DumpAllDirective extends BaseTemplateDirectiveModel {
     }
 
    @Override
-    public String help(Configuration config) {
+    public String help(Environment env) {
         Map<String, Object> map = new HashMap<String, Object>();
         
         String name = getDirectiveName();
@@ -94,7 +94,7 @@ public class DumpAllDirective extends BaseTemplateDirectiveModel {
         examples.add("<@" + name + " />");
         map.put("examples", examples);
         
-        return mergeToHelpTemplate(map, config);
+        return mergeToHelpTemplate(map, env);
     }
 
 }

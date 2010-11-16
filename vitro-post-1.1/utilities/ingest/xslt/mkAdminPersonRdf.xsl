@@ -47,8 +47,8 @@ select="if( != '') then  else concat($g_instance,)"/>
 <xsl:if test=' != "" and aiadm:netid != ""'>
 
 <rdf:Description rdf:about="{$peruri}">
-<rdf:type 
-rdf:resource='http://vivoweb.org/ontology/activity-insight#ActivityInsightPerson'/>
+<rdf:type rdf:resource=
+'http://vivoweb.org/ontology/activity-insight#ActivityInsightPerson'/>
 </rdf:Description>
 </xsl:if>
 
@@ -58,8 +58,8 @@ rdf:resource='http://vivoweb.org/ontology/activity-insight#ActivityInsightPerson
 rdf:resource='http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing'/>
 <rdf:type rdf:resource='http://xmlns.com/foaf/0.1/Person'/>
 <xsl:if test='aiadm:netid != ""'>
-<rdf:type 
-rdf:resource='http://vivoweb.org/ontology/activity-insight#ActivityInsightPerson'/>
+<rdf:type rdf:resource=
+'http://vivoweb.org/ontology/activity-insight#ActivityInsightPerson'/>
 </xsl:if>
 <rdfs:label>
 <xsl:value-of select='vfx:trim(aiadm:fullname)'/>
@@ -73,7 +73,8 @@ rdf:resource='http://vivoweb.org/ontology/activity-insight#ActivityInsightPerson
 
 <xsl:if test='aiadm:netid != ""'>
 
-<xsl:variable name='nidxml' select="concat($rawXmlPath,'/',aiadm:netid , '.xml')"/>
+<xsl:variable name='nidxml' 
+	select="concat($rawXmlPath,'/',aiadm:netid , '.xml')"/>
 
 <!-- do not bother with these if file is not available -->
 <xsl:if test='doc-available($nidxml)'>
@@ -81,10 +82,14 @@ rdf:resource='http://vivoweb.org/ontology/activity-insight#ActivityInsightPerson
 <core:workEmail><xsl:value-of select='$pci/dm:EMAIL'/></core:workEmail>
 <bibo:prefixName><xsl:value-of select='$pci/dm:PREFIX'/> </bibo:prefixName>
 <core:workFax>
-<xsl:value-of select='$pci/dm:FAX1'/>-<xsl:value-of select='$pci/dm:FAX2'/>-<xsl:value-of select='$pci/dm:FAX3'/>
+<xsl:value-of 
+	select='$pci/dm:FAX1'/>-<xsl:value-of 
+	select='$pci/dm:FAX2'/>-<xsl:value-of select='$pci/dm:FAX3'/>
 </core:workFax>
 <core:workPhone>
-<xsl:value-of select='$pci/dm:OPHONE1'/>-<xsl:value-of select='$pci/dm:OPHONE2'/>-<xsl:value-of select='$pci/dm:OPHONE3'/>
+<xsl:value-of 
+	select='$pci/dm:OPHONE1'/>-<xsl:value-of 
+	select='$pci/dm:OPHONE2'/>-<xsl:value-of select='$pci/dm:OPHONE3'/>
 </core:workPhone>
 </xsl:if>
 

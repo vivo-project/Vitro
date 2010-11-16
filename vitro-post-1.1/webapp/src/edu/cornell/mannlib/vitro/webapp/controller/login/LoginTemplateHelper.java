@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -101,7 +100,7 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 	 */
 	private TemplateResponseValues showLoginScreen(VitroRequest vreq)
 			throws IOException {
-		LoginProcessBean bean = getLoginProcessBean(vreq);
+		LoginProcessBean bean = LoginProcessBean.getBean(vreq);
 		bean.setState(State.LOGGING_IN);
 		log.trace("Going to login screen: " + bean);
 
@@ -126,7 +125,7 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 	 * change it (unless they cancel out).
 	 */
 	private TemplateResponseValues showPasswordChangeScreen(VitroRequest vreq) {
-		LoginProcessBean bean = getLoginProcessBean(vreq);
+		LoginProcessBean bean = LoginProcessBean.getBean(vreq);
 		bean.setState(State.FORCED_PASSWORD_CHANGE);
 		log.trace("Going to password change screen: " + bean);
 
@@ -159,11 +158,11 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 		Map<String, Object> sharedVariables = getSharedVariables(vreq, new HashMap<String, Object>());
 		Map<String, Object> root = new HashMap<String, Object>(sharedVariables);
 		Map<String, Object> body = new HashMap<String, Object>(sharedVariables);
-		root.putAll(getRootValues(vreq));
+		root.putAll(getPageTemplateValues(vreq));
 
 		// Add the values that we got, and merge to the template.
 		body.putAll(values.getMap());
-		return mergeMapToTemplate(values.getTemplateName(), body, config);
+		return processTemplateToString(values.getTemplateName(), body, config, vreq);
 	}
 
 	/**
@@ -173,25 +172,8 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 		if (LoginStatusBean.getBean(request).isLoggedIn()) {
 			return State.LOGGED_IN;
 		} else {
-			return getLoginProcessBean(request).getState();
+			return LoginProcessBean.getBean(request).getState();
 		}
-	}
-
-	/**
-	 * How is the login process coming along?
-	 */
-	private LoginProcessBean getLoginProcessBean(HttpServletRequest request) {
-		HttpSession session = request.getSession();
-
-		LoginProcessBean bean = (LoginProcessBean) session
-				.getAttribute(LoginProcessBean.SESSION_ATTRIBUTE);
-
-		if (bean == null) {
-			bean = new LoginProcessBean();
-			session.setAttribute(LoginProcessBean.SESSION_ATTRIBUTE, bean);
-		}
-
-		return bean;
 	}
 
 	/** What's the URL for this servlet? */

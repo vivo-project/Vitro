@@ -193,7 +193,7 @@ public class EntityController extends VitroHttpServlet {
         if( view == null){
             if (customView == null) {
                 view = default_jsp;
-                vreq.setAttribute("bodyJsp","/"+Controllers.ENTITY_JSP);
+                vreq.setAttribute("bodyJsp", Controllers.ENTITY_JSP);
                 log.debug("no custom view and no view parameter in request for rendering "+indiv.getName());
             } else {
                 view = default_jsp;

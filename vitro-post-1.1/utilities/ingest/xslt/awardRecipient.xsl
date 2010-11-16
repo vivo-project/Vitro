@@ -29,12 +29,14 @@
 <aiah:RECIPIENT_LIST>
 
 <xsl:for-each-group select='$docs//dm:Record' 
-	group-by='vfx:collapse(concat(dm:PCI/dm:LNAME, "|",
-				dm:PCI/dm:FNAME , "|", 
-				dm:PCI/dm:MNAME))'>
-<xsl:sort select='vfx:collapse(concat(dm:PCI/dm:LNAME, "|",
-				dm:PCI/dm:FNAME , "|", 
-				dm:PCI/dm:MNAME))'/>
+	group-by='vfx:collapse(concat(
+				normalize-space(dm:PCI/dm:LNAME), "|",
+				normalize-space(dm:PCI/dm:FNAME), "|", 
+				normalize-space(dm:PCI/dm:MNAME)))'>
+<xsl:sort select='vfx:collapse(concat(
+				normalize-space(dm:PCI/dm:LNAME), "|",
+				normalize-space(dm:PCI/dm:FNAME), "|", 
+				normalize-space(dm:PCI/dm:MNAME)))'/>
 
 
 <xsl:variable name='auth' select='.'/>

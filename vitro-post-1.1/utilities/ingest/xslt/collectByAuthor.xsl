@@ -115,6 +115,8 @@
             <xsl:attribute name='authorRank'><xsl:value-of select='ai:AUTHORSHIP_POSITION'/></xsl:attribute>
             <xsl:attribute name='public'><xsl:value-of select='ai:PUBLIC'/></xsl:attribute>
 	    <xsl:attribute name='hasTitle' select='ai:ARTICLE_ID/@hasTitle'/>
+	    <xsl:attribute name='hasGoodAuthor' 
+		select='ai:ARTICLE_ID/@hasGoodAuthor'/>
              <xsl:text>AI-</xsl:text>
              <xsl:value-of select='ai:ARTICLE_ID'/>
           </xsl:element>

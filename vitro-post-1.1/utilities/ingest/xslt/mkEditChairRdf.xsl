@@ -31,18 +31,24 @@
 <xsl:for-each select='aiedu:EDITCHAIR'>
 <xsl:if test='aiedu:netid != ""'>
 <xsl:variable name='ecid' select='@id'/>
-<xsl:variable name='nidxml' select="concat($rawXmlPath,'/',aiedu:netid, '.xml')"/>
+<xsl:variable name='nidxml' 
+	select="concat($rawXmlPath,'/',aiedu:netid, '.xml')"/>
 
-<xsl:variable name='ec' select='document($nidxml)//dm:EDITCHAIR[@id = $ecid]' />
+<xsl:variable name='ec' 
+	select='document($nidxml)//dm:EDITCHAIR[@id = $ecid]' />
 <xsl:if test='$ec/dm:PUBLIC_VIEW="Yes"'>
-<rdf:Description rdf:about="{concat($g_instance,@id)}" >
-<rdf:type rdf:resource='http://vivoweb.org/ontology/activity-insight#EditChair'/>
-<rdf:type rdf:resource='http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing'/>
+<rdf:Description rdf:about="{concat($g_instance,'AI-',@id)}" >
+<rdf:type rdf:resource=
+	'http://vivoweb.org/ontology/activity-insight#EditChair'/>
+<rdf:type rdf:resource=
+	'http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing'/>
 <rdfs:label>
 <xsl:value-of select="vfx:trim($ec/dm:TITLE)"/>
 </rdfs:label>
 
-<acti:editChairType><xsl:value-of select='$ec/dm:TYPE'/></acti:editChairType>
+<acti:editChairType>
+	<xsl:value-of select='$ec/dm:TYPE'/>
+</acti:editChairType>
 <acti:month><xsl:value-of select='$ec/dm:DTM_END'/></acti:month>
 <acti:day><xsl:value-of select='$ec/dm:DTD_END'/></acti:day>
 <acti:year><xsl:value-of select='$ec/dm:DTY_END'/></acti:year>
@@ -56,8 +62,12 @@
 </xsl:otherwise>
 </xsl:choose>
 </acti:editChairRole>
-<acti:numberArticlesReviewed><xsl:value-of select='$ec/dm:NUM_REVIEWED'/></acti:numberArticlesReviewed>
-<acti:conferenceTopic><xsl:value-of select='$ec/dm:TYPE'/></acti:conferenceTopic>
+<acti:numberArticlesReviewed>
+	<xsl:value-of select='$ec/dm:NUM_REVIEWED'/>
+</acti:numberArticlesReviewed>
+<acti:conferenceTopic>
+	<xsl:value-of select='$ec/dm:TYPE'/>
+</acti:conferenceTopic>
 <core:description>
 <xsl:value-of select='$ec/dm:DESC'/>
 </core:description>

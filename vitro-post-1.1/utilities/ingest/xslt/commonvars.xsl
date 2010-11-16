@@ -11,7 +11,7 @@
 <xsl:variable name='pfxlen' select='4'/>
 
 <xsl:variable name='g_instance'>
-<xsl:text>http://vivoweb.org/individual/</xsl:text>
+<xsl:text>http://vivo.cornell.edu/individual/</xsl:text>
 </xsl:variable>
 
 </xsl:stylesheet>

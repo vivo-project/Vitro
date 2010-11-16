@@ -141,12 +141,24 @@ public class JenaExportController extends BaseEditController {
 		}
 		
 		response.setContentType( mime );
+		if(mime.equals("application/rdf+xml"))
+			response.setHeader("content-disposition", "attachment; filename=" + "export.rdf");
+		else if(mime.equals("text/n3"))
+			response.setHeader("content-disposition", "attachment; filename=" + "export.n3");
+		else if(mime.equals("text/plain"))
+			response.setHeader("content-disposition", "attachment; filename=" + "export.txt");
+		else if(mime.equals("application/x-turtle"))
+			response.setHeader("content-disposition", "attachment; filename=" + "export.ttl");
+			
 		try {
 			OutputStream outStream = response.getOutputStream();
 			if ( formatParam.startsWith("RDF/XML") ) {
 				outStream.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>".getBytes());
 			}
-			model.write( outStream, formatParam );
+			// 2010-11-02 workaround for the fact that ARP now always seems to 
+			// try to parse N3 using strict Turtle rules.  Avoiding headaches
+			// by always serializing out as Turtle instead of using N3 sugar.
+			model.write( outStream, "N3".equals(formatParam) ? "TTL" : formatParam );
 			outStream.flush();
 			outStream.close();
 		} catch (IOException ioe) {

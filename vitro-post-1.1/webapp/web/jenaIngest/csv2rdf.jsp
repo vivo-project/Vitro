@@ -21,7 +21,7 @@
 
     <h2>Convert CSV to RDF</h2>
 
-    <form action="ingest" method="get"i>
+    <form action="csv2rdf" method="post" enctype="multipart/form-data">
         <input type="hidden" name="action" value="csv2rdf"/>
 
 	<p><input type="radio" name="separatorChar" value="comma" checked="checked"/> comma separated 
@@ -29,6 +29,9 @@
 
     <input type="text" style="width:80%;" name="csvUrl"/>
     <p>CSV file URL (e.g. "file:///")</p>
+    
+    <p>Or upload a file from your computer:</p>
+    <p><input type="file" name="filePath" /></p>
 
     <input type="text" name="namespace"/>
     <p>Namespace in which to generate resources</p>

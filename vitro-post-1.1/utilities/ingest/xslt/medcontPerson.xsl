@@ -2,8 +2,7 @@
 <xsl:stylesheet version='2.0'
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 	xmlns:ai="http://www.digitalmeasures.com/schema/data"
-	xmlns:aiedu="http://vivoweb.org/ontology/activity-insight"
-	xmlns="http://vivoweb.org/ontology/activity-insight"
+	xmlns:aimc="http://vivoweb.org/ontology/activity-insight"
 	xmlns:dm="http://www.digitalmeasures.com/schema/data"
 	xmlns:xs='http://www.w3.org/2001/XMLSchema'
 	xmlns:vfx='http://vivoweb.org/ext/functions'	
@@ -25,7 +24,7 @@
 <xsl:variable name='docs' as='node()*'
 	select='collection($listxml)'/>
 
-<aiedu:MEDCONT_PERSON_LIST>
+<aimc:MEDCONT_PERSON_LIST>
 
 <xsl:for-each-group select='$docs//dm:Record' 
 group-by='vfx:collapse(concat(dm:PCI/dm:LNAME, "|",
@@ -38,44 +37,44 @@ dm:PCI/dm:FNAME , "|", dm:PCI/dm:MNAME))'/>
 <xsl:variable name='rec' select='.'/>
 <xsl:variable name='cur_netid' select='$rec/@username'/>
 <xsl:variable name='cur_aiid' select='$rec/@userId'/>
-<aiedu:PERSON>
+<aimc:PERSON>
 <xsl:attribute name='counter' select='position()'/>
-<aiedu:netid><xsl:value-of select='$cur_netid'/></aiedu:netid>
-<aiedu:uid><xsl:value-of select='$cur_aiid'/></aiedu:uid>
+<aimc:netid><xsl:value-of select='$cur_netid'/></aimc:netid>
+<aimc:uid><xsl:value-of select='$cur_aiid'/></aimc:uid>
 
-<aiedu:fname>
+<aimc:fname>
 <xsl:value-of select='normalize-space($rec/dm:PCI/dm:FNAME)'/>
-</aiedu:fname>
-<aiedu:mname>
+</aimc:fname>
+<aimc:mname>
 <xsl:value-of select='normalize-space($rec/dm:PCI/dm:MNAME)'/>
-</aiedu:mname>
-<aiedu:lname>
+</aimc:mname>
+<aimc:lname>
 <xsl:value-of select='normalize-space($rec/dm:PCI/dm:LNAME)'/>
-</aiedu:lname>
-<aiedu:fullname><xsl:value-of 
+</aimc:lname>
+<aimc:fullname><xsl:value-of 
 select='normalize-space(concat(normalize-space($rec/dm:PCI/dm:LNAME),", ",
 normalize-space($rec/dm:PCI/dm:FNAME), " ", 
-normalize-space($rec/dm:PCI/dm:MNAME)))'/></aiedu:fullname>
+normalize-space($rec/dm:PCI/dm:MNAME)))'/></aimc:fullname>
 
 
 
-<aiedu:MEDCONT_LIST>
+<aimc:MEDCONT_LIST>
 <xsl:for-each select='current-group()'>
 
 <xsl:for-each select='dm:MEDCONT'>
 <xsl:if test='dm:PUBLIC_VIEW="Yes"'>
-<aiedu:MEDCONT>
+<aimc:MEDCONT>
 <xsl:attribute name='id' select='@id'/>
-</aiedu:MEDCONT>
+</aimc:MEDCONT>
 </xsl:if>
 </xsl:for-each>
 
 </xsl:for-each>
-</aiedu:MEDCONT_LIST>
-</aiedu:PERSON>
+</aimc:MEDCONT_LIST>
+</aimc:PERSON>
 </xsl:for-each-group>
 
-</aiedu:MEDCONT_PERSON_LIST>
+</aimc:MEDCONT_PERSON_LIST>
 <xsl:value-of select='$NL'/>
 </xsl:template>
 <!-- ================================== -->

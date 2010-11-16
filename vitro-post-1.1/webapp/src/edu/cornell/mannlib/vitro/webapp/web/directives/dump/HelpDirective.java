@@ -59,7 +59,7 @@ public class HelpDirective extends BaseTemplateDirectiveModel {
         Configuration config = env.getConfiguration();
         Map<String, Object> map = new HashMap<String, Object>();
         
-        String help = ((BaseTemplateDirectiveModel) value).help(config);
+        String help = ((BaseTemplateDirectiveModel) value).help(env);
         map.put("help", help);
         
         try {
@@ -74,7 +74,7 @@ public class HelpDirective extends BaseTemplateDirectiveModel {
     }
     
     
-    public String help(Configuration config) {
+    public String help(Environment env) {
         Map<String, Object> map = new HashMap<String, Object>();
         
         String name = getDirectiveName();
@@ -90,7 +90,7 @@ public class HelpDirective extends BaseTemplateDirectiveModel {
         examples.add("<@" + name + " directive=\"dump\" />");
         map.put("examples", examples);
         
-        return mergeToHelpTemplate(map, config);
+        return mergeToHelpTemplate(map, env);
     }
 
 }

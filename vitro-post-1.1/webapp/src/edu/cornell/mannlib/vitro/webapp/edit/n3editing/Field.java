@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -13,6 +15,8 @@ import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import edu.cornell.mannlib.vitro.webapp.edit.elements.EditElement;
 
 public class Field {
 
@@ -50,6 +54,11 @@ public class Field {
      * What type of options is this?
      */
     private OptionsType optionsType;
+    
+    /**
+     * Special class to use for option type
+     */
+    private Class customOptionType;
     
      /**
      * Used for  building Options when OptionsType is INDIVIDUALS_VIA_OBJECT_PROPERTY
@@ -105,6 +114,11 @@ public class Field {
     private List <String> retractions;
 
     private Map<String, String> queryForExisting;
+
+    /**
+     * Property for special edit element.
+     */
+    private EditElement editElement=null;;
     
     /* *********************** Constructors ************************** */
 
@@ -229,9 +243,34 @@ public class Field {
             setOptionsType(Field.OptionsType.DATE);
         } else if ("TIME".equalsIgnoreCase(s)) {
         	setOptionsType(Field.OptionsType.TIME);
-        } else {
+        } else if ("UNDEFINED".equalsIgnoreCase(s) || s == null || s.isEmpty()){
             setOptionsType(Field.OptionsType.UNDEFINED);
+        } else {
+            setSpecalOptionType(s);
         }
+    }
+
+    private void setSpecalOptionType(String s) {
+        try {
+            Class clz = Class.forName(s);
+            Object obj = clz.newInstance();  
+            editElement = (EditElement)obj;
+        } catch (ClassNotFoundException e) {
+            log.error("Java Class " + s + " not found for field " + name);
+            setOptionsType(Field.OptionsType.UNDEFINED);
+        } catch (SecurityException e) {
+            log.error("Problem with Java Class " + s + " for field " + name, e);
+            setOptionsType(Field.OptionsType.UNDEFINED);
+        } catch (IllegalArgumentException e) {
+            log.error("Problem with Java Class " + s + " for field " + name, e);
+            setOptionsType(Field.OptionsType.UNDEFINED);
+        } catch (InstantiationException e) {
+            log.error("Problem with Java Class " + s + " for field " + name, e);
+            setOptionsType(Field.OptionsType.UNDEFINED);
+        } catch (IllegalAccessException e) {
+            log.error("Problem with Java Class " + s + " for field " + name, e);
+            setOptionsType(Field.OptionsType.UNDEFINED);
+        }                 
     }
 
     public String getPredicateUri() {
@@ -322,5 +361,8 @@ public class Field {
        return copy;
     }
 
+    public EditElement getEditElement(){
+        return editElement;
+    }
 
 }
