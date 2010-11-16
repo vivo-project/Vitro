@@ -12,6 +12,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State;
 import freemarker.core.Environment;
@@ -24,6 +25,7 @@ public class LoginWidget extends Widget {
     private static enum Macro {
         LOGIN("loginForm"),
         FORCE_PASSWORD_CHANGE("forcePasswordChange"),
+        ALREADY_LOGGED_IN("alreadyLoggedIn"),
         SERVER_ERROR("error");
         
         private final String macroName;
@@ -71,7 +73,15 @@ public class LoginWidget extends Widget {
                         
             switch (state) {
             case LOGGED_IN:
-                return null;
+                // On the login page itself, show a message that the user is already logged in.
+                // Otherwise, when redirecting to login page from a page that the logged-in user
+                // doesn't have access to, we would just show a blank page.
+                if (request.getServletPath().equals(Route.LOGIN.path())) {
+                    values = showMessageToLoggedInUser(request);
+                    break;
+                } else {
+                    return null;
+                }
             case FORCED_PASSWORD_CHANGE:
                 values = showPasswordChangeScreen(request);
                 break;
@@ -112,6 +122,10 @@ public class LoginWidget extends Widget {
         }
 
         return values;
+    }
+    
+    private WidgetTemplateValues showMessageToLoggedInUser(HttpServletRequest request) {
+        return new WidgetTemplateValues(Macro.ALREADY_LOGGED_IN.toString());
     }
 
     /**

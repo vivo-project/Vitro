@@ -82,8 +82,8 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
 	        
 	        ResponseValues responseValues;
 	        
-	        // checkLoginStatus() does a redirect if the user is not logged in.
-	        if (requiresLogin() && !checkLoginStatus(request, response)) {
+	        // This method does a redirect if the required login level is not met, so just return.
+	        if (requiredLoginLevelNotFound(request, response)) {
 	            return; 
 	        } else {
 	            responseValues = processRequest(vreq);
@@ -106,14 +106,27 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
             FreemarkerConfigurationLoader.getFreemarkerConfigurationLoader(getServletContext());
         return loader.getConfig(vreq);
     }
+
+    private boolean requiredLoginLevelNotFound(HttpServletRequest request, HttpServletResponse response) {
+        int requiredLoginLevel = requiresLoginLevel();
+        // checkLoginStatus() does a redirect if the user is not logged in.
+        if (requiredLoginLevel > LoginStatusBean.ANYBODY && !checkLoginStatus(request, response, requiredLoginLevel)) {
+            return true;
+        }
+        return false;
+    }
     
     protected boolean requiresLogin() {
+        return false;
+    }
+    
+    protected int requiresLoginLevel() {
         // By default, user does not need to be logged in to view pages.
-        // Subclasses that require login to process their page will override to return true.
+        // Subclasses that require login to process their page will override to return the required login level.
         // NB This method can't be static, because then the superclass method gets called rather than
         // the subclass method. For the same reason, it can't refer to a static or instance field
-        // REQUIRES_LOGIN which is overridden in the subclass.
-        return false;
+        // REQUIRES_LOGIN_LEVEL which is overridden in the subclass.
+        return LoginStatusBean.ANYBODY;
     }
     
     // Subclasses will override

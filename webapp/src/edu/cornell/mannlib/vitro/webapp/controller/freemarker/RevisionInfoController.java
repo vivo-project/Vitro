@@ -8,6 +8,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.config.RevisionInfoBean;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 
@@ -18,6 +19,11 @@ public class RevisionInfoController extends FreemarkerHttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(RevisionInfoController.class);
     private static final String TEMPLATE_DEFAULT = "revisionInfo.ftl";
+
+    @Override
+    protected int requiresLoginLevel() {
+        return LoginStatusBean.EDITOR;
+    }
     
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {

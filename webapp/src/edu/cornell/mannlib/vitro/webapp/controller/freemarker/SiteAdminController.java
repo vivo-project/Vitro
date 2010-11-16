@@ -35,36 +35,35 @@ public class SiteAdminController extends FreemarkerHttpServlet {
 	}
 
     @Override
-    protected boolean requiresLogin() {
+    protected int requiresLoginLevel() {
         // User must be logged in to view this page.
-        return true;
+        return LoginStatusBean.EDITOR;
     }
     
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
-
+        // Note that we don't get here unless logged in at least at editor level, due
+        // to requiresLoginLevel().
     	LoginStatusBean loginBean = LoginStatusBean.getBean(vreq);
     	
-        Map<String, Object> body = new HashMap<String, Object>();
-        
-        if (loginBean.isLoggedInAtLeast(LoginStatusBean.EDITOR)) {
+        Map<String, Object> body = new HashMap<String, Object>();        
 
-            UrlBuilder urlBuilder = new UrlBuilder(vreq.getPortal());
+        UrlBuilder urlBuilder = new UrlBuilder(vreq.getPortal());
+        
+        body.put("dataInput", getDataInputData(vreq));
+
+        if (loginBean.isLoggedInAtLeast(LoginStatusBean.CURATOR)) {
+            body.put("siteConfig", getSiteConfigurationData(vreq, urlBuilder));
+            body.put("ontologyEditor", getOntologyEditorData(vreq, urlBuilder));
             
-            body.put("dataInput", getDataInputData(vreq));
-    
-            if (loginBean.isLoggedInAtLeast(LoginStatusBean.CURATOR)) {
-                body.put("siteConfig", getSiteConfigurationData(vreq, urlBuilder));
-                body.put("ontologyEditor", getOntologyEditorData(vreq, urlBuilder));
+            if (loginBean.isLoggedInAtLeast(LoginStatusBean.DBA)) {
+                body.put("dataTools", getDataToolsData(vreq, urlBuilder));
                 
-                if (loginBean.isLoggedInAtLeast(LoginStatusBean.DBA)) {
-                    body.put("dataTools", getDataToolsData(vreq, urlBuilder));
-                    
-                    // Only for DataStar. Should handle without needing a DataStar-specific version of this controller.
-                    //body.put("customReports", getCustomReportsData(vreq));
-                }
+                // Only for DataStar. Should handle without needing a DataStar-specific version of this controller.
+                //body.put("customReports", getCustomReportsData(vreq));
             }
         }
+        
         return new TemplateResponseValues(TEMPLATE_DEFAULT, body);
  
     }

@@ -78,6 +78,11 @@
     </section>
 </#macro>
 
+<#macro alreadyLoggedIn>
+    <h2>Log in</h2>
+    <p>You are already logged in. You may have been redirected to this page because you tried to access a page that you do not have permission to view.</p>
+</#macro>
+
 <#macro error>
     <p>There was an error in the system.</p>
 </#macro>
