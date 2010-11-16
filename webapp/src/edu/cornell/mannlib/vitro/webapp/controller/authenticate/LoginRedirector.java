@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.controller.authenticate;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
 
@@ -107,9 +106,9 @@ public class LoginRedirector {
 
 	/** What's the URL for the site admin screen? */
 	private String getSiteAdminUrl(HttpServletRequest request) {
+	    // return Route.SITE_ADMIN.url();
 		String contextPath = request.getContextPath();
-		String urlParams = "?login=block";
-		return contextPath + Controllers.SITE_ADMIN + urlParams;
+		return contextPath + Controllers.SITE_ADMIN;
 	}
 
 	/** Get a reference to the Authenticator. */

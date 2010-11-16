@@ -77,7 +77,8 @@ public class TemplateProcessingHelper {
         try {
             template = config.getTemplate(templateName);
         } catch (IOException e) {
-            log.error("Cannot get template " + templateName);
+            // RY Should probably throw this error instead.
+            log.error("Cannot get template " + templateName, e);
         }  
         return template;
     }

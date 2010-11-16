@@ -28,6 +28,7 @@ import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.AuthenticatorStub;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State;
 
@@ -46,8 +47,8 @@ public class AuthenticateTest extends AbstractTestClass {
 
 	private static final String URL_LOGIN_PAGE = "http://my.local.site/vivo/"
 			+ Controllers.LOGIN;
-	private static final String URL_SITE_ADMIN_PAGE = Controllers.SITE_ADMIN
-			+ "?login=block";
+	private static final String URL_SITE_ADMIN_PAGE = Controllers.SITE_ADMIN;
+
 	private static final String URL_HOME_PAGE = "";
 	private static final String URL_SESSION_REDIRECT = "/sessionRedirect";
 	private static final String URL_CONTEXT_REDIRECT_LOCAL = "/servletContextRedirect";
@@ -90,6 +91,7 @@ public class AuthenticateTest extends AbstractTestClass {
 
 		auth = new Authenticate();
 		auth.init(servletConfig);
+		
 	}
 
 	private User createNewDbaUser() {

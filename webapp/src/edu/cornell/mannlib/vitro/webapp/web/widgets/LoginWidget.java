@@ -80,7 +80,7 @@ public class LoginWidget extends Widget {
             }
         } catch (Exception e) {
             log.error(e);
-            values =  showError(e);
+            values = showError(e);
         } 
         values.put("urls", urls);
         return values;

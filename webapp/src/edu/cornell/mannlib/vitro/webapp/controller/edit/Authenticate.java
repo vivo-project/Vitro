@@ -55,16 +55,6 @@ public class Authenticate extends VitroHttpServlet {
 	/** If this parameter is "true" (ignoring case), cancel the login. */
 	private static final String PARAMETER_CANCEL = "cancel";
 
-	/** If they are logging in, show them this form. */
-	public static final String TEMPLATE_LOGIN = "login-form.ftl";
-
-	/** If they are changing their password on first login, show them this form. */
-	public static final String TEMPLATE_FORCE_PASSWORD_CHANGE = "login-forcedPasswordChange.ftl";
-
-	public static final String BODY_LOGIN_NAME = "loginName";
-	public static final String BODY_FORM_ACTION = "formAction";
-	public static final String BODY_ERROR_MESSAGE = "errorMessage";
-
 	/** Where do we find the User/Session map in the servlet context? */
 	public static final String USER_SESSION_MAP_ATTR = "userURISessionMap";
 

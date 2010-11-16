@@ -82,8 +82,9 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
 	        
 	        ResponseValues responseValues;
 	        
+	        // checkLoginStatus() does a redirect if the user is not logged in.
 	        if (requiresLogin() && !checkLoginStatus(request, response)) {
-	            responseValues = new RedirectResponseValues(UrlBuilder.Route.LOGIN.path());
+	            return; 
 	        } else {
 	            responseValues = processRequest(vreq);
 	        }
@@ -299,7 +300,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         urls.put("termsOfUse", urlBuilder.getPortalUrl(Route.TERMS_OF_USE));  
         urls.put("login", urlBuilder.getPortalUrl(Route.LOGIN));          
         urls.put("logout", urlBuilder.getLogoutUrl());       
-        urls.put("siteAdmin", urlBuilder.getPortalUrl(Route.LOGIN));  
+        urls.put("siteAdmin", urlBuilder.getPortalUrl(Route.SITE_ADMIN));  
         urls.put("siteIcons", urlBuilder.getPortalUrl(themeDir + "/site_icons"));
         urls.put("themeImages", urlBuilder.getPortalUrl(themeDir + "/images"));
         urls.put("images", urlBuilder.getUrl("/images"));

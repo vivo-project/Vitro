@@ -31,7 +31,7 @@ public class UrlBuilder {
         INDIVIDUAL("/individual"),
         INDIVIDUAL_EDIT("/entityEdit"),
         INDIVIDUAL_LIST("/individuallist"),
-        LOGIN("/siteAdmin"), // when login page is separated from site admin page, change to "/login"
+        LOGIN("/login"), 
         LOGOUT("/login_process.jsp"),
         SEARCH("/search"),
         SITE_ADMIN("/siteAdmin"),
