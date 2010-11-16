@@ -59,14 +59,19 @@ public class DisplayMessage {
 	 * If there is no message, return the empty string.
 	 */
 	public static String getMessageAndClear(HttpSession session) {
+	    String message = NO_MESSAGE;
 		if (session != null) {
-			Object message = session.getAttribute(ATTRIBUTE_NAME);
-			if (message instanceof String) {
-				log.debug("Get message: '" + message + "'");
-				return (String) message;
+			Object sessionMessage = session.getAttribute(ATTRIBUTE_NAME);
+			if (sessionMessage != null) {
+    			if (sessionMessage instanceof String) {
+    				log.debug("Get message: '" + sessionMessage + "'");    				
+    				message = (String) sessionMessage;
+    			} 
+    			session.removeAttribute(ATTRIBUTE_NAME);	
+			} else {
+			    log.debug("Get no message.");
 			}
-		}
-		log.debug("Get no message.");
-		return NO_MESSAGE;
+		}				
+		return message;
 	}
 }

@@ -21,6 +21,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
+import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.config.RevisionInfoBean;
 import edu.cornell.mannlib.vitro.webapp.controller.ContactMailServlet;
@@ -35,7 +36,6 @@ import edu.cornell.mannlib.vitro.webapp.web.templatemodels.files.Scripts;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.files.Stylesheets;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu.TabMenu;
 import freemarker.ext.beans.BeansWrapper;
-import freemarker.ext.servlet.AllHttpScopesHashModel;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.TemplateModel;
@@ -396,6 +396,11 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         String bannerImage = portal.getBannerImage();  
         if ( ! StringUtils.isEmpty(bannerImage)) {
             map.put("bannerImage", UrlBuilder.getUrl(themeDir + "site_icons/" + bannerImage));
+        }
+
+        String flashMessage = DisplayMessage.getMessageAndClear(vreq);
+        if (! flashMessage.isEmpty()) {
+            map.put("flash", flashMessage);
         }
         
         return map;        

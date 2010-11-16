@@ -21,7 +21,13 @@
 
         <hr class="hidden" />
 
-        <div id="contentwrap">      
+        <div id="contentwrap"> 
+            <#if flash?has_content>
+                <div id="flash-message">
+                    ${flash}
+                </div>
+            </#if>
+            
             <div id="content">                      
                 ${body}
             </div> <!-- content -->
