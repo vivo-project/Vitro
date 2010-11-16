@@ -15,15 +15,16 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.FakeSelfEditingIdentifierFactory;
-import edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep;
 
 /**
  * TODO This is caught in the middle of the transition from LoginFormBean to LoginStatusBean.
  */
 public class FakeSelfEditController extends VitroHttpServlet {
+	// TODO When the LoginFormBean goes away, these should too.
 	private static final String ATTRIBUTE_LOGIN_FORM_BEAN = "loginHandler";
-	private static final String ATTRIBUTE_LOGIN_STATUS_BEAN = "loginStatus";
 	private static final String ATTRIBUTE_LOGIN_FORM_SAVE = "saveLoginHandler";
+	
+	private static final String ATTRIBUTE_LOGIN_STATUS_BEAN = "loginStatus";
 	private static final String ATTRIBUTE_LOGIN_STATUS_SAVE = "saveLoginStatus";
 
 	private static final Log log = LogFactory
@@ -63,7 +64,6 @@ public class FakeSelfEditController extends VitroHttpServlet {
 	private void startFaking(VitroRequest vreq, HttpServletResponse response)
 			throws IOException {
 		HttpSession session = vreq.getSession();
-		VitroRequestPrep.forceToSelfEditing(vreq);
 		String id = vreq.getParameter("netid");
 		FakeSelfEditingIdentifierFactory.putFakeIdInSession(id, session);
 
@@ -80,7 +80,6 @@ public class FakeSelfEditController extends VitroHttpServlet {
 
 	private void stopFaking(VitroRequest request, HttpServletResponse response,
 			HttpSession session) throws IOException {
-		VitroRequestPrep.forceOutOfSelfEditing(request);
 		FakeSelfEditingIdentifierFactory.clearFakeIdInSession(session);
 
 		// Restore our original login status.

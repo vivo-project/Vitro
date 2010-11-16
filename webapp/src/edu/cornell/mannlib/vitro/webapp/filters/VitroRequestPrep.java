@@ -20,11 +20,14 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.Identifier;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory.SelfEditing;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.ServletIdentifierBundleFactory;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
 import edu.cornell.mannlib.vitro.webapp.dao.PortalDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
@@ -400,19 +403,28 @@ public class VitroRequestPrep implements Filter {
         (new VitroRequest(request)).setPortalId( portalId.toString() );
     }
 
-    public static void forceToSelfEditing(HttpServletRequest request){
-        HttpSession sess = request.getSession(true);
-        sess.setMaxInactiveInterval(Authenticator.LOGGED_IN_TIMEOUT_INTERVAL);
-        sess.setAttribute("inSelfEditing","true");
-    }
-    public static void forceOutOfSelfEditing(HttpServletRequest request){
-        HttpSession sess = request.getSession(true);
-        sess.removeAttribute("inSelfEditing");
-    }
-    public static boolean isSelfEditing(HttpServletRequest request){
-        HttpSession sess = request.getSession(false);
-        return sess != null && "true".equalsIgnoreCase((String)sess.getAttribute("inSelfEditing")) ;
-    }
+	/**
+	 * Check to see whether any of the current identifiers is a SelfEditing
+	 * identifier.
+	 */
+	public static boolean isSelfEditing(HttpServletRequest request) {
+		HttpSession session = request.getSession(false);
+		if (session == null) {
+			return false;
+		}
+		ServletContext sc = session.getServletContext();
+
+		IdentifierBundle idBundle = ServletIdentifierBundleFactory
+				.getIdBundleForRequest(request, session, sc);
+
+		for (Identifier id : idBundle) {
+			if (id instanceof SelfEditing) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 
     public void destroy() {       
     }
