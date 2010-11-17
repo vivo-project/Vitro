@@ -4,12 +4,12 @@
 
 ${stylesheets.add("/css/revision.css")} 
 
-<section  role="region">
+<section role="region">
     <h2>Revision Information</h2>
     
-    <section id="revision-levels"  role="region">
+    <section id="revision-levels" role="region">
         
-        <table summary = "This table shows revision levels">
+        <table summary="VIVO revision's levels table">
             <caption>Levels:</caption>
             
             <tr>
