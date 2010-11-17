@@ -16,6 +16,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.web.ViewFinder;
 import edu.cornell.mannlib.vitro.webapp.web.ViewFinder.ClassView;
 
@@ -57,13 +58,20 @@ public class IndividualTemplateModel extends BaseTemplateModel {
         
         URI uri = new URIImpl(individualUri);
         String namespace = uri.getNamespace();
-        String defaultNamespace = vreq.getWebappDaoFactory().getDefaultNamespace();
-        
+        WebappDaoFactory wadf = vreq.getWebappDaoFactory();
+        String defaultNamespace = wadf.getDefaultNamespace();
+                
         if (defaultNamespace.equals(namespace)) {
             profileUrl = getUrl(PATH + "/" + individual.getLocalName());
         } else {
-            ParamMap params = new ParamMap("uri", individualUri);
-            profileUrl = getUrl("/individual", params);
+            List<String> externallyLinkedNamespaces = wadf.getApplicationDao().getExternallyLinkedNamespaces();
+            if (externallyLinkedNamespaces.contains(namespace)) {
+                log.debug("Found externally linked namespace " + namespace);
+                profileUrl = namespace + "/" + individual.getLocalName();
+            } else {
+                ParamMap params = new ParamMap("uri", individualUri);
+                profileUrl = getUrl("/individual", params);
+            }
         }
         
         return profileUrl;
@@ -187,6 +195,10 @@ public class IndividualTemplateModel extends BaseTemplateModel {
           models.add(new IndividualTemplateModel(individual, vreq));
         }  
         return models;
+    }
+    
+    private boolean isExternallyLinkedNamespace(String namespace,List<String> externallyLinkedNamespaces) {     
+        return externallyLinkedNamespaces.contains(namespace);
     }
 
     // public Map< > getPropertyList
