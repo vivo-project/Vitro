@@ -15,7 +15,6 @@
 
 <%
     if(  request.getParameter("force") != null ){        
-        VitroRequestPrep.forceToSelfEditing(request);
         String netid = request.getParameter("netid");
         // note that this affects the current user's session, not the whole servlet context
         FakeSelfEditingIdentifierFactory.clearFakeIdInSession( session );
@@ -28,7 +27,6 @@
 <%  }
     String loggedOutNetId = (String)session.getAttribute(FakeSelfEditingIdentifierFactory.FAKE_SELF_EDIT_NETID);
     if( request.getParameter("stopfaking") != null){
-        VitroRequestPrep.forceOutOfSelfEditing(request);
         FakeSelfEditingIdentifierFactory.clearFakeIdInSession( session );        
      	// don't want to do this because would affect the whole session
         // if (!LoginStatusBean.getBean(request).isLoggedInAtLeast(LoginStatusBean.CURATOR)) {

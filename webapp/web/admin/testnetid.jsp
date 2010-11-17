@@ -74,7 +74,6 @@ private void checkNetId( String inNetId, JspWriter out, HttpServletRequest reque
         }else{
             out.println("could not find a Individual with the neditd of " + inNetId );
         }
-            //putNetIdInSession(session, selfE, netid);            
         
     }else{
         out.println("no remote user value found or value was longer than 100 chars.");    
