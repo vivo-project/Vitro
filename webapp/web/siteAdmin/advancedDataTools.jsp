@@ -10,7 +10,8 @@
 	        <li><a href="uploadRDFForm?home=<%=portal.getPortalId()%>">Add/Remove RDF data</a></li>
 	        <li><a href="export?home=<%=portal.getPortalId()%>">RDF export</a></li>
 	        <%-- <li><a href="refactorOp?home=<%=portal.getPortalId()%>&amp;modeStr=fixDataTypes">Datatype literal realignment</a></li> --%> 
-	        <li><a href="admin/sparqlquery">SPARQL query</a></li> 
+	        <li><a href="admin/sparqlquery">SPARQL query</a></li>
+	        <li><a href="admin/sparqlquerybuilder">SPARQL query builder</a></li> 
         </ul>
     </div>
 <% } %> 
