@@ -361,7 +361,7 @@ public class JenaNetidPolicy extends DefaultInconclusivePolicy implements Visiti
     /**
      * An inner class used to setup everything that's needed for
      * a JenaNetidPolicy.  This setups the JenaNetidPolicy and a
-     * NetIdIdentifierFactory.
+     * SelfEditingIdentifierFactory.
      *
      * @author bdc34
      *
