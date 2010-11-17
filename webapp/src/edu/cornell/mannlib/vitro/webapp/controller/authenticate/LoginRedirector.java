@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.controller.authenticate;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
 
@@ -23,9 +24,23 @@ import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 public class LoginRedirector {
 	private static final Log log = LogFactory.getLog(LoginRedirector.class);
 
+	public void redirectSelfEditingUser(HttpServletRequest request,
+			HttpServletResponse response, String uri) throws IOException {
+		String userHomePage = assembleUserHomePageUrl(request, uri);
+		log.debug("Redirecting self-editor to " + userHomePage);
+		response.sendRedirect(userHomePage);
+	}
+
+	public void redirectUnrecognizedUser(HttpServletRequest request,
+			HttpServletResponse response, String username) throws IOException {
+		log.debug("Redirecting unrecognized user: " + username);
+		response.sendRedirect(request.getContextPath()
+				+ "/unrecognizedUser?username=" + username);
+	}
+
 	/**
 	 * <pre>
-	 * Exit: the user is logged in. They might go to:
+	 * The user is logged in. They might go to:
 	 * - A one-time redirect, stored in the session, if they had tried to
 	 *     bookmark to a page that requires login.
 	 * - An application-wide redirect, stored in the servlet context.
@@ -68,9 +83,8 @@ public class LoginRedirector {
 			List<String> uris = getAuthenticator(request)
 					.asWhomMayThisUserEdit(user);
 			if (uris != null && uris.size() > 0) {
-				String userHomePage = request.getContextPath()
-						+ "/individual?uri="
-						+ URLEncoder.encode(uris.get(0), "UTF-8");
+				String userHomePage = assembleUserHomePageUrl(request,
+						uris.get(0));
 				log.debug("User is logged in. Redirect as self-editor to "
 						+ userHomePage);
 				response.sendRedirect(userHomePage);
@@ -106,7 +120,6 @@ public class LoginRedirector {
 
 	/** What's the URL for the site admin screen? */
 	private String getSiteAdminUrl(HttpServletRequest request) {
-	    // return Route.SITE_ADMIN.url();
 		String contextPath = request.getContextPath();
 		return contextPath + Controllers.SITE_ADMIN;
 	}
@@ -116,4 +129,9 @@ public class LoginRedirector {
 		return Authenticator.getInstance(request);
 	}
 
+	private String assembleUserHomePageUrl(HttpServletRequest request,
+			String uri) throws UnsupportedEncodingException {
+		return request.getContextPath() + "/individual?uri="
+				+ URLEncoder.encode(uri, "UTF-8");
+	}
 }

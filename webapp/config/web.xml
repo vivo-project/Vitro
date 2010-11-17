@@ -1087,14 +1087,28 @@
   </servlet>
 
   <servlet>
-    <servlet-name>loginShibboleth</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.authenticate.LoginShibboleth</servlet-class>
+    <servlet-name>loginExternalAuthSetup</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.authenticate.LoginExternalAuthSetup</servlet-class>
+  </servlet>
+
+  <servlet>
+    <servlet-name>loginExternalAuthReturn</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.authenticate.LoginExternalAuthReturn</servlet-class>
   </servlet>
 
   <servlet>
     <servlet-name>logout</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.Logout</servlet-class>
   </servlet>
+
+  <servlet>
+    <servlet-name>unrecognizedUser</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.authenticate.UnrecognizedUserController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>unrecognizedUser</servlet-name>
+    <url-pattern>/unrecognizedUser</url-pattern>
+  </servlet-mapping>
 
   <servlet>
     <servlet-name>browsecontroller</servlet-name>
@@ -1257,6 +1271,14 @@
   <servlet-mapping>
     <servlet-name>loginShibboleth</servlet-name>
     <url-pattern>/loginShibboleth</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>loginExternalAuthSetup</servlet-name>
+    <url-pattern>/loginExternalAuth</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>loginExternalAuthReturn</servlet-name>
+    <url-pattern>/loginExternalAuthReturn</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <!-- for backward-compatibility -->
