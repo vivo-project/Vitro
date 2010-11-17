@@ -170,7 +170,8 @@ public class SiteAdminController extends FreemarkerHttpServlet {
         urls.put("ingest", urlBuilder.getUrl("/ingest"));
         urls.put("rdfData", urlBuilder.getPortalUrl("/uploadRDFForm"));
         urls.put("rdfExport", urlBuilder.getPortalUrl("/export"));
-        urls.put("sparqlQuery", urlBuilder.getUrl("/admin/sparqlquery"));        
+        urls.put("sparqlQuery", urlBuilder.getUrl("/admin/sparqlquery"));
+        urls.put("sparqlQueryBuilder", urlBuilder.getUrl("/admin/sparqlquerybuilder"));
         map.put("urls", urls);
         
         return map;
