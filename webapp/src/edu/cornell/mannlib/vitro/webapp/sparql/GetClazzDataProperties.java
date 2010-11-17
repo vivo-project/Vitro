@@ -54,32 +54,11 @@ public class GetClazzDataProperties extends BaseEditController {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
+		if( !checkLoginStatus(request, response) )
+        	return;
 		VitroRequest vreq = new VitroRequest(request);
 
-		Object obj = vreq.getSession().getAttribute("loginHandler");
-		LoginFormBean loginHandler = null;
-		if (obj != null && obj instanceof LoginFormBean)
-			loginHandler = ((LoginFormBean) obj);
-		if (loginHandler == null
-				|| !"authenticated".equalsIgnoreCase(loginHandler
-						.getLoginStatus()) ||
-				// rjy7 Allows any editor (including self-editors) access to
-				// this servlet.
-				// This servlet is now requested via Ajax from some custom
-				// forms, so anyone
-				// using the custom form needs access rights.
-				Integer.parseInt(loginHandler.getLoginRole()) < LoginFormBean.NON_EDITOR) {
-			HttpSession session = request.getSession(true);
-
-			session.setAttribute("postLoginRequest", vreq.getRequestURI()
-					+ (vreq.getQueryString() != null ? ('?' + vreq
-							.getQueryString()) : ""));
-			String redirectURL = request.getContextPath()
-					+ Controllers.SITE_ADMIN + "?login=block";
-			response.sendRedirect(redirectURL);
-			return;
-		}
+		
 
 		String vClassURI = vreq.getParameter("vClassURI");
 		if (vClassURI == null || vClassURI.trim().equals("")) {
