@@ -3,6 +3,7 @@ package edu.cornell.mannlib.vitro.webapp.sparql;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -63,17 +64,16 @@ public class GetClazzAllProperties extends BaseEditController {
 			return;
 		}
 
-		String respo = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
-		respo += "<options>";
+		Map<String, String> hm = new HashMap();
 
 		// Get Data Properties
 		// Add rdfs:label to the list
-		respo += "<option>" 
-					+ "<key>" + "label" + "</key>" 
-					+ "<value>" + "http://www.w3.org/2000/01/rdf-schema#label" + "</value>"
-					+ "<type>0</type>" 
-				+ "</option>";
-
+		hm.put("label", "http://www.w3.org/2000/01/rdf-schema#label0");
+		/*
+		 * respo += "<option>" + "<key>" + "label" + "</key>" + "<value>" +
+		 * "http://www.w3.org/2000/01/rdf-schema#label" + "</value>" +
+		 * "<type>0</type>" + "</option>";
+		 */
 		DataPropertyDao ddao = vreq.getFullWebappDaoFactory()
 				.getDataPropertyDao();
 
@@ -88,11 +88,15 @@ public class GetClazzAllProperties extends BaseEditController {
 				DataProperty dprop = (DataProperty) ddao
 						.getDataPropertyByURI(dp.getURI());
 				if (dprop != null) {
-					respo += "<option>" 
-								+ "<key>" + dprop.getLocalName() + "</key>" 
-								+ "<value>" + dprop.getURI() + "</value>"
-								+ "<type>0</type>"
-							+ "</option>";
+					if (dprop.getLocalName() != null
+							|| !dprop.getLocalName().equals("")) {
+						hm.put(dprop.getLocalName(), dprop.getURI() + "0");
+					}
+					/*
+					 * respo += "<option>" + "<key>" + dprop.getLocalName() +
+					 * "</key>" + "<value>" + dprop.getURI() + "</value>" +
+					 * "<type>0</type>" + "</option>";
+					 */
 				}
 			}
 		}
@@ -135,15 +139,32 @@ public class GetClazzAllProperties extends BaseEditController {
 				ObjectProperty oprop = (ObjectProperty) odao
 						.getObjectPropertyByURI(pi.getPropertyURI());
 				if (oprop != null) {
-					respo += "<option>" 
-								+ "<key>" + oprop.getLocalName() + "</key>" 
-								+ "<value>" + oprop.getURI() + "</value>" 
-								+ "<type>1</type>"
-							+ "</option>";
+					/*
+					 * respo += "<option>" + "<key>" + oprop.getLocalName() +
+					 * "</key>" + "<value>" + oprop.getURI() + "</value>" +
+					 * "<type>1</type>" + "</option>";
+					 */
+					if (oprop.getLocalName() != null
+							|| !oprop.getLocalName().equals("")) {
+						hm.put(oprop.getLocalName(), oprop.getURI() + "1");
+					}
+
 				}
 			}
 		}
+		String respo = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+		respo += "<options>";
+		Object[] keys = hm.keySet().toArray();
+		Arrays.sort(keys);
+		for (int i = 0; i < keys.length; i++) {
+			String key = (String) keys[i];
+			String value = hm.get(key);
 
+			respo += "<option>" + "<key>" + key + "</key>" + "<value>"
+					+ value.substring(0, value.length() - 1) + "</value>"
+					+ "<type>" + value.charAt(value.length() - 1) + "</type>"
+					+ "</option>";
+		}
 		respo += "</options>";
 		response.setContentType("text/xml");
 		response.setCharacterEncoding("UTF-8");
