@@ -32,8 +32,9 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 /**
- * Pulls a netId out of the CUWebAuth REMOTE_USER header.
- *
+ * Attempts to pull a NetId and a SelfEditing identifier from the externally
+ * authorized username.
+ * 
  * @author bdc34, trashed by jeb228
  */
 public class SelfEditingIdentifierFactory implements IdentifierBundleFactory {
@@ -45,17 +46,10 @@ public class SelfEditingIdentifierFactory implements IdentifierBundleFactory {
 	 */
 	private static final String PROPERTY_EXTERNAL_AUTH_HEADER_NAME = "externalAuth.headerName";
 
-	private final static String ATTRIBUTE_NETID = "SelfEditingIdentifierFactory.netid";
-	private final static String ATTRIBUTE_SELFID = "SelfEditingIdentifierFactory.selfid";
-    
 	private static final int MAXIMUM_USERNAME_LENGTH = 100;
 	
 	public IdentifierBundle getIdentifierBundle(ServletRequest request,
 			HttpSession session, ServletContext context) {
-		if (session == null) {
-			log.debug("session is null.");
-			return null;
-		}
 		if (!(request instanceof HttpServletRequest)) {
 			log.debug("request is null or not an HttpServletRequest");
 			return null;
@@ -65,11 +59,13 @@ public class SelfEditingIdentifierFactory implements IdentifierBundleFactory {
 		
 		NetId netId = figureNetId(req);
 		SelfEditing selfId = figureSelfEditingId(req, netId);
-		putIdsInSession(req, netId, selfId);
 		
-		return getIdsFromSession(session);
+		return buildIdentifierBundle(netId, selfId);
 	}
 
+	/**
+	 * Get the name of the externally authorized user and put it into a NetId.
+	 */
 	private NetId figureNetId(HttpServletRequest req) {
 		String externalAuthHeaderName = ConfigurationProperties.getProperty(PROPERTY_EXTERNAL_AUTH_HEADER_NAME);
 		if (isEmpty(externalAuthHeaderName)) {
@@ -91,6 +87,10 @@ public class SelfEditingIdentifierFactory implements IdentifierBundleFactory {
 		return new NetId(externalUsername);
 	}
 
+	/**
+	 * If the externally authorized username is associated with an Individual in
+	 * the model, create a SelfEditing identifier.
+	 */
 	private SelfEditing figureSelfEditingId(HttpServletRequest request,
 			NetId netId) {
 		if (netId == null) {
@@ -129,24 +129,12 @@ public class SelfEditingIdentifierFactory implements IdentifierBundleFactory {
 		return new SelfEditing(ind, blacklisted, false);
 	}
 
-	private void putIdsInSession(HttpServletRequest request, NetId netId,
+	/**
+	 * Create a bundle that holds the identifiers we created, or null if we
+	 * didn't create any.
+	 */
+	private IdentifierBundle buildIdentifierBundle(NetId netId,
 			SelfEditing selfId) {
-		// If there is no session, and nothing to store, we're done.
-		HttpSession session = request.getSession(false);
-		if ((session == null) && (netId == null) && (selfId == null)) {
-			return;
-		}
-
-		// If there is a session, set or clear the attributes as appropriate.
-		session = request.getSession();
-		session.setAttribute(ATTRIBUTE_NETID, netId);
-		session.setAttribute(ATTRIBUTE_SELFID, selfId);
-	}
-
-	private IdentifierBundle getIdsFromSession(HttpSession session) {
-		NetId netId = (NetId) session.getAttribute(ATTRIBUTE_NETID);
-		SelfEditing selfId = (SelfEditing) session.getAttribute(ATTRIBUTE_SELFID);
-
 		if (netId == null && selfId == null) {
 			log.debug("no self-editing IDs in the session");
 			return null;
