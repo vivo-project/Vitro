@@ -97,6 +97,12 @@ public class EditConfiguration {
     
     private ProhibitedFromSearch prohibitedFromSearch;
 
+    /** Name of freemarker template to generate form. */
+    String template;
+    
+    /** URL to submit form to. */
+    String submitToUrl;
+    
     /** 
      * If true, then any dependent resources that are unlinked should be
      * removed using DependentResourceDelete. 
@@ -942,5 +948,21 @@ public class EditConfiguration {
     
     public List<EditSubmissionPreprocessor> getEditSubmissionPreprocessors() {
         return editSubmissionPreprocessors;
+    }
+
+    public void setTemplate(String template){
+        this.template = template;
+    }
+    
+    public String getTemplate() {
+        return this.template;
+    }
+
+    public String getSubmitToUrl() {
+        return submitToUrl;
+    }
+
+    public void setSubmitToUrl(String submitToUrl) {
+        this.submitToUrl = submitToUrl;
     }
 }

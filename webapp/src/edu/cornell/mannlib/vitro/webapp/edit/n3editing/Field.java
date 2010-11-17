@@ -123,6 +123,7 @@ public class Field {
     /* *********************** Constructors ************************** */
 
     public Field(String config, String varName) {
+        name=varName;
         JSONObject jsonObj  = null;
         try{
             jsonObj = new JSONObject(config);
@@ -138,8 +139,8 @@ public class Field {
     }
 
     public Field() {}
-    
-    private static String[] parameterNames = {"newResource","validators","optionsType","predicateUri","objectClassUri","rangeDatatypeUri","rangeLang","literalOptions","assertions"};
+        
+    private static String[] parameterNames = {"editElement","newResource","validators","optionsType","predicateUri","objectClassUri","rangeDatatypeUri","rangeLang","literalOptions","assertions"};
     static{  Arrays.sort(parameterNames); }
     
     private void setValuesFromJson(JSONObject obj, String fieldName){
@@ -161,7 +162,8 @@ public class Field {
                         
             setLiteralOptions(obj.getJSONArray("literalOptions"));
             setAssertions(EditConfiguration.JsonArrayToStringList(obj.getJSONArray("assertions")));
-                        
+                                          
+            setEditElement( obj, fieldName);
             
             //check for odd parameters
             JSONArray names = obj.names();
@@ -178,7 +180,56 @@ public class Field {
     }
 
 
+    /**
+     * A field may specify a class for additional features. 
+     */
+    private void setEditElement(JSONObject fieldConfigObj, String fieldName) {        
+        String className = fieldConfigObj.optString("editElement");
+        if( className == null || className.isEmpty() )
+            return;
+        setOptionsType(Field.OptionsType.UNDEFINED);
+        Class clz = null;
+        try {
+            clz = Class.forName(className);           
+        } catch (ClassNotFoundException e) {
+            log.error("Java Class " + className + " not found for field " + name);
+            return;
+        } catch (SecurityException e) {
+            log.error("Problem with Java Class " + className + " for field " + name, e);
+            return;
+        } catch (IllegalArgumentException e) {
+            log.error("Problem with Java Class " +className + " for field " + name, e);
+            return;
+        } 
+
+        Class[] types = new Class[]{ Field.class };
+        Constructor cons;
+        try {
+            cons = clz.getConstructor(types);
+        } catch (SecurityException e) {
+            log.error("Problem with Java Class " + className + " for field " + name, e);            
+            return;                        
+        } catch (NoSuchMethodException e) {
+            log.error("Java Class " + className + " must have a constructor that takes a Field.", e);            
+            return;
+        }
+        Object[] args = new Object[] { this };        
+        Object obj;
+        try {
+            obj = cons.newInstance(args);
+        } catch (Exception e) {
+            log.error("Problem with Java Class " + className + " for field " + name, e);            
+            return;   
+        }  
+        
+        editElement = (EditElement)obj;                       
+    }
+
     /* ****************** Getters and Setters ******************************* */
+
+    public String getName(){
+        return name;
+    }
     
     public List<String> getRetractions() {
         return retractions;
@@ -217,62 +268,43 @@ public class Field {
         optionsType = ot;
     }
     public void setOptionsType(String s) {
+        setOptionsType( getOptionForString(s));
+    }
+
+    public static OptionsType getOptionForString(String s){
+        if( s== null || s.isEmpty() )
+            return OptionsType.UNDEFINED;
         if ("LITERALS".equals(s)) {
-            setOptionsType(Field.OptionsType.LITERALS);
+            return Field.OptionsType.LITERALS;
         } else if ("HARDCODED_LITERALS".equals(s)) {
-            setOptionsType(Field.OptionsType.HARDCODED_LITERALS);
+            return Field.OptionsType.HARDCODED_LITERALS;
         } else if ("STRINGS_VIA_DATATYPE_PROPERTY".equalsIgnoreCase(s)) {
-            setOptionsType(Field.OptionsType.STRINGS_VIA_DATATYPE_PROPERTY);
+            return Field.OptionsType.STRINGS_VIA_DATATYPE_PROPERTY;
         } else if ("INDIVIDUALS_VIA_OBJECT_PROPERTY".equalsIgnoreCase(s)) {
-            setOptionsType(Field.OptionsType.INDIVIDUALS_VIA_OBJECT_PROPERTY);
+            return Field.OptionsType.INDIVIDUALS_VIA_OBJECT_PROPERTY;
         } else if ("INDIVIDUALS_VIA_VCLASS".equalsIgnoreCase(s)) {
-            setOptionsType(Field.OptionsType.INDIVIDUALS_VIA_VCLASS);
+            return Field.OptionsType.INDIVIDUALS_VIA_VCLASS;
         } else if ("MONIKERS_VIA_VCLASS".equalsIgnoreCase(s)) {
-            setOptionsType(Field.OptionsType.MONIKERS_VIA_VCLASS);
+            return Field.OptionsType.MONIKERS_VIA_VCLASS;
         } else if ("DATETIME".equalsIgnoreCase(s)) {
-            setOptionsType(Field.OptionsType.DATETIME);
+            return Field.OptionsType.DATETIME;
         } else if ("CHILD_VCLASSES".equalsIgnoreCase(s)) {            
-            setOptionsType(Field.OptionsType.CHILD_VCLASSES);
+            return Field.OptionsType.CHILD_VCLASSES;
         } else if ("CHILD_VCLASSES_WITH_PARENT".equalsIgnoreCase(s)) {            
-            setOptionsType(Field.OptionsType.CHILD_VCLASSES_WITH_PARENT);  
+            return Field.OptionsType.CHILD_VCLASSES_WITH_PARENT;  
         } else if ("VCLASSGROUP".equalsIgnoreCase(s)) {            
-            setOptionsType(Field.OptionsType.VCLASSGROUP);              
+            return Field.OptionsType.VCLASSGROUP;              
         } else if ("FILE".equalsIgnoreCase(s)) {
-            setOptionsType(Field.OptionsType.FILE);            
+            return Field.OptionsType.FILE;            
         } else if ("DATE".equalsIgnoreCase(s)) {
-            setOptionsType(Field.OptionsType.DATE);
+            return Field.OptionsType.DATE;
         } else if ("TIME".equalsIgnoreCase(s)) {
-        	setOptionsType(Field.OptionsType.TIME);
-        } else if ("UNDEFINED".equalsIgnoreCase(s) || s == null || s.isEmpty()){
-            setOptionsType(Field.OptionsType.UNDEFINED);
+            return Field.OptionsType.TIME;
         } else {
-            setSpecalOptionType(s);
-        }
+            return Field.OptionsType.UNDEFINED;
+        } 
     }
-
-    private void setSpecalOptionType(String s) {
-        try {
-            Class clz = Class.forName(s);
-            Object obj = clz.newInstance();  
-            editElement = (EditElement)obj;
-        } catch (ClassNotFoundException e) {
-            log.error("Java Class " + s + " not found for field " + name);
-            setOptionsType(Field.OptionsType.UNDEFINED);
-        } catch (SecurityException e) {
-            log.error("Problem with Java Class " + s + " for field " + name, e);
-            setOptionsType(Field.OptionsType.UNDEFINED);
-        } catch (IllegalArgumentException e) {
-            log.error("Problem with Java Class " + s + " for field " + name, e);
-            setOptionsType(Field.OptionsType.UNDEFINED);
-        } catch (InstantiationException e) {
-            log.error("Problem with Java Class " + s + " for field " + name, e);
-            setOptionsType(Field.OptionsType.UNDEFINED);
-        } catch (IllegalAccessException e) {
-            log.error("Problem with Java Class " + s + " for field " + name, e);
-            setOptionsType(Field.OptionsType.UNDEFINED);
-        }                 
-    }
-
+    
     public String getPredicateUri() {
         return predicateUri;
     }
@@ -363,6 +395,11 @@ public class Field {
 
     public EditElement getEditElement(){
         return editElement;
+    }
+    
+    /* this is mainly for unit testing */
+    public void setName(String name){
+        this.name = name;    
     }
 
 }

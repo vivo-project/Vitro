@@ -10,8 +10,9 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditSubmission;
 import freemarker.template.Configuration;
 /**
- * All classes that implement this interface must have a public empty constructor that
- * will be called with using reflection.
+ * All classes that implement this interface must have a public constructor that 
+ * takes a edu.cornell.mannlib.vitro.webapp.edit.n3editing.Field.  It will be 
+ * called with using reflection.
  */
 public interface EditElement {  
     /**
@@ -36,5 +37,11 @@ public interface EditElement {
      * This is a method to generate the HTML output for a form element.  It should use a freemarker template
      * to produce the output.  
      */
-    public String draw(String fieldName, EditConfiguration editConfig, EditSubmission editSub, Configuration fmConfig);        
+    public String draw(String fieldName, EditConfiguration editConfig, EditSubmission editSub, Configuration fmConfig);
+    
+    /**
+     * We may need a method to get existing URIs and Literals for use in building retraction statements?
+     */
+    // public Map<String,Literal> getExistingLiterals(?);
+    // public Map<String,Literal> getExistingURIs(?);
 }
