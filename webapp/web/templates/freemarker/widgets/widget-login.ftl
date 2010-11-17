@@ -31,8 +31,10 @@
         </#if>
        
         <#if errorMessage??>
-            <section id="errorAlert"><img src="${urls.siteIcons}/iconAlert.png"  alert="Error alert icon"/>
-                <p>${errorMessage}</p>
+            <section id="error-alert" role='region'>
+                <img src="${urls.siteIcons}/iconAlert.png"  alert="Error alert icon" />
+                
+                <p class="error-message">${errorMessage}</p>
             </section>
         </#if>
        
