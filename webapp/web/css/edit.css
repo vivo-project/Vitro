@@ -9,7 +9,6 @@
     margin-left      : 0.5em;
     padding-bottom   : 0.5em;
     color            : #444444;
-    font-family      : Verdana, Geneva, Arial, Helvetica, sans-serif;
     line-height      : 16px;
     min-height       : 100px;
     display          : inline;
@@ -22,7 +21,6 @@
     margin-left      : 0;
     padding-bottom   : 1em;
     color            : #444444;
-    font-family      : Verdana, Geneva, Arial, Helvetica, sans-serif;
     line-height      : 16px;
     background-color : #eee; /* cals+vivo themes were: #dddddd; */
     min-height       : 100px;
@@ -33,12 +31,12 @@
     text-align   : left;
     border-width : 1px;
     border-style : solid;
-    border-color : black;
+    border-color : #dfe6e6;
     border-collapse:separate;
 }
 
 .editingForm td{
-    padding: 2px 2px 2px 2px;
+    padding: 3px;
     font-size : 1em;
 }
 
@@ -50,17 +48,17 @@ td.verticalfieldlabel {
 .editingForm .entryFormHead {
     text-align      : center;
     padding         : 0.2em;
-    background-color: #f8f8c8;
+    background-color: #f1f2ee;
     border-width    : 1px;
     border-style    : solid;
-    border-color    : black;
+    border-color    : #dfe6e6;
 }
 
 .editingForm .entryFormHead h2{
     margin   : 0.1em;
     padding  : 0em;
     font-size: 1.4em;
-    color    : black;
+    color    : #5F6464;
 }
 
 .editingForm .entryFormHead h3{
@@ -80,7 +78,6 @@ td.verticalfieldlabel {
 .editingForm .form-item {
     background-color: #FAFAD2;
     border-color    : #2E440C;
-    font-family     : Verdana, Geneva, Arial, Helvetica, sans-serif;
     font-size       : 10px;
     border-width    : 1px;
 }
@@ -88,7 +85,6 @@ td.verticalfieldlabel {
 .editingForm .form-button {
     background-color: #ccf;
     border-color    : #ccf;
-    font-family     : Verdana, Geneva, Arial, Helvetica, sans-serif;
     font-size       : 1em;
     border-width    : 1px;
     margin-top      : 2px;
@@ -99,7 +95,6 @@ td.verticalfieldlabel {
 tr.form-row-even {
     background-color : #e9f0ff;
     border-color     : #eec; 
-    font-family      : Verdana, Geneva, Arial, Helvetica, sans-serif;
     font-size        : 10px;
     border-width     : 1px;
     margin-top       : 2px;
@@ -108,7 +103,6 @@ tr.form-row-even {
 tr.form-row-odd {
     background-color : #e9f9ff;
     border-color     : #eec; 
-    font-family      : Verdana, Geneva, Arial, Helvetica, sans-serif;
     font-size        : 10px;
     border-width     : 1px;
     margin-top       : 2px;
@@ -117,7 +111,6 @@ tr.form-row-odd {
 .form-editingRow {
     background-color: #ff9;
     border-color    : #eec; 
-    font-family     : Verdana, Geneva, Arial, Helvetica, sans-serif;
     font-size       : 10px;
     border-width    : 1px;
     margin-top      : 2px;
@@ -145,7 +138,6 @@ table.form-background td form {
 .form-background {
     background-color : #C8D8F8;
     border-color     : #CCCCFF;
-    font-family      : Verdana, Geneva, Arial, Helvetica, sans-serif;
     font-size        : 10px;
     border-width     : 1px;
     margin-top       : 2px;
@@ -163,15 +155,13 @@ table.form-background td form {
 .form-table-head {
     background-color: #ccf;
     border-color    : #eec; 
-    font-family     : Verdana, Geneva, Arial, Helvetica, sans-serif;
     font-size       : 10px;
     border-width    : 1px;
     margin-top      : 2px;
 }
 
 .navlinkblock {
-    color           : black; /*#4B0082;*/
-    font-family     : Verdana,Arial, Helvetica, sans-serif;
+    color           : #5F6464; /*#4B0082;*/
     font-size       : 10px;
     font-weight     : normal;
     margin-top      : 1px;
@@ -190,25 +180,22 @@ td.editformcell select {
 
 .header {
     background-color: #B0C4DE;
-    color           : black;
-    font-family     : Arial, Helvetica, sans-serif;
+    color           : #5F6464;
     font-size       : 10pt;
     font-style      : normal;
     text-align      : left;
 }
 .database_header {
-    background-color: #B0C4DE;
-    color           : black;
-    font-family     : Arial, Helvetica, sans-serif;
-    font-size       : 10pt;
+    background-color: #f1f2ee;
+    color           : #2485ae;
+    font-size       : 1em;
     font-style      : normal;
     text-align      : left;
 }
 
 .database_upperleftcorner {
     background-color: #B0C4DE;
-    color           : black;
-    font-family     : Arial, Helvetica, sans-serif;
+    color           : #5F6464;
     font-size       : 10pt;
     font-style      : normal;
     text-align      : left;
@@ -216,17 +203,15 @@ td.editformcell select {
 
 .database_upperleftcenter {
     background-color: #B0C4DE;
-    color           : black;
-    font-family     : Arial, Helvetica, sans-serif;
+    color           : #5F6464;
     font-size       : 10pt;
     font-style      : normal;
     text-align      : center;
 }
 
 .rownumheader {
-    background-color: #B0C4DE;
-    color           : black;
-    font-family     : Arial, Helvetica, sans-serif;
+    background-color: #F1F2EE;
+    color           : #5F6464;
     font-size       : 10pt;
     font-style      : normal;
     text-align      : center;
@@ -235,8 +220,7 @@ td.editformcell select {
 
 .headercenter {
     background-color: #9370DB;
-    color           :  black;
-    font-family     :  Arial, Helvetica, sans-serif;
+    color           :  #5F6464;
     font-size       :  10pt;
     font-style      :  normal;
     text-align      :  center;
@@ -245,16 +229,14 @@ td.editformcell select {
 .postheader {
     background-color: #E6E6FA;
     color           : #777777;
-    font-family     : Arial, Helvetica, sans-serif;
     font-size       : 10pt;
     font-style      : normal;
     text-align      : left;
 }
 
 .database_postheader {
-    background-color: #E6E6FA;
+    background-color: #f7f9f9;
     color           : #777777;
-    font-family     : Arial, Helvetica, sans-serif;
     font-size       : 10pt;
     font-style      : normal;
     text-align      : left;
@@ -263,7 +245,6 @@ td.editformcell select {
 .postheadercenter {
     background-color: #E6E6FA;
     color           : #4682B4;
-    font-family     : Arial, Helvetica, sans-serif;
     font-size       : 10pt;
     font-style      : normal;
     text-align      : center;
@@ -272,7 +253,6 @@ td.editformcell select {
 .postheaderright {
     background-color: #E6E6FA;
     color           : #4682B4;
-    font-family     : Arial, Helvetica, sans-serif;
     font-size       : 10pt;
     font-style      : normal;
     text-align      : right;
@@ -280,8 +260,7 @@ td.editformcell select {
 
 .verticalfieldlabel {
     background-color: #DEDEDF;
-    color           : black;
-    font-family     : Verdana, Arial, Helvetica, sans-serif;
+    color           : #5F6464;
     font-size       : 8pt;
     font-style      : normal;
     text-align      : right;
@@ -289,27 +268,26 @@ td.editformcell select {
 }
 
 .row, .rowvert {
-    background-color: #F0FFFF;
-    color           : black;
-    font-family     : Arial, Helvetica, sans-serif;
+    background-color: #f7f9f9;
+    color           : #5F6464;
     font-size       : 10pt;
     font-style      : normal;
     text-align      : left;
+    line-height     : 2em;
 }
 
 .rowalternate {
-    background-color: #F8F8FF;
-    color           : black;
-    font-family     : Arial, Helvetica, sans-serif;
+    background-color: #fff;
+    color           : #5F6464;
     font-size       : 10pt;
     font-style      : normal;
     text-align      : left;
+    line-height     : 2em;
 }
 
 .rowbold {
     background-color: #FFFAFA;
-    color           : black;
-    font-family     : Arial, Helvetica, sans-serif;
+    color           : #5F6464;
     font-size       : 10pt;
     font-style      : normal;
     font-weight : bold;
@@ -317,9 +295,8 @@ td.editformcell select {
 }
 
 .rownum {
-    background-color: #87CEFA;
-    color           : black;
-    font-family     : Arial, Helvetica, sans-serif;
+    background-color: #F1F2EE;
+    color           : #5F6464;
     font-size       : 10pt;
     font-style      : normal;
     text-align      : center;
@@ -339,4 +316,7 @@ span.entityRelationsSpan {
 .hideFromVivoWeb {
     display: none;
     height: 0;
+}
+.entities{
+    /*background-color:#F1F2EE;*/
 }
