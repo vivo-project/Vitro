@@ -1329,6 +1329,15 @@
     <servlet-name>GetClazzDataProperties</servlet-name>
     <url-pattern>/admin/getClazzDataProperties</url-pattern>
   </servlet-mapping>
+
+  <servlet>
+    <servlet-name>GetClazzAllProperties</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.sparql.GetClazzAllProperties</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>GetClazzAllProperties</servlet-name>
+    <url-pattern>/admin/getClazzAllProperties</url-pattern>
+  </servlet-mapping>
   
   <servlet>
     <servlet-name>GetClazzObjectProperties</servlet-name>

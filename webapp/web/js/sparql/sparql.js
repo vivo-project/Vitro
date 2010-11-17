@@ -32,22 +32,14 @@
 							subdiv.appendChild(document.createElement("br"));
 							
 							
-							var adddprop = document.createElement("input");
-							adddprop.type = "button";
-							adddprop.value = "Add Data Property";
-							adddprop.level = 0;
-							adddprop.onclick = function() {
-								return getDataProperty(this);
+							var addprop = document.createElement("input");
+							addprop.type = "button";
+							addprop.value = "Add Property";
+							addprop.level = 0;
+							addprop.onclick = function() {
+								return getProperty(this);
 							}
-							subdiv.appendChild(adddprop);
-							var addoprop = document.createElement("input");
-							addoprop.type = "button";
-							addoprop.value = "Add Object Property";
-							addoprop.level = 0;
-							addoprop.onclick = function() {
-								return getObjectProperty(this);
-							}
-							subdiv.appendChild(addoprop);
+							subdiv.appendChild(addprop);
 							level ++;
 						}
 					}
@@ -68,9 +60,9 @@
 			}
 			
 			
-			function getDataProperty(addprop){
+			function getProperty(addprop){
 				
-				var url = "getClazzDataProperties";
+				var url = "getClazzAllProperties";
 				var base = document.getElementById("subject(" + addprop.level + ",0)");
 				var subject = base.value;
 				if (subject == ""){
@@ -89,89 +81,8 @@
 									return;
 								}
 								for(i=0; i<options.length; i++){
-									property[property.length] = new Option(options[i].childNodes[0].firstChild.data, options[i].childNodes[1].firstChild.data);
+									property[property.length] = new Option(options[i].childNodes[0].firstChild.data, options[i].childNodes[1].firstChild.data + options[i].childNodes[2].firstChild.data);
 								}
-								
-								property.level = base.level;
-								property.count = base.count;
-								
-								property.onchange = function() {
-									return getData(this);
-								}
-								
-								var prediv = document.getElementById("predicate(" + base.level + ")");
-								
-								if (prediv.innerHTML.trim() != "") {
-									var lastNode = prediv.lastChild.previousSibling;
-									if (lastNode.selectedIndex == 0){
-										alert("You have a undefined property, please make sure it has been initialized.");
-										return;
-									}
-										
-								}
-								prediv.appendChild(property);
-								
-								base.count += 1
-								prediv.appendChild(document.createElement("br"));
-							}
-						}
-					);
-				}
-			}
-			
-			function getData(property){
-				var base = document.getElementById("subject(" + property.level + ",0)")
-				var subject = base.value;
-				
-				//Disable the selection
-				property.disabled = true;
-				
-				//DEL PROPERTY
-				var delprop = document.createElement("input");
-				delprop.type = "button";
-				delprop.value = "Delete";
-				delprop.count = base.count - 1;
-				delprop.level = base.level;
-				delprop.onclick = function() {
-					return delProperty(this);
-				}
-				var prediv = document.getElementById("predicate(" + base.level + ")");
-				prediv.insertBefore(delprop, property.nextSibling);
-				var objdiv = document.getElementById("object(" + base.level + ")");
-				var dataprop = document.createElement("input");
-				dataprop.type = "text";
-				dataprop.size = 50;
-				dataprop.count = base.count - 1;
-				dataprop.level = base.level;
-				dataprop.id = "object(" + base.level + "," + (base.count - 1) + ")";
-				objdiv.appendChild(dataprop);
-				objdiv.appendChild(document.createElement("br"));
-			}
-			
-			function getObjectProperty(addprop){
-				
-				var url = "getClazzObjectProperties";
-				var base = document.getElementById("subject(" + addprop.level + ",0)");
-				var subject = base.value;
-				if (subject == ""){
-					alert("Please select a class.");
-				}
-				else{
-					var params = "vClassURI=" + subject.replace('#', '%23');
-					var myAjax = new Ajax.Request( url, {method: "get", parameters: params, onComplete: function(originalRequest){
-								var response = originalRequest.responseXML;
-								var property = document.createElement("select");
-								property.id = "predicate(" + base.level + "," + base.count + ")";
-								property[property.length] = new Option("Properties", "");
-								var options = response.getElementsByTagName('option');
-								if (options == null || options.length == 0){
-									alert("Error: Cannot get object properties for " + subject + ".");
-									return;
-								}
-								for(i=0; i<options.length; i++){
-									property[property.length] = new Option(options[i].childNodes[0].firstChild.data, options[i].childNodes[1].firstChild.data);
-								}
-								
 								property.level = base.level;
 								property.count = base.count;
 								
@@ -180,6 +91,7 @@
 								}
 								
 								var prediv = document.getElementById("predicate(" + base.level + ")");
+								
 								if (prediv.innerHTML.trim() != "") {
 									var lastNode = prediv.lastChild.previousSibling;
 									if (lastNode.selectedIndex == 0){
@@ -197,6 +109,7 @@
 					);
 				}
 			}
+			
 			
 			function getObject(property){
 				var url = "getObjectClasses";
@@ -221,7 +134,20 @@
 				
 				
 				var predicate = property.value;
-
+				var type = predicate.charAt(predicate.length-1);
+				predicate = predicate.substring(0, predicate.length-1);
+				if (type == '0') {
+					var objdiv = document.getElementById("object(" + base.level + ")");
+					var dataprop = document.createElement("input");
+					dataprop.type = "text";
+					dataprop.size = 50;
+					dataprop.count = base.count - 1;
+					dataprop.level = base.level;
+					dataprop.id = "object(" + base.level + "," + (base.count - 1) + ")";
+					objdiv.appendChild(dataprop);
+					objdiv.appendChild(document.createElement("br"));
+				}
+				else{
 				var params = "predicate=" + predicate.replace('#', '%23');
 				
 				var myAjax = new Ajax.Request( url, {method: "get", parameters: params, onComplete: function(originalRequest){
@@ -283,6 +209,8 @@
 							}
 						}
 					);
+				}
+
 			}
 			
 			function addClass(obj){
@@ -313,22 +241,14 @@
 				}
 				subdiv.appendChild(delclazz);
 				subdiv.appendChild(document.createElement("br"));
-				var adddprop = document.createElement("input");
-				adddprop.type = "button";
-				adddprop.value = "Add Data Property";
-				adddprop.level = subject.level;
-				adddprop.onclick = function() {
-					return getDataProperty(this);
+				var addprop = document.createElement("input");
+				addprop.type = "button";
+				addprop.value = "Add Property";
+				addprop.level = subject.level;
+				addprop.onclick = function() {
+					return getProperty(this);
 				}
-				subdiv.appendChild(adddprop);
-				var addoprop = document.createElement("input");
-				addoprop.type = "button";
-				addoprop.value = "Add Object Property";
-				addoprop.level = subject.level;
-				addoprop.onclick = function() {
-					return getObjectProperty(this);
-				}
-				subdiv.appendChild(addoprop);
+				subdiv.appendChild(addprop);
 				
 			}
 			
@@ -416,6 +336,7 @@
 							return;
 						}
 						pre = pre.value;
+						pre = pre.substring(0, pre.length-1);
 						pre = getNameWithPrefix(pre);
 						if (obj.tagName == "INPUT"){
 							var objname = subname + "_" + pre.substring(pre.indexOf(":") + 1);
