@@ -1,11 +1,11 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
-<section id="#intro-menupage">
+<section id="#intro-menupage" role="region">
     <h3>People</h3>
     
-    <section id="content-foaf-person">
+    <section id="content-foaf-person" role="region">
         <h4>Visual Graph</h4>
         
-        <nav>
+        <nav role="navigation">
             <ul id="foaf-person-childClasses">
                 <li><a href="#">foaf:person childClass 1<span class="count-classes"> (280)</span></a></li>
                 <li><a href="#">foaf:person childClass  2<span class="count-classes"> (280)</span></a></li>
@@ -19,11 +19,13 @@
             </ul>
         </nav>
         
-        <section id="foaf-person-graph"> <img src="${urls.home}/images/menupage/visual-graph.jpg" /> </section>
+        <section id="foaf-person-graph" role="region">
+            <img src="${urls.home}/images/menupage/visual-graph.jpg" alt="" />
+        </section>
     </section>
     
-    <section id="find-by">
-        <nav>
+    <section id="find-by" role="region">
+        <nav role="navigation">
             <h3>Find By</h3>
             
             <ul id="find-filters">
@@ -40,42 +42,43 @@
     </section>
 </section>
 
-<section id="network-stats">
+<section id="network-stats" role="region">
     <h3>Network stats</h3>
     
     <p>(n) Persons | (n) with authorship | (n) researchers | (n) are principal investigators | (n) with awards | (n) are teaching | (n) have positions in organization</p>
 </section>
 
-<section id="researchers">
+<section id="researchers" role="region">
     <h3>Researchers</h3>
     
     <p>A | B | C | D | E | F | G | H | I | J | K | L | M | N | O | P | Q | R | S | T | U | V | W | X | Y | Z | All</p>
     
-    <section id="researchers-slider">
+    <section id="researchers-slider" role="region">
         <div id="alpha-display">A</div>
     
-        <div id="profile-photo-display">
+        <nav id="profile-photo-display" role = "navigation">
             <ul>
-                <li><img src="${urls.home}/images/menupage/person-thumbnail.jpg" width="90" height="90" /></li>
-                <li><img src="${urls.home}/images/menupage/person-thumbnail.jpg" width="90" height="90" /></li>
-                <li><img src="${urls.home}/images/menupage/person-thumbnail.jpg" width="90" height="90" /></li>
-                <li><img src="${urls.home}/images/menupage/person-thumbnail.jpg" width="90" height="90" /></li>
-                <li><img src="${urls.home}/images/menupage/person-thumbnail.jpg" width="90" height="90" /></li>
-                <li><img src="${urls.home}/images/menupage/person-thumbnail.jpg" width="90" height="90" /></li>
+                <li><img src="${urls.home}/images/menupage/person-thumbnail.jpg" width="90" height="90" alt="foaf:lastName, foaf:firstName" /></li>
+                <li><img src="${urls.home}/images/menupage/person-thumbnail.jpg" width="90" height="90" alt="foaf:lastName, foaf:firstName" /></li>
+                <li><img src="${urls.home}/images/menupage/person-thumbnail.jpg" width="90" height="90" alt="foaf:lastName, foaf:firstName" /></li>
+                <li><img src="${urls.home}/images/menupage/person-thumbnail.jpg" width="90" height="90" alt="foaf:lastName, foaf:firstName" /></li>
+                <li><img src="${urls.home}/images/menupage/person-thumbnail.jpg" width="90" height="90" alt="foaf:lastName, foaf:firstName" /></li>
+                <li><img src="${urls.home}/images/menupage/person-thumbnail.jpg" width="90" height="90" alt="foaf:lastName, foaf:firstName" /></li>
             </ul>
-        </div>
+        </nav>
         
         <div id="nav-display">
             <p>All</p>
             
-            <a href="#"><img src="${urls.home}/images/menupage/arrow-carousel-people.jpg" width="44" height="58" /></a> </div>
+            <a href="#"><img src="${urls.home}/images/menupage/arrow-carousel-people.jpg" alt="" width="44" height="58" /></a> 
+        </div>
     </section>
 </section>
 
-<section id="browse-by">
+<section id="browse-by" role="region">
     <h2>Browse By</h2>
     
-    <nav>
+    <nav role="navigation">
         <ul id="browse-childClasses">
             <li><a class="selected" href="#">Faculty Members<span class="count-classes"> (280)</span></a></li>
             <li><a href="#">Graduate Students<span class="count-classes"> (280)</span></a></li>
@@ -84,7 +87,7 @@
             <li><a href="#">Non Academic<span class="count-classes"> (280)</span></a></li>
             <li><a href="#">Non Faculty Members<span class="count-classes"> (280)</span></a></li>
         </ul>
-        <nav>
+        <nav role="navigation">
             <ul id="alpha-browse-childClass">
                 <li><a href="#">All<span class="count-classes"> (280)</span></a></li>
                 <li><a href="#">A<span class="count-classes"> (280)</span></a></li>
@@ -107,34 +110,34 @@
         </nav>
     </nav>
     
-    <section id="individuals-in-childClass">
+    <section id="individuals-in-childClass" role="region">
         <h3>B</h3>
         
-        <article class="vcard individual-foaf-person "> <img src="${urls.home}/images/menupage/person-thumbnail.jpg" width="90" height="90" />
+        <article class="vcard individual-foaf-person" role="navigation"> <img src="${urls.home}/images/menupage/person-thumbnail.jpg" width="90" height="90" alt="foaf:lastName, foaf:firstName" />
             <h1 class="fn"><strong>foaf:lastName, foaf:fisrtName</strong><br>core:preferredTitle <br><span class="org">Albert Mann Library</span></h1>
         </article>
         
-        <article class="vcard individual-foaf-person "> <img src="${urls.home}/images/menupage/person-thumbnail.jpg" width="90" height="90" />
+        <article class="vcard individual-foaf-person"  role="navigation"> <img src="${urls.home}/images/menupage/person-thumbnail.jpg" width="90" height="90"  alt="foaf:lastName, foaf:firstName"/>
             <h1 class="fn"><strong>foaf:lastName, foaf:fisrtName</strong><br>core:preferredTitle <br><span class="org">Albert Mann Library</span></h1>
         </article>
         
-        <article class="vcard individual-foaf-person "> <img src="${urls.home}/images/menupage/person-thumbnail.jpg" width="90" height="90" />
+        <article class="vcard individual-foaf-person" role="navigation"> <img src="${urls.home}/images/menupage/person-thumbnail.jpg" width="90" height="90"  alt="foaf:lastName, foaf:firstName"/>
             <h1 class="fn"><strong>foaf:lastName, foaf:fisrtName</strong><br>core:preferredTitle <br><span class="org">Albert Mann Library</span></h1>
         </article>
         
-        <article class="vcard individual-foaf-person "> <img src="${urls.home}/images/menupage/person-thumbnail.jpg" width="90" height="90" />
+        <article class="vcard individual-foaf-person" role="navigation"> <img src="${urls.home}/images/menupage/person-thumbnail.jpg" width="90" height="90"  alt="foaf:lastName, foaf:firstName"/>
             <h1 class="fn"><strong>foaf:lastName, foaf:fisrtName</strong><br>core:preferredTitle <br><span class="org">Albert Mann Library</span></h1>
         </article>
         
-        <article class="vcard individual-foaf-person "> <img src="${urls.home}/images/menupage/person-thumbnail.jpg" width="90" height="90" />
+        <article class="vcard individual-foaf-person" role="navigation"> <img src="${urls.home}/images/menupage/person-thumbnail.jpg" width="90" height="90"  alt="foaf:lastName, foaf:firstName"/>
             <h1 class="fn"><strong>foaf:lastName, foaf:fisrtName</strong><br>core:preferredTitle <br><span class="org">Albert Mann Library</span></h1>
         </article>
         
-        <article class="vcard individual-foaf-person "> <img src="${urls.home}/images/menupage/person-thumbnail.jpg" width="90" height="90" />
+        <article class="vcard individual-foaf-person" role="navigation"> <img src="${urls.home}/images/menupage/person-thumbnail.jpg" width="90" height="90"  alt="foaf:lastName, foaf:firstName"/>
             <h1 class="fn"><strong>foaf:lastName, foaf:fisrtName</strong><br>core:preferredTitle <br><span class="org">Albert Mann Library</span></h1>
         </article>
         
-        <article class="vcard individual-foaf-person "> <img src="${urls.home}/images/menupage/person-thumbnail.jpg" width="90" height="90" />
+        <article class="vcard individual-foaf-person" role="navigation"> <img src="${urls.home}/images/menupage/person-thumbnail.jpg" width="90" height="90"  alt="foaf:lastName, foaf:firstName"/>
             <h1 class="fn"><strong>foaf:lastName, foaf:fisrtName</strong><br>core:preferredTitle <br><span class="org">Albert Mann Library</span></h1>
         </article>
     </section>
