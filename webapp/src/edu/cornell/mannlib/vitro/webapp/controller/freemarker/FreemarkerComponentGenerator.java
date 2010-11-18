@@ -38,6 +38,8 @@ public class FreemarkerComponentGenerator extends FreemarkerHttpServlet {
         
         request.setAttribute("ftl_identity", get("identity", root, config, vreq));
         request.setAttribute("ftl_menu", get("menu", root, config, vreq));
+        request.setAttribute("ftl_stylesheets", get("stylesheets", root, config, vreq));
+        request.setAttribute("ftl_headScripts", get("headScripts", root, config, vreq));
         request.setAttribute("ftl_search", get("search", root, config, vreq));
         request.setAttribute("ftl_footer", get("footer", root, config, vreq));
         request.setAttribute("ftl_googleAnalytics", get("googleAnalytics", root, config, vreq));

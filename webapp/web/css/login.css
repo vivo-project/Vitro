@@ -149,19 +149,3 @@ p.passwordNote {
   display:inline;
   vertical-align:middle;
 }
-/* WILMA THEME ------>  */
-#error-alert{
-    width:260px;
-    position:relative;
-}
-#error-alert img{
-    padding-left:38px;
-}
-#error-alert p.error-message{
-    position:absolute;
-    width:200px;
-    top:8px;
-    left:82px;
-    font-size:0.7em;
-    color:#b30d1c;
-}

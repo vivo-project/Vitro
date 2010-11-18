@@ -31,10 +31,8 @@
         </#if>
        
         <#if errorMessage??>
-            <section id="error-alert" role='region'>
-                <img src="${urls.siteIcons}/iconAlert.png"  alert="Error alert icon" />
-                
-                <p class="error-message">${errorMessage}</p>
+            <section id="errorAlert"><img src="${urls.siteIcons}/iconAlert.png"  alert="Error alert icon"/>
+                <p>${errorMessage}</p>
             </section>
         </#if>
        
@@ -54,7 +52,7 @@
             </form>
 
             <p class="forgot-password"><a href="#">Forgot your password?</a></p>
-            <p class="request-account"><a class=" blue button" href="#">Request an account</a> </p>
+            <p class="request-account"><a class="blue button" href="#">Request an account</a> </p>
         </section>
     </section><!-- #log-in -->
 </#macro> 
