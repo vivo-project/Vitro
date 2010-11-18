@@ -115,6 +115,11 @@ public class UrlBuilder {
         return getUrl(path);
     }
     
+    // Used by templates to build urls.
+    public String getBaseUrl() {
+        return contextPath;
+    }
+    
     public String getLogoutUrl() {
         return getPortalUrl(Route.LOGOUT, new ParamMap("loginSubmitMode", "Log Out"));
     }

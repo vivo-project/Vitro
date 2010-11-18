@@ -20,7 +20,7 @@
     </nav>
     
     <section id="generic-class-graph" role="region">
-        <img src="${urls.home}/images/menupage/visual-graph-generic-class.jpg" width="500" height="283" alt ="" />
+        <img src="${urls.images}/menupage/visual-graph-generic-class.jpg" width="500" height="283" alt ="" />
     </section>
 </section>
 

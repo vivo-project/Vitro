@@ -20,7 +20,7 @@
         </nav>
         
         <section id="foaf-person-graph" role="region">
-            <img src="${urls.home}/images/menupage/visual-graph.jpg" alt="" />
+            <img src="${urls.images}/menupage/visual-graph.jpg" alt="" />
         </section>
     </section>
     
@@ -58,19 +58,19 @@
     
         <nav id="profile-photo-display" role = "navigation">
             <ul>
-                <li><img src="${urls.home}/images/menupage/person-thumbnail.jpg" width="90" height="90" alt="foaf:lastName, foaf:firstName" /></li>
-                <li><img src="${urls.home}/images/menupage/person-thumbnail.jpg" width="90" height="90" alt="foaf:lastName, foaf:firstName" /></li>
-                <li><img src="${urls.home}/images/menupage/person-thumbnail.jpg" width="90" height="90" alt="foaf:lastName, foaf:firstName" /></li>
-                <li><img src="${urls.home}/images/menupage/person-thumbnail.jpg" width="90" height="90" alt="foaf:lastName, foaf:firstName" /></li>
-                <li><img src="${urls.home}/images/menupage/person-thumbnail.jpg" width="90" height="90" alt="foaf:lastName, foaf:firstName" /></li>
-                <li><img src="${urls.home}/images/menupage/person-thumbnail.jpg" width="90" height="90" alt="foaf:lastName, foaf:firstName" /></li>
+                <li><img src="${urls.images}/menupage/person-thumbnail.jpg" width="90" height="90" alt="foaf:lastName, foaf:firstName" /></li>
+                <li><img src="${urls.images}/menupage/person-thumbnail.jpg" width="90" height="90" alt="foaf:lastName, foaf:firstName" /></li>
+                <li><img src="${urls.images}/menupage/person-thumbnail.jpg" width="90" height="90" alt="foaf:lastName, foaf:firstName" /></li>
+                <li><img src="${urls.images}/menupage/person-thumbnail.jpg" width="90" height="90" alt="foaf:lastName, foaf:firstName" /></li>
+                <li><img src="${urls.images}/menupage/person-thumbnail.jpg" width="90" height="90" alt="foaf:lastName, foaf:firstName" /></li>
+                <li><img src="${urls.images}/menupage/person-thumbnail.jpg" width="90" height="90" alt="foaf:lastName, foaf:firstName" /></li>
             </ul>
         </nav>
         
         <div id="nav-display">
             <p>All</p>
             
-            <a href="#"><img src="${urls.home}/images/menupage/arrow-carousel-people.jpg" alt="" width="44" height="58" /></a> 
+            <a href="#"><img src="${urls.images}/menupage/arrow-carousel-people.jpg" alt="" width="44" height="58" /></a> 
         </div>
     </section>
 </section>
@@ -113,31 +113,31 @@
     <section id="individuals-in-childClass" role="region">
         <h3>B</h3>
         
-        <article class="vcard individual-foaf-person" role="navigation"> <img src="${urls.home}/images/menupage/person-thumbnail.jpg" width="90" height="90" alt="foaf:lastName, foaf:firstName" />
+        <article class="vcard individual-foaf-person" role="navigation"> <img src="${urls.images}/menupage/person-thumbnail.jpg" width="90" height="90" alt="foaf:lastName, foaf:firstName" />
             <h1 class="fn"><strong>foaf:lastName, foaf:fisrtName</strong><br>core:preferredTitle <br><span class="org">Albert Mann Library</span></h1>
         </article>
         
-        <article class="vcard individual-foaf-person"  role="navigation"> <img src="${urls.home}/images/menupage/person-thumbnail.jpg" width="90" height="90"  alt="foaf:lastName, foaf:firstName"/>
+        <article class="vcard individual-foaf-person"  role="navigation"> <img src="${urls.images}/menupage/person-thumbnail.jpg" width="90" height="90"  alt="foaf:lastName, foaf:firstName"/>
             <h1 class="fn"><strong>foaf:lastName, foaf:fisrtName</strong><br>core:preferredTitle <br><span class="org">Albert Mann Library</span></h1>
         </article>
         
-        <article class="vcard individual-foaf-person" role="navigation"> <img src="${urls.home}/images/menupage/person-thumbnail.jpg" width="90" height="90"  alt="foaf:lastName, foaf:firstName"/>
+        <article class="vcard individual-foaf-person" role="navigation"> <img src="${urls.images}/menupage/person-thumbnail.jpg" width="90" height="90"  alt="foaf:lastName, foaf:firstName"/>
             <h1 class="fn"><strong>foaf:lastName, foaf:fisrtName</strong><br>core:preferredTitle <br><span class="org">Albert Mann Library</span></h1>
         </article>
         
-        <article class="vcard individual-foaf-person" role="navigation"> <img src="${urls.home}/images/menupage/person-thumbnail.jpg" width="90" height="90"  alt="foaf:lastName, foaf:firstName"/>
+        <article class="vcard individual-foaf-person" role="navigation"> <img src="${urls.images}/menupage/person-thumbnail.jpg" width="90" height="90"  alt="foaf:lastName, foaf:firstName"/>
             <h1 class="fn"><strong>foaf:lastName, foaf:fisrtName</strong><br>core:preferredTitle <br><span class="org">Albert Mann Library</span></h1>
         </article>
         
-        <article class="vcard individual-foaf-person" role="navigation"> <img src="${urls.home}/images/menupage/person-thumbnail.jpg" width="90" height="90"  alt="foaf:lastName, foaf:firstName"/>
+        <article class="vcard individual-foaf-person" role="navigation"> <img src="${urls.images}/menupage/person-thumbnail.jpg" width="90" height="90"  alt="foaf:lastName, foaf:firstName"/>
             <h1 class="fn"><strong>foaf:lastName, foaf:fisrtName</strong><br>core:preferredTitle <br><span class="org">Albert Mann Library</span></h1>
         </article>
         
-        <article class="vcard individual-foaf-person" role="navigation"> <img src="${urls.home}/images/menupage/person-thumbnail.jpg" width="90" height="90"  alt="foaf:lastName, foaf:firstName"/>
+        <article class="vcard individual-foaf-person" role="navigation"> <img src="${urls.images}/menupage/person-thumbnail.jpg" width="90" height="90"  alt="foaf:lastName, foaf:firstName"/>
             <h1 class="fn"><strong>foaf:lastName, foaf:fisrtName</strong><br>core:preferredTitle <br><span class="org">Albert Mann Library</span></h1>
         </article>
         
-        <article class="vcard individual-foaf-person" role="navigation"> <img src="${urls.home}/images/menupage/person-thumbnail.jpg" width="90" height="90"  alt="foaf:lastName, foaf:firstName"/>
+        <article class="vcard individual-foaf-person" role="navigation"> <img src="${urls.images}/menupage/person-thumbnail.jpg" width="90" height="90"  alt="foaf:lastName, foaf:firstName"/>
             <h1 class="fn"><strong>foaf:lastName, foaf:fisrtName</strong><br>core:preferredTitle <br><span class="org">Albert Mann Library</span></h1>
         </article>
     </section>

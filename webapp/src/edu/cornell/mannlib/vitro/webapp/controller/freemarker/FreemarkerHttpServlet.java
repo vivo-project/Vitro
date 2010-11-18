@@ -301,6 +301,9 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         Map<String, String> urls = new HashMap<String, String>();
         
         urls.put("home", urlBuilder.getHomeUrl());
+        
+        // Templates use this to construct urls.
+        urls.put("base", urlBuilder.contextPath);
 
         urls.put("about", urlBuilder.getPortalUrl(Route.ABOUT));
         if (ContactMailServlet.getSmtpHostFromProperties() != null) {
@@ -311,7 +314,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         urls.put("login", urlBuilder.getPortalUrl(Route.LOGIN));          
         urls.put("logout", urlBuilder.getLogoutUrl());       
         urls.put("siteAdmin", urlBuilder.getPortalUrl(Route.SITE_ADMIN));  
-        urls.put("siteIcons", urlBuilder.getPortalUrl(themeDir + "/site_icons"));
+        urls.put("siteIcons", urlBuilder.getPortalUrl(themeDir + "/site_icons")); // deprecated
         urls.put("themeImages", urlBuilder.getPortalUrl(themeDir + "/images"));
         urls.put("images", urlBuilder.getUrl("/images"));
         urls.put("theme", urlBuilder.getUrl(themeDir));
