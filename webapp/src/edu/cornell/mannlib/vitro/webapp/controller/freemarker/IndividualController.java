@@ -451,12 +451,14 @@ public class IndividualController extends FreemarkerHttpServlet {
 		return null;
 	}  
 
+	@SuppressWarnings("unused")
 	private boolean checkForSunset(VitroRequest vreq, Individual entity) {
         // TODO Auto-generated method stub
         return false;
     }
 
-    private boolean checkForHidden(VitroRequest vreq, Individual entity){ 
+    @SuppressWarnings("unused")
+	private boolean checkForHidden(VitroRequest vreq, Individual entity){ 
         // TODO Auto-generated method stub
         return false;
     }
