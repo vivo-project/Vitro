@@ -58,7 +58,7 @@ public class SelfEditingPolicyTest extends AbstractTestClass {
         
         
         ids = new ArrayIdentifierBundle();
-        //ids.add( new NetIdIdentifierFactory.NetId("test223") );
+        ids.add( new SelfEditingIdentifierFactory.NetId("test223") );
         
         IndividualImpl ind = new IndividualImpl();
         ind.setURI( SELFEDITOR_URI );        

@@ -1,7 +1,7 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
 <section id="individual-intro-person" class="vcard">
-    <div id="individual-intro-left-content"> <img class="individual-photo2" src="${urls.home}/images/individual/individual--foaf-person.png" /><!-- mb863 get rid off div-->
+    <div id="individual-intro-left-content"> <img class="individual-photo2" src="${urls.images}/individual/individual--foaf-person.png" /><!-- mb863 get rid off div-->
         <nav>
             <ul id ="individual-tools-people">
                 <li><a class="picto-font  picto-uri" href="#">j</a></li>
@@ -11,7 +11,7 @@
             </ul>
         </nav>
         
-        <a class="email" href="#"><span class ="picto-font  picto-email">M</span> email@cornell.edu</a> <a class="tel" href="#"><img class ="icon-phone" src="${urls.home}/images/individual/phone-icon.gif" />555 567 7878</a>
+        <a class="email" href="#"><span class ="picto-font  picto-email">M</span> email@cornell.edu</a> <a class="tel" href="#"><img class ="icon-phone" src="${urls.images}/individual/phone-icon.gif" />555 567 7878</a>
         
         <nav>
             <ul id ="individual-urls-people">
@@ -62,12 +62,12 @@
         </header>
         
         <ul>
-            <li><a href="#"><img class="co-author" src="${urls.home}/images/individual/Bacall.jpg" /></a></li>
-            <li><a href="#"><img class="co-author" src="${urls.home}/images/individual/Bogart.jpg" /></a></li>
-            <li><a href="#"><img class="co-author" src="${urls.home}/images/individual/Gable.jpg" /></a></li>
-            <li><a href="#"><img class="co-author" src="${urls.home}/images/individual/Grant.jpg" /></a></li>
-            <li><a href="#"><img class="co-author" src="${urls.home}/images/individual/Leigh.jpg" /></a></li>
-            <li><a href="#"><img class="co-author" src="${urls.home}/images/individual/Welles.jpg" /></a></li>
+            <li><a href="#"><img class="co-author" src="${urls.images}/individual/Bacall.jpg" /></a></li>
+            <li><a href="#"><img class="co-author" src="${urls.images}/individual/Bogart.jpg" /></a></li>
+            <li><a href="#"><img class="co-author" src="${urls.images}/individual/Gable.jpg" /></a></li>
+            <li><a href="#"><img class="co-author" src="${urls.images}/individual/Grant.jpg" /></a></li>
+            <li><a href="#"><img class="co-author" src="${urls.images}/individual/Leigh.jpg" /></a></li>
+            <li><a href="#"><img class="co-author" src="${urls.images}/individual/Welles.jpg" /></a></li>
         </ul>
         
         <p class="view-all-coauthors"><a class="view-all-style" href="#">View All <span class="pictos-arrow-10">4</span></a></p>

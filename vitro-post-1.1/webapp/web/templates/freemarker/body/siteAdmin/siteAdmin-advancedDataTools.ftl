@@ -11,7 +11,8 @@
             <li><a href="${dataTools.urls.ingest}">Ingest tools</a></li>   
             <li><a href="${dataTools.urls.rdfData}">Add/Remove RDF data</a></li>
             <li><a href="${dataTools.urls.rdfExport}">RDF export</a></li>
-            <li><a href="${dataTools.urls.sparqlQuery}">SPARQL query</a></li>        
+            <li><a href="${dataTools.urls.sparqlQuery}">SPARQL query</a></li>
+            <li><a href="${dataTools.urls.sparqlQueryBuilder}">SPARQL query builder</a></li>         
         </ul>
     </div>
 </#if>

@@ -19,69 +19,71 @@ import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.Message;
 
 /**
- * Set up the Shibboleth login process.
+ * Set up the external authorization process.
  * 
  * Write down the page that triggered the request, so we can get back to it.
  * 
- * Send a request to the Shibboleth server that will return us to the
- * LoginShibbolethReturn servlet for further processing.
+ * Send a request to the external authorization server that will return us to
+ * the LoginExternalAuthReturn servlet for further processing.
  */
-public class LoginShibbolethSetup extends BaseLoginServlet {
+public class LoginExternalAuthSetup extends BaseLoginServlet {
 	private static final Log log = LogFactory
-			.getLog(LoginShibbolethSetup.class);
+			.getLog(LoginExternalAuthSetup.class);
 
 	/** This session attribute tells where we came from. */
-	static final String ATTRIBUTE_REFERRER = LoginShibbolethSetup.class
+	static final String ATTRIBUTE_REFERRER = LoginExternalAuthSetup.class
 			.getName() + ".referrer";
 
-	private static final String RETURN_SERVLET_URL = "/loginShibbolethReturn";
+	private static final String RETURN_SERVLET_URL = "/loginExternalAuthReturn";
 
 	/** This http header holds the referring page. */
 	private static final String HEADING_REFERRER = "referer";
 
-	/** The configuration property that points to the Shibboleth server. */
-	private static final String PROPERTY_SHIBBOLETH_SERVER_URL = "shibboleth.server.url";
+	/**
+	 * The configuration property that points to the external authorization
+	 * server.
+	 */
+	private static final String PROPERTY_EXTERNAL_AUTH_SERVER_URL = "externalAuth.serverUrl";
 
-	/** The complaint we make if there is no Shibbolet server property. */
-	private static final Message MESSAGE_NO_SHIBBOLETH_SERVER = new LoginProcessBean.Message(
+	/**
+	 * The complaint we make if there is no external authorization server
+	 * property.
+	 */
+	private static final Message MESSAGE_NO_EXTERNAL_AUTH_SERVER = new LoginProcessBean.Message(
 			"deploy.properties doesn't contain a value for '"
-					+ PROPERTY_SHIBBOLETH_SERVER_URL + "'",
+					+ PROPERTY_EXTERNAL_AUTH_SERVER_URL + "'",
 			LoginProcessBean.MLevel.ERROR);
 
-	private String shibbolethServerUrl;
+	private String extrnalAuthServerUrl;
 
 	/** Get the configuration property. */
 	@Override
 	public void init() throws ServletException {
-		shibbolethServerUrl = ConfigurationProperties
-				.getProperty(PROPERTY_SHIBBOLETH_SERVER_URL);
+		extrnalAuthServerUrl = ConfigurationProperties
+				.getProperty(PROPERTY_EXTERNAL_AUTH_SERVER_URL);
 	}
 
 	/**
 	 * Write down the referring page, record that we are logging in, and
-	 * redirect to the shib server URL.
+	 * redirect to the external authorization server URL.
 	 */
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		// Record where we came from, so we can get back there.
 		storeTheReferringPage(req);
 
-		// If we have no URL for the Shibboleth server, give up.
-		if (shibbolethServerUrl == null) {
-			log.debug("No shibboleth server in deploy.properties");
+		if (extrnalAuthServerUrl == null) {
+			log.debug("No external authorization server in deploy.properties");
 			complainAndReturnToReferrer(req, resp, ATTRIBUTE_REFERRER,
-					MESSAGE_NO_SHIBBOLETH_SERVER);
+					MESSAGE_NO_EXTERNAL_AUTH_SERVER);
 			return;
 		}
 
-		// Record that we are in the process of logging in.
 		LoginProcessBean.getBean(req).setState(
 				LoginProcessBean.State.LOGGING_IN);
 
-		// Hand over to Shibboleth.
-		log.debug("Sending to shibboleth server.");
-		resp.sendRedirect(buildShibbolethRedirectUrl(req));
+		log.debug("Sending to external authorization server.");
+		resp.sendRedirect(buildExternalAuthRedirectUrl(req));
 	}
 
 	/** Remember where we came from - we'll need to go back there. */
@@ -95,15 +97,15 @@ public class LoginShibbolethSetup extends BaseLoginServlet {
 		req.getSession().setAttribute(ATTRIBUTE_REFERRER, referrer);
 	}
 
-	/** How do we get to the Shibboleth server and back? */
-	private String buildShibbolethRedirectUrl(HttpServletRequest req) {
+	/** How do we get to the external authorization server and back? */
+	private String buildExternalAuthRedirectUrl(HttpServletRequest req) {
 		try {
 			String returnUrl = figureHomePageUrl(req) + RETURN_SERVLET_URL;
 			String encodedReturnUrl = URLEncoder.encode(returnUrl, "UTF-8");
-			String shibbolethUrl = shibbolethServerUrl + "?target="
+			String externalAuthUrl = extrnalAuthServerUrl + "?target="
 					+ encodedReturnUrl;
-			log.debug("shibbolethURL is '" + shibbolethUrl + "'");
-			return shibbolethUrl;
+			log.debug("externalAuthUrl is '" + externalAuthUrl + "'");
+			return externalAuthUrl;
 		} catch (UnsupportedEncodingException e) {
 			throw new RuntimeException(e); // No UTF-8? Really?
 		}

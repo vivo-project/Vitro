@@ -12,7 +12,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 /** 
- * Attempts to simulate the action of NetIdIdentifierFactory.java using the
+ * Attempts to simulate the action of SelfEditingIdentifierFactory.java using the
  * request attribute FAKE_SELF_EDIT_NETID.
  */
 public class FakeSelfEditingIdentifierFactory implements IdentifierBundleFactory{    

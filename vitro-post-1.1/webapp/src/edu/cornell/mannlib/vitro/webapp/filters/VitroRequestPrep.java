@@ -20,8 +20,8 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.Identifier;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory.SelfEditing;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.ServletIdentifierBundleFactory;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
@@ -412,18 +412,19 @@ public class VitroRequestPrep implements Filter {
 		if (session == null) {
 			return false;
 		}
+
 		ServletContext sc = session.getServletContext();
-
-		IdentifierBundle idBundle = ServletIdentifierBundleFactory
-				.getIdBundleForRequest(request, session, sc);
-
-		for (Identifier id : idBundle) {
-			if (id instanceof SelfEditing) {
-				return true;
-			}
+		IdentifierBundle idBundle = ServletIdentifierBundleFactory.getIdBundleForRequest(request, session, sc);
+		if (idBundle == null) {
+			return false;
 		}
-
-		return false;
+		
+		SelfEditing selfId = SelfEditingIdentifierFactory.getSelfEditingIdentifier(idBundle);
+		if (selfId == null) {
+			return false;
+		}
+		
+		return true;
 	}
 
     public void destroy() {       

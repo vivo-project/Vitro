@@ -9,6 +9,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.Field;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -16,6 +17,12 @@ import freemarker.template.TemplateException;
 public abstract class BaseEditElement  implements EditElement {
     private static final Log log = LogFactory.getLog(BaseEditElement.class);
 
+    protected Field field;
+    
+    public BaseEditElement(Field field){
+        this.field = field;
+    }
+    
     /**
      * Utility method for use in EditElements to merge a freemarker template.
      */

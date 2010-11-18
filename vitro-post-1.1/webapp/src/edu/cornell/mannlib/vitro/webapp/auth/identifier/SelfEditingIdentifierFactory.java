@@ -27,78 +27,142 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 
+import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 /**
- * Pulls a netId out of the CUWebAuth REMOTE_USER header.
- *
- * @author bdc34
+ * Attempts to pull a NetId and a SelfEditing identifier from the externally
+ * authorized username.
+ * 
+ * @author bdc34, trashed by jeb228
  */
 public class SelfEditingIdentifierFactory implements IdentifierBundleFactory {
-    public final static String httpHeaderForNetId = "REMOTE_USER";
+	private static final Log log = LogFactory.getLog(SelfEditingIdentifierFactory.class);
+	
+	/**
+	 * The configuration property that names the HTTP header that will hold the
+	 * username from the external authorization system.
+	 */
+	private static final String PROPERTY_EXTERNAL_AUTH_HEADER_NAME = "externalAuth.headerName";
 
-    private static final Log log = LogFactory.getLog(SelfEditingIdentifierFactory.class.getName());
+	private static final int MAXIMUM_USERNAME_LENGTH = 100;
+	
+	public IdentifierBundle getIdentifierBundle(ServletRequest request,
+			HttpSession session, ServletContext context) {
+		if (!(request instanceof HttpServletRequest)) {
+			log.debug("request is null or not an HttpServletRequest");
+			return null;
+		}
+		HttpServletRequest req = (HttpServletRequest) request;
+		log.debug("request is for " + req.getRequestURI());
+		
+		NetId netId = figureNetId(req);
+		SelfEditing selfId = figureSelfEditingId(req, netId);
+		
+		return buildIdentifierBundle(netId, selfId);
+	}
 
-    public IdentifierBundle getIdentifierBundle(ServletRequest request, HttpSession session, ServletContext context) {
-       IdentifierBundle idb = getFromCUWebAuthHeader(request,session,context);       
-       if( idb != null )
-           return idb;
-       else
-           return getFromSession(session);       
-    }
+	/**
+	 * Get the name of the externally authorized user and put it into a NetId.
+	 */
+	private NetId figureNetId(HttpServletRequest req) {
+		String externalAuthHeaderName = ConfigurationProperties.getProperty(PROPERTY_EXTERNAL_AUTH_HEADER_NAME);
+		if (isEmpty(externalAuthHeaderName)) {
+			log.debug(PROPERTY_EXTERNAL_AUTH_HEADER_NAME + " property is not configured.");
+			return null;
+		}
 
-    private IdentifierBundle getFromCUWebAuthHeader(ServletRequest request, HttpSession session,ServletContext context){
-        String cuwebauthUser = ((HttpServletRequest)request).getHeader(CUWEBAUTH_REMOTE_USER_HEADER);
-        log.debug("Looking for CUWebAuth header " + CUWEBAUTH_REMOTE_USER_HEADER + " found : '" + cuwebauthUser +"'");
-        
-        if( cuwebauthUser == null || cuwebauthUser.length() == 0){
-                log.debug("No CUWebAuthUser string found");
-                return null;
-        }
-        if( cuwebauthUser.length() > 100){
-            log.info("CUWebAuthUser is longer than 100 chars, this may be a malicious request");
-            return null;
-        }
-        if( context == null ){
-            log.error("ServletContext was null");
-            return null;
-        }                                         
+		String externalUsername = req.getHeader(externalAuthHeaderName);
+		if (isEmpty(externalUsername)) {
+			log.debug("The external username is empty.");
+			return null;
+		}
+		if (externalUsername.length() > MAXIMUM_USERNAME_LENGTH) {
+			log.info("The external username is longer than " + MAXIMUM_USERNAME_LENGTH
+					+ " chars; this may be a malicious request");
+			return null;
+		}
+		
+		return new NetId(externalUsername);
+	}
 
-        NetId netid = new NetId(cuwebauthUser);                        
-        SelfEditing selfE = null;
+	/**
+	 * If the externally authorized username is associated with an Individual in
+	 * the model, create a SelfEditing identifier.
+	 */
+	private SelfEditing figureSelfEditingId(HttpServletRequest request,
+			NetId netId) {
+		if (netId == null) {
+			return null;
+		}
+		String username = netId.getValue();
 
-        IdentifierBundle idb = new ArrayIdentifierBundle();
-        idb.add(netid);
-        log.debug("added NetId object to IdentifierBundle from CUWEBAUTH header");            
-        //VitroRequest vreq = new VitroRequest((HttpServletRequest)request);
+		HttpSession session = request.getSession(false);
+		if (session == null) {
+			return null;
+		}
 
-        WebappDaoFactory wdf = (WebappDaoFactory)context.getAttribute("webappDaoFactory");
-        if( wdf == null ){
-            log.error("Could not get a WebappDaoFactory from the ServletContext");
-            return null;
-        }
+		ServletContext context = session.getServletContext();
+		WebappDaoFactory wdf = (WebappDaoFactory) context
+				.getAttribute("webappDaoFactory");
+		if (wdf == null) {
+			log.error("Could not get a WebappDaoFactory from the ServletContext");
+			return null;
+		}
 
-        String uri = wdf.getIndividualDao().getIndividualURIFromNetId(cuwebauthUser);
+		String uri = wdf.getIndividualDao().getIndividualURIFromNetId(username);
+		if (uri == null) {
+			log.debug("could not find an Individual with a netId of "
+					+ username);
+		}
 
-        if( uri != null){
-            Individual ind = wdf.getIndividualDao().getIndividualByURI(uri);
-            if( ind != null ){
-                String blacklisted = checkForBlacklisted(ind, context);
-                
-                selfE = new SelfEditing( ind ,blacklisted , false);                
-                idb.add(  selfE );
-                log.debug("Found an Individual for netId " + cuwebauthUser + " URI: " + ind.getURI() );
-            }else{
-                log.warn("found a URI for the netId " + cuwebauthUser + " but could not build Individual");
-            }
-        }else{
-            log.debug("could not find an Individual with a netId of " + cuwebauthUser );
-        }        
-        putNetIdInSession(session, selfE, netid);            
-        return idb;
-    }
-    
+		Individual ind = wdf.getIndividualDao().getIndividualByURI(uri);
+		if (ind == null) {
+			log.warn("found a URI for the netId " + username
+					+ " but could not build Individual");
+			return null;
+		}
+
+		log.debug("Found an Individual for netId " + username + " URI: " + uri);
+		String blacklisted = checkForBlacklisted(ind, context);
+		return new SelfEditing(ind, blacklisted, false);
+	}
+
+	/**
+	 * Create a bundle that holds the identifiers we created, or null if we
+	 * didn't create any.
+	 */
+	private IdentifierBundle buildIdentifierBundle(NetId netId,
+			SelfEditing selfId) {
+		if (netId == null && selfId == null) {
+			log.debug("no self-editing IDs in the session");
+			return null;
+		}
+
+		IdentifierBundle idb = new ArrayIdentifierBundle();
+		if (netId != null) {
+			idb.add(netId);
+			log.debug("added NetId from session: " + netId);
+		}
+		if (selfId != null) {
+			idb.add(selfId);
+			log.debug("added SelfEditing from Session: " + selfId);
+		}
+		return idb;
+	}
+
+	private boolean isEmpty(String string) {
+		return (string == null || string.isEmpty());
+	}
+
+	// ----------------------------------------------------------------------
+	// static utility methods
+	// ----------------------------------------------------------------------
+	
+    public static final String NOT_BLACKLISTED = null;   
+    private final static String BLACKLIST_SPARQL_DIR = "/admin/selfEditBlacklist";
+
     /**
      * Runs through .sparql files in the BLACKLIST_SPARQL_DIR, the first that returns one
      * or more rows will be cause the user to be blacklisted.  The first variable from
@@ -210,44 +274,27 @@ public class SelfEditingIdentifierFactory implements IdentifierBundleFactory {
         return null;
     }
 
-    private IdentifierBundle getFromSession( HttpSession session ){
-    	if (session == null) {
-    		return null;
-    	}
-    	
-        NetId netid = (NetId)session.getAttribute(NETID_IN_SESSION);
-        SelfEditing sed = (SelfEditing)session.getAttribute(URI_IN_SESSION);
-        
-        if( netid != null || sed != null ){
-            IdentifierBundle idb = new ArrayIdentifierBundle();
-            if( netid != null){
-                idb.add(netid);
-                log.debug("added NetId from session");
-            }
-            if( sed != null ){
-                idb.add(sed);
-                log.debug("added SelfEditing from Session");
-            }
-            return idb;
-        }else 
+    public static SelfEditing getSelfEditingIdentifier( IdentifierBundle whoToAuth ){
+        if( whoToAuth == null ) return null;        
+        for(Identifier id : whoToAuth){
+            if (id instanceof SelfEditing) 
+                return (SelfEditing)id;                           
+        }
+        return null;
+    }
+    
+    public static String getSelfEditingUri( IdentifierBundle whoToAuth){
+        SelfEditing sid = getSelfEditingIdentifier(whoToAuth);
+        if( sid != null )
+            return sid.getValue();
+        else
             return null;
     }
+
+    // ----------------------------------------------------------------------
+	// Helper classes
+	// ----------------------------------------------------------------------
     
-    
-    protected final static String NETID_IN_SESSION = "NetIdIdentifierFactory.netid";
-    protected final static String URI_IN_SESSION = "NetIdIdentifierFactory.uri";
-    
-    public static void putNetIdInSession( HttpSession session, SelfEditing se, NetId ni){
-        session.setAttribute(NETID_IN_SESSION, ni);
-        session.setAttribute(URI_IN_SESSION, se);
-    }
-    
-    public static void clearNetIdFromSession( HttpSession session ){
-        session.removeAttribute(NETID_IN_SESSION);
-        session.removeAttribute(URI_IN_SESSION);
-    }
-    
-    /********************** NetId inner class *************************/
     public static class NetId implements Identifier{
         public final String value;
         public NetId(String value){
@@ -288,30 +335,11 @@ public class SelfEditingIdentifierFactory implements IdentifierBundleFactory {
         }
         public String toString(){
             return "SelfEditing as " + getValue() +
-            (getBlacklisted()!=null?  " blacklisted by via " + getBlacklisted():"");
+            (getBlacklisted()!=null?  " blacklisted via " + getBlacklisted():"");
         }
         public boolean isFake() {
             return faked;
         }
     }
     
-    public static SelfEditing getSelfEditingIdentifier( IdentifierBundle whoToAuth ){
-        if( whoToAuth == null ) return null;        
-        for(Identifier id : whoToAuth){
-            if (id instanceof SelfEditing) 
-                return (SelfEditing)id;                           
-        }
-        return null;
-    }
-    
-    public static String getSelfEditingUri( IdentifierBundle whoToAuth){
-        SelfEditing sid = getSelfEditingIdentifier(whoToAuth);
-        if( sid != null )
-            return sid.getValue();
-        else
-            return null;
-    }
-    public static final String NOT_BLACKLISTED = null;   
-    private final static String BLACKLIST_SPARQL_DIR = "/admin/selfEditBlacklist";
-    private final static String CUWEBAUTH_REMOTE_USER_HEADER = "REMOTE_USER";
 }

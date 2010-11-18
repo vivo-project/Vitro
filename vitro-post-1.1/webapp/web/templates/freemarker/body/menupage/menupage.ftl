@@ -1,7 +1,7 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
-<section id="content-generic-class">
-    <nav>
+<section id="content-generic-class" role="region">
+    <nav role="navigation">
         <h3>Organizations</h3>
         
         <h4>Visual Graph</h4>
@@ -19,13 +19,15 @@
         </ul>
     </nav>
     
-    <section id="generic-class-graph"> <img src="${urls.home}/images/menupage/visual-graph-generic-class.jpg" width="500" height="283" /> </section>
+    <section id="generic-class-graph" role="region">
+        <img src="${urls.images}/menupage/visual-graph-generic-class.jpg" width="500" height="283" alt ="" />
+    </section>
 </section>
 
-<section id="browse-by">
+<section id="browse-by" role="region">
     <h2>Browse By</h2>
   
-    <nav>
+    <nav role="navigation">
         <ul id="browse-childClasses">
             <li><a class="selected" href="#">&lt;classInClassGroup&gt;<span class="count-classes"> (280)</span></a></li>
             <li><a href="#">&lt;classInClassGroup&gt;<span class="count-classes"> (280)</span></a></li>
@@ -38,7 +40,7 @@
             <li><a href="#">&lt;classInClassGroup&gt;<span class="count-classes"> (280)</span></a></li>
         </ul>
     
-        <nav>
+        <nav role="navigation">
             <ul id="alpha-browse-childClass">
                 <li><a href="#">All<span class="count-classes"> (280)</span></a></li>
                 <li><a href="#">A<span class="count-classes"> (280)</span></a></li>
@@ -61,20 +63,20 @@
         </nav>
     </nav>
   
-    <section id="individuals-in-childClass">
+    <section id="individuals-in-childClass" role="region">
         <h3>B</h3>
     
-        <article class="vcard individual"><h1 class="fn">&lt;individualName&gt;</h1></article>
-        <article class="vcard individual"><h1 class="fn">&lt;individualName&gt;</h1></article>
-        <article class="vcard individual"><h1 class="fn">&lt;individualName&gt;</h1></article>
-        <article class="vcard individual"><h1 class="fn">&lt;individualName&gt;</h1></article>
-        <article class="vcard individual"><h1 class="fn">&lt;individualName&gt;</h1></article>
-        <article class="vcard individual"><h1 class="fn">&lt;individualName&gt;</h1></article>
-        <article class="vcard individual"><h1 class="fn">&lt;individualName&gt;</h1></article>
-        <article class="vcard individual"><h1 class="fn">&lt;individualName&gt;</h1></article>
-        <article class="vcard individual"><h1 class="fn">&lt;individualName&gt;</h1></article>
-        <article class="vcard individual"><h1 class="fn">&lt;individualName&gt;</h1></article>
-        <article class="vcard individual"><h1 class="fn">&lt;individualName&gt;</h1></article>
-        <article class="vcard individual"><h1 class="fn">&lt;individualName&gt;</h1></article>
+        <article class="vcard individual" role="article"><h1 class="fn">&lt;individualName&gt;</h1></article>
+        <article class="vcard individual" role="article"><h1 class="fn">&lt;individualName&gt;</h1></article>
+        <article class="vcard individual" role="article"><h1 class="fn">&lt;individualName&gt;</h1></article>
+        <article class="vcard individual" role="article"><h1 class="fn">&lt;individualName&gt;</h1></article>
+        <article class="vcard individual" role="article"><h1 class="fn">&lt;individualName&gt;</h1></article>
+        <article class="vcard individual" role="article"><h1 class="fn">&lt;individualName&gt;</h1></article>
+        <article class="vcard individual" role="article"><h1 class="fn">&lt;individualName&gt;</h1></article>
+        <article class="vcard individual" role="article"><h1 class="fn">&lt;individualName&gt;</h1></article>
+        <article class="vcard individual" role="article"><h1 class="fn">&lt;individualName&gt;</h1></article>
+        <article class="vcard individual" role="article"><h1 class="fn">&lt;individualName&gt;</h1></article>
+        <article class="vcard individual" role="article"><h1 class="fn">&lt;individualName&gt;</h1></article>
+        <article class="vcard individual" role="article"><h1 class="fn">&lt;individualName&gt;</h1></article>
     </section>
 </section>

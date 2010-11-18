@@ -55,9 +55,17 @@ public abstract class Widget {
         HttpServletRequest request = (HttpServletRequest) env.getCustomAttribute("request");
         ServletContext context = (ServletContext) env.getCustomAttribute("context");
         
-        WidgetTemplateValues values = process(env, params, request, context); 
+        WidgetTemplateValues values = null;
+        
+        try {
+            values = process(env, params, request, context); 
+        } catch (Exception e) {
+            log.error(e, e);
+        }
+        
         // The widget process() method may determine that nothing should display for the widget:
-        // for example, the login widget doesn't display if the user is already logged in.
+        // for example, the login widget doesn't display if the user is already logged in. This also
+        // applies if process() threw an error.
         if (values == null) {
             return "";
         }
@@ -92,7 +100,7 @@ public abstract class Widget {
 //    }
 
     protected abstract WidgetTemplateValues process(Environment env, Map params, 
-            HttpServletRequest request, ServletContext context);
+            HttpServletRequest request, ServletContext context) throws Exception;
     
     private String processMacroToString(Environment env, String widgetName, Macro macro, Map<String, Object> map) {   
         StringWriter out = new StringWriter();
@@ -108,8 +116,8 @@ public abstract class Widget {
             // if it's already there or else add it. Leave this for later.
             Template template = new Template("widget", new StringReader(templateString), env.getConfiguration());          
             template.process(map, out);
-        } catch (Throwable th) {
-            log.error("Could not process widget " + widgetName, th);
+        } catch (Exception e) {
+            log.error("Could not process widget " + widgetName, e);
         }
         String output = out.toString(); 
         log.debug("Macro output: " + output);
@@ -163,8 +171,13 @@ public abstract class Widget {
 
         public String getMacroName() {
             return this.macroName;
+        } 
+    }
+    
+    protected class WidgetProcessingException extends Exception {
+        WidgetProcessingException(String message) {
+            super(message);
         }
- 
     }
 
 }

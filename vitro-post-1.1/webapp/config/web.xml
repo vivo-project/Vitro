@@ -1087,14 +1087,28 @@
   </servlet>
 
   <servlet>
-    <servlet-name>loginShibboleth</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.authenticate.LoginShibboleth</servlet-class>
+    <servlet-name>loginExternalAuthSetup</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.authenticate.LoginExternalAuthSetup</servlet-class>
+  </servlet>
+
+  <servlet>
+    <servlet-name>loginExternalAuthReturn</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.authenticate.LoginExternalAuthReturn</servlet-class>
   </servlet>
 
   <servlet>
     <servlet-name>logout</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.Logout</servlet-class>
   </servlet>
+
+  <servlet>
+    <servlet-name>unrecognizedUser</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.authenticate.UnrecognizedUserController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>unrecognizedUser</servlet-name>
+    <url-pattern>/unrecognizedUser</url-pattern>
+  </servlet-mapping>
 
   <servlet>
     <servlet-name>browsecontroller</servlet-name>
@@ -1259,6 +1273,14 @@
     <url-pattern>/loginShibboleth</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
+    <servlet-name>loginExternalAuthSetup</servlet-name>
+    <url-pattern>/loginExternalAuth</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>loginExternalAuthReturn</servlet-name>
+    <url-pattern>/loginExternalAuthReturn</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
     <!-- for backward-compatibility -->
     <servlet-name>login</servlet-name>
     <url-pattern>/login_process.jsp</url-pattern> 
@@ -1290,6 +1312,71 @@
   <servlet-mapping>
     <servlet-name>generic_delete</servlet-name>
     <url-pattern>/generic_delete</url-pattern>
+  </servlet-mapping>
+
+  <!-- ==================== sparql query builder ==================== -->
+  
+  <servlet>
+    <servlet-name>SparlQueryBuilder</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.SparqlQueryBuilderServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>SparlQueryBuilder</servlet-name>
+    <url-pattern>/admin/sparqlquerybuilder</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>GetAllClasses</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.sparql.GetAllClasses</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>GetAllClasses</servlet-name>
+    <url-pattern>/admin/getAllClasses</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>GetAllPrefix</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.sparql.GetAllPrefix</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>GetAllPrefix</servlet-name>
+    <url-pattern>/admin/getAllPrefix</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>GetClazzDataProperties</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.sparql.GetClazzDataProperties</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>GetClazzDataProperties</servlet-name>
+    <url-pattern>/admin/getClazzDataProperties</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>GetClazzAllProperties</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.sparql.GetClazzAllProperties</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>GetClazzAllProperties</servlet-name>
+    <url-pattern>/admin/getClazzAllProperties</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>GetClazzObjectProperties</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.sparql.GetClazzObjectProperties</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>GetClazzObjectProperties</servlet-name>
+    <url-pattern>/admin/getClazzObjectProperties</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>GetObjectClasses</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.sparql.GetObjectClasses</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>GetObjectClasses</servlet-name>
+    <url-pattern>/admin/getObjectClasses</url-pattern>
   </servlet-mapping>
 
   <!-- ==================== tag libraries ============================== -->

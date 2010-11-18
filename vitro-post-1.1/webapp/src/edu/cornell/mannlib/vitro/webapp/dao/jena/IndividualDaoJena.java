@@ -50,7 +50,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Keyword;
 import edu.cornell.mannlib.vitro.webapp.beans.KeywordIndividualRelation;
-import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
@@ -132,21 +131,21 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
         }
     }
 
-    public List /*of Entity*/ getIndividualsByVClass(VClass vclass ) {
+    public List<Individual> getIndividualsByVClass(VClass vclass ) {
         return getIndividualsByVClassURI(vclass.getURI(),-1,-1);
     }
     
-    public List /*of Entity*/ getIndividualsByVClassURI(String vclassURI) {
+    public List<Individual> getIndividualsByVClassURI(String vclassURI) {
         return getIndividualsByVClassURI(vclassURI,-1,-1);
     }
 
-    public List getIndividualsByVClassURI(String vclassURI, int offset, int quantity ) {
+    public List<Individual> getIndividualsByVClassURI(String vclassURI, int offset, int quantity ) {
 
     	if (vclassURI==null) {
             return null;
         }
         
-        List ents = new ArrayList();
+        List<Individual> ents = new ArrayList<Individual>();
         
         Resource theClass = (vclassURI.indexOf(PSEUDO_BNODE_NS) == 0) 
             ? getOntModel().createResource(new AnonId(vclassURI.split("#")[1]))
@@ -182,34 +181,12 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
 
     }
 
-    private class IndividualWebappComparator implements java.util.Comparator {
-        public int compare (Object o1, Object o2) {
-            if (o1 == null) {
-                return -1;
-            } else if (o2 == null) {
-                return 1;
-            }
-            Individual iw1 = (Individual) o1;
-            Individual iw2 = (Individual) o2;
-            String first = iw1.getName();
-            if (first==null) {
-                return -1;
-            }
-            String second = iw2.getName();
-            if (second==null) {
-                return 1;
-            }
-            Collator collator = Collator.getInstance();
-            return collator.compare(first,second);
-        }
-    }
-
     public int getCountOfIndividualsInVClass(String vclassURI ) {
         int count = 0;
         getOntModel().enterCriticalSection(Lock.READ);
         try {
             OntClass cls = getOntModel().getOntClass(vclassURI);
-            Iterator indIt = cls.listInstances();
+            Iterator<? extends OntResource> indIt = cls.listInstances();
             while (indIt.hasNext()) {
                 count++;
             }
@@ -227,9 +204,6 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
         initInd(ent);
         return insertNewIndividual(ent, getOntModelSelector().getABoxModel());
     }
-
-    private final boolean DONT_CHECK_UNIQUENESS=false;
-    private final boolean DO_CHECK_UNIQUENESS=true;
 
     /**
      * Inserts a new Individual into the knowledge base.
@@ -267,7 +241,7 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
                 if (ent.getName() != null) {
                     ind.setLabel(ent.getName(), (String) getDefaultLanguage());
                 }
-                List vclasses = ent.getVClasses(false);
+                List<VClass> vclasses = ent.getVClasses(false);
                 if (vclasses != null) {
                     for (Iterator<VClass> typeIt = vclasses.iterator(); typeIt.hasNext(); ) {
                         VClass vc = typeIt.next();
@@ -403,8 +377,8 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
                     ind.setLabel(ent.getName(), getDefaultLanguage());
                 }
                 Set<String> oldTypeURIsSet = new HashSet<String>();
-                for (Iterator typeIt = ind.listRDFTypes(true); typeIt.hasNext();) {
-                    Resource t = (Resource) typeIt.next();
+                for (Iterator<Resource> typeIt = ind.listRDFTypes(true); typeIt.hasNext();) {
+                    Resource t = typeIt.next();
                     if (t.getURI() != null) {
                         oldTypeURIsSet.add(t.getURI());
                     }
@@ -618,59 +592,31 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
         }
     }
 
-    /**
-     * fills in the Individual objects needed for any ObjectPropertyStatements attached to the specified individual.
-     * @param entity
-     */
-    private void fillIndividualsForObjectPropertyStatements(Individual entity){
-        getOntModel().enterCriticalSection(Lock.READ);
-        try {
-            Iterator e2eIt = entity.getObjectPropertyStatements().iterator();
-            while (e2eIt.hasNext()) {
-                ObjectPropertyStatement e2e = (ObjectPropertyStatement) e2eIt.next();
-                com.hp.hpl.jena.ontology.Individual subjInd = getOntModel().getIndividual(e2e.getSubjectURI());
-                if (subjInd != null) {
-                    Individual ent = new IndividualJena(subjInd, (WebappDaoFactoryJena) getWebappDaoFactory());
-                    getWebappDaoFactory().getLinksDao().addLinksToIndividual(ent);
-                    e2e.setSubject(ent);
-                }
-                com.hp.hpl.jena.ontology.Individual objInd = getOntModel().getIndividual(e2e.getObjectURI());
-                if (objInd != null) {
-                    Individual ent = new IndividualJena(objInd, (WebappDaoFactoryJena) getWebappDaoFactory());
-                    getWebappDaoFactory().getLinksDao().addLinksToIndividual(ent);
-                    e2e.setObject(ent);
-                }
-            }
-        } finally {
-            getOntModel().leaveCriticalSection();
-        }
-    }
-
     public void fillVClassForIndividual(Individual entity) {
         entity.setVClass(getWebappDaoFactory().getVClassDao().getVClassByURI(entity.getVClassURI()));
     }
 
-    public List monikers( String typeURI ) {
+    public List<String> monikers( String typeURI ) {
         getOntModel().enterCriticalSection(Lock.READ);
         try {
             HashSet<String> monikers = new HashSet<String>();
             OntClass cls = getOntModel().getOntClass(typeURI);
-            Iterator inds = cls.listInstances();
+            Iterator<? extends OntResource> inds = cls.listInstances();
             while (inds.hasNext()) {
-                com.hp.hpl.jena.ontology.Individual ind = (com.hp.hpl.jena.ontology.Individual) inds.next();
+            	OntResource ind = inds.next();
                 if (MONIKER != null) {
-                Iterator monikerIt = ind.listProperties(MONIKER);
+                Iterator<Statement> monikerIt = ind.listProperties(MONIKER);
                     while (monikerIt.hasNext()) {
-                        Statement monikerStmt = (Statement) monikerIt.next();
+                        Statement monikerStmt = monikerIt.next();
                         monikers.add(((Literal)monikerStmt.getObject()).getString());
                     }
                 }
             }
             List<String> monikerList = new ArrayList<String>();
             if (monikers.size()>0) {
-                Iterator monikerIt = monikers.iterator();
+                Iterator<String> monikerIt = monikers.iterator();
                 while (monikerIt.hasNext()) {
-                    monikerList.add((String)monikerIt.next());
+                    monikerList.add(monikerIt.next());
                 }
                 Collections.sort(monikerList,new Comparator<String>() {
                     public int compare( String first, String second ) {
@@ -693,10 +639,9 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public List<String> getKeywordsForIndividual(String entityURI) {
         KeywordDao kDao = getWebappDaoFactory().getKeywordDao();
-        List<String> keywords = new LinkedList();
+        List<String> keywords = new LinkedList<String>();
         List<KeywordIndividualRelation> kirs = getWebappDaoFactory().getKeys2EntsDao().getKeywordIndividualRelationsByIndividualURI(entityURI);
         Iterator<KeywordIndividualRelation> kirsIt = kirs.iterator();
         while (kirsIt.hasNext()) {
@@ -706,10 +651,9 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
         return keywords;
     }
 
-    @SuppressWarnings("unchecked")
     public List<String> getKeywordsForIndividualByMode(String entityURI, String modeStr) {
         KeywordDao kDao = getWebappDaoFactory().getKeywordDao();
-        List<String> keywords = new LinkedList();
+        List<String> keywords = new LinkedList<String>();
         List<KeywordIndividualRelation> kirs = getWebappDaoFactory().getKeys2EntsDao().getKeywordIndividualRelationsByIndividualURI(entityURI);
         Iterator<KeywordIndividualRelation> kirsIt = kirs.iterator();
         while (kirsIt.hasNext()) {
@@ -722,10 +666,9 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
         return keywords;
     }
 
-    @SuppressWarnings("unchecked")
     public List<Keyword> getKeywordObjectsForIndividual(String entityURI) {
         KeywordDao kDao = getWebappDaoFactory().getKeywordDao();
-        List<Keyword> keywords = new LinkedList();
+        List<Keyword> keywords = new LinkedList<Keyword>();
         List<KeywordIndividualRelation> kirs = getWebappDaoFactory().getKeys2EntsDao().getKeywordIndividualRelationsByIndividualURI(entityURI);
         Iterator<KeywordIndividualRelation> kirsIt = kirs.iterator();
         while (kirsIt.hasNext()) {
@@ -884,7 +827,7 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
             getOntModel().leaveCriticalSection();
         }
         
-        List<Individual> rv = new ArrayList(individualsMap.size());
+        List<Individual> rv = new ArrayList<Individual>(individualsMap.size());
         rv.addAll(individualsMap.values());
         return rv;
     }
@@ -954,15 +897,15 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
         return null;
     }
 
-    public Iterator getAllOfThisTypeIterator() {
+    public Iterator<Individual> getAllOfThisTypeIterator() {
         final List<com.hp.hpl.jena.ontology.Individual> list = 
             new LinkedList<com.hp.hpl.jena.ontology.Individual>();
         getOntModel().enterCriticalSection(Lock.READ);
         try {
-            ClosableIterator allIndIt = getOntModel().listIndividuals();
+            ClosableIterator<com.hp.hpl.jena.ontology.Individual> allIndIt = getOntModel().listIndividuals();
             try {
                 while (allIndIt.hasNext()) {
-                    com.hp.hpl.jena.ontology.Individual ind = (com.hp.hpl.jena.ontology.Individual) allIndIt.next();
+                    com.hp.hpl.jena.ontology.Individual ind = allIndIt.next();
                     
                     //don't include anything that lacks a label, issue VIVO-119.
                     if( getLabel(ind) == null )
@@ -970,10 +913,10 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
                     
                     boolean userVisible = true;
                     //Check for non-user visible types, maybe this should be an annotation?
-                    ClosableIterator typeIt = ind.listRDFTypes(false);
+                    ClosableIterator<Resource> typeIt = ind.listRDFTypes(false);
                     try {
                         while (typeIt.hasNext()) {
-                            Resource typeRes = (Resource) typeIt.next();
+                            Resource typeRes = typeIt.next();
                             String type = typeRes.getURI();
                             // brute forcing this until we implement a better strategy
                             if (VitroVocabulary.PORTAL.equals(type) || 
@@ -1011,12 +954,12 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
             getOntModel().leaveCriticalSection();
         }
         if (list.size() >0){
-            return new Iterator(){
+            return new Iterator<Individual>(){
                 Iterator<com.hp.hpl.jena.ontology.Individual> innerIt = list.iterator();
                 public boolean hasNext() { 
                     return innerIt.hasNext();                    
                 }
-                public Object next() {
+                public Individual next() {
                     return new IndividualJena(innerIt.next(), (WebappDaoFactoryJena) getWebappDaoFactory());
                 }
                 public void remove() {
@@ -1028,14 +971,14 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
             return null;
     }  
 
-    public Iterator getAllOfThisVClassIterator(String vClassURI) {
+    public Iterator<Individual> getAllOfThisVClassIterator(String vClassURI) {
         getOntModel().enterCriticalSection(Lock.READ);
         try {
-            List ents = new LinkedList();
+            List<Individual> ents = new LinkedList<Individual>();
             OntClass cls = getOntModel().getOntClass(vClassURI);
-            Iterator indIt = cls.listInstances();
+            Iterator<? extends OntResource> indIt = cls.listInstances();
             while (indIt.hasNext()) {
-                com.hp.hpl.jena.ontology.Individual ind = (com.hp.hpl.jena.ontology.Individual) indIt.next();
+            	OntResource ind = indIt.next();
                 ents.add(new IndividualJena(ind, (WebappDaoFactoryJena) getWebappDaoFactory()));
             }
             return ents.iterator();
@@ -1044,8 +987,8 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
         }
     }
 
-    public Iterator getUpdatedSinceIterator(long updatedSince){
-        List ents = new ArrayList();
+    public Iterator<Individual> getUpdatedSinceIterator(long updatedSince){
+        List<Individual> ents = new ArrayList<Individual>();
         Date since = new DateTime(updatedSince).toDate();
         String sinceStr = xsdDateTimeFormat.format(since);
         getOntModel().enterCriticalSection(Lock.READ);
@@ -1071,10 +1014,10 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
                 com.hp.hpl.jena.ontology.Individual ent = getOntModel().getIndividual(res.getURI());
                 if (ent != null) {
                     boolean userVisible = false;
-                    ClosableIterator typeIt = ent.listRDFTypes(true);
+                    ClosableIterator<Resource> typeIt = ent.listRDFTypes(true);
                     try {
                         while (typeIt.hasNext()) {
-                            Resource typeRes = (Resource) typeIt.next();
+                            Resource typeRes = typeIt.next();
                             if (typeRes.getNameSpace() == null || (!NONUSER_NAMESPACES.contains(typeRes.getNameSpace()))) {
                                 userVisible = true;
                                 break;
