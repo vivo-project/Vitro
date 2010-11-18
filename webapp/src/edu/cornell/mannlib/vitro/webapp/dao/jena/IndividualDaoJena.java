@@ -182,28 +182,6 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
 
     }
 
-    private class IndividualWebappComparator implements java.util.Comparator {
-        public int compare (Object o1, Object o2) {
-            if (o1 == null) {
-                return -1;
-            } else if (o2 == null) {
-                return 1;
-            }
-            Individual iw1 = (Individual) o1;
-            Individual iw2 = (Individual) o2;
-            String first = iw1.getName();
-            if (first==null) {
-                return -1;
-            }
-            String second = iw2.getName();
-            if (second==null) {
-                return 1;
-            }
-            Collator collator = Collator.getInstance();
-            return collator.compare(first,second);
-        }
-    }
-
     public int getCountOfIndividualsInVClass(String vclassURI ) {
         int count = 0;
         getOntModel().enterCriticalSection(Lock.READ);
@@ -227,9 +205,6 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
         initInd(ent);
         return insertNewIndividual(ent, getOntModelSelector().getABoxModel());
     }
-
-    private final boolean DONT_CHECK_UNIQUENESS=false;
-    private final boolean DO_CHECK_UNIQUENESS=true;
 
     /**
      * Inserts a new Individual into the knowledge base.
@@ -615,34 +590,6 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
             return null;
         } finally {
             ontModel.leaveCriticalSection();
-        }
-    }
-
-    /**
-     * fills in the Individual objects needed for any ObjectPropertyStatements attached to the specified individual.
-     * @param entity
-     */
-    private void fillIndividualsForObjectPropertyStatements(Individual entity){
-        getOntModel().enterCriticalSection(Lock.READ);
-        try {
-            Iterator e2eIt = entity.getObjectPropertyStatements().iterator();
-            while (e2eIt.hasNext()) {
-                ObjectPropertyStatement e2e = (ObjectPropertyStatement) e2eIt.next();
-                com.hp.hpl.jena.ontology.Individual subjInd = getOntModel().getIndividual(e2e.getSubjectURI());
-                if (subjInd != null) {
-                    Individual ent = new IndividualJena(subjInd, (WebappDaoFactoryJena) getWebappDaoFactory());
-                    getWebappDaoFactory().getLinksDao().addLinksToIndividual(ent);
-                    e2e.setSubject(ent);
-                }
-                com.hp.hpl.jena.ontology.Individual objInd = getOntModel().getIndividual(e2e.getObjectURI());
-                if (objInd != null) {
-                    Individual ent = new IndividualJena(objInd, (WebappDaoFactoryJena) getWebappDaoFactory());
-                    getWebappDaoFactory().getLinksDao().addLinksToIndividual(ent);
-                    e2e.setObject(ent);
-                }
-            }
-        } finally {
-            getOntModel().leaveCriticalSection();
         }
     }
 
