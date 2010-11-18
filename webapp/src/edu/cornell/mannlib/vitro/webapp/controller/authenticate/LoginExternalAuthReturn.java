@@ -13,10 +13,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
-import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.Message;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 
 /**
@@ -27,27 +25,7 @@ public class LoginExternalAuthReturn extends BaseLoginServlet {
 	private static final Log log = LogFactory
 			.getLog(LoginExternalAuthReturn.class);
 
-	/* This configuration property tells us what header contains the username. */
-	public static final String PROPERTY_EXTERNAL_AUTH_USERNAME_HEADER = "externalAuth.headerName";
-
-	/** The complaint we make if there is no such property. */
-	private static final Message MESSAGE_NO_EXTERNAL_AUTH_USERNAME = new LoginProcessBean.Message(
-			"deploy.properties doesn't contain a value for '"
-					+ PROPERTY_EXTERNAL_AUTH_USERNAME_HEADER + "'",
-			LoginProcessBean.MLevel.ERROR);
-
-	private static final Message MESSAGE_LOGIN_FAILED = new LoginProcessBean.Message(
-			"External login failed.", LoginProcessBean.MLevel.ERROR);
-
 	private final LoginRedirector loginRedirector = new LoginRedirector();
-	private String externalAuthUsernameHeader;
-
-	/** Get the configuration properties. */
-	@Override
-	public void init() throws ServletException {
-		externalAuthUsernameHeader = ConfigurationProperties
-				.getProperty(PROPERTY_EXTERNAL_AUTH_USERNAME_HEADER);
-	}
 
 	/**
 	 * <pre>
@@ -65,13 +43,7 @@ public class LoginExternalAuthReturn extends BaseLoginServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		if (externalAuthUsernameHeader == null) {
-			complainAndReturnToReferrer(req, resp, ATTRIBUTE_REFERRER,
-					MESSAGE_NO_EXTERNAL_AUTH_USERNAME);
-			return;
-		}
-
-		String username = req.getHeader(externalAuthUsernameHeader);
+		String username = ExternalAuthHelper.getHelper(req).getExternalUsername(req);
 		String uri = getAssociatedIndividualUri(username, req);
 
 		if (username == null) {
@@ -101,7 +73,7 @@ public class LoginExternalAuthReturn extends BaseLoginServlet {
 		}
 		IndividualDao indDao = new VitroRequest(req).getWebappDaoFactory()
 				.getIndividualDao();
-		return ExternalAuthHelper.getBean(req).getIndividualUriFromNetId(
+		return ExternalAuthHelper.getHelper(req).getIndividualUriFromNetId(
 				indDao, username);
 	}
 

@@ -115,7 +115,7 @@ public class SelfEditingIdentifierFactory implements IdentifierBundleFactory {
 
 		IndividualDao indDao = wdf.getIndividualDao();
 		
-		ExternalAuthHelper helper = ExternalAuthHelper.getBean(request);
+		ExternalAuthHelper helper = ExternalAuthHelper.getHelper(request);
 		String uri = helper.getIndividualUriFromNetId(indDao, username);
 		if (uri == null) {
 			log.debug("could not find an Individual with a netId of "

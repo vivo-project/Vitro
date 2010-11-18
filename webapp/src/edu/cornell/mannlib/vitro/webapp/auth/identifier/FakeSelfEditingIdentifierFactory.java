@@ -35,7 +35,7 @@ public class FakeSelfEditingIdentifierFactory implements IdentifierBundleFactory
             NetId netIdToken = new NetId(netid);
             ib.add(netIdToken);
             
-        	ExternalAuthHelper helper = ExternalAuthHelper.getBean(request);
+        	ExternalAuthHelper helper = ExternalAuthHelper.getHelper(request);
 			String uri = helper.getIndividualUriFromNetId(wdf.getIndividualDao(), netid);
             if( uri != null ){        
                 Individual ind = wdf.getIndividualDao().getIndividualByURI(uri);

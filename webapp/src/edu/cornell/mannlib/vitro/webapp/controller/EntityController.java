@@ -389,7 +389,7 @@ public class EntityController extends VitroHttpServlet {
         if (netIdStr==null || netIdStr.equals(""))
             netIdStr = vreq.getParameter("netid");
         if ( netIdStr != null ){
-        	uri = ExternalAuthHelper.getBean(vreq).getIndividualUriFromNetId(iwDao, netIdStr);
+        	uri = ExternalAuthHelper.getHelper(vreq).getIndividualUriFromNetId(iwDao, netIdStr);
         	return iwDao.getIndividualByURI(uri);
         }
 
