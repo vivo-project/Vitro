@@ -20,7 +20,6 @@ import freemarker.template.TemplateHashModel;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
 import freemarker.template.TemplateNumberModel;
-import freemarker.template.TemplateScalarModel;
 import freemarker.template.TemplateSequenceModel;
 import freemarker.template.utility.DeepUnwrap;
 
@@ -54,9 +53,7 @@ public class DumpHelper {
         map.put("var", varName);
         
         if (tm != null) {            
-            String type = null;
             Object unwrappedModel = null;
-
             try {
                 unwrappedModel = DeepUnwrap.permissiveUnwrap(tm);
             } catch (TemplateModelException e) {
@@ -66,39 +63,52 @@ public class DumpHelper {
             // Just use toString() method for now. Handles nested collections. Could make more sophisticated later.
             // tm.toString() gives wrong results in the case of, e.g., a boolean value in a hash. tm.toString() may
             // return a TemplateBooleanModel object, while unwrappedModel.toString() returns "true" or "false."
-            String value = unwrappedModel.toString(); // tm.toString();  
+            String value = unwrappedModel.toString(); // tm.toString();
+            String className = unwrappedModel.getClass().getName();
+            String type = null;
             
-            // This case must precede the TemplateScalarModel case, because
-            // tm is an instance of StringModel and thus a TemplateScalarModel.
+            // For basic Java types such as string, date, boolean, it's most helpful for the dump to
+            // show the shorthand type assigned below, rather than the Java class name. But for our
+            // BaseTemplateModel objects, show the actual class, since that provides additional
+            // information about the object (available methods, for example) that it is helpful to
+            // view in the dump. Not sure if we should handle our application-specific, non-template
+            // model objects in the same way. For now, these get assigned a shorthand type below.
             if (unwrappedModel instanceof BaseTemplateModel) {
-                type = unwrappedModel.getClass().getName(); 
-                value = ((BaseTemplateModel)unwrappedModel).dump();
-            } else if (tm instanceof TemplateScalarModel) {
-                type = "string";
+                value = ((BaseTemplateModel)unwrappedModel).dump();   
+                type = className;
+            }            
+            // Can't use this, because tm of (at least some) POJOs are
+            // StringModels, which are both TemplateScalarModels and TemplateHashModels
+            // if (tm instanceof TemplateScalarModel)
+            else if (unwrappedModel instanceof String) {
+                type = "String";
             } else if (tm instanceof TemplateDateModel) { 
-                type = "date";
+                type = "Date";
             } else if (tm instanceof TemplateNumberModel) {
-                type = "number";
+                type = "Number";
             } else if (tm instanceof TemplateBooleanModel) {
-                type = "boolean";
+                type = "Boolean";
                 try {
-                    value =  ((TemplateBooleanModel) tm).getAsBoolean() ? "true" : "false";
+                    value = ((TemplateBooleanModel) tm).getAsBoolean() ? "true" : "false";
                 } catch (TemplateModelException e) {
                     log.error("Error getting boolean value for " + varName + ".");
                 }
             } else if (tm instanceof TemplateSequenceModel){
-                type = "sequence";
+                type = "Sequence";
             } else if (tm instanceof TemplateHashModel) {
-                type = "hash";
+                type = "Hash";
             // In recursive dump, we've gotten down to a raw string. Just output it.    
             //  } else if (val == null) {
             //    out.write(var);
             //    return;
             } else {
-                type = "object";
+                // One of the above cases should have applied. Just in case not, show the Java class name.
+                type = className;
             }
+            
             map.put("value", value);
             map.put("type", type);
+
         }
 
         return map;
