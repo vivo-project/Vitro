@@ -68,21 +68,13 @@ public class N3EditFormController extends FreemarkerHttpServlet{
     private Map<String, Object> makeEditDataMap(EditConfiguration editConfig,
             EditSubmission editSubmission) throws TemplateModelException {
         
-        Map<String,Object> map = new HashMap<String,Object>();
-        
-        //This dosen't seem to be the right thing:
-        map.put("editConfig", ObjectWrapper.BEANS_WRAPPER.wrap(editConfig));
-        
-        //<@dump var="editConfig"/> outputs: 
-        /*
-         * Template variable dump
-            Variable name: editConfig
-            Type: string
-            Value: edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration@1e60601
-         */
-        
+        Map<String,Object> map = new HashMap<String,Object>();        
+
+        map.put("editConfig", editConfig);
+
         if( editSubmission != null)
-            map.put("editSubmission", ObjectWrapper.BEANS_WRAPPER.wrap(editSubmission));                
+            map.put("editSubmission", editSubmission); 
+        
         return map;                
     }
 }
