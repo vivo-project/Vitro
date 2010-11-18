@@ -152,23 +152,42 @@ public class RDFUploadController extends BaseEditController {
 		    }
 		}
 		/* ********** Do the model changes *********** */
-		long stmtCount = 0L;
+		long tboxstmtCount = 0L;
+		long aboxstmtCount = 0L;
 		if( tempModel != null ){
-		    OntModel memModel=null;
+			JenaModelUtils xutil = new JenaModelUtils();
+		    OntModel tboxModel=null;
+		    OntModel aboxModel=null;
+		    OntModel tboxChangeModel=null;
+		    Model aboxChangeModel=null;
+		    
 		    try {
-		        memModel = ((OntModelSelector) request.getSession()
-            			.getAttribute("unionOntModelSelector")).getABoxModel();
+		       tboxModel = ((OntModelSelector) request.getSession()
+            			.getAttribute("baseOntModelSelector")).getTBoxModel(); 
+		       aboxModel = ((OntModelSelector) request.getSession()
+           			.getAttribute("baseOntModelSelector")).getABoxModel(); 
+		       
 		    } catch (Exception e) {}
-		    if (memModel==null) {
-		        memModel = ((OntModelSelector) getServletContext()
-            			.getAttribute("unionOntModelSelector")).getABoxModel();
+		    if (tboxModel==null) {
+		        tboxModel = ((OntModelSelector) getServletContext()
+            			.getAttribute("baseOntModelSelector")).getTBoxModel();
 		    }
-		    if (memModel != null) {
-		        stmtCount = operateOnModel(request.getFullWebappDaoFactory(), memModel,tempModel,remove,makeClassgroups,portalArray,loginBean.getUserURI());
-		    }					
+		    if (aboxModel==null) {
+		        aboxModel = ((OntModelSelector) getServletContext()
+            			.getAttribute("baseOntModelSelector")).getABoxModel();
+		    }
+		    if (tboxModel != null) {
+		    	tboxChangeModel = xutil.extractTBox(tempModel);
+		        tboxstmtCount = operateOnModel(request.getFullWebappDaoFactory(), tboxModel,tboxChangeModel,remove,makeClassgroups,portalArray,loginBean.getUserURI());
+		    }
+		    if (aboxModel != null) {
+		    	aboxChangeModel = tempModel.remove(tboxChangeModel);
+		        aboxstmtCount = operateOnModel(request.getFullWebappDaoFactory(), aboxModel,aboxChangeModel,remove,makeClassgroups,portalArray,loginBean.getUserURI());
+		    }
+		    
 		}
 			
-		request.setAttribute("uploadDesc", uploadDesc + ". " + verb + " " + stmtCount + "  statements.");
+		request.setAttribute("uploadDesc", uploadDesc + ". " + verb + " " + (tboxstmtCount + aboxstmtCount) + "  statements.");
 	    
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         request.setAttribute("bodyJsp","/templates/edit/specific/upload_rdf_result.jsp");
