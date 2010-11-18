@@ -29,6 +29,8 @@ import com.hp.hpl.jena.rdf.model.Resource;
 
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.controller.authenticate.ExternalAuthHelper;
+import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 /**
@@ -111,13 +113,16 @@ public class SelfEditingIdentifierFactory implements IdentifierBundleFactory {
 			return null;
 		}
 
-		String uri = wdf.getIndividualDao().getIndividualURIFromNetId(username);
+		IndividualDao indDao = wdf.getIndividualDao();
+		
+		ExternalAuthHelper helper = ExternalAuthHelper.getBean(request);
+		String uri = helper.getIndividualUriFromNetId(indDao, username);
 		if (uri == null) {
 			log.debug("could not find an Individual with a netId of "
 					+ username);
 		}
 
-		Individual ind = wdf.getIndividualDao().getIndividualByURI(uri);
+		Individual ind = indDao.getIndividualByURI(uri);
 		if (ind == null) {
 			log.warn("found a URI for the netId " + username
 					+ " but could not build Individual");

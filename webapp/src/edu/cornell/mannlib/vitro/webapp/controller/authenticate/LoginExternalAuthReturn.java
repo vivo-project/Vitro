@@ -17,7 +17,7 @@ import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.Message;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 
 /**
  * Handle the return from the external authorization login server. If we are
@@ -30,7 +30,7 @@ public class LoginExternalAuthReturn extends BaseLoginServlet {
 	/* This configuration property tells us what header contains the username. */
 	public static final String PROPERTY_EXTERNAL_AUTH_USERNAME_HEADER = "externalAuth.headerName";
 
-	/** The complaint we make if there is no such property.	 */
+	/** The complaint we make if there is no such property. */
 	private static final Message MESSAGE_NO_EXTERNAL_AUTH_USERNAME = new LoginProcessBean.Message(
 			"deploy.properties doesn't contain a value for '"
 					+ PROPERTY_EXTERNAL_AUTH_USERNAME_HEADER + "'",
@@ -70,7 +70,7 @@ public class LoginExternalAuthReturn extends BaseLoginServlet {
 					MESSAGE_NO_EXTERNAL_AUTH_USERNAME);
 			return;
 		}
-		
+
 		String username = req.getHeader(externalAuthUsernameHeader);
 		String uri = getAssociatedIndividualUri(username, req);
 
@@ -99,9 +99,10 @@ public class LoginExternalAuthReturn extends BaseLoginServlet {
 		if (username == null) {
 			return null;
 		}
-		VitroRequest vreq = new VitroRequest(req);
-		WebappDaoFactory wdf = vreq.getWebappDaoFactory();
-		return wdf.getIndividualDao().getIndividualURIFromNetId(username);
+		IndividualDao indDao = new VitroRequest(req).getWebappDaoFactory()
+				.getIndividualDao();
+		return ExternalAuthHelper.getBean(req).getIndividualUriFromNetId(
+				indDao, username);
 	}
 
 	private void removeLoginProcessArtifacts(HttpServletRequest req) {

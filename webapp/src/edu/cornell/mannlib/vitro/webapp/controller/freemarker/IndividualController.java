@@ -39,6 +39,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.authenticate.ExternalAuthHelper;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration;
@@ -365,7 +366,7 @@ public class IndividualController extends FreemarkerHttpServlet {
         if (netIdStr==null || netIdStr.equals(""))
             netIdStr = vreq.getParameter("netid");
         if ( netIdStr != null ){
-            uri = iwDao.getIndividualURIFromNetId(netIdStr);
+        	uri = ExternalAuthHelper.getBean(vreq).getIndividualUriFromNetId(iwDao, netIdStr);
             return iwDao.getIndividualByURI(uri);
         }
 

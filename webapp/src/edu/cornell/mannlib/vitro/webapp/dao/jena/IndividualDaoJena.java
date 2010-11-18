@@ -678,38 +678,25 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
         return keywords;
     }
 
-    public String getIndividualURIFromNetId(String netIdStr) {
-        final String netidProp = "http://vivo.library.cornell.edu/ns/0.1#CornellemailnetId";
-        String outUri = null;
+	public String getIndividualURIFromNetId(String netIdStr, String netidMatchingPropertyUri) {
+		if (netidMatchingPropertyUri == null) {
+			return null;
+		}
 
-        Property prop = getOntModel().getProperty(netidProp);
-
+        Property prop = getOntModel().getProperty(netidMatchingPropertyUri);
         Literal netid = getOntModel().createLiteral(netIdStr);
+        
         ResIterator stmts = null;
         try{
-            stmts = getOntModel().listSubjectsWithProperty(prop,(RDFNode)netid);
-            while(stmts.hasNext()){
-                Resource st = stmts.nextResource();
-                outUri = st.getURI();
-                break;
+            stmts = getOntModel().listResourcesWithProperty(prop, netid);
+            if (stmts.hasNext()) {
+                return stmts.nextResource().getURI();
+            } else {
+            	return null;
             }
         }   finally{
             if( stmts != null ) stmts.close();
         }
-        if( outUri != null ) return outUri;
-
-        netid = getOntModel().createLiteral(netIdStr + "@cornell.edu");
-        try{
-            stmts = getOntModel().listSubjectsWithProperty(prop,(RDFNode)netid);
-            while(stmts.hasNext()){
-                Resource st = stmts.nextResource();
-                outUri = st.getURI();
-                break;
-            }
-        }   finally{
-            if( stmts != null ) stmts.close();
-        }
-        return outUri;
     }
 
     /**
