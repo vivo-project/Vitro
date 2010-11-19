@@ -31,7 +31,7 @@
         </#if>
        
         <#if errorMessage??>
-            <div id="errorAlert"><img src="${urls.siteIcons}/iconAlert.png"  alert="Error alert icon"/>
+            <div id="errorAlert"><img src="${urls.siteIcons}/iconAlert.png" alert="Error alert icon"/>
                 <p>${errorMessage}</p>
             </div>
         </#if>
@@ -47,10 +47,11 @@
 
             <input class="checkbox-remember-me" name="remember-me" type="checkbox" value="" />  
             <label class="label-remember-me" for="remember-me">Remember me</label>
+            
+            <p class="forgot-password"><a href="#">Forgot your password?</a></p>
+            
+            <p class="request-account"><a class="blue button" href="#">Request an account</a> </p>
         </form>
-
-        <p class="forgot-password"><a href="#">Forgot your password?</a></p>
-        <p class="request-account"><a class="blue button" href="#">Request an account</a> </p>
 
     </section><!-- #log-in -->
 </#macro> 
@@ -67,14 +68,14 @@
            
             <form role="form" id="log-in-form" action="${formAction}" method="post" name="log-in-form" required />
                 <label for="newPassword">New Password</label>
-                <input id="newPassword" class="focus" type="password" name="newPassword"  required />
+                <input id="newPassword" class="focus text-field" type="password" name="newPassword"  required />
                 
                 <p class="passwordNote">Minimum of 6 characters in length.</p>
                 
                 <label for="confirmPassword">Confirm Password</label>
-                <input id="confirmPassword" type="password" name="confirmPassword"  />
+                <input id="confirmPassword" class="text-field" type="password" name="confirmPassword"  />
                 
-                 <p class="submit"><input name="passwordChangeForm" type="submit" class="green button" value="Log in"/> <span class="or">or <a class="cancel" href="${cancelUrl}">Cancel</a></span></p>
+                 <p class="submit-password"><input name="passwordChangeForm" type="submit" class="green button" value="Log in"/> <span class="or">or <a class="cancel" href="${cancelUrl}">Cancel</a></span></p>
             </form>
     </section>
 </#macro>
