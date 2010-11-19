@@ -1,151 +1,161 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
 /* styles for log in */
-#formLogin {
-  width:600px;
-  padding:0px;
-  margin:0px;
-  text-align:left;
+
+#log-in-form label, 
+#log-in-form input.text,
+#log-in-form  #password,
+#log-in-form  #confirmPassword{
+    display:block;  
 }
-
-.noOuterBox {
-  width:340px;
-  padding:0px;
-  border: none;
-  margin:0px;
+#log-in-form label.label-remember-me{
+    display:block;
 }
-
-#formLogin h2 {
-  font-size:1.3em;
-  line-height:1em;
-  margin-top:0px;
-  margin-bottom:1em;
-  color:#111;
+#log-in-form p.submit {
+    float:left;
+    margin-bottom:0;
 }
-
-
-#formLogin h6 {
-  font-size:1.2em;
-  line-height:1em;
-  margin-top:0px;
-  margin-bottom:1em;
-  color:#111;
+#log-in-form input.checkbox-remember-me {
+    float:left;
+    height:14px;
+    padding:0;
+    margin-top:13px;
+    margin-left:20px;
 }
-
-#formLogin form {
-  margin: 0;
-  padding: 0;
+#log-in-form .label-remember-me {
+    display:block;
+    float:left;
+    width:100px;
+    margin:0;
+    padding:0;
+    margin-top:10px;
+    margin-right:25px;
+    padding-right:10px;
 }
-
-#formLogin label {
-  display:block;
-  margin-bottom:0.5em;
-  font-weight:bold;
+p.forgot-password {
+    clear:both;
+    margin-bottom:0;
 }
-
-#formLogin label span {
-  color:#900;
-}
-
-#formLogin input {
-  display:block;
-  margin-bottom:1.5em;
-  width: 200px;
-}
-
-#formLogin textarea {
-  width: 300px;
-  display:block;
-  margin-bottom:1.5em;
-}
-
-#formLogin .checkBox {
-  display:inline;
-  width:1em;
-  margin-bottom: 1em;
-}
-
-#formLogin p.small {
-  font-size: 0.8em;
-}
-
-#formLogin input.submit {
-  width: auto;
-  padding: 0 0.9em;
-  display:inline;
-}
-
-.requestAccount {
-  padding: 1em 0 0 2em;
-  margin-bottom:0;
-}
-
-.requestAccountNoOutterBox {
-  padding: 1em 0 0 0;
-  margin-bottom:0;
+p.request-account {
+    width:219px;
+    float:left;
 }
 
 #errorAlert {
-  color:#900;
-  padding:0px;
-  margin-bottom:5px;
-  height:30px;
+    color:#900;
+    padding:0px;
+    margin-bottom:5px;
+    height:30px;
 }
-
 #errorAlert img {
-  float:left;
-  margin:0;
-  padding:0;
-  vertical-align:middle;	
+    float:left;
+    margin:0;
+    padding:0;
+    vertical-align:middle;  	
 }
-
 #errorAlert p {
-  padding-left:35px;
-  font-size:0.9em;
-  line-height:30px;
+    padding-left:30px;
+    font-size:0.9em;
+    line-height:30px;
 }
-
-##confirmationAlert {
-  color:#169f43;
-  padding:0px;
-  margin-bottom:5px;
-  height:30px;
+#confirmationAlert {
+    color:#169f43;
+    padding:0px;
+    margin-bottom:5px;
+    height:30px;
 }
-
-##confirmationAlert img {
-  float:left;
-  margin:0;
-  padding:0;
-  vertical-align:middle;
+#confirmationAlert img {
+    float:left;
+    margin:0;
+    padding:0;
+    vertical-align:middle;
 }
-
 #confirmationAlert p {
-  padding-left:30px;
-  font-size:0.9em;
-  line-height:30px;
+    padding-left:30px;
+    font-size:0.9em;
+    line-height:30px;
 }
-
 .formFieldAlert {
-  border:2px solid #900;
+    border:2px solid #900;
 }
-
 .red {
-  color:#900;
+    color:#900;
 }
-
-#loginFormAndLinks {
-  display: none;
-}
-
 p.passwordNote {
-  margin:0;
-  padding:0;
-  margin-top:-8px;
-  font-size:0.8em;
-  color:#615e5e;
+    margin:0;
+    padding:0;
+    margin-top:-8px;
+    font-size:0.8em;
+    color:#615e5e;
+    padding-top:15px;
+}
+.or {
+    display:inline;
+    vertical-align:middle;
 }
 
-.or {
-  display:inline;
-  vertical-align:middle;
+/*
+#formLogin {
+    width:600px;
+    padding:0px;
+    margin:0px;
+    text-align:left;
+    border:1px solid red;
 }
+.noOuterBox {
+    width:340px;
+    padding:0px;
+    border: none;
+    margin:0px;
+}
+#formLogin h2 {
+    font-size:1.3em;
+    line-height:1em;
+    margin-top:0px;
+    margin-bottom:1em;
+    color:#111;
+}
+#formLogin h6 {
+    font-size:1.2em;
+    line-height:1em;
+    margin-top:0px;
+    margin-bottom:1em;
+    color:#111;
+}
+#formLogin form {
+    margin: 0;
+    padding: 0;
+}
+#formLogin label {
+    display:block;
+    margin-bottom:0.5em;
+    font-weight:bold;
+}
+#formLogin label span {
+    color:#900;
+}
+
+#formLogin input {
+    display:block;
+    margin-bottom:1.5em;
+    width: 200px;
+}
+#formLogin textarea {
+    width: 300px;
+    display:block;
+    margin-bottom:1.5em;
+}
+#formLogin .checkBox {
+    display:inline;
+    width:1em;
+    margin-bottom: 1em;
+}
+#formLogin p.small {
+    font-size: 0.8em;
+}
+#formLogin input.submit {
+    width: auto;
+    padding: 0 0.9em;
+    display:inline;
+}
+*/

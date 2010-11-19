@@ -31,29 +31,27 @@
         </#if>
        
         <#if errorMessage??>
-            <section id="errorAlert"><img src="${urls.siteIcons}/iconAlert.png"  alert="Error alert icon"/>
+            <div id="errorAlert"><img src="${urls.siteIcons}/iconAlert.png"  alert="Error alert icon"/>
                 <p>${errorMessage}</p>
-            </section>
+            </div>
         </#if>
        
-        <section id="loginFormAndLinks">
-       
-            <form id="log-in-form" action="${formAction}" method="post" name="log-in-form" />
-                <label for="email">Email</label>
-                <input class="text-field" name="loginName" id="loginName" type="text" required />
-    
-                <label for="password">Password</label>
-                <input class="text-field" name="loginPassword" id="password" type="password" required />
-                
-                <p class="submit"><input name="loginForm" type="submit" class="green button" value="Log in"/></p>
-    
-                <input class="checkbox-remember-me" name="remember-me" type="checkbox" value="" />  
-                <label class="label-remember-me" for="remember-me">Remember me</label>
-            </form>
+        <form  role="form" id="log-in-form" action="${formAction}" method="post" name="log-in-form" />
+            <label for="email">Email</label>
+            <input class="text-field" name="loginName" id="loginName" type="text" required />
 
-            <p class="forgot-password"><a href="#">Forgot your password?</a></p>
-            <p class="request-account"><a class="blue button" href="#">Request an account</a> </p>
-        </section>
+            <label for="password">Password</label>
+            <input class="text-field" name="loginPassword" id="password" type="password" required />
+            
+            <p class="submit"><input name="loginForm" type="submit" class="green button" value="Log in"/></p>
+
+            <input class="checkbox-remember-me" name="remember-me" type="checkbox" value="" />  
+            <label class="label-remember-me" for="remember-me">Remember me</label>
+        </form>
+
+        <p class="forgot-password"><a href="#">Forgot your password?</a></p>
+        <p class="request-account"><a class="blue button" href="#">Request an account</a> </p>
+
     </section><!-- #log-in -->
 </#macro> 
 
@@ -62,18 +60,21 @@
         <h2>Log in</h2>
            
             <#if errorMessage??>
-                <div id="errorAlert"><img src="${urls.siteIcons}/iconAlert.png" width="24" height="24" alert="Error alert icon"/>
+                <div id="errorAlert" role="alert"><img src="${urls.siteIcons}/iconAlert.png" width="24" height="24" alert="Error alert icon"/>
                     <p>${errorMessage}</p>
                 </div>
             </#if>
            
-            <form id="log-in-form" action="${formAction}" method="post" name="log-in-form" />
+            <form role="form" id="log-in-form" action="${formAction}" method="post" name="log-in-form" required />
                 <label for="newPassword">New Password</label>
-                <input id="newPassword" class="focus" type="password" name="newPassword"  />
+                <input id="newPassword" class="focus" type="password" name="newPassword"  required />
+                
                 <p class="passwordNote">Minimum of 6 characters in length.</p>
+                
                 <label for="confirmPassword">Confirm Password</label>
                 <input id="confirmPassword" type="password" name="confirmPassword"  />
-                <input name="passwordChangeForm" type="submit" class="submit" value="Save Changes"/> <span class="or">or <a class="cancel" href="${cancelUrl}">Cancel</a></span>
+                
+                 <p class="submit"><input name="passwordChangeForm" type="submit" class="green button" value="Log in"/> <span class="or">or <a class="cancel" href="${cancelUrl}">Cancel</a></span></p>
             </form>
     </section>
 </#macro>
