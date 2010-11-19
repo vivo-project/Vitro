@@ -140,6 +140,30 @@ END {
 		print STDOUT "\nreverting $g_fb/Org0.xml\n";
 		qx(mv $g_fb/REVERT_Org0.xml  $g_fb/Org0.xml );
 	    }
+	    if( -e "$g_fb/REVERT_Ceo0.xml"){
+		print STDOUT "\nreverting $g_fb/Ceo0.xml\n";
+		qx(mv $g_fb/REVERT_Ceo0.xml  $g_fb/Ceo0.xml );
+	    }
+	    if( -e "$g_fb/REVERT_Geo0.xml"){
+		print STDOUT "\nreverting $g_fb/Geo0.xml\n";
+		qx(mv $g_fb/REVERT_Geo0.xml  $g_fb/Geo0.xml );
+	    }
+	    if( -e "$g_fb/REVERT_Parea0.xml"){
+		print STDOUT "\nreverting $g_fb/Parea0.xml\n";
+		qx(mv $g_fb/REVERT_Parea0.xml  $g_fb/Parea0.xml );
+	    }
+	    if( -e "$g_fb/REVERT_Carea0.xml"){
+		print STDOUT "\nreverting $g_fb/Carea0.xml\n";
+		qx(mv $g_fb/REVERT_Carea0.xml  $g_fb/Carea0.xml );
+	    }
+	    if( -e "$g_fb/REVERT_Uarea0.xml"){
+		print STDOUT "\nreverting $g_fb/Uarea0.xml\n";
+		qx(mv $g_fb/REVERT_Uarea0.xml  $g_fb/Uarea0.xml );
+	    }
+	    if( -e "$g_fb/REVERT_Jour0.xml"){
+		print STDOUT "\nreverting $g_fb/Jour0.xml\n";
+		qx(mv $g_fb/REVERT_Jour0.xml  $g_fb/Jour0.xml );
+	    }
 	} else {
 	    if( -e "$g_fb/REVERT_ON_FAULT_Per0.xml"){
 		print STDOUT "\nFault reverting $g_fb/Per0.xml\n";
@@ -148,6 +172,30 @@ END {
 	    if( -e "$g_fb/REVERT_ON_FAULT_Org0.xml"){
 		print STDOUT "\nFault reverting $g_fb/Org0.xml\n";
 		qx(mv $g_fb/REVERT_ON_FAULT_Org0.xml  $g_fb/Org0.xml );
+	    }
+	    if( -e "$g_fb/REVERT_ON_FAULT_Ceo0.xml"){
+		print STDOUT "\nreverting $g_fb/Ceo0.xml\n";
+		qx(mv $g_fb/REVERT_ON_FAULT_Ceo0.xml  $g_fb/Ceo0.xml );
+	    }
+	    if( -e "$g_fb/REVERT_ON_FAULT_Geo0.xml"){
+		print STDOUT "\nreverting $g_fb/Geo0.xml\n";
+		qx(mv $g_fb/REVERT_ON_FAULT_Geo0.xml  $g_fb/Geo0.xml );
+	    }
+	    if( -e "$g_fb/REVERT_ON_FAULT_Parea0.xml"){
+		print STDOUT "\nreverting $g_fb/Parea0.xml\n";
+		qx(mv $g_fb/REVERT_ON_FAULT_Parea0.xml  $g_fb/Parea0.xml );
+	    }
+	    if( -e "$g_fb/REVERT_ON_FAULT_Carea0.xml"){
+		print STDOUT "\nreverting $g_fb/Carea0.xml\n";
+		qx(mv $g_fb/REVERT_ON_FAULT_Carea0.xml  $g_fb/Carea0.xml );
+	    }
+	    if( -e "$g_fb/REVERT_ON_FAULT_Uarea0.xml"){
+		print STDOUT "\nreverting $g_fb/Uarea0.xml\n";
+		qx(mv $g_fb/REVERT_ON_FAULT_Uarea0.xml  $g_fb/Uarea0.xml );
+	    }
+	    if( -e "$g_fb/REVERT_ON_FAULT_Jour0.xml"){
+		print STDOUT "\nreverting $g_fb/Jour0.xml\n";
+		qx(mv $g_fb/REVERT_ON_FAULT_Jour0.xml  $g_fb/Jour0.xml );
 	    }
 	}
 	qx($g_bin/nuno -s $g_unoMark $g_curUnoFile);
@@ -582,12 +630,53 @@ if( -e "$g_fb/REVERT_Per0.xml"){
 if( -e "$g_fb/REVERT_Org0.xml"){
     qx(/bin/rm -f $g_fb/REVERT_Org0.xml);
 }
-if( -e "$g_fb/REVERT_Per0.xml"){
+if( -e "$g_fb/REVERT_Ceo0.xml"){
+    qx(/bin/rm -f $g_fb/REVERT_Ceo0.xml);
+}
+if( -e "$g_fb/REVERT_Geo0.xml"){
+    qx(/bin/rm -f $g_fb/REVERT_Geo0.xml);
+}
+if( -e "$g_fb/REVERT_Parea0.xml"){
+    qx(/bin/rm -f $g_fb/REVERT_Parea0.xml);
+}
+if( -e "$g_fb/REVERT_Carea0.xml"){
+    qx(/bin/rm -f $g_fb/REVERT_Carea0.xml);
+}
+if( -e "$g_fb/REVERT_Uarea0.xml"){
+    qx(/bin/rm -f $g_fb/REVERT_Uarea0.xml);
+}
+if( -e "$g_fb/REVERT_Jour0.xml"){
+    qx(/bin/rm -f $g_fb/REVERT_Jour0.xml);
+}
+
+
+if( -e "$g_fb/REVERT_ON_FAULT_Per0.xml"){
     qx(/bin/rm -f $g_fb/REVERT_ON_FAULT_Per0.xml );
 }
-if( -e "$g_fb/REVERT_Org0.xml"){
+if( -e "$g_fb/REVERT_ON_FAULT_Org0.xml"){
     qx(/bin/rm -f $g_fb/REVERT_ON_FAULT_Org0.xml);
 }
+if( -e "$g_fb/REVERT_ON_FAULT_Ceo0.xml"){
+    qx(/bin/rm -f $g_fb/REVERT_ON_FAULT_Ceo0.xml);
+}
+if( -e "$g_fb/REVERT_ON_FAULT_Geo0.xml"){
+    qx(/bin/rm -f $g_fb/REVERT_ON_FAULT_Geo0.xml);
+}
+if( -e "$g_fb/REVERT_ON_FAULT_Parea0.xml"){
+    qx(/bin/rm -f $g_fb/REVERT_ON_FAULT_Parea0.xml);
+}
+if( -e "$g_fb/REVERT_ON_FAULT_Carea0.xml"){
+    qx(/bin/rm -f $g_fb/REVERT_ON_FAULT_Carea0.xml);
+}
+if( -e "$g_fb/REVERT_ON_FAULT_Uarea0.xml"){
+    qx(/bin/rm -f $g_fb/REVERT_ON_FAULT_Uarea0.xml);
+}
+if( -e "$g_fb/REVERT_ON_FAULT_Jour0.xml"){
+    qx(/bin/rm -f $g_fb/REVERT_ON_FAULT_Jour0.xml);
+}
+
+
+
 
 if($op_clean){
     qx(/bin/rm -f $g_fb/uri-maps/AT_END_*)      if $op_clean =~ /(e|a)/;

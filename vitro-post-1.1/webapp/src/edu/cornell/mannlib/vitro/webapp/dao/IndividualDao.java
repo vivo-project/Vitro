@@ -128,7 +128,8 @@ public interface IndividualDao extends ObjectSourceIface {
 
 	List<Keyword> getKeywordObjectsForIndividual(String individualURI);
 
-	String getIndividualURIFromNetId(String netIdStr);
+	/** In most cases, it's best to let ExternalAuthHelper call this for you. */
+	String getIndividualURIFromNetId(String netIdStr, String netidMatchingPropertyUri);
 
 	String getNetId(String entityURI);
 

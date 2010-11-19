@@ -320,114 +320,6 @@ removes leading and trailing whitespace from the argument string
 </xsl:function>
 
 <!-- ================================== -->
-<xsl:function name='vfx:knownPersonByNetidOrNameKeyed'>
-<xsl:param name='fn'/>
-<xsl:param name='mn'/>
-<xsl:param name='ln'/>
-<xsl:param name='nid'/>
-<xsl:param name='ep'/>
-<xsl:choose>
-<xsl:when test='$ep'>
-<xsl:variable name='nfn' select='normalize-space($fn)'/>
-<xsl:variable name='nmn' select='normalize-space($mn)'/>
-<xsl:variable name='nln' select='normalize-space($ln)'/>
-<xsl:variable name='unid' select='upper-case($nid)'/>
-
-  <xsl:choose>
-  <xsl:when test='$nid'>
-	<xsl:variable name='plist' 
-		select='$ep[netid != "" and $unid != "" and
-			           upper-case(netid) = $unid]'/>
-	<xsl:choose>
-	<xsl:when test='$plist[1] != ""'>
-	<xsl:copy-of select='$plist[1]'/>
-	</xsl:when>
-	<xsl:otherwise>
-<!-- =============================== -->
-	<xsl:variable name='results' 
-		select='$ep[upper-case(normalize-space(lname)) = 
-			upper-case($nln) and 
-        		vfx:isoName(fname,mname,lname,$fn,$mn,$ln)]'/>
-
-	<xsl:choose>
-	<xsl:when test='count($results)>0'>
-
-	<xsl:variable name='longest' 
-  		select='vfx:maxNameLength($results)' as='xs:integer'/>
-	<xsl:variable name='res' as='node()*' 
-		select='$results[string-length(concat(normalize-space(./lname),"|",
-                                           normalize-space(./fname),"|",
-                                           normalize-space(./mname)))
-                      = $longest]'/>
-
-
-	<xsl:copy-of select='$res[1]'/> 
-
-	</xsl:when>
-	<xsl:otherwise>
-	<xsl:value-of select='""'/>
-	</xsl:otherwise>
-	</xsl:choose>
-<!-- =============================== <xsl:value-of select='""'/> -->
-
-	</xsl:otherwise>
-	</xsl:choose>
-  </xsl:when>
-  <xsl:otherwise>
-
-<!-- =============================== -->
-	<xsl:variable name='results' 
-		select='$ep[upper-case(normalize-space(lname)) = 
-			upper-case($nln) and 
-        		vfx:isoName(fname,mname,lname,$fn,$mn,$ln)]'/>
-
-	<xsl:choose>
-	<xsl:when test='count($results)>0'>
-
-	<xsl:variable name='longest' 
-  		select='vfx:maxNameLength($results)' as='xs:integer'/>
-	<xsl:variable name='res' as='node()*' 
-	select='$results[string-length(concat(normalize-space(./lname),"|",
-                                           normalize-space(./fname),"|",
-                                           normalize-space(./mname)))
-                      = $longest]'/>
-
-
-	<xsl:copy-of select='$res[1]'/> 
-
-	</xsl:when>
-	<xsl:otherwise>
-	<xsl:value-of select='""'/>
-	</xsl:otherwise>
-	</xsl:choose>
-<!-- =============================== -->
-
-  </xsl:otherwise>
-  </xsl:choose>
-</xsl:when>
-<xsl:otherwise>
-<xsl:value-of select='""'/>
-</xsl:otherwise>
-</xsl:choose>
-
-</xsl:function>
-<!--  ================================= -->
-<xsl:function name='vfx:bestChoices' as='node()*' >
-<xsl:param name='nlist'/>
-
-<xsl:variable name='longest' 
-  select='vfx:maxNameLength($nlist)' as='xs:integer'/>
-
-
-<xsl:sequence
-	select='$nlist[
-            string-length(concat(normalize-space(./lname),"|",
-                                 normalize-space(./fname),"|",
-                                 normalize-space(./mname))) = $longest]' />
-
-</xsl:function>
-
-<!-- ================================== -->
 <xsl:function name='vfx:knownPersonByNetidOrName'>
 <xsl:param name='fn'/>
 <xsl:param name='mn'/>
@@ -491,7 +383,11 @@ removes leading and trailing whitespace from the argument string
 
 	<xsl:choose>
 	<xsl:when test='count($results)>0'>
-
+<!--
+	<xsl:comment>foo<xsl:value-of select='count($results)'/>
+<xsl:value-of select='$results'/>
+</xsl:comment>
+-->
 	<xsl:variable name='longest' 
   		select='vfx:maxNameLength($results)' as='xs:integer'/>
 	<xsl:variable name='res' as='node()*' 
@@ -500,9 +396,18 @@ removes leading and trailing whitespace from the argument string
                                            normalize-space(./mname)))
                       = $longest]'/>
 
-
+<!--<xsl:comment> plus <xsl:value-of select='$res'/></xsl:comment>
+	<xsl:variable name='res' as='node()*'
+		select='vfx:bestChoices($results)'/>
+-->
+<!--
+<xsl:comment>bar<xsl:value-of select='$longest'/></xsl:comment>
+-->
 	<xsl:copy-of select='$res[1]'/> 
 
+	<!--
+	<xsl:copy-of select='$results[1]'/> 
+	 -->
 	</xsl:when>
 	<xsl:otherwise>
 	<xsl:value-of select='""'/>
@@ -517,6 +422,21 @@ removes leading and trailing whitespace from the argument string
 <xsl:value-of select='""'/>
 </xsl:otherwise>
 </xsl:choose>
+
+</xsl:function>
+<!--  ================================= -->
+<xsl:function name='vfx:bestChoices' as='node()*' >
+<xsl:param name='nlist'/>
+
+<xsl:variable name='longest' 
+  select='vfx:maxNameLength($nlist)' as='xs:integer'/>
+
+
+<xsl:sequence
+	select='$nlist[
+            string-length(concat(normalize-space(./lname),"|",
+                                 normalize-space(./fname),"|",
+                                 normalize-space(./mname))) = $longest]' />
 
 </xsl:function>
 <!-- ================================== -->
@@ -671,7 +591,7 @@ select='$ep/person[normalize-space(lname) = $nln and vfx:isoName(fname,mname,lna
 <xsl:choose>
 <xsl:when test='$ep'>
 <xsl:variable name='results' 
-	select='$ep/person[name=$n and stateCountry = $sc]'/>
+	select='$ep/org[name=$n and stateCountry = $sc]'/>
 <xsl:value-of select='$results/uri'/>
 </xsl:when>
 <xsl:otherwise>

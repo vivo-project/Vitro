@@ -45,7 +45,7 @@
 <xsl:if test='not(contains($ilk,"OTHER"))'>
 
 <xsl:variable name='knownUri'
-select='vfx:knownOrgUri(aiis:FUNDING_ORG_NAME, $extantFOrgs)'/>
+select='vfx:knownOrgUri($name, $extantFOrgs)'/>
 <xsl:variable name='forguri'
 	select="if($knownUri != '') then 
 			$knownUri else 
@@ -59,7 +59,7 @@ select='vfx:knownOrgUri(aiis:FUNDING_ORG_NAME, $extantFOrgs)'/>
 </xsl:element>
 
 <xsl:element name='name' namespace=''>
-<xsl:value-of select='aiis:FUNDING_ORG_NAME'/>
+<xsl:value-of select='$name'/>
 </xsl:element>
 
 </xsl:element>
@@ -81,20 +81,20 @@ select='vfx:knownOrgUri(aiis:FUNDING_ORG_NAME, $extantFOrgs)'/>
 
 <!-- create a core:FundingOrganization for this Funding Org 
 OR use an old one -->
-<xsl:variable name='name' select='vfx:trim(aiis:FUNDING_ORG_NAME)'/>
+<xsl:variable name='name' select='vfx:simple-trim(aiis:FUNDING_ORG_NAME)'/>
 <xsl:variable name='ilk' select='@ilk'/>
 <xsl:variable name='ctr'  select='@counter'/>
 <xsl:variable name='uno' select='$unomap/map[position()=$ctr]/@nuno'/>
 
-<!--xsl:comment>
-<xsl:value-of select='$ctr'/> - <xsl:value-of select='$uno'/>
-</xsl:comment -->
+<xsl:comment>
+<xsl:value-of select='$name'/> - <xsl:value-of select='$ctr'/> - <xsl:value-of select='$uno'/>
+</xsl:comment>
 
 <!-- =================================================== -->
 <!-- Declare a core:FundingOrganization (use extant org if it exists) -->
 <!-- do not create one if in the 'OTHER' case -->
 <xsl:variable name='knownUri' 
-	select='vfx:knownOrgUri(aiis:FUNDING_ORG_NAME, 
+	select='vfx:knownOrgUri($name, 
 			$extantFOrgs union
 			$rawNewFundOrgs/ExtantOrgs)'/>
 
@@ -103,7 +103,7 @@ OR use an old one -->
 		substring-after($knownUri,"NEW-") else 
 		$knownUri'/>
 
-<!-- xsl:comment><xsl:value-of select='$forguri'/> - <xsl:value-of select='$knownUri'/></xsl:comment -->
+<xsl:comment><xsl:value-of select='$ilk'/> - <xsl:value-of select='$forguri'/> - <xsl:value-of select='$knownUri'/></xsl:comment>
 
 <xsl:if test='starts-with($knownUri,"NEW-") and 
 		not(contains($ilk,"OTHER"))'>
@@ -115,10 +115,10 @@ OR use an old one -->
 	'http://vivoweb.org/ontology/core#FundingOrganization'/>
 
 <rdfs:label>
-<xsl:value-of select='vfx:trim(aiis:FUNDING_ORG_NAME)'/>
+<xsl:value-of select='vfx:simple-trim(aiis:FUNDING_ORG_NAME)'/>
 </rdfs:label>
 <core:description>
-<xsl:value-of select='vfx:trim(aiis:FUNDING_ORG_NAME)'/>
+<xsl:value-of select='vfx:simple-trim(aiis:FUNDING_ORG_NAME)'/>
 </core:description>
 <acti:fundingIlk>
 <xsl:value-of select='concat("FUNDING_",$ilk)'/> </acti:fundingIlk>
@@ -228,12 +228,12 @@ core:FundingOrganization -->
 </rdf:Description>
 
 <!-- =================================================== -->
-
+<xsl:if test='not(contains($ilk,"OTHER")) and $name != "Other"'>
 <rdf:Description rdf:about="{$forgref}">
 <!-- 11 -->
 <core:fundingAgentFor rdf:resource="{concat($g_instance,$aiid)}"/>
 </rdf:Description>
-
+</xsl:if>
 
 </xsl:if>
 </xsl:for-each>

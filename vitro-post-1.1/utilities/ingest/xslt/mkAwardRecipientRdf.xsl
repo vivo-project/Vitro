@@ -9,6 +9,7 @@
         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
 	xmlns:aiah="http://vivoweb.org/ontology/activity-insight"
 	xmlns:acti="http://vivoweb.org/ontology/activity-insight#"
+        xmlns="http://vivoweb.org/ontology/activity-insight"
 	xmlns:dm="http://www.digitalmeasures.com/schema/data"	
 	xmlns:vfx='http://vivoweb.org/ext/functions'
 	exclude-result-prefixes='xs vfx'
@@ -115,18 +116,19 @@ select="if($kUri != '') then $kUri
 
 <xsl:if test='starts-with($known/uri,"NEW-")'>
 
-<xsl:if test='
-not(vfx:hasIsoMatchRecipient(., 
+<xsl:if test='not(vfx:hasIsoMatchRecipient(., 
 			  preceding-sibling::aiah:RECIPIENT))'>
 
 <rdf:Description rdf:about="{$peruri}">
 <rdf:type rdf:resource=
 	'http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing'/>
 <rdf:type rdf:resource='http://xmlns.com/foaf/0.1/Person'/>
+
 <xsl:if test='$known/netid != ""'>
 <rdf:type rdf:resource=
 	'http://vivoweb.org/ontology/activity-insight#ActivityInsightPerson'/>
-</xsl:if>
+</xsl:if> <!-- $known/netid != "" -->
+
 <rdfs:label>
 <xsl:value-of 
 select='concat(vfx:simple-trim($known/lname),", ",
@@ -161,17 +163,19 @@ select="concat($rawXmlPath,'/',$known/netid , '.xml')"/>
 <xsl:value-of select='$pci/dm:OPHONE2'/>-
 <xsl:value-of select='$pci/dm:OPHONE3'/>
 </core:workPhone>
-</xsl:if>
+</xsl:if> <!-- doc-available($nidxml) -->
 
-</xsl:if>
+</xsl:if> <!-- $known/netid != "" -->
 </rdf:Description>
-</xsl:if>
-</xsl:if>
+</xsl:if> <!-- not(vfx:hasIsoMatchRecipient(.,
+		preceding-sibling::aiah:RECIPIENT)) -->
+</xsl:if> <!-- starts-with($known/uri,"NEW-") -->
 
 <xsl:call-template name='process-awards'>
 <xsl:with-param name='list' select='aiah:AWARD_LIST'/>
 <xsl:with-param name='objref' select="$peruri"/>
 </xsl:call-template>
+
 </xsl:for-each>
 
 <xsl:call-template name='NewPeopleOut'>

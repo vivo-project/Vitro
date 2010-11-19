@@ -51,6 +51,7 @@
 <@dump var="fruit" />
 <@dump var="trueStatement" />
 <@dump var="zoo1" />
+<@dump var="pojo" />
 
 ${stylesheets.addFromTheme("/css/sstest.css", "/css/sstest2.css")}
 ${scripts.addFromTheme("/js/jstest.js")}

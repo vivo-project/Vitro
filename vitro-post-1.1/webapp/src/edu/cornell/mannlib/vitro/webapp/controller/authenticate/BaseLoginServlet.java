@@ -20,6 +20,10 @@ import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.Messag
 public class BaseLoginServlet extends HttpServlet {
 	private static final Log log = LogFactory.getLog(BaseLoginServlet.class);
 
+	/** A general purpose error message for the user to see. */
+	protected static final Message MESSAGE_LOGIN_FAILED = new LoginProcessBean.Message(
+			"External login failed.", LoginProcessBean.MLevel.ERROR);
+
 	protected Authenticator getAuthenticator(HttpServletRequest req) {
 		return Authenticator.getInstance(req);
 	}

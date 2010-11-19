@@ -51,7 +51,7 @@ exclude-result-prefixes='vfx xs dm aipres'
 -->
   </xsl:when>
   <xsl:otherwise>
-  <xsl:value-of select='"Unspecified"'/>
+  <xsl:value-of select='""'/>
   </xsl:otherwise>
 </xsl:choose>
 

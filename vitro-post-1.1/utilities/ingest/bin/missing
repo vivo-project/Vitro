@@ -1,0 +1,19 @@
+#!/usr/bin/perl
+use sigtrap qw(die INT QUIT);
+use sigtrap qw(die untrapped normal-signals stack-trace any error-signals);
+use Getopt::Std;
+use FileHandle;
+use POSIX qw( strftime );
+use FindBin qw($Bin);
+
+autoflush STDOUT 1;
+
+$f = join(" ",@ARGV);
+print "grep 'about=\"\"' $f" . "\n";
+print qx(grep 'about=""' $f) . "\n";
+print "grep 'resource=\"\"' $f" . "\n";
+print qx(grep 'resource=""' $f) . "\n";
+print "grep \"about=''\" $f" . "\n";
+print qx(grep "about=''" $f) . "\n";
+print "grep \"resource=''\" $f" . "\n";
+print qx(grep "resource=''" $f) . "\n";

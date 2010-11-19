@@ -17,7 +17,7 @@
 
 <xsl:include href='commonvars.xsl'/>
 
-<xsl:template match='/ExtantOrgs'>
+<xsl:template match='/ExtantCEOrgs'>
 <rdf:RDF>
 <xsl:for-each select='org'>
 
@@ -46,7 +46,7 @@
 <xsl:value-of select='$NL'/>
 </xsl:if>
 
-
+</xsl:for-each>
 </rdf:RDF>
 <xsl:value-of select='$NL'/>
 

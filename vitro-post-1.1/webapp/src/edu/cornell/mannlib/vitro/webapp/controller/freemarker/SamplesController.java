@@ -14,9 +14,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet.ResponseValues;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet.TemplateResponseValues;
-import freemarker.template.Configuration;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration;
 
 /**
  * Freemarker controller and template samples.
@@ -81,6 +79,8 @@ public class SamplesController extends FreemarkerHttpServlet {
         
         body.put("trueStatement", true);
         body.put("falseStatement", false);
+        
+        body.put("pojo", new EditConfiguration());
         
         getBerries(body);
         

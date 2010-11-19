@@ -55,8 +55,6 @@
 	vfx:trim(concat(dm:LNAME, ", ", dm:FNAME, " ", dm:MNAME))'/>
 </aipres:PERSON_NAME>
 
-
-
    <aipres:LastName>
     <xsl:value-of select='normalize-space($rec/dm:LNAME)'/>
    </aipres:LastName>
@@ -86,6 +84,8 @@
 
 <xsl:if test='../dm:USER_REFERENCE_CREATOR = "Yes"'>
    <aipres:PRESENT_INFO>
+   <xsl:attribute name='rank' 
+	select='count(preceding-sibling::dm:PRESENT_AUTH)+1'/>
    <xsl:attribute name='ref_netid'
         select='../../../dm:Record/@username'/>
    <xsl:attribute name='public' select='../dm:PUBLIC_VIEW'/>
@@ -95,8 +95,8 @@
       select='if(normalize-space(../dm:TITLE) = "") then "No" else "Yes"'/>
    <xsl:attribute name='hasConf' 
 	select='if(normalize-space(../dm:NAME) = "") then "No" else "Yes"'/>
-
-
+   <xsl:attribute name='role' 
+	select='vfx:presRole(dm:ROLE)'/>
     <xsl:value-of select='../@id'/>
    </aipres:PRESENT_INFO>
 </xsl:if>
@@ -109,11 +109,29 @@
 </aipres:PRESENT_PERSON_LIST>
 
 
-
-
 <xsl:value-of select='$NL'/>
 </xsl:template>
 <!-- ================================== -->
+<xsl:function name='vfx:presRole'>
+<xsl:param name='r'/>
+<xsl:choose>
+  <xsl:when test='starts-with($r, "Presenter Only")'>
+	<xsl:value-of select='"PO"'/>
+  </xsl:when>
+  <xsl:when test='starts-with($r, "Presenter")'>
+	<xsl:value-of select='"PA"'/>
+  </xsl:when>
+  <xsl:when test='starts-with($r, "Author")'>
+	<xsl:value-of select='"A"'/>
+  </xsl:when>
+  <xsl:when test='starts-with($r, "Organizer")'>
+	<xsl:value-of select='"O"'/>
+  </xsl:when>
+  <xsl:otherwise>
+	<xsl:value-of select='""'/>
+  </xsl:otherwise>
+</xsl:choose>
+</xsl:function>
 
 
 <xsl:include href='vivofuncs.xsl'/>

@@ -39,6 +39,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
+import edu.cornell.mannlib.vitro.webapp.controller.authenticate.ExternalAuthHelper;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
@@ -388,8 +389,8 @@ public class EntityController extends VitroHttpServlet {
         if (netIdStr==null || netIdStr.equals(""))
             netIdStr = vreq.getParameter("netid");
         if ( netIdStr != null ){
-            uri = iwDao.getIndividualURIFromNetId(netIdStr);
-            return iwDao.getIndividualByURI(uri);
+        	uri = ExternalAuthHelper.getHelper(vreq).getIndividualUriFromNetId(iwDao, netIdStr);
+        	return iwDao.getIndividualByURI(uri);
         }
 
 		return null;		

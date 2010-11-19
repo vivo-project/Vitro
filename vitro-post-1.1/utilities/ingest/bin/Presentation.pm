@@ -59,16 +59,31 @@ if($Phases{'PRPC'}>0 || $g_all){
 ############################################
 # make rdf
 
-if($Phases{'PRR'}>0 || $g_all){
-    print "\nPhase = PRR ================================\n";
-    $g_curPhase = 'PRR';
+if($Phases{'PRPRR'}>0 || $g_all){
+    print "\nPhase = PRPRR ================================\n";
+    $g_curPhase = 'PRPRR';
     mkUnoFile("$g_pres/cpresentation.xml", "index", 
-	      "$g_pres/prr-unomap.xml",
-	      "AI-PRR-",$op_uno);
+	      "$g_pres/prprr-unomap.xml",
+	      "AI-PRPRR-",$op_uno);
     my $cmd = "";
     $cmd .= "java $g_saxonCmdSequence $g_pres/cpresentation.xml ";
-    $cmd .= "$g_xslts/mkPresentation.xsl unoMapFile=$g_pres/prr-unomap.xml ";
+    $cmd .= "$g_xslts/mkPresentationRdf.xsl unoMapFile=$g_pres/prprr-unomap.xml ";
     $cmd .= "rawXmlPath=$g_xmls_raw > $g_rdf/presentation.rdf";
+    my $r = doit($cmd, $g_exef, $g_pw);
+    exit(1) if($r);
+
+}
+
+if($Phases{'PRCR'}>0 || $g_all){
+    print "\nPhase = PRCR ================================\n";
+    $g_curPhase = 'PRCR';
+    mkUnoFile("$g_pres/cpresentationConf.xml", "index", 
+	      "$g_pres/prcr-unomap.xml",
+	      "AI-PRCR-",$op_uno);
+    my $cmd = "";
+    $cmd .= "java $g_saxonCmdSequence $g_pres/cpresentationConf.xml ";
+    $cmd .= "$g_xslts/mkPresentationConfRdf.xsl unoMapFile=$g_pres/prcr-unomap.xml ";
+    $cmd .= "rawXmlPath=$g_xmls_raw > $g_rdf/presentationConf.rdf";
     my $r = doit($cmd, $g_exef, $g_pw);
     exit(1) if($r);
 
@@ -83,15 +98,15 @@ if($Phases{'PRR'}>0 || $g_all){
 if($Phases{'PRPR'}>0 || $g_all){
     print "\nPhase = PRPR ================================\n";
     $g_curPhase = 'PRPR';
-    mkUnoFile("$g_pres/cpresentationperson.xml", 
+    mkUnoFile("$g_pres/cpresentationPerson.xml", 
 	      "index", "$g_pres/prpr-unomap.xml",
 	      "AI-PRPR-","$g_store/.Person");
     initFeedbackFile('Per','PRPR');
     my $cmd = "";
     $cmd .= "java $g_saxonCmdSequence ";
     $cmd .= " -o $g_rdf/presentationPerson.rdf ";
-    $cmd .= " $g_pres/cpresentationperson.xml ";
-    $cmd .= " $g_xslts/mkPresentationPerson.xsl ";
+    $cmd .= " $g_pres/cpresentationPerson.xml ";
+    $cmd .= " $g_xslts/mkPresentationPersonRdf.xsl ";
     $cmd .= " unoMapFile=$g_pres/prpr-unomap.xml ";
     $cmd .= " rawXmlPath=$g_xmls_raw ";
     $cmd .= " extPerIn=$g_fb/Per0.xml ";
@@ -110,16 +125,16 @@ if($Phases{'PRPR'}>0 || $g_all){
 if($Phases{'PROR'}>0 || $g_all){
     print "\nPhase = PROR ================================\n";
     $g_curPhase = 'PROR';
-    mkUnoFile("$g_pres/cpresentationorg.xml", 
+    mkUnoFile("$g_pres/cpresentationOrg.xml", 
 	      "index", "$g_pres/pror-unomap.xml",
 	      "AI-PROR-","$g_store/.Org");
     initFeedbackFile('Org','PROR');
     my $cmd = "";
     $cmd .= "java $g_saxonCmdSequence ";
     $cmd .= " -o $g_rdf/presentationOrg.rdf ";
-    $cmd .= " $g_pres/cpresentationorg.xml ";
-    $cmd .= " $g_xslts/mkPresentationOrg.xsl ";
-    $cmd .= " unoMapFile=$g_edu/pror-unomap.xml ";
+    $cmd .= " $g_pres/cpresentationOrg.xml ";
+    $cmd .= " $g_xslts/mkPresentationOrgRdf.xsl ";
+    $cmd .= " unoMapFile=$g_pres/pror-unomap.xml ";
     $cmd .= " rawXmlPath=$g_xmls_raw ";
     $cmd .= " extOrgIn=$g_fb/Org0.xml ";
     $cmd .= " extOrgOut=$g_fb/Org1.xml ";

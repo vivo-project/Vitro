@@ -3,14 +3,12 @@
 <#-- Template for dumping a template variable -->
  
 <div class="var"> 
-
-    <h6>Variable name: <em>${var}</em></h6>
+    <p><strong>Variable name: <em>${var}</em></strong></p>
     <#if value??>
-        <strong>Type:</strong> ${type}<br />
-        <strong>Value:</strong> ${value}<br />
+        <p><strong>Value:</strong> ${value}</p>
+        <p><strong>Type:</strong> ${type}</p>
     <#else>
-        Variable is undefined in the data model
-    </#if>
-    
+        <p>Variable is undefined in the data model</p>
+    </#if>   
 </div>
 
