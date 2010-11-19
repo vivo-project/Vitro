@@ -12,6 +12,6 @@ $(document).ready(function(){
 
 // fade out error alerts
 $('#errorAlert').css('display', 'none');
-$('#errorAlert').fadeIn(2900);
+$('#errorAlert').fadeIn(2000);
   
 
