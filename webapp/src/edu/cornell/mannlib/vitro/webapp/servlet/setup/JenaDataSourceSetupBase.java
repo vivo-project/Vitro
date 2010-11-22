@@ -56,12 +56,12 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
    // (queries and updates) with the ABox data from the DB - this model is not maintained
    // in memory. For query performance reasons, there won't be any submodels for the ABox data.
    
-   static final String JENA_DB_MODEL = "http://vitro.mannlib.cornell.edu/default/vitro-kb-2";
+   public static final String JENA_DB_MODEL = "http://vitro.mannlib.cornell.edu/default/vitro-kb-2";
    
    // ABox inferences. This is ABox data that is inferred, using VIVO's native simple, specific-
    // purpose reasoning based on the combination of the Abox (assertion and inferences) data 
    // and the TBox (assertions and inferences) data.
-   static final String JENA_INF_MODEL = "http://vitro.mannlib.cornell.edu/default/vitro-kb-inf";
+   public static final String JENA_INF_MODEL = "http://vitro.mannlib.cornell.edu/default/vitro-kb-inf";
       
    // TBox assertions. 
    // Some of these (the local extensions) are stored and maintained in a Jena database and
@@ -69,17 +69,17 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
    // Other parts of the TBox, the 'VIVO Core', are also backed by a Jena DB, but they are 
    // read fresh from files each time the application starts. While the application is running,
    // they are kept in memory, as submodels of the in memory copy of this named graph. 
-   static final String JENA_TBOX_ASSERTIONS_MODEL = "http://vitro.mannlib.cornell.edu/default/asserted-tbox";
+   public static final String JENA_TBOX_ASSERTIONS_MODEL = "http://vitro.mannlib.cornell.edu/default/asserted-tbox";
 
    
    // Inferred TBox. This is TBox data that is inferred from the combination of VIVO core TBox
    // and any local extension TBox assertions. Pellet computes these inferences.
    // These are stored in the DB.
-   static final String JENA_TBOX_INF_MODEL = "http://vitro.mannlib.cornell.edu/default/inferred-tbox";
+   public static final String JENA_TBOX_INF_MODEL = "http://vitro.mannlib.cornell.edu/default/inferred-tbox";
    
    static final String JENA_AUDIT_MODEL = "http://vitro.mannlib.cornell.edu/ns/db/experimental/audit";
 
-   static final String JENA_USER_ACCOUNTS_MODEL = "http://vitro.mannlib.cornell.edu/default/vitro-kb-userAccounts";
+   public static final String JENA_USER_ACCOUNTS_MODEL = "http://vitro.mannlib.cornell.edu/default/vitro-kb-userAccounts";
    
    // This model doesn't exist yet. It's a placeholder for the application ontology.
    

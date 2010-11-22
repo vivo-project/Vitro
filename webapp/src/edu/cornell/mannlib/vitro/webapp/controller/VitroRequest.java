@@ -131,6 +131,14 @@ public class VitroRequest implements HttpServletRequest {
     	}
     	return jenaOntModel;    	
     }
+    
+    public OntModel getInferenceOntModel() {
+    	OntModel jenaOntModel = (OntModel)_req.getSession().getAttribute( JenaBaseDao.INFERENCE_ONT_MODEL_ATTRIBUTE_NAME );
+    	if ( jenaOntModel == null ) {
+    		jenaOntModel = (OntModel)_req.getSession().getServletContext().getAttribute( JenaBaseDao.INFERENCE_ONT_MODEL_ATTRIBUTE_NAME );
+    	}
+    	return jenaOntModel;    	
+    }
 
     public Portal getPortal(){
         return(Portal) getAttribute("portalBean");

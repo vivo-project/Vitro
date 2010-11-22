@@ -80,27 +80,27 @@ public class WebappDaoFactorySDBPrep implements Filter {
 		SDBConnection conn = null;
 		
 		try {
-		if (
-				request instanceof HttpServletRequest &&
-				_bds != null && _storeDesc != null && _oms != null) {
-			try {
-				conn = new SDBConnection(_bds.getConnection()) ;
-			} catch (SQLException sqe) {
-				throw new RuntimeException("Unable to connect to database", sqe);
+			if (
+					request instanceof HttpServletRequest &&
+					_bds != null && _storeDesc != null && _oms != null) {
+				try {
+					conn = new SDBConnection(_bds.getConnection()) ;
+				} catch (SQLException sqe) {
+					throw new RuntimeException("Unable to connect to database", sqe);
+				}
+				if (conn != null) {
+					Store store = SDBFactory.connectStore(conn, _storeDesc);
+					Dataset dataset = SDBFactory.connectDataset(store);
+					VitroRequest vreq = new VitroRequest((HttpServletRequest) request);
+					WebappDaoFactory wadf = 
+						new WebappDaoFactorySDB(_oms, dataset, _defaultNamespace, null, null);
+					vreq.setWebappDaoFactory(wadf);
+					vreq.setFullWebappDaoFactory(wadf);
+					vreq.setDataset(dataset);
+				}
 			}
-			if (conn != null) {
-				Store store = SDBFactory.connectStore(conn, _storeDesc);
-				Dataset dataset = SDBFactory.connectDataset(store);
-				VitroRequest vreq = new VitroRequest((HttpServletRequest) request);
-				WebappDaoFactory wadf = 
-					new WebappDaoFactorySDB(_oms, dataset, _defaultNamespace, null, null);
-				vreq.setWebappDaoFactory(wadf);
-				vreq.setFullWebappDaoFactory(wadf);
-				vreq.setDataset(dataset);
-			}
-		}
 		} catch (Throwable t) {
-			t.printStackTrace();
+			log.error("Unable to filter request to set up SDB connection", t);
 		}
 		
 		request.setAttribute("WebappDaoFactorySDBPrep.setup", 1);

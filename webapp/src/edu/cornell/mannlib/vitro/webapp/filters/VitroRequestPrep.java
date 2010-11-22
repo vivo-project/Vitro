@@ -20,6 +20,10 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.query.DataSource;
+import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.query.DatasetFactory;
+
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory.SelfEditing;
@@ -40,6 +44,7 @@ import edu.cornell.mannlib.vitro.webapp.flags.FlagException;
 import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
 import edu.cornell.mannlib.vitro.webapp.flags.RequestToAuthFlag;
 import edu.cornell.mannlib.vitro.webapp.flags.SunsetFlag;
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 
 /**
  * This sets up several objects in the Request scope for each
@@ -195,6 +200,15 @@ public class VitroRequestPrep implements Filter {
         if( log.isDebugEnabled() ) log.debug("setting role-based WebappDaoFactory filter for role " + role.toString());             
 
         vreq.setWebappDaoFactory(wdf);
+        
+        // support for Dataset interface if using Jena in-memory model
+        if (vreq.getDataset() == null) {
+        	DataSource dataset = DatasetFactory.create();
+        	dataset.addNamedModel(JenaDataSourceSetupBase.JENA_DB_MODEL, vreq.getAssertionsOntModel());
+        	dataset.addNamedModel(JenaDataSourceSetupBase.JENA_INF_MODEL, vreq.getInferenceOntModel());
+        	vreq.setDataset(dataset);
+        }
+        
         request.setAttribute("VitroRequestPrep.setup", new Integer(1));
         chain.doFilter(request, response);
     }

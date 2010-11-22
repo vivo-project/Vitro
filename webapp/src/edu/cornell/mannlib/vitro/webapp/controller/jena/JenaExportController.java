@@ -14,13 +14,20 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntModelSpec;
+import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.shared.Lock;
+import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaModelUtils;
 
 public class JenaExportController extends BaseEditController {
@@ -75,6 +82,7 @@ public class JenaExportController extends BaseEditController {
 	}
 	
 	private void outputRDF( VitroRequest vreq, HttpServletResponse response ) {
+		Dataset dataset = vreq.getDataset();
 		JenaModelUtils xutil = new JenaModelUtils();
 		String formatParam = vreq.getParameter("format");
 		String subgraphParam = vreq.getParameter("subgraph");
@@ -94,43 +102,33 @@ public class JenaExportController extends BaseEditController {
 			for(int i =0; i < uri.length-1;i++)
 				ontologyURI = ontologyURI + uri[i];
 		}
-		if ( "inferred".equals(assertedOrInferredParam) ) {
-			limitToInferred = true;
-			inferenceModel = getOntModelFromAttribute( INFERENCES_ONT_MODEL_ATTR, vreq );
-			model = inferenceModel;
-		} else if ( "full".equals(assertedOrInferredParam) ) {
-			model = getOntModelFromAttribute( FULL_ONT_MODEL_ATTR, vreq );
-		} else { // default 
-			model = getOntModelFromAttribute( ASSERTIONS_ONT_MODEL_ATTR, vreq );
-		}
 		
-		if ( "abox".equals(subgraphParam) ) {
-			if (limitToInferred) {
-				Model fullModel = getOntModelFromAttribute( FULL_ONT_MODEL_ATTR, vreq );
-				model = xutil.extractABox( fullModel );
-				try { 
-					inferenceModel.enterCriticalSection(Lock.READ);
-					model = model.intersection(inferenceModel);
-				} finally {
-					inferenceModel.leaveCriticalSection();
-				}
-			} else {
-				model = xutil.extractABox( model );
+		
+		if( "abox".equals(subgraphParam)){
+			model = ModelFactory.createDefaultModel();
+			if("inferred".equals(assertedOrInferredParam)){
+				model = xutil.extractABox(dataset, INFERENCE_GRAPH);
 			}
-		} else if ( "tbox".equals(subgraphParam) ) {
-			if (limitToInferred) {
-				Model fullModel = getOntModelFromAttribute( FULL_ONT_MODEL_ATTR, vreq );
-				model = xutil.extractTBox( fullModel, ontologyURI );
-				try { 
-					inferenceModel.enterCriticalSection(Lock.READ);
-					model = model.intersection(inferenceModel);
-				} finally {
-					inferenceModel.leaveCriticalSection();
-				}
-			} else {
-				model = xutil.extractTBox( model, ontologyURI );
+			else if("full".equals(assertedOrInferredParam)){
+				model = xutil.extractABox(dataset, FULL_GRAPH);
 			}
-		} 
+			else{
+				model = xutil.extractABox(dataset, ASSERTIONS_GRAPH);
+			}
+			
+		}
+		else if("tbox".equals(subgraphParam)){
+			if("inferred".equals(assertedOrInferredParam)){
+				model = xutil.extractTBox(dataset, ontologyURI,INFERENCE_GRAPH);
+			}
+			else if("full".equals(assertedOrInferredParam)){
+				model = xutil.extractTBox(dataset, ontologyURI, FULL_GRAPH);
+			}
+			else{
+				model = xutil.extractTBox(dataset, ontologyURI, ASSERTIONS_GRAPH);
+			}
+			
+		}
 		
 		if ( formatParam == null ) {
 			formatParam = "RDF/XML-ABBREV";  // default
@@ -178,6 +176,7 @@ public class JenaExportController extends BaseEditController {
 	}
 	
 	private OntModel getOntModelFromAttribute( String attributeName, VitroRequest vreq ) {
+		
 		Object o = vreq.getAttribute( attributeName );
 		if ( (o != null) && (o instanceof OntModel) ) {
 			return (OntModel) o;
@@ -194,6 +193,9 @@ public class JenaExportController extends BaseEditController {
 	static final String FULL_ONT_MODEL_ATTR = "jenaOntModel";
 	static final String ASSERTIONS_ONT_MODEL_ATTR = "baseOntModel";
 	static final String INFERENCES_ONT_MODEL_ATTR = "inferenceOntModel";
+	static final String FULL_GRAPH = "?g";
+	static final String ASSERTIONS_GRAPH = "<http://vitro.mannlib.cornell.edu/default/vitro-kb-2>";
+	static final String INFERENCE_GRAPH = "<http://vitro.mannlib.cornell.edu/default/vitro-kb-inf>";
 	
 	static Map<String,String> formatToExtension;
 	static Map<String,String> formatToMimetype;
