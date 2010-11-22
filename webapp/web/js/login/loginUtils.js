@@ -7,11 +7,12 @@ $(document).ready(function(){
   
     // focus on email or newpassword field
     $('.focus').focus();
+    
+    // fade out error alerts
+    $('#errorAlert').css('display', 'none');
+    $('#errorAlert').fadeIn(500);
 
 });
 
-// fade out error alerts
-$('#errorAlert').css('display', 'none');
-$('#errorAlert').fadeIn(2000);
-  
+
 
