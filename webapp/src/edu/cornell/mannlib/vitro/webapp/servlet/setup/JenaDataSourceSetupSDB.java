@@ -125,16 +125,16 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
             	JenaModelUtils modelUtils = new JenaModelUtils();
             	
             	Model aboxAssertions = SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_DB_MODEL);
-            	aboxAssertions.add(modelUtils.extractABox(baseOms.getABoxModel()));
+            	aboxAssertions.add(modelUtils.extractABox(memModel));
             
             	Model aboxInferences = SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_INF_MODEL);
-            	aboxInferences.add(modelUtils.extractABox(inferenceOms.getABoxModel()));
+            	aboxInferences.add(modelUtils.extractABox(inferenceModel));
             	
             	Model tboxAssertions = SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_TBOX_ASSERTIONS_MODEL);
-            	tboxAssertions.add(modelUtils.extractTBox(baseOms.getABoxModel()));
+            	tboxAssertions.add(modelUtils.extractTBox(memModel));
             	
             	Model tboxInferences = SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_TBOX_INF_MODEL);
-            	tboxInferences.add(modelUtils.extractTBox(inferenceOms.getABoxModel())); 
+            	tboxInferences.add(modelUtils.extractTBox(inferenceModel)); 
             	            	 
             	// The code below, which sets up the OntModelSelectors, controls whether each
             	// model is maintained in memory, in the DB, or both, while the application

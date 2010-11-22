@@ -19,7 +19,7 @@ import com.hp.hpl.jena.sdb.store.DatabaseType;
 import com.hp.hpl.jena.sdb.store.LayoutType;
 import com.hp.hpl.jena.vocabulary.OWL;
 
-import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelectorImpl;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDBGraphGenerator;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RegeneratingGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SDBGraphGenerator;
@@ -43,9 +43,9 @@ public class SimpleReasonerSetup implements ServletContextListener {
 		try {	
 		    // set up Pellet reasoning for the TBox	
 			
-			OntModelSelectorImpl assertionsOms = (OntModelSelectorImpl) sce.getServletContext().getAttribute("baseOntModelSelector");
-			OntModelSelectorImpl inferencesOms = (OntModelSelectorImpl) sce.getServletContext().getAttribute("inferenceOntModelSelector");
-			OntModelSelectorImpl unionOms = (OntModelSelectorImpl) sce.getServletContext().getAttribute("unionOntModelSelector");
+			OntModelSelector assertionsOms = (OntModelSelector) sce.getServletContext().getAttribute("baseOntModelSelector");
+			OntModelSelector inferencesOms = (OntModelSelector) sce.getServletContext().getAttribute("inferenceOntModelSelector");
+			OntModelSelector unionOms = (OntModelSelector) sce.getServletContext().getAttribute("unionOntModelSelector");
 
 			WebappDaoFactoryJena wadf = (WebappDaoFactoryJena) sce.getServletContext().getAttribute("webappDaoFactory");
 			
