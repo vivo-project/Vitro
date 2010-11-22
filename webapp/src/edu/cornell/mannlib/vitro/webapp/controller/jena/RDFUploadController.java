@@ -33,6 +33,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaModelUtils;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSpecialModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest;
@@ -155,10 +156,12 @@ public class RDFUploadController extends BaseEditController {
 		if( tempModel != null ){
 		    OntModel memModel=null;
 		    try {
-		        memModel = (OntModel) request.getSession().getAttribute("baseOntModel");
+		        memModel = ((OntModelSelector) request.getSession()
+            			.getAttribute("unionOntModelSelector")).getABoxModel();
 		    } catch (Exception e) {}
 		    if (memModel==null) {
-		        memModel = (OntModel) getServletContext().getAttribute("baseOntModel");
+		        memModel = ((OntModelSelector) getServletContext()
+            			.getAttribute("unionOntModelSelector")).getABoxModel();
 		    }
 		    if (memModel != null) {
 		        stmtCount = operateOnModel(request.getFullWebappDaoFactory(), memModel,tempModel,remove,makeClassgroups,portalArray,loginBean.getUserURI());

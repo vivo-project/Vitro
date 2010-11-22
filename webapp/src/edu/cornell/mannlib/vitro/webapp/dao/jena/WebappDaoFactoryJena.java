@@ -549,7 +549,7 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
         return propertyInstanceDao;
     }
 
-    private VClassDao vClassDao = null;
+    protected VClassDao vClassDao = null;
     public VClassDao getVClassDao() {
         if( vClassDao == null )
             vClassDao = new VClassDaoJena(this);

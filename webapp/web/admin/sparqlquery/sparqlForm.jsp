@@ -38,8 +38,10 @@ PREFIX <%=prefixText%>: <<%=urlText%>><%}}%>
 SELECT ?geoLocation ?label
 WHERE
 {
+  GRAPH ?g{
   ?geoLocation rdf:type core:GeographicLocation .
-  OPTIONAL { ?geoLocation rdfs:label ?label }
+  OPTIONAL { ?geoLocation rdfs:label ?label } .
+  }
 }
 LIMIT 20
 </textarea>

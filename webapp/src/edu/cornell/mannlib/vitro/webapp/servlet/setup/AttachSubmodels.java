@@ -53,10 +53,11 @@ public class AttachSubmodels implements ServletContextListener {
 						attachmentCount++;
 						log.info("Attached submodel from file " + p);
 					} catch (Exception ioe) {
-						fis.close();
 						log.error("Unable to attach submodel from file " + p, ioe);
 						System.out.println("Unable to attach submodel from file " + p);
 						ioe.printStackTrace();
+					} finally {
+						fis.close();
 					}
 				} catch (FileNotFoundException fnfe) {
 					log.warn(p + " not found. Unable to attach as submodel" + 

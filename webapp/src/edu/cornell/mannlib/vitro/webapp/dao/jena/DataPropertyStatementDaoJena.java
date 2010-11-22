@@ -66,9 +66,10 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
         }
         else
         {
-            getOntModel().enterCriticalSection(Lock.READ);
+        	OntModel ontModel = getOntModelSelector().getABoxModel();
+            ontModel.enterCriticalSection(Lock.READ);
             try {
-                Resource ind = getOntModel().getResource(entity.getURI());
+                Resource ind = ontModel.getResource(entity.getURI());
                 List<DataPropertyStatement> edList = new ArrayList<DataPropertyStatement>();
                 StmtIterator stmtIt = ind.listProperties();
                 while( stmtIt.hasNext() )
@@ -103,7 +104,7 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
                 entity.setDataPropertyStatements(edList);
                 return entity;
             } finally {
-                getOntModel().leaveCriticalSection();
+                ontModel.leaveCriticalSection();
             }
         }
     }
@@ -234,14 +235,14 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
         return 0;
     }
     
-    private DataPropertyStatement fillDataPropertyStatementWithJenaLiteral(DataPropertyStatement dataPropertyStatement, Literal l) {
+    protected DataPropertyStatement fillDataPropertyStatementWithJenaLiteral(DataPropertyStatement dataPropertyStatement, Literal l) {
     	dataPropertyStatement.setData(l.getLexicalForm());
         dataPropertyStatement.setDatatypeURI(l.getDatatypeURI());
         dataPropertyStatement.setLanguage(l.getLanguage());
         return dataPropertyStatement;
     }
     
-    private Literal jenaLiteralFromDataPropertyStatement(DataPropertyStatement dataPropertyStatement, OntModel ontModel) {
+    protected Literal jenaLiteralFromDataPropertyStatement(DataPropertyStatement dataPropertyStatement, OntModel ontModel) {
     	Literal l = null;
         if ((dataPropertyStatement.getLanguage()) != null && (dataPropertyStatement.getLanguage().length()>0)) {
         	l = ontModel.createLiteral(dataPropertyStatement.getData(),dataPropertyStatement.getLanguage());

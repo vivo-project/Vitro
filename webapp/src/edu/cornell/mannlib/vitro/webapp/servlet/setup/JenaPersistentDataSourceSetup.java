@@ -6,6 +6,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -27,6 +28,9 @@ public class JenaPersistentDataSourceSetup extends JenaDataSourceSetupBase imple
 		boolean firstStartup = false;
 		
         try {
+        	
+        	
+        	
             dbModel = makeDBModelFromConfigurationProperties(JENA_DB_MODEL, DB_ONT_MODEL_SPEC);
             
             ClosableIterator stmtIt = dbModel.listStatements();

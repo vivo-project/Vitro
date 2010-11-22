@@ -92,6 +92,7 @@ public class BrowseController extends FreemarkerHttpServlet {
 
     	int portalId = vreq.getPortal().getPortalId();
     	List<VClassGroup> groups = getGroups(vreq.getWebappDaoFactory().getVClassGroupDao(), portalId);
+    	_groupListMap.put(portalId, groups);
     	if (groups == null || groups.isEmpty()) {
     		message = "There are not yet any items in the system.";
     	}
@@ -114,13 +115,17 @@ public class BrowseController extends FreemarkerHttpServlet {
     public void destroy(){
         _cacheRebuildThread.kill();
     }
+    
+    private List getGroups( VClassGroupDao vcgDao, int portalId) {
+    	return getGroups( vcgDao, portalId, INCLUDE_INDIVIDUAL_COUNT);
+    }
 
-    private List getGroups( VClassGroupDao vcgDao, int portalId ){
+    private List getGroups( VClassGroupDao vcgDao, int portalId, boolean includeIndividualCount ){
         List grp = _groupListMap.get(portalId);
         if( grp == null ){
             log.debug("needed to build vclassGroups for portal " + portalId);
             // Get all classgroups, each populated with a list of their member vclasses
-            List groups = vcgDao.getPublicGroupsWithVClasses(ORDER_BY_DISPLAYRANK, !INCLUDE_UNINSTANTIATED, INCLUDE_INDIVIDUAL_COUNT); 
+            List groups = vcgDao.getPublicGroupsWithVClasses(ORDER_BY_DISPLAYRANK, !INCLUDE_UNINSTANTIATED, includeIndividualCount); 
 
             // remove classes that have been configured to be hidden
             // from search results
@@ -130,7 +135,7 @@ public class BrowseController extends FreemarkerHttpServlet {
             //removeUnpopulatedClasses( groups);
             vcgDao.removeUnpopulatedGroups(groups);
             
-            _groupListMap.put(portalId, groups);
+            //_groupListMap.put(portalId, groups);
             return groups;
         } else {
             return grp;
@@ -212,7 +217,7 @@ public class BrowseController extends FreemarkerHttpServlet {
                        portals.add(wdFactory.getPortalDao().getPortalByURI(uri));
                }
            }
-
+           
            for(Portal portal : portals){
                rebuildCacheForPortal(portal,appBean,wdFactory);
            }
@@ -258,8 +263,55 @@ public class BrowseController extends FreemarkerHttpServlet {
             filteringDaoFactory = wdFactory;
         }
         _groupListMap.remove(portal.getPortalId());
-        getGroups(filteringDaoFactory.getVClassGroupDao(),portal.getPortalId());
+        if ( !singlePortalApplication ) {
+	        _groupListMap.put(portal.getPortalId(), 
+	        		getGroups(filteringDaoFactory.getVClassGroupDao(),portal.getPortalId()));
+        } else {
+        	List<VClassGroup> unfilteredGroups = getGroups(wdFactory.getVClassGroupDao(), portal.getPortalId(), INCLUDE_INDIVIDUAL_COUNT);
+        	List<VClassGroup> filteredGroups = getGroups(filteringDaoFactory.getVClassGroupDao(),portal.getPortalId(), !INCLUDE_INDIVIDUAL_COUNT);
+        	_groupListMap.put(portal.getPortalId(), removeFilteredOutGroupsAndClasses(unfilteredGroups, filteredGroups));
+        	// BJL23:  You may be wondering, why this extra method?  
+        	// Can't we just use the filtering DAO?
+        	// Yes, but using the filtered DAO involves an expensive method
+        	// called correctVClassCounts() that requires each individual
+        	// in a VClass to be retrieved and filtered.  This is fine in memory,
+        	// but awful when using a database.  We can't (yet) avoid all
+        	// this work when portal filtering is involved, but we can
+        	// short-circuit it when we have a single portal by using
+        	// the filtering DAO only to filter groups and classes,
+        	// and the unfiltered DAO to get the counts.
+        }
     }
+    
+    private List<VClassGroup> removeFilteredOutGroupsAndClasses(List<VClassGroup> unfilteredGroups, List<VClassGroup> filteredGroups) {
+    	List<VClassGroup> groups = new ArrayList<VClassGroup>();
+    	Set<String> allowedGroups = new HashSet<String>();
+    	Set<String> allowedVClasses = new HashSet<String>();
+    	for (VClassGroup group : filteredGroups) {
+    		if (group.getURI() != null) {
+    			allowedGroups.add(group.getURI());
+    		}
+    		for (VClass vcl : group) {
+    			if (vcl.getURI() != null) {
+    				allowedVClasses.add(vcl.getURI());
+    			}
+    		}
+    	}
+    	for (VClassGroup group : unfilteredGroups) {
+    		if (allowedGroups.contains(group.getURI())) {
+    			groups.add(group);
+    		}
+    		List<VClass> tmp = new ArrayList<VClass>();
+    		for (VClass vcl : group) {
+    			if (allowedVClasses.contains(vcl.getURI())) {
+    				tmp.add(vcl);
+    			}
+    		}
+    		group.setVitroClassList(tmp);
+    	}
+    	return groups;
+    }
+    
 
     private void clearGroupCache(){
         _groupListMap = new ConcurrentHashMap<Integer, List>();

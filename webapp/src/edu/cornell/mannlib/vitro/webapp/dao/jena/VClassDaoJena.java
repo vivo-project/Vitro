@@ -27,7 +27,14 @@ import com.hp.hpl.jena.ontology.ProfileException;
 import com.hp.hpl.jena.ontology.Restriction;
 import com.hp.hpl.jena.ontology.SomeValuesFromRestriction;
 import com.hp.hpl.jena.ontology.UnionClass;
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Literal;
+import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
@@ -775,10 +782,10 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
             getOntModel().enterCriticalSection(Lock.READ);
             try {
                 if ((group != null) && (group.getURI() != null)) {
-                    Individual groupInd = getOntModel().getIndividual(group.getURI());
+                    Resource groupRes = ResourceFactory.createResource(group.getURI());
                     AnnotationProperty inClassGroup = getOntModel().getAnnotationProperty(VitroVocabulary.IN_CLASSGROUP);
                     if (inClassGroup != null) {
-                        ClosableIterator annotIt = getOntModel().listStatements((OntClass)null,inClassGroup,groupInd);
+                        ClosableIterator annotIt = getOntModel().listStatements((OntClass)null,inClassGroup,groupRes);
                         try {
                             while (annotIt.hasNext()) {
                                 try {
@@ -788,20 +795,39 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                                     if (vcw != null) {
                                         boolean classIsInstantiated = false;
                                         if (getIndividualCount) {
-                                        	int count = getOntModel().listStatements(null,RDF.type,cls).toList().size();
+                                        	Model aboxModel = getOntModelSelector().getABoxModel();
+                                        	aboxModel.enterCriticalSection(Lock.READ);
+                                        	int count = 0;
+                                        	try {
+                                        		String countQueryStr = "SELECT COUNT(*) WHERE \n" +
+                                        		                       "{ ?s a <" + cls.getURI() + "> } \n";
+                                        		Query countQuery = QueryFactory.create(countQueryStr, Syntax.syntaxARQ);
+                                        		QueryExecution qe = QueryExecutionFactory.create(countQuery, aboxModel);
+                                        		ResultSet rs =qe.execSelect();
+                                        		count = Integer.parseInt(((Literal) rs.nextSolution().get(".1")).getLexicalForm());
+                                        		//count = aboxModel.listStatements(null,RDF.type,cls).toList().size();
+                                        	} finally {
+                                        		aboxModel.leaveCriticalSection();
+                                        	}
                                         	vcw.setEntityCount(count);
                                         	classIsInstantiated = (count > 0);
                                         } else if (includeUninstantiatedClasses == false) {
 	                                        // Note: to support SDB models, may want to do this with 
 	                                        // SPARQL and LIMIT 1 if SDB can take advantage of it
-	                                        ClosableIterator countIt = getOntModel().listStatements(null,RDF.type,cls);
-	                                        try {
-	                                            if (countIt.hasNext()) {
-	                                            	classIsInstantiated = true;
-	                                            }
-	                                        } finally {
-	                                            countIt.close();
-	                                        }
+                                        	Model aboxModel = getOntModelSelector().getABoxModel();
+                                        	aboxModel.enterCriticalSection(Lock.READ);
+                                        	try {
+		                                        ClosableIterator countIt = aboxModel.listStatements(null,RDF.type,cls);
+		                                        try {
+		                                            if (countIt.hasNext()) {
+		                                            	classIsInstantiated = true;
+		                                            }
+		                                        } finally {
+		                                            countIt.close();
+		                                        }
+                                        	} finally {
+                                        		aboxModel.leaveCriticalSection();
+                                        	}
                                         }
                                         
                                         if (includeUninstantiatedClasses || classIsInstantiated) {

@@ -61,9 +61,10 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         	
         	ObjectPropertyDaoJena opDaoJena = new ObjectPropertyDaoJena(getWebappDaoFactory());
         	
-        	getOntModel().enterCriticalSection(Lock.READ);
+        	OntModel ontModel = getOntModelSelector().getABoxModel();
+        	ontModel.enterCriticalSection(Lock.READ);
         	try {
-	            Resource ind = getOntModel().getResource(entity.getURI());
+	            Resource ind = ontModel.getResource(entity.getURI());
 	            List<ObjectPropertyStatement> objPropertyStmtList = new ArrayList<ObjectPropertyStatement>();
 	            ClosableIterator<Statement> propIt = ind.listProperties();
 	            try {
@@ -119,7 +120,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
 	            }
 	            entity.setObjectPropertyStatements(objPropertyStmtList);
         	} finally {
-        		getOntModel().leaveCriticalSection();
+        		ontModel.leaveCriticalSection();
         	}
             return entity;
         }

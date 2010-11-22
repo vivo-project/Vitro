@@ -5,6 +5,8 @@ package edu.cornell.mannlib.vitro.webapp.controller.edit;
 import java.text.CollationKey;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.text.Collator;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -12,6 +14,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.TreeMap;
+import java.util.ListIterator;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
@@ -73,9 +76,8 @@ public class Properties2PropertiesRetryController extends BaseEditController {
         
     	Collections.sort(propList);
     	
-        String superpropertyURIstr = request.getParameter("SuperpropertyURI");
-        String subpropertyURIstr = request.getParameter("SubpropertyURI");
-        
+    	 String superpropertyURIstr = request.getParameter("SuperpropertyURI");
+         String subpropertyURIstr = request.getParameter("SubpropertyURI");
        
         HashMap<String,Option> hashMap = new HashMap<String,Option>();
         List<Option> optionList = FormUtils.makeOptionListFromBeans(propList,"URI","LocalNameWithPrefix",superpropertyURIstr,null);

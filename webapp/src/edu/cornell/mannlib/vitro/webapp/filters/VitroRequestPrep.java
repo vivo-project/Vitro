@@ -128,7 +128,7 @@ public class VitroRequestPrep implements Filter {
         vreq.setSunsetFlag(sunsetFlag);
 
         //-- setup DAO factory --//
-        WebappDaoFactory wdf = getWebappDaoFactory();
+        WebappDaoFactory wdf = getWebappDaoFactory(vreq);
         //TODO: get accept-language from request and set as preferred languages
         
         //-- setup portal and portalFlag --//
@@ -199,8 +199,10 @@ public class VitroRequestPrep implements Filter {
         chain.doFilter(request, response);
     }
 
-    private WebappDaoFactory getWebappDaoFactory(){
-        return (WebappDaoFactory) _context.getAttribute("webappDaoFactory");
+    private WebappDaoFactory getWebappDaoFactory(VitroRequest vreq){
+    	WebappDaoFactory webappDaoFactory = vreq.getWebappDaoFactory();
+        return (webappDaoFactory != null) ? webappDaoFactory :
+        	(WebappDaoFactory) _context.getAttribute("webappDaoFactory");
     }
 
     public void init(FilterConfig filterConfig) throws ServletException {

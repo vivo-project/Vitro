@@ -151,16 +151,19 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
             ? getOntModel().createResource(new AnonId(vclassURI.split("#")[1]))
             : ResourceFactory.createResource(vclassURI);
     
-        getOntModel().enterCriticalSection(Lock.READ);
-        try {
-            if (theClass.isAnon() && theClass.canAs(UnionClass.class)) {
-            	UnionClass u = (UnionClass) theClass.as(UnionClass.class);
-            	for (OntClass operand : u.listOperands().toList()) {
-            		VClass vc = new VClassJena(operand, getWebappDaoFactory());
-            		ents.addAll(getIndividualsByVClass(vc));
-            	}
-            } else {
-	            StmtIterator stmtIt = getOntModel().listStatements((Resource) null, RDF.type, theClass);
+        
+        
+        if (theClass.isAnon() && theClass.canAs(UnionClass.class)) {
+        	UnionClass u = (UnionClass) theClass.as(UnionClass.class);
+        	for (OntClass operand : u.listOperands().toList()) {
+        		VClass vc = new VClassJena(operand, getWebappDaoFactory());
+        		ents.addAll(getIndividualsByVClass(vc));
+        	}
+        } else {
+        	OntModel ontModel = getOntModelSelector().getABoxModel();
+        	try {
+        		ontModel.enterCriticalSection(Lock.READ);
+	            StmtIterator stmtIt = ontModel.listStatements((Resource) null, RDF.type, theClass);
 	            try {
 	                while (stmtIt.hasNext()) {
 	                    Statement stmt = stmtIt.nextStatement();
@@ -170,10 +173,11 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
 	            } finally {
 	                stmtIt.close();
 	            }
-            }
-        } finally {
-            getOntModel().leaveCriticalSection();
+        	} finally {
+        		ontModel.leaveCriticalSection();
+        	}
         }
+        
 
         java.util.Collections.sort(ents);
 

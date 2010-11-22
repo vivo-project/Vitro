@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.query.Dataset;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
@@ -68,14 +69,31 @@ public class VitroRequest implements HttpServletRequest {
     	return (WebappDaoFactory) getAttribute("webappDaoFactory");
     }
     
+    public void setFullWebappDaoFactory(WebappDaoFactory wdf) {
+    	setAttribute("fullWebappDaoFactory", wdf);
+    }
+    
+    public Dataset getDataset() {
+    	return (Dataset) getAttribute("dataset");
+    }
+    
+    public void setDataset(Dataset dataset) {
+    	setAttribute("dataset", dataset);
+    }
+    
     /** gets assertions + inferences WebappDaoFactory with no filtering **/
     public WebappDaoFactory getFullWebappDaoFactory() {
-        Object webappDaoFactoryAttr = _req.getSession().getAttribute("webappDaoFactory");
-        if (webappDaoFactoryAttr instanceof WebappDaoFactory) {
-             return (WebappDaoFactory) webappDaoFactoryAttr;
-        } else {
-        	return (WebappDaoFactory) _req.getSession().getServletContext().getAttribute("webappDaoFactory");	
-        }	
+    	Object webappDaoFactoryAttr = _req.getAttribute("fullWebappDaoFactory");
+    	if (webappDaoFactoryAttr instanceof WebappDaoFactory) {
+    		return (WebappDaoFactory) webappDaoFactoryAttr;
+    	} else {
+	        webappDaoFactoryAttr = _req.getSession().getAttribute("webappDaoFactory");
+	        if (webappDaoFactoryAttr instanceof WebappDaoFactory) {
+	             return (WebappDaoFactory) webappDaoFactoryAttr;
+	        } else {
+	        	return (WebappDaoFactory) _req.getSession().getServletContext().getAttribute("webappDaoFactory");	
+	        }
+    	}
     }
     
     /** gets assertions-only WebappDaoFactory with no filtering */

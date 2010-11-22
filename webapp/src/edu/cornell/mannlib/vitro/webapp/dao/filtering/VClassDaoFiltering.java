@@ -221,6 +221,7 @@ public class VClassDaoFiltering extends BaseFiltering implements VClassDao{
         Filter.filter(ents,filters.getIndividualFilter(),out);
         if( out != null )
             vclass.setEntityCount(out.size());
+        System.out.println(vclass.getURI() + " count: " + vclass.getEntityCount());
         return;
     }
 
