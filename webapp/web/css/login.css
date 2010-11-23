@@ -41,6 +41,10 @@ p.request-account {
     float:left;
 }
 
+#log-in-form p.external-auth {
+    margin-left: 36px;
+}
+
 #errorAlert {
     color:#900;
     padding:0px;

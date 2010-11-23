@@ -44,13 +44,17 @@
             <input class="text-field" name="loginPassword" id="password" type="password" required />
             
             <p class="submit"><input name="loginForm" type="submit" class="green button" value="Log in"/></p>
-
             <input class="checkbox-remember-me" name="remember-me" type="checkbox" value="" />  
             <label class="label-remember-me" for="remember-me">Remember me</label>
-            
-            <p class="forgot-password"><a href="#">Forgot your password?</a></p>
-            
-            <p class="request-account"><a class="blue button" href="#">Request an account</a> </p>
+            <p class="forgot-password"><a href="#">Forgot your password?</a></p>    
+            <p class="request-account"><a class="blue button" href="#">Request an account</a> </p>    
+                            
+            <#if externalAuthUrl??>
+                <p class="external-auth">
+                    <a class="green button" href="${externalAuthUrl}">Log in using ${externalAuthName}</a>
+                </p>
+            </#if>
+
         </form>
 
     </section><!-- #log-in -->

@@ -12,6 +12,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State;
@@ -45,6 +47,8 @@ public class LoginWidget extends Widget {
         FORM_ACTION("formAction"),
         INFO_MESSAGE("infoMessage"),
         ERROR_MESSAGE("errorMessage"),
+        EXTERNAL_AUTH_NAME("externalAuthName"),
+        EXTERNAL_AUTH_URL("externalAuthUrl"),
         CANCEL_URL("cancelUrl");
 
         private final String variableName;
@@ -113,6 +117,14 @@ public class LoginWidget extends Widget {
         WidgetTemplateValues values = new WidgetTemplateValues(Macro.LOGIN.toString());
         values.put(TemplateVariable.FORM_ACTION.toString(), getAuthenticateUrl(request));
         values.put(TemplateVariable.LOGIN_NAME.toString(), bean.getUsername());
+        
+        String externalAuthServerUrl = ConfigurationProperties.getProperty("externalAuth.serverUrl");
+        externalAuthServerUrl = UrlBuilder.getUrl(externalAuthServerUrl);
+        if (externalAuthServerUrl != null) {
+            values.put(TemplateVariable.EXTERNAL_AUTH_URL.toString(), externalAuthServerUrl);
+            values.put(TemplateVariable.EXTERNAL_AUTH_NAME.toString(), 
+                    ConfigurationProperties.getProperty("externalAuth.serverName"));
+        }
 
         String infoMessage = bean.getInfoMessage();
         if (!infoMessage.isEmpty()) {
