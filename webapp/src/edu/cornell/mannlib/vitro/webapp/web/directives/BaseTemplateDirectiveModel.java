@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.directives;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,7 +16,9 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper;
 import freemarker.core.Environment;
 import freemarker.template.Configuration;
+import freemarker.template.Template;
 import freemarker.template.TemplateDirectiveModel;
+import freemarker.template.TemplateException;
 
 public abstract class BaseTemplateDirectiveModel implements TemplateDirectiveModel {
 
@@ -38,18 +42,32 @@ public abstract class BaseTemplateDirectiveModel implements TemplateDirectiveMod
         return directiveName;               
     }
     
-    protected String mergeToHelpTemplate(Map<String, Object> map, Environment environment) {
-        TemplateProcessingHelper helper = getFreemarkerHelper(environment);
-        return helper.processTemplateToString("help-directive.ftl", map); 
+    protected String mergeToHelpTemplate(Map<String, Object> map, Environment env) {
+        return processTemplateToString("help-directive.ftl", map, env);        
     }
     
-    public static TemplateProcessingHelper getFreemarkerHelper(Environment env) {
-        Configuration config = env.getConfiguration();
-        // In a directive, custom attributes for request and context are available in the Environment.
-        // They are put there when the enclosing template is processed.
-        HttpServletRequest request = (HttpServletRequest) env.getCustomAttribute("request");
-        ServletContext context = (ServletContext) env.getCustomAttribute("context");
-        return new TemplateProcessingHelper(config, request, context);
+    public static String processTemplateToString(String templateName, Map<String, Object> map, Environment env) {
+        Template template = getTemplate(templateName, env);
+        StringWriter sw = new StringWriter();
+        try {
+            template.process(map, sw);
+        } catch (TemplateException e) {
+            log.error("Template Exception creating processing environment", e);
+        } catch (IOException e) {
+            log.error("IOException creating processing environment", e);
+        }
+        return sw.toString();        
     }
-
+    
+    private static Template getTemplate(String templateName, Environment env) {
+        Template template = null;
+        try {
+            template = env.getConfiguration().getTemplate(templateName);
+        } catch (IOException e) {
+            // RY Should probably throw this error instead.
+            log.error("Cannot get template " + templateName, e);
+        }  
+        return template;        
+    }
+    
 }

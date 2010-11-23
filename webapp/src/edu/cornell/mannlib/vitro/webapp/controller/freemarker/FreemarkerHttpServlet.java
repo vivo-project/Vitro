@@ -57,7 +57,8 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         TITLED_ERROR_MESSAGE("error-titled.ftl"),
         MESSAGE("message.ftl"),
         TITLED_MESSAGE("message-titled.ftl"),
-        PAGE_DEFAULT("page.ftl");
+        PAGE_DEFAULT("page.ftl"),
+        SETUP("setup.ftl");
         
         private final String filename;
         
@@ -162,19 +163,21 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
      
         Configuration config = getConfig(vreq);
         Map<String, Object> bodyMap = values.getMap();
+        TemplateProcessingHelper helper = new TemplateProcessingHelper(config, vreq, getServletContext());
         
         // We can't use shared variables in the Freemarker configuration to store anything 
         // except theme-specific data, because multiple portals or apps might share the same theme. So instead
         // just put the shared variables in both root and body.
         Map<String, Object> sharedVariables = getSharedVariables(vreq, bodyMap);
-        
+
+        //helper.processSetupTemplate(config, vreq, sharedVariables);
+
         // root is the map used to create the page shell - header, footer, menus, etc.
-        Map<String, Object> root = new HashMap<String, Object>(sharedVariables);
-        
+        Map<String, Object> root = new HashMap<String, Object>(sharedVariables);        
         root.putAll(getPageTemplateValues(vreq));
         // Tell the template and any directives it uses that we're processing a page template.
         root.put("templateType", PAGE_TEMPLATE_TYPE);
-
+ 
         // Add the values that we got, and merge to the template.
         String bodyTemplate = values.getTemplateName();
         String bodyString;
@@ -196,6 +199,11 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         root.put("body", bodyString);
         
         writePage(root, config, vreq, response);       
+    }
+    
+    private void processSetupTemplate(Configuration config, HttpServletRequest request, Map<String, Object> map) {
+        TemplateProcessingHelper helper = new TemplateProcessingHelper(config, request, getServletContext());
+        helper.processTemplate(Template.SETUP.toString(), map);
     }
     
     protected void doRedirect(HttpServletRequest request, HttpServletResponse response, ResponseValues values) 

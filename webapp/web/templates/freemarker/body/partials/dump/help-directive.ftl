@@ -12,15 +12,16 @@
             <p><strong>Comments:</strong> ${comments}</p>     
         </#if>      
         
-        <p><strong>Parameters:</strong></p>
+        <p><strong>Parameters: </strong>
         <#if params?? && params?keys?has_content>
+            </p>
             <ul>
                 <#list params?keys as param>
                     <li><strong>${param}:</strong> ${params[param]}</li>   
                 </#list>
             </ul>
         <#else>
-            <p>none</p>
+            none</p>
         </#if>
         <br />
         

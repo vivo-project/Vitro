@@ -7,3 +7,8 @@
 <@widget name="test" />
 
 ${stylesheets.add("/css/testfrombody.css")}
+${scripts.add("/js/jstest.js")}
+
+${bodyClass}
+
+<ul><@list.firstLastList><li>apples</li><li>bananas</li></@list.firstLastList></ul>

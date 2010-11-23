@@ -27,20 +27,19 @@ public class DumpHelper {
 
     private static final Log log = LogFactory.getLog(DumpHelper.class);
     
-    private Environment environment = null;
+    private Environment env = null;
     
     public DumpHelper(Environment env) {
-        environment = env;
+        this.env = env;
     }   
 
     public String getVariableDump(String varName) {
         Map<String, Object> map = getVariableDumpData(varName);
-        TemplateProcessingHelper helper = BaseTemplateDirectiveModel.getFreemarkerHelper(environment);
-        return helper.processTemplateToString("dump-var.ftl", map);
+        return BaseTemplateDirectiveModel.processTemplateToString("dump-var.ftl", map, env);
     }
 
     public Map<String, Object> getVariableDumpData(String varName) {
-        TemplateHashModel dataModel = environment.getDataModel();
+        TemplateHashModel dataModel = env.getDataModel();
 
         TemplateModel tm =  null;
         try {
@@ -115,10 +114,8 @@ public class DumpHelper {
     }
     
     public void writeDump(String templateName, Map<String, Object> map, String modelName) {
-
-        TemplateProcessingHelper helper = BaseTemplateDirectiveModel.getFreemarkerHelper(environment);
-        String output = helper.processTemplateToString(templateName, map);      
-        Writer out = environment.getOut();
+        String output = BaseTemplateDirectiveModel.processTemplateToString(templateName, map, env);      
+        Writer out = env.getOut();
         try {
             out.write(output);
         } catch (IOException e) {

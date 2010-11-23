@@ -26,28 +26,30 @@ public class TemplateProcessingHelper {
     private Configuration config = null;
     private HttpServletRequest request = null;
     private ServletContext context = null;
+    //private Map<String, Object> templateDataModel = null;
     
-    public TemplateProcessingHelper(Configuration config, HttpServletRequest request, ServletContext context) {
+    TemplateProcessingHelper(Configuration config, HttpServletRequest request, ServletContext context) {
         this.config = config;
         this.request = request;
         this.context = context;
+        //this.templateDataModel = new HashMap<String, Object>();
     }
-
-    public StringWriter processTemplate(String templateName, Map<String, Object> map) {
+    
+    protected StringWriter processTemplate(String templateName, Map<String, Object> map) {
         Template template = getTemplate(templateName);
         StringWriter sw = new StringWriter();        
         processTemplate(template, map, sw);
         return sw;
     }
     
-    public StringWriter processTemplate(ResponseValues values) {
+    protected StringWriter processTemplate(ResponseValues values) {
         if (values == null) {
             return null;
         }
         return processTemplate(values.getTemplateName(), values.getMap());
     }
 
-    public void processTemplate(Template template, Map<String, Object> map, Writer writer) {
+    private void processTemplate(Template template, Map<String, Object> map, Writer writer) {
         
         try {
             Environment env = template.createProcessingEnvironment(map, writer);
@@ -64,15 +66,15 @@ public class TemplateProcessingHelper {
     }
 
     // In fact, we can put StringWriter objects directly into the data model, so perhaps we should eliminate the processTemplateToString() methods.
-    public String processTemplateToString(String templateName, Map<String, Object> map) {
+    protected String processTemplateToString(String templateName, Map<String, Object> map) {
         return processTemplate(templateName, map).toString();
     }
 
-    public String processTemplateToString(ResponseValues values) {
+    protected String processTemplateToString(ResponseValues values) {
         return processTemplate(values).toString();
     }
     
-    public Template getTemplate(String templateName) {
+    private Template getTemplate(String templateName) {
         Template template = null;
         try {
             template = config.getTemplate(templateName);
