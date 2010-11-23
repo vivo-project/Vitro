@@ -26,16 +26,13 @@ public class ExternalAuthHelper {
 	private static final Log log = LogFactory.getLog(ExternalAuthHelper.class);
 
 	private static final ExternalAuthHelper DUMMY_HELPER = new ExternalAuthHelper(
-			null, null, null);
+			null, null);
 
 	private static final String BEAN_ATTRIBUTE = ExternalAuthHelper.class
 			.getName();
 
 	/** This configuration property points to the external authorization server. */
 	private static final String PROPERTY_EXTERNAL_AUTH_SERVER_URL = "externalAuth.serverUrl";
-
-	/** This configuration property says what ties an Individual to a NetID */
-	private static final String PROPERTY_NETID_MATCHING_RELATION = "externalAuth.netidMatchingProperty";
 
 	/** This configuration property says which HTTP header holds the username. */
 	public static final String PROPERTY_EXTERNAL_AUTH_USERNAME_HEADER = "externalAuth.headerName";
@@ -75,28 +72,24 @@ public class ExternalAuthHelper {
 	}
 
 	private static ExternalAuthHelper buildBean() {
-		String netidMatchingPropertyUri = ConfigurationProperties
-				.getProperty(PROPERTY_NETID_MATCHING_RELATION);
 		String externalAuthServerUrl = ConfigurationProperties
 				.getProperty(PROPERTY_EXTERNAL_AUTH_SERVER_URL);
 		String externalAuthHeaderName = ConfigurationProperties
 				.getProperty(PROPERTY_EXTERNAL_AUTH_USERNAME_HEADER);
 
-		return new ExternalAuthHelper(netidMatchingPropertyUri,
-				externalAuthServerUrl, externalAuthHeaderName);
+		return new ExternalAuthHelper(externalAuthServerUrl,
+				externalAuthHeaderName);
 	}
 
 	// ----------------------------------------------------------------------
 	// the bean
 	// ----------------------------------------------------------------------
 
-	private final String netidMatchingPropertyUri;
 	private final String externalAuthServerUrl;
 	private final String externalAuthHeaderName;
 
-	private ExternalAuthHelper(String netidMatchingPropertyUri,
-			String externalAuthServerUrl, String externalAuthHeaderName) {
-		this.netidMatchingPropertyUri = trimThis(netidMatchingPropertyUri);
+	private ExternalAuthHelper(String externalAuthServerUrl,
+			String externalAuthHeaderName) {
 		this.externalAuthServerUrl = trimThis(externalAuthServerUrl);
 		this.externalAuthHeaderName = trimThis(externalAuthHeaderName);
 	}
@@ -107,23 +100,6 @@ public class ExternalAuthHelper {
 		} else {
 			return string.trim();
 		}
-	}
-
-	public String getIndividualUriFromNetId(IndividualDao indDao, String netId) {
-		if (indDao == null) {
-			return null;
-		}
-		if (netId == null) {
-			return null;
-		}
-		if (netidMatchingPropertyUri == null) {
-			return null;
-		}
-
-		String uri = indDao.getIndividualURIFromNetId(netId,
-				netidMatchingPropertyUri);
-		log.debug("Netid=" + netId + ", individual URI=" + uri);
-		return uri;
 	}
 
 	public String buildExternalAuthRedirectUrl(String returnUrl) {
@@ -170,8 +146,7 @@ public class ExternalAuthHelper {
 
 	@Override
 	public String toString() {
-		return "ExternalAuthHelper[netidMatchingPropertyUri="
-				+ netidMatchingPropertyUri + ", externalAuthServerUrl="
+		return "ExternalAuthHelper[externalAuthServerUrl="
 				+ externalAuthServerUrl + ", externalAuthHeaderName="
 				+ externalAuthHeaderName + "]";
 	}

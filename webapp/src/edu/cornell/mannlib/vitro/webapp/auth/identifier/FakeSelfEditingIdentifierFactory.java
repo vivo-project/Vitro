@@ -9,7 +9,7 @@ import javax.servlet.http.HttpSession;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory.NetId;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.RoleBasedPolicy;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.controller.authenticate.ExternalAuthHelper;
+import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 /** 
@@ -35,8 +35,8 @@ public class FakeSelfEditingIdentifierFactory implements IdentifierBundleFactory
             NetId netIdToken = new NetId(netid);
             ib.add(netIdToken);
             
-        	ExternalAuthHelper helper = ExternalAuthHelper.getHelper(request);
-			String uri = helper.getIndividualUriFromNetId(wdf.getIndividualDao(), netid);
+    		SelfEditingConfiguration sec = SelfEditingConfiguration.getBean(request);
+    		String uri = sec.getIndividualUriFromUsername(wdf.getIndividualDao(), netid);
             if( uri != null ){        
                 Individual ind = wdf.getIndividualDao().getIndividualByURI(uri);
                 if( ind != null ){        

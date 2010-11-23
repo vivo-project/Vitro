@@ -14,6 +14,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
+import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
@@ -78,8 +79,8 @@ public class LoginExternalAuthReturn extends BaseLoginServlet {
 		}
 		IndividualDao indDao = new VitroRequest(req).getWebappDaoFactory()
 				.getIndividualDao();
-		return ExternalAuthHelper.getHelper(req).getIndividualUriFromNetId(
-				indDao, username);
+		return SelfEditingConfiguration.getBean(req)
+				.getIndividualUriFromUsername(indDao, username);
 	}
 
 	private void removeLoginProcessArtifacts(HttpServletRequest req) {

@@ -27,27 +27,19 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 
-import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.controller.authenticate.ExternalAuthHelper;
+import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 /**
  * Attempts to pull a NetId and a SelfEditing identifier from the externally
  * authorized username.
- * 
- * @author bdc34, trashed by jeb228
  */
 public class SelfEditingIdentifierFactory implements IdentifierBundleFactory {
 	private static final Log log = LogFactory.getLog(SelfEditingIdentifierFactory.class);
 	
-	/**
-	 * The configuration property that names the HTTP header that will hold the
-	 * username from the external authorization system.
-	 */
-	private static final String PROPERTY_EXTERNAL_AUTH_HEADER_NAME = "externalAuth.headerName";
-
 	private static final int MAXIMUM_USERNAME_LENGTH = 100;
 	
 	public IdentifierBundle getIdentifierBundle(ServletRequest request,
@@ -60,48 +52,64 @@ public class SelfEditingIdentifierFactory implements IdentifierBundleFactory {
 		log.debug("request is for " + req.getRequestURI());
 		
 		NetId netId = figureNetId(req);
-		SelfEditing selfId = figureSelfEditingId(req, netId);
+		SelfEditing selfId = figureSelfEditingId(req);
 		
 		return buildIdentifierBundle(netId, selfId);
 	}
 
 	/**
-	 * Get the name of the externally authorized user and put it into a NetId.
+	 * If the user is externally authorized, create a NetId identifier.
 	 */
 	private NetId figureNetId(HttpServletRequest req) {
-		String externalAuthHeaderName = ConfigurationProperties.getProperty(PROPERTY_EXTERNAL_AUTH_HEADER_NAME);
-		if (isEmpty(externalAuthHeaderName)) {
-			log.debug(PROPERTY_EXTERNAL_AUTH_HEADER_NAME + " property is not configured.");
+		LoginStatusBean bean = LoginStatusBean.getBean(req);
+		String username = bean.getUsername();
+		
+		if (!bean.isLoggedIn()) {
+			log.debug("No NetId: not logged in.");
 			return null;
 		}
-
-		String externalUsername = req.getHeader(externalAuthHeaderName);
-		if (isEmpty(externalUsername)) {
-			log.debug("The external username is empty.");
+		
+		if (isEmpty(username)) {
+			log.debug("No NetId: username is empty.");
 			return null;
 		}
-		if (externalUsername.length() > MAXIMUM_USERNAME_LENGTH) {
+		
+		if (!bean.hasExternalAuthentication()) {
+			log.debug("No NetId: user '" + bean.getUsername() +
+			"' did not use external authentication.");
+			return null;
+		}
+		
+		if (username.length() > MAXIMUM_USERNAME_LENGTH) {
 			log.info("The external username is longer than " + MAXIMUM_USERNAME_LENGTH
 					+ " chars; this may be a malicious request");
 			return null;
 		}
 		
-		return new NetId(externalUsername);
+		return new NetId(username);
 	}
 
 	/**
-	 * If the externally authorized username is associated with an Individual in
-	 * the model, create a SelfEditing identifier.
+	 * If the authorized username is associated with an Individual in the model,
+	 * create a SelfEditing identifier.
 	 */
-	private SelfEditing figureSelfEditingId(HttpServletRequest request,
-			NetId netId) {
-		if (netId == null) {
+	private SelfEditing figureSelfEditingId(HttpServletRequest req) {
+		LoginStatusBean bean = LoginStatusBean.getBean(req);
+		String username = bean.getUsername();
+
+		if (!bean.isLoggedIn()) {
+			log.debug("No SelfEditing: not logged in.");
 			return null;
 		}
-		String username = netId.getValue();
 
-		HttpSession session = request.getSession(false);
+		if (isEmpty(username)) {
+			log.debug("No SelfEditing: username is empty.");
+			return null;
+		}
+
+		HttpSession session = req.getSession(false);
 		if (session == null) {
+			log.debug("No SelfEditing: session is null.");
 			return null;
 		}
 
@@ -114,17 +122,17 @@ public class SelfEditingIdentifierFactory implements IdentifierBundleFactory {
 		}
 
 		IndividualDao indDao = wdf.getIndividualDao();
-		
-		ExternalAuthHelper helper = ExternalAuthHelper.getHelper(request);
-		String uri = helper.getIndividualUriFromNetId(indDao, username);
+
+		SelfEditingConfiguration sec = SelfEditingConfiguration.getBean(req);
+		String uri = sec.getIndividualUriFromUsername(indDao, username);
 		if (uri == null) {
-			log.debug("could not find an Individual with a netId of "
+			log.debug("Could not find an Individual with a netId of "
 					+ username);
 		}
 
 		Individual ind = indDao.getIndividualByURI(uri);
 		if (ind == null) {
-			log.warn("found a URI for the netId " + username
+			log.warn("Found a URI for the netId " + username
 					+ " but could not build Individual");
 			return null;
 		}
