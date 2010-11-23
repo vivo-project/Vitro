@@ -86,12 +86,24 @@ public abstract class Authenticator {
 	 * - notify other users of the model
 	 * </pre>
 	 */
-	public abstract void recordUserIsLoggedIn(String username);
+	public abstract void recordLoginAgainstUserAccount(String username);
 
 	/**
-	 * Record that the current user has logged out:
-	 * - notify other users of the model.
+	 * <pre>
+	 * Record that the user has logged in but with only external authentication 
+	 * info, so no internal user account.
+	 * - this involves everything except updating the user record.
+	 * </pre>
+	 */
+	public abstract void recordLoginWithoutUserAccount(String username,
+			String individualUri);
+
+	/**
+	 * <pre>
+	 * Record that the current user has logged out: - notify other users of the
+	 * model. 
 	 * - invalidate the session.
+	 * </pre>
 	 */
 	public abstract void recordUserIsLoggedOut();
 }

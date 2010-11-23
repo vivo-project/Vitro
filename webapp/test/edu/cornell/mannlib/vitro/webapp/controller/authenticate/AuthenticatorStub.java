@@ -138,7 +138,7 @@ public class AuthenticatorStub extends Authenticator {
 	}
 
 	@Override
-	public void recordUserIsLoggedIn(String username) {
+	public void recordLoginAgainstUserAccount(String username) {
 		recordedLogins.add(username);
 
 		User user = getUserByUsername(username);
@@ -173,6 +173,13 @@ public class AuthenticatorStub extends Authenticator {
 	public void recordUserIsLoggedOut() {
 		throw new RuntimeException(
 				"AuthenticatorStub.recordUserIsLoggedOut() not implemented.");
+	}
+
+	@Override
+	public void recordLoginWithoutUserAccount(String username,
+			String individualUri) {
+		throw new RuntimeException(
+				"AuthenticatorStub.recordLoginWithoutUserAccount() not implemented.");
 	}
 
 }

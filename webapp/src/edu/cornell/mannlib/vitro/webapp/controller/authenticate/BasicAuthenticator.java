@@ -16,6 +16,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginFormBean;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.RoleBasedPolicy.AuthRole;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.controller.edit.Authenticate;
 import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
@@ -80,22 +81,41 @@ public class BasicAuthenticator extends Authenticator {
 	}
 
 	@Override
-	public void recordUserIsLoggedIn(String username) {
+	public void recordLoginAgainstUserAccount(String username) {
 		User user = getUserByUsername(username);
 		if (user == null) {
-			log.error("Trying to change password on non-existent user: "
+			log.error("Trying to record the login of a non-existent user: "
 					+ username);
 			return;
 		}
 
-		HttpSession session = request.getSession();
-
 		recordLoginOnUserRecord(user);
-		createLoginFormBean(user, session);
-		createLoginStatusBean(user, session);
+
+		String userUri = user.getURI();
+		String roleUri = user.getRoleURI();
+		int securityLevel = parseUserSecurityLevel(user);
+		recordLoginWithOrWithoutUserAccount(username, userUri, roleUri,
+				securityLevel);
+	}
+
+	@Override
+	public void recordLoginWithoutUserAccount(String username,
+			String individualUri) {
+		String roleUri = AuthRole.USER.roleUri();
+		int securityLevel = LoginStatusBean.NON_EDITOR;
+		recordLoginWithOrWithoutUserAccount(username, individualUri, roleUri,
+				securityLevel);
+	}
+
+	/** This much is in common on login, whether or not you have a user account. */
+	private void recordLoginWithOrWithoutUserAccount(String username,
+			String userUri, String roleUri, int securityLevel) {
+		HttpSession session = request.getSession();
+		createLoginFormBean(username, userUri, roleUri, session);
+		createLoginStatusBean(username, userUri, securityLevel, session);
 		setSessionTimeoutLimit(session);
-		recordInUserSessionMap(user, session);
-		notifyOtherUsers(user, session);
+		recordInUserSessionMap(userUri, session);
+		notifyOtherUsers(userUri, session);
 	}
 
 	/**
@@ -114,14 +134,15 @@ public class BasicAuthenticator extends Authenticator {
 	 * 
 	 * TODO The LoginFormBean is being phased out.
 	 */
-	private void createLoginFormBean(User user, HttpSession session) {
+	private void createLoginFormBean(String username, String userUri,
+			String roleUri, HttpSession session) {
 		LoginFormBean lfb = new LoginFormBean();
-		lfb.setUserURI(user.getURI());
+		lfb.setUserURI(userUri);
 		lfb.setLoginStatus("authenticated");
 		lfb.setSessionId(session.getId());
-		lfb.setLoginRole(user.getRoleURI());
+		lfb.setLoginRole(roleUri);
 		lfb.setLoginRemoteAddr(request.getRemoteAddr());
-		lfb.setLoginName(user.getUsername());
+		lfb.setLoginName(username);
 		session.setAttribute("loginHandler", lfb);
 	}
 
@@ -130,9 +151,10 @@ public class BasicAuthenticator extends Authenticator {
 	 * 
 	 * TODO this should eventually replace the LoginFormBean.
 	 */
-	private void createLoginStatusBean(User user, HttpSession session) {
-		LoginStatusBean lsb = new LoginStatusBean(user.getURI(),
-				user.getUsername(), parseUserSecurityLevel(user));
+	private void createLoginStatusBean(String username, String userUri,
+			int securityLevel, HttpSession session) {
+		LoginStatusBean lsb = new LoginStatusBean(userUri, username,
+				securityLevel);
 		LoginStatusBean.setBean(session, lsb);
 		log.info("Adding status bean: " + lsb);
 	}
@@ -154,18 +176,18 @@ public class BasicAuthenticator extends Authenticator {
 	 * 
 	 * TODO What is this map used for?
 	 */
-	private void recordInUserSessionMap(User user, HttpSession session) {
+	private void recordInUserSessionMap(String userUri, HttpSession session) {
 		Map<String, HttpSession> userURISessionMap = Authenticate
 				.getUserURISessionMapFromContext(session.getServletContext());
-		userURISessionMap.put(user.getURI(), session);
+		userURISessionMap.put(userUri, session);
 	}
 
 	/**
-	 * Anyone listening to themodel might need to know that another user is
+	 * Anyone listening to the model might need to know that another user is
 	 * logged in.
 	 */
-	private void notifyOtherUsers(User user, HttpSession session) {
-		Authenticate.sendLoginNotifyEvent(new LoginEvent(user.getURI()),
+	private void notifyOtherUsers(String userUri, HttpSession session) {
+		Authenticate.sendLoginNotifyEvent(new LoginEvent(userUri),
 				session.getServletContext(), session);
 	}
 

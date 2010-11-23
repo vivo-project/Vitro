@@ -287,7 +287,7 @@ public class Authenticate extends VitroHttpServlet {
 	private void transitionToLoggedIn(HttpServletRequest request,
 			String username) {
 		log.debug("Completed login: " + username);
-		getAuthenticator(request).recordUserIsLoggedIn(username);
+		getAuthenticator(request).recordLoginAgainstUserAccount(username);
 		LoginProcessBean.removeBean(request);
 	}
 
@@ -299,7 +299,7 @@ public class Authenticate extends VitroHttpServlet {
 			String username, String newPassword) {
 		log.debug("Completed login: " + username + ", password changed.");
 		getAuthenticator(request).recordNewPassword(username, newPassword);
-		getAuthenticator(request).recordUserIsLoggedIn(username);
+		getAuthenticator(request).recordLoginAgainstUserAccount(username);
 		LoginProcessBean.removeBean(request);
 	}
 

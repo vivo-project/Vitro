@@ -52,11 +52,12 @@ public class LoginExternalAuthReturn extends BaseLoginServlet {
 					MESSAGE_LOGIN_FAILED);
 		} else if (getAuthenticator(req).isExistingUser(username)) {
 			log.debug("Logging in as " + username);
-			getAuthenticator(req).recordUserIsLoggedIn(username);
+			getAuthenticator(req).recordLoginAgainstUserAccount(username);
 			removeLoginProcessArtifacts(req);
 			loginRedirector.redirectLoggedInUser(req, resp);
 		} else if (uri != null) {
 			log.debug("Recognize '' as self-editor for " + uri);
+			getAuthenticator(req).recordLoginWithoutUserAccount(username, uri);
 			removeLoginProcessArtifacts(req);
 			loginRedirector.redirectSelfEditingUser(req, resp, uri);
 		} else {
