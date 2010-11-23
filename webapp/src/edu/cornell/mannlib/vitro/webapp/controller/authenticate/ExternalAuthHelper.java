@@ -13,7 +13,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
-import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 
 /**
  * Capture the properties used by the External Authorization system, and use
@@ -109,10 +108,10 @@ public class ExternalAuthHelper {
 		}
 
 		if (externalAuthServerUrl == null) {
-			log.error("User asked for external authentication, "
-					+ "but deploy.properties doesn't contain a value for '"
-					+ PROPERTY_EXTERNAL_AUTH_SERVER_URL + "'");
-			return null;
+			log.debug("deploy.properties doesn't contain a value for '"
+					+ PROPERTY_EXTERNAL_AUTH_SERVER_URL
+					+ "' -- sending directly to '" + returnUrl + "'");
+			return returnUrl;
 		}
 
 		try {

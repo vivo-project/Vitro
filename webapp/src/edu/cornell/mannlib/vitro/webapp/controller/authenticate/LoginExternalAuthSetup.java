@@ -48,14 +48,14 @@ public class LoginExternalAuthSetup extends BaseLoginServlet {
 				LoginProcessBean.State.LOGGING_IN);
 
 		String returnUrl = buildReturnUrl(req);
-		ExternalAuthHelper helper = ExternalAuthHelper.getHelper(req);
-		String redirectUrl = helper.buildExternalAuthRedirectUrl(returnUrl);
+		String redirectUrl = ExternalAuthHelper.getHelper(req)
+				.buildExternalAuthRedirectUrl(returnUrl);
 
 		if (redirectUrl == null) {
 			complainAndReturnToReferrer(req, resp, ATTRIBUTE_REFERRER,
 					MESSAGE_LOGIN_FAILED);
 		}
-		
+
 		resp.sendRedirect(redirectUrl);
 	}
 
