@@ -21,8 +21,10 @@ import freemarker.core.Environment;
 import freemarker.template.TemplateModel;
 
 public class LoginWidget extends Widget {
+	private static final Log log = LogFactory.getLog(LoginWidget.class);
 
-    private static final Log log = LogFactory.getLog(LoginWidget.class);
+    /** The page that kicks off the External Authentication process. */
+	private static final String EXTERNAL_AUTH_SETUP_URL = "/loginExternalAuth";
 
     private static enum Macro {
         LOGIN("loginForm"),
@@ -118,13 +120,13 @@ public class LoginWidget extends Widget {
         values.put(TemplateVariable.FORM_ACTION.toString(), getAuthenticateUrl(request));
         values.put(TemplateVariable.LOGIN_NAME.toString(), bean.getUsername());
         
-        String externalAuthServerUrl = ConfigurationProperties.getProperty("externalAuth.url");
-        externalAuthServerUrl = UrlBuilder.getUrl(externalAuthServerUrl);
-        if (externalAuthServerUrl != null) {
-            values.put(TemplateVariable.EXTERNAL_AUTH_URL.toString(), externalAuthServerUrl);
-            values.put(TemplateVariable.EXTERNAL_AUTH_NAME.toString(), 
-                    ConfigurationProperties.getProperty("externalAuth.displayName"));
-        }
+		String externalAuthDisplayName = ConfigurationProperties.getProperty("externalAuth.displayName");
+		if (externalAuthDisplayName != null) {
+			values.put(TemplateVariable.EXTERNAL_AUTH_URL.toString(),
+					UrlBuilder.getUrl(EXTERNAL_AUTH_SETUP_URL));
+			values.put(TemplateVariable.EXTERNAL_AUTH_NAME.toString(),
+					externalAuthDisplayName);
+		}
 
         String infoMessage = bean.getInfoMessage();
         if (!infoMessage.isEmpty()) {
