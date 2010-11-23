@@ -58,12 +58,6 @@ public class RDFUploadController extends BaseEditController {
 	    
 		VitroRequest request = new VitroRequest(req);		
 		if (!checkLoginStatus(request,response) ){
-		    try {
-                response.sendRedirect(getDefaultLandingPage(request));
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
 		    return;
 		}		
 		
