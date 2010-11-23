@@ -118,12 +118,12 @@ public class LoginWidget extends Widget {
         values.put(TemplateVariable.FORM_ACTION.toString(), getAuthenticateUrl(request));
         values.put(TemplateVariable.LOGIN_NAME.toString(), bean.getUsername());
         
-        String externalAuthServerUrl = ConfigurationProperties.getProperty("externalAuth.serverUrl");
+        String externalAuthServerUrl = ConfigurationProperties.getProperty("externalAuth.url");
         externalAuthServerUrl = UrlBuilder.getUrl(externalAuthServerUrl);
         if (externalAuthServerUrl != null) {
             values.put(TemplateVariable.EXTERNAL_AUTH_URL.toString(), externalAuthServerUrl);
             values.put(TemplateVariable.EXTERNAL_AUTH_NAME.toString(), 
-                    ConfigurationProperties.getProperty("externalAuth.serverName"));
+                    ConfigurationProperties.getProperty("externalAuth.displayName"));
         }
 
         String infoMessage = bean.getInfoMessage();
