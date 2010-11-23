@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.web.templatemodels;
+package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +19,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.web.ViewFinder;
 import edu.cornell.mannlib.vitro.webapp.web.ViewFinder.ClassView;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 
 public class IndividualTemplateModel extends BaseTemplateModel {
     
@@ -30,13 +31,6 @@ public class IndividualTemplateModel extends BaseTemplateModel {
     protected VitroRequest vreq;
     protected UrlBuilder urlBuilder;
     
-    // private PropertyListTemplateModel propertyList;
-    
-    // RY The IndividualTemplateModel object needs access to the request object.
-    // The only other template model that does is MainMenu. We could provide an 
-    // interface for RequestAware template models, but they still wouldn't share any code.
-    // If they both derive from a common RequestAwareTemplateModel class, we might be 
-    // locking ourselves in too tightly to that class hierarchy. 
     public IndividualTemplateModel(Individual individual, VitroRequest vreq) {
         this.individual = individual;
         this.vreq = vreq;
@@ -150,6 +144,19 @@ public class IndividualTemplateModel extends BaseTemplateModel {
         return links;      
     }
 
+    public static List<IndividualTemplateModel> getIndividualTemplateModelList(List<Individual> individuals, VitroRequest vreq) {
+        List<IndividualTemplateModel> models = new ArrayList<IndividualTemplateModel>(individuals.size());
+        for (Individual individual : individuals) {
+          models.add(new IndividualTemplateModel(individual, vreq));
+        }  
+        return models;
+    }
+
+    public List<Object> getPropertyList() {
+        PropertyListBuilder propListBuilder = new PropertyListBuilder(individual, vreq);
+        return propListBuilder.getPropertyList();
+    }
+    
     /* These methods simply forward to the Individual methods. It would be desirable to implement a scheme
        for proxying or delegation so that the methods don't need to be simply listed here. 
        A Ruby-style method missing method would be ideal. 
@@ -189,19 +196,6 @@ public class IndividualTemplateModel extends BaseTemplateModel {
         return individual.getLocalName();
     }
     
-    public static List<IndividualTemplateModel> getIndividualTemplateModelList(List<Individual> individuals, VitroRequest vreq) {
-        List<IndividualTemplateModel> models = new ArrayList<IndividualTemplateModel>(individuals.size());
-        for (Individual individual : individuals) {
-          models.add(new IndividualTemplateModel(individual, vreq));
-        }  
-        return models;
-    }
-    
-    private boolean isExternallyLinkedNamespace(String namespace,List<String> externallyLinkedNamespaces) {     
-        return externallyLinkedNamespaces.contains(namespace);
-    }
 
-    // public Map< > getPropertyList
     
-    // public Map< > getPropertyGroupList
 }

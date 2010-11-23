@@ -28,16 +28,25 @@ public class SiteAdminController extends FreemarkerHttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(SiteAdminController.class);
     private static final String TEMPLATE_DEFAULT = "siteAdmin-main.ftl";
+    private static final int REQUIRED_LOGIN_LEVEL = LoginStatusBean.EDITOR;
     
     @Override
 	public String getTitle(String siteName) {
         return siteName + " Site Administration";
 	}
 
+    /* requiredLoginLevel() must be an instance method, else, due to the way sublcass
+     * hiding works, when called from FreemarkerHttpServlet we will get its own method,
+     * rather than the subclass method. To figure out whether to display links at the
+     * page level, we need another, static method.
+     */
+    public static int staticRequiredLoginLevel() {
+        return REQUIRED_LOGIN_LEVEL;
+    }
+
     @Override
-    protected int requiresLoginLevel() {
-        // User must be logged in to view this page.
-        return LoginStatusBean.EDITOR;
+    protected int requiredLoginLevel() {
+        return REQUIRED_LOGIN_LEVEL;
     }
     
     @Override

@@ -19,10 +19,20 @@ public class RevisionInfoController extends FreemarkerHttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(RevisionInfoController.class);
     private static final String TEMPLATE_DEFAULT = "revisionInfo.ftl";
+    private static final int REQUIRED_LOGIN_LEVEL = LoginStatusBean.EDITOR;
 
+    /* requiredLoginLevel() must be an instance method, else, due to the way sublcass
+     * hiding works, when called from FreemarkerHttpServlet we will get its own method,
+     * rather than the subclass method. To figure out whether to display links at the
+     * page level, we need another, static method.
+     */
+    public static int staticRequiredLoginLevel() {
+        return REQUIRED_LOGIN_LEVEL;
+    }
+    
     @Override
-    protected int requiresLoginLevel() {
-        return LoginStatusBean.EDITOR;
+    protected int requiredLoginLevel() {
+        return REQUIRED_LOGIN_LEVEL;
     }
     
     @Override

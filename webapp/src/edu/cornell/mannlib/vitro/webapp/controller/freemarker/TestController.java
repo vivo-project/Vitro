@@ -36,14 +36,15 @@ public class TestController extends FreemarkerHttpServlet {
         Map<String, Object> body = new HashMap<String, Object>();
         
         body.put("title", "Freemarker Test");
-        
+
         return new TemplateResponseValues(TEMPLATE_DEFAULT, body);
+        
     }
     
     @Override
     protected String getTitle(String siteName) {
         return "Test";
     }
-    
+
 }
 

@@ -2,8 +2,6 @@
 
 <#-- Template for property listing on individual profile page -->
 
-<#if individual.propertyGroups??>
-
-<#elseif individual.properties??>
-
-</#if>
+<#-- 
+<#assign properties = individual.propertyList>
+-->

@@ -40,7 +40,7 @@ public class PrimitiveRdfEdit extends FreemarkerHttpServlet{
     }
 
     @Override
-    protected int requiresLoginLevel() {
+    protected int requiredLoginLevel() {
         return LoginStatusBean.EDITOR;
     }
     

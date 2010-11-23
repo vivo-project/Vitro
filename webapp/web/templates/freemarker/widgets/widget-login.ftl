@@ -3,9 +3,9 @@
 <#-- Login widget -->
 
 <#macro assets>
-    <#-- RY This test should be replaced by controller logic which doesn't display any assets if the user is logged in.
-    See NIHVIVO-1357. This test does nothing, since loginName has not been put into the data model.
-    <#if ! loginName?has_content> -->
+    <#-- RY This test should be replaced by widget controller logic which doesn't display any assets if the user is logged in.
+    See NIHVIVO-1357. This test does nothing, since user has not been put into the data model.
+    <#if ! user.loggedIn> -->
         ${stylesheets.add("/css/login.css")} 
         ${scripts.add("/js/jquery.js", "/js/login/loginUtils.js")}
         <#-- ${headScripts.add("")} -->

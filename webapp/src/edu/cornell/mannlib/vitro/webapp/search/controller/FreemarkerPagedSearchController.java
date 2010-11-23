@@ -72,8 +72,8 @@ import edu.cornell.mannlib.vitro.webapp.search.lucene.SimpleLuceneHighlighter;
 import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.Html2Text;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.IndividualTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.LinkTemplateModel;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModel;
 
 /**
  * PagedSearchController is the new search controller that interacts 

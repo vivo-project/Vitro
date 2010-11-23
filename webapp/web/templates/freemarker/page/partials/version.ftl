@@ -2,9 +2,9 @@
 
 <#-- Template for version/revision information -->
 
-<#-- Only show version info if user is logged in -->
-<#if loginName??>
-    <div id="version">
+<#-- Only show version info if user has access -->
+<#if user.hasRevisionInfoAccess>
+    <div id="revision">
         Version <a href="${version.moreInfoUrl}">${version.label}</a>
     </div>
 </#if>

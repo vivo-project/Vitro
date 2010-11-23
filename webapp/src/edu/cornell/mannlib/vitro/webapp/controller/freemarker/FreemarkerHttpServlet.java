@@ -32,6 +32,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 import edu.cornell.mannlib.vitro.webapp.web.BreadCrumbsUtil;
 import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 import edu.cornell.mannlib.vitro.webapp.web.PortalWebUtil;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.User;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.files.Scripts;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.files.Stylesheets;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu.TabMenu;
@@ -45,7 +46,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
 
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(FreemarkerHttpServlet.class);
-    private static final int FILTER_SECURITY_LEVEL = LoginStatusBean.EDITOR;
+
     
     public static final String PAGE_TEMPLATE_TYPE = "page";
     public static final String BODY_TEMPLATE_TYPE = "body";
@@ -108,7 +109,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     }
 
     private boolean requiredLoginLevelNotFound(HttpServletRequest request, HttpServletResponse response) {
-        int requiredLoginLevel = requiresLoginLevel();
+        int requiredLoginLevel = requiredLoginLevel();
         // checkLoginStatus() does a redirect if the user is not logged in.
         if (requiredLoginLevel > LoginStatusBean.ANYBODY && !checkLoginStatus(request, response, requiredLoginLevel)) {
             return true;
@@ -116,11 +117,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         return false;
     }
     
-    protected boolean requiresLogin() {
-        return false;
-    }
-    
-    protected int requiresLoginLevel() {
+    protected int requiredLoginLevel() {
         // By default, user does not need to be logged in to view pages.
         // Subclasses that require login to process their page will override to return the required login level.
         // NB This method can't be static, because then the superclass method gets called rather than
@@ -382,7 +379,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         PortalWebUtil.populateSearchOptions(portal, appBean, vreq.getWebappDaoFactory().getPortalDao());
         PortalWebUtil.populateNavigationChoices(portal, vreq, appBean, vreq.getWebappDaoFactory().getPortalDao()); 
         
-        map.putAll(getLoginValues(vreq));  
+        map.put("user", new User(vreq));
         
         UrlBuilder urlBuilder = new UrlBuilder(portal); 
         map.put("version", getRevisionInfo(urlBuilder));
@@ -409,29 +406,10 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         return map;        
     }   
 
-
     private TabMenu getTabMenu(VitroRequest vreq) {
         int portalId = vreq.getPortal().getPortalId();
         return new TabMenu(vreq, portalId);
     }
-
-    private final Map<String, Object> getLoginValues(VitroRequest vreq) {
-        Map<String, Object> map = new HashMap<String, Object>();
-        
-        LoginStatusBean loginBean = LoginStatusBean.getBean(vreq);
-        if (loginBean.isLoggedIn()) {
-            map.put("loginName", loginBean.getUsername());
-
-            if (loginBean.isLoggedInAtLeast(FILTER_SECURITY_LEVEL)) {
-                ApplicationBean appBean = vreq.getAppBean();
-                if (appBean.isFlag1Active()) {
-                    map.put("showFlag1SearchField", true);
-                }
-            }           
-        }  
-        
-        return map;
-    }   
     
     private final Map<String, Object> getCopyrightInfo(Portal portal) {
 
