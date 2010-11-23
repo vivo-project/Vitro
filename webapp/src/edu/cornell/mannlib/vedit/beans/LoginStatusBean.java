@@ -35,7 +35,7 @@ public class LoginStatusBean {
 
 	/** A bean to return when the user has not logged in. */
 	private static final LoginStatusBean DUMMY_BEAN = new LoginStatusBean("",
-			"", ANYBODY);
+			"", ANYBODY, AuthenticationSource.UNKNOWN);
 
 	/** The bean is attached to the session by this name. */
 	private static final String ATTRIBUTE_NAME = "loginStatus";
@@ -95,14 +95,21 @@ public class LoginStatusBean {
 	// the bean
 	// ----------------------------------------------------------------------
 
+	public enum AuthenticationSource {
+		UNKNOWN, INTERNAL, EXTERNAL
+	}
+
 	private final String userURI;
 	private final String username;
 	private final int securityLevel;
+	private final AuthenticationSource authenticationSource;
 
-	public LoginStatusBean(String userURI, String username, int securityLevel) {
+	public LoginStatusBean(String userURI, String username, int securityLevel,
+			AuthenticationSource authenticationSource) {
 		this.userURI = userURI;
 		this.username = username;
 		this.securityLevel = securityLevel;
+		this.authenticationSource = authenticationSource;
 	}
 
 	public String getUserURI() {
@@ -117,6 +124,10 @@ public class LoginStatusBean {
 		return securityLevel;
 	}
 
+	public AuthenticationSource getAuthenticationSource() {
+		return authenticationSource;
+	}
+
 	public boolean isLoggedIn() {
 		return securityLevel > ANYBODY;
 	}
@@ -129,10 +140,15 @@ public class LoginStatusBean {
 		return securityLevel >= minimumLevel;
 	}
 
+	public boolean hasExternalAuthentication() {
+		return authenticationSource == AuthenticationSource.EXTERNAL;
+	}
+
 	@Override
 	public String toString() {
 		return "LoginStatusBean[userURI=" + userURI + ", username=" + username
-				+ ", securityLevel=" + securityLevel + "]";
+				+ ", securityLevel=" + securityLevel
+				+ ", authenticationSource=" + authenticationSource + "]";
 	}
 
 }

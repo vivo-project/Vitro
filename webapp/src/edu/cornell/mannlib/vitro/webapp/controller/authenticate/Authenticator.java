@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
 
 /**
@@ -86,7 +87,8 @@ public abstract class Authenticator {
 	 * - notify other users of the model
 	 * </pre>
 	 */
-	public abstract void recordLoginAgainstUserAccount(String username);
+	public abstract void recordLoginAgainstUserAccount(String username,
+			AuthenticationSource authSource);
 
 	/**
 	 * <pre>
@@ -96,7 +98,7 @@ public abstract class Authenticator {
 	 * </pre>
 	 */
 	public abstract void recordLoginWithoutUserAccount(String username,
-			String individualUri);
+			String individualUri, AuthenticationSource authSource);
 
 	/**
 	 * <pre>

@@ -16,6 +16,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginFormBean;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.RoleBasedPolicy.AuthRole;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.controller.edit.Authenticate;
@@ -81,7 +82,8 @@ public class BasicAuthenticator extends Authenticator {
 	}
 
 	@Override
-	public void recordLoginAgainstUserAccount(String username) {
+	public void recordLoginAgainstUserAccount(String username,
+			AuthenticationSource authSource) {
 		User user = getUserByUsername(username);
 		if (user == null) {
 			log.error("Trying to record the login of a non-existent user: "
@@ -95,24 +97,26 @@ public class BasicAuthenticator extends Authenticator {
 		String roleUri = user.getRoleURI();
 		int securityLevel = parseUserSecurityLevel(user);
 		recordLoginWithOrWithoutUserAccount(username, userUri, roleUri,
-				securityLevel);
+				securityLevel, authSource);
 	}
 
 	@Override
 	public void recordLoginWithoutUserAccount(String username,
-			String individualUri) {
+			String individualUri, AuthenticationSource authSource) {
 		String roleUri = AuthRole.USER.roleUri();
 		int securityLevel = LoginStatusBean.NON_EDITOR;
 		recordLoginWithOrWithoutUserAccount(username, individualUri, roleUri,
-				securityLevel);
+				securityLevel, authSource);
 	}
 
 	/** This much is in common on login, whether or not you have a user account. */
 	private void recordLoginWithOrWithoutUserAccount(String username,
-			String userUri, String roleUri, int securityLevel) {
+			String userUri, String roleUri, int securityLevel,
+			AuthenticationSource authSource) {
 		HttpSession session = request.getSession();
 		createLoginFormBean(username, userUri, roleUri, session);
-		createLoginStatusBean(username, userUri, securityLevel, session);
+		createLoginStatusBean(username, userUri, securityLevel, authSource,
+				session);
 		setSessionTimeoutLimit(session);
 		recordInUserSessionMap(userUri, session);
 		notifyOtherUsers(userUri, session);
@@ -152,9 +156,10 @@ public class BasicAuthenticator extends Authenticator {
 	 * TODO this should eventually replace the LoginFormBean.
 	 */
 	private void createLoginStatusBean(String username, String userUri,
-			int securityLevel, HttpSession session) {
+			int securityLevel, AuthenticationSource authSource,
+			HttpSession session) {
 		LoginStatusBean lsb = new LoginStatusBean(userUri, username,
-				securityLevel);
+				securityLevel, authSource);
 		LoginStatusBean.setBean(session, lsb);
 		log.info("Adding status bean: " + lsb);
 	}

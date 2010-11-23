@@ -26,6 +26,7 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -287,7 +288,8 @@ public class Authenticate extends VitroHttpServlet {
 	private void transitionToLoggedIn(HttpServletRequest request,
 			String username) {
 		log.debug("Completed login: " + username);
-		getAuthenticator(request).recordLoginAgainstUserAccount(username);
+		getAuthenticator(request).recordLoginAgainstUserAccount(username,
+				AuthenticationSource.INTERNAL);
 		LoginProcessBean.removeBean(request);
 	}
 
@@ -299,7 +301,8 @@ public class Authenticate extends VitroHttpServlet {
 			String username, String newPassword) {
 		log.debug("Completed login: " + username + ", password changed.");
 		getAuthenticator(request).recordNewPassword(username, newPassword);
-		getAuthenticator(request).recordLoginAgainstUserAccount(username);
+		getAuthenticator(request).recordLoginAgainstUserAccount(username,
+				AuthenticationSource.INTERNAL);
 		LoginProcessBean.removeBean(request);
 	}
 

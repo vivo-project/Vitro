@@ -24,11 +24,11 @@ import stubs.javax.servlet.http.HttpServletRequestStub;
 import stubs.javax.servlet.http.HttpServletResponseStub;
 import stubs.javax.servlet.http.HttpSessionStub;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.AuthenticatorStub;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State;
 
@@ -56,7 +56,8 @@ public class AuthenticateTest extends AbstractTestClass {
 	private static final String URL_SELF_EDITOR_PAGE = "/individual?uri=selfEditorURI";
 
 	private static final LoginStatusBean LOGIN_STATUS_DBA = new LoginStatusBean(
-			USER_DBA_URI, USER_DBA_NAME, LoginStatusBean.DBA);
+			USER_DBA_URI, USER_DBA_NAME, LoginStatusBean.DBA,
+			AuthenticationSource.INTERNAL);
 
 	private AuthenticatorStub authenticator;
 	private ServletContextStub servletContext;
@@ -91,7 +92,7 @@ public class AuthenticateTest extends AbstractTestClass {
 
 		auth = new Authenticate();
 		auth.init(servletConfig);
-		
+
 	}
 
 	private User createNewDbaUser() {

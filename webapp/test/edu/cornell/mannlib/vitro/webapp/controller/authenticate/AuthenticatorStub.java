@@ -12,6 +12,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.controller.edit.Authenticate;
 
@@ -138,12 +139,13 @@ public class AuthenticatorStub extends Authenticator {
 	}
 
 	@Override
-	public void recordLoginAgainstUserAccount(String username) {
+	public void recordLoginAgainstUserAccount(String username,
+			AuthenticationSource authSource) {
 		recordedLogins.add(username);
 
 		User user = getUserByUsername(username);
 		LoginStatusBean lsb = new LoginStatusBean(user.getURI(), username,
-				parseUserSecurityLevel(user.getRoleURI()));
+				parseUserSecurityLevel(user.getRoleURI()), authSource);
 		LoginStatusBean.setBean(request.getSession(), lsb);
 	}
 
@@ -177,7 +179,7 @@ public class AuthenticatorStub extends Authenticator {
 
 	@Override
 	public void recordLoginWithoutUserAccount(String username,
-			String individualUri) {
+			String individualUri, AuthenticationSource authSource) {
 		throw new RuntimeException(
 				"AuthenticatorStub.recordLoginWithoutUserAccount() not implemented.");
 	}

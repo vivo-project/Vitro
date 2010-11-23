@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
@@ -43,7 +44,8 @@ public class LoginExternalAuthReturn extends BaseLoginServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		String username = ExternalAuthHelper.getHelper(req).getExternalUsername(req);
+		String username = ExternalAuthHelper.getHelper(req)
+				.getExternalUsername(req);
 		String uri = getAssociatedIndividualUri(username, req);
 
 		if (username == null) {
@@ -52,12 +54,14 @@ public class LoginExternalAuthReturn extends BaseLoginServlet {
 					MESSAGE_LOGIN_FAILED);
 		} else if (getAuthenticator(req).isExistingUser(username)) {
 			log.debug("Logging in as " + username);
-			getAuthenticator(req).recordLoginAgainstUserAccount(username);
+			getAuthenticator(req).recordLoginAgainstUserAccount(username,
+					AuthenticationSource.EXTERNAL);
 			removeLoginProcessArtifacts(req);
 			loginRedirector.redirectLoggedInUser(req, resp);
 		} else if (uri != null) {
 			log.debug("Recognize '' as self-editor for " + uri);
-			getAuthenticator(req).recordLoginWithoutUserAccount(username, uri);
+			getAuthenticator(req).recordLoginWithoutUserAccount(username, uri,
+					AuthenticationSource.EXTERNAL);
 			removeLoginProcessArtifacts(req);
 			loginRedirector.redirectSelfEditingUser(req, resp, uri);
 		} else {
