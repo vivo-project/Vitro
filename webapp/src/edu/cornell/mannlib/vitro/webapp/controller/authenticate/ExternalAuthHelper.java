@@ -34,7 +34,7 @@ public class ExternalAuthHelper {
 	private static final String PROPERTY_EXTERNAL_AUTH_SERVER_URL = "externalAuth.serverUrl";
 
 	/** This configuration property says which HTTP header holds the username. */
-	public static final String PROPERTY_EXTERNAL_AUTH_USERNAME_HEADER = "externalAuth.headerName";
+	public static final String PROPERTY_EXTERNAL_AUTH_USERNAME_HEADER = "externalAuth.netIdheaderName";
 
 	// ----------------------------------------------------------------------
 	// static methods
