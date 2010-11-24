@@ -128,11 +128,11 @@ public class LoginWidget extends Widget {
 					externalAuthDisplayName);
 		}
 
-        String infoMessage = bean.getInfoMessage();
+        String infoMessage = bean.getInfoMessageAndClear();
         if (!infoMessage.isEmpty()) {
             values.put(TemplateVariable.INFO_MESSAGE.toString(), infoMessage);
         }
-        String errorMessage = bean.getErrorMessage();
+        String errorMessage = bean.getErrorMessageAndClear();
         if (!errorMessage.isEmpty()) {
             values.put(TemplateVariable.ERROR_MESSAGE.toString(), errorMessage);
         }
@@ -158,7 +158,7 @@ public class LoginWidget extends Widget {
         values.put(TemplateVariable.FORM_ACTION.toString(), getAuthenticateUrl(request));
         values.put(TemplateVariable.CANCEL_URL.toString(), getCancelUrl(request));
 
-        String errorMessage = bean.getErrorMessage();
+        String errorMessage = bean.getErrorMessageAndClear();
         if (!errorMessage.isEmpty()) {
             values.put(TemplateVariable.ERROR_MESSAGE.toString(), errorMessage);
         }

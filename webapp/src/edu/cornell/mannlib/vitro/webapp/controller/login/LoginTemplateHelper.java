@@ -108,11 +108,11 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 		trv.put(BODY_FORM_ACTION, getAuthenticateUrl(vreq));
 		trv.put(BODY_LOGIN_NAME, bean.getUsername());
 
-		String infoMessage = bean.getInfoMessage();
+		String infoMessage = bean.getInfoMessageAndClear();
 		if (!infoMessage.isEmpty()) {
 			trv.put(BODY_INFO_MESSAGE, infoMessage);
 		}
-		String errorMessage = bean.getErrorMessage();
+		String errorMessage = bean.getErrorMessageAndClear();
 		if (!errorMessage.isEmpty()) {
 			trv.put(BODY_ERROR_MESSAGE, errorMessage);
 		}
@@ -134,7 +134,7 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 		trv.put(BODY_FORM_ACTION, getAuthenticateUrl(vreq));
 		trv.put(BODY_CANCEL_URL, getCancelUrl(vreq));
 
-		String errorMessage = bean.getErrorMessage();
+		String errorMessage = bean.getErrorMessageAndClear();
 		if (!errorMessage.isEmpty()) {
 			trv.put(BODY_ERROR_MESSAGE, errorMessage);
 		}

@@ -383,8 +383,8 @@ public class AuthenticateTest extends AbstractTestClass {
 		}
 		LoginProcessBean bean = LoginProcessBean.getBean(request);
 		assertEquals("state", state, bean.getState());
-		assertEquals("info message", infoMessage, bean.getInfoMessage());
-		assertEquals("error message", errorMessage, bean.getErrorMessage());
+		assertEquals("info message", infoMessage, bean.getInfoMessageAndClear());
+		assertEquals("error message", errorMessage, bean.getErrorMessageAndClear());
 		assertEquals("username", username, bean.getUsername());
 	}
 

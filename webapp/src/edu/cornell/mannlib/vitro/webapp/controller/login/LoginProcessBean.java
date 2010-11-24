@@ -188,20 +188,22 @@ public class LoginProcessBean {
 		this.messageArguments = args;
 	}
 
-	public String getInfoMessage() {
+	public String getInfoMessageAndClear() {
+		String text = "";
 		if (message.getMessageLevel() == MLevel.INFO) {
-			return message.formatMessage(messageArguments);
-		} else {
-			return "";
+			text = message.formatMessage(messageArguments);
+			clearMessage();
 		}
+		return text;
 	}
 
-	public String getErrorMessage() {
+	public String getErrorMessageAndClear() {
+		String text = "";
 		if (message.getMessageLevel() == MLevel.ERROR) {
-			return message.formatMessage(messageArguments);
-		} else {
-			return "";
+			text = message.formatMessage(messageArguments);
+			clearMessage();
 		}
+		return text;
 	}
 
 	public String getUsername() {
