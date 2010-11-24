@@ -9,7 +9,8 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 
 /**
- * TODO
+ * A user logged in using external authentication, but we don't have an account
+ * for him, or an associated individual.
  */
 public class UnrecognizedUserController extends FreemarkerHttpServlet {
 	private static final String TEMPLATE_DEFAULT = "unrecognizedUser.ftl";
