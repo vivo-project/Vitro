@@ -105,7 +105,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 					  doMiscAppMetadataReplacements(ctx.getRealPath(MISC_REPLACEMENTS_FILE), oms);
 				  }
 			  } catch (Throwable t){
-				  log.error("Unable to perform miscellaneous application metadata replacements", t);
+				  log.warn("Unable to perform miscellaneous application metadata replacements", t);
 			  }
 			  
 			  ontologyUpdater.update();
@@ -166,6 +166,9 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		    		applicationMetadataModel.leaveCriticalSection();
 		    	}
 		    }
+		} catch (FileNotFoundException fnfe) {
+			log.info("No miscellaneous application metadata replacements were performed.");
+		
 		} catch (Exception e) {
 			log.error("Error performing miscellaneous application metadata " +
 					" replacements.", e);
