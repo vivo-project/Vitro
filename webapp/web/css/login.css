@@ -2,27 +2,27 @@
 
 /* styles for log in */
 
-#log-in-form label, 
-#log-in-form input.text,
-#log-in-form  #password,
-#log-in-form  #confirmPassword{
+#login-form label, 
+#login-form input.text,
+#login-form #password,
+#login-form #confirmPassword{
     display:block;  
 }
-#log-in-form label.label-remember-me{
+#login-form label.label-remember-me{
     display:block;
 }
-#log-in-form p.submit {
+#login-form p.submit {
     float:left;
     margin-bottom:0;
 }
-#log-in-form input.checkbox-remember-me {
+#login-form input.checkbox-remember-me {
     float:left;
     height:14px;
     padding:0;
     margin-top:13px;
     margin-left:20px;
 }
-#log-in-form .label-remember-me {
+#login-form .label-remember-me {
     display:block;
     float:left;
     width:100px;
@@ -40,24 +40,22 @@ p.request-account {
     width:219px;
     float:left;
 }
-
-#log-in-form p.external-auth {
+#login-form p.external-auth {
     margin-left: 36px;
 }
-
-#errorAlert {
+#error-alert{
     color:#900;
-    padding:0px;
+    padding:10px;
     margin-bottom:5px;
     height:30px;
 }
-#errorAlert img {
+#error-alert img {
     float:left;
     margin:0;
     padding:0;
     vertical-align:middle;  	
 }
-#errorAlert p {
+#error-alert p {
     padding-left:30px;
     font-size:0.9em;
     line-height:30px;
@@ -97,69 +95,3 @@ p.passwordNote {
     display:inline;
     vertical-align:middle;
 }
-
-/*
-#formLogin {
-    width:600px;
-    padding:0px;
-    margin:0px;
-    text-align:left;
-    border:1px solid red;
-}
-.noOuterBox {
-    width:340px;
-    padding:0px;
-    border: none;
-    margin:0px;
-}
-#formLogin h2 {
-    font-size:1.3em;
-    line-height:1em;
-    margin-top:0px;
-    margin-bottom:1em;
-    color:#111;
-}
-#formLogin h6 {
-    font-size:1.2em;
-    line-height:1em;
-    margin-top:0px;
-    margin-bottom:1em;
-    color:#111;
-}
-#formLogin form {
-    margin: 0;
-    padding: 0;
-}
-#formLogin label {
-    display:block;
-    margin-bottom:0.5em;
-    font-weight:bold;
-}
-#formLogin label span {
-    color:#900;
-}
-
-#formLogin input {
-    display:block;
-    margin-bottom:1.5em;
-    width: 200px;
-}
-#formLogin textarea {
-    width: 300px;
-    display:block;
-    margin-bottom:1.5em;
-}
-#formLogin .checkBox {
-    display:inline;
-    width:1em;
-    margin-bottom: 1em;
-}
-#formLogin p.small {
-    font-size: 0.8em;
-}
-#formLogin input.submit {
-    width: auto;
-    padding: 0 0.9em;
-    display:inline;
-}
-*/

@@ -9,8 +9,8 @@ $(document).ready(function(){
     $('.focus').focus();
     
     // fade out error alerts
-    //$('#errorAlert').css('display', 'none');
-    //$('#errorAlert').fadeIn(500);
+    //$('#error-alert').css('display', 'none');
+    //$('#error-alert).fadeIn(500);
 
 });
 

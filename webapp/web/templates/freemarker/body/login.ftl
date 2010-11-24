@@ -2,7 +2,4 @@
 
 <#-- Main template for the login page -->
 
-<#-- Use this container to define styles that apply to the login widget only on the dedicated login page. -->
-<section id="login-full-page">
-    <@widget name="login" />
-</section>
+<@widget name="login" />

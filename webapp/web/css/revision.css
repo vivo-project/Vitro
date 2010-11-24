@@ -11,9 +11,7 @@
 }
 #revision-levels{
     width:375px;
-    float:left;
-
-   
+    float:left; 
 }
 #revision-levels caption{
     padding: 10px 0 12px 0;

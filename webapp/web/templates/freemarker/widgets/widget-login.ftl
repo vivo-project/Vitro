@@ -14,7 +14,7 @@
 
 <#macro loginForm>
 
-    <section id="log-in">
+    <section id="login">
         <h2>Log in</h2>
 
         <noscript>
@@ -31,12 +31,12 @@
         </#if>
        
         <#if errorMessage??>
-            <div id="errorAlert"><img src="${urls.siteIcons}/iconAlert.png" alert="Error alert icon"/>
+            <div id="error-alert"><img src="${urls.siteIcons}/iconAlert.png" alert="Error alert icon"/>
                 <p>${errorMessage}</p>
             </div>
         </#if>
        
-        <form  role="form" id="log-in-form" action="${formAction}" method="post" name="log-in-form" />
+        <form  role="form" id="login-form" action="${formAction}" method="post" name="login-form" />
             <label for="email">Email</label>
             <input class="text-field" name="loginName" id="loginName" type="text" required />
 
@@ -61,16 +61,16 @@
 </#macro> 
 
 <#macro forcePasswordChange>
-    <section id="log-in">
+    <section id="login">
         <h2>Log in</h2>
            
             <#if errorMessage??>
-                <div id="errorAlert" role="alert"><img src="${urls.siteIcons}/iconAlert.png" width="24" height="24" alert="Error alert icon"/>
+                <div id="error-alert" role="alert"><img src="${urls.siteIcons}/iconAlert.png" width="24" height="24" alert="Error alert icon"/>
                     <p>${errorMessage}</p>
                 </div>
             </#if>
            
-            <form role="form" id="log-in-form" action="${formAction}" method="post" name="log-in-form" required />
+            <form role="form" id="login-form" action="${formAction}" method="post" name="login-form" required />
                 <label for="newPassword">New Password</label>
                 <input id="newPassword" class="focus text-field" type="password" name="newPassword"  required />
                 
