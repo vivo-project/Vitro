@@ -56,6 +56,7 @@ public class LoginExternalAuthSetup extends BaseLoginServlet {
 					MESSAGE_LOGIN_FAILED);
 		}
 
+		log.debug("redirecting to '" + redirectUrl + "'");
 		resp.sendRedirect(redirectUrl);
 	}
 

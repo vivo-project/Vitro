@@ -60,7 +60,7 @@ public class LoginExternalAuthReturn extends BaseLoginServlet {
 			removeLoginProcessArtifacts(req);
 			loginRedirector.redirectLoggedInUser(req, resp);
 		} else if (uri != null) {
-			log.debug("Recognize '' as self-editor for " + uri);
+			log.debug("Recognize '" + username + "' as self-editor for " + uri);
 			getAuthenticator(req).recordLoginWithoutUserAccount(username, uri,
 					AuthenticationSource.EXTERNAL);
 			removeLoginProcessArtifacts(req);
