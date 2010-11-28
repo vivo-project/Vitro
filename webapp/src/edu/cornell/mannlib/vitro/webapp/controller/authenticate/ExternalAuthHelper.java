@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.authenticate;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -41,8 +42,7 @@ public class ExternalAuthHelper {
 	// ----------------------------------------------------------------------
 
 	/**
-	 * If there is no session, there is no bean. If there is a session and no
-	 * bean, create one.
+	 * Get the bean from the servlet context. If there is no bean, create one.
 	 * 
 	 * Never returns null.
 	 */
@@ -57,8 +57,10 @@ public class ExternalAuthHelper {
 			log.trace("No session; no need to create one.");
 			return DUMMY_HELPER;
 		}
+		
+		ServletContext context = session.getServletContext();
 
-		Object attr = session.getAttribute(BEAN_ATTRIBUTE);
+		Object attr = context.getAttribute(BEAN_ATTRIBUTE);
 		if (attr instanceof ExternalAuthHelper) {
 			log.trace("Found a bean: " + attr);
 			return (ExternalAuthHelper) attr;
@@ -66,8 +68,13 @@ public class ExternalAuthHelper {
 
 		ExternalAuthHelper bean = buildBean();
 		log.debug("Created a bean: " + bean);
-		session.setAttribute(BEAN_ATTRIBUTE, bean);
+		setBean(context, bean);
 		return bean;
+	}
+
+	/** It would be private, but we want to allow calls for faking. */
+	protected static void setBean(ServletContext context, ExternalAuthHelper bean) {
+		context.setAttribute(BEAN_ATTRIBUTE, bean);
 	}
 
 	private static ExternalAuthHelper buildBean() {
@@ -87,7 +94,8 @@ public class ExternalAuthHelper {
 	private final String externalAuthServerUrl;
 	private final String externalAuthHeaderName;
 
-	private ExternalAuthHelper(String externalAuthServerUrl,
+	/** It would be private, but we want to allow subclasses for faking. */
+	protected ExternalAuthHelper(String externalAuthServerUrl,
 			String externalAuthHeaderName) {
 		this.externalAuthServerUrl = trimThis(externalAuthServerUrl);
 		this.externalAuthHeaderName = trimThis(externalAuthHeaderName);
