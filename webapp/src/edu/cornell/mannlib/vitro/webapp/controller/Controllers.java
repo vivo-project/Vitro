@@ -42,8 +42,8 @@ public class Controllers {
     
     public static final String TAB = "/index.jsp";
 
-    public static final String LOGIN_JSP = "/login_process.jsp";
-    public static final String LOGOUT_JSP = "/login_process.jsp";
+    public static final String LOGIN_JSP = "/login";
+    public static final String LOGOUT_JSP = "/logout";
     
     public static final String BASIC_JSP = "/templates/page/basicPage.jsp";
     public static final String DEBUG_JSP = "/templates/page/debug.jsp";

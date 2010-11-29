@@ -25,15 +25,6 @@ public class Login extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
-		/*
-		 * For backward compatibility, if they requested a logout, honor the
-		 * request.
-		 */
-		if ("Log Out".equals(request.getParameter("loginSubmitMode"))) {
-			request.getRequestDispatcher("/logout").forward(request, response);
-			return;
-		}
-
 		String username = request.getParameter(PARAM_USERNAME);
 		String password = request.getParameter(PARAM_PASSWORD);
 

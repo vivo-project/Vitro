@@ -73,7 +73,6 @@ portal.getRootBreadCrumbURL() : request.getContextPath()+"/";
 
       <c:url var="logoutHref" value="<%= Controllers.LOGOUT_JSP %>">
         <c:param name="home" value="${currentPortal}" />
-        <c:param name="loginSubmitMode" value="Log Out" /> 
       </c:url>
   
       <c:url var="siteAdminHref" value="<%= Controllers.SITE_ADMIN %>">

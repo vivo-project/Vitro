@@ -32,7 +32,7 @@ public class UrlBuilder {
         INDIVIDUAL_EDIT("/entityEdit"),
         INDIVIDUAL_LIST("/individuallist"),
         LOGIN("/login"), 
-        LOGOUT("/login_process.jsp"),
+        LOGOUT("/logout"),
         SEARCH("/search"),
         SITE_ADMIN("/siteAdmin"),
         TERMS_OF_USE("/termsOfUse"),
@@ -121,7 +121,7 @@ public class UrlBuilder {
     }
     
     public String getLogoutUrl() {
-        return getPortalUrl(Route.LOGOUT, new ParamMap("loginSubmitMode", "Log Out"));
+        return getPortalUrl(Route.LOGOUT);
     }
     
     public ParamMap getPortalParam() {
