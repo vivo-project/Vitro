@@ -20,7 +20,11 @@ import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.sdb.SDBFactory;
 import com.hp.hpl.jena.sdb.Store;
 import com.hp.hpl.jena.sdb.StoreDesc;
@@ -58,11 +62,13 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
         	// TODO: I would like to make this code (before the sdb try/catch conditional so
         	// that it is not executed in a post-sdb-conversion environment.
             OntModel memModel = (OntModel) sce.getServletContext().getAttribute("jenaOntModel");
+            
             if (memModel == null) {
             	memModel = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC);
             	log.warn("WARNING: no database connected.  Changes will disappear after context restart.");
             	sce.getServletContext().setAttribute("jenaOntModel",memModel);
-            }            
+            }  
+            
             memModel.addSubModel((new JenaBaseDaoCon()).getConstModel()); // add the vitro tbox to the model
             
             OntModel inferenceModel = ontModelFromContextAttribute(sce.getServletContext(), "inferenceOntModel");
@@ -78,14 +84,17 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
             baseOms.setApplicationMetadataModel(memModel);
             baseOms.setTBoxModel(memModel);
             baseOms.setFullModel(memModel);
+            
             OntModelSelectorImpl inferenceOms = new OntModelSelectorImpl();
             inferenceOms.setABoxModel(inferenceModel);
             inferenceOms.setTBoxModel(inferenceModel);
             inferenceOms.setFullModel(inferenceModel);
+            
             OntModelSelectorImpl unionOms = new OntModelSelectorImpl();
             unionOms.setApplicationMetadataModel(unionModel);
             unionOms.setTBoxModel(unionModel);
             unionOms.setFullModel(unionModel);
+            
         	baseOms.setUserAccountsModel(userAccountsModel);
         	inferenceOms.setUserAccountsModel(userAccountsModel);
         	unionOms.setUserAccountsModel(userAccountsModel);       
@@ -124,20 +133,21 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
             	
             	JenaModelUtils modelUtils = new JenaModelUtils();
             	
-            	Model aboxAssertions = SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_DB_MODEL);
-            	aboxAssertions.add(modelUtils.extractABox(memModel));
-            
-            	Model aboxInferences = SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_INF_MODEL);
-            	aboxInferences.add(modelUtils.extractABox(inferenceModel));
-            	
-            	Model tboxAssertions = SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_TBOX_ASSERTIONS_MODEL);
-            	tboxAssertions.add(modelUtils.extractTBox(memModel));
+               	Model tboxAssertions = SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_TBOX_ASSERTIONS_MODEL);
+            	tboxAssertions.add(getTBoxAssertions(memModel, sce.getServletContext(), modelUtils));
             	
             	Model tboxInferences = SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_TBOX_INF_MODEL);
             	tboxInferences.add(modelUtils.extractTBox(inferenceModel)); 
-            	            	 
+            	
+            	
+            	Model aboxAssertions = SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_DB_MODEL);
+            	aboxAssertions.add(subtractModel(tboxAssertions,memModel));
+            
+            	Model aboxInferences = SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_INF_MODEL);
+            	aboxInferences.add(subtractModel(tboxInferences,inferenceModel));
+            	
             	// The code below, which sets up the OntModelSelectors, controls whether each
-            	// model is maintained in memory, in the DB, or both, while the application
+            	// model is maintained in memory, in the DB, or both while the application
             	// is running.
         	}
 
@@ -412,4 +422,50 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
         ontModel.add(initialDataModel);
     }
     
+    private OntModel getTBoxAssertions(OntModel memModel, ServletContext ctx, JenaModelUtils modelUtils) {
+ 
+    	OntModel tboxAssertions = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC);
+    	    	    	
+      	OntModel submodels = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC);
+        readOntologyFilesInPathSet(SUBMODELS, ctx, submodels);
+        
+        Model tempUnion = ModelFactory.createUnion(memModel, submodels);
+
+        Model tempTBox = modelUtils.extractTBox(tempUnion);
+     
+        /*
+        Model nonMem = subtractModel(tempTBox, memModel);
+        tboxAssertions.add(subtractModel(nonMem, tempTBox));
+        */
+        
+        StmtIterator iter = tempTBox.listStatements();
+        
+        while (iter.hasNext()) {
+		   Statement stmt = iter.next();
+		   if (memModel.contains(stmt)) {
+			   tboxAssertions.add(stmt);
+		   }
+	    }
+        
+    	return tboxAssertions;
+    }
+   
+    /* 
+     * returns a model containing all the statements from model 2 that are not in model 1
+     */
+    private Model subtractModel(Model model1, Model model2) {
+    	 
+    	Model difference = ModelFactory.createDefaultModel();
+        
+        StmtIterator iter = model2.listStatements();
+        
+        while (iter.hasNext()) {
+		   Statement stmt = iter.next();
+		   if (!model1.contains(stmt)) {
+			   difference.add(stmt);
+		   }
+	    }
+        
+    	return difference;
+    }   
 }
