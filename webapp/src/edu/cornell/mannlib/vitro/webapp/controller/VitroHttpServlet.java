@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LoginRedirector;
+import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LogoutRedirector;
 
 public class VitroHttpServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -78,6 +79,7 @@ public class VitroHttpServlet extends HttpServlet {
 	 */
 	public static boolean checkLoginStatus(HttpServletRequest request,
 			HttpServletResponse response) {
+		LogoutRedirector.recordRestrictedPageUri(request);
 		if (LoginStatusBean.getBean(request).isLoggedIn()) {
 			return true;
 		} else {
@@ -95,6 +97,7 @@ public class VitroHttpServlet extends HttpServlet {
 	 */
 	public static boolean checkLoginStatus(HttpServletRequest request,
 			HttpServletResponse response, int minimumLevel) {
+		LogoutRedirector.recordRestrictedPageUri(request);
 		if (LoginStatusBean.getBean(request).isLoggedInAtLeast(minimumLevel)) {
 			return true;
 		} else {
