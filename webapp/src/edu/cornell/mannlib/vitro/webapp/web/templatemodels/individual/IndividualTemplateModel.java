@@ -152,17 +152,19 @@ public class IndividualTemplateModel extends BaseTemplateModel {
         return models;
     }
 
-    public List<Object> getPropertyList() {
-        PropertyListBuilder propListBuilder = new PropertyListBuilder(individual, vreq);
-        return propListBuilder.getPropertyList();
+    public GroupedPropertyList getPropertyList() {
+//        PropertyListBuilder propListBuilder = new PropertyListBuilder(individual, vreq);
+//        return propListBuilder.getPropertyList();
+        return new GroupedPropertyList(individual, vreq);
     }
     
-    /* These methods simply forward to the Individual methods. It would be desirable to implement a scheme
-       for proxying or delegation so that the methods don't need to be simply listed here. 
-       A Ruby-style method missing method would be ideal. 
-       Update: DynamicProxy doesn't work because the proxied object is of type Individual, so we cannot
-       declare new methods here that are not declared in the Individual interface. 
-    */
+    /* These methods simply forward to the methods of the wrapped individual. It would be desirable to 
+     * implement a scheme for proxying or delegation so that the methods don't need to be simply listed here. 
+     * A Ruby-style method missing method would be ideal. 
+     * Update: DynamicProxy doesn't work because the proxied object is of type Individual, so we cannot
+     * declare new methods here that are not declared in the Individual interface. 
+     */
+    
     public String getName() {
         return individual.getName();
     }
