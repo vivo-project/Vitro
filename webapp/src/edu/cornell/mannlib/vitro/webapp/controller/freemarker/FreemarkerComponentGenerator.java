@@ -54,6 +54,7 @@ public class FreemarkerComponentGenerator extends FreemarkerHttpServlet {
     
     // RY We need the servlet context in getConfig(). For some reason using the method inherited from
     // GenericServlet bombs.
+    @Override
     public ServletContext getServletContext() {
         return context;
     }

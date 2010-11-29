@@ -46,7 +46,7 @@ public class SiteAdminController extends FreemarkerHttpServlet {
 
     @Override
     protected int requiredLoginLevel() {
-        return REQUIRED_LOGIN_LEVEL;
+        return staticRequiredLoginLevel();
     }
     
     @Override
@@ -61,6 +61,10 @@ public class SiteAdminController extends FreemarkerHttpServlet {
         
         body.put("dataInput", getDataInputData(vreq));
 
+        // rjy7 There is a risk that the login levels required to show the links will get out
+        // of step with the levels required by the pages themselves. We should implement a 
+        // mechanism similar to what's used on the front end to display links to Site Admin
+        // and Revision Info iff the user has access to those pages.
         if (loginBean.isLoggedInAtLeast(LoginStatusBean.CURATOR)) {
             body.put("siteConfig", getSiteConfigurationData(vreq, urlBuilder));
             body.put("ontologyEditor", getOntologyEditorData(vreq, urlBuilder));

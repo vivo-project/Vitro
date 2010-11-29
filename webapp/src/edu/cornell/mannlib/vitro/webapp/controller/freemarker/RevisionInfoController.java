@@ -32,7 +32,7 @@ public class RevisionInfoController extends FreemarkerHttpServlet {
     
     @Override
     protected int requiredLoginLevel() {
-        return REQUIRED_LOGIN_LEVEL;
+        return staticRequiredLoginLevel();
     }
     
     @Override

@@ -134,13 +134,6 @@ public class IndividualController extends FreemarkerHttpServlet {
 	    EditSubmission.clearAllEditSubmissionsInSession(session);
     }
     
-    // Set template values related to access privileges
-    // RY We may want to define an EditingIndividualTemplateModel class, with methods like getAdminPanel() and
-    // getEditLinks(property). The constructor would take an individual and a loginFormBean object, both of which
-    // are needed to generate property edit links. Another idea is to subclass IndividualTemplateModel with 
-    // EditableIndividualTemplateModel, and define editing-related methods there. However, that means in the 
-    // template we will have expressions like individual.adminPanel or individual.editingLinks(property), 
-    // which might seem opaque to template authors.
     private Map<String, Object> getEditingData(VitroRequest vreq) {
   
         LoginStatusBean loginBean = LoginStatusBean.getBean(vreq);
