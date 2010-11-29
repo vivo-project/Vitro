@@ -366,7 +366,12 @@
 					}
 					
 				}
-				var item = "distinct " + items.join(" ");
+				if (items.length == 0) {
+					var item = "*"
+				}
+				else{
+					var item = "distinct " + items.join(" ");
+				}
 				var criteria = criterias.join("\n");
 				
 				var query = namespace+ "SELECT " + item + "\nWHERE{\nGRAPH ?g {\n" + criteria + "\n}\n}\n";
