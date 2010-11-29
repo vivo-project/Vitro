@@ -101,9 +101,9 @@ public class IndividualDaoSDB extends IndividualDaoJena {
     	    		 "} WHERE " +
     	    		 "{ GRAPH ?g { \n" +
     	    		    " ?ind a <" + theClass.getURI() + ">  \n" +
-    	    		 	"OPTIONAL { ?ind  <" + RDFS.label.getURI() + "> ?ooo } \n" +
-    	    		 	"OPTIONAL { ?ind  <" + VitroVocabulary.MONIKER + "> ?moniker } \n" +
-    	    		 	"} \n" +
+    	    		    "} \n" +
+    	    		 	"OPTIONAL { GRAPH ?h { ?ind  <" + RDFS.label.getURI() + "> ?ooo } }\n" +
+    	    		 	"OPTIONAL { GRAPH ?i { ?ind  <" + VitroVocabulary.MONIKER + "> ?moniker } } \n" +
     	    		 "}";
         		model = QueryExecutionFactory.create(QueryFactory.create(query), dataset).execConstruct();
         	} finally {
