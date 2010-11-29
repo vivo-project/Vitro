@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
@@ -40,7 +41,7 @@ public class UserEditController extends BaseEditController {
 
     public void doPost (HttpServletRequest request, HttpServletResponse response) throws ServletException {
 
-        if (!checkLoginStatus(request,response))
+    	if (!checkLoginStatus(request,response, LoginStatusBean.DBA))
             return;
 
         try {
@@ -67,7 +68,7 @@ public class UserEditController extends BaseEditController {
             throw new ServletException(this.getClass().getName()+" could not find user "+userURIStr);
         }
 
-        ArrayList results = new ArrayList();
+        ArrayList<String> results = new ArrayList<String>();
         results.add("Email address");
         results.add("first name");
         results.add("last name");
