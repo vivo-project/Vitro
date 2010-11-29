@@ -20,8 +20,6 @@ import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
@@ -130,28 +128,27 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
             	// JenaPersistentDataSourceSetup.java
             	// In the code below, note that the current getABoxModel() methods on 
             	// the OntModelSelectors return a graph with both ABox and TBox data.
-            	
-            	JenaModelUtils modelUtils = new JenaModelUtils();
-            	
+            
+             	OntModel submodels = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC);
+                readOntologyFilesInPathSet(SUBMODELS, sce.getServletContext(), submodels);
+                
                	Model tboxAssertions = SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_TBOX_ASSERTIONS_MODEL);
-            	tboxAssertions.add(getTBoxAssertions(memModel, sce.getServletContext(), modelUtils));
-            	
+               	getTBoxModel(memModel, submodels, tboxAssertions);
+               	
             	Model tboxInferences = SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_TBOX_INF_MODEL);
-            	tboxInferences.add(modelUtils.extractTBox(inferenceModel)); 
-            	
+               	getTBoxModel(inferenceModel, submodels, tboxInferences);
             	
             	Model aboxAssertions = SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_DB_MODEL);
-            	aboxAssertions.add(subtractModel(tboxAssertions,memModel));
+            	copyDifference(memModel, tboxAssertions, aboxAssertions);
             
             	Model aboxInferences = SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_INF_MODEL);
-            	aboxInferences.add(subtractModel(tboxInferences,inferenceModel));
+            	copyDifference(inferenceModel, tboxInferences, aboxInferences);
             	
             	// The code below, which sets up the OntModelSelectors, controls whether each
             	// model is maintained in memory, in the DB, or both while the application
             	// is running.
         	}
 
-        	
             sce.getServletContext().setAttribute("kbStore", store);
             
             //store.getTableFormatter().dropIndexes();
@@ -421,51 +418,41 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
         log.debug(((System.currentTimeMillis()-startTime)/1000)+" seconds to read ontology files ");
         ontModel.add(initialDataModel);
     }
-    
-    private OntModel getTBoxAssertions(OntModel memModel, ServletContext ctx, JenaModelUtils modelUtils) {
- 
-    	OntModel tboxAssertions = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC);
-    	    	    	
-      	OntModel submodels = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC);
-        readOntologyFilesInPathSet(SUBMODELS, ctx, submodels);
-        
-        Model tempUnion = ModelFactory.createUnion(memModel, submodels);
 
-        Model tempTBox = modelUtils.extractTBox(tempUnion);
-     
-        /*
-        Model nonMem = subtractModel(tempTBox, memModel);
-        tboxAssertions.add(subtractModel(nonMem, tempTBox));
-        */
-        
-        StmtIterator iter = tempTBox.listStatements();
+    private void getTBoxModel(Model fullModel, Model submodels, Model tboxModel) {
+  
+    	JenaModelUtils modelUtils = new JenaModelUtils();
+       
+        Model tempModel = ModelFactory.createUnion(fullModel, submodels);
+        Model tempTBoxModel = modelUtils.extractTBox(tempModel);
+
+        // copy intersection of tempTBoxModel and fullModel to tboxModel.
+        StmtIterator iter = tempTBoxModel.listStatements();
         
         while (iter.hasNext()) {
 		   Statement stmt = iter.next();
-		   if (memModel.contains(stmt)) {
-			   tboxAssertions.add(stmt);
+		   if (fullModel.contains(stmt)) {
+			   tboxModel.add(stmt);
 		   }
 	    }
-        
-    	return tboxAssertions;
+
+    	return;
     }
    
     /* 
-     * returns a model containing all the statements from model 2 that are not in model 1
+     * Copy all statements from model 1 that are not in model 2 to model 3.
      */
-    private Model subtractModel(Model model1, Model model2) {
-    	 
-    	Model difference = ModelFactory.createDefaultModel();
-        
-        StmtIterator iter = model2.listStatements();
+    private void copyDifference(Model model1, Model model2, Model model3) {
+    	         
+        StmtIterator iter = model1.listStatements();
         
         while (iter.hasNext()) {
 		   Statement stmt = iter.next();
-		   if (!model1.contains(stmt)) {
-			   difference.add(stmt);
+		   if (!model2.contains(stmt)) {
+			   model3.add(stmt);
 		   }
 	    }
         
-    	return difference;
-    }   
-}
+    	return;
+    }
+ }
