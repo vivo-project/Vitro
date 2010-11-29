@@ -90,12 +90,15 @@ public class SelfEditingConfiguration {
 	public String getIndividualUriFromUsername(IndividualDao indDao,
 			String username) {
 		if (indDao == null) {
+			log.warn("No IndividualDao");
 			return null;
 		}
 		if (username == null) {
+			log.debug("username is null");
 			return null;
 		}
 		if (selfEditingIdMatchingProperty == null) {
+			log.debug("selfEditingMatchingProperty is null");
 			return null;
 		}
 
