@@ -147,15 +147,17 @@ public class PropertyInstanceDaoJena extends JenaBaseDao implements
         }
         allSuperclassURIs.addAll(vcDao.getAllSuperClassURIs(classURI));
         
+        OntModel ontModel = getOntModelSelector().getTBoxModel();
+        
         try {
         
-        	getOntModel().enterCriticalSection(Lock.READ);
+        	ontModel.enterCriticalSection(Lock.READ);
         	
         	Set<ObjectProperty> applicableProperties = new HashSet<ObjectProperty>();
         	
         	try {
 		        for (String VClassURI : allSuperclassURIs) {
-		        	OntClass ontClass = getOntClass(getOntModel(),VClassURI);
+		        	OntClass ontClass = getOntClass(ontModel,VClassURI);
 		        	if (ontClass != null) {
 		        		if (ontClass.isRestriction()) {
 		        			// TODO: check if restriction is something like
@@ -176,7 +178,7 @@ public class PropertyInstanceDaoJena extends JenaBaseDao implements
         	}
         	
 	        HashSet allSuperclassURIset = new HashSet(allSuperclassURIs);
-	        Iterator ops = getOntModel().listObjectProperties();
+	        Iterator ops = ontModel.listObjectProperties();
 	        while (ops.hasNext()) {
 	            ObjectProperty op = (ObjectProperty) ops.next();
 	            if (op.getNameSpace() != null && !NONUSER_NAMESPACES.contains(op.getNameSpace()) ) {
@@ -220,7 +222,7 @@ public class PropertyInstanceDaoJena extends JenaBaseDao implements
 	        }
         
         } finally {
-        	getOntModel().leaveCriticalSection();
+        	ontModel.leaveCriticalSection();
         }
         
         Collections.sort(propInsts, new PropInstSorter());
