@@ -219,16 +219,22 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
            
         String entURI = null;
         
-        ontModel.enterCriticalSection(Lock.WRITE);
+    	Resource cls = null;
+        OntModel tboxModel = getOntModelSelector().getTBoxModel();
+        tboxModel.enterCriticalSection(Lock.READ);
         try {
-        	
-            Resource cls = null;
             try {
-                cls = ontModel.getOntClass(ent.getVClassURI());
+                cls = tboxModel.getOntClass(ent.getVClassURI());
             } catch (Exception e) {}
             if (cls==null) {
                 cls = OWL.Thing; // This assumes we want OWL-DL compatibility. Individuals cannot be untyped.
             }
+        } finally {
+        	tboxModel.leaveCriticalSection();
+        }
+        
+        ontModel.enterCriticalSection(Lock.WRITE);
+        try {
          
             entURI = new String(preferredURI);          
             com.hp.hpl.jena.ontology.Individual test = ontModel.getIndividual(entURI);
@@ -605,9 +611,10 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
         try {
             HashSet<String> monikers = new HashSet<String>();
             OntClass cls = getOntModel().getOntClass(typeURI);
-            Iterator<? extends OntResource> inds = cls.listInstances();
+            ResIterator inds = getOntModel().listSubjectsWithProperty(
+            		RDF.type, ResourceFactory.createResource(typeURI));
             while (inds.hasNext()) {
-            	OntResource ind = inds.next();
+            	Resource ind = inds.nextResource();
                 if (MONIKER != null) {
                 Iterator<Statement> monikerIt = ind.listProperties(MONIKER);
                     while (monikerIt.hasNext()) {
