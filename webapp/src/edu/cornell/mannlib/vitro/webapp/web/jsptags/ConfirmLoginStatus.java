@@ -96,14 +96,8 @@ public class ConfirmLoginStatus extends BodyTagSupport {
 	}
 
 	private int redirectAndSkipPage() throws JspException {
-		try {
-			VitroHttpServlet.redirectToLoginPage(getRequest(), getResponse());
-			return SKIP_PAGE;
-		} catch (IOException ioe) {
-			throw new JspException(
-					"<vitro:confirmLoginStatus> could not redirect to login page",
-					ioe);
-		}
+		VitroHttpServlet.redirectToLoginPage(getRequest(), getResponse());
+		return SKIP_PAGE;
 	}
 
 	private HttpServletRequest getRequest() {

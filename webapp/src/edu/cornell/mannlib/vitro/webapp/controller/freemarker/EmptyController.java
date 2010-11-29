@@ -8,10 +8,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet.ResponseValues;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet.TemplateResponseValues;
 
 /*
  * Servlet that only specifies a template, without putting any data
@@ -25,12 +22,17 @@ public class EmptyController extends FreemarkerHttpServlet {
     private static final Map<String, String> urlsToTemplates = new HashMap<String, String>(){
         {
             put("/login", "login.ftl");
+            put("/insufficientAuthorization", "insufficientAuthorization.ftl");
         }
     };
 
     protected ResponseValues processRequest(VitroRequest vreq) {
         String requestedUrl = vreq.getServletPath();
         String templateName = urlsToTemplates.get(requestedUrl);
+        
+		log.debug("requestedUrl='" + requestedUrl + "', templateName='"
+				+ templateName + "'");
+		
         return new TemplateResponseValues(templateName);
     }    
 }

@@ -75,7 +75,7 @@ public class VitroHttpServlet extends HttpServlet {
 	// ----------------------------------------------------------------------
 
 	/**
-	 * If not logged in, redirect them to the appropriate page.
+	 * If not logged in, redirect them to the login page.
 	 */
 	public static boolean checkLoginStatus(HttpServletRequest request,
 			HttpServletResponse response) {
@@ -83,39 +83,48 @@ public class VitroHttpServlet extends HttpServlet {
 		if (LoginStatusBean.getBean(request).isLoggedIn()) {
 			return true;
 		} else {
-			try {
-				redirectToLoginPage(request, response);
-			} catch (IOException ioe) {
-				log.error("checkLoginStatus() could not redirect to login page");
-			}
+			redirectToLoginPage(request, response);
 			return false;
 		}
 	}
 
 	/**
-	 * If not logged in at the minimum level or higher, redirect them to the appropriate page.
+	 * If not logged in at the required level, redirect them to the appropriate page.
 	 */
 	public static boolean checkLoginStatus(HttpServletRequest request,
 			HttpServletResponse response, int minimumLevel) {
 		LogoutRedirector.recordRestrictedPageUri(request);
 		if (LoginStatusBean.getBean(request).isLoggedInAtLeast(minimumLevel)) {
 			return true;
+		} else if (LoginStatusBean.getBean(request).isLoggedIn()) {
+			redirectToInsufficientAuthorizationPage(request, response);
+			return false;
 		} else {
-			try {
-				redirectToLoginPage(request, response);
-			} catch (IOException ioe) {
-				log.error("checkLoginStatus() could not redirect to login page");
-			}
+			redirectToLoginPage(request, response);
 			return false;
 		}
 	}
 
 	/**
-	 * Not adequately logged in. Send them to the login page, and then back to
-	 * the page that invoked this.
+	 * Logged in, but with insufficent authorization. Send them to the
+	 * corresponding page. They won't be coming back.
+	 */
+	public static void redirectToInsufficientAuthorizationPage(
+			HttpServletRequest request, HttpServletResponse response) {
+		try {
+			response.sendRedirect(request.getContextPath()
+					+ Controllers.INSUFFICIENT_AUTHORIZATION);
+		} catch (IOException e) {
+			log.error("Could not redirect to insufficient authorization page.");
+		}
+	}
+	
+	/**
+	 * Not logged in. Send them to the login page, and then back to the page
+	 * that invoked this.
 	 */
 	public static void redirectToLoginPage(HttpServletRequest request,
-			HttpServletResponse response) throws IOException {
+			HttpServletResponse response)  {
 		String postLoginRequest;
 
 		String queryString = request.getQueryString();
@@ -128,7 +137,12 @@ public class VitroHttpServlet extends HttpServlet {
 		LoginRedirector.setReturnUrlFromForcedLogin(request, postLoginRequest);
 		
 		String loginPage = request.getContextPath() + Controllers.LOGIN;
-		response.sendRedirect(loginPage);
+		
+		try {
+			response.sendRedirect(loginPage);
+		} catch (IOException ioe) {
+			log.error("Could not redirect to login page");
+		}
 	}
 
 	/**
