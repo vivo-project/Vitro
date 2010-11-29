@@ -5,17 +5,16 @@ package edu.cornell.mannlib.vitro.webapp.controller.authenticate;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.RoleBasedPolicy.AuthRole;
-import edu.cornell.mannlib.vitro.webapp.beans.User;
+import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 
 /**
@@ -24,114 +23,127 @@ import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 public class LoginRedirector {
 	private static final Log log = LogFactory.getLog(LoginRedirector.class);
 
-	public void redirectSelfEditingUser(HttpServletRequest request,
-			HttpServletResponse response, String uri) throws IOException {
-		String userHomePage = assembleUserHomePageUrl(request, uri);
-		log.debug("Redirecting self-editor to " + userHomePage);
-		response.sendRedirect(userHomePage);
+	private static final String ATTRIBUTE_RETURN_FROM_FORCED_LOGIN = "return_from_forced_login";
+
+	private final HttpServletRequest request;
+	private final HttpServletResponse response;
+	private final HttpSession session;
+
+	private final String urlOfRestrictedPage;
+	private final String uriOfAssociatedIndividual;
+
+	public LoginRedirector(HttpServletRequest request,
+			HttpServletResponse response) {
+		this.request = request;
+		this.session = request.getSession();
+		this.response = response;
+
+		urlOfRestrictedPage = getUrlOfRestrictedPage();
+		uriOfAssociatedIndividual = getAssociatedIndividualUri();
 	}
 
-	public void redirectUnrecognizedUser(HttpServletRequest request,
-			HttpServletResponse response, String username) throws IOException {
-		log.debug("Redirecting unrecognized user: " + username);
-		response.sendRedirect(request.getContextPath()
-				+ "/unrecognizedUser?username=" + username);
+	/** Were we forced to log in when trying to access a restricted page? */
+	private String getUrlOfRestrictedPage() {
+		String url = (String) session
+				.getAttribute(ATTRIBUTE_RETURN_FROM_FORCED_LOGIN);
+		session.removeAttribute(ATTRIBUTE_RETURN_FROM_FORCED_LOGIN);
+		log.debug("URL of restricted page is " + url);
+		return url;
+
 	}
 
-	/**
-	 * <pre>
-	 * The user is logged in. They might go to:
-	 * - A one-time redirect, stored in the session, if they had tried to
-	 *     bookmark to a page that requires login.
-	 * - An application-wide redirect, stored in the servlet context.
-	 * - Their home page, if they are a self-editor.
-	 * - The site admin page.
-	 * </pre>
-	 */
-	public void redirectLoggedInUser(HttpServletRequest request,
-			HttpServletResponse response) throws IOException {
-		// Did they have a one-time redirect stored on the session?
-		String sessionRedirect = (String) request.getSession().getAttribute(
-				"postLoginRequest");
-		if (sessionRedirect != null) {
-			request.getSession().removeAttribute("postLoginRequest");
-			log.debug("User is logged in. Redirect by session to "
-					+ sessionRedirect);
-			response.sendRedirect(sessionRedirect);
-			return;
-		}
-
-		// Is there a login-redirect stored in the application as a whole?
-		// It could lead to another page in this app, or to any random URL.
-		String contextRedirect = (String) request.getSession()
-				.getServletContext().getAttribute("postLoginRequest");
-		if (contextRedirect != null) {
-			log.debug("User is logged in. Redirect by application to "
-					+ contextRedirect);
-			if (contextRedirect.indexOf(":") == -1) {
-				response.sendRedirect(request.getContextPath()
-						+ contextRedirect);
-			} else {
-				response.sendRedirect(contextRedirect);
-			}
-			return;
-		}
-
-		// If the user is a self-editor, send them to their home page.
-		User user = getLoggedInUser(request);
-		if (userIsANonEditor(user)) {
-			List<String> uris = getAuthenticator(request)
-					.asWhomMayThisUserEdit(user);
-			if (uris != null && uris.size() > 0) {
-				String userHomePage = assembleUserHomePageUrl(request,
-						uris.get(0));
-				log.debug("User is logged in. Redirect as self-editor to "
-						+ userHomePage);
-				response.sendRedirect(userHomePage);
-				return;
-			}
-		}
-
-		// If nothing else applies, send them to the Site Admin page.
-		log.debug("User is logged in. Redirect to site admin page.");
-		response.sendRedirect(getSiteAdminUrl(request));
-	}
-
-	/** Is the logged in user an AuthRole.USER? */
-	private boolean userIsANonEditor(User user) {
-		if (user == null) {
-			return false;
-		}
-		String nonEditorRoleUri = Integer.toString(AuthRole.USER.level());
-		return nonEditorRoleUri.equals(user.getRoleURI());
-	}
-
-	/**
-	 * What user are we logged in as?
-	 */
-	private User getLoggedInUser(HttpServletRequest request) {
-		LoginStatusBean bean = LoginStatusBean.getBean(request);
-		if (!bean.isLoggedIn()) {
-			log.debug("getLoggedInUser: not logged in");
+	/** Is there an Individual associated with this user? */
+	private String getAssociatedIndividualUri() {
+		String username = LoginStatusBean.getBean(request).getUsername();
+		if (username == null) {
+			log.warn("Not logged in? How did we get here?");
 			return null;
 		}
-		return getAuthenticator(request).getUserByUsername(bean.getUsername());
+
+		String uri = Authenticator.getInstance(request)
+				.getAssociatedIndividualUri(username);
+		log.debug("URI of associated individual is " + uri);
+		return uri;
 	}
 
-	/** What's the URL for the site admin screen? */
-	private String getSiteAdminUrl(HttpServletRequest request) {
+	public void redirectLoggedInUser() throws IOException {
+		if (isForcedFromRestrictedPage()) {
+			log.debug("Returning to restricted page.");
+			response.sendRedirect(urlOfRestrictedPage);
+		} else if (isUserEditorOrBetter()) {
+			log.debug("Going to site admin page.");
+			response.sendRedirect(getSiteAdminPageUrl());
+		} else if (isSelfEditorWithIndividual()) {
+			log.debug("Going to Individual home page.");
+			response.sendRedirect(getAssociatedIndividualHomePage());
+		} else {
+			log.debug("User not recognized. Going to application home.");
+			DisplayMessage.setMessage(request, "You have logged in, "
+					+ "but the system contains no profile for you.");
+			response.sendRedirect(getApplicationHomePageUrl());
+		}
+	}
+
+	private boolean isForcedFromRestrictedPage() {
+		return urlOfRestrictedPage != null;
+	}
+
+	private boolean isUserEditorOrBetter() {
+		return LoginStatusBean.getBean(session).isLoggedInAtLeast(
+				LoginStatusBean.EDITOR);
+	}
+
+	private String getSiteAdminPageUrl() {
 		String contextPath = request.getContextPath();
 		return contextPath + Controllers.SITE_ADMIN;
 	}
 
-	/** Get a reference to the Authenticator. */
-	private Authenticator getAuthenticator(HttpServletRequest request) {
-		return Authenticator.getInstance(request);
+	private boolean isSelfEditorWithIndividual() {
+		return uriOfAssociatedIndividual != null;
 	}
 
-	private String assembleUserHomePageUrl(HttpServletRequest request,
-			String uri) throws UnsupportedEncodingException {
-		return request.getContextPath() + "/individual?uri="
-				+ URLEncoder.encode(uri, "UTF-8");
+	private String getAssociatedIndividualHomePage() {
+		try {
+			return request.getContextPath() + "/individual?uri="
+					+ URLEncoder.encode(uriOfAssociatedIndividual, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			throw new IllegalStateException("No UTF-8 encoding? Really?", e);
+		}
+	}
+
+	public void redirectUnrecognizedExternalUser(String username)
+			throws IOException {
+		log.debug("Redirecting unrecognized external user: " + username);
+		DisplayMessage.setMessage(request,
+				"VIVO cannot find a profile for your account.");
+		response.sendRedirect(getApplicationHomePageUrl());
+	}
+
+	/**
+	 * The application home page can be overridden by an attribute in the
+	 * ServletContext. Further, it can either be an absolute URL, or it can be
+	 * relative to the application. Weird.
+	 */
+	private String getApplicationHomePageUrl() {
+		String contextRedirect = (String) session.getServletContext()
+				.getAttribute("postLoginRequest");
+		if (contextRedirect != null) {
+			if (contextRedirect.indexOf(":") == -1) {
+				return request.getContextPath() + contextRedirect;
+			} else {
+				return contextRedirect;
+			}
+		}
+		return request.getContextPath();
+	}
+
+	// ----------------------------------------------------------------------
+	// static helper methods
+	// ----------------------------------------------------------------------
+
+	public static void setReturnUrlFromForcedLogin(HttpServletRequest request,
+			String url) {
+		request.getSession().setAttribute(ATTRIBUTE_RETURN_FROM_FORCED_LOGIN,
+				url);
 	}
 }

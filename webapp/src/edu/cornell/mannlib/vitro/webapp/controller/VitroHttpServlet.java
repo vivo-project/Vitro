@@ -21,6 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LoginRedirector;
 
 public class VitroHttpServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -73,7 +74,7 @@ public class VitroHttpServlet extends HttpServlet {
 	// ----------------------------------------------------------------------
 
 	/**
-	 * If not logged in, send them to the login page.
+	 * If not logged in, redirect them to the appropriate page.
 	 */
 	public static boolean checkLoginStatus(HttpServletRequest request,
 			HttpServletResponse response) {
@@ -90,8 +91,7 @@ public class VitroHttpServlet extends HttpServlet {
 	}
 
 	/**
-	 * If not logged in at the minimum level or higher, send them to the login
-	 * page.
+	 * If not logged in at the minimum level or higher, redirect them to the appropriate page.
 	 */
 	public static boolean checkLoginStatus(HttpServletRequest request,
 			HttpServletResponse response, int minimumLevel) {
@@ -122,17 +122,15 @@ public class VitroHttpServlet extends HttpServlet {
 			postLoginRequest = request.getRequestURI() + "?" + queryString;
 		}
 
-		request.getSession().setAttribute("postLoginRequest", postLoginRequest);
+		LoginRedirector.setReturnUrlFromForcedLogin(request, postLoginRequest);
+		
 		String loginPage = request.getContextPath() + Controllers.LOGIN;
 		response.sendRedirect(loginPage);
 	}
 
-	/** Don't dump the contents of these headers, even if log.trace is enabled. */
-	private static final List<String> BORING_HEADERS = new ArrayList<String>(
-			Arrays.asList(new String[] { "host", "user-agent", "accept",
-					"accept-language", "accept-encoding", "accept-charset",
-					"keep-alive", "connection" }));
-	
+	/**
+	 * If logging is set to the TRACE level, dump the HTTP headers on the request.
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public void service(ServletRequest req, ServletResponse resp)
@@ -152,4 +150,10 @@ public class VitroHttpServlet extends HttpServlet {
 		super.service(req, resp);
 	}
 
+	/** Don't dump the contents of these headers, even if log.trace is enabled. */
+	private static final List<String> BORING_HEADERS = new ArrayList<String>(
+			Arrays.asList(new String[] { "host", "user-agent", "accept",
+					"accept-language", "accept-encoding", "accept-charset",
+					"keep-alive", "connection" }));
+	
 }

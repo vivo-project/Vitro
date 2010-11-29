@@ -29,6 +29,7 @@ import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.AuthenticatorStub;
+import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LoginRedirector;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State;
 
@@ -96,26 +97,26 @@ public class AuthenticateTest extends AbstractTestClass {
 	}
 
 	private User createNewDbaUser() {
-		User dbaUser = new User();
-		dbaUser.setUsername(USER_DBA_NAME);
-		dbaUser.setURI(USER_DBA_URI);
-		dbaUser.setRoleURI("50");
-		dbaUser.setMd5password(Authenticate.applyMd5Encoding(USER_DBA_PASSWORD));
-		dbaUser.setFirstTime(null);
-		dbaUser.setLoginCount(0);
-		return dbaUser;
+		User user = new User();
+		user.setUsername(USER_DBA_NAME);
+		user.setURI(USER_DBA_URI);
+		user.setRoleURI("50");
+		user.setMd5password(Authenticate.applyMd5Encoding(USER_DBA_PASSWORD));
+		user.setFirstTime(null);
+		user.setLoginCount(0);
+		return user;
 	}
 
 	private User createOldHandUser() {
-		User ohUser = new User();
-		ohUser.setUsername(USER_OLDHAND_NAME);
-		ohUser.setURI(USER_OLDHAND_URI);
-		ohUser.setRoleURI("1");
-		ohUser.setMd5password(Authenticate
+		User user = new User();
+		user.setUsername(USER_OLDHAND_NAME);
+		user.setURI(USER_OLDHAND_URI);
+		user.setRoleURI("1");
+		user.setMd5password(Authenticate
 				.applyMd5Encoding(USER_OLDHAND_PASSWORD));
-		ohUser.setLoginCount(USER_OLDHAND_LOGIN_COUNT);
-		ohUser.setFirstTime(new Date(0));
-		return ohUser;
+		user.setLoginCount(USER_OLDHAND_LOGIN_COUNT);
+		user.setFirstTime(new Date(0));
+		return user;
 	}
 
 	// ----------------------------------------------------------------------
@@ -201,7 +202,7 @@ public class AuthenticateTest extends AbstractTestClass {
 		auth.doPost(request, response);
 
 		assertNoProcessBean();
-		assertExpectedRedirect(URL_SITE_ADMIN_PAGE);
+		assertExpectedRedirect(URL_HOME_PAGE);
 		assertExpectedLoginSessions(USER_OLDHAND_NAME);
 	}
 
@@ -291,14 +292,35 @@ public class AuthenticateTest extends AbstractTestClass {
 	// ----------------------------------------------------------------------
 
 	@Test
-	public void redirectOnSession() {
-		session.setAttribute("postLoginRequest", URL_SESSION_REDIRECT);
+	public void redirectReturnToRestrictedPage() {
+		LoginRedirector.setReturnUrlFromForcedLogin(request,
+				URL_SESSION_REDIRECT);
 		loginNotFirstTime();
 		assertExpectedLiteralRedirect(URL_SESSION_REDIRECT);
 	}
 
 	@Test
-	public void redirectOnServletContext() {
+	public void redirectDbaToSiteAdmin() {
+		authenticator.getUserByUsername(USER_OLDHAND_NAME).setRoleURI("50");
+		loginNotFirstTime();
+		assertExpectedRedirect(URL_SITE_ADMIN_PAGE);
+	}
+
+	@Test
+	public void redirectSelfEditor() {
+		authenticator.setAssociatedUri(USER_OLDHAND_NAME, "selfEditorURI");
+		loginNotFirstTime();
+		assertExpectedRedirect(URL_SELF_EDITOR_PAGE);
+	}
+
+	@Test
+	public void redirectUnrecognizedUserToHome() {
+		loginNotFirstTime();
+		assertExpectedRedirect(URL_HOME_PAGE);
+	}
+
+	@Test
+	public void redirectUnrecognizedUserToApplicationHome() {
 		servletContext.setAttribute("postLoginRequest",
 				URL_CONTEXT_REDIRECT_LOCAL);
 		loginNotFirstTime();
@@ -306,24 +328,11 @@ public class AuthenticateTest extends AbstractTestClass {
 	}
 
 	@Test
-	public void redirectOnServletContextToExternalUrl() {
+	public void redirectUnrecognizedUserToApplicationExternalHome() {
 		servletContext.setAttribute("postLoginRequest",
 				URL_CONTEXT_REDIRECT_REMOTE);
 		loginNotFirstTime();
 		assertExpectedLiteralRedirect(URL_CONTEXT_REDIRECT_REMOTE);
-	}
-
-	@Test
-	public void redirectSelfEditor() {
-		authenticator.addEditingPermission(USER_OLDHAND_URI, "selfEditorURI");
-		loginNotFirstTime();
-		assertExpectedRedirect(URL_SELF_EDITOR_PAGE);
-	}
-
-	@Test
-	public void redirectNoneOfTheAbove() {
-		loginNotFirstTime();
-		assertExpectedRedirect(URL_SITE_ADMIN_PAGE);
 	}
 
 	// ----------------------------------------------------------------------
@@ -384,7 +393,8 @@ public class AuthenticateTest extends AbstractTestClass {
 		LoginProcessBean bean = LoginProcessBean.getBean(request);
 		assertEquals("state", state, bean.getState());
 		assertEquals("info message", infoMessage, bean.getInfoMessageAndClear());
-		assertEquals("error message", errorMessage, bean.getErrorMessageAndClear());
+		assertEquals("error message", errorMessage,
+				bean.getErrorMessageAndClear());
 		assertEquals("username", username, bean.getUsername());
 	}
 
@@ -412,7 +422,7 @@ public class AuthenticateTest extends AbstractTestClass {
 		assertEquals("recorded logins", expected, actualRecorded);
 	}
 
-	/** Boilerplate login process for the rediret tests. */
+	/** Boilerplate login process for the redirect tests. */
 	private void loginNotFirstTime() {
 		setProcessBean(LOGGING_IN);
 		setLoginNameAndPassword(USER_OLDHAND_NAME, USER_OLDHAND_PASSWORD);

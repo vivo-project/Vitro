@@ -67,9 +67,15 @@ public abstract class Authenticator {
 	public abstract User getUserByUsername(String username);
 
 	/**
+	 * Get the URI of the individual associated with this user, or null if no
+	 * such Individual exists.
+	 */
+	public abstract String getAssociatedIndividualUri(String username);
+
+	/**
 	 * Get a list of URIs of the people that this user is allowed to edit.
 	 */
-	public abstract List<String> asWhomMayThisUserEdit(User user);
+	public abstract List<String> asWhomMayThisUserEdit(String username);
 
 	/**
 	 * Record a new password for the user.
@@ -108,4 +114,5 @@ public abstract class Authenticator {
 	 * </pre>
 	 */
 	public abstract void recordUserIsLoggedOut();
+
 }

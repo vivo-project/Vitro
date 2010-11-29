@@ -14,10 +14,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
-import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
-import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
-import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 
 /**
  * Handle the return from the external authorization login server. If we are
@@ -26,8 +23,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 public class LoginExternalAuthReturn extends BaseLoginServlet {
 	private static final Log log = LogFactory
 			.getLog(LoginExternalAuthReturn.class);
-
-	private final LoginRedirector loginRedirector = new LoginRedirector();
 
 	/**
 	 * <pre>
@@ -47,7 +42,7 @@ public class LoginExternalAuthReturn extends BaseLoginServlet {
 			throws ServletException, IOException {
 		String username = ExternalAuthHelper.getHelper(req)
 				.getExternalUsername(req);
-		String uri = getAssociatedIndividualUri(username, req);
+		String uri = getAuthenticator(req).getAssociatedIndividualUri(username);
 
 		if (username == null) {
 			log.debug("No username.");
@@ -58,29 +53,19 @@ public class LoginExternalAuthReturn extends BaseLoginServlet {
 			getAuthenticator(req).recordLoginAgainstUserAccount(username,
 					AuthenticationSource.EXTERNAL);
 			removeLoginProcessArtifacts(req);
-			loginRedirector.redirectLoggedInUser(req, resp);
+			new LoginRedirector(req, resp).redirectLoggedInUser();
 		} else if (uri != null) {
 			log.debug("Recognize '" + username + "' as self-editor for " + uri);
 			getAuthenticator(req).recordLoginWithoutUserAccount(username, uri,
 					AuthenticationSource.EXTERNAL);
 			removeLoginProcessArtifacts(req);
-			loginRedirector.redirectSelfEditingUser(req, resp, uri);
+			new LoginRedirector(req, resp).redirectLoggedInUser();
 		} else {
 			log.debug("User is not recognized: " + username);
 			removeLoginProcessArtifacts(req);
-			loginRedirector.redirectUnrecognizedUser(req, resp, username);
+			new LoginRedirector(req, resp)
+					.redirectUnrecognizedExternalUser(username);
 		}
-	}
-
-	private String getAssociatedIndividualUri(String username,
-			HttpServletRequest req) {
-		if (username == null) {
-			return null;
-		}
-		IndividualDao indDao = new VitroRequest(req).getWebappDaoFactory()
-				.getIndividualDao();
-		return SelfEditingConfiguration.getBean(req)
-				.getIndividualUriFromUsername(indDao, username);
 	}
 
 	private void removeLoginProcessArtifacts(HttpServletRequest req) {

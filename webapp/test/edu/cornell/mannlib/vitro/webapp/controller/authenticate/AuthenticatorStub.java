@@ -71,6 +71,7 @@ public class AuthenticatorStub extends Authenticator {
 
 	private final Map<String, User> usersByName = new HashMap<String, User>();
 	private final Map<String, List<String>> editingPermissions = new HashMap<String, List<String>>();
+	private final Map<String, String> associatedUris = new HashMap<String, String>();
 	private final List<String> recordedLogins = new ArrayList<String>();
 	private final Map<String, String> newPasswords = new HashMap<String, String>();
 
@@ -84,11 +85,15 @@ public class AuthenticatorStub extends Authenticator {
 		usersByName.put(user.getUsername(), user);
 	}
 
-	public void addEditingPermission(String userUri, String personUri) {
-		if (!editingPermissions.containsKey(userUri)) {
-			editingPermissions.put(userUri, new ArrayList<String>());
+	public void addEditingPermission(String username, String personUri) {
+		if (!editingPermissions.containsKey(username)) {
+			editingPermissions.put(username, new ArrayList<String>());
 		}
-		editingPermissions.get(userUri).add(personUri);
+		editingPermissions.get(username).add(personUri);
+	}
+
+	public void setAssociatedUri(String username, String individualUri) {
+		associatedUris.put(username, individualUri);
 	}
 
 	public List<String> getRecordedLoginUsernames() {
@@ -114,6 +119,11 @@ public class AuthenticatorStub extends Authenticator {
 	}
 
 	@Override
+	public String getAssociatedIndividualUri(String username) {
+		return associatedUris.get(username);
+	}
+
+	@Override
 	public boolean isCurrentPassword(String username, String clearTextPassword) {
 		if (!isExistingUser(username)) {
 			return false;
@@ -129,10 +139,9 @@ public class AuthenticatorStub extends Authenticator {
 	}
 
 	@Override
-	public List<String> asWhomMayThisUserEdit(User user) {
-		String userUri = user.getURI();
-		if (editingPermissions.containsKey(userUri)) {
-			return editingPermissions.get(userUri);
+	public List<String> asWhomMayThisUserEdit(String username) {
+		if (editingPermissions.containsKey(username)) {
+			return editingPermissions.get(username);
 		} else {
 			return Collections.emptyList();
 		}

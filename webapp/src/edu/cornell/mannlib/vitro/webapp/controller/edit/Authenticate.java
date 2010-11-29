@@ -59,8 +59,6 @@ public class Authenticate extends VitroHttpServlet {
 	/** Where do we find the User/Session map in the servlet context? */
 	public static final String USER_SESSION_MAP_ATTR = "userURISessionMap";
 
-	private final LoginRedirector loginRedirector = new LoginRedirector();
-
 	/**
 	 * Find out where they are in the login process, process any input, record
 	 * the new state, and show the next page.
@@ -106,7 +104,7 @@ public class Authenticate extends VitroHttpServlet {
 				showLoginScreen(vreq, response);
 				break;
 			default: // LOGGED_IN:
-				loginRedirector.redirectLoggedInUser(vreq, response);
+				new LoginRedirector(vreq, response).redirectLoggedInUser();
 				break;
 			}
 		} catch (Exception e) {
@@ -332,11 +330,11 @@ public class Authenticate extends VitroHttpServlet {
 	private void showLoginScreen(VitroRequest vreq, HttpServletResponse response)
 			throws IOException {
 		log.debug("logging in.");
-		
+
 		String referringPage = vreq.getHeader("referer");
 		if (referringPage == null) {
 			log.warn("No referring page on the request");
-			referringPage = getHomeUrl(vreq); 
+			referringPage = getHomeUrl(vreq);
 		}
 		response.sendRedirect(referringPage);
 		return;

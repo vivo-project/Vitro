@@ -18,8 +18,11 @@ import edu.cornell.mannlib.vedit.beans.LoginFormBean;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.RoleBasedPolicy.AuthRole;
+import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.edit.Authenticate;
+import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.LoginEvent;
@@ -197,13 +200,26 @@ public class BasicAuthenticator extends Authenticator {
 	}
 
 	@Override
-	public List<String> asWhomMayThisUserEdit(User user) {
-		if (user == null) {
+	public String getAssociatedIndividualUri(String username) {
+		IndividualDao iDao = new VitroRequest(request).getWebappDaoFactory()
+				.getIndividualDao();
+		return SelfEditingConfiguration.getBean(request)
+				.getIndividualUriFromUsername(iDao, username);
+	}
+
+	@Override
+	public List<String> asWhomMayThisUserEdit(String username) {
+		if (username == null) {
 			return Collections.emptyList();
 		}
 
 		UserDao userDao = getUserDao(request);
 		if (userDao == null) {
+			return Collections.emptyList();
+		}
+
+		User user = userDao.getUserByUsername(username);
+		if (user == null) {
 			return Collections.emptyList();
 		}
 

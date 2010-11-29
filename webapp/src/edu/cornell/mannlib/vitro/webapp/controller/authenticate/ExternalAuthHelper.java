@@ -35,7 +35,7 @@ public class ExternalAuthHelper {
 	private static final String PROPERTY_EXTERNAL_AUTH_SERVER_URL = "externalAuth.serverUrl";
 
 	/** This configuration property says which HTTP header holds the username. */
-	public static final String PROPERTY_EXTERNAL_AUTH_USERNAME_HEADER = "externalAuth.netIdheaderName";
+	public static final String PROPERTY_EXTERNAL_AUTH_USERNAME_HEADER = "externalAuth.netIdHeaderName";
 
 	// ----------------------------------------------------------------------
 	// static methods
@@ -57,7 +57,7 @@ public class ExternalAuthHelper {
 			log.trace("No session; no need to create one.");
 			return DUMMY_HELPER;
 		}
-		
+
 		ServletContext context = session.getServletContext();
 
 		Object attr = context.getAttribute(BEAN_ATTRIBUTE);
@@ -73,7 +73,8 @@ public class ExternalAuthHelper {
 	}
 
 	/** It would be private, but we want to allow calls for faking. */
-	protected static void setBean(ServletContext context, ExternalAuthHelper bean) {
+	protected static void setBean(ServletContext context,
+			ExternalAuthHelper bean) {
 		context.setAttribute(BEAN_ATTRIBUTE, bean);
 	}
 
