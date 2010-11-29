@@ -369,7 +369,7 @@
 				var item = "distinct " + items.join(" ");
 				var criteria = criterias.join("\n");
 				
-				var query = namespace+ "SELECT " + item + "\nWHERE{\n" + criteria + "\n}\n";
+				var query = namespace+ "SELECT " + item + "\nWHERE{\nGRAPH ?g {\n" + criteria + "\n}\n}\n";
 				var quediv = document.getElementById("sparqlquery");
 				var quetextarea = document.getElementById("query");
 				quediv.style.visibility = "visible";
