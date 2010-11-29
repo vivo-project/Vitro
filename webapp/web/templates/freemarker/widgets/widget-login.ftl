@@ -18,11 +18,9 @@
         <h2>Log in</h2>
 
         <noscript>
-            <section id="javascriptDisableWrapper">
-                <section id="javascriptDisableContent">
-                    <img src="${urls.siteIcons}/iconAlertBig.png" alt="Alert Icon"/>
-                    <p>In order to edit VIVO content, you'll need to enable JavaScript.</p>
-                </section>
+            <section id="error-alert">
+                <img src="${urls.siteIcons}/iconAlertBig.png" alt="Alert Icon"/>
+                <p>In order to edit VIVO content, you'll need to enable JavaScript.</p>
             </section>
         </noscript>
     
@@ -71,13 +69,13 @@
             </#if>
            
             <form role="form" id="login-form" action="${formAction}" method="post" name="login-form" required />
-                <label for="newPassword">New Password</label>
-                <input id="newPassword" class="focus text-field" type="password" name="newPassword"  required />
+                <label for="new-password">New Password</label>
+                <input id="new-password" class="focus text-field" type="password" name="newPassword"  required />
                 
-                <p class="passwordNote">Minimum of 6 characters in length.</p>
+                <p class="password-note">Minimum of 6 characters in length.</p>
                 
-                <label for="confirmPassword">Confirm Password</label>
-                <input id="confirmPassword" class="text-field" type="password" name="confirmPassword"  />
+                <label for="confirm-password">Confirm Password</label>
+                <input id="confirm-password" class="text-field" type="password" name="confirmPassword"  />
                 
                  <p class="submit-password"><input name="passwordChangeForm" type="submit" class="green button" value="Log in"/> <span class="or">or <a class="cancel" href="${cancelUrl}">Cancel</a></span></p>
             </form>

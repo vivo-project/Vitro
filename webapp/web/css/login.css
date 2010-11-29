@@ -60,19 +60,19 @@ p.request-account {
     font-size:0.9em;
     line-height:30px;
 }
-#confirmationAlert {
+#confirmation-alert {
     color:#169f43;
     padding:0px;
     margin-bottom:5px;
     height:30px;
 }
-#confirmationAlert img {
+#confirmation-alert img {
     float:left;
     margin:0;
     padding:0;
     vertical-align:middle;
 }
-#confirmationAlert p {
+#confirmation-alert p {
     padding-left:30px;
     font-size:0.9em;
     line-height:30px;
@@ -83,7 +83,7 @@ p.request-account {
 .red {
     color:#900;
 }
-p.passwordNote {
+p.password-note {
     margin:0;
     padding:0;
     margin-top:-8px;
