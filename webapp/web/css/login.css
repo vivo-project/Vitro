@@ -6,92 +6,92 @@
 #login-form input.text,
 #login-form #password,
 #login-form #confirmPassword{
-    display:block;  
+    display: block;  
 }
 #login-form label.label-remember-me{
-    display:block;
+    display: block;
 }
 #login-form p.submit {
-    float:left;
-    margin-bottom:0;
+    float: left;
+    margin-bottom: 0;
 }
 #login-form input.checkbox-remember-me {
-    float:left;
-    height:14px;
-    padding:0;
-    margin-top:13px;
-    margin-left:20px;
+    float: left;
+    height: 14px;
+    padding: 0;
+    margin-top: 13px;
+    margin-left: 20px;
 }
 #login-form .label-remember-me {
-    display:block;
-    float:left;
-    width:100px;
-    margin:0;
-    padding:0;
-    margin-top:10px;
-    margin-right:25px;
-    padding-right:10px;
+    display: block;
+    float: left;
+    width: 100px;
+    margin: 0;
+    padding: 0;
+    margin-top: 10px;
+    margin-right: 25px;
+    padding-right: 10px;
 }
 p.forgot-password {
     clear:both;
-    margin-bottom:0;
+    margin-bottom: 0;
 }
 p.request-account {
-    width:219px;
-    float:left;
+    width: 219px;
+    float: left;
 }
 #login-form p.external-auth {
     margin-left: 36px;
 }
 #error-alert{
-    color:#900;
-    padding:10px;
-    margin-bottom:5px;
-    height:30px;
+    color: #900;
+    padding: 10px;
+    margin-bottom: 5px;
+    height: 30px;
 }
 #error-alert img {
     float:left;
-    margin:0;
-    padding:0;
-    vertical-align:middle;  	
+    margin: 0;
+    padding: 0;
+    vertical-align: middle;  	
 }
 #error-alert p {
-    padding-left:30px;
-    font-size:0.9em;
-    line-height:30px;
+    padding-left: 30px;
+    font-size: 0.9em;
+    line-height: 30px;
 }
 #confirmation-alert {
-    color:#169f43;
-    padding:0px;
-    margin-bottom:5px;
-    height:30px;
+    color: #169f43;
+    padding: 0px;
+    margin-bottom: 5px;
+    height: 30px;
 }
 #confirmation-alert img {
-    float:left;
-    margin:0;
-    padding:0;
-    vertical-align:middle;
+    float: left;
+    margin: 0;
+    padding: 0;
+    vertical-align: middle;
 }
 #confirmation-alert p {
-    padding-left:30px;
-    font-size:0.9em;
-    line-height:30px;
+    padding-left: 30px;
+    font-size: 0.9em;
+    line-height: 30px;
 }
 .formFieldAlert {
-    border:2px solid #900;
+    border: 2px solid #900;
 }
 .red {
-    color:#900;
+    color: #900;
 }
 p.password-note {
-    margin:0;
-    padding:0;
-    margin-top:-8px;
-    font-size:0.8em;
-    color:#615e5e;
-    padding-top:15px;
+    margin: 0;
+    padding: 0;
+    margin-top: -8px;
+    font-size: 0.8em;
+    color: #615e5e;
+    padding-top: 15px;
 }
 .or {
-    display:inline;
-    vertical-align:middle;
+    display: inline;
+    vertical-align: middle;
 }

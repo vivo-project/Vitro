@@ -44,8 +44,9 @@
             <p class="submit"><input name="loginForm" type="submit" class="green button" value="Log in"/></p>
             <input class="checkbox-remember-me" name="remember-me" type="checkbox" value="" />  
             <label class="label-remember-me" for="remember-me">Remember me</label>
+            <#-- mb863: forgot password and request an account won't be part of VIVO r1.2
             <p class="forgot-password"><a href="#">Forgot your password?</a></p>    
-            <p class="request-account"><a class="blue button" href="#">Request an account</a> </p>    
+            <p class="request-account"><a class="blue button" href="#">Request an account</a> </p> -->    
                             
             <#if externalAuthUrl??>
                 <p class="external-auth">
