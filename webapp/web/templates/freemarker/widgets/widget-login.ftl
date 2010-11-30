@@ -84,7 +84,7 @@
 
 <#macro alreadyLoggedIn>
     <h2>Log in</h2>
-    <p>You are already logged in. You may have been redirected to this page because you tried to access a page that you do not have permission to view.</p>
+    <p>You are already logged in.</p>
 </#macro>
 
 <#macro error>
