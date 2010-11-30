@@ -2,6 +2,4 @@
 
 <#-- Template for property listing on individual profile page -->
 
-<#-- 
 <#assign properties = individual.propertyList>
--->

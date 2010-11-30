@@ -13,9 +13,11 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
+import edu.cornell.mannlib.vitro.webapp.dao.PropertyListDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep;
@@ -36,7 +38,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
     private static final Collection<String> SUPPRESSED_OBJECT_PROPERTIES = Collections
             .unmodifiableCollection(Arrays
                     .asList(new String[] { VitroVocabulary.IND_MAIN_IMAGE }));
-    
+   
     // RY Do we really want to store subject and vreq as members? Could just pass around.
     private Individual subject;
     private VitroRequest vreq;
@@ -65,6 +67,14 @@ public class GroupedPropertyList extends BaseTemplateModel {
         if (groups.isEmpty()) {
             groups.add(new DummyPropertyGroupTemplateModel(null));
         }
+        
+        // Create the property list for the subject. The properties will be put into groups later.
+
+        // First get all the properties that occur in statements in the db with this subject as subject.
+        // This may include properties that are not defined as "possible properties" for a subject of this class.
+        PropertyListDao plDao = wdf.getPropertyListDao();
+        List<Property> propertyList = plDao.getPropertyListForSubject(subject);
+    
     }
 
     /** 
