@@ -26,6 +26,7 @@ import com.hp.hpl.jena.ontology.OntResource;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.ResultSetFormatter;
 import com.hp.hpl.jena.rdf.model.Literal;
@@ -652,15 +653,14 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         try {
             if (webappDaoFactory.getJenaBaseDao().PRIMARY_LINK != null) {
             	String listPropertyValues =
-            		"CONSTRUCT {<" + this.individualURI + "> <" + webappDaoFactory.getJenaBaseDao().PRIMARY_LINK + "> ?values}" +
+            		"SELECT ?values" +
             		"WHERE{ GRAPH ?g { <" + this.individualURI + "> <" + webappDaoFactory.getJenaBaseDao().PRIMARY_LINK + "> ?values} }";
-            	tempModel = QueryExecutionFactory.create(QueryFactory.create(listPropertyValues), dataset).execConstruct();
-            	ontModel.add(tempModel.listStatements());
-            	OntResource res = ontModel.createOntResource(this.individualURI);
-            	Iterator links = res.listPropertyValues(webappDaoFactory.getJenaBaseDao().PRIMARY_LINK);
-                if (links.hasNext()) {
+            	ResultSet links = QueryExecutionFactory.create(QueryFactory.create(listPropertyValues), dataset).execSelect();
+            	QuerySolution result = null;
+                if (links.hasNext()) { 
+                	result = links.next();
                     try {
-                        com.hp.hpl.jena.ontology.Individual linkInd = ((com.hp.hpl.jena.ontology.Individual)((Resource)links.next()).as(com.hp.hpl.jena.ontology.Individual.class));
+                        com.hp.hpl.jena.ontology.Individual linkInd = ((com.hp.hpl.jena.ontology.Individual)((Resource)result.get("values")).as(com.hp.hpl.jena.ontology.Individual.class));
                         if (webappDaoFactory.getJenaBaseDao().LINK_ANCHOR != null) {
                             try {
                                 Literal l = (Literal) linkInd.getPropertyValue(webappDaoFactory.getJenaBaseDao().LINK_ANCHOR);
@@ -814,26 +814,21 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	List<Individual> relatedIndividuals = new ArrayList<Individual>();
     	
     	dataset.getLock().enterCriticalSection(Lock.READ);
-    	Model tempModel = ModelFactory.createDefaultModel();
-    	OntModel ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
     	try {
     		String valuesOfProperty = 
-    			"CONSTRUCT{<" + this.individualURI + "> <" + propertyURI + "> ?object}" +
+    			"SELECT ?object" +
     			"WHERE{ GRAPH ?g { <" + this.individualURI + "> <" + propertyURI + "> ?object} }";
-    		tempModel = QueryExecutionFactory.create(QueryFactory.create(valuesOfProperty), dataset).execConstruct();
-    		ontModel.add(tempModel.listStatements());
-    	    OntResource ontRes = ontModel.createOntResource(this.individualURI);
-    	    NodeIterator values = ontRes.listPropertyValues(ontRes.getModel().getProperty(propertyURI));
+    		ResultSet values = QueryExecutionFactory.create(QueryFactory.create(valuesOfProperty), dataset).execSelect();
+    		QuerySolution result = null;
     	    while (values.hasNext()) {
-    	    	RDFNode value = values.nextNode();
+    	    	result = values.next();
+    	    	RDFNode value = result.get("object");
     	    	if (value.canAs(OntResource.class)) {
         	    	relatedIndividuals.add(
         	    		new IndividualSDB(((OntResource) value.as(OntResource.class)).getURI(), dataset, webappDaoFactory) );  
         	    } 
     	    }
     	} finally {
-    		tempModel.close();
-    		ontModel.close();
     		dataset.getLock().leaveCriticalSection();
     	}
     	return relatedIndividuals;
@@ -846,24 +841,19 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	}
     	
     	dataset.getLock().enterCriticalSection(Lock.READ);
-    	Model tempModel = ModelFactory.createDefaultModel();
-    	OntModel ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
     	try {
     		String valueOfProperty = 
-    			"CONSTRUCT{<" + this.individualURI + "> <" + propertyURI + "> ?object}" +
+    			"SELECT ?object" +
     			"WHERE{ GRAPH ?g { <" + this.individualURI + "> <" + propertyURI + "> ?object} }";
-    		tempModel = QueryExecutionFactory.create(QueryFactory.create(valueOfProperty), dataset).execConstruct();
-    		ontModel.add(tempModel.listStatements());
-    	    OntResource ontRes = ontModel.createOntResource(this.individualURI);
-    	    RDFNode value = ontRes.getPropertyValue(ontRes.getModel().getProperty(propertyURI));
+    		ResultSet results = QueryExecutionFactory.create(QueryFactory.create(valueOfProperty), dataset).execSelect();
+    		QuerySolution result = results.next();
+    		RDFNode value = result.get("object");
     	    if (value != null && value.canAs(OntResource.class)) {
     	    	return new IndividualSDB(((OntResource) value.as(OntResource.class)).getURI(), dataset, webappDaoFactory);  
     	    } else {
     	    	return null;
     	    }
     	} finally {
-    		tempModel.close();
-    		ontModel.close();
     		dataset.getLock().leaveCriticalSection();
     	}
     }
