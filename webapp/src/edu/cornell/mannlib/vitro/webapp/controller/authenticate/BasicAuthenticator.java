@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.authenticate;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -20,7 +21,6 @@ import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.RoleBasedPolicy.AuthRole;
 import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
-import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.edit.Authenticate;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
@@ -50,7 +50,7 @@ public class BasicAuthenticator extends Authenticator {
 
 	@Override
 	public User getUserByUsername(String username) {
-		UserDao userDao = getUserDao(request);
+		UserDao userDao = getUserDao();
 		if (userDao == null) {
 			return null;
 		}
@@ -59,7 +59,7 @@ public class BasicAuthenticator extends Authenticator {
 
 	@Override
 	public boolean isCurrentPassword(String username, String clearTextPassword) {
-		User user = getUserDao(request).getUserByUsername(username);
+		User user = getUserDao().getUserByUsername(username);
 		if (user == null) {
 			log.trace("Checking password '" + clearTextPassword
 					+ "' for user '" + username + "', but user doesn't exist.");
@@ -81,7 +81,7 @@ public class BasicAuthenticator extends Authenticator {
 		}
 		user.setOldPassword(user.getMd5password());
 		user.setMd5password(Authenticate.applyMd5Encoding(newClearTextPassword));
-		getUserDao(request).updateUser(user);
+		getUserDao().updateUser(user);
 	}
 
 	@Override
@@ -133,7 +133,7 @@ public class BasicAuthenticator extends Authenticator {
 		if (user.getFirstTime() == null) { // first login
 			user.setFirstTime(new Date());
 		}
-		getUserDao(request).updateUser(user);
+		getUserDao().updateUser(user);
 	}
 
 	/**
@@ -200,20 +200,38 @@ public class BasicAuthenticator extends Authenticator {
 	}
 
 	@Override
-	public String getAssociatedIndividualUri(String username) {
-		IndividualDao iDao = new VitroRequest(request).getWebappDaoFactory()
-				.getIndividualDao();
-		return SelfEditingConfiguration.getBean(request)
-				.getIndividualUriFromUsername(iDao, username);
+	public List<String> getAssociatedIndividualUris(String username) {
+		List<String> uris = new ArrayList<String>();
+		uris.addAll(getUrisAssociatedBySelfEditorConfig(username));
+		uris.addAll(getUrisAssociatedByMayEditAs(username));
+		return uris;
 	}
 
-	@Override
-	public List<String> asWhomMayThisUserEdit(String username) {
+	private List<String> getUrisAssociatedBySelfEditorConfig(String username) {
 		if (username == null) {
 			return Collections.emptyList();
 		}
 
-		UserDao userDao = getUserDao(request);
+		IndividualDao iDao = getIndividualDao();
+		if (iDao == null) {
+			return Collections.emptyList();
+		}
+		
+		String selfEditorUri = SelfEditingConfiguration.getBean(request)
+				.getIndividualUriFromUsername(iDao, username);
+		if (selfEditorUri == null) {
+			return Collections.emptyList();
+		} else {
+			return Collections.singletonList(selfEditorUri);
+		}
+	}
+
+	private List<String> getUrisAssociatedByMayEditAs(String username) {
+		if (username == null) {
+			return Collections.emptyList();
+		}
+
+		UserDao userDao = getUserDao();
 		if (userDao == null) {
 			return Collections.emptyList();
 		}
@@ -244,7 +262,7 @@ public class BasicAuthenticator extends Authenticator {
 			return;
 		}
 
-		UserDao userDao = getUserDao(request);
+		UserDao userDao = getUserDao();
 		if (userDao == null) {
 			return;
 		}
@@ -261,19 +279,11 @@ public class BasicAuthenticator extends Authenticator {
 	}
 
 	/**
-	 * Get a reference to the {@link UserDao}, or <code>null</code>.
+	 * Get a reference to the UserDao, or null.
 	 */
-	private UserDao getUserDao(HttpServletRequest request) {
-		HttpSession session = request.getSession(false);
-		if (session == null) {
-			return null;
-		}
-
-		ServletContext servletContext = session.getServletContext();
-		WebappDaoFactory wadf = (WebappDaoFactory) servletContext
-				.getAttribute("webappDaoFactory");
+	private UserDao getUserDao() {
+		WebappDaoFactory wadf = getWebappDaoFactory();
 		if (wadf == null) {
-			log.error("getUserDao: no WebappDaoFactory");
 			return null;
 		}
 
@@ -283,6 +293,43 @@ public class BasicAuthenticator extends Authenticator {
 		}
 
 		return userDao;
+	}
+
+	/**
+	 * Get a reference to the IndividualDao, or null.
+	 */
+	private IndividualDao getIndividualDao() {
+		WebappDaoFactory wadf = getWebappDaoFactory();
+		if (wadf == null) {
+			return null;
+		}
+		
+		IndividualDao individualDao = wadf.getIndividualDao();
+		if (individualDao == null) {
+			log.error("getIndividualDao: no IndividualDao");
+		}
+		
+		return individualDao;
+	}
+	
+	/**
+	 * Get a reference to the WebappDaoFactory, or null.
+	 */
+	private WebappDaoFactory getWebappDaoFactory() {
+		HttpSession session = request.getSession(false);
+		if (session == null) {
+			return null;
+		}
+
+		ServletContext servletContext = session.getServletContext();
+		WebappDaoFactory wadf = (WebappDaoFactory) servletContext
+				.getAttribute("webappDaoFactory");
+		if (wadf == null) {
+			log.error("no WebappDaoFactory");
+			return null;
+		}
+
+		return wadf;
 	}
 
 	/**

@@ -67,15 +67,10 @@ public abstract class Authenticator {
 	public abstract User getUserByUsername(String username);
 
 	/**
-	 * Get the URI of the individual associated with this user, or null if no
-	 * such Individual exists.
+	 * Get the URIs of all individuals associated with this user, whether by a
+	 * self-editing property like cornellEmailNetid, or by mayEditAs.
 	 */
-	public abstract String getAssociatedIndividualUri(String username);
-
-	/**
-	 * Get a list of URIs of the people that this user is allowed to edit.
-	 */
-	public abstract List<String> asWhomMayThisUserEdit(String username);
+	public abstract List<String> getAssociatedIndividualUris(String username);
 
 	/**
 	 * Record a new password for the user.

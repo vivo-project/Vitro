@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.authenticate;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -60,10 +61,18 @@ public class LoginRedirector {
 			return null;
 		}
 
-		String uri = Authenticator.getInstance(request)
-				.getAssociatedIndividualUri(username);
-		log.debug("URI of associated individual is " + uri);
-		return uri;
+		List<String> uris = Authenticator.getInstance(request)
+				.getAssociatedIndividualUris(username);
+		if (uris.isEmpty()) {
+			log.debug("'" + username
+					+ "' is not associated with an individual.");
+			return null;
+		} else {
+			String uri = uris.get(0);
+			log.debug("'" + username + "' is associated with an individual: "
+					+ uri);
+			return uri;
+		}
 	}
 
 	public void redirectLoggedInUser() throws IOException {

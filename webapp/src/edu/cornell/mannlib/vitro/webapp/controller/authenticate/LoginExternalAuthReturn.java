@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.authenticate;
 import static edu.cornell.mannlib.vitro.webapp.controller.authenticate.LoginExternalAuthSetup.ATTRIBUTE_REFERRER;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -42,7 +43,8 @@ public class LoginExternalAuthReturn extends BaseLoginServlet {
 			throws ServletException, IOException {
 		String username = ExternalAuthHelper.getHelper(req)
 				.getExternalUsername(req);
-		String uri = getAuthenticator(req).getAssociatedIndividualUri(username);
+		List<String> associatedUris = getAuthenticator(req)
+				.getAssociatedIndividualUris(username);
 
 		if (username == null) {
 			log.debug("No username.");
@@ -54,8 +56,11 @@ public class LoginExternalAuthReturn extends BaseLoginServlet {
 					AuthenticationSource.EXTERNAL);
 			removeLoginProcessArtifacts(req);
 			new LoginRedirector(req, resp).redirectLoggedInUser();
-		} else if (uri != null) {
-			log.debug("Recognize '" + username + "' as self-editor for " + uri);
+		} else if (!associatedUris.isEmpty()) {
+			log.debug("Recognize '" + username + "' as self-editor for "
+					+ associatedUris);
+			String uri = associatedUris.get(0);
+
 			getAuthenticator(req).recordLoginWithoutUserAccount(username, uri,
 					AuthenticationSource.EXTERNAL);
 			removeLoginProcessArtifacts(req);

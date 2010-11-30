@@ -4,7 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.controller.authenticate;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -119,8 +118,18 @@ public class AuthenticatorStub extends Authenticator {
 	}
 
 	@Override
-	public String getAssociatedIndividualUri(String username) {
-		return associatedUris.get(username);
+	public List<String> getAssociatedIndividualUris(String username) {
+		List<String> uris = new ArrayList<String>();
+
+		if (associatedUris.containsKey(username)) {
+			uris.add(associatedUris.get(username));
+		}
+
+		if (editingPermissions.containsKey(username)) {
+			uris.addAll(editingPermissions.get(username));
+		}
+
+		return uris;
 	}
 
 	@Override
@@ -136,15 +145,6 @@ public class AuthenticatorStub extends Authenticator {
 	@Override
 	public void recordNewPassword(String username, String newClearTextPassword) {
 		newPasswords.put(username, newClearTextPassword);
-	}
-
-	@Override
-	public List<String> asWhomMayThisUserEdit(String username) {
-		if (editingPermissions.containsKey(username)) {
-			return editingPermissions.get(username);
-		} else {
-			return Collections.emptyList();
-		}
 	}
 
 	@Override
