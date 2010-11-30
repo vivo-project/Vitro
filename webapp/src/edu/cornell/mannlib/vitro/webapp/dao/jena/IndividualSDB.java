@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -1095,37 +1096,19 @@ public class IndividualSDB extends IndividualImpl implements Individual {
 	
 	@Override
 	public boolean isMemberOfClassProhibitedFromSearch(ProhibitedFromSearch pfs) {  
-		this.dataset.getLock().enterCriticalSection(Lock.READ);
-		Model tempModel = ModelFactory.createDefaultModel();
-		OntModel ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
-		try {
-			String getTypes = 
-	    		"CONSTRUCT{ <" + this.individualURI + "> <" + RDF.type + "> ?types }\n" +
-	    		"WHERE{ GRAPH ?g { <" + this.individualURI +"> <" +RDF.type+ "> ?types \n" +
-	    				"} } \n";
-			tempModel = QueryExecutionFactory.create(QueryFactory.create(getTypes), dataset).execConstruct();
-    		ontModel.add(tempModel.listStatements());
-    	    OntResource ontRes = ontModel.createOntResource(this.individualURI);
-    	    StmtIterator stmtIt = ontRes.listProperties(RDF.type);
-    	    try {
-				while(stmtIt.hasNext()) {
-					Statement stmt = stmtIt.nextStatement();
-					if (stmt.getObject().isURIResource()) {
-						String typeURI = ((Resource)stmt.getObject()).getURI();
-						if (pfs.isClassProhibited(typeURI)) {
-							return false;
-						}
-					}
-				}
-			} finally {
-				stmtIt.close();
+
+		List<VClass> types =  getVClasses(false);
+		Iterator<VClass> itr = types.iterator();
+
+		while(itr.hasNext()) {
+			String typeURI = itr.next().getURI();
+			if (pfs.isClassProhibited(typeURI)) {
+				return false;
 			}
-			return false;
-		} finally {
-			tempModel.close();
-			ontModel.close();
-			this.dataset.getLock().leaveCriticalSection();
 		}
+
+		return false;
+
 	}
 
     /**
