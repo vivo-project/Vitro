@@ -2,11 +2,21 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
-public class DataPropertyTemplateModel extends PropertyTemplateModel {
+import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 
-    DataPropertyTemplateModel(String predicateUri) {
-        super(predicateUri);
-        // TODO Auto-generated constructor stub
+public class DataPropertyTemplateModel extends PropertyTemplateModel {
+    
+    private static final String TYPE = "data";
+
+    DataPropertyTemplateModel(DataProperty property) {
+        super(property);
+    }
+
+    
+    /* Access methods for templates */
+    
+    public String getType() {
+        return TYPE;
     }
 
 }

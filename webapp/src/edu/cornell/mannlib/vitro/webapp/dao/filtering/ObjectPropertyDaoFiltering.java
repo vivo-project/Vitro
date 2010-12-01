@@ -9,6 +9,7 @@ import java.util.List;
 import net.sf.jga.algorithms.Filter;
 import net.sf.jga.fn.UnaryFunctor;
 import net.sf.jga.fn.adaptor.AndUnary;
+import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
@@ -201,5 +202,16 @@ class ObjectPropertyDaoFiltering extends BaseFiltering implements ObjectProperty
     public List <VClass> getClassesWithRestrictionOnProperty(String propertyURI) {
     	return innerObjectPropertyDao.getClassesWithRestrictionOnProperty(propertyURI);
     }
-	
+
+    @Override
+    // This may need to be filtered at some point.
+    public List<ObjectProperty> getObjectPropertyList(Individual subject) {
+        return innerObjectPropertyDao.getObjectPropertyList(subject);
+    }
+    
+    @Override
+    // This may need to be filtered at some point.
+    public List<ObjectProperty> getObjectPropertyList(String subjectUri) {
+        return innerObjectPropertyDao.getObjectPropertyList(subjectUri);
+    }
 }

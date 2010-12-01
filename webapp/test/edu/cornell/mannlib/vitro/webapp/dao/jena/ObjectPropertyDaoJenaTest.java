@@ -2,23 +2,27 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
+import org.apache.log4j.Level;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.impl.RDFDefaultErrorHandler;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
+import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 
-public class ObjectPropertyDaoJenaTest {
-
+public class ObjectPropertyDaoJenaTest extends AbstractTestClass {  
+        
 	@Test
 	public void testCollateBySubclass(){
 		/* Check that we can save collateBySubclass */

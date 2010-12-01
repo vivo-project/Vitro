@@ -51,4 +51,8 @@ public interface ObjectPropertyDao extends PropertyDao {
 //    List /* of ObjectProperty */ getAllObjectProperties();
 
     List <ObjectProperty> getRootObjectProperties();
+    
+    public List<ObjectProperty> getObjectPropertyList(Individual subject);
+    
+    public List<ObjectProperty> getObjectPropertyList(String subjectUri); 
 }

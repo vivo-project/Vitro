@@ -46,12 +46,18 @@ public interface Individual extends ResourceBean, VitroTimeWindowedResource, Com
     List<ObjectProperty> getObjectPropertyList();
     void setPropertyList(List<ObjectProperty> propertyList);
 
+    List<ObjectProperty> getPopulatedObjectPropertyList();
+    void setPopulatedObjectPropertyList(List<ObjectProperty> propertyList);
+    
     Map<String,ObjectProperty> getObjectPropertyMap();
     void setObjectPropertyMap(Map<String,ObjectProperty> propertyMap);
     
     List<DataProperty> getDataPropertyList();
     void setDatatypePropertyList(List<DataProperty> datatypePropertyList);
 
+    List<DataProperty> getPopulatedDataPropertyList();
+    void setPopulatedDataPropertyList(List<DataProperty> dataPropertyList);
+    
     Map<String,DataProperty> getDataPropertyMap();
     void setDataPropertyMap(Map<String,DataProperty> propertyMap);
     

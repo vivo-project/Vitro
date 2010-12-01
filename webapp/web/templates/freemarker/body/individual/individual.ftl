@@ -71,7 +71,7 @@
                 </ul>
             </div>
         </#if>
-     
+
         <#-- <#include "individual-properties.ftl"> -->
 
         <#-- Keywords -->

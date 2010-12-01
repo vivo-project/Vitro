@@ -70,7 +70,27 @@ public class IndividualFiltering implements Individual {
         return outdProps;
     }
 
-
+    public List<DataProperty> getPopulatedDataPropertyList() {
+        List<DataProperty> dprops =  _innerIndividual.getPopulatedDataPropertyList();
+        LinkedList<DataProperty> outdProps = new LinkedList<DataProperty>();
+        Filter.filter(dprops,_filters.getDataPropertyFilter(), outdProps);
+        
+        ListIterator<DataProperty> it = outdProps.listIterator();
+        while(it.hasNext()){
+            DataProperty dp = it.next();
+            List<DataPropertyStatement> filteredStmts = 
+                new LinkedList<DataPropertyStatement>();
+            Filter.filter(dp.getDataPropertyStatements(),
+                    _filters.getDataPropertyStatementFilter(),filteredStmts);
+            if( filteredStmts == null || filteredStmts.size() == 0 ){
+                it.remove();
+            }else{
+                dp.setDataPropertyStatements(filteredStmts);
+            }
+        }
+        return outdProps;
+    }
+    
     public List<DataPropertyStatement> getDataPropertyStatements() {
         List<DataPropertyStatement> dstmts = _innerIndividual.getDataPropertyStatements();
         return filterDataPropertyStatements(dstmts);      
@@ -111,6 +131,13 @@ public class IndividualFiltering implements Individual {
     
     public List<ObjectProperty> getObjectPropertyList() {
         List <ObjectProperty> oprops = _innerIndividual.getObjectPropertyList();
+//        List<ObjectProperty> outOProps = new LinkedList<ObjectProperty>();
+//        Filter.filter(oprops, _filters.getObjectPropertyFilter(), outOProps);
+        return ObjectPropertyDaoFiltering.filterAndWrap(oprops, _filters);
+    }
+    
+    public List<ObjectProperty> getPopulatedObjectPropertyList() {
+        List <ObjectProperty> oprops = _innerIndividual.getPopulatedObjectPropertyList();
 //        List<ObjectProperty> outOProps = new LinkedList<ObjectProperty>();
 //        Filter.filter(oprops, _filters.getObjectPropertyFilter(), outOProps);
         return ObjectPropertyDaoFiltering.filterAndWrap(oprops, _filters);
@@ -360,6 +387,10 @@ public class IndividualFiltering implements Individual {
         _innerIndividual.setDatatypePropertyList(datatypePropertyList);
     }
 
+    public void setPopulatedDataPropertyList(List<DataProperty> dataPropertyList) {
+        _innerIndividual.setPopulatedDataPropertyList(dataPropertyList);
+    }
+    
     public void setDescription(String in) {
         _innerIndividual.setDescription(in);
     }
@@ -452,6 +483,10 @@ public class IndividualFiltering implements Individual {
         _innerIndividual.setPropertyList(propertyList);
     }
 
+    public void setPopulatedObjectPropertyList(List<ObjectProperty> propertyList) {
+        _innerIndividual.setPopulatedObjectPropertyList(propertyList);
+    }
+    
     public void setStatus(String s) {
         _innerIndividual.setStatus(s);
     }

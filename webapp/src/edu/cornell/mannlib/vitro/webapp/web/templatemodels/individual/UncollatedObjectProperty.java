@@ -2,19 +2,28 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 
 public class UncollatedObjectProperty extends ObjectPropertyTemplateModel {
 
-    private List<ObjectPropertyStatementTemplateModel> statements = null;
+    private List<ObjectPropertyStatementTemplateModel> statements;
     
-    UncollatedObjectProperty(String predicateUri) {
-        super(predicateUri);
-        // TODO Auto-generated constructor stub
+    UncollatedObjectProperty(ObjectProperty property) {
+        super(property);
+        statements = new ArrayList<ObjectPropertyStatementTemplateModel>();
     }
     
     public List<ObjectPropertyStatementTemplateModel> getStatements() {
         return statements;
     }
+    
 
+    /* Access methods for templates */
+    
+    public boolean getIsCollatedBySubtype() {
+        return false;
+    }
 }

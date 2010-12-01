@@ -36,8 +36,10 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
     protected Date timekey = null;
     protected Timestamp modTime = null;
     protected List <ObjectProperty>propertyList = null;
+    protected List<ObjectProperty> populatedObjectPropertyList = null;
     protected Map <String,ObjectProperty> objectPropertyMap = null;
     protected List <DataProperty>datatypePropertyList = null;
+    protected List<DataProperty> populatedDataPropertyList = null;
     protected Map <String,DataProperty> dataPropertyMap = null;
     protected List <DataPropertyStatement>dataPropertyStatements = null;
     protected List <ObjectPropertyStatement>objectPropertyStatements = null;
@@ -118,6 +120,12 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
     public void setPropertyList(List <ObjectProperty>propertyList) {
         this.propertyList = propertyList;
     }
+    public List<ObjectProperty> getPopulatedObjectPropertyList() {
+        return populatedObjectPropertyList;
+    }
+    public void setPopulatedObjectPropertyList(List<ObjectProperty> propertyList) {
+        populatedObjectPropertyList = propertyList;
+    }
     public Map<String,ObjectProperty> getObjectPropertyMap() {
     	return this.objectPropertyMap;
     }
@@ -129,6 +137,12 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
     }
     public void setDatatypePropertyList(List <DataProperty>datatypePropertyList) {
         this.datatypePropertyList = datatypePropertyList;
+    }
+    public List<DataProperty> getPopulatedDataPropertyList() {
+        return populatedDataPropertyList;
+    }
+    public void setPopulatedDataPropertyList(List<DataProperty> propertyList) {
+        populatedDataPropertyList = propertyList;
     }
     public Map<String,DataProperty> getDataPropertyMap() {
     	return this.dataPropertyMap;

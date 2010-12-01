@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.hp.hpl.jena.iri.IRI;
 import com.hp.hpl.jena.iri.IRIFactory;
@@ -29,6 +30,7 @@ import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
+import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.ApplicationDao;
 import edu.cornell.mannlib.vitro.webapp.dao.Classes2ClassesDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
@@ -47,7 +49,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PortalDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
-import edu.cornell.mannlib.vitro.webapp.dao.PropertyListDao;
 import edu.cornell.mannlib.vitro.webapp.dao.TabDao;
 import edu.cornell.mannlib.vitro.webapp.dao.TabIndividualRelationDao;
 import edu.cornell.mannlib.vitro.webapp.dao.TabVClassRelationDao;
@@ -546,14 +547,6 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
         if( propertyInstanceDao == null )
             propertyInstanceDao = new PropertyInstanceDaoJena(this);
         return propertyInstanceDao;
-    }
-    
-    private PropertyListDao propertyListDao = null;
-    public PropertyListDao getPropertyListDao() {
-        if (propertyListDao == null) {
-            propertyListDao = new PropertyListDaoJena(this);
-        }
-        return propertyListDao;
     }
 
     protected VClassDao vClassDao = null;

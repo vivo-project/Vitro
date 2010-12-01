@@ -17,6 +17,11 @@ import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntProperty;
 import com.hp.hpl.jena.ontology.OntResource;
 import com.hp.hpl.jena.ontology.ProfileException;
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -43,6 +48,27 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectPropertyDao {
     private static final Log log = LogFactory.getLog(ObjectPropertyDaoJena.class.getName());
 
+    protected static final String objectPropertyQueryString = 
+        PREFIXES + "\n" +
+        "SELECT DISTINCT ?predicate WHERE { \n" +
+        //"   GRAPH ?g {\n" + 
+        "       ?subject ?predicate ?object . \n" +
+        "       ?predicate rdf:type owl:ObjectProperty . \n" +
+        //"       OPTIONAL { ?predicate vitro:inPropertyGroupAnnot ?group } . \n" +
+        //"   }\n" +
+        "}" +
+        "ORDER BY ?predicate\n";
+
+    static protected Query objectPropertyQuery;
+    static {
+        try {
+            objectPropertyQuery = QueryFactory.create(objectPropertyQueryString);
+        } catch(Throwable th){
+            log.error("could not create SPARQL query for objectPropertyQueryString " + th.getMessage());
+            log.error(objectPropertyQueryString);
+        }           
+    }
+    
     public ObjectPropertyDaoJena(WebappDaoFactoryJena wadf) {
         super(wadf);
     }
@@ -799,4 +825,31 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
     	return false;
     }
 
+    @Override
+    public List<ObjectProperty> getObjectPropertyList(Individual subject) {
+        return getObjectPropertyList(subject.getURI());
+    }
+    
+    @Override
+    public List<ObjectProperty> getObjectPropertyList(String subjectUri) {
+        log.debug("objectPropertyQuery:\n" + objectPropertyQuery);
+        ResultSet results = getPropertyQueryResults(subjectUri, objectPropertyQuery);
+        List<ObjectProperty> properties = new ArrayList<ObjectProperty>();
+        while (results.hasNext()) {
+            QuerySolution sol = results.next();
+            Resource resource = sol.getResource("predicate");
+            // This is a hack to throw out properties in the vitro, rdf, rdfs, and owl namespaces.
+            // It will be implemented in a better way in v1.3 (Editing and Display Configuration).
+            // It must be done here rather than in PropertyList or PropertyListBuilder, because
+            // those properties must be removed for the IndividualFiltering object.
+            if ( ! EXCLUDED_NAMESPACES.contains(resource.getNameSpace())) {
+                String uri = resource.getURI();
+                ObjectProperty property = getObjectPropertyByURI(uri);
+                properties.add(property);
+            }
+        }
+        return properties; 
+    }
+
+    
 }

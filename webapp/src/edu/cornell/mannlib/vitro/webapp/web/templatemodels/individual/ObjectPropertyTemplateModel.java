@@ -2,11 +2,23 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
-public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel {
+import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 
-    ObjectPropertyTemplateModel(String predicateUri) {
-        super(predicateUri);
-        // TODO Auto-generated constructor stub
+public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel {
+    
+    private static final String TYPE = "object";
+
+    ObjectPropertyTemplateModel(ObjectProperty property) {
+        super(property);
     }
+    
+
+    /* Access methods for templates */
+    
+    public String getType() {
+        return TYPE;
+    }
+    
+    public abstract boolean getIsCollatedBySubtype();
 
 }

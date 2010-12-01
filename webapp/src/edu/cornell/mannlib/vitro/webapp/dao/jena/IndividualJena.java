@@ -43,6 +43,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
+import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.ImageInfo;
@@ -735,6 +736,14 @@ public class IndividualJena extends IndividualImpl implements Individual {
             return this.propertyList;
         }
     }
+
+    @Override 
+    public List<ObjectProperty> getPopulatedObjectPropertyList() {
+        if (populatedObjectPropertyList == null) {
+            populatedObjectPropertyList = webappDaoFactory.getObjectPropertyDao().getObjectPropertyList(this);
+        }
+        return populatedObjectPropertyList;       
+    }
     
     @Override
     public Map<String,ObjectProperty> getObjectPropertyMap() {
@@ -780,6 +789,14 @@ public class IndividualJena extends IndividualImpl implements Individual {
             }
             return this.datatypePropertyList;
         }
+    }
+    
+    @Override 
+    public List<DataProperty> getPopulatedDataPropertyList() {
+        if (populatedDataPropertyList == null) {
+            populatedDataPropertyList = webappDaoFactory.getDataPropertyDao().getDataPropertyList(this);
+        }
+        return populatedDataPropertyList;       
     }
     
     @Override

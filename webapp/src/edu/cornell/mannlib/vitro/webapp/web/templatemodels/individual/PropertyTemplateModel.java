@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
+import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 
 /** 
@@ -9,15 +10,26 @@ import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
  */
 public abstract class PropertyTemplateModel extends BaseTemplateModel {
     
-    // Not sure whether we need the property or the uri.
-    protected String predicateUri = null; 
+    protected Property property;
     
-    PropertyTemplateModel(String predicateUri) {
-        this.predicateUri = predicateUri;
+    PropertyTemplateModel(Property propertry) {
+        this.property = property;
     }
+    
+    protected Property getProperty() {
+        return property;
+    }
+    
+    protected String getUri() {
+        return property.getURI();
+    }
+    
+    /* Access methods for templates */
     
     public String getAddLink() {
         return null;
     }
+    
+    public abstract String getType();
  
 }

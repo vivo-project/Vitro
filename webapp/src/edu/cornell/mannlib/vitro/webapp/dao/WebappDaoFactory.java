@@ -132,6 +132,4 @@ public interface WebappDaoFactory {
     public NamespaceDao getNamespaceDao();
     
     public PropertyInstanceDao getPropertyInstanceDao();    
-    
-    public PropertyListDao getPropertyListDao();
 }

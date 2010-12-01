@@ -2,15 +2,18 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 
 public class CollatedObjectProperty extends ObjectPropertyTemplateModel {
 
-    private List<SubclassList> subclassList = null;
+    private List<SubclassList> subclassList;
     
-    CollatedObjectProperty(String predicateUri) {
-        super(predicateUri);
-        // TODO Auto-generated constructor stub
+    CollatedObjectProperty(ObjectProperty property) {
+        super(property);
+        subclassList = new ArrayList<SubclassList>();
     }
     
     public List<SubclassList> getSubclassList() {
@@ -19,5 +22,11 @@ public class CollatedObjectProperty extends ObjectPropertyTemplateModel {
     
     public List<SubclassList> getStatements() {
         return subclassList;
+    }
+    
+    /* Access methods for templates */
+    
+    public boolean getIsCollatedBySubtype() {
+        return true;
     }
 }

@@ -880,6 +880,14 @@ public class IndividualSDB extends IndividualImpl implements Individual {
             return this.propertyList;
         }
     }
+
+    @Override 
+    public List<ObjectProperty> getPopulatedObjectPropertyList() {
+        if (populatedObjectPropertyList == null) {
+            populatedObjectPropertyList = webappDaoFactory.getObjectPropertyDao().getObjectPropertyList(this);
+        }
+        return populatedObjectPropertyList;       
+    }
     
     @Override
     public Map<String,ObjectProperty> getObjectPropertyMap() { 
@@ -925,6 +933,14 @@ public class IndividualSDB extends IndividualImpl implements Individual {
             }
             return this.datatypePropertyList;
         }
+    }
+
+    @Override 
+    public List<DataProperty> getPopulatedDataPropertyList() {
+        if (populatedDataPropertyList == null) {
+            populatedDataPropertyList = webappDaoFactory.getDataPropertyDao().getDataPropertyList(this);
+        }
+        return populatedDataPropertyList;       
     }
     
     @Override

@@ -868,7 +868,15 @@ public class IndividualSDB2 extends IndividualImpl implements Individual {
             return this.propertyList;
         }
     }
-    
+
+    @Override 
+    public List<ObjectProperty> getPopulatedObjectPropertyList() {
+        if (populatedObjectPropertyList == null) {
+            populatedObjectPropertyList = webappDaoFactory.getObjectPropertyDao().getObjectPropertyList(this);
+        }
+        return populatedObjectPropertyList;       
+    }
+
     @Override
     public Map<String,ObjectProperty> getObjectPropertyMap() {
     	if (this.objectPropertyMap != null) {
