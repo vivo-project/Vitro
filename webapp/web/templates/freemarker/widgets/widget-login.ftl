@@ -36,7 +36,7 @@
        
         <form  role="form" id="login-form" action="${formAction}" method="post" name="login-form" />
             <label for="email">Email</label>
-            <input class="text-field" name="loginName" id="loginName" type="text" required />
+            <input class="text-field" name="loginName" id="loginName" type="text" value="${loginName!}" required />
 
             <label for="password">Password</label>
             <input class="text-field" name="loginPassword" id="password" type="password" required />

@@ -70,7 +70,7 @@ public class Authenticate extends VitroHttpServlet {
 		try {
 			// Where do we stand in the process?
 			State entryState = getCurrentLoginState(vreq);
-			log.debug("State on entry: " + entryState);
+			dumpStateToLog("entry", entryState, vreq);
 
 			// Act on any input.
 			switch (entryState) {
@@ -90,7 +90,7 @@ public class Authenticate extends VitroHttpServlet {
 
 			// Now where do we stand?
 			State exitState = getCurrentLoginState(vreq);
-			log.debug("State on exit: " + exitState);
+			dumpStateToLog("exit", exitState, vreq);
 
 			// Send them on their way.
 			switch (exitState) {
@@ -162,9 +162,9 @@ public class Authenticate extends VitroHttpServlet {
 		if ((username == null) || username.isEmpty()) {
 			bean.setMessage(Message.NO_USERNAME);
 			return;
-		} else {
-			bean.setUsername(username);
 		}
+
+		bean.setUsername(username);
 
 		User user = getAuthenticator(request).getUserByUsername(username);
 		log.trace("User is " + (user == null ? "null" : user.getURI()));
@@ -418,6 +418,21 @@ public class Authenticate extends VitroHttpServlet {
 		}
 
 		jenaOntModel.getBaseModel().notifyEvent(event);
+	}
+
+	private void dumpStateToLog(String label, State state, VitroRequest vreq) {
+		log.debug("State on " + label + ": " + state);
+		
+		if (log.isTraceEnabled()) {
+			log.trace("Status bean on " + label + ": "
+					+ LoginStatusBean.getBean(vreq));
+
+			LoginProcessBean processBean = null;
+			if (LoginProcessBean.isBean(vreq)) {
+				processBean = LoginProcessBean.getBean(vreq);
+			}
+			log.trace("Process bean on " + label + ": " + processBean);
+		}
 	}
 
 	@Override
