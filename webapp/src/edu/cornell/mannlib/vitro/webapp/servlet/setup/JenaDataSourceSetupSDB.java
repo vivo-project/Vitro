@@ -231,7 +231,9 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
             //WebappDaoFactory infWadf = new WebappDaoFactoryJena(inferenceOms, defaultNamespace, null, null);
             sce.getServletContext().setAttribute("deductionsWebappDaoFactory", infWadf);
             
-            sce.getServletContext().setAttribute("jenaOntModel", unionModel);  
+            OntModel masterUnion = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM,
+            		ModelFactory.createUnion(unionABoxModel, unionTBoxModel));
+            sce.getServletContext().setAttribute("jenaOntModel", masterUnion);  
             WebappDaoFactory wadf = new WebappDaoFactorySDB(unionOms, dataset, defaultNamespace, null, null);
             //WebappDaoFactory wadf = new WebappDaoFactoryJena(unionOms, defaultNamespace, null, null);
             sce.getServletContext().setAttribute("webappDaoFactory",wadf);
