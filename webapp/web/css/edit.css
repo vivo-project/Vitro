@@ -1,5 +1,70 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
+/******************* mb863: making styles theme agnostic ********************************/
+
+label{
+    display: block; 
+    margin-top: .5em; 
+}
+input{
+    padding:0.4em;
+}
+
+
+
+/******************* mb863: content below copied from Wilma theme /css/formedit.css ********************************/
+
+form {
+    padding-bottom: 20px;
+}
+
+.form p {
+    margin-bottom:0.5em;
+}
+
+form textarea {
+    width: 60%;
+}
+
+form a:link.cancel, form a:visited.cancel {
+    color: #f70;
+    border-color: #f70;
+}
+
+form a:hover.cancel {
+    text-decoration: none;
+}
+
+form select option{
+    padding-right: 5px;
+}
+
+form dl {
+    margin-bottom: 20px;
+}
+
+form dl dt, form dl dd {
+    padding-top: 15px;
+}
+
+.validationError {
+    padding-top: .5em;
+    color:red;
+}
+
+.inlineForm input {
+  display:inline;
+}
+
+.inlineForm label {
+  display:inline;
+}
+
+p.submit {
+  clear: left;
+  margin-top: 2em;
+}
+
 /******************* styles copied from old global.css.jsp ********************************/
 
 .buttonForm {

@@ -72,7 +72,7 @@
             </div>
         </#if>
      
-        <#include "individual-properties.ftl">
+        <#-- <#include "individual-properties.ftl"> -->
 
         <#-- Keywords -->
         <#if individual.keywords?has_content>
@@ -81,7 +81,110 @@
     </div> <!-- #contents -->
 
 </div> <!-- #personWrap -->
+<#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
+<section id="individual-intro-person" class="vcard">
+    <div id="individual-intro-left-content"> 
+        <#-- Thumbnail -->
+        <#--<div id="dprop-vitro-image" class="propsItem ${editingClass}">-->
+            <#if individual.thumbUrl??>
+                <#--<@p.dataPropsWrapper id="thumbnail">-->
+                    <a href="${individual.imageUrl}"><img class="individual-photo2" src="${individual.thumbUrl}" title="click to view larger image" alt="${individual.name}" width="115" /></a>
+                 <#--</@p.dataPropsWrapper>-->
+            <#elseif individual.person>
+                 <#--<@p.dataPropsWrapper id="thumbnail">-->
+                    <img class="individual-photo2" src="${urls.images}/dummyImages/person.thumbnail.jpg" title = "no image" alt="placeholder image" width="115" />                                                 
+                 <#--</@p.dataPropsWrapper>-->         
+            </#if>
+        <#--</div>-->
+        
+        <nav>
+            <ul id ="individual-tools-people">
+                <li><a class="picto-font  picto-uri" href="#">j</a></li>
+                <li><a class="picto-font  picto-pdf" href="#">F</a></li>
+                <li><a class="picto-font  picto-share" href="#">R</a></li>
+                <li><a class="icon-rdf" href="#">RDF</a></li>
+            </ul>
+        </nav>
+        
+        <a class="email" href="#"><span class ="picto-font  picto-email">M</span> email@cornell.edu</a> <a class="tel" href="#"><img class ="icon-phone" src="${urls.images}/individual/phone-icon.gif" />555 567 7878</a>
+        
+        <nav>
+            <ul id ="individual-urls-people">
+                <li><a href="#">&lt;core:PrimaryURLLink&gt;</a></li>
+                <li><a href="#">&lt;core:URLLink&gt;</a></li>
+                <li><a href="#">&lt;core:URLLink&gt;</a></li>
+                <li><a href="#">&lt;core:URLLink&gt;</a></li>
+            </ul>
+        </nav>
+    </div>
+    
+    <div id="individual-intro-right-content"><!-- mb863 get rid off div-->
+        <header>
+            <#if relatedSubject??>
+                <h2>${relatedSubject.relatingPredicateDomainPublic} for ${relatedSubject.name}</h2>
+                <p><a href="${relatedSubject.url}">&larr; return to ${relatedSubject.name}</a></p>                
+            <#else>
+                <#-- Label -->
+                <#--<@p.dataPropWrapper id="label">-->
+                    <h1 class="fn">${individual.name}
+                <#--</@p.dataPropWrapper>-->
+
+                <#-- Moniker -->
+                <#if individual.moniker?has_content>
+                    <#--<@p.dataPropsWrapper id="moniker">-->
+                        <span class="preferred-title">${individual.moniker}</span>
+                    <#--</@p.dataPropsWrapper>-->                   
+                </#if>
+                    </h1>
+            </#if>
+               
+            <h2>Current Positions</h2>
+            
+            <ul id ="individual-positions">
+                <li><a href="#">Dancing in heaven with other famous people</a></li>
+                <li><a href="#">Sabbatic year for ever</a></li>
+            </ul>
+        </header>
+        
+        <p class="individual-overview">Born Margarita Carmen Cansino in Brooklyn, New York City, she was the daughter of flamenco dancer Eduardo Cansino, Sr., who was himself a Sephardic Jewish Spaniard from Castilleja de la Cuesta (Seville), and Ziegfeld girl Volga Hayworth who was of Irish and English descent. She was raised as a Roman Catholic. Her father wanted her to become a dancer while her mother hoped she would become an actress. Her grandfather, Antonio Cansino [+]</p>
+        
+        <h2>Roles</h2>
+
+        <ul id ="individual-roles">
+            <li><a href="#">Researcher (5)</a></li>
+            <li><a href="#">Principal Investigator (3)</a></li>
+            <li><a href="#">Teacher (2)</a></li>
+        </ul>
+    </div>
+</section>
+
+<section id="publications-visualization">
+    <section id="sparklines-publications">
+        <header><img src="${urls.home}/images/individual/sparkline.gif" />
+            <h3><span class="grey">2</span> publications <span class="publication-year-range grey">within the last 10 years</span></h3>
+        </header>
+        
+        <p><a class="all-vivo-publications" href="#">All VIVO publications & co-author network.</a></p>
+    </section>
+    
+    <section id="co-authors">
+        <header>
+            <h3><span class="grey">10 </span>Co-Authors</h3>
+        </header>
+        
+        <ul>
+            <li><a href="#"><img class="co-author" src="${urls.images}/individual/Bacall.jpg" /></a></li>
+            <li><a href="#"><img class="co-author" src="${urls.images}/individual/Bogart.jpg" /></a></li>
+            <li><a href="#"><img class="co-author" src="${urls.images}/individual/Gable.jpg" /></a></li>
+            <li><a href="#"><img class="co-author" src="${urls.images}/individual/Grant.jpg" /></a></li>
+            <li><a href="#"><img class="co-author" src="${urls.images}/individual/Leigh.jpg" /></a></li>
+            <li><a href="#"><img class="co-author" src="${urls.images}/individual/Welles.jpg" /></a></li>
+        </ul>
+        
+        <p class="view-all-coauthors"><a class="view-all-style" href="#">View All <span class="pictos-arrow-10">4</span></a></p>
+    </section>
+</section>
 ${stylesheets.addFromTheme("/css/entity.css")}
                            
 <#-- RY Figure out which of these scripts really need to go into the head, and which are needed at all (e.g., tinyMCE??) -->
