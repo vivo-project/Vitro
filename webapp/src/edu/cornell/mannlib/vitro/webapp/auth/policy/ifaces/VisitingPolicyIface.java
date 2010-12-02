@@ -3,8 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces;
 
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AddResource;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.DropResource;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.admin.AddNewUser;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.admin.LoadOntology;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.admin.RebuildTextIndex;
@@ -22,6 +20,8 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropDataPr
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropObjectPropStmt;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditDataPropStmt;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjPropStmt;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.resource.AddResource;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.resource.DropResource;
 
 /**
  * This is a interface to write a policy that uses the Visitor pattern.
