@@ -12,6 +12,7 @@ import org.openrdf.model.impl.URIImpl;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Link;
+import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
@@ -152,7 +153,7 @@ public class IndividualTemplateModel extends BaseTemplateModel {
         return models;
     }
 
-    public GroupedPropertyList getPropertyList() {
+    public List<PropertyGroup> getPropertyList() {
         PropertyListBuilder propListBuilder = new PropertyListBuilder(individual, vreq);
         return propListBuilder.getPropertyList();
         //return new GroupedPropertyList(individual, vreq);
