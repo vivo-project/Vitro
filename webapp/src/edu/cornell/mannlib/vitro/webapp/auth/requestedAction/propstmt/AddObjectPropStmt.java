@@ -5,23 +5,18 @@ package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.VisitingPolicyIface;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.ThreeParameterAction;
 
-public class AddObjectPropStmt extends ThreeParameterAction implements RequestedAction {
+public class AddObjectPropStmt extends ObjectPropertyAction implements
+		RequestedAction {
 
-    public AddObjectPropStmt(String uriOfSub, String uriOfPred, String uriOfObj){
-        this.uriOfSubject = uriOfSub;
-        this.uriOfObject = uriOfObj;
-        this.uriOfPredicate = uriOfPred;
-    }
+	public AddObjectPropStmt(String uriOfSub, String uriOfPred, String uriOfObj) {
+		super(uriOfSub, uriOfPred, uriOfObj);
+	}
 
-    public String getURI() {
-        return RequestActionConstants.actionNamespace + this.getClass().getName();
-    }
-
-    public PolicyDecision accept(VisitingPolicyIface policy, IdentifierBundle ids){
-        return policy.visit(ids,this);
-    }
+	@Override
+	public PolicyDecision accept(VisitingPolicyIface policy,
+			IdentifierBundle ids) {
+		return policy.visit(ids, this);
+	}
 }

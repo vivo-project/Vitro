@@ -5,33 +5,25 @@ package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.VisitingPolicyIface;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.ThreeParameterAction;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 
-public class EditObjPropStmt extends ThreeParameterAction implements RequestedAction {
-    
-       
-    public EditObjPropStmt(ObjectPropertyStatement ops){    
-        setUriOfSubject(ops.getSubjectURI());
-        setUriOfPredicate(ops.getPropertyURI());
-        setUriOfObject(ops.getObjectURI());
-    }
-    
-    public EditObjPropStmt(String subjectUri, String keywordPredUri,
-            String objectUri) {
-        setUriOfSubject(subjectUri);
-        setUriOfPredicate(keywordPredUri);
-        setUriOfObject(objectUri);
-    }
+public class EditObjPropStmt extends ObjectPropertyAction implements
+		RequestedAction {
 
-    public PolicyDecision accept(VisitingPolicyIface policy, IdentifierBundle whoToAuth) {
-        return policy.visit(whoToAuth,this);
-    }
+	public EditObjPropStmt(ObjectPropertyStatement ops) {
+		super(ops.getSubjectURI(), ops.getPropertyURI(), ops.getObjectURI());
+	}
 
-    public String getURI() {
-     return RequestActionConstants.actionNamespace + this.getClass().getName();
-    }
+	public EditObjPropStmt(String subjectUri, String keywordPredUri,
+			String objectUri) {
+		super(subjectUri, keywordPredUri, objectUri);
+	}
+
+	@Override
+	public PolicyDecision accept(VisitingPolicyIface policy,
+			IdentifierBundle whoToAuth) {
+		return policy.visit(whoToAuth, this);
+	}
 
 }
