@@ -16,35 +16,17 @@ import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory.SelfEditing;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.VisitingPolicyIface;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.admin.AddNewUser;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.admin.LoadOntology;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.admin.RebuildTextIndex;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.admin.RemoveUser;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.admin.ServerStatus;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.admin.UpdateTextIndex;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.admin.UploadFile;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.AdminRequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.OntoRequestedAction;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ontology.CreateOwlClass;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ontology.DefineDataProperty;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ontology.DefineObjectProperty;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ontology.RemoveOwlClass;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPropStmt;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropStmt;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropDataPropStmt;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropObjectPropStmt;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditDataPropStmt;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjPropStmt;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.resource.AddResource;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.resource.DropResource;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AbstractDataPropertyAction;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AbstractObjectPropertyAction;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.resource.AbstractResourceAction;
 
 /**
  * Policy to use for Vivo Self-Editing based on NetId for use at Cornell. All
  * methods in this class should be thread safe and side effect free.
  */
-public class SelfEditingPolicy implements VisitingPolicyIface {
+public class SelfEditingPolicy implements PolicyIface {
 	protected static Log log = LogFactory.getLog(SelfEditingPolicy.class);
 
 	protected final OntModel model;
@@ -68,226 +50,119 @@ public class SelfEditingPolicy implements VisitingPolicyIface {
 		if (whatToAuth == null) {
 			return defaultDecision("whatToAuth was null");
 		}
-		if (whatToAuth instanceof OntoRequestedAction) {
-			return defaultDecision("Won't authorize OntoRequestedActions");
-		}
-		if (whatToAuth instanceof AdminRequestedAction) {
-			return defaultDecision("Won't authorize AdminRequestedActions");
-		}
-		if (getUrisOfSelfEditor(whoToAuth).isEmpty()) {
-			return defaultDecision("no non-blacklisted SelfEditing Identifier "
-					+ "found in IdentifierBundle");
+
+		List<String> userUris = getUrisOfSelfEditor(whoToAuth);
+
+		if (userUris.isEmpty()) {
+			return defaultDecision("Not self-editing.");
 		}
 
-		// kick off the visitor pattern
-		return whatToAuth.accept(this, whoToAuth);
+		if (whatToAuth instanceof AbstractObjectPropertyAction) {
+			return isAuthorizedForObjectPropertyAction(userUris,
+					(AbstractObjectPropertyAction) whatToAuth);
+		}
+		
+		if (whatToAuth instanceof AbstractDataPropertyAction) {
+			return isAuthorizedForDataPropertyAction(userUris,
+					(AbstractDataPropertyAction) whatToAuth);
+		}
+		
+		if (whatToAuth instanceof AbstractResourceAction) {
+			return isAuthorizedForResourceAction((AbstractResourceAction) whatToAuth);
+		}
+
+		return defaultDecision("Does not authorize "
+				+ whatToAuth.getClass().getSimpleName() + " actions");
 	}
 
-	// ----------------------------------------------------------------------
-	// Visitor methods.
-	// ----------------------------------------------------------------------
+	/**
+	 * The user can edit a object property if it is not restricted and if it is
+	 * about him.
+	 */
+	private PolicyDecision isAuthorizedForObjectPropertyAction(
+			List<String> userUris, AbstractObjectPropertyAction action) {
+		String subject = action.getUriOfSubject();
+		String predicate = action.getUriOfPredicate();
+		String object = action.getUriOfObject();
 
-	public PolicyDecision visit(IdentifierBundle ids, AddResource action) {
-		PolicyDecision pd = checkNullArguments(ids, action);
-		if (pd == null)
-			pd = checkRestrictedResource(action.getSubjectUri());
-		if (pd == null)
-			pd = authorizedDecision("May add resource.");
-		return pd;
+		if (!restrictor.canModifyResource(subject)) {
+			return cantModifyResource(subject);
+		}
+		if (!restrictor.canModifyPredicate(predicate)) {
+			return cantModifyPredicate(predicate);
+		}
+		if (!restrictor.canModifyResource(object)) {
+			return cantModifyResource(object);
+		}
+
+		if (userCanEditAsSubjectOrObjectOfStmt(userUris, subject, object)) {
+			return authorizedDecision("User is subject or object of statement.");
+		} else {
+			return userNotAuthorizedToStatement();
+		}
 	}
 
-	public PolicyDecision visit(IdentifierBundle ids, DropResource action) {
-		PolicyDecision pd = checkNullArguments(ids, action);
-		if (pd == null)
-			pd = checkRestrictedResource(action.getSubjectUri());
-		if (pd == null)
-			pd = authorizedDecision("May remove resource.");
-		return pd;
+	/**
+	 * The user can edit a data property if it is not restricted and if it is
+	 * about him.
+	 */
+	private PolicyDecision isAuthorizedForDataPropertyAction(
+			List<String> userUris, AbstractDataPropertyAction action) {
+		String subject = action.getSubjectUri();
+		String predicate = action.getPredicateUri();
+
+		if (!restrictor.canModifyResource(subject)) {
+			return cantModifyResource(subject);
+		}
+		if (!restrictor.canModifyPredicate(predicate)) {
+			return cantModifyPredicate(predicate);
+		}
+
+		if (userCanEditAsSubjectOfStmt(userUris, subject)) {
+			return authorizedDecision("User is subject of statement.");
+		} else {
+			return userNotAuthorizedToStatement();
+		}
 	}
 
-	public PolicyDecision visit(IdentifierBundle ids, AddObjectPropStmt action) {
-		PolicyDecision pd = checkNullArguments(ids, action);
-		if (pd == null)
-			pd = checkRestrictedResource(action.uriOfSubject);
-		if (pd == null)
-			pd = checkRestrictedResource(action.uriOfObject);
-		if (pd == null)
-			pd = checkRestrictedPredicate(action.uriOfPredicate);
-		if (pd == null)
-			pd = checkUserEditsAsSubjectOrObjectOfStmt(ids,
-					action.uriOfSubject, action.uriOfObject);
-		if (pd == null)
-			pd = defaultDecision("No basis for decision.");
-		return pd;
-	}
-
-	public PolicyDecision visit(IdentifierBundle ids, EditObjPropStmt action) {
-		PolicyDecision pd = checkNullArguments(ids, action);
-		if (pd == null)
-			pd = checkRestrictedResource(action.uriOfSubject);
-		if (pd == null)
-			pd = checkRestrictedResource(action.uriOfObject);
-		if (pd == null)
-			pd = checkRestrictedPredicate(action.uriOfPredicate);
-		if (pd == null)
-			pd = checkUserEditsAsSubjectOrObjectOfStmt(ids,
-					action.uriOfSubject, action.uriOfObject);
-		if (pd == null)
-			pd = defaultDecision("No basis for decision.");
-		return pd;
-	}
-
-	public PolicyDecision visit(IdentifierBundle ids, DropObjectPropStmt action) {
-		PolicyDecision pd = checkNullArguments(ids, action);
-		if (pd == null)
-			pd = checkRestrictedResource(action.uriOfSubject);
-		if (pd == null)
-			pd = checkRestrictedResource(action.uriOfObject);
-		if (pd == null)
-			pd = checkRestrictedPredicate(action.uriOfPredicate);
-		if (pd == null)
-			pd = checkUserEditsAsSubjectOrObjectOfStmt(ids,
-					action.uriOfSubject, action.uriOfObject);
-		if (pd == null)
-			pd = defaultDecision("No basis for decision.");
-		return pd;
-	}
-
-	public PolicyDecision visit(IdentifierBundle ids, AddDataPropStmt action) {
-		PolicyDecision pd = checkNullArguments(ids, action);
-		if (pd == null)
-			pd = checkRestrictedResource(action.getSubjectUri());
-		if (pd == null)
-			pd = checkRestrictedPredicate(action.getPredicateUri());
-		if (pd == null)
-			pd = checkUserEditsAsSubjectOfStmt(ids, action.getSubjectUri());
-		if (pd == null)
-			pd = defaultDecision("No basis for decision.");
-		return pd;
-	}
-
-	public PolicyDecision visit(IdentifierBundle ids, EditDataPropStmt action) {
-		PolicyDecision pd = checkNullArguments(ids, action);
-		if (pd == null)
-			pd = checkRestrictedResource(action.getSubjectUri());
-		if (pd == null)
-			pd = checkRestrictedPredicate(action.getPredicateUri());
-		if (pd == null)
-			pd = checkUserEditsAsSubjectOfStmt(ids, action.getSubjectUri());
-		if (pd == null)
-			pd = defaultDecision("No basis for decision.");
-		return pd;
-	}
-
-	public PolicyDecision visit(IdentifierBundle ids, DropDataPropStmt action) {
-		PolicyDecision pd = checkNullArguments(ids, action);
-		if (pd == null)
-			pd = checkRestrictedResource(action.getSubjectUri());
-		if (pd == null)
-			pd = checkRestrictedPredicate(action.getPredicateUri());
-		if (pd == null)
-			pd = checkUserEditsAsSubjectOfStmt(ids, action.getSubjectUri());
-		if (pd == null)
-			pd = defaultDecision("No basis for decision.");
-		return pd;
-	}
-
-	public PolicyDecision visit(IdentifierBundle ids, AddNewUser action) {
-		return defaultDecision("does not authorize administrative modifications");
-	}
-
-	public PolicyDecision visit(IdentifierBundle ids, RemoveUser action) {
-		return defaultDecision("does not authorize administrative modifications");
-	}
-
-	public PolicyDecision visit(IdentifierBundle ids, LoadOntology action) {
-		return defaultDecision("does not authorize administrative modifications");
-	}
-
-	public PolicyDecision visit(IdentifierBundle ids, RebuildTextIndex action) {
-		return defaultDecision("does not authorize administrative modifications");
-	}
-
-	public PolicyDecision visit(IdentifierBundle ids, UpdateTextIndex action) {
-		return defaultDecision("does not authorize administrative modifications");
-	}
-
-	public PolicyDecision visit(IdentifierBundle ids, ServerStatus action) {
-		return defaultDecision("does not authorize administrative modifications");
-	}
-
-	public PolicyDecision visit(IdentifierBundle ids, CreateOwlClass action) {
-		return defaultDecision("does not authorize administrative modifications");
-	}
-
-	public PolicyDecision visit(IdentifierBundle ids, RemoveOwlClass action) {
-		return defaultDecision("does not authorize administrative modifications");
-	}
-
-	public PolicyDecision visit(IdentifierBundle ids, DefineDataProperty action) {
-		return defaultDecision("does not authorize administrative modifications");
-	}
-
-	public PolicyDecision visit(IdentifierBundle ids,
-			DefineObjectProperty action) {
-		return defaultDecision("does not authorize administrative modifications");
-	}
-
-	public PolicyDecision visit(IdentifierBundle ids, UploadFile action) {
-		return defaultDecision("does not authorize administrative modifications");
+	/**
+	 * The user can add or remove resources if they are not restricted.
+	 */
+	private PolicyDecision isAuthorizedForResourceAction(
+			AbstractResourceAction action) {
+		String uri = action.getSubjectUri();
+		if (!restrictor.canModifyResource(uri)) {
+			return cantModifyResource(uri);
+		} else {
+			return authorizedDecision("May add/remove resource.");
+		}
 	}
 
 	// ----------------------------------------------------------------------
 	// Helper methods
 	// ----------------------------------------------------------------------
 
-	private PolicyDecision checkNullArguments(IdentifierBundle ids,
-			RequestedAction action) {
-		if (ids == null || action == null) {
-			return defaultDecision("Null action or ids.");
-		}
-		return null;
-	}
-
-	private PolicyDecision checkRestrictedResource(String uri) {
-		if (!restrictor.canModifyResource(uri)) {
-			return defaultDecision("No access to admin resources; "
-					+ "cannot modify " + uri);
-		}
-		return null;
-	}
-
-	private PolicyDecision checkRestrictedPredicate(String uri) {
-		if (!restrictor.canModifyPredicate(uri)) {
-			return defaultDecision("No access to admin predicates; "
-					+ "cannot modify " + uri);
-		}
-		return null;
-	}
-
-	private PolicyDecision checkUserEditsAsSubjectOfStmt(IdentifierBundle ids,
-			String uriOfSubject) {
-		List<String> userUris = getUrisOfSelfEditor(ids);
+	private boolean userCanEditAsSubjectOfStmt(List<String> userUris,
+			String subject) {
 		for (String userUri : userUris) {
-			if (userUri.equals(uriOfSubject)) {
-				return authorizedDecision("User is subject of statement.");
+			if (userUri.equals(subject)) {
+				return true;
 			}
 		}
-		return null;
+		return false;
 	}
 
-	private PolicyDecision checkUserEditsAsSubjectOrObjectOfStmt(
-			IdentifierBundle ids, String uriOfSubject, String uriOfObject) {
-		List<String> userUris = getUrisOfSelfEditor(ids);
+	private boolean userCanEditAsSubjectOrObjectOfStmt(List<String> userUris,
+			String subject, String object) {
 		for (String userUri : userUris) {
-			if (userUri.equals(uriOfSubject)) {
-				return authorizedDecision("User is subject of statement.");
+			if (userUri.equals(subject)) {
+				return true;
 			}
-			if (userUri.equals(uriOfObject)) {
-				return authorizedDecision("User is subject of statement.");
+			if (userUri.equals(object)) {
+				return true;
 			}
 		}
-		return null;
+		return false;
 	}
 
 	private List<String> getUrisOfSelfEditor(IdentifierBundle ids) {
@@ -303,6 +178,20 @@ public class SelfEditingPolicy implements VisitingPolicyIface {
 			}
 		}
 		return uris;
+	}
+
+	protected PolicyDecision cantModifyResource(String uri) {
+		return defaultDecision("No access to admin resources; cannot modify "
+				+ uri);
+	}
+
+	protected PolicyDecision cantModifyPredicate(String uri) {
+		return defaultDecision("No access to admin predicates; cannot modify "
+				+ uri);
+	}
+
+	private PolicyDecision userNotAuthorizedToStatement() {
+		return defaultDecision("User has no access to this statement.");
 	}
 
 	private PolicyDecision defaultDecision(String message) {
