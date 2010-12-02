@@ -13,8 +13,6 @@ import java.util.Map;
 
 import net.sf.jga.algorithms.Filter;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -29,7 +27,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.ObjectPropertyListDaoJena;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 
 /**
@@ -41,9 +38,6 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
  *
  */
 public class IndividualFiltering implements Individual {
-    
-    protected static final Log log = LogFactory.getLog(IndividualFiltering.class);
-
     private final Individual _innerIndividual;
     private final VitroFilters _filters;
 

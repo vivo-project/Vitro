@@ -872,7 +872,7 @@ public class IndividualSDB2 extends IndividualImpl implements Individual {
     @Override 
     public List<ObjectProperty> getPopulatedObjectPropertyList() {
         if (populatedObjectPropertyList == null) {
-            populatedObjectPropertyList = webappDaoFactory.getObjectPropertyListDao().getObjectPropertyList(this);
+            populatedObjectPropertyList = webappDaoFactory.getObjectPropertyDao().getObjectPropertyList(this);
         }
         return populatedObjectPropertyList;       
     }
@@ -921,14 +921,6 @@ public class IndividualSDB2 extends IndividualImpl implements Individual {
             }
             return this.datatypePropertyList;
         }
-    }
-
-    @Override 
-    public List<DataProperty> getPopulatedDataPropertyList() {
-        if (populatedDataPropertyList == null) {
-            populatedDataPropertyList = webappDaoFactory.getDataPropertyListDao().getDataPropertyList(this);
-        }
-        return populatedDataPropertyList;       
     }
     
     @Override

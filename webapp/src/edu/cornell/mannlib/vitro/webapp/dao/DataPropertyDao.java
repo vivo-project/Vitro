@@ -35,5 +35,8 @@ public interface DataPropertyDao extends PropertyDao {
     List<DataProperty> getRootDataProperties();
     
     boolean annotateDataPropertyAsExternalIdentifier(String dataPropertyURI);
-
+    
+    public List<DataProperty> getDataPropertyList(Individual subject);
+    
+    public List<DataProperty> getDataPropertyList(String subjectUri);
 }

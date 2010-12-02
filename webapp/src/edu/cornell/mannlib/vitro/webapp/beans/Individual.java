@@ -46,12 +46,6 @@ public interface Individual extends ResourceBean, VitroTimeWindowedResource, Com
     List<ObjectProperty> getObjectPropertyList();
     void setPropertyList(List<ObjectProperty> propertyList);
 
-    /* 
-     * RY These duplicate the functionality of getObjectPropertyList(),
-     * but get data through a sparql query rather than dao methods. They
-     * use a different field so as not to disrupt any code that depends on 
-     * the propertyList field. The two approaches should be integrated at a later point.
-     */
     List<ObjectProperty> getPopulatedObjectPropertyList();
     void setPopulatedObjectPropertyList(List<ObjectProperty> propertyList);
     
@@ -61,12 +55,6 @@ public interface Individual extends ResourceBean, VitroTimeWindowedResource, Com
     List<DataProperty> getDataPropertyList();
     void setDatatypePropertyList(List<DataProperty> datatypePropertyList);
 
-    /* 
-     * RY These duplicate the functionality of getDataPropertyList(),
-     * but get data through a sparql query rather than dao methods. They
-     * use a different field so as not to disrupt any code that depends on 
-     * the datatypePropertyList field. The two approaches should be integrated at a later point.
-     */
     List<DataProperty> getPopulatedDataPropertyList();
     void setPopulatedDataPropertyList(List<DataProperty> dataPropertyList);
     

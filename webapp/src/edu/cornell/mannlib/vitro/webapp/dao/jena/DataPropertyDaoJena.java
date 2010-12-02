@@ -61,6 +61,26 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
     
     protected static final Log log = LogFactory.getLog(DataPropertyDaoJena.class.getName());
     
+    protected static final String dataPropertyQueryString = 
+        PREFIXES + "\n" +
+        "SELECT DISTINCT ?property WHERE { \n" +
+        //"   GRAPH ?g {\n" + 
+        "       ?subject ?property ?object . \n" +        
+        "       ?property rdf:type owl:DatatypeProperty . \n" +
+        propertyFilters +
+        //"   }\n" +
+        "}";
+    
+    static protected Query dataPropertyQuery;
+    static {
+        try {
+            dataPropertyQuery = QueryFactory.create(dataPropertyQueryString);
+        } catch(Throwable th){
+            log.error("could not create SPARQL query for dataPropertyQueryString " + th.getMessage());
+            log.error(dataPropertyQueryString);
+        }             
+    }
+    
     private class DataPropertyRanker implements Comparator {
         public int compare (Object o1, Object o2) {
             DataProperty dp1 = (DataProperty) o1;
@@ -688,4 +708,32 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
             return rootProperties;
     }
 
+    @Override
+    public List<DataProperty> getDataPropertyList(Individual subject) {
+        return getDataPropertyList(subject.getURI());
+    }
+    
+    @Override
+    /*
+     * SPARQL-based method for getting the individual's data properties.
+     * Ideally this implementation should replace the existing way of getting
+     * the data property list, but the consequences of this may be far-reaching,
+     * so we are implementing a new method now and will merge the old approach
+     * into the new one in a future release.
+     */
+    public List<DataProperty> getDataPropertyList(String subjectUri) {
+        log.debug("dataPropertyQueryString:\n" + dataPropertyQueryString);         
+        log.debug("dataPropertyQuery:\n" + dataPropertyQuery);        
+        ResultSet results = getPropertyQueryResults(subjectUri, dataPropertyQuery);
+        List<DataProperty> properties = new ArrayList<DataProperty>();
+        while (results.hasNext()) {
+            QuerySolution sol = results.next();
+            Resource resource = sol.getResource("property");
+            String uri = resource.getURI();
+            DataProperty property = getDataPropertyByURI(uri);
+            properties.add(property);
+        }
+        return properties; 
+    }
+    
 }

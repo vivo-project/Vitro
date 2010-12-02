@@ -9,7 +9,6 @@ import java.util.Set;
 import edu.cornell.mannlib.vitro.webapp.dao.ApplicationDao;
 import edu.cornell.mannlib.vitro.webapp.dao.Classes2ClassesDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
-import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyListDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
 import edu.cornell.mannlib.vitro.webapp.dao.FlagDao;
@@ -20,7 +19,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.LinksDao;
 import edu.cornell.mannlib.vitro.webapp.dao.LinktypeDao;
 import edu.cornell.mannlib.vitro.webapp.dao.NamespaceDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
-import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyListDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PortalDao;
@@ -214,14 +212,6 @@ public class WebappDaoFactoryFiltering implements WebappDaoFactory {
     
     public PortalDao getPortalDao() {
         return innerWebappDaoFactory.getPortalDao();
-    }
-    
-    public ObjectPropertyListDao getObjectPropertyListDao() {
-        return innerWebappDaoFactory.getObjectPropertyListDao();
-    }
-    
-    public DataPropertyListDao getDataPropertyListDao() {
-        return innerWebappDaoFactory.getDataPropertyListDao();
     }
 
 ///////////////////////////////////////////////////////////////////

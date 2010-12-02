@@ -47,6 +47,26 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 
 public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectPropertyDao {
     private static final Log log = LogFactory.getLog(ObjectPropertyDaoJena.class.getName());
+
+    protected static final String objectPropertyQueryString = 
+        PREFIXES + "\n" +
+        "SELECT DISTINCT ?property WHERE { \n" +
+        //"   GRAPH ?g {\n" + 
+        "       ?subject ?property ?object . \n" +
+        "       ?property rdf:type owl:ObjectProperty . \n" +
+        propertyFilters +
+        //"   }\n" +
+        "}";
+
+    static protected Query objectPropertyQuery;
+    static {
+        try {
+            objectPropertyQuery = QueryFactory.create(objectPropertyQueryString);
+        } catch(Throwable th){
+            log.error("could not create SPARQL query for objectPropertyQueryString " + th.getMessage());
+            log.error(objectPropertyQueryString);
+        }           
+    }
     
     public ObjectPropertyDaoJena(WebappDaoFactoryJena wadf) {
         super(wadf);
@@ -804,4 +824,33 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
     	return false;
     }
 
+    @Override
+    public List<ObjectProperty> getObjectPropertyList(Individual subject) {
+        return getObjectPropertyList(subject.getURI());
+    }
+    
+    @Override
+    /*
+     * SPARQL-based method for getting the individual's object properties.
+     * Ideally this implementation should replace the existing way of getting
+     * the object property list, but the consequences of this may be far-reaching,
+     * so we are implementing a new method now and will merge the old approach
+     * into the new one in a future release.
+     */
+    public List<ObjectProperty> getObjectPropertyList(String subjectUri) {
+        log.debug("objectPropertyQueryString:\n" + objectPropertyQueryString);
+        log.debug("objectPropertyQuery:\n" + objectPropertyQuery);
+        ResultSet results = getPropertyQueryResults(subjectUri, objectPropertyQuery);
+        List<ObjectProperty> properties = new ArrayList<ObjectProperty>();
+        while (results.hasNext()) {
+            QuerySolution sol = results.next();
+            Resource resource = sol.getResource("property");
+            String uri = resource.getURI();
+            ObjectProperty property = getObjectPropertyByURI(uri);
+            properties.add(property);
+        }
+        return properties; 
+    }
+
+    
 }
