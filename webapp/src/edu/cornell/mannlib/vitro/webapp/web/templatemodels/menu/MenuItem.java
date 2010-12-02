@@ -13,10 +13,17 @@ public class MenuItem extends BaseTemplateModel {
     
     private String text;
     private String path;
+    private boolean active;
     
     public MenuItem(String linkText, String path) {
         text = linkText;
         this.path = path;
+    }
+    
+    public MenuItem(String linkText, String path, boolean active){
+        this.text= linkText;
+        this.path = path;
+        this.active= active;
     }
     
     public String getLinkText() {
@@ -26,4 +33,8 @@ public class MenuItem extends BaseTemplateModel {
     public String getUrl() {
         return getUrl(path);
     } 
+    
+    public boolean getActive(){
+        return active;
+    }
 }

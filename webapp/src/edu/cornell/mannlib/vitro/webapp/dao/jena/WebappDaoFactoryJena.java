@@ -42,10 +42,12 @@ import edu.cornell.mannlib.vitro.webapp.dao.KeywordDao;
 import edu.cornell.mannlib.vitro.webapp.dao.KeywordIndividualRelationDao;
 import edu.cornell.mannlib.vitro.webapp.dao.LinksDao;
 import edu.cornell.mannlib.vitro.webapp.dao.LinktypeDao;
+import edu.cornell.mannlib.vitro.webapp.dao.MenuDao;
 import edu.cornell.mannlib.vitro.webapp.dao.NamespaceDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
+import edu.cornell.mannlib.vitro.webapp.dao.PageDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PortalDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
@@ -77,6 +79,9 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     protected VClassGroupDao vClassGroupDao;
     protected PropertyGroupDao propertyGroupDao;
 
+    private PageDao pageDao;
+    private MenuDao menuDao;
+    
     protected OntModelSelector ontModelSelector;
     
     protected String defaultNamespace;
@@ -556,7 +561,8 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
         return vClassDao;
     }
 
-    private JenaBaseDao jenaBaseDao = null;
+    private JenaBaseDao jenaBaseDao = null;    
+    
     public JenaBaseDao getJenaBaseDao() {
         if (jenaBaseDao == null) {
             jenaBaseDao = new JenaBaseDao(this);
@@ -572,4 +578,18 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
         return this.flag2ClassLabelMap;
     }
 
+    @Override
+    public PageDao getPageDao() {
+        if( pageDao == null )
+            pageDao = new PageDaoJena(this);
+        return pageDao;
+    }
+
+    @Override
+    public MenuDao getMenuDao(){
+        if( menuDao == null )
+            menuDao = new MenuDaoJena(this);
+        return menuDao;
+    }
+    
 }

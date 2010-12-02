@@ -20,7 +20,7 @@ import com.hp.hpl.jena.rdf.model.impl.RDFDefaultErrorHandler;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu.Menu;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu.MainMenu;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu.MenuItem;
 
 
@@ -41,8 +41,11 @@ public class MenuDaoJenaTest extends AbstractTestClass {
 
     @Test
     public void getMenuItemTest(){
-        MenuDaoJena menuDaoJena = new MenuDaoJena(new WebappDaoFactoryJena(displayModel));
-        Menu menu = menuDaoJena.getMenu(VitroVocabulary.DISPLAY+"DefaultMenu", displayModel);       
+        SimpleOntModelSelector sos = new SimpleOntModelSelector( ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM));
+        sos.setDisplayModel(displayModel);
+        MenuDaoJena menuDaoJena = new MenuDaoJena(new WebappDaoFactoryJena(sos));
+        
+        MainMenu menu = menuDaoJena.getMainMenu( "notImportant" );       
         
         try{
             Class clz = UrlBuilder.class;

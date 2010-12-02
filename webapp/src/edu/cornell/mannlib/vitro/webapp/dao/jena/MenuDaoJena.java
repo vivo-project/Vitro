@@ -18,6 +18,7 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
 import edu.cornell.mannlib.vitro.webapp.dao.MenuDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu.MainMenu;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu.Menu;
 
 public class MenuDaoJena extends JenaBaseDao implements MenuDao {
@@ -35,9 +36,9 @@ public class MenuDaoJena extends JenaBaseDao implements MenuDao {
         prefixes + "\n" +
         "SELECT ?menuItem ?linkText ?urlMapping WHERE {\n" +
 //        "  GRAPH ?g{\n"+
-        "    ?menu rdf:type display:Menu .\n"+
+        "    ?menu rdf:type display:MainMenu .\n"+
         "    ?menu display:hasElement ?menuItem .  \n"+       
-        "    OPTIONAL { ?menuItem display:linkText ?linkText }.\n"+
+        "    ?menuItem display:linkText ?linkText .\n"+
         "    OPTIONAL { ?menuItem display:menuPosition ?menuPosition }.\n"+
         "    OPTIONAL { ?menuItem display:toPage ?page . }\n"+        
         "    OPTIONAL { ?page display:urlMapping ?urlMapping . }\n"+        
@@ -61,34 +62,38 @@ public class MenuDaoJena extends JenaBaseDao implements MenuDao {
     }
     
     @Override
-    public Menu getMenu(String uri) {
-        return getMenu(uri, getOntModelSelector().getDisplayModel());
+    public MainMenu getMainMenu( String url ) {
+        return getMenu( getOntModelSelector().getDisplayModel(), url );         
     }
+            
     
-    protected Menu getMenu(String uri, Model displayModel){                
+    protected MainMenu getMenu(Model displayModel, String url){                
         //setup query parameters
-        QuerySolutionMap initialBindings = new QuerySolutionMap();
-        initialBindings.add("menu", ResourceFactory.createResource(uri));
+        QuerySolutionMap initialBindings = new QuerySolutionMap();        
         
         //run SPARQL query to get menu and menu items        
-        QueryExecution qexec = QueryExecutionFactory.create(menuQuery,displayModel,initialBindings );
+        QueryExecution qexec = QueryExecutionFactory.create(menuQuery, displayModel, initialBindings );
         try{
-            Menu menu = new Menu();
+            MainMenu menu = new MainMenu();
             ResultSet results =qexec.execSelect();
             for( ; results.hasNext();){
                 QuerySolution soln = results.nextSolution();
                 Literal itemText = soln.getLiteral("linkText");
                 Literal itemLink = soln.getLiteral("urlMapping");
                 String text = itemText != null ? itemText.getLexicalForm():"(undefined text)";
-                String link = itemLink != null ? itemLink.getLexicalForm():"undefinedLink";                
-                menu.addItem(text,link);
+                String link = itemLink != null ? itemLink.getLexicalForm():"undefinedLink";
+                
+                menu.addItem(text,link, isActive( url, link ));
             }
             return menu;
         }catch(Throwable th){
             log.error(th,th);
-            return new Menu();
+            return new MainMenu();
         }
     }
 
  
+    protected boolean isActive(String url, String link){
+        return url.startsWith(link);
+    }
 }

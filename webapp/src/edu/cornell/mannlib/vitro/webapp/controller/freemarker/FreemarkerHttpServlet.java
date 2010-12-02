@@ -35,7 +35,7 @@ import edu.cornell.mannlib.vitro.webapp.web.PortalWebUtil;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.User;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.files.Scripts;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.files.Stylesheets;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu.TabMenu;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu.MainMenu;
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
@@ -323,6 +323,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         urls.put("themeImages", urlBuilder.getPortalUrl(themeDir + "/images"));
         urls.put("images", urlBuilder.getUrl("/images"));
         urls.put("theme", urlBuilder.getUrl(themeDir));
+        urls.put("index", urlBuilder.getUrl("/browse"));
 
         return urls;
     }
@@ -414,9 +415,12 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         return map;        
     }   
 
-    private TabMenu getTabMenu(VitroRequest vreq) {
-        int portalId = vreq.getPortal().getPortalId();
-        return new TabMenu(vreq, portalId);
+    private MainMenu getTabMenu(VitroRequest vreq) {
+//        int portalId = vreq.getPortal().getPortalId();
+//        return new TabMenu(vreq, portalId);
+        
+        String url = vreq.getRequestURI().substring(vreq.getContextPath().length());
+        return vreq.getWebappDaoFactory().getMenuDao().getMainMenu(url);
     }
     
     private final Map<String, Object> getCopyrightInfo(Portal portal) {

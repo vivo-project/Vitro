@@ -11,7 +11,7 @@
 #### Default Menu ####
 
 display:DefaultMenu 
-    a  display:Menu ;
+    a  display:MainMenu ;
     display:hasElement display:EventsMenuItem ;
     display:hasElement display:HomeMenuItem ;
     display:hasElement display:OrganizationsMenuItem ;

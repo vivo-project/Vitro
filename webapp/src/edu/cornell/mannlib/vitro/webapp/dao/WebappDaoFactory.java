@@ -131,5 +131,9 @@ public interface WebappDaoFactory {
     
     public NamespaceDao getNamespaceDao();
     
-    public PropertyInstanceDao getPropertyInstanceDao();    
+    public PropertyInstanceDao getPropertyInstanceDao();
+
+    public PageDao getPageDao();    
+    
+    public MenuDao getMenuDao();    
 }

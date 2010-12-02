@@ -81,7 +81,6 @@
     </div> <!-- #contents -->
 
 </div> <!-- #personWrap -->
-<#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
 <section id="individual-intro-person" class="vcard">
     <div id="individual-intro-left-content"> 

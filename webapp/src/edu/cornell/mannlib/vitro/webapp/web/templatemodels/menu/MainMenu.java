@@ -19,6 +19,8 @@ public class MainMenu extends Menu {
     
     protected VitroRequest vreq;
     
+    public MainMenu(){ }
+    
     public MainMenu(VitroRequest vreq) {
         this.vreq = vreq;
     }
@@ -34,6 +36,6 @@ public class MainMenu extends Menu {
     }
     
     protected boolean isActiveItem(String path) {
-        return vreq.getServletPath().equals(path);
+        return  vreq != null && vreq.getServletPath().equals(path);                    
     }
 }
