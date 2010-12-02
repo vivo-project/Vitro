@@ -7,7 +7,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.VisitingPolicyIface;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 
-public class AddObjectPropStmt extends ObjectPropertyAction implements
+public class AddObjectPropStmt extends AbstractObjectPropertyAction implements
 		RequestedAction {
 
 	public AddObjectPropStmt(String uriOfSub, String uriOfPred, String uriOfObj) {

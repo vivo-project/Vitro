@@ -271,8 +271,8 @@ public class JenaNetidPolicy extends DefaultInconclusivePolicy implements Visiti
 
         QuerySolutionMap parameters = new QuerySolutionMap();
         parameters.add("netid",  model.createLiteral( getNetid(ids) ));
-        parameters.add("subject",model.createResource( action.getResourceUri() )) ;
-        parameters.add("predicate", model.createResource( action.getDataPropUri() )) ;
+        parameters.add("subject",model.createResource( action.getSubjectUri() )) ;
+        parameters.add("predicate", model.createResource( action.getPredicateUri() )) ;
         parameters.add("literalValue", model.createLiteral(action.getData() ));
         return doQueries(queryStrs,parameters,action);
     }
@@ -287,8 +287,8 @@ public class JenaNetidPolicy extends DefaultInconclusivePolicy implements Visiti
 
         QuerySolutionMap parameters = new QuerySolutionMap();
         parameters.add("netid",  model.createLiteral( getNetid(ids) ));
-        parameters.add("subject",model.createResource( action.uriOfSubject() )) ;
-        parameters.add("predicate", model.createResource( action.uriOfPredicate() )) ;
+        parameters.add("subject",model.createResource( action.getSubjectUri() )) ;
+        parameters.add("predicate", model.createResource( action.getPredicateUri() )) ;
         parameters.add("literalValue", model.createLiteral(action.data() )); // caution: will always do untyped things
         return doQueries(queryStrs,parameters,action);
     }

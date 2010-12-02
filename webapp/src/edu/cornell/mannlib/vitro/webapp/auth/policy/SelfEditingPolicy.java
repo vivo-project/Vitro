@@ -201,27 +201,27 @@ public class SelfEditingPolicy implements VisitingPolicyIface {
 
     public PolicyDecision visit(IdentifierBundle ids, AddDataPropStmt action) {
     	PolicyDecision pd = checkNullArguments(ids, action);
-    	if (pd == null) pd = checkRestrictedResource(action.getResourceUri());
-    	if (pd == null) pd = checkRestrictedPredicate(action.getDataPropUri());
-    	if (pd == null) pd = checkUserEditsAsSubjectOfStmt(ids, action.getResourceUri());
+    	if (pd == null) pd = checkRestrictedResource(action.getSubjectUri());
+    	if (pd == null) pd = checkRestrictedPredicate(action.getPredicateUri());
+    	if (pd == null) pd = checkUserEditsAsSubjectOfStmt(ids, action.getSubjectUri());
     	if (pd == null) pd = defaultDecision("No basis for decision.");
     	return pd;
     }
 
     public PolicyDecision visit(IdentifierBundle ids, EditDataPropStmt action) {
     	PolicyDecision pd = checkNullArguments(ids, action);
-    	if (pd == null) pd = checkRestrictedResource(action.uriOfSubject());
-    	if (pd == null) pd = checkRestrictedPredicate(action.uriOfPredicate());
-    	if (pd == null) pd = checkUserEditsAsSubjectOfStmt(ids, action.uriOfSubject());
+    	if (pd == null) pd = checkRestrictedResource(action.getSubjectUri());
+    	if (pd == null) pd = checkRestrictedPredicate(action.getPredicateUri());
+    	if (pd == null) pd = checkUserEditsAsSubjectOfStmt(ids, action.getSubjectUri());
     	if (pd == null) pd = defaultDecision("No basis for decision.");
     	return pd;
     }
 
     public PolicyDecision visit(IdentifierBundle ids, DropDataPropStmt action) {
     	PolicyDecision pd = checkNullArguments(ids, action);
-    	if (pd == null) pd = checkRestrictedResource(action.uriOfSubject());
-    	if (pd == null) pd = checkRestrictedPredicate(action.uriOfPredicate());
-    	if (pd == null) pd = checkUserEditsAsSubjectOfStmt(ids, action.uriOfSubject());
+    	if (pd == null) pd = checkRestrictedResource(action.getSubjectUri());
+    	if (pd == null) pd = checkRestrictedPredicate(action.getPredicateUri());
+    	if (pd == null) pd = checkUserEditsAsSubjectOfStmt(ids, action.getSubjectUri());
     	if (pd == null) pd = defaultDecision("No basis for decision.");
     	return pd;
    }

@@ -267,27 +267,27 @@ public class DbAdminEditingPolicy implements VisitingPolicyIface {
             return new BasicPolicyDecision(this.defaultFailure,"DbAdminEditingPolicy, null action or ids");
         }
         //cannot edit resources related to system
-        if(  prohibitedNs.contains( action.uriOfSubject() ) ) { // jc55 was getResourceURI()
+        if(  prohibitedNs.contains( action.getSubjectUri() ) ) { // jc55 was getResourceURI()
             log.debug("DbAdminEditingPolicy for DropDatapropStmt is inconclusive because it does not grant access to admin resources");
             return new BasicPolicyDecision(this.defaultFailure,"DbAdminEditingPolicy does not grant access to admin resources");
         }
 
         //many predicates are prohibited by namespace but there are many ones that dbAdmin editors need to work with
-        if(  prohibitedNs.contains(action.uriOfPredicate() ) && ! editableVitroUris.contains( action.uriOfPredicate() ) ) {
+        if(  prohibitedNs.contains(action.getPredicateUri() ) && ! editableVitroUris.contains( action.getPredicateUri() ) ) {
             log.debug("DbAdminEditingPolicy for DropDatapropStmt is inconclusive because it does not grant access to admin controls");
             return new BasicPolicyDecision(this.defaultFailure,"DbAdminEditingPolicy does not grant access to admin controls");
         }
         
         //cannot edit resources related to system
-        if( !canModifyResource( action.uriOfSubject() ) ) {
-            log.debug("DbAdminEditingPolicy for EditDatapropStmt action is inconclusive because it does not grant access to admin resources; cannot modify " + action.uriOfSubject());
+        if( !canModifyResource( action.getSubjectUri() ) ) {
+            log.debug("DbAdminEditingPolicy for EditDatapropStmt action is inconclusive because it does not grant access to admin resources; cannot modify " + action.getSubjectUri());
             return new BasicPolicyDecision(this.defaultFailure,"DbAdminEditingPolicy does not grant access to admin resources; " +
-                    "cannot modify " + action.uriOfSubject());
+                    "cannot modify " + action.getSubjectUri());
         }
-        if( !canModifyPredicate( action.uriOfPredicate() ) ) {
-            log.debug("DbAdminEditingPolicy does not grant access to prohibited predicates or certain namespaces: cannot modify " + action.uriOfPredicate());
+        if( !canModifyPredicate( action.getPredicateUri() ) ) {
+            log.debug("DbAdminEditingPolicy does not grant access to prohibited predicates or certain namespaces: cannot modify " + action.getPredicateUri());
             return new BasicPolicyDecision(this.defaultFailure,"DbAdminEditingPolicy does not grant access to prohibited predicates or certain namespaces: " +
-                    "cannot modify " + action.uriOfPredicate());
+                    "cannot modify " + action.getPredicateUri());
         }
         log.debug("DbAdminEditingPolicy for DropDatapropStmt returns authorization because the user is a dbAdmin");
         
@@ -324,17 +324,17 @@ public class DbAdminEditingPolicy implements VisitingPolicyIface {
             return new BasicPolicyDecision(this.defaultFailure,"DbAdminEditingPolicy has null action or ids");
 
         //cannot edit resources related to system
-        if(  prohibitedNs.contains( action.getResourceUri() ) )
+        if(  prohibitedNs.contains( action.getSubjectUri() ) )
             return new BasicPolicyDecision(this.defaultFailure,"DbAdminEditingPolicy does not grant access to admin resources from prohibited namespaces");
 
         //many predicates are prohibited by namespace but there are many ones that dbAdmin editors need to work with
-        if(  prohibitedNs.contains(action.getDataPropUri() ) && ! editableVitroUris.contains( action.getDataPropUri() ) )
+        if(  prohibitedNs.contains(action.getPredicateUri() ) && ! editableVitroUris.contains( action.getPredicateUri() ) )
             return new BasicPolicyDecision(this.defaultFailure,"DbAdminEditingPolicy does not grant access to admin controls");
         
-        if( !canModifyPredicate( action.getDataPropUri() ) ) {
-            log.debug("DbAdminEditingPolicy for AddDataPropStmt does not grant access to prohibited predicates or certain namespaces: cannot modify " + action.getDataPropUri());
+        if( !canModifyPredicate( action.getPredicateUri() ) ) {
+            log.debug("DbAdminEditingPolicy for AddDataPropStmt does not grant access to prohibited predicates or certain namespaces: cannot modify " + action.getPredicateUri());
             return new BasicPolicyDecision(this.defaultFailure,"DbAdminEditingPolicy for AddDataPropStmt does not grant access to prohibited predicates or certain namespaces: " +
-                    "cannot modify " + action.getDataPropUri());
+                    "cannot modify " + action.getPredicateUri());
         }
         
         return new BasicPolicyDecision(Authorization.AUTHORIZED,"DbAdminEditingPolicy: user may add this data property statement");
@@ -351,15 +351,15 @@ public class DbAdminEditingPolicy implements VisitingPolicyIface {
         }
 
         //cannot edit resources related to system
-        if( !canModifyResource( action.uriOfSubject() ) ) {
-            log.debug("DbAdminEditingPolicy for EditDatapropStmt action is inconclusive because it does not grant access to admin resources; cannot modify " + action.uriOfSubject());
+        if( !canModifyResource( action.getSubjectUri() ) ) {
+            log.debug("DbAdminEditingPolicy for EditDatapropStmt action is inconclusive because it does not grant access to admin resources; cannot modify " + action.getSubjectUri());
             return new BasicPolicyDecision(this.defaultFailure,"DbAdminEditingPolicy does not grant access to admin resources; " +
-                    "cannot modify " + action.uriOfSubject());
+                    "cannot modify " + action.getSubjectUri());
         }
-        if( !canModifyPredicate( action.uriOfPredicate() ) ) {
-            log.debug("DbAdminEditingPolicy for EditDataPropStmt does not grant access to prohibited predicates or certain namespaces: cannot modify " + action.uriOfPredicate());
+        if( !canModifyPredicate( action.getPredicateUri() ) ) {
+            log.debug("DbAdminEditingPolicy for EditDataPropStmt does not grant access to prohibited predicates or certain namespaces: cannot modify " + action.getPredicateUri());
             return new BasicPolicyDecision(this.defaultFailure,"DbAdminEditingPolicy for EditDataPropStmt does not grant access to prohibited predicates or certain namespaces: " +
-                    "cannot modify " + action.uriOfPredicate());
+                    "cannot modify " + action.getPredicateUri());
         }
         
         log.debug("DbAdminEditingPolicy for EditDatapropStmt returns authorization because the user is a dbAdmin");

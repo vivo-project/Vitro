@@ -8,7 +8,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.VisitingPolicyIface;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 
-public class EditObjPropStmt extends ObjectPropertyAction implements
+public class EditObjPropStmt extends AbstractObjectPropertyAction implements
 		RequestedAction {
 
 	public EditObjPropStmt(ObjectPropertyStatement ops) {

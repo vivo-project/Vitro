@@ -7,7 +7,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.VisitingPolicyIface;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 
-public class DropObjectPropStmt extends ObjectPropertyAction implements
+public class DropObjectPropStmt extends AbstractObjectPropertyAction implements
 		RequestedAction {
 
 	public DropObjectPropStmt(String sub, String pred, String obj) {

@@ -253,27 +253,27 @@ public class CuratorEditingPolicy implements VisitingPolicyIface {
             return new BasicPolicyDecision(this.defaultFailure,"CuratorEditingPolicy, null action or ids");
         }
         //cannot edit resources related to system
-        if(  prohibitedNs.contains( action.uriOfSubject() ) ) { // jc55 was getResourceURI()
+        if(  prohibitedNs.contains( action.getSubjectUri() ) ) { // jc55 was getResourceURI()
             log.debug("CuratorEditingPolicy for DropDatapropStmt is inconclusive because it does not grant access to admin resources");
             return new BasicPolicyDecision(this.defaultFailure,"CuratorEditingPolicy does not grant access to admin resources");
         }
 
         //many predicates are prohibited by namespace but there are many ones that curator editors need to work with
-        if(  prohibitedNs.contains(action.uriOfPredicate() ) && ! editableVitroUris.contains( action.uriOfPredicate() ) ) {
+        if(  prohibitedNs.contains(action.getPredicateUri() ) && ! editableVitroUris.contains( action.getPredicateUri() ) ) {
             log.debug("CuratorEditingPolicy for DropDatapropStmt is inconclusive because it does not grant access to admin controls");
             return new BasicPolicyDecision(this.defaultFailure,"CuratorEditingPolicy does not grant access to admin controls");
         }
         
         //cannot edit resources related to system
-        if( !canModifyResource( action.uriOfSubject() ) ) {
-            log.debug("CuratorEditingPolicy for EditDatapropStmt action is inconclusive because it does not grant access to admin resources; cannot modify " + action.uriOfSubject());
+        if( !canModifyResource( action.getSubjectUri() ) ) {
+            log.debug("CuratorEditingPolicy for EditDatapropStmt action is inconclusive because it does not grant access to admin resources; cannot modify " + action.getSubjectUri());
             return new BasicPolicyDecision(this.defaultFailure,"CuratorEditingPolicy does not grant access to admin resources; " +
-                    "cannot modify " + action.uriOfSubject());
+                    "cannot modify " + action.getSubjectUri());
         }
-        if( !canModifyPredicate( action.uriOfPredicate() ) ) {
-            log.debug("CuratorEditingPolicy for EditDatapropStmt is inconclusive because it does not grant access to admin predicates; cannot modify " + action.uriOfPredicate());
+        if( !canModifyPredicate( action.getPredicateUri() ) ) {
+            log.debug("CuratorEditingPolicy for EditDatapropStmt is inconclusive because it does not grant access to admin predicates; cannot modify " + action.getPredicateUri());
             return new BasicPolicyDecision(this.defaultFailure,"CuratorEditingPolicy does not grant access to admin predicates; " +
-                    "cannot modify " + action.uriOfPredicate());
+                    "cannot modify " + action.getPredicateUri());
         }
         log.debug("CuratorEditingPolicy for DropDatapropStmt returns authorization because the user is a curator");
         
@@ -310,17 +310,17 @@ public class CuratorEditingPolicy implements VisitingPolicyIface {
             return new BasicPolicyDecision(this.defaultFailure,"CuratorEditingPolicy, null action or ids");
 
         //cannot edit resources related to system
-        if(  prohibitedNs.contains( action.getResourceUri() ) )
+        if(  prohibitedNs.contains( action.getSubjectUri() ) )
             return new BasicPolicyDecision(this.defaultFailure,"CuratorEditingPolicy does not grant access to admin resources");
 
         //many predicates are prohibited by namespace but there are many ones that curator editors need to work with
-        if(  prohibitedNs.contains(action.getDataPropUri() ) && ! editableVitroUris.contains( action.getDataPropUri() ) )
+        if(  prohibitedNs.contains(action.getPredicateUri() ) && ! editableVitroUris.contains( action.getPredicateUri() ) )
             return new BasicPolicyDecision(this.defaultFailure,"CuratorEditingPolicy does not grant access to admin controls");
 
-        if( !canModifyPredicate( action.getDataPropUri() ) ) {
-            log.debug("CuratorEditingPolicy for AddDataPropStmt does not grant access to prohibited predicates or certain namespaces: cannot modify " + action.getDataPropUri());
+        if( !canModifyPredicate( action.getPredicateUri() ) ) {
+            log.debug("CuratorEditingPolicy for AddDataPropStmt does not grant access to prohibited predicates or certain namespaces: cannot modify " + action.getPredicateUri());
             return new BasicPolicyDecision(this.defaultFailure,"CuratorEditingPolicy for AddDataPropStmt does not grant access to prohibited predicates or certain namespaces: " +
-                    "cannot modify " + action.getDataPropUri());
+                    "cannot modify " + action.getPredicateUri());
         }
 
         return new BasicPolicyDecision(Authorization.AUTHORIZED,"CuratorEditingPolicy: user may add this data property statement");
@@ -337,15 +337,15 @@ public class CuratorEditingPolicy implements VisitingPolicyIface {
         }
 
         //cannot edit resources related to system
-        if( !canModifyResource( action.uriOfSubject() ) ) {
-            log.debug("CuratorEditingPolicy for EditDatapropStmt action is inconclusive because it does not grant access to admin resources; cannot modify " + action.uriOfSubject());
+        if( !canModifyResource( action.getSubjectUri() ) ) {
+            log.debug("CuratorEditingPolicy for EditDatapropStmt action is inconclusive because it does not grant access to admin resources; cannot modify " + action.getSubjectUri());
             return new BasicPolicyDecision(this.defaultFailure,"CuratorEditingPolicy does not grant access to admin resources; " +
-                    "cannot modify " + action.uriOfSubject());
+                    "cannot modify " + action.getSubjectUri());
         }
-        if( !canModifyPredicate( action.uriOfPredicate() ) ) {
-            log.debug("CuratorEditingPolicy for EditDataPropStmt does not grant access to prohibited predicates or certain namespaces: cannot modify " + action.uriOfPredicate());
+        if( !canModifyPredicate( action.getPredicateUri() ) ) {
+            log.debug("CuratorEditingPolicy for EditDataPropStmt does not grant access to prohibited predicates or certain namespaces: cannot modify " + action.getPredicateUri());
             return new BasicPolicyDecision(this.defaultFailure,"CuratorEditingPolicy for EditDataPropStmt does not grant access to prohibited predicates or certain namespaces: " +
-                    "cannot modify " + action.uriOfPredicate());
+                    "cannot modify " + action.getPredicateUri());
         }
         
         log.debug("CuratorEditingPolicy for EditDatapropStmt returns authorization because the user is a curator");
