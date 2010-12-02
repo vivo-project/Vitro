@@ -7,12 +7,10 @@ import static edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization.
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertNull;
-import static org.junit.Assert.*;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -72,24 +70,6 @@ public class SelfEditingPolicyTest extends AbstractTestClass {
         
     }
     
-    @Test
-    public void testCanModifiyNs(){
-        Assert.assertTrue( policy.canModifyResource("http://bobs.com#hats") );        
-        Assert.assertTrue( policy.canModifyResource("ftp://bobs.com#hats"));
-        Assert.assertTrue( policy.canModifyResource( SAFE_RESOURCE ));
-        Assert.assertTrue( policy.canModifyPredicate( SAFE_PREDICATE ));        
-        Assert.assertTrue( policy.canModifyResource("http://bobs.com/hats"));
-        
-        
-        Assert.assertTrue( ! policy.canModifyResource(""));
-        Assert.assertTrue( ! policy.canModifyResource(VitroVocabulary.vitroURI + "something"));
-        Assert.assertTrue( ! policy.canModifyResource(VitroVocabulary.OWL + "Ontology"));    
-        Assert.assertTrue( ! policy.canModifyPredicate( UNSAFE_PREDICATE ));
-        Assert.assertTrue( ! policy.canModifyResource( UNSAFE_RESOURCE  ));
-        Assert.assertTrue( ! policy.canModifyResource( UNSAFE_NS ));        
-        
-    }
-
 	@Test
 	public void testProhibitedProperties() {
 		Set<String> badProps = new HashSet<String>();
