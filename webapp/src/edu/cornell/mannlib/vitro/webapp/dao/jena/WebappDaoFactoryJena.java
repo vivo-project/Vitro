@@ -9,7 +9,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.hp.hpl.jena.iri.IRI;
 import com.hp.hpl.jena.iri.IRIFactory;
@@ -30,10 +29,10 @@ import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
-import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.ApplicationDao;
 import edu.cornell.mannlib.vitro.webapp.dao.Classes2ClassesDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
+import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyListDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
 import edu.cornell.mannlib.vitro.webapp.dao.FlagDao;
@@ -44,6 +43,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.LinksDao;
 import edu.cornell.mannlib.vitro.webapp.dao.LinktypeDao;
 import edu.cornell.mannlib.vitro.webapp.dao.NamespaceDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
+import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyListDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PortalDao;
@@ -548,7 +548,23 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
             propertyInstanceDao = new PropertyInstanceDaoJena(this);
         return propertyInstanceDao;
     }
+    
+    private ObjectPropertyListDao objectPropertyListDao = null;
+    public ObjectPropertyListDao getObjectPropertyListDao() {
+        if (objectPropertyListDao == null) {
+            objectPropertyListDao = new ObjectPropertyListDaoJena(this);
+        }
+        return objectPropertyListDao;
+    }
 
+    private DataPropertyListDao DataPropertyListDao = null;
+    public DataPropertyListDao getDataPropertyListDao() {
+        if (DataPropertyListDao == null) {
+            DataPropertyListDao = new DataPropertyListDaoJena(this);
+        }
+        return DataPropertyListDao;
+    }
+    
     protected VClassDao vClassDao = null;
     public VClassDao getVClassDao() {
         if( vClassDao == null )

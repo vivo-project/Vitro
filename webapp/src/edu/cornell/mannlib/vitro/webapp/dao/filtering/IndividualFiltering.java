@@ -13,6 +13,8 @@ import java.util.Map;
 
 import net.sf.jga.algorithms.Filter;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -27,6 +29,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.ObjectPropertyListDaoJena;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 
 /**
@@ -38,6 +41,9 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
  *
  */
 public class IndividualFiltering implements Individual {
+    
+    protected static final Log log = LogFactory.getLog(IndividualFiltering.class);
+
     private final Individual _innerIndividual;
     private final VitroFilters _filters;
 
@@ -74,20 +80,6 @@ public class IndividualFiltering implements Individual {
         List<DataProperty> dprops =  _innerIndividual.getPopulatedDataPropertyList();
         LinkedList<DataProperty> outdProps = new LinkedList<DataProperty>();
         Filter.filter(dprops,_filters.getDataPropertyFilter(), outdProps);
-        
-        ListIterator<DataProperty> it = outdProps.listIterator();
-        while(it.hasNext()){
-            DataProperty dp = it.next();
-            List<DataPropertyStatement> filteredStmts = 
-                new LinkedList<DataPropertyStatement>();
-            Filter.filter(dp.getDataPropertyStatements(),
-                    _filters.getDataPropertyStatementFilter(),filteredStmts);
-            if( filteredStmts == null || filteredStmts.size() == 0 ){
-                it.remove();
-            }else{
-                dp.setDataPropertyStatements(filteredStmts);
-            }
-        }
         return outdProps;
     }
     

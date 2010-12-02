@@ -203,15 +203,4 @@ class ObjectPropertyDaoFiltering extends BaseFiltering implements ObjectProperty
     	return innerObjectPropertyDao.getClassesWithRestrictionOnProperty(propertyURI);
     }
 
-    @Override
-    // This may need to be filtered at some point.
-    public List<ObjectProperty> getObjectPropertyList(Individual subject) {
-        return innerObjectPropertyDao.getObjectPropertyList(subject);
-    }
-    
-    @Override
-    // This may need to be filtered at some point.
-    public List<ObjectProperty> getObjectPropertyList(String subjectUri) {
-        return innerObjectPropertyDao.getObjectPropertyList(subjectUri);
-    }
 }

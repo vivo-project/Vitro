@@ -35,16 +35,10 @@ public class PropertyList extends BaseTemplateModel {
     PropertyList() {
         propertyList = new ArrayList<PropertyTemplateModel>();
     }
-
+    
     protected void addObjectProperties(List<ObjectProperty> propertyList) {
-        for (ObjectProperty op : propertyList) {
-            // This is a hack to throw out properties in the vitro, rdf, rdfs, and owl namespaces.
-            // It will be implemented in a better way in v1.3 (Editing and Display Configuration).
-            //if (! EXCLUDED_NAMESPACES.contains(op.getNamespace())) {            
-                add(op);
-            //} else {
-            //    log.debug("Excluded " + op.getURI() + " from displayed property list on the basis of namespace");
-            //}   
+        for (ObjectProperty op : propertyList) {       
+            add(op); 
         }
     }
     
@@ -54,7 +48,7 @@ public class PropertyList extends BaseTemplateModel {
     
     protected void addDataProperties(List<DataProperty> propertyList) {
         for (DataProperty dp : propertyList) {       
-                add(dp); 
+            add(dp); 
         }
     }
     
@@ -135,20 +129,6 @@ public class PropertyList extends BaseTemplateModel {
             log.error("a null Collection is returned from DataPropertyDao.getAllPossibleDatapropsForIndividual())");
         }        
     }
-
-//  private void addUnique(Property p) {
-//      if (! contains(p)) {
-//          add(p);
-//      }
-//  }
-//
-//  protected void add(Property p) {
-//      if (p instanceof ObjectProperty) {
-//          add((ObjectProperty) p);            
-//      } else if (p instanceof DataProperty) {
-//          add((DataProperty) p);
-//      }
-//  }
 
     @SuppressWarnings("unchecked")
     protected void sort(VitroRequest vreq) {            

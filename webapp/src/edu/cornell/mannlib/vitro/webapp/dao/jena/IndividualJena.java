@@ -740,7 +740,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
     @Override 
     public List<ObjectProperty> getPopulatedObjectPropertyList() {
         if (populatedObjectPropertyList == null) {
-            populatedObjectPropertyList = webappDaoFactory.getObjectPropertyDao().getObjectPropertyList(this);
+            populatedObjectPropertyList = webappDaoFactory.getObjectPropertyListDao().getObjectPropertyList(this);
         }
         return populatedObjectPropertyList;       
     }
@@ -794,7 +794,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
     @Override 
     public List<DataProperty> getPopulatedDataPropertyList() {
         if (populatedDataPropertyList == null) {
-            populatedDataPropertyList = webappDaoFactory.getDataPropertyDao().getDataPropertyList(this);
+            populatedDataPropertyList = webappDaoFactory.getDataPropertyListDao().getDataPropertyList(this);
         }
         return populatedDataPropertyList;       
     }
