@@ -2,25 +2,22 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.policy;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.rdf.model.NodeIterator;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.impl.Util;
-import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.Identifier;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory.SelfEditing;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
@@ -57,6 +54,38 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 public class SelfEditingPolicy implements VisitingPolicyIface {
     protected static Log log = LogFactory.getLog( SelfEditingPolicy.class );
 
+    private static final String[] DEFAULT_PROHIBITED_PROPERTIES = {};
+
+    private static final String[] DEFAULT_PROHIBITED_RESOURCES = {};
+	
+    private static final String[] DEFAULT_PROHIBITED_NAMESPACES = {
+			VitroVocabulary.vitroURI, 
+			VitroVocabulary.OWL, 
+			"" 
+			};
+    
+	private static final String[] DEFAULT_EDITABLE_VITRO_URIS = {
+			VitroVocabulary.MONIKER, 
+			VitroVocabulary.BLURB,
+			VitroVocabulary.DESCRIPTION, 
+			VitroVocabulary.MODTIME,
+			VitroVocabulary.TIMEKEY,
+
+			VitroVocabulary.CITATION, 
+			VitroVocabulary.IND_MAIN_IMAGE,
+
+			VitroVocabulary.LINK, 
+			VitroVocabulary.PRIMARY_LINK,
+			VitroVocabulary.ADDITIONAL_LINK, 
+			VitroVocabulary.LINK_ANCHOR,
+			VitroVocabulary.LINK_URL,
+
+			VitroVocabulary.KEYWORD_INDIVIDUALRELATION,
+			VitroVocabulary.KEYWORD_INDIVIDUALRELATION_INVOLVESKEYWORD,
+			VitroVocabulary.KEYWORD_INDIVIDUALRELATION_INVOLVESINDIVIDUAL,
+			VitroVocabulary.KEYWORD_INDIVIDUALRELATION_MODE 
+			};
+    
     /**
      * Namespaces from which Self Editors should not be able to use resources.
      */
@@ -74,12 +103,6 @@ public class SelfEditingPolicy implements VisitingPolicyIface {
     
     protected OntModel model;
     
-    /** Indicates which Authorization to use when the user isn't explicitly authorized. */
-    private static Authorization defaultFailure = Authorization.INCONCLUSIVE;
-
-    
-
-
     public SelfEditingPolicy(
             Set<String>prohibitedProperties,
             Set<String>prohibitedResources,
@@ -88,443 +111,296 @@ public class SelfEditingPolicy implements VisitingPolicyIface {
             OntModel model){
         this.model = model;
         
-        if( prohibitedProperties != null )
-            this.prohibitedProperties = prohibitedProperties;
-        else
-            this.prohibitedProperties = Collections.EMPTY_SET;
-
-        if( prohibitedResources != null )
-            this.prohibitedResources = prohibitedResources;
-        else
-            this.prohibitedResources =  Collections.EMPTY_SET;
-
-        if( prohibitedNamespaces != null )
-            this.prohibitedNs = prohibitedNamespaces;
-        else{
-            prohibitedNs = new HashSet<String>();
-            prohibitedNs.add( VitroVocabulary.vitroURI);
-            prohibitedNs.add( VitroVocabulary.OWL );
-            prohibitedNs.add("");
-        }
-
-        if( editableVitroUris != null )
-            this.editableVitroUris = editableVitroUris;
-        else{
-            this.editableVitroUris = new HashSet<String>();
-            this.editableVitroUris.add(VitroVocabulary.MONIKER);
-            this.editableVitroUris.add(VitroVocabulary.BLURB);
-            this.editableVitroUris.add(VitroVocabulary.DESCRIPTION);               
-            this.editableVitroUris.add(VitroVocabulary.MODTIME);
-            this.editableVitroUris.add(VitroVocabulary.TIMEKEY);
-
-            this.editableVitroUris.add(VitroVocabulary.CITATION);
-            this.editableVitroUris.add(VitroVocabulary.IND_MAIN_IMAGE);
-
-            this.editableVitroUris.add(VitroVocabulary.LINK);
-            this.editableVitroUris.add(VitroVocabulary.PRIMARY_LINK);
-            this.editableVitroUris.add(VitroVocabulary.ADDITIONAL_LINK);
-            this.editableVitroUris.add(VitroVocabulary.LINK_ANCHOR);
-            this.editableVitroUris.add(VitroVocabulary.LINK_URL);
-
-            this.editableVitroUris.add(VitroVocabulary.KEYWORD_INDIVIDUALRELATION);
-            this.editableVitroUris.add(VitroVocabulary.KEYWORD_INDIVIDUALRELATION_INVOLVESKEYWORD);
-            this.editableVitroUris.add(VitroVocabulary.KEYWORD_INDIVIDUALRELATION_INVOLVESINDIVIDUAL);
-            this.editableVitroUris.add(VitroVocabulary.KEYWORD_INDIVIDUALRELATION_MODE);
-        }              
+		this.prohibitedProperties = useDefaultIfNull(prohibitedProperties,
+				DEFAULT_PROHIBITED_PROPERTIES);
+		this.prohibitedResources = useDefaultIfNull(prohibitedResources,
+				DEFAULT_PROHIBITED_RESOURCES);
+		this.prohibitedNs = useDefaultIfNull(prohibitedNamespaces,
+				DEFAULT_PROHIBITED_NAMESPACES);
+		this.editableVitroUris = useDefaultIfNull(editableVitroUris,
+				DEFAULT_EDITABLE_VITRO_URIS);
     }
 
-    public PolicyDecision isAuthorized(IdentifierBundle whoToAuth, RequestedAction whatToAuth) {
-        BasicPolicyDecision pd = new BasicPolicyDecision(this.defaultFailure,"not yet set");
-        if( whoToAuth == null )
-            return pd.setMessage("whoToAuth was null");
-        if(whatToAuth == null)
-            return pd.setMessage("whatToAuth was null");
+	private Set<String> useDefaultIfNull(Set<String> valueSet, String[] defaultArray) {
+		Collection<String> strings = (valueSet == null) ? Arrays
+				.asList(defaultArray) : valueSet;
+		return Collections.unmodifiableSet(new HashSet<String>(strings));
+	}
 
-        SelfEditingIdentifierFactory.SelfEditing selfEditId = SelfEditingIdentifierFactory.getSelfEditingIdentifier(whoToAuth);
-        if( selfEditId == null )
-            return pd.setMessage("no SelfEditing Identifier found in IdentifierBundle");
-        
-        if( selfEditId.getBlacklisted() != null ){
-            //pd.setAuthorized(Authorization.UNAUTHORIZED);
-            return pd.setMessage("user blacklisted because of " + selfEditId.getBlacklisted());
-        }
-        
-        String editorUri = selfEditId.getValue();
-        if (editorUri == null)
-            return new BasicPolicyDecision(Authorization.INCONCLUSIVE,
-                    "No Identifiers Related to SelfEditing found");        
-        
-        if (whatToAuth instanceof OntoRequestedAction)
-            return pd.setMessage("JenaNetidPolicy doesn't authorize OntoRequestedActions");
-        if (whatToAuth instanceof AdminRequestedAction)
-            return pd.setMessage("JenaNetidPolicy doesn't authorize AdminRequestedActions");
+    private static final Authorization DEFAULT_AUTHORIZATION = Authorization.INCONCLUSIVE;
+    
+    public PolicyDecision isAuthorized(IdentifierBundle whoToAuth, RequestedAction whatToAuth) {
+		if (whoToAuth == null) {
+			return defaultDecision("whoToAuth was null");
+		}
+		if (whatToAuth == null) {
+			return defaultDecision("whatToAuth was null");
+		}
+		if (whatToAuth instanceof OntoRequestedAction) {
+			return defaultDecision("Won't authorize OntoRequestedActions");
+		}
+		if (whatToAuth instanceof AdminRequestedAction) {
+			return defaultDecision("Won't authorize AdminRequestedActions");
+		}
+		if (getUrisOfSelfEditor(whoToAuth).isEmpty()) {
+			return defaultDecision("no non-blacklisted SelfEditing Identifier " +
+					"found in IdentifierBundle");
+		}
 
         //kick off the visitor pattern
         return whatToAuth.accept(this, whoToAuth);
     }
 
-    protected String getUriOfEditor( IdentifierBundle whoToAuth) {
-        if( whoToAuth == null ) return null;
+    // ----------------------------------------------------------------------
+	// Visitor methods.
+	// ----------------------------------------------------------------------
 
-        String uriStr = null;
-        for(Identifier id : whoToAuth){
-            if (id instanceof SelfEditing) {
-                SelfEditing seu = (SelfEditing) id;
-                uriStr = seu.getValue();
-                log.debug("found SelfEditingUri " + uriStr);
-                break;
-            }
-        }
-        return uriStr;
+    public PolicyDecision visit(IdentifierBundle ids, AddResource action) {
+    	PolicyDecision pd = checkNullArguments(ids, action);
+    	if (pd == null) pd = checkRestrictedResource(action.getSubjectUri());
+    	if (pd == null) pd = authorizedDecision("May add resource.");
+    	return pd;
     }
 
-    protected boolean canModifyResource(String uri){
-        if( uri == null || uri.length() == 0 )
-            return false;
-
-        if( editableVitroUris.contains( uri ) )
-            return true;
-
-        String namespace = uri.substring(0, Util.splitNamespace(uri));
-        //Matcher match = ns.matcher(uri);
-        //if( match.matches() && match.groupCount() > 0){
-        //    String namespace = match.group(1);
-            if( prohibitedNs.contains( namespace ) ) {
-                log.debug("The uri "+uri+" represents a resource that cannot be modified because it matches a prohibited namespace");
-                return false;
-            }
-        //}
-        return true;
-    }
-
-    protected boolean canModifyPredicate(String uri){
-        if( uri == null || uri.length() == 0 )
-            return false;
-
-        if( prohibitedProperties.contains(uri)) {
-            log.debug("The uri "+uri+" represents a predicate that cannot be modified because it is on a list of properties prohibited from self editing");
-            return false;
-        }
-        
-        if( editableVitroUris.contains( uri ) )
-            return true;
-
-        String namespace = uri.substring(0, Util.splitNamespace(uri));
-        //Matcher match = ns.matcher(uri);
-        //if( match.matches() && match.groupCount() > 0){
-        //    String namespace = match.group(1);
-            if( prohibitedNs.contains( namespace ) ) {
-                log.debug("The uri "+uri+" represents a predicate that cannot be modified because it matches a prohibited namespace");
-                return false;
-            }
-        //}
-        return true;
+    public PolicyDecision visit(IdentifierBundle ids, DropResource action) {
+    	PolicyDecision pd = checkNullArguments(ids, action);
+    	if (pd == null) pd = checkRestrictedResource(action.getSubjectUri());
+    	if (pd == null) pd = authorizedDecision("May remove resource.");
+    	return pd;
     }
 
     public PolicyDecision visit(IdentifierBundle ids, AddObjectPropStmt action) {
-        if( ids == null || action == null )
-            return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy, null action or ids");
-
-        //cannot edit resources related to system
-        if( !canModifyResource( action.uriOfObject ) )
-            return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy does not grant access to admin resources; " +
-                    "cannot modify " + action.uriOfObject);
-
-        if(  !canModifyResource( action.uriOfSubject ) )
-            return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy does not grant access to admin resources; " +
-                    "cannot modify " + action.uriOfSubject);
-
-        if( !canModifyPredicate( action.uriOfPredicate ) )
-            return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy does not grant access to admin predicates; " +
-                    "cannot modify " + action.uriOfPredicate);
-
-        String userUri = getUriOfEditor(ids);
-        if( userUri == null )
-            return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy, no uri found for editor");
-
-        if( userUri.equals( action.uriOfObject ) )
-            return new BasicPolicyDecision(Authorization.AUTHORIZED,"SelfEditingPolicy: user is object of statement");
-        if( userUri.equals( action.uriOfSubject ) )
-            return new BasicPolicyDecision(Authorization.AUTHORIZED,"SelfEditingPolicy: user is subject of statement");
-
-        return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy: no close relation to editor");
+    	PolicyDecision pd = checkNullArguments(ids, action);
+    	if (pd == null) pd = checkRestrictedResource(action.uriOfSubject);
+    	if (pd == null) pd = checkRestrictedResource(action.uriOfObject);
+    	if (pd == null) pd = checkRestrictedPredicate(action.uriOfPredicate);
+    	if (pd == null) pd = checkUserEditsAsSubjectOrObjectOfStmt(ids, action.uriOfSubject, action.uriOfObject);
+    	if (pd == null) pd = defaultDecision("No basis for decision.");
+    	return pd;
     }
 
-
-    public PolicyDecision visit(IdentifierBundle ids, DropResource action) {
-        if( ids == null || action == null )
-            return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy, null action or ids");
-
-        if(  prohibitedNs.contains( action.getSubjectUri() ) )
-            return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy does not removal of admin resources");
-
-        return new BasicPolicyDecision(Authorization.AUTHORIZED,"SelfEditingPolicy: may remove resource");
+    public PolicyDecision visit(IdentifierBundle ids, EditObjPropStmt action) {
+    	PolicyDecision pd = checkNullArguments(ids, action);
+    	if (pd == null) pd = checkRestrictedResource(action.uriOfSubject);
+    	if (pd == null) pd = checkRestrictedResource(action.uriOfObject);
+    	if (pd == null) pd = checkRestrictedPredicate(action.uriOfPredicate);
+    	if (pd == null) pd = checkUserEditsAsSubjectOrObjectOfStmt(ids, action.uriOfSubject, action.uriOfObject);
+    	if (pd == null) pd = defaultDecision("No basis for decision.");
+    	return pd;
     }
-
-    public PolicyDecision visit(IdentifierBundle ids, AddResource action) {
-        if( ids == null || action == null )
-            return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy, null action or ids");
-
-        if(  prohibitedNs.contains( action.getSubjectUri() ) )
-            return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy does not allow creation of admin resources");
-
-        return new BasicPolicyDecision(Authorization.AUTHORIZED,"SelfEditingPolicy: may add resource");
-    }
-
-    public PolicyDecision visit(IdentifierBundle ids, DropDataPropStmt action) {
-        if( ids == null || action == null ) {
-            log.debug("SelfEditingPolicy for DropDataPropStmt is inconclusive because the test has null action or ids");
-            return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy, null action or ids");
-        }
-        //cannot edit resources related to system
-        if(  prohibitedNs.contains( action.uriOfSubject() ) ) {
-            log.debug("SelfEditingPolicy for DropDatapropStmt is inconclusive because it does not grant access to admin resources");
-            return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy does not grant access to admin resources");
-        }
-
-        //many predicates are prohibited by namespace but there are many ones that self editors need to work with
-        if(  prohibitedNs.contains(action.uriOfPredicate() )  ) {
-            log.debug("SelfEditingPolicy for DropDatapropStmt is inconclusive because it does not grant access to admin controls");
-            return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy does not grant access to admin controls");
-        }
-
-        if( !canModifyPredicate( action.uriOfPredicate() ) )
-            return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy does not grant access to admin predicates; " +
-                    "cannot modify " + action.uriOfPredicate());
-        
-        String userUri = getUriOfEditor(ids);
-        if( userUri == null ) {
-            log.debug("SelfEditingPolicy for DropDatapropStmt is inconclusive because found no uri for editor");
-            return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy, no uri found for editor");
-        }
-
-        if( userUri.equals( action.uriOfSubject() ) ) {
-            log.debug("SelfEditingPolicy for DropDatapropStmt authorizes since user is subject of statement");
-            return new BasicPolicyDecision(Authorization.AUTHORIZED,"SelfEditingPolicy: user is subject of statement");
-        }
-
-        log.debug("SelfEditingPolicy for DropDatapropStmt returns inconclusive because the statement has no close relation to the editor");
-        return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy: no close relation to editor");
-   }
-
 
     public PolicyDecision visit(IdentifierBundle ids, DropObjectPropStmt action) {
-        if( ids == null || action == null )
-            return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy, null action or ids");
-
-        //cannot edit resources related to system
-        if( !canModifyResource( action.uriOfObject ) )
-            return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy does not grant access to admin resources; " +
-                    "cannot modify " + action.uriOfObject);
-
-        if(  !canModifyResource( action.uriOfSubject ) )
-            return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy does not grant access to admin resources; " +
-                    "cannot modify " + action.uriOfSubject);
-
-        if( !canModifyPredicate( action.uriOfPredicate ) )
-            return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy does not grant access to admin predicates; " +
-                    "cannot modify " + action.uriOfPredicate);
-
-        String userUri = getUriOfEditor(ids);
-        if( userUri == null )
-            return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy, no uri found for editor");
-
-        if( userUri.equals( action.uriOfObject ) )
-            return new BasicPolicyDecision(Authorization.AUTHORIZED,"SelfEditingPolicy: user is object of statement");
-        if( userUri.equals( action.uriOfSubject ) )
-            return new BasicPolicyDecision(Authorization.AUTHORIZED,"SelfEditingPolicy: user is subject of statement");
-
-        return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy: no close relation to editor");
+    	PolicyDecision pd = checkNullArguments(ids, action);
+    	if (pd == null) pd = checkRestrictedResource(action.uriOfSubject);
+    	if (pd == null) pd = checkRestrictedResource(action.uriOfObject);
+    	if (pd == null) pd = checkRestrictedPredicate(action.uriOfPredicate);
+    	if (pd == null) pd = checkUserEditsAsSubjectOrObjectOfStmt(ids, action.uriOfSubject, action.uriOfObject);
+    	if (pd == null) pd = defaultDecision("No basis for decision.");
+    	return pd;
     }
 
     public PolicyDecision visit(IdentifierBundle ids, AddDataPropStmt action) {
-        if( ids == null || action == null )
-            return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy, null action or ids");
-
-        //cannot edit resources related to system
-        if(  prohibitedNs.contains( action.getResourceUri() ) )
-            return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy does not grant access to admin resources");
-
-        if(  prohibitedProperties.contains( action.getDataPropUri() ) )
-            return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy does not grant access to admin controls");
-        
-        if( !canModifyPredicate( action.getDataPropUri() ) )
-            return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy does not grant access to admin predicates; " +
-                    "cannot modify " + action.getDataPropUri());
-        
-        String userUri = getUriOfEditor(ids);
-        if( userUri == null )
-            return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy, no uri found for editor");
-
-        if( userUri.equals( action.getResourceUri() ) )
-            return new BasicPolicyDecision(Authorization.AUTHORIZED,"SelfEditingPolicy: user is subject of statement");
-
-        return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy: no close relation to editor");
+    	PolicyDecision pd = checkNullArguments(ids, action);
+    	if (pd == null) pd = checkRestrictedResource(action.getResourceUri());
+    	if (pd == null) pd = checkRestrictedPredicate(action.getDataPropUri());
+    	if (pd == null) pd = checkUserEditsAsSubjectOfStmt(ids, action.getResourceUri());
+    	if (pd == null) pd = defaultDecision("No basis for decision.");
+    	return pd;
     }
-
 
     public PolicyDecision visit(IdentifierBundle ids, EditDataPropStmt action) {
-
-        if( ids == null || action == null ) {
-            log.debug("SelfEditingPolicy for EditDataPropStmt is inconclusive because the test has null action or ids");
-            return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy, null action or ids");
-        }
-
-        //cannot edit resources related to system
-        if( !canModifyResource( action.uriOfSubject() ) ) {
-            log.debug("SelfEditingPolicy for EditDatapropStmt action is inconclusive because it does not grant access to admin resources; cannot modify " + action.uriOfSubject());
-            return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy does not grant access to admin resources; " +
-                    "cannot modify " + action.uriOfSubject());
-        }
-        if( !canModifyPredicate( action.uriOfPredicate() ) ) {
-            log.debug("SelfEditingPolicy for EditDatapropStmt is inconclusive because it does not grant access to admin predicates; cannot modify " + action.uriOfPredicate());
-            return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy does not grant access to admin predicates; " +
-                    "cannot modify " + action.uriOfPredicate());
-        }        
-        String userUri = getUriOfEditor(ids);
-        if( userUri == null ) {
-            log.debug("SelfEditingPolicy for EditDatapropStmt returns inconclusive because no uri was found for editor");
-            return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy, no uri found for editor");
-        }
-        if( userUri.equals( action.uriOfSubject() ) ) {
-            log.debug("SelfEditingPolicy for EditDatapropStmt returns authorization because the user is subject of statement");
-            return new BasicPolicyDecision(Authorization.AUTHORIZED,"SelfEditingPolicy: user is subject of statement");
-        }
-        log.debug("SelfEditingPolicy for EditDatapropStmt returns inconclusive because the statement has no close relation to the editor");
-        return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy: no close relation to editor");
+    	PolicyDecision pd = checkNullArguments(ids, action);
+    	if (pd == null) pd = checkRestrictedResource(action.uriOfSubject());
+    	if (pd == null) pd = checkRestrictedPredicate(action.uriOfPredicate());
+    	if (pd == null) pd = checkUserEditsAsSubjectOfStmt(ids, action.uriOfSubject());
+    	if (pd == null) pd = defaultDecision("No basis for decision.");
+    	return pd;
     }
 
+    public PolicyDecision visit(IdentifierBundle ids, DropDataPropStmt action) {
+    	PolicyDecision pd = checkNullArguments(ids, action);
+    	if (pd == null) pd = checkRestrictedResource(action.uriOfSubject());
+    	if (pd == null) pd = checkRestrictedPredicate(action.uriOfPredicate());
+    	if (pd == null) pd = checkUserEditsAsSubjectOfStmt(ids, action.uriOfSubject());
+    	if (pd == null) pd = defaultDecision("No basis for decision.");
+    	return pd;
+   }
 
-    public PolicyDecision visit(IdentifierBundle ids, EditObjPropStmt action) {
-        if( ids == null || action == null )
-            return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy, null action or ids");
-
-        if( "http://vivoweb.org/ontology/core#informationResourceInAuthorship".equals( action.getUriOfPredicate() ) ){
-            return canEditAuthorship(ids, action, model);            
-        }
-        
-        //cannot edit resources related to system
-        if( !canModifyResource( action.uriOfObject ) )
-            return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy does not grant access to admin resources; " +
-                    "cannot modify " + action.uriOfObject);
-
-        if(  !canModifyResource( action.uriOfSubject ) )
-            return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy does not grant access to admin resources; " +
-                    "cannot modify " + action.uriOfSubject);
-
-        if( !canModifyPredicate( action.uriOfPredicate ) )
-            return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy does not grant access to admin predicates; " +
-                    "cannot modify " + action.uriOfPredicate);
-
-        String userUri = getUriOfEditor(ids);
-        if( userUri == null )
-            return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy, no uri found for editor");
-
-        if( userUri.equals( action.uriOfObject ) )
-            return new BasicPolicyDecision(Authorization.AUTHORIZED,"SelfEditingPolicy: user is object of statement");
-        if( userUri.equals( action.uriOfSubject ) )
-            return new BasicPolicyDecision(Authorization.AUTHORIZED,"SelfEditingPolicy: user is subject of statement");
-
-        return new BasicPolicyDecision(this.defaultFailure,"SelfEditingPolicy: editor not involved in triple");
-    }
-
-
-    public PolicyDecision visit(IdentifierBundle ids, UploadFile action) {
-        return new BasicPolicyDecision(Authorization.AUTHORIZED,"SelfEditingPolicy: may upload files");
-    }
-
-
-    // *** the following actions are generally not part of self editing *** //
-
-    public PolicyDecision visit(IdentifierBundle ids, AddNewUser action) {
-        return new BasicPolicyDecision(Authorization.INCONCLUSIVE,"SelfEditingPolicy does not authorize administrative modifications");
-    }
+	public PolicyDecision visit(IdentifierBundle ids, AddNewUser action) {
+		return defaultDecision("does not authorize administrative modifications");
+	}
 
     public PolicyDecision visit(IdentifierBundle ids, RemoveUser action) {
-        return new BasicPolicyDecision(Authorization.INCONCLUSIVE,"SelfEditingPolicy does not authorize administrative modifications");
+		return defaultDecision("does not authorize administrative modifications");
     }
 
     public PolicyDecision visit(IdentifierBundle ids, LoadOntology action) {
-        return new BasicPolicyDecision(Authorization.INCONCLUSIVE,"SelfEditingPolicy does not authorize administrative modifications");
+		return defaultDecision("does not authorize administrative modifications");
     }
 
     public PolicyDecision visit(IdentifierBundle ids, RebuildTextIndex action) {
-        return new BasicPolicyDecision(Authorization.INCONCLUSIVE,"SelfEditingPolicy does not authorize administrative modifications");
+		return defaultDecision("does not authorize administrative modifications");
     }
 
     public PolicyDecision visit(IdentifierBundle ids, UpdateTextIndex action) {
-        return new BasicPolicyDecision(Authorization.INCONCLUSIVE,"SelfEditingPolicy does not authorize administrative modifications");
+		return defaultDecision("does not authorize administrative modifications");
     }
 
     public PolicyDecision visit(IdentifierBundle ids, ServerStatus action) {
-        return new BasicPolicyDecision(Authorization.INCONCLUSIVE,"SelfEditingPolicy does not authorize administrative modifications");
+		return defaultDecision("does not authorize administrative modifications");
     }
 
     public PolicyDecision visit(IdentifierBundle ids, CreateOwlClass action) {
-        return new BasicPolicyDecision(Authorization.INCONCLUSIVE,"SelfEditingPolicy does not authorize administrative modifications");
+		return defaultDecision("does not authorize administrative modifications");
     }
 
     public PolicyDecision visit(IdentifierBundle ids, RemoveOwlClass action) {
-        return new BasicPolicyDecision(Authorization.INCONCLUSIVE,"SelfEditingPolicy does not authorize administrative modifications");
+		return defaultDecision("does not authorize administrative modifications");
     }
 
     public PolicyDecision visit(IdentifierBundle ids, DefineDataProperty action) {
-        return new BasicPolicyDecision(Authorization.INCONCLUSIVE,"SelfEditingPolicy does not authorize administrative modifications");
+		return defaultDecision("does not authorize administrative modifications");
     }
 
     public PolicyDecision visit(IdentifierBundle ids, DefineObjectProperty action) {
-        return new BasicPolicyDecision(Authorization.INCONCLUSIVE,"SelfEditingPolicy does not authorize administrative modifications");
+		return defaultDecision("does not authorize administrative modifications");
     }
 
-
-    private PolicyDecision canEditAuthorship(IdentifierBundle ids, EditObjPropStmt action, OntModel model2) {        
-        PolicyDecision pd = null;
-        String selfEditorUri = SelfEditingIdentifierFactory.getSelfEditingUri(ids);
-        if( selfEditorUri == null || selfEditorUri.isEmpty() )
-            return pd;
-                
-        model2.enterCriticalSection(Lock.READ);
-        try{
-            if( action != null && action.getUriOfObject() != null ){
-                Individual authorship = model2.getIndividual(action.getUriOfObject());
-                if( authorship != null ){                    
-                    NodeIterator authors = authorship.listPropertyValues(LINKED_AUTHOR_PROPERTY );
-                    try{
-                        while(authors.hasNext()){
-                            Resource author = (Resource)authors.nextNode();
-                            if( author != null && selfEditorUri.equals( author.getURI() ) ){
-                                pd = new BasicPolicyDecision(Authorization.AUTHORIZED, "SelfEditingPolicy, may edit because SelfEditor is author");
-                                
-                            }                        
-                        }
-                    }finally{
-                        if( authors != null)
-                            authors.close();
-                    }                    
-                }
-            }
-        }finally{
-            model2.leaveCriticalSection();
-        }
-        if( pd == null )
-            return new BasicPolicyDecision(Authorization.INCONCLUSIVE,
-            "SelfEditingPolicy from canEditAuthorship");
-        else
-            return pd;
+    public PolicyDecision visit(IdentifierBundle ids, UploadFile action) {
+		return defaultDecision("does not authorize administrative modifications");
     }
 
-    private static Property LINKED_AUTHOR_PROPERTY = ResourceFactory.createProperty("http://vivoweb.org/ontology/core#linkedAuthor");
-    
-    public String toString(){
-        return "SelfEditingPolicy " + hashCode()
-        + " nspaces: " + prohibitedNs.size() + " prohibited Props: "
-        + prohibitedProperties.size() + " prohibited resources: "
-        + prohibitedResources.size();
-    }
-    
-    public static void setDefaultFailure( Authorization defaultFail){
-        SelfEditingPolicy.defaultFailure = defaultFail;       
-    }
-    
-    
+	// ----------------------------------------------------------------------
+	// Helper methods
+	// ----------------------------------------------------------------------
+
+	private PolicyDecision checkNullArguments(IdentifierBundle ids,
+			RequestedAction action) {
+		if (ids == null || action == null) {
+			return defaultDecision("Null action or ids.");
+		}
+		return null;
+	}
+
+	private PolicyDecision checkRestrictedResource(String uri) {
+		if (!canModifyResource(uri)) {
+			return defaultDecision("No access to admin resources; "
+					+ "cannot modify " + uri);
+		}
+		return null;
+	}
+
+	private PolicyDecision checkRestrictedPredicate(String uri) {
+		if (!canModifyPredicate(uri)) {
+			return defaultDecision("No access to admin predicates; "
+					+ "cannot modify " + uri);
+		}
+		return null;
+	}
+
+	private PolicyDecision checkUserEditsAsSubjectOfStmt(IdentifierBundle ids,
+			String uriOfSubject) {
+    	List<String> userUris = getUrisOfSelfEditor(ids);
+    	for (String userUri: userUris) {
+    		if (userUri.equals(uriOfSubject)) {
+    			return authorizedDecision("User is subject of statement.");
+    		}
+    	}
+    	return null;
+	}
+
+	private PolicyDecision checkUserEditsAsSubjectOrObjectOfStmt(IdentifierBundle ids,
+			String uriOfSubject, String uriOfObject) {
+    	List<String> userUris = getUrisOfSelfEditor(ids);
+    	for (String userUri: userUris) {
+    		if (userUri.equals(uriOfSubject)) {
+    			return authorizedDecision("User is subject of statement.");
+    		}
+    		if (userUri.equals(uriOfObject)) {
+    			return authorizedDecision("User is subject of statement.");
+    		}
+    	}
+    	return null;
+	}
+
+	private List<String> getUrisOfSelfEditor(IdentifierBundle ids) {
+		List<String> uris = new ArrayList<String>();
+		if (ids != null) {
+			for (Identifier id : ids) {
+				if (id instanceof SelfEditing) {
+					SelfEditing selfEditId = (SelfEditing) id;
+					if (selfEditId.getBlacklisted() == null) {
+						uris.add(selfEditId.getValue());
+					}
+				}
+			}
+		}
+		return uris;
+	}
+
+	/** Package-level access to allow for unit tests. */
+	boolean canModifyResource(String uri) {
+		if (uri == null || uri.length() == 0) {
+			log.debug("Resource URI is empty: " + uri);
+			return false;
+		}
+
+		if (editableVitroUris.contains(uri)) {
+			log.debug("Resource matches an editable URI: " + uri);
+			return true;
+		}
+
+		String namespace = uri.substring(0, Util.splitNamespace(uri));
+		if (prohibitedNs.contains(namespace)) {
+			log.debug("Resource matches a prohibited namespace: " + uri);
+			return false;
+		}
+
+		log.debug("Resource is not prohibited: " + uri);
+		return true;
+	}
+
+	/** Package-level access to allow for unit tests. */
+	boolean canModifyPredicate(String uri) {
+		if (uri == null || uri.length() == 0) {
+			log.debug("Predicate URI is empty: " + uri);
+			return false;
+		}
+
+		if (prohibitedProperties.contains(uri)) {
+			log.debug("Predicate matches a prohibited predicate: " + uri);
+			return false;
+		}
+
+		if (editableVitroUris.contains(uri)) {
+			return true;
+		}
+
+		String namespace = uri.substring(0, Util.splitNamespace(uri));
+		if (prohibitedNs.contains(namespace)) {
+			log.debug("Predicate matches a prohibited namespace: " + uri);
+			return false;
+		}
+		return true;
+	}
+
+	private PolicyDecision defaultDecision(String message) {
+		return new BasicPolicyDecision(DEFAULT_AUTHORIZATION,
+				"SelfEditingPolicy: " + message);
+	}    
+
+	private PolicyDecision authorizedDecision(String message) {
+		return new BasicPolicyDecision(Authorization.AUTHORIZED,
+				"SelfEditingPolicy: " + message);
+	}    
+
+	@Override
+	public String toString() {
+		return "SelfEditingPolicy " + hashCode() + "[prohibitedNs="
+				+ prohibitedNs + ", prohibitedProperties="
+				+ prohibitedProperties + ", prohibitedResources="
+				+ prohibitedResources + ", editableVitroUris="
+				+ editableVitroUris + "]";
+	}
+
 }

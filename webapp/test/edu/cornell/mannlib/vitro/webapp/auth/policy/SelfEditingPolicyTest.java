@@ -7,6 +7,7 @@ import static edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization.
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -61,7 +62,6 @@ public class SelfEditingPolicyTest extends AbstractTestClass {
     @Before
     public void setUp() throws Exception {
         policy = new SelfEditingPolicy(null,null,null,null,null);
-        
         
         ids = new ArrayIdentifierBundle();
         ids.add( new SelfEditingIdentifierFactory.NetId("test223") );
@@ -202,7 +202,7 @@ public class SelfEditingPolicyTest extends AbstractTestClass {
     
 	@Test
 	public void testVisitIdentifierBundleAddObjectPropStmt() {
-		AddObjectPropStmt whatToAuth = new AddObjectPropStmt(SELFEDITOR_URI, SAFE_PREDICATE, SAFE_RESOURCE);
+		whatToAuth = new AddObjectPropStmt(SELFEDITOR_URI, SAFE_PREDICATE, SAFE_RESOURCE);
 		assertDecision(AUTHORIZED, policy.isAuthorized(ids, whatToAuth));
 
 		whatToAuth = new AddObjectPropStmt(SAFE_RESOURCE, SAFE_PREDICATE, SELFEDITOR_URI);
@@ -232,7 +232,7 @@ public class SelfEditingPolicyTest extends AbstractTestClass {
 //
     @Test
     public void testVisitIdentifierBundleDropObjectPropStmt() {
-        DropObjectPropStmt whatToAuth = new DropObjectPropStmt(
+        whatToAuth = new DropObjectPropStmt(
                 SELFEDITOR_URI,SAFE_PREDICATE,SAFE_RESOURCE);                
         assertDecision(AUTHORIZED, policy.isAuthorized(ids, whatToAuth));
 
@@ -277,7 +277,7 @@ public class SelfEditingPolicyTest extends AbstractTestClass {
         dps.setIndividualURI(SELFEDITOR_URI);
         dps.setDatapropURI(SAFE_PREDICATE);
         dps.setData("junk");        
-        EditDataPropStmt whatToAuth = new EditDataPropStmt(dps);                
+        whatToAuth = new EditDataPropStmt(dps);                
         assertDecision(AUTHORIZED, policy.isAuthorized(ids, whatToAuth));
         
         dps = new DataPropertyStatementImpl();
@@ -317,6 +317,73 @@ public class SelfEditingPolicyTest extends AbstractTestClass {
 
 		whatToAuth = new EditObjPropStmt(SELFEDITOR_URI, SAFE_PREDICATE, UNSAFE_RESOURCE);
 		assertDecision(INCONCLUSIVE, policy.isAuthorized(ids, whatToAuth));
+	}
+	// ----------------------------------------------------------------------
+	// What if there are two SelfEditor Identifiers?
+	// ----------------------------------------------------------------------
+	
+	@Test
+	public void twoSEIsFindObjectPropertySubject() {
+		setUpTwoSEIs();
+        whatToAuth = new DropObjectPropStmt(
+                SELFEDITOR_URI,SAFE_PREDICATE,SAFE_RESOURCE);                
+        assertDecision(AUTHORIZED, policy.isAuthorized(ids, whatToAuth));
+	}
+
+	@Test
+	public void twoSEIsFindObjectPropertyObject() {
+		setUpTwoSEIs();
+        whatToAuth = new DropObjectPropStmt(
+                SAFE_RESOURCE ,SAFE_PREDICATE, SELFEDITOR_URI);                
+        assertDecision(AUTHORIZED, policy.isAuthorized(ids, whatToAuth));
+	}
+
+	@Test
+	public void twoSEIsDontFindInObjectProperty() {
+		setUpTwoSEIs();
+        whatToAuth = new DropObjectPropStmt(
+                SAFE_RESOURCE ,SAFE_PREDICATE, SAFE_RESOURCE);                
+        assertDecision(INCONCLUSIVE, policy.isAuthorized(ids, whatToAuth));
+	}
+	
+	@Test
+	public void twoSEIsFindDataPropertySubject() {
+		setUpTwoSEIs();
+
+		DataPropertyStatement dps = new DataPropertyStatementImpl();
+        dps.setIndividualURI(SELFEDITOR_URI);
+        dps.setDatapropURI(SAFE_PREDICATE);
+        dps.setData("junk");        
+        whatToAuth = new EditDataPropStmt(dps);                
+        assertDecision(AUTHORIZED, policy.isAuthorized(ids, whatToAuth));
+	}
+
+	@Test
+	public void twoSEIsDontFindInDataProperty() {
+		setUpTwoSEIs();
+
+		DataPropertyStatement dps = new DataPropertyStatementImpl();
+        dps.setIndividualURI(SAFE_RESOURCE);
+        dps.setDatapropURI(SAFE_PREDICATE);
+        dps.setData("junk");        
+        whatToAuth = new EditDataPropStmt(dps);                
+        assertDecision(INCONCLUSIVE, policy.isAuthorized(ids, whatToAuth));
+	}
+
+	private void setUpTwoSEIs() {
+        ids = new ArrayIdentifierBundle();
+        
+        ids.add( new SelfEditingIdentifierFactory.NetId("bozoUser") );
+        
+        IndividualImpl ind1 = new IndividualImpl();
+        ind1.setURI( SAFE_NS + "bozoUri" );        
+        ids.add( new SelfEditingIdentifierFactory.SelfEditing( ind1, SelfEditingIdentifierFactory.NOT_BLACKLISTED ) );
+
+        ids.add( new SelfEditingIdentifierFactory.NetId("test223") );
+        
+        IndividualImpl ind2 = new IndividualImpl();
+        ind2.setURI( SELFEDITOR_URI );        
+        ids.add( new SelfEditingIdentifierFactory.SelfEditing( ind2, SelfEditingIdentifierFactory.NOT_BLACKLISTED ) );
 	}
 
 	// ----------------------------------------------------------------------
