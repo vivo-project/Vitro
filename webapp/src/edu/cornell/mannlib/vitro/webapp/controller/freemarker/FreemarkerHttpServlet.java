@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,8 +16,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.rdf.model.Model;
-
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
@@ -28,9 +25,14 @@ import edu.cornell.mannlib.vitro.webapp.controller.ContactMailServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ExceptionResponseValues;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ForwardResponseValues;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RdfResponseValues;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RedirectResponseValues;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 import edu.cornell.mannlib.vitro.webapp.web.BreadCrumbsUtil;
-import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 import edu.cornell.mannlib.vitro.webapp.web.PortalWebUtil;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.User;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.files.Scripts;
@@ -245,7 +247,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     protected void doException(VitroRequest vreq, HttpServletResponse response, ResponseValues values) {
         // Log the error, and display an error message on the page.        
         log.error(values.getException(), values.getException());      
-        TemplateResponseValues trv = new TemplateResponseValues(values.getTemplateName(), values.getMap());
+        TemplateResponseValues trv = TemplateResponseValues.getTemplateResponseValuesFromException((ExceptionResponseValues)values);
         doTemplate(vreq, response, trv);
     }
 
@@ -503,322 +505,5 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         // We need to create a FreeMarkerHttpServlet object in order to call the instance methods
         // to set up the data model.
         new FreemarkerComponentGenerator(request);
-    }
-
-    protected static interface ResponseValues {
-
-        String getTemplateName();
-
-        int getStatusCode();
-
-        void setStatusCode(int statusCode);
-
-        Map<String, Object> getMap();
-        
-        String getRedirectUrl();
-
-        String getForwardUrl();
-
-        Throwable getException();
-        
-        ContentType getContentType();
-        
-        Model getModel();
-    }
-    
-    protected static abstract class BaseResponseValues implements ResponseValues {
-        private int statusCode = 0;
-        private ContentType contentType = null;
-        
-        BaseResponseValues() { }
-        
-        BaseResponseValues(int statusCode) {
-            this.statusCode = statusCode;
-        }
-
-        BaseResponseValues(ContentType contentType) {
-            this.contentType = contentType;
-        }
-        
-        public int getStatusCode() {
-            return statusCode;
-        }
-        
-        public void setStatusCode(int statusCode) {
-            this.statusCode = statusCode;
-        }
-
-        public ContentType getContentType() {
-            return contentType;
-        }
-
-        public void setContentType(ContentType contentType) {
-            this.contentType = contentType;
-        }
-    }
-
-    protected static class TemplateResponseValues extends BaseResponseValues {
-        private final String templateName;
-        private final Map<String, Object> map;
-        
-        public TemplateResponseValues(String templateName) {
-            this.templateName = templateName;
-            this.map = new HashMap<String, Object>();
-        }
-
-        public TemplateResponseValues(String templateName, int statusCode) {
-            super(statusCode);
-            this.templateName = templateName;
-            this.map = new HashMap<String, Object>();
-        }
-        
-        public TemplateResponseValues(String templateName, Map<String, Object> map) {
-            this.templateName = templateName;
-            this.map = map;
-        }
-
-        public TemplateResponseValues(String templateName, Map<String, Object> map, int statusCode) {
-            super(statusCode);
-            this.templateName = templateName;
-            this.map = map;
-        }
-        
-        public TemplateResponseValues put(String key, Object value) {
-            this.map.put(key, value);
-            return this;
-        }
-
-        @Override
-        public Map<String, Object> getMap() {
-            return Collections.unmodifiableMap(this.map);
-        }
-
-        @Override
-        public String getTemplateName() {
-            return this.templateName;
-        }
-
-        @Override
-        public String getRedirectUrl() {
-            throw new UnsupportedOperationException(
-                    "This is not a redirect response.");
-        }
-        
-        @Override
-        public String getForwardUrl() {
-            throw new UnsupportedOperationException(
-                    "This is not a forwarding response.");
-        }
-        
-        @Override
-        public Throwable getException() {
-            throw new UnsupportedOperationException(
-                    "This is not an exception response.");
-        }
-
-        @Override
-        public Model getModel() {
-            throw new UnsupportedOperationException(
-                    "This is not an RDF response.");
-        }
-        
-    }
-
-    protected static class RedirectResponseValues extends BaseResponseValues {
-        private final String redirectUrl;
-
-        public RedirectResponseValues(String redirectUrl) {
-            this.redirectUrl = redirectUrl;
-        }
-
-        public RedirectResponseValues(String redirectUrl, int statusCode) {
-            super(statusCode);
-            this.redirectUrl = redirectUrl;
-        }
-        
-        @Override
-        public String getRedirectUrl() {
-            return this.redirectUrl;
-        }
-
-        @Override
-        public String getTemplateName() {
-            throw new UnsupportedOperationException(
-                    "This is not a template response.");
-        }
-
-        @Override
-        public Map<String, Object> getMap() {
-            throw new UnsupportedOperationException(
-                    "This is not a template response.");
-        }
-
-        @Override
-        public String getForwardUrl() {
-            throw new UnsupportedOperationException(
-                    "This is not a forwarding response.");
-        }
-        
-        @Override
-        public Throwable getException() {
-            throw new UnsupportedOperationException(
-                    "This is not an exception response.");
-        }
-
-        @Override
-        public Model getModel() {
-            throw new UnsupportedOperationException(
-                    "This is not an RDF response.");
-        }
-    }
-
-    protected static class ForwardResponseValues extends BaseResponseValues {
-        private final String forwardUrl;
-
-        public ForwardResponseValues(String forwardUrl) {
-            this.forwardUrl = forwardUrl;
-        }
-
-        public ForwardResponseValues(String forwardUrl, int statusCode) {
-            super(statusCode);
-            this.forwardUrl = forwardUrl;
-        }
-
-        @Override
-        public String getForwardUrl() {
-            return this.forwardUrl;
-        }
-
-        @Override
-        public String getTemplateName() {
-            throw new UnsupportedOperationException(
-                    "This is not a template response.");
-        }
-
-        @Override
-        public Map<String, Object> getMap() {
-            throw new UnsupportedOperationException(
-                    "This is not a template response.");
-        }
-
-        @Override
-        public String getRedirectUrl() {
-            throw new UnsupportedOperationException(
-                    "This is not a redirect response.");
-        }
-        
-        @Override
-        public Throwable getException() {
-            throw new UnsupportedOperationException(
-                    "This is not an exception response.");
-        }
-
-        @Override
-        public Model getModel() {
-            throw new UnsupportedOperationException(
-                    "This is not an RDF response.");
-        }
-    }
-
-    protected static class ExceptionResponseValues extends TemplateResponseValues {
-        private final static String DEFAULT_TEMPLATE_NAME = "error-standard.ftl";
-        private final Throwable cause;
-
-        public ExceptionResponseValues(Throwable cause) {
-            super(DEFAULT_TEMPLATE_NAME);
-            this.cause = cause;
-        }
-
-        public ExceptionResponseValues(Throwable cause, int statusCode) {
-            super(DEFAULT_TEMPLATE_NAME, statusCode);
-            this.cause = cause;
-        }
-        
-        public ExceptionResponseValues(String templateName, Throwable cause) {
-            super(templateName);
-            this.cause = cause;
-        }
-
-        public ExceptionResponseValues(String templateName, Throwable cause, int statusCode) {
-            super(templateName, statusCode);
-            this.cause = cause;
-        }
-        
-        public ExceptionResponseValues(String templateName, Map<String, Object> map, Throwable cause) {
-            super(templateName, map);
-            this.cause = cause;
-        }
-
-        public ExceptionResponseValues(String templateName, Map<String, Object> map, Throwable cause, int statusCode) {
-            super(templateName, map, statusCode);
-            this.cause = cause;
-        }
-
-        @Override
-        public Throwable getException() {
-            return cause;
-        }
-
-        @Override
-        public String getRedirectUrl() {
-            throw new UnsupportedOperationException(
-                    "This is not a redirect response.");
-        }
-        
-        @Override
-        public String getForwardUrl() {
-            throw new UnsupportedOperationException(
-                    "This is not a forwarding response.");
-        }
-        
-        @Override
-        public Model getModel() {
-            throw new UnsupportedOperationException(
-                    "This is not an RDF response.");
-        }        
-    }
-    
-    protected static class RdfResponseValues extends BaseResponseValues {
-        private final Model model;
-        
-        RdfResponseValues(ContentType contentType, Model model) {
-            super(contentType);
-            this.model = model;
-        }
-
-        @Override
-        public String getTemplateName() {
-            throw new UnsupportedOperationException(
-                "This is not a template response.");
-        }
-
-        @Override
-        public Map<String, Object> getMap() {
-            throw new UnsupportedOperationException(
-                "This is not a template response.");
-        }
-
-        @Override
-        public String getRedirectUrl() {
-            throw new UnsupportedOperationException(
-                "This is not a redirect response.");
-        }
-
-        @Override
-        public String getForwardUrl() {
-            throw new UnsupportedOperationException(
-                "This is not a forwarding response.");
-        }
-
-        @Override
-        public Throwable getException() {
-            throw new UnsupportedOperationException(
-                "This is not an exception response.");
-        }
-        
-        @Override
-        public Model getModel() {
-           return model;
-        }
     }
 }
