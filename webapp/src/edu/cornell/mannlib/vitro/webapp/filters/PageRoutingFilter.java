@@ -4,6 +4,8 @@ package edu.cornell.mannlib.vitro.webapp.filters;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -30,16 +32,19 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
  * It should only be applied to requests, not forwards, includes or errors.
  */
 public class PageRoutingFilter implements Filter{
-    FilterConfig filterConfig;
+    protected FilterConfig filterConfig;
     
-    private final static Log log = LogFactory.getLog( PageRoutingFilter.class)
-    ;
+    private final static Log log = LogFactory.getLog( PageRoutingFilter.class);
+        
+    protected final static String URL_PART_PATTERN = "(/[^/]*).*";
     protected final static String PAGE_CONTROLLER_NAME = "PageController";
     protected final static String HOME_CONTROLLER_NAME = "HomePageController";
     
+    protected final Pattern urlPartPattern = Pattern.compile(URL_PART_PATTERN);    
+    
     @Override
     public void init(FilterConfig arg0) throws ServletException {
-        this.filterConfig = arg0;
+        this.filterConfig = arg0;    
         log.debug("pageRoutingFilter setup");
     }
     
@@ -56,36 +61,44 @@ public class PageRoutingFilter implements Filter{
         
         // check for first part of path
         // ex. /hats/superHat -> /hats
-        String path1 = path;
-        if( path != null && path.indexOf("/",1) > 0 ){           
-            path1 = path.substring(0,path1.indexOf("/"));
-        }
-        
-        String pageUri = urlMappings.get(path1);
-        
-        //try it with a leading slash
-        if( pageUri == null ){
-            pageUri = urlMappings.get("/"+path1);
-        }
-        
-        if( pageUri != null && ! pageUri.isEmpty() ){
-            log.debug(path + "is a request to a page defined in the display model as " + pageUri );
-            		
-            //add the pageUri to the request scope for use by the PageController
-            PageController.putPageUri(req, pageUri);
+        Matcher m = urlPartPattern.matcher(path);
+        if( m.matches() && m.groupCount() >= 1){
+            String path1stPart = m.group(1);            
+            String pageUri = urlMappings.get(path1stPart);
             
-            //This will send requests to HomePageController or PageController
-            String controllerName = getControllerToForwardTo(req, pageUri, pageDao);            
-            log.debug(path + " is being forwarded to controller " + controllerName);
+            //try it with a leading slash?
+            if( pageUri == null )
+                pageUri = urlMappings.get("/"+path1stPart);            
             
-            RequestDispatcher rd = filterConfig.getServletContext().getNamedDispatcher( controllerName );            
-            rd.forward(req, response);
+            if( pageUri != null && ! pageUri.isEmpty() ){
+                log.debug(path + "is a request to a page defined in the display model as " + pageUri );
+                		
+                //add the pageUri to the request scope for use by the PageController
+                PageController.putPageUri(req, pageUri);
+                
+                //This will send requests to HomePageController or PageController
+                String controllerName = getControllerToForwardTo(req, pageUri, pageDao);            
+                log.debug(path + " is being forwarded to controller " + controllerName);
+                
+                RequestDispatcher rd = filterConfig.getServletContext().getNamedDispatcher( controllerName );            
+                rd.forward(req, response);
+            }else if( "/".equals( path ) || path.isEmpty() ){
+                log.debug("url '" +path + "' is being forward to home controller even though there is no mapping to home" );
+                RequestDispatcher rd = filterConfig.getServletContext().getNamedDispatcher( HOME_CONTROLLER_NAME );            
+                rd.forward(req, response);
+            }else{
+                doNonDisplayPage(path,arg0,arg1,chain);
+            }
         }else{
-            log.debug(path + "this isn't a request to a page defined in the display model, handle it normally.");
-            chain.doFilter(arg0, arg1);
+            doNonDisplayPage(path,arg0,arg1,chain);    
         }        
     }
-
+    
+    protected void doNonDisplayPage(String path, ServletRequest arg0, ServletResponse arg1, FilterChain chain) throws IOException, ServletException{
+        log.debug(path + "this isn't a request to a page defined in the display model, handle it normally.");
+        chain.doFilter(arg0, arg1);    
+    }
+    
     protected String getControllerToForwardTo(HttpServletRequest req,
             String pageUri, PageDao pageDao) {
         String homePageUri = pageDao.getHomePageUri();

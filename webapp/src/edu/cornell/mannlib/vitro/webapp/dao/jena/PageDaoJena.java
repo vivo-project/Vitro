@@ -188,7 +188,7 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
         return map;
     }
     
-    protected Object nodeToObject( RDFNode node ){
+    static protected Object nodeToObject( RDFNode node ){
         if( node == null ){
             return "";
         }else if( node.isLiteral() ){
@@ -205,7 +205,7 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
         }
     }
 
-    protected String nodeToString( RDFNode node ){
+    static protected String nodeToString( RDFNode node ){
         if( node == null ){
             return "";
         }else if( node.isLiteral() ){

@@ -2,6 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -14,12 +17,11 @@ import com.hp.hpl.jena.query.QuerySolutionMap;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 
 import edu.cornell.mannlib.vitro.webapp.dao.MenuDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu.MainMenu;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu.Menu;
 
 public class MenuDaoJena extends JenaBaseDao implements MenuDao {
 
@@ -34,7 +36,7 @@ public class MenuDaoJena extends JenaBaseDao implements MenuDao {
     
     static final protected String menuQueryString = 
         prefixes + "\n" +
-        "SELECT ?menuItem ?linkText ?urlMapping WHERE {\n" +
+        "SELECT ?menuItem ?linkText ?urlMapping  WHERE {\n" +
 //        "  GRAPH ?g{\n"+
         "    ?menu rdf:type display:MainMenu .\n"+
         "    ?menu display:hasElement ?menuItem .  \n"+       
@@ -67,7 +69,7 @@ public class MenuDaoJena extends JenaBaseDao implements MenuDao {
     }
             
     
-    protected MainMenu getMenu(Model displayModel, String url){                
+    protected MainMenu getMenu(Model displayModel, String url){    
         //setup query parameters
         QuerySolutionMap initialBindings = new QuerySolutionMap();        
         
@@ -75,15 +77,26 @@ public class MenuDaoJena extends JenaBaseDao implements MenuDao {
         QueryExecution qexec = QueryExecutionFactory.create(menuQuery, displayModel, initialBindings );
         try{
             MainMenu menu = new MainMenu();
+            
+            /* bdc34: currently there is no good way to decide which url to show
+             * on the menu when a page has multiple urls. */
+            Set <String>seenMenuItems = new HashSet<String>();    
+            
             ResultSet results =qexec.execSelect();
             for( ; results.hasNext();){
                 QuerySolution soln = results.nextSolution();
                 Literal itemText = soln.getLiteral("linkText");
-                Literal itemLink = soln.getLiteral("urlMapping");
-                String text = itemText != null ? itemText.getLexicalForm():"(undefined text)";
-                String link = itemLink != null ? itemLink.getLexicalForm():"undefinedLink";
+                Literal itemLink = soln.getLiteral("urlMapping");                
+                RDFNode menuItem = soln.getResource("menuItem");
                 
-                menu.addItem(text,link, isActive( url, link ));
+                String text = itemText != null ? itemText.getLexicalForm():"(undefined text)";
+                String link = itemLink != null ? itemLink.getLexicalForm():"undefinedLink";                
+                String menuItemUri = PageDaoJena.nodeToString(menuItem);
+                
+                if( !seenMenuItems.contains(menuItemUri) ){
+                    menu.addItem(text,link, isActive( url, link ));
+                    seenMenuItems.add( menuItemUri );
+                }
             }
             return menu;
         }catch(Throwable th){
@@ -94,6 +107,9 @@ public class MenuDaoJena extends JenaBaseDao implements MenuDao {
 
  
     protected boolean isActive(String url, String link){
-        return url.startsWith(link);
+        if( "/".equals(url) )
+            return "/".equals(link);
+        else
+            return url.startsWith(link);
     }
 }
