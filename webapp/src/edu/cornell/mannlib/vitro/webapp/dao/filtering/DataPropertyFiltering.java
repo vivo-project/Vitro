@@ -79,8 +79,8 @@ public class DataPropertyFiltering extends DataProperty {
     }
 
     @Override
-    public String getEditLabel() {
-        return innerDataProperty.getEditLabel();
+    public String getLabel() {
+        return innerDataProperty.getLabel();
     }
 
     @Override
@@ -164,8 +164,8 @@ public class DataPropertyFiltering extends DataProperty {
     }
 
     @Override
-    public void setEditLabel(String label) {
-        innerDataProperty.setEditLabel(label);
+    public void setLabel(String label) {
+        innerDataProperty.setLabel(label);
     }
 
     @Override

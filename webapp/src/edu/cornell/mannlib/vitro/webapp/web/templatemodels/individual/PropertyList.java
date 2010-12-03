@@ -170,7 +170,7 @@ public class PropertyList extends BaseTemplateModel {
                     }
                 }
             } catch (Exception ex) {
-                log.error("Cannot retrieve p1GroupRank for group "+p1.getEditLabel());
+                log.error("Cannot retrieve p1GroupRank for group "+p1.getLabel());
             }
             
             int p2GroupRank=MAX_GROUP_RANK;
@@ -182,7 +182,7 @@ public class PropertyList extends BaseTemplateModel {
                     }
                 }
             } catch (Exception ex) {
-                log.error("Cannot retrieve p2GroupRank for group "+p2.getEditLabel());
+                log.error("Cannot retrieve p2GroupRank for group "+p2.getLabel());
             }
             
             // int diff = pgDao.getGroupByURI(p1.getGroupURI()).getDisplayRank() - pgDao.getGroupByURI(p2.getGroupURI()).getDisplayRank();
@@ -190,7 +190,7 @@ public class PropertyList extends BaseTemplateModel {
             if (diff==0) {
                 diff = determineDisplayRank(p1) - determineDisplayRank(p2);
                 if (diff==0) {
-                    return p1.getEditLabel().compareTo(p2.getEditLabel());
+                    return p1.getLabel().compareTo(p2.getLabel());
                 } else {
                     return diff;
                 }

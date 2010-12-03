@@ -147,7 +147,7 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 				    		<c:set var="first" value=""/><c:if test="${counter == 0}"><c:set var="first" value=" first"/></c:if>
             		        <c:set var="last" value=""/><c:if test="${(counter+1) == propTotal}"><c:set var="last" value=" last"/></c:if>
                             <div class="propsItem${first}${last}" id="${objProp.localName}">
-                                <h4>${objProp.editLabel}</h4>
+                                <h4>${objProp.label}</h4>
 					    		<c:if test="${showSelfEdits || showCuratorEdits}"><edLnk:editLinks item="${objProp}" icons="false" /></c:if>
 					    		<%-- Verbose property display additions for object properties, using context variable verbosePropertyListing --%>
                           <c:if test="${showCuratorEdits && verbosePropertyListing}">
@@ -272,7 +272,7 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
             			<c:set var="addable" value=""/><c:if test="${dataRows >= 1 && displayLimit > 1}"><c:set var="addable" value=" addable"/></c:if>
             			
 						<div id="${dataProp.localName}" class="propsItem dataItem${first}${last}${multiItem}${addable}" style="${dataStyle}">
-							<h4>${dataProp.editLabel}</h4>
+							<h4>${dataProp.label}</h4>
 					    	<c:if test="${showSelfEdits || showCuratorEdits}">
                                 <c:choose>
                                     <c:when test="${dataRows == 1 && displayLimit==1 }">

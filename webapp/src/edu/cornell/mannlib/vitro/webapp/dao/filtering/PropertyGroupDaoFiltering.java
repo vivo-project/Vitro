@@ -81,8 +81,8 @@ public class PropertyGroupDaoFiltering implements PropertyGroupDao {
 		return groups;
 	}
 	
-	public PropertyGroup createTempPropertyGroup(String name, int rank) {
-	    return innerDao.createTempPropertyGroup(name, rank);
+	public PropertyGroup createDummyPropertyGroup(String name, int rank) {
+	    return innerDao.createDummyPropertyGroup(name, rank);
 	}
 	
 	public String insertNewPropertyGroup(PropertyGroup group) {

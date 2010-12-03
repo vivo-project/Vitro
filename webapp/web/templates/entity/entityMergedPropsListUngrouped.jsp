@@ -96,7 +96,7 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
     		    <c:if test="${showSelfEdits || showCuratorEdits}"><c:set var="classForEditControls" value=" editing"/></c:if>
                 <c:set var="uniqueOpropDivName" value="${fn:replace(objProp.localNameWithPrefix,':','-')}"/>
 				<div class="propsItem ${classForEditControls}" id="${'oprop-'}${uniqueOpropDivName}">
-					<h3 class="propertyName">${objProp.editLabel}</h3>
+					<h3 class="propertyName">${objProp.label}</h3>
 		    		<c:if test="${showSelfEdits || showCuratorEdits}"><edLnk:editLinks item="${objProp}" icons="false" /></c:if>
 
   					<%-- Verbose property display additions for object properties, using context variable verbosePropertyListing --%>
@@ -227,7 +227,7 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 			    <c:if test="${showSelfEdits || showCuratorEdits}"><c:set var="classForEditControls" value=" editing"/></c:if>
 	            <c:set var="uniqueDpropDivName" value="${fn:replace(dataProp.localNameWithPrefix,':','-')}"/>            
 	 			<div id="${'dprop-'}${uniqueDpropDivName}" class="propsItem ${classForEditControls}" style="${dataStyle}">
-					<h3 class="propertyName">${dataProp.editLabel}</h3>
+					<h3 class="propertyName">${dataProp.label}</h3>
 					<c:if test="${showSelfEdits || showCuratorEdits}"><edLnk:editLinks item="${dataProp}" icons="false"/></c:if> 					
 			    	<%-- Verbose property display additions for data properties, using context variable verbosePropertyListing --%>
 	                <c:if test="${showCuratorEdits && verbosePropertyListing}">

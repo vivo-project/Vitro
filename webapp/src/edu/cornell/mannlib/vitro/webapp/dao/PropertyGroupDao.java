@@ -15,7 +15,7 @@ public interface PropertyGroupDao {
 	
 	public abstract int removeUnpopulatedGroups(List<PropertyGroup> groups);
 	
-	public PropertyGroup createTempPropertyGroup(String name, int rank);
+	public PropertyGroup createDummyPropertyGroup(String name, int rank);
 	
 	public String insertNewPropertyGroup(PropertyGroup group);
 	

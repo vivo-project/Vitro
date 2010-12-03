@@ -67,7 +67,7 @@ public class PropertyListBuilder {
         // don't need to set editLabel, can just do this:
         //propertyList.addAll(objectPropertyList); 
         for (ObjectProperty op : objectPropertyList) {
-            op.setEditLabel(op.getDomainPublic());
+            op.setLabel(op.getDomainPublic());
             propertyList.add(op);
         }
                 
@@ -84,7 +84,7 @@ public class PropertyListBuilder {
         //propertyList.addAll(subject.getPopulatedDataPropertyList()); 
         List<DataProperty> dataPropertyList = subject.getPopulatedDataPropertyList();
         for (DataProperty dp : dataPropertyList) {
-            dp.setEditLabel(dp.getPublicName());
+            dp.setLabel(dp.getPublicName());
             propertyList.add(dp);
         }
 
@@ -197,55 +197,75 @@ public class PropertyListBuilder {
             log.error("a null Collection is returned from DataPropertyDao.getAllPossibleDatapropsForIndividual())");
         }        
     }
-    
+
     private List<PropertyGroup> addPropertiesToGroups(List<Property> propertyList) {
-        
+
         // Get the property groups
         PropertyGroupDao pgDao = wdf.getPropertyGroupDao(); 
         List<PropertyGroup> groupList = pgDao.getPublicGroups(false); // may be returned empty but not null
+        // To test no property groups defined, use: 
+        // List<PropertyGroup> groupList = new ArrayList<PropertyGroup>(); 
+                                                
+        int groupCount = groupList.size();
+
+        /* 
+         * If no property groups are defined, create a dummy group with a null name to signal to the template that it's
+         * not a real group. This allows the looping structure in the template to be the same whether there are groups or not.
+         */
+        if (groupCount == 0) {
+            log.warn("groupList has no groups on entering addPropertiesToGroups(); will create a new group");
+            PropertyGroup dummyGroup = pgDao.createDummyPropertyGroup(null, 1);
+            dummyGroup.getPropertyList().addAll(propertyList);
+            sortGroupPropertyList(dummyGroup.getName(), propertyList);
+            groupList.add(dummyGroup);
+            return groupList;            
+        } 
+
+        /* 
+         * This group will hold properties that are not assigned to any groups. In case no real property groups are
+         * populated, we end up with the dummy group case above, and we will change the name to null to signal to the
+         * template that it shouldn't be treated like a group.
+         */
+        PropertyGroup groupForUnassignedProperties = pgDao.createDummyPropertyGroup("", MAX_GROUP_DISPLAY_RANK);
         
-        int groupsCount=0;
-        try {
-            groupsCount = populateGroupsListWithProperties(pgDao, groupList, propertyList);
-        } catch (Exception ex) {
-            log.error("Exception on trying to populate groups list with properties: "+ex.getMessage());
-            ex.printStackTrace();
+        if (groupCount > 1) {
+            try {
+                Collections.sort(groupList);
+            } catch (Exception ex) {
+                log.error("Exception on sorting groupList in addPropertiesToGroups()");
+            }                    
         }
+
+        populateGroupListWithProperties(groupList, groupForUnassignedProperties, propertyList);
+
+        // Remove unpopulated groups
         try {
             int removedCount = pgDao.removeUnpopulatedGroups(groupList);
             if (removedCount == 0) {
-                log.warn("Of "+groupsCount+" groups, none removed by removeUnpopulatedGroups");
-        /*  } else {
-                log.warn("Of "+groupsCount+" groups, "+removedCount+" removed by removeUnpopulatedGroups"); */
+                log.warn("Of "+groupCount+" groups, none removed by removeUnpopulatedGroups");
             }
-            groupsCount -= removedCount;      
+            groupCount -= removedCount;      
         } catch (Exception ex) {
             log.error("Exception on trying to prune groups list with properties: "+ex.getMessage());
         }
-        return null;
+        
+        // If the group for unassigned properties is populated, add it to the group list.
+        if (groupForUnassignedProperties.getPropertyList().size() > 0) {
+            groupList.add(groupForUnassignedProperties);  
+            // If no real property groups are populated, the groupForUnassignedProperties moves from case 2 to case 1 above, so change
+            // the name to null to signal to the templates that there are no real groups.
+            if (groupCount == 0) {
+                groupForUnassignedProperties.setName(null);
+            }
+        }
+        
+        return groupList;
     }
-
-    private int populateGroupsListWithProperties(PropertyGroupDao pgDao, List<PropertyGroup> groupList, List<Property> propertyList) {
-        int count = groupList.size();
-        PropertyGroup tempGroup = null;
-        String unassignedGroupName = ""; // temp, for compilation
-        if (unassignedGroupName!=null) {
-            tempGroup = pgDao.createTempPropertyGroup(unassignedGroupName,MAX_GROUP_DISPLAY_RANK);
-            log.debug("creating temp property group "+unassignedGroupName+" for any unassigned properties");
-        }
-        switch (count) {
-        case 0: log.warn("groupsList has no groups on entering populateGroupsListWithProperties(); will create a new group \"other\"");
-                break;
-        case 1: break;
-        default: try {
-                     Collections.sort(groupList);
-                 } catch (Exception ex) {
-                     log.error("Exception on sorting groupsList in populateGroupsListWithProperties()");
-                 }
-        }
-        if (count==0 && unassignedGroupName!=null) {
-            groupList.add(tempGroup);
-        }
+ 
+    private void populateGroupListWithProperties(List<PropertyGroup> groupList, 
+            PropertyGroup groupForUnassignedProperties, List<Property> propertyList) {
+        
+        // Assign the properties to the groups
         for (PropertyGroup pg : groupList) {
              if (pg.getPropertyList().size()>0) {
                  pg.getPropertyList().clear();
@@ -253,33 +273,35 @@ public class PropertyListBuilder {
              for (Property p : propertyList) {
                  if (p.getURI() == null) {
                      log.error("Property p has null URI in populateGroupsListWithProperties()");
+                 // If the property is not assigned to any group, add it to the group for unassigned properties
                  } else if (p.getGroupURI()==null) {
-                     if (tempGroup!=null) { // not assigned any group yet and are creating a group for unassigned properties
-                         if (!alreadyOnPropertyList(tempGroup.getPropertyList(),p)) {
-                          
-                             tempGroup.getPropertyList().add(p);
-                             log.debug("adding property "+p.getEditLabel()+" to members of temp group "+unassignedGroupName);
+                     if (groupForUnassignedProperties!=null) { 
+                         // RY How could it happen that it's already in the group? Maybe we can remove this case.
+                         if (!alreadyOnPropertyList(groupForUnassignedProperties.getPropertyList(),p)) {                          
+                             groupForUnassignedProperties.getPropertyList().add(p);
+                             log.debug("adding property "+p.getLabel()+" to group for unassigned propertiues");
                          }
-                     } // otherwise don't put that property on the list
+                     } 
+                 // Otherwise, if the property is assigned to this group, add it to the group if it's not already there
                  } else if (p.getGroupURI().equals(pg.getURI())) {
+                     // RY How could it happen that it's already in the group? Maybe we can remove this case.
                      if (!alreadyOnPropertyList(pg.getPropertyList(),p)) {
                          pg.getPropertyList().add(p);
                      }
                  }
              }
-             if (pg.getPropertyList().size()>1) {
-                 try {
-                     Collections.sort(pg.getPropertyList(),new Property.DisplayComparatorIgnoringPropertyGroup());
-                 } catch (Exception ex) {
-                     log.error("Exception sorting property group "+pg.getName()+" property list: "+ex.getMessage());
-                 }
-             }
+             sortGroupPropertyList(pg.getName(), pg.getPropertyList());
         }
-        if (count>0 && tempGroup!=null && tempGroup.getPropertyList().size()>0) {
-            groupList.add(tempGroup);
-        }
-        count = groupList.size();
-        return count;
+    }
+    
+    private void sortGroupPropertyList(String groupName, List<Property> propertyList) {
+        if (propertyList.size()>1) {
+            try {
+                Collections.sort(propertyList,new Property.DisplayComparatorIgnoringPropertyGroup());
+            } catch (Exception ex) {
+                log.error("Exception sorting property group "+ groupName + " property list: "+ex.getMessage());
+            }
+        }       
     }
     
     private class PropertyRanker implements Comparator {
@@ -308,7 +330,7 @@ public class PropertyListBuilder {
                     }
                 }
             } catch (Exception ex) {
-                log.error("Cannot retrieve p1GroupRank for group "+p1.getEditLabel());
+                log.error("Cannot retrieve p1GroupRank for group "+p1.getLabel());
             }
             
             int p2GroupRank=MAX_GROUP_RANK;
@@ -320,7 +342,7 @@ public class PropertyListBuilder {
                     }
                 }
             } catch (Exception ex) {
-                log.error("Cannot retrieve p2GroupRank for group "+p2.getEditLabel());
+                log.error("Cannot retrieve p2GroupRank for group "+p2.getLabel());
             }
             
             // int diff = pgDao.getGroupByURI(p1.getGroupURI()).getDisplayRank() - pgDao.getGroupByURI(p2.getGroupURI()).getDisplayRank();
@@ -328,7 +350,7 @@ public class PropertyListBuilder {
             if (diff==0) {
                 diff = determineDisplayRank(p1) - determineDisplayRank(p2);
                 if (diff==0) {
-                    return p1.getEditLabel().compareTo(p2.getEditLabel());
+                    return p1.getLabel().compareTo(p2.getLabel());
                 } else {
                     return diff;
                 }

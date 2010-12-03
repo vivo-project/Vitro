@@ -2,4 +2,28 @@
 
 <#-- Template for property listing on individual profile page -->
 
-<#assign properties = individual.propertyList>
+<#assign propertyGroups = individual.propertyList>
+
+<#list propertyGroups as group>
+ 
+    <#-- Display the group heading -->    
+    <#-- If there are no groups, a dummy group has been created with a null name. -->
+    <#if ! group.name??> 
+        <#-- Here you might just do nothing and proceed to list the properties as in the grouped case, 
+        or you might choose different markup for the groupless case. -->        
+    <#-- This is the group for properties not assigned to any group. It has an empty name. -->
+    <#elseif group.name?length == 0> 
+        <h3>other</h3>       
+    <#else>
+        <h3>${group.name}</h3>
+    </#if>
+    
+    <#-- Now list the properties in the group -->
+    <p>Number of properties in group: ${group.propertyList?size}</p> <#-- testing -->
+    <#--
+    <#list group.properties as property>
+
+    </#list>
+    -->
+    
+</#list> 

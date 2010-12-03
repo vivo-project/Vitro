@@ -206,7 +206,7 @@ public class PropertyGroupDaoJena extends JenaBaseDao implements PropertyGroupDa
 	    }
 	}
 	
-	public PropertyGroup createTempPropertyGroup(String name, int rank) {
+	public PropertyGroup createDummyPropertyGroup(String name, int rank) {
 	    PropertyGroup newGroup = new PropertyGroup();
 	    newGroup.setName(name);
 	    newGroup.setDisplayRank(rank);

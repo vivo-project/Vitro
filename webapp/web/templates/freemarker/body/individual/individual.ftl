@@ -72,7 +72,8 @@
             </div>
         </#if>
 
-        <#-- <#include "individual-properties.ftl"> -->
+        <#-- Ontology properties -->
+        <#include "individual-properties.ftl">
 
         <#-- Keywords -->
         <#if individual.keywords?has_content>
@@ -187,8 +188,7 @@
 ${stylesheets.addFromTheme("/css/entity.css")}
                            
 <#-- RY Figure out which of these scripts really need to go into the head, and which are needed at all (e.g., tinyMCE??) -->
-${headScripts.add("/js/jquery.js",
-                  "/js/jquery_plugins/getUrlParam.js",
+${headScripts.add("/js/jquery_plugins/getUrlParam.js",                  
                   "/js/jquery_plugins/colorAnimations.js",
                   "/js/propertyGroupSwitcher.js",
                   "/js/jquery_plugins/jquery.form.js",
