@@ -38,6 +38,7 @@ import edu.cornell.mannlib.vitro.webapp.web.templatemodels.User;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.files.Scripts;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.files.Stylesheets;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu.MainMenu;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu.TabMenu;
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
@@ -383,7 +384,8 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("tabMenu", getTabMenu(vreq));
-
+        map.put("menu", getDisplayModelMenu(vreq));
+        
         Portal portal = vreq.getPortal();
         
         ApplicationBean appBean = vreq.getAppBean();
@@ -417,10 +419,12 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         return map;        
     }   
 
-    private MainMenu getTabMenu(VitroRequest vreq) {
-//        int portalId = vreq.getPortal().getPortalId();
-//        return new TabMenu(vreq, portalId);
-        
+    private TabMenu getTabMenu(VitroRequest vreq) {
+        int portalId = vreq.getPortal().getPortalId();
+        return new TabMenu(vreq, portalId);
+    }
+    
+    protected MainMenu getDisplayModelMenu(VitroRequest vreq){
         String url = vreq.getRequestURI().substring(vreq.getContextPath().length());
         return vreq.getWebappDaoFactory().getMenuDao().getMainMenu(url);
     }
