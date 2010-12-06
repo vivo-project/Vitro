@@ -21,6 +21,15 @@
     <#-- Now list the properties in the group -->
     <#list group.properties as property>
         <h4>${property.name}</h4>
+        
+        <#-- List the statements for each property -->
+        <#list property.statements as statement>
+            <#if statement.value??> <#-- data property -->
+                <div class="dataprop-value">
+                    ${statement.value}
+                </div>
+            </#if>
+        </#list>
     </#list>
     
 </#list> 
