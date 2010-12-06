@@ -21,6 +21,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.web.DisplayVocabulary;
@@ -55,16 +56,11 @@ public class BrowseController extends FreemarkerHttpServlet {
         super.init(servletConfig);
         ServletContext sContext = servletConfig.getServletContext();
 
-        //BJL23: I'll work on a strategy for avoiding all this craziness.
-        OntModel model = (OntModel)sContext.getAttribute("jenaOntModel");
-        OntModel baseModel = (OntModel)sContext.getAttribute("baseOntModel");
-        OntModel infModel = (OntModel)sContext.getAttribute("inferenceOntModel");
-        
-	
         BrowseControllerChangeListener bccl = new BrowseControllerChangeListener(this);
-        model.register(bccl);
-        baseModel.register(bccl);
-        infModel.register(bccl);
+        ModelContext.getJenaOntModel(sContext).register(bccl);
+        ModelContext.getBaseOntModel(sContext).register(bccl);
+        ModelContext.getInferenceOntModel(sContext).register(bccl);
+        ModelContext.getUnionOntModelSelector(sContext).getABoxModel().register(bccl);
 
         _rebuildQueue.add(REBUILD_EVERY_PORTAL);
         _cacheRebuildThread = new RebuildGroupCacheThread(this);

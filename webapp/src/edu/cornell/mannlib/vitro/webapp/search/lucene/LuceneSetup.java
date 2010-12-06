@@ -31,6 +31,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SearchReindexingListener;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ObjectSourceIface;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
@@ -115,13 +117,13 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 			context.setAttribute(IndexBuilder.class.getName(), builder);
 
 			// set up listeners so search index builder is notified of changes to model
-			OntModel baseOntModel = (OntModel) sce.getServletContext().getAttribute("baseOntModel");
-			OntModel jenaOntModel = (OntModel) sce.getServletContext().getAttribute("jenaOntModel");
-			OntModel inferenceModel = (OntModel) sce.getServletContext().getAttribute("inferenceOntModel");
+			ServletContext ctx = sce.getServletContext();
 			SearchReindexingListener srl = new SearchReindexingListener(builder);
-			baseOntModel.getBaseModel().register(srl);
-			jenaOntModel.getBaseModel().register(srl);
-			inferenceModel.register(srl);
+			ModelContext.getBaseOntModel(ctx).getBaseModel().register(srl);
+			ModelContext.getJenaOntModel(ctx).getBaseModel().register(srl);
+			ModelContext.getInferenceOntModel(ctx).register(srl);
+			ModelContext.getUnionOntModelSelector(ctx).getABoxModel()
+			        .getBaseModel().register(srl);
 
 			// set the classes that the indexBuilder ignores
 			OntModel displayOntModel = (OntModel) sce.getServletContext().getAttribute("displayOntModel");
