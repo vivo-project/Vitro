@@ -7,17 +7,18 @@ import java.util.List;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 
-public class UncollatedObjectProperty extends ObjectPropertyTemplateModel {
+public class UncollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateModel {
 
     private List<ObjectPropertyStatementTemplateModel> statements;
     
-    UncollatedObjectProperty(ObjectProperty property) {
+    UncollatedObjectPropertyTemplateModel(ObjectProperty property) {
         super(property);
         statements = new ArrayList<ObjectPropertyStatementTemplateModel>();
         
         // get the statements from the db via sparql query
     }
     
+    @Override
     public List<ObjectPropertyStatementTemplateModel> getStatements() {
         return statements;
     }
@@ -25,7 +26,8 @@ public class UncollatedObjectProperty extends ObjectPropertyTemplateModel {
 
     /* Access methods for templates */
     
-    public boolean getIsCollatedBySubtype() {
+    @Override
+    public boolean isCollatedBySubclass() {
         return false;
     }
 }

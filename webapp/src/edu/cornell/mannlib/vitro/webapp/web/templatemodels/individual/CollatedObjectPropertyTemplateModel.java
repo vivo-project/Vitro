@@ -7,11 +7,11 @@ import java.util.List;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 
-public class CollatedObjectProperty extends ObjectPropertyTemplateModel {
+public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateModel {
 
     private List<SubclassList> subclassList;
     
-    CollatedObjectProperty(ObjectProperty property) {
+    CollatedObjectPropertyTemplateModel(ObjectProperty property) {
         super(property);
         subclassList = new ArrayList<SubclassList>();
     }
@@ -20,13 +20,14 @@ public class CollatedObjectProperty extends ObjectPropertyTemplateModel {
         return subclassList;
     }
     
-    public List<SubclassList> getStatements() {
-        return subclassList;
-    }
+//    public List<SubclassList> getStatements() {
+//        return subclassList;
+//    }
     
     /* Access methods for templates */
     
-    public boolean getIsCollatedBySubtype() {
+    @Override
+    public boolean isCollatedBySubclass() {
         return true;
     }
 }

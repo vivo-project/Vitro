@@ -42,7 +42,7 @@
                         </#list>
                         
                     <#else> <#-- object property -->      
-                        
+                        <p>Collated? ${property.collatedBySubclass?string("yes", "no")}</p>
                     </#if>                   
                 </div> <!-- end property -->               
             </#list>            

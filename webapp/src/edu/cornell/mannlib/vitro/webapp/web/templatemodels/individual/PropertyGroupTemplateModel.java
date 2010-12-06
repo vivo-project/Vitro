@@ -26,11 +26,7 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
         for (Property p : propertyList)  {
             if (p instanceof ObjectProperty) {
                 ObjectProperty op = (ObjectProperty)p;
-                if (op.getCollateBySubclass()) {
-                    properties.add(new CollatedObjectProperty(op));
-                }  else {
-                    properties.add(new UncollatedObjectProperty(op));
-                }
+                properties.add(ObjectPropertyTemplateModel.getObjectPropertyTemplateModel(op));
             } else {
                 properties.add(new DataPropertyTemplateModel((DataProperty)p, subject, wdf));
             }
