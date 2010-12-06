@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.policy;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -11,10 +10,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
 
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.Identifier;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory.SelfEditing;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
@@ -26,7 +22,8 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.resource.AbstractRe
  * Policy to use for Vivo Self-Editing based on NetId for use at Cornell. All
  * methods in this class should be thread safe and side effect free.
  */
-public class SelfEditingPolicy implements PolicyIface {
+public class SelfEditingPolicy extends BaseSelfEditingPolicy implements
+		PolicyIface {
 	protected static Log log = LogFactory.getLog(SelfEditingPolicy.class);
 
 	protected final OntModel model;
@@ -40,38 +37,36 @@ public class SelfEditingPolicy implements PolicyIface {
 				prohibitedResources, prohibitedNamespaces, editableVitroUris);
 	}
 
-	private static final Authorization DEFAULT_AUTHORIZATION = Authorization.INCONCLUSIVE;
-
 	public PolicyDecision isAuthorized(IdentifierBundle whoToAuth,
 			RequestedAction whatToAuth) {
 		if (whoToAuth == null) {
-			return defaultDecision("whoToAuth was null");
+			return inconclusiveDecision("whoToAuth was null");
 		}
 		if (whatToAuth == null) {
-			return defaultDecision("whatToAuth was null");
+			return inconclusiveDecision("whatToAuth was null");
 		}
 
 		List<String> userUris = getUrisOfSelfEditor(whoToAuth);
 
 		if (userUris.isEmpty()) {
-			return defaultDecision("Not self-editing.");
+			return inconclusiveDecision("Not self-editing.");
 		}
 
 		if (whatToAuth instanceof AbstractObjectPropertyAction) {
 			return isAuthorizedForObjectPropertyAction(userUris,
 					(AbstractObjectPropertyAction) whatToAuth);
 		}
-		
+
 		if (whatToAuth instanceof AbstractDataPropertyAction) {
 			return isAuthorizedForDataPropertyAction(userUris,
 					(AbstractDataPropertyAction) whatToAuth);
 		}
-		
+
 		if (whatToAuth instanceof AbstractResourceAction) {
 			return isAuthorizedForResourceAction((AbstractResourceAction) whatToAuth);
 		}
 
-		return defaultDecision("Does not authorize "
+		return inconclusiveDecision("Does not authorize "
 				+ whatToAuth.getClass().getSimpleName() + " actions");
 	}
 
@@ -163,45 +158,6 @@ public class SelfEditingPolicy implements PolicyIface {
 			}
 		}
 		return false;
-	}
-
-	private List<String> getUrisOfSelfEditor(IdentifierBundle ids) {
-		List<String> uris = new ArrayList<String>();
-		if (ids != null) {
-			for (Identifier id : ids) {
-				if (id instanceof SelfEditing) {
-					SelfEditing selfEditId = (SelfEditing) id;
-					if (selfEditId.getBlacklisted() == null) {
-						uris.add(selfEditId.getValue());
-					}
-				}
-			}
-		}
-		return uris;
-	}
-
-	protected PolicyDecision cantModifyResource(String uri) {
-		return defaultDecision("No access to admin resources; cannot modify "
-				+ uri);
-	}
-
-	protected PolicyDecision cantModifyPredicate(String uri) {
-		return defaultDecision("No access to admin predicates; cannot modify "
-				+ uri);
-	}
-
-	private PolicyDecision userNotAuthorizedToStatement() {
-		return defaultDecision("User has no access to this statement.");
-	}
-
-	private PolicyDecision defaultDecision(String message) {
-		return new BasicPolicyDecision(DEFAULT_AUTHORIZATION,
-				"SelfEditingPolicy: " + message);
-	}
-
-	private PolicyDecision authorizedDecision(String message) {
-		return new BasicPolicyDecision(Authorization.AUTHORIZED,
-				"SelfEditingPolicy: " + message);
 	}
 
 	@Override
