@@ -14,6 +14,7 @@ import edu.cornell.mannlib.vedit.listener.ChangeListener;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.setup.CuratorEditingPolicySetup;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.setup.DbAdminEditingPolicySetup;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.setup.EditorEditingPolicySetup;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.setup.InformationResourceEditingPolicySetup;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.setup.SelfEditingPolicySetup;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
@@ -35,6 +36,7 @@ public class EditProhibitionListener implements ChangeListener {
             // do you want to do something more selective, such as seeing whether only certain policies are affected?
             // But, some (lower) will be affected if higher levels change (or will they if the object has been deleted?)
             SelfEditingPolicySetup.replaceSelfEditing(context,model);
+            InformationResourceEditingPolicySetup.replacePolicy(context,model);
             EditorEditingPolicySetup.replaceEditorEditing(context,model);
             CuratorEditingPolicySetup.replaceCuratorEditing(context,model);
             DbAdminEditingPolicySetup.replaceDbAdminEditing(context,model);
@@ -63,24 +65,29 @@ public class EditProhibitionListener implements ChangeListener {
             if (newRoleLevel.compareTo(BaseResourceBean.RoleLevel.SELF)==0) {
                 log.debug("replacing self editing editing policies after insertion of \"self\" update level");
                 SelfEditingPolicySetup.replaceSelfEditing(context,model);
+                InformationResourceEditingPolicySetup.replacePolicy(context,model);
             } else if (newRoleLevel.compareTo(BaseResourceBean.RoleLevel.EDITOR)==0) {
                 log.debug("replacing editor and lower editing policies after insertion of new \"editor\" update level");
                 SelfEditingPolicySetup.replaceSelfEditing(context,model);
+                InformationResourceEditingPolicySetup.replacePolicy(context,model);
                 EditorEditingPolicySetup.replaceEditorEditing(context,model);
             } else if (newRoleLevel.compareTo(BaseResourceBean.RoleLevel.CURATOR)==0) {
                 log.debug("replacing curator and lower editing policies after insertion of new \"curator\" update level");
                 SelfEditingPolicySetup.replaceSelfEditing(context,model);
+                InformationResourceEditingPolicySetup.replacePolicy(context,model);
                 EditorEditingPolicySetup.replaceEditorEditing(context,model);
                 CuratorEditingPolicySetup.replaceCuratorEditing(context,model);
             } else if (newRoleLevel.compareTo(BaseResourceBean.RoleLevel.DB_ADMIN)==0) {
                 log.debug("replacing db_admin and lower editing policies after insertion of new \"db_admin\" update level");
                 SelfEditingPolicySetup.replaceSelfEditing(context,model);
+                InformationResourceEditingPolicySetup.replacePolicy(context,model);
                 EditorEditingPolicySetup.replaceEditorEditing(context,model);
                 CuratorEditingPolicySetup.replaceCuratorEditing(context,model);
                 DbAdminEditingPolicySetup.replaceDbAdminEditing(context,model);
             } else if (newRoleLevel.compareTo(BaseResourceBean.RoleLevel.NOBODY)==0) {
                 log.debug("replacing db_admin and lower editing policies after insertion of new \"nobody\" update level");
                 SelfEditingPolicySetup.replaceSelfEditing(context,model);
+                InformationResourceEditingPolicySetup.replacePolicy(context,model);
                 EditorEditingPolicySetup.replaceEditorEditing(context,model);
                 CuratorEditingPolicySetup.replaceCuratorEditing(context,model);
                 DbAdminEditingPolicySetup.replaceDbAdminEditing(context,model);
@@ -99,6 +106,7 @@ public class EditProhibitionListener implements ChangeListener {
                 if (newRoleLevel.compareTo(oldRoleLevel)!=0) {
                     log.debug("replacing all editing policies after update when new level different from old");
                     SelfEditingPolicySetup.replaceSelfEditing(context,model);
+                    InformationResourceEditingPolicySetup.replacePolicy(context,model);
                     EditorEditingPolicySetup.replaceEditorEditing(context,model);
                     CuratorEditingPolicySetup.replaceCuratorEditing(context,model);
                     DbAdminEditingPolicySetup.replaceDbAdminEditing(context,model);
@@ -108,6 +116,7 @@ public class EditProhibitionListener implements ChangeListener {
             } else {
                 log.debug("replacing all editing policies after update when a role level introduced");
                 SelfEditingPolicySetup.replaceSelfEditing(context,model);
+                InformationResourceEditingPolicySetup.replacePolicy(context,model);
                 EditorEditingPolicySetup.replaceEditorEditing(context,model);
                 CuratorEditingPolicySetup.replaceCuratorEditing(context,model);
                 DbAdminEditingPolicySetup.replaceDbAdminEditing(context,model);
@@ -115,6 +124,7 @@ public class EditProhibitionListener implements ChangeListener {
         } else if (oldRoleLevel != null) { // with fixed selections, not likely to happen
             log.debug("replacing all editing policies after update when old role level removed");
             SelfEditingPolicySetup.replaceSelfEditing(context,model);
+            InformationResourceEditingPolicySetup.replacePolicy(context,model);
             EditorEditingPolicySetup.replaceEditorEditing(context,model);
             CuratorEditingPolicySetup.replaceCuratorEditing(context,model);
             DbAdminEditingPolicySetup.replaceDbAdminEditing(context,model);
