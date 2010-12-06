@@ -14,6 +14,8 @@ public class UncollatedObjectProperty extends ObjectPropertyTemplateModel {
     UncollatedObjectProperty(ObjectProperty property) {
         super(property);
         statements = new ArrayList<ObjectPropertyStatementTemplateModel>();
+        
+        // get the statements from the db via sparql query
     }
     
     public List<ObjectPropertyStatementTemplateModel> getStatements() {

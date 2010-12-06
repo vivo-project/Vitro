@@ -19,7 +19,7 @@
     </#if>
     
     <#-- Now list the properties in the group -->
-    <p>Number of properties in group: ${group.propertyList?size}</p> <#-- testing -->
+    <p>Number of properties in group: ${group.properties?size}</p> <#-- temporary -->
     <#--
     <#list group.properties as property>
 

@@ -21,4 +21,23 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     
     public abstract boolean getIsCollatedBySubtype();
 
+    @Override
+    public String addLink() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
+    @Override
+    public String editLink() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
+    @Override
+    public String deleteLink() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

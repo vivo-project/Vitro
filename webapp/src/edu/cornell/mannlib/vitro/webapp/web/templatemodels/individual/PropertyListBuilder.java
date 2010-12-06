@@ -50,7 +50,7 @@ public class PropertyListBuilder {
     }
     
     // RY Create the list here first to get it working. Then consider moving to GroupedPropertyList constructor.
-    protected List<PropertyGroup> getPropertyList() {
+    protected List<PropertyGroupTemplateModel> getPropertyList() {
         
         // Determine whether we're editing or not.
         boolean userCanEditThisProfile = getEditingStatus();
@@ -93,14 +93,19 @@ public class PropertyListBuilder {
         }
 
         sort(propertyList); //*** Does this do data and obj props, or just obj props??
-        
+
+        // Put the list into groups        
+        List<PropertyGroup> groupList = addPropertiesToGroups(propertyList);
+
+        // Build the template data model from the groupList
+        List<PropertyGroupTemplateModel> groups = new ArrayList<PropertyGroupTemplateModel>(groupList.size());
+        for (PropertyGroup pg : groupList) {
+            groups.add(new PropertyGroupTemplateModel(pg));
+        }         
         // *** ADD collation and statements here *** 
         // Don't  include custom sorting, since that will be handled from custom short views
         // We'll populate each item in the property list with its statements or subclass lists
 
-        // Put the list into groups        
-        //return new GroupedPropertyList(wdf, propertyList);
-        List<PropertyGroup> groups = addPropertiesToGroups(propertyList);
         return groups;
     }
     

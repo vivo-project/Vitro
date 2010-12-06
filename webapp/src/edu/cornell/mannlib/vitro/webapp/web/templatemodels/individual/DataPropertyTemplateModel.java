@@ -8,8 +8,10 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
     
     private static final String TYPE = "data";
 
-    DataPropertyTemplateModel(DataProperty property) {
-        super(property);
+    DataPropertyTemplateModel(DataProperty dp) {
+        super(dp);
+        
+        // get the data property statements from the db via sparql query
     }
 
     
@@ -17,6 +19,27 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
     
     public String getType() {
         return TYPE;
+    }
+
+
+    @Override
+    public String addLink() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
+    @Override
+    public String editLink() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
+    @Override
+    public String deleteLink() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

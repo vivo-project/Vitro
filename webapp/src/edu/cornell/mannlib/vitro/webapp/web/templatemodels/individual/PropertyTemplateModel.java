@@ -10,18 +10,12 @@ import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
  */
 public abstract class PropertyTemplateModel extends BaseTemplateModel {
     
+    private String name;
     protected Property property;
     
-    PropertyTemplateModel(Property propertry) {
+    PropertyTemplateModel(Property property) {
+        this.name = property.getLabel();
         this.property = property;
-    }
-    
-    protected Property getProperty() {
-        return property;
-    }
-    
-    protected String getUri() {
-        return property.getURI();
     }
     
     /* Access methods for templates */
@@ -31,5 +25,19 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     }
     
     public abstract String getType();
+    
+    public String getName() {
+        return name;
+    }
+    
+//    protected String getUri() {
+//        return property.getURI();
+//    }
+    
+    public abstract String addLink();
+    
+    public abstract String editLink();
+    
+    public abstract String deleteLink();
  
 }
