@@ -3,12 +3,9 @@
 <#-- Template for the insufficient authorization page -->
 
 <section role="region">
-    <h2>Insufficient Authorization</h2>
+    <h2>Houston...we have a problem</h2>
     
-    <p>
-      You are not authorized to view that page.
-    </p>
+    <p>We're sorry, but you are not authorized to view the page you requested. If you think this is an error, please <a href="${urls.contact}" title="Send us a message">contact us</a> and we'll be happy to help.</p>
 
-    <br/>
-    <a href="${urls.home}">Continue</a>
+    <p>Return to the <a href="${urls.home}" title="Head back home">home page</a>.</p>
 </section>
