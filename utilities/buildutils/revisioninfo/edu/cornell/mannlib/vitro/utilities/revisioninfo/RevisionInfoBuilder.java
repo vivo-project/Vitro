@@ -71,8 +71,6 @@ public class RevisionInfoBuilder {
 
 		String release = assembleReleaseNameFromSubversion();
 		String revision = obtainRevisionLevelFromSubversion();
-		System.err.println("release=" + release); // TODO
-		System.err.println("revision=" + revision); // TODO
 		return buildLine(release, revision);
 	}
 
