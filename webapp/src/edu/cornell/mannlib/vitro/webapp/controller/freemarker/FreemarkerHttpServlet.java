@@ -415,6 +415,9 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         if (! flashMessage.isEmpty()) {
             map.put("flash", flashMessage);
         }
+
+        // Let the page template know which page it's processing. 
+        map.put("currentPage", vreq.getServletPath().replaceFirst("/", ""));
         
         return map;        
     }   
