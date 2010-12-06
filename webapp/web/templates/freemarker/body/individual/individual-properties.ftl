@@ -5,31 +5,47 @@
 <#assign propertyGroups = individual.propertyList>
 
 <#list propertyGroups as group>
- 
-    <#-- Display the group heading -->    
-    <#-- If there are no groups, a dummy group has been created with a null name. -->
-    <#if ! group.name??> 
-        <#-- Here you might just do nothing and proceed to list the properties as in the grouped case, 
-        or you might choose different markup for the groupless case. -->        
-    <#-- This is the group for properties not assigned to any group. It has an empty name. -->
-    <#elseif group.name?length == 0> 
-        <h3>other</h3>       
+
+    <#-- Get the group name -->
+    <#if group.name??>        
+        <#if group.name?has_content>
+            <#assign groupName = group.name>
+        <#else>
+            <#-- This is the group for properties not assigned to any group. It has an empty name. -->
+            <#assign groupName = "other">
+        </#if>
     <#else>
-        <h3>${group.name}</h3>
-    </#if>
+        <#-- If there are no groups, a dummy group has been created with a null name. -->
+        <#assign groupName = "">
+    </#if> 
     
-    <#-- Now list the properties in the group -->
-    <#list group.properties as property>
-        <h4>${property.name}</h4>
+    <div class="property-group" id="group-${groupName}">
+   
+        <#-- Display the group heading --> 
+        <#if groupName?has_content>
+            <h3>${groupName}</h3>
+        </#if>
         
-        <#-- List the statements for each property -->
-        <#list property.statements as statement>
-            <#if statement.value??> <#-- data property -->
-                <div class="dataprop-value">
-                    ${statement.value}
-                </div>
-            </#if>
-        </#list>
-    </#list>
-    
+        <#-- Now list the properties in the group -->
+        <div class="properties">
+            <#list group.properties as property>
+                <div class="property" id="prop-${property.name}">
+                    <#-- Property display name -->
+                    <h4>${property.name}</h4>
+
+                    <#-- List the statements for each property -->                    
+                    <#if property.type == "data"> <#-- data property -->
+                        <#list property.statements as statement>
+                            <div class="dataprop-value">
+                                ${statement.value}
+                            </div> <!-- end dataprop-value -->
+                        </#list>
+                        
+                    <#else> <#-- object property -->      
+                        
+                    </#if>                   
+                </div> <!-- end property -->               
+            </#list>            
+        </div> <!-- end properties -->        
+    </div> <!-- end property-group -->   
 </#list> 
