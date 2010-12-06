@@ -2,18 +2,30 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
+import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 public class DataPropertyTemplateModel extends PropertyTemplateModel {
     
     private static final String TYPE = "data";
+    private List<DataPropertyStatementTemplateModel> statements;
 
-    DataPropertyTemplateModel(DataProperty dp) {
+    DataPropertyTemplateModel(DataProperty dp, Individual subject, WebappDaoFactory wdf) {
         super(dp);
-        
-        // get the data property statements from the db via sparql query
+        // Get the data property statements via sparql query
+        DataPropertyStatementDao dpDao = wdf.getDataPropertyStatementDao();
+        List<DataPropertyStatement> dpStatements = dpDao.getDataPropertyStatementsForIndividualByProperty(subject, dp);
+        statements = new ArrayList<DataPropertyStatementTemplateModel>(dpStatements.size());
+        for (DataPropertyStatement dps : dpStatements) {
+            statements.add(new DataPropertyStatementTemplateModel(dps));
+        }
     }
-
     
     /* Access methods for templates */
     
@@ -21,25 +33,27 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
         return TYPE;
     }
 
+    @Override
+    public String getAddLink() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
     @Override
-    public String addLink() {
+    public String getEditLink() {
         // TODO Auto-generated method stub
         return null;
     }
 
 
     @Override
-    public String editLink() {
+    public String getDeleteLink() {
         // TODO Auto-generated method stub
         return null;
     }
-
-
-    @Override
-    public String deleteLink() {
-        // TODO Auto-generated method stub
-        return null;
+    
+    public List<DataPropertyStatementTemplateModel> getStatements() {
+        return statements;
     }
 
 }

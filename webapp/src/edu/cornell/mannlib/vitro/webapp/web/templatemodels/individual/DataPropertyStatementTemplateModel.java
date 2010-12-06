@@ -5,18 +5,31 @@ package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class DataPropertyStatementTemplateModel extends PropertyStatementTemplateModel {
+import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
+
+public class DataPropertyStatementTemplateModel extends BaseTemplateModel {
     
     private static final Log log = LogFactory.getLog(DataPropertyStatementTemplateModel.class);  
     
-    // not sure whether we want the objects or the uris here
-    //protected DataProperty property = null;
-    protected String predicateUri = null;
-    protected String data = null;
+    private DataPropertyStatement statement;
 
-    DataPropertyStatementTemplateModel(String subjectUri, String predicateUri, String data) {
-        this.subjectUri = subjectUri;
-        this.predicateUri = predicateUri;
-        this.data = data;
+    DataPropertyStatementTemplateModel(DataPropertyStatement statement) {
+        this.statement = statement;
     }
+    
+    /* Access methods for templates */
+    
+    public String getValue() {
+        return statement.getData();
+    }
+    
+    public String getEditLink() {
+        return null;
+    }
+    
+    public String getDeleteLink() {
+        return null;
+    }
+
 }

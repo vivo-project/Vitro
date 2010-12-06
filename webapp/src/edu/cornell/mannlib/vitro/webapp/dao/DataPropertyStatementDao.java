@@ -38,5 +38,7 @@ public interface DataPropertyStatementDao {
 
     int insertNewDataPropertyStatement(DataPropertyStatement dataPropertyStatement );
 
+    List<DataPropertyStatement> getDataPropertyStatementsForIndividualByProperty(Individual subject, DataProperty property);
+
 }
 

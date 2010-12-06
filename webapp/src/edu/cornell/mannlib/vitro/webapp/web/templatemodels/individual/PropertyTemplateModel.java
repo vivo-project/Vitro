@@ -20,24 +20,16 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     
     /* Access methods for templates */
     
-    public String getAddLink() {
-        return null;
-    }
-    
     public abstract String getType();
     
     public String getName() {
         return name;
     }
     
-//    protected String getUri() {
-//        return property.getURI();
-//    }
+    public abstract String getAddLink();
     
-    public abstract String addLink();
+    public abstract String getEditLink();
     
-    public abstract String editLink();
-    
-    public abstract String deleteLink();
+    public abstract String getDeleteLink();
  
 }

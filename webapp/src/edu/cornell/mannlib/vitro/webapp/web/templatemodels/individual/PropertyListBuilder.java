@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -56,7 +57,6 @@ public class PropertyListBuilder {
         boolean userCanEditThisProfile = getEditingStatus();
 
         // Create the property list for the subject. The properties will be put into groups later.
-        //PropertyList propertyList = new PropertyList();
         List<Property> propertyList = new ArrayList<Property>();
         
         // First get all the object properties that occur in statements in the db with this subject as subject.
@@ -98,14 +98,12 @@ public class PropertyListBuilder {
         List<PropertyGroup> groupList = addPropertiesToGroups(propertyList);
 
         // Build the template data model from the groupList
+        // List<Map<String, Object>> groups = new ArrayList<Map<String, Object>>(groupList.size());
         List<PropertyGroupTemplateModel> groups = new ArrayList<PropertyGroupTemplateModel>(groupList.size());
         for (PropertyGroup pg : groupList) {
-            groups.add(new PropertyGroupTemplateModel(pg));
-        }         
-        // *** ADD collation and statements here *** 
-        // Don't  include custom sorting, since that will be handled from custom short views
-        // We'll populate each item in the property list with its statements or subclass lists
-
+            groups.add(new PropertyGroupTemplateModel(wdf, pg, subject));
+        }   
+        
         return groups;
     }
     

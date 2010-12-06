@@ -10,6 +10,13 @@ import com.hp.hpl.jena.datatypes.TypeMapper;
 import com.hp.hpl.jena.ontology.DatatypeProperty;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntResource;
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.QuerySolutionMap;
+import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.AnonId;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Property;
@@ -32,6 +39,23 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.event.IndividualUpdateEvent;
 public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPropertyStatementDao
 {
 
+    protected static final String dataPropertyValueQueryString = 
+        "SELECT ?value WHERE { \n" +
+        //"   GRAPH ?g {\n" + 
+        "       ?subject ?property ?value . \n" +        
+        //"   }\n" +
+        "}";
+    
+    static protected Query dataPropertyValueQuery;
+    static {
+        try {
+            dataPropertyValueQuery = QueryFactory.create(dataPropertyValueQueryString);
+        } catch(Throwable th){
+            log.error("could not create SPARQL query for dataPropertyQueryString " + th.getMessage());
+            log.error(dataPropertyValueQueryString);
+        }             
+    }
+    
     public DataPropertyStatementDaoJena(WebappDaoFactoryJena wadf) {
         super(wadf);
     }
@@ -254,4 +278,32 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
         return l;
     }
 
+    @Override
+    /*
+     * SPARQL-based method for getting the individual's values for a single data property.
+     */
+    public List<DataPropertyStatement> getDataPropertyStatementsForIndividualByProperty(Individual subject, DataProperty property) {
+        log.debug("dataPropertyValueQueryString:\n" + dataPropertyValueQueryString);         
+        log.debug("dataPropertyValueQuery:\n" + dataPropertyValueQuery);  
+        
+        String subjectUri = subject.getURI();
+        String propertyUri = property.getURI();
+
+        QuerySolutionMap bindings = new QuerySolutionMap();
+        bindings.add("subject", ResourceFactory.createResource(subjectUri));
+        bindings.add("property", ResourceFactory.createResource(propertyUri));
+
+        // Run the SPARQL query to get the properties        
+        QueryExecution qexec = QueryExecutionFactory.create(dataPropertyValueQuery, getOntModelSelector().getFullModel(), bindings);
+        ResultSet results = qexec.execSelect(); 
+
+        List<DataPropertyStatement> values = new ArrayList<DataPropertyStatement>();
+        while (results.hasNext()) {
+            QuerySolution sol = results.next();
+            Literal value = sol.getLiteral("value");
+            DataPropertyStatement dps = new DataPropertyStatementImpl(subjectUri, propertyUri, value.getLexicalForm());
+            values.add(dps);
+        }
+        return values;  
+    }
 }

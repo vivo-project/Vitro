@@ -6,6 +6,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -30,6 +31,8 @@ import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.AnonId;
 import com.hp.hpl.jena.rdf.model.Literal;
@@ -944,5 +947,69 @@ public class JenaBaseDao extends JenaBaseDaoCon {
 		
 		return temp;
     }
+
+    /* ****************************************************************************** */
     
+    /**
+     * Converts a sparql query that returns a multiple rows to a list of maps.
+     * The maps will have column names as keys to the values.
+     */
+    protected List<Map<String, Object>> executeQueryToCollection(
+            QueryExecution qexec) {
+        List<Map<String, Object>> rv = new ArrayList<Map<String, Object>>();
+        ResultSet results = qexec.execSelect();
+        while (results.hasNext()) {
+            QuerySolution soln = results.nextSolution();
+            rv.add(querySolutionToMap(soln));
+        }
+        return rv;
+    }
+    
+    protected Map<String,Object> querySolutionToMap( QuerySolution soln ){
+        Map<String,Object> map = new HashMap<String,Object>();
+        Iterator<String> varNames = soln.varNames();
+        while(varNames.hasNext()){
+            String varName = varNames.next();
+            map.put(varName, nodeToObject( soln.get(varName)));
+        }
+        return map;
+    }
+    
+    static protected Object nodeToObject( RDFNode node ){
+        if( node == null ){
+            return "";
+        }else if( node.isLiteral() ){
+            Literal literal = node.asLiteral();
+            return literal.getValue();
+        }else if( node.isURIResource() ){
+            Resource resource = node.asResource();
+            return resource.getURI();
+        }else if( node.isAnon() ){  
+            Resource resource = node.asResource();
+            return resource.getId().getLabelString(); //get b-node id
+        }else{
+            return "";
+        }
+    }
+
+    static protected String nodeToString( RDFNode node ){
+        if( node == null ){
+            return "";
+        }else if( node.isLiteral() ){
+            Literal literal = node.asLiteral();
+            return literal.getLexicalForm();
+        }else if( node.isURIResource() ){
+            Resource resource = node.asResource();
+            return resource.getURI();
+        }else if( node.isAnon() ){  
+            Resource resource = node.asResource();
+            return resource.getId().getLabelString(); //get b-node id
+        }else{
+            return "";
+        }
+    }
+    protected Map<String,Object> resultsToMap(){
+        return null;
+    }
+
 }

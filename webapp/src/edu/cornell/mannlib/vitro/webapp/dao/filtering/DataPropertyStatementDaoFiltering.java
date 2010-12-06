@@ -89,6 +89,11 @@ class DataPropertyStatementDaoFiltering extends BaseFiltering implements DataPro
             DataPropertyStatement dataPropertyStatement) {
         return innerDataPropertyStatementDao.insertNewDataPropertyStatement(dataPropertyStatement);
     }
-
+    
+    @Override
+    // RY What about filtering?
+    public List<DataPropertyStatement> getDataPropertyStatementsForIndividualByProperty(Individual subject, DataProperty property) {
+        return innerDataPropertyStatementDao.getDataPropertyStatementsForIndividualByProperty(subject, property);
+    }
 
 }
