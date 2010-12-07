@@ -8,7 +8,9 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateModel {
 
@@ -16,8 +18,8 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
     
     private List<SubclassList> subclassList;
     
-    CollatedObjectPropertyTemplateModel(ObjectProperty property) {
-        super(property);
+    CollatedObjectPropertyTemplateModel(ObjectProperty property, Individual subject, WebappDaoFactory wdf) {
+        super(property, subject, wdf);
         subclassList = new ArrayList<SubclassList>();
     }
     

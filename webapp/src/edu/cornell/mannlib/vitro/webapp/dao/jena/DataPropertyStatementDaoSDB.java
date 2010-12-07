@@ -101,30 +101,4 @@ public class DataPropertyStatementDaoSDB extends DataPropertyStatementDaoJena
             }
         }
     }
-
-	@Override
-    public List<DataPropertyStatement> getDataPropertyStatementsForIndividualByProperty(Individual subject, DataProperty property) {
-        log.debug("dataPropertyValueQueryString:\n" + dataPropertyValueQueryString);         
-        log.debug("dataPropertyValueQuery:\n" + dataPropertyValueQuery);  
-        
-        String subjectUri = subject.getURI();
-        String propertyUri = property.getURI();
-
-        QuerySolutionMap bindings = new QuerySolutionMap();
-        bindings.add("subject", ResourceFactory.createResource(subjectUri));
-        bindings.add("property", ResourceFactory.createResource(propertyUri));
-
-        // Run the SPARQL query to get the properties        
-        QueryExecution qexec = QueryExecutionFactory.create(dataPropertyValueQuery, getOntModelSelector().getFullModel(), bindings);
-        ResultSet results = qexec.execSelect(); 
-
-        List<DataPropertyStatement> values = new ArrayList<DataPropertyStatement>();
-        while (results.hasNext()) {
-            QuerySolution sol = results.next();
-            Literal value = sol.getLiteral("value");
-            DataPropertyStatement dps = new DataPropertyStatementImpl(subjectUri, propertyUri, value.getLexicalForm());
-            values.add(dps);
-        }
-        return values; 
-    }
 }

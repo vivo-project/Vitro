@@ -214,4 +214,9 @@ class ObjectPropertyDaoFiltering extends BaseFiltering implements ObjectProperty
     public List<ObjectProperty> getObjectPropertyList(String subjectUri) {
         return innerObjectPropertyDao.getObjectPropertyList(subjectUri);
     }
+
+    @Override
+    public String getCustomShortView() {
+        return innerObjectPropertyDao.getCustomShortView();
+    }
 }

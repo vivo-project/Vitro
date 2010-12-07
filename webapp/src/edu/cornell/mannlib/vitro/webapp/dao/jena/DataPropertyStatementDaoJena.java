@@ -297,13 +297,13 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
         QueryExecution qexec = QueryExecutionFactory.create(dataPropertyValueQuery, getOntModelSelector().getFullModel(), bindings);
         ResultSet results = qexec.execSelect(); 
 
-        List<DataPropertyStatement> values = new ArrayList<DataPropertyStatement>();
+        List<DataPropertyStatement> statements = new ArrayList<DataPropertyStatement>();
         while (results.hasNext()) {
             QuerySolution sol = results.next();
             Literal value = sol.getLiteral("value");
             DataPropertyStatement dps = new DataPropertyStatementImpl(subjectUri, propertyUri, value.getLexicalForm());
-            values.add(dps);
+            statements.add(dps);
         }
-        return values;  
+        return statements;  
     }
 }

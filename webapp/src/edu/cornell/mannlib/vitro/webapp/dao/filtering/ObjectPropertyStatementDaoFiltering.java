@@ -81,4 +81,12 @@ class ObjectPropertyStatementDaoFiltering extends BaseFiltering implements Objec
         return innerObjectPropertyStatementDao.insertNewObjectPropertyStatement(objPropertyStmt);
     }
 
+
+    @Override
+    // RY What about filtering?
+    public List<ObjectPropertyStatement> getObjectPropertyStatementsForIndividualByProperty(
+            Individual subject, ObjectProperty property, String query) {
+        return innerObjectPropertyStatementDao.getObjectPropertyStatementsForIndividualByProperty(subject, property, query);
+    }
+
 }

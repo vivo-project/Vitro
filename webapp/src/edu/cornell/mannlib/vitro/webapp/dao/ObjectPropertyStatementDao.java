@@ -28,5 +28,6 @@ public interface ObjectPropertyStatementDao {
     Individual fillExistingObjectPropertyStatements( Individual entity );
 
     int insertNewObjectPropertyStatement(ObjectPropertyStatement objPropertyStmt );
-
+    
+    public List<ObjectPropertyStatement> getObjectPropertyStatementsForIndividualByProperty(Individual subject, ObjectProperty property, String query);
 }

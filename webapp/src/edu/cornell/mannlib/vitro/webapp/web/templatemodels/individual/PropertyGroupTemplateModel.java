@@ -31,7 +31,7 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
         for (Property p : propertyList)  {
             if (p instanceof ObjectProperty) {
                 ObjectProperty op = (ObjectProperty)p;
-                properties.add(ObjectPropertyTemplateModel.getObjectPropertyTemplateModel(op));
+                properties.add(ObjectPropertyTemplateModel.getObjectPropertyTemplateModel(op, subject, wdf));
             } else {
                 properties.add(new DataPropertyTemplateModel((DataProperty)p, subject, wdf));
             }

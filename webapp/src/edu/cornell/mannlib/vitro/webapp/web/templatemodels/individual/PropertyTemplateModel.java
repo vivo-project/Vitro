@@ -16,10 +16,12 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     private static final Log log = LogFactory.getLog(PropertyTemplateModel.class); 
     
     private String name;
-    protected Property property;
+    private String uri;
+    protected Property property; // needed to get the edit links
     
     PropertyTemplateModel(Property property) {
         this.name = property.getLabel();
+        this.uri = property.getURI();
         this.property = property;
     }
     
@@ -29,6 +31,10 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     
     public String getName() {
         return name;
+    }
+
+    public String getUri() {
+        return uri;
     }
     
     public abstract String getAddLink();

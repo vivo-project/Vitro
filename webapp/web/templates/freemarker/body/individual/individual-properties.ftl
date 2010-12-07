@@ -36,13 +36,16 @@
                     <#-- List the statements for each property -->                    
                     <#if property.type == "data"> <#-- data property -->
                         <#list property.statements as statement>
-                            <div class="dataprop-value">
+                            <div class="data-prop-stmt-value">
                                 ${statement.value}
-                            </div> <!-- end dataprop-value -->
+                            </div> <!-- end data-prop-stmt-value -->
                         </#list>
                         
                     <#else> <#-- object property -->      
                         <p>Collated? ${property.collatedBySubclass?string("yes", "no")}</p>
+                        <#if ! property.collatedBySubclass> <#-- temporary, till we handle collated props -->
+                            <#include "${property.template}">
+                        </#if>
                     </#if>                   
                 </div> <!-- end property -->               
             </#list>            
