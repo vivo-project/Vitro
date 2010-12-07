@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
@@ -16,7 +17,10 @@ import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.sdb.SDBFactory;
+import com.hp.hpl.jena.sdb.Store;
 import com.hp.hpl.jena.sdb.StoreDesc;
+import com.hp.hpl.jena.sdb.sql.SDBConnection;
 import com.hp.hpl.jena.sdb.store.DatabaseType;
 import com.hp.hpl.jena.sdb.store.LayoutType;
 
@@ -26,6 +30,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDaoCon;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDBGraphGenerator;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RegeneratingGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SDBGraphGenerator;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaModelMaker;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSDBModelMaker;
 
 public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     private static final Log log = LogFactory.getLog(JenaDataSourceSetupBase.class);
@@ -261,5 +267,47 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
                 .createProperty(VitroVocabulary.USER_ROLE), model
                 .createTypedLiteral("role:/50")));
     }
+    
+    protected final static String DB_TYPE = "MySQL";
+    private static VitroJenaModelMaker vjmm = null;
+    private static VitroJenaSDBModelMaker vsmm = null;
+    private static final String sdbModelMaker = "vitroJenaSDBModelMaker";
+    private static final String rdbModelMaker = "vitroJenaModelMaker";
+    
+    protected void makeModelMakerFromConnectionProperties(TripleStoreType type){
+    	String jdbcUrl = ConfigurationProperties.getProperty("VitroConnection.DataSource.url")
+    	+ "?useUnicode=yes&characterEncoding=utf8";
+    	String username = ConfigurationProperties.getProperty("VitroConnection.DataSource.username");
+    	String password = ConfigurationProperties.getProperty("VitroConnection.DataSource.password");
+    	
+    	if (TripleStoreType.RDB.equals(type)){
+    		vjmm = new VitroJenaModelMaker(jdbcUrl, username, password, DB_TYPE);
+    		
+    	}
+    	else if(TripleStoreType.SDB.equals(type)){
+    		StoreDesc storeDesc = new StoreDesc(LayoutType.LayoutTripleNodesHash,DatabaseType.MySQL);
+    		SDBConnection sdbConn = new SDBConnection(jdbcUrl,username,password);
+    		Store store = SDBFactory.connectStore(sdbConn, storeDesc);
+    		vsmm = new VitroJenaSDBModelMaker(store);
+    	}
+		return;
+    }
+    
+    public static void setVitroJenaModelMaker(VitroJenaModelMaker vjmm, ServletContextEvent sce){
+    	sce.getServletContext().setAttribute(rdbModelMaker, vjmm);
+    }
+    
+    public static void setVitroJenaSDBModelMaker(VitroJenaSDBModelMaker vsmm, ServletContextEvent sce){
+    	sce.getServletContext().setAttribute(sdbModelMaker, vsmm);
+    }
+    
+    protected VitroJenaModelMaker getVitroJenaModelMaker(){
+    	return vjmm;
+    }
+    
+    protected VitroJenaSDBModelMaker getVitroJenaSDBModelMaker(){
+    	return vsmm;
+    }
+
 
 }

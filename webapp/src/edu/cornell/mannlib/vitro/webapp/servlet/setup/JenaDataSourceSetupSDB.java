@@ -43,7 +43,10 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDaoCon;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaModelUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelSynchronizer;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelectorImpl;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaModelMaker;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSDBModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB;
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase.TripleStoreType;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapper;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.InitialJenaModelUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.NamespaceMapperJena;
@@ -266,7 +269,14 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
         	memModel.getBaseModel().register(namespaceMapper);
         	
         	sce.getServletContext().setAttribute("defaultNamespace", defaultNamespace);
-        	       	
+        	
+        	makeModelMakerFromConnectionProperties(TripleStoreType.RDB);
+        	VitroJenaModelMaker vjmm = getVitroJenaModelMaker();
+        	setVitroJenaModelMaker(vjmm,sce);
+        	makeModelMakerFromConnectionProperties(TripleStoreType.SDB);
+        	VitroJenaSDBModelMaker vsmm = getVitroJenaSDBModelMaker();
+        	setVitroJenaSDBModelMaker(vsmm,sce);
+        	       	 
         } catch (Throwable t) {
             log.error("Throwable in " + this.getClass().getName(), t);
             // printing the error because Tomcat doesn't print context listener
