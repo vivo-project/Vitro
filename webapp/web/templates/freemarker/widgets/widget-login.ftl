@@ -50,7 +50,7 @@
                             
             <#if externalAuthUrl??>
                 <p class="external-auth">
-                    <a class="green button" href="${externalAuthUrl}">Log in using ${externalAuthName}</a>
+                    <a class="green button" href="${externalAuthUrl}">${externalAuthName}</a>
                 </p>
             </#if>
 

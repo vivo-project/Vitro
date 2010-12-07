@@ -120,7 +120,7 @@ public class LoginWidget extends Widget {
         values.put(TemplateVariable.FORM_ACTION.toString(), getAuthenticateUrl(request));
         values.put(TemplateVariable.LOGIN_NAME.toString(), bean.getUsername());
         
-		String externalAuthDisplayName = ConfigurationProperties.getProperty("externalAuth.displayName");
+		String externalAuthDisplayName = ConfigurationProperties.getProperty("externalAuth.buttonText");
 		if (externalAuthDisplayName != null) {
 			values.put(TemplateVariable.EXTERNAL_AUTH_URL.toString(),
 					UrlBuilder.getUrl(EXTERNAL_AUTH_SETUP_URL));
