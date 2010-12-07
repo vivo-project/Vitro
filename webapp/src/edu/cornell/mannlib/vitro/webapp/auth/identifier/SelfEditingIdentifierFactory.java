@@ -16,6 +16,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
@@ -30,6 +31,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
@@ -138,7 +140,7 @@ public class SelfEditingIdentifierFactory implements IdentifierBundleFactory {
 		}
 
 		log.debug("Found an Individual for netId " + username + " URI: " + uri);
-		String blacklisted = checkForBlacklisted(ind, context);
+		String blacklisted = checkForBlacklisted(ind, context, req);
 		return new SelfEditing(ind, blacklisted, false);
 	}
 
@@ -181,7 +183,7 @@ public class SelfEditingIdentifierFactory implements IdentifierBundleFactory {
      * or more rows will be cause the user to be blacklisted.  The first variable from
      * the first solution set will be returned.   
      */
-    public static String checkForBlacklisted(Individual ind, ServletContext context) {
+    public static String checkForBlacklisted(Individual ind, ServletContext context, HttpServletRequest req) {
         if( ind == null || context == null ) {
             log.error("could not check for Blacklist, null individual or context");
             return NOT_BLACKLISTED;
@@ -207,7 +209,7 @@ public class SelfEditingIdentifierFactory implements IdentifierBundleFactory {
         String reasonForBlacklist = NOT_BLACKLISTED;
         for( File file : files ){
             try{
-                reasonForBlacklist = runSparqlFileForBlacklist( file, ind, context);
+                reasonForBlacklist = runSparqlFileForBlacklist( file, ind, context, req);
                 if( reasonForBlacklist != NOT_BLACKLISTED ) 
                     break;
             }catch(RuntimeException ex){
@@ -228,7 +230,7 @@ public class SelfEditingIdentifierFactory implements IdentifierBundleFactory {
      * token "?individualURI" is found.
      */
     private static String runSparqlFileForBlacklist
-        (File file, Individual ind, ServletContext context) 
+        (File file, Individual ind, ServletContext context, HttpServletRequest req) 
     {
         if( !file.canRead() ){
             log.debug("cannot read blacklisting SPARQL file " + file.getName());
@@ -259,12 +261,14 @@ public class SelfEditingIdentifierFactory implements IdentifierBundleFactory {
             log.debug(file.getName() + " is empty");
             return NOT_BLACKLISTED;            
         }
-        Model model = (Model)context.getAttribute("jenaOntModel");
+       // Model model = (Model)context.getAttribute("jenaOntModel");
+        VitroRequest request = new VitroRequest(req);	
+        Dataset dataset = request.getDataset();
         
         queryString = queryString.replaceAll("\\?individualURI", "<" + ind.getURI() + ">");
         log.debug(queryString);
         Query query = QueryFactory.create(queryString);        
-        QueryExecution qexec = QueryExecutionFactory.create(query,model);
+        QueryExecution qexec = QueryExecutionFactory.create(query,dataset);
         try{
             ResultSet results = qexec.execSelect();
             while(results.hasNext()){
