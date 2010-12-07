@@ -5,10 +5,15 @@ package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 
 public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateModel {
 
+    private static final Log log = LogFactory.getLog(CollatedObjectPropertyTemplateModel.class);  
+    
     private List<SubclassList> subclassList;
     
     CollatedObjectPropertyTemplateModel(ObjectProperty property) {

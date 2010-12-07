@@ -5,9 +5,14 @@ package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 
 public class ObjectPropertyTemplateModel extends PropertyTemplateModel {
+    
+    private static final Log log = LogFactory.getLog(ObjectPropertyTemplateModel.class);  
     
     private static final String TYPE = "object";
     private List<ObjectPropertyStatementTemplateModel> statements;

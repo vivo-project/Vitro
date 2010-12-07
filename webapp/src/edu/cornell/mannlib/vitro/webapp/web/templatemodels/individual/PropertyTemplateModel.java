@@ -2,6 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 
@@ -9,6 +12,8 @@ import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
  * Represents the property statement list for a single property of an individual.
  */
 public abstract class PropertyTemplateModel extends BaseTemplateModel {
+
+    private static final Log log = LogFactory.getLog(PropertyTemplateModel.class); 
     
     private String name;
     protected Property property;
