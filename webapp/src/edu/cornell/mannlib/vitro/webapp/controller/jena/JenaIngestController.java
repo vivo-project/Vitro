@@ -63,6 +63,7 @@ import com.hp.hpl.jena.util.ResourceUtils;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
+import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -124,21 +125,64 @@ public class JenaIngestController extends BaseEditController {
 		
 		String actionStr = vreq.getParameter("action");
 		actionStr = (actionStr != null) ? actionStr : "";
-		
+		String modelType = vreq.getParameter("modelType");
 		if ("listModels".equals(actionStr)) {
+			String jdbcUrl = ConfigurationProperties.getProperty("VitroConnection.DataSource.url")
+	    	+ "?useUnicode=yes&characterEncoding=utf8";
+	    	String username = ConfigurationProperties.getProperty("VitroConnection.DataSource.username");
+	    	String password = ConfigurationProperties.getProperty("VitroConnection.DataSource.password");
+			VitroJenaModelMaker vjmm = new VitroJenaModelMaker(jdbcUrl, username, password, "MySQL");
+		    vreq.getSession().setAttribute("vitroJenaModelMaker",vjmm);
+        	request.setAttribute("modelType", "rdb");
+        	request.setAttribute("infoLine", "RDB models");
 			request.setAttribute("title","Available Models");
+			request.setAttribute("bodyJsp",LIST_MODELS_JSP);
+		}else if("sdbModels".equals(actionStr)){
+			String jdbcUrl = ConfigurationProperties.getProperty("VitroConnection.DataSource.url")
+	    	+ "?useUnicode=yes&characterEncoding=utf8";
+	    	String username = ConfigurationProperties.getProperty("VitroConnection.DataSource.username");
+	    	String password = ConfigurationProperties.getProperty("VitroConnection.DataSource.password");
+			StoreDesc storeDesc = new StoreDesc(LayoutType.LayoutTripleNodesHash,DatabaseType.MySQL) ;
+        	SDBConnection conn = new SDBConnection(jdbcUrl, username, password) ; 
+        	Store store = SDBFactory.connectStore(conn, storeDesc);
+        	VitroJenaSDBModelMaker vsmm = new VitroJenaSDBModelMaker(store);
+        	vreq.getSession().setAttribute("vitroJenaModelMaker",vsmm);
+        	request.setAttribute("modelType", "sdb");
+        	request.setAttribute("infoLine", "SDB models");
+        	request.setAttribute("title","Available Models");
 			request.setAttribute("bodyJsp",LIST_MODELS_JSP);
 		} else if ("createModel".equals(actionStr)) {
 			String modelName = vreq.getParameter("modelName");
 			if (modelName != null) {
+				if(modelType.equals("sdb")){
+					String jdbcUrl = ConfigurationProperties.getProperty("VitroConnection.DataSource.url")
+			    	+ "?useUnicode=yes&characterEncoding=utf8";
+			    	String username = ConfigurationProperties.getProperty("VitroConnection.DataSource.username");
+			    	String password = ConfigurationProperties.getProperty("VitroConnection.DataSource.password");
+					StoreDesc storeDesc = new StoreDesc(LayoutType.LayoutTripleNodesHash,DatabaseType.MySQL) ;
+		        	SDBConnection conn = new SDBConnection(jdbcUrl, username, password) ; 
+		        	Store store = SDBFactory.connectStore(conn, storeDesc);
+		        	maker = new VitroJenaSDBModelMaker(store);
+		        	request.setAttribute("infoLine", "SDB models");
+				}
+				else{
+					request.setAttribute("infoLine", "RDB models");
+				}
 				doCreateModel(modelName, maker);
 				request.setAttribute("title","Available Models");
 				request.setAttribute("bodyJsp",LIST_MODELS_JSP);
 			} else {
+				request.setAttribute("modelType", modelType);
 				request.setAttribute("title","Create New Model");
 				request.setAttribute("bodyJsp",CREATE_MODEL_JSP);
 			}
 		} else if ("removeModel".equals(actionStr)) {
+			if(modelType.equals("sdb")){
+				request.setAttribute("infoLine", "SDB models");
+			}
+			else{
+				request.setAttribute("infoLine", "RDB models");
+			}
 			String modelName = vreq.getParameter("modelName");
 			if (modelName!=null) {
 				doRemoveModel(modelName, maker);
@@ -191,13 +235,20 @@ public class JenaIngestController extends BaseEditController {
 			}
 			return;
 		} else if ("clearModel".equals(actionStr)) {
+			if(modelType.equals("sdb")){
+				request.setAttribute("infoLine", "SDB models");
+			}
+			else{
+				request.setAttribute("infoLine", "RDB models");
+			}
 			String modelName = vreq.getParameter("modelName");
 			if (modelName != null) {
 				doClearModel(modelName,maker);
 			}
 			request.setAttribute("title","Ingest Menu");
 			request.setAttribute("bodyJsp",INGEST_MENU_JSP);
-		} else if ("setWriteLayer".equals(actionStr)) {
+		} 
+		/*else if ("setWriteLayer".equals(actionStr)) {
 			String modelName = vreq.getParameter("modelName");
 			if (modelName != null) {
 				OntModel mainModel = (OntModel) getServletContext().getAttribute("jenaOntModel");
@@ -219,7 +270,8 @@ public class JenaIngestController extends BaseEditController {
 			}
 			request.setAttribute("title","Ingest Menu");
 			request.setAttribute("bodyJsp",INGEST_MENU_JSP);
-		} else if ("attachModel".equals(actionStr)) {
+		} */
+		else if ("attachModel".equals(actionStr)) {
 			String modelName = vreq.getParameter("modelName");
 			if (modelName != null) {
 				doAttachModel(modelName,maker);
