@@ -392,7 +392,7 @@ public class IndividualController extends FreemarkerHttpServlet {
 				}//else send them to html													
 			}
 			//else redirect to HTML representation
-			return "/display/" + m.group(1) ;
+			return UrlBuilder.getUrl("displayfm/" + m.group(1));
 		}else{			
 			return null;
 		}
