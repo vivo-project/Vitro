@@ -9,94 +9,18 @@
     <#if editStatus.showEditLinks>editing<#else></#if>
 </#assign>
 
-<div id="personWrap">
-    <#if editStatus.showAdminPanel>
-        <#include "individual-adminPanel.ftl">
-    </#if>
+<#if editStatus.showAdminPanel>
+    <#include "individual-adminPanel.ftl">
+</#if>
     
-    <div class="contents entity ${editingClass}">
-        <div id="labelAndMoniker">
-            
-            <#if relatedSubject??>
-                <h2>${relatedSubject.relatingPredicateDomainPublic} for ${relatedSubject.name}</h2>
-                <p><a href="${relatedSubject.url}">&larr; return to ${relatedSubject.name}</a></p>                
-            <#else>
-                <#-- Label -->
-                <@p.dataPropWrapper id="label">
-                    <h2>${individual.name}</h2>
-                </@p.dataPropWrapper>
-                
-                <#-- Moniker -->
-                <#if individual.moniker?has_content>
-                    <@p.dataPropsWrapper id="moniker">
-                        <em class="moniker">${individual.moniker}</em>
-                    </@p.dataPropsWrapper>                   
-                </#if>
-            </#if>
-        </div> <!-- labelAndMoniker -->
-
-        <#include "individual-sparklineVisualization.ftl">
-       
-        <#-- Thumbnail -->
-        <div id="dprop-vitro-image" class="propsItem ${editingClass}"> 
-            <#if individual.thumbUrl??>
-                <@p.dataPropsWrapper id="thumbnail">
-                    <a class="image" href="${individual.imageUrl}">
-                        <img src="${individual.thumbUrl}" 
-                             title="click to view larger image" 
-                             alt="${individual.name}" width="115" />
-                    </a>
-                </@p.dataPropsWrapper> 
-            <#elseif individual.person>
-                <@p.dataPropsWrapper id="thumbnail">
-                    <img src="${urls.images}/dummyImages/person.thumbnail.jpg"
-                         title = "no image" alt="placeholder image" width="115" />                                                 
-                </@p.dataPropsWrapper>             
-            </#if>
-        </div>
-        
-        <#-- Links -->
-        <#if individual.links?has_content>
-            <div id="dprop-vitro-links" class="propsItem ${editingClass}">
-                <ul class="externalLinks properties">
-                    <@l.firstLastList>
-                        <#list individual.links as link>                        
-                            <li>
-                                <span class="statementWrap">
-                                    <a class="externalLink" href="${link.url}">${link.anchor}</a>
-                                </span>
-                            </li>                                                        
-                        </#list>
-                    </@l.firstLastList>
-                </ul>
-            </div>
-        </#if>
-
-        <#-- Ontology properties -->
-        <#include "individual-properties.ftl">
-
-        <#-- Keywords -->
-        <#if individual.keywords?has_content>
-            <p id="keywords">Keywords: ${individual.keywordString}</p>
-        </#if>
-    </div> <!-- #contents -->
-
-</div> <!-- #personWrap -->
-
 <section id="individual-intro-person" class="vcard">
     <div id="individual-intro-left-content"> 
         <#-- Thumbnail -->
-        <#--<div id="dprop-vitro-image" class="propsItem ${editingClass}">-->
             <#if individual.thumbUrl??>
-                <#--<@p.dataPropsWrapper id="thumbnail">-->
-                    <a href="${individual.imageUrl}"><img class="individual-photo2" src="${individual.thumbUrl}" title="click to view larger image" alt="${individual.name}" width="115" /></a>
-                 <#--</@p.dataPropsWrapper>-->
+                <a href="${individual.imageUrl}"><img class="individual-photo2" src="${individual.thumbUrl}" title="click to view larger image" alt="${individual.name}" width="115" /></a>
             <#elseif individual.person>
-                 <#--<@p.dataPropsWrapper id="thumbnail">-->
-                    <img class="individual-photo2" src="${urls.images}/dummyImages/person.thumbnail.jpg" title = "no image" alt="placeholder image" width="115" />                                                 
-                 <#--</@p.dataPropsWrapper>-->         
+                <img class="individual-photo2" src="${urls.images}/dummyImages/person.thumbnail.jpg" title = "no image" alt="placeholder image" width="115" />                                                        
             </#if>
-        <#--</div>-->
         
         <nav>
             <ul id ="individual-tools-people">
@@ -109,12 +33,16 @@
         
         <a class="email" href="#"><span class ="picto-font  picto-email">M</span> email@cornell.edu</a> <a class="tel" href="#"><img class ="icon-phone" src="${urls.images}/individual/phone-icon.gif" />555 567 7878</a>
         
+        <#-- Links -->
         <nav>
             <ul id ="individual-urls-people">
-                <li><a href="#">&lt;core:PrimaryURLLink&gt;</a></li>
-                <li><a href="#">&lt;core:URLLink&gt;</a></li>
-                <li><a href="#">&lt;core:URLLink&gt;</a></li>
-                <li><a href="#">&lt;core:URLLink&gt;</a></li>
+            <#if individual.links?has_content>
+                <@l.firstLastList>
+                    <#list individual.links as link>                        
+                        <li><a href="${link.url}">${link.anchor}</a></li>
+                        </#list>
+                </@l.firstLastList>
+            </#if>              
             </ul>
         </nav>
     </div>
@@ -126,15 +54,11 @@
                 <p><a href="${relatedSubject.url}">&larr; return to ${relatedSubject.name}</a></p>                
             <#else>
                 <#-- Label -->
-                <#--<@p.dataPropWrapper id="label">-->
                     <h1 class="fn">${individual.name}
-                <#--</@p.dataPropWrapper>-->
-
+                        
                 <#-- Moniker -->
                 <#if individual.moniker?has_content>
-                    <#--<@p.dataPropsWrapper id="moniker">-->
-                        <span class="preferred-title">${individual.moniker}</span>
-                    <#--</@p.dataPropsWrapper>-->                   
+                        <span class="preferred-title">${individual.moniker}</span>                  
                 </#if>
                     </h1>
             </#if>
@@ -142,12 +66,12 @@
             <h2>Current Positions</h2>
             
             <ul id ="individual-positions">
-                <li><a href="#">Dancing in heaven with other famous people</a></li>
-                <li><a href="#">Sabbatic year for ever</a></li>
+                <li><a href="#">Consectetur adipiscing elit, sed est erat.</a></li>
+                <li><a href="#">Mauris posuere dui quis massa.</a></li>
             </ul>
         </header>
         
-        <p class="individual-overview">Born Margarita Carmen Cansino in Brooklyn, New York City, she was the daughter of flamenco dancer Eduardo Cansino, Sr., who was himself a Sephardic Jewish Spaniard from Castilleja de la Cuesta (Seville), and Ziegfeld girl Volga Hayworth who was of Irish and English descent. She was raised as a Roman Catholic. Her father wanted her to become a dancer while her mother hoped she would become an actress. Her grandfather, Antonio Cansino [+]</p>
+        <p class="individual-overview">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed est erat, tristique non bibendum eu, mollis non est. Cras vehicula velit quis elit porta vel molestie tellus blandit. Donec eget magna dolor. Phasellus faucibus mollis lorem at dapibus. Sed ultricies lobortis mauris in volutpat. Cras mattis neque ut sapien pellentesque fringilla. Mauris posuere dui quis massa mattis id mollis nibh accumsan.  [+]</p>
         
         <h2>Roles</h2>
 
@@ -161,6 +85,8 @@
 
 <section id="publications-visualization">
     <section id="sparklines-publications">
+         <#include "individual-sparklineVisualization.ftl">
+         
         <header><img src="${urls.home}/images/individual/sparkline.gif" />
             <h3><span class="grey">2</span> publications <span class="publication-year-range grey">within the last 10 years</span></h3>
         </header>
@@ -185,6 +111,15 @@
         <p class="view-all-coauthors"><a class="view-all-style" href="#">View All <span class="pictos-arrow-10">4</span></a></p>
     </section>
 </section>
+
+<#-- Ontology properties -->
+<#include "individual-properties.ftl">
+
+<#-- Keywords -->
+<#if individual.keywords?has_content>
+    <p id="keywords">Keywords: ${individual.keywordString}</p>
+</#if>
+
 ${stylesheets.addFromTheme("/css/entity.css")}
                            
 <#-- RY Figure out which of these scripts really need to go into the head, and which are needed at all (e.g., tinyMCE??) -->
