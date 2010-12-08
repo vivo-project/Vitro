@@ -1,3 +1,4 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
 /*
 Copyright (c) 2010, Cornell University
 All rights reserved.
