@@ -1,3 +1,4 @@
+<!-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 <%@page import="com.hp.hpl.jena.rdf.model.ModelMaker"%>
 <%@page import="java.util.Iterator"%>
 <%@page import="java.util.ArrayList"%>
