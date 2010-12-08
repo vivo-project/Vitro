@@ -21,8 +21,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
-import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LoginRedirector;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LogoutRedirector;
+import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
+import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State;
 
 public class VitroHttpServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -125,16 +126,10 @@ public class VitroHttpServlet extends HttpServlet {
 	 */
 	public static void redirectToLoginPage(HttpServletRequest request,
 			HttpServletResponse response)  {
-		String postLoginRequest;
-
-		String queryString = request.getQueryString();
-		if ((queryString == null) || queryString.isEmpty()) {
-			postLoginRequest = request.getRequestURI();
-		} else {
-			postLoginRequest = request.getRequestURI() + "?" + queryString;
-		}
-
-		LoginRedirector.setReturnUrlFromForcedLogin(request, postLoginRequest);
+		LoginProcessBean bean = new LoginProcessBean();
+		bean.setState(State.LOGGING_IN);
+		bean.setAfterLoginUrl(assembleAfterLoginUrl(request));
+		LoginProcessBean.setBean(request, bean);
 		
 		String loginPage = request.getContextPath() + Controllers.LOGIN;
 		
@@ -142,6 +137,15 @@ public class VitroHttpServlet extends HttpServlet {
 			response.sendRedirect(loginPage);
 		} catch (IOException ioe) {
 			log.error("Could not redirect to login page");
+		}
+	}
+
+	private static String assembleAfterLoginUrl(HttpServletRequest request) {
+		String queryString = request.getQueryString();
+		if ((queryString == null) || queryString.isEmpty()) {
+			return request.getRequestURI();
+		} else {
+			return request.getRequestURI() + "?" + queryString;
 		}
 	}
 
