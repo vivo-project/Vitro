@@ -7,6 +7,8 @@
 <%@ page errorPage="/error.jsp"%>
 <%@ page contentType="text/html; charset=UTF-8"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Portal"%>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet" %>
 
 <%  /***********************************************
          Display a single Page  in the most basic fashion.
@@ -51,25 +53,22 @@
 %>
 
 
-<c:set var="portal" value="${requestScope.portalBean}"/>
-<c:set var="themeDir"><c:out value="${portal.themeDir}" /></c:set>
-<c:set var="bodyJsp"><c:out value="${requestScope.bodyJsp}" default="/debug.jsp"/></c:set>
-        
-<jsp:include page="doctype.jsp"/>
-    <head>
-        <jsp:include page="headContent.jsp"/>
-    </head>
+<% /* Prepare Freemarker components to allow .ftl templates to be included from jsp */
+    FreemarkerHttpServlet.getFreemarkerComponentsForJsp(request);
+%>
+
+<!DOCTYPE html>
+<html lang="en">
+    ${ftl_head}
+    
     <body ${requestScope.bodyAttr}>
-        <div id="wrap" class="container">
-            <div id="header">
-                <jsp:include page="/templates/page/freemarkerTransition/identity.jsp" flush="true"/>
-                <jsp:include page="/templates/page/freemarkerTransition/menu.jsp" flush="true"/>
-            </div><!-- #header -->
-            <hr class="hidden" />
-            <div id="contentwrap">
+            ${ftl_identity}
+            
+            ${ftl_menu}
+            
                 <c:import url="${bodyJsp}"/>
-            </div> <!-- #contentwrap -->
-            <jsp:include page="/templates/page/freemarkerTransition/footer.jsp" flush="true"/>
-        </div> <!-- #wrap -->
+            
+            ${ftl_footer}
+
     </body>
 </html>
