@@ -44,8 +44,6 @@ public class FreemarkerComponentGenerator extends FreemarkerHttpServlet {
         request.setAttribute("ftl_search", get("search", root, config, vreq));
         request.setAttribute("ftl_footer", get("footer", root, config, vreq));
         request.setAttribute("ftl_googleAnalytics", get("googleAnalytics", root, config, vreq));
-        
-        request.setAttribute("freemarkerComponentsDone", true);
     }
 
     private String get(String templateName, Map<String, Object> root, Configuration config, HttpServletRequest request) {
