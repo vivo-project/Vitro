@@ -164,6 +164,12 @@ public class LoginProcessBean {
 	/** What arguments are needed to format the message? */
 	private Object[] messageArguments = NO_ARGUMENTS;
 
+	/** Where is the interaction taking place? */
+	private String loginPageUrl;
+
+	/** Where do we go when finished? */
+	private String afterLoginUrl;
+
 	/**
 	 * What username was submitted to the form? This isn't just for display --
 	 * if they are changing passwords, we need to remember who it is.
@@ -214,12 +220,29 @@ public class LoginProcessBean {
 		this.username = username;
 	}
 
+	public String getLoginPageUrl() {
+		return loginPageUrl;
+	}
+
+	public void setLoginPageUrl(String loginPageUrl) {
+		this.loginPageUrl = loginPageUrl;
+	}
+
+	public String getAfterLoginUrl() {
+		return afterLoginUrl;
+	}
+
+	public void setAfterLoginUrl(String afterLoginUrl) {
+		this.afterLoginUrl = afterLoginUrl;
+	}
+
 	@Override
 	public String toString() {
 		return "LoginProcessBean[state=" + currentState + ", message="
 				+ message + ", messageArguments="
 				+ Arrays.deepToString(messageArguments) + ", username="
-				+ username + "]";
+				+ username + ", loginPageUrl=" + loginPageUrl
+				+ ", afterLoginUrl=" + afterLoginUrl + "]";
 	}
 
 }

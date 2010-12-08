@@ -17,6 +17,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
+import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
 
 /**
  * A user has just completed the login process. What page do we direct them to?
@@ -24,14 +25,13 @@ import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 public class LoginRedirector {
 	private static final Log log = LogFactory.getLog(LoginRedirector.class);
 
-	private static final String ATTRIBUTE_RETURN_FROM_FORCED_LOGIN = "return_from_forced_login";
-
 	private final HttpServletRequest request;
 	private final HttpServletResponse response;
 	private final HttpSession session;
 
-	private final String urlOfRestrictedPage;
 	private final String uriOfAssociatedIndividual;
+	private final String loginProcessPage;
+	private final String afterLoginPage;
 
 	public LoginRedirector(HttpServletRequest request,
 			HttpServletResponse response) {
@@ -39,18 +39,12 @@ public class LoginRedirector {
 		this.session = request.getSession();
 		this.response = response;
 
-		urlOfRestrictedPage = getUrlOfRestrictedPage();
 		uriOfAssociatedIndividual = getAssociatedIndividualUri();
-	}
 
-	/** Were we forced to log in when trying to access a restricted page? */
-	private String getUrlOfRestrictedPage() {
-		String url = (String) session
-				.getAttribute(ATTRIBUTE_RETURN_FROM_FORCED_LOGIN);
-		session.removeAttribute(ATTRIBUTE_RETURN_FROM_FORCED_LOGIN);
-		log.debug("URL of restricted page is " + url);
-		return url;
-
+		LoginProcessBean processBean = LoginProcessBean.getBean(request);
+		log.debug("process bean is: " + processBean);
+		loginProcessPage = processBean.getLoginPageUrl();
+		afterLoginPage = processBean.getAfterLoginUrl();
 	}
 
 	/** Is there an Individual associated with this user? */
@@ -76,30 +70,79 @@ public class LoginRedirector {
 	}
 
 	public void redirectLoggedInUser() throws IOException {
-		if (isForcedFromRestrictedPage()) {
-			log.debug("Returning to restricted page.");
-			response.sendRedirect(urlOfRestrictedPage);
-		} else if (isUserEditorOrBetter()) {
-			log.debug("Going to site admin page.");
-			response.sendRedirect(getSiteAdminPageUrl());
-		} else if (isSelfEditorWithIndividual()) {
-			log.debug("Going to Individual home page.");
-			response.sendRedirect(getAssociatedIndividualHomePage());
-		} else {
-			log.debug("User not recognized. Going to application home.");
-			DisplayMessage.setMessage(request, "You have logged in, "
-					+ "but the system contains no profile for you.");
+		try {
+			if (isSelfEditorWithIndividual()) {
+				log.debug("Going to Individual home page.");
+				response.sendRedirect(getAssociatedIndividualHomePage());
+			} else if (isMerelySelfEditor()) {
+				log.debug("User not recognized. Going to application home.");
+				DisplayMessage.setMessage(request, "You have logged in, "
+						+ "but the system contains no profile for you.");
+				response.sendRedirect(getApplicationHomePageUrl());
+			} else {
+				if (hasSomeplaceToGoAfterLogin()) {
+					log.debug("Returning to requested page: " + afterLoginPage);
+					response.sendRedirect(afterLoginPage);
+				} else if (loginProcessPage == null) {
+					log.debug("Don't know what to do. Go home.");
+					response.sendRedirect(getApplicationHomePageUrl());
+				} else if (isLoginPage(loginProcessPage)) {
+					log.debug("Coming from /login. Going to site admin page.");
+					response.sendRedirect(getSiteAdminPageUrl());
+				} else {
+					log.debug("Coming from a login widget. Going back there.");
+					response.sendRedirect(loginProcessPage);
+				}
+			}
+			LoginProcessBean.removeBean(request);
+		} catch (IOException e) {
+			log.debug("Problem with re-direction", e);
 			response.sendRedirect(getApplicationHomePageUrl());
 		}
 	}
 
-	private boolean isForcedFromRestrictedPage() {
-		return urlOfRestrictedPage != null;
+	public void redirectCancellingUser() throws IOException {
+		try {
+			if (hasSomeplaceToGoAfterLogin()) {
+				log.debug("Returning to requested page: " + afterLoginPage);
+				response.sendRedirect(afterLoginPage);
+			} else if (loginProcessPage == null) {
+				log.debug("Don't know what to do. Go home.");
+				response.sendRedirect(getApplicationHomePageUrl());
+			} else if (isLoginPage(loginProcessPage)) {
+				log.debug("Coming from /login. Going to home.");
+				response.sendRedirect(getApplicationHomePageUrl());
+			} else {
+				log.debug("Coming from a login widget. Going back there.");
+				response.sendRedirect(loginProcessPage);
+			}
+			LoginProcessBean.removeBean(request);
+		} catch (IOException e) {
+			log.debug("Problem with re-direction", e);
+			response.sendRedirect(getApplicationHomePageUrl());
+		}
 	}
 
-	private boolean isUserEditorOrBetter() {
-		return LoginStatusBean.getBean(session).isLoggedInAtLeast(
-				LoginStatusBean.EDITOR);
+	public void redirectUnrecognizedExternalUser(String username)
+			throws IOException {
+		log.debug("Redirecting unrecognized external user: " + username);
+		DisplayMessage.setMessage(request,
+				"VIVO cannot find a profile for your account.");
+		response.sendRedirect(getApplicationHomePageUrl());
+	}
+
+	private boolean hasSomeplaceToGoAfterLogin() {
+		return afterLoginPage != null;
+	}
+
+	private boolean isMerelySelfEditor() {
+		return LoginStatusBean.getBean(session).isLoggedInExactly(
+				LoginStatusBean.NON_EDITOR);
+	}
+
+	private boolean isLoginPage(String page) {
+		return ((page != null) && page.endsWith(request.getContextPath()
+				+ Controllers.LOGIN));
 	}
 
 	private String getSiteAdminPageUrl() {
@@ -120,14 +163,6 @@ public class LoginRedirector {
 		}
 	}
 
-	public void redirectUnrecognizedExternalUser(String username)
-			throws IOException {
-		log.debug("Redirecting unrecognized external user: " + username);
-		DisplayMessage.setMessage(request,
-				"VIVO cannot find a profile for your account.");
-		response.sendRedirect(getApplicationHomePageUrl());
-	}
-
 	/**
 	 * The application home page can be overridden by an attribute in the
 	 * ServletContext. Further, it can either be an absolute URL, or it can be
@@ -144,15 +179,5 @@ public class LoginRedirector {
 			}
 		}
 		return request.getContextPath();
-	}
-
-	// ----------------------------------------------------------------------
-	// static helper methods
-	// ----------------------------------------------------------------------
-
-	public static void setReturnUrlFromForcedLogin(HttpServletRequest request,
-			String url) {
-		request.getSession().setAttribute(ATTRIBUTE_RETURN_FROM_FORCED_LOGIN,
-				url);
 	}
 }

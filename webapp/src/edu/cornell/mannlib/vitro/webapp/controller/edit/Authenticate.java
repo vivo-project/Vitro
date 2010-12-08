@@ -8,6 +8,8 @@ import static edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean
 import static edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State.NOWHERE;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -28,6 +30,7 @@ import com.hp.hpl.jena.ontology.OntModel;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
+import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
@@ -40,6 +43,24 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.LoginLogoutEvent;
 public class Authenticate extends VitroHttpServlet {
 	private static final Log log = LogFactory.getLog(Authenticate.class
 			.getName());
+
+	/**
+	 * If this is set at any point in the process, store it as the post-login
+	 * destination.
+	 * 
+	 * NOTE: we expect URL-encoding on this parameter, and will decode it when
+	 * we read it.
+	 */
+	private static final String PARAMETER_AFTER_LOGIN = "afterLogin";
+
+	/**
+	 * If this is set at any point in the process, store the referrer as the
+	 * post-login destination.
+	 */
+	private static final String PARAMETER_RETURN = "return";
+
+	/** If this is set, a status of NOWHERE should be treated as LOGGING_IN. */
+	private static final String PARAMETER_LOGGING_IN = "loginForm";
 
 	/** The username field on the login form. */
 	private static final String PARAMETER_USERNAME = "loginName";
@@ -68,6 +89,8 @@ public class Authenticate extends VitroHttpServlet {
 		VitroRequest vreq = new VitroRequest(request);
 
 		try {
+			recordLoginProcessPages(vreq);
+
 			// Where do we stand in the process?
 			State entryState = getCurrentLoginState(vreq);
 			dumpStateToLog("entry", entryState, vreq);
@@ -95,7 +118,7 @@ public class Authenticate extends VitroHttpServlet {
 			// Send them on their way.
 			switch (exitState) {
 			case NOWHERE:
-				redirectCancellingUser(vreq, response);
+				new LoginRedirector(vreq, response).redirectCancellingUser();
 				break;
 			case LOGGING_IN:
 				showLoginScreen(vreq, response);
@@ -114,29 +137,76 @@ public class Authenticate extends VitroHttpServlet {
 	}
 
 	/**
+	 * If they supply an after-login page, record it and use the Login page for
+	 * the process.
+	 * 
+	 * If they supply a return flag, record the referrer as the after-login page
+	 * and use the Login page for the process.
+	 * 
+	 * Otherwise, use the current page for the process.
+	 */
+	private void recordLoginProcessPages(HttpServletRequest request) {
+		LoginProcessBean bean = LoginProcessBean.getBean(request);
+
+		String afterLoginUrl = request.getParameter(PARAMETER_AFTER_LOGIN);
+		if (afterLoginUrl != null) {
+			try {
+				String decoded = URLDecoder.decode(afterLoginUrl, "UTF-8");
+				bean.setAfterLoginUrl(decoded);
+			} catch (UnsupportedEncodingException e) {
+				log.error("Really? No UTF-8 encoding?");
+			}
+		}
+
+		String returnParameter = request.getParameter(PARAMETER_RETURN);
+		if (returnParameter != null) {
+			String referrer = request.getHeader("referer");
+			bean.setAfterLoginUrl(referrer);
+		}
+
+		if (bean.getAfterLoginUrl() != null) {
+			bean.setLoginPageUrl(request.getContextPath() + Controllers.LOGIN);
+		} else {
+			bean.setLoginPageUrl(request.getHeader("referer"));
+		}
+	}
+
+	/**
 	 * Where are we in the process? Logged in? Not? Somewhere in between?
 	 */
 	private State getCurrentLoginState(HttpServletRequest request) {
+		State currentState;
+
 		HttpSession session = request.getSession(false);
 		if (session == null) {
+			currentState = NOWHERE;
 			log.debug("no session: current state is NOWHERE");
-			return NOWHERE;
-		}
-
-		if (LoginStatusBean.getBean(request).isLoggedIn()) {
+		} else if (LoginStatusBean.getBean(request).isLoggedIn()) {
+			currentState = LOGGED_IN;
 			log.debug("found a LoginStatusBean: current state is LOGGED IN");
-			return LOGGED_IN;
-		}
-
-		if (LoginProcessBean.isBean(request)) {
-			State state = LoginProcessBean.getBean(request).getState();
-			log.debug("state from LoginProcessBean is " + state);
-			return state;
+		} else if (LoginProcessBean.isBean(request)) {
+			currentState = LoginProcessBean.getBean(request).getState();
+			log.debug("state from LoginProcessBean is " + currentState);
 		} else {
+			currentState = NOWHERE;
 			log.debug("no LoginSessionBean, no LoginProcessBean: "
 					+ "current state is NOWHERE");
-			return NOWHERE;
 		}
+
+		if ((currentState == NOWHERE) && isLoggingInByParameter(request)) {
+			currentState = LOGGING_IN;
+			log.debug("forced from NOWHERE to LOGGING_IN by '"
+					+ PARAMETER_LOGGING_IN + "' parameter");
+		}
+
+		return currentState;
+	}
+
+	/**
+	 * If this parameter is present, we aren't NOWHERE.
+	 */
+	private boolean isLoggingInByParameter(HttpServletRequest request) {
+		return (request.getParameter(PARAMETER_LOGGING_IN) != null);
 	}
 
 	/**
@@ -288,7 +358,6 @@ public class Authenticate extends VitroHttpServlet {
 		log.debug("Completed login: " + username);
 		getAuthenticator(request).recordLoginAgainstUserAccount(username,
 				AuthenticationSource.INTERNAL);
-		LoginProcessBean.removeBean(request);
 	}
 
 	/**
@@ -301,15 +370,14 @@ public class Authenticate extends VitroHttpServlet {
 		getAuthenticator(request).recordNewPassword(username, newPassword);
 		getAuthenticator(request).recordLoginAgainstUserAccount(username,
 				AuthenticationSource.INTERNAL);
-		LoginProcessBean.removeBean(request);
 	}
 
 	/**
 	 * State change: they decided to cancel the login.
 	 */
 	private void transitionToNowhere(HttpServletRequest request) {
+		LoginProcessBean.getBean(request).setState(NOWHERE);
 		log.debug("Cancelling login.");
-		LoginProcessBean.removeBean(request);
 	}
 
 	/**
@@ -331,33 +399,15 @@ public class Authenticate extends VitroHttpServlet {
 			throws IOException {
 		log.debug("logging in.");
 
-		String referringPage = vreq.getHeader("referer");
-		if (referringPage == null) {
-			log.warn("No referring page on the request");
-			referringPage = getHomeUrl(vreq);
-		}
-		response.sendRedirect(referringPage);
+		String loginProcessPage = LoginProcessBean.getBean(vreq)
+				.getLoginPageUrl();
+		response.sendRedirect(loginProcessPage);
 		return;
-	}
-
-	/**
-	 * Exit: user cancelled the login, so show them the home page.
-	 */
-	private void redirectCancellingUser(HttpServletRequest request,
-			HttpServletResponse response) throws IOException {
-		log.debug("User cancelled the login. Redirect to site admin page.");
-		LoginProcessBean.removeBean(request);
-		response.sendRedirect(getHomeUrl(request));
 	}
 
 	/** Get a reference to the Authenticator. */
 	private Authenticator getAuthenticator(HttpServletRequest request) {
 		return Authenticator.getInstance(request);
-	}
-
-	/** What's the URL for the home page? */
-	private String getHomeUrl(HttpServletRequest request) {
-		return request.getContextPath();
 	}
 
 	// ----------------------------------------------------------------------
@@ -422,7 +472,7 @@ public class Authenticate extends VitroHttpServlet {
 
 	private void dumpStateToLog(String label, State state, VitroRequest vreq) {
 		log.debug("State on " + label + ": " + state);
-		
+
 		if (log.isTraceEnabled()) {
 			log.trace("Status bean on " + label + ": "
 					+ LoginStatusBean.getBean(vreq));

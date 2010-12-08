@@ -319,7 +319,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         }
         urls.put("search", urlBuilder.getPortalUrl(Route.SEARCH));  
         urls.put("termsOfUse", urlBuilder.getPortalUrl(Route.TERMS_OF_USE));  
-        urls.put("login", urlBuilder.getPortalUrl(Route.LOGIN));          
+        urls.put("login", urlBuilder.getLoginUrl());          
         urls.put("logout", urlBuilder.getLogoutUrl());       
         urls.put("siteAdmin", urlBuilder.getPortalUrl(Route.SITE_ADMIN));  
         urls.put("siteIcons", urlBuilder.getPortalUrl(themeDir + "/site_icons")); // deprecated

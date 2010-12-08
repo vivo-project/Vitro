@@ -106,14 +106,11 @@ public class LoginWidget extends Widget {
     }
 
     /**
-     * User is just starting the login process. Be sure that we have a
-     * {@link LoginProcessBean} with the correct status. Show them the login
-     * screen.
+     * User is starting the login process. Show them the login screen.
      */
     private WidgetTemplateValues showLoginScreen(HttpServletRequest request)
             throws IOException {
         LoginProcessBean bean = LoginProcessBean.getBean(request);
-        bean.setState(State.LOGGING_IN);
         log.trace("Going to login screen: " + bean);
 
         WidgetTemplateValues values = new WidgetTemplateValues(Macro.LOGIN.toString());
@@ -150,7 +147,6 @@ public class LoginWidget extends Widget {
      */
     private WidgetTemplateValues showPasswordChangeScreen(HttpServletRequest request) {
         LoginProcessBean bean = LoginProcessBean.getBean(request);
-        bean.setState(State.FORCED_PASSWORD_CHANGE);
         log.trace("Going to password change screen: " + bean);
 
         WidgetTemplateValues values = new WidgetTemplateValues(

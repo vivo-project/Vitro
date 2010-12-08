@@ -15,7 +15,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
-import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
 
 /**
  * Handle the return from the external authorization login server. If we are
@@ -74,7 +73,6 @@ public class LoginExternalAuthReturn extends BaseLoginServlet {
 	}
 
 	private void removeLoginProcessArtifacts(HttpServletRequest req) {
-		LoginProcessBean.removeBean(req);
 		req.getSession().removeAttribute(ATTRIBUTE_REFERRER);
 	}
 

@@ -9,6 +9,7 @@ import static org.junit.Assert.fail;
 
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,6 +18,9 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 import stubs.javax.servlet.ServletConfigStub;
 import stubs.javax.servlet.ServletContextStub;
@@ -27,38 +31,204 @@ import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
-import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.AuthenticatorStub;
-import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LoginRedirector;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State;
 
 /**
- * Test the Authentate class.
+ * <pre>
+ * Test the Authenticate class.
+ * 
+ * This uses parameterized unit tests. Several sets of test data are set up, and
+ * then each test is run with each set of data.
+ * 
+ * Each set of test data includes 
+ *   information about the user who is logging in, 
+ *   information about how the user began the login process
+ *   information about where the user should end up
+ *   
+ * We run the tests with these users:
+ *   A DBA who has never logged in before
+ *   A DBA who has logged in before
+ *   A self-editor who has logged in before
+ *   A self-editor wannabe, who has never logged in and has no profile.
+ * 
+ * We run the tests with the assumption that the user started from:
+ *   The login page
+ *   A page that holds the login widget
+ *   A forced login
+ *   A login link on some page
+ * </pre>
  */
+@RunWith(value = Parameterized.class)
 public class AuthenticateTest extends AbstractTestClass {
-	private static final String USER_DBA_NAME = "dbaName";
-	private static final String USER_DBA_URI = "dbaURI";
-	private static final String USER_DBA_PASSWORD = "dbaPassword";
 
-	private static final String USER_OLDHAND_NAME = "oldHandName";
-	private static final String USER_OLDHAND_URI = "oldHandURI";
-	private static final String USER_OLDHAND_PASSWORD = "oldHandPassword";
-	private static final int USER_OLDHAND_LOGIN_COUNT = 100;
+	// ----------------------------------------------------------------------
+	// Helper classes
+	// ----------------------------------------------------------------------
 
-	private static final String URL_LOGIN_PAGE = "http://my.local.site/vivo/"
-			+ Controllers.LOGIN;
-	private static final String URL_SITE_ADMIN_PAGE = Controllers.SITE_ADMIN;
+	private static class UserInfo {
+		final String username;
+		final String uri;
+		final String password;
+		final int securityLevel;
+		final int loginCount;
 
-	private static final String URL_HOME_PAGE = "";
-	private static final String URL_SESSION_REDIRECT = "/sessionRedirect";
-	private static final String URL_CONTEXT_REDIRECT_LOCAL = "/servletContextRedirect";
-	private static final String URL_CONTEXT_REDIRECT_REMOTE = "http://servletContextRedirect";
-	private static final String URL_SELF_EDITOR_PAGE = "/individual?uri=selfEditorURI";
+		public UserInfo(String username, String uri, String password,
+				int securityLevel, int loginCount) {
+			this.username = username;
+			this.uri = uri;
+			this.password = password;
+			this.securityLevel = securityLevel;
+			this.loginCount = loginCount;
+		}
 
-	private static final LoginStatusBean LOGIN_STATUS_DBA = new LoginStatusBean(
-			USER_DBA_URI, USER_DBA_NAME, LoginStatusBean.DBA,
-			AuthenticationSource.INTERNAL);
+		@Override
+		public String toString() {
+			return "UserInfo[username=" + username + ", uri=" + uri
+					+ ", password=" + password + ", securityLevel="
+					+ securityLevel + ", loginCount=" + loginCount + "]";
+		}
+	}
+
+	private static class HowDidWeGetHere {
+		final String afterLoginUrl;
+		final boolean returnParameterSet;
+		final String referrer;
+
+		public HowDidWeGetHere(String afterLoginUrl,
+				boolean returnParameterSet, String referrer) {
+			this.afterLoginUrl = afterLoginUrl;
+			this.returnParameterSet = returnParameterSet;
+			this.referrer = referrer;
+		}
+
+		@Override
+		public String toString() {
+			return "HowDidWeGetHere[afterLoginUrl=" + afterLoginUrl
+					+ ", returnParameterSet=" + returnParameterSet
+					+ ", referrer=" + referrer + "]";
+		}
+	}
+
+	private static class WhereTo {
+		final String expectedContinueUrl;
+		final String expectedCompletionUrl;
+		final String expectedCancelUrl;
+
+		public WhereTo(String expectedContinueUrl,
+				String expectedCompletionUrl, String expectedCancelUrl) {
+			this.expectedContinueUrl = expectedContinueUrl;
+			this.expectedCompletionUrl = expectedCompletionUrl;
+			this.expectedCancelUrl = expectedCancelUrl;
+		}
+
+		@Override
+		public String toString() {
+			return "WhereTo[expectedContinueUrl=" + expectedContinueUrl
+					+ ", expectedCompletionUrl=" + expectedCompletionUrl
+					+ ", expectedCancelUrl=" + expectedCancelUrl + "]";
+		}
+	}
+
+	// ----------------------------------------------------------------------
+	// The parameters
+	// ----------------------------------------------------------------------
+
+	// --------- Pages ----------
+
+	/** the login page */
+	private static final String URL_LOGIN = "/vivo/login";
+
+	/** some page with a login widget on it. */
+	private static final String URL_WIDGET = "/vivo/widgetPage";
+
+	/** a restricted page that forces a login. */
+	private static final String URL_RESTRICTED = "/vivo/otherPage";
+
+	/** a page with a login link. */
+	private static final String URL_LINK = "/vivo/linkPage";
+
+	// pages that we might end up on.
+	private static final String URL_HOME = "/vivo";
+	private static final String URL_SITE_ADMIN = "/vivo/siteAdmin";
+	private static final String URL_SELF_PROFILE = "/vivo/individual?uri=old_self_associated_uri";
+
+	// --------- Users ----------
+
+	/** A DBA who has never logged in (forces password change). */
+	private static final UserInfo NEW_DBA = new UserInfo("new_dba_name",
+			"new_dba_uri", "new_dba_pw", 50, 0);
+
+	/** A DBA who has logged in before. */
+	private static final UserInfo OLD_DBA = new UserInfo("old_dba_name",
+			"old_dba_uri", "old_dba_pw", 50, 5);
+
+	/** A self-editor who has logged in before and has a profile. */
+	private static final UserInfo OLD_SELF = new UserInfo("old_self_name",
+			"old_self_uri", "old_self_pw", 1, 100);
+
+	/** A self-editor who has never logged in and has no profile. */
+	private static final UserInfo NEW_STRANGER = new UserInfo(
+			"new_stranger_name", "new_stranger_uri", "stranger_pw", 1, 0);
+
+	// --------- Starting circumstances ----------
+
+	private static final HowDidWeGetHere FROM_FORCED = new HowDidWeGetHere(
+			URL_RESTRICTED, false, URL_RESTRICTED);
+
+	private static final HowDidWeGetHere FROM_LINK = new HowDidWeGetHere(null,
+			true, URL_LINK);
+
+	private static final HowDidWeGetHere FROM_WIDGET = new HowDidWeGetHere(
+			null, false, URL_WIDGET);
+
+	private static final HowDidWeGetHere FROM_LOGIN = new HowDidWeGetHere(null,
+			false, URL_LOGIN);
+
+	// --------- All sets of test data ----------
+
+	@Parameters
+	public static Collection<Object[]> data() {
+		Object[][] data = new Object[][] {
+				{ NEW_DBA, FROM_FORCED,
+						new WhereTo(URL_LOGIN, URL_RESTRICTED, URL_RESTRICTED) }, // 0
+				{ NEW_DBA, FROM_LINK,
+						new WhereTo(URL_LOGIN, URL_LINK, URL_LINK) }, // 1
+				{ NEW_DBA, FROM_WIDGET,
+						new WhereTo(URL_WIDGET, URL_WIDGET, URL_WIDGET) }, // 2
+				{ NEW_DBA, FROM_LOGIN,
+						new WhereTo(URL_LOGIN, URL_SITE_ADMIN, URL_HOME) }, // 3
+				{ OLD_DBA, FROM_FORCED,
+						new WhereTo(URL_LOGIN, URL_RESTRICTED, null) }, // 4
+				{ OLD_DBA, FROM_LINK, new WhereTo(URL_LOGIN, URL_LINK, null) }, // 5
+				{ OLD_DBA, FROM_WIDGET,
+						new WhereTo(URL_WIDGET, URL_WIDGET, null) }, // 6
+				{ OLD_DBA, FROM_LOGIN,
+						new WhereTo(URL_LOGIN, URL_SITE_ADMIN, null) }, // 7
+				{ OLD_SELF, FROM_FORCED,
+						new WhereTo(URL_LOGIN, URL_SELF_PROFILE, null) }, // 8
+				{ OLD_SELF, FROM_LINK,
+						new WhereTo(URL_LOGIN, URL_SELF_PROFILE, null) }, // 9
+				{ OLD_SELF, FROM_WIDGET,
+						new WhereTo(URL_WIDGET, URL_SELF_PROFILE, null) }, // 10
+				{ OLD_SELF, FROM_LOGIN,
+						new WhereTo(URL_LOGIN, URL_SELF_PROFILE, null) }, // 11
+				{ NEW_STRANGER, FROM_FORCED,
+						new WhereTo(URL_LOGIN, URL_HOME, URL_RESTRICTED) }, // 12
+				{ NEW_STRANGER, FROM_LINK,
+						new WhereTo(URL_LOGIN, URL_HOME, URL_LINK) }, // 13
+				{ NEW_STRANGER, FROM_WIDGET,
+						new WhereTo(URL_WIDGET, URL_HOME, URL_WIDGET) }, // 14
+				{ NEW_STRANGER, FROM_LOGIN,
+						new WhereTo(URL_LOGIN, URL_HOME, URL_HOME) } // 15
+		};
+		return Arrays.asList(data);
+	}
+
+	// ----------------------------------------------------------------------
+	// Instance variables and setup
+	// ----------------------------------------------------------------------
 
 	private AuthenticatorStub authenticator;
 	private ServletContextStub servletContext;
@@ -68,12 +238,23 @@ public class AuthenticateTest extends AbstractTestClass {
 	private HttpServletResponseStub response;
 	private Authenticate auth;
 
+	private final UserInfo userInfo;
+	private final HowDidWeGetHere urlBundle;
+	private final WhereTo whereTo;
+
+	public AuthenticateTest(UserInfo userInfo, HowDidWeGetHere urlBundle,
+			WhereTo whereTo) {
+		this.userInfo = userInfo;
+		this.urlBundle = urlBundle;
+		this.whereTo = whereTo;
+	}
+
 	@Before
 	public void setup() throws Exception {
 		authenticator = AuthenticatorStub.setup();
-
-		authenticator.addUser(createNewDbaUser());
-		authenticator.addUser(createOldHandUser());
+		authenticator.addUser(createUserFromUserInfo());
+		authenticator.setAssociatedUri(OLD_SELF.username,
+				"old_self_associated_uri");
 
 		servletContext = new ServletContextStub();
 
@@ -85,270 +266,246 @@ public class AuthenticateTest extends AbstractTestClass {
 
 		request = new HttpServletRequestStub();
 		request.setSession(session);
-		request.setRequestUrl(new URL("http://this.that/vivo/siteAdmin"));
+		request.setRequestUrl(new URL("http://this.that/vivo/authenticate"));
 		request.setMethod("POST");
-		request.setHeader("referer", URL_LOGIN_PAGE);
+		request.setHeader("referer", urlBundle.referrer);
+		if (urlBundle.afterLoginUrl != null) {
+			request.addParameter("afterLogin", urlBundle.afterLoginUrl);
+		}
+		if (urlBundle.returnParameterSet) {
+			request.addParameter("return", "");
+		}
 
 		response = new HttpServletResponseStub();
 
 		auth = new Authenticate();
 		auth.init(servletConfig);
-
 	}
 
-	private User createNewDbaUser() {
+	private User createUserFromUserInfo() {
 		User user = new User();
-		user.setUsername(USER_DBA_NAME);
-		user.setURI(USER_DBA_URI);
-		user.setRoleURI("50");
-		user.setMd5password(Authenticate.applyMd5Encoding(USER_DBA_PASSWORD));
-		user.setFirstTime(null);
-		user.setLoginCount(0);
-		return user;
-	}
-
-	private User createOldHandUser() {
-		User user = new User();
-		user.setUsername(USER_OLDHAND_NAME);
-		user.setURI(USER_OLDHAND_URI);
-		user.setRoleURI("1");
-		user.setMd5password(Authenticate
-				.applyMd5Encoding(USER_OLDHAND_PASSWORD));
-		user.setLoginCount(USER_OLDHAND_LOGIN_COUNT);
-		user.setFirstTime(new Date(0));
+		user.setUsername(userInfo.username);
+		user.setURI(userInfo.uri);
+		user.setRoleURI(String.valueOf(userInfo.securityLevel));
+		user.setMd5password(Authenticate.applyMd5Encoding(userInfo.password));
+		user.setLoginCount(userInfo.loginCount);
+		if (userInfo.loginCount > 0) {
+			user.setFirstTime(new Date(0));
+		}
 		return user;
 	}
 
 	// ----------------------------------------------------------------------
-	// the tests
+	// The tests
 	// ----------------------------------------------------------------------
-
-	@Test
-	public void alreadyLoggedIn() {
-		LoginStatusBean.setBean(session, LOGIN_STATUS_DBA);
-
-		auth.doPost(request, response);
-
-		assertExpectedRedirect(URL_SITE_ADMIN_PAGE);
-		assertNoProcessBean();
-		assertExpectedLoginSessions();
-	}
 
 	@Test
 	public void justGotHere() {
 		auth.doPost(request, response);
 
-		assertExpectedRedirect(URL_LOGIN_PAGE);
-		assertExpectedLoginSessions();
-		assertExpectedProcessBean(LOGGING_IN, "", "", "");
+		assertProcessBean(LOGGING_IN, "", "", "");
+		assertNewLoginSessions();
+		assertRedirectToContinueUrl();
 	}
 
 	@Test
 	public void loggingInNoUsername() {
-		setProcessBean(LOGGING_IN);
+		setProcessBean(LOGGING_IN, null);
 
 		auth.doPost(request, response);
 
-		assertExpectedRedirect(URL_LOGIN_PAGE);
-		assertExpectedLoginSessions();
-		assertExpectedProcessBean(LOGGING_IN, "", "",
+		assertProcessBean(LOGGING_IN, "", "",
 				"Please enter your email address.");
+		assertNewLoginSessions();
+		assertRedirectToContinueUrl();
 	}
 
 	@Test
 	public void loggingInUsernameNotRecognized() {
-		setProcessBean(LOGGING_IN);
+		setProcessBean(LOGGING_IN, null);
 		setLoginNameAndPassword("unknownBozo", null);
 
 		auth.doPost(request, response);
 
-		assertExpectedRedirect(URL_LOGIN_PAGE);
-		assertExpectedLoginSessions();
-		assertExpectedProcessBean(LOGGING_IN, "unknownBozo", "",
+		assertProcessBean(LOGGING_IN, "unknownBozo", "",
 				"The email or password you entered is incorrect.");
+		assertNewLoginSessions();
+		assertRedirectToContinueUrl();
 	}
 
 	@Test
 	public void loggingInNoPassword() {
-		setProcessBean(LOGGING_IN);
-		setLoginNameAndPassword(USER_DBA_NAME, null);
+		setProcessBean(LOGGING_IN, null);
+		setLoginNameAndPassword(userInfo.username, null);
 
 		auth.doPost(request, response);
 
-		assertExpectedRedirect(URL_LOGIN_PAGE);
-		assertExpectedLoginSessions();
-		assertExpectedProcessBean(LOGGING_IN, USER_DBA_NAME, "",
+		assertProcessBean(LOGGING_IN, userInfo.username, "",
 				"Please enter your password.");
+		assertNewLoginSessions();
+		assertRedirectToContinueUrl();
 	}
 
 	@Test
 	public void loggingInPasswordIsIncorrect() {
-		setProcessBean(LOGGING_IN);
-		setLoginNameAndPassword(USER_DBA_NAME, "bogus_password");
+		setProcessBean(LOGGING_IN, null);
+		setLoginNameAndPassword(userInfo.username, "bogus_password");
 
 		auth.doPost(request, response);
 
-		assertExpectedRedirect(URL_LOGIN_PAGE);
-		assertExpectedLoginSessions();
-		assertExpectedProcessBean(LOGGING_IN, USER_DBA_NAME, "",
+		assertProcessBean(LOGGING_IN, userInfo.username, "",
 				"The email or password you entered is incorrect.");
+		assertNewLoginSessions();
+		assertRedirectToContinueUrl();
 	}
 
 	@Test
-	public void loggingInSuccessfulNotFirstTime() {
-		setProcessBean(LOGGING_IN);
-		setLoginNameAndPassword(USER_OLDHAND_NAME, USER_OLDHAND_PASSWORD);
+	public void loggingInSuccessful() {
+		if (userInfo.loginCount == 0) {
+			testLoginFirstTime();
+		} else {
+			testLoginNotFirstTime();
+		}
+	}
+
+	private void testLoginFirstTime() {
+		setProcessBean(LOGGING_IN, null);
+		setLoginNameAndPassword(userInfo.username, userInfo.password);
+
+		auth.doPost(request, response);
+
+		assertProcessBean(FORCED_PASSWORD_CHANGE, userInfo.username, "", "");
+		assertNewLoginSessions();
+		assertRedirectToContinueUrl();
+	}
+
+	private void testLoginNotFirstTime() {
+		setProcessBean(LOGGING_IN, null);
+		setLoginNameAndPassword(userInfo.username, userInfo.password);
 
 		auth.doPost(request, response);
 
 		assertNoProcessBean();
-		assertExpectedRedirect(URL_HOME_PAGE);
-		assertExpectedLoginSessions(USER_OLDHAND_NAME);
-	}
-
-	// ----------------------------------------------------------------------
-	// first-time password change
-	// ----------------------------------------------------------------------
-
-	@Test
-	public void loggingInSuccessfulFirstTime() {
-		setProcessBean(LOGGING_IN);
-		setLoginNameAndPassword(USER_DBA_NAME, USER_DBA_PASSWORD);
-
-		auth.doPost(request, response);
-
-		assertExpectedRedirect(URL_LOGIN_PAGE);
-		assertExpectedLoginSessions();
-		assertExpectedProcessBean(FORCED_PASSWORD_CHANGE, USER_DBA_NAME, "", "");
+		assertNewLoginSessions(userInfo.username);
+		assertRedirectToCompletionUrl();
 	}
 
 	@Test
 	public void changingPasswordCancel() {
-		setProcessBean(FORCED_PASSWORD_CHANGE, USER_DBA_NAME);
-		request.addParameter("cancel", "true");
+		// Only valid for first-time login.
+		if (userInfo.loginCount == 0) {
+			setProcessBean(FORCED_PASSWORD_CHANGE, userInfo.username);
+			request.addParameter("cancel", "true");
 
-		auth.doPost(request, response);
+			auth.doPost(request, response);
 
-		assertExpectedRedirect(URL_HOME_PAGE);
-		assertExpectedLoginSessions();
-		assertNoProcessBean();
+			assertNoProcessBean();
+			assertNewLoginSessions();
+			assertRedirectToCancelUrl();
+		}
 	}
 
 	@Test
 	public void changingPasswordWrongLength() {
-		setProcessBean(FORCED_PASSWORD_CHANGE, USER_DBA_NAME);
-		setNewPasswordAttempt("HI", "HI");
+		// Only valid for first-time login.
+		if (userInfo.loginCount == 0) {
+			setProcessBean(FORCED_PASSWORD_CHANGE, userInfo.username);
+			setNewPasswordAttempt("HI", "HI");
 
-		auth.doPost(request, response);
+			auth.doPost(request, response);
 
-		assertExpectedRedirect(URL_LOGIN_PAGE);
-		assertExpectedLoginSessions();
-		assertExpectedProcessBean(FORCED_PASSWORD_CHANGE, USER_DBA_NAME, "",
-				"Please enter a password between 6 and 12 characters in length.");
+			assertRedirectToContinueUrl();
+			assertNewLoginSessions();
+			assertProcessBean(FORCED_PASSWORD_CHANGE, userInfo.username, "",
+					"Please enter a password between 6 and 12 characters in length.");
+		}
 	}
 
 	@Test
 	public void changingPasswordDontMatch() {
-		setProcessBean(FORCED_PASSWORD_CHANGE, USER_DBA_NAME);
-		setNewPasswordAttempt("LongEnough", "DoesNotMatch");
+		// Only valid for first-time login.
+		if (userInfo.loginCount == 0) {
+			setProcessBean(FORCED_PASSWORD_CHANGE, userInfo.username);
+			setNewPasswordAttempt("LongEnough", "DoesNotMatch");
 
-		auth.doPost(request, response);
+			auth.doPost(request, response);
 
-		assertExpectedRedirect(URL_LOGIN_PAGE);
-		assertExpectedLoginSessions();
-		assertExpectedProcessBean(FORCED_PASSWORD_CHANGE, USER_DBA_NAME, "",
-				"The passwords entered do not match.");
+			assertRedirectToContinueUrl();
+			assertNewLoginSessions();
+			assertProcessBean(FORCED_PASSWORD_CHANGE, userInfo.username, "",
+					"The passwords entered do not match.");
+		}
 	}
 
 	@Test
 	public void changingPasswordSameAsBefore() {
-		setProcessBean(FORCED_PASSWORD_CHANGE, USER_DBA_NAME);
-		setNewPasswordAttempt(USER_DBA_PASSWORD, USER_DBA_PASSWORD);
+		// Only valid for first-time login.
+		if (userInfo.loginCount == 0) {
+			setProcessBean(FORCED_PASSWORD_CHANGE, userInfo.username);
+			setNewPasswordAttempt(userInfo.password, userInfo.password);
 
-		auth.doPost(request, response);
+			auth.doPost(request, response);
 
-		assertExpectedRedirect(URL_LOGIN_PAGE);
-		assertExpectedLoginSessions();
-		assertExpectedProcessBean(FORCED_PASSWORD_CHANGE, USER_DBA_NAME, "",
-				"Please choose a different password from the "
-						+ "temporary one provided initially.");
+			assertRedirectToContinueUrl();
+			assertNewLoginSessions();
+			assertProcessBean(FORCED_PASSWORD_CHANGE, userInfo.username, "",
+					"Please choose a different password from the "
+							+ "temporary one provided initially.");
+		}
 	}
 
 	@Test
 	public void changingPasswordSuccess() {
-		setProcessBean(FORCED_PASSWORD_CHANGE, USER_DBA_NAME);
-		setNewPasswordAttempt("NewPassword", "NewPassword");
+		// Only valid for first-time login.
+		if (userInfo.loginCount == 0) {
+			setProcessBean(FORCED_PASSWORD_CHANGE, userInfo.username);
+			setNewPasswordAttempt("NewPassword", "NewPassword");
+
+			auth.doPost(request, response);
+
+			assertRedirectToCompletionUrl();
+			assertNewLoginSessions(userInfo.username);
+			assertNoProcessBean();
+			assertPasswordChanges(userInfo.username, "NewPassword");
+		}
+	}
+
+	@Test
+	public void alreadyLoggedIn() {
+		LoginStatusBean statusBean = new LoginStatusBean(userInfo.uri,
+				userInfo.username, userInfo.securityLevel,
+				AuthenticationSource.INTERNAL);
+		LoginStatusBean.setBean(session, statusBean);
 
 		auth.doPost(request, response);
 
+		assertRedirectToCompletionUrl();
 		assertNoProcessBean();
-		assertExpectedRedirect(URL_SITE_ADMIN_PAGE);
-		assertExpectedLoginSessions(USER_DBA_NAME);
-		assertExpectedPasswordChanges(USER_DBA_NAME, "NewPassword");
+		assertNewLoginSessions();
 	}
 
 	// ----------------------------------------------------------------------
-	// Assorted redirects: these assume a successful non-first-time login.
+	// Helper methods
 	// ----------------------------------------------------------------------
-
-	@Test
-	public void redirectReturnToRestrictedPage() {
-		LoginRedirector.setReturnUrlFromForcedLogin(request,
-				URL_SESSION_REDIRECT);
-		loginNotFirstTime();
-		assertExpectedLiteralRedirect(URL_SESSION_REDIRECT);
-	}
-
-	@Test
-	public void redirectDbaToSiteAdmin() {
-		authenticator.getUserByUsername(USER_OLDHAND_NAME).setRoleURI("50");
-		loginNotFirstTime();
-		assertExpectedRedirect(URL_SITE_ADMIN_PAGE);
-	}
-
-	@Test
-	public void redirectSelfEditor() {
-		authenticator.setAssociatedUri(USER_OLDHAND_NAME, "selfEditorURI");
-		loginNotFirstTime();
-		assertExpectedRedirect(URL_SELF_EDITOR_PAGE);
-	}
-
-	@Test
-	public void redirectUnrecognizedUserToHome() {
-		loginNotFirstTime();
-		assertExpectedRedirect(URL_HOME_PAGE);
-	}
-
-	@Test
-	public void redirectUnrecognizedUserToApplicationHome() {
-		servletContext.setAttribute("postLoginRequest",
-				URL_CONTEXT_REDIRECT_LOCAL);
-		loginNotFirstTime();
-		assertExpectedRedirect(URL_CONTEXT_REDIRECT_LOCAL);
-	}
-
-	@Test
-	public void redirectUnrecognizedUserToApplicationExternalHome() {
-		servletContext.setAttribute("postLoginRequest",
-				URL_CONTEXT_REDIRECT_REMOTE);
-		loginNotFirstTime();
-		assertExpectedLiteralRedirect(URL_CONTEXT_REDIRECT_REMOTE);
-	}
-
-	// ----------------------------------------------------------------------
-	// helper methods
-	// ----------------------------------------------------------------------
-
-	private void setProcessBean(State state) {
-		LoginProcessBean processBean = new LoginProcessBean();
-		processBean.setState(state);
-		LoginProcessBean.setBean(request, processBean);
-	}
 
 	private void setProcessBean(State state, String username) {
 		LoginProcessBean processBean = new LoginProcessBean();
 		processBean.setState(state);
-		processBean.setUsername(username);
+		if (username != null) {
+			processBean.setUsername(username);
+		}
+
+		// the urls come directly from the url bundle every time.
+		if (urlBundle.afterLoginUrl != null) {
+			processBean.setAfterLoginUrl(urlBundle.afterLoginUrl);
+			processBean.setLoginPageUrl(URL_LOGIN);
+		} else if (urlBundle.returnParameterSet) {
+			processBean.setAfterLoginUrl(urlBundle.referrer);
+			processBean.setLoginPageUrl(URL_LOGIN);
+		} else {
+			processBean.setAfterLoginUrl(null);
+			processBean.setLoginPageUrl(urlBundle.referrer);
+		}
 		LoginProcessBean.setBean(request, processBean);
 	}
 
@@ -363,19 +520,26 @@ public class AuthenticateTest extends AbstractTestClass {
 		request.addParameter("confirmPassword", confirmPassword);
 	}
 
-	private void assertExpectedRedirect(String path) {
+	private void assertRedirectToContinueUrl() {
+		assertRedirect(whereTo.expectedContinueUrl);
+	}
+
+	private void assertRedirectToCompletionUrl() {
+		assertRedirect(whereTo.expectedCompletionUrl);
+	}
+
+	private void assertRedirectToCancelUrl() {
+		assertRedirect(whereTo.expectedCancelUrl);
+	}
+
+	private void assertRedirect(String path) {
 		if (path.startsWith("http://")) {
 			assertEquals("absolute redirect", path,
 					response.getRedirectLocation());
 		} else {
-			assertEquals("relative redirect", request.getContextPath() + path,
+			assertEquals("relative redirect", path,
 					response.getRedirectLocation());
 		}
-	}
-
-	/** This is for explicit redirect URLs that already include context. */
-	private void assertExpectedLiteralRedirect(String path) {
-		assertEquals("redirect", path, response.getRedirectLocation());
 	}
 
 	private void assertNoProcessBean() {
@@ -385,7 +549,7 @@ public class AuthenticateTest extends AbstractTestClass {
 		}
 	}
 
-	private void assertExpectedProcessBean(State state, String username,
+	private void assertProcessBean(State state, String username,
 			String infoMessage, String errorMessage) {
 		if (!LoginProcessBean.isBean(request)) {
 			fail("login process bean is null");
@@ -396,9 +560,25 @@ public class AuthenticateTest extends AbstractTestClass {
 		assertEquals("error message", errorMessage,
 				bean.getErrorMessageAndClear());
 		assertEquals("username", username, bean.getUsername());
+
+		// This should represent the URL bundle, every time.
+		String expectedAfterLoginUrl = (urlBundle.returnParameterSet) ? urlBundle.referrer
+				: urlBundle.afterLoginUrl;
+		assertEquals("after login URL", expectedAfterLoginUrl,
+				bean.getAfterLoginUrl());
 	}
 
-	private void assertExpectedPasswordChanges(String... strings) {
+	/** What logins were completed in this test? */
+	private void assertNewLoginSessions(String... usernames) {
+		Set<String> expected = new HashSet<String>(Arrays.asList(usernames));
+
+		Set<String> actualRecorded = new HashSet<String>(
+				authenticator.getRecordedLoginUsernames());
+		assertEquals("recorded logins", expected, actualRecorded);
+	}
+
+	/** What passwords were changed in this test? */
+	private void assertPasswordChanges(String... strings) {
 		if ((strings.length % 2) != 0) {
 			throw new RuntimeException(
 					"supply even number of args: username and password");
@@ -411,26 +591,6 @@ public class AuthenticateTest extends AbstractTestClass {
 
 		assertEquals("password changes", expected,
 				authenticator.getNewPasswordMap());
-	}
-
-	/** How many folks logged in? */
-	private void assertExpectedLoginSessions(String... usernames) {
-		Set<String> expected = new HashSet<String>(Arrays.asList(usernames));
-
-		Set<String> actualRecorded = new HashSet<String>(
-				authenticator.getRecordedLoginUsernames());
-		assertEquals("recorded logins", expected, actualRecorded);
-	}
-
-	/** Boilerplate login process for the redirect tests. */
-	private void loginNotFirstTime() {
-		setProcessBean(LOGGING_IN);
-		setLoginNameAndPassword(USER_OLDHAND_NAME, USER_OLDHAND_PASSWORD);
-
-		auth.doPost(request, response);
-
-		assertExpectedLoginSessions(USER_OLDHAND_NAME);
-		assertNoProcessBean();
 	}
 
 	@SuppressWarnings("unused")

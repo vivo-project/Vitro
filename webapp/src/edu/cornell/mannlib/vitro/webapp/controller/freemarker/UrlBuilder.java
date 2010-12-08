@@ -26,6 +26,7 @@ public class UrlBuilder {
         
     public enum Route {
         ABOUT("/about"),
+        AUTHENTICATE("/authenticate"),
         BROWSE("/browse"),
         CONTACT("/contact"),
         INDIVIDUAL("/individual"),
@@ -119,6 +120,10 @@ public class UrlBuilder {
     public String getBaseUrl() {
         return contextPath;
     }
+    
+	public String getLoginUrl() {
+		return getPortalUrl(Route.AUTHENTICATE, "return", "true");
+	}
     
     public String getLogoutUrl() {
         return getPortalUrl(Route.LOGOUT);
