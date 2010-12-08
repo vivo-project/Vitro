@@ -24,7 +24,6 @@ public class EmptyController extends FreemarkerHttpServlet {
     private static final Map<String, String> urlsToTemplates = new HashMap<String, String>(){
         {
             put("/login", "login.ftl");
-            put("/insufficientAuthorization", "insufficientAuthorization.ftl");
         }
     };
 

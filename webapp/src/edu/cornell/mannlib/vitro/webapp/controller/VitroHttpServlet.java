@@ -21,6 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LogoutRedirector;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State;
@@ -42,6 +43,15 @@ public class VitroHttpServlet extends HttpServlet {
 														// unregistered
 	public final static String TTL_MIMETYPE = "text/turtle"; // unofficial and
 																// unregistered
+
+	/**
+	 * Show this to the user if they are logged in, but still not authorized to
+	 * view the page.
+	 */
+	private static final String INSUFFICIENT_AUTHORIZATION_MESSAGE = "We're sorry, "
+			+ "but you are not authorized to view the page you requested. "
+			+ "If you think this is an error, "
+			+ "please contact us and we'll be happy to help.";
 
 	/**
 	 * Setup the auth flag, portal flag and portal bean objects. Put them in the
@@ -108,15 +118,15 @@ public class VitroHttpServlet extends HttpServlet {
 
 	/**
 	 * Logged in, but with insufficent authorization. Send them to the
-	 * corresponding page. They won't be coming back.
+	 * home page with a message. They won't be coming back.
 	 */
-	public static void redirectToInsufficientAuthorizationPage(
+	private static void redirectToInsufficientAuthorizationPage(
 			HttpServletRequest request, HttpServletResponse response) {
 		try {
-			response.sendRedirect(request.getContextPath()
-					+ Controllers.INSUFFICIENT_AUTHORIZATION);
+			DisplayMessage.setMessage(request, INSUFFICIENT_AUTHORIZATION_MESSAGE);
+			response.sendRedirect(request.getContextPath());
 		} catch (IOException e) {
-			log.error("Could not redirect to insufficient authorization page.");
+			log.error("Could not redirect to show insufficient authorization.");
 		}
 	}
 	
