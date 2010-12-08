@@ -36,8 +36,7 @@ public class ViewFinder {
         // NB this is not the value currently used for custom forms - we use the value on the object property.
         // This value is specifiable from the backend editor, however.
         FORM("getCustomEntryForm", "form-default.ftl"), 
-        SEARCH("getCustomSearchView", "view-search-default.ftl"),
-        SHORT("getCustomShortView", "view-short-default.ftl"); 
+        SEARCH("getCustomSearchView", "view-search-default.ftl");
         
         private Method method = null;
         private String defaultTemplate = null;

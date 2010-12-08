@@ -4,7 +4,6 @@
 
 <#list property.statements as statement>
     <div class="obj-prop-stmt-obj">
-        <#-- ${statement.object.name} -->
         statement ${statement_index +1}
     </div> <!-- end obj-prop-stmt-obj -->
 </#list>

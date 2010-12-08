@@ -109,10 +109,6 @@ public class IndividualTemplateModel extends BaseTemplateModel {
         return getView(ClassView.SEARCH);
     }
     
-    public String getShortView() {        
-        return getView(ClassView.SHORT);
-    }
-    
     public String getDisplayView() {        
         return getView(ClassView.DISPLAY);
     }
