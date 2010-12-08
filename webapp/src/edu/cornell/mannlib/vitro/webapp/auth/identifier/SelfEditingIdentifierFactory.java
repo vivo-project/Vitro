@@ -140,7 +140,7 @@ public class SelfEditingIdentifierFactory implements IdentifierBundleFactory {
 		}
 
 		log.debug("Found an Individual for netId " + username + " URI: " + uri);
-		String blacklisted = checkForBlacklisted(ind, context, req);
+		String blacklisted = checkForBlacklisted(ind, context);
 		return new SelfEditing(ind, blacklisted, false);
 	}
 
@@ -183,7 +183,7 @@ public class SelfEditingIdentifierFactory implements IdentifierBundleFactory {
      * or more rows will be cause the user to be blacklisted.  The first variable from
      * the first solution set will be returned.   
      */
-    public static String checkForBlacklisted(Individual ind, ServletContext context, HttpServletRequest req) {
+    public static String checkForBlacklisted(Individual ind, ServletContext context) {
         if( ind == null || context == null ) {
             log.error("could not check for Blacklist, null individual or context");
             return NOT_BLACKLISTED;
@@ -209,7 +209,7 @@ public class SelfEditingIdentifierFactory implements IdentifierBundleFactory {
         String reasonForBlacklist = NOT_BLACKLISTED;
         for( File file : files ){
             try{
-                reasonForBlacklist = runSparqlFileForBlacklist( file, ind, context, req);
+                reasonForBlacklist = runSparqlFileForBlacklist( file, ind, context);
                 if( reasonForBlacklist != NOT_BLACKLISTED ) 
                     break;
             }catch(RuntimeException ex){
@@ -230,7 +230,7 @@ public class SelfEditingIdentifierFactory implements IdentifierBundleFactory {
      * token "?individualURI" is found.
      */
     private static String runSparqlFileForBlacklist
-        (File file, Individual ind, ServletContext context, HttpServletRequest req) 
+        (File file, Individual ind, ServletContext context) 
     {
         if( !file.canRead() ){
             log.debug("cannot read blacklisting SPARQL file " + file.getName());
@@ -261,14 +261,14 @@ public class SelfEditingIdentifierFactory implements IdentifierBundleFactory {
             log.debug(file.getName() + " is empty");
             return NOT_BLACKLISTED;            
         }
-       // Model model = (Model)context.getAttribute("jenaOntModel");
-        VitroRequest request = new VitroRequest(req);	
-        Dataset dataset = request.getDataset();
+       Model model = (Model)context.getAttribute("jenaOntModel");
+       // VitroRequest request = new VitroRequest(req);	
+       // Dataset dataset = request.getDataset();
         
         queryString = queryString.replaceAll("\\?individualURI", "<" + ind.getURI() + ">");
         log.debug(queryString);
         Query query = QueryFactory.create(queryString);        
-        QueryExecution qexec = QueryExecutionFactory.create(query,dataset);
+        QueryExecution qexec = QueryExecutionFactory.create(query,model);
         try{
             ResultSet results = qexec.execSelect();
             while(results.hasNext()){
