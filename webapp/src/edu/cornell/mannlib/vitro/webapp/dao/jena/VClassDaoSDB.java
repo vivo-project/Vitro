@@ -26,16 +26,16 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 public class VClassDaoSDB extends VClassDaoJena {
 
-	private Dataset dataset;
-	private WebappDaoFactoryJena wadf;
+	private DatasetWrapperFactory dwf;
 	
-    public VClassDaoSDB(Dataset dataset, WebappDaoFactoryJena wadf) {
+    public VClassDaoSDB(DatasetWrapperFactory datasetWrapperFactory, 
+                WebappDaoFactoryJena wadf) {
         super(wadf);
-        this.dataset = dataset;
+        this.dwf = datasetWrapperFactory;
     }
     
-    protected Dataset getDataset() {
-    	return this.dataset;
+    protected DatasetWrapper getDatasetWrapper() {
+    	return dwf.getDatasetWrapper();
     }
     
     @Deprecated
@@ -63,9 +63,17 @@ public class VClassDaoSDB extends VClassDaoJena {
                                     		String countQueryStr = "SELECT COUNT(*) WHERE \n" +
                                     		                       "{ GRAPH ?g { ?s a <" + cls.getURI() + "> } } \n";
                                     		Query countQuery = QueryFactory.create(countQueryStr, Syntax.syntaxARQ);
-                                    		QueryExecution qe = QueryExecutionFactory.create(countQuery, getDataset());
-                                    		ResultSet rs =qe.execSelect();
-                                    		count = Integer.parseInt(((Literal) rs.nextSolution().get(".1")).getLexicalForm());
+                                    		DatasetWrapper w = getDatasetWrapper();
+                                    		Dataset dataset = w.getDataset();
+                                    		dataset.getLock().enterCriticalSection(Lock.READ);
+                                    		try {
+                                        		QueryExecution qe = QueryExecutionFactory.create(countQuery, dataset);
+                                        		ResultSet rs = qe.execSelect();
+                                        		count = Integer.parseInt(((Literal) rs.nextSolution().get(".1")).getLexicalForm());
+                                    		} finally {
+                                    		    dataset.getLock().leaveCriticalSection();
+                                    		    w.close();
+                                    		}
                                     	} finally {
                                     		aboxModel.leaveCriticalSection();
                                     	}

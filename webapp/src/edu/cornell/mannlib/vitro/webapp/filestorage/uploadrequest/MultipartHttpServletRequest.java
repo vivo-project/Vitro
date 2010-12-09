@@ -137,7 +137,7 @@ class MultipartHttpServletRequest extends FileUploadServletRequest {
 	 */
 	private ServletFileUpload createUploadHandler(int maxFileSize, File tempDir) {
 		DiskFileItemFactory factory = new DiskFileItemFactory();
-		factory.setSizeThreshold(maxFileSize);
+		factory.setSizeThreshold(DiskFileItemFactory.DEFAULT_SIZE_THRESHOLD);
 		factory.setRepository(tempDir);
 
 		ServletFileUpload upload = new ServletFileUpload(factory);

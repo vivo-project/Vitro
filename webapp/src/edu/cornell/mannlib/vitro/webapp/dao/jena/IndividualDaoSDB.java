@@ -41,26 +41,27 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 public class IndividualDaoSDB extends IndividualDaoJena {
 
-	private Dataset dataset;
+	private DatasetWrapperFactory dwf;
 	private WebappDaoFactoryJena wadf;
 	
-    public IndividualDaoSDB(Dataset dataset, WebappDaoFactoryJena wadf) {
+    public IndividualDaoSDB(DatasetWrapperFactory dwf, WebappDaoFactoryJena wadf) {
         super(wadf);
-        this.dataset = dataset;
+        this.dwf = dwf;
     }
     
-    protected Dataset getDataset() {
-    	return this.dataset;
+    protected DatasetWrapper getDatasetWrapper() {
+    	return dwf.getDatasetWrapper();
     }
     
     protected Individual makeIndividual(String individualURI) {
-    	return new IndividualSDB2(individualURI, getDataset(), getWebappDaoFactory());
+    	return new IndividualSDB(individualURI, this.dwf, getWebappDaoFactory());
     }
 
     private static final Log log = LogFactory.getLog(IndividualDaoSDB.class.getName());
@@ -90,36 +91,49 @@ public class IndividualDaoSDB extends IndividualDaoJena {
         		ents.addAll(getIndividualsByVClass(vc));
         	}
         } else {
-        	Model model;
-        	dataset.getLock().enterCriticalSection(Lock.READ);
+        	Model model = null;
         	try {
-        		String query = 
-    	    		"CONSTRUCT " +
-    	    		"{ ?ind  <" + RDFS.label.getURI() + "> ?ooo. \n" +
-    	    		   "?ind  a <" + theClass.getURI() + "> . \n" +
-    	    		   "?ind  <" + VitroVocabulary.MONIKER + "> ?moniker \n" +
-    	    		 "} WHERE " +
-    	    		 "{ GRAPH ?g { \n" +
-    	    		    " ?ind a <" + theClass.getURI() + ">  \n" +
-    	    		    "} \n" +
-    	    		 	"OPTIONAL { GRAPH ?h { ?ind  <" + RDFS.label.getURI() + "> ?ooo } }\n" +
-    	    		 	"OPTIONAL { GRAPH ?i { ?ind  <" + VitroVocabulary.MONIKER + "> ?moniker } } \n" +
-    	    		 "}";
-        		model = QueryExecutionFactory.create(QueryFactory.create(query), dataset).execConstruct();
-        	} finally {
-        		dataset.getLock().leaveCriticalSection();
-        	}
-            ResIterator resIt = model.listSubjects();
-            try {
-                while (resIt.hasNext()) {
-                    Resource ind = resIt.nextResource();
-                    if (!ind.isAnon()) {
-                    	ents.add(new IndividualSDB(ind.getURI(), dataset, getWebappDaoFactory(), model));
+        	    DatasetWrapper w = getDatasetWrapper();
+        	    Dataset dataset = w.getDataset();
+            	dataset.getLock().enterCriticalSection(Lock.READ);
+            	try {
+            		String query = 
+        	    		"CONSTRUCT " +
+        	    		"{ ?ind  <" + RDFS.label.getURI() + "> ?ooo. \n" +
+        	    		   "?ind  a <" + theClass.getURI() + "> . \n" +
+        	    		   "?ind  <" + VitroVocabulary.MONIKER + "> ?moniker \n" +
+        	    		 "} WHERE " +
+        	    		 "{ GRAPH ?g { \n" +
+        	    		    " ?ind a <" + theClass.getURI() + ">  \n" +
+        	    		    "} \n" +
+        	    		 	"OPTIONAL { GRAPH ?h { ?ind  <" + RDFS.label.getURI() + "> ?ooo } }\n" +
+        	    		 	"OPTIONAL { GRAPH ?i { ?ind  <" + VitroVocabulary.MONIKER + "> ?moniker } } \n" +
+        	    		 "}";
+            		model = QueryExecutionFactory.create(QueryFactory.create(query), dataset).execConstruct();
+            	} finally {
+            		dataset.getLock().leaveCriticalSection();
+            		w.close();
+            	}
+                ResIterator resIt = model.listSubjects();
+                try {
+                    while (resIt.hasNext()) {
+                        Resource ind = resIt.nextResource();
+                        if (!ind.isAnon()) {
+                            //Individual indd = new IndividualImpl(ind.getURI());
+                            //indd.setLocalName(ind.getLocalName());
+                            //indd.setName(ind.getLocalName());
+                            //ents.add(indd);
+                        	ents.add(new IndividualSDB(ind.getURI(), dataset, getWebappDaoFactory(), model));
+                        }
                     }
+                } finally {
+                    resIt.close();
                 }
-            } finally {
-                resIt.close();
-            }	
+        	} finally {
+        	    if (model != null && !model.isClosed()) {
+        	        model.close();
+        	    }
+        	}
         }
      
 
@@ -285,6 +299,9 @@ public class IndividualDaoSDB extends IndividualDaoJena {
         
         
 	    Query q = QueryFactory.create(query);
+	    DatasetWrapper w = getDatasetWrapper();
+	    Dataset dataset = w.getDataset();
+	    dataset.getLock().enterCriticalSection(Lock.READ);
 	    QueryExecution qe = QueryExecutionFactory.create(q, dataset);
 	    try {
 	        ResultSet rs = qe.execSelect();
@@ -295,7 +312,9 @@ public class IndividualDaoSDB extends IndividualDaoJena {
 	        	}
 	        }
         } finally {
-        	qe.close(); 
+        	qe.close();
+        	dataset.getLock().leaveCriticalSection();
+        	w.close();
         }
         
 //        getOntModel().enterCriticalSection(Lock.READ);

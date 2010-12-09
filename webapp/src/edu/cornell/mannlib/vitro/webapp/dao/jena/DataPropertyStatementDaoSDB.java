@@ -35,11 +35,11 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 public class DataPropertyStatementDaoSDB extends DataPropertyStatementDaoJena
 							implements DataPropertyStatementDao {
 
-	private Dataset dataset;
+	private DatasetWrapperFactory dwf;
 	
-	public DataPropertyStatementDaoSDB(Dataset dataset, WebappDaoFactoryJena wadf) {
+	public DataPropertyStatementDaoSDB(DatasetWrapperFactory datasetWrapperFactory, WebappDaoFactoryJena wadf) {
 		super (wadf);
-		this.dataset = dataset;
+		this.dwf = datasetWrapperFactory;
 	}
 	
 	@Override
@@ -58,7 +58,16 @@ public class DataPropertyStatementDaoSDB extends DataPropertyStatementDaoJena
 			       "   <" + entity.getURI() + "> ?p ?o . \n" +
 			       "   FILTER(isLiteral(?o)) \n" +
 	            "} }" ;
-        	Model results = QueryExecutionFactory.create(QueryFactory.create(query), dataset).execConstruct();
+        	Model results = null;
+        	DatasetWrapper w = dwf.getDatasetWrapper();
+            Dataset dataset = w.getDataset();
+            dataset.getLock().enterCriticalSection(Lock.READ);
+            try { 
+        	    results = QueryExecutionFactory.create(QueryFactory.create(query), dataset).execConstruct();
+            } finally {
+                dataset.getLock().leaveCriticalSection();
+                w.close();
+            }
         	OntModel ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, results); 
             ontModel.enterCriticalSection(Lock.READ);
             try {

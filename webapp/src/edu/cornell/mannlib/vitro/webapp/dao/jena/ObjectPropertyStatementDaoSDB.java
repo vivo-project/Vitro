@@ -31,11 +31,13 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 public class ObjectPropertyStatementDaoSDB extends
 		ObjectPropertyStatementDaoJena implements ObjectPropertyStatementDao {
 
-	private Dataset dataset;
+	private DatasetWrapperFactory dwf;
 	
-	public ObjectPropertyStatementDaoSDB(Dataset dataset, WebappDaoFactoryJena wadf) {
+	public ObjectPropertyStatementDaoSDB(
+	            DatasetWrapperFactory datasetWrapperFactory, 
+	            WebappDaoFactoryJena wadf) {
 		super (wadf);
-		this.dataset = dataset;
+		this.dwf = datasetWrapperFactory;
 	}
 	
 	@Override
@@ -56,12 +58,15 @@ public class ObjectPropertyStatementDaoSDB extends
         			       "   OPTIONAL { ?o <" + VitroVocabulary.MONIKER + "> ?oMoniker }  \n" +
                            "} }";
         	long startTime = System.currentTimeMillis();
-        	dataset.getLock().enterCriticalSection(Lock.READ);
         	Model m = null;
+        	DatasetWrapper w = dwf.getDatasetWrapper();
+        	Dataset dataset = w.getDataset();
+        	dataset.getLock().enterCriticalSection(Lock.READ);
         	try {
         		m = QueryExecutionFactory.create(QueryFactory.create(query), dataset).execConstruct();
         	} finally {
         		dataset.getLock().leaveCriticalSection();
+        		w.close();
         	}
         	if (log.isDebugEnabled()) {
 	        	log.debug("Time (ms) to query for related individuals: " + (System.currentTimeMillis() - startTime));
@@ -112,12 +117,18 @@ public class ObjectPropertyStatementDaoSDB extends
 	                            	continue;                                                                
 	                            }
 	                            if (objPropertyStmt.getObjectURI() != null) {
-	                                Individual objInd = new IndividualSDB(objPropertyStmt.getObjectURI(), dataset, getWebappDaoFactory(), m);
+	                                Individual objInd = new IndividualSDB(
+	                                        objPropertyStmt.getObjectURI(), 
+	                                        this.dwf, 
+	                                        getWebappDaoFactory(),
+	                                        m);
 	                                objPropertyStmt.setObject(objInd);
 	                            }
 	
 	                            //add object property statement to list for Individual
-	                            if ((objPropertyStmt.getSubjectURI() != null) && (objPropertyStmt.getPropertyURI() != null) && (objPropertyStmt.getObject() != null)){
+	                            if ((objPropertyStmt.getSubjectURI() != null) 
+	                                    && (objPropertyStmt.getPropertyURI() != null) 
+	                                    && (objPropertyStmt.getObject() != null)){
 	                                objPropertyStmtList.add(objPropertyStmt);                           
 	                            } 
 	                        } catch (Throwable t) {

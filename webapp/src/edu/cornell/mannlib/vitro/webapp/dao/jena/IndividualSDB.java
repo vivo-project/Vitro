@@ -69,13 +69,13 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     private WebappDaoFactoryJena webappDaoFactory = null;
     private Float _searchBoostJena = null;
     private boolean retreivedNullRdfsLabel = false;
-    private Dataset dataset = null;
+    private DatasetWrapperFactory dwf = null;
     private String individualURI = null; 
     private Model model = null;
     
-    public IndividualSDB(String individualURI, Dataset dataset, WebappDaoFactoryJena wadf, Model initModel) {
+    public IndividualSDB(String individualURI, DatasetWrapperFactory datasetWrapperFactory, WebappDaoFactoryJena wadf, Model initModel) {
     	this.individualURI = individualURI;
-    	this.dataset = dataset;
+    	this.dwf = datasetWrapperFactory;
       
     	try {
 	    	initModel.getLock().enterCriticalSection(Lock.READ);
@@ -113,12 +113,14 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         this.webappDaoFactory = wadf;
     }
     
-    public IndividualSDB(String individualURI, Dataset dataset, WebappDaoFactoryJena wadf) {
+    public IndividualSDB(String individualURI, DatasetWrapperFactory datasetWrapperFactory, WebappDaoFactoryJena wadf) {
     	this.individualURI = individualURI;
-    	this.dataset = dataset;
+    	this.dwf = datasetWrapperFactory;
     	
+    	DatasetWrapper w = getDatasetWrapper();
+    	Dataset dataset = w.getDataset();
     	try {
-	    	this.dataset.getLock().enterCriticalSection(Lock.READ);
+	    	dataset.getLock().enterCriticalSection(Lock.READ);
 	    	String getStatements = 
 	    		"CONSTRUCT " +
 	    		"{ <"+individualURI+">  <" + RDFS.label.getURI() + "> ?ooo. \n" +
@@ -133,7 +135,8 @@ public class IndividualSDB extends IndividualImpl implements Individual {
 	    		 "}";
     		model = QueryExecutionFactory.create(QueryFactory.create(getStatements), dataset).execConstruct();
     	} finally {
-    		this.dataset.getLock().leaveCriticalSection();
+    		dataset.getLock().leaveCriticalSection();
+    		w.close();
     	}
     	
     	OntModel ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, model);
@@ -155,6 +158,10 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         this.webappDaoFactory = wadf;
     }
 
+    private DatasetWrapper getDatasetWrapper() {
+        return this.dwf.getDatasetWrapper();
+    }
+    
     public String getName() { 
         if (this.name != null) {
             return name;
@@ -249,10 +256,11 @@ public class IndividualSDB extends IndividualImpl implements Individual {
    "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing"
     */
     public boolean doesFlag1Match(int flagBitMask) { 
-        Long [] numerics = FlagMathUtils.numeric2numerics(flagBitMask);        
-        this.dataset.getLock().enterCriticalSection(Lock.READ);
-        String Ask = null;
-        
+        Long [] numerics = FlagMathUtils.numeric2numerics(flagBitMask);
+        String Ask = null;      
+        DatasetWrapper w = getDatasetWrapper();
+        Dataset dataset = w.getDataset();
+        dataset.getLock().enterCriticalSection(Lock.READ);
         try{
             for( Long numericPortal : numerics){
                 int portalid = FlagMathUtils.numeric2Portalid(numericPortal);
@@ -262,19 +270,19 @@ public class IndividualSDB extends IndividualImpl implements Individual {
                 	return false;
             }
         }finally{
-           
-        	this.dataset.getLock().leaveCriticalSection();
+        	dataset.getLock().leaveCriticalSection();
+        	w.close();
         }
         return true;
     }
 
     private void doFlag1() {
-       
     	String getObjects = null;
-    	
-        dataset.getLock().enterCriticalSection(Lock.READ);
         Model tempModel = ModelFactory.createDefaultModel();
         OntModel ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+        DatasetWrapper w = getDatasetWrapper();
+        Dataset dataset = w.getDataset();
+        dataset.getLock().enterCriticalSection(Lock.READ);
         try {
         	ClosableIterator typeIt = null;
             int portalNumeric = 0;
@@ -310,16 +318,19 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         } finally {
             tempModel.close();
             ontModel.close();
-        	this.dataset.getLock().leaveCriticalSection();
+            dataset.getLock().leaveCriticalSection();
+        	w.close();
         }
     }
 
     
     private void doFlag2() {
     	String getObjects = null;
-    	dataset.getLock().enterCriticalSection(Lock.READ);
-    	Model tempModel = ModelFactory.createDefaultModel();
+        Model tempModel = ModelFactory.createDefaultModel();
         OntModel ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+        DatasetWrapper w = getDatasetWrapper();
+        Dataset dataset = w.getDataset();
+    	dataset.getLock().enterCriticalSection(Lock.READ);
         try {
             ClosableIterator typeIt=null;
             String flagSet = "";
@@ -352,7 +363,8 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         } finally {
         	tempModel.close();
             ontModel.close();
-        	this.dataset.getLock().leaveCriticalSection();
+        	dataset.getLock().leaveCriticalSection();
+        	w.close();
         }
     }
 
@@ -566,7 +578,8 @@ public class IndividualSDB extends IndividualImpl implements Individual {
             String getPropertyValue = 
             	"SELECT ?value" +
             	"WHERE { GRAPH ?g { <" + individualURI + ">" + webappDaoFactory.getJenaBaseDao().SEARCH_BOOST_ANNOT + "?value} }";
-            
+            DatasetWrapper w = getDatasetWrapper();
+            Dataset dataset = w.getDataset();
         	dataset.getLock().enterCriticalSection(Lock.READ);
             try{
                 try {
@@ -577,8 +590,8 @@ public class IndividualSDB extends IndividualImpl implements Individual {
                 }                
                 return searchBoost;
             }finally{
-               
             	dataset.getLock().leaveCriticalSection();
+            	w.close();
             }
         }
     }    
@@ -646,10 +659,11 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     }
 
     private void doUrlAndAnchor() { 
-        
-    	this.dataset.getLock().enterCriticalSection(Lock.READ);
-    	Model tempModel = ModelFactory.createDefaultModel();
-    	OntModel ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+        Model tempModel = ModelFactory.createDefaultModel();
+        OntModel ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+        DatasetWrapper w = getDatasetWrapper();
+        Dataset dataset = w.getDataset();
+    	dataset.getLock().enterCriticalSection(Lock.READ);
         try {
             if (webappDaoFactory.getJenaBaseDao().PRIMARY_LINK != null) {
             	String listPropertyValues =
@@ -685,7 +699,8 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         } finally {
         	tempModel.close();
         	ontModel.close();
-        	this.dataset.getLock().leaveCriticalSection();
+        	dataset.getLock().leaveCriticalSection();
+        	w.close();
         }
     }
 
@@ -766,12 +781,13 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     		return null;
     	}
     	List<ObjectPropertyStatement> objectPropertyStatements = new ArrayList<ObjectPropertyStatement>();
-    	
+    
+	    Model tempModel = ModelFactory.createDefaultModel();
+        OntModel ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+        DatasetWrapper w = getDatasetWrapper();
+        Dataset dataset = w.getDataset();
     	dataset.getLock().enterCriticalSection(Lock.READ);
-    	Model tempModel = ModelFactory.createDefaultModel();
-    	OntModel ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
     	try {
-    		
     		String valuesOfProperty = 
     			"CONSTRUCT{<" + this.individualURI + "> <" + propertyURI + "> ?object}" +
     			"WHERE{ GRAPH ?g { <" + this.individualURI + "> <" + propertyURI + "> ?object} }";
@@ -784,8 +800,8 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     			if (!s.getSubject().canAs(OntResource.class) || !s.getObject().canAs(OntResource.class)) {
     			    continue;	
     			}
-    			Individual subj = new IndividualSDB(((OntResource) s.getSubject().as(OntResource.class)).getURI(), dataset, webappDaoFactory);
-    			Individual obj = new IndividualSDB(((OntResource) s.getObject().as(OntResource.class)).getURI(), dataset, webappDaoFactory);
+    			Individual subj = new IndividualSDB(((OntResource) s.getSubject().as(OntResource.class)).getURI(), this.dwf, webappDaoFactory);
+    			Individual obj = new IndividualSDB(((OntResource) s.getObject().as(OntResource.class)).getURI(), this.dwf, webappDaoFactory);
     			ObjectProperty op = webappDaoFactory.getObjectPropertyDao().getObjectPropertyByURI(s.getPredicate().getURI());
     			if (subj != null && obj != null && op != null) {
     				ObjectPropertyStatement ops = new ObjectPropertyStatementImpl();
@@ -802,6 +818,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     		tempModel.close();
     		ontModel.close();
      		dataset.getLock().leaveCriticalSection();
+     		w.close();
     	}
      	return objectPropertyStatements;
     }
@@ -813,6 +830,8 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	}
     	List<Individual> relatedIndividuals = new ArrayList<Individual>();
     	
+    	DatasetWrapper w = getDatasetWrapper();
+    	Dataset dataset = w.getDataset();
     	dataset.getLock().enterCriticalSection(Lock.READ);
     	try {
     		String valuesOfProperty = 
@@ -825,11 +844,12 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	    	RDFNode value = result.get("object");
     	    	if (value.canAs(OntResource.class)) {
         	    	relatedIndividuals.add(
-        	    		new IndividualSDB(((OntResource) value.as(OntResource.class)).getURI(), dataset, webappDaoFactory) );  
+        	    		new IndividualSDB(((OntResource) value.as(OntResource.class)).getURI(), this.dwf, webappDaoFactory) );  
         	    } 
     	    }
     	} finally {
     		dataset.getLock().leaveCriticalSection();
+    		w.close();
     	}
     	return relatedIndividuals;
     }
@@ -839,7 +859,8 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	if (propertyURI == null) {
     		return null;
     	}
-    	
+    	DatasetWrapper w = getDatasetWrapper();
+    	Dataset dataset = w.getDataset();
     	dataset.getLock().enterCriticalSection(Lock.READ);
     	try {
     		String valueOfProperty = 
@@ -849,12 +870,13 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     		QuerySolution result = results.next();
     		RDFNode value = result.get("object");
     	    if (value != null && value.canAs(OntResource.class)) {
-    	    	return new IndividualSDB(((OntResource) value.as(OntResource.class)).getURI(), dataset, webappDaoFactory);  
+    	    	return new IndividualSDB(((OntResource) value.as(OntResource.class)).getURI(), dwf, webappDaoFactory);  
     	    } else {
     	    	return null;
     	    }
     	} finally {
     		dataset.getLock().leaveCriticalSection();
+    		w.close();
     	}
     }
     

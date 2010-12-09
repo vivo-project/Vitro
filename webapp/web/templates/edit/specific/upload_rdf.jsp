@@ -13,13 +13,18 @@
     <p><strong class="warning">${errMsg}</strong></p>
 </c:if>
 
-    <p>Enter Web-accessible URL of RDF document:</p>
+    <p>Enter Web-accessible URL of document containing RDF to add or remove:</p>
     <p><input name="rdfUrl" type="text" style="width:67%;" value="<c:out value='${param.rdfUrl}'/>"/></p>
     
     <p>Or upload a file from your computer: </p>
     <p><input type="file" name="rdfStream"/> </p>
     
-    <p><input type="radio" name="mode" value="add" checked="checked"/>add RDF <input type="radio" name="mode" value="remove"/>remove RDF</p>
+    <ul style="list-style-type:none;">
+        <li><input type="radio" name="mode" value="directAddABox" checked="checked"/>add instance data (supports large data files)</li> 
+        <li><input type="radio" name="mode" value="add"/>add mixed RDF (instances and/or ontology)</li> 
+        <li><input type="radio" name="mode" value="remove"/>remove mixed RDF (instances and/or ontology)</li>
+    </ul>
+
     <select name="language">
         	<option value="RDF/XML">RDF/XML</option>
         	<option value="N3">N3</option>

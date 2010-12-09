@@ -1312,9 +1312,6 @@ private String doRename(String oldNamespace,String newNamespace,HttpServletRespo
 		result = counter.toString() + " resources renamed";
 		return result;
 		
-	}
-	public void prepareSmush (VitroRequest vreq) {
-		String smushPropURI = vreq.getParameter("smushPropURI");
-	}
+    }
 	
 }

@@ -13,16 +13,28 @@ import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 
 public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
 
-	private Dataset dataset;
+	private DatasetWrapperFactory dwf;
 	
+	/**
+	 * For use when any database connection associated with the Dataset
+	 * is managed externally
+	 * @param ontModelSelector
+	 * @param dataset
+	 */
 	public WebappDaoFactorySDB(OntModelSelector ontModelSelector, Dataset dataset) {
 		super(ontModelSelector);
-		this.dataset = dataset;
+		this.dwf = new StaticDatasetFactory(dataset);
 	}
 	
+    /**
+     * For use when any database connection associated with the Dataset
+     * is managed externally
+     * @param ontModelSelector
+     * @param dataset
+     */
 	public WebappDaoFactorySDB(OntModelSelector ontModelSelector, Dataset dataset, String defaultNamespace, HashSet<String> nonuserNamespaces, String[] preferredLanguages) {
 		super(ontModelSelector, defaultNamespace, nonuserNamespaces, preferredLanguages);
-        this.dataset = dataset;
+        this.dwf = new StaticDatasetFactory(dataset);
 	}
 	
 	@Override
@@ -30,7 +42,7 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
         if (entityWebappDao != null)
             return entityWebappDao;
         else
-            return entityWebappDao = new IndividualDaoSDB(dataset, this);
+            return entityWebappDao = new IndividualDaoSDB(dwf, this);
     }
 	
 	@Override
@@ -38,7 +50,7 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
 		if (dataPropertyStatementDao != null) 
 			return dataPropertyStatementDao;
 		else
-			return dataPropertyStatementDao = new DataPropertyStatementDaoSDB(dataset, this);
+			return dataPropertyStatementDao = new DataPropertyStatementDaoSDB(dwf, this);
 	}
 	
 	@Override
@@ -46,7 +58,7 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
 		if (objectPropertyStatementDao != null) 
 			return objectPropertyStatementDao;
 		else
-			return objectPropertyStatementDao = new ObjectPropertyStatementDaoSDB(dataset, this);
+			return objectPropertyStatementDao = new ObjectPropertyStatementDaoSDB(dwf, this);
 	}
 	
 	@Override
@@ -54,7 +66,21 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
 		if (vClassDao != null) 
 			return vClassDao;
 		else
-			return vClassDao = new VClassDaoSDB(dataset, this);
+			return vClassDao = new VClassDaoSDB(dwf, this);
+	}
+	
+	private class StaticDatasetFactory implements DatasetWrapperFactory {
+	 
+	    private Dataset dataset;
+	    
+	    public StaticDatasetFactory (Dataset dataset) {
+	        this.dataset = dataset;
+	    }
+	    
+	    public DatasetWrapper getDatasetWrapper() {
+	        return new DatasetWrapper(dataset);
+	    }
+	    
 	}
 	
 }
