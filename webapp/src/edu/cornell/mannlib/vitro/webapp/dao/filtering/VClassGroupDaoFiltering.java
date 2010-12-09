@@ -106,4 +106,10 @@ public class VClassGroupDaoFiltering extends BaseFiltering implements VClassGrou
     }
 
 
+    @Override
+    public void removeClassesHiddenFromSearch(List<VClassGroup> groups) {
+        innerDao.removeClassesHiddenFromSearch(groups);        
+    }
+
+
 }
