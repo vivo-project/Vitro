@@ -59,9 +59,6 @@ public class Authenticate extends VitroHttpServlet {
 	 */
 	private static final String PARAMETER_RETURN = "return";
 
-	/** If this is set, a status of NOWHERE should be treated as LOGGING_IN. */
-	private static final String PARAMETER_LOGGING_IN = "loginForm";
-
 	/** The username field on the login form. */
 	private static final String PARAMETER_USERNAME = "loginName";
 
@@ -193,20 +190,7 @@ public class Authenticate extends VitroHttpServlet {
 					+ "current state is NOWHERE");
 		}
 
-		if ((currentState == NOWHERE) && isLoggingInByParameter(request)) {
-			currentState = LOGGING_IN;
-			log.debug("forced from NOWHERE to LOGGING_IN by '"
-					+ PARAMETER_LOGGING_IN + "' parameter");
-		}
-
 		return currentState;
-	}
-
-	/**
-	 * If this parameter is present, we aren't NOWHERE.
-	 */
-	private boolean isLoggingInByParameter(HttpServletRequest request) {
-		return (request.getParameter(PARAMETER_LOGGING_IN) != null);
 	}
 
 	/**
