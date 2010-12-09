@@ -4,6 +4,9 @@ label{
     display: block; 
     margin-top: .5em; 
 }
+textarea{
+    margin-bottom: 1.5em;
+}
 /* mb863-reference: vivo-basic/css/formedit.css*/
 form {
     padding-bottom: 20px;
