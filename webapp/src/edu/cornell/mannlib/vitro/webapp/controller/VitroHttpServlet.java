@@ -3,6 +3,8 @@
 package edu.cornell.mannlib.vitro.webapp.controller;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -136,21 +138,17 @@ public class VitroHttpServlet extends HttpServlet {
 	 */
 	public static void redirectToLoginPage(HttpServletRequest request,
 			HttpServletResponse response)  {
-		LoginProcessBean bean = new LoginProcessBean();
-		bean.setState(State.LOGGING_IN);
-		bean.setAfterLoginUrl(assembleAfterLoginUrl(request));
-		LoginProcessBean.setBean(request, bean);
-		
-		String loginPage = request.getContextPath() + Controllers.LOGIN;
+		String returnUrl = assembleUrlToReturnHere(request);
+		String loginUrlWithReturn = assembleLoginUrlWithReturn(request, returnUrl);
 		
 		try {
-			response.sendRedirect(loginPage);
+			response.sendRedirect(loginUrlWithReturn);
 		} catch (IOException ioe) {
 			log.error("Could not redirect to login page");
 		}
 	}
 
-	private static String assembleAfterLoginUrl(HttpServletRequest request) {
+	private static String assembleUrlToReturnHere(HttpServletRequest request) {
 		String queryString = request.getQueryString();
 		if ((queryString == null) || queryString.isEmpty()) {
 			return request.getRequestURI();
@@ -159,6 +157,18 @@ public class VitroHttpServlet extends HttpServlet {
 		}
 	}
 
+	private static String assembleLoginUrlWithReturn(HttpServletRequest request,
+			String afterLoginUrl) {
+		String encodedAfterLoginUrl = afterLoginUrl;
+		try {
+			encodedAfterLoginUrl = URLEncoder.encode(afterLoginUrl, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			log.error("Really? No UTF-8 encoding?", e);
+		}
+		return request.getContextPath() + Controllers.AUTHENTICATE
+				+ "?afterLogin=" + encodedAfterLoginUrl;
+	}
+	
 	/**
 	 * If logging is set to the TRACE level, dump the HTTP headers on the request.
 	 */
