@@ -127,12 +127,28 @@ public class JenaIngestController extends BaseEditController {
 		actionStr = (actionStr != null) ? actionStr : "";
 		String modelType = vreq.getParameter("modelType");
 		if ("listModels".equals(actionStr)) {
+			getServletContext().setAttribute("vitroJenaModelMaker",maker);
+			String modelT = (String)getServletContext().getAttribute("modelT");
+			String info = (String)getServletContext().getAttribute("info");
+			if(modelT==null || modelT.equals("rdb")){
+				request.setAttribute("modelType", "rdb");
+				request.setAttribute("infoLine", "RDB models");
+			}
+			else{
+				request.setAttribute("modelType", "sdb");
+				request.setAttribute("infoLine", "SDB models");
+			}
+			request.setAttribute("title","Available Models");
+			request.setAttribute("bodyJsp",LIST_MODELS_JSP);
+		}else if("rdbModels".equals(actionStr)){
 			String jdbcUrl = ConfigurationProperties.getProperty("VitroConnection.DataSource.url")
 	    	+ "?useUnicode=yes&characterEncoding=utf8";
 	    	String username = ConfigurationProperties.getProperty("VitroConnection.DataSource.username");
 	    	String password = ConfigurationProperties.getProperty("VitroConnection.DataSource.password");
 			VitroJenaModelMaker vjmm = new VitroJenaModelMaker(jdbcUrl, username, password, "MySQL");
 		    vreq.getSession().setAttribute("vitroJenaModelMaker",vjmm);
+		    getServletContext().setAttribute("modelT", "rdb");
+		    getServletContext().setAttribute("info", "RDB models");
         	request.setAttribute("modelType", "rdb");
         	request.setAttribute("infoLine", "RDB models");
 			request.setAttribute("title","Available Models");
@@ -147,6 +163,8 @@ public class JenaIngestController extends BaseEditController {
         	Store store = SDBFactory.connectStore(conn, storeDesc);
         	VitroJenaSDBModelMaker vsmm = new VitroJenaSDBModelMaker(store);
         	vreq.getSession().setAttribute("vitroJenaModelMaker",vsmm);
+        	 getServletContext().setAttribute("modelT", "sdb");
+ 		    getServletContext().setAttribute("info", "SDB models");
         	request.setAttribute("modelType", "sdb");
         	request.setAttribute("infoLine", "SDB models");
         	request.setAttribute("title","Available Models");
