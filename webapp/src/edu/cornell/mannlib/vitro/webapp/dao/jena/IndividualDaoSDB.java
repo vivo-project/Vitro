@@ -123,7 +123,7 @@ public class IndividualDaoSDB extends IndividualDaoJena {
                             //indd.setLocalName(ind.getLocalName());
                             //indd.setName(ind.getLocalName());
                             //ents.add(indd);
-                        	ents.add(new IndividualSDB(ind.getURI(), dataset, getWebappDaoFactory(), model));
+                        	ents.add(new IndividualSDB(ind.getURI(), this.dwf, getWebappDaoFactory(), model));
                         }
                     }
                 } finally {
