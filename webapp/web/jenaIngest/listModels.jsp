@@ -20,7 +20,6 @@ function init(){
 <%
 
     ModelMaker maker = (ModelMaker) request.getSession().getAttribute("vitroJenaModelMaker");
-    getServletContext().setAttribute("vitroJenaModelMaker",maker);
     if (maker == null) {
 	maker = (ModelMaker) getServletContext().getAttribute("vitroJenaModelMaker");
 	getServletContext().setAttribute("vitroJenaModelMaker",maker);
