@@ -2,9 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.authenticate;
 
-import static edu.cornell.mannlib.vitro.webapp.controller.authenticate.ProgramLogin.PARAM_NEW_PASSWORD;
-import static edu.cornell.mannlib.vitro.webapp.controller.authenticate.ProgramLogin.PARAM_PASSWORD;
-import static edu.cornell.mannlib.vitro.webapp.controller.authenticate.ProgramLogin.PARAM_USERNAME;
+import static edu.cornell.mannlib.vitro.webapp.controller.authenticate.ProgramLogin.ProgramLoginCore.PARAM_NEW_PASSWORD;
+import static edu.cornell.mannlib.vitro.webapp.controller.authenticate.ProgramLogin.ProgramLoginCore.PARAM_PASSWORD;
+import static edu.cornell.mannlib.vitro.webapp.controller.authenticate.ProgramLogin.ProgramLoginCore.PARAM_USERNAME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -59,7 +59,7 @@ public class ProgramLoginTest extends AbstractTestClass {
 
 	@Before
 	public void setLogging() {
-		setLoggerLevel(this.getClass(), Level.DEBUG);
+//		setLoggerLevel(this.getClass(), Level.DEBUG);
 	}
 
 	@Before
