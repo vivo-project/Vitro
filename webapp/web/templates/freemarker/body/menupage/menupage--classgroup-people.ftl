@@ -2,6 +2,8 @@
 <section id="#intro-menupage" role="region">
     <h3>People</h3>
     
+    <@widget name="browse" />
+    
     <section id="content-foaf-person" role="region">
         <h4>Visual Graph</h4>
         
@@ -141,4 +143,6 @@
             <h1 class="fn"><strong>foaf:lastName, foaf:fisrtName</strong><br>core:preferredTitle <br><span class="org">Albert Mann Library</span></h1>
         </article>
     </section>
+    <@dumpAll/>
 </section>
+

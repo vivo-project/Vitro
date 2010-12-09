@@ -39,6 +39,7 @@ public class PageRoutingFilter implements Filter{
     protected final static String URL_PART_PATTERN = "(/[^/]*).*";
     protected final static String PAGE_CONTROLLER_NAME = "PageController";
     protected final static String HOME_CONTROLLER_NAME = "HomePageController";
+    protected final static String TAB_CONTROLLER_NAME = "TabController";
     
     protected final Pattern urlPartPattern = Pattern.compile(URL_PART_PATTERN);    
     
@@ -101,6 +102,9 @@ public class PageRoutingFilter implements Filter{
     
     protected String getControllerToForwardTo(HttpServletRequest req,
             String pageUri, PageDao pageDao) {
+        
+        if( isTabController(req) )
+            return TAB_CONTROLLER_NAME;        
         String homePageUri = pageDao.getHomePageUri();
         if( pageUri != null && pageUri.equals(homePageUri) )
             return HOME_CONTROLLER_NAME;
@@ -108,6 +112,20 @@ public class PageRoutingFilter implements Filter{
             return PAGE_CONTROLLER_NAME;
     }
 
+    /**
+     * Checks to see if this is a request to the old tab controller
+     */
+    protected boolean isTabController( HttpServletRequest req  ){
+        if( req.getParameter("primary") != null ||
+            req.getParameter("secondary") != null ||
+            req.getParameter("collection") != null ||
+            req.getParameter("subcollection") != null ){
+            String path = req.getRequestURI().substring(req.getContextPath().length());
+            return "/".equals(path) ;
+        }
+        return false;                
+    }
+    
     protected PageDao getPageDao(){
         WebappDaoFactory wdf = (WebappDaoFactory) 
             filterConfig.getServletContext().getAttribute("webappDaoFactory");

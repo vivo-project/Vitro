@@ -123,54 +123,21 @@ public class BrowseController extends FreemarkerHttpServlet {
             // Get all classgroups, each populated with a list of their member vclasses
             List groups = vcgDao.getPublicGroupsWithVClasses(ORDER_BY_DISPLAYRANK, !INCLUDE_UNINSTANTIATED, includeIndividualCount); 
 
-            // remove classes that have been configured to be hidden
-            // from search results
-            removeClassesHiddenFromSearch(groups);
+            // remove classes that have been configured to be hidden from search results
+            vcgDao.removeClassesHiddenFromSearch(groups);
             
-            // now cull out the groups with no populated classes
-            //removeUnpopulatedClasses( groups);
+            // now cull out the groups with no populated classes            
             vcgDao.removeUnpopulatedGroups(groups);
             
-            //_groupListMap.put(portalId, groups);
             return groups;
         } else {
             return grp;
         }
-    }
-    
-    private void removeClassesHiddenFromSearch(List<VClassGroup> groups) {
-    	OntModel displayOntModel = 
-    		    (OntModel) getServletConfig().getServletContext()
-    		    .getAttribute("displayOntModel");
-    	ProhibitedFromSearch pfs = new ProhibitedFromSearch(
-    			DisplayVocabulary.PRIMARY_LUCENE_INDEX_URI, displayOntModel);
-    	for (VClassGroup group : groups) {
-    		List<VClass> classList = new ArrayList<VClass>();
-    		for (VClass vclass : group.getVitroClassList()) {
-    			if (!pfs.isClassProhibited(vclass.getURI())) {
-    				classList.add(vclass);
-    			}
-    		}
-    		group.setVitroClassList(classList);
-    	}
-    	
-    }
+    }   
     
     private static boolean ORDER_BY_DISPLAYRANK = true;
     private static boolean INCLUDE_UNINSTANTIATED = true;
     private static boolean INCLUDE_INDIVIDUAL_COUNT = true;
-
-//  private void removeUnpopulatedClasses( List<VClassGroup> groups){
-//          if( groups == null || groups.size() == 0 ) return;
-//            for( VClassGroup grp : groups ){
-//                ListIterator it = grp.listIterator();
-//                while(it.hasNext()){
-//                    VClass claz = (VClass)it.next();
-//                    if( claz.getEntityCount() < 1 )
-//                        it.remove();
-//                }
-//            }
-//    }
 
     void requestCacheUpdate(String portalUri){
         log.debug("requesting update for portal " + portalUri);

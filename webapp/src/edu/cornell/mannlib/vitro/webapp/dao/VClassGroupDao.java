@@ -54,6 +54,8 @@ public interface VClassGroupDao {
 
     public abstract int removeUnpopulatedGroups(List<VClassGroup> groups);
 
+    public void removeClassesHiddenFromSearch(List<VClassGroup> groups);    
+    
     int insertNewVClassGroup(VClassGroup vcg);
 
     void updateVClassGroup(VClassGroup vcg);

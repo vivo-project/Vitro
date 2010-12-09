@@ -20,6 +20,10 @@ public class VClassTemplateModel extends BaseTemplateModel {
         this.vclass = vclass;
     }
 
+    public String getUri(){
+        return vclass.getURI();
+    }
+    
     public String getName() {
         return vclass.getName();
     }

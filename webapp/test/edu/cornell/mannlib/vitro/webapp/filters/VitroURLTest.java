@@ -42,18 +42,24 @@ public class VitroURLTest {
      * Test of toString method, of class VitroURL.
      * This test includes a Individual URI with a '=' and a '?'
      * This test is from David Cliff via sourceforge.
-     * It isn't clear if the double URLencoding is correct.
      */
-//    @Test
-//    public void testToString()
-//    {
-//        String MelbUniStr = "/entity?home=1&uri=HTTPS://bida.themis.unimelb.edu.au/pls/apex/f?p=mrw2rdf:org:::::org_id:145";
-//        VitroURL instance = new VitroURL(MelbUniStr, "UTF-8");
-//        String expResult = "/entity?home=1&uri=HTTPS%253A%252F%252Fbida.themis.unimelb.edu.au%252Fpls%252Fapex%252Ff%253Fp%253Dmrw2rdf%253Aorg%253A%253A%253A%253A%253Aorg_id%253A145";
-//        String result = instance.toString();
-//        assertEquals(expResult, result);
-//    }
+    @Test
+    public void testToString()
+    {
+        String MelbUniStr = "/entity?home=1&uri=HTTPS://bida.themis.unimelb.edu.au/pls/apex/f?p=mrw2rdf:org:::::org_id:145";
+        VitroURL instance = new VitroURL(MelbUniStr, "UTF-8");
+        String expResult = "/entity?home=1&uri=HTTPS%3A%2F%2Fbida.themis.unimelb.edu.au%2Fpls%2Fapex%2Ff%3Fp%3Dmrw2rdf%3Aorg%3A%3A%3A%3A%3Aorg_id%3A145";
+        String result = instance.toString();
+        assertEquals(expResult, result);
 
+        String defaultTestStr = "/entity?home=1&uri=http://aims.fao.org/aos/geopolitical.owl#Afghanistan";
+        instance = new VitroURL(defaultTestStr, "UTF-8");
+        expResult = "/entity?home=1&uri=http%3A%2F%2Faims.fao.org%2Faos%2Fgeopolitical.owl%23Afghanistan";
+        result = instance.toString();
+        assertEquals(expResult, result);
+    }
+    
+    
     /**
      * This is a test similar to testToString()
      * in that it has a = and a ?  but it doesn't
