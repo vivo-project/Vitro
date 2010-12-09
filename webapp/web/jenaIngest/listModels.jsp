@@ -20,8 +20,10 @@ function init(){
 <%
 
     ModelMaker maker = (ModelMaker) request.getSession().getAttribute("vitroJenaModelMaker");
+    getServletContext().setAttribute("vitroJenaModelMaker",maker);
     if (maker == null) {
 	maker = (ModelMaker) getServletContext().getAttribute("vitroJenaModelMaker");
+	getServletContext().setAttribute("vitroJenaModelMaker",maker);
     }
 %>
 
@@ -38,7 +40,7 @@ function init(){
     </td>
     <td>
     <form name="rdbform" action="ingest" method="get">
-        <input type="hidden" name="action" value="listModels"/>
+        <input type="hidden" name="action" value="rdbModels"/>
         <input type="submit" name="submit" value="RDB Models"/>
     </form>
     </td>
