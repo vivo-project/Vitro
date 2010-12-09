@@ -6,4 +6,5 @@
         <input type="hidden" name="action" value="createModel"/>
 	Model name: <input type="text" size="32" name="modelName"/>
         <input type="submit" name="submit" value="Create Model"/>
+        <input type="hidden" name="modelType" value="${modelType}"/>
     </form>
