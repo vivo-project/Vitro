@@ -71,7 +71,7 @@ portal.getRootBreadCrumbURL() : request.getContextPath()+"/";
     <%-- A user is logged in --%>
     <% if (isLoggedIn) { %>
 
-      <c:url var="logoutHref" value="<%= Controllers.LOGOUT_JSP %>">
+      <c:url var="logoutHref" value="<%= Controllers.LOGOUT %>">
         <c:param name="home" value="${currentPortal}" />
       </c:url>
   
