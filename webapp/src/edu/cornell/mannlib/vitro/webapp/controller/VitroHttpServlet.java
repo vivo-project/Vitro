@@ -25,8 +25,6 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LogoutRedirector;
-import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
-import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State;
 
 public class VitroHttpServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
