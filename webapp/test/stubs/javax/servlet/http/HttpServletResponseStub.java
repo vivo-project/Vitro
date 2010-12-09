@@ -4,6 +4,7 @@ package stubs.javax.servlet.http;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Locale;
 
 import javax.servlet.ServletOutputStream;
@@ -19,9 +20,20 @@ public class HttpServletResponseStub implements HttpServletResponse {
 	// ----------------------------------------------------------------------
 
 	private String redirectLocation;
+	private int status = 200;
+	private String errorMessage;
+	private StringWriter outputWriter = new StringWriter();
 
 	public String getRedirectLocation() {
 		return redirectLocation;
+	}
+
+	public int getStatus() {
+		return status;
+	}
+
+	public String getErrorMessage() {
+		return errorMessage;
 	}
 
 	// ----------------------------------------------------------------------
@@ -31,6 +43,22 @@ public class HttpServletResponseStub implements HttpServletResponse {
 	@Override
 	public void sendRedirect(String location) throws IOException {
 		this.redirectLocation = location;
+	}
+
+	@Override
+	public void sendError(int status) throws IOException {
+		this.status = status;
+	}
+
+	@Override
+	public void sendError(int status, String message) throws IOException {
+		this.status = status;
+		this.errorMessage = message;
+	}
+
+	@Override
+	public PrintWriter getWriter() throws IOException {
+		return new PrintWriter(outputWriter);
 	}
 
 	// ----------------------------------------------------------------------
@@ -71,12 +99,6 @@ public class HttpServletResponseStub implements HttpServletResponse {
 	public ServletOutputStream getOutputStream() throws IOException {
 		throw new RuntimeException(
 				"HttpServletResponseStub.getOutputStream() not implemented.");
-	}
-
-	@Override
-	public PrintWriter getWriter() throws IOException {
-		throw new RuntimeException(
-				"HttpServletResponseStub.getWriter() not implemented.");
 	}
 
 	@Override
@@ -179,18 +201,6 @@ public class HttpServletResponseStub implements HttpServletResponse {
 	public String encodeUrl(String arg0) {
 		throw new RuntimeException(
 				"HttpServletResponseStub.encodeUrl() not implemented.");
-	}
-
-	@Override
-	public void sendError(int arg0) throws IOException {
-		throw new RuntimeException(
-				"HttpServletResponseStub.sendError() not implemented.");
-	}
-
-	@Override
-	public void sendError(int arg0, String arg1) throws IOException {
-		throw new RuntimeException(
-				"HttpServletResponseStub.sendError() not implemented.");
 	}
 
 	@Override
