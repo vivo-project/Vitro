@@ -2,9 +2,17 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.HashSet;
 
+import org.apache.commons.dbcp.BasicDataSource;
+
 import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.sdb.SDBFactory;
+import com.hp.hpl.jena.sdb.Store;
+import com.hp.hpl.jena.sdb.StoreDesc;
+import com.hp.hpl.jena.sdb.sql.SDBConnection;
 
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
@@ -32,10 +40,30 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
      * @param ontModelSelector
      * @param dataset
      */
-	public WebappDaoFactorySDB(OntModelSelector ontModelSelector, Dataset dataset, String defaultNamespace, HashSet<String> nonuserNamespaces, String[] preferredLanguages) {
+	public WebappDaoFactorySDB(OntModelSelector ontModelSelector, 
+	                            Dataset dataset, 
+	                            String defaultNamespace, 
+	                            HashSet<String> nonuserNamespaces, 
+	                            String[] preferredLanguages) {
 		super(ontModelSelector, defaultNamespace, nonuserNamespaces, preferredLanguages);
         this.dwf = new StaticDatasetFactory(dataset);
 	}
+	
+    /**
+     * For use when any Dataset access should get a temporary DB connection
+     * from a pool
+     * @param ontModelSelector
+     * @param dataset
+     */
+    public WebappDaoFactorySDB(OntModelSelector ontModelSelector, 
+                                BasicDataSource bds,
+                                StoreDesc storeDesc,
+                                String defaultNamespace, 
+                                HashSet<String> nonuserNamespaces, 
+                                String[] preferredLanguages) {
+        super(ontModelSelector, defaultNamespace, nonuserNamespaces, preferredLanguages);
+        this.dwf = new ReconnectingDatasetFactory(bds, storeDesc);
+    }
 	
 	@Override
     public IndividualDao getIndividualDao() {
@@ -71,14 +99,44 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
 	
 	private class StaticDatasetFactory implements DatasetWrapperFactory {
 	 
-	    private Dataset dataset;
+	    private Dataset _dataset;
 	    
 	    public StaticDatasetFactory (Dataset dataset) {
-	        this.dataset = dataset;
+	        _dataset = dataset;
 	    }
 	    
 	    public DatasetWrapper getDatasetWrapper() {
-	        return new DatasetWrapper(dataset);
+	        return new DatasetWrapper(_dataset);
+	    }
+	    
+	}
+	
+	private class ReconnectingDatasetFactory implements DatasetWrapperFactory {
+	    
+	    private BasicDataSource _bds;
+	    private StoreDesc _storeDesc;
+	    private Dataset _dataset;
+	    private Connection _conn;
+	    
+	    public ReconnectingDatasetFactory(BasicDataSource bds, StoreDesc storeDesc) {
+	        _bds = bds;
+	        _storeDesc = storeDesc;
+	    }
+	    
+	    public DatasetWrapper getDatasetWrapper() {
+	        try {
+	            if ((_dataset != null) && (_conn != null) && (!_conn.isClosed())) {
+	                return new DatasetWrapper(_dataset);
+	            } else {
+	                _conn = _bds.getConnection();
+                    SDBConnection conn = new SDBConnection(_conn) ;
+                    Store store = SDBFactory.connectStore(conn, _storeDesc);
+                    _dataset = SDBFactory.connectDataset(store);
+                    return new DatasetWrapper(_dataset);
+	            }
+            } catch (SQLException sqe) {
+                throw new RuntimeException("Unable to connect to database", sqe);
+            }
 	    }
 	    
 	}

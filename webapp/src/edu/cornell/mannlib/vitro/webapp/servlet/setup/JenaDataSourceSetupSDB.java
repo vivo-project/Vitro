@@ -225,20 +225,20 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
         	//log.info("Test query returned " + qe.execConstruct().size() + " statements");
         	
             sce.getServletContext().setAttribute("baseOntModel", memModel);
-            WebappDaoFactory baseWadf = new WebappDaoFactorySDB(baseOms, dataset, defaultNamespace, null, null);
-            //WebappDaoFactory baseWadf = new WebappDaoFactoryJena(baseOms, defaultNamespace, null, null);
+            WebappDaoFactory baseWadf = new WebappDaoFactorySDB(baseOms, bds, storeDesc, defaultNamespace, null, null);
+            //WebappDaoFactory baseWadf = new WebappDaoFactorySDB(baseOms, dataset, defaultNamespace, null, null);
             sce.getServletContext().setAttribute("assertionsWebappDaoFactory",baseWadf);
             
             sce.getServletContext().setAttribute("inferenceOntModel", inferenceModel);
-            WebappDaoFactory infWadf = new WebappDaoFactorySDB(inferenceOms, dataset, defaultNamespace, null, null);
-            //WebappDaoFactory infWadf = new WebappDaoFactoryJena(inferenceOms, defaultNamespace, null, null);
+            WebappDaoFactory infWadf = new WebappDaoFactorySDB(inferenceOms, bds, storeDesc, defaultNamespace, null, null);
+            //WebappDaoFactory infWadf = new WebappDaoFactorySDB(inferenceOms, dataset, defaultNamespace, null, null);
             sce.getServletContext().setAttribute("deductionsWebappDaoFactory", infWadf);
             
             OntModel masterUnion = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM,
             		ModelFactory.createUnion(unionABoxModel, unionTBoxModel));
             sce.getServletContext().setAttribute("jenaOntModel", masterUnion);  
-            WebappDaoFactory wadf = new WebappDaoFactorySDB(unionOms, dataset, defaultNamespace, null, null);
-            //WebappDaoFactory wadf = new WebappDaoFactoryJena(unionOms, defaultNamespace, null, null);
+            WebappDaoFactory wadf = new WebappDaoFactorySDB(unionOms, bds, storeDesc, defaultNamespace, null, null);
+            //WebappDaoFactory wadf = new WebappDaoFactorySDB(unionOms, dataset, defaultNamespace, null, null);
             sce.getServletContext().setAttribute("webappDaoFactory",wadf);
             
             sce.getServletContext().setAttribute("unionOntModelSelector", unionOms);          //assertions and inferences

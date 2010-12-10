@@ -15,6 +15,11 @@ public class DatasetWrapper {
         this.dataset = dataset;
     }
     
+    public DatasetWrapper(Dataset dataset, SDBConnection conn) {
+        this.dataset = dataset;
+        this.conn = conn;
+    }
+    
     public Dataset getDataset() {
         if (!closed) {
             return dataset;
