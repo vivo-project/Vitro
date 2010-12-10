@@ -33,6 +33,6 @@
 
         <p>Destination model</p>
 
-        <input type="submit" name="submit" value="upload XML and convert to RDF"/>
+        <input id="submit" type="submit" name="submit" value="upload XML and convert to RDF"/>
     </form>
     

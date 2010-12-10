@@ -182,4 +182,4 @@ PREFIX <%=prefixText%>: <<%=urlText%>><%}}%>
 		<p><input type="checkbox" name="reasoning" value="pellet" />
 		include Pellet OWL-DL reasoning</p>
 	</c:otherwise>
-</c:choose> <input type="submit" value="Execute CONSTRUCT" />
+</c:choose> <input id="submit" type="submit" value="Execute CONSTRUCT" />

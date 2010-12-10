@@ -61,4 +61,4 @@
 	</select>
     <p>model in which difference should be saved</p>
 
-    <input type="submit" value="Subtract models"/>
+    <input id="submit" type="submit" value="Subtract models"/>

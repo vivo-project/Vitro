@@ -53,4 +53,4 @@
 %>   
     </select>
 
-    <input type="submit" value="Smush Resources"/>
+    <input id="submit" type="submit" value="Smush Resources"/>

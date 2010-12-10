@@ -39,6 +39,6 @@
     <td>Duplicate individual URI</td><td><input id="uri2" type="text" size="52" name="uri2"/></td>
 </tr>
 </table>
-<input type="submit" name="submit" value="Merge individuals" /></p>
+<input id="submit"type="submit" name="submit" value="Merge individuals" /></p>
 </form>
 

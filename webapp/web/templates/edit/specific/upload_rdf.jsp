@@ -44,7 +44,7 @@
       </p>
     </c:if>
 
-    <p><input type="submit" name="submit" value="submit"/></p>     
+    <p><input id="submit" type="submit" name="submit" value="submit"/></p>     
 </form>
 
 </div>

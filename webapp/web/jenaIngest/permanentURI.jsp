@@ -58,5 +58,5 @@ Or <%String defaultNamespace = (String)request.getAttribute("defaultNamespace");
 <p>Use default namespace <%=defaultNamespace%>  <input type="checkbox" name="defaultNamespace" value ="<%=defaultNamespace%>"/>
 </p>
 
-<p><input type="submit" name="submit" value="Generate URIs" /></p>
+<p><input id="submit" type="submit" name="submit" value="Generate URIs" /></p>
 </form>

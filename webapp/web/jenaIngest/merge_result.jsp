@@ -18,7 +18,7 @@ if(!result.equals("No statements merged") && !result.endsWith("statements.")){%>
 <TR>
                 <br>
                  <p>Download non-mergeable statements.</p>
-                 <p><input type="submit" name="Download" value="Download" ></input></p>
+                 <p><input id="submit"  type="submit" name="Download" value="Download" ></input></p>
                 <br>
   </TR>
 <%}} %>

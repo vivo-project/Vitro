@@ -70,4 +70,4 @@
     </select>
     <p>Destination Model for TBox</p>
 
-    <input type="submit" value="Convert CSV"/>
+    <input id="submit" type="submit" value="Convert CSV"/>

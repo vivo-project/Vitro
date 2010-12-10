@@ -27,4 +27,4 @@
         </select>
     <p>database type</p>
 
-    <input type="submit" value="Connect Database" class="green button"/>
+    <input id="submit" type="submit" value="Connect Database" />

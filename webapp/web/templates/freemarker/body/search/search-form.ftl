@@ -6,7 +6,7 @@
         <form name="filterForm" method="post" action="search">
             <h3>Search</h3>
             <input class="top_padded" name="querytext" value="" type="text" size="50" />
-            <p><input class="form-button" value="Search" type="submit"/></p>
+            <p><input id="submit" value="Search" type="submit"/></p>
         </form>     
     </div><!--advancedSearchForm--> 
     

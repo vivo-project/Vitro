@@ -18,5 +18,5 @@
 </select>
 <br></br>
 <br></br>
-<p><input type="submit" name="submit" value="Load Data" /></p>
+<p><input id="submit" type="submit" name="submit" value="Load Data" /></p>
 </form>

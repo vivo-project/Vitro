@@ -46,4 +46,4 @@
         %>
         </select>
   
-    <input type="submit" value="Execute Workflow"/>
+    <input id="submit" type="submit" value="Execute Workflow"/>

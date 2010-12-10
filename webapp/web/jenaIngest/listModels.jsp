@@ -34,13 +34,13 @@ function init(){
     <td>
      <form name="sdbform" action="ingest" method="get">
         <input type="hidden" name="action" value="sdbModels"/>
-        <input type="submit" name="submit" value="SDB Models"/>
+        <input id="submit" type="submit" name="submit" value="SDB Models"/>
     </form>
     </td>
     <td>
     <form name="rdbform" action="ingest" method="get">
         <input type="hidden" name="action" value="rdbModels"/>
-        <input type="submit" name="submit" value="RDB Models"/>
+        <input id="submit" type="submit" name="submit" value="RDB Models"/>
     </form>
     </td>
     </tr>
@@ -48,7 +48,7 @@ function init(){
     <form action="ingest" method="get">
         <input type="hidden" name="action" value="createModel"/>
         <input type="hidden" name="modelType" value="${modelType}"/>
-        <input type="submit" name="submit" value="Create Model"/>
+        <input id="submit" type="submit" name="submit" value="Create Model"/>
     </form>
     <form name="information">
     <input type="hidden" name="info" value="${infoLine}"/>
@@ -66,7 +66,7 @@ function init(){
                 <input type="hidden" name="action" value="loadRDFData"/>
                 <input type="hidden" name="modelName" value="<%=modelName%>"/>
                 <input type="hidden" name="modelType" value="${modelType}"/>
-                <input type="submit" name="submit" value="load RDF data"/>
+                <input id="submit" type="submit" name="submit" value="load RDF data"/>
             </form>
             </td>
             <td>
@@ -81,7 +81,7 @@ function init(){
                 <input type="hidden" name="action" value="clearModel"/>
                 <input type="hidden" name="modelName" value="<%=modelName%>"/>
                 <input type="hidden" name="modelType" value="${modelType}"/>
-                <input type="submit" name="submit" value="clear statements"/>
+                <input id="submit" type="submit" name="submit" value="clear statements"/>
             </form>
             </td>
             <td>
@@ -89,7 +89,7 @@ function init(){
                 <input type="hidden" name="action" value="removeModel"/>
                 <input type="hidden" name="modelName" value="<%=modelName%>"/>
                 <input type="hidden" name="modelType" value="${modelType}"/>
-                <input type="submit" name="submit" value="remove"/>
+                <input id="submit" type="submit" name="submit" value="remove"/>
             </form>
             </td>
             </tr>
@@ -99,7 +99,7 @@ function init(){
                 <input type="hidden" name="action" value="attachModel"/>
                 <input type="hidden" name="modelName" value="<%=modelName%>"/>
                 <input type="hidden" name="modelType" value="${modelType}"/>
-                <input type="submit" name="submit" value="attach to webapp"/>
+                <input id="submit" type="submit" name="submit" value="attach to webapp"/>
             </form>
             </td>
             <td>
@@ -107,7 +107,7 @@ function init(){
                 <input type="hidden" name="action" value="detachModel"/>
                 <input type="hidden" name="modelName" value="<%=modelName%>"/>
                 <input type="hidden" name="modelType" value="${modelType}"/>
-                <input type="submit" name="submit" value="detach from webapp"/>
+                <input id="submit" type="submit" name="submit" value="detach from webapp"/>
             </form>
             </td>
             <td>
@@ -115,7 +115,7 @@ function init(){
 			    <input type="hidden" name="action" value="permanentURI" />
 			    <input type="hidden" name="modelName" value="<%=modelName%>" /> 
 				<input type="hidden" name="modelType" value="${modelType}"/>
-				<input type="submit" name="submit" value="generate permanent URIs" /></form>
+				<input id="submit" type="submit" name="submit" value="generate permanent URIs" /></form>
 			</td>
             <td>&nbsp;</td>
             </tr>

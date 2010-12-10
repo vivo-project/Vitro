@@ -70,4 +70,4 @@
 	</select>
     <p>model in which to save retracted statements</p>
 
-    <input type="submit" value="Process property values"/>
+    <input id="submit" type="submit" value="Process property values"/>

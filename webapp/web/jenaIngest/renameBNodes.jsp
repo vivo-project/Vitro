@@ -57,4 +57,4 @@
 %>   
     </select>
 
-    <input type="submit" value="Rename Blank Nodes"/>
+    <input id="submit" type="submit" value="Rename Blank Nodes"/>

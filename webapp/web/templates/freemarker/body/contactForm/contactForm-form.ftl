@@ -46,7 +46,7 @@
         <textarea name="s34gfd88p9x1" rows="10" cols="90"></textarea>
         
         <div class="buttons">
-            <input type="submit" value="Send Mail" class="green button"/>
+            <input id="submit" type="submit" value="Send Mail"/>
         </div
 
         <p style="font-weight: bold; margin-top: 1em">Thank you!</p>

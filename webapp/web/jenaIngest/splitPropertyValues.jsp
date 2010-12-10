@@ -62,4 +62,4 @@
 %>   
     </select>
 
-    <input type="submit" value="Split Values"/>
+    <input id="submit" type="submit" value="Split Values"/>
