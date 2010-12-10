@@ -165,7 +165,7 @@
 	    	<p>${predicate.publicDescription}</p>
 	    </c:if>
 	    <v:input type="select" id="objectVar" size="80" />
-	    <div style="margin-top: 1em">
+	    <div style="margin-top: .2em">
  	        <v:input type="submit" id="submit" value="<%=submitLabel%>" cancel="true"/>
 	    </div>    
     </form>
@@ -204,7 +204,7 @@
 
 <c:if test="${ (!empty param.objectUri) && (empty param.deleteProhibited) }" >
     <form class="deleteForm" action="editRequestDispatch.jsp" method="get">       
-	 	<label for="delete"><h3>Delete this entry?</h3></label>
+	 	<label for="delete"><h3 class="delete-entry">Delete this entry?</h3></label>
         <input type="hidden" name="subjectUri"   value="${param.subjectUri}"/>
         <input type="hidden" name="predicateUri" value="${param.predicateUri}"/>
         <input type="hidden" name="objectUri"    value="${param.objectUri}"/>    
