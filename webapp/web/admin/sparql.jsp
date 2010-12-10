@@ -158,7 +158,7 @@ td {
 					</ul>
 
 				</div>
-				<input type="submit" value="Run Query">
+				<input type="submit" value="Run Query" class="green button">
 			</form>
 		</div>
 	</div>

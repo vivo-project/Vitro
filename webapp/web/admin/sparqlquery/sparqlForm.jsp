@@ -88,7 +88,7 @@ try{
 </ul>
 
 </div>
-<input type="submit" value="Run Query">
+<input type="submit" value="Run Query" class="green button">
 </form>
 <%--
 <h4>Notes</h4>
