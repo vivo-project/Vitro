@@ -15,7 +15,7 @@
  <h2>Macro allClassGroups from widget-browse.ftl</h2>
  <ul>
  <#list vclassGroupList as group>
-    <li><a href="${urls.base}${urlMapping}?classgroupUri=${group.uri?url}">${group.publicName}</a></li>
+    <li><a href="${urls.base}${urlMapping}?classgroupUri=${group.publicName?url}">${group.publicName}</a></li>
  </#list>
  </ul>
 </section>
@@ -31,7 +31,7 @@
  </div>
  <ul>
  <#list classes as class>
-    <li><a href="${urls.base}${urlMapping}?classgroupUri=${classGroup.uri?url}&vclassUri=${class.uri?url}">${class.name}</a></li> 
+    <li><a href="${urls.base}${urlMapping}?classgroupUri=${classGroup.publicName?url}&vclassUri=${class.uri?url}">${class.name}</a> ${class.individualCount}</li> 
  </#list>
  </ul> 
 </section>
@@ -41,7 +41,11 @@
 <#macro vclass>
 <section>
  <h2>vclass ${class.name} from ${classGroup.publicName}</h2>
-  This has classGroup, classes, and class.  It doesn't yet have a list of individuals in the class.
+  This has classGroup, classes, individualsInClass and class.  
+  <ul>
+  <#list individualsInClass as ind>
+    <li><a href="${urls.base}/individual?uri=${ind.uri?url}">${ind.name}</a></li>
+  </#list>
 </section>
 </#macro>
 

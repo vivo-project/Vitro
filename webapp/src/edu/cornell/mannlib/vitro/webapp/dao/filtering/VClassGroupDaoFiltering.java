@@ -112,4 +112,10 @@ public class VClassGroupDaoFiltering extends BaseFiltering implements VClassGrou
     }
 
 
+    @Override
+    public VClassGroup getGroupByName(String vcgName) {
+        return innerDao.getGroupByName(vcgName);
+    }
+
+
 }

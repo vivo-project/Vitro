@@ -304,4 +304,13 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
         }        
     }
 
+    @Override
+    public VClassGroup getGroupByName(String vcgName) {
+        if( vcgName == null )
+            return null;
+        else{
+            return getClassGroupMap().get(vcgName);
+        }
+    }
+
 }

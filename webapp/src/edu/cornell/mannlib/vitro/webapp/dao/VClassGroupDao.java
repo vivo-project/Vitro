@@ -61,4 +61,6 @@ public interface VClassGroupDao {
     void updateVClassGroup(VClassGroup vcg);
 
     void deleteVClassGroup(VClassGroup vcg);
+
+    VClassGroup getGroupByName(String vcgName);
 }

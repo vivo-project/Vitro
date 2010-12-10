@@ -2,7 +2,7 @@
 <section id="#intro-menupage" role="region">
     <h3>People</h3>
     
-    <@widget name="browse" />
+    <@widget name="browse" classGroup="people"/>
     
     <section id="content-foaf-person" role="region">
         <h4>Visual Graph</h4>
@@ -142,7 +142,6 @@
         <article class="vcard individual-foaf-person" role="navigation"> <img src="${urls.images}/menupage/person-thumbnail.jpg" width="90" height="90"  alt="foaf:lastName, foaf:firstName"/>
             <h1 class="fn"><strong>foaf:lastName, foaf:fisrtName</strong><br>core:preferredTitle <br><span class="org">Albert Mann Library</span></h1>
         </article>
-    </section>
-    <@dumpAll/>
+    </section>    
 </section>
 

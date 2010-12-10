@@ -11,11 +11,13 @@ import java.util.Map;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
+import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassGroupTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassTemplateModel;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModel;
 import freemarker.core.Environment;
 import freemarker.template.TemplateModelException;
 
@@ -55,7 +57,7 @@ public class BrowseWidget extends Widget {
 
     protected WidgetTemplateValues doAllClassGroupsDisplay(Environment env, Map params,
             HttpServletRequest request, ServletContext context) {
-        Map<String,Object> body = getAllClassGroupData(request);
+        Map<String,Object> body = getAllClassGroupData(request, params);
         try {
             body.put("urls",env.getDataModel().get("urls"));
             body.put("urlMapping",env.getDataModel().get("urlMapping"));
@@ -67,7 +69,7 @@ public class BrowseWidget extends Widget {
         return new WidgetTemplateValues(macroName, body);
     }
    
-    protected Map<String,Object> getAllClassGroupData(HttpServletRequest request){
+    protected Map<String,Object> getAllClassGroupData(HttpServletRequest request, Map params){
         Map<String,Object> map = new HashMap<String,Object>();
         
         VitroRequest vreq = new VitroRequest(request);
@@ -84,7 +86,9 @@ public class BrowseWidget extends Widget {
     
     protected WidgetTemplateValues doClassDisplay(Environment env, Map params,
             HttpServletRequest request, ServletContext context) {        
-        Map<String,Object> body = getClassData(request);
+        
+        Map<String,Object> body = getClassData(request,params);
+        
         try {
             body.put("urls",env.getDataModel().get("urls"));
             body.put("urlMapping",env.getDataModel().get("urlMapping"));
@@ -96,22 +100,33 @@ public class BrowseWidget extends Widget {
         return new WidgetTemplateValues(macroName, body);
     }
 
-    private Map<String, Object> getClassData(HttpServletRequest request) {
+    private Map<String, Object> getClassData(HttpServletRequest request, Map params) {
         Map<String,Object> map = new HashMap<String,Object>();
-        map.putAll(getClassGroupData(request));
-        String classUri = request.getParameter(Mode.VCLASS.param);
+        
+        map.putAll(getClassGroupData(request, params));
+        
+        String classUri = getParam(Mode.VCLASS, request, params);
         VitroRequest vreq = new VitroRequest(request);
         VClass vclass = vreq.getWebappDaoFactory().getVClassDao().getVClassByURI(classUri);
         map.put("class", new VClassTemplateModel(vclass));
         
-        //TODO: add list of individuals for class?
+        List<Individual> inds = vreq.getWebappDaoFactory().getIndividualDao()
+            .getIndividualsByVClass(vclass);
+        
+        List<IndividualTemplateModel> tInds = new ArrayList<IndividualTemplateModel>(inds.size());
+        for( Individual ind : inds){
+            tInds.add(new IndividualTemplateModel(ind, vreq));
+        }
+        map.put("individualsInClass", tInds);
+
         return map;
     }
 
     protected WidgetTemplateValues doClassGroupDisplay(Environment env,
             Map params, HttpServletRequest request, ServletContext context) {
 
-        Map<String,Object> body = getClassGroupData(request);
+        Map<String,Object> body = getClassGroupData(request,params);
+        
         try {
             body.put("urls",env.getDataModel().get("urls"));
             body.put("urlMapping",env.getDataModel().get("urlMapping"));
@@ -123,12 +138,13 @@ public class BrowseWidget extends Widget {
         return new WidgetTemplateValues(macroName, body);
     } 
         
-    protected Map<String, Object> getClassGroupData(HttpServletRequest request) {
+    protected Map<String, Object> getClassGroupData(HttpServletRequest request, Map params) {
         Map<String,Object> map = new HashMap<String,Object>();
         
-        String vcgUri = request.getParameter(Mode.CLASS_GROUP.param);
-        VitroRequest vreq = new VitroRequest(request);
-        VClassGroup vcg = vreq.getWebappDaoFactory().getVClassGroupDao().getGroupByURI(vcgUri);
+        String vcgName = getParam(Mode.CLASS_GROUP, request, params);
+        VitroRequest vreq = new VitroRequest(request);        
+        VClassGroup vcg = vreq.getWebappDaoFactory().getVClassGroupDao().getGroupByName(vcgName);
+        
         vreq.getWebappDaoFactory().getVClassDao().addVClassesToGroup(vcg, false, true);
         ArrayList<VClassTemplateModel> classes = new ArrayList<VClassTemplateModel>(vcg.size());
         for( VClass vc : vcg){
@@ -137,7 +153,8 @@ public class BrowseWidget extends Widget {
         map.put("classes", classes);
         
         map.put("classGroup", new VClassGroupTemplateModel(vcg));
-        map.put(Mode.CLASS_GROUP.param, vcgUri);
+        map.put("classGroupName", vcgName);
+        map.put("classGroupUri", vcg.getURI());
         
         return map;
     }
@@ -145,7 +162,7 @@ public class BrowseWidget extends Widget {
     enum Mode{
         VCLASS_ALPHA("vclassAlpha","vclassAlpha"),
         VCLASS("vclass","vclassUri"),
-        CLASS_GROUP("classGroup","classgroupUri"),
+        CLASS_GROUP("classGroup","classGroup"),
         ALL_CLASS_GROUPS("allClassGroups","all");                
         
         String macroName;
@@ -160,19 +177,25 @@ public class BrowseWidget extends Widget {
     
     protected Mode getMode(HttpServletRequest request, Map params){
         for( Mode mode : Mode.values()){
-            String param = request.getParameter( mode.param );
+            String queryParam = request.getParameter( mode.param );
+            if( queryParam != null && !queryParam.isEmpty() ){
+                return mode;
+            }
+            Object obj = params.get( mode.param );
+            String param = obj != null ? obj.toString():null;
             if( param != null && !param.isEmpty() ){
                 return mode;
             }
-        }
-        
-        for( Mode mode : Mode.values()){
-            String param = (String)params.get( mode.param );
-            if( param != null && !param.isEmpty() ){
-                return mode;
-            }
-        }
-        
+        }                
         return DEFAULT_MODE;        
+    }
+    
+    protected String getParam(Mode mode, HttpServletRequest request, Map params){
+        if( request.getParameter(mode.param) != null )
+            return request.getParameter(mode.param);
+        if( params.get(mode.param) != null )
+            return params.get(mode.param).toString();
+        else
+            return null;
     }
 }
