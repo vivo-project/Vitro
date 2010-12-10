@@ -97,65 +97,73 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	
     	OntModel ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, model);
     	this.ind = ontModel.createOntResource(individualURI);  
-    	
-    	if (ind != null) {
-	        if (ind.isAnon()) {
-	        	this.setNamespace(VitroVocabulary.PSEUDO_BNODE_NS);
-	        	this.setLocalName(ind.getId().toString());
-	        } else {
-	        	this.URI = ind.getURI();
-	        	this.namespace = ind.getNameSpace();
-	        	this.localName = ind.getLocalName();
-	        }
-    	} else if (individualURI != null) {
-    		log.warn("Null individual returned for URI " + individualURI);
-    	}
+    	setUpURIParts(ind);
         this.webappDaoFactory = wadf;
     }
     
-    public IndividualSDB(String individualURI, DatasetWrapperFactory datasetWrapperFactory, WebappDaoFactoryJena wadf) {
+    public IndividualSDB(String individualURI, 
+            DatasetWrapperFactory datasetWrapperFactory, 
+            WebappDaoFactoryJena wadf,
+            boolean skipInitialization) {
     	this.individualURI = individualURI;
     	this.dwf = datasetWrapperFactory;
     	
-    	DatasetWrapper w = getDatasetWrapper();
-    	Dataset dataset = w.getDataset();
-    	try {
-	    	dataset.getLock().enterCriticalSection(Lock.READ);
-	    	String getStatements = 
-	    		"CONSTRUCT " +
-	    		"{ <"+individualURI+">  <" + RDFS.label.getURI() + "> ?ooo. \n" +
-	    		   "<"+individualURI+">  a ?type . \n" +
-	    		   "<"+individualURI+">  <" + VitroVocabulary.MONIKER + "> ?moniker \n" +
-	    		 "} WHERE {" +
-	    		 "{ GRAPH ?g { \n" +
-	    		 	"{ <"+individualURI+">  <" + RDFS.label.getURI() + "> ?ooo } \n" +
-	    		 	"UNION { <"+individualURI+">  <" + VitroVocabulary.MONIKER + "> ?moniker } \n" +
-	    		 	"} \n" +
-	    		 	"} UNION { GRAPH <http://vitro.mannlib.cornell.edu/default/vitro-kb-2> { <"+individualURI+"> a ?type } } \n" +
-	    		 "}";
-    		model = QueryExecutionFactory.create(QueryFactory.create(getStatements), dataset).execConstruct();
-    	} finally {
-    		dataset.getLock().leaveCriticalSection();
-    		w.close();
+    	if (skipInitialization) {
+            OntModel ontModel = ModelFactory.createOntologyModel(
+                    OntModelSpec.OWL_MEM);
+            this.ind = ontModel.createOntResource(individualURI);  
+    	} else {
+        	DatasetWrapper w = getDatasetWrapper();
+        	Dataset dataset = w.getDataset();
+        	try {
+    	    	dataset.getLock().enterCriticalSection(Lock.READ);
+    	    	String getStatements = 
+    	    		"CONSTRUCT " +
+    	    		"{ <"+individualURI+">  <" + RDFS.label.getURI() + "> ?ooo. \n" +
+    	    		   "<"+individualURI+">  a ?type . \n" +
+    	    		   "<"+individualURI+">  <" + VitroVocabulary.MONIKER + "> ?moniker \n" +
+    	    		 "} WHERE {" +
+    	    		 "{ GRAPH ?g { \n" +
+    	    		 	"{ <"+individualURI+">  <" + RDFS.label.getURI() + "> ?ooo } \n" +
+    	    		 	"UNION { <"+individualURI+">  <" + VitroVocabulary.MONIKER + "> ?moniker } \n" +
+    	    		 	"} \n" +
+    	    		 	"} UNION { GRAPH <http://vitro.mannlib.cornell.edu/default/vitro-kb-2> { <"+individualURI+"> a ?type } } \n" +
+    	    		 "}";
+        		model = QueryExecutionFactory.create(QueryFactory.create(getStatements), dataset).execConstruct();
+        	} finally {
+        		dataset.getLock().leaveCriticalSection();
+        		w.close();
+        	}
+        	
+        	OntModel ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, model);
+        	
+        	this.ind = ontModel.createOntResource(individualURI);  
     	}
-    	
-    	OntModel ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, model);
-    	
-    	this.ind = ontModel.createOntResource(individualURI);  
-    	
-    	if (ind != null) {
-	        if (ind.isAnon()) {
-	        	this.setNamespace(VitroVocabulary.PSEUDO_BNODE_NS);
-	        	this.setLocalName(ind.getId().toString());
-	        } else {
-	        	this.URI = ind.getURI();
-	        	this.namespace = ind.getNameSpace();
-	        	this.localName = ind.getLocalName();
-	        }
-    	} else if (individualURI != null) {
-    		log.warn("Null individual returned for URI " + individualURI);
-    	}
+    	setUpURIParts(ind);
         this.webappDaoFactory = wadf;
+    }
+    
+    private static final boolean SKIP_INITIALIZATION = true;
+    
+    public IndividualSDB(String individualURI, 
+            DatasetWrapperFactory datasetWrapperFactory, 
+            WebappDaoFactoryJena wadf) {
+        this(individualURI, datasetWrapperFactory, wadf, !SKIP_INITIALIZATION);
+    }
+    
+    private void setUpURIParts(OntResource ind) {
+        if (ind != null) {
+            if (ind.isAnon()) {
+                this.setNamespace(VitroVocabulary.PSEUDO_BNODE_NS);
+                this.setLocalName(ind.getId().toString());
+            } else {
+                this.URI = ind.getURI();
+                this.namespace = ind.getNameSpace();
+                this.localName = ind.getLocalName();
+            }
+        } else if (individualURI != null) {
+            log.warn("Null individual returned for URI " + individualURI);
+        }
     }
 
     private DatasetWrapper getDatasetWrapper() {
@@ -1016,36 +1024,45 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     }
     
     private List<VClass> getMyVClasses(boolean direct) {
-        long mstart = System.currentTimeMillis();
 		List<VClass> vClassList = new ArrayList<VClass>(); 
-		//this.dataset.getLock().enterCriticalSection(Lock.READ);
-		//Model tempModel = ModelFactory.createDefaultModel();
-		Model tempModel = ind.getModel();
-		//try {
-			//String getTypes = 
-        	//	"CONSTRUCT{ <" + this.individualURI + "> <" + RDF.type + "> ?types }\n" +
-        	//	"WHERE{ GRAPH " + ((true) ? "<http://vitro.mannlib.cornell.edu/default/vitro-kb-2>" : "?g") 
-        	//	+ " { <" + this.individualURI +"> <" +RDF.type+ "> ?types \n" +
-        	//			"} } \n";
-        	//long startTime = System.currentTimeMillis();
-        	//tempModel = QueryExecutionFactory.create(QueryFactory.create(getTypes), dataset).execConstruct();
-        	//System.out.println((System.currentTimeMillis() - startTime));
-        	StmtIterator stmtItr = tempModel.listStatements((Resource) null, RDF.type, (RDFNode) null);
-        	LinkedList<String> list = new LinkedList<String>();
-        	while(stmtItr.hasNext()){
-        		Statement stmt = stmtItr.nextStatement();
-        		if (stmt.getObject().isResource() && !stmt.getObject().isAnon()) {
-        			list.add(((Resource) stmt.getObject()).getURI());
-        		}
-        	}
-        	Iterator<String> itr = null;
-        	VClassDao checkSubClass = this.webappDaoFactory.getVClassDao();
-        	boolean directTypes = false;
-        	String currentType = null;
-    	    ArrayList<String> done = new ArrayList<String>();
-    	    
-    	    /* Loop for comparing starts here */
-    	    if(direct){
+		Model tempModel = null;
+		if (ind.getModel().size() > 0) {
+		    tempModel = ind.getModel();
+		}
+		else {		
+			String getTypes = 
+        		"CONSTRUCT{ <" + this.individualURI + "> <" + RDF.type + "> ?types }\n" +
+        		"WHERE{ GRAPH " + ((true) ? "<http://vitro.mannlib.cornell.edu/default/vitro-kb-2>" : "?g") 
+        		+ " { <" + this.individualURI +"> <" +RDF.type+ "> ?types \n" +
+        				"} } \n";        	
+        	DatasetWrapper w = getDatasetWrapper();
+        	Dataset dataset = w.getDataset();
+        	dataset.getLock().enterCriticalSection(Lock.READ);
+        	try {
+        	    tempModel = QueryExecutionFactory.create(
+        	            QueryFactory.create(getTypes), dataset).execConstruct();
+        	} finally {
+        	    dataset.getLock().leaveCriticalSection();
+        	    w.close();
+        	}        	
+		}
+    	StmtIterator stmtItr = tempModel.listStatements(
+    	        (Resource) null, RDF.type, (RDFNode) null);
+    	LinkedList<String> list = new LinkedList<String>();
+    	while(stmtItr.hasNext()){
+    		Statement stmt = stmtItr.nextStatement();
+    		if (stmt.getObject().isResource() && !stmt.getObject().isAnon()) {
+    			list.add(((Resource) stmt.getObject()).getURI());
+    		}
+    	}
+    	Iterator<String> itr = null;
+    	VClassDao checkSubClass = this.webappDaoFactory.getVClassDao();
+    	boolean directTypes = false;
+    	String currentType = null;
+	    ArrayList<String> done = new ArrayList<String>();
+	    
+	    /* Loop for comparing starts here */
+	    if(direct){
         	while(!directTypes){
         		 itr = list.listIterator();
         		 
@@ -1058,48 +1075,50 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         		}while(done.contains(currentType));
         		
         		if(directTypes)
-        			break;                 // check to see if its all over otherwise start comparing
+        			break; 
+        		    // check to see if it's all over otherwise start comparing
         		else
         	    itr = list.listIterator();	
         		
-        	while(itr.hasNext()){
-        		String nextType = itr.next();
-        	    if(checkSubClass.isSubClassOf(currentType, nextType) && !currentType.equalsIgnoreCase(nextType)){
-        	    	//System.out.println(currentType + " is subClassOf " + nextType);
-        	    	itr.remove();
-        	    }
+            	while(itr.hasNext()){
+            		String nextType = itr.next();
+            	    if(checkSubClass.isSubClassOf(currentType, nextType) 
+            	            && !currentType.equalsIgnoreCase(nextType)){
+            	    	itr.remove();
+            	    }
+            	}
+            	
+            	done.add(currentType);  // add the uri to done list. 
         	}
-        	
-        	done.add(currentType);  // add the uri to done list. 
-        	}
-    	    }
-        	
-        	/* Loop for comparing ends here */
-    	    Iterator<String> typeIt = list.iterator();
-			try {
-				for (Iterator it = typeIt; it.hasNext();) {
-					Resource type = ResourceFactory.createResource(it.next().toString());
-					String typeURI = (!type.isAnon()) ? type.getURI() : VitroVocabulary.PSEUDO_BNODE_NS + type.getId().toString();
-					if (type.getNameSpace() == null || (!webappDaoFactory.getNonuserNamespaces().contains(type.getNameSpace())) ) {
-						VClass vc = webappDaoFactory.getVClassDao().getVClassByURI(type.getURI());
-						if (vc != null) {
-							vClassList.add(vc);
-						}
-					}
-					
+	    }
+    	
+    	/* Loop for comparing ends here */
+	    Iterator<String> typeIt = list.iterator();
+		
+		for (Iterator it = typeIt; it.hasNext();) {
+			Resource type = ResourceFactory
+			        .createResource(it.next().toString());
+			String typeURI = (!type.isAnon()) 
+			        ? type.getURI() 
+			        : VitroVocabulary.PSEUDO_BNODE_NS 
+			                + type.getId().toString();
+			if (type.getNameSpace() == null || 
+			        (!webappDaoFactory.getNonuserNamespaces()
+			                .contains(type.getNameSpace())) ) {
+				VClass vc = webappDaoFactory.getVClassDao()
+				        .getVClassByURI(type.getURI());
+				if (vc != null) {
+					vClassList.add(vc);
 				}
-			} finally {
-				//typeIt.close();
 			}
-		//} finally {
-		//	tempModel.close();
-		//	this.dataset.getLock().leaveCriticalSection();
-		//}
+		}
+
 		try {
 			Collections.sort(vClassList);
-		} catch (Exception e) {}
+		} catch (Exception e) {
+		    log.error("Unable to sort VClass list", e);
+		}
 		
-		//System.out.println("Overall: " + (System.currentTimeMillis() - mstart));
 		return vClassList;
 	}
     

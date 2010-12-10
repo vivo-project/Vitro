@@ -71,6 +71,8 @@ public class IndividualDaoSDB extends IndividualDaoJena {
     	return getOntModelSelector().getABoxModel();
     }
     
+    private static final boolean SKIP_INITIALIZATION = true;
+    
     @Override
     public List getIndividualsByVClassURI(String vclassURI, int offset, int quantity ) {
 
@@ -78,7 +80,7 @@ public class IndividualDaoSDB extends IndividualDaoJena {
             return null;
         }
         
-        List ents = new ArrayList();
+        List<Individual> ents = new ArrayList<Individual>();
         
         Resource theClass = (vclassURI.indexOf(PSEUDO_BNODE_NS) == 0) 
             ? getOntModel().createResource(new AnonId(vclassURI.split("#")[1]))
@@ -91,53 +93,58 @@ public class IndividualDaoSDB extends IndividualDaoJena {
         		ents.addAll(getIndividualsByVClass(vc));
         	}
         } else {
-        	Model model = null;
+    	    DatasetWrapper w = getDatasetWrapper();
+    	    Dataset dataset = w.getDataset();
+        	dataset.getLock().enterCriticalSection(Lock.READ);
         	try {
-        	    DatasetWrapper w = getDatasetWrapper();
-        	    Dataset dataset = w.getDataset();
-            	dataset.getLock().enterCriticalSection(Lock.READ);
-            	try {
-            		String query = 
-        	    		"CONSTRUCT " +
-        	    		"{ ?ind  <" + RDFS.label.getURI() + "> ?ooo. \n" +
-        	    		   "?ind  a <" + theClass.getURI() + "> . \n" +
-        	    		   "?ind  <" + VitroVocabulary.MONIKER + "> ?moniker \n" +
-        	    		 "} WHERE " +
-        	    		 "{ GRAPH ?g { \n" +
-        	    		    " ?ind a <" + theClass.getURI() + ">  \n" +
-        	    		    "} \n" +
-        	    		 	"OPTIONAL { GRAPH ?h { ?ind  <" + RDFS.label.getURI() + "> ?ooo } }\n" +
-        	    		 	"OPTIONAL { GRAPH ?i { ?ind  <" + VitroVocabulary.MONIKER + "> ?moniker } } \n" +
-        	    		 "}";
-            		model = QueryExecutionFactory.create(QueryFactory.create(query), dataset).execConstruct();
-            	} finally {
-            		dataset.getLock().leaveCriticalSection();
-            		w.close();
-            	}
-                ResIterator resIt = model.listSubjects();
-                try {
-                    while (resIt.hasNext()) {
-                        Resource ind = resIt.nextResource();
-                        if (!ind.isAnon()) {
-                            //Individual indd = new IndividualImpl(ind.getURI());
-                            //indd.setLocalName(ind.getLocalName());
-                            //indd.setName(ind.getLocalName());
-                            //ents.add(indd);
-                        	ents.add(new IndividualSDB(ind.getURI(), this.dwf, getWebappDaoFactory(), model));
-                        }
-                    }
-                } finally {
-                    resIt.close();
-                }
+        		String query = 
+    	    		"SELECT DISTINCT ?ind ?label ?moniker " +
+    	    		"WHERE " +
+    	    		 "{ GRAPH ?g { \n" +
+    	    		    " ?ind a <" + theClass.getURI() + ">  \n" +
+    	    		    "} \n" +
+    	    		 	"OPTIONAL { GRAPH ?h { ?ind  <" + RDFS.label.getURI() + "> ?label } }\n" +
+    	    		 	"OPTIONAL { GRAPH ?i { ?ind  <" + VitroVocabulary.MONIKER + "> ?moniker } } \n" +
+    	    		 "} ORDER BY ?label";
+        		ResultSet rs =QueryExecutionFactory.create(
+        		        QueryFactory.create(query), dataset)
+        		        .execSelect();
+        		Resource res = null;
+        		while (rs.hasNext()) {
+        		    QuerySolution sol = rs.nextSolution();
+        		    Resource currRes = sol.getResource("ind");
+        		    if ((res == null || !res.equals(currRes)) 
+        		            && !currRes.isAnon()) {    		        
+        		        res = currRes;
+        		        Individual ent = new IndividualSDB(currRes.getURI(), 
+                                this.dwf, getWebappDaoFactory(), 
+                                SKIP_INITIALIZATION);
+        		        Literal label = sol.getLiteral("label");
+        		        if (label != null) {
+        		            ent.setName(label.getLexicalForm());
+        		        }
+        		        Literal moniker = sol.getLiteral("moniker");
+        		        if (moniker != null) {
+        		            ent.setMoniker(moniker.getLexicalForm());
+        		        }
+                        ents.add(ent);
+        		    }
+        		}
         	} finally {
-        	    if (model != null && !model.isClosed()) {
-        	        model.close();
-        	    }
-        	}
+        		dataset.getLock().leaveCriticalSection();
+        		w.close();
+        	} 
         }
-     
-
+        
         java.util.Collections.sort(ents);
+        
+        if (quantity > 0 && offset > 0) {
+            List<Individual> sublist = new ArrayList<Individual>();
+            for (int i = offset - 1; i < ((offset - 1) + quantity); i++) {
+                sublist.add(ents.get(i));
+            }
+            return sublist;
+        }
         
         return ents;
 
