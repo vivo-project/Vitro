@@ -135,36 +135,60 @@ public class Authenticate extends VitroHttpServlet {
 
 	/**
 	 * If they supply an after-login page, record it and use the Login page for
-	 * the process.
+	 * the process. Note that we expect it to be URL-encoded.
 	 * 
-	 * If they supply a return flag, record the referrer as the after-login page
-	 * and use the Login page for the process.
+	 * If they supply a return flag, record the current page as the after-login
+	 * page and use the Login page for the process.
 	 * 
 	 * Otherwise, use the current page for the process.
+	 * 
+	 * The "current page" is the referrer, unless there is no referrer for some
+	 * reason. In that case, pretend it's the login page.
 	 */
 	private void recordLoginProcessPages(HttpServletRequest request) {
 		LoginProcessBean bean = LoginProcessBean.getBean(request);
 
-		String afterLoginUrl = request.getParameter(PARAMETER_AFTER_LOGIN);
+		String afterLoginUrl = decodeAfterLoginParameter(request);
+		boolean doReturn = isReturnParameterSet(request);
+		String referrer = whereDidWeComeFrom(request);
+
 		if (afterLoginUrl != null) {
-			try {
-				String decoded = URLDecoder.decode(afterLoginUrl, "UTF-8");
-				bean.setAfterLoginUrl(decoded);
-			} catch (UnsupportedEncodingException e) {
-				log.error("Really? No UTF-8 encoding?");
-			}
-		}
-
-		String returnParameter = request.getParameter(PARAMETER_RETURN);
-		if (returnParameter != null) {
-			String referrer = request.getHeader("referer");
+			bean.setAfterLoginUrl(afterLoginUrl);
+			bean.setLoginPageUrl(request.getContextPath() + Controllers.LOGIN);
+		} else if (doReturn) {
 			bean.setAfterLoginUrl(referrer);
-		}
-
-		if (bean.getAfterLoginUrl() != null) {
 			bean.setLoginPageUrl(request.getContextPath() + Controllers.LOGIN);
 		} else {
-			bean.setLoginPageUrl(request.getHeader("referer"));
+			bean.setAfterLoginUrl(referrer);
+			bean.setLoginPageUrl(referrer);
+		}
+	}
+
+	private String decodeAfterLoginParameter(HttpServletRequest request) {
+		String parm = request.getParameter(PARAMETER_AFTER_LOGIN);
+		if (parm == null) {
+			return null;
+		} else {
+			try {
+				return URLDecoder.decode(parm, "UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				log.error("No UTF-8 encoding? Really?", e);
+				return parm;
+			}
+		}
+	}
+
+	private boolean isReturnParameterSet(HttpServletRequest request) {
+		return (null != request.getParameter(PARAMETER_RETURN));
+	}
+
+	/** If no referrer, say we were on the login page. */
+	private String whereDidWeComeFrom(HttpServletRequest request) {
+		String referrer = request.getHeader("referer");
+		if (referrer != null) {
+			return referrer;
+		} else {
+			return request.getContextPath() + Controllers.LOGIN;
 		}
 	}
 

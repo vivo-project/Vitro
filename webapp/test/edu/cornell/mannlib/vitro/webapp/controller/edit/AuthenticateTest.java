@@ -183,8 +183,12 @@ public class AuthenticateTest extends AbstractTestClass {
 	private static final HowDidWeGetHere FROM_WIDGET = new HowDidWeGetHere(
 			null, false, URL_WIDGET);
 
-	private static final HowDidWeGetHere FROM_LOGIN = new HowDidWeGetHere(null,
-			false, URL_LOGIN);
+	private static final HowDidWeGetHere FROM_LOGIN = new HowDidWeGetHere(
+			null, false, URL_LOGIN);
+
+	/** "return" parameter with no referrer - like coming from the login page. */
+	private static final HowDidWeGetHere FROM_BOOKMARK_OF_LINK = new HowDidWeGetHere(
+			null, true, null);
 
 	// --------- All sets of test data ----------
 
@@ -202,26 +206,28 @@ public class AuthenticateTest extends AbstractTestClass {
 				{ OLD_DBA, FROM_FORCED,
 						new WhereTo(URL_LOGIN, URL_RESTRICTED, null) }, // 4
 				{ OLD_DBA, FROM_LINK, new WhereTo(URL_LOGIN, URL_LINK, null) }, // 5
+				{ OLD_DBA, FROM_BOOKMARK_OF_LINK,
+						new WhereTo(URL_LOGIN, URL_SITE_ADMIN, null) }, // 6
 				{ OLD_DBA, FROM_WIDGET,
-						new WhereTo(URL_WIDGET, URL_WIDGET, null) }, // 6
+						new WhereTo(URL_WIDGET, URL_WIDGET, null) }, // 7
 				{ OLD_DBA, FROM_LOGIN,
-						new WhereTo(URL_LOGIN, URL_SITE_ADMIN, null) }, // 7
+						new WhereTo(URL_LOGIN, URL_SITE_ADMIN, null) }, // 8
 				{ OLD_SELF, FROM_FORCED,
-						new WhereTo(URL_LOGIN, URL_SELF_PROFILE, null) }, // 8
-				{ OLD_SELF, FROM_LINK,
 						new WhereTo(URL_LOGIN, URL_SELF_PROFILE, null) }, // 9
+				{ OLD_SELF, FROM_LINK,
+						new WhereTo(URL_LOGIN, URL_SELF_PROFILE, null) }, // 10
 				{ OLD_SELF, FROM_WIDGET,
-						new WhereTo(URL_WIDGET, URL_SELF_PROFILE, null) }, // 10
+						new WhereTo(URL_WIDGET, URL_SELF_PROFILE, null) }, // 11
 				{ OLD_SELF, FROM_LOGIN,
-						new WhereTo(URL_LOGIN, URL_SELF_PROFILE, null) }, // 11
+						new WhereTo(URL_LOGIN, URL_SELF_PROFILE, null) }, // 12
 				{ NEW_STRANGER, FROM_FORCED,
-						new WhereTo(URL_LOGIN, URL_HOME, URL_RESTRICTED) }, // 12
+						new WhereTo(URL_LOGIN, URL_HOME, URL_RESTRICTED) }, // 13
 				{ NEW_STRANGER, FROM_LINK,
-						new WhereTo(URL_LOGIN, URL_HOME, URL_LINK) }, // 13
+						new WhereTo(URL_LOGIN, URL_HOME, URL_LINK) }, // 14
 				{ NEW_STRANGER, FROM_WIDGET,
-						new WhereTo(URL_WIDGET, URL_HOME, URL_WIDGET) }, // 14
+						new WhereTo(URL_WIDGET, URL_HOME, URL_WIDGET) }, // 15
 				{ NEW_STRANGER, FROM_LOGIN,
-						new WhereTo(URL_LOGIN, URL_HOME, URL_HOME) } // 15
+						new WhereTo(URL_LOGIN, URL_HOME, URL_HOME) } // 16
 		};
 		return Arrays.asList(data);
 	}
@@ -503,7 +509,7 @@ public class AuthenticateTest extends AbstractTestClass {
 			processBean.setAfterLoginUrl(urlBundle.referrer);
 			processBean.setLoginPageUrl(URL_LOGIN);
 		} else {
-			processBean.setAfterLoginUrl(null);
+			processBean.setAfterLoginUrl(urlBundle.referrer);
 			processBean.setLoginPageUrl(urlBundle.referrer);
 		}
 		LoginProcessBean.setBean(request, processBean);
@@ -562,10 +568,15 @@ public class AuthenticateTest extends AbstractTestClass {
 		assertEquals("username", username, bean.getUsername());
 
 		// This should represent the URL bundle, every time.
-		String expectedAfterLoginUrl = (urlBundle.returnParameterSet) ? urlBundle.referrer
-				: urlBundle.afterLoginUrl;
-		assertEquals("after login URL", expectedAfterLoginUrl,
-				bean.getAfterLoginUrl());
+		if (urlBundle.afterLoginUrl != null) {
+			assertEquals("after login URL", urlBundle.afterLoginUrl,
+					bean.getAfterLoginUrl());
+		} else if (urlBundle.referrer != null) {
+			assertEquals("after login URL", urlBundle.referrer,
+					bean.getAfterLoginUrl());
+		} else {
+			assertEquals("after login URL", URL_LOGIN, bean.getAfterLoginUrl());
+		}
 	}
 
 	/** What logins were completed in this test? */

@@ -30,7 +30,6 @@ public class LoginRedirector {
 	private final HttpSession session;
 
 	private final String uriOfAssociatedIndividual;
-	private final String loginProcessPage;
 	private final String afterLoginPage;
 
 	public LoginRedirector(HttpServletRequest request,
@@ -43,7 +42,6 @@ public class LoginRedirector {
 
 		LoginProcessBean processBean = LoginProcessBean.getBean(request);
 		log.debug("process bean is: " + processBean);
-		loginProcessPage = processBean.getLoginPageUrl();
 		afterLoginPage = processBean.getAfterLoginUrl();
 	}
 
@@ -80,18 +78,15 @@ public class LoginRedirector {
 						+ "but the system contains no profile for you.");
 				response.sendRedirect(getApplicationHomePageUrl());
 			} else {
-				if (hasSomeplaceToGoAfterLogin()) {
-					log.debug("Returning to requested page: " + afterLoginPage);
-					response.sendRedirect(afterLoginPage);
-				} else if (loginProcessPage == null) {
-					log.debug("Don't know what to do. Go home.");
-					response.sendRedirect(getApplicationHomePageUrl());
-				} else if (isLoginPage(loginProcessPage)) {
+				if (isLoginPage(afterLoginPage)) {
 					log.debug("Coming from /login. Going to site admin page.");
 					response.sendRedirect(getSiteAdminPageUrl());
+				} else if (null != afterLoginPage) {
+					log.debug("Returning to requested page: " + afterLoginPage);
+					response.sendRedirect(afterLoginPage);
 				} else {
-					log.debug("Coming from a login widget. Going back there.");
-					response.sendRedirect(loginProcessPage);
+					log.debug("Don't know what to do. Go home.");
+					response.sendRedirect(getApplicationHomePageUrl());
 				}
 			}
 			LoginProcessBean.removeBean(request);
@@ -103,18 +98,15 @@ public class LoginRedirector {
 
 	public void redirectCancellingUser() throws IOException {
 		try {
-			if (hasSomeplaceToGoAfterLogin()) {
-				log.debug("Returning to requested page: " + afterLoginPage);
-				response.sendRedirect(afterLoginPage);
-			} else if (loginProcessPage == null) {
-				log.debug("Don't know what to do. Go home.");
-				response.sendRedirect(getApplicationHomePageUrl());
-			} else if (isLoginPage(loginProcessPage)) {
+			if (isLoginPage(afterLoginPage)) {
 				log.debug("Coming from /login. Going to home.");
 				response.sendRedirect(getApplicationHomePageUrl());
+			} else if (null != afterLoginPage) {
+				log.debug("Returning to requested page: " + afterLoginPage);
+				response.sendRedirect(afterLoginPage);
 			} else {
-				log.debug("Coming from a login widget. Going back there.");
-				response.sendRedirect(loginProcessPage);
+				log.debug("Don't know what to do. Go home.");
+				response.sendRedirect(getApplicationHomePageUrl());
 			}
 			LoginProcessBean.removeBean(request);
 		} catch (IOException e) {
@@ -129,10 +121,6 @@ public class LoginRedirector {
 		DisplayMessage.setMessage(request,
 				"VIVO cannot find a profile for your account.");
 		response.sendRedirect(getApplicationHomePageUrl());
-	}
-
-	private boolean hasSomeplaceToGoAfterLogin() {
-		return afterLoginPage != null;
 	}
 
 	private boolean isMerelySelfEditor() {
