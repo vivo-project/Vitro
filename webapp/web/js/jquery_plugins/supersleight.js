@@ -1,41 +1,97 @@
-//Fix Transparent PNGs in IE6
-jQuery.fn.supersleight = function(settings) {
-	settings = jQuery.extend({
-		imgs: true,
-		backgrounds: true,
-		shim: 'x.gif',
-		apply_positioning: true
-	}, settings);
-	
-	return this.each(function(){
-		if (jQuery.browser.msie && parseInt(jQuery.browser.version, 10) < 7 && parseInt(jQuery.browser.version, 10) > 4) {
-			jQuery(this).find('*').andSelf().each(function(i,obj) {
-				var self = jQuery(obj);
-				// background pngs
-				if (settings.backgrounds && self.css('background-image').match(/\.png/i) !== null) {
-					var bg = self.css('background-image');
-					var src = bg.substring(5,bg.length-2);
-					var mode = (self.css('background-repeat') == 'no-repeat' ? 'crop' : 'scale');
-					var styles = {
-						'filter': "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='" + src + "', sizingMethod='" + mode + "')",
-						'background-image': 'url('+settings.shim+')'
-					};
-					self.css(styles);
-				};
-				// image elements
-				if (settings.imgs && self.is('img[src$=png]')){
-					var styles = {
-						'width': self.width() + 'px',
-						'height': self.height() + 'px',
-						'filter': "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='" + self.attr('src') + "', sizingMethod='scale')"
-					};
-					self.css(styles).attr('src', settings.shim);
-				};
-				// apply position to 'active' elements
-				if (settings.apply_positioning && self.is('a, input') && (self.css('position') === '' || self.css('position') == 'static')){
-					self.css('position', 'relative');
-				};
-			});
-		};
-	});
-};
+// SuperSleight, version 1.1.0
+// version 1.1.0 by Jeffrey Barke <http://themechanism.com/> 20071218
+// Essential (99% of the) code by Drew McLellan <http://24ways.org/2007/supersleight-transparent-png-in-ie6>
+var supersleight = function() {
+
+	// local vars
+	var root = false;
+	var applyPositioning = true;
+	// path to a transparent GIF image
+	var shim = '../images/x.gif';
+
+	var fnLoadPngs = function() {
+		// if supersleight.limitTo called, limit to specified id
+		if (root) { root = document.getElementById(root); } else { root = document; }
+		// loop
+		for (var i = root.all.length - 1, obj = null; (obj = root.all[i]); i--) {
+			// background pngs
+			if (obj.currentStyle.backgroundImage.match(/\.png/i) !== null) {
+				bg_fnFixPng(obj);
+			}
+			// image elements
+			if (obj.tagName == 'IMG' && obj.src.match(/\.png$/i) !== null) {
+				el_fnFixPng(obj);
+			}
+			// apply position to 'active' elements
+			if (applyPositioning && (obj.tagName == 'A' || obj.tagName == 'INPUT') && obj.style.position === '') {
+				obj.style.position = 'relative';
+			}
+		}
+	};
+
+	var bg_fnFixPng = function(obj) {
+		var mode = 'scale';
+		var bg = obj.currentStyle.backgroundImage;
+		var src = bg.substring(5,bg.length-2);
+		if (obj.currentStyle.backgroundRepeat == 'no-repeat') {
+			mode = 'crop';
+		}
+		obj.style.filter = "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='" + src + "', sizingMethod='" + mode + "')";
+		obj.style.backgroundImage = 'url(' + shim + ')';
+	};
+
+	var el_fnFixPng = function(img) {
+		var src = img.src;
+		img.style.width = img.width + 'px';
+		img.style.height = img.height + 'px';
+		img.style.filter = "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='" + src + "', sizingMethod='scale')";
+		img.src = shim;
+	};
+
+	var addLoadEvent = function(func) {
+		var oldonload = window.onload;
+		if (typeof window.onload != 'function') {
+			window.onload = func;
+		} else {
+			window.onload = function() {
+				if (oldonload) {
+					oldonload();
+				}
+				func();
+			};
+		}
+	};
+
+	// supersleight object
+	return {
+		init: function(strPath, blnPos, strId) {
+			if (document.getElementById) {
+				if (typeof(strPath) != 'undefined' && null !== strPath) { shim = strPath; }
+				if (typeof(blnPos) != 'undefined' && null !== blnPos) { applyPositioning = blnPos; }
+				if (typeof(strId) != 'undefined' && null !== strId) { root = strId; }
+				addLoadEvent(fnLoadPngs);
+			} else {
+				return false;
+			}
+		},
+		limitTo: function(el) {
+			root = el;
+		},
+		run: function(strPath, blnPos, strId) {
+			if (document.getElementById) {
+				if (typeof(strPath) != 'undefined' && null !== strPath) { shim = strPath; }
+				if (typeof(blnPos) != 'undefined' && null !== blnPos) { applyPositioning = blnPos; }
+				if (typeof(strId) != 'undefined' && null !== strId) { root = strId; }
+				fnLoadPngs();
+			} else {
+				return false;
+			}
+		}
+	};
+
+}();
+
+// limit to part of the page ... pass an ID to limitTo:
+// supersleight.limitTo('top');
+// optional path to a transparent GIF image, apply positioning, limitTo
+supersleight.init();
