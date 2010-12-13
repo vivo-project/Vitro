@@ -21,8 +21,15 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     
     PropertyTemplateModel(Property property) {
         this.name = property.getLabel();
+        // Do in subclass constructor. The label has not been set on the property, and getting the 
+        // label differs between object and data properties.
+        // this.name = property.getLabel();
         this.uri = property.getURI();
         this.property = property;
+    }
+    
+    protected void setName(String name) {
+        this.name = name;
     }
     
     /* Access methods for templates */

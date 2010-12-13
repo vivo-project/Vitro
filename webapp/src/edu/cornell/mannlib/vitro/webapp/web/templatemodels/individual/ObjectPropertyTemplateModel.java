@@ -3,8 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
 import java.io.File;
-import java.util.List;
-import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -17,7 +15,6 @@ import org.w3c.dom.NodeList;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
-import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel {
@@ -29,7 +26,8 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
 
     ObjectPropertyTemplateModel(ObjectProperty op, Individual subject, WebappDaoFactory wdf) {
         super(op);
- 
+        setName(op.getDomainPublic());
+        
         // Get the config for this object property
         try {
             config = new PropertyListConfig(op);
@@ -61,7 +59,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     private class PropertyListConfig {
 
         private static final String DEFAULT_CONFIG_FILE = "objectPropertyList-default.xml";
-        private static final String CONFIG_FILE_PATH = "/views/";
+        private static final String CONFIG_FILE_PATH = "/config/";
         private static final String NODE_NAME_QUERY = "query";
         private static final String NODE_NAME_TEMPLATE = "template";
         private static final String NODE_NAME_COLLATION_TARGET = "collation-target";

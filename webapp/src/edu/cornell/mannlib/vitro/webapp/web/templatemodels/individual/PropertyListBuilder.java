@@ -67,7 +67,7 @@ public class PropertyListBuilder {
         // don't need to set editLabel, can just do this:
         //propertyList.addAll(objectPropertyList); 
         for (ObjectProperty op : objectPropertyList) {
-            op.setLabel(op.getDomainPublic());
+            //op.setLabel(op.getDomainPublic());
             propertyList.add(op);
         }
                 
@@ -86,7 +86,7 @@ public class PropertyListBuilder {
         // two working in parallel.
         List<DataProperty> dataPropertyList = subject.getPopulatedDataPropertyList();
         for (DataProperty dp : dataPropertyList) {
-            dp.setLabel(dp.getPublicName());
+            //dp.setLabel(dp.getPublicName());
             propertyList.add(dp);
         }
 
@@ -169,6 +169,7 @@ public class PropertyListBuilder {
                         } else if (op.getURI() == null) {
                             log.error("ObjectProperty op returned with null propertyURI from opDao.getObjectPropertyByURI()");
                         } else  if (! alreadyOnPropertyList(propertyList, op)) {
+                            //op.setLabel(op.getDomainPublic());
                             propertyList.add(op);
                         }
                     }
@@ -191,6 +192,7 @@ public class PropertyListBuilder {
                     if (dp.getURI() == null) {
                         log.error("DataProperty dp returned with null propertyURI from dpDao.getAllPossibleDatapropsForIndividual()");
                     } else if (! alreadyOnPropertyList(propertyList, dp)) {
+                        //dp.setLabel(dp.getPublicName());
                         propertyList.add(dp);
                     }
                 } else {

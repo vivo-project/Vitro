@@ -23,6 +23,8 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
 
     DataPropertyTemplateModel(DataProperty dp, Individual subject, WebappDaoFactory wdf) {
         super(dp);
+        setName(dp.getPublicName());
+        
         // Get the data property statements via a sparql query
         DataPropertyStatementDao dpDao = wdf.getDataPropertyStatementDao();
         List<DataPropertyStatement> dpStatements = dpDao.getDataPropertyStatementsForIndividualByProperty(subject, dp);
