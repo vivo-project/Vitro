@@ -7,10 +7,12 @@ import java.io.OutputStream;
 import java.io.Writer;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -137,41 +139,68 @@ public class SparqlQueryServlet extends BaseEditController {
             return;
         }
         
-        DataSource dataSource = DatasetFactory.create() ;
-        Dataset dataset = null;
-        ModelMaker maker = (ModelMaker) getServletContext().getAttribute("vitroJenaModelMaker");
+        Dataset dataset = chooseDatasetForQuery(vreq);
 
-        boolean someModelSet = false;        
-        String models[] = request.getParameterValues("sourceModelName");        
-        if( models != null && models.length > 0 ){
-        	OntModel ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
-            for( String modelName : models ){
-                Model modelNamed = maker.getModel(modelName);
-                if( modelNamed != null ){
-                    dataSource.addNamedModel(modelName, modelNamed) ;
-                	// For now, people expect to query these graphs without using 
-                	// FROM NAMED, so we'll also add to the background
-                	ontModel.addSubModel(modelNamed);
-                    someModelSet = true;
-                }
-            }     
-           
-            if (someModelSet) {
-            	
-            	dataSource.setDefaultModel(ontModel);
-            }
-           
-        }
-        
-        if( ! someModelSet ){
-            dataset = vreq.getDataset();
-            if(dataset==null){
-            	dataSource.setDefaultModel(model) ;
-            }
-        }
-        executeQuery(response, resultFormatParam, rdfResultFormatParam, queryParam, (dataset != null) ? dataset : dataSource); 
+        executeQuery(response, resultFormatParam, rdfResultFormatParam, queryParam, dataset); 
         return;
     }
+    
+	private Dataset chooseDatasetForQuery(VitroRequest vreq) {
+		Map<String, Model> modelMap = getModelsFromRequest(vreq);
+		if (!modelMap.isEmpty()) {
+			return buildDataSetFromNamedModels(modelMap);
+		}
+
+		Dataset dataset = vreq.getDataset();
+		if (dataset != null) {
+			return dataset;
+		}
+
+		DataSource dataSource = DatasetFactory.create();
+		dataSource.setDefaultModel(vreq.getJenaOntModel());
+		return dataSource;
+	}
+    
+	private Map<String, Model> getModelsFromRequest(HttpServletRequest request) {
+		String modelNames[] = request.getParameterValues("sourceModelName");
+		if ((modelNames != null) && (modelNames.length > 0)) {
+			return Collections.emptyMap();
+		}
+
+		ModelMaker maker = (ModelMaker) getServletContext().getAttribute(
+				"vitroJenaModelMaker");
+
+		Map<String, Model> map = new HashMap<String, Model>();
+		for (String modelName : modelNames) {
+			Model model = maker.getModel(modelName);
+			if (model != null) {
+				map.put(modelName, model);
+			}
+		}
+
+		return map;
+	}
+
+	private Dataset buildDataSetFromNamedModels(Map<String, Model> modelMap) {
+		DataSource dataSource = DatasetFactory.create();
+		for (String name : modelMap.keySet()) {
+			Model model = modelMap.get(name);
+			dataSource.addNamedModel(name, model);
+		}
+
+    	// For now, people expect to query these graphs without using 
+    	// FROM NAMED, so we'll also add to the background
+		OntModel ontModel = ModelFactory
+				.createOntologyModel(OntModelSpec.OWL_MEM);
+		for (String name : modelMap.keySet()) {
+			Model model = modelMap.get(name);
+			ontModel.addSubModel(model);
+		}
+
+		dataSource.setDefaultModel(ontModel);
+		return dataSource;
+	}
+
     
     private void executeQuery(HttpServletResponse response, String resultFormatParam, String rdfResultFormatParam, String queryParam, Dataset dataset ) throws IOException {
         
