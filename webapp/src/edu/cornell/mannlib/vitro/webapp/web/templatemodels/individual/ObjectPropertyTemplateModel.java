@@ -31,7 +31,11 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         super(op);
  
         // Get the config for this object property
-        config = new PropertyListConfig(op);
+        try {
+            config = new PropertyListConfig(op);
+        } catch (Exception e) {
+            log.error(e, e);
+        }
     }
     
     protected String getQueryString() {
@@ -43,10 +47,15 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     }
        
     protected static ObjectPropertyTemplateModel getObjectPropertyTemplateModel(ObjectProperty op, Individual subject, WebappDaoFactory wdf) {
-// Temporarily comment out, since collation not working. Display as uncollated for now.
-//        return op.getCollateBySubclass() ? new CollatedObjectPropertyTemplateModel(op, subject, wdf) 
-//                                         : new UncollatedObjectPropertyTemplateModel(op, subject, wdf);
-        return new UncollatedObjectPropertyTemplateModel(op, subject, wdf);
+        if (op.getCollateBySubclass()) {
+            try {
+                return new CollatedObjectPropertyTemplateModel(op, subject, wdf);
+            } catch (Exception e) {
+                return new UncollatedObjectPropertyTemplateModel(op, subject, wdf);
+            }
+        } else {
+            return new UncollatedObjectPropertyTemplateModel(op, subject, wdf);
+        }
     }
     
     private class PropertyListConfig {
@@ -61,7 +70,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         private String templateName;
         private String collationTarget;
 
-        PropertyListConfig(ObjectProperty op) {
+        PropertyListConfig(ObjectProperty op) throws Exception {
             String filename = DEFAULT_CONFIG_FILE;;
             
             // Get the config filename from ObjectPropertyDaoJena by looking for the custom property list view annotation.
@@ -88,14 +97,26 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
                 log.error("Error processing config file " + configFilename + " for object property " + op.getURI(), e);
                 // What should we do here?
             }
+            
+            if (queryString == null) {
+                throw new Exception("Invalid custom view configuration: query string not defined.");                
+            }
+            if (templateName == null) {
+                throw new Exception("Invalid custom view configuration: template name not defined.");
+            }
         }
  
         private String getConfigValue(Document doc, String nodeName) {
             NodeList nodes = doc.getElementsByTagName(nodeName);
             Element element = (Element) nodes.item(0); 
-            String value = element.getChildNodes().item(0).getNodeValue();   
-            log.debug("Value of config parameter " + nodeName + " = " + value);
-            return value;        
+            String value = null;
+            if (element != null) {
+                value = element.getChildNodes().item(0).getNodeValue();   
+                log.debug("Value of config parameter " + nodeName + " = " + value);
+            } else {
+                log.warn("No value for config parameter " + nodeName);
+            }
+            return value;           
         }
         
         private String getConfigFilename(String filename) {

@@ -22,8 +22,17 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
     private Map<String, List<ObjectPropertyStatementTemplateModel>> collatedStatements;
     //private List<SubclassList> subclassList;
     
-    CollatedObjectPropertyTemplateModel(ObjectProperty op, Individual subject, WebappDaoFactory wdf) {
-        super(op, subject, wdf);        
+    CollatedObjectPropertyTemplateModel(ObjectProperty op, Individual subject, WebappDaoFactory wdf) throws Exception {
+        super(op, subject, wdf); 
+        
+        /* RY Temporarily throw an error because collation hasn't been implemented yet. We'll then use an uncollated one instead.
+         * In final version, throw an error if config doesn't contain collation-target element. We'll use an uncollated one instead.
+         */
+        boolean error = true;
+        if (error) {
+            throw new Exception("No collation target specified for collated object property " + op.getLabel());
+        }
+        
         ObjectPropertyStatementDao opDao = wdf.getObjectPropertyStatementDao();
         String subjectUri = subject.getURI();
         String propertyUri = op.getURI();
