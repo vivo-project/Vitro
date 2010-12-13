@@ -20,6 +20,8 @@ public interface ResponseValues {
     
     public String getRedirectUrl();
 
+    public Map<String, String> getHeader();
+    
     public String getForwardUrl();
 
     public Throwable getException();

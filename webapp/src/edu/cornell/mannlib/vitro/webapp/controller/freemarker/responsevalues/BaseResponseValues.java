@@ -61,6 +61,12 @@ public abstract class BaseResponseValues implements ResponseValues {
     }
     
     @Override
+    public Map<String, String> getHeader() {
+        throw new UnsupportedOperationException(
+                "This is not a header response.");
+    }
+    
+    @Override
     public String getForwardUrl() {
         throw new UnsupportedOperationException(
                 "This is not a forwarding response.");
