@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -148,15 +149,21 @@ public class VitroRequest implements HttpServletRequest {
         setAttribute("portal", p);
     }
     
-    public int getPortalId(){
+    public int getPortalId(){        
         String idstr =  (String)getAttribute("home");
-        if( idstr == null )
-            throw new Error("home parameter was not set in request");
+        
+        if( idstr == null ){
+            WebappDaoFactory wdf = getWebappDaoFactory();        
+            Portal[] portals = wdf.getPortalDao().getAllPortals().toArray(new Portal[0]);
+            return portals[0].getPortalId();            
+        }
+        
         try{
             return Integer.parseInt(idstr);
         }catch( Throwable th){
             throw new Error("home parameter was not set in request");
         }
+        
     }
     public void setPortalId(String in){
         setAttribute("home",in);
