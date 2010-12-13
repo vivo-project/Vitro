@@ -89,4 +89,12 @@ class ObjectPropertyStatementDaoFiltering extends BaseFiltering implements Objec
         return innerObjectPropertyStatementDao.getObjectPropertyStatementsForIndividualByProperty(subjectUri, propertyUri, query);
     }
 
+
+//    @Override
+//    // RY What about filtering?
+//    public Map<String, List<Map<String, Object>>> getCollatedObjectPropertyStatementsForIndividual(
+//            String subjectUri, String propertyUri, String query) {
+//        return innerObjectPropertyStatementDao.getCollatedObjectPropertyStatementsForIndividual(subjectUri, propertyUri, query);
+//    }
+
 }

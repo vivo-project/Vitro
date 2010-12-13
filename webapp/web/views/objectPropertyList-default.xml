@@ -7,5 +7,7 @@
         }       
     </query>
     
+    <collation-target>object</collation-target>
+    
     <template>objectPropertyList-default.ftl</template>
 </view-config>

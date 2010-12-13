@@ -2,6 +2,10 @@
 
 <#-- Template for property listing on individual profile page -->
 
+<#-- RY Just a temporary fix to prevent classgroup heading from being pushed to the right edge of the page. 
+Feel free to redo/remove. -->
+<div style="clear: both;" />
+
 <#list propertyGroups as group>
 
     <#-- Get the group name -->
@@ -40,10 +44,10 @@
                         </#list>
                         
                     <#else> <#-- object property -->      
-                        <#if ! property.collatedBySubclass> 
-                            <#include "${property.template}">
-                        <#else>
+                        <#if property.collatedBySubclass>                             
                             <#include "objectPropertyList-collated.ftl">
+                        <#else>
+                            <#include "${property.template}">
                         </#if>
                     </#if>                   
                 </div> <!-- end property -->               

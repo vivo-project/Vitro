@@ -12,6 +12,8 @@ import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 
 /** List of object property statements for an individual, where the objects belong to a single subclass **/
 
+// RY ** This can probably be eliminated. It can be a map of subclass name to statements.
+
 public class SubclassList extends BaseTemplateModel {
 
     private static final Log log = LogFactory.getLog(SubclassList.class); 

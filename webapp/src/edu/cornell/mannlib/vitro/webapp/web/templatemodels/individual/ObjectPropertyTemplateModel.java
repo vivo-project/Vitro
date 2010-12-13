@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -16,6 +17,7 @@ import org.w3c.dom.NodeList;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
+import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel {
@@ -35,10 +37,16 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     protected String getQueryString() {
         return config.queryString;
     }
+    
+    protected String getCollationTarget() {
+        return config.collationTarget;
+    }
        
     protected static ObjectPropertyTemplateModel getObjectPropertyTemplateModel(ObjectProperty op, Individual subject, WebappDaoFactory wdf) {
-        return op.getCollateBySubclass() ? new CollatedObjectPropertyTemplateModel(op, subject, wdf) 
-                                         : new UncollatedObjectPropertyTemplateModel(op, subject, wdf);
+// Temporarily comment out, since collation not working. Display as uncollated for now.
+//        return op.getCollateBySubclass() ? new CollatedObjectPropertyTemplateModel(op, subject, wdf) 
+//                                         : new UncollatedObjectPropertyTemplateModel(op, subject, wdf);
+        return new UncollatedObjectPropertyTemplateModel(op, subject, wdf);
     }
     
     private class PropertyListConfig {
@@ -47,9 +55,11 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         private static final String CONFIG_FILE_PATH = "/views/";
         private static final String NODE_NAME_QUERY = "query";
         private static final String NODE_NAME_TEMPLATE = "template";
+        private static final String NODE_NAME_COLLATION_TARGET = "collation-target";
         
         private String queryString;
         private String templateName;
+        private String collationTarget;
 
         PropertyListConfig(ObjectProperty op) {
             String filename = DEFAULT_CONFIG_FILE;;
@@ -60,19 +70,20 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
             
             String configFilename = getConfigFilename(filename);
             try {
-            File config = new File(configFilename);            
-            if (configFilename != DEFAULT_CONFIG_FILE && ! config.exists()) {
-                log.warn("Can't find config file " + configFilename + " for object property " + op.getURI() + "\n" +
-                        ". Using default config file instead.");
-                configFilename = getConfigFilename(DEFAULT_CONFIG_FILE);
-                // Should we test for the existence of the default, and throw an error if it doesn't exist?
-            }   
+                File config = new File(configFilename);            
+                if (configFilename != DEFAULT_CONFIG_FILE && ! config.exists()) {
+                    log.warn("Can't find config file " + configFilename + " for object property " + op.getURI() + "\n" +
+                            ". Using default config file instead.");
+                    configFilename = getConfigFilename(DEFAULT_CONFIG_FILE);
+                    // Should we test for the existence of the default, and throw an error if it doesn't exist?
+                }   
             
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+                DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
                 DocumentBuilder db = dbf.newDocumentBuilder();
                 Document doc = db.parse(configFilename);
                 queryString = getConfigValue(doc, NODE_NAME_QUERY);
                 templateName = getConfigValue(doc, NODE_NAME_TEMPLATE);
+                collationTarget = getConfigValue(doc, NODE_NAME_COLLATION_TARGET);
             } catch (Exception e) {
                 log.error("Error processing config file " + configFilename + " for object property " + op.getURI(), e);
                 // What should we do here?
