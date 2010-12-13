@@ -32,13 +32,14 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.RegeneratingGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SDBGraphGenerator;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSDBModelMaker;
+import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 
 public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     private static final Log log = LogFactory.getLog(JenaDataSourceSetupBase.class);
 
     protected final static int DEFAULT_MAXWAIT = 10000, // ms
             DEFAULT_MAXACTIVE = 300,
-            DEFAULT_MAXIDLE = 84,
+            DEFAULT_MAXIDLE = 30,
             DEFAULT_TIMEBETWEENEVICTIONS = 30 * 60 * 1000, // ms
             DEFAULT_TESTSPEREVICTION = 3,
             DEFAULT_MINEVICTIONIDLETIME = 1000 * 60 * 30; // ms
@@ -154,7 +155,18 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
        ds.setUrl(jdbcUrl);
        ds.setUsername(username);
        ds.setPassword(password);
-       ds.setMaxActive(DEFAULT_MAXACTIVE);
+       int maxActiveInt = DEFAULT_MAXACTIVE;
+       String maxActiveStr = ConfigurationProperties
+               .getProperty("VitroConnection.DataSource.pool.maxActive");   
+       if (!StringUtils.isEmpty(maxActiveStr)) {
+           try {
+               maxActiveInt = Integer.parseInt(maxActiveStr);    
+           } catch (NumberFormatException nfe) {
+               log.error("Unable to parse connection pool maxActive setting " 
+                       + maxActiveStr + " as an integer");
+           }
+       }
+       ds.setMaxActive(maxActiveInt);
        ds.setMaxIdle(DEFAULT_MAXIDLE);
        ds.setMaxWait(DEFAULT_MAXWAIT);
        ds.setValidationQuery(DEFAULT_VALIDATIONQUERY);
