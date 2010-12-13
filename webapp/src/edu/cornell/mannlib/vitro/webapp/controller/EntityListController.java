@@ -3,11 +3,16 @@
 package edu.cornell.mannlib.vitro.webapp.controller;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -16,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
@@ -115,23 +121,63 @@ public class EntityListController extends VitroHttpServlet {
      */
     private void doVClass(VitroRequest request, HttpServletResponse res, VClass vclass)
     throws ServletException, IOException, FlagException {
-        IndexSearcher index = LuceneIndexFactory.getIndexSearcher(getServletContext());
-        boolean isSinglePortal = request.getWebappDaoFactory().getPortalDao().isSinglePortal();
         
-        Portal portal = request.getPortal();
+        Map<String,Object> results = getResultsForVClass(
+                vclass.getURI(),
+                getPageParameter(request),
+                getAlphaParamter(request),
+                request.getPortal(),
+                request.getWebappDaoFactory().getPortalDao().isSinglePortal(), 
+                request.getWebappDaoFactory().getIndividualDao(),
+                getServletContext());           
+        
+        /* copy values from results in to request attributes */
+        request.setAttribute("entities", results.get("entities"));
+        request.setAttribute("count",results.get("count"));
+        request.setAttribute("totalCount",results.get("totalCount"));
+        request.setAttribute("alpha",results.get("alpha"));                
+        request.setAttribute("showPages",results.get("showPages"));
+        request.setAttribute("pages",results.get("pages"));                 
+       
+        /* Setup any additional attributes that are needed */
+        request.setAttribute("servlet",Controllers.ENTITY_LIST);
+        request.setAttribute("vclassId", vclass.getURI());
+        request.setAttribute("controllerParam","vclassId=" + URLEncoder.encode(vclass.getURI(),"UTF-8"));        
+        request.setAttribute("showAlpha","1");
+        request.setAttribute("letters",Controllers.getLetters());        
+
+        VClassGroup classGroup=vclass.getGroup();
+        if (classGroup==null) {
+            request.setAttribute("title",vclass.getName()/* + "&nbsp;("+vclass.getEntityCount()+")"*/);
+        } else {
+            request.setAttribute("title",classGroup.getPublicName());
+            request.setAttribute("subTitle",vclass.getName()/* + "&nbsp;("+vclass.getEntityCount()+")"*/);
+        }
+        
+        //FINALLY: send off to the BASIC_JSP to get turned into html
+        request.setAttribute("bodyJsp",Controllers.ENTITY_LIST_JSP);
+        RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
+
+        // use this for more direct debugging: RequestDispatcher rd = request.getRequestDispatcher(Controllers.ENTITY_LIST_JSP);
+        res.setContentType("text/html; charset=UTF-8");
+        request.setAttribute("pageTime", System.currentTimeMillis()-startTime);
+        rd.include(request,res);
+    }
+
+   
+    public static Map<String,Object> getResultsForVClass(String vclassURI, int page, String alpha, Portal portal, boolean isSinglePortal, IndividualDao indDao, ServletContext context) 
+    throws CorruptIndexException, IOException, ServletException{
+        Map<String,Object> rvMap = new HashMap<String,Object>();
+                        
         int portalId = 1;
         if( portal != null )
-            portalId = portal.getPortalId();
-        
-                 
-        String alpha = request.getParameter("alpha");
-        int page = getPage(request);
-        IndividualDao indDao = request.getWebappDaoFactory().getIndividualDao();                        
-        
+            portalId = portal.getPortalId();        
+                                 
         //make lucene query for this rdf:type
-        Query query = getQuery(vclass.getURI(),alpha, isSinglePortal, portalId);        
+        Query query = getQuery(vclassURI,alpha, isSinglePortal, portalId);        
         
         //execute lucene query for individuals of the specified type
+        IndexSearcher index = LuceneIndexFactory.getIndexSearcher(context);
         TopDocs docs = index.search(query, null, 
                 ENTITY_LIST_CONTROLLER_MAX_RESULTS, 
                 new Sort(Entity2LuceneDoc.term.NAMEUNANALYZED));    
@@ -153,9 +199,11 @@ public class EntityListController extends VitroHttpServlet {
                 Document doc = index.doc(hit.doc);
                 if (doc != null) {                                                                                        
                     String uri = doc.getField(Entity2LuceneDoc.term.URI).stringValue();
-                    Individual ind = indDao.getIndividualByURI( uri );                                
-                    individuals.add( ind );                         
-                    individualsAdded++;                    
+                    Individual ind = indDao.getIndividualByURI( uri );  
+                    if( ind != null ){
+                        individuals.add( ind );                         
+                        individualsAdded++;
+                    }
                 } else {
                     log.warn("no document found for lucene doc id " + hit.doc);
                 }
@@ -165,60 +213,28 @@ public class EntityListController extends VitroHttpServlet {
             ii++;            
         }   
         
-        
-        request.setAttribute("servlet",Controllers.ENTITY_LIST);
-        request.setAttribute("vclassId", vclass.getURI());
-        request.setAttribute("controllerParam","vclassId=" + URLEncoder.encode(vclass.getURI(),"UTF-8"));
-        request.setAttribute("count", size);
+        rvMap.put("count", size);
         
         if( size > INDIVIDUALS_PER_PAGE ){
-            request.setAttribute("showPages", Boolean.TRUE);
+            rvMap.put("showPages", Boolean.TRUE);
             List<PageRecord> pageRecords = TabEntitiesController.makePagesList(size, INDIVIDUALS_PER_PAGE, page);
-            request.setAttribute("pages", pageRecords);                    
+            rvMap.put("pages", pageRecords);                    
+        }else{
+            rvMap.put("showPages", Boolean.FALSE);
+            rvMap.put("pages", Collections.emptyList());
         }
-        request.setAttribute("showAlpha","1");
-        request.setAttribute("letters",Controllers.getLetters());
-        request.setAttribute("alpha",alpha);
+                        
+        rvMap.put("alpha",alpha);
         
-        request.setAttribute("totalCount", size);
-        request.setAttribute("entities",individuals);
+        rvMap.put("totalCount", size);
+        rvMap.put("entities",individuals);
         if (individuals == null) 
-            log.debug("entities list is null for vclass " + vclass.getURI());
+            log.debug("entities list is null for vclass " + vclassURI );                        
         
-
-        VClassGroup classGroup=vclass.getGroup();
-        if (classGroup==null) {
-            request.setAttribute("title",vclass.getName()/* + "&nbsp;("+vclass.getEntityCount()+")"*/);
-        } else {
-            request.setAttribute("title",classGroup.getPublicName());
-            request.setAttribute("subTitle",vclass.getName()/* + "&nbsp;("+vclass.getEntityCount()+")"*/);
-        }
-        
-        //FINALLY: send off to the BASIC_JSP to get turned into html
-        request.setAttribute("bodyJsp",Controllers.ENTITY_LIST_JSP);
-        RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
-
-        // use this for more direct debugging: RequestDispatcher rd = request.getRequestDispatcher(Controllers.ENTITY_LIST_JSP);
-        res.setContentType("text/html; charset=UTF-8");
-        request.setAttribute("pageTime", System.currentTimeMillis()-startTime);
-        rd.include(request,res);
+        return rvMap;
     }
-
-    private int getPage(VitroRequest request) {
-        String pageStr = request.getParameter("page");
-        if( pageStr != null ){
-            try{
-                return Integer.parseInt(pageStr);                
-            }catch(NumberFormatException nfe){
-                log.debug("could not parse page parameter");
-                return 1;
-            }                
-        }else{                   
-            return 1;
-        }
-    }
-
-    private BooleanQuery getQuery(String vclassUri,  String alpha , boolean isSinglePortal, int portalId){
+    
+    private static BooleanQuery getQuery(String vclassUri,  String alpha , boolean isSinglePortal, int portalId){
         BooleanQuery query = new BooleanQuery();
         try{      
            //query term for rdf:type
@@ -259,7 +275,24 @@ public class EntityListController extends VitroHttpServlet {
            return new BooleanQuery();        
        }        
     }    
-    
+
+    public static int getPageParameter(VitroRequest request) {
+        String pageStr = request.getParameter("page");
+        if( pageStr != null ){
+            try{
+                return Integer.parseInt(pageStr);                
+            }catch(NumberFormatException nfe){
+                log.debug("could not parse page parameter");
+                return 1;
+            }                
+        }else{                   
+            return 1;
+        }
+    }
+
+    public static String getAlphaParamter(VitroRequest request){
+        return request.getParameter("alpha");
+    }
     
     private void doHelp(HttpServletResponse res)
     throws IOException, ServletException {

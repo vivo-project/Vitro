@@ -4,7 +4,7 @@
 
 <#import "lib-list.ftl" as l>
 
-<div class="contents">
+<div class="contents">   
     <div class="individualList">
         <h2>${title}</h2>
         <#if subtitle??>
@@ -14,6 +14,17 @@
         <#if message??>
             <p>${message}</p>
         <#else>
+        
+            <#if pages?? >
+                <div>
+                pages          
+                <#list pages as page>                                                            
+                    <a href="${urls.base}/individuallist?${page.param}&vclassId=${vclassId?url}">${page.text}</a>
+                    <#if page.selected> selected </#if>                                                                                     
+                </#list>   
+                </div>
+            </#if>
+        
             <ul>
                 <#list individuals as individual>                   
                     <li>
@@ -26,14 +37,30 @@
                         <ul class="individualData">
                             <@l.firstLastList>
                                 <#if individual.moniker??><li>${individual.moniker}</li></#if>
+                                
                                 <#list individual.links as link>
-                                    <li><a class="externalLink" href="${link.url}">${link.anchor}</a></li>           
+                                    <#if link?? && link.url?? && link.anchor?? >
+                                    <li><a class="externalLink" href="${link.url}">${link.anchor}</a></li>
+                                    </#if>           
                                 </#list>
                             </@l.firstLastList>
                         </ul>           
                     </li>
                 </#list>
             </ul>
+            
+            <#if pages?? >
+                <div>
+                pages          
+                <#list pages as page>                                                            
+                    <a href="${urls.base}/individuallist?${page.param}&vclassId=${vclassId?url}">${page.text}</a> 
+                    <#if page.selected> selected </#if>                                                                                    
+                </#list>   
+                </div>
+            </#if>
         </#if>
-    </div>   
+        
+                     
+    </div>
+       
 </div>

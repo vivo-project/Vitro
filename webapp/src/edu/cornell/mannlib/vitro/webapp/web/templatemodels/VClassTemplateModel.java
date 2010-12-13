@@ -36,4 +36,7 @@ public class VClassTemplateModel extends BaseTemplateModel {
         return vclass.getEntityCount();
     }
 
+    public VClassGroupTemplateModel getGroup(){
+        return new VClassGroupTemplateModel(vclass.getGroup());
+    }
 }

@@ -13,13 +13,16 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
+import edu.cornell.mannlib.vitro.webapp.controller.EntityListController;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.TabEntitiesController.PageRecord;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ExceptionResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModel;
-import freemarker.template.Configuration;
+import freemarker.ext.beans.BeansWrapper;
+import freemarker.template.TemplateModel;
 
 /** 
  * Generates a list of individuals for display in a template 
@@ -63,16 +66,33 @@ public class IndividualListController extends FreemarkerHttpServlet {
                         + VClass.class.getName() + ".");
             }
             
+            body.put("vclassId", vclass.getURI());
+            
             if (vclass != null) {
-                // Create list of individual view objects
-                List<Individual> individualList = vreq.getWebappDaoFactory().getIndividualDao().getIndividualsByVClass(vclass);
+                String alpha = EntityListController.getAlphaParamter(vreq);
+                int page = EntityListController.getPageParameter(vreq);
+                Map<String,Object> map = EntityListController.getResultsForVClass(
+                        vclass.getURI(), 
+                        page, 
+                        alpha, 
+                        vreq.getPortal(), 
+                        vreq.getWebappDaoFactory().getPortalDao().isSinglePortal(), 
+                        vreq.getWebappDaoFactory().getIndividualDao(), 
+                        getServletContext());                                
+                body.putAll(map);
 
-                if (individualList == null) {
-                    // RY Is this really an error? 
-                    log.error("individuals list is null");
-                    message = "No individuals to display.";
-                } else {            
-                    body.put("individuals", IndividualTemplateModel.getIndividualTemplateModelList(individualList, vreq));
+                List<Individual> inds = (List<Individual>)map.get("entities");
+                List<IndividualTemplateModel> indsTm = new ArrayList<IndividualTemplateModel>();
+                for(Individual ind : inds ){
+                    indsTm.add(new IndividualTemplateModel(ind,vreq));
+                }
+                body.put("individuals", indsTm);
+                
+                List<TemplateModel> wpages = new ArrayList<TemplateModel>();
+                List<PageRecord> pages = (List<PageRecord>)body.get("pages");
+                BeansWrapper wrapper = new BeansWrapper();
+                for( PageRecord pr: pages ){
+                    wpages.add( wrapper.wrap(pr) );
                 }
 
                 // Set title and subtitle. Title will be retrieved later in getTitle().   

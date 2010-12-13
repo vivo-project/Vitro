@@ -4,7 +4,6 @@
 package edu.cornell.mannlib.vitro.webapp.controller;
 
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -40,6 +39,7 @@ import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneIndexFactory;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneIndexer;
 import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
 import edu.cornell.mannlib.vitro.webapp.web.TabWebUtil;
+import freemarker.template.TemplateModel;
 
 /**
  * Produces the entity lists for tabs.
@@ -564,7 +564,7 @@ public void doGet( HttpServletRequest req, HttpServletResponse response )
         return records;
     }
     
-    public static class PageRecord {
+    public static class PageRecord  {
         public PageRecord(String param, String index, String text, boolean selected) {            
             this.param = param;
             this.index = index;
