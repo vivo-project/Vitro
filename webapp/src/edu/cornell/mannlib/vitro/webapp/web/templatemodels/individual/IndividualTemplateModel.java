@@ -40,36 +40,9 @@ public class IndividualTemplateModel extends BaseTemplateModel {
     }
     
     /* These methods perform some manipulation of the data returned by the Individual methods */
-// RY Individiual.getMoniker() was already trying to do this, but due to errors in the code it was not.
-// That's fixed now.
-//    public String getTagline() {
-//        String tagline = individual.getMoniker();
-//        return StringUtils.isEmpty(tagline) ? individual.getVClass().getName() : tagline;
-//    }
     
     public String getProfileUrl() {
-        String profileUrl = null;
-        String individualUri = individual.getURI();
-        
-        URI uri = new URIImpl(individualUri);
-        String namespace = uri.getNamespace();
-        WebappDaoFactory wadf = vreq.getWebappDaoFactory();
-        String defaultNamespace = wadf.getDefaultNamespace();
-                
-        if (defaultNamespace.equals(namespace)) {
-            profileUrl = getUrl(PATH + "/" + individual.getLocalName());
-        } else {
-            List<String> externallyLinkedNamespaces = wadf.getApplicationDao().getExternallyLinkedNamespaces();
-            if (externallyLinkedNamespaces.contains(namespace)) {
-                log.debug("Found externally linked namespace " + namespace);
-                profileUrl = namespace + "/" + individual.getLocalName();
-            } else {
-                ParamMap params = new ParamMap("uri", individualUri);
-                profileUrl = getUrl("/individual", params);
-            }
-        }
-        
-        return profileUrl;
+        return UrlBuilder.getIndividualProfileUrl(individual, vreq.getWebappDaoFactory());
     }
     
     public String getVisualizationUrl() {

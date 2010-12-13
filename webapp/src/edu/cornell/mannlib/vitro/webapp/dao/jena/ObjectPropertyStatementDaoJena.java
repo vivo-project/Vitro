@@ -4,8 +4,12 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.query.Query;
@@ -15,7 +19,9 @@ import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.QuerySolutionMap;
 import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
@@ -32,6 +38,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.event.IndividualUpdateEvent;
 
 public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements ObjectPropertyStatementDao {
 
+    protected static final Log log = LogFactory.getLog(ObjectPropertyStatementDaoJena.class);
+    
     public ObjectPropertyStatementDaoJena(WebappDaoFactoryJena wadf) {
         super(wadf);
     }
@@ -237,9 +245,13 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
 
     @Override
     /*
-     * SPARQL-based method for getting the individual's values for a single data property.
+     * SPARQL-based method for getting values related to a single object property.
+     * We cannot return a List<ObjectPropertyStatement> here, the way the corresponding method of
+     * DataPropertyStatementDaoJena returns a List<DataPropertyStatement>. We need to accomodate
+     * custom queries that could request any data in addition to just the object of the statement.
+     * However, we do need to get the object of the statement so that we have it to create editing links.
      */
-    public List<ObjectPropertyStatement> getObjectPropertyStatementsForIndividualByProperty(Individual subject, ObjectProperty property, String queryString) {  
+    public List<Map<String, Object>> getObjectPropertyStatementsForIndividualByProperty(String subjectUri, String propertyUri, String queryString) {  
         
         log.debug("Object property query string: " + queryString);
         
@@ -250,9 +262,6 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
             log.error("could not create SPARQL query for query string " + th.getMessage());
             log.error(queryString);
         } 
-        
-        String subjectUri = subject.getURI();
-        String propertyUri = property.getURI();
 
         QuerySolutionMap bindings = new QuerySolutionMap();
         bindings.add("subject", ResourceFactory.createResource(subjectUri));
@@ -260,15 +269,44 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
 
         // Run the SPARQL query to get the properties        
         QueryExecution qexec = QueryExecutionFactory.create(query, getOntModelSelector().getFullModel(), bindings);
-        ResultSet results = qexec.execSelect(); 
-
-        List<ObjectPropertyStatement> statements = new ArrayList<ObjectPropertyStatement>();
+        return executeQueryToObjectValueCollection(qexec);
+    }
+    
+    protected List<Map<String, Object>> executeQueryToObjectValueCollection(
+            QueryExecution qexec) {
+        List<Map<String, Object>> rv = new ArrayList<Map<String, Object>>();
+        ResultSet results = qexec.execSelect();
         while (results.hasNext()) {
-            QuerySolution sol = results.next();
-            Resource resource = sol.getResource("object");
-            ObjectPropertyStatement ops = new ObjectPropertyStatementImpl(subjectUri, propertyUri, resource.getURI());
-            statements.add(ops);
+            QuerySolution soln = results.nextSolution();
+            rv.add(querySolutionToObjectValueMap(soln));
         }
-        return statements;  
+        return rv;
+    }
+    
+    protected Map<String,Object> querySolutionToObjectValueMap( QuerySolution soln){
+        Map<String,Object> map = new HashMap<String,Object>();
+        Iterator<String> varNames = soln.varNames();
+        while(varNames.hasNext()){
+            String varName = varNames.next();
+            map.put(varName, nodeToObject( soln.get(varName)));
+        }
+        return map;
+    }
+    
+    protected Object nodeToObject( RDFNode node ){
+        if( node == null ){
+            return "";
+        }else if( node.isLiteral() ){
+            Literal literal = node.asLiteral();
+            return literal.getValue();
+        }else if( node.isURIResource() ){
+            Resource resource = node.asResource();
+            return getWebappDaoFactory().getIndividualDao().getIndividualByURI(resource.getURI());
+        }else if( node.isAnon() ){  
+            Resource resource = node.asResource();
+            return resource.getId().getLabelString(); //get b-node id
+        }else{
+            return "";
+        }
     }
 }

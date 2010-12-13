@@ -6,12 +6,19 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openrdf.model.URI;
+import org.openrdf.model.impl.URIImpl;
 
+import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.filters.PortalPickerFilter;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 
@@ -235,6 +242,31 @@ public class UrlBuilder {
     
     public static String getPath(Route route, ParamMap params) {
         return getPath(route.path(), params);
+    }
+    
+    public static String getIndividualProfileUrl(Individual individual, WebappDaoFactory wadf) {
+        String profileUrl = null;
+        String individualUri = individual.getURI();
+        URI uri = new URIImpl(individualUri);
+        String namespace = uri.getNamespace();
+        String defaultNamespace = wadf.getDefaultNamespace();
+
+        String localName = individual.getLocalName();
+                
+        if (defaultNamespace.equals(namespace)) {
+            profileUrl = getUrl(Route.INDIVIDUAL.path() + "/" + localName);
+        } else {
+            List<String> externallyLinkedNamespaces = wadf.getApplicationDao().getExternallyLinkedNamespaces();
+            if (externallyLinkedNamespaces.contains(namespace)) {
+                log.debug("Found externally linked namespace " + namespace);
+                profileUrl = namespace + "/" + localName;
+            } else {
+                ParamMap params = new ParamMap("uri", individualUri);
+                profileUrl = getUrl("/individual", params);
+            }
+        }
+        
+        return profileUrl;        
     }
 
     public static String urlEncode(String url) {

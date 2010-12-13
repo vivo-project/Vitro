@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
 import java.io.File;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;

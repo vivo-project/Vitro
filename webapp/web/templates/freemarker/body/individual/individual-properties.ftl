@@ -2,8 +2,6 @@
 
 <#-- Template for property listing on individual profile page -->
 
-<#assign propertyGroups = individual.propertyList>
-
 <#list propertyGroups as group>
 
     <#-- Get the group name -->
@@ -42,9 +40,10 @@
                         </#list>
                         
                     <#else> <#-- object property -->      
-                        <p>Collated? ${property.collatedBySubclass?string("yes", "no")}</p>
-                        <#if ! property.collatedBySubclass> <#-- temporary, till we handle collated props -->
+                        <#if ! property.collatedBySubclass> 
                             <#include "${property.template}">
+                        <#else>
+                            <#include "objectPropertyList-collated.ftl">
                         </#if>
                     </#if>                   
                 </div> <!-- end property -->               

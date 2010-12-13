@@ -4,6 +4,6 @@
 
 <#list property.statements as statement>
     <div class="obj-prop-stmt-obj">
-        statement ${statement_index +1}
+       <a href="${statement.object.url}">${statement.object.name}</a> ${statement.object.moniker!} 
     </div> <!-- end obj-prop-stmt-obj -->
 </#list>

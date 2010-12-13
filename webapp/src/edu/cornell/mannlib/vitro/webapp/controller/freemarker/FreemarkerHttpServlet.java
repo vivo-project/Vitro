@@ -204,11 +204,6 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         writePage(root, config, vreq, response);       
     }
     
-    private void processSetupTemplate(Configuration config, HttpServletRequest request, Map<String, Object> map) {
-        TemplateProcessingHelper helper = new TemplateProcessingHelper(config, request, getServletContext());
-        helper.processTemplate(Template.SETUP.toString(), map);
-    }
-    
     protected void doRedirect(HttpServletRequest request, HttpServletResponse response, ResponseValues values) 
         throws ServletException, IOException { 
         String redirectUrl = values.getRedirectUrl();
@@ -331,12 +326,20 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         return urls;
     }
     
+    protected BeansWrapper getNonDefaultBeansWrapper(int exposureLevel) {
+        BeansWrapper wrapper = new DefaultObjectWrapper();
+        // Too bad exposure levels are ints instead of enum values; what happens if 
+        // we send an int that's not a defined exposure level?
+        wrapper.setExposureLevel(exposureLevel);
+        return wrapper;
+    }
+    
     private TemplateModel getStylesheetList(String themeDir) {
         
         // For script and stylesheet lists, use an object wrapper that exposes write methods, 
         // instead of the configuration's object wrapper, which doesn't. The templates can
         // add stylesheets and scripts to the lists by calling their add() methods.
-        BeansWrapper wrapper = new DefaultObjectWrapper();
+        BeansWrapper wrapper = getNonDefaultBeansWrapper(BeansWrapper.EXPOSE_SAFE);
         try {
             // Here themeDir SHOULD NOT have the context path already added to it.
             return wrapper.wrap(new Stylesheets(themeDir));       
@@ -351,7 +354,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         // For script and stylesheet lists, use an object wrapper that exposes write methods, 
         // instead of the configuration's object wrapper, which doesn't. The templates can
         // add stylesheets and scripts to the lists by calling their add() methods.
-        BeansWrapper wrapper = new DefaultObjectWrapper();
+        BeansWrapper wrapper = getNonDefaultBeansWrapper(BeansWrapper.EXPOSE_SAFE);
         try {
             return wrapper.wrap(new Scripts(themeDir));       
         } catch (TemplateModelException e) {

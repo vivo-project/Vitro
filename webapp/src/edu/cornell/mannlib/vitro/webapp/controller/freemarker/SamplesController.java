@@ -89,6 +89,8 @@ public class SamplesController extends FreemarkerHttpServlet {
         body.put("bookTitle", "Pride and Prejudice");
         body.put("bookTitle", "Persuasion");
         
+        body.put("year", "2001");
+        
         body.put("title", "Freemarker Samples");
         
         return new TemplateResponseValues(TEMPLATE_DEFAULT, body);

@@ -46,6 +46,8 @@
 
 <p><strong>Berries: </strong>${berries}</p>
 
+<p>${year?number?c}</p>
+
 <@dump var="now" />
 <@dump var="urls" />
 <@dump var="fruit" />

@@ -58,6 +58,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapperFactory;
 import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 import edu.cornell.mannlib.vitro.webapp.web.jsptags.StringProcessorTag;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModel;
+import freemarker.ext.beans.BeansWrapper;
 
 /**
  * Handles requests for entity information.
@@ -118,8 +119,14 @@ public class IndividualController extends FreemarkerHttpServlet {
             
     		body.put("relatedSubject", getRelatedSubject(vreq));
     		
-    		IndividualTemplateModel ind = getIndividualTemplateModel(vreq, individual); 
-	        body.put("individual", ind); 
+    		IndividualTemplateModel ind = getIndividualTemplateModel(vreq, individual);
+    		/* We need to expose non-getters in displaying the individual's property list, 
+    		 * since it requires calls to methods with parameters.
+    		 * This is still safe, because we are only putting BaseTemplateModel objects
+    		 * into the data model. No real data can be modified. 
+    		 * RY Not sure this will be needed; postpone.
+    		 */
+	        body.put("individual", ind); //getNonDefaultBeansWrapper(BeansWrapper.EXPOSE_SAFE).wrap(ind));
 	        
 	        String template = getIndividualTemplate(individual);
 	                
