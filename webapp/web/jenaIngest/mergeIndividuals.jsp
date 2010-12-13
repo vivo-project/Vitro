@@ -17,9 +17,9 @@
 <script type="text/javascript" src="js/jquery.js"></script>
 <script type="text/javascript" src="js/jenaIngest/ingestUtils.js"></script>
 
-<p><a href="ingest">Ingest Home</a></p>
+<h2><a href="ingest">Ingest Home</a></h2>
 
-<h2>Merge Individuals</h2>
+<h3>Merge Individuals</h3>
 
 <p>This tool allows two individuals with different URIs to be collapsed into a 
    single URI.  Any statements using the "duplicate individual URI" will be 

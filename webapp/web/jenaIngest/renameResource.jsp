@@ -10,9 +10,9 @@
 <script type="text/javascript" src="js/jquery.js"></script>
 <script type="text/javascript" src="js/jenaIngest/ingestUtils.js"></script>
 
-<p><a href="ingest">Ingest Home</a></p>
+<h2><a href="ingest">Ingest Home</a></h2>
 
-<h2>Change Namespace of Resources</h2>
+<h3>Change Namespace of Resources</h3>
 
 <p>This tool will change all resources in the supplied "old namespace" 
 to be in the "new namespace."  Additionally, the local names will be updated

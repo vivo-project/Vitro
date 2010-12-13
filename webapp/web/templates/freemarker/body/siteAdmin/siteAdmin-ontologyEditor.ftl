@@ -37,7 +37,7 @@
         <form id="${formId}" action="${ontologyEditor.verbosePropertyForm.action}#${formId}" method="get">
             <input type="hidden" name="verbose" value="${ontologyEditor.verbosePropertyForm.verboseFieldValue}" />
             <span>Verbose property display for this session is <b>${ontologyEditor.verbosePropertyForm.currentValue}</b>.</span>
-            <input type="submit" value="Turn ${ontologyEditor.verbosePropertyForm.newValue}" />
+            <input type="submit" id="submit" value="Turn ${ontologyEditor.verbosePropertyForm.newValue}" />
         </form>  
          
     </div>                       

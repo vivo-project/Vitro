@@ -26,9 +26,9 @@ function init(){
     }
 %>
 
-    <p><a href="ingest">Ingest Home</a></p>
+    <h2><a href="ingest">Ingest Home</a></h2>
 
-    <h2>Available Jena Models</h2>
+    <h3>Available Jena Models</h3>
     <table>
     <tr>
     <td>

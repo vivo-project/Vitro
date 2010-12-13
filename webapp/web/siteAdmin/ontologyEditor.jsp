@@ -50,7 +50,7 @@
             <form id="verbosePropertyForm" action="${Controllers.SITE_ADMIN}#verbosePropertyForm" method="get">
                 <input type="hidden" name="verbose" value="${!verbosePropertyListing}" />
                 <span>Verbose property display for this session is <b>${verbosePropertyListing == true ? 'on' : 'off'}</b>.</span>
-                <input type="submit" value="Turn ${verbosePropertyListing == true ? 'off' : 'on'}" />
+                <input type="submit" id="submit" value="Turn ${verbosePropertyListing == true ? 'off' : 'on'}" />
             </form>   
 
     </div>               

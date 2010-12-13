@@ -334,3 +334,11 @@ span.entityRelationsSpan {
     display: none;
     height: 0;
 }
+.notice{ 
+    padding: .8em; 
+    margin-bottom: 1em; 
+    border: 1px solid #ddd;
+    display: block;
+    background: #FFF6BF; 
+    color: #7F7034;
+}

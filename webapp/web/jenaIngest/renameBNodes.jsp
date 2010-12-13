@@ -17,9 +17,9 @@
 
 %>
 
-    <p><a href="ingest">Ingest Home</a></p>
+    <h2><a href="ingest">Ingest Home</a></h2>
 
-    <h2>Convert Blank Nodes to Named Resources</h2>
+    <h3>Convert Blank Nodes to Named Resources</h3>
 
     <form action="ingest" method="get"i>
         <input type="hidden" name="action" value="renameBNodes"/>

@@ -26,7 +26,7 @@
 <%@page import="java.util.ArrayList"%><h2>Execute SPARQL CONSTRUCT
 Query</h2>
 
-<p><a href="ingest">Ingest Home</a></p>
+<h2><a href="ingest">Ingest Home</a></h2>
 
 <c:if test="${requestScope.constructedStmtCount != null}">
 	<h3 class="notice">${requestScope.constructedStmtCount} statements

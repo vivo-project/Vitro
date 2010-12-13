@@ -14,7 +14,7 @@
 
 %>
 
-    <p><a href="ingest">Ingest Home</a></p>
+    <h3><a href="ingest">Ingest Home</a></h3>
     
 
     <form action="jenaXmlFileUpload" method="post" enctype="multipart/form-data">
