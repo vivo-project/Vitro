@@ -512,7 +512,8 @@ public class JenaIngestController extends BaseEditController {
 			  request.setAttribute("bodyJsp",PERMANENT_URI);
 			  }
 			  else if(oldModel!=null){
-				  doPermanentURI(oldModel,newModel,oldNamespace,newNamespace,dNamespace,maker,vreq);
+				  JenaIngestUtils utils = new JenaIngestUtils();
+				  utils.doPermanentURI(oldModel,newModel,oldNamespace,newNamespace,dNamespace,maker,vreq);
 				  request.setAttribute("title","Ingest Menu");
 				  request.setAttribute("bodyJsp",INGEST_MENU_JSP);
 			  }
@@ -523,7 +524,14 @@ public class JenaIngestController extends BaseEditController {
 			  String uri1 = vreq.getParameter("uri1");
 			  String uri2 = vreq.getParameter("uri2");
 			  if(uri1!=null){
-				  String result = doMerge(uri1,uri2,response,request);
+				  JenaIngestUtils utils = new JenaIngestUtils();
+				  OntModel baseOntModel = (OntModel) getServletContext().getAttribute("baseOntModel");
+					OntModel ontModel = (OntModel)
+					getServletContext().getAttribute("jenaOntModel");
+					OntModel infOntModel = (OntModel)
+					getServletContext().getAttribute(JenaBaseDao.INFERENCE_ONT_MODEL_ATTRIBUTE_NAME);
+				  String result = utils.doMerge(uri1,uri2,baseOntModel,ontModel,infOntModel);
+				  request.getSession().setAttribute("leftoverModel", utils.getLeftOverModel());
 				  request.setAttribute("result",result);
 				  request.setAttribute("title","Merge Individuals");
 				  request.setAttribute("bodyJsp",MERGE_RESULT);
@@ -1032,196 +1040,8 @@ public class JenaIngestController extends BaseEditController {
 		new JenaIngestWorkflowProcessor(jenaOntModel.getIndividual(workflowURI),getVitroJenaModelMaker(vreq)).run(jenaOntModel.getIndividual(workflowStepURI));
 	}
 
-	private void doPermanentURI(String oldModel,String newModel,String oldNamespace,
-			String newNamespace,String dNamespace,ModelMaker maker,VitroRequest vreq){
-			
-			
-		    WebappDaoFactory wdf = vreq.getFullWebappDaoFactory();
-			Model m = maker.getModel(oldModel);
-			Model saveModel = maker.getModel(newModel);
-			Model tempModel = ModelFactory.createDefaultModel();
-			ResIterator rsItr = null;
-			ArrayList<String> urlCheck = new ArrayList<String>();
-			String changeNamespace = null;
-			boolean urlFound = false;
-			if(!oldModel.equals(newModel)){
-				StmtIterator stmtItr = m.listStatements();
-				while(stmtItr.hasNext()){
-					Statement stmt = stmtItr.nextStatement();
-					tempModel.add(stmt);
-				}
-				rsItr = tempModel.listResourcesWithProperty((Property)null);
-			}
-			else{
-				rsItr = m.listResourcesWithProperty((Property)null); 
-			}
-			
-			String uri = null;  
-			while(rsItr.hasNext()){
-				Resource res = rsItr.next();
-				if(oldNamespace.equals(res.getNameSpace())){
-					if(!newNamespace.equals("")){
-						do{
-						uri = getUnusedURI(newNamespace,wdf);
-						if(!urlCheck.contains(uri)){
-				    		 urlCheck.add(uri);
-				    		 urlFound = true;
-				    		 }
-				    		 }while(!urlFound);
-				    		 urlFound = false;
-					}
-					else if(dNamespace.equals(vreq.getFullWebappDaoFactory().getDefaultNamespace())){
-						try{
-				    		 do{
-				    			 uri = wdf.getIndividualDao().getUnusedURI(null);
-				    		 if(!urlCheck.contains(uri)){
-				    		 urlCheck.add(uri);
-				    		 urlFound = true;
-				    		 }
-				    		 }while(!urlFound);
-				    		 urlFound = false;
-				        }catch(InsertException ex){
-				        	log.error("could not create uri");
-				        }     	  
-					}
-					ResourceUtils.renameResource(res, uri);					
-				}
-				
-			}
-			boolean statementDone = false;
-			if(!newNamespace.equals("")){
-				changeNamespace = newNamespace;
-			}
-			else if(dNamespace.equals(vreq.getFullWebappDaoFactory().getDefaultNamespace())){
-				changeNamespace = dNamespace;
-			}
-			if(!oldModel.equals(newModel)){
-			StmtIterator stmtItr = tempModel.listStatements();
-			while(stmtItr.hasNext()){
-				statementDone = false;
-				Statement stmt = stmtItr.nextStatement();
-				Resource sRes = stmt.getSubject();
-				Resource oRes = null;
-				if(sRes.getNameSpace().equals(changeNamespace)){
-					saveModel.add(stmt);
-					statementDone = true;
-					}
-				try{
-					oRes = (Resource)stmt.getObject();
-					if(oRes.getNameSpace().equals(changeNamespace) && !statementDone){
-						saveModel.add(stmt);
-						statementDone = true;
-						}	
-				}
-				catch(Exception e){
-					continue;
-				}
-				}
-				
-			}
-			}	
-	private String getUnusedURI(String newNamespace,WebappDaoFactory wdf){
-		String uri = null;
-		String errMsg = null;
-		Random random = new Random();
-		boolean uriIsGood = false;
-        int attempts = 0;
-		
-        while( uriIsGood == false && attempts < 30 ){			
-        	uri = newNamespace + "n" + random.nextInt( Math.min(Integer.MAX_VALUE,(int)Math.pow(2,attempts + 13)) );			
-        	errMsg = wdf.checkURI(uri);
-			if(  errMsg != null)
-				uri = null;
-			else
-				uriIsGood = true;				
-			attempts++;
-		}   
-        
-		return uri;
-	}
-	private String doMerge(String uri1, String uri2,HttpServletResponse response,HttpServletRequest request){
-		OntModel baseOntModel = (OntModel) getServletContext().getAttribute("baseOntModel");
-		OntModel ontModel = (OntModel)
-		getServletContext().getAttribute("jenaOntModel");
-		OntModel infOntModel = (OntModel)
-		getServletContext().getAttribute(JenaBaseDao.INFERENCE_ONT_MODEL_ATTRIBUTE_NAME);
-		boolean functionalPresent = false;
-		Resource res1 = baseOntModel.getResource(uri1);
-		Resource res2 = baseOntModel.getResource(uri2);
-		String result = null;
-		baseOntModel.enterCriticalSection(Lock.WRITE);
-		
-		StmtIterator stmtItr1 = baseOntModel.listStatements(res1,(Property)null,(RDFNode)null);
-		StmtIterator stmtItr2 = baseOntModel.listStatements(res2,(Property)null,(RDFNode)null);
-		StmtIterator stmtItr3 = baseOntModel.listStatements((Resource)null,(Property)null,(RDFNode)res2);
-		
-		if(!stmtItr1.hasNext()){
-			result = "resource 1 not present";
-			res1.removeAll((Property)null);
-			baseOntModel.leaveCriticalSection();
-			return result;
-		}
-		else if(!stmtItr2.hasNext()){
-			result = "resource 2 not present";
-			res2.removeAll((Property)null);
-			baseOntModel.leaveCriticalSection();
-			return result;
-		}
-		int counter = 0;
-		Model leftoverModel = ModelFactory.createDefaultModel();
-		ontModel.enterCriticalSection(Lock.WRITE);
-		infOntModel.enterCriticalSection(Lock.WRITE);
-		try{
-		
-		while(stmtItr2.hasNext()){
-		
-			Statement stmt = stmtItr2.next();
-			Property prop = stmt.getPredicate();
-			OntProperty oprop = baseOntModel.getOntProperty(prop.getURI());
-		    if(oprop!=null && oprop.isFunctionalProperty()){
-		    	leftoverModel.add(res2,stmt.getPredicate(),stmt.getObject());
-		    	functionalPresent = true;
-		    }
-		    else{
-		    baseOntModel.add(res1,stmt.getPredicate(),stmt.getObject()); 
-		    ontModel.add(res1,stmt.getPredicate(),stmt.getObject());
-		    infOntModel.add(res1,stmt.getPredicate(),stmt.getObject());
-		    counter++;
-		    }
-		}
-		  
-		while(stmtItr3.hasNext()){
-			Statement stmt = stmtItr3.nextStatement();
-			Resource sRes = stmt.getSubject();
-			Property sProp = stmt.getPredicate();
-			baseOntModel.add(sRes,sProp,res1);
-			ontModel.add(sRes,sProp,res1);
-			infOntModel.add(sRes,sProp,res1);
-		}
-		Resource ontRes = ontModel.getResource(res2.getURI());
-		Resource infRes = infOntModel.getResource(res2.getURI());
-		baseOntModel.removeAll((Resource)null,(Property)null,(RDFNode)res2);
-		ontModel.removeAll((Resource)null,(Property)null,(RDFNode)res2);
-		infOntModel.removeAll((Resource)null,(Property)null,(RDFNode)res2);
-		res2.removeAll((Property)null);
-		ontRes.removeAll((Property)null);
-		infRes.removeAll((Property)null);
-		}
-		finally{
-	    baseOntModel.leaveCriticalSection();
-	    infOntModel.leaveCriticalSection();
-		ontModel.leaveCriticalSection();
-		}
-		request.getSession().setAttribute("leftoverModel", leftoverModel);
-		if(counter>0 && functionalPresent)
-		result = "merged " + counter + " statements. Some statements could not be merged.";
-		else if(counter>0 && !functionalPresent)
-		result = "merged " + counter + " statements.";	
-		else if(counter==0)
-		result = "No statements merged";
-		return result;
-			
-	}
+	
+	
 private String doRename(String oldNamespace,String newNamespace,HttpServletResponse response){
 		
 		String userURI = null;
