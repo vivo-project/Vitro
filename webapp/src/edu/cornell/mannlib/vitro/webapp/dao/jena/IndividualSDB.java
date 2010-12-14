@@ -24,6 +24,7 @@ import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.ontology.OntResource;
 import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
@@ -668,42 +669,37 @@ public class IndividualSDB extends IndividualImpl implements Individual {
 
     private void doUrlAndAnchor() { 
         Model tempModel = ModelFactory.createDefaultModel();
-        OntModel ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+        OntModel ontModel = ModelFactory.createOntologyModel(
+                OntModelSpec.OWL_MEM);
         DatasetWrapper w = getDatasetWrapper();
         Dataset dataset = w.getDataset();
     	dataset.getLock().enterCriticalSection(Lock.READ);
         try {
-            if (webappDaoFactory.getJenaBaseDao().PRIMARY_LINK != null) {
-            	String listPropertyValues =
-            		"SELECT ?values" +
-            		"WHERE{ GRAPH ?g { <" + this.individualURI + "> <" + webappDaoFactory.getJenaBaseDao().PRIMARY_LINK + "> ?values} }";
-            	ResultSet links = QueryExecutionFactory.create(QueryFactory.create(listPropertyValues), dataset).execSelect();
-            	QuerySolution result = null;
-                if (links.hasNext()) { 
-                	result = links.next();
-                    try {
-                        com.hp.hpl.jena.ontology.Individual linkInd = ((com.hp.hpl.jena.ontology.Individual)((Resource)result.get("values")).as(com.hp.hpl.jena.ontology.Individual.class));
-                        if (webappDaoFactory.getJenaBaseDao().LINK_ANCHOR != null) {
-                            try {
-                                Literal l = (Literal) linkInd.getPropertyValue(webappDaoFactory.getJenaBaseDao().LINK_ANCHOR);
-                                if (l != null) {
-                                    anchor = l.getString();
-                                }
-                            } catch (ClassCastException e) {}
-                        }
-                        if (webappDaoFactory.getJenaBaseDao().LINK_URL != null) {
-                            try {
-                                Literal l = (Literal) linkInd.getPropertyValue(webappDaoFactory.getJenaBaseDao().LINK_URL);
-                                if (l != null) {
-                                    try {
-                                        url = URLDecoder.decode(l.getString(), "UTF-8");
-                                    } catch (UnsupportedEncodingException use) {}
-                                }
-                            } catch (ClassCastException e) {}
-                        }
-                    } catch (ClassCastException cce) {}
-                }
-            }
+        	StringBuffer selectPrimaryLinkQueryBuff = new StringBuffer().append(
+        		"SELECT ?url ?anchor \n" ).append(
+        		"WHERE{ GRAPH ?g { \n " ).append(
+        		"    <" + this.individualURI + "> ").append(
+        		             "<" + VitroVocabulary.PRIMARY_LINK + "> " ).append(
+        		                     "?link . \n").append(
+        		"    ?link <" + VitroVocabulary.LINK_URL + "> ?url . \n" 
+        		        ).append(
+        		"    ?link <" + VitroVocabulary.LINK_ANCHOR + "> ?anchor . \n" 
+        		        ).append(
+        		"} }");
+        	QueryExecution qexec = QueryExecutionFactory.create(
+                    QueryFactory.create(selectPrimaryLinkQueryBuff.toString())
+                            , dataset);
+        	try {
+        	    ResultSet linkResults = qexec.execSelect();
+        	    if (linkResults.hasNext()) {
+        	        QuerySolution solution = linkResults.next();
+        	        this.setUrl(solution.getLiteral("url").getLexicalForm());
+        	        this.setAnchor(solution.getLiteral("anchor")
+        	                .getLexicalForm());
+        	    }
+        	} finally {
+        	    qexec.close();
+        	}            
         } finally {
         	tempModel.close();
         	ontModel.close();
