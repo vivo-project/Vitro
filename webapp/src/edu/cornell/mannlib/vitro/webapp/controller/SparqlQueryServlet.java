@@ -163,7 +163,7 @@ public class SparqlQueryServlet extends BaseEditController {
     
 	private Map<String, Model> getModelsFromRequest(HttpServletRequest request) {
 		String modelNames[] = request.getParameterValues("sourceModelName");
-		if ((modelNames != null) && (modelNames.length > 0)) {
+		if ((modelNames == null) || (modelNames.length > 0)) {
 			return Collections.emptyMap();
 		}
 
