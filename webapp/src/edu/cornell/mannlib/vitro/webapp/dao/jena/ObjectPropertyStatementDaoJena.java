@@ -298,9 +298,12 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
             return "";
         }else if( node.isLiteral() ){
             Literal literal = node.asLiteral();
-            return literal.getValue();
+            //return literal.getValue();
+            return literal.getLexicalForm();
         }else if( node.isURIResource() ){
             Resource resource = node.asResource();
+            // See notes in ObjectPropertyStatementTemplateModel about why we are returning the individual
+            // here instead of just the URI.
             return getWebappDaoFactory().getIndividualDao().getIndividualByURI(resource.getURI());
         }else if( node.isAnon() ){  
             Resource resource = node.asResource();
