@@ -859,7 +859,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
     }
     
     @Override
-    public String getCustomShortView() {
+    public String getCustomListView() {
         //return getPropertyStringValue(, PROPERTY_CUSTOM_LIST_VIEW_ANNOT);  
         return null;
     }

@@ -28,6 +28,14 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
     CollatedObjectPropertyTemplateModel(ObjectProperty op, Individual subject, WebappDaoFactory wdf) throws Exception {
         super(op, subject, wdf); 
 
+        /* Change the approach to collation:
+         * Custom views can get the subclasses in the query. Must use a term ?subclass - throw error if not.
+         * Default view: we may be able to figure out the  class to get subclasses of by inspecting the property.
+         * If not, use getDirectClasses etc of the object term.
+         * We need a subclassed and nonsubclassed default query for the default view: collated-query and uncollated-query.
+         * We can also use these for custom views. Throw error if property is collated but there's no subclass term
+         * in the query. (The reverse is okay - uncollated property with a subclass term in the query.     
+         */
         String collationTargetError = getCollationTargetError();
         if ( ! collationTargetError.isEmpty()) {
             String errorMessage = "Collation target error for collated object property " + getName() + ": " + 
