@@ -147,7 +147,7 @@ public class JenaCsv2RdfController extends BaseEditController{
 			Model[] models = null;
 			
 			try {
-				 models = c2r.convertToRdf(is);
+				 models = c2r.convertToRdf(is,vreq,destination);
 			} catch (IOException e) {
 				System.out.println("IOException converting "+csvUrl+" to RDF");
 			}
