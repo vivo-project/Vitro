@@ -175,6 +175,10 @@
     </listener-class>
   </listener>
   
+   <listener>
+    <listener-class>edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache</listener-class>
+   </listener>
+ 
   <!--
     <listener>
         <listener-class>
