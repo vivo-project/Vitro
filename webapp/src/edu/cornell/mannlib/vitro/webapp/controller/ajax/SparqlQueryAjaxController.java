@@ -77,21 +77,8 @@ public class SparqlQueryAjaxController extends VitroAjaxController {
 					"Only 'select' queries are allowed.");
 		}
 
-		Dataset dataset = chooseDatasetToQueryAgainst(vreq);
-
-		executeQuery(response, query, dataset);
+		executeQuery(response, query, DatasetFactory.create(model));
 		return;
-	}
-
-	private Dataset chooseDatasetToQueryAgainst(VitroRequest vreq) {
-		Dataset dataset = vreq.getDataset();
-		if (dataset != null) {
-			return dataset;
-		}
-
-		DataSource dataSource = DatasetFactory.create();
-		dataSource.setDefaultModel(vreq.getJenaOntModel());
-		return dataSource;
 	}
 
 	private void executeQuery(HttpServletResponse response, Query query,
