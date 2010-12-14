@@ -11,7 +11,7 @@ ${stylesheets.addFromTheme("/css/uploadImages.css")}
     <h2>Photo Upload</h2>
               
     <#if errorMessage??>
-        <div id="error-alert"><img src="${urls.siteIcons}/iconAlert.png"/>
+        <div id="error-alert"><img src="${urls.images}/iconAlert.png"/>
             <p>${errorMessage}</p>
         </div>
     </#if>

@@ -19,7 +19,7 @@
 
         <noscript>
             <section id="error-alert">
-                <img src="${urls.siteIcons}/iconAlertBig.png" alt="Alert Icon"/>
+                <img src="${urls.images}/iconAlertBig.png" alt="Alert Icon"/>
                 <p>In order to edit VIVO content, you'll need to enable JavaScript.</p>
             </section>
         </noscript>
@@ -29,7 +29,7 @@
         </#if>
        
         <#if errorMessage??>
-            <div id="error-alert"><img src="${urls.siteIcons}/iconAlert.png" alert="Error alert icon"/>
+            <div id="error-alert"><img src="${urls.images}/iconAlert.png" alert="Error alert icon"/>
                 <p>${errorMessage}</p>
             </div>
         </#if>
@@ -64,7 +64,7 @@
         <h2>Log in</h2>
            
             <#if errorMessage??>
-                <div id="error-alert" role="alert"><img src="${urls.siteIcons}/iconAlert.png" width="24" height="24" alert="Error alert icon"/>
+                <div id="error-alert" role="alert"><img src="${urls.images}/iconAlert.png" width="24" height="24" alert="Error alert icon"/>
                     <p>${errorMessage}</p>
                 </div>
             </#if>

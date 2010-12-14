@@ -1,26 +1,12 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
-<section id="#intro-menupage" role="region">
+<section id="intro-menupage" role="region">
     <h3>People</h3>
-    
-    <@widget name="browse" classGroup="people"/>
     
     <section id="content-foaf-person" role="region">
         <h4>Visual Graph</h4>
         
-        <nav role="navigation">
-            <ul id="foaf-person-childClasses">
-                <li><a href="#">foaf:person childClass 1<span class="count-classes"> (280)</span></a></li>
-                <li><a href="#">foaf:person childClass  2<span class="count-classes"> (280)</span></a></li>
-                <li><a href="#">foaf:person childClass  3<span class="count-classes"> (280)</span></a></li>
-                <li><a  class="selected"  href="#">foaf:person childClass  4<span class="count-classes"> (280)</span></a></li>
-                <li><a href="#">foaf:person childClass  5<span class="count-classes"> (280)</span></a></li>
-                <li><a href="#">foaf:person childClass  6<span class="count-classes"> (280)</span></a></li>
-                <li><a href="#">foaf:person childClass  7<span class="count-classes"> (280)</span></a></li>
-                <li><a href="#">foaf:person childClass  8<span class="count-classes"> (280)</span></a></li>
-                <li><a href="#">foaf:person childClass  9<span class="count-classes"> (280)</span></a></li>
-            </ul>
-        </nav>
-        
+        <@widget name="browse" classGroup="people"/>
+          
         <section id="foaf-person-graph" role="region">
             <img src="${urls.images}/menupage/visual-graph.jpg" alt="" />
         </section>
