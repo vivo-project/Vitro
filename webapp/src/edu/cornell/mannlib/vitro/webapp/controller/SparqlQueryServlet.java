@@ -44,6 +44,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.sparql.resultset.ResultSetFormat;
 import com.hp.hpl.jena.vocabulary.XSD;
 
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
@@ -102,11 +103,7 @@ public class SparqlQueryServlet extends BaseEditController {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException
     {    	    	   	
-        super.doGet(request, response);
-        // rjy7 Allows any editor (including self-editors) access to this servlet.
-        // This servlet is now requested via Ajax from some custom forms, so anyone
-        // using the custom form needs access rights.
-        if( !checkLoginStatus(request, response) ) {
+        if( !checkLoginStatus(request, response, LoginStatusBean.DBA) ) {
         	return;
         }
         
