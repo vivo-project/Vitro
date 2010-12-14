@@ -183,8 +183,8 @@ public class AuthenticateTest extends AbstractTestClass {
 	private static final HowDidWeGetHere FROM_WIDGET = new HowDidWeGetHere(
 			null, false, URL_WIDGET);
 
-	private static final HowDidWeGetHere FROM_LOGIN = new HowDidWeGetHere(
-			null, false, URL_LOGIN);
+	private static final HowDidWeGetHere FROM_LOGIN = new HowDidWeGetHere(null,
+			false, URL_LOGIN);
 
 	/** "return" parameter with no referrer - like coming from the login page. */
 	private static final HowDidWeGetHere FROM_BOOKMARK_OF_LINK = new HowDidWeGetHere(
@@ -488,6 +488,30 @@ public class AuthenticateTest extends AbstractTestClass {
 		assertRedirectToCompletionUrl();
 		assertNoProcessBean();
 		assertNewLoginSessions();
+	}
+
+	/**
+	 * If there is no LoginProcessBean but we do have a 'loginForm' parameter,
+	 * treat it as if we had a status of LOGGING_IN.
+	 * 
+	 * TODO
+	 * To be thorough, this should actually be implemented for all cases that
+	 * could be encountered on a first go.
+	 */
+	@Test
+	public void justGotHereFromWidget() {
+		if ((urlBundle.afterLoginUrl == null)
+				&& (!urlBundle.returnParameterSet)) {
+			request.addParameter("loginForm", "");
+			setLoginNameAndPassword(userInfo.username, "bogus_password");
+
+			auth.doPost(request, response);
+
+			assertProcessBean(LOGGING_IN, userInfo.username, "",
+					"The email or password you entered is incorrect.");
+			assertNewLoginSessions();
+			assertRedirectToContinueUrl();
+		}
 	}
 
 	// ----------------------------------------------------------------------

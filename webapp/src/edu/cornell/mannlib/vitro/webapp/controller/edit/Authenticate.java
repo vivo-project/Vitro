@@ -74,6 +74,9 @@ public class Authenticate extends VitroHttpServlet {
 	/** If this parameter is "true" (ignoring case), cancel the login. */
 	private static final String PARAMETER_CANCEL = "cancel";
 
+	/** If this parameter is set, we are not NOWHERE. */
+	private static final String PARAMETER_LOGIN_FORM = "loginForm";
+
 	/** Where do we find the User/Session map in the servlet context? */
 	public static final String USER_SESSION_MAP_ATTR = "userURISessionMap";
 
@@ -214,7 +217,38 @@ public class Authenticate extends VitroHttpServlet {
 					+ "current state is NOWHERE");
 		}
 
+		if (weCameFromAColdWidget(request, currentState)) {
+			currentState = actLikeWeWereLoggingIn(request);
+		}
+
 		return currentState;
+	}
+
+	/**
+	 * If they submitted the login form, they shouldn't be NOWHERE.
+	 */
+	private boolean weCameFromAColdWidget(HttpServletRequest request,
+			State currentState) {
+		if (currentState == NOWHERE) {
+			if (null != request.getParameter(PARAMETER_LOGIN_FORM)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * They got here by submitting the login form. They should be treated as
+	 * already logging in.
+	 */
+	private State actLikeWeWereLoggingIn(HttpServletRequest request) {
+		LoginProcessBean bean = new LoginProcessBean();
+		bean.setState(LOGGING_IN);
+		bean.setLoginPageUrl(whereDidWeComeFrom(request));
+		bean.setAfterLoginUrl(whereDidWeComeFrom(request));
+		LoginProcessBean.setBean(request, bean);
+
+		return LOGGING_IN;
 	}
 
 	/**
