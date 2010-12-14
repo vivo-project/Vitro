@@ -1255,6 +1255,15 @@
     <url-pattern>/edit/primitiveDelete</url-pattern>    
   </servlet-mapping>
    
+  <servlet>
+    <servlet-name>ajaxSparqlQuery</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.ajax.SparqlQueryAjaxController</servlet-class>    
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ajaxSparqlQuery</servlet-name>
+    <url-pattern>/ajax/sparqlQuery</url-pattern>    
+  </servlet-mapping>
+   
   <!-- ============================== servlet-mappings ======================== -->
   <servlet-mapping>
     <servlet-name>fetch</servlet-name>
