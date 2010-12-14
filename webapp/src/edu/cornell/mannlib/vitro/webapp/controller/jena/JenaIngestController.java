@@ -336,14 +336,14 @@ public class JenaIngestController extends BaseEditController {
 		} else if ("csv2rdf".equals(actionStr)) {
 			String csvUrl = vreq.getParameter("csvUrl");
 			if (csvUrl != null) {
-				doExecuteCsv2Rdf(vreq);
+				/*doExecuteCsv2Rdf(vreq);*/
 				request.setAttribute("title","IngestMenu");
 				request.setAttribute("bodyJsp", INGEST_MENU_JSP);
 			} else {
 				request.setAttribute("title","Convert CSV to RDF");
 				request.setAttribute("bodyJsp",CSV2RDF_JSP);
 			}
-		} else if ("processStrings".equals(actionStr)) {
+		}else if ("processStrings".equals(actionStr)) {
 			String className = vreq.getParameter("className");
 			if (className != null) {
 				doProcessStrings(vreq);
@@ -812,7 +812,7 @@ public class JenaIngestController extends BaseEditController {
 		}
 	}
 	
-	public void doExecuteCsv2Rdf(VitroRequest vreq) {
+	/*public void doExecuteCsv2Rdf(VitroRequest vreq) {
 		char[] quoteChars = {'"'};
 		String namespace = vreq.getParameter("namespace");
 		String tboxNamespace = vreq.getParameter("tboxNamespace");
@@ -848,7 +848,7 @@ public class JenaIngestController extends BaseEditController {
 		Model[] models = null;
 		
 		try {
-			 models = c2r.convertToRdf(is);
+			 models = c2r.convertToRdf(is,vreq,destination);
 		} catch (IOException e) {
 			System.out.println("IOException converting "+csvUrl+" to RDF");
 		}
@@ -860,7 +860,7 @@ public class JenaIngestController extends BaseEditController {
 			tboxDestination.add(models[1]);
 		}
 				
-	}
+	}*/
 
 	public void doSubtractModels(VitroRequest vreq) {
 			String modela = vreq.getParameter("modela");
