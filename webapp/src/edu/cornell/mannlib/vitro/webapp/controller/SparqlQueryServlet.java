@@ -261,13 +261,8 @@ public class SparqlQueryServlet extends BaseEditController {
     }
 
     private void toCsv(Writer out, ResultSet results) {
-    	//SimpleWriter csvWriter = new SimpleWriter(out);
-    	//csvWriter.setSeperator(','); // sic
-    	//char[] quoteChars = {'"'};
-    	//csvWriter.setQuoteCharacters(quoteChars);
-    	
     	// The Skife library wouldn't quote and escape the normal way, so I'm trying it manually
-    	
+   	
     	while (results.hasNext()) {
     		QuerySolution solution = (QuerySolution) results.next();
     		List<String> valueList = new LinkedList<String>();
@@ -295,13 +290,7 @@ public class SparqlQueryServlet extends BaseEditController {
     			}
     			valueList.add(value);
     		}
-    		/*
-    		try {
-    			csvWriter.append(valueList.toArray());
-    		} catch (IOException ioe) {
-    			log.error(ioe);
-    		}
-    		*/
+
     		Iterator<String> valueIt = valueList.iterator();
 			StringBuffer rowBuff = new StringBuffer();
     		while (valueIt.hasNext()) {
@@ -328,14 +317,8 @@ public class SparqlQueryServlet extends BaseEditController {
     }
     
     private void doHelp(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-                	        	
-            //res.setStatus(HttpServletResponse.SC_BAD_REQUEST);        	            
-            
             VitroRequest vreq = new VitroRequest(req);
             Portal portal = vreq.getPortal();
-            
-            /* @author ass92 */
-                  
             
             OntologyDao daoObj = vreq.getFullWebappDaoFactory().getOntologyDao();
             List<Ontology> ontologiesObj = daoObj.getAllOntologies();
@@ -354,8 +337,6 @@ public class SparqlQueryServlet extends BaseEditController {
             
             req.setAttribute("prefixList", prefixList);
             
-            /* Code change completed */
-            
             req.setAttribute("portalBean",portal);
             // nac26: 2009-09-25 - this was causing problems in safari on localhost installations because the href did not include the context.  The edit.css is not being used here anyway (or anywhere else for that matter)
             // req.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+portal.getThemeDir()+"css/edit.css\"/>");
@@ -364,61 +345,7 @@ public class SparqlQueryServlet extends BaseEditController {
             
             RequestDispatcher rd = req.getRequestDispatcher("/"+Controllers.BASIC_JSP);
             rd.forward(req,res);
-//        } catch (Throwable e) {
-//            log.error(e);
-//            req.setAttribute("javax.servlet.jsp.jspException",e);
-//            RequestDispatcher rd = req.getRequestDispatcher("/error.jsp");
-//            rd.forward(req, res);
-//        }
-//            ServletOutputStream sos = res.getOutputStream();
-//
-//            sos.println("<html><body><h1>Sparql Query Form</h1>");
-//            if( query == null || "".equals(query)){
-//                sos.println("<p>The parameter 'query' must be not be null or zero length</p>");
-//            }
-//            if( resultFormat == null || "".equals(resultFormat)){
-//                sos.println("<p>The parameter 'resultFormat' must not be null or zero length</p>");
-//            }
-//            if( !formatSymbols.containsKey(resultFormat) ){
-//                sos.println("<p>The parameter 'resultFormat' must be one of the following: <ul>");
-//                for ( String str : formatSymbols.keySet() ){
-//                    sos.println("<li>" + str + "</li>");
-//                }
-//                sos.println("</ul></p>");
-//            }
-//            sos.println("<form action='sparqlquery'>");
-//            sos.println("query:<div><textarea name='query' rows ='25' cols='80'>"+query+"</textarea></div>");
-//            sos.println("<div>");
-//            for( String str : formatSymbols.keySet() ){
-//                sos.println(" "+str+":<input type='radio' name='resultFormat' value='"+str+"'>\n");
-//            }
-//            sos.println("</div>");
-//            sos.println("<input type=\"submit\" value=\"Submit\">");
-//            sos.println("</form>");
-//            sos.println("<p>note: CONSTRUCT and DESCRIBE queries always return RDF XML</p>");
-//            sos.println("</body></html>");
     }
-
-    /*
-    "PREFIX rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"+
-    "PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n"+
-    "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7>\n"+
-    "PREFIX vivo:  <http://vivo.library.cornell.edu/ns/0.1#>\n"+
-    "PREFIX mann:  <http://vivo.cornell.edu/ns/mannadditions/0.1#>"+
-    "#\n"+
-    "# This query gets all range entities labels and types of Steven Tanksley\n"+
-    "# A query like this could be used to get enough info to create a display\n"+
-    "# page for an entity.\n"+
-    "#\n"+
-    "SELECT ?pred ?obj ?objLabel ?objType\n"+
-    "WHERE \n"+
-    "{\n"+
-    " ?steve rdfs:label \"Tanksley, Steven D.\" .\n"+
-    " ?steve ?pred ?obj \n"+
-    " OPTIONAL { ?obj rdfs:label ?objLabel ; rdf:type ?objType }\n"+
-    "}\n"+
-    "ORDER BY ASC( ?pred )\n";
-    */
 
     @SuppressWarnings("unused")
 	private String example =
