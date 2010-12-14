@@ -24,8 +24,6 @@ import com.hp.hpl.jena.shared.Lock;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DependentResourceDeleteJena;
@@ -56,8 +54,7 @@ public class PrimitiveRdfEdit extends FreemarkerHttpServlet{
             HttpServletResponse response) throws ServletException, IOException {
         
         VitroRequest vreq = new VitroRequest(request);
-        boolean loggedIn = checkLoginStatus(request);
-        if( !loggedIn){
+        if( !LoginStatusBean.getBean(request).isLoggedIn()){
             doError(response,"You must be logged in to use this servlet.",HttpStatus.SC_UNAUTHORIZED);
             return;
         }
