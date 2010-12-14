@@ -20,7 +20,6 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     protected Property property; // needed to get the edit links
     
     PropertyTemplateModel(Property property) {
-        this.name = property.getLabel();
         // Do in subclass constructor. The label has not been set on the property, and getting the 
         // label differs between object and data properties.
         // this.name = property.getLabel();

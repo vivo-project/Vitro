@@ -49,6 +49,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
             try {
                 return new CollatedObjectPropertyTemplateModel(op, subject, wdf);
             } catch (Exception e) {
+                log.error(e, e);
                 return new UncollatedObjectPropertyTemplateModel(op, subject, wdf);
             }
         } else {

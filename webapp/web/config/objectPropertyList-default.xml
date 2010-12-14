@@ -2,7 +2,7 @@
 <!-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 <view-config>
     <query>        
-        SELECT ?object  {
+        SELECT ?object {
             ?subject ?property ?object .
         }       
     </query>

@@ -2,9 +2,12 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,13 +27,19 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
     
     CollatedObjectPropertyTemplateModel(ObjectProperty op, Individual subject, WebappDaoFactory wdf) throws Exception {
         super(op, subject, wdf); 
+
+        String collationTargetError = getCollationTargetError();
+        if ( ! collationTargetError.isEmpty()) {
+            String errorMessage = "Collation target error for collated object property " + getName() + ": " + 
+                                  collationTargetError + " " + 
+                                  "Creating uncollated property list instead.";
+            throw new Exception(errorMessage);
+        }   
         
-        /* RY Temporarily throw an error because collation hasn't been implemented yet. We'll then use an uncollated one instead.
-         * In final version, throw an error if config doesn't contain collation-target element. We'll use an uncollated one instead.
-         */
+        // RY Temporarily throw an error because collation hasn't been implemented yet.
         boolean error = true;
         if (error) {
-            throw new Exception("No collation target specified for collated object property " + op.getLabel());
+            throw new Exception("No collation target specified for collated object property " + getName());
         }
         
         ObjectPropertyStatementDao opDao = wdf.getObjectPropertyStatementDao();
@@ -47,6 +56,25 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
             List<VClass> vclasses = getDirectVClasses(collationTarget, statementData);
         }
         
+    }
+    
+    private String getCollationTargetError() {
+        String errorMessage = null;
+        String collationTarget = getCollationTarget();
+        // Make sure the collation target is not null or empty.
+        if (collationTarget == null || collationTarget.trim().isEmpty()) {
+            errorMessage = "No collation target specified.";
+        } else {
+            // Make sure the collation target is one of the select terms in the query.
+            String queryString = getQueryString();
+            String selectClause = queryString.substring(0, queryString.indexOf("{"));
+            Pattern collationTargetPattern = Pattern.compile("\\b\\\\?" + collationTarget + "\\b");
+            Matcher matcher = collationTargetPattern.matcher(selectClause);
+            if (! matcher.find()) {
+                errorMessage = "Invalid collation target.";
+            }
+        }   
+        return errorMessage;
     }
     
     private List<VClass> getDirectVClasses(String key, List<Map<String, Object>> data) {

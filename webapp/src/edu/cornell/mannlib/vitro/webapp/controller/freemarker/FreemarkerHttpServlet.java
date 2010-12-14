@@ -517,8 +517,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         write(sw, response);
     }
     
-    protected void write(StringWriter sw, HttpServletResponse response) {
-        
+    protected void write(StringWriter sw, HttpServletResponse response) {        
         try {
             PrintWriter out = response.getWriter();
             out.print(sw);     
