@@ -308,6 +308,8 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         map.put("scripts", getScriptList(themeDir));
         map.put("headScripts", getScriptList(themeDir));
   
+        map.put("currentPage", vreq.getServletPath().replaceFirst("/", ""));
+        
         map.putAll(getDirectives());
         
         return  map;
@@ -344,8 +346,8 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         urls.put("themeImages", urlBuilder.getPortalUrl(themeDir + "/images"));
         urls.put("images", urlBuilder.getUrl("/images"));
         urls.put("theme", urlBuilder.getUrl(themeDir));
-        urls.put("index", urlBuilder.getUrl("/browse"));
-
+        urls.put("index", urlBuilder.getUrl("/browse"));                
+        
         return urls;
     }
     
