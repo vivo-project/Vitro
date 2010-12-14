@@ -9,7 +9,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.hp.hpl.jena.iri.IRI;
 import com.hp.hpl.jena.iri.IRIFactory;
@@ -30,12 +29,12 @@ import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
-import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.ApplicationDao;
 import edu.cornell.mannlib.vitro.webapp.dao.Classes2ClassesDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
+import edu.cornell.mannlib.vitro.webapp.dao.DisplayModelDao;
 import edu.cornell.mannlib.vitro.webapp.dao.FlagDao;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.KeywordDao;
@@ -592,4 +591,8 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
         return menuDao;
     }
     
+    @Override
+    public DisplayModelDao getDisplayModelDao(){
+        return new DisplayModelDaoJena( this );
+    }
 }

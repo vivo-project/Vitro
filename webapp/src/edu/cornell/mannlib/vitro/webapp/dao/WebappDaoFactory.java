@@ -106,6 +106,8 @@ public interface WebappDaoFactory {
     public ObjectPropertyStatementDao getObjectPropertyStatementDao();
 
 
+    public DisplayModelDao getDisplayModelDao();
+    
     /* ======================== DAOs for other objects ======================== */
 
     public ApplicationDao getApplicationDao();
