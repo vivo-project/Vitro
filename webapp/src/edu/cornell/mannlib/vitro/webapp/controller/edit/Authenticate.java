@@ -89,7 +89,9 @@ public class Authenticate extends VitroHttpServlet {
 		VitroRequest vreq = new VitroRequest(request);
 
 		try {
-			recordLoginProcessPages(vreq);
+			if (loginProcessPagesAreEmpty(vreq)) {
+				recordLoginProcessPages(vreq);
+			}
 
 			// Where do we stand in the process?
 			State entryState = getCurrentLoginState(vreq);
@@ -134,6 +136,14 @@ public class Authenticate extends VitroHttpServlet {
 			showSystemError(e, response);
 		}
 
+	}
+
+	/**
+	 * Once these URLs have been set, don't change them.
+	 */
+	private boolean loginProcessPagesAreEmpty(HttpServletRequest request) {
+		LoginProcessBean bean = LoginProcessBean.getBean(request);
+		return ((bean.getAfterLoginUrl() == null) && (bean.getLoginPageUrl() == null));
 	}
 
 	/**

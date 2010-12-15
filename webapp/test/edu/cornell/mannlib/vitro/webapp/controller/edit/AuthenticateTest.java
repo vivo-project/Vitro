@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
 import static edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State.FORCED_PASSWORD_CHANGE;
 import static edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State.LOGGING_IN;
+import static edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State.NOWHERE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -494,9 +495,8 @@ public class AuthenticateTest extends AbstractTestClass {
 	 * If there is no LoginProcessBean but we do have a 'loginForm' parameter,
 	 * treat it as if we had a status of LOGGING_IN.
 	 * 
-	 * TODO
-	 * To be thorough, this should actually be implemented for all cases that
-	 * could be encountered on a first go.
+	 * TODO To be thorough, this should actually be implemented for all cases
+	 * that could be encountered on a first go.
 	 */
 	@Test
 	public void justGotHereFromWidget() {
@@ -514,6 +514,39 @@ public class AuthenticateTest extends AbstractTestClass {
 		}
 	}
 
+	/**
+	 * Once the process URLs have been set in the bean, they will not change.
+	 */
+	@Test
+	public void theProcessUrlsAreSticky() {
+		String afterLoginUrl = "/vivo/someStrangePage";
+		String loginPageUrl = "/vivo/someWidgetPage";
+
+		// Put a process bean out there that has the URLs already set.
+		LoginProcessBean processBean = new LoginProcessBean();
+		processBean.setState(NOWHERE);
+		processBean.setAfterLoginUrl(afterLoginUrl);
+		processBean.setLoginPageUrl(loginPageUrl);
+		LoginProcessBean.setBean(request, processBean);
+
+		auth.doPost(request, response);
+
+		// The bean should progress, but the URLs should not change.
+		if (!LoginProcessBean.isBean(request)) {
+			fail("login process bean is null");
+		}
+		LoginProcessBean bean = LoginProcessBean.getBean(request);
+		assertEquals("state", LOGGING_IN, bean.getState());
+		assertEquals("info message", "", bean.getInfoMessageAndClear());
+		assertEquals("error message", "", bean.getErrorMessageAndClear());
+		assertEquals("username", "", bean.getUsername());
+		assertEquals("after login URL", afterLoginUrl, bean.getAfterLoginUrl());
+		assertEquals("login page URL", loginPageUrl, bean.getLoginPageUrl());
+
+		assertNewLoginSessions();
+		assertRedirect(loginPageUrl);
+	}
+
 	// ----------------------------------------------------------------------
 	// Helper methods
 	// ----------------------------------------------------------------------
@@ -526,15 +559,17 @@ public class AuthenticateTest extends AbstractTestClass {
 		}
 
 		// the urls come directly from the url bundle every time.
+		String whereFrom = (urlBundle.referrer == null) ? URL_LOGIN
+				: urlBundle.referrer;
 		if (urlBundle.afterLoginUrl != null) {
 			processBean.setAfterLoginUrl(urlBundle.afterLoginUrl);
 			processBean.setLoginPageUrl(URL_LOGIN);
 		} else if (urlBundle.returnParameterSet) {
-			processBean.setAfterLoginUrl(urlBundle.referrer);
+			processBean.setAfterLoginUrl(whereFrom);
 			processBean.setLoginPageUrl(URL_LOGIN);
 		} else {
-			processBean.setAfterLoginUrl(urlBundle.referrer);
-			processBean.setLoginPageUrl(urlBundle.referrer);
+			processBean.setAfterLoginUrl(whereFrom);
+			processBean.setLoginPageUrl(whereFrom);
 		}
 		LoginProcessBean.setBean(request, processBean);
 	}
