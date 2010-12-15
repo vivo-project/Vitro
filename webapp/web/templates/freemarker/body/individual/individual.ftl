@@ -16,8 +16,8 @@
 <#-- Manolo, please do not remove this line. Thanks! -->
 <#assign propertyGroups = individual.propertyList>
     
-<section id="individual-intro-person" class="vcard">
-    <div id="individual-intro-left-content"> 
+<section id="individual-intro-person" class="vcard" role="region">
+    <section id="left-side" role="region"> 
         <#-- Thumbnail -->
             <#if individual.thumbUrl??>
                 <a href="${individual.imageUrl}"><img class="individual-photo2" src="${individual.thumbUrl}" title="click to view larger image" alt="${individual.name}" width="115" /></a>
@@ -25,32 +25,32 @@
                 <img class="individual-photo2" src="${urls.images}/dummyImages/person.thumbnail.jpg" title = "no image" alt="placeholder image" width="115" />                                                        
             </#if>
         
-        <nav>
-            <ul id ="individual-tools-people">
-                <li><a class="picto-font  picto-uri" href="#">j</a></li>
-                <li><a class="picto-font  picto-pdf" href="#">F</a></li>
-                <li><a class="picto-font  picto-share" href="#">R</a></li>
-                <li><a class="icon-rdf" href="#">RDF</a></li>
+        <nav role="navigation">
+            <ul id ="individual-tools-people" role="list">
+                <li role="listitem"><a class="picto-font  picto-uri" href="#">j</a></li>
+                <li role="listitem"><a class="picto-font  picto-pdf" href="#">F</a></li>
+                <li role="listitem"><a class="picto-font  picto-share" href="#">R</a></li>
+                <li role="listitem"><a class="icon-rdf" href="#">RDF</a></li>
             </ul>
         </nav>
         
-        <a class="email" href="#"><span class ="picto-font  picto-email">M</span> email@cornell.edu</a> <a class="tel" href="#"><img class ="icon-phone" src="${urls.images}/individual/phone-icon.gif" />555 567 7878</a>
+        <a class="email" href="#"><span class ="picto-font  picto-email">M</span> email@cornell.edu</a> <a class="tel" href="#"><img class ="icon-phone" src="${urls.images}/individual/phone-icon.gif" alt="phone icon" />555 567 7878</a>
         
         <#-- Links -->
-        <nav>
-            <ul id ="individual-urls-people">
+        <nav role="navigation">
+            <ul id ="individual-urls-people" role="list">
             <#if individual.links?has_content>
                 <@l.firstLastList>
                     <#list individual.links as link>                        
-                        <li><a href="${link.url}">${link.anchor}</a></li>
+                        <li role="listitem"><a href="${link.url}">${link.anchor}</a></li>
                         </#list>
                 </@l.firstLastList>
             </#if>              
             </ul>
         </nav>
-    </div>
+    </sction>
     
-    <div id="individual-intro-right-content"><!-- mb863 get rid off div-->
+    <section id="individual-info" role="region">
         <header>
             <#if relatedSubject??>
                 <h2>${relatedSubject.relatingPredicateDomainPublic} for ${relatedSubject.name}</h2>
@@ -68,52 +68,66 @@
                
             <h2>Current Positions</h2>
             
-            <ul id ="individual-positions">
-                <li><a href="#">Consectetur adipiscing elit, sed est erat.</a></li>
-                <li><a href="#">Mauris posuere dui quis massa.</a></li>
+            <ul id ="individual-positions" role="list">
+                <li role="listitem"><a href="#">Consectetur adipiscing elit, sed est erat.</a></li>
+                <li role="listitem"><a href="#">Mauris posuere dui quis massa.</a></li>
             </ul>
         </header>
         
         <p class="individual-overview">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed est erat, tristique non bibendum eu, mollis non est. Cras vehicula velit quis elit porta vel molestie tellus blandit. Donec eget magna dolor. Phasellus faucibus mollis lorem at dapibus. Sed ultricies lobortis mauris in volutpat. Cras mattis neque ut sapien pellentesque fringilla. Mauris posuere dui quis massa mattis id mollis nibh accumsan.  [+]</p>
         
-        <h2>Roles</h2>
+        <h2>Research Areas</h2>
 
-        <ul id ="individual-roles">
-            <li><a href="#">Researcher (5)</a></li>
-            <li><a href="#">Principal Investigator (3)</a></li>
-            <li><a href="#">Teacher (2)</a></li>
+        <ul id ="individual-areas" role="list">
+            <li role="listitem"><a href="#">Researcher (5)</a></li>
+            <li role="listitem"><a href="#">Principal Investigator (3)</a></li>
+            <li role="listitem"><a href="#">Teacher (2)</a></li>
         </ul>
-    </div>
+    </section>
 </section>
 
-<section id="publications-visualization">
-    <section id="sparklines-publications">
+<section id="publications-visualization" role="region">
+    <section id="sparklines-publications" role="region">
          <#include "individual-sparklineVisualization.ftl">
          
-        <header><img src="${urls.home}/images/individual/sparkline.gif" />
+        <header><img src="${urls.home}/images/individual/sparkline.gif" alt="" />
             <h3><span class="grey">2</span> publications <span class="publication-year-range grey">within the last 10 years</span></h3>
         </header>
         
         <p><a class="all-vivo-publications" href="#">All VIVO publications & co-author network.</a></p>
     </section>
     
-    <section id="co-authors">
+    <section id="co-authors" role="region">
         <header>
             <h3><span class="grey">10 </span>Co-Authors</h3>
         </header>
         
-        <ul>
-            <li><a href="#"><img class="co-author" src="${urls.images}/individual/Bacall.jpg" /></a></li>
-            <li><a href="#"><img class="co-author" src="${urls.images}/individual/Bogart.jpg" /></a></li>
-            <li><a href="#"><img class="co-author" src="${urls.images}/individual/Gable.jpg" /></a></li>
-            <li><a href="#"><img class="co-author" src="${urls.images}/individual/Grant.jpg" /></a></li>
-            <li><a href="#"><img class="co-author" src="${urls.images}/individual/Leigh.jpg" /></a></li>
-            <li><a href="#"><img class="co-author" src="${urls.images}/individual/Welles.jpg" /></a></li>
+        <ul role="list">
+            <li role="listitem"><a href="#"><img class="co-author" src="${urls.images}/individual/Bacall.jpg" /></a></li>
+            <li role="listitem"><a href="#"><img class="co-author" src="${urls.images}/individual/Bogart.jpg" /></a></li>
+            <li role="listitem"><a href="#"><img class="co-author" src="${urls.images}/individual/Gable.jpg" /></a></li>
+            <li role="listitem"><a href="#"><img class="co-author" src="${urls.images}/individual/Grant.jpg" /></a></li>
+            <li role="listitem"><a href="#"><img class="co-author" src="${urls.images}/individual/Leigh.jpg" /></a></li>
+            <li role="listitem"><a href="#"><img class="co-author" src="${urls.images}/individual/Welles.jpg" /></a></li>
         </ul>
         
         <p class="view-all-coauthors"><a class="view-all-style" href="#">View All <span class="pictos-arrow-10">4</span></a></p>
     </section>
 </section>
+
+<nav id="property-group-menus" role="navigation">
+    <ul role="list">
+        <li role="listitem"><a href="#propertyGroup1">Affiliations</a></li>
+        <li role="listitem"><a href="#publications">Publications</a></li>
+        <li role="listitem"><a href="#research">Research</a></li>
+        <li role="listitem"><a href="#teaching">Teaching</a></li>
+        <li role="listitem"><a href="#service">Service</a></li>
+        <li role="listitem"><a href="#background">Background</a></li>
+        <li role="listitem"><a href="#contact">Contact</a></li>
+        <li role="listitem"><a href="#identity">Identity</a></li>
+        <li role="listitem"><a href="#other">Other</a></li>
+    </ul>
+</nav>
 
 <#-- Ontology properties -->
 <#include "individual-properties.ftl">

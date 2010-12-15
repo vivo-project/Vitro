@@ -3,7 +3,5 @@
 <#-- Default object property list template -->
 
 <#list property.statements as statement>
-    <div class="obj-prop-stmt-obj">
-       <a href="${statement.object.url}">${statement.object.name}</a> ${statement.object.moniker!} 
-    </div> <!-- end obj-prop-stmt-obj -->
+    <li role="listitem"><a href="${statement.object.url}">${statement.object.name}</a> | ${statement.object.moniker!}</li>
 </#list>

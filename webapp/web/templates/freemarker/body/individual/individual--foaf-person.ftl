@@ -1,7 +1,7 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
 <section id="individual-intro-person" class="vcard">
-    <div id="individual-intro-left-content"> <img class="individual-photo2" src="${urls.images}/individual/individual--foaf-person.png" /><!-- mb863 get rid off div-->
+    <section id="left-side"> <img class="individual-photo2" src="${urls.images}/individual/individual--foaf-person.png" /><!-- mb863 get rid off div-->
         <nav>
             <ul id ="individual-tools-people">
                 <li><a class="picto-font  picto-uri" href="#">j</a></li>
@@ -21,9 +21,9 @@
                 <li><a href="#">&lt;core:URLLink&gt;</a></li>
             </ul>
         </nav>
-    </div>
+    </section>
     
-    <div id="individual-intro-right-content"><!-- mb863 get rid off div-->
+    <section id="individual-info">
         <header>
             <h1 class="fn">Hayworth, Rita<span class="preferred-title">Actress, dancer</span></h1>
             
@@ -37,9 +37,9 @@
         
         <p class="individual-overview">Born Margarita Carmen Cansino in Brooklyn, New York City, she was the daughter of flamenco dancer Eduardo Cansino, Sr., who was himself a Sephardic Jewish Spaniard from Castilleja de la Cuesta (Seville), and Ziegfeld girl Volga Hayworth who was of Irish and English descent. She was raised as a Roman Catholic. Her father wanted her to become a dancer while her mother hoped she would become an actress. Her grandfather, Antonio Cansino [+]</p>
         
-        <h2>Roles</h2>
+        <h2>Research Areas</h2>
 
-        <ul id ="individual-roles">
+        <ul id ="individual-areas">
             <li><a href="#">Researcher (5)</a></li>
             <li><a href="#">Principal Investigator (3)</a></li>
             <li><a href="#">Teacher (2)</a></li>
@@ -91,27 +91,27 @@
 <section class="property-groups">
     <h2><a name="affiliations"></a>Affiliation</h2>
     
-    <article class="property-group-item">
+    <article class="property-group">
         <h3>property-label</h3>
         
         <p class="data-property">data property</p>
     </article>
-    <article class="property-group-item">
+    <article class="property-group">
         <h3>property-label</h3>
         
         <p class="data-property">In ante neque, adipiscing ut aliquet in, dictum eu est. Suspendisse lobortis nulla at ligula dictum et tincidunt nunc accumsan. Integer molestie faucibus lacinia. Integer lacinia, nisl a lobortis vehicula, nisl turpis molestie tortor, nec commodo augue erat ac enim. Aenean ac mauris risus. Donec vehicula eleifend purus ac porta. Fusce quis massa eu urna dignissim consequat rutrum quis libero. Donec pellentesque orci ac massa ornare facilisis. Aenean fringilla sem at enim tristique at ultrices lorem dapibus. Nulla ultricies laoreet sem ut tincidunt. Donec sit amet eros at lorem suscipit ultricies. Suspendisse nunc sem, vestibulum ac gravida a, sodales non purus. Curabitur sodales ultricies lectus et auctor. In in mi vel eros tempor hendrerit volutpat eu libero. Curabitur aliquam adipiscing bibendum. Suspendisse vel nibh sit amet tortor gravida viverra a sed neque. Curabitur bibendum turpis vel dui gravida sed rhoncus magna euismod. Etiam euismod, dui non hendrerit varius, elit lorem interdum risus, ultricies rutrum elit felis ac ante. Phasellus porttitor tempus tortor id dictum. Vestibulum in nulla vitae lectus porta placerat quis vel dolor.</p>
     </article>
-    <article class="property-group-item">
+    <article class="property-group">
         <h3>property-label</h3>
         
         <p class="data-property">data property</p>
     </article>
-    <article class="property-group-item">
+    <article class="property-group">
         <h3>property-label</h3>
         
         <p class="data-property">data property</p>
     </article>
-    <article class="property-group-item">
+    <article class="property-group">
         <h3>property-label</h3>
         <ul class="object-property">
             <li><a href="#">&lt;object property&gt;</a> | Moniker</li>
@@ -126,27 +126,27 @@
 <section class="property-groups">
     <h2><a name="research"></a>Research</h2>
     
-    <article class="property-group-item">
+    <article class="property-group">
         <h3>property-label</h3>
         
         <p class="data-property">data property</p>
     </article>
-    <article class="property-group-item">
+    <article class="property-group">
         <h3>property-label</h3>
         
         <p class="data-property">In ante neque, adipiscing ut aliquet in, dictum eu est. Suspendisse lobortis nulla at ligula dictum et tincidunt nunc accumsan. Integer molestie faucibus lacinia. Integer lacinia, nisl a lobortis vehicula, nisl turpis molestie tortor, nec commodo augue erat ac enim. Aenean ac mauris risus. Donec vehicula eleifend purus ac porta. Fusce quis massa eu urna dignissim consequat rutrum quis libero. Donec pellentesque orci ac massa ornare facilisis. Aenean fringilla sem at enim tristique at ultrices lorem dapibus. Nulla ultricies laoreet sem ut tincidunt. Donec sit amet eros at lorem suscipit ultricies. Suspendisse nunc sem, vestibulum ac gravida a, sodales non purus. Curabitur sodales ultricies lectus et auctor. In in mi vel eros tempor hendrerit volutpat eu libero. Curabitur aliquam adipiscing bibendum. Suspendisse vel nibh sit amet tortor gravida viverra a sed neque. Curabitur bibendum turpis vel dui gravida sed rhoncus magna euismod. Etiam euismod, dui non hendrerit varius, elit lorem interdum risus, ultricies rutrum elit felis ac ante. Phasellus porttitor tempus tortor id dictum. Vestibulum in nulla vitae lectus porta placerat quis vel dolor.</p>
     </article>
-    <article class="property-group-item">
+    <article class="property-group">
         <h3>property-label</h3>
         
         <p class="data-property">data property</p>
     </article>
-    <article class="property-group-item">
+    <article class="property-group">
         <h3>property-label</h3>
         
         <p class="data-property">data property</p>
     </article>
-    <article class="property-group-item">
+    <article class="property-group">
         <h3>property-label</h3>
 
         <ul class="object-property">
@@ -162,22 +162,22 @@
 <section class="property-groups">
     <h2><a name="teaching"></a>Teaching</h2>
     
-    <article class="property-group-item">
+    <article class="property-group">
         <h3>property-label</h3>
         
         <p class="data-property">data property</p>
     </article>
-    <article class="property-group-item">
+    <article class="property-group">
         <h3>property-label</h3>
         
         <p class="data-property">data property</p>
     </article>
-    <article class="property-group-item">
+    <article class="property-group">
         <h3>property-label</h3>
         
         <p class="data-property">data property</p>
     </article>
-    <article class="property-group-item">
+    <article class="property-group">
         <h3>property-label</h3>
        
         <ul class="object-property">
@@ -192,11 +192,11 @@
 <section class="property-groups">
     <h2><a name="publications"></a>Publications</h2>
     
-    <article class="property-group-item">
+    <article class="property-group">
         <h3>property-label</h3>
         <p class="data-property">data property</p>
     </article>
-    <article class="property-group-item">
+    <article class="property-group">
         <h3>property-label</h3>
        
         <ul class="object-property">
