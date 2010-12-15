@@ -8,6 +8,7 @@ import java.util.Map;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -36,10 +37,8 @@ public class FreemarkerComponentGenerator extends FreemarkerHttpServlet {
         Map<String, Object> root = getSharedVariables(vreq, new HashMap<String, Object>()); 
         root.putAll(getPageTemplateValues(vreq));  
         
-        request.setAttribute("ftl_head", get("head", root, config, vreq));
+        request.setAttribute("ftl_head", getHead("head", root, config, vreq));
         request.setAttribute("ftl_identity", get("identity", root, config, vreq));
-        request.setAttribute("ftl_stylesheets", get("stylesheets", root, config, vreq));
-        request.setAttribute("ftl_headScripts", get("headScripts", root, config, vreq));
         request.setAttribute("ftl_menu", get("menu", root, config, vreq));
         request.setAttribute("ftl_search", get("search", root, config, vreq));
         request.setAttribute("ftl_footer", get("footer", root, config, vreq));
@@ -49,6 +48,15 @@ public class FreemarkerComponentGenerator extends FreemarkerHttpServlet {
     private String get(String templateName, Map<String, Object> root, Configuration config, HttpServletRequest request) {
         templateName += ".ftl";
         return processTemplate(templateName, root, config, request).toString();
+    }
+    
+    private String getHead(String templateName, Map<String, Object> root, Configuration config, HttpServletRequest request) {
+        // The Freemarker head template displays the page title in the <title> tag. Get the value out of the request.
+        String title = (String) request.getAttribute("title");
+        if (!StringUtils.isEmpty(title)) {
+            root.put("title", title);
+        }
+        return get(templateName, root, config, request);        
     }
     
     // RY We need the servlet context in getConfig(). For some reason using the method inherited from
