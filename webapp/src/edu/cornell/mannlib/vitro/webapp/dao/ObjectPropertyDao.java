@@ -34,7 +34,7 @@ public interface ObjectPropertyDao extends PropertyDao {
     public void deleteObjectProperty(ObjectProperty objectProperty);
     
     public boolean skipEditForm(String predicateURI);
-                                             
+    
 
 //    List /*of ObjectProperty */ getObjectPropertiesForObjectPropertyStatements(List /*of ObjectPropertyStatement */ objectPropertyStatements);
 //
@@ -56,5 +56,5 @@ public interface ObjectPropertyDao extends PropertyDao {
     
     public List<ObjectProperty> getObjectPropertyList(String subjectUri); 
     
-    public String getCustomListView();
+    public String getCustomListConfigFilename(ObjectProperty objectProperty);
 }

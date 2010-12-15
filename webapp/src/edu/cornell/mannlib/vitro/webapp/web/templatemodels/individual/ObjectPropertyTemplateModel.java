@@ -15,6 +15,7 @@ import org.w3c.dom.NodeList;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
+import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel {
@@ -30,7 +31,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         
         // Get the config for this object property
         try {
-            config = new PropertyListConfig(op);
+            config = new PropertyListConfig(op, wdf);
         } catch (Exception e) {
             log.error(e, e);
         }
@@ -69,31 +70,34 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         private String templateName;
         private String collationTarget;
 
-        PropertyListConfig(ObjectProperty op) throws Exception {
-            String filename = DEFAULT_CONFIG_FILE;;
+        PropertyListConfig(ObjectProperty op, WebappDaoFactory wdf) throws Exception {
+
+            // Get the custom config filename
+            ObjectPropertyDao opDao = wdf.getObjectPropertyDao();
+            String filename = opDao.getCustomListConfigFilename(op);
+            if (filename == null) { // no custom config; use default config
+                filename = DEFAULT_CONFIG_FILE;
+            }
+            log.debug("Using custom list view config file " + filename + " for object property " + op.getURI());
             
-            // Get the config filename from ObjectPropertyDaoJena by looking for the custom property list view annotation.
-            // If there is none, use the default config filename.
-            // do stuff here to get the custom config filename ***
-            
-            String configFilename = getConfigFilename(filename);
+            String configFilePath = getConfigFilePath(filename);
             try {
-                File config = new File(configFilename);            
-                if (configFilename != DEFAULT_CONFIG_FILE && ! config.exists()) {
-                    log.warn("Can't find config file " + configFilename + " for object property " + op.getURI() + "\n" +
+                File config = new File(configFilePath);            
+                if (configFilePath != DEFAULT_CONFIG_FILE && ! config.exists()) {
+                    log.warn("Can't find config file " + configFilePath + " for object property " + op.getURI() + "\n" +
                             ". Using default config file instead.");
-                    configFilename = getConfigFilename(DEFAULT_CONFIG_FILE);
+                    configFilePath = getConfigFilePath(DEFAULT_CONFIG_FILE);
                     // Should we test for the existence of the default, and throw an error if it doesn't exist?
                 }   
             
                 DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
                 DocumentBuilder db = dbf.newDocumentBuilder();
-                Document doc = db.parse(configFilename);
+                Document doc = db.parse(configFilePath);
                 queryString = getConfigValue(doc, NODE_NAME_QUERY);
                 templateName = getConfigValue(doc, NODE_NAME_TEMPLATE);
                 collationTarget = getConfigValue(doc, NODE_NAME_COLLATION_TARGET);
             } catch (Exception e) {
-                log.error("Error processing config file " + configFilename + " for object property " + op.getURI(), e);
+                log.error("Error processing config file " + configFilePath + " for object property " + op.getURI(), e);
                 // What should we do here?
             }
             
@@ -118,7 +122,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
             return value;           
         }
         
-        private String getConfigFilename(String filename) {
+        private String getConfigFilePath(String filename) {
             return servletContext.getRealPath(CONFIG_FILE_PATH + filename);
         }
     }

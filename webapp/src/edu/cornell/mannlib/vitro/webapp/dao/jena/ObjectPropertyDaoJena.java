@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -18,15 +19,14 @@ import com.hp.hpl.jena.ontology.OntProperty;
 import com.hp.hpl.jena.ontology.OntResource;
 import com.hp.hpl.jena.ontology.ProfileException;
 import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.QuerySolutionMap;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Literal;
+import com.hp.hpl.jena.rdf.model.NodeIterator;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
@@ -38,9 +38,6 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean;
-import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
-import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
@@ -73,6 +70,8 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
             log.error(objectPropertyQueryString);
         }           
     }
+    
+    Map<ObjectProperty, String> customListViewConfigFiles = null;
     
     public ObjectPropertyDaoJena(WebappDaoFactoryJena wadf) {
         super(wadf);
@@ -859,9 +858,26 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
     }
     
     @Override
-    public String getCustomListView() {
-        //return getPropertyStringValue(, PROPERTY_CUSTOM_LIST_VIEW_ANNOT);  
-        return null;
+    public String getCustomListConfigFilename(ObjectProperty op) {
+        if (customListViewConfigFiles == null) {
+            customListViewConfigFiles = new HashMap<ObjectProperty, String>();
+            OntModel ontModel = getOntModelSelector().getDisplayModel();
+            Property listViewConfigProp = ontModel.getProperty(VitroVocabulary.DISPLAY + "customListViewConfigurationFile");
+            ResIterator resources = ontModel.listResourcesWithProperty(listViewConfigProp);
+            while (resources.hasNext()) {
+                Resource resource = resources.next();
+                ObjectProperty prop = getObjectPropertyByURI(resource.getURI());
+                NodeIterator nodes = ontModel.listObjectsOfProperty(resource, listViewConfigProp);
+                if (nodes.hasNext()) {
+                    RDFNode node = nodes.next(); // there should be at most one value; just get the first one
+                    if (node.isLiteral()) {
+                        String configFileName = ((Literal)node).getLexicalForm();
+                        customListViewConfigFiles.put(prop, configFileName);
+                    }
+                }
+            }
+        }        
+        return customListViewConfigFiles.get(op);
     }
     
 }

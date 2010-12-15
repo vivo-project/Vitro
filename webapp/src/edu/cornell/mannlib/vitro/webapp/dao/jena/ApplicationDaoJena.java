@@ -19,6 +19,7 @@ public class ApplicationDaoJena extends JenaBaseDao implements ApplicationDao {
 
 	Integer portalCount = null;
 	List<String> externallyLinkedNamespaces = null;
+
 	
     public ApplicationDaoJena(WebappDaoFactoryJena wadf) {
         super(wadf);
