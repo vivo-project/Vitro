@@ -99,6 +99,7 @@ public class DataPropertyStatementDaoSDB extends DataPropertyStatementDaoJena
                         fillDataPropertyStatementWithJenaLiteral(ed,lit);
                         ed.setDatapropURI(st.getPredicate().getURI());
                         ed.setIndividualURI(ind.getURI());
+                        ed.setIndividual(entity);
                         edList.add(ed);
                      /* } */
                     }

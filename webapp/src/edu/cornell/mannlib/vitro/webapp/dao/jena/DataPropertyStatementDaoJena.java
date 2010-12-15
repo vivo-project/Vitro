@@ -121,6 +121,7 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
                         fillDataPropertyStatementWithJenaLiteral(ed,lit);
                         ed.setDatapropURI(st.getPredicate().getURI());
                         ed.setIndividualURI(ind.getURI());
+                        ed.setIndividual(entity);
                         edList.add(ed);
                      /* } */
                     }
@@ -180,6 +181,7 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
 	                    Literal lit = (Literal)st.getObject();
 	                    fillDataPropertyStatementWithJenaLiteral(ed, lit);
 	                    ed.setIndividualURI(entity.getURI());
+	                    ed.setIndividual(entity);
 	                    ed.setDatapropURI(st.getPredicate().getURI());
 	                    edList.add(ed);
 	                }

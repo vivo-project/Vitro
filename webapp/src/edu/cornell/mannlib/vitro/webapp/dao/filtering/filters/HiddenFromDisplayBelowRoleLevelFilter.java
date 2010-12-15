@@ -154,7 +154,7 @@ public class HiddenFromDisplayBelowRoleLevelFilter extends VitroFiltersImpl {
                         return false;
                 }
 
-                Individual subject = wdf.getIndividualDao().getIndividualByURI( dPropStmt.getIndividualURI() );
+                Individual subject = dPropStmt.getIndividual();
                 if( subject == null ) {
                     if( ! canViewOddItems() ){  return false; }
                 }else{

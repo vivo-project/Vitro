@@ -12,6 +12,10 @@ import com.hp.hpl.jena.rdf.model.Property;
  */
 public interface DataPropertyStatement {
     
+    public Individual getIndividual();
+    
+    public void setIndividual(Individual individual);
+    
     public String getIndividualURI();
 
     public void setIndividualURI(String individualURI);

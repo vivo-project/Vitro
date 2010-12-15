@@ -38,8 +38,10 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     private static final Log log = LogFactory.getLog(JenaDataSourceSetupBase.class);
 
     protected final static int DEFAULT_MAXWAIT = 10000, // ms
+            DEFAULT_INITIALSIZE = 8,
             DEFAULT_MAXACTIVE = 300,
             DEFAULT_MAXIDLE = 30,
+            DEFAULT_MINIDLE = 8,
             DEFAULT_TIMEBETWEENEVICTIONS = 30 * 60 * 1000, // ms
             DEFAULT_TESTSPEREVICTION = 3,
             DEFAULT_MINEVICTIONIDLETIME = 1000 * 60 * 30; // ms
@@ -167,6 +169,8 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
            }
        }
        ds.setMaxActive(maxActiveInt);
+       ds.setInitialSize(DEFAULT_INITIALSIZE);
+       ds.setMinIdle(DEFAULT_MINIDLE);
        ds.setMaxIdle(DEFAULT_MAXIDLE);
        ds.setMaxWait(DEFAULT_MAXWAIT);
        ds.setValidationQuery(DEFAULT_VALIDATIONQUERY);
