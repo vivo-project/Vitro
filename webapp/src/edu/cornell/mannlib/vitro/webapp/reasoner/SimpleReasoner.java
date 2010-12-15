@@ -312,16 +312,15 @@ public class SimpleReasoner extends StatementListener {
 		
 		try {
 			OntModel unionModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
-			unionModel.add(aboxModel);
-			unionModel.add(inferenceModel);
+			unionModel.addSubModel(aboxModel);
+			unionModel.addSubModel(inferenceModel);
 					
 			StmtIterator iter = unionModel.listStatements((Resource) null, RDF.type, subClass);
 	
 			while (iter.hasNext()) {
 				
 				Statement stmt = iter.next();
-				Resource ind = unionModel.getResource(stmt.getSubject().getURI());
-				Statement infStmt = ResourceFactory.createStatement(ind, RDF.type, superClass);
+				Statement infStmt = ResourceFactory.createStatement(stmt.getSubject(), RDF.type, superClass);
 				
 				inferenceModel.enterCriticalSection(Lock.WRITE);
 				
@@ -353,15 +352,15 @@ public class SimpleReasoner extends StatementListener {
 		
 		try {
 			OntModel unionModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
-			unionModel.add(aboxModel);
-			unionModel.add(inferenceModel);
+			unionModel.addSubModel(aboxModel);
+			unionModel.addSubModel(inferenceModel);
 					
 			StmtIterator iter = unionModel.listStatements((Resource) null, RDF.type, subClass);
 	
 			while (iter.hasNext()) {
 				
 				Statement stmt = iter.next();
-				Resource ind = unionModel.getResource(stmt.getSubject().getURI());
+				Resource ind = stmt.getSubject();
 				
 				if (entailedType(ind,superClass)) continue;
 				
