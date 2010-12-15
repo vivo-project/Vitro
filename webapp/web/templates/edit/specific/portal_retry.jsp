@@ -55,7 +55,7 @@
 <!-- mb has added the following input text area to collect the homepage blurb, it is not functional -->
 <tr class="editformcell">
     <td valign="bottom" colspan="4">
-        <b>Homepage Blurb</b> <i>used for short institution summary (HTML is allowed)</i><br />
+        <b>Homepage blurb</b> <i>used for short institution summary (HTML is allowed)</i><br />
         <textarea name="HomepageBlurb" style="width: 90%;" ROWS="7" wrap="physical"><form:value name=""/></textarea>
         <font color="red"><form:error name=""/></font>
     </td>
