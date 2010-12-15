@@ -228,6 +228,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		       destdir="${war-classes.dir}"
 		       debug="true"
 		       deprecation="true"
+		       encoding="UTF8"
 		       optimize="true"
 		       source="1.6">
 			<classpath refid="compile.classpath" />
@@ -242,6 +243,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		       destdir="${test-classes.dir}"
 		       debug="true"
 		       deprecation="true"
+		       encoding="UTF8"
 		       optimize="false"
 		       source="1.6">
 			<classpath refid="test.compile.classpath" />
@@ -275,6 +277,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		       destdir="${test-classes.dir}"
 		       debug="true"
 		       deprecation="true"
+		       encoding="UTF8"
 		       optimize="false"
 		       source="1.6">
 		</javac>

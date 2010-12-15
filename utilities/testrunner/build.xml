@@ -58,6 +58,7 @@ run      - Run the tester.
 		       destdir="${build.dir}"
 		       debug="true"
 		       deprecation="true"
+		       encoding="UTF8"
 		       optimize="true"
 		       source="1.6">
 			<classpath>
@@ -77,6 +78,7 @@ run      - Run the tester.
 		       destdir="${build.dir}"
 		       debug="true"
 		       deprecation="true"
+		       encoding="UTF8"
 		       optimize="false"
 		       source="1.6">
 			<classpath>
