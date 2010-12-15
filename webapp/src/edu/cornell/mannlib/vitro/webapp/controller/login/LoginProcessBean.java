@@ -149,6 +149,11 @@ public class LoginProcessBean {
 		public String formatMessage(Object[] args) {
 			return new MessageFormat(this.format).format(args);
 		}
+
+		@Override
+		public String toString() {
+			return "Message[" + messageLevel + ", '" + format + "']";
+		}
 	}
 
 	// ----------------------------------------------------------------------
@@ -158,17 +163,20 @@ public class LoginProcessBean {
 	/** Where are we in the process? */
 	private State currentState = State.NOWHERE;
 
+	/** Where is the interaction taking place? */
+	private volatile String loginPageUrl;
+
+	/** Where do we go when finished? */
+	private volatile String afterLoginUrl;
+
+	/** message and messageArguments must be kept consistent. */
+	private final Object messageSynchronizer = new Object();
+
 	/** What message should we display on the screen? */
 	private Message message = Message.NO_MESSAGE;
 
 	/** What arguments are needed to format the message? */
 	private Object[] messageArguments = NO_ARGUMENTS;
-
-	/** Where is the interaction taking place? */
-	private String loginPageUrl;
-
-	/** Where do we go when finished? */
-	private String afterLoginUrl;
 
 	/**
 	 * What username was submitted to the form? This isn't just for display --
@@ -185,31 +193,39 @@ public class LoginProcessBean {
 	}
 
 	public void clearMessage() {
-		this.message = Message.NO_MESSAGE;
-		this.messageArguments = NO_ARGUMENTS;
+		synchronized (messageSynchronizer) {
+			this.message = Message.NO_MESSAGE;
+			this.messageArguments = NO_ARGUMENTS;
+		}
 	}
 
 	public void setMessage(Message message, Object... args) {
-		this.message = message;
-		this.messageArguments = args;
+		synchronized (messageSynchronizer) {
+			this.message = message;
+			this.messageArguments = args;
+		}
 	}
 
 	public String getInfoMessageAndClear() {
-		String text = "";
-		if (message.getMessageLevel() == MLevel.INFO) {
-			text = message.formatMessage(messageArguments);
-			clearMessage();
+		synchronized (messageSynchronizer) {
+			String text = "";
+			if (message.getMessageLevel() == MLevel.INFO) {
+				text = message.formatMessage(messageArguments);
+				clearMessage();
+			}
+			return text;
 		}
-		return text;
 	}
 
 	public String getErrorMessageAndClear() {
-		String text = "";
-		if (message.getMessageLevel() == MLevel.ERROR) {
-			text = message.formatMessage(messageArguments);
-			clearMessage();
+		synchronized (messageSynchronizer) {
+			String text = "";
+			if (message.getMessageLevel() == MLevel.ERROR) {
+				text = message.formatMessage(messageArguments);
+				clearMessage();
+			}
+			return text;
 		}
-		return text;
 	}
 
 	public String getUsername() {
@@ -238,8 +254,8 @@ public class LoginProcessBean {
 
 	@Override
 	public String toString() {
-		return "LoginProcessBean[state=" + currentState + ", message="
-				+ message + ", messageArguments="
+		return "LoginProcessBean(" + hashCode() + ")[state=" + currentState
+				+ ", message=" + message + ", messageArguments="
 				+ Arrays.deepToString(messageArguments) + ", username="
 				+ username + ", loginPageUrl=" + loginPageUrl
 				+ ", afterLoginUrl=" + afterLoginUrl + "]";
