@@ -59,7 +59,11 @@
 
 <!DOCTYPE html>
 <html lang="en">
-    ${ftl_head}
+    <head>
+        ${ftl_head}
+        
+        <c:if test="${!empty scripts}"><jsp:include page="${scripts}"/></c:if>
+    </head>
     
     <body ${requestScope.bodyAttr}>
             ${ftl_identity}
