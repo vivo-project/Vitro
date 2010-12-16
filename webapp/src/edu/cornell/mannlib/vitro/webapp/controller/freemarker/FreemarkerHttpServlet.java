@@ -26,7 +26,6 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ExceptionResponseValues;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.FileResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ForwardResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RdfResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RedirectResponseValues;
@@ -154,9 +153,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
                 doForward(vreq, response, values);
             } else if (values instanceof RdfResponseValues) {
                 doRdf(vreq, response, values);
-            } else if (values instanceof FileResponseValues) {
-                doFile(vreq, response, values);
-            }
+            } 
         } catch (ServletException e) {
             log.error("ServletException in doResponse()", e);
         } catch (IOException e) {
@@ -241,26 +238,6 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         }
         
         values.getModel().write( response.getOutputStream(), format );      
-    }
-    
-    protected void doFile(HttpServletRequest request, HttpServletResponse response, ResponseValues values) 
-        throws IOException {
-        
-        String mediaType = values.getContentType().getMediaType();
-        response.setContentType(mediaType);
-        
-        Map<String, String> headerKeyToValue = values.getHeader();
-        
-        for (Map.Entry<String, String> currentHeaderPair : headerKeyToValue.entrySet()) {
-        	response.setHeader(currentHeaderPair.getKey(), currentHeaderPair.getValue());
-        }
-        
-		PrintWriter responseWriter = response.getWriter();
-		
-		String rawFileContent = (String) values.getMap().get("fileContent");
-		responseWriter.append(rawFileContent);
-		responseWriter.close();
-			
     }
 
     protected void doException(VitroRequest vreq, HttpServletResponse response, ResponseValues values) {
