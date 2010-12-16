@@ -282,6 +282,7 @@ public class VClassGroupCache implements ServletContextListener{
         private boolean awareOfQueueChange = false;
 
         RebuildGroupCacheThread(VClassGroupCache cache) {
+        	super("VClassGroupCache.RebuildGroupCacheThread");
             this.cache = cache;
         }
         public void run() {

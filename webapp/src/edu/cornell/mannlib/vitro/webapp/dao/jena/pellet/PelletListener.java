@@ -428,7 +428,7 @@ public class PelletListener implements ModelChangedListener {
 			if (foreground) {
 				(new InferenceGetter(this)).run();
 			} else {
-				new Thread(new InferenceGetter(this)).start();
+				new Thread(new InferenceGetter(this), "PelletListener.InferenceGetter").start();
 			}
 		}
 	}
@@ -625,7 +625,7 @@ public class PelletListener implements ModelChangedListener {
 						if (foreground) {
 							(new PelletSynchronizer()).run();
 						} else {
-							new Thread(new PelletSynchronizer()).start();
+							new Thread(new PelletSynchronizer(), "PelletListener.PelletSynchronizer").start();
 						}
 					}
 				}
