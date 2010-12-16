@@ -3,27 +3,20 @@ package edu.cornell.mannlib.vitro.webapp.sparql;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vedit.beans.EditProcessObject;
-import edu.cornell.mannlib.vedit.beans.FormObject;
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
-import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.edit.SiteAdminController;
 
 /**
  * This servlet gets all the classes for initizing the sparql query builder.
@@ -33,8 +26,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.edit.SiteAdminController;
 
 public class GetAllClasses extends BaseEditController {
 
-	private static final Log log = LogFactory.getLog(SiteAdminController.class
-			.getName());
+	private static final Log log = LogFactory.getLog(GetAllClasses.class);
 
 	/**
 	 * The doGet method of the servlet. <br>
