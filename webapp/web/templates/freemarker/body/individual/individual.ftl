@@ -90,11 +90,11 @@
     <section id="sparklines-publications" role="region">
          <#include "individual-sparklineVisualization.ftl">
          
-        <header><img src="${urls.home}/images/individual/sparkline.gif" alt="" />
+        <#--<header><img src="${urls.home}/images/individual/sparkline.gif" alt="" />
             <h3><span class="grey">2</span> publications <span class="publication-year-range grey">within the last 10 years</span></h3>
         </header>
         
-        <p><a class="all-vivo-publications" href="#">All VIVO publications & co-author network.</a></p>
+        <p><a class="all-vivo-publications" href="#">All VIVO publications & co-author network.</a></p>-->
     </section>
     
     <section id="co-authors" role="region">

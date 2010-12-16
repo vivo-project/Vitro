@@ -1,6 +1,7 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-/* Style for individual display */
+@charset "UTF-8";
+/* CSS Document */
 
 /* <------ INDIVIDUAL INTRO FOR ANY CLASS*/
 #individual-intro{
@@ -291,8 +292,8 @@ p.view-all-coauthors{
 #property-group-menus li:last-child{
     background: none;
 }
-/* PROPERTY GROUPS------>  */
-.property-groups{
+/* PROPERTY GROUP------>  */
+.property-group{
     clear: both;
     width: 920px;
     border: 1px solid #dfebe5;
@@ -302,27 +303,27 @@ p.view-all-coauthors{
     margin-bottom: 20px;
     overflow: hidden;
 }
-section.property-groups h2{
+section.property-group h2{
     padding: 20px 25px 12px 35px;
     font-size: 20px;
     color: #2485ae;
     font-weight: normal;
     /*background:url(../../images/individual/arrow-down.gif) 120px 24px no-repeat;*/
 }
-article.property-group{
+article.property{
     width: 852px;
     margin: 0 auto;
     border: 1px solid #dfe6e5;
     margin-bottom: 20px;
 }
-article.property-group h3{
+article.property h3{
     border-bottom: 1px solid #dfe6e5;
     background: #fafaf9;
     font-size: 17px;
     color: #8aa149;
     padding: 10px 20px 10px 20px;
 }
-article.property-group .data-property{
+article.property .data-property-statement{
     background: #fff;
     font-size: 16px;
     color: #5e6363;
@@ -330,17 +331,17 @@ article.property-group .data-property{
     line-height: 1.2em;
     margin-bottom: 0;
 }
-article.property-group ul.object-property{
+article.property ul.property-list{
     background: #fff;
     font-size: 16px;
     color:# 5e6363;
 }
-article.property-group ul.object-property li{
+article.property ul.property-list li{
     line-height: 1.2em;
     padding-bottom: 10px;
     padding: 10px 20px 10px 20px;
 }
-article.property-group ul.object-property li a{
+article.property ul.property-list li a{
     color: #2485ae;
 }
 /* MISCELLANEOUS------>  */

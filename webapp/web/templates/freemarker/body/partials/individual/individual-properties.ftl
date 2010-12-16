@@ -17,7 +17,7 @@
         <#assign groupName = "">
     </#if> 
     
-    <section class="property-groups" role="region">
+    <section class="property-group" role="region">
    
         <#-- Display the group heading --> 
         <#if groupName?has_content>
@@ -26,23 +26,25 @@
         
         <#-- List the properties in the group -->        
         <#list group.properties as property>
-            <article class="property-group" role="article">
+            <article class="property" role="article">
                 <#-- Property display name -->
                 <h3>${property.name}</h3>
                     
                 <#-- List the statements for each property -->   
-                <#-- data property -->                 
-                <#if property.type == "data"> 
-                    <#list property.statements as statement>
-                        <p class="data-property">${statement.value}</p>
-                    </#list>
-                        
-                <#-- object property -->      
-                <#elseif property.collatedBySubclass>                             
-                    <#include "objectPropertyList-collated.ftl">
-                <#else>
-                    <#include "objectPropertyList-statements.ftl">
-                </#if>                   
+                <ul class="property-list" role="list"> 
+                    <#-- data property -->                 
+                    <#if property.type == "data"> 
+                        <#list property.statements as statement>
+                            <p class="data-property-statement">${statement.value}</p>
+                        </#list>
+                    
+                    <#-- object property -->      
+                    <#elseif property.collatedBySubclass>                             
+                        <#include "objectPropertyList-collated.ftl">
+                    <#else>
+                        <#include "objectPropertyList-statements.ftl">
+                    </#if>  
+                </ul>                 
             </article>              
 
         </#list>                    
