@@ -21,7 +21,7 @@
    
         <#-- Display the group heading --> 
         <#if groupName?has_content>
-            <h2><a name="${groupName}"></a>${groupName}</h2
+            <h2><a name="${groupName}"></a>${groupName}</h2>
         </#if>
         
         <#-- List the properties in the group -->        
