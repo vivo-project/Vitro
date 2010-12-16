@@ -244,9 +244,18 @@ public class UrlBuilder {
         return getPath(route.path(), params);
     }
     
+    public static String getIndividualProfileUrl(String individualUri, WebappDaoFactory wadf) {
+        Individual individual = wadf.getIndividualDao().getIndividualByURI(individualUri);
+        return getIndividualProfileUrl(individual, individualUri, wadf);
+    }
+    
     public static String getIndividualProfileUrl(Individual individual, WebappDaoFactory wadf) {
-        String profileUrl = null;
         String individualUri = individual.getURI();
+        return getIndividualProfileUrl(individual, individualUri, wadf);        
+    }
+    
+    private static String getIndividualProfileUrl(Individual individual, String individualUri, WebappDaoFactory wadf) {
+        String profileUrl = null;
         URI uri = new URIImpl(individualUri);
         String namespace = uri.getNamespace();
         String defaultNamespace = wadf.getDefaultNamespace();

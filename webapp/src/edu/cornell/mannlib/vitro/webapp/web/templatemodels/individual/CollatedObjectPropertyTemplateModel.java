@@ -22,7 +22,7 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
 
     private static final Log log = LogFactory.getLog(CollatedObjectPropertyTemplateModel.class);  
     
-    private Map<String, List<ObjectPropertyStatementTemplateModel>> collatedStatements;
+    private Map<String, List<ObjectPropertyStatementTemplateModel>> subclasses;
     //private List<SubclassList> subclassList;
     
     CollatedObjectPropertyTemplateModel(ObjectProperty op, Individual subject, WebappDaoFactory wdf) throws Exception {
@@ -53,16 +53,16 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
         ObjectPropertyStatementDao opDao = wdf.getObjectPropertyStatementDao();
         String subjectUri = subject.getURI();
         String propertyUri = op.getURI();
-        List<Map<String, Object>> statementData = opDao.getObjectPropertyStatementsForIndividualByProperty(subjectUri, propertyUri, getQueryString());
-        collatedStatements = new HashMap<String, List<ObjectPropertyStatementTemplateModel>>(statementData.size());
+        List<Map<String, String>> statementData = opDao.getObjectPropertyStatementsForIndividualByProperty(subjectUri, propertyUri, getQueryString());
+        subclasses = new HashMap<String, List<ObjectPropertyStatementTemplateModel>>(statementData.size());
 //        for (Map<String, Object> map : statementData) {
 //            statements.add(new ObjectPropertyStatementTemplateModel(subjectUri, propertyUri, map, wdf));
 //        }
         
-        if (statementData.size() > 0) {
-            String collationTarget = getCollationTarget();
-            List<VClass> vclasses = getDirectVClasses(collationTarget, statementData);
-        }
+//        if (statementData.size() > 0) {
+//            String collationTarget = getCollationTarget();
+//            List<VClass> vclasses = getDirectVClasses(collationTarget, statementData);
+//        }
         
     }
     
@@ -92,7 +92,7 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
     /* Access methods for templates */
     
     public Map<String, List<ObjectPropertyStatementTemplateModel>> getCollatedStatements() {
-        return collatedStatements;
+        return subclasses;
     }
     
     @Override

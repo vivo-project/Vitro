@@ -2,10 +2,6 @@
 
 <#-- Template for property listing on individual profile page -->
 
-<#-- RY Just a temporary fix to prevent classgroup heading from being pushed to the right edge of the page. 
-Feel free to redo/remove. -->
-<#--><div style="clear: both;" />-->
-
 <#list propertyGroups as group>
 
     <#-- Get the group name -->
@@ -17,7 +13,7 @@ Feel free to redo/remove. -->
             <#assign groupName = "other">
         </#if>
     <#else>
-        <#-- If there are no groups, a dummy group has been created with a null name. -->
+        <#-- If there are no groups, a dummy group has been created with a null (as opposed to empty) name. -->
         <#assign groupName = "">
     </#if> 
     
@@ -28,32 +24,27 @@ Feel free to redo/remove. -->
             <h2><a name="${groupName}"></a>${groupName}</h2
         </#if>
         
-        <#-- Now list the properties in the group -->
-        
-            <#list group.properties as property>
+        <#-- List the properties in the group -->        
+        <#list group.properties as property>
             <article class="property-group" role="article">
                 <#-- Property display name -->
                 <h3>${property.name}</h3>
-
-                <#-- List the statements for each property -->                    
-                <#if property.type == "data"> <#-- data property -->
+                    
+                <#-- List the statements for each property -->   
+                <#-- data property -->                 
+                <#if property.type == "data"> 
                     <#list property.statements as statement>
                         <p class="data-property">${statement.value}</p>
-                         <!-- end data-prop-stmt-value -->
                     </#list>
-            
-                <#else> <#-- object property -->      
-                    <#if property.collatedBySubclass>                             
-                        <#include "objectPropertyList-collated.ftl">
-                    <#else>
-                    <ul class="object-property" role="list">
-                        <#include "${property.template}">
-                    </ul> <!-- end obj-prop-stmt-obj -->
-                    </#if>
+                        
+                <#-- object property -->      
+                <#elseif property.collatedBySubclass>                             
+                    <#include "objectPropertyList-collated.ftl">
+                <#else>
+                    <#include "objectPropertyList-statements.ftl">
                 </#if>                   
-             <!-- end property -->  
-              </article>             
-            </#list>            
-        <!-- end properties -->        
-    </section> <!-- end property-group -->   
+            </article>              
+
+        </#list>                    
+    </section> 
 </#list> 

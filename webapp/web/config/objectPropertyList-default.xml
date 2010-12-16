@@ -1,13 +1,22 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 <view-config>
-    <query>        
-        SELECT ?object {
+    <query>    
+        PREFIX vitro: &lt;http://vitro.mannlib.cornell.edu/ns/vitro/0.7#&gt;
+        PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;  
+          
+        SELECT ?object ?name ?moniker {
             ?subject ?property ?object .
+            OPTIONAL { ?object rdfs:label ?name . }
+            OPTIONAL { ?object vitro:moniker ?moniker . }
         }       
     </query>
     
     <collation-target>object</collation-target>
     
-    <template>objectPropertyList-default.ftl</template>
+    <link-target>object</link-target>
+    
+    <preprocessor></preprocessor>
+    
+    <template>shortView-default.ftl</template>
 </view-config>

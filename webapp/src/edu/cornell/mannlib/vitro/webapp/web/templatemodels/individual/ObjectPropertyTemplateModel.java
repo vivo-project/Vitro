@@ -3,6 +3,8 @@
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
 import java.io.File;
+import java.util.List;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -15,6 +17,7 @@ import org.w3c.dom.NodeList;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
@@ -44,6 +47,11 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     protected String getCollationTarget() {
         return config.collationTarget;
     }
+    
+    protected String getLinkTarget() {
+        return config.linkTarget;
+    }
+    
        
     protected static ObjectPropertyTemplateModel getObjectPropertyTemplateModel(ObjectProperty op, Individual subject, WebappDaoFactory wdf) {
         if (op.getCollateBySubclass()) {
@@ -58,6 +66,23 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         }
     }
     
+    /** Applies preprocessing to query results to prepare for template */
+    protected void preprocess(List<Map<String, String>> data, WebappDaoFactory wdf) {
+        /* First apply standard post-processing for all object properties */
+        
+        // Add urls for link targets to the data
+        String linkTarget = config.linkTarget;
+        for (Map<String, String> map : data) {
+            String targetUri = map.get(linkTarget);
+            if (targetUri != null) {
+                String targetUrl = UrlBuilder.getIndividualProfileUrl(targetUri, wdf);
+                map.put(linkTarget + "Url", targetUrl);
+            }
+        }
+
+        /* Then apply custom post-processing specified in config */
+    }
+    
     private class PropertyListConfig {
 
         private static final String DEFAULT_CONFIG_FILE = "objectPropertyList-default.xml";
@@ -65,10 +90,14 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         private static final String NODE_NAME_QUERY = "query";
         private static final String NODE_NAME_TEMPLATE = "template";
         private static final String NODE_NAME_COLLATION_TARGET = "collation-target";
+        private static final String NODE_NAME_LINK_TARGET = "link-target";
+        private static final String NODE_NAME_PREPROCESSOR = "preprocessor";
         
         private String queryString;
         private String templateName;
         private String collationTarget;
+        private String linkTarget; // we could easily make this a list if we ever want multiple links
+        private String preprocessor;
 
         PropertyListConfig(ObjectProperty op, WebappDaoFactory wdf) throws Exception {
 
@@ -93,9 +122,13 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
                 DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
                 DocumentBuilder db = dbf.newDocumentBuilder();
                 Document doc = db.parse(configFilePath);
+                // Required values
                 queryString = getConfigValue(doc, NODE_NAME_QUERY);
-                templateName = getConfigValue(doc, NODE_NAME_TEMPLATE);
+                templateName = getConfigValue(doc, NODE_NAME_TEMPLATE);                
+                // Optional values
                 collationTarget = getConfigValue(doc, NODE_NAME_COLLATION_TARGET);
+                linkTarget = getConfigValue(doc, NODE_NAME_LINK_TARGET); // if this is null, no link will be generated
+                preprocessor = getConfigValue(doc, NODE_NAME_PREPROCESSOR);
             } catch (Exception e) {
                 log.error("Error processing config file " + configFilePath + " for object property " + op.getURI(), e);
                 // What should we do here?

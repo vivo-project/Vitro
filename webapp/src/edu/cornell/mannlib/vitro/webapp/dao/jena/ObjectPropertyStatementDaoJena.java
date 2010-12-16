@@ -251,7 +251,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
      * custom queries that could request any data in addition to just the object of the statement.
      * However, we do need to get the object of the statement so that we have it to create editing links.
      */
-    public List<Map<String, Object>> getObjectPropertyStatementsForIndividualByProperty(String subjectUri, String propertyUri, String queryString) {  
+    public List<Map<String, String>> getObjectPropertyStatementsForIndividualByProperty(String subjectUri, String propertyUri, String queryString) {  
         
         log.debug("Object property query string: " + queryString);
         
@@ -269,47 +269,16 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
 
         // Run the SPARQL query to get the properties        
         QueryExecution qexec = QueryExecutionFactory.create(query, getOntModelSelector().getFullModel(), bindings);
-        return executeQueryToObjectValueCollection(qexec);
-    }
-    
-    protected List<Map<String, Object>> executeQueryToObjectValueCollection(
-            QueryExecution qexec) {
-        List<Map<String, Object>> rv = new ArrayList<Map<String, Object>>();
         ResultSet results = qexec.execSelect();
+        List<Map<String, String>> list = new ArrayList<Map<String, String>>();
+
         while (results.hasNext()) {
             QuerySolution soln = results.nextSolution();
-            rv.add(querySolutionToObjectValueMap(soln));
+            list.add(QueryUtils.querySolutionToStringValueMap(soln));
         }
-        return rv;
+        return list;
     }
     
-    protected Map<String,Object> querySolutionToObjectValueMap( QuerySolution soln){
-        Map<String,Object> map = new HashMap<String,Object>();
-        Iterator<String> varNames = soln.varNames();
-        while(varNames.hasNext()){
-            String varName = varNames.next();
-            map.put(varName, nodeToObject( soln.get(varName)));
-        }
-        return map;
-    }
+
     
-    protected Object nodeToObject( RDFNode node ){
-        if( node == null ){
-            return "";
-        }else if( node.isLiteral() ){
-            Literal literal = node.asLiteral();
-            //return literal.getValue();
-            return literal.getLexicalForm();
-        }else if( node.isURIResource() ){
-            Resource resource = node.asResource();
-            // See notes in ObjectPropertyStatementTemplateModel about why we are returning the individual
-            // here instead of just the URI.
-            return getWebappDaoFactory().getIndividualDao().getIndividualByURI(resource.getURI());
-        }else if( node.isAnon() ){  
-            Resource resource = node.asResource();
-            return resource.getId().getLabelString(); //get b-node id
-        }else{
-            return "";
-        }
-    }
 }

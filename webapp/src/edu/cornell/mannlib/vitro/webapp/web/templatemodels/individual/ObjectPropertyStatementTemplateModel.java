@@ -19,24 +19,12 @@ public class ObjectPropertyStatementTemplateModel extends BaseTemplateModel {
     
     private String subjectUri; // we'll use these to make the edit links
     private String propertyUri;
-    private Map<String, Object> data;
-    private WebappDaoFactory wdf;
+    private Map<String, String> data;
 
-    ObjectPropertyStatementTemplateModel(String subjectUri, String propertyUri, Map<String, Object> data, WebappDaoFactory wdf) {
+    ObjectPropertyStatementTemplateModel(String subjectUri, String propertyUri, Map<String, String> data) {
         this.subjectUri = subjectUri;
         this.propertyUri = propertyUri;
-        this.wdf = wdf;
-        this.data = new HashMap<String, Object>(data.size());
-        // See comments above the StatementObject class definition on why we don't just set this.data = data.
-        for (String key : data.keySet()) {
-            Object value = data.get(key);
-            if (value instanceof Individual) {
-                Individual i = (Individual) value;
-                this.data.put(key, new StatementObject(i));
-            } else {
-                this.data.put(key, value);
-            } 
-        }
+        this.data = data;
     }
 
     /* This is a hopefully temporary solution to account for the fact that in the default
@@ -75,28 +63,7 @@ public class ObjectPropertyStatementTemplateModel extends BaseTemplateModel {
      * object getProfileUrl(String uri), so in the template we call ${statement.profileUrl(object)} (but still the semantics
      * is a bit weird, since the profile url doesn't belong to the statement).
      */
-    public class StatementObject {
-        
-        private Individual individual;
-        
-        StatementObject(Individual individual) {
-            this.individual = individual;
-        }
-        
-        /* Access methods for templates */
-        
-        public String getName() {
-            return individual.getName();
-        }
-        
-        public String getMoniker() {
-            return individual.getMoniker();
-        }
-        
-        public String getUrl() {
-            return UrlBuilder.getIndividualProfileUrl(individual, wdf);
-        }
-    }
+
 
     
     /* Access methods for templates */

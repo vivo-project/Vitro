@@ -30,5 +30,5 @@ public interface ObjectPropertyStatementDao {
 
     int insertNewObjectPropertyStatement(ObjectPropertyStatement objPropertyStmt );
     
-    public List<Map<String, Object>> getObjectPropertyStatementsForIndividualByProperty(String subjectUri, String propertyUri, String query);
+    public List<Map<String, String>> getObjectPropertyStatementsForIndividualByProperty(String subjectUri, String propertyUri, String query);
 }
