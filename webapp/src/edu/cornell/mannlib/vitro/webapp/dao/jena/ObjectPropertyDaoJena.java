@@ -72,18 +72,19 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         }           
     }
     
-    static protected String customListViewConfigFileQueryString =
+    static protected String listViewConfigFileQueryString =
         "PREFIX display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#>" +
         "SELECT ?property ?filename WHERE { \n" +
-        "    ?property display:customListViewConfigurationFile ?filename . \n" +
+        "    ?property display:listViewConfigurationFile ?filename . \n" +
         "} LIMIT 1";
-    static protected Query customListViewConfigFileQuery;
+    
+    static protected Query listViewConfigFileQuery;
     static {
         try {
-            customListViewConfigFileQuery = QueryFactory.create(customListViewConfigFileQueryString);
+            listViewConfigFileQuery = QueryFactory.create(listViewConfigFileQueryString);
         } catch(Throwable th){
-            log.error("could not create SPARQL query for customListViewConfigFileQueryString " + th.getMessage());
-            log.error(customListViewConfigFileQueryString);
+            log.error("could not create SPARQL query for listViewConfigFileQueryString " + th.getMessage());
+            log.error(listViewConfigFileQueryString);
         }           
     }
     
@@ -894,7 +895,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
 //                }
 //            }
             
-            QueryExecution qexec = QueryExecutionFactory.create(customListViewConfigFileQuery, displayModel); 
+            QueryExecution qexec = QueryExecutionFactory.create(listViewConfigFileQuery, displayModel); 
             ResultSet results = qexec.execSelect();           
             while (results.hasNext()) {
                 QuerySolution soln = results.next();
