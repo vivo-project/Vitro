@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
 import java.io.File;
+import java.lang.reflect.Constructor;
 import java.util.List;
 import java.util.Map;
 
@@ -17,7 +18,6 @@ import org.w3c.dom.NodeList;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
@@ -25,6 +25,12 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     
     private static final Log log = LogFactory.getLog(ObjectPropertyTemplateModel.class);      
     private static final String TYPE = "object";
+    /* NB The default preprocessor is not the same as the preprocessor for the default view. The latter
+     * actually defines its own preprocessor, whereas the default preprocessor is used for custom views
+     * that don't define a preprocessor.
+     */
+    private static final String DEFAULT_PREPROCESSOR = 
+        "edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.BaseObjectPropertyDataPreprocessor";
 
     private PropertyListConfig config;
 
@@ -66,21 +72,21 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         }
     }
     
-    /** Applies preprocessing to query results to prepare for template */
+    /** Apply preprocessing to query results to prepare for template */
     protected void preprocess(List<Map<String, String>> data, WebappDaoFactory wdf) {
-        /* First apply standard post-processing for all object properties */
-        
-        // Add urls for link targets to the data
-        String linkTarget = config.linkTarget;
-        for (Map<String, String> map : data) {
-            String targetUri = map.get(linkTarget);
-            if (targetUri != null) {
-                String targetUrl = UrlBuilder.getIndividualProfileUrl(targetUri, wdf);
-                map.put(linkTarget + "Url", targetUrl);
-            }
+        String preprocessorName = config.preprocessor;
+        if (preprocessorName == null) {
+            preprocessorName = DEFAULT_PREPROCESSOR;
         }
 
-        /* Then apply custom post-processing specified in config */
+        try {
+            Class<?> preprocessorClass = Class.forName(preprocessorName);
+            Constructor<?> constructor = preprocessorClass.getConstructor(ObjectPropertyTemplateModel.class, WebappDaoFactory.class);
+            ObjectPropertyDataPreprocessor preprocessor = (ObjectPropertyDataPreprocessor) constructor.newInstance(this, wdf);
+            preprocessor.process(data);
+        } catch (Exception e) {
+            log.error(e, e);
+        }
     }
     
     private class PropertyListConfig {

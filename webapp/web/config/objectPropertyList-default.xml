@@ -16,7 +16,7 @@
     
     <link-target>object</link-target>
     
-    <preprocessor></preprocessor>
+    <preprocessor>edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.DefaultObjectPropertyDataPreprocessor</preprocessor>
     
     <template>shortView-default.ftl</template>
 </view-config>

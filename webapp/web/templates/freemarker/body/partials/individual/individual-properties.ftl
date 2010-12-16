@@ -35,7 +35,7 @@
                     <#-- data property -->                 
                     <#if property.type == "data"> 
                         <#list property.statements as statement>
-                            <p class="data-property-statement">${statement.value}</p>
+                            <li role="listitem">${statement.value}</li>
                         </#list>
                     
                     <#-- object property -->      
@@ -45,8 +45,7 @@
                         <#include "objectPropertyList-statements.ftl">
                     </#if>  
                 </ul>                 
-            </article>              
-
+            </article> <!-- end property -->             
         </#list>                    
-    </section> 
+    </section> <!-- end property-group -->
 </#list> 

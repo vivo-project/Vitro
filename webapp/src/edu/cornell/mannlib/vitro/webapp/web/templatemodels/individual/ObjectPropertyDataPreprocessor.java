@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.web.templatemodels.preprocessors;
+package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
 import java.util.List;
 import java.util.Map;
@@ -15,6 +15,6 @@ import java.util.Map;
 
 public interface ObjectPropertyDataPreprocessor {
 
-    public void preprocess(List<Map<String, String>> data);
+    public void process(List<Map<String, String>> data);
    
 }
