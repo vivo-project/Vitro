@@ -48,7 +48,7 @@
             </#if>              
             </ul>
         </nav>
-    </sction>
+    </section>
     
     <section id="individual-info" role="region">
         <header>
@@ -90,7 +90,7 @@
     <section id="sparklines-publications" role="region">
          <#include "individual-sparklineVisualization.ftl">
          
-        <#--<header><img src="${urls.home}/images/individual/sparkline.gif" alt="" />
+         <#--<header><img src="${urls.home}/images/individual/sparkline.gif" alt="" />
             <h3><span class="grey">2</span> publications <span class="publication-year-range grey">within the last 10 years</span></h3>
         </header>
         
