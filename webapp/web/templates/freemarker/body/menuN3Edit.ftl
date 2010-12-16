@@ -15,7 +15,7 @@
     </#if>
     
     <#if menuN3??>
-    <form class="" action="${urls.base}/MenuN3EditController" method="post">
+    <form class="" action="${urls.base}/${currentPage}" method="post">
       <label for="navigatioN3"></label>
       <textarea name="navigationN3" id="textarea" cols="45" rows="40">
       ${menuN3}

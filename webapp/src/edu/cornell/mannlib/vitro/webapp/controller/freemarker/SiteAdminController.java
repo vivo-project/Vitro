@@ -119,6 +119,10 @@ public class SiteAdminController extends FreemarkerHttpServlet {
         }
  
         urls.put("siteInfo", urlBuilder.getPortalUrl("/editForm", new ParamMap("controller", "Portal", "id", String.valueOf(urlBuilder.getPortalId()))));  
+
+        if (LoginStatusBean.getBean(vreq).isLoggedInAtLeast(LoginStatusBean.DBA)) {
+            urls.put("menuN3Editor", urlBuilder.getPortalUrl("/menuN3Editor"));            
+        }
         
         map.put("urls", urls);
         
