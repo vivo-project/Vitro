@@ -4,6 +4,9 @@ package edu.cornell.mannlib.vitro.webapp.controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Writer;
+import java.net.HttpURLConnection;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -22,15 +25,19 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import atg.taglib.json.util.HTTP;
+
 import com.hp.hpl.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
+import edu.cornell.mannlib.vitro.webapp.controller.TabEntitiesController.PageRecord;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.SelectListGenerator;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.web.DisplayVocabulary;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModel;
 
 /**
  * This servlet is for servicing requests for JSON objects/data.
@@ -61,7 +68,107 @@ public class JSONServlet extends VitroHttpServlet {
         }else if( vreq.getParameter("getN3EditOptionList") != null ){
             doN3EditOptionList(req,resp);
             return;
+        }else if( vreq.getParameter("getLuceneIndividualsByVClass") != null ){
+            getLuceneIndividualsByVClass(req,resp);
+            return;
         }
+        
+    }
+
+    private void getLuceneIndividualsByVClass(HttpServletRequest req, HttpServletResponse resp) {        
+        VitroRequest vreq = new VitroRequest(req);
+        String errorMessage = null;
+        String message = null;
+        VClass vclass=null;
+        JSONObject rObj = new JSONObject();
+        
+        try {                                   
+            String vitroClassIdStr = vreq.getParameter("vclassId");
+            if ( vitroClassIdStr != null && !vitroClassIdStr.isEmpty()){                             
+                vclass = vreq.getWebappDaoFactory().getVClassDao().getVClassByURI(vitroClassIdStr);
+                if (vclass == null) {
+                    log.debug("Couldn't retrieve vclass ");   
+                    throw new Exception (errorMessage = "Class " + vitroClassIdStr + " not found");
+                }                           
+            }else{
+                log.debug("parameter vclassId URI parameter expected ");
+                throw new Exception("parameter vclassId URI parameter expected ");
+            }
+            
+            rObj.put("vclass", 
+                    new JSONObject().put("URI",vclass.getURI())
+                                    .put("name",vclass.getName()));
+            
+            if (vclass != null) {
+                String alpha = EntityListController.getAlphaParamter(vreq);
+                int page = EntityListController.getPageParameter(vreq);
+                Map<String,Object> map = EntityListController.getResultsForVClass(
+                        vclass.getURI(), 
+                        page, 
+                        alpha, 
+                        vreq.getPortal(), 
+                        vreq.getWebappDaoFactory().getPortalDao().isSinglePortal(), 
+                        vreq.getWebappDaoFactory().getIndividualDao(), 
+                        getServletContext());                                                
+                
+                rObj.put("totalCount", map.get("totalCount"));
+                rObj.put("alpha", map.get("alpha"));
+                
+                List<Individual> inds = (List<Individual>)map.get("entities");
+                List<IndividualTemplateModel> indsTm = new ArrayList<IndividualTemplateModel>();
+                JSONArray jInds = new JSONArray();
+                for(Individual ind : inds ){
+                    JSONObject jo = new JSONObject();
+                    jo.put("URI", ind.getURI());
+                    jo.put("label",ind.getRdfsLabel());
+                    jo.put("name",ind.getName());                    
+                    jInds.put(jo);
+                }
+                rObj.put("individuals", jInds);
+                
+                JSONArray wpages = new JSONArray();
+                List<PageRecord> pages = (List<PageRecord>)map.get("pages");                
+                for( PageRecord pr: pages ){                    
+                    JSONObject p = new JSONObject();
+                    p.put("text", pr.text);
+                    p.put("param", pr.param);
+                    p.put("index", pr.index);
+                    wpages.put( p );
+                }
+                rObj.put("pages",wpages);    
+                
+                JSONArray jletters = new JSONArray();
+                List<String> letters = Controllers.getLetters();
+                for( String s : letters){
+                    JSONObject jo = new JSONObject();
+                    jo.put("text", s);
+                    jo.put("param", "alpha=" + URLEncoder.encode(s, "UTF-8"));
+                    jletters.put( jo );
+                }
+                rObj.put("letters", jletters);
+            }            
+                                    
+        }catch(Exception ex){
+            errorMessage = ex.getMessage();
+        }      
+        try{
+            resp.setCharacterEncoding("UTF-8");
+            resp.setContentType("application/json;charset=UTF-8");
+            
+            if( errorMessage != null ){
+                rObj.put("errorMessage", errorMessage);
+                resp.setStatus(500 /*HttpURLConnection.HTTP_SERVER_ERROR*/);
+            }else{
+                rObj.put("errorMessage", "");
+            }            
+            Writer writer = resp.getWriter();
+            writer.write(rObj.toString());
+        }catch(JSONException jse){
+            log.error(jse,jse);
+        } catch (IOException e) {
+            log.error(e,e);
+        }
+        return;
     }
 
     /**
@@ -130,7 +237,7 @@ public class JSONServlet extends VitroHttpServlet {
         boolean more = false;
         int count = 0;
         int size = REPLY_SIZE;
-          /* we have a large number of items to send back so we need to stash the list in the session scope */
+        /* we have a large number of items to send back so we need to stash the list in the session scope */
         if( entsInVClass.size() > REPLY_SIZE){
             more = true;
             ListIterator<Individual> entsFromVclass = entsInVClass.listIterator();

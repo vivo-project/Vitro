@@ -68,7 +68,7 @@ public class EntityListController extends VitroHttpServlet {
     throws IOException, ServletException {
         startTime = System.currentTimeMillis(); // TODO: remove
         try {
-            super.doGet(req, res);
+            super.doGet(req, res); 
             VitroRequest vreq = new VitroRequest(req);
             Object obj = req.getAttribute("vclass");
             VClass vclass=null;
@@ -164,7 +164,10 @@ public class EntityListController extends VitroHttpServlet {
         rd.include(request,res);
     }
 
-   
+   /**
+    * This method is now called in a couple of places.  It should be refactored
+    * into a DAO or similar object.
+    */
     public static Map<String,Object> getResultsForVClass(String vclassURI, int page, String alpha, Portal portal, boolean isSinglePortal, IndividualDao indDao, ServletContext context) 
     throws CorruptIndexException, IOException, ServletException{
         Map<String,Object> rvMap = new HashMap<String,Object>();

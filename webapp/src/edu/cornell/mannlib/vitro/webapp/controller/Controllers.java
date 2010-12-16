@@ -94,12 +94,12 @@ public class Controllers {
     
     //public static final String TAB_ENTITIES_LIST_JSP = "templates/tab/tabEntities.jsp";
 
-    private static List letters = null;
-    public static List getLetters() {
+    private static List<String> letters = null;
+    public static List<String> getLetters() {
         //there must be a better place to put this.
         if (Controllers.letters == null) {
             char c[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
-            Controllers.letters = new ArrayList(c.length);
+            Controllers.letters = new ArrayList<String>(c.length);
             for (int i = 0; i < c.length; i++) {
                 letters.add("" + c[i]);
             }
