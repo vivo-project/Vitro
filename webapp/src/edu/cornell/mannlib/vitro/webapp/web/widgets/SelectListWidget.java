@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
@@ -25,7 +24,7 @@ public class SelectListWidget extends Widget {
     
     @Override
     protected WidgetTemplateValues process(Environment env, Map params,
-            HttpServletRequest request, ServletContext context) {        
+            VitroRequest vreq, ServletContext context) {        
         
         Object obj = params.get("fieldName");
         if( obj == null  || !(obj instanceof SimpleScalar)){
@@ -37,10 +36,9 @@ public class SelectListWidget extends Widget {
             log.error("SelectListWidget must have a parameter 'fieldName'");        
             throw new Error("SelectListWidget must have a parameter 'fieldName' of type String");
         }
-        
-        VitroRequest vreq = new VitroRequest(request);        
-        HttpSession session = request.getSession(false);
-        EditConfiguration editConfig = EditConfiguration.getConfigFromSession(session,request);                
+              
+        HttpSession session = vreq.getSession(false);
+        EditConfiguration editConfig = EditConfiguration.getConfigFromSession(session,vreq);                
         
         WebappDaoFactory wdf;
         if (editConfig != null) { 

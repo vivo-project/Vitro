@@ -2,4 +2,4 @@
 
 <#-- Default object property statement short view template -->
 
-<a href="${statement.objectUrl}">${statement.name!}</a> ${statement.moniker!} 
+<a href="${url(statement.object)}">${statement.name!}</a> ${statement.moniker!} 

@@ -32,20 +32,20 @@ public class BrowseWidget extends Widget {
             
     @Override
     protected WidgetTemplateValues process(Environment env, Map params,
-            HttpServletRequest request, ServletContext context) throws Exception 
+            VitroRequest vreq, ServletContext context) throws Exception 
     {
-        Mode mode = getMode( request, params );
+        Mode mode = getMode( vreq, params );
         switch( mode ){          
             case VCLASS_ALPHA:
-                return doClassAlphaDisplay(env,params,request,context);
+                return doClassAlphaDisplay(env,params,vreq,context);
             case CLASS_GROUP:
-                return doClassGroupDisplay(env, params, request, context);
+                return doClassGroupDisplay(env, params, vreq, context);
             case VCLASS:
-                return doClassDisplay(env, params, request, context);
+                return doClassDisplay(env, params, vreq, context);
             case ALL_CLASS_GROUPS:
-                return doAllClassGroupsDisplay(env, params, request, context);
+                return doAllClassGroupsDisplay(env, params, vreq, context);
             default:
-                return doAllClassGroupsDisplay(env, params, request, context);
+                return doAllClassGroupsDisplay(env, params, vreq, context);
         }
     }
     
@@ -56,8 +56,8 @@ public class BrowseWidget extends Widget {
     }
 
     protected WidgetTemplateValues doAllClassGroupsDisplay(Environment env, Map params,
-            HttpServletRequest request, ServletContext context) {
-        Map<String,Object> body = getAllClassGroupData(request, params);
+            VitroRequest vreq, ServletContext context) {
+        Map<String,Object> body = getAllClassGroupData(vreq, params);
         try {
             body.put("urls",env.getDataModel().get("urls"));
             body.put("urlMapping",env.getDataModel().get("urlMapping"));
@@ -69,10 +69,9 @@ public class BrowseWidget extends Widget {
         return new WidgetTemplateValues(macroName, body);
     }
    
-    protected Map<String,Object> getAllClassGroupData(HttpServletRequest request, Map params){
+    protected Map<String,Object> getAllClassGroupData(VitroRequest vreq, Map params){
         Map<String,Object> map = new HashMap<String,Object>();
         
-        VitroRequest vreq = new VitroRequest(request);
         List<VClassGroup> classGroups =
             vreq.getWebappDaoFactory().getVClassGroupDao().getPublicGroupsWithVClasses();
         
@@ -85,9 +84,9 @@ public class BrowseWidget extends Widget {
     }
     
     protected WidgetTemplateValues doClassDisplay(Environment env, Map params,
-            HttpServletRequest request, ServletContext context) {        
+            VitroRequest vreq, ServletContext context) {        
         
-        Map<String,Object> body = getClassData(request,params);
+        Map<String,Object> body = getClassData(vreq,params);
         
         try {
             body.put("urls",env.getDataModel().get("urls"));
@@ -100,13 +99,12 @@ public class BrowseWidget extends Widget {
         return new WidgetTemplateValues(macroName, body);
     }
 
-    private Map<String, Object> getClassData(HttpServletRequest request, Map params) {
+    private Map<String, Object> getClassData(VitroRequest vreq, Map params) {
         Map<String,Object> map = new HashMap<String,Object>();
         
-        map.putAll(getClassGroupData(request, params));
+        map.putAll(getClassGroupData(vreq, params));
         
-        String classUri = getParam(Mode.VCLASS, request, params);
-        VitroRequest vreq = new VitroRequest(request);
+        String classUri = getParam(Mode.VCLASS, vreq, params);
         VClass vclass = vreq.getWebappDaoFactory().getVClassDao().getVClassByURI(classUri);
         map.put("class", new VClassTemplateModel(vclass));
         
@@ -123,9 +121,9 @@ public class BrowseWidget extends Widget {
     }
 
     protected WidgetTemplateValues doClassGroupDisplay(Environment env,
-            Map params, HttpServletRequest request, ServletContext context) {
+            Map params, VitroRequest vreq, ServletContext context) {
 
-        Map<String,Object> body = getClassGroupData(request,params);
+        Map<String,Object> body = getClassGroupData(vreq,params);
         
         try {
             body.put("urls",env.getDataModel().get("urls"));
@@ -138,11 +136,10 @@ public class BrowseWidget extends Widget {
         return new WidgetTemplateValues(macroName, body);
     } 
         
-    protected Map<String, Object> getClassGroupData(HttpServletRequest request, Map params) {
+    protected Map<String, Object> getClassGroupData(VitroRequest vreq, Map params) {
         Map<String,Object> map = new HashMap<String,Object>();
         
-        String vcgName = getParam(Mode.CLASS_GROUP, request, params);
-        VitroRequest vreq = new VitroRequest(request);        
+        String vcgName = getParam(Mode.CLASS_GROUP, vreq, params);       
         VClassGroup vcg = vreq.getWebappDaoFactory().getVClassGroupDao().getGroupByName(vcgName);
         
         vreq.getWebappDaoFactory().getVClassDao().addVClassesToGroup(vcg, false, true);

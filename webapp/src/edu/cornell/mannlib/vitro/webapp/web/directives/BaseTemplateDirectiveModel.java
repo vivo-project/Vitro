@@ -7,15 +7,10 @@ import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper;
 import freemarker.core.Environment;
-import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateDirectiveModel;
 import freemarker.template.TemplateException;
