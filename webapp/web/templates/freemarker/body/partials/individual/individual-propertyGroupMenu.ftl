@@ -3,6 +3,7 @@
 <#-- Template for property group menu on individual profile page -->
 
 <#assign nameForOtherGroup = nameForOtherGroup!"other">
+<a name="property-nav"></a>
 <nav id="property-group-menus" role="navigation">
     <ul role="list">
         <#list propertyGroups as group>

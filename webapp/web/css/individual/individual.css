@@ -294,6 +294,7 @@ p.view-all-coauthors{
 }
 /* PROPERTY GROUP------>  */
 .property-group{
+    position: relative;
     clear: both;
     width: 920px;
     border: 1px solid #dfebe5;
@@ -301,7 +302,13 @@ p.view-all-coauthors{
     margin-bottom: 10px;
     background: #fff;
     margin-bottom: 20px;
-    overflow: hidden;
+}
+.scroll-up{
+   position: absolute; 
+   width: 21px;
+   height: 30px;
+   top: 0;
+   right: -21px;
 }
 section.property-group h2{
     padding: 20px 25px 12px 35px;
