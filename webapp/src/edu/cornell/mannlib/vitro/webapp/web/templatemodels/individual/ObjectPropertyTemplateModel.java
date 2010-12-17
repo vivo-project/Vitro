@@ -80,7 +80,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     
     private class PropertyListConfig {
 
-        private static final String DEFAULT_CONFIG_FILE = "objectPropertyList-default.xml";
+        private static final String DEFAULT_CONFIG_FILE = "listViewConfig-default.xml";
         private static final String CONFIG_FILE_PATH = "/config/";
         private static final String NODE_NAME_QUERY = "query";
         private static final String NODE_NAME_TEMPLATE = "template";

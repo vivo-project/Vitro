@@ -75,7 +75,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
     static protected String listViewConfigFileQueryString =
         "PREFIX display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#>" +
         "SELECT ?property ?filename WHERE { \n" +
-        "    ?property display:listViewConfigurationFile ?filename . \n" +
+        "    ?property display:listViewConfigFile ?filename . \n" +
         "} LIMIT 1";
     
     static protected Query listViewConfigFileQuery;

@@ -278,7 +278,5 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         }
         return list;
     }
-    
-
-    
+ 
 }

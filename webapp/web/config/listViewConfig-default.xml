@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
-<view-config>
+<list-view-config>
     <query>    
         PREFIX vitro: &lt;http://vitro.mannlib.cornell.edu/ns/vitro/0.7#&gt;
         PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;  
@@ -14,9 +14,7 @@
     
     <collation-target>object</collation-target>
     
-    <link-target>object</link-target>
-    
     <preprocessor>edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.DefaultObjectPropertyDataPreprocessor</preprocessor>
     
-    <template>shortView-default.ftl</template>
-</view-config>
+    <template>propStatement-default.ftl</template>
+</list-view-config>

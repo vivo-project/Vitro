@@ -12,7 +12,6 @@
     <#include "individual-adminPanel.ftl">
 </#if>
 
-<#-- Manolo, please do not remove this line. Thanks! -->
 <#assign propertyGroups = individual.propertyList>
     
 <section id="individual-intro-person" class="vcard" role="region">
