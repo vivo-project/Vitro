@@ -143,6 +143,7 @@
 		       debug="true"
 		       deprecation="true"
 		       encoding="UTF8"
+			   includeantruntime="false"
 		       optimize="true"
 		       source="1.6">
 			<classpath>
@@ -172,6 +173,7 @@
 		       debug="true"
 		       deprecation="true"
 		       encoding="UTF8"
+			   includeantruntime="false"
 		       optimize="false"
 		       source="1.6">
 			<classpath refid="test.compile.classpath" />

@@ -229,6 +229,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		       debug="true"
 		       deprecation="true"
 		       encoding="UTF8"
+			   includeantruntime="false"
 		       optimize="true"
 		       source="1.6">
 			<classpath refid="compile.classpath" />
@@ -244,6 +245,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		       debug="true"
 		       deprecation="true"
 		       encoding="UTF8"
+			   includeantruntime="false"
 		       optimize="false"
 		       source="1.6">
 			<classpath refid="test.compile.classpath" />
@@ -278,6 +280,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		       debug="true"
 		       deprecation="true"
 		       encoding="UTF8"
+			   includeantruntime="false"
 		       optimize="false"
 		       source="1.6">
 		</javac>
