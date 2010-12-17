@@ -42,8 +42,9 @@
             <input class="text-field" name="loginPassword" id="password" type="password" required />
             
             <p class="submit"><input name="loginForm" type="submit" class="green button" value="Log in"/></p>
+            <#-- nac26: remember me won't be ready for r1.2
             <input class="checkbox-remember-me" name="remember-me" type="checkbox" value="" />  
-            <label class="label-remember-me" for="remember-me">Remember me</label>
+            <label class="label-remember-me" for="remember-me">Remember me</label> -->
             <#-- mb863: forgot password and request an account won't be part of VIVO r1.2
             <p class="forgot-password"><a href="#">Forgot your password?</a></p>    
             <p class="request-account"><a class="blue button" href="#">Request an account</a> </p> -->    
