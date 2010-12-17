@@ -2,7 +2,6 @@
 
 <#-- Template for individual profile page -->
 
-<#import "lib-property.ftl" as p>
 <#import "lib-list.ftl" as l>
 
 <#assign editingClass>
@@ -117,15 +116,14 @@
 
 <nav id="property-group-menus" role="navigation">
     <ul role="list">
-        <li role="listitem"><a href="#propertyGroup1">Affiliations</a></li>
-        <li role="listitem"><a href="#publications">Publications</a></li>
-        <li role="listitem"><a href="#research">Research</a></li>
-        <li role="listitem"><a href="#teaching">Teaching</a></li>
-        <li role="listitem"><a href="#service">Service</a></li>
-        <li role="listitem"><a href="#background">Background</a></li>
-        <li role="listitem"><a href="#contact">Contact</a></li>
-        <li role="listitem"><a href="#identity">Identity</a></li>
-        <li role="listitem"><a href="#other">Other</a></li>
+        <#list propertyGroups as group>
+            <#assign groupname = groupName(group)>
+            <#if groupname?has_content>
+                <#-- capitalize will capitalize each word in the name; cap_first only the first. We may need a custom
+                function to capitalize all except function words. -->
+                <li role="listitem"><a href="#${groupname}">${groupname?capitalize}</a></li>
+            </#if>
+        </#list>
     </ul>
 </nav>
 
@@ -150,3 +148,19 @@ ${headScripts.add("/js/jquery_plugins/getUrlParam.js",
                   "/js/toggle.js")}
                   
 ${scripts.add("/js/imageUpload/imageUploadUtils.js")}
+
+<#-- RY TEMPORARY Replace with Java method on group - pass "other" as a parameter -->
+<#function groupName group> 
+    <#if group.name??>        
+        <#if group.name?has_content>
+            <#assign name = group.name>
+        <#else>
+            <#-- This is the group for properties not assigned to any group. It has an empty name. -->
+            <#assign name = "other">
+        </#if>
+    <#else>
+        <#-- If there are no groups, a dummy group has been created with a null (as opposed to empty) name. -->
+        <#assign name = "">
+    </#if> 
+    <#return name>
+</#function>
