@@ -38,8 +38,17 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
         }
     }
     
-    public String getName() {
-        return name;
+    /* Freemarker doesn't consider this a getter, because it takes a parameter, so to call it as group.name
+     * in the templates the method name must be simply "name" and not "getName."
+     */
+    public String name(String otherGroupName) {
+        String displayName = name;
+        if (displayName == null) {
+            displayName = "";
+        } else if (displayName.isEmpty()) {
+            displayName = otherGroupName;
+        } 
+        return displayName;
     }
     
     public List<PropertyTemplateModel> getProperties() {

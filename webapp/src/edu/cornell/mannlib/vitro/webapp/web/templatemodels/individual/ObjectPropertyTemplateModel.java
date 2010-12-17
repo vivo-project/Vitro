@@ -54,11 +54,6 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         return config.collationTarget;
     }
     
-    protected String getLinkTarget() {
-        return config.linkTarget;
-    }
-    
-       
     protected static ObjectPropertyTemplateModel getObjectPropertyTemplateModel(ObjectProperty op, Individual subject, WebappDaoFactory wdf) {
         if (op.getCollateBySubclass()) {
             try {
@@ -96,13 +91,11 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         private static final String NODE_NAME_QUERY = "query";
         private static final String NODE_NAME_TEMPLATE = "template";
         private static final String NODE_NAME_COLLATION_TARGET = "collation-target";
-        private static final String NODE_NAME_LINK_TARGET = "link-target";
         private static final String NODE_NAME_PREPROCESSOR = "preprocessor";
         
         private String queryString;
         private String templateName;
         private String collationTarget;
-        private String linkTarget; // we could easily make this a list if we ever want multiple links
         private String preprocessor;
 
         PropertyListConfig(ObjectProperty op, WebappDaoFactory wdf) throws Exception {
@@ -133,7 +126,6 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
                 templateName = getConfigValue(doc, NODE_NAME_TEMPLATE);                
                 // Optional values
                 collationTarget = getConfigValue(doc, NODE_NAME_COLLATION_TARGET);
-                linkTarget = getConfigValue(doc, NODE_NAME_LINK_TARGET); // if this is null, no link will be generated
                 preprocessor = getConfigValue(doc, NODE_NAME_PREPROCESSOR);
             } catch (Exception e) {
                 log.error("Error processing config file " + configFilePath + " for object property " + op.getURI(), e);

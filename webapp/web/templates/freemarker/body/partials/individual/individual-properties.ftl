@@ -4,7 +4,7 @@
 
 <#list propertyGroups as group>
 
-    <#assign groupname = groupName(group)>
+    <#assign groupname = group.name(nameForOtherGroup)>
     
     <section class="property-group" role="region">
    

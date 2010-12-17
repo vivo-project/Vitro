@@ -24,31 +24,21 @@ public class BaseObjectPropertyDataPreprocessor implements
     public void process(List<Map<String, String>> data) {
         for (Map<String, String> map : data) {
             applyStandardPreprocessing(map);
-            applySpecificPreprocessing(map);            
+            applyPropertySpecificPreprocessing(map);            
         }
     }
     
     /* Standard preprocessing that applies to all views. */
     protected void applyStandardPreprocessing(Map<String, String> map) {
-        addLinkForTarget(map);   
+        /* none identified yet */
     }
     
-    protected void applySpecificPreprocessing(Map<String, String> map) { 
+    protected void applyPropertySpecificPreprocessing(Map<String, String> map) { 
         /* Base class method is empty because this method is defined 
          * to apply subclass preprocessing. 
          */        
     }
-    
-    private void addLinkForTarget(Map<String, String> map) {
-        String linkTarget = objectPropertyTemplateModel.getLinkTarget();
-        String targetUri = map.get(linkTarget);
-        if (targetUri != null) {
-            String targetUrl = getLink(targetUri);
-            map.put(linkTarget + "Url", targetUrl);
-        } 
-    }
-    
-    
+     
     /* Preprocessor helper methods callable from any preprocessor */
     
     protected String getLink(String uri) {

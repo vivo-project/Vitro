@@ -15,7 +15,7 @@ public class DefaultObjectPropertyDataPreprocessor extends
 
     @Override
     /* Apply preprocessing specific to this preprocessor */
-    protected void applySpecificPreprocessing(Map<String, String> map) {
+    protected void applyPropertySpecificPreprocessing(Map<String, String> map) {
         addName(map);
         addMoniker(map);
     }
@@ -26,7 +26,12 @@ public class DefaultObjectPropertyDataPreprocessor extends
             map.put("name", getName(map.get("object")));
         }
     }
-    
+    /* This is a temporary measure to handle the fact that the current Individual.getMoniker()
+     * method returns the individual's VClass if moniker is null. We want to replicate that
+     * behavior here, but in future the moniker property (along with other Vitro namespace
+     * properties) will be removed. In addition, this type of logic (display x if it exists, otherwise y)
+     * will be moved into the display modules (Editing and Display Configuration Improvements).
+     */
     private void addMoniker(Map<String, String> map) {
         String moniker = map.get("moniker");
         if (moniker == null) {

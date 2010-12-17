@@ -12,7 +12,7 @@ import freemarker.core.Environment;
 import freemarker.template.TemplateMethodModel;
 import freemarker.template.TemplateModelException;
 
-public class IndividualUrlMethod implements TemplateMethodModel {
+public class IndividualProfileUrlMethod implements TemplateMethodModel {
 
     @Override
     public String exec(List args) throws TemplateModelException {

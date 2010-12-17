@@ -114,10 +114,11 @@
     </section>
 </section>
 
+<#assign nameForOtherGroup = "other">
 <nav id="property-group-menus" role="navigation">
     <ul role="list">
         <#list propertyGroups as group>
-            <#assign groupname = groupName(group)>
+            <#assign groupname = group.name(nameForOtherGroup)>
             <#if groupname?has_content>
                 <#-- capitalize will capitalize each word in the name; cap_first only the first. We may need a custom
                 function to capitalize all except function words. -->
@@ -149,18 +150,4 @@ ${headScripts.add("/js/jquery_plugins/getUrlParam.js",
                   
 ${scripts.add("/js/imageUpload/imageUploadUtils.js")}
 
-<#-- RY TEMPORARY Replace with Java method on group - pass "other" as a parameter -->
-<#function groupName group> 
-    <#if group.name??>        
-        <#if group.name?has_content>
-            <#assign name = group.name>
-        <#else>
-            <#-- This is the group for properties not assigned to any group. It has an empty name. -->
-            <#assign name = "other">
-        </#if>
-    <#else>
-        <#-- If there are no groups, a dummy group has been created with a null (as opposed to empty) name. -->
-        <#assign name = "">
-    </#if> 
-    <#return name>
-</#function>
+
