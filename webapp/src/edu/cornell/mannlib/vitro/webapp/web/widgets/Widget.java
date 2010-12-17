@@ -10,11 +10,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import freemarker.core.Environment;
 import freemarker.core.Macro;
 import freemarker.template.Template;
@@ -52,13 +52,13 @@ public abstract class Widget {
     }
     
     public String doMarkup(Environment env, Map params) {
-        VitroRequest vreq = (VitroRequest) env.getCustomAttribute("vreq");
+        HttpServletRequest request = (HttpServletRequest) env.getCustomAttribute("request");
         ServletContext context = (ServletContext) env.getCustomAttribute("context");
         
         WidgetTemplateValues values = null;
         
         try {
-            values = process(env, params, vreq, context); 
+            values = process(env, params, request, context); 
         } catch (Exception e) {
             log.error(e, e);
         }
@@ -100,7 +100,7 @@ public abstract class Widget {
 //    }
 
     protected abstract WidgetTemplateValues process(Environment env, Map params, 
-            VitroRequest vreq, ServletContext context) throws Exception;
+            HttpServletRequest request, ServletContext context) throws Exception;
     
     private String processMacroToString(Environment env, String widgetName, Macro macro, Map<String, Object> map) {   
         StringWriter out = new StringWriter();

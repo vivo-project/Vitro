@@ -13,7 +13,6 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
-import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
@@ -68,14 +67,14 @@ public class LoginWidget extends Widget {
 
     @Override
     protected WidgetTemplateValues process(Environment env, Map params,
-            VitroRequest vreq, ServletContext context) {
+            HttpServletRequest request, ServletContext context) {
         
         WidgetTemplateValues values = null;
         TemplateModel urls = null;
         
         try {
             urls = env.getDataModel().get("urls");
-            State state = getCurrentLoginState(vreq);
+            State state = getCurrentLoginState(request);
             log.debug("State on exit: " + state);
                         
             switch (state) {
@@ -83,17 +82,17 @@ public class LoginWidget extends Widget {
                 // On the login page itself, show a message that the user is already logged in.
                 // Otherwise, when redirecting to login page from a page that the logged-in user
                 // doesn't have access to, we would just show a blank page.
-                if (vreq.getServletPath().equals(Route.LOGIN.path())) {
-                    values = showMessageToLoggedInUser(vreq);
+                if (request.getServletPath().equals(Route.LOGIN.path())) {
+                    values = showMessageToLoggedInUser(request);
                     break;
                 } else {
                     return null;
                 }
             case FORCED_PASSWORD_CHANGE:
-                values = showPasswordChangeScreen(vreq);
+                values = showPasswordChangeScreen(request);
                 break;
             default:
-                values = showLoginScreen(vreq);
+                values = showLoginScreen(request);
             }
         } catch (Exception e) {
             log.error(e);
