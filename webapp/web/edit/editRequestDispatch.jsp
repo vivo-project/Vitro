@@ -47,6 +47,9 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
        ? EditConfiguration.newEditKey(session)
        : EditConfiguration.getEditKey(request);
    request.setAttribute("editKey", editKey);
+   
+   //set title to Edit to maintain functionality from 1.1.1 and avoid updates to Selenium tests
+   request.setAttribute("title","Edit");
   
    // set the referrer URL, if available
    setEditReferer(editKey, request.getHeader("Referer"), request.getSession()); 
