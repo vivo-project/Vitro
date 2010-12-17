@@ -15,7 +15,7 @@ public class DefaultObjectPropertyDataPreprocessor extends
 
     @Override
     /* Apply preprocessing specific to this preprocessor */
-    protected void applyPropertySpecificPreprocessing(Map<String, String> map) {
+    protected void process(Map<String, String> map) {
         addName(map);
         addMoniker(map);
     }

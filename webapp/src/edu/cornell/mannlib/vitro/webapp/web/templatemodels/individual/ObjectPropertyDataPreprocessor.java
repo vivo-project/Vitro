@@ -16,5 +16,5 @@ import java.util.Map;
 public interface ObjectPropertyDataPreprocessor {
 
     public void process(List<Map<String, String>> data);
-   
+
 }

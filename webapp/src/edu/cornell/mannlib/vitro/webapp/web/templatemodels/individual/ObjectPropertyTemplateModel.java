@@ -71,7 +71,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     protected void preprocess(List<Map<String, String>> data, WebappDaoFactory wdf) {
         String preprocessorName = config.preprocessor;
         if (preprocessorName == null) {
-            preprocessorName = DEFAULT_PREPROCESSOR;
+            return;
         }
 
         try {
