@@ -25,12 +25,6 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     
     private static final Log log = LogFactory.getLog(ObjectPropertyTemplateModel.class);      
     private static final String TYPE = "object";
-    /* NB The default preprocessor is not the same as the preprocessor for the default view. The latter
-     * actually defines its own preprocessor, whereas the default preprocessor is used for custom views
-     * that don't define a preprocessor.
-     */
-    private static final String DEFAULT_PREPROCESSOR = 
-        "edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.BaseObjectPropertyDataPreprocessor";
 
     private PropertyListConfig config;
 

@@ -56,13 +56,13 @@
                 <p><a href="${relatedSubject.url}">&larr; return to ${relatedSubject.name}</a></p>                
             <#else>
                 <#-- Label -->
-                    <h1 class="fn">${individual.name}
+                <h1 class="fn">${individual.name}
                         
                 <#-- Moniker -->
                 <#if individual.moniker?has_content>
                         <span class="preferred-title">${individual.moniker}</span>                  
                 </#if>
-                    </h1>
+                </h1>
             </#if>
                
             <h2>Current Positions</h2>
@@ -114,19 +114,9 @@
     </section>
 </section>
 
+<#-- Property group menu -->
 <#assign nameForOtherGroup = "other">
-<nav id="property-group-menus" role="navigation">
-    <ul role="list">
-        <#list propertyGroups as group>
-            <#assign groupname = group.name(nameForOtherGroup)>
-            <#if groupname?has_content>
-                <#-- capitalize will capitalize each word in the name; cap_first only the first. We may need a custom
-                function to capitalize all except function words. -->
-                <li role="listitem"><a href="#${groupname}">${groupname?capitalize}</a></li>
-            </#if>
-        </#list>
-    </ul>
-</nav>
+<#include "individual-propertyGroupMenu.ftl">
 
 <#-- Ontology properties -->
 <#include "individual-properties.ftl">

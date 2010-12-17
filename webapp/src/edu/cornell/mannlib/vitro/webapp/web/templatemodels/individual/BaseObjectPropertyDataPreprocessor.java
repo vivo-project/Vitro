@@ -17,8 +17,7 @@ public abstract class BaseObjectPropertyDataPreprocessor implements
         this.objectPropertyTemplateModel = optm;
         this.wdf = wdf;
     }
-    
-    
+        
     @Override
     public void process(List<Map<String, String>> data) {
         for (Map<String, String> map : data) {
