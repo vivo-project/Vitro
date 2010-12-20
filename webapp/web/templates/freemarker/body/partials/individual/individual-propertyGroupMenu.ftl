@@ -6,6 +6,7 @@
 
 <nav id="property-group-menus" role="navigation">
     <a name="property-nav"></a>
+    
     <ul role="list">
         <#list propertyGroups as group>
             <#assign groupname = group.name(nameForOtherGroup)>
