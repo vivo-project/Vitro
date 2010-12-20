@@ -15,14 +15,14 @@
                 <li><a href="${siteConfig.urls.siteInfo}">Site information</a></li>
             </#if>
             
+            <#if siteConfig.urls.menuN3Editor??>
+                <li><a href="${siteConfig.urls.menuN3Editor}">Menu management</a></li>  
+            </#if>
+            
             <li><a href="${siteConfig.urls.tabs}">Tab management</a></li>
             
             <#if siteConfig.urls.users??>
                 <li><a href="${siteConfig.urls.users}">User accounts</a></li>  
-            </#if>
-                
-            <#if siteConfig.urls.menuN3Editor??>
-                <li><a href="${siteConfig.urls.menuN3Editor}">Menu N3 editor</a></li>  
             </#if>
             
         </ul>
