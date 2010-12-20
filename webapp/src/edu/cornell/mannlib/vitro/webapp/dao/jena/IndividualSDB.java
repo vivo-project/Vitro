@@ -142,8 +142,8 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	    		 	"UNION { <" +
     	    		 	    individualURI+">  <" + VitroVocabulary.MONIKER + 
     	    		 	        "> ?moniker } \n" +
-    	    		 	"} \n" +
-    	    		 	"} UNION { GRAPH <http://vitro.mannlib.cornell.edu/default/vitro-kb-2> { <"
+    	    		 	"} } \n" +
+    	    		 	"UNION { GRAPH <http://vitro.mannlib.cornell.edu/default/vitro-kb-2> { <"
     	    		 	    + individualURI + "> a ?type } } \n" +
     	    		 "}";
         		model = QueryExecutionFactory.create(
@@ -1060,15 +1060,14 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     private List<VClass> getMyVClasses(boolean direct) {
 		List<VClass> vClassList = new ArrayList<VClass>(); 
 		Model tempModel = null;
-		if (ind.getModel().size() > 0) {
+		if (ind.getModel().contains((Resource) null, RDF.type, (RDFNode) null)){
 		    tempModel = ind.getModel();
-		}
-		else {		
-			String getTypes = 
+		} else {
+    		String getTypes = 
         		"CONSTRUCT{ <" + this.individualURI + "> <" + RDF.type +
         		        "> ?types }\n" +
         		"WHERE{ GRAPH " + 
-        		((true) 
+        		((direct) 
         		    ? "<http://vitro.mannlib.cornell.edu/default/vitro-kb-2>" 
         		    : "?g") 
         		+ " { <" + this.individualURI +"> <" +RDF.type+ "> ?types \n" +
@@ -1082,7 +1081,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         	} finally {
         	    dataset.getLock().leaveCriticalSection();
         	    w.close();
-        	}        	
+        	}
 		}
     	StmtIterator stmtItr = tempModel.listStatements(
     	        (Resource) null, RDF.type, (RDFNode) null);
