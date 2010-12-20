@@ -26,7 +26,7 @@ public class UncollatedObjectPropertyTemplateModel extends ObjectPropertyTemplat
         String subjectUri = subject.getURI();
         String propertyUri = op.getURI();
         List<Map<String, String>> statementData = opDao.getObjectPropertyStatementsForIndividualByProperty(subjectUri, propertyUri, getQueryString());
-        preprocess(statementData, wdf);
+        postprocess(statementData, wdf);
         statements = new ArrayList<ObjectPropertyStatementTemplateModel>(statementData.size());
         for (Map<String, String> map : statementData) {
             statements.add(new ObjectPropertyStatementTemplateModel(subjectUri, propertyUri, map));

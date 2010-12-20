@@ -6,14 +6,14 @@ import java.util.List;
 import java.util.Map;
 
 /** 
- * These preprocessors take a list of object property statement data derived from a 
+ * These postprocessors take a list of object property statement data derived from a 
  * SPARQL query (or other source) and prepare it for insertion into the template data model.
  * 
  * @author rjy7
  *
  */
 
-public interface ObjectPropertyDataPreprocessor {
+public interface ObjectPropertyDataPostprocessor {
 
     public void process(List<Map<String, String>> data);
 

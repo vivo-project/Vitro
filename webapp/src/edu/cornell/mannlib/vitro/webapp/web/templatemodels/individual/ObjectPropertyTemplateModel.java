@@ -61,18 +61,18 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         }
     }
     
-    /** Apply preprocessing to query results to prepare for template */
-    protected void preprocess(List<Map<String, String>> data, WebappDaoFactory wdf) {
-        String preprocessorName = config.preprocessor;
-        if (preprocessorName == null) {
+    /** Apply postprocessing to query results to prepare for template */
+    protected void postprocess(List<Map<String, String>> data, WebappDaoFactory wdf) {
+        String postprocessorName = config.postprocessor;
+        if (postprocessorName == null) {
             return;
         }
 
         try {
-            Class<?> preprocessorClass = Class.forName(preprocessorName);
-            Constructor<?> constructor = preprocessorClass.getConstructor(ObjectPropertyTemplateModel.class, WebappDaoFactory.class);
-            ObjectPropertyDataPreprocessor preprocessor = (ObjectPropertyDataPreprocessor) constructor.newInstance(this, wdf);
-            preprocessor.process(data);
+            Class<?> postprocessorClass = Class.forName(postprocessorName);
+            Constructor<?> constructor = postprocessorClass.getConstructor(ObjectPropertyTemplateModel.class, WebappDaoFactory.class);
+            ObjectPropertyDataPostprocessor postprocessor = (ObjectPropertyDataPostprocessor) constructor.newInstance(this, wdf);
+            postprocessor.process(data);
         } catch (Exception e) {
             log.error(e, e);
         }
@@ -85,12 +85,12 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         private static final String NODE_NAME_QUERY = "query";
         private static final String NODE_NAME_TEMPLATE = "template";
         private static final String NODE_NAME_COLLATION_TARGET = "collation-target";
-        private static final String NODE_NAME_PREPROCESSOR = "preprocessor";
+        private static final String NODE_NAME_POSTPROCESSOR = "postprocessor";
         
         private String queryString;
         private String templateName;
         private String collationTarget;
-        private String preprocessor;
+        private String postprocessor;
 
         PropertyListConfig(ObjectProperty op, WebappDaoFactory wdf) throws Exception {
 
@@ -120,7 +120,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
                 templateName = getConfigValue(doc, NODE_NAME_TEMPLATE);                
                 // Optional values
                 collationTarget = getConfigValue(doc, NODE_NAME_COLLATION_TARGET);
-                preprocessor = getConfigValue(doc, NODE_NAME_PREPROCESSOR);
+                postprocessor = getConfigValue(doc, NODE_NAME_POSTPROCESSOR);
             } catch (Exception e) {
                 log.error("Error processing config file " + configFilePath + " for object property " + op.getURI(), e);
                 // What should we do here?

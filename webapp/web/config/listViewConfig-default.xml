@@ -14,7 +14,7 @@
     
     <collation-target>object</collation-target>
     
-    <preprocessor>edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.DefaultObjectPropertyDataPreprocessor</preprocessor>
+    <postprocessor>edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.DefaultObjectPropertyDataPostprocessor</postprocessor>
     
     <template>propStatement-default.ftl</template>
 </list-view-config>
