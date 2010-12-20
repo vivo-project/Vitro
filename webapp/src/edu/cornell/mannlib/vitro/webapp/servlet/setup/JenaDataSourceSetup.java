@@ -44,6 +44,17 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
 	
     public void contextInitialized(ServletContextEvent sce) {
         try {
+            
+            String tripleStoreTypeStr = 
+                ConfigurationProperties.getProperty(
+                        "VitroConnection.DataSource.tripleStoreType", "RDB");
+            
+            //FIXME improve
+            if ("SDB".equals(tripleStoreTypeStr)) {
+                (new JenaDataSourceSetupSDB()).contextInitialized(sce);
+                return;
+            }
+            
             OntModel memModel = (OntModel) sce.getServletContext().getAttribute("jenaOntModel");
             if (memModel == null) {
             	memModel = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC);
