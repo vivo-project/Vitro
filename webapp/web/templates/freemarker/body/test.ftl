@@ -2,13 +2,13 @@
 
 <#-- FreeMarker test cases -->
 
+<#import "lib-datetime.ftl" as dt>
+
 <h2>${title}</h2>
 
-<@widget name="test" />
+<p>Current date & time: ${now?datetime}</p>
+<p>Current date: ${now?date}</p>
+<p>Current datetime: ${now?time}</p>
 
-${stylesheets.add("/css/testfrombody.css")}
-${scripts.add("/js/jstest.js")}
 
-${bodyClass}
-
-<ul><@list.firstLastList><li>apples</li><li>bananas</li></@list.firstLastList></ul>
+<p>${dt.xsdDateTimeToYear(datetime)}</p>

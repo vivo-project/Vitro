@@ -86,11 +86,13 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         private static final String NODE_NAME_TEMPLATE = "template";
         private static final String NODE_NAME_COLLATION_TARGET = "collation-target";
         private static final String NODE_NAME_POSTPROCESSOR = "postprocessor";
+        private static final String NODE_NAME_EDIT_OBJECT = "edit-object";
         
         private String queryString;
         private String templateName;
         private String collationTarget;
         private String postprocessor;
+        private String editObject;
 
         PropertyListConfig(ObjectProperty op, WebappDaoFactory wdf) throws Exception {
 
@@ -121,6 +123,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
                 // Optional values
                 collationTarget = getConfigValue(doc, NODE_NAME_COLLATION_TARGET);
                 postprocessor = getConfigValue(doc, NODE_NAME_POSTPROCESSOR);
+                editObject = getConfigValue(doc, NODE_NAME_EDIT_OBJECT);
             } catch (Exception e) {
                 log.error("Error processing config file " + configFilePath + " for object property " + op.getURI(), e);
                 // What should we do here?

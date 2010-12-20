@@ -8,6 +8,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
@@ -21,7 +24,9 @@ import com.hp.hpl.jena.rdf.model.Resource;
  */
 
 public class QueryUtils {
-
+    
+    private static final Log log = LogFactory.getLog(QueryUtils.class);
+    
     protected static Map<String,Object> querySolutionToObjectValueMap( QuerySolution soln){
         Map<String,Object> map = new HashMap<String,Object>();
         Iterator<String> varNames = soln.varNames();

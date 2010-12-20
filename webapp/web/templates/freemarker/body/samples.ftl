@@ -4,11 +4,13 @@
 
 <h2>${title}</h2>
 
+<@widget name="test" />
+
 <h3>Dates</h3>
 <ul>
-<li>${now?datetime}</li>
-<li>${now?date}</li>
-<li>${now?time}</li>
+    <li>Current date & time: ${now?datetime}</li>
+    <li>Current date: ${now?date}</li>
+    <li>Current time: ${now?time}</li>
 </ul>
 
 <h3>Apples</h3>
