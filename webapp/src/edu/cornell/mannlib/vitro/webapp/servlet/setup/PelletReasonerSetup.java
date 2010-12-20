@@ -13,6 +13,7 @@ import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.vocabulary.OWL;
 
+import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.ReasonerConfiguration;
@@ -27,6 +28,17 @@ public class PelletReasonerSetup implements ServletContextListener {
 		
 		try {	
 			
+	        //FIXME refactor this
+            String tripleStoreTypeStr = 
+                ConfigurationProperties.getProperty(
+                        "VitroConnection.DataSource.tripleStoreType", "RDB");
+            if ("SDB".equals(tripleStoreTypeStr)) {
+                (new SimpleReasonerSetup()).contextInitialized(sce);
+                return;
+                // use the simple reasoner instead of Pellet for ABox inferences
+                // if we're running SDB
+            }
+		    
 			OntModel memoryModel = (OntModel) sce.getServletContext().getAttribute("jenaOntModel");
 			OntModel baseModel = (OntModel) sce.getServletContext().getAttribute("baseOntModel");
 			OntModel inferenceModel = (OntModel) sce.getServletContext().getAttribute("inferenceOntModel");
