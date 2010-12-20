@@ -37,15 +37,7 @@ public class TestController extends FreemarkerHttpServlet {
         
         body.put("title", "Freemarker Test");
 
-        Calendar cal = Calendar.getInstance();
-        Date now = cal.getTime();
-        body.put("now", now);
-        // In template: ${now?date}, ${now?datetime}, ${now?time}
-        
-        body.put("datetime", "1983-12-07T17:15:28Z");
-        
-        return new TemplateResponseValues(TEMPLATE_DEFAULT, body);
-        
+        return new TemplateResponseValues(TEMPLATE_DEFAULT, body);       
     }
     
     @Override

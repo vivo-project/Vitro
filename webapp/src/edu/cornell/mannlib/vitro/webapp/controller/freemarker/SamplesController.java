@@ -91,6 +91,8 @@ public class SamplesController extends FreemarkerHttpServlet {
         
         body.put("year", "2001");
         
+        body.put("xsddatetime", "1983-12-07T17:15:28Z");
+        
         body.put("title", "Freemarker Samples");
         
         return new TemplateResponseValues(TEMPLATE_DEFAULT, body);
