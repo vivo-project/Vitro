@@ -1,5 +1,22 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+
+<!--
+    Required elements: 
+        - query: the sparql query used to retrieve the data
+        - template: the name of the template used to display a single property statement
+    
+    Optional elements: 
+        postprocessor: a Java class that postprocesses the data retrieved from the query before
+                       sending it to the template
+    
+    Query requirements:
+        - WHERE clause must contain a statement ?subject ?property ?objectvariable, with the variables
+          ?subject and ?property named as such. The objectvariable can be given any name, but it must be 
+          included in the SELECT terms retrieved by the query. This is the statement that will be edited 
+          from the edit links.
+-->
+
 <list-view-config>
     <query>    
         PREFIX vitro: &lt;http://vitro.mannlib.cornell.edu/ns/vitro/0.7#&gt;
@@ -13,9 +30,7 @@
     </query>
     
     <collation-target>object</collation-target>
-    
-    <edit-object>object</edit-object>
-    
+
     <postprocessor>edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.DefaultObjectPropertyDataPostprocessor</postprocessor>
     
     <template>propStatement-default.ftl</template>

@@ -22,12 +22,10 @@
                     
                 <#-- List the statements for each property -->   
                 <ul class="property-list" role="list"> 
-                    <#-- data property -->                 
+                    <#-- data property -->  
                     <#if property.type == "data"> 
-                        <#list property.statements as statement>
-                            <li role="listitem">${statement.value}</li>
-                        </#list>
-                    
+                        <#include "dataPropertyList-statements.ftl">               
+
                     <#-- object property -->      
                     <#elseif property.collatedBySubclass>                             
                         <#include "objectPropertyList-collated.ftl">

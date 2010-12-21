@@ -91,13 +91,11 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         private static final String NODE_NAME_TEMPLATE = "template";
         private static final String NODE_NAME_COLLATION_TARGET = "collation-target";
         private static final String NODE_NAME_POSTPROCESSOR = "postprocessor";
-        private static final String NODE_NAME_EDIT_OBJECT = "edit-object";
         
         private String queryString;
         private String templateName;
         private String collationTarget;
         private String postprocessor;
-        private String editObject;
 
         PropertyListConfig(ObjectProperty op, VitroRequest vreq) throws Exception {
 
@@ -170,7 +168,6 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
                 // Required values
                 queryString = getConfigValue(doc, NODE_NAME_QUERY);
                 templateName = getConfigValue(doc, NODE_NAME_TEMPLATE); 
-                editObject = getConfigValue(doc, NODE_NAME_EDIT_OBJECT);
                 
                 // Optional values
                 collationTarget = getConfigValue(doc, NODE_NAME_COLLATION_TARGET);
