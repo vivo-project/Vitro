@@ -56,6 +56,7 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQueryWrapper;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapper;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapperFactory;
 import edu.cornell.mannlib.vitro.webapp.web.ContentType;
+import edu.cornell.mannlib.vitro.webapp.web.functions.IndividualLocalNameMethod;
 import edu.cornell.mannlib.vitro.webapp.web.functions.IndividualProfileUrlMethod;
 import edu.cornell.mannlib.vitro.webapp.web.jsptags.StringProcessorTag;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModel;
@@ -129,6 +130,7 @@ public class IndividualController extends FreemarkerHttpServlet {
 	        body.put("individual", getNonDefaultBeansWrapper(BeansWrapper.EXPOSE_SAFE).wrap(ind));
 	        
 	        body.put("url", new IndividualProfileUrlMethod());
+	        body.put("localName", new IndividualLocalNameMethod());
 	        
 	        String template = getIndividualTemplate(individual);
 	                

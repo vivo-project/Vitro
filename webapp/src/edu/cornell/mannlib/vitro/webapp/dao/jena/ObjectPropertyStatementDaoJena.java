@@ -4,7 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -19,9 +18,8 @@ import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.QuerySolutionMap;
 import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.rdf.model.Literal;
+import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
@@ -257,7 +255,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         
         Query query = null;
         try {
-            query = QueryFactory.create(queryString);
+            query = QueryFactory.create(queryString, Syntax.syntaxARQ);
         } catch(Throwable th){
             log.error("could not create SPARQL query for query string " + th.getMessage());
             log.error(queryString);

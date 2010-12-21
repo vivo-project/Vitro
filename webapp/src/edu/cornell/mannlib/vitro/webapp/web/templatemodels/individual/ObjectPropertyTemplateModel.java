@@ -111,7 +111,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
             String configFilePath = getConfigFilePath(configFileName);
             try {
                 File config = new File(configFilePath);            
-                if (configFileName != DEFAULT_CONFIG_FILE && ! config.exists()) {
+                if ( ! isDefaultConfig(configFileName) && ! config.exists() ) {
                     log.warn("Can't find config file " + configFilePath + " for object property " + op.getURI() + "\n" +
                             ". Using default config file instead.");
                     configFilePath = getConfigFilePath(DEFAULT_CONFIG_FILE);
@@ -124,7 +124,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
                 // What should we do here?
             }
             
-            if ( ! configFileName.equals(DEFAULT_CONFIG_FILE) ) {
+            if ( ! isDefaultConfig(configFileName) ) {
                 String invalidConfigMessage = checkForInvalidConfig(vreq);
                 if ( StringUtils.isNotEmpty(invalidConfigMessage) ) {
                     log.warn("Invalid list view config for object property " + op.getURI() + 
@@ -134,6 +134,10 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
                     setValuesFromConfigFile(configFilePath);                    
                 }
             }
+        }
+        
+        private boolean isDefaultConfig(String configFileName) {
+            return configFileName.equals(DEFAULT_CONFIG_FILE);
         }
         
         private String checkForInvalidConfig(VitroRequest vreq) {

@@ -11,8 +11,8 @@
                        sending it to the template
     
     Query requirements:
-        - WHERE clause must contain a statement ?subject ?property ?objectvariable, with the variables
-          ?subject and ?property named as such. The objectvariable can be given any name, but it must be 
+        - WHERE clause must contain a statement ?subject ?property ?object, with the variables
+          ?subject and ?property named as such. The object can be given any name, but it must be 
           included in the SELECT terms retrieved by the query. This is the statement that will be edited 
           from the edit links.
 -->
