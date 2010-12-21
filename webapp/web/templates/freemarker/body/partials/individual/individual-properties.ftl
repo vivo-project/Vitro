@@ -7,7 +7,7 @@
     <#assign groupname = group.name(nameForOtherGroup)>
     
     <section class="property-group" role="region">
-        <nav class="scroll-up" role="navigation"><a href="#property-nav"><img src="${urls.images}/individual/scroll-up.png" /></a></nav>
+        <nav class="scroll-up" role="navigation"><a href="#property-nav"><img src="${urls.images}/individual/scroll-up.png" alt="scroll to property group menus" /></a></nav>
    
         <#-- Display the group heading --> 
         <#if groupname?has_content>
