@@ -2,6 +2,8 @@
 
 <#-- Template for the main Site Administration page -->
 
+${stylesheets.add("/css/admin.css")}
+
 <div class="tab">
     <h2>Site Administration</h2>
 </div>
