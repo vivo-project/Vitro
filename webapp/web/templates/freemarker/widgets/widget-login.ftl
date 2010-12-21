@@ -36,15 +36,12 @@
        
         <form  role="form" id="login-form" action="${formAction}" method="post" name="login-form" />
             <#if externalAuthUrl??>
-                <p class="external-auth">
-                    <a class="blue button" href="${externalAuthUrl}">${externalAuthName}</a>
-                </p>
-                
+                <p class="external-auth"><a class="blue button" href="${externalAuthUrl}">${externalAuthName}</a></p>
+                <p class="or-auth">or</p>
+
+                <h3 class="internal-auth" >Login using a different account</h3>
             </#if>
-            <p class="or-auth">or</p>
-            
-            <h3 class="internal-auth" >Login using a different account</h3>
-            
+
             <label for="email">Email</label>
             <input class="text-field" name="loginName" id="loginName" type="text" value="${loginName!}" required />
 
