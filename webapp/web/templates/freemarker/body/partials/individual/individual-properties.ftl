@@ -11,7 +11,7 @@
    
         <#-- Display the group heading --> 
         <#if groupname?has_content>
-            <h2><a name="${groupname}"></a>${groupname}</h2>
+            <h2><a name="${groupname}"></a>${groupname?capitalize}</h2>
         </#if>
         
         <#-- List the properties in the group -->        
