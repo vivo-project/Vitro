@@ -9,10 +9,9 @@ $(document).ready(function(){
     $('.focus').focus();
     
     // fade out error alerts
-    //$('#error-alert').css('display', 'none');
-    //$('#error-alert).fadeIn(500);
-
+    $('section#error-alert').css('display', 'none').fadeIn(1500);
+    
+    // fade out fash-message when user log out
+    $('section#flash-message').css('display', 'none').fadeIn(1500);   
+    
 });
-
-
-

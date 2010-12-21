@@ -42,6 +42,25 @@ p.request-account {
 }
 #login-form p.external-auth {
     margin-left: 36px;
+    margin-top: 1em;
+}
+.or-auth{
+    margin-left: 135px;
+    width: 30px;
+    height: 30px;
+    background: #fff 0 0 url(../images/login-or.png) no-repeat;
+    margin-bottom: 0;
+    padding-left: 8px;
+    padding-top: 5px;
+    color: #fff;
+    font-size: .8em;
+}
+h3.internal-auth{
+    margin-left: 38px;
+    color: #5F6464;
+    font-size: 1em;
+    margin-bottom: 0;
+    padding-bottom: 0;
 }
 #error-alert{
     color: #900;

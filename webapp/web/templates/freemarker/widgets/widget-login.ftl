@@ -29,12 +29,22 @@
         </#if>
        
         <#if errorMessage??>
-            <div id="error-alert"><img src="${urls.images}/iconAlert.png" alert="Error alert icon"/>
+            <section id="error-alert" role="alert"><img src="${urls.images}/iconAlert.png" alert="Error alert icon" />
                 <p>${errorMessage}</p>
-            </div>
+            </section>
         </#if>
        
         <form  role="form" id="login-form" action="${formAction}" method="post" name="login-form" />
+            <#if externalAuthUrl??>
+                <p class="external-auth">
+                    <a class="blue button" href="${externalAuthUrl}">${externalAuthName}</a>
+                </p>
+                
+            </#if>
+            <p class="or-auth">or</p>
+            
+            <h3 class="internal-auth" >Login using a different account</h3>
+            
             <label for="email">Email</label>
             <input class="text-field" name="loginName" id="loginName" type="text" value="${loginName!}" required />
 
@@ -47,14 +57,7 @@
             <label class="label-remember-me" for="remember-me">Remember me</label> -->
             <#-- mb863: forgot password and request an account won't be part of VIVO r1.2
             <p class="forgot-password"><a href="#">Forgot your password?</a></p>    
-            <p class="request-account"><a class="blue button" href="#">Request an account</a> </p> -->    
-                            
-            <#if externalAuthUrl??>
-                <p class="external-auth">
-                    <a class="green button" href="${externalAuthUrl}">${externalAuthName}</a>
-                </p>
-            </#if>
-
+            <p class="request-account"><a class="blue button" href="#">Request an account</a> </p> -->                       
         </form>
 
     </section><!-- #log-in -->
