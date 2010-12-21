@@ -56,5 +56,5 @@ public interface ObjectPropertyDao extends PropertyDao {
     
     public List<ObjectProperty> getObjectPropertyList(String subjectUri); 
     
-    public String getCustomListConfigFilename(ObjectProperty objectProperty);
+    public String getCustomListConfigFileName(ObjectProperty objectProperty);
 }

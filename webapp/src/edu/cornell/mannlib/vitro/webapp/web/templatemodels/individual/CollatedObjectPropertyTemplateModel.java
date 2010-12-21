@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +14,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
@@ -23,10 +23,9 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
     private static final Log log = LogFactory.getLog(CollatedObjectPropertyTemplateModel.class);  
     
     private Map<String, List<ObjectPropertyStatementTemplateModel>> subclasses;
-    //private List<SubclassList> subclassList;
     
-    CollatedObjectPropertyTemplateModel(ObjectProperty op, Individual subject, WebappDaoFactory wdf) throws Exception {
-        super(op, subject, wdf); 
+    CollatedObjectPropertyTemplateModel(ObjectProperty op, Individual subject, VitroRequest vreq) throws Exception {
+        super(op, subject, vreq); 
 
         /* Change the approach to collation:
          * Custom views can get the subclasses in the query. Must use a term ?subclass - throw error if not.
@@ -36,13 +35,6 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
          * We can also use these for custom views. Throw error if property is collated but there's no subclass term
          * in the query. (The reverse is okay - uncollated property with a subclass term in the query.     
          */
-        String collationTargetError = getCollationTargetError();
-        if ( ! collationTargetError.isEmpty()) {
-            String errorMessage = "Collation target error for collated object property " + getName() + ": " + 
-                                  collationTargetError + " " + 
-                                  "Creating uncollated property list instead.";
-            throw new Exception(errorMessage);
-        }   
         
         // RY Temporarily throw an error because collation hasn't been implemented yet.
         boolean error = true;
@@ -50,6 +42,7 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
             throw new Exception("No collation target specified for collated object property " + getName());
         }
         
+        WebappDaoFactory wdf = vreq.getWebappDaoFactory();
         ObjectPropertyStatementDao opDao = wdf.getObjectPropertyStatementDao();
         String subjectUri = subject.getURI();
         String propertyUri = op.getURI();

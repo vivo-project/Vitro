@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,7 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
@@ -18,8 +20,11 @@ import org.w3c.dom.NodeList;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import freemarker.cache.TemplateLoader;
+import freemarker.template.Configuration;
 
 public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel {
     
@@ -28,13 +33,13 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
 
     private PropertyListConfig config;
 
-    ObjectPropertyTemplateModel(ObjectProperty op, Individual subject, WebappDaoFactory wdf) {
+    ObjectPropertyTemplateModel(ObjectProperty op, Individual subject, VitroRequest vreq) {
         super(op);
         setName(op.getDomainPublic());
         
         // Get the config for this object property
         try {
-            config = new PropertyListConfig(op, wdf);
+            config = new PropertyListConfig(op, vreq);
         } catch (Exception e) {
             log.error(e, e);
         }
@@ -48,16 +53,16 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         return config.collationTarget;
     }
     
-    protected static ObjectPropertyTemplateModel getObjectPropertyTemplateModel(ObjectProperty op, Individual subject, WebappDaoFactory wdf) {
+    protected static ObjectPropertyTemplateModel getObjectPropertyTemplateModel(ObjectProperty op, Individual subject, VitroRequest vreq) {
         if (op.getCollateBySubclass()) {
             try {
-                return new CollatedObjectPropertyTemplateModel(op, subject, wdf);
+                return new CollatedObjectPropertyTemplateModel(op, subject, vreq);
             } catch (Exception e) {
                 log.error(e, e);
-                return new UncollatedObjectPropertyTemplateModel(op, subject, wdf);
+                return new UncollatedObjectPropertyTemplateModel(op, subject, vreq);
             }
         } else {
-            return new UncollatedObjectPropertyTemplateModel(op, subject, wdf);
+            return new UncollatedObjectPropertyTemplateModel(op, subject, vreq);
         }
     }
     
@@ -94,47 +99,86 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         private String postprocessor;
         private String editObject;
 
-        PropertyListConfig(ObjectProperty op, WebappDaoFactory wdf) throws Exception {
+        PropertyListConfig(ObjectProperty op, VitroRequest vreq) throws Exception {
 
             // Get the custom config filename
+            WebappDaoFactory wdf = vreq.getWebappDaoFactory();
             ObjectPropertyDao opDao = wdf.getObjectPropertyDao();
-            String filename = opDao.getCustomListConfigFilename(op);
-            if (filename == null) { // no custom config; use default config
-                filename = DEFAULT_CONFIG_FILE;
+            String configFileName = opDao.getCustomListConfigFileName(op);
+            if (configFileName == null) { // no custom config; use default config
+                configFileName = DEFAULT_CONFIG_FILE;
             }
-            log.debug("Using custom list view config file " + filename + " for object property " + op.getURI());
+            log.debug("Using list view config file " + configFileName + " for object property " + op.getURI());
             
-            String configFilePath = getConfigFilePath(filename);
+            String configFilePath = getConfigFilePath(configFileName);
             try {
                 File config = new File(configFilePath);            
-                if (configFilePath != DEFAULT_CONFIG_FILE && ! config.exists()) {
+                if (configFileName != DEFAULT_CONFIG_FILE && ! config.exists()) {
                     log.warn("Can't find config file " + configFilePath + " for object property " + op.getURI() + "\n" +
                             ". Using default config file instead.");
                     configFilePath = getConfigFilePath(DEFAULT_CONFIG_FILE);
                     // Should we test for the existence of the default, and throw an error if it doesn't exist?
-                }   
-            
-                DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-                DocumentBuilder db = dbf.newDocumentBuilder();
-                Document doc = db.parse(configFilePath);
-                // Required values
-                queryString = getConfigValue(doc, NODE_NAME_QUERY);
-                templateName = getConfigValue(doc, NODE_NAME_TEMPLATE);                
-                // Optional values
-                collationTarget = getConfigValue(doc, NODE_NAME_COLLATION_TARGET);
-                postprocessor = getConfigValue(doc, NODE_NAME_POSTPROCESSOR);
-                editObject = getConfigValue(doc, NODE_NAME_EDIT_OBJECT);
+                }                   
+                setValuesFromConfigFile(configFilePath);           
+
             } catch (Exception e) {
                 log.error("Error processing config file " + configFilePath + " for object property " + op.getURI(), e);
                 // What should we do here?
             }
             
-            if (queryString == null) {
-                throw new Exception("Invalid custom view configuration: query string not defined.");                
+            if ( ! configFileName.equals(DEFAULT_CONFIG_FILE) ) {
+                String invalidConfigMessage = checkForInvalidConfig(vreq);
+                if ( StringUtils.isNotEmpty(invalidConfigMessage) ) {
+                    log.warn("Invalid list view config for object property " + op.getURI() + 
+                            " in " + configFilePath + ":\n" +                            
+                            invalidConfigMessage + " Using default config instead.");
+                    configFilePath = getConfigFilePath(DEFAULT_CONFIG_FILE);
+                    setValuesFromConfigFile(configFilePath);                    
+                }
             }
-            if (templateName == null) {
-                throw new Exception("Invalid custom view configuration: template name not defined.");
+        }
+        
+        private String checkForInvalidConfig(VitroRequest vreq) {
+            String invalidConfigMessage = null;
+
+            if ( StringUtils.isBlank(queryString)) {
+                invalidConfigMessage = "Missing query specification.";
+            } else if ( StringUtils.isBlank(templateName)) {
+                invalidConfigMessage = "Missing template specification.";
+            } else {
+                Configuration fmConfig = (Configuration) vreq.getAttribute("freemarkerConfig");
+                TemplateLoader tl = fmConfig.getTemplateLoader();
+                try {
+                    if ( tl.findTemplateSource(templateName) == null ) {
+                        invalidConfigMessage = "Specified template " + templateName + " does not exist.";
+                    }
+                } catch (IOException e) {
+                    log.error("Error finding template " + templateName, e);
+                }
             }
+            return invalidConfigMessage;
+        }
+        
+        private void setValuesFromConfigFile(String configFilePath) {
+            
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db;
+ 
+            try {
+                db = dbf.newDocumentBuilder();
+                Document doc = db.parse(configFilePath);
+                // Required values
+                queryString = getConfigValue(doc, NODE_NAME_QUERY);
+                templateName = getConfigValue(doc, NODE_NAME_TEMPLATE); 
+                editObject = getConfigValue(doc, NODE_NAME_EDIT_OBJECT);
+                
+                // Optional values
+                collationTarget = getConfigValue(doc, NODE_NAME_COLLATION_TARGET);
+                postprocessor = getConfigValue(doc, NODE_NAME_POSTPROCESSOR);
+            } catch (Exception e) {
+                log.error("Error processing config file " + configFilePath, e);
+                // What should we do here?
+            }            
         }
  
         private String getConfigValue(Document doc, String nodeName) {

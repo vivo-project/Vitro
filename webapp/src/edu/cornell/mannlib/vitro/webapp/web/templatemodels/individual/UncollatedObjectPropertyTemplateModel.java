@@ -11,6 +11,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
@@ -20,8 +21,9 @@ public class UncollatedObjectPropertyTemplateModel extends ObjectPropertyTemplat
     
     private List<ObjectPropertyStatementTemplateModel> statements;
     
-    UncollatedObjectPropertyTemplateModel(ObjectProperty op, Individual subject, WebappDaoFactory wdf) {
-        super(op, subject, wdf);        
+    UncollatedObjectPropertyTemplateModel(ObjectProperty op, Individual subject, VitroRequest vreq) {
+        super(op, subject, vreq);
+        WebappDaoFactory wdf = vreq.getWebappDaoFactory();
         ObjectPropertyStatementDao opDao = wdf.getObjectPropertyStatementDao();
         String subjectUri = subject.getURI();
         String propertyUri = op.getURI();

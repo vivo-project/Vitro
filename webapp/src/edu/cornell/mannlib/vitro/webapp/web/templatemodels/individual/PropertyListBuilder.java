@@ -102,7 +102,7 @@ public class PropertyListBuilder {
         // Build the template data model from the groupList
         List<PropertyGroupTemplateModel> groups = new ArrayList<PropertyGroupTemplateModel>(groupList.size());
         for (PropertyGroup pg : groupList) {
-            groups.add(new PropertyGroupTemplateModel(wdf, pg, subject));
+            groups.add(new PropertyGroupTemplateModel(vreq, pg, subject));
         }   
         
         return groups;

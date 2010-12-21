@@ -76,7 +76,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         "PREFIX display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#>" +
         "SELECT ?property ?filename WHERE { \n" +
         "    ?property display:listViewConfigFile ?filename . \n" +
-        "} LIMIT 1";
+        "}";
     
     static protected Query listViewConfigFileQuery;
     static {
@@ -875,7 +875,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
     }
     
     @Override
-    public String getCustomListConfigFilename(ObjectProperty op) {
+    public String getCustomListConfigFileName(ObjectProperty op) {
         if (customListViewConfigFileMap == null) {
             customListViewConfigFileMap = new HashMap<ObjectProperty, String>();
             OntModel displayModel = getOntModelSelector().getDisplayModel();

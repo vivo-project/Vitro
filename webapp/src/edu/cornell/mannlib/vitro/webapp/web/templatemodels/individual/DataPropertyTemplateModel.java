@@ -11,6 +11,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
@@ -21,12 +22,12 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
     private static final String TYPE = "data";
     private List<DataPropertyStatementTemplateModel> statements;
 
-    DataPropertyTemplateModel(DataProperty dp, Individual subject, WebappDaoFactory wdf) {
+    DataPropertyTemplateModel(DataProperty dp, Individual subject, VitroRequest vreq) {
         super(dp);
         setName(dp.getPublicName());
         
         // Get the data property statements via a sparql query
-        DataPropertyStatementDao dpDao = wdf.getDataPropertyStatementDao();
+        DataPropertyStatementDao dpDao = vreq.getWebappDaoFactory().getDataPropertyStatementDao();
         List<DataPropertyStatement> dpStatements = dpDao.getDataPropertyStatementsForIndividualByProperty(subject, dp);
         statements = new ArrayList<DataPropertyStatementTemplateModel>(dpStatements.size());
         for (DataPropertyStatement dps : dpStatements) {

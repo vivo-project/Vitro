@@ -3,4 +3,3 @@
 <#-- FreeMarker test cases -->
 
 <h2>${title}</h2>
-
