@@ -58,7 +58,6 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         "   GRAPH ?g { ?subject ?property ?object } \n" + 
         "   GRAPH ?h { ?property rdf:type owl:ObjectProperty } \n" +
         propertyFilters +
-        "   }\n" +
         "}";
 
     static protected Query objectPropertyQuery;

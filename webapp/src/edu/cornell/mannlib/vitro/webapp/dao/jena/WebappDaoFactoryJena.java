@@ -121,6 +121,7 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     }
 
     public WebappDaoFactoryJena(OntModelSelector ontModelSelector, 
+                                OntModelSelector baseOntModelSelector,
                                 OntModelSelector inferenceOntModelSelector,
                                 String defaultNamespace, 
                                 HashSet<String> nonuserNamespaces, 
@@ -176,7 +177,9 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
         DataSource dataset = DatasetFactory.create();
         
         dataset.addNamedModel(JenaDataSourceSetupBase.JENA_DB_MODEL, 
-                ontModelSelector.getFullModel());
+                (baseOntModelSelector != null) 
+                    ? baseOntModelSelector.getFullModel()
+                    : ontModelSelector.getFullModel());
         if (inferenceOntModelSelector != null) {
             dataset.addNamedModel(JenaDataSourceSetupBase.JENA_INF_MODEL, 
                     inferenceOntModelSelector.getFullModel());
@@ -194,6 +197,7 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
             String userURI){
         this(ontModelSelector, 
              null, 
+             null,
              defaultNamespace,
              nonuserNamespaces, 
              preferredLanguages, 
@@ -204,8 +208,8 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
         this(ontModelSelector, defaultNamespace, nonuserNamespaces, preferredLanguages, null);
     }
     
-    public WebappDaoFactoryJena(OntModelSelector ontModelSelector, OntModelSelector inferenceOntModelSelector, String defaultNamespace, HashSet<String> nonuserNamespaces, String[] preferredLanguages){
-        this(ontModelSelector, inferenceOntModelSelector, defaultNamespace, nonuserNamespaces, preferredLanguages, null);
+    public WebappDaoFactoryJena(OntModelSelector ontModelSelector, OntModelSelector baseOntModelSelector, OntModelSelector inferenceOntModelSelector, String defaultNamespace, HashSet<String> nonuserNamespaces, String[] preferredLanguages){
+        this(ontModelSelector, baseOntModelSelector, inferenceOntModelSelector, defaultNamespace, nonuserNamespaces, preferredLanguages, null);
     }
 
     public WebappDaoFactoryJena(OntModelSelector ontModelSelector) {
