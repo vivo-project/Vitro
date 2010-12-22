@@ -28,7 +28,7 @@ import edu.cornell.mannlib.vitro.utilities.revisioninfo.ProcessRunner.ProcessExc
  */
 public class RevisionInfoBuilder {
 	private static final String SVN_DIRECTORY_NAME = ".svn";
-	private static final String[] SVNVERSION_COMMAND = { "svnversion" };
+	private static final String[] SVNVERSION_COMMAND = { "svnversion", "." };
 	private static final String[] SVN_INFO_COMMAND = { "svn", "info" };
 	private static final String INFO_LINE_DELIMITER = " ~ ";
 	private static final String REVISION_INFO_FILENAME = ".revisionInfo";
