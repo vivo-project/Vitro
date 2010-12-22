@@ -36,8 +36,8 @@ public class PageController extends FreemarkerHttpServlet{
     protected final static String DEFAULT_TITLE = "Page";        
     protected final static String DEFAULT_BODY_TEMPLATE = "menupage.ftl";
 
-    protected static Map<String,PageDataGetter> typeToDataGetter;
-    
+    protected static Map<String,PageDataGetter> typeToDataGetter;      
+
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
         try {
@@ -50,7 +50,10 @@ public class PageController extends FreemarkerHttpServlet{
             try {
                 pageUri = getPageUri( vreq , url );
                 page = getMapForPage( vreq, pageUri );
-                mapForTemplate.put( "page", page);                
+                mapForTemplate.put( "page", page);
+                if( page.containsKey("title") ){
+                    mapForTemplate.put("title", page.get("title"));
+                }
             } catch (Throwable th) {
                 return doNotFound(vreq);                
             }
@@ -62,7 +65,8 @@ public class PageController extends FreemarkerHttpServlet{
                 return doError(vreq);
             }
             
-            return new TemplateResponseValues(getTemplate( mapForTemplate ), mapForTemplate);       
+            ResponseValues rv = new TemplateResponseValues(getTemplate( mapForTemplate ), mapForTemplate);            
+            return rv;
         } catch (Throwable e) {
             log.error(e);
             return new ExceptionResponseValues(e);
