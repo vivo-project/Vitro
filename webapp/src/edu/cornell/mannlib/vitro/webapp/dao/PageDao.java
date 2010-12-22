@@ -20,4 +20,6 @@ public interface PageDao {
      * @return
      */
     String getHomePageUri();
+   
+    String getClassGroupPage(String pageUri);
 }

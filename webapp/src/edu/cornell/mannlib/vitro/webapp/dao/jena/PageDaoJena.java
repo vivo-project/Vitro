@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
@@ -24,50 +25,58 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
+import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.PageDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 public class PageDaoJena extends JenaBaseDao implements PageDao {
 
+    final static Log log = LogFactory.getLog(PageDaoJena.class);
+    
     static protected Query pageQuery;
+    static protected Query pageTypeQuery;
     static protected Query pageMappingsQuery;
     static protected Query homePageUriQuery;
+    static protected Query classGroupPageQuery;
     
     static final String prefixes = 
         "PREFIX rdf:   <" + VitroVocabulary.RDF +"> \n" +
         "PREFIX rdfs:  <" + VitroVocabulary.RDFS +"> \n" + 
         "PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#> \n" +
-        "PREFIX display: <" + VitroVocabulary.DISPLAY +"> \n";
+        "PREFIX display: <" + DisplayVocabulary.DISPLAY_NS +"> \n";
     
     
     static final protected String pageQueryString = 
         prefixes + "\n" +
         "SELECT ?pageUri ?bodyTemplate ?urlMapping ?title WHERE {\n" +
-//        "  GRAPH ?g{\n"+
-        "    ?pageUri rdf:type display:Page .\n"+               
-        "    OPTIONAL { ?pageUri display:requiresBodyTemplate ?bodyTemplate }.\n"+
-        "    OPTIONAL { ?pageUri display:title ?title }.\n"+
-        "    OPTIONAL { ?pageUri display:urlMapping ?urlMapping . }\n"+                
-//        "  }\n"+
+        "    ?pageUri rdf:type <" + DisplayVocabulary.PAGE_TYPE + ">.\n"+               
+        "    OPTIONAL { ?pageUri <" + DisplayVocabulary.REQUIRES_BODY_TEMPLATE + "> ?bodyTemplate }.\n"+
+        "    OPTIONAL { ?pageUri <" + DisplayVocabulary.TITLE + "> ?title }.\n"+
+        "    OPTIONAL { ?pageUri <" + DisplayVocabulary.URL_MAPPING + "> ?urlMapping . }\n"+                
+        "} \n" ;
+    
+    static final protected String pageTypeQueryString = 
+        prefixes + "\n" +
+        "SELECT ?type WHERE {\n" +
+        "    ?pageUri rdf:type ?type .\n"+                              
         "} \n" ;
     
     static final protected String pageMappingsQueryString = 
         prefixes + "\n" +
         "SELECT ?pageUri ?urlMapping WHERE {\n" +
-//        "  GRAPH ?g{\n"+
-        "    ?pageUri rdf:type display:Page .\n"+                       
-        "    ?pageUri display:urlMapping ?urlMapping . \n"+                
-//        "  }\n"+
+        "    ?pageUri rdf:type <" + DisplayVocabulary.PAGE_TYPE + "> .\n"+                       
+        "    ?pageUri <" + DisplayVocabulary.URL_MAPPING + "> ?urlMapping . \n"+                
         "} \n" ;
                           
     static final protected String homePageUriQueryString = 
         prefixes + "\n" +
         "SELECT ?pageUri WHERE {\n" +
-//        "  GRAPH ?g{\n"+
-        "    ?pageUri rdf:type display:HomePage .\n"+                
-//        "  }\n"+
+        "    ?pageUri rdf:type <" + DisplayVocabulary.HOME_PAGE_TYPE + "> .\n"+                
         "} \n" ;
 
+    static final protected String classGroupPageQueryString = 
+        prefixes + "\n" +
+        "SELECT ?classGroup WHERE { ?pageUri <" + DisplayVocabulary.FOR_CLASSGROUP + "> ?classGroup . }";
     
     static{
         try{    
@@ -75,6 +84,12 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
         }catch(Throwable th){
             log.error("could not create SPARQL query for pageQuery " + th.getMessage());
             log.error(pageQueryString);
+        }
+        try{
+            pageTypeQuery = QueryFactory.create(pageTypeQueryString);
+        }catch(Throwable th){
+            log.error("could not create SPARQL query for pageTypeQuery " + th.getMessage());
+            log.error(pageTypeQueryString);
         }
         try{    
             pageMappingsQuery=QueryFactory.create(pageMappingsQueryString);
@@ -87,6 +102,12 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
         }catch(Throwable th){
             log.error("could not create SPARQL query for homePageUriQuery " + th.getMessage());
             log.error(homePageUriQueryString);
+        }
+        try{    
+            classGroupPageQuery=QueryFactory.create(classGroupPageQueryString);
+        }catch(Throwable th){
+            log.error("could not create SPARQL query for classGroupPageQuery " + th.getMessage());
+            log.error(classGroupPageQueryString);
         }  
     }        
     
@@ -109,17 +130,25 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
     }
     
     /**
-     * Gets information about a page identified by a URI.
+     * Gets information about a page identified by a URI.   
      */
     @Override
     public Map<String, Object> getPage(String pageUri) {     
       //setup query parameters
       QuerySolutionMap initialBindings = new QuerySolutionMap();
       initialBindings.add("pageUri", ResourceFactory.createResource(pageUri));
-        
+      
+      List<Map<String, Object>> list; 
       Model displayModel = getOntModelSelector().getDisplayModel();
-      QueryExecution qexec = QueryExecutionFactory.create(pageQuery,displayModel,initialBindings );
-      List<Map<String, Object>> list = executeQueryToCollection( qexec );
+      displayModel.enterCriticalSection(false);
+      try{
+          QueryExecution qexec = QueryExecutionFactory.create(pageQuery,displayModel,initialBindings );
+          list = executeQueryToCollection( qexec );
+          qexec.close();
+      }finally{
+          displayModel.leaveCriticalSection();
+      }
+      
       if( list == null ){
           log.error("executeQueryToCollection returned null.");
           return Collections.emptyMap();
@@ -128,12 +157,32 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
           log.debug("no page found for " + pageUri);
           return Collections.emptyMap();          
       }
-      if( list.size() > 1 ){
+      
+      if( list.size() > 1 )
           log.debug("multiple results found for " + pageUri + " using only the first.");
-          return list.get(0);
-      }else{
-          return list.get(0);
-      }      
+      Map<String,Object> pageData = list.get(0);
+      
+      //now get the rdf:types for the page
+      List<String> types = new ArrayList<String>();
+      displayModel.enterCriticalSection(false);
+      try{
+          QueryExecution qexec = QueryExecutionFactory.create(pageTypeQuery, displayModel, initialBindings);
+          ResultSet rs = qexec.execSelect();
+          while(rs.hasNext()){
+              QuerySolution soln = rs.next();
+              types.add( nodeToString( soln.get("type" ) ));
+          }
+          qexec.close();
+      }finally{
+          displayModel.leaveCriticalSection();
+      }
+      
+      if( list == null )
+          log.error("could not get types for page " + pageUri);
+      else
+          pageData.put("types", types);
+      
+      return pageData;
     }
     
     @Override
@@ -159,6 +208,38 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
         }
         return rv.get(0);
     }
+    
+    /**
+     * Gets a URI for display:forClassGroup for the specified page.
+     * Only one value is expected in the model.
+     * This may return null if there is no ClassGroup associated with the page. 
+     * @param pageUri
+     * @return
+     */
+    @Override
+    public String getClassGroupPage(String pageUri) {        
+        QuerySolutionMap initialBindings = new QuerySolutionMap();
+        initialBindings.add("pageUri", ResourceFactory.createResource(pageUri));
+        
+        Model displayModel = getOntModelSelector().getDisplayModel();
+        QueryExecution qexec = QueryExecutionFactory.create( classGroupPageQuery, displayModel , initialBindings);
+        
+        List<String> classGroupsForPage = new ArrayList<String>();
+        ResultSet resultSet = qexec.execSelect();        
+        while(resultSet.hasNext()){
+            QuerySolution soln = resultSet.next();
+            classGroupsForPage.add( nodeToString(soln.get("classGroup")) );        
+        }
+        if( classGroupsForPage.size() == 0 ){
+            log.debug("No classgroup info defined in display model for "+ pageUri);
+            return null;
+        }
+        if( classGroupsForPage.size() > 1 ){
+            log.error("More than one display:forClassGroup defined in display model for page " + pageUri);            
+        }        
+        return classGroupsForPage.get(0);
+    }
+    
     
     /* ****************************************************************************** */
     
@@ -223,6 +304,8 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
     protected Map<String,Object> resultsToMap(){
         return null;
     }
+
+
     
 
 }
