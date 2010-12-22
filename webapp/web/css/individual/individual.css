@@ -13,16 +13,14 @@ div.admin{
 }
 div.panelContents{
   color: #777;
-  background: #e5e3d5;
+  background: #efebe6A;
 /*display: none;*/
   padding: 12px;
 }
 div.top{
   margin: 0;
   padding: 0 24px 0 0;
-  position: relative;
-  top: -16px;
-  background: #e5e3d5;
+  background: #efebe6;
 }
 div.bottom{
   margin: 0 -12px;
