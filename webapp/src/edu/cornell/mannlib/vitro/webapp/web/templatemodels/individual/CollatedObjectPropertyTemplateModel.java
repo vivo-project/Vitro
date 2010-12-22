@@ -33,10 +33,10 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
         super(op, subject, vreq); 
 
         // RY Temporarily throw an error because collation hasn't been implemented yet.
-        boolean error = true;
-        if (error) {
-            throw new Exception("Collated object property not implemented yet");
-        }
+//        boolean error = true;
+//        if (error) {
+//            throw new Exception("Collated object property not implemented yet");
+//        }
         
         /* Change the approach to collation:
          * Custom views can get the subclasses in the query. Must use a term ?subclass - throw error if not.

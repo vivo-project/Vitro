@@ -32,7 +32,7 @@
 
                     <#-- object property -->      
                     <#elseif property.collatedBySubclass>                             
-                        <@objectPropertySubclassList property />
+                        <@collatedObjectPropertyList property />
                     <#else>
                         <@objectPropertyList property.statements property.template />
                     </#if>  
@@ -52,10 +52,11 @@
     </#list> 
 </#macro>
 
-<#macro objectPropertySubclassList property>
-    <#list property.subclasses as subclass>
-        <h3>${subclass}</h3>
-        <@objectPropertyList subclass.statements property.template />
+<#macro collatedObjectPropertyList property>
+    <#assign subclasses = property.subclasses>
+    <#list subclasses?keys as subclass>
+        <h3>${subclass?lower_case}</h3>
+        <@objectPropertyList subclasses[subclass] property.template /> 
     </#list>
 </#macro>
 
