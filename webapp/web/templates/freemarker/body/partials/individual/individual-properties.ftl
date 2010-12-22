@@ -48,7 +48,7 @@
 
 <#macro dataPropertyList statements>
     <#list statements as statement>
-        <li role="listitem">${statement.value}</li>
+        <@propertyListItem>${statement.value}</@propertyListItem>
     </#list> 
 </#macro>
 
@@ -62,8 +62,10 @@
 
 <#macro objectPropertyList statements template>
     <#list statements as statement>
-        <li role="listitem">
-            <#include "${template}">
-        </li>
+        <@propertyListItem><#include "${template}"></@propertyListItem>
     </#list>
+</#macro>
+
+<#macro propertyListItem>
+    <li role="listitem"><#nested></li>
 </#macro>
