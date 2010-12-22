@@ -70,9 +70,13 @@ public class PageController extends FreemarkerHttpServlet{
     }
 
     private String getTemplate(Map<String, Object> mapForTemplate) {
-        if( mapForTemplate.containsKey("bodyTemplate"))
-            return (String) mapForTemplate.get("bodyTemplate");
-        else
+        if( mapForTemplate.containsKey("page") ){
+            Map page = (Map) mapForTemplate.get("page");
+            if( page != null && page.containsKey("bodyTemplate"))
+                return (String) page.get("bodyTemplate");
+            else
+                return DEFAULT_BODY_TEMPLATE;
+        }else
             return DEFAULT_BODY_TEMPLATE;        
     }
 
