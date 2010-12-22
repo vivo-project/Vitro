@@ -37,13 +37,11 @@
         <#-- Links -->
         <nav role="navigation">
             <ul id ="individual-urls-people" role="list">
-            <#if individual.links?has_content>
-                <@l.firstLastList>
-                    <#list individual.links as link>                        
-                        <li role="listitem"><a href="${link.url}">${link.anchor}</a></li>
-                        </#list>
-                </@l.firstLastList>
-            </#if>              
+            <@l.firstLastList>
+                <#list individual.links as link>                               
+                    <li role="listitem"><a href="${link.url}">${link.anchor}</a></li>                                 
+                </#list>
+            </@l.firstLastList>          
             </ul>
         </nav>
     </section>

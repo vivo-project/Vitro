@@ -15,6 +15,8 @@
           ?subject and ?property named as such. The object can be given any name, but it must be 
           included in the SELECT terms retrieved by the query. This is the statement that will be edited 
           from the edit links.
+        - Each assertion or set of optional assertions must reference a different graph variable, so that
+          we do not impose a requirement about which assertions are in the same graph.           
 -->
 
 <list-view-config>

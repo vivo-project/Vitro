@@ -2,7 +2,7 @@
 
 <#-- Template to list statements for an object property -->
 
-<#list property.statements as statement>
+<#list statements as statement>
     <li role="listitem">
         <#include "${property.template}">
     </li>

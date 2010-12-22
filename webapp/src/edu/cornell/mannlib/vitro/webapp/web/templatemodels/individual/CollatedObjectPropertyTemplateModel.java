@@ -2,9 +2,13 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,17 +20,24 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
+import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateModel {
 
     private static final Log log = LogFactory.getLog(CollatedObjectPropertyTemplateModel.class);  
     
-    private Map<String, List<ObjectPropertyStatementTemplateModel>> subclasses;
+    private SortedMap<String, List<ObjectPropertyStatementTemplateModel>> subclasses;
     
     CollatedObjectPropertyTemplateModel(ObjectProperty op, Individual subject, VitroRequest vreq) throws Exception {
         super(op, subject, vreq); 
 
+        // RY Temporarily throw an error because collation hasn't been implemented yet.
+        boolean error = true;
+        if (error) {
+            throw new Exception("Collated object property not implemented yet");
+        }
+        
         /* Change the approach to collation:
          * Custom views can get the subclasses in the query. Must use a term ?subclass - throw error if not.
          * Default view: we may be able to figure out the  class to get subclasses of by inspecting the property.
@@ -36,27 +47,58 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
          * in the query. (The reverse is okay - uncollated property with a subclass term in the query.     
          */
         
-        // RY Temporarily throw an error because collation hasn't been implemented yet.
-        boolean error = true;
-        if (error) {
-            throw new Exception("Collated object property not implemented yet");
-        }
-        
         WebappDaoFactory wdf = vreq.getWebappDaoFactory();
         ObjectPropertyStatementDao opDao = wdf.getObjectPropertyStatementDao();
         String subjectUri = subject.getURI();
         String propertyUri = op.getURI();
         List<Map<String, String>> statementData = opDao.getObjectPropertyStatementsForIndividualByProperty(subjectUri, propertyUri, getQueryString());
-        subclasses = new HashMap<String, List<ObjectPropertyStatementTemplateModel>>(statementData.size());
-//        for (Map<String, Object> map : statementData) {
-//            statements.add(new ObjectPropertyStatementTemplateModel(subjectUri, propertyUri, map, wdf));
-//        }
         
-//        if (statementData.size() > 0) {
-//            String collationTarget = getCollationTarget();
-//            List<VClass> vclasses = getDirectVClasses(collationTarget, statementData);
-//        }
+        Map<String, List<ObjectPropertyStatementTemplateModel>> unsortedSubclasses = hasCustomListView() ?
+                collateCustomListView(subjectUri, propertyUri, statementData, vreq) :
+                collateDefaultListView(subjectUri, propertyUri, statementData, vreq);  
+
+        /* Sort by subclass name */
+        Comparator<String> comparer = new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                    return o1.compareTo(o2);
+            }};
+        subclasses = new TreeMap<String, List<ObjectPropertyStatementTemplateModel>>(comparer);
+        subclasses.putAll(unsortedSubclasses);        
+    }
+    
+    private Map<String, List<ObjectPropertyStatementTemplateModel>> collateCustomListView(String subjectUri, 
+            String propertyUri, List<Map<String, String>> statementData, VitroRequest vreq) {
+    
+        Map<String, List<ObjectPropertyStatementTemplateModel>> unsortedSubclasses = 
+            new HashMap<String, List<ObjectPropertyStatementTemplateModel>>();
+        String currentSubclassUri = null;
+        List<ObjectPropertyStatementTemplateModel> currentList = null;
+        for (Map<String, String> map : statementData) {
+            String subclassUri = map.get("subclass");
+            if (!subclassUri.equals(currentSubclassUri)) {
+                currentSubclassUri = subclassUri;
+                currentList = new ArrayList<ObjectPropertyStatementTemplateModel>();
+                String subclassName = getSubclassName(subclassUri, vreq);
+                unsortedSubclasses.put(subclassName, currentList);
+            }
+            currentList.add(new ObjectPropertyStatementTemplateModel(subjectUri, propertyUri, map));
+        }   
+        return unsortedSubclasses; 
+    }
+    
+    private Map<String, List<ObjectPropertyStatementTemplateModel>> collateDefaultListView(String subjectUri, 
+            String propertyUri, List<Map<String, String>> statementData, VitroRequest vreq) {
         
+        Map<String, List<ObjectPropertyStatementTemplateModel>> unsortedSubclasses = 
+            new HashMap<String, List<ObjectPropertyStatementTemplateModel>>();
+        return unsortedSubclasses;
+    }
+    
+    private String getSubclassName(String subclassUri, VitroRequest vreq) {
+        VClassDao vclassDao = vreq.getWebappDaoFactory().getVClassDao();
+        VClass vclass = vclassDao.getVClassByURI(subclassUri);
+        return vclass.getName();
     }
     
     private String getCollationTargetError() {
@@ -84,7 +126,7 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
 
     /* Access methods for templates */
     
-    public Map<String, List<ObjectPropertyStatementTemplateModel>> getCollatedStatements() {
+    public Map<String, List<ObjectPropertyStatementTemplateModel>> getSubclasses() {
         return subclasses;
     }
     

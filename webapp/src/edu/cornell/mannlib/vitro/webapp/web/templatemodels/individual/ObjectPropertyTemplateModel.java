@@ -53,6 +53,10 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         return config.collationTarget;
     }
     
+    protected boolean hasCustomListView() {
+        return !config.isDefaultConfig;
+    }
+    
     protected static ObjectPropertyTemplateModel getObjectPropertyTemplateModel(ObjectProperty op, Individual subject, VitroRequest vreq) {
         if (op.getCollateBySubclass()) {
             try {
@@ -92,6 +96,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         private static final String NODE_NAME_COLLATION_TARGET = "collation-target";
         private static final String NODE_NAME_POSTPROCESSOR = "postprocessor";
         
+        private boolean isDefaultConfig;
         private String queryString;
         private String templateName;
         private String collationTarget;
@@ -134,6 +139,8 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
                     setValuesFromConfigFile(configFilePath);                    
                 }
             }
+            
+            isDefaultConfig = isDefaultConfig(configFileName);
         }
         
         private boolean isDefaultConfig(String configFileName) {
