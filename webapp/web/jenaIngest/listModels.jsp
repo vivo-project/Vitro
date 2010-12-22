@@ -26,21 +26,20 @@ function init(){
     }
 %>
 
-    <h2><a href="ingest">Ingest Home</a></h2>
+    <h2><a class="ingestMenu" href="ingest">Ingest Menu</a> > Available Jena Models</h2>
 
-    <h3>Available Jena Models</h3>
     <table>
     <tr>
     <td>
      <form name="sdbform" action="ingest" method="get">
         <input type="hidden" name="action" value="sdbModels"/>
-        <input id="submit" type="submit" name="submit" value="SDB Models"/>
+        <input type="submit" name="submit" value="SDB Models"/>
     </form>
     </td>
     <td>
     <form name="rdbform" action="ingest" method="get">
         <input type="hidden" name="action" value="rdbModels"/>
-        <input id="submit" type="submit" name="submit" value="RDB Models"/>
+        <input type="submit" name="submit" value="RDB Models"/>
     </form>
     </td>
     </tr>
@@ -48,7 +47,7 @@ function init(){
     <form action="ingest" method="get">
         <input type="hidden" name="action" value="createModel"/>
         <input type="hidden" name="modelType" value="${modelType}"/>
-        <input id="submit" type="submit" name="submit" value="Create Model"/>
+        <input type="submit" name="submit" value="Create Model"/>
     </form>
     <form name="information">
     <input type="hidden" name="info" value="${infoLine}"/>
@@ -66,7 +65,7 @@ function init(){
                 <input type="hidden" name="action" value="loadRDFData"/>
                 <input type="hidden" name="modelName" value="<%=modelName%>"/>
                 <input type="hidden" name="modelType" value="${modelType}"/>
-                <input id="submit" type="submit" name="submit" value="load RDF data"/>
+                <input type="submit" name="submit" value="load RDF data"/>
             </form>
             </td>
             <td>
@@ -81,7 +80,7 @@ function init(){
                 <input type="hidden" name="action" value="clearModel"/>
                 <input type="hidden" name="modelName" value="<%=modelName%>"/>
                 <input type="hidden" name="modelType" value="${modelType}"/>
-                <input id="submit" type="submit" name="submit" value="clear statements"/>
+                <input type="submit" name="submit" value="clear statements"/>
             </form>
             </td>
             <td>
@@ -89,7 +88,7 @@ function init(){
                 <input type="hidden" name="action" value="removeModel"/>
                 <input type="hidden" name="modelName" value="<%=modelName%>"/>
                 <input type="hidden" name="modelType" value="${modelType}"/>
-                <input id="submit" type="submit" name="submit" value="remove"/>
+                <input type="submit" name="submit" value="remove"/>
             </form>
             </td>
             </tr>
@@ -99,7 +98,7 @@ function init(){
                 <input type="hidden" name="action" value="attachModel"/>
                 <input type="hidden" name="modelName" value="<%=modelName%>"/>
                 <input type="hidden" name="modelType" value="${modelType}"/>
-                <input id="submit" type="submit" name="submit" value="attach to webapp"/>
+                <input type="submit" name="submit" value="attach to webapp"/>
             </form>
             </td>
             <td>
@@ -107,7 +106,7 @@ function init(){
                 <input type="hidden" name="action" value="detachModel"/>
                 <input type="hidden" name="modelName" value="<%=modelName%>"/>
                 <input type="hidden" name="modelType" value="${modelType}"/>
-                <input id="submit" type="submit" name="submit" value="detach from webapp"/>
+                <input type="submit" name="submit" value="detach from webapp"/>
             </form>
             </td>
             <td>
@@ -115,7 +114,7 @@ function init(){
 			    <input type="hidden" name="action" value="permanentURI" />
 			    <input type="hidden" name="modelName" value="<%=modelName%>" /> 
 				<input type="hidden" name="modelType" value="${modelType}"/>
-				<input id="submit" type="submit" name="submit" value="generate permanent URIs" /></form>
+				<input type="submit" name="submit" value="generate permanent URIs" /></form>
 			</td>
             <td>&nbsp;</td>
             </tr>

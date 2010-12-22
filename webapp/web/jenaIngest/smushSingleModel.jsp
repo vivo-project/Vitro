@@ -16,10 +16,8 @@
     }
 
 %>
-
-    <h2><a href="ingest">Ingest Home</a></h2>
-
-    <h3>Smush Resources</h3>
+  
+    <h2><a class="ingestMenu" href="ingest">Ingest Menu</a> > Smush Resources</h2>
 
     <form action="ingest" method="get"i>
         <input type="hidden" name="action" value="smushSingleModel"/>

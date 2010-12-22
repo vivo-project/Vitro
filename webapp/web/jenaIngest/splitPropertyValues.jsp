@@ -16,8 +16,7 @@
     }
 
 %>
-
-    <h2>Split Property Value Strings into Multiple Property Values</h2>
+    <h2><a class="ingestMenu" href="ingest">Ingest Menu</a> > Split Property Value Strings into Multiple Property Values</h2>
 
     <form action="ingest" method="get">
         <input type="hidden" name="action" value="splitPropertyValues"/>

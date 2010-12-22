@@ -3,8 +3,7 @@
 
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
 
-<h2><a href="ingest">Ingest Home</a></h2>
+<h2><a class="ingestMenu" href="ingest">Ingest Menu</a> > Rename Resource</h2>
 
-<h3>Rename Resource</h3>
 <%String result = (String) request.getAttribute("result");%>
 <p><b><%=result%></b></p>

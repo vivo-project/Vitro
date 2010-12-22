@@ -23,10 +23,9 @@
 <%@page import="java.util.HashSet"%>
 <%@page import="java.util.Set"%>
 <%@page import="java.util.Arrays"%>
-<%@page import="java.util.ArrayList"%><h2>Execute SPARQL CONSTRUCT
-Query</h2>
+<%@page import="java.util.ArrayList"%>
 
-<h2><a href="ingest">Ingest Home</a></h2>
+<h2><a class="ingestMenu" href="ingest">Ingest Menu</a> > Execute SPARQL CONSTRUCT Query</h2>
 
 <c:if test="${requestScope.constructedStmtCount != null}">
 	<h3 class="notice">${requestScope.constructedStmtCount} statements
@@ -63,7 +62,9 @@ Query</h2>
                   jenaOntModel.leaveCriticalSection();
 	      }
         %>
-</select> <textarea rows="16" cols="40" name="sparqlQueryStr"><c:choose>
+</select> 
+
+<textarea rows="16" cols="40" name="sparqlQueryStr" class="maxWidth"><c:choose>
     <c:when test="${param.sparqlQueryStr != null}">
         ${param.sparqlQueryStr}
     </c:when>

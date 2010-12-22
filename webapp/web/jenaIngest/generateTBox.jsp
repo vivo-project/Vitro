@@ -17,7 +17,7 @@
 
 %>
 
-    <h2>Generate TBox from Assertions Data</h2>
+    <h2><a class="ingestMenu" href="ingest">Ingest Menu</a> > Generate TBox from Assertions Data</h2>
 
     <form action="ingest" method="get">
         <input type="hidden" name="action" value="generateTBox"/>

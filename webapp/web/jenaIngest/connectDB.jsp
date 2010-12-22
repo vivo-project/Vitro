@@ -1,6 +1,6 @@
 <%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
 
-    <h2>Connect to Jena Database</h2>
+    <h2><a class="ingestMenu" href="ingest">Ingest Menu</a> > Connect to Jena Database</h2>
 
     <form action="ingest" method="post">
         <input type="hidden" name="action" value="connectDB"/>

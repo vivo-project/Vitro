@@ -17,9 +17,7 @@
 
 %>
 
-    <h2><a href="ingest">Ingest Home</a></h2>
-
-    <h3>Convert CSV to RDF</h3>
+    <h2><a class="ingestMenu" href="ingest">Ingest Menu</a> > Convert CSV to RDF</h2>
 
     <form action="csv2rdf" method="post" enctype="multipart/form-data">
         <input type="hidden" name="action" value="csv2rdf"/>

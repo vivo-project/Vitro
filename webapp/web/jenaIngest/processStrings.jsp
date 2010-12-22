@@ -16,8 +16,7 @@
     }
 
 %>
-
-    <h2>Process Property Value Strings</h2>
+    <h2><a class="ingestMenu" href="ingest">Ingest Menu</a> > Process Property Value Strings</h2>
 
     <form action="ingest" method="get"i>
         <input type="hidden" name="action" value="processStrings"/>

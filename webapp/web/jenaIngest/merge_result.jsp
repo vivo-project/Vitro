@@ -3,9 +3,9 @@
 
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
 <%@ page import="com.hp.hpl.jena.rdf.model.Model"%>
-<h2><a href="ingest">Ingest Home</a></h2>
 
-<h3>Merge Individuals</h3>
+<h2><a class="ingestMenu" href="ingest">Ingest Menu</a> > Merge Individuals</h2>
+
 <form action="ingest" method="get">
 <input type="hidden" name="action" value="mergeResult"/>
 <%String result = (String) request.getAttribute("result");%>

@@ -14,8 +14,7 @@
 
 %>
 
-    <h3><a href="ingest">Ingest Home</a></h3>
-    
+    <h2><a class="ingestMenu" href="ingest">Ingest Menu</a> > Load XML and convert to RDF</h2>
 
     <form action="jenaXmlFileUpload" method="post" enctype="multipart/form-data">
     

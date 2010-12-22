@@ -17,9 +17,7 @@
 
 %>
 
-    <h2><a href="ingest">Ingest Home</a></h2>
-
-    <h3>Subtract One Model from Another</h3>
+    <h2><a class="ingestMenu" href="ingest">Ingest Menu</a> > Subtract One Model from Another</h2>
 
     <form action="ingest" method="get"i>
         <input type="hidden" name="action" value="subtractModels"/>

@@ -1,6 +1,6 @@
 <%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
 
-<h2>Load RDF Data</h2>
+<h2><a class="ingestMenu" href="ingest">Ingest Menu</a> > Load RDF Data</h2>
 
 <form style="margin-bottom: 2ex;" action="uploadRDF" method="POST" enctype="multipart/form-data">
 <input type="hidden" name="modelName"

@@ -17,9 +17,9 @@ td {
 <BODY onload="init()">
 	<div id="content" class="sparqlform"
 		style="width: 900px; margin: 0 auto;">
-		<h1>
+		<h2>
 			SPARQL Query Builder
-		</h1>
+		</h2>
 		<table id="builder" width="100%">
 			<tr>
 				<td width="33%">
@@ -49,19 +49,19 @@ td {
 			</tr>
 		</table>
 		<div>
-			<input type="button" value="Generate Query" onclick="genQuery();" />
+			<input type="button" id="submit" value="Generate Query" onclick="genQuery();" />
 		</div>
 		<div id="sparqlquery" style="visibility: hidden;">
 			<form action="sparqlquery">
 				<div>
-					<textarea id="query" name="query" rows="20" cols="111">
+					<textarea id="query" name="query" rows="20" cols="111" class="maxWidth">
 							
 						</textarea>
 				</div>
 				<p>
-					<h4>
+					<h3>
 						Format for SELECT query results:
-					</h4>
+					</h3>
 					<input id='RS_XML_BUTTON' type='radio' name='resultFormat'
 						value='RS_XML'>
 					<label for='RS_XML_BUTTON'>
@@ -95,9 +95,9 @@ td {
 				</p>
 
 				<p>
-					<h4>
+					<h3>
 						Format for CONSTRUCT and DESCRIBE query results:
-					</h4>
+					</h3>
 					<input id='RR_RDFXML_BUTTON' type='radio' name='rdfResultFormat'
 						value='RDF/XML'>
 					<label for='RR_RDFXML_BUTTON'>
@@ -158,7 +158,7 @@ td {
 					</ul>
 
 				</div>
-				<input type="submit" value="Run Query" class="green button">
+				<input type="submit" value="Run Query" id="submit">
 			</form>
 		</div>
 	</div>

@@ -15,9 +15,7 @@
 
 %>
 
-<h2><a href="ingest">Ingest Home</a></h2>
-
-<h3>Assign Permanent URIs To Resources</h3>
+<h2><a class="ingestMenu" href="ingest">Ingest Menu</a> > Assign Permanent URIs To Resources</h2>
 
 <p>This tool will rename the resources in the selected model to with new
 randomly-generated URIs following the pattern used in the main application.  

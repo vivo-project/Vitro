@@ -10,7 +10,7 @@
 
 <div class="staticPageBackground">
 
-<h2> Export to RDF </h2>
+<h2>Export to RDF</h2>
 
 <form action="" method="get">
 
