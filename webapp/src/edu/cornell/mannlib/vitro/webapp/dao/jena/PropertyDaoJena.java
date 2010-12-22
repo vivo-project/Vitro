@@ -15,6 +15,7 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntProperty;
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
@@ -69,8 +70,12 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
         }
     }
     
-    public PropertyDaoJena(WebappDaoFactoryJena wadf) {
+    private DatasetWrapperFactory dwf;
+    
+    public PropertyDaoJena(DatasetWrapperFactory dwf, 
+                           WebappDaoFactoryJena wadf) {
         super(wadf);
+        this.dwf = dwf;
     }
     
     @Override
@@ -410,10 +415,21 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
         log.debug("SPARQL query:\n" + query.toString());
         // Bind the subject's uri to the ?subject query term
         QuerySolutionMap subjectBinding = new QuerySolutionMap();
-        subjectBinding.add("subject", ResourceFactory.createResource(subjectUri));
+        subjectBinding.add("subject", 
+                ResourceFactory.createResource(subjectUri));
 
         // Run the SPARQL query to get the properties        
-        QueryExecution qexec = QueryExecutionFactory.create(query, getOntModelSelector().getFullModel(), subjectBinding);
-        return qexec.execSelect();        
+        DatasetWrapper w = dwf.getDatasetWrapper();
+        Dataset dataset = w.getDataset();
+        dataset.getLock().enterCriticalSection(Lock.READ);
+        try {
+            QueryExecution qexec = QueryExecutionFactory.create(
+                    query, dataset, subjectBinding);
+            return qexec.execSelect();
+        } finally {
+            dataset.getLock().leaveCriticalSection();
+            w.close();
+        }
     }
+    
 }

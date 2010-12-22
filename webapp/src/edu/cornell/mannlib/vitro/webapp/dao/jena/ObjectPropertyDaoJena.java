@@ -55,11 +55,10 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
     protected static final String objectPropertyQueryString = 
         PREFIXES + "\n" +
         "SELECT DISTINCT ?property WHERE { \n" +
-        //"   GRAPH ?g {\n" + 
-        "       ?subject ?property ?object . \n" +
-        "       ?property rdf:type owl:ObjectProperty . \n" +
+        "   GRAPH ?g { ?subject ?property ?object } \n" + 
+        "   GRAPH ?h { ?property rdf:type owl:ObjectProperty } \n" +
         propertyFilters +
-        //"   }\n" +
+        "   }\n" +
         "}";
 
     static protected Query objectPropertyQuery;
@@ -90,8 +89,9 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
     
     Map<ObjectProperty, String> customListViewConfigFileMap = null;
     
-    public ObjectPropertyDaoJena(WebappDaoFactoryJena wadf) {
-        super(wadf);
+    public ObjectPropertyDaoJena(DatasetWrapperFactory dwf, 
+                                 WebappDaoFactoryJena wadf) {
+        super(dwf, wadf);
     }
 
     @Override

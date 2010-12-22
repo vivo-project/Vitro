@@ -23,9 +23,9 @@
         PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;  
           
         SELECT ?object ?name ?moniker {
-            ?subject ?property ?object .
-            OPTIONAL { ?object rdfs:label ?name . }
-            OPTIONAL { ?object vitro:moniker ?moniker . }
+            GRAPH ?g1 { ?subject ?property ?object }
+            OPTIONAL { GRAPH ?g2 { ?object rdfs:label ?name } }
+            OPTIONAL { GRAPH ?g3 { ?object vitro:moniker ?moniker } }
         }       
     </query>
     

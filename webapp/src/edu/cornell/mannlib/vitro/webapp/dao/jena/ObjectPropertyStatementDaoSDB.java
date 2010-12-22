@@ -34,10 +34,10 @@ public class ObjectPropertyStatementDaoSDB extends
 	private DatasetWrapperFactory dwf;
 	
 	public ObjectPropertyStatementDaoSDB(
-	            DatasetWrapperFactory datasetWrapperFactory, 
+	            DatasetWrapperFactory dwf, 
 	            WebappDaoFactoryJena wadf) {
-		super (wadf);
-		this.dwf = datasetWrapperFactory;
+		super (dwf, wadf);
+		this.dwf = dwf;
 	}
 	
 	@Override

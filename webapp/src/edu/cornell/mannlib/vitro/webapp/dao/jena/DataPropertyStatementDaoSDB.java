@@ -38,7 +38,7 @@ public class DataPropertyStatementDaoSDB extends DataPropertyStatementDaoJena
 	private DatasetWrapperFactory dwf;
 	
 	public DataPropertyStatementDaoSDB(DatasetWrapperFactory datasetWrapperFactory, WebappDaoFactoryJena wadf) {
-		super (wadf);
+		super (datasetWrapperFactory, wadf);
 		this.dwf = datasetWrapperFactory;
 	}
 	

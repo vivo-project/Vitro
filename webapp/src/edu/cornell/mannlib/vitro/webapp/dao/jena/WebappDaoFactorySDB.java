@@ -97,20 +97,6 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
 			return vClassDao = new VClassDaoSDB(dwf, this);
 	}
 	
-	private class StaticDatasetFactory implements DatasetWrapperFactory {
-	 
-	    private Dataset _dataset;
-	    
-	    public StaticDatasetFactory (Dataset dataset) {
-	        _dataset = dataset;
-	    }
-	    
-	    public DatasetWrapper getDatasetWrapper() {
-	        return new DatasetWrapper(_dataset);
-	    }
-	    
-	}
-	
 	private class ReconnectingDatasetFactory implements DatasetWrapperFactory {
 	    
 	    private BasicDataSource _bds;

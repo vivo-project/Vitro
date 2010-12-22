@@ -11,6 +11,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
@@ -38,8 +39,12 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
 
     protected static final Log log = LogFactory.getLog(ObjectPropertyStatementDaoJena.class);
     
-    public ObjectPropertyStatementDaoJena(WebappDaoFactoryJena wadf) {
+    private DatasetWrapperFactory dwf;
+    
+    public ObjectPropertyStatementDaoJena(DatasetWrapperFactory dwf,
+                                          WebappDaoFactoryJena wadf) {
         super(wadf);
+        this.dwf = dwf;
     }
 
     @Override
@@ -72,7 +77,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         else {
         	Map<String, ObjectProperty> uriToObjectProperty = new HashMap<String,ObjectProperty>();
         	
-        	ObjectPropertyDaoJena opDaoJena = new ObjectPropertyDaoJena(getWebappDaoFactory());
+        	ObjectPropertyDaoJena opDaoJena = new ObjectPropertyDaoJena(dwf, getWebappDaoFactory());
         	
         	OntModel ontModel = getOntModelSelector().getABoxModel();
         	ontModel.enterCriticalSection(Lock.READ);
@@ -265,14 +270,25 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         bindings.add("subject", ResourceFactory.createResource(subjectUri));
         bindings.add("property", ResourceFactory.createResource(propertyUri));
 
-        // Run the SPARQL query to get the properties        
-        QueryExecution qexec = QueryExecutionFactory.create(query, getOntModelSelector().getFullModel(), bindings);
-        ResultSet results = qexec.execSelect();
+        // Run the SPARQL query to get the properties
         List<Map<String, String>> list = new ArrayList<Map<String, String>>();
-
-        while (results.hasNext()) {
-            QuerySolution soln = results.nextSolution();
-            list.add(QueryUtils.querySolutionToStringValueMap(soln));
+        DatasetWrapper w = dwf.getDatasetWrapper();
+        Dataset dataset = w.getDataset();
+        dataset.getLock().enterCriticalSection(Lock.READ);
+        try {
+            
+            QueryExecution qexec = QueryExecutionFactory.create(
+                    query, dataset, bindings);
+            ResultSet results = qexec.execSelect();
+        
+            while (results.hasNext()) {
+                QuerySolution soln = results.nextSolution();
+                list.add(QueryUtils.querySolutionToStringValueMap(soln));
+            }
+            
+        } finally {
+            dataset.getLock().leaveCriticalSection();
+            w.close();
         }
         return list;
     }

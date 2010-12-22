@@ -64,11 +64,10 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
     protected static final String dataPropertyQueryString = 
         PREFIXES + "\n" +
         "SELECT DISTINCT ?property WHERE { \n" +
-        //"   GRAPH ?g {\n" + 
-        "       ?subject ?property ?object . \n" +        
-        "       ?property rdf:type owl:DatatypeProperty . \n" +
+        "   GRAPH ?g { ?subject ?property ?object } \n" + 
+        "   GRAPH ?h { ?property rdf:type owl:DatatypeProperty } \n" +
         propertyFilters +
-        //"   }\n" +
+        "   }\n" +
         "}";
     
     static protected Query dataPropertyQuery;
@@ -93,8 +92,9 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
         }
     }
 
-    public DataPropertyDaoJena(WebappDaoFactoryJena wadf) {
-        super(wadf);
+    public DataPropertyDaoJena(DatasetWrapperFactory dwf, 
+                               WebappDaoFactoryJena wadf) {
+        super(dwf, wadf);
     }
 
     public void deleteDataProperty(DataProperty dtp) {
