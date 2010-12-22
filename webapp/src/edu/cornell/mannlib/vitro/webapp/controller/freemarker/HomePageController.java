@@ -3,14 +3,17 @@
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 
 public class HomePageController extends FreemarkerHttpServlet {
 
@@ -22,7 +25,11 @@ public class HomePageController extends FreemarkerHttpServlet {
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) { 
         
-        Map<String, Object> body = new HashMap<String, Object>();        
+        Map<String, Object> body = new HashMap<String, Object>();    
+        VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache( getServletContext() );
+        List<VClassGroup> vClassGroups =  vcgc.getGroups(vreq.getPortalId());
+        body.put("vClassGroups", vClassGroups);
+        
         // Add home page data to body here         
         return new TemplateResponseValues(BODY_TEMPLATE, body);
     }

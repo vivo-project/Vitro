@@ -385,10 +385,7 @@ public class InputElementFormattingTag extends TagSupport {
 
     public int doStartTag() {
         try {
-            /* first check for blank or missing type and id values */
-            if (getType()==null || getType().equals("")){
-                log.error("Error in doStartTag: input element type is blank or not specified.");
-            }
+
             if (getId()==null || getId().equals("")){
                 log.error("Error in doStartTag: input element id is blank or not specified.");
             }
@@ -439,6 +436,11 @@ public class InputElementFormattingTag extends TagSupport {
 //                log.error("could not get field for id " + getId());
 //                return SKIP_BODY;
 //            }
+            
+           
+            if ((getType()==null || getType().equals("")) && field.getEditElement() == null ){
+                log.error("Error in doStartTag: input element type is blank or not specified.");
+            }
             
             // set ProhibitedFromSearch object so picklist doesn't show
             // individuals from classes that should be hidden from list views

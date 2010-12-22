@@ -29,6 +29,34 @@ This is a test file for the DateTimeWithPrecision EditElement.
     WebappDaoFactory wdf = vreq.getWebappDaoFactory();    
 %>
 
+<v:jsonset var="queryForInverse" >
+    PREFIX owl:  <http://www.w3.org/2002/07/owl#>
+    SELECT ?inverse_property
+    WHERE {
+        ?inverse_property owl:inverseOf ?predicate
+    }
+</v:jsonset>
+
+<v:jsonset var="sparqlForDxPrecision"  >
+ PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> 
+ PREFIX core: <http://vivoweb.org/ontology/core#>     
+ SELECT ?dtX.precision WHERE {
+    ?subject ?predicate ?object .
+    ?object <core:hasDateTimeValue> ?dtX. 
+    ?dtX <rdf:type>  <core:DateTimeValue> .           
+    ?dtX <core:dateTimePrecision> ?dtX.precision .            
+</v:jsonset>
+
+<v:jsonset var="sparqlForDxValue"  >
+ PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>    
+ PREFIX core: <http://vivoweb.org/ontology/core#>     
+ SELECT ?dtX.value WHERE {
+    ?subject ?predicate ?object .
+    ?object <core:hasDateTimeValue> ?dtX. 
+    ?dtX <rdf:type>  <core:DateTimeValue> .    
+    ?dtX <core:dateTime> ?dtX.value .                   
+</v:jsonset>
+
 <v:jsonset var="n3ForEdit"  >
     @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
     @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
@@ -64,13 +92,14 @@ This is a test file for the DateTimeWithPrecision EditElement.
     "filesOnForm"               : [ ],
     "sparqlForLiterals"         : { },
     "sparqlForUris"             : { },
-    "sparqlForExistingLiterals" : { },
-    "sparqlForExistingUris"     : { },
+    "sparqlForExistingLiterals" : { "dtX.value": "${sparqlForDxValue}" },
+    "sparqlForExistingUris"     : { "dtX.precision": "${sparqlForDxPrecision}" },
     "fields" : {
         "dtX" : {
             "newResource"       : "true",
             "validators"        : [  ],
             "optionsType"       : "edu.cornell.mannlib.vitro.webapp.edit.elements.DateTimeWithPrecision",
+            "editElement"       : "edu.cornell.mannlib.vitro.webapp.edit.elements.DateTimeWithPrecision",
             "literalOptions"    : [ ],
             "predicateUri"      : "",
             "objectClassUri"    : "",
@@ -107,7 +136,7 @@ This is a test file for the DateTimeWithPrecision EditElement.
 <h2>${title}</h2>
 
 <form action="<c:url value="/edit/processRdfForm2.jsp"/>" >
-    <v:input id="dtX" />        
+    <v:input id="dtX" type="what" />        
     <v:input type="submit" id="submit" value="submit" cancel="true"/>
 </form>
 

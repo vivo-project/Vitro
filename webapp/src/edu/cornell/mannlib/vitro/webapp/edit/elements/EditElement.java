@@ -39,9 +39,9 @@ public interface EditElement {
      */
     public String draw(String fieldName, EditConfiguration editConfig, EditSubmission editSub, Configuration fmConfig);
     
-    /**
-     * We may need a method to get existing URIs and Literals for use in building retraction statements?
-     */
-    // public Map<String,Literal> getExistingLiterals(?);
-    // public Map<String,Literal> getExistingURIs(?);
+    /* in the future, we may need to get existing values */
+    /*
+    public Map<String,Literal> getExistingLiterals(???)
+    public Map<String,String> getExistingURIs(???);
+    */
 }

@@ -119,7 +119,7 @@ public class Field {
      * Property for special edit element.
      */
     private EditElement editElement=null;;
-    
+        
     /* *********************** Constructors ************************** */
 
     public Field(String config, String varName) {
@@ -163,7 +163,7 @@ public class Field {
             setLiteralOptions(obj.getJSONArray("literalOptions"));
             setAssertions(EditConfiguration.JsonArrayToStringList(obj.getJSONArray("assertions")));
                                           
-            setEditElement( obj, fieldName);
+            setEditElement( obj, fieldName);           
             
             //check for odd parameters
             JSONArray names = obj.names();
@@ -179,7 +179,10 @@ public class Field {
         }
     }
 
-
+    public void setEditElement(EditElement editElement){
+        this.editElement = editElement;
+    }
+    
     /**
      * A field may specify a class for additional features. 
      */

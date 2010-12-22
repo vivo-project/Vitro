@@ -13,7 +13,7 @@ public class DisplayVocabulary {
     public static final String PAGE_TYPE = NS + "Page";
     public static final String HOME_PAGE_TYPE = NS + "HomePage";
     public static final String CLASSGROUP_PAGE_TYPE = NS + "ClassGroupPage";
-    
+
     /* Object Properties */
     public static final String FOR_CLASSGROUP = NS + "forClassGroup";
     
