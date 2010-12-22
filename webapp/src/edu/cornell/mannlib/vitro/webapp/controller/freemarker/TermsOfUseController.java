@@ -37,7 +37,7 @@ public class TermsOfUseController extends FreemarkerHttpServlet {
     }
     
     @Override
-    protected String getTitle(String siteName) {
+    protected String getTitle(String siteName, VitroRequest vreq) {
         return siteName + " Terms of Use";
     }
 }

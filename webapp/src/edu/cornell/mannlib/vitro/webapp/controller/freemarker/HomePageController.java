@@ -8,9 +8,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet.Template;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 
@@ -30,7 +28,7 @@ public class HomePageController extends FreemarkerHttpServlet {
     }
 
     @Override
-    protected String getTitle(String siteName) {
+    protected String getTitle(String siteName, VitroRequest vreq) {
         return siteName;
     }
 

@@ -99,7 +99,7 @@ public class SamplesController extends FreemarkerHttpServlet {
     }
     
     @Override
-    protected String getTitle(String siteName) {
+    protected String getTitle(String siteName, VitroRequest vreq) {
         return "Freemarker Samples";
     }
     

@@ -341,7 +341,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         map.put("siteName", siteName);
         
         // This may be overridden by the body data model received from the subcontroller.
-        map.put("title", getTitle(siteName));
+        map.put("title", getTitle(siteName, vreq));
 
         String themeDir = getThemeDir(portal);
         UrlBuilder urlBuilder = new UrlBuilder(portal);
@@ -426,7 +426,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     }
 
     // Subclasses may override. This serves as a default.
-    protected String getTitle(String siteName) {        
+    protected String getTitle(String siteName, VitroRequest vreq) {        
         return siteName;
     }
 

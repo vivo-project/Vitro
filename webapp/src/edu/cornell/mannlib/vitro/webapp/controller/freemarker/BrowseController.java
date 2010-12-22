@@ -49,7 +49,7 @@ public class BrowseController extends FreemarkerHttpServlet {
     private static final String TEMPLATE_DEFAULT = "classGroups.ftl";   
      
     @Override
-    protected String getTitle(String siteName) {
+    protected String getTitle(String siteName, VitroRequest vreq) {
     	return "Index to " + siteName + " Contents";
     }
 

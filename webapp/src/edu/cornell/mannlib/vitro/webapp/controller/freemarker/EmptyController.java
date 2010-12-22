@@ -21,12 +21,23 @@ public class EmptyController extends FreemarkerHttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(EmptyController.class);
     
+    @SuppressWarnings("serial")
     private static final Map<String, String> urlsToTemplates = new HashMap<String, String>(){
         {
             put("/login", "login.ftl");
         }
     };
 
+    @Override
+    protected String getTitle(String siteName, VitroRequest vreq) {
+        String requestedUrl = vreq.getServletPath();
+        String title = null;
+        if (requestedUrl.equals("/login")) {
+            title = "Log in to " + siteName;
+        }
+        return title;
+    }
+    
     protected ResponseValues processRequest(VitroRequest vreq) {
         String requestedUrl = vreq.getServletPath();
         String templateName = urlsToTemplates.get(requestedUrl);

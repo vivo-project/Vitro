@@ -35,7 +35,7 @@ public class PrimitiveRdfEdit extends FreemarkerHttpServlet{
     private static final long serialVersionUID = 1L;
 
     @Override
-    protected String getTitle(String siteName) {
+    protected String getTitle(String siteName, VitroRequest vreq) {
         return "RDF edit";
     }
 

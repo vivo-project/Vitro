@@ -37,7 +37,7 @@ public class ContactFormController extends FreemarkerHttpServlet {
     private static final String TEMPLATE_ERROR = "contactForm-error.ftl";
     
     @Override
-    protected String getTitle(String siteName) {
+    protected String getTitle(String siteName, VitroRequest vreq) {
         return siteName + " Feedback Form";
     }
     

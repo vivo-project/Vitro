@@ -32,7 +32,7 @@ public class SiteAdminController extends FreemarkerHttpServlet {
     private static final int REQUIRED_LOGIN_LEVEL = LoginStatusBean.EDITOR;
     
     @Override
-	public String getTitle(String siteName) {
+	public String getTitle(String siteName, VitroRequest vreq) {
         return siteName + " Site Administration";
 	}
 

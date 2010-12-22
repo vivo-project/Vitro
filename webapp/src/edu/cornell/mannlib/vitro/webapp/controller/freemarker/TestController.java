@@ -41,7 +41,7 @@ public class TestController extends FreemarkerHttpServlet {
     }
     
     @Override
-    protected String getTitle(String siteName) {
+    protected String getTitle(String siteName, VitroRequest vreq) {
         return "Test";
     }
 
