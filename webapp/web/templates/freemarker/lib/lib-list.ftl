@@ -13,11 +13,19 @@
     <li> elements. An <li> element may span multiple lines.
     
     Usage:
-        <@firstLastList />
+        <@firstLastList>
             <li>apples</li>
             <li>bananas</li>
             <li>oranges</li>
-        </@firstLastList />
+        </@firstLastList>
+        
+        <@firstLastList>
+            <#list animals as animal>
+                <#if animal != "cow"> 
+                    <li>${animal}</li>
+                </#if>
+            </#list>
+        </@firstLastList>
 
     RY Consider rewriting in Java. Probably designers won't want to modify this. That would allow us to support
     nested <li> elements.
@@ -27,9 +35,8 @@
     <#assign text>
         <#nested>
     </#assign>
-    
-    <@processListItems text?matches("<li>.*?</li>", "s") />
 
+    <@processListItems text?matches("<li>.*?</li>", "s") />
 </#macro>
 
 <#---------------------------------------------------------------------------->
@@ -49,19 +56,27 @@
     indicate how to split the text.
     
     Usage:
-        <@firstLastListNested />
+        <@firstLastListNested>
             <li>apples</li>,
             <li>bananas</li>,
             <li>oranges</li>
-        </@firstLastListNested />
+        </@firstLastListNested>
         
-        <@firstLastListNested delim="??" />
+        <@firstLastListNested>
+            <#list animals as animal>
+                <#if animal != "cow"> 
+                    <li>${animal}</li>,
+                </#if>
+            </#list>
+        </@firstLastListNested>
+        
+        <@firstLastListNested delim="??">
             <li>apples, oranges</li>??
             <li>bananas, lemons</li>??
             <li>grapefruit, limes</li>
-        </@firstLastListNested />
+        </@firstLastListNested>
         
-        <@firstLastListNested delim="??" />
+        <@firstLastListNested delim="??">
             <li>Books
                 <ul>
                     <li>Persuasion</li>
@@ -74,7 +89,7 @@
                     <li>Time</li>
                 </ul>
             </li>
-        </@firstLastListNested />
+        </@firstLastListNested>
 
     RY Consider rewriting in Java. Probably designers won't want to modify this.
 -->
@@ -104,6 +119,7 @@
 -->
 <#macro processListItems items>
     <#list items as item>
+
         <#-- A FreeMarker loop variable cannot have its value modified, so we use a new variable. -->
         <#assign newItem = item?trim>
 
@@ -112,6 +128,7 @@
         <#-- Keep any class value already assigned -->
         <#assign currentClass = newItem?matches("^<li [^>]*(class=[\'\"](.*?)[\'\"])")>
         <#list currentClass as m>
+        ${m?groups[2]}<br />
             <#assign classVal = m?groups[2]>
             <#assign newItem = newItem?replace(m?groups[1], "")>
         </#list>
