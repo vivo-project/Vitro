@@ -1,12 +1,5 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-/**********************************************
-Admin Panels & Controls
-
-the odd combinations of positioning types
-are necessary for cross-browser consistency
-**********************************************/
-
 /*** Admin Dashboard ***/
 
 #adminDashboard {
@@ -14,12 +7,6 @@ are necessary for cross-browser consistency
   display: inline-block;
   width: 100%;
 }
-
-/*#adminDashboard .pageBodyGroup {
-  margin-top: 2em;
-  margin-bottom: 2em;
-  clear: both;
-}*/
 
 #adminDashboard .pageBodyGroup {
   float: left;
@@ -51,7 +38,7 @@ are necessary for cross-browser consistency
 }
 
 #adminDashboard #verbosePropertyForm {
-  margin-top: 3em;
+    margin-top: 3em;
 }
 
 #adminDashboard .add-action-button {
