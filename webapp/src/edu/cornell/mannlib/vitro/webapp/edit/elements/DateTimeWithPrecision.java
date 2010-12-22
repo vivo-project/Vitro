@@ -71,14 +71,14 @@ public class DateTimeWithPrecision extends BaseEditElement {
     }
     
     private static final Log log = LogFactory.getLog(DateTimeWithPrecision.class);
-    protected String TEMPATE_NAME = "DateTimeWithPrecision.ftl";
+    protected String TEMPLATE_NAME = "dateTimeWithPrecision.ftl";
     
     @Override
     public String draw(String fieldName, EditConfiguration editConfig,
             EditSubmission editSub, Configuration fmConfig) {                        
         Map map = getMapForTemplate( editConfig, editSub);
         map.putAll( FreemarkerHttpServlet.getDirectives());        
-        return merge( fmConfig, TEMPATE_NAME, map);
+        return merge( fmConfig, TEMPLATE_NAME, map);
     }    
     
     /**
