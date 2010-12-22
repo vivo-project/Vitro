@@ -33,16 +33,14 @@ public class FreemarkerComponentGenerator extends FreemarkerHttpServlet {
         VitroRequest vreq = new VitroRequest(request);
         Configuration config = getConfig(vreq);
 
-        // root is the map used to create the page shell - header, footer, menus, etc.
-        Map<String, Object> root = getSharedVariables(vreq, new HashMap<String, Object>()); 
-        root.putAll(getPageTemplateValues(vreq));  
+        Map<String, Object> map = getPageTemplateValues(vreq);
         
-        request.setAttribute("ftl_head", getHead("head", root, config, vreq));
-        request.setAttribute("ftl_identity", get("identity", root, config, vreq));
-        request.setAttribute("ftl_menu", get("menu", root, config, vreq));
-        request.setAttribute("ftl_search", get("search", root, config, vreq));
-        request.setAttribute("ftl_footer", get("footer", root, config, vreq));
-        request.setAttribute("ftl_googleAnalytics", get("googleAnalytics", root, config, vreq));
+        request.setAttribute("ftl_head", getHead("head", map, config, vreq));
+        request.setAttribute("ftl_identity", get("identity", map, config, vreq));
+        request.setAttribute("ftl_menu", get("menu", map, config, vreq));
+        request.setAttribute("ftl_search", get("search", map, config, vreq));
+        request.setAttribute("ftl_footer", get("footer", map, config, vreq));
+        request.setAttribute("ftl_googleAnalytics", get("googleAnalytics", map, config, vreq));
     }
 
     private String get(String templateName, Map<String, Object> root, Configuration config, HttpServletRequest request) {

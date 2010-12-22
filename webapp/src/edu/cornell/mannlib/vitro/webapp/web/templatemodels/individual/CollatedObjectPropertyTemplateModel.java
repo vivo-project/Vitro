@@ -39,7 +39,7 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
         // RY Temporarily throw an error because collation hasn't been implemented yet.
         boolean error = true;
         if (error) {
-            throw new Exception("No collation target specified for collated object property " + getName());
+            throw new Exception("Collated object property not implemented yet");
         }
         
         WebappDaoFactory wdf = vreq.getWebappDaoFactory();

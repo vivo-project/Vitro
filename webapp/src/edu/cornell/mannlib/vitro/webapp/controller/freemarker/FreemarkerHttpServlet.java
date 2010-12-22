@@ -165,43 +165,32 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     protected void doTemplate(VitroRequest vreq, HttpServletResponse response, ResponseValues values) {
      
         Configuration config = getConfig(vreq);
-        Map<String, Object> bodyMap = values.getMap();
-        TemplateProcessingHelper helper = new TemplateProcessingHelper(config, vreq, getServletContext());
         
-        // We can't use shared variables in the Freemarker configuration to store anything 
-        // except theme-specific data, because multiple portals or apps might share the same theme. So instead
-        // just put the shared variables in both root and body.
-        Map<String, Object> sharedVariables = getSharedVariables(vreq, bodyMap);
+        Map<String, Object> templateDataModel = new HashMap<String, Object>();        
+        templateDataModel.putAll(getPageTemplateValues(vreq));
 
-        //helper.processSetupTemplate(config, vreq, sharedVariables);
-
-        // root is the map used to create the page shell - header, footer, menus, etc.
-        Map<String, Object> root = new HashMap<String, Object>(sharedVariables);        
-        root.putAll(getPageTemplateValues(vreq));
-        // Tell the template and any directives it uses that we're processing a page template.
-        root.put("templateType", PAGE_TEMPLATE_TYPE);
- 
-        // Add the values that we got, and merge to the template.
-        String bodyTemplate = values.getTemplateName();
+        // Add the values that we got from the subcontroller processRequest() method, and merge to the template.
+        // Subcontroller values (for example, for page title) will override what's already been set at the page
+        // level.
+        templateDataModel.putAll(values.getMap());
+        
+        // If a body template is specified, merge it with the template data model.
         String bodyString;
+        String bodyTemplate = values.getTemplateName();        
         if (bodyTemplate != null) {
-            // body is the map used to create the page body
-            // Adding sharedVariables before bodyMap values is important. If the body
-            // processing has changed a shared value such as title, we want to get that 
-            // value.
-            Map<String, Object> body = new HashMap<String, Object>(sharedVariables);
-            body.putAll(bodyMap);
             // Tell the template and any directives it uses that we're processing a body template.
-            body.put("templateType", BODY_TEMPLATE_TYPE);
-            bodyString = processTemplateToString(bodyTemplate, body, config, vreq); 
+            templateDataModel.put("templateType", BODY_TEMPLATE_TYPE);
+            bodyString = processTemplateToString(bodyTemplate, templateDataModel, config, vreq); 
         } else {
             // The subcontroller has not defined a body template. All markup for the page 
             // is specified in the main page template.
             bodyString = "";
         }
-        root.put("body", bodyString);
+        templateDataModel.put("body", bodyString);
         
-        writePage(root, config, vreq, response);       
+        // Tell the template and any directives it uses that we're processing a page template.
+        templateDataModel.put("templateType", PAGE_TEMPLATE_TYPE);        
+        writePage(templateDataModel, config, vreq, response);       
     }
     
     protected void doRedirect(HttpServletRequest request, HttpServletResponse response, ResponseValues values) 
@@ -246,52 +235,6 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         TemplateResponseValues trv = TemplateResponseValues.getTemplateResponseValuesFromException((ExceptionResponseValues)values);
         doTemplate(vreq, response, trv);
     }
-
-    // We can't use shared variables in the Freemarker configuration to store anything 
-    // except theme-specific data, because multiple portals or apps might share the same theme. So instead
-    // we'll get all the shared variables here, and put them in both root and body maps.
-    // If we can eliminate this use case and use shared variables, it would simplify the implementation greatly.
-    // See also directives, where since there are no shared variables we have to manually put elements
-    // of the data model into the directive template model. 
-    public Map<String, Object> getSharedVariables(VitroRequest vreq, Map<String, Object> bodyMap) {
-        
-        Map<String, Object> map = new HashMap<String, Object>();
-        
-        Portal portal = vreq.getPortal();
-        // Ideally, templates wouldn't need portal id. Currently used as a hidden input value
-        // in the site search box, so needed for now.
-        map.put("portalId", portal.getPortalId());
-        
-        String siteName = portal.getAppName();
-        map.put("siteName", siteName);
-        
-        // In some cases the title is determined during the subclass processRequest() method; e.g., 
-        // for an Individual profile page, the title should be the Individual's label. In that case,
-        // put that title in the sharedVariables map because it's needed by the page root map as well
-        // to generate the <title> element. Otherwise, use the getTitle() method to generate the title.
-        String title = (String) bodyMap.get("title");
-        if (StringUtils.isEmpty(title)) {
-            title = getTitle(siteName);
-        }
-        map.put("title", title);
-
-        String themeDir = getThemeDir(portal);
-        UrlBuilder urlBuilder = new UrlBuilder(portal);
-        
-        map.put("urls", getUrls(themeDir, urlBuilder)); 
-
-        map.put("themeDir", themeDir);
-        map.put("stylesheets", getStylesheetList(themeDir));
-        map.put("scripts", getScriptList(themeDir));
-        map.put("headScripts", getScriptList(themeDir));
-  
-        map.put("currentPage", vreq.getServletPath().replaceFirst("/", ""));
-        
-        map.putAll(getDirectives());
-        
-        return  map;
-    }
-
 
     public String getThemeDir(Portal portal) {
         return portal.getThemeDir().replaceAll("/$", "");
@@ -388,10 +331,34 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     protected Map<String, Object> getPageTemplateValues(VitroRequest vreq) {
         
         Map<String, Object> map = new HashMap<String, Object>();
+
+        Portal portal = vreq.getPortal();
+        // Ideally, templates wouldn't need portal id. Currently used as a hidden input value
+        // in the site search box, so needed for now.
+        map.put("portalId", portal.getPortalId());
+        
+        String siteName = portal.getAppName();
+        map.put("siteName", siteName);
+        
+        // This may be overridden by the body data model received from the subcontroller.
+        map.put("title", getTitle(siteName));
+
+        String themeDir = getThemeDir(portal);
+        UrlBuilder urlBuilder = new UrlBuilder(portal);
+        
+        map.put("urls", getUrls(themeDir, urlBuilder)); 
+
+        map.put("themeDir", themeDir);
+        map.put("stylesheets", getStylesheetList(themeDir));
+        map.put("scripts", getScriptList(themeDir));
+        map.put("headScripts", getScriptList(themeDir));
+  
+        map.put("currentPage", vreq.getServletPath().replaceFirst("/", ""));
+        
+        map.putAll(getDirectives());
+        
         map.put("tabMenu", getTabMenu(vreq));
         map.put("menu", getDisplayModelMenu(vreq));
-        
-        Portal portal = vreq.getPortal();
         
         ApplicationBean appBean = vreq.getAppBean();
         PortalWebUtil.populateSearchOptions(portal, appBean, vreq.getWebappDaoFactory().getPortalDao());
@@ -399,14 +366,11 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         
         map.put("user", new User(vreq));
         
-        UrlBuilder urlBuilder = new UrlBuilder(portal); 
         map.put("version", getRevisionInfo(urlBuilder));
         
         map.put("copyright", getCopyrightInfo(portal));    
         map.put("siteTagline", portal.getShortHand());
         map.put("breadcrumbs", BreadCrumbsUtil.getBreadCrumbsDiv(vreq));
-    
-        String themeDir = getThemeDir(portal);
 
         // This value is used only in stylesheets.ftl and already contains the context path.
         map.put("stylesheetPath", UrlBuilder.getUrl(themeDir + "/css"));  
