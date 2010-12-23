@@ -123,7 +123,7 @@
     <p id="keywords">Keywords: ${individual.keywordString}</p>
 </#if>
 
-${stylesheets.addFromTheme("/css/entity.css")}
+${stylesheets.add("/css/individual/individual.css")}
                            
 <#-- RY Figure out which of these scripts really need to go into the head, and which are needed at all (e.g., tinyMCE??) -->
 ${headScripts.add("/js/jquery_plugins/getUrlParam.js",                  
@@ -136,5 +136,3 @@ ${headScripts.add("/js/jquery_plugins/getUrlParam.js",
                   "/js/toggle.js")}
                   
 ${scripts.add("/js/imageUpload/imageUploadUtils.js")}
-
-

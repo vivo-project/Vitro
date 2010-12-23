@@ -80,3 +80,5 @@
         <article class="vcard individual" role="article"><h1 class="fn">&lt;individualName&gt;</h1></article>
     </section>
 </section>
+
+${stylesheets.add("/css/menupage/menupage.css")}
