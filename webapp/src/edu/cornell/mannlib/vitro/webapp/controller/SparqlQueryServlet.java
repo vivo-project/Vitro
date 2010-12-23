@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -147,9 +148,18 @@ public class SparqlQueryServlet extends BaseEditController {
 		if (!modelMap.isEmpty()) {
 			return buildDataSetFromNamedModels(modelMap);
 		}
-
+		
+		String queryParam = vreq.getParameter("query");
+		boolean graphPresent = false;
+		StringTokenizer tokenizer = new StringTokenizer(queryParam, " ");
+	    while(tokenizer.hasMoreTokens()){
+	    	if("graph".equalsIgnoreCase(tokenizer.nextToken())){
+	    		graphPresent = true;
+	    		break;
+	    	}
+	    }
 		Dataset dataset = vreq.getDataset();
-		if (dataset != null) {
+		if (dataset != null && graphPresent) {
 			return dataset;
 		}
 
