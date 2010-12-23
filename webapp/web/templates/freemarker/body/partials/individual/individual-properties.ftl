@@ -31,9 +31,9 @@
                         <@dataPropertyList property.statements />
 
                     <#-- object property -->      
-                    <#elseif property.collatedBySubclass>                             
+                    <#elseif property.collatedBySubclass> <#-- collated -->                            
                         <@collatedObjectPropertyList property />
-                    <#else>
+                    <#else> <#-- uncollated -->
                         <@objectPropertyList property.statements property.template />
                     </#if>  
                 </ul>                 
@@ -55,8 +55,12 @@
 <#macro collatedObjectPropertyList property>
     <#assign subclasses = property.subclasses>
     <#list subclasses?keys as subclass>
-        <h3>${subclass?lower_case}</h3>
-        <@objectPropertyList subclasses[subclass] property.template /> 
+        <li>
+            <h3>${subclass?lower_case}</h3>
+            <ul>
+                <@objectPropertyList subclasses[subclass] property.template /> 
+            </ul>
+        </li>
     </#list>
 </#macro>
 
