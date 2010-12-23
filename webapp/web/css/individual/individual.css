@@ -324,6 +324,10 @@ article.property h3{
     border-bottom: 1px solid #dfe6e5;
     padding: 10px 20px 10px 20px;
 }
+article.property ul.property-list li.subclass h3 {
+    border-bottom: none;
+    padding: 10px 10px 10px 20px;
+}
 article.property .data-property-statement{
     padding: 10px 20px 10px 20px;
     line-height: 1.2em;
@@ -331,10 +335,22 @@ article.property .data-property-statement{
 }
 article.property ul.property-list{
     background: #fff;
+    padding-bottom: 20px;
 }
 article.property ul.property-list li{
     line-height: 1.2em;
     padding-bottom: 10px;
     padding: 10px 20px 10px 20px;
+}
+article.property ul.subclass-property-list{
+    background: #fff;
+    border: 1px solid #DFE6E5;
+    padding-top: 10px;
+    padding-bottom: 10px;   
+}
+article.property ul.subclass-property-list li{
+    line-height: 1.2em;
+    padding-bottom: 10px;
+    padding: 10px 20px 10px 40px;
 }
 /* MISCELLANEOUS------>  */
