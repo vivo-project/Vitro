@@ -55,9 +55,9 @@
 <#macro collatedObjectPropertyList property>
     <#assign subclasses = property.subclasses>
     <#list subclasses?keys as subclass>
-        <li>
+        <li class="subclass">
             <h3>${subclass?lower_case}</h3>
-            <ul>
+            <ul class="subclass-property-list">
                 <@objectPropertyList subclasses[subclass] property.template /> 
             </ul>
         </li>
