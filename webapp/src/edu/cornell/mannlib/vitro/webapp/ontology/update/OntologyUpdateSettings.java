@@ -10,6 +10,7 @@ public class OntologyUpdateSettings {
 
 	private String dataDir;
 	private String sparqlConstructAdditionsDir;
+	private String sparqlConstructAdditionsPass2Dir;
 	private String sparqlConstructDeletionsDir;
 	private String askQueryFile;
 	private String successAssertionsFile;
@@ -34,6 +35,12 @@ public class OntologyUpdateSettings {
 	}
 	public String getSparqlConstructAdditionsDir() {
 		return sparqlConstructAdditionsDir;
+	}
+	public void setSparqlConstructAdditionsPass2Dir(String sparqlConstructAdditionsDir) {
+		this.sparqlConstructAdditionsPass2Dir = sparqlConstructAdditionsDir;
+	}
+	public String getSparqlConstructAdditionsPass2Dir() {
+		return sparqlConstructAdditionsPass2Dir;
 	}
 	public void setSparqlConstructAdditionsDir(String sparqlConstructAdditionsDir) {
 		this.sparqlConstructAdditionsDir = sparqlConstructAdditionsDir;

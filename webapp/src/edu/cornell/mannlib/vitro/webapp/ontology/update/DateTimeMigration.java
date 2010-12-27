@@ -37,13 +37,17 @@ public class DateTimeMigration {
 	
 	private static final String dateTimeURI = "http://vivoweb.org/ontology/core#dateTime";
 	private static final String dateTimePrecisionURI = "http://vivoweb.org/ontology/core#dateTimePrecision";
-
+	private static final String hasTimeIntervalURI = "http://vivoweb.org/ontology/core#hasTimeInterval";
+	private static final String dateTimeIntervalURI = "http://vivoweb.org/ontology/core#dateTimeInterval";
+	
 	private static final String yPrecisionURI = "http://vivoweb.org/ontology/core#yearPrecision";
 	private static final String ymPrecisionURI = "http://vivoweb.org/ontology/core#yearMonthPrecision";
 	private static final String ymdPrecisionURI = "http://vivoweb.org/ontology/core#yearMonthDayPrecision";
 	private static final String ymdtPrecisionURI = "http://vivoweb.org/ontology/core#yearMonthDayTimePrecision";
 	
 	private DatatypeProperty dateTimeProp = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createDatatypeProperty(dateTimeURI);
+	private ObjectProperty hasTimeIntervalProp = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createObjectProperty(hasTimeIntervalURI);
+	private ObjectProperty dateTimeIntervalProp = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createObjectProperty(dateTimeIntervalURI);
 	private ObjectProperty dateTimePrecisionProp = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createObjectProperty(dateTimePrecisionURI);
 	
 	
@@ -65,11 +69,57 @@ public class DateTimeMigration {
 	
 	/**
 	 * 
-	 * Update a knowledge base to align with changes in the Date/Time class
+	 * Update the abox to align with changes in the Date/Time class
 	 * and property definitions in the transition from version 1.1 to 1.2.
 	 *  
 	 */
 	public void updateABox() throws IOException {
+		
+		updateAcademicIntervals();
+		updateLiterals();
+	}
+	
+	/**
+	 * 
+	 *  
+	 */
+	public void updateAcademicIntervals() throws IOException {
+
+		aboxModel.enterCriticalSection(Lock.WRITE);
+		
+		try {			
+	        Model additions = ModelFactory.createDefaultModel();
+	        Model retractions = ModelFactory.createDefaultModel();
+
+		    StmtIterator iter = aboxModel.listStatements((Resource) null, hasTimeIntervalProp, (RDFNode) null);
+	       
+		    while (iter.hasNext()) {
+
+			   Statement stmt = iter.next();
+
+			   Statement stmt2 = aboxModel.getProperty(stmt.getObject().asResource(), dateTimeIntervalProp);
+
+			   if (stmt2 != null) {
+				  retractions.add(stmt2);
+				  additions.add(stmt.getSubject(), dateTimeIntervalProp, stmt2.getObject());
+			   }
+				   
+		    }
+		   
+		    aboxModel.remove(retractions);
+		    record.recordRetractions(retractions);
+		    aboxModel.add(additions);
+		    record.recordAdditions(additions);
+		   
+		} finally {
+			aboxModel.leaveCriticalSection();
+		}	
+	}
+	/**
+	 * 
+	 *  
+	 */
+	public void updateLiterals() throws IOException {
 
 		// note: not handling timezones - they are not expected to be in the 1.1.1 data
 		DateFormat yearFormat = new SimpleDateFormat("yyyy");

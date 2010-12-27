@@ -81,22 +81,20 @@ public class OntologyUpdater {
 		
 		performSparqlConstructAdditions(settings.getSparqlConstructAdditionsDir(), settings.getOntModelSelector().getABoxModel());
 		performSparqlConstructRetractions(settings.getSparqlConstructDeletionsDir(), settings.getOntModelSelector().getABoxModel());
+		performSparqlConstructAdditions(settings.getSparqlConstructAdditionsPass2Dir(), settings.getOntModelSelector().getABoxModel());
 
 		DateTimeMigration dtMigration = new DateTimeMigration(settings.getOntModelSelector().getABoxModel(), logger, record);
         dtMigration.updateABox();
         
 		List<AtomicOntologyChange> rawChanges = getAtomicOntologyChanges();
 		
-		AtomicOntologyChangeLists changes = new AtomicOntologyChangeLists(rawChanges, 
-						                                                  settings.getNewTBoxModel(), 
-						                                                  settings.getOldTBoxModel());
-		   //process the TBox before the ABox
-	       //TODO: uncomment updateTBoxAnnotations();
-
-    	   updateABox(changes);
+		AtomicOntologyChangeLists changes = new AtomicOntologyChangeLists(rawChanges,settings.getNewTBoxModel(),settings.getOldTBoxModel());
 		
+        //process the TBox before the ABox
+	    //TODO: uncomment updateTBoxAnnotations();   12/27/2010 - commented out just for testing abox updater
+
+    	updateABox(changes);		
 	}
-	
 	
 	private void performSparqlConstructAdditions(String sparqlConstructDir, OntModel aboxModel) throws IOException {
 		
