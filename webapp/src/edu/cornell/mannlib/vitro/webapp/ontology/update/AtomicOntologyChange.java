@@ -13,6 +13,7 @@ public class AtomicOntologyChange {
 	private String sourceURI;	
 	private String destinationURI;
 	private AtomicChangeType atomicChangeType;
+	private String notes;
 
 	public AtomicOntologyChange() {
 
@@ -20,11 +21,13 @@ public class AtomicOntologyChange {
 
 	public AtomicOntologyChange(String sourceURI,
 	                            String destinationURI,
-	                            AtomicChangeType atomicChangeType) {
+	                            AtomicChangeType atomicChangeType,
+	                            String notes) {
 		
 		this.sourceURI = sourceURI;
 		this.destinationURI = destinationURI;
 		this.atomicChangeType = atomicChangeType;
+		this.notes = notes;
     }
 
 	
@@ -63,9 +66,17 @@ public class AtomicOntologyChange {
 	public void setAtomicChangeType(AtomicChangeType atomicChangeType) {
 		this.atomicChangeType = atomicChangeType;
 	}
-	
+
+	public String getNotes() {
+		return notes;
+	}
+
+	public void setNotes(String notes) {
+		this.notes = notes;
+	}
+
 	public enum AtomicChangeType {
 		ADD, DELETE, RENAME
 	}
-	
+
 }

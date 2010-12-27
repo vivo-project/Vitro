@@ -65,7 +65,6 @@ public class OntologyUpdater {
 			if (!logger.errorsWritten()) {
 				// add assertions to the knowledge base showing that the 
 				// update was successful, so we don't need to run it again.
-				// TODO improve error handling in future version.
 				assertSuccess();
 			}
 			
@@ -80,19 +79,19 @@ public class OntologyUpdater {
 	
 	private void performUpdate() throws IOException {
 		
-		DateTimeMigration dtMigration = new DateTimeMigration(settings.getOntModelSelector().getABoxModel(), logger, record);
-        dtMigration.updateABox();
-		
 		performSparqlConstructAdditions(settings.getSparqlConstructAdditionsDir(), settings.getOntModelSelector().getABoxModel());
 		performSparqlConstructRetractions(settings.getSparqlConstructDeletionsDir(), settings.getOntModelSelector().getABoxModel());
-		
+
+		DateTimeMigration dtMigration = new DateTimeMigration(settings.getOntModelSelector().getABoxModel(), logger, record);
+        dtMigration.updateABox();
+        
 		List<AtomicOntologyChange> rawChanges = getAtomicOntologyChanges();
 		
 		AtomicOntologyChangeLists changes = new AtomicOntologyChangeLists(rawChanges, 
 						                                                  settings.getNewTBoxModel(), 
 						                                                  settings.getOldTBoxModel());
 		   //process the TBox before the ABox
-	       updateTBoxAnnotations();
+	       //TODO: uncomment updateTBoxAnnotations();
 
     	   updateABox(changes);
 		
@@ -226,8 +225,7 @@ public class OntologyUpdater {
 	
 	private List<AtomicOntologyChange> getAtomicOntologyChanges() 
 			throws IOException {
-		return (new OntologyChangeParser(logger))
-				.parseFile(settings.getDiffFile());
+		return (new OntologyChangeParser(logger)).parseFile(settings.getDiffFile());
 	}
 	
 
@@ -339,18 +337,19 @@ public class OntologyUpdater {
 				if (changeObj.getSourceURI() != null){
 			
 					if (oldTboxModel.getOntProperty(changeObj.getSourceURI()) != null){
-						atomicPropertyChanges.add(changeObj);
-					}
-					else if (oldTboxModel.getOntClass(changeObj.getSourceURI()) != null) {
-						atomicClassChanges.add(changeObj);
-					}
-					else{
-						logger.logError("Source URI is neither a Property" +
-								" nor a Class. " + "Change Object skipped for sourceURI: " + changeObj.getSourceURI());
+						 atomicPropertyChanges.add(changeObj);
+					} else if (oldTboxModel.getOntClass(changeObj.getSourceURI()) != null) {
+						 atomicClassChanges.add(changeObj);
+					} else if ("Prop".equals(changeObj.getNotes())) {
+						 atomicPropertyChanges.add(changeObj);
+					} else if ("Class".equals(changeObj.getNotes())) {
+						 atomicClassChanges.add(changeObj);
+					} else{
+						 logger.log("WARNING: Source URI is neither a Property" +
+						    		" nor a Class. " + "Change Object skipped for sourceURI: " + changeObj.getSourceURI());
 					}
 					
-				}
-				else if(changeObj.getDestinationURI() != null){
+				} else if(changeObj.getDestinationURI() != null){
 					
 					if (newTboxModel.getOntProperty(changeObj.getDestinationURI()) != null) {
 						atomicPropertyChanges.add(changeObj);
@@ -358,16 +357,14 @@ public class OntologyUpdater {
 						getDestinationURI()) != null) {
 						atomicClassChanges.add(changeObj);
 					} else{
-						logger.logError("Destination URI is neither a Property" +
+						logger.log("WARNING: Destination URI is neither a Property" +
 								" nor a Class. " + "Change Object skipped for destinationURI: " + changeObj.getDestinationURI());
 					}
-				}
-				else{
-					logger.logError("Source and Destination URI can't be null. " 
-							+ "Change Object skipped" );
+				} else{
+					logger.log("WARNING: Source and Destination URI can't be null. " + "Change Object skipped" );
 				}
 			}
-			//logger.log("Property and Class change Object lists separated");
+			//logger.log("Property and Class change Object lists have been created");
 		}
 		
 		public List<AtomicOntologyChange> getAtomicClassChanges() {

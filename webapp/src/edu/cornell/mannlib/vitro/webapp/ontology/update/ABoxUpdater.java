@@ -39,9 +39,7 @@ public class ABoxUpdater {
 	private OntModel newTBoxAnnotationsModel;
 	private OntologyChangeLogger logger;  
 	private OntologyChangeRecord record;
-	private OntClass OWL_THING = (ModelFactory
-			.createOntologyModel(OntModelSpec.OWL_MEM))
-			.createClass(OWL.Thing.getURI());
+	private OntClass OWL_THING = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createClass(OWL.Thing.getURI());
 
 	/**
 	 * 
@@ -311,7 +309,7 @@ public class ABoxUpdater {
 				namedClassList.add(ontClass);
 			}
 		}
-		OntClass parent = (namedClassList.isEmpty()) 
+		OntClass parent = (!namedClassList.isEmpty()) 
 								? namedClassList.get(0) 
 								: OWL_THING;
 		
@@ -323,10 +321,9 @@ public class ABoxUpdater {
 		} 
 
 	   //log summary of changes
-	   //logger.log("Class " + deletedClass.getURI() + " has been deleted. Any references to it in the knowledge base will be changed to " + 
-	   //		        replacementClass.getURI());
+	   logger.log("Class " + deletedClass.getURI() + " has been deleted. Any references to it in the knowledge base will be changed to " +   replacementClass.getURI());
 
-		AtomicOntologyChange chg = new AtomicOntologyChange(deletedClass.getURI(), replacementClass.getURI(), AtomicChangeType.RENAME);
+		AtomicOntologyChange chg = new AtomicOntologyChange(deletedClass.getURI(), replacementClass.getURI(), AtomicChangeType.RENAME, change.getNotes());
 		renameClass(chg);		
 	}
 	
@@ -349,18 +346,59 @@ public class ABoxUpdater {
 	}
 	
 	private void addProperty(AtomicOntologyChange propObj) throws IOException{
-		OntProperty tempProperty = newTboxModel.getOntProperty
-			(propObj.getDestinationURI());
-		if (tempProperty == null) {
-			logger.logError("Unable to find property " + 
-					propObj.getDestinationURI() +
-					" in newTBoxModel");
+		OntProperty addedProperty = newTboxModel.getOntProperty 	(propObj.getDestinationURI());
+		
+		if (addedProperty == null) {
+			logger.logError("Unable to find property " + propObj.getDestinationURI() + 	" in new TBox");
 			return;
 		}
-		OntProperty superProperty = tempProperty.getSuperProperty();
+		
+		//  if the newly added property has an inverse in the new TBox, then for all  existing
+		//  ABox statements involving that inverse (if the inverse is new also there won't be
+		//  any) add the corresponding statement with the new property.
+		//  
+		//  Shouldn't a reasoner be doing this?
+		
+		
+		OntProperty inverseOfAddedProperty = addedProperty.getInverseOf();
+		
+		if (inverseOfAddedProperty != null) {
+			Model additions = ModelFactory.createDefaultModel();
+			aboxModel.enterCriticalSection(Lock.WRITE);
+			
+			try {
+				StmtIterator iter = aboxModel.listStatements((Resource) null, inverseOfAddedProperty, (RDFNode) null);
+		
+				while (iter.hasNext()) {
+					
+					Statement stmt = iter.next();
+					Statement newStmt = ResourceFactory.createStatement(stmt.getObject().asResource(), addedProperty, stmt.getSubject());
+					additions.add(newStmt);
+				}
+				
+				aboxModel.add(additions);
+				record.recordAdditions(additions);
+				
+				if (additions.size() > 0) {
+					logger.log(additions.size() + " statement" + 
+							((additions.size() > 1) ? "s" : "") +
+							" with predicate " + addedProperty.getURI() + " " + 
+							((additions.size() > 1) ? "were" : "was") 
+							+ " added (as an inverse to existing  " + inverseOfAddedProperty.getURI() + 
+							" assertions");
+				}
+				
+			} finally {
+				aboxModel.leaveCriticalSection();
+			}
+			
+		}
+		
+/*		OntProperty superProperty = addedProperty.getSuperProperty();
 		if (superProperty == null) {
 			return;
 		}
+		
 		int count = aboxModel.listStatements(
 				(Resource) null, superProperty, (RDFNode) null).toSet().size();
 		if (count > 0) {
@@ -369,7 +407,7 @@ public class ABoxUpdater {
 							"a new subproperty " + propObj.getDestinationURI() +
 					" in the new ontology version. ");
 			logger.log("Please review uses of this property to see if " + propObj.getDestinationURI() + " is a more appropriate choice.");
-		}
+		}*/
 	}
 	
 	private void deleteProperty(AtomicOntologyChange propObj) throws IOException{
@@ -413,7 +451,7 @@ public class ABoxUpdater {
 						propObj.getSourceURI() + " " + (plural ? "were" : "was") + " removed. ");
 			}
 		} else {
-			AtomicOntologyChange chg = new AtomicOntologyChange(deletedProperty.getURI(), replacementProperty.getURI(), AtomicChangeType.RENAME);
+			AtomicOntologyChange chg = new AtomicOntologyChange(deletedProperty.getURI(), replacementProperty.getURI(), AtomicChangeType.RENAME, propObj.getNotes());
 			renameProperty(chg);
 		}		
 		
@@ -435,8 +473,7 @@ public class ABoxUpdater {
 		}
 		
 		Model renamePropAddModel = ModelFactory.createDefaultModel();
-		Model renamePropRetractModel = 
-			ModelFactory.createDefaultModel();
+		Model renamePropRetractModel = 	ModelFactory.createDefaultModel();
 		
 		aboxModel.enterCriticalSection(Lock.WRITE);
 		try {
