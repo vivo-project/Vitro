@@ -39,6 +39,7 @@ public class DateTimeMigration {
 	private static final String dateTimePrecisionURI = "http://vivoweb.org/ontology/core#dateTimePrecision";
 	private static final String hasTimeIntervalURI = "http://vivoweb.org/ontology/core#hasTimeInterval";
 	private static final String dateTimeIntervalURI = "http://vivoweb.org/ontology/core#dateTimeInterval";
+	private static final String dateTimeIntervalForURI = "http://vivoweb.org/ontology/core#dateTimeIntervalFor";
 	
 	private static final String yPrecisionURI = "http://vivoweb.org/ontology/core#yearPrecision";
 	private static final String ymPrecisionURI = "http://vivoweb.org/ontology/core#yearMonthPrecision";
@@ -48,6 +49,7 @@ public class DateTimeMigration {
 	private DatatypeProperty dateTimeProp = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createDatatypeProperty(dateTimeURI);
 	private ObjectProperty hasTimeIntervalProp = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createObjectProperty(hasTimeIntervalURI);
 	private ObjectProperty dateTimeIntervalProp = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createObjectProperty(dateTimeIntervalURI);
+	private ObjectProperty dateTimeIntervalForProp = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createObjectProperty(dateTimeIntervalForURI);
 	private ObjectProperty dateTimePrecisionProp = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createObjectProperty(dateTimePrecisionURI);
 	
 	
@@ -101,7 +103,9 @@ public class DateTimeMigration {
 
 			   if (stmt2 != null) {
 				  retractions.add(stmt2);
+				  retractions.add(stmt2.getObject().asResource(), dateTimeIntervalForProp, stmt2.getSubject());
 				  additions.add(stmt.getSubject(), dateTimeIntervalProp, stmt2.getObject());
+				  additions.add(stmt2.getObject().asResource(), dateTimeIntervalProp, stmt.getSubject());
 			   }
 				   
 		    }
