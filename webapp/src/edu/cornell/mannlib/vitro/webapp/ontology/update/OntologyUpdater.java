@@ -91,7 +91,7 @@ public class OntologyUpdater {
 		AtomicOntologyChangeLists changes = new AtomicOntologyChangeLists(rawChanges,settings.getNewTBoxModel(),settings.getOldTBoxModel());
 		
         //process the TBox before the ABox
-	    //TODO: uncomment updateTBoxAnnotations();   12/27/2010 - commented out just for testing abox updater
+	    updateTBoxAnnotations();
 
     	updateABox(changes);		
 	}

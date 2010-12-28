@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.hp.hpl.jena.ontology.DatatypeProperty;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
@@ -297,8 +298,7 @@ public class ABoxUpdater {
 		OntClass deletedClass = oldTboxModel.getOntClass(change.getSourceURI());
 		
 		if (deletedClass == null) {
-			logger.logError("didn't find the deleted class " +
-					        change.getSourceURI() + " in the old model.");
+			logger.log("WARNING: didn't find the deleted class " +  change.getSourceURI() + " in the old model. Skipping updates for this deletion");
 			return;
 		}
 
@@ -309,19 +309,25 @@ public class ABoxUpdater {
 				namedClassList.add(ontClass);
 			}
 		}
+		
 		OntClass parent = (!namedClassList.isEmpty()) 
 								? namedClassList.get(0) 
 								: OWL_THING;
-		
+										
 		OntClass replacementClass = newTboxModel.getOntClass(parent.getURI());
 		
 		while (replacementClass == null) {
 			 parent = parent.getSuperClass();
-	    	 replacementClass = newTboxModel.getOntClass(parent.getURI()); 			
+			 
+			 if (parent == null) {
+				  replacementClass = OWL_THING; 
+			 } else {
+	    	      replacementClass = newTboxModel.getOntClass(parent.getURI());
+			 }
 		} 
 
-	   //log summary of changes
-	   logger.log("Class " + deletedClass.getURI() + " has been deleted. Any references to it in the knowledge base will be changed to " +   replacementClass.getURI());
+	    //log summary of changes
+	    logger.log("Class " + deletedClass.getURI() + " has been deleted. Any references to it in the knowledge base have been changed to " +   replacementClass.getURI());
 
 		AtomicOntologyChange chg = new AtomicOntologyChange(deletedClass.getURI(), replacementClass.getURI(), AtomicChangeType.RENAME, change.getNotes());
 		renameClass(chg);		
@@ -407,20 +413,26 @@ public class ABoxUpdater {
 							"a new subproperty " + propObj.getDestinationURI() +
 					" in the new ontology version. ");
 			logger.log("Please review uses of this property to see if " + propObj.getDestinationURI() + " is a more appropriate choice.");
-		}*/
+		}
+	*/
 	}
 	
 	private void deleteProperty(AtomicOntologyChange propObj) throws IOException{
+		
 		OntProperty deletedProperty = oldTboxModel.getOntProperty(propObj.getSourceURI());
 		
-		if (deletedProperty == null) {
-			logger.logError("expected to find property " 
-					+ propObj.getSourceURI() + " in oldTBoxModel");
+		if (deletedProperty == null && "Prop".equals(propObj.getNotes())) {
+			deletedProperty = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createOntProperty(propObj.getSourceURI());
+		}
+		
+		if (deletedProperty == null ) {
+			logger.log("WARNING: didn't find deleted property " + propObj.getSourceURI() + " in oldTBoxModel");
 			return;
 		}
 		
 		OntProperty replacementProperty = null;
-		OntProperty parent = deletedProperty.getSuperProperty();
+		OntProperty parent =  deletedProperty.getSuperProperty();
+		
 		if (parent != null) {
 			replacementProperty = newTboxModel.getOntProperty(parent.getURI());
 			
@@ -436,10 +448,10 @@ public class ABoxUpdater {
 		Model deletePropModel = ModelFactory.createDefaultModel();
 		
 		if (replacementProperty == null) {
+						
 			aboxModel.enterCriticalSection(Lock.WRITE);
 			try {
-				deletePropModel.add(aboxModel.listStatements(
-						(Resource) null, deletedProperty, (RDFNode) null));
+				deletePropModel.add(aboxModel.listStatements((Resource) null, deletedProperty, (RDFNode) null));
 				aboxModel.remove(deletePropModel);
 			} finally {
 				aboxModel.leaveCriticalSection();
