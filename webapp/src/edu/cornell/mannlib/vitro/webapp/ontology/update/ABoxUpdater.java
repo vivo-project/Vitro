@@ -119,7 +119,7 @@ public class ABoxUpdater {
 	 */
 	public void renameClass(AtomicOntologyChange change) throws IOException {
 		
-		//logger.log("Processing a class rename from: " + change.getSourceURI() + " to " + change.getDestinationURI());
+		logger.log("Processing a class rename from: " + change.getSourceURI() + " to " + change.getDestinationURI());
 		aboxModel.enterCriticalSection(Lock.WRITE);
 		
 		try {
@@ -226,7 +226,7 @@ public class ABoxUpdater {
 	 */
 	public void addClass(AtomicOntologyChange change) throws IOException {
 	   
-		//logger.log("Processing a class addition of class " + change.getDestinationURI());
+		logger.log("Processing a class addition of class " + change.getDestinationURI());
 		
 		OntClass addedClass = newTboxModel.getOntClass(change.getDestinationURI());
 		
@@ -275,25 +275,18 @@ public class ABoxUpdater {
 		}
 	}
 
-
+	
 	/**
 	 * 
-	 * Update a knowledge base to account for a class deletion in the ontology.
-	 * All references to the deleted class URI in either the subject or the object
-	 * position of a statement are changed to use the closest available parent of
-	 * the deleted class from the previous ontology that remains in the new version
-	 * of the ontology. Note that the closest available parent may be owl:Thing.
-	 * If the deleted class has more than one closest available parent, then
-	 * change individuals that were asserted to be of the deleted class to be 
-	 * asserted to be of both parent classes. 
-	 *  
+	 * Remove all instances of and references to a class in the abox of the knowledge base.
+	 * 
 	 * @param   change - an AtomicOntologyChange object representing a class
 	 *                   delete operation.
 	 *                    
 	 */
 	public void deleteClass(AtomicOntologyChange change) throws IOException {
 
-		//logger.log("Processing a class deletion of class " + change.getSourceURI());
+		logger.log("Processing a class deletion of class " + change.getSourceURI());
 		
 		OntClass deletedClass = oldTboxModel.getOntClass(change.getSourceURI());
 		
@@ -302,39 +295,84 @@ public class ABoxUpdater {
 			return;
 		}
 
-		List<OntClass> classList = deletedClass.listSuperClasses(true).toList();
-		List<OntClass> namedClassList = new ArrayList<OntClass>();
-		for (OntClass ontClass : classList) { 
-			if (!ontClass.isAnon()) {
-				namedClassList.add(ontClass);
-			}
+	    Model retractions = ModelFactory.createDefaultModel();
+		
+		// Remove statements where the deleted class is the subject  (e.g. statements with vitro annotation properties as the predicate)
+		aboxModel.enterCriticalSection(Lock.WRITE);
+	    try {
+	       int count = 0;
+		   StmtIterator iter = aboxModel.listStatements(deletedClass, (Property) null, (RDFNode) null);
+		   
+		   while (iter.hasNext()) {
+			   Statement oldStatement = iter.next();
+			   count++;
+			   retractions.add(oldStatement);
+			   logChange(oldStatement, false);
+		   }
+		   
+		   if (count > 0) {
+			   logger.log("Removed " + count + "  subject reference" + ((count > 1) ? "s" : "") + " to the "  + deletedClass.getURI() + " class");
+		   }
+		} finally {
+			aboxModel.leaveCriticalSection();
 		}
-		
-		OntClass parent = (!namedClassList.isEmpty()) 
-								? namedClassList.get(0) 
-								: OWL_THING;
-										
-		OntClass replacementClass = newTboxModel.getOntClass(parent.getURI());
-		
-		while (replacementClass == null) {
-			 parent = parent.getSuperClass();
-			 
-			 if (parent == null) {
-				  replacementClass = OWL_THING; 
-			 } else {
-	    	      replacementClass = newTboxModel.getOntClass(parent.getURI());
-			 }
-		} 
 
-	    //log summary of changes
-	    logger.log("Class " + deletedClass.getURI() + " has been deleted. Any references to it in the knowledge base have been changed to " +   replacementClass.getURI());
+		// Remove instances of the deleted class
+		aboxModel.enterCriticalSection(Lock.WRITE);
+	    try {
+	    	int count = 0;
+	    	StmtIterator iter = aboxModel.listStatements((Resource) null, RDF.type, deletedClass);
 
-		AtomicOntologyChange chg = new AtomicOntologyChange(deletedClass.getURI(), replacementClass.getURI(), AtomicChangeType.RENAME, change.getNotes());
-		renameClass(chg);		
+    		while (iter.hasNext()) {
+			   count++;
+			   Statement typeStmt = iter.next();
+			   retractions.add(typeStmt);
+
+			   StmtIterator iter2 = aboxModel.listStatements(typeStmt.getSubject(), (Property) null, (RDFNode) null);
+			   while (iter2.hasNext()) {
+				   retractions.add(iter2.next());
+			   }   
+		   }
+		   
+		   //log summary of changes
+		   if (count > 0) {
+			   logger.log("Removed " + count + " instance" + ((count > 1) ? "s" : "") + " of the "  + deletedClass.getURI() + " class.");
+		   }
+		   
+		   aboxModel.remove(retractions);
+		   record.recordRetractions(retractions);		
+		   
+		} finally {
+			aboxModel.leaveCriticalSection();
+		}
+
+	    // Remove other object references to the deleted class - what would these be? nothing, I think.
+		aboxModel.enterCriticalSection(Lock.WRITE);
+	    try {
+	       int count = 0;
+	       StmtIterator iter = aboxModel.listStatements((Resource) null, (Property) null, deletedClass);
+   
+		   while (iter.hasNext()) {
+			   count++;
+			   Statement oldStatement = iter.next();
+			   retractions.add(oldStatement);
+			   logChange(oldStatement, false);
+		   }
+		   
+		   //log summary of changes
+		   if (count > 0) {
+			   logger.log("Removed " + count + " object reference" + ((count > 1) ? "s" : "") + " to the "  + deletedClass.getURI() + " class.");
+		   }
+
+		   aboxModel.remove(retractions);
+		   record.recordRetractions(retractions);		   
+		} finally {
+			aboxModel.leaveCriticalSection();
+		}
 	}
 	
-	
 	public void processPropertyChanges(List<AtomicOntologyChange> changes) throws IOException {
+				
 		Iterator<AtomicOntologyChange> propItr = changes.iterator();
 		while(propItr.hasNext()){
 			AtomicOntologyChange propChangeObj = propItr.next();
@@ -352,6 +390,9 @@ public class ABoxUpdater {
 	}
 	
 	private void addProperty(AtomicOntologyChange propObj) throws IOException{
+		
+		logger.log("Processing a property addition of property " + propObj.getDestinationURI());
+		
 		OntProperty addedProperty = newTboxModel.getOntProperty 	(propObj.getDestinationURI());
 		
 		if (addedProperty == null) {
@@ -419,6 +460,8 @@ public class ABoxUpdater {
 	
 	private void deleteProperty(AtomicOntologyChange propObj) throws IOException{
 		
+		logger.log("Processing a property deletion of property " + propObj.getSourceURI());
+		
 		OntProperty deletedProperty = oldTboxModel.getOntProperty(propObj.getSourceURI());
 		
 		if (deletedProperty == null && "Prop".equals(propObj.getNotes())) {
@@ -471,6 +514,8 @@ public class ABoxUpdater {
 	
 	private void renameProperty(AtomicOntologyChange propObj) throws IOException {
 		
+		logger.log("Processing a property rename from: " + propObj.getSourceURI() + " to " + propObj.getDestinationURI());
+		
 		OntProperty oldProperty = oldTboxModel.getOntProperty(propObj.getSourceURI());
 		OntProperty newProperty = newTboxModel.getOntProperty(propObj.getDestinationURI());
 		
@@ -515,10 +560,8 @@ public class ABoxUpdater {
 					+ " changed to use " +
 					propObj.getDestinationURI() + " instead.");
 		}
-		
 	}
 
-	
 	public void logChanges(Statement oldStatement, Statement newStatement) throws IOException {
        logChange(oldStatement,false);
        logChange(newStatement,true);
@@ -529,5 +572,62 @@ public class ABoxUpdater {
 				" property = " + statement.getPredicate().getURI() +
                 " object = " + (statement.getObject().isLiteral() ?  ((Literal)statement.getObject()).getLexicalForm()
                 		                                          : ((Resource)statement.getObject()).getURI()));	
+	}
+
+	/**
+	 * 
+	 * Update a knowledge base to account for a class deletion in the ontology.
+	 * All references to the deleted class URI in either the subject or the object
+	 * position of a statement are changed to use the closest available parent of
+	 * the deleted class from the previous ontology that remains in the new version
+	 * of the ontology. Note that the closest available parent may be owl:Thing.
+	 * If the deleted class has more than one closest available parent, then
+	 * change individuals that were asserted to be of the deleted class to be 
+	 * asserted to be of both parent classes. 
+	 *  
+	 * @param   change - an AtomicOntologyChange object representing a class
+	 *                   delete operation.
+	 *                    
+	 */
+	public void obsolete_deleteClass(AtomicOntologyChange change) throws IOException {
+
+		logger.log("Processing a class deletion of class " + change.getSourceURI());
+		
+		OntClass deletedClass = oldTboxModel.getOntClass(change.getSourceURI());
+		
+		if (deletedClass == null) {
+			logger.log("WARNING: didn't find the deleted class " +  change.getSourceURI() + " in the old model. Skipping updates for this deletion");
+			return;
+		}
+
+		List<OntClass> classList = deletedClass.listSuperClasses(true).toList();
+		List<OntClass> namedClassList = new ArrayList<OntClass>();
+		for (OntClass ontClass : classList) { 
+			if (!ontClass.isAnon()) {
+				namedClassList.add(ontClass);
+			}
+		}
+		
+		OntClass parent = (!namedClassList.isEmpty()) 
+								? namedClassList.get(0) 
+								: OWL_THING;
+										
+		OntClass replacementClass = newTboxModel.getOntClass(parent.getURI());
+		
+		while (replacementClass == null) {
+			 parent = parent.getSuperClass();
+			 
+			 if (parent == null) {
+				  replacementClass = OWL_THING; 
+			 } else {
+	    	      replacementClass = newTboxModel.getOntClass(parent.getURI());
+			 }
+		} 
+
+	    //log summary of changes
+	    logger.log("Class " + deletedClass.getURI() + " has been deleted. Any references to it in the knowledge base have been changed to " +   replacementClass.getURI());
+
+		AtomicOntologyChange chg = new AtomicOntologyChange(deletedClass.getURI(), replacementClass.getURI(), AtomicChangeType.RENAME, change.getNotes());
+		renameClass(chg);			
 	}
 }
