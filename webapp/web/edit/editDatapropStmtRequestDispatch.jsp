@@ -49,6 +49,9 @@
         vreq.setAttribute("editKey", EditConfiguration.getEditKey( vreq ));
     }
 
+    //set title to Edit to maintain functionality from 1.1.1 and avoid updates to Selenium tests
+    request.setAttribute("title","Edit");
+    
     String subjectUri   = vreq.getParameter("subjectUri");
     String predicateUri = vreq.getParameter("predicateUri");
     String formParam    = vreq.getParameter("editForm");
