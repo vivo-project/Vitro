@@ -1,16 +1,15 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
-
 <section id="content-generic-class" role="region">
     <nav role="navigation">
         <h3>Organizations</h3>
         
         <h4>Visual Graph</h4>
         
-        <ul id="class-generic-childClasses">
+        <ul id="vgraph-childClasses">
             <li><a href="#">class:generic<span class="count-classes"> (280)</span></a></li>
             <li><a href="#">class:generic<span class="count-classes"> (280)</span></a></li>
             <li><a href="#">class:generic<span class="count-classes"> (280)</span></a></li>
-            <li><a  class="selected"  href="#">class:generic<span class="count-classes"> (280)</span></a></li>
+            <li><a class="selected" href="#">class:generic<span class="count-classes"> (280)</span></a></li>
             <li><a href="#">class:generic<span class="count-classes"> (280)</span></a></li>
             <li><a href="#">class:generic<span class="count-classes"> (280)</span></a></li>
             <li><a href="#">class:generic<span class="count-classes"> (280)</span></a></li>

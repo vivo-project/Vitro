@@ -5,7 +5,14 @@
     <section id="content-foaf-person" role="region">
         <h4>Visual Graph</h4>
         
-        <@widget name="browse" classGroup="people"/>
+        <#-- <@widget name="browse" classGroup="people"/> -->
+        <nav role="navigation">
+            <ul id="vgraph-childClasses">
+            <#list vClassGroup as vClass>
+                <li><a href="#browse-by" title="Browse all people in this class" data-uri="${vClass.URI}">${vClass.name} <span class="count-classes">(indivCount)</span></a></li>
+            </#list>
+            </ul>
+        </nav>
           
         <section id="foaf-person-graph" role="region">
             <img src="${urls.images}/menupage/visual-graph.jpg" alt="" />
@@ -64,71 +71,64 @@
 </section>
 
 <section id="browse-by" role="region">
-    <h2>Browse By</h2>
+    <h2>Browse by</h2>
     
     <nav role="navigation">
         <ul id="browse-childClasses">
-            <li><a class="selected" href="#">Faculty Members<span class="count-classes"> (280)</span></a></li>
-            <li><a href="#">Graduate Students<span class="count-classes"> (280)</span></a></li>
-            <li><a href="#">Undergraduate Students<span class="count-classes"> (280)</span></a></li>
-            <li><a href="#">Librarians<span class="count-classes"> (280)</span></a></li>
-            <li><a href="#">Non Academic<span class="count-classes"> (280)</span></a></li>
-            <li><a href="#">Non Faculty Members<span class="count-classes"> (280)</span></a></li>
+            <#list vClassGroup as vClass>
+                <#------------------------------------------------------------
+                Need to replace vClassCamel with full URL that allows function
+                to degrade gracefully in absence of JavaScript. Something
+                similar to what Brian had setup with widget-browse.ftl
+                ------------------------------------------------------------->
+                <#assign vClassCamel = vClass.name?capitalize?replace(" ", "")?uncap_first />
+                <li id="${vClassCamel}"><a href="#${vClassCamel}" title="Browse all people in this class" data-uri="${vClass.URI}">${vClass.name} <span class="count-classes">(indivCount)</span></a></li>
+            </#list>
         </ul>
         <nav role="navigation">
             <ul id="alpha-browse-childClass">
-                <li><a href="#">All<span class="count-classes"> (280)</span></a></li>
-                <li><a href="#">A<span class="count-classes"> (280)</span></a></li>
-                <li><a class="selected" href="#">B<span class="count-classes"> (280)</span></a></li>
-                <li><a href="#">D<span class="count-classes"> (280)</span></a></li>
-                <li><a href="#">F<span class="count-classes"> (280)</span></a></li>
-                <li><a href="#">G<span class="count-classes"> (280)</span></a></li>
-                <li><a href="#">H<span class="count-classes"> (280)</span></a></li>
-                <li><a href="#">I<span class="count-classes"> (280)</span></a></li>
-                <li><a href="#">K<span class="count-classes"> (280)</span></a></li>
-                <li><a href="#">L<span class="count-classes"> (280)</span></a></li>
-                <li><a href="#">N<span class="count-classes"> (280)</span></a></li>
-                <li><a href="#">P<span class="count-classes"> (280)</span></a></li>
-                <li><a href="#">R<span class="count-classes"> (280)</span></a></li>
-                <li><a href="#">U<span class="count-classes"> (280)</span></a></li>
-                <li><a href="#">V<span class="count-classes"> (280)</span></a></li>
-                <li><a href="#">Y<span class="count-classes"> (280)</span></a></li>
-                <li><a href="#">Z<span class="count-classes"> (280)</span></a></li>
+                <li><a href="#" class="selected" data-alpha="all">All<span class="count-classes"> (280)</span></a></li>
+                <li><a href="#" data-alpha="a">A<span class="count-classes"> (280)</span></a></li>
+                <li><a href="#" data-alpha="b">B<span class="count-classes"> (280)</span></a></li>
+                <li><a href="#" data-alpha="d">D<span class="count-classes"> (280)</span></a></li>
+                <li><a href="#" data-alpha="f">F<span class="count-classes"> (280)</span></a></li>
+                <li><a href="#" data-alpha="g">G<span class="count-classes"> (280)</span></a></li>
+                <li><a href="#" data-alpha="h">H<span class="count-classes"> (280)</span></a></li>
+                <li><a href="#" data-alpha="i">I<span class="count-classes"> (280)</span></a></li>
+                <li><a href="#" data-alpha="k">K<span class="count-classes"> (280)</span></a></li>
+                <li><a href="#" data-alpha="l">L<span class="count-classes"> (280)</span></a></li>
+                <li><a href="#" data-alpha="n">N<span class="count-classes"> (280)</span></a></li>
+                <li><a href="#" data-alpha="p">P<span class="count-classes"> (280)</span></a></li>
+                <li><a href="#" data-alpha="r">R<span class="count-classes"> (280)</span></a></li>
+                <li><a href="#" data-alpha="u">U<span class="count-classes"> (280)</span></a></li>
+                <li><a href="#" data-alpha="v">V<span class="count-classes"> (280)</span></a></li>
+                <li><a href="#" data-alpha="y">Y<span class="count-classes"> (280)</span></a></li>
+                <li><a href="#" data-alpha="z">Z<span class="count-classes"> (280)</span></a></li>
             </ul>
         </nav>
     </nav>
     
     <section id="individuals-in-childClass" role="region">
-        <h3>B</h3>
         
-        <article class="vcard individual-foaf-person" role="navigation"> <img src="${urls.images}/menupage/person-thumbnail.jpg" width="90" height="90" alt="foaf:lastName, foaf:firstName" />
-            <h1 class="fn"><strong>foaf:lastName, foaf:fisrtName</strong><br>core:preferredTitle <br><span class="org">Albert Mann Library</span></h1>
-        </article>
-        
-        <article class="vcard individual-foaf-person"  role="navigation"> <img src="${urls.images}/menupage/person-thumbnail.jpg" width="90" height="90"  alt="foaf:lastName, foaf:firstName"/>
-            <h1 class="fn"><strong>foaf:lastName, foaf:fisrtName</strong><br>core:preferredTitle <br><span class="org">Albert Mann Library</span></h1>
-        </article>
-        
-        <article class="vcard individual-foaf-person" role="navigation"> <img src="${urls.images}/menupage/person-thumbnail.jpg" width="90" height="90"  alt="foaf:lastName, foaf:firstName"/>
-            <h1 class="fn"><strong>foaf:lastName, foaf:fisrtName</strong><br>core:preferredTitle <br><span class="org">Albert Mann Library</span></h1>
-        </article>
-        
-        <article class="vcard individual-foaf-person" role="navigation"> <img src="${urls.images}/menupage/person-thumbnail.jpg" width="90" height="90"  alt="foaf:lastName, foaf:firstName"/>
-            <h1 class="fn"><strong>foaf:lastName, foaf:fisrtName</strong><br>core:preferredTitle <br><span class="org">Albert Mann Library</span></h1>
-        </article>
-        
-        <article class="vcard individual-foaf-person" role="navigation"> <img src="${urls.images}/menupage/person-thumbnail.jpg" width="90" height="90"  alt="foaf:lastName, foaf:firstName"/>
-            <h1 class="fn"><strong>foaf:lastName, foaf:fisrtName</strong><br>core:preferredTitle <br><span class="org">Albert Mann Library</span></h1>
-        </article>
-        
-        <article class="vcard individual-foaf-person" role="navigation"> <img src="${urls.images}/menupage/person-thumbnail.jpg" width="90" height="90"  alt="foaf:lastName, foaf:firstName"/>
-            <h1 class="fn"><strong>foaf:lastName, foaf:fisrtName</strong><br>core:preferredTitle <br><span class="org">Albert Mann Library</span></h1>
-        </article>
-        
-        <article class="vcard individual-foaf-person" role="navigation"> <img src="${urls.images}/menupage/person-thumbnail.jpg" width="90" height="90"  alt="foaf:lastName, foaf:firstName"/>
-            <h1 class="fn"><strong>foaf:lastName, foaf:fisrtName</strong><br>core:preferredTitle <br><span class="org">Albert Mann Library</span></h1>
-        </article>
-    </section>    
+    </section>
 </section>
 
 ${stylesheets.add("/css/menupage/menupage.css")}
+
+<#----------------------------------------------------------------------------------
+requestedPage is currently provided by FreemarkerHttpServlet. Should this be moved
+to PageController? Maybe we should have Java provide the domain name directly
+instead of the full URL of the requested page? Chintan was also asking for a
+template variable with the domain name for an AJAX request with visualizations.
+------------------------------------------------------------------------------------>
+<#assign domainName = requestedPage?substring(0, requestedPage?index_of("/", 7)) />
+
+<script type="text/javascript">
+var menupageData = {
+    baseUrl: '${domainName + urls.base}',
+    dataServiceUrl: '${domainName + urls.base}/dataservice?getLuceneIndividualsByVClass=1&vclassId=',
+    defaultBrowseVClassUri: '${vClassGroup[0].URI}'
+};
+</script>
+
+${scripts.add("/js/menupage/browseByVClass.js", "/js/jquery_plugins/jquery.dump.js")}

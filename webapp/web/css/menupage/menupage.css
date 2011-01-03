@@ -7,9 +7,9 @@
 #intro-menupage{
     clear: both;
     width: 100%;
-    margin: 0 auto;
-    padding-top: 30px;
-    margin-bottom: 30px;
+    margin: 1em auto;
+/*    padding-top: 30px;  nac26: not sure we need all this space up top*/
+/*    margin-bottom: 30px;*/
 }
 #intro-menupage  h3{
     padding: 0 25px 15px 0;
@@ -59,20 +59,20 @@ ul#foaf-person-childClasses a{
 #content-generic-class h4{
     padding: 20px 25px 12px 0;
 }
-ul#class-generic-childClasses{
+ul#vgraph-childClasses{
     float: left;
     width: 265px;
     margin-left: 35px;
 }
-ul#class-generic-childClasses li{
+ul#vgraph-childClasses li{
     display: block;
     height: 35px;
     line-height: 35px;
 }
-ul#class-generic-childClasses li:last-child{    
+ul#vgraph-childClasses li:last-child{    
     border-bottom: 0;
 }
-ul#class-generic-childClasses a{
+ul#vgraph-childClasses a{
     display: block;
     padding-left: 15px;
     width: 265px;

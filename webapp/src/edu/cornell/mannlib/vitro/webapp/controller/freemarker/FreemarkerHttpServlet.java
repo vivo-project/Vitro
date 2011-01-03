@@ -388,6 +388,9 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         // Let the page template know which page it's processing. 
         map.put("currentPage", vreq.getServletPath().replaceFirst("/", ""));
         
+        // Allow template to send domain name to JavaScript (needed for AJAX calls)
+        map.put("requestedPage", vreq.getRequestURL().toString());
+        
         return map;        
     }   
 
