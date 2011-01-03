@@ -28,7 +28,6 @@
 <c:url var="jquery" value="/js/jquery.js"/>
 <c:url var="getURLParam" value="/js/jquery_plugins/getURLParam.js"/>
 <c:url var="colorAnimations" value="/js/jquery_plugins/colorAnimations.js"/>
-<c:url var="propertyGroupSwitcher" value="/js/propertyGroupSwitcher.js"/>
 <c:url var="vitroControls" value="/js/controls.js"/>
 <c:url var="jqueryForm" value="/js/jquery_plugins/jquery.form.js"/>
 <c:url var="tinyMCE" value="/js/tiny_mce/tiny_mce.js"/>
@@ -42,7 +41,6 @@
 <script type="text/javascript" src="${jquery}"></script>
 <script type="text/javascript" src="${getURLParam}"></script>
 <script type="text/javascript" src="${colorAnimations}"></script>
-<script type="text/javascript" src="${propertyGroupSwitcher}"></script>
 <script type="text/javascript" src="${jqueryForm}"></script>
 <script type="text/javascript" src="${tinyMCE}"></script>
 <script type="text/javascript" src="${vitroControls}"></script>
