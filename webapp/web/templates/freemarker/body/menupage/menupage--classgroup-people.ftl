@@ -5,11 +5,10 @@
     <section id="content-foaf-person" role="region">
         <h4>Visual Graph</h4>
         
-        <#-- <@widget name="browse" classGroup="people"/> -->
         <nav role="navigation">
             <ul id="vgraph-childClasses">
             <#list vClassGroup as vClass>
-                <li><a href="#browse-by" title="Browse all people in this class" data-uri="${vClass.URI}">${vClass.name} <span class="count-classes">(indivCount)</span></a></li>
+                <li><a href="#browse-by" title="Browse all people in this class" data-uri="${vClass.URI}">${vClass.name} <span class="count-classes">(${vClass.entityCount})</span></a></li>
             </#list>
             </ul>
         </nav>
@@ -82,7 +81,7 @@
                 similar to what Brian had setup with widget-browse.ftl
                 ------------------------------------------------------------->
                 <#assign vClassCamel = vClass.name?capitalize?replace(" ", "")?uncap_first />
-                <li id="${vClassCamel}"><a href="#${vClassCamel}" title="Browse all people in this class" data-uri="${vClass.URI}">${vClass.name} <span class="count-classes">(indivCount)</span></a></li>
+                <li id="${vClassCamel}"><a href="#${vClassCamel}" title="Browse all people in this class" data-uri="${vClass.URI}">${vClass.name} <span class="count-classes">(${vClass.entityCount})</span></a></li>
             </#list>
         </ul>
         <nav role="navigation">
