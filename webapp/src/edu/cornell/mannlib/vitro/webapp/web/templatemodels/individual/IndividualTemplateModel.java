@@ -79,6 +79,10 @@ public class IndividualTemplateModel extends BaseTemplateModel {
         return individual.isVClass("http://xmlns.com/foaf/0.1/Person");        
     }
     
+    public boolean isOrganization() {
+        return individual.isVClass("http://xmlns.com/foaf/0.1/Organization");        
+    }
+    
     public String getSearchView() {        
         return getView(ClassView.SEARCH);
     }
