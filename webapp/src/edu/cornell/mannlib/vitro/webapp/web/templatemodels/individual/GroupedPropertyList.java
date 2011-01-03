@@ -27,6 +27,11 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 
+/*
+public class GroupedPropertyList extends ArrayList<PropertyGroupTemplateModel> {
+If this class extends a List type, Freemarker does not let the templates call methods
+on it. 
+*/
 public class GroupedPropertyList extends BaseTemplateModel {
 
     private static final long serialVersionUID = 1L;
