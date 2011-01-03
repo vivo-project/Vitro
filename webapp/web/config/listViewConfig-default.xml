@@ -7,7 +7,7 @@
         - template: the name of the template used to display a single property statement
     
     Optional elements: 
-        postprocessor: a Java class that postprocesses the data retrieved from the query before
+        - postprocessor: a Java class that postprocesses the data retrieved from the query before
                        sending it to the template
     
     Query requirements:
@@ -30,8 +30,6 @@
             OPTIONAL { GRAPH ?g3 { ?object vitro:moniker ?moniker } }
         }       
     </query>
-    
-    <collation-target>object</collation-target>
 
     <postprocessor>edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.DefaultObjectPropertyDataPostprocessor</postprocessor>
     
