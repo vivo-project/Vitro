@@ -30,7 +30,11 @@ import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 /*
 public class GroupedPropertyList extends ArrayList<PropertyGroupTemplateModel> {
 If this class extends a List type, Freemarker does not let the templates call methods
-on it. 
+on it. Since the class must then contain a list rather than be a list, the template
+syntax is less idiomatic: e.g., groups.all rather than simply groups. An alternative
+is to make the get methods (getProperty and getPropertyAndRemoveFromList) methods
+of the IndividualTemplateModel. Then this class doesn't need methods, and can extend
+a List type.
 */
 public class GroupedPropertyList extends BaseTemplateModel {
 
@@ -385,43 +389,35 @@ public class GroupedPropertyList extends BaseTemplateModel {
     }
     
     public PropertyTemplateModel getProperty(String propertyUri) {
-        
-        PropertyTemplateModel propertyTemplateModel = null;
-        
-        groupLoop: for (PropertyGroupTemplateModel pgtm : groups) {
+
+        for (PropertyGroupTemplateModel pgtm : groups) {
             List<PropertyTemplateModel> properties = pgtm.getProperties();
             for (PropertyTemplateModel ptm : properties) {
                 if (propertyUri.equals(ptm.getUri())) {
-                    propertyTemplateModel = ptm;                    
-                    break groupLoop;
+                    return ptm;
                 }
             }
-        }
-        
-        return propertyTemplateModel;
+        }        
+        return null;
     }
     
     public PropertyTemplateModel getPropertyAndRemoveFromList(String propertyUri) {
-        
-        PropertyTemplateModel propertyTemplateModel = null;
-        
-        groupLoop: for (PropertyGroupTemplateModel pgtm : groups) {
+
+        for (PropertyGroupTemplateModel pgtm : groups) {
             List<PropertyTemplateModel> properties = pgtm.getProperties();
             for (PropertyTemplateModel ptm : properties) {
-                if (propertyUri.equals(ptm.getUri())) {
-                    propertyTemplateModel = ptm;   
+                if (propertyUri.equals(ptm.getUri())) { 
                     // Remove the property from the group
                     properties.remove(ptm);
                     // If this is the only property in the group, remove the group as well
                     if (properties.size() == 0) {
-                        groups.remove(pgtm);
+                        groups.remove(pgtm);   
                     }
-                    break groupLoop;
+                    return ptm;
                 }
             }
-        }
-        
-        return propertyTemplateModel;
+        }        
+        return null;
     }
 }
 

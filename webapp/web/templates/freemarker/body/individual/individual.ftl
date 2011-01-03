@@ -2,7 +2,11 @@
 
 <#-- Template for individual profile page -->
 
+<#-- RY This is actually the person profile page, but we cannot move it to its proper location until selection of template by
+annotaiton has been implemented. -->
+
 <#import "lib-list.ftl" as l>
+<#import "lib-properties.ftl" as p>
 
 <#assign editingClass>
     <#if editStatus.showEditLinks>editing<#else></#if>
@@ -70,15 +74,22 @@
             </ul>
         </header>
         
-        <p class="individual-overview">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed est erat, tristique non bibendum eu, mollis non est. Cras vehicula velit quis elit porta vel molestie tellus blandit. Donec eget magna dolor. Phasellus faucibus mollis lorem at dapibus. Sed ultricies lobortis mauris in volutpat. Cras mattis neque ut sapien pellentesque fringilla. Mauris posuere dui quis massa mattis id mollis nibh accumsan.  [+]</p>
+        <#-- Overview -->
+        <#assign overview = propertyGroups.getPropertyAndRemoveFromList("http://vivoweb.org/ontology/core#overview")> 
+        <#if overview?has_content>
+            <p class="individual-overview">${overview.value}</p>
+        </#if>
         
-        <h2>Research Areas</h2>
-
-        <ul id ="individual-areas" role="list">
-            <li role="listitem"><a href="#">Researcher (5)</a></li>
-            <li role="listitem"><a href="#">Principal Investigator (3)</a></li>
-            <li role="listitem"><a href="#">Teacher (2)</a></li>
-        </ul>
+        <#-- Research Areas -->
+        <#assign researchAreas = propertyGroups.getPropertyAndRemoveFromList("http://vivoweb.org/ontology/core#hasResearchArea")> 
+        <#if researchAreas?has_content>
+            <h2>Research Areas</h2>
+                  
+            <ul id="individual-areas" role="list">
+                <@p.objectProperty researchAreas />
+            </ul>
+        </#if>
+                
     </section>
 </section>
 

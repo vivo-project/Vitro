@@ -2,6 +2,8 @@
 
 <#-- Template for property listing on individual profile page -->
 
+<#import "lib-properties.ftl" as p>
+
 <#list propertyGroups.all as group>
 
     <#assign groupname = group.name(nameForOtherGroup)>
@@ -28,13 +30,13 @@
                 <ul class="property-list" role="list"> 
                     <#-- data property -->  
                     <#if property.type == "data"> 
-                        <@dataPropertyList property.statements />
+                        <@p.dataPropertyList property.statements />
 
                     <#-- object property -->      
                     <#elseif property.collatedBySubclass> <#-- collated -->                            
-                        <@collatedObjectPropertyList property />
+                        <@p.collatedObjectPropertyList property />
                     <#else> <#-- uncollated -->
-                        <@objectPropertyList property.statements property.template />
+                        <@p.objectPropertyList property.statements property.template />
                     </#if>  
                 </ul>                 
             </article> <!-- end property -->             
@@ -42,34 +44,3 @@
     </section> <!-- end property-group -->
 </#list> 
 
-<#-----------------------------------------------------------------------------
-    Macros for generating property lists
------------------------------------------------------------------------------->
-
-<#macro dataPropertyList statements>
-    <#list statements as statement>
-        <@propertyListItem>${statement.value}</@propertyListItem>
-    </#list> 
-</#macro>
-
-<#macro collatedObjectPropertyList property>
-    <#assign subclasses = property.subclasses>
-    <#list subclasses?keys as subclass>
-        <li class="subclass">
-            <h3>${subclass?lower_case}</h3>
-            <ul class="subclass-property-list">
-                <@objectPropertyList subclasses[subclass] property.template /> 
-            </ul>
-        </li>
-    </#list>
-</#macro>
-
-<#macro objectPropertyList statements template>
-    <#list statements as statement>
-        <@propertyListItem><#include "${template}"></@propertyListItem>
-    </#list>
-</#macro>
-
-<#macro propertyListItem>
-    <li role="listitem"><#nested></li>
-</#macro>

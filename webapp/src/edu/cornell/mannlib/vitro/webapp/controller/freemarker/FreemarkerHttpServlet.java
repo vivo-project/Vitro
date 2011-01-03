@@ -325,6 +325,12 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         return map;
     }
     
+    protected Map<String, Object> getMethods() {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("url", new edu.cornell.mannlib.vitro.webapp.web.functions.IndividualProfileUrlMethod());
+        return map;
+    }
+    
     // Add variables that should be available only to the page's root map, not to the body.
     // RY This is protected instead of private so FreeMarkerComponentGenerator can access.
     // Once we don't need that (i.e., jsps have been eliminated) we can make it private.
@@ -356,6 +362,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         map.put("currentPage", vreq.getServletPath().replaceFirst("/", ""));
         
         map.putAll(getDirectives());
+        map.putAll(getMethods());
         
         map.put("tabMenu", getTabMenu(vreq));
         map.put("menu", getDisplayModelMenu(vreq));

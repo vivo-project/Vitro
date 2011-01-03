@@ -31,6 +31,7 @@ public class IndividualTemplateModel extends BaseTemplateModel {
     protected Individual individual;
     protected VitroRequest vreq;
     protected UrlBuilder urlBuilder;
+    protected GroupedPropertyList propertyList = null;
     
     public IndividualTemplateModel(Individual individual, VitroRequest vreq) {
         this.individual = individual;
@@ -123,7 +124,10 @@ public class IndividualTemplateModel extends BaseTemplateModel {
     }
 
     public GroupedPropertyList getPropertyList() {
-        return new GroupedPropertyList(individual, vreq);
+        if (propertyList == null) {
+            propertyList = new GroupedPropertyList(individual, vreq);
+        }
+        return propertyList;
     }
     
     /* These methods simply forward to the methods of the wrapped individual. It would be desirable to 

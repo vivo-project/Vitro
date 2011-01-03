@@ -128,8 +128,7 @@ public class IndividualController extends FreemarkerHttpServlet {
     		 * into the data model: no real data can be modified. 
     		 */
 	        body.put("individual", getNonDefaultBeansWrapper(BeansWrapper.EXPOSE_SAFE).wrap(ind));
-	        
-	        body.put("url", new IndividualProfileUrlMethod());
+	       
 	        body.put("localName", new IndividualLocalNameMethod());
 	        
 	        String template = getIndividualTemplate(individual);

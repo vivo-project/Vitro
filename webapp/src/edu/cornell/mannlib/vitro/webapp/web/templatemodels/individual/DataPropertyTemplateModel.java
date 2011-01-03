@@ -63,5 +63,11 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
     public List<DataPropertyStatementTemplateModel> getStatements() {
         return statements;
     }
+    
+    // Allows the template to display a data value for a single property, when there is expected to be
+    // only a single value for the property.
+    public String getValue() {
+        return statements.get(0).getValue();
+    }
 
 }
