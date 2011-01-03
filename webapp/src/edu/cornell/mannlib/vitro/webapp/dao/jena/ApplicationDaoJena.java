@@ -20,8 +20,9 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 public class ApplicationDaoJena extends JenaBaseDao implements ApplicationDao {
 
-    Property LINKED_NAMESPACE_PROP = ResourceFactory.createProperty(
-            VitroVocabulary.DISPLAY + "linkedNamespace");
+    private static final Property LINKED_NAMESPACE_PROP = 
+            ResourceFactory.createProperty(
+                    VitroVocabulary.DISPLAY + "linkedNamespace");
     
 	Integer portalCount = null;
 	List<String> externallyLinkedNamespaces = null;
