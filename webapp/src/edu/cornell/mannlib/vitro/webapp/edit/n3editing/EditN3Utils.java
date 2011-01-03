@@ -49,6 +49,9 @@ public class EditN3Utils {
      * @return
      */
     public static String stripInvalidXMLChars(String in) {
+        if (in == null) {
+            return null;
+        }
         StringBuffer out = new StringBuffer();
         for (int i = 0; i < in.length(); i++) {
             char c = in.charAt(i);
