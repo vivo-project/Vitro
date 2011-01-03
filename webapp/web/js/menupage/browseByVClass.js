@@ -72,7 +72,7 @@ var browseByVClass = {
                 // test for individual image is not currently functional
                 // since the image is not yet included in the JSON results
                 if ( !results.individuals[i].image ) {
-                    indivImage = browseByVClass.baseUrl + '/images//menupage/person-thumbnail.jpg';
+                    indivImage = browseByVClass.baseUrl + '/images/dummyImages/person.thumbnail.jpg';
                 } else {
                     indivImage = results.individuals[i].image;
                 }

@@ -237,9 +237,10 @@ ul#browse-childClasses a{
     height: 35px;
 }
 /* ALPHA BROWSE------>  */
-#alpha-browse-childClass{
+ul#alpha-browse-childClass{
     float: left;
     width: 77px;
+    margin-bottom: 20px;
 }
 ul#alpha-browse-childClass li{
     display: block;
