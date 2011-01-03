@@ -153,8 +153,6 @@ private final OntModelSpec DEFAULT_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM;
 	}
 	
 	public OntModel extractTBox( Dataset dataset, String namespace, String graphURI ) {
-		System.out.println(namespace);
-		System.out.println(graphURI);
 		OntModel tboxModel = ModelFactory.createOntologyModel(DEFAULT_ONT_MODEL_SPEC);
 		
 		List<String> queryStrList = new LinkedList<String>();
