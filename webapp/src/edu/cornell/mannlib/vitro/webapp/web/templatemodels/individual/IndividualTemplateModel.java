@@ -122,9 +122,8 @@ public class IndividualTemplateModel extends BaseTemplateModel {
         return models;
     }
 
-    public List<PropertyGroupTemplateModel> getPropertyList() {
-        PropertyListBuilder propListBuilder = new PropertyListBuilder(individual, vreq);
-        return propListBuilder.getPropertyList();
+    public GroupedPropertyList getPropertyList() {
+        return new GroupedPropertyList(individual, vreq);
     }
     
     /* These methods simply forward to the methods of the wrapped individual. It would be desirable to 

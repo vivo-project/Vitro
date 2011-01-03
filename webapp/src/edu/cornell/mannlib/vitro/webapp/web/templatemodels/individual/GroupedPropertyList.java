@@ -7,7 +7,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,35 +26,29 @@ import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep;
 
-/**
- * Build the list of ontology properties for display on an individual profile page.
- * @author rjy7
- *
+/* This class extends ArrayList rather than BaseTemplateModel so the template can simply
+ * call individual.propertyList. Otherwise, the class must declare a member list object
+ * and the template must call individual.propertyList.groups, which is semantically awkward.
+ * But if we need the methods in BaseTemplateModel we'll have to do that.
  */
+public class GroupedPropertyList extends ArrayList<PropertyGroupTemplateModel> {
 
-// RY We may not need this class. Logic for building the list can be moved to GroupedPropertyList.java.
-// Wait and see how much code remains here - if little, just put in IndividualTemplateModel.
-public class PropertyListBuilder {
-
-    private static final Log log = LogFactory.getLog(PropertyListBuilder.class);
+    private static final long serialVersionUID = 1L;
+    private static final Log log = LogFactory.getLog(GroupedPropertyList.class);
     private static final int MAX_GROUP_DISPLAY_RANK = 99;
     
-    protected Individual subject;
-    protected VitroRequest vreq;
-    protected WebappDaoFactory wdf;
-   
-    PropertyListBuilder(Individual individual, VitroRequest vreq) {
-        this.subject = individual;
+    private Individual subject;
+    private VitroRequest vreq;
+    private WebappDaoFactory wdf;
+    
+    GroupedPropertyList(Individual subject, VitroRequest vreq) {
+        this.subject = subject;
         this.vreq = vreq;
         this.wdf = vreq.getWebappDaoFactory();
-    }
-    
-    // RY Create the list here first to get it working. Then consider moving to GroupedPropertyList constructor.
-    protected List<PropertyGroupTemplateModel> getPropertyList() {
-        
+
         // Determine whether we're editing or not.
         boolean userCanEditThisProfile = getEditingStatus();
-
+    
         // Create the property list for the subject. The properties will be put into groups later.
         List<Property> propertyList = new ArrayList<Property>();
         
@@ -89,36 +82,35 @@ public class PropertyListBuilder {
             //dp.setLabel(dp.getPublicName());
             propertyList.add(dp);
         }
-
+    
         if (userCanEditThisProfile) {
             mergeAllPossibleDataProperties(propertyList);           
         }
-
-        sort(propertyList); //*** Does this do data and obj props, or just obj props??
-
-        // Put the list into groups        
-        List<PropertyGroup> groupList = addPropertiesToGroups(propertyList);
-
-        // Build the template data model from the groupList
-        List<PropertyGroupTemplateModel> groups = new ArrayList<PropertyGroupTemplateModel>(groupList.size());
-        for (PropertyGroup pg : groupList) {
-            groups.add(new PropertyGroupTemplateModel(vreq, pg, subject));
-        }   
-        
-        return groups;
-    }
     
+        sort(propertyList); //*** Does this do data and obj props, or just obj props??
+    
+        // Put the list into groups        
+        List<PropertyGroup> propertyGroupList = addPropertiesToGroups(propertyList);
+    
+        // Build the template data model from the groupList
+        //groups = new ArrayList<PropertyGroupTemplateModel>(propertyGroupList.size());
+        for (PropertyGroup pg : propertyGroupList) {
+            add(new PropertyGroupTemplateModel(vreq, pg, subject));
+        }   
+    
+    }
+
     /** 
      * Return true iff the user is editing. 
      * These tests may change once self-editing issues are straightened out. What we really need to know
-     * is whether the user can edit this profile, not whether in general they are an editor.
+     * is whether the user can edit this profile, not whether in general he/she is an editor.
      */
     private boolean getEditingStatus() { 
         boolean isSelfEditing = VitroRequestPrep.isSelfEditing(vreq);
         boolean isCurator = LoginStatusBean.getBean(vreq).isLoggedInAtLeast(LoginStatusBean.CURATOR);
         return isSelfEditing || isCurator;
     }
-
+    
     @SuppressWarnings("unchecked")
     protected void sort(List<Property> propertyList) {            
         try {
@@ -181,7 +173,7 @@ public class PropertyListBuilder {
             log.error("a null Collection is returned from PropertyInstanceDao.getAllPossiblePropInstForIndividual()");
         }                    
     }    
-
+    
     protected void mergeAllPossibleDataProperties(List<Property> propertyList) {
         DataPropertyDao dpDao = wdf.getDataPropertyDao();
         // RY *** Does this exclude properties in the excluded namespaces already? If not, need same test as above
@@ -203,9 +195,9 @@ public class PropertyListBuilder {
             log.error("a null Collection is returned from DataPropertyDao.getAllPossibleDatapropsForIndividual())");
         }        
     }
-
+    
     private List<PropertyGroup> addPropertiesToGroups(List<Property> propertyList) {
-
+    
         // Get the property groups
         PropertyGroupDao pgDao = wdf.getPropertyGroupDao(); 
         List<PropertyGroup> groupList = pgDao.getPublicGroups(false); // may be returned empty but not null
@@ -213,7 +205,7 @@ public class PropertyListBuilder {
         // List<PropertyGroup> groupList = new ArrayList<PropertyGroup>(); 
                                                 
         int groupCount = groupList.size();
-
+    
         /* 
          * If no property groups are defined, create a dummy group with a null name to signal to the template that it's
          * not a real group. This allows the looping structure in the template to be the same whether there are groups or not.
@@ -226,7 +218,7 @@ public class PropertyListBuilder {
             groupList.add(dummyGroup);
             return groupList;            
         } 
-
+    
         /* 
          * This group will hold properties that are not assigned to any groups. In case no real property groups are
          * populated, we end up with the dummy group case above, and we will change the name to null to signal to the
@@ -241,9 +233,9 @@ public class PropertyListBuilder {
                 log.error("Exception on sorting groupList in addPropertiesToGroups()");
             }                    
         }
-
+    
         populateGroupListWithProperties(groupList, groupForUnassignedProperties, propertyList);
-
+    
         // Remove unpopulated groups
         try {
             int removedCount = pgDao.removeUnpopulatedGroups(groupList);
@@ -267,7 +259,7 @@ public class PropertyListBuilder {
         
         return groupList;
     }
- 
+    
     private void populateGroupListWithProperties(List<PropertyGroup> groupList, 
             PropertyGroup groupForUnassignedProperties, List<Property> propertyList) {
         
@@ -309,12 +301,12 @@ public class PropertyListBuilder {
             }
         }       
     }
-    
-    private class PropertyRanker implements Comparator {
 
+    private class PropertyRanker implements Comparator {
+    
         WebappDaoFactory wdf;
         PropertyGroupDao pgDao;
-
+    
         private PropertyRanker(VitroRequest vreq) {
             this.wdf = vreq.getWebappDaoFactory();
             this.pgDao = wdf.getPropertyGroupDao();
@@ -382,4 +374,15 @@ public class PropertyListBuilder {
             return 0;
         }
     }
+    
+    /* Access methods for templates */
+    
+    public PropertyTemplateModel get(String propertyUri) {
+        return null;
+    }
+    
+    public PropertyTemplateModel getAndRemoveFromList(String propertyUri) {
+        return null;
+    }
 }
+
