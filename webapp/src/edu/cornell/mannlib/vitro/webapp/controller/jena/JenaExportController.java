@@ -90,7 +90,7 @@ public class JenaExportController extends BaseEditController {
 		String ontologyURI = vreq.getParameter("ontologyURI");
 		
 		Model model = null;
-		
+		OntModel ontModel = ModelFactory.createOntologyModel();
 		boolean limitToInferred = false;
 		Model inferenceModel = null;
 		
@@ -129,6 +129,21 @@ public class JenaExportController extends BaseEditController {
 			}
 			
 		}
+		else if("full".equals(subgraphParam)){
+			if("inferred".equals(assertedOrInferredParam)){
+				ontModel = xutil.extractTBox(dataset, ontologyURI,INFERENCE_GRAPH);
+				ontModel.addSubModel(xutil.extractABox(dataset, INFERENCE_GRAPH));
+			}
+			else if("full".equals(assertedOrInferredParam)){
+				ontModel = xutil.extractTBox(dataset, ontologyURI, FULL_GRAPH);
+				ontModel.addSubModel(xutil.extractABox(dataset, FULL_GRAPH));
+			}
+			else{
+				ontModel = xutil.extractTBox(dataset, ontologyURI, ASSERTIONS_GRAPH);
+				ontModel.addSubModel(xutil.extractABox(dataset, ASSERTIONS_GRAPH));
+			}
+			
+		}
 		
 		if ( formatParam == null ) {
 			formatParam = "RDF/XML-ABBREV";  // default
@@ -156,7 +171,10 @@ public class JenaExportController extends BaseEditController {
 			// 2010-11-02 workaround for the fact that ARP now always seems to 
 			// try to parse N3 using strict Turtle rules.  Avoiding headaches
 			// by always serializing out as Turtle instead of using N3 sugar.
-			model.write( outStream, "N3".equals(formatParam) ? "TTL" : formatParam );
+			if(!"full".equals(subgraphParam))
+				model.write( outStream, "N3".equals(formatParam) ? "TTL" : formatParam );
+			else
+				ontModel.writeAll(outStream, "N3".equals(formatParam) ? "TTL" : formatParam, null );
 			outStream.flush();
 			outStream.close();
 		} catch (IOException ioe) {
