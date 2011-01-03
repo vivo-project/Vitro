@@ -6,10 +6,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.rdf.listeners.StatementListener;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.NodeIterator;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import com.hp.hpl.jena.rdf.model.Statement;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.dao.ApplicationDao;
@@ -17,12 +20,16 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 public class ApplicationDaoJena extends JenaBaseDao implements ApplicationDao {
 
+    Property LINKED_NAMESPACE_PROP = ResourceFactory.createProperty(
+            VitroVocabulary.DISPLAY + "linkedNamespace");
+    
 	Integer portalCount = null;
 	List<String> externallyLinkedNamespaces = null;
-
 	
     public ApplicationDaoJena(WebappDaoFactoryJena wadf) {
         super(wadf);
+        getOntModelSelector().getDisplayModel().register(
+                new ExternalNamespacesChangeListener());
     }
 	   
 	
@@ -44,13 +51,17 @@ public class ApplicationDaoJena extends JenaBaseDao implements ApplicationDao {
 		return (getFlag2ValueMap().isEmpty()) ? false : true;
 	}
 
+	private static final boolean CLEAR_CACHE = true;
+	
+	public synchronized List<String> getExternallyLinkedNamespaces() {
+	    return getExternallyLinkedNamespaces(!CLEAR_CACHE);
+	}
 
-    public List<String> getExternallyLinkedNamespaces() {
-        if (externallyLinkedNamespaces == null) {            
+    public synchronized List<String> getExternallyLinkedNamespaces(boolean clearCache) {
+        if (clearCache || externallyLinkedNamespaces == null) {            
             externallyLinkedNamespaces = new ArrayList<String>();
             OntModel ontModel = getOntModelSelector().getDisplayModel();
-            Property linkedNamespaceProp = ontModel.getProperty(VitroVocabulary.DISPLAY + "linkedNamespace");
-            NodeIterator nodes = ontModel.listObjectsOfProperty(linkedNamespaceProp);
+            NodeIterator nodes = ontModel.listObjectsOfProperty(LINKED_NAMESPACE_PROP);
             while (nodes.hasNext()) {
                 RDFNode node = nodes.next();
                 if (node.isLiteral()) {
@@ -66,6 +77,31 @@ public class ApplicationDaoJena extends JenaBaseDao implements ApplicationDao {
             }
         }
         return externallyLinkedNamespaces;
+    }
+    
+    private class ExternalNamespacesChangeListener extends StatementListener {
+        
+        @Override
+        public void addedStatement(Statement stmt) {
+            process(stmt);
+        }
+        
+        @Override
+        public void removedStatement(Statement stmt) {
+            process(stmt);
+        }
+        
+        //We could also listen for end-of-edit events,
+        //but there should be so few of these statments that
+        //it won't be very expensive to run this method multiple
+        //times when the model is updated.
+        
+        private void process(Statement stmt) {
+            if (stmt.getPredicate().equals(LINKED_NAMESPACE_PROP)) {
+                getExternallyLinkedNamespaces(CLEAR_CACHE);
+            }
+        }
+        
     }
     
 }
