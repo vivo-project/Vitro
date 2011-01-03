@@ -131,4 +131,4 @@ var menupageData = {
 };
 </script>
 
-${scripts.add("/js/menupage/browseByVClass.js", "/js/jquery_plugins/jquery.dump.js")}
+${scripts.add("/js/menupage/browseByVClass.js")}
