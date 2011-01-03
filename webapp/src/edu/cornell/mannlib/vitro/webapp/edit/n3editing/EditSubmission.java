@@ -28,6 +28,7 @@ import com.hp.hpl.jena.vocabulary.XSD;
 
 import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
 import edu.cornell.mannlib.vitro.webapp.edit.elements.EditElement;
+import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 
 public class EditSubmission {
     private String editKey;
@@ -114,10 +115,24 @@ public class EditSubmission {
             	String[] valuesArray = queryParameters.get(var); 
                 List<String> valueList = (valuesArray != null) ? Arrays.asList(valuesArray) : null;                
                 if( valueList != null && valueList.size() > 0 ) {
-                    literalsFromForm.put(var, createLiteral(valueList.get(0), field.getRangeDatatypeUri(), field.getRangeLang()));
+                    String value = valueList.get(0);
+                    
+                    // remove any characters that are not valid in XML 1.0
+                    // from user input so they don't cause problems
+                    // with model serialization
+                    value = EditN3Utils.stripInvalidXMLChars(value);
+                    
+                    if (!StringUtils.isEmpty(value)) {
+                        literalsFromForm.put(var, createLiteral(
+                                                    value, 
+                                                    field.getRangeDatatypeUri(), 
+                                                    field.getRangeLang()));
+                    }
+                    
                     if(valueList != null && valueList.size() > 1 )
                         log.debug("For field " + var +", cannot yet handle multiple " +
-                        		"Literals for a single field, using first Literal on list");                            
+                        		"Literals for a single field, using first Literal on list");
+                    
                 }else{
                     log.debug("could not find value for parameter " + var  );
                 }
@@ -194,7 +209,7 @@ public class EditSubmission {
     	validationErrors.putAll(this.basicValidation.validateFiles( fileItems ) );
 	}
 
-	protected Literal createLiteral(String value, String datatypeUri, String lang){
+	protected Literal createLiteral(String value, String datatypeUri, String lang) {
         if( datatypeUri != null ){            
             if( "http://www.w3.org/2001/XMLSchema:anyURI".equals(datatypeUri) ){
                 try {

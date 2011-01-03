@@ -25,6 +25,8 @@ import edu.cornell.mannlib.vitro.webapp.auth.identifier.ServletIdentifierBundleF
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep;
 
+import org.apache.xerces.util.XMLChar;
+
 public class EditN3Utils {
 
     public static String getEditorUri(HttpServletRequest request, HttpSession session, ServletContext context){
@@ -39,6 +41,22 @@ public class EditN3Utils {
             editorUri = RoleIdentifier.getUri(ids);
         
         return editorUri;        
+    }
+    
+    /**
+     * Strips from a string any characters that are not valid in XML 1.0
+     * @param in
+     * @return
+     */
+    public static String stripInvalidXMLChars(String in) {
+        StringBuffer out = new StringBuffer();
+        for (int i = 0; i < in.length(); i++) {
+            char c = in.charAt(i);
+            if (!XMLChar.isInvalid(c)) {
+                out.append(c);
+            }
+        }
+        return out.toString();
     }
     
     
