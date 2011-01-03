@@ -119,7 +119,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     protected String getPropertyStringValue(OntResource res, Property dataprop) {
         if (dataprop != null) {
             try {
-                ClosableIterator stateIt = getOntModel().listStatements(res,dataprop,(Literal)null);
+                ClosableIterator stateIt = res.getModel().listStatements(res,dataprop,(Literal)null);
                 try {
                     if (stateIt.hasNext())
                         return ((Literal)((Statement)stateIt.next()).getObject()).getString();
@@ -142,6 +142,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     protected void addPropertyStringValue(Resource res, Property dataprop, String value, Model model) {
         if (res != null && dataprop != null && value != null && value.length()>0) {
             model.add(res, dataprop, value, XSDDatatype.XSDstring);
+            System.out.println("JenaBaseDao" + value);
         }
     }
     
