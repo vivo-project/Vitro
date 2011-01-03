@@ -2,7 +2,7 @@
 
 <#-- Template for property listing on individual profile page -->
 
-<#list propertyGroups as group>
+<#list propertyGroups.all as group>
 
     <#assign groupname = group.name(nameForOtherGroup)>
     

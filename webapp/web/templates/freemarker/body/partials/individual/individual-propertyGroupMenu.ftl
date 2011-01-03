@@ -8,7 +8,7 @@
     <a name="property-nav"></a>
     
     <ul role="list">
-        <#list propertyGroups as group>
+        <#list propertyGroups.all as group>
             <#assign groupname = group.name(nameForOtherGroup)>
             <#if groupname?has_content>
                 <#-- capitalize will capitalize each word in the name; cap_first only the first. We may need a custom

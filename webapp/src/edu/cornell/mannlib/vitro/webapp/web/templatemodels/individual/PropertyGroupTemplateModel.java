@@ -39,6 +39,10 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
         }
     }
     
+    protected void remove(PropertyTemplateModel ptm) {
+        properties.remove(ptm);
+    }
+    
     /* Freemarker doesn't consider this a getter, because it takes a parameter, so to call it as group.name
      * in the templates the method name must be simply "name" and not "getName."
      */

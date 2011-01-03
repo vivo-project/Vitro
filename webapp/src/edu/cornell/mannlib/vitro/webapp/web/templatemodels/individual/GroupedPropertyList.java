@@ -25,13 +25,9 @@ import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 
-/* This class extends ArrayList rather than BaseTemplateModel so the template can simply
- * call individual.propertyList. Otherwise, the class must declare a member list object
- * and the template must call individual.propertyList.groups, which is semantically awkward.
- * But if we need the methods in BaseTemplateModel we'll have to do that.
- */
-public class GroupedPropertyList extends ArrayList<PropertyGroupTemplateModel> {
+public class GroupedPropertyList extends BaseTemplateModel {
 
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(GroupedPropertyList.class);
@@ -40,6 +36,7 @@ public class GroupedPropertyList extends ArrayList<PropertyGroupTemplateModel> {
     private Individual subject;
     private VitroRequest vreq;
     private WebappDaoFactory wdf;
+    private List<PropertyGroupTemplateModel> groups;
     
     GroupedPropertyList(Individual subject, VitroRequest vreq) {
         this.subject = subject;
@@ -93,9 +90,9 @@ public class GroupedPropertyList extends ArrayList<PropertyGroupTemplateModel> {
         List<PropertyGroup> propertyGroupList = addPropertiesToGroups(propertyList);
     
         // Build the template data model from the groupList
-        //groups = new ArrayList<PropertyGroupTemplateModel>(propertyGroupList.size());
+        groups = new ArrayList<PropertyGroupTemplateModel>(propertyGroupList.size());
         for (PropertyGroup pg : propertyGroupList) {
-            add(new PropertyGroupTemplateModel(vreq, pg, subject));
+            groups.add(new PropertyGroupTemplateModel(vreq, pg, subject));
         }   
     
     }
@@ -375,14 +372,51 @@ public class GroupedPropertyList extends ArrayList<PropertyGroupTemplateModel> {
         }
     }
     
+    
     /* Access methods for templates */
     
-    public PropertyTemplateModel get(String propertyUri) {
-        return null;
+    public List<PropertyGroupTemplateModel> getAll() {
+        return groups;
     }
     
-    public PropertyTemplateModel getAndRemoveFromList(String propertyUri) {
-        return null;
+    public PropertyTemplateModel getProperty(String propertyUri) {
+        
+        PropertyTemplateModel propertyTemplateModel = null;
+        
+        groupLoop: for (PropertyGroupTemplateModel pgtm : groups) {
+            List<PropertyTemplateModel> properties = pgtm.getProperties();
+            for (PropertyTemplateModel ptm : properties) {
+                if (propertyUri.equals(ptm.getUri())) {
+                    propertyTemplateModel = ptm;                    
+                    break groupLoop;
+                }
+            }
+        }
+        
+        return propertyTemplateModel;
+    }
+    
+    public PropertyTemplateModel getPropertyAndRemoveFromList(String propertyUri) {
+        
+        PropertyTemplateModel propertyTemplateModel = null;
+        
+        groupLoop: for (PropertyGroupTemplateModel pgtm : groups) {
+            List<PropertyTemplateModel> properties = pgtm.getProperties();
+            for (PropertyTemplateModel ptm : properties) {
+                if (propertyUri.equals(ptm.getUri())) {
+                    propertyTemplateModel = ptm;   
+                    // Remove the property from the group
+                    properties.remove(ptm);
+                    // If this is the only property in the group, remove the group as well
+                    if (properties.size() == 0) {
+                        groups.remove(pgtm);
+                    }
+                    break groupLoop;
+                }
+            }
+        }
+        
+        return propertyTemplateModel;
     }
 }
 
