@@ -149,38 +149,39 @@ public class DateTimeMigration {
 		       } else  if (yPrecisionURI.equals(precision)) {
 		    	   try {
 		               date = yearFormat.parse(stmt.getObject().asLiteral().getLexicalForm());
+		               newStmt = ResourceFactory.createStatement(stmt.getSubject(), stmt.getPredicate(), getDateTimeLiteral(date) );
 		    	   } catch (ParseException pe) {
-		    		   logger.log("Parse Exception for year literal: " + stmt.getObject().asLiteral().getLexicalForm() + ". skipping statement.");
-		    	   }
-		    	   
-		    	   newStmt = ResourceFactory.createStatement(stmt.getSubject(), stmt.getPredicate(), getDateTimeLiteral(date) );
-		    	   
+		    		   logger.log("Parse Exception for year literal: " + stmt.getObject().asLiteral().getLexicalForm() + 
+		    				   ". The following statement has been removed from the knowledge base " + stmtString(stmt));
+		    	   }		    	   		    	   
 		       } else  if (ymPrecisionURI.equals(precision)) {
 		    	   try {
 		               date = yearMonthFormat.parse(stmt.getObject().asLiteral().getLexicalForm());
+		               newStmt = ResourceFactory.createStatement(stmt.getSubject(), stmt.getPredicate(), getDateTimeLiteral(date) );
 		    	   } catch (ParseException pe) {
-		    		   logger.log("Parse Exception for year literal: " + stmt.getObject().asLiteral().getLexicalForm() + ". skipping statement.");
+		    		   logger.log("Parse Exception for yearMonth literal: " + stmt.getObject().asLiteral().getLexicalForm() + 
+		    				   ". The following statement has been removed from the knowledge base " + stmtString(stmt));
 		    	   }
-		    	   
-		    	   newStmt = ResourceFactory.createStatement(stmt.getSubject(), stmt.getPredicate(), getDateTimeLiteral(date) );
 		       } else  if (ymdPrecisionURI.equals(precision)) {
 		    	   try {
 		               date = yearMonthDayFormat.parse(stmt.getObject().asLiteral().getLexicalForm());
+		               newStmt = ResourceFactory.createStatement(stmt.getSubject(), stmt.getPredicate(), getDateTimeLiteral(date) );
 		    	   } catch (ParseException pe) {
-		    		   logger.log("Parse Exception for year literal: " + stmt.getObject().asLiteral().getLexicalForm() + ". skipping statement.");
-		    	   }
-		    	   
-		    	   newStmt = ResourceFactory.createStatement(stmt.getSubject(), stmt.getPredicate(), getDateTimeLiteral(date) );
-	   
+		    		   logger.log("Parse Exception for yearMonthDay literal: " + stmt.getObject().asLiteral().getLexicalForm() + 
+		    				   ". The following statement has been removed from the knowledge base " + stmtString(stmt));
+		    	   }	   
 		       } else  if (ymdtPrecisionURI.equals(precision)) {
-		    	   logger.log("WARNING: unhandled precision found for individual " + stmt.getSubject().getURI() + ": " + precision );
+		    	   logger.log("WARNING: unhandled precision found for individual " + stmt.getSubject().getURI() + ": " + precision +
+		    			      ". The following statement has been removed from the knowledge base " + stmtString(stmt));
 		       } else {
-		    	   logger.log("WARNING: unrecognized precision found for individual " + stmt.getSubject().getURI() + ": " + precision );
+		    	   logger.log("WARNING: unrecognized precision found for individual " + stmt.getSubject().getURI() + ": " + precision +
+		    			      ". The following statement has been removed from the knowledge base " + stmtString(stmt));
 		       }
-			   
+
+			   retractions.add(stmt);
+			     
 		       if (newStmt != null ) {
 			     additions.add(newStmt);
-			     retractions.add(stmt);
 		       }		   
 		    }
 		   
@@ -217,7 +218,6 @@ public class DateTimeMigration {
 		}	
 	}	
 
-     
     public static Literal getDateTimeLiteral(Date date) {
 
       // Note this loses time zone info, don't know how get parser to extract that
@@ -226,7 +226,13 @@ public class DateTimeMigration {
       Calendar cal = Calendar.getInstance();
       cal.setTime(date);
       XSDDateTime dt = new XSDDateTime(cal);
-      return ResourceFactory.createTypedLiteral(dt);
-        
+      return ResourceFactory.createTypedLiteral(dt);   
     }
+    
+    public static String stmtString(Statement statement) {
+        return  " subject = " + statement.getSubject().getURI() +
+        			" property = " + statement.getPredicate().getURI() +
+                    " object = " + (statement.getObject().isLiteral() ? ((Literal)statement.getObject()).getLexicalForm() + " (Literal)"
+                    		                                          : ((Resource)statement.getObject()).getURI() + " (Resource)");	
+    }    
 }

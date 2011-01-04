@@ -403,9 +403,6 @@ public class ABoxUpdater {
 		//  if the newly added property has an inverse in the new TBox, then for all  existing
 		//  ABox statements involving that inverse (if the inverse is new also there won't be
 		//  any) add the corresponding statement with the new property.
-		//  
-		//  Shouldn't a reasoner be doing this?
-		
 		
 		OntProperty inverseOfAddedProperty = addedProperty.getInverseOf();
 		
@@ -419,8 +416,17 @@ public class ABoxUpdater {
 				while (iter.hasNext()) {
 					
 					Statement stmt = iter.next();
-					Statement newStmt = ResourceFactory.createStatement(stmt.getObject().asResource(), addedProperty, stmt.getSubject());
-					additions.add(newStmt);
+					
+					if (stmt.getObject().isResource()) {
+					   Statement newStmt = ResourceFactory.createStatement(stmt.getObject().asResource(), addedProperty, stmt.getSubject());
+					   additions.add(newStmt);
+					} else {
+						logger.log("WARNING: expected the object of this statement to be a Resource, and it's not. No inverse has been asserted: " + 
+							            " subject = " + stmt.getSubject().getURI() +
+										" property = " + stmt.getPredicate().getURI() +
+						                " object = " + (stmt.getObject().isLiteral() ?  ((Literal)stmt.getObject()).getLexicalForm()
+						                		                                          : ((Resource)stmt.getObject()).getURI()));
+					}
 				}
 				
 				aboxModel.add(additions);
@@ -474,18 +480,22 @@ public class ABoxUpdater {
 		}
 		
 		OntProperty replacementProperty = null;
-		OntProperty parent =  deletedProperty.getSuperProperty();
 		
-		if (parent != null) {
-			replacementProperty = newTboxModel.getOntProperty(parent.getURI());
+		if (!propObj.getNotes().equals("Delete")) {
+		
+			OntProperty parent =  deletedProperty.getSuperProperty();
 			
-			while (replacementProperty == null) {
-				 parent = parent.getSuperProperty();
-				 if (parent == null) {
-					 break;
-				 }
-		    	 replacementProperty = newTboxModel.getOntProperty(parent.getURI()); 			
-			} 
+			if (parent != null) {
+				replacementProperty = newTboxModel.getOntProperty(parent.getURI());
+				
+				while (replacementProperty == null) {
+					 parent = parent.getSuperProperty();
+					 if (parent == null) {
+						 break;
+					 }
+			    	 replacementProperty = newTboxModel.getOntProperty(parent.getURI()); 			
+				} 
+			}
 		}
 		
 		Model deletePropModel = ModelFactory.createDefaultModel();
@@ -574,6 +584,13 @@ public class ABoxUpdater {
                 		                                          : ((Resource)statement.getObject()).getURI()));	
 	}
 
+    public static String stmtString(Statement statement) {
+    	return  " subject = " + statement.getSubject().getURI() +
+    			" property = " + statement.getPredicate().getURI() +
+                " object = " + (statement.getObject().isLiteral() ? ((Literal)statement.getObject()).getLexicalForm() + " (Literal)"
+                		                                          : ((Resource)statement.getObject()).getURI() + " (Resource)");	
+    }    
+	
 	/**
 	 * 
 	 * Update a knowledge base to account for a class deletion in the ontology.
