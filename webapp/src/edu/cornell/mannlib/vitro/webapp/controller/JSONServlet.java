@@ -8,6 +8,7 @@ import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -32,6 +33,7 @@ import com.hp.hpl.jena.ontology.OntModel;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.TabEntitiesController.PageRecord;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.SelectListGenerator;
@@ -82,6 +84,17 @@ public class JSONServlet extends VitroHttpServlet {
         VClass vclass=null;
         JSONObject rObj = new JSONObject();
         
+        if( log.isDebugEnabled() ){
+            Enumeration<String> e = vreq.getParameterNames();
+            while(e.hasMoreElements()){
+                String name = (String)e.nextElement();
+                log.debug("parameter: " + name);
+                for( String value : vreq.getParameterValues(name) ){
+                    log.debug("value for " + name + ": '" + value + "'");
+                }            
+            }
+        }
+        
         try {                                   
             String vitroClassIdStr = vreq.getParameter("vclassId");
             if ( vitroClassIdStr != null && !vitroClassIdStr.isEmpty()){                             
@@ -113,7 +126,7 @@ public class JSONServlet extends VitroHttpServlet {
                 
                 rObj.put("totalCount", map.get("totalCount"));
                 rObj.put("alpha", map.get("alpha"));
-                
+                                
                 List<Individual> inds = (List<Individual>)map.get("entities");
                 List<IndividualTemplateModel> indsTm = new ArrayList<IndividualTemplateModel>();
                 JSONArray jInds = new JSONArray();
@@ -121,7 +134,11 @@ public class JSONServlet extends VitroHttpServlet {
                     JSONObject jo = new JSONObject();
                     jo.put("URI", ind.getURI());
                     jo.put("label",ind.getRdfsLabel());
-                    jo.put("name",ind.getName());                    
+                    jo.put("name",ind.getName());
+                    jo.put("thumbUrl", ind.getThumbUrl());
+                    jo.put("imageUrl", ind.getImageUrl());
+                    jo.put("profileUrl", UrlBuilder.getIndividualProfileUrl(ind, vreq.getWebappDaoFactory()));                                      
+                    
                     jInds.put(jo);
                 }
                 rObj.put("individuals", jInds);
