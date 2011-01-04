@@ -66,13 +66,12 @@ var browseByVClass = {
         
         $.getJSON(url, function(results) {
             $.each(results.individuals, function(i, item) {
-                // alert(results.individuals[i].label);
                 indivLabel = results.individuals[i].label;
                 indivUri = results.individuals[i].URI;
                 // test for individual image is not currently functional
                 // since the image is not yet included in the JSON results
                 if ( !results.individuals[i].image ) {
-                    indivImage = browseByVClass.baseUrl + '/images/dummyImages/person.thumbnail.jpg';
+                    indivImage = browseByVClass.baseUrl + '/images/placeholders/person.thumbnail.jpg';
                 } else {
                     indivImage = results.individuals[i].image;
                 }
@@ -107,7 +106,7 @@ var browseByVClass = {
     }
 };
 
-$(document).ready(function() {   
+$(document).ready(function() {
     browseByVClass.onLoad();
     browseByVClass.defaultVClass();
 });

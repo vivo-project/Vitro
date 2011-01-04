@@ -142,7 +142,7 @@ if (showSelfEdits || showCuratorEdits) {
 	                    <div class="datatypeProperties">
 	                        <div class="datatypePropertyValue">
 	                            <div class="statementWrap thumbnail">
-                                    <img src="<c:url value='/images/dummyImages/person.thumbnail.jpg'/>" 
+                                    <img src="<c:url value='/images/placeholders/person.thumbnail.jpg'/>" 
                                                 title="no image" alt="" width="115"/>
                                     <c:if test="${showEdits}">
                                         <span class="editLinks">${imageLinks}</span>

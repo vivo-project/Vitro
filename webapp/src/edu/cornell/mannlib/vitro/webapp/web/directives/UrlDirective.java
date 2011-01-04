@@ -75,7 +75,7 @@ public class UrlDirective extends BaseTemplateDirectiveModel {
         map.put("params", params);
         
         List<String> examples = new ArrayList<String>();
-        examples.add("<@" + name + " path=\"/images/dummyImages/person.thumbnail.jpg\" />");
+        examples.add("<@" + name + " path=\"/images/placeholders/person.thumbnail.jpg\" />");
         map.put("examples", examples);
         
         return mergeToHelpTemplate(map, env);

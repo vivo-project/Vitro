@@ -53,7 +53,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	private static final String DEFAULT_NAMESPACE = ConfigurationProperties
 			.getProperty("Vitro.defaultNamespace");
 
-	public static final String DUMMY_THUMBNAIL_URL = "/images/dummyImages/person.thumbnail.jpg";
+	public static final String DUMMY_THUMBNAIL_URL = "/images/placeholders/person.thumbnail.jpg";
 
 	/** Limit file size to 6 megabytes. */
 	public static final int MAXIMUM_FILE_SIZE = 6 * 1024 * 1024;
