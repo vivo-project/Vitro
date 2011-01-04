@@ -39,7 +39,7 @@
                 <p class="external-auth"><a class="blue button" href="${externalAuthUrl}">${externalAuthName}</a></p>
                 <p class="or-auth">or</p>
 
-                <h3 class="internal-auth" >Login using a different account</h3>
+                <h3 class="internal-auth" >Log in using your ${siteName} account</h3>
             </#if>
 
             <label for="email">Email</label>

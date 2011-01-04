@@ -51,7 +51,8 @@ public class LoginWidget extends Widget {
         ERROR_MESSAGE("errorMessage"),
         EXTERNAL_AUTH_NAME("externalAuthName"),
         EXTERNAL_AUTH_URL("externalAuthUrl"),
-        CANCEL_URL("cancelUrl");
+        CANCEL_URL("cancelUrl"),
+        SITE_NAME("siteName");
 
         private final String variableName;
         
@@ -76,6 +77,8 @@ public class LoginWidget extends Widget {
             urls = env.getDataModel().get("urls");
             State state = getCurrentLoginState(request);
             log.debug("State on exit: " + state);
+            
+            String siteName = env.getDataModel().get("siteName").toString();
                         
             switch (state) {
             case LOGGED_IN:
@@ -92,7 +95,7 @@ public class LoginWidget extends Widget {
                 values = showPasswordChangeScreen(request);
                 break;
             default:
-                values = showLoginScreen(request);
+                values = showLoginScreen(request, siteName);
             }
         } catch (Exception e) {
             log.error(e);
@@ -108,7 +111,7 @@ public class LoginWidget extends Widget {
     /**
      * User is starting the login process. Show them the login screen.
      */
-    private WidgetTemplateValues showLoginScreen(HttpServletRequest request)
+    private WidgetTemplateValues showLoginScreen(HttpServletRequest request, String siteName)
             throws IOException {
         LoginProcessBean bean = LoginProcessBean.getBean(request);
         log.trace("Going to login screen: " + bean);
@@ -133,6 +136,8 @@ public class LoginWidget extends Widget {
         if (!errorMessage.isEmpty()) {
             values.put(TemplateVariable.ERROR_MESSAGE.toString(), errorMessage);
         }
+        
+        values.put(TemplateVariable.SITE_NAME.toString(), siteName);
 
         return values;
     }
