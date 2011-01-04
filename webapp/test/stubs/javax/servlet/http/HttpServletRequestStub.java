@@ -24,6 +24,7 @@ import javax.servlet.http.HttpSession;
 /**
  * A simple stub for HttpServletRequest
  */
+@SuppressWarnings("deprecation")
 public class HttpServletRequestStub implements HttpServletRequest {
 	// ----------------------------------------------------------------------
 	// Stub infrastructure

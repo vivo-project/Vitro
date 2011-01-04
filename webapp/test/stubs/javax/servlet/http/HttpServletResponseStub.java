@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * A simple stub for HttpServletResponse
  */
+@SuppressWarnings("deprecation")
 public class HttpServletResponseStub implements HttpServletResponse {
 	// ----------------------------------------------------------------------
 	// Stub infrastructure
