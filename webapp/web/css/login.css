@@ -41,8 +41,8 @@ p.request-account {
     float: left;
 }
 #login-form p.external-auth {
-    margin-left: 36px;
     margin-top: 1em;
+    text-align: center;
 }
 .or-auth{
     margin-left: 135px;
