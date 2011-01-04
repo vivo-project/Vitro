@@ -421,11 +421,7 @@ public class ABoxUpdater {
 					   Statement newStmt = ResourceFactory.createStatement(stmt.getObject().asResource(), addedProperty, stmt.getSubject());
 					   additions.add(newStmt);
 					} else {
-						logger.log("WARNING: expected the object of this statement to be a Resource, and it's not. No inverse has been asserted: " + 
-							            " subject = " + stmt.getSubject().getURI() +
-										" property = " + stmt.getPredicate().getURI() +
-						                " object = " + (stmt.getObject().isLiteral() ?  ((Literal)stmt.getObject()).getLexicalForm()
-						                		                                          : ((Resource)stmt.getObject()).getURI()));
+						logger.log("WARNING: expected the object of this statement to be a Resource but it is not. No inverse has been asserted: " + stmtString(stmt));
 					}
 				}
 				
@@ -438,7 +434,7 @@ public class ABoxUpdater {
 							" with predicate " + addedProperty.getURI() + " " + 
 							((additions.size() > 1) ? "were" : "was") 
 							+ " added (as an inverse to existing  " + inverseOfAddedProperty.getURI() + 
-							" assertions");
+							" assertions)");
 				}
 				
 			} finally {

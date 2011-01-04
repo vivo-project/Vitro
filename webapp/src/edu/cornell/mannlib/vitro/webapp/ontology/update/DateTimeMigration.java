@@ -114,11 +114,16 @@ public class DateTimeMigration {
 		    record.recordRetractions(retractions);
 		    aboxModel.add(additions);
 		    record.recordAdditions(additions);
-		   
+		    
+			if (additions.size() > 0) {	
+			   long count = additions.size() / 2;	
+			   logger.log(count + "Academic Term and/or Year statement" + 	((count > 1) ? "s" : "") + " were updated to use dateTimeInterval instead");
+			}
 		} finally {
 			aboxModel.leaveCriticalSection();
 		}	
 	}
+		
 	/**
 	 * 
 	 *  
@@ -189,7 +194,12 @@ public class DateTimeMigration {
 		    record.recordRetractions(retractions);
 		    aboxModel.add(additions);
 		    record.recordAdditions(additions);
-		   
+		    
+			if (additions.size() > 0) {
+					logger.log(additions.size() + " date/time assertions" + 
+							((additions.size() > 1) ? "s" : "") +
+							" were updated to the 1.2 representation.");
+			}		   
 		} finally {
 			aboxModel.leaveCriticalSection();
 		}	
@@ -231,8 +241,8 @@ public class DateTimeMigration {
     
     public static String stmtString(Statement statement) {
         return  " subject = " + statement.getSubject().getURI() +
-        			" property = " + statement.getPredicate().getURI() +
-                    " object = " + (statement.getObject().isLiteral() ? ((Literal)statement.getObject()).getLexicalForm() + " (Literal)"
+        		" property = " + statement.getPredicate().getURI() +
+                " object = " + (statement.getObject().isLiteral() ? ((Literal)statement.getObject()).getLexicalForm() + " (Literal)"
                     		                                          : ((Resource)statement.getObject()).getURI() + " (Resource)");	
     }    
 }
