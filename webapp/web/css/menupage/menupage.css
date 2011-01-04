@@ -102,8 +102,9 @@ ul#find-filters li{
     display: block;
     height: 35px;
     line-height: 35px;
+    padding-left: 10px;
 }
-ul#find-filters li:last-child{}   
+ul#find-filters li:last-child{ 
     border-bottom: 0;
 }
 ul#find-filters a{
