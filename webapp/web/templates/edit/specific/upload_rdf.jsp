@@ -17,7 +17,7 @@
     <p><input name="rdfUrl" type="text" style="width:67%;" value="<c:out value='${param.rdfUrl}'/>"/></p>
     
     <p>Or upload a file from your computer: </p>
-    <p><input type="file" name="rdfStream"/> </p>
+    <p><input type="file" name="rdfStream" size="60"/> </p>
     
     <ul style="list-style-type:none;">
         <li><input type="radio" name="mode" value="directAddABox" checked="checked"/>add instance data (supports large data files)</li> 
