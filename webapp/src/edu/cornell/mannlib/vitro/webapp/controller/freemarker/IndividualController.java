@@ -660,7 +660,7 @@ public class IndividualController extends FreemarkerHttpServlet {
         body.put("title","Individual Not Found");
         body.put("errorMessage", "The individual was not found in the system.");
         
-        return new TemplateResponseValues(Template.TITLED_ERROR_MESSAGE.toString(), body, HttpServletResponse.SC_NOT_FOUND);
+        return new TemplateResponseValues(Template.TITLED_ERROR_MESSAGE.toString(), body);
     }
 
 }
