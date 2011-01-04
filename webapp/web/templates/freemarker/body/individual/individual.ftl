@@ -33,26 +33,6 @@
                 <li role="listitem"><a class="icon-rdf" href="#">RDF</a></li>
             </ul>
         </nav>
-            
-        <#-- Email -->    
-        <#assign email = propertyGroups.getPropertyAndRemoveFromList("${core}email")!>
-        <#if email?has_content>
-            <ul>
-                <#list email.statements as statement>
-                    <li><a class="email" href="#"><span class ="picto-font  picto-email">M</span> ${statement.value}</a></li>
-                </#list>
-            </ul>
-        </#if>
-          
-        <#-- Phone --> 
-        <#assign phone = propertyGroups.getPropertyAndRemoveFromList("${core}phoneNumber")!>
-        <#if phone?has_content>
-            <ul>
-                <#list phone.statements as statement>
-                    <li><a class="tel" href="#"><img class ="icon-phone" src="${urls.images}/individual/phone-icon.gif" alt="phone icon" />${statement.value}</a></li>
-                </#list>
-            </ul>
-        </#if>      
                 
         <#-- Links -->
         <nav role="navigation">
@@ -80,16 +60,6 @@
                     </#if>
                 </h1>
             </#if>
-               
-            <#-- Positions -->
-            <#assign positions = propertyGroups.getPropertyAndRemoveFromList("${core}personInPosition")!>
-            <#if positions?has_content> <#-- true when the property is in the list, even if not populated (when editing) -->
-                <h2>Positions</h2>
-                <ul id ="individual-positions" role="list">
-                    <@p.objectPropertyList positions.statements positions.template />
-                </ul>
-            </#if>
-        </header>
          
         <#-- Overview -->
         <#assign overview = propertyGroups.getPropertyAndRemoveFromList("${core}overview")!> 
@@ -98,16 +68,7 @@
                 <p class="individual-overview">${statement.value}</p>
             </#list>
         </#if>
-        
-        <#-- Research Areas -->
-        <#assign researchAreas = propertyGroups.getPropertyAndRemoveFromList("${core}hasResearchArea")!> 
-        <#if researchAreas?has_content> <#-- true when the property is in the list, even if not populated (when editing) -->
-            <h2>Research Areas</h2>                   
-            <ul id="individual-areas" role="list">
-                <@p.simpleObjectPropertyList researchAreas />
-            </ul>
-        </#if>
-                
+   
     </section>
 </section>
 
@@ -115,7 +76,8 @@
     <section id="sparklines-publications" role="region">
          <#include "individual-sparklineVisualization.ftl">
          
-         <#-- RY Move out of this template when it's converted to individual--foaf-person.ftl. Will we have an organization-specific individual template? -->
+         <#-- RY Will we have an individual--foaf-organization.ftl template? If so, move this there and remove from here.
+         Also remove the method IndividualTemplateModel.isOrganization(). -->
          <#if individual.organization >
 	     	<div style="width: 100%;">
 				<div style="width: 30%;float:left;margin-top: 5%;margin-right: 10px;"><img src="${urls.images}/visualization/temporal_vis_icon.jpg"/></div>
@@ -123,23 +85,6 @@
 			</div>		
 			<#--<div>VISMODE: ${individual.moniker}</div>-->
 		</#if>
-    </section>
-    
-    <section id="co-authors" role="region">
-        <header>
-            <h3><span class="grey">10 </span>Co-Authors</h3>
-        </header>
-        
-        <ul role="list">
-            <li role="listitem"><a href="#"><img class="co-author" src="${urls.images}/individual/Bacall.jpg" /></a></li>
-            <li role="listitem"><a href="#"><img class="co-author" src="${urls.images}/individual/Bogart.jpg" /></a></li>
-            <li role="listitem"><a href="#"><img class="co-author" src="${urls.images}/individual/Gable.jpg" /></a></li>
-            <li role="listitem"><a href="#"><img class="co-author" src="${urls.images}/individual/Grant.jpg" /></a></li>
-            <li role="listitem"><a href="#"><img class="co-author" src="${urls.images}/individual/Leigh.jpg" /></a></li>
-            <li role="listitem"><a href="#"><img class="co-author" src="${urls.images}/individual/Welles.jpg" /></a></li>
-        </ul>
-        
-        <p class="view-all-coauthors"><a class="view-all-style" href="#">View All <span class="pictos-arrow-10">4</span></a></p>
     </section>
 </section>
 

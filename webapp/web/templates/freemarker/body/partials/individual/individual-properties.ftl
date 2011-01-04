@@ -19,13 +19,13 @@
         <#if groupname?has_content>
             <h2><a name="${groupname}"></a>${groupname?capitalize}</h2>
         </#if>
-        
+
         <#-- List the properties in the group -->        
         <#list group.properties as property>
             <article class="property" role="article">
                 <#-- Property display name -->
                 <h3>${property.name}</h3>
-                    
+
                 <#-- List the statements for each property -->   
                 <ul class="property-list" role="list"> 
                     <#-- data property -->  
