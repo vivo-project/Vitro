@@ -2,7 +2,12 @@
 
 <#-- Template for individual profile page -->
 
+<#-- RY This is actually the person profile page, but we cannot move it to its proper location until selection of template by
+annotaiton has been implemented. -->
+
 <#import "lib-list.ftl" as l>
+<#import "lib-properties.ftl" as p>
+<#assign core = "http://vivoweb.org/ontology/core#">
 
 <#assign editingClass>
     <#if editStatus.showEditLinks>editing<#else></#if>
@@ -17,11 +22,11 @@
 <section id="individual-intro-person" class="vcard" role="region">
     <section id="left-side" role="region"> 
         <#-- Thumbnail -->
-            <#if individual.thumbUrl??>
-                <a href="${individual.imageUrl}"><img class="individual-photo2" src="${individual.thumbUrl}" title="click to view larger image" alt="${individual.name}" width="115" /></a>
-            <#elseif individual.person>
-                <img class="individual-photo2" src="${urls.images}/placeholders/person.thumbnail.jpg" title = "no image" alt="placeholder image" width="115" />                                                        
-            </#if>
+        <#if individual.thumbUrl??>
+            <a href="${individual.imageUrl}"><img class="individual-photo2" src="${individual.thumbUrl}" title="click to view larger image" alt="${individual.name}" width="115" /></a>
+        <#elseif individual.person>
+            <img class="individual-photo2" src="${urls.images}/placeholders/person.thumbnail.jpg" title = "no image" alt="placeholder image" width="115" />                                                        
+        </#if>
         
         <nav role="navigation">
             <ul id ="individual-tools-people" role="list">
@@ -31,17 +36,33 @@
                 <li role="listitem"><a class="icon-rdf" href="#">RDF</a></li>
             </ul>
         </nav>
-        
-        <a class="email" href="#"><span class ="picto-font  picto-email">M</span> email@cornell.edu</a> <a class="tel" href="#"><img class ="icon-phone" src="${urls.images}/individual/phone-icon.gif" alt="phone icon" />555 567 7878</a>
-        
+            
+        <#-- Email -->    
+        <#assign email = propertyGroups.getPropertyAndRemoveFromList("${core}email")!>
+        <#if email?has_content>
+            <ul>
+                <#list email.statements as statement>
+                    <li><a class="email" href="#"><span class ="picto-font  picto-email">M</span> ${statement.value}</a></li>
+                </#list>
+            </ul>
+        </#if>
+          
+        <#-- Phone --> 
+        <#assign phone = propertyGroups.getPropertyAndRemoveFromList("${core}phoneNumber")!>
+        <#if phone?has_content>
+            <ul>
+                <#list phone.statements as statement>
+                    <li><a class="tel" href="#"><img class ="icon-phone" src="${urls.images}/individual/phone-icon.gif" alt="phone icon" />${statement.value}</a></li>
+                </#list>
+            </ul>
+        </#if>      
+                
         <#-- Links -->
         <nav role="navigation">
             <ul id ="individual-urls-people" role="list">
-            <@l.firstLastList>
                 <#list individual.links as link>                               
                     <li role="listitem"><a href="${link.url}">${link.anchor}</a></li>                                 
-                </#list>
-            </@l.firstLastList>          
+                </#list>         
             </ul>
         </nav>
     </section>
@@ -51,34 +72,46 @@
             <#if relatedSubject??>
                 <h2>${relatedSubject.relatingPredicateDomainPublic} for ${relatedSubject.name}</h2>
                 <p><a href="${relatedSubject.url}">&larr; return to ${relatedSubject.name}</a></p>                
-            <#else>
-                <#-- Label -->
-                <h1 class="fn">${individual.name}
+            <#else>                
+                <h1 class="fn">
+                    <#-- Label -->
+                    ${individual.name}
                         
-                <#-- Moniker -->
-                <#if individual.moniker?has_content>
+                    <#-- Moniker -->
+                    <#if individual.moniker?has_content>
                         <span class="preferred-title">${individual.moniker}</span>                  
-                </#if>
+                    </#if>
                 </h1>
             </#if>
                
-            <h2>Current Positions</h2>
-            
-            <ul id ="individual-positions" role="list">
-                <li role="listitem"><a href="#">Consectetur adipiscing elit, sed est erat.</a></li>
-                <li role="listitem"><a href="#">Mauris posuere dui quis massa.</a></li>
-            </ul>
-        </header>
-        
-        <p class="individual-overview">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed est erat, tristique non bibendum eu, mollis non est. Cras vehicula velit quis elit porta vel molestie tellus blandit. Donec eget magna dolor. Phasellus faucibus mollis lorem at dapibus. Sed ultricies lobortis mauris in volutpat. Cras mattis neque ut sapien pellentesque fringilla. Mauris posuere dui quis massa mattis id mollis nibh accumsan.  [+]</p>
-        
-        <h2>Research Areas</h2>
+            <#-- Current positions -->
+            <#assign positions = propertyGroups.getProperty("${core}personInPosition")!>
+            <#if positions?has_content> <#-- true when the property is in the list, even if there are no statements (when editing) -->
+                <h2>Current Positions</h2>
+                <ul id ="individual-positions" role="list">
+                    <@p.objectProperty positions />
+                </ul>
+            </#if>
 
-        <ul id ="individual-areas" role="list">
-            <li role="listitem"><a href="#">Researcher (5)</a></li>
-            <li role="listitem"><a href="#">Principal Investigator (3)</a></li>
-            <li role="listitem"><a href="#">Teacher (2)</a></li>
-        </ul>
+        </header>
+         
+        <#-- Overview -->
+        <#assign overview = propertyGroups.getPropertyAndRemoveFromList("${core}overview")!> 
+        <#if overview?has_content> <#-- true when the property is in the list, even if there are no statements (when editing) -->
+            <#list overview.statements as statement>
+                <p class="individual-overview">${statement.value}</p>
+            </#list>
+        </#if>
+        
+        <#-- Research Areas -->
+        <#assign researchAreas = propertyGroups.getPropertyAndRemoveFromList("${core}hasResearchArea")!> 
+        <#if researchAreas?has_content> <#-- true when the property is in the list, even if there are no statements (when editing) -->
+            <h2>Research Areas</h2>                   
+            <ul id="individual-areas" role="list">
+                <@p.objectProperty researchAreas />
+            </ul>
+        </#if>
+                
     </section>
 </section>
 
@@ -86,6 +119,7 @@
     <section id="sparklines-publications" role="region">
          <#include "individual-sparklineVisualization.ftl">
          
+         <#-- RY Move out of this template when it's converted to individual--foaf-person.ftl. Will we have an organization-specific individual template? -->
          <#if individual.organization >
 	     	<div style="width: 100%;">
 				<div style="width: 30%;float:left;margin-top: 5%;margin-right: 10px;"><img src="${urls.images}/visualization/temporal_vis_icon.jpg"/></div>
@@ -93,12 +127,6 @@
 			</div>		
 			<#--<div>VISMODE: ${individual.moniker}</div>-->
 		</#if>
-         
-         <#--<header><img src="${urls.home}/images/individual/sparkline.gif" alt="" />
-            <h3><span class="grey">2</span> publications <span class="publication-year-range grey">within the last 10 years</span></h3>
-        </header>
-        
-        <p><a class="all-vivo-publications" href="#">All VIVO publications & co-author network.</a></p>-->
     </section>
     
     <section id="co-authors" role="region">
