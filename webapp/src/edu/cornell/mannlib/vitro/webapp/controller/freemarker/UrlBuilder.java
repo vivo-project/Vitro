@@ -44,7 +44,9 @@ public class UrlBuilder {
         SEARCH("/search"),
         SITE_ADMIN("/siteAdmin"),
         TERMS_OF_USE("/termsOfUse"),
-        VISUALIZATION("/visualization");
+        VISUALIZATION("/visualization"),
+        VISUALIZATION_AJAX("/visualizationAjax"),
+        VISUALIZATION_DATA("/visualizationData");
 
         private final String path;
         

@@ -47,7 +47,7 @@ public class IndividualTemplateModel extends BaseTemplateModel {
     }
     
     public String getVisualizationUrl() {
-        return isPerson() ? getUrl(Route.VISUALIZATION.path(), "uri", getUri()) : null;
+        return isPerson() ? getUrl(Route.VISUALIZATION_AJAX.path(), "uri", getUri()) : null;
     }
 
     public String getImageUrl() {
