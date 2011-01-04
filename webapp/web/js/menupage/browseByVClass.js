@@ -68,14 +68,13 @@ var browseByVClass = {
             $.each(results.individuals, function(i, item) {
                 indivLabel = results.individuals[i].label;
                 indivUri = results.individuals[i].URI;
-                // test for individual image is not currently functional
-                // since the image is not yet included in the JSON results
-                if ( !results.individuals[i].image ) {
+                indivProfileUrl = results.individuals[i].profileUrl;
+                if ( !results.individuals[i].imageUrl ) {
                     indivImage = browseByVClass.baseUrl + '/images/placeholders/person.thumbnail.jpg';
                 } else {
-                    indivImage = results.individuals[i].image;
+                    indivImage = browseByVClass.baseUrl + results.individuals[i].imageUrl;
                 }
-                browseByVClass.individualsInVClass.append('<article class="vcard individual-foaf-person" role="navigation"> <img src="'+ indivImage +'" width="90" height="90" alt="'+ indivLabel +'" /><h1 class="fn"><a href="'+ indivUri +'" title="View the profile page for '+ indivLabel +'">'+ indivLabel + '</a></h1><p>core:preferredTitle <span class="org">org from preferredTitle??</span></p></article>');
+                browseByVClass.individualsInVClass.append('<article class="vcard individual-foaf-person" role="navigation"> <img src="'+ indivImage +'" width="90" height="90" alt="'+ indivLabel +'" /><h1 class="fn"><a href="'+ indivProfileUrl +'" title="View the profile page for '+ indivLabel +'">'+ indivLabel + '</a></h1><p>core:preferredTitle <span class="org">org from preferredTitle??</span></p></article>');
             })
             // set selected class and alpha
             browseByVClass.selectedVClass(results.vclass.URI);
