@@ -130,18 +130,21 @@ public class TBoxUpdater {
 				 // first check to see if the site has a local value change
 				 // that should override the deletion
 				 List<RDFNode> siteObjects = siteModel.listObjectsOfProperty(subject, predicate).toList();
+				
 				 if (siteObjects.size() > 1) {
-					 logger.logError("Error: found " + siteObjects.size() +
+					 logger.log("WARNING: found " + siteObjects.size() +
 							 " statements with subject = " + subject.getURI() + 
 							 " and property = " + predicate.getURI() +
 							 " in the site database. (maximum of one is expected)");
 				 }
+				 
 				 if (siteObjects.size() > 0) {
 					 RDFNode siteNode = siteObjects.get(0);
 					 if (siteNode.equals(oldObject)) {
 						 retractions.add(siteModel.listStatements(subject, predicate, (RDFNode) null));		 
 					 }
 				 }
+				 
 				 continue;				 			 
 			 }
 			
