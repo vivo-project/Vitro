@@ -183,6 +183,37 @@ public class DateTimeWithPrecisionTest {
     }
     
     @Test
+    public void precisionNoValueTest() throws Exception{
+        String FIELDNAME = "testfield";       
+        Field field = new Field();
+        field.setName(FIELDNAME);
+        DateTimeWithPrecision dtwp = new DateTimeWithPrecision(field);
+        
+        Map<String,String[]> queryParameters = new HashMap<String, String[]>();
+        //field is not filled out at all
+        //no year
+        //no months
+        //no days
+        //no hours
+        //no minutes
+        //no seconds
+
+        EditConfiguration editConfig=null;
+        Map<String,String> validationMsgs = dtwp.getValidationMessages("testfield", editConfig, queryParameters);        
+        Assert.assertNotNull(validationMsgs);
+        Assert.assertTrue(validationMsgs.size() == 0 );
+        
+        String precisionURI = null;
+        precisionURI = dtwp.getSubmittedPrecision( queryParameters );
+        
+        Assert.assertNotNull(precisionURI);
+        Assert.assertEquals(VitroVocabulary.Precision.NONE.uri(), precisionURI);    
+        
+        Literal date = dtwp.getDateTime( queryParameters);        
+        Assert.assertNull(date);                  
+    }
+    
+    @Test
     public void getDateLiteralTest(){
         String FIELDNAME = "testfield";       
         Field field = new Field();

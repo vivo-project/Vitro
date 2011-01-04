@@ -153,6 +153,11 @@ public class DateTimeWithPrecision extends BaseEditElement {
     
     protected Literal getDateTime( Map<String, String[]> queryParameters ) {
         Integer year = parseToInt(fieldName+".year", queryParameters);
+        
+        //this is the case where date has not been filled out at all.        
+        if( year == null ) 
+            return null;
+        
         Integer month = parseToInt(fieldName+".month", queryParameters);
         if( month == null || month == 0 ) 
             month = 1;        
@@ -232,6 +237,10 @@ public class DateTimeWithPrecision extends BaseEditElement {
             }            
         }
         
+        /* the field wasn't filled out at all */
+        if( indexOfFirstNull == 0 )
+            return VitroVocabulary.Precision.NONE.uri();
+        
         /* if they all had values then we have seconds precision */
         if( indexOfFirstNull == -1 )
             return VitroVocabulary.Precision.SECOND.uri();
@@ -247,7 +256,7 @@ public class DateTimeWithPrecision extends BaseEditElement {
             }
         }
         if( nonNullAfterFirstNull )
-            throw new Exception("cannot determine precision, there were filledout values after the first un-filledout value, ");
+            throw new Exception("cannot determine precision, there were filled out values after the first un-filledout value, ");
         else{            
             return precisions[ indexOfFirstNull ].uri(); 
         }
