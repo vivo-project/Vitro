@@ -65,10 +65,10 @@ div.bottom{
 }
 /* <------ INDIVIDUAL INTRO FOR ANY CLASS*/
 #individual-intro{
-    width: 920px;
-    margin: 0 auto;
+    float: left;
+    width: 75%;
     margin-top: 35px;
-    margin-bottom: 30px;
+    margin-bottom: 45px;
 }
 #individual-intro h1{
     padding-bottom: 24px;  
@@ -94,6 +94,7 @@ div.bottom{
 #left-side img.individual-photo2{
     width: 160px;
     height: 160px;
+    float: left;
 }
 ul#individual-tools-people{
     margin-top: 5px;
@@ -138,7 +139,7 @@ ul#individual-tools li{
 .icon-rdf{
     position: absolute;
     font-size: 1.125em;
-    top: 16px;
+    top: 13px;
 }
 .picto-email{
     font-size: 1.375em;
@@ -186,10 +187,10 @@ ul#individual-urls-people li{
 #individual-info{
     width: 65%;
     float: left;
-    padding: 60px 0 0 10px;
+    padding: 10px 0 0 10px;
 }
 #individual-info h1.fn{
-    padding-bottom: 24px;
+    padding-bottom: 12px;
 }
 h1.fn .preferred-title {
     padding-left: 10px;
@@ -228,9 +229,6 @@ ul#individual-areas li{
     border-right: 1px solid #5e6363;
     padding-right: 10px;
     padding-left: 10px;
-}
-ul#individual-areas li a{
-    color: #2485ae;
 }
 /* <------ INDIVIDUAL VISUALIZATION */
 #publications-visualization{
