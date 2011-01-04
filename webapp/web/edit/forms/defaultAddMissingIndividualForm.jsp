@@ -231,11 +231,13 @@
 
     String submitButtonLabel="";
     /* title is used by pre and post form fragments */
+    //set title to Edit to maintain functionality from 1.1.1 and avoid updates to Selenium tests
+    request.setAttribute("title", "Edit");
     if (objectUri != null) {
-        request.setAttribute("title", "Edit \""+propDomainPublic+"\" entry for " + subject.getName());
+        request.setAttribute("formTitle", "Edit \""+propDomainPublic+"\" entry for " + subject.getName());
         submitButtonLabel = "Save changes";
     } else {
-        request.setAttribute("title","Create \""+propDomainPublic+"\" entry for " + subject.getName());
+        request.setAttribute("formTitle","Create \""+propDomainPublic+"\" entry for " + subject.getName());
         submitButtonLabel = "Create \""+propDomainPublic+"\" entry";
     }
 
@@ -246,7 +248,7 @@
     <jsp:param name="useAutoComplete" value="false"/>
 </jsp:include>
 
-<h2>${title}</h2>
+<h2>${formTitle}</h2>
 <form action="<c:url value="/edit/processRdfForm2.jsp"/>" ><br/>
     <v:input type="text" label="name (required)" id="name" size="30"/><br/>    
     <v:input type="submit" id="submit" value="<%=submitButtonLabel%>" cancel="true"/>
