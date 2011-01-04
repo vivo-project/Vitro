@@ -197,7 +197,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
                 value = element.getChildNodes().item(0).getNodeValue();   
                 log.debug("Value of config parameter " + nodeName + " = " + value);
             } else {
-                log.warn("No value for config parameter " + nodeName);
+                log.debug("No value for config parameter " + nodeName);
             }
             return value;           
         }
