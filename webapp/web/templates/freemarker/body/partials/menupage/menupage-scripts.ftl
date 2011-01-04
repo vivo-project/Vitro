@@ -1,6 +1,6 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
-<#-- Template for browsing VClasses in menupages-->
+<#-- Template to setup and call scripts for menupages -->
 
 <#----------------------------------------------------------------------------------
 requestedPage is currently provided by FreemarkerHttpServlet. Should this be moved

@@ -1,6 +1,6 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
-<#-- Template for class groups menu in menupages -->
+<#-- Template for rendering the classes in a class group for menupages -->
 
 <nav role="navigation">
     <ul id="vgraph-childClasses">

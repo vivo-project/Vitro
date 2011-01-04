@@ -1,6 +1,6 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
-<#-- Template for browsing class groups in menupages -->
+<#-- Template for browsing individuals in class groups for menupages -->
 
 <section id="browse-by" role="region">
     <h2>Browse by</h2>

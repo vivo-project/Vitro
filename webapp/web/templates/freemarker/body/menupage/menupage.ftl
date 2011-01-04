@@ -6,7 +6,7 @@
     <section id="content-generic-class" role="region">
         <h4>Visual Graph</h4>
     
-        <#include "menupage-classGroupsMenu.ftl">
+        <#include "menupage-vClassesInClassgroup.ftl">
     
         <section id="generic-class-graph" role="region">
             <img src="${urls.images}/menupage/visual-graph-generic-class.jpg" width="500" height="283" alt ="" />
@@ -18,4 +18,4 @@
 
 ${stylesheets.add("/css/menupage/menupage.css")}
 
-<#include "menupage-browseByVClass.ftl">
+<#include "menupage-scripts.ftl">

@@ -5,7 +5,7 @@
     <section id="content-foaf-person" role="region">
         <h4>Visual Graph</h4>
         
-        <#include "menupage-classGroupsMenu.ftl">
+        <#include "menupage-vClassesInClassgroup.ftl">
           
         <section id="foaf-person-graph" role="region">
             <img src="${urls.images}/menupage/visual-graph.jpg" alt="" />
@@ -43,12 +43,12 @@
     
         <nav id="profile-photo-display" role = "navigation">
             <ul>
-                <li><img src="${urls.images}/menupage/person-thumbnail.jpg" width="90" height="90" alt="foaf:lastName, foaf:firstName" /></li>
-                <li><img src="${urls.images}/menupage/person-thumbnail.jpg" width="90" height="90" alt="foaf:lastName, foaf:firstName" /></li>
-                <li><img src="${urls.images}/menupage/person-thumbnail.jpg" width="90" height="90" alt="foaf:lastName, foaf:firstName" /></li>
-                <li><img src="${urls.images}/menupage/person-thumbnail.jpg" width="90" height="90" alt="foaf:lastName, foaf:firstName" /></li>
-                <li><img src="${urls.images}/menupage/person-thumbnail.jpg" width="90" height="90" alt="foaf:lastName, foaf:firstName" /></li>
-                <li><img src="${urls.images}/menupage/person-thumbnail.jpg" width="90" height="90" alt="foaf:lastName, foaf:firstName" /></li>
+                <li><img src="${urls.images}/placeholders/person.thumbnail.jpg" width="90" height="90" alt="foaf:lastName, foaf:firstName" /></li>
+                <li><img src="${urls.images}/placeholders/person.thumbnail.jpg" width="90" height="90" alt="foaf:lastName, foaf:firstName" /></li>
+                <li><img src="${urls.images}/placeholders/person.thumbnail.jpg" width="90" height="90" alt="foaf:lastName, foaf:firstName" /></li>
+                <li><img src="${urls.images}/placeholders/person.thumbnail.jpg" width="90" height="90" alt="foaf:lastName, foaf:firstName" /></li>
+                <li><img src="${urls.images}/placeholders/person.thumbnail.jpg" width="90" height="90" alt="foaf:lastName, foaf:firstName" /></li>
+                <li><img src="${urls.images}/placeholders/person.thumbnail.jpg" width="90" height="90" alt="foaf:lastName, foaf:firstName" /></li>
             </ul>
         </nav>
         
@@ -64,4 +64,4 @@
 
 ${stylesheets.add("/css/menupage/menupage.css")}
 
-<#include "menupage-browseByVClass.ftl">
+<#include "menupage-scripts.ftl">
