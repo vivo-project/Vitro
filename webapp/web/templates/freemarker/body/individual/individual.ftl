@@ -84,20 +84,19 @@ annotaiton has been implemented. -->
                 </h1>
             </#if>
                
-            <#-- Current positions -->
-            <#assign positions = propertyGroups.getProperty("${core}personInPosition")!>
-            <#if positions?has_content> <#-- true when the property is in the list, even if there are no statements (when editing) -->
-                <h2>Current Positions</h2>
+            <#-- Positions -->
+            <#assign positions = propertyGroups.getPropertyAndRemoveFromList("${core}personInPosition")!>
+            <#if positions?has_content> <#-- true when the property is in the list, even if not populated (when editing) -->
+                <h2>Positions</h2>
                 <ul id ="individual-positions" role="list">
-                    <@p.objectProperty positions />
+                    <@p.objectPropertyList positions.statements positions.template />
                 </ul>
             </#if>
-
         </header>
          
         <#-- Overview -->
         <#assign overview = propertyGroups.getPropertyAndRemoveFromList("${core}overview")!> 
-        <#if overview?has_content> <#-- true when the property is in the list, even if there are no statements (when editing) -->
+        <#if overview?has_content> <#-- true when the property is in the list, even if not populated (when editing) -->
             <#list overview.statements as statement>
                 <p class="individual-overview">${statement.value}</p>
             </#list>
@@ -105,10 +104,10 @@ annotaiton has been implemented. -->
         
         <#-- Research Areas -->
         <#assign researchAreas = propertyGroups.getPropertyAndRemoveFromList("${core}hasResearchArea")!> 
-        <#if researchAreas?has_content> <#-- true when the property is in the list, even if there are no statements (when editing) -->
+        <#if researchAreas?has_content> <#-- true when the property is in the list, even if not populated (when editing) -->
             <h2>Research Areas</h2>                   
             <ul id="individual-areas" role="list">
-                <@p.objectProperty researchAreas />
+                <@p.simpleObjectPropertyList researchAreas />
             </ul>
         </#if>
                 

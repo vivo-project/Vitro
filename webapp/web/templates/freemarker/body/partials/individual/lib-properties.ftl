@@ -22,7 +22,7 @@
     </#list>
 </#macro>
 
-<#macro objectProperty property>
+<#macro simpleObjectPropertyList property>
     <@objectPropertyList property.statements "propStatement-simple.ftl" />
 </#macro>
 
