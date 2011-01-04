@@ -354,3 +354,8 @@ article.property ul.subclass-property-list li{
     padding: 10px 20px 10px 40px;
 }
 /* MISCELLANEOUS------>  */
+.listDateTime {
+    padding: 0.2em 0.4em;
+    font-size: 0.8em;
+    background: #f4f4f4;
+}
