@@ -181,6 +181,10 @@ public class EntityController extends VitroHttpServlet {
                     indiv.getVClassURI() + ": no class found with that URI");
         }
         if (customView!=null) {
+            // RY Transitional hack: ignore Freemarker templates so we can load old individual page with default display view
+            if (customView.endsWith(".ftl")) {
+                customView = null;
+            }
             // insert test for whether a css files of the same name exists, and populate the customCss string for use when construction the header
         }
         String netid = iwDao.getNetId(indiv.getURI());

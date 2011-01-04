@@ -2,9 +2,6 @@
 
 <#-- Template for individual profile page -->
 
-<#-- RY This is actually the person profile page, but we cannot move it to its proper location until selection of template by
-annotaiton has been implemented. -->
-
 <#import "lib-list.ftl" as l>
 <#import "lib-properties.ftl" as p>
 <#assign core = "http://vivoweb.org/ontology/core#">
