@@ -30,7 +30,14 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     
     private static final Log log = LogFactory.getLog(ObjectPropertyTemplateModel.class);      
     private static final String TYPE = "object";
-
+    
+    /* NB The default postprocessor is not the same as the postprocessor for the default view. The latter
+     * actually defines its own postprocessor, whereas the default postprocessor is used for custom views
+     * that don't define a postprocessor, to ensure that the standard postprocessing applies.
+     */
+    private static final String DEFAULT_POSTPROCESSOR = 
+        "edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.DefaultObjectPropertyDataPostProcessor";
+    
     private PropertyListConfig config;
 
     ObjectPropertyTemplateModel(ObjectProperty op, Individual subject, VitroRequest vreq) {
@@ -53,8 +60,8 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         return config.collationTarget;
     }
     
-    protected boolean hasCustomListView() {
-        return !config.isDefaultConfig;
+    protected boolean hasDefaultListView() {
+        return config.isDefaultConfig;
     }
     
     protected static ObjectPropertyTemplateModel getObjectPropertyTemplateModel(ObjectProperty op, Individual subject, VitroRequest vreq) {
@@ -74,13 +81,14 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     protected void postprocess(List<Map<String, String>> data, WebappDaoFactory wdf) {
         String postprocessorName = config.postprocessor;
         if (postprocessorName == null) {
-            return;
+            //return;
+            postprocessorName = DEFAULT_POSTPROCESSOR;
         }
 
         try {
             Class<?> postprocessorClass = Class.forName(postprocessorName);
             Constructor<?> constructor = postprocessorClass.getConstructor(ObjectPropertyTemplateModel.class, WebappDaoFactory.class);
-            ObjectPropertyDataPostprocessor postprocessor = (ObjectPropertyDataPostprocessor) constructor.newInstance(this, wdf);
+            ObjectPropertyDataPostProcessor postprocessor = (ObjectPropertyDataPostProcessor) constructor.newInstance(this, wdf);
             postprocessor.process(data);
         } catch (Exception e) {
             log.error(e, e);

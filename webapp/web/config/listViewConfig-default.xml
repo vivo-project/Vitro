@@ -31,7 +31,7 @@
         }       
     </query>
 
-    <postprocessor>edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.DefaultObjectPropertyDataPostprocessor</postprocessor>
+    <postprocessor>edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.DefaultListViewDataPostProcessor</postprocessor>
     
     <template>propStatement-default.ftl</template>
 </list-view-config>

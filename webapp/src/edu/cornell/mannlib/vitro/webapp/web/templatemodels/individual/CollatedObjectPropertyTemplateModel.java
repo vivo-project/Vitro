@@ -53,9 +53,9 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
         String propertyUri = op.getURI();
         List<Map<String, String>> statementData = opDao.getObjectPropertyStatementsForIndividualByProperty(subjectUri, propertyUri, getQueryString());
         
-        Map<String, List<ObjectPropertyStatementTemplateModel>> unsortedSubclasses = hasCustomListView() ?
-                collateCustomListView(subjectUri, propertyUri, statementData, vreq) :
-                collateDefaultListView(subjectUri, propertyUri, statementData, vreq);  
+        Map<String, List<ObjectPropertyStatementTemplateModel>> unsortedSubclasses = hasDefaultListView() ?
+                collateDefaultListView(subjectUri, propertyUri, statementData, vreq) :
+                collateCustomListView(subjectUri, propertyUri, statementData, vreq);
 
         /* Sort by subclass name */
         Comparator<String> comparer = new Comparator<String>() {
