@@ -17,7 +17,7 @@
             OPTIONAL { GRAPH ?g4 { ?object a ?subclass } 
                        FILTER (?g4 != &lt;http://vitro.mannlib.cornell.edu/default/inferred-tbox&gt; &amp;&amp; 
                                ?g4 != &lt;http://vitro.mannlib.cornell.edu/default/vitro-kb-inf&gt; )             
-                     }
+            }
         }       
     </query>
 
