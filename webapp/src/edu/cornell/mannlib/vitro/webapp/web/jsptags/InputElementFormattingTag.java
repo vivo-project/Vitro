@@ -438,8 +438,8 @@ public class InputElementFormattingTag extends TagSupport {
 //            }
             
            
-            if ((getType()==null || getType().equals("")) && field.getEditElement() == null ){
-                log.error("Error in doStartTag: input element type is blank or not specified.");
+            if ((getType()==null || getType().equals("")) && (field != null && field.getEditElement() == null )){
+                log.error("Error in doStartTag: input element type not specified and editElement not specified.");
             }
             
             // set ProhibitedFromSearch object so picklist doesn't show

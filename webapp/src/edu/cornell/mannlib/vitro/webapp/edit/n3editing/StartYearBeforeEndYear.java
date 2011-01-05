@@ -56,7 +56,8 @@ public class StartYearBeforeEndYear implements N3Validator {
 				errors.put(endFieldName, "End year must be after start year");
 			}
 		} catch (NumberFormatException nfe) {
-
+		    errors.put(startFieldName, "could not format star or end date");
+		    errors.put(endFieldName, "could not format star or end date");
 		}
 		return errors;
 	}
