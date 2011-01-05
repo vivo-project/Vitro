@@ -15,7 +15,8 @@ Optional elements
 ----------------- 
     
 - postprocessor: a Java class that postprocesses the data retrieved from the query before
-                 sending it to the template
+                 sending it to the template. If no postprocessor is specified, the default
+                 postprocessor will be invoked.
 
 
 ------------------
@@ -27,12 +28,13 @@ the same individual is retrieved more than once, if there are multiple solutions
 other assertions, but DISTINCT provides a start at uniqueness.
       
 - The WHERE clause must contain a statement ?subject ?property ?object, with the variables
-?subject and ?property named as such. The object can be given any name, but it must be 
+?subject and ?property named as such. For a default list view, the ?object variable must
+also be named as such. For a custom list view, the object can be given any name, but it must be 
 included in the SELECT terms retrieved by the query. This is the statement that will be edited 
 from the edit links.
       
-- It is generally necessary to provide for a missing linked individual, due to incomplete data.
-Make sure the query does the following:
+- In a custom list view, it is generally necessary to provide for a missing linked individual, 
+due to the possibility of incomplete data. Make sure the query does the following:
     - Enclose the clause for the linked individual in an OPTIONAL block. 
     - Select the object's localname using the ARQ localname function, so that the template can 
       display the local name in the absence of the linked individual. Alternatively, this can be 
@@ -43,7 +45,7 @@ no requirement about which assertions are in the same graph is imposed (unless t
 in a specific case).
       
 - For collated properties: 
-    - Include a ?subclass variable, named as such, in the SELECT claus. If the ?subclass variable
+    - Include a ?subclass variable, named as such, in the SELECT clause. If the ?subclass variable
       is missing, the property will be displayed without collation.
     - ?subclass must be the first term in the ORDER BY clause
     - Include the following in the WHERE clause, substituting in the relevant variables for
