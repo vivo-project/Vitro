@@ -20,7 +20,7 @@ public abstract class BaseObjectPropertyDataPostProcessor implements
 
     private static String KEY_SUBJECT = "subject";
     private static final String KEY_PROPERTY = "property";
-
+    private static final String DEFAULT_LIST_VIEW_QUERY_OBJECT_VARIABLE_NAME = "object";
     private static final Pattern QUERY_PATTERN = Pattern.compile("\\?" + KEY_SUBJECT + "\\s+\\?" + KEY_PROPERTY + "\\s+\\?(\\w+)");
     
     protected ObjectPropertyTemplateModel objectPropertyTemplateModel;
@@ -33,6 +33,12 @@ public abstract class BaseObjectPropertyDataPostProcessor implements
         
     @Override
     public void process(List<Map<String, String>> data) {
+        
+        if (data.isEmpty()) {
+            log.debug("No data to postprocess for property " + objectPropertyTemplateModel.getUri());
+            return;
+        }
+        
         removeDuplicates(data);
         for (Map<String, String> map : data) {
             process(map);           
@@ -41,8 +47,8 @@ public abstract class BaseObjectPropertyDataPostProcessor implements
     
     protected abstract void process(Map<String, String> map);
     
-    /** The SPARQL query results may contain duplicate rows for a single object, if there are multiple assertions for some of the
-     * other query variables. Remove duplicates here by arbitrarily selecting only the first row returned.
+    /** The SPARQL query results may contain duplicate rows for a single object, if there are multiple solutions 
+     * to the entire query. Remove duplicates here by arbitrarily selecting only the first row returned.
      * @param List<Map<String, String>> data
      */
     protected void removeDuplicates(List<Map<String, String>> data) {
@@ -71,7 +77,7 @@ public abstract class BaseObjectPropertyDataPostProcessor implements
         String object = null;
         
         if (objectPropertyTemplateModel.hasDefaultListView()) {
-            object = ObjectPropertyTemplateModel.DEFAULT_LIST_VIEW_QUERY_OBJECT_VARIABLE_NAME;
+            object = DEFAULT_LIST_VIEW_QUERY_OBJECT_VARIABLE_NAME;
             log.debug("Using default list view for property " + objectPropertyTemplateModel.getUri() + 
                       ", so query object = '" + object + "'");
         } else {
