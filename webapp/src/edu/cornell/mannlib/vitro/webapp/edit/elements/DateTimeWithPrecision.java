@@ -84,7 +84,7 @@ public class DateTimeWithPrecision extends BaseEditElement {
     //it would be nice to have only the version of the constructor that takes the enum 
     //but this is to quickly get the JSP configuration working.
     public DateTimeWithPrecision(Field field, String minimumPrecisionURI, String displayRequiredLevelUri){
-        super(field);
+        this(field);
         
         this.minimumPrecision = toPrecision( minimumPrecisionURI);                
         if( this.minimumPrecision == null )
@@ -116,7 +116,7 @@ public class DateTimeWithPrecision extends BaseEditElement {
     /**
      * This produces a map for use in the template.
      */
-    private Map getMapForTemplate(EditConfiguration editConfig, EditSubmission editSub) {              
+    protected Map getMapForTemplate(EditConfiguration editConfig, EditSubmission editSub) {              
         Map<String,Object>map = new HashMap<String,Object>();       
 
         //always need the fieldName, required precision, and constants

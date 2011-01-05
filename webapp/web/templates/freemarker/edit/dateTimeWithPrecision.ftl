@@ -30,10 +30,12 @@ precisionConstants.minute -- URI for precision
 precisionConstants.second -- URI for precision
  -->
  
+ ${fieldName}
 <@dateTime specificity="${minimumPrecision}" required="${requiredLevel}" />
 
 <#macro dateTime specificity="full" required=specificity>
-
+   
+   
     <#assign specLevel = 10 />
     <#assign reqLevel = 10 />
     <#if specificity == "${precisionConstants.year}">
