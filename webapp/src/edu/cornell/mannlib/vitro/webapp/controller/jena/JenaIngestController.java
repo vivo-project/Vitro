@@ -5,16 +5,18 @@ package edu.cornell.mannlib.vitro.webapp.controller.jena;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,11 +30,9 @@ import org.apache.commons.logging.LogFactory;
 import org.mindswap.pellet.exceptions.InconsistentOntologyException;
 import org.mindswap.pellet.jena.PelletReasonerFactory;
 
-import com.hp.hpl.jena.db.DBConnection;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
-import com.hp.hpl.jena.ontology.OntProperty;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecException;
 import com.hp.hpl.jena.query.QueryExecution;
@@ -64,25 +64,20 @@ import com.hp.hpl.jena.util.iterator.ClosableIterator;
 
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
+import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDao;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.SimpleOntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSDBModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSpecialModelMaker;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
-import edu.cornell.mannlib.vitro.webapp.utils.Csv2Rdf;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestWorkflowProcessor;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.WorkflowOntology;
-
-import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
-import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 
 public class JenaIngestController extends BaseEditController {
 
@@ -96,6 +91,7 @@ public class JenaIngestController extends BaseEditController {
 	private static final String LOAD_RDF_DATA_JSP = "/jenaIngest/loadRDFData.jsp";
 	private static final String EXECUTE_SPARQL_JSP = "/jenaIngest/sparqlConstruct.jsp";
 	private static final String RENAME_BNODES_JSP = "/jenaIngest/renameBNodes.jsp";
+	private static final String RENAME_BNODES_URI_SELECT_JSP = "/jenaIngest/renameBNodesURISelect.jsp";
 	private static final String SMUSH_JSP = "/jenaIngest/smushSingleModel.jsp";
 	private static final String CONNECT_DB_JSP = "/jenaIngest/connectDB.jsp";
 	private static final String CSV2RDF_JSP = "/jenaIngest/csv2rdf.jsp";
@@ -263,8 +259,8 @@ public class JenaIngestController extends BaseEditController {
 			if (modelName != null) {
 				doClearModel(modelName,maker);
 			}
-			request.setAttribute("title","Ingest Menu");
-			request.setAttribute("bodyJsp",INGEST_MENU_JSP);
+			request.setAttribute("title","Available Models");
+			request.setAttribute("bodyJsp",LIST_MODELS_JSP);
 		} 
 		/*else if ("setWriteLayer".equals(actionStr)) {
 			String modelName = vreq.getParameter("modelName");
@@ -294,26 +290,53 @@ public class JenaIngestController extends BaseEditController {
 			if (modelName != null) {
 				doAttachModel(modelName,maker);
 			}
-			request.setAttribute("title","Ingest Menu");
-			request.setAttribute("bodyJsp",INGEST_MENU_JSP);
+			request.setAttribute("title","Available Models");
+			request.setAttribute("bodyJsp",LIST_MODELS_JSP);
 		} else if ("detachModel".equals(actionStr)) {
 			String modelName = vreq.getParameter("modelName");
 			if (modelName != null) {
 				doDetachModel(modelName,maker);
 			}
-			request.setAttribute("title","Ingest Menu");
-			request.setAttribute("bodyJsp",INGEST_MENU_JSP);
+			//request.setAttribute("title","Ingest Menu");
+			//request.setAttribute("bodyJsp",INGEST_MENU_JSP);
+			request.setAttribute("title","Available Models");
+			request.setAttribute("bodyJsp",LIST_MODELS_JSP);
 		} else if ("renameBNodes".equals(actionStr)) {
-			String namespaceEtcStr = vreq.getParameter("namespaceEtcStr");
-			if (namespaceEtcStr != null) {
-				doRenameBNodes(vreq);
-				request.setAttribute("title","Ingest Menu");
-				request.setAttribute("bodyJsp",INGEST_MENU_JSP);
+			String[] sourceModel = vreq.getParameterValues("sourceModelName");
+			Model model = ModelFactory.createDefaultModel();
+			JenaIngestUtils utils = new JenaIngestUtils();
+			if(sourceModel!=null && sourceModel.length!=0){
+				Map<String,LinkedList<String>> propertyMap = utils.generatePropertyMap(sourceModel, model, maker);
+				getServletContext().setAttribute("sourceModel",sourceModel);
+				request.setAttribute("propertyMap", propertyMap);
+				request.setAttribute("title","URI Select");
+				request.setAttribute("bodyJsp",RENAME_BNODES_URI_SELECT_JSP);
 			} else {
 				request.setAttribute("title","Rename Blank Nodes");
 				request.setAttribute("bodyJsp",RENAME_BNODES_JSP);
 			}
-		} else if ("smushSingleModel".equals(actionStr)) {
+		}else if("renameBNodesURISelect".equals(actionStr)){
+			String namespaceEtcStr = vreq.getParameter("namespaceEtcStr");
+			String pattern = vreq.getParameter("pattern");
+			String concatenate = vreq.getParameter("concatenate");
+			String[] sourceModel = (String[])getServletContext().getAttribute("sourceModel");
+			if(namespaceEtcStr!=null && !namespaceEtcStr.isEmpty()){
+				if(concatenate.equals("integer")){
+					doRenameBNodes(vreq,namespaceEtcStr, false, null, sourceModel);
+				}
+				else{
+					pattern = pattern.trim();
+					doRenameBNodes(vreq,namespaceEtcStr, true, pattern, sourceModel);
+				}
+				request.setAttribute("title", "Ingest Menu");
+				request.setAttribute("bodyJsp", INGEST_MENU_JSP);
+			}
+			else{
+				request.setAttribute("title", "URI Select");
+				request.setAttribute("bodyJsp", RENAME_BNODES_URI_SELECT_JSP);
+			}
+		
+		}else if ("smushSingleModel".equals(actionStr)) {
 			String propertyURIStr = vreq.getParameter("propertyURI");
 			if (propertyURIStr != null) {
 				doSmushSingleModel(vreq);
@@ -697,19 +720,26 @@ public class JenaIngestController extends BaseEditController {
 		vitroJenaModel.removeSubModel(m);
 	}
 	
-	private void doRenameBNodes(VitroRequest vreq) {
+	private void doRenameBNodes(VitroRequest vreq, String namespaceEtc, boolean patternBoolean, String pattern, String[] sourceModel) {
 		OntModel source = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM);
-		String[] sourceModel = vreq.getParameterValues("sourceModelName");
+		//String[] sourceModel = vreq.getParameterValues("sourceModelName");
+		
 		for (int i=0; i<sourceModel.length; i++) {
 			Model m = getModel(sourceModel[i],vreq);
 			source.addSubModel(m);
 		}
 		Model destination = getModel(vreq.getParameter("destinationModelName"),vreq);
-		String namespaceEtc = vreq.getParameter("namespaceEtcStr");
 		JenaIngestUtils utils = new JenaIngestUtils();
 		destination.enterCriticalSection(Lock.WRITE);
 		try {
-			destination.add(utils.renameBNodes(source, namespaceEtc, vreq.getJenaOntModel()));
+			if(!patternBoolean){
+				destination.add(utils.renameBNodes(source, namespaceEtc, vreq.getJenaOntModel()));
+			}
+			else{
+				String property = vreq.getParameter("property");
+				destination.add(utils.renameBNodesByPattern(source, namespaceEtc, vreq.getJenaOntModel(), pattern, property));
+			}
+				
 		} finally {
 			destination.leaveCriticalSection();
 		}
