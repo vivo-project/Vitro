@@ -142,6 +142,13 @@ PREFIX <%=prefixText%>: <<%=urlText%>><%}}%>
 <h3>Select Destination Model</h3>
 
 <select name="destinationModelName">
+    <option value="vitro:baseOntModel"
+		<% if ("vitro:baseOntModel".equals(request.getParameter("destinationModelName"))) {
+                  %>
+		selected="selected" <%
+                 }
+              %> />webapp
+	assertions</option>
 	<option value="vitro:jenaOntModel"
 		<% if ("vitro:jenaOntModel".equals(request.getParameter("destinationModelName"))) {
             	  %>
@@ -149,13 +156,6 @@ PREFIX <%=prefixText%>: <<%=urlText%>><%}}%>
             	 }
               %> />webapp
 	model</option>
-	<option value="vitro:baseOntModel"
-		<% if ("vitro:baseOntModel".equals(request.getParameter("destinationModelName"))) {
-                  %>
-		selected="selected" <%
-                 }
-              %> />webapp
-	assertions</option>
 	<%
     for (Iterator it = maker.listModels(); it.hasNext(); ) {
     String modelName = (String) it.next();
