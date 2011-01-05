@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.edit.elements;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,11 +16,31 @@ import com.hp.hpl.jena.rdf.model.Literal;
 
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditSubmission;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.Field;
 
 
 public class DateTimeWithPrecisionTest {
 
+    @Test 
+    public void fieldNameTemplateVariableTest() throws Exception{
+        String FIELDNAME = "testfield";       
+        Field field = new Field();
+        field.setName(FIELDNAME);
+        DateTimeWithPrecision dtwp = new DateTimeWithPrecision(field);
+        
+        EditSubmission editSub = null;
+        EditConfiguration editConfig = new EditConfiguration();
+        editConfig.setUrisInScope(Collections.EMPTY_MAP);
+        editConfig.setLiteralsInScope(Collections.EMPTY_MAP);
+        
+        Map templateVars = dtwp.getMapForTemplate(editConfig, editSub);
+        Assert.assertNotNull(templateVars);
+        
+        Assert.assertTrue( templateVars.containsKey("fieldName") );
+        Assert.assertEquals(templateVars.get("fieldName"), "testfield");
+    }
+    
     @Test
     public void precisionSecondsValidationTest() throws Exception{
         String FIELDNAME = "testfield";       

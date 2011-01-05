@@ -456,6 +456,8 @@ public class InputElementFormattingTag extends TagSupport {
            
         	if( field != null && field.getEditElement() != null ){
         	    out.print( field.getEditElement().draw(getId(), editConfig, editSub, fmConfig));
+        	}else if( getType() == null ){
+        	    log.error("type or editElement must be specified for input element " + getId() );
         	}else if( getType().equalsIgnoreCase("date") || 
                     (field != null && field.getRangeDatatypeUri() != null && field.getRangeDatatypeUri().equals(XSD.date.getURI())) ){
                 //if its a dataprop that should be a string override type and use date picker    
