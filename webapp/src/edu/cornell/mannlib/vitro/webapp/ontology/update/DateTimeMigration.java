@@ -117,7 +117,7 @@ public class DateTimeMigration {
 		    
 			if (additions.size() > 0) {	
 			   long count = additions.size() / 2;	
-			   logger.log(count + "Academic Term and/or Year statement" + 	((count > 1) ? "s" : "") + " were updated to use dateTimeInterval instead");
+			   logger.log(count + "Academic Term and/or Year assertion" + 	((count > 1) ? "s" : "") + " were updated to use dateTimeInterval instead");
 			}
 		} finally {
 			aboxModel.leaveCriticalSection();
@@ -130,7 +130,7 @@ public class DateTimeMigration {
 	 */
 	public void updateLiterals() throws IOException {
 
-		// note: not handling timezones - they are not expected to be in the 1.1.1 data
+		//TODO: look into java locale note: not handling timezones - they are not expected to be in the 1.1.1 data
 		DateFormat yearFormat = new SimpleDateFormat("yyyy");
 		DateFormat yearMonthFormat = new SimpleDateFormat("yyyy-mm");
 		DateFormat yearMonthDayFormat = new SimpleDateFormat("yyyy-mm-dd");
@@ -196,7 +196,7 @@ public class DateTimeMigration {
 		    record.recordAdditions(additions);
 		    
 			if (additions.size() > 0) {
-					logger.log(additions.size() + " date/time assertions" + 
+					logger.log(additions.size() + " date/time assertion" + 
 							((additions.size() > 1) ? "s" : "") +
 							" were updated to the 1.2 representation.");
 			}		   

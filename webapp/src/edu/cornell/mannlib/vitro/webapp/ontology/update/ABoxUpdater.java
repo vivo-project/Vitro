@@ -96,7 +96,11 @@ public class ABoxUpdater {
 				  addClass(change);
 			      break;
 			   case DELETE:
-				  deleteClass(change);
+				  if ("Delete".equals(change.getNotes())) {
+				     deleteClass(change);
+				  } else {
+					 renameClassToParent(change);
+				  }
 			      break;
 			   case RENAME:
 				  renameClass(change);
@@ -275,6 +279,62 @@ public class ABoxUpdater {
 		}
 	}
 
+	/**
+	 * 
+	 * Update a knowledge base to account for a class deletion in the ontology.
+	 * All references to the deleted class URI in either the subject or the object
+	 * position of a statement are changed to use the closest available parent of
+	 * the deleted class from the previous ontology that remains in the new version
+	 * of the ontology. Note that the closest available parent may be owl:Thing.
+	 * If the deleted class has more than one closest available parent, then
+	 * change individuals that were asserted to be of the deleted class to be 
+	 * asserted to be of both parent classes. 
+	 *  
+	 * @param   change - an AtomicOntologyChange object representing a class
+	 *                   delete operation.
+	 *                    
+	 */
+	public void renameClassToParent(AtomicOntologyChange change) throws IOException {
+
+		logger.log("Processing a class migration to parent for deleted class " + change.getSourceURI());
+		
+		OntClass deletedClass = oldTboxModel.getOntClass(change.getSourceURI());
+		
+		if (deletedClass == null) {
+			logger.log("WARNING: didn't find the deleted class " +  change.getSourceURI() + " in the old model. Skipping updates for this deletion");
+			return;
+		}
+
+		List<OntClass> classList = deletedClass.listSuperClasses(true).toList();
+		List<OntClass> namedClassList = new ArrayList<OntClass>();
+		for (OntClass ontClass : classList) { 
+			if (!ontClass.isAnon()) {
+				namedClassList.add(ontClass);
+			}
+		}
+		
+		OntClass parent = (!namedClassList.isEmpty()) 
+								? namedClassList.get(0) 
+								: OWL_THING;
+										
+		OntClass replacementClass = newTboxModel.getOntClass(parent.getURI());
+		
+		while (replacementClass == null) {
+			 parent = parent.getSuperClass();
+			 
+			 if (parent == null) {
+				  replacementClass = OWL_THING; 
+			 } else {
+	    	      replacementClass = newTboxModel.getOntClass(parent.getURI());
+			 }
+		} 
+
+	    //log summary of changes
+	    logger.log("Class " + deletedClass.getURI() + " has been deleted. Any references to it in the knowledge base have been changed to " +   replacementClass.getURI());
+
+		AtomicOntologyChange chg = new AtomicOntologyChange(deletedClass.getURI(), replacementClass.getURI(), AtomicChangeType.RENAME, change.getNotes());
+		renameClass(chg);			
+	}
 	
 	/**
 	 * 
@@ -587,60 +647,4 @@ public class ABoxUpdater {
                 		                                          : ((Resource)statement.getObject()).getURI() + " (Resource)");	
     }    
 	
-	/**
-	 * 
-	 * Update a knowledge base to account for a class deletion in the ontology.
-	 * All references to the deleted class URI in either the subject or the object
-	 * position of a statement are changed to use the closest available parent of
-	 * the deleted class from the previous ontology that remains in the new version
-	 * of the ontology. Note that the closest available parent may be owl:Thing.
-	 * If the deleted class has more than one closest available parent, then
-	 * change individuals that were asserted to be of the deleted class to be 
-	 * asserted to be of both parent classes. 
-	 *  
-	 * @param   change - an AtomicOntologyChange object representing a class
-	 *                   delete operation.
-	 *                    
-	 */
-	public void obsolete_deleteClass(AtomicOntologyChange change) throws IOException {
-
-		logger.log("Processing a class deletion of class " + change.getSourceURI());
-		
-		OntClass deletedClass = oldTboxModel.getOntClass(change.getSourceURI());
-		
-		if (deletedClass == null) {
-			logger.log("WARNING: didn't find the deleted class " +  change.getSourceURI() + " in the old model. Skipping updates for this deletion");
-			return;
-		}
-
-		List<OntClass> classList = deletedClass.listSuperClasses(true).toList();
-		List<OntClass> namedClassList = new ArrayList<OntClass>();
-		for (OntClass ontClass : classList) { 
-			if (!ontClass.isAnon()) {
-				namedClassList.add(ontClass);
-			}
-		}
-		
-		OntClass parent = (!namedClassList.isEmpty()) 
-								? namedClassList.get(0) 
-								: OWL_THING;
-										
-		OntClass replacementClass = newTboxModel.getOntClass(parent.getURI());
-		
-		while (replacementClass == null) {
-			 parent = parent.getSuperClass();
-			 
-			 if (parent == null) {
-				  replacementClass = OWL_THING; 
-			 } else {
-	    	      replacementClass = newTboxModel.getOntClass(parent.getURI());
-			 }
-		} 
-
-	    //log summary of changes
-	    logger.log("Class " + deletedClass.getURI() + " has been deleted. Any references to it in the knowledge base have been changed to " +   replacementClass.getURI());
-
-		AtomicOntologyChange chg = new AtomicOntologyChange(deletedClass.getURI(), replacementClass.getURI(), AtomicChangeType.RENAME, change.getNotes());
-		renameClass(chg);			
-	}
 }

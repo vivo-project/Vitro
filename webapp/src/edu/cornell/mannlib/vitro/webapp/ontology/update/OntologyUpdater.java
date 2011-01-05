@@ -81,8 +81,7 @@ public class OntologyUpdater {
 		
 		performSparqlConstructAdditions(settings.getSparqlConstructAdditionsDir(), settings.getOntModelSelector().getABoxModel());
 		performSparqlConstructRetractions(settings.getSparqlConstructDeletionsDir(), settings.getOntModelSelector().getABoxModel());
-		performSparqlConstructAdditions(settings.getSparqlConstructAdditionsPass2Dir(), settings.getOntModelSelector().getABoxModel());
-
+		
 		DateTimeMigration dtMigration = new DateTimeMigration(settings.getOntModelSelector().getABoxModel(), logger, record);
         dtMigration.updateABox();
         
