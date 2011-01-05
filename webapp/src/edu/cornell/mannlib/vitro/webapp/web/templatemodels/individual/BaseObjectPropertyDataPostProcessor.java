@@ -50,6 +50,9 @@ public abstract class BaseObjectPropertyDataPostProcessor implements
     
     /** The SPARQL query results may contain duplicate rows for a single object, if there are multiple solutions 
      * to the entire query. Remove duplicates here by arbitrarily selecting only the first row returned.
+     * Note that in the case of a collated query, the query has filtered out inferred subclasses, but if there
+     * are multiple asserted subclasses, all will be returned. This method will arbitrarily remove all but the
+     * first one returned.
      * @param List<Map<String, String>> data
      */
     protected void removeDuplicates(List<Map<String, String>> data) {
@@ -59,7 +62,7 @@ public abstract class BaseObjectPropertyDataPostProcessor implements
             return;
         }
         List<String> foundObjects = new ArrayList<String>();
-        log.debug("Processing property: " + objectPropertyTemplateModel.getUri());
+        log.debug("Removing duplicates from property: " + objectPropertyTemplateModel.getUri());
         Iterator<Map<String, String>> dataIterator = data.iterator();
         while (dataIterator.hasNext()) {
             Map<String, String> map = dataIterator.next();

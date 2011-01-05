@@ -67,6 +67,10 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
         List<ObjectPropertyStatementTemplateModel> currentList = null;
         for (Map<String, String> map : statementData) {
             String subclassUri = map.get("subclass");
+            // Rows with no subclass are put into a subclass map with an empty name.
+            if (subclassUri == null) {
+                subclassUri = "";
+            }
             if (!subclassUri.equals(currentSubclassUri)) {
                 currentSubclassUri = subclassUri;
                 currentList = new ArrayList<ObjectPropertyStatementTemplateModel>();
@@ -79,9 +83,15 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
     }
     
     private String getSubclassName(String subclassUri, VitroRequest vreq) {
-        VClassDao vclassDao = vreq.getWebappDaoFactory().getVClassDao();
-        VClass vclass = vclassDao.getVClassByURI(subclassUri);
-        return vclass.getName();
+        String subclassName = null;
+        if (subclassUri.isEmpty()) {
+            subclassName = "";
+        } else {
+            VClassDao vclassDao = vreq.getWebappDaoFactory().getVClassDao();
+            VClass vclass = vclassDao.getVClassByURI(subclassUri);
+            subclassName = vclass.getName();
+        }
+        return subclassName;
     }
 
     @Override
