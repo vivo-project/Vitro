@@ -31,9 +31,6 @@
     <p>Or upload a file from your computer:</p>
     <p><input type="file" name="filePath" /></p>
 
-    <input type="text" name="namespace"/>
-    <p>Namespace in which to generate resources</p>
-
 	<input type="text" name="tboxNamespace"/>
     <p>Namespace in which to generate class and properties</p>
 
@@ -68,4 +65,4 @@
     </select>
     <p>Destination Model for TBox</p>
 
-    <input id="submit" type="submit" value="Convert CSV"/>
+    <input id="submit" type="submit" value="Next Step"/>
