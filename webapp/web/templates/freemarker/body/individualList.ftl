@@ -15,15 +15,16 @@
             <p>${message}</p>
         <#else>
         
-            <#if pages?? >
-                <div>
-                pages          
+        <#if (pages?size > 1) >           
+            pages:&nbsp; 
+       		<ul class="pagination">
                 <#list pages as page>                                                            
-                    <a href="${urls.base}/individuallist?${page.param}&vclassId=${vclassId?url}">${page.text}</a>
-                    <#if page.selected> selected </#if>                                                                                     
-                </#list>   
-                </div>
-            </#if>
+                    <#if page.selected><li class="selectedNavPage">${page.text}</li>
+				    <#else><li><a href="${urls.base}/individuallist?${page.param}&vclassId=${vclassId?url}">${page.text}</a></li>
+				    </#if>                                                                                     
+                </#list>
+            </ul>               
+        </#if>
         
             <ul>
                 <#list individuals as individual>                   
@@ -49,15 +50,16 @@
                 </#list>
             </ul>
             
-            <#if pages?? >
-                <div>
-                pages          
-                <#list pages as page>                                                            
-                    <a href="${urls.base}/individuallist?${page.param}&vclassId=${vclassId?url}">${page.text}</a> 
-                    <#if page.selected> selected </#if>                                                                                    
-                </#list>   
-                </div>
-            </#if>
+	        <#if (pages?size > 1) >           
+	            pages:&nbsp; 
+	       		<ul class="pagination">
+	                <#list pages as page>                                                            
+	                    <#if page.selected><li class="selectedNavPage">${page.text}</li>
+					    <#else><li><a href="${urls.base}/individuallist?${page.param}&vclassId=${vclassId?url}">${page.text}</a></li>
+					    </#if>                                                                                     
+	                </#list>
+	            </ul>               
+	        </#if>
         </#if>
         
                      
