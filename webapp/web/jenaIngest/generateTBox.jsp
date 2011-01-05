@@ -39,8 +39,9 @@
     <h3>Select Destination Model for Generated TBox</h3>
 
     <select name="destinationModelName">
+           <option value="vitro:baseOntModel"/>webapp assertions</option>   
            <option value="vitro:jenaOntModel"/>webapp model</option>
-           <option value="vitro:baseOntModel"/>webapp assertions</option>
+           
 <%
     for (Iterator it = maker.listModels(); it.hasNext(); ) {
 	String modelName = (String) it.next();
