@@ -100,8 +100,8 @@ ul#individual-tools-people{
     margin-top: 5px;
     height: 27px;
     padding-bottom: 20px;
-    overflow: hidden;
     list-style-type: none;
+    clear: both;
 }
 ul#individual-tools-people li{
     position: relative;
@@ -145,22 +145,29 @@ ul#individual-tools li{
     font-size: 1.375em;
     padding-right: 5px;
 }
-#left-side a.email{
-    font-size: .875em;
-    display: block;
-    margin-top: 15px;
+ul#individual-email{
+    clear: both;
+    list-style-type: circle;
+    margin-top: 20px;
 }
-#left-side a.tel{
+ul#individual-email a.email{
     font-size: .875em;
     display: block;
-    margin-top: 15px;
+}
+ul#individual-phone{
+    clear: both;
+    list-style-type: circle;
+    margin-top: 20px;
+}
+ul#individual-phone a.tel{
+    font-size: .875em;
+    display: block;
 }
 .icon-phone{
     vertical-align: middle;
     padding-right: 5px;
 }
 ul#individual-urls{
-    list-style: none;
     list-style-type: circle;
     margin-left: 10px;
     float: left;
@@ -174,6 +181,7 @@ ul#individual-urls li a{
     color: #2485ae;
 }
 ul#individual-urls-people{
+    clear: both;
     margin-top: 20px;
     list-style: none;
     list-style-type: circle;
@@ -238,7 +246,7 @@ ul#individual-areas li{
 }
 /* <------ SPARKLINES  */
 #sparklines-publications{
-    width: 184px;
+    width: 220px;
     padding: 0 20px 45px 20px;
 }
 #sparklines-publications h3{
@@ -248,6 +256,15 @@ ul#individual-areas li{
 .publication-year-range{
     display: block;
     padding-top: 5px;
+}
+/* <------ TEMPORAL GRAPH  */
+#temporal-graph{
+    width: 220px;
+    padding: 0 20px 45px 20px;
+}
+#temporal-graph h3 img{
+    padding-right: 10px;
+    vertical-align: text-top;
 }
 /* <------ COAUTHORS */
 #co-authors{

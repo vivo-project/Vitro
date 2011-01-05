@@ -55,8 +55,8 @@
         <nav role="navigation">
             <ul id ="individual-tools" role="list">
                 <li role="listitem"><a class="picto-font picto-uri" href="#">j</a></li>
-                <li role="listitem"><a class="picto-font picto-pdf" href="#">F</a></li>
-                <#--<li role="listitem"><a class="picto-font picto-share" href="#">R</a></li>-->
+                <#--<li role="listitem"><a class="picto-font picto-pdf" href="#">F</a></li>-->
+                <li role="listitem"><a class="picto-font picto-share" href="#">R</a></li>
                 <li role="listitem"><a class="icon-rdf" href="#">RDF</a></li>
             </ul>
         </nav>
@@ -79,10 +79,9 @@
          <#-- RY Will we have an individual--foaf-organization.ftl template? If so, move this there and remove from here.
          Also remove the method IndividualTemplateModel.isOrganization(). -->
          <#if individual.organization >
-            <div style="width: 100%;">
-                <div style="width: 30%;float:left;margin-top: 5%;margin-right: 10px;"><img src="${urls.images}/visualization/temporal_vis_icon.jpg"/></div>
-                <div><h3>Temporal Graph <br/><a class="view-all-style" href="${urls.base}/visualization?vis=entity_comparison&vis_mode=${individual.moniker}&render_mode=standalone&uri=${individual.uri}">View <span class= "pictos-arrow-10">4</span></a></h3></div>
-            </div>      
+            <section id="temporal-graph" role="region">
+                <h3><img src="${urls.images}/visualization/temporal_vis_icon.jpg" width="25px" height="25px" /><a href="${urls.base}/visualization?vis=entity_comparison&vis_mode=${individual.moniker}&render_mode=standalone&uri=${individual.uri}">Temporal Graph</a></h3>
+            </section>      
             <#--<div>VISMODE: ${individual.moniker}</div>-->
         </#if>
     </section>
