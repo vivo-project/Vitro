@@ -30,44 +30,76 @@ import freemarker.template.Configuration;
  * datetime with precision and to convert he submitted parameters into 
  * varname -> Literal and varname -> URI maps.
  * 
- * This requires two variables to be defined:
- * ${fieldname}.precision - URI of datetime precision
- * ${fieldname}.value - DateTime literal  
+ * The variables that get passed to the template are defined in:
+ * DateTimeWithPrecision.getMapForTemplate() 
+ * 
+ * Two variables will be defined for the N3 edit graphs (These are NOT variables passed to FM templates):
+ * $fieldname.precision - URI of datetime precision
+ * $fieldname.value - DateTime literal  
  * 
  */
 public class DateTimeWithPrecision extends BaseEditElement {
     
     String fieldName;
-    VitroVocabulary.Precision requiredMinimumPrecision;
-
+    
+    /**
+     * This is the minimum datetime precision that this element 
+     * will accept.  If the parameters submitted do not meet this
+     * requirement, then a validation error will be created.  
+     */
+    VitroVocabulary.Precision minimumPrecision;
+    
+    /**
+     * This is the maximum precision that the form should 
+     * allow the user to enter.  This value is not used by 
+     * DateTimeWithPrecision for validation, it is only passed 
+     * to the template.  This should be removed when it can be 
+     * specified in a ftl file.
+     * 
+     * This could be thought of as the maximum precision to display. 
+     */
+    VitroVocabulary.Precision displayRequiredLevel;
+    
 
     VitroVocabulary.Precision DEFAULT_MIN_PRECISION = VitroVocabulary.Precision.DAY;
+    VitroVocabulary.Precision DEFAULT_DISPLAY_LEVEL = VitroVocabulary.Precision.DAY;
     VitroVocabulary.Precision[] precisions = VitroVocabulary.Precision.values();
-    
+        
     public DateTimeWithPrecision(Field field) {
         super(field);
         fieldName = field.getName();
-        requiredMinimumPrecision = DEFAULT_MIN_PRECISION;
+        minimumPrecision = DEFAULT_MIN_PRECISION;
+        displayRequiredLevel = DEFAULT_DISPLAY_LEVEL;
     }
 
-    public DateTimeWithPrecision(Field field, VitroVocabulary.Precision requiredMinimumPrecision){
+    public DateTimeWithPrecision(Field field, VitroVocabulary.Precision minimumPrecision){
         this(field);
-        if( requiredMinimumPrecision != null )
-            this.requiredMinimumPrecision = requiredMinimumPrecision;
+        if( minimumPrecision != null )
+            this.minimumPrecision = minimumPrecision;
         else
-            requiredMinimumPrecision = DEFAULT_MIN_PRECISION;
+            this.minimumPrecision = DEFAULT_MIN_PRECISION;  
+        this.displayRequiredLevel = this.minimumPrecision;
     }
-   
+    
     //it would be nice to have only the version of the constructor that takes the enum 
     //but this is to quickly get the JSP configuration working.
-    public DateTimeWithPrecision(Field field, String precisionURI){
-        this(field);
-        for( VitroVocabulary.Precision precision : VitroVocabulary.Precision.values()){
-            if( precision.uri().equals(precisionURI))
-                this.requiredMinimumPrecision = precision;
+    public DateTimeWithPrecision(Field field, String minimumPrecisionURI, String displayRequiredLevelUri){
+        super(field);
+        
+        this.minimumPrecision = toPrecision( minimumPrecisionURI);                
+        if( this.minimumPrecision == null )
+            throw new IllegalArgumentException(minimumPrecisionURI 
+                    +" is not a valid precision for minimumPrecision, see VitroVocabulary.Precision");
+                
+        this.displayRequiredLevel = toPrecision( displayRequiredLevelUri );
+        if( this.displayRequiredLevel == null )
+            throw new IllegalArgumentException(minimumPrecisionURI 
+                    +" is not a valid precision for displayRequiredLevel, see VitroVocabulary.Precision");
+        
+        if( this.displayRequiredLevel.ordinal() < this.minimumPrecision.ordinal() ){
+            throw new IllegalArgumentException("the display precision level " + this.displayRequiredLevel 
+                    + " is less precise than the required minimum precision of " + this.minimumPrecision);
         }
-        if( this.requiredMinimumPrecision == null )
-            throw new IllegalArgumentException(precisionURI +" is not a valid precision, see VitroVocabulary.Precision");
     }
     
     private static final Log log = LogFactory.getLog(DateTimeWithPrecision.class);
@@ -86,21 +118,76 @@ public class DateTimeWithPrecision extends BaseEditElement {
      */
     private Map getMapForTemplate(EditConfiguration editConfig, EditSubmission editSub) {              
         Map<String,Object>map = new HashMap<String,Object>();       
-        
+
+        //always need the fieldName, required precision, and constants
         map.put("fieldName", fieldName);
-        
-        DateTime value = getTimeValue(editConfig,editSub);
-        map.put("year", Integer.toString(value.getYear()));
-        map.put("month", Integer.toString(value.getMonthOfYear()));
-        map.put("day", Integer.toString(value.getDayOfMonth()) );
-        map.put("hour", Integer.toString(value.getHourOfDay()) );
-        map.put("minute", Integer.toString(value.getMinuteOfHour()) );
-        map.put("second", Integer.toString(value.getSecondOfMinute() )) ;
-               
-        map.put("precision", getPrecision(editConfig,editSub));        
-        map.put("requiredMinimumPrecision", requiredMinimumPrecision.uri());
-                
         addPrecisionConstants(map);
+        map.put("minimumPrecision", minimumPrecision.uri());
+        map.put("requiredLevel", displayRequiredLevel.uri());
+        
+        String precisionUri = getExistingPrecision(editConfig,editSub);
+        VitroVocabulary.Precision existingPrec = toPrecision(precisionUri);
+        
+        if( precisionUri != null && !"".equals(precisionUri) && existingPrec == null ){
+            log.error("field " + fieldName + ": existing precision uri was " +
+            		"'" + precisionUri + "' but could not convert to Precision object");
+        }
+        
+        if( precisionUri == null || precisionUri.isEmpty()  ){
+            map.put("existingPrecision", "");
+            
+            /* no precision so there should also be no datetime */
+            DateTime value = getTimeValue(editConfig,editSub);
+            if( value != null )
+                log.info("Unexpected state: Precision for " + fieldName 
+                        + " was '" + precisionUri + "' but date time was " + value);
+            
+            map.put("year", "");
+            map.put("month", "");
+            map.put("day", "");
+            map.put("hour", "");
+            map.put("minute", "");
+            map.put("second", "") ;
+        } else if( VitroVocabulary.Precision.NONE.uri().equals(precisionUri) ){
+            //bdc34: not sure what to do with the NONE precision
+            map.put("existingPrecision", precisionUri);
+            
+            map.put("year", "");
+            map.put("month", "");
+            map.put("day", "");
+            map.put("hour", "");
+            map.put("minute", "");
+            map.put("second", "") ;                        
+        }else{            
+            map.put("existingPrecision", precisionUri);
+                        
+            DateTime value = getTimeValue(editConfig,editSub);
+            /* This is the case where there is a precision so there should be a datetime */
+            if( value == null )
+                log.error("Field " + fieldName + " has precision " + precisionUri 
+                        + " but the date time is " + value);                        
+            
+            /* only put the values in the map for ones which are significant based on the precision */
+            if( existingPrec.ordinal() >= VitroVocabulary.Precision.SECOND.ordinal() ){
+                map.put("second", Integer.toString(value.getSecondOfMinute() )) ;
+            }
+            if( existingPrec.ordinal() >= VitroVocabulary.Precision.MINUTE.ordinal()  ){
+                map.put("minute", Integer.toString(value.getMinuteOfHour()) );    
+            }
+            if( existingPrec.ordinal() >= VitroVocabulary.Precision.HOUR.ordinal() ){
+                map.put("hour", Integer.toString(value.getHourOfDay()) );            
+            }
+            if( existingPrec.ordinal() >= VitroVocabulary.Precision.DAY.ordinal()  ){
+                map.put("day", Integer.toString(value.getDayOfMonth()) );                    
+            }
+            if( existingPrec.ordinal() >= VitroVocabulary.Precision.MONTH.ordinal() ){
+                map.put("month", Integer.toString(value.getMonthOfYear()));                            
+            }
+            if( existingPrec.ordinal() >= VitroVocabulary.Precision.YEAR.ordinal() ){
+                map.put("year", Integer.toString(value.getYear()));                  
+            }
+        }               
+        
         return map;
     }
    
@@ -110,17 +197,16 @@ public class DateTimeWithPrecision extends BaseEditElement {
         for( VitroVocabulary.Precision pc: VitroVocabulary.Precision.values()){
             constants.put(pc.name().toLowerCase(),pc.uri());
         }
-        map.put("precisions", constants);
+        map.put("precisionConstants", constants);
     }
     
     /**
-     * Gets the currently set precision
+     * Gets the currently set precision.  May return null.
      */
-    private String getPrecision(EditConfiguration editConfig, EditSubmission editSub) {
+    private String getExistingPrecision(EditConfiguration editConfig, EditSubmission editSub) {
         String precisionURI = editConfig.getUrisInScope().get( getPrecisionVariableName() );
         if( precisionURI == null ){
-            //maybe we need a way to specify a default value?
-            return VitroVocabulary.Precision.DAY.uri();
+            return null;
         }else{
             return precisionURI;
         } 
@@ -129,8 +215,7 @@ public class DateTimeWithPrecision extends BaseEditElement {
     private DateTime getTimeValue(EditConfiguration editConfig, EditSubmission editSub) {
         Literal dtValue = editConfig.getLiteralsInScope().get( getValueVariableName() );
         if( dtValue == null ){
-            //maybe we need a way to specify a default value?
-            return new DateTime();
+           return null;
         }else{
             return new DateTime( dtValue.getLexicalForm() );
         }
@@ -462,12 +547,21 @@ public class DateTimeWithPrecision extends BaseEditElement {
     }
 
     public VitroVocabulary.Precision getRequiredMinimumPrecision() {
-        return requiredMinimumPrecision;
+        return minimumPrecision;
     }
 
     public void setRequiredMinimumPrecision(
             VitroVocabulary.Precision requiredMinimumPrecision) {
-        this.requiredMinimumPrecision = requiredMinimumPrecision;
+        this.minimumPrecision = requiredMinimumPrecision;
+    }
+    
+    /* returns null if it cannot convert */
+    private static VitroVocabulary.Precision toPrecision(String precisionUri){              
+        for( VitroVocabulary.Precision precision : VitroVocabulary.Precision.values()){
+            if( precision.uri().equals(precisionUri))
+                return precision;
+        }
+        return null;                
     }
     
     public String getValueVariableName(){ return fieldName + ".value" ; }

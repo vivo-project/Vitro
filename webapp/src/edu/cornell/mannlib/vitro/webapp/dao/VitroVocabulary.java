@@ -308,6 +308,8 @@ public class VitroVocabulary {
         DATETIME_NS+"YearMonthDayHourMinutePrecision",
         DATETIME_NS+"YearMonthDayTimePrecision"};
 
+    //The Precision.ordinal method is used so do 
+    //not change the order of these enums.
     public enum Precision {
         NONE(PRECISIONS[0]),
         YEAR(PRECISIONS[1]),
