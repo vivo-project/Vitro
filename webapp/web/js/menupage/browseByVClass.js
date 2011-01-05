@@ -69,10 +69,10 @@ var browseByVClass = {
                 indivLabel = results.individuals[i].label;
                 indivUri = results.individuals[i].URI;
                 indivProfileUrl = results.individuals[i].profileUrl;
-                if ( !results.individuals[i].imageUrl ) {
+                if ( !results.individuals[i].thumbUrl ) {
                     indivImage = browseByVClass.baseUrl + '/images/placeholders/person.thumbnail.jpg';
                 } else {
-                    indivImage = browseByVClass.baseUrl + results.individuals[i].imageUrl;
+                    indivImage = browseByVClass.baseUrl + results.individuals[i].thumbUrl;
                 }
                 browseByVClass.individualsInVClass.append('<article class="vcard individual-foaf-person" role="navigation"> <img src="'+ indivImage +'" width="90" height="90" alt="'+ indivLabel +'" /><h1 class="fn"><a href="'+ indivProfileUrl +'" title="View the profile page for '+ indivLabel +'">'+ indivLabel + '</a></h1><p>core:preferredTitle <span class="org">org from preferredTitle??</span></p></article>');
             })
