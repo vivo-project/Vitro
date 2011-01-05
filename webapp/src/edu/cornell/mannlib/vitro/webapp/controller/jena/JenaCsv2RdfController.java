@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -32,11 +33,13 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSpecialModelMaker;
 import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest;
 import edu.cornell.mannlib.vitro.webapp.utils.Csv2Rdf;
+import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils;
 
 
 public class JenaCsv2RdfController extends BaseEditController{
 	private static final String CSV2RDF_JSP = "/jenaIngest/csv2rdf.jsp";
 	private static final String INGEST_MENU_JSP = "/jenaIngest/ingestMenu.jsp";
+	private static final String CSV2RDF_SELECT_URI_JSP = "/jenaIngest/csv2rdfSelectUri.jsp";
 	private static int maxFileSizeInBytes = 1024 * 1024 * 2000; //2000mb 
 	
 	public void doPost(HttpServletRequest rawRequest,
@@ -48,8 +51,6 @@ public class JenaCsv2RdfController extends BaseEditController{
 			return;
 		}
 
-		
-		
 		VitroRequest request = new VitroRequest(req);		
 		if (!checkLoginStatus(request,response) ){
 		    try {
@@ -70,9 +71,17 @@ public class JenaCsv2RdfController extends BaseEditController{
 		if ("csv2rdf".equals(actionStr)) {
 			String csvUrl = request.getParameter("csvUrl");
 			if (!csvUrl.isEmpty() || !filePath.isEmpty()) {
-				doExecuteCsv2Rdf(request,fileStream,filePath);
-				request.setAttribute("title","IngestMenu");
-				request.setAttribute("bodyJsp", INGEST_MENU_JSP);
+				String[] sourceModel = new String[1];
+				sourceModel[0] = doExecuteCsv2Rdf(request,fileStream,filePath);
+				Model model = ModelFactory.createDefaultModel();
+				ModelMaker maker = getVitroJenaModelMaker(request);
+				JenaIngestUtils utils = new JenaIngestUtils();
+				Map<String,LinkedList<String>> propertyMap = utils.generatePropertyMap(sourceModel, model, maker);
+				request.setAttribute("propertyMap",propertyMap);
+				getServletContext().setAttribute("sourceModel", sourceModel);
+				request.setAttribute("destinationModelName", sourceModel[0]);
+				request.setAttribute("title","URI Select");
+				request.setAttribute("bodyJsp", CSV2RDF_SELECT_URI_JSP);
 			} else {
 				request.setAttribute("title","Convert CSV to RDF");
 				request.setAttribute("bodyJsp",CSV2RDF_JSP);
@@ -107,9 +116,9 @@ public class JenaCsv2RdfController extends BaseEditController{
          return;
      }
 	 
-	 public void doExecuteCsv2Rdf(VitroRequest vreq,FileItem fileStream, String filePath) {
+	 public String doExecuteCsv2Rdf(VitroRequest vreq,FileItem fileStream, String filePath) {
 			char[] quoteChars = {'"'};
-			String namespace = vreq.getParameter("namespace");
+			String namespace = "";
 			String tboxNamespace = vreq.getParameter("tboxNamespace");
 			String typeName = vreq.getParameter("typeName");
 			String csvUrl = vreq.getParameter("csvUrl");
@@ -141,7 +150,7 @@ public class JenaCsv2RdfController extends BaseEditController{
 					
 			} catch (IOException e) {
 				System.out.println("IOException opening URL "+csvUrl);
-				return;
+				return null;
 			}
 			
 			Model[] models = null;
@@ -157,8 +166,8 @@ public class JenaCsv2RdfController extends BaseEditController{
 			}
 			if (tboxDestination != null) {
 				tboxDestination.add(models[1]);
-			}
-					
+			}	
+			return destinationModelNameStr;
 		}
 	 
 	 private Model getModel(String name, HttpServletRequest request) {
