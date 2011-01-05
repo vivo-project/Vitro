@@ -359,7 +359,8 @@ article.property ul.property-list li{
 }
 article.property ul.subclass-property-list{
     background: #fff;
-    border-top: 1px solid #DFE6E5;
+    border: 1px dotted #DFE6E5;
+    background-color: #fafaf9;
     padding-top: 10px;
     padding-bottom: 10px;   
 }
