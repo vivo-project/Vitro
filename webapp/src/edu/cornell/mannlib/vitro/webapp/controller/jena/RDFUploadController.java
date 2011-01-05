@@ -47,6 +47,7 @@ public class RDFUploadController extends BaseEditController {
     private static FileItem fileStream=null; 
     private static final String INGEST_MENU_JSP = "/jenaIngest/ingestMenu.jsp";
     private static final String LOAD_RDF_DATA_JSP = "/jenaIngest/loadRDFData.jsp";
+    private static final String LIST_MODELS_JSP = "/jenaIngest/listModels.jsp";
 	
 	public void doPost(HttpServletRequest rawRequest,
 			HttpServletResponse response) throws ServletException, IOException {
@@ -216,8 +217,10 @@ public class RDFUploadController extends BaseEditController {
 		
 		if (docLoc!=null && modelName != null) {
 			doLoadRDFData(modelName,docLoc,filePath,languageStr,maker);
-			request.setAttribute("title","Ingest Menu");
-			request.setAttribute("bodyJsp",INGEST_MENU_JSP);
+			//request.setAttribute("title","Ingest Menu");
+			//request.setAttribute("bodyJsp",INGEST_MENU_JSP);
+			request.setAttribute("title","Available Models");
+			request.setAttribute("bodyJsp",LIST_MODELS_JSP);
 		} else {
 			request.setAttribute("title","Load RDF Data");
 			request.setAttribute("bodyJsp",LOAD_RDF_DATA_JSP);
