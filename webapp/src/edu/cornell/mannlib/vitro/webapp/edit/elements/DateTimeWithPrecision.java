@@ -96,10 +96,10 @@ public class DateTimeWithPrecision extends BaseEditElement {
             throw new IllegalArgumentException(minimumPrecisionURI 
                     +" is not a valid precision for displayRequiredLevel, see VitroVocabulary.Precision");
         
-        if( this.displayRequiredLevel.ordinal() < this.minimumPrecision.ordinal() ){
-            throw new IllegalArgumentException("the display precision level " + this.displayRequiredLevel 
-                    + " is less precise than the required minimum precision of " + this.minimumPrecision);
-        }
+//        if( this.displayRequiredLevel.ordinal() < this.minimumPrecision.ordinal() ){
+//            throw new IllegalArgumentException("the display precision level " + this.displayRequiredLevel 
+//                    + " is less precise than the required minimum precision of " + this.minimumPrecision);
+//        }
     }
     
     private static final Log log = LogFactory.getLog(DateTimeWithPrecision.class);
