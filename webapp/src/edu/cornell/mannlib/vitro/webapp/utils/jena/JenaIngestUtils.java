@@ -5,11 +5,13 @@ package edu.cornell.mannlib.vitro.webapp.utils.jena;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -135,6 +137,125 @@ public class JenaIngestUtils {
 			inModel.leaveCriticalSection();
 		}
 		return outModel;
+	}
+	
+	public Model renameBNodesByPattern(Model inModel, String namespaceEtc, Model dedupModel, String pattern, String property){
+		Model outModel = ModelFactory.createDefaultModel();
+		Property propertyRes = ResourceFactory.createProperty(property);
+		OntModel dedupUnionModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); // we're not using OWL here, just the OntModel submodel infrastructure
+		dedupUnionModel.addSubModel(outModel);
+		if (dedupModel != null) {
+			dedupUnionModel.addSubModel(dedupModel);
+		}
+		// the dedupUnionModel is so we can guard against reusing a URI in an 
+		// existing model, as well as in the course of running this process
+		inModel.enterCriticalSection(Lock.READ);
+		Set<String> doneSet = new HashSet<String>();
+		
+		try {
+			outModel.add(inModel);
+			ClosableIterator closeIt = inModel.listSubjects();
+			try {
+				for (Iterator it = closeIt; it.hasNext();) {
+					Resource res = (Resource) it.next();
+					if (res.isAnon() && !(doneSet.contains(res.getId()))) {
+						// now we do something hacky to get the same resource in the outModel, since there's no getResourceById();
+						ClosableIterator closfIt = outModel.listStatements(res,propertyRes,(RDFNode)null);
+						Statement stmt = null;
+						try {
+							if (closfIt.hasNext()) {
+								stmt = (Statement) closfIt.next();
+							}
+						} finally {
+							closfIt.close();
+						}
+						if (stmt != null) {
+							Resource outRes = stmt.getSubject();
+							if(stmt.getObject().isLiteral()){
+								ResourceUtils.renameResource(outRes,namespaceEtc+pattern+"_"+stmt.getObject().toString());
+							}
+							doneSet.add(res.getId().toString());
+						}
+					}
+				}
+			} finally {
+				closeIt.close();
+			}
+		} finally {
+			inModel.leaveCriticalSection();
+		}
+		
+		
+		return outModel;
+		
+	}
+	
+	public Map generatePropertyMap(String[] sourceModel, Model model, ModelMaker maker){
+		Map<String,LinkedList<String>> propertyMap = Collections.synchronizedMap(new HashMap<String, LinkedList<String>>());
+		Set<String> doneList = new HashSet<String>();
+		if(sourceModel!=null && sourceModel.length!=0){
+			for(String modelName : sourceModel){
+				if(modelName != null){
+					model = maker.getModel(modelName);
+					ClosableIterator cItr = model.listSubjects();
+					while(cItr.hasNext()){
+						Resource res = (Resource) cItr.next();
+						if(res.isAnon() && !doneList.contains(res.getId())){
+							
+							doneList.add(res.getId().toString());
+							StmtIterator stmtItr = model.listStatements(res, (Property)null, (RDFNode)null);
+							while(stmtItr.hasNext()){
+								Statement stmt = stmtItr.next();
+								if(!stmt.getObject().isResource()){
+									if(propertyMap.containsKey(stmt.getPredicate().getURI())){
+										LinkedList linkList = propertyMap.get(stmt.getPredicate().getURI());
+										linkList.add(stmt.getObject().toString());
+										
+									}
+									else{
+										propertyMap.put(stmt.getPredicate().getURI(), new LinkedList());
+										LinkedList linkList = propertyMap.get(stmt.getPredicate().getURI());
+										linkList.add(stmt.getObject().toString());
+										
+									}
+									
+								}
+								
+							}
+						}
+					}
+					cItr = model.listObjects();
+					while(cItr.hasNext()){
+						RDFNode rdfn = (RDFNode) cItr.next();
+						if(rdfn.isResource()){
+							Resource res = (Resource)rdfn;
+							if(res.isAnon() && !doneList.contains(res.getId())){
+								doneList.add(res.getId().toString());
+								StmtIterator stmtItr = model.listStatements(res, (Property)null, (RDFNode)null);
+								while(stmtItr.hasNext()){
+									Statement stmt = stmtItr.next();
+									if(!stmt.getObject().isResource()){
+										if(propertyMap.containsKey(stmt.getPredicate().getURI())){
+											LinkedList linkList = propertyMap.get(stmt.getPredicate().getURI());
+											linkList.add(stmt.getObject().toString());
+										
+										}
+										else{
+											propertyMap.put(stmt.getPredicate().getURI(), new LinkedList());
+											LinkedList linkList = propertyMap.get(stmt.getPredicate().getURI());
+											linkList.add(stmt.getObject().toString());
+											
+										}
+									}
+								}
+							}
+						}
+					}
+					cItr.close();
+				}
+			}
+		}
+		return propertyMap;
 	}
 	
 	private String getNextURI(String namespaceEtc, Model model) {
