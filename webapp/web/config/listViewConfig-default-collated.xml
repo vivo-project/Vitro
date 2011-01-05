@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+
+<!-- 
+    Default list view config file for collated object properties 
+
+    Required elements: 
+        - query: the sparql query used to retrieve the data
+        - template: the name of the template used to display a single property statement
+    
+    Optional elements: 
+        - postprocessor: a Java class that postprocesses the data retrieved from the query before
+                       sending it to the template
+    
+    Query requirements:
+        - WHERE clause must contain a statement ?subject ?property ?object, with the variables
+          ?subject and ?property named as such. The object can be given any name, but it must be 
+          included in the SELECT terms retrieved by the query. This is the statement that will be edited 
+          from the edit links.
+        - Each assertion or set of optional assertions must reference a different graph variable, so that
+          we do not impose a requirement about which assertions are in the same graph.           
+-->
+
+<list-view-config>
+    <query>    
+        PREFIX vitro: &lt;http://vitro.mannlib.cornell.edu/ns/vitro/0.7#&gt;
+        PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;  
+          
+        SELECT ?subclass ?object ?name ?moniker {
+            GRAPH ?g1 { ?subject ?property ?object }
+            OPTIONAL { GRAPH ?g2 { ?object rdfs:label ?name } }
+            OPTIONAL { GRAPH ?g3 { ?object vitro:moniker ?moniker } }
+            OPTIONAL { GRAPH ?g4 { ?object a ?subclass } 
+                       FILTER (?g4 != &lt;http://vitro.mannlib.cornell.edu/default/inferred-tbox&gt; &amp;&amp; 
+                               ?g4 != &lt;http://vitro.mannlib.cornell.edu/default/vitro-kb-inf&gt; )             
+                     }
+        }       
+    </query>
+
+    <postprocessor>edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.DefaultListViewDataPostProcessor</postprocessor>
+    
+    <template>propStatement-default.ftl</template>
+</list-view-config>

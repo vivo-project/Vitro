@@ -18,21 +18,33 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 public class UncollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateModel {
 
     private static final Log log = LogFactory.getLog(UncollatedObjectPropertyTemplateModel.class);  
+    private static final String DEFAULT_CONFIG_FILE = "listViewConfig-default-uncollated.xml";
     
     private List<ObjectPropertyStatementTemplateModel> statements;
     
     UncollatedObjectPropertyTemplateModel(ObjectProperty op, Individual subject, VitroRequest vreq) {
         super(op, subject, vreq);
+        
+        /* Get the data */
         WebappDaoFactory wdf = vreq.getWebappDaoFactory();
         ObjectPropertyStatementDao opDao = wdf.getObjectPropertyStatementDao();
         String subjectUri = subject.getURI();
         String propertyUri = op.getURI();
         List<Map<String, String>> statementData = opDao.getObjectPropertyStatementsForIndividualByProperty(subjectUri, propertyUri, getQueryString());
+        
+        /* Apply postprocessing */
         postprocess(statementData, wdf);
+        
+        /* Put into data structure to send to template */
         statements = new ArrayList<ObjectPropertyStatementTemplateModel>(statementData.size());
         for (Map<String, String> map : statementData) {
             statements.add(new ObjectPropertyStatementTemplateModel(subjectUri, propertyUri, map));
         }
+    }
+    
+    @Override
+    protected String getDefaultConfigFileName() {
+        return DEFAULT_CONFIG_FILE;
     }
     
     /* Access methods for templates */

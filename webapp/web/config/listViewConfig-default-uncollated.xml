@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
-<!--
+<!-- 
+    Default list view config file for uncollated object properties 
+    
     Required elements: 
         - query: the sparql query used to retrieve the data
         - template: the name of the template used to display a single property statement

@@ -26,36 +26,27 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateModel {
 
     private static final Log log = LogFactory.getLog(CollatedObjectPropertyTemplateModel.class);  
+    private static final String DEFAULT_CONFIG_FILE = "listViewConfig-default-collated.xml";
     
     private SortedMap<String, List<ObjectPropertyStatementTemplateModel>> subclasses;
     
     CollatedObjectPropertyTemplateModel(ObjectProperty op, Individual subject, VitroRequest vreq) throws Exception {
         super(op, subject, vreq); 
 
-        // RY Temporarily throw an error because collation hasn't been implemented yet.
-//        boolean error = true;
-//        if (error) {
-//            throw new Exception("Collated object property not implemented yet");
-//        }
-        
-        /* Change the approach to collation:
-         * Custom views can get the subclasses in the query. Must use a term ?subclass - throw error if not.
-         * Default view: we may be able to figure out the  class to get subclasses of by inspecting the property.
-         * If not, use getDirectClasses etc of the object term.
-         * We need a subclassed and nonsubclassed default query for the default view: collated-query and uncollated-query.
-         * We can also use these for custom views. Throw error if property is collated but there's no subclass term
-         * in the query. (The reverse is okay - uncollated property with a subclass term in the query.     
-         */
-        
+        /* Get the data */
         WebappDaoFactory wdf = vreq.getWebappDaoFactory();
         ObjectPropertyStatementDao opDao = wdf.getObjectPropertyStatementDao();
         String subjectUri = subject.getURI();
         String propertyUri = op.getURI();
-        List<Map<String, String>> statementData = opDao.getObjectPropertyStatementsForIndividualByProperty(subjectUri, propertyUri, getQueryString());
+        List<Map<String, String>> statementData = 
+            opDao.getObjectPropertyStatementsForIndividualByProperty(subjectUri, propertyUri, getQueryString());
+
+        /* Apply postprocessing */
+        postprocess(statementData, wdf);
         
-        Map<String, List<ObjectPropertyStatementTemplateModel>> unsortedSubclasses = hasDefaultListView() ?
-                collateDefaultListView(subjectUri, propertyUri, statementData, vreq) :
-                collateCustomListView(subjectUri, propertyUri, statementData, vreq);
+        /* Collate the data */
+        Map<String, List<ObjectPropertyStatementTemplateModel>> unsortedSubclasses = 
+            collate(subjectUri, propertyUri, statementData, vreq);
 
         /* Sort by subclass name */
         Comparator<String> comparer = new Comparator<String>() {
@@ -67,10 +58,10 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
         subclasses.putAll(unsortedSubclasses);        
     }
     
-    private Map<String, List<ObjectPropertyStatementTemplateModel>> collateCustomListView(String subjectUri, 
+    private Map<String, List<ObjectPropertyStatementTemplateModel>> collate(String subjectUri, 
             String propertyUri, List<Map<String, String>> statementData, VitroRequest vreq) {
     
-        Map<String, List<ObjectPropertyStatementTemplateModel>> unsortedSubclasses = 
+        Map<String, List<ObjectPropertyStatementTemplateModel>> subclassMap = 
             new HashMap<String, List<ObjectPropertyStatementTemplateModel>>();
         String currentSubclassUri = null;
         List<ObjectPropertyStatementTemplateModel> currentList = null;
@@ -80,19 +71,11 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
                 currentSubclassUri = subclassUri;
                 currentList = new ArrayList<ObjectPropertyStatementTemplateModel>();
                 String subclassName = getSubclassName(subclassUri, vreq);
-                unsortedSubclasses.put(subclassName, currentList);
+                subclassMap.put(subclassName, currentList);
             }
             currentList.add(new ObjectPropertyStatementTemplateModel(subjectUri, propertyUri, map));
         }   
-        return unsortedSubclasses; 
-    }
-    
-    private Map<String, List<ObjectPropertyStatementTemplateModel>> collateDefaultListView(String subjectUri, 
-            String propertyUri, List<Map<String, String>> statementData, VitroRequest vreq) {
-        
-        Map<String, List<ObjectPropertyStatementTemplateModel>> unsortedSubclasses = 
-            new HashMap<String, List<ObjectPropertyStatementTemplateModel>>();
-        return unsortedSubclasses;
+        return subclassMap; 
     }
     
     private String getSubclassName(String subclassUri, VitroRequest vreq) {
@@ -100,30 +83,12 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
         VClass vclass = vclassDao.getVClassByURI(subclassUri);
         return vclass.getName();
     }
-    
-    private String getCollationTargetError() {
-        String errorMessage = null;
-        String collationTarget = getCollationTarget();
-        // Make sure the collation target is not null or empty.
-        if (collationTarget == null || collationTarget.trim().isEmpty()) {
-            errorMessage = "No collation target specified.";
-        } else {
-            // Make sure the collation target is one of the select terms in the query.
-            String queryString = getQueryString();
-            String selectClause = queryString.substring(0, queryString.indexOf("{"));
-            Pattern collationTargetPattern = Pattern.compile("\\b\\\\?" + collationTarget + "\\b");
-            Matcher matcher = collationTargetPattern.matcher(selectClause);
-            if (! matcher.find()) {
-                errorMessage = "Invalid collation target.";
-            }
-        }   
-        return errorMessage;
-    }
-    
-    private List<VClass> getDirectVClasses(String key, List<Map<String, Object>> data) {
-        return null;
-    }
 
+    @Override
+    protected String getDefaultConfigFileName() {
+        return DEFAULT_CONFIG_FILE;
+    }
+    
     /* Access methods for templates */
     
     public Map<String, List<ObjectPropertyStatementTemplateModel>> getSubclasses() {

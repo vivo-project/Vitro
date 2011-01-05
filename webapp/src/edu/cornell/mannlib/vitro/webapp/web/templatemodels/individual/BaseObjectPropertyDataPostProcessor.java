@@ -2,6 +2,7 @@
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -58,11 +59,14 @@ public abstract class BaseObjectPropertyDataPostProcessor implements
             return;
         }
         List<String> foundObjects = new ArrayList<String>();
-        for (Map<String, String> map : data) {
+        log.debug("Processing property: " + objectPropertyTemplateModel.getUri());
+        Iterator<Map<String, String>> dataIterator = data.iterator();
+        while (dataIterator.hasNext()) {
+            Map<String, String> map = dataIterator.next();
             String objectValue = map.get(objectVariableName);
             // We arbitrarily remove all but the first. Not sure what selection criteria could be brought to bear on this.
             if (foundObjects.contains(objectValue)) {
-                data.remove(map);
+                dataIterator.remove();
             } else {
                 foundObjects.add(objectValue);
             }
