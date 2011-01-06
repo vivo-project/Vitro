@@ -170,8 +170,8 @@ public class URLRewritingHttpServletResponseTest {
     }
     @Test
     public void test42090(){ urlEncodingStyleA(
-    "vclassEdit?home=1&uri=http%3a%2f%2fvivoweb.org%2fontology%2fcore%23AwardOrHonor",
-    "vclassEdit?home=1&uri=http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23AwardOrHonor");
+    "vclassEdit?home=1&uri=http%3a%2f%2fvivoweb.org%2fontology%2fcore%23Award",
+    "vclassEdit?home=1&uri=http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23Award");
     }
     @Test
     public void test42091(){ urlEncodingStyleA(

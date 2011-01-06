@@ -2,6 +2,10 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao;
 
+import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
+
 
 public class DisplayVocabulary {
     
@@ -21,4 +25,8 @@ public class DisplayVocabulary {
     public static final String URL_MAPPING = NS + "urlMapping";
     public static final String TITLE = NS + "title";
     public static final String REQUIRES_BODY_TEMPLATE = NS + "requiresBodyTemplate"; 
+    
+    /* URIs for storing menu.n3 */
+    public static final String MENU_TEXT_RES = NS + "MenuText";    
+    public static final String HAS_TEXT_REPRESENTATION = NS + "hasMenuText";
 }
