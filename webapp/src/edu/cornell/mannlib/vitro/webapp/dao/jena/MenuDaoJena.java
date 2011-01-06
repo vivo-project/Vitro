@@ -107,8 +107,8 @@ public class MenuDaoJena extends JenaBaseDao implements MenuDao {
 
  
     protected boolean isActive(String url, String link){
-        if( "/".equals(url) )
-            return "/".equals(link);
+        if( "/".equals(link) )                    
+            return "/".equals(url);
         else
             return url.startsWith(link);
     }

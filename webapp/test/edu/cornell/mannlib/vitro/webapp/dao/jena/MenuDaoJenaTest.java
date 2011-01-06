@@ -88,4 +88,20 @@ public class MenuDaoJenaTest extends AbstractTestClass {
         Assert.assertEquals("Organizations",item.getLinkText());
         Assert.assertEquals("bogusUrlContextPath/organizations",item.getUrl());
     }
+    
+    
+    @Test
+    public void isActiveTest(){
+        SimpleOntModelSelector sos = new SimpleOntModelSelector( ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM));
+        sos.setDisplayModel(displayModel);
+        MenuDaoJena menuDaoJena = new MenuDaoJena(new WebappDaoFactoryJena(sos));                 
+        
+        //First arg is the page the user is on.  Second arg is the urlmapping of the menu item.
+        Assert.assertTrue( menuDaoJena.isActive("/", "/") );
+        Assert.assertTrue( menuDaoJena.isActive("/people", "/people") );
+        
+        Assert.assertFalse( menuDaoJena.isActive("/people", "/") );
+        Assert.assertFalse( menuDaoJena.isActive("/", "/people") );
+        
+    }
 }
