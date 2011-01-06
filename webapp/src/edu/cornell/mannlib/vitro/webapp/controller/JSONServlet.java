@@ -5,7 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.controller;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
-import java.net.HttpURLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -26,15 +25,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import atg.taglib.json.util.HTTP;
-
 import com.hp.hpl.jena.ontology.OntModel;
 
+import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
+import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.TabEntitiesController.PageRecord;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
-import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.SelectListGenerator;
@@ -78,12 +77,18 @@ public class JSONServlet extends VitroHttpServlet {
         
     }
 
-    private void getLuceneIndividualsByVClass(HttpServletRequest req, HttpServletResponse resp) {        
+    private void getLuceneIndividualsByVClass(HttpServletRequest req, HttpServletResponse resp) {
+        
         VitroRequest vreq = new VitroRequest(req);
         String errorMessage = null;
         String message = null;
         VClass vclass=null;
         JSONObject rObj = new JSONObject();
+        
+        DataProperty fNameDp = (new DataProperty());
+        fNameDp.setURI("http://xmlns.com/foaf/0.1/firstName");
+        DataProperty lNameDp = (new DataProperty());
+        lNameDp.setURI("http://xmlns.com/foaf/0.1/lastName");
         
         if( log.isDebugEnabled() ){
             Enumeration<String> e = vreq.getParameterNames();
@@ -95,6 +100,10 @@ public class JSONServlet extends VitroHttpServlet {
                 }            
             }
         }
+        
+        //need an unfiltered dao to get firstnames and lastnames
+        WebappDaoFactory fullWdf = vreq.getFullWebappDaoFactory();
+        
         
         try {                                   
             String vitroClassIdStr = vreq.getParameter("vclassId");
@@ -139,19 +148,9 @@ public class JSONServlet extends VitroHttpServlet {
                     jo.put("thumbUrl", ind.getThumbUrl());
                     jo.put("imageUrl", ind.getImageUrl());
                     jo.put("profileUrl", UrlBuilder.getIndividualProfileUrl(ind, vreq.getWebappDaoFactory()));
-                              
-                    //this doesn't work as these properties are filtered out.          
-                    String fname = ind.getDataValue( "http://xmlns.com/foaf/0.1/firstName");
-                    if( fname != null )
-                        jo.put("firstName", fname);
-                    else 
-                        jo.put("firstName", "");
                     
-                    String lname = ind.getDataValue( "http://xmlns.com/foaf/0.1/lastName");
-                    if( lname != null )
-                        jo.put("lastName", lname);
-                    else 
-                        jo.put("lastName", "");
+                    jo.put("firstName", getDataPropertyValue(ind, fNameDp, fullWdf));                     
+                    jo.put("lastName", getDataPropertyValue(ind, lNameDp, fullWdf));
                     
                     jInds.put(jo);
                 }
@@ -202,6 +201,20 @@ public class JSONServlet extends VitroHttpServlet {
         return;
     }
 
+    String getDataPropertyValue(Individual ind, DataProperty dp, WebappDaoFactory wdf){
+        List<DataPropertyStatement> stmts = wdf.getDataPropertyStatementDao()
+            .getDataPropertyStatementsForIndividualByProperty(ind, dp);
+        if( stmts == null || stmts.isEmpty() )
+            return "";
+        else{
+            if( stmts.get(0) != null )
+                return stmts.get(0).getData();
+            else
+                return "";
+        }
+            
+    }
+    
     /**
      * Gets an option list for a given EditConfiguration and Field.
      * Requires following HTTP query parameters:
@@ -342,7 +355,7 @@ public class JSONServlet extends VitroHttpServlet {
         String vclassURI = vreq.getParameter("vclassURI");
         WebappDaoFactory daos = (new VitroRequest(req)).getFullWebappDaoFactory();
         resp.setCharacterEncoding("UTF-8");
-        
+               
         // ServletOutputStream doesn't support UTF-8
         PrintWriter out = resp.getWriter();
         resp.getWriter();
