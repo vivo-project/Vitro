@@ -65,7 +65,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
             try {
                 return new CollatedObjectPropertyTemplateModel(op, subject, vreq);
             } catch (InvalidConfigurationException e) {
-                log.error(e, e);
+                log.error(e);
                 return new UncollatedObjectPropertyTemplateModel(op, subject, vreq);
             }
         } else {

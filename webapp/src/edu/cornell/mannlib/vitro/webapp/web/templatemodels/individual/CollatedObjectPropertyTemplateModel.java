@@ -36,13 +36,9 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
         
         super(op, subject, vreq); 
         
-        /* Make sure the query contains a subclass variable. If not, throw an exception so the caller will create
-         * an UncollatedObjectPropertyTemplateModel instead.
-         */
-        String queryString = getQueryString();
-        Matcher m = QUERY_PATTERN.matcher(queryString);
-        if ( ! m.find()) { 
-            throw new InvalidConfigurationException("Invalid configuration: Query does not select a subclass variable."); 
+        if ( ! validConfigurationForCollatedProperty() ) {
+            throw new InvalidConfigurationException("Invalid configuration for property " + op.getURI() + 
+                                                    ": Query does not select a subclass variable."); 
         }
 
         /* Get the data */
@@ -68,6 +64,19 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
             }};
         subclasses = new TreeMap<String, List<ObjectPropertyStatementTemplateModel>>(comparer);
         subclasses.putAll(unsortedSubclasses);        
+    }
+    
+    private boolean validConfigurationForCollatedProperty() {
+        boolean validConfig = true;
+        
+        // Make sure the query selects a ?subclass variable. 
+        String queryString = getQueryString();
+        Matcher m = QUERY_PATTERN.matcher(queryString);
+        if ( ! m.find() ) { 
+            validConfig = false;
+        }    
+        
+        return validConfig;
     }
     
     private Map<String, List<ObjectPropertyStatementTemplateModel>> collate(String subjectUri, 
