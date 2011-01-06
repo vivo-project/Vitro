@@ -19,6 +19,7 @@ import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
@@ -42,6 +43,8 @@ public class DateTimeMigration {
 	private static final String hasTimeIntervalURI = "http://vivoweb.org/ontology/core#hasTimeInterval";
 	private static final String dateTimeIntervalURI = "http://vivoweb.org/ontology/core#dateTimeInterval";
 	private static final String dateTimeIntervalForURI = "http://vivoweb.org/ontology/core#dateTimeIntervalFor";
+	private static final String startURI = "http://vivoweb.org/ontology/core#start";
+	private static final String endURI = "http://vivoweb.org/ontology/core#end";
 	
 	private static final String yPrecisionURI = "http://vivoweb.org/ontology/core#yearPrecision";
 	private static final String ymPrecisionURI = "http://vivoweb.org/ontology/core#yearMonthPrecision";
@@ -53,7 +56,8 @@ public class DateTimeMigration {
 	private ObjectProperty dateTimeIntervalProp = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createObjectProperty(dateTimeIntervalURI);
 	private ObjectProperty dateTimeIntervalForProp = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createObjectProperty(dateTimeIntervalForURI);
 	private ObjectProperty dateTimePrecisionProp = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createObjectProperty(dateTimePrecisionURI);
-	
+	private ObjectProperty startProp = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createObjectProperty(startURI);
+	private ObjectProperty endProp = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createObjectProperty(endURI);
 	
 	/**
 	 * Constructor 
@@ -99,17 +103,29 @@ public class DateTimeMigration {
 	       
 		    while (iter.hasNext()) {
 
-			   Statement stmt = iter.next();
+			   Statement stmt1 = iter.next();
 
-			   Statement stmt2 = aboxModel.getProperty(stmt.getObject().asResource(), dateTimeIntervalProp);
+			   Statement stmt2 = aboxModel.getProperty(stmt1.getObject().asResource(), dateTimeIntervalProp);
 
-			   if (stmt2 != null) {
-				  retractions.add(stmt2);
-				  retractions.add(stmt2.getObject().asResource(), dateTimeIntervalForProp, stmt2.getSubject());
-				  additions.add(stmt.getSubject(), dateTimeIntervalProp, stmt2.getObject());
-				  additions.add(stmt2.getObject().asResource(), dateTimeIntervalProp, stmt.getSubject());
-			   }
+			   if (stmt2 == null) continue;
+			   if (!stmt1.getObject().isResource()) continue;
+			   if (!stmt2.getObject().isResource()) continue;
+			   
+			   retractions.add(stmt2);
+			   retractions.add(stmt2.getObject().asResource(), dateTimeIntervalForProp, stmt2.getSubject());
+			   additions.add(stmt1.getSubject(), dateTimeIntervalProp, stmt1.getObject());
+			   additions.add(stmt1.getObject().asResource(), dateTimeIntervalForProp, stmt1.getSubject());
+			   
+			   StmtIterator iter2 = aboxModel.listStatements(stmt2.getObject().asResource(), (Property) null, (RDFNode) null);
+			   
+			   while (iter2.hasNext()) {
+				   Statement stmt3 = iter2.next();
+				   retractions.add(stmt3);
 				   
+				   if ( (stmt3.getPredicate().equals(startProp)) || (stmt3.getPredicate().equals(endProp)) ) {
+					   additions.add(stmt1.getObject().asResource(), stmt3.getPredicate(), stmt3.getObject());
+				   }
+			   }  
 		    }
 		   
 		    aboxModel.remove(retractions);
@@ -119,7 +135,7 @@ public class DateTimeMigration {
 		    
 			if (additions.size() > 0) {	
 			   long count = additions.size() / 2;	
-			   logger.log(count + " hasTimeInterval predicate" + ((count > 1) ? "s were" : " was") + " updated to use dateTimeInterval instead");
+			   logger.log(count + " Academic interval" + ((count > 1) ? "s were" : " was") + " updated to the new date/time format");
 			}
 		} finally {
 			aboxModel.leaveCriticalSection();
@@ -198,7 +214,7 @@ public class DateTimeMigration {
 		    record.recordAdditions(additions);
 		    
 			if (additions.size() > 0) {
-					logger.log(additions.size() + " date/time assertion" + 
+					logger.log(additions.size() + " date/time literal" + 
 							((additions.size() > 1) ? "s" : "") +
 							" were updated to the 1.2 representation.");
 			}		   
