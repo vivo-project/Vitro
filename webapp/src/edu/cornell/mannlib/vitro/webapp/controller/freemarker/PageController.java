@@ -7,20 +7,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ExceptionResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
-import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
+import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.PageDataGetter;
+import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.ClassGroupPageData;
 
 /**
  * Controller for getting data for pages defined in the display model. 
@@ -34,13 +35,24 @@ public class PageController extends FreemarkerHttpServlet{
     private static final Log log = LogFactory.getLog(PageController.class);
     
     protected final static String DEFAULT_TITLE = "Page";        
-    protected final static String DEFAULT_BODY_TEMPLATE = "menupage.ftl";
+    protected final static String DEFAULT_BODY_TEMPLATE = "menupage.ftl";     
 
-    protected static Map<String,PageDataGetter> typeToDataGetter;      
+    protected static final String DATA_GETTER_MAP = "pageTypeToDataGetterMap";
+    
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        getServletContext().setAttribute(DATA_GETTER_MAP, new HashMap<String,PageDataGetter>());
+        
+        /* register all page data getters with the PageController servlet.  
+         * There should be a better way of doing this. */                        
+        ClassGroupPageData cgpd = new ClassGroupPageData();
+        getPageDataGetterMap(getServletContext()).put(cgpd.getType(), cgpd);        
+    }
 
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
-        try {
+        try {            
             // get URL without hostname or servlet context
             String url = vreq.getRequestURI().substring(vreq.getContextPath().length()); 
         
@@ -108,7 +120,7 @@ public class PageController extends FreemarkerHttpServlet{
         if(type == null || type.isEmpty())
             return Collections.emptyMap();
             
-        PageDataGetter getter = typeToDataGetter.get(type);
+        PageDataGetter getter = getPageDataGetterMap(getServletContext()).get(type);
         
         if( getter != null ){
             try{
@@ -154,72 +166,13 @@ public class PageController extends FreemarkerHttpServlet{
         else
             throw new Exception("no page found for " + vreq.getRequestURI() );
     }
+
+    public static Map<String,PageDataGetter> getPageDataGetterMap(ServletContext sc){
+        return (Map<String,PageDataGetter>)sc.getAttribute(DATA_GETTER_MAP);
+    }        
     
     public static void putPageUri(HttpServletRequest req, String pageUri){
         req.setAttribute("pageURI", pageUri);
-    }
-    
-    private interface PageDataGetter{
-        Map<String,Object> getData(ServletContext contect, VitroRequest vreq, String pageUri, Map<String, Object> page, String type );
-        
-        /** Gets the type that this class applies to */
-        String getType();
-    }
-    
-    /**
-     * This will pass these variables to the template:
-     * classGroupUri: uri of the classgroup associated with this page.
-     * vClassGroup: a data structure that is the classgroup associated with this page.     
-     */
-    static private class ClassGroupPageData implements PageDataGetter{
-        public Map<String,Object> getData(ServletContext context, VitroRequest vreq, String pageUri, Map<String, Object> page, String type ){
-            HashMap<String, Object> data = new HashMap<String,Object>();
-            String classGroupUri = vreq.getWebappDaoFactory().getPageDao().getClassGroupPage(pageUri);
-            data.put("classGroupUri", classGroupUri);
-
-            VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(context);            
-            List<VClassGroup> vcgList = vcgc.getGroups(vreq.getPortalId());
-            VClassGroup group = null;
-            for( VClassGroup vcg : vcgList){
-                if( vcg.getURI() != null && vcg.getURI().equals(classGroupUri)){
-                    group = vcg;
-                    break;
-                }
-            }
-            if( classGroupUri != null && !classGroupUri.isEmpty() && group == null ){ 
-                /*This could be for two reasons: one is that the classgroup doesn't exist
-                 * The other is that there are no individuals in any of the classgroup's classes */
-                group = vreq.getWebappDaoFactory().getVClassGroupDao().getGroupByURI(classGroupUri);
-                if( group != null ){
-                    List<VClassGroup> vcgFullList = vreq.getWebappDaoFactory().getVClassGroupDao()
-                        .getPublicGroupsWithVClasses(false, true, false);
-                    for( VClassGroup vcg : vcgFullList ){
-                        if( classGroupUri.equals(vcg.getURI()) ){
-                            group = vcg;
-                            break;
-                        }                                
-                    }
-                    if( group == null ){
-                        log.error("Cannot get classgroup '" + classGroupUri + "' for page '" + pageUri + "'");
-                    }
-                }
-                
-            }
-                        
-            data.put("vClassGroup", group);  //may put null            
-            return data;
-        }
-        
-        public String getType(){
-            return DisplayVocabulary.CLASSGROUP_PAGE_TYPE;
-        } 
-    }
-    
-    /* register all page data getters with the PageController servlet */
-    static{ 
-        typeToDataGetter = new HashMap<String,PageDataGetter>();
-        ClassGroupPageData cgpd = new ClassGroupPageData();
-        typeToDataGetter.put(cgpd.getType(), cgpd);
-    }
+    }  
     
 }

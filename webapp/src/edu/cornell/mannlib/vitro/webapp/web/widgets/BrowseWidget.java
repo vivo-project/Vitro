@@ -11,6 +11,9 @@ import java.util.Map;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
@@ -29,7 +32,8 @@ import freemarker.template.TemplateModelException;
  *
  */
 public class BrowseWidget extends Widget {
-            
+    final static Log log = LogFactory.getLog(BrowseWidget.class);
+    
     @Override
     protected WidgetTemplateValues process(Environment env, Map params,
             HttpServletRequest request, ServletContext context) throws Exception 
@@ -60,7 +64,7 @@ public class BrowseWidget extends Widget {
         Map<String,Object> body = getAllClassGroupData(request, params);
         try {
             body.put("urls",env.getDataModel().get("urls"));
-            body.put("urlMapping",env.getDataModel().get("urlMapping"));
+            body.put("currentPage", env.getDataModel().get("currentPage"));                        
         } catch (TemplateModelException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

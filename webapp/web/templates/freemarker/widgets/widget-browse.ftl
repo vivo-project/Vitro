@@ -16,7 +16,7 @@
 
         <ul>
         <#list vclassGroupList as group>
-            <li><a href="${urls.base}${urlMapping}?classgroupUri=${group.publicName?url}">${group.publicName}</a></li>
+            <li><a href="${urls.base}/${currentPage}?classgroupUri=${group.publicName?url}">${group.publicName}</a></li>
         </#list>
         </ul>
     </section>
@@ -33,14 +33,14 @@
     <nav role="navigation">
         <ul id="foaf-person-childClasses">
             <#list classes as class>
-            <li><a href="${urls.base}${urlMapping}?classgroupUri=${classGroup.publicName?url}&vclassUri=${class.uri?url}">${class.name}<span class="count-classes"> ${class.individualCount}</span></a></li>
+            <li><a href="${urls.base}/${currentPage}?classgroupUri=${classGroup.publicName?url}&vclassUri=${class.uri?url}">${class.name}<span class="count-classes"> ${class.individualCount}</span></a></li>
             </#list>
         </ul>
     </nav>
  
     <#--<ul>
     <#list classes as class>
-        <li><a href="${urls.base}${urlMapping}?classgroupUri=${classGroup.publicName?url}&vclassUri=${class.uri?url}">${class.name}</a> ${class.individualCount}</li> 
+        <li><a href="${urls.base}/${currentPage}?classgroupUri=${classGroup.publicName?url}&vclassUri=${class.uri?url}">${class.name}</a> ${class.individualCount}</li> 
     </#list>
     </ul>-->
 </section>

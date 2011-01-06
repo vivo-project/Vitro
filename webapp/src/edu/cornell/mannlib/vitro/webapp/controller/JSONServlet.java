@@ -34,6 +34,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.TabEntitiesController.PageRecord;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.SelectListGenerator;
@@ -137,7 +138,20 @@ public class JSONServlet extends VitroHttpServlet {
                     jo.put("name",ind.getName());
                     jo.put("thumbUrl", ind.getThumbUrl());
                     jo.put("imageUrl", ind.getImageUrl());
-                    jo.put("profileUrl", UrlBuilder.getIndividualProfileUrl(ind, vreq.getWebappDaoFactory()));                                      
+                    jo.put("profileUrl", UrlBuilder.getIndividualProfileUrl(ind, vreq.getWebappDaoFactory()));
+                              
+                    //this doesn't work as these properties are filtered out.          
+                    String fname = ind.getDataValue( "http://xmlns.com/foaf/0.1/firstName");
+                    if( fname != null )
+                        jo.put("firstName", fname);
+                    else 
+                        jo.put("firstName", "");
+                    
+                    String lname = ind.getDataValue( "http://xmlns.com/foaf/0.1/lastName");
+                    if( lname != null )
+                        jo.put("lastName", lname);
+                    else 
+                        jo.put("lastName", "");
                     
                     jInds.put(jo);
                 }

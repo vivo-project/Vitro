@@ -84,7 +84,7 @@ public class PageRoutingFilter implements Filter{
                 RequestDispatcher rd = filterConfig.getServletContext().getNamedDispatcher( controllerName );            
                 rd.forward(req, response);
             }else if( "/".equals( path ) || path.isEmpty() ){
-                log.debug("url '" +path + "' is being forward to home controller even though there is no mapping to home" );
+                log.debug("url '" +path + "' is being forward to home controller" );
                 RequestDispatcher rd = filterConfig.getServletContext().getNamedDispatcher( HOME_CONTROLLER_NAME );            
                 rd.forward(req, response);
             }else{
