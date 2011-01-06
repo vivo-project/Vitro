@@ -55,6 +55,10 @@
 
 <p>${year?number?c}</p>
 
+<h3>Raw String Literals</h3>
+<p>${r"#{title}"}</p>
+<p>${r"${title}"}</p>
+
 <@dump var="now" />
 <@dump var="urls" />
 <@dump var="fruit" />

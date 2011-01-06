@@ -64,7 +64,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         if (op.getCollateBySubclass()) {
             try {
                 return new CollatedObjectPropertyTemplateModel(op, subject, vreq);
-            } catch (Exception e) {
+            } catch (InvalidConfigurationException e) {
                 log.error(e, e);
                 return new UncollatedObjectPropertyTemplateModel(op, subject, vreq);
             }
@@ -206,6 +206,15 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         
         private String getConfigFilePath(String filename) {
             return servletContext.getRealPath(CONFIG_FILE_PATH + filename);
+        }
+    }
+    
+    protected class InvalidConfigurationException extends Exception { 
+
+        private static final long serialVersionUID = 1L;
+
+        protected InvalidConfigurationException(String s) {
+            super(s);
         }
     }
     

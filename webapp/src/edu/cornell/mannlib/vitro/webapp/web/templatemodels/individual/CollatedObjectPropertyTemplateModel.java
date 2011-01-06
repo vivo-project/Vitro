@@ -27,11 +27,23 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
 
     private static final Log log = LogFactory.getLog(CollatedObjectPropertyTemplateModel.class);  
     private static final String DEFAULT_CONFIG_FILE = "listViewConfig-default-collated.xml";
+    private static final Pattern QUERY_PATTERN = Pattern.compile("SELECT[^{]*\\?subclass\\b");
     
     private SortedMap<String, List<ObjectPropertyStatementTemplateModel>> subclasses;
     
-    CollatedObjectPropertyTemplateModel(ObjectProperty op, Individual subject, VitroRequest vreq) throws Exception {
+    CollatedObjectPropertyTemplateModel(ObjectProperty op, Individual subject, VitroRequest vreq) 
+        throws InvalidConfigurationException {
+        
         super(op, subject, vreq); 
+        
+        /* Make sure the query contains a subclass variable. If not, throw an exception so the caller will create
+         * an UncollatedObjectPropertyTemplateModel instead.
+         */
+        String queryString = getQueryString();
+        Matcher m = QUERY_PATTERN.matcher(queryString);
+        if ( ! m.find()) { 
+            throw new InvalidConfigurationException("Invalid configuration: Query does not select a subclass variable."); 
+        }
 
         /* Get the data */
         WebappDaoFactory wdf = vreq.getWebappDaoFactory();
