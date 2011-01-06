@@ -306,8 +306,8 @@ p.view-all-coauthors{
     padding-right: 15px;
     padding-left: 15px;
 }
- #property-group-menu li:fisrt-child{
-     padding-left: 0;
+#property-group-menu li:first-child{
+     padding-left: 10px;
 }
 /* PROPERTY GROUP------>  */
 .property-group{
