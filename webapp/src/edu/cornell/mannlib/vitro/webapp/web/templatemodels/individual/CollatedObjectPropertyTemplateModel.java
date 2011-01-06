@@ -27,7 +27,8 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
 
     private static final Log log = LogFactory.getLog(CollatedObjectPropertyTemplateModel.class);  
     private static final String DEFAULT_CONFIG_FILE = "listViewConfig-default-collated.xml";
-    private static final Pattern QUERY_PATTERN = Pattern.compile("SELECT[^{]*\\?subclass\\b");
+    private static final Pattern SELECT_QUERY_PATTERN = Pattern.compile("SELECT[^{]*\\?subclass\\b", Pattern.CASE_INSENSITIVE);
+    private static final Pattern ORDER_BY_QUERY_PATTERN = Pattern.compile("ORDER\\s+BY\\s+(DESC\\s*\\(\\s*)?\\?subclass", Pattern.CASE_INSENSITIVE);
     
     private SortedMap<String, List<ObjectPropertyStatementTemplateModel>> subclasses;
     
@@ -36,9 +37,10 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
         
         super(op, subject, vreq); 
         
-        if ( ! validConfigurationForCollatedProperty() ) {
-            throw new InvalidConfigurationException("Invalid configuration for property " + op.getURI() + 
-                                                    ": Query does not select a subclass variable."); 
+        String invalidConfigMessage = checkConfiguration();
+        if ( ! invalidConfigMessage.isEmpty() ) {
+            throw new InvalidConfigurationException("Invalid configuration for property " + 
+                    op.getURI() + ":" + invalidConfigMessage); 
         }
 
         /* Get the data */
@@ -66,17 +68,22 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
         subclasses.putAll(unsortedSubclasses);        
     }
     
-    private boolean validConfigurationForCollatedProperty() {
-        boolean validConfig = true;
-        
-        // Make sure the query selects a ?subclass variable. 
+    private String checkConfiguration() {
+
         String queryString = getQueryString();
-        Matcher m = QUERY_PATTERN.matcher(queryString);
-        if ( ! m.find() ) { 
-            validConfig = false;
-        }    
+        Matcher m;
         
-        return validConfig;
+        m = SELECT_QUERY_PATTERN.matcher(queryString); 
+        if ( ! m.find() ) { 
+            return("Query does not select a subclass variable.");
+        } 
+        
+        m = ORDER_BY_QUERY_PATTERN.matcher(queryString);
+        if ( ! m.find() ) {
+            return("Query does not sort first by subclass variable.");
+        }
+        
+        return "";
     }
     
     private Map<String, List<ObjectPropertyStatementTemplateModel>> collate(String subjectUri, 
