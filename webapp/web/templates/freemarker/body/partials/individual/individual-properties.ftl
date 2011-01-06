@@ -10,14 +10,14 @@
     
     <section class="property-group" role="region">
         <nav class="scroll-up" role="navigation">
-            <a href="#property-nav">
+            <a href="#property-group-menu">
                 <img src="${urls.images}/individual/scroll-up.png" alt="scroll to property group menus" />
             </a>
         </nav>
    
         <#-- Display the group heading --> 
         <#if groupname?has_content>
-            <h2><a name="${groupname}"></a>${groupname?capitalize}</h2>
+            <h2 id="${groupname}">${groupname?capitalize}</h2>
         </#if>
 
         <#-- List the properties in the group -->        

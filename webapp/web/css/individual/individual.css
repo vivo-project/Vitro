@@ -81,15 +81,15 @@ div.bottom{
 #individual-intro-person{
     float: left;
     width: 75%;
-    margin-top: 35px;
+    margin-top: 0.5em;
     margin-bottom: 30px;
 }
 /* <------ INDIVIDUAL INTRO LEFT CONTENT */
 #left-side{
     width: 166px;
     float: left;
-    padding-left: 27px;
-    padding-right: 34px;
+    padding-left: 0.5em;
+    padding-right: 1.5em;
 }
 #left-side img.individual-photo2{
     width: 160px;
@@ -193,7 +193,7 @@ ul#individual-urls-people li{
 }
 /* <------ INDIVIDUAL RIGHT CONTENT */
 #individual-info{
-    width: 65%;
+    width: 69%;
     float: left;
     padding: 10px 0 0 10px;
 }
@@ -287,7 +287,7 @@ p.view-all-coauthors{
     text-align: left;
 }
 /* PROPERTY GROUP MENU------>  */
-#property-group-menus{
+#property-group-menu{
     clear: both;
     width: 95%;;
     height: 46px;
@@ -296,17 +296,17 @@ p.view-all-coauthors{
     margin-bottom: 10px;
     margin-top: 20px;
 }
-#property-group-menus ul{
+#property-group-menu ul{
     display: block;
     color: #5e6363;
 }
-#property-group-menus li{
+#property-group-menu li{
     float: left;
     line-height: 46px;
     padding-right: 15px;
     padding-left: 15px;
 }
- #property-group-menus li:fisrt-child{
+ #property-group-menu li:fisrt-child{
      padding-left: 0;
 }
 /* PROPERTY GROUP------>  */
@@ -354,20 +354,11 @@ article.property ul.property-list{
 }
 article.property ul.property-list li{
     line-height: 1.2em;
-    padding-bottom: 10px;
     padding: 10px 20px 10px 20px;
-}
-article.property ul.subclass-property-list{
-    background: #fff;
-    border: 1px dotted #DFE6E5;
-    background-color: #fafaf9;
-    padding-top: 10px;
-    padding-bottom: 10px;   
 }
 article.property ul.subclass-property-list li{
     line-height: 1.2em;
-    padding-bottom: 10px;
-    padding: 10px 20px 10px 40px;
+    padding: 0 20px 10px 40px;
 }
 /* MISCELLANEOUS------>  */
 .listDateTime {

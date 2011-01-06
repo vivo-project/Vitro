@@ -4,9 +4,7 @@
 
 <#assign nameForOtherGroup = nameForOtherGroup!"other">
 
-<nav id="property-group-menus" role="navigation">
-    <a name="property-nav"></a>
-    
+<nav id="property-group-menu" role="navigation">
     <ul role="list">
         <#list propertyGroups.all as group>
             <#assign groupname = group.name(nameForOtherGroup)>
