@@ -85,13 +85,13 @@ div.bottom{
     margin-bottom: 30px;
 }
 /* <------ INDIVIDUAL INTRO LEFT CONTENT */
-#left-side{
+#share-contact{
     width: 166px;
     float: left;
     padding-left: 0.5em;
     padding-right: 1.5em;
 }
-#left-side img.individual-photo2{
+#share-contact img.individual-photo2{
     width: 160px;
     height: 160px;
     float: left;
