@@ -287,8 +287,8 @@ public class EntityController extends VitroHttpServlet {
         res.setStatus(res.SC_SEE_OTHER);
     }
 
-	private static Pattern LINKED_DATA_URL = Pattern.compile("^/individual/([^/]*)$");		
-	private static Pattern NS_PREFIX_URL = Pattern.compile("^/individual/([^/]*)/([^/]*)$");
+	private static Pattern LINKED_DATA_URL = Pattern.compile("^/individualold/([^/]*)$");		
+	private static Pattern NS_PREFIX_URL = Pattern.compile("^/individualold/([^/]*)/([^/]*)$");
 	
     /**
         Gets the entity id from the request.
@@ -402,7 +402,7 @@ public class EntityController extends VitroHttpServlet {
     }
  
 	
-	private static Pattern URI_PATTERN = Pattern.compile("^/individual/([^/]*)$");
+	private static Pattern URI_PATTERN = Pattern.compile("^/individualold/([^/]*)$");
     //Redirect if the request is for http://hostname/individual/localname
     // if accept is nothing or text/html redirect to ???
     // if accept is some RDF thing redirect to the URL for RDF
@@ -411,7 +411,7 @@ public class EntityController extends VitroHttpServlet {
 		if( m.matches() && m.groupCount() == 1 ){			
 			ContentType c = checkForLinkedDataRequest(url, acceptHeader);			
 			if( c != null ){
-				String redirectUrl = "/individual/" + m.group(1) + "/" + m.group(1) ; 
+				String redirectUrl = "/individualold/" + m.group(1) + "/" + m.group(1) ; 
 				if( RDFXML_MIMETYPE.equals( c.getMediaType())  ){
 					return redirectUrl + ".rdf";
 				}else if( N3_MIMETYPE.equals( c.getMediaType() )){
@@ -427,10 +427,10 @@ public class EntityController extends VitroHttpServlet {
 		}
 	}
 
-	private static Pattern RDF_REQUEST = Pattern.compile("^/individual/([^/]*)/\\1.rdf$");
-    private static Pattern N3_REQUEST = Pattern.compile("^/individual/([^/]*)/\\1.n3$");
-    private static Pattern TTL_REQUEST = Pattern.compile("^/individual/([^/]*)/\\1.ttl$");
-    private static Pattern HTML_REQUEST = Pattern.compile("^/display/([^/]*)$");
+	private static Pattern RDF_REQUEST = Pattern.compile("^/individualold/([^/]*)/\\1.rdf$");
+    private static Pattern N3_REQUEST = Pattern.compile("^/individualold/([^/]*)/\\1.n3$");
+    private static Pattern TTL_REQUEST = Pattern.compile("^/individualold/([^/]*)/\\1.ttl$");
+    private static Pattern HTML_REQUEST = Pattern.compile("^/displayold/([^/]*)$");
     
     /**  
      * @return null if this is not a linked data request, returns content type if it is a 

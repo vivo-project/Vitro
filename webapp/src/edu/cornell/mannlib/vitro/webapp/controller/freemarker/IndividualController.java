@@ -267,9 +267,8 @@ public class IndividualController extends FreemarkerHttpServlet {
 		return new RdfResponseValues(rdfFormat, newModel);
 	}
 
-	// RY **** Remove "fm" from the patterns when switching web.xml to this controller.
-	private static Pattern LINKED_DATA_URL = Pattern.compile("^/individualfm/([^/]*)$");		
-	private static Pattern NS_PREFIX_URL = Pattern.compile("^/individualfm/([^/]*)/([^/]*)$");
+	private static Pattern LINKED_DATA_URL = Pattern.compile("^/individual/([^/]*)$");		
+	private static Pattern NS_PREFIX_URL = Pattern.compile("^/individual/([^/]*)/([^/]*)$");
 	
     /**
         Gets the entity id from the request.
@@ -383,7 +382,7 @@ public class IndividualController extends FreemarkerHttpServlet {
     }
  
 	
-	private static Pattern URI_PATTERN = Pattern.compile("^/individualfm/([^/]*)$");
+	private static Pattern URI_PATTERN = Pattern.compile("^/individual/([^/]*)$");
     //Redirect if the request is for http://hostname/individual/localname
     // if accept is nothing or text/html redirect to ???
     // if accept is some RDF thing redirect to the URL for RDF
@@ -402,16 +401,16 @@ public class IndividualController extends FreemarkerHttpServlet {
 				}//else send them to html													
 			}
 			//else redirect to HTML representation
-			return UrlBuilder.getUrl("displayfm/" + m.group(1));
+			return UrlBuilder.getUrl("display/" + m.group(1));
 		}else{			
 			return null;
 		}
 	}
 
-	private static Pattern RDF_REQUEST = Pattern.compile("^/individualfm/([^/]*)/\\1.rdf$");
-    private static Pattern N3_REQUEST = Pattern.compile("^/individualfm/([^/]*)/\\1.n3$");
-    private static Pattern TTL_REQUEST = Pattern.compile("^/individualfm/([^/]*)/\\1.ttl$");
-    private static Pattern HTML_REQUEST = Pattern.compile("^/displayfm/([^/]*)$");
+	private static Pattern RDF_REQUEST = Pattern.compile("^/individual/([^/]*)/\\1.rdf$");
+    private static Pattern N3_REQUEST = Pattern.compile("^/individual/([^/]*)/\\1.n3$");
+    private static Pattern TTL_REQUEST = Pattern.compile("^/individual/([^/]*)/\\1.ttl$");
+    private static Pattern HTML_REQUEST = Pattern.compile("^/display/([^/]*)$");
     
     /**  
      * @return null if this is not a linked data request, returns content type if it is a 

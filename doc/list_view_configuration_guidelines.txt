@@ -114,3 +114,5 @@ THE TEMPLATE
 The query must have been constructed to return orgName (see above under "General query requirements"), or 
 alternatively the template can use the localname function: ${localname(org)}.
 
+- If a variable is in an OPTIONAL clause in the query, the display of the value in the template should 
+include the default value operator ! to prevent an error on null values.
