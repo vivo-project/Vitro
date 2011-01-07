@@ -137,11 +137,11 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
                 // If the first statement has a null end datetime, all subsequent statements in the list also do,
                 // so there is nothing to reorder.
                 // NB This assumption is FALSE if the query orders by subclass but the property is not collated.
-                // This happens because all the queries are written with a subclass variable to support 
-                // collation if switched on in the back end.
-                //if (statements.indexOf(stmt) == 0) {
-                //    break;
-                //}               
+                // This happens when a query is written with a subclass variable to support turning on collation
+                // in the back end.
+                // if (statements.indexOf(stmt) == 0) {
+                //     break;
+                // }               
                 tempList.add(stmt); 
                 iterator.remove(); 
             }
