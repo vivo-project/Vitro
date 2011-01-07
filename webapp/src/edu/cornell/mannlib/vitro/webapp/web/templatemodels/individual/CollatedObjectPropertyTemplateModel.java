@@ -27,8 +27,13 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
 
     private static final Log log = LogFactory.getLog(CollatedObjectPropertyTemplateModel.class);  
     private static final String DEFAULT_CONFIG_FILE = "listViewConfig-default-collated.xml";
-    private static final Pattern SELECT_QUERY_PATTERN = Pattern.compile("SELECT[^{]*\\?subclass\\b", Pattern.CASE_INSENSITIVE);
-    private static final Pattern ORDER_BY_QUERY_PATTERN = Pattern.compile("ORDER\\s+BY\\s+(DESC\\s*\\(\\s*)?\\?subclass", Pattern.CASE_INSENSITIVE);
+    private static final Pattern SELECT_SUBCLASS_PATTERN = 
+        // SELECT ?subclass
+        Pattern.compile("SELECT[^{]*\\?subclass\\b", Pattern.CASE_INSENSITIVE);
+        // ORDER BY ?subclass
+        // ORDER BY DESC(?subclass)
+    private static final Pattern ORDER_BY_SUBCLASS_PATTERN = 
+        Pattern.compile("ORDER\\s+BY\\s+(DESC\\s*\\(\\s*)?\\?subclass", Pattern.CASE_INSENSITIVE);
     
     private SortedMap<String, List<ObjectPropertyStatementTemplateModel>> subclasses;
     
@@ -65,7 +70,11 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
                     return o1.compareTo(o2);
             }};
         subclasses = new TreeMap<String, List<ObjectPropertyStatementTemplateModel>>(comparer);
-        subclasses.putAll(unsortedSubclasses);        
+        subclasses.putAll(unsortedSubclasses); 
+        
+        for (List<ObjectPropertyStatementTemplateModel> list : subclasses.values()) {
+            postprocessStatementList(list);
+        }
     }
     
     private String checkConfiguration() {
@@ -73,12 +82,12 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
         String queryString = getQueryString();
         Matcher m;
         
-        m = SELECT_QUERY_PATTERN.matcher(queryString); 
+        m = SELECT_SUBCLASS_PATTERN.matcher(queryString); 
         if ( ! m.find() ) { 
             return("Query does not select a subclass variable.");
         } 
         
-        m = ORDER_BY_QUERY_PATTERN.matcher(queryString);
+        m = ORDER_BY_SUBCLASS_PATTERN.matcher(queryString);
         if ( ! m.find() ) {
             return("Query does not sort first by subclass variable.");
         }

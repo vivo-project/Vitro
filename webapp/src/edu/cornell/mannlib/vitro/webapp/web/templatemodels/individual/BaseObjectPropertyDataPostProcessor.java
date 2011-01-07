@@ -22,7 +22,9 @@ public abstract class BaseObjectPropertyDataPostProcessor implements
     private static String KEY_SUBJECT = "subject";
     private static final String KEY_PROPERTY = "property";
     private static final String DEFAULT_LIST_VIEW_QUERY_OBJECT_VARIABLE_NAME = "object";
-    private static final Pattern QUERY_PATTERN = Pattern.compile("\\?" + KEY_SUBJECT + "\\s+\\?" + KEY_PROPERTY + "\\s+\\?(\\w+)");
+    private static final Pattern SUBJECT_PROPERTY_OBJECT_PATTERN = 
+        // ?subject ?property ?\w+
+        Pattern.compile("\\?" + KEY_SUBJECT + "\\s+\\?" + KEY_PROPERTY + "\\s+\\?(\\w+)");
     
     protected ObjectPropertyTemplateModel objectPropertyTemplateModel;
     protected WebappDaoFactory wdf;
@@ -41,6 +43,7 @@ public abstract class BaseObjectPropertyDataPostProcessor implements
         }
         
         removeDuplicates(data);
+        
         for (Map<String, String> map : data) {
             process(map);           
         }
@@ -89,7 +92,7 @@ public abstract class BaseObjectPropertyDataPostProcessor implements
                       ", so query object = '" + object + "'");
         } else {
             String queryString = objectPropertyTemplateModel.getQueryString();
-            Matcher m = QUERY_PATTERN.matcher(queryString);
+            Matcher m = SUBJECT_PROPERTY_OBJECT_PATTERN.matcher(queryString);
             if (m.find()) {
                 object = m.group(1);
                 log.debug("Query object for property " + objectPropertyTemplateModel.getUri() + " = '" + object + "'");
@@ -99,7 +102,7 @@ public abstract class BaseObjectPropertyDataPostProcessor implements
         return object;
     }
      
-    /* Postprocessor helper methods callable from any postprocessor */
+    /* Postprocessor methods callable from any postprocessor */
 
     protected void addName(Map<String, String> map, String nameKey, String objectKey) {
         String name = map.get(nameKey);
@@ -123,5 +126,9 @@ public abstract class BaseObjectPropertyDataPostProcessor implements
     
     protected Individual getIndividual(String uri) {
         return wdf.getIndividualDao().getIndividualByURI(uri);
+    }
+    
+    protected static void moveNullEndDateTimesToTop(List<ObjectPropertyStatementTemplateModel> list) {
+        
     }
 }

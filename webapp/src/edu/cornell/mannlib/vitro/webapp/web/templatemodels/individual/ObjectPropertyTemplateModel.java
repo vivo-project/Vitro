@@ -5,8 +5,12 @@ package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -31,12 +35,20 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     private static final Log log = LogFactory.getLog(ObjectPropertyTemplateModel.class);      
     private static final String TYPE = "object";
     
-    /* NB The default postprocessor is not the same as the postprocessor for the default view. The latter
-     * actually defines its own postprocessor, whereas the default postprocessor is used for custom views
-     * that don't define a postprocessor, to ensure that the standard postprocessing applies.
+    /* NB The default post-processor is not the same as the post-processor for the default view. The latter
+     * actually defines its own post-processor, whereas the default post-processor is used for custom views
+     * that don't define a post-processor, to ensure that the standard post-processing applies.
      */
     private static final String DEFAULT_POSTPROCESSOR = 
         "edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.DefaultObjectPropertyDataPostProcessor";
+    
+    private static final String END_DATE_TIME_VARIABLE = "dateTimeEnd";
+    private static final Pattern ORDER_BY_END_DATE_TIME_PATTERN = 
+        /* ORDER BY DESC(?dateTimeEnd)
+         * ORDER BY ?subclass ?dateTimeEnd
+         * ORDER BY DESC(?subclass) DESC(?dateTimeEnd)
+         */
+        Pattern.compile("ORDER\\s+BY\\s+((DESC\\()?\\?subclass\\)?\\s+)?DESC\\s*\\(\\s*\\?" + END_DATE_TIME_VARIABLE + "\\)", Pattern.CASE_INSENSITIVE);
     
     private PropertyListConfig config;
 
@@ -89,6 +101,54 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         } catch (Exception e) {
             log.error(e, e);
         }
+    }
+    
+    /* Post-processing that must occur after collation, because it does reordering on collated subclass
+     * lists rather than on the entire list. This should ideally be configurable in the config file
+     * like the pre-collation post-processing, but for now due to time constraints it applies to all views.
+     */
+    protected void postprocessStatementList(List<ObjectPropertyStatementTemplateModel> statements) {        
+        moveEndDateTimesToTop(statements);        
+    }
+    
+    /* SPARQL ORDER BY gives null values the lowest value, so null datetimes occur at the end
+     * of a list in descending sort order. Generally we assume that a null end datetime means the
+     * activity is  ongoing in the present, so we want to display those at the top of the list.
+     * Application of this method should be configurable in the config file, but for now due to
+     * time constraints it applies to all views that sort by DESC(?dateTimeEnd), and the variable
+     * name is hard-coded here. (Note, therefore, that using a different variable name  
+     * effectively turns off this post-processing.)
+     */
+    protected void moveEndDateTimesToTop(List<ObjectPropertyStatementTemplateModel> statements) {
+        String queryString = getQueryString();
+        Matcher m = ORDER_BY_END_DATE_TIME_PATTERN.matcher(queryString);
+        if ( ! m.find() ) {
+            return;
+        }
+        
+        // Store the statements with null end datetimes in a temporary list, remove them from the original list,
+        // and move them back to the top of the original list.
+        List<ObjectPropertyStatementTemplateModel> tempList = new ArrayList<ObjectPropertyStatementTemplateModel>();
+        Iterator<ObjectPropertyStatementTemplateModel> iterator = statements.iterator();
+        while (iterator.hasNext()) {
+            ObjectPropertyStatementTemplateModel stmt = (ObjectPropertyStatementTemplateModel)iterator.next();
+            String dateTimeEnd = (String) stmt.get(END_DATE_TIME_VARIABLE);
+            if (dateTimeEnd == null) {
+                // If the first statement has a null end datetime, all subsequent statements in the list also do,
+                // so there is nothing to reorder.
+                // NB This assumption is FALSE if the query orders by subclass but the property is not collated.
+                // This happens because all the queries are written with a subclass variable to support 
+                // collation if switched on in the back end.
+                //if (statements.indexOf(stmt) == 0) {
+                //    break;
+                //}               
+                tempList.add(stmt); 
+                iterator.remove(); 
+            }
+        }
+        // Put all the statements with null end datetimes at the top of the list, preserving their original order.
+        statements.addAll(0, tempList);
+    
     }
     
     protected abstract String getDefaultConfigFileName();

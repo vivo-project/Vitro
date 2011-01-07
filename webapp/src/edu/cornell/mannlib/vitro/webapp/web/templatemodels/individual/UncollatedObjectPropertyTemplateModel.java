@@ -40,6 +40,8 @@ public class UncollatedObjectPropertyTemplateModel extends ObjectPropertyTemplat
         for (Map<String, String> map : statementData) {
             statements.add(new ObjectPropertyStatementTemplateModel(subjectUri, propertyUri, map));
         }
+        
+        postprocessStatementList(statements);
     }
     
     @Override

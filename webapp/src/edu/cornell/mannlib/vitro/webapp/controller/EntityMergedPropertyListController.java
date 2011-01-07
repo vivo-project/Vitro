@@ -573,7 +573,11 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
 
         for (ObjectPropertyStatement statement : statements) {
             Individual object = statement.getObject();
-            relatedStatements.add(object.getObjectPropertyStatements(op).get(0));
+            List<ObjectPropertyStatement> statementsForObject = object.getObjectPropertyStatements(op);
+            // Could be empty for statements with no linked individual.
+            if ( ! statementsForObject.isEmpty() ) {
+                relatedStatements.add(statementsForObject.get(0));
+            }
         }
 
         return relatedStatements;
