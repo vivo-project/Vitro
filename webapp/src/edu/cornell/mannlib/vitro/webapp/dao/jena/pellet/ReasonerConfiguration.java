@@ -81,6 +81,7 @@ public class ReasonerConfiguration {
         Set<ObjectPropertyStatementPattern> defaultInferenceReceivingPatternAllowSet = new HashSet<ObjectPropertyStatementPattern>();
         defaultInferenceReceivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null,RDF.type,null));
         defaultInferenceReceivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null,RDFS.subClassOf,null));
+        defaultInferenceReceivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null,RDFS.subPropertyOf,null));
         defaultInferenceReceivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null,OWL.equivalentClass,null));
         defaultInferenceReceivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null,OWL.disjointWith,null));
         defaultInferenceReceivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null,OWL.inverseOf,null));
