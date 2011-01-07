@@ -108,7 +108,13 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
         	checkForNamespaceMismatch( memModel, defaultNamespace );
 
         	// SDB initialization
-			StoreDesc storeDesc = new StoreDesc(LayoutType.LayoutTripleNodesHash, DatabaseType.MySQL) ;
+            String layoutStr = ConfigurationProperties.getProperty(
+                    "VitroConnection.DataSource.sdb.layout","layout2/hash");
+            String dbtypeStr = ConfigurationProperties.getProperty(
+                    "VitroConnection.DataSource.dbtype", "MySQL");
+            StoreDesc storeDesc = new StoreDesc(
+                    LayoutType.fetch(layoutStr),
+                    DatabaseType.fetch(dbtypeStr) );
 			sce.getServletContext().setAttribute("storeDesc", storeDesc);
 			BasicDataSource bds = makeDataSourceFromConfigurationProperties();
         	this.setApplicationDataSource(bds, sce.getServletContext());
