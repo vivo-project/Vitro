@@ -23,7 +23,7 @@ var browseByVClass = {
         this.alphaIndex = $('#alpha-browse-childClass');
         this.alphaIndexLinks = $('#alpha-browse-childClass li a');
         this.selectedAlphaIndex = $('#alpha-browse-childClass li a.selected');
-        this.individualsInVClass = $('#individuals-in-childClass');
+        this.individualsInVClass = $('#individuals-in-childClass ul');
     },
     
     // Event listeners. Called on page load
@@ -67,6 +67,8 @@ var browseByVClass = {
         $.getJSON(url, function(results) {
             $.each(results.individuals, function(i, item) {
                 indivLabel = results.individuals[i].label;
+                firstName = results.individuals[i].firstName;
+                lastName = results.individuals[i].lastName;
                 indivUri = results.individuals[i].URI;
                 indivProfileUrl = results.individuals[i].profileUrl;
                 if ( !results.individuals[i].thumbUrl ) {
@@ -74,7 +76,7 @@ var browseByVClass = {
                 } else {
                     indivImage = browseByVClass.baseUrl + results.individuals[i].thumbUrl;
                 }
-                browseByVClass.individualsInVClass.append('<article class="vcard individual-foaf-person" role="navigation"> <img src="'+ indivImage +'" width="90" height="90" alt="'+ indivLabel +'" /><h1 class="fn"><a href="'+ indivProfileUrl +'" title="View the profile page for '+ indivLabel +'">'+ indivLabel + '</a></h1><p>core:preferredTitle <span class="org">org from preferredTitle??</span></p></article>');
+                browseByVClass.individualsInVClass.append('<li role="listitem" class="vcard individual-foaf-person" role="navigation"> <img src="'+ indivImage +'" width="90" height="90" alt="'+ firstName + ' ' + lastName +'" /><h1 class="fn"><a href="'+ indivProfileUrl +'" title="View the profile page for '+ firstName + ' ' + lastName +'">'+ firstName + ' ' + lastName + '</a></h1><p>core:preferredTitle <span class="org">org from preferredTitle??</span></p></li>');
             })
             // set selected class and alpha
             browseByVClass.selectedVClass(results.vclass.URI);

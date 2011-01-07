@@ -51,6 +51,8 @@
     </nav>
     
     <section id="individuals-in-childClass" role="region">
-        
+        <ul role="list">
+            
+        </ul>
     </section>
 </section>

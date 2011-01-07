@@ -3,9 +3,9 @@
 <#-- Template for rendering the classes in a class group for menupages -->
 
 <nav role="navigation">
-    <ul id="vgraph-childClasses">
+    <ul id="vgraph-childClasses" role="list">
     <#list vClassGroup as vClass>
-        <li><a href="#browse-by" title="Browse all people in this class" data-uri="${vClass.URI}">${vClass.name} <span class="count-classes">(${vClass.entityCount})</span></a></li>
+        <li role="listitem"><a href="#browse-by" title="Browse all people in this class" data-uri="${vClass.URI}">${vClass.name} <span class="count-classes">(${vClass.entityCount})</span></a></li>
     </#list>
     </ul>
 </nav>
