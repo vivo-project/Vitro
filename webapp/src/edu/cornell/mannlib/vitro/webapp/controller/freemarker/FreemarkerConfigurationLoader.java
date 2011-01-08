@@ -114,7 +114,7 @@ public class FreemarkerConfigurationLoader {
         
         String dateFormat = "M/d/yyyy";
         config.setDateFormat(dateFormat);
-        String timeFormat = "hh:mm a";
+        String timeFormat = "h:mm a";
         config.setTimeFormat(timeFormat);
         config.setDateTimeFormat(dateFormat + " " + timeFormat);
         

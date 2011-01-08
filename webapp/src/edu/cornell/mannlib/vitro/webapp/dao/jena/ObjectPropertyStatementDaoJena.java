@@ -256,13 +256,13 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
      */
     public List<Map<String, String>> getObjectPropertyStatementsForIndividualByProperty(String subjectUri, String propertyUri, String queryString) {  
         
-        log.debug("Object property query string: " + queryString);
+        log.debug("Query string for object property " + propertyUri + ": " + queryString);
         
         Query query = null;
         try {
             query = QueryFactory.create(queryString, Syntax.syntaxARQ);
         } catch(Throwable th){
-            log.error("could not create SPARQL query for query string " + th.getMessage());
+            log.error("Could not create SPARQL query for query string. " + th.getMessage());
             log.error(queryString);
         } 
 
@@ -280,7 +280,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
             QueryExecution qexec = QueryExecutionFactory.create(
                     query, dataset, bindings);
             ResultSet results = qexec.execSelect();
-        
+
             while (results.hasNext()) {
                 QuerySolution soln = results.nextSolution();
                 list.add(QueryUtils.querySolutionToStringValueMap(soln));
