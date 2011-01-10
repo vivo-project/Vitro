@@ -300,13 +300,13 @@ public class VitroVocabulary {
     private static final String DATETIME_NS = "http://vivoweb.org/ontology/core#";
     
     protected  static final String[] PRECISIONS = {
-        DATETIME_NS+"NoPrecision",
-        DATETIME_NS+"YearPrecision",
-        DATETIME_NS+"YearMonthPrecision",
-        DATETIME_NS+"YearMonthDayPrecision",
-        DATETIME_NS+"YearMonthDayHourPrecision",
-        DATETIME_NS+"YearMonthDayHourMinutePrecision",
-        DATETIME_NS+"YearMonthDayTimePrecision"};
+        DATETIME_NS+"noPrecision", // this individual doesn't actually exist in the ontology
+        DATETIME_NS+"yearPrecision",
+        DATETIME_NS+"yearMonthPrecision",
+        DATETIME_NS+"yearMonthDayPrecision",
+        DATETIME_NS+"yearMonthDayHourPrecision",
+        DATETIME_NS+"yearMonthDayHourMinutePrecision",
+        DATETIME_NS+"yearMonthDayTimePrecision"};
 
     //The Precision.ordinal method is used so do 
     //not change the order of these enums.
