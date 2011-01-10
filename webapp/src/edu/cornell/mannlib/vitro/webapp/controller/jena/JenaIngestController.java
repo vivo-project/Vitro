@@ -722,12 +722,13 @@ public class JenaIngestController extends BaseEditController {
 	
 	private void doRenameBNodes(VitroRequest vreq, String namespaceEtc, boolean patternBoolean, String pattern, String[] sourceModel) {
 		OntModel source = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM);
-		//String[] sourceModel = vreq.getParameterValues("sourceModelName");
-		
+		String property = vreq.getParameter("property");
+		Boolean csv2rdf = (Boolean)getServletContext().getAttribute("csv2rdf");
 		for (int i=0; i<sourceModel.length; i++) {
 			Model m = getModel(sourceModel[i],vreq);
 			source.addSubModel(m);
 		}
+		System.out.println(vreq.getParameter("destinationModelName"));
 		Model destination = getModel(vreq.getParameter("destinationModelName"),vreq);
 		JenaIngestUtils utils = new JenaIngestUtils();
 		destination.enterCriticalSection(Lock.WRITE);
@@ -736,10 +737,38 @@ public class JenaIngestController extends BaseEditController {
 				destination.add(utils.renameBNodes(source, namespaceEtc, vreq.getJenaOntModel()));
 			}
 			else{
-				String property = vreq.getParameter("property");
 				destination.add(utils.renameBNodesByPattern(source, namespaceEtc, vreq.getJenaOntModel(), pattern, property));
 			}
-				
+			if(csv2rdf){
+				ClosableIterator closeIt = destination.listSubjects();
+				Property prop = ResourceFactory.createProperty(property);
+				try {
+					for (Iterator it = closeIt; it.hasNext();) {
+						Resource res = (Resource) it.next();
+						if (res.isAnon()) {
+							// now we do something hacky to get the same resource in the outModel, since there's no getResourceById();
+							ClosableIterator closfIt = destination.listStatements(res,prop,(RDFNode)null);
+							Statement stmt = null;
+							try {
+								if (closfIt.hasNext()) {
+									stmt = (Statement) closfIt.next();
+								}
+							} finally {
+								closfIt.close();
+							}
+							if (stmt != null) {
+								Resource outRes = stmt.getSubject();
+								destination.removeAll(outRes,(Property)null,(RDFNode)null);
+							}
+						}
+					}
+				} finally {
+					closeIt.close();
+				}
+				csv2rdf = false;
+				getServletContext().setAttribute("csv2rdf", csv2rdf);
+			}
+			
 		} finally {
 			destination.leaveCriticalSection();
 		}
