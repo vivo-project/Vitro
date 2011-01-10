@@ -138,7 +138,6 @@ public class OntologyController extends VitroHttpServlet{
 	     }
 	     String url = ontology;
 	     
-	     System.out.println(url);
 	    		
 		OntModel ontModel = null;
 		HttpSession session = vreq.getSession(false);
