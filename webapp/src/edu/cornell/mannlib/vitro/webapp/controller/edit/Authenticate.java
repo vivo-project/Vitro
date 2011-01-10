@@ -89,9 +89,8 @@ public class Authenticate extends VitroHttpServlet {
 		VitroRequest vreq = new VitroRequest(request);
 
 		try {
-			if (loginProcessPagesAreEmpty(vreq)) {
-				recordLoginProcessPages(vreq);
-			}
+			restartTheProcessIfAppropriate(vreq);
+			recordLoginProcessPages(vreq);
 
 			// Where do we stand in the process?
 			State entryState = getCurrentLoginState(vreq);
@@ -139,11 +138,37 @@ public class Authenticate extends VitroHttpServlet {
 	}
 
 	/**
-	 * Once these URLs have been set, don't change them.
+	 * Try to detect if they are re-starting the login process.
 	 */
-	private boolean loginProcessPagesAreEmpty(HttpServletRequest request) {
-		LoginProcessBean bean = LoginProcessBean.getBean(request);
-		return ((bean.getAfterLoginUrl() == null) && (bean.getLoginPageUrl() == null));
+	private void restartTheProcessIfAppropriate(HttpServletRequest request) {
+		String afterLoginUrl = decodeAfterLoginParameter(request);
+		boolean doReturn = isReturnParameterSet(request);
+		String referrer = whereDidWeComeFrom(request);
+
+		/*
+		 * If they have navigated to a restricted page, restart the process.
+		 */
+		if (afterLoginUrl != null) {
+			LoginProcessBean.removeBean(request);
+		}
+
+		/*
+		 * If they have used a login link, restart the process.
+		 */
+		if (doReturn) {
+			LoginProcessBean.removeBean(request);
+		}
+
+		/*
+		 * If they are using a login widget that is not the one they were
+		 * previously using, restart the process.
+		 */
+		if (LoginProcessBean.isBean(request)) {
+			LoginProcessBean bean = LoginProcessBean.getBean(request);
+			if (!referrer.equals(bean.getLoginPageUrl())) {
+				LoginProcessBean.removeBean(request);
+			}
+		}
 	}
 
 	/**
@@ -153,7 +178,8 @@ public class Authenticate extends VitroHttpServlet {
 	 * If they supply a return flag, record the current page as the after-login
 	 * page and use the Login page for the process.
 	 * 
-	 * Otherwise, use the current page for the process.
+	 * Otherwise, use the current page for the process (unless the process has
+	 * already been set).
 	 * 
 	 * The "current page" is the referrer, unless there is no referrer for some
 	 * reason. In that case, pretend it's the login page.
@@ -172,8 +198,12 @@ public class Authenticate extends VitroHttpServlet {
 			bean.setAfterLoginUrl(referrer);
 			bean.setLoginPageUrl(request.getContextPath() + Controllers.LOGIN);
 		} else {
-			bean.setAfterLoginUrl(referrer);
-			bean.setLoginPageUrl(referrer);
+			if (bean.getAfterLoginUrl() == null) {
+				bean.setAfterLoginUrl(referrer);
+			}
+			if (bean.getLoginPageUrl() == null) {
+				bean.setLoginPageUrl(referrer);
+			}
 		}
 	}
 
