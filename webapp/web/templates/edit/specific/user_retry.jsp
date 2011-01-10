@@ -35,7 +35,7 @@
         <c:if test="${empty user.md5password}">
           <tr class="editformcell">
               <td valign="bottom" colspan="2">
-                      <b>Default Password* (6-12 characters; must be changed on first login)</b><br/>
+                      <b>Temporary Password* (6-12 characters; must be changed on first login)</b><br/>
                       <input type="password" name="Md5password" value="${formValue['Md5password']}" size="64" maxlength="128"/>
                       <span class="warning"><form:error name="Md5password"/></span>
               </td>
