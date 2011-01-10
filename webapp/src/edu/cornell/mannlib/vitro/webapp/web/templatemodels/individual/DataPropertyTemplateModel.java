@@ -47,18 +47,18 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
         return null;
     }
 
-    @Override
-    public String getEditLink() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-
-    @Override
-    public String getDeleteLink() {
-        // TODO Auto-generated method stub
-        return null;
-    }
+//    @Override
+//    public String getEditLink() {
+//        // TODO Auto-generated method stub
+//        return null;
+//    }
+//
+//
+//    @Override
+//    public String getDeleteLink() {
+//        // TODO Auto-generated method stub
+//        return null;
+//    }
     
     public List<DataPropertyStatementTemplateModel> getStatements() {
         return statements;

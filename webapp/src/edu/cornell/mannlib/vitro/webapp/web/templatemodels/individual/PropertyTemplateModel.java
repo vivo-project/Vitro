@@ -45,8 +45,8 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     
     public abstract String getAddLink();
     
-    public abstract String getEditLink();
-    
-    public abstract String getDeleteLink();
+//    public abstract String getEditLink();
+//    
+//    public abstract String getDeleteLink();
  
 }

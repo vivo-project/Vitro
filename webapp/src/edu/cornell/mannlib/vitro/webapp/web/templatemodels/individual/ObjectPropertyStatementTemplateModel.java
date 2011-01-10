@@ -17,6 +17,9 @@ public class ObjectPropertyStatementTemplateModel extends BaseTemplateModel {
     
     private static final Log log = LogFactory.getLog(ObjectPropertyStatementTemplateModel.class);  
     
+    // RY WE may want to instead store the ObjectPropertyStatement; get the object from the data
+    // the same way we do in BaseObjectPropertyDataPostProcessor.getQueryObjectVariableName, then
+    // getting the value from the data.
     private String subjectUri; // we'll use these to make the edit links
     private String propertyUri;
     private Map<String, String> data;

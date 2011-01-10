@@ -18,13 +18,6 @@ public abstract class BaseObjectPropertyDataPostProcessor implements
         ObjectPropertyDataPostProcessor {
 
     private static final Log log = LogFactory.getLog(BaseObjectPropertyDataPostProcessor.class); 
-
-    private static String KEY_SUBJECT = "subject";
-    private static final String KEY_PROPERTY = "property";
-    private static final String DEFAULT_LIST_VIEW_QUERY_OBJECT_VARIABLE_NAME = "object";
-    private static final Pattern SUBJECT_PROPERTY_OBJECT_PATTERN = 
-        // ?subject ?property ?\w+
-        Pattern.compile("\\?" + KEY_SUBJECT + "\\s+\\?" + KEY_PROPERTY + "\\s+\\?(\\w+)");
     
     protected ObjectPropertyTemplateModel objectPropertyTemplateModel;
     protected WebappDaoFactory wdf;
@@ -59,7 +52,7 @@ public abstract class BaseObjectPropertyDataPostProcessor implements
      * @param List<Map<String, String>> data
      */
     protected void removeDuplicates(List<Map<String, String>> data) {
-        String objectVariableName = getQueryObjectVariableName();
+        String objectVariableName = objectPropertyTemplateModel.getObjectKey();
         if (objectVariableName == null) {
             log.error("Cannot remove duplicate statements for property " + objectPropertyTemplateModel.getName() + " because no object found to dedupe.");
             return;
@@ -79,29 +72,7 @@ public abstract class BaseObjectPropertyDataPostProcessor implements
         }
     }
     
-    /** Return the name of the primary object variable of the query by inspecting the query string.
-     * The primary object is the X in the assertion "?subject ?property ?X".
-     */
-    private String getQueryObjectVariableName() {
-        
-        String object = null;
-        
-        if (objectPropertyTemplateModel.hasDefaultListView()) {
-            object = DEFAULT_LIST_VIEW_QUERY_OBJECT_VARIABLE_NAME;
-            log.debug("Using default list view for property " + objectPropertyTemplateModel.getUri() + 
-                      ", so query object = '" + object + "'");
-        } else {
-            String queryString = objectPropertyTemplateModel.getQueryString();
-            Matcher m = SUBJECT_PROPERTY_OBJECT_PATTERN.matcher(queryString);
-            if (m.find()) {
-                object = m.group(1);
-                log.debug("Query object for property " + objectPropertyTemplateModel.getUri() + " = '" + object + "'");
-            }
-        }
-        
-        return object;
-    }
-     
+
     /* Postprocessor methods callable from any postprocessor */
 
     protected void addName(Map<String, String> map, String nameKey, String objectKey) {
@@ -127,8 +98,5 @@ public abstract class BaseObjectPropertyDataPostProcessor implements
     protected Individual getIndividual(String uri) {
         return wdf.getIndividualDao().getIndividualByURI(uri);
     }
-    
-    protected static void moveNullEndDateTimesToTop(List<ObjectPropertyStatementTemplateModel> list) {
-        
-    }
+
 }

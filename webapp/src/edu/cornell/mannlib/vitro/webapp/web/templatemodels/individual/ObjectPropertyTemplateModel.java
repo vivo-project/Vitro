@@ -49,8 +49,16 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
          * ORDER BY DESC(?subclass) DESC(?dateTimeEnd)
          */
         Pattern.compile("ORDER\\s+BY\\s+((DESC\\()?\\?subclass\\)?\\s+)?DESC\\s*\\(\\s*\\?" + END_DATE_TIME_VARIABLE + "\\)", Pattern.CASE_INSENSITIVE);
+
+    private static String KEY_SUBJECT = "subject";
+    private static final String KEY_PROPERTY = "property";
+    private static final String DEFAULT_LIST_VIEW_QUERY_OBJECT_VARIABLE_NAME = "object";
+    private static final Pattern SUBJECT_PROPERTY_OBJECT_PATTERN = 
+        // ?subject ?property ?\w+
+        Pattern.compile("\\?" + KEY_SUBJECT + "\\s+\\?" + KEY_PROPERTY + "\\s+\\?(\\w+)");
     
     private PropertyListConfig config;
+    private String objectKey;
 
     ObjectPropertyTemplateModel(ObjectProperty op, Individual subject, VitroRequest vreq) {
         super(op);
@@ -62,6 +70,8 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         } catch (Exception e) {
             log.error(e, e);
         }
+        
+        objectKey = getQueryObjectVariableName();
     }
     
     protected String getQueryString() {
@@ -71,7 +81,30 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     protected boolean hasDefaultListView() {
         return config.isDefaultConfig;
     }
-    
+
+    /** Return the name of the primary object variable of the query by inspecting the query string.
+     * The primary object is the X in the assertion "?subject ?property ?X".
+     */
+    private String getQueryObjectVariableName() {
+        
+        String object = null;
+        
+        if (hasDefaultListView()) {
+            object = DEFAULT_LIST_VIEW_QUERY_OBJECT_VARIABLE_NAME;
+            log.debug("Using default list view for property " + getUri() + 
+                      ", so query object = '" + object + "'");
+        } else {
+            String queryString = getQueryString();
+            Matcher m = SUBJECT_PROPERTY_OBJECT_PATTERN.matcher(queryString);
+            if (m.find()) {
+                object = m.group(1);
+                log.debug("Query object for property " + getUri() + " = '" + object + "'");
+            }
+        }
+        
+        return object;
+    }
+     
     protected static ObjectPropertyTemplateModel getObjectPropertyTemplateModel(ObjectProperty op, Individual subject, VitroRequest vreq) {
         if (op.getCollateBySubclass()) {
             try {
@@ -85,7 +118,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         }
     }
     
-    /** Apply postprocessing to query results to prepare for template */
+    /** Apply post-processing to query results to prepare for template */
     protected void postprocess(List<Map<String, String>> data, WebappDaoFactory wdf) {
         String postprocessorName = config.postprocessor;
         if (postprocessorName == null) {
@@ -108,7 +141,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
      * like the pre-collation post-processing, but for now due to time constraints it applies to all views.
      */
     protected void postprocessStatementList(List<ObjectPropertyStatementTemplateModel> statements) {        
-        moveEndDateTimesToTop(statements);        
+        moveNullEndDateTimesToTop(statements);        
     }
     
     /* SPARQL ORDER BY gives null values the lowest value, so null datetimes occur at the end
@@ -119,7 +152,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
      * name is hard-coded here. (Note, therefore, that using a different variable name  
      * effectively turns off this post-processing.)
      */
-    protected void moveEndDateTimesToTop(List<ObjectPropertyStatementTemplateModel> statements) {
+    protected void moveNullEndDateTimesToTop(List<ObjectPropertyStatementTemplateModel> statements) {
         String queryString = getQueryString();
         Matcher m = ORDER_BY_END_DATE_TIME_PATTERN.matcher(queryString);
         if ( ! m.find() ) {
@@ -149,6 +182,10 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         // Put all the statements with null end datetimes at the top of the list, preserving their original order.
         statements.addAll(0, tempList);
     
+    }
+    
+    protected String getObjectKey() {
+        return objectKey;
     }
     
     protected abstract String getDefaultConfigFileName();
@@ -297,16 +334,16 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     }
 
 
-    @Override
-    public String getEditLink() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-
-    @Override
-    public String getDeleteLink() {
-        // TODO Auto-generated method stub
-        return null;
-    }
+//    @Override
+//    public String getEditLink() {
+//        // TODO Auto-generated method stub
+//        return null;
+//    }
+//
+//
+//    @Override
+//    public String getDeleteLink() {
+//        // TODO Auto-generated method stub
+//        return null;
+//    }
 }
