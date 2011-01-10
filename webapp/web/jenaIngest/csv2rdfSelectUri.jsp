@@ -75,7 +75,7 @@ function disableProperties(){
     
     <%String modelName = (String) request.getAttribute("destinationModelName"); %>
     
-   <input type="hidden" name="destinationModelName" value=<%=modelName%>/>
+   <input type="hidden" name="destinationModelName" value="<%=modelName%>"/>
     
     <input id="submit" type="submit" value="Convert CSV"/>
     
