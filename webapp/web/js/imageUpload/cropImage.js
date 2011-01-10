@@ -9,7 +9,7 @@
 			onSelect: showPreview,
 			setSelect:   [ 0, 0, 115, 115 ],
 			minSize: [ 115, 115 ],
-			boxWidth: 400,
+			boxWidth: 650,
 			aspectRatio: 1
 			
 		});

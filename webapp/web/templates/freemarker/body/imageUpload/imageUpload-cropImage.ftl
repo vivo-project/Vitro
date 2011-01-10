@@ -28,7 +28,6 @@ ${stylesheets.add("/js/jquery_plugins/jcrop/jquery.Jcrop.css")}
     
     <!-- This is the image we're attaching Jcrop to -->
     <section id="photoCroppingPreview" role="region">
-        <h3>Current Photo</h3>
         
         <p class="photoCroppingTitleBody">Your profile photo will look like the image below. </p>
         
