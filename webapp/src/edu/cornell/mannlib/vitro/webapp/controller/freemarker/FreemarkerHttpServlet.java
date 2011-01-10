@@ -331,7 +331,8 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         return map;
     }
     
-    // Add variables that should be available only to the page's root map, not to the body.
+    // Add variables that are needed to generate the page template (they will also be accessible
+    // to the body template).
     // RY This is protected instead of private so FreeMarkerComponentGenerator can access.
     // Once we don't need that (i.e., jsps have been eliminated) we can make it private.
     protected Map<String, Object> getPageTemplateValues(VitroRequest vreq) {
