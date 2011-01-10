@@ -75,10 +75,12 @@ public class JenaCsv2RdfController extends BaseEditController{
 				sourceModel[0] = doExecuteCsv2Rdf(request,fileStream,filePath);
 				Model model = ModelFactory.createDefaultModel();
 				ModelMaker maker = getVitroJenaModelMaker(request);
+				Boolean csv2rdf = true;
 				JenaIngestUtils utils = new JenaIngestUtils();
 				Map<String,LinkedList<String>> propertyMap = utils.generatePropertyMap(sourceModel, model, maker);
 				request.setAttribute("propertyMap",propertyMap);
 				getServletContext().setAttribute("sourceModel", sourceModel);
+				getServletContext().setAttribute("csv2rdf",csv2rdf);
 				request.setAttribute("destinationModelName", sourceModel[0]);
 				request.setAttribute("title","URI Select");
 				request.setAttribute("bodyJsp", CSV2RDF_SELECT_URI_JSP);
