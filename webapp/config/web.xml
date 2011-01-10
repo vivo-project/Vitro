@@ -1094,6 +1094,11 @@
     <servlet-name>entity</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.EntityController</servlet-class>
   </servlet>
+   
+   <servlet>
+   <servlet-name>ontology</servlet-name>
+   <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.OntologyController</servlet-class>
+   </servlet>
 
   <servlet>
     <servlet-name>updateEntityFlags</servlet-name>
@@ -1320,6 +1325,10 @@
     <url-pattern>/display/*</url-pattern>
   </servlet-mapping>  
   
+  <servlet-mapping>
+    <servlet-name>ontology</servlet-name>
+    <url-pattern>/ontology/*</url-pattern>
+  </servlet-mapping>
   <servlet-mapping>
     <servlet-name>updateEntityFlags</servlet-name>
     <url-pattern>/updateEntityFlags</url-pattern>
