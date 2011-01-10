@@ -905,10 +905,6 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
                 while (allIndIt.hasNext()) {
                     com.hp.hpl.jena.ontology.Individual ind = allIndIt.next();
                     
-                    //don't include anything that lacks a label, issue VIVO-119.
-                    if( getLabel(ind) == null )
-                        continue;
-                    
                     boolean userVisible = true;
                     //Check for non-user visible types, maybe this should be an annotation?
                     ClosableIterator<Resource> typeIt = ind.listRDFTypes(false);

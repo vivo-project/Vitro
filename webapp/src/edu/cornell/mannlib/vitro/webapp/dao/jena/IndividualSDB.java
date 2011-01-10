@@ -139,11 +139,11 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	    		 "{ GRAPH ?g { \n" +
     	    		 	"{ <"+individualURI+">  <" + RDFS.label.getURI() + 
     	    		 	        "> ?ooo } \n" +
-    	    		 	"UNION { <" +
+    	    		 	"UNION { GRAPH ?h { <" +
     	    		 	    individualURI+">  <" + VitroVocabulary.MONIKER + 
-    	    		 	        "> ?moniker } \n" +
+    	    		 	        "> ?moniker } } \n" +
     	    		 	"} } \n" +
-    	    		 	"UNION { GRAPH <http://vitro.mannlib.cornell.edu/default/vitro-kb-2> { <"
+    	    		 	"UNION { GRAPH ?i { <"
     	    		 	    + individualURI + "> a ?type } } \n" +
     	    		 "}";
         		model = QueryExecutionFactory.create(
