@@ -33,14 +33,22 @@
     </#if>  
 </#macro>
 
-<#macro dateTimeInterval dateTimeStart precisionStart dateTimeEnd precisionEnd endAsRange=true>
+<#macro dateTimeIntervalLong dateTimeStart precisionStart dateTimeEnd precisionEnd endAsRange=true>
+    <@dateTimeInterval dateTimeStart precisionStart dateTimeEnd precisionEnd "long" endAsRange />
+</#macro>
+
+<#macro dateTimeIntervalShort dateTimeStart precisionStart dateTimeEnd precisionEnd endAsRange=true>
+    <@dateTimeInterval dateTimeStart precisionStart dateTimeEnd precisionEnd "short" endAsRange />
+</#macro>
+
+<#macro dateTimeInterval dateTimeStart precisionStart dateTimeEnd precisionEnd view="short" endAsRange=true>
 
     <#if dateTimeStart?has_content>   
-        <#local start = formatXsdDateTime(dateTimeStart, precisionStart)>
+        <#local start = formatXsdDateTime(dateTimeStart, precisionStart, view)>
     </#if>
     
     <#if dateTimeEnd?has_content>
-        <#local end = formatXsdDateTime(dateTimeEnd, precisionEnd)>
+        <#local end = formatXsdDateTime(dateTimeEnd, precisionEnd, view)>
     </#if>
     
     <#local interval>
@@ -54,7 +62,7 @@
     </#local>
     
     <#if interval?has_content>
-        <span class="listDateTime">${interval}</span>
+        ${interval}
     </#if>
 </#macro>
 
@@ -68,8 +76,16 @@
 
 <#function toDateTime dateTimeString>
     <#-- First convert the datetime string to a string format that Freemarker 
-         understands, then to a datetime object -->
-    <#return dateTimeString?replace("T", " ")?datetime("yyyy-MM-dd HH:mm:ss")>
+         understands, then to a datetime object --> 
+    <#return dateTimeString?replace("T", " ")?replace("Z", "")?datetime("yyyy-MM-dd HH:mm:ss")>
+</#function>
+
+<#function formatXsdDateTimeLong dateTime precision>
+    <#return formatXsdDateTime(dateTime, precision, "long")>
+</#function>
+
+<#function formatXsdDateTimeShort dateTime precision>
+    <#return formatXsdDateTime(dateTime, precision)>
 </#function>
 
 <#function formatXsdDateTime dateTime precision view="short">
@@ -87,11 +103,11 @@
             <#elseif precision == "yearMonthDayPrecision">MMMM d, yyyy
             <#else>MMMM d, yyyy h:mm a
             </#if>
-        <#else>
+        <#else> <#-- view == "short" -->
              <#if precision == "yearPrecision">yyyy
-            <#elseif precision == "yearMonthPrecision">M-yyyy
-            <#elseif precision == "yearMonthDayPrecision">M-d-yyyy
-            <#else>M-d-yyyy h:mm a
+            <#elseif precision == "yearMonthPrecision">M/yyyy
+            <#elseif precision == "yearMonthDayPrecision">M/d/yyyy
+            <#else>M/d/yyyy h:mm a
             </#if>
         </#if>
     </#local>
