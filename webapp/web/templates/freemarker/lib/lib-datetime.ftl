@@ -1,21 +1,36 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
-<#-- Macros and functions for datetime formatting --> 
+<#-- Macros and functions for datetime formatting 
 
-<#-- Convenience macros to display year and year interval attributes in a classed span -->
+     In this library, functions are used to format the datetime or interval
+     according to a format string and precision, returning a raw string.
+     Macros are used to generate the string with appropriate markup.
+--> 
+
+<#-- MACROS -->
+
+<#-- Convenience display macros -->
 <#macro yearSpan dateTime>
     <#if dateTime?has_content>
-        <span class="listDateTime">${xsdDateTimeToYear(dateTime)}</span>
+        <@dateTimeSpan>${xsdDateTimeToYear(dateTime)}</@dateTimeSpan>
     </#if>
 </#macro>
 
 <#macro yearIntervalSpan startDateTime endDateTime endYearAsRange=true>
     <#local yearInterval = yearInterval(startDateTime, endDateTime, endYearAsRange)>
     <#if yearInterval?has_content>
-        <span class="listDateTime">${yearInterval}</span>
+        <@dateTimeSpan>${yearInterval}</@dateTimeSpan>
     </#if>  
 </#macro>
 
+<#-- Display the datetime value or interval in a classed span appropriate for 
+     a property statement list -->
+<#macro dateTimeSpan>
+    <span class="listDateTime"><#nested></span>
+</#macro>
+
+
+<#-- FUNCTIONS -->
 
 <#-- Assign a year precision and generate the interval -->
 <#function yearInterval dateTimeStart dateTimeEnd endYearAsRange=true>
@@ -34,14 +49,14 @@
 </#function>
 
 <#-- Generate a datetime interval -->
-<#function dateTimeInterval dateTimeStart precisionStart dateTimeEnd precisionEnd view="short" endAsRange=true>
+<#function dateTimeInterval dateTimeStart precisionStart dateTimeEnd precisionEnd formatType="short" endAsRange=true>
 
     <#if dateTimeStart?has_content>   
-        <#local start = formatXsdDateTime(dateTimeStart, precisionStart, view)>
+        <#local start = formatXsdDateTime(dateTimeStart, precisionStart, formatType)>
     </#if>
     
     <#if dateTimeEnd?has_content>
-        <#local end = formatXsdDateTime(dateTimeEnd, precisionEnd, view)>
+        <#local end = formatXsdDateTime(dateTimeEnd, precisionEnd, formatType)>
     </#if>
     
     <#local interval>
@@ -90,22 +105,22 @@
     <#return dateTimeString?replace("T", " ")?replace("Z", "")?datetime("yyyy-MM-dd HH:mm:ss")>
 </#function>
 
-<#-- Apply a precision and view to format a datetime -->
-<#function formatXsdDateTime dateTime precision view="short">
+<#-- Apply a precision and format type to format a datetime -->
+<#function formatXsdDateTime dateTime precision formatType="short">
 
     <#-- First convert the string dateTime to a datetime object -->
     <#local dt = toDateTime(dateTime)>
     
     <#-- Use the precision to determine which portion to display, 
-         and the view to determine how to display it.  -->
+         and the format type to determine how to display it.  -->
     <#local format>
-        <#if view == "long">
+        <#if formatType == "long">
             <#if precision == "yearPrecision">yyyy
             <#elseif precision == "yearMonthPrecision">MMMM yyyy
             <#elseif precision == "yearMonthDayPrecision">MMMM d, yyyy
             <#else>MMMM d, yyyy h:mm a
             </#if>
-        <#else> <#-- view == "short" -->
+        <#else> <#-- formatType == "short" -->
              <#if precision == "yearPrecision">yyyy
             <#elseif precision == "yearMonthPrecision">M/yyyy
             <#elseif precision == "yearMonthDayPrecision">M/d/yyyy
