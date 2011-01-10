@@ -17,10 +17,10 @@
     <#if menuN3??>
     <form class="" action="${urls.base}/${currentPage}" method="post">
       <label for="navigatioN3"></label>
-      <textarea name="navigationN3" id="textarea" cols="45" rows="40">
+      <textarea name="navigationN3" id="textarea" cols="45" rows="40" class="maxWidth">
       ${menuN3}
       </textarea>
-      <input name="submit" class="submit" value="Save" type="submit"/>
+      <input name="submit" id="submit" value="Save" type="submit"/>
       or <a href="#">Cancel</a>
       <p class="small red">&nbsp;</p>
     </form>
