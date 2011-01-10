@@ -10,6 +10,26 @@
      }
 
      function validatePw(theForm) {
+         if (theForm.Username.value.length == 0 ) {
+             alert("Please enter a valid Email address.");
+             theForm.Username.focus();
+             return false;
+         }
+        if (theForm.FirstName.value.length == 0 ) {
+             alert("Please enter a First Name.");
+             theForm.FirstName.focus();
+             return false;
+         }
+         if (theForm.LastName.value.length == 0 ) {
+             alert("Please enter a Last Name.");
+             theForm.LastName.focus();
+             return false;
+         }
+         if (theForm.Md5password.value.length == 0 ) {
+             alert("Please enter a password.");
+             theForm.Md5password.focus();
+             return false;
+         }
          if (theForm.Md5password.value != theForm.passwordConfirmation.value) {
              alert("The passwords do not match.");
              theForm.Md5password.focus();
@@ -19,7 +39,8 @@
              alert("Please enter a password between 6 and 12 characters long."); 
              theForm.Md5password.focus();
              return false;
-         } else {    
+         } 
+		 else {    
              return true;
          }
      }
