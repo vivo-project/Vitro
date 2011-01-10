@@ -15,17 +15,21 @@
             <p>${message}</p>
         <#else>
         
-        <#if (pages?size > 1) >           
-            pages:&nbsp; 
-       		<ul class="pagination">
-                <#list pages as page>                                                            
-                    <#if page.selected><li class="selectedNavPage">${page.text}</li>
-				    <#else><li><a href="${urls.base}/individuallist?${page.param}&vclassId=${vclassId?url}">${page.text}</a></li>
-				    </#if>                                                                                     
-                </#list>
-            </ul>               
-        </#if>
+            <#assign pagination>
+                <#if (pages?size > 1) >           
+                    pages:&nbsp; 
+                    <ul class="pagination">
+                        <#list pages as page>                                                            
+                            <#if page.selected><li class="selectedNavPage">${page.text}</li>
+                            <#else><li><a href="${urls.base}/individuallist?${page.param}&vclassId=${vclassId?url}">${page.text}</a></li>
+                            </#if>                                                                                     
+                        </#list>
+                    </ul>               
+                </#if>            
+            </#assign>
         
+            ${pagination} 
+            
             <ul>
                 <#list individuals as individual>                   
                     <li>
@@ -49,20 +53,10 @@
                     </li>
                 </#list>
             </ul>
-            
-	        <#if (pages?size > 1) >           
-	            pages:&nbsp; 
-	       		<ul class="pagination">
-	                <#list pages as page>                                                            
-	                    <#if page.selected><li class="selectedNavPage">${page.text}</li>
-					    <#else><li><a href="${urls.base}/individuallist?${page.param}&vclassId=${vclassId?url}">${page.text}</a></li>
-					    </#if>                                                                                     
-	                </#list>
-	            </ul>               
-	        </#if>
-        </#if>
-        
-                     
-    </div>
-       
+
+            ${pagination}  
+
+        </#if>              
+    </div>       
 </div>
+
