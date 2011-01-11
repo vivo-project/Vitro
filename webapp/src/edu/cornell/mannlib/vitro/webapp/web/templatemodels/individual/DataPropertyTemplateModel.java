@@ -13,7 +13,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 public class DataPropertyTemplateModel extends PropertyTemplateModel {
 
@@ -22,10 +21,9 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
     private static final String TYPE = "data";
     
     private List<DataPropertyStatementTemplateModel> statements;
-    private EditingHelper editingHelper;
 
     DataPropertyTemplateModel(DataProperty dp, Individual subject, VitroRequest vreq, EditingHelper editingHelper) {
-        super(dp, editingHelper);
+        super(dp, subject, editingHelper);
 
         setName(dp.getPublicName());
         
@@ -46,8 +44,8 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
 
     @Override
     public String getAddUrl() {
-        // TODO Auto-generated method stub
-        return null;
+        String addUrl = "";
+        return addUrl;
     }
     
     public List<DataPropertyStatementTemplateModel> getStatements() {

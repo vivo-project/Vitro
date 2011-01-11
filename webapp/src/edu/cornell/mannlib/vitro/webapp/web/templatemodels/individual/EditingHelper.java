@@ -12,7 +12,9 @@ import edu.cornell.mannlib.vitro.webapp.auth.identifier.ServletIdentifierBundleF
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyList;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.RequestPolicyList;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 
 public class EditingHelper {
@@ -49,13 +51,8 @@ public class EditingHelper {
             log.error("No IdentifierBundle objects for request");
         }
     }
-    
-    protected PolicyIface getPolicy() {
-        return policy;
-    }
-    
-    protected IdentifierBundle getIds() {
-        return ids;
-    }
 
+    protected PolicyDecision getPolicyDecision(RequestedAction action) {
+        return policy.isAuthorized(ids, action);
+    }
 }

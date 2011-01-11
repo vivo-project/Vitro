@@ -32,6 +32,15 @@
     </#list>
 </#macro>
 
+<#macro addLink property showEditingLinks>
+    <#if showEditingLinks>
+        <#local url = property.addUrl>
+        <#if url?has_content>
+            <a href="${url}">add</a>
+        </#if>
+    </#if>
+</#macro>
+
 <#macro propertyListItem statement showEditingLinks>
     <li role="listitem">    
         <#nested>

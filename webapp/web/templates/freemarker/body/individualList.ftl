@@ -6,6 +6,7 @@
 
 <div class="contents">   
     <div class="individualList">
+        
         <h2>${title}</h2>
         <#if subtitle??>
             <h4>${subtitle}</h4>

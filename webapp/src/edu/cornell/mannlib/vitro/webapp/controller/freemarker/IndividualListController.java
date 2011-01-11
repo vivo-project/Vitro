@@ -104,7 +104,7 @@ public class IndividualListController extends FreemarkerHttpServlet {
                     title = classGroup.getPublicName();
                     body.put("subtitle", vclass.getName());
                 }
-                body.put("title", title);                
+                body.put("title", title);  
                 
             }   
             

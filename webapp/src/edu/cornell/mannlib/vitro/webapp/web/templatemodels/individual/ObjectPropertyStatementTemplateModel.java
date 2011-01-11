@@ -29,38 +29,40 @@ public class ObjectPropertyStatementTemplateModel extends BaseTemplateModel {
     private static enum EditAccess {
         EDIT, DELETE;
     }
-    
-    private String subjectUri; // we'll use these to make the edit links
-    private String propertyUri;
+
     private Map<String, String> data;
     
+    // Used for editing
+    private String subjectUri = null; 
+    private String propertyUri = null;
     private String objectUri = null;
     private List<EditAccess> editAccessList;
 
     ObjectPropertyStatementTemplateModel(String subjectUri, String propertyUri, 
             String objectKey, Map<String, String> data, EditingHelper editingHelper) {
-        this.subjectUri = subjectUri;
-        this.propertyUri = propertyUri;
+
         this.data = data;
         
         // If the editingHelper is non-null, we are in edit mode, so create the list of editing permissions.
         // We do this now rather than in getEditUrl() and getDeleteUrl(), because getEditUrl() also needs to know
         // whether a delete is allowed.
         if (editingHelper != null) {
+            this.subjectUri = subjectUri;
+            this.propertyUri = propertyUri;
             objectUri = data.get(objectKey);
-            editAccessList = new ArrayList<EditAccess>();  // limit size to number of elements in EditAccess
+            editAccessList = new ArrayList<EditAccess>();
             ObjectPropertyStatement objectPropertyStatement = new ObjectPropertyStatementImpl(subjectUri, propertyUri, objectUri);
             
             // Determine whether the statement can be edited
             RequestedAction action =  new EditObjPropStmt(objectPropertyStatement);
-            PolicyDecision decision = editingHelper.getPolicy().isAuthorized(editingHelper.getIds(), action);
+            PolicyDecision decision = editingHelper.getPolicyDecision(action);
             if (decision != null && decision.getAuthorized() == Authorization.AUTHORIZED) {
                 editAccessList.add(EditAccess.EDIT);
             }
             
             // Determine whether the statement can be deleted
             action = new DropObjectPropStmt(subjectUri, propertyUri, objectUri);
-            decision = editingHelper.getPolicy().isAuthorized(editingHelper.getIds(), action);
+            decision = editingHelper.getPolicyDecision(action);
             if (decision != null && decision.getAuthorized() == Authorization.AUTHORIZED) {      
                 editAccessList.add(EditAccess.DELETE);
             }

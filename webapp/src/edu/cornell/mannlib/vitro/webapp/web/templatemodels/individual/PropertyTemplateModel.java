@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 
@@ -16,17 +17,24 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     private static final Log log = LogFactory.getLog(PropertyTemplateModel.class); 
     
     private String name;
-    private String uri;
-    protected Property property; // needed to get the edit links
-    protected EditingHelper editingHelper;
     
-    PropertyTemplateModel(Property property, EditingHelper editingHelper) {
+    // For editing
+    protected String subjectUri = null;
+    protected String propertyUri = null;
+    protected Property property; // RY DO WE NEED THIS, or just the uri??
+    protected boolean addAccess = false;
+    
+    PropertyTemplateModel(Property property, Individual subject, EditingHelper editingHelper) {
         // Do in subclass constructor. The label has not been set on the property, and getting the 
         // label differs between object and data properties.
         // this.name = property.getLabel();
-        this.uri = property.getURI();
+        this.propertyUri = property.getURI();
         this.property = property;
-        this.editingHelper = editingHelper;
+        
+        if (editingHelper != null) {
+            subjectUri = subject.getURI();
+            propertyUri = property.getURI();
+        }
     }
     
     protected void setName(String name) {
@@ -42,7 +50,7 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     }
 
     public String getUri() {
-        return uri;
+        return propertyUri;
     }
     
     public abstract String getAddUrl();
