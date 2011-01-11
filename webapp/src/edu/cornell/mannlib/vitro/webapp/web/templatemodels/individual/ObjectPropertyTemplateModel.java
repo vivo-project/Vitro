@@ -61,8 +61,8 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     private PropertyListConfig config;
     private String objectKey;
 
-    ObjectPropertyTemplateModel(ObjectProperty op, Individual subject, VitroRequest vreq, EditingHelper editLinkHelper) {
-        super(op, editLinkHelper);
+    ObjectPropertyTemplateModel(ObjectProperty op, Individual subject, VitroRequest vreq, EditingHelper editingHelper) {
+        super(op, editingHelper);
         setName(op.getDomainPublic());
         
         // Get the config for this object property
@@ -107,16 +107,16 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     }
      
     protected static ObjectPropertyTemplateModel getObjectPropertyTemplateModel(ObjectProperty op, 
-            Individual subject, VitroRequest vreq, EditingHelper editLinkHelper) {
+            Individual subject, VitroRequest vreq, EditingHelper editingHelper) {
         if (op.getCollateBySubclass()) {
             try {
-                return new CollatedObjectPropertyTemplateModel(op, subject, vreq, editLinkHelper);
+                return new CollatedObjectPropertyTemplateModel(op, subject, vreq, editingHelper);
             } catch (InvalidConfigurationException e) {
                 log.error(e);
-                return new UncollatedObjectPropertyTemplateModel(op, subject, vreq, editLinkHelper);
+                return new UncollatedObjectPropertyTemplateModel(op, subject, vreq, editingHelper);
             }
         } else {
-            return new UncollatedObjectPropertyTemplateModel(op, subject, vreq, editLinkHelper);
+            return new UncollatedObjectPropertyTemplateModel(op, subject, vreq, editingHelper);
         }
     }
     

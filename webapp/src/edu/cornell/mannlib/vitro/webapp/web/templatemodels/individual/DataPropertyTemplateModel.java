@@ -22,10 +22,10 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
     private static final String TYPE = "data";
     
     private List<DataPropertyStatementTemplateModel> statements;
-    private EditingHelper editLinkHelper;
+    private EditingHelper editingHelper;
 
-    DataPropertyTemplateModel(DataProperty dp, Individual subject, VitroRequest vreq, EditingHelper editLinkHelper) {
-        super(dp, editLinkHelper);
+    DataPropertyTemplateModel(DataProperty dp, Individual subject, VitroRequest vreq, EditingHelper editingHelper) {
+        super(dp, editingHelper);
 
         setName(dp.getPublicName());
         
@@ -34,7 +34,7 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
         List<DataPropertyStatement> dpStatements = dpDao.getDataPropertyStatementsForIndividualByProperty(subject, dp);
         statements = new ArrayList<DataPropertyStatementTemplateModel>(dpStatements.size());
         for (DataPropertyStatement dps : dpStatements) {
-            statements.add(new DataPropertyStatementTemplateModel(dps, editLinkHelper));
+            statements.add(new DataPropertyStatementTemplateModel(dps, editingHelper));
         }
     }
     

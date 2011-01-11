@@ -4,56 +4,58 @@
     Macros for generating property lists
 ------------------------------------------------------------------------------>
 
-<#macro dataPropertyList statements>
+<#macro dataPropertyList statements showEditingLinks>
     <#list statements as statement>
-        <@propertyListItem statement>${statement.value}</@propertyListItem>
+        <@propertyListItem statement showEditingLinks>${statement.value}</@propertyListItem>
     </#list> 
 </#macro>
 
-<#macro collatedObjectPropertyList property>
+<#macro collatedObjectPropertyList property showEditingLinks>
     <#assign subclasses = property.subclasses>
     <#list subclasses?keys as subclass>
         <li class="subclass">
             <h3>${subclass?lower_case}</h3>
             <ul class="subclass-property-list">
-                <@objectPropertyList subclasses[subclass] property.template /> 
+                <@objectPropertyList subclasses[subclass] property.template showEditingLinks /> 
             </ul>
         </li>
     </#list>
 </#macro>
 
-<#macro simpleObjectPropertyList property>
-    <@objectPropertyList property.statements "propStatement-simple.ftl" />
+<#macro simpleObjectPropertyList property showEditingLinks>
+    <@objectPropertyList property.statements "propStatement-simple.ftl" showEditingLinks />
 </#macro>
 
-<#macro objectPropertyList statements template>
+<#macro objectPropertyList statements template showEditingLinks>
     <#list statements as statement>
-        <@propertyListItem statement><#include "${template}"></@propertyListItem>
+        <@propertyListItem statement showEditingLinks><#include "${template}"></@propertyListItem>
     </#list>
 </#macro>
 
-<#macro propertyListItem statement>
+<#macro propertyListItem statement showEditingLinks>
     <li role="listitem">
-        <@editLink statement />
-        <@deleteLink statement />
+        <@editingLinks statement showEditingLinks />
         <#nested>
     </li>
 </#macro>
 
-<#macro editLink statement>
-    <#if editStatus.showEditingLinks>
-        <#local url = statement.editUrl>
-        <#if url?has_content>
-            <a href="${url}">edit</a>
-        </#if>
+<#macro editingLinks statement showEditingLinks>
+    <#if showEditingLinks>
+        <@editLink statement />
+        <@deleteLink statement />
     </#if>
 </#macro>
 
-<#macro deleteLink statement>
-    <#if editStatus.showEditingLinks>
-        <#local url = statement.deleteUrl>
-        <#if url?has_content>
-            <a href="${url}">delete</a>
-        </#if>
+<#macro editLink statement>
+    <#local url = statement.editUrl>
+    <#if url?has_content>
+        <a href="${url}">edit</a>
+    </#if>
+</#macro>
+
+<#macro deleteLink statement> 
+    <#local url = statement.deleteUrl>
+    <#if url?has_content>
+        <a href="${url}">delete</a>
     </#if>
 </#macro>

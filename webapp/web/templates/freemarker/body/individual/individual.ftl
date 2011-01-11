@@ -1,20 +1,12 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
-<#-- Template for individual profile page -->
+<#-- Generic template for individual profile page -->
 
-<#import "lib-list.ftl" as l>
-<#import "lib-properties.ftl" as p>
-<#assign core = "http://vivoweb.org/ontology/core#">
+<#include "individual-setup.ftl">
 
-<#assign editingClass>
-    <#if editStatus.showEditingLinks>editing<#else></#if>
-</#assign>
-
-<#if editStatus.showAdminPanel>
+<#if individual.showAdminPanel>
     <#include "individual-adminPanel.ftl">
 </#if>
-
-<#assign propertyGroups = individual.propertyList>
 
 <section id="individual-intro" class="vcard" role="region">
     <section id="share-contact" role="region"> 
@@ -48,6 +40,7 @@
         <#assign overview = propertyGroups.getPropertyAndRemoveFromList("${core}overview")!> 
         <#if overview?has_content> <#-- true when the property is in the list, even if not populated (when editing) -->
             <#list overview.statements as statement>
+                <@p.editingLinks statement showEditingLinks />
                 <p class="individual-overview">${statement.value}</p>
             </#list>
         </#if>
@@ -87,8 +80,9 @@
     </section>
 </section>
 
+<#assign nameForOtherGroup = "other"> <#-- used by both individual-propertyGroupMenu.ftl and individual-properties.ftl -->
+
 <#-- Property group menu -->
-<#assign nameForOtherGroup = "other">
 <#include "individual-propertyGroupMenu.ftl">
 
 <#-- Ontology properties -->

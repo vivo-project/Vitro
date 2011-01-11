@@ -30,13 +30,13 @@
                 <ul class="property-list" role="list"> 
                     <#-- data property -->  
                     <#if property.type == "data"> 
-                        <@p.dataPropertyList property.statements />
+                        <@p.dataPropertyList property.statements showEditingLinks />
 
                     <#-- object property -->      
                     <#elseif property.collatedBySubclass> <#-- collated -->                            
-                        <@p.collatedObjectPropertyList property />
+                        <@p.collatedObjectPropertyList property showEditingLinks />
                     <#else> <#-- uncollated -->
-                        <@p.objectPropertyList property.statements property.template />
+                        <@p.objectPropertyList property.statements property.template showEditingLinks />
                     </#if>  
                 </ul>                 
             </article> <!-- end property -->             

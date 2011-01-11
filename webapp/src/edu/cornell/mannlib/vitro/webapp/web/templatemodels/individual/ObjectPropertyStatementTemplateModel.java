@@ -27,20 +27,20 @@ public class ObjectPropertyStatementTemplateModel extends BaseTemplateModel {
     private String propertyUri;
     private Map<String, String> data;
     
-    private EditingHelper editLinkHelper;
+    private EditingHelper editingHelper;
     private String objectUri = null;
     private ObjectPropertyStatement objectPropertyStatement = null;
 
 
     ObjectPropertyStatementTemplateModel(String subjectUri, String propertyUri, 
-            String objectKey, Map<String, String> data, EditingHelper editLinkHelper) {
+            String objectKey, Map<String, String> data, EditingHelper editingHelper) {
         this.subjectUri = subjectUri;
         this.propertyUri = propertyUri;
         this.data = data;
-        this.editLinkHelper = editLinkHelper;
+        this.editingHelper = editingHelper;
         
-        // If the editLinkHelper is non-null, we are in edit mode, so create the necessary objects.
-        if (this.editLinkHelper != null) {
+        // If the editingHelper is non-null, we are in edit mode, so create the necessary objects.
+        if (this.editingHelper != null) {
             objectUri = data.get(objectKey);
             objectPropertyStatement = new ObjectPropertyStatementImpl(subjectUri, propertyUri, objectUri);
         }
@@ -57,7 +57,7 @@ public class ObjectPropertyStatementTemplateModel extends BaseTemplateModel {
     public String getEditUrl() {
         String editUrl = "";
         RequestedAction action = new EditObjPropStmt(objectPropertyStatement);
-        PolicyDecision decision = editLinkHelper.getPolicy().isAuthorized(editLinkHelper.getIds(), action);
+        PolicyDecision decision = editingHelper.getPolicy().isAuthorized(editingHelper.getIds(), action);
         if (decision != null && decision.getAuthorized() == Authorization.AUTHORIZED) {
             ParamMap params = new ParamMap(
                     "subjectUri", subjectUri,

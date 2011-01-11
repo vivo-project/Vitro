@@ -10,6 +10,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.URIImpl;
 
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Link;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
@@ -18,6 +19,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep;
 import edu.cornell.mannlib.vitro.webapp.web.ViewFinder;
 import edu.cornell.mannlib.vitro.webapp.web.ViewFinder.ClassView;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
@@ -32,10 +34,19 @@ public class IndividualTemplateModel extends BaseTemplateModel {
     protected VitroRequest vreq;
     protected UrlBuilder urlBuilder;
     protected GroupedPropertyList propertyList = null;
+    protected LoginStatusBean loginStatusBean = null;
     
     public IndividualTemplateModel(Individual individual, VitroRequest vreq) {
         this.individual = individual;
         this.vreq = vreq;
+        // Needed for getting portal-sensitive urls. Remove if multi-portal support is removed.
+        this.urlBuilder = new UrlBuilder(vreq.getPortal());
+    }
+
+    public IndividualTemplateModel(Individual individual, VitroRequest vreq, LoginStatusBean loginStatusBean) {
+        this.individual = individual;
+        this.vreq = vreq;
+        this.loginStatusBean = loginStatusBean;
         // Needed for getting portal-sensitive urls. Remove if multi-portal support is removed.
         this.urlBuilder = new UrlBuilder(vreq.getPortal());
     }
@@ -129,9 +140,20 @@ public class IndividualTemplateModel extends BaseTemplateModel {
 
     public GroupedPropertyList getPropertyList() {
         if (propertyList == null) {
-            propertyList = new GroupedPropertyList(individual, vreq);
+            propertyList = new GroupedPropertyList(individual, vreq, loginStatusBean);
         }
         return propertyList;
+    }
+    
+    public boolean getShowEditingLinks() {
+        // RY This will be improved later. What is important is not whether the user is a self-editor,
+        // but whether he has editing privileges on this profile.
+        return VitroRequestPrep.isSelfEditing(vreq) || 
+            loginStatusBean.isLoggedInAtLeast(LoginStatusBean.NON_EDITOR);
+    }
+    
+    public boolean getShowAdminPanel() {
+        return loginStatusBean.isLoggedInAtLeast(LoginStatusBean.EDITOR);
     }
     
     /* These methods simply forward to the methods of the wrapped individual. It would be desirable to 

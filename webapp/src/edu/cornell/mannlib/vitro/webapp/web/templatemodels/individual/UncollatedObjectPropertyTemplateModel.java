@@ -22,8 +22,8 @@ public class UncollatedObjectPropertyTemplateModel extends ObjectPropertyTemplat
     
     private List<ObjectPropertyStatementTemplateModel> statements;
     
-    UncollatedObjectPropertyTemplateModel(ObjectProperty op, Individual subject, VitroRequest vreq, EditingHelper editLinkHelper) {
-        super(op, subject, vreq, editLinkHelper);
+    UncollatedObjectPropertyTemplateModel(ObjectProperty op, Individual subject, VitroRequest vreq, EditingHelper editingHelper) {
+        super(op, subject, vreq, editingHelper);
         
         /* Get the data */
         WebappDaoFactory wdf = vreq.getWebappDaoFactory();
@@ -41,7 +41,7 @@ public class UncollatedObjectPropertyTemplateModel extends ObjectPropertyTemplat
         String objectKey = getObjectKey();
         for (Map<String, String> map : statementData) {
             statements.add(new ObjectPropertyStatementTemplateModel(subjectUri, 
-                    propertyUri, objectKey, map, editLinkHelper));
+                    propertyUri, objectKey, map, editingHelper));
         }
         
         postprocessStatementList(statements);
