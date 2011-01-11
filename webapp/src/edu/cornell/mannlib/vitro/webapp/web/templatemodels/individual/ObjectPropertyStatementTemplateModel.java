@@ -10,6 +10,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropObjectPropStmt;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjPropStmt;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
@@ -56,8 +57,8 @@ public class ObjectPropertyStatementTemplateModel extends BaseTemplateModel {
     
     public String getEditUrl() {
         String editUrl = "";
-        RequestedAction action = new EditObjPropStmt(objectPropertyStatement);
-        PolicyDecision decision = editingHelper.getPolicy().isAuthorized(editingHelper.getIds(), action);
+        RequestedAction editAction = new EditObjPropStmt(objectPropertyStatement);
+        PolicyDecision decision = editingHelper.getPolicy().isAuthorized(editingHelper.getIds(), editAction);
         if (decision != null && decision.getAuthorized() == Authorization.AUTHORIZED) {
             ParamMap params = new ParamMap(
                     "subjectUri", subjectUri,
@@ -71,6 +72,16 @@ public class ObjectPropertyStatementTemplateModel extends BaseTemplateModel {
     
     public String getDeleteUrl() {
         String deleteUrl = "";
+        RequestedAction dropAction = new DropObjectPropStmt(subjectUri, propertyUri, objectUri);
+        PolicyDecision decision = editingHelper.getPolicy().isAuthorized(editingHelper.getIds(), dropAction);
+        if (decision != null && decision.getAuthorized() == Authorization.AUTHORIZED) {
+            ParamMap params = new ParamMap(
+                    "subjectUri", subjectUri,
+                    "predicateUri", propertyUri,
+                    "objectUri", objectUri,
+                    "cmd", "delete");
+            deleteUrl = UrlBuilder.getUrl(EDIT_PATH, params);
+        }
         return deleteUrl;
     }
 }
