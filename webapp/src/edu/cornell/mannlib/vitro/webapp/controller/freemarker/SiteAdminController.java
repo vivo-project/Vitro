@@ -3,10 +3,12 @@
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -19,10 +21,8 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMa
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
-import edu.cornell.mannlib.vitro.webapp.controller.login.LoginTemplateHelper;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
-import freemarker.template.Configuration;
 
 public class SiteAdminController extends FreemarkerHttpServlet {
 	
@@ -90,13 +90,27 @@ public class SiteAdminController extends FreemarkerHttpServlet {
         WebappDaoFactory wadf = vreq.getFullWebappDaoFactory();
         
         // Create map for data input entry form options list
-        List classGroups = wadf.getVClassGroupDao().getPublicGroupsWithVClasses(true,true,false); // order by displayRank, include uninstantiated classes, don't get the counts of individuals        
+        List classGroups = wadf.getVClassGroupDao().getPublicGroupsWithVClasses(true,true,false); // order by displayRank, include uninstantiated classes, don't get the counts of individuals
+        
+        boolean classGroupDisplayAssumptionsMeet = checkClassGroupDisplayAssumptions(classGroups);   
+        
+        Set<String> seenGroupNames = new HashSet<String>();
+        
         Iterator classGroupIt = classGroups.iterator();
         LinkedHashMap<String, List> orderedClassGroups = new LinkedHashMap<String, List>(classGroups.size());
         while (classGroupIt.hasNext()) {
-            VClassGroup group = (VClassGroup)classGroupIt.next();
-            List classes = group.getVitroClassList();
-            orderedClassGroups.put(group.getPublicName(),FormUtils.makeOptionListFromBeans(classes,"URI","PickListName",null,null,false));
+            VClassGroup group = (VClassGroup)classGroupIt.next();            
+            List opts = FormUtils.makeOptionListFromBeans(group.getVitroClassList(),"URI","PickListName",null,null,false);
+            if( seenGroupNames.contains(group.getPublicName() )){
+                //have a duplicat classgroup name, stick in the URI
+                orderedClassGroups.put(group.getPublicName() + " ("+group.getURI()+")", opts);
+            }else if( group.getPublicName() == null ){
+                //have an unlabeled group, use stick in the URI
+                orderedClassGroups.put("unnamed group ("+group.getURI()+")", opts);
+            }else{
+                orderedClassGroups.put(group.getPublicName(),opts);
+                seenGroupNames.add(group.getPublicName());
+            }             
         }
         
         map.put("groupedClassOptions", orderedClassGroups);
@@ -193,6 +207,44 @@ public class SiteAdminController extends FreemarkerHttpServlet {
         map.put("urls", urls);
         
         return map;
+    }
+
+    /*
+     * There is a problem where labels are being used as keys for a map of 
+     * classgroups that gets passed to the templates. This representation isn't an accurate 
+     * reflection of the model since classgroups could have two labels, multiple classgroups 
+     * could have the same label, and a classgroup could have no lables.
+     * 
+     *  Check the assumptions and use the URIs as the key if the assumptions are not
+     *  meet. see issue NIHVIVO-1635.
+     */
+    private boolean checkClassGroupDisplayAssumptions( List<VClassGroup> groups){
+        //Assumption A: all of the classgroups have a non-null rdfs:label
+        //Assumption B: none of the classgroups have the same rdfs:label
+        //the assumption that all classgroups have only one rdfs:label is not checked
+        boolean rvalue = true;
+        Set<String> seenPublicNames = new HashSet<String>();
+        
+        for( VClassGroup group :groups ){
+            //check Assumption A
+            if( group.getPublicName() == null){
+                rvalue = false;
+                break;
+            }
+                            
+            //check Assumption B
+            if( seenPublicNames.contains(group.getPublicName()) ){
+                rvalue = false;
+                break;
+            }
+            seenPublicNames.add(group.getPublicName());            
+        }
+        
+        
+        if( !rvalue )
+            log.error("The rdfs:labels on the classgroups in the system do " +
+                    "not meet the display assumptions.  Falling back to alternative.");
+        return rvalue;
     }
 
 }
