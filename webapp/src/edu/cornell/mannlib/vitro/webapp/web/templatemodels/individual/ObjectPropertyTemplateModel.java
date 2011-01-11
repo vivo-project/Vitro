@@ -72,8 +72,8 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     // Used for editing
     private boolean addAccess = false;
 
-    ObjectPropertyTemplateModel(ObjectProperty op, Individual subject, VitroRequest vreq, EditingHelper editingHelper) {
-        super(op, subject, editingHelper);
+    ObjectPropertyTemplateModel(ObjectProperty op, Individual subject, VitroRequest vreq, EditingPolicyHelper policyHelper) {
+        super(op, subject, policyHelper);
         setName(op.getDomainPublic());
         
         // Get the config for this object property
@@ -86,9 +86,9 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         objectKey = getQueryObjectVariableName();
         
         // Determine whether a new statement can be added
-        if (editingHelper != null) {
+        if (policyHelper != null) {
             RequestedAction action = new AddObjectPropStmt(subjectUri, propertyUri, RequestActionConstants.SOME_URI);
-            PolicyDecision decision = editingHelper.getPolicyDecision(action);
+            PolicyDecision decision = policyHelper.getPolicyDecision(action);
             if( decision != null && decision.getAuthorized() == Authorization.AUTHORIZED ) {
                 addAccess = true;
             }
@@ -127,16 +127,16 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     }
      
     protected static ObjectPropertyTemplateModel getObjectPropertyTemplateModel(ObjectProperty op, 
-            Individual subject, VitroRequest vreq, EditingHelper editingHelper) {
+            Individual subject, VitroRequest vreq, EditingPolicyHelper policyHelper) {
         if (op.getCollateBySubclass()) {
             try {
-                return new CollatedObjectPropertyTemplateModel(op, subject, vreq, editingHelper);
+                return new CollatedObjectPropertyTemplateModel(op, subject, vreq, policyHelper);
             } catch (InvalidConfigurationException e) {
                 log.error(e);
-                return new UncollatedObjectPropertyTemplateModel(op, subject, vreq, editingHelper);
+                return new UncollatedObjectPropertyTemplateModel(op, subject, vreq, policyHelper);
             }
         } else {
-            return new UncollatedObjectPropertyTemplateModel(op, subject, vreq, editingHelper);
+            return new UncollatedObjectPropertyTemplateModel(op, subject, vreq, policyHelper);
         }
     }
     

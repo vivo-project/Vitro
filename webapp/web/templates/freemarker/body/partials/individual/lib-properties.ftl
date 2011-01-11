@@ -32,6 +32,15 @@
     </#list>
 </#macro>
 
+<#-- Some properties usually display without a label. But if there's an add link, 
+we need to also show the property label. -->
+<#macro showLabelAndAddLink property showEditingLinks>
+    <#local addLink><@addLink property showEditingLinks /></#local>
+    <#if addLink?has_content>
+        <h3>${property.name?capitalize} ${addLink}</h3> 
+    </#if>
+</#macro>
+
 <#macro addLink property showEditingLinks>
     <#if showEditingLinks>
         <#local url = property.addUrl>

@@ -24,14 +24,14 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     protected Property property; // RY DO WE NEED THIS, or just the uri??
     protected boolean addAccess = false;
     
-    PropertyTemplateModel(Property property, Individual subject, EditingHelper editingHelper) {
+    PropertyTemplateModel(Property property, Individual subject, EditingPolicyHelper policyHelper) {
         // Do in subclass constructor. The label has not been set on the property, and getting the 
         // label differs between object and data properties.
         // this.name = property.getLabel();
         this.propertyUri = property.getURI();
         this.property = property;
         
-        if (editingHelper != null) {
+        if (policyHelper != null) {
             subjectUri = subject.getURI();
             propertyUri = property.getURI();
         }

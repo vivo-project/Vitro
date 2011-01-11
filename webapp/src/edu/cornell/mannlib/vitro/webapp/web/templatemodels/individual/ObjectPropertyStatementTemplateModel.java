@@ -39,14 +39,14 @@ public class ObjectPropertyStatementTemplateModel extends BaseTemplateModel {
     private List<EditAccess> editAccessList;
 
     ObjectPropertyStatementTemplateModel(String subjectUri, String propertyUri, 
-            String objectKey, Map<String, String> data, EditingHelper editingHelper) {
+            String objectKey, Map<String, String> data, EditingPolicyHelper policyHelper) {
 
         this.data = data;
         
-        // If the editingHelper is non-null, we are in edit mode, so create the list of editing permissions.
+        // If the policyHelper is non-null, we are in edit mode, so create the list of editing permissions.
         // We do this now rather than in getEditUrl() and getDeleteUrl(), because getEditUrl() also needs to know
         // whether a delete is allowed.
-        if (editingHelper != null) {
+        if (policyHelper != null) {
             this.subjectUri = subjectUri;
             this.propertyUri = propertyUri;
             objectUri = data.get(objectKey);
@@ -55,14 +55,14 @@ public class ObjectPropertyStatementTemplateModel extends BaseTemplateModel {
             
             // Determine whether the statement can be edited
             RequestedAction action =  new EditObjPropStmt(objectPropertyStatement);
-            PolicyDecision decision = editingHelper.getPolicyDecision(action);
+            PolicyDecision decision = policyHelper.getPolicyDecision(action);
             if (decision != null && decision.getAuthorized() == Authorization.AUTHORIZED) {
                 editAccessList.add(EditAccess.EDIT);
             }
             
             // Determine whether the statement can be deleted
             action = new DropObjectPropStmt(subjectUri, propertyUri, objectUri);
-            decision = editingHelper.getPolicyDecision(action);
+            decision = policyHelper.getPolicyDecision(action);
             if (decision != null && decision.getAuthorized() == Authorization.AUTHORIZED) {      
                 editAccessList.add(EditAccess.DELETE);
             }

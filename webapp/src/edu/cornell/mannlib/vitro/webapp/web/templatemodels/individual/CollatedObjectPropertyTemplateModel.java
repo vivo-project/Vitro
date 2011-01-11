@@ -38,10 +38,10 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
     private SortedMap<String, List<ObjectPropertyStatementTemplateModel>> subclasses;
     
     CollatedObjectPropertyTemplateModel(ObjectProperty op, Individual subject, 
-            VitroRequest vreq, EditingHelper editingHelper) 
+            VitroRequest vreq, EditingPolicyHelper policyHelper) 
         throws InvalidConfigurationException {
         
-        super(op, subject, vreq, editingHelper); 
+        super(op, subject, vreq, policyHelper); 
         
         String invalidConfigMessage = checkConfiguration();
         if ( ! invalidConfigMessage.isEmpty() ) {
@@ -62,7 +62,7 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
         
         /* Collate the data */
         Map<String, List<ObjectPropertyStatementTemplateModel>> unsortedSubclasses = 
-            collate(subjectUri, propertyUri, statementData, vreq, editingHelper);
+            collate(subjectUri, propertyUri, statementData, vreq, policyHelper);
 
         /* Sort by subclass name */
         Comparator<String> comparer = new Comparator<String>() {
@@ -97,7 +97,7 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
     }
     
     private Map<String, List<ObjectPropertyStatementTemplateModel>> collate(String subjectUri, String propertyUri,
-            List<Map<String, String>> statementData, VitroRequest vreq, EditingHelper editingHelper) {
+            List<Map<String, String>> statementData, VitroRequest vreq, EditingPolicyHelper policyHelper) {
     
         Map<String, List<ObjectPropertyStatementTemplateModel>> subclassMap = 
             new HashMap<String, List<ObjectPropertyStatementTemplateModel>>();
@@ -117,7 +117,7 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
                 subclassMap.put(subclassName, currentList);
             }
             currentList.add(new ObjectPropertyStatementTemplateModel(subjectUri, 
-                    propertyUri, objectKey, map, editingHelper));
+                    propertyUri, objectKey, map, policyHelper));
         }   
         return subclassMap; 
     }

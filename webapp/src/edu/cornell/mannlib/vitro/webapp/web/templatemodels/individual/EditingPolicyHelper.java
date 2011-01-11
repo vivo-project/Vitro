@@ -17,16 +17,16 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 
-public class EditingHelper {
+public class EditingPolicyHelper {
     
-    private static final Log log = LogFactory.getLog(EditingHelper.class);  
+    private static final Log log = LogFactory.getLog(EditingPolicyHelper.class);  
     
     private VitroRequest vreq;
     private ServletContext servletContext;
     private PolicyIface policy;
     private IdentifierBundle ids;
     
-    protected EditingHelper(VitroRequest vreq, ServletContext servletContext) {
+    protected EditingPolicyHelper(VitroRequest vreq, ServletContext servletContext) {
         this.vreq = vreq;
         this.servletContext = servletContext;
         setPolicy();
