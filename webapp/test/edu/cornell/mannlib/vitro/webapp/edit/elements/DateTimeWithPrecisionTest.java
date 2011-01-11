@@ -225,10 +225,11 @@ public class DateTimeWithPrecisionTest {
         Assert.assertTrue(validationMsgs.size() == 0 );
         
         String precisionURI = null;
+        
         precisionURI = dtwp.getSubmittedPrecision( queryParameters );
         
-        Assert.assertNotNull(precisionURI);
-        Assert.assertEquals(VitroVocabulary.Precision.NONE.uri(), precisionURI);    
+        Assert.assertNotNull(precisionURI);        
+        Assert.assertEquals(dtwp.BLANK_SENTINEL, precisionURI);    
         
         Literal date = dtwp.getDateTime( queryParameters);        
         Assert.assertNull(date);                  

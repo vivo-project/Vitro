@@ -64,7 +64,9 @@ public class DateTimeWithPrecision extends BaseEditElement {
     VitroVocabulary.Precision DEFAULT_MIN_PRECISION = VitroVocabulary.Precision.DAY;
     VitroVocabulary.Precision DEFAULT_DISPLAY_LEVEL = VitroVocabulary.Precision.DAY;
     VitroVocabulary.Precision[] precisions = VitroVocabulary.Precision.values();
-        
+    
+    protected static final String BLANK_SENTINEL = ">SUBMITTED VALUE WAS BLANK<";
+    
     public DateTimeWithPrecision(Field field) {
         super(field);
         fieldName = field.getName();
@@ -247,7 +249,17 @@ public class DateTimeWithPrecision extends BaseEditElement {
         return literalMap;
     }
     
-    protected Literal getDateTime( Map<String, String[]> queryParameters ) {
+    protected Literal getDateTime(  Map<String, String[]> queryParameters ) {
+        String submittedPrec = BLANK_SENTINEL;
+        try {
+            submittedPrec = getSubmittedPrecision( queryParameters);
+        } catch (Exception e) {
+            log.error("could not get submitted precsion",e);
+        }
+        
+        if( BLANK_SENTINEL.equals( submittedPrec ) )
+            return null;
+        
         Integer year = parseToInt(fieldName+".year", queryParameters);
         
         //this is the case where date has not been filled out at all.        
@@ -305,7 +317,8 @@ public class DateTimeWithPrecision extends BaseEditElement {
             return Collections.emptyMap();        
         }
         Map<String,String> uriMap = new HashMap<String,String>();
-        uriMap.put(fieldName+".precision", precisionUri);        
+        if( precisionUri != null )
+            uriMap.put(fieldName+".precision", precisionUri);        
         return uriMap;
     }
     
@@ -335,7 +348,8 @@ public class DateTimeWithPrecision extends BaseEditElement {
         
         /* the field wasn't filled out at all */
         if( indexOfFirstNull == 0 )
-            return VitroVocabulary.Precision.NONE.uri();
+            //return VitroVocabulary.Precision.NONE.uri();
+            return BLANK_SENTINEL;
         
         /* if they all had values then we have seconds precision */
         if( indexOfFirstNull == -1 )
