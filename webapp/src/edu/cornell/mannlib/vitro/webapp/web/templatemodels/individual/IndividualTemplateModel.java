@@ -77,6 +77,12 @@ public class IndividualTemplateModel extends BaseTemplateModel {
         return uri.startsWith(defaultNamespace) ? uri + "/" + getLocalName() + ".rdf" : null;
     }
     
+    // RY Used for the rdf link on the individual page. Is it correct that this is not the same
+    // as getLinkedDataUrl()?
+    public String getRdfUrl() {
+        return getProfileUrl() + "/" + getLocalName() + ".rdf";
+    }
+    
     public String getEditUrl() {
         return urlBuilder.getPortalUrl(Route.INDIVIDUAL_EDIT, "uri", getUri());
     }
