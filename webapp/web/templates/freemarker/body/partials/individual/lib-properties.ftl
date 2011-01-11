@@ -33,9 +33,9 @@
 </#macro>
 
 <#macro propertyListItem statement showEditingLinks>
-    <li role="listitem">
-        <@editingLinks statement showEditingLinks />
+    <li role="listitem">    
         <#nested>
+        <@editingLinks statement showEditingLinks />
     </li>
 </#macro>
 
