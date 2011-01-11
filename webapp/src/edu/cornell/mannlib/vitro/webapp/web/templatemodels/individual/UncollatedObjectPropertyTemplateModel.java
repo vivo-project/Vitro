@@ -37,8 +37,9 @@ public class UncollatedObjectPropertyTemplateModel extends ObjectPropertyTemplat
         
         /* Put into data structure to send to template */
         statements = new ArrayList<ObjectPropertyStatementTemplateModel>(statementData.size());
+        String objectKey = getObjectKey();
         for (Map<String, String> map : statementData) {
-            statements.add(new ObjectPropertyStatementTemplateModel(subjectUri, propertyUri, map));
+            statements.add(new ObjectPropertyStatementTemplateModel(subjectUri, propertyUri, objectKey, map, vreq));
         }
         
         postprocessStatementList(statements);

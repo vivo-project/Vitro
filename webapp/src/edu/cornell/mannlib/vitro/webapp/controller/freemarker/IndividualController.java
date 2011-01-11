@@ -153,14 +153,14 @@ public class IndividualController extends FreemarkerHttpServlet {
     
     private Map<String, Object> getEditingData(VitroRequest vreq) {
   
-        LoginStatusBean loginBean = LoginStatusBean.getBean(vreq);
-        
+        LoginStatusBean loginBean = LoginStatusBean.getBean(vreq);       
     	Map<String, Object> editingData = new HashMap<String, Object>();
 
-		editingData.put("showEditLinks", VitroRequestPrep.isSelfEditing(vreq) || loginBean.isLoggedInAtLeast(LoginStatusBean.NON_EDITOR));	
-		
-		boolean showAdminPanel = loginBean.isLoggedInAtLeast(LoginStatusBean.EDITOR);
-		editingData.put("showAdminPanel", showAdminPanel);
+    	// RY This will be improved later. What is important is not whether the user is a self-editor,
+    	// but whether he has editing privileges on this profile.
+		editingData.put("showEditingLinks", VitroRequestPrep.isSelfEditing(vreq) || 
+		        loginBean.isLoggedInAtLeast(LoginStatusBean.NON_EDITOR));	
+		editingData.put("showAdminPanel", loginBean.isLoggedInAtLeast(LoginStatusBean.EDITOR));
 
 		return editingData;		
     }

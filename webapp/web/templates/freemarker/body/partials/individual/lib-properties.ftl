@@ -6,7 +6,7 @@
 
 <#macro dataPropertyList statements>
     <#list statements as statement>
-        <@propertyListItem>${statement.value}</@propertyListItem>
+        <@propertyListItem statement>${statement.value}</@propertyListItem>
     </#list> 
 </#macro>
 
@@ -28,10 +28,32 @@
 
 <#macro objectPropertyList statements template>
     <#list statements as statement>
-        <@propertyListItem><#include "${template}"></@propertyListItem>
+        <@propertyListItem statement><#include "${template}"></@propertyListItem>
     </#list>
 </#macro>
 
-<#macro propertyListItem>
-    <li role="listitem"><#nested></li>
+<#macro propertyListItem statement>
+    <li role="listitem">
+        <@editLink statement />
+        <@deleteLink statement />
+        <#nested>
+    </li>
+</#macro>
+
+<#macro editLink statement>
+    <#if editStatus.showEditingLinks>
+        <#local url = statement.editUrl>
+        <#if url?has_content>
+            <a href="${url}">edit</a>
+        </#if>
+    </#if>
+</#macro>
+
+<#macro deleteLink statement>
+    <#if editStatus.showEditingLinks>
+        <#local url = statement.deleteUrl>
+        <#if url?has_content>
+            <a href="${url}">delete</a>
+        </#if>
+    </#if>
 </#macro>

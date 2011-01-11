@@ -102,6 +102,7 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
             new HashMap<String, List<ObjectPropertyStatementTemplateModel>>();
         String currentSubclassUri = null;
         List<ObjectPropertyStatementTemplateModel> currentList = null;
+        String objectKey = getObjectKey();
         for (Map<String, String> map : statementData) {
             String subclassUri = map.get("subclass");
             // Rows with no subclass are put into a subclass map with an empty name.
@@ -114,7 +115,7 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
                 String subclassName = getSubclassName(subclassUri, vreq);
                 subclassMap.put(subclassName, currentList);
             }
-            currentList.add(new ObjectPropertyStatementTemplateModel(subjectUri, propertyUri, map));
+            currentList.add(new ObjectPropertyStatementTemplateModel(subjectUri, propertyUri, objectKey, map, vreq));
         }   
         return subclassMap; 
     }

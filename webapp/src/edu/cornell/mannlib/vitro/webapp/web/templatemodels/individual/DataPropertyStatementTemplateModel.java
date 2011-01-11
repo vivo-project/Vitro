@@ -24,12 +24,14 @@ public class DataPropertyStatementTemplateModel extends BaseTemplateModel {
         return statement.getData();
     }
     
-    public String getEditLink() {
-        return null;
+    public String getEditUrl() {
+        String editUrl = "";
+        return editUrl;
     }
     
-    public String getDeleteLink() {
-        return null;
+    public String getDeleteUrl() {
+        String deleteUrl = "";
+        return deleteUrl;
     }
 
 }

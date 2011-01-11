@@ -43,10 +43,6 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
         return uri;
     }
     
-    public abstract String getAddLink();
-    
-//    public abstract String getEditLink();
-//    
-//    public abstract String getDeleteLink();
+    public abstract String getAddUrl();
  
 }

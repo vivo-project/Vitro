@@ -22,31 +22,40 @@ public class EditLinkHelper {
     
     private VitroRequest vreq;
     private ServletContext context;
+    private PolicyIface policy;
+    private IdentifierBundle ids;
     
     protected EditLinkHelper(VitroRequest vreq) {
         this.vreq = vreq;
         this.context = BaseTemplateModel.getServletContext();
+        setPolicy();
+        setIds();
     }
     
-    protected PolicyIface getPolicy() {
-        PolicyIface policy = RequestPolicyList.getPolicies(vreq);
+    private void setPolicy() {
+        policy = RequestPolicyList.getPolicies(vreq);
         if( policy == null || ( policy instanceof PolicyList && ((PolicyList)policy).size() == 0 )){
             policy = ServletPolicyList.getPolicies( context );
             if( policy == null || ( policy instanceof PolicyList && ((PolicyList)policy).size() == 0 )){            
                 log.error("No policy found in request at " + RequestPolicyList.POLICY_LIST);
             }
         }           
-        return policy;
     }
     
-    protected IdentifierBundle getIds() {
-        IdentifierBundle ids = (IdentifierBundle)ServletIdentifierBundleFactory
+    private void setIds() {
+        ids = (IdentifierBundle)ServletIdentifierBundleFactory
             .getIdBundleForRequest(vreq, vreq.getSession(), context);
         
         if (ids == null) {
             log.error("No IdentifierBundle objects for request");
         }
-        
+    }
+    
+    protected PolicyIface getPolicy() {
+        return policy;
+    }
+    
+    protected IdentifierBundle getIds() {
         return ids;
     }
 
