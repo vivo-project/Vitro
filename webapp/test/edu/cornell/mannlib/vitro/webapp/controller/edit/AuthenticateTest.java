@@ -212,6 +212,7 @@ public class AuthenticateTest extends AbstractTestClass {
 	// ----------------------------------------------------------------------
 
 	/** The "return" parameter is set, so we detect the restart. */
+	@Ignore
 	@Test
 	public void restartFromALoginLink() {
 		setProcessBean(LOGGING_IN, "username", URL_LOGIN, URL_SOMEWHERE_ELSE);
@@ -219,6 +220,7 @@ public class AuthenticateTest extends AbstractTestClass {
 	}
 
 	/** The "return" parameter is set, so we detect the restart. */
+	@Ignore
 	@Test
 	public void restartFromABookmarkOfTheLoginLink() {
 		setProcessBean(LOGGING_IN, "username", URL_LOGIN, URL_SOMEWHERE_ELSE);
@@ -226,6 +228,7 @@ public class AuthenticateTest extends AbstractTestClass {
 	}
 
 	/** The "afterLoginUrl" parameter is set, so we detect the restart. */
+	@Ignore
 	@Test
 	public void restartFromARestrictedPage() {
 		setProcessBean(LOGGING_IN, "username", URL_LOGIN, URL_SOMEWHERE_ELSE);
@@ -233,6 +236,7 @@ public class AuthenticateTest extends AbstractTestClass {
 	}
 
 	/** The referrer is not the loginProcessPage, so we detect the restart. */
+	@Ignore
 	@Test
 	public void restartFromADifferentWidgetPage() {
 		setProcessBean(LOGGING_IN, "username", URL_LOGIN, URL_SOMEWHERE_ELSE);
@@ -240,6 +244,7 @@ public class AuthenticateTest extends AbstractTestClass {
 	}
 
 	/** The referrer is not the loginProcessPage, so we detect the restart. */
+	@Ignore
 	@Test
 	public void restartFromTheLoginPageWhenWeWereUsingAWidgetPage() {
 		setProcessBean(LOGGING_IN, "username", URL_SOMEWHERE_ELSE,
