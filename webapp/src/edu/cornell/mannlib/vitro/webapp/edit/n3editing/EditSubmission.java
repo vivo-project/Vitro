@@ -148,6 +148,8 @@ public class EditSubmission {
         	}
         }
         
+        processEditElementFields(editConfig,queryParameters);
+        
         this.basicValidation = new BasicValidation(editConfig,this);
         Map<String,String> errors = basicValidation.validateUris( urisFromForm );
         if( errors != null ) {
@@ -157,7 +159,7 @@ public class EditSubmission {
         errors = basicValidation.validateLiterals( literalsFromForm );
         if( errors != null ) {
             validationErrors.putAll( errors);
-        }
+        }                
         
         if(editConfig.getValidators() != null ){
         	for( N3Validator validator : editConfig.getValidators()){
@@ -167,9 +169,7 @@ public class EditSubmission {
         				validationErrors.putAll(errors);
         		}
         	}
-        }
-        
-        processEditElementFields(editConfig,queryParameters);
+        }               
         
         if( log.isDebugEnabled() )
             log.debug( this.toString() );
