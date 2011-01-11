@@ -13,9 +13,11 @@ public class DataPropertyStatementTemplateModel extends BaseTemplateModel {
     private static final Log log = LogFactory.getLog(DataPropertyStatementTemplateModel.class);  
     
     private DataPropertyStatement statement;
+    private EditingHelper editLinkHelper;
 
-    DataPropertyStatementTemplateModel(DataPropertyStatement statement) {
+    DataPropertyStatementTemplateModel(DataPropertyStatement statement, EditingHelper editLinkHelper) {
         this.statement = statement;
+        this.editLinkHelper = editLinkHelper;
     }
     
     /* Access methods for templates */

@@ -13,7 +13,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAct
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjPropStmt;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
-import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
@@ -24,37 +23,30 @@ public class ObjectPropertyStatementTemplateModel extends BaseTemplateModel {
     
     private static final String EDIT_PATH = "edit/editRequestDispatch.jsp";
     
-    // RY WE may want to instead store the ObjectPropertyStatement
     private String subjectUri; // we'll use these to make the edit links
     private String propertyUri;
-    private String objectUri;
     private Map<String, String> data;
-    private VitroRequest vreq;
-    private ObjectPropertyStatement objectPropertyStatement;
-    private EditLinkHelper editLinkHelper;
+    
+    private EditingHelper editLinkHelper;
+    private String objectUri = null;
+    private ObjectPropertyStatement objectPropertyStatement = null;
+
 
     ObjectPropertyStatementTemplateModel(String subjectUri, String propertyUri, 
-            String objectKey, Map<String, String> data, VitroRequest vreq) {
+            String objectKey, Map<String, String> data, EditingHelper editLinkHelper) {
         this.subjectUri = subjectUri;
         this.propertyUri = propertyUri;
-        this.objectUri = data.get(objectKey);
         this.data = data;
-        this.vreq = vreq;
-        // Don't set these until needed (when edit links are requested)
-        this.objectPropertyStatement = null;
-        this.editLinkHelper = null;
-    }
-    
-    private void doEditingLinkPrep() {
-        // Assign the objectPropertyStatement and editLinkHelper to instance variables, so we don't
-        // have to do it twice, once for edit link and once for delete link.
-        if (objectPropertyStatement == null) {
+        this.editLinkHelper = editLinkHelper;
+        
+        // If the editLinkHelper is non-null, we are in edit mode, so create the necessary objects.
+        if (this.editLinkHelper != null) {
+            objectUri = data.get(objectKey);
             objectPropertyStatement = new ObjectPropertyStatementImpl(subjectUri, propertyUri, objectUri);
         }
-        if (editLinkHelper == null) {
-            editLinkHelper = new EditLinkHelper(vreq);
-        }
+
     }
+
     
     /* Access methods for templates */
 
@@ -64,7 +56,6 @@ public class ObjectPropertyStatementTemplateModel extends BaseTemplateModel {
     
     public String getEditUrl() {
         String editUrl = "";
-        doEditingLinkPrep();
         RequestedAction action = new EditObjPropStmt(objectPropertyStatement);
         PolicyDecision decision = editLinkHelper.getPolicy().isAuthorized(editLinkHelper.getIds(), action);
         if (decision != null && decision.getAuthorized() == Authorization.AUTHORIZED) {
@@ -80,7 +71,6 @@ public class ObjectPropertyStatementTemplateModel extends BaseTemplateModel {
     
     public String getDeleteUrl() {
         String deleteUrl = "";
-        doEditingLinkPrep();
         return deleteUrl;
     }
 }

@@ -37,10 +37,11 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
     
     private SortedMap<String, List<ObjectPropertyStatementTemplateModel>> subclasses;
     
-    CollatedObjectPropertyTemplateModel(ObjectProperty op, Individual subject, VitroRequest vreq) 
+    CollatedObjectPropertyTemplateModel(ObjectProperty op, Individual subject, 
+            VitroRequest vreq, EditingHelper editLinkHelper) 
         throws InvalidConfigurationException {
         
-        super(op, subject, vreq); 
+        super(op, subject, vreq, editLinkHelper); 
         
         String invalidConfigMessage = checkConfiguration();
         if ( ! invalidConfigMessage.isEmpty() ) {
@@ -56,12 +57,12 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
         List<Map<String, String>> statementData = 
             opDao.getObjectPropertyStatementsForIndividualByProperty(subjectUri, propertyUri, getQueryString());
 
-        /* Apply postprocessing */
+        /* Apply post-processing */
         postprocess(statementData, wdf);
         
         /* Collate the data */
         Map<String, List<ObjectPropertyStatementTemplateModel>> unsortedSubclasses = 
-            collate(subjectUri, propertyUri, statementData, vreq);
+            collate(subjectUri, propertyUri, statementData, vreq, editLinkHelper);
 
         /* Sort by subclass name */
         Comparator<String> comparer = new Comparator<String>() {
@@ -95,8 +96,8 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
         return "";
     }
     
-    private Map<String, List<ObjectPropertyStatementTemplateModel>> collate(String subjectUri, 
-            String propertyUri, List<Map<String, String>> statementData, VitroRequest vreq) {
+    private Map<String, List<ObjectPropertyStatementTemplateModel>> collate(String subjectUri, String propertyUri,
+            List<Map<String, String>> statementData, VitroRequest vreq, EditingHelper editLinkHelper) {
     
         Map<String, List<ObjectPropertyStatementTemplateModel>> subclassMap = 
             new HashMap<String, List<ObjectPropertyStatementTemplateModel>>();
@@ -115,7 +116,8 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
                 String subclassName = getSubclassName(subclassUri, vreq);
                 subclassMap.put(subclassName, currentList);
             }
-            currentList.add(new ObjectPropertyStatementTemplateModel(subjectUri, propertyUri, objectKey, map, vreq));
+            currentList.add(new ObjectPropertyStatementTemplateModel(subjectUri, 
+                    propertyUri, objectKey, map, editLinkHelper));
         }   
         return subclassMap; 
     }

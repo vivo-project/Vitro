@@ -54,6 +54,11 @@ public class GroupedPropertyList extends BaseTemplateModel {
 
         // Determine whether we're editing or not.
         boolean userCanEditThisProfile = getEditingStatus();
+        
+        EditingHelper editLinkHelper = null;
+        if (userCanEditThisProfile) {
+            editLinkHelper = new EditingHelper(vreq, getServletContext());
+        } 
     
         // Create the property list for the subject. The properties will be put into groups later.
         List<Property> propertyList = new ArrayList<Property>();
@@ -101,7 +106,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
         // Build the template data model from the groupList
         groups = new ArrayList<PropertyGroupTemplateModel>(propertyGroupList.size());
         for (PropertyGroup pg : propertyGroupList) {
-            groups.add(new PropertyGroupTemplateModel(vreq, pg, subject));
+            groups.add(new PropertyGroupTemplateModel(vreq, pg, subject, editLinkHelper));
         }   
     
     }

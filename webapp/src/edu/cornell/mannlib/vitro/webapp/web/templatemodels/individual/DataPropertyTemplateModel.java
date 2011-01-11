@@ -20,10 +20,13 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
     private static final Log log = LogFactory.getLog(DataPropertyTemplateModel.class);  
     
     private static final String TYPE = "data";
+    
     private List<DataPropertyStatementTemplateModel> statements;
+    private EditingHelper editLinkHelper;
 
-    DataPropertyTemplateModel(DataProperty dp, Individual subject, VitroRequest vreq) {
-        super(dp);
+    DataPropertyTemplateModel(DataProperty dp, Individual subject, VitroRequest vreq, EditingHelper editLinkHelper) {
+        super(dp, editLinkHelper);
+
         setName(dp.getPublicName());
         
         // Get the data property statements via a sparql query
@@ -31,7 +34,7 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
         List<DataPropertyStatement> dpStatements = dpDao.getDataPropertyStatementsForIndividualByProperty(subject, dp);
         statements = new ArrayList<DataPropertyStatementTemplateModel>(dpStatements.size());
         for (DataPropertyStatement dps : dpStatements) {
-            statements.add(new DataPropertyStatementTemplateModel(dps));
+            statements.add(new DataPropertyStatementTemplateModel(dps, editLinkHelper));
         }
     }
     

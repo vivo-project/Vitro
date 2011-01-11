@@ -14,20 +14,19 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.RequestPolicyList;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 
-public class EditLinkHelper {
+public class EditingHelper {
     
-    private static final Log log = LogFactory.getLog(EditLinkHelper.class);  
+    private static final Log log = LogFactory.getLog(EditingHelper.class);  
     
     private VitroRequest vreq;
-    private ServletContext context;
+    private ServletContext servletContext;
     private PolicyIface policy;
     private IdentifierBundle ids;
     
-    protected EditLinkHelper(VitroRequest vreq) {
+    protected EditingHelper(VitroRequest vreq, ServletContext servletContext) {
         this.vreq = vreq;
-        this.context = BaseTemplateModel.getServletContext();
+        this.servletContext = servletContext;
         setPolicy();
         setIds();
     }
@@ -35,7 +34,7 @@ public class EditLinkHelper {
     private void setPolicy() {
         policy = RequestPolicyList.getPolicies(vreq);
         if( policy == null || ( policy instanceof PolicyList && ((PolicyList)policy).size() == 0 )){
-            policy = ServletPolicyList.getPolicies( context );
+            policy = ServletPolicyList.getPolicies( servletContext );
             if( policy == null || ( policy instanceof PolicyList && ((PolicyList)policy).size() == 0 )){            
                 log.error("No policy found in request at " + RequestPolicyList.POLICY_LIST);
             }
@@ -44,7 +43,7 @@ public class EditLinkHelper {
     
     private void setIds() {
         ids = (IdentifierBundle)ServletIdentifierBundleFactory
-            .getIdBundleForRequest(vreq, vreq.getSession(), context);
+            .getIdBundleForRequest(vreq, vreq.getSession(), servletContext);
         
         if (ids == null) {
             log.error("No IdentifierBundle objects for request");

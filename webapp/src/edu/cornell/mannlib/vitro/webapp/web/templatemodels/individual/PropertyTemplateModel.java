@@ -18,13 +18,15 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     private String name;
     private String uri;
     protected Property property; // needed to get the edit links
+    protected EditingHelper editLinkHelper;
     
-    PropertyTemplateModel(Property property) {
+    PropertyTemplateModel(Property property, EditingHelper editLinkHelper) {
         // Do in subclass constructor. The label has not been set on the property, and getting the 
         // label differs between object and data properties.
         // this.name = property.getLabel();
         this.uri = property.getURI();
         this.property = property;
+        this.editLinkHelper = editLinkHelper;
     }
     
     protected void setName(String name) {

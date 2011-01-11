@@ -22,15 +22,16 @@ public class UncollatedObjectPropertyTemplateModel extends ObjectPropertyTemplat
     
     private List<ObjectPropertyStatementTemplateModel> statements;
     
-    UncollatedObjectPropertyTemplateModel(ObjectProperty op, Individual subject, VitroRequest vreq) {
-        super(op, subject, vreq);
+    UncollatedObjectPropertyTemplateModel(ObjectProperty op, Individual subject, VitroRequest vreq, EditingHelper editLinkHelper) {
+        super(op, subject, vreq, editLinkHelper);
         
         /* Get the data */
         WebappDaoFactory wdf = vreq.getWebappDaoFactory();
         ObjectPropertyStatementDao opDao = wdf.getObjectPropertyStatementDao();
         String subjectUri = subject.getURI();
         String propertyUri = op.getURI();
-        List<Map<String, String>> statementData = opDao.getObjectPropertyStatementsForIndividualByProperty(subjectUri, propertyUri, getQueryString());
+        List<Map<String, String>> statementData = 
+            opDao.getObjectPropertyStatementsForIndividualByProperty(subjectUri, propertyUri, getQueryString());
         
         /* Apply postprocessing */
         postprocess(statementData, wdf);
@@ -39,7 +40,8 @@ public class UncollatedObjectPropertyTemplateModel extends ObjectPropertyTemplat
         statements = new ArrayList<ObjectPropertyStatementTemplateModel>(statementData.size());
         String objectKey = getObjectKey();
         for (Map<String, String> map : statementData) {
-            statements.add(new ObjectPropertyStatementTemplateModel(subjectUri, propertyUri, objectKey, map, vreq));
+            statements.add(new ObjectPropertyStatementTemplateModel(subjectUri, 
+                    propertyUri, objectKey, map, editLinkHelper));
         }
         
         postprocessStatementList(statements);

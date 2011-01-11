@@ -48,7 +48,8 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
          * ORDER BY ?subclass ?dateTimeEnd
          * ORDER BY DESC(?subclass) DESC(?dateTimeEnd)
          */
-        Pattern.compile("ORDER\\s+BY\\s+((DESC\\()?\\?subclass\\)?\\s+)?DESC\\s*\\(\\s*\\?" + END_DATE_TIME_VARIABLE + "\\)", Pattern.CASE_INSENSITIVE);
+        Pattern.compile("ORDER\\s+BY\\s+((DESC\\()?\\?subclass\\)?\\s+)?DESC\\s*\\(\\s*\\?" + 
+                END_DATE_TIME_VARIABLE + "\\)", Pattern.CASE_INSENSITIVE);
 
     private static String KEY_SUBJECT = "subject";
     private static final String KEY_PROPERTY = "property";
@@ -60,8 +61,8 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     private PropertyListConfig config;
     private String objectKey;
 
-    ObjectPropertyTemplateModel(ObjectProperty op, Individual subject, VitroRequest vreq) {
-        super(op);
+    ObjectPropertyTemplateModel(ObjectProperty op, Individual subject, VitroRequest vreq, EditingHelper editLinkHelper) {
+        super(op, editLinkHelper);
         setName(op.getDomainPublic());
         
         // Get the config for this object property
@@ -105,16 +106,17 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         return object;
     }
      
-    protected static ObjectPropertyTemplateModel getObjectPropertyTemplateModel(ObjectProperty op, Individual subject, VitroRequest vreq) {
+    protected static ObjectPropertyTemplateModel getObjectPropertyTemplateModel(ObjectProperty op, 
+            Individual subject, VitroRequest vreq, EditingHelper editLinkHelper) {
         if (op.getCollateBySubclass()) {
             try {
-                return new CollatedObjectPropertyTemplateModel(op, subject, vreq);
+                return new CollatedObjectPropertyTemplateModel(op, subject, vreq, editLinkHelper);
             } catch (InvalidConfigurationException e) {
                 log.error(e);
-                return new UncollatedObjectPropertyTemplateModel(op, subject, vreq);
+                return new UncollatedObjectPropertyTemplateModel(op, subject, vreq, editLinkHelper);
             }
         } else {
-            return new UncollatedObjectPropertyTemplateModel(op, subject, vreq);
+            return new UncollatedObjectPropertyTemplateModel(op, subject, vreq, editLinkHelper);
         }
     }
     
