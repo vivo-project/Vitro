@@ -24,7 +24,7 @@
         <#list group.properties as property>
             <article class="property" role="article">
                 <#-- Property display name -->
-                <h3>${property.name}</h3> <@p.addLink property showEditingLinks />
+                <h3>${property.name} <@p.addLink property showEditingLinks /></h3> 
 
                 <#-- List the statements for each property -->   
                 <ul class="property-list" role="list"> 

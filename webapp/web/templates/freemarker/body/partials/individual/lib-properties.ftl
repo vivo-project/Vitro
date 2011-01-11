@@ -36,7 +36,7 @@
     <#if showEditingLinks>
         <#local url = property.addUrl>
         <#if url?has_content>
-            <a href="${url}">add</a>
+            <a href="${url}"><img class="add-individual" src="${urls.images}/individual/addIcon.gif" alt="add relationship" /></a>
         </#if>
     </#if>
 </#macro>
@@ -44,6 +44,7 @@
 <#macro propertyListItem statement showEditingLinks>
     <li role="listitem">    
         <#nested>
+        
         <@editingLinks statement showEditingLinks />
     </li>
 </#macro>
@@ -58,13 +59,13 @@
 <#macro editLink statement>
     <#local url = statement.editUrl>
     <#if url?has_content>
-        <a href="${url}">edit</a>
+        <a href="${url}"><img class="edit-individual" src="${urls.images}/individual/editIcon.gif" alt="change this relationship" /></a>
     </#if>
 </#macro>
 
 <#macro deleteLink statement> 
     <#local url = statement.deleteUrl>
     <#if url?has_content>
-        <a href="${url}">delete</a>
+        <a href="${url}"><img  class="delete-individual" src="${urls.images}/individual/deleteIcon.gif" alt="delete this relationship" /></a>
     </#if>
 </#macro>

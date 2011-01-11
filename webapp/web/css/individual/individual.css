@@ -369,3 +369,18 @@ article.property ul.subclass-property-list li{
     font-size: 0.8em;
     background: #f4f4f4;
 }
+/* EDITING DISPLAY------>  */
+.add-individual{
+    vertical-align: middle;
+    margin-left: 2px;
+}
+.edit-individual{
+    border-left: 1px dotted #B2D15A;
+    margin-left: 10px;
+    padding-left: 8px;
+    padding-right: 1px;
+    vertical-align: text-top;
+}
+.delete-individual{
+    vertical-align: text-top;
+}
