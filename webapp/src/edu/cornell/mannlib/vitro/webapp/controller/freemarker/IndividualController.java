@@ -121,8 +121,6 @@ public class IndividualController extends FreemarkerHttpServlet {
             
     		body.put("relatedSubject", getRelatedSubject(vreq));
     		
-    		body.put("headContent", getRdfLinkTag(individual));
-    		
     		IndividualTemplateModel itm = getIndividualTemplateModel(vreq, individual);
     		/* We need to expose non-getters in displaying the individual's property list, 
     		 * since it requires calls to methods with parameters.
@@ -130,7 +128,9 @@ public class IndividualController extends FreemarkerHttpServlet {
     		 * into the data model: no real data can be modified. 
     		 */
 	        body.put("individual", getNonDefaultBeansWrapper(BeansWrapper.EXPOSE_SAFE).wrap(itm));
-	       
+
+	        body.put("headContent", getRdfLinkTag(itm));
+	        
 	        body.put("localName", new IndividualLocalNameMethod());
 	        
 	        String template = getIndividualTemplate(individual);
@@ -194,11 +194,13 @@ public class IndividualController extends FreemarkerHttpServlet {
         return map;
     }
     
-    //<link rel="alternate" type="application/rdf+xml" href="http://vivo.cornell.edu/individual/n337/n337.rdf" /> 
-    private String getRdfLinkTag(Individual individual) {
-        String href = individual.getURI() + "/" + individual.getLocalName() + ".rdf";
-        String linkTag = "<link rel=\"alternate\" type=\"application/rdf+xml\" href=\"" +
-        		         href + "\" /> ";
+    private String getRdfLinkTag(IndividualTemplateModel itm) {
+        String linkTag = null;
+        String linkedDataUrl = itm.getLinkedDataUrl();
+        if (linkedDataUrl != null) {
+            linkTag = "<link rel=\"alternate\" type=\"application/rdf+xml\" href=\"" +
+                          linkedDataUrl + "\" /> ";
+        }
         return linkTag;
     }
     
