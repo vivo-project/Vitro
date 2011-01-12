@@ -38,9 +38,9 @@ public class DataPropertyStatementTemplateModel extends BaseTemplateModel {
     private String dataPropHash = null;
 
     DataPropertyStatementTemplateModel(String subjectUri, String propertyUri, 
-            Literal value2, EditingPolicyHelper policyHelper) {
+            Literal value, EditingPolicyHelper policyHelper) {
         
-        this.value = value2;
+        this.value = value;
         
         if (policyHelper != null) {
             this.subjectUri = subjectUri;

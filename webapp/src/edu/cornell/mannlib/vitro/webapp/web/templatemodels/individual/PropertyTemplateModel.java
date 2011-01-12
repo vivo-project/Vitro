@@ -17,29 +17,31 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     private static final Log log = LogFactory.getLog(PropertyTemplateModel.class); 
     
     private String name;
+    protected String propertyUri;
     
     // For editing
     protected String subjectUri = null;
-    protected String propertyUri = null;
-    protected Property property; // RY DO WE NEED THIS, or just the uri??
     protected boolean addAccess = false;
     
     PropertyTemplateModel(Property property, Individual subject, EditingPolicyHelper policyHelper) {
-        // Do in subclass constructor. The label has not been set on the property, and getting the 
-        // label differs between object and data properties.
+        // Do in subclass constructor. The label has not been set on the property, and the
+        // means of getting the label differs between object and data properties.
         // this.name = property.getLabel();
-        this.propertyUri = property.getURI();
-        this.property = property;
+        propertyUri = property.getURI();
         
         if (policyHelper != null) {
-            subjectUri = subject.getURI();
-            propertyUri = property.getURI();
+            subjectUri = subject.getURI();            
         }
     }
     
     protected void setName(String name) {
         this.name = name;
     }
+    
+    protected String getUri() {
+        return propertyUri;
+    }
+        
     
     /* Access methods for templates */
     
@@ -49,10 +51,7 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
         return name;
     }
 
-    public String getUri() {
-        return propertyUri;
-    }
-    
+
     public abstract String getAddUrl();
  
 }
