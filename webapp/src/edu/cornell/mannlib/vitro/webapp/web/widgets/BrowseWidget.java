@@ -18,6 +18,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassGroupTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModel;
@@ -61,7 +62,7 @@ public class BrowseWidget extends Widget {
 
     protected WidgetTemplateValues doAllClassGroupsDisplay(Environment env, Map params,
             HttpServletRequest request, ServletContext context) {
-        Map<String,Object> body = getAllClassGroupData(request, params);
+        Map<String,Object> body = getAllClassGroupData(request, params, context);
         try {
             body.put("urls",env.getDataModel().get("urls"));
             body.put("currentPage", env.getDataModel().get("currentPage"));                        
@@ -73,29 +74,36 @@ public class BrowseWidget extends Widget {
         return new WidgetTemplateValues(macroName, body);
     }
    
-    protected Map<String,Object> getAllClassGroupData(HttpServletRequest request, Map params){
+    /**
+     * Gets a list of all VClassGroups with vclasses with individual counts.
+     */
+    protected Map<String,Object> getAllClassGroupData(HttpServletRequest request, Map params, ServletContext context){
         Map<String,Object> map = new HashMap<String,Object>();
-        
+                
         VitroRequest vreq = new VitroRequest(request);
-        List<VClassGroup> classGroups =
-            vreq.getWebappDaoFactory().getVClassGroupDao().getPublicGroupsWithVClasses();
         
-        LinkedList<VClassGroupTemplateModel> cgList = new LinkedList<VClassGroupTemplateModel>();
-        for( VClassGroup classGroup : classGroups){
-            cgList.add( new VClassGroupTemplateModel( classGroup ));
+        VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(context);
+        List<VClassGroup> cgList = vcgc.getGroups(vreq.getPortalId());
+        
+//        List<VClassGroup> classGroups =
+//            vreq.getWebappDaoFactory().getVClassGroupDao().getPublicGroupsWithVClasses();
+//        
+        LinkedList<VClassGroupTemplateModel> cgtmList = new LinkedList<VClassGroupTemplateModel>();
+        for( VClassGroup classGroup : cgList){
+            cgtmList.add( new VClassGroupTemplateModel( classGroup ));
         }
-        map.put("vclassGroupList",cgList);
+        map.put("vclassGroupList",cgtmList);
         return map;
     }
     
     protected WidgetTemplateValues doClassDisplay(Environment env, Map params,
             HttpServletRequest request, ServletContext context) {        
         
-        Map<String,Object> body = getClassData(request,params);
+        Map<String,Object> body = getClassData(request,params,context);
         
         try {
             body.put("urls",env.getDataModel().get("urls"));
-            body.put("urlMapping",env.getDataModel().get("urlMapping"));
+            body.put("currentPage", env.getDataModel().get("currentPage"));            
         } catch (TemplateModelException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -104,10 +112,10 @@ public class BrowseWidget extends Widget {
         return new WidgetTemplateValues(macroName, body);
     }
 
-    private Map<String, Object> getClassData(HttpServletRequest request, Map params) {
+    private Map<String, Object> getClassData(HttpServletRequest request, Map params, ServletContext context) {
         Map<String,Object> map = new HashMap<String,Object>();
         
-        map.putAll(getClassGroupData(request, params));
+        map.putAll(getClassGroupData(request, params,context));
         
         String classUri = getParam(Mode.VCLASS, request, params);
         VitroRequest vreq = new VitroRequest(request);
@@ -129,11 +137,11 @@ public class BrowseWidget extends Widget {
     protected WidgetTemplateValues doClassGroupDisplay(Environment env,
             Map params, HttpServletRequest request, ServletContext context) {
 
-        Map<String,Object> body = getClassGroupData(request,params);
+        Map<String,Object> body = getClassGroupData(request,params, context);
         
         try {
             body.put("urls",env.getDataModel().get("urls"));
-            body.put("urlMapping",env.getDataModel().get("urlMapping"));
+            body.put("currentPage", env.getDataModel().get("currentPage"));            
         } catch (TemplateModelException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -142,14 +150,17 @@ public class BrowseWidget extends Widget {
         return new WidgetTemplateValues(macroName, body);
     } 
         
-    protected Map<String, Object> getClassGroupData(HttpServletRequest request, Map params) {
+    protected Map<String, Object> getClassGroupData(HttpServletRequest request, Map params, ServletContext context) {
         Map<String,Object> map = new HashMap<String,Object>();
         
-        String vcgName = getParam(Mode.CLASS_GROUP, request, params);
+        String vcgUri = getParam(Mode.CLASS_GROUP, request, params);
         VitroRequest vreq = new VitroRequest(request);        
-        VClassGroup vcg = vreq.getWebappDaoFactory().getVClassGroupDao().getGroupByName(vcgName);
+        //VClassGroup vcg = vreq.getWebappDaoFactory().getVClassGroupDao().getGroupByURI(vcgUri);
         
-        vreq.getWebappDaoFactory().getVClassDao().addVClassesToGroup(vcg, false, true);
+        VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(context);
+        VClassGroup vcg = vcgc.getGroup(vreq.getPortalId(), vcgUri);        
+        
+        //vreq.getWebappDaoFactory().getVClassDao().addVClassesToGroup(vcg, false, true);
         ArrayList<VClassTemplateModel> classes = new ArrayList<VClassTemplateModel>(vcg.size());
         for( VClass vc : vcg){
             classes.add(new VClassTemplateModel(vc));
@@ -157,7 +168,7 @@ public class BrowseWidget extends Widget {
         map.put("classes", classes);
         
         map.put("classGroup", new VClassGroupTemplateModel(vcg));
-        map.put("classGroupName", vcgName);
+        map.put("classGroupName", vcg.getPublicName());
         map.put("classGroupUri", vcg.getURI());
         
         return map;
@@ -166,7 +177,7 @@ public class BrowseWidget extends Widget {
     enum Mode{
         VCLASS_ALPHA("vclassAlpha","vclassAlpha"),
         VCLASS("vclass","vclassUri"),
-        CLASS_GROUP("classGroup","classGroup"),
+        CLASS_GROUP("classGroup","classgroupUri"),
         ALL_CLASS_GROUPS("allClassGroups","all");                
         
         String macroName;

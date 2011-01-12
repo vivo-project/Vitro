@@ -158,9 +158,13 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
             }
             */
             if (groups.size()>0) {
+                if( getIndividualCount )
+                    addIndividualCountToGroups(groups);
                 return groups;
             } else {
                 classDao.addVClassesToGroups(groups);
+                if( getIndividualCount )
+                    addIndividualCountToGroups(groups);
                 return groups;
             }
         } finally {
@@ -169,6 +173,16 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
 
     }
 
+    private void addIndividualCountToGroups( List<VClassGroup> cgList ){
+        for( VClassGroup cg : cgList){
+            int count = 0;
+            for( VClass vc : cg){
+                count = count + vc.getEntityCount();
+            }
+            cg.setIndividualCount(count);
+        }
+    }
+    
     public VClassGroup groupFromGroupIndividual(Individual groupInd) {
         if (groupInd==null) {
             return null;

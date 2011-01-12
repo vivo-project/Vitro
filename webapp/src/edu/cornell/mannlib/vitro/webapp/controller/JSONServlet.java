@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -77,11 +78,57 @@ public class JSONServlet extends VitroHttpServlet {
         
     }
 
-    private void getLuceneIndividualsByVClass(HttpServletRequest req, HttpServletResponse resp) {
-        
-        VitroRequest vreq = new VitroRequest(req);
+    private void getLuceneIndividualsByVClass( HttpServletRequest req, HttpServletResponse resp ){
         String errorMessage = null;
-        String message = null;
+        JSONObject rObj = null;
+        try{            
+            VitroRequest vreq = new VitroRequest(req);
+            VClass vclass=null;
+            
+            
+            String vitroClassIdStr = vreq.getParameter("vclassId");            
+            if ( vitroClassIdStr != null && !vitroClassIdStr.isEmpty()){                             
+                vclass = vreq.getWebappDaoFactory().getVClassDao().getVClassByURI(vitroClassIdStr);
+                if (vclass == null) {
+                    log.debug("Couldn't retrieve vclass ");   
+                    throw new Exception (errorMessage = "Class " + vitroClassIdStr + " not found");
+                }                           
+            }else{
+                log.debug("parameter vclassId URI parameter expected ");
+                throw new Exception("parameter vclassId URI parameter expected ");
+            }
+            rObj = getLuceneIndividualsByVClass(vclass.getURI(),req,resp,getServletContext());
+        }catch(Exception ex){
+            errorMessage = ex.toString();
+            log.error(ex,ex);
+        }
+
+        if( rObj == null )
+            rObj = new JSONObject();
+        
+        try{
+            resp.setCharacterEncoding("UTF-8");
+            resp.setContentType("application/json;charset=UTF-8");
+            
+            if( errorMessage != null ){
+                rObj.put("errorMessage", errorMessage);
+                resp.setStatus(500 /*HttpURLConnection.HTTP_SERVER_ERROR*/);
+            }else{
+                rObj.put("errorMessage", "");
+            }            
+            Writer writer = resp.getWriter();
+            writer.write(rObj.toString());
+        }catch(JSONException jse){
+            log.error(jse,jse);
+        } catch (IOException e) {
+            log.error(e,e);
+        }
+        
+    }
+    
+    protected static JSONObject getLuceneIndividualsByVClass(String vclassURI, HttpServletRequest req, HttpServletResponse resp, ServletContext context) throws Exception {
+        
+        VitroRequest vreq = new VitroRequest(req);        
         VClass vclass=null;
         JSONObject rObj = new JSONObject();
         
@@ -109,111 +156,90 @@ public class JSONServlet extends VitroHttpServlet {
         
         //need an unfiltered dao to get firstnames and lastnames
         WebappDaoFactory fullWdf = vreq.getFullWebappDaoFactory();
-        
-        
-        try {                                   
-            String vitroClassIdStr = vreq.getParameter("vclassId");
-            if ( vitroClassIdStr != null && !vitroClassIdStr.isEmpty()){                             
-                vclass = vreq.getWebappDaoFactory().getVClassDao().getVClassByURI(vitroClassIdStr);
-                if (vclass == null) {
-                    log.debug("Couldn't retrieve vclass ");   
-                    throw new Exception (errorMessage = "Class " + vitroClassIdStr + " not found");
-                }                           
-            }else{
-                log.debug("parameter vclassId URI parameter expected ");
-                throw new Exception("parameter vclassId URI parameter expected ");
-            }
-            
-            rObj.put("vclass", 
-                    new JSONObject().put("URI",vclass.getURI())
-                                    .put("name",vclass.getName()));
-            
-            if (vclass != null) {
-                String alpha = EntityListController.getAlphaParamter(vreq);
-                int page = EntityListController.getPageParameter(vreq);
-                Map<String,Object> map = EntityListController.getResultsForVClass(
-                        vclass.getURI(), 
-                        page, 
-                        alpha, 
-                        vreq.getPortal(), 
-                        vreq.getWebappDaoFactory().getPortalDao().isSinglePortal(), 
-                        vreq.getWebappDaoFactory().getIndividualDao(), 
-                        getServletContext());                                                
                 
-                rObj.put("totalCount", map.get("totalCount"));
-                rObj.put("alpha", map.get("alpha"));
-                                
-                List<Individual> inds = (List<Individual>)map.get("entities");
-                List<IndividualTemplateModel> indsTm = new ArrayList<IndividualTemplateModel>();
-                JSONArray jInds = new JSONArray();
-                for(Individual ind : inds ){
-                    JSONObject jo = new JSONObject();
-                    jo.put("URI", ind.getURI());
-                    jo.put("label",ind.getRdfsLabel());
-                    jo.put("name",ind.getName());
-                    jo.put("thumbUrl", ind.getThumbUrl());
-                    jo.put("imageUrl", ind.getImageUrl());
-                    jo.put("profileUrl", UrlBuilder.getIndividualProfileUrl(ind, vreq.getWebappDaoFactory()));
-                    
-                    String moniker = getDataPropertyValue(ind, monikerDp, fullWdf);
-                    jo.put("moniker", moniker);
-                    jo.put("vclassName", getVClassName(ind,moniker,fullWdf));
-                                        
-                    jo.put("perferredTitle", getDataPropertyValue(ind, perferredTitleDp, fullWdf));
-                    jo.put("firstName", getDataPropertyValue(ind, fNameDp, fullWdf));                     
-                    jo.put("lastName", getDataPropertyValue(ind, lNameDp, fullWdf));
-                    
-                    jInds.put(jo);
-                }
-                rObj.put("individuals", jInds);
-                
-                JSONArray wpages = new JSONArray();
-                List<PageRecord> pages = (List<PageRecord>)map.get("pages");                
-                for( PageRecord pr: pages ){                    
-                    JSONObject p = new JSONObject();
-                    p.put("text", pr.text);
-                    p.put("param", pr.param);
-                    p.put("index", pr.index);
-                    wpages.put( p );
-                }
-                rObj.put("pages",wpages);    
-                
-                JSONArray jletters = new JSONArray();
-                List<String> letters = Controllers.getLetters();
-                for( String s : letters){
-                    JSONObject jo = new JSONObject();
-                    jo.put("text", s);
-                    jo.put("param", "alpha=" + URLEncoder.encode(s, "UTF-8"));
-                    jletters.put( jo );
-                }
-                rObj.put("letters", jletters);
-            }            
-                                    
-        }catch(Exception ex){
-            errorMessage = ex.getMessage();
-        }      
-        try{
-            resp.setCharacterEncoding("UTF-8");
-            resp.setContentType("application/json;charset=UTF-8");
-            
-            if( errorMessage != null ){
-                rObj.put("errorMessage", errorMessage);
-                resp.setStatus(500 /*HttpURLConnection.HTTP_SERVER_ERROR*/);
-            }else{
-                rObj.put("errorMessage", "");
-            }            
-            Writer writer = resp.getWriter();
-            writer.write(rObj.toString());
-        }catch(JSONException jse){
-            log.error(jse,jse);
-        } catch (IOException e) {
-            log.error(e,e);
+                                   
+        String vitroClassIdStr = vreq.getParameter("vclassId");
+        if ( vitroClassIdStr != null && !vitroClassIdStr.isEmpty()){                             
+            vclass = vreq.getWebappDaoFactory().getVClassDao().getVClassByURI(vitroClassIdStr);
+            if (vclass == null) {
+                log.debug("Couldn't retrieve vclass ");   
+                throw new Exception ("Class " + vitroClassIdStr + " not found");
+            }                           
+        }else{
+            log.debug("parameter vclassId URI parameter expected ");
+            throw new Exception("parameter vclassId URI parameter expected ");
         }
-        return;
+        
+        rObj.put("vclass", 
+                new JSONObject().put("URI",vclass.getURI())
+                                .put("name",vclass.getName()));
+        
+        if (vclass != null) {
+            String alpha = EntityListController.getAlphaParamter(vreq);
+            int page = EntityListController.getPageParameter(vreq);
+            Map<String,Object> map = EntityListController.getResultsForVClass(
+                    vclass.getURI(), 
+                    page, 
+                    alpha, 
+                    vreq.getPortal(), 
+                    vreq.getWebappDaoFactory().getPortalDao().isSinglePortal(), 
+                    vreq.getWebappDaoFactory().getIndividualDao(), 
+                    context);                                                
+            
+            rObj.put("totalCount", map.get("totalCount"));
+            rObj.put("alpha", map.get("alpha"));
+                            
+            List<Individual> inds = (List<Individual>)map.get("entities");
+            List<IndividualTemplateModel> indsTm = new ArrayList<IndividualTemplateModel>();
+            JSONArray jInds = new JSONArray();
+            for(Individual ind : inds ){
+                JSONObject jo = new JSONObject();
+                jo.put("URI", ind.getURI());
+                jo.put("label",ind.getRdfsLabel());
+                jo.put("name",ind.getName());
+                jo.put("thumbUrl", ind.getThumbUrl());
+                jo.put("imageUrl", ind.getImageUrl());
+                jo.put("profileUrl", UrlBuilder.getIndividualProfileUrl(ind, vreq.getWebappDaoFactory()));
+                
+                String moniker = getDataPropertyValue(ind, monikerDp, fullWdf);
+                jo.put("moniker", moniker);
+                jo.put("vclassName", getVClassName(ind,moniker,fullWdf));
+                                    
+                jo.put("perferredTitle", getDataPropertyValue(ind, perferredTitleDp, fullWdf));
+                jo.put("firstName", getDataPropertyValue(ind, fNameDp, fullWdf));                     
+                jo.put("lastName", getDataPropertyValue(ind, lNameDp, fullWdf));
+                
+                jInds.put(jo);
+            }
+            rObj.put("individuals", jInds);
+            
+            JSONArray wpages = new JSONArray();
+            List<PageRecord> pages = (List<PageRecord>)map.get("pages");                
+            for( PageRecord pr: pages ){                    
+                JSONObject p = new JSONObject();
+                p.put("text", pr.text);
+                p.put("param", pr.param);
+                p.put("index", pr.index);
+                wpages.put( p );
+            }
+            rObj.put("pages",wpages);    
+            
+            JSONArray jletters = new JSONArray();
+            List<String> letters = Controllers.getLetters();
+            for( String s : letters){
+                JSONObject jo = new JSONObject();
+                jo.put("text", s);
+                jo.put("param", "alpha=" + URLEncoder.encode(s, "UTF-8"));
+                jletters.put( jo );
+            }
+            rObj.put("letters", jletters);
+        }            
+                                       
+        return rObj;        
     }
 
     
-    private String getVClassName(Individual ind, String moniker,
+    private static String getVClassName(Individual ind, String moniker,
             WebappDaoFactory fullWdf) {
         /* so the moniker frequently has a vclass name in it.  Try to return
          * the vclass name that is the same as the moniker so that the templates
@@ -239,7 +265,7 @@ public class JSONServlet extends VitroHttpServlet {
              return "";        
     }
 
-    String getDataPropertyValue(Individual ind, DataProperty dp, WebappDaoFactory wdf){
+    static String getDataPropertyValue(Individual ind, DataProperty dp, WebappDaoFactory wdf){
         List<Literal> values = wdf.getDataPropertyStatementDao()
             .getDataPropertyValuesForIndividualByProperty(ind, dp);
         if( values == null || values.isEmpty() )

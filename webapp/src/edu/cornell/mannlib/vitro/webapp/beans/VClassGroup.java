@@ -23,6 +23,19 @@ public class VClassGroup extends LinkedList <VClass> implements Comparable<VClas
     private String localName    = null;
     private String publicName   = null;
     private int    displayRank  = -1;
+    private int individualCount = -1;
+    
+    public boolean isIndividualCountSet(){
+        return individualCount >= 0;
+    }
+    
+    public int getIndividualCount() {
+        return individualCount;
+    }
+
+    public void setIndividualCount(int individualCount) {
+        this.individualCount = individualCount;
+    }
 
     public int getDisplayRank() {
         return displayRank;

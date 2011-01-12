@@ -79,6 +79,20 @@ public class VClassGroupCache implements ServletContextListener{
         return getGroups(getVCGDao(),portalId );
     }
     
+    /**
+     * May return null.
+     */
+    public VClassGroup getGroup( int portalId, String vClassGroupURI ){
+        if( vClassGroupURI == null || vClassGroupURI.isEmpty() )
+            return null;
+        List<VClassGroup> cgList = getGroups(portalId);
+        for( VClassGroup cg : cgList ){
+            if( vClassGroupURI.equals( cg.getURI()))
+                return cg;
+        }
+        return null;
+    }
+    
     public void clearGroupCache(){
         _groupListMap = new ConcurrentHashMap<Integer, List<VClassGroup>>();
     }   
@@ -90,13 +104,13 @@ public class VClassGroupCache implements ServletContextListener{
             log.debug("needed to build vclassGroups for portal " + portalId);
             // Get all classgroups, each populated with a list of their member vclasses            
             List<VClassGroup> groups = 
-                vcgDao.getPublicGroupsWithVClasses(ORDER_BY_DISPLAYRANK, !INCLUDE_UNINSTANTIATED, includeIndividualCount); 
+                vcgDao.getPublicGroupsWithVClasses(ORDER_BY_DISPLAYRANK, INCLUDE_UNINSTANTIATED, includeIndividualCount); 
 
             // remove classes that have been configured to be hidden from search results
             vcgDao.removeClassesHiddenFromSearch(groups);
             
             // now cull out the groups with no populated classes            
-            vcgDao.removeUnpopulatedGroups(groups);
+            //vcgDao.removeUnpopulatedGroups(groups);
             
             return groups;
         } else {

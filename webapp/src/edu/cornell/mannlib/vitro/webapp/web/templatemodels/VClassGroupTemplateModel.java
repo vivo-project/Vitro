@@ -54,4 +54,16 @@ public class VClassGroupTemplateModel extends BaseTemplateModel {
         
         return classes;
     }
+    
+    public String getIndividualCount(){
+        if( vClassGroup.isIndividualCountSet() )
+            return Integer.toString(vClassGroup.getIndividualCount());
+        else
+            return "";
+    }
+    
+    public boolean isIndividualCountSet(){
+        return vClassGroup.isIndividualCountSet();
+    }    
+    
 }

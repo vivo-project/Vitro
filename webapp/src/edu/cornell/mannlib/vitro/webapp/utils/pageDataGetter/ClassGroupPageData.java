@@ -16,6 +16,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassGroupTemplateModel;
 
 /**
  * This will pass these variables to the template:
@@ -67,12 +68,51 @@ public class ClassGroupPageData implements PageDataGetter{
         return data;
     }        
     
+    public static VClassGroupTemplateModel getClassGroup(String classGroupUri, ServletContext context, VitroRequest vreq){
+        
+        VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(context);
+        List<VClassGroup> vcgList = vcgc.getGroups(vreq.getPortalId());
+        VClassGroup group = null;
+        for( VClassGroup vcg : vcgList){
+            if( vcg.getURI() != null && vcg.getURI().equals(classGroupUri)){
+                group = vcg;
+                break;
+            }
+        }
+        
+        if( classGroupUri != null && !classGroupUri.isEmpty() && group == null ){ 
+            /*This could be for two reasons: one is that the classgroup doesn't exist
+             * The other is that there are no individuals in any of the classgroup's classes */
+            group = vreq.getWebappDaoFactory().getVClassGroupDao().getGroupByURI(classGroupUri);
+            if( group != null ){
+                List<VClassGroup> vcgFullList = vreq.getWebappDaoFactory().getVClassGroupDao()
+                    .getPublicGroupsWithVClasses(false, true, false);
+                for( VClassGroup vcg : vcgFullList ){
+                    if( classGroupUri.equals(vcg.getURI()) ){
+                        group = vcg;
+                        break;
+                    }                                
+                }
+                if( group == null ){
+                    log.error("Cannot get classgroup '" + classGroupUri + "'");
+                    return null;
+                }else{
+                    setAllClassCountsToZero(group);
+                }
+            }else{
+                log.error("classgroup " + classGroupUri + " does not exist in the system");
+                return null;
+            }            
+        }
+        
+        return new VClassGroupTemplateModel(group);
+    }
     
     public String getType(){
         return DisplayVocabulary.CLASSGROUP_PAGE_TYPE;
     } 
     
-    protected void setAllClassCountsToZero(VClassGroup vcg){
+    protected static void setAllClassCountsToZero(VClassGroup vcg){
         for(VClass vc : vcg){
             vc.setEntityCount(0);
         }

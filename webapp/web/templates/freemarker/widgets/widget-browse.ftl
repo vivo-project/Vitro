@@ -16,41 +16,41 @@
         
         <ul id="browse-classgroups" role="list">
         <#list vclassGroupList as group>
-            <li role="listitem"><a href="${urls.base}/${currentPage}?classgroupUri=${group.publicName?url}">${group.publicName} <span class="count-classes">(n)</span></a></li>
+            <li role="listitem"><a href="${urls.base}/${currentPage}?classgroupUri=${group.uri?url}">${group.publicName} <span class="count-classes">(n)</span></a></li>
         </#list>
         </ul>
     </section>
 </#macro>
 
 <#macro classGroup>
-<section>
-     <#--<h2>Macro classGroup from widget-browse.ftl</h2>  
+    <section id="browse" role="region">
+    <h4>Browse</h4>
+          
      <div>
-       There are ${classes?size} classes in classGroup ${classGroup.publicName}.  
-       Only classes with instances are included.
-     </div>-->
+       There are ${classes?size} classes in classGroup ${classGroup.publicName}.
+       There are ${classGroup.individualCount} individuals in the class group.  
+       Classes with and without instances are included.
+     </div>-
  
     <nav role="navigation">
         <ul id="foaf-person-childClasses">
             <#list classes as class>
-            <li><a href="${urls.base}/${currentPage}?classgroupUri=${classGroup.publicName?url}&vclassUri=${class.uri?url}">${class.name}<span class="count-classes"> ${class.individualCount}</span></a></li>
+            <li><a href="${urls.base}/${currentPage}?classgroupUri=${classGroup.uri?url}&vclassUri=${class.uri?url}">${class.name}<span class="count-classes"> ${class.individualCount}</span></a></li>
             </#list>
         </ul>
     </nav>
  
-    <#--<ul>
-    <#list classes as class>
-        <li><a href="${urls.base}/${currentPage}?classgroupUri=${classGroup.publicName?url}&vclassUri=${class.uri?url}">${class.name}</a> ${class.individualCount}</li> 
-    </#list>
-    </ul>-->
 </section>
 
 </#macro>
 
 <#macro vclass>
-    <section>
-        <h2>vclass ${class.name} from ${classGroup.publicName}</h2>
-        This has classGroup, classes, individualsInClass and class. 
+    <section id="browse" role="region">
+    <h4>Browse</h4>    
+        <div>
+            vclass ${class.name} from ${classGroup.publicName}
+            This has classGroup, classes, individualsInClass and class.
+        </div> 
          
         <ul>
             <#list individualsInClass as ind>
@@ -60,7 +60,8 @@
 </#macro>
 
 <#macro vclassAlpha>
-    <section role="region">
-        <h2>vclassAlpha</h2> 
+    <section id="browse" role="region">
+    <h4>Browse</h4>     
+        <div>vclassAlpha is not yet implemented.</div> 
     </section>
 </#macro>
