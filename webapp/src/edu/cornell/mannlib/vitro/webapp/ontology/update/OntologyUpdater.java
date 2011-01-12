@@ -243,9 +243,13 @@ public class OntologyUpdater {
 	}
 	
 	private void updateTBoxAnnotations() throws IOException {
-		(new TBoxUpdater(settings.getOldTBoxAnnotationsModel(),
-				         settings.getNewTBoxAnnotationsModel(),
-		                 settings.getOntModelSelector().getABoxModel(), logger, record)).updateVitroPropertyDefaultValues();
+		
+		TBoxUpdater tboxUpdater = new TBoxUpdater(settings.getOldTBoxAnnotationsModel(),
+		                                          settings.getNewTBoxAnnotationsModel(),
+                                                  settings.getOntModelSelector().getABoxModel(), logger, record);
+                                                  
+        tboxUpdater.updateVitroPropertyDefaultValues();
+        tboxUpdater.updateVitroAnnotationsModel();
 	}
 	
 	/**

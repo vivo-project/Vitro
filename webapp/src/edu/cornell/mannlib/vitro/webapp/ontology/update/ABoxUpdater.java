@@ -634,17 +634,14 @@ public class ABoxUpdater {
 	}
 
 	public void logChange(Statement statement, boolean add) throws IOException {
-		logger.log( (add ? "Added " : "Removed") + "Statement: subject = " + statement.getSubject().getURI() +
-				" property = " + statement.getPredicate().getURI() +
-                " object = " + (statement.getObject().isLiteral() ?  ((Literal)statement.getObject()).getLexicalForm()
-                		                                          : ((Resource)statement.getObject()).getURI()));	
+		logger.log( (add ? "Added" : "Removed") + stmtString(statement));
 	}
 
     public static String stmtString(Statement statement) {
-    	return  " subject = " + statement.getSubject().getURI() +
-    			" property = " + statement.getPredicate().getURI() +
-                " object = " + (statement.getObject().isLiteral() ? ((Literal)statement.getObject()).getLexicalForm() + " (Literal)"
-                		                                          : ((Resource)statement.getObject()).getURI() + " (Resource)");	
+    	return  " [subject = " + statement.getSubject().getURI() +
+    			"] [property = " + statement.getPredicate().getURI() +
+                "] [object = " + (statement.getObject().isLiteral() ? ((Literal)statement.getObject()).getLexicalForm() + " (Literal)"
+                		                                          : ((Resource)statement.getObject()).getURI() + " (Resource)") + "]";	
     }    
 	
 }

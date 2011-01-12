@@ -5,7 +5,9 @@ package edu.cornell.mannlib.vitro.webapp.ontology.update;
 import java.io.IOException;
 import java.util.List;
 
+import com.hp.hpl.jena.ontology.DatatypeProperty;
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -16,6 +18,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
+import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
@@ -32,6 +35,11 @@ public class TBoxUpdater {
 	private OntologyChangeLogger logger;  
 	private OntologyChangeRecord record;
 	private boolean detailLogs = false;
+	
+    private static final String classGroupURI = "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#ClassGroup";
+	private Resource classGroupClass = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createResource(classGroupURI);
+    private static final String inClassGroupURI = "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#inClassGroup";
+	private Property inClassGroupProp = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createProperty(inClassGroupURI);
 
 	/**
 	 * 
@@ -297,4 +305,75 @@ public class TBoxUpdater {
 		siteModel.leaveCriticalSection();
 	}
 }
+	
+/**
+ * 
+ * Update a knowledge base to align with changes to the vitro annotation model  
+ * in a new version of the ontology. The two versions of the ontology and the
+ * knowledge base to be updated are provided in the class constructor and are
+ * referenced via class level variables. 
+ *                    
+ * Currently, this method only handles deletions of a ClassGroup
+ *                    
+ *  Writes to the change log file, the error log file, and the incremental change
+ *  knowledge base.                  
+ *  
+ */	
+public void updateVitroAnnotationsModel() throws IOException {
+		
+	   // for each ClassGroup in the old vitro annotations model: if it is not in 
+	   // the new vitro annotations model and the site has no classes asserted to 
+	   // be in that class group then delete it.
+	   // TODO: the site will have classes asserted to be in it if we have switched
+	   // the default assignment in the new version but haven't migration yet. How
+	   // to handle this?
+	   
+	   siteModel.enterCriticalSection(Lock.WRITE);
+	   
+	   try {	
+		    Model retractions = ModelFactory.createDefaultModel();
+		    
+			StmtIterator iter = oldTboxAnnotationsModel.listStatements((Resource) null, RDF.type, classGroupClass);
+	  	
+			int count = 0;
+			while (iter.hasNext()) {  
+			  Statement stmt = iter.next();
+			  
+			  if (!newTboxAnnotationsModel.contains(stmt) && !usesGroup(siteModel, stmt.getSubject())) {
+				  count++;
+				  retractions.add(siteModel.listStatements(stmt.getSubject(),(Property) null,(RDFNode)null));
+			  }
+			}
+	    	
+			if (retractions.size() > 0) {
+			   siteModel.remove(retractions);
+			   record.recordRetractions(retractions);
+			
+			   // log summary of changes
+			   if (retractions.size() > 0) {
+		          logger.log("Removed " + count + " Class Group" + (count > 1 ? "s" : "") + " from the annotations model."); 		   
+			   }
+			}  
+		} finally {
+			siteModel.leaveCriticalSection();
+		}
+
+	   // If we were going to handle add, this is the logic:
+	   // for each ClassGroup in new old vitro annotations model: if it is not in 
+	   // the old vitro annotations and it is not in the site model, then 
+	   // add it.
+	   
+}
+
+public boolean usesGroup(Model model, Resource theClassGroup) throws IOException {
+	
+   model.enterCriticalSection(Lock.READ);
+     
+   try {
+	    return (model.contains((Resource) null, inClassGroupProp, theClassGroup) ? true : false);
+   } finally {
+	    model.leaveCriticalSection();
+   }
+}
+
 }

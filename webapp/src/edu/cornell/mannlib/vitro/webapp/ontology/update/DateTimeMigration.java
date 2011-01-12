@@ -175,7 +175,7 @@ public class DateTimeMigration {
 		               newStmt = ResourceFactory.createStatement(stmt.getSubject(), stmt.getPredicate(), getDateTimeLiteral(date) );
 		    	   } catch (ParseException pe) {
 		    		   logger.log("Parse Exception for year literal: " + stmt.getObject().asLiteral().getLexicalForm() + 
-		    				   ". The following statement has been removed from the knowledge base " + stmtString(stmt));
+		    				   ". The following statement has been removed from the knowledge base " + ABoxUpdater.stmtString(stmt));
 		    	   }		    	   		    	   
 		       } else  if (ymPrecisionURI.equals(precision)) {
 		    	   try {
@@ -183,7 +183,7 @@ public class DateTimeMigration {
 		               newStmt = ResourceFactory.createStatement(stmt.getSubject(), stmt.getPredicate(), getDateTimeLiteral(date) );
 		    	   } catch (ParseException pe) {
 		    		   logger.log("Parse Exception for yearMonth literal: " + stmt.getObject().asLiteral().getLexicalForm() + 
-		    				   ". The following statement has been removed from the knowledge base " + stmtString(stmt));
+		    				   ". The following statement has been removed from the knowledge base " + ABoxUpdater.stmtString(stmt));
 		    	   }
 		       } else  if (ymdPrecisionURI.equals(precision)) {
 		    	   try {
@@ -191,14 +191,14 @@ public class DateTimeMigration {
 		               newStmt = ResourceFactory.createStatement(stmt.getSubject(), stmt.getPredicate(), getDateTimeLiteral(date) );
 		    	   } catch (ParseException pe) {
 		    		   logger.log("Parse Exception for yearMonthDay literal: " + stmt.getObject().asLiteral().getLexicalForm() + 
-		    				   ". The following statement has been removed from the knowledge base " + stmtString(stmt));
+		    				   ". The following statement has been removed from the knowledge base " + ABoxUpdater.stmtString(stmt));
 		    	   }	   
 		       } else  if (ymdtPrecisionURI.equals(precision)) {
 		    	   logger.log("WARNING: unhandled precision found for individual " + stmt.getSubject().getURI() + ": " + precision +
-		    			      ". The following statement has been removed from the knowledge base " + stmtString(stmt));
+		    			      ". The following statement has been removed from the knowledge base " + ABoxUpdater.stmtString(stmt));
 		       } else {
 		    	   logger.log("WARNING: unrecognized precision found for individual " + stmt.getSubject().getURI() + ": " + precision +
-		    			      ". The following statement has been removed from the knowledge base " + stmtString(stmt));
+		    			      ". The following statement has been removed from the knowledge base " + ABoxUpdater.stmtString(stmt));
 		       }
 
 			   retractions.add(stmt);
@@ -256,11 +256,4 @@ public class DateTimeMigration {
 	    String dateString = dt.toString().substring(0, dt.toString().length()-1);
 	    return ResourceFactory.createTypedLiteral(dateString, XSDDatatype.XSDdateTime);
     }
-    
-    public static String stmtString(Statement statement) {
-        return  " subject = " + statement.getSubject().getURI() +
-        		" property = " + statement.getPredicate().getURI() +
-                " object = " + (statement.getObject().isLiteral() ? ((Literal)statement.getObject()).getLexicalForm() + " (Literal)"
-                    		                                      : ((Resource)statement.getObject()).getURI() + " (Resource)");	
-    }    
 }
