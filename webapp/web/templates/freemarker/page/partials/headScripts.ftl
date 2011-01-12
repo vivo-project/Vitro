@@ -7,3 +7,7 @@
 <script type="text/javascript" src="${urls.base}/js/jquery.js"></script>
 
 ${headScripts.tags}
+
+<!--[if lt IE 7]>
+<script type="text/javascript" src="${urls.base}/js/jquery_plugins/supersleight.js"></script>
+<![endif]-->
