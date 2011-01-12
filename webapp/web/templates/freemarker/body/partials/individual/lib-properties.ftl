@@ -34,7 +34,7 @@
 
 <#-- Some properties usually display without a label. But if there's an add link, 
 we need to also show the property label. -->
-<#macro showLabelAndAddLink property showEditingLinks>
+<#macro addLinkWithLabel property showEditingLinks>
     <#local addLink><@addLink property showEditingLinks /></#local>
     <#if addLink?has_content>
         <h3>${property.name?capitalize} ${addLink}</h3> 
@@ -52,8 +52,7 @@ we need to also show the property label. -->
 
 <#macro propertyListItem statement showEditingLinks>
     <li role="listitem">    
-        <#nested>
-        
+        <#nested>        
         <@editingLinks statement showEditingLinks />
     </li>
 </#macro>
