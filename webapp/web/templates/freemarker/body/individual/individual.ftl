@@ -79,7 +79,7 @@
          Also remove the method IndividualTemplateModel.isOrganization(). -->
          <#if individual.organization >
             <section id="temporal-graph" role="region">
-                <h3><img src="${urls.images}/visualization/temporal_vis_icon.jpg" width="25px" height="25px" /><a href="${urls.base}/visualization?vis=entity_comparison&vis_mode=${individual.moniker}&render_mode=standalone&uri=${individual.uri}">Temporal Graph</a></h3>
+                <h3><img src="${urls.images}/visualization/temporal_vis_icon.jpg" width="25px" height="25px" /><a href="${urls.base}/visualization?vis=entity_comparison&uri=${individual.uri}">Temporal Graph</a></h3>
             </section>      
             <#--<div>VISMODE: ${individual.moniker}</div>-->
         </#if>
