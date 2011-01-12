@@ -9,14 +9,14 @@
    ${scripts.add("/js/browse.js")}
    -->        
 </#macro>
-        
-<#macro allClassGroups>
-    <section>
-        <h2>Macro allClassGroups from widget-browse.ftl</h2>
 
-        <ul>
+<#macro allClassGroups>
+    <section id="browse" role="region">
+        <h4>Browse</h4>
+        
+        <ul id="browse-classgroups" role="list">
         <#list vclassGroupList as group>
-            <li><a href="${urls.base}/${currentPage}?classgroupUri=${group.publicName?url}">${group.publicName}</a></li>
+            <li role="listitem"><a href="${urls.base}/${currentPage}?classgroupUri=${group.publicName?url}">${group.publicName} <span class="count-classes">(n)</span></a></li>
         </#list>
         </ul>
     </section>
