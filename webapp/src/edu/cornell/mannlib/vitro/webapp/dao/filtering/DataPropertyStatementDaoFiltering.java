@@ -99,4 +99,10 @@ class DataPropertyStatementDaoFiltering extends BaseFiltering implements DataPro
         return innerDataPropertyStatementDao.getDataPropertyValuesForIndividualByProperty(subject, property);
     }
 
+    @Override
+    // RY What about filtering?
+    public List<Literal> getDataPropertyValuesForIndividualByProperty(String subjectUri, String propertyUri) {
+        return innerDataPropertyStatementDao.getDataPropertyValuesForIndividualByProperty(subjectUri, propertyUri);
+    }
+    
 }

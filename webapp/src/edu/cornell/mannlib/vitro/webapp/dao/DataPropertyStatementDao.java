@@ -41,6 +41,8 @@ public interface DataPropertyStatementDao {
     int insertNewDataPropertyStatement(DataPropertyStatement dataPropertyStatement );
 
     List<Literal> getDataPropertyValuesForIndividualByProperty(Individual subject, DataProperty property);
+    
+    List<Literal> getDataPropertyValuesForIndividualByProperty(String subjectUri, String propertyUri);
 
 }
 

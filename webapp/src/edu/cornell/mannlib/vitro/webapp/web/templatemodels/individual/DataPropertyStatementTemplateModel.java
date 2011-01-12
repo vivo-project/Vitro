@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -15,10 +14,12 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropDataPr
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditDataPropStmt;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
+import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.RdfLiteralHash;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 
 public class DataPropertyStatementTemplateModel extends PropertyStatementTemplateModel {
     
@@ -35,6 +36,22 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
         super(subjectUri, propertyUri, policyHelper);
         
         this.value = value;
+        setEditAccess(value, policyHelper);
+
+    }
+    
+    DataPropertyStatementTemplateModel(String subjectUri, String propertyUri, VitroRequest vreq, EditingPolicyHelper policyHelper) {
+        super(subjectUri, propertyUri, policyHelper);
+        
+        DataPropertyStatementDao dpsDao = vreq.getWebappDaoFactory().getDataPropertyStatementDao();
+        List<Literal> values = dpsDao.getDataPropertyValuesForIndividualByProperty(subjectUri, propertyUri);
+        
+        value = values.get(0);
+        setEditAccess(value, policyHelper);
+        
+    }
+    
+    private void setEditAccess(Literal value, EditingPolicyHelper policyHelper) {
         
         if (policyHelper != null) { // we're editing         
             DataPropertyStatement dps = new DataPropertyStatementImpl(subjectUri, propertyUri, value.getLexicalForm());
@@ -50,12 +67,15 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
             }      
             
             // Determine whether the statement can be deleted
-            action = new DropDataPropStmt(dps);
-            if (policyHelper.isAuthorizedAction(action)) {
-                markDeletable();
-            } 
-        }
+            if ( ! propertyUri.equals(VitroVocabulary.LABEL)) {
+                action = new DropDataPropStmt(dps);
+                if (policyHelper.isAuthorizedAction(action)) {
+                    markDeletable();
+                } 
+            }
+        }        
     }
+    
     
     /* Access methods for templates */
     
@@ -72,6 +92,10 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
                     "datapropKey", dataPropHash);
             if (! isDeletable()) {
                 params.put("deleteProhibited", "prohibited");
+            }
+            //
+            if (propertyUri.equals(VitroVocabulary.LABEL)) {
+                params.put("vitroNsProp", "true");
             }
             editUrl = UrlBuilder.getUrl(EDIT_PATH, params);    
         }

@@ -58,7 +58,7 @@
     String command      = vreq.getParameter("cmd");
     
     String vitroNsProp = (String) vreq.getParameter("vitroNsProp");
-    boolean isVitroNsProp = (vitroNsProp != null && vitroNsProp.equals("true")) ? true : false;
+    boolean isVitroNsProp = "true".equals(vitroNsProp) ? true : false;
 
     if( subjectUri == null || subjectUri.trim().length() == 0 ) {
         log.error("required subjectUri parameter missing");

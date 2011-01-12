@@ -101,8 +101,9 @@
 <#-- Convert the string dateTimeString to a datetime object -->
 <#function toDateTime dateTimeString>
     <#-- First convert the datetime string to a string format that Freemarker 
-         understands, then to a datetime object --> 
-    <#return dateTimeString?replace("T", " ")?replace("Z", "")?datetime("yyyy-MM-dd HH:mm:ss")>
+         understands, then to a datetime object. For now, strip away a time zone rather
+         than displaying it. --> 
+    <#return dateTimeString?replace("T", " ")?replace("Z.*$", "", "r")?datetime("yyyy-MM-dd HH:mm:ss")>
 </#function>
 
 <#-- Apply a precision and format type to format a datetime -->

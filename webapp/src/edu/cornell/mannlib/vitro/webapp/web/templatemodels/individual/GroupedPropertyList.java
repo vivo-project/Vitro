@@ -45,22 +45,13 @@ public class GroupedPropertyList extends BaseTemplateModel {
     private Individual subject;
     private VitroRequest vreq;
     private WebappDaoFactory wdf;
-    private LoginStatusBean loginStatusBean;
+
     private List<PropertyGroupTemplateModel> groups;
     
-    GroupedPropertyList(Individual subject, VitroRequest vreq, LoginStatusBean loginStatusBean) {
+    GroupedPropertyList(Individual subject, VitroRequest vreq, EditingPolicyHelper policyHelper) {
         this.subject = subject;
         this.vreq = vreq;
         this.wdf = vreq.getWebappDaoFactory();
-        this.loginStatusBean = loginStatusBean;
-
-        // Determine whether we're editing or not.
-        boolean userCanEditThisProfile = getEditingStatus();
-        
-        EditingPolicyHelper policyHelper = null;
-        if (userCanEditThisProfile) {
-            policyHelper = new EditingPolicyHelper(vreq, getServletContext());
-        } 
     
         // Create the property list for the subject. The properties will be put into groups later.
         List<Property> propertyList = new ArrayList<Property>();
@@ -80,7 +71,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
         // If editing this page, merge in object properties applicable to the individual that are currently
         // unpopulated, so the properties are displayed to allow statements to be added to these properties.
         // RY In future, we should limit this to properties that the user CAN add properties to.
-        if (userCanEditThisProfile) {
+        if (policyHelper != null) {
             mergeAllPossibleObjectProperties(objectPropertyList, propertyList);
         }
         
@@ -96,7 +87,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
             propertyList.add(dp);
         }
     
-        if (userCanEditThisProfile) {
+        if (policyHelper != null) {
             mergeAllPossibleDataProperties(propertyList);           
         }
     
@@ -113,17 +104,6 @@ public class GroupedPropertyList extends BaseTemplateModel {
     
     }
 
-    /** 
-     * Return true iff the user is editing. 
-     * These tests may change once self-editing issues are straightened out. What we really need to know
-     * is whether the user can edit this profile, not whether in general he/she is an editor.
-     */
-    private boolean getEditingStatus() { 
-        boolean isSelfEditing = VitroRequestPrep.isSelfEditing(vreq);
-        boolean isCurator = loginStatusBean.isLoggedInAtLeast(LoginStatusBean.CURATOR);
-        return isSelfEditing || isCurator;
-    }
-    
     @SuppressWarnings("unchecked")
     protected void sort(List<Property> propertyList) {            
         try {
@@ -160,7 +140,6 @@ public class GroupedPropertyList extends BaseTemplateModel {
     
     private void mergeAllPossibleObjectProperties(List<ObjectProperty> objectPropertyList, List<Property> propertyList) {
         PropertyInstanceDao piDao = wdf.getPropertyInstanceDao();
-        // RY *** Does this exclude properties in the excluded namespaces already? If not, need same test as above
         Collection<PropertyInstance> allPropInstColl = piDao.getAllPossiblePropInstForIndividual(subject.getURI());
         if (allPropInstColl != null) {
             for (PropertyInstance pi : allPropInstColl) {
@@ -189,7 +168,6 @@ public class GroupedPropertyList extends BaseTemplateModel {
     
     protected void mergeAllPossibleDataProperties(List<Property> propertyList) {
         DataPropertyDao dpDao = wdf.getDataPropertyDao();
-        // RY *** Does this exclude properties in the excluded namespaces already? If not, need same test as above
         Collection <DataProperty> allDatapropColl = dpDao.getAllPossibleDatapropsForIndividual(subject.getURI());
         if (allDatapropColl != null) {
             for (DataProperty dp : allDatapropColl ) {

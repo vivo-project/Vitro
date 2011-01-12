@@ -285,17 +285,20 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
         return l;
     }
 
-    @Override
     /*
-     * SPARQL-based method for getting the individual's values for a single data property.
+     * SPARQL-based methods for getting the individual's values for a single data property.
      */
+    
+    @Override
     public List<Literal> getDataPropertyValuesForIndividualByProperty(Individual subject, DataProperty property) {
+        return getDataPropertyValuesForIndividualByProperty(subject.getURI(), property.getURI());
+    }
+    
+    @Override
+    public List<Literal> getDataPropertyValuesForIndividualByProperty(String subjectUri, String propertyUri) {    
         log.debug("dataPropertyValueQueryString:\n" + dataPropertyValueQueryString);         
-        log.debug("dataPropertyValueQuery:\n" + dataPropertyValueQuery);  
+        log.debug("dataPropertyValueQuery:\n" + dataPropertyValueQuery); 
         
-        String subjectUri = subject.getURI();
-        String propertyUri = property.getURI();
-
         QuerySolutionMap bindings = new QuerySolutionMap();
         bindings.add("subject", ResourceFactory.createResource(subjectUri));
         bindings.add("property", ResourceFactory.createResource(propertyUri));
@@ -319,6 +322,6 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
             dataset.getLock().leaveCriticalSection();
             w.close();
         }
-        return values;  
+        return values;         
     }
 }
