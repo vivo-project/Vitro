@@ -349,10 +349,7 @@ public void updateVitroAnnotationsModel() throws IOException {
 			   siteModel.remove(retractions);
 			   record.recordRetractions(retractions);
 			
-			   // log summary of changes
-			   if (retractions.size() > 0) {
-		          logger.log("Removed " + count + " Class Group" + (count > 1 ? "s" : "") + " from the annotations model."); 		   
-			   }
+		       logger.log("Removed " + count + " Class Group" + (count > 1 ? "s" : "") + " from the annotations model."); 		   
 			}  
 		} finally {
 			siteModel.leaveCriticalSection();
