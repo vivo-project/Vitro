@@ -91,6 +91,11 @@ div.bottom{
     padding-left: 0.5em;
     padding-right: 1.5em;
 }
+#share-contact h3{
+    margin-top: 15px;
+    padding-bottom: 0;
+    line-height: .6em;
+}
 #share-contact img.individual-photo2{
     width: 160px;
     height: 160px;
@@ -124,47 +129,33 @@ ul#individual-tools li{
     float: left;
     line-height: 27px;
 }
-.picto-font{
-    font-family: 'Pictos';
-}
-.picto-uri{
-    font-size: 1.68em;
-}
-.picto-pdf{
-    font-size: 1.68em;
-}
-.picto-share{
-    font-size: 1.68em;
-}
 .icon-rdf{
     position: absolute;
     font-size: 1.125em;
     top: 13px;
 }
-.picto-email{
-    font-size: 1.375em;
-    padding-right: 5px;
-}
 ul#individual-email{
     clear: both;
     list-style-type: circle;
-    margin-top: 20px;
 }
-ul#individual-email a.email{
+ul#individual-email li{
     font-size: .875em;
-    display: block;
+}
+ul#individual-email li:first-child{
+    font-size: .875em;
+    margin-top: 10px;
 }
 ul#individual-phone{
     clear: both;
     list-style-type: circle;
-    margin-top: 20px;
 }
-ul#individual-phone a.tel{
+ul#individual-phone li{
     font-size: .875em;
-    display: block;
 }
-.icon-phone{
-    vertical-align: middle;
+ul#individual-phone li:first-child{
+    margin-top: 10px;
+}
+.icon-phone, .icon-email{
     padding-right: 5px;
 }
 ul#individual-urls{
