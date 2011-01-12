@@ -33,6 +33,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.TabEntitiesController.PageRecord;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.SelectListGenerator;
@@ -88,6 +89,12 @@ public class JSONServlet extends VitroHttpServlet {
         fNameDp.setURI("http://xmlns.com/foaf/0.1/firstName");
         DataProperty lNameDp = (new DataProperty());
         lNameDp.setURI("http://xmlns.com/foaf/0.1/lastName");
+        DataProperty monikerDp = (new DataProperty());
+        monikerDp.setURI( VitroVocabulary.MONIKER);
+        //this property is vivo specific
+        DataProperty perferredTitleDp = (new DataProperty());
+        perferredTitleDp.setURI("http://vivoweb.org/ontology/core#preferredTitle");
+        
         
         if( log.isDebugEnabled() ){
             Enumeration<String> e = vreq.getParameterNames();
@@ -148,6 +155,11 @@ public class JSONServlet extends VitroHttpServlet {
                     jo.put("imageUrl", ind.getImageUrl());
                     jo.put("profileUrl", UrlBuilder.getIndividualProfileUrl(ind, vreq.getWebappDaoFactory()));
                     
+                    String moniker = getDataPropertyValue(ind, monikerDp, fullWdf);
+                    jo.put("moniker", moniker);
+                    jo.put("vclassName", getVClassName(ind,moniker,fullWdf));
+                                        
+                    jo.put("perferredTitle", getDataPropertyValue(ind, perferredTitleDp, fullWdf));
                     jo.put("firstName", getDataPropertyValue(ind, fNameDp, fullWdf));                     
                     jo.put("lastName", getDataPropertyValue(ind, lNameDp, fullWdf));
                     
@@ -198,6 +210,33 @@ public class JSONServlet extends VitroHttpServlet {
             log.error(e,e);
         }
         return;
+    }
+
+    
+    private String getVClassName(Individual ind, String moniker,
+            WebappDaoFactory fullWdf) {
+        /* so the moniker frequently has a vclass name in it.  Try to return
+         * the vclass name that is the same as the moniker so that the templates
+         * can detect this. */
+        if( (moniker == null || moniker.isEmpty()) ){
+            if( ind.getVClass() != null && ind.getVClass().getName() != null )
+                return ind.getVClass().getName();
+            else
+                return "";
+        }
+            
+         List<VClass> vcList = ind.getVClasses();
+         for( VClass vc : vcList){
+             if( vc != null && moniker.equals( vc.getName() ))
+                 return moniker;
+         }
+         
+         // if we get here, then we didn't find a moniker that matched a vclass, 
+         // so just return any vclass.name
+         if( ind.getVClass() != null && ind.getVClass().getName() != null )
+             return ind.getVClass().getName();
+         else
+             return "";        
     }
 
     String getDataPropertyValue(Individual ind, DataProperty dp, WebappDaoFactory wdf){
