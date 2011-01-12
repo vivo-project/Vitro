@@ -142,16 +142,24 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
                 readOntologyFilesInPathSet(SUBMODELS, sce.getServletContext(), submodels);
                 
                	Model tboxAssertions = SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_TBOX_ASSERTIONS_MODEL);
-               	getTBoxModel(memModel, submodels, tboxAssertions);
+                // initially putting the results in memory so we have a
+                // cheaper way of computing the difference when we copy the ABox
+               	Model memTboxAssertions = ModelFactory.createDefaultModel();
+               	getTBoxModel(memModel, submodels, memTboxAssertions);
+               	tboxAssertions.add(memTboxAssertions);
                	
             	Model tboxInferences = SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_TBOX_INF_MODEL);
-               	getTBoxModel(inferenceModel, submodels, tboxInferences);
+            	// initially putting the results in memory so we have a
+            	// cheaper way of computing the difference when we copy the ABox
+            	Model memTboxInferences = ModelFactory.createDefaultModel();
+               	getTBoxModel(inferenceModel, submodels, memTboxInferences);
+               	tboxInferences.add(memTboxInferences);
             	
             	Model aboxAssertions = SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_DB_MODEL);
-            	copyDifference(memModel, tboxAssertions, aboxAssertions);
+            	copyDifference(memModel, memTboxAssertions, aboxAssertions);
             
             	Model aboxInferences = SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_INF_MODEL);
-            	copyDifference(inferenceModel, tboxInferences, aboxInferences);
+            	copyDifference(inferenceModel, memTboxInferences, aboxInferences);
             	
             	// The code below, which sets up the OntModelSelectors, controls whether each
             	// model is maintained in memory, in the DB, or both while the application
