@@ -55,15 +55,13 @@ public class ObjectPropertyStatementTemplateModel extends BaseTemplateModel {
             
             // Determine whether the statement can be edited
             RequestedAction action =  new EditObjPropStmt(objectPropertyStatement);
-            PolicyDecision decision = policyHelper.getPolicyDecision(action);
-            if (decision != null && decision.getAuthorized() == Authorization.AUTHORIZED) {
+            if (policyHelper.isAuthorizedAction(action)) {
                 editAccessList.add(EditAccess.EDIT);
             }
             
             // Determine whether the statement can be deleted
             action = new DropObjectPropStmt(subjectUri, propertyUri, objectUri);
-            decision = policyHelper.getPolicyDecision(action);
-            if (decision != null && decision.getAuthorized() == Authorization.AUTHORIZED) {      
+            if (policyHelper.isAuthorizedAction(action)) {    
                 editAccessList.add(EditAccess.DELETE);
             }
         }

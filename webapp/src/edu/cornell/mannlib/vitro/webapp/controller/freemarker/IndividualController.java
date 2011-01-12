@@ -93,7 +93,7 @@ public class IndividualController extends FreemarkerHttpServlet {
 	
 	        Individual individual = null;
 	        try {
-	            individual = getEntityFromRequest(vreq);
+	            individual = getIndividualFromRequest(vreq);
 	        } catch (Throwable th) {
 	            return doHelp();
 	        }
@@ -285,7 +285,7 @@ public class IndividualController extends FreemarkerHttpServlet {
           
         @return null on failure.
     */
-    public static Individual getEntityFromRequest(VitroRequest vreq) {
+    public static Individual getIndividualFromRequest(VitroRequest vreq) {
         String netIdStr = null;
         Individual entity = null;
         IndividualDao iwDao = vreq.getWebappDaoFactory().getIndividualDao();

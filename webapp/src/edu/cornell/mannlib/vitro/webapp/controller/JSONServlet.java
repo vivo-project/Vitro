@@ -26,14 +26,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.rdf.model.Literal;
 
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
-import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.TabEntitiesController.PageRecord;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
-import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.SelectListGenerator;
@@ -202,13 +201,13 @@ public class JSONServlet extends VitroHttpServlet {
     }
 
     String getDataPropertyValue(Individual ind, DataProperty dp, WebappDaoFactory wdf){
-        List<DataPropertyStatement> stmts = wdf.getDataPropertyStatementDao()
-            .getDataPropertyStatementsForIndividualByProperty(ind, dp);
-        if( stmts == null || stmts.isEmpty() )
+        List<Literal> values = wdf.getDataPropertyStatementDao()
+            .getDataPropertyValuesForIndividualByProperty(ind, dp);
+        if( values == null || values.isEmpty() )
             return "";
         else{
-            if( stmts.get(0) != null )
-                return stmts.get(0).getData();
+            if( values.get(0) != null )
+                return values.get(0).getLexicalForm();
             else
                 return "";
         }

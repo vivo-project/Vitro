@@ -12,6 +12,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.identifier.ServletIdentifierBundleF
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyList;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.RequestPolicyList;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
@@ -51,8 +52,14 @@ public class EditingPolicyHelper {
             log.error("No IdentifierBundle objects for request");
         }
     }
+   
+    protected boolean isAuthorizedAction(RequestedAction action) {
+        PolicyDecision decision = getPolicyDecision(action);
+        return (decision != null && decision.getAuthorized() == Authorization.AUTHORIZED);
+    }
+    
 
-    protected PolicyDecision getPolicyDecision(RequestedAction action) {
+    private PolicyDecision getPolicyDecision(RequestedAction action) {
         return policy.isAuthorized(ids, action);
     }
 }

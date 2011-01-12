@@ -8,13 +8,12 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
+import com.hp.hpl.jena.rdf.model.Literal;
+
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPropStmt;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
-import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
@@ -38,18 +37,17 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
         // Determine whether a new statement can be added
         if (policyHelper != null) {
             RequestedAction action = new AddDataPropStmt(subjectUri, propertyUri,RequestActionConstants.SOME_LITERAL, null, null);
-            PolicyDecision decision = policyHelper.getPolicyDecision(action);
-            if( decision != null && decision.getAuthorized() == Authorization.AUTHORIZED ) {
+            if (policyHelper.isAuthorizedAction(action)) {
                 addAccess = true;
             }            
         }
         
         // Get the data property statements via a sparql query
         DataPropertyStatementDao dpDao = vreq.getWebappDaoFactory().getDataPropertyStatementDao();
-        List<DataPropertyStatement> dpStatements = dpDao.getDataPropertyStatementsForIndividualByProperty(subject, dp);
-        statements = new ArrayList<DataPropertyStatementTemplateModel>(dpStatements.size());
-        for (DataPropertyStatement dps : dpStatements) {
-            statements.add(new DataPropertyStatementTemplateModel(dps, policyHelper));
+        List<Literal> values = dpDao.getDataPropertyValuesForIndividualByProperty(subject, dp);
+        statements = new ArrayList<DataPropertyStatementTemplateModel>(values.size());
+        for (Literal value : values) {
+            statements.add(new DataPropertyStatementTemplateModel(subjectUri, propertyUri, value, policyHelper));
         }
     }
     

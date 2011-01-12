@@ -88,8 +88,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         // Determine whether a new statement can be added
         if (policyHelper != null) {
             RequestedAction action = new AddObjectPropStmt(subjectUri, propertyUri, RequestActionConstants.SOME_URI);
-            PolicyDecision decision = policyHelper.getPolicyDecision(action);
-            if( decision != null && decision.getAuthorized() == Authorization.AUTHORIZED ) {
+            if (policyHelper.isAuthorizedAction(action)) {
                 addAccess = true;
             }
         }
