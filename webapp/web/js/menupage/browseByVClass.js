@@ -52,7 +52,9 @@ var browseByVClass = {
     
     // Load individuals for default class as specified by menupage template
     defaultVClass: function() {
-        this.getIndividuals(this.defaultBrowseVClassUri);
+        if ( this.defaultBrowseVClassURI != "false" ) {
+            this.getIndividuals(this.defaultBrowseVClassUri);
+        }
     },
     
     getIndividuals: function(vclassUri, alpha) {
