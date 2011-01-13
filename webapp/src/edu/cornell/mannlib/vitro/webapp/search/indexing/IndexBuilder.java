@@ -150,8 +150,7 @@ public class IndexBuilder {
     	return out;
     }
     
-    protected void indexRebuild() throws IndexingException {
-    	setReindexRequested(false);
+    protected void indexRebuild() throws IndexingException {    	
         log.info("Rebuild of search index is starting.");
 
         Iterator<ObjectSourceIface> sources = sourceList.iterator();
@@ -171,7 +170,8 @@ public class IndexBuilder {
         getAndEmptyChangedUris();
         
         if( listOfIterators.size() == 0){ log.debug("Warning: no ObjectSources found.");}
-        
+                
+        setReindexRequested(false);
         doBuild( listOfIterators, Collections.EMPTY_LIST, true, NEW_DOCS );
         log.info("Rebuild of search index is complete.");
     }
@@ -291,7 +291,7 @@ public class IndexBuilder {
             	for(Individual deleteMe : deletes ){
             		indexer.removeFromIndex(deleteMe);
             	}
-            }
+            }            
 
             //get an iterator for all of the sources of indexable objects
             Iterator sourceIters = sourceIterators.iterator();

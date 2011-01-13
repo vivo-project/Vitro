@@ -98,6 +98,14 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 			context.setAttribute(LuceneIndexer.class.getName(), indexer);
 			indexer.setLuceneIndexFactory(lif);
 			
+			if( indexer.isIndexCorroupt() ){
+			    log.info("index is corrupt, requesting rebuild");
+			}
+			if( indexer.isIndexEmpty() ){
+			    log.info("index is empty, requesting rebuild");
+			    sce.getServletContext().setAttribute(INDEX_REBUILD_REQUESTED_AT_STARTUP, Boolean.TRUE);			
+			}
+			
 			// This is where the builder gets the list of places to try to
 			// get objects to index. It is filtered so that non-public text
 			// does not get into the search index.
@@ -130,20 +138,22 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 						
 			if( (Boolean)sce.getServletContext().getAttribute(INDEX_REBUILD_REQUESTED_AT_STARTUP) instanceof Boolean &&
 				(Boolean)sce.getServletContext().getAttribute(INDEX_REBUILD_REQUESTED_AT_STARTUP) ){
-				builder.doIndexRebuild();
-				log.info("Rebuild of search index required before startup.");
+			    log.info("Rebuild of search index required before startup.");
+				builder.doIndexRebuild();				
+				Thread.currentThread().sleep(500);				
 				int n = 0;
-				while( builder.isIndexing() ){
-					Thread.currentThread().sleep(500);
+				while( builder.isReindexRequested() || builder.isIndexing() ){
+				    n++;
 					if( n % 20 == 0 ) //output message every 10 sec. 
 					    log.info("Still rebulding search index");
-				}
-				log.info("Search index rebuild completed.");				
+					Thread.currentThread().sleep(500);
+				}				
 			}
 			
 			log.debug("**** End of " + this.getClass().getName() + ".contextInitialized()");			
 		} catch (Throwable t) {
 			log.error("***** Error setting up Lucene search *****", t);
+			throw new RuntimeException("Startup of vitro application was prevented by errors in the lucene configuration");
 		}
 	}
 
@@ -153,7 +163,9 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 	public void contextDestroyed(ServletContextEvent sce) {
 		log.debug("**** Running " + this.getClass().getName() + ".contextDestroyed()");
 		IndexBuilder builder = (IndexBuilder) sce.getServletContext().getAttribute(IndexBuilder.class.getName());
-		builder.killIndexingThread();
+		if( builder != null){		    		
+		    builder.killIndexingThread();
+		}
 	}
 
 	/**

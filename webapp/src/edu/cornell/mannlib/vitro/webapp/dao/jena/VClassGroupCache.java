@@ -365,7 +365,8 @@ public class VClassGroupCache implements ServletContextListener{
 
     @Override
     public void contextDestroyed(ServletContextEvent arg0) {
-        _cacheRebuildThread.kill();        
+        if( _cacheRebuildThread != null )
+            _cacheRebuildThread.kill();        
     }
 
     @Override

@@ -11,14 +11,17 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.index.TermDocs;
+import org.apache.lucene.index.TermEnum;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
@@ -35,7 +38,8 @@ import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexerIface;
  */
 public class LuceneIndexer implements IndexerIface {
 	
-	private final static Log log = LogFactory.getLog(LuceneIndexer.class.getName());	
+	private final static Log log = LogFactory.getLog(LuceneIndexer.class);
+	
     LinkedList<Obj2DocIface> obj2DocList = new LinkedList<Obj2DocIface>();
     String baseIndexDir = null;
     String liveIndexDir = null;
@@ -80,42 +84,9 @@ public class LuceneIndexer implements IndexerIface {
         this.analyzer = analyzer;
         if( searchers != null )
             this.searchers = searchers;
-        makeIndexIfNone();
-    }
-    
-    private synchronized void makeIndexIfNone() throws IOException {        
-        if( !liveIndexExists() ){
-            log.debug("Making new index dir and initially empty lucene index  at " + liveIndexDir);
-            closeWriter();
-            
-            File baseDir = new File(baseIndexDir);
-            baseDir.mkdirs();
-            
-            File dir = new File(liveIndexDir);
-            dir.mkdirs();
-            
-            writer = new IndexWriter(liveIndexDir,analyzer,true,MAX_FIELD_LENGTH);
-            closeWriter();
-        }                                   
-    }
 
-    private boolean liveIndexExists(){
-        Directory fsDir = null;
-        IndexSearcher isearcher = null ;
-        try{
-            fsDir = FSDirectory.getDirectory(liveIndexDir);
-            isearcher = new IndexSearcher(fsDir);
-            return true;
-        }catch(Exception ex){
-            return false;
-        }finally{
-            try{
-                if( isearcher != null )
-                    isearcher.close();
-                if( fsDir != null)
-                    fsDir.close();
-            }catch(Exception ex){}
-        }
+        updateTo1p2();
+        makeEmptyIndexIfNone();        
     }
 
     public synchronized void addObj2Doc(Obj2DocIface o2d) {
@@ -134,6 +105,14 @@ public class LuceneIndexer implements IndexerIface {
         searchers.add( s );
     }
     
+    @Override
+    public synchronized void prepareForRebuild() throws IndexingException {
+        if( this.indexing )
+            log.error("Only an update will be performed, must call prepareForRebuild() before startIndexing()");
+        else
+            this.fullRebuild = true;        
+    }
+    
     /**
      * Checks to see if indexing is currently happening.
      */
@@ -143,12 +122,12 @@ public class LuceneIndexer implements IndexerIface {
 
     public synchronized void startIndexing() throws IndexingException{
         while( indexing ){ //wait for indexing to end.
-            log.info("LuceneIndexer.startIndexing() waiting...");
+            log.debug("LuceneIndexer.startIndexing() waiting...");
             try{ wait(); } catch(InterruptedException ex){}
         }
         checkStartPreconditions();
         try {
-            log.info("Starting to index");        
+            log.debug("Starting to index");        
             if( this.fullRebuild ){
                 String offLineDir = getOffLineBuildDir();
                 this.currentOffLineDir = offLineDir;
@@ -166,16 +145,6 @@ public class LuceneIndexer implements IndexerIface {
         }
     }
 
-    private void checkStartPreconditions() {        
-        if( this.writer != null )
-            log.info("it is expected that the writer would " +
-            		"be null but it isn't");
-        if( this.currentOffLineDir != null)
-            log.info("it is expected that the current" +
-            		"OffLineDir would be null but it is " + currentOffLineDir);
-        if( indexing )
-            log.info("indexing should not be set to true just yet");        
-    }
 
     public synchronized void endIndexing() {
         if( ! indexing ){ 
@@ -184,7 +153,7 @@ public class LuceneIndexer implements IndexerIface {
         }            
         try {
         	urisIndexed = null;
-            log.info("ending index");
+            log.debug("ending index");
             if( writer != null )
                 writer.optimize();
                      
@@ -209,22 +178,14 @@ public class LuceneIndexer implements IndexerIface {
         }
     }
 
-    private synchronized void bringRebuildOnLine() {
-        closeWriter();
-        deleteDir(new File(liveIndexDir));
-        File offLineDir = new File(currentOffLineDir);
-        File liveDir = new File(liveIndexDir);
-        boolean success =  offLineDir.renameTo( liveDir );
-        if( ! success )
-            log.error("could not move off line index at " 
-                    + offLineDir.getAbsolutePath() + " to live index directory " 
-                    + liveDir.getAbsolutePath());
-    }
+    public void setLuceneIndexFactory(LuceneIndexFactory lif) {
+        luceneIndexFactory = lif;    
+    } 
 
     public synchronized Analyzer getAnalyzer(){
-           return analyzer;
+        return analyzer;
     }
-
+    
     /**
      * Indexes an object.  startIndexing() must be called before this method
      * to setup the modifier.
@@ -314,6 +275,18 @@ public class LuceneIndexer implements IndexerIface {
         writer = null;
     }   
 
+    private synchronized void bringRebuildOnLine() {
+        closeWriter();
+        deleteDir(new File(liveIndexDir));
+        File offLineDir = new File(currentOffLineDir);
+        File liveDir = new File(liveIndexDir);
+        boolean success =  offLineDir.renameTo( liveDir );
+        if( ! success )
+            log.error("could not move off line index at " 
+                    + offLineDir.getAbsolutePath() + " to live index directory " 
+                    + liveDir.getAbsolutePath());
+    }  
+    
     private synchronized String getOffLineBuildDir(){
         File baseDir = new File(baseIndexDir);
         baseDir.mkdirs();
@@ -354,18 +327,100 @@ public class LuceneIndexer implements IndexerIface {
         }
         // The directory is now empty so delete it
         return dir.delete();
+    }   
+
+    private void checkStartPreconditions() {        
+        if( this.writer != null )
+            log.error("it is expected that the writer would " +
+                    "be null but it isn't");
+        if( this.currentOffLineDir != null)
+            log.error("it is expected that the current" +
+                    "OffLineDir would be null but it is " + currentOffLineDir);
+        if( indexing )
+            log.error("indexing should not be set to true just yet");        
     }
 
-    public void setLuceneIndexFactory(LuceneIndexFactory lif) {
-        luceneIndexFactory = lif;    
+    
+    private synchronized void makeEmptyIndexIfNone() throws IOException {        
+        if( !liveIndexExists() ){
+            log.debug("Making new index dir and initially empty lucene index  at " + liveIndexDir);
+            closeWriter();
+            makeIndexDirs();            
+            writer = new IndexWriter(liveIndexDir,analyzer,true,MAX_FIELD_LENGTH);
+            closeWriter();
+        }                                   
+    }
+
+    private synchronized void makeIndexDirs() throws IOException{            
+        File baseDir = new File(baseIndexDir);
+        if( ! baseDir.exists())
+            baseDir.mkdirs();
+        
+        File dir = new File(liveIndexDir);
+        if( ! dir.exists() )
+            dir.mkdirs();        
+    }
+    
+    private boolean liveIndexExists(){        
+        return indexExistsAt(liveIndexDir);        
     }    
 
-    @Override
-    public synchronized void prepareForRebuild() throws IndexingException {
-        if( this.indexing )
-            log.error("Only an update will be performed, must call prepareForRebuild() before startIndexing()");
-        else
-            this.fullRebuild = true;        
+    private boolean indexExistsAt(String dirName){
+        Directory fsDir = null;
+        try{
+            fsDir = FSDirectory.getDirectory(dirName);
+            return IndexReader.indexExists(fsDir);            
+        }catch(Exception ex){
+            return false;
+        }finally{
+            try{
+                if( fsDir != null)
+                    fsDir.close();
+            }catch(Exception ex){}
+        }
+    }
+    
+    /*
+     * In needed, create new 1.2 style index directories and copy old index to new dirs.
+     */
+    private synchronized void updateTo1p2() throws IOException {
+        //check if live index directory exists, don't check for a lucene index.
+        File liveDirF = new File(this.liveIndexDir);
+        if( ! liveDirF.exists() && indexExistsAt(baseIndexDir)){
+            log.info("Updating to vitro 1.2 search index directory structure");
+            makeIndexDirs();            
+            File live = new File(liveIndexDir);
+            
+            //copy existing index to live index directory
+            File baseDir = new File(baseIndexDir);
+            for( File file : baseDir.listFiles()){                                
+                if( ! file.isDirectory() && ! live.getName().equals(file.getName() ) ){
+                    FileUtils.copyFile(file, new File(liveIndexDir+File.separator+file.getName()));
+                    boolean success = file.delete();
+                    if( ! success )
+                        log.error("could not delete "+ baseIndexDir + file.getName());
+                }
+            }
+            log.info("Done updating to vitro 1.2 search index directory structure.");
+        }        
+    }
+    
+    public boolean isIndexEmpty() throws CorruptIndexException, IOException{        
+        TermDocs td = null;
+        try{
+            IndexReader reader = IndexReader.open(new File( this.liveIndexDir ));            
+            td = reader.termDocs(new Term( Entity2LuceneDoc.VitroLuceneTermNames.DOCID) );
+            if( td.next() )
+                return false;
+            else 
+                return true;
+        }finally{
+            if (td != null) td.close();
+        }
     }
 
+    public boolean isIndexCorroupt(){
+        //if it is clear it out but don't rebuild.
+        return false;
+    }    
 }
