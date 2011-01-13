@@ -58,12 +58,17 @@ public void doGet (HttpServletRequest req, HttpServletResponse res) throws IOExc
 	
 	if(Pattern.compile("^/entityurl/$").matcher(url).matches()){
 		String redirectURL = null;
-		if ( RDFXML_MIMETYPE.equals(contentType.getMediaType()))
-			redirectURL = "/entityurl/entityurl.rdf";
-		else if( N3_MIMETYPE.equals(contentType.getMediaType()))
-			redirectURL = "/entityurl/entityurl.n3";
-	    else if ( TTL_MIMETYPE.equals(contentType.getMediaType()))
-	    	redirectURL = "/entityurl/entityurl.ttl";
+		if(contentType!=null){
+			if ( RDFXML_MIMETYPE.equals(contentType.getMediaType()))
+				redirectURL = "/entityurl/entityurl.rdf";
+			else if( N3_MIMETYPE.equals(contentType.getMediaType()))
+				redirectURL = "/entityurl/entityurl.n3";
+			else if ( TTL_MIMETYPE.equals(contentType.getMediaType()))
+				redirectURL = "/entityurl/entityurl.ttl";
+		}
+		else{
+			redirectURL = "/entityurl/entityrurl.rdf";
+		}
 		
 		 String hn = req.getHeader("Host");
 	        if (req.isSecure()) {
@@ -94,8 +99,8 @@ public void doGet (HttpServletRequest req, HttpServletResponse res) throws IOExc
 		}
 	}
 	
-	if(contentType != null){
-		String format = ""; 
+	String format = ""; 
+	if(contentType != null){	
 		if ( RDFXML_MIMETYPE.equals(contentType.getMediaType()))
 			format = "RDF/XML";
 		else if( N3_MIMETYPE.equals(contentType.getMediaType()))
@@ -103,8 +108,12 @@ public void doGet (HttpServletRequest req, HttpServletResponse res) throws IOExc
 		else if ( TTL_MIMETYPE.equals(contentType.getMediaType()))
 			format ="TTL";
 		res.setContentType(contentType.getMediaType());
-		model.write(res.getOutputStream(), format);
 	}
+	else{
+		res.setContentType(RDFXML_MIMETYPE);
+		format = "RDF/XML";
+	}
+	model.write(res.getOutputStream(), format);
 }
 public void doPost (HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException{
 	doGet(req,res);
