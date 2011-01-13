@@ -215,8 +215,8 @@ public class DateTimeMigration {
 		    
 			if (additions.size() > 0) {
 					logger.log(additions.size() + " date/time literal" + 
-							((additions.size() > 1) ? "s" : "") +
-							" were updated to the 1.2 representation.");
+							((additions.size() > 1) ? "s" : "") + ((additions.size() > 1) ? " were " : " was ") +
+							"updated to the 1.2 representation.");
 			}		   
 		} finally {
 			aboxModel.leaveCriticalSection();
