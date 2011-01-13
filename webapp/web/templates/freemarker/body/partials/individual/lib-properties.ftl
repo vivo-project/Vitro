@@ -78,3 +78,35 @@ name will be used as the label. -->
         <a href="${url}" title="delete this relationship"><img  class="delete-individual" src="${urls.images}/individual/deleteIcon.gif" alt="delete" /></a>
     </#if>
 </#macro>
+
+<#-- Macros for specific properties -->
+
+<#-- Vitro namespace links 
+
+     Currently the page displays the vitro namespace links properties. Future versions 
+     will use the vivo core ontology links property, eliminating the need for special handling.
+     
+     Note that this macro has a side-effect in the calls to propertyGroups.getPropertyAndRemoveFromList().
+-->
+<#macro vitroLinks propertyGroups showEditLinks linkListClass="individual-urls">
+    <#local vitroNs = "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#">
+    <#local primaryLink = propertyGroups.getPropertyAndRemoveFromList("${vitroNs}primaryLink")!>   
+    <#local additionalLinks = propertyGroups.getPropertyAndRemoveFromList("${vitroNs}additionalLink")!>    
+
+    <#if (primaryLink?has_content || additionalLinks?has_content)> <#-- true when the property is in the list, even if not populated (when editing) -->
+        <nav role="navigation">
+            <@addLinkWithLabel primaryLink showEditLinks "Primary Web Page" />
+            <#if primaryLink.statements?has_content> <#-- if there are any statements -->
+                <ul class="${linkListClass}" id="links-primary" role="list">
+                    <@objectPropertyList primaryLink.statements primaryLink.template showEditLinks />
+                </ul>
+            </#if>
+            <@addLinkWithLabel additionalLinks showEditLinks "Additional Web Pages" />
+            <#if additionalLinks.statements?has_content> <#-- if there are any statements -->
+                <ul class="${linkListClass}" id="links-additional" role="list">            
+                    <@objectPropertyList additionalLinks.statements additionalLinks.template showEditLinks />           
+                </ul>
+            </#if>
+        </nav>
+    </#if>
+</#macro>

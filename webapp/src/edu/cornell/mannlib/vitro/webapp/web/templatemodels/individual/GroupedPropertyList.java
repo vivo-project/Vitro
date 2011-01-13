@@ -69,11 +69,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
         // This may include properties that are not defined as "possible properties" for a subject of this class,
         // so we cannot just rely on getting that list.
         List<ObjectProperty> objectPropertyList = subject.getPopulatedObjectPropertyList();
-        // If we're going to create a new template model object property with a name,
-        // don't need to set editLabel, can just do this:
-        //propertyList.addAll(objectPropertyList); 
         for (ObjectProperty op : objectPropertyList) {
-            //op.setLabel(op.getDomainPublic());
             propertyList.add(op);
         }
                 
@@ -92,7 +88,6 @@ public class GroupedPropertyList extends BaseTemplateModel {
         // two working in parallel.
         List<DataProperty> dataPropertyList = subject.getPopulatedDataPropertyList();
         for (DataProperty dp : dataPropertyList) {
-            //dp.setLabel(dp.getPublicName());
             propertyList.add(dp);
         }
     
@@ -100,7 +95,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
             mergeAllPossibleDataProperties(propertyList);           
         }
     
-        sort(propertyList); //*** Does this do data and obj props, or just obj props??
+        sort(propertyList); 
     
         // Put the list into groups        
         List<PropertyGroup> propertyGroupList = addPropertiesToGroups(propertyList);

@@ -75,9 +75,9 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
             namespaceFilters.add("afn:namespace(?property) != \"" + s + "\"");
         }
         // A hack to include the vitro:primaryLink and vitro:additionalLink properties in the list
-//        namespaceFilters.add("( ?property = <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#primaryLink> ||" +
-//                               "?property = <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#additionalLink> ||" +
-//                               "afn:namespace(?property) != \"http://vitro.mannlib.cornell.edu/ns/vitro/0.7#\" )");
+        namespaceFilters.add("( ?property = <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#primaryLink> ||" +
+                               "?property = <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#additionalLink> ||" +
+                               "afn:namespace(?property) != \"http://vitro.mannlib.cornell.edu/ns/vitro/0.7#\" )");
         propertyFilters = "FILTER (" + StringUtils.join(namespaceFilters, " && \n") + ")\n";
     }
     
