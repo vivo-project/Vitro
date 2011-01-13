@@ -4,12 +4,12 @@
     <h3>${page.title}</h3>
     
     <section id="content-generic-class" role="region">
-        <h4>Visual Graph</h4>
-        
         <#-- This will allow us to keep menupage.ftl generic and keep vivo-specific extensions in VIVO -->
         <#if visualizationLink??>
             ${visualizationLink}
         </#if>
+        
+        <h4>Visual Graph</h4>
     
         <#include "menupage-vClassesInClassgroup.ftl">
     

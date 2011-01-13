@@ -1,0 +1,26 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+/****************************************
+ Vitro base styles
+ 
+ Styles declared here are intended for
+ application-wide use.
+ 
+ Original version
+ 2011-01-12 UI Team
+ 
+ Last updated
+ 2011-01-13
+*****************************************/
+
+/************************
+Miscellaneous
+************************/
+
+.clear {
+    clear: both;
+}
+
+.hidden {
+    display: none !important;
+}
