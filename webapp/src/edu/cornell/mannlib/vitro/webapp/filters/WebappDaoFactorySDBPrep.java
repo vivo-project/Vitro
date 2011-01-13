@@ -67,6 +67,7 @@ public class WebappDaoFactorySDBPrep implements Filter {
 		        (request.getAttribute(
 		                "WebappDaoFactorySDBPrep.setup") != null) ) {
 			// don't run multiple times or if SDB is not active
+		    filterChain.doFilter(request, response);
 			return;
 		}
 		
