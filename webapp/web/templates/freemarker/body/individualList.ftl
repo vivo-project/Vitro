@@ -6,7 +6,7 @@
 
 <div class="contents">   
     <div class="individualList">
-        
+     <p><a href="${redirecturl}">Download</a></p>
         <h2>${title}</h2>
         <#if subtitle??>
             <h4>${subtitle}</h4>
@@ -15,7 +15,7 @@
         <#if message??>
             <p>${message}</p>
         <#else>
-        
+       
             <#assign pagination>
                 <#if (pages?size > 1) >           
                     pages:&nbsp; 
