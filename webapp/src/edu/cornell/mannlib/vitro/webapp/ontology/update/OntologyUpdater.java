@@ -44,7 +44,7 @@ public class OntologyUpdater {
 	
 	public OntologyUpdater(OntologyUpdateSettings settings) {
 		this.settings = settings;
-		this.logger = new SimpleOntologyChangeLogger(settings.getLogFile(),	settings.getErrorLogFile());
+		this.logger = null;
 		this.record = new SimpleOntologyChangeRecord(settings.getAddedDataFile(), settings.getRemovedDataFile());
 	}
 	
@@ -54,6 +54,10 @@ public class OntologyUpdater {
 		
 		boolean updateRequired = updateRequired();
 		if (updateRequired) {
+			
+			if (this.logger == null) {
+				this.logger = new SimpleOntologyChangeLogger(settings.getLogFile(),	settings.getErrorLogFile());
+			}
 			
 			try {
 			     performUpdate();
