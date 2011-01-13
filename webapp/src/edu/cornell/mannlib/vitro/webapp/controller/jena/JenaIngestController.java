@@ -23,6 +23,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContextEvent;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -77,6 +78,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSDBModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSpecialModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetup;
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupSDB;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestWorkflowProcessor;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.WorkflowOntology;
@@ -125,7 +128,6 @@ public class JenaIngestController extends BaseEditController {
 		actionStr = (actionStr != null) ? actionStr : "";
 		String modelType = vreq.getParameter("modelType");
 		if ("listModels".equals(actionStr)) {
-			getServletContext().setAttribute("vitroJenaModelMaker",maker);
 			String modelT = (String)getServletContext().getAttribute("modelT");
 			String info = (String)getServletContext().getAttribute("info");
 			if(modelT==null || modelT.equals("rdb")){
@@ -139,12 +141,8 @@ public class JenaIngestController extends BaseEditController {
 			request.setAttribute("title","Available Models");
 			request.setAttribute("bodyJsp",LIST_MODELS_JSP);
 		}else if("rdbModels".equals(actionStr)){
-			String jdbcUrl = ConfigurationProperties.getProperty("VitroConnection.DataSource.url")
-	    	+ "?useUnicode=yes&characterEncoding=utf8";
-	    	String username = ConfigurationProperties.getProperty("VitroConnection.DataSource.username");
-	    	String password = ConfigurationProperties.getProperty("VitroConnection.DataSource.password");
-			VitroJenaModelMaker vjmm = new VitroJenaModelMaker(jdbcUrl, username, password, "MySQL");
-		    vreq.getSession().setAttribute("vitroJenaModelMaker",vjmm);
+			VitroJenaModelMaker vjmm = (VitroJenaModelMaker) getServletContext().getAttribute("vitroJenaModelMaker");
+			vreq.getSession().setAttribute("vitroJenaModelMaker", vjmm);
 		    getServletContext().setAttribute("modelT", "rdb");
 		    getServletContext().setAttribute("info", "RDB models");
         	request.setAttribute("modelType", "rdb");
@@ -152,16 +150,9 @@ public class JenaIngestController extends BaseEditController {
 			request.setAttribute("title","Available Models");
 			request.setAttribute("bodyJsp",LIST_MODELS_JSP);
 		}else if("sdbModels".equals(actionStr)){
-			String jdbcUrl = ConfigurationProperties.getProperty("VitroConnection.DataSource.url")
-	    	+ "?useUnicode=yes&characterEncoding=utf8";
-	    	String username = ConfigurationProperties.getProperty("VitroConnection.DataSource.username");
-	    	String password = ConfigurationProperties.getProperty("VitroConnection.DataSource.password");
-			StoreDesc storeDesc = new StoreDesc(LayoutType.LayoutTripleNodesHash,DatabaseType.MySQL) ;
-        	SDBConnection conn = new SDBConnection(jdbcUrl, username, password) ; 
-        	Store store = SDBFactory.connectStore(conn, storeDesc);
-        	VitroJenaSDBModelMaker vsmm = new VitroJenaSDBModelMaker(store);
-        	vreq.getSession().setAttribute("vitroJenaModelMaker",vsmm);
-        	 getServletContext().setAttribute("modelT", "sdb");
+			VitroJenaSDBModelMaker vsmm = (VitroJenaSDBModelMaker) getServletContext().getAttribute("vitroJenaSDBModelMaker");
+			vreq.getSession().setAttribute("vitroJenaModelMaker", vsmm);
+        	getServletContext().setAttribute("modelT", "sdb");
  		    getServletContext().setAttribute("info", "SDB models");
         	request.setAttribute("modelType", "sdb");
         	request.setAttribute("infoLine", "SDB models");
@@ -171,14 +162,7 @@ public class JenaIngestController extends BaseEditController {
 			String modelName = vreq.getParameter("modelName");
 			if (modelName != null) {
 				if(modelType.equals("sdb")){
-					String jdbcUrl = ConfigurationProperties.getProperty("VitroConnection.DataSource.url")
-			    	+ "?useUnicode=yes&characterEncoding=utf8";
-			    	String username = ConfigurationProperties.getProperty("VitroConnection.DataSource.username");
-			    	String password = ConfigurationProperties.getProperty("VitroConnection.DataSource.password");
-					StoreDesc storeDesc = new StoreDesc(LayoutType.LayoutTripleNodesHash,DatabaseType.MySQL) ;
-		        	SDBConnection conn = new SDBConnection(jdbcUrl, username, password) ; 
-		        	Store store = SDBFactory.connectStore(conn, storeDesc);
-		        	maker = new VitroJenaSDBModelMaker(store);
+		        	maker = (VitroJenaSDBModelMaker) getServletContext().getAttribute("vitroJenaSDBModelMaker");
 		        	request.setAttribute("infoLine", "SDB models");
 				}
 				else{
@@ -350,8 +334,20 @@ public class JenaIngestController extends BaseEditController {
 			}
 		} else if ("connectDB".equals(actionStr)) {
 			String jdbcUrl = vreq.getParameter("jdbcUrl");
+			String tripleStore = vreq.getParameter("tripleStore");
 			if (jdbcUrl != null) {
 				doConnectDB(vreq);
+				if ("SDB".equals(tripleStore)) {
+		        	getServletContext().setAttribute("modelT", "sdb");
+		 		    getServletContext().setAttribute("info", "SDB models");
+		        	request.setAttribute("modelType", "sdb");
+		        	request.setAttribute("infoLine", "SDB models");
+				} else {
+			        getServletContext().setAttribute("modelT", "rdb");
+				    getServletContext().setAttribute("info", "RDB models");
+		        	request.setAttribute("modelType", "rdb");
+		        	request.setAttribute("infoLine", "RDB models");
+				}
 				request.setAttribute("title","Ingest Menu");
 				request.setAttribute("bodyJsp",INGEST_MENU_JSP);
 			} else {
@@ -871,18 +867,20 @@ public class JenaIngestController extends BaseEditController {
 		}
 		dbTypeObj = DatabaseType.fetch(dbType);
         loadDriver(dbTypeObj);
-		if ("SDB".equals(tripleStore)) {
-			StoreDesc storeDesc = new StoreDesc(LayoutType.LayoutTripleNodesHash,dbTypeObj) ;
-        	SDBConnection conn = new SDBConnection(jdbcUrl, username, password) ; 
-        	Store store = SDBFactory.connectStore(conn, storeDesc);
-        	VitroJenaSDBModelMaker vjmm = new VitroJenaSDBModelMaker(store);
-        	vreq.getSession().setAttribute("vitroJenaModelMaker",vjmm);
-		} else {
-			System.out.println("Connecting to DB at "+jdbcUrl);
-	        VitroJenaModelMaker vjmm = new VitroJenaModelMaker(jdbcUrl, username, password, dbType);
-	        vreq.getSession().setAttribute("vitroJenaModelMaker",vjmm);
-		}
+		System.out.println("Connecting to DB at "+jdbcUrl);
+		StoreDesc storeDesc = new StoreDesc(LayoutType.LayoutTripleNodesHash,dbTypeObj) ;
+    	SDBConnection conn = new SDBConnection(jdbcUrl, username, password) ; 
+    	Store store = SDBFactory.connectStore(conn, storeDesc);
+    	VitroJenaSDBModelMaker vsmm = new VitroJenaSDBModelMaker(store);
+    	VitroJenaModelMaker vjmm = new VitroJenaModelMaker(jdbcUrl, username, password, dbType);
+    	getServletContext().setAttribute("vitroJenaSDBModelMaker", vsmm);
+    	getServletContext().setAttribute("vitroJenaModelMaker", vjmm);
+    	if("SDB".equals(tripleStore))
+    		vreq.getSession().setAttribute("vitroJenaModelMaker",vsmm);
+    	else
+    		vreq.getSession().setAttribute("vitroJenaModelMaker",vjmm);
 	}
+	
 	
 	private void loadDriver(DatabaseType dbType) {
         if (DatabaseType.MySQL.equals(dbType)) {
