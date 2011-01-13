@@ -123,7 +123,7 @@ public class ABoxUpdater {
 	 */
 	public void renameClass(AtomicOntologyChange change) throws IOException {
 		
-		logger.log("Processing a class rename from: " + change.getSourceURI() + " to " + change.getDestinationURI());
+		//logger.log("Processing a class rename from: " + change.getSourceURI() + " to " + change.getDestinationURI());
 		aboxModel.enterCriticalSection(Lock.WRITE);
 		
 		try {
@@ -230,7 +230,7 @@ public class ABoxUpdater {
 	 */
 	public void addClass(AtomicOntologyChange change) throws IOException {
 	   
-		logger.log("Processing a class addition of class " + change.getDestinationURI());
+		//logger.log("Processing a class addition of class " + change.getDestinationURI());
 		
 		OntClass addedClass = newTboxModel.getOntClass(change.getDestinationURI());
 		
@@ -296,7 +296,7 @@ public class ABoxUpdater {
 	 */
 	public void renameClassToParent(AtomicOntologyChange change) throws IOException {
 
-		logger.log("Processing a class migration to parent for deleted class " + change.getSourceURI());
+		//logger.log("Processing a class migration to parent for deleted class " + change.getSourceURI());
 		
 		OntClass deletedClass = oldTboxModel.getOntClass(change.getSourceURI());
 		
@@ -346,7 +346,7 @@ public class ABoxUpdater {
 	 */
 	public void deleteClass(AtomicOntologyChange change) throws IOException {
 
-		logger.log("Processing a class deletion of class " + change.getSourceURI());
+		//logger.log("Processing a class deletion of class " + change.getSourceURI());
 		
 		OntClass deletedClass = oldTboxModel.getOntClass(change.getSourceURI());
 		
@@ -451,7 +451,7 @@ public class ABoxUpdater {
 	
 	private void addProperty(AtomicOntologyChange propObj) throws IOException{
 		
-		logger.log("Processing a property addition of property " + propObj.getDestinationURI());
+		//logger.log("Processing a property addition of property " + propObj.getDestinationURI());
 		
 		OntProperty addedProperty = newTboxModel.getOntProperty 	(propObj.getDestinationURI());
 		
@@ -522,7 +522,7 @@ public class ABoxUpdater {
 	
 	private void deleteProperty(AtomicOntologyChange propObj) throws IOException{
 		
-		logger.log("Processing a property deletion of property " + propObj.getSourceURI());
+		//logger.log("Processing a property deletion of property " + propObj.getSourceURI());
 		
 		OntProperty deletedProperty = oldTboxModel.getOntProperty(propObj.getSourceURI());
 		
@@ -580,7 +580,7 @@ public class ABoxUpdater {
 	
 	private void renameProperty(AtomicOntologyChange propObj) throws IOException {
 		
-		logger.log("Processing a property rename from: " + propObj.getSourceURI() + " to " + propObj.getDestinationURI());
+		//logger.log("Processing a property rename from: " + propObj.getSourceURI() + " to " + propObj.getDestinationURI());
 		
 		OntProperty oldProperty = oldTboxModel.getOntProperty(propObj.getSourceURI());
 		OntProperty newProperty = newTboxModel.getOntProperty(propObj.getDestinationURI());
