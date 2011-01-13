@@ -59,8 +59,8 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	public static final int MAXIMUM_FILE_SIZE = 6 * 1024 * 1024;
 
 	/** Generated thumbnails will be this big. */
-	public static final int THUMBNAIL_HEIGHT = 115;
-	public static final int THUMBNAIL_WIDTH = 115;
+	public static final int THUMBNAIL_HEIGHT = 200;
+	public static final int THUMBNAIL_WIDTH = 200;
 
 	/** The form field that tells what we are doing: uploading? deleting? */
 	public static final String PARAMETER_ACTION = "action";
