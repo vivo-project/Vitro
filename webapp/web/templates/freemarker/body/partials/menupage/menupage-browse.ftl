@@ -14,38 +14,19 @@
                 similar to what Brian had setup with widget-browse.ftl
                 ------------------------------------------------------------->
                 <#assign vClassCamel = vClass.name?capitalize?replace(" ", "")?uncap_first />
-                <li id="${vClassCamel}"><a href="#${vClassCamel}" title="Browse all people in this class" data-uri="${vClass.URI}">${vClass.name} <span class="count-classes">(${vClass.entityCount})</span></a></li>
+                <#-- Only display vClasses with individuals -->
+                <#if (vClass.entityCount > 0)>
+                    <li id="${vClassCamel}"><a href="#${vClassCamel}" title="Browse all people in this class" data-uri="${vClass.URI}">${vClass.name} <span class="count-classes">(${vClass.entityCount})</span></a></li>
+                </#if>
             </#list>
         </ul>
         <nav role="navigation">
+            <#assign alphabet = ["A", "B", "C", "D", "E", "F", "G" "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"] />
             <ul id="alpha-browse-childClass">
                 <li><a href="#" class="selected" data-alpha="all">All<span class="count-classes"> (n)</span></a></li>
-                <li><a href="#" data-alpha="a">A<span class="count-classes"> (n)</span></a></li>
-                <li><a href="#" data-alpha="b">B<span class="count-classes"> (n)</span></a></li>
-                <li><a href="#" data-alpha="c">C<span class="count-classes"> (n)</span></a></li>
-                <li><a href="#" data-alpha="d">D<span class="count-classes"> (n)</span></a></li>
-                <li><a href="#" data-alpha="e">E<span class="count-classes"> (n)</span></a></li>
-                <li><a href="#" data-alpha="f">F<span class="count-classes"> (n)</span></a></li>
-                <li><a href="#" data-alpha="g">G<span class="count-classes"> (n)</span></a></li>
-                <li><a href="#" data-alpha="h">H<span class="count-classes"> (n)</span></a></li>
-                <li><a href="#" data-alpha="i">I<span class="count-classes"> (n)</span></a></li>
-                <li><a href="#" data-alpha="j">J<span class="count-classes"> (n)</span></a></li>
-                <li><a href="#" data-alpha="k">K<span class="count-classes"> (n)</span></a></li>
-                <li><a href="#" data-alpha="l">L<span class="count-classes"> (n)</span></a></li>
-                <li><a href="#" data-alpha="m">M<span class="count-classes"> (n)</span></a></li>
-                <li><a href="#" data-alpha="n">N<span class="count-classes"> (n)</span></a></li>
-                <li><a href="#" data-alpha="o">O<span class="count-classes"> (n)</span></a></li>
-                <li><a href="#" data-alpha="p">P<span class="count-classes"> (n)</span></a></li>
-                <li><a href="#" data-alpha="q">Q<span class="count-classes"> (n)</span></a></li>
-                <li><a href="#" data-alpha="r">R<span class="count-classes"> (n)</span></a></li>
-                <li><a href="#" data-alpha="s">S<span class="count-classes"> (n)</span></a></li>
-                <li><a href="#" data-alpha="t">T<span class="count-classes"> (n)</span></a></li>
-                <li><a href="#" data-alpha="u">U<span class="count-classes"> (n)</span></a></li>
-                <li><a href="#" data-alpha="v">V<span class="count-classes"> (n)</span></a></li>
-                <li><a href="#" data-alpha="w">W<span class="count-classes"> (n)</span></a></li>
-                <li><a href="#" data-alpha="x">X<span class="count-classes"> (n)</span></a></li>
-                <li><a href="#" data-alpha="y">Y<span class="count-classes"> (n)</span></a></li>
-                <li><a href="#" data-alpha="z">Z<span class="count-classes"> (n)</span></a></li>
+                <#list alphabet as letter>
+                    <li><a href="#" data-alpha="${letter?lower_case}" title="Browse all individuals whose names start with ${letter}">${letter}</a></li>
+                </#list>
             </ul>
         </nav>
     </nav>
