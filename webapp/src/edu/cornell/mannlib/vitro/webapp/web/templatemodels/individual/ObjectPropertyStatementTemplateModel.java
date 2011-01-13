@@ -2,8 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -14,17 +12,16 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropObject
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjPropStmt;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
+import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 
 public class ObjectPropertyStatementTemplateModel extends PropertyStatementTemplateModel {
     
     private static final Log log = LogFactory.getLog(ObjectPropertyStatementTemplateModel.class); 
     
     private static final String EDIT_PATH = "edit/editRequestDispatch.jsp";
-    
-
 
     private Map<String, String> data;
     
@@ -36,12 +33,30 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
         super(subjectUri, propertyUri, policyHelper);
         
         this.data = data;
+        objectUri = data.get(objectKey);
+        setEditAccess(policyHelper);
+    }
+
+    /** 
+     * This method handles the special case where we are creating a DataPropertyStatementTemplateModel 
+     * outside the GroupedPropertyList. Specifically, it allows vitro:primaryLink and vitro:additionalLink 
+     * to be treated like data property statements and thus have editing links. (In a future version, 
+     * these properties will be replaced by vivo core ontology properties.) It could potentially be used 
+     * for other properties outside the property list as well.
+     */
+    ObjectPropertyStatementTemplateModel(String subjectUri, String propertyUri, 
+            VitroRequest vreq, EditingPolicyHelper policyHelper) {
+        super(subjectUri, propertyUri, policyHelper);
         
+        ObjectPropertyStatementDao opsDao = vreq.getWebappDaoFactory().getObjectPropertyStatementDao();
+        
+    }
+
+    private void setEditAccess(EditingPolicyHelper policyHelper) {
         // If the policyHelper is non-null, we are in edit mode, so create the list of editing permissions.
         // We do this now rather than in getEditUrl() and getDeleteUrl(), because getEditUrl() also needs to know
         // whether a delete is allowed.
         if (policyHelper != null) {
-            objectUri = data.get(objectKey);
             ObjectPropertyStatement objectPropertyStatement = new ObjectPropertyStatementImpl(subjectUri, propertyUri, objectUri);
             
             // Determine whether the statement can be edited
@@ -55,9 +70,8 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
             if (policyHelper.isAuthorizedAction(action)) {    
                 markDeletable();
             }
-        }
+        }        
     }
-
     
     /* Access methods for templates */
 

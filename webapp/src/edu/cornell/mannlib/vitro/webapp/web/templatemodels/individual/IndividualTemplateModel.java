@@ -16,8 +16,6 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep;
-import edu.cornell.mannlib.vitro.webapp.web.ViewFinder;
-import edu.cornell.mannlib.vitro.webapp.web.ViewFinder.ClassView;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 
 public class IndividualTemplateModel extends BaseTemplateModel {
@@ -68,6 +66,7 @@ public class IndividualTemplateModel extends BaseTemplateModel {
         return isPerson() ? getUrl(Route.VISUALIZATION_AJAX.path(), "uri", getUri()) : null;
     }
 
+    // ** Remove these when the new methods are written
     public String getImageUrl() {
         String imageUrl = individual.getImageUrl();
         return imageUrl == null ? null : getUrl(imageUrl);
@@ -133,7 +132,7 @@ public class IndividualTemplateModel extends BaseTemplateModel {
         links.addAll(additionalLinks);
         return links;      
     }
-
+    
     public GroupedPropertyList getPropertyList() {
         if (propertyList == null) {
             propertyList = new GroupedPropertyList(individual, vreq, policyHelper);

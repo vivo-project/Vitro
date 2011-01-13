@@ -33,11 +33,12 @@
 </#macro>
 
 <#-- Some properties usually display without a label. But if there's an add link, 
-we need to also show the property label. -->
-<#macro addLinkWithLabel property showEditingLinks>
+we need to also show the property label. If no label is specified, the property
+name will be used as the label. -->
+<#macro addLinkWithLabel property showEditingLinks label="${property.name?capitalize}">
     <#local addLink><@addLink property showEditingLinks /></#local>
     <#if addLink?has_content>
-        <h3>${property.name?capitalize} ${addLink}</h3> 
+        <h3>${label} ${addLink}</h3> 
     </#if>
 </#macro>
 
@@ -77,5 +78,3 @@ we need to also show the property label. -->
         <a href="${url}" title="delete this relationship"><img  class="delete-individual" src="${urls.images}/individual/deleteIcon.gif" alt="delete" /></a>
     </#if>
 </#macro>
-
-<#-- Macros for specific properties -->

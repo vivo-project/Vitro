@@ -161,27 +161,27 @@ ul#individual-phone li:first-child{
 .icon-phone, .icon-email{
     padding-right: 5px;
 }
-ul#individual-urls{
+ul.individual-urls{
     list-style-type: circle;
     margin-left: 10px;
     float: left;
     margin-bottom: 30px;
 }
-ul#individual-urls li{
+ul.individual-urls li{
     font-size: .875em;
     line-height: 1.2em;
 }
-ul#individual-urls li a{
+ul.individual-urls li a{
     color: #2485ae;
 }
-ul#individual-urls-people{
+ul.individual-urls-people{
     clear: both;
     margin-top: 20px;
     list-style: none;
     list-style-type: circle;
     padding-left: 24px;
 }
-ul#individual-urls-people li{
+ul.individual-urls-people li{
     font-size: .875em;
     line-height: 1.2em;
 }

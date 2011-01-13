@@ -43,11 +43,26 @@ public class ListedIndividualTemplateModel extends BaseTemplateModel {
         return models;
     }
     
+    private String getView(ClassView view) {
+        ViewFinder vf = new ViewFinder(view);
+        return vf.findClassView(individual, vreq);
+    }
+    
     /* Access methods for templates */
     
     public String getProfileUrl() {
         return UrlBuilder.getIndividualProfileUrl(individual, vreq.getWebappDaoFactory());
     }    
+
+    public String getImageUrl() {
+        String imageUrl = individual.getImageUrl();
+        return imageUrl == null ? null : getUrl(imageUrl);
+    }
+    
+    public String getThumbUrl() {
+        String thumbUrl = individual.getThumbUrl();
+        return thumbUrl == null ? null : getUrl(thumbUrl);
+    } 
     
     public Link getPrimaryLink() {
         Link primaryLink = null;
@@ -90,15 +105,6 @@ public class ListedIndividualTemplateModel extends BaseTemplateModel {
     
     public String getSearchView() {        
         return getView(ClassView.SEARCH);
-    }
-    
-    public String getDisplayView() {        
-        return getView(ClassView.DISPLAY);
-    }
-    
-    private String getView(ClassView view) {
-        ViewFinder vf = new ViewFinder(view);
-        return vf.findClassView(individual, vreq);
     }
     
 }

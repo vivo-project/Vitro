@@ -47,28 +47,6 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
         "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> \n" + 
         "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n" +
         "PREFIX afn: <http://jena.hpl.hp.com/ARQ/function#>";
-
-    /* This may be the intent behind JenaBaseDao.NONUSER_NAMESPACES, but that
-     * value does not contain all of these namespaces.
-     */
-    protected static final List<String> EXCLUDED_NAMESPACES = Arrays.asList(
-            "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#",
-            "http://vitro.mannlib.cornell.edu/ns/vitro/public#",
-            "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-            "http://www.w3.org/2000/01/rdf-schema#",
-            "http://www.w3.org/2002/07/owl#"            
-        ); 
-
-    /*
-     * This is a hack to throw out properties in the vitro, rdf, rdfs, and owl namespaces.
-     * It will be implemented in a better way in v1.3 (Editing and Display Configuration).
-     */
-    protected static String propertyFilters = "";
-    static {
-        for (String s : EXCLUDED_NAMESPACES) {
-            propertyFilters += "FILTER (afn:namespace(?property) != \"" + s + "\") \n";
-        }
-    }
     
     private DatasetWrapperFactory dwf;
     

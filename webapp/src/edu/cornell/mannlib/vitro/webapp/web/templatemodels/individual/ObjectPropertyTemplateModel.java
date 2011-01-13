@@ -94,6 +94,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         }
     }
     
+    
     protected String getQueryString() {
         return config.queryString;
     }

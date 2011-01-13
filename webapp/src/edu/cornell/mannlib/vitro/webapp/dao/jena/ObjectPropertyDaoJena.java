@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -48,10 +49,38 @@ import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
+import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 
 public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectPropertyDao {
     private static final Log log = LogFactory.getLog(ObjectPropertyDaoJena.class.getName());
 
+    /* This may be the intent behind JenaBaseDao.NONUSER_NAMESPACES, but that
+     * value does not contain all of these namespaces.
+     */
+    protected static final List<String> EXCLUDED_NAMESPACES = Arrays.asList(
+            //"http://vitro.mannlib.cornell.edu/ns/vitro/0.7#",
+            //"http://vitro.mannlib.cornell.edu/ns/vitro/public#",
+            "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+            "http://www.w3.org/2000/01/rdf-schema#",
+            "http://www.w3.org/2002/07/owl#"            
+        ); 
+    /*
+     * This is a hack to throw out properties in the vitro, rdf, rdfs, and owl namespaces.
+     * It will be implemented in a better way in v1.3 (Editing and Display Configuration).
+     */
+    protected static String propertyFilters = "";
+    static {
+        List<String> namespaceFilters = new ArrayList<String>();
+        for (String s : EXCLUDED_NAMESPACES) {
+            namespaceFilters.add("afn:namespace(?property) != \"" + s + "\"");
+        }
+        // A hack to include the vitro:primaryLink and vitro:additionalLink properties in the list
+//        namespaceFilters.add("( ?property = <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#primaryLink> ||" +
+//                               "?property = <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#additionalLink> ||" +
+//                               "afn:namespace(?property) != \"http://vitro.mannlib.cornell.edu/ns/vitro/0.7#\" )");
+        propertyFilters = "FILTER (" + StringUtils.join(namespaceFilters, " && \n") + ")\n";
+    }
+    
     protected static final String objectPropertyQueryString = 
         PREFIXES + "\n" +
         "SELECT DISTINCT ?property WHERE { \n" +
