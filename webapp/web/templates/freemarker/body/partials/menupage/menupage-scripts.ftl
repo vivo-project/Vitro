@@ -22,11 +22,11 @@ template variable with the domain name for an AJAX request with visualizations.
 </#list>
 
 <script type="text/javascript">
-var menupageData = {
-    baseUrl: '${domainName + urls.base}',
-    dataServiceUrl: '${domainName + urls.base}/dataservice?getLuceneIndividualsByVClass=1&vclassId=',
-    defaultBrowseVClassUri: '${firstNonEmptyVClass}'
-};
+    var menupageData = {
+        baseUrl: '${domainName + urls.base}',
+        dataServiceUrl: '${domainName + urls.base}/dataservice?getLuceneIndividualsByVClass=1&vclassId=',
+        defaultBrowseVClassUri: '${firstNonEmptyVClass}'
+    };
 </script>
 
 ${scripts.add("/js/menupage/browseByVClass.js")}
