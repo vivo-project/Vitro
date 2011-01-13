@@ -37,18 +37,6 @@
                 </h1>
             </#if>
         </header>
-         
-        <#-- Overview -->
-        <#assign overview = propertyGroups.getPropertyAndRemoveFromList("${core}overview")!> 
-        <#if overview?has_content> <#-- true when the property is in the list, even if not populated (when editing) -->
-            <@p.addLinkWithLabel overview editing />
-            <#list overview.statements as statement>
-                <p class="individual-overview">                   
-                    ${statement.value}
-                    <@p.editingLinks statement editing />
-                </p>
-            </#list>
-        </#if>
         
         <nav role="navigation">
             <ul id ="individual-tools" role="list">
@@ -64,21 +52,6 @@
                 
         <#-- Links -->
         <#include "individual-links.ftl">
-    </section>
-</section>
-
-<section id="publications-visualization" role="region">
-    <section id="sparklines-publications" role="region">
-         <#include "individual-sparklineVisualization.ftl">
-
-         <#-- RY Will we have an individual--foaf-organization.ftl template? If so, move this there and remove from here.
-         Also remove the method IndividualTemplateModel.isOrganization(). -->
-         <#if individual.organization >
-            <section id="temporal-graph" role="region">
-                <h3><img src="${urls.images}/visualization/temporal_vis_icon.jpg" width="25px" height="25px" /><a href="${urls.base}/visualization?vis=entity_comparison&uri=${individual.uri}">Temporal Graph</a></h3>
-            </section>      
-            <#--<div>VISMODE: ${individual.moniker}</div>-->
-        </#if>
     </section>
 </section>
 
