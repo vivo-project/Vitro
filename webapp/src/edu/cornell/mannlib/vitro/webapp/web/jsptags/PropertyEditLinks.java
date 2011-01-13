@@ -155,9 +155,6 @@ public class PropertyEditLinks extends TagSupport{
                 if (data == null) { // link to add a new value
                     links = doObjProp( subjectUri, predicateUri, policyToAccess(ids, policy, subjectUri, predicateUri), contextPath );
                 } else { // links to edit or delete an existing value  
-                    // RY **** May need new policyToAccess which gets the specific obj prop statement using the data as well as subject and predicate
-                    // This is NOT the correct object property statement - we need the link individual uri in data, instead of the link URL
-                    // Then we can combine this with doObjPropStmt
                     ObjectPropertyStatement prop = new ObjectPropertyStatementImpl(subjectUri, predicateUri, data);
                     links = doObjPropStmt( prop, policyToAccess(ids, policy, prop), contextPath );                       
                 }                    

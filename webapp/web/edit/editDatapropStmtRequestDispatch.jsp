@@ -61,6 +61,7 @@
     String vitroNsProp = (String) vreq.getParameter("vitroNsProp");
     
     boolean isVitroNsProp = false;
+    // On new Freemarker individual page, the editing link for rdfs:label doesn't get this url param attached
     if ( "true".equals(vitroNsProp) || predicateUri.equals(VitroVocabulary.LABEL) ) {
         isVitroNsProp = true;
     }

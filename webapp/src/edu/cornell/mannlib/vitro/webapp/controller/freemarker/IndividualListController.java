@@ -14,13 +14,13 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.EntityListController;
-import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.TabEntitiesController.PageRecord;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ExceptionResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModel;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ListedIndividualTemplateModel;
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.template.TemplateModel;
 
@@ -82,9 +82,9 @@ public class IndividualListController extends FreemarkerHttpServlet {
                 body.putAll(map);
 
                 List<Individual> inds = (List<Individual>)map.get("entities");
-                List<IndividualTemplateModel> indsTm = new ArrayList<IndividualTemplateModel>();
+                List<ListedIndividualTemplateModel> indsTm = new ArrayList<ListedIndividualTemplateModel>();
                 for(Individual ind : inds ){
-                    indsTm.add(new IndividualTemplateModel(ind,vreq));
+                    indsTm.add(new ListedIndividualTemplateModel(ind,vreq));
                 }
                 body.put("individuals", indsTm);
                 

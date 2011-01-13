@@ -77,3 +77,5 @@ we need to also show the property label. -->
         <a href="${url}" title="delete this relationship"><img  class="delete-individual" src="${urls.images}/individual/deleteIcon.gif" alt="delete" /></a>
     </#if>
 </#macro>
+
+<#-- Macros for specific properties -->

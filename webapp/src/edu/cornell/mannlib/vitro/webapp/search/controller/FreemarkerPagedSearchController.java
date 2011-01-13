@@ -74,7 +74,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.Html2Text;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.LinkTemplateModel;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModel;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ListedIndividualTemplateModel;
 import freemarker.template.Configuration;
 
 /**
@@ -334,7 +334,7 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
             }
 
             // Convert search result individuals to template model objects
-            body.put("individuals", IndividualTemplateModel
+            body.put("individuals", ListedIndividualTemplateModel
                     .getIndividualTemplateModelList(beans, vreq));
 
             body.put("querytext", qtxt);

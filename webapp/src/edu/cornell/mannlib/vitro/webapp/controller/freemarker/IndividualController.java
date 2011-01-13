@@ -50,16 +50,15 @@ import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditSubmission;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
-import edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep;
 import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQuery;
 import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQueryWrapper;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapper;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapperFactory;
 import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 import edu.cornell.mannlib.vitro.webapp.web.functions.IndividualLocalNameMethod;
-import edu.cornell.mannlib.vitro.webapp.web.functions.IndividualProfileUrlMethod;
 import edu.cornell.mannlib.vitro.webapp.web.jsptags.StringProcessorTag;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModel;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ListedIndividualTemplateModel;
 import freemarker.ext.beans.BeansWrapper;
 
 /**
@@ -165,7 +164,7 @@ public class IndividualController extends FreemarkerHttpServlet {
             if (relatedSubjectInd != null) {
                 map = new HashMap<String, Object>();
                 map.put("name", relatedSubjectInd.getName());
-                map.put("url", (new IndividualTemplateModel(relatedSubjectInd, vreq)).getProfileUrl());
+                map.put("url", (new ListedIndividualTemplateModel(relatedSubjectInd, vreq)).getProfileUrl());
                 String relatingPredicateUri = vreq.getParameter("relatingPredicateUri");
                 if (relatingPredicateUri != null) {
                     ObjectProperty relatingPredicateProp = opDao.getObjectPropertyByURI(relatingPredicateUri);
