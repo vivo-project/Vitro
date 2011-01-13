@@ -88,10 +88,10 @@ public class FileStorageUpdater implements FSUController {
 	private static final Log log = LogFactory.getLog(FileStorageUpdater.class);
 
 	/** How wide should a generated thumbnail image be (in pixels)? */
-	public static final int THUMBNAIL_WIDTH = 150;
+	public static final int THUMBNAIL_WIDTH = 200;
 
 	/** How high should a generated thumbnail image be (in pixels)? */
-	public static final int THUMBNAIL_HEIGHT = 150;
+	public static final int THUMBNAIL_HEIGHT = 200;
 
 	/** How is the main image referenced in the old scheme? */
 	public static final String IMAGEFILE = VitroVocabulary.vitroURI
