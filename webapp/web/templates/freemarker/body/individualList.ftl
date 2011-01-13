@@ -6,7 +6,7 @@
 
 <div class="contents">   
     <div class="individualList">
-     <p><a href="${redirecturl}">Download</a></p>
+     <p><a href="${redirecturl}">URL List</a></p>
         <h2>${title}</h2>
         <#if subtitle??>
             <h4>${subtitle}</h4>
