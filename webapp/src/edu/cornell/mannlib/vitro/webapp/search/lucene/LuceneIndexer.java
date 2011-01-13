@@ -37,13 +37,17 @@ public class LuceneIndexer implements IndexerIface {
 	
 	private final static Log log = LogFactory.getLog(LuceneIndexer.class.getName());	
     LinkedList<Obj2DocIface> obj2DocList = new LinkedList<Obj2DocIface>();
-    String indexDir = null;
+    String baseIndexDir = null;
+    String liveIndexDir = null;
     Analyzer analyzer = null;
     List<Searcher> searchers = Collections.EMPTY_LIST;
     IndexWriter writer = null;
     boolean indexing = false;
+    boolean fullRebuild = false;
     HashSet<String> urisIndexed;
     private LuceneIndexFactory luceneIndexFactory;
+    private String currentOffLineDir;
+    
 
     //JODA timedate library can use java date format strings.
     //http://java.sun.com/j2se/1.3/docs/api/java/text/SimpleDateFormat.html
@@ -70,8 +74,9 @@ public class LuceneIndexer implements IndexerIface {
     private static final IndexWriter.MaxFieldLength MAX_FIELD_LENGTH =
         IndexWriter.MaxFieldLength.UNLIMITED;
 
-    public LuceneIndexer(String indexDir, List<Searcher> searchers, Analyzer analyzer ) throws IOException{
-        this.indexDir = indexDir;
+    public LuceneIndexer(String baseIndexDir, String liveIndexDir,  List<Searcher> searchers, Analyzer analyzer ) throws IOException{
+        this.baseIndexDir = baseIndexDir;
+        this.liveIndexDir = liveIndexDir;
         this.analyzer = analyzer;
         if( searchers != null )
             this.searchers = searchers;
@@ -79,15 +84,26 @@ public class LuceneIndexer implements IndexerIface {
     }
     
     private synchronized void makeIndexIfNone() throws IOException {        
-        if( !indexExists( indexDir ) )
-            makeNewIndex();                           
+        if( !liveIndexExists() ){
+            log.debug("Making new index dir and initially empty lucene index  at " + liveIndexDir);
+            closeWriter();
+            
+            File baseDir = new File(baseIndexDir);
+            baseDir.mkdirs();
+            
+            File dir = new File(liveIndexDir);
+            dir.mkdirs();
+            
+            writer = new IndexWriter(liveIndexDir,analyzer,true,MAX_FIELD_LENGTH);
+            closeWriter();
+        }                                   
     }
 
-    private boolean indexExists(String dir){
+    private boolean liveIndexExists(){
         Directory fsDir = null;
         IndexSearcher isearcher = null ;
         try{
-            fsDir = FSDirectory.getDirectory(indexDir);
+            fsDir = FSDirectory.getDirectory(liveIndexDir);
             isearcher = new IndexSearcher(fsDir);
             return true;
         }catch(Exception ex){
@@ -100,10 +116,6 @@ public class LuceneIndexer implements IndexerIface {
                     fsDir.close();
             }catch(Exception ex){}
         }
-    }
-
-    public synchronized void setIndexDir(String dirName) {
-        indexDir = dirName;
     }
 
     public synchronized void addObj2Doc(Obj2DocIface o2d) {
@@ -124,7 +136,6 @@ public class LuceneIndexer implements IndexerIface {
     
     /**
      * Checks to see if indexing is currently happening.
-     * @return
      */
     public synchronized boolean isIndexing(){
         return indexing;
@@ -135,24 +146,35 @@ public class LuceneIndexer implements IndexerIface {
             log.info("LuceneIndexer.startIndexing() waiting...");
             try{ wait(); } catch(InterruptedException ex){}
         }
+        checkStartPreconditions();
         try {
-            log.info("Starting to index");
-            if( writer == null )
-                writer =  
-                    new IndexWriter(indexDir,analyzer,false, MAX_FIELD_LENGTH);
+            log.info("Starting to index");        
+            if( this.fullRebuild ){
+                String offLineDir = getOffLineBuildDir();
+                this.currentOffLineDir = offLineDir;
+                writer = new IndexWriter(offLineDir, analyzer, true, MAX_FIELD_LENGTH);
+            }else{                
+                writer = new IndexWriter(this.liveIndexDir, analyzer, false, MAX_FIELD_LENGTH);                
+            }
             indexing = true;
             urisIndexed = new HashSet<String>();
-        } catch(Throwable ioe){
-            try{
-                makeNewIndex();
-                indexing = true;
-            }catch(Throwable ioe2){
-                throw new IndexingException("LuceneIndexer.startIndexing() unable " +
-                        "to make indexModifier " + ioe2.getMessage());
-            }        
+        } catch(Throwable th){
+            throw new IndexingException("startIndexing() unable " +
+                         "to make IndexWriter:" + th.getMessage());
         }finally{
             notifyAll();
         }
+    }
+
+    private void checkStartPreconditions() {        
+        if( this.writer != null )
+            log.info("it is expected that the writer would " +
+            		"be null but it isn't");
+        if( this.currentOffLineDir != null)
+            log.info("it is expected that the current" +
+            		"OffLineDir would be null but it is " + currentOffLineDir);
+        if( indexing )
+            log.info("indexing should not be set to true just yet");        
     }
 
     public synchronized void endIndexing() {
@@ -165,7 +187,10 @@ public class LuceneIndexer implements IndexerIface {
             log.info("ending index");
             if( writer != null )
                 writer.optimize();
-                                    
+                     
+            if( this.fullRebuild )
+                bringRebuildOnLine();
+            
             //close the searcher so it will find the newly indexed documents
             for( Searcher s : searchers){
                 s.close();
@@ -176,11 +201,24 @@ public class LuceneIndexer implements IndexerIface {
         } catch (IOException e) {
             log.error("LuceneIndexer.endIndexing() - "
                     + "unable to optimize lucene index: \n" + e);
-        }finally{
-            closeModifier();
+        }finally{            
+            fullRebuild = false;
+            closeWriter();
             indexing = false;
             notifyAll();
         }
+    }
+
+    private synchronized void bringRebuildOnLine() {
+        closeWriter();
+        deleteDir(new File(liveIndexDir));
+        File offLineDir = new File(currentOffLineDir);
+        File liveDir = new File(liveIndexDir);
+        boolean success =  offLineDir.renameTo( liveDir );
+        if( ! success )
+            log.error("could not move off line index at " 
+                    + offLineDir.getAbsolutePath() + " to live index directory " 
+                    + liveDir.getAbsolutePath());
     }
 
     public synchronized Analyzer getAnalyzer(){
@@ -255,40 +293,13 @@ public class LuceneIndexer implements IndexerIface {
     }
 
     /**
-     * clear the index by deleting the directory and make a new empty index.
-     */
-    public synchronized void clearIndex() throws IndexingException{
-        
-        log.debug("Clearing the index at "+indexDir);
-        closeModifier();
-        deleteDir(new File(indexDir));
-        
-        try {
-            makeNewIndex();
-            for(Searcher s : searchers){
-                s.close();
-            }
-            //this is the call that replaces Searcher.close()
-            luceneIndexFactory.forceNewIndexSearcher();
-        } catch (IOException e) {
-            throw new IndexingException(e.getMessage());
-        }
-        notifyAll();
-    }
-
-    /**
      *  This will make a new directory and create a lucene index in it.
      */
     private synchronized void makeNewIndex() throws  IOException{
-        log.debug("Making new index dir and initially empty lucene index  at " + indexDir);
-        closeModifier();
-        File dir = new File(indexDir);
-        dir.mkdirs();
-        //This will wipe out an existing index because of the true flag
-        writer = new IndexWriter(indexDir,analyzer,true,MAX_FIELD_LENGTH);
+     
     }
-
-    private synchronized void closeModifier(){
+    
+    private synchronized void closeWriter(){
         if( writer != null )try{
             writer.commit();
             writer.close();
@@ -303,10 +314,23 @@ public class LuceneIndexer implements IndexerIface {
         writer = null;
     }   
 
+    private synchronized String getOffLineBuildDir(){
+        File baseDir = new File(baseIndexDir);
+        baseDir.mkdirs();
+        File tmpDir = new File( baseIndexDir + File.separator + "tmp" );
+        tmpDir.mkdir();        
+        File offLineBuildDir = new File( baseIndexDir + File.separator + "tmp"  + File.separator + "offLineRebuild" + System.currentTimeMillis());
+        offLineBuildDir.mkdir();
+        String dirName = offLineBuildDir.getAbsolutePath();
+        if( ! dirName.endsWith(File.separator) )
+            dirName = dirName + File.separator;
+        return dirName;            
+    }
+    
     public long getModified() {
         long rv = 0;
         try{
-            FSDirectory d = FSDirectory.getDirectory(indexDir);
+            FSDirectory d = FSDirectory.getDirectory(liveIndexDir);
             rv = IndexReader.lastModified(d);
         }catch(IOException ex){
             log.error("LuceneIndexer.getModified() - could not get modified time "+ ex);
@@ -334,6 +358,14 @@ public class LuceneIndexer implements IndexerIface {
 
     public void setLuceneIndexFactory(LuceneIndexFactory lif) {
         luceneIndexFactory = lif;    
+    }    
+
+    @Override
+    public synchronized void prepareForRebuild() throws IndexingException {
+        if( this.indexing )
+            log.error("Only an update will be performed, must call prepareForRebuild() before startIndexing()");
+        else
+            this.fullRebuild = true;        
     }
 
 }

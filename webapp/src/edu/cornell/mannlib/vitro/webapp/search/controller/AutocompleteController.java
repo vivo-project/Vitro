@@ -88,13 +88,11 @@ public class AutocompleteController extends FreemarkerHttpServlet{
             IndividualDao iDao = vreq.getWebappDaoFactory().getIndividualDao();                       
             
             int maxHitSize = defaultMaxSearchSize;
-
-            String indexDir = getIndexDir(getServletContext());
             
             String qtxt = vreq.getParameter(QUERY_PARAMETER_NAME);
             Analyzer analyzer = getAnalyzer(getServletContext());
             
-            Query query = getQuery(vreq, portalFlag, analyzer, indexDir, qtxt);             
+            Query query = getQuery(vreq, portalFlag, analyzer, qtxt);             
             log.debug("query for '" + qtxt +"' is " + query.toString());
 
             if (query == null ) {
@@ -161,13 +159,13 @@ public class AutocompleteController extends FreemarkerHttpServlet{
         }
     }
 
-    private String getIndexDir(ServletContext servletContext) throws SearchException {
-        Object obj = servletContext.getAttribute(LuceneSetup.INDEX_DIR);
-        if( obj == null || !(obj instanceof String) )
-            throw new SearchException("Could not get IndexDir for lucene index");
-        else
-            return (String)obj;
-    }
+//    private String getIndexDir(ServletContext servletContext) throws SearchException {
+//        Object obj = servletContext.getAttribute(LuceneSetup.INDEX_DIR);
+//        if( obj == null || !(obj instanceof String) )
+//            throw new SearchException("Could not get IndexDir for lucene index");
+//        else
+//            return (String)obj;
+//    }
 
     private Analyzer getAnalyzer(ServletContext servletContext) throws SearchException {
         Object obj = servletContext.getAttribute(LuceneSetup.ANALYZER);
@@ -178,7 +176,7 @@ public class AutocompleteController extends FreemarkerHttpServlet{
     }
 
     private Query getQuery(VitroRequest request, PortalFlag portalState,
-                       Analyzer analyzer, String indexDir, String querystr) throws SearchException{
+                       Analyzer analyzer, String querystr) throws SearchException{
         
         Query query = null;
         try {

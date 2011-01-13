@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -38,8 +37,6 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.WildcardQuery;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
@@ -71,7 +68,6 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQuery;
 import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQueryFactory;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneIndexFactory;
-import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneIndexer;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.SimpleLuceneHighlighter;
 import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
@@ -562,20 +558,12 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
             }
         }
         return typesInHits;
-    }
-    
-    private String getIndexDir(ServletContext servletContext) throws SearchException {
-        Object obj = servletContext.getAttribute(LuceneSetup.INDEX_DIR);
-        if( obj == null || !(obj instanceof String) )
-            throw new SearchException("Could not get IndexDir for luecene index");
-        else
-            return (String)obj;
-    }
+    }       
 
     private Analyzer getAnalyzer(ServletContext servletContext) throws SearchException {
         Object obj = servletContext.getAttribute(LuceneSetup.ANALYZER);
         if( obj == null || !(obj instanceof Analyzer) )
-            throw new SearchException("Could not get anlyzer");
+            throw new SearchException("Could not get analyzer");
         else
             return (Analyzer)obj;        
     }
@@ -720,22 +708,6 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
         }
     }
 
-    private synchronized IndexSearcher getIndexSearcher(String indexDir) {
-        if( searcher == null ){
-            try {                
-                Directory fsDir = FSDirectory.getDirectory(indexDir);
-                searcher = new IndexSearcher(fsDir);
-            } catch (IOException e) {
-                log.error("LuceneSearcher: could not make indexSearcher "+e);
-                log.error("It is likely that you have not made a directory for the lucene index.  "+
-                          "Create the directory indicated in the error and set permissions/ownership so"+
-                          " that the tomcat server can read/write to it.");
-                //The index directory is created by LuceneIndexer.makeNewIndex()
-            }
-        }
-        return searcher;
-    }
-    
     private List<Individual> highlightBeans(List<Individual> beans, 
             DataPropertyDao dpDao, ObjectPropertyDao opDao, VitroHighlighter highlighter) {
         if( beans == null ){

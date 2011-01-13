@@ -75,15 +75,15 @@ public class LuceneSetupCJK implements javax.servlet.ServletContextListener {
             objectPropertyBlacklist.add("http://www.w3.org/2002/07/owl#differentFrom");
             context.setAttribute(LuceneSetup.SEARCH_OBJECTPROPERTY_BLACKLIST, objectPropertyBlacklist);
             
-            //here we want to put the LuceneIndex object into the application scope
-            LuceneIndexer indexer = new LuceneIndexer(indexDir, null, getAnalyzer());            
-            context.setAttribute(LuceneSetup.ANALYZER, getAnalyzer());
-            context.setAttribute(LuceneSetup.INDEX_DIR, indexDir);
-            indexer.addObj2Doc(new Entity2LuceneDoc());
-
             //This is where to get a LucenIndex from.  The indexer will
-            //need to reference this to notify it of updates to the index           
-            LuceneIndexFactory lif = LuceneIndexFactory.getLuceneIndexFactoryFromContext(context);
+            //need to reference this to notify it of updates to the index
+            LuceneIndexFactory lif = LuceneIndexFactory.setup(context, indexDir);            
+            String liveIndexDir = lif.getLiveIndexDir(context);
+            
+            //here we want to put the LuceneIndex object into the application scope
+            LuceneIndexer indexer = new LuceneIndexer(indexDir, liveIndexDir, null, getAnalyzer());            
+            context.setAttribute(LuceneSetup.ANALYZER, getAnalyzer());
+            indexer.addObj2Doc(new Entity2LuceneDoc());                      
             indexer.setLuceneIndexFactory(lif);
             
             //This is where the builder gets the list of places to try to 

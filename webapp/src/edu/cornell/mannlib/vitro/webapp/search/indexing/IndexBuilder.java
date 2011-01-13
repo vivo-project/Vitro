@@ -280,13 +280,14 @@ public class IndexBuilder {
      * to false, and a check is made before adding, it will work fine; but
      * checking if an object is on the index is slow.
      */
-    private void doBuild(List sourceIterators, Collection<Individual> deletes, boolean wipeIndexFirst, boolean newDocs ){
+    private void doBuild(List sourceIterators, Collection<Individual> deletes, boolean forceNewIndex, boolean newDocs ){
         try {
+            if( forceNewIndex )
+                indexer.prepareForRebuild();
+            
             indexer.startIndexing();
 
-            if( wipeIndexFirst )
-                indexer.clearIndex();
-            else{
+            if( ! forceNewIndex ){                
             	for(Individual deleteMe : deletes ){
             		indexer.removeFromIndex(deleteMe);
             	}

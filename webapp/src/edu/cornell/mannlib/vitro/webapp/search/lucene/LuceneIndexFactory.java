@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.search.lucene;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -17,10 +18,16 @@ import edu.cornell.mannlib.vitro.webapp.search.SearchException;
 
 public class LuceneIndexFactory {
     
-	IndexSearcher searcher = null;	
+	IndexSearcher searcher = null;
+	String baseIndexDirName = null;
+	
 	private static final Log log = LogFactory.getLog(LuceneIndexFactory.class.getName());
 
 	public static final String LUCENE_INDEX_FACTORY= "LuceneIndexFactory";
+	
+	public LuceneIndexFactory(String baseIndexDirName){
+	    this.baseIndexDirName = baseIndexDirName;
+	}
 	
 	/**
 	 * Get a lucene IndexSearch. This may return null.
@@ -30,11 +37,7 @@ public class LuceneIndexFactory {
     }
     
     public static LuceneIndexFactory getLuceneIndexFactoryFromContext(ServletContext context){
-        Object obj = context.getAttribute(LUCENE_INDEX_FACTORY);
-        if( obj == null ){
-            setup(context);
-            obj = context.getAttribute(LUCENE_INDEX_FACTORY);
-        }
+        Object obj = context.getAttribute(LUCENE_INDEX_FACTORY);        
         if( obj == null ){
             log.error("cannot get LuceneIndexFactory from context.  Search is not setup correctly");
             return null;
@@ -48,11 +51,13 @@ public class LuceneIndexFactory {
     }
     
     
-    public static void setup(ServletContext context){
+    public static LuceneIndexFactory setup(ServletContext context, String baseIndexDirName){
         LuceneIndexFactory lif = (LuceneIndexFactory)context.getAttribute(LuceneIndexFactory.LUCENE_INDEX_FACTORY);
         if( lif == null ){
-            context.setAttribute(LuceneIndexFactory.LUCENE_INDEX_FACTORY, new LuceneIndexFactory());
+            lif = new LuceneIndexFactory(baseIndexDirName);
+            context.setAttribute(LuceneIndexFactory.LUCENE_INDEX_FACTORY, lif);
         }   
+        return lif;        
     }   
         
     /**
@@ -68,16 +73,17 @@ public class LuceneIndexFactory {
     
 	private synchronized IndexSearcher innerGetIndexSearcher(ServletContext context) {
 		if (searcher == null ) {	    
-			String indexDir = getIndexDir( context );
-			if( indexDir != null ){
+			String liveDir = getLiveIndexDir( context );
+			if( liveDir != null ){
 				try {
-					Directory fsDir = FSDirectory.getDirectory(indexDir);
+					Directory fsDir = FSDirectory.getDirectory(liveDir);
 					searcher = new IndexSearcher(fsDir);
 				} catch (IOException e) {
-					log.error("could not make indexSearcher " + e);
+				    String base = getBaseIndexDir();
+					log.error("could not make IndexSearcher " + e);
 					log.error("It is likely that you have not made a directory for the lucene index.  "
-								+ "Create the directory indicated in the error and set permissions/ownership so"
-								+ " that the tomcat server can read and write to it.");
+								+ "Create the directory " + base + " and set permissions/ownership so"
+								+ " that the tomcat process can read and write to it.");
 				}		
 			}else{
 			    log.error("Could not create IndexSearcher because index directory was null. It may be that the LucenSetup.indexDir is " +
@@ -87,16 +93,20 @@ public class LuceneIndexFactory {
 		return searcher;
 	}
 		
-	private String getIndexDir(ServletContext servletContext){
-		Object obj = servletContext.getAttribute(LuceneSetup.INDEX_DIR);
-		if (obj == null ){
-			log.error("could not find " + LuceneSetup.INDEX_DIR + " in context. Search is not configured correctly.");
-			return null;
-		}else if ( !(obj instanceof String) ){
-			log.error( LuceneSetup.INDEX_DIR + " from context was not a String. Search is not configured correctly.");
-			return null;
-		}else
-			return (String) obj;
+	protected String getBaseIndexDir(){
+	    if( this.baseIndexDirName == null )
+	        log.error("LucenIndexFactory was not setup correctly, it must have a value for baseIndexDir");
+		return this.baseIndexDirName;
 	}
+	
+	protected String getLiveIndexDir(ServletContext servletContext){
+	    String base = getBaseIndexDir();
+	    if( base == null )
+	        return null;
+	    else
+	        return base + File.separator + "live";	    
+	}
+	
+	
 		
 }
