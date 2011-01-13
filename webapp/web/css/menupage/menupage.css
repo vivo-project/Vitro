@@ -217,8 +217,9 @@ ul#find-filters a{
 /* BROWSE CLASSES ------>  */
 ul#browse-childClasses{
     float: left;
-    width: 284px;
-    margin-left: 30px;
+    width: 255px;
+    margin-left: 15px;
+    margin-bottom: 20px;
 }
 ul#browse-childClasses li{
     display: block;
@@ -240,33 +241,31 @@ ul#browse-childClasses a{
 /* ALPHA BROWSE------>  */
 ul#alpha-browse-childClass{
     float: left;
-    width: 77px;
-    margin-bottom: 20px;
+    width: 620px;
+    padding-left: 10px;
 }
 ul#alpha-browse-childClass li{
-    display: block;
-    width: 67px;
-    font-size: 1.125em;
-    height: 35px;
-    line-height: 35px;
+    float: left;
+    margin-right: 4px;
+    padding-top: 8px;
 }
 ul#alpha-browse-childClass li:last-child{    
     border-bottom: 0;
 }
 ul#alpha-browse-childClass a{
     display: block;
-    width: 57px;
     height: 35px;
-    text-align: center;
-    margin-left: 5px;
-    padding-left: 10px;
+    margin-left: 0;
+    padding-left: 8px;
+    width: 10px;
 }
 /* BROWSE INDIVIDUALS------>  */
 #individuals-in-childClass{
-    float: left;
+    float: right;
     width: 45%;
     padding-bottom: 30px;
     margin-bottom: 30px;
+    margin-right: 17px;
 }
 #individuals-in-childClass h3{
     padding: 10px 0 10px 30px;
