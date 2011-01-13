@@ -26,29 +26,41 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
     private static final Log log = LogFactory.getLog(DataPropertyStatementTemplateModel.class); 
     private static final String EDIT_PATH = "edit/editDatapropStmtRequestDispatch.jsp";  
     
-    private Literal value;
+    private String value = null;
     
     // Used for editing
     private String dataPropHash = null;
 
     DataPropertyStatementTemplateModel(String subjectUri, String propertyUri, 
-            Literal value, EditingPolicyHelper policyHelper) {
+            Literal literal, EditingPolicyHelper policyHelper) {
         super(subjectUri, propertyUri, policyHelper);
         
-        this.value = value;
-        setEditAccess(value, policyHelper);
+        this.value = literal.getLexicalForm();
+        setEditAccess(literal, policyHelper);
 
     }
     
+    /** 
+     * This method handles the special case where we are creating a DataPropertyStatementTemplateModel outside the GroupedPropertyList.
+     * Specifically, it allows rdfs:label to be treated like a data property statement and thus have editing links. It could potentially
+     * be used for other properties outside the property list as well.
+     */
     DataPropertyStatementTemplateModel(String subjectUri, String propertyUri, VitroRequest vreq, EditingPolicyHelper policyHelper) {
         super(subjectUri, propertyUri, policyHelper);
         
         DataPropertyStatementDao dpsDao = vreq.getWebappDaoFactory().getDataPropertyStatementDao();
-        List<Literal> values = dpsDao.getDataPropertyValuesForIndividualByProperty(subjectUri, propertyUri);
+        List<Literal> literals = dpsDao.getDataPropertyValuesForIndividualByProperty(subjectUri, propertyUri);
         
-        value = values.get(0);
-        setEditAccess(value, policyHelper);
-        
+        // Make sure the subject has a value for this property 
+        if (literals.size() > 0) {
+            Literal literal = literals.get(0);
+            value = literal.getLexicalForm();
+            setEditAccess(literal, policyHelper);
+        } 
+    }
+    
+    protected void setValue(String value) {
+        this.value = value;
     }
     
     private void setEditAccess(Literal value, EditingPolicyHelper policyHelper) {
@@ -80,7 +92,7 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
     /* Access methods for templates */
     
     public String getValue() {
-        return value.getLexicalForm();
+        return value;
     }
     
     public String getEditUrl() {

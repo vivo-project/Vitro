@@ -188,8 +188,13 @@ public class IndividualTemplateModel extends BaseTemplateModel {
     }
     
     public DataPropertyStatementTemplateModel getNameStatement() {
-        String propertyUri = VitroVocabulary.LABEL;
-        return new DataPropertyStatementTemplateModel(getUri(), propertyUri, vreq, policyHelper);
+        String propertyUri = VitroVocabulary.LABEL; // rdfs:label
+        DataPropertyStatementTemplateModel dpstm = new DataPropertyStatementTemplateModel(getUri(), propertyUri, vreq, policyHelper);
+        // If the individual has no rdfs:label, return the local name. It will correctly not be editable.
+        if (dpstm.getValue() == null) {
+            dpstm.setValue(getLocalName());
+        }
+        return dpstm;
     }
     
     public String getMoniker() {
