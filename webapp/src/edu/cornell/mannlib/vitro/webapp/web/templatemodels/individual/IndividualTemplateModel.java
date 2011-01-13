@@ -175,6 +175,20 @@ public class IndividualTemplateModel extends BaseTemplateModel {
     public boolean getShowAdminPanel() {
         return loginStatusBean.isLoggedInAtLeast(LoginStatusBean.EDITOR);
     }
+ 
+    public DataPropertyStatementTemplateModel getNameStatement() {
+        String propertyUri = VitroVocabulary.LABEL; // rdfs:label
+        DataPropertyStatementTemplateModel dpstm = new DataPropertyStatementTemplateModel(getUri(), propertyUri, vreq, policyHelper);
+        
+        // If the individual has no rdfs:label, return the local name. It will not be editable (this replicates previous behavior;
+        // perhaps we would want to allow a label to be added. But such individuals do not usually have their profiles viewed or
+        // edited directly.
+        if (dpstm.getValue() == null) {
+            dpstm.setValue(getLocalName());
+        }
+        
+        return dpstm;
+    }
     
     /* These methods simply forward to the methods of the wrapped individual. It would be desirable to 
      * implement a scheme for proxying or delegation so that the methods don't need to be simply listed here. 
@@ -186,17 +200,7 @@ public class IndividualTemplateModel extends BaseTemplateModel {
     public String getName() {           
         return individual.getName();
     }
-    
-    public DataPropertyStatementTemplateModel getNameStatement() {
-        String propertyUri = VitroVocabulary.LABEL; // rdfs:label
-        DataPropertyStatementTemplateModel dpstm = new DataPropertyStatementTemplateModel(getUri(), propertyUri, vreq, policyHelper);
-        // If the individual has no rdfs:label, return the local name. It will correctly not be editable.
-        if (dpstm.getValue() == null) {
-            dpstm.setValue(getLocalName());
-        }
-        return dpstm;
-    }
-    
+
     public String getMoniker() {
         return individual.getMoniker();
     }

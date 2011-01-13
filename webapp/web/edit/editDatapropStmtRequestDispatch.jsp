@@ -12,6 +12,7 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Portal" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary" %>
 <%@ page import="java.util.HashMap" %>
 <%@ page import="org.apache.commons.logging.Log" %>
 <%@ page import="org.apache.commons.logging.LogFactory" %>
@@ -58,7 +59,11 @@
     String command      = vreq.getParameter("cmd");
     
     String vitroNsProp = (String) vreq.getParameter("vitroNsProp");
-    boolean isVitroNsProp = "true".equals(vitroNsProp) ? true : false;
+    
+    boolean isVitroNsProp = false;
+    if ( "true".equals(vitroNsProp) || predicateUri.equals(VitroVocabulary.LABEL) ) {
+        isVitroNsProp = true;
+    }
 
     if( subjectUri == null || subjectUri.trim().length() == 0 ) {
         log.error("required subjectUri parameter missing");
@@ -87,7 +92,6 @@
     DataProperty dataproperty = wdf.getDataPropertyDao().getDataPropertyByURI( predicateUri );
     if( dataproperty == null) {
         // No dataproperty will be returned for a vitro ns prop, but we shouldn't throw an error.
-        // RY This is not necessarily true...
         if (!isVitroNsProp) {
             log.error("Could not find data property '"+predicateUri+"' in model");
             throw new Error("editDatapropStmtRequest.jsp: Could not find DataProperty in model: " + predicateUri);

@@ -79,7 +79,8 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
             }      
             
             // Determine whether the statement can be deleted
-            if ( ! propertyUri.equals(VitroVocabulary.LABEL)) {
+            // Hack for rdfs:label - the policy doesn't prevent deletion
+            if ( ! propertyUri.equals(VitroVocabulary.LABEL) ) {
                 action = new DropDataPropStmt(dps);
                 if (policyHelper.isAuthorizedAction(action)) {
                     markDeletable();
@@ -104,10 +105,6 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
                     "datapropKey", dataPropHash);
             if (! isDeletable()) {
                 params.put("deleteProhibited", "prohibited");
-            }
-            //
-            if (propertyUri.equals(VitroVocabulary.LABEL)) {
-                params.put("vitroNsProp", "true");
             }
             editUrl = UrlBuilder.getUrl(EDIT_PATH, params);    
         }
