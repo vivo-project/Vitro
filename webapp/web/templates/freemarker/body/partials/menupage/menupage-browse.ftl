@@ -23,7 +23,7 @@
         <nav role="navigation">
             <#assign alphabet = ["A", "B", "C", "D", "E", "F", "G" "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"] />
             <ul id="alpha-browse-childClass">
-                <li><a href="#" class="selected" data-alpha="all">All<span class="count-classes"> (n)</span></a></li>
+                <li><a href="#" class="selected" data-alpha="all">All</a></li>
                 <#list alphabet as letter>
                     <li><a href="#" data-alpha="${letter?lower_case}" title="Browse all individuals whose names start with ${letter}">${letter}</a></li>
                 </#list>
