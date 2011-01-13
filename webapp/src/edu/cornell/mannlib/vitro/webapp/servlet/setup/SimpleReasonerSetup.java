@@ -2,6 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
+import java.sql.Connection;
+
+import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -14,11 +17,15 @@ import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.sdb.SDBFactory;
+import com.hp.hpl.jena.sdb.Store;
 import com.hp.hpl.jena.sdb.StoreDesc;
+import com.hp.hpl.jena.sdb.sql.SDBConnection;
 import com.hp.hpl.jena.sdb.store.DatabaseType;
 import com.hp.hpl.jena.sdb.store.LayoutType;
 import com.hp.hpl.jena.vocabulary.OWL;
 
+import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDBGraphGenerator;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RegeneratingGraph;
@@ -39,7 +46,7 @@ public class SimpleReasonerSetup implements ServletContextListener {
 	static final String JENA_INF_MODEL_SCRATCHPAD = "http://vitro.mannlib.cornell.edu/default/vitro-kb-inf-scratchpad";
 
 	public void contextInitialized(ServletContextEvent sce) {
-		
+	    
 		try {	
 		    // set up Pellet reasoning for the TBox	
 			
@@ -74,10 +81,26 @@ public class SimpleReasonerSetup implements ServletContextListener {
      
 	       // set up simple reasoning for the ABox
 	    	    	
-	        BasicDataSource bds = JenaDataSourceSetupBase.getApplicationDataSource(sce.getServletContext());
-            Model rebuildModel = makeDBModel(bds, JENA_INF_MODEL_REBUILD, JenaDataSourceSetupBase.DB_ONT_MODEL_SPEC, TripleStoreType.SDB);            
-            Model scratchModel = makeDBModel(bds, JENA_INF_MODEL_SCRATCHPAD, JenaDataSourceSetupBase.DB_ONT_MODEL_SPEC, TripleStoreType.SDB); 
-            
+	        ServletContext ctx = sce.getServletContext();
+	        BasicDataSource bds = JenaDataSourceSetupBase
+	                                .getApplicationDataSource(ctx);
+	        String dbType = ConfigurationProperties.getProperty( // database type
+                    "VitroConnection.DataSource.dbtype","MySQL");
+	        
+	        	        
+            Model rebuildModel = JenaDataSourceSetupBase.makeDBModel(
+                    bds, 
+                    JENA_INF_MODEL_REBUILD, 
+                    JenaDataSourceSetupBase.DB_ONT_MODEL_SPEC, 
+                    TripleStoreType.SDB, 
+                    dbType);            
+            Model scratchModel = JenaDataSourceSetupBase.makeDBModel(
+                    bds, 
+                    JENA_INF_MODEL_SCRATCHPAD, 
+                    JenaDataSourceSetupBase.DB_ONT_MODEL_SPEC, 
+                    TripleStoreType.SDB, 
+                    dbType); 
+	        
 	        
 	        // the simple reasoner will register itself as a listener to the ABox assertions
 	        SimpleReasoner simpleReasoner = new SimpleReasoner(unionOms.getTBoxModel(), assertionsOms.getABoxModel(), inferencesOms.getABoxModel(), rebuildModel, scratchModel);
@@ -97,29 +120,4 @@ public class SimpleReasonerSetup implements ServletContextListener {
 		// nothing to do
 	}
   
-   protected Model makeDBModel(BasicDataSource ds, String jenaDbModelName, OntModelSpec jenaDbOntModelSpec, TripleStoreType storeType) {
-	   String DB = "MySQL";    // database type
-	   Model dbModel = null;
-       try {
-           //  open the db model
-            try {
-                Graph g = null;
-                switch (storeType) {
-                	case RDB:
-                		g = new RegeneratingGraph(new RDBGraphGenerator(ds, DB, jenaDbModelName)); break;
-                	case SDB:
-                		StoreDesc desc = new StoreDesc(LayoutType.LayoutTripleNodesHash, DatabaseType.MySQL);
-                    	g = new RegeneratingGraph(new SDBGraphGenerator(ds, desc, jenaDbModelName)); break;
-                	default: throw new RuntimeException ("Unsupported store type " + storeType); 
-                }
-                dbModel = ModelFactory.createModelForGraph(g);
-                log.debug("Using database at "+ds.getUrl());
-            } catch (Throwable t) {
-                t.printStackTrace();
-            }
-       } catch (Throwable t) {
-           t.printStackTrace();
-       }
-       return dbModel;
-   }
 }

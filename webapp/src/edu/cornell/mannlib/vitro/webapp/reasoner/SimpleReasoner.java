@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.reasoner;
 
+import javax.servlet.ServletContext;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -378,6 +380,28 @@ public class SimpleReasoner extends StatementListener {
 			inferenceModel.leaveCriticalSection();
 		}
 	}
+	
+	private boolean recomputing = false;
+	
+	/**
+	 * Returns true if the reasoner is in the process of recomputing all
+	 * inferences.
+	 */
+	public boolean isRecomputing() {
+	    return recomputing;
+	}
+	
+	/**
+	 * Recompute all inferences.
+	 */
+	public synchronized void recompute() {
+	    recomputing = true;
+	    try {
+	        recomputeABox();
+	    } finally {
+	        recomputing = false;
+	    }
+	}
 
 	/*
 	 * Recompute the entire ABox inference graph. The new 
@@ -388,7 +412,7 @@ public class SimpleReasoner extends StatementListener {
 	 * memory since we are supporting very large ABox 
 	 * inference models.	  
 	 */
-	public void recompute(OntClass subClass, OntClass superClass) {
+	public synchronized void recomputeABox() {
 	
 		// recompute the inferences 
 		inferenceRebuildModel.enterCriticalSection(Lock.WRITE);	
@@ -571,4 +595,15 @@ public class SimpleReasoner extends StatementListener {
 			aboxModel.leaveCriticalSection();
 		}	
 	}
-  }
+	
+	public static SimpleReasoner getSimpleReasonerFromServletContext(
+	                                                    ServletContext ctx) {
+	    Object simpleReasoner = ctx.getAttribute("simpleReasoner");
+	    if (simpleReasoner instanceof SimpleReasoner) {
+	        return (SimpleReasoner) simpleReasoner;
+	    } else {
+	        return null;
+	    }
+	}
+	
+}

@@ -40,7 +40,7 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
             JenaDataSourceSetupBase.class);
 
     protected final static int DEFAULT_MAXWAIT = 10000, // ms
-            DEFAULT_MAXACTIVE = 32,
+            DEFAULT_MAXACTIVE = 40,
             DEFAULT_MAXIDLE = 10,
             DEFAULT_TIMEBETWEENEVICTIONS = 30 * 60 * 1000, // ms
             DEFAULT_TESTSPEREVICTION = 3,
@@ -222,8 +222,21 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
                        + maxActiveStr + " as an integer");
                }
        }
+       int maxIdleInt = (maxActiveInt > DEFAULT_MAXACTIVE) 
+               ? maxActiveInt / 4
+               : DEFAULT_MAXIDLE;
+       String maxIdleStr = ConfigurationProperties
+               .getProperty("VitroConnection.DataSource.pool.maxIdle");   
+       if (!StringUtils.isEmpty(maxIdleStr)) {
+           try {
+               maxIdleInt = Integer.parseInt(maxIdleStr);    
+           } catch (NumberFormatException nfe) {
+               log.error("Unable to parse connection pool maxIdle setting " 
+                       + maxIdleStr + " as an integer");
+           }
+       }
        ds.setMaxActive(maxActiveInt);
-       ds.setMaxIdle(DEFAULT_MAXIDLE);
+       ds.setMaxIdle(maxIdleInt);
        ds.setMaxWait(DEFAULT_MAXWAIT);
        ds.setValidationQuery(VALIDATIONQUERY);
        ds.setTestOnBorrow(DEFAULT_TESTONBORROW);
@@ -253,9 +266,17 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
    }
    
    protected Model makeDBModel(BasicDataSource ds, 
+           String jenaDbModelName, 
+           OntModelSpec jenaDbOntModelSpec, 
+           TripleStoreType storeType) {
+       return makeDBModel (
+               ds, jenaDbModelName, jenaDbOntModelSpec, storeType, DB);
+   }
+   
+   public static Model makeDBModel(BasicDataSource ds, 
                                String jenaDbModelName, 
                                OntModelSpec jenaDbOntModelSpec, 
-                               TripleStoreType storeType) {
+                               TripleStoreType storeType, String dbType) {
        Model dbModel = null;
        try {
            //  open the db model
@@ -265,7 +286,7 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
             	case RDB:
             		g = new RegeneratingGraph(
             		        new RDBGraphGenerator(
-            		                ds, DB, jenaDbModelName)); 
+            		                ds, dbType, jenaDbModelName)); 
             		break;
             	case SDB:
             	    String layoutStr = ConfigurationProperties.getProperty(
@@ -397,6 +418,13 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     public static void setVitroJenaSDBModelMaker(VitroJenaSDBModelMaker vsmm, 
                                                  ServletContextEvent sce){
     	sce.getServletContext().setAttribute(sdbModelMaker, vsmm);
+    }
+    
+    public static boolean isSDBActive() {
+        String tripleStoreTypeStr = 
+            ConfigurationProperties.getProperty(
+                    "VitroConnection.DataSource.tripleStoreType", "RDB");
+        return ("SDB".equals(tripleStoreTypeStr)); 
     }
     
     protected VitroJenaModelMaker getVitroJenaModelMaker(){

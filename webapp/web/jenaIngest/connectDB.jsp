@@ -1,6 +1,8 @@
 <%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
 
-    <h2><a class="ingestMenu" href="ingest">Ingest Menu</a> > Connect to Jena Database</h2>
+<%@ taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
+    
+<%@page import="java.util.List"%><h2><a class="ingestMenu" href="ingest">Ingest Menu</a> > Connect to Jena Database</h2>
 
     <form action="ingest" method="post">
         <input type="hidden" name="action" value="connectDB"/>
@@ -20,11 +22,20 @@
 			<label for="tripleStoreRDB">Jena RDB</label>
 		<input id="tripleStoreSDB" name="tripleStore" type="radio" value="SDB"/>
 			<label for="tripleStoreRDB">Jena SDB (hash layout)</label>
-
     
         <select name="dbType">
-            <option value="MySQL">MySQL</option>
+            <c:forEach items="${requestScope.dbTypes}" var="typeName">
+                <c:choose>
+                    <c:when test="${typeName eq 'MySQL'}">
+                        <option value="${typeName}" selected="selected">${typeName}</option>
+                    </c:when>
+                    <c:otherwise>
+                        <option value="${typeName}">${typeName}</option>
+                    </c:otherwise>
+                </c:choose>
+            </c:forEach>
         </select>
+
     <p>database type</p>
 
     <input id="submit" type="submit" value="Connect Database" />

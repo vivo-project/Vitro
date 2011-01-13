@@ -8,8 +8,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -353,6 +355,9 @@ public class JenaIngestController extends BaseEditController {
 				request.setAttribute("title","Ingest Menu");
 				request.setAttribute("bodyJsp",INGEST_MENU_JSP);
 			} else {
+			    List<String> dbTypes = DatabaseType.allNames();
+			    Collections.sort(dbTypes, new CollationSort());
+			    request.setAttribute("dbTypes", dbTypes);
 				request.setAttribute("title", "Connect Jena Database");
 				request.setAttribute("bodyJsp",CONNECT_DB_JSP);
 			}
@@ -863,9 +868,9 @@ public class JenaIngestController extends BaseEditController {
 		if ("MySQL".equals(dbType)) {
 			jdbcUrl += (jdbcUrl.contains("?")) ? "&" : "?";
 			jdbcUrl += "useUnicode=yes&characterEncoding=utf8";
-			dbTypeObj = DatabaseType.MySQL;
-			JDBC.loadDriverMySQL();
 		}
+		dbTypeObj = DatabaseType.fetch(dbType);
+        loadDriver(dbTypeObj);
 		if ("SDB".equals(tripleStore)) {
 			StoreDesc storeDesc = new StoreDesc(LayoutType.LayoutTripleNodesHash,dbTypeObj) ;
         	SDBConnection conn = new SDBConnection(jdbcUrl, username, password) ; 
@@ -877,6 +882,26 @@ public class JenaIngestController extends BaseEditController {
 	        VitroJenaModelMaker vjmm = new VitroJenaModelMaker(jdbcUrl, username, password, dbType);
 	        vreq.getSession().setAttribute("vitroJenaModelMaker",vjmm);
 		}
+	}
+	
+	private void loadDriver(DatabaseType dbType) {
+        if (DatabaseType.MySQL.equals(dbType)) {
+            JDBC.loadDriverMySQL();
+        } else if (DatabaseType.DB2.equals(dbType)) {
+            JDBC.loadDriverDB2();
+        } else if (DatabaseType.Derby.equals(dbType)) {
+            JDBC.loadDriverDerby();
+        } else if (DatabaseType.H2.equals(dbType)) {
+            JDBC.loadDriverH2();
+        } else if (DatabaseType.HSQLDB.equals(dbType)) {
+            JDBC.loadDriverHSQL();
+        } else if (DatabaseType.Oracle.equals(dbType)) {
+            JDBC.loadDriverOracle();
+        } else if (DatabaseType.PostgreSQL.equals(dbType)) {
+            JDBC.loadDriverPGSQL();
+        } else if (DatabaseType.SQLServer.equals(dbType)) {
+            JDBC.loadDriverSQLServer();
+        }
 	}
 	
 	/*public void doExecuteCsv2Rdf(VitroRequest vreq) {
@@ -1191,6 +1216,16 @@ private String doRename(String oldNamespace,String newNamespace,HttpServletRespo
 		result = counter.toString() + " resources renamed";
 		return result;
 		
+    }
+
+    private class CollationSort implements Comparator<String> {
+        
+        Collator collator = Collator.getInstance();
+        
+        public int compare(String s1, String s2) {
+            return collator.compare(s1, s2);
+        }
+        
     }
 	
 }
