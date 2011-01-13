@@ -6,7 +6,7 @@
 
 <div class="contents">   
     <div class="individualList">
-     <p><a href="${redirecturl}">URL List</a></p>
+    <p align="right"><a href="${redirecturl}">RDF ${title} List</a></p>
         <h2>${title}</h2>
         <#if subtitle??>
             <h4>${subtitle}</h4>
