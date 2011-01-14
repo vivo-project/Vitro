@@ -959,7 +959,10 @@ public class JenaIngestController extends BaseEditController {
 			Model ma = getModel(modela,vreq);
 			Model mb = getModel(modelb,vreq);
 			Model destinationModel = getModel(destination,vreq);
-			destinationModel.add(ma.difference(mb));
+			if(!destination.equals(modela))
+			    destinationModel.add(ma.difference(mb));
+			else
+				ma.remove(mb);
 	}
 	
 	public void doSplitPropertyValues(VitroRequest vreq) {
