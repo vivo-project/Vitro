@@ -20,10 +20,9 @@ import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.index.TermDocs;
-import org.apache.lucene.index.TermEnum;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.store.LockObtainFailedException;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
@@ -133,7 +132,7 @@ public class LuceneIndexer implements IndexerIface {
                 this.currentOffLineDir = offLineDir;
                 writer = new IndexWriter(offLineDir, analyzer, true, MAX_FIELD_LENGTH);
             }else{                
-                writer = new IndexWriter(this.liveIndexDir, analyzer, false, MAX_FIELD_LENGTH);                
+                writer = getLiveIndexWriter(false);                
             }
             indexing = true;
             urisIndexed = new HashSet<String>();
@@ -340,13 +339,16 @@ public class LuceneIndexer implements IndexerIface {
             log.error("indexing should not be set to true just yet");        
     }
 
-    
+    private IndexWriter getLiveIndexWriter(boolean createNew) throws CorruptIndexException, LockObtainFailedException, IOException{
+        return new IndexWriter(this.liveIndexDir, analyzer, createNew, MAX_FIELD_LENGTH);
+    }
+
     private synchronized void makeEmptyIndexIfNone() throws IOException {        
         if( !liveIndexExists() ){
             log.debug("Making new index dir and initially empty lucene index  at " + liveIndexDir);
             closeWriter();
             makeIndexDirs();            
-            writer = new IndexWriter(liveIndexDir,analyzer,true,MAX_FIELD_LENGTH);
+            writer = getLiveIndexWriter(true);
             closeWriter();
         }                                   
     }
@@ -405,17 +407,13 @@ public class LuceneIndexer implements IndexerIface {
         }        
     }
     
-    public boolean isIndexEmpty() throws CorruptIndexException, IOException{        
-        TermDocs td = null;
+    public boolean isIndexEmpty() throws CorruptIndexException, IOException{                
+        IndexWriter writer = null;
         try{
-            IndexReader reader = IndexReader.open(new File( this.liveIndexDir ));            
-            td = reader.termDocs(new Term( Entity2LuceneDoc.VitroLuceneTermNames.DOCID) );
-            if( td.next() )
-                return false;
-            else 
-                return true;
+            writer = getLiveIndexWriter(false);            
+            return  writer.numDocs() == 0;
         }finally{
-            if (td != null) td.close();
+            if (writer != null) writer.close();
         }
     }
 

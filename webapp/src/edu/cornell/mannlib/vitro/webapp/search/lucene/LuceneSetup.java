@@ -70,10 +70,9 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 	public void contextInitialized(ServletContextEvent sce) {
 		try {
 			ServletContext context = sce.getServletContext();
-			log.debug("**** Running " + this.getClass().getName() + ".contextInitialized()");
 
 			String baseIndexDir = getBaseIndexDirName();
-			log.info("Base directory of lucene full text index: " + baseIndexDir);
+			log.info("Seting up Lucene index. Base directory of lucene index: " + baseIndexDir);
 
 			setBoolMax();
 
@@ -99,10 +98,10 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 			indexer.setLuceneIndexFactory(lif);
 			
 			if( indexer.isIndexCorroupt() ){
-			    log.info("index is corrupt, requesting rebuild");
+			    log.info("lucene index is corrupt, requesting rebuild");
 			}
 			if( indexer.isIndexEmpty() ){
-			    log.info("index is empty, requesting rebuild");
+			    log.info("lucene index is empty, requesting rebuild");
 			    sce.getServletContext().setAttribute(INDEX_REBUILD_REQUESTED_AT_STARTUP, Boolean.TRUE);			
 			}
 			
@@ -138,21 +137,21 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 						
 			if( (Boolean)sce.getServletContext().getAttribute(INDEX_REBUILD_REQUESTED_AT_STARTUP) instanceof Boolean &&
 				(Boolean)sce.getServletContext().getAttribute(INDEX_REBUILD_REQUESTED_AT_STARTUP) ){
-			    log.info("Rebuild of search index required before startup.");
+			    log.info("Rebuild of lucene index required before startup.");
 				builder.doIndexRebuild();				
 				Thread.currentThread().sleep(500);				
 				int n = 0;
 				while( builder.isReindexRequested() || builder.isIndexing() ){
 				    n++;
 					if( n % 20 == 0 ) //output message every 10 sec. 
-					    log.info("Still rebulding search index");
+					    log.info("Still rebulding lucene  index");
 					Thread.currentThread().sleep(500);
 				}				
 			}
 			
-			log.debug("**** End of " + this.getClass().getName() + ".contextInitialized()");			
+			log.info("Setup of Lucene index completed.");			
 		} catch (Throwable t) {
-			log.error("***** Error setting up Lucene search *****", t);
+			log.error("***** Error setting up Lucene index *****", t);
 			throw new RuntimeException("Startup of vitro application was prevented by errors in the lucene configuration");
 		}
 	}
