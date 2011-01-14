@@ -68,17 +68,26 @@ var browseByVClass = {
         
         $.getJSON(url, function(results) {
             $.each(results.individuals, function(i, item) {
-                indivLabel = results.individuals[i].label;
-                firstName = results.individuals[i].firstName;
-                lastName = results.individuals[i].lastName;
-                indivUri = results.individuals[i].URI;
-                indivProfileUrl = results.individuals[i].profileUrl;
-                if ( !results.individuals[i].thumbUrl ) {
-                    indivImage = browseByVClass.baseUrl + '/images/placeholders/person.thumbnail.jpg';
-                } else {
-                    indivImage = browseByVClass.baseUrl + results.individuals[i].thumbUrl;
+                label = results.individuals[i].label;
+                moniker = results.individuals[i].moniker;
+                vclassName = results.individuals[i].vclassName;
+                uri = results.individuals[i].URI;
+                profileUrl = results.individuals[i].profileUrl;
+                if ( results.individuals[i].thumbUrl ) {
+                    image = browseByVClass.baseUrl + results.individuals[i].thumbUrl;
                 }
-                browseByVClass.individualsInVClass.append('<li role="listitem" class="vcard individual-foaf-person" role="navigation"> <img src="'+ indivImage +'" width="90" height="90" alt="'+ firstName + ' ' + lastName +'" /><h1 class="fn"><a href="'+ indivProfileUrl +'" title="View the profile page for '+ firstName + ' ' + lastName +'">'+ firstName + ' ' + lastName + '</a></h1><p>core:preferredTitle <span class="org">org from preferredTitle??</span></p></li>');
+                // Build the content of each list item, piecing together each component
+                listItem = '<li class="individual" role="listitem" role="navigation">';
+                if ( typeof image !== "undefined" ) {
+                    listItem += '<img src="'+ image +'" width="90" height="90" alt="'+ label +'" />';
+                }
+                listItem += '<h1><a href="'+ profileUrl +'" title="View the profile page for '+ label +'">'+ label +'</a></h1>';
+                // Include the moniker only if it's not empty and not equal to the VClass name
+                if ( moniker != vclassName && moniker != "" ) {
+                    listItem += '<p>'+ moniker +'</p>';
+                }
+                listItem += '</li>';
+                browseByVClass.individualsInVClass.append(listItem);
             })
             // set selected class and alpha
             browseByVClass.selectedVClass(results.vclass.URI);
