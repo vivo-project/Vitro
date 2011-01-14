@@ -32,8 +32,10 @@
 
      function validatePw(theForm) {
 
-         if ( !validateUserFields(theForm) ) {
-             return false;
+         if ( theForm.Md5password.value != "CANCEL") {
+             if ( !validateUserFields(theForm) ) {
+                 return false;
+             }
          }
          if (theForm.Md5password.value.length == 0 ) {
              alert("Please enter a password.");
