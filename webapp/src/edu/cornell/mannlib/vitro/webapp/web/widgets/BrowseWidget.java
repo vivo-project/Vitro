@@ -18,6 +18,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassGroupTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassTemplateModel;
@@ -57,12 +58,23 @@ public class BrowseWidget extends Widget {
     private WidgetTemplateValues doClassAlphaDisplay(Environment env,
             Map params, HttpServletRequest request, ServletContext context) {
         // TODO Auto-generated method stub
+        
         return null;
     }
 
+    private Map<String,Object> getCommonValues(Environment env, ServletContext context){
+        Map<String,Object> values = new HashMap<String,Object>();
+        values.putAll(FreemarkerHttpServlet.getDirectives());
+                
+        return values;
+    }
+    
     protected WidgetTemplateValues doAllClassGroupsDisplay(Environment env, Map params,
-            HttpServletRequest request, ServletContext context) {
-        Map<String,Object> body = getAllClassGroupData(request, params, context);
+            HttpServletRequest request, ServletContext context) {        
+        Map<String,Object> body = new HashMap<String,Object>();
+        body.putAll(getCommonValues(env,context));        
+        body.putAll(getAllClassGroupData(request, params, context));
+        
         try {
             body.put("urls",env.getDataModel().get("urls"));
             body.put("currentPage", env.getDataModel().get("currentPage"));                        
@@ -97,9 +109,10 @@ public class BrowseWidget extends Widget {
     }
     
     protected WidgetTemplateValues doClassDisplay(Environment env, Map params,
-            HttpServletRequest request, ServletContext context) {        
-        
-        Map<String,Object> body = getClassData(request,params,context);
+            HttpServletRequest request, ServletContext context) {                
+        Map<String,Object> body = new HashMap<String,Object>();
+        body.putAll(getCommonValues(env,context));        
+        body.putAll(getClassData(request,params,context));
         
         try {
             body.put("urls",env.getDataModel().get("urls"));
@@ -136,8 +149,9 @@ public class BrowseWidget extends Widget {
 
     protected WidgetTemplateValues doClassGroupDisplay(Environment env,
             Map params, HttpServletRequest request, ServletContext context) {
-
-        Map<String,Object> body = getClassGroupData(request,params, context);
+        Map<String,Object> body = new HashMap<String,Object>();
+        body.putAll(getCommonValues(env,context));        
+        body.putAll( getClassGroupData(request,params, context));
         
         try {
             body.put("urls",env.getDataModel().get("urls"));
