@@ -2,25 +2,44 @@
 /* browseIndex.css contains styles used in the Index pages.  */
 
 /* INDIVIDUAL LIST ------>  */
-.individualList ul.individualData li {
+.individualList ul.individualData li{
     padding-bottom: 0;
 }
-.pagination  {
-    display:inline-block;
+.pagination {
+    display: inline-block;
 }
-.pagination li {
-    display:inline-block;
-    padding-right:2px;
+.pagination li{
+    display: inline-block;
+    padding-right: 2px;
 }
-.pagination li.selectedNavPage {
-    color:#91b039;
-    font-size:1em;
+.pagination li.selectedNavPage{
+    font-size: 1em;
 }
 .rdfLink {
     font-size: 0.8em;
-    border-left: 1px solid #a6b1b0;
 }
-
-.rdfLink a {
-    color: #84a655;
+.individualList a.externalLink {
+    text-decoration: none;
+    font-weight: normal;
+}
+.individualList ul.individualData {
+    display: inline;
+}
+.individualList ul.individualData li {
+    display: inline;
+    padding-right: .3em;
+    padding-bottom:1.2em;
+}
+.individualList ul.individualData li.last {
+    border: none;
+}
+.individualList ul { 
+    margin-left: 0; 
+}
+.individualList li { 
+    list-style-type: none;
+    margin-bottom: .5em;
+ }
+.individualList li a { 
+    font-weight: normal; 
 }
