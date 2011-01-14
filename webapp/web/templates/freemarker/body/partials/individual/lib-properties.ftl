@@ -123,7 +123,7 @@ name will be used as the label. -->
     <#else>
         <@p.addLinkWithLabel mainImage showEditLinks "Photo" /> 
         <#if placeholderImage?has_content>
-            <img class="individual-photo2" src="${dummyImage}" title = "no image" alt="placeholder image" width="115" /> 
+            <img class="individual-photo2" src="${placeholderImage}" title = "no image" alt="placeholder image" width="115" /> 
         </#if>                                                      
     </#if>
 
