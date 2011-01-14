@@ -33,21 +33,24 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
         super(dp, subject, policyHelper);
 
         setName(dp.getPublicName());
-        
-        // Determine whether a new statement can be added
-        if (policyHelper != null) {
-            RequestedAction action = new AddDataPropStmt(subjectUri, propertyUri,RequestActionConstants.SOME_LITERAL, null, null);
-            if (policyHelper.isAuthorizedAction(action)) {
-                addAccess = true;
-            }            
-        }
-        
+
         // Get the data property statements via a sparql query
         DataPropertyStatementDao dpDao = vreq.getWebappDaoFactory().getDataPropertyStatementDao();
         List<Literal> values = dpDao.getDataPropertyValuesForIndividualByProperty(subject, dp);
         statements = new ArrayList<DataPropertyStatementTemplateModel>(values.size());
         for (Literal value : values) {
             statements.add(new DataPropertyStatementTemplateModel(subjectUri, propertyUri, value, policyHelper));
+        }
+        
+        // Determine whether a new statement can be added
+        if (policyHelper != null) {
+            // If the display limit has already been reached, we can't add a new statement
+            if ( dp.getDisplayLimit() > statements.size() ) {
+                RequestedAction action = new AddDataPropStmt(subjectUri, propertyUri,RequestActionConstants.SOME_LITERAL, null, null);
+                if (policyHelper.isAuthorizedAction(action)) {
+                    addAccess = true;
+                }
+            }
         }
     }
     

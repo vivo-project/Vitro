@@ -99,8 +99,8 @@ public class GroupedPropertyList extends BaseTemplateModel {
     
         // Build the template data model from the groupList
         groups = new ArrayList<PropertyGroupTemplateModel>(propertyGroupList.size());
-        for (PropertyGroup pg : propertyGroupList) {
-            groups.add(new PropertyGroupTemplateModel(vreq, pg, subject, policyHelper));
+        for (PropertyGroup propertyGroup: propertyGroupList) {
+            groups.add(new PropertyGroupTemplateModel(vreq, propertyGroup, subject, policyHelper));
         }   
     
     }
@@ -425,5 +425,6 @@ public class GroupedPropertyList extends BaseTemplateModel {
         }        
         return null;
     }
+
 }
 
