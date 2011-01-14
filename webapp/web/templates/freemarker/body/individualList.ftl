@@ -3,11 +3,14 @@
 <#-- List individual members of a class. -->
 
 <#import "lib-list.ftl" as l>
-
+${stylesheets.add("/css/browseIndex.css")}
 <div class="contents">   
     <div class="individualList">
-    <p align="right"><a href="${redirecturl}">RDF ${title} List</a></p>
-        <h2>${title}</h2>
+       <h2>${title} 
+         &nbsp;<span class="rdfLink">&nbsp; 
+           <a class="icon-rdf" href="${redirecturl}" title="View the Non-Academic list in RDF format">RDF</a>
+         </span>
+        </h2>
         <#if subtitle??>
             <h4>${subtitle}</h4>
         </#if>
