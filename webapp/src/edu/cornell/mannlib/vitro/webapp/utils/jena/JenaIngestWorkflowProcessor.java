@@ -67,7 +67,7 @@ public class JenaIngestWorkflowProcessor {
 	public void run(Individual startingWorkflowStep) {
 		for (Individual step : getWorkflowSteps(startingWorkflowStep)) {
 			Individual action = getAction(step);
-			System.out.println("Executing action "+action.getURI());
+			log.debug("Executing workflow action "+action.getURI());
 			for (ActionHandler handler : actionHandlerList) {
 				ActionResult result = handler.handleAction(action);
 				if (result != null) {
@@ -81,7 +81,7 @@ public class JenaIngestWorkflowProcessor {
 	 * returns the Action related to the supplied WorkflowStep
 	 */
 	private Individual getAction(Individual stepInd) {
-		System.out.println("Workflow step: "+stepInd.getURI());
+		log.debug("Workflow step: "+stepInd.getURI());
 		RDFNode actionNode = stepInd.getPropertyValue(WorkflowOntology.action);
 		if (actionNode != null && actionNode.canAs(Individual.class)) {
 			return (Individual) actionNode.as(Individual.class);
@@ -146,9 +146,11 @@ public class JenaIngestWorkflowProcessor {
 	 * returns the model represented by the given Node, which is expected to be an Individual of type Model
 	 */
 	private Model getModel(RDFNode modelNode) {
+	    if (modelNode == null) {
+	        return null;
+	    }
 		Individual modelInd = (Individual) modelNode.as(Individual.class);
 		String modelNameStr = ((Literal)modelInd.getPropertyValue(WorkflowOntology.modelName).as(Literal.class)).getLexicalForm();
-		System.out.println("Trying to get model "+modelNameStr);
 		// false = strict mode off, i.e., 
 		// if a model already exists of the given name, return it.  Otherwise, create a new one.
 		return vitroJenaModelMaker.createModel(modelNameStr,false);
@@ -187,16 +189,27 @@ public class JenaIngestWorkflowProcessor {
 				Model sourceModel = getModel(actionInd.getPropertyValue(WorkflowOntology.sourceModel)); 
 				Model modelToAdd = getModel(actionInd.getPropertyValue(WorkflowOntology.modelToAdd));
 				Model destinationModel = getModel(actionInd.getPropertyValue(WorkflowOntology.destinationModel)); 
+				Boolean applyChangesDirectlyToSource = false;
+				RDFNode valueNode = actionInd.getPropertyValue(WorkflowOntology.applyChangesDirectlyToSource);
+				if ((valueNode != null) && (valueNode.isLiteral())) {
+				    applyChangesDirectlyToSource = ((Literal)valueNode.as(Literal.class)).getBoolean();
+				}
+
 				sourceModel.enterCriticalSection(Lock.WRITE);
 				try {
 					modelToAdd.enterCriticalSection(Lock.READ);
 					try {
-						destinationModel.enterCriticalSection(Lock.WRITE);
-						try{
-							destinationModel.add(modelToAdd);
-						} finally {
-							destinationModel.leaveCriticalSection();
-						}
+					    if (applyChangesDirectlyToSource) {
+					        // TODO: are all listeners notified this way?
+					        sourceModel.add(modelToAdd);
+					    } else {
+    						destinationModel.enterCriticalSection(Lock.WRITE);
+    						try{
+    							destinationModel.add(modelToAdd);
+    						} finally {
+    							destinationModel.leaveCriticalSection();
+    						}
+					    }
 					} finally {
 						modelToAdd.leaveCriticalSection();
 					}
@@ -216,16 +229,26 @@ public class JenaIngestWorkflowProcessor {
 				Model sourceModel = getModel(actionInd.getPropertyValue(WorkflowOntology.sourceModel)); 
 				Model modelToSubtract = getModel(actionInd.getPropertyValue(WorkflowOntology.modelToSubtract));
 				Model destinationModel = getModel(actionInd.getPropertyValue(WorkflowOntology.destinationModel)); 
+				Boolean applyChangesDirectlyToSource = false;
+				RDFNode valueNode = actionInd.getPropertyValue(WorkflowOntology.applyChangesDirectlyToSource);
+				if ((valueNode != null) && (valueNode.isLiteral())) {
+				    applyChangesDirectlyToSource = ((Literal)valueNode.as(Literal.class)).getBoolean();
+				}
 				sourceModel.enterCriticalSection(Lock.WRITE);
 				try {
 					modelToSubtract.enterCriticalSection(Lock.READ);
 					try {
-						destinationModel.enterCriticalSection(Lock.WRITE);
-						try{
-							destinationModel.add(sourceModel.difference(modelToSubtract));
-						} finally {
-							destinationModel.leaveCriticalSection();
-						}
+    					if (applyChangesDirectlyToSource) {
+                            // TODO: are all listeners notified this way?
+    					    sourceModel.remove(modelToSubtract);
+    					} else {
+    						destinationModel.enterCriticalSection(Lock.WRITE);
+    						try{
+    							destinationModel.add(sourceModel.difference(modelToSubtract));
+    						} finally {
+    							destinationModel.leaveCriticalSection();
+    						}
+    					}
 					} finally {
 						modelToSubtract.leaveCriticalSection();
 					}
@@ -247,18 +270,18 @@ public class JenaIngestWorkflowProcessor {
 			if (instanceOf(actionInd,WorkflowOntology.SPARQLCONSTRUCTAction)) {
 				OntModel sourceModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
 				for (RDFNode node : (List<RDFNode>) actionInd.listPropertyValues(WorkflowOntology.sourceModel).toList()) {
-					System.out.println("SPARQL: adding submodel ");
+					log.debug("SPARQL: adding submodel ");
 					sourceModel.addSubModel(getModel(node));
 				}
 				if (actionInd.getPropertyValue(WorkflowOntology.destinationModel) == null) {
-				    System.out.println("Error: destination model for SPARQL Construct action not specified for this action");
+				    log.debug("Error: destination model for SPARQL Construct action not specified for this action");
 				    return null;
 				}
 				Model destinationModel = getModel(actionInd.getPropertyValue(WorkflowOntology.destinationModel));
 				Model tempModel = ModelFactory.createDefaultModel();
 				OntResource sparqlQuery = (OntResource) actionInd.getPropertyValue(WorkflowOntology.sparqlQuery);
 				String queryStr = ((Literal)sparqlQuery.getPropertyValue(ResourceFactory.createProperty(QUERY_STR_PROPERTY))).getLexicalForm();
-				System.out.println(queryStr);
+				log.debug("SPARQL query: \n" + queryStr);
 				Query query = QueryFactory.create(queryStr,Syntax.syntaxARQ);
 		        QueryExecution qexec = QueryExecutionFactory.create(query,sourceModel);
 		        qexec.execConstruct(tempModel);

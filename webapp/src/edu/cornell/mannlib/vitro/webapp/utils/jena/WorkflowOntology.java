@@ -82,6 +82,8 @@ public class WorkflowOntology {
     
     public static final ObjectProperty previousStep = m_model.createObjectProperty( "http://vitro.mannlib.cornell.edu/ns/vitro/rdfIngestWorkflow#previousStep" );
     
+    public static final ObjectProperty addedInAction = m_model.createObjectProperty( "http://vitro.mannlib.cornell.edu/ns/vitro/rdfIngestWorkflow#addedInAction" );
+    
     public static final ObjectProperty subtractedInAction = m_model.createObjectProperty( "http://vitro.mannlib.cornell.edu/ns/vitro/rdfIngestWorkflow#subtractedInAction" );
     
     public static final ObjectProperty nextStep = m_model.createObjectProperty( "http://vitro.mannlib.cornell.edu/ns/vitro/rdfIngestWorkflow#nextStep" );
