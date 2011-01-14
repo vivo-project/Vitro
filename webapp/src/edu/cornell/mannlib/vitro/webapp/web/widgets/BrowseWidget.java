@@ -83,8 +83,7 @@ public class BrowseWidget extends Widget {
         VClass vclass = vreq.getWebappDaoFactory().getVClassDao().getVClassByURI(classUri);
         map.put("class", new VClassTemplateModel(vclass));
         
-        JSONObject vclassRes = JSONServlet.getLuceneIndividualsByVClass(vclass.getURI(), request, context);
-        map.put("vclass", JSONtoFmModel.convertJSONObjectToMap( (JSONObject) vclassRes.get("vclass") ));
+        JSONObject vclassRes = JSONServlet.getLuceneIndividualsByVClass(vclass.getURI(), request, context);        
         map.put("totalCount", JSONtoFmModel.convertJSONObjectToMap( (String) vclassRes.get("totalCount") ));
         map.put("alpha", JSONtoFmModel.convertJSONObjectToMap( (String) vclassRes.get("alpha") ));
         map.put("individuals", JSONtoFmModel.convertJSONArrayToList( (JSONArray) vclassRes.get("individuals") ));
@@ -97,7 +96,13 @@ public class BrowseWidget extends Widget {
     private Map<String,Object> getCommonValues(Environment env, ServletContext context){
         Map<String,Object> values = new HashMap<String,Object>();
         values.putAll(FreemarkerHttpServlet.getDirectives());
-                
+        try {
+            values.put("urls",env.getDataModel().get("urls"));
+            values.put("currentPage", env.getDataModel().get("currentPage"));            
+        } catch (TemplateModelException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         return values;
     }
     
@@ -106,14 +111,7 @@ public class BrowseWidget extends Widget {
         Map<String,Object> body = new HashMap<String,Object>();
         body.putAll(getCommonValues(env,context));        
         body.putAll(getAllClassGroupData(request, params, context));
-        
-        try {
-            body.put("urls",env.getDataModel().get("urls"));
-            body.put("currentPage", env.getDataModel().get("currentPage"));                        
-        } catch (TemplateModelException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+                
         String macroName = Mode.ALL_CLASS_GROUPS.macroName;
         return new WidgetTemplateValues(macroName, body);
     }
@@ -145,14 +143,7 @@ public class BrowseWidget extends Widget {
         Map<String,Object> body = new HashMap<String,Object>();
         body.putAll(getCommonValues(env,context));        
         body.putAll(getClassData(request,params,context));
-        
-        try {
-            body.put("urls",env.getDataModel().get("urls"));
-            body.put("currentPage", env.getDataModel().get("currentPage"));            
-        } catch (TemplateModelException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+            
         String macroName = Mode.VCLASS.macroName;
         return new WidgetTemplateValues(macroName, body);
     }
@@ -184,14 +175,7 @@ public class BrowseWidget extends Widget {
         Map<String,Object> body = new HashMap<String,Object>();
         body.putAll(getCommonValues(env,context));        
         body.putAll( getClassGroupData(request,params, context));
-        
-        try {
-            body.put("urls",env.getDataModel().get("urls"));
-            body.put("currentPage", env.getDataModel().get("currentPage"));            
-        } catch (TemplateModelException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+   
         String macroName = Mode.CLASS_GROUP.macroName;
         return new WidgetTemplateValues(macroName, body);
     } 

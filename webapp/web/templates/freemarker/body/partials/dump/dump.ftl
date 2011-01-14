@@ -8,4 +8,6 @@
     ${var}
 </div>
 
-${stylesheets.add("/css/dump.css")}
+<#if stylesheets??>
+    ${stylesheets.add("/css/dump.css")}
+</#if>
