@@ -501,6 +501,8 @@ public class SimpleReasoner extends StatementListener {
 			inferenceRebuildModel.leaveCriticalSection();
 			scratchpadModel.leaveCriticalSection();			
 		}
+		
+		log.info("ABox inferences recomputed.");
 	}
 		
 	// The following three methods aren't currently called; the default behavior of VIVO is to not materialize such inferences.

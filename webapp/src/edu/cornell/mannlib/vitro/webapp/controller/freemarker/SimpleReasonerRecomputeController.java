@@ -42,10 +42,10 @@ public class SimpleReasonerRecomputeController extends FreemarkerHttpServlet {
             } else {
                 if (simpleReasoner.isRecomputing()) {
                     messageStr = 
-                         "The SimpleReasoner is already in the process of " +
+                         "The SimpleReasoner is currently in the process of " +
                          "recomputing inferences.";
                 } else {
-                    simpleReasoner.recompute();
+                    new Thread(new Recomputer(simpleReasoner)).start();
                     messageStr = "Recomputation of inferences started";
                 }
             }
@@ -61,6 +61,20 @@ public class SimpleReasonerRecomputeController extends FreemarkerHttpServlet {
         
         body.put("message", messageStr); 
         return new TemplateResponseValues(Template.MESSAGE.toString(), body);
+    }
+    
+    private class Recomputer implements Runnable {
+        
+        private SimpleReasoner simpleReasoner;
+        
+        public Recomputer(SimpleReasoner simpleReasoner) {
+            this.simpleReasoner = simpleReasoner;
+        }
+        
+        public void run() {
+            simpleReasoner.recompute();
+        }
+        
     }
     
 }
