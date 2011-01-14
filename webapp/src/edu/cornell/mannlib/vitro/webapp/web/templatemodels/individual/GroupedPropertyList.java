@@ -278,7 +278,9 @@ public class GroupedPropertyList extends BaseTemplateModel {
                          // RY How could it happen that it's already in the group? Maybe we can remove this test.
                          if (!alreadyOnPropertyList(groupForUnassignedProperties.getPropertyList(),p)) {                          
                              groupForUnassignedProperties.getPropertyList().add(p);
-                             log.debug("adding property "+p.getLabel()+" to group for unassigned properties");
+                             if (log.isDebugEnabled()) {
+                                 log.debug("adding property " + getLabel(p) + " to group for unassigned properties");
+                             }                             
                          }
                      } 
                  // Otherwise, if the property is assigned to this group, add it to the group if it's not already there
@@ -349,7 +351,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
             if (diff==0) {
                 diff = determineDisplayRank(p1) - determineDisplayRank(p2);
                 if (diff==0) {
-                    return p1.getLabel().compareTo(p2.getLabel());
+                    return getLabel(p1).compareTo(getLabel(p2));
                 } else {
                     return diff;
                 }
@@ -376,6 +378,15 @@ public class GroupedPropertyList extends BaseTemplateModel {
         }
     }
     
+    // Since we're now including some vitro properties in the property list, which don't have labels,
+    // use their local name instead.
+    private String getLabel(Property property) {
+        String label = property.getLabel();
+        if (label == null) {
+            label = property.getLocalName();
+        }
+        return label;
+    }
     
     /* Access methods for templates */
     

@@ -896,7 +896,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
             QuerySolution soln = results.next();
             Resource resource = soln.getResource("property");
             String uri = resource.getURI();
-            log.debug("Found populated object property " + uri + " for individual " + subjectUri);
+            log.debug("Found populated object property " + uri);
             ObjectProperty property = getObjectPropertyByURI(uri);
             properties.add(property);
         }
