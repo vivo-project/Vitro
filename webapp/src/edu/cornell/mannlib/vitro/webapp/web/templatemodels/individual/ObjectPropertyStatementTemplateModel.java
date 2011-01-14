@@ -84,7 +84,7 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
         String editUrl = "";
         if (isEditable()) {
             if (propertyUri.equals(VitroVocabulary.IND_MAIN_IMAGE)) {
-                return UrlBuilder.getImageUploadUrl(subjectUri, "edit");
+                return ObjectPropertyTemplateModel.getImageUploadUrl(subjectUri, "edit");
             } 
             ParamMap params = new ParamMap(
                     "subjectUri", subjectUri,
@@ -94,7 +94,6 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
                 params.put("deleteProhibited", "prohibited");
             }
             editUrl = UrlBuilder.getUrl(EDIT_PATH, params);
-
         }
         
         return editUrl;
@@ -104,7 +103,7 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
         String deleteUrl = "";
         if (isDeletable()) {
             if (propertyUri.equals(VitroVocabulary.IND_MAIN_IMAGE)) {
-                return UrlBuilder.getImageUploadUrl(subjectUri, "delete");
+                return ObjectPropertyTemplateModel.getImageUploadUrl(subjectUri, "delete");
             } 
             ParamMap params = new ParamMap(
                     "subjectUri", subjectUri,
