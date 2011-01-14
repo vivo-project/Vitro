@@ -18,29 +18,29 @@
 # The AI ingest files are exceptions -- until we decide otherwise.
 utilities/ingest/**/*
 
-# Doctype declaration
+# PROBLEM: Can't find any info on licensing.
 webapp/web/templates/freemarker/page/partials/doctype.html
 
-# ContentType from Google gdata API, Apache 2.0 license included in file.
+# See /doc/3rd-party-licenses.txt for LICENSE file
 webapp/src/edu/cornell/mannlib/vitro/webapp/web/ContentType.java
 
-# The JSON Java source files from json.org
+# See /doc/3rd-party-licenses.txt for LICENSE file
 webapp/src/org/json/*
 
-# TinyMCE from tinymce.moxiecode.com
+# See /doc/3rd-party-licenses.txt for LICENSE file
 webapp/web/js/tiny_mce/*
 webapp/web/js/tiny_mce/**/*
 
-# From apache.org under the Apache license.
+# See /doc/3rd-party-licenses.txt for LICENSE file
 webapp/web/admin/axis/SOAPMonitorApplet.java
 services/additions/admin/axis/SOAPMonitorApplet.java
 
-# JQuery from jquery.com
+# See /doc/3rd-party-licenses.txt for LICENSE file
 webapp/web/js/jquery.js
 webapp/web/js/jquery-ui/*
 webapp/web/js/jquery_plugins/*
 
-# From dojotoolkit.org
+# See /doc/3rd-party-licenses.txt for LICENSE file
 webapp/web/dojo.js
 webapp/web/src/AdapterRegistry.js
 webapp/web/src/animation/*
@@ -110,58 +110,51 @@ webapp/web/src/widget/*
 webapp/web/src/widget/**/*
 webapp/web/src/xml/*
 
-# Sample code from Google.
+# See /doc/3rd-party-licenses.txt for LICENSE file
 webapp/web/templates/freemarker/page/partials/googleAnalytics.ftl
 
-# PROBLEM: requires an accompanying license text, as spelled out on 
-#     http://djpowell.net/blog/entries/sparqltag.html
+# See /doc/3rd-party-licenses.txt for LICENSE file
 webapp/config/tlds/sparqltag.tld
 
-# PROBLEM: requires an accompanying copy of the Apache license, as spelled out
-#     in the distribution from http://jakarta.apache.org/site/downloads/downloads_taglibs-standard.cgi
+# See /doc/3rd-party-licenses.txt for LICENSE file
 webapp/config/tlds/c.tld
 webapp/config/tlds/fn.tld
 
-# PROBLEM: appears to be a modified version of some Sun code, which means that we need to
-#     distribute the original source as well as the modified source (plus the license, of course)
+# PROBLEM: Can't find any info on licensing.
 webapp/config/tlds/database.tld
 
-# PROBLEM: requires an accompanying copy of the Apache license 1.1, as spelled out
-#     in the distribution from http://jakarta.apache.org/site/downloads/downloads_taglibs-mailer.cgi
+# See /doc/3rd-party-licenses.txt for LICENSE file
 webapp/config/tlds/taglibs-mailer.tld
 
-# PROBLEM? Third-party tlds - where do they come from?
+# See /doc/3rd-party-licenses.txt for LICENSE file
 webapp/config/tlds/taglibs-random.tld
 webapp/config/tlds/taglibs-string.tld
 
-# PROBLEM: It appears that these files require a LICENSE file to accompany them.
+# See /doc/3rd-party-licenses.txt for LICENSE file
 webapp/web/themes/enhanced/css/blueprint/grid.css
 webapp/web/themes/enhanced/css/blueprint/ie.css
 
-# PROBLEM: This is from www.involutionstudios.com, not blueprint. What are the license restrictions? 
+# PROBLEM: Can't find any info on licensing.
 webapp/web/themes/enhanced/css/blueprint/liquid.css
 
-# PROBLEM? from simon.incutio.com, but what are the license restrictions?
+# See /doc/3rd-party-licenses.txt for LICENSE file
 webapp/web/js/betterDateInput.js
 
-# PROBLEM? from wrox.com, but what are the license restrictions?
+# PROBLEM: Can't find any info on licensing.
 webapp/web/js/detect.js
 
-# PROBLEM? perhaps from www.dannyg.com, but what are the license restrictions?
+# See /doc/3rd-party-licenses.txt for LICENSE file
 webapp/web/toggle.js
 webapp/web/js/toggle.js
 
-
-# Script for enabling new HTML5 semantic markup in IE browsers. 
-# remysharp.com/2009/01/07/html5-enabling-script/
+# See /doc/3rd-party-licenses.txt for LICENSE file
 webapp/web/js/html5.js
 
-# selectivizr is a JavaScript utility that emulates CSS3 pseudo-classes and attribute selectors in Internet Explorer 6-8. selectivizr.com
+# See /doc/3rd-party-licenses.txt for LICENSE file
 webapp/web/js/selectivizr.js
 
-# Supersleight jQuery Plugin for Transparent PNGs in IE6. allinthehead.com/retro/338/supersleight-jquery-plugin
+# PROBLEM: Can't find any info on licensing.
 webapp/web/js/jquery_plugins/supersleight.js
 
-
-# Javascript code from 2005 Sam Stephenson (http://prototype.conio.net/)
+# See /doc/3rd-party-licenses.txt for LICENSE file
 webapp/web/js/sparql/prototype.js
