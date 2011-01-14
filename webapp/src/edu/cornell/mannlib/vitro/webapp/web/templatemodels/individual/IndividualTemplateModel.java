@@ -160,27 +160,8 @@ public class IndividualTemplateModel extends BaseTemplateModel {
         return individual.getURI();
     }
     
-    public List<String> getKeywords() {
-        return individual.getKeywords();
-    }
-    
-    public String getKeywordString() {
-        // Since this is a display method, the implementation should be moved out of IndividualImpl to here.
-        return individual.getKeywordString();
-    }
-    
     public String getLocalName() {
         return individual.getLocalName();
-    }
-    
-    @Deprecated
-    public String getDescription() {
-        return individual.getDescription();
-    }
-    
-    @Deprecated
-    public String getBlurb() {
-        return individual.getBlurb();
     }   
     
 }

@@ -59,11 +59,6 @@
 <#-- Ontology properties -->
 <#include "individual-properties.ftl">
 
-<#-- Keywords -->
-<#if individual.keywords?has_content>
-    <p id="keywords">Keywords: ${individual.keywordString}</p>
-</#if>
-
 ${stylesheets.add("/css/individual/individual.css")}
                            
 <#-- RY Figure out which of these scripts really need to go into the head, and which are needed at all (e.g., tinyMCE??) -->
