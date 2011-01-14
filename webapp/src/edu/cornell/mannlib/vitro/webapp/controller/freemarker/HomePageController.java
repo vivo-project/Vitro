@@ -28,9 +28,9 @@ public class HomePageController extends FreemarkerHttpServlet {
     protected ResponseValues processRequest(VitroRequest vreq) { 
         
         Map<String, Object> body = new HashMap<String, Object>();    
-        VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache( getServletContext() );
-        List<VClassGroup> vClassGroups =  vcgc.getGroups(vreq.getPortalId());
-        body.put("vClassGroups", vClassGroups);
+//        VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache( getServletContext() );
+//        List<VClassGroup> vClassGroups =  vcgc.getGroups(vreq.getPortalId());
+//        body.put("vClassGroups", vClassGroups);
         
         PageDataGetter dataGetter =
             PageController.getPageDataGetterMap(getServletContext())
