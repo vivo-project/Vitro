@@ -2,6 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -9,20 +12,25 @@ import java.util.List;
 import java.util.Set;
 
 import com.hp.hpl.jena.graph.GraphMaker;
+import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelMaker;
 import com.hp.hpl.jena.rdf.model.ModelReader;
+import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.sdb.SDBFactory;
 import com.hp.hpl.jena.sdb.Store;
+import com.hp.hpl.jena.sdb.util.StoreUtils;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.hp.hpl.jena.util.iterator.WrappedIterator;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
+import com.ibm.icu.text.Collator;
 
 public class VitroJenaSDBModelMaker implements ModelMaker {
 
@@ -100,15 +108,129 @@ public class VitroJenaSDBModelMaker implements ModelMaker {
 	}
 
 	public ExtendedIterator listModels() {
-		List<String> nameList = new LinkedList<String>();
-		Iterator nameIt = metadataModel.listObjectsOfProperty(metadataModel.getProperty(HAS_NAMED_MODEL_URI));
-		while (nameIt.hasNext()) {
-			RDFNode obj = (RDFNode) nameIt.next();
-			if (obj.isLiteral()) {
-				nameList.add( ((Literal)obj).getLexicalForm() );
+		ArrayList<String> metaNameList = new ArrayList<String>();
+		ArrayList<String> storeNameList = new ArrayList<String>();
+		ArrayList<String> unionNameList = new ArrayList<String>();
+		Iterator<RDFNode> metadataNameIt = metadataModel.listObjectsOfProperty(metadataModel.getProperty(HAS_NAMED_MODEL_URI));
+		Iterator<Node> storeNameIt = StoreUtils.storeGraphNames(store);
+		Node node = null;
+		RDFNode rdfNode = null;
+		
+		// implement comparator to sort the lists
+		
+		class sortList implements Comparator<String>{
+			Collator collator = Collator.getInstance();
+			int compareResult;
+			public int compare(String str1, String str2){
+				compareResult = collator.compare(str1, str2);
+				if(compareResult > 0)
+					return 1;
+				else if(compareResult < 0)
+					return -1;
+				else 
+					return 0;
 			}
 		}
-		return WrappedIterator.create(nameList.iterator());
+		
+		// put the names into the lists.
+		
+		while (metadataNameIt.hasNext()) {
+			rdfNode = metadataNameIt.next();
+			if (rdfNode.isLiteral()) {
+				metaNameList.add( ((Literal)rdfNode).getLexicalForm());
+			}
+		}
+		
+		
+	
+		while (storeNameIt.hasNext()){
+			 node = storeNameIt.next();
+			 storeNameList.add(node.getURI());
+		}
+		
+		
+		// sort the lists
+		if(metaNameList.size()!=0)
+			Collections.sort(metaNameList, new sortList());
+		if(storeNameList.size()!=0)
+			Collections.sort(storeNameList, new sortList());
+		
+		
+		// code to merge the lists.
+				
+		Collator collator = Collator.getInstance();
+		int check = 0;
+		
+		Iterator<String> metaItr = metaNameList.iterator();
+	    Iterator<String> storeItr = storeNameList.iterator();
+	    String metaString = null;
+	    String storeString = null;
+	    
+	    do{
+	    	
+	    	if(metaString != null && storeString !=null){
+	    		check = collator.compare(metaString, storeString);
+	    	}
+	    	else if(metaString!=null && storeString == null){
+	    		unionNameList.add(metaString);
+	    		if(metaItr.hasNext())
+	    			metaString = metaItr.next();
+	    		else
+	    			metaString = null;
+	    		continue;
+	    	}
+	    	else if(metaString==null && storeString!=null){
+	    		unionNameList.add(storeString);
+	    		if(storeItr.hasNext())
+	    			storeString = storeItr.next();
+	    		else
+	    			storeString = null;
+	    		continue;
+	    	}
+	    	else{
+	    	    if(metaItr.hasNext()){
+	    	    	metaString = metaItr.next();
+	    	    }
+	    	    if(storeItr.hasNext()){
+	    	    	storeString = storeItr.next();
+	    	    }
+	    	    if(metaString!=null && storeString !=null)
+	    	    	check = collator.compare(metaString, storeString);
+	    	    else
+	    	    	continue;
+	    	}
+	    	
+	    	if(check > 0){
+	    		unionNameList.add(storeString);
+	    		if(storeItr.hasNext())
+	    			storeString = storeItr.next();
+	    		else
+	    			storeString = null;
+	    	}
+	    	else if(check < 0){
+	    		unionNameList.add(metaString);
+	    		if(metaItr.hasNext())
+	    			metaString = metaItr.next();
+	    		else
+	    			metaString = null;
+	    	}
+	    	else{
+	    		unionNameList.add(metaString);
+	    		if(metaItr.hasNext())
+	    			metaString = metaItr.next();
+	    		else 
+	    			metaString = null;
+	    		
+	    		if(storeItr.hasNext())
+	    			storeString = storeItr.next();
+	    		else
+	    			storeString = null;
+	    	}
+	    	
+	    		
+	    }while(metaString!=null || storeString!=null);
+		
+		return WrappedIterator.create(unionNameList.iterator());
 	}
 
 	public Model openModel(String arg0, boolean arg1) {
