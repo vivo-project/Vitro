@@ -163,9 +163,11 @@ public class JenaIngestController extends BaseEditController {
 			if (modelName != null) {
 				if(modelType.equals("sdb")){
 		        	maker = (VitroJenaSDBModelMaker) getServletContext().getAttribute("vitroJenaSDBModelMaker");
+		        	request.setAttribute("modelType", "sdb");
 		        	request.setAttribute("infoLine", "SDB models");
 				}
 				else{
+					request.setAttribute("modelType", "rdb");
 					request.setAttribute("infoLine", "RDB models");
 				}
 				doCreateModel(modelName, maker);
@@ -178,9 +180,11 @@ public class JenaIngestController extends BaseEditController {
 			}
 		} else if ("removeModel".equals(actionStr)) {
 			if(modelType.equals("sdb")){
+				request.setAttribute("modelType", "sdb");
 				request.setAttribute("infoLine", "SDB models");
 			}
 			else{
+				request.setAttribute("modelType", "rdb");
 				request.setAttribute("infoLine", "RDB models");
 			}
 			String modelName = vreq.getParameter("modelName");
