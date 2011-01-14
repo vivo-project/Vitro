@@ -103,7 +103,7 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
 	
 	private Map<String,String> properties = new HashMap<String,String>();
 	
-	private DatasetWrapperFactory dwf;
+	protected DatasetWrapperFactory dwf;
 
     // for temporary use to construct URIs for the things that still use integer IDs.
     // As these objects get changed to support getURI(), this should become unnecessary.

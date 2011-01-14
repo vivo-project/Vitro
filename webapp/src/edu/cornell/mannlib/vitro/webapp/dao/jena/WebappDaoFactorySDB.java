@@ -32,6 +32,7 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
 	public WebappDaoFactorySDB(OntModelSelector ontModelSelector, Dataset dataset) {
 		super(ontModelSelector);
 		this.dwf = new StaticDatasetFactory(dataset);
+		super.dwf = new StaticDatasetFactory(dataset);
 	}
 	
     /**
@@ -47,6 +48,7 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
 	                            String[] preferredLanguages) {
 		super(ontModelSelector, defaultNamespace, nonuserNamespaces, preferredLanguages);
         this.dwf = new StaticDatasetFactory(dataset);
+        super.dwf = new StaticDatasetFactory(dataset);
 	}
 	
     /**
@@ -63,6 +65,7 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
                                 String[] preferredLanguages) {
         super(ontModelSelector, defaultNamespace, nonuserNamespaces, preferredLanguages);
         this.dwf = new ReconnectingDatasetFactory(bds, storeDesc);
+        super.dwf = new ReconnectingDatasetFactory(bds, storeDesc);
     }
 	
 	@Override
