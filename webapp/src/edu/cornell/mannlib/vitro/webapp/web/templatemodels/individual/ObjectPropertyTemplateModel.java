@@ -238,7 +238,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
             // Get the custom config filename
             WebappDaoFactory wdf = vreq.getWebappDaoFactory();
             ObjectPropertyDao opDao = wdf.getObjectPropertyDao();
-            String configFileName = opDao.getCustomListConfigFileName(op);
+            String configFileName = opDao.getCustomListViewConfigFileName(op);
             if (configFileName == null) { // no custom config; use default config
                 configFileName = getDefaultConfigFileName();
             }

@@ -72,20 +72,20 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
     static {
         List<String> namespaceFilters = new ArrayList<String>();
         for (String s : EXCLUDED_NAMESPACES) {
-            namespaceFilters.add("afn:namespace(?property) != \"" + s + "\"");
+            namespaceFilters.add("(afn:namespace(?property) != \"" + s + "\")");
         }
         // A hack to include the vitro:primaryLink and vitro:additionalLink properties in the list
         namespaceFilters.add("( ?property = <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#primaryLink> ||" +
                                "?property = <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#additionalLink> ||" +
                                "afn:namespace(?property) != \"http://vitro.mannlib.cornell.edu/ns/vitro/0.7#\" )");
-        propertyFilters = "FILTER (" + StringUtils.join(namespaceFilters, " && \n") + ")\n";
+        propertyFilters = "FILTER (" + StringUtils.join(namespaceFilters, " && ") + ")\n";
     }
     
     protected static final String objectPropertyQueryString = 
         PREFIXES + "\n" +
         "SELECT DISTINCT ?property WHERE { \n" +
-        "   GRAPH ?g { ?subject ?property ?object } \n" + 
-        "   GRAPH ?h { ?property rdf:type owl:ObjectProperty } \n" +
+        "   GRAPH ?g1 { ?subject ?property ?object } \n" + 
+        "   GRAPH ?g2 { ?property rdf:type owl:ObjectProperty } \n" +
         propertyFilters +
         "}";
 
@@ -896,6 +896,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
             QuerySolution soln = results.next();
             Resource resource = soln.getResource("property");
             String uri = resource.getURI();
+            log.debug("Found populated object property " + uri + " for individual " + subjectUri);
             ObjectProperty property = getObjectPropertyByURI(uri);
             properties.add(property);
         }
@@ -903,26 +904,10 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
     }
     
     @Override
-    public String getCustomListConfigFileName(ObjectProperty op) {
+    public String getCustomListViewConfigFileName(ObjectProperty op) {
         if (customListViewConfigFileMap == null) {
             customListViewConfigFileMap = new HashMap<ObjectProperty, String>();
             OntModel displayModel = getOntModelSelector().getDisplayModel();
-            
-//            Property listViewConfigProp = displayModel.getProperty(VitroVocabulary.DISPLAY + "customListViewConfigurationFile");
-//            ResIterator resources = displayModel.listResourcesWithProperty(listViewConfigProp);
-//            while (resources.hasNext()) {
-//                Resource resource = resources.next();
-//                ObjectProperty prop = getObjectPropertyByURI(resource.getURI());
-//                NodeIterator nodes = displayModel.listObjectsOfProperty(resource, listViewConfigProp);
-//                if (nodes.hasNext()) {
-//                    RDFNode node = nodes.next(); // there should be at most one value; just get the first one
-//                    if (node.isLiteral()) {
-//                        String configFileName = ((Literal)node).getLexicalForm();
-//                        customListViewConfigFiles.put(prop, configFileName);
-//                    }
-//                }
-//            }
-            
             QueryExecution qexec = QueryExecutionFactory.create(listViewConfigFileQuery, displayModel); 
             ResultSet results = qexec.execSelect();           
             while (results.hasNext()) {

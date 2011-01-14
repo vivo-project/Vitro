@@ -216,7 +216,7 @@ class ObjectPropertyDaoFiltering extends BaseFiltering implements ObjectProperty
     }
 
     @Override
-    public String getCustomListConfigFileName(ObjectProperty objectProperty) {
-        return innerObjectPropertyDao.getCustomListConfigFileName(objectProperty);
+    public String getCustomListViewConfigFileName(ObjectProperty objectProperty) {
+        return innerObjectPropertyDao.getCustomListViewConfigFileName(objectProperty);
     }
 }

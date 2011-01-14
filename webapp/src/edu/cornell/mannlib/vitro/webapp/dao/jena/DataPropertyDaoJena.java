@@ -82,15 +82,15 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
     static {
         List<String> namespaceFilters = new ArrayList<String>();
         for (String s : EXCLUDED_NAMESPACES) {
-            namespaceFilters.add("afn:namespace(?property) != \"" + s + "\"");
+            namespaceFilters.add("(afn:namespace(?property) != \"" + s + "\")");
         }
-        propertyFilters = "FILTER (" + StringUtils.join(namespaceFilters, " && \n") + ")\n";
+        propertyFilters = "FILTER (" + StringUtils.join(namespaceFilters, " && ") + ")\n";
     } 
     protected static final String dataPropertyQueryString = 
         PREFIXES + "\n" +
         "SELECT DISTINCT ?property WHERE { \n" +
-        "   GRAPH ?g { ?subject ?property ?object } \n" + 
-        "   GRAPH ?h { ?property rdf:type owl:DatatypeProperty } \n" +
+        "   GRAPH ?g1 { ?subject ?property ?object } \n" + 
+        "   GRAPH ?g2 { ?property rdf:type owl:DatatypeProperty } \n" +
         propertyFilters +
         "}";
     

@@ -70,9 +70,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
         // This may include properties that are not defined as "possible properties" for a subject of this class,
         // so we cannot just rely on getting that list.
         List<ObjectProperty> objectPropertyList = subject.getPopulatedObjectPropertyList();
-        for (ObjectProperty op : objectPropertyList) {
-            propertyList.add(op);
-        }
+        propertyList.addAll(objectPropertyList);
                 
         // If editing this page, merge in object properties applicable to the individual that are currently
         // unpopulated, so the properties are displayed to allow statements to be added to these properties.
@@ -88,9 +86,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
         // can be customized and thus differ from property to property. So it's easier for now to keep the
         // two working in parallel.
         List<DataProperty> dataPropertyList = subject.getPopulatedDataPropertyList();
-        for (DataProperty dp : dataPropertyList) {
-            propertyList.add(dp);
-        }
+        propertyList.addAll(dataPropertyList);
     
         if (policyHelper != null) {
             mergeAllPossibleDataProperties(propertyList);           
@@ -279,10 +275,10 @@ public class GroupedPropertyList extends BaseTemplateModel {
                  // If the property is not assigned to any group, add it to the group for unassigned properties
                  } else if (p.getGroupURI()==null) {
                      if (groupForUnassignedProperties!=null) { 
-                         // RY How could it happen that it's already in the group? Maybe we can remove this case.
+                         // RY How could it happen that it's already in the group? Maybe we can remove this test.
                          if (!alreadyOnPropertyList(groupForUnassignedProperties.getPropertyList(),p)) {                          
                              groupForUnassignedProperties.getPropertyList().add(p);
-                             log.debug("adding property "+p.getLabel()+" to group for unassigned propertiues");
+                             log.debug("adding property "+p.getLabel()+" to group for unassigned properties");
                          }
                      } 
                  // Otherwise, if the property is assigned to this group, add it to the group if it's not already there
