@@ -245,7 +245,8 @@
 
 </td>
 </tr>
-
+    <%-- RY Removing these forms: they are buggy; the property is not displayed on the individual page;
+    and the property will be removed in v1.3.
 	<!-- keyterms -->
 	<tr valign="bottom" align="center">
 		<td valign="bottom" align="center">
@@ -263,6 +264,8 @@
             	</form>
         	</c:if>
 		</td>
+		
+
     	<td>
     		<form action="editForm" method="get">
 				<input type="hidden" name="home" value="${portalBean.portalId}" />
@@ -284,6 +287,7 @@
             	<input type="hidden" name="controller" value="Keyword"/>
         	</form>
     	</td>
+    	--%>
 	</tr>
 	</table>
 
