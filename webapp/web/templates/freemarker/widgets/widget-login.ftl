@@ -7,8 +7,8 @@
     See NIHVIVO-1357. This test does nothing, since user has not been put into the data model.
     <#if ! user.loggedIn> -->
         ${stylesheets.add("/css/login.css")} 
-        ${scripts.add("/js/login/loginUtils.js")}
-        <#-- ${headScripts.add("")} -->
+        <#-- ${scripts.add("")} -->
+        ${headScripts.add("/js/login/loginUtils.js")}
     <#-- </#if> -->
 </#macro>
 

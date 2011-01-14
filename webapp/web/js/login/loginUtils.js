@@ -8,10 +8,10 @@ $(document).ready(function(){
     // focus on email or newpassword field
     $('.focus').focus();
     
-    // fade out error alerts
+    // fade in error alerts
     $('section#error-alert').css('display', 'none').fadeIn(1500);
     
-    // fade out fash-message when user log out
+    // fade in fash-message when user log out
     $('section#flash-message').css('display', 'none').fadeIn(1500);   
     
 });
