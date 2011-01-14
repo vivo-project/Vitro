@@ -97,7 +97,7 @@ public class JSONServlet extends VitroHttpServlet {
                 log.debug("parameter vclassId URI parameter expected ");
                 throw new Exception("parameter vclassId URI parameter expected ");
             }
-            rObj = getLuceneIndividualsByVClass(vclass.getURI(),req,resp,getServletContext());
+            rObj = getLuceneIndividualsByVClass(vclass.getURI(),req, getServletContext());
         }catch(Exception ex){
             errorMessage = ex.toString();
             log.error(ex,ex);
@@ -126,7 +126,7 @@ public class JSONServlet extends VitroHttpServlet {
         
     }
     
-    protected static JSONObject getLuceneIndividualsByVClass(String vclassURI, HttpServletRequest req, HttpServletResponse resp, ServletContext context) throws Exception {
+    public static JSONObject getLuceneIndividualsByVClass(String vclassURI, HttpServletRequest req, ServletContext context) throws Exception {
         
         VitroRequest vreq = new VitroRequest(req);        
         VClass vclass=null;
