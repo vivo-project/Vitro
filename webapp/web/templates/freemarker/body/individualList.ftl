@@ -8,7 +8,7 @@ ${stylesheets.add("/css/browseIndex.css")}
     <div class="individualList">
        <h2>${title} 
          &nbsp;<span class="rdfLink">&nbsp; 
-           <a class="icon-rdf" href="${redirecturl}" title="View the Non-Academic list in RDF format">RDF</a>
+           <a class="icon-rdf" href="${redirecturl}" title="View the ${title} list in RDF format">RDF</a>
          </span>
         </h2>
         <#if subtitle??>
