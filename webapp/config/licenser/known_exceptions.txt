@@ -28,6 +28,9 @@ webapp/src/edu/cornell/mannlib/vitro/webapp/web/ContentType.java
 webapp/src/org/json/*
 
 # See /doc/3rd-party-licenses.txt for LICENSE file
+webapp/src/edu/cornell/mannlib/vitro/webapp/utils/JSONtoFmModel.java
+
+# See /doc/3rd-party-licenses.txt for LICENSE file
 webapp/web/js/tiny_mce/*
 webapp/web/js/tiny_mce/**/*
 
