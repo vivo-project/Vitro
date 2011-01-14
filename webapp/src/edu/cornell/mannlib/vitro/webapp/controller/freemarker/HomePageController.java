@@ -13,7 +13,9 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
+import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
+import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.PageDataGetter;
 
 public class HomePageController extends FreemarkerHttpServlet {
 
@@ -30,10 +32,24 @@ public class HomePageController extends FreemarkerHttpServlet {
         List<VClassGroup> vClassGroups =  vcgc.getGroups(vreq.getPortalId());
         body.put("vClassGroups", vClassGroups);
         
+        PageDataGetter dataGetter =
+            PageController.getPageDataGetterMap(getServletContext())
+            .get(DisplayVocabulary.HOME_PAGE_TYPE);        
+        if( dataGetter != null ){
+            String uriOfPageInDisplayModel = "not defined";            
+            Map<String, Object> pageData = 
+                dataGetter.getData(getServletContext(), vreq, 
+                        uriOfPageInDisplayModel, body, 
+                        DisplayVocabulary.HOME_PAGE_TYPE);
+            if(pageData != null)
+                body.putAll(pageData);            
+        }
+        
         // Add home page data to body here         
         return new TemplateResponseValues(BODY_TEMPLATE, body);
     }
 
+    
     @Override
     protected String getTitle(String siteName, VitroRequest vreq) {
         return siteName;
