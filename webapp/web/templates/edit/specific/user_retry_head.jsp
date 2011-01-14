@@ -9,7 +9,7 @@
          return true;
      }
 
-     function validatePw(theForm) {
+     function validateUserFields(theForm) {
          if (theForm.Username.value.length == 0 ) {
              alert("Please enter a valid Email address.");
              theForm.Username.focus();
@@ -23,6 +23,16 @@
          if (theForm.LastName.value.length == 0 ) {
              alert("Please enter a Last Name.");
              theForm.LastName.focus();
+             return false;
+         }
+		 else {    
+             return true;
+         }
+     }
+
+     function validatePw(theForm) {
+
+         if ( !validateUserFields(theForm) ) {
              return false;
          }
          if (theForm.Md5password.value.length == 0 ) {
@@ -40,7 +50,7 @@
              theForm.Md5password.focus();
              return false;
          } 
-		 else {    
+ 		 else {    
              return true;
          }
      }
