@@ -36,6 +36,7 @@ public class UrlBuilder {
         AUTHENTICATE("/authenticate"),
         BROWSE("/browse"),
         CONTACT("/contact"),
+        IMAGE_UPLOAD("/uploadImages"),
         INDIVIDUAL("/individual"),
         INDIVIDUAL_EDIT("/entityEdit"),
         INDIVIDUAL_LIST("/individuallist"),
@@ -278,6 +279,13 @@ public class UrlBuilder {
         }
         
         return profileUrl;        
+    }
+    
+    public static String getImageUploadUrl(String subjectUri, String action) {
+        ParamMap params = new ParamMap(
+                "entityUri", subjectUri,
+                "action", action);                              
+        return UrlBuilder.getUrl(Route.IMAGE_UPLOAD, params);        
     }
 
     public static String urlEncode(String url) {

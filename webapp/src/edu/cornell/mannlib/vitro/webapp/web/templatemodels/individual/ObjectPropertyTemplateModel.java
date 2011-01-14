@@ -33,6 +33,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import freemarker.cache.TemplateLoader;
 import freemarker.template.Configuration;
@@ -353,10 +354,14 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     public String getAddUrl() {
         String addUrl = "";
         if (addAccess) {
+            if (propertyUri.equals(VitroVocabulary.IND_MAIN_IMAGE)) {
+                return UrlBuilder.getImageUploadUrl(subjectUri, "add");
+            } 
             ParamMap params = new ParamMap(
                     "subjectUri", subjectUri,
-                    "predicateUri", propertyUri);
-            addUrl = UrlBuilder.getUrl(EDIT_PATH, params);            
+                    "predicateUri", propertyUri);                              
+            addUrl = UrlBuilder.getUrl(EDIT_PATH, params);  
+
         }
         return addUrl;
     }

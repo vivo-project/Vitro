@@ -47,6 +47,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Res
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditSubmission;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
@@ -73,8 +74,14 @@ public class IndividualController extends FreemarkerHttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(IndividualController.class);
     
+    private static final Map<String, String> namespaces = new HashMap<String, String>() {{
+        put("vitro", VitroVocabulary.vitroURI);
+        put("vitroPublic", VitroVocabulary.VITRO_PUBLIC);
+    }};
+    
     private static final String TEMPLATE_INDIVIDUAL_DEFAULT = "individual.ftl";
     private static final String TEMPLATE_HELP = "individual-help.ftl";
+    
     
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
@@ -114,9 +121,9 @@ public class IndividualController extends FreemarkerHttpServlet {
 
 	        Map<String, Object> body = new HashMap<String, Object>();
 
-            body.put("title", individual.getName());
-            
+            body.put("title", individual.getName());            
     		body.put("relatedSubject", getRelatedSubject(vreq));
+    		body.put("namespaces", namespaces);
     		
     		IndividualTemplateModel itm = getIndividualTemplateModel(vreq, individual);
     		/* We need to expose non-getters in displaying the individual's property list, 
@@ -125,9 +132,7 @@ public class IndividualController extends FreemarkerHttpServlet {
     		 * into the data model: no real data can be modified. 
     		 */
 	        body.put("individual", getNonDefaultBeansWrapper(BeansWrapper.EXPOSE_SAFE).wrap(itm));
-
-	        body.put("headContent", getRdfLinkTag(itm));
-	        
+	        body.put("headContent", getRdfLinkTag(itm));	        
 	        body.put("localName", new IndividualLocalNameMethod());
 	        
 	        String template = getIndividualTemplate(individual);

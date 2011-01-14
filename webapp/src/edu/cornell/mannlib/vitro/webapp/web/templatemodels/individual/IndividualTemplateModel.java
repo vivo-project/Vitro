@@ -66,12 +66,15 @@ public class IndividualTemplateModel extends BaseTemplateModel {
         return isPerson() ? getUrl(Route.VISUALIZATION_AJAX.path(), "uri", getUri()) : null;
     }
 
-    // ** Remove these when the new methods are written
+    // This remains as a convenience method for getting the image url. We could instead use a custom list 
+    // view for mainImage which would provide this data in the query results.
     public String getImageUrl() {
         String imageUrl = individual.getImageUrl();
         return imageUrl == null ? null : getUrl(imageUrl);
     }
-    
+
+    // This remains as a convenience method for getting the thumbnail url. We could instead use a custom list 
+    // view for mainImage which would provide this data in the query results.
     public String getThumbUrl() {
         String thumbUrl = individual.getThumbUrl();
         return thumbUrl == null ? null : getUrl(thumbUrl);
@@ -104,33 +107,6 @@ public class IndividualTemplateModel extends BaseTemplateModel {
     
     public boolean isOrganization() {
         return individual.isVClass("http://xmlns.com/foaf/0.1/Organization");        
-    }
-    
-    public Link getPrimaryLink() {
-        Link primaryLink = null;
-        String anchor = individual.getAnchor();
-        String url = individual.getUrl();
-        if (anchor != null && url != null) {
-            primaryLink = new Link();
-            primaryLink.setAnchor(individual.getAnchor());
-            primaryLink.setUrl(individual.getUrl());           
-        } 
-        return primaryLink;
-    }
-    
-    public List<Link> getAdditionalLinks() {
-        return individual.getLinksList();
-    }
-    
-    public List<Link> getLinks() {
-        List<Link> additionalLinks = getAdditionalLinks();
-        List<Link> links = new ArrayList<Link>(additionalLinks.size()+1);
-        Link primaryLink = getPrimaryLink();
-        if (primaryLink != null) {
-            links.add(primaryLink);
-        }        
-        links.addAll(additionalLinks);
-        return links;      
     }
     
     public GroupedPropertyList getPropertyList() {

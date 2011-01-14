@@ -16,6 +16,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 public class ObjectPropertyStatementTemplateModel extends PropertyStatementTemplateModel {
     
@@ -82,6 +83,9 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
     public String getEditUrl() {
         String editUrl = "";
         if (isEditable()) {
+            if (propertyUri.equals(VitroVocabulary.IND_MAIN_IMAGE)) {
+                return UrlBuilder.getImageUploadUrl(subjectUri, "edit");
+            } 
             ParamMap params = new ParamMap(
                     "subjectUri", subjectUri,
                     "predicateUri", propertyUri,
@@ -90,6 +94,7 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
                 params.put("deleteProhibited", "prohibited");
             }
             editUrl = UrlBuilder.getUrl(EDIT_PATH, params);
+
         }
         
         return editUrl;
@@ -98,12 +103,16 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
     public String getDeleteUrl() {
         String deleteUrl = "";
         if (isDeletable()) {
+            if (propertyUri.equals(VitroVocabulary.IND_MAIN_IMAGE)) {
+                return UrlBuilder.getImageUploadUrl(subjectUri, "delete");
+            } 
             ParamMap params = new ParamMap(
                     "subjectUri", subjectUri,
                     "predicateUri", propertyUri,
                     "objectUri", objectUri,
                     "cmd", "delete");
             deleteUrl = UrlBuilder.getUrl(EDIT_PATH, params);
+
         }
         return deleteUrl;
     }
