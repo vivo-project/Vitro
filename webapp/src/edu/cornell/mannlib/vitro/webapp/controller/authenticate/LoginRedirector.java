@@ -16,6 +16,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
+import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
 
@@ -68,14 +69,14 @@ public class LoginRedirector {
 	}
 
 	public void redirectLoggedInUser() throws IOException {
+		DisplayMessage.setMessage(request, assembleWelcomeMessage());
+
 		try {
 			if (isSelfEditorWithIndividual()) {
 				log.debug("Going to Individual home page.");
 				response.sendRedirect(getAssociatedIndividualHomePage());
 			} else if (isMerelySelfEditor()) {
 				log.debug("User not recognized. Going to application home.");
-				DisplayMessage.setMessage(request, "You have logged in, "
-						+ "but the system contains no profile for you.");
 				response.sendRedirect(getApplicationHomePageUrl());
 			} else {
 				if (isLoginPage(afterLoginPage)) {
@@ -94,6 +95,33 @@ public class LoginRedirector {
 			log.debug("Problem with re-direction", e);
 			response.sendRedirect(getApplicationHomePageUrl());
 		}
+	}
+
+	private String assembleWelcomeMessage() {
+		if (isMerelySelfEditor() && !isSelfEditorWithIndividual()) {
+			// A special message for unrecognized self-editors:
+			return "You have logged in, "
+					+ "but the system contains no profile for you.";
+		}
+
+		LoginStatusBean bean = LoginStatusBean.getBean(request);
+		Authenticator auth = Authenticator.getInstance(request);
+		User user = auth.getUserByUsername(bean.getUsername());
+
+		String backString = "";
+		String greeting = bean.getUsername();
+
+		if (user != null) {
+			if (user.getLoginCount() > 1) {
+				backString = " back";
+			}
+			String name = user.getFirstName();
+			if ((name != null) && (name.length() > 0)) {
+				greeting = name;
+			}
+		}
+
+		return "Welcome" + backString + ", " + greeting;
 	}
 
 	public void redirectCancellingUser() throws IOException {
