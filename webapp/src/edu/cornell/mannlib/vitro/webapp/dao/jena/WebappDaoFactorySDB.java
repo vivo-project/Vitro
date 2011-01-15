@@ -20,8 +20,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 
 public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
-
-	private DatasetWrapperFactory dwf;
 	
 	/**
 	 * For use when any database connection associated with the Dataset
@@ -32,7 +30,6 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
 	public WebappDaoFactorySDB(OntModelSelector ontModelSelector, Dataset dataset) {
 		super(ontModelSelector);
 		this.dwf = new StaticDatasetFactory(dataset);
-		super.dwf = new StaticDatasetFactory(dataset);
 	}
 	
     /**
@@ -48,7 +45,6 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
 	                            String[] preferredLanguages) {
 		super(ontModelSelector, defaultNamespace, nonuserNamespaces, preferredLanguages);
         this.dwf = new StaticDatasetFactory(dataset);
-        super.dwf = new StaticDatasetFactory(dataset);
 	}
 	
     /**
@@ -65,7 +61,6 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
                                 String[] preferredLanguages) {
         super(ontModelSelector, defaultNamespace, nonuserNamespaces, preferredLanguages);
         this.dwf = new ReconnectingDatasetFactory(bds, storeDesc);
-        super.dwf = new ReconnectingDatasetFactory(bds, storeDesc);
     }
 	
 	@Override
