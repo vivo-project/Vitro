@@ -326,6 +326,10 @@ span.entityRelationsSpan {
     color: #2E440C;
     text-align: center;
 }
+div.sparqlform label {
+    display: inline;
+    font-weight: normal;
+}
 /* Temporary hack to remove stuff from forms in vivoweb only */
 .hideFromVivoWeb {
     display: none;

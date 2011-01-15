@@ -279,6 +279,8 @@ ul#alpha-browse-childClass a{
     padding-top: 20px;
     margin-left: 30px;
     margin-right: 30px;
+    clear: left;
+    min-height: 100px;
 }
 #individuals-in-childClass li.individual-foaf-person img{
     float: left;
