@@ -4,7 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.ontology.update;
 
 import java.io.IOException;
 
-public interface OntologyChangeLogger {
+public interface ChangeLogger {
 
 	public void log(String logMessage) throws IOException;
 	

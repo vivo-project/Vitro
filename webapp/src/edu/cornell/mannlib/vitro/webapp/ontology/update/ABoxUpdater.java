@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.hp.hpl.jena.ontology.DatatypeProperty;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
@@ -38,8 +37,8 @@ public class ABoxUpdater {
 	private OntModel newTboxModel;
 	private OntModel aboxModel;
 	private OntModel newTBoxAnnotationsModel;
-	private OntologyChangeLogger logger;  
-	private OntologyChangeRecord record;
+	private ChangeLogger logger;  
+	private ChangeRecord record;
 	private OntClass OWL_THING = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createClass(OWL.Thing.getURI());
 
 	/**
@@ -59,8 +58,8 @@ public class ABoxUpdater {
 			           OntModel newTboxModel,
 			           OntModel aboxModel,
 			           OntModel newAnnotationsModel,
-		               OntologyChangeLogger logger,
-		               OntologyChangeRecord record) {
+		               ChangeLogger logger,
+		               ChangeRecord record) {
 		
 		this.oldTboxModel = oldTboxModel;
 		this.newTboxModel = newTboxModel;
@@ -177,10 +176,12 @@ public class ABoxUpdater {
 		   
 		   //log summary of changes
 		   if (renameCount > 0) {
-			   logger.log("Changed " + renameCount + " subject reference" + ((renameCount > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class to be " + newClass.getURI());
+			   //logger.log("Changed " + renameCount + " subject reference" + ((renameCount > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class to be " + newClass.getURI());
+			   logger.log(renameCount + " subject reference" + ((renameCount > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class " + ((renameCount > 1) ? "were" : "was") +" changed to " + newClass.getURI());
 		   }
 		   if (removeCount > 0) {
-			   logger.log("Removed " + removeCount + " remaining subject reference" + ((removeCount > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class");
+			   //logger.log("Removed " + removeCount + " remaining subject reference" + ((removeCount > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class");
+			   logger.log(removeCount + " remaining subject reference" + ((removeCount > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class " + ((removeCount > 1) ? "were" : "was") + "removed." );
 		   }
 
 		   // Change class references in the objects of rdf:type statements
@@ -193,14 +194,12 @@ public class ABoxUpdater {
 			   Statement newStatement = ResourceFactory.createStatement(oldStatement.getSubject(), oldStatement.getPredicate(), newClass);
 			   retractions.add(oldStatement);
 			   additions.add(newStatement);
-			   //TODO - worried about logging changes before the changes have actually been made
-			   // in the model
-			   //logChanges(oldStatement, newStatement);
 		   }
 		   
 		   //log summary of changes
 		   if (renameCount > 0) {
-			   logger.log("Changed " + renameCount + " object reference" + ((renameCount > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class to be " + newClass.getURI());
+			   logger.log(renameCount + " object reference" + ((renameCount > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class " + ((renameCount > 1) ? "were" : "was") + " changed to " + newClass.getURI());
+			   //logger.log("Changed " + renameCount + " object reference" + ((renameCount > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class to be " + newClass.getURI());
 		   }
 		   
 		   aboxModel.remove(retractions);

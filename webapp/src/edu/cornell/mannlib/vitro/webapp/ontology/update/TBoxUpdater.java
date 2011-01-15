@@ -5,7 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.ontology.update;
 import java.io.IOException;
 import java.util.List;
 
-import com.hp.hpl.jena.ontology.DatatypeProperty;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Literal;
@@ -32,8 +31,8 @@ public class TBoxUpdater {
 	private OntModel oldTboxAnnotationsModel;
 	private OntModel newTboxAnnotationsModel;
 	private OntModel siteModel;
-	private OntologyChangeLogger logger;  
-	private OntologyChangeRecord record;
+	private ChangeLogger logger;  
+	private ChangeRecord record;
 	private boolean detailLogs = false;
 	
     private static final String classGroupURI = "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#ClassGroup";
@@ -57,8 +56,8 @@ public class TBoxUpdater {
 	public TBoxUpdater(OntModel oldTboxAnnotationsModel,
 			           OntModel newTboxAnnotationsModel,
 			           OntModel siteModel,
-		               OntologyChangeLogger logger,
-		               OntologyChangeRecord record) {
+		               ChangeLogger logger,
+		               ChangeRecord record) {
 		
 		this.oldTboxAnnotationsModel = oldTboxAnnotationsModel;
 		this.newTboxAnnotationsModel = newTboxAnnotationsModel;
@@ -92,7 +91,7 @@ public class TBoxUpdater {
 	 *  Note: as specified, this method for now assumes that no new vitro annotation
 	 *  properties have been introduced. This should be updated for future versions.
 	 */
-	public void updateVitroPropertyDefaultValues() throws IOException {
+	public void updateDefaultAnnotationValues() throws IOException {
 				
 		siteModel.enterCriticalSection(Lock.WRITE);
 		
@@ -296,9 +295,9 @@ public class TBoxUpdater {
 			// log the additions - summary
 			if (newAnnotationSettingsToAdd.size() > 0) {
 				boolean plural = (newAnnotationSettingsToAdd.size() > 1);
-	            logger.log("Added " + newAnnotationSettingsToAdd.size() + " new annotation property setting" + (plural ? "s" : "") + " to the knowledge base. This includes " +
+	            logger.log("Added " + newAnnotationSettingsToAdd.size() + " new annotation property setting" + (plural ? "s" : "") + " to the knowledge base. This includes only " +
 	                         "existing annotation properties applied to existing classes where they weren't applied before, or existing " +
-	                         "properties applied to new classes. No new annotation properties have been introduced.");
+	                         "properties applied to new classes.");
 			}
 		   
 	} finally {
@@ -319,7 +318,7 @@ public class TBoxUpdater {
  *  knowledge base.                  
  *  
  */	
-public void updateVitroAnnotationsModel() throws IOException {
+public void updateAnnotationModel() throws IOException {
 		
 	   // for each ClassGroup in the old vitro annotations model: if it is not in 
 	   // the new vitro annotations model and the site has no classes asserted to 
@@ -335,22 +334,20 @@ public void updateVitroAnnotationsModel() throws IOException {
 		    
 			StmtIterator iter = oldTboxAnnotationsModel.listStatements((Resource) null, RDF.type, classGroupClass);
 	  	
-			int count = 0;
 			while (iter.hasNext()) {  
 			  Statement stmt = iter.next();
-			  
+						  
 			  if (!newTboxAnnotationsModel.contains(stmt) && !usesGroup(siteModel, stmt.getSubject())) {
-				  count++;
 				  retractions.add(siteModel.listStatements(stmt.getSubject(),(Property) null,(RDFNode)null));
+				  logger.log("Removed the " + stmt.getSubject().getURI() + " ClassGroup from the annotations model.");
 			  }
 			}
 	    	
 			if (retractions.size() > 0) {
 			   siteModel.remove(retractions);
 			   record.recordRetractions(retractions);
-			
-		       logger.log("Removed " + count + " Class Group" + (count > 1 ? "s" : "") + " from the annotations model."); 		   
-			}  
+		    }   
+		        
 		} finally {
 			siteModel.leaveCriticalSection();
 		}
@@ -364,12 +361,19 @@ public void updateVitroAnnotationsModel() throws IOException {
 
 public boolean usesGroup(Model model, Resource theClassGroup) throws IOException {
 	
+   //logger.log("called for " + theClassGroup.getLocalName() );
+   
    model.enterCriticalSection(Lock.READ);
      
    try {
-	    return (model.contains((Resource) null, inClassGroupProp, theClassGroup) ? true : false);
+	   StmtIterator iter = model.listStatements((Resource) null, inClassGroupProp, theClassGroup);
+	   while (iter.hasNext()) {
+		   logger.log("statement: " + ABoxUpdater.stmtString(iter.next()));
+	   }
+	   
+	   return (model.contains((Resource) null, inClassGroupProp, theClassGroup) ? true : false);
    } finally {
-	    model.leaveCriticalSection();
+	   model.leaveCriticalSection();
    }
 }
 

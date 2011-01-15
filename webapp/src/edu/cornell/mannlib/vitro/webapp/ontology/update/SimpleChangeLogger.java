@@ -8,14 +8,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 
-public class SimpleOntologyChangeLogger implements OntologyChangeLogger {
+public class SimpleChangeLogger implements ChangeLogger {
 
 	private Writer logWriter;
 	private Writer errorWriter;
 	
 	private boolean errorsWritten = false;
 	
-	public SimpleOntologyChangeLogger( String logPath, 
+	public SimpleChangeLogger( String logPath, 
 									   String errorPath ) {
 		File logFile = new File(logPath);
 		File errorFile = new File(errorPath);
@@ -36,7 +36,8 @@ public class SimpleOntologyChangeLogger implements OntologyChangeLogger {
 		className = className.substring(className.lastIndexOf('.') + 1 );
 		String methodName = ((StackTraceElement)elements[1]).getMethodName();
 		
-		logWriter.write(className + "." + methodName +  ":  " + logMessage + "\n\n");
+		logWriter.write(className + ":  " + logMessage + "\n\n");
+		//logWriter.write(className + "." + methodName +  ":  " + logMessage + "\n\n");
 		logWriter.flush();
 	}
 

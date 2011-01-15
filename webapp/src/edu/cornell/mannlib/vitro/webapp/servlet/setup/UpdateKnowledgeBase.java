@@ -27,8 +27,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDao;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SimpleOntModelSelector;
-import edu.cornell.mannlib.vitro.webapp.ontology.update.OntologyUpdateSettings;
-import edu.cornell.mannlib.vitro.webapp.ontology.update.OntologyUpdater;
+import edu.cornell.mannlib.vitro.webapp.ontology.update.UpdateSettings;
+import edu.cornell.mannlib.vitro.webapp.ontology.update.KnowledgeBaseUpdater;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup;
 
 /**
@@ -71,7 +71,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 					(OntModel) sce.getServletContext().getAttribute(
 							JenaBaseDao.ASSERTIONS_ONT_MODEL_ATTRIBUTE_NAME));
 			
-			OntologyUpdateSettings settings = new OntologyUpdateSettings();
+			UpdateSettings settings = new UpdateSettings();
 			settings.setAskQueryFile(ctx.getRealPath(ASK_QUERY_FILE));
 			settings.setDataDir(ctx.getRealPath(DATA_DIR));
 			settings.setSparqlConstructAdditionsDir(ctx.getRealPath(SPARQL_CONSTRUCT_ADDITIONS_DIR));
@@ -99,7 +99,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			
 			try {
 				
-			  OntologyUpdater ontologyUpdater = new OntologyUpdater(settings);
+			  KnowledgeBaseUpdater ontologyUpdater = new KnowledgeBaseUpdater(settings);
 			  
 			  try {
 				  if (ontologyUpdater.updateRequired()) {

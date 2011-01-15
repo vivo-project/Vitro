@@ -23,9 +23,9 @@ import edu.cornell.mannlib.vitro.webapp.ontology.update.AtomicOntologyChange.Ato
 
 public class OntologyChangeParser {
 
-	private OntologyChangeLogger logger;
+	private ChangeLogger logger;
 	
-	public OntologyChangeParser(OntologyChangeLogger logger) {
+	public OntologyChangeParser(ChangeLogger logger) {
 		this.logger = logger;
 	}
 		
