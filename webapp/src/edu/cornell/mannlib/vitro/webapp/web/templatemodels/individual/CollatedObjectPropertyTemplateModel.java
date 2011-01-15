@@ -45,8 +45,8 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
         
         String invalidConfigMessage = checkConfiguration();
         if ( ! invalidConfigMessage.isEmpty() ) {
-            throw new InvalidConfigurationException("Invalid configuration for property " + 
-                    op.getURI() + ":" + invalidConfigMessage); 
+            throw new InvalidConfigurationException("Invalid configuration for collated property " + 
+                    op.getURI() + ":" + invalidConfigMessage + ". Creating uncollated display instead."); 
         }
 
         /* Get the data */
