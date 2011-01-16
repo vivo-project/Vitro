@@ -104,6 +104,23 @@ public class SimpleReasonerSetup implements ServletContextListener {
 	        
 	        // the simple reasoner will register itself as a listener to the ABox assertions
 	        SimpleReasoner simpleReasoner = new SimpleReasoner(unionOms.getTBoxModel(), assertionsOms.getABoxModel(), inferencesOms.getABoxModel(), rebuildModel, scratchModel);
+	        
+	        if (isRecomputeRequired(sce.getServletContext())) {
+	            
+	            log.info("ABox inference recompute required");
+	            
+	            int sleeps = 0;
+	            while (sleeps < 1000 && pelletListener.isReasoning()) {
+	                if ((sleeps % 30) == 0) {
+	                    log.info("Waiting for initial TBox reasoning to complete");
+	                }
+	                Thread.sleep(100);   
+	                sleeps++;
+	            }
+	            
+	            simpleReasoner.recompute();
+	            
+	        }
 
 	        assertionsOms.getTBoxModel().register(new SimpleReasonerTBoxListener(simpleReasoner));
 	        
@@ -118,6 +135,17 @@ public class SimpleReasonerSetup implements ServletContextListener {
 	
 	public void contextDestroyed(ServletContextEvent arg0) {
 		// nothing to do
+	}
+	
+	private static final String RECOMPUTE_REQUIRED_ATTR = 
+	        SimpleReasonerSetup.class.getName() + ".recomputeRequired";
+	
+	public static void setRecomputeRequired(ServletContext ctx) {
+	    ctx.setAttribute(RECOMPUTE_REQUIRED_ATTR, true);
+	}
+	
+	private static boolean isRecomputeRequired(ServletContext ctx) {
+	    return (ctx.getAttribute(RECOMPUTE_REQUIRED_ATTR) != null);
 	}
   
 }
