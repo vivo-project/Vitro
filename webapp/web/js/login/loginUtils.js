@@ -3,7 +3,7 @@
 $(document).ready(function(){
 
     // login form is hidden by default; use JavaScript to reveal
-    $("#loginFormAndLinks").show();
+    $("#login").removeClass('hidden');
   
     // focus on email or newpassword field
     $('.focus').focus();
