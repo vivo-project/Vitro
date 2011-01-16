@@ -44,7 +44,7 @@ public class PropertyInstanceDaoJena extends JenaBaseDao implements
     }
 
     public void deleteObjectPropertyStatement(String subjectURI, String propertyURI, String objectURI) {
-    	deleteObjectPropertyStatement(subjectURI, propertyURI, objectURI, getOntModelSelector().getABoxModel());
+    	deleteObjectPropertyStatement(subjectURI, propertyURI, objectURI, getOntModelSelector().getFullModel());
     }
 
     public void deleteObjectPropertyStatement(String subjectURI, String propertyURI, String objectURI, OntModel ontModel) {
@@ -316,35 +316,42 @@ public class PropertyInstanceDaoJena extends JenaBaseDao implements
     }
 
     public int insertProp(PropertyInstanceIface prop) {
-    	return insertProp(prop, getOntModelSelector().getABoxModel());
+    	return insertProp(prop, getOntModelSelector());
     }
 
-    public int insertProp(PropertyInstanceIface prop, OntModel ontModel) {
+    public int insertProp(PropertyInstanceIface prop, OntModelSelector oms) {
+        OntModel ontModel = oms.getABoxModel();
+        OntModel tboxModel = oms.getTBoxModel();
         ontModel.enterCriticalSection(Lock.WRITE);
         try {
-            Resource subjRes = ontModel.getResource(prop.getSubjectEntURI());
-            OntProperty pred = ontModel.getOntProperty(prop.getPropertyURI());            
-            Resource objRes = ontModel.getResource(prop.getObjectEntURI());
-            if ( (subjRes != null) && (pred != null) && (objRes != null) ) {
-            	getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),true,prop.getSubjectEntURI()));
-            	try {
-            		ontModel.add(subjRes,pred,objRes);
-                	updatePropertyDateTimeValue(subjRes,MODTIME,Calendar.getInstance().getTime(),getOntModel());
-            	} finally {
-            		getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),false,prop.getSubjectEntURI()));
-            	}
-            	OntProperty invPred = pred.getInverse();
-                if (invPred != null) {
-                	getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),true,prop.getObjectEntURI()));
-                    try {
-                    	ontModel.add(objRes,invPred,subjRes);
-                    	updatePropertyDateTimeValue(objRes,MODTIME,Calendar.getInstance().getTime(),getOntModel());
-                    } finally {
-                    	getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),false,prop.getSubjectEntURI()));
+            tboxModel.enterCriticalSection(Lock.READ);
+            try {
+                Resource subjRes = ontModel.getResource(prop.getSubjectEntURI());
+                OntProperty pred = tboxModel.getOntProperty(prop.getPropertyURI());            
+                Resource objRes = ontModel.getResource(prop.getObjectEntURI());
+                if ( (subjRes != null) && (pred != null) && (objRes != null) ) {
+                	getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),true,prop.getSubjectEntURI()));
+                	try {
+                		ontModel.add(subjRes,pred,objRes);
+                    	updatePropertyDateTimeValue(subjRes,MODTIME,Calendar.getInstance().getTime(),getOntModel());
+                	} finally {
+                		getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),false,prop.getSubjectEntURI()));
+                	}
+                	OntProperty invPred = pred.getInverse();
+                    if (invPred != null) {
+                    	getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),true,prop.getObjectEntURI()));
+                        try {
+                        	ontModel.add(objRes,invPred,subjRes);
+                        	updatePropertyDateTimeValue(objRes,MODTIME,Calendar.getInstance().getTime(),getOntModel());
+                        } finally {
+                        	getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),false,prop.getSubjectEntURI()));
+                        }
                     }
                 }
+                return 0;
+            } finally {
+                tboxModel.leaveCriticalSection();
             }
-            return 0;
         } finally {
             ontModel.leaveCriticalSection();
         }
