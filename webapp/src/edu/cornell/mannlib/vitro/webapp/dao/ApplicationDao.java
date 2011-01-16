@@ -12,4 +12,6 @@ public interface ApplicationDao {
 	
 	public List<String> getExternallyLinkedNamespaces();
 	
+	public boolean isExternallyLinkedNamespace(String namespace);
+	
 }

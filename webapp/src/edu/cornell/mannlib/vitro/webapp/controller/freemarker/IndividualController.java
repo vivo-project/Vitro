@@ -92,7 +92,7 @@ public class IndividualController extends FreemarkerHttpServlet {
 	        String url = vreq.getRequestURI().substring(vreq.getContextPath().length()); 
 	
 	        // Check to see if the request is for a non-information resource, redirect if it is.
-	        String redirectURL = checkForRedirect ( url, vreq.getHeader("accept") );
+	        String redirectURL = checkForRedirect ( url, vreq );
 	        if( redirectURL != null ){
 	            return new RedirectResponseValues(redirectURL);
 	        }            	                                         
@@ -108,7 +108,7 @@ public class IndividualController extends FreemarkerHttpServlet {
 	        	return doNotFound(vreq);
 	        }
 
-            ContentType rdfFormat = checkForLinkedDataRequest(url,vreq.getHeader("accept"));
+            ContentType rdfFormat = checkForLinkedDataRequest(url, vreq);
             if( rdfFormat != null ){
                 return doRdf(vreq, individual, rdfFormat);
             }   
@@ -387,10 +387,10 @@ public class IndividualController extends FreemarkerHttpServlet {
     //Redirect if the request is for http://hostname/individual/localname
     // if accept is nothing or text/html redirect to ???
     // if accept is some RDF thing redirect to the URL for RDF
-	private String checkForRedirect(String url, String acceptHeader) {
+	private String checkForRedirect(String url, VitroRequest vreq) {
 		Matcher m = URI_PATTERN.matcher(url);
 		if( m.matches() && m.groupCount() == 1 ){			
-			ContentType c = checkForLinkedDataRequest(url, acceptHeader);			
+			ContentType c = checkForLinkedDataRequest(url, vreq);			
 			if( c != null ){
 				String redirectUrl = "/individual/" + m.group(1) + "/" + m.group(1) ; 
 				if( RDFXML_MIMETYPE.equals( c.getMediaType())  ){
@@ -413,13 +413,37 @@ public class IndividualController extends FreemarkerHttpServlet {
     private static Pattern TTL_REQUEST = Pattern.compile("^/individual/([^/]*)/\\1.ttl$");
     private static Pattern HTML_REQUEST = Pattern.compile("^/display/([^/]*)$");
     
+    private static Pattern RDF_PARAM = Pattern.compile("rdf");
+    private static Pattern N3_PARAM = Pattern.compile("n3");
+    private static Pattern TTL_PARAM = Pattern.compile("ttl");
+    
     /**  
      * @return null if this is not a linked data request, returns content type if it is a 
      * linked data request.
      */
-	protected ContentType checkForLinkedDataRequest(String url, String acceptHeader) {		
+	protected ContentType checkForLinkedDataRequest(String url, VitroRequest vreq ) {		
 		try {
-			//check the accept header			
+		    ContentType contentType = null;
+		    Matcher m;
+		    // Check for url param specifying format
+		    String formatParam = (String) vreq.getParameter("format");
+		    if (formatParam != null) {
+		        m = RDF_PARAM.matcher(formatParam);
+		        if ( m.matches() ) {
+		            return new ContentType(RDFXML_MIMETYPE);
+		        }
+	            m = N3_PARAM.matcher(formatParam);
+	            if( m.matches() ) {
+	                return new ContentType(N3_MIMETYPE);
+	            }
+	            m = TTL_PARAM.matcher(formatParam);
+	            if( m.matches() ) {
+	                return new ContentType(TTL_MIMETYPE);
+	            } 		        
+		    }
+		    
+			//check the accept header
+		    String acceptHeader = vreq.getHeader("accept");
 			if (acceptHeader != null) {
 				List<ContentType> actualContentTypes = new ArrayList<ContentType>();				
 				actualContentTypes.add(new ContentType( XHTML_MIMETYPE ));
@@ -428,14 +452,13 @@ public class IndividualController extends FreemarkerHttpServlet {
 				actualContentTypes.add(new ContentType( RDFXML_MIMETYPE ));
 				actualContentTypes.add(new ContentType( N3_MIMETYPE ));
 				actualContentTypes.add(new ContentType( TTL_MIMETYPE ));
-				
-								
-				ContentType best = ContentType.getBestContentType(acceptHeader,actualContentTypes);
-				if (best!=null && (
-						RDFXML_MIMETYPE.equals(best.getMediaType()) || 
-						N3_MIMETYPE.equals(best.getMediaType()) ||
-						TTL_MIMETYPE.equals(best.getMediaType()) ))
-					return best;				
+			
+				contentType = ContentType.getBestContentType(acceptHeader,actualContentTypes);
+				if (contentType!=null && (
+						RDFXML_MIMETYPE.equals(contentType.getMediaType()) || 
+						N3_MIMETYPE.equals(contentType.getMediaType()) ||
+						TTL_MIMETYPE.equals(contentType.getMediaType()) ))
+					return contentType;				
 			}
 			
 			/*
@@ -444,22 +467,30 @@ public class IndividualController extends FreemarkerHttpServlet {
 			   http://vivo.cornell.edu/individual/n23/n23.n3
 			   http://vivo.cornell.edu/individual/n23/n23.ttl
 			 */
-						
-			Matcher m = RDF_REQUEST.matcher(url);
-			if( m.matches() )
-				return new ContentType(RDFXML_MIMETYPE);
-			m = N3_REQUEST.matcher(url);
-			if( m.matches() )
-				return new ContentType(N3_MIMETYPE);
-			m = TTL_REQUEST.matcher(url);
-			if( m.matches() )
-				return new ContentType(TTL_MIMETYPE);
+	        m = RDF_REQUEST.matcher(url);
+	        if( m.matches() ) {
+	            return new ContentType(RDFXML_MIMETYPE);
+	        }
+	        m = N3_REQUEST.matcher(url);
+	        if( m.matches() ) {
+	            return new ContentType(N3_MIMETYPE);
+	        }
+	        m = TTL_REQUEST.matcher(url);
+	        if( m.matches() ) {
+	            return new ContentType(TTL_MIMETYPE);
+	        }    
+			
 			
 		} catch (Throwable th) {
 			log.error("problem while checking accept header " , th);
 		}
 		return null;
 	}  
+	
+	private ContentType getContentTypeFromString(String string) {
+
+        return null;
+	}
 
 	@SuppressWarnings("unused")
 	private boolean checkForSunset(VitroRequest vreq, Individual entity) {
