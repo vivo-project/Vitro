@@ -2,15 +2,16 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openrdf.model.URI;
+import org.openrdf.model.impl.URIImpl;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.beans.Link;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
@@ -31,10 +32,10 @@ public class IndividualTemplateModel extends BaseTemplateModel {
     protected LoginStatusBean loginStatusBean = null;
     private EditingPolicyHelper policyHelper = null;
 
-    public IndividualTemplateModel(Individual individual, VitroRequest vreq, LoginStatusBean loginStatusBean) {
+    public IndividualTemplateModel(Individual individual, VitroRequest vreq) {
         this.individual = individual;
         this.vreq = vreq;
-        this.loginStatusBean = loginStatusBean;
+        this.loginStatusBean = LoginStatusBean.getBean(vreq);
         // Needed for getting portal-sensitive urls. Remove if multi-portal support is removed.
         this.urlBuilder = new UrlBuilder(vreq.getPortal());
         
@@ -80,16 +81,39 @@ public class IndividualTemplateModel extends BaseTemplateModel {
         return thumbUrl == null ? null : getUrl(thumbUrl);
     } 
     
-    public String getLinkedDataUrl() {
-        String defaultNamespace = vreq.getWebappDaoFactory().getDefaultNamespace();
-        String uri = getUri();
-        return uri.startsWith(defaultNamespace) ? uri + "/" + getLocalName() + ".rdf" : null;
+    public String getRdfUrl() {
+        return getRdfUrl(true);
     }
     
-    // RY Used for the rdf link on the individual page. Is it correct that this is not the same
-    // as getLinkedDataUrl()?
-    public String getRdfUrl() {
-        return getProfileUrl() + "/" + getLocalName() + ".rdf";
+    // Used to create a link to generate the individual's rdf.
+    public String getRdfUrl(boolean checkExternalNamespaces) {
+        
+        String individualUri = getUri();
+        String profileUrl = getProfileUrl();
+        
+        URI uri = new URIImpl(individualUri);
+        String namespace = uri.getNamespace();
+        
+        // Individuals in the default namespace
+        // e.g., http://vivo.cornell.edu/individual/n2345/n2345.rdf
+        // where default namespace = http://vivo.cornell.edu/individual/ 
+        String defaultNamespace = vreq.getWebappDaoFactory().getDefaultNamespace();
+        if (defaultNamespace.equals(namespace)) {
+            return profileUrl + "/" + getLocalName() + ".rdf";
+        } 
+        
+        // An RDF url is not defined for an externally linked namespace. The data does not reside
+        // in the current system, and the external system may not accept a request for rdf.
+        if (checkExternalNamespaces && vreq.getWebappDaoFactory()
+                                           .getApplicationDao()
+                                           .isExternallyLinkedNamespace(namespace)) {
+            return null;
+        }
+
+        // http://some.other.namespace/n2345?format=rdfxml
+        // ** RY Not sure it is correct to return this for the <link> element
+        return UrlBuilder.addParams(profileUrl, "format", "rdfxml");
+
     }
     
     public String getEditUrl() {

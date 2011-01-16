@@ -234,12 +234,24 @@ public class UrlBuilder {
     }
     
     public static String getPath(String path, ParamMap params) {
-        String glue = "?";
-        for (String key : params.keySet()) {
-            path += glue + key + "=" + urlEncode(params.get(key));
+        return addParams(path, params, "?");      
+    }
+    
+    private static String addParams(String url, ParamMap params, String glue) {
+        for (String key: params.keySet()) {
+            url += glue + key + "=" + urlEncode(params.get(key));
             glue = "&";
         }
-        return path;       
+        return url;        
+    }
+    
+    public static String addParams(String url, ParamMap params) {
+        String glue = url.contains("?") ? "&" : "?";
+        return addParams(url, params, glue);
+    }
+    
+    public static String addParams(String url, String...params) {
+        return addParams(url, new ParamMap(params));
     }
     
     public static String getPath(Route route, ParamMap params) {
@@ -267,8 +279,7 @@ public class UrlBuilder {
         if (defaultNamespace.equals(namespace)) {
             profileUrl = getUrl(Route.INDIVIDUAL.path() + "/" + localName);
         } else {
-            List<String> externallyLinkedNamespaces = wadf.getApplicationDao().getExternallyLinkedNamespaces();
-            if (externallyLinkedNamespaces.contains(namespace)) {
+            if (wadf.getApplicationDao().isExternallyLinkedNamespace(namespace)) {
                 log.debug("Found externally linked namespace " + namespace);
                 profileUrl = namespace + "/" + localName;
             } else {

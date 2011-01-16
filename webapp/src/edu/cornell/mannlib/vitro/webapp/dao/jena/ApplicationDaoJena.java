@@ -80,6 +80,11 @@ public class ApplicationDaoJena extends JenaBaseDao implements ApplicationDao {
         return externallyLinkedNamespaces;
     }
     
+    public boolean isExternallyLinkedNamespace(String namespace) {
+        List<String> namespaces = getExternallyLinkedNamespaces();
+        return namespaces.contains(namespace);
+    }
+    
     private class ExternalNamespacesChangeListener extends StatementListener {
         
         @Override
