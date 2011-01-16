@@ -52,10 +52,10 @@ public class ObjectPropertyStatementDaoSDB extends
         			       "   ?o <" + RDFS.label.getURI() + "> ?oLabel .  \n" +
         			       "   ?o <" + VitroVocabulary.MONIKER + "> ?oMoniker  \n" +
         			       "} WHERE { GRAPH ?g { \n" +
-        			       "   <" + entity.getURI() + "> ?p ?o . \n" +
-        			       "   ?o a ?oType \n" +
-        			       "   OPTIONAL { ?o <" + RDFS.label.getURI() + "> ?oLabel }  \n" +
-        			       "   OPTIONAL { ?o <" + VitroVocabulary.MONIKER + "> ?oMoniker }  \n" +
+        			       "   <" + entity.getURI() + "> ?p ?o \n" +
+        			       "   OPTIONAL { GRAPH ?h { ?o a ?oType } } \n" +
+        			       "   OPTIONAL { GRAPH ?i { ?o <" + RDFS.label.getURI() + "> ?oLabel } } \n" +
+        			       "   OPTIONAL { GRAPH ?j { ?o <" + VitroVocabulary.MONIKER + "> ?oMoniker } }  \n" +
                            "} }";
         	long startTime = System.currentTimeMillis();
         	Model m = null;
@@ -85,7 +85,6 @@ public class ObjectPropertyStatementDaoSDB extends
 	            try {
 	                while (propIt.hasNext()) {
 	                    Statement st = (Statement) propIt.next();
-	                    
 	                    if (st.getObject().isResource() && !(NONUSER_NAMESPACES.contains(st.getPredicate().getNameSpace()))) {
 	                        try {
 	                            ObjectPropertyStatement objPropertyStmt = new ObjectPropertyStatementImpl();
