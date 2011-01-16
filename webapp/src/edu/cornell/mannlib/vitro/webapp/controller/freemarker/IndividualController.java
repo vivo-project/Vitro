@@ -184,7 +184,7 @@ public class IndividualController extends FreemarkerHttpServlet {
     
     private String getRdfLinkTag(IndividualTemplateModel itm) {
         String linkTag = null;
-        String linkedDataUrl = itm.getLinkedDataUrl();
+        String linkedDataUrl = itm.getRdfUrl(false);
         if (linkedDataUrl != null) {
             linkTag = "<link rel=\"alternate\" type=\"application/rdf+xml\" href=\"" +
                           linkedDataUrl + "\" /> ";
@@ -200,10 +200,7 @@ public class IndividualController extends FreemarkerHttpServlet {
         individual.setKeywords(iwDao.getKeywordsForIndividualByMode(individual.getURI(),"visible"));
         individual.sortForDisplay();
 
-        //setup highlighter for search terms
-        //checkForSearch(vreq, individual);
-        
-        return new IndividualTemplateModel(individual, vreq, LoginStatusBean.getBean(vreq));
+        return new IndividualTemplateModel(individual, vreq);
 	}
 	
 	// Determine whether the individual has a custom display template based on its class membership.
@@ -413,9 +410,9 @@ public class IndividualController extends FreemarkerHttpServlet {
     private static Pattern TTL_REQUEST = Pattern.compile("^/individual/([^/]*)/\\1.ttl$");
     private static Pattern HTML_REQUEST = Pattern.compile("^/display/([^/]*)$");
     
-    private static Pattern RDF_PARAM = Pattern.compile("rdf");
-    private static Pattern N3_PARAM = Pattern.compile("n3");
-    private static Pattern TTL_PARAM = Pattern.compile("ttl");
+    public static final Pattern RDFXML_FORMAT = Pattern.compile("rdfxml");
+    public static final Pattern N3_FORMAT = Pattern.compile("n3");
+    public static final Pattern TTL_FORMAT = Pattern.compile("ttl");
     
     /**  
      * @return null if this is not a linked data request, returns content type if it is a 
@@ -428,15 +425,15 @@ public class IndividualController extends FreemarkerHttpServlet {
 		    // Check for url param specifying format
 		    String formatParam = (String) vreq.getParameter("format");
 		    if (formatParam != null) {
-		        m = RDF_PARAM.matcher(formatParam);
+		        m = RDFXML_FORMAT.matcher(formatParam);
 		        if ( m.matches() ) {
 		            return new ContentType(RDFXML_MIMETYPE);
 		        }
-	            m = N3_PARAM.matcher(formatParam);
+	            m = N3_FORMAT.matcher(formatParam);
 	            if( m.matches() ) {
 	                return new ContentType(N3_MIMETYPE);
 	            }
-	            m = TTL_PARAM.matcher(formatParam);
+	            m = TTL_FORMAT.matcher(formatParam);
 	            if( m.matches() ) {
 	                return new ContentType(TTL_MIMETYPE);
 	            } 		        
@@ -570,27 +567,6 @@ public class IndividualController extends FreemarkerHttpServlet {
 		}
 		
     	return newModel;
-    }
-    
-    
-    private void checkForSearch(HttpServletRequest req, Individual ent) {                
-        if (req.getSession().getAttribute("LastQuery") != null) {
-            VitroQueryWrapper qWrap = (VitroQueryWrapper) req.getSession()
-                    .getAttribute("LastQuery");
-            if (qWrap.getRequestCount() > 0 && qWrap.getQuery() != null) {
-                VitroQuery query = qWrap.getQuery();
-
-                //set query text so we can get it in JSP
-                req.setAttribute("querytext", query.getTerms());
-
-                //setup highlighting for output
-                StringProcessorTag.putStringProcessorInRequest(req, qWrap.getHighlighter());                                
-                        
-                qWrap.setRequestCount(qWrap.getRequestCount() - 1);
-            } else {
-                req.getSession().removeAttribute("LastQuery");
-            }
-        }
     }
 
     private Pattern badrequest= Pattern.compile(".*([&\\?=]|\\.\\.).*");

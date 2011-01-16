@@ -2,7 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,10 +32,10 @@ public class IndividualTemplateModel extends BaseTemplateModel {
     protected LoginStatusBean loginStatusBean = null;
     private EditingPolicyHelper policyHelper = null;
 
-    public IndividualTemplateModel(Individual individual, VitroRequest vreq, LoginStatusBean loginStatusBean) {
+    public IndividualTemplateModel(Individual individual, VitroRequest vreq) {
         this.individual = individual;
         this.vreq = vreq;
-        this.loginStatusBean = loginStatusBean;
+        this.loginStatusBean = LoginStatusBean.getBean(vreq);
         // Needed for getting portal-sensitive urls. Remove if multi-portal support is removed.
         this.urlBuilder = new UrlBuilder(vreq.getPortal());
         
@@ -80,14 +81,12 @@ public class IndividualTemplateModel extends BaseTemplateModel {
         return thumbUrl == null ? null : getUrl(thumbUrl);
     } 
     
-    public String getLinkedDataUrl() {
-        String defaultNamespace = vreq.getWebappDaoFactory().getDefaultNamespace();
-        String uri = getUri();
-        return uri.startsWith(defaultNamespace) ? uri + "/" + getLocalName() + ".rdf" : null;
+    public String getRdfUrl() {
+        return getRdfUrl(true);
     }
     
-    // Used to create a link to a display of the individual's rdf.
-    public String getRdfUrl() {
+    // Used to create a link to generate the individual's rdf.
+    public String getRdfUrl(boolean checkExternalNamespaces) {
         
         String individualUri = getUri();
         String profileUrl = getProfileUrl();
@@ -97,7 +96,7 @@ public class IndividualTemplateModel extends BaseTemplateModel {
         
         // Individuals in the default namespace
         // e.g., http://vivo.cornell.edu/individual/n2345/n2345.rdf
-        // where default namespace = http://vivo.cornell.edu/individual/        
+        // where default namespace = http://vivo.cornell.edu/individual/ 
         String defaultNamespace = vreq.getWebappDaoFactory().getDefaultNamespace();
         if (defaultNamespace.equals(namespace)) {
             return profileUrl + "/" + getLocalName() + ".rdf";
@@ -105,12 +104,15 @@ public class IndividualTemplateModel extends BaseTemplateModel {
         
         // An RDF url is not defined for an externally linked namespace. The data does not reside
         // in the current system, and the external system may not accept a request for rdf.
-        if (vreq.getWebappDaoFactory().getApplicationDao().isExternallyLinkedNamespace(namespace)) {
+        if (checkExternalNamespaces && vreq.getWebappDaoFactory()
+                                           .getApplicationDao()
+                                           .isExternallyLinkedNamespace(namespace)) {
             return null;
         }
 
-        // http://some.other.namespace/n2345?format=application/rdf+xml
-        return UrlBuilder.addParams(profileUrl, "format", "rdf");
+        // http://some.other.namespace/n2345?format=rdfxml
+        // ** RY Not sure it is correct to return this for the <link> element
+        return UrlBuilder.addParams(profileUrl, "format", "rdfxml");
 
     }
     
