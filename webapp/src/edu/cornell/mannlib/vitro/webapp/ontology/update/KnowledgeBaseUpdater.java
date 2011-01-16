@@ -81,9 +81,8 @@ public class KnowledgeBaseUpdater {
 			record.writeChanges();
 			logger.closeLogs();
 
-			long endTime = System.currentTimeMillis();
-			System.out.println("Finished knowledge base migration in " + (endTime - startTime)/1000 + " seconds");
-
+			long elapsedSecs = (System.currentTimeMillis() - startTime)/1000;		
+			System.out.println("Finished knowledge base migration in " + elapsedSecs + " second" + (elapsedSecs != 1 ? "s" : ""));
 		}
 		
 		return updateRequired;

@@ -51,7 +51,7 @@ public class SimpleChangeLogger implements ChangeLogger {
 		String className = ((StackTraceElement)elements[1]).getClassName();
 		className = className.substring(className.lastIndexOf('.') + 1 );
 		Date now = new Date();
-		SimpleDateFormat formatter = new SimpleDateFormat("MMM dd, yyyy HH:mm:ss");
+		SimpleDateFormat formatter = new SimpleDateFormat("MMM dd, yyyy hh:mm a z");
 		logWriter.write(formatter.format(now) + " " + className + ":  " + logMessage + "\n\n");
 		logWriter.flush();		
 	}
