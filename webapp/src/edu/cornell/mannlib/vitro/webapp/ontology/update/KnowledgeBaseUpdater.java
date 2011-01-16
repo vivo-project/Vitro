@@ -9,7 +9,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -59,6 +61,10 @@ public class KnowledgeBaseUpdater {
 				this.logger = new SimpleChangeLogger(settings.getLogFile(),	settings.getErrorLogFile());
 			}
 			
+			
+			long startTime = System.currentTimeMillis();
+            System.out.println("Migrating the knowledge base");
+			
 			try {
 			     performUpdate();
 			} catch (Exception e) {
@@ -74,6 +80,9 @@ public class KnowledgeBaseUpdater {
 			
 			record.writeChanges();
 			logger.closeLogs();
+
+			long endTime = System.currentTimeMillis();
+			System.out.println("Finished knowledge base migration in " + (endTime - startTime)/1000 + " seconds");
 
 		}
 		
@@ -312,13 +321,12 @@ public class KnowledgeBaseUpdater {
 		try {
 			
 		    Model m = settings.getOntModelSelector().getApplicationMetadataModel();
-		    File successAssertionsFile = 
-		    	new File(settings.getSuccessAssertionsFile()); 
+		    File successAssertionsFile = new File(settings.getSuccessAssertionsFile()); 
 		    InputStream inStream = new FileInputStream(successAssertionsFile);
 		    m.enterCriticalSection(Lock.WRITE);
 		    try {
 		    	m.read(inStream, null, settings.getSuccessRDFFormat());
-		    	logger.log("Successfully finished processing ontology changes.");
+		    	logger.logWithDate("Successfully finished processing ontology changes.");
 		    } finally {
 		    	m.leaveCriticalSection();
 		    }

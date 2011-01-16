@@ -370,7 +370,8 @@ public class ABoxUpdater {
 		   }
 		   
 		   if (count > 0) {
-			   logger.log("Removed " + count + "  subject reference" + ((count > 1) ? "s" : "") + " to the "  + deletedClass.getURI() + " class");
+			   //logger.log("Removed " + count + "  subject reference" + ((count > 1) ? "s" : "") + " to the "  + deletedClass.getURI() + " class");
+			   logger.log(count + "  subject reference" + ((count > 1) ? "s" : "") + " to the "  + deletedClass.getURI() + " class " + ((count > 1) ? "were" : "was") + " removed.");
 		   }
 		} finally {
 			aboxModel.leaveCriticalSection();

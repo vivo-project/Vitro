@@ -7,6 +7,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class SimpleChangeLogger implements ChangeLogger {
 
@@ -27,18 +29,31 @@ public class SimpleChangeLogger implements ChangeLogger {
 										"files for writing", ioe);
 		}
 	}
-					
+
 	public void log(String logMessage) throws IOException {
+		Exception e = new Exception();
+		StackTraceElement[] elements = e.getStackTrace();
+		String className = ((StackTraceElement)elements[1]).getClassName();
+		className = className.substring(className.lastIndexOf('.') + 1 );
+		//String methodName = ((StackTraceElement)elements[1]).getMethodName();
+		//logWriter.write(className + "." + methodName +  ":  " + logMessage + "\n\n");
+		
+		Date now = new Date();
+		SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
+		logWriter.write(formatter.format(now) + " " + className + ":  " + logMessage + "\n\n");
+		logWriter.flush();		
+	}
+
+	public void logWithDate(String logMessage) throws IOException {
 		
 		Exception e = new Exception();
 		StackTraceElement[] elements = e.getStackTrace();
 		String className = ((StackTraceElement)elements[1]).getClassName();
 		className = className.substring(className.lastIndexOf('.') + 1 );
-		String methodName = ((StackTraceElement)elements[1]).getMethodName();
-		
-		logWriter.write(className + ":  " + logMessage + "\n\n");
-		//logWriter.write(className + "." + methodName +  ":  " + logMessage + "\n\n");
-		logWriter.flush();
+		Date now = new Date();
+		SimpleDateFormat formatter = new SimpleDateFormat("MMM dd, yyyy HH:mm:ss");
+		logWriter.write(formatter.format(now) + " " + className + ":  " + logMessage + "\n\n");
+		logWriter.flush();		
 	}
 
 	public void logError(String errorMessage) throws IOException {

@@ -8,6 +8,8 @@ public interface ChangeLogger {
 
 	public void log(String logMessage) throws IOException;
 	
+	public void logWithDate(String logMessage) throws IOException;
+	
 	public void logError(String errorMessage) throws IOException;
 	
 	public void closeLogs() throws IOException;
