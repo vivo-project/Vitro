@@ -31,15 +31,21 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB.SDBDatasetMode;
 
 public class DataPropertyStatementDaoSDB extends DataPropertyStatementDaoJena
 							implements DataPropertyStatementDao {
 
 	private DatasetWrapperFactory dwf;
+	private SDBDatasetMode datasetMode;
 	
-	public DataPropertyStatementDaoSDB(DatasetWrapperFactory datasetWrapperFactory, WebappDaoFactoryJena wadf) {
+	public DataPropertyStatementDaoSDB(
+	        DatasetWrapperFactory datasetWrapperFactory, 
+	        SDBDatasetMode datasetMode, 
+	        WebappDaoFactoryJena wadf) {
 		super (datasetWrapperFactory, wadf);
 		this.dwf = datasetWrapperFactory;
+		this.datasetMode = datasetMode;
 	}
 	
 	@Override
@@ -51,12 +57,14 @@ public class DataPropertyStatementDaoSDB extends DataPropertyStatementDaoJena
         }
         else
         {
+            String[] graphVars = { "?g" };
         	String query = 
 	        	"CONSTRUCT { \n" +
 			       "   <" + entity.getURI() + "> ?p ?o . \n" +
 			       "} WHERE { GRAPH ?g { \n" +
 			       "   <" + entity.getURI() + "> ?p ?o . \n" +
 			       "   FILTER(isLiteral(?o)) \n" +
+			       WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode) +
 	            "} }" ;
         	Model results = null;
         	DatasetWrapper w = dwf.getDatasetWrapper();

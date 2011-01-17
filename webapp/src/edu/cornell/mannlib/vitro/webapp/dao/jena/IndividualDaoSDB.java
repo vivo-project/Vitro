@@ -45,15 +45,20 @@ import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB.SDBDatasetMode;
 
 public class IndividualDaoSDB extends IndividualDaoJena {
 
 	private DatasetWrapperFactory dwf;
+    private SDBDatasetMode datasetMode;
 	private WebappDaoFactoryJena wadf;
 	
-    public IndividualDaoSDB(DatasetWrapperFactory dwf, WebappDaoFactoryJena wadf) {
+    public IndividualDaoSDB(DatasetWrapperFactory dwf, 
+                            SDBDatasetMode datasetMode, 
+                            WebappDaoFactoryJena wadf) {
         super(wadf);
         this.dwf = dwf;
+        this.datasetMode = datasetMode;
     }
     
     protected DatasetWrapper getDatasetWrapper() {
@@ -61,7 +66,7 @@ public class IndividualDaoSDB extends IndividualDaoJena {
     }
     
     protected Individual makeIndividual(String individualURI) {
-    	return new IndividualSDB(individualURI, this.dwf, getWebappDaoFactory());
+    	return new IndividualSDB(individualURI, this.dwf, datasetMode, getWebappDaoFactory());
     }
 
     private static final Log log = LogFactory.getLog(IndividualDaoSDB.class.getName());
@@ -97,6 +102,7 @@ public class IndividualDaoSDB extends IndividualDaoJena {
     	    Dataset dataset = w.getDataset();
         	dataset.getLock().enterCriticalSection(Lock.READ);
         	try {
+        	    String[] graphVars = {"?g", "?h", "?i"};
         		String query = 
     	    		"SELECT DISTINCT ?ind ?label ?moniker " +
     	    		"WHERE " +
@@ -105,6 +111,7 @@ public class IndividualDaoSDB extends IndividualDaoJena {
     	    		    "} \n" +
     	    		 	"OPTIONAL { GRAPH ?h { ?ind  <" + RDFS.label.getURI() + "> ?label } }\n" +
     	    		 	"OPTIONAL { GRAPH ?i { ?ind  <" + VitroVocabulary.MONIKER + "> ?moniker } } \n" +
+    	    		 	WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode) +
     	    		 "} ORDER BY ?label";
         		ResultSet rs =QueryExecutionFactory.create(
         		        QueryFactory.create(query), dataset)
@@ -117,7 +124,7 @@ public class IndividualDaoSDB extends IndividualDaoJena {
         		            && !currRes.isAnon()) {    		        
         		        res = currRes;
         		        Individual ent = new IndividualSDB(currRes.getURI(), 
-                                this.dwf, getWebappDaoFactory(), 
+                                this.dwf, datasetMode, getWebappDaoFactory(), 
                                 SKIP_INITIALIZATION);
         		        Literal label = sol.getLiteral("label");
         		        if (label != null) {

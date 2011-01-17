@@ -187,16 +187,28 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
                     ModelFactory.createUnion(baseOms.getABoxModel(), baseOms.getTBoxModel()));
             baseOms.setFullModel(baseUnion);
             ModelContext.setBaseOntModel(baseOms.getFullModel(), sce.getServletContext());
-            WebappDaoFactory baseWadf = new WebappDaoFactorySDB(baseOms, bds, storeDesc, defaultNamespace, null, null);
-            //WebappDaoFactory baseWadf = new WebappDaoFactorySDB(baseOms, dataset, defaultNamespace, null, null);
+            WebappDaoFactory baseWadf = new WebappDaoFactorySDB(
+                    baseOms,
+                    bds,
+                    storeDesc, 
+                    defaultNamespace, 
+                    null, 
+                    null, 
+                    WebappDaoFactorySDB.SDBDatasetMode.ASSERTIONS_ONLY);
             sce.getServletContext().setAttribute("assertionsWebappDaoFactory",baseWadf);
             
             OntModel inferenceUnion = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM,
                     ModelFactory.createUnion(inferenceOms.getABoxModel(), inferenceOms.getTBoxModel()));
             inferenceOms.setFullModel(inferenceUnion);
             ModelContext.setInferenceOntModel(inferenceOms.getFullModel(), sce.getServletContext());
-            WebappDaoFactory infWadf = new WebappDaoFactorySDB(inferenceOms, bds, storeDesc, defaultNamespace, null, null);
-            //WebappDaoFactory infWadf = new WebappDaoFactorySDB(inferenceOms, dataset, defaultNamespace, null, null);
+            WebappDaoFactory infWadf = new WebappDaoFactorySDB(
+                    inferenceOms, 
+                    bds, 
+                    storeDesc, 
+                    defaultNamespace, 
+                    null, 
+                    null, 
+                    WebappDaoFactorySDB.SDBDatasetMode.INFERENCES_ONLY);
             sce.getServletContext().setAttribute("deductionsWebappDaoFactory", infWadf);
             
             OntModel masterUnion = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM,

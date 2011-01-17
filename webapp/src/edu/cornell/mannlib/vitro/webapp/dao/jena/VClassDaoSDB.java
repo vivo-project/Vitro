@@ -23,15 +23,19 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB.SDBDatasetMode;
 
 public class VClassDaoSDB extends VClassDaoJena {
 
 	private DatasetWrapperFactory dwf;
+	private SDBDatasetMode datasetMode;
 	
     public VClassDaoSDB(DatasetWrapperFactory datasetWrapperFactory, 
-                WebappDaoFactoryJena wadf) {
+                        SDBDatasetMode datasetMode,
+                        WebappDaoFactoryJena wadf) {
         super(wadf);
         this.dwf = datasetWrapperFactory;
+        this.datasetMode = datasetMode;
     }
     
     protected DatasetWrapper getDatasetWrapper() {
@@ -60,8 +64,11 @@ public class VClassDaoSDB extends VClassDaoJena {
                                     	aboxModel.enterCriticalSection(Lock.READ);
                                     	int count = 0;
                                     	try {
+                                    	    String[] graphVars = { "?g" };
                                     		String countQueryStr = "SELECT COUNT(*) WHERE \n" +
-                                    		                       "{ GRAPH ?g { ?s a <" + cls.getURI() + "> } } \n";
+                                    		                       "{ GRAPH ?g { ?s a <" + cls.getURI() + "> } \n" +
+                                    		                       WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode) +
+                                    		                       "} \n";
                                     		Query countQuery = QueryFactory.create(countQueryStr, Syntax.syntaxARQ);
                                     		DatasetWrapper w = getDatasetWrapper();
                                     		Dataset dataset = w.getDataset();
