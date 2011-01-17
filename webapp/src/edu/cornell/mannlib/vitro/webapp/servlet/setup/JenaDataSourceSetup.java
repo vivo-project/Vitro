@@ -32,6 +32,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaModelUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SearchReindexingListener;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SimpleOntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaModelMaker;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSDBModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase.TripleStoreType;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapper;
@@ -129,6 +130,9 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
         	makeModelMakerFromConnectionProperties(TripleStoreType.RDB);
         	VitroJenaModelMaker vjmm = getVitroJenaModelMaker();
         	setVitroJenaModelMaker(vjmm,sce);
+        	makeModelMakerFromConnectionProperties(TripleStoreType.SDB);
+        	VitroJenaSDBModelMaker vsmm = getVitroJenaSDBModelMaker();
+        	setVitroJenaSDBModelMaker(vsmm,sce);
         	
         } catch (Throwable t) {
             log.error("Throwable in " + this.getClass().getName(), t);
