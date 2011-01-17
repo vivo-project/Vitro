@@ -79,6 +79,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSDBModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSpecialModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetup;
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupSDB;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestWorkflowProcessor;
@@ -130,7 +131,18 @@ public class JenaIngestController extends BaseEditController {
 		if ("listModels".equals(actionStr)) {
 			String modelT = (String)getServletContext().getAttribute("modelT");
 			String info = (String)getServletContext().getAttribute("info");
-			if(modelT==null || modelT.equals("rdb")){
+			if(modelT == null){
+				boolean initialSwitch = new JenaDataSourceSetupBase().isSDBActive();
+				if(initialSwitch){
+					VitroJenaSDBModelMaker vsmm = (VitroJenaSDBModelMaker) getServletContext().getAttribute("vitroJenaSDBModelMaker");
+					vreq.getSession().setAttribute("vitroJenaModelMaker", vsmm);
+					modelT = "sdb";
+				}
+				else{
+					modelT = "rdb";
+				}
+			}
+			if(modelT.equals("rdb")){
 				request.setAttribute("modelType", "rdb");
 				request.setAttribute("infoLine", "RDB models");
 			}
