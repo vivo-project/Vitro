@@ -18,7 +18,9 @@ import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
@@ -105,6 +107,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 				  if (ontologyUpdater.updateRequired()) {
 					  ctx.setAttribute(LuceneSetup.INDEX_REBUILD_REQUESTED_AT_STARTUP, Boolean.TRUE);
 					  doMiscAppMetadataReplacements(ctx.getRealPath(MISC_REPLACEMENTS_FILE), oms);
+					  reloadDisplayModel(ctx);
 				  }
 			  } catch (Throwable t){
 				  log.warn("Unable to perform miscellaneous application metadata replacements", t);
@@ -175,6 +178,26 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			log.error("Error performing miscellaneous application metadata " +
 					" replacements.", e);
 		}
+	}
+	
+	private void reloadDisplayModel(ServletContext ctx) {
+	    log.info("Reloading display model");
+	    Object o = ctx.getAttribute("displayOntModel");
+	    if (o instanceof OntModel) {
+	        OntModel displayModel = (OntModel) o;
+	        displayModel.removeAll((Resource) null, (Property) null, (RDFNode) null);
+	        if (displayModel.size() != 0) {
+	            log.error("Display model not cleared successfully");
+	        }
+            JenaPersistentDataSourceSetup.readOntologyFilesInPathSet(
+                    JenaPersistentDataSourceSetup.APPPATH, ctx, displayModel);
+            log.info("Display model reloaded");
+            if (displayModel.size() == 0) {
+                log.warn("Display model empty after reloading");
+            }
+	    } else {
+	        log.error("No display model found in context");
+	    }
 	}
 	
 	private OntModel loadModelFromDirectory(String directoryPath) {

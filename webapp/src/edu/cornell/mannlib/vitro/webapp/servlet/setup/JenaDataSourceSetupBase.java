@@ -57,7 +57,7 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     protected static String USERPATH = BASE+"user/";
     protected static String SYSTEMPATH = BASE+"system/";
     protected static String AUTHPATH = BASE+"auth/";
-    protected static String APPPATH = BASE+"app/";
+    public static String APPPATH = BASE+"app/";
     protected static String SUBMODELS = "/WEB-INF/submodels/";
 
     String DB_USER =   "jenatest";                          // database user id
