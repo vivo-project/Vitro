@@ -8,7 +8,7 @@
     padding: 15px;
 }
 #photoUploadDefaultImage{
-    width: 120px;
+    width: 130px;
     float: left;
 }
 #photoUploadDefaultImage img{
@@ -17,7 +17,7 @@
 #photoUploadForm{
     width: 280px;
     float: left;
-    padding-left: 15px;
+    padding-left: 25px;
     margin-left: 1.2em;
     margin-top: 30px;
     padding-top: 15px;
