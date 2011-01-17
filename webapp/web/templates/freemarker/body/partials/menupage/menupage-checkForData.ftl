@@ -16,7 +16,7 @@
 <#assign noDataNotification>
     <h3>There are currently no ${page.title?lower_case} in the system</h3>
     
-    <p>Please <a href="${urls.login}" title="log in to manage this site">login</a> to manage content.</p>
+    <p>Please <a href="${urls.login}" title="log in to manage this site">log in</a> to manage content.</p>
     
     <p>You can browse all of the public content currently in the system using the <a href="${urls.index}" title="browse all content">index page</a>.</p>
 </#assign>
