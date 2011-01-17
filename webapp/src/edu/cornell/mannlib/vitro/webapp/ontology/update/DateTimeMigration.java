@@ -35,8 +35,8 @@ import com.hp.hpl.jena.shared.Lock;
 public class DateTimeMigration {
 
 	private OntModel aboxModel;
-	private OntologyChangeLogger logger;  
-	private OntologyChangeRecord record;
+	private ChangeLogger logger;  
+	private ChangeRecord record;
 	
 	private static final String dateTimeURI = "http://vivoweb.org/ontology/core#dateTime";
 	private static final String dateTimePrecisionURI = "http://vivoweb.org/ontology/core#dateTimePrecision";
@@ -68,7 +68,7 @@ public class DateTimeMigration {
 	 * @param   record       - for writing to the additions model 
 	 *                         and the retractions model.                  
 	 */
-	public DateTimeMigration(OntModel aboxModel,OntologyChangeLogger logger, OntologyChangeRecord record) {
+	public DateTimeMigration(OntModel aboxModel,ChangeLogger logger, ChangeRecord record) {
 		
 		this.aboxModel = aboxModel;
 		this.logger = logger;
@@ -216,7 +216,7 @@ public class DateTimeMigration {
 			if (additions.size() > 0) {
 					logger.log(additions.size() + " date/time literal" + 
 							((additions.size() > 1) ? "s" : "") + ((additions.size() > 1) ? " were " : " was ") +
-							"updated to the 1.2 representation.");
+							"updated to the xsd:dateTime representation.");
 			}		   
 		} finally {
 			aboxModel.leaveCriticalSection();

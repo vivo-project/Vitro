@@ -14,10 +14,10 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
-public class SimpleOntologyChangeRecord implements OntologyChangeRecord {
+public class SimpleChangeRecord implements ChangeRecord {
 
 	private final static Log log = 
-			LogFactory.getLog(SimpleOntologyChangeRecord.class);
+			LogFactory.getLog(SimpleChangeRecord.class);
 	
 	private final static String RDF_SYNTAX = "N3";
 	
@@ -26,7 +26,7 @@ public class SimpleOntologyChangeRecord implements OntologyChangeRecord {
 	private File additionsFile;
 	private File retractionsFile;
 	
-	public SimpleOntologyChangeRecord(
+	public SimpleChangeRecord(
 			String additionsFile, String retractionsFile) {
 		this.additionsFile = new File(additionsFile);
 		try {

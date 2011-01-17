@@ -6,7 +6,7 @@ import com.hp.hpl.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 
-public class OntologyUpdateSettings {
+public class UpdateSettings {
 
 	private String dataDir;
 	private String sparqlConstructAdditionsDir;
