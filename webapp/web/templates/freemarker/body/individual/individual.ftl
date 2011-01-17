@@ -47,7 +47,7 @@
         </nav>
                 
         <#-- Links -->
-        <#include "individual-links.ftl">
+        <@p.vitroLinks propertyGroups editing  />
     </section>
 </section>
 
