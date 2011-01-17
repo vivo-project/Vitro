@@ -62,40 +62,6 @@ h3.internal-auth{
     margin-bottom: 0;
     padding-bottom: 0;
 }
-#error-alert{
-    color: #900;
-    padding: 10px;
-    margin-bottom: 5px;
-    height: 30px;
-}
-#error-alert img {
-    float:left;
-    margin: 0;
-    padding: 0;
-    vertical-align: middle;  	
-}
-#error-alert p {
-    padding-left: 30px;
-    font-size: 0.9em;
-    line-height: 30px;
-}
-#confirmation-alert {
-    color: #169f43;
-    padding: 0px;
-    margin-bottom: 5px;
-    height: 30px;
-}
-#confirmation-alert img {
-    float: left;
-    margin: 0;
-    padding: 0;
-    vertical-align: middle;
-}
-#confirmation-alert p {
-    padding-left: 30px;
-    font-size: 0.9em;
-    line-height: 30px;
-}
 .formFieldAlert {
     border: 2px solid #900;
 }
