@@ -118,12 +118,12 @@ name will be used as the label. -->
     <#-- Don't assume that if the mainImage property is populated, there is a thumbnail image (though that is the general case).
          If there's a mainImage statement but no thumbnail image, treat it as if there is no image. --> 
     <#if (mainImage.statements)?has_content && thumbUrl?has_content>    
-        <a href="${individual.imageUrl}"><img class="individual-photo" src="${thumbUrl}" title="click to view larger image" alt="${individual.name}" width="115" /></a>            
+        <a href="${individual.imageUrl}"><img class="individual-photo" src="${thumbUrl}" title="click to view larger image" alt="${individual.name}" width="160" /></a>            
         <@p.editingLinks mainImage.statements[0] showEditLinks /> 
     <#else>
         <@p.addLinkWithLabel mainImage showEditLinks "Photo" /> 
         <#if placeholderImage?has_content>
-            <img class="individual-photo" src="${placeholderImage}" title = "no image" alt="placeholder image" width="115" /> 
+            <img class="individual-photo" src="${placeholderImage}" title = "no image" alt="placeholder image" width="160" /> 
         </#if>                                                      
     </#if>
 

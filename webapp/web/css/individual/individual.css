@@ -93,10 +93,11 @@ div.bottom{
 }
 #share-contact h3{
     margin-top: 15px;
-    padding-bottom: 0;
-    line-height: .6em;
+    padding-bottom: .3em;
+    font-size: 1em;
+    line-height: 1.2em;
 }
-#share-contact img.individual-photo2{
+#share-contact img.individual-photo{
     width: 160px;
     height: 160px;
     float: left;
@@ -176,14 +177,13 @@ ul.individual-urls li a{
 }
 ul.individual-urls-people{
     clear: both;
-    margin-top: 20px;
     list-style: none;
     list-style-type: circle;
     padding-left: 24px;
 }
 ul.individual-urls-people li{
     font-size: .875em;
-    line-height: 1.2em;
+    line-height: 1.3em;
 }
 /* <------ INDIVIDUAL RIGHT CONTENT */
 #individual-info{
@@ -352,7 +352,7 @@ article.property ul.property-list li{
 }
 article.property ul.subclass-property-list{
     margin-left: 0;
-}
+}#share-contact h3
 article.property ul.subclass-property-list li{
     line-height: 1.2em;
     padding: 0 20px 10px 20px;
