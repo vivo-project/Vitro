@@ -77,6 +77,24 @@ div.bottom{
     padding-left: 10px;
     margin-left: 10px;
 }
+#individual-intro #individual-info h3{
+    padding-bottom: 5px;
+    margin-top: 5px;
+}
+#individual-intro #share-contact h3{
+    padding-bottom: .3em;
+    margin-top: 0;
+}
+#individual-intro .icon-rdf{
+    font-size: 1.125em;
+}
+
+#individual-intro .individual-overview{
+    margin-bottom: 10px;
+}
+#individual-intro ul#individual-tools{
+    margin-bottom: 10px;
+}
 /* <------ INDIVIDUAL INTRO FOR PERSON*/
 #individual-intro-person{
     float: left;
@@ -116,21 +134,12 @@ ul#individual-tools-people li{
     float: left;
 }
 ul#individual-tools{
-    margin-top: -18px; /*not good adding negative margin*/
-    height: 38px;
-    overflow: hidden;
-    float: left;
-    width: 150px;
     color: #8AA149
 }
 ul#individual-tools li{
-    position: relative;
-    display: block;
     padding-right: 14px;
-    float: left;
-    line-height: 27px;
 }
-.icon-rdf{
+ul#individual-tools-people a.icon-rdf-people{
     position: absolute;
     font-size: 1.125em;
     top: 13px;
@@ -162,22 +171,18 @@ ul#individual-phone li:first-child{
 .icon-phone, .icon-email{
     padding-right: 5px;
 }
-ul.individual-urls{
+#individual-intro ul.individual-urls{
     list-style-type: circle;
-    margin-left: 10px;
-    float: left;
-    margin-bottom: 30px;
+    color: red;
+    margin-left: 20px;
 }
-ul.individual-urls li{
+#individual-intro ul.individual-urls li{
     font-size: .875em;
-    line-height: 1.2em;
-}
-ul.individual-urls li a{
-    color: #2485ae;
+    line-height: 1.3em;
+    clear: left;
 }
 ul.individual-urls-people{
     clear: both;
-    list-style: none;
     list-style-type: circle;
     padding-left: 24px;
 }
