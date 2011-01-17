@@ -2,12 +2,10 @@
 
 $(document).ready(function(){
 
-  // Confirmation alert for photo deletion
-  $('a.thumbnail').click(function(){
+  // Confirmation alert for photo deletion in image upload and individual templates
+  $('#photoUploadDefaultImage a.thumbnail,#share-contact a:eq(2)').click(function(){
+    //$('#share-contact a [title="delete this relationship"]').click(function(){  
    var answer = confirm('Are you sure you want to delete your photo?');
     return answer;
   });
-
 });
-
-
