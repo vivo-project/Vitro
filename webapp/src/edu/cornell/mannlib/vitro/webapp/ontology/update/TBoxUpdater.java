@@ -327,6 +327,8 @@ public void updateAnnotationModel() throws IOException {
 	   // the default assignment in the new version but haven't migration yet. How
 	   // to handle this?
 	   
+	   removeObsoleteAnnotations();
+	   
 	   siteModel.enterCriticalSection(Lock.WRITE);
 	   
 	   try {	
@@ -360,21 +362,57 @@ public void updateAnnotationModel() throws IOException {
 }
 
 public boolean usesGroup(Model model, Resource theClassGroup) throws IOException {
-	
-   //logger.log("called for " + theClassGroup.getLocalName() );
-   
+	   
    model.enterCriticalSection(Lock.READ);
      
-   try {
-	   StmtIterator iter = model.listStatements((Resource) null, inClassGroupProp, theClassGroup);
-	   while (iter.hasNext()) {
-		   logger.log("statement: " + ABoxUpdater.stmtString(iter.next()));
-	   }
-	   
+   try {	   
 	   return (model.contains((Resource) null, inClassGroupProp, theClassGroup) ? true : false);
    } finally {
 	   model.leaveCriticalSection();
    }
+}
+
+public void removeObsoleteAnnotations() throws IOException {
+		
+	Resource subj1 = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createResource("http://vivoweb.org/ontology/florida#StatewideGoalAndFocusArea");
+	Resource obj1 = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createResource("http://vivoweb.org/ontology#vitroClassGrouptopics");
+	
+	Property subj2 = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createProperty("http://vivoweb.org/ontology/florida#divisionOfSponsoredResearchNumber");
+	Resource obj2 = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createResource("http://vivoweb.org/ontology#vitroPropertyGroupidentifiers");
+	
+	Property subj3 = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createProperty("http://vivoweb.org/ontology/florida#statewideGoalAndFocusArea");
+	Resource obj3 = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createResource("http://vivoweb.org/ontology#vitroPropertyGroupoutreach");
+	
+	Property inPropertyGroupProp = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createProperty("http://vitro.mannlib.cornell.edu/ns/vitro/0.7#inPropertyGroup");
+	   
+    siteModel.enterCriticalSection(Lock.WRITE);
+   
+    try {	
+	    Model retractions = ModelFactory.createDefaultModel();
+	    
+        if (siteModel.contains(subj1, inClassGroupProp, obj1) ) {
+        	retractions.add(subj1, inClassGroupProp, obj1);
+        	logger.log("Removed statement " + ABoxUpdater.stmtString(subj1, inClassGroupProp, obj1) + " from the knowledge base.");
+        }
+
+        if (siteModel.contains(subj2, inPropertyGroupProp, obj2) ) {
+        	retractions.add(subj2, inPropertyGroupProp, obj2);
+        	logger.log("Removed statement " + ABoxUpdater.stmtString(subj2, inPropertyGroupProp, obj2) + " from the knowledge base.");
+        }
+
+        if (siteModel.contains(subj3, inPropertyGroupProp, obj3) ) {
+        	retractions.add(subj3, inPropertyGroupProp, obj3);
+        	logger.log("Removed statement " + ABoxUpdater.stmtString(subj3, inPropertyGroupProp, obj3) + " from the knowledge base.");
+        }
+    	
+		if (retractions.size() > 0) {
+		   siteModel.remove(retractions);
+		   record.recordRetractions(retractions);
+	    }   
+	        
+	 } finally {
+		siteModel.leaveCriticalSection();
+	 }
 }
 
 }

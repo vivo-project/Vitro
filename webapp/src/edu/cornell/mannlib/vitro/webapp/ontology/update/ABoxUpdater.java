@@ -644,4 +644,10 @@ public class ABoxUpdater {
                 		                                          : ((Resource)statement.getObject()).getURI() + " (Resource)") + "]";	
     }    
 	
+    public static String stmtString(Resource subject, Property predicate, RDFNode object) {
+    	return  " [subject = " + subject.getURI() +
+    			"] [property = " + predicate.getURI() +
+                "] [object = " + (object.isLiteral() ? ((Literal)object).getLexicalForm() + " (Literal)"
+                		                             : ((Resource)object).getURI() + " (Resource)") + "]";	
+    }    
 }
