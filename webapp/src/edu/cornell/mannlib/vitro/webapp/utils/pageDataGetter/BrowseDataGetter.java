@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -63,7 +64,7 @@ public class BrowseDataGetter implements PageDataGetter {
 
     private Map<String, Object> doClassAlphaDisplay( Map params, VitroRequest request, ServletContext context) throws Exception {
         Map<String,Object> body = new HashMap<String,Object>();
-        body.putAll(getCommonValues(context));
+        body.putAll(getCommonValues(context, request));
         body.putAll(getClassAlphaValues(params,request,context));        
         return body;
     }
@@ -86,15 +87,23 @@ public class BrowseDataGetter implements PageDataGetter {
         return map;
     }
     
-    private Map<String,Object> getCommonValues( ServletContext context){
-        //doesn't do anything yet
-        Map<String,Object> values = new HashMap<String,Object>();        
+    private Map<String,Object> getCommonValues( ServletContext context, VitroRequest vreq){
+        Map<String,Object> values = new HashMap<String,Object>();              
+                
+        VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(context);
+        List<VClassGroup> cgList = vcgc.getGroups(vreq.getPortalId());        
+        LinkedList<VClassGroupTemplateModel> cgtmList = new LinkedList<VClassGroupTemplateModel>();
+        for( VClassGroup classGroup : cgList){
+            cgtmList.add( new VClassGroupTemplateModel( classGroup ));
+        }
+        values.put("vClassGroups",cgtmList);
+        
         return values;
     }
     
     protected Map<String, Object> doAllClassGroupsDisplay( Map params, Map<String, Object> page, VitroRequest request, ServletContext context) {        
         Map<String,Object> body = new HashMap<String,Object>();
-        body.putAll(getCommonValues(context));        
+        body.putAll(getCommonValues(context,request));        
         body.putAll(getAllClassGroupData(request, params, page, context));
                         
         return body;
@@ -105,23 +114,7 @@ public class BrowseDataGetter implements PageDataGetter {
      * @param params2 
      */
     protected Map<String,Object> getAllClassGroupData(VitroRequest request, Map params, Map<String, Object> page, ServletContext context){
-        Map<String,Object> map = new HashMap<String,Object>();
-                
-        if( !page.containsKey("vClassGroups")){
-            VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache( context );
-            List<VClassGroup> vClassGroups =  vcgc.getGroups(request.getPortalId());
-            map.put("vClassGroups", vClassGroups);            
-        }
-//        VitroRequest vreq = new VitroRequest(request);
-//        
-//        VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(context);
-//        List<VClassGroup> cgList = vcgc.getGroups(vreq.getPortalId());
-//        
-//        LinkedList<VClassGroupTemplateModel> cgtmList = new LinkedList<VClassGroupTemplateModel>();
-//        for( VClassGroup classGroup : cgList){
-//            cgtmList.add( new VClassGroupTemplateModel( classGroup ));
-//        }
-//        map.put("vclassGroupList",cgtmList);
+        Map<String,Object> map = new HashMap<String,Object>();                  
         return map;
     }
     
@@ -129,7 +122,7 @@ public class BrowseDataGetter implements PageDataGetter {
             VitroRequest request, ServletContext context) {                
         Map<String,Object> body = new HashMap<String,Object>();
         
-        body.putAll(getCommonValues(context));        
+        body.putAll(getCommonValues(context,request));        
         body.putAll(getClassData(request,params,context));
             
         return body;
@@ -159,7 +152,7 @@ public class BrowseDataGetter implements PageDataGetter {
 
     protected Map<String, Object> doClassGroupDisplay(Map params, VitroRequest request, ServletContext context) {
         Map<String,Object> body = new HashMap<String,Object>();
-        body.putAll(getCommonValues(context));        
+        body.putAll(getCommonValues(context,request));        
         body.putAll( getClassGroupData(request,params, context));
    
         return body;
