@@ -15,11 +15,7 @@
 </#if>
 
 <#assign noDataNotification>
-    <#if page.title?contains("Research") >
-        <h3>There is currently no ${page.title?lower_case} in the system</h3>
-    <#else>
-        <h3>There are currently no ${page.title?lower_case} in the system</h3>
-    </#if>
+    <h3>There is currently no ${page.title} content in the system</h3>
     <#if !user.loggedIn>
         <p>Please <a href="${urls.login}" title="log in to manage this site">log in</a> to manage content.</p>
     </#if>
