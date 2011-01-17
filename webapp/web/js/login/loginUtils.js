@@ -13,5 +13,8 @@ $(document).ready(function(){
     
     // fade in fash-message when user log out
     $('section#flash-message').css('display', 'none').fadeIn(1500);   
-    
+
+    // fade out flash-message when user logs in
+    $('section#welcome-message').css('display', 'block').delay(2500).fadeOut(1500);   
+
 });
