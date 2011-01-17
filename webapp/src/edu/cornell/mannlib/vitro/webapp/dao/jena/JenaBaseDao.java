@@ -142,7 +142,6 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     protected void addPropertyStringValue(Resource res, Property dataprop, String value, Model model) {
         if (res != null && dataprop != null && value != null && value.length()>0) {
             model.add(res, dataprop, value, XSDDatatype.XSDstring);
-            System.out.println("JenaBaseDao" + value);
         }
     }
     

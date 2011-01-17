@@ -48,7 +48,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
         "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n" +
         "PREFIX afn: <http://jena.hpl.hp.com/ARQ/function#>";
     
-    private DatasetWrapperFactory dwf;
+    protected DatasetWrapperFactory dwf;
     
     public PropertyDaoJena(DatasetWrapperFactory dwf, 
                            WebappDaoFactoryJena wadf) {
@@ -396,7 +396,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
         subjectBinding.add("subject", 
                 ResourceFactory.createResource(subjectUri));
 
-        // Run the SPARQL query to get the properties        
+        // Run the SPARQL query to get the properties
         DatasetWrapper w = dwf.getDatasetWrapper();
         Dataset dataset = w.getDataset();
         dataset.getLock().enterCriticalSection(Lock.READ);

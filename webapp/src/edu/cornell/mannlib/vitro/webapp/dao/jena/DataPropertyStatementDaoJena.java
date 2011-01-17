@@ -65,26 +65,40 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
         this.dwf = dwf;
     }
 
-    public void deleteDataPropertyStatement(DataPropertyStatement dataPropertyStmt) {
-    	deleteDataPropertyStatement(dataPropertyStmt, getOntModelSelector().getABoxModel());
-    }
 
-    public void deleteDataPropertyStatement( DataPropertyStatement dataPropertyStatement, OntModel ontModel )
+    public void deleteDataPropertyStatement( DataPropertyStatement dataPropertyStatement )
     {
-    	try {
-	    	ontModel.enterCriticalSection(Lock.WRITE);
-	    	getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),true,dataPropertyStatement.getIndividualURI()));
-	        com.hp.hpl.jena.ontology.Individual ind = ontModel.getIndividual(dataPropertyStatement.getIndividualURI());
-	        Property prop = ontModel.getProperty(dataPropertyStatement.getDatapropURI());
-	        Literal l = jenaLiteralFromDataPropertyStatement(dataPropertyStatement, ontModel);
-	        if (ind != null && prop != null && l != null) {
-	            ontModel.getBaseModel().remove(ind, prop, l);
-	        }
-    	} finally {
-    		getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),false,dataPropertyStatement.getIndividualURI()));
-    		ontModel.leaveCriticalSection();
-    		
-    	}
+        OntModel ontModel = getOntModelSelector().getABoxModel();
+        try {
+            ontModel.enterCriticalSection(Lock.WRITE);
+            getOntModel().getBaseModel().notifyEvent(
+                    new IndividualUpdateEvent(
+                            getWebappDaoFactory().getUserURI(),
+                            true,
+                            dataPropertyStatement.getIndividualURI()));
+            com.hp.hpl.jena.ontology.Individual ind = ontModel.getIndividual(
+                        dataPropertyStatement.getIndividualURI());
+            OntModel tboxModel = getOntModelSelector().getTBoxModel();
+            tboxModel.enterCriticalSection(Lock.READ);
+            try {
+                Property prop = tboxModel.getProperty(
+                        dataPropertyStatement.getDatapropURI());
+                Literal l = jenaLiteralFromDataPropertyStatement(
+                        dataPropertyStatement, ontModel);
+                if (ind != null && prop != null && l != null) {
+                    ontModel.getBaseModel().remove(ind, prop, l);
+                }
+            } finally {
+                tboxModel.leaveCriticalSection();
+            }
+        } finally {
+            getOntModel().getBaseModel().notifyEvent(
+                    new IndividualUpdateEvent(
+                            getWebappDaoFactory().getUserURI(),
+                            false,
+                            dataPropertyStatement.getIndividualURI()));
+            ontModel.leaveCriticalSection();       
+        }
     }
 
     public Individual fillExistingDataPropertyStatementsForIndividual( Individual entity/*, boolean allowAnyNameSpace*/)
@@ -143,19 +157,29 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
         deleteDataPropertyStatementsForIndividualByDataProperty(individualURI, dataPropertyURI, getOntModelSelector().getABoxModel());
     }
 
-    public void deleteDataPropertyStatementsForIndividualByDataProperty(String individualURI, String dataPropertyURI, OntModel ontModel) {
+    public void deleteDataPropertyStatementsForIndividualByDataProperty(
+            String individualURI, 
+            String dataPropertyURI, 
+            OntModel ontModel) {
+        
         ontModel.enterCriticalSection(Lock.WRITE);
-        getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),true,individualURI));
+        getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(
+                getWebappDaoFactory().getUserURI(),
+                true,
+                individualURI));
         try {
-            Resource indRes = ontModel.getResource(individualURI);
-            DatatypeProperty datatypeProperty = ontModel.getDatatypeProperty(dataPropertyURI);
-            if (indRes != null && datatypeProperty != null) {
-                ontModel.removeAll(indRes, datatypeProperty, (Literal)null);
-            }
+            Resource indRes = ResourceFactory.createResource(individualURI);
+            Property datatypeProperty = ResourceFactory.createProperty(
+                    dataPropertyURI);
+            ontModel.removeAll(indRes, datatypeProperty, (Literal)null);
         } finally {
-        	getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),false,individualURI));
+        	getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(
+        	        getWebappDaoFactory().getUserURI(),
+        	        false,
+        	        individualURI));
             ontModel.leaveCriticalSection();
         }
+        
     }
 
     public void deleteDataPropertyStatementsForIndividualByDataProperty(Individual individual, DataProperty dataProperty) {

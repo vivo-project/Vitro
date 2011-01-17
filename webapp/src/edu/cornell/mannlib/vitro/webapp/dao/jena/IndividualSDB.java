@@ -24,6 +24,7 @@ import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.ontology.OntResource;
 import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
@@ -427,15 +428,14 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         if (sunrise != null) {
             return sunrise;
         } else {
-          
+            constructProperty(ind, VitroVocabulary.SUNRISE);
         	ind.getOntModel().enterCriticalSection(Lock.READ);
             try {
                 sunrise = webappDaoFactory.getJenaBaseDao()
                         .getPropertyDateTimeValue(
                                 ind,webappDaoFactory.getJenaBaseDao().SUNRISE);
                 return sunrise;
-            } finally {
-               
+            } finally { 
             	ind.getOntModel().leaveCriticalSection();
             }
         }
@@ -445,7 +445,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         if (sunset != null) {
             return sunset;
         } else {
-           
+            constructProperty(ind, VitroVocabulary.SUNSET);
         	ind.getOntModel().enterCriticalSection(Lock.READ);
             try {
                 sunset = webappDaoFactory.getJenaBaseDao()
@@ -463,7 +463,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         if (timekey != null) {
             return timekey;
         } else {
-            
+            constructProperty(ind, VitroVocabulary.TIMEKEY);
         	ind.getOntModel().enterCriticalSection(Lock.READ);
             try {
                 timekey = webappDaoFactory.getJenaBaseDao()
@@ -554,7 +554,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         if (this.blurb != null) {
             return blurb;
         } else {
-            
+            constructProperty(ind, VitroVocabulary.BLURB);
         	ind.getOntModel().enterCriticalSection(Lock.READ);
             try {
                 blurb = webappDaoFactory.getJenaBaseDao().getPropertyStringValue(ind,webappDaoFactory.getJenaBaseDao().BLURB);
@@ -570,7 +570,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         if (this.description != null) {
             return description;
         } else {
-           
+            constructProperty(ind, VitroVocabulary.DESCRIPTION);
         	ind.getOntModel().enterCriticalSection(Lock.READ);
             try {
                 description = webappDaoFactory.getJenaBaseDao()
@@ -584,6 +584,24 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         }
     }
 
+    private synchronized void constructProperty(OntResource ind, String propertyURI) {
+        DatasetWrapper w = getDatasetWrapper();
+        Dataset dataset = w.getDataset();
+        dataset.getLock().enterCriticalSection(Lock.READ);
+        try {
+            String queryStr = "CONSTRUCT { ?ind <" + 
+                    propertyURI + "> ?value } \n" +
+                    "WHERE { GRAPH ?g {  ?ind <" +
+                    propertyURI + "> ?value } } \n";
+            Query query = QueryFactory.create(queryStr);
+            QueryExecution qe = QueryExecutionFactory.create(
+                    query, dataset);
+            qe.execConstruct(ind.getModel());
+        } finally {
+            dataset.getLock().leaveCriticalSection();
+            w.close();
+        }
+    }
 
     public Float getSearchBoost(){ 
         if( this._searchBoostJena != null ){

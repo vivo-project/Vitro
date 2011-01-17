@@ -18,6 +18,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
 	
@@ -62,6 +63,18 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
         super(ontModelSelector, defaultNamespace, nonuserNamespaces, preferredLanguages);
         this.dwf = new ReconnectingDatasetFactory(bds, storeDesc);
     }
+    
+    public WebappDaoFactorySDB(WebappDaoFactorySDB base, String userURI) {
+        super(base.ontModelSelector);
+        this.ontModelSelector = base.ontModelSelector;
+        this.defaultNamespace = base.defaultNamespace;
+        this.nonuserNamespaces = base.nonuserNamespaces;
+        this.preferredLanguages = base.preferredLanguages;
+        this.userURI = userURI;
+        this.flag2ValueMap = base.flag2ValueMap;
+        this.flag2ClassLabelMap = base.flag2ClassLabelMap;
+        this.dwf = base.dwf;
+    }
 	
 	@Override
     public IndividualDao getIndividualDao() {
@@ -94,6 +107,11 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
 		else
 			return vClassDao = new VClassDaoSDB(dwf, this);
 	}
+	
+	public WebappDaoFactory getUserAwareDaoFactory(String userURI) {
+        // TODO: put the user-aware factories in a hashmap so we don't keep re-creating them
+        return new WebappDaoFactorySDB(this, userURI);
+    }
 	
 	private class ReconnectingDatasetFactory implements DatasetWrapperFactory {
 	    
