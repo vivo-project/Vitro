@@ -100,27 +100,21 @@
 <#-- Apply a precision and format type to format a datetime -->
 <#function formatXsdDateTime dateTimeStr precision="" formatType="short">
     
-    <#-- First convert the string to a datetime object. 
+    <#-- First convert the string to a format that Freemarker can interpret as a datetime.
          For now, strip away time zone rather than displaying it. -->
-    <#local dateTimeStr = dateTimeStr?replace("T", " ")?replace("Z.*$", "", "r")>
+    <#local dateTimeStr = dateTimeStr?replace("T", " ")?replace("Z.*$", "", "r")?trim>
 
-    <#local dateTimeStringFormat = "yyyy-MM-dd HH:mm:ss">
-    
     <#-- If a non-standard datetime format (e.g, "2000-04" from
          "2000-04"^^<http://www.w3.org/2001/XMLSchema#gYearMonth>), just
          return the string without attempting to format. Possibly this should
          be handled in Java by examining the xsd type and making an appropriate
          conversion. -->
-    <#if ! dateTimeStr?matches(dateTimeStringFormat)>
+    <#if ! dateTimeStr?matches("(\\d{4})-(\\d{2})-(\\d{2}) (\\d{2}):(\\d{2}):(\\d{2})")>
         <#return dateTimeStr>
     </#if>
     
     <#-- Convert the string to a datetime object. -->
-    <#local dateTimeObj = dateTimeStr?datetime(dateTimeStringFormat)>
-    
-    <#if dateTimeObj == null>
-        <#return "non-standard datetime string">
-    </#if>
+    <#local dateTimeObj = dateTimeStr?datetime("yyyy-MM-dd HH:mm:ss")>
 
     <#-- If no precision is specified, assign it from the datetime value.
          Pass dateTimeStr rather than dateTimeObj, because dateTimeObj
@@ -138,7 +132,9 @@
 
 <#function getPrecision dateTime>
 
+    <#-- We know this will match because the format has already been checked -->
     <#local match = dateTime?matches("(\\d{4})-(\\d{2})-(\\d{2}) (\\d{2}):(\\d{2}):(\\d{2})")>
+
     <#list match as m>
         <#local hours = m?groups[4]?number>
         <#local minutes = m?groups[5]?number>
@@ -175,6 +171,5 @@
     
     <#return format?trim>
 </#function>
-
-
+  
 
