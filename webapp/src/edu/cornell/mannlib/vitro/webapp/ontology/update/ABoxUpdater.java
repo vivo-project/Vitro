@@ -370,7 +370,7 @@ public class ABoxUpdater {
 		   }
 		   
 		   if (count > 0) {
-			   logger.log(count + "  subject reference" + ((count > 1) ? "s" : "") + " to the "  + deletedClass.getURI() + " class " + ((count > 1) ? "were" : "was") + " removed.");
+			   logger.log(count + " subject reference" + ((count > 1) ? "s" : "") + " to the "  + deletedClass.getURI() + " class " + ((count > 1) ? "were" : "was") + " removed.");
 		   }
 		} finally {
 			aboxModel.leaveCriticalSection();
@@ -395,7 +395,7 @@ public class ABoxUpdater {
 		   
 		   //log summary of changes
 		   if (count > 0) {
-			   logger.log(count + "  instance" + ((count > 1) ? "s" : "") + " of the "  + deletedClass.getURI() + " class " + ((count > 1) ? "were" : "was") + " removed.");
+			   logger.log(count + " instance" + ((count > 1) ? "s" : "") + " of the "  + deletedClass.getURI() + " class " + ((count > 1) ? "were" : "was") + " removed.");
 		   }
 		   
 		   aboxModel.remove(retractions);
@@ -420,7 +420,7 @@ public class ABoxUpdater {
 		   
 		   //log summary of changes
 		   if (count > 0) {
-			   logger.log(count + "  object reference" + ((count > 1) ? "s" : "") + " of the "  + deletedClass.getURI() + " class " + ((count > 1) ? "were" : "was") + " removed.");
+			   logger.log(count + " object reference" + ((count > 1) ? "s" : "") + " of the "  + deletedClass.getURI() + " class " + ((count > 1) ? "were" : "was") + " removed.");
 		   }
 
 		   aboxModel.remove(retractions);
