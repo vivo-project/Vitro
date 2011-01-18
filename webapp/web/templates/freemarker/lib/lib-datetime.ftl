@@ -1,6 +1,6 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
-<#-- Macros and functions for datetime formatting 
+<#-- Macros for datetime formatting 
 
      In this library, functions are used to format the datetime or interval
      according to a format string and precision, returning a raw string.
@@ -28,7 +28,6 @@
 <#macro dateTimeSpan>
     <span class="listDateTime"><#nested></span>
 </#macro>
-
 
 <#-- FUNCTIONS -->
 
@@ -89,7 +88,7 @@
 
 <#-- Generate a datetime with date formatted as "1/1/2011" -->
 <#function formatXsdDateTimeShort dateTime precision>
-    <#return formatXsdDateTime(dateTime, precision)>
+    <#return formatXsdDateTime(dateTime, precision, "short")>
 </#function>
 
 <#-- Generate a datetime as a year -->
@@ -98,22 +97,50 @@
     <#return formatXsdDateTime(dateTime, precision)>
 </#function>
 
-<#-- Convert the string dateTimeString to a datetime object -->
-<#function toDateTime dateTimeString>
-    <#-- First convert the datetime string to a string format that Freemarker 
-         understands, then to a datetime object. For now, strip away a time zone rather
-         than displaying it. --> 
-    <#return dateTimeString?replace("T", " ")?replace("Z.*$", "", "r")?datetime("yyyy-MM-dd HH:mm:ss")>
+<#-- Apply a precision and format type to format a datetime -->
+<#function formatXsdDateTime dateTime precision="" formatType="short">
+    
+    <#-- First convert the string to a datetime object. 
+         For now, strip away time zone rather than displaying it. -->
+    <#local dateTime = dateTime?replace("T", " ")?replace("Z.*$", "", "r")>
+
+    <#-- If no precision is specified, assign it from the datetime value.
+         This must be done before conversion to a datetime object, since that
+         process fills in zero values. -->
+    <#if ! precision?has_content>
+        <#local precision = getPrecision(dateTime)>
+    </#if>
+    
+    <#-- Convert the string to a datetime object. -->
+    <#local dateTime = dateTime?datetime("yyyy-MM-dd HH:mm:ss")>
+    
+    <#-- Get the format string for the datetime output -->
+    <#local format = getFormat(formatType, precision)>
+
+    <#return dateTime?string(format)>
 </#function>
 
-<#-- Apply a precision and format type to format a datetime -->
-<#function formatXsdDateTime dateTime precision formatType="short">
+<#function getPrecision dateTime>
 
-    <#-- First convert the string dateTime to a datetime object -->
-    <#local dt = toDateTime(dateTime)>
+    <#local match = dateTime?matches("(\\d{4})-(\\d{2})-(\\d{2}) (\\d{2}):(\\d{2}):(\\d{2})")>
+    <#list match as m>
+        <#local hours = m?groups[4]?number>
+        <#local minutes = m?groups[5]?number>
+        <#local seconds = m?groups[6]?number> 
+    </#list> 
     
+    <#local precision>   
+        <#if hours == 0 && minutes == 0 && seconds == 0>yearMonthDayPrecision
+        <#else>yearMonthDayTimePrecision
+        </#if>
+    </#local> 
+    
+    <#return precision?trim>  
+</#function>
+
+<#function getFormat formatType precision>
     <#-- Use the precision to determine which portion to display, 
-         and the format type to determine how to display it.  -->
+         and the format type to determine how to display it.  -->    
     <#local format>
         <#if formatType == "long">
             <#if precision == "yearPrecision">yyyy
@@ -122,7 +149,7 @@
             <#else>MMMM d, yyyy h:mm a
             </#if>
         <#else> <#-- formatType == "short" -->
-             <#if precision == "yearPrecision">yyyy
+            <#if precision == "yearPrecision">yyyy
             <#elseif precision == "yearMonthPrecision">M/yyyy
             <#elseif precision == "yearMonthDayPrecision">M/d/yyyy
             <#else>M/d/yyyy h:mm a
@@ -130,7 +157,8 @@
         </#if>
     </#local>
     
-    <#return dt?string(format)>
+    <#return format?trim>
 </#function>
-     
+
+
 
