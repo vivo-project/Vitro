@@ -249,6 +249,9 @@ public class RefactorOperationController extends BaseEditController {
 			ontModel.leaveCriticalSection();
 		}
 		
+		// there are no statements to delete, but we want indexes updated appropriately
+		request.getFullWebappDaoFactory().getIndividualDao().deleteIndividual(oldURIStr);
+		
 		String redirectStr = null;
 		
 		/* we can't go back to the referer, because the URI is now different. */
