@@ -65,7 +65,7 @@ public class VClassDaoSDB extends VClassDaoJena {
                                     	int count = 0;
                                     	try {
                                     	    String[] graphVars = { "?g" };
-                                    		String countQueryStr = "SELECT COUNT(*) WHERE \n" +
+                                    		String countQueryStr = "SELECT COUNT(DISTINCT ?s) WHERE \n" +
                                     		                       "{ GRAPH ?g { ?s a <" + cls.getURI() + "> } \n" +
                                     		                       WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode) +
                                     		                       "} \n";
