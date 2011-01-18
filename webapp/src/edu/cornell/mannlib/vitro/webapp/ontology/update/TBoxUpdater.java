@@ -397,17 +397,17 @@ public void removeObsoleteAnnotations() throws IOException {
 	    
         if (siteModel.contains(subj1, inClassGroupProp, obj1) ) {
         	retractions.add(subj1, inClassGroupProp, obj1);
-        	logger.log("Removed statement " + ABoxUpdater.stmtString(subj1, inClassGroupProp, obj1) + " from the knowledge base.");
+        	logger.log("Removed statement " + ABoxUpdater.stmtString(subj1, inClassGroupProp, obj1) + " from the knowledge base (assumed to be obsolete).");
         }
 
         if (siteModel.contains(subj2, inPropertyGroupProp, obj2) ) {
         	retractions.add(subj2, inPropertyGroupProp, obj2);
-        	logger.log("Removed statement " + ABoxUpdater.stmtString(subj2, inPropertyGroupProp, obj2) + " from the knowledge base.");
+        	logger.log("Removed statement " + ABoxUpdater.stmtString(subj2, inPropertyGroupProp, obj2) + " from the knowledge base (assumed to be obsolete).");
         }
 
         if (siteModel.contains(subj3, inPropertyGroupProp, obj3) ) {
         	retractions.add(subj3, inPropertyGroupProp, obj3);
-        	logger.log("Removed statement " + ABoxUpdater.stmtString(subj3, inPropertyGroupProp, obj3) + " from the knowledge base.");
+        	logger.log("Removed statement " + ABoxUpdater.stmtString(subj3, inPropertyGroupProp, obj3) + " from the knowledge base (assumed to be obsolete).");
         }
     	
 		if (retractions.size() > 0) {
