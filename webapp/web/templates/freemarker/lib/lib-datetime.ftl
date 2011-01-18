@@ -16,7 +16,7 @@
     </#if>
 </#macro>
 
-<#macro yearIntervalSpan startDateTime endDateTime endYearAsRange=true>
+<#macro yearIntervalSpan startDateTime="" endDateTime="" endYearAsRange=true>
     <#local yearInterval = yearInterval(startDateTime, endDateTime, endYearAsRange)>
     <#if yearInterval?has_content>
         <@dateTimeSpan>${yearInterval}</@dateTimeSpan>
@@ -32,23 +32,23 @@
 <#-- FUNCTIONS -->
 
 <#-- Assign a year precision and generate the interval -->
-<#function yearInterval dateTimeStart dateTimeEnd endYearAsRange=true>
+<#function yearInterval dateTimeStart="" dateTimeEnd="" endYearAsRange=true>
     <#local precision = "yearPrecision">
     <#return dateTimeIntervalShort(dateTimeStart, precision, dateTimeEnd, precision, endYearAsRange)>
 </#function>
 
 <#-- Generate a datetime interval with dates displayed as "January 1, 2011" -->
-<#function dateTimeIntervalLong dateTimeStart precisionStart dateTimeEnd precisionEnd endAsRange=true>
+<#function dateTimeIntervalLong dateTimeStart="" precisionStart="" dateTimeEnd="" precisionEnd="" endAsRange=true>
     <#return dateTimeInterval(dateTimeStart, precisionStart, dateTimeEnd, precisionEnd, "long", endAsRange) >
 </#function>
 
 <#-- Generate a datetime interval with dates displayed as "1/1/2011" -->
-<#function dateTimeIntervalShort dateTimeStart precisionStart dateTimeEnd precisionEnd endAsRange=true>
+<#function dateTimeIntervalShort dateTimeStart="" precisionStart="" dateTimeEnd="" precisionEnd="" endAsRange=true>
     <#return dateTimeInterval(dateTimeStart, precisionStart, dateTimeEnd, precisionEnd, "short", endAsRange)>
 </#function>
 
 <#-- Generate a datetime interval -->
-<#function dateTimeInterval dateTimeStart precisionStart dateTimeEnd precisionEnd formatType="short" endAsRange=true>
+<#function dateTimeInterval dateTimeStart="" precisionStart="" dateTimeEnd="" precisionEnd="" formatType="short" endAsRange=true>
 
     <#if dateTimeStart?has_content>   
         <#local start = formatXsdDateTime(dateTimeStart, precisionStart, formatType)>
@@ -99,7 +99,7 @@
 
 <#-- Apply a precision and format type to format a datetime -->
 <#function formatXsdDateTime dateTimeStr precision="" formatType="short">
-    
+
     <#-- First convert the string to a format that Freemarker can interpret as a datetime.
          For now, strip away time zone rather than displaying it. -->
     <#local dateTimeStr = dateTimeStr?replace("T", " ")?replace("Z.*$", "", "r")?trim>
