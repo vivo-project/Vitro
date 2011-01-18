@@ -140,22 +140,28 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
 	    for (int i = 0; i < graphVars.length; i++) {
 	        switch (datasetMode) {
 	            case ASSERTIONS_ONLY :  
-	                    filterBlock.append("FILTER (").append(graphVars[i])
+	                    filterBlock.append("FILTER (")
+	                        .append("(!bound(").append(graphVars[i])
+	                        .append(")) || (")
+	                        .append(graphVars[i])
 	                        .append(" != <")
 	                        .append(JenaDataSourceSetupBase.JENA_INF_MODEL)
 	                        .append("> && ").append(graphVars[i])
 	                        .append(" != <")
 	                        .append(JenaDataSourceSetupBase.JENA_TBOX_INF_MODEL)
-	                        .append(">) \n");
+	                        .append(">) ) \n");
 	                    break;
 	            case INFERENCES_ONLY :  
-                    filterBlock.append("FILTER (").append(graphVars[i])
+                    filterBlock.append("FILTER (")
+                        .append("(!bound(").append(graphVars[i])
+                        .append(")) || (")
+                        .append(graphVars[i])
                         .append(" = <")
                         .append(JenaDataSourceSetupBase.JENA_INF_MODEL)
                         .append("> || ").append(graphVars[i])
                         .append(" = <")
                         .append(JenaDataSourceSetupBase.JENA_TBOX_INF_MODEL)
-                        .append(">) \n");
+                        .append(">) )\n");
                     break;
 	            default:
 	                break;
