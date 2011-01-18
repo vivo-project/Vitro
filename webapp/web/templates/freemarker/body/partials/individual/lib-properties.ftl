@@ -46,7 +46,7 @@ name will be used as the label. -->
     <#if showEditingLinks>
         <#local url = property.addUrl>
         <#if url?has_content>
-            <a href="${url}" title="add relationship"><img class="add-individual" src="${urls.images}/individual/addIcon.gif" alt="add" /></a>
+            <a href="${url}" title="add entry"><img class="add-individual" src="${urls.images}/individual/addIcon.gif" alt="add" /></a>
         </#if>
     </#if>
 </#macro>
@@ -68,14 +68,14 @@ name will be used as the label. -->
 <#macro editLink statement>
     <#local url = statement.editUrl>
     <#if url?has_content>
-        <a href="${url}" title="change this relationship"><img class="edit-individual" src="${urls.images}/individual/editIcon.gif" alt="edit" /></a>
+        <a href="${url}" title="edit this entry"><img class="edit-individual" src="${urls.images}/individual/editIcon.gif" alt="edit" /></a>
     </#if>
 </#macro>
 
 <#macro deleteLink statement> 
     <#local url = statement.deleteUrl>
     <#if url?has_content>
-        <a href="${url}" title="delete this relationship"><img  class="delete-individual" src="${urls.images}/individual/deleteIcon.gif" alt="delete" /></a>
+        <a href="${url}" title="delete this entry"><img  class="delete-individual" src="${urls.images}/individual/deleteIcon.gif" alt="delete" /></a>
     </#if>
 </#macro>
 
