@@ -69,7 +69,7 @@
     </td>
     <td valign="top" colspan="1">
         <b>Theme</b><br />
-        <select name="ThemeDir">
+        <select id="ThemeDir" name="ThemeDir">
             <form:option name="ThemeDir" />
         </select>
         <font color="red"><form:error name="ThemeDir"/></font>
