@@ -366,7 +366,7 @@ public class ABoxUpdater {
 			   Statement oldStatement = iter.next();
 			   count++;
 			   retractions.add(oldStatement);
-			   logChange(oldStatement, false);
+			   //logChange(oldStatement, false);
 		   }
 		   
 		   if (count > 0) {
@@ -415,7 +415,7 @@ public class ABoxUpdater {
 			   count++;
 			   Statement oldStatement = iter.next();
 			   retractions.add(oldStatement);
-			   logChange(oldStatement, false);
+			   //logChange(oldStatement, false);
 		   }
 		   
 		   //log summary of changes
