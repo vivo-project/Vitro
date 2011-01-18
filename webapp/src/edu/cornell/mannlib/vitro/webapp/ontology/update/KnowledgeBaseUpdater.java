@@ -282,10 +282,12 @@ public class KnowledgeBaseUpdater {
 	 * needs to be updated to conform to a new ontology version
 	 */
 	public boolean updateRequired() throws IOException {
+		
 		String sparqlQueryStr = loadSparqlQuery(settings.getAskQueryFile());
 		if (sparqlQueryStr == null) {
 			return false;
 		}
+		
 		Model m = settings.getOntModelSelector().getApplicationMetadataModel();
 		Query query = QueryFactory.create(sparqlQueryStr);
 		QueryExecution qexec = QueryExecutionFactory.create(query, m);

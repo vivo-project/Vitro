@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.ontology.update;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.hp.hpl.jena.ontology.OntModel;
@@ -340,8 +341,12 @@ public void updateAnnotationModel() throws IOException {
 			  Statement stmt = iter.next();
 						  
 			  if (!newTboxAnnotationsModel.contains(stmt) && !usesGroup(siteModel, stmt.getSubject())) {
+				  long pre = retractions.size();
 				  retractions.add(siteModel.listStatements(stmt.getSubject(),(Property) null,(RDFNode)null));
-				  logger.log("Removed the " + stmt.getSubject().getURI() + " ClassGroup from the annotations model.");
+				  long post = retractions.size();
+				  if ((post - pre) > 0) {
+				     logger.log("Removed the " + stmt.getSubject().getURI() + " ClassGroup from the annotations model.");
+				  }  
 			  }
 			}
 	    	
