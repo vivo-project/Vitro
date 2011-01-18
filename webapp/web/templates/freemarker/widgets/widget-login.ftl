@@ -61,7 +61,7 @@
 
 <#macro forcePasswordChange>
     <section id="login">
-        <h2>Change Your Password</h2>
+        <h2>Change Password to Log in</h2>
            
             <#if errorMessage??>
                 <div id="error-alert" role="alert"><img src="${urls.images}/iconAlert.png" width="24" height="24" alert="Error alert icon"/>
