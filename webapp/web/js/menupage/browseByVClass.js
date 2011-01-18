@@ -79,15 +79,14 @@ var browseByVClass = {
                 // Build the content of each list item, piecing together each component
                 listItem = '<li class="individual" role="listitem" role="navigation">';
                 if ( typeof results.individuals[i].thumbUrl !== "undefined" ) {
-                    listItem += '<img src="'+ image +'" width="90" height="90" alt="'+ label +'" />';
-                    listItem += '<h1><a href="'+ profileUrl +'" title="View the profile page for '+ label +'">'+ label +'</a></h1>';
-                    // Include the moniker only if it's not empty and not equal to the VClass name
-                }else {
-                    listItem += '<h1 class="no-thumb"><a href="'+ profileUrl +'" title="View the profile page for '+ label +'">'+ label +'</a></h1>';
-                    // Include the moniker only if it's not empty and not equal to the VClass name
+                    listItem += '<img src="'+ image +'" width="90" height="90" alt="'+ label +'" /><h1 class="thumb">';
+                } else {
+                    listItem += '<h1>';
                 }
+                listItem += '<a href="'+ profileUrl +'" title="View the profile page for '+ label +'">'+ label +'</a></h1>';
+                // Include the moniker only if it's not empty and not equal to the VClass name
                 if ( moniker != vclassName && moniker != "" ) {
-                    listItem += '<p>'+ moniker +'</p>';
+                    listItem += '<span class="title">'+ moniker +'</span>';
                 }
                 listItem += '</li>';
                 browseByVClass.individualsInVClass.append(listItem);
