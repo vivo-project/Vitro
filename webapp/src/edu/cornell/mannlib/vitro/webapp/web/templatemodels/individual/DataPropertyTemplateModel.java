@@ -45,7 +45,9 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
         // Determine whether a new statement can be added
         if (policyHelper != null) {
             // If the display limit has already been reached, we can't add a new statement
-            if ( dp.getDisplayLimit() > statements.size() ) {
+            int displayLimit = dp.getDisplayLimit();
+            // Display limit of -1 (default value for new property) doesn't count
+            if ( (displayLimit < 0) || (displayLimit > statements.size()) ) {
                 RequestedAction action = new AddDataPropStmt(subjectUri, propertyUri,RequestActionConstants.SOME_LITERAL, null, null);
                 if (policyHelper.isAuthorizedAction(action)) {
                     addAccess = true;

@@ -151,6 +151,12 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     
     /** Apply post-processing to query results to prepare for template */
     protected void postprocess(List<Map<String, String>> data, WebappDaoFactory wdf) {
+        
+        if (log.isDebugEnabled()) {
+            log.debug("Data before postprocessing");
+            logData(data);
+        }
+        
         String postprocessorName = config.postprocessor;
         if (postprocessorName == null) {
             //return;
@@ -165,6 +171,25 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         } catch (Exception e) {
             log.error(e, e);
         }
+        
+        if (log.isDebugEnabled()) {
+            log.debug("Data after postprocessing");
+            logData(data);
+        }               
+    }
+    
+    private void logData(List<Map<String, String>> data) {
+        
+        if (log.isDebugEnabled()) {
+            int count = 1;
+            for (Map<String, String> map : data) {
+                log.debug("List item " + count);
+                count++;
+                for (String key : map.keySet()) {
+                   log.debug(key + ": " + map.get(key));
+               }
+            }
+        }        
     }
     
     /* Post-processing that must occur after collation, because it does reordering on collated subclass
