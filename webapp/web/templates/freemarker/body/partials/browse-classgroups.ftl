@@ -6,7 +6,7 @@
 
 <#macro allClassGroups>
     <section id="browse" role="region">
-        <h4>Browse</h4>
+        <h4>Browse by</h4>
         
         <ul id="browse-classgroups" role="list">
         <#assign selected = 'class="selected" ' />
