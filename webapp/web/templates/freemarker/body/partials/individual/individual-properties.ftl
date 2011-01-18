@@ -3,7 +3,6 @@
 <#-- Template for property listing on individual profile page -->
 
 <#import "lib-properties.ftl" as p>
-<#import "lib-dump.ftl" as dumper>
 
 <#list propertyGroups.all as group>
     <#assign groupname = group.name(nameForOtherGroup)>
