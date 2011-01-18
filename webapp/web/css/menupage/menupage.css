@@ -273,21 +273,28 @@ ul#alpha-browse-childClass a{
 #individuals-in-childClass ul{
     list-style: none;
 }
-#individuals-in-childClass li.individual-foaf-person{
+#individuals-in-childClass li.individual-foaf-person,
+#individuals-in-childClass li.individual{
     width: 39%;
     padding-bottom: 30px;
     padding-top: 20px;
     margin-left: 30px;
     margin-right: 30px;
-    clear: left;
-    min-height: 100px;
+    overflow: hidden;
 }
-#individuals-in-childClass li.individual-foaf-person img{
+#individuals-in-childClass li.individual-foaf-person img,
+#individuals-in-childClass li.individual img{
     float: left;
+    margin-bottom: 10px;
 }
-#individuals-in-childClass  li.individual-foaf-person h1{
+#individuals-in-childClass li.individual-foaf-person h1,
+#individuals-in-childClass li.individual h1{
     font-weight: bold;
     padding: 30px 0 10px 110px;
+    line-height: 1.2em;
+}
+#individuals-in-childClass li.individual h1.no-thumb{
+    padding: 0 0 10px 0;
     line-height: 1.2em;
 }
 #individuals-in-childClass  p{
@@ -296,19 +303,4 @@ ul#alpha-browse-childClass a{
 }
 #individuals-in-childClass span.org{
     display: block;
-}
-#individuals-in-childClass li.individual{
-    width: 440px;
-    margin-left: 30px;
-    margin-right: 30px;
-}
-#individuals-in-childClass li.individual h1{
-    margin: 0;
-    padding: 0;
-    color: #5e6363;
-    line-height: 1.2em;
-    padding-bottom: 20px;
-    padding-top: 20px;
-    font-size: 1em;
-    font-weight: normal;
 }
