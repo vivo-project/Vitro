@@ -307,11 +307,10 @@ public class IndividualDaoSDB extends IndividualDaoJena {
         final List<String> list = 
             new LinkedList<String>();
         
-        String query = "SELECT ?ind WHERE { \n" +
+        String query = "SELECT DISTINCT ?ind WHERE { \n" +
                        "  GRAPH ?g { ?ind <" + RDFS.label.getURI() + "> ?label } \n" +
                        "}";
-        
-        
+              
 	    Query q = QueryFactory.create(query);
 	    DatasetWrapper w = getDatasetWrapper();
 	    Dataset dataset = w.getDataset();
