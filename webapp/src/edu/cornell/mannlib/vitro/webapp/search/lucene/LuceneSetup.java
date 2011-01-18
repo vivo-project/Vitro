@@ -144,7 +144,7 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 				while( builder.isReindexRequested() || builder.isIndexing() ){
 				    n++;
 					if( n % 20 == 0 ) //output message every 10 sec. 
-					    log.info("Still rebulding lucene  index");
+					    log.info("Still rebuilding lucene  index");
 					Thread.currentThread().sleep(500);
 				}				
 			}
