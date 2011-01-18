@@ -98,26 +98,42 @@
 </#function>
 
 <#-- Apply a precision and format type to format a datetime -->
-<#function formatXsdDateTime dateTime precision="" formatType="short">
+<#function formatXsdDateTime dateTimeStr precision="" formatType="short">
     
     <#-- First convert the string to a datetime object. 
          For now, strip away time zone rather than displaying it. -->
-    <#local dateTime = dateTime?replace("T", " ")?replace("Z.*$", "", "r")>
+    <#local dateTimeStr = dateTimeStr?replace("T", " ")?replace("Z.*$", "", "r")>
 
-    <#-- If no precision is specified, assign it from the datetime value.
-         This must be done before conversion to a datetime object, since that
-         process fills in zero values. -->
-    <#if ! precision?has_content>
-        <#local precision = getPrecision(dateTime)>
+    <#local dateTimeStringFormat = "yyyy-MM-dd HH:mm:ss">
+    
+    <#-- If a non-standard datetime format (e.g, "2000-04" from
+         "2000-04"^^<http://www.w3.org/2001/XMLSchema#gYearMonth>), just
+         return the string without attempting to format. Possibly this should
+         be handled in Java by examining the xsd type and making an appropriate
+         conversion. -->
+    <#if ! dateTimeStr?matches(dateTimeStringFormat)>
+        <#return dateTimeStr>
     </#if>
     
     <#-- Convert the string to a datetime object. -->
-    <#local dateTime = dateTime?datetime("yyyy-MM-dd HH:mm:ss")>
+    <#local dateTimeObj = dateTimeStr?datetime(dateTimeStringFormat)>
+    
+    <#if dateTimeObj == null>
+        <#return "non-standard datetime string">
+    </#if>
+
+    <#-- If no precision is specified, assign it from the datetime value.
+         Pass dateTimeStr rather than dateTimeObj, because dateTimeObj
+         replaces zeroes with default values, whereas we want to set 
+         precision based on whether the times values are all 0. -->
+    <#if ! precision?has_content>
+        <#local precision = getPrecision(dateTimeStr)>
+    </#if>
     
     <#-- Get the format string for the datetime output -->
     <#local format = getFormat(formatType, precision)>
 
-    <#return dateTime?string(format)>
+    <#return dateTimeObj?string(format)>
 </#function>
 
 <#function getPrecision dateTime>
