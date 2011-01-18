@@ -934,7 +934,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	try {
     	    String[] graphVars = { "?g" };
     		String valueOfProperty = 
-    			"SELECT ?object" +
+    			"SELECT ?object " +
     			"WHERE{ GRAPH ?g { <" + this.individualURI + "> <" + 
     			        propertyURI + "> ?object} \n" +
     			        WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode) +
