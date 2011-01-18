@@ -17,6 +17,7 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     private static final Log log = LogFactory.getLog(PropertyTemplateModel.class); 
     
     private String name;
+    private String localName;
     protected String propertyUri;
     
     // For editing
@@ -24,10 +25,12 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     protected boolean addAccess = false;
     
     PropertyTemplateModel(Property property, Individual subject, EditingPolicyHelper policyHelper) {
+        propertyUri = property.getURI();
+        localName = property.getLocalName();
+        
         // Do in subclass constructor. The label has not been set on the property, and the
         // means of getting the label differs between object and data properties.
         // this.name = property.getLabel();
-        propertyUri = property.getURI();
         
         if (policyHelper != null) {
             subjectUri = subject.getURI();            
@@ -38,10 +41,6 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
         this.name = name;
     }
     
-    protected String getUri() {
-        return propertyUri;
-    }
-        
     
     /* Access methods for templates */
     
@@ -51,7 +50,14 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
         return name;
     }
 
-
+    public String getLocalName() {
+        return localName;
+    }
+    
+    public String getUri() {
+        return propertyUri;
+    }
+    
     public abstract String getAddUrl();
  
 }

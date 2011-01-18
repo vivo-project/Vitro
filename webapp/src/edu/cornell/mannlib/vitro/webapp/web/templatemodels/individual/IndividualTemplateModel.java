@@ -140,7 +140,7 @@ public class IndividualTemplateModel extends BaseTemplateModel {
         return propertyList;
     }
     
-    public boolean getShowEditingLinks() {
+    public boolean isEditable() {
         // RY This will be improved later. What is important is not whether the user is a self-editor,
         // but whether he has editing privileges on this profile.
         return VitroRequestPrep.isSelfEditing(vreq) || 

@@ -21,20 +21,22 @@
         
         <#-- List the properties in the group -->
         <#list group.properties as property>
-            <#assign propertyNameCamel = property.name?capitalize?replace(" ", "")?uncap_first />
             <article class="property" role="article">
                 <#-- Property display name -->
-                <h3 id="${propertyNameCamel}">${property.name} <@p.addLink property editing /></h3>
+                <h3 id="${property.localName}">${property.name} <@p.addLink property editable /></h3>
                 <#-- List the statements for each property -->
                 <ul class="property-list" role="list">
                     <#-- data property -->
                     <#if property.type == "data">
-                        <@p.dataPropertyList property.statements editing />
+                        <@p.dataPropertyList property editable />
                     <#-- object property -->
                     <#elseif property.collatedBySubclass> <#-- collated -->
-                        <@p.collatedObjectPropertyList property editing />
+                        <@p.collatedObjectPropertyList property editable />
                     <#else> <#-- uncollated -->
-                        <@p.objectPropertyList property.statements property.template editing />
+                        <#-- We pass property.statements and property.template even though we are also
+                             passing property, because objecctPropertyList can get other values, and
+                             doesn't necessarily use property.statements and property.template -->
+                        <@p.objectPropertyList property property.statements property.template editable />
                     </#if>
                 </ul>
             </article> <!-- end property -->
