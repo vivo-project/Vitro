@@ -267,6 +267,7 @@ ul#alpha-browse-childClass a{
     padding-bottom: 30px;
     margin-bottom: 30px;
     margin-right: 17px;
+    min-height: 170px;
 }
 #individuals-in-childClass h3{
     padding: 10px 0 10px 30px;
@@ -295,7 +296,7 @@ ul#alpha-browse-childClass a{
 }
 #individuals-in-childClass span.title{
     display: block;
-    margin: 0.3em 0 0 0;
+    margin: 0.8em 0 0 0;
     font-size: 0.8em;
     line-height: 1;
 }
