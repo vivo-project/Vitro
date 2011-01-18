@@ -3,9 +3,9 @@
 <#-- Template for property listing on individual profile page -->
 
 <#import "lib-properties.ftl" as p>
+<#import "lib-dump.ftl" as dumper>
 
 <#list propertyGroups.all as group>
-
     <#assign groupname = group.name(nameForOtherGroup)>
     
     <section class="property-group" role="region">
@@ -14,32 +14,31 @@
                 <img src="${urls.images}/individual/scroll-up.png" alt="scroll to property group menus" />
             </a>
         </nav>
-   
+        
         <#-- Display the group heading --> 
         <#if groupname?has_content>
             <h2 id="${groupname}">${groupname?capitalize}</h2>
         </#if>
-
-        <#-- List the properties in the group -->        
+        
+        <#-- List the properties in the group -->
         <#list group.properties as property>
+            <#assign propertyNameCamel = property.name?capitalize?replace(" ", "")?uncap_first />
             <article class="property" role="article">
                 <#-- Property display name -->
-                <h3>${property.name} <@p.addLink property editing /></h3>
-                <#-- List the statements for each property -->   
-                <ul class="property-list" role="list"> 
-                    <#-- data property -->  
-                    <#if property.type == "data"> 
+                <h3 id="${propertyNameCamel}">${property.name} <@p.addLink property editing /></h3>
+                <#-- List the statements for each property -->
+                <ul class="property-list" role="list">
+                    <#-- data property -->
+                    <#if property.type == "data">
                         <@p.dataPropertyList property.statements editing />
-
-                    <#-- object property -->      
-                    <#elseif property.collatedBySubclass> <#-- collated -->                            
+                    <#-- object property -->
+                    <#elseif property.collatedBySubclass> <#-- collated -->
                         <@p.collatedObjectPropertyList property editing />
                     <#else> <#-- uncollated -->
                         <@p.objectPropertyList property.statements property.template editing />
-                    </#if>  
-                </ul>                 
-            </article> <!-- end property -->             
-        </#list>                    
+                    </#if>
+                </ul>
+            </article> <!-- end property -->
+        </#list>
     </section> <!-- end property-group -->
-</#list> 
-
+</#list>
