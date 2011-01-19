@@ -330,6 +330,17 @@ div.sparqlform label {
     display: inline;
     font-weight: normal;
 }
+
+div.sparqlform div {
+    margin-bottom: 1.5em;
+}
+
+div.sparqlform .parenthetical {
+    font-style: italic;
+    margin-top: 0;
+    margin-bottom: .25em;
+}
+
 /* Temporary hack to remove stuff from forms in vivoweb only */
 .hideFromVivoWeb {
     display: none;
