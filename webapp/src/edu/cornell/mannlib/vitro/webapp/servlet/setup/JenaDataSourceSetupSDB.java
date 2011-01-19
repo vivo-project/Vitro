@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -92,20 +93,15 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
                     
             checkForNamespaceMismatch( memModel, defaultNamespace );
 
-            // SDB initialization
-            String layoutStr = ConfigurationProperties.getProperty(
-                    "VitroConnection.DataSource.sdb.layout","layout2/hash");
-            String dbtypeStr = ConfigurationProperties.getProperty(
-                    "VitroConnection.DataSource.dbtype", "MySQL");
-            StoreDesc storeDesc = new StoreDesc(
-                    LayoutType.fetch(layoutStr),
-                    DatabaseType.fetch(dbtypeStr) );
-            sce.getServletContext().setAttribute("storeDesc", storeDesc);
+            // SDB setup
+            StoreDesc storeDesc = makeStoreDesc();
+            setApplicationStoreDesc(storeDesc, sce.getServletContext());
+
             BasicDataSource bds = makeDataSourceFromConfigurationProperties();
             this.setApplicationDataSource(bds, sce.getServletContext());
-            SDBConnection conn = new SDBConnection(bds.getConnection()) ; 
-            Store store = SDBFactory.connectStore(conn, storeDesc);
-            sce.getServletContext().setAttribute("kbStore", store);
+            
+            Store store = connectStore(bds, storeDesc);
+            setApplicationStore(store, sce.getServletContext());
             
             if (!isSetUp(store)) {
                 log.debug("Non-SDB system detected. Setting up SDB store");
@@ -452,6 +448,22 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
         return;
     }
     
+    public static StoreDesc makeStoreDesc() {
+        String layoutStr = ConfigurationProperties.getProperty(
+                "VitroConnection.DataSource.sdb.layout","layout2/hash");
+        String dbtypeStr = ConfigurationProperties.getProperty(
+                "VitroConnection.DataSource.dbtype", "MySQL");
+       return new StoreDesc(
+                LayoutType.fetch(layoutStr),
+                DatabaseType.fetch(dbtypeStr) );
+    }
+    
+    public static Store connectStore(BasicDataSource bds, StoreDesc storeDesc) 
+            throws SQLException {
+        SDBConnection conn = new SDBConnection(bds.getConnection()) ; 
+        return SDBFactory.connectStore(conn, storeDesc);
+    }
+    
     public static void setupSDB(ServletContext ctx, 
                                 Store store, 
                                 Model memModel, 
@@ -512,6 +524,27 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
         } catch (Exception e) { // unformatted store
             return false;
         }
+    }
+    
+    private static final String STOREDESC_ATTR = "storeDesc";
+    private static final String STORE_ATTR = "kbStore";
+    
+    public static void setApplicationStoreDesc(StoreDesc storeDesc, 
+                                          ServletContext ctx) {
+        ctx.setAttribute(STOREDESC_ATTR, storeDesc);
+    }
+   
+    public static StoreDesc getApplicationStoreDesc(ServletContext ctx) {
+        return (StoreDesc) ctx.getAttribute(STOREDESC_ATTR);
+    }
+    
+    public static void setApplicationStore(Store store,
+                                           ServletContext ctx) {
+        ctx.setAttribute(STORE_ATTR, store);
+    }
+    
+    public static Store getApplicationStore(ServletContext ctx) {
+        return (Store) ctx.getAttribute(STORE_ATTR);
     }
     
  }
