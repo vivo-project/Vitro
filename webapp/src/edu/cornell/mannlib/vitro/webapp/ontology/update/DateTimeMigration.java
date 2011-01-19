@@ -148,10 +148,10 @@ public class DateTimeMigration {
 	 */
 	public void updateLiterals() throws IOException {
 
-		//TODO: look into java locale note: not handling timezones - they are not expected to be in the 1.1.1 data
 		DateFormat yearFormat = new SimpleDateFormat("yyyy");
 		DateFormat yearMonthFormat = new SimpleDateFormat("yyyy-MM");
 		DateFormat yearMonthDayFormat = new SimpleDateFormat("yyyy-MM-dd");
+		DateFormat yearMonthDayFormat2 = new SimpleDateFormat("dd-MMM-yy");
 	 	
 		aboxModel.enterCriticalSection(Lock.WRITE);
 		
@@ -189,9 +189,14 @@ public class DateTimeMigration {
 		    	   try {
 		               date = yearMonthDayFormat.parse(stmt.getObject().asLiteral().getLexicalForm());
 		               newStmt = ResourceFactory.createStatement(stmt.getSubject(), stmt.getPredicate(), getDateTimeLiteral(date) );
-		    	   } catch (ParseException pe) {
-		    		   logger.log("Parse Exception for yearMonthDay literal: " + stmt.getObject().asLiteral().getLexicalForm() + 
-		    				   ". The following statement has been removed from the knowledge base " + ABoxUpdater.stmtString(stmt));
+		    	   } catch (ParseException pe) {		   
+		    		   try {
+		                   date = yearMonthDayFormat2.parse(stmt.getObject().asLiteral().getLexicalForm());
+		                   newStmt = ResourceFactory.createStatement(stmt.getSubject(), stmt.getPredicate(), getDateTimeLiteral(date) );  		   
+		    		   } catch (ParseException pe2) {
+			    		   logger.log("Parse Exception for yearMonthDay literal: " + stmt.getObject().asLiteral().getLexicalForm() + 
+			    				   ". The following statement has been removed from the knowledge base " + ABoxUpdater.stmtString(stmt));		    			   
+		    		   }
 		    	   }	   
 		       } else  if (ymdtPrecisionURI.equals(precision)) {
 		    	   logger.log("WARNING: unhandled precision found for individual " + stmt.getSubject().getURI() + ": " + precision +

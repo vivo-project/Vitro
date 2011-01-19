@@ -64,6 +64,7 @@ public class KnowledgeBaseUpdater {
 			
 			long startTime = System.currentTimeMillis();
             System.out.println("Migrating the knowledge base");
+            logger.log("Started");
 			
 			try {
 			     performUpdate();

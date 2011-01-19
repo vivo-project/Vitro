@@ -17,8 +17,7 @@ public class SimpleChangeLogger implements ChangeLogger {
 	
 	private boolean errorsWritten = false;
 	
-	public SimpleChangeLogger( String logPath, 
-									   String errorPath ) {
+	public SimpleChangeLogger( String logPath, String errorPath ) {
 		File logFile = new File(logPath);
 		File errorFile = new File(errorPath);
 		try {
