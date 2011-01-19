@@ -28,7 +28,6 @@
 .individualList ul.individualData li {
     display: inline;
     padding-right: .3em;
-    padding-bottom:1.2em;
 }
 .individualList ul.individualData li.last {
     border: none;
