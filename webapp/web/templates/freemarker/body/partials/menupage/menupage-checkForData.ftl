@@ -2,12 +2,15 @@
 
 <#assign populatedClasses = 0 />
 
-<#list vClassGroup as vClass>
-    <#-- Check to see if any of the classes in this class group have individuals -->
-    <#if (vClass.entityCount > 0)>
-        <#assign populatedClasses = populatedClasses + 1 />
-    </#if>
-</#list>
+<#if vClassGroup??> <#-- the controller may put a null -->
+    <#list vClassGroup as vClass>
+        <#-- Check to see if any of the classes in this class group have individuals -->
+        <#if (vClass.entityCount > 0)>
+            <#assign populatedClasses = populatedClasses + 1 />
+        </#if>
+    </#list>
+</#if>
+
 <#if (populatedClasses == 0)>
     <#assign noData = true />
 <#else>
