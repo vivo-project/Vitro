@@ -581,7 +581,7 @@ public class DateTimeWithPrecision extends BaseEditElement {
     }
     
     /* returns null if it cannot convert */
-    private static VitroVocabulary.Precision toPrecision(String precisionUri){              
+    public static VitroVocabulary.Precision toPrecision(String precisionUri){              
         for( VitroVocabulary.Precision precision : VitroVocabulary.Precision.values()){
             if( precision.uri().equals(precisionUri))
                 return precision;
