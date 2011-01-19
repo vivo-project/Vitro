@@ -69,6 +69,26 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         // ?subject ?property ?\w+
         Pattern.compile("\\?" + KEY_SUBJECT + "\\s+\\?" + KEY_PROPERTY + "\\s+\\?(\\w+)");
     
+    private static enum ConfigError {
+        NO_QUERY("Missing query specification"),
+        NO_TEMPLATE("Missing template specification"),
+        TEMPLATE_NOT_FOUND("Specified template does not exist");
+        
+        String message;
+        
+        ConfigError(String message) {
+            this.message = message;
+        }
+        
+        public String getMessage() {
+            return message;
+        }
+        
+        public String toString() {
+            return getMessage();
+        }
+    }
+    
     private PropertyListConfig config;
     private String objectKey;
     
@@ -76,9 +96,13 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     private boolean addAccess = false;
 
     ObjectPropertyTemplateModel(ObjectProperty op, Individual subject, VitroRequest vreq, EditingPolicyHelper policyHelper) {
-        super(op, subject, policyHelper);
-        setName(op.getDomainPublic());
         
+        super(op, subject, policyHelper);
+        
+        log.debug("Creating template model for object property " + op.getURI());
+        
+        setName(op.getDomainPublic());
+
         // Get the config for this object property
         try {
             config = new PropertyListConfig(op, vreq);
@@ -140,7 +164,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         if (op.getCollateBySubclass()) {
             try {
                 return new CollatedObjectPropertyTemplateModel(op, subject, vreq, policyHelper);
-            } catch (InvalidConfigurationException e) {
+            } catch (InvalidCollatedPropertyConfigurationException e) {
                 log.warn(e.getMessage());
                 return new UncollatedObjectPropertyTemplateModel(op, subject, vreq, policyHelper);
             }
@@ -225,12 +249,9 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
             if (dateTimeEnd == null) {
                 // If the first statement has a null end datetime, all subsequent statements in the list also do,
                 // so there is nothing to reorder.
-                // NB This assumption is FALSE if the query orders by subclass but the property is not collated.
-                // This happens when a query is written with a subclass variable to support turning on collation
-                // in the back end.
-                // if (statements.indexOf(stmt) == 0) {
-                //     break;
-                // }               
+                if (statements.indexOf(stmt) == 0) {
+                    break;
+                }               
                 tempList.add(stmt); 
                 iterator.remove(); 
             }
@@ -244,12 +265,13 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         return objectKey;
     }
     
-    protected abstract String getDefaultConfigFileName();
-    
-    private class PropertyListConfig {
-
+    private class PropertyListConfig {  
+        
         private static final String CONFIG_FILE_PATH = "/config/";
-        private static final String NODE_NAME_QUERY = "query";
+        private static final String DEFAULT_CONFIG_FILE_NAME = "listViewConfig-default.xml";
+        
+        private static final String NODE_NAME_QUERY_BASE = "query-base";
+        private static final String NODE_NAME_QUERY_COLLATED = "query-collated";
         private static final String NODE_NAME_TEMPLATE = "template";
         private static final String NODE_NAME_POSTPROCESSOR = "postprocessor";
         
@@ -258,27 +280,26 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         private String templateName;
         private String postprocessor;
 
-        PropertyListConfig(ObjectProperty op, VitroRequest vreq) throws Exception {
+        PropertyListConfig(ObjectProperty op, VitroRequest vreq) {
 
             // Get the custom config filename
-            WebappDaoFactory wdf = vreq.getWebappDaoFactory();
-            ObjectPropertyDao opDao = wdf.getObjectPropertyDao();
-            String configFileName = opDao.getCustomListViewConfigFileName(op);
+            String configFileName = vreq.getWebappDaoFactory().getObjectPropertyDao().getCustomListViewConfigFileName(op);
             if (configFileName == null) { // no custom config; use default config
-                configFileName = getDefaultConfigFileName();
+                configFileName = DEFAULT_CONFIG_FILE_NAME;
             }
             log.debug("Using list view config file " + configFileName + " for object property " + op.getURI());
             
             String configFilePath = getConfigFilePath(configFileName);
+            
             try {
                 File config = new File(configFilePath);            
                 if ( ! isDefaultConfig(configFileName) && ! config.exists() ) {
                     log.warn("Can't find config file " + configFilePath + " for object property " + op.getURI() + "\n" +
                             ". Using default config file instead.");
-                    configFilePath = getConfigFilePath(getDefaultConfigFileName());
+                    configFilePath = getConfigFilePath(DEFAULT_CONFIG_FILE_NAME);
                     // Should we test for the existence of the default, and throw an error if it doesn't exist?
                 }                   
-                setValuesFromConfigFile(configFilePath);           
+                setValuesFromConfigFile(configFilePath, op);           
 
             } catch (Exception e) {
                 log.error("Error processing config file " + configFilePath + " for object property " + op.getURI(), e);
@@ -286,13 +307,18 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
             }
             
             if ( ! isDefaultConfig(configFileName) ) {
-                String invalidConfigMessage = checkForInvalidConfig(vreq);
-                if ( StringUtils.isNotEmpty(invalidConfigMessage) ) {
+                ConfigError configError = checkForInvalidConfig(vreq);
+                // If the configuration contains an error, use the default configuration.
+                // Exception: a collated property with a missing collated query. This will
+                // be caught in CollatedObjectPropertyTemplateModel constructor and result
+                // in using an UncollatedObjectPropertyTemplateModel instead.
+                if ( configError != null && 
+                        ! (configError == ConfigError.NO_QUERY && op.getCollateBySubclass()) ) {
                     log.warn("Invalid list view config for object property " + op.getURI() + 
                             " in " + configFilePath + ":\n" +                            
-                            invalidConfigMessage + " Using default config instead.");
-                    configFilePath = getConfigFilePath(getDefaultConfigFileName());
-                    setValuesFromConfigFile(configFilePath);                    
+                            configError + " Using default config instead.");
+                    configFilePath = getConfigFilePath(DEFAULT_CONFIG_FILE_NAME);
+                    setValuesFromConfigFile(configFilePath, op);                    
                 }
             }
             
@@ -300,31 +326,31 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         }
         
         private boolean isDefaultConfig(String configFileName) {
-            return configFileName.equals(getDefaultConfigFileName());
+            return configFileName.equals(DEFAULT_CONFIG_FILE_NAME);
         }
         
-        private String checkForInvalidConfig(VitroRequest vreq) {
-            String invalidConfigMessage = null;
+        private ConfigError checkForInvalidConfig(VitroRequest vreq) {
+            ConfigError error = null;
 
             if ( StringUtils.isBlank(queryString)) {
-                invalidConfigMessage = "Missing query specification.";
+                error = ConfigError.NO_QUERY;
             } else if ( StringUtils.isBlank(templateName)) {
-                invalidConfigMessage = "Missing template specification.";
+                error = ConfigError.NO_TEMPLATE;
             } else {
                 Configuration fmConfig = (Configuration) vreq.getAttribute("freemarkerConfig");
                 TemplateLoader tl = fmConfig.getTemplateLoader();
                 try {
                     if ( tl.findTemplateSource(templateName) == null ) {
-                        invalidConfigMessage = "Specified template " + templateName + " does not exist.";
+                        error = ConfigError.TEMPLATE_NOT_FOUND;
                     }
                 } catch (IOException e) {
                     log.error("Error finding template " + templateName, e);
                 }
             }
-            return invalidConfigMessage;
+            return error;
         }
         
-        private void setValuesFromConfigFile(String configFilePath) {
+        private void setValuesFromConfigFile(String configFilePath, ObjectProperty op) {
             
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db;
@@ -332,8 +358,11 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
             try {
                 db = dbf.newDocumentBuilder();
                 Document doc = db.parse(configFilePath);
+                
                 // Required values
-                queryString = getConfigValue(doc, NODE_NAME_QUERY);
+                String queryNodeName = op.getCollateBySubclass() ? NODE_NAME_QUERY_COLLATED : NODE_NAME_QUERY_BASE;
+                log.debug("Using query element " + queryNodeName + " for object property " + op.getURI());
+                queryString = getConfigValue(doc, queryNodeName);
                 templateName = getConfigValue(doc, NODE_NAME_TEMPLATE); 
                 
                 // Optional values
@@ -362,11 +391,11 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         }
     }
     
-    protected class InvalidConfigurationException extends Exception { 
+    protected class InvalidCollatedPropertyConfigurationException extends Exception { 
 
         private static final long serialVersionUID = 1L;
 
-        protected InvalidConfigurationException(String s) {
+        protected InvalidCollatedPropertyConfigurationException(String s) {
             super(s);
         }
     }

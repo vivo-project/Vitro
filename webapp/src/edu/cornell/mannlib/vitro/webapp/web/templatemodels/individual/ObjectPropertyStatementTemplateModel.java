@@ -41,16 +41,13 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
     /** 
      * This method handles the special case where we are creating a DataPropertyStatementTemplateModel 
      * outside the GroupedPropertyList. Specifically, it allows vitro:primaryLink and vitro:additionalLink 
-     * to be treated like data property statements and thus have editing links. (In a future version, 
+     * to be treated like object property statements and thus have editing links. (In a future version, 
      * these properties will be replaced by vivo core ontology properties.) It could potentially be used 
      * for other properties outside the property list as well.
      */
     ObjectPropertyStatementTemplateModel(String subjectUri, String propertyUri, 
             VitroRequest vreq, EditingPolicyHelper policyHelper) {
-        super(subjectUri, propertyUri, policyHelper);
-        
-        ObjectPropertyStatementDao opsDao = vreq.getWebappDaoFactory().getObjectPropertyStatementDao();
-        
+        super(subjectUri, propertyUri, policyHelper);       
     }
 
     private void setEditAccess(EditingPolicyHelper policyHelper) {

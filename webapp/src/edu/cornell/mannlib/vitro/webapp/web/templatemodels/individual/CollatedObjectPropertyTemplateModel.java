@@ -12,6 +12,7 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -26,7 +27,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateModel {
 
     private static final Log log = LogFactory.getLog(CollatedObjectPropertyTemplateModel.class);  
-    private static final String DEFAULT_CONFIG_FILE = "listViewConfig-default-collated.xml";
     private static final Pattern SELECT_SUBCLASS_PATTERN = 
         // SELECT ?subclass
         Pattern.compile("SELECT[^{]*\\?subclass\\b", Pattern.CASE_INSENSITIVE);
@@ -34,19 +34,42 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
         // ORDER BY DESC(?subclass)
     private static final Pattern ORDER_BY_SUBCLASS_PATTERN = 
         Pattern.compile("ORDER\\s+BY\\s+(DESC\\s*\\(\\s*)?\\?subclass", Pattern.CASE_INSENSITIVE);
+
+    private static enum ConfigError {
+        NO_QUERY("Missing query specification"),
+        NO_SUBCLASS_SELECT("Query does not select a subclass variable"),
+        NO_SUBCLASS_ORDER_BY("Query does not sort first by subclass variable");
+        
+        String message;
+        
+        ConfigError(String message) {
+            this.message = message;
+        }
+        
+        public String getMessage() {
+            return message;
+        }
+        
+        public String toString() {
+            return getMessage();
+        }
+    }
     
     private SortedMap<String, List<ObjectPropertyStatementTemplateModel>> subclasses;
     
     CollatedObjectPropertyTemplateModel(ObjectProperty op, Individual subject, 
             VitroRequest vreq, EditingPolicyHelper policyHelper) 
-        throws InvalidConfigurationException {
+        throws InvalidCollatedPropertyConfigurationException {
         
         super(op, subject, vreq, policyHelper); 
         
-        String invalidConfigMessage = checkConfiguration();
-        if ( ! invalidConfigMessage.isEmpty() ) {
-            throw new InvalidConfigurationException("Invalid configuration for collated property " + 
-                    op.getURI() + ":" + invalidConfigMessage + ". Creating uncollated display instead."); 
+        // RY It would be more efficient to check for these errors in the super constructor, so that we don't
+        // go through the rest of that constructor before throwing an error. In that case, the subclasses
+        // could each have their own checkConfiguration() method.
+        ConfigError configError = checkConfiguration();
+        if ( configError != null ) {
+            throw new InvalidCollatedPropertyConfigurationException("Invalid configuration for collated property " + 
+                    op.getURI() + ":" + configError + ". Creating uncollated display instead."); 
         }
 
         /* Get the data */
@@ -78,22 +101,26 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
         }
     }
     
-    private String checkConfiguration() {
+    private ConfigError checkConfiguration() {
 
         String queryString = getQueryString();
-        Matcher m;
         
+        if (StringUtils.isBlank(queryString)) {
+            return ConfigError.NO_QUERY;
+        }
+        
+        Matcher m;
         m = SELECT_SUBCLASS_PATTERN.matcher(queryString); 
         if ( ! m.find() ) { 
-            return("Query does not select a subclass variable.");
+            return ConfigError.NO_SUBCLASS_SELECT;
         } 
         
         m = ORDER_BY_SUBCLASS_PATTERN.matcher(queryString);
         if ( ! m.find() ) {
-            return("Query does not sort first by subclass variable.");
+            return ConfigError.NO_SUBCLASS_ORDER_BY;
         }
         
-        return "";
+        return null;
     }
     
     private Map<String, List<ObjectPropertyStatementTemplateModel>> collate(String subjectUri, String propertyUri,
@@ -132,11 +159,6 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
             subclassName = vclass.getName();
         }
         return subclassName;
-    }
-
-    @Override
-    protected String getDefaultConfigFileName() {
-        return DEFAULT_CONFIG_FILE;
     }
     
     /* Access methods for templates */

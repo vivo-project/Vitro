@@ -18,7 +18,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 public class UncollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateModel {
 
     private static final Log log = LogFactory.getLog(UncollatedObjectPropertyTemplateModel.class);  
-    private static final String DEFAULT_CONFIG_FILE = "listViewConfig-default-uncollated.xml";
     
     private List<ObjectPropertyStatementTemplateModel> statements;
     
@@ -45,11 +44,6 @@ public class UncollatedObjectPropertyTemplateModel extends ObjectPropertyTemplat
         }
         
         postprocessStatementList(statements);
-    }
-    
-    @Override
-    protected String getDefaultConfigFileName() {
-        return DEFAULT_CONFIG_FILE;
     }
     
     /* Access methods for templates */
