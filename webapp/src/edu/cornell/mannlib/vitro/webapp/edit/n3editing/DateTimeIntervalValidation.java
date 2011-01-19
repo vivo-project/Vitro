@@ -12,6 +12,10 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.datatypes.xsd.XSDDateTime;
 import com.hp.hpl.jena.rdf.model.Literal;
 
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.Precision;
+import edu.cornell.mannlib.vitro.webapp.edit.elements.DateTimeWithPrecision;
+
 public class DateTimeIntervalValidation implements N3Validator {
     private static Log log = LogFactory.getLog(DateTimeIntervalValidation.class);
     
@@ -20,12 +24,17 @@ public class DateTimeIntervalValidation implements N3Validator {
 
     private String startValueName;
     private String endValueName;
+
+    private String startPrecisionName;
+    private String endPrecisionName;
     
     public DateTimeIntervalValidation(String startFieldName, String endFieldName){
         this.startFieldName = startFieldName;
         this.endFieldName = endFieldName;
         startValueName = startFieldName + ".value";
         endValueName = endFieldName + ".value";
+        startPrecisionName = startFieldName + ".precision";
+        endPrecisionName = endFieldName + ".precision";
     }
     
     public Map<String, String> validate(EditConfiguration editConfig,
@@ -38,16 +47,19 @@ public class DateTimeIntervalValidation implements N3Validator {
         Literal formStartYear = literalsFromForm.get(startValueName);
         Literal formEndYear = literalsFromForm.get(endValueName);
 
+        VitroVocabulary.Precision startPrecision = getPrecision(startPrecisionName, editConfig, editSub);
+        VitroVocabulary.Precision endPrecision = getPrecision(endPrecisionName, editConfig, editSub);
+        
         Map<String, String> errors = new HashMap<String, String>();
 
         if (formStartYear != null && formEndYear != null) {
-            errors.putAll(checkDateLiterals(formStartYear, formEndYear));
+            errors.putAll(checkDateLiterals(formStartYear, formEndYear, startPrecision, endPrecision));
         } else if (formStartYear != null && existingEndYear != null) {
-            errors.putAll(checkDateLiterals(formStartYear, existingEndYear));
+            errors.putAll(checkDateLiterals(formStartYear, existingEndYear, startPrecision, endPrecision));
         } else if (existingStartYear != null && formEndYear != null) {
-            errors.putAll(checkDateLiterals(existingStartYear, formEndYear));
+            errors.putAll(checkDateLiterals(existingStartYear, formEndYear, startPrecision, endPrecision));
         } else if (existingStartYear != null && existingEndYear != null) {
-            errors.putAll(checkDateLiterals(existingStartYear, existingEndYear));
+            errors.putAll(checkDateLiterals(existingStartYear, existingEndYear, startPrecision, endPrecision));
         }
 
         if (errors.size() != 0)
@@ -56,8 +68,45 @@ public class DateTimeIntervalValidation implements N3Validator {
             return null;
     }
 
-    private Map<String, String> checkDateLiterals(Literal startLit, Literal endLit) {
+    private Precision getPrecision(String precisionVarName,
+            EditConfiguration editConfig, EditSubmission editSub) {
+        if( editSub != null 
+                && editSub.getUrisFromForm() != null 
+                && editSub.getUrisFromForm().containsKey(precisionVarName)){            
+            String precisionStr = editSub.getUrisFromForm().get(precisionVarName);
+            VitroVocabulary.Precision precision = DateTimeWithPrecision.toPrecision( precisionStr );
+            if( precision == null )
+                log.warn("cannot convert " + precisionStr + " to a precision");
+            else
+                return precision;
+        }else if( editConfig != null 
+                && editConfig.getUrisInScope() != null 
+                && editConfig.getUrisInScope().containsKey(precisionVarName)){
+            String precisionStr = editConfig.getUrisInScope().get(precisionVarName);
+            VitroVocabulary.Precision precision = DateTimeWithPrecision.toPrecision( precisionStr );
+            if( precision == null )
+                log.warn("cannot convert " + precisionStr + " to a precision");
+            else
+                return precision;        
+        }
+        //this is what is returned if a precision was not found in the config or submission
+        return null;
+    }
+
+    private Map<String, String> checkDateLiterals(
+            Literal startLit, Literal endLit, 
+            VitroVocabulary.Precision startPrecision, VitroVocabulary.Precision endPrecision) {                
         Map<String, String> errors = new HashMap<String, String>();        
+        
+        //check to make sure that there are precisions
+        if( startPrecision == null )
+            errors.put("startFieldName", "could not determine start precision");
+        if( endPrecision == null )
+            errors.put("endFieldName" , "could not determine end precision");
+        if( errors.size() > 0 )
+            return errors;
+        
+        
         try{
              XSDDateTime startDate = (XSDDateTime)startLit.getValue();
              XSDDateTime endDate = (XSDDateTime)endLit.getValue();
@@ -65,9 +114,16 @@ public class DateTimeIntervalValidation implements N3Validator {
                  Calendar startCal = startDate.asCalendar();
                  Calendar endCal = endDate.asCalendar();
                                   
-                 if( endCal != null && ! endCal.after( startCal ) ){
-                     errors.put(startFieldName, "Start year must be before end year");
-                     errors.put(endFieldName, "End year must be after start year");
+                 if( endCal != null ){
+                     if( !startCal.before( endCal ) ){
+                         if( startPrecision == VitroVocabulary.Precision.YEAR 
+                             && endPrecision == VitroVocabulary.Precision.YEAR ){
+                             errors.putAll( checkYears(startCal,endCal));
+                         }else{
+                             errors.put(startFieldName, "Start must be before end");
+                             errors.put(endFieldName, "End must be after start");
+                         }
+                     }
                  }
              }
         }catch(ClassCastException cce){
@@ -79,4 +135,16 @@ public class DateTimeIntervalValidation implements N3Validator {
         return errors;
     }
 
+    private Map<? extends String, ? extends String> checkYears(
+            Calendar startCal, Calendar endCal) {
+        
+        Map<String, String> errors = new HashMap<String, String>();    
+     
+        if( ! (endCal.get(Calendar.YEAR) >=  startCal.get(Calendar.YEAR) )){
+            errors.put(startFieldName, "Start must be before end");
+            errors.put(endFieldName, "End must be after start");
+        }
+        
+        return errors;
+    }
 }
