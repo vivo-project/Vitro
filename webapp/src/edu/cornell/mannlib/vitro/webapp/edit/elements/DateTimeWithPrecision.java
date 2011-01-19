@@ -127,7 +127,7 @@ public class DateTimeWithPrecision extends BaseEditElement {
         map.put("minimumPrecision", minimumPrecision.uri());
         map.put("requiredLevel", displayRequiredLevel.uri());
         
-        String precisionUri = getExistingPrecision(editConfig,editSub);
+        String precisionUri = getPrecision(editConfig,editSub);
         VitroVocabulary.Precision existingPrec = toPrecision(precisionUri);
         
         if( precisionUri != null && !"".equals(precisionUri) && existingPrec == null ){
@@ -216,22 +216,35 @@ public class DateTimeWithPrecision extends BaseEditElement {
     /**
      * Gets the currently set precision.  May return null.
      */
-    private String getExistingPrecision(EditConfiguration editConfig, EditSubmission editSub) {
-        String precisionURI = editConfig.getUrisInScope().get( getPrecisionVariableName() );
-        if( precisionURI == null ){
-            return null;
+    private String getPrecision(EditConfiguration editConfig, EditSubmission editSub) {
+        if( editSub != null ){
+            String submittedPrecisionURI = editSub.getUrisFromForm().get( getPrecisionVariableName() );
+            if( submittedPrecisionURI != null ){
+                return submittedPrecisionURI;
+            }
+        }
+        
+        String existingPrecisionURI = editConfig.getUrisInScope().get( getPrecisionVariableName() );
+        if( existingPrecisionURI != null ){
+            return existingPrecisionURI;
         }else{
-            return precisionURI;
-        } 
+            return null;
+        }         
     }
 
     private DateTime getTimeValue(EditConfiguration editConfig, EditSubmission editSub) {
+        if( editSub != null ){
+            Literal submittedValue = editSub.getLiteralsFromForm().get( getValueVariableName() );
+            if( submittedValue != null )
+                return new DateTime( submittedValue.getLexicalForm() );
+        }        
+        
         Literal dtValue = editConfig.getLiteralsInScope().get( getValueVariableName() );
-        if( dtValue == null ){
-           return null;
-        }else{
+        if( dtValue != null ){
             return new DateTime( dtValue.getLexicalForm() );
-        }
+        }else{
+            return null; 
+        }        
     }
 
     /**
