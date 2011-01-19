@@ -27,7 +27,7 @@
 <%@ taglib prefix="v" uri="http://vitro.mannlib.cornell.edu/vitro/tags" %>
 
 <%! 
-    public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.edit.forms.dateTimeIntervalForm.jsp");
+    public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.edit.forms.dateTimeIntervalForm");
 %>
 <%
     VitroRequest vreq = new VitroRequest(request);
