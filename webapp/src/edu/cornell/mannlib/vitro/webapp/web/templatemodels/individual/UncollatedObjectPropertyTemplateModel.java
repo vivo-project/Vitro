@@ -21,7 +21,9 @@ public class UncollatedObjectPropertyTemplateModel extends ObjectPropertyTemplat
     
     private List<ObjectPropertyStatementTemplateModel> statements;
     
-    UncollatedObjectPropertyTemplateModel(ObjectProperty op, Individual subject, VitroRequest vreq, EditingPolicyHelper policyHelper) {
+    UncollatedObjectPropertyTemplateModel(ObjectProperty op, Individual subject, VitroRequest vreq, EditingPolicyHelper policyHelper)
+        throws InvalidConfigurationException {
+        
         super(op, subject, vreq, policyHelper);
         
         /* Get the data */

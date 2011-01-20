@@ -34,44 +34,15 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
         // ORDER BY DESC(?subclass)
     private static final Pattern ORDER_BY_SUBCLASS_PATTERN = 
         Pattern.compile("ORDER\\s+BY\\s+(DESC\\s*\\(\\s*)?\\?subclass", Pattern.CASE_INSENSITIVE);
-
-    private static enum ConfigError {
-        NO_QUERY("Missing query specification"),
-        NO_SUBCLASS_SELECT("Query does not select a subclass variable"),
-        NO_SUBCLASS_ORDER_BY("Query does not sort first by subclass variable");
-        
-        String message;
-        
-        ConfigError(String message) {
-            this.message = message;
-        }
-        
-        public String getMessage() {
-            return message;
-        }
-        
-        public String toString() {
-            return getMessage();
-        }
-    }
     
     private SortedMap<String, List<ObjectPropertyStatementTemplateModel>> subclasses;
     
     CollatedObjectPropertyTemplateModel(ObjectProperty op, Individual subject, 
             VitroRequest vreq, EditingPolicyHelper policyHelper) 
-        throws InvalidCollatedPropertyConfigurationException {
+            throws InvalidConfigurationException {
         
         super(op, subject, vreq, policyHelper); 
         
-        // RY It would be more efficient to check for these errors in the super constructor, so that we don't
-        // go through the rest of that constructor before throwing an error. In that case, the subclasses
-        // could each have their own checkConfiguration() method.
-        ConfigError configError = checkConfiguration();
-        if ( configError != null ) {
-            throw new InvalidCollatedPropertyConfigurationException("Invalid configuration for collated property " + 
-                    op.getURI() + ":" + configError + ". Creating uncollated display instead."); 
-        }
-
         /* Get the data */
         WebappDaoFactory wdf = vreq.getWebappDaoFactory();
         ObjectPropertyStatementDao opDao = wdf.getObjectPropertyStatementDao();
@@ -101,9 +72,7 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
         }
     }
     
-    private ConfigError checkConfiguration() {
-
-        String queryString = getQueryString();
+    protected ConfigError checkQuery(String queryString) {
         
         if (StringUtils.isBlank(queryString)) {
             return ConfigError.NO_QUERY;
