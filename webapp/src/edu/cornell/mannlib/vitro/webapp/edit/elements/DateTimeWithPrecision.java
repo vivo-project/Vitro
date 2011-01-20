@@ -95,7 +95,7 @@ public class DateTimeWithPrecision extends BaseEditElement {
                 
         this.displayRequiredLevel = toPrecision( displayRequiredLevelUri );
         if( this.displayRequiredLevel == null )
-            throw new IllegalArgumentException(minimumPrecisionURI 
+            throw new IllegalArgumentException(displayRequiredLevelUri 
                     +" is not a valid precision for displayRequiredLevel, see VitroVocabulary.Precision");
         
 //        if( this.displayRequiredLevel.ordinal() < this.minimumPrecision.ordinal() ){

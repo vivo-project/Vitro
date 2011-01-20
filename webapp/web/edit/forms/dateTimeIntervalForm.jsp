@@ -223,9 +223,9 @@
         //setup date time edit elements
         Field startField = editConfig.getField("startField");
         // arguments for DateTimeWithPrecision are (fieldName, minimumPrecision, [requiredLevel])
-        startField.setEditElement(new DateTimeWithPrecision(startField, VitroVocabulary.Precision.YEAR.uri(), VitroVocabulary.Precision.SECOND.uri()));        
+        startField.setEditElement(new DateTimeWithPrecision(startField, VitroVocabulary.Precision.DAY.uri(), VitroVocabulary.Precision.DAY.uri()));        
         Field endField = editConfig.getField("endField");
-        endField.setEditElement(new DateTimeWithPrecision(endField, VitroVocabulary.Precision.YEAR.uri(), VitroVocabulary.Precision.SECOND.uri()));
+        endField.setEditElement(new DateTimeWithPrecision(endField, VitroVocabulary.Precision.DAY.uri(), VitroVocabulary.Precision.DAY.uri()));
     }
     
     editConfig.addValidator(new DateTimeIntervalValidation("startField","endField") ); 

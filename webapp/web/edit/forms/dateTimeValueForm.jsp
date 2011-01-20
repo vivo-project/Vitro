@@ -155,7 +155,7 @@
         //setup date time edit elements
         Field dateTimeField = editConfig.getField("dateTimeField");
         // arguments for DateTimeWithPrecision are (fieldName, minimumPrecision, [requiredLevel])
-        dateTimeField.setEditElement(new DateTimeWithPrecision(dateTimeField, VitroVocabulary.Precision.YEAR.uri(), VitroVocabulary.Precision.SECOND.uri()));                
+        dateTimeField.setEditElement(new DateTimeWithPrecision(dateTimeField, VitroVocabulary.Precision.DAY.uri(), VitroVocabulary.Precision.DAY.uri()));                
     }     
             
     Model model = (Model) application.getAttribute("jenaOntModel");
