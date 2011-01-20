@@ -22,12 +22,17 @@
         PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;  
           
         SELECT ?subclass ?object ?name ?moniker {
-            GRAPH ?g1 { ?subject ?property ?object }
+            GRAPH ?g1 { ?subject ?property ?object
+                OPTIONAL { ?object a ?subclass } 
+                # TODO: the original intent was to allow the
+                # type triple to be in a different graph,
+                # but SDB makes an extremely inefficient
+                # query with this additional graph variable.
+            }
             OPTIONAL { GRAPH ?g2 { ?object rdfs:label ?name } }
             OPTIONAL { GRAPH ?g3 { ?object vitro:moniker ?moniker } }
-            OPTIONAL { GRAPH ?g4 { ?object a ?subclass } 
-                       FILTER (?g4 != &lt;http://vitro.mannlib.cornell.edu/default/inferred-tbox&gt; &amp;&amp; 
-                               ?g4 != &lt;http://vitro.mannlib.cornell.edu/default/vitro-kb-inf&gt; )             
+                       FILTER (?g1 != &lt;http://vitro.mannlib.cornell.edu/default/inferred-tbox&gt; &amp;&amp; 
+                               ?g1 != &lt;http://vitro.mannlib.cornell.edu/default/vitro-kb-inf&gt; )             
             }
         } ORDER BY ?subclass      
     </query-collated>
