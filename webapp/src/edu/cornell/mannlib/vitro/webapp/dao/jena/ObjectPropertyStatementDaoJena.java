@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -264,6 +265,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         } catch(Throwable th){
             log.error("Could not create SPARQL query for query string. " + th.getMessage());
             log.error(queryString);
+            return Collections.emptyList();
         } 
 
         QuerySolutionMap bindings = new QuerySolutionMap();
