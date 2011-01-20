@@ -7,35 +7,34 @@
     <form action="ingest" method="post">
         <input type="hidden" name="action" value="connectDB"/>
 
-    
-	<input type="text" style="width:80%;" name="jdbcUrl" value="jdbc:mysql://localhost/"/>
-    <p>JDBC URL</p>
+    <label for="JDBC URL">JDBC URL</label>
+    <input type="text" style="width:80%;" name="jdbcUrl" value="jdbc:mysql://localhost/"/>
  
+    <label for="username">Username</label>
     <input type="text" name="username"/>
-    <p>username</p>
-
-    <input type="password" name="password"/>
-    <p>password</p>
-
-
-		<input id="tripleStoreRDB" name="tripleStore" type="radio" checked="checked" value="RDB"/>
-			<label for="tripleStoreRDB">Jena RDB</label>
-		<input id="tripleStoreSDB" name="tripleStore" type="radio" value="SDB"/>
-			<label for="tripleStoreRDB">Jena SDB (hash layout)</label>
     
-        <select name="dbType">
-            <c:forEach items="${requestScope.dbTypes}" var="typeName">
-                <c:choose>
-                    <c:when test="${typeName eq 'MySQL'}">
-                        <option value="${typeName}" selected="selected">${typeName}</option>
-                    </c:when>
+    <label for="password">Password</label>
+    <input type="password" name="password" class="block"/>
+
+    <input id="tripleStoreRDB" name="tripleStore" type="radio" checked="checked" value="RDB"/>
+    <label for="tripleStoreRDB" class="inline">Jena RDB</label>
+    
+    <input id="tripleStoreSDB" name="tripleStore" type="radio" value="SDB"/>
+    <label for="tripleStoreRDB" class="inline">Jena SDB (hash layout)</label>
+        
+    <label for="database type">Database type</label>
+    <select name="dbType">
+        <c:forEach items="${requestScope.dbTypes}" var="typeName">
+            <c:choose>
+                <c:when test="${typeName eq 'MySQL'}">
+                <option value="${typeName}" selected="selected">${typeName}</option>
+                </c:when>
                     <c:otherwise>
                         <option value="${typeName}">${typeName}</option>
                     </c:otherwise>
-                </c:choose>
-            </c:forEach>
-        </select>
+            </c:choose>
+        </c:forEach>
+    </select>
 
-    <p>database type</p>
 
     <input id="submit" type="submit" value="Connect Database" />

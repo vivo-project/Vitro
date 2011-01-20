@@ -7,7 +7,7 @@ var supersleight = function() {
 	var root = false;
 	var applyPositioning = true;
 	// path to a transparent GIF image
-	var shim = '../images/x.gif';
+	var shim = './images/x.gif';
 
 	var fnLoadPngs = function() {
 		// if supersleight.limitTo called, limit to specified id

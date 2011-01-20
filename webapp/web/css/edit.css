@@ -4,6 +4,13 @@ label{
     display: block; 
     margin-top: .5em; 
 }
+label.inline {
+    display: inline;
+    font-weight: normal;
+}
+input.block{
+    display: block;
+}
 textarea{
     margin-bottom: 1.5em;
 }

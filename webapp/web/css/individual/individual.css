@@ -4,64 +4,29 @@
 /* CSS Document */
 
 /* ADMIN PANEL------>  */
-div.admin{
-  color: #fff;
-  background: #aaa;
-  padding: 6px;
-  height: 1%; /* IE likes this */
-  width: 98%; /* and this */
+#admin{
+    font-size: .8em;
+    background-color: #f2f9fb;
+    padding-top: 0;
 }
-div.panelContents{
-  color: #777;
-  background: #efebe6;
-/*display: none;*/
-  padding: 12px;
+#admin h3{
+    display: inline-block;
+    background-color: #2a98bd;
+    padding: 3px 6px 3px 10px;
+    color: #fff;
+    margin-bottom: 5px;
 }
-div.top{
-  margin: 0;
-  padding: 0 24px 0 0;
-  background: #efebe6;
+#admin .uri-link {
+    color: #888c8c;
+    padding-left: 11px;
+    padding-bottom: 5px;
 }
-div.bottom{
-  margin: 0 -12px;
-  position: relative;
-  bottom: -16px;
-  padding: 6px 12px 8px 12px;
+#admin a.edit-individual{
+    padding-left: 5px;
+    border-left: none;
 }
-.admin h3{
-  font-size: 1em;
-  text-transform: uppercase;
-  font-weight: bold;
-  color: #ddd;
-  background: #aaa;
-  line-height: 2em;
-  margin: 0 !important; /* fix for IE6 */
-  margin-right: -24px;
-  padding: 0 12px;
-  width: 100% !important; /* fix for IE6 */
-  width: auto;
-}
-.admin p{ 
-    margin-bottom: .25em; 
-}
-.admin a:link,
-.admin a:visited{ 
-    color: #fff; 
-}
-.panelContents a:link,
-.panelContents a:visited{ 
-    color: #777; 
-}
-.admin a:hover,
-.admin a:active { 
-    color: #000; 
-}
-#loginPanel ul { 
-    margin: 0; 
-}
-#loginPanel li {
-  list-style-type: none;
-  margin-bottom: .5em;
+#admin a{
+    color: #2a98bc;
 }
 /* <------ INDIVIDUAL INTRO FOR ANY CLASS*/
 #individual-intro{
@@ -80,19 +45,17 @@ div.bottom{
 #individual-intro #individual-info h3{
     padding-bottom: 5px;
     margin-top: 5px;
+    clear: both;
 }
 #individual-intro #share-contact h3{
     padding-bottom: .3em;
     margin-top: 0;
+    padding-top: 0;
 }
-#individual-intro .icon-rdf{
+#individual-intro a.icon-rdf{
     font-size: 1.125em;
 }
-
 #individual-intro .individual-overview{
-    margin-bottom: 10px;
-}
-#individual-intro ul#individual-tools{
     margin-bottom: 10px;
 }
 /* <------ INDIVIDUAL INTRO FOR PERSON*/
@@ -102,8 +65,9 @@ div.bottom{
     margin-top: 0.5em;
     margin-bottom: 30px;
 }
-/* <------ INDIVIDUAL INTRO LEFT CONTENT */
+/* <------ INDIVIDUAL INTRO - LEFT SIDE CONTENT */
 #share-contact{
+    position: relative;
     width: 166px;
     float: left;
     padding-left: 0.5em;
@@ -114,35 +78,34 @@ div.bottom{
     padding-bottom: .3em;
     font-size: 1em;
     line-height: 1.2em;
+    padding-top: 0;
 }
 #share-contact img.individual-photo{
     width: 160px;
     height: 160px;
-    float: left;
 }
 ul#individual-tools-people{
     margin-top: 5px;
-    height: 27px;
+    height: 20px;
     padding-bottom: 20px;
     list-style-type: none;
     clear: both;
+    margin-bottom: 15px;
 }
 ul#individual-tools-people li{
     position: relative;
     display: block;
-    padding-right: 14px;
+    padding-right: 7px;
     float: left;
+    margin-bottom: 20px;
 }
 ul#individual-tools{
-    color: #8AA149
+    margin-bottom: 10px;
+    height: 20px;
 }
 ul#individual-tools li{
-    padding-right: 14px;
-}
-ul#individual-tools-people a.icon-rdf-people{
-    position: absolute;
-    font-size: 1.125em;
-    top: 13px;
+    padding-right: 9px;
+    float: left;
 }
 ul#individual-email{
     clear: both;
@@ -178,7 +141,7 @@ ul#individual-phone li:first-child{
 }
 #individual-intro ul.individual-urls li{
     font-size: .875em;
-    line-height: 1.3em;
+    line-height: 1.7em;
     clear: left;
 }
 ul.individual-urls-people{
@@ -190,11 +153,11 @@ ul.individual-urls-people li{
     font-size: .875em;
     line-height: 1.3em;
 }
-/* <------ INDIVIDUAL RIGHT CONTENT */
+/* <------ INDIVIDUAL INTRO - RIGHT SIDE CONTENT */
 #individual-info{
     width: 69%;
     float: left;
-    padding: 10px 0 0 10px;
+    padding: 0 0 0 10px;
 }
 #individual-info h1.fn{
     padding-bottom: 12px;
@@ -227,19 +190,13 @@ ul#individual-areas li{
     float: left;
     padding-right: 10px;
     padding-left: 10px;
+    border-right: 1px solid #5e6363;
 }
 ul#individual-areas li:first-child{
     padding-left: 0;
 }
-ul#individual-areas li{
-    float:left;
-    border-right: 1px solid #5e6363;
-    padding-right: 10px;
-    padding-left: 10px;
-}
 /* <------ INDIVIDUAL VISUALIZATION */
 #publications-visualization{
-    margin-top: 35px;
     float: right;
     width: 226px;
 }
@@ -341,6 +298,7 @@ article.property h3{
 article.property ul.property-list li.subclass h3 {
     border-bottom: none;
     padding: 10px 10px 10px 0;
+    background-color: #fff;
 }
 article.property .data-property-statement{
     padding: 10px 20px 10px 20px;
@@ -354,10 +312,17 @@ article.property ul.property-list{
 article.property ul.property-list li{
     line-height: 1.2em;
     padding: 10px 20px 5px 20px;
+    background-color: #fff;
 }
 article.property ul.subclass-property-list{
     margin-left: 0;
-}#share-contact h3
+}
+#share-contact h3{
+    margin-top: 15px;
+    padding-bottom: .3em;
+    font-size: 1em;
+    line-height: 1em;
+}
 article.property ul.subclass-property-list li{
     line-height: 1.2em;
     padding: 0 20px 10px 20px;
@@ -381,5 +346,17 @@ article.property ul.subclass-property-list li{
     vertical-align: middle;
 }
 .delete-individual{
+    vertical-align: middle;
+}
+.thumb-edit-links{
+    position: absolute;
+    top 0;
+    right: 22px;
+   /* background: rgba(255, 255, 255, 0.8);*/
+    background: #fff;
+    margin-top: 143px;
+    padding: 0 6px 0 0;
+}
+.middle{
     vertical-align: middle;
 }
