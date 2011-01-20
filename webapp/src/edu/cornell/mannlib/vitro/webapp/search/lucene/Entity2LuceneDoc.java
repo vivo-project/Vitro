@@ -174,41 +174,6 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         }
         doc.add(  new Field(term.MODTIME, value , Field.Store.YES, Field.Index.NOT_ANALYZED));
 
-        //do sunrise and sunset. set to 'null' if not found
-        // which would indicate that it was sunrised at the beginning of
-        // time or sunset at the end of time.
-        try{
-            value = null;
-            if( ent.getSunrise() != null ){
-                value = (new DateTime(ent.getSunrise().getTime()))
-                    .toString(LuceneIndexer.DATE_FORMAT);
-            }
-        }catch (Exception ex){
-            value = null;
-        }
-
-        if( value != null ){
-            doc.add( new Field(term.SUNRISE, value, Field.Store.YES, Field.Index.NOT_ANALYZED));
-        }else{
-            doc.add(new Field(term.SUNRISE, earliestTime, Field.Store.YES, Field.Index.NOT_ANALYZED));
-        }
-
-        try{
-            value = null;
-            if( ent.getSunset() != null ){
-                value = (new DateTime(ent.getSunset().getTime()))
-                    .toString(LuceneIndexer.DATE_FORMAT);
-            }
-        }catch (Exception ex){
-            value = null;
-        }
-
-        if( value != null ){
-            doc.add( new Field(term.SUNSET, value, Field.Store.YES, Field.Index.NOT_ANALYZED));
-        }else{
-            doc.add(new Field(term.SUNSET, latestTime, Field.Store.YES, Field.Index.NOT_ANALYZED));
-        }
-
         try{
             value = null;
             if( ent.getTimekey() != null ){
