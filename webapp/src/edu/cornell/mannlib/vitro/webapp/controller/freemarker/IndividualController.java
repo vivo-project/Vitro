@@ -30,7 +30,6 @@ import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
-import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -47,17 +46,15 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Res
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
+import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditSubmission;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
-import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQuery;
-import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQueryWrapper;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapper;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapperFactory;
 import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 import edu.cornell.mannlib.vitro.webapp.web.functions.IndividualLocalNameMethod;
-import edu.cornell.mannlib.vitro.webapp.web.jsptags.StringProcessorTag;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ListedIndividualTemplateModel;
 import freemarker.ext.beans.BeansWrapper;
@@ -135,7 +132,7 @@ public class IndividualController extends FreemarkerHttpServlet {
 	        body.put("headContent", getRdfLinkTag(itm));	        
 	        body.put("localName", new IndividualLocalNameMethod());
 	        
-	        String template = getIndividualTemplate(individual);
+	        String template = getIndividualTemplate(individual, vreq);
 	                
 	        return new TemplateResponseValues(template, body);
         
@@ -205,39 +202,63 @@ public class IndividualController extends FreemarkerHttpServlet {
 	
 	// Determine whether the individual has a custom display template based on its class membership.
 	// If not, return the default individual template.
-	private String getIndividualTemplate(Individual individual) {
+	private String getIndividualTemplate(Individual individual, VitroRequest vreq) {
 	    
         @SuppressWarnings("unused")
         String vclassName = "unknown"; 
         String customTemplate = null;
 
-        if( individual.getVClass() != null ){
+        // First check vclass
+        if( individual.getVClass() != null ){ 
             vclassName = individual.getVClass().getName();
-            List<VClass> clasList = individual.getVClasses(true);
-            for (VClass clas : clasList) {
-                customTemplate = clas.getCustomDisplayView();
+            List<VClass> directClasses = individual.getVClasses(true);
+            for (VClass vclass : directClasses) {
+                customTemplate = vclass.getCustomDisplayView();
                 if (customTemplate != null) {
                     if (customTemplate.length()>0) {
-                        vclassName = clas.getName(); // reset entity vclassname to name of class where a custom view; this call has side-effects
-                        log.debug("Found direct class [" + clas.getName() + "] with custom view " + customTemplate + "; resetting entity vclassName to this class");
+                        vclassName = vclass.getName(); // reset entity vclassname to name of class where a custom view; this call has side-effects
+                        log.debug("Found direct class [" + vclass.getName() + "] with custom view " + customTemplate + "; resetting entity vclassName to this class");
                         break;
                     } else {
                         customTemplate = null;
                     }
                 }
             }
-            if (customTemplate == null) { //still
-                clasList = individual.getVClasses(false);
-                for (VClass clas : clasList) {
-                    customTemplate = clas.getCustomDisplayView();
+            // If no custom template defined, check other vclasses
+            if (customTemplate == null) {
+                List<VClass> inferredClasses = individual.getVClasses(false);
+                for (VClass vclass : inferredClasses) {
+                    customTemplate = vclass.getCustomDisplayView();
                     if (customTemplate != null) {
                         if (customTemplate.length()>0) {
                             // note that NOT changing entity vclassName here yet
-                            log.debug("Found inferred class [" + clas.getName() + "] with custom view " + customTemplate);
+                            log.debug("Found inferred class [" + vclass.getName() + "] with custom view " + customTemplate);
                             break;
                         } else {
                             customTemplate = null;
                         }
+                    }
+                }
+            }
+            // If still no custom template defined, and inferencing is asynchronous (under RDB), check
+            // superclasses of the vclass. 
+            // The method to check for asynchronous inferencing will be added later; see NIHVIVO-1834.
+            if (customTemplate == null) { //&& inferencing is asynchronous) { 
+                for (VClass directVClass : directClasses) {
+                    VClassDao vcDao = vreq.getWebappDaoFactory().getVClassDao();
+                    List<String> superClassUris = vcDao.getAllSuperClassURIs(directVClass.getURI());
+                    for (String uri : superClassUris) {
+                        VClass vclass = vcDao.getVClassByURI(uri);
+                        customTemplate = vclass.getCustomDisplayView();
+                        if (customTemplate != null) {
+                            if (customTemplate.length()>0) {
+                                // note that NOT changing entity vclassName here
+                                log.debug("Found superclass [" + vclass.getName() + "] with custom view " + customTemplate);
+                                break;
+                            } else {
+                                customTemplate = null;
+                            }                            
+                        }                        
                     }
                 }
             }

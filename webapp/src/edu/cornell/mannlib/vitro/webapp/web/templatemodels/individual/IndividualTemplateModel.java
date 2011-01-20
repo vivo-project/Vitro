@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -12,9 +13,11 @@ import org.openrdf.model.impl.URIImpl;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
+import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
@@ -54,6 +57,24 @@ public class IndividualTemplateModel extends BaseTemplateModel {
         boolean isSelfEditing = VitroRequestPrep.isSelfEditing(vreq);
         boolean isCurator = loginStatusBean.isLoggedInAtLeast(LoginStatusBean.CURATOR);
         return isSelfEditing || isCurator;
+    }
+    
+    private boolean isVClass(String vClassUri) {
+        boolean isVClass = individual.isVClass(vClassUri);  
+        // If reasoning is asynchronous, this inference may not have been made yet. Check the superclasses
+        // of the individual's vclass.
+        if (!isVClass) { // & reasoning is asynchronous: method to be added later; see NIHVIVO-1834
+            List<VClass> directVClasses = individual.getVClasses(true);
+            for (VClass directVClass : directVClasses) {
+                VClassDao vcDao = vreq.getWebappDaoFactory().getVClassDao();
+                List<String> superClassUris = vcDao.getAllSuperClassURIs(directVClass.getURI());
+                if (superClassUris.contains(vClassUri)) {
+                    isVClass = true;
+                    break;
+                }
+            }
+        }
+        return isVClass;
     }
     
     
@@ -126,11 +147,11 @@ public class IndividualTemplateModel extends BaseTemplateModel {
     // and getVisualizationUrl() methods there, but we still need to know whether to
     // instantiate the IndividualTemplateModel or the VivoIndividualTemplateModel class.
     public boolean isPerson() {
-        return individual.isVClass("http://xmlns.com/foaf/0.1/Person");        
+        return isVClass("http://xmlns.com/foaf/0.1/Person");
     }
     
     public boolean isOrganization() {
-        return individual.isVClass("http://xmlns.com/foaf/0.1/Organization");        
+        return isVClass("http://xmlns.com/foaf/0.1/Organization");        
     }
     
     public GroupedPropertyList getPropertyList() {
