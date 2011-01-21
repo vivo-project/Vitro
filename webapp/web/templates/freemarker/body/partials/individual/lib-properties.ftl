@@ -54,28 +54,28 @@ name will be used as the label. -->
 <#macro propertyListItem property statement editable>
     <li role="listitem">    
         <#nested>        
-        <@editingLinks property statement editable />
+        <@editingLinks "${property.localName}" statement editable />
     </li>
 </#macro>
 
-<#macro editingLinks property statement editable>
+<#macro editingLinks propertyLocalName statement editable>
     <#if editable>
-        <@editLink property statement />
-        <@deleteLink property statement />
+        <@editLink propertyLocalName statement />
+        <@deleteLink propertyLocalName statement />
     </#if>
 </#macro>
 
-<#macro editLink property statement>
+<#macro editLink propertyLocalName statement>
     <#local url = statement.editUrl>
     <#if url?has_content>
-        <a class="edit-${property.localName}" href="${url}" title="edit this entry"><img class="edit-individual" src="${urls.images}/individual/editIcon.gif" alt="edit" /></a>
+        <a class="edit-${propertyLocalName}" href="${url}" title="edit this entry"><img class="edit-individual" src="${urls.images}/individual/editIcon.gif" alt="edit" /></a>
     </#if>
 </#macro>
 
-<#macro deleteLink property statement> 
+<#macro deleteLink propertyLocalName statement> 
     <#local url = statement.deleteUrl>
     <#if url?has_content>
-        <a class="delete-${property.localName}" href="${url}" title="delete this entry"><img  class="delete-individual" src="${urls.images}/individual/deleteIcon.gif" alt="delete" /></a>
+        <a class="delete-${propertyLocalName}" href="${url}" title="delete this entry"><img  class="delete-individual" src="${urls.images}/individual/deleteIcon.gif" alt="delete" /></a>
     </#if>
 </#macro>
 
@@ -118,7 +118,7 @@ name will be used as the label. -->
          If there's a mainImage statement but no thumbnail image, treat it as if there is no image. --> 
     <#if (mainImage.statements)?has_content && thumbUrl?has_content>    
         <a href="${individual.imageUrl}"><img class="individual-photo" src="${thumbUrl}" title="click to view larger image" alt="${individual.name}" width="160" /></a>            
-        <@p.editingLinks mainImage mainImage.statements[0] editable /> 
+        <@p.editingLinks "${mainImage.localName}" mainImage.statements[0] editable /> 
     <#else>
         <@p.addLinkWithLabel mainImage editable "Photo" /> 
         <#if placeholderImage?has_content>
@@ -131,5 +131,5 @@ name will be used as the label. -->
 <#macro label individual editable>
     <#local label = individual.nameStatement>
     ${label.value}
-    <#-- ><@p.editingLinks "label" label editable /> -->
+    <@p.editingLinks "label" label editable /> 
 </#macro>
