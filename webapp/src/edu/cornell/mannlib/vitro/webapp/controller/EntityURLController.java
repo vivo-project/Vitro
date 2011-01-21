@@ -19,6 +19,15 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.TopDocs;
 
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
@@ -44,12 +53,15 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.Classes2ClassesDao;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
+import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc;
+import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneIndexFactory;
 import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 
 
 
 public class EntityURLController extends VitroHttpServlet {
 	 private static final Log log = LogFactory.getLog(EntityURLController.class.getName());
+	 public static final int ENTITY_LIST_CONTROLLER_MAX_RESULTS = 30000;
 	 
 public void doGet (HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException{
 	 
@@ -84,21 +96,45 @@ public void doGet (HttpServletRequest req, HttpServletResponse res) throws IOExc
 		return;
 	}
 	
-	List<Individual> inds = (List<Individual>)getServletContext().getAttribute("inds");
-	Model model = ModelFactory.createDefaultModel();
-	if(inds != null){
-		System.out.println("Into the loop");
-		Iterator<Individual> itr = (Iterator<Individual>)inds.iterator();
-		Individual ind = null;
-		Resource resource = null;
-		while(itr.hasNext()){
-			ind = itr.next();
-			resource = ResourceFactory.createResource(ind.getURI());
-			RDFNode node = (RDFNode) ResourceFactory.createResource((String) getServletContext().getAttribute("classuri"));
-			model.add(resource, RDF.type, node);
-		}
-	}
-	
+	String classUri = (String) getServletContext().getAttribute("classuri");
+	BooleanQuery query = new BooleanQuery();
+	 query.add(
+             new TermQuery( new Term(Entity2LuceneDoc.term.RDFTYPE, classUri)),
+             BooleanClause.Occur.MUST );     
+	 
+	 IndexSearcher index = LuceneIndexFactory.getIndexSearcher(getServletContext());
+     TopDocs docs = index.search(query, null, 
+             ENTITY_LIST_CONTROLLER_MAX_RESULTS, 
+             new Sort(Entity2LuceneDoc.term.NAMEUNANALYZED));   
+     
+     if( docs == null ){
+         log.error("Search of lucene index returned null");
+         throw new ServletException("Search of lucene index returned null");
+     }
+	 
+     int ii = 0;
+     int size = docs.totalHits;
+     Resource resource = null;
+     RDFNode node = null;
+     Model model = ModelFactory.createDefaultModel();
+     while( ii < size ){
+         ScoreDoc hit = docs.scoreDocs[ii];
+         if (hit != null) {
+             Document doc = index.doc(hit.doc);
+             if (doc != null) {                                                                                        
+                 String uri = doc.getField(Entity2LuceneDoc.term.URI).stringValue();
+                 resource = ResourceFactory.createResource(uri);
+                 node = (RDFNode) ResourceFactory.createResource(classUri);
+                 model.add(resource, RDF.type, node);
+             } else {
+                 log.warn("no document found for lucene doc id " + hit.doc);
+             }
+         } else {
+             log.debug("hit was null");
+         }                         
+         ii++;            
+     }   
+  
 	String format = ""; 
 	if(contentType != null){	
 		if ( RDFXML_MIMETYPE.equals(contentType.getMediaType()))
