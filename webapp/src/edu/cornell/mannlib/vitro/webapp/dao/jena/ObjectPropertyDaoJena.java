@@ -55,8 +55,9 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
     private static final Log log = LogFactory.getLog(ObjectPropertyDaoJena.class.getName());
     
     protected static final List<String> EXCLUDED_NAMESPACES = Arrays.asList(
-            "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-            "http://www.w3.org/2000/01/rdf-schema#",
+            // Don't need to exclude these, because they are not owl:ObjectProperty
+            //"http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+            //"http://www.w3.org/2000/01/rdf-schema#",
             "http://www.w3.org/2002/07/owl#"            
         ); 
     /*

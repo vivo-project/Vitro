@@ -6,8 +6,12 @@ REQUIRED ELEMENTS
 -----------------
 
 - list-view-config: root element
-- query: the sparql query used to retrieve the data
+- query-base: sparql query used to retrieve data for an uncollated property
+- query-collated: sparql query used to retrieve data for a collated property
 - template: the name of the template used to display a single property statement
+
+Note: both query-base and query-collated must be included to support the collation checkbox
+on the back end Object Property Edit form.
 
 
 -----------------

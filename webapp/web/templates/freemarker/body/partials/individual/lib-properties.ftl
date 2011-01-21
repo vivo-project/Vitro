@@ -10,23 +10,30 @@
     </#list> 
 </#macro>
 
-<#macro collatedObjectPropertyList property editable>
+<#macro objectProperty property editable template="${property.template}">
+    <#if property.collatedBySubclass> <#-- collated -->
+        <@p.collatedObjectPropertyList property editable template />
+    <#else> <#-- uncollated -->
+        <#-- We pass property.statements and property.template even though we are also
+             passing property, because objecctPropertyList can get other values, and
+             doesn't necessarily use property.statements and property.template -->
+        <@p.objectPropertyList property editable property.statements template />
+    </#if>
+</#macro>
+
+<#macro collatedObjectPropertyList property editable template="${property.template}">
     <#assign subclasses = property.subclasses>
     <#list subclasses?keys as subclass>
         <li class="subclass">
             <h3>${subclass?lower_case}</h3>
             <ul class="subclass-property-list">
-                <@objectPropertyList property subclasses[subclass] property.template editable /> 
+                <@objectPropertyList property editable subclasses[subclass] template/> 
             </ul>
         </li>
     </#list>
 </#macro>
 
-<#macro simpleObjectPropertyList property editable>
-    <@objectPropertyList property property.statements "propStatement-simple.ftl" editable />
-</#macro>
-
-<#macro objectPropertyList property statements template editable>
+<#macro objectPropertyList property editable statements="${property.statements}" template="${property.template}">
     <#list statements as statement>
         <@propertyListItem property statement editable><#include "${template}"></@propertyListItem>
     </#list>
@@ -97,13 +104,13 @@ name will be used as the label. -->
             <@addLinkWithLabel primaryLink editable "Primary Web Page" />
             <#if primaryLink.statements?has_content> <#-- if there are any statements -->
                 <ul class="${linkListClass}" id="links-primary" role="list">
-                    <@objectPropertyList primaryLink primaryLink.statements primaryLink.template editable />
+                    <@objectPropertyList primaryLink editable />
                 </ul>
             </#if>
             <@addLinkWithLabel additionalLinks editable "Additional Web Pages" />
             <#if additionalLinks.statements?has_content> <#-- if there are any statements -->
                 <ul class="${linkListClass}" id="links-additional" role="list">            
-                    <@objectPropertyList additionalLinks additionalLinks.statements additionalLinks.template editable />           
+                    <@objectPropertyList additionalLinks editable />           
                 </ul>
             </#if>
         </nav>

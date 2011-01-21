@@ -63,11 +63,12 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
      * value does not contain all of these namespaces.
      */
     protected static final List<String> EXCLUDED_NAMESPACES = Arrays.asList(
+            // Don't need to exclude these, because they are not owl:DatatypeProperty
+            //"http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+            //"http://www.w3.org/2000/01/rdf-schema#",
+            "http://www.w3.org/2002/07/owl#",
             "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#",
-            "http://vitro.mannlib.cornell.edu/ns/vitro/public#",
-            "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-            "http://www.w3.org/2000/01/rdf-schema#",
-            "http://www.w3.org/2002/07/owl#"            
+            "http://vitro.mannlib.cornell.edu/ns/vitro/public#"
         ); 
 
     /*

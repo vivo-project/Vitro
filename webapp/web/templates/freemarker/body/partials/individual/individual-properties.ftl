@@ -30,13 +30,8 @@
                     <#if property.type == "data">
                         <@p.dataPropertyList property editable />
                     <#-- object property -->
-                    <#elseif property.collatedBySubclass> <#-- collated -->
-                        <@p.collatedObjectPropertyList property editable />
-                    <#else> <#-- uncollated -->
-                        <#-- We pass property.statements and property.template even though we are also
-                             passing property, because objecctPropertyList can get other values, and
-                             doesn't necessarily use property.statements and property.template -->
-                        <@p.objectPropertyList property property.statements property.template editable />
+                    <#else>
+                        <@p.objectProperty property editable />
                     </#if>
                 </ul>
             </article> <!-- end property -->
