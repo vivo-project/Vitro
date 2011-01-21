@@ -27,13 +27,13 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core"%>
 <%@ taglib prefix="v" uri="http://vitro.mannlib.cornell.edu/vitro/tags" %>
 
-<%! 
+<%!
     public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.edit.forms.dateTimeValueForm");
 %>
 <%
     VitroRequest vreq = new VitroRequest(request);
-    WebappDaoFactory wdf = vreq.getWebappDaoFactory();    
-    vreq.setAttribute("defaultNamespace", ""); //empty string triggers default new URI behavior       
+    WebappDaoFactory wdf = vreq.getWebappDaoFactory();
+    vreq.setAttribute("defaultNamespace", ""); //empty string triggers default new URI behavior
 %>
 
 <c:set var="vivoCore" value="http://vivoweb.org/ontology/core#" />
@@ -48,33 +48,31 @@
 <c:set var="dateTimePrecision" value="${vivoCore}dateTimePrecision"/>
 
 <%-- Assertions for adding a new date time value --%>
-<v:jsonset var="n3ForValue">    
-    ?subject      <${toDateTimeValue}> ?valueNode .    
-    ?valueNode  <${type}> <${valueType}> .    
+<v:jsonset var="n3ForValue">
+    ?subject      <${toDateTimeValue}> ?valueNode .
+    ?valueNode  <${type}> <${valueType}> .
     ?valueNode  <${dateTimeValue}> ?dateTimeField.value .
     ?valueNode  <${dateTimePrecision}> ?dateTimeField.precision .
 </v:jsonset>
 
 <%-- Queries for editing an existing role --%>
-
- <v:jsonset var="existingNodeQuery" >  
+<v:jsonset var="existingNodeQuery" >
     SELECT ?existingNode WHERE {
           ?subject <${toDateTimeValue}> ?existingNode .
           ?existingNode <${type}> <${valueType}> . }
 </v:jsonset>
- 
-                existingDateTimeValueQuery
-<v:jsonset var="existingDateTimeValueQuery" >  
-    SELECT ?existingDateTimeValue WHERE {     
-     ?subject <${toDateTimeValue}> ?existingValueNode .     
-     ?existingValueNode <${type}> <${valueType}> .         
+
+<v:jsonset var="existingDateTimeValueQuery" >
+    SELECT ?existingDateTimeValue WHERE {
+     ?subject <${toDateTimeValue}> ?existingValueNode .
+     ?existingValueNode <${type}> <${valueType}> .
      ?existingValueNode <${dateTimeValue}> ?existingDateTimeValue . }
 </v:jsonset>
 
-<v:jsonset var="existingPrecisionQuery" >  
-    SELECT ?existingPrecision WHERE {      
-      ?subject <${toDateTimeValue}> ?existingValueNode .      
-      ?existingValueNode <${type}> <${valueType}> .                     
+<v:jsonset var="existingPrecisionQuery" >
+    SELECT ?existingPrecision WHERE {
+      ?subject <${toDateTimeValue}> ?existingValueNode .
+      ?existingValueNode <${type}> <${valueType}> .
       ?existingValueNode <${dateTimePrecision}> ?existingPrecision . }
 </v:jsonset>
 
@@ -87,14 +85,14 @@
 %>
         <c:set var="editMode" value="edit" />
         <c:set var="titleVerb" value="Edit" />
-        <c:set var="submitButtonText" value="Edit DateTime Value" />
+        <c:set var="submitButtonText" value="Edit Date/Time Value" />
         <c:set var="disabledVal" value="disabled" />
 <% 
     } else { // adding new entry
 %>
         <c:set var="editMode" value="add" />
         <c:set var="titleVerb" value="Create" />
-        <c:set var="submitButtonText" value="DateTime Value" />
+        <c:set var="submitButtonText" value="Create Date/Time Value" />
         <c:set var="disabledVal" value="" />
 <%  } %> 
 
@@ -103,21 +101,21 @@
     "formUrl" : "${formUrl}",
     "editKey" : "${editKey}",
     "urlPatternToReturnTo" : "/individual",
-
+    
     "subject"   : ["subject",    "${subjectUriJson}" ],
     "predicate" : ["toDateTimeValue", "${predicateUriJson}" ],
     "object"    : ["valueNode", "${objectUriJson}", "URI" ],
-        
-    "n3required"    : [ "${n3ForValue}" ],
-        
-    "n3optional"    : [  ],                        
-                                                                     
+    
+    "n3required"    : [  ],
+    
+    "n3optional"    : [ "${n3ForValue}" ],
+    
     "newResources"  : { "valueNode" : "${defaultNamespace}" },
-
+    
     "urisInScope"    : { },
     "literalsInScope": { },
     "urisOnForm"     : [ ],
-    "literalsOnForm" :  [ ],                          
+    "literalsOnForm" :  [ ],
     "filesOnForm"    : [ ],
     "sparqlForLiterals" : { },
     "sparqlForUris" : {  },
@@ -125,8 +123,8 @@
         "dateTimeField.value"   : "${existingDateTimeValueQuery}",
     },
     "sparqlForExistingUris" : {
-        "valueNode"      : "${existingNodeQuery}",         
-        "dateTimeField.precision": "${existingPrecisionQuery}"        
+        "valueNode"      : "${existingNodeQuery}",
+        "dateTimeField.precision": "${existingPrecisionQuery}"
     },
     "fields" : {     
       "dateTimeField" : {
@@ -137,7 +135,7 @@
          "predicateUri"     : "",
          "objectClassUri"   : "",
          "rangeDatatypeUri" : "",
-         "rangeLang"        : "",         
+         "rangeLang"        : "",
          "assertions"       : ["${n3ForValue}"]
       }
   }
@@ -149,13 +147,13 @@
 
     EditConfiguration editConfig = EditConfiguration.getConfigFromSession(session,request);
     if (editConfig == null) {
-        editConfig = new EditConfiguration((String) request.getAttribute("editjson"));     
+        editConfig = new EditConfiguration((String) request.getAttribute("editjson"));
         EditConfiguration.putConfigInSession(editConfig,session);
         
         //setup date time edit elements
         Field dateTimeField = editConfig.getField("dateTimeField");
         // arguments for DateTimeWithPrecision are (fieldName, minimumPrecision, [requiredLevel])
-        dateTimeField.setEditElement(new DateTimeWithPrecision(dateTimeField, VitroVocabulary.Precision.DAY.uri(), VitroVocabulary.Precision.DAY.uri()));                
+        dateTimeField.setEditElement(new DateTimeWithPrecision(dateTimeField, VitroVocabulary.Precision.SECOND.uri(), VitroVocabulary.Precision.NONE.uri()));
     }     
             
     Model model = (Model) application.getAttribute("jenaOntModel");
@@ -164,20 +162,32 @@
         editConfig.prepareForObjPropUpdate(model);
     } else { // adding new
         editConfig.prepareForNonUpdate(model);
-    }  
+    }
+    
+    List<String> customJs = new ArrayList<String>(Arrays.asList(JavaScript.JQUERY_UI.path(),
+                                                                JavaScript.CUSTOM_FORM_UTILS.path(),
+                                                                "/edit/forms/js/customFormWithAutocomplete.js"                                                    
+                                                               ));            
+    request.setAttribute("customJs", customJs);
+    
+    List<String> customCss = new ArrayList<String>(Arrays.asList(Css.JQUERY_UI.path(),
+                                                                 Css.CUSTOM_FORM.path(),
+                                                                 "/edit/forms/css/customFormWithAutocomplete.css"
+                                                                ));
+    request.setAttribute("customCss", customCss);
     
     String subjectName = ((Individual) request.getAttribute("subject")).getName();
 %>
 
 <jsp:include page="${preForm}" />
 
-<h2>${titleVerb}&nbsp;date time value for <%= subjectName %></h2>
+<h2>${titleVerb} date time value for <%= subjectName %></h2>
 
 <form class="customForm" action="<c:url value="/edit/processRdfForm2.jsp"/>" >
     
-    <v:input id="dateTimeField"  label="date time" />                        
+    <v:input id="dateTimeField" />
        
-    <p class="submit"><v:input type="submit" id="submit" value="${submitButtonText}" cancel="true"/></p>        
+    <p class="submit"><v:input type="submit" id="submit" value="${submitButtonText}" cancel="true"/></p>
 </form>
     
 <jsp:include page="${postForm}"/>

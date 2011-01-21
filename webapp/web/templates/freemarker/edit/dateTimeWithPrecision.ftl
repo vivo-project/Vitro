@@ -68,7 +68,7 @@ precisionConstants.second -- URI for precision
         <#assign reqLevel = 0 />
     </#if>
 
-    <fieldset id="dateTime">              
+    <fieldset class="dateTime">              
     
         <#if precLevel gte 1>
             <#-- Only text input field in the mix. We should have some validation to ensure it's a valid year (4 digits, integer, etc) -->

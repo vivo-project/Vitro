@@ -138,14 +138,14 @@
 %>
         <c:set var="editMode" value="edit" />
         <c:set var="titleVerb" value="Edit" />
-        <c:set var="submitButtonText" value="Edit Position" />
+        <c:set var="submitButtonText" value="Edit Date/Time Interval" />
         <c:set var="disabledVal" value="disabled" />
 <% 
     } else { // adding new entry
 %>
         <c:set var="editMode" value="add" />
         <c:set var="titleVerb" value="Create" />
-        <c:set var="submitButtonText" value="Position" />
+        <c:set var="submitButtonText" value="Create Date/Time Interval" />
         <c:set var="disabledVal" value="" />
 <%  } %> 
 
@@ -223,9 +223,9 @@
         //setup date time edit elements
         Field startField = editConfig.getField("startField");
         // arguments for DateTimeWithPrecision are (fieldName, minimumPrecision, [requiredLevel])
-        startField.setEditElement(new DateTimeWithPrecision(startField, VitroVocabulary.Precision.DAY.uri(), VitroVocabulary.Precision.DAY.uri()));        
+        startField.setEditElement(new DateTimeWithPrecision(startField, VitroVocabulary.Precision.SECOND.uri(), VitroVocabulary.Precision.NONE.uri()));        
         Field endField = editConfig.getField("endField");
-        endField.setEditElement(new DateTimeWithPrecision(endField, VitroVocabulary.Precision.DAY.uri(), VitroVocabulary.Precision.DAY.uri()));
+        endField.setEditElement(new DateTimeWithPrecision(endField, VitroVocabulary.Precision.SECOND.uri(), VitroVocabulary.Precision.NONE.uri()));
     }
     
     editConfig.addValidator(new DateTimeIntervalValidation("startField","endField") ); 
@@ -236,7 +236,19 @@
         editConfig.prepareForObjPropUpdate(model);
     } else { // adding new
         editConfig.prepareForNonUpdate(model);
-    }  
+    }
+    
+    List<String> customJs = new ArrayList<String>(Arrays.asList(JavaScript.JQUERY_UI.path(),
+                                                                JavaScript.CUSTOM_FORM_UTILS.path(),
+                                                                "/edit/forms/js/customFormWithAutocomplete.js"                                                    
+                                                               ));            
+    request.setAttribute("customJs", customJs);
+    
+    List<String> customCss = new ArrayList<String>(Arrays.asList(Css.JQUERY_UI.path(),
+                                                                 Css.CUSTOM_FORM.path(),
+                                                                 "/edit/forms/css/customFormWithAutocomplete.css"
+                                                                ));
+    request.setAttribute("customCss", customCss);
     
     String subjectName = ((Individual) request.getAttribute("subject")).getName();
 %>
