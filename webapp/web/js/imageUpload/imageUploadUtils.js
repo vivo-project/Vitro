@@ -3,8 +3,8 @@
 $(document).ready(function(){
 
   // Confirmation alert for photo deletion in image upload and individual templates
-  $('#photoUploadDefaultImage a.thumbnail').click(function(){
-      var answer = confirm('Are you sure you want to delete your photo?');
+  $('#photoUploadDefaultImage a.thumbnail, a.delete-mainImage').click(function(){
+      var answer = confirm('Are you sure you want to delete this photo?');
       return answer;
   });
 });
