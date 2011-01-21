@@ -14,6 +14,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LogoutRedirector;
 import edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep;
 
 /**
@@ -69,6 +70,8 @@ public class ConfirmLoginStatus extends BodyTagSupport {
 
 	@Override
 	public int doEndTag() throws JspException {
+		LogoutRedirector.recordRestrictedPageUri(getRequest());
+
 		LoginStatusBean loginBean = LoginStatusBean.getBean(getRequest());
 		boolean isLoggedIn = loginBean.isLoggedInAtLeast(level);
 
