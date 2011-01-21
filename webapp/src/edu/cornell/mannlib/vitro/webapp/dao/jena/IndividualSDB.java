@@ -939,17 +939,23 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     			        propertyURI + "> ?object} \n" +
     			        WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode) +
     			"}";
-    		ResultSet results = QueryExecutionFactory.create(
-    		        QueryFactory.create(valueOfProperty), dataset).execSelect();
-    		QuerySolution result = results.next();
-    		RDFNode value = result.get("object");
-    	    if (value != null && value.canAs(OntResource.class)) {
-    	    	return new IndividualSDB(
-    	    	        ((OntResource) value.as(OntResource.class)).getURI(), 
-    	    	                dwf, datasetMode, webappDaoFactory);  
-    	    } else {
-    	    	return null;
-    	    }
+    		QueryExecution qe = QueryExecutionFactory.create(
+                    QueryFactory.create(valueOfProperty), dataset);
+    		try {
+    		    ResultSet results = qe.execSelect();
+        		if (results.hasNext()) {
+            		QuerySolution result = results.next();
+            		RDFNode value = result.get("object");
+            	    if (value != null && value.canAs(OntResource.class)) {
+            	    	return new IndividualSDB(
+            	    	        ((OntResource) value.as(OntResource.class)).getURI(), 
+            	    	                dwf, datasetMode, webappDaoFactory);  
+            	    } 
+        	    }
+        		return null;
+    		} finally {
+    		    qe.close();
+    		}
     	} finally {
     		dataset.getLock().leaveCriticalSection();
     		w.close();
