@@ -34,9 +34,10 @@
     width: 75%;
     margin-top: 35px;
     margin-bottom: 45px;
+    position: relative;
 }
 #individual-intro h1{
-    padding-bottom: 24px;  
+    padding-bottom: 8px;  
 }
 #individual-intro span.preferred-title{
     padding-left: 10px;
@@ -64,6 +65,7 @@
     width: 75%;
     margin-top: 0.5em;
     margin-bottom: 30px;
+    position: relative;
 }
 /* <------ INDIVIDUAL INTRO - LEFT SIDE CONTENT */
 #share-contact{
@@ -100,6 +102,7 @@ ul#individual-tools-people li{
     margin-bottom: 20px;
 }
 ul#individual-tools{
+    margin-top: 10px;
     margin-bottom: 10px;
     height: 20px;
 }
@@ -155,12 +158,12 @@ ul.individual-urls-people li{
 }
 /* <------ INDIVIDUAL INTRO - RIGHT SIDE CONTENT */
 #individual-info{
-    width: 69%;
     float: left;
     padding: 0 0 0 10px;
+    width: 69%;
 }
 #individual-info h1.fn{
-    padding-bottom: 12px;
+    /*padding-bottom: 12px;*/
 }
 h1.fn .preferred-title {
     padding-left: 10px;
@@ -196,7 +199,7 @@ ul#individual-areas li:first-child{
     padding-left: 0;
 }
 /* <------ INDIVIDUAL VISUALIZATION */
-#publications-visualization{
+#visualization{
     float: right;
     width: 226px;
 }
@@ -204,6 +207,7 @@ ul#individual-areas li:first-child{
 #sparklines-publications{
     width: 220px;
     padding: 0 20px 45px 20px;
+    margin-top: 30px;
 }
 #sparklines-publications h3{
     padding-top: 10px;
@@ -348,10 +352,9 @@ article.property ul.subclass-property-list li{
 .delete-individual{
     vertical-align: middle;
 }
-.thumb-edit-links{
+.thumb-links{
     position: absolute;
-    top 0;
-    right: 22px;
+    margin-left: 108px;
    /* background: rgba(255, 255, 255, 0.8);*/
     background: #fff;
     margin-top: 143px;
