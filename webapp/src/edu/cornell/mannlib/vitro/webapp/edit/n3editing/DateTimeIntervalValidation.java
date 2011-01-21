@@ -52,6 +52,11 @@ public class DateTimeIntervalValidation implements N3Validator {
         
         Map<String, String> errors = new HashMap<String, String>();
 
+        if( formStartYear == null && formEndYear != null ){                               
+            errors.put(startFieldName, "If there is an end date, there should be a start date");
+            return errors;              
+        }
+        
         if (formStartYear != null && formEndYear != null) {
             errors.putAll(checkDateLiterals(formStartYear, formEndYear, startPrecision, endPrecision));
         } else if (formStartYear != null && existingEndYear != null) {
@@ -98,14 +103,10 @@ public class DateTimeIntervalValidation implements N3Validator {
             VitroVocabulary.Precision startPrecision, VitroVocabulary.Precision endPrecision) {                
         Map<String, String> errors = new HashMap<String, String>();        
         
-        //check to make sure that there are precisions
-        if( startPrecision == null )
-            errors.put("startFieldName", "could not determine start precision");
-        if( endPrecision == null )
-            errors.put("endFieldName" , "could not determine end precision");
-        if( errors.size() > 0 )
+        if( endPrecision == null ){
+            //there is no end date, nothing to check
             return errors;
-        
+        }             
         
         try{
              XSDDateTime startDate = (XSDDateTime)startLit.getValue();
