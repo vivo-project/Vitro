@@ -31,8 +31,8 @@
             }
             OPTIONAL { GRAPH ?g2 { ?object rdfs:label ?name } }
             OPTIONAL { GRAPH ?g3 { ?object vitro:moniker ?moniker } }
-                       FILTER (?g1 != &lt;http://vitro.mannlib.cornell.edu/default/inferred-tbox&gt; &amp;&amp; 
-                               ?g1 != &lt;http://vitro.mannlib.cornell.edu/default/vitro-kb-inf&gt; )             
+            FILTER ( ?g1 != &lt;http://vitro.mannlib.cornell.edu/default/inferred-tbox&gt; &amp;&amp; 
+                     ?g1 != &lt;http://vitro.mannlib.cornell.edu/default/vitro-kb-inf&gt; )             
         } ORDER BY ?subclass      
     </query-collated>
     

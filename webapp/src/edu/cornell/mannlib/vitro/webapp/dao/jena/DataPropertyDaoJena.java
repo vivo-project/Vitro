@@ -24,11 +24,8 @@ import com.hp.hpl.jena.ontology.ProfileException;
 import com.hp.hpl.jena.ontology.Restriction;
 import com.hp.hpl.jena.ontology.SomeValuesFromRestriction;
 import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.QuerySolutionMap;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
@@ -46,7 +43,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
@@ -86,21 +82,21 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
         }
         propertyFilters = "FILTER (" + StringUtils.join(namespaceFilters, " && ") + ")\n";
     } 
-    protected static final String dataPropertyQueryString = 
-        PREFIXES + "\n" +
+    protected static final String DATA_PROPERTY_QUERY_STRING = 
+        prefixes + "\n" +
         "SELECT DISTINCT ?property WHERE { \n" +
         "   GRAPH ?g1 { ?subject ?property ?object } \n" + 
         "   GRAPH ?g2 { ?property rdf:type owl:DatatypeProperty } \n" +
         propertyFilters +
         "}";
     
-    static protected Query dataPropertyQuery;
+    protected static Query dataPropertyQuery;
     static {
         try {
-            dataPropertyQuery = QueryFactory.create(dataPropertyQueryString);
+            dataPropertyQuery = QueryFactory.create(DATA_PROPERTY_QUERY_STRING);
         } catch(Throwable th){
-            log.error("could not create SPARQL query for dataPropertyQueryString " + th.getMessage());
-            log.error(dataPropertyQueryString);
+            log.error("could not create SPARQL query for DATA_PROPERTY_QUERY_STRING " + th.getMessage());
+            log.error(DATA_PROPERTY_QUERY_STRING);
         }             
     }
     
@@ -746,8 +742,8 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
      * into the new one in a future release.
      */
     public List<DataProperty> getDataPropertyList(String subjectUri) {
-        log.debug("dataPropertyQueryString:\n" + dataPropertyQueryString);         
-        log.debug("dataPropertyQuery:\n" + dataPropertyQuery);        
+        log.debug("Data property query string:\n" + DATA_PROPERTY_QUERY_STRING);         
+        log.debug("Data property query:\n" + dataPropertyQuery);        
         ResultSet results = getPropertyQueryResults(subjectUri, dataPropertyQuery);
         List<DataProperty> properties = new ArrayList<DataProperty>();
         while (results.hasNext()) {

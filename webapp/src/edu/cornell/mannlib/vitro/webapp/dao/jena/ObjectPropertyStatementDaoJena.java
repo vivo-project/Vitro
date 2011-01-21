@@ -268,9 +268,11 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
             return Collections.emptyList();
         } 
 
-        QuerySolutionMap bindings = new QuerySolutionMap();
-        bindings.add("subject", ResourceFactory.createResource(subjectUri));
-        bindings.add("property", ResourceFactory.createResource(propertyUri));
+        // RY One oddity here is that SDB adds the bound variables to the query select terms,
+        // even if they're not included in the query.
+        QuerySolutionMap initialBindings = new QuerySolutionMap();
+        initialBindings.add("subject", ResourceFactory.createResource(subjectUri));
+        initialBindings.add("property", ResourceFactory.createResource(propertyUri));
 
         // Run the SPARQL query to get the properties
         List<Map<String, String>> list = new ArrayList<Map<String, String>>();
@@ -280,7 +282,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         try {
             
             QueryExecution qexec = QueryExecutionFactory.create(
-                    query, dataset, bindings);
+                    query, dataset, initialBindings);
             ResultSet results = qexec.execSelect();
 
             while (results.hasNext()) {

@@ -81,12 +81,12 @@ public class HiddenFromDisplayBelowRoleLevelFilter extends VitroFiltersImpl {
     @SuppressWarnings("serial")
     private class  RoleFilter<E extends ResourceBean> extends UnaryFunctor<E,Boolean>{
         @Override
-        public Boolean fn(E resource) {
-            log.debug("checking hidden status for \"" + resource.getURI() + "\"");
+        public Boolean fn(E resource) {            
             try{
                 if( resource == null )
                     return canViewOddItems();
                 else
+                    log.debug("checking hidden status for \"" + resource.getURI() + "\"");
                     return sameLevelOrHigher( resource.getHiddenFromDisplayBelowRoleLevel() );
             }catch(RuntimeException th){
                 log.warn("Error checking hidden status for " + resource, th);

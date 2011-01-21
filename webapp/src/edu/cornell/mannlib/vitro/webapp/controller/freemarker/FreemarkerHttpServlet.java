@@ -49,8 +49,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
 
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(FreemarkerHttpServlet.class);
-
-    
+  
     public static final String PAGE_TEMPLATE_TYPE = "page";
     public static final String BODY_TEMPLATE_TYPE = "body";
 

@@ -3,11 +3,12 @@
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -19,7 +20,6 @@ import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.QuerySolutionMap;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.RDFNode;
@@ -36,17 +36,29 @@ import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 
 public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
 	
 	protected static final Log log = LogFactory.getLog(PropertyDaoJena.class.getName());
 
-    protected static final String PREFIXES = 
-        "PREFIX rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n" +
-        //"PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> \n" + 
-        "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n" +
-        "PREFIX afn: <http://jena.hpl.hp.com/ARQ/function#>";
+    private static final Map<String, String> NAMESPACES = new HashMap<String, String>() {{
+        put("afn", VitroVocabulary.AFN);
+        put("owl", VitroVocabulary.OWL);
+        put("rdf", VitroVocabulary.RDF);
+        put("rdfs", VitroVocabulary.RDFS);
+        put("vitro", VitroVocabulary.vitroURI);
+        put("vitroPublic", VitroVocabulary.VITRO_PUBLIC);
+    }};
+    
+    protected static String prefixes = "";
+    static {
+        for (String key : NAMESPACES.keySet()) {
+            prefixes += "PREFIX " + key + ": <" + NAMESPACES.get(key) + ">\n";
+        }
+        log.debug("Query prefixes: " + prefixes);
+    }
     
     protected DatasetWrapperFactory dwf;
     

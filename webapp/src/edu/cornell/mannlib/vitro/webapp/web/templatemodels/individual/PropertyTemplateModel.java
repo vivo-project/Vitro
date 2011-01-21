@@ -26,7 +26,8 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     
     PropertyTemplateModel(Property property, Individual subject, EditingPolicyHelper policyHelper) {
         propertyUri = property.getURI();
-        localName = property.getLocalName();
+        localName = property.getLocalName();        
+        log.debug("Local name for property " + propertyUri + ": " + localName);
         
         // Do in subclass constructor. The label has not been set on the property, and the
         // means of getting the label differs between object and data properties.

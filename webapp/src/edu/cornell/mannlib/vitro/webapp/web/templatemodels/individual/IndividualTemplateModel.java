@@ -172,6 +172,10 @@ public class IndividualTemplateModel extends BaseTemplateModel {
         return loginStatusBean.isLoggedInAtLeast(LoginStatusBean.EDITOR);
     }
  
+    /* rdfs:label needs special treatment, because it is not possible to construct a 
+     * DataProperty from it. It cannot be handled the way the vitro links and vitro public image
+     * are handled like ordinary ObjectProperty instances.
+     */
     public DataPropertyStatementTemplateModel getNameStatement() {
         String propertyUri = VitroVocabulary.LABEL; // rdfs:label
         DataPropertyStatementTemplateModel dpstm = new DataPropertyStatementTemplateModel(getUri(), propertyUri, vreq, policyHelper);

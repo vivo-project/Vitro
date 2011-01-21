@@ -88,23 +88,22 @@ name will be used as the label. -->
      
      Note that this macro has a side-effect in the calls to propertyGroups.getPropertyAndRemoveFromList().
 -->
-<#macro vitroLinks propertyGroups showEditLinks linkListClass="individual-urls">
-    <#local vitroNs = "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#">
-    <#local primaryLink = propertyGroups.getPropertyAndRemoveFromList("${vitroNs}primaryLink")!>   
-    <#local additionalLinks = propertyGroups.getPropertyAndRemoveFromList("${vitroNs}additionalLink")!>    
+<#macro vitroLinks propertyGroups namespaces editable linkListClass="individual-urls">
+    <#local primaryLink = propertyGroups.getPropertyAndRemoveFromList("${namespaces.vitro}primaryLink")!>   
+    <#local additionalLinks = propertyGroups.getPropertyAndRemoveFromList("${namespaces.vitro}additionalLink")!>    
 
     <#if (primaryLink?has_content || additionalLinks?has_content)> <#-- true when the property is in the list, even if not populated (when editing) -->
         <nav role="navigation">
-            <@addLinkWithLabel primaryLink showEditLinks "Primary Web Page" />
+            <@addLinkWithLabel primaryLink editable "Primary Web Page" />
             <#if primaryLink.statements?has_content> <#-- if there are any statements -->
                 <ul class="${linkListClass}" id="links-primary" role="list">
-                    <@objectPropertyList primaryLink primaryLink.statements primaryLink.template showEditLinks />
+                    <@objectPropertyList primaryLink primaryLink.statements primaryLink.template editable />
                 </ul>
             </#if>
-            <@addLinkWithLabel additionalLinks showEditLinks "Additional Web Pages" />
+            <@addLinkWithLabel additionalLinks editable "Additional Web Pages" />
             <#if additionalLinks.statements?has_content> <#-- if there are any statements -->
                 <ul class="${linkListClass}" id="links-additional" role="list">            
-                    <@objectPropertyList additionalLinks additionalLinks.statements additionalLinks.template showEditLinks />           
+                    <@objectPropertyList additionalLinks additionalLinks.statements additionalLinks.template editable />           
                 </ul>
             </#if>
         </nav>
@@ -112,18 +111,25 @@ name will be used as the label. -->
 </#macro>
 
 <#-- Main image links -->
-<#macro imageLinks individual propertyGroups showEditLinks placeholderImage="">
-    <#assign mainImage = propertyGroups.getPropertyAndRemoveFromList("${namespaces.vitroPublic}mainImage")!>    
-    <#assign thumbUrl = individual.thumbUrl!>  
+<#macro imageLinks individual propertyGroups namespaces editable placeholderImage="">
+    <#local mainImage = propertyGroups.getPropertyAndRemoveFromList("${namespaces.vitroPublic}mainImage")!>    
+    <#local thumbUrl = individual.thumbUrl!>  
     <#-- Don't assume that if the mainImage property is populated, there is a thumbnail image (though that is the general case).
          If there's a mainImage statement but no thumbnail image, treat it as if there is no image. --> 
-    <#if (mainImage.statements)?has_content && thumbUrl?has_content>
-        <div class="thumb-links"><@p.editingLinks mainImage mainImage.statements[0] showEditLinks /></div>    
-        <a href="${individual.imageUrl}"><img class="individual-photo" src="${thumbUrl}" title="click to view larger image" alt="${individual.name}" width="160" /></a>             
+    <#if (mainImage.statements)?has_content && thumbUrl?has_content>    
+        <a href="${individual.imageUrl}"><img class="individual-photo" src="${thumbUrl}" title="click to view larger image" alt="${individual.name}" width="160" /></a>            
+        <@p.editingLinks mainImage mainImage.statements[0] editable /> 
     <#else>
-        <@p.addLinkWithLabel mainImage showEditLinks "Photo" /> 
+        <@p.addLinkWithLabel mainImage editable "Photo" /> 
         <#if placeholderImage?has_content>
-            <img class="individual-photo" src="${placeholderImage}" title = "no image" alt="placeholder image" width="160" />
-        </#if>                                             
+            <img class="individual-photo" src="${placeholderImage}" title = "no image" alt="placeholder image" width="160" /> 
+        </#if>                                                      
     </#if>
+</#macro>
+
+<#-- Label -->
+<#macro label individual editable>
+    <#local label = individual.nameStatement>
+    ${label.value}
+    <#-- ><@p.editingLinks "label" label editable /> -->
 </#macro>

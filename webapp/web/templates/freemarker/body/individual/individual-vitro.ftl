@@ -4,9 +4,8 @@
 
 <section id="individual-intro" class="vcard" role="region">
     
-        <#-- Image -->
-        <@p.imageLinks individual propertyGroups editable />
-    
+    <#-- Image -->
+    <@p.imageLinks individual propertyGroups namespaces editable />
 
     <section id="individual-info" role="region">
         <#if individual.showAdminPanel>
@@ -20,9 +19,7 @@
             <#else>                
                 <h1 class="fn">
                     <#-- Label -->
-                    <#assign label = individual.nameStatement>
-                    ${label.value}
-                    <#-- <@p.editingLinks label label editable /> -->
+                    <@p.label individual editable />
                         
                     <#-- Moniker -->
                     <#if individual.moniker?has_content>
@@ -47,7 +44,7 @@
         </nav>
                 
         <#-- Links -->
-        <@p.vitroLinks propertyGroups editable  />
+        <@p.vitroLinks propertyGroups namespaces editable  />
 
     <#if individualProductExtension??>
         ${individualProductExtension}

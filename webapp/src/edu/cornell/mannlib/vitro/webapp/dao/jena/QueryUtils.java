@@ -32,7 +32,9 @@ public class QueryUtils {
         Iterator<String> varNames = soln.varNames();
         while(varNames.hasNext()){
             String varName = varNames.next();
-            map.put(varName, nodeToObject( soln.get(varName)));
+            Object value = nodeToObject( soln.get(varName));
+            log.debug("Adding " + varName + " : " + value + " to query solution data.");            
+            map.put(varName, value);
         }
         return map;
     }
@@ -42,7 +44,9 @@ public class QueryUtils {
         Iterator<String> varNames = soln.varNames();
         while(varNames.hasNext()){
             String varName = varNames.next();
-            map.put(varName, nodeToString( soln.get(varName)));
+            String value = nodeToString( soln.get(varName));
+            log.debug("Adding " + varName + " : " + value + " to query solution data.");
+            map.put(varName, value);           
         }
         return map;
     }
