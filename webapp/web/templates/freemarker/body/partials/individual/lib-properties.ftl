@@ -38,7 +38,7 @@ name will be used as the label. -->
 <#macro addLinkWithLabel property editable label="${property.name?capitalize}">
     <#local addLink><@addLink property editable /></#local>
     <#if addLink?has_content>
-        <h3>${label} ${addLink}</h3> 
+        <h3 id="${property.localName}">${label} ${addLink}</h3> 
     </#if>
 </#macro>
 
@@ -46,7 +46,7 @@ name will be used as the label. -->
     <#if editable>
         <#local url = property.addUrl>
         <#if url?has_content>
-            <a href="${url}" title="add entry"><img class="add-individual" src="${urls.images}/individual/addIcon.gif" alt="add" /></a>
+            <a class="add-${property.localName}" href="${url}" title="add entry"><img class="add-individual" src="${urls.images}/individual/addIcon.gif" alt="add" /></a>
         </#if>
     </#if>
 </#macro>
@@ -68,14 +68,14 @@ name will be used as the label. -->
 <#macro editLink property statement>
     <#local url = statement.editUrl>
     <#if url?has_content>
-        <a href="${url}" title="edit this entry"><img class="edit-individual" src="${urls.images}/individual/editIcon.gif" alt="edit" /></a>
+        <a class="edit-${property.localName}" href="${url}" title="edit this entry"><img class="edit-individual" src="${urls.images}/individual/editIcon.gif" alt="edit" /></a>
     </#if>
 </#macro>
 
 <#macro deleteLink property statement> 
     <#local url = statement.deleteUrl>
     <#if url?has_content>
-        <a href="${url}" title="delete this entry"><img  class="delete-individual" src="${urls.images}/individual/deleteIcon.gif" alt="delete" /></a>
+        <a class="delete-${property.localName}" href="${url}" title="delete this entry"><img  class="delete-individual" src="${urls.images}/individual/deleteIcon.gif" alt="delete" /></a>
     </#if>
 </#macro>
 
@@ -117,13 +117,13 @@ name will be used as the label. -->
     <#assign thumbUrl = individual.thumbUrl!>  
     <#-- Don't assume that if the mainImage property is populated, there is a thumbnail image (though that is the general case).
          If there's a mainImage statement but no thumbnail image, treat it as if there is no image. --> 
-    <#if (mainImage.statements)?has_content && thumbUrl?has_content>    
-        <a href="${individual.imageUrl}"><img class="individual-photo" src="${thumbUrl}" title="click to view larger image" alt="${individual.name}" width="160" /></a>            
-        <@p.editingLinks mainImage mainImage.statements[0] showEditLinks /> 
+    <#if (mainImage.statements)?has_content && thumbUrl?has_content>
+        <div class="thumb-links"><@p.editingLinks mainImage mainImage.statements[0] showEditLinks /></div>    
+        <a href="${individual.imageUrl}"><img class="individual-photo" src="${thumbUrl}" title="click to view larger image" alt="${individual.name}" width="160" /></a>             
     <#else>
         <@p.addLinkWithLabel mainImage showEditLinks "Photo" /> 
         <#if placeholderImage?has_content>
-            <img class="individual-photo" src="${placeholderImage}" title = "no image" alt="placeholder image" width="160" /> 
-        </#if>                                                      
+            <img class="individual-photo" src="${placeholderImage}" title = "no image" alt="placeholder image" width="160" />
+        </#if>                                             
     </#if>
 </#macro>

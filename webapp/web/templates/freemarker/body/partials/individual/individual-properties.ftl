@@ -10,7 +10,7 @@
     <section class="property-group" role="region">
         <nav class="scroll-up" role="navigation">
             <a href="#property-group-menu">
-                <img src="${urls.images}/individual/scroll-up.png" alt="scroll to property group menus" />
+                <img src="${urls.images}/individual/scroll-up.gif" alt="scroll to property group menus" />
             </a>
         </nav>
         
