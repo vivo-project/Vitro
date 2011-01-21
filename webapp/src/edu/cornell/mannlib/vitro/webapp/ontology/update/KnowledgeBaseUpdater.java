@@ -64,7 +64,7 @@ public class KnowledgeBaseUpdater {
 			
 			long startTime = System.currentTimeMillis();
             System.out.println("Migrating the knowledge base");
-            logger.log("Started");
+            logger.log("Started knowledge base migration");
 			
 			try {
 			     performUpdate();
@@ -328,7 +328,7 @@ public class KnowledgeBaseUpdater {
 		    m.enterCriticalSection(Lock.WRITE);
 		    try {
 		    	m.read(inStream, null, settings.getSuccessRDFFormat());
-		    	logger.logWithDate("Successfully finished processing ontology changes.");
+		    	logger.logWithDate("Finished knowledge base migration");
 		    } finally {
 		    	m.leaveCriticalSection();
 		    }
