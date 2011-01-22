@@ -10,7 +10,7 @@
     </#list> 
 </#macro>
 
-<#macro objectProperty property editable template="${property.template}">
+<#macro objectProperty property editable template=property.template>
     <#if property.collatedBySubclass> <#-- collated -->
         <@p.collatedObjectPropertyList property editable template />
     <#else> <#-- uncollated -->
@@ -21,7 +21,7 @@
     </#if>
 </#macro>
 
-<#macro collatedObjectPropertyList property editable template="${property.template}">
+<#macro collatedObjectPropertyList property editable template=property.template>
     <#assign subclasses = property.subclasses>
     <#list subclasses?keys as subclass>
         <li class="subclass">
@@ -33,7 +33,7 @@
     </#list>
 </#macro>
 
-<#macro objectPropertyList property editable statements="${property.statements}" template="${property.template}">
+<#macro objectPropertyList property editable statements=property.statements template=property.template>
     <#list statements as statement>
         <@propertyListItem property statement editable><#include "${template}"></@propertyListItem>
     </#list>
