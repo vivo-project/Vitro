@@ -3,13 +3,12 @@
 <#-- Default individual profile page template -->
 
 <section id="individual-intro" class="vcard" role="region">
-    
     <#-- Image -->
     <@p.imageLinks individual propertyGroups namespaces editable />
-
+    
     <section id="individual-info" role="region">
         <#if individual.showAdminPanel>
-            <#include "individual-adminPanel.ftl">
+               <#include "individual-adminPanel.ftl">
         </#if>
         
         <header>

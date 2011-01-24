@@ -8,6 +8,7 @@
     font-size: .8em;
     background-color: #f2f9fb;
     padding-top: 0;
+    padding-right: 40px;
 }
 #admin h3{
     display: inline-block;
@@ -15,6 +16,7 @@
     padding: 3px 6px 3px 10px;
     color: #fff;
     margin-bottom: 5px;
+    font-size: 14px;
 }
 #admin .uri-link {
     color: #888c8c;
@@ -30,8 +32,6 @@
 }
 /* <------ INDIVIDUAL INTRO FOR ANY CLASS*/
 #individual-intro{
-    float: left;
-    width: 75%;
     margin-top: 35px;
     margin-bottom: 45px;
     position: relative;
@@ -46,7 +46,6 @@
 #individual-intro #individual-info h3{
     padding-bottom: 5px;
     margin-top: 5px;
-    clear: both;
 }
 #individual-intro #share-contact h3{
     padding-bottom: .3em;
@@ -57,15 +56,23 @@
     font-size: 1.125em;
 }
 #individual-intro .individual-overview{
-    margin-bottom: 10px;
+    margin-bottom: 30px;
 }
 /* <------ INDIVIDUAL INTRO FOR PERSON*/
 #individual-intro-person{
     float: left;
-    width: 75%;
     margin-top: 0.5em;
     margin-bottom: 30px;
     position: relative;
+    width: 100%;
+}
+#individual-intro-person #admin{
+    margin-top: 37px;
+    width: 70%;
+}
+#individual-intro-person #individual-info{
+    float: left;
+    width: 78%;
 }
 /* <------ INDIVIDUAL INTRO - LEFT SIDE CONTENT */
 #share-contact{
@@ -139,13 +146,11 @@ ul#individual-phone li:first-child{
 }
 #individual-intro ul.individual-urls{
     list-style-type: circle;
-    color: red;
     margin-left: 20px;
 }
 #individual-intro ul.individual-urls li{
     font-size: .875em;
     line-height: 1.7em;
-    clear: left;
 }
 ul.individual-urls-people{
     clear: both;
@@ -157,10 +162,10 @@ ul.individual-urls-people li{
     line-height: 1.3em;
 }
 /* <------ INDIVIDUAL INTRO - RIGHT SIDE CONTENT */
-#individual-info{
+#individual-intro #individual-info{
+    padding: 0;
     float: left;
-    padding: 0 0 0 10px;
-    width: 69%;
+    width: 79%;
 }
 #individual-info h1.fn{
     /*padding-bottom: 12px;*/
@@ -205,9 +210,12 @@ ul#individual-areas li:first-child{
 }
 /* <------ SPARKLINES  */
 #sparklines-publications{
-    width: 220px;
-    padding: 0 20px 45px 20px;
+    padding: 0 10px 45px 20px;
     margin-top: 30px;
+    padding-top: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
 }
 #sparklines-publications h3{
     padding-top: 10px;
@@ -219,8 +227,11 @@ ul#individual-areas li:first-child{
 }
 /* <------ TEMPORAL GRAPH  */
 #temporal-graph{
-    width: 220px;
-    padding: 0 20px 45px 20px;
+    position: absolute;
+    padding: 0 3px 20px 10px;
+    background-color: #fff;
+    top: 0;
+    right: 0;
 }
 #temporal-graph h3 img{
     padding-right: 10px;
