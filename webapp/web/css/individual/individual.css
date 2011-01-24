@@ -33,7 +33,7 @@
 /* <------ INDIVIDUAL INTRO FOR ANY CLASS*/
 #individual-intro{
     margin-top: 0;
-    margin-bottom: 45px;
+    margin-bottom: 20px;
     position: relative;
     overflow: hidden;
 }
@@ -69,6 +69,7 @@
 #individual-intro-person #individual-info{
     float: left;
     width: 78%;
+    margin-bottom: 20px;
 }
 #individual-intro-person .individual-overview{
     width: 100%;
