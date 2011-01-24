@@ -67,9 +67,6 @@
     position: relative;
     width: 100%;
 }
-#individual-intro-person #admin{
-    margin-top: 37px;
-}
 #individual-intro-person #individual-info{
     float: left;
     width: 78%;
@@ -95,6 +92,13 @@
 #share-contact img.individual-photo{
     width: 160px;
     height: 160px;
+}
+#share-contact #mainImage{
+    position: absolute;
+    padding: 5px 5px 8px 5px;
+    background-color: #fff;
+    top: 123px;
+    right: 23px;
 }
 ul#individual-tools-people{
     margin-top: 5px;
@@ -213,7 +217,6 @@ ul#individual-areas li:first-child{
 /* <------ SPARKLINES  */
 #sparklines-publications{
     padding: 0 10px 25px 30px;
-    margin-top: 30px;
     padding-top: 0;
     float: right;
     background-color: #fff;
