@@ -2,6 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.reasoner;
 
+import java.util.Iterator;
+import java.util.List;
+
 import javax.servlet.ServletContext;
 
 import org.apache.commons.logging.Log;
@@ -179,7 +182,6 @@ public class SimpleReasoner extends StatementListener {
 		}
 	}
 	
-	
 	/*
 	 * If it is added that B is of type A, then for each superclass of
 	 * A assert that B is of that type.
@@ -195,10 +197,14 @@ public class SimpleReasoner extends StatementListener {
 			OntClass cls = tboxModel.getOntClass(((Resource)stmt.getObject()).getURI()); 
 			
 			if (cls != null) {
-				ExtendedIterator<OntClass> superIt = cls.listSuperClasses(false);
 				
-				while (superIt.hasNext()) {
-					OntClass parentClass = superIt.next();
+				List<OntClass> parents = (cls.listSuperClasses(false)).toList();		
+				parents.addAll((cls.listEquivalentClasses()).toList());
+				
+				Iterator<OntClass> parentIt = parents.iterator();
+				
+				while (parentIt.hasNext()) {
+					OntClass parentClass = parentIt.next();
 					
 					// VIVO doesn't materialize statements that assert anonymous types
 					// for individuals. Also, sharing an identical anonymous node is
@@ -241,9 +247,14 @@ public class SimpleReasoner extends StatementListener {
 			OntClass cls = tboxModel.getOntClass(((Resource)stmt.getObject()).getURI()); 
 			
 			if (cls != null) {
-				ExtendedIterator<OntClass> superIt = cls.listSuperClasses(false);
-				while (superIt.hasNext()) {
-					OntClass parentClass = superIt.next();
+				
+				List<OntClass> parents = (cls.listSuperClasses(false)).toList();		
+				parents.addAll((cls.listEquivalentClasses()).toList());
+				
+				Iterator<OntClass> parentIt = parents.iterator();
+				
+				while (parentIt.hasNext()) {
+					OntClass parentClass = parentIt.next();
 					
 					// VIVO doesn't materialize statements that assert anonymous types
 					// for individuals. Also, sharing an identical anonymous node is
