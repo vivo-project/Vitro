@@ -94,6 +94,7 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
         return null;
     }
     
+    @Override
     protected void removeDuplicates(List<Map<String, String>> data) {
         filterSubclasses(data);
     }
@@ -101,10 +102,7 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
     /*
      * The query returns subclasses of a specific superclass that the object belongs to; for example,
      * in the case of authorInAuthorship, subclasses of core:InformationResource. Here we remove all but
-     * the most specific subclass for the object. This must precede BaseObjectPropertyDataPostProcess.removeDuplicates(),
-     * since that will arbitrarily remove all but the first result for a given object. 
-     * RY Implementation alternative: roll this filtering into the removeDuplicates() method to reduce the number of times
-     * we need to iterate through the results; but at the cost of conceptual clarity.
+     * the most specific subclass for the object. 
      */
     private void filterSubclasses(List<Map<String, String>> statementData) {
         String objectVariableName = getObjectKey();
@@ -148,44 +146,8 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
             log.debug("Data after subclass filtering");
             logData(statementData);
         }
-        
-//        List<Map<String, String>> filteredList = new ArrayList<Map<String, String>>();  
-//        Set<String> processedObjects = new HashSet<String>();
-//        Iterator<Map<String, String>> iOuter = statementData.iterator();
-//        while (iOuter.hasNext()) {
-////        for (Map<String, String> map : statementData) {
-//            Map<String, String> outerMap = (Map<String, String>) iOuter.next();
-//            String outerObjectUri = outerMap.get(objectVariableName);
-//            if (processedObjects.contains(outerObjectUri)) {
-//                continue;
-//            }
-//            processedObjects.add(outerObjectUri);
-//            String outerSubclass = outerMap.get(SUBCLASS_VARIABLE_NAME);
-//            if (outerSubclass == null) {
-//                continue;
-//            }
-//            List<String> superclassUris = wdf.getVClassDao().getAllSuperClassURIs(outerSubclass);
-////            List<Map<String, String>> dataForThisObject = new ArrayList<Map<String, String>>();
-//            Iterator<Map<String, String>> iInner = statementData.iterator();
-//            while (iInner.hasNext()) {
-//                Map<String, String> innerMap = iInner.next();
-//                if (innerMap == outerMap || innerMap.get(objectVariableName) != outerObjectUri) { 
-//                    continue; 
-//                }
-//                String innerSubclass = innerMap.get(SUBCLASS_VARIABLE_NAME);
-//                if (superclassUris.contains(innerSubclass)) {
-//                    
-//                }
-//                
-//            }
-//            
-//        }
-        
-
     }
     
-    
-    // Collections.sort(mergedPropertyList,new PropertyRanker(vreq));
     private class SubclassComparator implements Comparator<Map<String, String>> {
         
         private VClassDao vclassDao;
@@ -226,10 +188,8 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
                 return 1;
             }
             
-            return 0;
-            
-        }
-        
+            return 0;            
+        }       
     }
     
     private Map<String, List<ObjectPropertyStatementTemplateModel>> collate(String subjectUri, String propertyUri,

@@ -196,12 +196,12 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         
         String postprocessorName = config.postprocessor;
         if (postprocessorName == null) {
-            //return;
             postprocessorName = DEFAULT_POSTPROCESSOR;
         }
 
         try {
             Class<?> postprocessorClass = Class.forName(postprocessorName);
+            // RY If class doesn't exist, use default postprocessor ***
             Constructor<?> constructor = postprocessorClass.getConstructor(ObjectPropertyTemplateModel.class, WebappDaoFactory.class);
             ObjectPropertyDataPostProcessor postprocessor = (ObjectPropertyDataPostProcessor) constructor.newInstance(this, wdf);
             postprocessor.process(data);

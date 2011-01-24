@@ -47,6 +47,7 @@ due to the possibility of incomplete data. Make sure the query does the followin
       display the local name in the absence of the linked individual. Alternatively, this can be 
       retrieved in the template using the localname(uri) method. 
       
+### TO BE AMENDED - use uniongraph instead
 - Each assertion or set of optional assertions must reference a different graph variable, so that
 no requirement about which assertions are in the same graph is imposed (unless this is desired
 in a specific case).
@@ -58,20 +59,16 @@ Query for collated property
 - Include a ?subclass variable, named as such, in the SELECT clause. If the ?subclass variable
 is missing, the property will be displayed without collation.
 
-- ?subclass must be the first term in the ORDER BY clause
+- ?subclass must be the first term in the ORDER BY clause.
 
 - Include the following in the WHERE clause, substituting in the relevant variables for
 ?infoResource and core:InformationResource:
 
     OPTIONAL { GRAPH ?g4 { ?subclass rdfs:subClassOf core:InformationResource }
         GRAPH ?g5 { ?infoResource a ?subclass } 
-        FILTER (?g5 != &lt;http://vitro.mannlib.cornell.edu/default/inferred-tbox&gt; &amp;&amp; 
-                ?g5 != &lt;http://vitro.mannlib.cornell.edu/default/vitro-kb-inf&gt; ) 
     }  
     
-The filter blocks the retrieval of inferred type statements, so that, for example, we get
-subclass bibo:Book but not bibo:Document, assuming the latter is inferred. If both have been
-asserted, we will get both.
+- Postprocessing removes all but the most specific subclass value from the query result set.
 
 ----------------------
 Datetimes in the query

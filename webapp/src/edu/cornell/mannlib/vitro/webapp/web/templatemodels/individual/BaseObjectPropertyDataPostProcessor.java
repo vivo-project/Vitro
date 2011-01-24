@@ -35,13 +35,19 @@ public abstract class BaseObjectPropertyDataPostProcessor implements
             return;
         }
         
-        objectPropertyTemplateModel.removeDuplicates(data);
-        
+        processList(data);
+
         for (Map<String, String> map : data) {
             process(map);           
         }
     }
     
+    /** Postprocessing that applies to the list as a whole - reordering, removing duplicates, etc. */
+    protected void processList(List<Map<String, String>> data) {
+        objectPropertyTemplateModel.removeDuplicates(data);
+    }
+    
+    /** Postprocessing that applies to individual list items */
     protected abstract void process(Map<String, String> map);
     
 
