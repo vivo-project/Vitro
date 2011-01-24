@@ -160,4 +160,7 @@ webapp/web/js/selectivizr.js
 webapp/web/js/jquery_plugins/supersleight.js
 
 # See /doc/3rd-party-licenses.txt for LICENSE file
+webapp/web/js/raphael/*
+
+# See /doc/3rd-party-licenses.txt for LICENSE file
 webapp/web/js/sparql/prototype.js
