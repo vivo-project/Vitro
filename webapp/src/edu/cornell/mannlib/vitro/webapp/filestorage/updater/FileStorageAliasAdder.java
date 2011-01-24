@@ -7,8 +7,12 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -40,30 +44,26 @@ public class FileStorageAliasAdder {
 	/**
 	 * Query: get all bytestream resources that do not have alias URLs.
 	 */
-	private static final String QUERY_WORK_TO_DO = "PREFIX rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
+	private static final String QUERY_BYTESTREAMS_WITHOUT_ALIASES = ""
+			+ "PREFIX rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
 			+ "PREFIX public: <http://vitro.mannlib.cornell.edu/ns/vitro/public#>\n"
-			+ "SELECT ?bs\n"
-			+ "WHERE {\n"
+			+ "SELECT ?bs\n" + "WHERE {\n"
 			+ "  ?bs rdf:type public:FileByteStream\n"
 			+ "  OPTIONAL { ?bs public:directDownloadUrl ?alias }\n"
 			+ "  FILTER ( !BOUND(?alias) )\n" + "}\n";
 
 	/**
-	 * Query: get all bytestream resources that do not have alias URLs. Get
-	 * their filenames from their surrogates also.
+	 * Query: get the filenames for all bytestream resources that do not have
+	 * alias URLs.
 	 */
-	private static final String QUERY_MORE_INFO = "PREFIX rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
+	private static final String QUERY_FILENAMES_FOR_BYTESTREAMS = ""
+			+ "PREFIX rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
 			+ "PREFIX public: <http://vitro.mannlib.cornell.edu/ns/vitro/public#>\n"
-			+ "SELECT ?bs ?f ?fn\n"
-			+ "WHERE {\n"
+			+ "SELECT ?bs ?fn\n" + "WHERE {\n"
 			+ "  ?bs rdf:type public:FileByteStream . \n"
 			+ "  ?f public:downloadLocation ?bs . \n"
-			+ "  OPTIONAL { \n"
-			+ "    ?f public:filename ?fn . \n"
-			+ "  }\n"
-			+ "  OPTIONAL { \n"
-			+ "    ?bs public:directDownloadUrl ?alias . \n"
-			+ "  }\n"
+			+ "  ?f public:filename ?fn . \n"
+			+ "  OPTIONAL { ?bs public:directDownloadUrl ?alias . }\n"
 			+ "  FILTER ( !BOUND(?alias) )\n" + "}\n";
 
 	private final Model model;
@@ -71,6 +71,9 @@ public class FileStorageAliasAdder {
 	private final String vivoDefaultNamespace;
 
 	private FSULog updateLog;
+
+	private Set<String> bytestreamUrisWithoutAliases;
+	private Map<String, String> bytestreamUrisAndFilenames;
 
 	public FileStorageAliasAdder(Model model, File uploadDirectory,
 			String vivoDefaultNamespace) {
@@ -120,7 +123,7 @@ public class FileStorageAliasAdder {
 	 * URL, we have work to do.
 	 */
 	private boolean isThereAnythingToDo() {
-		String queryString = QUERY_WORK_TO_DO;
+		String queryString = QUERY_BYTESTREAMS_WITHOUT_ALIASES;
 		log.debug("query: " + queryString);
 
 		QueryExecution qexec = null;
@@ -165,31 +168,104 @@ public class FileStorageAliasAdder {
 	 * Add an alias URL to any FileByteStream object that doesn't have one.
 	 */
 	private void findAndAddMissingAliasUrls() {
-		List<BytestreamInfo> list;
-		list = findBytestreamsWithMissingValues();
-		addMissingValuesToModel(list);
+		findBytestreamsWithoutAliasUrls();
+		findFilenamesForBytestreams();
+		addAliasUrlsToModel();
 	}
 
 	/**
-	 * Find every bytestream that doesn't have an alias URL. Find the filename
-	 * for the bytestream also.
+	 * Find every bytestream that doesn't have an alias URL.
 	 */
-	private List<BytestreamInfo> findBytestreamsWithMissingValues() {
-		List<BytestreamInfo> list = new ArrayList<BytestreamInfo>();
-		String queryString = QUERY_MORE_INFO;
+	private void findBytestreamsWithoutAliasUrls() {
+		BytestreamUriUnpacker unpacker = new BytestreamUriUnpacker();
+
+		runQuery(QUERY_BYTESTREAMS_WITHOUT_ALIASES, unpacker);
+		this.bytestreamUrisWithoutAliases = unpacker.getUris();
+
+		log.debug("Found " + unpacker.getUris().size()
+				+ " bytestreams without alias URLs");
+	}
+
+	/**
+	 * Find the filename for every bytestream that doesn't have an alias URL.
+	 */
+	private void findFilenamesForBytestreams() {
+		FilenameUnpacker unpacker = new FilenameUnpacker();
+
+		runQuery(QUERY_FILENAMES_FOR_BYTESTREAMS, unpacker);
+		this.bytestreamUrisAndFilenames = unpacker.getFilenameMap();
+
+		log.debug("Found " + unpacker.getFilenameMap().size()
+				+ " bytestreams with filenames but no alias URLs");
+	}
+
+	/** Add an alias URL to each resource in the list. */
+	private void addAliasUrlsToModel() {
+		if (this.bytestreamUrisWithoutAliases.isEmpty()) {
+			updateLog.warn("Found no bytestreams without aliases. "
+					+ "Why am I here?");
+			return;
+		}
+
+		Property aliasProperty = model
+				.createProperty(VitroVocabulary.FS_ALIAS_URL);
+
+		for (String bytestreamUri : this.bytestreamUrisWithoutAliases) {
+			String aliasUrl = figureAliasUrl(bytestreamUri);
+			Resource resource = model.getResource(bytestreamUri);
+
+			ModelWrapper.add(model, resource, aliasProperty, aliasUrl);
+			updateLog.log(resource, "added alias URL: '" + aliasUrl + "'");
+		}
+	}
+
+	/**
+	 * Convert the bytestream URI and the filename into an alias URL.
+	 * 
+	 * If they aren't in our default namespace, or they don't have a filename,
+	 * then their URI is the best we can do for an alias URL.
+	 */
+	private String figureAliasUrl(String bytestreamUri) {
+		if (!bytestreamUri.startsWith(vivoDefaultNamespace)) {
+			updateLog.warn("bytestream uri does not start "
+					+ "with the default namespace: '" + bytestreamUri + "'");
+			return bytestreamUri;
+		}
+
+		String filename = this.bytestreamUrisAndFilenames.get(bytestreamUri);
+		if (filename == null) {
+			updateLog.warn("bytestream has no surrogate or no filename: '"
+					+ bytestreamUri + "'");
+			return "filename_not_found";
+		}
+
+		try {
+			String remainder = bytestreamUri.substring(vivoDefaultNamespace
+					.length());
+			String encodedFilename = URLEncoder.encode(filename, "UTF-8");
+			String separator = remainder.endsWith("/") ? "" : "/";
+
+			return FILE_PATH + remainder + separator + encodedFilename;
+		} catch (UnsupportedEncodingException e) {
+			throw new IllegalStateException(e); // No UTF-8? Can't happen.
+		}
+	}
+
+	private void runQuery(String queryString, QueryResultUnpacker unpacker) {
 		log.debug("query: " + queryString);
 
 		QueryExecution qexec = null;
 		try {
 			qexec = createQueryExecutor(queryString);
 
-			Iterator<?> results = qexec.execSelect();
+			Iterator<QuerySolution> results = qexec.execSelect();
 			while (results.hasNext()) {
-				QuerySolution result = (QuerySolution) results.next();
-				BytestreamInfo bs = captureQueryResult(result);
-				if (bs != null) {
-					list.add(bs);
+				QuerySolution result = results.next();
+				if (log.isDebugEnabled()) {
+					log.debug("Query result variables: "
+							+ listVariables(result));
 				}
+				unpacker.unpack(result);
 			}
 		} catch (Exception e) {
 			log.error(e, e);
@@ -197,76 +273,6 @@ public class FileStorageAliasAdder {
 			if (qexec != null) {
 				qexec.close();
 			}
-		}
-		return list;
-	}
-
-	/**
-	 * Capture the data from each valid query result. If this data isn't
-	 * perfectly valid, complain and return null instead.
-	 */
-	private BytestreamInfo captureQueryResult(QuerySolution result) {
-		if (log.isDebugEnabled()) {
-			log.debug("Query result variables: " + listVariables(result));
-		}
-
-		Resource bytestream = result.getResource("bs");
-		if (bytestream == null) {
-			updateLog.error("Query result contains no bytestream resource: "
-					+ result);
-			return null;
-		}
-
-		String uri = bytestream.getURI();
-		if (!uri.startsWith(vivoDefaultNamespace)) {
-			updateLog.warn("uri does not start with the default namespace: '"
-					+ uri + "'");
-			return null;
-		}
-
-		Literal filenameLiteral = result.getLiteral("fn");
-		if (filenameLiteral == null) {
-			updateLog.error("Query result for '" + uri
-					+ "' contains no filename.");
-			return null;
-		}
-		String filename = filenameLiteral.getString();
-
-		return new BytestreamInfo(uri, filename);
-	}
-
-	/** Add an alias URL to each resource in the list. */
-	private void addMissingValuesToModel(List<BytestreamInfo> list) {
-		if (list.isEmpty()) {
-			updateLog.warn("Query found no valid results.");
-			return;
-		}
-
-		Property aliasProperty = model
-				.createProperty(VitroVocabulary.FS_ALIAS_URL);
-
-		for (BytestreamInfo bytestreamInfo : list) {
-			String value = figureAliasUrl(bytestreamInfo);
-			Resource resource = model.getResource(bytestreamInfo.uri);
-
-			ModelWrapper.add(model, resource, aliasProperty, value);
-			updateLog.log(resource, "added alias URL: '" + value + "'");
-		}
-	}
-
-	/**
-	 * Convert the bytestream URI and the filename into an alias URL. If
-	 * problems, return null.
-	 */
-	String figureAliasUrl(BytestreamInfo bsi) {
-		try {
-			String remainder = bsi.uri.substring(vivoDefaultNamespace.length());
-			String filename = URLEncoder.encode(bsi.filename, "UTF-8");
-			String separator = remainder.endsWith("/") ? "" : "/";
-
-			return FILE_PATH + remainder + separator + filename;
-		} catch (UnsupportedEncodingException e) {
-			throw new IllegalStateException(e); // No UTF-8? Can't happen.
 		}
 	}
 
@@ -276,7 +282,6 @@ public class FileStorageAliasAdder {
 	}
 
 	/** For debug logging. */
-	@SuppressWarnings("unchecked")
 	private List<String> listVariables(QuerySolution result) {
 		List<String> list = new ArrayList<String>();
 		for (Iterator<String> names = result.varNames(); names.hasNext();) {
@@ -287,13 +292,61 @@ public class FileStorageAliasAdder {
 		return list;
 	}
 
-	private static class BytestreamInfo {
-		final String uri;
-		final String filename;
+	// ----------------------------------------------------------------------
+	// Helper classes
+	// ----------------------------------------------------------------------
 
-		BytestreamInfo(String uri, String filename) {
-			this.uri = uri;
-			this.filename = filename;
+	private interface QueryResultUnpacker {
+		public abstract void unpack(QuerySolution result);
+	}
+
+	private class BytestreamUriUnpacker implements QueryResultUnpacker {
+		private final Set<String> uris = new HashSet<String>();
+
+		@Override
+		public void unpack(QuerySolution result) {
+			Resource bytestream = result.getResource("bs");
+			if (bytestream == null) {
+				updateLog.error("Query result contains no "
+						+ "bytestream resource: " + result);
+				return;
+			}
+
+			uris.add(bytestream.getURI());
+		}
+
+		public Set<String> getUris() {
+			return uris;
 		}
 	}
+
+	private class FilenameUnpacker implements QueryResultUnpacker {
+		private final Map<String, String> filenameMap = new HashMap<String, String>();
+
+		@Override
+		public void unpack(QuerySolution result) {
+			Resource bytestream = result.getResource("bs");
+			if (bytestream == null) {
+				updateLog.error("Query result contains no "
+						+ "bytestream resource: " + result);
+				return;
+			}
+			String bytestreamUri = bytestream.getURI();
+
+			Literal filenameLiteral = result.getLiteral("fn");
+			if (filenameLiteral == null) {
+				updateLog.error("Query result for '" + bytestreamUri
+						+ "' contains no filename.");
+				return;
+			}
+			String filename = filenameLiteral.getString();
+
+			filenameMap.put(bytestreamUri, filename);
+		}
+
+		public Map<String, String> getFilenameMap() {
+			return filenameMap;
+		}
+	}
+
 }
