@@ -35,7 +35,7 @@ public abstract class BaseObjectPropertyDataPostProcessor implements
             return;
         }
         
-        removeDuplicates(data);
+        objectPropertyTemplateModel.removeDuplicates(data);
         
         for (Map<String, String> map : data) {
             process(map);           
@@ -43,34 +43,6 @@ public abstract class BaseObjectPropertyDataPostProcessor implements
     }
     
     protected abstract void process(Map<String, String> map);
-    
-    /** The SPARQL query results may contain duplicate rows for a single object, if there are multiple solutions 
-     * to the entire query. Remove duplicates here by arbitrarily selecting only the first row returned.
-     * Note that in the case of a collated query, the query has filtered out inferred subclasses, but if there
-     * are multiple asserted subclasses, all will be returned. This method will arbitrarily remove all but the
-     * first one returned.
-     * @param List<Map<String, String>> data
-     */
-    protected void removeDuplicates(List<Map<String, String>> data) {
-        String objectVariableName = objectPropertyTemplateModel.getObjectKey();
-        if (objectVariableName == null) {
-            log.error("Cannot remove duplicate statements for property " + objectPropertyTemplateModel.getName() + " because no object found to dedupe.");
-            return;
-        }
-        List<String> foundObjects = new ArrayList<String>();
-        log.debug("Removing duplicates from property: " + objectPropertyTemplateModel.getUri());
-        Iterator<Map<String, String>> dataIterator = data.iterator();
-        while (dataIterator.hasNext()) {
-            Map<String, String> map = dataIterator.next();
-            String objectValue = map.get(objectVariableName);
-            // We arbitrarily remove all but the first. Not sure what selection criteria could be brought to bear on this.
-            if (foundObjects.contains(objectValue)) {
-                dataIterator.remove();
-            } else {
-                foundObjects.add(objectValue);
-            }
-        }
-    }
     
 
     /* Postprocessor methods callable from any postprocessor */

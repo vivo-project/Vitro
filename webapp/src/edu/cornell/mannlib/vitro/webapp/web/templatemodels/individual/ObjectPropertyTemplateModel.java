@@ -215,7 +215,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         }               
     }
     
-    private void logData(List<Map<String, String>> data) {
+    protected void logData(List<Map<String, String>> data) {
         
         if (log.isDebugEnabled()) {
             int count = 1;
@@ -227,6 +227,32 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
                }
             }
         }        
+    }
+    
+    
+    /** The SPARQL query results may contain duplicate rows for a single object, if there are multiple solutions 
+     * to the entire query. Remove duplicates here by arbitrarily selecting only the first row returned.
+     * @param List<Map<String, String>> data
+     */
+    protected void removeDuplicates(List<Map<String, String>> data) {
+        String objectVariableName = getObjectKey();
+        if (objectVariableName == null) {
+            log.error("Cannot remove duplicate statements for property " + getUri() + " because no object found to dedupe.");
+            return;
+        }
+        List<String> foundObjects = new ArrayList<String>();
+        log.debug("Removing duplicates from property: " + getUri());
+        Iterator<Map<String, String>> dataIterator = data.iterator();
+        while (dataIterator.hasNext()) {
+            Map<String, String> map = dataIterator.next();
+            String objectValue = map.get(objectVariableName);
+            // We arbitrarily remove all but the first. Not sure what selection criteria could be brought to bear on this.
+            if (foundObjects.contains(objectValue)) {
+                dataIterator.remove();
+            } else {
+                foundObjects.add(objectValue);
+            }
+        }
     }
     
     /* Post-processing that must occur after collation, because it does reordering on collated subclass

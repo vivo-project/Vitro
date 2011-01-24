@@ -3,10 +3,14 @@
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
@@ -27,15 +31,18 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateModel {
 
     private static final Log log = LogFactory.getLog(CollatedObjectPropertyTemplateModel.class);  
+    private static final String SUBCLASS_VARIABLE_NAME = "subclass";
+    
     private static final Pattern SELECT_SUBCLASS_PATTERN = 
         // SELECT ?subclass
-        Pattern.compile("SELECT[^{]*\\?subclass\\b", Pattern.CASE_INSENSITIVE);
+        Pattern.compile("SELECT[^{]*\\?" + SUBCLASS_VARIABLE_NAME + "\\b", Pattern.CASE_INSENSITIVE);
         // ORDER BY ?subclass
         // ORDER BY DESC(?subclass)
     private static final Pattern ORDER_BY_SUBCLASS_PATTERN = 
-        Pattern.compile("ORDER\\s+BY\\s+(DESC\\s*\\(\\s*)?\\?subclass", Pattern.CASE_INSENSITIVE);
+        Pattern.compile("ORDER\\s+BY\\s+(DESC\\s*\\(\\s*)?\\?" + SUBCLASS_VARIABLE_NAME, Pattern.CASE_INSENSITIVE);
     
     private SortedMap<String, List<ObjectPropertyStatementTemplateModel>> subclasses;
+    private WebappDaoFactory wdf;
     
     CollatedObjectPropertyTemplateModel(ObjectProperty op, Individual subject, 
             VitroRequest vreq, EditingPolicyHelper policyHelper) 
@@ -44,7 +51,7 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
         super(op, subject, vreq, policyHelper); 
         
         /* Get the data */
-        WebappDaoFactory wdf = vreq.getWebappDaoFactory();
+        wdf = vreq.getWebappDaoFactory();
         ObjectPropertyStatementDao opDao = wdf.getObjectPropertyStatementDao();
         String subjectUri = subject.getURI();
         String propertyUri = op.getURI();
@@ -59,12 +66,7 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
             collate(subjectUri, propertyUri, statementData, vreq, policyHelper);
 
         /* Sort by subclass name */
-        Comparator<String> comparer = new Comparator<String>() {
-            @Override
-            public int compare(String o1, String o2) {
-                    return o1.compareTo(o2);
-            }};
-        subclasses = new TreeMap<String, List<ObjectPropertyStatementTemplateModel>>(comparer);
+        subclasses = new TreeMap<String, List<ObjectPropertyStatementTemplateModel>>();
         subclasses.putAll(unsortedSubclasses); 
         
         for (List<ObjectPropertyStatementTemplateModel> list : subclasses.values()) {
@@ -92,6 +94,144 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
         return null;
     }
     
+    protected void removeDuplicates(List<Map<String, String>> data) {
+        filterSubclasses(data);
+    }
+    
+    /*
+     * The query returns subclasses of a specific superclass that the object belongs to; for example,
+     * in the case of authorInAuthorship, subclasses of core:InformationResource. Here we remove all but
+     * the most specific subclass for the object. This must precede BaseObjectPropertyDataPostProcess.removeDuplicates(),
+     * since that will arbitrarily remove all but the first result for a given object. 
+     * RY Implementation alternative: roll this filtering into the removeDuplicates() method to reduce the number of times
+     * we need to iterate through the results; but at the cost of conceptual clarity.
+     */
+    private void filterSubclasses(List<Map<String, String>> statementData) {
+        String objectVariableName = getObjectKey();
+        if (objectVariableName == null) {
+            log.error("Cannot remove duplicate statements for property " + getUri() + " because no object found to dedupe.");
+            return;
+        } 
+        
+        if (log.isDebugEnabled()) {
+            log.debug("Data before subclass filtering");
+            logData(statementData);
+        }
+        
+        List<Map<String, String>> filteredList = new ArrayList<Map<String, String>>();  
+        Set<String> processedObjects = new HashSet<String>();
+        for (Map<String, String> outerMap : statementData) {
+            String objectUri = outerMap.get(objectVariableName);
+            if (processedObjects.contains(objectUri)) {
+                continue;
+            }
+            processedObjects.add(objectUri);
+            String subclassUri = outerMap.get(SUBCLASS_VARIABLE_NAME);
+            if (subclassUri == null) {
+                continue;
+            }
+            List<Map<String, String>> dataForThisObject = new ArrayList<Map<String, String>>();
+            for (Map<String, String> innerMap : statementData) {
+                if ( innerMap.get(objectVariableName) == objectUri ) {
+                    dataForThisObject.add(innerMap);
+                }                
+            }
+            // Sort the data for this object from most to least specific subclass, with nulls at end
+            Collections.sort(dataForThisObject, new SubclassComparator(wdf));
+            filteredList.add(dataForThisObject.get(0));
+        }
+
+        statementData.clear();
+        statementData.addAll(filteredList);
+        
+        if (log.isDebugEnabled()) {
+            log.debug("Data after subclass filtering");
+            logData(statementData);
+        }
+        
+//        List<Map<String, String>> filteredList = new ArrayList<Map<String, String>>();  
+//        Set<String> processedObjects = new HashSet<String>();
+//        Iterator<Map<String, String>> iOuter = statementData.iterator();
+//        while (iOuter.hasNext()) {
+////        for (Map<String, String> map : statementData) {
+//            Map<String, String> outerMap = (Map<String, String>) iOuter.next();
+//            String outerObjectUri = outerMap.get(objectVariableName);
+//            if (processedObjects.contains(outerObjectUri)) {
+//                continue;
+//            }
+//            processedObjects.add(outerObjectUri);
+//            String outerSubclass = outerMap.get(SUBCLASS_VARIABLE_NAME);
+//            if (outerSubclass == null) {
+//                continue;
+//            }
+//            List<String> superclassUris = wdf.getVClassDao().getAllSuperClassURIs(outerSubclass);
+////            List<Map<String, String>> dataForThisObject = new ArrayList<Map<String, String>>();
+//            Iterator<Map<String, String>> iInner = statementData.iterator();
+//            while (iInner.hasNext()) {
+//                Map<String, String> innerMap = iInner.next();
+//                if (innerMap == outerMap || innerMap.get(objectVariableName) != outerObjectUri) { 
+//                    continue; 
+//                }
+//                String innerSubclass = innerMap.get(SUBCLASS_VARIABLE_NAME);
+//                if (superclassUris.contains(innerSubclass)) {
+//                    
+//                }
+//                
+//            }
+//            
+//        }
+        
+
+    }
+    
+    
+    // Collections.sort(mergedPropertyList,new PropertyRanker(vreq));
+    private class SubclassComparator implements Comparator<Map<String, String>> {
+        
+        private VClassDao vclassDao;
+        
+        SubclassComparator(WebappDaoFactory wdf) {
+            this.vclassDao = wdf.getVClassDao();
+        }
+
+        @Override
+        public int compare(Map<String, String> map1, Map<String, String> map2) {
+            
+            String subclass1 = map1.get(SUBCLASS_VARIABLE_NAME);
+            String subclass2 = map2.get(SUBCLASS_VARIABLE_NAME);
+            
+            if (subclass1 == null) {
+                if (subclass2 == null) {
+                    return 0;
+                } else {
+                    return 1; // nulls rank highest
+                }
+            }
+            
+            if (subclass2 == null) {
+                return -1; // nulls rank highest
+            }
+            
+            if (subclass1.equals(subclass2)) {
+                return 0;
+            }
+            
+            List<String> superclasses = vclassDao.getAllSuperClassURIs(subclass1);
+            if (superclasses.contains(subclass2)) {
+                return -1;
+            }
+            
+            superclasses = vclassDao.getAllSuperClassURIs(subclass2);
+            if  (superclasses.contains(subclass1)) {
+                return 1;
+            }
+            
+            return 0;
+            
+        }
+        
+    }
+    
     private Map<String, List<ObjectPropertyStatementTemplateModel>> collate(String subjectUri, String propertyUri,
             List<Map<String, String>> statementData, VitroRequest vreq, EditingPolicyHelper policyHelper) {
     
@@ -101,7 +241,7 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
         List<ObjectPropertyStatementTemplateModel> currentList = null;
         String objectKey = getObjectKey();
         for (Map<String, String> map : statementData) {
-            String subclassUri = map.get("subclass");
+            String subclassUri = map.get(SUBCLASS_VARIABLE_NAME);
             // Rows with no subclass are put into a subclass map with an empty name.
             if (subclassUri == null) {
                 subclassUri = "";
