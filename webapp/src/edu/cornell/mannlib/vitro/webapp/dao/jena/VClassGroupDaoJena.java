@@ -23,12 +23,12 @@ import com.hp.hpl.jena.util.iterator.ClosableIterator;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
+import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
-import edu.cornell.mannlib.vitro.webapp.web.DisplayVocabulary;
 
 public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
 
@@ -158,10 +158,16 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
             }
             */
             if (groups.size()>0) {
-                if( getIndividualCount )
-                    addIndividualCountToGroups(groups);
+//                if( getIndividualCount )
+//                    addIndividualCountToGroups(groups);
                 return groups;
             } else {
+                /* bdc34: the effect of the following code is that 
+                 * classgroups will get empty vclasses added to them
+                 * when includeUninstantiatedClasses == false and all
+                 * the vclasses are empty.
+                 * This may not be the desired behavior. 
+                 */
                 classDao.addVClassesToGroups(groups);
                 if( getIndividualCount )
                     addIndividualCountToGroups(groups);
@@ -172,8 +178,8 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
         }
 
     }
-
-    private void addIndividualCountToGroups( List<VClassGroup> cgList ){
+    
+    protected void addIndividualCountToGroups( List<VClassGroup> cgList ){
         for( VClassGroup cg : cgList){
             int count = 0;
             for( VClass vc : cg){
@@ -182,6 +188,47 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
             cg.setIndividualCount(count);
         }
     }
+    
+//    private int individuialCountForGroup( VClassGroup vcg){
+//        int count = 0;        
+//        try{           
+//            Model aboxModel = getOntModelSelector().getABoxModel();
+//            aboxModel.enterCriticalSection(Lock.READ);            
+//            try {
+//                
+//                String[] graphVars = { "?g" };
+//                String countQueryStr = "SELECT COUNT(DISTINCT ?s) WHERE \n" +
+//                                       "{ GRAPH ?g { ?s a <" + cls.getURI() + "> } \n" +
+//                                       WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode) +
+//                                       "} \n";
+//                Query countQuery = QueryFactory.create(countQueryStr, Syntax.syntaxARQ);
+//                DatasetWrapper w = getDatasetWrapper();
+//                Dataset dataset = w.getDataset();
+//                dataset.getLock().enterCriticalSection(Lock.READ);
+//                try {
+//                    QueryExecution qe = QueryExecutionFactory.create(countQuery, dataset);
+//                    ResultSet rs = qe.execSelect();
+//                    count = Integer.parseInt(((Literal) rs.nextSolution().get(".1")).getLexicalForm());
+//                } finally {
+//                    dataset.getLock().leaveCriticalSection();
+//                    w.close();
+//                }
+//                
+//                
+////                String countQueryStr = "SELECT COUNT(*) WHERE \n" +
+////                                       "{ ?s a <" + cls.getURI() + "> } ";
+////                Query countQuery = QueryFactory.create(countQueryStr, Syntax.syntaxARQ);
+////                QueryExecution qe = QueryExecutionFactory.create(countQuery, aboxModel);
+////                ResultSet rs =qe.execSelect();
+////                count = Integer.parseInt(((Literal) rs.nextSolution().get(".1")).getLexicalForm());
+//            } finally {
+//                aboxModel.leaveCriticalSection();
+//            }         
+//        }catch(Exception ex){
+//            log.debug("error during individuialCountForGroup()", ex);
+//        }
+//        return count;
+//    }
     
     public VClassGroup groupFromGroupIndividual(Individual groupInd) {
         if (groupInd==null) {

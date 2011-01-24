@@ -15,7 +15,7 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
-import edu.cornell.mannlib.vitro.webapp.web.DisplayVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 
 
 public class ProhibitedFromSearchTest {

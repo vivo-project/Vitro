@@ -36,7 +36,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.SearchReindexingListener;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ObjectSourceIface;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
-import edu.cornell.mannlib.vitro.webapp.web.DisplayVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 
 /**
  * Setup objects for lucene searching and indexing.

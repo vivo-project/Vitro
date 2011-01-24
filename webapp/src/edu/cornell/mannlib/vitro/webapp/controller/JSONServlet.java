@@ -8,6 +8,7 @@ import java.io.Writer;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -32,14 +33,18 @@ import com.hp.hpl.jena.rdf.model.Literal;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
+import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.TabEntitiesController.PageRecord;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
+import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.SelectListGenerator;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
-import edu.cornell.mannlib.vitro.webapp.web.DisplayVocabulary;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassGroupTemplateModel;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModel;
 
 /**
@@ -60,22 +65,64 @@ public class JSONServlet extends VitroHttpServlet {
         super.doGet(req, resp);
         VitroRequest vreq = new VitroRequest(req);
 
-        if(vreq.getParameter("getEntitiesByVClass") != null ){
-            if( vreq.getParameter("resultKey") == null) {
-                getEntitiesByVClass(req, resp);
+        try{
+            if(vreq.getParameter("getEntitiesByVClass") != null ){
+                if( vreq.getParameter("resultKey") == null) {
+                    getEntitiesByVClass(req, resp);
+                    return;
+                } else {
+                    getEntitiesByVClassContinuation( req, resp);
+                    return;
+                }
+            }else if( vreq.getParameter("getN3EditOptionList") != null ){
+                doN3EditOptionList(req,resp);
                 return;
-            } else {
-                getEntitiesByVClassContinuation( req, resp);
+            }else if( vreq.getParameter("getLuceneIndividualsByVClass") != null ){
+                getLuceneIndividualsByVClass(req,resp);
+                return;
+            }else if( vreq.getParameter("getVClassesForVClassGroup") != null ){
+                getVClassesForVClassGroup(req,resp);
                 return;
             }
-        }else if( vreq.getParameter("getN3EditOptionList") != null ){
-            doN3EditOptionList(req,resp);
-            return;
-        }else if( vreq.getParameter("getLuceneIndividualsByVClass") != null ){
-            getLuceneIndividualsByVClass(req,resp);
+        }catch(Exception ex){
+            log.warn(ex,ex);            
+        }        
+    }
+
+    private void getVClassesForVClassGroup(HttpServletRequest req, HttpServletResponse resp) throws IOException, JSONException {                
+        JSONObject map = new JSONObject();           
+        VitroRequest vreq = new VitroRequest(req);        
+        String vcgUri = vreq.getParameter("classgroupUri");
+        if( vcgUri == null ){
+            log.debug("no URI passed for classgroupUri");
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             return;
         }
         
+        VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(getServletContext());
+        VClassGroup vcg = vcgc.getGroup(vreq.getPortalId(), vcgUri);
+        if( vcg == null ){
+            log.debug("Could not find vclassgroup: " + vcgUri);
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return;
+        }        
+                        
+        ArrayList<JSONObject> classes = new ArrayList<JSONObject>(vcg.size());
+        for( VClass vc : vcg){
+            JSONObject vcObj = new JSONObject();
+            vcObj.put("name", vc.getName());
+            vcObj.put("URI", vc.getURI());
+            vcObj.put("entityCount", vc.getEntityCount());
+            classes.add(vcObj);
+        }
+        map.put("classes", classes);                
+        map.put("classGroupName", vcg.getPublicName());
+        map.put("classGroupUri", vcg.getURI());
+                
+        resp.setCharacterEncoding("UTF-8");
+        resp.setContentType("application/json;charset=UTF-8");
+        Writer writer = resp.getWriter();
+        writer.write(map.toString());                        
     }
 
     private void getLuceneIndividualsByVClass( HttpServletRequest req, HttpServletResponse resp ){

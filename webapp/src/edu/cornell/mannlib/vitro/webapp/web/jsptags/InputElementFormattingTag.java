@@ -47,7 +47,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.Field;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.SelectListGenerator;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
-import edu.cornell.mannlib.vitro.webapp.web.DisplayVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import freemarker.template.Configuration;
 
 /**

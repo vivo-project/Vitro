@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
+import java.util.List;
+
 import com.hp.hpl.jena.ontology.AnnotationProperty;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.query.Dataset;
@@ -9,6 +11,8 @@ import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.QuerySolutionMap;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Literal;
@@ -44,9 +48,12 @@ public class VClassDaoSDB extends VClassDaoJena {
     
     @Deprecated
     public void addVClassesToGroup(VClassGroup group, boolean includeUninstantiatedClasses, boolean getIndividualCount) {
+        
+        group.setIndividualCount( getClassGroupInstanceCount(group));
+        
         getOntModel().enterCriticalSection(Lock.READ);
         try {
-            if ((group != null) && (group.getURI() != null)) {
+            if ((group != null) && (group.getURI() != null)) {                                
                 Resource groupRes = ResourceFactory.createResource(group.getURI());
                 AnnotationProperty inClassGroup = getOntModel().getAnnotationProperty(VitroVocabulary.IN_CLASSGROUP);
                 if (inClassGroup != null) {
@@ -121,5 +128,45 @@ public class VClassDaoSDB extends VClassDaoJena {
             getOntModel().leaveCriticalSection();
         }
     }
+        
+//    protected void addIndividualCountToGroups( List<VClassGroup> cgList ){
+//        for( VClassGroup cg : cgList){           
+//            cg.setIndividualCount(getClassGroupInstanceCount(cg));
+//        }        
+//    }
+    
+    int getClassGroupInstanceCount(VClassGroup vcg){
+        int count = 0;
+        String[] graphVars = { "?g1", "?g2" };        
+        try {
+            String queryText =              
+                "SELECT COUNT( DISTINCT ?instance ) WHERE { \n" +
+                "  GRAPH <urn:x-arq:UnionGraph> { \n" + 
+                "      ?class <"+VitroVocabulary.IN_CLASSGROUP+"> ?classGroupUri .\n" +                
+                "      ?instance a ?class .  \n" +
+                "  } \n" +
+                "} \n" ;
+            
+            Query countQuery = QueryFactory.create(queryText, Syntax.syntaxARQ);
+            DatasetWrapper w = getDatasetWrapper();
+            Dataset dataset = w.getDataset();
+            QuerySolutionMap initialBinding = new QuerySolutionMap();
+            initialBinding.add("classGroupUri", ResourceFactory.createResource( vcg.getURI()));
+            dataset.getLock().enterCriticalSection(Lock.READ);
+            try {
+                QueryExecution qe = QueryExecutionFactory.create(countQuery, dataset, initialBinding);
+                ResultSet rs = qe.execSelect();
+                count = Integer.parseInt(((Literal) rs.nextSolution().get(".1")).getLexicalForm());
+            } finally {
+                dataset.getLock().leaveCriticalSection();
+                w.close();
+            }
+        }catch(Exception ex){
+            log.error("error in getClassGroupInstanceCount()", ex);
+        }    
+        
+        return count;
+    }
+
     
 }
