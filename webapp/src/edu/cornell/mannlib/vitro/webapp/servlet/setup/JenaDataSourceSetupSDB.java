@@ -17,6 +17,11 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -163,7 +168,7 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
             } catch (Throwable e) {
                 log.error("Unable to load tbox inference cache from DB", e);
             }
-            
+                                  
             // union ABox
             OntModel unionABoxModel = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC,ModelFactory.createUnion(baseOms.getABoxModel(), inferenceOms.getABoxModel()));
             unionOms.setABoxModel(unionABoxModel);
@@ -171,7 +176,35 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
             // union TBox
             OntModel unionTBoxModel = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC,ModelFactory.createUnion(baseOms.getTBoxModel(), inferenceOms.getTBoxModel()));       
             unionOms.setTBoxModel(unionTBoxModel);
-                         
+                      
+            
+            // Application metadata model is cached in memory.
+            try {
+                Model applicationMetadataModelDB = makeDBModel(bds, JENA_APPLICATION_METADATA_MODEL, DB_ONT_MODEL_SPEC, TripleStoreType.SDB);
+                
+                if (applicationMetadataModelDB == null || applicationMetadataModelDB.size() == 0) {
+                   	repairAppMetadataModel(store, aboxAssertions, aboxInferences);
+                }
+                
+                OntModel applicationMetadataModel = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC);
+                
+                if (applicationMetadataModelDB != null && applicationMetadataModelDB.size() > 0) {
+                    long startTime = System.currentTimeMillis();
+                    System.out.println("Copying cached application metadata model into memory");
+                    applicationMetadataModel.add(applicationMetadataModelDB);
+                    System.out.println((System.currentTimeMillis()-startTime)/1000+" seconds to load application metadata model assertions of size " + applicationMetadataModel.size());
+                    applicationMetadataModel.getBaseModel().register(new ModelSynchronizer(applicationMetadataModelDB));
+                    baseOms.setApplicationMetadataModel(applicationMetadataModel);
+                    inferenceOms.setApplicationMetadataModel(baseOms.getApplicationMetadataModel());
+                    unionOms.setApplicationMetadataModel(baseOms.getApplicationMetadataModel());
+                } else {
+                	log.error("The application metadata model was not found");
+                }
+            } catch (Throwable e) {
+                log.error("Unable to load application metadata model cache from DB", e);
+            }
+            
+            
             // add the vitro ontologies to the tbox models
             OntModel vitroTBoxModel = (new JenaBaseDaoCon()).getConstModel();
             baseOms.getTBoxModel().addSubModel(vitroTBoxModel);
@@ -218,12 +251,7 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
             sce.getServletContext().setAttribute("unionOntModelSelector", unionOms);          //assertions and inferences
             sce.getServletContext().setAttribute("baseOntModelSelector", baseOms);            //assertions
             sce.getServletContext().setAttribute("inferenceOntModelSelector", inferenceOms);  //inferences
-            
-            // use "full" models as the legacy application metadata models
-            baseOms.setApplicationMetadataModel(baseOms.getFullModel());
-            inferenceOms.setApplicationMetadataModel(inferenceOms.getFullModel());
-            unionOms.setApplicationMetadataModel(unionOms.getFullModel());
-            
+                        
             ApplicationBean appBean = getApplicationBeanFromOntModel(unionOms.getFullModel(),wadf);
             if (appBean != null) {
                 sce.getServletContext().setAttribute("applicationBean", appBean);
@@ -448,6 +476,37 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
         return;
     }
     
+    private static void getAppMetadata(Model source, Model target) {
+             	
+        String amdQuery = "DESCRIBE ?x WHERE { " +
+                    "{?x a <" + VitroVocabulary.PORTAL +"> } UNION " +
+                    "{?x a <" + VitroVocabulary.TAB +"> } UNION " +
+                    "{?x a <" + VitroVocabulary.PROPERTYGROUP +"> } UNION " +
+                    "{?x a <" + VitroVocabulary.CLASSGROUP +"> } } ";
+        
+		try {						
+			Query q = QueryFactory.create(amdQuery, Syntax.syntaxARQ);
+			QueryExecution qe = QueryExecutionFactory.create(q, source);
+			qe.execDescribe(target);
+	   	} catch (Exception e) {
+			log.error("unable to create the application metadata model",e);
+		}	
+        
+   		return;
+    }
+    
+    private static void repairAppMetadataModel(Store store, Model aboxAssertions, Model aboxInferences) {
+     	
+    	log.info("Repairing the application metadata model");
+        Model applicationMetadataModel = SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_APPLICATION_METADATA_MODEL);
+        getAppMetadata(aboxAssertions, applicationMetadataModel);
+        getAppMetadata(aboxInferences, applicationMetadataModel);
+        aboxAssertions.remove(applicationMetadataModel);
+        aboxInferences.remove(applicationMetadataModel);
+        
+   		return;
+    }
+    
     public static StoreDesc makeStoreDesc() {
         String layoutStr = ConfigurationProperties.getProperty(
                 "VitroConnection.DataSource.sdb.layout","layout2/hash");
@@ -505,9 +564,13 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
         Model aboxInferences = SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_INF_MODEL);
         copyDifference(inferenceModel, memTboxInferences, aboxInferences);
         
+        // Set up the application metadata model
+        Model applicationMetadataModel = SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_APPLICATION_METADATA_MODEL);
+        getAppMetadata(memModel, applicationMetadataModel);
+	   	log.info("During initial SDB setup, created an application metadata model of size " + applicationMetadataModel.size());
+                
         // Make sure the reasoner takes into account the newly-set-up data.
         SimpleReasonerSetup.setRecomputeRequired(ctx);
-
     }
     
     /**
