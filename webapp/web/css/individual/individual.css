@@ -35,6 +35,7 @@
     margin-top: 35px;
     margin-bottom: 45px;
     position: relative;
+    overflow: hidden;
 }
 #individual-intro h1{
     padding-bottom: 8px;  
@@ -68,11 +69,13 @@
 }
 #individual-intro-person #admin{
     margin-top: 37px;
-    width: 70%;
 }
 #individual-intro-person #individual-info{
     float: left;
     width: 78%;
+}
+#individual-intro-person .individual-overview{
+    width: 100%;
 }
 /* <------ INDIVIDUAL INTRO - LEFT SIDE CONTENT */
 #share-contact{
@@ -210,12 +213,11 @@ ul#individual-areas li:first-child{
 }
 /* <------ SPARKLINES  */
 #sparklines-publications{
-    padding: 0 10px 45px 20px;
+    padding: 0 10px 25px 30px;
     margin-top: 30px;
     padding-top: 0;
-    position: absolute;
-    right: 0;
-    top: 0;
+    float: right;
+    background-color: #fff;
 }
 #sparklines-publications h3{
     padding-top: 10px;
