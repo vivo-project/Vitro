@@ -5,7 +5,12 @@
 <section id="individual-intro" class="vcard" role="region">
     
     <#-- Image -->
-    <@p.imageLinks individual propertyGroups namespaces editable />
+    <@p.imageLinks individual=individual 
+                   propertyGroups=propertyGroups 
+                   namespaces=namespaces 
+                   editable=editable 
+                   showPlaceholder="with_add_link" 
+                   placeholder="${urls.images}/placeholders/person.thumbnail.jpg" />
     
     <section id="individual-info" role="region">
         <#if individual.showAdminPanel>

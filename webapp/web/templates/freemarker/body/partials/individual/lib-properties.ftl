@@ -118,7 +118,8 @@ name will be used as the label. -->
 </#macro>
 
 <#-- Main image links -->
-<#macro imageLinks individual propertyGroups namespaces editable placeholderImage="">
+<#-- Values for showPlaceholderImage: "always", "never", "with_add_link" -->
+<#macro imageLinks individual propertyGroups namespaces editable showPlaceholder="never" placeholder="">
     <#local mainImage = propertyGroups.getPropertyAndRemoveFromList("${namespaces.vitroPublic}mainImage")!>    
     <#local thumbUrl = individual.thumbUrl!>  
     <#-- Don't assume that if the mainImage property is populated, there is a thumbnail image (though that is the general case).
@@ -127,9 +128,12 @@ name will be used as the label. -->
         <a href="${individual.imageUrl}"><img class="individual-photo" src="${thumbUrl}" title="click to view larger image" alt="${individual.name}" width="160" /></a>            
         <@p.editingLinks "${mainImage.localName}" mainImage.statements[0] editable />
     <#else>
-        <@p.addLinkWithLabel mainImage editable "Photo" /> 
-        <#if placeholderImage?has_content>
-            <img class="individual-photo" src="${placeholderImage}" title = "no image" alt="placeholder image" width="160" /> 
+        <#local imageLabel><@p.addLinkWithLabel mainImage editable "Photo" /></#local>
+        ${imageLabel}
+        <#if placeholder?has_content>
+            <#if showPlaceholder == "always" || (showPlaceholder="with_add_link" && imageLabel?has_content)>
+                <img class="individual-photo" src="${placeholder}" title = "no image" alt="placeholder image" width="160" /> 
+            </#if>
         </#if>                                                      
     </#if>
 </#macro>
