@@ -780,6 +780,11 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
         @Deprecated
         public void addVClassesToGroup(VClassGroup group, boolean includeUninstantiatedClasses, boolean getIndividualCount) {
             getOntModel().enterCriticalSection(Lock.READ);
+            
+            if (getIndividualCount) {
+                group.setIndividualCount( getClassGroupInstanceCount(group));
+            } 
+            
             try {
                 if ((group != null) && (group.getURI() != null)) {
                     Resource groupRes = ResourceFactory.createResource(group.getURI());
@@ -847,6 +852,29 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
             }
         }
 
+        int getClassGroupInstanceCount(VClassGroup vcg){        
+            Model ontModel = getOntModel();
+            ontModel.enterCriticalSection(Lock.READ);
+            int count = 0;
+            try {
+                String queryText =              
+                    "SELECT COUNT( DISTINCT ?instance ) WHERE { \n" +                    
+                    "      ?class <"+VitroVocabulary.IN_CLASSGROUP+"> <"+vcg.getURI() +"> .\n" +                
+                    "      ?instance a ?class .  \n" +                    
+                    "}" ;                
+                Query countQuery = QueryFactory.create(queryText, Syntax.syntaxARQ);
+                QueryExecution qe = QueryExecutionFactory.create(countQuery, ontModel);
+                ResultSet rs =qe.execSelect();
+                count = Integer.parseInt(((Literal) rs.nextSolution().get(".1")).getLexicalForm());
+            }catch(Exception ex){
+                log.error(ex,ex);
+            } finally {
+                ontModel.leaveCriticalSection();
+            }
+            return count;
+        }
+        
+        
         public void addVClassesToGroups(List <VClassGroup> groups) {
             getOntModel().enterCriticalSection(Lock.READ);
             try {

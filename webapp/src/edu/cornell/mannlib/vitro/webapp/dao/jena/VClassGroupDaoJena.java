@@ -157,9 +157,7 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
             	groups.add(ungrouped);
             }
             */
-            if (groups.size()>0) {
-//                if( getIndividualCount )
-//                    addIndividualCountToGroups(groups);
+            if (groups.size()>0) {                
                 return groups;
             } else {
                 /* bdc34: the effect of the following code is that 
@@ -168,9 +166,7 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
                  * the vclasses are empty.
                  * This may not be the desired behavior. 
                  */
-                classDao.addVClassesToGroups(groups);
-                if( getIndividualCount )
-                    addIndividualCountToGroups(groups);
+                classDao.addVClassesToGroups(groups);                
                 return groups;
             }
         } finally {
@@ -179,56 +175,6 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
 
     }
     
-    protected void addIndividualCountToGroups( List<VClassGroup> cgList ){
-        for( VClassGroup cg : cgList){
-            int count = 0;
-            for( VClass vc : cg){
-                count = count + vc.getEntityCount();
-            }
-            cg.setIndividualCount(count);
-        }
-    }
-    
-//    private int individuialCountForGroup( VClassGroup vcg){
-//        int count = 0;        
-//        try{           
-//            Model aboxModel = getOntModelSelector().getABoxModel();
-//            aboxModel.enterCriticalSection(Lock.READ);            
-//            try {
-//                
-//                String[] graphVars = { "?g" };
-//                String countQueryStr = "SELECT COUNT(DISTINCT ?s) WHERE \n" +
-//                                       "{ GRAPH ?g { ?s a <" + cls.getURI() + "> } \n" +
-//                                       WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode) +
-//                                       "} \n";
-//                Query countQuery = QueryFactory.create(countQueryStr, Syntax.syntaxARQ);
-//                DatasetWrapper w = getDatasetWrapper();
-//                Dataset dataset = w.getDataset();
-//                dataset.getLock().enterCriticalSection(Lock.READ);
-//                try {
-//                    QueryExecution qe = QueryExecutionFactory.create(countQuery, dataset);
-//                    ResultSet rs = qe.execSelect();
-//                    count = Integer.parseInt(((Literal) rs.nextSolution().get(".1")).getLexicalForm());
-//                } finally {
-//                    dataset.getLock().leaveCriticalSection();
-//                    w.close();
-//                }
-//                
-//                
-////                String countQueryStr = "SELECT COUNT(*) WHERE \n" +
-////                                       "{ ?s a <" + cls.getURI() + "> } ";
-////                Query countQuery = QueryFactory.create(countQueryStr, Syntax.syntaxARQ);
-////                QueryExecution qe = QueryExecutionFactory.create(countQuery, aboxModel);
-////                ResultSet rs =qe.execSelect();
-////                count = Integer.parseInt(((Literal) rs.nextSolution().get(".1")).getLexicalForm());
-//            } finally {
-//                aboxModel.leaveCriticalSection();
-//            }         
-//        }catch(Exception ex){
-//            log.debug("error during individuialCountForGroup()", ex);
-//        }
-//        return count;
-//    }
     
     public VClassGroup groupFromGroupIndividual(Individual groupInd) {
         if (groupInd==null) {

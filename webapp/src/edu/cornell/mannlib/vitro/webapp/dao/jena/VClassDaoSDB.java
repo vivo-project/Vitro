@@ -68,31 +68,25 @@ public class VClassDaoSDB extends VClassDaoJena {
                                 VClass vcw = (VClass) getVClassByURI(cls.getURI());
                                 if (vcw != null) {
                                     boolean classIsInstantiated = false;
-                                    if (getIndividualCount) {
-                                    	Model aboxModel = getOntModelSelector().getABoxModel();
-                                    	aboxModel.enterCriticalSection(Lock.READ);
-                                    	int count = 0;
-                                    	try {
-                                    	    String[] graphVars = { "?g" };
-                                    		String countQueryStr = "SELECT COUNT(DISTINCT ?s) WHERE \n" +
-                                    		                       "{ GRAPH ?g { ?s a <" + cls.getURI() + "> } \n" +
-                                    		                       WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode) +
-                                    		                       "} \n";
-                                    		Query countQuery = QueryFactory.create(countQueryStr, Syntax.syntaxARQ);
-                                    		DatasetWrapper w = getDatasetWrapper();
-                                    		Dataset dataset = w.getDataset();
-                                    		dataset.getLock().enterCriticalSection(Lock.READ);
-                                    		try {
-                                        		QueryExecution qe = QueryExecutionFactory.create(countQuery, dataset);
-                                        		ResultSet rs = qe.execSelect();
-                                        		count = Integer.parseInt(((Literal) rs.nextSolution().get(".1")).getLexicalForm());
-                                    		} finally {
-                                    		    dataset.getLock().leaveCriticalSection();
-                                    		    w.close();
-                                    		}
-                                    	} finally {
-                                    		aboxModel.leaveCriticalSection();
-                                    	}
+                                    if (getIndividualCount) {                                                                            
+                                    	int count = 0;                                    	
+                                	    String[] graphVars = { "?g" };
+                                		String countQueryStr = "SELECT COUNT(DISTINCT ?s) WHERE \n" +
+                                		                       "{ GRAPH ?g { ?s a <" + cls.getURI() + "> } \n" +
+                                		                       WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode) +
+                                		                       "} \n";
+                                		Query countQuery = QueryFactory.create(countQueryStr, Syntax.syntaxARQ);
+                                		DatasetWrapper w = getDatasetWrapper();
+                                		Dataset dataset = w.getDataset();
+                                		dataset.getLock().enterCriticalSection(Lock.READ);                                    		
+                                		try {
+                                    		QueryExecution qe = QueryExecutionFactory.create(countQuery, dataset);
+                                    		ResultSet rs = qe.execSelect();
+                                    		count = Integer.parseInt(((Literal) rs.nextSolution().get(".1")).getLexicalForm());
+                                		} finally {
+                                		    dataset.getLock().leaveCriticalSection();
+                                		    w.close();
+                                		}
                                     	vcw.setEntityCount(count);
                                     	classIsInstantiated = (count > 0);
                                     } else if (includeUninstantiatedClasses == false) {
@@ -137,6 +131,7 @@ public class VClassDaoSDB extends VClassDaoJena {
 //        }        
 //    }
     
+    @Override
     int getClassGroupInstanceCount(VClassGroup vcg){
         int count = 0;               
         try {
