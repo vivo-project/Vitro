@@ -3,6 +3,7 @@
 <#-- Default individual profile page template -->
 
 <section id="individual-intro" class="vcard" role="region">
+    
     <#-- Image -->
     <@p.imageLinks individual propertyGroups namespaces editable />
     

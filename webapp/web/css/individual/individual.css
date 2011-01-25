@@ -58,6 +58,12 @@
 }
 #individual-intro .individual-overview{
     margin-bottom: 30px;
+    margin-top: 10px;
+    display: inline;
+    clear: both;
+}
+ul#links-additional{
+    margin-bottom: 20px;
 }
 /* <------ INDIVIDUAL INTRO FOR PERSON*/
 #individual-intro-person{
@@ -81,6 +87,7 @@
     float: left;
     padding-left: 0.5em;
     padding-right: 1.5em;
+    margin-bottom: 20px;
 }
 #share-contact h3{
     margin-top: 15px;
@@ -224,7 +231,7 @@ ul#individual-areas li:first-child{
 }
 /* <------ SPARKLINES  */
 #sparklines-publications{
-    padding: 0 10px 25px 30px;
+    padding: 0 10px 35px 30px;
     padding-top: 0;
     float: right;
     background-color: #fff;
@@ -239,11 +246,15 @@ ul#individual-areas li:first-child{
 }
 /* <------ TEMPORAL GRAPH  */
 #temporal-graph{
+    padding: 0 3px 20px 0;
+    background-color: #fff;
+    /* 
     position: absolute;
     padding: 0 3px 20px 10px;
     background-color: #fff;
     top: 0;
-    right: 0;
+    right: 0
+    */
 }
 #temporal-graph h3 img{
     padding-right: 10px;
