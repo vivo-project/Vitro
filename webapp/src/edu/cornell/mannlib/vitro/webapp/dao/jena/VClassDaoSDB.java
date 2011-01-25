@@ -49,7 +49,9 @@ public class VClassDaoSDB extends VClassDaoJena {
     @Deprecated
     public void addVClassesToGroup(VClassGroup group, boolean includeUninstantiatedClasses, boolean getIndividualCount) {
         
-        group.setIndividualCount( getClassGroupInstanceCount(group));
+        if (getIndividualCount) {
+            group.setIndividualCount( getClassGroupInstanceCount(group));
+        } 
         
         getOntModel().enterCriticalSection(Lock.READ);
         try {
@@ -136,13 +138,12 @@ public class VClassDaoSDB extends VClassDaoJena {
 //    }
     
     int getClassGroupInstanceCount(VClassGroup vcg){
-        int count = 0;
-        String[] graphVars = { "?g1", "?g2" };        
+        int count = 0;               
         try {
             String queryText =              
                 "SELECT COUNT( DISTINCT ?instance ) WHERE { \n" +
                 "  GRAPH <urn:x-arq:UnionGraph> { \n" + 
-                "      ?class <"+VitroVocabulary.IN_CLASSGROUP+"> ?classGroupUri .\n" +                
+                "      ?class <"+VitroVocabulary.IN_CLASSGROUP+"> <"+vcg.getURI() +"> .\n" +                
                 "      ?instance a ?class .  \n" +
                 "  } \n" +
                 "} \n" ;
@@ -150,11 +151,9 @@ public class VClassDaoSDB extends VClassDaoJena {
             Query countQuery = QueryFactory.create(queryText, Syntax.syntaxARQ);
             DatasetWrapper w = getDatasetWrapper();
             Dataset dataset = w.getDataset();
-            QuerySolutionMap initialBinding = new QuerySolutionMap();
-            initialBinding.add("classGroupUri", ResourceFactory.createResource( vcg.getURI()));
             dataset.getLock().enterCriticalSection(Lock.READ);
             try {
-                QueryExecution qe = QueryExecutionFactory.create(countQuery, dataset, initialBinding);
+                QueryExecution qe = QueryExecutionFactory.create(countQuery, dataset);
                 ResultSet rs = qe.execSelect();
                 count = Integer.parseInt(((Literal) rs.nextSolution().get(".1")).getLexicalForm());
             } finally {
