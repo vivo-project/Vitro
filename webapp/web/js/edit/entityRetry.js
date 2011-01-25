@@ -4,7 +4,7 @@
 
 <script language="JavaScript">
 function confirmDelete() {
-    var msg="Are you SURE you want to delete this entity? If in doubt, CANCEL."
+    var msg="Are you SURE you want to delete this individual? If in doubt, CANCEL."
     return confirm(msg);
 }
 </script>

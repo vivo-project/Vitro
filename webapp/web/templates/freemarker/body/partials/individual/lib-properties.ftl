@@ -118,7 +118,7 @@ name will be used as the label. -->
 </#macro>
 
 <#-- Main image links -->
-<#-- Values for showPlaceholderImage: "always", "never", "with_add_link" -->
+<#-- Values for showPlaceholder: "always", "never", "with_add_link" -->
 <#macro imageLinks individual propertyGroups namespaces editable showPlaceholder="never" placeholder="">
     <#local mainImage = propertyGroups.getPropertyAndRemoveFromList("${namespaces.vitroPublic}mainImage")!>    
     <#local thumbUrl = individual.thumbUrl!>  
