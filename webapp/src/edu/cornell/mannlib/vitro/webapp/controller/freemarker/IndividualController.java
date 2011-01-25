@@ -51,6 +51,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditSubmission;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
+import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasoner;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapper;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapperFactory;
 import edu.cornell.mannlib.vitro.webapp.web.ContentType;
@@ -241,9 +242,9 @@ public class IndividualController extends FreemarkerHttpServlet {
                 }
             }
             // If still no custom template defined, and inferencing is asynchronous (under RDB), check
-            // superclasses of the vclass. 
-            // The method to check for asynchronous inferencing will be added later; see NIHVIVO-1834.
-            if (customTemplate == null) { //&& inferencing is asynchronous) { 
+            // the superclasses of the vclass for a custom template specification. 
+            if (customTemplate == null && SimpleReasoner.isABoxReasoningAsynchronous(getServletContext())) { 
+                log.debug("Checking superclasses for custom template specification because ABox reasoning is asynchronous");
                 for (VClass directVClass : directClasses) {
                     VClassDao vcDao = vreq.getWebappDaoFactory().getVClassDao();
                     List<String> superClassUris = vcDao.getAllSuperClassURIs(directVClass.getURI());

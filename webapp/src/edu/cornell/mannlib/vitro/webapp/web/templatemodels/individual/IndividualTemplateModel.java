@@ -20,6 +20,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep;
+import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasoner;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 
 public class IndividualTemplateModel extends BaseTemplateModel {
@@ -61,9 +62,10 @@ public class IndividualTemplateModel extends BaseTemplateModel {
     
     private boolean isVClass(String vClassUri) {
         boolean isVClass = individual.isVClass(vClassUri);  
-        // If reasoning is asynchronous, this inference may not have been made yet. Check the superclasses
-        // of the individual's vclass.
-        if (!isVClass) { // & reasoning is asynchronous: method to be added later; see NIHVIVO-1834
+        // If reasoning is asynchronous (under RDB), this inference may not have been made yet. 
+        // Check the superclasses of the individual's vclass.
+        if (!isVClass && SimpleReasoner.isABoxReasoningAsynchronous(getServletContext())) { 
+            log.debug("Checking superclasses to see if individual is a " + vClassUri + " because reasoning is asynchronous");
             List<VClass> directVClasses = individual.getVClasses(true);
             for (VClass directVClass : directVClasses) {
                 VClassDao vcDao = vreq.getWebappDaoFactory().getVClassDao();
