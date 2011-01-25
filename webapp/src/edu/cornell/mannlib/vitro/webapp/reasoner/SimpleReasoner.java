@@ -609,14 +609,17 @@ public class SimpleReasoner extends StatementListener {
 		}	
 	}
 	
-	public static SimpleReasoner getSimpleReasonerFromServletContext(
-	                                                    ServletContext ctx) {
+	public static SimpleReasoner getSimpleReasonerFromServletContext(ServletContext ctx) {
 	    Object simpleReasoner = ctx.getAttribute("simpleReasoner");
+	    
 	    if (simpleReasoner instanceof SimpleReasoner) {
 	        return (SimpleReasoner) simpleReasoner;
 	    } else {
 	        return null;
 	    }
 	}
-	
+
+	public static boolean isABoxReasoningAsynchronous(ServletContext ctx) {
+	   return (getSimpleReasonerFromServletContext(ctx) == null);	
+	}	
 }
