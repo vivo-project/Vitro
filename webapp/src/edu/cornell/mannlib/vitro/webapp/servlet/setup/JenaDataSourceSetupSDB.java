@@ -101,6 +101,9 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
 
             // SDB setup
             
+            // union default graph
+            SDB.getContext().set(SDB.unionDefaultGraph, true) ;
+
             StoreDesc storeDesc = makeStoreDesc();
             setApplicationStoreDesc(storeDesc, sce.getServletContext());
 
@@ -182,26 +185,24 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
             
             // Application metadata model is cached in memory.
             try {
+                
                 Model applicationMetadataModelDB = makeDBModel(bds, JENA_APPLICATION_METADATA_MODEL, DB_ONT_MODEL_SPEC, TripleStoreType.SDB);
-                
-                if (applicationMetadataModelDB == null || applicationMetadataModelDB.size() == 0) {
-                   	repairAppMetadataModel(store, aboxAssertions, aboxInferences);
-                }
-                
                 OntModel applicationMetadataModel = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC);
                 
-                if (applicationMetadataModelDB != null && applicationMetadataModelDB.size() > 0) {
-                    long startTime = System.currentTimeMillis();
-                    System.out.println("Copying cached application metadata model into memory");
-                    applicationMetadataModel.add(applicationMetadataModelDB);
-                    System.out.println((System.currentTimeMillis()-startTime)/1000+" seconds to load application metadata model assertions of size " + applicationMetadataModel.size());
-                    applicationMetadataModel.getBaseModel().register(new ModelSynchronizer(applicationMetadataModelDB));
-                    baseOms.setApplicationMetadataModel(applicationMetadataModel);
-                    inferenceOms.setApplicationMetadataModel(baseOms.getApplicationMetadataModel());
-                    unionOms.setApplicationMetadataModel(baseOms.getApplicationMetadataModel());
-                } else {
-                	log.error("The application metadata model was not found");
+                long startTime = System.currentTimeMillis();
+                System.out.println("Copying cached application metadata model into memory");
+                applicationMetadataModel.add(applicationMetadataModelDB);
+                System.out.println((System.currentTimeMillis()-startTime)/1000+" seconds to load application metadata model assertions of size " + applicationMetadataModel.size());
+                applicationMetadataModel.getBaseModel().register(new ModelSynchronizer(applicationMetadataModelDB));
+                
+                if (applicationMetadataModelDB.size() == 0) {
+                    repairAppMetadataModel(applicationMetadataModel, aboxAssertions, aboxInferences);
                 }
+                
+                baseOms.setApplicationMetadataModel(applicationMetadataModel);
+                inferenceOms.setApplicationMetadataModel(baseOms.getApplicationMetadataModel());
+                unionOms.setApplicationMetadataModel(baseOms.getApplicationMetadataModel());
+                
             } catch (Throwable e) {
                 log.error("Unable to load application metadata model cache from DB", e);
             }
@@ -498,10 +499,11 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
    		return;
     }
     
-    private static void repairAppMetadataModel(Store store, Model aboxAssertions, Model aboxInferences) {
+    private static void repairAppMetadataModel(Model applicationMetadataModel,
+                                               Model aboxAssertions, 
+                                               Model aboxInferences) {
      	
-    	log.info("Repairing the application metadata model");
-        Model applicationMetadataModel = SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_APPLICATION_METADATA_MODEL);
+    	log.info("Moving application metadata from ABox to dedicated model");
         getAppMetadata(aboxAssertions, applicationMetadataModel);
         getAppMetadata(aboxInferences, applicationMetadataModel);
         aboxAssertions.remove(applicationMetadataModel);
@@ -534,46 +536,60 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
         store.getTableFormatter().create();
         store.getTableFormatter().truncate();
         
-        // This is a one-time copy of stored KB data - from a Jena RDB store
-        // to a Jena SDB store. In the process, we will also separate out the
-        // TBox from the Abox; these are in the same graph in pre 1.2 VIVO 
-        // versions and will now be stored and maintained in separate models
-        // Access to the Jena RDB data is through the OntModelSelectors that have
-        // been set up earlier in the current session by
-        // JenaPersistentDataSourceSetup.java
-        // In the code below, note that the current getABoxModel() methods on 
-        // the OntModelSelectors return a graph with both ABox and TBox data.
-    
-        OntModel submodels = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC);
-        readOntologyFilesInPathSet(SUBMODELS, ctx, submodels);
+        store.getTableFormatter().dropIndexes(); // improve load performance
         
-        Model tboxAssertions = SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_TBOX_ASSERTIONS_MODEL);
-        // initially putting the results in memory so we have a
-        // cheaper way of computing the difference when we copy the ABox
-        Model memTboxAssertions = ModelFactory.createDefaultModel();
-        getTBoxModel(memModel, submodels, memTboxAssertions);
-        tboxAssertions.add(memTboxAssertions);
+        try {
         
-        Model tboxInferences = SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_TBOX_INF_MODEL);
-        // initially putting the results in memory so we have a
-        // cheaper way of computing the difference when we copy the ABox
-        Model memTboxInferences = ModelFactory.createDefaultModel();
-        getTBoxModel(inferenceModel, submodels, memTboxInferences);
-        tboxInferences.add(memTboxInferences);
+            // This is a one-time copy of stored KB data - from a Jena RDB store
+            // to a Jena SDB store. In the process, we will also separate out the
+            // TBox from the Abox; these are in the same graph in pre 1.2 VIVO 
+            // versions and will now be stored and maintained in separate models
+            // Access to the Jena RDB data is through the OntModelSelectors that have
+            // been set up earlier in the current session by
+            // JenaPersistentDataSourceSetup.java
+            // In the code below, note that the current getABoxModel() methods on 
+            // the OntModelSelectors return a graph with both ABox and TBox data.
         
-        Model aboxAssertions = SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_DB_MODEL);
-        copyDifference(memModel, memTboxAssertions, aboxAssertions);
-    
-        Model aboxInferences = SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_INF_MODEL);
-        copyDifference(inferenceModel, memTboxInferences, aboxInferences);
+            OntModel submodels = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC);
+            readOntologyFilesInPathSet(SUBMODELS, ctx, submodels);
+            
+            Model tboxAssertions = SDBFactory.connectNamedModel(
+                    store, JenaDataSourceSetupBase.JENA_TBOX_ASSERTIONS_MODEL);
+            // initially putting the results in memory so we have a
+            // cheaper way of computing the difference when we copy the ABox
+            Model memTboxAssertions = ModelFactory.createDefaultModel();
+            getTBoxModel(memModel, submodels, memTboxAssertions);
+            tboxAssertions.add(memTboxAssertions);
+            
+            Model tboxInferences = SDBFactory.connectNamedModel(
+                    store, JenaDataSourceSetupBase.JENA_TBOX_INF_MODEL);
+            // initially putting the results in memory so we have a
+            // cheaper way of computing the difference when we copy the ABox
+            Model memTboxInferences = ModelFactory.createDefaultModel();
+            getTBoxModel(inferenceModel, submodels, memTboxInferences);
+            tboxInferences.add(memTboxInferences);
+            
+            Model aboxAssertions = SDBFactory.connectNamedModel(
+                    store, JenaDataSourceSetupBase.JENA_DB_MODEL);
+            copyDifference(memModel, memTboxAssertions, aboxAssertions);
         
-        // Set up the application metadata model
-        Model applicationMetadataModel = SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_APPLICATION_METADATA_MODEL);
-        getAppMetadata(memModel, applicationMetadataModel);
-	   	log.info("During initial SDB setup, created an application metadata model of size " + applicationMetadataModel.size());
-                
-        // Make sure the reasoner takes into account the newly-set-up data.
-        SimpleReasonerSetup.setRecomputeRequired(ctx);
+            Model aboxInferences = SDBFactory.connectNamedModel(
+                    store, JenaDataSourceSetupBase.JENA_INF_MODEL);
+            copyDifference(inferenceModel, memTboxInferences, aboxInferences);
+            
+            // Set up the application metadata model
+            Model applicationMetadataModel = SDBFactory.connectNamedModel(
+                    store, JenaDataSourceSetupBase.JENA_APPLICATION_METADATA_MODEL);
+            getAppMetadata(memModel, applicationMetadataModel);
+    	   	log.info("During initial SDB setup, created an application metadata model of size " 
+    	   	        + applicationMetadataModel.size());
+                    
+            // Make sure the reasoner takes into account the newly-set-up data.
+            SimpleReasonerSetup.setRecomputeRequired(ctx);
+        
+        } finally {
+            store.getTableFormatter().addIndexes();
+        }
     }
     
     /**
