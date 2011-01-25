@@ -111,7 +111,7 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
             setApplicationStore(store, sce.getServletContext());
             
             if (!isSetUp(store)) {
-                log.debug("Non-SDB system detected. Setting up SDB store");
+                log.info("Non-SDB system detected. Setting up SDB store");
                 setupSDB(sce.getServletContext(), store, memModel, inferenceModel);
             }
             
@@ -577,17 +577,14 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
     }
     
     /**
-     * Tests whether an SDB store has been formatted for use.
+     * Tests whether an SDB store has been formatted and populated for use.
      * @param store
      * @return
      */
     private boolean isSetUp(Store store) {
         try {
-            // a test query to see if the store is formatted
-            SDBFactory.connectDefaultModel(store).contains(
-                    OWL.Thing, RDF.type, OWL.Nothing);
-            return true;
-        } catch (Exception e) { // unformatted store
+            return (SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_TBOX_ASSERTIONS_MODEL)).size() > 0;    
+        } catch (Exception e) { 
             return false;
         }
     }
