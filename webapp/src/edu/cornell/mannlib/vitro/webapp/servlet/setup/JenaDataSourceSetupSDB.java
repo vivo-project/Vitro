@@ -28,6 +28,7 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.sdb.SDB;
 import com.hp.hpl.jena.sdb.SDBFactory;
 import com.hp.hpl.jena.sdb.Store;
 import com.hp.hpl.jena.sdb.StoreDesc;
@@ -99,6 +100,7 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
             checkForNamespaceMismatch( memModel, defaultNamespace );
 
             // SDB setup
+            
             StoreDesc storeDesc = makeStoreDesc();
             setApplicationStoreDesc(storeDesc, sce.getServletContext());
 
@@ -251,15 +253,14 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
             sce.getServletContext().setAttribute("unionOntModelSelector", unionOms);          //assertions and inferences
             sce.getServletContext().setAttribute("baseOntModelSelector", baseOms);            //assertions
             sce.getServletContext().setAttribute("inferenceOntModelSelector", inferenceOms);  //inferences
-                        
             ApplicationBean appBean = getApplicationBeanFromOntModel(unionOms.getFullModel(),wadf);
             if (appBean != null) {
                 sce.getServletContext().setAttribute("applicationBean", appBean);
             }
             
-            if (isEmpty(unionOms.getFullModel())) {
-                loadDataFromFilesystem(unionOms.getFullModel(), sce.getServletContext());
-            }
+            //if (isEmpty(unionOms.getFullModel())) {
+            //    loadDataFromFilesystem(unionOms.getFullModel(), sce.getServletContext());
+            //}
             
             if (userAccountsModel.size() == 0) {
                 readOntologyFilesInPathSet(AUTHPATH, sce.getServletContext(), userAccountsModel);
@@ -268,7 +269,7 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
                 }
             }                        
             
-            ensureEssentialInterfaceData(unionOms.getFullModel(), sce, wadf);        
+            ensureEssentialInterfaceData(unionOms.getApplicationMetadataModel(), sce, wadf);        
             
             NamespaceMapper namespaceMapper = new NamespaceMapperJena(masterUnion, masterUnion, defaultNamespace);
             sce.getServletContext().setAttribute("NamespaceMapper", namespaceMapper);
@@ -417,7 +418,9 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
     }
     
     private boolean isEmpty(Model model) {
-        ClosableIterator<Statement> closeIt = model.listStatements();
+        ClosableIterator<Statement> closeIt = model.listStatements(
+                null, RDF.type, ResourceFactory.createResource(
+                        VitroVocabulary.PORTAL));
         try {
             if (closeIt.hasNext()) {
                 return false;
