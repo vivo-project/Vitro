@@ -59,6 +59,61 @@
 <p>${r"#{title}"}</p>
 <p>${r"${title}"}</p>
 
+<h2>Containers do not pick up changes to the value of their elements</h2>
+<#assign
+    fruit = ["apples", "oranges", "bananas"]
+    veg = ["beans", "peas", "carrots"]
+    food = [fruit, veg]
+    fruit = fruit + ["pears"]
+>
+
+<#noparse>
+    <#assign<br />
+        fruit = ["apples", "oranges", "bananas"]<br />
+        veg = ["beans", "peas", "carrots"]<br />
+        food = [fruit, veg]<br />
+        fruit = fruit + ["pears"]<br />
+    ><br />
+</#noparse>
+
+<h3>List elements of ${r"${fruit}"}</h3>
+<#list fruit as f>
+    ${f}<br />
+</#list>
+
+<h3>List elements of ${r"${food}"}: contains no pears</h3>
+<#list food as item>
+    <#list item as i>
+        ${i}<br />
+    </#list>
+</#list>
+
+
+<h3>Numbers</h3>
+
+<#assign
+    one = 1
+    two = 2
+    numbers = [one, two]
+    two = 20
+    numbers2 = [one, two]
+>
+
+<#noparse>
+    <#assign<br />
+        one = 1<br />
+        two = 2<br />
+        numbers = [one, two]<br />
+        two = 20<br />
+        numbers2 = [one, two]<br />
+    ><br />
+</#noparse>
+
+${r"${two}"}: ${two}<br />
+${r"${numbers[1]}"}: ${numbers[1]}<br />
+${r"${numbers2[1]}"}: ${numbers2[1]}<br />
+
+
 <@dump var="now" />
 <@dump var="urls" />
 <@dump var="fruit" />
