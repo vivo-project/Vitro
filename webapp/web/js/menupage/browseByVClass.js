@@ -15,39 +15,57 @@ var browseByVClass = {
     
     // Create references to frequently used elements for convenience
     initObjects: function() {
-        this.vgraphVClasses = $('#vgraph-childClasses');
-        this.vgraphVClassLinks = $('#vgraph-childClasses li a');
-        this.browseVClasses = $('#browse-childClasses');
-        this.browseVClassLinks = $('#browse-childClasses li a');
-        this.selectedBrowseVClass = $('#browse-childClasses li a.selected');
-        this.alphaIndex = $('#alpha-browse-childClass');
-        this.alphaIndexLinks = $('#alpha-browse-childClass li a');
-        this.selectedAlphaIndex = $('#alpha-browse-childClass li a.selected');
-        this.individualsInVClass = $('#individuals-in-childClass ul');
+        this.vgraphVClasses = $('#vgraph-classes');
+        this.vgraphVClassLinks = $('#vgraph-classes li a');
+        this.browseVClasses = $('#browse-classes');
+        this.browseVClassLinks = $('#browse-classes li a');
+        this.selectedBrowseVClass = $('#browse-classes li a.selected');
+        this.alphaIndex = $('#alpha-browse-individuals');
+        this.alphaIndexLinks = $('#alpha-browse-individuals li a');
+        this.selectedAlphaIndex = $('#alpha-browse-individuals li a.selected');
+        this.paginationNav = $('nav.pagination');
+        this.paginationLinks = $('nav.pagination li a');
+        this.individualsInVClass = $('#individuals-in-class ul');
+        this.individualsContainer = $('#individuals-in-class');
     },
     
     // Event listeners. Called on page load
     bindEventListeners: function() {
         // Listeners for vClass switching
         this.vgraphVClassLinks.click(function() {
-            uri = $(this).attr("data-uri");
+            uri = $(this).attr('data-uri');
             browseByVClass.getIndividuals(uri);
         });
         
         this.browseVClassLinks.click(function() {
-            uri = $(this).attr("data-uri");
+            uri = $(this).attr('data-uri');
             browseByVClass.getIndividuals(uri);
             return false;
-        })
+        });
         
         // Listener for alpha switching
         this.alphaIndexLinks.click(function() {
-            uri = $('#browse-childClasses li a.selected').attr("data-uri");
-            alpha = $(this).attr("data-alpha");
+            uri = $('#browse-classes li a.selected').attr('data-uri');
+            alpha = $(this).attr('data-alpha');
             // alpha = $(this).text().substring(0, 1);
             browseByVClass.getIndividuals(uri, alpha);
             return false;
-        })
+        });
+        
+        // Call the pagination listener
+        this.paginationListener();
+    },
+    
+    paginationListener: function() {
+        // Listener for page switching
+        // separate from the rest because it needs to be callable
+        $('nav.pagination li a').click(function() {
+            uri = $('#browse-classes li a.selected').attr('data-uri');
+            alpha = $('#alpha-browse-individuals li a.selected').attr('data-alpha');
+            page = $(this).attr('class').substring(4,5);
+            browseByVClass.getIndividuals(uri, alpha, page);
+            return false;
+        });
     },
     
     // Load individuals for default class as specified by menupage template
@@ -57,16 +75,54 @@ var browseByVClass = {
         }
     },
     
-    getIndividuals: function(vclassUri, alpha) {
+    getIndividuals: function(vclassUri, alpha, page) {
         url = this.dataServiceUrl + encodeURIComponent(vclassUri);
         if ( alpha && alpha != "all") {
-            url = url + '&alpha=' + alpha;
+            url += '&alpha=' + alpha;
+        }
+        if ( page ) {
+            url += '&page=' + page;
+        } else {
+            page = 1;
         }
         
-        // First wipe currently displayed individuals
+        // First wipe currently displayed individuals and existing pagination
         this.individualsInVClass.empty();
+        $('nav.pagination').remove();
         
         $.getJSON(url, function(results) {
+            // Check to see if we're dealing with pagination
+            if ( results.pages.length ) {
+                pages = results.pages;
+                
+                pagination = '<nav class="pagination menupage">';
+                pagination += '<h3>page</h3>';
+                pagination += '<ul>';
+                $.each(pages, function(i, item) {
+                    anchorOpen = '<a class="page'+ pages[i].text +' round" href="#" title="View page '+ pages[i].text +' of the results">';
+                    anchorClose = '</a>';
+                    
+                    pagination += '<li class="page'+ pages[i].text;
+                    pagination += ' round';
+                    // Test for active page
+                    if ( pages[i].text == page) {
+                        pagination += ' selected';
+                        anchorOpen = "";
+                        anchorClose = "";
+                    }
+                    pagination += '" role="listitem">';
+                    pagination += anchorOpen;
+                    pagination += pages[i].text;
+                    pagination += anchorClose;
+                    pagination += '</li>';
+                })
+                pagination += '</ul>';
+                
+                // Add the pagination above the list of individuals and call the listener
+                browseByVClass.individualsContainer.prepend(pagination);
+                browseByVClass.paginationListener();
+            }
+            
             $.each(results.individuals, function(i, item) {
                 label = results.individuals[i].label;
                 moniker = results.individuals[i].moniker;
@@ -91,7 +147,13 @@ var browseByVClass = {
                 listItem += '</li>';
                 browseByVClass.individualsInVClass.append(listItem);
             })
-            // set selected class and alpha
+            
+            // Add the pagination below the list as well
+            if ( results.pages.length ) {
+                browseByVClass.individualsContainer.append(pagination);
+            }
+            
+            // set selected class, alpha and page
             browseByVClass.selectedVClass(results.vclass.URI);
             browseByVClass.selectedAlpha(alpha);
         });
@@ -99,12 +161,12 @@ var browseByVClass = {
     
     selectedVClass: function(vclassUri) {
         // Remove active class on all vClasses
-        $('#browse-childClasses li a.selected').removeClass('selected');
+        $('#browse-classes li a.selected').removeClass('selected');
         // Can't figure out why using this.selectedBrowseVClass doesn't work here
         // this.selectedBrowseVClass.removeClass('selected');
         
         // Add active class for requested vClass
-        $('#browse-childClasses li a[data-uri="'+ vclassUri +'"]').addClass('selected');
+        $('#browse-classes li a[data-uri="'+ vclassUri +'"]').addClass('selected');
     },
 
     selectedAlpha: function(alpha) {
@@ -113,10 +175,10 @@ var browseByVClass = {
             alpha = "all";
         }
         // Remove active class on all letters
-        $('#alpha-browse-childClass li a.selected').removeClass('selected');
+        $('#alpha-browse-individuals li a.selected').removeClass('selected');
         
         // Add active class for requested alpha
-        $('#alpha-browse-childClass li a[data-alpha="'+ alpha +'"]').addClass('selected');
+        $('#alpha-browse-individuals li a[data-alpha="'+ alpha +'"]').addClass('selected');
     }
 };
 
