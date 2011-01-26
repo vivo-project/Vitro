@@ -360,7 +360,9 @@ public class IndividualSDB extends IndividualImpl implements Individual {
                                 portalSet+=",";
                             }
                             portalSet+=Integer.toString(portalNumber);
-                        } catch (Exception e) {}
+                        } catch (Exception e) {
+                        	log.error(e,e);
+                        }
                     }
                 }
             }finally{
@@ -418,7 +420,9 @@ public class IndividualSDB extends IndividualImpl implements Individual {
                                 flagSet+=",";
                             }
                             flagSet+=flagValue;
-                        } catch (Exception e) {}
+                        } catch (Exception e) {
+                        	log.error(e,e);
+                        }
                     }
                 }
             }finally{
@@ -583,7 +587,9 @@ public class IndividualSDB extends IndividualImpl implements Individual {
                                  preferredClass.getName();
                             }
                         }
-                	} catch (Exception e) {}
+                	} catch (Exception e) {
+                		log.error(e,e);
+                	}
                 }
                 return moniker;
             } finally {
@@ -664,15 +670,13 @@ public class IndividualSDB extends IndividualImpl implements Individual {
             Dataset dataset = w.getDataset();
         	dataset.getLock().enterCriticalSection(Lock.READ);
             try{
-                try {
-                    searchBoost = 
-                        ((Literal)QueryExecutionFactory.create(
-                                QueryFactory.create(getPropertyValue), dataset)
-                                        .execSelect()).getFloat();
-                } catch (Exception e) {
-                    searchBoost = null;
-                }                
+                searchBoost = ((Literal)QueryExecutionFactory.create(
+                		QueryFactory.create(getPropertyValue),
+                		dataset).execSelect()).getFloat();
                 return searchBoost;
+            } catch (Exception e){
+            	log.error(e,e); 
+                return null;            	
             }finally{
             	dataset.getLock().leaveCriticalSection();
             	w.close();
