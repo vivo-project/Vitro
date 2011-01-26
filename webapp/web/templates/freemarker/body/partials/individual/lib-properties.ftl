@@ -45,7 +45,7 @@ name will be used as the label. -->
 <#macro addLinkWithLabel property editable label="${property.name?capitalize}">
     <#local addLink><@addLink property editable /></#local>
     <#if addLink?has_content>
-        <h3 id="${property.localName}">${label} ${addLink}</h3> 
+        <h2 id="${property.localName}">${label} ${addLink}</h2> 
     </#if>
 </#macro>
 

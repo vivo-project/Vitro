@@ -6,20 +6,16 @@
 /* ADMIN PANEL------>  */
 #admin{
     font-size: .8em;
-    background-color: #f2f9fb;
     padding-top: 0;
     padding-right: 40px;
 }
 #admin h3{
     display: inline-block;
-    background-color: #2a98bd;
     padding: 3px 6px 3px 10px;
-    color: #fff;
     margin-bottom: 5px;
     font-size: 14px;
 }
 #admin .uri-link {
-    color: #888c8c;
     padding-left: 11px;
     padding-bottom: 5px;
 }
@@ -27,12 +23,9 @@
     padding-left: 5px;
     border-left: none;
 }
-#admin a{
-    color: #2a98bc;
-}
 /* <------ INDIVIDUAL INTRO FOR ANY CLASS*/
 #individual-intro{
-    margin-top: 0;
+    margin-top: 15px;
     margin-bottom: 20px;
     position: relative;
     overflow: hidden;
@@ -44,48 +37,37 @@
     padding-left: 10px;
     margin-left: 10px;
 }
-#individual-intro #individual-info h3{
+#individual-info h3{
     padding-bottom: 5px;
     margin-top: 5px;
-}
-#individual-intro #share-contact h3{
-    padding-bottom: .3em;
-    margin-top: 0;
-    padding-top: 0;
+    clear: left;
 }
 #individual-intro a.icon-rdf{
     font-size: 1.125em;
 }
-#individual-intro .individual-overview{
-    margin-bottom: 30px;
-    margin-top: 10px;
-    display: inline;
-    clear: both;
-}
 ul#links-additional{
-    margin-bottom: 20px;
+    margin-bottom: 5px;
 }
 /* <------ INDIVIDUAL INTRO FOR PERSON*/
-#individual-intro-person{
-    margin-top: 0.5em;
+#individual-intro.person{
     margin-bottom: 30px;
     position: relative;
     width: 100%;
 }
-#individual-intro-person #individual-info{
+#individual-intro.person #individual-info{
     float: left;
     width: 78%;
     margin-bottom: 20px;
 }
-#individual-intro-person .individual-overview{
+#individual-intro.person .individual-overview{
     width: 100%;
+    float: none;
 }
 /* <------ INDIVIDUAL INTRO - LEFT SIDE CONTENT */
 #share-contact{
     position: relative;
     width: 166px;
     float: left;
-    padding-left: 0.5em;
     padding-right: 1.5em;
     margin-bottom: 20px;
 }
@@ -96,24 +78,26 @@ ul#links-additional{
     line-height: 1.2em;
     padding-top: 0;
 }
-#share-contact img.individual-photo{
+img.individual-photo{
     width: 160px;
     height: 160px;
     margin-left: 0;
-}
-img.individual-photo{
-    border: 7px solid #ebebeb;
     float: left;
     margin-right: 20px;
     margin-bottom: 20px;
-    margin-left: .5em;
 }
-#share-contact #mainImage{
+#mainImage{
     position: absolute;
     padding: 5px 5px 8px 5px;
     background-color: #fff;
-    top: 123px;
-    right: 23px;
+    top: 126px;
+    right: 27px;
+}
+h2#mainImage, #share-contact h2{
+    font-size: 1em;
+    line-height: 1em;
+    margin-top: 15px;
+    padding-bottom: 0.3em
 }
 ul#individual-tools-people{
     margin-top: 5px;
@@ -183,14 +167,18 @@ ul.individual-urls-people li{
     font-size: .875em;
     line-height: 1.3em;
 }
+#photo-wrapper{
+    position: relative;
+    float: left;
+}
 /* <------ INDIVIDUAL INTRO - RIGHT SIDE CONTENT */
-#individual-intro #individual-info{
+#individual-info{
     padding: 0;
     float: left;
-    width: 78%;
+    width: 98%;
 }
-#individual-info h1.fn{
-    /*padding-bottom: 12px;*/
+#individual-info.withThumb{
+    width: 78%;
 }
 h1.fn .preferred-title {
     padding-left: 10px;
@@ -200,17 +188,14 @@ h1.fn .preferred-title {
     padding-bottom: 10px;
 }
 ul#individual-positions{
-    padding-bottom: 10px;
     list-style-type: circle;
     padding-left: 20px;
 }
 ul#individual-positions li{
     line-height: 1em;
 }
-.individual-overview{
-    font-size: 1em;
-    padding-bottom: 0;
-    line-height: 1.3em;
+ul#individual-positions li:last-child{
+    padding-bottom: 15px;
 }
 ul#individual-areas{
     padding-bottom: 24px;
@@ -224,6 +209,18 @@ ul#individual-areas li{
 ul#individual-areas li:first-child{
     padding-left: 0;
 }
+#individual-info nav{
+    float: left;
+    width: 78%;
+    clear: left;
+}
+#individual-intro .individual-overview{
+    margin-bottom: 30px;
+    margin-top: 10px;
+    display: inline;
+    clear: both;
+    float: left;
+}
 /* <------ INDIVIDUAL VISUALIZATION */
 #visualization{
     float: right;
@@ -231,7 +228,7 @@ ul#individual-areas li:first-child{
 }
 /* <------ SPARKLINES  */
 #sparklines-publications{
-    padding: 0 10px 35px 30px;
+    padding: 0 0 40px 30px;
     padding-top: 0;
     float: right;
     background-color: #fff;
@@ -243,22 +240,6 @@ ul#individual-areas li:first-child{
 .publication-year-range{
     display: block;
     padding-top: 5px;
-}
-/* <------ TEMPORAL GRAPH  */
-#temporal-graph{
-    padding: 0 3px 20px 0;
-    background-color: #fff;
-    /* 
-    position: absolute;
-    padding: 0 3px 20px 10px;
-    background-color: #fff;
-    top: 0;
-    right: 0
-    */
-}
-#temporal-graph h3 img{
-    padding-right: 10px;
-    vertical-align: text-top;
 }
 /* <------ COAUTHORS */
 #co-authors{
@@ -292,7 +273,6 @@ p.view-all-coauthors{
 }
 #property-group-menu ul{
     display: block;
-    color: #5e6363;
 }
 #property-group-menu li{
     float: left;
@@ -355,12 +335,6 @@ article.property ul.property-list li{
 article.property ul.subclass-property-list{
     margin-left: 0;
 }
-#share-contact h3{
-    margin-top: 15px;
-    padding-bottom: .3em;
-    font-size: 1em;
-    line-height: 1em;
-}
 article.property ul.subclass-property-list li{
     line-height: 1.2em;
     padding: 0 20px 10px 20px;
@@ -377,7 +351,6 @@ article.property ul.subclass-property-list li{
     margin-left: 2px;
 }
 .edit-individual{
-    border-left: 1px dotted #B2D15A;
     margin-left: 10px;
     padding-left: 8px;
     padding-right: 1px;
@@ -391,7 +364,7 @@ article.property ul.subclass-property-list li{
     background: #fff;
     padding: 0 6px 0 0;
     top: 143px;
-    left: 119px;
+    left: 110px;
 }
 a.edit-mainImage img.edit-individual{
     border: 0;
@@ -401,7 +374,7 @@ a.edit-mainImage img.edit-individual{
 .delete-mainImage{
     position: absolute;
     top: 143px;
-    left: 149px;
+    left: 140px;
     background: #fff;
     padding: 0 6px 0 8px;
 }

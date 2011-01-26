@@ -3,16 +3,24 @@
 <#-- Default individual profile page template -->
 
 <section id="individual-intro" class="vcard" role="region">
-    
     <#-- Image -->
-    <@p.imageLinks individual=individual 
-                   propertyGroups=propertyGroups 
-                   namespaces=namespaces 
-                   editable=editable 
-                   showPlaceholder="with_add_link" 
-                   placeholder="${urls.images}/placeholders/person.thumbnail.jpg" />
+    <#assign individualImage>
+        <@p.imageLinks individual=individual 
+                       propertyGroups=propertyGroups 
+                       namespaces=namespaces 
+                       editable=editable 
+                       showPlaceholder="with_add_link" 
+                       placeholder="${urls.images}/placeholders/non.person.thumbnail.jpg" />
+    </#assign>
     
-    <section id="individual-info" role="region">
+    <#-- <#if ( individualImage?matches('<img class="individual-photo"')?size > 0 )> -->
+    <#if ( individualImage?contains('<img class="individual-photo"') )>
+        <#assign infoClass = 'class="withThumb"'/>
+    </#if>
+    
+    <div id="photo-wrapper">${individualImage}</div>
+    
+    <section id="individual-info" ${infoClass!} role="region">
         <#if individual.showAdminPanel>
                <#include "individual-adminPanel.ftl">
         </#if>
