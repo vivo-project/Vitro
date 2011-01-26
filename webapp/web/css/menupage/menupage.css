@@ -3,86 +3,63 @@
 @charset "UTF-8";
 /* CSS Document */
 
-/* VISUAL GRAPH FOAF:PERSON------>  */
-#intro-menupage{
+/* VISUAL GRAPH----->  */
+#menupage-intro{
     clear: both;
     width: 100%;
     margin: 1em auto;
 /*    padding-top: 30px;  nac26: not sure we need all this space up top*/
 /*    margin-bottom: 30px;*/
 }
-#intro-menupage  h3{
+#menupage-intro  h3{
     padding: 0 25px 15px 0;
     padding-bottom: 20px;
 }
-#content-foaf-person{
-    float: left;
-    width: 64%;
-    margin-bottom: 30px;
-}
-#content-foaf-person h4{
-    padding: 20px 25px 12px 0;
-}
-ul#foaf-person-childClasses{
-    float: left;
-    width: 265px;
-    margin-left: 45px;
-}
-ul#foaf-person-childClasses li{
-    display: block;
-    height: 35px;
-    line-height: 35px;
-}
-ul#foaf-person-childClasses li:last-child{    
-    border-bottom: 0; 
-}
-ul#foaf-person-childClasses a{
-    display: block;
-    padding-left: 15px;
-    width: 265px;
-    height: 35px;
-}
-#foaf-person-graph{
-    float: right;
-    width: 270px;
-    height: 270px;
-}
-/* VISUAL GRAPH CLASS:GENERIC (ORGANIZATION, RESEARCH, EVENT) ------>  */
-#content-generic-class{
+#menupage-content{
     float: left;
     width: 90%;
     margin-bottom: 30px;
 }
-#content-generic-class h3{
+#menupage-content.people{
+    width: 68%;
+}
+#menupage-content h3{
     padding: 0 25px 15px 0;
 }
-#content-generic-class h4{
+#menupage-content h4{
     padding: 20px 25px 12px 0;
 }
-ul#vgraph-childClasses{
+ul#vgraph-classes{
     float: left;
     width: 265px;
     margin-left: 35px;
 }
-ul#vgraph-childClasses li{
+ul#vgraph-classes li{
     display: block;
     height: 35px;
     line-height: 35px;
 }
-ul#vgraph-childClasses li:last-child {
+ul#vgraph-classes li:last-child {
     border-bottom: 0;
 }
-ul#vgraph-childClasses a{
+ul#vgraph-classes a{
     display: block;
     padding-left: 15px;
     width: 265px;
     height: 35px;
 }
-#generic-class-graph{
+#menupage-graph{
     float: right;
     width: 500px;
     height: 283px;
     padding-right: 20px;
+    border: 1px dotted #ccc;
+}
+#menupage-graph.people{
+    width: 270px;
+    height: 270px;
+    padding-right: 0;
+    border: none;
 }
 /* FIND BY ------>  */
 #find-by{
@@ -215,45 +192,45 @@ ul#find-filters a{
     margin-bottom: 27px;
 }
 /* BROWSE CLASSES ------>  */
-ul#browse-childClasses{
+ul#browse-classes{
     float: left;
     width: 255px;
     margin-left: 15px;
     margin-bottom: 20px;
 }
-ul#browse-childClasses li{
+ul#browse-classes li{
     display: block;
-    width: 264px;
+    width: 245px;
     height: 35px;
     line-height: 35px;
     margin-left: 10px;
     margin-right: 10px;
 }
-ul#browse-childClasses li:last-child{    
+ul#browse-classes li:last-child{    
     border-bottom: 0;
 }
-ul#browse-childClasses a{
+ul#browse-classes a{
     display: block;
     padding-left: 20px;
     width: 264px;
     height: 35px;
 }
 /* ALPHA BROWSE------>  */
-ul#alpha-browse-childClass{
+ul#alpha-browse-individuals{
     float: left;
     width: 620px;
     padding-left: 10px;
     list-style: none;
 }
-ul#alpha-browse-childClass li{
+ul#alpha-browse-individuals li{
     float: left;
     margin-right: 4px;
     padding-top: 8px;
 }
-ul#alpha-browse-childClass li:last-child{
+ul#alpha-browse-individuals li:last-child{
     border-bottom: 0;
 }
-ul#alpha-browse-childClass a{
+ul#alpha-browse-individuals a{
     display: block;
     height: 35px;
     margin-left: 0;
@@ -261,7 +238,7 @@ ul#alpha-browse-childClass a{
     width: 10px;
 }
 /* BROWSE INDIVIDUALS------>  */
-#individuals-in-childClass{
+#individuals-in-class{
     float: right;
     width: 68%;
     padding-bottom: 30px;
@@ -269,37 +246,77 @@ ul#alpha-browse-childClass a{
     margin-right: 17px;
     min-height: 170px;
 }
-#individuals-in-childClass h3{
-    padding: 10px 0 10px 30px;
-}
-#individuals-in-childClass ul{
+#individuals-in-class ul{
     list-style: none;
 }
-#individuals-in-childClass li{
+li.individual {
     width: 90%;
     padding: 20px 0;
     margin-left: 30px;
     margin-right: 30px;
     overflow: hidden;
 }
-#individuals-in-childClass li img{
+li.individual img{
     float: left;
     margin-right: 20px;
 }
-#individuals-in-childClass li h1{
+li.individual h1{
     padding: 0;
     line-height: 1.2;
     font-weight: bold;
 }
-#individuals-in-childClass li h1.thumb{
+li.individual h1.thumb{
     padding-top: 30px;
 }
-#individuals-in-childClass span.title{
+#individuals-in-class span.title{
     display: block;
     margin: 0.8em 0 0 0;
     font-size: 0.8em;
     line-height: 1;
 }
-#individuals-in-childClass span.org{
+#individuals-in-class span.org{
     display: block;
+}
+nav.pagination{
+    margin: 0.3em 0 0 1.4em;
+}
+nav.pagination h3{
+    display: inline;
+    margin: 0 0.3em 0 0;
+    padding: 0;
+    font-size: 1.1em;
+    color: #666;
+}
+nav.pagination ul{
+    display: inline;
+}
+nav.pagination li{
+    display: inline-block;
+    margin: 0;
+/*    padding: 0.1em 0.6em;*/
+    border: none;
+}
+nav.pagination li.selected{
+    padding: 0 0.6em;
+    color: #fff;
+    background: #333;
+}
+nav.pagination li a{
+    padding: 0.1em 0.6em;
+    border: none;
+}
+nav.pagination li a:hover{
+    background: #ddd;
+    border: none;
+}
+nav.pagination li.selected a{
+    color: #fff;
+}
+nav.pagination li.selected a:hover{
+    background: #333;
+}
+nav.pagination .round{
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
 }
