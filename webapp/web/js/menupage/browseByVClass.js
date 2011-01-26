@@ -118,8 +118,9 @@ var browseByVClass = {
                 })
                 pagination += '</ul>';
                 
-                // Add the pagination above the list of individuals and call the listener
+                // Add the pagination above and below the list of individuals and call the listener
                 browseByVClass.individualsContainer.prepend(pagination);
+                browseByVClass.individualsContainer.append(pagination);
                 browseByVClass.paginationListener();
             }
             
@@ -147,11 +148,6 @@ var browseByVClass = {
                 listItem += '</li>';
                 browseByVClass.individualsInVClass.append(listItem);
             })
-            
-            // Add the pagination below the list as well
-            if ( results.pages.length ) {
-                browseByVClass.individualsContainer.append(pagination);
-            }
             
             // set selected class, alpha and page
             browseByVClass.selectedVClass(results.vclass.URI);
