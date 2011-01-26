@@ -130,6 +130,7 @@ public class SelfEditingIdentifierFactory implements IdentifierBundleFactory {
 		if (uri == null) {
 			log.debug("Could not find an Individual with a netId of "
 					+ username);
+			return null;
 		}
 
 		Individual ind = indDao.getIndividualByURI(uri);
