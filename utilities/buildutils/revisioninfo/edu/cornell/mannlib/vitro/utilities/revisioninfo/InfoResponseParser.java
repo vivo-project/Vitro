@@ -72,7 +72,7 @@ public class InfoResponseParser {
 			throws Exception {
 		Matcher matcher = pattern.matcher(infoResponse);
 		if (!matcher.find()) {
-			throw new Exception("no match with '" + pattern + "'.");
+			throw new Exception("no match with '" + pattern + "'. Is your Subversion client out of date?");
 		}
 
 		String value = matcher.group(groupIndex);
