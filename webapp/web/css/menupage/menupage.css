@@ -297,23 +297,19 @@ nav.pagination li{
     border: none;
 }
 nav.pagination li.selected{
-    padding: 0 0.6em;
-    color: #fff;
-    background: #333;
+    padding: 0 0.4em;
+    line-height: 1.5;
+    color: #333;
+    background: #ddd;
 }
 nav.pagination li a{
-    padding: 0.1em 0.6em;
+    padding: 0 0.4em;
     border: none;
 }
 nav.pagination li a:hover{
-    background: #ddd;
-    border: none;
-}
-nav.pagination li.selected a{
     color: #fff;
-}
-nav.pagination li.selected a:hover{
     background: #333;
+    border: none;
 }
 nav.pagination .round{
     -moz-border-radius: 3px;
