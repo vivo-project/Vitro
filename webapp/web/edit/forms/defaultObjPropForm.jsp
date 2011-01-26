@@ -27,7 +27,9 @@
 <%@page import="java.util.Map"%>
 <%@page import="com.hp.hpl.jena.ontology.OntModel"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch"%>
-<%@page import="edu.cornell.mannlib.vitro.webapp.web.DisplayVocabulary"%><v:jsonset var="queryForInverse" >
+<%@page import="edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary"%>
+
+<v:jsonset var="queryForInverse" >
     PREFIX owl:  <http://www.w3.org/2002/07/owl#>
     SELECT ?inverse_property
     WHERE {
