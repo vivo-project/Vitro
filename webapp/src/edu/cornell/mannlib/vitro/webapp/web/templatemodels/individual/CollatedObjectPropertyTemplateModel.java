@@ -96,7 +96,7 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
     
     @Override
     protected void removeDuplicates(List<Map<String, String>> data) {
-        filterSubclasses(data);
+       filterSubclasses(data);
     }
     
     /*
@@ -124,10 +124,6 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
                 continue;
             }
             processedObjects.add(objectUri);
-            String subclassUri = outerMap.get(SUBCLASS_VARIABLE_NAME);
-            if (subclassUri == null) {
-                continue;
-            }
             List<Map<String, String>> dataForThisObject = new ArrayList<Map<String, String>>();
             for (Map<String, String> innerMap : statementData) {
                 if ( innerMap.get(objectVariableName) == objectUri ) {
