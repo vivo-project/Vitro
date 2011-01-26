@@ -2,7 +2,7 @@
 /* browseIndex.css contains styles used in the Index pages.  */
 
 /* INDIVIDUAL LIST ------>  */
-.individualList ul.individualData li{
+.individualList ul.individualData li {
     padding-bottom: 0;
     display: inline;
     padding-right: .3em;
@@ -10,15 +10,17 @@
 .pagination {
     display: inline-block;
 }
-.pagination li{
+.pagination li {
     display: inline-block;
     padding-right: 2px;
 }
-.pagination li.selectedNavPage{
+.pagination li.selectedNavPage {
     font-size: 1em;
 }
 .rdfLink {
+    padding-left: 0.5em;
     font-size: 0.8em;
+    border-left: 1px solid #a6b1b0;
 }
 .individualList a.externalLink {
     text-decoration: none;
@@ -36,7 +38,7 @@
 .individualList li { 
     list-style-type: none;
     margin-bottom: .5em;
- }
+}
 .individualList li a { 
     font-weight: normal; 
 }
