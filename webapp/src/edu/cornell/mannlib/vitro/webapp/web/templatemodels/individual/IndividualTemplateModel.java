@@ -44,20 +44,9 @@ public class IndividualTemplateModel extends BaseTemplateModel {
         this.urlBuilder = new UrlBuilder(vreq.getPortal());
         
         // If editing, create a helper object to check requested actions against policies
-        if (isEditable(loginStatusBean)) {
+        if (isEditable()) {
             policyHelper = new EditingPolicyHelper(vreq, getServletContext());
         } 
-    }
-
-    /** 
-     * Return true iff the user is editing. 
-     * These tests may change once self-editing issues are straightened out. What we really need to know
-     * is whether the user can edit this profile, not whether in general he/she is an editor.
-     */
-    private boolean isEditable(LoginStatusBean loginStatusBean) { 
-        boolean isSelfEditing = VitroRequestPrep.isSelfEditing(vreq);
-        boolean isCurator = loginStatusBean.isLoggedInAtLeast(LoginStatusBean.CURATOR);
-        return isSelfEditing || isCurator;
     }
     
     private boolean isVClass(String vClassUri) {
@@ -165,9 +154,9 @@ public class IndividualTemplateModel extends BaseTemplateModel {
     
     public boolean isEditable() {
         // RY This will be improved later. What is important is not whether the user is a self-editor,
-        // but whether he has editing privileges on this profile.
-        return VitroRequestPrep.isSelfEditing(vreq) || 
-            loginStatusBean.isLoggedInAtLeast(LoginStatusBean.NON_EDITOR);
+        // but whether he has editing privileges on this profile. This is just a crude way of determining
+        // whether to even bother looking at the editing policies.
+        return VitroRequestPrep.isSelfEditing(vreq) || loginStatusBean.isLoggedIn();            
     }
     
     public boolean getShowAdminPanel() {
