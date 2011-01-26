@@ -30,7 +30,7 @@ ${stylesheets.add("/css/browseIndex.css")}
             </#if>
         </#assign>
         
-        ${pagination} \
+        ${pagination}
         
         <ul>
             <#list individuals as individual>
