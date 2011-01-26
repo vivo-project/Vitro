@@ -37,7 +37,6 @@ import com.hp.hpl.jena.sdb.store.DatabaseType;
 import com.hp.hpl.jena.sdb.store.LayoutType;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
-import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
@@ -58,7 +57,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.jena.NamespaceMapperJena;
 
 public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements javax.servlet.ServletContextListener {
     
-    private static final Log log = LogFactory.getLog(JenaDataSourceSetup.class.getName());
+    private static final Log log = LogFactory.getLog(JenaDataSourceSetupSDB.class);
     
     public void contextInitialized(ServletContextEvent sce) {
         try {
