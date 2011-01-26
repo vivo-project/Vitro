@@ -18,6 +18,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
 
+import com.hp.hpl.jena.datatypes.RDFDatatype;
+import com.hp.hpl.jena.datatypes.xsd.XSDDateTime;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.ontology.OntResource;
@@ -435,89 +437,68 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     public Date getSunrise() {
         if( this.sunrise == null ){            
             String[] graphVars = { "?g" };
-            String getPropertyValue = 
-                "SELECT ?value" +
+            String queryStr = 
+                "SELECT ?value " +
                 "WHERE { GRAPH ?g { <" + individualURI + "> " + 
                         "<" + webappDaoFactory.getJenaBaseDao().SUNRISE + "> " + 
                         "?value} \n" + 
-                        WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode) +
+                        //WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode) +
                         "}";
             DatasetWrapper w = getDatasetWrapper();
             Dataset dataset = w.getDataset();
             dataset.getLock().enterCriticalSection(Lock.READ);
             try{            
-                sunrise =(Date) 
-                ((Literal)QueryExecutionFactory.create(QueryFactory.create(getPropertyValue), dataset)
-                                    .execSelect()).getValue();                                                
+                ResultSet rs = QueryExecutionFactory.create(QueryFactory.create(queryStr), dataset)
+                    .execSelect();
+                if( rs.hasNext()){
+                    QuerySolution qs = rs.nextSolution();
+                    if( qs.get("value") != null ){
+                        Literal value = qs.get("value").asLiteral();
+                        RDFDatatype datatype = value.getDatatype();
+                        XSDDateTime xsdDt = (XSDDateTime)datatype.parse( value.getLexicalForm() );
+                        sunrise = xsdDt.asCalendar().getTime();
+                    }
+                }            
             }catch(Exception ex){
                 log.error("could not get sunrise: " + ex.getMessage(),ex);
             }finally{
                 dataset.getLock().leaveCriticalSection();
                 w.close();
             }
-        }
-        
+        }        
         return sunrise;        
-        
-//        if (sunrise != null) {
-//            return sunrise;
-//        } else {
-//            constructProperty(ind, VitroVocabulary.SUNRISE);
-//        	ind.getOntModel().enterCriticalSection(Lock.READ);
-//            try {
-//                sunrise = webappDaoFactory.getJenaBaseDao()
-//                        .getPropertyDateTimeValue(
-//                                ind,webappDaoFactory.getJenaBaseDao().SUNRISE);
-//                return sunrise;
-//            } finally { 
-//            	ind.getOntModel().leaveCriticalSection();
-//            }
-//        }
     }
 
-    public Date getSunset() {
-        
+    public Date getSunset() {        
         if( this.sunset == null ){            
             String[] graphVars = { "?g" };
-            String getPropertyValue = 
-                "SELECT ?value" +
+            String queryStr = 
+                "SELECT ?value " +
                 "WHERE { GRAPH ?g { <" + individualURI + "> " + 
-                        "<"+webappDaoFactory.getJenaBaseDao().SUNSET+"> " + 
-                        "?value} \n" + 
-                        WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode) +
-                        "}";
+                        "<"+webappDaoFactory.getJenaBaseDao().SUNSET+"> ?value} }";
             DatasetWrapper w = getDatasetWrapper();
             Dataset dataset = w.getDataset();
             dataset.getLock().enterCriticalSection(Lock.READ);
-            try{            
-                sunset =(Date) 
-                ((Literal)QueryExecutionFactory.create(QueryFactory.create(getPropertyValue), dataset)
-                                    .execSelect()).getValue();                                                
+            try{          
+                ResultSet rs = QueryExecutionFactory.create(QueryFactory.create(queryStr), dataset)
+                    .execSelect();
+                if( rs.hasNext()){
+                    QuerySolution qs = rs.nextSolution();
+                    if( qs.get("value") != null ){
+                        Literal value = qs.get("value").asLiteral();
+                        RDFDatatype datatype = value.getDatatype();
+                        XSDDateTime xsdDt = (XSDDateTime)datatype.parse( value.getLexicalForm() );
+                        sunset = xsdDt.asCalendar().getTime();
+                    }
+                }
             }catch(Exception ex){
                 log.error("could not get sunset: " + ex.getMessage(),ex);
             }finally{
                 dataset.getLock().leaveCriticalSection();
                 w.close();
             }
-        }
-        
-        return sunset;  
-        
-//        if (sunset != null) {
-//            return sunset;
-//        } else {
-//            constructProperty(ind, VitroVocabulary.SUNSET);
-//        	ind.getOntModel().enterCriticalSection(Lock.READ);
-//            try {
-//                sunset = webappDaoFactory.getJenaBaseDao()
-//                        .getPropertyDateTimeValue(
-//                                ind,webappDaoFactory.getJenaBaseDao().SUNSET);
-//                return sunset;
-//            } finally {
-//                
-//            	ind.getOntModel().leaveCriticalSection();
-//            }
-//        }
+        }        
+        return sunset;          
     }
 
     public Date getTimekey() { 
