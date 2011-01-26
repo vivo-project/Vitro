@@ -14,9 +14,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
+import com.hp.hpl.jena.ontology.DatatypeProperty;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Literal;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 
@@ -130,9 +133,9 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
                     if (vgrp!=null) {
                         classDao.addVClassesToGroup(vgrp, includeUninstantiatedClasses, getIndividualCount);
                         groups.add(vgrp);
-                        java.util.Collections.sort(groups);
                     }
                 }    
+                java.util.Collections.sort(groups);
             } finally {
                 groupIt.close();
             }
@@ -186,9 +189,10 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
         group.setNamespace(groupInd.getNameSpace());
         group.setLocalName(groupInd.getLocalName());
         try {
-            group.setDisplayRank(Integer.decode(((Literal)(groupInd.getProperty(getOntModel().getDatatypeProperty(VitroVocabulary.DISPLAY_RANK)).getObject())).getString()).intValue());
+        	DatatypeProperty drProp = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createDatatypeProperty(VitroVocabulary.DISPLAY_RANK);
+            group.setDisplayRank(Integer.decode(((Literal)(groupInd.getProperty(drProp).getObject())).getString()).intValue());
         } catch (Exception e) {
-            // e.printStackTrace();
+            e.printStackTrace();
         }
         return group;
     }
