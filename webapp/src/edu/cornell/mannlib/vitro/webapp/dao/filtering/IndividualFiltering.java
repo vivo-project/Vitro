@@ -646,4 +646,10 @@ public class IndividualFiltering implements Individual {
         // Since the statements have been filtered, we can just take the first individual without filtering.
         return stmts.isEmpty() ? null : stmts.get(0).getObject();
     }
+
+
+    @Override
+    public boolean hasThumb() {
+        return _innerIndividual.hasThumb();
+    }
 }

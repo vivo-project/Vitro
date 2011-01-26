@@ -221,7 +221,7 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         
         try{
             value = null;
-            if( ent.getThumbUrl() != null )
+            if( ent.hasThumb() )
                 doc.add(new Field(term.THUMBNAIL, "1", Field.Store.YES, Field.Index.NOT_ANALYZED));
             else
                 doc.add(new Field(term.THUMBNAIL, "0", Field.Store.YES, Field.Index.NOT_ANALYZED));
@@ -238,7 +238,7 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         doPortalFlags(ent, doc);
 
         //do flag 2 legacy, only used at Cornell
-        doFlag2( ent, doc );
+        //doFlag2( ent, doc );
         
         //ALLTEXT, all of the 'full text'
         String t=null;
