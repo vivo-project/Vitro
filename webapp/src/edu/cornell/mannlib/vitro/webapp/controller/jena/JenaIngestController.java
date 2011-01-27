@@ -756,14 +756,13 @@ public class JenaIngestController extends BaseEditController {
 			else{
 				destination.add(utils.renameBNodesByPattern(source, namespaceEtc, vreq.getJenaOntModel(), pattern, property));
 			}
-			if(csv2rdf){
+			if(csv2rdf && property!=null){
 				ClosableIterator closeIt = destination.listSubjects();
 				Property prop = ResourceFactory.createProperty(property);
 				try {
 					for (Iterator it = closeIt; it.hasNext();) {
 						Resource res = (Resource) it.next();
 						if (res.isAnon()) {
-							// now we do something hacky to get the same resource in the outModel, since there's no getResourceById();
 							ClosableIterator closfIt = destination.listStatements(res,prop,(RDFNode)null);
 							Statement stmt = null;
 							try {
@@ -777,6 +776,21 @@ public class JenaIngestController extends BaseEditController {
 								Resource outRes = stmt.getSubject();
 								destination.removeAll(outRes,(Property)null,(RDFNode)null);
 							}
+						}
+					}
+				} finally {
+					closeIt.close();
+				}
+				csv2rdf = false;
+				getServletContext().setAttribute("csv2rdf", csv2rdf);
+			}
+			else if(csv2rdf && property == null){
+				ClosableIterator closeIt = destination.listSubjects();
+				try {
+					for (Iterator it = closeIt; it.hasNext();) {
+						Resource res = (Resource) it.next();
+						if (res.isAnon()) {
+								destination.removeAll(res,(Property)null,(RDFNode)null);
 						}
 					}
 				} finally {
