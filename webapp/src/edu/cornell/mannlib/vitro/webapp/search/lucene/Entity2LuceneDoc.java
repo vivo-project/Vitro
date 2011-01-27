@@ -251,20 +251,20 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         value+= " "+ getKeyterms(ent);
 
 
-        List dataPropertyStatements = ent.getDataPropertyStatements();
+        List<DataPropertyStatement> dataPropertyStatements = ent.getDataPropertyStatements();
         if (dataPropertyStatements != null) {
-            Iterator dataPropertyStmtIter = dataPropertyStatements.iterator();
+            Iterator<DataPropertyStatement> dataPropertyStmtIter = dataPropertyStatements.iterator();
             while (dataPropertyStmtIter.hasNext()) {
-                DataPropertyStatement dataPropertyStmt = (DataPropertyStatement) dataPropertyStmtIter.next();
+                DataPropertyStatement dataPropertyStmt =  dataPropertyStmtIter.next();
                 value+= " "+ ( ((t=dataPropertyStmt.getData()) == null)?"":t );
             }
         }
 
-        List objectPropertyStatements = ent.getObjectPropertyStatements();
+        List<ObjectPropertyStatement> objectPropertyStatements = ent.getObjectPropertyStatements();
         if (objectPropertyStatements != null) {
-            Iterator objectPropertyStmtIter = objectPropertyStatements.iterator();
+            Iterator<ObjectPropertyStatement> objectPropertyStmtIter = objectPropertyStatements.iterator();
             while (objectPropertyStmtIter.hasNext()) {
-                ObjectPropertyStatement objectPropertyStmt = (ObjectPropertyStatement) objectPropertyStmtIter.next();
+                ObjectPropertyStatement objectPropertyStmt = objectPropertyStmtIter.next();
                 if( "http://www.w3.org/2002/07/owl#differentFrom".equals(objectPropertyStmt.getPropertyURI()) )
                     continue;
                 try {
