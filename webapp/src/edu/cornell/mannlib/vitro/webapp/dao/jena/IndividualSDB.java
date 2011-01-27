@@ -565,7 +565,8 @@ public class IndividualSDB extends IndividualImpl implements Individual {
                 	    // may have more than 1 VClass
                         List<VClass> clasList = this.getVClasses(true);
                         if (clasList == null || clasList.size() < 2) {
-                            moniker = getVClass().getName();
+                            if( getVClass() != null )
+                                moniker = getVClass().getName();
                         } else {
                             VClass preferredClass = null;
                             for (VClass clas : clasList) {
@@ -644,12 +645,12 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         dataset.getLock().enterCriticalSection(Lock.READ);
         try {
             String[] graphVars = { "?g" };
-            String queryStr = "CONSTRUCT { ?ind <" + 
-                    propertyURI + "> ?value } \n" +
-                    "WHERE { GRAPH ?g {  ?ind <" +
-                    propertyURI + "> ?value } \n" + 
+            String queryStr = 
+                "CONSTRUCT { <"+ind.getURI()+"> <" + propertyURI + "> ?value } \n" +
+                    "WHERE { GRAPH ?g {  \n" +
+                    "<" + ind.getURI() +"> <" + propertyURI + "> ?value } \n" + 
                     WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode) +
-                    "\n} \n";
+                    "\n} ";
             Query query = QueryFactory.create(queryStr);
             QueryExecution qe = QueryExecutionFactory.create(
                     query, dataset);
@@ -666,12 +667,11 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         }else{
             String[] graphVars = { "?g" };
             String getPropertyValue = 
-            	"SELECT ?value" +
-            	"WHERE { GRAPH ?g { <" + individualURI + ">" + 
-            	        webappDaoFactory.getJenaBaseDao().SEARCH_BOOST_ANNOT + 
-            	        "?value} \n" + 
-            	        WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode) +
-            	        "}";
+            	"SELECT ?value \n" +
+            	"WHERE { GRAPH ?g { \n" +
+            	"<" +individualURI+ "> <" +webappDaoFactory.getJenaBaseDao().SEARCH_BOOST_ANNOT+ "> ?value} \n" + 
+            	WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode) + "\n" +
+            	"}";
             DatasetWrapper w = getDatasetWrapper();
             Dataset dataset = w.getDataset();
         	dataset.getLock().enterCriticalSection(Lock.READ);
