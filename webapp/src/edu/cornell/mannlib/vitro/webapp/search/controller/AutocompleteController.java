@@ -270,7 +270,7 @@ public class AutocompleteController extends FreemarkerHttpServlet{
             
             log.debug("Name query is: " + boolQuery.toString());
         } catch (ParseException e) {
-            log.warn(e);
+            log.warn(e, e);
         }
         
         
