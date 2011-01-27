@@ -110,7 +110,7 @@ public class EntityController extends VitroHttpServlet {
             return;
             
         } catch (Throwable e) {
-            log.error(e);
+            log.error(e, e);
             req.setAttribute("javax.servlet.jsp.jspException",e);
             RequestDispatcher rd = req.getRequestDispatcher("/error.jsp");
             rd.forward(req, res);

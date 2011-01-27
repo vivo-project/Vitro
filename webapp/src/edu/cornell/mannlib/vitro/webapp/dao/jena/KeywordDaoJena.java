@@ -155,7 +155,7 @@ public class KeywordDaoJena extends JenaBaseDao implements KeywordDao {
         try {
         	keywordURI = webappDaoFactory.getIndividualDao().insertNewIndividual(keywordIndividual);
         } catch (InsertException e) {
-        	log.error(e);
+        	log.error(e, e);
         }
       log.debug("KeywordDaoJena.insertNewKeyword() : "+keywordURI);
         

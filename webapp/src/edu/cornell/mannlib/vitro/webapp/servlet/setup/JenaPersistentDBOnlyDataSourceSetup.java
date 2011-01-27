@@ -81,7 +81,7 @@ public class JenaPersistentDBOnlyDataSourceSetup extends JenaDataSourceSetupBase
         	OntModel infDbModel = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC,infDbPlainModel);
         	sce.getServletContext().setAttribute("inferenceOntModel",infDbModel);
         } catch (Throwable e) {
-        	log.error(e);
+        	log.error(e, e);
         }
            
         sce.getServletContext().setAttribute("jenaOntModel", memModel);

@@ -138,7 +138,7 @@ public class IndividualController extends FreemarkerHttpServlet {
 	        return new TemplateResponseValues(template, body);
         
 	    } catch (Throwable e) {
-	        log.error(e);
+	        log.error(e, e);
 	        return new ExceptionResponseValues(e);
 	    }
     }

@@ -1431,7 +1431,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
 
     		
     	} catch (Exception e) {
-    		log.error(e);
+    		log.error(e, e);
     	}
     }
     

@@ -70,7 +70,7 @@ public class PageController extends FreemarkerHttpServlet{
             ResponseValues rv = new TemplateResponseValues(getTemplate( mapForTemplate ), mapForTemplate);            
             return rv;
         } catch (Throwable e) {
-            log.error(e);
+            log.error(e, e);
             return new ExceptionResponseValues(e);
         }
     }

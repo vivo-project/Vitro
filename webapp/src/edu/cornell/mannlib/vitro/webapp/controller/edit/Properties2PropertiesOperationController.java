@@ -67,7 +67,7 @@ public class Properties2PropertiesOperationController extends
 		        try {
 		            response.sendRedirect(defaultLandingPage);
 		        } catch (IOException e) {
-		            log.error(e);
+		            log.error(e, e);
 		        }
 		        return;
 		    }

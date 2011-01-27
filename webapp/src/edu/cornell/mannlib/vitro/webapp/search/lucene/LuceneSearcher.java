@@ -324,9 +324,9 @@ public class LuceneSearcher implements Searcher {
             }
             highlighter = new LuceneHighlighter( query, analyzer );
         } catch (SearchException e) {
-            log.error(e);
+            log.error(e, e);
         } catch (IOException e) {
-            log.error(e);
+            log.error(e, e);
         }
         return   (VitroHighlighter)highlighter;
     }

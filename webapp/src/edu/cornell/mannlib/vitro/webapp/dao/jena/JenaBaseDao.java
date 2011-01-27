@@ -475,7 +475,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
             }
         } catch (Exception e) {
             log.error("Error in updatePropertyDateTimeValue");
-            log.error(e);
+            log.error(e, e);
         }
     }
 

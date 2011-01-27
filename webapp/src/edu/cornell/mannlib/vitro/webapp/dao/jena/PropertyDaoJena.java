@@ -129,7 +129,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
                 } catch (Exception cce) {}
             }
 	    } catch (Exception e) {
-	    	log.error(e); 
+	    	log.error(e, e); 
     	} finally {
     		getOntModel().leaveCriticalSection();
     	}
@@ -170,7 +170,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
                 } catch (Exception cce) {}
             }
 	    } catch (Exception e) {
-	    	log.error(e); 
+	    	log.error(e, e); 
     	} finally {
     		getOntModel().leaveCriticalSection();
     	}
@@ -250,7 +250,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
                 }
             }
 	    } catch (Exception e) {
-	    	log.error(e); 
+	    	log.error(e, e); 
     	} finally {
     		getOntModel().leaveCriticalSection();
     	}

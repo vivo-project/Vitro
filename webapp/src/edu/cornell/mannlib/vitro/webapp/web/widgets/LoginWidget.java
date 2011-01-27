@@ -98,7 +98,7 @@ public class LoginWidget extends Widget {
                 values = showLoginScreen(request, siteName);
             }
         } catch (Exception e) {
-            log.error(e);
+            log.error(e, e);
             // This widget should display an error message rather than throwing the exception
             // up to the doMarkup() method, which would result in no display.
             values = showError(e);

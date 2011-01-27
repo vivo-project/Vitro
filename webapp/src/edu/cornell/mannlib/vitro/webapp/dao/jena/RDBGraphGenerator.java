@@ -51,7 +51,7 @@ public class RDBGraphGenerator implements GraphGenerator {
             Graph graphRDB = new GraphRDB(idbConn, graphID, requestedProperties, GraphRDB.OPTIMIZE_ALL_REIFICATIONS_AND_HIDE_NOTHING, !modelExists);
             return graphRDB;
         } catch (SQLException e) {
-        	log.error(e);
+        	log.error(e, e);
         	throw new RuntimeException("SQLException: unable to regenerate graph", e);
         }
     }
