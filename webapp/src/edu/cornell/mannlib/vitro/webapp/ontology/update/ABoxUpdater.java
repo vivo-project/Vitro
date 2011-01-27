@@ -176,12 +176,12 @@ public class ABoxUpdater {
 		   
 		   //log summary of changes
 		   if (renameCount > 0) {
-			   //logger.log("Changed " + renameCount + " subject reference" + ((renameCount > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class to be " + newClass.getURI());
-			   logger.log(renameCount + " subject reference" + ((renameCount > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class " + ((renameCount > 1) ? "were" : "was") +" changed to " + newClass.getURI());
+			   logger.log("Renamed " + renameCount + " subject reference" + ((renameCount > 1) ? "s" : "") + " from type"  + oldClass.getURI() + " to " + newClass.getURI());
+			   //logger.log(renameCount + " subject reference" + ((renameCount > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class " + ((renameCount > 1) ? "were" : "was") +" changed to " + newClass.getURI());
 		   }
 		   if (removeCount > 0) {
-			   //logger.log("Removed " + removeCount + " remaining subject reference" + ((removeCount > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class");
-			   logger.log(removeCount + " remaining subject reference" + ((removeCount > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class " + ((removeCount > 1) ? "were" : "was") + "removed." );
+			   logger.log("Removed " + removeCount + " remaining subject reference" + ((removeCount > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class");
+			   //logger.log(removeCount + " remaining subject reference" + ((removeCount > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class " + ((removeCount > 1) ? "were" : "was") + "removed." );
 		   }
 
 		   // Change class references in the objects of rdf:type statements
@@ -198,8 +198,8 @@ public class ABoxUpdater {
 		   
 		   //log summary of changes
 		   if (renameCount > 0) {
-			   logger.log(renameCount + " object reference" + ((renameCount > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class " + ((renameCount > 1) ? "were" : "was") + " changed to " + newClass.getURI());
-			   //logger.log("Changed " + renameCount + " object reference" + ((renameCount > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class to be " + newClass.getURI());
+			   //logger.log(renameCount + " object reference" + ((renameCount > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class " + ((renameCount > 1) ? "were" : "was") + " changed to " + newClass.getURI());
+			   logger.log("Renamed " + renameCount + " object reference" + ((renameCount > 1) ? "s" : "") + " from type "  + oldClass.getURI() + " to " + newClass.getURI());
 		   }
 		   
 		   aboxModel.remove(retractions);
@@ -370,7 +370,8 @@ public class ABoxUpdater {
 		   }
 		   
 		   if (count > 0) {
-			   logger.log(count + " subject reference" + ((count > 1) ? "s" : "") + " to the "  + deletedClass.getURI() + " class " + ((count > 1) ? "were" : "was") + " removed.");
+			   //logger.log(count + " subject reference" + ((count > 1) ? "s" : "") + " to the "  + deletedClass.getURI() + " class " + ((count > 1) ? "were" : "was") + " removed.");
+			   logger.log("Removed " + count + " subject reference" + ((count > 1) ? "s" : "") + " to the "  + deletedClass.getURI() + " class.");
 		   }
 		} finally {
 			aboxModel.leaveCriticalSection();
@@ -395,7 +396,8 @@ public class ABoxUpdater {
 		   
 		   //log summary of changes
 		   if (count > 0) {
-			   logger.log(count + " instance" + ((count > 1) ? "s" : "") + " of the "  + deletedClass.getURI() + " class " + ((count > 1) ? "were" : "was") + " removed.");
+			   //logger.log(count + " instance" + ((count > 1) ? "s" : "") + " of the "  + deletedClass.getURI() + " class " + ((count > 1) ? "were" : "was") + " removed.");
+			   logger.log("Removed " + count + " instance" + ((count > 1) ? "s" : "") + " of the "  + deletedClass.getURI() + " class.");
 		   }
 		   
 		   aboxModel.remove(retractions);
@@ -420,7 +422,8 @@ public class ABoxUpdater {
 		   
 		   //log summary of changes
 		   if (count > 0) {
-			   logger.log(count + " object reference" + ((count > 1) ? "s" : "") + " of the "  + deletedClass.getURI() + " class " + ((count > 1) ? "were" : "was") + " removed.");
+			   //logger.log(count + " object reference" + ((count > 1) ? "s" : "") + " of the "  + deletedClass.getURI() + " class " + ((count > 1) ? "were" : "was") + " removed.");
+			   logger.log("Removed " + count + " object reference" + ((count > 1) ? "s" : "") + " to the "  + deletedClass.getURI() + " class.");
 		   }
 
 		   aboxModel.remove(retractions);
@@ -567,8 +570,10 @@ public class ABoxUpdater {
 			record.recordRetractions(deletePropModel);
 			boolean plural = (deletePropModel.size() > 1);
 			if (deletePropModel.size() > 0) {
-				logger.log(deletePropModel.size() + " statement" + (plural ? "s" : "") + " with predicate " + 
-						propObj.getSourceURI() + " " + (plural ? "were" : "was") + " removed. ");
+				//logger.log(deletePropModel.size() + " statement" + (plural ? "s" : "") + " with predicate " + 
+				//		propObj.getSourceURI() + " " + (plural ? "were" : "was") + " removed. ");
+				logger.log("Removed " + deletePropModel.size() + " statement" + (plural ? "s" : "") + " with predicate " + 
+						propObj.getSourceURI() + ".");
 			}
 		} else {
 			AtomicOntologyChange chg = new AtomicOntologyChange(deletedProperty.getURI(), replacementProperty.getURI(), AtomicChangeType.RENAME, propObj.getNotes());
@@ -618,12 +623,20 @@ public class ABoxUpdater {
 		record.recordRetractions(renamePropRetractModel);
 		
 		if (renamePropRetractModel.size() > 0) {
+			/*
 			logger.log(renamePropRetractModel.size() + " statement" + 
 					((renamePropRetractModel.size() > 1) ? "s" : "") +
 					" with predicate " + propObj.getSourceURI() + " " + 
 					((renamePropRetractModel.size() > 1) ? "were" : "was") 
 					+ " changed to use " +
 					propObj.getDestinationURI() + " instead.");
+			*/
+			logger.log("Changed " + renamePropRetractModel.size() + " statement" + 
+					((renamePropRetractModel.size() > 1) ? "s" : "") +
+					" with predicate " + propObj.getSourceURI() + " to use " +
+					propObj.getDestinationURI() + " instead.");
+			
+			
 		}
 	}
 
