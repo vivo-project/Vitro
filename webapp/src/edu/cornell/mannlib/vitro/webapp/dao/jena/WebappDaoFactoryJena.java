@@ -15,6 +15,7 @@ import com.hp.hpl.jena.iri.IRIFactory;
 import com.hp.hpl.jena.iri.Violation;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.ontology.OntResource;
 import com.hp.hpl.jena.query.DataSource;
 import com.hp.hpl.jena.query.Dataset;
@@ -175,21 +176,37 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
         if (languageUniversalsModel.size()>0) {
         	this.ontModelSelector.getTBoxModel().addSubModel(languageUniversalsModel);
         }
-        DataSource dataset = DatasetFactory.create();
         
-        dataset.addNamedModel(JenaDataSourceSetupBase.JENA_DB_MODEL, 
-                (baseOntModelSelector != null) 
-                    ? baseOntModelSelector.getFullModel()
-                    : ontModelSelector.getFullModel());
-        if (inferenceOntModelSelector != null) {
-            dataset.addNamedModel(JenaDataSourceSetupBase.JENA_INF_MODEL, 
-                    inferenceOntModelSelector.getFullModel());
-        }
+        Model assertions = (baseOntModelSelector != null) 
+                ? baseOntModelSelector.getFullModel()
+                : ontModelSelector.getFullModel();
+        Model inferences = (inferenceOntModelSelector != null) 
+                ? inferenceOntModelSelector.getFullModel()
+                : null;
+        
+        Dataset dataset = makeInMemoryDataset(assertions, inferences);      
         this.dwf = new StaticDatasetFactory(dataset);
         
-        
-        
     } 
+    
+    public static Dataset makeInMemoryDataset(Model assertions, Model inferences) {
+        DataSource dataset = DatasetFactory.create();
+        
+        OntModel union = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+        
+        if (assertions != null) {
+            dataset.addNamedModel(JenaDataSourceSetupBase.JENA_DB_MODEL, assertions);
+            union.addSubModel(assertions);
+        } 
+        if (inferences != null) {
+            dataset.addNamedModel(JenaDataSourceSetupBase.JENA_INF_MODEL, 
+                    inferences);
+            union.addSubModel(inferences);
+        }
+        dataset.setDefaultModel(union);
+        dataset.addNamedModel("urn:x-arq:UnionGraph", union);
+        return dataset;
+    }
     
     public WebappDaoFactoryJena(OntModelSelector ontModelSelector, 
             String defaultNamespace, 

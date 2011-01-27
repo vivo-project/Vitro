@@ -45,6 +45,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.IndividualSDB.IndividualNotFoundException;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB.SDBDatasetMode;
 
 public class IndividualDaoSDB extends IndividualDaoJena {
@@ -66,7 +67,12 @@ public class IndividualDaoSDB extends IndividualDaoJena {
     }
     
     protected Individual makeIndividual(String individualURI) {
-    	return new IndividualSDB(individualURI, this.dwf, datasetMode, getWebappDaoFactory());
+        try {
+            return new IndividualSDB(individualURI, this.dwf, datasetMode, getWebappDaoFactory());
+        } catch (IndividualNotFoundException e) {
+            // If the individual does not exist, return null.
+            return null;
+        }
     }
 
     private static final Log log = LogFactory.getLog(IndividualDaoSDB.class.getName());

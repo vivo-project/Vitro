@@ -216,8 +216,15 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
     	groupInd.setVClassURI(CLASSGROUP.getURI());
     	
     	String groupURI = null;
+    	
+    	OntModel unionForURIGeneration = ModelFactory.createOntologyModel(
+    	        OntModelSpec.OWL_MEM, ModelFactory.createUnion(
+    	                getOntModelSelector().getApplicationMetadataModel(), 
+    	                getOntModelSelector().getFullModel()));
+    	
     	try {
-    		groupURI = (new WebappDaoFactoryJena(ontModel)).getIndividualDao().insertNewIndividual(groupInd);
+    		groupURI = (new WebappDaoFactoryJena(unionForURIGeneration)).
+                            getIndividualDao().insertNewIndividual(groupInd);
     	} catch (InsertException ie) {
     		throw new RuntimeException(InsertException.class.getName() + "Unable to insert class group "+groupURI, ie);
     	}

@@ -137,21 +137,21 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	    		"CONSTRUCT " +
     	    		"{ <"+individualURI+">  <" + RDFS.label.getURI() + 
     	    		        "> ?ooo. \n" +
-    	    		   "<"+individualURI+">  a ?type . \n" +
+//    	    		   "<"+individualURI+">  a ?type . \n" +
     	    		   "<"+individualURI+">  <" + VitroVocabulary.MONIKER + 
     	    		           "> ?moniker \n" +
-    	    		 "} WHERE {" +
-    	    		 "{ GRAPH ?g { \n" +
+    	    		 "} WHERE { GRAPH <urn:x-arq:UnionGraph> {" +
+    	    		 "{ \n" +
     	    		 	"{ <"+individualURI+">  <" + RDFS.label.getURI() + 
     	    		 	        "> ?ooo } \n" +
-    	    		 	"UNION { GRAPH ?h { <" +
+    	    		 	"UNION { <" +
     	    		 	    individualURI+">  <" + VitroVocabulary.MONIKER + 
-    	    		 	        "> ?moniker } } \n" +
-    	    		 	"} } \n" +
-    	    		 	"UNION { GRAPH ?i { <"
-    	    		 	    + individualURI + "> a ?type } } \n" +
-    	    		    WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode) +
-    	    		 "}";
+    	    		 	        "> ?moniker }  \n" +
+    	    		 	"}  \n" +
+//    	    		 	"UNION { <"
+//    	    		 	    + individualURI + "> a ?type } \n" +
+//    	    		    WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode) +
+    	    		 "} }";
         		model = QueryExecutionFactory.create(
         		        QueryFactory.create(getStatements), dataset)
         		                .execConstruct();
@@ -162,6 +162,10 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         	
         	OntModel ontModel = ModelFactory.createOntologyModel(
         	        OntModelSpec.OWL_MEM, model);
+        	
+        	if (model.isEmpty()) {
+        	    throw new IndividualNotFoundException();
+        	}
         	
         	this.ind = ontModel.createOntResource(individualURI);  
     	}
@@ -181,6 +185,8 @@ public class IndividualSDB extends IndividualImpl implements Individual {
              wadf, 
              !SKIP_INITIALIZATION);
     }
+    
+    public class IndividualNotFoundException extends RuntimeException {}
     
     private void setUpURIParts(OntResource ind) {
         if (ind != null) {
@@ -304,8 +310,8 @@ public class IndividualSDB extends IndividualImpl implements Individual {
                 int portalid = FlagMathUtils.numeric2Portalid(numericPortal);
                 String portalTypeUri = VitroVocabulary.vitroURI + 
                         "Flag1Value" + portalid + "Thing";
-                String Ask = "ASK { GRAPH ?g { <" + this.individualURI + 
-                        "> <" +RDF.type+ "> <" + portalTypeUri +">} }"; 
+                String Ask = "ASK { <" + this.individualURI + 
+                        "> <" +RDF.type+ "> <" + portalTypeUri +">} "; 
                 if(!QueryExecutionFactory.create(
                         QueryFactory.create(Ask), dataset).execAsk()) {
                 	return false;
@@ -334,8 +340,8 @@ public class IndividualSDB extends IndividualImpl implements Individual {
             	getObjects = 
             		"CONSTRUCT{<" + this.individualURI + "> <" + 
             		        RDF.type + "> ?object}" +
-        			"WHERE{ GRAPH ?g { <" + this.individualURI + "> <" + 
-        			        RDF.type + "> ?object} }";
+        			"WHERE{ <" + this.individualURI + "> <" + 
+        			        RDF.type + "> ?object }";
         		tempModel = QueryExecutionFactory.create(
         		        QueryFactory.create(
         		                getObjects), dataset).execConstruct();
@@ -394,8 +400,8 @@ public class IndividualSDB extends IndividualImpl implements Individual {
             	getObjects = 
             		"CONSTRUCT{<" + this.individualURI + "> <" + 
             		        RDF.type + "> ?object}" +
-        			"WHERE{ GRAPH ?g { <" + this.individualURI + "> <" + 
-        			        RDF.type + "> ?object} }";
+        			"WHERE{ <" + this.individualURI + "> <" + 
+        			        RDF.type + "> ?object }";
         		tempModel = QueryExecutionFactory.create(
         		        QueryFactory.create(
         		                getObjects), dataset).execConstruct();

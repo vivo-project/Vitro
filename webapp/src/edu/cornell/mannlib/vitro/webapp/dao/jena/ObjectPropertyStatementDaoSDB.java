@@ -50,19 +50,19 @@ public class ObjectPropertyStatementDaoSDB extends
             return entity;
         else {
         	Map<String, ObjectProperty> uriToObjectProperty = new HashMap<String,ObjectProperty>();
-        	String[] graphVars = { "?g", "?h", "?i", "?j" };
+        	//String[] graphVars = { "?g", "?h", "?i", "?j" };
         	String query = "CONSTRUCT { \n" +
         			       "   <" + entity.getURI() + "> ?p ?o . \n" +
-        			       "   ?o a ?oType . \n" +
+        			      // "   ?o a ?oType . \n" +
         			       "   ?o <" + RDFS.label.getURI() + "> ?oLabel .  \n" +
         			       "   ?o <" + VitroVocabulary.MONIKER + "> ?oMoniker  \n" +
-        			       "} WHERE { GRAPH ?g { \n" +
+        			       "} WHERE { GRAPH <urn:x-arq:UnionGraph> { \n" +
         			       "   <" + entity.getURI() + "> ?p ?o \n" +
-        			       "   OPTIONAL { GRAPH ?h { ?o a ?oType } } \n" +
-        			       "   OPTIONAL { GRAPH ?i { ?o <" + RDFS.label.getURI() + "> ?oLabel } } \n" +
-        			       "   OPTIONAL { GRAPH ?j { ?o <" + VitroVocabulary.MONIKER + "> ?oMoniker } }  \n" +
+        			       //"   OPTIONAL { GRAPH ?h { ?o a ?oType } } \n" +
+        			      // "   OPTIONAL {  { ?o <" + RDFS.label.getURI() + "> ?oLabel } } \n" +
+        			      // "   OPTIONAL {  { ?o <" + VitroVocabulary.MONIKER + "> ?oMoniker } }  \n" +
                            "} \n" +
-                           WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode) +
+                           //WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode) +
         			       "}";
         	long startTime = System.currentTimeMillis();
         	Model m = null;

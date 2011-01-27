@@ -11,9 +11,21 @@
         PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;  
           
         SELECT ?object ?name ?moniker {
-            GRAPH ?g1 { ?subject ?property ?object }
-            OPTIONAL { GRAPH ?g2 { ?object rdfs:label ?name } }
-            OPTIONAL { GRAPH ?g3 { ?object vitro:moniker ?moniker } }
+            { 
+                ?subject ?property ?object .
+            }
+            UNION { 
+                ?subject ?property ?object .
+                ?object rdfs:label ?name 
+            }
+            UNION { 
+                ?subject ?property ?object .
+                ?object vitro:moniker ?moniker 
+            } UNION {
+                ?subject ?property ?object .
+                ?object rdfs:label ?name .
+                ?object vitro:moniker ?moniker . 
+            }
         }       
     </query-base>
 
@@ -22,11 +34,28 @@
         PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;  
           
         SELECT ?subclass ?object ?name ?moniker {
-            GRAPH ?g1 { ?subject ?property ?object
-                OPTIONAL { ?object a ?subclass } 
+
+            { 
+                ?subject ?property ?object .
+                ?object a ?subclass .
             }
-            OPTIONAL { GRAPH ?g2 { ?object rdfs:label ?name } }
-            OPTIONAL { GRAPH ?g3 { ?object vitro:moniker ?moniker } }           
+            UNION { 
+                ?subject ?property ?object .
+                ?object a ?subclass .
+                ?object rdfs:label ?name 
+            }
+            UNION { 
+                ?subject ?property ?object .
+                ?object a ?subclass .
+                ?object vitro:moniker ?moniker 
+            } UNION {
+                ?subject ?property ?object .
+                ?object a ?subclass .
+                ?object rdfs:label ?name .
+                ?object vitro:moniker ?moniker . 
+            }
+ 
+
         } ORDER BY ?subclass      
     </query-collated>
     

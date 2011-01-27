@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -227,6 +228,67 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
                }
             }
         }        
+    }
+    
+    /**
+     * For performance reasons, we've had to rewrite SPARQL queries that would
+     * naturally use OPTIONAL blocks to use UNIONs instead.  These UNION queries
+     * return a superset of the solutions returned by the originals.  This 
+     * method filters out the unwanted solutions with extra null values.
+     * 
+     * This operation is polynomial time in the worst case, but should be linear
+     * with the actual queries used for list views.  The ORDER BY clauses
+     * should minimize the seek distance for solution elimination.
+     * 
+     * @param List<Map<String, String>> data
+     */
+    protected void removeLessSpecificSolutions(List<Map<String, String>> data) {
+       List<Map<String, String>> redundantSolns = 
+               new ArrayList<Map<String, String>>();
+       for (int i = 0; i < data.size(); i++) {
+           Map<String,String> soln = data.get(i);
+           boolean redundantSoln = false;
+           // seek forward
+           int j = i + 1;
+           while (!redundantSoln && (j < data.size())) {
+               redundantSoln = isEqualToOrLessSpecificThan(soln, data.get(j));
+               j++;
+           }
+           // loop back around
+           j = 0;
+           while (!redundantSoln && (j < i)) {
+               redundantSoln = isEqualToOrLessSpecificThan(soln, data.get(j));
+               j++;
+           }
+           if (redundantSoln) {
+               redundantSolns.add(soln);
+           }
+       }
+       data.removeAll(redundantSolns);
+    }
+    
+    /**
+     * Returns true if soln1 is equal to or less specific (i.e., has more null
+     * values) than soln2
+     * @param List<Map<String, String>> soln1
+     * @param List<Map<String, String>> soln2
+     */
+    private boolean isEqualToOrLessSpecificThan (Map<String, String> soln1, 
+                                Map<String, String> soln2) {
+        if (soln1.keySet().size() < soln2.keySet().size()) {
+            return true;
+        }
+        for (String key : soln1.keySet()) {
+            String value1 = soln1.get(key);
+            String value2 = soln2.get(key);
+            if (value2 == null && value1 != null) {
+                return false;
+            } 
+            if (value1 != null && value2 != null && !value1.equals(value2)) {
+                return false;
+            }
+        }
+        return true;
     }
     
     

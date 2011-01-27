@@ -15,6 +15,7 @@ import org.openrdf.model.URI;
 import org.openrdf.model.impl.URIImpl;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
@@ -259,7 +260,7 @@ public class UrlBuilder {
     }
     
     public static String getIndividualProfileUrl(String individualUri, WebappDaoFactory wadf) {
-        Individual individual = wadf.getIndividualDao().getIndividualByURI(individualUri);
+        Individual individual = new IndividualImpl(individualUri);
         return getIndividualProfileUrl(individual, individualUri, wadf);
     }
     

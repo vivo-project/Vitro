@@ -206,12 +206,15 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
                 log.error("Unable to load application metadata model cache from DB", e);
             }
             
+            log.info("Adding vitro application ontology");
             
-            // add the vitro ontologies to the tbox models
+            // add the vitroontologies to the tbox models
             OntModel vitroTBoxModel = (new JenaBaseDaoCon()).getConstModel();
             baseOms.getTBoxModel().addSubModel(vitroTBoxModel);
             inferenceOms.getTBoxModel().addSubModel(vitroTBoxModel);
             unionOms.getTBoxModel().addSubModel(vitroTBoxModel);
+            
+            log.error("Setting up union models and DAO factories");
             
             // create TBox + ABox union models and set up webapp DAO factories
             OntModel baseUnion = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM,
@@ -262,6 +265,8 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
             //    loadDataFromFilesystem(unionOms.getFullModel(), sce.getServletContext());
             //}
             
+            log.info("Checking for user account data");
+            
             if (userAccountsModel.size() == 0) {
                 readOntologyFilesInPathSet(AUTHPATH, sce.getServletContext(), userAccountsModel);
                 if (userAccountsModel.size() == 0) {
@@ -269,7 +274,11 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
                 }
             }                        
             
+            log.info("Checking for minimal interface metadata");
+            
             ensureEssentialInterfaceData(unionOms.getApplicationMetadataModel(), sce, wadf);        
+            
+            //log.info("Setting up namespace mapper");
             
             NamespaceMapper namespaceMapper = new NamespaceMapperJena(masterUnion, masterUnion, defaultNamespace);
             sce.getServletContext().setAttribute("NamespaceMapper", namespaceMapper);
@@ -277,12 +286,16 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
             
             sce.getServletContext().setAttribute("defaultNamespace", defaultNamespace);
             
+            log.info("SDB store ready for use");
+            
             makeModelMakerFromConnectionProperties(TripleStoreType.RDB);
             VitroJenaModelMaker vjmm = getVitroJenaModelMaker();
             setVitroJenaModelMaker(vjmm,sce);
             makeModelMakerFromConnectionProperties(TripleStoreType.SDB);
             VitroJenaSDBModelMaker vsmm = getVitroJenaSDBModelMaker();
             setVitroJenaSDBModelMaker(vsmm,sce);
+            
+            log.info("Model makers set up");
                      
         } catch (Throwable t) {
             log.error("Throwable in " + this.getClass().getName(), t);
@@ -587,7 +600,9 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
             SimpleReasonerSetup.setRecomputeRequired(ctx);
         
         } finally {
+            log.info("Adding indexes to SDB database tables.");
             store.getTableFormatter().addIndexes();
+            log.info("Indexes created.");
         }
     }
     

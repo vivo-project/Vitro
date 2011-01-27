@@ -15,7 +15,9 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Literal;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.shared.Lock;
@@ -129,26 +131,44 @@ public class PropertyGroupDaoJena extends JenaBaseDao implements PropertyGroupDa
     	groupInd.setURI(group.getURI());
     	
     	String groupURI = null;
-    	try {
-    		groupURI = (new WebappDaoFactoryJena(getOntModelSelector().getApplicationMetadataModel())).getIndividualDao().insertNewIndividual(groupInd);
+    	
+        OntModel unionForURIGeneration = ModelFactory.createOntologyModel(
+                OntModelSpec.OWL_MEM, ModelFactory.createUnion(
+                        getOntModelSelector().getApplicationMetadataModel(), 
+                        getOntModelSelector().getFullModel()));
+        
+        try {
+            groupURI = (new WebappDaoFactoryJena(unionForURIGeneration)).
+                            getIndividualDao().insertNewIndividual(groupInd);
     	} catch (InsertException ie) {
-    		throw new RuntimeException(InsertException.class.getName() + "Unable to insert property group "+groupURI, ie);
+    		throw new RuntimeException(InsertException.class.getName() + 
+    		        "Unable to insert property group " + groupURI, ie);
     	}
     	
     	if (groupURI != null) {
 	        getOntModel().enterCriticalSection(Lock.WRITE);
 	        try {
-	        	com.hp.hpl.jena.ontology.Individual groupJenaInd = getOntModel().getIndividual(groupURI);
+	        	com.hp.hpl.jena.ontology.Individual groupJenaInd = 
+	        	        getOntModel().getIndividual(groupURI);
 	            try {
-	                groupJenaInd.addProperty(DISPLAY_RANK, Integer.toString(group.getDisplayRank()), XSDDatatype.XSDint);
+	                groupJenaInd.addProperty(DISPLAY_RANK, Integer.toString(
+	                        group.getDisplayRank()), XSDDatatype.XSDint);
 	            } catch (Exception e) {
-	                log.error("error setting displayRank for "+groupInd.getURI());
+	                log.error(
+	                        "error setting displayRank for " 
+	                                + groupInd.getURI());
 	            }
-	            if (group.getPublicDescription() != null && group.getPublicDescription().length()>0) {
+	            if (group.getPublicDescription() != null 
+	                    && group.getPublicDescription().length()>0) {
 		            try {   
-		                groupJenaInd.addProperty(PUBLIC_DESCRIPTION_ANNOT, group.getPublicDescription(), XSDDatatype.XSDstring);
+		                groupJenaInd.addProperty(
+		                        PUBLIC_DESCRIPTION_ANNOT, 
+		                        group.getPublicDescription(), 
+		                        XSDDatatype.XSDstring);
 		            } catch (Exception ex) {
-		                log.error("error setting public description for "+groupInd.getURI());
+		                log.error(
+		                        "error setting public description for "
+		                                + groupInd.getURI());
 		            }
 		        }
 	        } finally {

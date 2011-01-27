@@ -14,10 +14,10 @@
                (afn:localname(?link) AS ?linkName) 
                ?anchor 
                ?url WHERE {
-            GRAPH ?g1 { ?subject ?property ?link }
-            OPTIONAL { GRAPH ?g2 { ?link vitro:linkAnchor ?anchor } }
-            OPTIONAL { GRAPH ?g3 { ?link vitro:linkURL ?url } }
-            OPTIONAL { GRAPH ?g4 { ?link vitro:linkDisplayRank ?rank } }
+            ?subject ?property ?link
+            OPTIONAL { ?link vitro:linkAnchor ?anchor }
+            OPTIONAL { ?link vitro:linkURL ?url }
+            OPTIONAL { ?link vitro:linkDisplayRank ?rank }
         } ORDER BY ?rank
     </query-base>
     
