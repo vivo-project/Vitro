@@ -143,7 +143,7 @@ public class TBoxUpdater {
 					 logger.log("WARNING: found " + siteObjects.size() +
 							 " statements with subject = " + subject.getURI() + 
 							 " and property = " + predicate.getURI() +
-							 " in the site database. (maximum of one is expected)");
+							 " in the site database (maximum of one is expected)");
 				 }
 				 
 				 if (siteObjects.size() > 0) {
@@ -168,7 +168,7 @@ public class TBoxUpdater {
 				 logger.log("WARNING: found " + i +
 						 " statements with subject = " + subject.getURI() + 
 						 " and property = " + predicate.getURI() +
-						 " in the new version of the annotations ontology. (maximum of one is expected)");
+						 " in the new version of the annotations ontology (maximum of one is expected)");
 				 continue; 
 			 }
 			 
@@ -214,7 +214,7 @@ public class TBoxUpdater {
 					 logger.log("WARNING: found " + i +
 							 " statements with subject = " + subject.getURI() + 
 							 " and property = " + predicate.getURI() +
-							 " in the site annotations model. (maximum of one is expected) "); 
+							 " in the site annotations model (maximum of one is expected) "); 
 					 continue; 
 				 }
 				 	 
@@ -407,7 +407,7 @@ public void removeObsoleteAnnotations() throws IOException {
 
         if (siteModel.contains(subj3, inPropertyGroupProp, obj3) ) {
         	retractions.add(subj3, inPropertyGroupProp, obj3);
-        	logger.log("Removed statement " + ABoxUpdater.stmtString(subj3, inPropertyGroupProp, obj3) + " from the knowledge base (assumed to be obsolete).");
+        	logger.log("Removed statement " + ABoxUpdater.stmtString(subj3, inPropertyGroupProp, obj3) + " from the knowledge base (assumed to be obsolete)");
         }
     	
 		if (retractions.size() > 0) {
