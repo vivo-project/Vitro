@@ -176,11 +176,11 @@ public class ABoxUpdater {
 		   
 		   //log summary of changes
 		   if (renameCount > 0) {
-			   logger.log("Renamed " + renameCount + " subject reference" + ((renameCount > 1) ? "s" : "") + " from type"  + oldClass.getURI() + " to " + newClass.getURI());
+			   logger.log("Changed " + renameCount + " subject reference" + ((renameCount > 1) ? "s" : "") + " from type"  + oldClass.getURI() + " to " + newClass.getURI());
 			   //logger.log(renameCount + " subject reference" + ((renameCount > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class " + ((renameCount > 1) ? "were" : "was") +" changed to " + newClass.getURI());
 		   }
 		   if (removeCount > 0) {
-			   logger.log("Removed " + removeCount + " remaining subject reference" + ((removeCount > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class");
+			   logger.log("Changed " + removeCount + " remaining subject reference" + ((removeCount > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class");
 			   //logger.log(removeCount + " remaining subject reference" + ((removeCount > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class " + ((removeCount > 1) ? "were" : "was") + "removed." );
 		   }
 

@@ -345,7 +345,7 @@ public void updateAnnotationModel() throws IOException {
 				  retractions.add(siteModel.listStatements(stmt.getSubject(),(Property) null,(RDFNode)null));
 				  long post = retractions.size();
 				  if ((post - pre) > 0) {
-				     logger.log("Removed the " + stmt.getSubject().getURI() + " ClassGroup from the annotations model.");
+				     logger.log("Removed the " + stmt.getSubject().getURI() + " ClassGroup from the annotations model");
 				  }  
 			  }
 			}
@@ -397,12 +397,12 @@ public void removeObsoleteAnnotations() throws IOException {
 	    
         if (siteModel.contains(subj1, inClassGroupProp, obj1) ) {
         	retractions.add(subj1, inClassGroupProp, obj1);
-        	logger.log("Removed statement " + ABoxUpdater.stmtString(subj1, inClassGroupProp, obj1) + " from the knowledge base (assumed to be obsolete).");
+        	logger.log("Removed statement " + ABoxUpdater.stmtString(subj1, inClassGroupProp, obj1) + " from the knowledge base (assumed to be obsolete)");
         }
 
         if (siteModel.contains(subj2, inPropertyGroupProp, obj2) ) {
         	retractions.add(subj2, inPropertyGroupProp, obj2);
-        	logger.log("Removed statement " + ABoxUpdater.stmtString(subj2, inPropertyGroupProp, obj2) + " from the knowledge base (assumed to be obsolete).");
+        	logger.log("Removed statement " + ABoxUpdater.stmtString(subj2, inPropertyGroupProp, obj2) + " from the knowledge base (assumed to be obsolete)");
         }
 
         if (siteModel.contains(subj3, inPropertyGroupProp, obj3) ) {
