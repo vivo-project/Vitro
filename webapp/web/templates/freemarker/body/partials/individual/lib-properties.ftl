@@ -33,6 +33,17 @@
     </#list>
 </#macro>
 
+<#-- Full object property listing, including heading and ul wrapper element. -->
+<#macro objectPropertyListing property editable template=property.template>
+    <#if property?has_content> <#-- true when the property is in the list, even if not populated (when editing) -->
+        <#local localName = property.localName>
+        <h2 id="${localName}">${property.name?capitalize} <@addLink property editable /></h2>
+        <ul id="individual-${localName}" role="list">
+            <@p.objectProperty property editable />
+        </ul>
+    </#if>
+</#macro>
+
 <#macro objectPropertyList property editable statements=property.statements template=property.template>
     <#list statements as statement>
         <@propertyListItem property statement editable><#include "${template}"></@propertyListItem>
