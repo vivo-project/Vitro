@@ -81,23 +81,29 @@ public class Csv2Rdf {
         for (int i=0; i<columnHeaders.length; i++) {
             dpArray[i] = tboxOntModel.createDatatypeProperty(tboxNamespace+propertyNameBase+columnHeaders[i].replaceAll("\\W",""));
         }
-
+        Individual ind = null;
         for (int row=1; row<fileRows.size(); row++) {
-        	while( uriIsGood == false && attempts < 30 ){	
-        		uri = namespace+individualNameBase+random.nextInt( Math.min(Integer.MAX_VALUE,(int)Math.pow(2,attempts + 13)) );
-	        errMsg = wdf.checkURI(uri);
-	        Resource res = ResourceFactory.createResource(uri);
-	        inDestination = destination.contains(res, null);
-			if(  errMsg != null && !inDestination)
-				uri = null;
-			else
-				uriIsGood = true;				
-			attempts++;
-		}
+        	if(namespace!=null && !namespace.isEmpty()){
+        		while( uriIsGood == false && attempts < 30 ){	
+        			uri = namespace+individualNameBase+random.nextInt( Math.min(Integer.MAX_VALUE,(int)Math.pow(2,attempts + 13)) );
+        			errMsg = wdf.checkURI(uri);
+        			Resource res = ResourceFactory.createResource(uri);
+        			inDestination = destination.contains(res, null);
+        			if(  errMsg != null && !inDestination)
+        				uri = null;
+        			else
+        				uriIsGood = true;				
+        			attempts++;
+        		}
+        	}
         	uriIsGood = false;
         	attempts =0;
         	inDestination = false;
-        	Individual ind = ontModel.createIndividual(uri,theClass);
+        	
+        	if(uri!=null)
+        		ind = ontModel.createIndividual(uri,theClass);
+        	else
+        		ind = ontModel.createIndividual(theClass);
 	        String[] cols = fileRows.get(row);
 	        for (int col=0; col<cols.length; col++) {
 				String value = cols[col].trim();
