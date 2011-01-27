@@ -214,7 +214,7 @@ public class TBoxUpdater {
 					 logger.log("WARNING: found " + i +
 							 " statements with subject = " + subject.getURI() + 
 							 " and property = " + predicate.getURI() +
-							 " in the site annotations model. (maximum of one is expected). "); 
+							 " in the site annotations model. (maximum of one is expected) "); 
 					 continue; 
 				 }
 				 	 
@@ -260,13 +260,13 @@ public class TBoxUpdater {
 		   // log summary of changes
 		   if (actualAdditions.size() > 0) {
 	           logger.log("Updated the default vitro annotation value for " + 
-	        		   actualAdditions.size() + " statements in the knowledge base.");
+	        		   actualAdditions.size() + " statements in the knowledge base");
 		   }
 		   
            long numRemoved = actualRetractions.size() - actualAdditions.size();
            if (numRemoved > 0) {
 	           logger.log("Removed " + numRemoved +
-	        		      " outdated vitro annotation property setting" + ((numRemoved > 1) ? "s" : "") + " from the knowledge base.");
+	        		      " outdated vitro annotation property setting" + ((numRemoved > 1) ? "s" : "") + " from the knowledge base");
            }
            
 		    //	   Copy annotation property settings that were introduced in the new ontology
