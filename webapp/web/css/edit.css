@@ -75,7 +75,8 @@ p.submit {
     padding-bottom: 1em;
     color: #444444;
     line-height: 16px;
-    background-color: #eee; /* cals+vivo themes were: #dddddd; */
+    /*background-color: #eee;  cals+vivo themes were: #dddddd; */
+    background-color: #fff
     min-height: 100px;
     font-size: 0.9em;
 }
