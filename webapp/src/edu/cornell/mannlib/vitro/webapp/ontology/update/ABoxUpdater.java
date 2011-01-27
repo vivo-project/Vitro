@@ -371,7 +371,7 @@ public class ABoxUpdater {
 		   
 		   if (count > 0) {
 			   //logger.log(count + " subject reference" + ((count > 1) ? "s" : "") + " to the "  + deletedClass.getURI() + " class " + ((count > 1) ? "were" : "was") + " removed.");
-			   logger.log("Removed " + count + " subject reference" + ((count > 1) ? "s" : "") + " to the "  + deletedClass.getURI() + " class.");
+			   logger.log("Removed " + count + " subject reference" + ((count > 1) ? "s" : "") + " to the "  + deletedClass.getURI() + " class");
 		   }
 		} finally {
 			aboxModel.leaveCriticalSection();
@@ -397,7 +397,7 @@ public class ABoxUpdater {
 		   //log summary of changes
 		   if (count > 0) {
 			   //logger.log(count + " instance" + ((count > 1) ? "s" : "") + " of the "  + deletedClass.getURI() + " class " + ((count > 1) ? "were" : "was") + " removed.");
-			   logger.log("Removed " + count + " instance" + ((count > 1) ? "s" : "") + " of the "  + deletedClass.getURI() + " class.");
+			   logger.log("Removed " + count + " instance" + ((count > 1) ? "s" : "") + " of the "  + deletedClass.getURI() + " class");
 		   }
 		   
 		   aboxModel.remove(retractions);
@@ -423,7 +423,7 @@ public class ABoxUpdater {
 		   //log summary of changes
 		   if (count > 0) {
 			   //logger.log(count + " object reference" + ((count > 1) ? "s" : "") + " of the "  + deletedClass.getURI() + " class " + ((count > 1) ? "were" : "was") + " removed.");
-			   logger.log("Removed " + count + " object reference" + ((count > 1) ? "s" : "") + " to the "  + deletedClass.getURI() + " class.");
+			   logger.log("Removed " + count + " object reference" + ((count > 1) ? "s" : "") + " to the "  + deletedClass.getURI() + " class");
 		   }
 
 		   aboxModel.remove(retractions);
@@ -491,12 +491,19 @@ public class ABoxUpdater {
 				record.recordAdditions(additions);
 				
 				if (additions.size() > 0) {
+					/*
 					logger.log(additions.size() + " statement" + 
 							((additions.size() > 1) ? "s" : "") +
 							" with predicate " + addedProperty.getURI() + " " + 
 							((additions.size() > 1) ? "were" : "was") 
 							+ " added (as an inverse to existing  " + inverseOfAddedProperty.getURI() + 
 							" assertions)");
+					*/
+					logger.log("Added " + additions.size() + " statement" + 
+							((additions.size() > 1) ? "s" : "") +
+							" with predicate " + addedProperty.getURI() + 
+							" (as an inverse to existing  " + inverseOfAddedProperty.getURI() + 
+							" statements)");
 				}
 				
 			} finally {
@@ -573,7 +580,7 @@ public class ABoxUpdater {
 				//logger.log(deletePropModel.size() + " statement" + (plural ? "s" : "") + " with predicate " + 
 				//		propObj.getSourceURI() + " " + (plural ? "were" : "was") + " removed. ");
 				logger.log("Removed " + deletePropModel.size() + " statement" + (plural ? "s" : "") + " with predicate " + 
-						propObj.getSourceURI() + ".");
+						propObj.getSourceURI());
 			}
 		} else {
 			AtomicOntologyChange chg = new AtomicOntologyChange(deletedProperty.getURI(), replacementProperty.getURI(), AtomicChangeType.RENAME, propObj.getNotes());
@@ -634,7 +641,7 @@ public class ABoxUpdater {
 			logger.log("Changed " + renamePropRetractModel.size() + " statement" + 
 					((renamePropRetractModel.size() > 1) ? "s" : "") +
 					" with predicate " + propObj.getSourceURI() + " to use " +
-					propObj.getDestinationURI() + " instead.");
+					propObj.getDestinationURI() + " instead");
 			
 			
 		}

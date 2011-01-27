@@ -135,7 +135,8 @@ public class DateTimeMigration {
 		    
 			if (additions.size() > 0) {	
 			   long count = additions.size() / 2;	
-			   logger.log(count + " Academic interval" + ((count > 1) ? "s were" : " was") + " updated to the new date/time format");
+			   //logger.log(count + " Academic interval" + ((count > 1) ? "s were" : " was") + " updated to the new date/time format");
+			   logger.log("Updated " + count + " Academic interval" + ((count > 1) ? "s" : "") + " to the new date/time format");
 			}
 		} finally {
 			aboxModel.leaveCriticalSection();
@@ -219,9 +220,13 @@ public class DateTimeMigration {
 		    record.recordAdditions(additions);
 		    
 			if (additions.size() > 0) {
+				/*
 					logger.log(additions.size() + " date/time literal" + 
 							((additions.size() > 1) ? "s" : "") + ((additions.size() > 1) ? " were " : " was ") +
 							"updated to the xsd:dateTime representation.");
+				*/
+					logger.log("Updated " + additions.size() + " date/time literal" + 
+							((additions.size() > 1) ? "s" : "") + " to the xsd:dateTime representation");
 			}		   
 		} finally {
 			aboxModel.leaveCriticalSection();
