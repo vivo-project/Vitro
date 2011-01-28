@@ -44,7 +44,6 @@ public abstract class BaseObjectPropertyDataPostProcessor implements
     
     /** Postprocessing that applies to the list as a whole - reordering, removing duplicates, etc. */
     protected void processList(List<Map<String, String>> data) {
-        objectPropertyTemplateModel.removeLessSpecificSolutions(data);
         objectPropertyTemplateModel.removeDuplicates(data);
     }
     

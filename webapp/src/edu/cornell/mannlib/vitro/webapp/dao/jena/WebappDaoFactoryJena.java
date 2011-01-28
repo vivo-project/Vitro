@@ -204,7 +204,6 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
             union.addSubModel(inferences);
         }
         dataset.setDefaultModel(union);
-        dataset.addNamedModel("urn:x-arq:UnionGraph", union);
         return dataset;
     }
     
