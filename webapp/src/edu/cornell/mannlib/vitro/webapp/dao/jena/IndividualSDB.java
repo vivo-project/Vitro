@@ -669,17 +669,29 @@ public class IndividualSDB extends IndividualImpl implements Individual {
             String getPropertyValue = 
             	"SELECT ?value \n" +
             	"WHERE { GRAPH ?g { \n" +
-            	"<" +individualURI+ "> <" +webappDaoFactory.getJenaBaseDao().SEARCH_BOOST_ANNOT+ "> ?value} \n" + 
+            	"<" +individualURI+ "> <" +webappDaoFactory.getJenaBaseDao().SEARCH_BOOST_ANNOT+ "> ?value }\n" + 
             	WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode) + "\n" +
             	"}";
+            
             DatasetWrapper w = getDatasetWrapper();
             Dataset dataset = w.getDataset();
         	dataset.getLock().enterCriticalSection(Lock.READ);
             try{
-                searchBoost = ((Literal)QueryExecutionFactory.create(
+                ResultSet rs = QueryExecutionFactory.create(
                 		QueryFactory.create(getPropertyValue),
-                		dataset).execSelect()).getFloat();
-                return searchBoost;
+                		dataset).execSelect();
+                
+                if(rs.hasNext()){
+                	QuerySolution qs = rs.nextSolution();
+                	if(qs.get("value") !=null){
+                		Literal value = qs.get("value").asLiteral();
+                		searchBoost = Float.parseFloat(value.getLexicalForm());
+                		return searchBoost;
+                	}
+                }
+                else{
+                	    return null;
+                }
             } catch (Exception e){
             	log.error(e,e); 
                 return null;            	
@@ -688,6 +700,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
             	w.close();
             }
         }
+        return null;
     }    
 
 	@Override
