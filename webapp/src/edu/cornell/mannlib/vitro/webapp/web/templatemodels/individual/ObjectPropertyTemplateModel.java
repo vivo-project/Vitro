@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
@@ -132,6 +134,10 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         
     protected String getQueryString() {
         return config.queryString;
+    }
+    
+    protected Set<String> getConstructQueryStrings() {
+        return config.constructQueryStrings;
     }
 
     protected boolean hasDefaultListView() {
@@ -371,12 +377,14 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         private static final String CONFIG_FILE_PATH = "/config/";
         private static final String DEFAULT_CONFIG_FILE_NAME = "listViewConfig-default.xml";
         
+        private static final String NODE_NAME_QUERY_CONSTRUCT = "query-construct";
         private static final String NODE_NAME_QUERY_BASE = "query-base";
         private static final String NODE_NAME_QUERY_COLLATED = "query-collated";
         private static final String NODE_NAME_TEMPLATE = "template";
         private static final String NODE_NAME_POSTPROCESSOR = "postprocessor";
         
         private boolean isDefaultConfig;
+        private Set<String> constructQueryStrings;
         private String queryString;
         private String templateName;
         private String postprocessor;
@@ -468,35 +476,55 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
             try {
                 db = dbf.newDocumentBuilder();
                 Document doc = db.parse(configFilePath);
-                
+                String propertyUri = op.getURI();
                 // Required values
                 String queryNodeName = 
                     // Don't test op.getCollateBySubclass(), since if creating a CollatedObjectPropertyTemplateModel failed,
                     // we now want to create an UncollatedObjectPropertyTemplateModel
                     (ObjectPropertyTemplateModel.this instanceof CollatedObjectPropertyTemplateModel) ? NODE_NAME_QUERY_COLLATED : NODE_NAME_QUERY_BASE;
-                log.debug("Using query element " + queryNodeName + " for object property " + op.getURI());
-                queryString = getConfigValue(doc, queryNodeName);
-                templateName = getConfigValue(doc, NODE_NAME_TEMPLATE); 
+                log.debug("Using query element " + queryNodeName + " for object property " + propertyUri);
+                queryString = getConfigValue(doc, queryNodeName, propertyUri);
+                templateName = getConfigValue(doc, NODE_NAME_TEMPLATE, propertyUri); 
                 
                 // Optional values
-                postprocessor = getConfigValue(doc, NODE_NAME_POSTPROCESSOR);
+                postprocessor = getConfigValue(doc, NODE_NAME_POSTPROCESSOR, propertyUri);
+                constructQueryStrings = getConfigValues(doc, NODE_NAME_QUERY_CONSTRUCT, propertyUri);
+       
             } catch (Exception e) {
                 log.error("Error processing config file " + configFilePath, e);
                 // What should we do here?
             }            
         }
  
-        private String getConfigValue(Document doc, String nodeName) {
+        private String getConfigValue(Document doc, String nodeName, String propertyUri) {
             NodeList nodes = doc.getElementsByTagName(nodeName);
             Element element = (Element) nodes.item(0); 
             String value = null;
             if (element != null) {
                 value = element.getChildNodes().item(0).getNodeValue();   
-                log.debug("Value of config parameter " + nodeName + " = " + value);
+                log.debug("Found config parameter " + nodeName + " for object property " + propertyUri +  " with value " + value);
             } else {
-                log.debug("No value for config parameter " + nodeName);
+                log.debug("No value found for config parameter " + nodeName + " for object property " + propertyUri);
             }
             return value;           
+        }
+        
+        private Set<String> getConfigValues(Document doc, String nodeName, String propertyUri) {
+            Set<String> values = null;
+            NodeList nodes = doc.getElementsByTagName(nodeName);
+            int nodeCount = nodes.getLength();
+            if (nodeCount > 0) {
+                values = new HashSet<String>(nodeCount);
+                for (int i = 0; i < nodeCount; i++) {
+                    Element element = (Element) nodes.item(i);
+                    String value = element.getChildNodes().item(0).getNodeValue();
+                    values.add(value);  
+                    log.debug("Found config parameter " + nodeName + " for object property " + propertyUri +  " with value " + value);
+                }
+            } else {
+                log.debug("No values found for config parameter " + nodeName + " for object property " + propertyUri);
+            }
+            return values;
         }
         
         private String getConfigFilePath(String filename) {
