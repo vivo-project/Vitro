@@ -53,8 +53,9 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	private static final String DEFAULT_NAMESPACE = ConfigurationProperties
 			.getProperty("Vitro.defaultNamespace");
 
-	public static final String DUMMY_THUMBNAIL_URL = "/images/placeholders/person.thumbnail.jpg";
-
+	public static final String DUMMY_THUMBNAIL_PERSON_URL = "/images/placeholders/person.thumbnail.jpg"; 
+    public static final String DUMMY_THUMBNAIL_NON_PERSON_URL = "/images/placeholders/non.person.thumbnail.jpg"; 
+    
 	/** Limit file size to 6 megabytes. */
 	public static final int MAXIMUM_FILE_SIZE = 6 * 1024 * 1024;
 
@@ -389,7 +390,14 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 				entity.getURI());
 
 		TemplateResponseValues rv = new TemplateResponseValues(TEMPLATE_NEW);
-		rv.put(BODY_THUMBNAIL_URL, UrlBuilder.getUrl(DUMMY_THUMBNAIL_URL));
+		
+		// rjy7 We should not be referencing particular ontology values here, and ideally
+		// the template would add the placeholder url to the edit link, since it already
+		// knows which placeholder it's using. However, this requires a significantly more
+		// complex implementation, so keeping it simple for now.
+		String dummyThumbnailUrl = entity.isVClass("http://xmlns.com/foaf/0.1/Person") ?
+		        DUMMY_THUMBNAIL_PERSON_URL : DUMMY_THUMBNAIL_NON_PERSON_URL;
+		rv.put(BODY_THUMBNAIL_URL, UrlBuilder.getUrl(dummyThumbnailUrl));
 		rv.put(BODY_FORM_ACTION, formAction);
 		rv.put(BODY_CANCEL_URL, cancelUrl);
 		rv.put(BODY_TITLE, "Upload image" + forName(entity));
