@@ -77,7 +77,7 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
     protected ConfigError checkQuery(String queryString) {
         
         if (StringUtils.isBlank(queryString)) {
-            return ConfigError.NO_QUERY;
+            return ConfigError.NO_SELECT_QUERY;
         }
         
         Matcher m;
