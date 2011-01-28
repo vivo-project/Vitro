@@ -33,26 +33,29 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
 
-public class VClassGroupCache implements ServletContextListener{
-    
-    /* This is the cache of VClassGroups.  It is a portal id to list of VClassGroups  */
-    private transient ConcurrentHashMap<Integer, List<VClassGroup>> _groupListMap;
-        
-    private transient ConcurrentLinkedQueue<String> _rebuildQueue;            
-    private RebuildGroupCacheThread _cacheRebuildThread;
-    private ServletContext context;
-    
+public class VClassGroupCache{
     private static final Log log = LogFactory.getLog(VClassGroupCache.class);
     
-    private static boolean ORDER_BY_DISPLAYRANK = true;
-    private static boolean INCLUDE_UNINSTANTIATED = true;
-    private static boolean INCLUDE_INDIVIDUAL_COUNT = true;
-    
-    public VClassGroupCache(){}
-    
+	private static final String ATTRIBUTE_NAME = "VClassGroupCache";
+
+    private static final boolean ORDER_BY_DISPLAYRANK = true;
+    private static final boolean INCLUDE_UNINSTANTIATED = true;
+    private static final boolean INCLUDE_INDIVIDUAL_COUNT = true;
+
     /** 
      * Use getVClassGroupCache(ServletContext) to get a VClassGroupCache.
      */
+    public static VClassGroupCache getVClassGroupCache(ServletContext sc){
+        return (VClassGroupCache) sc.getAttribute(ATTRIBUTE_NAME);
+    }
+        
+	/* This is the cache of VClassGroups.  It is a portal id to list of VClassGroups  */
+    private final ConcurrentHashMap<Integer, List<VClassGroup>> _groupListMap;
+        
+    private final ConcurrentLinkedQueue<String> _rebuildQueue;            
+    private final RebuildGroupCacheThread _cacheRebuildThread;
+    private final ServletContext context;
+    
     private VClassGroupCache(ServletContext context) {
         this.context = context;
         this._groupListMap = new ConcurrentHashMap<Integer, List<VClassGroup>>();
@@ -71,10 +74,6 @@ public class VClassGroupCache implements ServletContextListener{
         _cacheRebuildThread.informOfQueueChange();       
     }
      
-    public static VClassGroupCache getVClassGroupCache(ServletContext sc){
-        return (VClassGroupCache) sc.getAttribute("VClassGroupCache");
-    }
-        
     public List<VClassGroup> getGroups( int portalId ){
         return getGroups(getVCGDao(),portalId );
     }
@@ -94,7 +93,7 @@ public class VClassGroupCache implements ServletContextListener{
     }
     
     public void clearGroupCache(){
-        _groupListMap = new ConcurrentHashMap<Integer, List<VClassGroup>>();
+        _groupListMap.clear();
     }   
     
     
@@ -254,8 +253,24 @@ public class VClassGroupCache implements ServletContextListener{
         return groups;
     }
     
+	private void requestStop() {
+		_cacheRebuildThread.kill();
+	}
 
-
+    protected VClassGroupDao getVCGDao(){
+        if( context == null ){
+            log.error("Context was not set for VClassGroupCache");
+            return null;
+        }
+        WebappDaoFactory wdf =(WebappDaoFactory)context.getAttribute("webappDaoFactory");
+        if( wdf == null ){
+            log.error("Cannot get webappDaoFactory from context");
+            return null;
+        }else
+            return wdf.getVClassGroupDao();
+    }
+    
+    protected static String REBUILD_EVERY_PORTAL ="Rebuild every portal.";
 
     /* ******************  Jena Model Change Listener***************************** */
     private class VClassGroupCacheChangeListener extends StatementListener {
@@ -348,29 +363,22 @@ public class VClassGroupCache implements ServletContextListener{
         }
     }
 
-    protected VClassGroupDao getVCGDao(){
-        if( context == null ){
-            log.error("Context was not set for VClassGroupCache");
-            return null;
+    /* ******************** ServletContextListener **************** */	
+    public static class Setup implements ServletContextListener {
+        @Override
+        public void contextInitialized(ServletContextEvent sce) {        
+            ServletContext servletContext = sce.getServletContext();
+			servletContext.setAttribute(ATTRIBUTE_NAME,  new VClassGroupCache(servletContext) );
         }
-        WebappDaoFactory wdf =(WebappDaoFactory)context.getAttribute("webappDaoFactory");
-        if( wdf == null ){
-            log.error("Cannot get webappDaoFactory from context");
-            return null;
-        }else
-            return wdf.getVClassGroupDao();
-    }
-    
-    protected static String REBUILD_EVERY_PORTAL ="Rebuild every portal.";
 
-    @Override
-    public void contextDestroyed(ServletContextEvent arg0) {
-        if( _cacheRebuildThread != null )
-            _cacheRebuildThread.kill();        
-    }
-
-    @Override
-    public void contextInitialized(ServletContextEvent arg0) {        
-        arg0.getServletContext().setAttribute("VClassGroupCache",  new VClassGroupCache(arg0.getServletContext()) );
+        @Override
+        public void contextDestroyed(ServletContextEvent sce) {
+            ServletContext servletContext = sce.getServletContext();
+        	Object o = servletContext.getAttribute(ATTRIBUTE_NAME);
+        	if (o instanceof VClassGroupCache) {
+        		VClassGroupCache cache = (VClassGroupCache) o;
+        		cache.requestStop();
+        	}
+        }
     }
 }
