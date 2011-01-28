@@ -69,7 +69,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         Pattern.compile("\\?" + KEY_SUBJECT + "\\s+\\?" + KEY_PROPERTY + "\\s+\\?(\\w+)");
     
     protected static enum ConfigError {
-        NO_QUERY("Missing query specification"),
+        NO_SELECT_QUERY("Missing select query specification"),
         NO_SUBCLASS_SELECT("Query does not select a subclass variable"),
         NO_SUBCLASS_ORDER_BY("Query does not sort first by subclass variable"),
         NO_TEMPLATE("Missing template specification"),
@@ -127,17 +127,17 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     
     protected ConfigError checkQuery(String queryString) {
         if (StringUtils.isBlank(queryString)) {
-            return ConfigError.NO_QUERY;
+            return ConfigError.NO_SELECT_QUERY;
         }
         return null;
     }
-        
-    protected String getQueryString() {
-        return config.queryString;
+      
+    protected String getSelectQuery() {
+        return config.selectQuery;
     }
     
-    protected Set<String> getConstructQueryStrings() {
-        return config.constructQueryStrings;
+    protected Set<String> getConstructQueries() {
+        return config.constructQueries;
     }
 
     protected boolean hasDefaultListView() {
@@ -163,7 +163,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
             log.debug("Using default list view for property " + propertyUri + 
                       ", so query object = '" + object + "'");
         } else {
-            String queryString = getQueryString();
+            String queryString = getSelectQuery();
             Matcher m = SUBJECT_PROPERTY_OBJECT_PATTERN.matcher(queryString);
             if (m.find()) {
                 object = m.group(1);
@@ -340,7 +340,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
      * effectively turns off this post-processing.)
      */
     protected void moveNullEndDateTimesToTop(List<ObjectPropertyStatementTemplateModel> statements) {
-        String queryString = getQueryString();
+        String queryString = getSelectQuery();
         Matcher m = ORDER_BY_END_DATE_TIME_PATTERN.matcher(queryString);
         if ( ! m.find() ) {
             return;
@@ -384,8 +384,8 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         private static final String NODE_NAME_POSTPROCESSOR = "postprocessor";
         
         private boolean isDefaultConfig;
-        private Set<String> constructQueryStrings;
-        private String queryString;
+        private Set<String> constructQueries;
+        private String selectQuery;
         private String templateName;
         private String postprocessor;
 
@@ -442,13 +442,13 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         
         private ConfigError checkConfiguration(VitroRequest vreq) {
 
-            ConfigError error = ObjectPropertyTemplateModel.this.checkQuery(queryString);
+            ConfigError error = ObjectPropertyTemplateModel.this.checkQuery(selectQuery);
             if (error != null) {
                 return error;
             }
 
-            if (StringUtils.isBlank(queryString)) {
-                return ConfigError.NO_QUERY;
+            if (StringUtils.isBlank(selectQuery)) {
+                return ConfigError.NO_SELECT_QUERY;
             }
 
             if ( StringUtils.isBlank(templateName)) {
@@ -483,12 +483,12 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
                     // we now want to create an UncollatedObjectPropertyTemplateModel
                     (ObjectPropertyTemplateModel.this instanceof CollatedObjectPropertyTemplateModel) ? NODE_NAME_QUERY_COLLATED : NODE_NAME_QUERY_BASE;
                 log.debug("Using query element " + queryNodeName + " for object property " + propertyUri);
-                queryString = getConfigValue(doc, queryNodeName, propertyUri);
+                selectQuery = getConfigValue(doc, queryNodeName, propertyUri);
                 templateName = getConfigValue(doc, NODE_NAME_TEMPLATE, propertyUri); 
                 
                 // Optional values
                 postprocessor = getConfigValue(doc, NODE_NAME_POSTPROCESSOR, propertyUri);
-                constructQueryStrings = getConfigValues(doc, NODE_NAME_QUERY_CONSTRUCT, propertyUri);
+                constructQueries = getConfigValues(doc, NODE_NAME_QUERY_CONSTRUCT, propertyUri);
        
             } catch (Exception e) {
                 log.error("Error processing config file " + configFilePath, e);
