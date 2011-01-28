@@ -19,10 +19,8 @@ var browseByVClass = {
         this.vgraphVClassLinks = $('#vgraph-classes li a');
         this.browseVClasses = $('#browse-classes');
         this.browseVClassLinks = $('#browse-classes li a');
-        this.selectedBrowseVClass = $('#browse-classes li a.selected');
         this.alphaIndex = $('#alpha-browse-individuals');
         this.alphaIndexLinks = $('#alpha-browse-individuals li a');
-        this.selectedAlphaIndex = $('#alpha-browse-individuals li a.selected');
         this.paginationNav = $('nav.pagination');
         this.paginationLinks = $('nav.pagination li a');
         this.individualsInVClass = $('#individuals-in-class ul');
@@ -56,9 +54,8 @@ var browseByVClass = {
         this.paginationListener();
     },
     
+    // Listener for page switching -- separate from the rest because it needs to be callable
     paginationListener: function() {
-        // Listener for page switching
-        // separate from the rest because it needs to be callable
         $('nav.pagination li a').click(function() {
             uri = $('#browse-classes li a.selected').attr('data-uri');
             alpha = $('#alpha-browse-individuals li a.selected').attr('data-alpha');
@@ -75,6 +72,7 @@ var browseByVClass = {
         }
     },
     
+    // Where all the magic happens -- gonna fetch me some individuals
     getIndividuals: function(vclassUri, alpha, page) {
         url = this.dataServiceUrl + encodeURIComponent(vclassUri);
         if ( alpha && alpha != "all") {
@@ -149,22 +147,22 @@ var browseByVClass = {
                 browseByVClass.individualsInVClass.append(listItem);
             })
             
-            // set selected class, alpha and page
+            // Set selected class, alpha and page
             browseByVClass.selectedVClass(results.vclass.URI);
             browseByVClass.selectedAlpha(alpha);
         });
     },
     
+    // Toggle the active class so it's clear which is selected
     selectedVClass: function(vclassUri) {
         // Remove active class on all vClasses
         $('#browse-classes li a.selected').removeClass('selected');
-        // Can't figure out why using this.selectedBrowseVClass doesn't work here
-        // this.selectedBrowseVClass.removeClass('selected');
         
         // Add active class for requested vClass
         $('#browse-classes li a[data-uri="'+ vclassUri +'"]').addClass('selected');
     },
 
+    // Toggle the active letter so it's clear which is selected
     selectedAlpha: function(alpha) {
         // if no alpha argument sent, assume all
         if ( alpha == null ) {
