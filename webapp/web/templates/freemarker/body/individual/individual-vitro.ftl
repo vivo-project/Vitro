@@ -13,7 +13,6 @@
                        placeholder="${urls.images}/placeholders/non.person.thumbnail.jpg" />
     </#assign>
     
-    <#-- <#if ( individualImage?matches('<img class="individual-photo"')?size > 0 )> -->
     <#if ( individualImage?contains('<img class="individual-photo"') )>
         <#assign infoClass = 'class="withThumb"'/>
     </#if>
