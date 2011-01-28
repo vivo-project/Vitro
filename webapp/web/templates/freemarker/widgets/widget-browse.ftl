@@ -32,7 +32,7 @@
         
          <section id="browse-classes" role="navigation">
              <nav>
-                 <ul id="classgroup-list" role="list">
+                 <ul id="classes-in-classgroup" role="list">
                      <#list classes as class>
                         <#if (class.individualCount > 0)>
                             <li role="listitem"><a href="${urls.base}/${currentPage}?classgroupUri=${classGroup.uri?url}&vclassUri=${class.uri?url}">${class.name} <span class="count-individuals"> (${class.individualCount})</span></a></li>

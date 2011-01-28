@@ -64,18 +64,18 @@ ul#browse-classgroups .count-classes {
     background: #fff;
     min-height: 230px;
 }
-ul#classgroup-list {
+ul#classes-in-classgroup {
     float: left;
     width: 90%;
     padding: 0 10px 15px 22px;
     margin-top: 20px;
     margin-bottom: 10px;
 }
-ul#classgroup-list.vis {
+ul#classes-in-classgroup.vis {
     width: 44%;
     border-right: 1px solid #DDE5E4;
 }
-ul#classgroup-list li {
+ul#classes-in-classgroup li {
     display: block;
     float: left;
     width: 100%;
@@ -84,17 +84,17 @@ ul#classgroup-list li {
     height: 35px;
     line-height: 35px;
 }
-ul#classgroup-list li:last-child {
+ul#classes-in-classgroup li:last-child {
     border-bottom: none
 }
-ul#classgroup-list a {
+ul#classes-in-classgroup a {
     display: block;
     padding-left: 15px;
     height: 35px;
     color: #5e6363;
     text-decoration: none;
 }
-ul#classgroup-list .count-individuals {
+ul#classes-in-classgroup .count-individuals {
     font-size: 12px;
 }
 /* VISUALIZATION  ------>  */

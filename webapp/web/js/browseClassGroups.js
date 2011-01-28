@@ -5,17 +5,17 @@ var browseClassGroups = {
     onLoad: function() {
         this.mergeFromTemplate();
         this.initObjects();
-        // this.bindEventListeners();
+        this.bindEventListeners();
     },
     
-    // Add variables from menupage template
+    // Add variables from browse template
     mergeFromTemplate: function() {
         $.extend(this, browseData);
     },
     
     // Create references to frequently used elements for convenience
     initObjects: function() {
-        this.vClassesInClassGroup = $('ul#classgroup-list');
+        this.vClassesInClassGroup = $('ul#classes-in-classgroup');
         this.browseClassGroupLinks = $('#browse-classgroups li a');
     },
     
@@ -26,6 +26,25 @@ var browseClassGroups = {
             uri = $(this).attr("data-uri");
             browseClassGroups.getVClasses(uri);
             return false;
+        });
+        
+        // Call the bar chart highlighter listener
+        this.chartHighlighterListener();
+    },
+
+    // Listener for bar chart highlighting -- separate from the rest because it needs to be callable
+    chartHighlighterListener: function() {
+        // This essentially replicates the native Raphael hover behavior (see chart.hover below)
+        // but allows us to trigger it via jQuery from the list of classes adjacent to the chart
+        $('ul#classes-in-classgroup li a').hover(function() {
+            var classIndex = $('ul#classes-in-classgroup li a').index(this);
+            $('#visual-graph svg path').eq(classIndex).attr('fill', '#ccc');
+            $('#visual-graph svg text').eq(classIndex).toggle();
+            return false;
+        }, function() {
+            var classIndex = $('ul#classes-in-classgroup li a').index(this);
+            $('#visual-graph svg path').eq(classIndex).attr('fill', '#999');
+            $('#visual-graph svg text').eq(classIndex).toggle();
         })
     },
     
@@ -36,6 +55,7 @@ var browseClassGroups = {
         }
     },
     
+    // Where all the magic happens -- gonna fetch me some classes
     getVClasses: function(classgroupUri, alpha) {
         url = this.dataServiceUrl + encodeURIComponent(classgroupUri);
         if ( alpha && alpha != "all") {
@@ -45,72 +65,92 @@ var browseClassGroups = {
         // First wipe currently displayed classes
         this.vClassesInClassGroup.empty();
         
+        var values = [],
+            labels = [],
+            uris = [];
+        
         $.getJSON(url, function(results) {
-            $.each(results.vClasses, function(i, item) {
-                name = results.vClasses[i].name;
-                uri = results.vClasses[i].URI;
-                indivCount = results.vClasses[i].individualCount;
+            $.each(results.classes, function(i, item) {
+                name = results.classes[i].name;
+                uri = results.classes[i].URI;
+                indivCount = results.classes[i].entityCount;
                 indexUrl = browseClassGroups.baseUrl + '/individuallist?vclassId=' + encodeURIComponent(uri);
-                // Build the content of each list item, piecing together each component
-                listItem = '<li role="listitem">';
-                listItem += '<a href="'+ indexUrl +'" title="View all '+ name +'content">'+ name +'</a>';
-                // Include the moniker only if it's not empty and not equal to the VClass name
-                listItem += ' <span class="count-individuals">(${indivCount})</span>'
-                listItem += '</li>';
-                browseClassGroups.vClassesInClassGroup.append(listItem);
+                // Only add to the arrays and render classes when they aren't empty
+                if ( indivCount > 0 ) {
+                    values.push(parseInt(indivCount, 10));
+                    labels.push(name + ' (' + parseInt(indivCount, 10) +')');
+                    uris.push(uri);
+                    
+                    // Build the content of each list item, piecing together each component
+                    listItem = '<li role="listitem">';
+                    listItem += '<a href="'+ indexUrl +'" title="Browse all '+ name +' content">'+ name;
+                    listItem += ' <span class="count-individuals">('+ indivCount +')</span></a>';
+                    listItem += '</li>';
+                    browseClassGroups.vClassesInClassGroup.append(listItem);
+                }
             })
-            // set selected class group
-            browseClassGroups.selectedClassGroup(results.vclassGroup.URI);
+            // Set selected class group
+            browseClassGroups.selectedClassGroup(results.classGroupUri);
+            
+            // Update the graph
+            graphClassGroups.barchart(values, labels, uris);
+            
+            // Call the bar highlighter listener
+            browseClassGroups.chartHighlighterListener();
         });
     },
     
-    selectedClassGroup: function(vclassUri) {
+    // Toggle the active class group so it's clear which is selected
+    selectedClassGroup: function(classGroupUri) {
         // Remove active class on all vClasses
-        $('#browse-childClasses li a.selected').removeClass('selected');
-        // Can't figure out why using this.selectedBrowseVClass doesn't work here
-        // this.selectedBrowseVClass.removeClass('selected');
+        $('#browse-classgroups li a.selected').removeClass('selected');
         
         // Add active class for requested vClass
-        $('#browse-childClasses li a[data-uri="'+ vclassUri +'"]').addClass('selected');
+        $('#browse-classgroups li a[data-uri="'+ classGroupUri +'"]').addClass('selected');
     }
 };
 
 var graphClassGroups = {
-    
-    barchart: function() {
-        var values = [],
-            labels = [];
-            uris = [];
-        $("tr").each(function() {
-            values.push(parseInt($("td", this).text(), 10));
-            labels.push($("th", this).text());
-            uris.push($("th", this).attr("data-uri"));
-        });
+    // Build the bar chart using gRaphael
+    barchart: function(values, labels, uris) {
+        // Clear the existing bar chart
+        $('#visual-graph').empty();
+        
         var height = values.length * 37;
         
         // Create the canvas
-        var r = Raphael("pieViz", 300, height + 10);
+        var r = Raphael("visual-graph", 300, height + 10);
         
-        // Hide the table containing the data to be graphed
-        $('table.graph-data').addClass('hidden');
         var chart = r.g.hbarchart(0, 16, 300, height, [values], {type:"soft", singleColor:"#999"});
         
         // Add the class names as labels and then hide them
         chart.label(labels, true);
-        // getting a JS error in the console when trying to add the class
+        // Getting a JS error in the console when trying to add the class
         // "setting a property that has only a getter"
         // $('svg text').addClass('hidden');
         // so using .hide() instead
         $('svg text').hide();
         
         // Was unable to append <a> within <svg> -- was always hidden and couldn't get it to display
-        // So using jQuery click to add links
+        // so using jQuery click to add links
         $('rect').click(function() {
             var index = $('rect').index(this);
             var uri = uris[index];
             var link = browseClassGroups.baseUrl + '/individuallist?vclassId=' + encodeURIComponent(uri);
             window.location = link;
-        })
+        });
+        
+        // Add title attributes to each <rect> in the bar chart
+        $('rect').each(function() {
+            var index = $('rect').index(this);
+            var label = labels[index];
+            var countStart = label.lastIndexOf(' (');
+            var label = label.substring(0, countStart);
+            var title = 'View all '+ label +' content';
+            
+            // Add a title attribute
+            $(this).attr('title', title);
+        });
         
         // On hover
         // 1. Change bar color
@@ -121,14 +161,14 @@ var graphClassGroups = {
             $('rect').hover(function() {
                 var index = $('rect').index(this);
                 $('svg text').eq(index).show();
-                $('#classgroup-list li a').eq(index).addClass('selected');
+                $('#classes-in-classgroup li a').eq(index).addClass('selected');
             })
         }, function() {
             this.bar.attr({fill: "#999"});
             $('rect').hover(function() {
                 var index = $('rect').index(this);
                 $('svg text').eq(index).hide();
-                $('#classgroup-list li a').eq(index).removeClass('selected');
+                $('#classes-in-classgroup li a').eq(index).removeClass('selected');
             })
         });
     }
@@ -136,6 +176,5 @@ var graphClassGroups = {
 
 $(document).ready(function() {
     browseClassGroups.onLoad();
-    // browseClassGroups.defaultClassGroup();
-    graphClassGroups.barchart();
+    browseClassGroups.defaultClassGroup();
 });
