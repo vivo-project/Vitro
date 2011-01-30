@@ -4,37 +4,35 @@
 /* CSS Document */
 
 /* VISUAL GRAPH----->  */
-#menupage-intro{
+#menupage-intro {
     clear: both;
     width: 100%;
     margin: 1em auto;
-/*    padding-top: 30px;  nac26: not sure we need all this space up top*/
-/*    margin-bottom: 30px;*/
 }
-#menupage-intro  h3{
+#menupage-intro h3 {
     padding: 0 25px 15px 0;
     padding-bottom: 20px;
 }
-#menupage-content{
+#menupage-content {
     float: left;
     width: 90%;
     margin-bottom: 30px;
 }
-#menupage-content.people{
+#menupage-content.people {
     width: 68%;
 }
-#menupage-content h3{
+#menupage-content h3 {
     padding: 0 25px 15px 0;
 }
-#menupage-content h4{
+#menupage-content h4 {
     padding: 20px 25px 12px 0;
 }
-ul#vgraph-classes{
+ul#vgraph-classes {
     float: left;
     width: 265px;
     margin-left: 35px;
 }
-ul#vgraph-classes li{
+ul#vgraph-classes li {
     display: block;
     height: 35px;
     line-height: 35px;
@@ -42,82 +40,63 @@ ul#vgraph-classes li{
 ul#vgraph-classes li:last-child {
     border-bottom: 0;
 }
-ul#vgraph-classes a{
+ul#vgraph-classes a {
     display: block;
     padding-left: 15px;
     width: 265px;
     height: 35px;
 }
-#menupage-graph{
+#menupage-graph {
     float: right;
     width: 500px;
     height: 283px;
     padding-right: 20px;
     border: 1px dotted #ccc;
 }
-#menupage-graph.people{
+#menupage-graph.people {
     width: 270px;
     height: 270px;
     padding-right: 0;
     border: none;
 }
 /* FIND BY ------>  */
-#find-by{
+#find-by {
     width: 275px;
     float: right;
     margin-top: 20px;
 }
-#find-by h3{
+#find-by h3 {
     padding: 0 25px 12px 12px;
     border-bottom: 0;
 }
-ul#find-filters{
+ul#find-filters {
     float: left;
     width: 265px;
 }
-ul#find-filters li{
+ul#find-filters li {
     display: block;
     height: 35px;
     line-height: 35px;
     padding-left: 10px;
 }
-ul#find-filters li:last-child{ 
+ul#find-filters li:last-child { 
     border-bottom: 0;
 }
-ul#find-filters a{
+ul#find-filters a {
     display: block;
     padding-left: 15px;
     width: 265px;
     height: 35px;
 }
-/* NETWORK STATS ------>  */
-#network-stats{
-    clear: both;
-    width: 90%;
-    margin: 0 auto;
-    height: 67px;
-    margin-bottom: 30px;
-}
-#network-stats h3{
-    float: left;
-    width: 150px;
-    padding: 20px 12px 10px 12px;
-}
-#network-stats p{
-    padding: 15px 15px 15px 175px;
-    font-size: .875em;
-    line-height: 1.5;
-    color: #5e6363;
-}
 /* RESEARCHERS ------>  */
-#researchers{
+#researchers {
     clear: both;
     width: 90%;
     height: 229px;
     margin: 0 auto;
     margin-top: 30px;
 }
-#researchers h3{
+#researchers h3 {
     float: left;
     width: 150px;
     padding: 20px 12px 10px 12px;
@@ -126,65 +105,65 @@ ul#find-filters a{
     font-weight: normal;
     background: url(../images/arrow.gif) 140px 27px no-repeat;
 }
-#researchers p{
+#researchers p {
     padding: 17px 15px 15px 175px;
     line-height: 1.5;
 }
-#researchers-slider{
+#researchers-slider {
     clear: both;
     margin: 0 auto;
     width: 887px;
     height: 115px;
 }
-#alpha-display{
+#alpha-display {
     width: 100px;
     height: 115px;
     line-height: 115px;
     float: left;
     margin-right: 10px;
 }
-#profile-photo-display{
+#profile-photo-display {
     width: 60%;
     height: 115px;
     float: left;
 }
-#profile-photo-display ul{    
+#profile-photo-display ul {    
     display: block;
 }
-#profile-photo-display li{
+#profile-photo-display li {
     display: block;
     width: 90px;
     float: left;
     padding-right: 10px;
     padding-top: 10px;
 }
-#nav-display{
+#nav-display {
     width: 100px;
     height: 70px;
     margin-top: 30px;
     margin-right: 20px;
     float: right;
 }
-#nav-display p{
+#nav-display p {
     float: left;
     padding: 0;
     padding-top: 7px;
     width: 30px;
 }
-#nav-display img{
+#nav-display img {
     display: block;
     float: right;
     padding-left: 15px;
 }
 /* BROWSE BY ------>  */
-#browse-by{
+#browse-by {
     clear: both;
     width: 90%;
     margin: 0 auto;
     margin-top: 40px;
     overflow: hidden;
 }
-#browse-by h2{
+#browse-by h2 {
     width: 120px;
     height: 44px;
     line-height: 44px;
@@ -192,13 +171,13 @@ ul#find-filters a{
     margin-bottom: 27px;
 }
 /* BROWSE CLASSES ------>  */
-ul#browse-classes{
+ul#browse-classes {
     float: left;
     width: 255px;
     margin-left: 15px;
     margin-bottom: 20px;
 }
-ul#browse-classes li{
+ul#browse-classes li {
     display: block;
     width: 245px;
     height: 35px;
@@ -206,31 +185,31 @@ ul#browse-classes li{
     margin-left: 10px;
     margin-right: 10px;
 }
-ul#browse-classes li:last-child{    
+ul#browse-classes li:last-child {    
     border-bottom: 0;
 }
-ul#browse-classes a{
+ul#browse-classes a {
     display: block;
     padding-left: 20px;
     width: 264px;
     height: 35px;
 }
 /* ALPHA BROWSE------>  */
-ul#alpha-browse-individuals{
+ul#alpha-browse-individuals {
     float: left;
     width: 620px;
     padding-left: 10px;
     list-style: none;
 }
-ul#alpha-browse-individuals li{
+ul#alpha-browse-individuals li {
     float: left;
     margin-right: 4px;
     padding-top: 8px;
 }
-ul#alpha-browse-individuals li:last-child{
+ul#alpha-browse-individuals li:last-child {
     border-bottom: 0;
 }
-ul#alpha-browse-individuals a{
+ul#alpha-browse-individuals a {
     display: block;
     height: 35px;
     margin-left: 0;
@@ -238,7 +217,7 @@ ul#alpha-browse-individuals a{
     width: 10px;
 }
 /* BROWSE INDIVIDUALS------>  */
-#individuals-in-class{
+#individuals-in-class {
     float: right;
     width: 68%;
     padding-bottom: 30px;
@@ -246,7 +225,7 @@ ul#alpha-browse-individuals a{
     margin-right: 17px;
     min-height: 170px;
 }
-#individuals-in-class ul{
+#individuals-in-class ul {
     list-style: none;
 }
 li.individual {
@@ -256,62 +235,62 @@ li.individual {
     margin-right: 30px;
     overflow: hidden;
 }
-li.individual img{
+li.individual img {
     float: left;
     margin-right: 20px;
 }
-li.individual h1{
+li.individual h1 {
     padding: 0;
     line-height: 1.2;
     font-weight: bold;
 }
-li.individual h1.thumb{
+li.individual h1.thumb {
     padding-top: 30px;
 }
-#individuals-in-class span.title{
+#individuals-in-class span.title {
     display: block;
     margin: 0.8em 0 0 0;
     font-size: 0.8em;
     line-height: 1;
 }
-#individuals-in-class span.org{
+#individuals-in-class span.org {
     display: block;
 }
-nav.pagination{
+nav.pagination {
     margin: 0.3em 0 0 1.4em;
 }
-nav.pagination h3{
+nav.pagination h3 {
     display: inline;
     margin: 0 0.3em 0 0;
     padding: 0;
     font-size: 1.1em;
     color: #666;
 }
-nav.pagination ul{
+nav.pagination ul {
     display: inline;
 }
-nav.pagination li{
+nav.pagination li {
     display: inline-block;
     margin: 0;
 /*    padding: 0.1em 0.6em;*/
     border: none;
 }
-nav.pagination li.selected{
+nav.pagination li.selected {
     padding: 0 0.4em;
     line-height: 1.5;
     color: #333;
     background: #ddd;
 }
-nav.pagination li a{
+nav.pagination li a {
     padding: 0 0.4em;
     border: none;
 }
-nav.pagination li a:hover{
+nav.pagination li a:hover {
     color: #fff;
     background: #333;
     border: none;
 }
-nav.pagination .round{
+nav.pagination .round {
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
     border-radius: 3px;
