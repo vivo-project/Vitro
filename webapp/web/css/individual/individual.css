@@ -4,12 +4,12 @@
 /* CSS Document */
 
 /* ADMIN PANEL------>  */
-#admin{
+#admin {
     font-size: .8em;
     padding-top: 0;
     padding-right: 40px;
 }
-#admin h3{
+#admin h3 {
     display: inline-block;
     padding: 3px 6px 3px 10px;
     margin-bottom: 5px;
@@ -19,66 +19,66 @@
     padding-left: 11px;
     padding-bottom: 5px;
 }
-#admin a.edit-individual{
+#admin a.edit-individual {
     padding-left: 5px;
     border-left: none;
 }
 /* <------ INDIVIDUAL INTRO FOR ANY CLASS*/
-#individual-intro{
+#individual-intro {
     margin-top: 15px;
     margin-bottom: 20px;
     position: relative;
     overflow: hidden;
 }
-#individual-intro h1{
+#individual-intro h1 {
     padding-bottom: 8px;  
 }
-#individual-intro span.preferred-title{
+#individual-intro span.preferred-title {
     padding-left: 10px;
     margin-left: 10px;
 }
-#individual-info h3{
+#individual-info h3 {
     padding-bottom: 5px;
     margin-top: 5px;
     clear: left;
 }
-#individual-intro a.icon-rdf{
+#individual-intro a.icon-rdf {
     font-size: 1.125em;
 }
 ul#links-additional{
     margin-bottom: 5px;
 }
 /* <------ INDIVIDUAL INTRO FOR PERSON*/
-#individual-intro.person{
+#individual-intro.person {
     margin-bottom: 30px;
     position: relative;
     width: 100%;
 }
-#individual-intro.person #individual-info{
+#individual-intro.person #individual-info {
     float: left;
     width: 78%;
     margin-bottom: 20px;
 }
-#individual-intro.person .individual-overview{
+#individual-intro.person .individual-overview {
     width: 100%;
     float: none;
 }
 /* <------ INDIVIDUAL INTRO - LEFT SIDE CONTENT */
-#share-contact{
+#share-contact {
     position: relative;
     width: 166px;
     float: left;
     padding-right: 1.5em;
     margin-bottom: 20px;
 }
-#share-contact h3{
+#share-contact h3 {
     margin-top: 15px;
     padding-bottom: .3em;
     font-size: 1em;
     line-height: 1.2em;
     padding-top: 0;
 }
-img.individual-photo{
+img.individual-photo {
     width: 160px;
     height: 160px;
     margin-left: 0;
@@ -86,20 +86,20 @@ img.individual-photo{
     margin-right: 20px;
     margin-bottom: 20px;
 }
-#mainImage{
+#mainImage {
     position: absolute;
     padding: 5px 5px 8px 5px;
     background-color: #fff;
     top: 126px;
     right: 27px;
 }
-h2#mainImage, #share-contact h2{
+h2#mainImage, #share-contact h2 {
     font-size: 1em;
     line-height: 1em;
     margin-top: 15px;
     padding-bottom: 0.3em
 }
-ul#individual-tools-people{
+ul#individual-tools-people {
     margin-top: 5px;
     height: 20px;
     padding-bottom: 20px;
@@ -107,114 +107,92 @@ ul#individual-tools-people{
     clear: both;
     margin-bottom: 15px;
 }
-ul#individual-tools-people li{
+ul#individual-tools-people li {
     position: relative;
     display: block;
     padding-right: 7px;
     float: left;
     margin-bottom: 20px;
 }
-ul#individual-tools{
+ul#individual-tools {
     margin-top: 10px;
     margin-bottom: 10px;
     height: 20px;
 }
-ul#individual-tools li{
+ul#individual-tools li {
     padding-right: 9px;
     float: left;
 }
-ul#individual-email{
+ul#individual-email {
     clear: both;
     list-style-type: circle;
 }
-ul#individual-email li{
+ul#individual-email li {
     font-size: .875em;
 }
-ul#individual-email li:first-child{
+ul#individual-email li:first-child {
     font-size: .875em;
     margin-top: 10px;
 }
-ul#individual-phone{
+ul#individual-phone {
     clear: both;
     list-style-type: circle;
 }
-ul#individual-phone li{
+ul#individual-phone li {
     font-size: .875em;
 }
-ul#individual-phone li:last-child{
+ul#individual-phone li:last-child {
     margin-bottom: 15px;
 }
-ul#individual-phone li:first-child{
+ul#individual-phone li:first-child {
     margin-top: 10px;
 }
-.icon-phone, .icon-email{
+.icon-phone, .icon-email {
     padding-right: 5px;
 }
-#individual-intro ul.individual-urls{
+#individual-intro ul.individual-urls {
     list-style-type: circle;
     margin-left: 20px;
 }
-#individual-intro ul.individual-urls li{
+#individual-intro ul.individual-urls li {
     font-size: .875em;
     line-height: 1.7em;
 }
-ul.individual-urls-people{
+ul.individual-urls-people {
     clear: both;
     list-style-type: circle;
     padding-left: 24px;
 }
-ul.individual-urls-people li{
+ul.individual-urls-people li {
     font-size: .875em;
     line-height: 1.3em;
 }
-#photo-wrapper{
+#photo-wrapper {
     position: relative;
     float: left;
 }
 /* <------ INDIVIDUAL INTRO - RIGHT SIDE CONTENT */
-#individual-info{
+#individual-info {
     padding: 0;
     float: left;
     width: 98%;
 }
-#individual-info.withThumb{
+#individual-info.withThumb {
     width: 78%;
 }
 h1.fn .preferred-title {
     padding-left: 10px;
     margin-left: 10px;
 }
-#individual-info h2{
+#individual-info h2 {
     padding-bottom: 10px;
 }
-ul#individual-personInPosition{
-    list-style-type: circle;
-    padding-left: 20px;
-}
-ul#individual-personInPosition li{
-    line-height: 1em;
-}
-ul#individual-personInPosition li:last-child{
-    padding-bottom: 15px;
-}
-ul#individual-hasResearchArea{
-    padding-bottom: 24px;
-}
-ul#individual-hasResearchArea li{
-    float: left;
-    padding-right: 10px;
-    padding-left: 10px;
-    border-right: 1px solid #5e6363;
-}
-ul#individual-hasResearchArea li:first-child{
-    padding-left: 0;
-}
-#individual-info nav{
+#individual-info nav {
     float: left;
     width: 78%;
     clear: left;
 }
-#individual-intro .individual-overview{
+#individual-intro .individual-overview {
     margin-bottom: 30px;
     margin-top: 10px;
     display: inline;
@@ -222,47 +200,47 @@ ul#individual-hasResearchArea li:first-child{
     float: left;
 }
 /* <------ INDIVIDUAL VISUALIZATION */
-#visualization{
+#visualization {
     float: right;
     width: 226px;
 }
 /* <------ SPARKLINES  */
-#sparklines-publications{
+#sparklines-publications {
     padding: 0 0 40px 30px;
     padding-top: 0;
     float: right;
     background-color: #fff;
 }
-#sparklines-publications h3{
+#sparklines-publications h3 {
     padding-top: 10px;
     margin-bottom: 10px;
 }
-.publication-year-range{
+.publication-year-range {
     display: block;
     padding-top: 5px;
 }
 /* <------ COAUTHORS */
-#co-authors{
+#co-authors {
     padding: 0 20px 30px 20px;
 }
-img.co-author{
+img.co-author {
     margin-right: 5px;
     margin-bottom: 5px;
 }
-#co-authors h3{
+#co-authors h3 {
     margin-bottom: 10px;
 }
-#co-authors ul li{
+#co-authors ul li {
     display: block;
     float: left;
 }
-p.view-all-coauthors{
+p.view-all-coauthors {
     clear: both;
     width:  200px;
     text-align: left;
 }
 /* PROPERTY GROUP MENU------>  */
-#property-group-menu{
+#property-group-menu {
     clear: both;
     width: 95%;;
     height: 46px;
@@ -271,20 +249,20 @@ p.view-all-coauthors{
     margin-bottom: 10px;
     margin-top: 20px;
 }
-#property-group-menu ul{
+#property-group-menu ul {
     display: block;
 }
-#property-group-menu li{
+#property-group-menu li {
     float: left;
     line-height: 46px;
     padding-right: 15px;
     padding-left: 15px;
 }
-#property-group-menu li:first-child{
+#property-group-menu li:first-child {
      padding-left: 10px;
 }
 /* PROPERTY GROUP------>  */
-.property-group{
+.property-group {
     position: relative;
     clear: both;
     width: 95%;
@@ -293,23 +271,23 @@ p.view-all-coauthors{
     margin-bottom: 20px;
     border: 1px solid #dfebe5;
 }
-.scroll-up{
+.scroll-up {
    position: absolute; 
    width: 21px;
    height: 30px;
    top: 0;
    right: -21px;
 }
-section.property-group h2{
+section.property-group h2 {
     padding: 20px 25px 12px 35px;
 }
-article.property{
+article.property {
     width: 93%;
     margin: 0 auto;
     margin-bottom: 20px;
     border: 1px solid #dfe6e5;
 }
-article.property h3{
+article.property h3 {
     border-bottom: 1px solid #dfe6e5;
     padding: 10px 20px 10px 20px;
 }
@@ -318,24 +296,24 @@ article.property ul.property-list li.subclass h3 {
     padding: 10px 10px 10px 0;
     background-color: #fff;
 }
-article.property .data-property-statement{
+article.property .data-property-statement {
     padding: 10px 20px 10px 20px;
     line-height: 1.2em;
     margin-bottom: 0;
 }
-article.property ul.property-list{
+article.property ul.property-list {
     background: #fff;
     padding-bottom: 20px;
 }
-article.property ul.property-list li{
+article.property ul.property-list li {
     line-height: 1.2em;
     padding: 10px 20px 5px 20px;
     background-color: #fff;
 }
-article.property ul.subclass-property-list{
+article.property ul.subclass-property-list {
     margin-left: 0;
 }
-article.property ul.subclass-property-list li{
+article.property ul.subclass-property-list li {
     line-height: 1.2em;
     padding: 0 20px 10px 20px;
 }
@@ -346,38 +324,38 @@ article.property ul.subclass-property-list li{
     background: #f4f4f4;
 }
 /* EDITING DISPLAY------>  */
-.add-individual{
+.add-individual {
     vertical-align: middle;
     margin-left: 2px;
 }
-.edit-individual{
+.edit-individual {
     margin-left: 10px;
     padding-left: 8px;
     padding-right: 1px;
     vertical-align: middle;
 }
-.delete-individual{
+.delete-individual {
     vertical-align: middle;
 }
-.edit-mainImage{
+.edit-mainImage {
     position: absolute;
     background: #fff;
     padding: 0 6px 0 0;
     top: 143px;
     left: 110px;
 }
-a.edit-mainImage img.edit-individual{
+a.edit-mainImage img.edit-individual {
     border: 0;
     padding-left: 0px;
     margin-left: 8px;
 }
-.delete-mainImage{
+.delete-mainImage {
     position: absolute;
     top: 143px;
     left: 140px;
     background: #fff;
     padding: 0 6px 0 8px;
 }
-.middle{
+.middle {
     vertical-align: middle;
 }
