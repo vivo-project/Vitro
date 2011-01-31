@@ -1,7 +1,13 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
 <#-- Function to test whether any statements exist with property as predicate -->
-<#function hasStatements property>
+<#function hasStatements property=false>
+    <#-- First ensure that the property is defined
+    (an unpopulated property while logged out is undefined) -->
+    <#if property?is_boolean>
+        <#return false>
+    </#if>
+    
     <#if property.collatedBySubclass!false> <#-- collated -->
         <#if (property.subclasses?size > 0)>
             <#return true>
