@@ -127,6 +127,7 @@ name will be used as the label. -->
 ------------------------------------------------------------------------------>
 
 <#-- Vitro namespace links
+
      Currently the page displays the vitro namespace links properties. Future versions 
      will use the vivo core ontology links property, eliminating the need for special handling.
      
@@ -154,8 +155,12 @@ name will be used as the label. -->
     </#if>
 </#macro>
 
-<#-- Main image links -->
-<#-- Values for showPlaceholder: "always", "never", "with_add_link" -->
+<#-- Image 
+
+     Values for showPlaceholder: "always", "never", "with_add_link" 
+     
+     Note that this macro has a side-effect in the call to propertyGroups.getPropertyAndRemoveFromList().
+-->
 <#macro image individual propertyGroups namespaces editable showPlaceholder="never" placeholder="">
     <#local mainImage = propertyGroups.getPropertyAndRemoveFromList("${namespaces.vitroPublic}mainImage")!>
     <#local thumbUrl = individual.thumbUrl!>

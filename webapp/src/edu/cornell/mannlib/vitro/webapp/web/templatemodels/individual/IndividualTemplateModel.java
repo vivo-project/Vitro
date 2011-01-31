@@ -123,7 +123,6 @@ public class IndividualTemplateModel extends BaseTemplateModel {
         }
 
         // http://some.other.namespace/n2345?format=rdfxml
-        // ** RY Not sure it is correct to return this for the <link> element
         return UrlBuilder.addParams(profileUrl, "format", "rdfxml");
 
     }
@@ -132,11 +131,9 @@ public class IndividualTemplateModel extends BaseTemplateModel {
         return urlBuilder.getPortalUrl(Route.INDIVIDUAL_EDIT, "uri", getUri());
     }
 
-    // RY We should not have references to a specific ontology in the vitro code!
-    // Figure out how to move this out of here.
-    // We could subclass IndividualTemplateModel in the VIVO code and add the isPerson()
-    // and getVisualizationUrl() methods there, but we still need to know whether to
-    // instantiate the IndividualTemplateModel or the VivoIndividualTemplateModel class.
+    // RY We should not have references to a specific ontology in the vitro code.
+    // We should subclass IndividualTemplateModel in the VIVO code and add the isPerson()
+    // and getVisualizationUrl() methods there.
     public boolean isPerson() {
         return isVClass("http://xmlns.com/foaf/0.1/Person");
     }
