@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.dao;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
@@ -31,4 +32,6 @@ public interface ObjectPropertyStatementDao {
     int insertNewObjectPropertyStatement(ObjectPropertyStatement objPropertyStmt );
     
     public List<Map<String, String>> getObjectPropertyStatementsForIndividualByProperty(String subjectUri, String propertyUri, String query);
+    
+    public List<Map<String, String>> getObjectPropertyStatementsForIndividualByProperty(String subjectUri, String propertyUri, String query, Set<String> constructQueries);
 }

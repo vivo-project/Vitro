@@ -53,15 +53,16 @@ public class ObjectPropertyStatementDaoSDB extends
         	String[] graphVars = { "?g", "?h", "?i", "?j" };
         	String query = "CONSTRUCT { \n" +
         			       "   <" + entity.getURI() + "> ?p ?o . \n" +
-        			       "   ?o a ?oType . \n" +
+//        			       "   ?o a ?oType . \n" +
         			       "   ?o <" + RDFS.label.getURI() + "> ?oLabel .  \n" +
         			       "   ?o <" + VitroVocabulary.MONIKER + "> ?oMoniker  \n" +
-        			       "} WHERE { GRAPH ?g { \n" +
-        			       "   <" + entity.getURI() + "> ?p ?o \n" +
-        			       "   OPTIONAL { GRAPH ?h { ?o a ?oType } } \n" +
-        			       "   OPTIONAL { GRAPH ?i { ?o <" + RDFS.label.getURI() + "> ?oLabel } } \n" +
-        			       "   OPTIONAL { GRAPH ?j { ?o <" + VitroVocabulary.MONIKER + "> ?oMoniker } }  \n" +
-                           "} \n" +
+        			       "} WHERE { \n" +
+        			       "   { <" + entity.getURI() + "> ?p ?o } \n" +
+//        			       "   UNION { <" + entity.getURI() + "> ?p ?o . ?o a ?oType } \n" +
+        			       "   UNION { <" + entity.getURI() + "> ?p ?o . \n" +
+        			       "           ?o <" + RDFS.label.getURI() + "> ?oLabel } \n" +
+        			       "   UNION { <" + entity.getURI() + "> ?p ?o . \n " +
+        			       "           ?o <" + VitroVocabulary.MONIKER + "> ?oMoniker } \n" +
                            WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode) +
         			       "}";
         	long startTime = System.currentTimeMillis();

@@ -214,7 +214,7 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
             inferenceOms.getTBoxModel().addSubModel(vitroTBoxModel);
             unionOms.getTBoxModel().addSubModel(vitroTBoxModel);
             
-            log.error("Setting up union models and DAO factories");
+            log.info("Setting up union models and DAO factories");
             
             // create TBox + ABox union models and set up webapp DAO factories
             OntModel baseUnion = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM,
@@ -278,7 +278,7 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
             
             ensureEssentialInterfaceData(unionOms.getApplicationMetadataModel(), sce, wadf);        
             
-            //log.info("Setting up namespace mapper");
+            log.info("Setting up namespace mapper");
             
             NamespaceMapper namespaceMapper = new NamespaceMapperJena(masterUnion, masterUnion, defaultNamespace);
             sce.getServletContext().setAttribute("NamespaceMapper", namespaceMapper);

@@ -56,7 +56,7 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
         String subjectUri = subject.getURI();
         String propertyUri = op.getURI();
         List<Map<String, String>> statementData = 
-            opDao.getObjectPropertyStatementsForIndividualByProperty(subjectUri, propertyUri, getSelectQuery());
+            opDao.getObjectPropertyStatementsForIndividualByProperty(subjectUri, propertyUri, getSelectQuery(), getConstructQueries());
 
         /* Apply post-processing */
         postprocess(statementData, wdf);
