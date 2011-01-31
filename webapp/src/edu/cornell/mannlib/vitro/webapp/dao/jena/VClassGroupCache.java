@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -37,6 +38,7 @@ public class VClassGroupCache{
     private static final Log log = LogFactory.getLog(VClassGroupCache.class);
     
 	private static final String ATTRIBUTE_NAME = "VClassGroupCache";
+    private static final String REBUILD_EVERY_PORTAL = "Rebuild every portal.";
 
     private static final boolean ORDER_BY_DISPLAYRANK = true;
     private static final boolean INCLUDE_UNINSTANTIATED = true;
@@ -49,7 +51,7 @@ public class VClassGroupCache{
         return (VClassGroupCache) sc.getAttribute(ATTRIBUTE_NAME);
     }
         
-	/* This is the cache of VClassGroups.  It is a portal id to list of VClassGroups  */
+	/** This is the cache of VClassGroups.  It is a portal id to list of VClassGroups  */
     private final ConcurrentHashMap<Integer, List<VClassGroup>> _groupListMap;
         
     private final ConcurrentLinkedQueue<String> _rebuildQueue;            
@@ -74,9 +76,9 @@ public class VClassGroupCache{
         _cacheRebuildThread.informOfQueueChange();       
     }
      
-    public List<VClassGroup> getGroups( int portalId ){
-        return getGroups(getVCGDao(),portalId );
-    }
+    public void clearGroupCache(){
+        _groupListMap.clear();
+    }   
     
     /**
      * May return null.
@@ -92,10 +94,13 @@ public class VClassGroupCache{
         return null;
     }
     
-    public void clearGroupCache(){
-        _groupListMap.clear();
-    }   
+    public List<VClassGroup> getGroups( int portalId ){
+        return getGroups(getVCGDao(),portalId );
+    }
     
+    private List<VClassGroup> getGroups( VClassGroupDao vcgDao, int portalId) {
+        return getGroups( vcgDao, portalId, INCLUDE_INDIVIDUAL_COUNT);
+    }   
     
     private List<VClassGroup> getGroups( VClassGroupDao vcgDao , int portalId, boolean includeIndividualCount ){
         List<VClassGroup> groupList = _groupListMap.get(portalId);
@@ -117,10 +122,6 @@ public class VClassGroupCache{
         }
     }   
         
-    private List<VClassGroup> getGroups( VClassGroupDao vcgDao, int portalId) {
-        return getGroups( vcgDao, portalId, INCLUDE_INDIVIDUAL_COUNT);
-    }   
-    
     private void requestCacheUpdate(String portalUri){
         log.debug("requesting update for portal " + portalUri);
         _rebuildQueue.add(portalUri);
@@ -254,14 +255,18 @@ public class VClassGroupCache{
     }
     
 	private void requestStop() {
+		log.info("Killing the thread.");
 		_cacheRebuildThread.kill();
+		
+		try {
+			_cacheRebuildThread.join();
+			log.info("The thread is dead.");
+		} catch (InterruptedException e) {
+			log.warn("Waiting for the thread to die, but interrupted.", e);
+		}
 	}
 
     protected VClassGroupDao getVCGDao(){
-        if( context == null ){
-            log.error("Context was not set for VClassGroupCache");
-            return null;
-        }
         WebappDaoFactory wdf =(WebappDaoFactory)context.getAttribute("webappDaoFactory");
         if( wdf == null ){
             log.error("Cannot get webappDaoFactory from context");
@@ -270,8 +275,6 @@ public class VClassGroupCache{
             return wdf.getVClassGroupDao();
     }
     
-    protected static String REBUILD_EVERY_PORTAL ="Rebuild every portal.";
-
     /* ******************  Jena Model Change Listener***************************** */
     private class VClassGroupCacheChangeListener extends StatementListener {
         private VClassGroupCache cache = null;
@@ -304,62 +307,53 @@ public class VClassGroupCache{
     }
     /* ******************** RebuildGroupCacheThread **************** */
     protected class RebuildGroupCacheThread extends Thread {
-        VClassGroupCache cache;
-        boolean die = false;
-        boolean queueChange = false;
-        long queueChangeMills = 0;
-        private boolean awareOfQueueChange = false;
+        private final VClassGroupCache cache;
+        private final AtomicLong queueChangeMillis = new AtomicLong();
+        private volatile boolean die = false;
 
         RebuildGroupCacheThread(VClassGroupCache cache) {
         	super("VClassGroupCache.RebuildGroupCacheThread");
             this.cache = cache;
         }
+        
         public void run() {
-            while(true){
-                try{
-                    synchronized (this){
-                        if( _rebuildQueue.isEmpty() ){
-                             log.debug("rebuildGroupCacheThread.run() -- queye empty, sleep");
-                             wait(1000 * 60 );
-                        }
-                        if( die ) {
-                            log.debug("doing rebuildGroupCacheThread.run() -- die()");
-                            return;
-                        }
-                        if( queueChange && !awareOfQueueChange){
-                            log.debug("rebuildGroupCacheThread.run() -- awareOfQueueChange, delay start of rebuild");
-                            awareOfQueueChange = true;
-                            wait(200);
-                        }
-                    }
-
-                    if( awareOfQueueChange && System.currentTimeMillis() - queueChangeMills > 200){
-                        log.debug("rebuildGroupCacheThread.run() -- refreshGroupCache()");
-                        cache.refreshGroupCache();
-                        synchronized( this){
-                            queueChange = false;
-                        }
-                        awareOfQueueChange = false;
-                    }else {
-                        synchronized( this ){
-                            wait(200);
-                        }
-                    }
-                }   catch(InterruptedException e){}
+			while (!die) {
+				int delay;
+				
+				if (_rebuildQueue.isEmpty()) {
+					log.debug("rebuildGroupCacheThread.run() -- queue empty, sleep");
+					delay = 1000 * 60;
+				} else if ((System.currentTimeMillis() - queueChangeMillis.get()) < 200) {
+					log.debug("rebuildGroupCacheThread.run() -- delay start of rebuild");
+					delay = 200;
+				} else {
+					log.debug("rebuildGroupCacheThread.run() -- refreshGroupCache()");
+					cache.refreshGroupCache();
+					delay = 0;
+				}
+				
+				if (delay > 0) {
+					synchronized (this) {
+						try {
+							wait(delay);
+						} catch (InterruptedException e) {
+							log.warn("Waiting " + delay
+									+ " milliseconds, but interrupted.", e);
+						}
+					}
+				}
             }
-
-
+            log.debug("rebuildGroupCacheThread.run() -- die()");
         }
 
         synchronized void informOfQueueChange(){
-            queueChange = true;
-            queueChangeMills = System.currentTimeMillis();
+            queueChangeMillis.set(System.currentTimeMillis());
             this.notifyAll();
         }
 
         synchronized void kill(){
             die = true;
-            notifyAll();
+            this.notifyAll();
         }
     }
 
@@ -373,11 +367,9 @@ public class VClassGroupCache{
 
         @Override
         public void contextDestroyed(ServletContextEvent sce) {
-            ServletContext servletContext = sce.getServletContext();
-        	Object o = servletContext.getAttribute(ATTRIBUTE_NAME);
+            Object o = sce.getServletContext().getAttribute(ATTRIBUTE_NAME);
         	if (o instanceof VClassGroupCache) {
-        		VClassGroupCache cache = (VClassGroupCache) o;
-        		cache.requestStop();
+        		((VClassGroupCache) o).requestStop();
         	}
         }
     }
