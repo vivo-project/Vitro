@@ -64,7 +64,7 @@ public class PortalRetryController extends BaseEditController {
         if (!epo.getUseRecycledBean()){
             if (request.getParameter("id") != null) {
                 int id = Integer.parseInt(request.getParameter("id"));
-                if (id > 0) {
+                if (id >= 0) {
                     try {
                         portalForEditing = (Portal)pDao.getPortal(id);
                         action = "update";
