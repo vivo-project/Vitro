@@ -1,5 +1,22 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
+<#-- Function to test whether any statements exist with property as predicate -->
+<#function hasStatements property>
+    <#if property.collatedBySubclass!false> <#-- collated -->
+        <#if (property.subclasses?size > 0)>
+            <#return true>
+        <#else>
+            <#return false>
+        </#if>
+    <#elseif property.statements??>
+        <#if (property.statements?size > 0)>
+            <#return true>
+        <#else>
+            <#return false>
+        </#if>
+    </#if>
+</#function>
+
 <#-----------------------------------------------------------------------------
     Macros for generating property lists
 ------------------------------------------------------------------------------>
@@ -29,7 +46,7 @@
                 <h3>${subclass?lower_case}</h3>
             </#if>
             <ul class="subclass-property-list">
-                <@objectPropertyList property editable subclasses[subclass] template/> 
+                <@objectPropertyList property editable subclasses[subclass] template/>
             </ul>
         </li>
     </#list>
@@ -100,16 +117,15 @@ name will be used as the label. -->
 
 <#-- Macros for specific properties -->
 
-<#-- Vitro namespace links 
-
+<#-- Vitro namespace links
      Currently the page displays the vitro namespace links properties. Future versions 
      will use the vivo core ontology links property, eliminating the need for special handling.
      
      Note that this macro has a side-effect in the calls to propertyGroups.getPropertyAndRemoveFromList().
 -->
 <#macro vitroLinks propertyGroups namespaces editable linkListClass="individual-urls">
-    <#local primaryLink = propertyGroups.getPropertyAndRemoveFromList("${namespaces.vitro}primaryLink")!>   
-    <#local additionalLinks = propertyGroups.getPropertyAndRemoveFromList("${namespaces.vitro}additionalLink")!>    
+    <#local primaryLink = propertyGroups.getPropertyAndRemoveFromList("${namespaces.vitro}primaryLink")!>
+    <#local additionalLinks = propertyGroups.getPropertyAndRemoveFromList("${namespaces.vitro}additionalLink")!>
 
     <#if (primaryLink?has_content || additionalLinks?has_content)> <#-- true when the property is in the list, even if not populated (when editing) -->
         <nav role="navigation">
@@ -121,8 +137,8 @@ name will be used as the label. -->
             </#if>
             <@addLinkWithLabel additionalLinks editable "Additional Web Pages" />
             <#if additionalLinks.statements?has_content> <#-- if there are any statements -->
-                <ul class="${linkListClass}" id="links-additional" role="list">            
-                    <@objectPropertyList additionalLinks editable />           
+                <ul class="${linkListClass}" id="links-additional" role="list">
+                    <@objectPropertyList additionalLinks editable />
                 </ul>
             </#if>
         </nav>
@@ -132,21 +148,21 @@ name will be used as the label. -->
 <#-- Main image links -->
 <#-- Values for showPlaceholder: "always", "never", "with_add_link" -->
 <#macro image individual propertyGroups namespaces editable showPlaceholder="never" placeholder="">
-    <#local mainImage = propertyGroups.getPropertyAndRemoveFromList("${namespaces.vitroPublic}mainImage")!>    
-    <#local thumbUrl = individual.thumbUrl!>  
+    <#local mainImage = propertyGroups.getPropertyAndRemoveFromList("${namespaces.vitroPublic}mainImage")!>
+    <#local thumbUrl = individual.thumbUrl!>
     <#-- Don't assume that if the mainImage property is populated, there is a thumbnail image (though that is the general case).
-         If there's a mainImage statement but no thumbnail image, treat it as if there is no image. --> 
-    <#if (mainImage.statements)?has_content && thumbUrl?has_content>    
-        <a href="${individual.imageUrl}"><img class="individual-photo" src="${thumbUrl}" title="click to view larger image" alt="${individual.name}" width="160" /></a>            
+         If there's a mainImage statement but no thumbnail image, treat it as if there is no image. -->
+    <#if (mainImage.statements)?has_content && thumbUrl?has_content>
+        <a href="${individual.imageUrl}"><img class="individual-photo" src="${thumbUrl}" title="click to view larger image" alt="${individual.name}" width="160" /></a>
         <@p.editingLinks "${mainImage.localName}" mainImage.statements[0] editable />
     <#else>
         <#local imageLabel><@p.addLinkWithLabel mainImage editable "Photo" /></#local>
         ${imageLabel}
         <#if placeholder?has_content>
             <#if showPlaceholder == "always" || (showPlaceholder="with_add_link" && imageLabel?has_content)>
-                <img class="individual-photo" src="${placeholder}" title = "no image" alt="placeholder image" width="160" /> 
+                <img class="individual-photo" src="${placeholder}" title = "no image" alt="placeholder image" width="160" />
             </#if>
-        </#if>                                                      
+        </#if>
     </#if>
 </#macro>
 
@@ -154,5 +170,5 @@ name will be used as the label. -->
 <#macro label individual editable>
     <#local label = individual.nameStatement>
     ${label.value}
-    <@p.editingLinks "label" label editable /> 
+    <@p.editingLinks "label" label editable />
 </#macro>
