@@ -60,7 +60,11 @@
     
     <#local interval>
         <#if start?? && end??>
-            ${start} - ${end}
+            <#if start == end>
+                ${start}
+            <#else>
+                ${start} - ${end}
+            </#if>
         <#elseif start??>
             ${start} -
         <#elseif end??>
