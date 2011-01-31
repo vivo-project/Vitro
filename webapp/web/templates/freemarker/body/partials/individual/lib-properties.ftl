@@ -25,7 +25,9 @@
     <#assign subclasses = property.subclasses>
     <#list subclasses?keys as subclass>
         <li class="subclass">
-            <h3>${subclass?lower_case}</h3>
+            <#if subclass?has_content>
+                <h3>${subclass?lower_case}</h3>
+            </#if>
             <ul class="subclass-property-list">
                 <@objectPropertyList property editable subclasses[subclass] template/> 
             </ul>
