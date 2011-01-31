@@ -161,7 +161,7 @@ public class IndexBuilder {
                  listOfIterators.add((((ObjectSourceIface) obj)
                         .getAllOfThisTypeIterator()));
              else
-                 log.debug("\tskipping object of class "
+                 log.warn("\tskipping object of class "
                          + obj.getClass().getName() + "\n"
                          + "\tIt doesn not implement ObjectSourceIface.\n");
         }
@@ -169,7 +169,7 @@ public class IndexBuilder {
         //clear out changed uris since we are doing a full index rebuild
         getAndEmptyChangedUris();
         
-        if( listOfIterators.size() == 0){ log.debug("Warning: no ObjectSources found.");}
+        if( listOfIterators.size() == 0){ log.warn("Warning: no ObjectSources found.");}
                 
         setReindexRequested(false);
         doBuild( listOfIterators, Collections.EMPTY_LIST, true, NEW_DOCS );
@@ -191,7 +191,7 @@ public class IndexBuilder {
 	            listOfIterators.add((((ObjectSourceIface) obj)
 	                    .getUpdatedSinceIterator(since)));
 	        else
-	            log.debug("\tskipping object of class "
+	            log.warn("\tskipping object of class "
 	                    + obj.getClass().getName() + "\n"
 	                    + "\tIt doesn not implement " + "ObjectSourceIface.\n");
 	    }
@@ -299,7 +299,7 @@ public class IndexBuilder {
             while (sourceIters.hasNext()) {
                 obj = sourceIters.next();
                 if (obj == null || !(obj instanceof Iterator)) {
-                    log.debug("\tskipping object of class "
+                    log.warn("\tskipping object of class "
                             + obj.getClass().getName() + "\n"
                             + "\tIt doesn not implement "
                             + "Iterator.\n");
@@ -323,9 +323,22 @@ public class IndexBuilder {
      */
     private void indexForSource(Iterator<Individual> individuals , boolean newDocs){
         if( individuals == null ) return;
-        while(individuals.hasNext()){
+     
+        long starttime = System.currentTimeMillis();         
+        long count = 0;
+        while(individuals.hasNext()){            
             indexItem(individuals.next(), newDocs);
+            count++;
+            if( log.isDebugEnabled() ){            
+                if( (count % 100 ) == 0 && count > 0 ){
+                    long dt = (System.currentTimeMillis() - starttime);
+                    log.debug("individuals indexed: " + count + " in " + dt + " msec " +
+                            " time pre individual = " + (dt / count) + " msec");                         
+                }                
+            }                
         }
+        log.info("individuals indexed: " + count + " in " + (System.currentTimeMillis() - starttime) + " msec" +
+        		" time per individual = " + (System.currentTimeMillis() - starttime)/ count + " msec") ;
     }
     
     /**
@@ -340,24 +353,29 @@ public class IndexBuilder {
         	if( ind.getVClasses() == null || ind.getVClasses().size() < 1 )
         		return;
         	boolean prohibitedClass = false;
+        	VClass prohClass = null;
         	if(  classesProhibitedFromSearch != null ){
         		for( VClass vclass : ind.getVClasses() ){
         			if( classesProhibitedFromSearch.isClassProhibited(vclass.getURI()) ){        			
         				prohibitedClass = true;
-        				log.debug("removing " + ind.getURI() + " from index because class " + vclass.getURI() + " is on prohibited list.");
+        				prohClass = vclass;
         				break;
         			}        		
         		}
         	}
         	if( !prohibitedClass ){
-        	    log.debug("Indexing '" + ind.getName() + "' URI: " + ind.getURI());
         		indexer.index(ind, newDoc);
-        	}else{        	    
-        		indexer.removeFromIndex(ind);
+        	}else{
+        	    if( ! newDoc ){
+        	        //log.debug("removing " + ind.getURI() + " from index because class " + prohClass.getURI() + " is on prohibited list.");
+        	        indexer.removeFromIndex(ind);
+        	    }else{
+        	        //log.debug("not adding " + ind.getURI() + " to index because class " + prohClass.getURI() + " is on prohibited list.");
+        	    }
         	}
         	
         }catch(Throwable ex){            
-            log.debug("IndexBuilder.indexItem() Error indexing "
+            log.warn("IndexBuilder.indexItem() Error indexing "
                     + ind + "\n" +ex);
         }
         return ;
