@@ -14,12 +14,25 @@
                (afn:localname(?link) AS ?linkName) 
                ?anchor 
                ?url WHERE {
-            GRAPH ?g1 { ?subject ?property ?link }
-            OPTIONAL { GRAPH ?g2 { ?link vitro:linkAnchor ?anchor } }
-            OPTIONAL { GRAPH ?g3 { ?link vitro:linkURL ?url } }
-            OPTIONAL { GRAPH ?g4 { ?link vitro:linkDisplayRank ?rank } }
+            ?subject ?property ?link 
+            OPTIONAL { ?link vitro:linkAnchor ?anchor }
+            OPTIONAL { ?link vitro:linkURL ?url }
+            OPTIONAL { ?link vitro:linkDisplayRank ?rank }
         } ORDER BY ?rank
     </query-base>
+
+    <query-construct>
+        CONSTRUCT {
+            ?subject ?property ?link .
+            ?link ?linkProp ?linkObj
+        } WHERE {
+            { ?subject ?property ?link }
+            UNION {
+                ?subject ?property ?link .
+                ?link ?linkProp ?linkObj
+            } 
+        }
+    </query-construct>
     
     <template>propStatement-vitroLink.ftl</template>
 </list-view-config>

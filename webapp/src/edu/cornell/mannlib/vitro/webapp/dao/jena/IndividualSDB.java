@@ -30,6 +30,7 @@ import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -132,7 +133,6 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         	Dataset dataset = w.getDataset();
         	try {
     	    	dataset.getLock().enterCriticalSection(Lock.READ);
-    	    	String[] graphVars = {"?g", "?h", "?i"};
     	    	String getStatements = 
     	    		"CONSTRUCT " +
     	    		"{ <"+individualURI+">  <" + RDFS.label.getURI() + 
@@ -140,18 +140,16 @@ public class IndividualSDB extends IndividualImpl implements Individual {
 //    	    		   "<"+individualURI+">  a ?type . \n" +
     	    		   "<"+individualURI+">  <" + VitroVocabulary.MONIKER + 
     	    		           "> ?moniker \n" +
-    	    		 "} WHERE { GRAPH <urn:x-arq:UnionGraph> {" +
-    	    		 "{ \n" +
+    	    		 "} WHERE {" +
     	    		 	"{ <"+individualURI+">  <" + RDFS.label.getURI() + 
     	    		 	        "> ?ooo } \n" +
     	    		 	"UNION { <" +
     	    		 	    individualURI+">  <" + VitroVocabulary.MONIKER + 
-    	    		 	        "> ?moniker }  \n" +
+    	    		 	        "> ?moniker \n" +
     	    		 	"}  \n" +
 //    	    		 	"UNION { <"
 //    	    		 	    + individualURI + "> a ?type } \n" +
-//    	    		    WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode) +
-    	    		 "} }";
+    	    		 "}";
         		model = QueryExecutionFactory.create(
         		        QueryFactory.create(getStatements), dataset)
         		                .execConstruct();
@@ -163,7 +161,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         	OntModel ontModel = ModelFactory.createOntologyModel(
         	        OntModelSpec.OWL_MEM, model);
         	
-        	if (model.isEmpty()) {
+        	if (model.isEmpty() && noTriplesFor(individualURI)) {
         	    throw new IndividualNotFoundException();
         	}
         	
@@ -171,6 +169,25 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	}
     	setUpURIParts(ind);
         this.webappDaoFactory = wadf;
+    }
+    
+    private boolean noTriplesFor(String individualURI) {
+        String ask = "ASK { <" + individualURI + "> ?p ?o }";
+        DatasetWrapper w = getDatasetWrapper();
+        Dataset dataset = w.getDataset();
+        dataset.getLock().enterCriticalSection(Lock.READ);
+        try {
+            Query askQuery = QueryFactory.create(ask, Syntax.syntaxARQ);
+            QueryExecution qe = QueryExecutionFactory.create(askQuery, dataset);
+            try {
+                return !qe.execAsk();
+            } finally {
+                qe.close();
+            }
+        } finally {
+            dataset.getLock().leaveCriticalSection();
+            w.close();
+        }
     }
     
     private static final boolean SKIP_INITIALIZATION = true;

@@ -56,7 +56,11 @@ public abstract class BaseObjectPropertyDataPostProcessor implements
     protected void addName(Map<String, String> map, String nameKey, String objectKey) {
         String name = map.get(nameKey);
         if (name == null) {
-            map.put(nameKey, getIndividual(map.get(objectKey)).getName());
+            // getIndividual() could return null
+            Individual ind = getIndividual(map.get(objectKey));
+            if (ind != null) {
+                map.put(nameKey, ind.getName());
+            }
         }
     }
     
