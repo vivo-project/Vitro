@@ -47,14 +47,17 @@
 <#macro collatedObjectPropertyList property editable template=property.template>
     <#assign subclasses = property.subclasses>
     <#list subclasses?keys as subclass>
-        <li class="subclass">
-            <#if subclass?has_content>
+        <#if subclass?has_content>
+            <li class="subclass" role="listitem">
                 <h3>${subclass?lower_case}</h3>
-            </#if>
-            <ul class="subclass-property-list">
-                <@objectPropertyList property editable subclasses[subclass] template/>
-            </ul>
-        </li>
+                <ul class="subclass-property-list">
+                    <@objectPropertyList property editable subclasses[subclass] template/>
+                </ul>
+            </li>
+        <#else>
+            <#-- If not in a subclass, list the statements in the top level ul, not nested -->
+            <@objectPropertyList property editable subclasses[subclass] template/>
+        </#if>
     </#list>
 </#macro>
 
