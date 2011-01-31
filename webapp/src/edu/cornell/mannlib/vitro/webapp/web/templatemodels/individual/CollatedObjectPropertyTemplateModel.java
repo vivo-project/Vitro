@@ -45,32 +45,40 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
     private WebappDaoFactory wdf;
     
     CollatedObjectPropertyTemplateModel(ObjectProperty op, Individual subject, 
-            VitroRequest vreq, EditingPolicyHelper policyHelper) 
-            throws InvalidConfigurationException {
+            VitroRequest vreq, EditingPolicyHelper policyHelper,
+            List<ObjectProperty> populatedObjectPropertyList) 
+        throws InvalidConfigurationException {
         
         super(op, subject, vreq, policyHelper); 
         
-        /* Get the data */
-        wdf = vreq.getWebappDaoFactory();
-        ObjectPropertyStatementDao opDao = wdf.getObjectPropertyStatementDao();
-        String subjectUri = subject.getURI();
-        String propertyUri = op.getURI();
-        List<Map<String, String>> statementData = 
-            opDao.getObjectPropertyStatementsForIndividualByProperty(subjectUri, propertyUri, getSelectQuery(), getConstructQueries());
-
-        /* Apply post-processing */
-        postprocess(statementData, wdf);
-        
-        /* Collate the data */
-        Map<String, List<ObjectPropertyStatementTemplateModel>> unsortedSubclasses = 
-            collate(subjectUri, propertyUri, statementData, vreq, policyHelper);
-
-        /* Sort by subclass name */
         subclasses = new TreeMap<String, List<ObjectPropertyStatementTemplateModel>>();
-        subclasses.putAll(unsortedSubclasses); 
         
-        for (List<ObjectPropertyStatementTemplateModel> list : subclasses.values()) {
-            postprocessStatementList(list);
+        if (populatedObjectPropertyList.contains(op)) {
+            log.debug("Getting data for populated object property " + getUri());
+            /* Get the data */
+            wdf = vreq.getWebappDaoFactory();
+            ObjectPropertyStatementDao opDao = wdf.getObjectPropertyStatementDao();
+            String subjectUri = subject.getURI();
+            String propertyUri = op.getURI();
+            List<Map<String, String>> statementData = 
+                opDao.getObjectPropertyStatementsForIndividualByProperty(subjectUri, propertyUri, getSelectQuery(), getConstructQueries());
+    
+            /* Apply post-processing */
+            postprocess(statementData, wdf);
+            
+            /* Collate the data */
+            Map<String, List<ObjectPropertyStatementTemplateModel>> unsortedSubclasses = 
+                collate(subjectUri, propertyUri, statementData, vreq, policyHelper);
+    
+            /* Sort by subclass name */
+            subclasses = new TreeMap<String, List<ObjectPropertyStatementTemplateModel>>();
+            subclasses.putAll(unsortedSubclasses); 
+            
+            for (List<ObjectPropertyStatementTemplateModel> list : subclasses.values()) {
+                postprocessStatementList(list);
+            }
+        } else {
+            log.debug("Object property " + getUri() + " is unpopulated.");
         }
     }
     

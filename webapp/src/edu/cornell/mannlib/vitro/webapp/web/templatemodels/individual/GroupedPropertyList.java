@@ -69,14 +69,14 @@ public class GroupedPropertyList extends BaseTemplateModel {
         // First get all the object properties that occur in statements in the db with this subject as subject.
         // This may include properties that are not defined as "possible properties" for a subject of this class,
         // so we cannot just rely on getting that list.
-        List<ObjectProperty> objectPropertyList = subject.getPopulatedObjectPropertyList();
-        propertyList.addAll(objectPropertyList);
+        List<ObjectProperty> populatedObjectPropertyList = subject.getPopulatedObjectPropertyList();
+        propertyList.addAll(populatedObjectPropertyList);
                 
         // If editing this page, merge in object properties applicable to the individual that are currently
         // unpopulated, so the properties are displayed to allow statements to be added to these properties.
         // RY In future, we should limit this to properties that the user CAN add properties to.
         if (policyHelper != null) {
-            mergeAllPossibleObjectProperties(objectPropertyList, propertyList);
+            mergeAllPossibleObjectProperties(populatedObjectPropertyList, propertyList);
         }
         
         // Now do much the same with data properties: get the list of populated data properties, then add in placeholders for missing ones 
@@ -85,8 +85,8 @@ public class GroupedPropertyList extends BaseTemplateModel {
         // DataPropertyStatements. Note that this does not apply to object properties, because the queries
         // can be customized and thus differ from property to property. So it's easier for now to keep the
         // two working in parallel.
-        List<DataProperty> dataPropertyList = subject.getPopulatedDataPropertyList();
-        propertyList.addAll(dataPropertyList);
+        List<DataProperty> populatedDataPropertyList = subject.getPopulatedDataPropertyList();
+        propertyList.addAll(populatedDataPropertyList);
     
         if (policyHelper != null) {
             mergeAllPossibleDataProperties(propertyList);           
@@ -100,7 +100,8 @@ public class GroupedPropertyList extends BaseTemplateModel {
         // Build the template data model from the groupList
         groups = new ArrayList<PropertyGroupTemplateModel>(propertyGroupList.size());
         for (PropertyGroup propertyGroup: propertyGroupList) {
-            groups.add(new PropertyGroupTemplateModel(vreq, propertyGroup, subject, policyHelper));
+            groups.add(new PropertyGroupTemplateModel(vreq, propertyGroup, subject, 
+                    policyHelper, populatedDataPropertyList, populatedObjectPropertyList));
         }   
     
     }

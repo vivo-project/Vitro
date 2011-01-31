@@ -29,17 +29,23 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
     
     private List<DataPropertyStatementTemplateModel> statements;
 
-    DataPropertyTemplateModel(DataProperty dp, Individual subject, VitroRequest vreq, EditingPolicyHelper policyHelper) {
+    DataPropertyTemplateModel(DataProperty dp, Individual subject, VitroRequest vreq, 
+            EditingPolicyHelper policyHelper, List<DataProperty> populatedDataPropertyList) {
+        
         super(dp, subject, policyHelper);
-
         setName(dp.getPublicName());
-
-        // Get the data property statements via a sparql query
-        DataPropertyStatementDao dpDao = vreq.getWebappDaoFactory().getDataPropertyStatementDao();
-        List<Literal> values = dpDao.getDataPropertyValuesForIndividualByProperty(subject, dp);
-        statements = new ArrayList<DataPropertyStatementTemplateModel>(values.size());
-        for (Literal value : values) {
-            statements.add(new DataPropertyStatementTemplateModel(subjectUri, propertyUri, value, policyHelper));
+        statements = new ArrayList<DataPropertyStatementTemplateModel>();
+        
+        // If the property is populated, get the data property statements via a sparql query
+        if (populatedDataPropertyList.contains(dp)) {
+            log.debug("Getting data for populated data property " + getUri());
+            DataPropertyStatementDao dpDao = vreq.getWebappDaoFactory().getDataPropertyStatementDao();
+            List<Literal> values = dpDao.getDataPropertyValuesForIndividualByProperty(subject, dp);            
+            for (Literal value : values) {
+                statements.add(new DataPropertyStatementTemplateModel(subjectUri, propertyUri, value, policyHelper));
+            }
+        } else {
+            log.debug("Data property " + getUri() + " is unpopulated.");
         }
         
         // Determine whether a new statement can be added

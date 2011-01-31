@@ -21,31 +21,38 @@ public class UncollatedObjectPropertyTemplateModel extends ObjectPropertyTemplat
     
     private List<ObjectPropertyStatementTemplateModel> statements;
     
-    UncollatedObjectPropertyTemplateModel(ObjectProperty op, Individual subject, VitroRequest vreq, EditingPolicyHelper policyHelper)
+    UncollatedObjectPropertyTemplateModel(ObjectProperty op, Individual subject, 
+            VitroRequest vreq, EditingPolicyHelper policyHelper, 
+            List<ObjectProperty> populatedObjectPropertyList)
         throws InvalidConfigurationException {
         
         super(op, subject, vreq, policyHelper);
+        statements = new ArrayList<ObjectPropertyStatementTemplateModel>();
         
-        /* Get the data */
-        WebappDaoFactory wdf = vreq.getWebappDaoFactory();
-        ObjectPropertyStatementDao opDao = wdf.getObjectPropertyStatementDao();
-        String subjectUri = subject.getURI();
-        String propertyUri = op.getURI();
-        List<Map<String, String>> statementData = 
-            opDao.getObjectPropertyStatementsForIndividualByProperty(subjectUri, propertyUri, getSelectQuery(), getConstructQueries());
-        
-        /* Apply postprocessing */
-        postprocess(statementData, wdf);
-        
-        /* Put into data structure to send to template */
-        statements = new ArrayList<ObjectPropertyStatementTemplateModel>(statementData.size());
-        String objectKey = getObjectKey();
-        for (Map<String, String> map : statementData) {
-            statements.add(new ObjectPropertyStatementTemplateModel(subjectUri, 
-                    propertyUri, objectKey, map, policyHelper));
+        if (populatedObjectPropertyList.contains(op)) {
+            log.debug("Getting data for populated object property " + getUri());
+            /* Get the data */
+            WebappDaoFactory wdf = vreq.getWebappDaoFactory();
+            ObjectPropertyStatementDao opDao = wdf.getObjectPropertyStatementDao();
+            String subjectUri = subject.getURI();
+            String propertyUri = op.getURI();
+            List<Map<String, String>> statementData = 
+                opDao.getObjectPropertyStatementsForIndividualByProperty(subjectUri, propertyUri, getSelectQuery(), getConstructQueries());
+            
+            /* Apply postprocessing */
+            postprocess(statementData, wdf);
+            
+            /* Put into data structure to send to template */            
+            String objectKey = getObjectKey();
+            for (Map<String, String> map : statementData) {
+                statements.add(new ObjectPropertyStatementTemplateModel(subjectUri, 
+                        propertyUri, objectKey, map, policyHelper));
+            }
+            
+            postprocessStatementList(statements);
+        } else {
+            log.debug("Object property " + getUri() + " is unpopulated.");
         }
-        
-        postprocessStatementList(statements);
     }
     
     /* Access methods for templates */

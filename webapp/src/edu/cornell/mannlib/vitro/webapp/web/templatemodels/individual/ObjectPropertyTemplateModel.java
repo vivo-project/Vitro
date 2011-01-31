@@ -169,18 +169,19 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     }
      
     protected static ObjectPropertyTemplateModel getObjectPropertyTemplateModel(ObjectProperty op, 
-            Individual subject, VitroRequest vreq, EditingPolicyHelper policyHelper) {
+            Individual subject, VitroRequest vreq, EditingPolicyHelper policyHelper, 
+            List<ObjectProperty> populatedObjectPropertyList) {
         
         if (op.getCollateBySubclass()) {
             try {
-                return new CollatedObjectPropertyTemplateModel(op, subject, vreq, policyHelper);
+                return new CollatedObjectPropertyTemplateModel(op, subject, vreq, policyHelper, populatedObjectPropertyList);
             } catch (InvalidConfigurationException e) {
                 log.warn(e.getMessage());     
                 // If the collated config is invalid, instantiate an UncollatedObjectPropertyTemplateModel instead.
             }
         } 
         try {
-            return new UncollatedObjectPropertyTemplateModel(op, subject, vreq, policyHelper);
+            return new UncollatedObjectPropertyTemplateModel(op, subject, vreq, policyHelper, populatedObjectPropertyList);
         } catch (InvalidConfigurationException e) {
             log.error(e.getMessage());
             return null;
