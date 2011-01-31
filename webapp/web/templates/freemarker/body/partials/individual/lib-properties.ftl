@@ -1,25 +1,24 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
-<#-- Function to test whether any statements exist with property as predicate -->
-<#function hasStatements property=false>
+<#-----------------------------------------------------------------------------
+    Macros for generating property lists
+------------------------------------------------------------------------------>
+
+<#-- Return true iff there are statements for this property -->
+<#function hasStatements propertyGroups propertyName>
+
+    <#local property = propertyGroups.getProperty(propertyName)!>
+    
     <#-- First ensure that the property is defined
     (an unpopulated property while logged out is undefined) -->
-    <#if property?is_boolean>
+    <#if ! property?has_content>
         <#return false>
     </#if>
     
-    <#if property.collatedBySubclass!false> <#-- collated -->
-        <#if (property.subclasses?size > 0)>
-            <#return true>
-        <#else>
-            <#return false>
-        </#if>
-    <#elseif property.statements??>
-        <#if (property.statements?size > 0)>
-            <#return true>
-        <#else>
-            <#return false>
-        </#if>
+    <#if property.collatedBySubclass!false> <#-- collated object property-->
+        <#return property.subclasses?has_content>
+    <#else>
+        <#return property.statements?has_content> <#-- data property or uncollated object property -->
     </#if>
 </#function>
 
