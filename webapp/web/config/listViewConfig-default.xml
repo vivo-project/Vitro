@@ -10,7 +10,7 @@
         PREFIX vitro: &lt;http://vitro.mannlib.cornell.edu/ns/vitro/0.7#&gt;
         PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;  
           
-        SELECT ?object ?name ?moniker {
+        SELECT ?object ?name ?moniker WHERE {
             GRAPH ?g1 { ?subject ?property ?object }
             OPTIONAL { GRAPH ?g2 { ?object rdfs:label ?name } }
             OPTIONAL { GRAPH ?g3 { ?object vitro:moniker ?moniker } }
@@ -20,13 +20,14 @@
     <query-collated>    
         PREFIX vitro: &lt;http://vitro.mannlib.cornell.edu/ns/vitro/0.7#&gt;
         PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;  
+        PREFIX afn:  &lt;http://jena.hpl.hp.com/ARQ/function#&gt;
           
-        SELECT ?subclass ?object ?name ?moniker {
-            GRAPH ?g1 { ?subject ?property ?object
-                OPTIONAL { ?object a ?subclass } 
-            }
+        SELECT ?subclass ?object ?name ?moniker WHERE {
+            GRAPH ?g1 { ?subject ?property ?object }
             OPTIONAL { GRAPH ?g2 { ?object rdfs:label ?name } }
-            OPTIONAL { GRAPH ?g3 { ?object vitro:moniker ?moniker } }           
+            OPTIONAL { GRAPH ?g3 { ?object vitro:moniker ?moniker } } 
+            OPTIONAL { GRAPH ?g4 { ?object a ?subclass } }
+            FILTER ( afn:namespace(?subclass) != "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#" )                     
         } ORDER BY ?subclass      
     </query-collated>
     
