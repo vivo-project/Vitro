@@ -336,63 +336,8 @@ public class IndividualDaoSDB extends IndividualDaoJena {
         	w.close();
         }
         
-//        getOntModel().enterCriticalSection(Lock.READ);
-//        try {
-//            ClosableIterator allIndIt = getOntModel().listIndividuals();
-//            try {
-//                while (allIndIt.hasNext()) {
-//                    com.hp.hpl.jena.ontology.Individual ind = (com.hp.hpl.jena.ontology.Individual) allIndIt.next();
-//                    
-//                    
-//                    
-//                    //don't include anything that lacks a label, issue VIVO-119.
-//                    if( getLabel(ind) == null )
-//                        continue;
-//                    
-//                    
-//                    boolean userVisible = true;
-//                    //Check for non-user visible types, maybe this should be an annotation?
-//                    ClosableIterator typeIt = ind.listRDFTypes(false);
-//                    try {
-//                        while (typeIt.hasNext()) {
-//                            Resource typeRes = (Resource) typeIt.next();
-//                            String type = typeRes.getURI();
-//                            // brute forcing this until we implement a better strategy
-//                            if (VitroVocabulary.PORTAL.equals(type) || 
-//                            	VitroVocabulary.TAB.equals(type) ||
-//                            	VitroVocabulary.TAB_INDIVIDUALRELATION.equals(type) ||
-//                            	VitroVocabulary.LINK.equals(type) ||
-//                            	VitroVocabulary.KEYWORD.equals(type) ||
-//                            	VitroVocabulary.KEYWORD_INDIVIDUALRELATION.equals(type) ||
-//                            	VitroVocabulary.CLASSGROUP.equals(type) ||
-//                            	VitroVocabulary.PROPERTYGROUP.equals(type) ||
-//                            	VitroVocabulary.APPLICATION.equals(type)) {    	
-//                                userVisible = false;
-//                                break;
-//                            }
-//                            if( OWL.ObjectProperty.getURI().equals(type) ||
-//                            	OWL.DatatypeProperty.getURI().equals(type) ||
-//                            	OWL.AnnotationProperty.getURI().equals(type) ||
-//                            	RDF.type.getURI().equals(type) ){
-//                            	userVisible = false;
-//                            	break;
-//                        	} 
-//                        }
-//                    } finally {
-//                        typeIt.close();
-//                    }
-//                    if (userVisible) {
-//                        list.add(ind);
-//                    }
-//                    
-//                }
-//            } finally {
-//                allIndIt.close();
-//            }
-//        } finally {
-//            getOntModel().leaveCriticalSection();
-//        }
         if (list.size() >0){
+            log.info("Number of individuals from source: " + list.size());
             return new Iterator(){
                 Iterator<String> innerIt = list.iterator();
                 public boolean hasNext() { 
