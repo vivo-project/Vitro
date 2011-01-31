@@ -11,7 +11,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,11 +31,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
-import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
-
-import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
-import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 
 public class SelectListGenerator {
     
@@ -188,13 +182,11 @@ public class SelectListGenerator {
                                                         if( stmts == null ) log.error("object properties for subject were null in SelectListGenerator.getOptions()");
     
                         individuals = removeIndividualsAlreadyInRange(individuals,stmts,predicateUri,editConfig.getObject());
-                        //Collections.sort(individuals,new compareIndividualsByName());
-    
-                        ProhibitedFromSearch pfs = editConfig.getProhibitedFromSearch();
+                        //Collections.sort(individuals,new compareIndividualsByName());    
                         
                         for( Individual ind : individuals ){
                             String uri = ind.getURI();
-                            if( uri != null && (pfs == null || !ind.isMemberOfClassProhibitedFromSearch(pfs)) ){              
+                            if( uri != null ){              
                         		optionsMap.put(uri,ind.getName().trim());                        
                         		++optionsCount;             	
                             }
@@ -279,10 +271,9 @@ public class SelectListGenerator {
                             log.error("No individuals of type "+vclass.getName()+" to add to pick list in SelectListGenerator.getOptions(); check portal visibility");
                             optionsMap.put("", "No " + vclass.getName() + " found");
                         }else{
-                        	ProhibitedFromSearch pfs = editConfig.getProhibitedFromSearch();
                             for( Individual ind : individuals ) {
                                 String uri = ind.getURI();
-                                if( uri != null && (pfs == null || !ind.isMemberOfClassProhibitedFromSearch(pfs)) ) {       
+                                if( uri != null ) {       
                                 	optionsMap.put(uri,ind.getName().trim());                        
                             		++optionsCount;
                                 }
