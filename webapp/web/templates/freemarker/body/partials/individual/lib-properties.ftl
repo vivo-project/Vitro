@@ -121,7 +121,10 @@ name will be used as the label. -->
     </#if>
 </#macro>
 
-<#-- Macros for specific properties -->
+
+<#-----------------------------------------------------------------------------
+    Macros for specific properties
+------------------------------------------------------------------------------>
 
 <#-- Vitro namespace links
      Currently the page displays the vitro namespace links properties. Future versions 
