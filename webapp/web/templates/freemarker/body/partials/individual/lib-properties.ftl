@@ -1,7 +1,7 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
 <#-----------------------------------------------------------------------------
-    Macros for generating property lists
+    Macros and functions for working with properties and property lists
 ------------------------------------------------------------------------------>
 
 <#-- Return true iff there are statements for this property -->
@@ -21,6 +21,7 @@
         <#return property.statements?has_content> <#-- data property or uncollated object property -->
     </#if>
 </#function>
+
 
 <#-----------------------------------------------------------------------------
     Macros for generating property lists
