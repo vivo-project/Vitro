@@ -36,7 +36,7 @@ template variable with the domain name for an AJAX request with visualizations.
 </script>
 
 <#-- Script to enable browsing individuals within a class -->
-${scripts.add("/js/menupage/browseByVClass.js")}
+${scripts.add("/js/jquery_plugins/jquery.scrollTo-min.js", "/js/menupage/browseByVClass.js")}
 
 <#-- Scripts required to create the visual graphs -->
 ${scripts.add("/js/raphael/raphael.js", "/js/raphael/g.raphael.js", "/js/raphael/g.pie.js", "/js/browseClassGroupsPie.js")}
