@@ -379,8 +379,7 @@ public class AuthenticateTest extends AbstractTestClass {
 		doTheRequest();
 
 		assertProcessBean(FORCED_PASSWORD_CHANGE, NEW_DBA_NAME, NO_MSG,
-				"Please choose a different password from the temporary "
-						+ "one provided initially.", URL_LOGIN, URL_WITH_LINK);
+				"Your new password cannot match the current one.", URL_LOGIN, URL_WITH_LINK);
 		assertRedirectToLoginProcessPage();
 	}
 
