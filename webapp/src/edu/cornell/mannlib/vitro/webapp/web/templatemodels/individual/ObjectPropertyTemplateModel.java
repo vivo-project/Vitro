@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -44,13 +45,6 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     private static final String TYPE = "object";
     private static final String EDIT_PATH = "edit/editRequestDispatch.jsp";
     private static final String IMAGE_UPLOAD_PATH = "/uploadImages";
-    
-    /* NB The default post-processor is not the same as the post-processor for the default view. The latter
-     * actually defines its own post-processor, whereas the default post-processor is used for custom views
-     * that don't define a post-processor, to ensure that the standard post-processing applies.
-     */
-    private static final String DEFAULT_POSTPROCESSOR = 
-        "edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.DefaultObjectPropertyDataPostProcessor";
     
     private static final String END_DATE_TIME_VARIABLE = "dateTimeEnd";
     private static final Pattern ORDER_BY_END_DATE_TIME_PATTERN = 
@@ -197,27 +191,22 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     protected void postprocess(List<Map<String, String>> data, WebappDaoFactory wdf) {
         
         if (log.isDebugEnabled()) {
-            log.debug("Data before postprocessing");
+            log.debug("Data for property " + getUri() + " before postprocessing");
             logData(data);
         }
         
-        String postprocessorName = config.postprocessor;
-        if (postprocessorName == null) {
-            postprocessorName = DEFAULT_POSTPROCESSOR;
-        }
-
-        try {
-            Class<?> postprocessorClass = Class.forName(postprocessorName);
-            // RY If class doesn't exist, use default postprocessor ***
-            Constructor<?> constructor = postprocessorClass.getConstructor(ObjectPropertyTemplateModel.class, WebappDaoFactory.class);
-            ObjectPropertyDataPostProcessor postprocessor = (ObjectPropertyDataPostProcessor) constructor.newInstance(this, wdf);
-            postprocessor.process(data);
-        } catch (Exception e) {
-            log.error(e, e);
+        ObjectPropertyDataPostProcessor postprocessor = config.postprocessor;
+        if (postprocessor == null) {
+            log.debug("No postprocessor for property " + getUri());
+            return;
+        } else {
+            log.debug("Using postprocessor " + postprocessor.getClass().getName() + " for property " + getUri());
         }
         
+        postprocessor.process(data);
+        
         if (log.isDebugEnabled()) {
-            log.debug("Data after postprocessing");
+            log.debug("Data for property " + getUri() + " after postprocessing");
             logData(data);
         }               
     }
@@ -320,12 +309,19 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         private static final String NODE_NAME_QUERY_COLLATED = "query-collated";
         private static final String NODE_NAME_TEMPLATE = "template";
         private static final String NODE_NAME_POSTPROCESSOR = "postprocessor";
+
+        /* NB The default post-processor is not the same as the post-processor for the default view. The latter
+         * actually defines its own post-processor, whereas the default post-processor is used for custom views
+         * that don't define a post-processor, to ensure that the standard post-processing applies.
+         */
+        private static final String DEFAULT_POSTPROCESSOR = 
+            "edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.DefaultObjectPropertyDataPostProcessor";
         
         private boolean isDefaultConfig;
         private Set<String> constructQueries;
         private String selectQuery;
         private String templateName;
-        private String postprocessor;
+        private ObjectPropertyDataPostProcessor postprocessor = null;
 
         PropertyListConfig(ObjectProperty op, VitroRequest vreq) 
             throws InvalidConfigurationException {
@@ -347,7 +343,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
                     configFilePath = getConfigFilePath(DEFAULT_CONFIG_FILE_NAME);
                     // Should we test for the existence of the default, and throw an error if it doesn't exist?
                 }                   
-                setValuesFromConfigFile(configFilePath, op);           
+                setValuesFromConfigFile(configFilePath, op, vreq.getWebappDaoFactory());           
 
             } catch (Exception e) {
                 log.error("Error processing config file " + configFilePath + " for object property " + op.getURI(), e);
@@ -367,7 +363,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
                             " in " + configFilePath + ":\n" +                            
                             configError + " Using default config instead.");
                     configFilePath = getConfigFilePath(DEFAULT_CONFIG_FILE_NAME);
-                    setValuesFromConfigFile(configFilePath, op);                    
+                    setValuesFromConfigFile(configFilePath, op, vreq.getWebappDaoFactory());                    
                 }
             }
             
@@ -406,7 +402,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
             return null;
         }
         
-        private void setValuesFromConfigFile(String configFilePath, ObjectProperty op) {
+        private void setValuesFromConfigFile(String configFilePath, ObjectProperty op, WebappDaoFactory wdf) {
             
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db;
@@ -419,19 +415,41 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
                 String queryNodeName = 
                     // Don't test op.getCollateBySubclass(), since if creating a CollatedObjectPropertyTemplateModel failed,
                     // we now want to create an UncollatedObjectPropertyTemplateModel
-                    (ObjectPropertyTemplateModel.this instanceof CollatedObjectPropertyTemplateModel) ? NODE_NAME_QUERY_COLLATED : NODE_NAME_QUERY_BASE;
+                    (ObjectPropertyTemplateModel.this instanceof CollatedObjectPropertyTemplateModel) ?
+                        NODE_NAME_QUERY_COLLATED : NODE_NAME_QUERY_BASE;
+                        
                 log.debug("Using query element " + queryNodeName + " for object property " + propertyUri);
                 selectQuery = getConfigValue(doc, queryNodeName, propertyUri);
                 templateName = getConfigValue(doc, NODE_NAME_TEMPLATE, propertyUri); 
                 
-                // Optional values
-                postprocessor = getConfigValue(doc, NODE_NAME_POSTPROCESSOR, propertyUri);
                 constructQueries = getConfigValues(doc, NODE_NAME_QUERY_CONSTRUCT, propertyUri);
-       
+                
+                String postprocessorName = getConfigValue(doc, NODE_NAME_POSTPROCESSOR, propertyUri);
+
+                if (StringUtils.isBlank(postprocessorName)) {
+                    log.debug("No postprocessor specified for property " + propertyUri + ". Using default postprocessor.");
+                    postprocessorName = DEFAULT_POSTPROCESSOR;
+                } 
+                try {
+                    getPostProcessor(postprocessorName, wdf);
+                } catch (Exception e) {
+                    if (! postprocessorName.equals(DEFAULT_POSTPROCESSOR)) {
+                        log.debug("Cannot find postprocessor specified for property " + propertyUri + ". Using default postprocessor.");
+                        postprocessorName = DEFAULT_POSTPROCESSOR;
+                        getPostProcessor(postprocessorName, wdf);
+                    }                 
+                }
+                
             } catch (Exception e) {
                 log.error("Error processing config file " + configFilePath, e);
                 // What should we do here?
             }            
+        }
+        
+        private void getPostProcessor(String name, WebappDaoFactory wdf) throws Exception {
+            Class<?> postprocessorClass = Class.forName(name);
+            Constructor<?> constructor = postprocessorClass.getConstructor(ObjectPropertyTemplateModel.class, WebappDaoFactory.class);
+            postprocessor = (ObjectPropertyDataPostProcessor) constructor.newInstance(ObjectPropertyTemplateModel.this, wdf);           
         }
  
         private String getConfigValue(Document doc, String nodeName, String propertyUri) {
