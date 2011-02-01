@@ -98,11 +98,9 @@ public WebappDaoFactory getUnfilteredDaoFactory() {
     if( subject == null ) throw new Error("could not find subject " + subjectUri);
     request.setAttribute("subjectName",subject.getName());
     
-    // Put keys statement_x into map as x => value
-    // get the fm config
-    // pass the statement map to the template
-    // put into string 
-    // output string in form
+    // Get the statement data to display
+    // rjy7 Alternative implementation: have the template put the markup into a url or form param
+    // which can then just be spit out here.
     String templateName = request.getParameter("templateName");
     Map params = request.getParameterMap();
     Map<String, String> statement = new HashMap<String, String>();
@@ -115,6 +113,7 @@ public WebappDaoFactory getUnfilteredDaoFactory() {
         }
     }
     
+    // Process the statement data through the template to create the display string
     String statementDisplay = null;
     if (! statement.isEmpty()) {
         Map<String, Object> map = new HashMap<String, Object>();
