@@ -181,14 +181,18 @@ public class EntityListController extends VitroHttpServlet {
         
         //execute lucene query for individuals of the specified type
         IndexSearcher index = LuceneIndexFactory.getIndexSearcher(context);
-        TopDocs docs = index.search(query, null, 
+        TopDocs docs = null;
+        try{
+            docs = index.search(query, null, 
                 ENTITY_LIST_CONTROLLER_MAX_RESULTS, 
-                new Sort(Entity2LuceneDoc.term.NAMEUNANALYZED));    
-        
-        if( docs == null ){
-            log.error("Search of lucene index returned null");
-            throw new ServletException("Search of lucene index returned null");
+                new Sort(Entity2LuceneDoc.term.NAMEUNANALYZED));
+        }catch(Throwable th){
+            log.error("Could not run search. " + th.getMessage());
+            docs = null;
         }
+        
+        if( docs == null )            
+            throw new ServletException("Could not run search in EntityListController");        
         
         //get list of individuals for the search results
         int size = docs.totalHits;
