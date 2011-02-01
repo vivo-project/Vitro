@@ -19,7 +19,7 @@
     margin-bottom: 30px;
 }
 #menupage-content.people {
-    width: 68%;
+    width: 73%;
 }
 #menupage-content h3 {
     padding: 0 25px 15px 0;
@@ -54,14 +54,15 @@ ul#vgraph-classes a {
     border: 1px dotted #ccc;
 }
 #menupage-graph.people {
-    width: 270px;
-    height: 270px;
+    width: 300px;
+    height: 360px;
     padding-right: 0;
     border: none;
+    margin-top: -40px;
 }
 /* FIND BY ------>  */
 #find-by {
-    width: 275px;
+    width: 230px;
     float: right;
     margin-top: 20px;
 }
@@ -71,7 +72,7 @@ ul#vgraph-classes a {
 }
 ul#find-filters {
     float: left;
-    width: 265px;
+    width: 230px;
 }
 ul#find-filters li {
     display: block;
