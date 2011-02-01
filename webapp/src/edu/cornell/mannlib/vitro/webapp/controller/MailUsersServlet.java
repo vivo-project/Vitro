@@ -2,9 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller;
 
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -25,15 +23,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.Logger;
-
 
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
 
 public class MailUsersServlet extends VitroHttpServlet {
-	//private static final Logger LOG = Logger.getLogger(ContactMailServlet.class);
+	private static final Log log = LogFactory.getLog(MailUsersServlet.class);
 	
     public static HttpServletRequest request;
     public static HttpServletRequest response;
@@ -55,9 +51,9 @@ public class MailUsersServlet extends VitroHttpServlet {
 	private String getSmtpHostFromProperties() {
 		String host = ConfigurationProperties.getProperty("Vitro.smtpHost");
 		if (host != null && !host.equals("")) {
-			//LOG.info("Found Vitro.smtpHost value of " + host);
+			log.debug("Found Vitro.smtpHost value of " + host);
 		} else {
-			System.out.println("No Vitro.smtpHost specified");
+			log.warn("No Vitro.smtpHost specified");
 		}
 		return (host != null && host.length() > 0) ? host : null;
 	}
@@ -187,7 +183,7 @@ public class MailUsersServlet extends VitroHttpServlet {
         try {
             // Construct the message
             MimeMessage msg = new MimeMessage( s );
-            //System.out.println("trying to send message from servlet");
+            log.debug("trying to send message from servlet");
 
             // Set the from address
             msg.setFrom( new InternetAddress( webuseremail ));
@@ -211,7 +207,7 @@ public class MailUsersServlet extends VitroHttpServlet {
             // set the Date: header
             msg.setSentDate( new Date() );
 
-            //System.out.println("sending from servlet");
+            log.debug("sending from servlet");
 
         //if (!probablySpam)
             Transport.send( msg ); // try to send the message via smtp - catch error exceptions
@@ -219,20 +215,13 @@ public class MailUsersServlet extends VitroHttpServlet {
 
         } catch (AddressException e) {
             status = "Please supply a valid email address.";
-            System.out.println("Error - status is " + status);
-            //outFile.println( status );
-            //outFile.println( e.getMessage() );
+            log.debug("Error - status is " + status);
         } catch (SendFailedException e) {
             status = "The system was unable to deliver your mail.  Please try again later.  [SEND FAILED]";
-            System.out.println("Error - status is " + status);
-            //outFile.println( status );
-            //outFile.println( e.getMessage() );
+            log.error("Error - status is " + status);
         } catch (MessagingException e) {
             status = "The system was unable to deliver your mail.  Please try again later.  [MESSAGING]";
-            System.out.println("Error - status is " + status);
-            //outFile.println( status );
-            //outFile.println( e.getMessage() );
-            e.printStackTrace();
+            log.error("Error - status is " + status, e);
         }
 
         //outFile.flush();
