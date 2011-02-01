@@ -29,7 +29,7 @@
        
         <#if errorMessage??>
             <section id="error-alert" role="alert"><img src="${urls.images}/iconAlert.png" alert="Error alert icon" />
-                <p>${errorMessage}</p>
+                <p class="login-alert">${errorMessage}</p>
             </section>
         </#if>
        

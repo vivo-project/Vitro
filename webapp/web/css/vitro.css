@@ -45,6 +45,9 @@ User feedback
     font-size: 0.9em;
     line-height: 30px;
 }
+#error-alert p.login-alert {
+    padding-top: 0px;
+}
 #confirmation-alert {
     color: #169f43;
     padding: 0px;
