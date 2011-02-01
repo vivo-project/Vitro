@@ -118,6 +118,7 @@ ul#individual-tools {
     margin-top: 10px;
     margin-bottom: 10px;
     height: 20px;
+    list-style-type: none;
 }
 ul#individual-tools li {
     padding-right: 9px;
@@ -251,6 +252,7 @@ p.view-all-coauthors {
 }
 #property-group-menu ul {
     display: block;
+    list-style-type: none;
 }
 #property-group-menu li {
     float: left;
@@ -295,6 +297,7 @@ article.property ul.property-list li.subclass h3 {
     border-bottom: none;
     padding: 10px 10px 10px 0;
     background-color: #fff;
+    margin-bottom: 0;
 }
 article.property .data-property-statement {
     padding: 10px 20px 10px 20px;
@@ -304,6 +307,7 @@ article.property .data-property-statement {
 article.property ul.property-list {
     background: #fff;
     padding-bottom: 20px;
+    list-style-type: none;
 }
 article.property ul.property-list li {
     line-height: 1.2em;
@@ -312,16 +316,11 @@ article.property ul.property-list li {
 }
 article.property ul.subclass-property-list {
     margin-left: 0;
+    list-style-position: inside;
 }
 article.property ul.subclass-property-list li {
     line-height: 1.2em;
     padding: 0 20px 10px 20px;
-}
-/* MISCELLANEOUS------>  */
-.listDateTime {
-    padding: 0.2em 0.4em;
-    font-size: 0.8em;
-    background: #f4f4f4;
 }
 /* EDITING DISPLAY------>  */
 .add-individual {
@@ -358,4 +357,10 @@ a.edit-mainImage img.edit-individual {
 }
 .middle {
     vertical-align: middle;
+}
+/* MISCELLANEOUS------>  */
+.listDateTime {
+    padding: 0.2em 0.4em;
+    font-size: 0.8em;
+    background: #f4f4f4;
 }
