@@ -202,17 +202,12 @@ h1.fn .preferred-title {
 }
 /* <------ INDIVIDUAL VISUALIZATION */
 #visualization {
-    float: right;
-    width: 226px;
-}
-/* <------ SPARKLINES  */
-#sparklines-publications {
     padding: 0 0 40px 30px;
     padding-top: 0;
     float: right;
     background-color: #fff;
 }
-#sparklines-publications h3 {
+#visualization h3 {
     padding-top: 10px;
     margin-bottom: 10px;
 }
