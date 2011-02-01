@@ -112,13 +112,16 @@ public class IndividualDaoSDB extends IndividualDaoJena {
         		String query = 
     	    		"SELECT DISTINCT ?ind ?label ?moniker " +
     	    		"WHERE " +
-    	    		 "{ GRAPH ?g { \n" +
-    	    		    " ?ind a <" + theClass.getURI() + ">  \n" +
-    	    		    "} \n" +
-    	    		 	"OPTIONAL { GRAPH ?h { ?ind  <" + RDFS.label.getURI() + "> ?label } }\n" +
-    	    		 	"OPTIONAL { GRAPH ?i { ?ind  <" + VitroVocabulary.MONIKER + "> ?moniker } } \n" +
-    	    		 	WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode) +
-    	    		 "} ORDER BY ?label";
+    	    		 "{ \n" +
+    	    		 	"{ \n" +
+                        "    ?ind a <" + theClass.getURI() + "> . \n" +
+    	    		 	"    ?ind  <" + RDFS.label.getURI() + "> ?label \n" +
+    	    		 	"} \n" +
+    	    		 	"UNION { \n" +
+                        "    ?ind a <" + theClass.getURI() + "> . \n" +
+    	    		 	"    ?ind  <" + VitroVocabulary.MONIKER + "> ?moniker \n" +
+    	    		 	"} \n" +
+    	    		 "} ORDER BY ?ind ?label";
         		ResultSet rs =QueryExecutionFactory.create(
         		        QueryFactory.create(query), dataset)
         		        .execSelect();

@@ -190,7 +190,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         }
     }
     
-    private static final boolean SKIP_INITIALIZATION = true;
+    static final boolean SKIP_INITIALIZATION = true;
     
     public IndividualSDB(String individualURI, 
             DatasetWrapperFactory datasetWrapperFactory,

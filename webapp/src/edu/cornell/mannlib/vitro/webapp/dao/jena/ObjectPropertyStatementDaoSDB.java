@@ -53,15 +53,15 @@ public class ObjectPropertyStatementDaoSDB extends
         	String query = "CONSTRUCT { \n" +
         			       "   <" + entity.getURI() + "> ?p ?o . \n" +
 //        			       "   ?o a ?oType . \n" +
-        			       "   ?o <" + RDFS.label.getURI() + "> ?oLabel .  \n" +
-        			       "   ?o <" + VitroVocabulary.MONIKER + "> ?oMoniker  \n" +
+//        			       "   ?o <" + RDFS.label.getURI() + "> ?oLabel .  \n" +
+//        			       "   ?o <" + VitroVocabulary.MONIKER + "> ?oMoniker  \n" +
         			       "} WHERE { \n" +
         			       "   { <" + entity.getURI() + "> ?p ?o } \n" +
 //        			       "   UNION { <" + entity.getURI() + "> ?p ?o . ?o a ?oType } \n" +
-        			       "   UNION { <" + entity.getURI() + "> ?p ?o . \n" +
-        			       "           ?o <" + RDFS.label.getURI() + "> ?oLabel } \n" +
-        			       "   UNION { <" + entity.getURI() + "> ?p ?o . \n " +
-        			       "           ?o <" + VitroVocabulary.MONIKER + "> ?oMoniker } \n" +
+//        			       "   UNION { <" + entity.getURI() + "> ?p ?o . \n" +
+//        			       "           ?o <" + RDFS.label.getURI() + "> ?oLabel } \n" +
+//        			       "   UNION { <" + entity.getURI() + "> ?p ?o . \n " +
+//        			       "           ?o <" + VitroVocabulary.MONIKER + "> ?oMoniker } \n" +
         			       "}";
         	long startTime = System.currentTimeMillis();
         	Model m = null;
@@ -127,7 +127,7 @@ public class ObjectPropertyStatementDaoSDB extends
 	                                        this.dwf, 
 	                                        datasetMode,
 	                                        getWebappDaoFactory(),
-	                                        m);
+	                                        IndividualSDB.SKIP_INITIALIZATION);
 	                                objPropertyStmt.setObject(objInd);
 	                            }
 	
