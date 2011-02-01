@@ -203,28 +203,29 @@ public class LuceneIndexer implements IndexerIface {
         	if( urisIndexed.contains(ind.getURI()) ){
         		log.debug("already indexed " + ind.getURI() );
         		return;
-        	}else
+        	}else{
         		urisIndexed.add(ind.getURI());
-        	
-            Iterator<Obj2DocIface> it = getObj2DocList().iterator();
-            while (it.hasNext()) {
-                Obj2DocIface obj2doc = (Obj2DocIface) it.next();
-                if (obj2doc.canTranslate(ind)) {
-                	Document d = (Document) obj2doc.translate(ind);
-                	if( d != null){                		                		                		
-                		if( !newDoc ){                    	                    		
-                			writer.updateDocument((Term)obj2doc.getIndexId(ind), d);
-                			log.debug("updated " + ind.getName() + " " + ind.getURI());
-                		}else{                    	
-                    		writer.addDocument(d);
-                    		log.debug("added " + ind.getName() + " " + ind.getURI());
-                		}
-                    }else{
-                    	log.debug("could not translate, removing from index " + ind.getURI());
-                    	writer.deleteDocuments((Term)obj2doc.getIndexId(ind));
+        	    log.debug("indexing " + ind.getURI());
+                Iterator<Obj2DocIface> it = getObj2DocList().iterator();
+                while (it.hasNext()) {
+                    Obj2DocIface obj2doc = (Obj2DocIface) it.next();
+                    if (obj2doc.canTranslate(ind)) {
+                    	Document d = (Document) obj2doc.translate(ind);
+                    	if( d != null){                		                		                		
+                    		if( !newDoc ){                    	                    		
+                    			writer.updateDocument((Term)obj2doc.getIndexId(ind), d);
+                    			log.debug("updated " + ind.getName() + " " + ind.getURI());
+                    		}else{                    	
+                        		writer.addDocument(d);
+                        		log.debug("added " + ind.getName() + " " + ind.getURI());
+                    		}
+                        }else{
+                        	log.debug("could not translate, removing from index " + ind.getURI());
+                        	writer.deleteDocuments((Term)obj2doc.getIndexId(ind));
+                        }
                     }
                 }
-            }
+        	}
         } catch (IOException ex) {
             throw new IndexingException(ex.getMessage());
         }
@@ -238,7 +239,7 @@ public class LuceneIndexer implements IndexerIface {
         if( writer == null )
             throw new IndexingException("LuceneIndexer: cannot delete from " +
             		"index, IndexWriter is null.");
-        try {
+        try {            
             Iterator<Obj2DocIface> it = getObj2DocList().iterator();
             while (it.hasNext()) {
                 Obj2DocIface obj2doc = (Obj2DocIface) it.next();
@@ -280,10 +281,14 @@ public class LuceneIndexer implements IndexerIface {
         File offLineDir = new File(currentOffLineDir);
         File liveDir = new File(liveIndexDir);
         boolean success =  offLineDir.renameTo( liveDir );
-        if( ! success )
+        if( ! success ){
             log.error("could not move off line index at " 
                     + offLineDir.getAbsolutePath() + " to live index directory " 
                     + liveDir.getAbsolutePath());
+        }else{            
+            deleteDir(new File(currentOffLineDir));
+            currentOffLineDir = null;
+        }
     }  
     
     private synchronized String getOffLineBuildDir(){
@@ -334,7 +339,7 @@ public class LuceneIndexer implements IndexerIface {
                     "be null but it isn't");
         if( this.currentOffLineDir != null)
             log.error("it is expected that the current" +
-                    "OffLineDir would be null but it is " + currentOffLineDir);
+                    "OffLineDir would be null but it is " + currentOffLineDir);      
         if( indexing )
             log.error("indexing should not be set to true just yet");        
     }

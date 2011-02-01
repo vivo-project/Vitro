@@ -333,12 +333,15 @@ public class IndexBuilder {
                 if( (count % 100 ) == 0 && count > 0 ){
                     long dt = (System.currentTimeMillis() - starttime);
                     log.debug("individuals indexed: " + count + " in " + dt + " msec " +
-                            " time pre individual = " + (dt / count) + " msec");                         
+                             " time pre individual = " + (dt / count) + " msec" );                          
                 }                
             }                
         }
-        log.info("individuals indexed: " + count + " in " + (System.currentTimeMillis() - starttime) + " msec" +
-        		" time per individual = " + (System.currentTimeMillis() - starttime)/ count + " msec") ;
+        
+        log.info( 
+             "individuals indexed: " + count + " in " + (System.currentTimeMillis() - starttime) + " msec" +
+        	  (count!=0?(" time per individual = " + (System.currentTimeMillis() - starttime)/ count + " msec"):"")
+        );
     }
     
     /**

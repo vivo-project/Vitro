@@ -119,7 +119,7 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
             //log.debug("Skipping individual without rdfs:label " + ent.getURI());
             //return null;
             log.debug("Using local name for individual with rdfs:label " + ent.getURI());
-            return ent.getLocalName();
+            value = ent.getLocalName();
         }
         Field name =new Field(term.NAME, value, 
                                Field.Store.YES, Field.Index.ANALYZED);
