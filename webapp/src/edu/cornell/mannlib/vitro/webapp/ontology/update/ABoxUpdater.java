@@ -503,7 +503,7 @@ public class ABoxUpdater {
 							((additions.size() > 1) ? "s" : "") +
 							" with predicate " + addedProperty.getURI() + 
 							" (as an inverse to existing  " + inverseOfAddedProperty.getURI() + 
-							" statements)");
+							" statement" + ((additions.size() > 1) ? "s" : "") + ")");
 				}
 				
 			} finally {
