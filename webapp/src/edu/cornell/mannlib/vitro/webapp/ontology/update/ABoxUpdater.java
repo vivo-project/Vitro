@@ -176,7 +176,7 @@ public class ABoxUpdater {
 		   
 		   //log summary of changes
 		   if (renameCount > 0) {
-			   logger.log("Changed " + renameCount + " subject reference" + ((renameCount > 1) ? "s" : "") + " from type"  + oldClass.getURI() + " to " + newClass.getURI());
+			   logger.log("Changed " + renameCount + " subject reference" + ((renameCount > 1) ? "s" : "") + " from type"  + oldClass.getURI() + " to type " + newClass.getURI());
 			   //logger.log(renameCount + " subject reference" + ((renameCount > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class " + ((renameCount > 1) ? "were" : "was") +" changed to " + newClass.getURI());
 		   }
 		   if (removeCount > 0) {
@@ -199,7 +199,7 @@ public class ABoxUpdater {
 		   //log summary of changes
 		   if (renameCount > 0) {
 			   //logger.log(renameCount + " object reference" + ((renameCount > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class " + ((renameCount > 1) ? "were" : "was") + " changed to " + newClass.getURI());
-			   logger.log("Renamed " + renameCount + " object reference" + ((renameCount > 1) ? "s" : "") + " from type "  + oldClass.getURI() + " to " + newClass.getURI());
+			   logger.log("Renamed " + renameCount + " object reference" + ((renameCount > 1) ? "s" : "") + " from type "  + oldClass.getURI() + " to type " + newClass.getURI());
 		   }
 		   
 		   aboxModel.remove(retractions);
