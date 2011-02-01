@@ -50,7 +50,6 @@ public class ObjectPropertyStatementDaoSDB extends
             return entity;
         else {
         	Map<String, ObjectProperty> uriToObjectProperty = new HashMap<String,ObjectProperty>();
-        	String[] graphVars = { "?g", "?h", "?i", "?j" };
         	String query = "CONSTRUCT { \n" +
         			       "   <" + entity.getURI() + "> ?p ?o . \n" +
 //        			       "   ?o a ?oType . \n" +
@@ -63,7 +62,6 @@ public class ObjectPropertyStatementDaoSDB extends
         			       "           ?o <" + RDFS.label.getURI() + "> ?oLabel } \n" +
         			       "   UNION { <" + entity.getURI() + "> ?p ?o . \n " +
         			       "           ?o <" + VitroVocabulary.MONIKER + "> ?oMoniker } \n" +
-                           WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode) +
         			       "}";
         	long startTime = System.currentTimeMillis();
         	Model m = null;
