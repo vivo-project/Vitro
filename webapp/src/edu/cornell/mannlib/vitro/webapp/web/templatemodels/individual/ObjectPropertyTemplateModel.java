@@ -55,7 +55,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         Pattern.compile("ORDER\\s+BY\\s+((DESC\\()?\\?subclass\\)?\\s+)?DESC\\s*\\(\\s*\\?" + 
                 END_DATE_TIME_VARIABLE + "\\)", Pattern.CASE_INSENSITIVE);
 
-    private static String KEY_SUBJECT = "subject";
+    private static final String KEY_SUBJECT = "subject";
     private static final String KEY_PROPERTY = "property";
     private static final String DEFAULT_LIST_VIEW_QUERY_OBJECT_VARIABLE_NAME = "object";
     private static final Pattern SUBJECT_PROPERTY_OBJECT_PATTERN = 
@@ -85,12 +85,13 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     }
     
     private PropertyListConfig config;
-    private String objectKey;
+    private String objectKey;    
     
     // Used for editing
     private boolean addAccess = false;
 
-    ObjectPropertyTemplateModel(ObjectProperty op, Individual subject, VitroRequest vreq, EditingPolicyHelper policyHelper)
+    ObjectPropertyTemplateModel(ObjectProperty op, Individual subject, VitroRequest vreq, 
+            EditingPolicyHelper policyHelper)
         throws InvalidConfigurationException {
         
         super(op, subject, policyHelper);
@@ -132,6 +133,10 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     
     protected Set<String> getConstructQueries() {
         return config.constructQueries;
+    }
+    
+    protected String getTemplateName() {
+        return config.templateName;
     }
 
     protected boolean hasDefaultListView() {

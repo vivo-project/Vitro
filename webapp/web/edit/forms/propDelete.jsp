@@ -21,8 +21,15 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.utils.FrontEndEditingUtils" %>
 <%@ page import="com.hp.hpl.jena.rdf.model.Model" %>
 <%@page import="edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils"%>
+<%@page import="edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerConfigurationLoader"%>
+<%@page import="edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet"%>
+<%@page import="edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper"%>
+
+<%@page import="freemarker.template.Configuration"%>
 
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="java.util.HashMap" %>
 
 <%@ page import="org.apache.commons.logging.Log" %>
 <%@ page import="org.apache.commons.logging.LogFactory" %>
@@ -90,58 +97,45 @@ public WebappDaoFactory getUnfilteredDaoFactory() {
     Individual subject = wdf.getIndividualDao().getIndividualByURI(subjectUri);
     if( subject == null ) throw new Error("could not find subject " + subjectUri);
     request.setAttribute("subjectName",subject.getName());
-
-    boolean foundClass = false;
-    String customShortView = null;
-    String shortViewPrefix = "/templates/entity/";
-    Individual object = getUnfilteredDaoFactory().getIndividualDao().getIndividualByURI(objectUri);
     
-    if( object == null ) {
-        //log.warn("Could not find object individual "+objectUri+" via wdf.getIndividualDao().getIndividualByURI(objectUri)");
-        request.setAttribute("objectName","(name unspecified)");
-    } else if (FrontEndEditingUtils.isVitroNsObjProp(predicateUri)) {
-          Model model = (Model)application.getAttribute("jenaOntModel");
-          request.setAttribute("individual", object);
-          request.setAttribute("objectName", FrontEndEditingUtils.getVitroNsObjDisplayName(predicateUri, object, model));
-          log.debug("setting object name " + (String)request.getAttribute("objectName") + " for vitro namespace object property " + predicateUri);
-    } else {
-        customShortView = MiscWebUtils.getCustomShortView(object, request); 
-        if (customShortView != null) {
-            foundClass = true;
-            log.debug("setting object name from VClass custom short view");
-            request.setAttribute("customShortView",shortViewPrefix + customShortView.trim());
-            request.setAttribute("individual",object);
+    // Put keys statement_x into map as x => value
+    // get the fm config
+    // pass the statement map to the template
+    // put into string 
+    // output string in form
+    String templateName = request.getParameter("templateName");
+    Map params = request.getParameterMap();
+    Map<String, String> statement = new HashMap<String, String>();
+    for (Object key : params.keySet()) {
+        String keyString = (String) key; //key.toString()
+        if (keyString.startsWith("statement_")) {
+            keyString = keyString.replaceFirst("statement_", "");
+            String value = ( (String[]) params.get(key))[0];
+            statement.put(keyString, value);
         }
-        if (!foundClass) {
-            VClass clas = prop.getRangeVClass();
-	        if (clas != null) {
-	            customShortView = clas.getCustomShortView();
-	            if (customShortView != null && customShortView.trim().length()>0) {
-	                log.warn("setting object name from VClass custom short view \""+customShortView.trim()+"\"");
-	                request.setAttribute("customShortView",shortViewPrefix + customShortView.trim());
-	                request.setAttribute("individual",object);
-	            } else {
-	                log.error("No custom short view jsp set for VClass "+clas.getName()+" so cannot render link name correctly");
-	                request.setAttribute("objectName",object.getName());
-	            }
-            }        
-        }
-    }%>
+    }
+    
+    String statementDisplay = null;
+    if (! statement.isEmpty()) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("statement", statement);
+        map.putAll(FreemarkerHttpServlet.getDirectives());
+        map.putAll(FreemarkerHttpServlet.getMethods());
+        ServletContext context = getServletContext();
+        FreemarkerConfigurationLoader loader = 
+            FreemarkerConfigurationLoader.getFreemarkerConfigurationLoader(context);
+        Configuration fmConfig = loader.getConfig(vreq);
+        TemplateProcessingHelper helper = new TemplateProcessingHelper(fmConfig, vreq, context);
+        statementDisplay =  helper.processTemplateToString(templateName, map);       
+    }
+    request.setAttribute("statementDisplay", statementDisplay);
+%>
 
 <jsp:include page="${preForm}"/>
 
 <form action="editRequestDispatch.jsp" method="get">
     <label for="submit"><h2>Are you sure you want to delete the following entry from <em>${propertyName}</em>?</h2></label>
-    <div class="toBeDeleted objProp">
-    	<c:choose>
-    		<c:when test="${!empty customShortView}">
-    			<c:set scope="request" var="individual" value="${individual}"/>
-    			<jsp:include page="${customShortView}" flush="true"/>
-                <c:remove var="customShortView"/>
-    		</c:when>
-    		<c:otherwise>${objectName}</c:otherwise>
-    	</c:choose>
-	</div>
+    <div class="toBeDeleted objProp">${statementDisplay}</div>
     <input type="hidden" name="subjectUri"   value="${param.subjectUri}"/>
     <input type="hidden" name="predicateUri" value="${param.predicateUri}"/>
     <input type="hidden" name="objectUri"    value="${param.objectUri}"/>

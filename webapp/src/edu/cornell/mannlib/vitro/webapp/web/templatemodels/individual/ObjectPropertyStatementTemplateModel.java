@@ -28,13 +28,16 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
     
     // Used for editing
     private String objectUri = null;
+    private String templateName = null;
 
-    ObjectPropertyStatementTemplateModel(String subjectUri, String propertyUri, 
-            String objectKey, Map<String, String> data, EditingPolicyHelper policyHelper) {
+    ObjectPropertyStatementTemplateModel(String subjectUri, String propertyUri, String objectKey, 
+            Map<String, String> data, EditingPolicyHelper policyHelper, String templateName) {
         super(subjectUri, propertyUri, policyHelper);
         
         this.data = data;
-        objectUri = data.get(objectKey);
+        this.objectUri = data.get(objectKey);
+        this.templateName = templateName;
+        
         setEditAccess(policyHelper);
     }
 
@@ -107,6 +110,11 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
                     "predicateUri", propertyUri,
                     "objectUri", objectUri,
                     "cmd", "delete");
+            for ( String key : data.keySet() ) {
+                params.put("statement_" + key, data.get(key));
+            }
+            params.put("templateName", templateName);
+            
             deleteUrl = UrlBuilder.getUrl(EDIT_PATH, params);
 
         }

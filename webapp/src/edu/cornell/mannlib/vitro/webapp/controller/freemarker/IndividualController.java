@@ -130,8 +130,7 @@ public class IndividualController extends FreemarkerHttpServlet {
     		 * into the data model: no real data can be modified. 
     		 */
 	        body.put("individual", getNonDefaultBeansWrapper(BeansWrapper.EXPOSE_SAFE).wrap(itm));
-	        body.put("headContent", getRdfLinkTag(itm));	        
-	        body.put("localName", new IndividualLocalNameMethod());
+	        body.put("headContent", getRdfLinkTag(itm));	       
 	        
 	        String template = getIndividualTemplate(individual, vreq);
 	                

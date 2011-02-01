@@ -34,6 +34,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Tem
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 import edu.cornell.mannlib.vitro.webapp.web.BreadCrumbsUtil;
 import edu.cornell.mannlib.vitro.webapp.web.PortalWebUtil;
+import edu.cornell.mannlib.vitro.webapp.web.functions.IndividualLocalNameMethod;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.User;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.files.Scripts;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.files.Stylesheets;
@@ -311,7 +312,6 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
      *  Add any Java directives the templates should have access to.
      *  This is public and static so that these may be used by other classes during
      *  the transition from JSP to Freemarker.
-     * @return
      */    
     public static Map<String, Object> getDirectives() {
         Map<String, Object> map = new HashMap<String, Object>();
@@ -324,9 +324,10 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         return map;
     }
     
-    protected Map<String, Object> getMethods() {
+    public static Map<String, Object> getMethods() {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("profileUrl", new edu.cornell.mannlib.vitro.webapp.web.functions.IndividualProfileUrlMethod());
+        map.put("localName", new edu.cornell.mannlib.vitro.webapp.web.functions.IndividualLocalNameMethod());
         return map;
     }
     

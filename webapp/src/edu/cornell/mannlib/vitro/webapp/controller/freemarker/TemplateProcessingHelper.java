@@ -26,16 +26,14 @@ public class TemplateProcessingHelper {
     private Configuration config = null;
     private HttpServletRequest request = null;
     private ServletContext context = null;
-    //private Map<String, Object> templateDataModel = null;
     
-    TemplateProcessingHelper(Configuration config, HttpServletRequest request, ServletContext context) {
+    public TemplateProcessingHelper(Configuration config, HttpServletRequest request, ServletContext context) {
         this.config = config;
         this.request = request;
         this.context = context;
-        //this.templateDataModel = new HashMap<String, Object>();
     }
     
-    protected StringWriter processTemplate(String templateName, Map<String, Object> map) {
+    public StringWriter processTemplate(String templateName, Map<String, Object> map) {
         Template template = getTemplate(templateName);
         StringWriter sw = new StringWriter();        
         processTemplate(template, map, sw);
@@ -65,8 +63,9 @@ public class TemplateProcessingHelper {
         }        
     }
 
-    // In fact, we can put StringWriter objects directly into the data model, so perhaps we should eliminate the processTemplateToString() methods.
-    protected String processTemplateToString(String templateName, Map<String, Object> map) {
+    // For cases where we need a String instead of a StringWriter. StringWriter objects can be put in the template data model,
+    // but we can use this method from a jsp, for example.
+    public String processTemplateToString(String templateName, Map<String, Object> map) {
         return processTemplate(templateName, map).toString();
     }
 
