@@ -96,6 +96,10 @@ name will be used as the label. -->
     </#if>
 </#macro>
 
+<#macro propertyLabel property label="${property.name?capitalize}">
+    <h2 id="${property.localName}">${label}</h2> 
+</#macro>
+
 <#macro propertyListItem property statement editable>
     <li role="listitem">    
         <#nested>        
@@ -142,11 +146,16 @@ name will be used as the label. -->
 
     <#if (primaryLink?has_content || additionalLinks?has_content)> <#-- true when the property is in the list, even if not populated (when editing) -->
         <nav role="navigation">
-            <@addLinkWithLabel primaryLink editable "Primary Web Page" />
+            <#local primaryLinkLabel = "Primary Web Page">
+            <@propertyLabel primaryLink primaryLinkLabel />
             <#if primaryLink.statements?has_content> <#-- if there are any statements -->
                 <ul class="${linkListClass}" id="links-primary" role="list">
                     <@objectPropertyList primaryLink editable />
                 </ul>
+            <#else>
+                <#-- Show add link only if there isn't a primaryLink already (displayLimitAnnnot not 
+                supported for object properties). -->
+                <@addLinkWithLabel primaryLink editable primaryLinkLabel /> 
             </#if>
             <@addLinkWithLabel additionalLinks editable "Additional Web Pages" />
             <#if additionalLinks.statements?has_content> <#-- if there are any statements -->
