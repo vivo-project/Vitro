@@ -49,34 +49,30 @@ public class IndividualTemplateModel extends BaseTemplateModel {
         } 
     }
     
-    private boolean isVClass(String vClassUri) {
-        boolean isVClass = individual.isVClass(vClassUri);  
-        // If reasoning is asynchronous (under RDB), this inference may not have been made yet. 
-        // Check the superclasses of the individual's vclass.
-        if (!isVClass && SimpleReasoner.isABoxReasoningAsynchronous(getServletContext())) { 
-            log.debug("Checking superclasses to see if individual is a " + vClassUri + " because reasoning is asynchronous");
-            List<VClass> directVClasses = individual.getVClasses(true);
-            for (VClass directVClass : directVClasses) {
-                VClassDao vcDao = vreq.getWebappDaoFactory().getVClassDao();
-                List<String> superClassUris = vcDao.getAllSuperClassURIs(directVClass.getURI());
-                if (superClassUris.contains(vClassUri)) {
-                    isVClass = true;
-                    break;
-                }
-            }
-        }
-        return isVClass;
-    }
+//    private boolean isVClass(String vClassUri) {
+//        boolean isVClass = individual.isVClass(vClassUri);  
+//        // If reasoning is asynchronous (under RDB), this inference may not have been made yet. 
+//        // Check the superclasses of the individual's vclass.
+//        if (!isVClass && SimpleReasoner.isABoxReasoningAsynchronous(getServletContext())) { 
+//            log.debug("Checking superclasses to see if individual is a " + vClassUri + " because reasoning is asynchronous");
+//            List<VClass> directVClasses = individual.getVClasses(true);
+//            for (VClass directVClass : directVClasses) {
+//                VClassDao vcDao = vreq.getWebappDaoFactory().getVClassDao();
+//                List<String> superClassUris = vcDao.getAllSuperClassURIs(directVClass.getURI());
+//                if (superClassUris.contains(vClassUri)) {
+//                    isVClass = true;
+//                    break;
+//                }
+//            }
+//        }
+//        return isVClass;
+//    }
     
     
     /* These methods perform some manipulation of the data returned by the Individual methods */
     
     public String getProfileUrl() {
         return UrlBuilder.getIndividualProfileUrl(individual, vreq.getWebappDaoFactory());
-    }
-    
-    public String getVisualizationUrl() {
-        return isPerson() ? getUrl(Route.VISUALIZATION_AJAX.path(), "uri", getUri()) : null;
     }
 
     // This remains as a convenience method for getting the image url. We could instead use a custom list 
@@ -131,17 +127,6 @@ public class IndividualTemplateModel extends BaseTemplateModel {
         return urlBuilder.getPortalUrl(Route.INDIVIDUAL_EDIT, "uri", getUri());
     }
 
-    // RY We should not have references to a specific ontology in the vitro code.
-    // We should subclass IndividualTemplateModel in the VIVO code and add the isPerson()
-    // and getVisualizationUrl() methods there.
-    public boolean isPerson() {
-        return isVClass("http://xmlns.com/foaf/0.1/Person");
-    }
-    
-    public boolean isOrganization() {
-        return isVClass("http://xmlns.com/foaf/0.1/Organization");        
-    }
-    
     public GroupedPropertyList getPropertyList() {
         if (propertyList == null) {
             propertyList = new GroupedPropertyList(individual, vreq, policyHelper);
