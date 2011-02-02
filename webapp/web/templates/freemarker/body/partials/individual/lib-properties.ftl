@@ -146,9 +146,9 @@ name will be used as the label. -->
 
     <#if (primaryLink?has_content || additionalLinks?has_content)> <#-- true when the property is in the list, even if not populated (when editing) -->
         <nav role="navigation">
-            <#local primaryLinkLabel = "Primary Web Page">
-            <@propertyLabel primaryLink primaryLinkLabel />
+            <#local primaryLinkLabel = "Primary Web Page">            
             <#if primaryLink.statements?has_content> <#-- if there are any statements -->
+                <@propertyLabel primaryLink primaryLinkLabel />
                 <ul class="${linkListClass}" id="links-primary" role="list">
                     <@objectPropertyList primaryLink editable />
                 </ul>
