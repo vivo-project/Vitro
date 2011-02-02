@@ -342,122 +342,133 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     }
 
     private void doFlag1() {
-    	String getObjects = null;
-        Model tempModel = ModelFactory.createDefaultModel();
-        OntModel ontModel = ModelFactory.createOntologyModel(
-                OntModelSpec.OWL_MEM);
-        DatasetWrapper w = getDatasetWrapper();
-        Dataset dataset = w.getDataset();
-        dataset.getLock().enterCriticalSection(Lock.READ);
-        try {
-        	ClosableIterator typeIt = null;
-            int portalNumeric = 0;
-            String portalSet = "";
-            try{
-            	getObjects = 
-            		"CONSTRUCT{<" + this.individualURI + "> <" + 
-            		        RDF.type + "> ?object}" +
-        			"WHERE{ <" + this.individualURI + "> <" + 
-        			        RDF.type + "> ?object }";
-        		tempModel = QueryExecutionFactory.create(
-        		        QueryFactory.create(
-        		                getObjects), dataset).execConstruct();
-        		ontModel.add(tempModel.listStatements());
-        	    OntResource ontRes = ontModel.createOntResource(
-        	            this.individualURI);
-        	    typeIt = ontRes.getOntModel().listStatements(
-        	            ontRes, RDF.type ,(String) null);
-        	    while (typeIt.hasNext()) {
-                    Statement stmt = (Statement) typeIt.next();
-                    Resource type = (Resource)stmt.getObject();
-                    String typeName = type.getLocalName();
-                    if(type.getNameSpace() != null 
-                            && type.getNameSpace().equals(
-                                    VitroVocabulary.vitroURI) 
-                            && typeName.indexOf("Flag1Value")==0) {
-                        try {
-                            int portalNumber = Integer.decode(
-                                    typeName.substring(10,typeName.length()-5));
-                            portalNumeric = portalNumeric | (1 << portalNumber);
-                            if (portalSet.length() > 0) {
-                                portalSet+=",";
+        if( webappDaoFactory.getPortalDao().isSinglePortal() ){
+            flag1Set = "0";
+            flag1Numeric = 1;
+        }else{
+        	String getObjects = null;
+            Model tempModel = ModelFactory.createDefaultModel();
+            OntModel ontModel = ModelFactory.createOntologyModel(
+                    OntModelSpec.OWL_MEM);
+            DatasetWrapper w = getDatasetWrapper();
+            Dataset dataset = w.getDataset();
+            dataset.getLock().enterCriticalSection(Lock.READ);
+            try {
+            	ClosableIterator typeIt = null;
+                int portalNumeric = 0;
+                String portalSet = "";
+                try{
+                	getObjects = 
+                		"CONSTRUCT{<" + this.individualURI + "> <" + 
+                		        RDF.type + "> ?object}" +
+            			"WHERE{ <" + this.individualURI + "> <" + 
+            			        RDF.type + "> ?object }";
+            		tempModel = QueryExecutionFactory.create(
+            		        QueryFactory.create(
+            		                getObjects), dataset).execConstruct();
+            		ontModel.add(tempModel.listStatements());
+            	    OntResource ontRes = ontModel.createOntResource(
+            	            this.individualURI);
+            	    typeIt = ontRes.getOntModel().listStatements(
+            	            ontRes, RDF.type ,(String) null);
+            	    while (typeIt.hasNext()) {
+                        Statement stmt = (Statement) typeIt.next();
+                        Resource type = (Resource)stmt.getObject();
+                        String typeName = type.getLocalName();
+                        if(type.getNameSpace() != null 
+                                && type.getNameSpace().equals(
+                                        VitroVocabulary.vitroURI) 
+                                && typeName.indexOf("Flag1Value")==0) {
+                            try {
+                                int portalNumber = Integer.decode(
+                                        typeName.substring(10,typeName.length()-5));
+                                portalNumeric = portalNumeric | (1 << portalNumber);
+                                if (portalSet.length() > 0) {
+                                    portalSet+=",";
+                                }
+                                portalSet+=Integer.toString(portalNumber);
+                            } catch (Exception e) {
+                            	log.warn("could not convert into a " +
+                            			"portal id:'" + typeName + "' " + e.getMessage());
                             }
-                            portalSet+=Integer.toString(portalNumber);
-                        } catch (Exception e) {
-                        	log.error(e,e);
                         }
                     }
+                }finally{
+                    if( typeIt != null ) typeIt.close() ;
                 }
-            }finally{
-                if( typeIt != null ) typeIt.close() ;
-            }
-            flag1Set = portalSet;
-            flag1Numeric = portalNumeric;
-        } finally {
-            tempModel.close();
-            ontModel.close();
-            dataset.getLock().leaveCriticalSection();
-        	w.close();
+                flag1Set = portalSet;
+                flag1Numeric = portalNumeric;
+            } finally {
+                tempModel.close();
+                ontModel.close();
+                dataset.getLock().leaveCriticalSection();
+            	w.close();
+            }        
         }
     }
 
     
     private void doFlag2() {
-    	String getObjects = null;
-        Model tempModel = ModelFactory.createDefaultModel();
-        OntModel ontModel = ModelFactory.createOntologyModel(
-                OntModelSpec.OWL_MEM);
-        DatasetWrapper w = getDatasetWrapper();
-        Dataset dataset = w.getDataset();
-    	dataset.getLock().enterCriticalSection(Lock.READ);
-        try {
-            ClosableIterator typeIt=null;
-            String flagSet = "";
-            try{
-            	getObjects = 
-            		"CONSTRUCT{<" + this.individualURI + "> <" + 
-            		        RDF.type + "> ?object}" +
-        			"WHERE{ <" + this.individualURI + "> <" + 
-        			        RDF.type + "> ?object }";
-        		tempModel = QueryExecutionFactory.create(
-        		        QueryFactory.create(
-        		                getObjects), dataset).execConstruct();
-        		ontModel.add(tempModel.listStatements());
-        	    OntResource ontRes = ontModel.createOntResource(
-        	            this.individualURI);
-        	    typeIt = ontRes.getOntModel().listStatements(
-        	            ontRes, RDF.type ,(String) null);
-        	    while (typeIt.hasNext()) {
-                    Statement stmt = (Statement) typeIt.next();
-                    Resource type = (Resource)stmt.getObject();
-                    String typeName = type.getLocalName();
-                    if(type.getNameSpace() != null 
-                            && type.getNameSpace().equals(
-                                    VitroVocabulary.vitroURI) 
-                            && typeName.indexOf("Flag2Value")==0) {
-                        try {
-                            String flagValue = 
-                                    ((WebappDaoFactoryJena) webappDaoFactory)
-                                            .getFlag2ClassLabelMap().get(type);
-                            if (flagSet.length() > 0) {
-                                flagSet+=",";
+        if( webappDaoFactory.getPortalDao().isSinglePortal() ){
+            flag2Set = "";
+            flag2Numeric = 0 ;
+        }else{
+        	String getObjects = null;
+            Model tempModel = ModelFactory.createDefaultModel();
+            OntModel ontModel = ModelFactory.createOntologyModel(
+                    OntModelSpec.OWL_MEM);
+            DatasetWrapper w = getDatasetWrapper();
+            Dataset dataset = w.getDataset();
+        	dataset.getLock().enterCriticalSection(Lock.READ);
+            try {
+                ClosableIterator typeIt=null;
+                String flagSet = "";
+                try{
+                	getObjects = 
+                		"CONSTRUCT{<" + this.individualURI + "> <" + 
+                		        RDF.type + "> ?object}" +
+            			"WHERE{ <" + this.individualURI + "> <" + 
+            			        RDF.type + "> ?object }";
+            		tempModel = QueryExecutionFactory.create(
+            		        QueryFactory.create(
+            		                getObjects), dataset).execConstruct();
+            		ontModel.add(tempModel.listStatements());
+            	    OntResource ontRes = ontModel.createOntResource(
+            	            this.individualURI);
+            	    typeIt = ontRes.getOntModel().listStatements(
+            	            ontRes, RDF.type ,(String) null);
+            	    while (typeIt.hasNext()) {
+                        Statement stmt = (Statement) typeIt.next();
+                        Resource type = (Resource)stmt.getObject();
+                        String typeName = type.getLocalName();
+                        if(type.getNameSpace() != null 
+                                && type.getNameSpace().equals(
+                                        VitroVocabulary.vitroURI) 
+                                && typeName.indexOf("Flag2Value")==0) {
+                            try {
+                                String flagValue = 
+                                        ((WebappDaoFactoryJena) webappDaoFactory)
+                                                .getFlag2ClassLabelMap().get(type);
+                                if (flagSet.length() > 0) {
+                                    flagSet+=",";
+                                }
+                                flagSet+=flagValue;
+                            } catch (Exception e) {
+                            	log.error(e,e);
                             }
-                            flagSet+=flagValue;
-                        } catch (Exception e) {
-                        	log.error(e,e);
                         }
                     }
+                }finally{
+                    if( typeIt != null ) typeIt.close() ;
                 }
-            }finally{
-                if( typeIt != null ) typeIt.close() ;
+                flag2Set = flagSet;
+            } finally {
+            	tempModel.close();
+                ontModel.close();
+            	dataset.getLock().leaveCriticalSection();
+            	w.close();
             }
-            flag2Set = flagSet;
-        } finally {
-        	tempModel.close();
-            ontModel.close();
-        	dataset.getLock().leaveCriticalSection();
-        	w.close();
-        }
+        }        
     }
 
 
@@ -576,45 +587,48 @@ public class IndividualSDB extends IndividualImpl implements Individual {
                 moniker = webappDaoFactory.getJenaBaseDao()
                         .getPropertyStringValue(
                                 ind,webappDaoFactory.getJenaBaseDao().MONIKER);
-                if (moniker == null) {
-                	try {
-                        // trying to deal with the fact that an entity 
-                	    // may have more than 1 VClass
-                        List<VClass> clasList = this.getVClasses(true);
-                        if (clasList == null || clasList.size() < 2) {
-                            if( getVClass() != null )
-                                moniker = getVClass().getName();
-                        } else {
-                            VClass preferredClass = null;
-                            for (VClass clas : clasList) {
-                                if (clas.getCustomDisplayView() != null 
-                                        && clas.getCustomDisplayView()
-                                                .length()>0) {
-                                    // arbitrarily deciding that the 
-                                    // preferred class (could be >1) 
-                                    // is one with a custom view
-                                    preferredClass = clas;
-                                    log.debug("Found direct class [" +
-                                            clas.getName() + 
-                                            "] with custom view " +
-                                            clas.getCustomDisplayView() + 
-                                            "; resetting entity vClass " +
-                                            "to this class");
-                                }
-                            }
-                            if (preferredClass == null) {
-                                // no basis for selecting a preferred 
-                                // class name to use
-                                moniker = null; 
-                                        // was this.getVClass().getName();
-                            } else {
-                                 preferredClass.getName();
-                            }
-                        }
-                	} catch (Exception e) {
-                		log.error(e,e);
-                	}
-                }
+                //Changing behavior to moniker because it is taking extra time to get the vclass
+                //alternative if the moniker isn't filled out.  That time is wasted if the vclass alternative isn't desired.
+                //see NIHVIVO-2001
+//                if (moniker == null) {                   
+//                	try {
+//                        // trying to deal with the fact that an entity 
+//                	    // may have more than 1 VClass
+//                        List<VClass> clasList = this.getVClasses(true);
+//                        if (clasList == null || clasList.size() < 2) {
+//                            if( getVClass() != null )
+//                                moniker = getVClass().getName();
+//                        } else {
+//                            VClass preferredClass = null;
+//                            for (VClass clas : clasList) {
+//                                if (clas.getCustomDisplayView() != null 
+//                                        && clas.getCustomDisplayView()
+//                                                .length()>0) {
+//                                    // arbitrarily deciding that the 
+//                                    // preferred class (could be >1) 
+//                                    // is one with a custom view
+//                                    preferredClass = clas;
+//                                    log.debug("Found direct class [" +
+//                                            clas.getName() + 
+//                                            "] with custom view " +
+//                                            clas.getCustomDisplayView() + 
+//                                            "; resetting entity vClass " +
+//                                            "to this class");
+//                                }
+//                            }
+//                            if (preferredClass == null) {
+//                                // no basis for selecting a preferred 
+//                                // class name to use
+//                                moniker = null; 
+//                                        // was this.getVClass().getName();
+//                            } else {
+//                                 preferredClass.getName();
+//                            }
+//                        }
+//                	} catch (Exception e) {
+//                		log.error(e,e);
+//                	}
+//                }
                 return moniker;
             } finally {
             	ind.getOntModel().leaveCriticalSection();
