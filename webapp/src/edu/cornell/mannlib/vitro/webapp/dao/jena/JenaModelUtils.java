@@ -257,8 +257,8 @@ private final OntModelSpec DEFAULT_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM;
 		//OntModel ontModel = ( inputModel instanceof OntModel ) 
 		//? (OntModel)inputModel
 		//: ModelFactory.createOntologyModel( DEFAULT_ONT_MODEL_SPEC, inputModel );
-		OntModel ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
-		Model model = ModelFactory.createDefaultModel();
+		//OntModel ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+		/*Model model = ModelFactory.createDefaultModel();
 		String getStatements = 
 			"CONSTRUCT " +
 			"{ ?p ?o ?a \n" +
@@ -274,7 +274,8 @@ private final OntModelSpec DEFAULT_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM;
 		finally{
 			dataset.getLock().leaveCriticalSection();
 		}
-		ontModel.add(model.listStatements());	
+		ontModel.add(model.listStatements());*/	
+		OntModel ontModel = extractTBox(dataset, null, graphURI);
 		
 	
 		try {
@@ -284,8 +285,9 @@ private final OntModelSpec DEFAULT_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM;
 			while ( classIt.hasNext() ) {
 				
 				OntClass ontClass = (OntClass) classIt.next();
-				if ( !(ontClass.getNameSpace().startsWith(OWL.getURI()) )  
-					 && !(ontClass.getNameSpace().startsWith(VitroVocabulary.vitroURI))	) {
+				//if ( !(ontClass.getNameSpace().startsWith(OWL.getURI()) )  
+				// && !(ontClass.getNameSpace().startsWith(VitroVocabulary.vitroURI))	) {
+			 if(!(ontClass.getNameSpace().startsWith(OWL.getURI()))){
 					
 					String queryStr = makeDescribeQueryStr( ontClass.getURI(), null, graphURI );
 					
