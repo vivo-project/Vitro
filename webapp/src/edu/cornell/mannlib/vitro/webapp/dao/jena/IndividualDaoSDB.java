@@ -125,26 +125,34 @@ public class IndividualDaoSDB extends IndividualDaoJena {
         		ResultSet rs =QueryExecutionFactory.create(
         		        QueryFactory.create(query), dataset)
         		        .execSelect();
-        		Resource res = null;
+        		String uri = null;
+        		String label = null;
+        		String moniker = null;
         		while (rs.hasNext()) {
         		    QuerySolution sol = rs.nextSolution();
         		    Resource currRes = sol.getResource("ind");
-        		    if ((res == null || !res.equals(currRes)) 
-        		            && !currRes.isAnon()) {    		        
-        		        res = currRes;
-        		        Individual ent = new IndividualSDB(currRes.getURI(), 
-                                this.dwf, datasetMode, getWebappDaoFactory(), 
-                                SKIP_INITIALIZATION);
-        		        Literal label = sol.getLiteral("label");
-        		        if (label != null) {
-        		            ent.setName(label.getLexicalForm());
-        		        }
-        		        Literal moniker = sol.getLiteral("moniker");
-        		        if (moniker != null) {
-        		            ent.setMoniker(moniker.getLexicalForm());
-        		        }
-                        ents.add(ent);
+        		    if (currRes.isAnon()) {
+        		        continue;
         		    }
+        		    if (uri != null && !uri.equals(currRes.getURI())) {
+        		        ents.add(makeIndividual(uri, label, moniker));
+        	            uri = currRes.getURI();
+        	            label = null;
+        	            moniker = null;
+        		    } else if (uri == null) {
+        		        uri = currRes.getURI();
+        		    }
+                    Literal labelLit = sol.getLiteral("label");
+                    if (labelLit != null) {
+                        label = labelLit.getLexicalForm();
+                    }
+                    Literal monikerLit = sol.getLiteral("moniker");
+                    if (monikerLit != null) {
+                        moniker = monikerLit.getLexicalForm();
+                    }
+                    if (!rs.hasNext()) {
+                        ents.add(makeIndividual(uri, label, moniker));
+                    }
         		}
         	} finally {
         		dataset.getLock().leaveCriticalSection();
@@ -164,6 +172,15 @@ public class IndividualDaoSDB extends IndividualDaoJena {
         
         return ents;
 
+    }
+    
+    private Individual makeIndividual(String uri, String label, String moniker) {
+        Individual ent = new IndividualSDB(uri, 
+                this.dwf, datasetMode, getWebappDaoFactory(), 
+                SKIP_INITIALIZATION);
+        ent.setName(label);
+        ent.setMoniker(moniker);
+        return ent;
     }
 	
     @Override
