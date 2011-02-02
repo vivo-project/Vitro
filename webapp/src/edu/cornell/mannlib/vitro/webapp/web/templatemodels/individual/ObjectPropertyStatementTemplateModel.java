@@ -111,7 +111,10 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
                     "objectUri", objectUri,
                     "cmd", "delete");
             for ( String key : data.keySet() ) {
-                params.put("statement_" + key, data.get(key));
+                String value = data.get(key);
+                if (value != null) {
+                    params.put("statement_" + key, data.get(key));
+                }
             }
             params.put("templateName", templateName);
             

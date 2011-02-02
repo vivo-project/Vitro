@@ -240,7 +240,15 @@ public class UrlBuilder {
     
     private static String addParams(String url, ParamMap params, String glue) {
         for (String key: params.keySet()) {
-            url += glue + key + "=" + urlEncode(params.get(key));
+            String value = params.get(key);
+            // rjy7 Some users might require nulls to be converted to empty
+            // string, others to eliminate params with null values.
+            // Here we convert to empty string to prevent an exception
+            // from UrlEncoder.encode() when passed a null. Callers are advised
+            // to remove null values or convert to empty strings, whichever
+            // is desired in the particular instance.
+            value = (value == null) ? "" : urlEncode(value);
+            url += glue + key + "=" + value;
             glue = "&";
         }
         return url;        
@@ -292,24 +300,24 @@ public class UrlBuilder {
         return profileUrl;        
     }
     
-    public static String urlEncode(String url) {
+    public static String urlEncode(String str) {
         String encoding = "ISO-8859-1";
         String encodedUrl = null;
         try {
-            encodedUrl = URLEncoder.encode(url, encoding);
+            encodedUrl = URLEncoder.encode(str, encoding);
         } catch (UnsupportedEncodingException e) {
-            log.error("Error encoding url " + url + " with encoding " + encoding + ": Unsupported encoding.");
+            log.error("Error encoding url " + str + " with encoding " + encoding + ": Unsupported encoding.");
         }
         return encodedUrl;
     }
 
-    public static String urlDecode(String url) {
+    public static String urlDecode(String str) {
         String encoding = "ISO-8859-1";
         String decodedUrl = null;
         try {
-            decodedUrl = URLDecoder.decode(url, encoding);
+            decodedUrl = URLDecoder.decode(str, encoding);
         } catch (UnsupportedEncodingException e) {
-            log.error("Error decoding url " + url + " with encoding " + encoding + ": Unsupported encoding.");
+            log.error("Error decoding url " + str + " with encoding " + encoding + ": Unsupported encoding.");
         }
         return decodedUrl;
     }
