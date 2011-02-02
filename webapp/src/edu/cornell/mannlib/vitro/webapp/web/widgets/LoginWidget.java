@@ -174,17 +174,38 @@ public class LoginWidget extends Widget {
     }
 
     /**
-     * Where are we in the process? Logged in? Not? Somewhere in between?
+     * Are we already logged in? If not, where are we in the process?
      */
     private State getCurrentLoginState(HttpServletRequest request) {
         if (LoginStatusBean.getBean(request).isLoggedIn()) {
             return State.LOGGED_IN;
-        } else {
-            return LoginProcessBean.getBean(request).getState();
+        } 
+        if (isOutdatedLoginProcessBean(request)) {
+        	LoginProcessBean.removeBean(request);
         }
+        return LoginProcessBean.getBean(request).getState();
     }
 
-    /** What's the URL for this servlet? */
+	/**
+	 * A LoginProcessBean is outdated if the login was occuring on a page other
+	 * than this one.
+	 */
+	private boolean isOutdatedLoginProcessBean(HttpServletRequest request) {
+		if (!LoginProcessBean.isBean(request)) {
+			return false;
+		}
+		LoginProcessBean bean = LoginProcessBean.getBean(request);
+		String loginPageUrl = bean.getLoginPageUrl();
+		if (loginPageUrl == null) {
+			return false;
+		}
+		if (loginPageUrl.endsWith(request.getRequestURI())) {
+			return false;
+		}
+		return true;
+	}
+
+	/** What's the URL for this servlet? */
     private String getAuthenticateUrl(HttpServletRequest request) {
         String contextPath = request.getContextPath();   
         return contextPath + "/authenticate";
