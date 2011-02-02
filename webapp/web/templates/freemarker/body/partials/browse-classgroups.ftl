@@ -28,7 +28,7 @@ ${stylesheets.add("/css/browseClassGroups.css")}
                 <#elseif classGroup.uri == group.uri>
                     <#assign activeGroup = selected />
                 </#if>
-                <li role="listitem"><a data-uri="${group.uri}" ${activeGroup}href="${urls.base}/${currentPage}?classgroupUri=${group.uri?url}#browse" title="Browse ${group.publicName?capitalize}">${group.publicName?capitalize} <span class="count-classes">(${group.individualCount})</span></a></li>
+                <li role="listitem"><a ${activeGroup}href="${urls.base}/${currentPage}?classgroupUri=${group.uri?url}#browse" title="Browse ${group.publicName?capitalize}" data-uri="${group.uri}" data-count="${group.individualCount}">${group.publicName?capitalize} <span class="count-classes">(${group.individualCount})</span></a></li>
             </#if>
         </#list>
     </#assign>
@@ -79,7 +79,8 @@ ${stylesheets.add("/css/browseClassGroups.css")}
             var browseData = {
                 baseUrl: '${domainName + urls.base}',
                 dataServiceUrl: '${domainName + urls.base}/dataservice?getVClassesForVClassGroup=1&classgroupUri=',
-                defaultBrowseClassGroupUri: '${firstPopulatedClassGroup.uri!}'
+                defaultBrowseClassGroupUri: '${firstPopulatedClassGroup.uri!}',
+                defaultBrowseClassGroupCount: '${firstPopulatedClassGroup.individualCount!}'
             };
         </script>
 
@@ -102,27 +103,6 @@ ${stylesheets.add("/css/browseClassGroups.css")}
             <li role="listitem"><a href="${urls.base}/individuallist?vclassId=${class.uri?url}" title="Browse all ${class.name} content">${class.name} <span class="count-individuals"> (${class.individualCount})</span></a></li>
         </#if>
      </#list>
-</#macro>
-
-
-<#macro pieChart classes=classes classGroup=classGroup>
-    <section id="visual-graph" role="region">
-        <table class="graph-data">
-            <#list classes?sort_by("individualCount") as class>
-                <#assign countPercentage = (class.individualCount / classGroup.individualCount) * 100 />
-                <#if (class.individualCount > 0 && countPercentage?round > 0)>
-                    <tr>
-                        <th>${class.name}</th>
-                        <td>${countPercentage?round}%</td>
-                    </tr>
-                </#if>
-            </#list>
-        </table>
-          
-        <section id="pieViz" role="region"></section>
-    </section>
-    
-    ${scripts.add("/themes/wilma/js/jquery_plugins/raphael/raphael.js", "/themes/wilma/js/jquery_plugins/raphael/pie.js")}
 </#macro>
 
 

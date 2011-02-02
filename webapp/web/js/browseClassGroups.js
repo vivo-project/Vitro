@@ -17,6 +17,7 @@ var browseClassGroups = {
     initObjects: function() {
         this.vClassesInClassGroup = $('ul#classes-in-classgroup');
         this.browseClassGroupLinks = $('#browse-classgroups li a');
+        this.browseClasses = $('#browse-classes');
     },
     
     // Event listeners. Called on page load
@@ -24,7 +25,8 @@ var browseClassGroups = {
         // Listener for classGroup switching
         this.browseClassGroupLinks.click(function() {
             uri = $(this).attr("data-uri");
-            browseClassGroups.getVClasses(uri);
+            individualCount = $(this).attr("data-count");
+            browseClassGroups.getVClasses(uri, individualCount);
             return false;
         });
         
@@ -51,44 +53,78 @@ var browseClassGroups = {
     // Load classes and chart for default class group as defined by template
     defaultClassGroup: function() {
         if ( this.defaultBrowseClassGroupURI != "false" ) {
-            this.getVClasses(this.defaultBrowseClassGroupUri);
+            this.getVClasses(this.defaultBrowseClassGroupUri, this.defaultBrowseClassGroupCount);
         }
     },
     
     // Where all the magic happens -- gonna fetch me some classes
-    getVClasses: function(classgroupUri, alpha) {
+    getVClasses: function(classgroupUri, classGroupIndivCount) {
         url = this.dataServiceUrl + encodeURIComponent(classgroupUri);
-        if ( alpha && alpha != "all") {
-            url = url + '&alpha=' + alpha;
-        }
-        
-        // First wipe currently displayed classes
+
+        // First wipe currently displayed classes, browse all link, and bar chart
         this.vClassesInClassGroup.empty();
+        $('a.browse-superclass').remove();
+        $('#visual-graph').empty();
         
         var values = [],
             labels = [],
-            uris = [];
+            uris = [],
+            classList = [],
+            populatedClasses = 0;
+            potentialSuperClasses = [];
         
         $.getJSON(url, function(results) {
+            
             $.each(results.classes, function(i, item) {
                 name = results.classes[i].name;
                 uri = results.classes[i].URI;
                 indivCount = results.classes[i].entityCount;
-                indexUrl = browseClassGroups.baseUrl + '/individuallist?vclassId=' + encodeURIComponent(uri);
+                indexUrl = browseClassGroups.baseUrl +'/individuallist?vclassId='+ encodeURIComponent(uri);
                 // Only add to the arrays and render classes when they aren't empty
                 if ( indivCount > 0 ) {
+                    // if the class individual count is equal to the class group individual count, this could be a super class
+                    if ( indivCount == classGroupIndivCount ) {
+                        potentialSuperClasses.push(populatedClasses);
+                    }
+                    
                     values.push(parseInt(indivCount, 10));
-                    labels.push(name + ' (' + parseInt(indivCount, 10) +')');
+                    labels.push(name);
                     uris.push(uri);
                     
                     // Build the content of each list item, piecing together each component
                     listItem = '<li role="listitem">';
                     listItem += '<a href="'+ indexUrl +'" title="Browse all '+ name +' content">'+ name;
-                    listItem += ' <span class="count-individuals">('+ indivCount +')</span></a>';
+                    listItem += ' <span>('+ indivCount +')</span>';
                     listItem += '</li>';
-                    browseClassGroups.vClassesInClassGroup.append(listItem);
+                    
+                    // Add the list item to the array of classes
+                    classList.push(listItem);
+                    
+                    populatedClasses++;
                 }
             })
+            
+            // Test for number of potential super classes. If only 1, then remove it from all arrays
+            // But only do so if there are at least 2 classes in the list to begin with
+            if ( classList.length > 1 && potentialSuperClasses.length == 1 ){
+                // Grab the URI of the super class before splicing
+                superClassUri = uris[potentialSuperClasses];
+                
+                values.splice(potentialSuperClasses, 1);
+                labels.splice(potentialSuperClasses, 1);
+                uris.splice(potentialSuperClasses, 1);
+                classList.splice(potentialSuperClasses, 1);
+                
+                browseAllUrl = browseClassGroups.baseUrl +'/individuallist?vclassId='+ encodeURIComponent(superClassUri);
+                browseAllLink = '<a class="browse-superclass" href="'+ browseAllUrl +'" title="Browse all '+ results.classGroupName +'">Browse all &raquo;</a>';
+                browseClassGroups.browseClasses.prepend(browseAllLink);
+            }
+            
+            // Add the classes to the DOM
+            $.each(classList, function(i, listItem) {
+                browseClassGroups.vClassesInClassGroup.append(listItem);
+            })
+            
             // Set selected class group
             browseClassGroups.selectedClassGroup(results.classGroupUri);
             
@@ -113,9 +149,6 @@ var browseClassGroups = {
 var graphClassGroups = {
     // Build the bar chart using gRaphael
     barchart: function(values, labels, uris) {
-        // Clear the existing bar chart
-        $('#visual-graph').empty();
-        
         var height = values.length * 37;
         
         // Create the canvas
@@ -144,9 +177,7 @@ var graphClassGroups = {
         $('rect').each(function() {
             var index = $('rect').index(this);
             var label = labels[index];
-            var countStart = label.lastIndexOf(' (');
-            var label = label.substring(0, countStart);
-            var title = 'View all '+ label +' content';
+            var title = 'Browse all '+ label +' content';
             
             // Add a title attribute
             $(this).attr('title', title);
