@@ -1,20 +1,20 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
 /* <------ UPLOAD PICTURE*/
-#photoUpload{
-    margin-left: 0px;
+#photoUpload {
+    margin-left: 0;
     height: 280px;
     background: #fff;
     padding: 15px;
 }
-#photoUploadDefaultImage{
+#photoUploadDefaultImage {
     width: 130px;
     float: left;
 }
-#photoUploadDefaultImage img{
+#photoUploadDefaultImage img {
     margin-bottom: 10px;
 }
-#photoUploadForm{
+#photoUploadForm {
     width: 280px;
     float: left;
     padding-left: 25px;
@@ -23,33 +23,33 @@
     padding-top: 15px;
     padding-bottom: 25px;
 }
-#photoUploadForm label{
+#photoUploadForm label {
     display: block;
     padding-bottom: 10px;
 }
-#photoUploadForm label span{    
-    font-size: 0.7em;
+#photoUploadForm label span {    
+    font-size: .7em;
 }
-#photoUploadForm input{    
+#photoUploadForm input {    
     margin-bottom: 10px;
 }
 /* <------ CROP PICTURE*/
-#photoCropping{
-    margin-left: 0px;
+#photoCropping {
+    margin-left: 0;
     height: 450px;
     background: #fff;
     padding: 15px 0 15px 15px;
     margin-right: 0;
 }
-#photoCroppingPreview{
+#photoCroppingPreview {
     width: 180px;
     float: left;
 }
-.photoCroppingNote{
+.photoCroppingNote {
     margin-top: 15px;
-    font-size: 0.8em;
+    font-size: .8em;
 }
-#photoCropping{
+#photoCropping {
     width: 400px;
     float: left;
     padding-top: 30px;
@@ -57,37 +57,37 @@
     margin-left: 0;
     margin-right: 0;
 }
-.photoCroppedPreview{
+.photoCroppedPreview {
     width: 115px;
     height: 115px;
     overflow: hidden;
 }
 /* <------ DELETE PICTURE*/
-#photoDeletingContainer{
-    margin-left: 0px;
+#photoDeletingContainer {
+    margin-left: 0;
     width: 720px;
     height: 330px;
     background: #fff;
     padding: 15px;
 }
 /* <------ ERROR ALERTS*/
-#error-alert{
+#error-alert {
     color: #900;
-    padding: 0px;
+    padding: 0;
     margin-bottom: 5px;
     height: 30px;
 }
-#error-alert img{
+#error-alert img {
     float: left;
     margin: 0;
     padding: 0;
     vertical-align: middle;
 }
-#error-alert  p{
+#error-alert  p {
     padding-left: 35px;
-    font-size: 0.9em;
+    font-size: .9em;
     line-height: 30px;
 }
-.or{
+.or {
     display: inline;
 }

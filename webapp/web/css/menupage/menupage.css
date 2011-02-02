@@ -1,8 +1,5 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-@charset "UTF-8";
-/* CSS Document */
-
 /* VISUAL GRAPH----->  */
 #menupage-intro {
     clear: both;
@@ -108,7 +105,7 @@ ul#find-filters a {
 }
 #researchers p {
     padding: 17px 15px 15px 175px;
-    line-height: 1.5;
+    line-height: 1.5em;
 }
 #researchers-slider {
     clear: both;
@@ -242,7 +239,7 @@ li.individual img {
 }
 li.individual h1 {
     padding: 0;
-    line-height: 1.2;
+    line-height: 1.2em;
     font-weight: bold;
 }
 li.individual h1.thumb {
@@ -250,19 +247,19 @@ li.individual h1.thumb {
 }
 #individuals-in-class span.title {
     display: block;
-    margin: 0.8em 0 0 0;
-    font-size: 0.8em;
+    margin: .8em 0 0 0;
+    font-size: .8em;
     line-height: 1;
 }
 #individuals-in-class span.org {
     display: block;
 }
 nav.pagination {
-    margin: 0.3em 0 0 1.4em;
+    margin: .3em 0 0 1.4em;
 }
 nav.pagination h3 {
     display: inline;
-    margin: 0 0.3em 0 0;
+    margin: 0 .3em 0 0;
     padding: 0;
     font-size: 1.1em;
     color: #666;
@@ -273,7 +270,6 @@ nav.pagination ul {
 nav.pagination li {
     display: inline-block;
     margin: 0;
-/*    padding: 0.1em 0.6em;*/
     border: none;
 }
 nav.pagination li.selected {

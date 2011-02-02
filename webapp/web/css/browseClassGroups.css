@@ -116,7 +116,6 @@ svg text {
     font-family: inherit !important;
     font-size: 12px !important;
     color: #5E6363 !important;
-/*    display: none;*/
 }
 svg rect {
     cursor: pointer;

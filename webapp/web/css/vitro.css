@@ -13,22 +13,15 @@
  2011-01-13
 *****************************************/
 
-/************************
-Miscellaneous
-************************/
-
+/* <------ MISCELLANEOUS*/
 .clear {
     clear: both;
 }
-
 .hidden {
     display: none !important;
 }
-
-/************************
-User feedback
-************************/
-#error-alert{
+/* <------ USER FEEDBACK*/
+#error-alert {
     color: #900;
     padding: 10px;
     margin-bottom: 5px;
@@ -42,15 +35,15 @@ User feedback
 }
 #error-alert p {
     padding-left: 30px;
-    font-size: 0.9em;
+    font-size: .9em;
     line-height: 30px;
 }
 #error-alert p.login-alert {
-    padding-top: 0px;
+    padding-top: 0;
 }
 #confirmation-alert {
     color: #169f43;
-    padding: 0px;
+    padding: 0;
     margin-bottom: 5px;
     height: 30px;
 }
@@ -62,11 +55,11 @@ User feedback
 }
 #confirmation-alert p {
     padding-left: 30px;
-    font-size: 0.9em;
+    font-size: .9em;
     line-height: 30px;
 }
 #flash-message{
     background-color: #7285a0;
-    padding: 0.5em;  
+    padding: .5em;  
     margin-bottom: 10px;
 }
