@@ -3,6 +3,8 @@
 package edu.cornell.mannlib.vitro.webapp.web.widgets;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -187,21 +189,46 @@ public class LoginWidget extends Widget {
     }
 
 	/**
-	 * A LoginProcessBean is outdated if the login was occuring on a page other
-	 * than this one.
+	 * A LoginProcessBean is outdated if we have come from a page other than
+	 * this one.
+	 * 
+	 * If we can't be certain, assume that the bean is not outdated.
 	 */
 	private boolean isOutdatedLoginProcessBean(HttpServletRequest request) {
+		// If there is no bean, it is not outdated.
 		if (!LoginProcessBean.isBean(request)) {
 			return false;
 		}
-		LoginProcessBean bean = LoginProcessBean.getBean(request);
-		String loginPageUrl = bean.getLoginPageUrl();
-		if (loginPageUrl == null) {
+
+		String referrer = request.getHeader("referer");
+
+		// They don't say where they were, assume they were here.
+		if ((referrer == null) || (referrer.isEmpty())) {
 			return false;
 		}
-		if (loginPageUrl.endsWith(request.getRequestURI())) {
+
+		// If the referrer equals the request, they were here.
+		String requestURL = request.getRequestURL().toString();
+		if (referrer.equals(requestURL)) {
 			return false;
 		}
+
+		// RFC2616 says that the referrer might be relative to the request.
+		// Translate to absolute, and test if they were here.
+		try {
+			String absoluteReferrer = new URL(new URL(requestURL), referrer)
+					.toString();
+			if (absoluteReferrer.equals(requestURL)) {
+				return false;
+			}
+		} catch (MalformedURLException e) {
+			log.warn("Problems trying to resolve a relative referrer: requestURL = '"
+					+ requestURL + "', referrer = '" + referrer + "'" + e);
+			return false;
+		}
+
+		// The referrer is not equal to the request, so they came from somewhere
+		// else.
 		return true;
 	}
 
