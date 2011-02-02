@@ -112,6 +112,11 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
                     "cmd", "delete");
             for ( String key : data.keySet() ) {
                 String value = data.get(key);
+                // Remove an entry with a null value instead of letting it get passed
+                // as a param with an empty value, in order to align with behavior on
+                // profile page. E.g., if statement.moniker is null, a test for 
+                // statement.moniker?? will yield different results if null on the 
+                // profile page but an empty string on the deletion page.
                 if (value != null) {
                     params.put("statement_" + key, data.get(key));
                 }
