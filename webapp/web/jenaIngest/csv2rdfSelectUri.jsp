@@ -77,7 +77,7 @@ function disableProperties(){
     
    <input type="hidden" name="destinationModelName" value="<%=modelName%>"/>
     
-    <input id="submit" type="submit" value="Convert CSV"/>
+    <input class="submit" type="submit" value="Convert CSV"/>
     
     </form>
     

@@ -37,4 +37,4 @@
     </select>
 
 
-    <input id="submit" type="submit" value="Connect Database" />
+    <input class="submit" type="submit" value="Connect Database" />

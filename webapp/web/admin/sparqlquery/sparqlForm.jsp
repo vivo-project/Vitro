@@ -89,7 +89,7 @@ LIMIT 20
 	</ul>
 </div>
 
-<input id="submit" type="submit" value="Run Query" />
+<input class="submit" type="submit" value="Run Query" />
 </form>
 <%--
 <h4>Notes</h4>

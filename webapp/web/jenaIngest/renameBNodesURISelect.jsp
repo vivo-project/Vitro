@@ -88,7 +88,7 @@ function disableProperties(){
 %>   
     </select>
 
-    <input id="submit" type="submit" value="Rename Blank Nodes"/>
+    <input class="submit" type="submit" value="Rename Blank Nodes"/>
     
     </form>
     

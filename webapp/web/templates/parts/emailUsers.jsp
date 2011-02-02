@@ -31,7 +31,7 @@
 		<textarea name="s34gfd88p9x1" rows="10" cols="90"></textarea>
 		<div>
   		<input type="submit" id="submit" value="Send Mail" />
-  		<input type="reset" id="delete" value="Clear Form" />
+  		<input type="reset" class="delete" value="Clear Form" />
 		</div
 
 		<p style="font-weight: bold; margin-top: 1em">Thank you!</p>
