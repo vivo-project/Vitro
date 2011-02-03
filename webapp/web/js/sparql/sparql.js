@@ -303,7 +303,7 @@
 				
 				// namespaces shown in the SPARQL query box
 				var namespace = getNamespace();
-				var gid = 0;
+				//var gid = 0;
 				for (i=0; i < level; i++){
 					var subjects = document.getElementById("subject(" + i + ")");
 					if (subjects == null){
@@ -322,8 +322,9 @@
 						_sub = sub.substring(sub.indexOf(":") + 1) + clazz[sub.substring(sub.indexOf(":") + 1)];
 					}
 					var subname = "?" + _sub;
-					gid++;
-					criterias[criterias.length] = "GRAPH ?g" + gid + " { " + subname + " rdf:type " + sub + " . }";
+					//gid++;
+					//criterias[criterias.length] = "GRAPH ?g" + gid + " { " + subname + " rdf:type " + sub + " . }";
+					criterias[criterias.length] = subname + " rdf:type " + sub + " .";
 					
 					
 					var predicates = document.getElementById("predicate(" + i + ")");
@@ -331,7 +332,7 @@
 					var num = preNodes.length;
 					
 					for (j=0; j<num; j++){
-						gid++;
+						//gid++;
 						var pre = preNodes[j];
 						obj = document.getElementById("object(" + pre.level + "," + pre.count + ")");
 						if (obj == null){
@@ -344,7 +345,8 @@
 						if (obj.tagName == "INPUT"){
 							var objname = subname + "_" + pre.substring(pre.indexOf(":") + 1);
 							
-							criterias[criterias.length] = "GRAPH ?g" + gid + " { " + subname + " " + pre + " " + objname + " . }";
+							//criterias[criterias.length] = "GRAPH ?g" + gid + " { " + subname + " " + pre + " " + objname + " . }";
+							criterias[criterias.length] = subname + " " + pre + " " + objname + " .";
 							items[items.length] = objname;
 							if (obj.value != ""){
 								criterias[criterias.length] = "FILTER REGEX (str(" + objname + "), '" + obj.value + "', 'i')";
@@ -364,7 +366,8 @@
 								_obj = obj.substring(obj.indexOf(":") + 1) + number;
 							}
 							var objname = "?" + _obj;
-							criterias[criterias.length] = "GRAPH ?g" + gid + " { " + subname + " " + pre + " " + objname + " . }";
+							//criterias[criterias.length] = "GRAPH ?g" + gid + " { " + subname + " " + pre + " " + objname + " . }";
+							criterias[criterias.length] = subname + " " + pre + " " + objname + " .";
 						}
 					}
 					
