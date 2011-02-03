@@ -157,6 +157,7 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 			
 			log.info("Setup of Lucene index completed.");			
 		} catch (Throwable t) {
+		    AbortStartup.abortStartup(sce.getServletContext());
 			log.error("***** Error setting up Lucene index *****", t);
 			throw new RuntimeException("Startup of vitro application was prevented by errors in the lucene configuration");
 		}
