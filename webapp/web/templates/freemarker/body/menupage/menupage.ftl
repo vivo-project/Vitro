@@ -6,6 +6,10 @@
     <section id="menupage-intro" role="region">
         <h3>${page.title}</h3>
         
+        <#-- This will allow us to keep menupage.ftl generic and keep vivo-specific extensions in VIVO -->
+        <#if visualizationLink??>
+            ${visualizationLink}
+        </#if>
     </section>
     
     <#include "menupage-browse.ftl">
