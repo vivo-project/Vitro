@@ -329,7 +329,7 @@ public class AutocompleteController extends FreemarkerHttpServlet{
     private Query makeUntokenizedNameQuery(String querystr) {
         
         querystr = querystr.toLowerCase();
-        String termName = Entity2LuceneDoc.term.NAMEUNANALYZED;
+        String termName = Entity2LuceneDoc.term.NAMELOWERCASE;
         BooleanQuery query = new BooleanQuery();
         log.debug("Adding wildcard query on unanalyzed name");
         query.add( 

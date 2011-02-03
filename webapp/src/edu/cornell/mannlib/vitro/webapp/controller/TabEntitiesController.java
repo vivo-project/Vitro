@@ -247,10 +247,10 @@ public void doGet( HttpServletRequest req, HttpServletResponse response )
                 }else if( sortField.equalsIgnoreCase("sunset") ){
                     sort =     new Sort(Entity2LuceneDoc.term.SUNSET);
                 }else{
-                    sort =  new Sort(Entity2LuceneDoc.term.NAMEUNANALYZED);
+                    sort =  new Sort(Entity2LuceneDoc.term.NAMELOWERCASE);
                 }
             } else {
-                sort =     new Sort(Entity2LuceneDoc.term.NAMEUNANALYZED);
+                sort =     new Sort(Entity2LuceneDoc.term.NAMELOWERCASE);
             }
             
             if( depth > 1 && "rand()".equalsIgnoreCase(sortField) ){
@@ -482,7 +482,7 @@ public void doGet( HttpServletRequest req, HttpServletResponse response )
            Query alphaQuery = null;
            if( alpha != null && !"".equals(alpha) && alpha.length() == 1){      
                alphaQuery =    
-                   new PrefixQuery(new Term(Entity2LuceneDoc.term.NAMEUNANALYZED, alpha.toLowerCase()));
+                   new PrefixQuery(new Term(Entity2LuceneDoc.term.NAMELOWERCASE, alpha.toLowerCase()));
                query.add(alphaQuery,BooleanClause.Occur.MUST);
            }           
            

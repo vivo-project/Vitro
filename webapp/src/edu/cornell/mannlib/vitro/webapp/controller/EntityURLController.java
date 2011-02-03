@@ -105,7 +105,7 @@ public void doGet (HttpServletRequest req, HttpServletResponse res) throws IOExc
 	 IndexSearcher index = LuceneIndexFactory.getIndexSearcher(getServletContext());
      TopDocs docs = index.search(query, null, 
              ENTITY_LIST_CONTROLLER_MAX_RESULTS, 
-             new Sort(Entity2LuceneDoc.term.NAMEUNANALYZED));   
+             new Sort(Entity2LuceneDoc.term.NAMELOWERCASE));   
      
      if( docs == null ){
          log.error("Search of lucene index returned null");

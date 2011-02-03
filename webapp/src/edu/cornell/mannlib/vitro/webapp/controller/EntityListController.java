@@ -185,7 +185,7 @@ public class EntityListController extends VitroHttpServlet {
         try{
             docs = index.search(query, null, 
                 ENTITY_LIST_CONTROLLER_MAX_RESULTS, 
-                new Sort(Entity2LuceneDoc.term.NAMEUNANALYZED));
+                new Sort(Entity2LuceneDoc.term.NAMELOWERCASE));
         }catch(Throwable th){
             log.error("Could not run search. " + th.getMessage());
             docs = null;
@@ -271,7 +271,7 @@ public class EntityListController extends VitroHttpServlet {
            Query alphaQuery = null;
            if( alpha != null && !"".equals(alpha) && alpha.length() == 1){      
                alphaQuery =    
-                   new PrefixQuery(new Term(Entity2LuceneDoc.term.NAMEUNANALYZED, alpha.toLowerCase()));
+                   new PrefixQuery(new Term(Entity2LuceneDoc.term.NAMELOWERCASE, alpha.toLowerCase()));
                query.add(alphaQuery,BooleanClause.Occur.MUST);
            }                      
                            

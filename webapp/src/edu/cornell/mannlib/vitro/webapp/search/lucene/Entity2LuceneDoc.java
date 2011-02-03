@@ -47,9 +47,11 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         /** Name of entity, tab or vclass */
         public static String NAME       = "name";
         /** rdfs:label unanalyzed */
-        public static String NAMEUNANALYZED = "nameunanalyzed" ;
+        public static String NAMELOWERCASE = "nameunanalyzed" ;
         /** Name of entity, unstemmed */
         public static String NAMEUNSTEMMED       = "nameunstemmed";
+        /** Unaltered name of individual, un-lowercased, un-stemmed, un-tokenized" */
+        public static String NAMERAW      = "nameraw";
         /** portal ( 2 ^ portalId ) */
         public static String PORTAL     = "portal";
         /** Flag 2 (legacy, only used at Cornell) */
@@ -122,7 +124,7 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
             value = ent.getLocalName();
         }
         Field name =new Field(term.NAME, value, 
-                               Field.Store.YES, Field.Index.ANALYZED);
+                               Field.Store.NO, Field.Index.ANALYZED);
         name.setBoost( NAME_BOOST );
         doc.add( name );
         
@@ -131,10 +133,12 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         nameUn.setBoost( NAME_BOOST );
         doc.add( nameUn );
 
-        Field nameUnanalyzed = new Field(term.NAMEUNANALYZED, value.toLowerCase(), 
+        Field nameUnanalyzed = new Field(term.NAMELOWERCASE, value.toLowerCase(), 
 				Field.Store.YES, Field.Index.NOT_ANALYZED);        
         doc.add( nameUnanalyzed );
-
+        
+        doc.add( new Field(term.NAMERAW, value, Field.Store.YES, Field.Index.NOT_ANALYZED));
+        
         //boost for entity
         if( ent.getSearchBoost() != null && ent.getSearchBoost() != 0 )
             doc.setBoost(ent.getSearchBoost());
