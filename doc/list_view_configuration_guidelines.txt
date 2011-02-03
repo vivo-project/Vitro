@@ -26,9 +26,15 @@ OPTIONAL ELEMENTS
 THE QUERY
 ---------
 
---------------------------
-General query requirements
---------------------------
+----------------- 
+Construct queries
+-----------------
+
+ - forthcoming -
+
+---------------------------------
+General select query requirements
+---------------------------------
 
 - Use a SELECT DISTINCT clause rather than a simple SELECT. There can still be cases where 
 the same individual is retrieved more than once, if there are multiple solutions to the
@@ -47,10 +53,6 @@ due to the possibility of incomplete data. Make sure the query does the followin
       display the local name in the absence of the linked individual. Alternatively, this can be 
       retrieved in the template using the localname(uri) method. 
       
-### TO BE AMENDED - use uniongraph instead
-- Each assertion or set of optional assertions must reference a different graph variable, so that
-no requirement about which assertions are in the same graph is imposed (unless this is desired
-in a specific case).
     
 --------------------------- 
 Query for collated property

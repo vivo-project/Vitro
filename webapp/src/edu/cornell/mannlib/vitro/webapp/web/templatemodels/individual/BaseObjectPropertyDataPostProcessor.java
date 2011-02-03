@@ -70,12 +70,17 @@ public abstract class BaseObjectPropertyDataPostProcessor implements
      * properties) will be removed. In addition, this type of logic (display x if it exists, otherwise y)
      * will be moved into the display modules (Editing and Display Configuration Improvements).
      */
-    protected void addMoniker(Map<String, String> map, String monikerKey, String objectKey) {
-        String moniker = map.get(monikerKey);
-        if (moniker == null) {
-            map.put(monikerKey, getIndividual(map.get(objectKey)).getMoniker());
-        }
-    }
+// rjy7 Now Individual.getMoniker() returns only the moniker, not the VClass, so no reason to call the method
+// if the sparql query returns a null moniker.
+//    protected void addMoniker(Map<String, String> map, String monikerKey, String objectKey) {
+//        String moniker = map.get(monikerKey);
+//        if (moniker == null) {
+//            Individual ind = getIndividual(map.get(objectKey));
+//            if (ind != null) {
+//                map.put(monikerKey, ind.getMoniker());
+//            }
+//        }
+//    }
     
     protected Individual getIndividual(String uri) {
         return wdf.getIndividualDao().getIndividualByURI(uri);
