@@ -656,9 +656,10 @@ public class JenaBaseDao extends JenaBaseDaoCon {
             label = tryPropertyForPreferredLanguages( r, RDFS.label, ALSO_TRY_NO_LANG );
             
             // try vitro:label with preferred languages
-            if ( label == null ) {
+            // Commenting out for NIHVIVO-1962
+           /* if ( label == null ) {
                 label = tryPropertyForPreferredLanguages( r, r.getModel().getProperty(VitroVocabulary.label), ALSO_TRY_NO_LANG );
-            }                              
+            }   */                           
         } finally {
             r.getOntModel().leaveCriticalSection();
         }
