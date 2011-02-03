@@ -33,6 +33,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.AbortStartup;
 
 public class VClassGroupCache{
     private static final Log log = LogFactory.getLog(VClassGroupCache.class);
@@ -63,6 +64,11 @@ public class VClassGroupCache{
         this._groupListMap = new ConcurrentHashMap<Integer, List<VClassGroup>>();
         this._rebuildQueue = new ConcurrentLinkedQueue<String>();
        
+        if( AbortStartup.isStartupAborted(context)){
+            _cacheRebuildThread = null;
+            return;
+        }
+        
         VClassGroupCacheChangeListener bccl = new VClassGroupCacheChangeListener(this);
         ModelContext.getJenaOntModel(context).register(bccl);
         ModelContext.getBaseOntModel(context).register(bccl);
@@ -255,14 +261,13 @@ public class VClassGroupCache{
     }
     
 	private void requestStop() {
-		log.info("Killing the thread.");
-		_cacheRebuildThread.kill();
-		
-		try {
-			_cacheRebuildThread.join();
-			log.info("The thread is dead.");
-		} catch (InterruptedException e) {
-			log.warn("Waiting for the thread to die, but interrupted.", e);
+		if( _cacheRebuildThread != null ){
+		    _cacheRebuildThread.kill();		
+        	try {
+        		_cacheRebuildThread.join();
+        	} catch (InterruptedException e) {
+        		log.warn("Waiting for the thread to die, but interrupted.", e);
+        	}
 		}
 	}
 
@@ -368,7 +373,7 @@ public class VClassGroupCache{
         @Override
         public void contextDestroyed(ServletContextEvent sce) {
             Object o = sce.getServletContext().getAttribute(ATTRIBUTE_NAME);
-        	if (o instanceof VClassGroupCache) {
+        	if (o instanceof VClassGroupCache ) {
         		((VClassGroupCache) o).requestStop();
         	}
         }
