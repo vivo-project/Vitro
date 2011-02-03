@@ -59,22 +59,30 @@ ul#vgraph-classes a {
 /* FIND BY ------>  */
 #find-by {
     float: right;
-    margin: 0 2em .4em 0;
+    margin: 0 1.1em 1em 0;
+    padding: 8px 8px 3px 5px;
 }
 #find-by h3 {
-    padding: 0 0 .2em .8em;
+    padding: 0 .2em .2em .8em;
     border-bottom: 0;
+    float: left;
+}
+ul#find-filters {
+    float: right;
 }
 ul#find-filters li {
     float: left;
-    padding-left: 10px;
+    padding-left: 3px;
+    padding-right: 15px;
+    border-right: 1px solid #E4EAE9;
 }
 ul#find-filters li:last-child { 
     border-bottom: 0;
+    border-right: none;
 }
 ul#find-filters a {
     display: block;
-    padding-left: 15px;
+    padding-left: 13px;
 }
 /* RESEARCHERS ------>  */
 #researchers {
