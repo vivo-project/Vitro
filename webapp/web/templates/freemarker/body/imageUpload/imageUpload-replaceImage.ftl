@@ -27,7 +27,7 @@ ${stylesheets.add("/css/uploadImages.css")}
         <label>Replace Photo <span> (JPEG, GIF or PNG)</span></label>
 
         <input type="file" name="datafile" size="30">
-        <input id="submit" type="submit" value="Upload photo"> 
+        <input class="submit" type="submit" value="Upload photo"> 
 
         <span class="or"> or <a class="cancel"  href="${cancelUrl}">Cancel</a></span>
      </form>
