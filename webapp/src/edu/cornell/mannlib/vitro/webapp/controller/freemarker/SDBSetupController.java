@@ -28,7 +28,7 @@ import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupSDB;
 public class SDBSetupController extends FreemarkerHttpServlet {
 
     private static final Log log = LogFactory.getLog(
-            SimpleReasonerRecomputeController.class);
+            SDBSetupController.class);
     
     private static final String SDB_SETUP_FTL = "sdbSetup.ftl";
     
@@ -46,7 +46,7 @@ public class SDBSetupController extends FreemarkerHttpServlet {
         	Boolean done = (Boolean)getServletContext().getAttribute("done");
         	String setupsignal = (String) vreq.getParameter("setupsignal");
                 if (done!=null && done) {
-                	 messageStr = "SDB is being setup";
+                	 messageStr = "SDB is currently being set up.";
                 } else{
                 	String sdbsetup = (String)getServletContext().getAttribute("sdbsetup");
                 	if(sdbsetup == null || sdbsetup.equals("showButton") || setupsignal == null){
@@ -56,7 +56,7 @@ public class SDBSetupController extends FreemarkerHttpServlet {
                 	}
                 	else if(setupsignal!=null && setupsignal.equals("setup")){
                 		new Thread(new SDBSetupRunner(jenaDataSourceSetupSDB)).start();
-                		messageStr = "SDB setup started";
+                		messageStr = "SDB setup started.";
                         getServletContext().setAttribute("sdbsetup", "showButton");
                 	}	
                 }
@@ -102,8 +102,11 @@ public class SDBSetupController extends FreemarkerHttpServlet {
            if(inferenceModel == null){
         	   inferenceModel = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC);
            }
-           if(store!=null)
+           if (store!=null) {
+               log.info("Setting up SDB store.");
         	   jenaDataSourceSetupSDB.setupSDB(getServletContext(), store, memModel, inferenceModel);
+               log.info("SDB setup complete.");
+           }
            done = false;
            getServletContext().setAttribute("done",done);
         }
