@@ -29,8 +29,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDao;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SimpleOntModelSelector;
-import edu.cornell.mannlib.vitro.webapp.ontology.update.UpdateSettings;
 import edu.cornell.mannlib.vitro.webapp.ontology.update.KnowledgeBaseUpdater;
+import edu.cornell.mannlib.vitro.webapp.ontology.update.UpdateSettings;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup;
 
 /**
@@ -43,25 +43,25 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	
 	private final static Log log = LogFactory.getLog(UpdateKnowledgeBase.class);
 	
-	private final String DATA_DIR = "/WEB-INF/ontologies/update/";
-	private final String LOG_DIR = "logs/";
-	private final String CHANGED_DATA_DIR = "changedData/";
-	private final String ASK_QUERY_FILE = DATA_DIR + "ask.sparql";
-	private final String SUCCESS_ASSERTIONS_FILE = DATA_DIR + "success.n3";
-	private final String SUCCESS_RDF_FORMAT = "N3";
-	private final String DIFF_FILE = DATA_DIR + "diff.tab.txt";
-	private final String LOG_FILE = DATA_DIR + LOG_DIR + "knowledgeBaseUpdate.log";
-	private final String ERROR_LOG_FILE = DATA_DIR + LOG_DIR + 	"knowledgeBaseUpdate.error.log";
-	private final String REMOVED_DATA_FILE = DATA_DIR + CHANGED_DATA_DIR + 	"removedData.n3";
-	private final String ADDED_DATA_FILE = DATA_DIR + CHANGED_DATA_DIR + "addedData.n3";
-	private final String SPARQL_CONSTRUCT_ADDITIONS_DIR = DATA_DIR + "sparqlConstructs/additions/";
-	private final String SPARQL_CONSTRUCT_ADDITIONS_PASS2_DIR = DATA_DIR + "sparqlConstructs/additions-pass2/";
-	private final String SPARQL_CONSTRUCT_DELETIONS_DIR = DATA_DIR + "sparqlConstructs/deletions/";
-	private final String MISC_REPLACEMENTS_FILE = DATA_DIR + "miscReplacements.rdf";
-	private final String OLD_TBOX_MODEL_DIR = DATA_DIR + "oldVersion/";
-	private final String NEW_TBOX_MODEL_DIR = "/WEB-INF/submodels/";
-	private final String OLD_TBOX_ANNOTATIONS_DIR = DATA_DIR + "oldAnnotations/";
-	private final String NEW_TBOX_ANNOTATIONS_DIR = "/WEB-INF/ontologies/user";
+	private static final String DATA_DIR = "/WEB-INF/ontologies/update/";
+	private static final String LOG_DIR = "logs/";
+	private static final String CHANGED_DATA_DIR = "changedData/";
+	private static final String ASK_QUERY_FILE = DATA_DIR + "ask.sparql";
+	private static final String SUCCESS_ASSERTIONS_FILE = DATA_DIR + "success.n3";
+	private static final String SUCCESS_RDF_FORMAT = "N3";
+	private static final String DIFF_FILE = DATA_DIR + "diff.tab.txt";
+	private static final String LOG_FILE = DATA_DIR + LOG_DIR + "knowledgeBaseUpdate.log";
+	private static final String ERROR_LOG_FILE = DATA_DIR + LOG_DIR + 	"knowledgeBaseUpdate.error.log";
+	private static final String REMOVED_DATA_FILE = DATA_DIR + CHANGED_DATA_DIR + 	"removedData.n3";
+	private static final String ADDED_DATA_FILE = DATA_DIR + CHANGED_DATA_DIR + "addedData.n3";
+	private static final String SPARQL_CONSTRUCT_ADDITIONS_DIR = DATA_DIR + "sparqlConstructs/additions/";
+	private static final String SPARQL_CONSTRUCT_ADDITIONS_PASS2_DIR = DATA_DIR + "sparqlConstructs/additions-pass2/";
+	private static final String SPARQL_CONSTRUCT_DELETIONS_DIR = DATA_DIR + "sparqlConstructs/deletions/";
+	private static final String MISC_REPLACEMENTS_FILE = DATA_DIR + "miscReplacements.rdf";
+	private static final String OLD_TBOX_MODEL_DIR = DATA_DIR + "oldVersion/";
+	private static final String NEW_TBOX_MODEL_DIR = "/WEB-INF/submodels/";
+	private static final String OLD_TBOX_ANNOTATIONS_DIR = DATA_DIR + "oldAnnotations/";
+	private static final String NEW_TBOX_ANNOTATIONS_DIR = "/WEB-INF/ontologies/user";
 	
 	public void contextInitialized(ServletContextEvent sce) {
 				
@@ -72,13 +72,11 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		try {
 
 			ServletContext ctx = sce.getServletContext();
-			
-			OntModelSelector oms = new SimpleOntModelSelector(
-					(OntModel) sce.getServletContext().getAttribute(
-							JenaBaseDao.ASSERTIONS_ONT_MODEL_ATTRIBUTE_NAME));
+
+			OntModelSelector oms = new SimpleOntModelSelector((OntModel) sce.getServletContext().getAttribute(JenaBaseDao.ASSERTIONS_ONT_MODEL_ATTRIBUTE_NAME));
 			
 			UpdateSettings settings = new UpdateSettings();
-			settings.setAskQueryFile(ctx.getRealPath(ASK_QUERY_FILE));
+			settings.setAskQueryFile(getAskQueryPath(ctx));
 			settings.setDataDir(ctx.getRealPath(DATA_DIR));
 			settings.setSparqlConstructAdditionsDir(ctx.getRealPath(SPARQL_CONSTRUCT_ADDITIONS_DIR));
 			settings.setSparqlConstructAdditionsPass2Dir(ctx.getRealPath(SPARQL_CONSTRUCT_ADDITIONS_PASS2_DIR));
@@ -237,5 +235,9 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	public void contextDestroyed(ServletContextEvent arg0) {
 		// nothing to do	
 	}
-
+	
+	public static String getAskQueryPath(ServletContext ctx) {
+		return ctx.getRealPath(ASK_QUERY_FILE);
+	
+    }
 }

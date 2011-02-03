@@ -299,14 +299,14 @@ public class KnowledgeBaseUpdater {
 		return !qexec.execAsk(); 
 		
 	}
-	
+		
 	/**
 	 * loads a SPARQL ASK query from a text file
 	 * @param filePath
 	 * @return the query string or null if file not found
 	 */
-	private String loadSparqlQuery(String filePath) throws IOException {
-		File file = new File(settings.getAskQueryFile());	
+	public static String loadSparqlQuery(String filePath) throws IOException {
+		File file = new File(filePath);	
 		if (!file.exists()) {
 			return null;
 		}

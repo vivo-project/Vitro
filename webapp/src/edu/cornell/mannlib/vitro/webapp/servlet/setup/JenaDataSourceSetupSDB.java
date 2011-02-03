@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -51,6 +52,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelectorImpl;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSDBModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB;
+import edu.cornell.mannlib.vitro.webapp.ontology.update.KnowledgeBaseUpdater;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapper;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.InitialJenaModelUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.NamespaceMapperJena;
@@ -72,6 +74,15 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
             // TODO: I would like to make this code (before the sdb try/catch conditional so
             // that it is not executed in a post-sdb-conversion environment.
             OntModel memModel = (OntModel) sce.getServletContext().getAttribute("jenaOntModel");
+            
+            if ( updateRequired(sce.getServletContext(), memModel)) {
+            	log.error(getMigrationErrString());
+            	System.out.println(getMigrationErrString());
+            	// The rest of the application should not 
+            	// start if this condition is encountered
+            	AbortStartup.abortStartup(sce.getServletContext());
+            	throw new MigrationRequiredError(getMigrationErrString());
+            }
             
             if (memModel == null) {
                 memModel = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC);
@@ -255,12 +266,12 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
             unionOms.setFullModel(masterUnion);
             sce.getServletContext().setAttribute("jenaOntModel", masterUnion);  
             WebappDaoFactory wadf = new WebappDaoFactorySDB(unionOms, bds, storeDesc, defaultNamespace, null, null);
-            //WebappDaoFactory wadf = new WebappDaoFactorySDB(unionOms, dataset, defaultNamespace, null, null);
             sce.getServletContext().setAttribute("webappDaoFactory",wadf);
+    
+            ModelContext.setUnionOntModelSelector(unionOms, sce.getServletContext());          // assertions and inferences
+            ModelContext.setBaseOntModelSelector(baseOms, sce.getServletContext());            // assertions
+            ModelContext.setInferenceOntModelSelector(inferenceOms, sce.getServletContext());  // inferences
             
-            sce.getServletContext().setAttribute("unionOntModelSelector", unionOms);          //assertions and inferences
-            sce.getServletContext().setAttribute("baseOntModelSelector", baseOms);            //assertions
-            sce.getServletContext().setAttribute("inferenceOntModelSelector", inferenceOms);  //inferences
             ApplicationBean appBean = getApplicationBeanFromOntModel(unionOms.getFullModel(),wadf);
             if (appBean != null) {
                 sce.getServletContext().setAttribute("applicationBean", appBean);
@@ -301,7 +312,9 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
             setVitroJenaSDBModelMaker(vsmm,sce);
             
             log.info("Model makers set up");
-                     
+         
+        } catch (MigrationRequiredError mre) {
+        	throw new MigrationRequiredError(mre.getMessage());
         } catch (Throwable t) {
             log.error("Throwable in " + this.getClass().getName(), t);
             // printing the error because Tomcat doesn't print context listener
@@ -644,5 +657,47 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
     public static Store getApplicationStore(ServletContext ctx) {
         return (Store) ctx.getAttribute(STORE_ATTR);
     }
+    
+	/**
+	 * Executes a SPARQL ASK query to determine whether the knowledge base
+	 * needs to be updated to conform to a new ontology version
+	 */
+	public boolean updateRequired(ServletContext ctx, OntModel m) throws IOException {
+		
+		String sparqlQueryStr = KnowledgeBaseUpdater.loadSparqlQuery(UpdateKnowledgeBase.getAskQueryPath(ctx));
+		if (sparqlQueryStr == null) {
+			return false;
+		}
+
+		Query query = QueryFactory.create(sparqlQueryStr);
+		QueryExecution qexec = QueryExecutionFactory.create(query, m);
+		
+		// if the ASK query DOES have a solution (i.e. the assertions exist
+		// showing that the update has already been performed), then the update
+		// is NOT required.
+		return !qexec.execAsk(); 
+		
+	}
+	
+	private String getMigrationErrString() {
+      	String errMessage = "\n*******************************************************************";
+    	errMessage += "\nA knowledge base migration is " +
+    		            	"required and this must be done in" +
+    		            	" RDB mode before converting to SDB. " +
+    		            	"Please change deploy.properties to" +
+    		            	" use RDB mode, redeploy, and restart. After " +
+    		            	"the knowledge base migration has completed " +
+    		            	"successfully, change deploy.properties to use " +
+    		            	"SDB mode, redeploy, and restart.\n";
+    	errMessage += "*******************************************************************";
+		
+		return errMessage;
+    }
+	
+	private class MigrationRequiredError extends Error {
+	       public MigrationRequiredError(String string) {
+	           super(string);
+	       }
+	}
     
  }

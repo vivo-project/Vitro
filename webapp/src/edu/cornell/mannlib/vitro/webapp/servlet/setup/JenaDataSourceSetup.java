@@ -29,6 +29,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDaoCon;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaModelUtils;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SearchReindexingListener;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SimpleOntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaModelMaker;
@@ -44,22 +45,22 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
 	private static final Log log = LogFactory.getLog(JenaDataSourceSetup.class.getName());
 	
     public void contextInitialized(ServletContextEvent sce) {
+    	        
+        String tripleStoreTypeStr = 
+            ConfigurationProperties.getProperty(
+                    "VitroConnection.DataSource.tripleStoreType", "RDB");
+        
+        if ("SDB".equals(tripleStoreTypeStr)) {
+            (new JenaDataSourceSetupSDB()).contextInitialized(sce);
+            return;
+        }
+
         
         if (AbortStartup.isStartupAborted(sce.getServletContext())) {
             return;
         }
         
         try {
-            
-            String tripleStoreTypeStr = 
-                ConfigurationProperties.getProperty(
-                        "VitroConnection.DataSource.tripleStoreType", "RDB");
-            
-            //FIXME improve
-            if ("SDB".equals(tripleStoreTypeStr)) {
-                (new JenaDataSourceSetupSDB()).contextInitialized(sce);
-                return;
-            }
             
             OntModel memModel = (OntModel) sce.getServletContext().getAttribute("jenaOntModel");
             if (memModel == null) {
@@ -96,19 +97,19 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
             WebappDaoFactory baseWadf = new WebappDaoFactoryJena(
                     baseOms, defaultNamespace, null, null);
             sce.getServletContext().setAttribute("assertionsWebappDaoFactory",baseWadf);
-            sce.getServletContext().setAttribute("baseOntModelSelector", baseOms);
+            ModelContext.setBaseOntModelSelector(baseOms, sce.getServletContext());
             
             sce.getServletContext().setAttribute("inferenceOntModel", inferenceModel);
             WebappDaoFactory infWadf = new WebappDaoFactoryJena(
                     inferenceOms, defaultNamespace, null, null);
             sce.getServletContext().setAttribute("deductionsWebappDaoFactory", infWadf);
-            sce.getServletContext().setAttribute("inferenceOntModelSelector", inferenceOms);
+            ModelContext.setInferenceOntModelSelector(inferenceOms, sce.getServletContext());
             
             sce.getServletContext().setAttribute("jenaOntModel", unionModel);  
             WebappDaoFactory wadf = new WebappDaoFactoryJena(
                     unionOms, baseOms, inferenceOms,  defaultNamespace, null, null);
             sce.getServletContext().setAttribute("webappDaoFactory",wadf);
-            sce.getServletContext().setAttribute("unionOntModelSelector", unionOms);
+            ModelContext.setUnionOntModelSelector(unionOms, sce.getServletContext());
             
             ApplicationBean appBean = getApplicationBeanFromOntModel(memModel,wadf);
             if (appBean != null) {

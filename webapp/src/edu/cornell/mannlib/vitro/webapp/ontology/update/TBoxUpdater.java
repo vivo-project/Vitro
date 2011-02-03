@@ -257,13 +257,15 @@ public class TBoxUpdater {
 		   siteModel.remove(actualRetractions);
 		   record.recordRetractions(actualRetractions);
 		
+		   long numAdded = actualAdditions.size();
+		   long numRemoved = actualRetractions.size();
+		   
 		   // log summary of changes
-		   if (actualAdditions.size() > 0) {
+		   if (numAdded > 0) {
 	           logger.log("Updated the default vitro annotation value for " + 
-	        		   actualAdditions.size() + " statements in the knowledge base");
+	        		   numAdded + " statements in the knowledge base");
 		   }
 		   
-           long numRemoved = actualRetractions.size() - actualAdditions.size();
            if (numRemoved > 0) {
 	           logger.log("Removed " + numRemoved +
 	        		      " outdated vitro annotation property setting" + ((numRemoved > 1) ? "s" : "") + " from the knowledge base");
