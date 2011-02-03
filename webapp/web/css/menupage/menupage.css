@@ -59,22 +59,15 @@ ul#vgraph-classes a {
 }
 /* FIND BY ------>  */
 #find-by {
-    width: 230px;
     float: right;
-    margin-top: 20px;
+    margin: 0 2em .4em 0;
 }
 #find-by h3 {
-    padding: 0 25px 12px 12px;
+    padding: 0 0 .2em .8em;
     border-bottom: 0;
 }
-ul#find-filters {
-    float: left;
-    width: 230px;
-}
 ul#find-filters li {
-    display: block;
-    height: 35px;
-    line-height: 35px;
+    float: left;
     padding-left: 10px;
 }
 ul#find-filters li:last-child { 
@@ -83,8 +76,6 @@ ul#find-filters li:last-child {
 ul#find-filters a {
     display: block;
     padding-left: 15px;
-    width: 265px;
-    height: 35px;
 }
 /* RESEARCHERS ------>  */
 #researchers {
@@ -158,7 +149,6 @@ ul#find-filters a {
     clear: both;
     width: 90%;
     margin: 0 auto;
-    margin-top: 40px;
     overflow: hidden;
 }
 #browse-by h2 {
@@ -222,6 +212,10 @@ ul#alpha-browse-individuals a {
     margin-bottom: 30px;
     margin-right: 17px;
     min-height: 170px;
+}
+h3.selected-class {
+    margin: 0 0 0 1em;
+    padding: .8em 0 0 0;
 }
 #individuals-in-class ul {
     list-style: none;

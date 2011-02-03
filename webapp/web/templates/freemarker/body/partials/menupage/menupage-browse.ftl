@@ -3,8 +3,6 @@
 <#-- Template for browsing individuals in class groups for menupages -->
 
 <section id="browse-by" role="region">
-    <h2>Browse by</h2>
-    
     <nav role="navigation">
         <ul id="browse-classes">
             <#list vClassGroup as vClass>

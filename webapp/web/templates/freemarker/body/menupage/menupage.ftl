@@ -6,20 +6,6 @@
     <section id="menupage-intro" role="region">
         <h3>${page.title}</h3>
         
-        <section id="menupage-content" role="region">
-            <#-- This will allow us to keep menupage.ftl generic and keep vivo-specific extensions in VIVO -->
-            <#if visualizationLink??>
-                ${visualizationLink}
-            </#if>
-            
-            <h4>Visual Graph</h4>
-            
-            <#include "menupage-vClassesInClassgroup.ftl">
-            
-            <section id="menupage-graph" role="region">
-                <img src="${urls.images}/menupage/visual-graph-generic-class.jpg" width="500" height="283" alt ="" />
-            </section>
-        </section>
     </section>
     
     <#include "menupage-browse.ftl">
