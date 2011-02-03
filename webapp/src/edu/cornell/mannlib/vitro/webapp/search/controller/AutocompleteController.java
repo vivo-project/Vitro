@@ -129,13 +129,6 @@ public class AutocompleteController extends FreemarkerHttpServlet{
                 try{                     
                     Document doc = searcherForRequest.doc(topDocs.scoreDocs[i].doc);                    
                     String uri = doc.get(VitroLuceneTermNames.URI);
-//                    IndividualDao iDao = vreq.getWebappDaoFactory().getIndividualDao();   
-//                    Individual ind = iDao.getIndividualByURI(uri);
-//                    if (ind != null) {
-//                        String name = ind.getName();
-//                        SearchResult result = new SearchResult(name, uri);
-//                        results.add(result);
-//                    }
                     String name = doc.get(VitroLuceneTermNames.NAMERAW);
                     SearchResult result = new SearchResult(name, uri);
                     results.add(result);
