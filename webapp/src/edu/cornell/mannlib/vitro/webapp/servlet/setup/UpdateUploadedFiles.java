@@ -48,6 +48,11 @@ public class UpdateUploadedFiles implements ServletContextListener {
 	 */
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
+	    
+	    if (AbortStartup.isStartupAborted(sce.getServletContext())) {
+            return;
+        }
+	    
 		try {
 			ServletContext ctx = sce.getServletContext();
 

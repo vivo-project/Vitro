@@ -26,6 +26,10 @@ public class PelletReasonerSetup implements ServletContextListener {
 	
 	public void contextInitialized(ServletContextEvent sce) {
 		
+	    if (AbortStartup.isStartupAborted(sce.getServletContext())) {
+            return;
+        }
+	    
 		try {	
 			
 	        //FIXME refactor this

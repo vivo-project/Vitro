@@ -65,6 +65,10 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	
 	public void contextInitialized(ServletContextEvent sce) {
 				
+	    if (AbortStartup.isStartupAborted(sce.getServletContext())) {
+            return;
+        }
+	    
 		try {
 
 			ServletContext ctx = sce.getServletContext();

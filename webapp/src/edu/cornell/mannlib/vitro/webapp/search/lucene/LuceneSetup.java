@@ -36,6 +36,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.SearchReindexingListener;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ObjectSourceIface;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.AbortStartup;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 
 /**
@@ -68,6 +69,11 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 	 * created.
 	 */
 	public void contextInitialized(ServletContextEvent sce) {
+	    
+	    if (AbortStartup.isStartupAborted(sce.getServletContext())) {
+            return;
+        }
+	    
 		try {
 			ServletContext context = sce.getServletContext();
 

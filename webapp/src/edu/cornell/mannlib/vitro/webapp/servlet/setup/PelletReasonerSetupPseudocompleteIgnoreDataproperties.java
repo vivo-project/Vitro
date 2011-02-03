@@ -22,6 +22,10 @@ public class PelletReasonerSetupPseudocompleteIgnoreDataproperties implements
 	
 	public void contextInitialized(ServletContextEvent sce) {
 	
+	    if (AbortStartup.isStartupAborted(sce.getServletContext())) {
+            return;
+        }
+	    
 		try {
 		
 			OntModel memoryModel = (OntModel) sce.getServletContext().getAttribute("jenaOntModel");

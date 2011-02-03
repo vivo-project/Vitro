@@ -60,6 +60,11 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
     private static final Log log = LogFactory.getLog(JenaDataSourceSetupSDB.class);
     
     public void contextInitialized(ServletContextEvent sce) {
+        
+        if (AbortStartup.isStartupAborted(sce.getServletContext())) {
+            return;
+        }
+        
         try {
 
             // JenaPersistentDataSourceSetup should have already set this up - it just sets

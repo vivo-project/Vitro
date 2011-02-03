@@ -16,6 +16,10 @@ public class DefaultThemeSetup implements ServletContextListener {
 	// Set default theme based on themes present on the file system
 	public void contextInitialized(ServletContextEvent event) {
 
+	    if (AbortStartup.isStartupAborted(event.getServletContext())) {
+            return;
+        }
+	    
     	// Find the themes directory in the file system
 		ServletContext sc = event.getServletContext();		
     	boolean doSort = true;

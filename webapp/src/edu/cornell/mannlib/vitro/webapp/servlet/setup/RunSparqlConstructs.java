@@ -42,6 +42,10 @@ public class RunSparqlConstructs implements ServletContextListener {
 	
 	public void contextInitialized(ServletContextEvent sce) {
 		
+	    if (AbortStartup.isStartupAborted(sce.getServletContext())) {
+            return;
+        }
+	    
 		try {
 		
 			WebappDaoFactory wadf = (WebappDaoFactory) sce.getServletContext().getAttribute("webappDaoFactory");

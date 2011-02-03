@@ -44,6 +44,11 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
 	private static final Log log = LogFactory.getLog(JenaDataSourceSetup.class.getName());
 	
     public void contextInitialized(ServletContextEvent sce) {
+        
+        if (AbortStartup.isStartupAborted(sce.getServletContext())) {
+            return;
+        }
+        
         try {
             
             String tripleStoreTypeStr = 

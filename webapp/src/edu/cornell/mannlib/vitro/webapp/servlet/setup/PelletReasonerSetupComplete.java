@@ -21,36 +21,40 @@ public class PelletReasonerSetupComplete implements ServletContextListener {
 	
 	public void contextInitialized(ServletContextEvent sce) {
 		
+	    if (AbortStartup.isStartupAborted(sce.getServletContext())) {
+            return;
+        }
+	    
 		try {	
 			
-		OntModel memoryModel = (OntModel) sce.getServletContext().getAttribute("jenaOntModel");
-		OntModel baseModel = (OntModel) sce.getServletContext().getAttribute("baseOntModel");
-		OntModel inferenceModel = (OntModel) sce.getServletContext().getAttribute("inferenceOntModel");
-		
-		if (!baseModel.getProfile().NAMESPACE().equals(OWL.NAMESPACE.getNameSpace())) {		
-			log.error("Not connecting Pellet reasoner - base model is not an OWL model");
-			return;
-		}       
-        
-        // Set various options
-		PelletOptions.DL_SAFE_RULES = true;
-        PelletOptions.USE_COMPLETION_QUEUE = true;
-        PelletOptions.USE_TRACING = true;
-        PelletOptions.TRACK_BRANCH_EFFECTS = true;
-        PelletOptions.USE_INCREMENTAL_CONSISTENCY = true;
-        PelletOptions.USE_INCREMENTAL_DELETION = true;
-        
-        // Pellet 2.0-RC5 is buggy with incremental reasoning through Jena
-        //PelletOptions.USE_INCREMENTAL_CONSISTENCY = true;
-        //PelletOptions.USE_INCREMENTAL_DELETION = true;
-        ReasonerConfiguration config = ReasonerConfiguration.COMPLETE;
-        config.setIncrementalReasongingEnabled(false);
-        
-        PelletListener pelletListener = new PelletListener(memoryModel,baseModel,inferenceModel,config);
-        sce.getServletContext().setAttribute("pelletListener",pelletListener);
-        sce.getServletContext().setAttribute("pelletOntModel", pelletListener.getPelletModel());
-        
-        log.debug("Reasoner connected");
+    		OntModel memoryModel = (OntModel) sce.getServletContext().getAttribute("jenaOntModel");
+    		OntModel baseModel = (OntModel) sce.getServletContext().getAttribute("baseOntModel");
+    		OntModel inferenceModel = (OntModel) sce.getServletContext().getAttribute("inferenceOntModel");
+    		
+    		if (!baseModel.getProfile().NAMESPACE().equals(OWL.NAMESPACE.getNameSpace())) {		
+    			log.error("Not connecting Pellet reasoner - base model is not an OWL model");
+    			return;
+    		}       
+            
+            // Set various options
+    		PelletOptions.DL_SAFE_RULES = true;
+            PelletOptions.USE_COMPLETION_QUEUE = true;
+            PelletOptions.USE_TRACING = true;
+            PelletOptions.TRACK_BRANCH_EFFECTS = true;
+            PelletOptions.USE_INCREMENTAL_CONSISTENCY = true;
+            PelletOptions.USE_INCREMENTAL_DELETION = true;
+            
+            // Pellet 2.0-RC5 is buggy with incremental reasoning through Jena
+            //PelletOptions.USE_INCREMENTAL_CONSISTENCY = true;
+            //PelletOptions.USE_INCREMENTAL_DELETION = true;
+            ReasonerConfiguration config = ReasonerConfiguration.COMPLETE;
+            config.setIncrementalReasongingEnabled(false);
+            
+            PelletListener pelletListener = new PelletListener(memoryModel,baseModel,inferenceModel,config);
+            sce.getServletContext().setAttribute("pelletListener",pelletListener);
+            sce.getServletContext().setAttribute("pelletOntModel", pelletListener.getPelletModel());
+            
+            log.debug("Reasoner connected");
      
 		} catch (Throwable t) {
 			t.printStackTrace();
