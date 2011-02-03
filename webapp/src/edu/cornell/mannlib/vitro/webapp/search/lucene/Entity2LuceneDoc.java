@@ -155,16 +155,6 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
                                     Field.Store.YES, Field.Index.NOT_ANALYZED));
         }
 
-        //Keywords
-        for( String word : ent.getKeywords()){
-            if( word != null ){
-                Field kwf = new Field(term.KEYWORDS, word, 
-                                    Field.Store.YES, Field.Index.NOT_ANALYZED);
-                kwf.setBoost( KEYWORD_BOOST );
-                doc.add( kwf );
-            }
-        }
-
         //Modification time
         if( ent.getModTime() != null){
             value = (new DateTime(ent.getModTime().getTime()))
