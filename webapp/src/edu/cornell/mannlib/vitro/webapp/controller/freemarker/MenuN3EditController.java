@@ -35,6 +35,7 @@ public class MenuN3EditController extends FreemarkerHttpServlet {
             menuN3 = vreq.getWebappDaoFactory().getDisplayModelDao()
                     .getDisplayModel(getServletContext());
             data.put("menuN3", menuN3);
+            data.put("cancelUrl", "/siteAdmin");
         } catch (Exception e) {
             data.put("errorMessage",e.getMessage());
         }        
