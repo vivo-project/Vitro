@@ -96,7 +96,8 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         Individual ent = (Individual)obj;
         String value;
         Document doc = new Document();
-
+        String classPublicNames = "";
+        
         //DocId
         String id = ent.getURI();
         if( id == null ){
@@ -145,14 +146,16 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
 
         //rdf:type and ClassGroup
         List<VClass> vclasses = ent.getVClasses(false);
-        for( VClass clz : vclasses){
-        	log.debug( id + " as type " + clz.getURI() );
-        	
+        for( VClass clz : vclasses){        	
             //document boost for given classes
             if( clz.getSearchBoost() != null )
                 doc.setBoost( doc.getBoost() + clz.getSearchBoost() );            
             doc.add( new Field(term.RDFTYPE, clz.getURI(), 
-                                Field.Store.YES, Field.Index.NOT_ANALYZED));                                               
+                                Field.Store.YES, Field.Index.NOT_ANALYZED));
+            
+            if( clz.getName() != null )
+                classPublicNames = classPublicNames + " " + clz.getName();
+            
             //Classgroup URI
             if( clz.getGroupURI() != null )
                 doc.add( new Field(term.CLASSGROUP_URI, clz.getGroupURI(), 
@@ -244,6 +247,7 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         value+= " "+ ( ((t=ent.getBlurb()) == null)?"":t );
         value+= " "+ getKeyterms(ent);
 
+        value+= " " + classPublicNames;
 
         List<DataPropertyStatement> dataPropertyStatements = ent.getDataPropertyStatements();
         if (dataPropertyStatements != null) {
@@ -370,15 +374,8 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
     }
 
     private String getKeyterms(Individual ent){
-        //List<String> terms = entityWADao.getKeywords(ent.getId());
-        List<String> terms = ent.getKeywords();
-        String rv = "";
-        if( terms != null ){
-            for( String term : terms){
-                rv += term + " ";
-            }
-        }
-        return rv;
+        /* bdc34: vitro:keywords are no longer being indexed */
+        return "";
     }
 
     public static float NAME_BOOST = 10;
