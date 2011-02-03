@@ -34,6 +34,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
+import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LoginInProcessFlag;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LoginRedirector;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.Message;
@@ -475,6 +476,8 @@ public class Authenticate extends VitroHttpServlet {
 			throws IOException {
 		log.debug("logging in.");
 
+		LoginInProcessFlag.set(vreq);
+		
 		String loginProcessPage = LoginProcessBean.getBean(vreq)
 				.getLoginPageUrl();
 		response.sendRedirect(loginProcessPage);

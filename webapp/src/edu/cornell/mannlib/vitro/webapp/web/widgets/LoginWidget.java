@@ -15,6 +15,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LoginInProcessFlag;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
@@ -189,47 +190,19 @@ public class LoginWidget extends Widget {
     }
 
 	/**
-	 * A LoginProcessBean is outdated if we have come from a page other than
-	 * this one.
+	 * A LoginProcessBean is outdated unless the the "in-process" flag is set in the
+	 * session. 
 	 * 
-	 * If we can't be certain, assume that the bean is not outdated.
+	 * Each time we hit Authenticate, the flag is set, and each time
+	 * we draw the widget it is reset.
 	 */
 	private boolean isOutdatedLoginProcessBean(HttpServletRequest request) {
-		// If there is no bean, it is not outdated.
-		if (!LoginProcessBean.isBean(request)) {
-			return false;
+		boolean inProcess = LoginInProcessFlag.checkAndReset(request);
+		if (!inProcess) {
+			log.debug("The process bean is outdated. Discard it.");
 		}
-
-		String referrer = request.getHeader("referer");
-
-		// They don't say where they were, assume they were here.
-		if ((referrer == null) || (referrer.isEmpty())) {
-			return false;
-		}
-
-		// If the referrer equals the request, they were here.
-		String requestURL = request.getRequestURL().toString();
-		if (referrer.equals(requestURL)) {
-			return false;
-		}
-
-		// RFC2616 says that the referrer might be relative to the request.
-		// Translate to absolute, and test if they were here.
-		try {
-			String absoluteReferrer = new URL(new URL(requestURL), referrer)
-					.toString();
-			if (absoluteReferrer.equals(requestURL)) {
-				return false;
-			}
-		} catch (MalformedURLException e) {
-			log.warn("Problems trying to resolve a relative referrer: requestURL = '"
-					+ requestURL + "', referrer = '" + referrer + "'" + e);
-			return false;
-		}
-
-		// The referrer is not equal to the request, so they came from somewhere
-		// else.
-		return true;
+		
+		return !inProcess;
 	}
 
 	/** What's the URL for this servlet? */
