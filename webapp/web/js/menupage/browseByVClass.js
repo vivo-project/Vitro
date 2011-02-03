@@ -21,8 +21,6 @@ var browseByVClass = {
         this.browseVClassLinks = $('#browse-classes li a');
         this.alphaIndex = $('#alpha-browse-individuals');
         this.alphaIndexLinks = $('#alpha-browse-individuals li a');
-        this.paginationNav = $('nav.pagination');
-        this.paginationLinks = $('nav.pagination li a');
         this.individualsInVClass = $('#individuals-in-class ul');
         this.individualsContainer = $('#individuals-in-class');
     },
@@ -56,7 +54,7 @@ var browseByVClass = {
     
     // Listener for page switching -- separate from the rest because it needs to be callable
     paginationListener: function() {
-        $('nav.pagination li a').click(function() {
+        $('.pagination li a').click(function() {
             uri = $('#browse-classes li a.selected').attr('data-uri');
             alpha = $('#alpha-browse-individuals li a.selected').attr('data-alpha');
             page = $(this).attr('class').substring(4,5);
@@ -87,60 +85,91 @@ var browseByVClass = {
             scroll = true;
         }
         
-        // First wipe currently displayed class heading, individuals, and existing pagination
-        $('h3.selected-class').remove();
-        this.individualsInVClass.empty();
-        $('nav.pagination').remove();
+        // Scroll to #menupage-intro page unless told otherwise
+        if ( scroll != false ) {
+            // only scroll back up if we're past the top of the #browse-by section
+            scrollPosition = browseByVClass.getPageScroll();
+            browseByOffset = $('#browse-by').offset();
+            if ( scrollPosition[1] > browseByOffset.top) {
+                $.scrollTo('#menupage-intro', 500);
+            }
+        }
         
         $.getJSON(url, function(results) {
-            // Check to see if we're dealing with pagination
-            if ( results.pages.length ) {
-                pages = results.pages;
-                browseByVClass.pagination(pages, page);
-            }
+            individualList = "";
             
-            selectedClassHeading = '<h3 class="selected-class">'+ results.vclass.name +'</h3>';
-            browseByVClass.individualsContainer.prepend(selectedClassHeading);
-            
-            $.each(results.individuals, function(i, item) {
-                label = results.individuals[i].label;
-                moniker = results.individuals[i].moniker;
-                vclassName = results.individuals[i].vclassName;
-                uri = results.individuals[i].URI;
-                profileUrl = results.individuals[i].profileUrl;
-                if ( results.individuals[i].thumbUrl ) {
-                    image = browseByVClass.baseUrl + results.individuals[i].thumbUrl;
+            // Catch exceptions when empty individuals result set is returned
+            // This is very likely to happen now since we don't have individual counts for each letter and always allow the result set to be filtered by any letter
+            if ( results.individuals.length == 0 ) {
+                browseByVClass.emptyResultSet(results.vclass, alpha)
+            } else {
+                $.each(results.individuals, function(i, item) {
+                    label = results.individuals[i].label;
+                    moniker = results.individuals[i].moniker;
+                    vclassName = results.individuals[i].vclassName;
+                    uri = results.individuals[i].URI;
+                    profileUrl = results.individuals[i].profileUrl;
+                    if ( results.individuals[i].thumbUrl ) {
+                        image = browseByVClass.baseUrl + results.individuals[i].thumbUrl;
+                    }
+                    // Build the content of each list item, piecing together each component
+                    listItem = '<li class="individual" role="listitem" role="navigation">';
+                    if ( typeof results.individuals[i].thumbUrl !== "undefined" ) {
+                        listItem += '<img src="'+ image +'" width="90" height="90" alt="'+ label +'" /><h1 class="thumb">';
+                    } else {
+                        listItem += '<h1>';
+                    }
+                    listItem += '<a href="'+ profileUrl +'" title="View the profile page for '+ label +'">'+ label +'</a></h1>';
+                    // Include the moniker only if it's not empty and not equal to the VClass name
+                    if ( moniker != vclassName && moniker != "" ) {
+                        listItem += '<span class="title">'+ moniker +'</span>';
+                    }
+                    listItem += '</li>';
+                    // browseByVClass.individualsInVClass.append(listItem);
+                    individualList += listItem;
+                })
+                
+                // Remove existing content
+                browseByVClass.wipeSlate();
+                
+                // And then add the new content
+                browseByVClass.individualsInVClass.append(individualList);
+                
+                // Check to see if we're dealing with pagination
+                if ( results.pages.length ) {
+                    pages = results.pages;
+                    browseByVClass.pagination(pages, page);
                 }
-                // Build the content of each list item, piecing together each component
-                listItem = '<li class="individual" role="listitem" role="navigation">';
-                if ( typeof results.individuals[i].thumbUrl !== "undefined" ) {
-                    listItem += '<img src="'+ image +'" width="90" height="90" alt="'+ label +'" /><h1 class="thumb">';
-                } else {
-                    listItem += '<h1>';
-                }
-                listItem += '<a href="'+ profileUrl +'" title="View the profile page for '+ label +'">'+ label +'</a></h1>';
-                // Include the moniker only if it's not empty and not equal to the VClass name
-                if ( moniker != vclassName && moniker != "" ) {
-                    listItem += '<span class="title">'+ moniker +'</span>';
-                }
-                listItem += '</li>';
-                browseByVClass.individualsInVClass.append(listItem);
-            })
-            
-            // Set selected class, alpha and page
-            browseByVClass.selectedVClass(results.vclass.URI);
-            browseByVClass.selectedAlpha(alpha);
-            
-            // Scroll to #menupage-intro page unless told otherwise
-            if ( scroll != false ) {
-                $.scrollTo('#menupage-intro', 500);
+                
+                selectedClassHeading = '<h3 class="selected-class">'+ results.vclass.name +'</h3>';
+                browseByVClass.individualsContainer.prepend(selectedClassHeading);
+                
+                // Set selected class, alpha and page
+                browseByVClass.selectedVClass(results.vclass.URI);
+                browseByVClass.selectedAlpha(alpha);
             }
         });
     },
     
+    // getPageScroll() by quirksmode.org
+    getPageScroll: function() {
+        var xScroll, yScroll;
+        if (self.pageYOffset) {
+          yScroll = self.pageYOffset;
+          xScroll = self.pageXOffset;
+        } else if (document.documentElement && document.documentElement.scrollTop) {
+          yScroll = document.documentElement.scrollTop;
+          xScroll = document.documentElement.scrollLeft;
+        } else if (document.body) {// all other Explorers
+          yScroll = document.body.scrollTop;
+          xScroll = document.body.scrollLeft;
+        }
+        return new Array(xScroll,yScroll)
+    },
+    
     // Print out the pagination nav if called
     pagination: function(pages, page) {
-        pagination = '<nav class="pagination menupage">';
+        pagination = '<div class="pagination menupage">';
         pagination += '<h3>page</h3>';
         pagination += '<ul>';
         $.each(pages, function(i, item) {
@@ -189,6 +218,23 @@ var browseByVClass = {
         
         // Add active class for requested alpha
         $('#alpha-browse-individuals li a[data-alpha="'+ alpha +'"]').addClass('selected');
+    },
+    
+    // Wipe the currently displayed class heading, individuals, no-content message, and existing pagination
+    wipeSlate: function() {
+        $('h3.selected-class').remove();
+        browseByVClass.individualsInVClass.empty();
+        $('p.no-individuals').remove();
+        $('.pagination').remove();
+    },
+    
+    // When no individuals are returned for the AJAX request, print a reasonable message for the user
+    emptyResultSet: function(vclass, alpha) {
+        this.wipeSlate();
+        this.selectedAlpha(alpha);
+        
+        nothingToSeeHere = '<p class="no-individuals">There are no '+ vclass.name +' individuals whose name starts with <em>'+ alpha +'</em>.</p> <p class="no-individuals">Please try another letter or browse all '+ vclass.name +' individuals.</p>';
+        browseByVClass.individualsContainer.prepend(nothingToSeeHere);
     }
 };
 

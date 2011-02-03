@@ -248,40 +248,43 @@ li.individual h1.thumb {
 #individuals-in-class span.org {
     display: block;
 }
-nav.pagination {
+p.no-individuals {
+    margin: 1em 2em;
+}
+.pagination {
     margin: .3em 0 0 1.4em;
 }
-nav.pagination h3 {
+.pagination h3 {
     display: inline;
     margin: 0 .3em 0 0;
     padding: 0;
     font-size: 1.1em;
     color: #666;
 }
-nav.pagination ul {
+.pagination ul {
     display: inline;
 }
-nav.pagination li {
+.pagination li {
     display: inline-block;
     margin: 0;
     border: none;
 }
-nav.pagination li.selected {
+.pagination li.selected {
     padding: 0 0.4em;
     line-height: 1.5;
     color: #333;
     background: #ddd;
 }
-nav.pagination li a {
+.pagination li a {
     padding: 0 0.4em;
     border: none;
 }
-nav.pagination li a:hover {
+.pagination li a:hover {
     color: #fff;
     background: #333;
     border: none;
 }
-nav.pagination .round {
+.pagination .round {
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
     border-radius: 3px;
