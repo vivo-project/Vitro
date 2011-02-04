@@ -35,18 +35,14 @@ ${stylesheets.add("/css/browseIndex.css")}
         <ul>
             <#list individuals as individual>
                 <li>
-                    <#-- The old JSP version uses a custom search view if one is defined, but it doesn't make sense
-                    to do that in the current system, because we don't use the default search view. We could define
-                    a custom list or use the custom short view, but for now just hard-code the view here; it will not be
-                    customizable.
-                    <#include "${individual.searchView}"> -->
-                    <a href="${individual.profileUrl}">${individual.name}</a><#if individual.moniker??> <span class="moniker">${individual.moniker}</span></#if>
+                    <#assign moniker = individual.moniker!"">
+                    <a href="${individual.profileUrl}">${individual.name}</a><#if moniker?has_content> <span class="moniker">${moniker}</span></#if>
                     <#if individual.links?has_content>
                         <ul class="individualData">
                             <@l.firstLastList>
                                 <#list individual.links as link>
                                     <#if link?? && link.url?? && link.anchor?? >
-                                    <li><a class="externalLink" href="${link.url}">${link.anchor}</a></li>
+                                        <li><a class="externalLink" href="${link.url}">${link.anchor}</a></li>
                                     </#if>
                                 </#list>
                             </@l.firstLastList>
