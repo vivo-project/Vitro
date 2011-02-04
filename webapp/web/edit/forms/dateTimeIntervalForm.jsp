@@ -239,14 +239,12 @@
     }
     
     List<String> customJs = new ArrayList<String>(Arrays.asList(JavaScript.JQUERY_UI.path(),
-                                                                JavaScript.CUSTOM_FORM_UTILS.path(),
-                                                                "/edit/forms/js/customFormWithAutocomplete.js"                                                    
+                                                                JavaScript.CUSTOM_FORM_UTILS.path()                                               
                                                                ));            
     request.setAttribute("customJs", customJs);
     
     List<String> customCss = new ArrayList<String>(Arrays.asList(Css.JQUERY_UI.path(),
-                                                                 Css.CUSTOM_FORM.path(),
-                                                                 "/edit/forms/css/customFormWithAutocomplete.css"
+                                                                 Css.CUSTOM_FORM.path()
                                                                 ));
     request.setAttribute("customCss", customCss);
     
