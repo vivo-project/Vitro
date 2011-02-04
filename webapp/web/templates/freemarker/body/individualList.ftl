@@ -35,15 +35,14 @@ ${stylesheets.add("/css/browseIndex.css")}
         <ul>
             <#list individuals as individual>
                 <li>
-                    <#assign moniker = individual.moniker!"">
+                    <#assign moniker = individual.moniker!>
                     <a href="${individual.profileUrl}">${individual.name}</a><#if moniker?has_content> <span class="moniker">${moniker}</span></#if>
-                    <#if individual.links?has_content>
+                    <#assign links = individual.links>
+                    <#if links?has_content>
                         <ul class="individualData">
                             <@l.firstLastList>
-                                <#list individual.links as link>
-                                    <#if link?? && link.url?? && link.anchor?? >
-                                        <li><a class="externalLink" href="${link.url}">${link.anchor}</a></li>
-                                    </#if>
+                                <#list links as link>
+                                    <li><a class="externalLink" href="${link.url}">${link.anchor}</a></li>
                                 </#list>
                             </@l.firstLastList>
                         </ul>

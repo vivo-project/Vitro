@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -70,25 +71,30 @@ public class ListedIndividualTemplateModel extends BaseTemplateModel {
         String url = individual.getUrl();
         if (anchor != null && url != null) {
             primaryLink = new Link();
-            primaryLink.setAnchor(individual.getAnchor());
-            primaryLink.setUrl(individual.getUrl());           
+            primaryLink.setAnchor(anchor);
+            primaryLink.setUrl(url);           
         } 
         return primaryLink;
     }
     
     public List<Link> getAdditionalLinks() {
-        return individual.getLinksList();
+        return individual.getLinksList(); // returns an empty list, but not null
     }
     
     public List<Link> getLinks() {
-        List<Link> additionalLinks = getAdditionalLinks();
+        List<Link> additionalLinks = getAdditionalLinks();  // returns an empty list, but not null
         List<Link> links = new ArrayList<Link>(additionalLinks.size()+1);
         Link primaryLink = getPrimaryLink();
         if (primaryLink != null) {
             links.add(primaryLink);
         }        
-        links.addAll(additionalLinks);
-        return links;      
+        for (Link link : additionalLinks) {
+            // Hide malformed links from the template to make things easier
+            if ( !(StringUtils.isEmpty(link.getAnchor())) && !(StringUtils.isEmpty(link.getUrl())) ) {
+                links.add(link);
+            }
+        }
+        return links;  // returns an empty list, but not null   
     }
     
     public String getName() {           
