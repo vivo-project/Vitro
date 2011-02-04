@@ -3,14 +3,20 @@
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import java.io.StringReader;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import junit.framework.Assert;
 
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.vocabulary.XSD;
 
+import edu.cornell.mannlib.vitro.webapp.beans.PropertyInstance;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
@@ -135,4 +141,66 @@ public class PropertyInstanceDaoJenaTest {
     void wipeOutModTime(Model model){
 		model.removeAll(null, model.createProperty(VitroVocabulary.MODTIME), null);
 	}
+    
+    @org.junit.Test
+    public void testGetAllPossiblePropInstForIndividual() {
+        String n3 = prefixesN3 +
+            "ex:hasMold a owl:ObjectProperty . \n" +
+            "ex:hasSpore a owl:ObjectProperty . \n" +
+            "ex:hasFungus a owl:ObjectProperty . \n" +
+            "ex:redHerring a owl:ObjectProperty . \n" +
+            "ex:Person a owl:Class . \n" +
+            "ex:Agent a owl:Class . \n" +
+            "ex:Mold a owl:Class . \n" +
+            "ex:Spore a owl:Class . \n" +
+            "ex:Fungus a owl:Class . \n" +
+            "ex:Organism a owl:Class . \n" +
+            "ex:Mold rdfs:subClassOf ex:Organism . \n" +
+            "ex:Spore rdfs:subClassOf ex:Organism . \n" +
+            "ex:Fungus rdfs:subClassOf ex:Organism . \n" +
+            "ex:Person rdfs:subClassOf ex:Agent . \n" +
+            "ex:hasFungus rdfs:range ex:Fungus . \n" +
+            "ex:hasFungus rdfs:domain ex:Agent . \n" +
+            "ex:Agent rdfs:subClassOf [ a owl:Restriction ; \n" +
+                                       "owl:onProperty ex:hasMold ; \n" +
+                                       "owl:allValuesFrom ex:Organism ] . \n" +
+            "ex:Person rdfs:subClassOf [ a owl:Restriction ; \n" +
+                                       "owl:onProperty ex:hasMold ; \n" +
+                                       "owl:allValuesFrom ex:Mold ] . \n" +
+            "ex:Agent rdfs:subClassOf [ a owl:Restriction ; \n" +
+                                       "owl:onProperty ex:hasSpore ; \n" +
+                                       "owl:allValuesFrom ex:Organism ] . \n" +
+            "ex:Person rdfs:subClassOf [ a owl:Restriction ; \n" +
+                                       "owl:onProperty ex:hasSpore ; \n" +
+                                       "owl:someValuesFrom ex:Spore ] . \n" +            
+            "ex:bob a ex:Person ; a ex:Agent . \n";
+        
+        // The applicable properties for bob should be:
+        // 1. hasMold (values from Mold)
+        // 2. hasSpore (values from Organism)
+        // 3. hasFungus (values from Fungus)
+        
+        OntModel ontModel = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM));
+        ontModel.read(new StringReader(n3), null, "N3");
+        
+        WebappDaoFactory wadf = new WebappDaoFactoryJena(ontModel);
+        Assert.assertEquals(4, wadf.getObjectPropertyDao().getAllObjectProperties().size());
+        Assert.assertEquals(6, wadf.getVClassDao().getAllVclasses().size());
+        Assert.assertNotNull(wadf.getIndividualDao().getIndividualByURI("http://example.com/bob"));
+        
+        Collection<PropertyInstance> pinsts = wadf.getPropertyInstanceDao()
+                .getAllPossiblePropInstForIndividual("http://example.com/bob");
+        
+        Assert.assertEquals(3, pinsts.size());
+        
+        Map<String, String> propToRange = new HashMap<String,String>();
+        for (PropertyInstance pi : pinsts) {
+            propToRange.put(pi.getPropertyURI(), pi.getRangeClassURI());
+        }
+        
+        Assert.assertEquals("http://example.com/Mold", propToRange.get("http://example.com/hasMold"));
+        Assert.assertEquals("http://example.com/Organism", propToRange.get("http://example.com/hasSpore"));
+        Assert.assertEquals("http://example.com/Fungus", propToRange.get("http://example.com/hasFungus"));    
+            
+    }
 }
