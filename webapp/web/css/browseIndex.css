@@ -19,22 +19,24 @@
     font-size: 1em;
 }
 .rdfLink {
-    padding-left: 0.5em;
-    font-size: 0.8em;
+    padding-left: .5em;
+    font-size: .8em;
     border-left: 1px solid #a6b1b0;
-}
-.individualList a.externalLink {
-    text-decoration: none;
-    font-weight: normal;
 }
 .individualList ul.individualData {
     display: inline;
+    padding: 0.2em 0.4em;
+    font-size: 0.8em;
+    background: #f7f7f7;
 }
 .individualList ul.individualData li.last {
     border: none;
 }
+.individualList a.externalLink {
+    font-weight: normal;
+}
 .individualList ul { 
-    margin-left: 0; 
+    margin-left: 0;
 }
 .individualList li { 
     list-style-type: none;
