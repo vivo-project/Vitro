@@ -45,8 +45,7 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 public class IndexBuilder {
     private List<ObjectSourceIface> sourceList = new LinkedList<ObjectSourceIface>();
     private IndexerIface indexer = null;
-    private ServletContext context = null;
-    private ProhibitedFromSearch classesProhibitedFromSearch = null;    
+    private ServletContext context = null;    
     
     private long lastRun = 0;
      
@@ -125,15 +124,6 @@ public class IndexBuilder {
 	public synchronized boolean isThereWorkToDo(){
 		return isReindexRequested() || ! changedUris.isEmpty() ;
 	}
-	
-	public ProhibitedFromSearch getClassesProhibitedFromSearch() {
-		return classesProhibitedFromSearch;
-	}
-
-	public void setClassesProhibitedFromSearch(
-			ProhibitedFromSearch classesProhibitedFromSearch) {
-		this.classesProhibitedFromSearch = classesProhibitedFromSearch;
-	}	
 	
 	public void killIndexingThread() {
 		this.indexingThread.kill();		
@@ -351,32 +341,9 @@ public class IndexBuilder {
      */
     private void indexItem( Individual ind, boolean newDoc){
         try{
-        	if( ind == null )
-        		return;
-        	if( ind.getVClasses() == null || ind.getVClasses().size() < 1 )
-        		return;
-        	boolean prohibitedClass = false;
-        	VClass prohClass = null;
-        	if(  classesProhibitedFromSearch != null ){
-        		for( VClass vclass : ind.getVClasses() ){
-        			if( classesProhibitedFromSearch.isClassProhibited(vclass.getURI()) ){        			
-        				prohibitedClass = true;
-        				prohClass = vclass;
-        				break;
-        			}        		
-        		}
-        	}
-        	if( !prohibitedClass ){
+        	if( ind != null ){        	       
         		indexer.index(ind, newDoc);
-        	}else{
-        	    if( ! newDoc ){
-        	        //log.debug("removing " + ind.getURI() + " from index because class " + prohClass.getURI() + " is on prohibited list.");
-        	        indexer.removeFromIndex(ind);
-        	    }else{
-        	        //log.debug("not adding " + ind.getURI() + " to index because class " + prohClass.getURI() + " is on prohibited list.");
-        	    }
-        	}
-        	
+        	}        	
         }catch(Throwable ex){            
             log.warn("IndexBuilder.indexItem() Error indexing "
                     + ind + "\n" +ex);

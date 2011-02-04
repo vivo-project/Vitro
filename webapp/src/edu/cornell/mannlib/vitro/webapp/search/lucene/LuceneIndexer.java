@@ -220,7 +220,7 @@ public class LuceneIndexer implements IndexerIface {
                         		log.debug("added " + ind.getName() + " " + ind.getURI());
                     		}
                         }else{
-                        	log.debug("could not translate, removing from index " + ind.getURI());
+                        	log.debug("removing from index " + ind.getURI());
                         	writer.deleteDocuments((Term)obj2doc.getIndexId(ind));
                         }
                     }

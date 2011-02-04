@@ -21,6 +21,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
+import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.docbuilder.Obj2DocIface;
 import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
 
@@ -84,7 +85,8 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
     public static VitroLuceneTermNames term = new VitroLuceneTermNames();
 
     private static String entClassName = Individual.class.getName();
-
+    private ProhibitedFromSearch classesProhibitedFromSearch = null;
+    
     public boolean canTranslate(Object obj) {    	
         return (obj != null && obj instanceof Individual);        	
     }    
@@ -104,6 +106,13 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         	log.debug("cannot translate bnodes");
             throw new IndexingException("Not indexing bnodes");
         }
+        
+        List<VClass> vclasses = ent.getVClasses(false);               
+        for( VClass vclass : vclasses ){
+            if( classesProhibitedFromSearch.isClassProhibited(vclass.getURI()) ){                   
+                return null;
+            }
+        }                        
         
         doc.add( new Field(term.DOCID, entClassName + id,
                             Field.Store.YES, Field.Index.NOT_ANALYZED));
@@ -144,8 +153,7 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         if( ent.getSearchBoost() != null && ent.getSearchBoost() != 0 )
             doc.setBoost(ent.getSearchBoost());
 
-        //rdf:type and ClassGroup
-        List<VClass> vclasses = ent.getVClasses(false);
+        //rdf:type and ClassGroup        
         for( VClass clz : vclasses){        	
             //document boost for given classes
             if( clz.getSearchBoost() != null )
@@ -380,6 +388,15 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         return "";
     }
 
+    public ProhibitedFromSearch getClassesProhibitedFromSearch() {
+        return classesProhibitedFromSearch;
+    }
+
+    public void setClassesProhibitedFromSearch(
+            ProhibitedFromSearch classesProhibitedFromSearch) {
+        this.classesProhibitedFromSearch = classesProhibitedFromSearch;
+    }
+    
     public static float NAME_BOOST = 10;
     public static float KEYWORD_BOOST = 2;
 }

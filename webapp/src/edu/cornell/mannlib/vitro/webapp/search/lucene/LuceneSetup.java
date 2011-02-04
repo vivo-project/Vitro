@@ -99,7 +99,11 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 			// This will attempt to create a new directory and empty index if there is none.
 			LuceneIndexer indexer = new LuceneIndexer(getBaseIndexDirName(),liveIndexDir, null, getAnalyzer());
 			context.setAttribute(ANALYZER, getAnalyzer());
-			indexer.addObj2Doc(new Entity2LuceneDoc());
+			Entity2LuceneDoc translator = new Entity2LuceneDoc();
+			OntModel displayOntModel = (OntModel) sce.getServletContext().getAttribute("displayOntModel");
+			translator.setClassesProhibitedFromSearch(
+			        new ProhibitedFromSearch(DisplayVocabulary.PRIMARY_LUCENE_INDEX_URI, displayOntModel));			
+			indexer.addObj2Doc(translator);			
 			context.setAttribute(LuceneIndexer.class.getName(), indexer);
 			indexer.setLuceneIndexFactory(lif);
 			
@@ -135,11 +139,6 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 			ModelContext.getInferenceOntModel(ctx).register(srl);
 			ModelContext.getUnionOntModelSelector(ctx).getABoxModel()
 			        .getBaseModel().register(srl);
-
-			// set the classes that the indexBuilder ignores
-			OntModel displayOntModel = (OntModel) sce.getServletContext().getAttribute("displayOntModel");
-			builder.setClassesProhibitedFromSearch(
-				new ProhibitedFromSearch(DisplayVocabulary.PRIMARY_LUCENE_INDEX_URI, displayOntModel));
 						
 			if( (Boolean)sce.getServletContext().getAttribute(INDEX_REBUILD_REQUESTED_AT_STARTUP) instanceof Boolean &&
 				(Boolean)sce.getServletContext().getAttribute(INDEX_REBUILD_REQUESTED_AT_STARTUP) ){
