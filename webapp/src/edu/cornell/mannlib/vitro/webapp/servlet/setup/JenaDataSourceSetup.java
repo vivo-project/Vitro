@@ -151,8 +151,8 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
 
     
     private void checkForNamespaceMismatch(OntModel model, String defaultNamespace) {
-        String defaultNamespaceFromDeployProperites = ConfigurationProperties.getProperty("Vitro.defaultNamespace");
-        if( defaultNamespaceFromDeployProperites == null ){            
+        String defaultNamespaceFromDeployProperties = ConfigurationProperties.getProperty("Vitro.defaultNamespace");
+        if( defaultNamespaceFromDeployProperties == null ){            
             log.error("Could not get namespace from deploy.properties.");
         }               
         
@@ -168,13 +168,14 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
         }
         if( portalURIs.size() > 0 ){
             for( String portalUri : portalURIs){
-                if( portalUri != null && ! portalUri.startsWith(defaultNamespaceFromDeployProperites)){
+                if( portalUri != null && ! portalUri.startsWith(defaultNamespaceFromDeployProperties)){
                     log.error("Namespace mismatch between db and deploy.properties.");
+                    String portalNamespace = portalUri.substring(0, portalUri.lastIndexOf("/")+1);
                     log.error("Vivo will not start up correctly because the default namespace specified in deploy.properties does not match the namespace of " +
-                    		"a portal in the database. Namespace from deploy.properties: \"" + defaultNamespaceFromDeployProperites + 
-                            "\" Namespace from an existing portal: \"" + portalUri + "\" To get the application to start with this " +
-                            "database change the default namespace in deploy.properties " + portalUri.substring(0, portalUri.lastIndexOf("/")+1) + 
-                            "  Another possibility is that deploy.properties does not specify the intended database.");
+                    		"a portal in the database. Namespace from deploy.properties: \"" + defaultNamespaceFromDeployProperties + 
+                            "\". Namespace from an existing portal: \"" + portalNamespace + "\". To get the application to start with this " +
+                            "database, change the default namespace in deploy.properties to \"" + portalNamespace + 
+                            "\".  Another possibility is that deploy.properties does not specify the intended database.");
                 }
             }
         }

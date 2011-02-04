@@ -78,7 +78,7 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 			ServletContext context = sce.getServletContext();
 
 			String baseIndexDir = getBaseIndexDirName();
-			log.info("Seting up Lucene index. Base directory of lucene index: " + baseIndexDir);
+			log.info("Setting up Lucene index. Base directory of lucene index: " + baseIndexDir);
 
 			setBoolMax();
 
