@@ -267,7 +267,9 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
                     continue;
                 try {
                     value+= " "+ ( ((t=objectPropertyStmt.getObject().getName()) == null)?"":t );
-                } catch (Exception e) { }
+                } catch (Exception e) { 
+                    log.debug("could not index name of related object: " + e.getMessage());
+                }
             }
         }
 

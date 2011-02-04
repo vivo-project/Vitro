@@ -126,8 +126,7 @@ public class ObjectPropertyStatementDaoSDB extends
 	                                        objPropertyStmt.getObjectURI(), 
 	                                        this.dwf, 
 	                                        datasetMode,
-	                                        getWebappDaoFactory(),
-	                                        IndividualSDB.SKIP_INITIALIZATION);
+	                                        getWebappDaoFactory());
 	                                objPropertyStmt.setObject(objInd);
 	                            }
 	
