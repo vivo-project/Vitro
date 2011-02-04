@@ -63,3 +63,7 @@
     padding: .5em;  
     margin-bottom: 10px;
 }
+/* <------ INDEX PAGE*/
+.siteMap h2 {
+    padding-bottom: 0;
+}

@@ -5,22 +5,22 @@
 <#include "classgroups-checkForData.ftl">
 
 <#if (!noData)>
-    <div class="siteMap">
+    <section class="siteMap" role="region">
         <#list classGroups as classGroup>
             <#-- Only render classgroups that have at least one class with individuals -->
             <#if (classGroup.individualCount > 0)>
                 <h2>${classGroup.publicName}</h2>
-                <ul>
+                <ul role="list">
                     <#list classGroup.classes as class> 
                         <#-- Only render classes with individuals -->
                         <#if (class.individualCount > 0)>
-                            <li><a href="${class.url}">${class.name}</a> (${class.individualCount})</li>
+                            <li role="listitem"><a href="${class.url}">${class.name}</a> (${class.individualCount})</li>
                         </#if>
                     </#list>
                 </ul>
             </#if>
         </#list>
-    </div>
+    </section>
 <#else>
     ${noDataNotification}
 </#if>
