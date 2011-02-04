@@ -20,7 +20,7 @@
             <textarea name="navigationN3" id="navigationN3" cols="45" rows="40" class="maxWidth">
                 ${menuN3}
             </textarea>
-            <input name="submit" id="submit" value="Save" type="submit"/> or <a href="#">Cancel</a>
+            <input name="submit" id="submit" value="Save" type="submit"/> or <a href="${urls.base}${cancelUrl}">Cancel</a>
         </form>
     </#if>
-</div>                     
+</div>
