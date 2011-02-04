@@ -126,9 +126,9 @@
         <#local classVal = "">
         
         <#-- Keep any class value already assigned -->
-        <#local currentClass = newItem?matches("^<li [^>]*(class=[\'\"](.*?)[\'\"])")>
+        <#local currentClass = newItem?matches("^<li [^>]*(class=([\'\"])(.*?)\\2)")>
         <#list currentClass as m>
-            <#local classVal = m?groups[2]> <#-- get the assigned class value -->
+            <#local classVal = m?groups[3]> <#-- get the assigned class value -->
             <#local newItem = newItem?replace(m?groups[1], "")> <#-- remove 'class="xyz"' -->
         </#list>
 
