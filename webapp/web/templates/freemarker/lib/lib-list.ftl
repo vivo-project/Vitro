@@ -32,11 +32,11 @@
            
 -->
 <#macro firstLastList>
-    <#assign text>
+    <#local text>
         <#nested>
-    </#assign>
+    </#local>
 
-    <@processListItems text?matches("<li>.*?</li>", "s") />
+    <@processListItems text?matches("<li.*?</li>", "s") />
 </#macro>
 
 <#---------------------------------------------------------------------------->
@@ -94,13 +94,13 @@
     RY Consider rewriting in Java. Probably designers won't want to modify this.
 -->
 <#macro firstLastListNested delim=",">
-    <#assign text>
+    <#local text>
         <#nested>
-    </#assign>
+    </#local>
 
     <#-- Strip out a list-final delimiter, else (unlike most languages) it 
     results in an empty final array item. -->
-    <#assign text = text?replace("${delim}\\s*$", "", "r")>
+    <#local text = text?replace("${delim}\\s*$", "", "r")>
 
     <@processListItems text?split(delim) />
 
@@ -121,29 +121,29 @@
     <#list items as item>
 
         <#-- A FreeMarker loop variable cannot have its value modified, so we use a new variable. -->
-        <#assign newItem = item?trim>
+        <#local newItem = item?trim>
 
-        <#assign classVal = "">
+        <#local classVal = "">
         
         <#-- Keep any class value already assigned -->
-        <#assign currentClass = newItem?matches("^<li [^>]*(class=[\'\"](.*?)[\'\"])")>
+        <#local currentClass = newItem?matches("^<li [^>]*(class=[\'\"](.*?)[\'\"])")>
         <#list currentClass as m>
-        ${m?groups[2]}<br />
-            <#assign classVal = m?groups[2]>
-            <#assign newItem = newItem?replace(m?groups[1], "")>
+            <#local classVal = m?groups[2]> <#-- get the assigned class value -->
+            <#local newItem = newItem?replace(m?groups[1], "")> <#-- remove 'class="xyz"' -->
         </#list>
 
         <#if item_index == 0> 
-            <#assign classVal = "${classVal} first">
+            <#local classVal = "${classVal} first">
         </#if>
-        <#if !item_has_next>       
-            <#assign classVal = "${classVal} last">
+        <#if ! item_has_next>       
+            <#local classVal = "${classVal} last">
         </#if>
         
-        <#if classVal != ""> 
-            <#assign classVal = classVal?replace("^ ", "", "r")>      
+        <#local classVal = classVal?trim>
+        
+        <#if classVal?has_content>    
             <#-- Replace first instance only, in case the item contains nested li tags. -->     
-            <#assign newItem = newItem?replace("<li", "<li class=\"${classVal}\"", "f")>
+            <#local newItem = newItem?replace("<li", "<li class=\"${classVal}\"", "f")>
         </#if>
         ${newItem}
     </#list>
