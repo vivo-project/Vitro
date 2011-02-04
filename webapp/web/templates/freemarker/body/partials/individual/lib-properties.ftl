@@ -148,7 +148,7 @@ name will be used as the label. -->
         <nav role="navigation">
             <#local primaryLinkLabel = "Primary Web Page">            
             <#if primaryLink.statements?has_content> <#-- if there are any statements -->
-                <@propertyLabel primaryLink primaryLinkLabel />
+                <#if editable><@propertyLabel primaryLink primaryLinkLabel /></#if>
                 <ul class="${linkListClass}" id="links-primary" role="list">
                     <@objectPropertyList primaryLink editable />
                 </ul>
