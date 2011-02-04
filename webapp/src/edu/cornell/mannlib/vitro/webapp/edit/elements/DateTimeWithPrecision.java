@@ -499,29 +499,32 @@ public class DateTimeWithPrecision extends BaseEditElement {
         if( second == null )
             second = 0;                
                 
-        DateTime dateTime = new DateTime();
+        //initialize to something so that we can be assured not to get 
+        //system date dependent behavior
+        DateTime dateTime = new DateTime("1970-01-01T00:00:00Z");
+        
         try{
-            dateTime.withYear(year);
+            dateTime = dateTime.withYear(year);
         }catch(IllegalArgumentException iae){
            errors.put(fieldName+".year", iae.getLocalizedMessage());   
         }
         try{
-            dateTime.withMonthOfYear(month);
+            dateTime = dateTime.withMonthOfYear(month);
         }catch(IllegalArgumentException iae){
             errors.put(fieldName+".month", iae.getLocalizedMessage());
         }
         try{
-            dateTime.withDayOfMonth(day);
+            dateTime = dateTime.withDayOfMonth(day);
         }catch(IllegalArgumentException iae){
             errors.put(fieldName+".day", iae.getLocalizedMessage());
         }
         try{
-            dateTime.withHourOfDay(hour);
+            dateTime = dateTime.withHourOfDay(hour);
         }catch(IllegalArgumentException iae){
             errors.put(fieldName+".hour", iae.getLocalizedMessage());
         }
         try{
-            dateTime.withSecondOfMinute(second);
+            dateTime = dateTime.withSecondOfMinute(second);
         }catch(IllegalArgumentException iae){
             errors.put(fieldName+".second", iae.getLocalizedMessage());    
         }       
