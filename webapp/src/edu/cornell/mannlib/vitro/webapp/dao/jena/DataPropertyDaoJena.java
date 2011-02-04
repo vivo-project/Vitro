@@ -418,9 +418,10 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
     public Collection<DataProperty> getAllPossibleDatapropsForIndividual(String individualURI) {
         Individual ind = getWebappDaoFactory().getIndividualDao().getIndividualByURI(individualURI);
         Collection<DataProperty> dpColl = new ArrayList<DataProperty>();
+        List<String> vclassURIs = getVClassURIs(ind);
+        
         try {
-	        for (VClass currClass : ind.getVClasses(true)) {
-            
+	        for (VClass currClass : ind.getVClasses( DIRECT )) {            
                 List<DataProperty> currList = getDatapropsForClass(currClass.getURI());
                 for (Iterator<DataProperty> dpIter = currList.iterator(); dpIter.hasNext();) {
                     DataProperty dp = (DataProperty) dpIter.next();
@@ -444,7 +445,7 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
                 // now change range datatype based on individual
                 // TODO: rethink all these methods to reduce inefficiency
                 for (DataProperty dp : dpColl) {
-                	dp.setRangeDatatypeURI(getRequiredDatatypeURI(ind, dp));
+                	dp.setRangeDatatypeURI(getRequiredDatatypeURI(ind, dp, vclassURIs));
                 }
         	}
         } catch (ProfileException pe) {
@@ -466,59 +467,68 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
     	);
     }
     
-    public String getRequiredDatatypeURI(Individual individual, DataProperty dataprop) {
-    	OntModel ontModel = getOntModelSelector().getFullModel();
-    	String datatypeURI = dataprop.getRangeDatatypeURI();	
-    	List<String> vclassURIs = null;
-    	if (reasoningAvailable()) {
-    		vclassURIs = new ArrayList<String>();
-    		for (VClass vc : individual.getVClasses(INDIRECT)) {
-    			if (vc.getURI() != null) {
-    				vclassURIs.add(vc.getURI());
-    			}
-    		}
-    	} else {
-    		vclassURIs = getSupertypeURIs(individual);
-    	}
-    	ontModel.enterCriticalSection(Lock.READ);
-    	try {
-    		// get universal restrictions applicable to data property
-    		Iterator<Resource> restIt = ontModel.listSubjectsWithProperty(OWL.onProperty, ontModel.getResource(dataprop.getURI()));
-    		while (restIt.hasNext()) {
-    			Resource restRes = restIt.next();
-    			if (restRes.canAs(Restriction.class)) {
-    				Restriction rest = (Restriction) restRes.as(Restriction.class);
-    				if (rest.isAllValuesFromRestriction()) {
-    					AllValuesFromRestriction avfrest = rest.asAllValuesFromRestriction();
-    					if (avfrest.getAllValuesFrom() != null) {
-    						// check if the individual has the restriction as one of its types
-	    					if (!individual.isAnonymous() &&
-	    					    ontModel.contains(ontModel.getResource(individual.getURI()),
-	    					    				  RDF.type,
-	    					    				  rest)
-	    					    ) {
-			    						datatypeURI = avfrest.getAllValuesFrom().getURI();
-		    							break; 
-	    					} else {
-    					    	// check if the restriction applies to one of the individual's types
-    					    	List<Resource> equivOrSubResources = new ArrayList<Resource>();
-    	    					equivOrSubResources.addAll(ontModel.listSubjectsWithProperty(RDFS.subClassOf, rest).toList());
-    	    					equivOrSubResources.addAll(ontModel.listSubjectsWithProperty(OWL.equivalentClass, rest).toList());
-    	    					for(Resource equivOrSubRes : equivOrSubResources) {
-    	    						if (!equivOrSubRes.isAnon() && vclassURIs.contains(equivOrSubRes.getURI())) {
-    	    							datatypeURI = avfrest.getAllValuesFrom().getURI();
-    	    							break;
-    	    						}
-    	    					}
-	    					}
-    					} 
-    				}
-    			}
-    		}
-    	} finally {
-    		ontModel.leaveCriticalSection();
-    	}
-    	return datatypeURI;
+    private String getRequiredDatatypeURI(Individual individual, DataProperty dataprop, List<String> vclassURIs) {
+        OntModel ontModel = getOntModelSelector().getFullModel();
+        String datatypeURI = dataprop.getRangeDatatypeURI();    
+    
+        ontModel.enterCriticalSection(Lock.READ);
+        try {
+            // get universal restrictions applicable to data property
+            Iterator<Resource> restIt = ontModel.listSubjectsWithProperty(OWL.onProperty, ontModel.getResource(dataprop.getURI()));
+            while (restIt.hasNext()) {
+                Resource restRes = restIt.next();
+                if (restRes.canAs(Restriction.class)) {
+                    Restriction rest = (Restriction) restRes.as(Restriction.class);
+                    if (rest.isAllValuesFromRestriction()) {
+                        AllValuesFromRestriction avfrest = rest.asAllValuesFromRestriction();
+                        if (avfrest.getAllValuesFrom() != null) {
+                            // check if the individual has the restriction as one of its types
+                            if (!individual.isAnonymous() &&
+                                ontModel.contains(ontModel.getResource(individual.getURI()),
+                                                  RDF.type,
+                                                  rest)
+                                ) {
+                                        datatypeURI = avfrest.getAllValuesFrom().getURI();
+                                        break; 
+                            } else {
+                                // check if the restriction applies to one of the individual's types
+                                List<Resource> equivOrSubResources = new ArrayList<Resource>();
+                                equivOrSubResources.addAll(ontModel.listSubjectsWithProperty(RDFS.subClassOf, rest).toList());
+                                equivOrSubResources.addAll(ontModel.listSubjectsWithProperty(OWL.equivalentClass, rest).toList());
+                                for(Resource equivOrSubRes : equivOrSubResources) {
+                                    if (!equivOrSubRes.isAnon() && vclassURIs.contains(equivOrSubRes.getURI())) {
+                                        datatypeURI = avfrest.getAllValuesFrom().getURI();
+                                        break;
+                                    }
+                                }
+                            }
+                        } 
+                    }
+                }
+            }
+        } finally {
+            ontModel.leaveCriticalSection();
+        }
+        return datatypeURI;
+    }
+    
+    public String getRequiredDatatypeURI(Individual individual, DataProperty dataprop) {    	    		    	
+    	return getRequiredDatatypeURI(individual,dataprop,getVClassURIs(individual));
+    }
+    
+    private List<String> getVClassURIs(Individual individual){
+        List<String> vclassURIs = null;
+        if (reasoningAvailable()) {
+            vclassURIs = new ArrayList<String>();
+            for (VClass vc : individual.getVClasses(INDIRECT)) {
+                if (vc.getURI() != null) {
+                    vclassURIs.add(vc.getURI());
+                }
+            }
+        } else {
+            vclassURIs = getSupertypeURIs(individual);
+        }
+        return vclassURIs;
     }
     
     private boolean DIRECT = true;
