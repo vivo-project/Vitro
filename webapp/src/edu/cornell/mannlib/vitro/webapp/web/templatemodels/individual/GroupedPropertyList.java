@@ -141,14 +141,23 @@ public class GroupedPropertyList extends BaseTemplateModel {
     }
     
     private void mergeAllPossibleObjectProperties(List<ObjectProperty> objectPropertyList, List<Property> propertyList) {
+        
+        // Performance improvement: keep a list of uris on the propertyList to check against, rather than
+        // having to instantiate a property from propertyUri to check against the propertyList.
+        List<String> propertyListUris = new ArrayList<String>(propertyList.size());
+        for (Property p : propertyList) {
+            propertyListUris.add(p.getURI());
+        }
+        
         PropertyInstanceDao piDao = wdf.getPropertyInstanceDao();
         Collection<PropertyInstance> allPropInstColl = piDao.getAllPossiblePropInstForIndividual(subject.getURI());
+        
         if (allPropInstColl != null) {
             ObjectPropertyDao opDao = wdf.getObjectPropertyDao();
             for (PropertyInstance pi : allPropInstColl) {
                 if (pi != null) {
                     if (! alreadyOnObjectPropertyList(objectPropertyList, pi)) {
-                        addIfNotAlreadyOnList(propertyList, pi.getPropertyURI(), opDao);
+                        addIfNotAlreadyOnList(propertyList, propertyListUris, pi.getPropertyURI(), opDao);
                     }
                 } else {
                     log.error("a property instance in the Collection created by PropertyInstanceDao.getAllPossiblePropInstForIndividual() is unexpectedly null");
@@ -158,23 +167,26 @@ public class GroupedPropertyList extends BaseTemplateModel {
             // In future, vitro ns props will be phased out. Vitro public properties should be changed so they do no
             // constitute a special case.
             for (String propertyUri : VITRO_PROPS_TO_ADD_TO_LIST) {
-                addIfNotAlreadyOnList(propertyList, propertyUri, opDao);
+                addIfNotAlreadyOnList(propertyList, propertyListUris, propertyUri, opDao);
             }
         } else {
             log.error("a null Collection is returned from PropertyInstanceDao.getAllPossiblePropInstForIndividual()");
         }                    
     }    
     
-    private void addIfNotAlreadyOnList(List<Property> propertyList, String propertyUri, ObjectPropertyDao opDao) {
+    private void addIfNotAlreadyOnList(List<Property> propertyList, List<String> propertyListUris, String propertyUri, ObjectPropertyDao opDao) {
         
-        ObjectProperty op = opDao.getObjectPropertyByURI(propertyUri);
-        if (op == null) {
-            log.error("ObjectProperty op returned null from opDao.getObjectPropertyByURI()");
-        } else if (op.getURI() == null) {
-            log.error("ObjectProperty op returned with null propertyURI from opDao.getObjectPropertyByURI()");
-        } else  if (! alreadyOnPropertyList(propertyList, op)) {          
-            propertyList.add(op);
-        }        
+        if ( ! propertyListUris.contains(propertyUri)) {
+            ObjectProperty op = opDao.getObjectPropertyByURI(propertyUri);
+            if (op == null) {
+                log.error("ObjectProperty op returned null from opDao.getObjectPropertyByURI()");
+            } else if (op.getURI() == null) {
+                log.error("ObjectProperty op returned with null propertyURI from opDao.getObjectPropertyByURI()");
+            } else {          
+                propertyList.add(op);
+                propertyListUris.add(propertyUri);
+            }     
+        }
     }
     
     protected void mergeAllPossibleDataProperties(List<Property> propertyList) {
@@ -186,7 +198,6 @@ public class GroupedPropertyList extends BaseTemplateModel {
                     if (dp.getURI() == null) {
                         log.error("DataProperty dp returned with null propertyURI from dpDao.getAllPossibleDatapropsForIndividual()");
                     } else if (! alreadyOnPropertyList(propertyList, dp)) {
-                        //dp.setLabel(dp.getPublicName());
                         propertyList.add(dp);
                     }
                 } else {
