@@ -19,7 +19,11 @@
 
 <#assign noDataNotification>
     <h3>There is currently no ${page.title} content in the system</h3>
-    <#if !user.loggedIn>
+    <#if user.loggedIn>
+        <#if user.hasSiteAdminAccess>
+            <p>You can <a href="${urls.siteAdmin}" title="Manage content">add content and manage this site</a> from the Site Administration page.</p>
+        </#if>
+    <#else>
         <p>Please <a href="${urls.login}" title="log in to manage this site">log in</a> to manage content.</p>
     </#if>
     
