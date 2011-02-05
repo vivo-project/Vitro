@@ -75,6 +75,8 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
             // that it is not executed in a post-sdb-conversion environment.
             OntModel memModel = (OntModel) sce.getServletContext().getAttribute("jenaOntModel");
             
+            //memModel.writeAll(System.out,"N3",null);
+            
             if ( updateRequired(sce.getServletContext(), memModel)) {
             	log.error(getMigrationErrString());
             	System.out.println(getMigrationErrString());
@@ -664,21 +666,34 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
 	 */
 	public boolean updateRequired(ServletContext ctx, OntModel m) throws IOException {
 		
+		boolean required = false;
+		
 		String sparqlQueryStr = KnowledgeBaseUpdater.loadSparqlQuery(UpdateKnowledgeBase.getAskQueryPath(ctx));
 		if (sparqlQueryStr == null) {
-			return false;
+			return required;
 		}
-
+				
 		Query query = QueryFactory.create(sparqlQueryStr);
-		QueryExecution qexec = QueryExecutionFactory.create(query, m);
+		QueryExecution isUpdated = QueryExecutionFactory.create(query, m);
 		
 		// if the ASK query DOES have a solution (i.e. the assertions exist
 		// showing that the update has already been performed), then the update
 		// is NOT required.
-		return !qexec.execAsk(); 
 		
+		if (isUpdated.execAsk()) {
+			required = false;
+		} else {
+			required = true;
+			String sparqlQueryStr2 = KnowledgeBaseUpdater.loadSparqlQuery(UpdateKnowledgeBase.getAskEmptyQueryPath(ctx));
+			if (sparqlQueryStr2 != null) {
+				Query query2 = QueryFactory.create(sparqlQueryStr2);
+				QueryExecution isNotEmpty = QueryExecutionFactory.create(query2, m);
+				required = isNotEmpty.execAsk();
+			} 
+		}
+		
+		return required; 
 	}
-	
 	private String getMigrationErrString() {
       	String errMessage = "\n*******************************************************************";
     	errMessage += "\nA knowledge base migration is " +

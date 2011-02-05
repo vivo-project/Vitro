@@ -9,9 +9,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -284,20 +282,34 @@ public class KnowledgeBaseUpdater {
 	 */
 	public boolean updateRequired() throws IOException {
 		
+		boolean required = false;
+		
 		String sparqlQueryStr = loadSparqlQuery(settings.getAskQueryFile());
 		if (sparqlQueryStr == null) {
-			return false;
+			return required;
 		}
-		
+				
 		Model m = settings.getOntModelSelector().getApplicationMetadataModel();
 		Query query = QueryFactory.create(sparqlQueryStr);
-		QueryExecution qexec = QueryExecutionFactory.create(query, m);
+		QueryExecution isUpdated = QueryExecutionFactory.create(query, m);
 		
 		// if the ASK query DOES have a solution (i.e. the assertions exist
 		// showing that the update has already been performed), then the update
 		// is NOT required.
-		return !qexec.execAsk(); 
 		
+		if (isUpdated.execAsk()) {
+			required = false;
+		} else {
+			required = true;
+			String sparqlQueryStr2 = loadSparqlQuery(settings.getAskEmptyQueryFile());
+			if (sparqlQueryStr2 != null) {
+				Query query2 = QueryFactory.create(sparqlQueryStr2);
+				QueryExecution isNotEmpty = QueryExecutionFactory.create(query2, m);
+				required = isNotEmpty.execAsk();
+			} 
+		}
+		
+		return required; 
 	}
 		
 	/**
@@ -306,6 +318,7 @@ public class KnowledgeBaseUpdater {
 	 * @return the query string or null if file not found
 	 */
 	public static String loadSparqlQuery(String filePath) throws IOException {
+		
 		File file = new File(filePath);	
 		if (!file.exists()) {
 			return null;
@@ -400,9 +413,6 @@ public class KnowledgeBaseUpdater {
 
 		public List<AtomicOntologyChange> getAtomicPropertyChanges() {
 			return atomicPropertyChanges;
-		}
-		
-	}
-	
-	
+		}	
+	}	
 }

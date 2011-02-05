@@ -47,6 +47,8 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	private static final String LOG_DIR = "logs/";
 	private static final String CHANGED_DATA_DIR = "changedData/";
 	private static final String ASK_QUERY_FILE = DATA_DIR + "ask.sparql";
+	private static final String ASK_EMPTY_QUERY_FILE = DATA_DIR + "askEmpty.sparql";
+	private static final String ASK_EVER_QUERY_FILE = DATA_DIR + "askEver.sparql";
 	private static final String SUCCESS_ASSERTIONS_FILE = DATA_DIR + "success.n3";
 	private static final String SUCCESS_RDF_FORMAT = "N3";
 	private static final String DIFF_FILE = DATA_DIR + "diff.tab.txt";
@@ -77,6 +79,8 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			
 			UpdateSettings settings = new UpdateSettings();
 			settings.setAskQueryFile(getAskQueryPath(ctx));
+			settings.setAskEverQueryFile(getAskEverQueryPath(ctx));
+			settings.setAskEmptyQueryFile(getAskEmptyQueryPath(ctx));
 			settings.setDataDir(ctx.getRealPath(DATA_DIR));
 			settings.setSparqlConstructAdditionsDir(ctx.getRealPath(SPARQL_CONSTRUCT_ADDITIONS_DIR));
 			settings.setSparqlConstructAdditionsPass2Dir(ctx.getRealPath(SPARQL_CONSTRUCT_ADDITIONS_PASS2_DIR));
@@ -235,9 +239,16 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	public void contextDestroyed(ServletContextEvent arg0) {
 		// nothing to do	
 	}
-	
 	public static String getAskQueryPath(ServletContext ctx) {
 		return ctx.getRealPath(ASK_QUERY_FILE);
+	
+    }	
+	public static String getAskEverQueryPath(ServletContext ctx) {
+		return ctx.getRealPath(ASK_EVER_QUERY_FILE);
+	
+    }
+	public static String getAskEmptyQueryPath(ServletContext ctx) {
+		return ctx.getRealPath(ASK_EMPTY_QUERY_FILE);
 	
     }
 }
