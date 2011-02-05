@@ -62,7 +62,9 @@ public class GroupedPropertyList extends BaseTemplateModel {
         this.subject = subject;
         this.vreq = vreq;
         this.wdf = vreq.getWebappDaoFactory();
-    
+        
+        boolean editing = policyHelper != null;
+        
         // Create the property list for the subject. The properties will be put into groups later.
         List<Property> propertyList = new ArrayList<Property>();
         
@@ -71,11 +73,11 @@ public class GroupedPropertyList extends BaseTemplateModel {
         // so we cannot just rely on getting that list.
         List<ObjectProperty> populatedObjectPropertyList = subject.getPopulatedObjectPropertyList();
         propertyList.addAll(populatedObjectPropertyList);
-                
+           
         // If editing this page, merge in object properties applicable to the individual that are currently
         // unpopulated, so the properties are displayed to allow statements to be added to these properties.
         // RY In future, we should limit this to properties that the user CAN add properties to.
-        if (policyHelper != null) {
+        if (editing) {
             mergeAllPossibleObjectProperties(populatedObjectPropertyList, propertyList);
         }
         
@@ -88,7 +90,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
         List<DataProperty> populatedDataPropertyList = subject.getPopulatedDataPropertyList();
         propertyList.addAll(populatedDataPropertyList);
     
-        if (policyHelper != null) {
+        if (editing) {
             mergeAllPossibleDataProperties(propertyList);           
         }
     
@@ -115,6 +117,37 @@ public class GroupedPropertyList extends BaseTemplateModel {
         }
     }
     
+    private void mergeAllPossibleObjectProperties(List<ObjectProperty> populatedObjectPropertyList, List<Property> propertyList) {
+        
+        // There is no ObjectPropertyDao.getAllPossibleObjectPropertiesForIndividual() parallel to 
+        // DataPropertyDao.getAllPossibleDatapropsForIndividual(). The comparable method for object properties
+        // is defined using PropertyInstance rather than ObjectProperty.
+        PropertyInstanceDao piDao = wdf.getPropertyInstanceDao();
+        Collection<PropertyInstance> allPropInstColl =  piDao.getAllPossiblePropInstForIndividual(subject.getURI());        
+        if (allPropInstColl != null) {
+            for (PropertyInstance pi : allPropInstColl) {
+                if (pi != null) {
+                    if (! alreadyOnObjectPropertyList(populatedObjectPropertyList, pi)) {
+                        addObjectPropertyToPropertyList(pi.getPropertyURI(), propertyList);
+                    }
+                } else {
+                    log.error("a property instance in the Collection created by PropertyInstanceDao.getAllPossiblePropInstForIndividual() is unexpectedly null");
+                }
+            }
+        } else {
+            log.error("a null Collection is returned from PropertyInstanceDao.getAllPossiblePropInstForIndividual()");
+        } 
+        
+        // These properties are outside the ontologies (in vitro and vitro public) but need to be added to the list.
+        // In future, vitro ns props will be phased out. Vitro public properties should be changed so they do not
+        // constitute a special case (i.e., included in piDao.getAllPossiblePropInstForIndividual()).
+        for (String propertyUri : VITRO_PROPS_TO_ADD_TO_LIST) {
+            if ( ! alreadyOnPropertyList(propertyList, propertyUri) ) {
+                addObjectPropertyToPropertyList(propertyUri, propertyList);
+            }                
+        }
+    }    
+
     private boolean alreadyOnObjectPropertyList(List<ObjectProperty> opList, PropertyInstance pi) {
         if (pi.getPropertyURI() == null) {
             return false;
@@ -127,66 +160,16 @@ public class GroupedPropertyList extends BaseTemplateModel {
         return false;
     }
     
-    private boolean alreadyOnPropertyList(List<Property> propsList, Property p) {
-        if (p.getURI() == null) {
-            log.error("Property p has no propertyURI in alreadyOnPropertyList()");
-            return true; // don't add to list
-        }
-        for (Property ptest : propsList) {
-            if (ptest.getURI() != null && ptest.getURI().equals(p.getURI())) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    private void mergeAllPossibleObjectProperties(List<ObjectProperty> objectPropertyList, List<Property> propertyList) {
-        
-        // Performance improvement: keep a list of uris on the propertyList to check against, rather than
-        // having to instantiate a property from propertyUri to check against the propertyList.
-        List<String> propertyListUris = new ArrayList<String>(propertyList.size());
-        for (Property p : propertyList) {
-            propertyListUris.add(p.getURI());
-        }
-        
-        PropertyInstanceDao piDao = wdf.getPropertyInstanceDao();
-        Collection<PropertyInstance> allPropInstColl = piDao.getAllPossiblePropInstForIndividual(subject.getURI());
-        
-        if (allPropInstColl != null) {
-            ObjectPropertyDao opDao = wdf.getObjectPropertyDao();
-            for (PropertyInstance pi : allPropInstColl) {
-                if (pi != null) {
-                    if (! alreadyOnObjectPropertyList(objectPropertyList, pi)) {
-                        addIfNotAlreadyOnList(propertyList, propertyListUris, pi.getPropertyURI(), opDao);
-                    }
-                } else {
-                    log.error("a property instance in the Collection created by PropertyInstanceDao.getAllPossiblePropInstForIndividual() is unexpectedly null");
-                }
-            }
-            // These properties are outside the ontologies (in vitro and vitro public) but need to be added to the list
-            // In future, vitro ns props will be phased out. Vitro public properties should be changed so they do no
-            // constitute a special case.
-            for (String propertyUri : VITRO_PROPS_TO_ADD_TO_LIST) {
-                addIfNotAlreadyOnList(propertyList, propertyListUris, propertyUri, opDao);
-            }
-        } else {
-            log.error("a null Collection is returned from PropertyInstanceDao.getAllPossiblePropInstForIndividual()");
-        }                    
-    }    
-    
-    private void addIfNotAlreadyOnList(List<Property> propertyList, List<String> propertyListUris, String propertyUri, ObjectPropertyDao opDao) {
-        
-        if ( ! propertyListUris.contains(propertyUri)) {
-            ObjectProperty op = opDao.getObjectPropertyByURI(propertyUri);
-            if (op == null) {
-                log.error("ObjectProperty op returned null from opDao.getObjectPropertyByURI()");
-            } else if (op.getURI() == null) {
-                log.error("ObjectProperty op returned with null propertyURI from opDao.getObjectPropertyByURI()");
-            } else {          
-                propertyList.add(op);
-                propertyListUris.add(propertyUri);
-            }     
-        }
+    private void addObjectPropertyToPropertyList(String propertyUri, List<Property> propertyList) {
+        ObjectPropertyDao opDao = wdf.getObjectPropertyDao();
+        ObjectProperty op = opDao.getObjectPropertyByURI(propertyUri);
+        if (op == null) {
+            log.error("ObjectProperty op returned null from opDao.getObjectPropertyByURI()");
+        } else if (op.getURI() == null) {
+            log.error("ObjectProperty op returned with null propertyURI from opDao.getObjectPropertyByURI()");
+        } else {          
+            propertyList.add(op);
+        }         
     }
     
     protected void mergeAllPossibleDataProperties(List<Property> propertyList) {
@@ -207,6 +190,24 @@ public class GroupedPropertyList extends BaseTemplateModel {
         } else {
             log.error("a null Collection is returned from DataPropertyDao.getAllPossibleDatapropsForIndividual())");
         }        
+    }
+
+    private boolean alreadyOnPropertyList(List<Property> propertyList, Property p) {
+        if (p.getURI() == null) {
+            log.error("Property p has no propertyURI in alreadyOnPropertyList()");
+            return true; // don't add to list
+        }
+        return (alreadyOnPropertyList(propertyList, p.getURI()));
+    }
+    
+    private boolean alreadyOnPropertyList(List<Property> propertyList, String propertyUri) {
+        for (Property p : propertyList) {
+            String uri = p.getURI();
+            if (uri != null && uri.equals(propertyUri)) {
+                return true;
+            }
+        }
+        return false;        
     }
     
     private List<PropertyGroup> addPropertiesToGroups(List<Property> propertyList) {
