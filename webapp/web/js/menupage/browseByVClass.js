@@ -43,7 +43,6 @@ var browseByVClass = {
         this.alphaIndexLinks.click(function() {
             uri = $('#browse-classes li a.selected').attr('data-uri');
             alpha = $(this).attr('data-alpha');
-            // alpha = $(this).text().substring(0, 1);
             browseByVClass.getIndividuals(uri, alpha);
             return false;
         });
@@ -57,7 +56,7 @@ var browseByVClass = {
         $('.pagination li a').click(function() {
             uri = $('#browse-classes li a.selected').attr('data-uri');
             alpha = $('#alpha-browse-individuals li a.selected').attr('data-alpha');
-            page = $(this).attr('class').substring(4,5);
+            page = $(this).attr('data-page');
             browseByVClass.getIndividuals(uri, alpha, page);
             return false;
         });
@@ -173,11 +172,10 @@ var browseByVClass = {
         pagination += '<h3>page</h3>';
         pagination += '<ul>';
         $.each(pages, function(i, item) {
-            anchorOpen = '<a class="page'+ pages[i].text +' round" href="#" title="View page '+ pages[i].text +' of the results">';
+            anchorOpen = '<a class="round" href="#" title="View page '+ pages[i].text +' of the results" data-page="'+ pages[i].index +'">';
             anchorClose = '</a>';
             
-            pagination += '<li class="page'+ pages[i].text;
-            pagination += ' round';
+            pagination += '<li class="round';
             // Test for active page
             if ( pages[i].text == page) {
                 pagination += ' selected';
