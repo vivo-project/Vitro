@@ -231,7 +231,11 @@ var browseByVClass = {
         this.wipeSlate();
         this.selectedAlpha(alpha);
         
-        nothingToSeeHere = '<p class="no-individuals">There are no '+ vclass.name +' individuals whose name starts with <em>'+ alpha.toUpperCase() +'</em>.</p> <p class="no-individuals">Please try another letter or browse all.</p>';
+        if ( alpha != "all" ) {
+            nothingToSeeHere = '<p class="no-individuals">There are no '+ vclass.name +' individuals whose name starts with <em>'+ alpha.toUpperCase() +'</em>.</p> <p class="no-individuals">Please try another letter or browse all.</p>';
+        } else {
+            nothingToSeeHere = '<p class="no-individuals">There are no '+ vclass.name +' individuals in the system.</p> <p class="no-individuals">Please select another class from the list.</p>';
+        }
         browseByVClass.individualsContainer.prepend(nothingToSeeHere);
     }
 };
