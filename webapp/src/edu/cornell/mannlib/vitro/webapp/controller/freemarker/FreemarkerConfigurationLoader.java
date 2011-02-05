@@ -126,10 +126,6 @@ public class FreemarkerConfigurationLoader {
             log.error("Error setting value for url_escaping_charset.");
         }
         
-        // auto include setup.ftl which allows for globals to be easily defined in a template that's always included
-        // used primarily to setup ${bodyClasses} for now
-        config.addAutoInclude("pageSetup.ftl");
-        
         config.setTemplateLoader(getTemplateLoader(config, themeDir));        
         
         return config;
