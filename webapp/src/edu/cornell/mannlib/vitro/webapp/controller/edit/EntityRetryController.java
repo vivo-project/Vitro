@@ -326,7 +326,8 @@ public class EntityRetryController extends BaseEditController {
         request.setAttribute("title","Individual Editing Form");
         request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+portal.getThemeDir()+"css/edit.css\"/>");
         request.setAttribute("scripts", "/js/edit/entityRetry.js");
-        request.setAttribute("bodyAttr"," onLoad=\"monikerInit()\"");
+        // NC Commenting this out for now. Going to pass on DWR for moniker and use jQuery instead
+        // request.setAttribute("bodyAttr"," onLoad=\"monikerInit()\"");
         request.setAttribute("_action",action);
         request.setAttribute("unqualifiedClassName","Individual");
         setRequestAttributes(request,epo);
