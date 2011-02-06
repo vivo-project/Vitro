@@ -331,4 +331,27 @@ function fillList(id, data, selectedtext) {
 		return [curleft,curtop];
 	}
 -->
+
+    // -------------------------------------------------------------------------------
+    // Using jQuery to step in for DWR and provide original moniker selection behavior
+    // -------------------------------------------------------------------------------
+    var monikerSelection = {
+        // onChange event listener for moniker select list
+        monikerListener: function() {
+            $('#Moniker').change(function() {
+                // alert('The moniker has changed');
+                // if "[new moniker]" is selected, then enable the alt field
+                if ( $('#Moniker option:selected').text() == "[new moniker]" ) {
+                    $('#MonikerSelectAlt').removeAttr('disabled');
+                } else {
+                    $('#MonikerSelectAlt').val('');
+                    $('#MonikerSelectAlt').attr('disabled', 'disabled');
+                }
+            });
+        }
+    }
+
+    $(document).ready(function() {
+        monikerSelection.monikerListener();
+    });
 </script>

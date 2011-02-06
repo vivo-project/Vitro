@@ -32,7 +32,7 @@
 		</td>
 		
 		<td id="newMonikerTd" valign="top">If [new moniker] is selected, enter here:<br/>
-                <input id="MonikerSelectAlt" name="Moniker" value="<form:value name="Moniker"/>"/>
+                <input id="MonikerSelectAlt" name="Moniker" value="<form:value name="Moniker"/>" disabled="disabled" />
                 <i>otherwise leave this field blank</i>
         </td>
     </tr>
