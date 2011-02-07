@@ -86,12 +86,12 @@ public class AutocompleteController extends FreemarkerHttpServlet{
             Analyzer analyzer = getAnalyzer(getServletContext());
             
             Query query = getQuery(vreq, portalFlag, analyzer, qtxt);             
-            log.debug("query for '" + qtxt +"' is " + query.toString());
-
             if (query == null ) {
+                log.debug("query for '" + qtxt +"' is null.");
                 doNoQuery(map, config, request, response);
                 return;
             }
+            log.debug("query for '" + qtxt +"' is " + query.toString());
                         
             IndexSearcher searcherForRequest = LuceneIndexFactory.getIndexSearcher(getServletContext());
             
