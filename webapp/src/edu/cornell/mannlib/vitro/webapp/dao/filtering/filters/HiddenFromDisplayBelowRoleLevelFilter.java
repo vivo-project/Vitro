@@ -99,9 +99,11 @@ public class HiddenFromDisplayBelowRoleLevelFilter extends VitroFiltersImpl {
     private class IndividualRoleFilter extends UnaryFunctor<Individual,Boolean>{
         @Override
         public Boolean fn(Individual ind){
+            if( ind == null ) {
+            	log.debug("checking hidden status for null Individual");
+                return canViewOddItems(); 
+            }
             log.debug("checking hidden status for Individual \"" + ind.getName() + "\"");
-            if( ind == null )
-                return canViewOddItems();
 
             try{
                 if( ! sameLevelOrHigher( ind.getHiddenFromDisplayBelowRoleLevel() ) )
