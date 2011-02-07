@@ -311,8 +311,6 @@ public class LuceneSearcher implements Searcher {
             log.error("LuceneSearcher expects to get a LuceneQuery");
             throw new Error("LuceneSearcher expects to get a LuceneQuery");
         }
-        if( queryIn == null )
-            return null;
 
         LuceneHighlighter highlighter = null;
         try {
