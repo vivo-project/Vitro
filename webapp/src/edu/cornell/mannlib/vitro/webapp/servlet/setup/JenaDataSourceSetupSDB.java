@@ -650,12 +650,17 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
      * @return
      */
     private boolean isSetUp(Store store) throws SQLException {
-        return StoreUtils.isFormatted(store);
-//        try {
-//            return (SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_TBOX_ASSERTIONS_MODEL)).size() > 0;    
-//        } catch (Exception e) { 
-//            return false;
-//        }
+        if (!(StoreUtils.isFormatted(store))) {
+            return false;
+        }
+        
+        // even if the store exists, it may be empty
+        
+        try {
+            return (SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_TBOX_ASSERTIONS_MODEL)).size() > 0;    
+        } catch (Exception e) { 
+            return false;
+        }
     }
     
     private static final String STOREDESC_ATTR = "storeDesc";
