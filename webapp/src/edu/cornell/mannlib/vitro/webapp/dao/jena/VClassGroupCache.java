@@ -74,6 +74,8 @@ public class VClassGroupCache{
         ModelContext.getBaseOntModel(context).register(bccl);
         ModelContext.getInferenceOntModel(context).register(bccl);
         ModelContext.getUnionOntModelSelector(context).getABoxModel().register(bccl);
+        ModelContext.getBaseOntModelSelector(context).getABoxModel().register(bccl);
+        ModelContext.getInferenceOntModelSelector(context).getABoxModel().register(bccl);
        
         _rebuildQueue.add(REBUILD_EVERY_PORTAL);
         _cacheRebuildThread = new RebuildGroupCacheThread(this);
