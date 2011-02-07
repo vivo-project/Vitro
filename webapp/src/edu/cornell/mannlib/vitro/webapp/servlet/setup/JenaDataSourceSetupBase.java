@@ -110,7 +110,7 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
    
     // This model doesn't exist yet. It's a placeholder for the application 
     // ontology.
-    static final String JENA_APPLICATION_METADATA_MODEL = 
+    public static final String JENA_APPLICATION_METADATA_MODEL = 
         "http://vitro.mannlib.cornell.edu/default/vitro-kb-applicationMetadata";
    
     // This is Brian C's application.owl file. We may not have to be concerned 

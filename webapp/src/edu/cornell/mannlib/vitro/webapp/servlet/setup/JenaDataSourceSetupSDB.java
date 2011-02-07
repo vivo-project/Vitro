@@ -36,6 +36,7 @@ import com.hp.hpl.jena.sdb.StoreDesc;
 import com.hp.hpl.jena.sdb.sql.SDBConnection;
 import com.hp.hpl.jena.sdb.store.DatabaseType;
 import com.hp.hpl.jena.sdb.store.LayoutType;
+import com.hp.hpl.jena.sdb.util.StoreUtils;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
@@ -317,6 +318,19 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
          
         } catch (MigrationRequiredError mre) {
         	throw new MigrationRequiredError(mre.getMessage());
+        } catch (SQLException sqle) {
+            
+            // SQL exceptions are fatal and should halt startup
+            AbortStartup.abortStartup(sce.getServletContext());
+            
+            log.error("Error using SQL database; startup aborted.", sqle);
+            
+            // print to catalina.out for good measure
+            System.out.println("Error using SQL database; startup aborted.");
+            sqle.printStackTrace();
+           
+            throw new Error(this.getClass().getName() + "failed");
+            
         } catch (Throwable t) {
             log.error("Throwable in " + this.getClass().getName(), t);
             // printing the error because Tomcat doesn't print context listener
@@ -615,6 +629,10 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
             getAppMetadata(memModel, applicationMetadataModel);
     	   	log.info("During initial SDB setup, created an application metadata model of size " 
     	   	        + applicationMetadataModel.size());
+    	   	
+    	   	// remove application metadata from ABox model
+    	   	aboxAssertions.remove(applicationMetadataModel);
+    	   	aboxInferences.remove(applicationMetadataModel);
                     
             // Make sure the reasoner takes into account the newly-set-up data.
             SimpleReasonerSetup.setRecomputeRequired(ctx);
@@ -631,12 +649,13 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
      * @param store
      * @return
      */
-    private boolean isSetUp(Store store) {
-        try {
-            return (SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_TBOX_ASSERTIONS_MODEL)).size() > 0;    
-        } catch (Exception e) { 
-            return false;
-        }
+    private boolean isSetUp(Store store) throws SQLException {
+        return StoreUtils.isFormatted(store);
+//        try {
+//            return (SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_TBOX_ASSERTIONS_MODEL)).size() > 0;    
+//        } catch (Exception e) { 
+//            return false;
+//        }
     }
     
     private static final String STOREDESC_ATTR = "storeDesc";

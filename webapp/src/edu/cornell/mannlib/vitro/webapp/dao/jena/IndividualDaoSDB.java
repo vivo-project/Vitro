@@ -47,6 +47,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.IndividualSDB.IndividualNotFoundException;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB.SDBDatasetMode;
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 
 public class IndividualDaoSDB extends IndividualDaoJena {
 
@@ -333,8 +334,11 @@ public class IndividualDaoSDB extends IndividualDaoJena {
         final List<String> list = 
             new LinkedList<String>();
         
+        // get all labeled resources from any non-tbox and non-metadata graphs.
         String query = "SELECT DISTINCT ?ind WHERE { \n" +
                        "  GRAPH ?g { ?ind <" + RDFS.label.getURI() + "> ?label } \n" +
+                       "  FILTER (?g != <" + JenaDataSourceSetupBase.JENA_APPLICATION_METADATA_MODEL + "> " +
+                       "          && !regex(str(?g),\"tbox\")) \n " +
                        "}";
               
 	    Query q = QueryFactory.create(query);
