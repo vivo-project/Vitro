@@ -171,14 +171,15 @@ ul#browse-classes {
     width: 255px;
     margin-left: 15px;
     margin-bottom: 20px;
+    margin-top: 10px;
 }
 ul#browse-classes li {
     display: block;
-    width: 245px;
-    height: 35px;
-    line-height: 35px;
+    width: 235px;
     margin-left: 10px;
     margin-right: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
 }
 ul#browse-classes li:last-child {    
     border-bottom: 0;
@@ -186,8 +187,7 @@ ul#browse-classes li:last-child {
 ul#browse-classes a {
     display: block;
     padding-left: 20px;
-    width: 264px;
-    height: 35px;
+    width: 225px;
 }
 /* ALPHA BROWSE------>  */
 ul#alpha-browse-individuals {
