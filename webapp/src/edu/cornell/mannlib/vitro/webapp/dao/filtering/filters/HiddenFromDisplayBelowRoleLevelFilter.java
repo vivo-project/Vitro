@@ -138,9 +138,9 @@ public class HiddenFromDisplayBelowRoleLevelFilter extends VitroFiltersImpl {
     extends UnaryFunctor<E,Boolean>{
         @Override
         public Boolean fn(E dPropStmt) {
+        	if( dPropStmt == null ) return false; //don't know why this would happen
             log.debug("checking hidden status for data property statement \"" + dPropStmt.getDatapropURI() + "\"");
             try {
-                if( dPropStmt == null ) return false; //don't know why this would happen
                 String propUri = dPropStmt.getDatapropURI();
                 DataProperty prop = null;                
                 if( dataPropertyMap.containsKey(propUri) ){
