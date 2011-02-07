@@ -129,8 +129,16 @@ public class SimpleReasoner extends StatementListener {
 
 		try {
 			
-			if ( !(stmt.getPredicate().equals(RDFS.subClassOf) || stmt.getPredicate().equals(RDFS.subClassOf) ) ) return;
-			  
+			if ( !(stmt.getPredicate().equals(RDFS.subClassOf) 
+			        || stmt.getPredicate().equals(RDFS.subClassOf) ) ) {
+			    return;
+			}
+			
+			// ignore anonymous classes
+			if (stmt.getSubject().isAnon() || stmt.getObject().isAnon()) {
+			    return;
+			}
+			
 			log.debug("stmt = " + stmt.toString());
 			
 			OntClass subject = tboxModel.getOntClass((stmt.getSubject()).getURI());
@@ -161,9 +169,17 @@ public class SimpleReasoner extends StatementListener {
 	
 		try {
 			
-			if ( !(stmt.getPredicate().equals(RDFS.subClassOf) || stmt.getPredicate().equals(RDFS.subClassOf) ) ) return;
+			if ( !(stmt.getPredicate().equals(RDFS.subClassOf) 
+			        || stmt.getPredicate().equals(RDFS.subClassOf) ) ) {
+			    return;
+			}
 			  
-			log.debug("stmt = " + stmt.toString());
+	        // ignore anonymous classes
+            if (stmt.getSubject().isAnon() || stmt.getObject().isAnon()) {
+                return;
+            }
+            
+            log.debug("stmt = " + stmt.toString());
 			
 			OntClass subject = tboxModel.getOntClass((stmt.getSubject()).getURI());
 			OntClass object = tboxModel.getOntClass(((Resource)stmt.getObject()).getURI()); 
