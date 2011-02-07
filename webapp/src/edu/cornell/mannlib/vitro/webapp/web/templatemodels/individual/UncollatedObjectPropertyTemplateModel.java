@@ -65,4 +65,8 @@ public class UncollatedObjectPropertyTemplateModel extends ObjectPropertyTemplat
     public boolean isCollatedBySubclass() {
         return false;
     }
+    
+    public ObjectPropertyStatementTemplateModel getFirst() {
+        return ( (statements == null || statements.isEmpty()) ) ? null : statements.get(0);
+    }
 }

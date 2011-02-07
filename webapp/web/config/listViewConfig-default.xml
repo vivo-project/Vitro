@@ -14,7 +14,7 @@
             ?subject ?property ?object 
             OPTIONAL { ?object rdfs:label ?name }
             OPTIONAL { ?object vitro:moniker ?moniker }
-        }       
+        } ORDER BY ?name ?object  
     </query-base>
 
     <query-collated>    
@@ -28,7 +28,7 @@
             OPTIONAL { ?object rdfs:label ?name }
             OPTIONAL { ?object vitro:moniker ?moniker }           
             FILTER ( afn:namespace(?subclass) != "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#" )                     
-        } ORDER BY ?subclass      
+        } ORDER BY ?subclass ?name ?object  
     </query-collated>
 
     <query-construct>

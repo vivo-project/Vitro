@@ -180,7 +180,7 @@ name will be used as the label. -->
          If there's a mainImage statement but no thumbnail image, treat it as if there is no image. -->
     <#if (mainImage.statements)?has_content && thumbUrl?has_content>
         <a href="${individual.imageUrl}"><img class="individual-photo" src="${thumbUrl}" title="click to view larger image" alt="${individual.name}" width="160" /></a>
-        <@p.editingLinks "${mainImage.localName}" mainImage.statements[0] editable />
+        <@p.editingLinks "${mainImage.localName}" mainImage.first editable />
     <#else>
         <#local imageLabel><@p.addLinkWithLabel mainImage editable "Photo" /></#local>
         ${imageLabel}

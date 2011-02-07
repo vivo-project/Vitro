@@ -84,4 +84,13 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
         return statements;
     }
     
+    public DataPropertyStatementTemplateModel getFirst() {
+        return ( (statements == null || statements.isEmpty()) ) ? null : statements.get(0);
+    }
+    
+    public String getFirstValue() {
+        DataPropertyStatementTemplateModel first = getFirst();
+        return first == null ? null : first.getValue();
+    }
+    
 }
