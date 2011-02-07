@@ -379,7 +379,7 @@ public class DateTimeWithPrecision extends BaseEditElement {
             }
         }
         if( nonNullAfterFirstNull )
-            throw new Exception("cannot determine precision, there were filled out values after the first un-filledout value, ");
+            throw new Exception("Invalid date-time value. When creating a date-time value, there cannot be gaps between any of the selected fields.");
         else{            
             return precisions[ indexOfFirstNull ].uri(); 
         }
