@@ -3,8 +3,10 @@
 <#-- Login widget -->
 
 <#macro assets>
-    <#-- RY This test should be replaced by widget controller logic which doesn't display any assets if the user is logged in.
-    See NIHVIVO-1357. This test does nothing, since user has not been put into the data model.
+    <#-- RY This test should be replaced by login widget controller logic which displays different assets macros depending
+         on login status, but currently there's no widget-specific doAssets() method. See NIHVIVO-1357. The test doesn't work
+         because we don't have the user in the template data model when we generate the assets. This can also be fixed by 
+         NIHVIVO-1357.     
     <#if ! user.loggedIn> -->
         ${stylesheets.add("/css/login.css")} 
         <#-- ${scripts.add("")} -->

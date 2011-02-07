@@ -92,7 +92,7 @@ public class SiteAdminController extends FreemarkerHttpServlet {
         // Create map for data input entry form options list
         List classGroups = wadf.getVClassGroupDao().getPublicGroupsWithVClasses(true,true,false); // order by displayRank, include uninstantiated classes, don't get the counts of individuals
         
-        boolean classGroupDisplayAssumptionsMeet = checkClassGroupDisplayAssumptions(classGroups);   
+        //boolean classGroupDisplayAssumptionsMet = checkClassGroupDisplayAssumptions(classGroups);   
         
         Set<String> seenGroupNames = new HashSet<String>();
         
@@ -102,10 +102,10 @@ public class SiteAdminController extends FreemarkerHttpServlet {
             VClassGroup group = (VClassGroup)classGroupIt.next();            
             List opts = FormUtils.makeOptionListFromBeans(group.getVitroClassList(),"URI","PickListName",null,null,false);
             if( seenGroupNames.contains(group.getPublicName() )){
-                //have a duplicat classgroup name, stick in the URI
+                //have a duplicate classgroup name, stick in the URI
                 orderedClassGroups.put(group.getPublicName() + " ("+group.getURI()+")", opts);
             }else if( group.getPublicName() == null ){
-                //have an unlabeled group, use stick in the URI
+                //have an unlabeled group, stick in the URI
                 orderedClassGroups.put("unnamed group ("+group.getURI()+")", opts);
             }else{
                 orderedClassGroups.put(group.getPublicName(),opts);
@@ -199,11 +199,11 @@ public class SiteAdminController extends FreemarkerHttpServlet {
         Map<String, Object> map = new HashMap<String, Object>();
         
         Map<String, String> urls = new HashMap<String, String>();
-        urls.put("ingest", urlBuilder.getUrl("/ingest"));
+        urls.put("ingest", UrlBuilder.getUrl("/ingest"));
         urls.put("rdfData", urlBuilder.getPortalUrl("/uploadRDFForm"));
         urls.put("rdfExport", urlBuilder.getPortalUrl("/export"));
-        urls.put("sparqlQuery", urlBuilder.getUrl("/admin/sparqlquery"));
-        urls.put("sparqlQueryBuilder", urlBuilder.getUrl("/admin/sparqlquerybuilder"));
+        urls.put("sparqlQuery", UrlBuilder.getUrl("/admin/sparqlquery"));
+        urls.put("sparqlQueryBuilder", UrlBuilder.getUrl("/admin/sparqlquerybuilder"));
         map.put("urls", urls);
         
         return map;
@@ -218,33 +218,33 @@ public class SiteAdminController extends FreemarkerHttpServlet {
      *  Check the assumptions and use the URIs as the key if the assumptions are not
      *  meet. see issue NIHVIVO-1635.
      */
-    private boolean checkClassGroupDisplayAssumptions( List<VClassGroup> groups){
-        //Assumption A: all of the classgroups have a non-null rdfs:label
-        //Assumption B: none of the classgroups have the same rdfs:label
-        //the assumption that all classgroups have only one rdfs:label is not checked
-        boolean rvalue = true;
-        Set<String> seenPublicNames = new HashSet<String>();
-        
-        for( VClassGroup group :groups ){
-            //check Assumption A
-            if( group.getPublicName() == null){
-                rvalue = false;
-                break;
-            }
-                            
-            //check Assumption B
-            if( seenPublicNames.contains(group.getPublicName()) ){
-                rvalue = false;
-                break;
-            }
-            seenPublicNames.add(group.getPublicName());            
-        }
-        
-        
-        if( !rvalue )
-            log.error("The rdfs:labels on the classgroups in the system do " +
-                    "not meet the display assumptions.  Falling back to alternative.");
-        return rvalue;
-    }
+//    private boolean checkClassGroupDisplayAssumptions( List<VClassGroup> groups){
+//        //Assumption A: all of the classgroups have a non-null rdfs:label
+//        //Assumption B: none of the classgroups have the same rdfs:label
+//        //the assumption that all classgroups have only one rdfs:label is not checked
+//        boolean rvalue = true;
+//        Set<String> seenPublicNames = new HashSet<String>();
+//        
+//        for( VClassGroup group :groups ){
+//            //check Assumption A
+//            if( group.getPublicName() == null){
+//                rvalue = false;
+//                break;
+//            }
+//                            
+//            //check Assumption B
+//            if( seenPublicNames.contains(group.getPublicName()) ){
+//                rvalue = false;
+//                break;
+//            }
+//            seenPublicNames.add(group.getPublicName());            
+//        }
+//        
+//        
+//        if( !rvalue )
+//            log.error("The rdfs:labels on the classgroups in the system do " +
+//                    "not meet the display assumptions.  Falling back to alternative.");
+//        return rvalue;
+//    }
 
 }

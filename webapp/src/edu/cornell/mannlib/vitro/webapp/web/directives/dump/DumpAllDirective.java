@@ -26,7 +26,6 @@ public class DumpAllDirective extends BaseTemplateDirectiveModel {
 
     private static final Log log = LogFactory.getLog(DumpAllDirective.class);
     
-    @SuppressWarnings({ "unchecked" })
     @Override
     public void execute(Environment env, Map params, TemplateModel[] loopVars,
             TemplateDirectiveBody body) throws TemplateException, IOException {
@@ -45,12 +44,12 @@ public class DumpAllDirective extends BaseTemplateDirectiveModel {
         }
        
         TemplateHashModel dataModel = env.getDataModel();    
+        @SuppressWarnings("unchecked")
         Map<String, Object> dm = (Map<String, Object>) DeepUnwrap.permissiveUnwrap(dataModel);        
-        List<String> varNames = new ArrayList(dm.keySet()); 
+        List<String> varNames = new ArrayList<String>(dm.keySet()); 
         Collections.sort(varNames);
         
-        DumpHelper helper = new DumpHelper(env);
-        Configuration config = env.getConfiguration();        
+        DumpHelper helper = new DumpHelper(env);       
         List<String> models = new ArrayList<String>();
         List<String> directives = new ArrayList<String>();
         
