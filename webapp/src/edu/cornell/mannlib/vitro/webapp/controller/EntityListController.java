@@ -196,6 +196,8 @@ public class EntityListController extends VitroHttpServlet {
         
         //get list of individuals for the search results
         int size = docs.totalHits;
+        log.debug("Number of search results: " + size);
+        
         // don't get all the results, only get results for the requestedSize
         List<Individual> individuals = new ArrayList<Individual>(INDIVIDUALS_PER_PAGE);
         int individualsAdded = 0;
