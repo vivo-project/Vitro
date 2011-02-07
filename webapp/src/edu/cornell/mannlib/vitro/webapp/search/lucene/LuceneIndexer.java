@@ -277,18 +277,26 @@ public class LuceneIndexer implements IndexerIface {
 
     private synchronized void bringRebuildOnLine() {
         closeWriter();
-        deleteDir(new File(liveIndexDir));
         File offLineDir = new File(currentOffLineDir);
         File liveDir = new File(liveIndexDir);
+
+        boolean deleted = deleteDir(liveDir);
+        if (! deleted ){
+            log.error("failed to delete live index directory " 
+                    + liveDir.getAbsolutePath());
+            return;
+        }
+
         boolean success =  offLineDir.renameTo( liveDir );
         if( ! success ){
             log.error("could not move off line index at " 
                     + offLineDir.getAbsolutePath() + " to live index directory " 
                     + liveDir.getAbsolutePath());
-        }else{            
-            deleteDir(new File(currentOffLineDir));
-            currentOffLineDir = null;
-        }
+            return;
+        }            
+
+        deleteDir(new File(currentOffLineDir));
+        currentOffLineDir = null;
     }  
     
     private synchronized String getOffLineBuildDir(){
@@ -323,8 +331,10 @@ public class LuceneIndexer implements IndexerIface {
         if (dir.isDirectory()) {
             String[] children = dir.list();
             for (int i=0; i<children.length; i++) {
-                boolean success = deleteDir(new File(dir, children[i]));
+                File child = new File(dir, children[i]);
+				boolean success = deleteDir(child);
                 if (!success) {
+                	log.warn("failed to delete " + child.getAbsolutePath());
                     return false;
                 }
             }
