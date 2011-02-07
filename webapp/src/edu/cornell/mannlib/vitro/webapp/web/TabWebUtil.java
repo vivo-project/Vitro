@@ -170,12 +170,12 @@ public class TabWebUtil {
       */
     public static Tab findStashedTab( String tabId, HttpServletRequest request)
     throws JspException{
+    	if( request == null )
+    		throw new JspException("findStashedTab: request was null");
         if( request.getAttribute(STASHED_KEY) == null )
             throw new JspException("findStashedTab: called before stashTabsInRequest.");
         if( tabId == null)
             throw new JspException("findStashedTab: tabId was null");
-        if( request == null )
-            throw new JspException("findStashedTab: request was null");
         Object obj = request.getAttribute("tab"+tabId);
         if( obj == null )
             throw new JspException("findStashedTab: tab"+tabId+" not found in vitro request");
