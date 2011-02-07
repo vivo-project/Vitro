@@ -188,9 +188,11 @@ public class HiddenFromDisplayBelowRoleLevelFilter extends VitroFiltersImpl {
     extends UnaryFunctor<E,Boolean>{
         @Override
         public Boolean fn(E stmt) {
-            log.debug("checking hidden status for object property statement \"" + stmt.getPropertyURI() + "\"");
-            if( stmt == null )
+            if( stmt == null ) {
+                log.debug("checking hidden status for null object property statement");
                 return false;
+            }
+            log.debug("checking hidden status for object property statement \"" + stmt.getPropertyURI() + "\"");
 
             try {
                 ObjectProperty prop = stmt.getProperty();                
