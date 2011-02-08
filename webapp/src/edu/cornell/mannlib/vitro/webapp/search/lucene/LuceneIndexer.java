@@ -348,15 +348,19 @@ public class LuceneIndexer implements IndexerIface {
             String[] children = dir.list();
             for (int i=0; i<children.length; i++) {
                 File child = new File(dir, children[i]);
-				boolean success = deleteDir(child);
-                if (!success) {
-                	log.warn("failed to delete " + child.getAbsolutePath());
+				boolean childDeleted = deleteDir(child);
+                if (!childDeleted) {
+                	log.debug("failed to delete " + child.getAbsolutePath());
                     return false;
                 }
             }
         }
         // The directory is now empty so delete it
-        return dir.delete();
+        boolean deleted = dir.delete();
+        if (!deleted) {
+        	log.debug("failed to delete " + dir.getAbsolutePath());
+        }
+        return deleted;
     }   
 
     private void checkStartPreconditions() {        
