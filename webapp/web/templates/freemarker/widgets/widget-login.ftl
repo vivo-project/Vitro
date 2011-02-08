@@ -15,12 +15,15 @@
 </#macro>
 
 <#macro loginForm>
-    <noscript>
-        <section id="error-alert">
-            <img src="${urls.images}/iconAlertBig.png" alt="Alert Icon"/>
-            <p>In order to edit VIVO content, you'll need to enable JavaScript.</p>
-        </section>
-    </noscript>
+    <#-- Don't display the JavaScript required to edit message on the home page even if JavaScript is unavailable -->
+    <#if ( currentPage != 'home' && currentPage != 'index.jsp')>
+        <noscript>
+            <section id="error-alert">
+                <img src="${urls.images}/iconAlertBig.png" alt="Alert Icon"/>
+                <p>In order to edit VIVO content, you'll need to enable JavaScript.</p>
+            </section>
+        </noscript>
+    </#if>
 
     <section id="login" class="hidden">
         <h2>Log in</h2>
