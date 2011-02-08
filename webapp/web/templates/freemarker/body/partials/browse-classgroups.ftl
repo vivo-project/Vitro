@@ -104,7 +104,7 @@ ${stylesheets.add("/css/browseClassGroups.css")}
 <#macro classesInClassgroup classes=classes classGroup=classGroup>
      <#list classes as class>
         <#if (class.individualCount > 0)>
-            <li role="listitem"><a href="${urls.base}/individuallist?vclassId=${class.uri?url}" title="Browse all ${class.name} content">${class.name} <span class="count-individuals"> (${class.individualCount})</span></a></li>
+            <li role="listitem"><a href="${urls.base}/individuallist?vclassId=${class.uri?url}" title="Browse all ${class.name} content">${class.name}</a></li>
         </#if>
      </#list>
 </#macro>
