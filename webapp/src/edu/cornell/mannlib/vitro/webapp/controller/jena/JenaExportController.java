@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -24,11 +25,13 @@ import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
+import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaModelUtils;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 
 public class JenaExportController extends BaseEditController {
 
@@ -104,18 +107,38 @@ public class JenaExportController extends BaseEditController {
 		}
 		
 		
+		String mode = ConfigurationProperties.getProperty("VitroConnection.DataSource.tripleStoreType");
+		ModelContext modelContext = new ModelContext();
 		if( "abox".equals(subgraphParam)){
 			model = ModelFactory.createDefaultModel();
 			if("inferred".equals(assertedOrInferredParam)){
-				model = xutil.extractABox(dataset, INFERENCE_GRAPH);
+				if(mode.equals("RDB")){
+					Dataset jenaDataset = DatasetFactory.create((OntModel)getServletContext().getAttribute("jenaOntModel"));
+					Dataset inferenceDataset = DatasetFactory.create((OntModel)getServletContext().getAttribute("inferenceOntModel"));
+					model = xutil.extractABox(jenaDataset,inferenceDataset,null);
+				}
+				else{
+					model = ModelContext.getInferenceOntModelSelector(getServletContext()).getABoxModel();
+				}
 			}
 			else if("full".equals(assertedOrInferredParam)){
-				model = xutil.extractABox(dataset, FULL_GRAPH);
+				if(mode.equals("RDB")){
+					model = xutil.extractABox((OntModel)getServletContext().getAttribute("jenaOntModel"));
+				}
+				else{
+					model = ModelContext.getUnionOntModelSelector(getServletContext()).getABoxModel();
+				}
 			}
-			else{
-				model = xutil.extractABox(dataset, ASSERTIONS_GRAPH);
+			else if("asserted".equals(assertedOrInferredParam)){
+				if(mode.equals("RDB")){
+					Dataset jenaDataset = DatasetFactory.create((OntModel)getServletContext().getAttribute("jenaOntModel"));
+					Dataset baseDataset = DatasetFactory.create((OntModel)getServletContext().getAttribute("baseOntModel"));
+					model = xutil.extractABox(jenaDataset,baseDataset,null);
+				}
+				else{
+					model = ModelContext.getBaseOntModelSelector(getServletContext()).getABoxModel();
+				}
 			}
-			
 		}
 		else if("tbox".equals(subgraphParam)){
 			if("inferred".equals(assertedOrInferredParam)){
@@ -132,15 +155,34 @@ public class JenaExportController extends BaseEditController {
 		else if("full".equals(subgraphParam)){
 			if("inferred".equals(assertedOrInferredParam)){
 				ontModel = xutil.extractTBox(dataset, ontologyURI,INFERENCE_GRAPH);
-				ontModel.addSubModel(xutil.extractABox(dataset, INFERENCE_GRAPH));
+				if(mode.equals("RDB")){
+					Dataset jenaDataset = DatasetFactory.create((OntModel)getServletContext().getAttribute("jenaOntModel"));
+					Dataset inferenceDataset = DatasetFactory.create((OntModel)getServletContext().getAttribute("inferenceOntModel"));
+					ontModel.addSubModel(xutil.extractABox(jenaDataset, inferenceDataset, null));
+				}
+				else{
+					ontModel.addSubModel(ModelContext.getInferenceOntModelSelector(getServletContext()).getABoxModel());
+				}
 			}
 			else if("full".equals(assertedOrInferredParam)){
 				ontModel = xutil.extractTBox(dataset, ontologyURI, FULL_GRAPH);
-				ontModel.addSubModel(xutil.extractABox(dataset, FULL_GRAPH));
+				if(mode.equals("RDB")){
+					ontModel.addSubModel(xutil.extractABox((OntModel)getServletContext().getAttribute("jenaOntModel")));
+				}
+				else{
+					ontModel.addSubModel(ModelContext.getUnionOntModelSelector(getServletContext()).getABoxModel());
+				}
 			}
 			else{
 				ontModel = xutil.extractTBox(dataset, ontologyURI, ASSERTIONS_GRAPH);
-				ontModel.addSubModel(xutil.extractABox(dataset, ASSERTIONS_GRAPH));
+				if(mode.equals("RDB")){
+					Dataset jenaDataset = DatasetFactory.create((OntModel)getServletContext().getAttribute("jenaOntModel"));
+					Dataset baseDataset = DatasetFactory.create((OntModel)getServletContext().getAttribute("baseOntModel"));
+					ontModel.addSubModel(xutil.extractABox(jenaDataset,baseDataset,null));
+				}
+				else{
+					ontModel.addSubModel(ModelContext.getBaseOntModelSelector(getServletContext()).getABoxModel());
+				}
 			}
 			
 		}
