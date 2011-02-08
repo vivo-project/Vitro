@@ -85,31 +85,28 @@ public class WebappDaoFactorySDBPrep implements Filter {
 		SDBConnection conn = null;
 		Store store = null;
 		Dataset dataset = null;
+		WebappDaoFactory wadf = null;
 		
-		try {
-			if ( request instanceof HttpServletRequest 
-				     && JenaDataSourceSetupBase.isSDBActive()) {
-					
-			    if (bds == null || storeDesc == null || oms == null) {
-			        throw new RuntimeException("SDB store not property set up");
-			    }
-			    
-				try {
-				    sqlConn = bds.getConnection();
-					conn = new SDBConnection(sqlConn) ;
-				} catch (SQLException sqe) {
-					throw new RuntimeException("Unable to connect to database", sqe);
-				}
-				if (conn != null) {
-					store = SDBFactory.connectStore(conn, storeDesc);
-					dataset = SDBFactory.connectDataset(store);
-					VitroRequest vreq = new VitroRequest((HttpServletRequest) request);
-					WebappDaoFactory wadf = 
-						new WebappDaoFactorySDB(oms, dataset, defaultNamespace, null, null);
-					vreq.setWebappDaoFactory(wadf);
-					vreq.setFullWebappDaoFactory(wadf);
-					vreq.setDataset(dataset);
-				}
+		try {		
+		    if (bds == null || storeDesc == null || oms == null) {
+		        throw new RuntimeException("SDB store not property set up");
+		    }
+		    
+			try {
+			    sqlConn = bds.getConnection();
+				conn = new SDBConnection(sqlConn) ;
+			} catch (SQLException sqe) {
+				throw new RuntimeException("Unable to connect to database", sqe);
+			}
+			if (conn != null) {
+				store = SDBFactory.connectStore(conn, storeDesc);
+				dataset = SDBFactory.connectDataset(store);
+				VitroRequest vreq = new VitroRequest((HttpServletRequest) request);
+				wadf = 
+					new WebappDaoFactorySDB(oms, dataset, defaultNamespace, null, null);
+				vreq.setWebappDaoFactory(wadf);
+				vreq.setFullWebappDaoFactory(wadf);
+				vreq.setDataset(dataset);
 			}
 		} catch (Throwable t) {
 			log.error("Unable to filter request to set up SDB connection", t);
@@ -124,18 +121,14 @@ public class WebappDaoFactorySDBPrep implements Filter {
 			if (conn != null) {
 				conn.close();
 			}
-			if (sqlConn != null) {
-			    try {
-			        sqlConn.close();
-			    } catch (SQLException e) {
-			        log.error("Unable to close SQL connection", e);
-			    }
-			}
 			if (dataset != null) {
 			    dataset.close();
 			}
 			if (store != null) {
 			    store.close();
+			}
+			if (wadf != null) {
+			    wadf.close();
 			}
 		}
 		

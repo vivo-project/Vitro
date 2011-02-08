@@ -73,7 +73,7 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     protected KeywordDao keywordDao;
     protected LinksDao linksDao;
     protected LinktypeDao linktypeDao;
-    protected ApplicationDao applicationDao;
+    protected ApplicationDaoJena applicationDao;
     protected PortalDao portalDao;
     protected TabDao tabDao;
     protected TabIndividualRelationDao tabs2EntsDao;
@@ -657,6 +657,13 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     @Override
     public DisplayModelDao getDisplayModelDao(){
         return new DisplayModelDaoJena( this );
+    }
+    
+    @Override
+    public void close() {
+        if (applicationDao != null) {
+            applicationDao.close();
+        }   
     }
    
 }

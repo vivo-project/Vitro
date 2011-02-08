@@ -8,6 +8,7 @@ import java.util.List;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.listeners.StatementListener;
 import com.hp.hpl.jena.rdf.model.Literal;
+import com.hp.hpl.jena.rdf.model.ModelChangedListener;
 import com.hp.hpl.jena.rdf.model.NodeIterator;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
@@ -26,14 +27,20 @@ public class ApplicationDaoJena extends JenaBaseDao implements ApplicationDao {
     
 	Integer portalCount = null;
 	List<String> externallyLinkedNamespaces = null;
+    ModelChangedListener modelChangedListener = null;
 	
     public ApplicationDaoJena(WebappDaoFactoryJena wadf) {
         super(wadf);
-        getOntModelSelector().getDisplayModel().register(
-                new ExternalNamespacesChangeListener());
+        modelChangedListener = new ExternalNamespacesChangeListener();
+        getOntModelSelector().getDisplayModel().register(modelChangedListener);
     }
-	   
-	
+    
+    public void close() {
+        if (modelChangedListener != null) {
+            getOntModelSelector().getDisplayModel().unregister(modelChangedListener);
+        }
+    }
+	   	
 	public boolean isFlag1Active() {
 		boolean somePortalIsFiltering=false;		
 		if (portalCount == null) {
