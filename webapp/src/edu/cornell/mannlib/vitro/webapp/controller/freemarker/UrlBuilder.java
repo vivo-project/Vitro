@@ -17,8 +17,6 @@ import org.openrdf.model.impl.URIImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
-import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.filters.PortalPickerFilter;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
@@ -186,6 +184,10 @@ public class UrlBuilder {
                 this.put(strings[i], strings[i+1]);
             }
         } 
+        
+        public ParamMap(List<String> strings) {
+            this((String[]) strings.toArray());
+        }
         
         public ParamMap(Map<String, String> map) {
             putAll(map);
