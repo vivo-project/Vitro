@@ -58,10 +58,11 @@ public class FreemarkerConfigurationLoader {
         String themeDir = getThemeDir(vreq.getPortal());
         return getConfigForTheme(themeDir);
     }
-    
+
     protected String getThemeDir(Portal portal) {
         return portal.getThemeDir().replaceAll("/$", "");
     }
+
     
     protected Configuration getConfigForTheme(String themeDir) {
         
@@ -95,10 +96,10 @@ public class FreemarkerConfigurationLoader {
             config.setTemplateUpdateDelay(0); // no template caching in development 
         } else {
             int delay = 60;
-            log.debug("Setting Freemarker template cache update delay to " + delay + ".");
+            log.debug("Setting Freemarker template cache update delay to " + delay + ".");            
             config.setTemplateUpdateDelay(delay); // in seconds; Freemarker default is 5
         }
-        
+
         // Specify how templates will see the data model. 
         // The default wrapper exposes set methods unless exposure level is set.
         // By default we want to block exposure of set methods. 
@@ -125,19 +126,15 @@ public class FreemarkerConfigurationLoader {
             log.error("Error setting value for url_escaping_charset.");
         }
         
-        // auto include setup.ftl which allows for globals to be easily defined in a template that's always included
-        // used primarily to setup ${bodyClasses} for now
-        config.addAutoInclude("pageSetup.ftl");
-        
-        config.setTemplateLoader(getTemplateLoader(config, themeDir));
+        config.setTemplateLoader(getTemplateLoader(config, themeDir));        
         
         return config;
     }
-    
+
     // Define template locations. Template loader will look first in the theme-specific
     // location, then in the vitro location.
     protected final TemplateLoader getTemplateLoader(Configuration config, String themeDir) {
-        
+
         List<TemplateLoader> loaders = new ArrayList<TemplateLoader>();
         MultiTemplateLoader mtl = null;
         try {
@@ -148,7 +145,7 @@ public class FreemarkerConfigurationLoader {
             if (themeTemplateDir.exists()) {
                 FileTemplateLoader themeFtl = new FileTemplateLoader(themeTemplateDir);
                 loaders.add(themeFtl);
-            }
+            } 
             
             // Vitro template loader
             String vitroTemplatePath = context.getRealPath("/templates/freemarker");
@@ -162,6 +159,8 @@ public class FreemarkerConfigurationLoader {
         } catch (IOException e) {
             log.error("Error creating template loaders");
         }
-        return mtl;   
+        return mtl;
+        
     }
+    
 }
