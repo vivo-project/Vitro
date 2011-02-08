@@ -104,12 +104,25 @@ public class DateTimeMigration {
 		    while (iter.hasNext()) {
 
 			   Statement stmt1 = iter.next();
+			   
+			   if (!stmt1.getObject().isResource()) {
+				   logger.log("WARN: the object of this statement is expected to be a resource: " + ABoxUpdater.stmtString(stmt1));
+				   continue;
+			   }
 
 			   Statement stmt2 = aboxModel.getProperty(stmt1.getObject().asResource(), dateTimeIntervalProp);
 
-			   if (stmt2 == null) continue;
-			   if (!stmt1.getObject().isResource()) continue;
-			   if (!stmt2.getObject().isResource()) continue;
+			   if (stmt2 == null) {
+				   logger.log("Info: Found an AcademicInterval without dates attached");
+				   additions.add(stmt1.getSubject(), dateTimeIntervalProp, stmt1.getObject());
+				   additions.add(stmt1.getObject().asResource(), dateTimeIntervalForProp, stmt1.getSubject());
+				   continue;
+			   }
+			   
+			   if (!stmt2.getObject().isResource()) {
+				   logger.log("WARN: the object of this statement is expected to be a resource: " + ABoxUpdater.stmtString(stmt2));
+				   continue;
+			   }
 			   
 			   retractions.add(stmt2);
 			   retractions.add(stmt2.getObject().asResource(), dateTimeIntervalForProp, stmt2.getSubject());
@@ -135,7 +148,6 @@ public class DateTimeMigration {
 		    
 			if (additions.size() > 0) {	
 			   long count = additions.size() / 2;	
-			   //logger.log(count + " Academic interval" + ((count > 1) ? "s were" : " was") + " updated to the new date/time format");
 			   logger.log("Updated " + count + " Academic interval" + ((count > 1) ? "s" : "") + " to the new date/time format");
 			}
 		} finally {
@@ -220,11 +232,6 @@ public class DateTimeMigration {
 		    record.recordAdditions(additions);
 		    
 			if (additions.size() > 0) {
-				/*
-					logger.log(additions.size() + " date/time literal" + 
-							((additions.size() > 1) ? "s" : "") + ((additions.size() > 1) ? " were " : " was ") +
-							"updated to the xsd:dateTime representation.");
-				*/
 					logger.log("Updated " + additions.size() + " date/time literal" + 
 							((additions.size() > 1) ? "s" : "") + " to the xsd:dateTime representation");
 			}		   
