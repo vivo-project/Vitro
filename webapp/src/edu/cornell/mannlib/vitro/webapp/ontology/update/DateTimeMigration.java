@@ -42,7 +42,6 @@ public class DateTimeMigration {
 	private static final String dateTimePrecisionURI = "http://vivoweb.org/ontology/core#dateTimePrecision";
 	private static final String hasTimeIntervalURI = "http://vivoweb.org/ontology/core#hasTimeInterval";
 	private static final String dateTimeIntervalURI = "http://vivoweb.org/ontology/core#dateTimeInterval";
-	private static final String dateTimeIntervalForURI = "http://vivoweb.org/ontology/core#dateTimeIntervalFor";
 	private static final String startURI = "http://vivoweb.org/ontology/core#start";
 	private static final String endURI = "http://vivoweb.org/ontology/core#end";
 	
@@ -54,7 +53,6 @@ public class DateTimeMigration {
 	private DatatypeProperty dateTimeProp = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createDatatypeProperty(dateTimeURI);
 	private ObjectProperty hasTimeIntervalProp = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createObjectProperty(hasTimeIntervalURI);
 	private ObjectProperty dateTimeIntervalProp = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createObjectProperty(dateTimeIntervalURI);
-	private ObjectProperty dateTimeIntervalForProp = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createObjectProperty(dateTimeIntervalForURI);
 	private ObjectProperty dateTimePrecisionProp = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createObjectProperty(dateTimePrecisionURI);
 	private ObjectProperty startProp = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createObjectProperty(startURI);
 	private ObjectProperty endProp = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createObjectProperty(endURI);
@@ -116,7 +114,7 @@ public class DateTimeMigration {
 			   if (stmt2 == null) {
 				   datelessCount++;
 				   additions.add(stmt1.getSubject(), dateTimeIntervalProp, stmt1.getObject());
-				   additions.add(stmt1.getObject().asResource(), dateTimeIntervalForProp, stmt1.getSubject());
+				   //additions.add(stmt1.getObject().asResource(), dateTimeIntervalForProp, stmt1.getSubject());
 				   continue;
 			   }
 			   
@@ -126,9 +124,9 @@ public class DateTimeMigration {
 			   }
 			   
 			   retractions.add(stmt2);
-			   retractions.add(stmt2.getObject().asResource(), dateTimeIntervalForProp, stmt2.getSubject());
+			   //retractions.add(stmt2.getObject().asResource(), dateTimeIntervalForProp, stmt2.getSubject());
 			   additions.add(stmt1.getSubject(), dateTimeIntervalProp, stmt1.getObject());
-			   additions.add(stmt1.getObject().asResource(), dateTimeIntervalForProp, stmt1.getSubject());
+			   //additions.add(stmt1.getObject().asResource(), dateTimeIntervalForProp, stmt1.getSubject());
 			   
 			   StmtIterator iter2 = aboxModel.listStatements(stmt2.getObject().asResource(), (Property) null, (RDFNode) null);
 			   
@@ -149,9 +147,9 @@ public class DateTimeMigration {
 		    
 			if (datelessCount > 0) {	
 			    logger.log("INFO: Found " + datelessCount + " Academic Term and/or Year individual" + ((datelessCount > 1) ? "s" : "") +
-			    		" that " + ((datelessCount > 1) ? "don't have" : "doesn't have an") + " associated date" + 
-			    		((datelessCount > 1) ? "s" : "")  + ". Such an individual will be displayed as an incomplete Date/Time" +
-			    				" interval on any Course page that refers to it.");
+			    		" that " + ((datelessCount > 1) ? "don't have " : "doesn't have ") + "an associated date." + 
+			    		 " Such an individual will be displayed as an incomplete Date/Time" +
+			    	     " interval on any Course page that refers to it.");
 			}
 		    
 			if (additions.size() > 0) {	
