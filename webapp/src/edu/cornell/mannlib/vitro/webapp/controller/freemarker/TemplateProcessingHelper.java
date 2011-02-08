@@ -55,6 +55,13 @@ public class TemplateProcessingHelper {
             // can be used in directives.
             env.setCustomAttribute("request", request);
             env.setCustomAttribute("context", context);
+            
+            // Define a setup template to be included by every page template
+            String templateType = (String) map.get("templateType");
+            if (templateType != null && templateType.equals(FreemarkerHttpServlet.PAGE_TEMPLATE_TYPE)) {
+                env.include(getTemplate("pageSetup.ftl"));
+            }
+            
             env.process();
         } catch (TemplateException e) {
             log.error("Template Exception creating processing environment", e);

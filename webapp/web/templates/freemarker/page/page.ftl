@@ -4,7 +4,7 @@
 
 <#include "head.ftl">
 
-<body>
+<body class="${bodyClasses!}">
     <div id="wrap" class="container">
         <div id="header">
         
