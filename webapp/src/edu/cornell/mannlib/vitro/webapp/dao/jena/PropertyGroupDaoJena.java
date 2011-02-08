@@ -137,12 +137,17 @@ public class PropertyGroupDaoJena extends JenaBaseDao implements PropertyGroupDa
                         getOntModelSelector().getApplicationMetadataModel(), 
                         getOntModelSelector().getFullModel()));
         
+        WebappDaoFactory wadfForURIGeneration = null;
         try {
-            groupURI = (new WebappDaoFactoryJena(unionForURIGeneration)).
-                            getIndividualDao().insertNewIndividual(groupInd);
+            wadfForURIGeneration = new WebappDaoFactoryJena(
+                    unionForURIGeneration);
+            groupURI = wadfForURIGeneration
+                    .getIndividualDao().insertNewIndividual(groupInd);
     	} catch (InsertException ie) {
     		throw new RuntimeException(InsertException.class.getName() + 
     		        "Unable to insert property group " + groupURI, ie);
+    	} finally {
+    	    wadfForURIGeneration.close();
     	}
     	
     	if (groupURI != null) {

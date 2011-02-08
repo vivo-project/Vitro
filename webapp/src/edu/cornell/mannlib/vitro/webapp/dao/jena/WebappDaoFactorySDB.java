@@ -174,8 +174,6 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
 	    
 	    private BasicDataSource _bds;
 	    private StoreDesc _storeDesc;
-	    private Dataset _dataset;
-	    private Connection _conn;
 	    
 	    public ReconnectingDatasetFactory(BasicDataSource bds, StoreDesc storeDesc) {
 	        _bds = bds;
@@ -184,15 +182,11 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
 	    
 	    public DatasetWrapper getDatasetWrapper() {
 	        try {
-	            if ((_dataset != null) && (_conn != null) && (!_conn.isClosed())) {
-	                return new DatasetWrapper(_dataset);
-	            } else {
-	                _conn = _bds.getConnection();
-                    SDBConnection conn = new SDBConnection(_conn) ;
-                    Store store = SDBFactory.connectStore(conn, _storeDesc);
-                    _dataset = SDBFactory.connectDataset(store);
-                    return new DatasetWrapper(_dataset);
-	            }
+                Connection sqlConn = _bds.getConnection();
+                SDBConnection conn = new SDBConnection(sqlConn) ;
+                Store store = SDBFactory.connectStore(conn, _storeDesc);
+                Dataset dataset = SDBFactory.connectDataset(store);
+                return new DatasetWrapper(dataset, conn);
             } catch (SQLException sqe) {
                 throw new RuntimeException("Unable to connect to database", sqe);
             }

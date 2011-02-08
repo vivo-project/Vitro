@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
 import java.io.InputStream;
+import java.sql.SQLException;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
@@ -400,10 +401,13 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     	else if(TripleStoreType.SDB.equals(type)){
     		StoreDesc storeDesc = new StoreDesc(
     		        LayoutType.LayoutTripleNodesHash, DatabaseType.MySQL);
-    		SDBConnection sdbConn = new SDBConnection(
-    		        jdbcUrl, username, password);
-    		Store store = SDBFactory.connectStore(sdbConn, storeDesc);
-    		vsmm = new VitroJenaSDBModelMaker(store);
+    	    BasicDataSource bds = JenaDataSourceSetup.makeBasicDataSource(
+    	            DB_DRIVER_CLASS_NAME, jdbcUrl, username, password);
+    	    try {
+    	        vsmm = new VitroJenaSDBModelMaker(storeDesc, bds);
+    	    } catch (SQLException sqle) {
+    	        log.error("Unable to set up SDB ModelMaker", sqle);
+    	    }
     	}
     	
 		return;

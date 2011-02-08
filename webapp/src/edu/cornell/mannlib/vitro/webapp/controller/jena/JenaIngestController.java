@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.sql.SQLException;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,6 +28,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -352,7 +354,11 @@ public class JenaIngestController extends BaseEditController {
 			String jdbcUrl = vreq.getParameter("jdbcUrl");
 			String tripleStore = vreq.getParameter("tripleStore");
 			if (jdbcUrl != null) {
-				doConnectDB(vreq);
+			    try {
+			        doConnectDB(vreq);
+			    } catch (SQLException sqle) {
+			        throw new RuntimeException("Unable to connect to DB", sqle);
+			    }
 				if ("SDB".equals(tripleStore)) {
 		        	getServletContext().setAttribute("modelT", "sdb");
 		 		    getServletContext().setAttribute("info", "SDB models");
@@ -884,7 +890,7 @@ public class JenaIngestController extends BaseEditController {
         return tempModel.size();     
 	}
 	
-	public void doConnectDB(VitroRequest vreq) {
+	public void doConnectDB(VitroRequest vreq) throws SQLException {
 		String jdbcUrl = vreq.getParameter("jdbcUrl");
 		String username = vreq.getParameter("username");
 		String password = vreq.getParameter("password");
@@ -896,40 +902,48 @@ public class JenaIngestController extends BaseEditController {
 			jdbcUrl += "useUnicode=yes&characterEncoding=utf8";
 		}
 		dbTypeObj = DatabaseType.fetch(dbType);
-        loadDriver(dbTypeObj);
+        String driver = loadDriver(dbTypeObj);
 		System.out.println("Connecting to DB at "+jdbcUrl);
-		StoreDesc storeDesc = new StoreDesc(LayoutType.LayoutTripleNodesHash,dbTypeObj) ;
-    	SDBConnection conn = new SDBConnection(jdbcUrl, username, password) ; 
-    	Store store = SDBFactory.connectStore(conn, storeDesc);
-    	VitroJenaSDBModelMaker vsmm = new VitroJenaSDBModelMaker(store);
-    	VitroJenaModelMaker vjmm = new VitroJenaModelMaker(jdbcUrl, username, password, dbType);
-    	getServletContext().setAttribute("vitroJenaSDBModelMaker", vsmm);
-    	getServletContext().setAttribute("vitroJenaModelMaker", vjmm);
-    	if("SDB".equals(tripleStore))
-    		vreq.getSession().setAttribute("vitroJenaModelMaker",vsmm);
-    	else
-    		vreq.getSession().setAttribute("vitroJenaModelMaker",vjmm);
+		StoreDesc storeDesc = new StoreDesc(LayoutType.LayoutTripleNodesHash,dbTypeObj) ; 
+    	BasicDataSource bds = JenaDataSourceSetup.makeBasicDataSource(
+    	        driver, jdbcUrl, username, password);
+    	try {
+    	    VitroJenaSDBModelMaker vsmm = new VitroJenaSDBModelMaker(storeDesc, bds);
+    	  	VitroJenaModelMaker vjmm = new VitroJenaModelMaker(jdbcUrl, username, password, dbType);
+        	getServletContext().setAttribute("vitroJenaSDBModelMaker", vsmm);
+        	getServletContext().setAttribute("vitroJenaModelMaker", vjmm);
+        	if("SDB".equals(tripleStore))
+        		vreq.getSession().setAttribute("vitroJenaModelMaker",vsmm);
+        	else
+        		vreq.getSession().setAttribute("vitroJenaModelMaker",vjmm);
+    	} catch (SQLException sqle) {
+            throw new RuntimeException("Unable to create SDB ModelMaker", sqle);
+        }
 	}
 	
 	
-	private void loadDriver(DatabaseType dbType) {
-        if (DatabaseType.MySQL.equals(dbType)) {
-            JDBC.loadDriverMySQL();
-        } else if (DatabaseType.DB2.equals(dbType)) {
-            JDBC.loadDriverDB2();
-        } else if (DatabaseType.Derby.equals(dbType)) {
-            JDBC.loadDriverDerby();
-        } else if (DatabaseType.H2.equals(dbType)) {
-            JDBC.loadDriverH2();
-        } else if (DatabaseType.HSQLDB.equals(dbType)) {
-            JDBC.loadDriverHSQL();
-        } else if (DatabaseType.Oracle.equals(dbType)) {
-            JDBC.loadDriverOracle();
-        } else if (DatabaseType.PostgreSQL.equals(dbType)) {
-            JDBC.loadDriverPGSQL();
-        } else if (DatabaseType.SQLServer.equals(dbType)) {
-            JDBC.loadDriverSQLServer();
-        }
+	private String loadDriver(DatabaseType dbType) {
+	    String driverName = JDBC.getDriver(dbType);
+	    JDBC.loadDriver(driverName);
+	    return driverName;
+	    
+//        if (DatabaseType.MySQL.equals(dbType)) {
+//            JDBC.loadDriverMySQL();
+//        } else if (DatabaseType.DB2.equals(dbType)) {
+//            JDBC.loadDriverDB2();
+//        } else if (DatabaseType.Derby.equals(dbType)) {
+//            JDBC.loadDriverDerby();
+//        } else if (DatabaseType.H2.equals(dbType)) {
+//            JDBC.loadDriverH2();
+//        } else if (DatabaseType.HSQLDB.equals(dbType)) {
+//            JDBC.loadDriverHSQL();
+//        } else if (DatabaseType.Oracle.equals(dbType)) {
+//            JDBC.loadDriverOracle();
+//        } else if (DatabaseType.PostgreSQL.equals(dbType)) {
+//            JDBC.loadDriverPGSQL();
+//        } else if (DatabaseType.SQLServer.equals(dbType)) {
+//            JDBC.loadDriverSQLServer();
+//        }
 	}
 	
 	/*public void doExecuteCsv2Rdf(VitroRequest vreq) {

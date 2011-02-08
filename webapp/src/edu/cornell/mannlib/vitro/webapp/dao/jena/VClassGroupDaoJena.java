@@ -31,6 +31,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 
 public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
@@ -226,11 +227,16 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
     	                getOntModelSelector().getApplicationMetadataModel(), 
     	                getOntModelSelector().getFullModel()));
     	
+    	WebappDaoFactory wadfForURIGeneration = null;
     	try {
-    		groupURI = (new WebappDaoFactoryJena(unionForURIGeneration)).
-                            getIndividualDao().insertNewIndividual(groupInd);
+    	    wadfForURIGeneration = new WebappDaoFactoryJena(
+    	            unionForURIGeneration);
+    		groupURI = wadfForURIGeneration
+                    .getIndividualDao().insertNewIndividual(groupInd);
     	} catch (InsertException ie) {
     		throw new RuntimeException(InsertException.class.getName() + "Unable to insert class group "+groupURI, ie);
+    	} finally {
+    	    wadfForURIGeneration.close();
     	}
     	
     	if (groupURI != null) {
