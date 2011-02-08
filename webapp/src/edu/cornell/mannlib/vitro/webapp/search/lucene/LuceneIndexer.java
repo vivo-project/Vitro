@@ -280,13 +280,25 @@ public class LuceneIndexer implements IndexerIface {
         File offLineDir = new File(currentOffLineDir);
         File liveDir = new File(liveIndexDir);
 
+        log.debug("deleting old live directory " + liveDir.getAbsolutePath());
         boolean deleted = deleteDir(liveDir);
         if (! deleted ){
-            log.error("failed to delete live index directory " 
+            log.debug("failed to delete live index directory " 
                     + liveDir.getAbsolutePath());
+            log.debug("Attempting to close searcher and delete live directory");
+            this.luceneIndexFactory.forceClose();
+            boolean secondDeleted = deleteDir(liveDir);
+            if( ! secondDeleted ){
+                log.error("Search index is out of date and cannot be replaced " +
+                		"because could not remove lucene index from directory" 
+                        + liveDir.getAbsolutePath());
+            }
             return;
         }
 
+        log.debug("moving " + offLineDir.getAbsolutePath() + " to " 
+                + liveDir.getAbsolutePath());
+        
         boolean success =  offLineDir.renameTo( liveDir );
         if( ! success ){
             log.error("could not move off line index at " 
@@ -295,7 +307,11 @@ public class LuceneIndexer implements IndexerIface {
             return;
         }            
 
-        deleteDir(new File(currentOffLineDir));
+        File oldWorkignDir = new File(currentOffLineDir);
+        if( oldWorkignDir.exists() )
+            log.debug("old working directory should have been removed " +
+            		"but still exits at " + oldWorkignDir.getAbsolutePath());
+
         currentOffLineDir = null;
     }  
     
