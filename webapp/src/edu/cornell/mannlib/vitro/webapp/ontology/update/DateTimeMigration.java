@@ -113,7 +113,7 @@ public class DateTimeMigration {
 			   Statement stmt2 = aboxModel.getProperty(stmt1.getObject().asResource(), dateTimeIntervalProp);
 
 			   if (stmt2 == null) {
-				   logger.log("Info: Found an AcademicInterval without dates attached");
+				   logger.log("Info: Found an Academic Term or Year without dates attached");
 				   additions.add(stmt1.getSubject(), dateTimeIntervalProp, stmt1.getObject());
 				   additions.add(stmt1.getObject().asResource(), dateTimeIntervalForProp, stmt1.getSubject());
 				   continue;
