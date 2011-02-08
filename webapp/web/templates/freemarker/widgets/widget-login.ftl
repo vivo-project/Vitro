@@ -16,7 +16,7 @@
 
 <#macro loginForm>
     <#-- Don't display the JavaScript required to edit message on the home page even if JavaScript is unavailable -->
-    <#if ( currentPage != 'home' && currentPage != 'index.jsp')>
+    <#if currentServlet != 'home'>
         <noscript>
             <section id="error-alert">
                 <img src="${urls.images}/iconAlertBig.png" alt="Alert Icon"/>

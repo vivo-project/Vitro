@@ -101,7 +101,7 @@ public class LoginWidget extends Widget {
             }
             
             values.put("urls", dataModel.get("urls"));
-            values.put("currentPage", dataModel.get("currentPage"));
+            values.put("currentServlet", dataModel.get("currentServlet"));
             
             @SuppressWarnings("unchecked")
             Map<String, Object> dm = (Map<String, Object>) DeepUnwrap.permissiveUnwrap(dataModel);     

@@ -263,14 +263,22 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         urls.put("themeImages", urlBuilder.getPortalUrl(themeDir + "/images"));
         urls.put("images", UrlBuilder.getUrl("/images"));
         urls.put("theme", UrlBuilder.getUrl(themeDir));
-        urls.put("index", UrlBuilder.getUrl("/browse")); 
-        
-        //urls.put("currentPage", vreq.getRequestURI());
-        urls.put("currentPage", getCurrentPageValue(vreq));
+        urls.put("index", UrlBuilder.getUrl("/browse"));   
+        urls.put("currentPage", getCurrentPageUrl(vreq));
         
         return urls;
     }
     
+    private String getCurrentPageUrl(HttpServletRequest request) {
+        String path = request.getServletPath().replaceFirst("/", "");
+        String pathInfo = request.getPathInfo();
+        if (pathInfo != null) {
+            path += pathInfo;
+        }
+        path = normalizeServletName(path);        
+        return UrlBuilder.getUrl(path);
+    }
+
     protected BeansWrapper getNonDefaultBeansWrapper(int exposureLevel) {
         BeansWrapper wrapper = new DefaultObjectWrapper();
         // Too bad exposure levels are ints instead of enum values; what happens if 
@@ -392,23 +400,20 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
             map.put("flash", flashMessage);
         }
 
-        // Let the page template know which page it's processing. 
-        String currentPage = getCurrentPageValue(vreq).replaceFirst(vreq.getContextPath() + "/", "");
-        map.put("currentPage", currentPage);
+        // Let the page template know which page it's processing.
+        map.put("currentServlet", normalizeServletName(vreq.getServletPath().replaceFirst("/", "")));
         
         // Allow template to send domain name to JavaScript (needed for AJAX calls)
         map.put("requestedPage", vreq.getRequestURL().toString());
         
         return map;        
-    }   
+    }  
     
-    private String getCurrentPageValue(HttpServletRequest request) {
-        String currentPage = request.getRequestURI();
-        // Return a uniform value for the home page
-        if (currentPage.equals("") || currentPage.equals("index.jsp")) {
-            currentPage = "home";
-        }   
-        return currentPage;
+    private String normalizeServletName(String name) {
+        // Return a uniform value for the home page.
+        // Note that if servletName is "index.jsp", it must be the home page,
+        // since we don't get here on other tabs.
+        return (name.length() == 0 || name.equals("index.jsp")) ? "home" : name;
     }
 
     private TabMenu getTabMenu(VitroRequest vreq) {
