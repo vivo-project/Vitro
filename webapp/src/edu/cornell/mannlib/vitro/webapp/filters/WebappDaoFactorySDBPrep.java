@@ -81,6 +81,8 @@ public class WebappDaoFactorySDBPrep implements Filter {
         }
 		
 		SDBConnection conn = null;
+		Store store = null;
+		Dataset dataset = null;
 		
 		try {
 			if (
@@ -92,8 +94,8 @@ public class WebappDaoFactorySDBPrep implements Filter {
 					throw new RuntimeException("Unable to connect to database", sqe);
 				}
 				if (conn != null) {
-					Store store = SDBFactory.connectStore(conn, _storeDesc);
-					Dataset dataset = SDBFactory.connectDataset(store);
+					store = SDBFactory.connectStore(conn, _storeDesc);
+					dataset = SDBFactory.connectDataset(store);
 					VitroRequest vreq = new VitroRequest((HttpServletRequest) request);
 					WebappDaoFactory wadf = 
 						new WebappDaoFactorySDB(_oms, dataset, _defaultNamespace, null, null);
@@ -114,7 +116,21 @@ public class WebappDaoFactorySDBPrep implements Filter {
 		} finally {
 			if (conn != null) {
 				conn.close();
+				conn = null;
 			}
+			if (dataset != null) {
+			    dataset.close();
+			    dataset = null;
+			}
+			if (store != null) {
+			    store.close();
+			    store = null;
+			}
+			_bds = null;
+			_storeDesc = null;
+			_conn = null;
+			_oms = null;
+			_defaultNamespace = null;
 		}
 		
 	}
