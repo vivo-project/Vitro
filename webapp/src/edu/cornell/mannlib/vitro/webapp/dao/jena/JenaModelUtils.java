@@ -242,11 +242,11 @@ private final OntModelSpec DEFAULT_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM;
 	
 	public Model extractABox(Model inputModel){
 		Dataset dataset = DatasetFactory.create(inputModel);
-	    return extractABox(dataset, null);
+	    return extractABox(dataset, null, null);
 	}
 	
-	public Model extractABox( Dataset dataset, String graphURI ) {
-	
+	public Model extractABox( Dataset unionDataset, Dataset baseOrInfDataset, String graphURI ) {
+		
 		Model aboxModel = ModelFactory.createDefaultModel();
 
 		// iterate through all classes and DESCRIBE each of their instances
@@ -257,31 +257,13 @@ private final OntModelSpec DEFAULT_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM;
 		//OntModel ontModel = ( inputModel instanceof OntModel ) 
 		//? (OntModel)inputModel
 		//: ModelFactory.createOntologyModel( DEFAULT_ONT_MODEL_SPEC, inputModel );
-		//OntModel ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
-		/*Model model = ModelFactory.createDefaultModel();
-		String getStatements = 
-			"CONSTRUCT " +
-			"{ ?p ?o ?a \n" +
-			"} WHERE {" +
-			"GRAPH ?g { \n" +
-			"{ ?p ?o ?a } \n" +
-			"} \n" +
-			"}";
-		try{
-			dataset.getLock().enterCriticalSection(Lock.READ);
-			model = QueryExecutionFactory.create(QueryFactory.create(getStatements), dataset).execConstruct();
-		}
-		finally{
-			dataset.getLock().leaveCriticalSection();
-		}
-		ontModel.add(model.listStatements());*/	
-		OntModel ontModel = extractTBox(dataset, null, graphURI);
+		OntModel ontModel = extractTBox(unionDataset, null, graphURI);
 		
 	
 		try {
 			ontModel.enterCriticalSection(Lock.READ);
 			Iterator classIt = ontModel.listNamedClasses();
-			
+			QueryExecution qe = null;
 			while ( classIt.hasNext() ) {
 				
 				OntClass ontClass = (OntClass) classIt.next();
@@ -292,12 +274,27 @@ private final OntModelSpec DEFAULT_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM;
 					String queryStr = makeDescribeQueryStr( ontClass.getURI(), null, graphURI );
 					
 					Query aboxSparqlQuery = QueryFactory.create(queryStr);
-					QueryExecution qe = QueryExecutionFactory.create(aboxSparqlQuery,dataset);
-					try {
-						dataset.getLock().enterCriticalSection(Lock.READ);
-						qe.execDescribe(aboxModel); // puts the statements about each resource into aboxModel.
-					} finally {
-						dataset.getLock().leaveCriticalSection();
+					if(baseOrInfDataset != null){
+						qe = QueryExecutionFactory.create(aboxSparqlQuery,baseOrInfDataset);
+					}
+					else{
+						qe = QueryExecutionFactory.create(aboxSparqlQuery,unionDataset);
+					}
+					if(baseOrInfDataset != null){
+						try {
+							baseOrInfDataset.getLock().enterCriticalSection(Lock.READ);
+							qe.execDescribe(aboxModel); // puts the statements about each resource into aboxModel.
+						} finally {
+							baseOrInfDataset.getLock().leaveCriticalSection();
+						}
+					}
+					else{
+						try {
+							unionDataset.getLock().enterCriticalSection(Lock.READ);
+							qe.execDescribe(aboxModel); // puts the statements about each resource into aboxModel.
+						} finally {
+							unionDataset.getLock().leaveCriticalSection();
+						}
 					}
 					
 				}
