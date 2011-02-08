@@ -41,12 +41,10 @@ var browseClassGroups = {
         $('ul#classes-in-classgroup li a').hover(function() {
             var classIndex = $('ul#classes-in-classgroup li a').index(this);
             $('#visual-graph svg path').eq(classIndex).attr('fill', '#ccc');
-            $('#visual-graph svg text').eq(classIndex).toggle();
             return false;
         }, function() {
             var classIndex = $('ul#classes-in-classgroup li a').index(this);
             $('#visual-graph svg path').eq(classIndex).attr('fill', '#999');
-            $('#visual-graph svg text').eq(classIndex).toggle();
         })
     },
     
@@ -93,8 +91,7 @@ var browseClassGroups = {
                     
                     // Build the content of each list item, piecing together each component
                     listItem = '<li role="listitem">';
-                    listItem += '<a href="'+ indexUrl +'" title="Browse all '+ name +' content">'+ name;
-                    listItem += ' <span>('+ indivCount +')</span>';
+                    listItem += '<a href="'+ indexUrl +'" title="Browse all '+ name +' content">'+ name +'</a>'; 
                     listItem += '</li>';
                     
                     // Add the list item to the array of classes
@@ -156,14 +153,6 @@ var graphClassGroups = {
         
         var chart = r.g.hbarchart(0, 16, 300, height, [values], {type:"soft", singleColor:"#999"});
         
-        // Add the class names as labels and then hide them
-        chart.label(labels, true);
-        // Getting a JS error in the console when trying to add the class
-        // "setting a property that has only a getter"
-        // $('svg text').addClass('hidden');
-        // so using .hide() instead
-        $('svg text').hide();
-        
         // Was unable to append <a> within <svg> -- was always hidden and couldn't get it to display
         // so using jQuery click to add links
         $('rect').click(function() {
@@ -185,20 +174,17 @@ var graphClassGroups = {
         
         // On hover
         // 1. Change bar color
-        // 2. Reveal label
-        // 3. Highlight class name in main list
+        // 2. Highlight class name in main list
         chart.hover(function() {
             this.bar.attr({fill: "#ccc"});
             $('rect').hover(function() {
                 var index = $('rect').index(this);
-                $('svg text').eq(index).show();
                 $('#classes-in-classgroup li a').eq(index).addClass('selected');
             })
         }, function() {
             this.bar.attr({fill: "#999"});
             $('rect').hover(function() {
                 var index = $('rect').index(this);
-                $('svg text').eq(index).hide();
                 $('#classes-in-classgroup li a').eq(index).removeClass('selected');
             })
         });
