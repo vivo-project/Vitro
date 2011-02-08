@@ -10,7 +10,7 @@ if (request.getAttribute("title") != null) { %>
 %>
 <%
 if (request.getAttribute("title") == "Tabs") { %>
-    <div id="flash-message" role="alert">Tab management has been deprecated with the 1.2 release and is no longer recommended for production VIVO instances. All development relating to tab management has ceased, and it will not be distributed in future releases.
+    <div id="flash-message" role="alert">Tabs have been deprecated with the 1.2 release and is no longer recommended for production VIVO instances. All development relating to tabs has ceased, and it will not be distributed in future releases.
     </div><%
 }
 %>
