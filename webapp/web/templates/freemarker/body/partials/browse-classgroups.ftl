@@ -15,10 +15,6 @@ ${stylesheets.add("/css/browseClassGroups.css")}
                 <#if !firstPopulatedClassGroup??>
                     <#assign firstPopulatedClassGroup = group />
                 </#if>
-                <#-- Remove "index.jsp" from URL (should verify with RY if this can be taken care of in the controller) -->
-                <#if currentPage == "index.jsp">
-                    <#assign currentPage = "" />
-                </#if>
                 <#-- Determine the active (selected) group -->
                 <#assign activeGroup = "" />
                 <#if !classGroup??>
@@ -28,7 +24,7 @@ ${stylesheets.add("/css/browseClassGroups.css")}
                 <#elseif classGroup.uri == group.uri>
                     <#assign activeGroup = selected />
                 </#if>
-                <li role="listitem"><a ${activeGroup}href="${urls.base}/${currentPage}?classgroupUri=${group.uri?url}#browse" title="Browse ${group.publicName?capitalize}" data-uri="${group.uri}" data-count="${group.individualCount}">${group.publicName?capitalize} <span class="count-classes">(${group.individualCount})</span></a></li>
+                <li role="listitem"><a ${activeGroup}href="${urls.currentPage}?classgroupUri=${group.uri?url}#browse" title="Browse ${group.publicName?capitalize}" data-uri="${group.uri}" data-count="${group.individualCount}">${group.publicName?capitalize} <span class="count-classes">(${group.individualCount})</span></a></li>
             </#if>
         </#list>
     </#assign>

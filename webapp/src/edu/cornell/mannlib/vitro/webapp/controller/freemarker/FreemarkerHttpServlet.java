@@ -242,16 +242,13 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
 
     // Define the URLs that are accessible to the templates. Note that we do not create menus here,
     // because we want the templates to be free to define the link text and where the links are displayed.
-    private final Map<String, String> getUrls(String themeDir, UrlBuilder urlBuilder) {
-        // The urls that are accessible to the templates. 
-        // NB We are not using our menu object mechanism to build menus here, because we want the 
-        // view to control which links go where, and the link text and title.
+    private final Map<String, String> getUrls(String themeDir, UrlBuilder urlBuilder, VitroRequest vreq) {
         Map<String, String> urls = new HashMap<String, String>();
         
         urls.put("home", urlBuilder.getHomeUrl());
         
         // Templates use this to construct urls.
-        urls.put("base", urlBuilder.contextPath);
+        urls.put("base", UrlBuilder.contextPath);
 
         urls.put("about", urlBuilder.getPortalUrl(Route.ABOUT));
         if (ContactMailServlet.getSmtpHostFromProperties() != null) {
@@ -264,9 +261,12 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         urls.put("siteAdmin", urlBuilder.getPortalUrl(Route.SITE_ADMIN));  
         urls.put("siteIcons", urlBuilder.getPortalUrl(themeDir + "/site_icons")); // deprecated
         urls.put("themeImages", urlBuilder.getPortalUrl(themeDir + "/images"));
-        urls.put("images", urlBuilder.getUrl("/images"));
-        urls.put("theme", urlBuilder.getUrl(themeDir));
-        urls.put("index", urlBuilder.getUrl("/browse"));                
+        urls.put("images", UrlBuilder.getUrl("/images"));
+        urls.put("theme", UrlBuilder.getUrl(themeDir));
+        urls.put("index", UrlBuilder.getUrl("/browse")); 
+        
+        //urls.put("currentPage", vreq.getRequestURI());
+        urls.put("currentPage", getCurrentPageValue(vreq));
         
         return urls;
     }
@@ -353,15 +353,13 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         String themeDir = getThemeDir(portal);
         UrlBuilder urlBuilder = new UrlBuilder(portal);
         
-        map.put("urls", getUrls(themeDir, urlBuilder)); 
+        map.put("urls", getUrls(themeDir, urlBuilder, vreq)); 
 
         map.put("themeDir", themeDir);
         map.put("currentTheme", themeDir.substring(themeDir.lastIndexOf('/')+1));
         map.put("stylesheets", getStylesheetList(themeDir));
         map.put("scripts", getScriptList(themeDir));
         map.put("headScripts", getScriptList(themeDir));
-  
-        map.put("currentPage", vreq.getServletPath().replaceFirst("/", ""));
         
         map.putAll(getDirectives());
         map.putAll(getMethods());
@@ -395,13 +393,23 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         }
 
         // Let the page template know which page it's processing. 
-        map.put("currentPage", vreq.getServletPath().replaceFirst("/", ""));
+        String currentPage = getCurrentPageValue(vreq).replaceFirst(vreq.getContextPath() + "/", "");
+        map.put("currentPage", currentPage);
         
         // Allow template to send domain name to JavaScript (needed for AJAX calls)
         map.put("requestedPage", vreq.getRequestURL().toString());
         
         return map;        
     }   
+    
+    private String getCurrentPageValue(HttpServletRequest request) {
+        String currentPage = request.getRequestURI();
+        // Return a uniform value for the home page
+        if (currentPage.equals("") || currentPage.equals("index.jsp")) {
+            currentPage = "home";
+        }   
+        return currentPage;
+    }
 
     private TabMenu getTabMenu(VitroRequest vreq) {
         int portalId = vreq.getPortal().getPortalId();

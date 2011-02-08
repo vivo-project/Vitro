@@ -17,7 +17,7 @@
         <ul id="browse-classgroups" role="list">
         <#list vclassGroupList as group>
             <#if (group.individualCount > 0)>
-                <li role="listitem"><a href="${urls.base}/${currentPage}?classgroupUri=${group.uri?url}">${group.publicName?capitalize} <span class="count-classes">(${group.individualCount})</span></a></li>
+                <li role="listitem"><a href="${urls.currentPage}?classgroupUri=${group.uri?url}">${group.publicName?capitalize} <span class="count-classes">(${group.individualCount})</span></a></li>
             </#if>
         </#list>
         </ul>
@@ -35,7 +35,7 @@
                  <ul id="classes-in-classgroup" role="list">
                      <#list classes as class>
                         <#if (class.individualCount > 0)>
-                            <li role="listitem"><a href="${urls.base}/${currentPage}?classgroupUri=${classGroup.uri?url}&vclassUri=${class.uri?url}">${class.name} <span class="count-individuals"> (${class.individualCount})</span></a></li>
+                            <li role="listitem"><a href="${urls.currentPage}?classgroupUri=${classGroup.uri?url}&vclassUri=${class.uri?url}">${class.name} <span class="count-individuals"> (${class.individualCount})</span></a></li>
                         </#if>
                      </#list>
                  </ul>

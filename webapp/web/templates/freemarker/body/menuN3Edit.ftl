@@ -15,7 +15,7 @@
     </#if>
     
     <#if menuN3??>
-        <form class="" action="${urls.base}/${currentPage}" method="post">
+        <form class="" action="${urls.currentPage}" method="post">
             <label for="navigatioN3">Setup the primary navigation menu for your website</label>
             <textarea name="navigationN3" id="navigationN3" cols="45" rows="40" class="maxWidth">
                 ${menuN3}<#t><#-- The trim directive here is to trim leading and trailing white-space -->
