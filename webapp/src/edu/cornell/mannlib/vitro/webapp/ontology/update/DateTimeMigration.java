@@ -101,6 +101,7 @@ public class DateTimeMigration {
 
 		    StmtIterator iter = aboxModel.listStatements((Resource) null, hasTimeIntervalProp, (RDFNode) null);
 	       
+		    int datelessCount = 0;
 		    while (iter.hasNext()) {
 
 			   Statement stmt1 = iter.next();
@@ -113,7 +114,7 @@ public class DateTimeMigration {
 			   Statement stmt2 = aboxModel.getProperty(stmt1.getObject().asResource(), dateTimeIntervalProp);
 
 			   if (stmt2 == null) {
-				   logger.log("Info: Found an Academic Term or Year without dates attached");
+				   datelessCount++;
 				   additions.add(stmt1.getSubject(), dateTimeIntervalProp, stmt1.getObject());
 				   additions.add(stmt1.getObject().asResource(), dateTimeIntervalForProp, stmt1.getSubject());
 				   continue;
@@ -145,6 +146,13 @@ public class DateTimeMigration {
 		    record.recordRetractions(retractions);
 		    aboxModel.add(additions);
 		    record.recordAdditions(additions);
+		    
+			if (datelessCount > 0) {	
+			    logger.log("INFO: Found " + datelessCount + " Academic Term and/or Year individual" + ((datelessCount > 1) ? "s" : "") +
+			    		" that " + ((datelessCount > 1) ? "don't have" : "doesn't have an") + " associated date" + 
+			    		((datelessCount > 1) ? "s" : "")  + ". Such an individual will be displayed as an incomplete Date/Time" +
+			    				" interval on any Course page that refers to it.");
+			}
 		    
 			if (additions.size() > 0) {	
 			   long count = additions.size() / 2;	
