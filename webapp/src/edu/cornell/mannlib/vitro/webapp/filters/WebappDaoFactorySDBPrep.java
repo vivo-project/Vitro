@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.filters;
 
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,11 +37,7 @@ public class WebappDaoFactorySDBPrep implements Filter {
 	
 	private final static Log log = LogFactory.getLog(WebappDaoFactorySDBPrep.class);
 	
-	BasicDataSource _bds;
-	StoreDesc _storeDesc;
-	SDBConnection _conn;
-	OntModelSelector _oms;
-	String _defaultNamespace;
+	ServletContext _ctx;
 
     /**
      * The filter will be applied to all incoming urls,
@@ -80,25 +77,35 @@ public class WebappDaoFactorySDBPrep implements Filter {
             }
         }
 		
+        BasicDataSource bds = JenaDataSourceSetupBase.getApplicationDataSource(_ctx);
+        StoreDesc storeDesc = (StoreDesc) _ctx.getAttribute("storeDesc");
+        OntModelSelector oms = (OntModelSelector) _ctx.getAttribute("unionOntModelSelector");
+        String defaultNamespace = (String) _ctx.getAttribute("defaultNamespace");
+        Connection sqlConn = null;
 		SDBConnection conn = null;
 		Store store = null;
 		Dataset dataset = null;
 		
 		try {
-			if (
-					request instanceof HttpServletRequest &&
-					_bds != null && _storeDesc != null && _oms != null) {
+			if ( request instanceof HttpServletRequest 
+				     && JenaDataSourceSetupBase.isSDBActive()) {
+					
+			    if (bds == null || storeDesc == null || oms == null) {
+			        throw new RuntimeException("SDB store not property set up");
+			    }
+			    
 				try {
-					conn = new SDBConnection(_bds.getConnection()) ;
+				    sqlConn = bds.getConnection();
+					conn = new SDBConnection(sqlConn) ;
 				} catch (SQLException sqe) {
 					throw new RuntimeException("Unable to connect to database", sqe);
 				}
 				if (conn != null) {
-					store = SDBFactory.connectStore(conn, _storeDesc);
+					store = SDBFactory.connectStore(conn, storeDesc);
 					dataset = SDBFactory.connectDataset(store);
 					VitroRequest vreq = new VitroRequest((HttpServletRequest) request);
 					WebappDaoFactory wadf = 
-						new WebappDaoFactorySDB(_oms, dataset, _defaultNamespace, null, null);
+						new WebappDaoFactorySDB(oms, dataset, defaultNamespace, null, null);
 					vreq.setWebappDaoFactory(wadf);
 					vreq.setFullWebappDaoFactory(wadf);
 					vreq.setDataset(dataset);
@@ -116,34 +123,29 @@ public class WebappDaoFactorySDBPrep implements Filter {
 		} finally {
 			if (conn != null) {
 				conn.close();
-				conn = null;
+			}
+			if (sqlConn != null) {
+			    try {
+			        sqlConn.close();
+			    } catch (SQLException e) {
+			        log.error("Unable to close SQL connection", e);
+			    }
 			}
 			if (dataset != null) {
 			    dataset.close();
-			    dataset = null;
 			}
 			if (store != null) {
 			    store.close();
-			    store = null;
 			}
-			_bds = null;
-			_storeDesc = null;
-			_conn = null;
-			_oms = null;
-			_defaultNamespace = null;
 		}
 		
 	}
 
 	public void init(FilterConfig filterConfig) throws ServletException {
 		try {
-			ServletContext ctx = filterConfig.getServletContext();
-			_bds = JenaDataSourceSetupBase.getApplicationDataSource(ctx);
-		    _storeDesc = (StoreDesc) ctx.getAttribute("storeDesc");
-		    _oms = (OntModelSelector) ctx.getAttribute("unionOntModelSelector");
-		    _defaultNamespace = (String) ctx.getAttribute("defaultNamespace");
+			_ctx = filterConfig.getServletContext();
 		} catch (Throwable t) {
-			log.error("Unable to set up SDB WebappDaoFactory for request", t);
+			log.error("Unable to initialize WebappDaoFactorySDBPrep", t);
 		}		
 	}
 	
