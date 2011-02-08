@@ -20,7 +20,6 @@ import java.io.OutputStream;
 import javax.media.jai.JAI;
 import javax.media.jai.RenderedOp;
 import javax.media.jai.operator.StreamDescriptor;
-import javax.media.jai.widget.ImageCanvas;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -60,6 +59,7 @@ public class ImageUploaderThumbnailerTester extends Frame {
 	private final ImageUploadThumbnailer thumbnailer = new ImageUploadThumbnailer(
 			THUMBNAIL_HEIGHT, THUMBNAIL_WIDTH);
 
+	@SuppressWarnings("deprecation")
 	private ImageUploaderThumbnailerTester() {
 		setTitle("Alpha Killer Test");
 		addWindowListener(new CloseWindowListener());
@@ -75,7 +75,7 @@ public class ImageUploaderThumbnailerTester extends Frame {
 						new FileInputStream(thumbFile));
 				RenderedOp thumbImage = StreamDescriptor.create(
 						thumbFileStream, null, null);
-				add(new ImageCanvas(thumbImage));
+				add(new javax.media.jai.widget.ImageCanvas(thumbImage));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
