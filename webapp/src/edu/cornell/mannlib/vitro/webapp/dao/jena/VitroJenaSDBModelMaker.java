@@ -64,12 +64,7 @@ public class VitroJenaSDBModelMaker implements ModelMaker {
 	    this.bds = bds;
 	    Store store = getStore();
     	try {
-    		if (!StoreUtils.isFormatted(store)) {
-    			// initialize the store
-    			store.getTableFormatter().create();
-            	store.getTableFormatter().truncate();
-    		}
-    		
+		
     		Model metadataModel = getMetadataModel();
     		
     		if (metadataModel.size()==0) {
@@ -113,6 +108,16 @@ public class VitroJenaSDBModelMaker implements ModelMaker {
                 }
 	        }
 	        store = SDBFactory.connectStore(conn, storeDesc);
+	        try {
+    	        if (!StoreUtils.isFormatted(store)) {
+                    // initialize the store
+                    store.getTableFormatter().create();
+                    store.getTableFormatter().truncate();
+                }
+	        } catch (SQLException sqle) {
+	            throw new RuntimeException(
+	                    "Unable to set up SDB store for model maker", sqle);
+	        }
 	        if (!isWorking(store)) {
 	            if (conn != null) {
 	                conn.close();
