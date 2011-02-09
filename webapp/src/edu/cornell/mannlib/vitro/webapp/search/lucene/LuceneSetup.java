@@ -134,17 +134,12 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 			// set up listeners so search index builder is notified of changes to model
 			ServletContext ctx = sce.getServletContext();
 			SearchReindexingListener srl = new SearchReindexingListener(builder);
-			ModelContext.getBaseOntModel(ctx).getBaseModel().register(srl);
-			ModelContext.getJenaOntModel(ctx).getBaseModel().register(srl);
-			ModelContext.getInferenceOntModel(ctx).register(srl);
-			ModelContext.getUnionOntModelSelector(ctx).getABoxModel()
-			        .getBaseModel().register(srl);
-						
+			ModelContext.registerListenerForChanges(ctx, srl);
+									
 			if( (Boolean)sce.getServletContext().getAttribute(INDEX_REBUILD_REQUESTED_AT_STARTUP) instanceof Boolean &&
 				(Boolean)sce.getServletContext().getAttribute(INDEX_REBUILD_REQUESTED_AT_STARTUP) ){
 			    log.info("Rebuild of lucene index required before startup.");
-				builder.doIndexRebuild();				
-				Thread.currentThread().sleep(500);				
+				builder.doIndexRebuild();												
 				int n = 0;
 				while( builder.isReindexRequested() || builder.isIndexing() ){
 				    n++;
@@ -169,7 +164,7 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 		log.debug("**** Running " + this.getClass().getName() + ".contextDestroyed()");
 		IndexBuilder builder = (IndexBuilder) sce.getServletContext().getAttribute(IndexBuilder.class.getName());
 		if( builder != null){		    		
-		    builder.killIndexingThread();
+		    builder.stopIndexingThread();
 		}
 	}
 

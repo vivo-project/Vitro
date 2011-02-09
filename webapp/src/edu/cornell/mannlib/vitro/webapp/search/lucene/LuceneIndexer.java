@@ -455,5 +455,22 @@ public class LuceneIndexer implements IndexerIface {
     public boolean isIndexCorroupt(){
         //if it is clear it out but don't rebuild.
         return false;
+    }
+
+    @Override
+    public synchronized void abortIndexingAndCleanUp() {
+        if( ! indexing )
+            log.error("abortIndexingAndCleanUp() should only be called if LuceneIndexer is indexing.");
+        else if( ! fullRebuild )
+            log.error("abortIndexingAndCleanUp() should only be called if LuceneIndexer to end an aborted full index rebuild");
+        else{
+            closeWriter();
+            File offLineDir = new File(currentOffLineDir);
+            boolean deleted = deleteDir(offLineDir);
+            //log might be null if system is shutting down.
+            if( ! deleted ){
+                System.out.println("Could not clean up temp indexing dir " + currentOffLineDir);
+            }
+        }                
     }    
 }

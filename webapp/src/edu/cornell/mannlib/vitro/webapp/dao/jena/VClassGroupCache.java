@@ -70,12 +70,14 @@ public class VClassGroupCache{
         }
         
         VClassGroupCacheChangeListener bccl = new VClassGroupCacheChangeListener(this);
-        ModelContext.getJenaOntModel(context).register(bccl);
-        ModelContext.getBaseOntModel(context).register(bccl);
-        ModelContext.getInferenceOntModel(context).register(bccl);
-        ModelContext.getUnionOntModelSelector(context).getABoxModel().register(bccl);
-        ModelContext.getBaseOntModelSelector(context).getABoxModel().register(bccl);
-        ModelContext.getInferenceOntModelSelector(context).getABoxModel().register(bccl);
+        ModelContext.registerListenerForChanges(context, bccl);
+//        
+//        ModelContext.getJenaOntModel(context).register(bccl);
+//        ModelContext.getBaseOntModel(context).register(bccl);
+//        ModelContext.getInferenceOntModel(context).register(bccl);
+//        ModelContext.getUnionOntModelSelector(context).getABoxModel().register(bccl);
+//        ModelContext.getBaseOntModelSelector(context).getABoxModel().register(bccl);
+//        ModelContext.getInferenceOntModelSelector(context).getABoxModel().register(bccl);
        
         _rebuildQueue.add(REBUILD_EVERY_PORTAL);
         _cacheRebuildThread = new RebuildGroupCacheThread(this);

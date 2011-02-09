@@ -54,4 +54,10 @@ public interface IndexerIface {
     public void endIndexing();
 
     public long getModified();
+    
+    /**
+     * Ends the indexing and removes any temporary files.
+     * This may be called instead of endIndexing()
+     */
+    public void abortIndexingAndCleanUp();
 }

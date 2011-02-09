@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 import javax.servlet.ServletContext;
 
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.rdf.model.ModelChangedListener;
 
 public class ModelContext {
 	
@@ -73,6 +74,28 @@ public class ModelContext {
 	
 	public static void setInferenceOntModel(OntModel ontModel, ServletContext ctx) {
 		ctx.setAttribute(INFERENCE_ONT_MODEL, ontModel);
+	}
+	
+	/**
+	 * Register a listener to the models needed to get changes to:
+	 *   class membership
+	 *   inferred class membership
+	 *   class group membership,   
+	 *   object properties,
+	 *   data properties,
+	 *   inferred object properties,
+	 *   rdfs:label annotations
+	 * This listener does not need:
+	 *   other annotations
+	 *   change to TBox  
+	 */
+	public static void registerListenerForChanges(ServletContext ctx, ModelChangedListener ml){
+	    ModelContext.getJenaOntModel(ctx).register(ml);
+        ModelContext.getBaseOntModel(ctx).register(ml);
+        ModelContext.getInferenceOntModel(ctx).register(ml);
+        ModelContext.getUnionOntModelSelector(ctx).getABoxModel().register(ml);
+        ModelContext.getBaseOntModelSelector(ctx).getABoxModel().register(ml);
+        ModelContext.getInferenceOntModelSelector(ctx).getABoxModel().register(ml);
 	}
 	
 }
