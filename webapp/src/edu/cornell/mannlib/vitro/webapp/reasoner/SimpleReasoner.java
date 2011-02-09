@@ -205,7 +205,7 @@ public class SimpleReasoner extends StatementListener {
 	 */
 	public void addedType(Statement stmt, Model inferenceModel) {
 
-		log.debug("stmt = " + stmt.toString());
+		//log.debug("stmt = " + stmt.toString());
 		
 		tboxModel.enterCriticalSection(Lock.READ);
 		
@@ -231,8 +231,8 @@ public class SimpleReasoner extends StatementListener {
 					Statement infStmt = ResourceFactory.createStatement(stmt.getSubject(), RDF.type, parentClass);
 					inferenceModel.enterCriticalSection(Lock.WRITE);
 					try {
-						if (!inferenceModel.contains(infStmt)) {
-							log.debug("Adding this inferred statement:  " + infStmt.toString() );
+						if (!inferenceModel.contains(infStmt) && !infStmt.equals(stmt) ) {
+						    //log.debug("Adding this inferred statement:  " + infStmt.toString() );
 							inferenceModel.add(infStmt);
 						}
 					} finally {
@@ -255,7 +255,7 @@ public class SimpleReasoner extends StatementListener {
 	 */
 	public void removedType(Statement stmt) {
 		
-		log.debug("stmt = " + stmt.toString());
+		//log.debug("stmt = " + stmt.toString());
 		
 		tboxModel.enterCriticalSection(Lock.READ);
 		
@@ -287,7 +287,7 @@ public class SimpleReasoner extends StatementListener {
 					inferenceModel.enterCriticalSection(Lock.WRITE);
 					try {
 						if (inferenceModel.contains(infStmt)) {
-							log.debug("Removing this inferred statement:  " + infStmt.toString() + " - " + infStmt.getSubject().toString() + " - " + infStmt.getPredicate().toString() + " - " + infStmt.getObject().toString());
+							//log.debug("Removing this inferred statement:  " + infStmt.toString() + " - " + infStmt.getSubject().toString() + " - " + infStmt.getPredicate().toString() + " - " + infStmt.getObject().toString());
 							inferenceModel.remove(infStmt);
 						}
 					} finally {
@@ -306,7 +306,7 @@ public class SimpleReasoner extends StatementListener {
 	// of type cls; otherwise returns false.
 	public boolean entailedType(Resource subject, OntClass cls) {
 		
-		log.debug("subject = " + subject.getURI() + " class = " + cls.getURI());
+		//log.debug("subject = " + subject.getURI() + " class = " + cls.getURI());
 		
 		aboxModel.enterCriticalSection(Lock.READ);
 		tboxModel.enterCriticalSection(Lock.READ);
@@ -354,7 +354,7 @@ public class SimpleReasoner extends StatementListener {
 				inferenceModel.enterCriticalSection(Lock.WRITE);
 				
 				if (!inferenceModel.contains(infStmt)) {
-					log.debug("Adding this inferred statement:  " + infStmt.toString() );
+					//log.debug("Adding this inferred statement:  " + infStmt.toString() );
 					inferenceModel.add(infStmt);
 				} 
 			}
@@ -398,7 +398,7 @@ public class SimpleReasoner extends StatementListener {
 				inferenceModel.enterCriticalSection(Lock.WRITE);
 				
 				if (inferenceModel.contains(infStmt)) {
-					log.debug("Removing this inferred statement:  " + infStmt.toString() );
+					//log.debug("Removing this inferred statement:  " + infStmt.toString() );
 					inferenceModel.remove(infStmt);
 				} 
 			}
@@ -549,7 +549,7 @@ public class SimpleReasoner extends StatementListener {
 					inferenceModel.enterCriticalSection(Lock.WRITE);
 					try {
 						if (!inferenceModel.contains(infStmt)) {
-							log.debug("Adding inferred statement: " + infStmt.toString() + " - " + infStmt.getSubject().toString() + " - " + infStmt.getPredicate().toString() + " - " + infStmt.getObject().toString());
+							//log.debug("Adding inferred statement: " + infStmt.toString() + " - " + infStmt.getSubject().toString() + " - " + infStmt.getPredicate().toString() + " - " + infStmt.getObject().toString());
 							inferenceModel.add(infStmt);
 						}
 					} finally {
@@ -586,7 +586,7 @@ public class SimpleReasoner extends StatementListener {
 					inferenceModel.enterCriticalSection(Lock.WRITE);
 					try {
 						if (inferenceModel.contains(infStmt)) {
-							log.debug("Removing inferred statement: " + infStmt.toString() + " - " + infStmt.getSubject().toString() + " - " + infStmt.getPredicate().toString() + " - " + infStmt.getObject().toString());
+							//log.debug("Removing inferred statement: " + infStmt.toString() + " - " + infStmt.getSubject().toString() + " - " + infStmt.getPredicate().toString() + " - " + infStmt.getObject().toString());
 							inferenceModel.remove(infStmt);
 						}
 					} finally {
