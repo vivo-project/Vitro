@@ -20,6 +20,7 @@ import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.QuerySolutionMap;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.RDFNode;
@@ -401,7 +402,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
         return classSet;
     }
      
-    protected ResultSet getPropertyQueryResults(String subjectUri, Query query) {        
+    protected Iterator<QuerySolution> getPropertyQueryResults(String subjectUri, Query query) {        
         log.debug("SPARQL query:\n" + query.toString());
         // Bind the subject's uri to the ?subject query term
         QuerySolutionMap subjectBinding = new QuerySolutionMap();
@@ -409,13 +410,24 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
                 ResourceFactory.createResource(subjectUri));
 
         // Run the SPARQL query to get the properties
+        System.out.println(dwf.getClass().getName());
         DatasetWrapper w = dwf.getDatasetWrapper();
         Dataset dataset = w.getDataset();
         dataset.getLock().enterCriticalSection(Lock.READ);
         try {
             QueryExecution qexec = QueryExecutionFactory.create(
                     query, dataset, subjectBinding);
-            return qexec.execSelect();
+            try {
+                ResultSet rs = qexec.execSelect();
+                // consume iterator before wrapper w is closed in finally block
+                List<QuerySolution> results = new ArrayList<QuerySolution>();
+                while (rs.hasNext()) {
+                    results.add(rs.next());
+                }
+                return results.iterator();
+            } finally {
+                qexec.close();
+            }
         } finally {
             dataset.getLock().leaveCriticalSection();
             w.close();

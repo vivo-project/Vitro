@@ -755,7 +755,7 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
     public List<DataProperty> getDataPropertyList(String subjectUri) {
         log.debug("Data property query string:\n" + DATA_PROPERTY_QUERY_STRING);         
         log.debug("Data property query:\n" + dataPropertyQuery);        
-        ResultSet results = getPropertyQueryResults(subjectUri, dataPropertyQuery);
+        Iterator<QuerySolution> results = getPropertyQueryResults(subjectUri, dataPropertyQuery);
         List<DataProperty> properties = new ArrayList<DataProperty>();
         while (results.hasNext()) {
             QuerySolution sol = results.next();

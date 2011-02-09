@@ -886,7 +886,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
     public List<ObjectProperty> getObjectPropertyList(String subjectUri) {
         log.debug("Object property query string:\n" + OBJECT_PROPERTY_QUERY_STRING);
         log.debug("Object property query:\n" + objectPropertyQuery);
-        ResultSet results = getPropertyQueryResults(subjectUri, objectPropertyQuery);
+        Iterator<QuerySolution> results = getPropertyQueryResults(subjectUri, objectPropertyQuery);
         List<ObjectProperty> properties = new ArrayList<ObjectProperty>();
         while (results.hasNext()) {
             QuerySolution soln = results.next();
