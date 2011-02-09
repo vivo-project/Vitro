@@ -30,6 +30,42 @@ public class SimpleReasonerTest extends AbstractTestClass {
 	}
 
 	@Test
+	public void addType(){
+	
+		// Test that when a new instance is asserted, its asserted type is not added to the
+		// inference graph
+		
+		// Create a Tbox with a simple class hierarchy. B is a subclass of A.
+		// Pellet will compute TBox inferences
+		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
+		
+		OntClass classA = tBox.createClass("http://test.vivo/A");
+	    classA.setLabel("class A", "en-US");
+
+		OntClass classB = tBox.createClass("http://test.vivo/B");
+	    classB.setLabel("class B", "en-US");
+
+	    classA.addSubClass(classB);
+	            
+        // this is the model to receive inferences
+        Model inf = ModelFactory.createDefaultModel();
+        
+		// create an Abox and register the SimpleReasoner listener with it
+		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
+		aBox.register(new SimpleReasoner(tBox, aBox, inf));
+		
+        // Individual x 
+		Resource ind_x = aBox.createResource("http://test.vivo/x");
+		
+        // add a statement to the ABox that individual x is of type (i.e. is an instance of) B.		
+		Statement xisb = ResourceFactory.createStatement(ind_x, RDF.type, classB);	
+		aBox.add(xisb);		
+
+		// Verify that "x is of type B" was not inferred	
+		Assert.assertFalse(inf.contains(xisb));	
+	}
+	
+	@Test
 	public void addTypes(){
 	
 		// Create a Tbox with a simple class hierarchy. D and E are subclasses of C. B and C are subclasses of A.
