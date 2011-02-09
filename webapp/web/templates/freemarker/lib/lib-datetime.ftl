@@ -63,16 +63,16 @@
             <#if start == end>
                 ${start}
             <#else>
-                ${start} - ${end}
+                ${start}&nbsp;-&nbsp;${end}
             </#if>
         <#elseif start??>
             ${start} -
         <#elseif end??>
-            <#if endAsRange>- </#if>${end}
+            <#if endAsRange>-&nbsp;</#if>${end}
         </#if>
     </#local>
     
-    <#return interval>
+    <#return interval?trim>
 </#function>
 
 <#-- Functions for formatting and applying precision to a datetime
