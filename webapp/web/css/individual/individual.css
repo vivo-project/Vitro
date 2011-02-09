@@ -77,7 +77,6 @@ ul#links-additional{
 }
 img.individual-photo {
     width: 160px;
-    height: 160px;
     margin-left: 0;
     float: left;
     margin-right: 20px;
@@ -87,13 +86,12 @@ img.individual-photo {
     position: absolute;
     padding: 5px 5px 8px 5px;
     background-color: #fff;
-    top: 126px;
-    right: 27px;
+    top: 6px;
+    left: 6px;
 }
 h2#mainImage, #share-contact h2 {
     font-size: 1em;
     line-height: 1em;
-    margin-top: 15px;
     padding-bottom: 0.3em
 }
 ul#individual-tools-people {
@@ -332,8 +330,8 @@ article.property ul.subclass-property-list li {
     position: absolute;
     background: #fff;
     padding: 0 6px 0 0;
-    top: 143px;
-    left: 110px;
+    top: 6px;
+    left: 6px;
 }
 a.edit-mainImage img.edit-individual {
     border: 0;
@@ -342,8 +340,8 @@ a.edit-mainImage img.edit-individual {
 }
 .delete-mainImage {
     position: absolute;
-    top: 143px;
-    left: 140px;
+    top: 6px;
+    left: 36px;
     background: #fff;
     padding: 0 6px 0 8px;
 }
