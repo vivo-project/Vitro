@@ -19,11 +19,11 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
-import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaModelUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 
 public class JenaExportController extends BaseEditController {
 
@@ -97,7 +97,7 @@ public class JenaExportController extends BaseEditController {
 		}
 		
 		
-		String mode = ConfigurationProperties.getProperty("VitroConnection.DataSource.tripleStoreType");
+		String mode = (JenaDataSourceSetupBase.isSDBActive()) ? "SDB" : "RDB"; 
 		if( "abox".equals(subgraphParam)){
 			model = ModelFactory.createDefaultModel();
 			if("inferred".equals(assertedOrInferredParam)){
