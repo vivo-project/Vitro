@@ -5,7 +5,8 @@
 
 <#if link??>
 <form method="post" action="sdbsetup">
-<input type="submit" value="SDB Setup" name="submit"/>
+<p>${sdbstatus}</p>
+<input type="submit" value="Run SDB Setup" name="submit"/>
 <input type="hidden" value="setup" name="setupsignal">
 </form>
 </#if>
