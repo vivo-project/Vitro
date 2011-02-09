@@ -53,6 +53,10 @@ public class SDBSetupController extends FreemarkerHttpServlet {
                 		body.put("link", "show");
                     	messageStr = null;
                     	getServletContext().setAttribute("sdbsetup", "yes");
+                    	if(getServletContext().getAttribute("sdbstatus")!=null)
+                    		body.put("sdbstatus",getServletContext().getAttribute("sdbstatus"));
+                    	else
+                    		body.put("sdbstatus"," ");
                 	}
                 	else if(setupsignal!=null && setupsignal.equals("setup")){
                 		new Thread(new SDBSetupRunner(jenaDataSourceSetupSDB)).start();
@@ -104,7 +108,13 @@ public class SDBSetupController extends FreemarkerHttpServlet {
            }
            if (store!=null) {
                log.info("Setting up SDB store.");
-        	   jenaDataSourceSetupSDB.setupSDB(getServletContext(), store, memModel, inferenceModel);
+               try{
+            	   jenaDataSourceSetupSDB.setupSDB(getServletContext(), store, memModel, inferenceModel);
+            	   getServletContext().setAttribute("sdbstatus","SDB setup done successfully");
+               }
+               catch(Exception e){
+            	   getServletContext().setAttribute("sdbstatus",e.getMessage());
+               }
                log.info("SDB setup complete.");
            }
            done = false;
