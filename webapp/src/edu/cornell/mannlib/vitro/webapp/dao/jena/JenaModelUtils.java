@@ -148,8 +148,12 @@ public class JenaModelUtils {
 private final OntModelSpec DEFAULT_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM;
 	
 	public OntModel extractTBox( Model inputModel) {
-		Dataset dataset = DatasetFactory.create(inputModel);
-		return extractTBox( dataset,null,null );
+	return extractTBox(inputModel, null);	
+	}
+	
+	public OntModel extractTBox( Model inputModel, String namespace ) {
+	    Dataset dataset = DatasetFactory.create(inputModel);
+        return extractTBox( dataset, namespace, null );
 	}
 	
 	public OntModel extractTBox( Dataset dataset, String namespace, String graphURI ) {
