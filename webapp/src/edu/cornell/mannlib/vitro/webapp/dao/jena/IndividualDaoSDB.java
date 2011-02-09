@@ -136,7 +136,10 @@ public class IndividualDaoSDB extends IndividualDaoJena {
         		        continue;
         		    }
         		    if (uri != null && !uri.equals(currRes.getURI())) {
-        		        ents.add(makeIndividual(uri, label, moniker));
+        		        Individual ent = makeIndividual(uri, label, moniker);
+        		        if (ent != null) {
+        		            ents.add(ent);
+        		        }
         	            uri = currRes.getURI();
         	            label = null;
         	            moniker = null;
@@ -152,7 +155,10 @@ public class IndividualDaoSDB extends IndividualDaoJena {
                         moniker = monikerLit.getLexicalForm();
                     }
                     if (!rs.hasNext()) {
-                        ents.add(makeIndividual(uri, label, moniker));
+                        Individual ent = makeIndividual(uri, label, moniker);
+                        if (ent != null) {
+                            ents.add(ent);
+                        }
                     }
         		}
         	} finally {
@@ -189,7 +195,7 @@ public class IndividualDaoSDB extends IndividualDaoJena {
         if( entityURI == null || entityURI.length() == 0 ) {
             return null;
         } else {
-        	return makeIndividual(entityURI);	
+        	return makeIndividual(entityURI);
         }
     }  
     
@@ -368,7 +374,13 @@ public class IndividualDaoSDB extends IndividualDaoJena {
                     return innerIt.hasNext();                    
                 }
                 public Object next() {
-                    return makeIndividual(innerIt.next());
+                    String indURI = innerIt.next();
+                    Individual ind = makeIndividual(indURI);
+                    if (ind != null) {
+                        return ind;
+                    } else {
+                        return new IndividualImpl(indURI);
+                    }
                 }
                 public void remove() {
                     //not used
@@ -388,7 +400,10 @@ public class IndividualDaoSDB extends IndividualDaoJena {
             Iterator indIt = cls.listInstances();
             while (indIt.hasNext()) {
                 com.hp.hpl.jena.ontology.Individual ind = (com.hp.hpl.jena.ontology.Individual) indIt.next();
-                ents.add(makeIndividual(ind.getURI()));
+                Individual ent = makeIndividual(ind.getURI());
+                if (ent != null) {
+                    ents.add(ent);
+                }
             }
             return ents.iterator();
         } finally {
@@ -437,7 +452,10 @@ public class IndividualDaoSDB extends IndividualDaoJena {
                         typeIt.close();
                     }
                     if (userVisible) {
-                        ents.add(makeIndividual(ent.getURI()));
+                        Individual ind = makeIndividual(ent.getURI());
+                        if (ind != null) {
+                            ents.add(ind);
+                        }
                     }
                 }
             }
