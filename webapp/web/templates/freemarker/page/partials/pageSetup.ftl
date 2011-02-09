@@ -8,7 +8,7 @@ the domain of the controllers. -->
     <#-- The compress directives and formatting here resolve whitespace issues in output; please do not alter them. -->
     <#compress>
     <#assign bodyClassList = [currentServlet!]>
-
+    
     <#if user.loggedIn> 
         <#assign bodyClassList = bodyClassList + ["loggedIn"]/>
     </#if> 
