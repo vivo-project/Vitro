@@ -26,7 +26,7 @@ if(prefixes != null){
 		String prefixText = (String) prefixItr.next();
 		if(prefixText.equals("(not yet specified)")){
 			count++;
-			prefixText = "j." + count.toString();		
+			prefixText = "p." + count.toString();		
 		}
 		String urlText = (String) prefixItr.next();%>
 PREFIX <%=prefixText%>: <<%=urlText%>><%}}%>
@@ -38,10 +38,8 @@ PREFIX <%=prefixText%>: <<%=urlText%>><%}}%>
 SELECT ?geoLocation ?label
 WHERE
 {
-  GRAPH ?g {
       ?geoLocation rdf:type core:GeographicLocation
-      OPTIONAL { GRAPH ?h { ?geoLocation rdfs:label ?label } } 
-  }
+      OPTIONAL { ?geoLocation rdfs:label ?label } 
 }
 LIMIT 20
 </textarea>
@@ -64,29 +62,6 @@ LIMIT 20
 	 <input id='RR_N3_BUTTON' type='radio' name='rdfResultFormat' value='N3'> <label for='RR_N3_BUTTON'>N3</label>
 	 <input id='RR_NTRIPLE_BUTTON' type='radio' name='rdfResultFormat' value='N-TRIPLE'> <label for='RR_NTRIPLE_BUTTON'>N-Triples</label>
 	 <input id='RR_TURTLE_BUTTON' type='radio' name='rdfResultFormat' value='TTL'> <label for='RR_TURTLE_BUTTON'>Turtle</label>
-</div>
-
-<div>
-    <h3>Graphs to query: </h3>
-    <p class="parenthetical">(all graphs are queried by default)</p>
-	<ul class="clean">
-	<%
-	try{
-	 if( request.getSession() != null && application.getAttribute("vitroJenaModelMaker") != null ){
-	    ModelMaker maker = (ModelMaker) application.getAttribute("vitroJenaModelMaker");
-	    for (Iterator it = maker.listModels(); it.hasNext(); ) {
-	    String modelName = (String) it.next();
-	        %> <li> <input type="checkbox" name="sourceModelName" value="<%=modelName%>"/><%=modelName%></li>
-	        <%    
-	    }
-	 }else{
-	    %><li>could not find named models in session</li><%
-	 }
-	}catch(Exception ex){  
-	  %><li>could not find named models in ModelMaker</li><%
-	}
-	 %>  
-	</ul>
 </div>
 
 <input class="submit" type="submit" value="Run Query" />
