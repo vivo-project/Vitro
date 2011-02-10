@@ -30,6 +30,7 @@ import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
+import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -122,6 +123,7 @@ public class IndividualController extends FreemarkerHttpServlet {
             body.put("title", individual.getName());            
     		body.put("relatedSubject", getRelatedSubject(vreq));
     		body.put("namespaces", namespaces);
+    		body.put("temporalVisualizationEnabled", getTemporalVisualizationFlag());
     		
     		IndividualTemplateModel itm = getIndividualTemplateModel(vreq, individual);
     		/* We need to expose non-getters in displaying the individual's property list, 
@@ -546,6 +548,15 @@ public class IndividualController extends FreemarkerHttpServlet {
 		}
 	}
  
+	private Boolean getTemporalVisualizationFlag() {
+		String property = ConfigurationProperties.getProperty("visualization.temporal");
+		if ("enabled".equals(property)) {
+			return Boolean.TRUE;
+		} else {
+			return null;
+		}
+	}
+
     private Model getRDF(Individual entity, OntModel contextModel, Model newModel, int recurseDepth ) {
     	Resource subj = newModel.getResource(entity.getURI());
     	
