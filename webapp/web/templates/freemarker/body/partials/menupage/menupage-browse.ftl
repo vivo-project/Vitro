@@ -14,7 +14,7 @@
                 <#assign vClassCamel = vClass.name?capitalize?replace(" ", "")?uncap_first />
                 <#-- Only display vClasses with individuals -->
                 <#if (vClass.entityCount > 0)>
-                    <li id="${vClassCamel}"><a href="#${vClassCamel}" title="Browse all people in this class" data-uri="${vClass.URI}">${vClass.name} <span class="count-classes">(${vClass.entityCount})</span></a></li>
+                    <li id="${vClassCamel}"><a href="#${vClassCamel}" title="Browse all individuals in this class" data-uri="${vClass.URI}">${vClass.name} <span class="count-classes">(${vClass.entityCount})</span></a></li>
                 </#if>
             </#list>
         </ul>
