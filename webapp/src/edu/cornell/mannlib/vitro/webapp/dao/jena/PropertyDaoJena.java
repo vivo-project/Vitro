@@ -410,7 +410,6 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
                 ResourceFactory.createResource(subjectUri));
 
         // Run the SPARQL query to get the properties
-        System.out.println(dwf.getClass().getName());
         DatasetWrapper w = dwf.getDatasetWrapper();
         Dataset dataset = w.getDataset();
         dataset.getLock().enterCriticalSection(Lock.READ);
