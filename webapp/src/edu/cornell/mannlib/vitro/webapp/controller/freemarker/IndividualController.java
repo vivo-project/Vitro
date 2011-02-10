@@ -550,7 +550,7 @@ public class IndividualController extends FreemarkerHttpServlet {
  
 	private boolean getTemporalVisualizationFlag() {
 		String property = ConfigurationProperties.getProperty("visualization.temporal");
-		return "enabled".equals(property);
+		return ! "disabled".equals(property);
 	}
 
     private Model getRDF(Individual entity, OntModel contextModel, Model newModel, int recurseDepth ) {
