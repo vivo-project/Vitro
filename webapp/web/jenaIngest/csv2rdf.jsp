@@ -65,4 +65,4 @@
     </select>
     <p>Destination Model for TBox</p>
 
-    <input id="submit" type="submit" value="Next Step"/>
+    <input class="submit" type="submit" value="Next Step"/>

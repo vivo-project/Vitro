@@ -3,10 +3,8 @@
 <#-- Template for browsing individuals in class groups for menupages -->
 
 <section id="browse-by" role="region">
-    <h2>Browse by</h2>
-    
     <nav role="navigation">
-        <ul id="browse-childClasses">
+        <ul id="browse-classes">
             <#list vClassGroup as vClass>
                 <#------------------------------------------------------------
                 Need to replace vClassCamel with full URL that allows function
@@ -22,18 +20,18 @@
         </ul>
         <nav role="navigation">
             <#assign alphabet = ["A", "B", "C", "D", "E", "F", "G" "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"] />
-            <ul id="alpha-browse-childClass">
+            <ul id="alpha-browse-individuals">
                 <li><a href="#" class="selected" data-alpha="all">All</a></li>
                 <#list alphabet as letter>
-                    <li><a href="#" data-alpha="${letter?lower_case}" title="Browse all individuals whose names start with ${letter}">${letter}</a></li>
+                    <li><a href="#" data-alpha="${letter?lower_case}" title="Browse all individuals whose name starts with ${letter}">${letter}</a></li>
                 </#list>
             </ul>
         </nav>
     </nav>
     
-    <section id="individuals-in-childClass" role="region">
+    <section id="individuals-in-class" role="region">
         <ul role="list">
-            
+            <#-- Will be populated dynamically via AJAX request -->
         </ul>
     </section>
 </section>

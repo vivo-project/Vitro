@@ -45,7 +45,7 @@ ${stylesheets.add("/js/jquery_plugins/jcrop/jquery.Jcrop.css")}
                 <input type="hidden" name="w" value="" />
                 <input type="hidden" name="h" value="" />
                                       
-                <input  id="submit" type="submit" value="Save photo">
+                <input  class="submit" type="submit" value="Save photo">
                 
                 <span class="or"> or <a class="cancel"  href="${cancelUrl}">Cancel</a></span>
             </form>

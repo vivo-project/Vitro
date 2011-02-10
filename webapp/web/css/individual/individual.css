@@ -1,287 +1,237 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-@charset "UTF-8";
-/* CSS Document */
-
 /* ADMIN PANEL------>  */
-div.admin{
-  color: #fff;
-  background: #aaa;
-  padding: 6px;
-  height: 1%; /* IE likes this */
-  width: 98%; /* and this */
+#admin {
+    font-size: .8em;
+    padding-top: 0;
+    padding-right: 40px;
 }
-div.panelContents{
-  color: #777;
-  background: #efebe6;
-/*display: none;*/
-  padding: 12px;
+#admin h3 {
+    display: inline-block;
+    padding: 3px 6px 3px 10px;
+    margin-bottom: 5px;
+    font-size: 14px;
 }
-div.top{
-  margin: 0;
-  padding: 0 24px 0 0;
-  background: #efebe6;
+#admin .uri-link {
+    padding-left: 11px;
+    padding-bottom: 5px;
 }
-div.bottom{
-  margin: 0 -12px;
-  position: relative;
-  bottom: -16px;
-  padding: 6px 12px 8px 12px;
-}
-.admin h3{
-  font-size: 1em;
-  text-transform: uppercase;
-  font-weight: bold;
-  color: #ddd;
-  background: #aaa;
-  line-height: 2em;
-  margin: 0 !important; /* fix for IE6 */
-  margin-right: -24px;
-  padding: 0 12px;
-  width: 100% !important; /* fix for IE6 */
-  width: auto;
-}
-.admin p{ 
-    margin-bottom: .25em; 
-}
-.admin a:link,
-.admin a:visited{ 
-    color: #fff; 
-}
-.panelContents a:link,
-.panelContents a:visited{ 
-    color: #777; 
-}
-.admin a:hover,
-.admin a:active { 
-    color: #000; 
-}
-#loginPanel ul { 
-    margin: 0; 
-}
-#loginPanel li {
-  list-style-type: none;
-  margin-bottom: .5em;
+#admin a.edit-individual {
+    padding-left: 5px;
+    border-left: none;
 }
 /* <------ INDIVIDUAL INTRO FOR ANY CLASS*/
-#individual-intro{
-    float: left;
-    width: 75%;
-    margin-top: 35px;
-    margin-bottom: 45px;
+#individual-intro {
+    margin-top: 15px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
 }
-#individual-intro h1{
-    padding-bottom: 24px;  
+#individual-intro h1 {
+    padding-bottom: 8px;  
 }
-#individual-intro span.preferred-title{
+#individual-intro span.preferred-title {
     padding-left: 10px;
     margin-left: 10px;
 }
-/* <------ INDIVIDUAL INTRO FOR PERSON*/
-#individual-intro-person{
-    float: left;
-    width: 75%;
-    margin-top: 0.5em;
-    margin-bottom: 30px;
+#individual-info h3 {
+    padding-bottom: 5px;
+    margin-top: 5px;
+    clear: left;
 }
-/* <------ INDIVIDUAL INTRO LEFT CONTENT */
-#share-contact{
+#individual-intro a.icon-rdf {
+    font-size: 1.125em;
+}
+ul#links-additional{
+    margin-bottom: 5px;
+}
+/* <------ INDIVIDUAL INTRO FOR PERSON*/
+#individual-intro.person {
+    margin-bottom: 30px;
+    position: relative;
+    width: 100%;
+}
+#individual-intro.person #individual-info {
+    float: left;
+    width: 78%;
+    margin-bottom: 20px;
+}
+#individual-intro.person .individual-overview {
+    width: 100%;
+    float: none;
+}
+/* <------ INDIVIDUAL INTRO - LEFT SIDE CONTENT */
+#share-contact {
+    position: relative;
     width: 166px;
     float: left;
-    padding-left: 0.5em;
     padding-right: 1.5em;
+    margin-bottom: 20px;
 }
-#share-contact h3{
+#share-contact h3 {
     margin-top: 15px;
-    padding-bottom: 0;
-    line-height: .6em;
+    padding-bottom: .3em;
+    font-size: 1em;
+    line-height: 1.2em;
+    padding-top: 0;
 }
-#share-contact img.individual-photo2{
+img.individual-photo {
     width: 160px;
-    height: 160px;
+    margin-left: 0;
     float: left;
+    margin-right: 20px;
+    margin-bottom: 20px;
 }
-ul#individual-tools-people{
+#mainImage {
+    position: absolute;
+    padding: 5px 5px 8px 5px;
+    background-color: #fff;
+    top: 6px;
+    left: 6px;
+}
+h2#mainImage, #share-contact h2 {
+    font-size: 1em;
+    line-height: 1em;
+    padding-bottom: 0.3em
+}
+ul#individual-tools-people {
     margin-top: 5px;
-    height: 27px;
+    height: 20px;
     padding-bottom: 20px;
     list-style-type: none;
     clear: both;
-}
-ul#individual-tools-people li{
-    position: relative;
-    display: block;
-    padding-right: 14px;
-    float: left;
-}
-ul#individual-tools{
-    margin-top: -18px; /*not good adding negative margin*/
-    height: 38px;
-    overflow: hidden;
-    float: left;
-    width: 150px;
-    color: #8AA149
-}
-ul#individual-tools li{
-    position: relative;
-    display: block;
-    padding-right: 14px;
-    float: left;
-    line-height: 27px;
-}
-.icon-rdf{
-    position: absolute;
-    font-size: 1.125em;
-    top: 13px;
-}
-ul#individual-email{
-    clear: both;
-    list-style-type: circle;
-}
-ul#individual-email li{
-    font-size: .875em;
-}
-ul#individual-email li:first-child{
-    font-size: .875em;
-    margin-top: 10px;
-}
-ul#individual-phone{
-    clear: both;
-    list-style-type: circle;
-}
-ul#individual-phone li{
-    font-size: .875em;
-}
-ul#individual-phone li:last-child{
     margin-bottom: 15px;
 }
-ul#individual-phone li:first-child{
+ul#individual-tools-people li {
+    position: relative;
+    display: block;
+    padding-right: 7px;
+    float: left;
+    margin-bottom: 20px;
+}
+ul#individual-tools {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    height: 20px;
+    list-style-type: none;
+}
+ul#individual-tools li {
+    padding-right: 9px;
+    float: left;
+}
+ul#individual-email {
+    clear: both;
+    list-style-type: circle;
+}
+ul#individual-email li {
+    font-size: .875em;
+}
+ul#individual-email li:first-child {
+    font-size: .875em;
     margin-top: 10px;
 }
-.icon-phone, .icon-email{
+ul#individual-phone {
+    clear: both;
+    list-style-type: circle;
+}
+ul#individual-phone li {
+    font-size: .875em;
+}
+ul#individual-phone li:last-child {
+    margin-bottom: 15px;
+}
+ul#individual-phone li:first-child {
+    margin-top: 10px;
+}
+.icon-phone, .icon-email {
     padding-right: 5px;
 }
-ul.individual-urls{
+#individual-intro ul.individual-urls {
     list-style-type: circle;
-    margin-left: 10px;
-    float: left;
-    margin-bottom: 30px;
+    margin-left: 20px;
 }
-ul.individual-urls li{
+#individual-intro ul.individual-urls li {
     font-size: .875em;
-    line-height: 1.2em;
+    line-height: 1.7em;
 }
-ul.individual-urls li a{
-    color: #2485ae;
-}
-ul.individual-urls-people{
+ul.individual-urls-people {
     clear: both;
-    margin-top: 20px;
-    list-style: none;
     list-style-type: circle;
     padding-left: 24px;
 }
-ul.individual-urls-people li{
+ul.individual-urls-people li {
     font-size: .875em;
-    line-height: 1.2em;
+    line-height: 1.3em;
 }
-/* <------ INDIVIDUAL RIGHT CONTENT */
-#individual-info{
-    width: 69%;
+#photo-wrapper {
+    position: relative;
     float: left;
-    padding: 10px 0 0 10px;
 }
-#individual-info h1.fn{
-    padding-bottom: 12px;
+/* <------ INDIVIDUAL INTRO - RIGHT SIDE CONTENT */
+#individual-info {
+    padding: 0;
+    float: left;
+    width: 98%;
+}
+#individual-info.withThumb {
+    width: 78%;
 }
 h1.fn .preferred-title {
     padding-left: 10px;
     margin-left: 10px;
 }
-#individual-info h2{
+#individual-info h2 {
     padding-bottom: 10px;
 }
-ul#individual-positions{
-    padding-bottom: 24px;
-    list-style: none;
-    list-style-type: circle;
-    padding-left: 20px;
-}
-ul#individual-positions li{
-    line-height: 1em;
-}
-.individual-overview{
-    font-size: 1em;
-    padding-bottom: 0;
-    line-height: 1.3em;
-}
-ul#individual-areas{
-    padding-bottom: 24px;
-}
-ul#individual-areas li{
+#individual-info nav {
     float: left;
-    padding-right: 10px;
-    padding-left: 10px;
+    width: 78%;
+    clear: left;
 }
-ul#individual-areas li:first-child{
-    padding-left: 0;
-}
-ul#individual-areas li{
-    float:left;
-    border-right: 1px solid #5e6363;
-    padding-right: 10px;
-    padding-left: 10px;
+#individual-intro .individual-overview {
+    margin-bottom: 30px;
+    margin-top: 10px;
+    display: inline;
+    clear: both;
+    float: left;
 }
 /* <------ INDIVIDUAL VISUALIZATION */
-#publications-visualization{
-    margin-top: 35px;
+#visualization {
+    padding: 0 0 40px 30px;
+    padding-top: 0;
     float: right;
-    width: 226px;
+    background-color: #fff;
 }
-/* <------ SPARKLINES  */
-#sparklines-publications{
-    width: 220px;
-    padding: 0 20px 45px 20px;
-}
-#sparklines-publications h3{
+#visualization h3 {
     padding-top: 10px;
     margin-bottom: 10px;
 }
-.publication-year-range{
+.publication-year-range {
     display: block;
     padding-top: 5px;
 }
-/* <------ TEMPORAL GRAPH  */
-#temporal-graph{
-    width: 220px;
-    padding: 0 20px 45px 20px;
-}
-#temporal-graph h3 img{
-    padding-right: 10px;
-    vertical-align: text-top;
-}
 /* <------ COAUTHORS */
-#co-authors{
+#co-authors {
     padding: 0 20px 30px 20px;
 }
-img.co-author{
+img.co-author {
     margin-right: 5px;
     margin-bottom: 5px;
 }
-#co-authors h3{
+#co-authors h3 {
     margin-bottom: 10px;
 }
-#co-authors ul li{
+#co-authors ul li {
     display: block;
     float: left;
 }
-p.view-all-coauthors{
+p.view-all-coauthors {
     clear: both;
     width:  200px;
     text-align: left;
 }
 /* PROPERTY GROUP MENU------>  */
-#property-group-menu{
+#property-group-menu {
     clear: both;
     width: 95%;;
     height: 46px;
@@ -290,21 +240,21 @@ p.view-all-coauthors{
     margin-bottom: 10px;
     margin-top: 20px;
 }
-#property-group-menu ul{
+#property-group-menu ul {
     display: block;
-    color: #5e6363;
+    list-style-type: none;
 }
-#property-group-menu li{
+#property-group-menu li {
     float: left;
     line-height: 46px;
     padding-right: 15px;
     padding-left: 15px;
 }
-#property-group-menu li:first-child{
+#property-group-menu li:first-child {
      padding-left: 10px;
 }
 /* PROPERTY GROUP------>  */
-.property-group{
+.property-group {
     position: relative;
     clear: both;
     width: 95%;
@@ -313,68 +263,94 @@ p.view-all-coauthors{
     margin-bottom: 20px;
     border: 1px solid #dfebe5;
 }
-.scroll-up{
+.scroll-up {
    position: absolute; 
    width: 21px;
    height: 30px;
    top: 0;
    right: -21px;
 }
-section.property-group h2{
+section.property-group h2 {
     padding: 20px 25px 12px 35px;
 }
-article.property{
+article.property {
     width: 93%;
     margin: 0 auto;
     margin-bottom: 20px;
     border: 1px solid #dfe6e5;
 }
-article.property h3{
+article.property h3 {
     border-bottom: 1px solid #dfe6e5;
     padding: 10px 20px 10px 20px;
 }
 article.property ul.property-list li.subclass h3 {
     border-bottom: none;
     padding: 10px 10px 10px 0;
+    background-color: #fff;
+    margin-bottom: 0;
 }
-article.property .data-property-statement{
+article.property .data-property-statement {
     padding: 10px 20px 10px 20px;
     line-height: 1.2em;
     margin-bottom: 0;
 }
-article.property ul.property-list{
+article.property ul.property-list {
     background: #fff;
     padding-bottom: 20px;
+    list-style-type: none;
 }
-article.property ul.property-list li{
+article.property ul.property-list li {
     line-height: 1.2em;
     padding: 10px 20px 5px 20px;
+    background-color: #fff;
 }
-article.property ul.subclass-property-list{
+article.property ul.subclass-property-list {
     margin-left: 0;
+    list-style-position: inside;
 }
-article.property ul.subclass-property-list li{
+article.property ul.subclass-property-list li {
     line-height: 1.2em;
     padding: 0 20px 10px 20px;
+}
+/* EDITING DISPLAY------>  */
+.add-individual {
+    vertical-align: middle;
+    margin-left: 2px;
+}
+.edit-individual {
+    margin-left: 10px;
+    padding-left: 8px;
+    padding-right: 1px;
+    vertical-align: middle;
+}
+.delete-individual {
+    vertical-align: middle;
+}
+.edit-mainImage {
+    position: absolute;
+    background: #fff;
+    padding: 0 6px 0 0;
+    top: 6px;
+    left: 6px;
+}
+a.edit-mainImage img.edit-individual {
+    border: 0;
+    padding-left: 0px;
+    margin-left: 8px;
+}
+.delete-mainImage {
+    position: absolute;
+    top: 6px;
+    left: 36px;
+    background: #fff;
+    padding: 0 6px 0 8px;
+}
+.middle {
+    vertical-align: middle;
 }
 /* MISCELLANEOUS------>  */
 .listDateTime {
     padding: 0.2em 0.4em;
     font-size: 0.8em;
     background: #f4f4f4;
-}
-/* EDITING DISPLAY------>  */
-.add-individual{
-    vertical-align: middle;
-    margin-left: 2px;
-}
-.edit-individual{
-    border-left: 1px dotted #B2D15A;
-    margin-left: 10px;
-    padding-left: 8px;
-    padding-right: 1px;
-    vertical-align: middle;
-}
-.delete-individual{
-    vertical-align: middle;
 }

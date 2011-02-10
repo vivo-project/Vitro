@@ -138,4 +138,6 @@ public interface WebappDaoFactory {
     public PageDao getPageDao();    
     
     public MenuDao getMenuDao();    
+    
+    public void close();
 }

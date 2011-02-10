@@ -15,6 +15,7 @@ import com.hp.hpl.jena.iri.IRIFactory;
 import com.hp.hpl.jena.iri.Violation;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.ontology.OntResource;
 import com.hp.hpl.jena.query.DataSource;
 import com.hp.hpl.jena.query.Dataset;
@@ -72,7 +73,7 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     protected KeywordDao keywordDao;
     protected LinksDao linksDao;
     protected LinktypeDao linktypeDao;
-    protected ApplicationDao applicationDao;
+    protected ApplicationDaoJena applicationDao;
     protected PortalDao portalDao;
     protected TabDao tabDao;
     protected TabIndividualRelationDao tabs2EntsDao;
@@ -118,6 +119,7 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
         this.userURI = userURI;
         this.flag2ValueMap = base.flag2ValueMap;
         this.flag2ClassLabelMap = base.flag2ClassLabelMap;
+        this.dwf = base.dwf;
     }
 
     public WebappDaoFactoryJena(OntModelSelector ontModelSelector, 
@@ -174,21 +176,36 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
         if (languageUniversalsModel.size()>0) {
         	this.ontModelSelector.getTBoxModel().addSubModel(languageUniversalsModel);
         }
-        DataSource dataset = DatasetFactory.create();
         
-        dataset.addNamedModel(JenaDataSourceSetupBase.JENA_DB_MODEL, 
-                (baseOntModelSelector != null) 
-                    ? baseOntModelSelector.getFullModel()
-                    : ontModelSelector.getFullModel());
-        if (inferenceOntModelSelector != null) {
-            dataset.addNamedModel(JenaDataSourceSetupBase.JENA_INF_MODEL, 
-                    inferenceOntModelSelector.getFullModel());
-        }
+        Model assertions = (baseOntModelSelector != null) 
+                ? baseOntModelSelector.getFullModel()
+                : ontModelSelector.getFullModel();
+        Model inferences = (inferenceOntModelSelector != null) 
+                ? inferenceOntModelSelector.getFullModel()
+                : null;
+        
+        Dataset dataset = makeInMemoryDataset(assertions, inferences);      
         this.dwf = new StaticDatasetFactory(dataset);
         
-        
-        
     } 
+    
+    public static Dataset makeInMemoryDataset(Model assertions, Model inferences) {
+        DataSource dataset = DatasetFactory.create();
+        
+        OntModel union = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+        
+        if (assertions != null) {
+            dataset.addNamedModel(JenaDataSourceSetupBase.JENA_DB_MODEL, assertions);
+            union.addSubModel(assertions);
+        } 
+        if (inferences != null) {
+            dataset.addNamedModel(JenaDataSourceSetupBase.JENA_INF_MODEL, 
+                    inferences);
+            union.addSubModel(inferences);
+        }
+        dataset.setDefaultModel(union);
+        return dataset;
+    }
     
     public WebappDaoFactoryJena(OntModelSelector ontModelSelector, 
             String defaultNamespace, 
@@ -640,6 +657,13 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     @Override
     public DisplayModelDao getDisplayModelDao(){
         return new DisplayModelDaoJena( this );
+    }
+    
+    @Override
+    public void close() {
+        if (applicationDao != null) {
+            applicationDao.close();
+        }   
     }
    
 }

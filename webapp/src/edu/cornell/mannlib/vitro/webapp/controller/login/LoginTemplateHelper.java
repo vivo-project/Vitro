@@ -65,7 +65,7 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 				return doTemplate(vreq, showLoginScreen(vreq));
 			}
 		} catch (Exception e) {
-			log.error(e);
+			log.error(e, e);
 			return doTemplate(vreq, showError(e));
 		}
 	}
@@ -89,7 +89,7 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 				return showLoginScreen(vreq);
 			}
 		} catch (Exception e) {
-			log.error(e);
+			log.error(e, e);
 			return showError(e);
 		}
 	}

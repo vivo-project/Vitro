@@ -24,7 +24,9 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
     private String name;
     private List<PropertyTemplateModel> properties;
       
-    PropertyGroupTemplateModel(VitroRequest vreq, PropertyGroup group, Individual subject, EditingPolicyHelper policyHelper) {
+    PropertyGroupTemplateModel(VitroRequest vreq, PropertyGroup group, 
+            Individual subject, EditingPolicyHelper policyHelper, 
+            List<DataProperty> populatedDataPropertyList, List<ObjectProperty> populatedObjectPropertyList) {
         this.name = group.getName();
         
         List<Property> propertyList = group.getPropertyList();
@@ -32,9 +34,9 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
         for (Property p : propertyList)  {
             if (p instanceof ObjectProperty) {
                 ObjectProperty op = (ObjectProperty)p;
-                properties.add(ObjectPropertyTemplateModel.getObjectPropertyTemplateModel(op, subject, vreq, policyHelper));
+                properties.add(ObjectPropertyTemplateModel.getObjectPropertyTemplateModel(op, subject, vreq, policyHelper, populatedObjectPropertyList));
             } else {
-                properties.add(new DataPropertyTemplateModel((DataProperty)p, subject, vreq, policyHelper));
+                properties.add(new DataPropertyTemplateModel((DataProperty)p, subject, vreq, policyHelper, populatedDataPropertyList));
             }
         }
     }

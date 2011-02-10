@@ -8,6 +8,12 @@ if (request.getAttribute("title") != null) { %>
     <h2><%=request.getAttribute("title")%></h2><%
 }
 %>
+<%
+if (request.getAttribute("title") == "Tabs") { %>
+    <div id="flash-message" role="alert">Tabs have been deprecated with the 1.2 release and is no longer recommended for production VIVO instances. All development relating to tabs has ceased, and it will not be distributed in future releases.
+    </div><%
+}
+%>
 
 <table style="margin-bottom:1.5ex;">
 <tr>

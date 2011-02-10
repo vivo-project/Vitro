@@ -67,7 +67,7 @@ public class OperationUtils{
      * @return
      */
     public static Object cloneBean (Object bean) {
-        return cloneBean(bean, bean.getClass());
+        return cloneBean(bean, bean.getClass(), bean.getClass());
     }
 
     /**
@@ -76,39 +76,61 @@ public class OperationUtils{
      * @param bean
      * @return
      */
-    public static Object cloneBean (Object bean, Class beanClass){
+    public static Object cloneBean (Object bean, Class beanClass, Class iface){
         Object newBean = null;
         try {
             newBean = beanClass.newInstance();
-            Method[] beanMeths = beanClass.getMethods();
-            for (int i=0; i<beanMeths.length ; ++i){
-                String methName = beanMeths[i].getName();
-                if (methName.indexOf("get")==0){
+            Method[] beanMeths = iface.getMethods();
+            for (int i=0; i<beanMeths.length ; ++i) {
+                Method beanMeth = beanMeths[i];
+                String methName = beanMeth.getName();
+                if (methName.startsWith("get") 
+                        && beanMeth.getParameterTypes().length == 0 ) {
                     String fieldName = methName.substring(3,methName.length());
-                    Class returnType = beanMeths[i].getReturnType();
+                    Class returnType = beanMeth.getReturnType();
                     try {
                         Class[] args = new Class[1];
                         args[0] = returnType;
-                        Method setterMethod = beanClass.getMethod("set"+fieldName,args);
+                        Method setterMethod = iface.getMethod("set"+fieldName,args);
                         try {
-                            Object fieldVal = beanMeths[i].invoke(bean,(Object[])null);
+                            Object fieldVal = beanMeth.invoke(bean,(Object[])null);
                             try {
                                 Object[] setArgs = new Object[1];
                                 setArgs[0] = fieldVal;
                                 setterMethod.invoke(newBean,setArgs);
                             } catch (IllegalAccessException iae) {
-                                log.error("edu.cornell.mannlib.vitro.edit.utils.OperationUtils encountered IllegalAccessException invoking "+setterMethod.getName());
+                                log.error(OperationUtils.class.getName() +
+                                        ".cloneBean() " +
+                                        " encountered IllegalAccessException " +
+                                        " invoking " + 
+                                        setterMethod.getName(), iae);
+                                throw new RuntimeException(iae);
                             } catch (InvocationTargetException ite) {
-                                log.error("edu.cornell.mannlib.vitro.edit.utils.OperationUtils encountered InvocationTargetException invoking "+setterMethod.getName());
-                                log.error(ite.getTargetException().getClass().toString());
+                                log.error(OperationUtils.class.getName() +
+                                        ".cloneBean() " +
+                                        " encountered InvocationTargetException" 
+                                        + " invoking " 
+                                        + setterMethod.getName(), ite);
+                                throw new RuntimeException(ite);
                             }
                         } catch (IllegalAccessException iae) {
-                            log.error(OperationUtils.class.getName()+" encountered IllegalAccessException invoking "+beanMeths[i].getName());
+                            log.error(OperationUtils.class.getName() + 
+                                    ".cloneBean() encountered " +
+                                    " IllegalAccessException invoking " + 
+                                    beanMeths[i].getName(), iae);
+                            throw new RuntimeException(iae);
                         } catch (InvocationTargetException ite) {
-                            log.error(OperationUtils.class.getName()+" encountered InvocationTargetException invoking "+beanMeths[i].getName());
-                            log.error(ite.getTargetException().getClass().toString());
+                            log.error(OperationUtils.class.getName() + 
+                                    ".cloneBean() encountered " +
+                                    " InvocationTargetException invoking " + 
+                                    beanMeths[i].getName(), ite);
+                            throw new RuntimeException(ite);
                         } catch (IllegalArgumentException iae) {
-                            // log.error(OperationUtils.class.getName()+" found that "+beanMeths[i].getName()+" requires one or more arguments. Skipping.");
+                            log.error(OperationUtils.class.getName() + 
+                                    ".cloneBean() encountered " +
+                                    " IllegalArgumentException invoking " + 
+                                    beanMeths[i].getName(), iae);
+                            throw new RuntimeException(iae);
                         }
                     } catch (NoSuchMethodException nsme){
                         // ignore this field because there is no setter method

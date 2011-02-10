@@ -36,7 +36,7 @@ public class LuceneIndexFactory {
     	return getLuceneIndexFactoryFromContext(context).innerGetIndexSearcher(context);    	
     }
     
-    public static LuceneIndexFactory getLuceneIndexFactoryFromContext(ServletContext context){
+    protected static LuceneIndexFactory getLuceneIndexFactoryFromContext(ServletContext context){
         Object obj = context.getAttribute(LUCENE_INDEX_FACTORY);        
         if( obj == null ){
             log.error("cannot get LuceneIndexFactory from context.  Search is not setup correctly");
@@ -68,6 +68,20 @@ public class LuceneIndexFactory {
      */
     public synchronized void forceNewIndexSearcher(){
         log.debug("forcing the re-opening of the search index");
+        IndexSearcher oldSearcher = searcher;
+        
+        
+        searcher = null;
+    }
+    
+    protected synchronized void forceClose(){
+        log.debug("forcing the closing of the search index");
+        try {
+            if( searcher != null )
+                searcher.close();
+        } catch (IOException e) {
+            log.error("could not close lucene searcher: " + e.getMessage());
+        }
         searcher = null;
     }
     

@@ -106,7 +106,6 @@ public class IndividualListController extends FreemarkerHttpServlet {
                 }
                 body.put("title", title);  
                 body.put("redirecturl", vreq.getContextPath()+"/entityurl/");
-                getServletContext().setAttribute("inds", inds);
                 getServletContext().setAttribute("classuri", vclass.getURI());
             }   
             

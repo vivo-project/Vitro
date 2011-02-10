@@ -110,7 +110,7 @@ public class EntityController extends VitroHttpServlet {
             return;
             
         } catch (Throwable e) {
-            log.error(e);
+            log.error(e, e);
             req.setAttribute("javax.servlet.jsp.jspException",e);
             RequestDispatcher rd = req.getRequestDispatcher("/error.jsp");
             rd.forward(req, res);
@@ -505,7 +505,14 @@ public class EntityController extends VitroHttpServlet {
 
 		String url = fileInfo.getBytestreamAliasUrl();
 		log.debug("Alias URL for '" + entity.getURI() + "' is '" + url + "'");
-		return url;
+
+		if (entity.getURI().equals(url)) {
+			// Avoid a tight loop; if the alias URL is equal to the URI, then
+			// don't recognize it as a File Bytestream.
+			return null;
+		} else {
+			return url;
+		}
 	}
  
     private Model getRDF(Individual entity, OntModel contextModel, Model newModel, int recurseDepth ) {

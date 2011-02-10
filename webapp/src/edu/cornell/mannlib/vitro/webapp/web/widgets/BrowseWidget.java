@@ -98,7 +98,7 @@ public class BrowseWidget extends Widget {
         values.putAll(FreemarkerHttpServlet.getDirectives());
         try {
             values.put("urls",env.getDataModel().get("urls"));
-            values.put("currentPage", env.getDataModel().get("currentPage"));            
+            values.put("currentServlet", env.getDataModel().get("currentServlet"));            
         } catch (TemplateModelException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

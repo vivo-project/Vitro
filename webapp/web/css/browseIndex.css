@@ -1,45 +1,47 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
 /* browseIndex.css contains styles used in the Index pages.  */
 
 /* INDIVIDUAL LIST ------>  */
-.individualList ul.individualData li{
+.individualList ul.individualData li {
     padding-bottom: 0;
+    display: inline;
+    padding-right: .3em;
 }
 .pagination {
     display: inline-block;
 }
-.pagination li{
+.pagination li {
     display: inline-block;
     padding-right: 2px;
 }
-.pagination li.selectedNavPage{
+.pagination li.selectedNavPage {
     font-size: 1em;
 }
 .rdfLink {
-    font-size: 0.8em;
-}
-.individualList a.externalLink {
-    text-decoration: none;
-    font-weight: normal;
+    padding-left: .5em;
+    font-size: .8em;
+    border-left: 1px solid #a6b1b0;
 }
 .individualList ul.individualData {
     display: inline;
-}
-.individualList ul.individualData li {
-    display: inline;
-    padding-right: .3em;
-    padding-bottom:1.2em;
+    padding: 0.2em 0.4em;
+    font-size: 0.8em;
+    background: #f7f7f7;
 }
 .individualList ul.individualData li.last {
     border: none;
 }
+.individualList a.externalLink {
+    font-weight: normal;
+}
 .individualList ul { 
-    margin-left: 0; 
+    margin-left: 0;
 }
 .individualList li { 
     list-style-type: none;
     margin-bottom: .5em;
- }
+}
 .individualList li a { 
     font-weight: normal; 
 }

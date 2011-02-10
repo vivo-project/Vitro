@@ -5,9 +5,9 @@ var supersleight = function() {
 
 	// local vars
 	var root = false;
-	var applyPositioning = true;
+	var applyPositioning = false;
 	// path to a transparent GIF image
-	var shim = '../images/x.gif';
+	var shim = './images/x.gif';
 
 	var fnLoadPngs = function() {
 		// if supersleight.limitTo called, limit to specified id

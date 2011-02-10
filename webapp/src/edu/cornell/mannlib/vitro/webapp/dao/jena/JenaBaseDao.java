@@ -142,7 +142,6 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     protected void addPropertyStringValue(Resource res, Property dataprop, String value, Model model) {
         if (res != null && dataprop != null && value != null && value.length()>0) {
             model.add(res, dataprop, value, XSDDatatype.XSDstring);
-            System.out.println("JenaBaseDao" + value);
         }
     }
     
@@ -476,7 +475,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
             }
         } catch (Exception e) {
             log.error("Error in updatePropertyDateTimeValue");
-            log.error(e);
+            log.error(e, e);
         }
     }
 
@@ -657,9 +656,10 @@ public class JenaBaseDao extends JenaBaseDaoCon {
             label = tryPropertyForPreferredLanguages( r, RDFS.label, ALSO_TRY_NO_LANG );
             
             // try vitro:label with preferred languages
-            if ( label == null ) {
+            // Commenting out for NIHVIVO-1962
+           /* if ( label == null ) {
                 label = tryPropertyForPreferredLanguages( r, r.getModel().getProperty(VitroVocabulary.label), ALSO_TRY_NO_LANG );
-            }                              
+            }   */                           
         } finally {
             r.getOntModel().leaveCriticalSection();
         }

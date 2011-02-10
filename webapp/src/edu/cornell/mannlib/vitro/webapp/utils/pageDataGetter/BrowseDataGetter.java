@@ -163,12 +163,10 @@ public class BrowseDataGetter implements PageDataGetter {
         
         String vcgUri = getParam(Mode.CLASS_GROUP, request, params);
         VitroRequest vreq = new VitroRequest(request);        
-        //VClassGroup vcg = vreq.getWebappDaoFactory().getVClassGroupDao().getGroupByURI(vcgUri);
         
         VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(context);
         VClassGroup vcg = vcgc.getGroup(vreq.getPortalId(), vcgUri);        
         
-        //vreq.getWebappDaoFactory().getVClassDao().addVClassesToGroup(vcg, false, true);
         ArrayList<VClassTemplateModel> classes = new ArrayList<VClassTemplateModel>(vcg.size());
         for( VClass vc : vcg){
             classes.add(new VClassTemplateModel(vc));
@@ -211,7 +209,7 @@ public class BrowseDataGetter implements PageDataGetter {
         return DEFAULT_MODE;        
     }
     
-    protected String getParam(Mode mode, VitroRequest request, Map params){
+    public static String getParam(Mode mode, VitroRequest request, Map params){
         if( request.getParameter(mode.param) != null )
             return request.getParameter(mode.param);
         if( params.get(mode.param) != null )

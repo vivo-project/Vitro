@@ -28,6 +28,11 @@ public class AttachSubmodels implements ServletContextListener {
 	private static final Log log = LogFactory.getLog( AttachSubmodels.class );
 	
 	public void contextInitialized( ServletContextEvent sce ) {
+	    
+	    if (AbortStartup.isStartupAborted(sce.getServletContext())) {
+            return;
+        }
+	    
 		try {
 		    
 		    //FIXME refactor this

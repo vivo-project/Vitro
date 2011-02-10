@@ -16,4 +16,4 @@
         <input type="text" name="querytext" id="search" class="search-form-item" value="${querytext!}" size="20" />
         <input class="search-form-submit" name="submit" type="submit"  value="Search" />
     </form>
-</div>
+</div> <!-- end searchBlock -->

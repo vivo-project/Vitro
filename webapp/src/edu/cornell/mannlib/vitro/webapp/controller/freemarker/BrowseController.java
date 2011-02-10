@@ -43,52 +43,47 @@ import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassGroupTemplateMo
 
 public class BrowseController extends FreemarkerHttpServlet {
     static final long serialVersionUID=2006030721126L;
-
+    
     private static final Log log = LogFactory.getLog(BrowseController.class);
     
-    private static final String TEMPLATE_DEFAULT = "classGroups.ftl";   
+    private static final String TEMPLATE_DEFAULT = "classGroups.ftl";
      
     @Override
     protected String getTitle(String siteName, VitroRequest vreq) {
-    	return "Index to " + siteName + " Contents";
+        return "Index of Contents";
     }
-
+    
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
-
+        
         Map<String, Object> body = new HashMap<String, Object>();
         String message = null;
         String templateName = TEMPLATE_DEFAULT;
         
-    	if( vreq.getParameter("clearcache") != null ) //mainly for debugging
-    		clearGroupCache();
-    	
-    	int portalId = vreq.getPortalId();
-    	
-    	List<VClassGroup> groups = null;
-    	VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(getServletContext());
-    	if( vcgc == null ){
-    	    log.error("Could not get VClassGroupCache");
-    	    message = "The system is not configured correctly. Please check your logs for error messages.";
-    	}else{    	
-    	    groups =vcgc.getGroups( vreq.getPortalId());
-    	    if (groups == null || groups.isEmpty()) {
-                message = "There are not yet any items in the system.";
+        if ( vreq.getParameter("clearcache") != null ) //mainly for debugging
+            clearGroupCache();
+        
+        int portalId = vreq.getPortalId();
+        
+        List<VClassGroup> groups = null;
+        VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(getServletContext());
+        if ( vcgc == null ) {
+            log.error("Could not get VClassGroupCache");
+            message = "The system is not configured correctly. Please check your logs for error messages.";
+        } else {
+            groups =vcgc.getGroups( vreq.getPortalId());
+            List<VClassGroupTemplateModel> vcgroups = new ArrayList<VClassGroupTemplateModel>(groups.size());
+            for (VClassGroup group : groups) {
+                vcgroups.add(new VClassGroupTemplateModel(group));
             }
-            else {          
-                List<VClassGroupTemplateModel> vcgroups = new ArrayList<VClassGroupTemplateModel>(groups.size());           
-                for (VClassGroup group : groups) {
-                    vcgroups.add(new VClassGroupTemplateModel(group));
-                }
-                body.put("classGroups", vcgroups);
-            } 
-    	}	            	            
-    	
-    	if (message != null) {
-    	    body.put("message", message);
-    	    templateName = Template.TITLED_MESSAGE.toString();
-    	} 
-    	
+            body.put("classGroups", vcgroups);
+        }
+        
+        if (message != null) {
+            body.put("message", message);
+            templateName = Template.TITLED_MESSAGE.toString();
+        }
+        
         return new TemplateResponseValues(templateName, body);
     }
     

@@ -47,7 +47,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.Field;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.SelectListGenerator;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
-import edu.cornell.mannlib.vitro.webapp.web.DisplayVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import freemarker.template.Configuration;
 
 /**
@@ -1114,7 +1114,12 @@ public class InputElementFormattingTag extends TagSupport {
         		} else if ( valueFromLiteral instanceof XSDDateTime) {
         			strFromLit = date.getLexicalForm();
         			log.debug("found existing literal of type XSDDateTime for field " + fieldName);
+            	} else {
+					log.error("found an existing value for field " + fieldName
+							+ "but it was not a String or Date:"
+							+ valueFromLiteral.getClass().getName());
         		} 
+        		
         		if( dateFromLit != null ){
         			dt = new DateTime(dateFromLit);
         		}else{
@@ -1122,9 +1127,6 @@ public class InputElementFormattingTag extends TagSupport {
                     //dt = new DateTime( dtFmt.parseDateTime(strFromLit) );
         			dt = new DateTime( strFromLit );
         		}
-        	} else {
-        		log.error("found an existing value from the editConfig but it was not a String or Date:");
-        		log.error(valueFromLiteral.getClass().getName());
         	}                
         }else{
         	//No EditSubmission found, try to get default value from EditConfig 

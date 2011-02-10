@@ -34,6 +34,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
+import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LoginInProcessFlag;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LoginRedirector;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.Message;
@@ -89,6 +90,9 @@ public class Authenticate extends VitroHttpServlet {
 		VitroRequest vreq = new VitroRequest(request);
 
 		try {
+			if (loginProcessIsRestarting(vreq)) {
+				LoginProcessBean.removeBean(vreq);
+			}
 			if (loginProcessPagesAreEmpty(vreq)) {
 				recordLoginProcessPages(vreq);
 			}
@@ -136,6 +140,23 @@ public class Authenticate extends VitroHttpServlet {
 			showSystemError(e, response);
 		}
 
+	}
+
+	/**
+	 * The after-login page or the return flag are supplied only on the first
+	 * step in the process. If we see either of them, we conclude that the user
+	 * has re-started the login.
+	 */
+	private boolean loginProcessIsRestarting(HttpServletRequest request) {
+		if (isAfterLoginParameterSet(request)) {
+			log.debug("after-login parameter is set: restarting the login.");
+			return true;
+		}
+		if (isReturnParameterSet(request)) {
+			log.debug("return parameter is set: restarting the login.");
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -189,6 +210,10 @@ public class Authenticate extends VitroHttpServlet {
 				return parm;
 			}
 		}
+	}
+
+	private boolean isAfterLoginParameterSet(HttpServletRequest request) {
+		return (null != request.getParameter(PARAMETER_AFTER_LOGIN));
 	}
 
 	private boolean isReturnParameterSet(HttpServletRequest request) {
@@ -451,6 +476,8 @@ public class Authenticate extends VitroHttpServlet {
 			throws IOException {
 		log.debug("logging in.");
 
+		LoginInProcessFlag.set(vreq);
+		
 		String loginProcessPage = LoginProcessBean.getBean(vreq)
 				.getLoginPageUrl();
 		response.sendRedirect(loginProcessPage);

@@ -92,53 +92,65 @@ public class VitroHttpServlet extends HttpServlet {
 			HttpServletResponse response) {
 		LogoutRedirector.recordRestrictedPageUri(request);
 		if (LoginStatusBean.getBean(request).isLoggedIn()) {
+			log.trace("Logged in. No minimum level.");
 			return true;
 		} else {
+			log.trace("Not logged in. No minimum level.");
 			redirectToLoginPage(request, response);
 			return false;
 		}
 	}
 
 	/**
-	 * If not logged in at the required level, redirect them to the appropriate page.
+	 * If not logged in at the required level, redirect them to the appropriate
+	 * page.
 	 */
 	public static boolean checkLoginStatus(HttpServletRequest request,
 			HttpServletResponse response, int minimumLevel) {
 		LogoutRedirector.recordRestrictedPageUri(request);
-		if (LoginStatusBean.getBean(request).isLoggedInAtLeast(minimumLevel)) {
+		LoginStatusBean statusBean = LoginStatusBean.getBean(request);
+		if (statusBean.isLoggedInAtLeast(minimumLevel)) {
+			log.trace("Security level " + statusBean.getSecurityLevel()
+					+ " is sufficient for minimum of " + minimumLevel);
 			return true;
-		} else if (LoginStatusBean.getBean(request).isLoggedIn()) {
+		} else if (statusBean.isLoggedIn()) {
+			log.trace("Security level " + statusBean.getSecurityLevel()
+					+ " is insufficient for minimum of " + minimumLevel);
 			redirectToInsufficientAuthorizationPage(request, response);
 			return false;
 		} else {
+			log.trace("Not logged in; not sufficient for minimum of "
+					+ minimumLevel);
 			redirectToLoginPage(request, response);
 			return false;
 		}
 	}
 
 	/**
-	 * Logged in, but with insufficent authorization. Send them to the
-	 * home page with a message. They won't be coming back.
+	 * Logged in, but with insufficent authorization. Send them to the home page
+	 * with a message. They won't be coming back.
 	 */
-	private static void redirectToInsufficientAuthorizationPage(
+	public static void redirectToInsufficientAuthorizationPage(
 			HttpServletRequest request, HttpServletResponse response) {
 		try {
-			DisplayMessage.setMessage(request, INSUFFICIENT_AUTHORIZATION_MESSAGE);
+			DisplayMessage.setMessage(request,
+					INSUFFICIENT_AUTHORIZATION_MESSAGE);
 			response.sendRedirect(request.getContextPath());
 		} catch (IOException e) {
 			log.error("Could not redirect to show insufficient authorization.");
 		}
 	}
-	
+
 	/**
 	 * Not logged in. Send them to the login page, and then back to the page
 	 * that invoked this.
 	 */
 	public static void redirectToLoginPage(HttpServletRequest request,
-			HttpServletResponse response)  {
+			HttpServletResponse response) {
 		String returnUrl = assembleUrlToReturnHere(request);
-		String loginUrlWithReturn = assembleLoginUrlWithReturn(request, returnUrl);
-		
+		String loginUrlWithReturn = assembleLoginUrlWithReturn(request,
+				returnUrl);
+
 		try {
 			response.sendRedirect(loginUrlWithReturn);
 		} catch (IOException ioe) {
@@ -155,8 +167,8 @@ public class VitroHttpServlet extends HttpServlet {
 		}
 	}
 
-	private static String assembleLoginUrlWithReturn(HttpServletRequest request,
-			String afterLoginUrl) {
+	private static String assembleLoginUrlWithReturn(
+			HttpServletRequest request, String afterLoginUrl) {
 		String encodedAfterLoginUrl = afterLoginUrl;
 		try {
 			encodedAfterLoginUrl = URLEncoder.encode(afterLoginUrl, "UTF-8");
@@ -166,9 +178,10 @@ public class VitroHttpServlet extends HttpServlet {
 		return request.getContextPath() + Controllers.AUTHENTICATE
 				+ "?afterLogin=" + encodedAfterLoginUrl;
 	}
-	
+
 	/**
-	 * If logging is set to the TRACE level, dump the HTTP headers on the request.
+	 * If logging is set to the TRACE level, dump the HTTP headers on the
+	 * request.
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
@@ -177,7 +190,8 @@ public class VitroHttpServlet extends HttpServlet {
 		if (log.isTraceEnabled()) {
 			HttpServletRequest request = (HttpServletRequest) req;
 			Enumeration<String> names = request.getHeaderNames();
-			log.trace("----------------------request:" + request.getRequestURL());
+			log.trace("----------------------request:"
+					+ request.getRequestURL());
 			while (names.hasMoreElements()) {
 				String name = names.nextElement();
 				if (!BORING_HEADERS.contains(name)) {
@@ -194,5 +208,5 @@ public class VitroHttpServlet extends HttpServlet {
 			Arrays.asList(new String[] { "host", "user-agent", "accept",
 					"accept-language", "accept-encoding", "accept-charset",
 					"keep-alive", "connection" }));
-	
+
 }

@@ -39,6 +39,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.FilterFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.HiddenFromDisplayBelowRoleLevelFilter;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
 import edu.cornell.mannlib.vitro.webapp.flags.AuthFlag;
 import edu.cornell.mannlib.vitro.webapp.flags.FlagException;
 import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
@@ -203,9 +204,8 @@ public class VitroRequestPrep implements Filter {
         
         // support for Dataset interface if using Jena in-memory model
         if (vreq.getDataset() == null) {
-        	DataSource dataset = DatasetFactory.create();
-        	dataset.addNamedModel(JenaDataSourceSetupBase.JENA_DB_MODEL, vreq.getAssertionsOntModel());
-        	dataset.addNamedModel(JenaDataSourceSetupBase.JENA_INF_MODEL, vreq.getInferenceOntModel());
+        	Dataset dataset = WebappDaoFactoryJena.makeInMemoryDataset(
+        	        vreq.getAssertionsOntModel(), vreq.getInferenceOntModel());
         	vreq.setDataset(dataset);
         }
         

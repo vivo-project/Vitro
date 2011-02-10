@@ -135,15 +135,16 @@ public class N3MultiPartUpload extends VitroHttpServlet {
 
 		EditConfiguration editConfig = EditConfiguration.getConfigFromSession(
 				session, request);
+		if (editConfig == null) {
+			RequestDispatcher rd = request
+			.getRequestDispatcher("/edit/messages/noEditConfigFound.jsp");
+			rd.forward(request, resp);
+			return;
+		}
+		
         EditSubmission submission = 
             new EditSubmission(request.getParameterMap(), editConfig, request.getFiles());
         EditN3Generator n3Subber = editConfig.getN3Generator();
-
-        if (editConfig == null) {
-            RequestDispatcher rd = request
-                    .getRequestDispatcher("/edit/messages/noEditConfigFound.jsp");
-            rd.forward(request, resp);
-        }
 
         // check for form validation errors
         Map<String, String> errors = submission.getValidationErrors();

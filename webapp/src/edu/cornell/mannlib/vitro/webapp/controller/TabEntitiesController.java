@@ -247,10 +247,10 @@ public void doGet( HttpServletRequest req, HttpServletResponse response )
                 }else if( sortField.equalsIgnoreCase("sunset") ){
                     sort =     new Sort(Entity2LuceneDoc.term.SUNSET);
                 }else{
-                    sort =  new Sort(Entity2LuceneDoc.term.NAMEUNANALYZED);
+                    sort =  new Sort(Entity2LuceneDoc.term.NAMELOWERCASE);
                 }
             } else {
-                sort =     new Sort(Entity2LuceneDoc.term.NAMEUNANALYZED);
+                sort =     new Sort(Entity2LuceneDoc.term.NAMELOWERCASE);
             }
             
             if( depth > 1 && "rand()".equalsIgnoreCase(sortField) ){
@@ -426,24 +426,7 @@ public void doGet( HttpServletRequest req, HttpServletResponse response )
                            }
                            typeQuery.add(tabQueries,BooleanClause.Occur.MUST);
                        }
-                   }
-                   
-                   String flag2Set = tab.getFlag2Set();
-                   if( tab.getFlag2Set() != null && ! tab.getFlag2Set().isEmpty()){                                              
-                       if( flag2Set != null && ! "".equals(flag2Set)){
-                           BooleanQuery flag2Query = new BooleanQuery();
-                           for( String flag2Value : flag2Set.split(",")){
-                               if( flag2Value != null ){
-                                   String value = flag2Value.replace(",", "");
-                                   if(!value.isEmpty()){
-                                       flag2Query.add(new TermQuery(new Term(Entity2LuceneDoc.term.FLAG2,value)),
-                                               BooleanClause.Occur.SHOULD);
-                                   }                                      
-                               }                
-                           }
-                           typeQuery.add(flag2Query, BooleanClause.Occur.MUST);
-                       }                       
-                   }
+                   }                                      
             }
            
             //make query for manually linked individuals
@@ -482,7 +465,7 @@ public void doGet( HttpServletRequest req, HttpServletResponse response )
            Query alphaQuery = null;
            if( alpha != null && !"".equals(alpha) && alpha.length() == 1){      
                alphaQuery =    
-                   new PrefixQuery(new Term(Entity2LuceneDoc.term.NAMEUNANALYZED, alpha.toLowerCase()));
+                   new PrefixQuery(new Term(Entity2LuceneDoc.term.NAMELOWERCASE, alpha.toLowerCase()));
                query.add(alphaQuery,BooleanClause.Occur.MUST);
            }           
            
@@ -539,7 +522,7 @@ public void doGet( HttpServletRequest req, HttpServletResponse response )
             for(int page = 1; page < requiredPages && page <= MAX_PAGES ; page++ ){
                 records.add( new PageRecord( "page=" + page, Integer.toString(page), Integer.toString(page), selectedPage == page ) );            
             }
-            records.add( new PageRecord( "page="+ MAX_PAGES+1, Integer.toString(MAX_PAGES+1), "more...", false));
+            records.add( new PageRecord( "page="+ (MAX_PAGES+1), Integer.toString(MAX_PAGES+1), "more...", false));
         }else if( requiredPages > MAX_PAGES && selectedPage+1 > MAX_PAGES && selectedPage < requiredPages - MAX_PAGES){
             //the selected pages is in the middle of the list of page
             int startPage = selectedPage - MAX_PAGES / 2;

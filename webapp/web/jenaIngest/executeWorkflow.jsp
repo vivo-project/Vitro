@@ -42,4 +42,4 @@
         %>
         </select>
   
-    <input id="submit" type="submit" value="Next &gt;"/>
+    <input class="submit" type="submit" value="Next &gt;"/>

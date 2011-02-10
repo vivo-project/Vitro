@@ -268,4 +268,69 @@ public class DateTimeWithPrecisionTest {
         Assert.assertEquals(XSDDateTime.class, obj.getClass());        
     }
 
+    
+    @Test
+    public void day30Test()  throws Exception{        
+        String FIELDNAME = "testfield";        
+        Field field = new Field();
+        field.setName(FIELDNAME);
+        DateTimeWithPrecision dtwp = new DateTimeWithPrecision(field);
+        
+        
+        /* Check if it works with day number under 29 */
+        Map<String,String[]> queryParameters = new HashMap<String, String[]>();                        
+        queryParameters.put(FIELDNAME+".year", new String[]{"1999" });
+        queryParameters.put(FIELDNAME+".month", new String[]{"12"});
+        queryParameters.put(FIELDNAME+".day", new String[]{"28"});
+                
+        Map<String,String> validationMsgs = dtwp.getValidationMessages("testfield", (EditConfiguration)null, queryParameters);        
+        Assert.assertNotNull(validationMsgs);
+        Assert.assertTrue(validationMsgs.size() == 0 );
+        
+        String precisionURI = dtwp.getSubmittedPrecision( queryParameters);        
+        Assert.assertNotNull(precisionURI);
+        Assert.assertEquals(VitroVocabulary.Precision.DAY.uri(), precisionURI);               
+        
+        /* Check for days greater than 28 */
+        queryParameters = new HashMap<String, String[]>();                        
+        queryParameters.put(FIELDNAME+".year", new String[]{"1999" });
+        queryParameters.put(FIELDNAME+".month", new String[]{"12"});
+        queryParameters.put(FIELDNAME+".day", new String[]{"30"});
+                
+        validationMsgs = dtwp.getValidationMessages("testfield", (EditConfiguration)null, queryParameters);        
+        Assert.assertNotNull(validationMsgs);
+        Assert.assertTrue(validationMsgs.size() == 0 );
+                       
+        precisionURI = dtwp.getSubmittedPrecision( queryParameters);        
+        Assert.assertNotNull(precisionURI);
+        Assert.assertEquals(VitroVocabulary.Precision.DAY.uri(), precisionURI);
+        
+        /* Check for leap year */
+        queryParameters = new HashMap<String, String[]>();                        
+        queryParameters.put(FIELDNAME+".year", new String[]{"2000" });
+        queryParameters.put(FIELDNAME+".month", new String[]{"2"});
+        queryParameters.put(FIELDNAME+".day", new String[]{"29"});
+                
+        validationMsgs = dtwp.getValidationMessages("testfield", (EditConfiguration)null, queryParameters);        
+        Assert.assertNotNull(validationMsgs);
+        Assert.assertTrue(validationMsgs.size() == 0 );
+                       
+        precisionURI = dtwp.getSubmittedPrecision( queryParameters);        
+        Assert.assertNotNull(precisionURI);
+        Assert.assertEquals(VitroVocabulary.Precision.DAY.uri(), precisionURI);
+        
+        /* check for non leap year */
+        queryParameters = new HashMap<String, String[]>();                        
+        queryParameters.put(FIELDNAME+".year", new String[]{"1999" });
+        queryParameters.put(FIELDNAME+".month", new String[]{"2"});
+        queryParameters.put(FIELDNAME+".day", new String[]{"29"});
+                
+        validationMsgs = dtwp.getValidationMessages("testfield", (EditConfiguration)null, queryParameters);        
+        Assert.assertNotNull(validationMsgs);
+        Assert.assertTrue(validationMsgs.size() > 0 );
+                       
+        precisionURI = dtwp.getSubmittedPrecision( queryParameters);        
+        Assert.assertNotNull(precisionURI);
+        Assert.assertEquals(VitroVocabulary.Precision.DAY.uri(), precisionURI);
+    }
 }

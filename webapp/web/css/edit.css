@@ -1,18 +1,24 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-label{
+label {
     display: block; 
     margin-top: .5em; 
 }
-textarea{
+label.inline {
+    display: inline;
+    font-weight: normal;
+}
+input.block {
+    display: block;
+}
+textarea {
     margin-bottom: 1.5em;
 }
-/* mb863-reference: vivo-basic/css/formedit.css*/
 form {
     padding-bottom: 20px;
 }
 .form p {
-    margin-bottom:0.5em;
+    margin-bottom: .5em;
 }
 form textarea {
     width: 60%;
@@ -25,7 +31,7 @@ form a:hover.cancel, form a:active.cancel {
     color: #fff;
     background: #f70;
 }
-form select option{
+form select option {
     padding-right: 5px;
 }
 form dl {
@@ -48,7 +54,6 @@ p.submit {
   clear: left;
   margin-top: 2em;
 }
-/* mb863-reference:vivo-basic/css/edit.css*/
 .buttonForm {
     margin-top: 0;
     margin-bottom: 0;
@@ -68,7 +73,7 @@ p.submit {
     padding-bottom: 1em;
     color: #444444;
     line-height: 16px;
-    background-color: #eee; /* cals+vivo themes were: #dddddd; */
+    background-color: #fff
     min-height: 100px;
     font-size: 0.9em;
 }
@@ -76,10 +81,10 @@ p.submit {
     text-align: left;
     border-width: 1px;
     border-style: solid;
-    border-color: black;
+    border-color: #000;
     border-collapse: separate;
 }
-.editingForm td{
+.editingForm td {
     padding: 2px 2px 2px 2px;
     font-size: 1em;
 }
@@ -93,20 +98,20 @@ td.verticalfieldlabel {
     background-color: #f8f8c8;
     border-width: 1px;
     border-style: solid;
-    border-color: black;
+    border-color: #000;
 }
-.editingForm .entryFormHead h2{
+.editingForm .entryFormHead h2 {
     margin: 0.1em;
     padding : 0em;
     font-size: 1.4em;
-    color: black;
+    color: #000;
 }
-.editingForm .entryFormHead h3{
+.editingForm .entryFormHead h3 {
     margin: 0.1em;
     padding: 0;
     font-size: 1.2em;
     font-weight: 600; /* cals theme was: 650 */
-    color: red;
+    color: #f00;
 }
 .editingForm .entryFormHead .entryFormHeadInstructions {
     margin: 0em;
@@ -120,7 +125,7 @@ td.verticalfieldlabel {
     font-size: 10px;
     border-width: 1px;
 }
-.editingForm .form-button{
+.editingForm .form-button {
     font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
     font-size: 1em;
     margin-top: 2px;
@@ -170,7 +175,7 @@ table.form-background td form {
     background-color: #E05550;
 }
 .form-background.property {
-    background-color : #A8F0A0;
+    background-color: #A8F0A0;
 }
 .form-table-head {
     background-color: #ccf;
@@ -181,13 +186,13 @@ table.form-background td form {
     margin-top: 2px;
 }
 .navlinkblock {
-    color: #000; /*#4B0082;*/
+    color: #000;
     font-family: Verdana,Arial, Helvetica, sans-serif;
     font-size: 10px;
     font-weight: normal;
     margin-top: 1px;
     margin-bottom: 1px;
-    padding-top : 1px;
+    padding-top: 1px;
     padding-bottom: 4px;
 }
 td.editformcell {
@@ -230,7 +235,7 @@ td.editformcell select {
 }
 .rownumheader {
     background-color: #B0C4DE;
-    color: black;
+    color: #000;
     font-family: Arial, Helvetica, sans-serif;
     font-size: 10pt;
     font-style: normal;
@@ -238,7 +243,7 @@ td.editformcell select {
 }
 .headercenter {
     background-color: #9370DB;
-    color: black;
+    color: #000;
     font-family:  Arial, Helvetica, sans-serif;
     font-size:  10pt;
     font-style: normal;
@@ -247,7 +252,7 @@ td.editformcell select {
 .postheader {
     background-color: #E6E6FA;
     color: #777;
-    font-family:; Arial, Helvetica, sans-serif;
+    font-family: Arial, Helvetica, sans-serif;
     font-size: 10pt;
     font-style: normal;
     text-align: left;
@@ -329,6 +334,14 @@ span.entityRelationsSpan {
 div.sparqlform label {
     display: inline;
     font-weight: normal;
+}
+div.sparqlform div {
+    margin-bottom: 1.5em;
+}
+div.sparqlform .parenthetical {
+    font-style: italic;
+    margin-top: 0;
+    margin-bottom: .25em;
 }
 /* Temporary hack to remove stuff from forms in vivoweb only */
 .hideFromVivoWeb {

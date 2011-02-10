@@ -131,8 +131,7 @@ public class LoginProcessBean {
 				MLevel.ERROR);
 
 		public static final Message USING_OLD_PASSWORD = new Message(
-				"Please choose a different password from the "
-						+ "temporary one provided initially.", MLevel.ERROR);
+				"Your new password cannot match the current one.", MLevel.ERROR);
 
 		private final String format;
 		private final MLevel messageLevel;

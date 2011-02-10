@@ -51,4 +51,4 @@
 %>   
     </select>
 
-    <input id="submit" type="submit" value="Generate TBox"/>
+    <input class="submit" type="submit" value="Generate TBox"/>

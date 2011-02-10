@@ -28,6 +28,10 @@ public class JenaPersistentDataSourceSetup extends JenaDataSourceSetupBase
 	
 	public void contextInitialized(ServletContextEvent sce) {
 		
+	    if (AbortStartup.isStartupAborted(sce.getServletContext())) {
+            return;
+        }
+	    
 		Model dbModel;
 		OntModel memModel = ModelFactory.createOntologyModel(
                 this.DB_ONT_MODEL_SPEC);	

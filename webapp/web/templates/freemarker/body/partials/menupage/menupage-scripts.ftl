@@ -29,4 +29,5 @@ template variable with the domain name for an AJAX request with visualizations.
     };
 </script>
 
-${scripts.add("/js/menupage/browseByVClass.js")}
+<#-- Script to enable browsing individuals within a class -->
+${scripts.add("/js/jquery_plugins/jquery.scrollTo-min.js", "/js/menupage/browseByVClass.js")}

@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -16,21 +18,27 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.sdb.SDB;
 import com.hp.hpl.jena.sdb.SDBFactory;
 import com.hp.hpl.jena.sdb.Store;
 import com.hp.hpl.jena.sdb.StoreDesc;
 import com.hp.hpl.jena.sdb.sql.SDBConnection;
 import com.hp.hpl.jena.sdb.store.DatabaseType;
 import com.hp.hpl.jena.sdb.store.LayoutType;
+import com.hp.hpl.jena.sdb.util.StoreUtils;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
-import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
@@ -45,15 +53,21 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelectorImpl;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSDBModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB;
+import edu.cornell.mannlib.vitro.webapp.ontology.update.KnowledgeBaseUpdater;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapper;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.InitialJenaModelUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.NamespaceMapperJena;
 
 public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements javax.servlet.ServletContextListener {
     
-    private static final Log log = LogFactory.getLog(JenaDataSourceSetup.class.getName());
+    private static final Log log = LogFactory.getLog(JenaDataSourceSetupSDB.class);
     
     public void contextInitialized(ServletContextEvent sce) {
+        
+        if (AbortStartup.isStartupAborted(sce.getServletContext())) {
+            return;
+        }
+        
         try {
 
             // JenaPersistentDataSourceSetup should have already set this up - it just sets
@@ -61,6 +75,17 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
             // TODO: I would like to make this code (before the sdb try/catch conditional so
             // that it is not executed in a post-sdb-conversion environment.
             OntModel memModel = (OntModel) sce.getServletContext().getAttribute("jenaOntModel");
+            
+            //memModel.writeAll(System.out,"N3",null);
+            
+            if ( updateRequired(sce.getServletContext(), memModel)) {
+            	log.error(getMigrationErrString());
+            	System.out.println(getMigrationErrString());
+            	// The rest of the application should not 
+            	// start if this condition is encountered
+            	AbortStartup.abortStartup(sce.getServletContext());
+            	throw new MigrationRequiredError(getMigrationErrString());
+            }
             
             if (memModel == null) {
                 memModel = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC);
@@ -92,23 +117,22 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
                     
             checkForNamespaceMismatch( memModel, defaultNamespace );
 
-            // SDB initialization
-            String layoutStr = ConfigurationProperties.getProperty(
-                    "VitroConnection.DataSource.sdb.layout","layout2/hash");
-            String dbtypeStr = ConfigurationProperties.getProperty(
-                    "VitroConnection.DataSource.dbtype", "MySQL");
-            StoreDesc storeDesc = new StoreDesc(
-                    LayoutType.fetch(layoutStr),
-                    DatabaseType.fetch(dbtypeStr) );
-            sce.getServletContext().setAttribute("storeDesc", storeDesc);
+            // SDB setup
+            
+            // union default graph
+            SDB.getContext().set(SDB.unionDefaultGraph, true) ;
+
+            StoreDesc storeDesc = makeStoreDesc();
+            setApplicationStoreDesc(storeDesc, sce.getServletContext());
+
             BasicDataSource bds = makeDataSourceFromConfigurationProperties();
             this.setApplicationDataSource(bds, sce.getServletContext());
-            SDBConnection conn = new SDBConnection(bds.getConnection()) ; 
-            Store store = SDBFactory.connectStore(conn, storeDesc);
-            sce.getServletContext().setAttribute("kbStore", store);
+            
+            Store store = connectStore(bds, storeDesc);
+            setApplicationStore(store, sce.getServletContext());
             
             if (!isSetUp(store)) {
-                log.debug("Non-SDB system detected. Setting up SDB store");
+                log.info("Non-SDB system detected. Setting up SDB store");
                 setupSDB(sce.getServletContext(), store, memModel, inferenceModel);
             }
             
@@ -167,7 +191,7 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
             } catch (Throwable e) {
                 log.error("Unable to load tbox inference cache from DB", e);
             }
-            
+                                  
             // union ABox
             OntModel unionABoxModel = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC,ModelFactory.createUnion(baseOms.getABoxModel(), inferenceOms.getABoxModel()));
             unionOms.setABoxModel(unionABoxModel);
@@ -175,28 +199,69 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
             // union TBox
             OntModel unionTBoxModel = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC,ModelFactory.createUnion(baseOms.getTBoxModel(), inferenceOms.getTBoxModel()));       
             unionOms.setTBoxModel(unionTBoxModel);
-                         
-            // add the vitro ontologies to the tbox models
+                      
+            
+            // Application metadata model is cached in memory.
+            try {
+                
+                Model applicationMetadataModelDB = makeDBModel(bds, JENA_APPLICATION_METADATA_MODEL, DB_ONT_MODEL_SPEC, TripleStoreType.SDB);
+                OntModel applicationMetadataModel = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC);
+                
+                long startTime = System.currentTimeMillis();
+                System.out.println("Copying cached application metadata model into memory");
+                applicationMetadataModel.add(applicationMetadataModelDB);
+                System.out.println((System.currentTimeMillis()-startTime)/1000+" seconds to load application metadata model assertions of size " + applicationMetadataModel.size());
+                applicationMetadataModel.getBaseModel().register(new ModelSynchronizer(applicationMetadataModelDB));
+                
+                if (applicationMetadataModelDB.size() == 0) {
+                    repairAppMetadataModel(applicationMetadataModel, aboxAssertions, aboxInferences);
+                }
+                
+                baseOms.setApplicationMetadataModel(applicationMetadataModel);
+                inferenceOms.setApplicationMetadataModel(baseOms.getApplicationMetadataModel());
+                unionOms.setApplicationMetadataModel(baseOms.getApplicationMetadataModel());
+                
+            } catch (Throwable e) {
+                log.error("Unable to load application metadata model cache from DB", e);
+            }
+            
+            log.info("Adding vitro application ontology");
+            
+            // add the vitroontologies to the tbox models
             OntModel vitroTBoxModel = (new JenaBaseDaoCon()).getConstModel();
             baseOms.getTBoxModel().addSubModel(vitroTBoxModel);
             inferenceOms.getTBoxModel().addSubModel(vitroTBoxModel);
             unionOms.getTBoxModel().addSubModel(vitroTBoxModel);
+            
+            log.info("Setting up union models and DAO factories");
             
             // create TBox + ABox union models and set up webapp DAO factories
             OntModel baseUnion = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM,
                     ModelFactory.createUnion(baseOms.getABoxModel(), baseOms.getTBoxModel()));
             baseOms.setFullModel(baseUnion);
             ModelContext.setBaseOntModel(baseOms.getFullModel(), sce.getServletContext());
-            WebappDaoFactory baseWadf = new WebappDaoFactorySDB(baseOms, bds, storeDesc, defaultNamespace, null, null);
-            //WebappDaoFactory baseWadf = new WebappDaoFactorySDB(baseOms, dataset, defaultNamespace, null, null);
+            WebappDaoFactory baseWadf = new WebappDaoFactorySDB(
+                    baseOms,
+                    bds,
+                    storeDesc, 
+                    defaultNamespace, 
+                    null, 
+                    null, 
+                    WebappDaoFactorySDB.SDBDatasetMode.ASSERTIONS_ONLY);
             sce.getServletContext().setAttribute("assertionsWebappDaoFactory",baseWadf);
             
             OntModel inferenceUnion = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM,
                     ModelFactory.createUnion(inferenceOms.getABoxModel(), inferenceOms.getTBoxModel()));
             inferenceOms.setFullModel(inferenceUnion);
             ModelContext.setInferenceOntModel(inferenceOms.getFullModel(), sce.getServletContext());
-            WebappDaoFactory infWadf = new WebappDaoFactorySDB(inferenceOms, bds, storeDesc, defaultNamespace, null, null);
-            //WebappDaoFactory infWadf = new WebappDaoFactorySDB(inferenceOms, dataset, defaultNamespace, null, null);
+            WebappDaoFactory infWadf = new WebappDaoFactorySDB(
+                    inferenceOms, 
+                    bds, 
+                    storeDesc, 
+                    defaultNamespace, 
+                    null, 
+                    null, 
+                    WebappDaoFactorySDB.SDBDatasetMode.INFERENCES_ONLY);
             sce.getServletContext().setAttribute("deductionsWebappDaoFactory", infWadf);
             
             OntModel masterUnion = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM,
@@ -204,26 +269,22 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
             unionOms.setFullModel(masterUnion);
             sce.getServletContext().setAttribute("jenaOntModel", masterUnion);  
             WebappDaoFactory wadf = new WebappDaoFactorySDB(unionOms, bds, storeDesc, defaultNamespace, null, null);
-            //WebappDaoFactory wadf = new WebappDaoFactorySDB(unionOms, dataset, defaultNamespace, null, null);
             sce.getServletContext().setAttribute("webappDaoFactory",wadf);
-            
-            sce.getServletContext().setAttribute("unionOntModelSelector", unionOms);          //assertions and inferences
-            sce.getServletContext().setAttribute("baseOntModelSelector", baseOms);            //assertions
-            sce.getServletContext().setAttribute("inferenceOntModelSelector", inferenceOms);  //inferences
-            
-            // use "full" models as the legacy application metadata models
-            baseOms.setApplicationMetadataModel(baseOms.getFullModel());
-            inferenceOms.setApplicationMetadataModel(inferenceOms.getFullModel());
-            unionOms.setApplicationMetadataModel(unionOms.getFullModel());
+    
+            ModelContext.setUnionOntModelSelector(unionOms, sce.getServletContext());          // assertions and inferences
+            ModelContext.setBaseOntModelSelector(baseOms, sce.getServletContext());            // assertions
+            ModelContext.setInferenceOntModelSelector(inferenceOms, sce.getServletContext());  // inferences
             
             ApplicationBean appBean = getApplicationBeanFromOntModel(unionOms.getFullModel(),wadf);
             if (appBean != null) {
                 sce.getServletContext().setAttribute("applicationBean", appBean);
             }
             
-            if (isEmpty(unionOms.getFullModel())) {
-                loadDataFromFilesystem(unionOms.getFullModel(), sce.getServletContext());
-            }
+            //if (isEmpty(unionOms.getFullModel())) {
+            //    loadDataFromFilesystem(unionOms.getFullModel(), sce.getServletContext());
+            //}
+            
+            log.info("Checking for user account data");
             
             if (userAccountsModel.size() == 0) {
                 readOntologyFilesInPathSet(AUTHPATH, sce.getServletContext(), userAccountsModel);
@@ -232,7 +293,11 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
                 }
             }                        
             
-            ensureEssentialInterfaceData(unionOms.getFullModel(), sce, wadf);        
+            log.info("Checking for minimal interface metadata");
+            
+            ensureEssentialInterfaceData(unionOms.getApplicationMetadataModel(), sce, wadf);        
+            
+            log.info("Setting up namespace mapper");
             
             NamespaceMapper namespaceMapper = new NamespaceMapperJena(masterUnion, masterUnion, defaultNamespace);
             sce.getServletContext().setAttribute("NamespaceMapper", namespaceMapper);
@@ -240,13 +305,32 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
             
             sce.getServletContext().setAttribute("defaultNamespace", defaultNamespace);
             
+            log.info("SDB store ready for use");
+            
             makeModelMakerFromConnectionProperties(TripleStoreType.RDB);
             VitroJenaModelMaker vjmm = getVitroJenaModelMaker();
             setVitroJenaModelMaker(vjmm,sce);
             makeModelMakerFromConnectionProperties(TripleStoreType.SDB);
             VitroJenaSDBModelMaker vsmm = getVitroJenaSDBModelMaker();
             setVitroJenaSDBModelMaker(vsmm,sce);
-                     
+            
+            log.info("Model makers set up");
+         
+        } catch (MigrationRequiredError mre) {
+        	throw new MigrationRequiredError(mre.getMessage());
+        } catch (SQLException sqle) {
+            
+            // SQL exceptions are fatal and should halt startup
+            AbortStartup.abortStartup(sce.getServletContext());
+            
+            log.error("Error using SQL database; startup aborted.", sqle);
+            
+            // print to catalina.out for good measure
+            System.out.println("Error using SQL database; startup aborted.");
+            sqle.printStackTrace();
+           
+            throw new Error(this.getClass().getName() + "failed");
+            
         } catch (Throwable t) {
             log.error("Throwable in " + this.getClass().getName(), t);
             // printing the error because Tomcat doesn't print context listener
@@ -381,7 +465,9 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
     }
     
     private boolean isEmpty(Model model) {
-        ClosableIterator<Statement> closeIt = model.listStatements();
+        ClosableIterator<Statement> closeIt = model.listStatements(
+                null, RDF.type, ResourceFactory.createResource(
+                        VitroVocabulary.PORTAL));
         try {
             if (closeIt.hasNext()) {
                 return false;
@@ -440,6 +526,54 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
         return;
     }
     
+    private static void getAppMetadata(Model source, Model target) {
+             	
+        String amdQuery = "DESCRIBE ?x WHERE { " +
+                    "{?x a <" + VitroVocabulary.PORTAL +"> } UNION " +
+                    "{?x a <" + VitroVocabulary.TAB +"> } UNION " +
+                    "{?x a <" + VitroVocabulary.PROPERTYGROUP +"> } UNION " +
+                    "{?x a <" + VitroVocabulary.CLASSGROUP +"> } } ";
+        
+		try {						
+			Query q = QueryFactory.create(amdQuery, Syntax.syntaxARQ);
+			QueryExecution qe = QueryExecutionFactory.create(q, source);
+			qe.execDescribe(target);
+	   	} catch (Exception e) {
+			log.error("unable to create the application metadata model",e);
+		}	
+        
+   		return;
+    }
+    
+    private static void repairAppMetadataModel(Model applicationMetadataModel,
+                                               Model aboxAssertions, 
+                                               Model aboxInferences) {
+     	
+    	log.info("Moving application metadata from ABox to dedicated model");
+        getAppMetadata(aboxAssertions, applicationMetadataModel);
+        getAppMetadata(aboxInferences, applicationMetadataModel);
+        aboxAssertions.remove(applicationMetadataModel);
+        aboxInferences.remove(applicationMetadataModel);
+        
+   		return;
+    }
+    
+    public static StoreDesc makeStoreDesc() {
+        String layoutStr = ConfigurationProperties.getProperty(
+                "VitroConnection.DataSource.sdb.layout","layout2/hash");
+        String dbtypeStr = ConfigurationProperties.getProperty(
+                "VitroConnection.DataSource.dbtype", "MySQL");
+       return new StoreDesc(
+                LayoutType.fetch(layoutStr),
+                DatabaseType.fetch(dbtypeStr) );
+    }
+    
+    public static Store connectStore(BasicDataSource bds, StoreDesc storeDesc) 
+            throws SQLException {
+        SDBConnection conn = new SDBConnection(bds.getConnection()) ; 
+        return SDBFactory.connectStore(conn, storeDesc);
+    }
+    
     public static void setupSDB(ServletContext ctx, 
                                 Store store, 
                                 Model memModel, 
@@ -448,58 +582,161 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
         store.getTableFormatter().create();
         store.getTableFormatter().truncate();
         
-        // This is a one-time copy of stored KB data - from a Jena RDB store
-        // to a Jena SDB store. In the process, we will also separate out the
-        // TBox from the Abox; these are in the same graph in pre 1.2 VIVO 
-        // versions and will now be stored and maintained in separate models
-        // Access to the Jena RDB data is through the OntModelSelectors that have
-        // been set up earlier in the current session by
-        // JenaPersistentDataSourceSetup.java
-        // In the code below, note that the current getABoxModel() methods on 
-        // the OntModelSelectors return a graph with both ABox and TBox data.
-    
-        OntModel submodels = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC);
-        readOntologyFilesInPathSet(SUBMODELS, ctx, submodels);
+        store.getTableFormatter().dropIndexes(); // improve load performance
         
-        Model tboxAssertions = SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_TBOX_ASSERTIONS_MODEL);
-        // initially putting the results in memory so we have a
-        // cheaper way of computing the difference when we copy the ABox
-        Model memTboxAssertions = ModelFactory.createDefaultModel();
-        getTBoxModel(memModel, submodels, memTboxAssertions);
-        tboxAssertions.add(memTboxAssertions);
+        try {
         
-        Model tboxInferences = SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_TBOX_INF_MODEL);
-        // initially putting the results in memory so we have a
-        // cheaper way of computing the difference when we copy the ABox
-        Model memTboxInferences = ModelFactory.createDefaultModel();
-        getTBoxModel(inferenceModel, submodels, memTboxInferences);
-        tboxInferences.add(memTboxInferences);
+            // This is a one-time copy of stored KB data - from a Jena RDB store
+            // to a Jena SDB store. In the process, we will also separate out the
+            // TBox from the Abox; these are in the same graph in pre 1.2 VIVO 
+            // versions and will now be stored and maintained in separate models
+            // Access to the Jena RDB data is through the OntModelSelectors that have
+            // been set up earlier in the current session by
+            // JenaPersistentDataSourceSetup.java
+            // In the code below, note that the current getABoxModel() methods on 
+            // the OntModelSelectors return a graph with both ABox and TBox data.
         
-        Model aboxAssertions = SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_DB_MODEL);
-        copyDifference(memModel, memTboxAssertions, aboxAssertions);
-    
-        Model aboxInferences = SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_INF_MODEL);
-        copyDifference(inferenceModel, memTboxInferences, aboxInferences);
+            OntModel submodels = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC);
+            readOntologyFilesInPathSet(SUBMODELS, ctx, submodels);
+            
+            Model tboxAssertions = SDBFactory.connectNamedModel(
+                    store, JenaDataSourceSetupBase.JENA_TBOX_ASSERTIONS_MODEL);
+            // initially putting the results in memory so we have a
+            // cheaper way of computing the difference when we copy the ABox
+            Model memTboxAssertions = ModelFactory.createDefaultModel();
+            getTBoxModel(memModel, submodels, memTboxAssertions);
+            tboxAssertions.add(memTboxAssertions);
+            
+            Model tboxInferences = SDBFactory.connectNamedModel(
+                    store, JenaDataSourceSetupBase.JENA_TBOX_INF_MODEL);
+            // initially putting the results in memory so we have a
+            // cheaper way of computing the difference when we copy the ABox
+            Model memTboxInferences = ModelFactory.createDefaultModel();
+            getTBoxModel(inferenceModel, submodels, memTboxInferences);
+            tboxInferences.add(memTboxInferences);
+            
+            Model aboxAssertions = SDBFactory.connectNamedModel(
+                    store, JenaDataSourceSetupBase.JENA_DB_MODEL);
+            copyDifference(memModel, memTboxAssertions, aboxAssertions);
         
-        // Make sure the reasoner takes into account the newly-set-up data.
-        SimpleReasonerSetup.setRecomputeRequired(ctx);
-
+            Model aboxInferences = SDBFactory.connectNamedModel(
+                    store, JenaDataSourceSetupBase.JENA_INF_MODEL);
+            copyDifference(inferenceModel, memTboxInferences, aboxInferences);
+            
+            // Set up the application metadata model
+            Model applicationMetadataModel = SDBFactory.connectNamedModel(
+                    store, JenaDataSourceSetupBase.JENA_APPLICATION_METADATA_MODEL);
+            getAppMetadata(memModel, applicationMetadataModel);
+    	   	log.info("During initial SDB setup, created an application metadata model of size " 
+    	   	        + applicationMetadataModel.size());
+    	   	
+    	   	// remove application metadata from ABox model
+    	   	aboxAssertions.remove(applicationMetadataModel);
+    	   	aboxInferences.remove(applicationMetadataModel);
+                    
+            // Make sure the reasoner takes into account the newly-set-up data.
+            SimpleReasonerSetup.setRecomputeRequired(ctx);
+        
+        } finally {
+            log.info("Adding indexes to SDB database tables.");
+            store.getTableFormatter().addIndexes();
+            log.info("Indexes created.");
+        }
     }
     
     /**
-     * Tests whether an SDB store has been formatted for use.
+     * Tests whether an SDB store has been formatted and populated for use.
      * @param store
      * @return
      */
-    private boolean isSetUp(Store store) {
+    private boolean isSetUp(Store store) throws SQLException {
+        if (!(StoreUtils.isFormatted(store))) {
+            return false;
+        }
+        
+        // even if the store exists, it may be empty
+        
         try {
-            // a test query to see if the store is formatted
-            SDBFactory.connectDefaultModel(store).contains(
-                    OWL.Thing, RDF.type, OWL.Nothing);
-            return true;
-        } catch (Exception e) { // unformatted store
+            return (SDBFactory.connectNamedModel(store, JenaDataSourceSetupBase.JENA_TBOX_ASSERTIONS_MODEL)).size() > 0;    
+        } catch (Exception e) { 
             return false;
         }
     }
+    
+    private static final String STOREDESC_ATTR = "storeDesc";
+    private static final String STORE_ATTR = "kbStore";
+    
+    public static void setApplicationStoreDesc(StoreDesc storeDesc, 
+                                          ServletContext ctx) {
+        ctx.setAttribute(STOREDESC_ATTR, storeDesc);
+    }
+   
+    public static StoreDesc getApplicationStoreDesc(ServletContext ctx) {
+        return (StoreDesc) ctx.getAttribute(STOREDESC_ATTR);
+    }
+    
+    public static void setApplicationStore(Store store,
+                                           ServletContext ctx) {
+        ctx.setAttribute(STORE_ATTR, store);
+    }
+    
+    public static Store getApplicationStore(ServletContext ctx) {
+        return (Store) ctx.getAttribute(STORE_ATTR);
+    }
+    
+	/**
+	 * Executes a SPARQL ASK query to determine whether the knowledge base
+	 * needs to be updated to conform to a new ontology version
+	 */
+	public boolean updateRequired(ServletContext ctx, OntModel m) throws IOException {
+		
+		boolean required = false;
+		
+		String sparqlQueryStr = KnowledgeBaseUpdater.loadSparqlQuery(UpdateKnowledgeBase.getAskQueryPath(ctx));
+		if (sparqlQueryStr == null) {
+			return required;
+		}
+				
+		Query query = QueryFactory.create(sparqlQueryStr);
+		QueryExecution isUpdated = QueryExecutionFactory.create(query, m);
+		
+		// if the ASK query DOES have a solution (i.e. the assertions exist
+		// showing that the update has already been performed), then the update
+		// is NOT required.
+		
+		if (isUpdated.execAsk()) {
+			required = false;
+		} else {
+			required = true;
+			String sparqlQueryStr2 = KnowledgeBaseUpdater.loadSparqlQuery(UpdateKnowledgeBase.getAskEmptyQueryPath(ctx));
+			if (sparqlQueryStr2 != null) {
+				Query query2 = QueryFactory.create(sparqlQueryStr2);
+				QueryExecution isNotEmpty = QueryExecutionFactory.create(query2, m);
+				required = isNotEmpty.execAsk();
+			} 
+		}
+		
+		return required; 
+	}
+	private String getMigrationErrString() {
+      	String errMessage = "\n*******************************************************************";
+    	errMessage += "\nA knowledge base migration is " +
+    		            	"required and this must be done in" +
+    		            	" RDB mode before converting to SDB. " +
+    		            	"Please change deploy.properties to" +
+    		            	" use RDB mode, redeploy, and restart. After " +
+    		            	"the knowledge base migration has completed " +
+    		            	"successfully, change deploy.properties to use " +
+    		            	"SDB mode, redeploy, and restart.\n";
+    	errMessage += "*******************************************************************";
+		
+		return errMessage;
+    }
+	
+	private class MigrationRequiredError extends Error {
+	       public MigrationRequiredError(String string) {
+	           super(string);
+	       }
+	}
     
  }

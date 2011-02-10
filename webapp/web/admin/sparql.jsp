@@ -49,7 +49,7 @@ td {
 			</tr>
 		</table>
 		<div>
-			<input type="button" id="submit" value="Generate Query" onclick="genQuery();" />
+			<input type="button" class="submit" value="Generate Query" onclick="genQuery();" />
 		</div>
 		<div id="sparqlquery" style="visibility: hidden;">
 			<form action="sparqlquery">
@@ -158,7 +158,7 @@ td {
 					</ul>
 
 				</div>
-				<input type="submit" value="Run Query" id="submit">
+				<input type="submit" value="Run Query" class="submit">
 			</form>
 		</div>
 	</div>

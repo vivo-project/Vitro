@@ -25,8 +25,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SearchReindexingListener;
-import edu.cornell.mannlib.vitro.webapp.search.beans.Searcher;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
 
 /**
@@ -108,8 +108,7 @@ public class LuceneSetupCJK implements javax.servlet.ServletContextListener {
             OntModel baseOntModel = (OntModel)sce.getServletContext().getAttribute("baseOntModel");
             OntModel jenaOntModel = (OntModel)sce.getServletContext().getAttribute("jenaOntModel");
             SearchReindexingListener srl = new SearchReindexingListener( builder );
-            baseOntModel.getBaseModel().register(srl);
-        	jenaOntModel.getBaseModel().register(srl);
+            ModelContext.registerListenerForChanges(sce.getServletContext(), srl);
         	
             }catch(Exception ex){
                 log.error("Could not setup lucene full text search." , ex);
@@ -125,7 +124,7 @@ public class LuceneSetupCJK implements javax.servlet.ServletContextListener {
         	
             log.info("**** Running "+this.getClass().getName()+".contextDestroyed()");
             IndexBuilder builder = (IndexBuilder)sce.getServletContext().getAttribute(IndexBuilder.class.getName());
-        	builder.killIndexingThread();
+        	builder.stopIndexingThread();
         }
 
         /**

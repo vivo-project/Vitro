@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -12,11 +13,14 @@ import org.openrdf.model.impl.URIImpl;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
+import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep;
+import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasoner;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 
 public class IndividualTemplateModel extends BaseTemplateModel {
@@ -40,31 +44,35 @@ public class IndividualTemplateModel extends BaseTemplateModel {
         this.urlBuilder = new UrlBuilder(vreq.getPortal());
         
         // If editing, create a helper object to check requested actions against policies
-        if (isEditable(loginStatusBean)) {
+        if (isEditable()) {
             policyHelper = new EditingPolicyHelper(vreq, getServletContext());
         } 
     }
-
-    /** 
-     * Return true iff the user is editing. 
-     * These tests may change once self-editing issues are straightened out. What we really need to know
-     * is whether the user can edit this profile, not whether in general he/she is an editor.
-     */
-    private boolean isEditable(LoginStatusBean loginStatusBean) { 
-        boolean isSelfEditing = VitroRequestPrep.isSelfEditing(vreq);
-        boolean isCurator = loginStatusBean.isLoggedInAtLeast(LoginStatusBean.CURATOR);
-        return isSelfEditing || isCurator;
-    }
+    
+//    private boolean isVClass(String vClassUri) {
+//        boolean isVClass = individual.isVClass(vClassUri);  
+//        // If reasoning is asynchronous (under RDB), this inference may not have been made yet. 
+//        // Check the superclasses of the individual's vclass.
+//        if (!isVClass && SimpleReasoner.isABoxReasoningAsynchronous(getServletContext())) { 
+//            log.debug("Checking superclasses to see if individual is a " + vClassUri + " because reasoning is asynchronous");
+//            List<VClass> directVClasses = individual.getVClasses(true);
+//            for (VClass directVClass : directVClasses) {
+//                VClassDao vcDao = vreq.getWebappDaoFactory().getVClassDao();
+//                List<String> superClassUris = vcDao.getAllSuperClassURIs(directVClass.getURI());
+//                if (superClassUris.contains(vClassUri)) {
+//                    isVClass = true;
+//                    break;
+//                }
+//            }
+//        }
+//        return isVClass;
+//    }
     
     
     /* These methods perform some manipulation of the data returned by the Individual methods */
     
     public String getProfileUrl() {
         return UrlBuilder.getIndividualProfileUrl(individual, vreq.getWebappDaoFactory());
-    }
-    
-    public String getVisualizationUrl() {
-        return isPerson() ? getUrl(Route.VISUALIZATION_AJAX.path(), "uri", getUri()) : null;
     }
 
     // This remains as a convenience method for getting the image url. We could instead use a custom list 
@@ -111,7 +119,6 @@ public class IndividualTemplateModel extends BaseTemplateModel {
         }
 
         // http://some.other.namespace/n2345?format=rdfxml
-        // ** RY Not sure it is correct to return this for the <link> element
         return UrlBuilder.addParams(profileUrl, "format", "rdfxml");
 
     }
@@ -120,19 +127,6 @@ public class IndividualTemplateModel extends BaseTemplateModel {
         return urlBuilder.getPortalUrl(Route.INDIVIDUAL_EDIT, "uri", getUri());
     }
 
-    // RY We should not have references to a specific ontology in the vitro code!
-    // Figure out how to move this out of here.
-    // We could subclass IndividualTemplateModel in the VIVO code and add the isPerson()
-    // and getVisualizationUrl() methods there, but we still need to know whether to
-    // instantiate the IndividualTemplateModel or the VivoIndividualTemplateModel class.
-    public boolean isPerson() {
-        return individual.isVClass("http://xmlns.com/foaf/0.1/Person");        
-    }
-    
-    public boolean isOrganization() {
-        return individual.isVClass("http://xmlns.com/foaf/0.1/Organization");        
-    }
-    
     public GroupedPropertyList getPropertyList() {
         if (propertyList == null) {
             propertyList = new GroupedPropertyList(individual, vreq, policyHelper);
@@ -140,17 +134,21 @@ public class IndividualTemplateModel extends BaseTemplateModel {
         return propertyList;
     }
     
-    public boolean getShowEditingLinks() {
+    public boolean isEditable() {
         // RY This will be improved later. What is important is not whether the user is a self-editor,
-        // but whether he has editing privileges on this profile.
-        return VitroRequestPrep.isSelfEditing(vreq) || 
-            loginStatusBean.isLoggedInAtLeast(LoginStatusBean.NON_EDITOR);
+        // but whether he has editing privileges on this profile. This is just a crude way of determining
+        // whether to even bother looking at the editing policies.
+        return VitroRequestPrep.isSelfEditing(vreq) || loginStatusBean.isLoggedIn();            
     }
     
     public boolean getShowAdminPanel() {
         return loginStatusBean.isLoggedInAtLeast(LoginStatusBean.EDITOR);
     }
  
+    /* rdfs:label needs special treatment, because it is not possible to construct a 
+     * DataProperty from it. It cannot be handled the way the vitro links and vitro public image
+     * are handled like ordinary ObjectProperty instances.
+     */
     public DataPropertyStatementTemplateModel getNameStatement() {
         String propertyUri = VitroVocabulary.LABEL; // rdfs:label
         DataPropertyStatementTemplateModel dpstm = new DataPropertyStatementTemplateModel(getUri(), propertyUri, vreq, policyHelper);

@@ -16,4 +16,4 @@
 
 </div>
 
-${stylesheets.addFromTheme("/css/search.css")}
+${stylesheets.add("/css/search.css")}

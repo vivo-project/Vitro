@@ -5,10 +5,10 @@
 #login-form label, 
 #login-form input.text,
 #login-form #password,
-#login-form #confirmPassword{
+#login-form #confirmPassword {
     display: block;  
 }
-#login-form label.label-remember-me{
+#login-form label.label-remember-me {
     display: block;
 }
 #login-form p.submit {
@@ -44,7 +44,7 @@ p.request-account {
     margin-top: 1em;
     text-align: center;
 }
-.or-auth{
+.or-auth {
     margin-left: 135px;
     width: 30px;
     height: 30px;
@@ -55,7 +55,7 @@ p.request-account {
     color: #fff;
     font-size: .8em;
 }
-h3.internal-auth{
+h3.internal-auth {
     margin-left: 38px;
     color: #5F6464;
     font-size: 1em;

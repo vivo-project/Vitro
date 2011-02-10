@@ -5,7 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.reasoner;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mindswap.pellet.jena.PelletReasonerFactory;
 
@@ -30,6 +29,42 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		suppressSyserr();
 	}
 
+	@Test
+	public void addType(){
+	
+		// Test that when a new instance is asserted, its asserted type is not added to the
+		// inference graph
+		
+		// Create a Tbox with a simple class hierarchy. B is a subclass of A.
+		// Pellet will compute TBox inferences
+		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
+		
+		OntClass classA = tBox.createClass("http://test.vivo/A");
+	    classA.setLabel("class A", "en-US");
+
+		OntClass classB = tBox.createClass("http://test.vivo/B");
+	    classB.setLabel("class B", "en-US");
+
+	    classA.addSubClass(classB);
+	            
+        // this is the model to receive inferences
+        Model inf = ModelFactory.createDefaultModel();
+        
+		// create an Abox and register the SimpleReasoner listener with it
+		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
+		aBox.register(new SimpleReasoner(tBox, aBox, inf));
+		
+        // Individual x 
+		Resource ind_x = aBox.createResource("http://test.vivo/x");
+		
+        // add a statement to the ABox that individual x is of type (i.e. is an instance of) B.		
+		Statement xisb = ResourceFactory.createStatement(ind_x, RDF.type, classB);	
+		aBox.add(xisb);		
+
+		// Verify that "x is of type B" was not inferred	
+		Assert.assertFalse(inf.contains(xisb));	
+	}
+	
 	@Test
 	public void addTypes(){
 	
@@ -305,6 +340,135 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		// Verify that "y is of type A" is in the inference graph
 		Statement yisa = ResourceFactory.createStatement(ind_y, RDF.type, classA);	
 		Assert.assertTrue(inf.contains(yisa));
+				
+	}
+	
+	// Test inference based on class equivalence
+	// 
+	@Test
+	public void equivClass1(){
+				
+		// Create TBox, ABox and Inference models and register
+		// the ABox reasoner listeners with the ABox and TBox
+		// Pellet will compute TBox inferences
+		
+		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
+		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
+        Model inf = ModelFactory.createDefaultModel();
+		
+        SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
+		aBox.register(simpleReasoner);
+		tBox.register(new SimpleReasonerTBoxListener(simpleReasoner));
+
+		// Add classes classes A, B and C to the TBox
+	    // A is equivalent to B
+		// C is a subclass of A
+		
+		OntClass classA = tBox.createClass("http://test.vivo/A");
+	    classA.setLabel("class A", "en-US");
+
+		OntClass classB = tBox.createClass("http://test.vivo/B");
+	    classB.setLabel("class B", "en-US");
+
+		OntClass classC = tBox.createClass("http://test.vivo/C");
+	    classC.setLabel("class C", "en-US");
+
+	    classA.addEquivalentClass(classB);
+	    classA.addSubClass(classC);
+	    
+        // Add a statement that individual x is of type C to the ABox
+		Resource ind_x = aBox.createResource("http://test.vivo/x");
+		aBox.add(ind_x, RDF.type, classC);		
+	    
+		// Verify that "x is of type A" was inferred
+		Statement xisa = ResourceFactory.createStatement(ind_x, RDF.type, classA);	
+		Assert.assertTrue(inf.contains(xisa));		
+		
+		// Verify that "x is of type B" was inferred
+		Statement xisb = ResourceFactory.createStatement(ind_x, RDF.type, classB);	
+		Assert.assertTrue(inf.contains(xisb));		
+
+	}
+	
+	// Test inference based on class equivalence
+	// 
+	@Test
+	public void equivClass2(){
+				
+		// Create TBox, ABox and Inference models and register
+		// the ABox reasoner listeners with the ABox and TBox
+		// Pellet will compute TBox inferences
+		
+		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
+		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
+        Model inf = ModelFactory.createDefaultModel();
+		
+        SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
+		aBox.register(simpleReasoner);
+		tBox.register(new SimpleReasonerTBoxListener(simpleReasoner));
+
+		// Add classes classes A and B to the TBox
+	    // A is equivalent to B
+		
+		OntClass classA = tBox.createClass("http://test.vivo/A");
+	    classA.setLabel("class A", "en-US");
+
+		OntClass classB = tBox.createClass("http://test.vivo/B");
+	    classB.setLabel("class B", "en-US");
+
+	    classA.addEquivalentClass(classB);
+	    
+        // Add a statement that individual x is of type B to the ABox
+		Resource ind_x = aBox.createResource("http://test.vivo/x");
+		aBox.add(ind_x, RDF.type, classB);		
+	    
+		// Verify that "x is of type A" was inferred
+		Statement xisa = ResourceFactory.createStatement(ind_x, RDF.type, classA);	
+		Assert.assertTrue(inf.contains(xisa));		
+	}
+	
+	
+	// Test inference based on class equivalence
+	// 
+	@Test
+	public void equivClass3(){
+				
+		// Create TBox, ABox and Inference models and register
+		// the ABox reasoner listeners with the ABox and TBox
+		// Pellet will compute TBox inferences
+		
+		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
+		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
+        Model inf = ModelFactory.createDefaultModel();
+		
+        SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
+		aBox.register(simpleReasoner);
+		tBox.register(new SimpleReasonerTBoxListener(simpleReasoner));
+
+		// Add classes classes A and B to the TBox
+	    // A is equivalent to B
+		
+		OntClass classA = tBox.createClass("http://test.vivo/A");
+	    classA.setLabel("class A", "en-US");
+
+		OntClass classB = tBox.createClass("http://test.vivo/B");
+	    classB.setLabel("class B", "en-US");
+
+	    classA.addEquivalentClass(classB);
+	    
+        // Add a statement that individual x is of type B to the ABox
+		Resource ind_x = aBox.createResource("http://test.vivo/x");
+		aBox.add(ind_x, RDF.type, classB);		
+	    
+		// Verify that "x is of type A" was inferred
+		Statement xisa = ResourceFactory.createStatement(ind_x, RDF.type, classA);	
+		Assert.assertTrue(inf.contains(xisa));	
+		
+		// Remove the statement that x is of type B from the ABox
+		aBox.remove(ind_x, RDF.type, classB);
+		
+		// Verify that "x is of type A" was removed from the inference graph
+		Assert.assertFalse(inf.contains(xisa));	
 				
 	}
 	

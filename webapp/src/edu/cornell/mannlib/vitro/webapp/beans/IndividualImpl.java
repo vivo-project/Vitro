@@ -501,4 +501,8 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
            return getURI() + " " + getName();
        }
    }
+    
+    public boolean hasThumb() {
+        return getThumbUrl() != null && ! getThumbUrl().isEmpty();
+    }
 }

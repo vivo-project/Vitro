@@ -4,14 +4,11 @@ package edu.cornell.mannlib.vitro.webapp.search.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -32,17 +29,14 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.WildcardQuery;
 
-import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
-import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
 import edu.cornell.mannlib.vitro.webapp.search.SearchException;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc;
-import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneIndexer;
+import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneIndexFactory;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup;
-import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
 import freemarker.template.Configuration;
 
 /**
@@ -84,8 +78,7 @@ public class AutocompleteController extends FreemarkerHttpServlet{
                 log.error("makeUsableBeans() could not get IndividualDao ");
                 doSearchError(map, config, request, response);
                 return;
-            }
-            IndividualDao iDao = vreq.getWebappDaoFactory().getIndividualDao();                       
+            }                    
             
             int maxHitSize = defaultMaxSearchSize;
             
@@ -93,12 +86,12 @@ public class AutocompleteController extends FreemarkerHttpServlet{
             Analyzer analyzer = getAnalyzer(getServletContext());
             
             Query query = getQuery(vreq, portalFlag, analyzer, qtxt);             
-            log.debug("query for '" + qtxt +"' is " + query.toString());
-
             if (query == null ) {
+                log.debug("query for '" + qtxt +"' is null.");
                 doNoQuery(map, config, request, response);
                 return;
             }
+            log.debug("query for '" + qtxt +"' is " + query.toString());
                         
             IndexSearcher searcherForRequest = LuceneIndexFactory.getIndexSearcher(getServletContext());
             
@@ -135,13 +128,10 @@ public class AutocompleteController extends FreemarkerHttpServlet{
             for(int i=0; i<topDocs.scoreDocs.length ;i++){
                 try{                     
                     Document doc = searcherForRequest.doc(topDocs.scoreDocs[i].doc);                    
-                    String uri = doc.get(Entity2LuceneDoc.term.URI);
-                    Individual ind = iDao.getIndividualByURI(uri);
-                    if (ind != null) {
-                        String name = ind.getName();
-                        SearchResult result = new SearchResult(name, uri);
-                        results.add(result);
-                    }
+                    String uri = doc.get(VitroLuceneTermNames.URI);
+                    String name = doc.get(VitroLuceneTermNames.NAMERAW);
+                    SearchResult result = new SearchResult(name, uri);
+                    results.add(result);
                 } catch(Exception e){
                     log.error("problem getting usable Individuals from search " +
                             "hits" + e.getMessage());
@@ -197,7 +187,7 @@ public class AutocompleteController extends FreemarkerHttpServlet{
                 BooleanQuery boolQuery = new BooleanQuery(); 
                 String typeParam = (String) request.getParameter("type");
                 boolQuery.add(  new TermQuery(
-                        new Term(Entity2LuceneDoc.term.RDFTYPE, 
+                        new Term(VitroLuceneTermNames.RDFTYPE, 
                                 typeParam)),
                     BooleanClause.Occur.MUST);
                 boolQuery.add(query, BooleanClause.Occur.MUST);
@@ -242,7 +232,7 @@ public class AutocompleteController extends FreemarkerHttpServlet{
  
         String stemParam = (String) request.getParameter("stem"); 
         boolean stem = "true".equals(stemParam);
-        String termName = stem ? Entity2LuceneDoc.term.NAME : Entity2LuceneDoc.term.NAMEUNSTEMMED;
+        String termName = stem ? VitroLuceneTermNames.NAME : VitroLuceneTermNames.NAMEUNSTEMMED;
 
         BooleanQuery boolQuery = new BooleanQuery();
         
@@ -270,7 +260,7 @@ public class AutocompleteController extends FreemarkerHttpServlet{
             
             log.debug("Name query is: " + boolQuery.toString());
         } catch (ParseException e) {
-            log.warn(e);
+            log.warn(e, e);
         }
         
         
@@ -329,7 +319,7 @@ public class AutocompleteController extends FreemarkerHttpServlet{
     private Query makeUntokenizedNameQuery(String querystr) {
         
         querystr = querystr.toLowerCase();
-        String termName = Entity2LuceneDoc.term.NAMEUNANALYZED;
+        String termName = VitroLuceneTermNames.NAMELOWERCASE;
         BooleanQuery query = new BooleanQuery();
         log.debug("Adding wildcard query on unanalyzed name");
         query.add( 
@@ -339,58 +329,6 @@ public class AutocompleteController extends FreemarkerHttpServlet{
         return query;
     }
             
-    /**
-     * Makes a flag based query clause.  This is where searches can filtered
-     * by portal.
-     *
-     * If you think that search is not working correctly with protals and
-     * all that kruft then this is a method you want to look at.
-     *
-     * It only takes into account "the portal flag" and flag1Exclusive must
-     * be set.  Where does that stuff get set?  Look in vitro.flags.PortalFlag
-     * 
-     * One thing to keep in mind with portal filtering and search is that if
-     * you want to search a portal that is different then the portal the user
-     * is 'in' then the home parameter should be set to force the user into
-     * the new portal.  
-     * 
-     * Ex.  Bob requests the search page for vivo in portal 3.  You want to
-     * have a drop down menu so bob can search the all CALS protal, id 60.
-     * You need to have a home=60 on your search form. If you don't set 
-     * home=60 with your search query, then the search will not be in the
-     * all portal AND the WebappDaoFactory will be filtered to only show 
-     * things in portal 3.    
-     * 
-     * Notice: flag1 as a parameter is ignored. bdc34 2009-05-22.
-     */
-    @SuppressWarnings("static-access")
-    private Query makeFlagQuery( PortalFlag flag){        
-        if( flag == null || !flag.isFilteringActive() 
-                || flag.getFlag1DisplayStatus() == flag.SHOW_ALL_PORTALS )
-            return null;
-
-        // make one term for each bit in the numeric flag that is set
-        Collection<TermQuery> terms = new LinkedList<TermQuery>();
-        int portalNumericId = flag.getFlag1Numeric();        
-        Long[] bits = FlagMathUtils.numeric2numerics(portalNumericId);
-        for (Long bit : bits) {
-            terms.add(new TermQuery(new Term(Entity2LuceneDoc.term.PORTAL, Long
-                    .toString(bit))));
-        }
-
-        // make a boolean OR query for all of those terms
-        BooleanQuery boolQuery = new BooleanQuery();
-        if (terms.size() > 0) {
-            for (TermQuery term : terms) {
-                    boolQuery.add(term, BooleanClause.Occur.SHOULD);
-            }
-            return boolQuery;
-        } else {
-            //we have no flags set, so no flag filtering
-            return null;
-        }
-    }
-
     private QueryParser getQueryParser(String searchField, Analyzer analyzer){
         // searchField indicates which field to search against when there is no term
         // indicated in the query string.

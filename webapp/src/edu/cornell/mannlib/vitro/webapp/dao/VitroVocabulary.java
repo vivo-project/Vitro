@@ -29,6 +29,8 @@ public class VitroVocabulary {
     public static final String OWL = "http://www.w3.org/2002/07/owl#";
     public static final String OWL_ONTOLOGY = OWL+"Ontology";
     public static final String OWL_THING = OWL+"Thing";
+    
+    public static final String AFN = "http://jena.hpl.hp.com/ARQ/function#";
 
     public static final String label = vitroURI + "label";
     

@@ -2,12 +2,15 @@
 
 <#assign populatedClasses = 0 />
 
-<#list vClassGroup as vClass>
-    <#-- Check to see if any of the classes in this class group have individuals -->
-    <#if (vClass.entityCount > 0)>
-        <#assign populatedClasses = populatedClasses + 1 />
-    </#if>
-</#list>
+<#if vClassGroup??> <#-- the controller may put a null -->
+    <#list vClassGroup as vClass>
+        <#-- Check to see if any of the classes in this class group have individuals -->
+        <#if (vClass.entityCount > 0)>
+            <#assign populatedClasses = populatedClasses + 1 />
+        </#if>
+    </#list>
+</#if>
+
 <#if (populatedClasses == 0)>
     <#assign noData = true />
 <#else>
@@ -15,9 +18,12 @@
 </#if>
 
 <#assign noDataNotification>
-    <h3>There are currently no ${page.title?lower_case} in the system</h3>
-    
-    <#if !user.loggedIn>
+    <h3>There is currently no ${page.title} content in the system</h3>
+    <#if user.loggedIn>
+        <#if user.hasSiteAdminAccess>
+            <p>You can <a href="${urls.siteAdmin}" title="Manage content">add content and manage this site</a> from the Site Administration page.</p>
+        </#if>
+    <#else>
         <p>Please <a href="${urls.login}" title="log in to manage this site">log in</a> to manage content.</p>
     </#if>
     

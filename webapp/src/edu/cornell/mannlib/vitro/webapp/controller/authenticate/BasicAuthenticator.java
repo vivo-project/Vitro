@@ -164,7 +164,7 @@ public class BasicAuthenticator extends Authenticator {
 		LoginStatusBean lsb = new LoginStatusBean(userUri, username,
 				securityLevel, authSource);
 		LoginStatusBean.setBean(session, lsb);
-		log.info("Adding status bean: " + lsb);
+		log.debug("Adding status bean: " + lsb);
 	}
 
 	/**

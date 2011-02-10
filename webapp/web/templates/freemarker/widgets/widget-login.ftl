@@ -3,8 +3,10 @@
 <#-- Login widget -->
 
 <#macro assets>
-    <#-- RY This test should be replaced by widget controller logic which doesn't display any assets if the user is logged in.
-    See NIHVIVO-1357. This test does nothing, since user has not been put into the data model.
+    <#-- RY This test should be replaced by login widget controller logic which displays different assets macros depending
+         on login status, but currently there's no widget-specific doAssets() method. See NIHVIVO-1357. The test doesn't work
+         because we don't have the user in the template data model when we generate the assets. This can also be fixed by 
+         NIHVIVO-1357.     
     <#if ! user.loggedIn> -->
         ${stylesheets.add("/css/login.css")} 
         <#-- ${scripts.add("")} -->
@@ -13,12 +15,15 @@
 </#macro>
 
 <#macro loginForm>
-    <noscript>
-        <section id="error-alert">
-            <img src="${urls.images}/iconAlertBig.png" alt="Alert Icon"/>
-            <p>In order to edit VIVO content, you'll need to enable JavaScript.</p>
-        </section>
-    </noscript>
+    <#-- Don't display the JavaScript required to edit message on the home page even if JavaScript is unavailable -->
+    <#if currentServlet != 'home'>
+        <noscript>
+            <section id="error-alert">
+                <img src="${urls.images}/iconAlertBig.png" alt="Alert Icon"/>
+                <p>In order to edit VIVO content, you'll need to enable JavaScript.</p>
+            </section>
+        </noscript>
+    </#if>
 
     <section id="login" class="hidden">
         <h2>Log in</h2>
@@ -29,7 +34,7 @@
        
         <#if errorMessage??>
             <section id="error-alert" role="alert"><img src="${urls.images}/iconAlert.png" alert="Error alert icon" />
-                <p>${errorMessage}</p>
+                <p class="login-alert">${errorMessage}</p>
             </section>
         </#if>
        
@@ -61,7 +66,7 @@
 
 <#macro forcePasswordChange>
     <section id="login">
-        <h2>Change Your Password</h2>
+        <h2>Change Password to Log in</h2>
            
             <#if errorMessage??>
                 <div id="error-alert" role="alert"><img src="${urls.images}/iconAlert.png" width="24" height="24" alert="Error alert icon"/>

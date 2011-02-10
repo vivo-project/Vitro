@@ -175,10 +175,11 @@ public class UserRetryController extends BaseEditController {
             request.setAttribute("formOnSubmit", "return validatePw(this);");
             request.setAttribute("formOnCancel", "forceCancel(this.form);");
         }
-        else {
+       else {
             request.setAttribute("formOnSubmit", "return validateUserFields(this);");
-            request.setAttribute("formOnCancel", "forceCancel(this.form);");
+            request.setAttribute("formOnCancel", "forceCancelTwo(this.form);");
         }
+
         request.setAttribute("formJsp","/templates/edit/specific/user_retry.jsp");
         request.setAttribute("scripts","/templates/edit/specific/user_retry_head.jsp");
         request.setAttribute("title","User Account Editing Form");

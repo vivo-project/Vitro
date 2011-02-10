@@ -42,7 +42,6 @@ public class DateTimeMigration {
 	private static final String dateTimePrecisionURI = "http://vivoweb.org/ontology/core#dateTimePrecision";
 	private static final String hasTimeIntervalURI = "http://vivoweb.org/ontology/core#hasTimeInterval";
 	private static final String dateTimeIntervalURI = "http://vivoweb.org/ontology/core#dateTimeInterval";
-	private static final String dateTimeIntervalForURI = "http://vivoweb.org/ontology/core#dateTimeIntervalFor";
 	private static final String startURI = "http://vivoweb.org/ontology/core#start";
 	private static final String endURI = "http://vivoweb.org/ontology/core#end";
 	
@@ -54,7 +53,6 @@ public class DateTimeMigration {
 	private DatatypeProperty dateTimeProp = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createDatatypeProperty(dateTimeURI);
 	private ObjectProperty hasTimeIntervalProp = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createObjectProperty(hasTimeIntervalURI);
 	private ObjectProperty dateTimeIntervalProp = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createObjectProperty(dateTimeIntervalURI);
-	private ObjectProperty dateTimeIntervalForProp = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createObjectProperty(dateTimeIntervalForURI);
 	private ObjectProperty dateTimePrecisionProp = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createObjectProperty(dateTimePrecisionURI);
 	private ObjectProperty startProp = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createObjectProperty(startURI);
 	private ObjectProperty endProp = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createObjectProperty(endURI);
@@ -101,20 +99,34 @@ public class DateTimeMigration {
 
 		    StmtIterator iter = aboxModel.listStatements((Resource) null, hasTimeIntervalProp, (RDFNode) null);
 	       
+		    int datelessCount = 0;
 		    while (iter.hasNext()) {
 
 			   Statement stmt1 = iter.next();
+			   
+			   if (!stmt1.getObject().isResource()) {
+				   logger.log("WARN: the object of this statement is expected to be a resource: " + ABoxUpdater.stmtString(stmt1));
+				   continue;
+			   }
 
 			   Statement stmt2 = aboxModel.getProperty(stmt1.getObject().asResource(), dateTimeIntervalProp);
 
-			   if (stmt2 == null) continue;
-			   if (!stmt1.getObject().isResource()) continue;
-			   if (!stmt2.getObject().isResource()) continue;
+			   if (stmt2 == null) {
+				   datelessCount++;
+				   additions.add(stmt1.getSubject(), dateTimeIntervalProp, stmt1.getObject());
+				   //additions.add(stmt1.getObject().asResource(), dateTimeIntervalForProp, stmt1.getSubject());
+				   continue;
+			   }
+			   
+			   if (!stmt2.getObject().isResource()) {
+				   logger.log("WARN: the object of this statement is expected to be a resource: " + ABoxUpdater.stmtString(stmt2));
+				   continue;
+			   }
 			   
 			   retractions.add(stmt2);
-			   retractions.add(stmt2.getObject().asResource(), dateTimeIntervalForProp, stmt2.getSubject());
+			   //retractions.add(stmt2.getObject().asResource(), dateTimeIntervalForProp, stmt2.getSubject());
 			   additions.add(stmt1.getSubject(), dateTimeIntervalProp, stmt1.getObject());
-			   additions.add(stmt1.getObject().asResource(), dateTimeIntervalForProp, stmt1.getSubject());
+			   //additions.add(stmt1.getObject().asResource(), dateTimeIntervalForProp, stmt1.getSubject());
 			   
 			   StmtIterator iter2 = aboxModel.listStatements(stmt2.getObject().asResource(), (Property) null, (RDFNode) null);
 			   
@@ -133,9 +145,16 @@ public class DateTimeMigration {
 		    aboxModel.add(additions);
 		    record.recordAdditions(additions);
 		    
+			if (datelessCount > 0) {	
+			    logger.log("INFO: Found " + datelessCount + " Academic Term and/or Year individual" + ((datelessCount > 1) ? "s" : "") +
+			    		" that " + ((datelessCount > 1) ? "don't have " : "doesn't have ") + "an associated date." + 
+			    		 " Such an individual will be displayed as an incomplete Date/Time" +
+			    	     " interval on any Course page that refers to it.");
+			}
+		    
 			if (additions.size() > 0) {	
 			   long count = additions.size() / 2;	
-			   logger.log(count + " Academic interval" + ((count > 1) ? "s were" : " was") + " updated to the new date/time format");
+			   logger.log("Updated " + count + " Academic interval" + ((count > 1) ? "s" : "") + " to the new date/time format");
 			}
 		} finally {
 			aboxModel.leaveCriticalSection();
@@ -148,10 +167,10 @@ public class DateTimeMigration {
 	 */
 	public void updateLiterals() throws IOException {
 
-		//TODO: look into java locale note: not handling timezones - they are not expected to be in the 1.1.1 data
 		DateFormat yearFormat = new SimpleDateFormat("yyyy");
 		DateFormat yearMonthFormat = new SimpleDateFormat("yyyy-MM");
 		DateFormat yearMonthDayFormat = new SimpleDateFormat("yyyy-MM-dd");
+		DateFormat yearMonthDayFormat2 = new SimpleDateFormat("dd-MMM-yy");
 	 	
 		aboxModel.enterCriticalSection(Lock.WRITE);
 		
@@ -189,9 +208,14 @@ public class DateTimeMigration {
 		    	   try {
 		               date = yearMonthDayFormat.parse(stmt.getObject().asLiteral().getLexicalForm());
 		               newStmt = ResourceFactory.createStatement(stmt.getSubject(), stmt.getPredicate(), getDateTimeLiteral(date) );
-		    	   } catch (ParseException pe) {
-		    		   logger.log("Parse Exception for yearMonthDay literal: " + stmt.getObject().asLiteral().getLexicalForm() + 
-		    				   ". The following statement has been removed from the knowledge base " + ABoxUpdater.stmtString(stmt));
+		    	   } catch (ParseException pe) {		   
+		    		   try {
+		                   date = yearMonthDayFormat2.parse(stmt.getObject().asLiteral().getLexicalForm());
+		                   newStmt = ResourceFactory.createStatement(stmt.getSubject(), stmt.getPredicate(), getDateTimeLiteral(date) );  		   
+		    		   } catch (ParseException pe2) {
+			    		   logger.log("Parse Exception for yearMonthDay literal: " + stmt.getObject().asLiteral().getLexicalForm() + 
+			    				   ". The following statement has been removed from the knowledge base " + ABoxUpdater.stmtString(stmt));		    			   
+		    		   }
 		    	   }	   
 		       } else  if (ymdtPrecisionURI.equals(precision)) {
 		    	   logger.log("WARNING: unhandled precision found for individual " + stmt.getSubject().getURI() + ": " + precision +
@@ -214,9 +238,8 @@ public class DateTimeMigration {
 		    record.recordAdditions(additions);
 		    
 			if (additions.size() > 0) {
-					logger.log(additions.size() + " date/time literal" + 
-							((additions.size() > 1) ? "s" : "") + ((additions.size() > 1) ? " were " : " was ") +
-							"updated to the xsd:dateTime representation.");
+					logger.log("Updated " + additions.size() + " date/time literal" + 
+							((additions.size() > 1) ? "s" : "") + " to the xsd:dateTime representation");
 			}		   
 		} finally {
 			aboxModel.leaveCriticalSection();

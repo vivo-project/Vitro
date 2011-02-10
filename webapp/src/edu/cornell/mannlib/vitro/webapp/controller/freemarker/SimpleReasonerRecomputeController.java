@@ -24,6 +24,8 @@ public class SimpleReasonerRecomputeController extends FreemarkerHttpServlet {
     private static final Log log = LogFactory.getLog(
             SimpleReasonerRecomputeController.class);
     
+    private static final String RECOMPUTE_INFERENCES_FTL = "recomputeInferences.ftl";
+    
     protected ResponseValues processRequest(VitroRequest vreq) { 
         // Due to requiresLoginLevel(), we don't get here unless logged in as DBA
         if (!LoginStatusBean.getBean(vreq)
@@ -40,13 +42,23 @@ public class SimpleReasonerRecomputeController extends FreemarkerHttpServlet {
             if (simpleReasoner == null) {
                 messageStr = "No SimpleReasoner has been set up.";
             } else {
+            	String signal = (String) vreq.getParameter("signal");
                 if (simpleReasoner.isRecomputing()) {
                     messageStr = 
                          "The SimpleReasoner is currently in the process of " +
                          "recomputing inferences.";
-                } else {
-                    new Thread(new Recomputer(simpleReasoner)).start();
-                    messageStr = "Recomputation of inferences started";
+                } else{
+                	String restart = (String)getServletContext().getAttribute("restart");
+                	if(restart == null || restart.equals("showButton") || signal == null){
+                		body.put("link", "show");
+                    	messageStr = null;
+                    	getServletContext().setAttribute("restart", "yes");
+                	}
+                	else if(signal!=null && signal.equals("Recompute")){
+                		new Thread(new Recomputer(simpleReasoner)).start();
+                        messageStr = "Recomputation of inferences started";
+                        getServletContext().setAttribute("restart", "showButton");
+                	}	
                 }
             }
             
@@ -55,12 +67,13 @@ public class SimpleReasonerRecomputeController extends FreemarkerHttpServlet {
             body.put("errorMessage", 
                     "There was an error while recomputing inferences: " + 
                     e.getMessage());
-            return new ExceptionResponseValues(
-                    Template.ERROR_MESSAGE.toString(), body, e);            
+          return new ExceptionResponseValues(
+            RECOMPUTE_INFERENCES_FTL, body, e);  
         }
         
         body.put("message", messageStr); 
-        return new TemplateResponseValues(Template.MESSAGE.toString(), body);
+        body.put("redirecturl",vreq.getContextPath()+"/RecomputeInferences");
+        return new TemplateResponseValues(RECOMPUTE_INFERENCES_FTL, body);
     }
     
     private class Recomputer implements Runnable {

@@ -35,5 +35,5 @@
 %>
     </ul>
 
-    <input id="submit" type="submit" value="Next Step"/>
+    <input class="submit" type="submit" value="Next Step"/>
     </form>

@@ -34,6 +34,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Tem
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 import edu.cornell.mannlib.vitro.webapp.web.BreadCrumbsUtil;
 import edu.cornell.mannlib.vitro.webapp.web.PortalWebUtil;
+import edu.cornell.mannlib.vitro.webapp.web.functions.IndividualLocalNameMethod;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.User;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.files.Scripts;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.files.Stylesheets;
@@ -49,8 +50,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
 
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(FreemarkerHttpServlet.class);
-
-    
+  
     public static final String PAGE_TEMPLATE_TYPE = "page";
     public static final String BODY_TEMPLATE_TYPE = "body";
 
@@ -242,16 +242,13 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
 
     // Define the URLs that are accessible to the templates. Note that we do not create menus here,
     // because we want the templates to be free to define the link text and where the links are displayed.
-    private final Map<String, String> getUrls(String themeDir, UrlBuilder urlBuilder) {
-        // The urls that are accessible to the templates. 
-        // NB We are not using our menu object mechanism to build menus here, because we want the 
-        // view to control which links go where, and the link text and title.
+    private final Map<String, String> getUrls(String themeDir, UrlBuilder urlBuilder, VitroRequest vreq) {
         Map<String, String> urls = new HashMap<String, String>();
         
         urls.put("home", urlBuilder.getHomeUrl());
         
         // Templates use this to construct urls.
-        urls.put("base", urlBuilder.contextPath);
+        urls.put("base", UrlBuilder.contextPath);
 
         urls.put("about", urlBuilder.getPortalUrl(Route.ABOUT));
         if (ContactMailServlet.getSmtpHostFromProperties() != null) {
@@ -264,13 +261,24 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         urls.put("siteAdmin", urlBuilder.getPortalUrl(Route.SITE_ADMIN));  
         urls.put("siteIcons", urlBuilder.getPortalUrl(themeDir + "/site_icons")); // deprecated
         urls.put("themeImages", urlBuilder.getPortalUrl(themeDir + "/images"));
-        urls.put("images", urlBuilder.getUrl("/images"));
-        urls.put("theme", urlBuilder.getUrl(themeDir));
-        urls.put("index", urlBuilder.getUrl("/browse"));                
+        urls.put("images", UrlBuilder.getUrl("/images"));
+        urls.put("theme", UrlBuilder.getUrl(themeDir));
+        urls.put("index", UrlBuilder.getUrl("/browse"));   
+        urls.put("currentPage", getCurrentPageUrl(vreq));
         
         return urls;
     }
     
+    private String getCurrentPageUrl(HttpServletRequest request) {
+        String path = request.getServletPath().replaceFirst("/", "");
+        String pathInfo = request.getPathInfo();
+        if (pathInfo != null) {
+            path += pathInfo;
+        }
+        path = normalizeServletName(path);        
+        return UrlBuilder.getUrl(path);
+    }
+
     protected BeansWrapper getNonDefaultBeansWrapper(int exposureLevel) {
         BeansWrapper wrapper = new DefaultObjectWrapper();
         // Too bad exposure levels are ints instead of enum values; what happens if 
@@ -312,7 +320,6 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
      *  Add any Java directives the templates should have access to.
      *  This is public and static so that these may be used by other classes during
      *  the transition from JSP to Freemarker.
-     * @return
      */    
     public static Map<String, Object> getDirectives() {
         Map<String, Object> map = new HashMap<String, Object>();
@@ -325,9 +332,10 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         return map;
     }
     
-    protected Map<String, Object> getMethods() {
+    public static Map<String, Object> getMethods() {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("profileUrl", new edu.cornell.mannlib.vitro.webapp.web.functions.IndividualProfileUrlMethod());
+        map.put("localName", new edu.cornell.mannlib.vitro.webapp.web.functions.IndividualLocalNameMethod());
         return map;
     }
     
@@ -353,14 +361,13 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         String themeDir = getThemeDir(portal);
         UrlBuilder urlBuilder = new UrlBuilder(portal);
         
-        map.put("urls", getUrls(themeDir, urlBuilder)); 
+        map.put("urls", getUrls(themeDir, urlBuilder, vreq)); 
 
         map.put("themeDir", themeDir);
+        map.put("currentTheme", themeDir.substring(themeDir.lastIndexOf('/')+1));
         map.put("stylesheets", getStylesheetList(themeDir));
         map.put("scripts", getScriptList(themeDir));
         map.put("headScripts", getScriptList(themeDir));
-  
-        map.put("currentPage", vreq.getServletPath().replaceFirst("/", ""));
         
         map.putAll(getDirectives());
         map.putAll(getMethods());
@@ -393,14 +400,21 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
             map.put("flash", flashMessage);
         }
 
-        // Let the page template know which page it's processing. 
-        map.put("currentPage", vreq.getServletPath().replaceFirst("/", ""));
+        // Let the page template know which page it's processing.
+        map.put("currentServlet", normalizeServletName(vreq.getServletPath().replaceFirst("/", "")));
         
         // Allow template to send domain name to JavaScript (needed for AJAX calls)
         map.put("requestedPage", vreq.getRequestURL().toString());
         
         return map;        
-    }   
+    }  
+    
+    private String normalizeServletName(String name) {
+        // Return a uniform value for the home page.
+        // Note that if servletName is "index.jsp", it must be the home page,
+        // since we don't get here on other tabs.
+        return (name.length() == 0 || name.equals("index.jsp")) ? "home" : name;
+    }
 
     private TabMenu getTabMenu(VitroRequest vreq) {
         int portalId = vreq.getPortal().getPortalId();

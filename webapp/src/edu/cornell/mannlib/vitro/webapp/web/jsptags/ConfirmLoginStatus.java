@@ -2,8 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.jsptags;
 
-import java.io.IOException;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspException;
@@ -14,6 +12,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LogoutRedirector;
 import edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep;
 
 /**
@@ -69,8 +68,11 @@ public class ConfirmLoginStatus extends BodyTagSupport {
 
 	@Override
 	public int doEndTag() throws JspException {
+		LogoutRedirector.recordRestrictedPageUri(getRequest());
+
 		LoginStatusBean loginBean = LoginStatusBean.getBean(getRequest());
-		boolean isLoggedIn = loginBean.isLoggedInAtLeast(level);
+		boolean isLoggedIn = loginBean.isLoggedIn();
+		boolean isSufficient = loginBean.isLoggedInAtLeast(level);
 
 		boolean isSelfEditing = VitroRequestPrep.isSelfEditing(getRequest());
 
@@ -78,9 +80,12 @@ public class ConfirmLoginStatus extends BodyTagSupport {
 				+ ", requiredLevel=" + level + ", selfEditingAllowed="
 				+ allowSelfEditing + ", isSelfEditing=" + isSelfEditing);
 
-		if (isLoggedIn || (allowSelfEditing && isSelfEditing)) {
+		if (isSufficient || (allowSelfEditing && isSelfEditing)) {
 			log.debug("Login status confirmed.");
 			return setBeanAndReturn(loginBean);
+		} else if (isLoggedIn) {
+			log.debug("Logged in, but not sufficient.");
+			return showInsufficientAuthorizationMessage();
 		} else {
 			log.debug("Login status not confirmed.");
 			return redirectAndSkipPage();
@@ -93,6 +98,12 @@ public class ConfirmLoginStatus extends BodyTagSupport {
 			getRequest().setAttribute(beanAttributeName, loginBean);
 		}
 		return EVAL_PAGE;
+	}
+
+	private int showInsufficientAuthorizationMessage() {
+		VitroHttpServlet.redirectToInsufficientAuthorizationPage(getRequest(),
+				getResponse());
+		return SKIP_PAGE;
 	}
 
 	private int redirectAndSkipPage() throws JspException {

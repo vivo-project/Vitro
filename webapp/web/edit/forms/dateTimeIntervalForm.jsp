@@ -19,6 +19,7 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Css" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.edit.elements.DateTimeWithPrecision"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.Field"%>
+<%@page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.DateTimeIntervalValidation"%>
 
 <%@ page import="org.apache.commons.logging.Log" %>
 <%@ page import="org.apache.commons.logging.LogFactory" %>
@@ -27,7 +28,7 @@
 <%@ taglib prefix="v" uri="http://vitro.mannlib.cornell.edu/vitro/tags" %>
 
 <%! 
-    public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.edit.forms.dateTimeIntervalForm.jsp");
+    public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.edit.forms.dateTimeIntervalForm");
 %>
 <%
     VitroRequest vreq = new VitroRequest(request);
@@ -35,8 +36,7 @@
     vreq.setAttribute("defaultNamespace", ""); //empty string triggers default new URI behavior       
 %>
 
-
-<%@page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.DateTimeIntervalValidation"%><c:set var="vivoCore" value="http://vivoweb.org/ontology/core#" />
+<c:set var="vivoCore" value="http://vivoweb.org/ontology/core#" />
 <c:set var="type" value="<%= VitroVocabulary.RDF_TYPE %>" />
 <c:set var="rdfs" value="<%= VitroVocabulary.RDFS %>" />
 <c:set var="label" value="${rdfs}label" />
@@ -138,14 +138,14 @@
 %>
         <c:set var="editMode" value="edit" />
         <c:set var="titleVerb" value="Edit" />
-        <c:set var="submitButtonText" value="Edit Position" />
+        <c:set var="submitButtonText" value="Edit Date/Time Interval" />
         <c:set var="disabledVal" value="disabled" />
 <% 
     } else { // adding new entry
 %>
         <c:set var="editMode" value="add" />
         <c:set var="titleVerb" value="Create" />
-        <c:set var="submitButtonText" value="Position" />
+        <c:set var="submitButtonText" value="Create Date/Time Interval" />
         <c:set var="disabledVal" value="" />
 <%  } %> 
 
@@ -223,9 +223,9 @@
         //setup date time edit elements
         Field startField = editConfig.getField("startField");
         // arguments for DateTimeWithPrecision are (fieldName, minimumPrecision, [requiredLevel])
-        startField.setEditElement(new DateTimeWithPrecision(startField, VitroVocabulary.Precision.YEAR.uri(), VitroVocabulary.Precision.SECOND.uri()));        
+        startField.setEditElement(new DateTimeWithPrecision(startField, VitroVocabulary.Precision.SECOND.uri(), VitroVocabulary.Precision.NONE.uri()));        
         Field endField = editConfig.getField("endField");
-        endField.setEditElement(new DateTimeWithPrecision(endField, VitroVocabulary.Precision.YEAR.uri(), VitroVocabulary.Precision.SECOND.uri()));
+        endField.setEditElement(new DateTimeWithPrecision(endField, VitroVocabulary.Precision.SECOND.uri(), VitroVocabulary.Precision.NONE.uri()));
     }
     
     editConfig.addValidator(new DateTimeIntervalValidation("startField","endField") ); 
@@ -236,7 +236,17 @@
         editConfig.prepareForObjPropUpdate(model);
     } else { // adding new
         editConfig.prepareForNonUpdate(model);
-    }  
+    }
+    
+    List<String> customJs = new ArrayList<String>(Arrays.asList(JavaScript.JQUERY_UI.path(),
+                                                                JavaScript.CUSTOM_FORM_UTILS.path()                                               
+                                                               ));            
+    request.setAttribute("customJs", customJs);
+    
+    List<String> customCss = new ArrayList<String>(Arrays.asList(Css.JQUERY_UI.path(),
+                                                                 Css.CUSTOM_FORM.path()
+                                                                ));
+    request.setAttribute("customCss", customCss);
     
     String subjectName = ((Individual) request.getAttribute("subject")).getName();
 %>

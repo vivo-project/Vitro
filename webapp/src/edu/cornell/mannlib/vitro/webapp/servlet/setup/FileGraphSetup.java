@@ -41,6 +41,10 @@ public class FileGraphSetup implements ServletContextListener {
 		
 	public void contextInitialized(ServletContextEvent sce) {
 		
+	    if (AbortStartup.isStartupAborted(sce.getServletContext())) {
+            return;
+        }
+	    
 		try {
 			OntModelSelectorImpl baseOms = (OntModelSelectorImpl) sce.getServletContext().getAttribute("baseOntModelSelector");
 			Store kbStore = (Store) sce.getServletContext().getAttribute("kbStore");

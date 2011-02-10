@@ -280,16 +280,20 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
             
             Map<String, Object> body = new HashMap<String, Object>();
             
-            String classGroupParam = vreq.getParameter("classgroup");            
+            String classGroupParam = vreq.getParameter("classgroup");    
+            boolean classGroupFilterRequested = false;
             if (!StringUtils.isEmpty(classGroupParam)) {
                 VClassGroup grp = grpDao.getGroupByURI(classGroupParam);
+                classGroupFilterRequested = true;
                 if (grp != null && grp.getPublicName() != null)
                     body.put("classGroupName", grp.getPublicName());
             }
             
             String typeParam = vreq.getParameter("type");
+            boolean typeFiltereRequested = false;
             if (!StringUtils.isEmpty(typeParam)) {
                 VClass type = vclassDao.getVClassByURI(typeParam);
+                typeFiltereRequested = true;
                 if (type != null && type.getName() != null)
                     body.put("typeName", type.getName());
             }
@@ -297,7 +301,7 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
             /* Add classgroup and type refinement links to body */
             if( wasHtmlRequested ){                                
                 // Search request includes no classgroup and no type, so add classgroup search refinement links.
-                if ( classGroupParam == null && typeParam == null) { 
+                if ( !classGroupFilterRequested && !typeFiltereRequested ) { 
                     List<VClassGroup> classgroups = getClassGroups(grpDao, topDocs, searcherForRequest);
                     List<VClassGroupSearchLink> classGroupLinks = new ArrayList<VClassGroupSearchLink>(classgroups.size());
                     for (VClassGroup vcg : classgroups) {
@@ -307,7 +311,7 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
      
                 // Search request is for a classgroup, so add rdf:type search refinement links
                 // but try to filter out classes that are subclasses
-                } else if ( classGroupParam != null && typeParam == null ) {  
+                } else if ( classGroupFilterRequested && !typeFiltereRequested ) {  
                     List<VClass> vClasses = getVClasses(vclassDao,topDocs,searcherForRequest);
                     List<VClassSearchLink> vClassLinks = new ArrayList<VClassSearchLink>(vClasses.size());
                     for (VClass vc : vClasses) {
@@ -323,15 +327,7 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
                 } else {
                     pagingLinkParams.put("type", typeParam);
                 }
-            }
-
-            /* Adding html hightlighting */
-            if( wasHtmlRequested ){
-                beans = highlightBeans(beans, vreq.getWebappDaoFactory()
-                        .getDataPropertyDao(), vreq.getWebappDaoFactory()
-                        .getObjectPropertyDao(), new SimpleLuceneHighlighter(query,
-                        analyzer));
-            }
+            }           
 
             // Convert search result individuals to template model objects
             body.put("individuals", ListedIndividualTemplateModel
@@ -706,97 +702,8 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
             //we have no flags set, so no flag filtering
             return null;
         }
-    }
-
-    private List<Individual> highlightBeans(List<Individual> beans, 
-            DataPropertyDao dpDao, ObjectPropertyDao opDao, VitroHighlighter highlighter) {
-        if( beans == null ){
-            log.debug("List of beans passed to highlightBeans() was null");
-            return Collections.EMPTY_LIST;
-        }else if( highlighter == null ){
-            log.debug("Null highlighter passed to highlightBeans()");
-            return beans;
-        }            
-        Iterator<Individual> it = beans.iterator();
-        while(it.hasNext()){
-            Individual ent = it.next();
-            try{
-                dpDao.fillDataPropertiesForIndividual(ent);
-                opDao.fillObjectPropertiesForIndividual(ent);
-                fragmentHighlight(ent, highlighter);
-            }catch( Exception ex ){
-                log.debug("Error while doing search highlighting" , ex);
-            }            
-        }
-        return beans;
-    }  
+    } 
     
-    /**
-     * Highlights the name and then replaces the description with
-     * highlighted fragments.
-     * @param ent
-     * @param highlighter 
-     */
-    public void fragmentHighlight(Individual ent, VitroHighlighter hl){
-        try{
-            if( ent == null ) return;
-
-            Html2Text h2t = new Html2Text();        
-            StringBuffer sb = new StringBuffer("");
-            if(ent.getBlurb() != null)
-                sb.append(ent.getBlurb()).append(' ');
-
-            if(ent.getDescription() != null )
-                sb.append(ent.getDescription()).append(' ');
-
-            if(ent.getDataPropertyList() != null) {
-                Iterator edIt = ent.getDataPropertyList().iterator();
-                while (edIt.hasNext()) {
-                    try{
-                    DataProperty dp = (DataProperty)edIt.next();                    
-                    if( getDataPropertyBlacklist().contains(dp.getURI()))
-                        continue;
-                    for(DataPropertyStatement dps : dp.getDataPropertyStatements()){
-                        sb.append(dp.getPublicName()).append(' ')
-                          .append(dps.getData()).append(' ');    
-                    }    
-                    }catch(Throwable e){
-                        log.debug("Error highlighting data property statment " +
-                                "for individual "+ent.getURI());
-                    }
-                }
-            }
-
-            if(ent.getObjectPropertyList() != null) {
-                Iterator edIt = ent.getObjectPropertyList().iterator();
-                String t = null;
-                while (edIt.hasNext()) {
-                    try {                
-                        ObjectProperty op = (ObjectProperty)edIt.next();
-                        if( getObjectPropertyBlacklist().contains(op.getURI()))
-                            continue;
-                        for( ObjectPropertyStatement stmt : op.getObjectPropertyStatements()){                                            
-                            sb.append( ( (t = op.getDomainPublic()) != null) ? t : "" );
-                            sb.append(' ');
-                            sb.append( ( (t = stmt.getObject().getName()) != null) ? t : "" );
-                            sb.append(' ');
-                        }
-                    } catch (Throwable e) {
-                        log.debug("Error highlighting object property " +
-                                "statement for individual "+ent.getURI());
-                    }
-                }
-            }
-
-            String keywords = ent.getKeywordString();
-            if( keywords != null )
-                sb.append(keywords);
-
-            ent.setDescription(hl.getHighlightFragments(  h2t.stripHtml( sb.toString() )));
-        }catch(Throwable th){
-            log.debug("could not hightlight for entity " + ent.getURI(),th);
-        }
-    }        
 
     private ExceptionResponseValues doSearchError(Throwable e, Format f) {
         Map<String, Object> body = new HashMap<String, Object>();

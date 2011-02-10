@@ -36,7 +36,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.SearchReindexingListener;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ObjectSourceIface;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
-import edu.cornell.mannlib.vitro.webapp.web.DisplayVocabulary;
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.AbortStartup;
+import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 
 /**
  * Setup objects for lucene searching and indexing.
@@ -68,11 +69,16 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 	 * created.
 	 */
 	public void contextInitialized(ServletContextEvent sce) {
+	    
+	    if (AbortStartup.isStartupAborted(sce.getServletContext())) {
+            return;
+        }
+	    
 		try {
 			ServletContext context = sce.getServletContext();
 
 			String baseIndexDir = getBaseIndexDirName();
-			log.info("Seting up Lucene index. Base directory of lucene index: " + baseIndexDir);
+			log.info("Setting up Lucene index. Base directory of lucene index: " + baseIndexDir);
 
 			setBoolMax();
 
@@ -93,7 +99,11 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 			// This will attempt to create a new directory and empty index if there is none.
 			LuceneIndexer indexer = new LuceneIndexer(getBaseIndexDirName(),liveIndexDir, null, getAnalyzer());
 			context.setAttribute(ANALYZER, getAnalyzer());
-			indexer.addObj2Doc(new Entity2LuceneDoc());
+			Entity2LuceneDoc translator = new Entity2LuceneDoc();
+			OntModel displayOntModel = (OntModel) sce.getServletContext().getAttribute("displayOntModel");
+			translator.setClassesProhibitedFromSearch(
+			        new ProhibitedFromSearch(DisplayVocabulary.PRIMARY_LUCENE_INDEX_URI, displayOntModel));			
+			indexer.addObj2Doc(translator);			
 			context.setAttribute(LuceneIndexer.class.getName(), indexer);
 			indexer.setLuceneIndexFactory(lif);
 			
@@ -124,33 +134,24 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 			// set up listeners so search index builder is notified of changes to model
 			ServletContext ctx = sce.getServletContext();
 			SearchReindexingListener srl = new SearchReindexingListener(builder);
-			ModelContext.getBaseOntModel(ctx).getBaseModel().register(srl);
-			ModelContext.getJenaOntModel(ctx).getBaseModel().register(srl);
-			ModelContext.getInferenceOntModel(ctx).register(srl);
-			ModelContext.getUnionOntModelSelector(ctx).getABoxModel()
-			        .getBaseModel().register(srl);
-
-			// set the classes that the indexBuilder ignores
-			OntModel displayOntModel = (OntModel) sce.getServletContext().getAttribute("displayOntModel");
-			builder.setClassesProhibitedFromSearch(
-				new ProhibitedFromSearch(DisplayVocabulary.PRIMARY_LUCENE_INDEX_URI, displayOntModel));
-						
+			ModelContext.registerListenerForChanges(ctx, srl);
+									
 			if( (Boolean)sce.getServletContext().getAttribute(INDEX_REBUILD_REQUESTED_AT_STARTUP) instanceof Boolean &&
 				(Boolean)sce.getServletContext().getAttribute(INDEX_REBUILD_REQUESTED_AT_STARTUP) ){
 			    log.info("Rebuild of lucene index required before startup.");
-				builder.doIndexRebuild();				
-				Thread.currentThread().sleep(500);				
+				builder.doIndexRebuild();												
 				int n = 0;
 				while( builder.isReindexRequested() || builder.isIndexing() ){
 				    n++;
 					if( n % 20 == 0 ) //output message every 10 sec. 
-					    log.info("Still rebulding lucene  index");
+					    log.info("Still rebuilding lucene  index");
 					Thread.currentThread().sleep(500);
 				}				
 			}
 			
 			log.info("Setup of Lucene index completed.");			
 		} catch (Throwable t) {
+		    AbortStartup.abortStartup(sce.getServletContext());
 			log.error("***** Error setting up Lucene index *****", t);
 			throw new RuntimeException("Startup of vitro application was prevented by errors in the lucene configuration");
 		}
@@ -163,7 +164,7 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 		log.debug("**** Running " + this.getClass().getName() + ".contextDestroyed()");
 		IndexBuilder builder = (IndexBuilder) sce.getServletContext().getAttribute(IndexBuilder.class.getName());
 		if( builder != null){		    		
-		    builder.killIndexingThread();
+		    builder.stopIndexingThread();
 		}
 	}
 

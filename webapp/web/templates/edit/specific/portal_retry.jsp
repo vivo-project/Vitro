@@ -69,7 +69,7 @@
     </td>
     <td valign="top" colspan="1">
         <b>Theme</b><br />
-        <select name="ThemeDir">
+        <select id="ThemeDir" name="ThemeDir">
             <form:option name="ThemeDir" />
         </select>
         <font color="red"><form:error name="ThemeDir"/></font>
@@ -148,7 +148,14 @@
         <font color="red"><form:error name="LogotypeHeight"/></font>
     </td>
 </tr>  
-
+<script  type="text/javascript" >
+$(function() {
+        $("#ThemeDir option").each(function(i){
+                if ($(this).text() == "vivo-basic")
+                        $(this).text("vivo-basic (deprecated)");
+        });
+});
+</script>
 <% /*
 
 <tr class="editformcell">

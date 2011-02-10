@@ -15,9 +15,8 @@ import org.openrdf.model.URI;
 import org.openrdf.model.impl.URIImpl;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
-import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.filters.PortalPickerFilter;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
@@ -186,6 +185,10 @@ public class UrlBuilder {
             }
         } 
         
+        public ParamMap(List<String> strings) {
+            this((String[]) strings.toArray());
+        }
+        
         public ParamMap(Map<String, String> map) {
             putAll(map);
         }
@@ -239,7 +242,15 @@ public class UrlBuilder {
     
     private static String addParams(String url, ParamMap params, String glue) {
         for (String key: params.keySet()) {
-            url += glue + key + "=" + urlEncode(params.get(key));
+            String value = params.get(key);
+            // rjy7 Some users might require nulls to be converted to empty
+            // string, others to eliminate params with null values.
+            // Here we convert to empty string to prevent an exception
+            // from UrlEncoder.encode() when passed a null. Callers are advised
+            // to remove null values or convert to empty strings, whichever
+            // is desired in the particular instance.
+            value = (value == null) ? "" : urlEncode(value);
+            url += glue + key + "=" + value;
             glue = "&";
         }
         return url;        
@@ -259,7 +270,7 @@ public class UrlBuilder {
     }
     
     public static String getIndividualProfileUrl(String individualUri, WebappDaoFactory wadf) {
-        Individual individual = wadf.getIndividualDao().getIndividualByURI(individualUri);
+        Individual individual = new IndividualImpl(individualUri);
         return getIndividualProfileUrl(individual, individualUri, wadf);
     }
     
@@ -291,24 +302,24 @@ public class UrlBuilder {
         return profileUrl;        
     }
     
-    public static String urlEncode(String url) {
+    public static String urlEncode(String str) {
         String encoding = "ISO-8859-1";
         String encodedUrl = null;
         try {
-            encodedUrl = URLEncoder.encode(url, encoding);
+            encodedUrl = URLEncoder.encode(str, encoding);
         } catch (UnsupportedEncodingException e) {
-            log.error("Error encoding url " + url + " with encoding " + encoding + ": Unsupported encoding.");
+            log.error("Error encoding url " + str + " with encoding " + encoding + ": Unsupported encoding.");
         }
         return encodedUrl;
     }
 
-    public static String urlDecode(String url) {
+    public static String urlDecode(String str) {
         String encoding = "ISO-8859-1";
         String decodedUrl = null;
         try {
-            decodedUrl = URLDecoder.decode(url, encoding);
+            decodedUrl = URLDecoder.decode(str, encoding);
         } catch (UnsupportedEncodingException e) {
-            log.error("Error decoding url " + url + " with encoding " + encoding + ": Unsupported encoding.");
+            log.error("Error decoding url " + str + " with encoding " + encoding + ": Unsupported encoding.");
         }
         return decodedUrl;
     }

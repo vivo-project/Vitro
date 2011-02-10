@@ -25,6 +25,7 @@ import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 
 public class BaseEditController extends VitroHttpServlet {
 
@@ -159,14 +160,13 @@ public class BaseEditController extends VitroHttpServlet {
     	
     	try {
     		ontModel = (OntModel) request.getSession().getAttribute(MODEL_ATTR_NAME);
-    	} catch (Exception e) {}
+    	} catch (Exception e) {
+    	    // ignoring any problems here - we're not really expecting
+    	    // this attribute to be populated anyway
+    	}
     	
     	if ( ontModel == null ) {
-    		try {
-    			ontModel = (OntModel) ctx.getAttribute(MODEL_ATTR_NAME);
-    		} catch (Exception e) {
-    			throw new RuntimeException("Could not find OntModel in context attribute '"+MODEL_ATTR_NAME+"'");
-    		}
+            ontModel = (OntModel) ModelContext.getBaseOntModelSelector(ctx).getTBoxModel();
     	}
     	
     	return ontModel;

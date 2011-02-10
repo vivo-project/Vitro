@@ -28,29 +28,29 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
     
     // Used for editing
     private String objectUri = null;
+    private String templateName = null;
 
-    ObjectPropertyStatementTemplateModel(String subjectUri, String propertyUri, 
-            String objectKey, Map<String, String> data, EditingPolicyHelper policyHelper) {
+    ObjectPropertyStatementTemplateModel(String subjectUri, String propertyUri, String objectKey, 
+            Map<String, String> data, EditingPolicyHelper policyHelper, String templateName) {
         super(subjectUri, propertyUri, policyHelper);
         
         this.data = data;
-        objectUri = data.get(objectKey);
+        this.objectUri = data.get(objectKey);
+        this.templateName = templateName;
+        
         setEditAccess(policyHelper);
     }
 
     /** 
      * This method handles the special case where we are creating a DataPropertyStatementTemplateModel 
      * outside the GroupedPropertyList. Specifically, it allows vitro:primaryLink and vitro:additionalLink 
-     * to be treated like data property statements and thus have editing links. (In a future version, 
+     * to be treated like object property statements and thus have editing links. (In a future version, 
      * these properties will be replaced by vivo core ontology properties.) It could potentially be used 
      * for other properties outside the property list as well.
      */
     ObjectPropertyStatementTemplateModel(String subjectUri, String propertyUri, 
             VitroRequest vreq, EditingPolicyHelper policyHelper) {
-        super(subjectUri, propertyUri, policyHelper);
-        
-        ObjectPropertyStatementDao opsDao = vreq.getWebappDaoFactory().getObjectPropertyStatementDao();
-        
+        super(subjectUri, propertyUri, policyHelper);       
     }
 
     private void setEditAccess(EditingPolicyHelper policyHelper) {
@@ -110,6 +110,19 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
                     "predicateUri", propertyUri,
                     "objectUri", objectUri,
                     "cmd", "delete");
+            for ( String key : data.keySet() ) {
+                String value = data.get(key);
+                // Remove an entry with a null value instead of letting it get passed
+                // as a param with an empty value, in order to align with behavior on
+                // profile page. E.g., if statement.moniker is null, a test for 
+                // statement.moniker?? will yield different results if null on the 
+                // profile page but an empty string on the deletion page.
+                if (value != null) {
+                    params.put("statement_" + key, data.get(key));
+                }
+            }
+            params.put("templateName", templateName);
+            
             deleteUrl = UrlBuilder.getUrl(EDIT_PATH, params);
 
         }

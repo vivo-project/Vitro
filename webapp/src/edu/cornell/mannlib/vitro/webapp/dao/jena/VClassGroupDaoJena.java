@@ -14,21 +14,25 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
+import com.hp.hpl.jena.ontology.DatatypeProperty;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Literal;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
+import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
-import edu.cornell.mannlib.vitro.webapp.web.DisplayVocabulary;
 
 public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
 
@@ -130,9 +134,9 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
                     if (vgrp!=null) {
                         classDao.addVClassesToGroup(vgrp, includeUninstantiatedClasses, getIndividualCount);
                         groups.add(vgrp);
-                        java.util.Collections.sort(groups);
                     }
                 }    
+                java.util.Collections.sort(groups);
             } finally {
                 groupIt.close();
             }
@@ -157,14 +161,16 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
             	groups.add(ungrouped);
             }
             */
-            if (groups.size()>0) {
-                if( getIndividualCount )
-                    addIndividualCountToGroups(groups);
+            if (groups.size()>0) {                
                 return groups;
             } else {
-                classDao.addVClassesToGroups(groups);
-                if( getIndividualCount )
-                    addIndividualCountToGroups(groups);
+                /* bdc34: the effect of the following code is that 
+                 * classgroups will get empty vclasses added to them
+                 * when includeUninstantiatedClasses == false and all
+                 * the vclasses are empty.
+                 * This may not be the desired behavior. 
+                 */
+                classDao.addVClassesToGroups(groups);                
                 return groups;
             }
         } finally {
@@ -172,16 +178,7 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
         }
 
     }
-
-    private void addIndividualCountToGroups( List<VClassGroup> cgList ){
-        for( VClassGroup cg : cgList){
-            int count = 0;
-            for( VClass vc : cg){
-                count = count + vc.getEntityCount();
-            }
-            cg.setIndividualCount(count);
-        }
-    }
+    
     
     public VClassGroup groupFromGroupIndividual(Individual groupInd) {
         if (groupInd==null) {
@@ -193,9 +190,14 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
         group.setNamespace(groupInd.getNameSpace());
         group.setLocalName(groupInd.getLocalName());
         try {
-            group.setDisplayRank(Integer.decode(((Literal)(groupInd.getProperty(getOntModel().getDatatypeProperty(VitroVocabulary.DISPLAY_RANK)).getObject())).getString()).intValue());
+        	DatatypeProperty drProp = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createDatatypeProperty(VitroVocabulary.DISPLAY_RANK);
+        	if( drProp == null ){
+        	    log.debug("No display rank in model for portal " + groupInd.getURI() );
+        	}else{
+        	    group.setDisplayRank(Integer.decode(((Literal)(groupInd.getProperty(drProp).getObject())).getString()).intValue());
+        	}
         } catch (Exception e) {
-            // e.printStackTrace();
+            log.warn("Cannot get display rank for portal " + groupInd.getURI() + " " + e.getMessage() );            
         }
         return group;
     }
@@ -219,10 +221,22 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
     	groupInd.setVClassURI(CLASSGROUP.getURI());
     	
     	String groupURI = null;
+    	
+    	OntModel unionForURIGeneration = ModelFactory.createOntologyModel(
+    	        OntModelSpec.OWL_MEM, ModelFactory.createUnion(
+    	                getOntModelSelector().getApplicationMetadataModel(), 
+    	                getOntModelSelector().getFullModel()));
+    	
+    	WebappDaoFactory wadfForURIGeneration = null;
     	try {
-    		groupURI = (new WebappDaoFactoryJena(ontModel)).getIndividualDao().insertNewIndividual(groupInd);
+    	    wadfForURIGeneration = new WebappDaoFactoryJena(
+    	            unionForURIGeneration);
+    		groupURI = wadfForURIGeneration
+                    .getIndividualDao().insertNewIndividual(groupInd);
     	} catch (InsertException ie) {
     		throw new RuntimeException(InsertException.class.getName() + "Unable to insert class group "+groupURI, ie);
+    	} finally {
+    	    wadfForURIGeneration.close();
     	}
     	
     	if (groupURI != null) {

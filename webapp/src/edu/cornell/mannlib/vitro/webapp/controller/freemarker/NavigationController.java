@@ -30,7 +30,7 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
-import edu.cornell.mannlib.vitro.webapp.web.DisplayVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import freemarker.template.Configuration;
 
 public class NavigationController extends FreemarkerHttpServlet {

@@ -215,7 +215,7 @@ public class EditSubmission {
                 try {
                     return literalCreationModel.createTypedLiteral( URLEncoder.encode(value, "UTF8"), datatypeUri);
                 } catch (UnsupportedEncodingException e) { 
-                    log.error(e);
+                    log.error(e, e);
                 }                
             }   
             return literalCreationModel.createTypedLiteral(value, datatypeUri);

@@ -47,7 +47,7 @@ public class ConfigurationPropertiesTest extends AbstractTestClass {
 	 * The mappings that we might find from the property files.
 	 */
 	private static final String[][] MAP_VALUES_DEFAULT = new String[][] { {
-			"whichfile", "test_config_default" } };
+			"whichfile", "test_config_default" }, {"trimmed", "whitespace_test"} };
 	private static final String[][] MAP_VALUES_CONFIGURED = new String[][] { {
 			"whichfile", "test_config" } };
 

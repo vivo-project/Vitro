@@ -1,6 +1,6 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
-<#-- Macros and functions for datetime formatting 
+<#-- Macros for datetime formatting 
 
      In this library, functions are used to format the datetime or interval
      according to a format string and precision, returning a raw string.
@@ -16,7 +16,7 @@
     </#if>
 </#macro>
 
-<#macro yearIntervalSpan startDateTime endDateTime endYearAsRange=true>
+<#macro yearIntervalSpan startDateTime="" endDateTime="" endYearAsRange=true>
     <#local yearInterval = yearInterval(startDateTime, endDateTime, endYearAsRange)>
     <#if yearInterval?has_content>
         <@dateTimeSpan>${yearInterval}</@dateTimeSpan>
@@ -29,27 +29,26 @@
     <span class="listDateTime"><#nested></span>
 </#macro>
 
-
 <#-- FUNCTIONS -->
 
 <#-- Assign a year precision and generate the interval -->
-<#function yearInterval dateTimeStart dateTimeEnd endYearAsRange=true>
+<#function yearInterval dateTimeStart="" dateTimeEnd="" endYearAsRange=true>
     <#local precision = "yearPrecision">
     <#return dateTimeIntervalShort(dateTimeStart, precision, dateTimeEnd, precision, endYearAsRange)>
 </#function>
 
 <#-- Generate a datetime interval with dates displayed as "January 1, 2011" -->
-<#function dateTimeIntervalLong dateTimeStart precisionStart dateTimeEnd precisionEnd endAsRange=true>
+<#function dateTimeIntervalLong dateTimeStart="" precisionStart="" dateTimeEnd="" precisionEnd="" endAsRange=true>
     <#return dateTimeInterval(dateTimeStart, precisionStart, dateTimeEnd, precisionEnd, "long", endAsRange) >
 </#function>
 
 <#-- Generate a datetime interval with dates displayed as "1/1/2011" -->
-<#function dateTimeIntervalShort dateTimeStart precisionStart dateTimeEnd precisionEnd endAsRange=true>
+<#function dateTimeIntervalShort dateTimeStart="" precisionStart="" dateTimeEnd="" precisionEnd="" endAsRange=true>
     <#return dateTimeInterval(dateTimeStart, precisionStart, dateTimeEnd, precisionEnd, "short", endAsRange)>
 </#function>
 
 <#-- Generate a datetime interval -->
-<#function dateTimeInterval dateTimeStart precisionStart dateTimeEnd precisionEnd formatType="short" endAsRange=true>
+<#function dateTimeInterval dateTimeStart="" precisionStart="" dateTimeEnd="" precisionEnd="" formatType="short" endAsRange=true>
 
     <#if dateTimeStart?has_content>   
         <#local start = formatXsdDateTime(dateTimeStart, precisionStart, formatType)>
@@ -61,15 +60,19 @@
     
     <#local interval>
         <#if start?? && end??>
-            ${start} - ${end}
+            <#if start == end>
+                ${start}
+            <#else>
+                ${start}&nbsp;-&nbsp;${end}
+            </#if>
         <#elseif start??>
             ${start} -
         <#elseif end??>
-            <#if endAsRange>- </#if>${end}
+            <#if endAsRange>-&nbsp;</#if>${end}
         </#if>
     </#local>
     
-    <#return interval>
+    <#return interval?trim>
 </#function>
 
 <#-- Functions for formatting and applying precision to a datetime
@@ -89,7 +92,7 @@
 
 <#-- Generate a datetime with date formatted as "1/1/2011" -->
 <#function formatXsdDateTimeShort dateTime precision>
-    <#return formatXsdDateTime(dateTime, precision)>
+    <#return formatXsdDateTime(dateTime, precision, "short")>
 </#function>
 
 <#-- Generate a datetime as a year -->
@@ -98,22 +101,62 @@
     <#return formatXsdDateTime(dateTime, precision)>
 </#function>
 
-<#-- Convert the string dateTimeString to a datetime object -->
-<#function toDateTime dateTimeString>
-    <#-- First convert the datetime string to a string format that Freemarker 
-         understands, then to a datetime object. For now, strip away a time zone rather
-         than displaying it. --> 
-    <#return dateTimeString?replace("T", " ")?replace("Z.*$", "", "r")?datetime("yyyy-MM-dd HH:mm:ss")>
+<#-- Apply a precision and format type to format a datetime -->
+<#function formatXsdDateTime dateTimeStr precision="" formatType="short">
+
+    <#-- First convert the string to a format that Freemarker can interpret as a datetime.
+         For now, strip away time zone rather than displaying it. -->
+    <#local dateTimeStr = dateTimeStr?replace("T", " ")?replace("Z.*$", "", "r")?trim>
+
+    <#-- If a non-standard datetime format (e.g, "2000-04" from
+         "2000-04"^^<http://www.w3.org/2001/XMLSchema#gYearMonth>), just
+         return the string without attempting to format. Possibly this should
+         be handled in Java by examining the xsd type and making an appropriate
+         conversion. -->
+    <#if ! dateTimeStr?matches("(\\d{4})-(\\d{2})-(\\d{2}) (\\d{2}):(\\d{2}):(\\d{2})")>
+        <#return dateTimeStr>
+    </#if>
+    
+    <#-- Convert the string to a datetime object. -->
+    <#local dateTimeObj = dateTimeStr?datetime("yyyy-MM-dd HH:mm:ss")>
+
+    <#-- If no precision is specified, assign it from the datetime value.
+         Pass dateTimeStr rather than dateTimeObj, because dateTimeObj
+         replaces zeroes with default values, whereas we want to set 
+         precision based on whether the times values are all 0. -->
+    <#if ! precision?has_content>
+        <#local precision = getPrecision(dateTimeStr)>
+    </#if>
+    
+    <#-- Get the format string for the datetime output -->
+    <#local format = getFormat(formatType, precision)>
+
+    <#return dateTimeObj?string(format)>
 </#function>
 
-<#-- Apply a precision and format type to format a datetime -->
-<#function formatXsdDateTime dateTime precision formatType="short">
+<#function getPrecision dateTime>
 
-    <#-- First convert the string dateTime to a datetime object -->
-    <#local dt = toDateTime(dateTime)>
+    <#-- We know this will match because the format has already been checked -->
+    <#local match = dateTime?matches("(\\d{4})-(\\d{2})-(\\d{2}) (\\d{2}):(\\d{2}):(\\d{2})")>
+
+    <#list match as m>
+        <#local hours = m?groups[4]?number>
+        <#local minutes = m?groups[5]?number>
+        <#local seconds = m?groups[6]?number> 
+    </#list> 
     
+    <#local precision>   
+        <#if hours == 0 && minutes == 0 && seconds == 0>yearMonthDayPrecision
+        <#else>yearMonthDayTimePrecision
+        </#if>
+    </#local> 
+    
+    <#return precision?trim>  
+</#function>
+
+<#function getFormat formatType precision>
     <#-- Use the precision to determine which portion to display, 
-         and the format type to determine how to display it.  -->
+         and the format type to determine how to display it.  -->    
     <#local format>
         <#if formatType == "long">
             <#if precision == "yearPrecision">yyyy
@@ -122,7 +165,7 @@
             <#else>MMMM d, yyyy h:mm a
             </#if>
         <#else> <#-- formatType == "short" -->
-             <#if precision == "yearPrecision">yyyy
+            <#if precision == "yearPrecision">yyyy
             <#elseif precision == "yearMonthPrecision">M/yyyy
             <#elseif precision == "yearMonthDayPrecision">M/d/yyyy
             <#else>M/d/yyyy h:mm a
@@ -130,7 +173,7 @@
         </#if>
     </#local>
     
-    <#return dt?string(format)>
+    <#return format?trim>
 </#function>
-     
+  
 

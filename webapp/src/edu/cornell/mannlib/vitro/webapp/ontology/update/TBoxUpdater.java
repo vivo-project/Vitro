@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.ontology.update;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.hp.hpl.jena.ontology.OntModel;
@@ -142,7 +143,7 @@ public class TBoxUpdater {
 					 logger.log("WARNING: found " + siteObjects.size() +
 							 " statements with subject = " + subject.getURI() + 
 							 " and property = " + predicate.getURI() +
-							 " in the site database. (maximum of one is expected)");
+							 " in the site database (maximum of one is expected)");
 				 }
 				 
 				 if (siteObjects.size() > 0) {
@@ -167,7 +168,7 @@ public class TBoxUpdater {
 				 logger.log("WARNING: found " + i +
 						 " statements with subject = " + subject.getURI() + 
 						 " and property = " + predicate.getURI() +
-						 " in the new version of the annotations ontology. (maximum of one is expected)");
+						 " in the new version of the annotations ontology (maximum of one is expected)");
 				 continue; 
 			 }
 			 
@@ -213,7 +214,7 @@ public class TBoxUpdater {
 					 logger.log("WARNING: found " + i +
 							 " statements with subject = " + subject.getURI() + 
 							 " and property = " + predicate.getURI() +
-							 " in the site annotations model. (maximum of one is expected). "); 
+							 " in the site annotations model (maximum of one is expected) "); 
 					 continue; 
 				 }
 				 	 
@@ -256,16 +257,18 @@ public class TBoxUpdater {
 		   siteModel.remove(actualRetractions);
 		   record.recordRetractions(actualRetractions);
 		
+		   long numAdded = actualAdditions.size();
+		   long numRemoved = actualRetractions.size();
+		   
 		   // log summary of changes
-		   if (actualAdditions.size() > 0) {
+		   if (numAdded > 0) {
 	           logger.log("Updated the default vitro annotation value for " + 
-	        		   actualAdditions.size() + " statements in the knowledge base.");
+	        		   numAdded + " statements in the knowledge base");
 		   }
 		   
-           long numRemoved = actualRetractions.size() - actualAdditions.size();
            if (numRemoved > 0) {
 	           logger.log("Removed " + numRemoved +
-	        		      " outdated vitro annotation property setting" + ((numRemoved > 1) ? "s" : "") + " from the knowledge base.");
+	        		      " outdated vitro annotation property setting" + ((numRemoved > 1) ? "s" : "") + " from the knowledge base");
            }
            
 		    //	   Copy annotation property settings that were introduced in the new ontology
@@ -340,8 +343,12 @@ public void updateAnnotationModel() throws IOException {
 			  Statement stmt = iter.next();
 						  
 			  if (!newTboxAnnotationsModel.contains(stmt) && !usesGroup(siteModel, stmt.getSubject())) {
+				  long pre = retractions.size();
 				  retractions.add(siteModel.listStatements(stmt.getSubject(),(Property) null,(RDFNode)null));
-				  logger.log("Removed the " + stmt.getSubject().getURI() + " ClassGroup from the annotations model.");
+				  long post = retractions.size();
+				  if ((post - pre) > 0) {
+				     logger.log("Removed the " + stmt.getSubject().getURI() + " ClassGroup from the annotations model");
+				  }  
 			  }
 			}
 	    	
@@ -392,17 +399,17 @@ public void removeObsoleteAnnotations() throws IOException {
 	    
         if (siteModel.contains(subj1, inClassGroupProp, obj1) ) {
         	retractions.add(subj1, inClassGroupProp, obj1);
-        	logger.log("Removed statement " + ABoxUpdater.stmtString(subj1, inClassGroupProp, obj1) + " from the knowledge base.");
+        	logger.log("Removed statement " + ABoxUpdater.stmtString(subj1, inClassGroupProp, obj1) + " from the knowledge base (assumed to be obsolete)");
         }
 
         if (siteModel.contains(subj2, inPropertyGroupProp, obj2) ) {
         	retractions.add(subj2, inPropertyGroupProp, obj2);
-        	logger.log("Removed statement " + ABoxUpdater.stmtString(subj2, inPropertyGroupProp, obj2) + " from the knowledge base.");
+        	logger.log("Removed statement " + ABoxUpdater.stmtString(subj2, inPropertyGroupProp, obj2) + " from the knowledge base (assumed to be obsolete)");
         }
 
         if (siteModel.contains(subj3, inPropertyGroupProp, obj3) ) {
         	retractions.add(subj3, inPropertyGroupProp, obj3);
-        	logger.log("Removed statement " + ABoxUpdater.stmtString(subj3, inPropertyGroupProp, obj3) + " from the knowledge base.");
+        	logger.log("Removed statement " + ABoxUpdater.stmtString(subj3, inPropertyGroupProp, obj3) + " from the knowledge base (assumed to be obsolete)");
         }
     	
 		if (retractions.size() > 0) {

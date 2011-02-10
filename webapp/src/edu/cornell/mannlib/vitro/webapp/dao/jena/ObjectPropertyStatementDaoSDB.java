@@ -27,17 +27,22 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.IndividualSDB.IndividualNotFoundException;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB.SDBDatasetMode;
 
 public class ObjectPropertyStatementDaoSDB extends
 		ObjectPropertyStatementDaoJena implements ObjectPropertyStatementDao {
 
 	private DatasetWrapperFactory dwf;
+	private SDBDatasetMode datasetMode;
 	
 	public ObjectPropertyStatementDaoSDB(
 	            DatasetWrapperFactory dwf, 
+	            SDBDatasetMode datasetMode,
 	            WebappDaoFactoryJena wadf) {
 		super (dwf, wadf);
 		this.dwf = dwf;
+		this.datasetMode = datasetMode;
 	}
 	
 	@Override
@@ -48,15 +53,17 @@ public class ObjectPropertyStatementDaoSDB extends
         	Map<String, ObjectProperty> uriToObjectProperty = new HashMap<String,ObjectProperty>();
         	String query = "CONSTRUCT { \n" +
         			       "   <" + entity.getURI() + "> ?p ?o . \n" +
-        			       "   ?o a ?oType . \n" +
-        			       "   ?o <" + RDFS.label.getURI() + "> ?oLabel .  \n" +
-        			       "   ?o <" + VitroVocabulary.MONIKER + "> ?oMoniker  \n" +
-        			       "} WHERE { GRAPH ?g { \n" +
-        			       "   <" + entity.getURI() + "> ?p ?o \n" +
-        			       "   OPTIONAL { GRAPH ?h { ?o a ?oType } } \n" +
-        			       "   OPTIONAL { GRAPH ?i { ?o <" + RDFS.label.getURI() + "> ?oLabel } } \n" +
-        			       "   OPTIONAL { GRAPH ?j { ?o <" + VitroVocabulary.MONIKER + "> ?oMoniker } }  \n" +
-                           "} }";
+//        			       "   ?o a ?oType . \n" +
+//        			       "   ?o <" + RDFS.label.getURI() + "> ?oLabel .  \n" +
+//        			       "   ?o <" + VitroVocabulary.MONIKER + "> ?oMoniker  \n" +
+        			       "} WHERE { \n" +
+        			       "   { <" + entity.getURI() + "> ?p ?o } \n" +
+//        			       "   UNION { <" + entity.getURI() + "> ?p ?o . ?o a ?oType } \n" +
+//        			       "   UNION { <" + entity.getURI() + "> ?p ?o . \n" +
+//        			       "           ?o <" + RDFS.label.getURI() + "> ?oLabel } \n" +
+//        			       "   UNION { <" + entity.getURI() + "> ?p ?o . \n " +
+//        			       "           ?o <" + VitroVocabulary.MONIKER + "> ?oMoniker } \n" +
+        			       "}";
         	long startTime = System.currentTimeMillis();
         	Model m = null;
         	DatasetWrapper w = dwf.getDatasetWrapper();
@@ -90,48 +97,46 @@ public class ObjectPropertyStatementDaoSDB extends
 	                            ObjectPropertyStatement objPropertyStmt = new ObjectPropertyStatementImpl();
 	                            objPropertyStmt.setSubjectURI(entity.getURI());
 	                            objPropertyStmt.setSubject(entity);
-	                            try {
-	                                objPropertyStmt.setObjectURI(((Resource)st.getObject()).getURI());
-	                            } catch (Throwable t) {
-	                                t.printStackTrace();
-	                            }
+	                            objPropertyStmt.setObjectURI(((Resource)st.getObject()).getURI());
+	                            
 	                            objPropertyStmt.setPropertyURI(st.getPredicate().getURI());
-	                            try {
-	                                Property prop = st.getPredicate();
-	                                if( uriToObjectProperty.containsKey(prop.getURI())){
-	                                	objPropertyStmt.setProperty(uriToObjectProperty.get(prop.getURI()));
-	                                }else{
-	                                	ObjectProperty p = getWebappDaoFactory().getObjectPropertyDao().getObjectPropertyByURI(prop.getURI());
-	                                	if( p != null ){
-	                                		uriToObjectProperty.put(prop.getURI(), p);
-	                                		objPropertyStmt.setProperty(uriToObjectProperty.get(prop.getURI()));
-	                                	}else{
-	                                		//if ObjectProperty not found in ontology, skip it
-	                                		continue;
-	                                	}
-	                                }                                
-	                            } catch (Throwable g) {
-	                                //do not add statement to list
-	                            	log.debug("exception while trying to get object property for statement list, statement skipped.", g);
-	                            	continue;                                                                
-	                            }
+                                Property prop = st.getPredicate();
+                                if( uriToObjectProperty.containsKey(prop.getURI())){
+                                	objPropertyStmt.setProperty(uriToObjectProperty.get(prop.getURI()));
+                                }else{
+                                	ObjectProperty p = getWebappDaoFactory().getObjectPropertyDao().getObjectPropertyByURI(prop.getURI());
+                                	if( p != null ){
+                                		uriToObjectProperty.put(prop.getURI(), p);
+                                		objPropertyStmt.setProperty(uriToObjectProperty.get(prop.getURI()));
+                                	}else{
+                                		//if ObjectProperty not found in ontology, skip it
+                                		continue;
+                                	}
+                                }                                
+
 	                            if (objPropertyStmt.getObjectURI() != null) {
-	                                Individual objInd = new IndividualSDB(
-	                                        objPropertyStmt.getObjectURI(), 
-	                                        this.dwf, 
-	                                        getWebappDaoFactory(),
-	                                        m);
-	                                objPropertyStmt.setObject(objInd);
+	                                //this might throw IndividualNotFoundException
+                                    Individual objInd = new IndividualSDB(
+                                        objPropertyStmt.getObjectURI(), 
+                                        this.dwf, 
+                                        datasetMode,
+                                        getWebappDaoFactory());
+                                    objPropertyStmt.setObject(objInd);	                                
 	                            }
-	
-	                            //add object property statement to list for Individual
-	                            if ((objPropertyStmt.getSubjectURI() != null) 
-	                                    && (objPropertyStmt.getPropertyURI() != null) 
-	                                    && (objPropertyStmt.getObject() != null)){
+	                            
+	                            //only add statement to list if it has its values filled out
+	                            if (    (objPropertyStmt.getSubjectURI() != null) 
+	                                 && (objPropertyStmt.getPropertyURI() != null) 
+	                                 && (objPropertyStmt.getObject() != null) ) {
 	                                objPropertyStmtList.add(objPropertyStmt);                           
 	                            } 
-	                        } catch (Throwable t) {
-	                            t.printStackTrace();
+	                            
+	                        } catch (IndividualNotFoundException t) {
+	                            log.error(t,t);
+	                            continue;
+	                        } catch (Throwable t){
+	                            log.error(t,t);
+                                continue;
 	                        }
 	                    }
 	                }

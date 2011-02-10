@@ -13,12 +13,15 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LoginInProcessFlag;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.User;
 import freemarker.core.Environment;
-import freemarker.template.TemplateModel;
+import freemarker.template.TemplateHashModel;
+import freemarker.template.utility.DeepUnwrap;
 
 public class LoginWidget extends Widget {
 	private static final Log log = LogFactory.getLog(LoginWidget.class);
@@ -71,15 +74,14 @@ public class LoginWidget extends Widget {
             HttpServletRequest request, ServletContext context) {
         
         WidgetTemplateValues values = null;
-        TemplateModel urls = null;
-        
+  
         try {
-            urls = env.getDataModel().get("urls");
+           
             State state = getCurrentLoginState(request);
             log.debug("State on exit: " + state);
             
-            String siteName = env.getDataModel().get("siteName").toString();
-                        
+            TemplateHashModel dataModel = env.getDataModel();
+            
             switch (state) {
             case LOGGED_IN:
                 // On the login page itself, show a message that the user is already logged in.
@@ -95,15 +97,24 @@ public class LoginWidget extends Widget {
                 values = showPasswordChangeScreen(request);
                 break;
             default:
-                values = showLoginScreen(request, siteName);
+                values = showLoginScreen(request, dataModel.get("siteName").toString());
             }
+            
+            values.put("urls", dataModel.get("urls"));
+            values.put("currentServlet", dataModel.get("currentServlet"));
+            
+            @SuppressWarnings("unchecked")
+            Map<String, Object> dm = (Map<String, Object>) DeepUnwrap.permissiveUnwrap(dataModel);     
+            User user =  (User) dm.get("user");   
+            values.put("user", user); 
+            
         } catch (Exception e) {
-            log.error(e);
+            log.error(e, e);
             // This widget should display an error message rather than throwing the exception
             // up to the doMarkup() method, which would result in no display.
             values = showError(e);
         } 
-        values.put("urls", urls);
+        
         return values;
 
     }
@@ -174,17 +185,35 @@ public class LoginWidget extends Widget {
     }
 
     /**
-     * Where are we in the process? Logged in? Not? Somewhere in between?
+     * Are we already logged in? If not, where are we in the process?
      */
     private State getCurrentLoginState(HttpServletRequest request) {
         if (LoginStatusBean.getBean(request).isLoggedIn()) {
             return State.LOGGED_IN;
-        } else {
-            return LoginProcessBean.getBean(request).getState();
+        } 
+        if (isOutdatedLoginProcessBean(request)) {
+        	LoginProcessBean.removeBean(request);
         }
+        return LoginProcessBean.getBean(request).getState();
     }
 
-    /** What's the URL for this servlet? */
+	/**
+	 * A LoginProcessBean is outdated unless the the "in-process" flag is set in the
+	 * session. 
+	 * 
+	 * Each time we hit Authenticate, the flag is set, and each time
+	 * we draw the widget it is reset.
+	 */
+	private boolean isOutdatedLoginProcessBean(HttpServletRequest request) {
+		boolean inProcess = LoginInProcessFlag.checkAndReset(request);
+		if (!inProcess) {
+			log.debug("The process bean is outdated. Discard it.");
+		}
+		
+		return !inProcess;
+	}
+
+	/** What's the URL for this servlet? */
     private String getAuthenticateUrl(HttpServletRequest request) {
         String contextPath = request.getContextPath();   
         return contextPath + "/authenticate";

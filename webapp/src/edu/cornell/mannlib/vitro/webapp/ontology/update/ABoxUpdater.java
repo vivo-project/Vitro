@@ -176,12 +176,10 @@ public class ABoxUpdater {
 		   
 		   //log summary of changes
 		   if (renameCount > 0) {
-			   //logger.log("Changed " + renameCount + " subject reference" + ((renameCount > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class to be " + newClass.getURI());
-			   logger.log(renameCount + " subject reference" + ((renameCount > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class " + ((renameCount > 1) ? "were" : "was") +" changed to " + newClass.getURI());
+			   logger.log("Changed " + renameCount + " subject reference" + ((renameCount > 1) ? "s" : "") + " from type"  + oldClass.getURI() + " to type " + newClass.getURI());
 		   }
 		   if (removeCount > 0) {
-			   //logger.log("Removed " + removeCount + " remaining subject reference" + ((removeCount > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class");
-			   logger.log(removeCount + " remaining subject reference" + ((removeCount > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class " + ((removeCount > 1) ? "were" : "was") + "removed." );
+			   logger.log("Removed " + removeCount + " subject reference" + ((removeCount > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class");
 		   }
 
 		   // Change class references in the objects of rdf:type statements
@@ -198,8 +196,7 @@ public class ABoxUpdater {
 		   
 		   //log summary of changes
 		   if (renameCount > 0) {
-			   logger.log(renameCount + " object reference" + ((renameCount > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class " + ((renameCount > 1) ? "were" : "was") + " changed to " + newClass.getURI());
-			   //logger.log("Changed " + renameCount + " object reference" + ((renameCount > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class to be " + newClass.getURI());
+			   logger.log("Renamed " + renameCount + " object reference" + ((renameCount > 1) ? "s" : "") + " from type "  + oldClass.getURI() + " to type " + newClass.getURI());
 		   }
 		   
 		   aboxModel.remove(retractions);
@@ -366,12 +363,11 @@ public class ABoxUpdater {
 			   Statement oldStatement = iter.next();
 			   count++;
 			   retractions.add(oldStatement);
-			   logChange(oldStatement, false);
+			   //logChange(oldStatement, false);
 		   }
 		   
 		   if (count > 0) {
-			   //logger.log("Removed " + count + "  subject reference" + ((count > 1) ? "s" : "") + " to the "  + deletedClass.getURI() + " class");
-			   logger.log(count + "  subject reference" + ((count > 1) ? "s" : "") + " to the "  + deletedClass.getURI() + " class " + ((count > 1) ? "were" : "was") + " removed.");
+			   logger.log("Removed " + count + " subject reference" + ((count > 1) ? "s" : "") + " to the "  + deletedClass.getURI() + " class");
 		   }
 		} finally {
 			aboxModel.leaveCriticalSection();
@@ -396,7 +392,7 @@ public class ABoxUpdater {
 		   
 		   //log summary of changes
 		   if (count > 0) {
-			   logger.log("Removed " + count + " instance" + ((count > 1) ? "s" : "") + " of the "  + deletedClass.getURI() + " class.");
+			   logger.log("Removed " + count + " instance" + ((count > 1) ? "s" : "") + " of the "  + deletedClass.getURI() + " class");
 		   }
 		   
 		   aboxModel.remove(retractions);
@@ -416,12 +412,12 @@ public class ABoxUpdater {
 			   count++;
 			   Statement oldStatement = iter.next();
 			   retractions.add(oldStatement);
-			   logChange(oldStatement, false);
+			   //logChange(oldStatement, false);
 		   }
 		   
 		   //log summary of changes
 		   if (count > 0) {
-			   logger.log("Removed " + count + " object reference" + ((count > 1) ? "s" : "") + " to the "  + deletedClass.getURI() + " class.");
+			   logger.log("Removed " + count + " object reference" + ((count > 1) ? "s" : "") + " to the "  + deletedClass.getURI() + " class");
 		   }
 
 		   aboxModel.remove(retractions);
@@ -489,12 +485,11 @@ public class ABoxUpdater {
 				record.recordAdditions(additions);
 				
 				if (additions.size() > 0) {
-					logger.log(additions.size() + " statement" + 
+					logger.log("Added " + additions.size() + " statement" + 
 							((additions.size() > 1) ? "s" : "") +
-							" with predicate " + addedProperty.getURI() + " " + 
-							((additions.size() > 1) ? "were" : "was") 
-							+ " added (as an inverse to existing  " + inverseOfAddedProperty.getURI() + 
-							" assertions)");
+							" with predicate " + addedProperty.getURI() + 
+							" (as an inverse to existing  " + inverseOfAddedProperty.getURI() + 
+							" statement" + ((additions.size() > 1) ? "s" : "") + ")");
 				}
 				
 			} finally {
@@ -503,21 +498,6 @@ public class ABoxUpdater {
 			
 		}
 		
-/*		OntProperty superProperty = addedProperty.getSuperProperty();
-		if (superProperty == null) {
-			return;
-		}
-		
-		int count = aboxModel.listStatements(
-				(Resource) null, superProperty, (RDFNode) null).toSet().size();
-		if (count > 0) {
-			logger.log("The Property " + superProperty.getURI() + 
-					" which occurs " + count + " time " + ((count > 1) ? "s" : "") + " in the database has " +
-							"a new subproperty " + propObj.getDestinationURI() +
-					" in the new ontology version. ");
-			logger.log("Please review uses of this property to see if " + propObj.getDestinationURI() + " is a more appropriate choice.");
-		}
-	*/
 	}
 	
 	private void deleteProperty(AtomicOntologyChange propObj) throws IOException{
@@ -568,8 +548,8 @@ public class ABoxUpdater {
 			record.recordRetractions(deletePropModel);
 			boolean plural = (deletePropModel.size() > 1);
 			if (deletePropModel.size() > 0) {
-				logger.log(deletePropModel.size() + " statement" + (plural ? "s" : "") + " with predicate " + 
-						propObj.getSourceURI() + " " + (plural ? "were" : "was") + " removed. ");
+				logger.log("Removed " + deletePropModel.size() + " statement" + (plural ? "s" : "") + " with predicate " + 
+						propObj.getSourceURI());
 			}
 		} else {
 			AtomicOntologyChange chg = new AtomicOntologyChange(deletedProperty.getURI(), replacementProperty.getURI(), AtomicChangeType.RENAME, propObj.getNotes());
@@ -619,12 +599,12 @@ public class ABoxUpdater {
 		record.recordRetractions(renamePropRetractModel);
 		
 		if (renamePropRetractModel.size() > 0) {
-			logger.log(renamePropRetractModel.size() + " statement" + 
+			logger.log("Changed " + renamePropRetractModel.size() + " statement" + 
 					((renamePropRetractModel.size() > 1) ? "s" : "") +
-					" with predicate " + propObj.getSourceURI() + " " + 
-					((renamePropRetractModel.size() > 1) ? "were" : "was") 
-					+ " changed to use " +
-					propObj.getDestinationURI() + " instead.");
+					" with predicate " + propObj.getSourceURI() + " to use " +
+					propObj.getDestinationURI() + " instead");
+			
+			
 		}
 	}
 

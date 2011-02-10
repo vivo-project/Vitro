@@ -45,15 +45,22 @@ import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.IndividualSDB.IndividualNotFoundException;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB.SDBDatasetMode;
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 
 public class IndividualDaoSDB extends IndividualDaoJena {
 
 	private DatasetWrapperFactory dwf;
+    private SDBDatasetMode datasetMode;
 	private WebappDaoFactoryJena wadf;
 	
-    public IndividualDaoSDB(DatasetWrapperFactory dwf, WebappDaoFactoryJena wadf) {
+    public IndividualDaoSDB(DatasetWrapperFactory dwf, 
+                            SDBDatasetMode datasetMode, 
+                            WebappDaoFactoryJena wadf) {
         super(wadf);
         this.dwf = dwf;
+        this.datasetMode = datasetMode;
     }
     
     protected DatasetWrapper getDatasetWrapper() {
@@ -61,7 +68,12 @@ public class IndividualDaoSDB extends IndividualDaoJena {
     }
     
     protected Individual makeIndividual(String individualURI) {
-    	return new IndividualSDB(individualURI, this.dwf, getWebappDaoFactory());
+        try {
+            return new IndividualSDB(individualURI, this.dwf, datasetMode, getWebappDaoFactory());
+        } catch (IndividualNotFoundException e) {
+            // If the individual does not exist, return null.
+            return null;
+        }
     }
 
     private static final Log log = LogFactory.getLog(IndividualDaoSDB.class.getName());
@@ -97,38 +109,57 @@ public class IndividualDaoSDB extends IndividualDaoJena {
     	    Dataset dataset = w.getDataset();
         	dataset.getLock().enterCriticalSection(Lock.READ);
         	try {
+        	    String[] graphVars = {"?g", "?h", "?i"};
         		String query = 
     	    		"SELECT DISTINCT ?ind ?label ?moniker " +
     	    		"WHERE " +
-    	    		 "{ GRAPH ?g { \n" +
-    	    		    " ?ind a <" + theClass.getURI() + ">  \n" +
-    	    		    "} \n" +
-    	    		 	"OPTIONAL { GRAPH ?h { ?ind  <" + RDFS.label.getURI() + "> ?label } }\n" +
-    	    		 	"OPTIONAL { GRAPH ?i { ?ind  <" + VitroVocabulary.MONIKER + "> ?moniker } } \n" +
-    	    		 "} ORDER BY ?label";
+    	    		 "{ \n" +
+    	    		 	"{ \n" +
+                        "    ?ind a <" + theClass.getURI() + "> . \n" +
+    	    		 	"    ?ind  <" + RDFS.label.getURI() + "> ?label \n" +
+    	    		 	"} \n" +
+    	    		 	"UNION { \n" +
+                        "    ?ind a <" + theClass.getURI() + "> . \n" +
+    	    		 	"    ?ind  <" + VitroVocabulary.MONIKER + "> ?moniker \n" +
+    	    		 	"} \n" +
+    	    		 "} ORDER BY ?ind ?label";
         		ResultSet rs =QueryExecutionFactory.create(
         		        QueryFactory.create(query), dataset)
         		        .execSelect();
-        		Resource res = null;
+        		String uri = null;
+        		String label = null;
+        		String moniker = null;
         		while (rs.hasNext()) {
         		    QuerySolution sol = rs.nextSolution();
         		    Resource currRes = sol.getResource("ind");
-        		    if ((res == null || !res.equals(currRes)) 
-        		            && !currRes.isAnon()) {    		        
-        		        res = currRes;
-        		        Individual ent = new IndividualSDB(currRes.getURI(), 
-                                this.dwf, getWebappDaoFactory(), 
-                                SKIP_INITIALIZATION);
-        		        Literal label = sol.getLiteral("label");
-        		        if (label != null) {
-        		            ent.setName(label.getLexicalForm());
-        		        }
-        		        Literal moniker = sol.getLiteral("moniker");
-        		        if (moniker != null) {
-        		            ent.setMoniker(moniker.getLexicalForm());
-        		        }
-                        ents.add(ent);
+        		    if (currRes.isAnon()) {
+        		        continue;
         		    }
+        		    if (uri != null && !uri.equals(currRes.getURI())) {
+        		        Individual ent = makeIndividual(uri, label, moniker);
+        		        if (ent != null) {
+        		            ents.add(ent);
+        		        }
+        	            uri = currRes.getURI();
+        	            label = null;
+        	            moniker = null;
+        		    } else if (uri == null) {
+        		        uri = currRes.getURI();
+        		    }
+                    Literal labelLit = sol.getLiteral("label");
+                    if (labelLit != null) {
+                        label = labelLit.getLexicalForm();
+                    }
+                    Literal monikerLit = sol.getLiteral("moniker");
+                    if (monikerLit != null) {
+                        moniker = monikerLit.getLexicalForm();
+                    }
+                    if (!rs.hasNext()) {
+                        Individual ent = makeIndividual(uri, label, moniker);
+                        if (ent != null) {
+                            ents.add(ent);
+                        }
+                    }
         		}
         	} finally {
         		dataset.getLock().leaveCriticalSection();
@@ -149,13 +180,22 @@ public class IndividualDaoSDB extends IndividualDaoJena {
         return ents;
 
     }
+    
+    private Individual makeIndividual(String uri, String label, String moniker) {
+        Individual ent = new IndividualSDB(uri, 
+                this.dwf, datasetMode, getWebappDaoFactory(), 
+                SKIP_INITIALIZATION);
+        ent.setName(label);
+        ent.setMoniker(moniker);
+        return ent;
+    }
 	
     @Override
     public Individual getIndividualByURI(String entityURI) {
         if( entityURI == null || entityURI.length() == 0 ) {
             return null;
         } else {
-        	return makeIndividual(entityURI);	
+        	return makeIndividual(entityURI);
         }
     }  
     
@@ -300,11 +340,13 @@ public class IndividualDaoSDB extends IndividualDaoJena {
         final List<String> list = 
             new LinkedList<String>();
         
-        String query = "SELECT ?ind WHERE { \n" +
+        // get all labeled resources from any non-tbox and non-metadata graphs.
+        String query = "SELECT DISTINCT ?ind WHERE { \n" +
                        "  GRAPH ?g { ?ind <" + RDFS.label.getURI() + "> ?label } \n" +
+                       "  FILTER (?g != <" + JenaDataSourceSetupBase.JENA_APPLICATION_METADATA_MODEL + "> " +
+                       "          && !regex(str(?g),\"tbox\")) \n " +
                        "}";
-        
-        
+              
 	    Query q = QueryFactory.create(query);
 	    DatasetWrapper w = getDatasetWrapper();
 	    Dataset dataset = w.getDataset();
@@ -324,70 +366,21 @@ public class IndividualDaoSDB extends IndividualDaoJena {
         	w.close();
         }
         
-//        getOntModel().enterCriticalSection(Lock.READ);
-//        try {
-//            ClosableIterator allIndIt = getOntModel().listIndividuals();
-//            try {
-//                while (allIndIt.hasNext()) {
-//                    com.hp.hpl.jena.ontology.Individual ind = (com.hp.hpl.jena.ontology.Individual) allIndIt.next();
-//                    
-//                    
-//                    
-//                    //don't include anything that lacks a label, issue VIVO-119.
-//                    if( getLabel(ind) == null )
-//                        continue;
-//                    
-//                    
-//                    boolean userVisible = true;
-//                    //Check for non-user visible types, maybe this should be an annotation?
-//                    ClosableIterator typeIt = ind.listRDFTypes(false);
-//                    try {
-//                        while (typeIt.hasNext()) {
-//                            Resource typeRes = (Resource) typeIt.next();
-//                            String type = typeRes.getURI();
-//                            // brute forcing this until we implement a better strategy
-//                            if (VitroVocabulary.PORTAL.equals(type) || 
-//                            	VitroVocabulary.TAB.equals(type) ||
-//                            	VitroVocabulary.TAB_INDIVIDUALRELATION.equals(type) ||
-//                            	VitroVocabulary.LINK.equals(type) ||
-//                            	VitroVocabulary.KEYWORD.equals(type) ||
-//                            	VitroVocabulary.KEYWORD_INDIVIDUALRELATION.equals(type) ||
-//                            	VitroVocabulary.CLASSGROUP.equals(type) ||
-//                            	VitroVocabulary.PROPERTYGROUP.equals(type) ||
-//                            	VitroVocabulary.APPLICATION.equals(type)) {    	
-//                                userVisible = false;
-//                                break;
-//                            }
-//                            if( OWL.ObjectProperty.getURI().equals(type) ||
-//                            	OWL.DatatypeProperty.getURI().equals(type) ||
-//                            	OWL.AnnotationProperty.getURI().equals(type) ||
-//                            	RDF.type.getURI().equals(type) ){
-//                            	userVisible = false;
-//                            	break;
-//                        	} 
-//                        }
-//                    } finally {
-//                        typeIt.close();
-//                    }
-//                    if (userVisible) {
-//                        list.add(ind);
-//                    }
-//                    
-//                }
-//            } finally {
-//                allIndIt.close();
-//            }
-//        } finally {
-//            getOntModel().leaveCriticalSection();
-//        }
         if (list.size() >0){
+            log.info("Number of individuals from source: " + list.size());
             return new Iterator(){
                 Iterator<String> innerIt = list.iterator();
                 public boolean hasNext() { 
                     return innerIt.hasNext();                    
                 }
                 public Object next() {
-                    return makeIndividual(innerIt.next());
+                    String indURI = innerIt.next();
+                    Individual ind = makeIndividual(indURI);
+                    if (ind != null) {
+                        return ind;
+                    } else {
+                        return new IndividualImpl(indURI);
+                    }
                 }
                 public void remove() {
                     //not used
@@ -407,7 +400,10 @@ public class IndividualDaoSDB extends IndividualDaoJena {
             Iterator indIt = cls.listInstances();
             while (indIt.hasNext()) {
                 com.hp.hpl.jena.ontology.Individual ind = (com.hp.hpl.jena.ontology.Individual) indIt.next();
-                ents.add(makeIndividual(ind.getURI()));
+                Individual ent = makeIndividual(ind.getURI());
+                if (ent != null) {
+                    ents.add(ent);
+                }
             }
             return ents.iterator();
         } finally {
@@ -456,7 +452,10 @@ public class IndividualDaoSDB extends IndividualDaoJena {
                         typeIt.close();
                     }
                     if (userVisible) {
-                        ents.add(makeIndividual(ent.getURI()));
+                        Individual ind = makeIndividual(ent.getURI());
+                        if (ind != null) {
+                            ents.add(ind);
+                        }
                     }
                 }
             }

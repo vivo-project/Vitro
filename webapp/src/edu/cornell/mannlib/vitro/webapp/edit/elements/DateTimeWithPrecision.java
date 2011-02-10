@@ -95,7 +95,7 @@ public class DateTimeWithPrecision extends BaseEditElement {
                 
         this.displayRequiredLevel = toPrecision( displayRequiredLevelUri );
         if( this.displayRequiredLevel == null )
-            throw new IllegalArgumentException(minimumPrecisionURI 
+            throw new IllegalArgumentException(displayRequiredLevelUri 
                     +" is not a valid precision for displayRequiredLevel, see VitroVocabulary.Precision");
         
 //        if( this.displayRequiredLevel.ordinal() < this.minimumPrecision.ordinal() ){
@@ -127,7 +127,7 @@ public class DateTimeWithPrecision extends BaseEditElement {
         map.put("minimumPrecision", minimumPrecision.uri());
         map.put("requiredLevel", displayRequiredLevel.uri());
         
-        String precisionUri = getExistingPrecision(editConfig,editSub);
+        String precisionUri = getPrecision(editConfig,editSub);
         VitroVocabulary.Precision existingPrec = toPrecision(precisionUri);
         
         if( precisionUri != null && !"".equals(precisionUri) && existingPrec == null ){
@@ -216,22 +216,35 @@ public class DateTimeWithPrecision extends BaseEditElement {
     /**
      * Gets the currently set precision.  May return null.
      */
-    private String getExistingPrecision(EditConfiguration editConfig, EditSubmission editSub) {
-        String precisionURI = editConfig.getUrisInScope().get( getPrecisionVariableName() );
-        if( precisionURI == null ){
-            return null;
+    private String getPrecision(EditConfiguration editConfig, EditSubmission editSub) {
+        if( editSub != null ){
+            String submittedPrecisionURI = editSub.getUrisFromForm().get( getPrecisionVariableName() );
+            if( submittedPrecisionURI != null ){
+                return submittedPrecisionURI;
+            }
+        }
+        
+        String existingPrecisionURI = editConfig.getUrisInScope().get( getPrecisionVariableName() );
+        if( existingPrecisionURI != null ){
+            return existingPrecisionURI;
         }else{
-            return precisionURI;
-        } 
+            return null;
+        }         
     }
 
     private DateTime getTimeValue(EditConfiguration editConfig, EditSubmission editSub) {
+        if( editSub != null ){
+            Literal submittedValue = editSub.getLiteralsFromForm().get( getValueVariableName() );
+            if( submittedValue != null )
+                return new DateTime( submittedValue.getLexicalForm() );
+        }        
+        
         Literal dtValue = editConfig.getLiteralsInScope().get( getValueVariableName() );
-        if( dtValue == null ){
-           return null;
-        }else{
+        if( dtValue != null ){
             return new DateTime( dtValue.getLexicalForm() );
-        }
+        }else{
+            return null; 
+        }        
     }
 
     /**
@@ -366,7 +379,7 @@ public class DateTimeWithPrecision extends BaseEditElement {
             }
         }
         if( nonNullAfterFirstNull )
-            throw new Exception("cannot determine precision, there were filled out values after the first un-filledout value, ");
+            throw new Exception("Invalid date-time value. When creating a date-time value, there cannot be gaps between any of the selected fields.");
         else{            
             return precisions[ indexOfFirstNull ].uri(); 
         }
@@ -486,29 +499,32 @@ public class DateTimeWithPrecision extends BaseEditElement {
         if( second == null )
             second = 0;                
                 
-        DateTime dateTime = new DateTime();
+        //initialize to something so that we can be assured not to get 
+        //system date dependent behavior
+        DateTime dateTime = new DateTime("1970-01-01T00:00:00Z");
+        
         try{
-            dateTime.withYear(year);
+            dateTime = dateTime.withYear(year);
         }catch(IllegalArgumentException iae){
            errors.put(fieldName+".year", iae.getLocalizedMessage());   
         }
         try{
-            dateTime.withMonthOfYear(month);
+            dateTime = dateTime.withMonthOfYear(month);
         }catch(IllegalArgumentException iae){
             errors.put(fieldName+".month", iae.getLocalizedMessage());
         }
         try{
-            dateTime.withDayOfMonth(day);
+            dateTime = dateTime.withDayOfMonth(day);
         }catch(IllegalArgumentException iae){
             errors.put(fieldName+".day", iae.getLocalizedMessage());
         }
         try{
-            dateTime.withHourOfDay(hour);
+            dateTime = dateTime.withHourOfDay(hour);
         }catch(IllegalArgumentException iae){
             errors.put(fieldName+".hour", iae.getLocalizedMessage());
         }
         try{
-            dateTime.withSecondOfMinute(second);
+            dateTime = dateTime.withSecondOfMinute(second);
         }catch(IllegalArgumentException iae){
             errors.put(fieldName+".second", iae.getLocalizedMessage());    
         }       
@@ -581,7 +597,7 @@ public class DateTimeWithPrecision extends BaseEditElement {
     }
     
     /* returns null if it cannot convert */
-    private static VitroVocabulary.Precision toPrecision(String precisionUri){              
+    public static VitroVocabulary.Precision toPrecision(String precisionUri){              
         for( VitroVocabulary.Precision precision : VitroVocabulary.Precision.values()){
             if( precision.uri().equals(precisionUri))
                 return precision;

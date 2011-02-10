@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
 import java.io.InputStream;
+import java.sql.SQLException;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
@@ -57,7 +58,7 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     protected static String USERPATH = BASE+"user/";
     protected static String SYSTEMPATH = BASE+"system/";
     protected static String AUTHPATH = BASE+"auth/";
-    protected static String APPPATH = BASE+"app/";
+    public static String APPPATH = BASE+"app/";
     protected static String SUBMODELS = "/WEB-INF/submodels/";
 
     String DB_USER =   "jenatest";                          // database user id
@@ -110,7 +111,7 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
    
     // This model doesn't exist yet. It's a placeholder for the application 
     // ontology.
-    static final String JENA_APPLICATION_METADATA_MODEL = 
+    public static final String JENA_APPLICATION_METADATA_MODEL = 
         "http://vitro.mannlib.cornell.edu/default/vitro-kb-applicationMetadata";
    
     // This is Brian C's application.owl file. We may not have to be concerned 
@@ -400,10 +401,13 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     	else if(TripleStoreType.SDB.equals(type)){
     		StoreDesc storeDesc = new StoreDesc(
     		        LayoutType.LayoutTripleNodesHash, DatabaseType.MySQL);
-    		SDBConnection sdbConn = new SDBConnection(
-    		        jdbcUrl, username, password);
-    		Store store = SDBFactory.connectStore(sdbConn, storeDesc);
-    		vsmm = new VitroJenaSDBModelMaker(store);
+    	    BasicDataSource bds = JenaDataSourceSetup.makeBasicDataSource(
+    	            DB_DRIVER_CLASS_NAME, jdbcUrl, username, password);
+    	    try {
+    	        vsmm = new VitroJenaSDBModelMaker(storeDesc, bds);
+    	    } catch (SQLException sqle) {
+    	        log.error("Unable to set up SDB ModelMaker", sqle);
+    	    }
     	}
     	
 		return;

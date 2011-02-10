@@ -115,6 +115,7 @@ public interface Individual extends ResourceBean, VitroTimeWindowedResource, Com
     
     String getImageUrl();
     String getThumbUrl();
+    boolean hasThumb();
 
     String getUrl();
     void setUrl(String url);

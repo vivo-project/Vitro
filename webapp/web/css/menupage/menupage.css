@@ -1,146 +1,98 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-@charset "UTF-8";
-/* CSS Document */
-
-/* VISUAL GRAPH FOAF:PERSON------>  */
-#intro-menupage{
+/* VISUAL GRAPH----->  */
+#menupage-intro {
     clear: both;
     width: 100%;
     margin: 1em auto;
-/*    padding-top: 30px;  nac26: not sure we need all this space up top*/
-/*    margin-bottom: 30px;*/
 }
-#intro-menupage  h3{
-    padding: 0 25px 15px 0;
-    padding-bottom: 20px;
+#menupage-intro h2 {
+    padding: 0 25px 20px 0;
 }
-#content-foaf-person{
-    float: left;
-    width: 64%;
-    margin-bottom: 30px;
-}
-#content-foaf-person h4{
-    padding: 20px 25px 12px 0;
-}
-ul#foaf-person-childClasses{
-    float: left;
-    width: 265px;
-    margin-left: 45px;
-}
-ul#foaf-person-childClasses li{
-    display: block;
-    height: 35px;
-    line-height: 35px;
-}
-ul#foaf-person-childClasses li:last-child{    
-    border-bottom: 0; 
-}
-ul#foaf-person-childClasses a{
-    display: block;
-    padding-left: 15px;
-    width: 265px;
-    height: 35px;
-}
-#foaf-person-graph{
-    float: right;
-    width: 270px;
-    height: 270px;
-}
-/* VISUAL GRAPH CLASS:GENERIC (ORGANIZATION, RESEARCH, EVENT) ------>  */
-#content-generic-class{
+#menupage-content {
     float: left;
     width: 90%;
     margin-bottom: 30px;
 }
-#content-generic-class h3{
+#menupage-content.people {
+    width: 73%;
+}
+#menupage-content h3 {
     padding: 0 25px 15px 0;
 }
-#content-generic-class h4{
+#menupage-content h4 {
     padding: 20px 25px 12px 0;
 }
-ul#vgraph-childClasses{
+ul#vgraph-classes {
     float: left;
     width: 265px;
     margin-left: 35px;
 }
-ul#vgraph-childClasses li{
+ul#vgraph-classes li {
     display: block;
     height: 35px;
     line-height: 35px;
 }
-ul#vgraph-childClasses li:last-child{    
+ul#vgraph-classes li:last-child {
     border-bottom: 0;
 }
-ul#vgraph-childClasses a{
+ul#vgraph-classes a {
     display: block;
     padding-left: 15px;
     width: 265px;
     height: 35px;
 }
-#generic-class-graph{
+#menupage-graph {
     float: right;
     width: 500px;
     height: 283px;
     padding-right: 20px;
+    border: 1px dotted #ccc;
+}
+#menupage-graph.people {
+    width: 300px;
+    height: 360px;
+    padding-right: 0;
+    border: none;
+    margin-top: -40px;
 }
 /* FIND BY ------>  */
-#find-by{
-    width: 275px;
+#find-by {
     float: right;
-    margin-top: 20px;
+    margin: 0 1.1em 1.5em 0;
+    padding: 8px 8px 3px 5px;
 }
-#find-by h3{
-    padding: 0 25px 12px 12px;
+#find-by h3 {
+    padding: 0 .2em .2em .8em;
     border-bottom: 0;
-}
-ul#find-filters{
     float: left;
-    width: 265px;
 }
-ul#find-filters li{
-    display: block;
-    height: 35px;
-    line-height: 35px;
-    padding-left: 10px;
+ul#find-filters {
+    float: right;
 }
-ul#find-filters li:last-child{ 
+ul#find-filters li {
+    float: left;
+    padding-left: 3px;
+    padding-right: 15px;
+    border-right: 1px solid #E4EAE9;
+}
+ul#find-filters li:last-child { 
     border-bottom: 0;
+    border-right: none;
 }
-ul#find-filters a{
+ul#find-filters a {
     display: block;
-    padding-left: 15px;
-    width: 265px;
-    height: 35px;
-}
-/* NETWORK STATS ------>  */
-#network-stats{
-    clear: both;
-    width: 90%;
-    margin: 0 auto;
-    height: 67px;
-    margin-bottom: 30px;
-}
-#network-stats h3{
-    float: left;
-    width: 150px;
-    padding: 20px 12px 10px 12px;
-}
-#network-stats p{
-    padding: 15px 15px 15px 175px;
-    font-size: .875em;
-    line-height: 1.5em;
-    color: #5e6363;
+    padding-left: 13px;
 }
 /* RESEARCHERS ------>  */
-#researchers{
+#researchers {
     clear: both;
     width: 90%;
     height: 229px;
     margin: 0 auto;
     margin-top: 30px;
 }
-#researchers h3{
+#researchers h3 {
     float: left;
     width: 150px;
     padding: 20px 12px 10px 12px;
@@ -149,65 +101,64 @@ ul#find-filters a{
     font-weight: normal;
     background: url(../images/arrow.gif) 140px 27px no-repeat;
 }
-#researchers p{
+#researchers p {
     padding: 17px 15px 15px 175px;
     line-height: 1.5em;
 }
-#researchers-slider{
+#researchers-slider {
     clear: both;
     margin: 0 auto;
     width: 887px;
     height: 115px;
 }
-#alpha-display{
+#alpha-display {
     width: 100px;
     height: 115px;
     line-height: 115px;
     float: left;
     margin-right: 10px;
 }
-#profile-photo-display{
+#profile-photo-display {
     width: 60%;
     height: 115px;
     float: left;
 }
-#profile-photo-display ul{    
+#profile-photo-display ul {    
     display: block;
 }
-#profile-photo-display li{
+#profile-photo-display li {
     display: block;
     width: 90px;
     float: left;
     padding-right: 10px;
     padding-top: 10px;
 }
-#nav-display{
+#nav-display {
     width: 100px;
     height: 70px;
     margin-top: 30px;
     margin-right: 20px;
     float: right;
 }
-#nav-display p{
+#nav-display p {
     float: left;
     padding: 0;
     padding-top: 7px;
     width: 30px;
 }
-#nav-display img{
+#nav-display img {
     display: block;
     float: right;
     padding-left: 15px;
 }
 /* BROWSE BY ------>  */
-#browse-by{
+#browse-by {
     clear: both;
     width: 90%;
     margin: 0 auto;
-    margin-top: 40px;
     overflow: hidden;
 }
-#browse-by h2{
+#browse-by h2 {
     width: 120px;
     height: 44px;
     line-height: 44px;
@@ -215,44 +166,45 @@ ul#find-filters a{
     margin-bottom: 27px;
 }
 /* BROWSE CLASSES ------>  */
-ul#browse-childClasses{
+ul#browse-classes {
     float: left;
     width: 255px;
     margin-left: 15px;
     margin-bottom: 20px;
+    margin-top: 10px;
 }
-ul#browse-childClasses li{
+ul#browse-classes li {
     display: block;
-    width: 264px;
-    height: 35px;
-    line-height: 35px;
+    width: 235px;
     margin-left: 10px;
     margin-right: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
 }
-ul#browse-childClasses li:last-child{    
+ul#browse-classes li:last-child {    
     border-bottom: 0;
 }
-ul#browse-childClasses a{
+ul#browse-classes a {
     display: block;
     padding-left: 20px;
-    width: 264px;
-    height: 35px;
+    width: 225px;
 }
 /* ALPHA BROWSE------>  */
-ul#alpha-browse-childClass{
+ul#alpha-browse-individuals {
     float: left;
     width: 620px;
     padding-left: 10px;
+    list-style: none;
 }
-ul#alpha-browse-childClass li{
+ul#alpha-browse-individuals li {
     float: left;
     margin-right: 4px;
     padding-top: 8px;
 }
-ul#alpha-browse-childClass li:last-child{    
+ul#alpha-browse-individuals li:last-child {
     border-bottom: 0;
 }
-ul#alpha-browse-childClass a{
+ul#alpha-browse-individuals a {
     display: block;
     height: 35px;
     margin-left: 0;
@@ -260,55 +212,87 @@ ul#alpha-browse-childClass a{
     width: 10px;
 }
 /* BROWSE INDIVIDUALS------>  */
-#individuals-in-childClass{
+#individuals-in-class {
     float: right;
-    width: 45%;
+    width: 68%;
     padding-bottom: 30px;
     margin-bottom: 30px;
     margin-right: 17px;
+    min-height: 170px;
 }
-#individuals-in-childClass h3{
-    padding: 10px 0 10px 30px;
+h3.selected-class {
+    margin: 0 0 0 1em;
+    padding: .8em 0 0 0;
 }
-#individuals-in-childClass ul{
+#individuals-in-class ul {
     list-style: none;
 }
-#individuals-in-childClass li.individual-foaf-person{
-    width: 39%;
-    padding-bottom: 30px;
-    padding-top: 20px;
+li.individual {
+    width: 90%;
+    padding: 20px 0;
     margin-left: 30px;
     margin-right: 30px;
-    clear: left;
-    min-height: 100px;
+    overflow: hidden;
 }
-#individuals-in-childClass li.individual-foaf-person img{
+li.individual img {
     float: left;
+    margin-right: 20px;
 }
-#individuals-in-childClass  li.individual-foaf-person h1{
+li.individual h1 {
+    padding: 0;
+    line-height: 1.2em;
     font-weight: bold;
-    padding: 30px 0 10px 110px;
-    line-height: 1.2em;
 }
-#individuals-in-childClass  p{
-    padding-left: 110px;
-    line-height: 1.2em;
+li.individual h1.thumb {
+    padding-top: 30px;
 }
-#individuals-in-childClass span.org{
+#individuals-in-class span.title {
+    display: block;
+    margin: .8em 0 0 0;
+    font-size: .8em;
+    line-height: 1;
+}
+#individuals-in-class span.org {
     display: block;
 }
-#individuals-in-childClass li.individual{
-    width: 440px;
-    margin-left: 30px;
-    margin-right: 30px;
+p.no-individuals {
+    margin: 1em 2em;
 }
-#individuals-in-childClass li.individual h1{
-    margin: 0;
+.pagination {
+    margin: .3em 0 0 1.4em;
+}
+.pagination h3 {
+    display: inline;
+    margin: 0 .3em 0 0;
     padding: 0;
-    color: #5e6363;
-    line-height: 1.2em;
-    padding-bottom: 20px;
-    padding-top: 20px;
-    font-size: 1em;
-    font-weight: normal;
+    font-size: 1.1em;
+    color: #666;
+}
+.pagination ul {
+    display: inline;
+}
+.pagination li {
+    display: inline-block;
+    margin: 0;
+    border: none;
+}
+.pagination li.selected {
+    padding: 0 0.4em;
+    line-height: 1.5;
+    color: #333;
+    background: #ddd;
+}
+.pagination li a {
+    padding: 0 0.4em;
+    border: none;
+}
+.pagination li a:hover {
+    color: #fff;
+    background: #333;
+    border: none;
+}
+.pagination .round {
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
 }

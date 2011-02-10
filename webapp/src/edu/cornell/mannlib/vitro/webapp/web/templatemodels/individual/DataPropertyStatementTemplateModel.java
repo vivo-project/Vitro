@@ -40,10 +40,11 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
 
     }
     
-    /** 
+    /*
      * This method handles the special case where we are creating a DataPropertyStatementTemplateModel outside the GroupedPropertyList.
-     * Specifically, it allows rdfs:label to be treated like a data property statement and thus have editing links. It could potentially
-     * be used for other properties outside the property list as well.
+     * Specifically, it allows rdfs:label to be treated like a data property statement and thus have editing links. It is not possible
+     * to handle rdfs:label like vitro links and vitroPublic image, because it is not possible to construct a DataProperty from
+     * rdfs:label. 
      */
     DataPropertyStatementTemplateModel(String subjectUri, String propertyUri, VitroRequest vreq, EditingPolicyHelper policyHelper) {
         super(subjectUri, propertyUri, policyHelper);

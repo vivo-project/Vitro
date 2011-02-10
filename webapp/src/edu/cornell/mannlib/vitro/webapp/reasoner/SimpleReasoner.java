@@ -2,6 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.reasoner;
 
+import java.util.Iterator;
+import java.util.List;
+
 import javax.servlet.ServletContext;
 
 import org.apache.commons.logging.Log;
@@ -126,8 +129,16 @@ public class SimpleReasoner extends StatementListener {
 
 		try {
 			
-			if ( !(stmt.getPredicate().equals(RDFS.subClassOf) || stmt.getPredicate().equals(RDFS.subClassOf) ) ) return;
-			  
+			if ( !(stmt.getPredicate().equals(RDFS.subClassOf) 
+			        || stmt.getPredicate().equals(RDFS.subClassOf) ) ) {
+			    return;
+			}
+			
+			// ignore anonymous classes
+			if (stmt.getSubject().isAnon() || stmt.getObject().isAnon()) {
+			    return;
+			}
+			
 			log.debug("stmt = " + stmt.toString());
 			
 			OntClass subject = tboxModel.getOntClass((stmt.getSubject()).getURI());
@@ -158,9 +169,17 @@ public class SimpleReasoner extends StatementListener {
 	
 		try {
 			
-			if ( !(stmt.getPredicate().equals(RDFS.subClassOf) || stmt.getPredicate().equals(RDFS.subClassOf) ) ) return;
+			if ( !(stmt.getPredicate().equals(RDFS.subClassOf) 
+			        || stmt.getPredicate().equals(RDFS.subClassOf) ) ) {
+			    return;
+			}
 			  
-			log.debug("stmt = " + stmt.toString());
+	        // ignore anonymous classes
+            if (stmt.getSubject().isAnon() || stmt.getObject().isAnon()) {
+                return;
+            }
+            
+            log.debug("stmt = " + stmt.toString());
 			
 			OntClass subject = tboxModel.getOntClass((stmt.getSubject()).getURI());
 			OntClass object = tboxModel.getOntClass(((Resource)stmt.getObject()).getURI()); 
@@ -179,7 +198,6 @@ public class SimpleReasoner extends StatementListener {
 		}
 	}
 	
-	
 	/*
 	 * If it is added that B is of type A, then for each superclass of
 	 * A assert that B is of that type.
@@ -187,7 +205,7 @@ public class SimpleReasoner extends StatementListener {
 	 */
 	public void addedType(Statement stmt, Model inferenceModel) {
 
-		log.debug("stmt = " + stmt.toString());
+		//log.debug("stmt = " + stmt.toString());
 		
 		tboxModel.enterCriticalSection(Lock.READ);
 		
@@ -195,10 +213,14 @@ public class SimpleReasoner extends StatementListener {
 			OntClass cls = tboxModel.getOntClass(((Resource)stmt.getObject()).getURI()); 
 			
 			if (cls != null) {
-				ExtendedIterator<OntClass> superIt = cls.listSuperClasses(false);
 				
-				while (superIt.hasNext()) {
-					OntClass parentClass = superIt.next();
+				List<OntClass> parents = (cls.listSuperClasses(false)).toList();		
+				parents.addAll((cls.listEquivalentClasses()).toList());
+				
+				Iterator<OntClass> parentIt = parents.iterator();
+				
+				while (parentIt.hasNext()) {
+					OntClass parentClass = parentIt.next();
 					
 					// VIVO doesn't materialize statements that assert anonymous types
 					// for individuals. Also, sharing an identical anonymous node is
@@ -209,8 +231,8 @@ public class SimpleReasoner extends StatementListener {
 					Statement infStmt = ResourceFactory.createStatement(stmt.getSubject(), RDF.type, parentClass);
 					inferenceModel.enterCriticalSection(Lock.WRITE);
 					try {
-						if (!inferenceModel.contains(infStmt)) {
-							log.debug("Adding this inferred statement:  " + infStmt.toString() );
+						if (!inferenceModel.contains(infStmt) && !infStmt.equals(stmt) ) {
+						    //log.debug("Adding this inferred statement:  " + infStmt.toString() );
 							inferenceModel.add(infStmt);
 						}
 					} finally {
@@ -233,7 +255,7 @@ public class SimpleReasoner extends StatementListener {
 	 */
 	public void removedType(Statement stmt) {
 		
-		log.debug("stmt = " + stmt.toString());
+		//log.debug("stmt = " + stmt.toString());
 		
 		tboxModel.enterCriticalSection(Lock.READ);
 		
@@ -241,9 +263,14 @@ public class SimpleReasoner extends StatementListener {
 			OntClass cls = tboxModel.getOntClass(((Resource)stmt.getObject()).getURI()); 
 			
 			if (cls != null) {
-				ExtendedIterator<OntClass> superIt = cls.listSuperClasses(false);
-				while (superIt.hasNext()) {
-					OntClass parentClass = superIt.next();
+				
+				List<OntClass> parents = (cls.listSuperClasses(false)).toList();		
+				parents.addAll((cls.listEquivalentClasses()).toList());
+				
+				Iterator<OntClass> parentIt = parents.iterator();
+				
+				while (parentIt.hasNext()) {
+					OntClass parentClass = parentIt.next();
 					
 					// VIVO doesn't materialize statements that assert anonymous types
 					// for individuals. Also, sharing an identical anonymous node is
@@ -260,7 +287,7 @@ public class SimpleReasoner extends StatementListener {
 					inferenceModel.enterCriticalSection(Lock.WRITE);
 					try {
 						if (inferenceModel.contains(infStmt)) {
-							log.debug("Removing this inferred statement:  " + infStmt.toString() + " - " + infStmt.getSubject().toString() + " - " + infStmt.getPredicate().toString() + " - " + infStmt.getObject().toString());
+							//log.debug("Removing this inferred statement:  " + infStmt.toString() + " - " + infStmt.getSubject().toString() + " - " + infStmt.getPredicate().toString() + " - " + infStmt.getObject().toString());
 							inferenceModel.remove(infStmt);
 						}
 					} finally {
@@ -279,7 +306,7 @@ public class SimpleReasoner extends StatementListener {
 	// of type cls; otherwise returns false.
 	public boolean entailedType(Resource subject, OntClass cls) {
 		
-		log.debug("subject = " + subject.getURI() + " class = " + cls.getURI());
+		//log.debug("subject = " + subject.getURI() + " class = " + cls.getURI());
 		
 		aboxModel.enterCriticalSection(Lock.READ);
 		tboxModel.enterCriticalSection(Lock.READ);
@@ -327,7 +354,7 @@ public class SimpleReasoner extends StatementListener {
 				inferenceModel.enterCriticalSection(Lock.WRITE);
 				
 				if (!inferenceModel.contains(infStmt)) {
-					log.debug("Adding this inferred statement:  " + infStmt.toString() );
+					//log.debug("Adding this inferred statement:  " + infStmt.toString() );
 					inferenceModel.add(infStmt);
 				} 
 			}
@@ -371,7 +398,7 @@ public class SimpleReasoner extends StatementListener {
 				inferenceModel.enterCriticalSection(Lock.WRITE);
 				
 				if (inferenceModel.contains(infStmt)) {
-					log.debug("Removing this inferred statement:  " + infStmt.toString() );
+					//log.debug("Removing this inferred statement:  " + infStmt.toString() );
 					inferenceModel.remove(infStmt);
 				} 
 			}
@@ -522,7 +549,7 @@ public class SimpleReasoner extends StatementListener {
 					inferenceModel.enterCriticalSection(Lock.WRITE);
 					try {
 						if (!inferenceModel.contains(infStmt)) {
-							log.debug("Adding inferred statement: " + infStmt.toString() + " - " + infStmt.getSubject().toString() + " - " + infStmt.getPredicate().toString() + " - " + infStmt.getObject().toString());
+							//log.debug("Adding inferred statement: " + infStmt.toString() + " - " + infStmt.getSubject().toString() + " - " + infStmt.getPredicate().toString() + " - " + infStmt.getObject().toString());
 							inferenceModel.add(infStmt);
 						}
 					} finally {
@@ -559,7 +586,7 @@ public class SimpleReasoner extends StatementListener {
 					inferenceModel.enterCriticalSection(Lock.WRITE);
 					try {
 						if (inferenceModel.contains(infStmt)) {
-							log.debug("Removing inferred statement: " + infStmt.toString() + " - " + infStmt.getSubject().toString() + " - " + infStmt.getPredicate().toString() + " - " + infStmt.getObject().toString());
+							//log.debug("Removing inferred statement: " + infStmt.toString() + " - " + infStmt.getSubject().toString() + " - " + infStmt.getPredicate().toString() + " - " + infStmt.getObject().toString());
 							inferenceModel.remove(infStmt);
 						}
 					} finally {
@@ -598,14 +625,17 @@ public class SimpleReasoner extends StatementListener {
 		}	
 	}
 	
-	public static SimpleReasoner getSimpleReasonerFromServletContext(
-	                                                    ServletContext ctx) {
+	public static SimpleReasoner getSimpleReasonerFromServletContext(ServletContext ctx) {
 	    Object simpleReasoner = ctx.getAttribute("simpleReasoner");
+	    
 	    if (simpleReasoner instanceof SimpleReasoner) {
 	        return (SimpleReasoner) simpleReasoner;
 	    } else {
 	        return null;
 	    }
 	}
-	
+
+	public static boolean isABoxReasoningAsynchronous(ServletContext ctx) {
+	   return (getSimpleReasonerFromServletContext(ctx) == null);	
+	}	
 }

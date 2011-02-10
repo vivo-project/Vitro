@@ -70,7 +70,15 @@ public class RevisionInfoBuilder {
 		}
 
 		String release = assembleReleaseNameFromSubversion();
+		if (release == null) {
+			return null;
+		}
+		
 		String revision = obtainRevisionLevelFromSubversion();
+		if (revision == null) {
+			return null;
+		}
+		
 		return buildLine(release, revision);
 	}
 

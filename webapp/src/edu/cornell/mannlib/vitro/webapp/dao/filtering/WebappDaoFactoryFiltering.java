@@ -316,4 +316,9 @@ public class WebappDaoFactoryFiltering implements WebappDaoFactory {
     public DisplayModelDao getDisplayModelDao(){
         return innerWebappDaoFactory.getDisplayModelDao();
     }
+    
+    @Override 
+    public void close() {
+        innerWebappDaoFactory.close();
+    }
 }

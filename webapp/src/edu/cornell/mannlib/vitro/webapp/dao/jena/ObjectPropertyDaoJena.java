@@ -53,15 +53,11 @@ import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 
 public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectPropertyDao {
     private static final Log log = LogFactory.getLog(ObjectPropertyDaoJena.class.getName());
-
-    /* This may be the intent behind JenaBaseDao.NONUSER_NAMESPACES, but that
-     * value does not contain all of these namespaces.
-     */
+    
     protected static final List<String> EXCLUDED_NAMESPACES = Arrays.asList(
-            //"http://vitro.mannlib.cornell.edu/ns/vitro/0.7#",
-            //"http://vitro.mannlib.cornell.edu/ns/vitro/public#",
-            "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-            "http://www.w3.org/2000/01/rdf-schema#",
+            // Don't need to exclude these, because they are not owl:ObjectProperty
+            //"http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+            //"http://www.w3.org/2000/01/rdf-schema#",
             "http://www.w3.org/2002/07/owl#"            
         ); 
     /*
@@ -75,43 +71,43 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
             namespaceFilters.add("(afn:namespace(?property) != \"" + s + "\")");
         }
         // A hack to include the vitro:primaryLink and vitro:additionalLink properties in the list
-        namespaceFilters.add("( ?property = <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#primaryLink> ||" +
-                               "?property = <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#additionalLink> ||" +
+        namespaceFilters.add("( ?property = vitro:primaryLink ||" +
+                               "?property = vitro:additionalLink ||" +
                                "afn:namespace(?property) != \"http://vitro.mannlib.cornell.edu/ns/vitro/0.7#\" )");
         propertyFilters = "FILTER (" + StringUtils.join(namespaceFilters, " && ") + ")\n";
     }
     
-    protected static final String objectPropertyQueryString = 
-        PREFIXES + "\n" +
+    protected static final String OBJECT_PROPERTY_QUERY_STRING = 
+        prefixes + "\n" +
         "SELECT DISTINCT ?property WHERE { \n" +
         "   GRAPH ?g1 { ?subject ?property ?object } \n" + 
         "   GRAPH ?g2 { ?property rdf:type owl:ObjectProperty } \n" +
         propertyFilters +
         "}";
 
-    static protected Query objectPropertyQuery;
+    protected static Query objectPropertyQuery;
     static {
         try {
-            objectPropertyQuery = QueryFactory.create(objectPropertyQueryString);
+            objectPropertyQuery = QueryFactory.create(OBJECT_PROPERTY_QUERY_STRING);
         } catch(Throwable th){
-            log.error("could not create SPARQL query for objectPropertyQueryString " + th.getMessage());
-            log.error(objectPropertyQueryString);
+            log.error("could not create SPARQL query for OBJECT_PROPERTY_QUERY_STRING " + th.getMessage());
+            log.error(OBJECT_PROPERTY_QUERY_STRING);
         }           
     }
     
-    static protected String listViewConfigFileQueryString =
+    protected static final String LIST_VIEW_CONFIG_FILE_QUERY_STRING =
         "PREFIX display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#>" +
         "SELECT ?property ?filename WHERE { \n" +
         "    ?property display:listViewConfigFile ?filename . \n" +
         "}";
     
-    static protected Query listViewConfigFileQuery;
+    protected static Query listViewConfigFileQuery;
     static {
         try {
-            listViewConfigFileQuery = QueryFactory.create(listViewConfigFileQueryString);
+            listViewConfigFileQuery = QueryFactory.create(LIST_VIEW_CONFIG_FILE_QUERY_STRING);
         } catch(Throwable th){
-            log.error("could not create SPARQL query for listViewConfigFileQueryString " + th.getMessage());
-            log.error(listViewConfigFileQueryString);
+            log.error("could not create SPARQL query for LIST_VIEW_CONFIG_FILE_QUERY_STRING " + th.getMessage());
+            log.error(LIST_VIEW_CONFIG_FILE_QUERY_STRING);
         }           
     }
     
@@ -888,9 +884,9 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
      * into the new one in a future release.
      */
     public List<ObjectProperty> getObjectPropertyList(String subjectUri) {
-        log.debug("objectPropertyQueryString:\n" + objectPropertyQueryString);
-        log.debug("objectPropertyQuery:\n" + objectPropertyQuery);
-        ResultSet results = getPropertyQueryResults(subjectUri, objectPropertyQuery);
+        log.debug("Object property query string:\n" + OBJECT_PROPERTY_QUERY_STRING);
+        log.debug("Object property query:\n" + objectPropertyQuery);
+        Iterator<QuerySolution> results = getPropertyQueryResults(subjectUri, objectPropertyQuery);
         List<ObjectProperty> properties = new ArrayList<ObjectProperty>();
         while (results.hasNext()) {
             QuerySolution soln = results.next();

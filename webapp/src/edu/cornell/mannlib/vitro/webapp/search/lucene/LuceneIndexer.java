@@ -203,28 +203,29 @@ public class LuceneIndexer implements IndexerIface {
         	if( urisIndexed.contains(ind.getURI()) ){
         		log.debug("already indexed " + ind.getURI() );
         		return;
-        	}else
+        	}else{
         		urisIndexed.add(ind.getURI());
-        	
-            Iterator<Obj2DocIface> it = getObj2DocList().iterator();
-            while (it.hasNext()) {
-                Obj2DocIface obj2doc = (Obj2DocIface) it.next();
-                if (obj2doc.canTranslate(ind)) {
-                	Document d = (Document) obj2doc.translate(ind);
-                	if( d != null){                		                		                		
-                		if( !newDoc ){                    	                    		
-                			writer.updateDocument((Term)obj2doc.getIndexId(ind), d);
-                			log.debug("updated " + ind.getName() + " " + ind.getURI());
-                		}else{                    	
-                    		writer.addDocument(d);
-                    		log.debug("added " + ind.getName() + " " + ind.getURI());
-                		}
-                    }else{
-                    	log.debug("could not translate, removing from index " + ind.getURI());
-                    	writer.deleteDocuments((Term)obj2doc.getIndexId(ind));
+        	    log.debug("indexing " + ind.getURI());
+                Iterator<Obj2DocIface> it = getObj2DocList().iterator();
+                while (it.hasNext()) {
+                    Obj2DocIface obj2doc = (Obj2DocIface) it.next();
+                    if (obj2doc.canTranslate(ind)) {
+                    	Document d = (Document) obj2doc.translate(ind);
+                    	if( d != null){                		                		                		
+                    		if( !newDoc ){                    	                    		
+                    			writer.updateDocument((Term)obj2doc.getIndexId(ind), d);
+                    			log.debug("updated " + ind.getName() + " " + ind.getURI());
+                    		}else{                    	
+                        		writer.addDocument(d);
+                        		log.debug("added " + ind.getName() + " " + ind.getURI());
+                    		}
+                        }else{
+                        	log.debug("removing from index " + ind.getURI());
+                        	writer.deleteDocuments((Term)obj2doc.getIndexId(ind));
+                        }
                     }
                 }
-            }
+        	}
         } catch (IOException ex) {
             throw new IndexingException(ex.getMessage());
         }
@@ -238,7 +239,7 @@ public class LuceneIndexer implements IndexerIface {
         if( writer == null )
             throw new IndexingException("LuceneIndexer: cannot delete from " +
             		"index, IndexWriter is null.");
-        try {
+        try {            
             Iterator<Obj2DocIface> it = getObj2DocList().iterator();
             while (it.hasNext()) {
                 Obj2DocIface obj2doc = (Obj2DocIface) it.next();
@@ -276,14 +277,42 @@ public class LuceneIndexer implements IndexerIface {
 
     private synchronized void bringRebuildOnLine() {
         closeWriter();
-        deleteDir(new File(liveIndexDir));
         File offLineDir = new File(currentOffLineDir);
         File liveDir = new File(liveIndexDir);
+
+        log.debug("deleting old live directory " + liveDir.getAbsolutePath());
+        boolean deleted = deleteDir(liveDir);
+        if (! deleted ){
+            log.debug("failed to delete live index directory " 
+                    + liveDir.getAbsolutePath());
+            log.debug("Attempting to close searcher and delete live directory");
+            this.luceneIndexFactory.forceClose();
+            boolean secondDeleted = deleteDir(liveDir);
+            if( ! secondDeleted ){
+                log.error("Search index is out of date and cannot be replaced " +
+                		"because could not remove lucene index from directory" 
+                        + liveDir.getAbsolutePath());
+            }
+            return;
+        }
+
+        log.debug("moving " + offLineDir.getAbsolutePath() + " to " 
+                + liveDir.getAbsolutePath());
+        
         boolean success =  offLineDir.renameTo( liveDir );
-        if( ! success )
+        if( ! success ){
             log.error("could not move off line index at " 
                     + offLineDir.getAbsolutePath() + " to live index directory " 
                     + liveDir.getAbsolutePath());
+            return;
+        }            
+
+        File oldWorkignDir = new File(currentOffLineDir);
+        if( oldWorkignDir.exists() )
+            log.debug("old working directory should have been removed " +
+            		"but still exits at " + oldWorkignDir.getAbsolutePath());
+
+        currentOffLineDir = null;
     }  
     
     private synchronized String getOffLineBuildDir(){
@@ -318,14 +347,20 @@ public class LuceneIndexer implements IndexerIface {
         if (dir.isDirectory()) {
             String[] children = dir.list();
             for (int i=0; i<children.length; i++) {
-                boolean success = deleteDir(new File(dir, children[i]));
-                if (!success) {
+                File child = new File(dir, children[i]);
+				boolean childDeleted = deleteDir(child);
+                if (!childDeleted) {
+                	log.debug("failed to delete " + child.getAbsolutePath());
                     return false;
                 }
             }
         }
         // The directory is now empty so delete it
-        return dir.delete();
+        boolean deleted = dir.delete();
+        if (!deleted) {
+        	log.debug("failed to delete " + dir.getAbsolutePath());
+        }
+        return deleted;
     }   
 
     private void checkStartPreconditions() {        
@@ -334,7 +369,7 @@ public class LuceneIndexer implements IndexerIface {
                     "be null but it isn't");
         if( this.currentOffLineDir != null)
             log.error("it is expected that the current" +
-                    "OffLineDir would be null but it is " + currentOffLineDir);
+                    "OffLineDir would be null but it is " + currentOffLineDir);      
         if( indexing )
             log.error("indexing should not be set to true just yet");        
     }
@@ -420,5 +455,22 @@ public class LuceneIndexer implements IndexerIface {
     public boolean isIndexCorroupt(){
         //if it is clear it out but don't rebuild.
         return false;
+    }
+
+    @Override
+    public synchronized void abortIndexingAndCleanUp() {
+        if( ! indexing )
+            log.error("abortIndexingAndCleanUp() should only be called if LuceneIndexer is indexing.");
+        else if( ! fullRebuild )
+            log.error("abortIndexingAndCleanUp() should only be called if LuceneIndexer to end an aborted full index rebuild");
+        else{
+            closeWriter();
+            File offLineDir = new File(currentOffLineDir);
+            boolean deleted = deleteDir(offLineDir);
+            //log might be null if system is shutting down.
+            if( ! deleted ){
+                System.out.println("Could not clean up temp indexing dir " + currentOffLineDir);
+            }
+        }                
     }    
 }

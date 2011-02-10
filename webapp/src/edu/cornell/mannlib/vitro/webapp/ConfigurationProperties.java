@@ -35,6 +35,9 @@ import org.apache.commons.logging.LogFactory;
  * to a value like <code>/usr/local/vitro/stuff/deploy.properties</code> for a
  * file, or like <code>deploy.properties</code> for a resource in the classpath.
  * 
+ * When the properties file is loaded, the values are trimmed to remove leading
+ * or trailing white space, since such white space is almost always an error.
+ * 
  * @author jeb228
  */
 public class ConfigurationProperties {
@@ -144,7 +147,10 @@ public class ConfigurationProperties {
 		Map<String, String> newMap = new HashMap<String, String>();
 		for (Enumeration<?> keys = props.keys(); keys.hasMoreElements();) {
 			String key = (String) keys.nextElement();
-			newMap.put(key, props.getProperty(key));
+			String value = props.getProperty(key);
+			// While we're copying, remove leading and trailing white space.
+			String trimmed = value.trim();
+			newMap.put(key, trimmed);
 		}
 
 		log.info("Configuration properties are: " + newMap);
