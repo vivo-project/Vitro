@@ -58,7 +58,7 @@ public class TemplateProcessingHelper {
             
             // Define a setup template to be included by every page template
             String templateType = (String) map.get("templateType");
-            if (templateType != null && templateType.equals(FreemarkerHttpServlet.PAGE_TEMPLATE_TYPE)) {
+            if (FreemarkerHttpServlet.PAGE_TEMPLATE_TYPE.equals(templateType)) {
                 env.include(getTemplate("pageSetup.ftl"));
             }
             
