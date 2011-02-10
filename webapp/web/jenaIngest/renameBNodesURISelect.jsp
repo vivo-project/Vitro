@@ -58,7 +58,7 @@ function disableProperties(){
        Iterator<Entry<String,LinkedList<String>>> itr = set.iterator();
        Entry<String, LinkedList<String>> entry = null;
     %>
-   
+   <%if(itr.hasNext()){%>
     <select name="property" id="properties" disabled="disabled">
     <% while(itr.hasNext()){%>
     
@@ -66,7 +66,7 @@ function disableProperties(){
     	Iterator<String> listItr = entry.getValue().iterator();
     	%>
     	<option value ="<%=entry.getKey() %>"><%=entry.getKey()%></option>
-    <%}
+    <%}}
     %>
     </select>
     <br></br>
