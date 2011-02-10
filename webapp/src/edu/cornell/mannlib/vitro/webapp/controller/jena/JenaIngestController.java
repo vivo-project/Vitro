@@ -762,48 +762,50 @@ public class JenaIngestController extends BaseEditController {
 			else{
 				destination.add(utils.renameBNodesByPattern(source, namespaceEtc, vreq.getJenaOntModel(), pattern, property));
 			}
-			if(csv2rdf && property!=null){
-				ClosableIterator closeIt = destination.listSubjects();
-				Property prop = ResourceFactory.createProperty(property);
-				try {
-					for (Iterator it = closeIt; it.hasNext();) {
-						Resource res = (Resource) it.next();
-						if (res.isAnon()) {
-							ClosableIterator closfIt = destination.listStatements(res,prop,(RDFNode)null);
-							Statement stmt = null;
-							try {
-								if (closfIt.hasNext()) {
-									stmt = (Statement) closfIt.next();
+			if(csv2rdf!=null){
+				if(csv2rdf && property!=null){
+					ClosableIterator closeIt = destination.listSubjects();
+					Property prop = ResourceFactory.createProperty(property);
+					try {
+						for (Iterator it = closeIt; it.hasNext();) {
+							Resource res = (Resource) it.next();
+							if (res.isAnon()) {
+								ClosableIterator closfIt = destination.listStatements(res,prop,(RDFNode)null);
+								Statement stmt = null;
+								try {
+									if (closfIt.hasNext()) {
+										stmt = (Statement) closfIt.next();
+									}
+								} finally {
+									closfIt.close();
 								}
-							} finally {
-								closfIt.close();
-							}
-							if (stmt != null) {
-								Resource outRes = stmt.getSubject();
-								destination.removeAll(outRes,(Property)null,(RDFNode)null);
+								if (stmt != null) {
+									Resource outRes = stmt.getSubject();
+									destination.removeAll(outRes,(Property)null,(RDFNode)null);
+								}
 							}
 						}
+					} finally {
+						closeIt.close();
 					}
-				} finally {
-					closeIt.close();
+					csv2rdf = false;
+					getServletContext().setAttribute("csv2rdf", csv2rdf);
 				}
-				csv2rdf = false;
-				getServletContext().setAttribute("csv2rdf", csv2rdf);
-			}
-			else if(csv2rdf && property == null){
-				ClosableIterator closeIt = destination.listSubjects();
-				try {
-					for (Iterator it = closeIt; it.hasNext();) {
-						Resource res = (Resource) it.next();
-						if (res.isAnon()) {
+				else if(csv2rdf && property == null){
+					ClosableIterator closeIt = destination.listSubjects();
+					try {
+						for (Iterator it = closeIt; it.hasNext();) {
+							Resource res = (Resource) it.next();
+							if (res.isAnon()) {
 								destination.removeAll(res,(Property)null,(RDFNode)null);
+							}
 						}
+					} finally {
+						closeIt.close();
 					}
-				} finally {
-					closeIt.close();
+					csv2rdf = false;
+					getServletContext().setAttribute("csv2rdf", csv2rdf);
 				}
-				csv2rdf = false;
-				getServletContext().setAttribute("csv2rdf", csv2rdf);
 			}
 			
 		} finally {
