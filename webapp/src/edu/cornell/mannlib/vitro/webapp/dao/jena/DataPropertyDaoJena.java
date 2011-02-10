@@ -468,7 +468,7 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
     }
     
     private String getRequiredDatatypeURI(Individual individual, DataProperty dataprop, List<String> vclassURIs) {
-        OntModel ontModel = getOntModelSelector().getFullModel();
+        OntModel ontModel = getOntModelSelector().getTBoxModel();
         String datatypeURI = dataprop.getRangeDatatypeURI();    
     
         ontModel.enterCriticalSection(Lock.READ);
