@@ -81,17 +81,17 @@ Assumes property is non-null. -->
 we need to also show the property label. If no label is specified, the property
 name will be used as the label. -->
 <#macro addLinkWithLabel property editable label="${property.name?capitalize}">
-    <#local addLink><@addLink property editable /></#local>
+    <#local addLink><@addLink property editable label /></#local>
     <#if addLink?has_content>
         <h2 id="${property.localName}">${label} ${addLink}</h2> 
     </#if>
 </#macro>
 
-<#macro addLink property editable>
+<#macro addLink property editable label="${property.name}">
     <#if editable>
         <#local url = property.addUrl>
         <#if url?has_content>
-            <a class="add-${property.localName}" href="${url}" title="Add new ${property.name}"><img class="add-individual" src="${urls.images}/individual/addIcon.gif" alt="add" /></a>
+            <a class="add-${property.localName}" href="${url}" title="Add new ${label?lower_case}"><img class="add-individual" src="${urls.images}/individual/addIcon.gif" alt="add" /></a>
         </#if>
     </#if>
 </#macro>
