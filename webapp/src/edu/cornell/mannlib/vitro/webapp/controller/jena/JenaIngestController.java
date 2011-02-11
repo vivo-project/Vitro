@@ -577,7 +577,8 @@ public class JenaIngestController extends BaseEditController {
 					OntModel infOntModel = (OntModel)
 					getServletContext().getAttribute(JenaBaseDao.INFERENCE_ONT_MODEL_ATTRIBUTE_NAME);
 				  String result = utils.doMerge(uri1,uri2,baseOntModel,ontModel,infOntModel);
-				  request.getSession().setAttribute("leftoverModel", utils.getLeftOverModel());
+				// request.getSession().setAttribute("leftoverModel", utils.getLeftOverModel());
+				  getServletContext().setAttribute("leftoverModel", utils.getLeftOverModel());
 				  request.setAttribute("result",result);
 				  request.setAttribute("title","Merge Individuals");
 				  request.setAttribute("bodyJsp",MERGE_RESULT);
@@ -606,7 +607,8 @@ public class JenaIngestController extends BaseEditController {
 			  
 		  }
 		else if("mergeResult".equals(actionStr)){
-			Model lmodel = (Model)request.getSession().getAttribute("leftoverModel");
+			//Model lmodel = (Model)request.getSession().getAttribute("leftoverModel");
+			Model lmodel = (Model)getServletContext().getAttribute("leftoverModel");
 			response.setContentType("RDF/XML-ABBREV");
 			try{
 			OutputStream outStream = response.getOutputStream();
