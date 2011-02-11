@@ -287,15 +287,12 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 
 		<java classname="edu.cornell.mannlib.vitro.utilities.revisioninfo.RevisionInfoBuilder"
 		      fork="no"
-		      failonerror="true"
-		      logerror="true"
-		      outputproperty="revisionInfo.outputLine">
+		      failonerror="true">
 			<classpath refid="test.run.classpath" />
 			<arg value="${ant.project.name}" />
 			<arg file="${revisionInfo.product.dir}" />
+			<arg file="${revisionInfo.build.file}" />
 		</java>
-		<echo file="${revisionInfo.build.file}" append="true">${revisionInfo.outputLine}
-</echo>
 	</target>
 
 	<!-- ================================= 
