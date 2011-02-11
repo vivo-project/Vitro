@@ -94,14 +94,12 @@ public class VitroJenaSDBModelMaker implements ModelMaker {
 	private Store getStore() {
 	    Store store = null;
 	    boolean goodStore = false;
-	    boolean badConn = false;
 	    int tries = 0;
 	    while (!goodStore && tries < MAX_TRIES) {
 	        tries++;
-	        if (conn == null || badConn) {
+	        if (conn == null) {
 	            try {
                     conn = new SDBConnection(bds.getConnection());
-                    badConn = false;
                 } catch (SQLException sqle) {
                     throw new RuntimeException(
                             "Unable to get SQL connection", sqle);
@@ -115,13 +113,15 @@ public class VitroJenaSDBModelMaker implements ModelMaker {
                     store.getTableFormatter().truncate();
                 }
 	        } catch (SQLException sqle) {
+                conn.close();
+                conn = null;
 	            throw new RuntimeException(
 	                    "Unable to set up SDB store for model maker", sqle);
 	        }
 	        if (!isWorking(store)) {
 	            if (conn != null) {
 	                conn.close();
-	                badConn = true;
+                    conn = null;
 	            }
 	            
 	        } else {
