@@ -89,7 +89,7 @@ public class TemplateProcessingHelper {
         try {
             template = config.getTemplate(templateName);
         } catch (IOException e) {
-            throw new TemplateProcessingException("Cannot find template " + templateName, e);
+            throw new TemplateProcessingException("Cannot find template " + templateName);
         }  
         return template;
     }
