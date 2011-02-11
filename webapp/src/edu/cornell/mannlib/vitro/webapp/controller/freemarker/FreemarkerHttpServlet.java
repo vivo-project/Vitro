@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,7 +35,6 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Tem
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 import edu.cornell.mannlib.vitro.webapp.web.BreadCrumbsUtil;
 import edu.cornell.mannlib.vitro.webapp.web.PortalWebUtil;
-import edu.cornell.mannlib.vitro.webapp.web.functions.IndividualLocalNameMethod;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.User;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.files.Scripts;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.files.Stylesheets;
@@ -405,6 +405,9 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         
         // Allow template to send domain name to JavaScript (needed for AJAX calls)
         map.put("requestedPage", vreq.getRequestURL().toString());
+
+        // In template: ${now?date}, ${now?datetime}, ${now?time}
+        map.put("now", new Date());
         
         return map;        
     }  

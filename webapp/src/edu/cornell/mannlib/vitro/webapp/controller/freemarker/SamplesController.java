@@ -40,11 +40,6 @@ public class SamplesController extends FreemarkerHttpServlet {
         // List<String> apples = null; // error
         body.put("apples", apples); // without this: error        
         
-        Calendar cal = Calendar.getInstance();
-        Date now = cal.getTime();
-        body.put("now", now);
-        // In template: ${now?date}, ${now?datetime}, ${now?time}
-        
         // You can add to a collection AFTER putting it in the template data model.
         // The data model contains a reference to the collection, not a copy.
         List<String> fruit = new ArrayList<String>();

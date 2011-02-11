@@ -15,6 +15,8 @@
     <li>Current date: ${now?date}</li>
     <li>Current time: ${now?time}</li>
 </ul>
+<h3>Dates</h3>
+
 
 <h3>Formatted datetime</h3>
 <p><p>${dt.xsdDateTimeToYear(xsddatetime)}</p>
