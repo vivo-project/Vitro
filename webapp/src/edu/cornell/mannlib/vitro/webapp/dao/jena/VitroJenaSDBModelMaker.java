@@ -109,24 +109,27 @@ public class VitroJenaSDBModelMaker implements ModelMaker {
 	        try {
     	        if (!StoreUtils.isFormatted(store)) {
                     // initialize the store
-                    store.getTableFormatter().create();
-                    store.getTableFormatter().truncate();
+                    try {
+                        store.getTableFormatter().create();
+                        store.getTableFormatter().truncate();
+                    } catch (Exception e) {
+                        throw new RuntimeException(
+                                "Unable to format store for " +
+                                "VitroJenaSDBModelMaker", e); 
+                    }
                 }
 	        } catch (SQLException sqle) {
                 conn.close();
                 conn = null;
-	            throw new RuntimeException(
-	                    "Unable to set up SDB store for model maker", sqle);
 	        }
-	        if (!isWorking(store)) {
-	            if (conn != null) {
+	        if (conn != null) {
+                if (isWorking(store)) {
+                     goodStore = true;
+	            } else {
 	                conn.close();
                     conn = null;
 	            }
-	            
-	        } else {
-	            goodStore = true;
-	        }
+            }
 	    }
 	    if (store == null) {
 	        throw new RuntimeException(
