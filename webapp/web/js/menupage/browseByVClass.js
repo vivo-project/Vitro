@@ -114,7 +114,7 @@ var browseByVClass = {
                     // Build the content of each list item, piecing together each component
                     listItem = '<li class="individual" role="listitem" role="navigation">';
                     if ( typeof results.individuals[i].thumbUrl !== "undefined" ) {
-                        listItem += '<img src="'+ image +'" width="90" height="90" alt="'+ label +'" /><h1 class="thumb">';
+                        listItem += '<img src="'+ image +'" width="90" alt="'+ label +'" /><h1 class="thumb">';
                     } else {
                         listItem += '<h1>';
                     }
