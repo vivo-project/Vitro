@@ -488,7 +488,8 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
                                                   RDF.type,
                                                   rest)
                                 ) {
-                                        datatypeURI = avfrest.getAllValuesFrom().getURI();
+                                        datatypeURI = convertRequiredDatatypeURI(
+                                                avfrest.getAllValuesFrom().getURI());
                                         break; 
                             } else {
                                 // check if the restriction applies to one of the individual's types
@@ -497,7 +498,8 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
                                 equivOrSubResources.addAll(ontModel.listSubjectsWithProperty(OWL.equivalentClass, rest).toList());
                                 for(Resource equivOrSubRes : equivOrSubResources) {
                                     if (!equivOrSubRes.isAnon() && vclassURIs.contains(equivOrSubRes.getURI())) {
-                                        datatypeURI = avfrest.getAllValuesFrom().getURI();
+                                        datatypeURI = convertRequiredDatatypeURI(
+                                                avfrest.getAllValuesFrom().getURI());
                                         break;
                                     }
                                 }
@@ -510,6 +512,18 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
             ontModel.leaveCriticalSection();
         }
         return datatypeURI;
+    }
+    
+    /**
+     * Converts datatypes used in allValuesFromRestrictions to actual
+     * requirements for editing.  Initially, this means we filter out
+     * rdfs:Literal because we don't want to populate literals with this
+     * as a datatype.
+     */
+    private String convertRequiredDatatypeURI(String datatypeURI) {
+        return (RDFS.Literal.getURI().equals(datatypeURI)) 
+                ? null 
+                : datatypeURI;
     }
     
     public String getRequiredDatatypeURI(Individual individual, DataProperty dataprop) {    	    		    	
