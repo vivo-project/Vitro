@@ -3,6 +3,7 @@
 <#-- FreeMarker samples -->
 
 <#import "lib-datetime.ftl" as dt>
+<#import "lib-string.ftl" as str>
 
 <h2>${title}</h2>
 
@@ -113,6 +114,11 @@ ${r"${two}"}: ${two}<br />
 ${r"${numbers[1]}"}: ${numbers[1]}<br />
 ${r"${numbers2[1]}"}: ${numbers2[1]}<br />
 
+<h3>Uncamelcasing</h3>
+<#assign s1 = "FreemarkerTest">
+${s1} => ${str.unCamelCase(s1)}<br />
+<#assign s2 = "Freemarker">
+${s2} => ${str.unCamelCase(s2)}<br />
 
 <@dump var="now" />
 <@dump var="urls" />
