@@ -163,6 +163,9 @@ ul.individual-urls-people li {
     font-size: .875em;
     line-height: 1.3em;
 }
+ul.individual-urls-people li a {
+    word-wrap: break-word;
+}
 #photo-wrapper {
     position: relative;
     float: left;
