@@ -33,6 +33,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SearchReindexingListener;
+import edu.cornell.mannlib.vitro.webapp.search.beans.IndividualProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ObjectSourceIface;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
@@ -99,11 +100,13 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 			// This will attempt to create a new directory and empty index if there is none.
 			LuceneIndexer indexer = new LuceneIndexer(getBaseIndexDirName(),liveIndexDir, null, getAnalyzer());
 			context.setAttribute(ANALYZER, getAnalyzer());
-			Entity2LuceneDoc translator = new Entity2LuceneDoc();
+			
 			OntModel displayOntModel = (OntModel) sce.getServletContext().getAttribute("displayOntModel");
-			translator.setClassesProhibitedFromSearch(
-			        new ProhibitedFromSearch(DisplayVocabulary.PRIMARY_LUCENE_INDEX_URI, displayOntModel));			
+			Entity2LuceneDoc translator = new Entity2LuceneDoc( 
+			        new ProhibitedFromSearch(DisplayVocabulary.PRIMARY_LUCENE_INDEX_URI, displayOntModel),
+			        new IndividualProhibitedFromSearch(context) );									
 			indexer.addObj2Doc(translator);			
+			
 			context.setAttribute(LuceneIndexer.class.getName(), indexer);
 			indexer.setLuceneIndexFactory(lif);
 			
