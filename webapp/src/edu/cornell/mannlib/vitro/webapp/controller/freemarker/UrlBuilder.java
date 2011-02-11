@@ -201,6 +201,12 @@ public class UrlBuilder {
             put(key, String.valueOf(value));
         }
         
+        public void put(ParamMap params) {
+            for (String key: params.keySet()) {
+                put(key, params.get(key));
+            }
+        }
+        
     }
     
     /********** Static utility methods **********/
@@ -262,6 +268,10 @@ public class UrlBuilder {
     }
     
     public static String addParams(String url, String...params) {
+        return addParams(url, new ParamMap(params));
+    }
+    
+    public static String addParams(String url, List<String> params) {
         return addParams(url, new ParamMap(params));
     }
     
