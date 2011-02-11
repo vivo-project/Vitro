@@ -25,6 +25,7 @@ import edu.cornell.mannlib.vitro.webapp.config.RevisionInfoBean;
 import edu.cornell.mannlib.vitro.webapp.controller.ContactMailServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper.TemplateProcessingException;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ExceptionResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ForwardResponseValues;
@@ -94,8 +95,10 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
 	            responseValues = processRequest(vreq);
 	        }
 
-	        doResponse(vreq, response, responseValues);	        
-       
+	        doResponse(vreq, response, responseValues);	 
+	        
+    	} catch (TemplateProcessingException e) {
+    	    log.error(e.getMessage(), e);
         } catch (Throwable e) {
             log.error("FreeMarkerHttpServlet could not forward to view.", e);
         }
@@ -135,7 +138,8 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         return null;
     }
        
-    protected void doResponse(VitroRequest vreq, HttpServletResponse response, ResponseValues values) {
+    protected void doResponse(VitroRequest vreq, HttpServletResponse response, 
+            ResponseValues values) throws TemplateProcessingException {
         try {
             
             int statusCode = values.getStatusCode();
@@ -159,10 +163,10 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         } catch (IOException e) {
             log.error("IOException in doResponse()", e);
         }
-     
     }
 
-    protected void doTemplate(VitroRequest vreq, HttpServletResponse response, ResponseValues values) {
+    protected void doTemplate(VitroRequest vreq, HttpServletResponse response, 
+            ResponseValues values) throws TemplateProcessingException {
      
         Configuration config = getConfig(vreq);
         
@@ -229,7 +233,8 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         values.getModel().write( response.getOutputStream(), format );      
     }
 
-    protected void doException(VitroRequest vreq, HttpServletResponse response, ResponseValues values) {
+    protected void doException(VitroRequest vreq, HttpServletResponse response, 
+            ResponseValues values) throws TemplateProcessingException {
         // Log the error, and display an error message on the page.        
         log.error(values.getException(), values.getException());      
         TemplateResponseValues trv = TemplateResponseValues.getTemplateResponseValuesFromException((ExceptionResponseValues)values);
@@ -459,31 +464,34 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     }
 
     protected StringWriter processTemplate(String templateName, Map<String, Object> map, Configuration config, 
-            HttpServletRequest request) {    
+            HttpServletRequest request) throws TemplateProcessingException {    
         TemplateProcessingHelper helper = new TemplateProcessingHelper(config, request, getServletContext());
         return helper.processTemplate(templateName, map);
     }
     
-    protected StringWriter processTemplate(ResponseValues values, Configuration config, HttpServletRequest request) {
+    protected StringWriter processTemplate(ResponseValues values, Configuration config, 
+            HttpServletRequest request) throws TemplateProcessingException {
         return processTemplate(values.getTemplateName(), values.getMap(), config, request);
     }
     
     // In fact, we can put StringWriter objects directly into the data model, so perhaps we should eliminate the processTemplateToString() methods.
     protected String processTemplateToString(String templateName, Map<String, Object> map, Configuration config, 
-            HttpServletRequest request) {
+            HttpServletRequest request) throws TemplateProcessingException {
         return processTemplate(templateName, map, config, request).toString();
     }
   
-    protected String processTemplateToString(ResponseValues values, Configuration config, HttpServletRequest request) {
+    protected String processTemplateToString(ResponseValues values, Configuration config, 
+            HttpServletRequest request) throws TemplateProcessingException {
         return processTemplate(values, config, request).toString();
     }
     
-    protected void writePage(Map<String, Object> root, Configuration config, HttpServletRequest request, HttpServletResponse response) {   
+    protected void writePage(Map<String, Object> root, Configuration config, 
+            HttpServletRequest request, HttpServletResponse response) throws TemplateProcessingException {   
         writeTemplate(getPageTemplateName(), root, config, request, response);                   
     }
     
     protected void writeTemplate(String templateName, Map<String, Object> map, Configuration config, 
-            HttpServletRequest request, HttpServletResponse response) {       
+            HttpServletRequest request, HttpServletResponse response) throws TemplateProcessingException {       
         StringWriter sw = processTemplate(templateName, map, config, request);          
         write(sw, response);
     }

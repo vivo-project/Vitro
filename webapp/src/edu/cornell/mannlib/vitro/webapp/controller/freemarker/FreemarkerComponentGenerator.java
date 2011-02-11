@@ -13,6 +13,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper.TemplateProcessingException;
 import freemarker.template.Configuration;
 
 /**
@@ -45,7 +46,12 @@ public class FreemarkerComponentGenerator extends FreemarkerHttpServlet {
 
     private String get(String templateName, Map<String, Object> root, Configuration config, HttpServletRequest request) {
         templateName += ".ftl";
-        return processTemplate(templateName, root, config, request).toString();
+        try {
+            return processTemplate(templateName, root, config, request).toString();
+        } catch (TemplateProcessingException e) {
+            log.error("Error processing template " + templateName + ": " + e.getMessage(), e);
+            return null;
+        }
     }
     
     private String getHead(String templateName, Map<String, Object> root, Configuration config, HttpServletRequest request) {

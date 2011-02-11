@@ -15,6 +15,7 @@ import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.edit.Authenticate;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper.TemplateProcessingException;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State;
 import freemarker.template.Configuration;
@@ -64,9 +65,17 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 			default:
 				return doTemplate(vreq, showLoginScreen(vreq));
 			}
+		} catch (TemplateProcessingException e) {
+		    log.error(e.getMessage(), e);
+		    return null;
 		} catch (Exception e) {
 			log.error(e, e);
-			return doTemplate(vreq, showError(e));
+			try {
+                return doTemplate(vreq, showError(e));
+            } catch (TemplateProcessingException e1) {
+                log.error(e1.getMessage(), e1);
+                return null;
+            }
 		}
 	}
 
@@ -153,7 +162,7 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 	 * We processed a response, and want to show a template. Version for JSP
 	 * page.
 	 */
-	private String doTemplate(VitroRequest vreq, TemplateResponseValues values) {
+	private String doTemplate(VitroRequest vreq, TemplateResponseValues values) throws TemplateProcessingException {
 		// Set it up like FreeMarkerHttpServlet.doGet() would do.
 		Configuration config = getConfig(vreq);
 		

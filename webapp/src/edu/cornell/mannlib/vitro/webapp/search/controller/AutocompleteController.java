@@ -31,9 +31,9 @@ import org.apache.lucene.search.WildcardQuery;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper.TemplateProcessingException;
 import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
 import edu.cornell.mannlib.vitro.webapp.search.SearchException;
-import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneIndexFactory;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup;
@@ -141,11 +141,16 @@ public class AutocompleteController extends FreemarkerHttpServlet{
             Collections.sort(results);
             map.put("results", results);
             writeTemplate(TEMPLATE_DEFAULT, map, config, request, response);
-   
+        
+        } catch (TemplateProcessingException e) {
+            log.error(e, e);
         } catch (Throwable e) {
             log.error("AutocompleteController(): " + e);            
-            doSearchError(map, config, request, response);
-            return;
+            try {
+                doSearchError(map, config, request, response);
+            } catch (TemplateProcessingException e1) {
+                log.error(e1.getMessage(), e1);
+            }
         }
     }
 
@@ -340,15 +345,18 @@ public class AutocompleteController extends FreemarkerHttpServlet{
         return qp;
     }
 
-    private void doNoQuery(Map<String, Object> map, Configuration config, HttpServletRequest request, HttpServletResponse response) {
+    private void doNoQuery(Map<String, Object> map, Configuration config, HttpServletRequest request, 
+            HttpServletResponse response) throws TemplateProcessingException {
         writeTemplate(TEMPLATE_DEFAULT, map, config, request, response);
     }
 
-    private void doFailedSearch(Map<String, Object> map, Configuration config, HttpServletRequest request, HttpServletResponse response) {
+    private void doFailedSearch(Map<String, Object> map, Configuration config, HttpServletRequest request, 
+            HttpServletResponse response) throws TemplateProcessingException {
         writeTemplate(TEMPLATE_DEFAULT, map, config, request, response);
     }
  
-    private void doSearchError(Map<String, Object> map, Configuration config, HttpServletRequest request, HttpServletResponse response) {
+    private void doSearchError(Map<String, Object> map, Configuration config, HttpServletRequest request, 
+            HttpServletResponse response) throws TemplateProcessingException {
         // For now, we are not sending an error message back to the client because with the default autocomplete configuration it
         // chokes.
         writeTemplate(TEMPLATE_DEFAULT, map, config, request, response);

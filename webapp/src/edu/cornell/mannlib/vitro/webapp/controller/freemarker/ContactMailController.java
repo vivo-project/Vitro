@@ -29,6 +29,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper.TemplateProcessingException;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import freemarker.template.Configuration;
@@ -255,7 +256,12 @@ public class ContactMailController extends FreemarkerHttpServlet {
             email.put("referrer", UrlBuilder.urlDecode(originalReferer));
         }
     	
-        return processTemplateToString(template, email, config, request);
+        try {
+            return processTemplateToString(template, email, config, request);
+        } catch (TemplateProcessingException e) {
+            log.error("Error processing email text through template: " + e.getMessage(), e);
+            return null;            
+        }
     }
     
     private void writeBackupCopy(PrintWriter outFile, String msgText, 
@@ -272,11 +278,15 @@ public class ContactMailController extends FreemarkerHttpServlet {
         }
         
         backup.put("msgText", msgText);
-
-        String backupText = processTemplateToString(template, backup, config, request);
-        outFile.print(backupText);
-        outFile.flush();
-        //outFile.close(); 
+        
+        try {
+            String backupText = processTemplateToString(template, backup, config, request);
+            outFile.print(backupText);
+            outFile.flush();
+            //outFile.close(); 
+        } catch (TemplateProcessingException e) {
+            log.error("Error processing backup text throug template: " + e.getMessage(), e);
+        }
     }
     
     private void sendMessage(Session s, String webuseremail, String webusername,

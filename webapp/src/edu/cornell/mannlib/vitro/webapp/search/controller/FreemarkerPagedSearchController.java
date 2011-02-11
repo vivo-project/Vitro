@@ -141,13 +141,17 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
         if( ! wasXmlRequested ){
             super.doGet(request,response);
         }else{
-            VitroRequest vreq = new VitroRequest(request);
-            Configuration config = getConfig(vreq);            
-            ResponseValues rvalues = processRequest(vreq);
-            
-            response.setCharacterEncoding("UTF-8");
-            response.setContentType("text/xml;charset=UTF-8");
-            writeTemplate(rvalues.getTemplateName(), rvalues.getMap(), config, request, response);
+            try {
+                VitroRequest vreq = new VitroRequest(request);
+                Configuration config = getConfig(vreq);            
+                ResponseValues rvalues = processRequest(vreq);
+                
+                response.setCharacterEncoding("UTF-8");
+                response.setContentType("text/xml;charset=UTF-8");
+                writeTemplate(rvalues.getTemplateName(), rvalues.getMap(), config, request, response);
+            } catch (Exception e) {
+                log.error(e, e);
+            }
         }
     }
 
