@@ -91,7 +91,7 @@ name will be used as the label. -->
     <#if editable>
         <#local url = property.addUrl>
         <#if url?has_content>
-            <a class="add-${property.localName}" href="${url}" title="Add new ${label?lower_case}"><img class="add-individual" src="${urls.images}/individual/addIcon.gif" alt="add" /></a>
+            <a class="add-${property.localName}" href="${url}" title="Add new ${label?lower_case} entry"><img class="add-individual" src="${urls.images}/individual/addIcon.gif" alt="add" /></a>
         </#if>
     </#if>
 </#macro>
