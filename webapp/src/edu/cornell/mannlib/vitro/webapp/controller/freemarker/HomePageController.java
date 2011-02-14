@@ -58,7 +58,11 @@ public class HomePageController extends FreemarkerHttpServlet {
         Portal portal = vreq.getPortal();
         int tabId = portal.getRootTabId();
         Tab tab = vreq.getWebappDaoFactory().getTabDao().getTab(tabId,0,vreq.getAppBean());
-        return tab.getBody();
+        String body = tab.getBody();
+        if (body == null) {
+            body = "";
+        }
+        return body;
     }
     
     @Override
