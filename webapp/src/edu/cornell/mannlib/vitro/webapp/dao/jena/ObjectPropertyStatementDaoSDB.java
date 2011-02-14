@@ -116,12 +116,17 @@ public class ObjectPropertyStatementDaoSDB extends
 
 	                            if (objPropertyStmt.getObjectURI() != null) {
 	                                //this might throw IndividualNotFoundException
-                                    Individual objInd = new IndividualSDB(
-                                        objPropertyStmt.getObjectURI(), 
-                                        this.dwf, 
-                                        datasetMode,
-                                        getWebappDaoFactory());
-                                    objPropertyStmt.setObject(objInd);	                                
+	                            	try {
+                                         Individual objInd = new IndividualSDB(
+                                             objPropertyStmt.getObjectURI(), 
+                                             this.dwf, 
+                                             datasetMode,
+                                             getWebappDaoFactory());
+                                         objPropertyStmt.setObject(objInd);	
+	                            	} catch (IndividualNotFoundException infe) {
+	                            		 log.warn("Individual Not Found for uri: " + objPropertyStmt.getObjectURI());
+	                            		 continue;
+	                            	}                 
 	                            }
 	                            
 	                            //only add statement to list if it has its values filled out
@@ -131,9 +136,6 @@ public class ObjectPropertyStatementDaoSDB extends
 	                                objPropertyStmtList.add(objPropertyStmt);                           
 	                            } 
 	                            
-	                        } catch (IndividualNotFoundException t) {
-	                            log.error(t,t);
-	                            continue;
 	                        } catch (Throwable t){
 	                            log.error(t,t);
                                 continue;
