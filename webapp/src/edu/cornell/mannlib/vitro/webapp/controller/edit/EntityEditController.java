@@ -28,7 +28,6 @@ import edu.cornell.mannlib.vedit.beans.FormObject;
 import edu.cornell.mannlib.vedit.beans.Option;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vedit.util.FormUtils;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.JenaNetidPolicy.ContextSetup;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -72,7 +71,18 @@ public class EntityEditController extends BaseEditController {
 
         Individual ent = vreq.getAssertionsWebappDaoFactory().getIndividualDao().getIndividualByURI(entURI);
         if (ent == null) {
-        	ent = new IndividualImpl(entURI);
+        	try {
+        		RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
+        		request.setAttribute("bodyJsp","/jenaIngest/notfound.jsp");
+        		request.setAttribute("portalBean",portal);
+        		request.setAttribute("title","Individual Not Found");
+        		request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+portal.getThemeDir()+"css/edit.css\"/>");
+        		rd.forward(request, response);
+            } catch (Exception e) {
+                log.error("EntityEditController could not forward to view.");
+                log.error(e.getMessage());
+                log.error(e.getStackTrace());
+            }
         }
         
         Individual inferredEnt = vreq.getFullWebappDaoFactory().getIndividualDao().getIndividualByURI(entURI);
