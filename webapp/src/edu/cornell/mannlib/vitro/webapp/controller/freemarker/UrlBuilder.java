@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openrdf.model.URI;
@@ -19,7 +20,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.filters.PortalPickerFilter;
-import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 
 public class UrlBuilder {
 
@@ -291,24 +291,28 @@ public class UrlBuilder {
     
     private static String getIndividualProfileUrl(Individual individual, String individualUri, WebappDaoFactory wadf) {
         String profileUrl = null;
-        URI uri = new URIImpl(individualUri);
-        String namespace = uri.getNamespace();
-        String defaultNamespace = wadf.getDefaultNamespace();
-
-        String localName = individual.getLocalName();
-                
-        if (defaultNamespace.equals(namespace)) {
-            profileUrl = getUrl(Route.INDIVIDUAL.path() + "/" + localName);
-        } else {
-            if (wadf.getApplicationDao().isExternallyLinkedNamespace(namespace)) {
-                log.debug("Found externally linked namespace " + namespace);
-                profileUrl = namespace + "/" + localName;
+        try {
+            URI uri = new URIImpl(individualUri); // throws exception if individualUri is invalid
+            String namespace = uri.getNamespace();
+            String defaultNamespace = wadf.getDefaultNamespace();
+    
+            String localName = individual.getLocalName();
+                    
+            if (defaultNamespace.equals(namespace)) {
+                profileUrl = getUrl(Route.INDIVIDUAL.path() + "/" + localName);
             } else {
-                ParamMap params = new ParamMap("uri", individualUri);
-                profileUrl = getUrl("/individual", params);
+                if (wadf.getApplicationDao().isExternallyLinkedNamespace(namespace)) {
+                    log.debug("Found externally linked namespace " + namespace);
+                    profileUrl = namespace + "/" + localName;
+                } else {
+                    ParamMap params = new ParamMap("uri", individualUri);
+                    profileUrl = getUrl("/individual", params);
+                }
             }
+        } catch (Exception e) {
+            log.warn(e);
+            return null;
         }
-        
         return profileUrl;        
     }
     
