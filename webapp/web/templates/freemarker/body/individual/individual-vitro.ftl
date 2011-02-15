@@ -42,12 +42,9 @@
         </header>
         
         <nav role="navigation">
-            <ul id ="individual-tools" role="list">
-                <#assign uriUrl = individual.uri>
-                <#if uriUrl??>
-                    <li role="listitem"><a title="Individual uri" href="${uriUrl}"><img class="middle" src="${urls.images}/individual/uriIcon.gif" alt="uri icon" /></a></li>
-                </#if>
-                
+            <ul id ="individual-tools" role="list">                          
+                <li role="listitem"><a title="Individual uri" href="${individual.uri}"><img class="middle" src="${urls.images}/individual/uriIcon.gif" alt="uri icon" /></a></li>
+
                 <#assign rdfUrl = individual.rdfUrl>
                 <#if rdfUrl??>
                     <li role="listitem"><a title="View this individual in RDF format" class="icon-rdf" href="${rdfUrl}">RDF</a></li>
