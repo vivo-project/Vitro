@@ -20,7 +20,8 @@ public class IndividualProfileUrlMethod implements TemplateMethodModel {
             throw new TemplateModelException("Wrong number of arguments");
         }
 
-        String uri = (String) args.get(0);        
+        String uri = (String) args.get(0);      
+        uri = UrlBuilder.urlDecode(uri); // decode in case it's encoded
         Environment env = Environment.getCurrentEnvironment();
         HttpServletRequest request = (HttpServletRequest) env.getCustomAttribute("request");
         VitroRequest vreq = new VitroRequest(request);
