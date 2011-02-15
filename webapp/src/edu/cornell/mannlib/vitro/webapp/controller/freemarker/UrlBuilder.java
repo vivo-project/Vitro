@@ -300,7 +300,7 @@ public class UrlBuilder {
                 }
             }
         } catch (Exception e) {
-            log.error(e, e);
+            log.warn(e);
             return null;
         }
         return profileUrl;        
