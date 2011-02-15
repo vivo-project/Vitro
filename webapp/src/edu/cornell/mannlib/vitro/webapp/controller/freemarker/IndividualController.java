@@ -183,7 +183,7 @@ public class IndividualController extends FreemarkerHttpServlet {
     
     private String getRdfLinkTag(IndividualTemplateModel itm) {
         String linkTag = null;
-        String linkedDataUrl = itm.getRdfUrl(false);
+        String linkedDataUrl = itm.getRdfUrl();
         if (linkedDataUrl != null) {
             linkTag = "<link rel=\"alternate\" type=\"application/rdf+xml\" href=\"" +
                           linkedDataUrl + "\" /> ";

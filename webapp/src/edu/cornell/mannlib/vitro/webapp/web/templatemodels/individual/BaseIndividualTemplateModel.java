@@ -2,9 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -87,13 +85,9 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
         String thumbUrl = individual.getThumbUrl();
         return thumbUrl == null ? null : getUrl(thumbUrl);
     } 
-    
-    public String getRdfUrl() {
-        return getRdfUrl(true);
-    }
-    
+
     // Used to create a link to generate the individual's rdf.
-    public String getRdfUrl(boolean checkExternalNamespaces) {
+    public String getRdfUrl() {
         
         String individualUri = getUri();
         String profileUrl = getProfileUrl();
@@ -104,21 +98,10 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
         // Individuals in the default namespace
         // e.g., http://vivo.cornell.edu/individual/n2345/n2345.rdf
         // where default namespace = http://vivo.cornell.edu/individual/ 
+        // Other individuals: http://some.other.namespace/n2345?format=rdfxml
         String defaultNamespace = vreq.getWebappDaoFactory().getDefaultNamespace();
-        if (defaultNamespace.equals(namespace)) {
-            return profileUrl + "/" + getLocalName() + ".rdf";
-        } 
-        
-        // An RDF url is not defined for an externally linked namespace. The data does not reside
-        // in the current system, and the external system may not accept a request for rdf.
-        if (checkExternalNamespaces && vreq.getWebappDaoFactory()
-                                           .getApplicationDao()
-                                           .isExternallyLinkedNamespace(namespace)) {
-            return null;
-        }
-
-        // http://some.other.namespace/n2345?format=rdfxml
-        return UrlBuilder.addParams(profileUrl, "format", "rdfxml");
+        return (defaultNamespace.equals(namespace)) ? profileUrl + "/" + getLocalName() + ".rdf" 
+                                                    : UrlBuilder.addParams(profileUrl, "format", "rdfxml");
 
     }
     
