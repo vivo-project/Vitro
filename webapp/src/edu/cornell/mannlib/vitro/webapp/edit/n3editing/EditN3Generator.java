@@ -52,11 +52,13 @@ public class EditN3Generator {
     }
 
 
+
     public static String subInUris(String var, String value, String target){
         //empty URIs get skipped
         if( var == null || var.length() == 0 || value==null  )
             return target;
-        String varRegex = "\\?" + var + "(?=[\\W])";
+        /* var followed by dot some whitespace or var followed by whitespace*/
+        String varRegex = "\\?" + var + "(?=\\.\\p{Space}|\\p{Space})";
         String out = null;
         if("".equals(value))
         	out = target.replaceAll(varRegex,">::" + var + " was BLANK::< ");
@@ -106,7 +108,7 @@ public class EditN3Generator {
      *
      */
     protected  String subInLiterals(String var, Literal literal, String target){
-        String varRegex = "\\?" + var + "(?=[\\W])";
+        String varRegex = "\\?" + var + "(?=\\.\\p{Space}|\\p{Space})";
         if (target==null ) {
             log.error("subInLiterals was passed a null target");
             return "blankBecauseTargetOrValueWasNull";

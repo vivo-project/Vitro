@@ -4,7 +4,7 @@
 
 <#include "head.ftl">
 
-<body>
+<body class="${bodyClasses!}">
     <div id="wrap" class="container">
         <div id="header">
         
@@ -21,11 +21,15 @@
 
         <hr class="hidden" />
 
-        <div id="contentwrap">      
-            <div id="content">
-                <#-- We don't do title here because some pages don't get a title, or it may not be the same as the <title> text.
-                <h2>${title}</h2> -->                            
-                ${body} 
+        <div id="contentwrap"> 
+            <#if flash?has_content>
+                <div id="flash-message">
+                    ${flash}
+                </div>
+            </#if>
+            
+            <div id="content">                      
+                ${body}
             </div> <!-- content -->
         </div> <!-- contentwrap -->
     
@@ -41,8 +45,8 @@
 Three ways to add a stylesheet:
 
 A. In theme directory:
-${stylesheets.addFromTheme("/sample.css")}
-${stylesheets.add(themeStylesheetDir + "/sample.css")}
+${stylesheets.addFromTheme("/css/sample.css")}
+${stylesheets.add(themeDir + "/css/sample.css")}
 
 B. Any location
 ${stylesheets.add("/edit/forms/css/sample.css)"}
@@ -50,7 +54,7 @@ ${stylesheets.add("/edit/forms/css/sample.css)"}
 To add a script: 
 
 A. In theme directory:
-${scripts.addFromTheme("/sample.js")}
+${scripts.addFromTheme("/css/sample.js")}
 
 B. Any location
 ${scripts("/edit/forms/js/sample.js)"}

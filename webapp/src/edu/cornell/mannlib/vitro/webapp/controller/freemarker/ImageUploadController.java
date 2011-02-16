@@ -2,59 +2,48 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
-import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.ArrayIdentifierBundle;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.ServletIdentifierBundleFactory;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyList;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.RequestPolicyList;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AddDataPropStmt;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.DropObjectPropStmt;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.EditObjPropStmt;
+import edu.cornell.mannlib.vitro.webapp.auth.AuthorizationHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPropStmt;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropObjectPropStmt;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjPropStmt;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ExceptionResponseValues;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ForwardResponseValues;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RedirectResponseValues;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.filestorage.FileModelHelper;
-import edu.cornell.mannlib.vitro.webapp.filestorage.FileServingHelper;
 import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorage;
 import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
+import edu.cornell.mannlib.vitro.webapp.filestorage.model.ImageInfo;
 import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest;
 import edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep;
-import freemarker.template.Configuration;
 
 /**
  * Handle adding, replacing or deleting the main image on an Individual.
  */
-public class ImageUploadController extends FreeMarkerHttpServlet {
+public class ImageUploadController extends FreemarkerHttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final Log log = LogFactory
 			.getLog(ImageUploadController.class);
@@ -64,14 +53,15 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	private static final String DEFAULT_NAMESPACE = ConfigurationProperties
 			.getProperty("Vitro.defaultNamespace");
 
-	public static final String DUMMY_THUMBNAIL_URL = "/images/dummyImages/person.thumbnail.jpg";
-
+	public static final String DUMMY_THUMBNAIL_PERSON_URL = "/images/placeholders/person.thumbnail.jpg"; 
+    public static final String DUMMY_THUMBNAIL_NON_PERSON_URL = "/images/placeholders/non.person.thumbnail.jpg"; 
+    
 	/** Limit file size to 6 megabytes. */
 	public static final int MAXIMUM_FILE_SIZE = 6 * 1024 * 1024;
 
 	/** Generated thumbnails will be this big. */
-	public static final int THUMBNAIL_HEIGHT = 115;
-	public static final int THUMBNAIL_WIDTH = 115;
+	public static final int THUMBNAIL_HEIGHT = 200;
+	public static final int THUMBNAIL_WIDTH = 200;
 
 	/** The form field that tells what we are doing: uploading? deleting? */
 	public static final String PARAMETER_ACTION = "action";
@@ -108,7 +98,7 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	public static final String TEMPLATE_NEW = "imageUpload-newImage.ftl";
 	public static final String TEMPLATE_REPLACE = "imageUpload-replaceImage.ftl";
 	public static final String TEMPLATE_CROP = "imageUpload-cropImage.ftl";
-	public static final String TEMPLATE_ERROR = "error.ftl";
+	public static final String TEMPLATE_ERROR = "error-standard.ftl";
 
 	private static final String URL_HERE = UrlBuilder.getUrl("/uploadImages");
 
@@ -161,92 +151,29 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	 * </ul>
 	 * </p>
 	 */
-	@Override
-	public void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws IOException, ServletException {
 
+	@Override
+	protected ResponseValues processRequest(VitroRequest vreq) {
 		try {
 			// Parse the multi-part request.
-			request = FileUploadServletRequest.parseRequest(request,
-					MAXIMUM_FILE_SIZE);
+			FileUploadServletRequest request = FileUploadServletRequest
+					.parseRequest(vreq, MAXIMUM_FILE_SIZE);
 			if (log.isTraceEnabled()) {
-				dumpRequestDetails(request);
+				dumpRequestDetails(vreq);
 			}
-
-			// Do setup defined in VitroHttpServlet
-			setup(request);
-
-			VitroRequest vreq = new VitroRequest(request);
 
 			// If they aren't authorized to do this, send them to login.
 			if (!checkAuthorized(vreq)) {
 				String loginPage = request.getContextPath() + Controllers.LOGIN;
-				response.sendRedirect(loginPage);
-				return;
+				return new RedirectResponseValues(loginPage);
 			}
 
-			ResponseValues values = buildTheResponse(vreq);
+			return buildTheResponse(vreq);
 
-			switch (values.getType()) {
-			case FORWARD:
-				doForward(vreq, response, values);
-				break;
-			case TEMPLATE:
-				doTemplate(vreq, response, values);
-				break;
-			case EXCEPTION:
-				doException(vreq, response, values);
-				break;
-			}
 		} catch (Exception e) {
-			log.error("Could not produce response page", e);
+			// log.error("Could not produce response page", e);
+			return new ExceptionResponseValues(e);
 		}
-	}
-
-	/**
-	 * We processed a response, and want to show a template.
-	 */
-	private void doTemplate(VitroRequest vreq, HttpServletResponse response,
-			ResponseValues values) {
-		// Set it up like FreeMarkerHttpServlet.doGet() would do.
-		Configuration config = getConfig(vreq);
-		Map<String, Object> sharedVariables = getSharedVariables(vreq);
-		Map<String, Object> root = new HashMap<String, Object>(sharedVariables);
-		Map<String, Object> body = new HashMap<String, Object>(sharedVariables);
-		setUpRoot(vreq, root);
-
-		// Add the values that we got, and merge to the template.
-		body.putAll(values.getBodyMap());
-		root.put("body", mergeBodyToTemplate(values.getTemplateName(), body,
-				config));
-
-		// Continue to simulate FreeMarkerHttpServlet.doGet()
-		root.put("title", body.get("title"));
-		writePage(root, config, response);
-	}
-
-	/**
-	 * We processsed a response, and want to forward to another page.
-	 */
-	private void doForward(HttpServletRequest req, HttpServletResponse resp,
-			ResponseValues values) throws ServletException, IOException {
-		String forwardUrl = values.getForwardUrl();
-		if (forwardUrl.contains("://")) {
-			// It's a full URL, so redirect.
-			resp.sendRedirect(forwardUrl);
-		} else {
-			// It's a relative URL, so forward within the application.
-			req.getRequestDispatcher(forwardUrl).forward(req, resp);
-		}
-	}
-
-	/**
-	 * We processed a response, and need to display an internal exception.
-	 */
-	private void doException(VitroRequest vreq, HttpServletResponse resp,
-			ResponseValues values) {
-		log.error(values.getException(), values.getException());
-		doTemplate(vreq, resp, new TemplateResponseValues(TEMPLATE_ERROR));
 	}
 
 	/**
@@ -298,11 +225,12 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	 * Show the first screen in the upload process: Add or Replace.
 	 */
 	private ResponseValues doIntroScreen(VitroRequest vreq, Individual entity) {
-		String thumbUrl = getThumbnailUrl(entity);
-		if (thumbUrl == null) {
+		ImageInfo imageInfo = ImageInfo.instanceFromEntityUri(
+				vreq.getFullWebappDaoFactory(), entity);
+		if (imageInfo == null) {
 			return showAddImagePage(vreq, entity);
 		} else {
-			return showReplaceImagePage(vreq, entity, thumbUrl);
+			return showReplaceImagePage(vreq, entity, imageInfo);
 		}
 	}
 
@@ -311,8 +239,8 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	 * image (and thumbnail), and attach the new main image.
 	 */
 	private ResponseValues doUploadImage(VitroRequest vreq, Individual entity) {
-		ImageUploadHelper helper = new ImageUploadHelper(fileStorage, vreq
-				.getFullWebappDaoFactory());
+		ImageUploadHelper helper = new ImageUploadHelper(fileStorage,
+				vreq.getFullWebappDaoFactory());
 
 		try {
 			// Did they provide a file to upload? If not, show an error.
@@ -325,8 +253,8 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 			Dimensions size = helper.getNewImageSize(fileInfo);
 
 			// Go to the cropping page.
-			return showCropImagePage(vreq, entity, fileInfo
-					.getBytestreamAliasUrl(), size);
+			return showCropImagePage(vreq, entity,
+					fileInfo.getBytestreamAliasUrl(), size);
 		} catch (UserMistakeException e) {
 			return showErrorMessage(vreq, entity, e.getMessage());
 		}
@@ -338,11 +266,12 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	 */
 	private ResponseValues showErrorMessage(VitroRequest vreq,
 			Individual entity, String message) {
-		String thumbUrl = getThumbnailUrl(entity);
-		if (thumbUrl == null) {
+		ImageInfo imageInfo = ImageInfo.instanceFromEntityUri(
+				vreq.getFullWebappDaoFactory(), entity);
+		if (imageInfo == null) {
 			return showAddImagePageWithError(vreq, entity, message);
 		} else {
-			return showReplaceImagePageWithError(vreq, entity, thumbUrl,
+			return showReplaceImagePageWithError(vreq, entity, imageInfo,
 					message);
 		}
 	}
@@ -353,8 +282,8 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	 */
 	private ResponseValues doCreateThumbnail(VitroRequest vreq,
 			Individual entity) {
-		ImageUploadHelper helper = new ImageUploadHelper(fileStorage, vreq
-				.getFullWebappDaoFactory());
+		ImageUploadHelper helper = new ImageUploadHelper(fileStorage,
+				vreq.getFullWebappDaoFactory());
 
 		try {
 			CropRectangle crop = validateCropCoordinates(vreq);
@@ -375,8 +304,8 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	 * page.
 	 */
 	private ResponseValues doDeleteImage(VitroRequest vreq, Individual entity) {
-		ImageUploadHelper helper = new ImageUploadHelper(fileStorage, vreq
-				.getFullWebappDaoFactory());
+		ImageUploadHelper helper = new ImageUploadHelper(fileStorage,
+				vreq.getFullWebappDaoFactory());
 
 		helper.removeExistingImage(entity);
 
@@ -388,8 +317,8 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	 * screen.
 	 */
 	private ResponseValues doDeleteThenEdit(VitroRequest vreq, Individual entity) {
-		ImageUploadHelper helper = new ImageUploadHelper(fileStorage, vreq
-				.getFullWebappDaoFactory());
+		ImageUploadHelper helper = new ImageUploadHelper(fileStorage,
+				vreq.getFullWebappDaoFactory());
 
 		helper.removeExistingImage(entity);
 
@@ -448,15 +377,6 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	}
 
 	/**
-	 * Get the URL that will serve this entity's thumbnail image, or null.
-	 */
-	private String getThumbnailUrl(Individual entity) {
-		String thumbUri = FileModelHelper.getThumbnailBytestreamUri(entity);
-		String thumbFilename = FileModelHelper.getThumbnailFilename(entity);
-		return FileServingHelper.getBytestreamAliasUrl(thumbUri, thumbFilename);
-	}
-
-	/**
 	 * The individual has no image - go to the Add Image page.
 	 * 
 	 * @param entity
@@ -466,11 +386,18 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 			Individual entity) {
 		String formAction = (entity == null) ? "" : formAction(entity.getURI(),
 				ACTION_UPLOAD);
-		String cancelUrl = (entity == null) ? "" : exitPageUrl(vreq, entity
-				.getURI());
+		String cancelUrl = (entity == null) ? "" : exitPageUrl(vreq,
+				entity.getURI());
 
 		TemplateResponseValues rv = new TemplateResponseValues(TEMPLATE_NEW);
-		rv.put(BODY_THUMBNAIL_URL, UrlBuilder.getUrl(DUMMY_THUMBNAIL_URL));
+		
+		// rjy7 We should not be referencing particular ontology values here, and ideally
+		// the template would add the placeholder url to the edit link, since it already
+		// knows which placeholder it's using. However, this requires a significantly more
+		// complex implementation, so keeping it simple for now.
+		String dummyThumbnailUrl = entity.isVClass("http://xmlns.com/foaf/0.1/Person") ?
+		        DUMMY_THUMBNAIL_PERSON_URL : DUMMY_THUMBNAIL_NON_PERSON_URL;
+		rv.put(BODY_THUMBNAIL_URL, UrlBuilder.getUrl(dummyThumbnailUrl));
 		rv.put(BODY_FORM_ACTION, formAction);
 		rv.put(BODY_CANCEL_URL, cancelUrl);
 		rv.put(BODY_TITLE, "Upload image" + forName(entity));
@@ -489,9 +416,10 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	 * The individual has an image - go to the Replace Image page.
 	 */
 	private TemplateResponseValues showReplaceImagePage(VitroRequest vreq,
-			Individual entity, String thumbUrl) {
+			Individual entity, ImageInfo imageInfo) {
 		TemplateResponseValues rv = new TemplateResponseValues(TEMPLATE_REPLACE);
-		rv.put(BODY_THUMBNAIL_URL, UrlBuilder.getUrl(thumbUrl));
+		rv.put(BODY_THUMBNAIL_URL, UrlBuilder.getUrl(imageInfo.getThumbnail()
+				.getBytestreamAliasUrl()));
 		rv.put(BODY_DELETE_URL, formAction(entity.getURI(), ACTION_DELETE_EDIT));
 		rv.put(BODY_FORM_ACTION, formAction(entity.getURI(), ACTION_UPLOAD));
 		rv.put(BODY_CANCEL_URL, exitPageUrl(vreq, entity.getURI()));
@@ -503,9 +431,10 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	 * The individual has an image, but the user did something wrong.
 	 */
 	private TemplateResponseValues showReplaceImagePageWithError(
-			VitroRequest vreq, Individual entity, String thumbUrl,
+			VitroRequest vreq, Individual entity, ImageInfo imageInfo,
 			String message) {
-		TemplateResponseValues rv = showReplaceImagePage(vreq, entity, thumbUrl);
+		TemplateResponseValues rv = showReplaceImagePage(vreq, entity,
+				imageInfo);
 		rv.put(BODY_ERROR_MESSAGE, message);
 		return rv;
 	}
@@ -564,8 +493,8 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	 * URI.
 	 */
 	private String formAction(String entityUri, String action) {
-		UrlBuilder.Params params = new UrlBuilder.Params(PARAMETER_ENTITY_URI,
-				entityUri, PARAMETER_ACTION, action);
+		UrlBuilder.ParamMap params = new UrlBuilder.ParamMap(
+				PARAMETER_ENTITY_URI, entityUri, PARAMETER_ACTION, action);
 		return UrlBuilder.getPath(URL_HERE, params);
 	}
 
@@ -664,137 +593,6 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 		}
 	}
 
-	private static interface ResponseValues {
-		enum ResponseType {
-			TEMPLATE, FORWARD, EXCEPTION
-		}
-
-		ResponseType getType();
-
-		String getTemplateName();
-
-		Map<? extends String, ? extends Object> getBodyMap();
-
-		String getForwardUrl();
-
-		Throwable getException();
-	}
-
-	private static class TemplateResponseValues implements ResponseValues {
-		private final String templateName;
-		private final Map<String, Object> bodyMap = new HashMap<String, Object>();
-
-		public TemplateResponseValues(String templateName) {
-			this.templateName = templateName;
-		}
-
-		public TemplateResponseValues put(String key, Object value) {
-			this.bodyMap.put(key, value);
-			return this;
-		}
-
-		@Override
-		public ResponseType getType() {
-			return ResponseType.TEMPLATE;
-		}
-
-		@Override
-		public Map<? extends String, ? extends Object> getBodyMap() {
-			return Collections.unmodifiableMap(this.bodyMap);
-		}
-
-		@Override
-		public String getTemplateName() {
-			return this.templateName;
-		}
-
-		@Override
-		public Throwable getException() {
-			throw new UnsupportedOperationException(
-					"This is not an exception response.");
-		}
-
-		@Override
-		public String getForwardUrl() {
-			throw new UnsupportedOperationException(
-					"This is not a forwarding response.");
-		}
-
-	}
-
-	private static class ForwardResponseValues implements ResponseValues {
-		private final String forwardUrl;
-
-		public ForwardResponseValues(String forwardUrl) {
-			this.forwardUrl = forwardUrl;
-		}
-
-		@Override
-		public ResponseType getType() {
-			return ResponseType.FORWARD;
-		}
-
-		@Override
-		public String getForwardUrl() {
-			return this.forwardUrl;
-		}
-
-		@Override
-		public String getTemplateName() {
-			throw new UnsupportedOperationException(
-					"This is not a template response.");
-		}
-
-		@Override
-		public Map<? extends String, ? extends Object> getBodyMap() {
-			throw new UnsupportedOperationException(
-					"This is not a template response.");
-		}
-
-		@Override
-		public Throwable getException() {
-			throw new UnsupportedOperationException(
-					"This is not an exception response.");
-		}
-
-	}
-
-	private static class ExceptionResponseValues implements ResponseValues {
-		private final Throwable cause;
-
-		public ExceptionResponseValues(Throwable cause) {
-			this.cause = cause;
-		}
-
-		@Override
-		public ResponseType getType() {
-			return ResponseType.EXCEPTION;
-		}
-
-		@Override
-		public Throwable getException() {
-			return cause;
-		}
-
-		@Override
-		public String getTemplateName() {
-			throw new UnsupportedOperationException(
-					"This is not a template response.");
-		}
-
-		@Override
-		public Map<? extends String, ? extends Object> getBodyMap() {
-			throw new IllegalStateException("This is not a template response.");
-		}
-
-		@Override
-		public String getForwardUrl() {
-			throw new UnsupportedOperationException(
-					"This is not a forwarding response.");
-		}
-
-	}
-
 	/**
 	 * If they are logged in as an Editor or better, they can do whatever they
 	 * want.
@@ -804,7 +602,8 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 	 */
 	private boolean checkAuthorized(VitroRequest vreq)
 			throws UserMistakeException {
-		if (LoginFormBean.loggedIn(vreq, LoginFormBean.EDITOR)) {
+		if (LoginStatusBean.getBean(vreq).isLoggedInAtLeast(
+				LoginStatusBean.EDITOR)) {
 			log.debug("Authorized because logged in as Editor");
 			return true;
 		}
@@ -831,62 +630,12 @@ public class ImageUploadController extends FreeMarkerHttpServlet {
 					VitroVocabulary.IND_MAIN_IMAGE,
 					RequestActionConstants.SOME_LITERAL, null, null);
 		}
-		return checkAuthorizedForRequestedAction(vreq, ra);
-	}
 
-	private boolean checkAuthorizedForRequestedAction(VitroRequest vreq,
-			RequestedAction action) {
-		PolicyIface policy = getPolicies(vreq);
-		PolicyDecision dec = policy.isAuthorized(getIdentifiers(vreq), action);
-		if (dec != null && dec.getAuthorized() == Authorization.AUTHORIZED) {
-			log.debug("Authorized because self-editing.");
-			return true;
-		} else {
-			log.debug("Not Authorized even though self-editing: "
-					+ ((dec == null) ? "null" : dec.getMessage() + ", "
-							+ dec.getDebuggingInfo()));
-			return false;
-		}
-	}
-
-	/**
-	 * Get the policy from the request, or from the servlet context.
-	 */
-	private PolicyIface getPolicies(VitroRequest vreq) {
-		ServletContext servletContext = vreq.getSession().getServletContext();
-
-		PolicyIface policy = RequestPolicyList.getPolicies(vreq);
-		if (isEmptyPolicy(policy)) {
-			policy = ServletPolicyList.getPolicies(servletContext);
-			if (isEmptyPolicy(policy)) {
-				log.error("No policy found in request at "
-						+ RequestPolicyList.POLICY_LIST);
-				policy = new PolicyList();
-			}
-		}
-
-		return policy;
-	}
-
-	/**
-	 * Is there actually a policy here?
-	 */
-	private boolean isEmptyPolicy(PolicyIface policy) {
-		return policy == null
-				|| (policy instanceof PolicyList && ((PolicyList) policy)
-						.size() == 0);
-	}
-
-	private IdentifierBundle getIdentifiers(VitroRequest vreq) {
-		HttpSession session = vreq.getSession();
-		ServletContext context = session.getServletContext();
-		IdentifierBundle ids = ServletIdentifierBundleFactory
-				.getIdBundleForRequest(vreq, session, context);
-		if (ids == null) {
-			return new ArrayIdentifierBundle();
-		} else {
-			return ids;
-		}
+		AuthorizationHelper helper = new AuthorizationHelper(vreq);
+		boolean authorized = helper.isAuthorizedForRequestedAction(ra);
+		log.debug((authorized ? "" : "Not ") + "Authorized for '" + action
+				+ "' as self-editor;  requested action = " + ra);
+		return authorized;
 	}
 
 }

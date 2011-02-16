@@ -1,10 +1,9 @@
 <%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
 
-<%@ page import="edu.cornell.mannlib.vedit.beans.LoginFormBean" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
 <%@ page import="org.apache.log4j.*" %>
 <%@ page import="java.util.*" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
+<%@ taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
 
  <%--
   This JSP will display all the log4j Logger objects, their
@@ -14,11 +13,9 @@
   Brian Cauros bdc34@cornell.edu
   based on work by Volker Mentzner. --%>
 
-<%
-if (session == null || !LoginFormBean.loggedIn(request, LoginFormBean.DBA)) {
-    %><c:redirect url="<%= Controllers.LOGIN %>" /><%
-}
+<vitro:confirmLoginStatus level="DBA" bean="loginBean" />
 
+<%
 try {
     String name;
     Level[] levels =  new Level[]
@@ -106,32 +103,7 @@ try {
     }
     out.write("</table>\r\n");
     out.write("<input type=submit value=\"Submit changes to logging levels\">");
-    out.write("</form>\n");
-
-
-    /* write out form to do a test message */
-    out.write("<h2>Test the logging configuration by sending a test message</h2>\n");
-    out.write("<form name=\"TestForm\" ACTION=\""+request.getContextPath()+request.getServletPath()+"\" METHOD=\"PUT\">\n");
-    out.write("<input type=\"hidden\" name=\"doTestMsg\" value=\"true\">\n");
-    out.write("<table>\n\r");
-    out.write("    <tr><td>logger:</td>\n\r");
-    out.write("    <td><select name=\"logger\"/>\n\r");
-    for(String logName : logNames){
-        out.write("        <option>" + logName + "</option>\n\r");
-    }
-    out.write("    </select></td></tr>\n\r");
-
-    out.write("    <tr><td>level:</td>\n\r");
-    out.write("    <td><select name=\"level\">\n\r");
-    for (int i = 0; i < levels.length; i++) {
-        out.write("        <option>"+levels[i].toString() + "</option>\n\r");
-    }
-    out.write("    </select></td></tr>\n\r");
-
-    out.write("    <tr><td>message:</td> \n\r");
-    out.write("    <td><textarea name=\"msg\"></textarea></td></tr>\n\r");
-    out.write("    <tr><td><input type=\"submit\" value=\"submit test message\"/></td></tr>\n\r");
-    out.write("</table></form>\n");
+    out.write("</form>\n");  
 
     out.write("</BODY></HTML>\r\n");
     out.flush();

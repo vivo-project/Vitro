@@ -14,7 +14,6 @@ import org.openrdf.model.impl.URIImpl;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.RepositoryResult;
 import org.openrdf.repository.http.HTTPRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
@@ -47,7 +46,7 @@ public class SesameSyncUtils {
 		    PipedInputStream in = new PipedInputStream();
 		    PipedOutputStream out = new PipedOutputStream(in);
 		    try {
-			    new Thread((new JenaOutputter(jenaModel, out))).start();
+			    new Thread(new JenaOutputter(jenaModel, out), "SesameSyncUtilities.JenaOutputter").start();
 			    if (contextRes != null) {
 			    	myConn.add(in,"http://example.org/base/", RDFFormat.NTRIPLES, contextRes);
 			    } else {

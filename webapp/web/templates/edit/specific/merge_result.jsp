@@ -3,8 +3,8 @@
 
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
 
-<p><a href="ingest">Ingest Home</a></p>
+<h2><a href="ingest">Ingest Home</a></h2>
 
-<h2>Merge Individuals</h2>
+<h3>Merge Individuals</h3>
 <%String result = (String) request.getAttribute("result");%>
 <p><b><%=result%></b></p>

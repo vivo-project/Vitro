@@ -1,6 +1,6 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
-<#import "listMacros.ftl" as l>
+<#import "lib-list.ftl" as l>
 
 <div id="footer">
 
@@ -20,4 +20,5 @@
 
     All Rights Reserved. <a href="${urls.termsOfUse}">Terms of Use</a>
 
+    <#include "version.ftl">
 </div>

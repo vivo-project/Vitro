@@ -15,8 +15,7 @@
 <%@ page import="org.apache.commons.logging.Log" %>
 <%@ page import="org.apache.commons.logging.LogFactory" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep" %>
-<%@ page import="edu.cornell.mannlib.vedit.beans.LoginFormBean" %>
-<jsp:useBean id="loginHandler" class="edu.cornell.mannlib.vedit.beans.LoginFormBean" scope="session" />
+<%@ page import="edu.cornell.mannlib.vedit.beans.LoginStatusBean" %>
 <%! 
 public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.edit.dashboardPropsList.jsp");
 %>
@@ -29,7 +28,7 @@ if( VitroRequestPrep.isSelfEditing(request) ) {
 } else {
     log.debug("self editing inactive");
 }
-if (loginHandler!=null && loginHandler.getLoginStatus()=="authenticated" && Integer.parseInt(loginHandler.getLoginRole())>=loginHandler.getEditor()) {
+if (LoginStatusBean.getBean(request).isLoggedInAtLeast(LoginStatusBean.EDITOR)) {
 	showCuratorEdits=true;
 	log.debug("curator editing active");
 } else {

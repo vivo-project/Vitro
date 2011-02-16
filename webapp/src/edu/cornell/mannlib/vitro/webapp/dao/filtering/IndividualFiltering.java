@@ -70,7 +70,13 @@ public class IndividualFiltering implements Individual {
         return outdProps;
     }
 
-
+    public List<DataProperty> getPopulatedDataPropertyList() {
+        List<DataProperty> dprops =  _innerIndividual.getPopulatedDataPropertyList();
+        LinkedList<DataProperty> outdProps = new LinkedList<DataProperty>();
+        Filter.filter(dprops,_filters.getDataPropertyFilter(), outdProps);
+        return outdProps;
+    }
+    
     public List<DataPropertyStatement> getDataPropertyStatements() {
         List<DataPropertyStatement> dstmts = _innerIndividual.getDataPropertyStatements();
         return filterDataPropertyStatements(dstmts);      
@@ -111,6 +117,13 @@ public class IndividualFiltering implements Individual {
     
     public List<ObjectProperty> getObjectPropertyList() {
         List <ObjectProperty> oprops = _innerIndividual.getObjectPropertyList();
+//        List<ObjectProperty> outOProps = new LinkedList<ObjectProperty>();
+//        Filter.filter(oprops, _filters.getObjectPropertyFilter(), outOProps);
+        return ObjectPropertyDaoFiltering.filterAndWrap(oprops, _filters);
+    }
+    
+    public List<ObjectProperty> getPopulatedObjectPropertyList() {
+        List <ObjectProperty> oprops = _innerIndividual.getPopulatedObjectPropertyList();
 //        List<ObjectProperty> outOProps = new LinkedList<ObjectProperty>();
 //        Filter.filter(oprops, _filters.getObjectPropertyFilter(), outOProps);
         return ObjectPropertyDaoFiltering.filterAndWrap(oprops, _filters);
@@ -360,6 +373,10 @@ public class IndividualFiltering implements Individual {
         _innerIndividual.setDatatypePropertyList(datatypePropertyList);
     }
 
+    public void setPopulatedDataPropertyList(List<DataProperty> dataPropertyList) {
+        _innerIndividual.setPopulatedDataPropertyList(dataPropertyList);
+    }
+    
     public void setDescription(String in) {
         _innerIndividual.setDescription(in);
     }
@@ -452,6 +469,10 @@ public class IndividualFiltering implements Individual {
         _innerIndividual.setPropertyList(propertyList);
     }
 
+    public void setPopulatedObjectPropertyList(List<ObjectProperty> propertyList) {
+        _innerIndividual.setPopulatedObjectPropertyList(propertyList);
+    }
+    
     public void setStatus(String s) {
         _innerIndividual.setStatus(s);
     }
@@ -624,5 +645,11 @@ public class IndividualFiltering implements Individual {
         List<ObjectPropertyStatement> stmts = getObjectPropertyStatements(propertyUri); 
         // Since the statements have been filtered, we can just take the first individual without filtering.
         return stmts.isEmpty() ? null : stmts.get(0).getObject();
+    }
+
+
+    @Override
+    public boolean hasThumb() {
+        return _innerIndividual.hasThumb();
     }
 }

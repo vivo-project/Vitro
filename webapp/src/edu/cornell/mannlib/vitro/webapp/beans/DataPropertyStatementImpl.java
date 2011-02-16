@@ -10,6 +10,7 @@ import java.util.Date;
  */
 public class DataPropertyStatementImpl implements VitroTimeWindowedResource, DataPropertyStatement
 {
+    private Individual individual = null;
     private String individualURI = null;
     private String data = null;
     private String datapropURI = null;
@@ -35,6 +36,14 @@ public class DataPropertyStatementImpl implements VitroTimeWindowedResource, Dat
         this.data = data;
     }
 
+    public Individual getIndividual() {
+        return this.individual;
+    }
+    
+    public void setIndividual(Individual individual) {
+        this.individual = individual;
+    }
+    
     public String getIndividualURI() {
         return individualURI;
     }

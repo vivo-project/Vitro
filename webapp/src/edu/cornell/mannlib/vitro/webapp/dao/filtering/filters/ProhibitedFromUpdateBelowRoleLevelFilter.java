@@ -126,7 +126,7 @@ public class ProhibitedFromUpdateBelowRoleLevelFilter extends VitroFiltersImpl {
                         return false;
                 }
                 
-                Individual subject = wdf.getIndividualDao().getIndividualByURI( dPropStmt.getIndividualURI() );                        
+                Individual subject = dPropStmt.getIndividual();                        
                 if( subject == null ) {
                     if( ! canViewOddItems() ){  return false; }
                 }else{
@@ -163,13 +163,18 @@ public class ProhibitedFromUpdateBelowRoleLevelFilter extends VitroFiltersImpl {
             
             try {
                 ObjectProperty prop = stmt.getProperty();
-                if( prop == null )
-                    prop = wdf.getObjectPropertyDao().getObjectPropertyByURI( stmt.getPropertyURI() );                        
-                if( prop == null ) 
-                    if( ! canViewOddItems() ){ return false; }
-                else
-                    if( sameLevelOrHigher( prop.getProhibitedFromUpdateBelowRoleLevel()) == false)
-                        return false;      
+				if (prop == null) {
+					prop = wdf.getObjectPropertyDao().getObjectPropertyByURI(stmt.getPropertyURI());
+				}
+				if (prop == null) {
+					if (!canViewOddItems()) {
+						return false;
+					}
+				} else {
+					if (sameLevelOrHigher(prop.getProhibitedFromUpdateBelowRoleLevel()) == false) {
+						return false;
+					}
+				}
                 
                 Individual subject = 
                     (stmt.getSubject() != null ? stmt.getSubject() : wdf.getIndividualDao().getIndividualByURI( stmt.getSubjectURI()));            

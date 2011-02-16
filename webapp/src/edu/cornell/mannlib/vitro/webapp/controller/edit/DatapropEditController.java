@@ -40,7 +40,7 @@ public class DatapropEditController extends BaseEditController {
     	
         final int NUM_COLS=15;
 
-        if (!checkLoginStatus(request,response,(String)request.getAttribute("fetchURI")))
+        if (!checkLoginStatus(request,response))
             return;
 
         try {

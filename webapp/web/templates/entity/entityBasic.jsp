@@ -4,7 +4,7 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.VClass" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditSubmission" %>
-<%@ page import="edu.cornell.mannlib.vedit.beans.LoginFormBean" %>
+<%@ page import="edu.cornell.mannlib.vedit.beans.LoginStatusBean" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.VitroRequest"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary" %>
@@ -51,16 +51,13 @@ if (entity == null){
     throw new JspException(e);
 }
 
-if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, LoginFormBean.NON_EDITOR) /* minimum level*/) {
-    request.setAttribute("showSelfEdits",Boolean.TRUE);
-}%>
-<c:if test="${sessionScope.loginHandler != null &&
-              sessionScope.loginHandler.loginStatus == 'authenticated' &&
-              sessionScope.loginHandler.loginRole >= LoginFormBean.NON_EDITOR}">
-    <c:set var="showCuratorEdits" value="${true}"/>
-</c:if>
+boolean showSelfEdits = VitroRequestPrep.isSelfEditing(request);
+boolean showCuratorEdits = LoginStatusBean.getBean(request).isLoggedInAtLeast(LoginStatusBean.CURATOR);
+if (showSelfEdits || showCuratorEdits) {
+    request.setAttribute("showEdits",Boolean.TRUE);
+}
+%>
 
-<c:set var="showEdits" value="${showSelfEdits || showCuratorEdits}" scope="request"/>
 <c:set var="editingClass" value="${showEdits ? 'editing' : ''}" scope="request"/>
 
 <c:set var="themeDir"><c:out value="${portalBean.themeDir}" /></c:set>
@@ -145,7 +142,7 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
 	                    <div class="datatypeProperties">
 	                        <div class="datatypePropertyValue">
 	                            <div class="statementWrap thumbnail">
-                                    <img src="<c:url value='/images/dummyImages/person.thumbnail.jpg'/>" 
+                                    <img src="<c:url value='/images/placeholders/person.thumbnail.jpg'/>" 
                                                 title="no image" alt="" width="115"/>
                                     <c:if test="${showEdits}">
                                         <span class="editLinks">${imageLinks}</span>
@@ -315,3 +312,4 @@ if (VitroRequestPrep.isSelfEditing(request) || LoginFormBean.loggedIn(request, L
     </div> <!-- content -->
     
 <script type="text/javascript" src="<c:url value="/js/imageUpload/imageUploadUtils.js"/>"></script>
+

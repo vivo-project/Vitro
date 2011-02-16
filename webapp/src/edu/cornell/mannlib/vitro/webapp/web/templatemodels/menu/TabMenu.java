@@ -12,7 +12,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.Tab;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Params;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 import edu.cornell.mannlib.vitro.webapp.web.TabWebUtil;
 
 /** A main menu constructed from persisted tab data
@@ -55,7 +55,7 @@ public class TabMenu extends MainMenu {
     private void addItem(Tab tab) {
         boolean isActive = isActiveItem(tab);
         String text = tab.getTitle();
-        String path = UrlBuilder.getPath(PATH, new Params(TAB_PARAM, "" + tab.getTabId()));
+        String path = UrlBuilder.getPath(PATH, new ParamMap(TAB_PARAM, "" + tab.getTabId()));
         addItem(text, path, isActive);       
     }
     

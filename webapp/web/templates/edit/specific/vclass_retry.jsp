@@ -102,14 +102,9 @@
     		<input name="CustomDisplayView" style="width:90%" value="${formValue['CustomDisplayView']}"/>
     		<font size="2" color="red"><form:error name="CustomDisplayView"/></font>
     	</td>
-    	<td valign="bottom" colspan="1">
-    		<em>Optional: <strong>custom short view</strong></em><br />
-    		<input name="CustomShortView" style="width:90%" value="${formValue['CustomShortView']}"/>
-    		<font size="2" color="red"><form:error name="CustomShortView"/></font>
-    	</td>
-    	<td valign="bottom" colspan="1">
+    	<td valign="bottom" colspan="2">
     		<em>Optional: <strong>custom search view</strong></em><br />
-    		<input name="CustomSearchView" style="width:90%" value="${formValue['CustomSearchView']}"/>
+    		<input name="CustomSearchView" style="width:45%" value="${formValue['CustomSearchView']}"/>
     		<font size="2" color="red"><form:error name="CustomSearchView"/></font>
     	</td>
 	</tr>

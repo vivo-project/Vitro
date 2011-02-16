@@ -22,19 +22,22 @@ vitro.customFormUtils = {
     // This method should always be called instead of calling hide() directly on any
     // element containing form fields.
     hideFields: function(el) {
-        // Clear any input and error message, so if we re-show the element it won't still be there.
+        // Clear any input and error messages, so if we re-show the element it won't still be there.
     	this.clearFields(el);
         el.hide();
     },
     
     // Clear data from form elements in element el
     clearFields: function(el) {
-    	el.find(':input[type!="hidden"][type!="submit"][type!="button"]').val(''); 	
-    	
-        // For now we can remove the error elements. Later we may include them in
-        // the markup, for customized positioning, in which case we will empty them
-        // but not remove them here. See findValidationErrors().  
-        el.find('.validationError').remove();      
+    	el.find(':input[type!="hidden"][type!="submit"][type!="button"]').each(function() {
+            $(this).val('');
+            // Remove a validation error associated with this element.
+            // For now we can remove the error elements. Later we may include them in
+            // the markup, for customized positioning, in which case we will empty them
+            // but not remove them here. See findValidationErrors().  
+            $('*[id=' + $(this).attr('id') + '_validationError]').remove();
+        });
+    	    
     },
        
     // Return true iff there are validation errors on the form
@@ -60,5 +63,9 @@ vitro.customFormUtils = {
 //    	}
 //    	
 //    	return foundErrors;
+    },
+    
+    capitalize: function(word) {
+        return word.substring(0, 1).toUpperCase() + word.substring(1);
     }
 }

@@ -28,10 +28,12 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.web.DisplayVocabulary;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
+import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import freemarker.template.Configuration;
 
-public class NavigationController extends FreeMarkerHttpServlet {
+public class NavigationController extends FreemarkerHttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final Log log = LogFactory.getLog(NavigationController.class.getName());
 	
@@ -46,8 +48,8 @@ public class NavigationController extends FreeMarkerHttpServlet {
 		displayOntModel.getBaseModel().register( urlPatterns );
 	}
 	
-	@Override
-	protected String getBody(VitroRequest vreq, Map<String, Object> body, Configuration config) {		
+    @Override
+    protected ResponseValues processRequest(VitroRequest vreq) {		
 		OntModel displayOntModel = (OntModel)getServletContext().getAttribute("displayOntModel");
 		OntModel jenaOntModel = (OntModel)getServletContext().getAttribute("jenaOntModel");
 				
@@ -56,7 +58,7 @@ public class NavigationController extends FreeMarkerHttpServlet {
 		Map<String,Object> values = getValues(ind, displayOntModel,jenaOntModel, getValuesFromRequest(/*?*/) );		
 		String template = getTemplate(ind, displayOntModel);		
 		
-		return mergeBodyToTemplate(template, values, config);
+		return new TemplateResponseValues(template, values);
 	}
 	
 	private Map<String,Object>getValuesFromRequest(){

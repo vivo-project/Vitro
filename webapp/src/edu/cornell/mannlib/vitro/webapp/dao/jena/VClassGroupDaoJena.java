@@ -5,7 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -15,19 +14,25 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
+import com.hp.hpl.jena.ontology.DatatypeProperty;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Literal;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
+import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
+import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 
 public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
 
@@ -58,12 +63,12 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
         }
     }
 
-    public LinkedHashMap getClassGroupMap() {
+    public LinkedHashMap<String, VClassGroup> getClassGroupMap() {
         getOntModel().enterCriticalSection(Lock.READ);
         try {
-            LinkedHashMap map = new LinkedHashMap();
-            List groups = new ArrayList();
-            ClosableIterator groupIt = getOntModel().listIndividuals(CLASSGROUP);
+            LinkedHashMap<String, VClassGroup> map = new LinkedHashMap<String, VClassGroup>();
+            List<VClassGroup> groups = new ArrayList<VClassGroup>();
+            ClosableIterator<Individual> groupIt = getOntModel().listIndividuals(CLASSGROUP);
             try {
                 while (groupIt.hasNext()) {
                     Individual groupInd = (Individual) groupIt.next();
@@ -76,7 +81,7 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
                 groupIt.close();
             }
             Collections.sort(groups);
-            Iterator groupsIt = groups.iterator();
+            Iterator<VClassGroup> groupsIt = groups.iterator();
             while (groupsIt.hasNext()) {
                 VClassGroup group = (VClassGroup) groupsIt.next();
                 map.put(group.getPublicName(), group);
@@ -103,25 +108,25 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
     }
 
 
-    public List getPublicGroupsWithVClasses() {
+    public List<VClassGroup> getPublicGroupsWithVClasses() {
         return getPublicGroupsWithVClasses(false);
     }
 
-    public List getPublicGroupsWithVClasses(boolean displayOrder) {
+    public List<VClassGroup> getPublicGroupsWithVClasses(boolean displayOrder) {
         return getPublicGroupsWithVClasses(displayOrder, true);
     }
 
-    public List getPublicGroupsWithVClasses(boolean displayOrder, boolean includeUninstantiatedClasses) {
+    public List<VClassGroup> getPublicGroupsWithVClasses(boolean displayOrder, boolean includeUninstantiatedClasses) {
         return getPublicGroupsWithVClasses(displayOrder, includeUninstantiatedClasses, false);
     }
 
-    public List getPublicGroupsWithVClasses(boolean displayOrder, boolean includeUninstantiatedClasses,
+    public List<VClassGroup> getPublicGroupsWithVClasses(boolean displayOrder, boolean includeUninstantiatedClasses,
             boolean getIndividualCount) {
         VClassDao classDao = getWebappDaoFactory().getVClassDao();
         getOntModel().enterCriticalSection(Lock.READ);
         try {
-            List groups = new ArrayList();
-            ClosableIterator groupIt = getOntModel().listIndividuals(CLASSGROUP);
+            List<VClassGroup> groups = new ArrayList<VClassGroup>();
+            ClosableIterator<Individual> groupIt = getOntModel().listIndividuals(CLASSGROUP);
             try {
                 while (groupIt.hasNext()) {
                     Individual grp = (Individual) groupIt.next();
@@ -129,9 +134,9 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
                     if (vgrp!=null) {
                         classDao.addVClassesToGroup(vgrp, includeUninstantiatedClasses, getIndividualCount);
                         groups.add(vgrp);
-                        java.util.Collections.sort(groups);
                     }
                 }    
+                java.util.Collections.sort(groups);
             } finally {
                 groupIt.close();
             }
@@ -156,10 +161,16 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
             	groups.add(ungrouped);
             }
             */
-            if (groups.size()>0) {
+            if (groups.size()>0) {                
                 return groups;
             } else {
-                classDao.addVClassesToGroups(groups);
+                /* bdc34: the effect of the following code is that 
+                 * classgroups will get empty vclasses added to them
+                 * when includeUninstantiatedClasses == false and all
+                 * the vclasses are empty.
+                 * This may not be the desired behavior. 
+                 */
+                classDao.addVClassesToGroups(groups);                
                 return groups;
             }
         } finally {
@@ -167,7 +178,8 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
         }
 
     }
-
+    
+    
     public VClassGroup groupFromGroupIndividual(Individual groupInd) {
         if (groupInd==null) {
             return null;
@@ -178,9 +190,14 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
         group.setNamespace(groupInd.getNameSpace());
         group.setLocalName(groupInd.getLocalName());
         try {
-            group.setDisplayRank(Integer.decode(((Literal)(groupInd.getProperty(getOntModel().getDatatypeProperty(VitroVocabulary.DISPLAY_RANK)).getObject())).getString()).intValue());
+        	DatatypeProperty drProp = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createDatatypeProperty(VitroVocabulary.DISPLAY_RANK);
+        	if( drProp == null ){
+        	    log.debug("No display rank in model for portal " + groupInd.getURI() );
+        	}else{
+        	    group.setDisplayRank(Integer.decode(((Literal)(groupInd.getProperty(drProp).getObject())).getString()).intValue());
+        	}
         } catch (Exception e) {
-            // e.printStackTrace();
+            log.warn("Cannot get display rank for portal " + groupInd.getURI() + " " + e.getMessage() );            
         }
         return group;
     }
@@ -204,10 +221,22 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
     	groupInd.setVClassURI(CLASSGROUP.getURI());
     	
     	String groupURI = null;
+    	
+    	OntModel unionForURIGeneration = ModelFactory.createOntologyModel(
+    	        OntModelSpec.OWL_MEM, ModelFactory.createUnion(
+    	                getOntModelSelector().getApplicationMetadataModel(), 
+    	                getOntModelSelector().getFullModel()));
+    	
+    	WebappDaoFactory wadfForURIGeneration = null;
     	try {
-    		groupURI = (new WebappDaoFactoryJena(ontModel)).getIndividualDao().insertNewIndividual(groupInd);
+    	    wadfForURIGeneration = new WebappDaoFactoryJena(
+    	            unionForURIGeneration);
+    		groupURI = wadfForURIGeneration
+                    .getIndividualDao().insertNewIndividual(groupInd);
     	} catch (InsertException ie) {
     		throw new RuntimeException(InsertException.class.getName() + "Unable to insert class group "+groupURI, ie);
+    	} finally {
+    	    wadfForURIGeneration.close();
     	}
     	
     	if (groupURI != null) {
@@ -230,14 +259,14 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
         
     }
 
-    public int removeUnpopulatedGroups(List groups) {
+    public int removeUnpopulatedGroups(List<VClassGroup> groups) {
         if (groups==null || groups.size()==0)
             return 0;
         int removedGroupsCount = 0;
-        ListIterator it = groups.listIterator();
+        ListIterator<VClassGroup> it = groups.listIterator();
         while(it.hasNext()){
             VClassGroup group = (VClassGroup) it.next();
-            List classes = group.getVitroClassList();
+            List<VClass> classes = group.getVitroClassList();
             if( classes == null || classes.size() < 1 ){
                 removedGroupsCount++;
                 it.remove();
@@ -246,11 +275,9 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
         return removedGroupsCount;
     }
 
-    public void sortGroupList(List groupList) {
-        Collections.sort(groupList, new Comparator() {
-            public int compare(Object obj1, Object obj2) {
-                VClassGroup first  = (VClassGroup) obj1;
-                VClassGroup second = (VClassGroup) obj2;
+    public void sortGroupList(List<VClassGroup> groupList) {
+        Collections.sort(groupList, new Comparator<VClassGroup>() {
+            public int compare(VClassGroup first, VClassGroup second) {
                 if (first!=null) {
                     if (second!=null) {
                         return (first.getDisplayRank()-second.getDisplayRank());
@@ -286,6 +313,31 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
             }
         } finally {
             ontModel.leaveCriticalSection();
+        }
+    }
+
+    @Override
+    public void removeClassesHiddenFromSearch(List<VClassGroup> groups) {        
+        OntModel displayOntModel = getOntModelSelector().getDisplayModel();
+        ProhibitedFromSearch pfs = new ProhibitedFromSearch(
+                DisplayVocabulary.PRIMARY_LUCENE_INDEX_URI, displayOntModel);
+        for (VClassGroup group : groups) {
+            List<VClass> classList = new ArrayList<VClass>();
+            for (VClass vclass : group.getVitroClassList()) {
+                if (!pfs.isClassProhibited(vclass.getURI())) {
+                    classList.add(vclass);
+                }
+            }
+            group.setVitroClassList(classList);
+        }        
+    }
+
+    @Override
+    public VClassGroup getGroupByName(String vcgName) {
+        if( vcgName == null )
+            return null;
+        else{
+            return getClassGroupMap().get(vcgName);
         }
     }
 

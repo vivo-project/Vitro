@@ -6,8 +6,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -19,18 +17,14 @@ import java.util.regex.Pattern;
  * Extract any summary information from the log file.
  */
 public class LogStats {
-	private static final Pattern START_TIME_PATTERN = Pattern
-			.compile("(.*) Run started.");
-	private static final Pattern END_TIME_PATTERN = Pattern
-			.compile("(.*) Testing complete.");
+	public static LogStats EMPTY_LOG_STATS = new LogStats();
+
 	private static final Pattern SUITE_NAME_PATTERN = Pattern
 			.compile("Running suite (.*)");
 	private static final Pattern ERROR_PATTERN = Pattern
 			.compile("ERROR\\s+(.*)");
 	private static final Pattern WARNING_PATTERN = Pattern
 			.compile("WARN\\s+(.*)");
-	private static final SimpleDateFormat dateParser = new SimpleDateFormat(
-			"yyyy-MM-dd HH:mm:ss.SSS");
 
 	/**
 	 * Factory method.
@@ -39,11 +33,13 @@ public class LogStats {
 		return new LogStats(logFile);
 	}
 
-	private long startTime;
-	private long endTime;
 	private final List<String> suiteNames = new ArrayList<String>();
 	private final List<String> errors = new ArrayList<String>();
 	private final List<String> warnings = new ArrayList<String>();
+
+	private LogStats() {
+		// Nothing to initialize for empty instance.
+	}
 
 	private LogStats(File logFile) {
 
@@ -53,27 +49,17 @@ public class LogStats {
 			reader = new BufferedReader(new FileReader(logFile));
 			while (null != (line = reader.readLine())) {
 				Matcher m;
-				m = START_TIME_PATTERN.matcher(line);
+				m = SUITE_NAME_PATTERN.matcher(line);
 				if (m.matches()) {
-					startTime = parseTime(m.group(1));
+					suiteNames.add(m.group(1));
 				} else {
-					m = END_TIME_PATTERN.matcher(line);
+					m = ERROR_PATTERN.matcher(line);
 					if (m.matches()) {
-						endTime = parseTime(m.group(1));
+						errors.add(m.group(1));
 					} else {
-						m = SUITE_NAME_PATTERN.matcher(line);
+						m = WARNING_PATTERN.matcher(line);
 						if (m.matches()) {
-							suiteNames.add(m.group(1));
-						} else {
-							m = ERROR_PATTERN.matcher(line);
-							if (m.matches()) {
-								errors.add(m.group(1));
-							} else {
-								m = WARNING_PATTERN.matcher(line);
-								if (m.matches()) {
-									warnings.add(m.group(1));
-								}
-							}
+							warnings.add(m.group(1));
 						}
 					}
 				}
@@ -93,15 +79,6 @@ public class LogStats {
 		}
 	}
 
-	private long parseTime(String timeString) {
-		try {
-			return dateParser.parse(timeString).getTime();
-		} catch (ParseException e) {
-			e.printStackTrace();
-			return 0L;
-		}
-	}
-
 	public boolean hasErrors() {
 		return !errors.isEmpty();
 	}
@@ -116,18 +93,6 @@ public class LogStats {
 
 	public Collection<String> getWarnings() {
 		return Collections.unmodifiableCollection(warnings);
-	}
-
-	public long getStartTime() {
-		return startTime;
-	}
-
-	public long getEndTime() {
-		return endTime;
-	}
-
-	public long getElapsedTime() {
-		return Math.abs(endTime - startTime);
 	}
 
 }

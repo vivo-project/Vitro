@@ -26,39 +26,31 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 
 /**
  * The IndexBuilder is used to rebuild or update a search index.
+ * There should only be one IndexBuilder in a vitro web application.
  * It uses an implementation of a back-end through an object that
  * implements IndexerIface.  An example of a back-end is LuceneIndexer.
  *
  * See the class SearchReindexingListener for an example of how a model change
  * listener can use an IndexBuilder to keep the full text index in sncy with 
- * updates to a model.
+ * updates to a model. It calls IndexBuilder.addToChangedUris().
  *
- * There should be an IndexBuilder in the servlet context, try:
- *
-    IndexBuilder builder = (IndexBuilder)getServletContext().getAttribute(IndexBuilder.class.getName());
-    if( request.getParameter("update") != null )
-        builder.doUpdateIndex();
-
  * @author bdc34
  *
  */
-public class IndexBuilder {
+public class IndexBuilder extends Thread {
     private List<ObjectSourceIface> sourceList = new LinkedList<ObjectSourceIface>();
     private IndexerIface indexer = null;
-    private ServletContext context = null;
-    private ProhibitedFromSearch classesProhibitedFromSearch = null;    
+    private ServletContext context = null;       
     
-    private long lastRun = 0;
-     
-    private HashSet<String> changedUris = null;         
+    /* changedUris should only be accessed from synchronized blocks */
+    private HashSet<String> changedUris = null;
     
     private List<Individual> updatedInds = null;
-    private List<Individual> deletedInds = null;
+    private List<Individual> deletedInds = null;    
     
-    private IndexBuilderThread indexingThread = null;
-    
-    //shared with IndexBuilderThread
-    private boolean reindexRequested = false;
+    private boolean reindexRequested = false;    
+    protected boolean stopRequested = false;
+    protected long reindexInterval = 1000 * 60 /* msec */ ;        
     
     public static final boolean UPDATE_DOCS = false;
     public static final boolean NEW_DOCS = true;
@@ -68,15 +60,20 @@ public class IndexBuilder {
     public IndexBuilder(ServletContext context,
                 IndexerIface indexer,
                 List /*ObjectSourceIface*/ sources){
+        super("IndexBuilder");
         this.indexer = indexer;
         this.sourceList = sources;
         this.context = context;    
         
-        this.changedUris = new HashSet<String>();
-        this.indexingThread = new IndexBuilderThread(this); 
-        this.indexingThread.start();
+        this.changedUris = new HashSet<String>();    
+        this.start();
     }
-
+    
+    protected IndexBuilder(){
+        //for testing only
+        this( null, null, Collections.emptyList());        
+    }
+    
     public void addObjectSource(ObjectSourceIface osi) {    	
         if (osi != null)
             sourceList.add(osi);
@@ -90,30 +87,26 @@ public class IndexBuilder {
         return sourceList;
     }
 
-    public void doIndexRebuild() throws IndexingException {
-    	//set up full index rebuild
-    	setReindexRequested( true );    	
-    	//wake up indexing thread
-    	synchronized (this.indexingThread) {					
-    		this.indexingThread.notifyAll();
-    	}
+    public synchronized void doIndexRebuild() throws IndexingException {
+    	//set flag for full index rebuild
+    	this.reindexRequested = true; 	
+    	//wake up     						
+    	this.notifyAll();    	
     }
 
-    /**
+    /** 
      * This will re-index Individuals that changed because of modtime or because they
      * were added with addChangedUris(). 
      */
-    public void doUpdateIndex() {        	    
-    	//wake up thread
-    	synchronized (this.indexingThread) {					
-    		this.indexingThread.notifyAll();
-    	}    	    
+    public synchronized void doUpdateIndex() {        	    
+    	//wake up thread and it will attempt to index anything in changedUris
+        this.notifyAll();    	    	   
     }
    
     public synchronized void addToChangedUris(String uri){
     	changedUris.add(uri);
     }
-        
+    
     public synchronized void addToChangedUris(Collection<String> uris){
     	changedUris.addAll(uris);    	
     }
@@ -126,88 +119,47 @@ public class IndexBuilder {
 		return isReindexRequested() || ! changedUris.isEmpty() ;
 	}
 	
-	public ProhibitedFromSearch getClassesProhibitedFromSearch() {
-		return classesProhibitedFromSearch;
+	public synchronized void stopIndexingThread() {
+	    stopRequested = true;
+	    this.notifyAll();		
 	}
+	
+    @Override
+    public void run() {
+        while(! stopRequested ){                        
+            try{
+                if( !stopRequested && isReindexRequested() ){
+                    log.debug("full re-index requested");
+                    indexRebuild();
+                }else if( !stopRequested && isThereWorkToDo() ){                       
+                    Thread.sleep(250); //wait a bit to let a bit more work to come into the queue
+                    log.debug("work found for IndexBuilder, starting update");
+                    updatedIndex();
+                }else if( !stopRequested && ! isThereWorkToDo() ){
+                    log.debug("there is no indexing working to do, waiting for work");              
+                    synchronized (this) { this.wait(reindexInterval); }                         
+                }
+            } catch (InterruptedException e) {
+                log.debug("woken up",e);
+            }catch(Throwable e){
+                log.error(e,e);
+            }
+        }
+        log.info("Stopping IndexBuilder thread");
+    }
 
-	public void setClassesProhibitedFromSearch(
-			ProhibitedFromSearch classesProhibitedFromSearch) {
-		this.classesProhibitedFromSearch = classesProhibitedFromSearch;
-	}	
-	
-	public void killIndexingThread() {
-		this.indexingThread.kill();		
-	}
+  
 	/* ******************** non-public methods ************************* */
-	
-	private synchronized void setReindexRequested(boolean reindexRequested) {
-		this.reindexRequested = reindexRequested;
-	}
-	
     private synchronized Collection<String> getAndEmptyChangedUris(){
     	Collection<String> out = changedUris;     	    
     	changedUris = new HashSet<String>();
     	return out;
     }
     
-    protected void indexRebuild() throws IndexingException {
-    	setReindexRequested(false);
-        log.info("Rebuild of search index is starting.");
-
-        Iterator<ObjectSourceIface> sources = sourceList.iterator();
-        List listOfIterators = new LinkedList();
-        while(sources.hasNext()){
-            Object obj = sources.next();
-             if( obj != null && obj instanceof ObjectSourceIface )
-                 listOfIterators.add((((ObjectSourceIface) obj)
-                        .getAllOfThisTypeIterator()));
-             else
-                 log.debug("\tskipping object of class "
-                         + obj.getClass().getName() + "\n"
-                         + "\tIt doesn not implement ObjectSourceIface.\n");
-        }
-        
-        //clear out changed uris since we are doing a full index rebuild
-        getAndEmptyChangedUris();
-        
-        if( listOfIterators.size() == 0){ log.debug("Warning: no ObjectSources found.");}
-        
-        doBuild( listOfIterators, Collections.EMPTY_LIST, true, NEW_DOCS );
-        log.info("Rebuild of search index is complete.");
-    }
-    
-    protected void updatedIndex() throws IndexingException{
-    	log.debug("Starting updateIndex()");
-		long since = indexer.getModified() - 60000;
-			    		
-	    Iterator<ObjectSourceIface> sources = sourceList.iterator();
-	    
-	    List<Iterator<Individual>> listOfIterators = 
-	        new LinkedList<Iterator<Individual>>();
-	    
-	    while (sources.hasNext()) {
-	        Object obj = sources.next();
-	        if (obj != null && obj instanceof ObjectSourceIface)
-	            listOfIterators.add((((ObjectSourceIface) obj)
-	                    .getUpdatedSinceIterator(since)));
-	        else
-	            log.debug("\tskipping object of class "
-	                    + obj.getClass().getName() + "\n"
-	                    + "\tIt doesn not implement " + "ObjectSourceIface.\n");
-	    }
-	                 
-	    buildAddAndDeleteLists( getAndEmptyChangedUris());                   
-	    listOfIterators.add( (new IndexBuilder.BuilderObjectSource(updatedInds)).getUpdatedSinceIterator(0) );
-	    
-	    doBuild( listOfIterators, deletedInds, false,  UPDATE_DOCS );
-	    log.debug("Ending updateIndex()");
-    }
-    
 	/**
-	 * Sets updatedUris and deletedUris.
-	 * @param changedUris
+	 * Sets updatedUris and deletedUris lists.
 	 */
-	private void buildAddAndDeleteLists( Collection<String> uris){	    
+	private void makeAddAndDeleteLists( Collection<String> uris){	    
 		/* clear updateInds and deletedUris.  This is the only method that should set these. */
 		this.updatedInds = new ArrayList<Individual>();
 		this.deletedInds = new ArrayList<Individual>();
@@ -226,45 +178,60 @@ public class IndexBuilder {
     	}
     	
 	    this.updatedInds = addDepResourceClasses(updatedInds);	            	
-	}
-	
+	}	
+  
+    protected void indexRebuild() throws IndexingException {
+        log.info("Rebuild of search index is starting.");
 
-    
-    private List<Individual> addDepResourceClasses(List<Individual> inds) {
-    	WebappDaoFactory wdf = (WebappDaoFactory)context.getAttribute("webappDaoFactory");
-    	VClassDao vClassDao = wdf.getVClassDao();
-    	Iterator<Individual> it = inds.iterator();
-    	VClass depResVClass = new VClass(VitroVocabulary.DEPENDENT_RESORUCE); 
-    	while(it.hasNext()){
-    		Individual ind = it.next();
-    		List<VClass> classes = ind.getVClasses();
-    		boolean isDepResource = false;
-            for( VClass clazz : classes){
-            	if( !isDepResource && VitroVocabulary.DEPENDENT_RESORUCE.equals(  clazz.getURI() ) ){            		
-            		isDepResource = true;
-            		break;
-            	}
-            }
-            if( ! isDepResource ){ 
-	            for( VClass clazz : classes){   	            
-            		List<String> superClassUris = vClassDao.getAllSuperClassURIs(clazz.getURI());
-            		for( String uri : superClassUris){
-            			if( VitroVocabulary.DEPENDENT_RESORUCE.equals( uri ) ){            				
-            				isDepResource = true;
-            				break;
-            			}
-            		}
-            		if( isDepResource )
-            			break;	            	
-	            }
-            }
-            if( isDepResource){
-            	classes.add(depResVClass);
-            	ind.setVClasses(classes, true);
-            }
-    	}
-    	return inds;
-	}
+        Iterator<ObjectSourceIface> sources = sourceList.iterator();
+        List listOfIterators = new LinkedList();
+        while (sources.hasNext()) {
+            Object obj = sources.next();
+            if (obj != null && obj instanceof ObjectSourceIface)
+                listOfIterators.add((((ObjectSourceIface) obj)
+                        .getAllOfThisTypeIterator()));
+            else
+                log.warn("\tskipping object of class "
+                        + obj.getClass().getName() + "\n"
+                        + "\tIt doesn not implement ObjectSourceIface.\n");
+        }
+
+        // clear out changed uris since we are doing a full index rebuild
+        getAndEmptyChangedUris();
+
+        if (listOfIterators.size() == 0) 
+            log.warn("Warning: no ObjectSources found.");        
+
+        doBuild(listOfIterators, Collections.EMPTY_LIST );
+        if( log != null )  //log might be null if system is shutting down.
+            log.info("Rebuild of search index is complete.");
+    }
+      
+    protected void updatedIndex() throws IndexingException{
+        log.debug("Starting updateIndex()");
+        long since = indexer.getModified() - 60000;
+                        
+        Iterator<ObjectSourceIface> sources = sourceList.iterator();        
+        List<Iterator<Individual>> listOfIterators = 
+            new LinkedList<Iterator<Individual>>();
+        
+        while (sources.hasNext()) {
+            Object obj = sources.next();
+            if (obj != null && obj instanceof ObjectSourceIface)
+                listOfIterators.add((((ObjectSourceIface) obj)
+                        .getUpdatedSinceIterator(since)));
+            else
+                log.warn("\tskipping object of class "
+                        + obj.getClass().getName() + "\n"
+                        + "\tIt doesn not implement " + "ObjectSourceIface.\n");
+        }
+                     
+        makeAddAndDeleteLists( getAndEmptyChangedUris());                   
+        listOfIterators.add( (new IndexBuilder.BuilderObjectSource(updatedInds)).getUpdatedSinceIterator(0) );
+        
+        doBuild( listOfIterators, deletedInds );
+        log.debug("Ending updateIndex()");
+    }
     
     /**
      * For each sourceIterator, get all of the objects and attempt to
@@ -280,17 +247,23 @@ public class IndexBuilder {
      * to false, and a check is made before adding, it will work fine; but
      * checking if an object is on the index is slow.
      */
-    private void doBuild(List sourceIterators, Collection<Individual> deletes, boolean wipeIndexFirst, boolean newDocs ){
+    private void doBuild(List<Iterator<Individual>> sourceIterators, Collection<Individual> deletes ){
+        boolean aborted = false;
+        boolean newDocs = reindexRequested;
+        boolean forceNewIndex = reindexRequested;
+        
         try {
+            if( reindexRequested )
+                indexer.prepareForRebuild();
+            
             indexer.startIndexing();
-
-            if( wipeIndexFirst )
-                indexer.clearIndex();
-            else{
-            	for(Individual deleteMe : deletes ){
-            		indexer.removeFromIndex(deleteMe);
-            	}
-            }
+            reindexRequested = false;
+            
+            if( ! forceNewIndex ){                
+                for(Individual deleteMe : deletes ){
+                    indexer.removeFromIndex(deleteMe);
+                }
+            }            
 
             //get an iterator for all of the sources of indexable objects
             Iterator sourceIters = sourceIterators.iterator();
@@ -298,98 +271,130 @@ public class IndexBuilder {
             while (sourceIters.hasNext()) {
                 obj = sourceIters.next();
                 if (obj == null || !(obj instanceof Iterator)) {
-                    log.debug("\tskipping object of class "
-                            + obj.getClass().getName() + "\n"
-                            + "\tIt doesn not implement "
-                            + "Iterator.\n");
+                    log.warn("skipping object of class " + obj.getClass().getName() 
+                            + "It doesn not implement Iterator.");
                     continue;
                 }
                 indexForSource((Iterator)obj, newDocs);
             }
-        } catch (IndexingException ex) {
-            log.error(ex,ex);
+        } catch (AbortIndexing abort){
+            if( log != null)
+                log.debug("aborting the indexing because thread stop was requested");
+            aborted = true;                            
         } catch (Exception e) {
             log.error(e,e);
-        } finally {
+        }
+        
+        if( aborted && forceNewIndex ){
+            indexer.abortIndexingAndCleanUp();
+        }else{
             indexer.endIndexing();
         }
+        
     }
     
     /**
      * Use the back end indexer to index each object that the Iterator returns.
-     * @param items
-     * @return
+     * @throws AbortIndexing 
      */
-    private void indexForSource(Iterator<Individual> individuals , boolean newDocs){
-        if( individuals == null ) return;
+    private void indexForSource(Iterator<Individual> individuals , boolean newDocs) throws AbortIndexing{     
+        long starttime = System.currentTimeMillis();         
+        long count = 0;
         while(individuals.hasNext()){
-            indexItem(individuals.next(), newDocs);
+            if( stopRequested )
+                throw new AbortIndexing();
+            
+            Individual ind = null;
+            try{
+                ind = individuals.next();                                
+                indexer.index(ind, newDocs);                         
+            }catch(Throwable ex){
+                if( stopRequested || log == null){//log might be null if system is shutting down.
+                    throw new AbortIndexing();
+                }
+                String uri = ind!=null?ind.getURI():"null";
+                log.warn("Error indexing individual " + uri + " " + ex.getMessage());
+            }
+            count++;
+            if( log.isDebugEnabled() ){            
+                if( (count % 100 ) == 0 && count > 0 ){
+                    long dt = (System.currentTimeMillis() - starttime);
+                    log.debug("individuals indexed: " + count + " in " + dt + " msec " +
+                             " time pre individual = " + (dt / count) + " msec" );                          
+                }                
+            }                
         }
-    }
+        
+        log.info( 
+             "individuals indexed: " + count + " in " + (System.currentTimeMillis() - starttime) + " msec" +
+              (count!=0?(" time per individual = " + (System.currentTimeMillis() - starttime)/ count + " msec"):"")
+        );
+    }        
     
     /**
-     * Use the backend indexer to index a single item.
-     * @param item
-     * @return
+     * For a list of individuals, this builds a list of dependent resources and returns it.  
      */
-    private void indexItem( Individual ind, boolean newDoc){
-        try{
-        	if( ind == null )
-        		return;
-        	if( ind.getVClasses() == null || ind.getVClasses().size() < 1 )
-        		return;
-        	boolean prohibitedClass = false;
-        	if(  classesProhibitedFromSearch != null ){
-        		for( VClass vclass : ind.getVClasses() ){
-        			if( classesProhibitedFromSearch.isClassProhibited(vclass.getURI()) ){        			
-        				prohibitedClass = true;
-        				log.debug("removing " + ind.getURI() + " from index because class " + vclass.getURI() + " is on prohibited list.");
-        				break;
-        			}        		
-        		}
-        	}
-        	if( !prohibitedClass ){
-        	    log.debug("Indexing '" + ind.getName() + "' URI: " + ind.getURI());
-        		indexer.index(ind, newDoc);
-        	}else{        	    
-        		indexer.removeFromIndex(ind);
-        	}
-        	
-        }catch(Throwable ex){            
-            log.debug("IndexBuilder.indexItem() Error indexing "
-                    + ind + "\n" +ex);
+    private List<Individual> addDepResourceClasses(List<Individual> inds) {
+        WebappDaoFactory wdf = (WebappDaoFactory)context.getAttribute("webappDaoFactory");
+        VClassDao vClassDao = wdf.getVClassDao();
+        Iterator<Individual> it = inds.iterator();
+        VClass depResVClass = new VClass(VitroVocabulary.DEPENDENT_RESORUCE); 
+        while(it.hasNext()){
+            Individual ind = it.next();
+            List<VClass> classes = ind.getVClasses();
+            boolean isDepResource = false;
+            for( VClass clazz : classes){
+                if( !isDepResource && VitroVocabulary.DEPENDENT_RESORUCE.equals(  clazz.getURI() ) ){                   
+                    isDepResource = true;
+                    break;
+                }
+            }
+            if( ! isDepResource ){ 
+                for( VClass clazz : classes){                   
+                    List<String> superClassUris = vClassDao.getAllSuperClassURIs(clazz.getURI());
+                    for( String uri : superClassUris){
+                        if( VitroVocabulary.DEPENDENT_RESORUCE.equals( uri ) ){                         
+                            isDepResource = true;
+                            break;
+                        }
+                    }
+                    if( isDepResource )
+                        break;                  
+                }
+            }
+            if( isDepResource){
+                classes.add(depResVClass);
+                ind.setVClasses(classes, true);
+            }
         }
-        return ;
-    } 
+        return inds;
+    }    
     
+    /* maybe ObjectSourceIface should be replaced with just an iterator. */
     private class BuilderObjectSource implements ObjectSourceIface {
-    	private final List<Individual> individuals; 
-    	public BuilderObjectSource( List<Individual>  individuals){
-    		this.individuals=individuals;
-    	}
-		
-		public Iterator getAllOfThisTypeIterator() {
-			return new Iterator(){
-				final Iterator it = individuals.iterator();
-				
-				public boolean hasNext() {
-					return it.hasNext();
-				}
-				
-				public Object next() {
-					return it.next();
-				}
-				
-				public void remove() { /* not implemented */}				
-			};
-		}
-		
-		public Iterator getUpdatedSinceIterator(long msSinceEpoc) {
-			return getAllOfThisTypeIterator();
-		}
+        private final List<Individual> individuals; 
+        public BuilderObjectSource( List<Individual>  individuals){
+            this.individuals=individuals;
+        }        
+        public Iterator getAllOfThisTypeIterator() {
+            return new Iterator(){
+                final Iterator it = individuals.iterator();
+                
+                public boolean hasNext() {
+                    return it.hasNext();
+                }
+                
+                public Object next() {
+                    return it.next();
+                }
+                
+                public void remove() { /* not implemented */}               
+            };
+        }        
+        public Iterator getUpdatedSinceIterator(long msSinceEpoc) {
+            return getAllOfThisTypeIterator();
+        }
     }
-
-	
-
-
+    
+    private class AbortIndexing extends Exception { }    
 }

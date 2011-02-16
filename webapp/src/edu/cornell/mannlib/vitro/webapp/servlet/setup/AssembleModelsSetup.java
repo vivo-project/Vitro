@@ -42,6 +42,11 @@ public class AssembleModelsSetup implements ServletContextListener {
 	private String SYNTAX = "N3";
 	
 	public void contextInitialized(ServletContextEvent sce) {
+	    
+	    if (AbortStartup.isStartupAborted(sce.getServletContext())) {
+	        return;
+	    }
+	    
 		OntModel jenaOntModel = null;
 		try {
 			jenaOntModel = (OntModel) sce.getServletContext().getAttribute("baseOntModel");

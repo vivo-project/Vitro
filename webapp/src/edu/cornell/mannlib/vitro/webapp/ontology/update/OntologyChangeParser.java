@@ -2,18 +2,17 @@
 
 package edu.cornell.mannlib.vitro.webapp.ontology.update;
 
-import edu.cornell.mannlib.vitro.webapp.ontology.update.AtomicOntologyChange;
-import edu.cornell.mannlib.vitro.webapp.ontology.update.AtomicOntologyChange.AtomicChangeType;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
 
 import org.skife.csv.CSVReader;
 import org.skife.csv.SimpleReader;
 
-import java.io.FileInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.StringTokenizer;
-import java.util.ArrayList;
+import edu.cornell.mannlib.vitro.webapp.ontology.update.AtomicOntologyChange.AtomicChangeType;
 
 /**
  * Performs parsing on Prompt output and provides change object list.
@@ -24,9 +23,9 @@ import java.util.ArrayList;
 
 public class OntologyChangeParser {
 
-	private OntologyChangeLogger logger;
+	private ChangeLogger logger;
 	
-	public OntologyChangeParser(OntologyChangeLogger logger) {
+	public OntologyChangeParser(ChangeLogger logger) {
 		this.logger = logger;
 	}
 		
@@ -61,12 +60,19 @@ public class OntologyChangeParser {
 			} else {
 		
 				changeObj = new AtomicOntologyChange();
+				
 				if (cols[0] != null && cols[0].length() > 0) {
 					changeObj.setSourceURI(cols[0]);
 				}
+				
 				if (cols[1] != null && cols[1].length() > 0) {
 					changeObj.setDestinationURI(cols[1]);
 				}
+
+				if (cols[4] != null && cols[4].length() > 0) {
+                  changeObj.setNotes(cols[4]);
+                }
+
 				if ("Yes".equals(cols[2])) {
 					changeObj.setAtomicChangeType(AtomicChangeType.RENAME);
 				} else if ("Delete".equals(cols[3])) {
@@ -77,6 +83,8 @@ public class OntologyChangeParser {
 					logger.logError("Invalid rename or change type data: '" +
 							cols[2] + " " + cols[3] + "'");
 				}
+				
+				
 				changeObjects.add(changeObj);
 					
 			}

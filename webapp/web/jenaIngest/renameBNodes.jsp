@@ -17,19 +17,10 @@
 
 %>
 
-    <p><a href="ingest">Ingest Home</a></p>
+    <h2><a class="ingestMenu" href="ingest">Ingest Menu</a> > Convert Blank Nodes to Named Resources</h2>
 
-    <h2>Convert Blank Nodes to Named Resources</h2>
-
-    <form action="ingest" method="get"i>
+    <form action="ingest" method="get">
         <input type="hidden" name="action" value="renameBNodes"/>
-
-    <h3>Select URI prefix</h3>
-   
-	<p>URIs will be constructed from the following string concatenated with a random integer:</p>
-	<input type="text" style="width:65%;" name="namespaceEtcStr"/> 
-
-    <p/>
 
     <h3>Select Source Models</h3>
 
@@ -44,17 +35,5 @@
 %>
     </ul>
 
-    <h3>Select Destination Model</h3>
-
-    <select name="destinationModelName">
-        <option value="vitro:baseOntModel">webapp assertions</option>
-<%
-    for (Iterator it = maker.listModels(); it.hasNext(); ) {
-	String modelName = (String) it.next();
-        %> <option value="<%=modelName%>"/><%=modelName%></option>
-        <%    
-    }
-%>   
-    </select>
-
-    <input type="submit" value="Rename Blank Nodes"/>
+    <input class="submit" type="submit" value="Next Step"/>
+    </form>

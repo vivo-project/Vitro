@@ -31,12 +31,14 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SearchReindexingListener;
+import edu.cornell.mannlib.vitro.webapp.search.beans.IndividualProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ObjectSourceIface;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
-import edu.cornell.mannlib.vitro.webapp.search.beans.Searcher;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
-import edu.cornell.mannlib.vitro.webapp.web.DisplayVocabulary;
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.AbortStartup;
+import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 
 /**
  * Setup objects for lucene searching and indexing.
@@ -60,21 +62,24 @@ import edu.cornell.mannlib.vitro.webapp.web.DisplayVocabulary;
  * @author bdc34
  *
  */
-public class LuceneSetup implements javax.servlet.ServletContextListener {
-        private static String indexDir = null;
-        private static final Log log = LogFactory.getLog(LuceneSetup.class.getName());
+public class LuceneSetup implements javax.servlet.ServletContextListener {        
+    private static final Log log = LogFactory.getLog(LuceneSetup.class.getName());
         
 	/**
 	 * Gets run to set up DataSource when the webapp servlet context gets
 	 * created.
 	 */
 	public void contextInitialized(ServletContextEvent sce) {
+	    
+	    if (AbortStartup.isStartupAborted(sce.getServletContext())) {
+            return;
+        }
+	    
 		try {
 			ServletContext context = sce.getServletContext();
-			log.debug("**** Running " + this.getClass().getName() + ".contextInitialized()");
 
-			indexDir = getIndexDirName();
-			log.info("Directory of full text index: " + indexDir);
+			String baseIndexDir = getBaseIndexDirName();
+			log.info("Setting up Lucene index. Base directory of lucene index: " + baseIndexDir);
 
 			setBoolMax();
 
@@ -85,18 +90,33 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 			objectPropertyBlacklist.add("http://www.w3.org/2002/07/owl#differentFrom");
 			context.setAttribute(SEARCH_OBJECTPROPERTY_BLACKLIST, objectPropertyBlacklist);
 
+	         //This is where to get a LucenIndex from.  The indexer will
+            //need to reference this to notify it of updates to the index           
+			context.setAttribute(BASE_INDEX_DIR, baseIndexDir);
+            LuceneIndexFactory lif = LuceneIndexFactory.setup(context, baseIndexDir);                       
+            String liveIndexDir = lif.getLiveIndexDir(context);
+            
 			// Here we want to put the LuceneIndex object into the application scope.
 			// This will attempt to create a new directory and empty index if there is none.
-			LuceneIndexer indexer = new LuceneIndexer(indexDir, null, getAnalyzer());
+			LuceneIndexer indexer = new LuceneIndexer(getBaseIndexDirName(),liveIndexDir, null, getAnalyzer());
 			context.setAttribute(ANALYZER, getAnalyzer());
-			context.setAttribute(INDEX_DIR, indexDir);
-			indexer.addObj2Doc(new Entity2LuceneDoc());
+			
+			OntModel displayOntModel = (OntModel) sce.getServletContext().getAttribute("displayOntModel");
+			Entity2LuceneDoc translator = new Entity2LuceneDoc( 
+			        new ProhibitedFromSearch(DisplayVocabulary.PRIMARY_LUCENE_INDEX_URI, displayOntModel),
+			        new IndividualProhibitedFromSearch(context) );									
+			indexer.addObj2Doc(translator);			
+			
 			context.setAttribute(LuceneIndexer.class.getName(), indexer);
-
-			//This is where to get a LucenIndex from.  The indexer will
-			//need to reference this to notify it of updates to the index 			
-			LuceneIndexFactory lif = LuceneIndexFactory.getLuceneIndexFactoryFromContext(context);
 			indexer.setLuceneIndexFactory(lif);
+			
+			if( indexer.isIndexCorroupt() ){
+			    log.info("lucene index is corrupt, requesting rebuild");
+			}
+			if( indexer.isIndexEmpty() ){
+			    log.info("lucene index is empty, requesting rebuild");
+			    sce.getServletContext().setAttribute(INDEX_REBUILD_REQUESTED_AT_STARTUP, Boolean.TRUE);			
+			}
 			
 			// This is where the builder gets the list of places to try to
 			// get objects to index. It is filtered so that non-public text
@@ -115,35 +135,28 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 			context.setAttribute(IndexBuilder.class.getName(), builder);
 
 			// set up listeners so search index builder is notified of changes to model
-			OntModel baseOntModel = (OntModel) sce.getServletContext().getAttribute("baseOntModel");
-			OntModel jenaOntModel = (OntModel) sce.getServletContext().getAttribute("jenaOntModel");
-			OntModel inferenceModel = (OntModel) sce.getServletContext().getAttribute("inferenceOntModel");
+			ServletContext ctx = sce.getServletContext();
 			SearchReindexingListener srl = new SearchReindexingListener(builder);
-			baseOntModel.getBaseModel().register(srl);
-			jenaOntModel.getBaseModel().register(srl);
-			inferenceModel.register(srl);
-
-			// set the classes that the indexBuilder ignores
-			OntModel displayOntModel = (OntModel) sce.getServletContext().getAttribute("displayOntModel");
-			builder.setClassesProhibitedFromSearch(
-				new ProhibitedFromSearch(DisplayVocabulary.PRIMARY_LUCENE_INDEX_URI, displayOntModel));
-						
+			ModelContext.registerListenerForChanges(ctx, srl);
+									
 			if( (Boolean)sce.getServletContext().getAttribute(INDEX_REBUILD_REQUESTED_AT_STARTUP) instanceof Boolean &&
 				(Boolean)sce.getServletContext().getAttribute(INDEX_REBUILD_REQUESTED_AT_STARTUP) ){
-				builder.doIndexRebuild();
-				log.info("Rebuild of search index required before startup.");
+			    log.info("Rebuild of lucene index required before startup.");
+				builder.doIndexRebuild();												
 				int n = 0;
-				while( builder.isIndexing() ){
-					Thread.currentThread().sleep(500);
+				while( builder.isReindexRequested() || builder.isIndexing() ){
+				    n++;
 					if( n % 20 == 0 ) //output message every 10 sec. 
-					    log.info("Still rebulding search index");
-				}
-				log.info("Search index rebuild completed.");				
+					    log.info("Still rebuilding lucene  index");
+					Thread.currentThread().sleep(500);
+				}				
 			}
 			
-			log.debug("**** End of " + this.getClass().getName() + ".contextInitialized()");			
+			log.info("Setup of Lucene index completed.");			
 		} catch (Throwable t) {
-			log.error("***** Error setting up Lucene search *****", t);
+		    AbortStartup.abortStartup(sce.getServletContext());
+			log.error("***** Error setting up Lucene index *****", t);
+			throw new RuntimeException("Startup of vitro application was prevented by errors in the lucene configuration");
 		}
 	}
 
@@ -153,7 +166,9 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 	public void contextDestroyed(ServletContextEvent sce) {
 		log.debug("**** Running " + this.getClass().getName() + ".contextDestroyed()");
 		IndexBuilder builder = (IndexBuilder) sce.getServletContext().getAttribute(IndexBuilder.class.getName());
-		builder.killIndexingThread();
+		if( builder != null){		    		
+		    builder.stopIndexingThread();
+		}
 	}
 
 	/**
@@ -180,7 +195,7 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 	 * @throws IOException
 	 *             if the directory doesn't exist and we fail to create it.
 	 */
-	private String getIndexDirName()
+	private String getBaseIndexDirName()
 			throws IOException {
 		String dirName = ConfigurationProperties
 				.getProperty("LuceneSetup.indexDir");
@@ -219,7 +234,7 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
         
     public static final String INDEX_REBUILD_REQUESTED_AT_STARTUP = "LuceneSetup.indexRebuildRequestedAtStarup";
     public static final String ANALYZER= "lucene.analyzer";
-    public static final String INDEX_DIR = "lucene.indexDir";
+    public static final String BASE_INDEX_DIR = "lucene.indexDir";
     public static final String SEARCH_DATAPROPERTY_BLACKLIST = 
         "search.dataproperty.blacklist";
     public static final String SEARCH_OBJECTPROPERTY_BLACKLIST = 

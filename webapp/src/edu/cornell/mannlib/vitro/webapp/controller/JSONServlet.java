@@ -4,12 +4,17 @@ package edu.cornell.mannlib.vitro.webapp.controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Writer;
+import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -23,14 +28,24 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.rdf.model.Literal;
 
+import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
+import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
+import edu.cornell.mannlib.vitro.webapp.controller.TabEntitiesController.PageRecord;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
+import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.SelectListGenerator;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
-import edu.cornell.mannlib.vitro.webapp.web.DisplayVocabulary;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassGroupTemplateModel;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassTemplateModel;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModel;
 
 /**
  * This servlet is for servicing requests for JSON objects/data.
@@ -50,20 +65,267 @@ public class JSONServlet extends VitroHttpServlet {
         super.doGet(req, resp);
         VitroRequest vreq = new VitroRequest(req);
 
-        if(vreq.getParameter("getEntitiesByVClass") != null ){
-            if( vreq.getParameter("resultKey") == null) {
-                getEntitiesByVClass(req, resp);
+        try{
+            if(vreq.getParameter("getEntitiesByVClass") != null ){
+                if( vreq.getParameter("resultKey") == null) {
+                    getEntitiesByVClass(req, resp);
+                    return;
+                } else {
+                    getEntitiesByVClassContinuation( req, resp);
+                    return;
+                }
+            }else if( vreq.getParameter("getN3EditOptionList") != null ){
+                doN3EditOptionList(req,resp);
                 return;
-            } else {
-                getEntitiesByVClassContinuation( req, resp);
+            }else if( vreq.getParameter("getLuceneIndividualsByVClass") != null ){
+                getLuceneIndividualsByVClass(req,resp);
+                return;
+            }else if( vreq.getParameter("getVClassesForVClassGroup") != null ){
+                getVClassesForVClassGroup(req,resp);
                 return;
             }
-        }else if( vreq.getParameter("getN3EditOptionList") != null ){
-            doN3EditOptionList(req,resp);
-            return;
-        }
+        }catch(Exception ex){
+            log.warn(ex,ex);            
+        }        
     }
 
+    private void getVClassesForVClassGroup(HttpServletRequest req, HttpServletResponse resp) throws IOException, JSONException {                
+        JSONObject map = new JSONObject();           
+        VitroRequest vreq = new VitroRequest(req);        
+        String vcgUri = vreq.getParameter("classgroupUri");
+        if( vcgUri == null ){
+            log.debug("no URI passed for classgroupUri");
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return;
+        }
+        
+        VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(getServletContext());
+        VClassGroup vcg = vcgc.getGroup(vreq.getPortalId(), vcgUri);
+        if( vcg == null ){
+            log.debug("Could not find vclassgroup: " + vcgUri);
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return;
+        }        
+                        
+        ArrayList<JSONObject> classes = new ArrayList<JSONObject>(vcg.size());
+        for( VClass vc : vcg){
+            JSONObject vcObj = new JSONObject();
+            vcObj.put("name", vc.getName());
+            vcObj.put("URI", vc.getURI());
+            vcObj.put("entityCount", vc.getEntityCount());
+            classes.add(vcObj);
+        }
+        map.put("classes", classes);                
+        map.put("classGroupName", vcg.getPublicName());
+        map.put("classGroupUri", vcg.getURI());
+                
+        resp.setCharacterEncoding("UTF-8");
+        resp.setContentType("application/json;charset=UTF-8");
+        Writer writer = resp.getWriter();
+        writer.write(map.toString());                        
+    }
+
+    private void getLuceneIndividualsByVClass( HttpServletRequest req, HttpServletResponse resp ){
+        String errorMessage = null;
+        JSONObject rObj = null;
+        try{            
+            VitroRequest vreq = new VitroRequest(req);
+            VClass vclass=null;
+            
+            
+            String vitroClassIdStr = vreq.getParameter("vclassId");            
+            if ( vitroClassIdStr != null && !vitroClassIdStr.isEmpty()){                             
+                vclass = vreq.getWebappDaoFactory().getVClassDao().getVClassByURI(vitroClassIdStr);
+                if (vclass == null) {
+                    log.debug("Couldn't retrieve vclass ");   
+                    throw new Exception (errorMessage = "Class " + vitroClassIdStr + " not found");
+                }                           
+            }else{
+                log.debug("parameter vclassId URI parameter expected ");
+                throw new Exception("parameter vclassId URI parameter expected ");
+            }
+            rObj = getLuceneIndividualsByVClass(vclass.getURI(),req, getServletContext());
+        }catch(Exception ex){
+            errorMessage = ex.toString();
+            log.error(ex,ex);
+        }
+
+        if( rObj == null )
+            rObj = new JSONObject();
+        
+        try{
+            resp.setCharacterEncoding("UTF-8");
+            resp.setContentType("application/json;charset=UTF-8");
+            
+            if( errorMessage != null ){
+                rObj.put("errorMessage", errorMessage);
+                resp.setStatus(500 /*HttpURLConnection.HTTP_SERVER_ERROR*/);
+            }else{
+                rObj.put("errorMessage", "");
+            }            
+            Writer writer = resp.getWriter();
+            writer.write(rObj.toString());
+        }catch(JSONException jse){
+            log.error(jse,jse);
+        } catch (IOException e) {
+            log.error(e,e);
+        }
+        
+    }
+    
+    public static JSONObject getLuceneIndividualsByVClass(String vclassURI, HttpServletRequest req, ServletContext context) throws Exception {
+        
+        VitroRequest vreq = new VitroRequest(req);        
+        VClass vclass=null;
+        JSONObject rObj = new JSONObject();
+        
+        DataProperty fNameDp = (new DataProperty());
+        fNameDp.setURI("http://xmlns.com/foaf/0.1/firstName");
+        DataProperty lNameDp = (new DataProperty());
+        lNameDp.setURI("http://xmlns.com/foaf/0.1/lastName");
+        DataProperty monikerDp = (new DataProperty());
+        monikerDp.setURI( VitroVocabulary.MONIKER);
+        //this property is vivo specific
+        DataProperty preferredTitleDp = (new DataProperty());
+        preferredTitleDp.setURI("http://vivoweb.org/ontology/core#preferredTitle");
+        
+        
+        if( log.isDebugEnabled() ){
+            Enumeration<String> e = vreq.getParameterNames();
+            while(e.hasMoreElements()){
+                String name = (String)e.nextElement();
+                log.debug("parameter: " + name);
+                for( String value : vreq.getParameterValues(name) ){
+                    log.debug("value for " + name + ": '" + value + "'");
+                }            
+            }
+        }
+        
+        //need an unfiltered dao to get firstnames and lastnames
+        WebappDaoFactory fullWdf = vreq.getFullWebappDaoFactory();
+                
+                                   
+        String vitroClassIdStr = vreq.getParameter("vclassId");
+        if ( vitroClassIdStr != null && !vitroClassIdStr.isEmpty()){                             
+            vclass = vreq.getWebappDaoFactory().getVClassDao().getVClassByURI(vitroClassIdStr);
+            if (vclass == null) {
+                log.debug("Couldn't retrieve vclass ");   
+                throw new Exception ("Class " + vitroClassIdStr + " not found");
+            }                           
+        }else{
+            log.debug("parameter vclassId URI parameter expected ");
+            throw new Exception("parameter vclassId URI parameter expected ");
+        }
+        
+        rObj.put("vclass", 
+                new JSONObject().put("URI",vclass.getURI())
+                                .put("name",vclass.getName()));
+        
+        if (vclass != null) {
+            String alpha = EntityListController.getAlphaParamter(vreq);
+            int page = EntityListController.getPageParameter(vreq);
+            Map<String,Object> map = EntityListController.getResultsForVClass(
+                    vclass.getURI(), 
+                    page, 
+                    alpha, 
+                    vreq.getPortal(), 
+                    vreq.getWebappDaoFactory().getPortalDao().isSinglePortal(), 
+                    vreq.getWebappDaoFactory().getIndividualDao(), 
+                    context);                                                
+            
+            rObj.put("totalCount", map.get("totalCount"));
+            rObj.put("alpha", map.get("alpha"));
+                            
+            List<Individual> inds = (List<Individual>)map.get("entities");
+            List<IndividualTemplateModel> indsTm = new ArrayList<IndividualTemplateModel>();
+            JSONArray jInds = new JSONArray();
+            for(Individual ind : inds ){
+                JSONObject jo = new JSONObject();
+                jo.put("URI", ind.getURI());
+                jo.put("label",ind.getRdfsLabel());
+                jo.put("name",ind.getName());
+                jo.put("thumbUrl", ind.getThumbUrl());
+                jo.put("imageUrl", ind.getImageUrl());
+                jo.put("profileUrl", UrlBuilder.getIndividualProfileUrl(ind, vreq.getWebappDaoFactory()));
+                
+                String moniker = getDataPropertyValue(ind, monikerDp, fullWdf);
+                jo.put("moniker", moniker);
+                jo.put("vclassName", getVClassName(ind,moniker,fullWdf));
+                                    
+                jo.put("preferredTitle", getDataPropertyValue(ind, preferredTitleDp, fullWdf));
+                jo.put("firstName", getDataPropertyValue(ind, fNameDp, fullWdf));                     
+                jo.put("lastName", getDataPropertyValue(ind, lNameDp, fullWdf));
+                
+                jInds.put(jo);
+            }
+            rObj.put("individuals", jInds);
+            
+            JSONArray wpages = new JSONArray();
+            List<PageRecord> pages = (List<PageRecord>)map.get("pages");                
+            for( PageRecord pr: pages ){                    
+                JSONObject p = new JSONObject();
+                p.put("text", pr.text);
+                p.put("param", pr.param);
+                p.put("index", pr.index);
+                wpages.put( p );
+            }
+            rObj.put("pages",wpages);    
+            
+            JSONArray jletters = new JSONArray();
+            List<String> letters = Controllers.getLetters();
+            for( String s : letters){
+                JSONObject jo = new JSONObject();
+                jo.put("text", s);
+                jo.put("param", "alpha=" + URLEncoder.encode(s, "UTF-8"));
+                jletters.put( jo );
+            }
+            rObj.put("letters", jletters);
+        }            
+                                       
+        return rObj;        
+    }
+
+    
+    private static String getVClassName(Individual ind, String moniker,
+            WebappDaoFactory fullWdf) {
+        /* so the moniker frequently has a vclass name in it.  Try to return
+         * the vclass name that is the same as the moniker so that the templates
+         * can detect this. */
+        if( (moniker == null || moniker.isEmpty()) ){
+            if( ind.getVClass() != null && ind.getVClass().getName() != null )
+                return ind.getVClass().getName();
+            else
+                return "";
+        }
+            
+         List<VClass> vcList = ind.getVClasses();
+         for( VClass vc : vcList){
+             if( vc != null && moniker.equals( vc.getName() ))
+                 return moniker;
+         }
+         
+         // if we get here, then we didn't find a moniker that matched a vclass, 
+         // so just return any vclass.name
+         if( ind.getVClass() != null && ind.getVClass().getName() != null )
+             return ind.getVClass().getName();
+         else
+             return "";        
+    }
+
+    static String getDataPropertyValue(Individual ind, DataProperty dp, WebappDaoFactory wdf){
+        List<Literal> values = wdf.getDataPropertyStatementDao()
+            .getDataPropertyValuesForIndividualByProperty(ind, dp);
+        if( values == null || values.isEmpty() )
+            return "";
+        else{
+            if( values.get(0) != null )
+                return values.get(0).getLexicalForm();
+            else
+                return "";
+        }
+            
+    }
+    
     /**
      * Gets an option list for a given EditConfiguration and Field.
      * Requires following HTTP query parameters:
@@ -130,7 +392,7 @@ public class JSONServlet extends VitroHttpServlet {
         boolean more = false;
         int count = 0;
         int size = REPLY_SIZE;
-          /* we have a large number of items to send back so we need to stash the list in the session scope */
+        /* we have a large number of items to send back so we need to stash the list in the session scope */
         if( entsInVClass.size() > REPLY_SIZE){
             more = true;
             ListIterator<Individual> entsFromVclass = entsInVClass.listIterator();
@@ -204,7 +466,7 @@ public class JSONServlet extends VitroHttpServlet {
         String vclassURI = vreq.getParameter("vclassURI");
         WebappDaoFactory daos = (new VitroRequest(req)).getFullWebappDaoFactory();
         resp.setCharacterEncoding("UTF-8");
-        
+               
         // ServletOutputStream doesn't support UTF-8
         PrintWriter out = resp.getWriter();
         resp.getWriter();

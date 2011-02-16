@@ -20,11 +20,18 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.query.DataSource;
+import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.query.DatasetFactory;
+
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory.SelfEditing;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.ServletIdentifierBundleFactory;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.edit.Authenticate;
 import edu.cornell.mannlib.vitro.webapp.dao.PortalDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
@@ -32,11 +39,13 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.FilterFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.HiddenFromDisplayBelowRoleLevelFilter;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
 import edu.cornell.mannlib.vitro.webapp.flags.AuthFlag;
 import edu.cornell.mannlib.vitro.webapp.flags.FlagException;
 import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
 import edu.cornell.mannlib.vitro.webapp.flags.RequestToAuthFlag;
 import edu.cornell.mannlib.vitro.webapp.flags.SunsetFlag;
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 
 /**
  * This sets up several objects in the Request scope for each
@@ -125,7 +134,7 @@ public class VitroRequestPrep implements Filter {
         vreq.setSunsetFlag(sunsetFlag);
 
         //-- setup DAO factory --//
-        WebappDaoFactory wdf = getWebappDaoFactory();
+        WebappDaoFactory wdf = getWebappDaoFactory(vreq);
         //TODO: get accept-language from request and set as preferred languages
         
         //-- setup portal and portalFlag --//
@@ -192,12 +201,22 @@ public class VitroRequestPrep implements Filter {
         if( log.isDebugEnabled() ) log.debug("setting role-based WebappDaoFactory filter for role " + role.toString());             
 
         vreq.setWebappDaoFactory(wdf);
+        
+        // support for Dataset interface if using Jena in-memory model
+        if (vreq.getDataset() == null) {
+        	Dataset dataset = WebappDaoFactoryJena.makeInMemoryDataset(
+        	        vreq.getAssertionsOntModel(), vreq.getInferenceOntModel());
+        	vreq.setDataset(dataset);
+        }
+        
         request.setAttribute("VitroRequestPrep.setup", new Integer(1));
         chain.doFilter(request, response);
     }
 
-    private WebappDaoFactory getWebappDaoFactory(){
-        return (WebappDaoFactory) _context.getAttribute("webappDaoFactory");
+    private WebappDaoFactory getWebappDaoFactory(VitroRequest vreq){
+    	WebappDaoFactory webappDaoFactory = vreq.getWebappDaoFactory();
+        return (webappDaoFactory != null) ? webappDaoFactory :
+        	(WebappDaoFactory) _context.getAttribute("webappDaoFactory");
     }
 
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -400,19 +419,29 @@ public class VitroRequestPrep implements Filter {
         (new VitroRequest(request)).setPortalId( portalId.toString() );
     }
 
-    public static void forceToSelfEditing(HttpServletRequest request){
-        HttpSession sess = request.getSession(true);
-        sess.setMaxInactiveInterval(Authenticate.LOGGED_IN_TIMEOUT_INTERVAL);
-        sess.setAttribute("inSelfEditing","true");
-    }
-    public static void forceOutOfSelfEditing(HttpServletRequest request){
-        HttpSession sess = request.getSession(true);
-        sess.removeAttribute("inSelfEditing");
-    }
-    public static boolean isSelfEditing(HttpServletRequest request){
-        HttpSession sess = request.getSession(false);
-        return sess != null && "true".equalsIgnoreCase((String)sess.getAttribute("inSelfEditing")) ;
-    }
+	/**
+	 * Check to see whether any of the current identifiers is a SelfEditing
+	 * identifier.
+	 */
+	public static boolean isSelfEditing(HttpServletRequest request) {
+		HttpSession session = request.getSession(false);
+		if (session == null) {
+			return false;
+		}
+
+		ServletContext sc = session.getServletContext();
+		IdentifierBundle idBundle = ServletIdentifierBundleFactory.getIdBundleForRequest(request, session, sc);
+		if (idBundle == null) {
+			return false;
+		}
+		
+		SelfEditing selfId = SelfEditingIdentifierFactory.getSelfEditingIdentifier(idBundle);
+		if (selfId == null) {
+			return false;
+		}
+		
+		return true;
+	}
 
     public void destroy() {       
     }

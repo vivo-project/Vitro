@@ -33,17 +33,16 @@ public class Controllers {
     public static final String TAB_ENTITIES = "/TabEntitiesController";  
 
     public static final String SITE_ADMIN = "/siteAdmin";
-    public static final String LOGIN = "/siteAdmin";
+    public static final String LOGIN = "/login";
+    public static final String LOGOUT = "/logout";
+    public static final String AUTHENTICATE = "/authenticate";
     
     public static final String EXPORT_RDF = "/export";
     
     // jsps go here:
     
-    public static final String EMPTY = "/empty.jsp";
     public static final String TAB = "/index.jsp";
 
-    public static final String LOGIN_JSP = "/login_process.jsp";
-    public static final String LOGOUT_JSP = "/login_process.jsp";
     
     public static final String BASIC_JSP = "/templates/page/basicPage.jsp";
     public static final String DEBUG_JSP = "/templates/page/debug.jsp";
@@ -71,37 +70,36 @@ public class Controllers {
 
     public static final String ALPHA_INDEX_JSP = "/templates/alpha/alphaIndex.jsp";
 
-
     public static final String SEARCH_BASIC_JSP = "/templates/search/searchBasic.jsp";
     public static final String SEARCH_PAGED_JSP = "/templates/search/searchPaged.jsp";
     public static final String SEARCH_FAILED_JSP = "/templates/search/searchFailed.jsp";
     public static final String SEARCH_GROUP_JSP = "/templates/search/searchGroup.jsp";
     public static final Object SEARCH_FORM_JSP = "/templates/search/searchForm.jsp";
     public static final Object SEARCH_BAD_QUERY_JSP = "/templates/search/searchBadQuery.jsp";
-
+    
     public static final String BROWSE_GROUP_JSP = "/templates/browse/browseGroup.jsp";
 
-    public static final String HORIZONTAL_JSP = "/horizontal.jsp";
+    public static final String HORIZONTAL_JSP = "/templates/edit/fetch/horizontal.jsp";
     public static final String VERTICAL_JSP = "/templates/edit/fetch/vertical.jsp";
     
-    public static final String CHECK_DATATYPE_PROPERTIES = "/checkDatatypeProperties.jsp";
+    public static final String CHECK_DATATYPE_PROPERTIES = "/jsp/checkDatatypeProperties.jsp";
     public static final String EXPORT_SELECTION_JSP = "/jenaIngest/exportSelection.jsp";
 
     public static final String VCLASS_RETRY_URL = "vclass_retry";
 
     public static final String TOGGLE_SCRIPT_ELEMENT = "<script language='JavaScript' type='text/javascript' src='js/toggle.js'></script>";
 
-    public static final Object SEARCH_ERROR_JSP = "/search_error.jsp";
+    public static final Object SEARCH_ERROR_JSP = "/templates/parts/search_error.jsp";
 
     
     //public static final String TAB_ENTITIES_LIST_JSP = "templates/tab/tabEntities.jsp";
 
-    private static List letters = null;
-    public static List getLetters() {
+    private static List<String> letters = null;
+    public static List<String> getLetters() {
         //there must be a better place to put this.
         if (Controllers.letters == null) {
             char c[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
-            Controllers.letters = new ArrayList(c.length);
+            Controllers.letters = new ArrayList<String>(c.length);
             for (int i = 0; i < c.length; i++) {
                 letters.add("" + c[i]);
             }

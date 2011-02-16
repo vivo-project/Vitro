@@ -9,7 +9,6 @@
 <%@ page import="com.hp.hpl.jena.shared.Lock" %>
 <%@ page import="com.thoughtworks.xstream.XStream" %>
 <%@ page import="com.thoughtworks.xstream.io.xml.DomDriver" %>
-<%@ page import="edu.cornell.mannlib.vedit.beans.LoginFormBean" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditN3Generator" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditSubmission" %>
@@ -42,8 +41,14 @@
 <%@page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.ModelChangePreprocessor"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
 <%@ page import="java.net.URLDecoder" %>
+<%@page import="edu.cornell.mannlib.vitro.webapp.dao.jena.DependentResourceDeleteJena"%>
+<%@page import="edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory"%>
+<%@page import="edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl"%>
+<%@page import="edu.cornell.mannlib.vitro.webapp.beans.Individual"%>
+<%@page import="edu.cornell.mannlib.vitro.webapp.dao.InsertException"%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
+<%@ taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
 
 <%-- 2nd prototype of processing.
 
@@ -53,21 +58,10 @@ be processed as n3 by Jena then it is an error in processing the form.
 The optional n3 blocks will proccessed if their variables are bound and
 are well formed.
 --%>
-<%    
-    if( session == null)
-        throw new Error("need to have session");
-    boolean selfEditing = VitroRequestPrep.isSelfEditing(request);
-    if (!selfEditing && !LoginFormBean.loggedIn(request, LoginFormBean.NON_EDITOR)) {
-%>
-        
-<%@page import="edu.cornell.mannlib.vitro.webapp.dao.jena.DependentResourceDeleteJena"%>
-<%@page import="edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory"%>
-<%@page import="edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl"%>
-<%@page import="edu.cornell.mannlib.vitro.webapp.beans.Individual"%>
-<%@page import="edu.cornell.mannlib.vitro.webapp.dao.InsertException"%><c:redirect url="<%= Controllers.LOGIN %>" />      
+
+<vitro:confirmLoginStatus allowSelfEditing="true" />
+
 <%
-    }
-    
     VitroRequest vreq = new VitroRequest(request);
     WebappDaoFactory wdf = vreq.getWebappDaoFactory();
     

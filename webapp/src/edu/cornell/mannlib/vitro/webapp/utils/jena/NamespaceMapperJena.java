@@ -9,6 +9,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.listeners.StatementListener;
@@ -26,6 +29,8 @@ import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapper;
 public class NamespaceMapperJena extends StatementListener implements
 		NamespaceMapper {
 	
+    private static final Log log = LogFactory.getLog(NamespaceMapperJena.class);
+    
 	private HashMap<String,String> prefixToNamespaceMap;
 	private HashMap<String,List<String>> namespaceToPrefixMap;
 	
@@ -60,15 +65,23 @@ public class NamespaceMapperJena extends StatementListener implements
 		
 	}
 	
+	private static int LARGE_NS = 200;
+	
 	private void rebuildNamespaceCache() {
 		HashMap<String,String> tempPrefixToNamespaceMap = new HashMap<String,String>();
 		HashMap<String,List<String>> tempNamespaceToPrefixMap = new HashMap<String,List<String>>();
 		metadataModel.enterCriticalSection(Lock.READ);
+		int nsCount = 0;
 		try {	
 			// Iterate through all the namespace objects
 			ClosableIterator closeIt = metadataModel.listIndividuals(metadataModel.getResource(VitroVocabulary.NAMESPACE));
 			try {
 				for (Iterator namespaceIt = closeIt; namespaceIt.hasNext();) {
+				    nsCount++;
+				    if (nsCount == LARGE_NS) {
+				        log.warn("Unusually large number of different namespaces encountered; " +
+				                 "namespace mapper setup may take some time.");
+				    }
 					Individual namespaceInd = (Individual) namespaceIt.next();
 					String namespaceURI = null;
 					RDFNode node = namespaceInd.getPropertyValue(metadataModel.getProperty(VitroVocabulary.NAMESPACE_NAMESPACEURI));
@@ -210,4 +223,7 @@ public class NamespaceMapperJena extends StatementListener implements
 		return namespaceToPrefixMap.get(namespace);
 	}
 	
+	public String toString(){
+	    return namespaceToPrefixMap.toString();
+	}
 }

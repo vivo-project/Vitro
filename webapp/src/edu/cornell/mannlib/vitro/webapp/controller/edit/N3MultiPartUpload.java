@@ -32,7 +32,7 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
 
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -135,15 +135,16 @@ public class N3MultiPartUpload extends VitroHttpServlet {
 
 		EditConfiguration editConfig = EditConfiguration.getConfigFromSession(
 				session, request);
+		if (editConfig == null) {
+			RequestDispatcher rd = request
+			.getRequestDispatcher("/edit/messages/noEditConfigFound.jsp");
+			rd.forward(request, resp);
+			return;
+		}
+		
         EditSubmission submission = 
             new EditSubmission(request.getParameterMap(), editConfig, request.getFiles());
         EditN3Generator n3Subber = editConfig.getN3Generator();
-
-        if (editConfig == null) {
-            RequestDispatcher rd = request
-                    .getRequestDispatcher("/edit/messages/noEditConfigFound.jsp");
-            rd.forward(request, resp);
-        }
 
         // check for form validation errors
         Map<String, String> errors = submission.getValidationErrors();
@@ -508,7 +509,7 @@ public class N3MultiPartUpload extends VitroHttpServlet {
     }
     
     public void sendUserEmail(HttpServletRequest request, HttpSession session, String uploadFileName) {
-		LoginFormBean loginBean = (LoginFormBean) session.getAttribute("loginHandler");
+        LoginStatusBean loginBean = LoginStatusBean.getBean(request);
         String userURI = loginBean.getUserURI();
         try{
 	        System.out.println("User URI is " + userURI);

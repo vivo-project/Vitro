@@ -1,0 +1,360 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+/* ADMIN PANEL------>  */
+#admin {
+    font-size: .8em;
+    padding-top: 0;
+    padding-right: 40px;
+}
+#admin h3 {
+    display: inline-block;
+    padding: 3px 6px 3px 10px;
+    margin-bottom: 5px;
+    font-size: 14px;
+}
+#admin .uri-link {
+    padding-left: 11px;
+    padding-bottom: 5px;
+}
+#admin a.edit-individual {
+    padding-left: 5px;
+    border-left: none;
+}
+/* <------ INDIVIDUAL INTRO FOR ANY CLASS*/
+#individual-intro {
+    margin-top: 15px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+}
+#individual-intro h1 {
+    padding-bottom: 8px;  
+}
+#individual-intro span.preferred-title {
+    padding-left: 10px;
+    margin-left: 10px;
+}
+#individual-info h3 {
+    padding-bottom: 5px;
+    margin-top: 5px;
+    clear: left;
+}
+#individual-intro a.icon-rdf {
+    font-size: 1.125em;
+}
+ul#links-additional{
+    margin-bottom: 5px;
+}
+/* <------ INDIVIDUAL INTRO FOR PERSON*/
+#individual-intro.person {
+    margin-bottom: 30px;
+    position: relative;
+    width: 100%;
+}
+#individual-intro.person #individual-info {
+    float: left;
+    width: 78%;
+    margin-bottom: 20px;
+}
+#individual-intro.person .individual-overview {
+    width: 100%;
+    float: none;
+}
+/* <------ INDIVIDUAL INTRO - LEFT SIDE CONTENT */
+#share-contact {
+    position: relative;
+    width: 166px;
+    float: left;
+    padding-right: 1.5em;
+    margin-bottom: 20px;
+}
+#share-contact h3 {
+    margin-top: 15px;
+    padding-bottom: .3em;
+    font-size: 1em;
+    line-height: 1.2em;
+    padding-top: 0;
+}
+img.individual-photo {
+    width: 160px;
+    margin-left: 0;
+    float: left;
+    margin-right: 20px;
+    margin-bottom: 20px;
+}
+#mainImage {
+    position: absolute;
+    padding: 5px 5px 8px 5px;
+    background-color: #fff;
+    top: 6px;
+    left: 6px;
+}
+h2#mainImage, #share-contact h2 {
+    font-size: 1em;
+    line-height: 1em;
+    padding-bottom: 0.3em
+}
+ul#individual-tools-people {
+    margin-top: 5px;
+    height: 20px;
+    padding-bottom: 20px;
+    list-style-type: none;
+    clear: both;
+    margin-bottom: 15px;
+}
+ul#individual-tools-people li {
+    position: relative;
+    display: block;
+    padding-right: 7px;
+    float: left;
+    margin-bottom: 20px;
+}
+ul#individual-tools {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    height: 20px;
+    list-style-type: none;
+}
+ul#individual-tools li {
+    padding-right: 9px;
+    float: left;
+}
+ul#individual-email {
+    clear: both;
+    list-style-type: circle;
+}
+ul#individual-email li {
+    font-size: .875em;
+}
+ul#individual-email li:first-child {
+    font-size: .875em;
+    margin-top: 10px;
+}
+ul#individual-phone {
+    clear: both;
+    list-style-type: circle;
+}
+ul#individual-phone li {
+    font-size: .875em;
+}
+ul#individual-phone li:last-child {
+    margin-bottom: 15px;
+}
+ul#individual-phone li:first-child {
+    margin-top: 10px;
+}
+.icon-phone, .icon-email {
+    padding-right: 5px;
+}
+#individual-intro ul.individual-urls {
+    list-style-type: circle;
+    margin-left: 20px;
+}
+#individual-intro ul.individual-urls li {
+    font-size: .875em;
+    line-height: 1.7em;
+}
+ul.individual-urls-people {
+    clear: both;
+    list-style-type: circle;
+    padding-left: 24px;
+}
+ul.individual-urls-people li {
+    font-size: .875em;
+    line-height: 1.3em;
+}
+ul#links-additional li, ul#links-primary li {
+    width: 145px;
+    word-wrap: break-word;
+}
+#photo-wrapper {
+    position: relative;
+    float: left;
+}
+/* <------ INDIVIDUAL INTRO - RIGHT SIDE CONTENT */
+#individual-info {
+    padding: 0;
+    float: left;
+    width: 98%;
+}
+#individual-info.withThumb {
+    width: 78%;
+}
+h1.fn .preferred-title {
+    padding-left: 10px;
+    margin-left: 10px;
+}
+#individual-info h2 {
+    padding-bottom: 10px;
+}
+#individual-info nav {
+    float: left;
+    width: 78%;
+    clear: left;
+}
+#individual-intro .individual-overview {
+    margin-bottom: 30px;
+    margin-top: 10px;
+    display: inline;
+    clear: both;
+    float: left;
+}
+/* <------ INDIVIDUAL VISUALIZATION */
+#visualization {
+    padding: 0 0 40px 30px;
+    padding-top: 0;
+    float: right;
+    background-color: #fff;
+}
+#visualization h3 {
+    padding-top: 10px;
+    margin-bottom: 10px;
+}
+.publication-year-range {
+    display: block;
+    padding-top: 5px;
+}
+/* <------ COAUTHORS */
+#co-authors {
+    padding: 0 20px 30px 20px;
+}
+img.co-author {
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+#co-authors h3 {
+    margin-bottom: 10px;
+}
+#co-authors ul li {
+    display: block;
+    float: left;
+}
+p.view-all-coauthors {
+    clear: both;
+    width:  200px;
+    text-align: left;
+}
+/* PROPERTY GROUP MENU------>  */
+#property-group-menu {
+    clear: both;
+    width: 95%;;
+    height: 46px;
+    border: 1px solid #dfebe5;
+    margin: 0 auto;
+    margin-bottom: 10px;
+    margin-top: 20px;
+}
+#property-group-menu ul {
+    display: block;
+    list-style-type: none;
+}
+#property-group-menu li {
+    float: left;
+    line-height: 46px;
+    padding-right: 15px;
+    padding-left: 15px;
+}
+#property-group-menu li:first-child {
+     padding-left: 10px;
+}
+/* PROPERTY GROUP------>  */
+.property-group {
+    position: relative;
+    clear: both;
+    width: 95%;
+    margin: 0 auto;
+    margin-bottom: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #dfebe5;
+}
+.scroll-up {
+   position: absolute; 
+   width: 21px;
+   height: 30px;
+   top: 0;
+   right: -21px;
+}
+section.property-group h2 {
+    padding: 20px 25px 12px 35px;
+}
+article.property {
+    width: 93%;
+    margin: 0 auto;
+    margin-bottom: 20px;
+    border: 1px solid #dfe6e5;
+}
+article.property h3 {
+    border-bottom: 1px solid #dfe6e5;
+    padding: 10px 20px 10px 20px;
+}
+article.property ul.property-list li.subclass h3 {
+    border-bottom: none;
+    padding: 10px 10px 10px 0;
+    background-color: #fff;
+    margin-bottom: 0;
+}
+article.property .data-property-statement {
+    padding: 10px 20px 10px 20px;
+    line-height: 1.2em;
+    margin-bottom: 0;
+}
+article.property ul.property-list {
+    background: #fff;
+    padding-bottom: 20px;
+    list-style-type: none;
+}
+article.property ul.property-list li {
+    line-height: 1.2em;
+    padding: 10px 20px 5px 20px;
+    background-color: #fff;
+}
+article.property ul.subclass-property-list {
+    margin-left: 0;
+    list-style-position: inside;
+}
+article.property ul.subclass-property-list li {
+    line-height: 1.2em;
+    padding: 0 20px 10px 20px;
+}
+/* EDITING DISPLAY------>  */
+.add-individual {
+    vertical-align: middle;
+    margin-left: 2px;
+}
+.edit-individual {
+    margin-left: 10px;
+    padding-left: 8px;
+    padding-right: 1px;
+    vertical-align: middle;
+}
+.delete-individual {
+    vertical-align: middle;
+}
+.edit-mainImage {
+    position: absolute;
+    background: #fff;
+    padding: 0 6px 0 0;
+    top: 6px;
+    left: 6px;
+}
+a.edit-mainImage img.edit-individual {
+    border: 0;
+    padding-left: 0px;
+    margin-left: 8px;
+}
+.delete-mainImage {
+    position: absolute;
+    top: 6px;
+    left: 36px;
+    background: #fff;
+    padding: 0 6px 0 8px;
+}
+.middle {
+    vertical-align: middle;
+}
+/* MISCELLANEOUS------>  */
+.listDateTime {
+    padding: 0.2em 0.4em;
+    font-size: 0.8em;
+    background: #f4f4f4;
+}

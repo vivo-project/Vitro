@@ -2,13 +2,16 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.filtering;
 
-import edu.cornell.mannlib.vitro.webapp.beans.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Set;
+
+import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
-import net.sf.jga.fn.UnaryFunctor;
-
-import java.util.*;
 
 public class VClassGroupDaoFiltering extends BaseFiltering implements VClassGroupDao {
 
@@ -31,9 +34,9 @@ public class VClassGroupDaoFiltering extends BaseFiltering implements VClassGrou
     }
 
 
-    public LinkedHashMap getClassGroupMap() {
-        LinkedHashMap lhm = innerDao.getClassGroupMap();
-        Set keys = lhm.keySet();
+    public LinkedHashMap<String, VClassGroup> getClassGroupMap() {
+        LinkedHashMap<String, VClassGroup> lhm = innerDao.getClassGroupMap();
+        Set<String> keys = lhm.keySet();
         for( Object key : keys){
             VClassGroup vcg = (VClassGroup)lhm.get(key);
             if( vcg == null || !filters.getVClassGroupFilter().fn(vcg) ){
@@ -51,22 +54,22 @@ public class VClassGroupDaoFiltering extends BaseFiltering implements VClassGrou
             return null;
     }
 
-    public List getPublicGroupsWithVClasses() {
+    public List<VClassGroup> getPublicGroupsWithVClasses() {
         return this.getPublicGroupsWithVClasses(false);
     }
 
-    public List getPublicGroupsWithVClasses(boolean displayOrder) {
+    public List<VClassGroup> getPublicGroupsWithVClasses(boolean displayOrder) {
         return this.getPublicGroupsWithVClasses(displayOrder,true);
     }
-    public List getPublicGroupsWithVClasses(boolean displayOrder, boolean includeUninstantiatedClasses) {
+    public List<VClassGroup> getPublicGroupsWithVClasses(boolean displayOrder, boolean includeUninstantiatedClasses) {
         return this.getPublicGroupsWithVClasses(displayOrder,includeUninstantiatedClasses,false);
     }
     /** filter both vclassgroups and their vclasses */
-    public List getPublicGroupsWithVClasses(boolean displayOrder, boolean includeUninstantiatedClasses,
+    public List<VClassGroup> getPublicGroupsWithVClasses(boolean displayOrder, boolean includeUninstantiatedClasses,
             boolean getIndividualCount) {
 
-        LinkedHashMap groupMap = this.getClassGroupMap();
-        List<VClassGroup> groups = new ArrayList(groupMap.values());
+        LinkedHashMap<String, VClassGroup> groupMap = this.getClassGroupMap();
+        List<VClassGroup> groups = new ArrayList<VClassGroup>(groupMap.values());
 
         VClassDao vclassDao = filteredDaos.getVClassDao();
         for( VClassGroup vg : groups){
@@ -88,18 +91,30 @@ public class VClassGroupDaoFiltering extends BaseFiltering implements VClassGrou
     }
 
 
-    public int removeUnpopulatedGroups(List groups) {
+    public int removeUnpopulatedGroups(List<VClassGroup> groups) {
         return innerDao.removeUnpopulatedGroups(groups);
     }
 
 
-    public void sortGroupList(List groupList) {
+    public void sortGroupList(List<VClassGroup> groupList) {
         innerDao.sortGroupList(groupList);
     }
 
 
     public void updateVClassGroup(VClassGroup vcg) {
         innerDao.updateVClassGroup(vcg);
+    }
+
+
+    @Override
+    public void removeClassesHiddenFromSearch(List<VClassGroup> groups) {
+        innerDao.removeClassesHiddenFromSearch(groups);        
+    }
+
+
+    @Override
+    public VClassGroup getGroupByName(String vcgName) {
+        return innerDao.getGroupByName(vcgName);
     }
 
 

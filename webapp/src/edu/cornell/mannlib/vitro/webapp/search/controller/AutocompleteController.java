@@ -4,10 +4,8 @@ package edu.cornell.mannlib.vitro.webapp.search.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -31,16 +29,14 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.WildcardQuery;
 
-import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreeMarkerHttpServlet;
-import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
 import edu.cornell.mannlib.vitro.webapp.search.SearchException;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc;
+import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneIndexFactory;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup;
-import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
 import freemarker.template.Configuration;
 
 /**
@@ -48,14 +44,15 @@ import freemarker.template.Configuration;
  * through a Lucene search. 
  */
 
-public class AutocompleteController extends FreeMarkerHttpServlet{
+public class AutocompleteController extends FreemarkerHttpServlet{
 
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(AutocompleteController.class);
-
+    
+    private static final String TEMPLATE_DEFAULT = "autocompleteResults.ftl";
+    
     private static String QUERY_PARAMETER_NAME = "term";
     
-    private IndexSearcher searcher = null;
     String NORESULT_MSG = "";    
     private int defaultMaxSearchSize= 1000;
 
@@ -67,8 +64,6 @@ public class AutocompleteController extends FreeMarkerHttpServlet{
     public void doGet(HttpServletRequest request, HttpServletResponse response)
     throws IOException, ServletException {
         
-        // String templateName = request.getServletPath().equals("/autocomplete") ? "autocompleteResults.ftl" : "selectResults.ftl";  
-        String templateName = "autocompleteResults.ftl";
         Map<String, Object> map = new HashMap<String, Object>();
 
         VitroRequest vreq = new VitroRequest(request);
@@ -81,26 +76,25 @@ public class AutocompleteController extends FreeMarkerHttpServlet{
             if( vreq.getWebappDaoFactory() == null 
                     || vreq.getWebappDaoFactory().getIndividualDao() == null ){
                 log.error("makeUsableBeans() could not get IndividualDao ");
-                doSearchError(templateName, map, config, response);
+                doSearchError(map, config, request, response);
                 return;
-            }
-            IndividualDao iDao = vreq.getWebappDaoFactory().getIndividualDao();                       
+            }                    
             
             int maxHitSize = defaultMaxSearchSize;
             
             String qtxt = vreq.getParameter(QUERY_PARAMETER_NAME);
             Analyzer analyzer = getAnalyzer(getServletContext());
             
-            Query query = getQuery(vreq, portalFlag, analyzer,  qtxt);             
-            log.debug("query for '" + qtxt +"' is " + query.toString());
-
+            Query query = getQuery(vreq, portalFlag, analyzer, qtxt);             
             if (query == null ) {
-                doNoQuery(templateName, map, config, response);
+                log.debug("query for '" + qtxt +"' is null.");
+                doNoQuery(map, config, request, response);
                 return;
             }
-            
+            log.debug("query for '" + qtxt +"' is " + query.toString());
+                        
             IndexSearcher searcherForRequest = LuceneIndexFactory.getIndexSearcher(getServletContext());
-                                                
+            
             TopDocs topDocs = null;
             try{
                 topDocs = searcherForRequest.search(query,null,maxHitSize);
@@ -112,20 +106,20 @@ public class AutocompleteController extends FreeMarkerHttpServlet{
                     topDocs = searcherForRequest.search(query,null,maxHitSize);
                 }catch (Exception ex){
                     log.error(ex);
-                    doFailedSearch(templateName, map, config, response);
+                    doFailedSearch(map, config, request, response);
                     return;
                 }
             }
 
             if( topDocs == null || topDocs.scoreDocs == null){
                 log.error("topDocs for a search was null");                
-                doFailedSearch(templateName, map, config, response);
+                doFailedSearch(map, config, request, response);
                 return;
             }
             
             int hitsLength = topDocs.scoreDocs.length;
             if ( hitsLength < 1 ){                
-                doFailedSearch(templateName, map, config, response);
+                doFailedSearch(map, config, request, response);
                 return;
             }            
             log.debug("found "+hitsLength+" hits"); 
@@ -134,13 +128,10 @@ public class AutocompleteController extends FreeMarkerHttpServlet{
             for(int i=0; i<topDocs.scoreDocs.length ;i++){
                 try{                     
                     Document doc = searcherForRequest.doc(topDocs.scoreDocs[i].doc);                    
-                    String uri = doc.get(Entity2LuceneDoc.term.URI);
-                    Individual ind = iDao.getIndividualByURI(uri);
-                    if (ind != null) {
-                        String name = ind.getName();
-                        SearchResult result = new SearchResult(name, uri);
-                        results.add(result);
-                    }
+                    String uri = doc.get(VitroLuceneTermNames.URI);
+                    String name = doc.get(VitroLuceneTermNames.NAMERAW);
+                    SearchResult result = new SearchResult(name, uri);
+                    results.add(result);
                 } catch(Exception e){
                     log.error("problem getting usable Individuals from search " +
                             "hits" + e.getMessage());
@@ -149,22 +140,22 @@ public class AutocompleteController extends FreeMarkerHttpServlet{
 
             Collections.sort(results);
             map.put("results", results);
-            writeTemplate(templateName, map, config, response);
+            writeTemplate(TEMPLATE_DEFAULT, map, config, request, response);
    
         } catch (Throwable e) {
             log.error("AutocompleteController(): " + e);            
-            doSearchError(templateName, map, config, response);
+            doSearchError(map, config, request, response);
             return;
         }
     }
 
-    private String getIndexDir(ServletContext servletContext) throws SearchException {
-        Object obj = servletContext.getAttribute(LuceneSetup.INDEX_DIR);
-        if( obj == null || !(obj instanceof String) )
-            throw new SearchException("Could not get IndexDir for lucene index");
-        else
-            return (String)obj;
-    }
+//    private String getIndexDir(ServletContext servletContext) throws SearchException {
+//        Object obj = servletContext.getAttribute(LuceneSetup.INDEX_DIR);
+//        if( obj == null || !(obj instanceof String) )
+//            throw new SearchException("Could not get IndexDir for lucene index");
+//        else
+//            return (String)obj;
+//    }
 
     private Analyzer getAnalyzer(ServletContext servletContext) throws SearchException {
         Object obj = servletContext.getAttribute(LuceneSetup.ANALYZER);
@@ -196,7 +187,7 @@ public class AutocompleteController extends FreeMarkerHttpServlet{
                 BooleanQuery boolQuery = new BooleanQuery(); 
                 String typeParam = (String) request.getParameter("type");
                 boolQuery.add(  new TermQuery(
-                        new Term(Entity2LuceneDoc.term.RDFTYPE, 
+                        new Term(VitroLuceneTermNames.RDFTYPE, 
                                 typeParam)),
                     BooleanClause.Occur.MUST);
                 boolQuery.add(query, BooleanClause.Occur.MUST);
@@ -241,7 +232,7 @@ public class AutocompleteController extends FreeMarkerHttpServlet{
  
         String stemParam = (String) request.getParameter("stem"); 
         boolean stem = "true".equals(stemParam);
-        String termName = stem ? Entity2LuceneDoc.term.NAME : Entity2LuceneDoc.term.NAMEUNSTEMMED;
+        String termName = stem ? VitroLuceneTermNames.NAME : VitroLuceneTermNames.NAMEUNSTEMMED;
 
         BooleanQuery boolQuery = new BooleanQuery();
         
@@ -269,7 +260,7 @@ public class AutocompleteController extends FreeMarkerHttpServlet{
             
             log.debug("Name query is: " + boolQuery.toString());
         } catch (ParseException e) {
-            log.warn(e);
+            log.warn(e, e);
         }
         
         
@@ -328,7 +319,7 @@ public class AutocompleteController extends FreeMarkerHttpServlet{
     private Query makeUntokenizedNameQuery(String querystr) {
         
         querystr = querystr.toLowerCase();
-        String termName = Entity2LuceneDoc.term.NAMEUNANALYZED;
+        String termName = VitroLuceneTermNames.NAMELOWERCASE;
         BooleanQuery query = new BooleanQuery();
         log.debug("Adding wildcard query on unanalyzed name");
         query.add( 
@@ -338,58 +329,6 @@ public class AutocompleteController extends FreeMarkerHttpServlet{
         return query;
     }
             
-    /**
-     * Makes a flag based query clause.  This is where searches can filtered
-     * by portal.
-     *
-     * If you think that search is not working correctly with protals and
-     * all that kruft then this is a method you want to look at.
-     *
-     * It only takes into account "the portal flag" and flag1Exclusive must
-     * be set.  Where does that stuff get set?  Look in vitro.flags.PortalFlag
-     * 
-     * One thing to keep in mind with portal filtering and search is that if
-     * you want to search a portal that is different then the portal the user
-     * is 'in' then the home parameter should be set to force the user into
-     * the new portal.  
-     * 
-     * Ex.  Bob requests the search page for vivo in portal 3.  You want to
-     * have a drop down menu so bob can search the all CALS protal, id 60.
-     * You need to have a home=60 on your search form. If you don't set 
-     * home=60 with your search query, then the search will not be in the
-     * all portal AND the WebappDaoFactory will be filtered to only show 
-     * things in portal 3.    
-     * 
-     * Notice: flag1 as a parameter is ignored. bdc34 2009-05-22.
-     */
-    @SuppressWarnings("static-access")
-    private Query makeFlagQuery( PortalFlag flag){        
-        if( flag == null || !flag.isFilteringActive() 
-                || flag.getFlag1DisplayStatus() == flag.SHOW_ALL_PORTALS )
-            return null;
-
-        // make one term for each bit in the numeric flag that is set
-        Collection<TermQuery> terms = new LinkedList<TermQuery>();
-        int portalNumericId = flag.getFlag1Numeric();        
-        Long[] bits = FlagMathUtils.numeric2numerics(portalNumericId);
-        for (Long bit : bits) {
-            terms.add(new TermQuery(new Term(Entity2LuceneDoc.term.PORTAL, Long
-                    .toString(bit))));
-        }
-
-        // make a boolean OR query for all of those terms
-        BooleanQuery boolQuery = new BooleanQuery();
-        if (terms.size() > 0) {
-            for (TermQuery term : terms) {
-                    boolQuery.add(term, BooleanClause.Occur.SHOULD);
-            }
-            return boolQuery;
-        } else {
-            //we have no flags set, so no flag filtering
-            return null;
-        }
-    }
-
     private QueryParser getQueryParser(String searchField, Analyzer analyzer){
         // searchField indicates which field to search against when there is no term
         // indicated in the query string.
@@ -399,20 +338,20 @@ public class AutocompleteController extends FreeMarkerHttpServlet{
         //this sets the query parser to AND all of the query terms it finds.
         qp.setDefaultOperator(QueryParser.AND_OPERATOR);
         return qp;
-    }       
-
-    private void doNoQuery(String templateName, Map<String, Object> map, Configuration config, HttpServletResponse response) {
-        writeTemplate(templateName, map, config, response);
     }
 
-    private void doFailedSearch(String templateName, Map<String, Object> map, Configuration config, HttpServletResponse response) {
-        writeTemplate(templateName, map, config, response);
+    private void doNoQuery(Map<String, Object> map, Configuration config, HttpServletRequest request, HttpServletResponse response) {
+        writeTemplate(TEMPLATE_DEFAULT, map, config, request, response);
+    }
+
+    private void doFailedSearch(Map<String, Object> map, Configuration config, HttpServletRequest request, HttpServletResponse response) {
+        writeTemplate(TEMPLATE_DEFAULT, map, config, request, response);
     }
  
-    private void doSearchError(String templateName, Map<String, Object> map, Configuration config, HttpServletResponse response) {
+    private void doSearchError(Map<String, Object> map, Configuration config, HttpServletRequest request, HttpServletResponse response) {
         // For now, we are not sending an error message back to the client because with the default autocomplete configuration it
         // chokes.
-        writeTemplate(templateName, map, config, response);
+        writeTemplate(TEMPLATE_DEFAULT, map, config, request, response);
     }
 
     public static final int MAX_QUERY_LENGTH = 500;
@@ -446,5 +385,7 @@ public class AutocompleteController extends FreeMarkerHttpServlet{
             return label.compareTo(sr.getLabel());
         }
     }
+    
+
 
 }

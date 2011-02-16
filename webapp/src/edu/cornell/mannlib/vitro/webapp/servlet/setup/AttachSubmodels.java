@@ -18,6 +18,7 @@ import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
+import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDao;
 
 public class AttachSubmodels implements ServletContextListener {
@@ -27,7 +28,23 @@ public class AttachSubmodels implements ServletContextListener {
 	private static final Log log = LogFactory.getLog( AttachSubmodels.class );
 	
 	public void contextInitialized( ServletContextEvent sce ) {
+	    
+	    if (AbortStartup.isStartupAborted(sce.getServletContext())) {
+            return;
+        }
+	    
 		try {
+		    
+		    //FIXME refactor this
+            String tripleStoreTypeStr = 
+                ConfigurationProperties.getProperty(
+                        "VitroConnection.DataSource.tripleStoreType", "RDB");
+            if ("SDB".equals(tripleStoreTypeStr)) {
+                (new FileGraphSetup()).contextInitialized(sce);
+                return;
+                // use filegraphs instead of submodels if we're running SDB
+            }
+		    
 			int attachmentCount = 0;
 			OntModel baseModel = (OntModel) sce.getServletContext().getAttribute( JenaBaseDao.ASSERTIONS_ONT_MODEL_ATTRIBUTE_NAME );
 			Set<String> pathSet = sce.getServletContext().getResourcePaths( PATH );
@@ -53,10 +70,11 @@ public class AttachSubmodels implements ServletContextListener {
 						attachmentCount++;
 						log.info("Attached submodel from file " + p);
 					} catch (Exception ioe) {
-						fis.close();
 						log.error("Unable to attach submodel from file " + p, ioe);
 						System.out.println("Unable to attach submodel from file " + p);
 						ioe.printStackTrace();
+					} finally {
+						fis.close();
 					}
 				} catch (FileNotFoundException fnfe) {
 					log.warn(p + " not found. Unable to attach as submodel" + 

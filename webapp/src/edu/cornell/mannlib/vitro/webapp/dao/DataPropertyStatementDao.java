@@ -5,6 +5,8 @@ package edu.cornell.mannlib.vitro.webapp.dao;
 import java.util.Collection;
 import java.util.List;
 
+import com.hp.hpl.jena.rdf.model.Literal;
+
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -37,6 +39,10 @@ public interface DataPropertyStatementDao {
     void deleteDataPropertyStatementsForIndividualByDataProperty(Individual individual, DataProperty dataProperty);
 
     int insertNewDataPropertyStatement(DataPropertyStatement dataPropertyStatement );
+
+    List<Literal> getDataPropertyValuesForIndividualByProperty(Individual subject, DataProperty property);
+    
+    List<Literal> getDataPropertyValuesForIndividualByProperty(String subjectUri, String propertyUri);
 
 }
 

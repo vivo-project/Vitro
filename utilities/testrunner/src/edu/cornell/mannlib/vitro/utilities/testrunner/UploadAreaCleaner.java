@@ -5,6 +5,8 @@ package edu.cornell.mannlib.vitro.utilities.testrunner;
 import java.io.File;
 import java.io.IOException;
 
+import edu.cornell.mannlib.vitro.utilities.testrunner.listener.Listener;
+
 /**
  * Clean out the file upload area, so the next suite will start with no uploads.
  */

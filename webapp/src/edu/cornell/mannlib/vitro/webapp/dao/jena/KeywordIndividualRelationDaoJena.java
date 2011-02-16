@@ -10,6 +10,7 @@ import java.util.List;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
@@ -68,7 +69,7 @@ public class KeywordIndividualRelationDaoJena extends JenaBaseDao implements Key
             }
             getOntModel().enterCriticalSection(Lock.READ);
             try {
-                com.hp.hpl.jena.ontology.Individual individual = getOntModel().getIndividual(individualURI);
+                Resource individual = ResourceFactory.createResource(individualURI);
                 if (individual != null) {
                     ClosableIterator stmtIt = getOntModel().listStatements(null, KEYWORD_INDIVIDUALRELATION_INVOLVESINDIVIDUAL, individual);
                     try {

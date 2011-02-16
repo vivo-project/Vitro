@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -22,6 +23,10 @@ import com.hp.hpl.jena.ontology.OntResource;
 import com.hp.hpl.jena.ontology.ProfileException;
 import com.hp.hpl.jena.ontology.Restriction;
 import com.hp.hpl.jena.ontology.SomeValuesFromRestriction;
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -47,12 +52,55 @@ import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
+import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 
 public class DataPropertyDaoJena extends PropertyDaoJena implements
         DataPropertyDao {
     
     protected static final Log log = LogFactory.getLog(DataPropertyDaoJena.class.getName());
+    
+    /* This may be the intent behind JenaBaseDao.NONUSER_NAMESPACES, but that
+     * value does not contain all of these namespaces.
+     */
+    protected static final List<String> EXCLUDED_NAMESPACES = Arrays.asList(
+            // Don't need to exclude these, because they are not owl:DatatypeProperty
+            //"http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+            //"http://www.w3.org/2000/01/rdf-schema#",
+            "http://www.w3.org/2002/07/owl#",
+            "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#",
+            "http://vitro.mannlib.cornell.edu/ns/vitro/public#"
+        ); 
 
+    /*
+     * This is a hack to throw out properties in the vitro, rdf, rdfs, and owl namespaces.
+     * It will be implemented in a better way in v1.3 (Editing and Display Configuration).
+     */
+    protected static String propertyFilters = null;
+    static {
+        List<String> namespaceFilters = new ArrayList<String>();
+        for (String s : EXCLUDED_NAMESPACES) {
+            namespaceFilters.add("(afn:namespace(?property) != \"" + s + "\")");
+        }
+        propertyFilters = "FILTER (" + StringUtils.join(namespaceFilters, " && ") + ")\n";
+    } 
+    protected static final String DATA_PROPERTY_QUERY_STRING = 
+        prefixes + "\n" +
+        "SELECT DISTINCT ?property WHERE { \n" +
+        "   GRAPH ?g1 { ?subject ?property ?object } \n" + 
+        "   GRAPH ?g2 { ?property rdf:type owl:DatatypeProperty } \n" +
+        propertyFilters +
+        "}";
+    
+    protected static Query dataPropertyQuery;
+    static {
+        try {
+            dataPropertyQuery = QueryFactory.create(DATA_PROPERTY_QUERY_STRING);
+        } catch(Throwable th){
+            log.error("could not create SPARQL query for DATA_PROPERTY_QUERY_STRING " + th.getMessage());
+            log.error(DATA_PROPERTY_QUERY_STRING);
+        }             
+    }
+    
     private class DataPropertyRanker implements Comparator {
         public int compare (Object o1, Object o2) {
             DataProperty dp1 = (DataProperty) o1;
@@ -65,8 +113,9 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
         }
     }
 
-    public DataPropertyDaoJena(WebappDaoFactoryJena wadf) {
-        super(wadf);
+    public DataPropertyDaoJena(DatasetWrapperFactory dwf, 
+                               WebappDaoFactoryJena wadf) {
+        super(dwf, wadf);
     }
 
     public void deleteDataProperty(DataProperty dtp) {
@@ -369,9 +418,10 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
     public Collection<DataProperty> getAllPossibleDatapropsForIndividual(String individualURI) {
         Individual ind = getWebappDaoFactory().getIndividualDao().getIndividualByURI(individualURI);
         Collection<DataProperty> dpColl = new ArrayList<DataProperty>();
+        List<String> vclassURIs = getVClassURIs(ind);
+        
         try {
-	        for (VClass currClass : ind.getVClasses(true)) {
-            
+	        for (VClass currClass : ind.getVClasses( DIRECT )) {            
                 List<DataProperty> currList = getDatapropsForClass(currClass.getURI());
                 for (Iterator<DataProperty> dpIter = currList.iterator(); dpIter.hasNext();) {
                     DataProperty dp = (DataProperty) dpIter.next();
@@ -395,7 +445,7 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
                 // now change range datatype based on individual
                 // TODO: rethink all these methods to reduce inefficiency
                 for (DataProperty dp : dpColl) {
-                	dp.setRangeDatatypeURI(getRequiredDatatypeURI(ind, dp));
+                	dp.setRangeDatatypeURI(getRequiredDatatypeURI(ind, dp, vclassURIs));
                 }
         	}
         } catch (ProfileException pe) {
@@ -417,59 +467,82 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
     	);
     }
     
-    public String getRequiredDatatypeURI(Individual individual, DataProperty dataprop) {
-    	OntModel ontModel = getOntModelSelector().getFullModel();
-    	String datatypeURI = dataprop.getRangeDatatypeURI();	
-    	List<String> vclassURIs = null;
-    	if (reasoningAvailable()) {
-    		vclassURIs = new ArrayList<String>();
-    		for (VClass vc : individual.getVClasses(INDIRECT)) {
-    			if (vc.getURI() != null) {
-    				vclassURIs.add(vc.getURI());
-    			}
-    		}
-    	} else {
-    		vclassURIs = getSupertypeURIs(individual);
-    	}
-    	ontModel.enterCriticalSection(Lock.READ);
-    	try {
-    		// get universal restrictions applicable to data property
-    		Iterator<Resource> restIt = ontModel.listSubjectsWithProperty(OWL.onProperty, ontModel.getResource(dataprop.getURI()));
-    		while (restIt.hasNext()) {
-    			Resource restRes = restIt.next();
-    			if (restRes.canAs(Restriction.class)) {
-    				Restriction rest = (Restriction) restRes.as(Restriction.class);
-    				if (rest.isAllValuesFromRestriction()) {
-    					AllValuesFromRestriction avfrest = rest.asAllValuesFromRestriction();
-    					if (avfrest.getAllValuesFrom() != null) {
-    						// check if the individual has the restriction as one of its types
-	    					if (!individual.isAnonymous() &&
-	    					    ontModel.contains(ontModel.getResource(individual.getURI()),
-	    					    				  RDF.type,
-	    					    				  rest)
-	    					    ) {
-			    						datatypeURI = avfrest.getAllValuesFrom().getURI();
-		    							break; 
-	    					} else {
-    					    	// check if the restriction applies to one of the individual's types
-    					    	List<Resource> equivOrSubResources = new ArrayList<Resource>();
-    	    					equivOrSubResources.addAll(ontModel.listSubjectsWithProperty(RDFS.subClassOf, rest).toList());
-    	    					equivOrSubResources.addAll(ontModel.listSubjectsWithProperty(OWL.equivalentClass, rest).toList());
-    	    					for(Resource equivOrSubRes : equivOrSubResources) {
-    	    						if (!equivOrSubRes.isAnon() && vclassURIs.contains(equivOrSubRes.getURI())) {
-    	    							datatypeURI = avfrest.getAllValuesFrom().getURI();
-    	    							break;
-    	    						}
-    	    					}
-	    					}
-    					} 
-    				}
-    			}
-    		}
-    	} finally {
-    		ontModel.leaveCriticalSection();
-    	}
-    	return datatypeURI;
+    private String getRequiredDatatypeURI(Individual individual, DataProperty dataprop, List<String> vclassURIs) {
+        OntModel ontModel = getOntModelSelector().getTBoxModel();
+        String datatypeURI = dataprop.getRangeDatatypeURI();    
+    
+        ontModel.enterCriticalSection(Lock.READ);
+        try {
+            // get universal restrictions applicable to data property
+            Iterator<Resource> restIt = ontModel.listSubjectsWithProperty(OWL.onProperty, ontModel.getResource(dataprop.getURI()));
+            while (restIt.hasNext()) {
+                Resource restRes = restIt.next();
+                if (restRes.canAs(Restriction.class)) {
+                    Restriction rest = (Restriction) restRes.as(Restriction.class);
+                    if (rest.isAllValuesFromRestriction()) {
+                        AllValuesFromRestriction avfrest = rest.asAllValuesFromRestriction();
+                        if (avfrest.getAllValuesFrom() != null) {
+                            // check if the individual has the restriction as one of its types
+                            if (!individual.isAnonymous() &&
+                                ontModel.contains(ontModel.getResource(individual.getURI()),
+                                                  RDF.type,
+                                                  rest)
+                                ) {
+                                        datatypeURI = convertRequiredDatatypeURI(
+                                                avfrest.getAllValuesFrom().getURI());
+                                        break; 
+                            } else {
+                                // check if the restriction applies to one of the individual's types
+                                List<Resource> equivOrSubResources = new ArrayList<Resource>();
+                                equivOrSubResources.addAll(ontModel.listSubjectsWithProperty(RDFS.subClassOf, rest).toList());
+                                equivOrSubResources.addAll(ontModel.listSubjectsWithProperty(OWL.equivalentClass, rest).toList());
+                                for(Resource equivOrSubRes : equivOrSubResources) {
+                                    if (!equivOrSubRes.isAnon() && vclassURIs.contains(equivOrSubRes.getURI())) {
+                                        datatypeURI = convertRequiredDatatypeURI(
+                                                avfrest.getAllValuesFrom().getURI());
+                                        break;
+                                    }
+                                }
+                            }
+                        } 
+                    }
+                }
+            }
+        } finally {
+            ontModel.leaveCriticalSection();
+        }
+        return datatypeURI;
+    }
+    
+    /**
+     * Converts datatypes used in allValuesFromRestrictions to actual
+     * requirements for editing.  Initially, this means we filter out
+     * rdfs:Literal because we don't want to populate literals with this
+     * as a datatype.
+     */
+    private String convertRequiredDatatypeURI(String datatypeURI) {
+        return (RDFS.Literal.getURI().equals(datatypeURI)) 
+                ? null 
+                : datatypeURI;
+    }
+    
+    public String getRequiredDatatypeURI(Individual individual, DataProperty dataprop) {    	    		    	
+    	return getRequiredDatatypeURI(individual,dataprop,getVClassURIs(individual));
+    }
+    
+    private List<String> getVClassURIs(Individual individual){
+        List<String> vclassURIs = null;
+        if (reasoningAvailable()) {
+            vclassURIs = new ArrayList<String>();
+            for (VClass vc : individual.getVClasses(INDIRECT)) {
+                if (vc.getURI() != null) {
+                    vclassURIs.add(vc.getURI());
+                }
+            }
+        } else {
+            vclassURIs = getSupertypeURIs(individual);
+        }
+        return vclassURIs;
     }
     
     private boolean DIRECT = true;
@@ -680,4 +753,32 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
             return rootProperties;
     }
 
+    @Override
+    public List<DataProperty> getDataPropertyList(Individual subject) {
+        return getDataPropertyList(subject.getURI());
+    }
+    
+    @Override
+    /*
+     * SPARQL-based method for getting the individual's data properties.
+     * Ideally this implementation should replace the existing way of getting
+     * the data property list, but the consequences of this may be far-reaching,
+     * so we are implementing a new method now and will merge the old approach
+     * into the new one in a future release.
+     */
+    public List<DataProperty> getDataPropertyList(String subjectUri) {
+        log.debug("Data property query string:\n" + DATA_PROPERTY_QUERY_STRING);         
+        log.debug("Data property query:\n" + dataPropertyQuery);        
+        Iterator<QuerySolution> results = getPropertyQueryResults(subjectUri, dataPropertyQuery);
+        List<DataProperty> properties = new ArrayList<DataProperty>();
+        while (results.hasNext()) {
+            QuerySolution sol = results.next();
+            Resource resource = sol.getResource("property");
+            String uri = resource.getURI();
+            DataProperty property = getDataPropertyByURI(uri);
+            properties.add(property);
+        }
+        return properties; 
+    }
+    
 }

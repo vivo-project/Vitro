@@ -1,0 +1,93 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+/* <------ UPLOAD PICTURE*/
+#photoUpload {
+    margin-left: 0;
+    height: 280px;
+    background: #fff;
+    padding: 15px;
+}
+#photoUploadDefaultImage {
+    width: 130px;
+    float: left;
+}
+#photoUploadDefaultImage img {
+    margin-bottom: 10px;
+}
+#photoUploadForm {
+    width: 280px;
+    float: left;
+    padding-left: 25px;
+    margin-left: 1.2em;
+    margin-top: 30px;
+    padding-top: 15px;
+    padding-bottom: 25px;
+}
+#photoUploadForm label {
+    display: block;
+    padding-bottom: 10px;
+}
+#photoUploadForm label span {    
+    font-size: .7em;
+}
+#photoUploadForm input {    
+    margin-bottom: 10px;
+}
+/* <------ CROP PICTURE*/
+#photoCropping {
+    margin-left: 0;
+    height: 450px;
+    background: #fff;
+    padding: 15px 0 15px 15px;
+    margin-right: 0;
+}
+#photoCroppingPreview {
+    width: 180px;
+    float: left;
+}
+.photoCroppingNote {
+    margin-top: 15px;
+    font-size: .8em;
+}
+#photoCropping {
+    width: 400px;
+    float: left;
+    padding-top: 30px;
+    padding-left: 15px;
+    margin-left: 0;
+    margin-right: 0;
+}
+.photoCroppedPreview {
+    width: 115px;
+    height: 115px;
+    overflow: hidden;
+}
+/* <------ DELETE PICTURE*/
+#photoDeletingContainer {
+    margin-left: 0;
+    width: 720px;
+    height: 330px;
+    background: #fff;
+    padding: 15px;
+}
+/* <------ ERROR ALERTS*/
+#error-alert {
+    color: #900;
+    padding: 0;
+    margin-bottom: 5px;
+    height: 30px;
+}
+#error-alert img {
+    float: left;
+    margin: 0;
+    padding: 0;
+    vertical-align: middle;
+}
+#error-alert  p {
+    padding-left: 35px;
+    font-size: .9em;
+    line-height: 30px;
+}
+.or {
+    display: inline;
+}

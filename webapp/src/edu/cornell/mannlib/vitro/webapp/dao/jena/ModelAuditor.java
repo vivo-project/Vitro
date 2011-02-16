@@ -189,7 +189,7 @@ public class ModelAuditor implements ModelChangedListener {
                
 			}
 		} catch (Exception e) {
-			log.error(e);
+			log.error(e, e);
 		}
  	}
 

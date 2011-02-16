@@ -10,6 +10,14 @@ import com.hp.hpl.jena.datatypes.TypeMapper;
 import com.hp.hpl.jena.ontology.DatatypeProperty;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntResource;
+import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.QuerySolutionMap;
+import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.AnonId;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Property;
@@ -32,30 +40,65 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.event.IndividualUpdateEvent;
 public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPropertyStatementDao
 {
 
-    public DataPropertyStatementDaoJena(WebappDaoFactoryJena wadf) {
+    private DatasetWrapperFactory dwf;
+    
+    protected static final String DATA_PROPERTY_VALUE_QUERY_STRING = 
+        "SELECT ?value WHERE { \n" +
+        "   GRAPH ?g {\n" + 
+        "       ?subject ?property ?value . \n" +        
+        "   }\n" +
+        "}";
+    
+    static protected Query dataPropertyValueQuery;
+    static {
+        try {
+            dataPropertyValueQuery = QueryFactory.create(DATA_PROPERTY_VALUE_QUERY_STRING);
+        } catch(Throwable th){
+            log.error("could not create SPARQL query for DATA_PROPERTY_VALUE_QUERY_STRING " + th.getMessage());
+            log.error(DATA_PROPERTY_VALUE_QUERY_STRING);
+        }             
+    }
+    
+    public DataPropertyStatementDaoJena(DatasetWrapperFactory dwf, 
+                                        WebappDaoFactoryJena wadf) {
         super(wadf);
+        this.dwf = dwf;
     }
 
-    public void deleteDataPropertyStatement(DataPropertyStatement dataPropertyStmt) {
-    	deleteDataPropertyStatement(dataPropertyStmt, getOntModelSelector().getABoxModel());
-    }
 
-    public void deleteDataPropertyStatement( DataPropertyStatement dataPropertyStatement, OntModel ontModel )
+    public void deleteDataPropertyStatement( DataPropertyStatement dataPropertyStatement )
     {
-    	try {
-	    	ontModel.enterCriticalSection(Lock.WRITE);
-	    	getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),true,dataPropertyStatement.getIndividualURI()));
-	        com.hp.hpl.jena.ontology.Individual ind = ontModel.getIndividual(dataPropertyStatement.getIndividualURI());
-	        Property prop = ontModel.getProperty(dataPropertyStatement.getDatapropURI());
-	        Literal l = jenaLiteralFromDataPropertyStatement(dataPropertyStatement, ontModel);
-	        if (ind != null && prop != null && l != null) {
-	            ontModel.getBaseModel().remove(ind, prop, l);
-	        }
-    	} finally {
-    		getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),false,dataPropertyStatement.getIndividualURI()));
-    		ontModel.leaveCriticalSection();
-    		
-    	}
+        OntModel ontModel = getOntModelSelector().getABoxModel();
+        try {
+            ontModel.enterCriticalSection(Lock.WRITE);
+            getOntModel().getBaseModel().notifyEvent(
+                    new IndividualUpdateEvent(
+                            getWebappDaoFactory().getUserURI(),
+                            true,
+                            dataPropertyStatement.getIndividualURI()));
+            com.hp.hpl.jena.ontology.Individual ind = ontModel.getIndividual(
+                        dataPropertyStatement.getIndividualURI());
+            OntModel tboxModel = getOntModelSelector().getTBoxModel();
+            tboxModel.enterCriticalSection(Lock.READ);
+            try {
+                Property prop = tboxModel.getProperty(
+                        dataPropertyStatement.getDatapropURI());
+                Literal l = jenaLiteralFromDataPropertyStatement(
+                        dataPropertyStatement, ontModel);
+                if (ind != null && prop != null && l != null) {
+                    ontModel.getBaseModel().remove(ind, prop, l);
+                }
+            } finally {
+                tboxModel.leaveCriticalSection();
+            }
+        } finally {
+            getOntModel().getBaseModel().notifyEvent(
+                    new IndividualUpdateEvent(
+                            getWebappDaoFactory().getUserURI(),
+                            false,
+                            dataPropertyStatement.getIndividualURI()));
+            ontModel.leaveCriticalSection();       
+        }
     }
 
     public Individual fillExistingDataPropertyStatementsForIndividual( Individual entity/*, boolean allowAnyNameSpace*/)
@@ -66,9 +109,10 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
         }
         else
         {
-            getOntModel().enterCriticalSection(Lock.READ);
+        	OntModel ontModel = getOntModelSelector().getABoxModel();
+            ontModel.enterCriticalSection(Lock.READ);
             try {
-                Resource ind = getOntModel().getResource(entity.getURI());
+                Resource ind = ontModel.getResource(entity.getURI());
                 List<DataPropertyStatement> edList = new ArrayList<DataPropertyStatement>();
                 StmtIterator stmtIt = ind.listProperties();
                 while( stmtIt.hasNext() )
@@ -96,6 +140,7 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
                         fillDataPropertyStatementWithJenaLiteral(ed,lit);
                         ed.setDatapropURI(st.getPredicate().getURI());
                         ed.setIndividualURI(ind.getURI());
+                        ed.setIndividual(entity);
                         edList.add(ed);
                      /* } */
                     }
@@ -103,7 +148,7 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
                 entity.setDataPropertyStatements(edList);
                 return entity;
             } finally {
-                getOntModel().leaveCriticalSection();
+                ontModel.leaveCriticalSection();
             }
         }
     }
@@ -112,19 +157,29 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
         deleteDataPropertyStatementsForIndividualByDataProperty(individualURI, dataPropertyURI, getOntModelSelector().getABoxModel());
     }
 
-    public void deleteDataPropertyStatementsForIndividualByDataProperty(String individualURI, String dataPropertyURI, OntModel ontModel) {
+    public void deleteDataPropertyStatementsForIndividualByDataProperty(
+            String individualURI, 
+            String dataPropertyURI, 
+            OntModel ontModel) {
+        
         ontModel.enterCriticalSection(Lock.WRITE);
-        getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),true,individualURI));
+        getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(
+                getWebappDaoFactory().getUserURI(),
+                true,
+                individualURI));
         try {
-            Resource indRes = ontModel.getResource(individualURI);
-            DatatypeProperty datatypeProperty = ontModel.getDatatypeProperty(dataPropertyURI);
-            if (indRes != null && datatypeProperty != null) {
-                ontModel.removeAll(indRes, datatypeProperty, (Literal)null);
-            }
+            Resource indRes = ResourceFactory.createResource(individualURI);
+            Property datatypeProperty = ResourceFactory.createProperty(
+                    dataPropertyURI);
+            ontModel.removeAll(indRes, datatypeProperty, (Literal)null);
         } finally {
-        	getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),false,individualURI));
+        	getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(
+        	        getWebappDaoFactory().getUserURI(),
+        	        false,
+        	        individualURI));
             ontModel.leaveCriticalSection();
         }
+        
     }
 
     public void deleteDataPropertyStatementsForIndividualByDataProperty(Individual individual, DataProperty dataProperty) {
@@ -155,6 +210,7 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
 	                    Literal lit = (Literal)st.getObject();
 	                    fillDataPropertyStatementWithJenaLiteral(ed, lit);
 	                    ed.setIndividualURI(entity.getURI());
+	                    ed.setIndividual(entity);
 	                    ed.setDatapropURI(st.getPredicate().getURI());
 	                    edList.add(ed);
 	                }
@@ -234,14 +290,14 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
         return 0;
     }
     
-    private DataPropertyStatement fillDataPropertyStatementWithJenaLiteral(DataPropertyStatement dataPropertyStatement, Literal l) {
+    protected DataPropertyStatement fillDataPropertyStatementWithJenaLiteral(DataPropertyStatement dataPropertyStatement, Literal l) {
     	dataPropertyStatement.setData(l.getLexicalForm());
         dataPropertyStatement.setDatatypeURI(l.getDatatypeURI());
         dataPropertyStatement.setLanguage(l.getLanguage());
         return dataPropertyStatement;
     }
     
-    private Literal jenaLiteralFromDataPropertyStatement(DataPropertyStatement dataPropertyStatement, OntModel ontModel) {
+    protected Literal jenaLiteralFromDataPropertyStatement(DataPropertyStatement dataPropertyStatement, OntModel ontModel) {
     	Literal l = null;
         if ((dataPropertyStatement.getLanguage()) != null && (dataPropertyStatement.getLanguage().length()>0)) {
         	l = ontModel.createLiteral(dataPropertyStatement.getData(),dataPropertyStatement.getLanguage());
@@ -253,4 +309,43 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
         return l;
     }
 
+    /*
+     * SPARQL-based methods for getting the individual's values for a single data property.
+     */
+    
+    @Override
+    public List<Literal> getDataPropertyValuesForIndividualByProperty(Individual subject, DataProperty property) {
+        return getDataPropertyValuesForIndividualByProperty(subject.getURI(), property.getURI());
+    }
+    
+    @Override
+    public List<Literal> getDataPropertyValuesForIndividualByProperty(String subjectUri, String propertyUri) {    
+        log.debug("Data property value query string:\n" + DATA_PROPERTY_VALUE_QUERY_STRING);         
+        log.debug("Data property value:\n" + dataPropertyValueQuery); 
+        
+        QuerySolutionMap initialBindings = new QuerySolutionMap();
+        initialBindings.add("subject", ResourceFactory.createResource(subjectUri));
+        initialBindings.add("property", ResourceFactory.createResource(propertyUri));
+
+        // Run the SPARQL query to get the properties
+        List<Literal> values = new ArrayList<Literal>();                
+        DatasetWrapper w = dwf.getDatasetWrapper();
+        Dataset dataset = w.getDataset();
+        dataset.getLock().enterCriticalSection(Lock.READ);
+        try {
+            QueryExecution qexec = QueryExecutionFactory.create(
+                    dataPropertyValueQuery, dataset, initialBindings);
+            ResultSet results = qexec.execSelect(); 
+    
+            while (results.hasNext()) {
+                QuerySolution sol = results.next();
+                Literal value = sol.getLiteral("value");
+                values.add(value);
+            }
+        } finally {
+            dataset.getLock().leaveCriticalSection();
+            w.close();
+        }
+        return values;         
+    }
 }

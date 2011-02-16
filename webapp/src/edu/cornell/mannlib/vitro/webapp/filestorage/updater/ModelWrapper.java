@@ -42,4 +42,13 @@ public class ModelWrapper {
 		}
 	}
 
+	public static void add(Model model, Resource subject, Property predicate,
+			String value) {
+		model.enterCriticalSection(Lock.WRITE);
+		try {
+			model.add(subject, predicate, value);
+		} finally {
+			model.leaveCriticalSection();
+		}
+	}
 }

@@ -8,13 +8,20 @@
           version="2.0"> */ %> 
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
 <%@ taglib prefix="form" uri="http://vitro.mannlib.cornell.edu/edit/tags" %>
+<%@ page import="edu.cornell.mannlib.vedit.beans.LoginStatusBean" %>
+
+<%
+	if (LoginStatusBean.getBean(request).isLoggedInAtLeast(LoginStatusBean.EDITOR)) {
+		request.setAttribute("isEditor", Boolean.TRUE);
+	}
+%>
 
 <c:set var="singlePortal" value="${requestScope.singlePortal}"/>
 <div name="anybody" class="editingForm">
 <jsp:include page="/templates/edit/fetch/vertical.jsp"/>
 <c:set var='individual' value='${requestScope.entityWebapp}'/>
-<jsp:useBean id="loginHandler" class="edu.cornell.mannlib.vedit.beans.LoginFormBean" scope="session" />
-<c:if test="${loginHandler.loginRole >= 4}">
+
+<c:if test="${isEditor}">
 	<div name="authorized" align="center">
 	<table class="form-background" border="0" cellpadding="2" cellspacing="2" width="100%">
     	<tr valign="top" align="center">
@@ -31,9 +38,9 @@
                         SELECT   ?pred  ?predLabel ?obj ?objLabel
                         WHERE 
                         {
-                         {<${entity.URI}> ?pred ?obj} 
-                         OPTIONAL { ?obj rdfs:label ?objLabel }
-                         OPTIONAL { ?pred rdfs:label ?predLabel }
+                         { GRAPH ?g { <${entity.URI}> ?pred ?obj} } 
+                         OPTIONAL { GRAPH ?h { ?obj rdfs:label ?objLabel } }
+                         OPTIONAL { GRAPH ?i { ?pred rdfs:label ?predLabel } }
                         }
                         limit 10000"/>
           <form action="admin/sparqlquery" method="get">
@@ -48,9 +55,9 @@
                         SELECT ?sub ?subL  ?pred  ?predLabel
                         WHERE 
                         {
-                         { ?sub ?pred <${entity.URI}> }
-                         OPTIONAL { ?sub rdfs:label ?subL }
-                         OPTIONAL { ?pred rdfs:label ?predLabel }
+                         { GRAPH ?g { ?sub ?pred <${entity.URI}> } }
+                         OPTIONAL { GRAPH ?h { ?sub rdfs:label ?subL } }
+                         OPTIONAL { GRAPH ?i { ?pred rdfs:label ?predLabel } }
                         }
                         limit 10000"/>
           <form action="admin/sparqlquery" method="get">
@@ -238,7 +245,8 @@
 
 </td>
 </tr>
-
+    <%-- RY Removing these forms: they are buggy; the property is not displayed on the individual page;
+    and the property will be removed in v1.3.
 	<!-- keyterms -->
 	<tr valign="bottom" align="center">
 		<td valign="bottom" align="center">
@@ -256,6 +264,8 @@
             	</form>
         	</c:if>
 		</td>
+		
+
     	<td>
     		<form action="editForm" method="get">
 				<input type="hidden" name="home" value="${portalBean.portalId}" />
@@ -277,6 +287,7 @@
             	<input type="hidden" name="controller" value="Keyword"/>
         	</form>
     	</td>
+    	--%>
 	</tr>
 	</table>
 

@@ -4,11 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
@@ -25,42 +21,40 @@ import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.shared.Lock;
 
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreeMarkerHttpServlet;
-import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DependentResourceDeleteJena;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditN3Utils;
-import freemarker.template.Configuration;
 
-public class PrimitiveRdfEdit extends FreeMarkerHttpServlet{
+public class PrimitiveRdfEdit extends FreemarkerHttpServlet{
 
     private static final long serialVersionUID = 1L;
 
     @Override
-    protected String getBody(VitroRequest vreq, Map<String, Object> body, Configuration config) {
-//      boolean loggedIn = checkLoginStatus(request, response);
-//      if( !loggedIn){
-//          doError(response,"You must be logged in to use this servlet.",HttpStatus.SC_UNAUTHORIZED);
-//          return;
-//      }
-        return mergeBodyToTemplate("primitiveRdfEdit.ftl",new HashMap<String, Object>(), config);
-    }
-
-    @Override
-    protected String getTitle(String siteName) {
+    protected String getTitle(String siteName, VitroRequest vreq) {
         return "RDF edit";
     }
 
+    @Override
+    protected int requiredLoginLevel() {
+        return LoginStatusBean.EDITOR;
+    }
+    
+    @Override
+    protected ResponseValues processRequest(VitroRequest vreq) {
+        return new TemplateResponseValues("primitiveRdfEdit.ftl");
+    }
+    
     @Override
     public void doPost(HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException {
         
         VitroRequest vreq = new VitroRequest(request);
-        boolean loggedIn = checkLoginStatus(request, response);
-        if( !loggedIn){
+        if( !LoginStatusBean.getBean(request).isLoggedIn()){
             doError(response,"You must be logged in to use this servlet.",HttpStatus.SC_UNAUTHORIZED);
             return;
         }
@@ -238,13 +232,8 @@ public class PrimitiveRdfEdit extends FreeMarkerHttpServlet{
     Log log = LogFactory.getLog(PrimitiveRdfEdit.class.getName());
 
 
-    static public boolean checkLoginStatus(HttpServletRequest request, HttpServletResponse response){
-        LoginFormBean loginBean = (LoginFormBean) request.getSession().getAttribute("loginHandler");        
-        if (loginBean == null){            
-            return false;            
-        } else {                        
-            return true;
-        }
+    static public boolean checkLoginStatus(HttpServletRequest request){
+    	return LoginStatusBean.getBean(request).isLoggedIn();
     }
 
 

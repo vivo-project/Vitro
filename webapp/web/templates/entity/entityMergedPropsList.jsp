@@ -31,9 +31,9 @@
 <%@ page import="org.apache.commons.logging.Log" %>
 <%@ page import="org.apache.commons.logging.LogFactory" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep" %>
-<%@ page import="edu.cornell.mannlib.vedit.beans.LoginFormBean" %>
+<%@ page import="edu.cornell.mannlib.vedit.beans.LoginStatusBean" %>
 
-<%@page import="edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils"%><jsp:useBean id="loginHandler" class="edu.cornell.mannlib.vedit.beans.LoginFormBean" scope="session" />
+<%@page import="edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils"%>
 <%! 
 public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.templates.entity.entityMergedPropsList.jsp");
 %>
@@ -41,7 +41,7 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
         log.debug("setting showSelfEdits true");%>
         <c:set var="showSelfEdits" value="${true}"/>     
 <%  }
-    if (loginHandler!=null && loginHandler.getLoginStatus()=="authenticated" && Integer.parseInt(loginHandler.getLoginRole())>=loginHandler.getNonEditor()) {
+    if (LoginStatusBean.getBean(request).isLoggedIn()) {
         log.debug("setting showCuratorEdits true");%>
         <c:set var="showCuratorEdits" value="${true}"/>
         <c:set var='themeDir'><c:out value='${portalBean.themeDir}' /></c:set>
@@ -147,7 +147,7 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 				    		<c:set var="first" value=""/><c:if test="${counter == 0}"><c:set var="first" value=" first"/></c:if>
             		        <c:set var="last" value=""/><c:if test="${(counter+1) == propTotal}"><c:set var="last" value=" last"/></c:if>
                             <div class="propsItem${first}${last}" id="${objProp.localName}">
-                                <h4>${objProp.editLabel}</h4>
+                                <h4>${objProp.label}</h4>
 					    		<c:if test="${showSelfEdits || showCuratorEdits}"><edLnk:editLinks item="${objProp}" icons="false" /></c:if>
 					    		<%-- Verbose property display additions for object properties, using context variable verbosePropertyListing --%>
                           <c:if test="${showCuratorEdits && verbosePropertyListing}">
@@ -272,7 +272,7 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
             			<c:set var="addable" value=""/><c:if test="${dataRows >= 1 && displayLimit > 1}"><c:set var="addable" value=" addable"/></c:if>
             			
 						<div id="${dataProp.localName}" class="propsItem dataItem${first}${last}${multiItem}${addable}" style="${dataStyle}">
-							<h4>${dataProp.editLabel}</h4>
+							<h4>${dataProp.label}</h4>
 					    	<c:if test="${showSelfEdits || showCuratorEdits}">
                                 <c:choose>
                                     <c:when test="${dataRows == 1 && displayLimit==1 }">
@@ -392,7 +392,7 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 			</div><!-- class="propsCategory" -->
 		</c:if>
 			<c:if test="${showSelfEdits || showCuratorEdits}">
-		    	<a class="backToTop" href="#wrap" title="jump to top of the page">back to top</a>
+		    	<a class="backToTop" href="#content" title="jump to top of the page">back to top</a>
 			</c:if>
 <%		} // end for (PropertyGroup g : groupsList)
     } else {

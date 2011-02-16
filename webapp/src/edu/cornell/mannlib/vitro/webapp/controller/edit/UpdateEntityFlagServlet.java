@@ -6,19 +6,15 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
-import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.JenaNetidPolicy.ContextSetup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
 
 public class UpdateEntityFlagServlet extends VitroHttpServlet {
     private static final int DEFAULT_PORTAL_ID=1;
@@ -30,11 +26,6 @@ public class UpdateEntityFlagServlet extends VitroHttpServlet {
     	
         Connection con=null;
         try {
-            HttpSession session = request.getSession();
-            LoginFormBean f = (LoginFormBean) session.getAttribute( "loginHandler" );
-
-            //don't need to touch the users database for now
-
             // JCR 20040905 passing on portal home parameter
             String portalIdStr=(portalIdStr=request.getParameter("home"))==null?String.valueOf(DEFAULT_PORTAL_ID):portalIdStr;
             //request.setAttribute("home",portalIdStr);

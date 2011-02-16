@@ -25,7 +25,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 public class IndividualsListingController extends BaseEditController {
 
-    private static final int MAX_INDIVIDUALS = 50;
+    //private static final int MAX_INDIVIDUALS = 50;
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
         VitroRequest vrequest = new VitroRequest(request);
@@ -59,7 +59,8 @@ public class IndividualsListingController extends BaseEditController {
         String vclassURI = request.getParameter("VClassURI");
         VClass vc = vcDao.getVClassByURI(vclassURI);
         
-        List inds = dao.getIndividualsByVClassURI(vclassURI,1,MAX_INDIVIDUALS);
+        List inds = dao.getIndividualsByVClassURI(vclassURI);
+        //List inds = dao.getIndividualsByVClassURI(vclassURI,1,MAX_INDIVIDUALS);
 
         ArrayList results = new ArrayList();
         results.add("XX");

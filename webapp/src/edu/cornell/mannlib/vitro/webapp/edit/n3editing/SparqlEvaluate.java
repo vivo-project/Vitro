@@ -223,7 +223,7 @@ public class SparqlEvaluate {
                 qe.close();
         }
 
-        if( log.isDebugEnabled() ) log.debug("queryToUri() query: '"+ querystr +"'\nvalue: '" + value +"'");
+        if( log.isDebugEnabled() ) log.debug("queryToLiteral() query: '"+ querystr +"'\nvalue: '" + value +"'");
         return value;
     }
 

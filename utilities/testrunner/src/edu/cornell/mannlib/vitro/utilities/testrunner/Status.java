@@ -10,24 +10,43 @@ public enum Status {
 	OK("good"),
 
 	/**
-	 * Any test failure was ignored, and any messages were no worse than
-	 * warnings.
+	 * One or more tests have not been run yet.
 	 */
-	WARN("fair"),
+	PENDING("pending"),
+
+	/**
+	 * Will not run because it is ignored, or has run and failed but the failure
+	 * is ignored.
+	 */
+	IGNORED("fair"),
 
 	/**
 	 * A test failed and could not be ignored, or an error message was
 	 * generated.
 	 */
 	ERROR("bad");
-	
+
 	private final String htmlClass;
-	
+
 	private Status(String htmlClass) {
 		this.htmlClass = htmlClass;
 	}
-	
+
 	public String getHtmlClass() {
 		return this.htmlClass;
+	}
+
+	/** When combined, the more severe status (defined later) takes precedence. */
+	public static Status combine(Status s1, Status s2) {
+		if (s1.compareTo(s2) > 0) {
+			return s1;
+		} else {
+			return s2;
+		}
+	}
+
+	/** Anything except ERROR is considered to be a success. */
+	public static boolean isSuccess(Status status) {
+		return status != Status.ERROR;
 	}
 }

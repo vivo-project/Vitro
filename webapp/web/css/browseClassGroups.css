@@ -1,0 +1,128 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+/* Styles used for class group browse (browse-classgroups.ftl) */
+
+#browse {
+    clear: both;
+    width: 920px;
+    margin: 0 auto;
+    border: 1px solid #dfe6e6;
+    background: #f7f9f9;
+    overflow: hidden;
+    padding-bottom: 30px;
+}
+#browse h4 {
+    width: 13%;
+    height: 30px;
+    margin-bottom: 27px;
+    padding-left: 15px;
+    font-weight: normal;
+    line-height: 38px;
+    color: #fff;
+    background: #5e6363;
+    font-size: 20px;
+}
+/* BROWSE CLASS GROUPS ------>  */
+ul#browse-classgroups {
+    float: left;
+    width: 200px;
+    border: 1px solid #dde4e3;
+    border-right: none;
+    background: #f1f2ee;
+    margin-left: 34px;
+    padding: 0 20px 23px 20px;
+    margin-top: 10px;
+    padding-top: 10px;
+}
+ul#browse-classgroups li {
+    display: block;
+    border-bottom: 1px solid #dde4e3;
+    font-size: 18px;
+    width: 200px;
+    height: 35px;
+    line-height: 35px;
+}
+ul#browse-classgroups li:last-child {
+    border-bottom: none
+}
+ul#browse-classgroups a {
+    display: block;
+    padding-left: 15px;
+    width: 200px;
+    height: 35px;
+    color: #5e6363;
+    text-decoration: none;
+}
+ul#browse-classgroups .count-classes {
+    font-size: 14px
+}
+/* BROWSE CLASSES IN CLASS GROUP ------>  */
+#browse-classes {
+    float: left;
+    position: relative;
+    width: 610px;
+    border: 1px solid #dde6e5;
+    background: #fff;
+    min-height: 230px;
+}
+a.browse-superclass {
+    position: absolute;
+    right: 0.5em;
+    font-size: 0.9em;
+}
+ul#classes-in-classgroup {
+    float: left;
+    width: 90%;
+    padding: 0 10px 15px 22px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+ul#classes-in-classgroup.vis {
+    width: 44%;
+    border-right: 1px solid #DDE5E4;
+}
+ul#classes-in-classgroup li {
+    display: block;
+    float: left;
+    width: 100%;
+    border-bottom: 1px solid #dde4e3;
+    font-size: 14px;
+    height: 35px;
+    line-height: 35px;
+}
+ul#classes-in-classgroup li:last-child {
+    border-bottom: none
+}
+ul#classes-in-classgroup a {
+    display: block;
+    padding-left: 15px;
+    height: 35px;
+    color: #5e6363;
+    text-decoration: none;
+}
+ul#classes-in-classgroup .count-individuals {
+    font-size: 12px;
+}
+/* VISUALIZATION  ------>  */
+#visual-graph {
+    float: left;
+    width: 308px;
+}
+#visual-graph h5 {
+    padding: 20px 0 12px 12px;
+    width: auto;
+    font-size: 18px;
+    font-weight: normal;
+}
+#pieViz {
+    width: 308px;
+    height: 308px;
+}
+svg text {
+    font-family: inherit !important;
+    font-size: 12px !important;
+    color: #5E6363 !important;
+}
+svg rect {
+    cursor: pointer;
+}

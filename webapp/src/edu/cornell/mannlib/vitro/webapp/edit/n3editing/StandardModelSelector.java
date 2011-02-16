@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.hp.hpl.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 
 public class StandardModelSelector implements ModelSelector {
 
@@ -15,13 +16,18 @@ public class StandardModelSelector implements ModelSelector {
         VitroRequest vreq = new VitroRequest( request );        
         
         Object sessionOntModel = null;
-        if( vreq.getSession() != null)
-            sessionOntModel = vreq.getSession().getAttribute("jenaOntModel");            
-        
+        if( vreq.getSession() != null) {
+            OntModelSelector oms = (OntModelSelector) vreq.getSession()
+            							.getAttribute("unionOntModelSelector");
+            if (oms != null) {
+            	sessionOntModel = oms.getABoxModel();
+            }
+        }
         if(sessionOntModel != null && sessionOntModel instanceof OntModel )
             return (OntModel)sessionOntModel;
         else 
-            return (OntModel)context.getAttribute("jenaOntModel");              
+            return ((OntModelSelector) context
+            			.getAttribute("unionOntModelSelector")).getABoxModel();              
     }
     
     public static final ModelSelector selector = new StandardModelSelector();

@@ -4,6 +4,7 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Individual" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.flags.PortalFlagChoices" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory" %>
+<%@page import="edu.cornell.mannlib.vedit.beans.LoginStatusBean"%>
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ page errorPage="/error.jsp"%>
@@ -29,10 +30,8 @@
             throw new JspException(e);
         }
 %>
-<c:if test="${sessionScope.loginHandler != null &&
-              sessionScope.loginHandler.loginStatus == 'authenticated' &&
-              sessionScope.loginHandler.loginRole >= sessionScope.loginHandler.editor }">
-    <c:set var='entity' value='${requestScope.entity}'/><%/* just moving this into page scope for easy use */ %>
+<% if ( LoginStatusBean.getBean(request).isLoggedInAtLeast(LoginStatusBean.EDITOR))  {  %>    
+<c:set var='entity' value='${requestScope.entity}'/><%/* just moving this into page scope for easy use */ %>
     <c:set var='portal' value='${requestScope.portal}'/> 
     <div class='admin top'>
         <h3 class="toggle">Admin Panel</h3>
@@ -45,5 +44,5 @@
           <p>Resource URI: <c:out value="${entity.URI}"/></p>
           </div>
     </div>
+<% } %>
 
-</c:if>

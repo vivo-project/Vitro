@@ -29,9 +29,13 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDaoCon;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaModelUtils;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SearchReindexingListener;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SimpleOntModelSelector;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaModelMaker;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSDBModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase.TripleStoreType;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapper;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.InitialJenaModelUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.NamespaceMapperJena;
@@ -41,7 +45,23 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
 	private static final Log log = LogFactory.getLog(JenaDataSourceSetup.class.getName());
 	
     public void contextInitialized(ServletContextEvent sce) {
+    	        
+        String tripleStoreTypeStr = 
+            ConfigurationProperties.getProperty(
+                    "VitroConnection.DataSource.tripleStoreType", "RDB");
+        
+        if ("SDB".equals(tripleStoreTypeStr)) {
+            (new JenaDataSourceSetupSDB()).contextInitialized(sce);
+            return;
+        }
+
+        
+        if (AbortStartup.isStartupAborted(sce.getServletContext())) {
+            return;
+        }
+        
         try {
+            
             OntModel memModel = (OntModel) sce.getServletContext().getAttribute("jenaOntModel");
             if (memModel == null) {
             	memModel = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC);
@@ -74,16 +94,22 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
         	checkForNamespaceMismatch( memModel, defaultNamespace );
         	
             sce.getServletContext().setAttribute("baseOntModel", memModel);
-            WebappDaoFactory baseWadf = new WebappDaoFactoryJena(baseOms, defaultNamespace, null, null);
+            WebappDaoFactory baseWadf = new WebappDaoFactoryJena(
+                    baseOms, defaultNamespace, null, null);
             sce.getServletContext().setAttribute("assertionsWebappDaoFactory",baseWadf);
+            ModelContext.setBaseOntModelSelector(baseOms, sce.getServletContext());
             
             sce.getServletContext().setAttribute("inferenceOntModel", inferenceModel);
-            WebappDaoFactory infWadf = new WebappDaoFactoryJena(inferenceOms, defaultNamespace, null, null);
+            WebappDaoFactory infWadf = new WebappDaoFactoryJena(
+                    inferenceOms, defaultNamespace, null, null);
             sce.getServletContext().setAttribute("deductionsWebappDaoFactory", infWadf);
+            ModelContext.setInferenceOntModelSelector(inferenceOms, sce.getServletContext());
             
             sce.getServletContext().setAttribute("jenaOntModel", unionModel);  
-            WebappDaoFactory wadf = new WebappDaoFactoryJena(unionOms, defaultNamespace, null, null);
+            WebappDaoFactory wadf = new WebappDaoFactoryJena(
+                    unionOms, baseOms, inferenceOms,  defaultNamespace, null, null);
             sce.getServletContext().setAttribute("webappDaoFactory",wadf);
+            ModelContext.setUnionOntModelSelector(unionOms, sce.getServletContext());
             
             ApplicationBean appBean = getApplicationBeanFromOntModel(memModel,wadf);
             if (appBean != null) {
@@ -107,6 +133,13 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
         	sce.getServletContext().setAttribute("NamespaceMapper", namespaceMapper);
         	memModel.getBaseModel().register(namespaceMapper);
         	
+        	makeModelMakerFromConnectionProperties(TripleStoreType.RDB);
+        	VitroJenaModelMaker vjmm = getVitroJenaModelMaker();
+        	setVitroJenaModelMaker(vjmm,sce);
+        	makeModelMakerFromConnectionProperties(TripleStoreType.SDB);
+        	VitroJenaSDBModelMaker vsmm = getVitroJenaSDBModelMaker();
+        	setVitroJenaSDBModelMaker(vsmm,sce);
+        	
         } catch (Throwable t) {
             log.error("Throwable in " + this.getClass().getName(), t);
             // printing the error because Tomcat doesn't print context listener
@@ -118,8 +151,8 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
 
     
     private void checkForNamespaceMismatch(OntModel model, String defaultNamespace) {
-        String defaultNamespaceFromDeployProperites = ConfigurationProperties.getProperty("Vitro.defaultNamespace");
-        if( defaultNamespaceFromDeployProperites == null ){            
+        String defaultNamespaceFromDeployProperties = ConfigurationProperties.getProperty("Vitro.defaultNamespace");
+        if( defaultNamespaceFromDeployProperties == null ){            
             log.error("Could not get namespace from deploy.properties.");
         }               
         
@@ -135,13 +168,14 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
         }
         if( portalURIs.size() > 0 ){
             for( String portalUri : portalURIs){
-                if( portalUri != null && ! portalUri.startsWith(defaultNamespaceFromDeployProperites)){
+                if( portalUri != null && ! portalUri.startsWith(defaultNamespaceFromDeployProperties)){
                     log.error("Namespace mismatch between db and deploy.properties.");
+                    String portalNamespace = portalUri.substring(0, portalUri.lastIndexOf("/")+1);
                     log.error("Vivo will not start up correctly because the default namespace specified in deploy.properties does not match the namespace of " +
-                    		"a portal in the database. Namespace from deploy.properties: \"" + defaultNamespaceFromDeployProperites + 
-                            "\" Namespace from an existing portal: \"" + portalUri + "\" To get the application to start with this " +
-                            "database change the default namespace in deploy.properties " + portalUri.substring(0, portalUri.lastIndexOf("/")+1) + 
-                            "  Another possibility is that deploy.properties does not specify the intended database.");
+                    		"a portal in the database. Namespace from deploy.properties: \"" + defaultNamespaceFromDeployProperties + 
+                            "\". Namespace from an existing portal: \"" + portalNamespace + "\". To get the application to start with this " +
+                            "database, change the default namespace in deploy.properties to \"" + portalNamespace + 
+                            "\".  Another possibility is that deploy.properties does not specify the intended database.");
                 }
             }
         }
@@ -262,3 +296,4 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
     }
     
 }
+

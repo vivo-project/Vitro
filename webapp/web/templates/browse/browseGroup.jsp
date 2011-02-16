@@ -7,7 +7,7 @@
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c" %><%/* this odd thing points to something in web.xml */ %>
 <%@ page errorPage="/error.jsp"%>
 
-<%@page import="com.hp.hpl.jena.vocabulary.OWL"%><jsp:useBean id="loginHandler" class="edu.cornell.mannlib.vedit.beans.LoginFormBean" scope="session" />
+<%@page import="com.hp.hpl.jena.vocabulary.OWL"%>
 <%  /***********************************************
          Display Browse Results (the "Index" menu command)
 

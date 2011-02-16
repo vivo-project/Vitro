@@ -14,17 +14,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.hp.hpl.jena.ontology.AllValuesFromRestriction;
 import com.hp.hpl.jena.ontology.ObjectProperty;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntProperty;
 import com.hp.hpl.jena.ontology.Restriction;
+import com.hp.hpl.jena.ontology.SomeValuesFromRestriction;
 import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.vocabulary.OWL;
+import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
@@ -44,7 +49,7 @@ public class PropertyInstanceDaoJena extends JenaBaseDao implements
     }
 
     public void deleteObjectPropertyStatement(String subjectURI, String propertyURI, String objectURI) {
-    	deleteObjectPropertyStatement(subjectURI, propertyURI, objectURI, getOntModelSelector().getABoxModel());
+    	deleteObjectPropertyStatement(subjectURI, propertyURI, objectURI, getOntModelSelector().getFullModel());
     }
 
     public void deleteObjectPropertyStatement(String subjectURI, String propertyURI, String objectURI, OntModel ontModel) {
@@ -95,23 +100,40 @@ public class PropertyInstanceDaoJena extends JenaBaseDao implements
 
     public Collection<PropertyInstance> getAllPossiblePropInstForIndividual(String individualURI) {
     	Individual ind = getWebappDaoFactory().getIndividualDao().getIndividualByURI(individualURI);
-    	Map<String, PropertyInstance> propURI2propInst = new HashMap<String, PropertyInstance>();
+    	VClassDao vcDao = getWebappDaoFactory().getVClassDao();
+    	
     	List<VClass> allTypes = ind.getVClasses(false); // include indirect types
-    	Collections.sort(allTypes, new VClassHierarchyRanker(this.getWebappDaoFactory().getVClassDao()));
-    	for (VClass currClass : allTypes) {
-			Collection<PropertyInstance> propInstsForClass = getAllPropInstByVClass(currClass.getURI());
-			for (PropertyInstance propInst : propInstsForClass) {
-				if (propURI2propInst.get(propInst.getPropertyURI()) == null) {
-					propURI2propInst.put(propInst.getPropertyURI(), propInst);
-				}
-			}
+        
+        Set<String> allSuperclassURIs = new HashSet<String>();
+       
+        for (VClass type : allTypes) {
+            String classURI = type.getURI();
+            if (classURI != null) {
+                allSuperclassURIs.add(type.getURI());
+            }
+            for (String equivURI : vcDao.getEquivalentClassURIs(classURI)) {
+                allSuperclassURIs.add(equivURI);
+                allSuperclassURIs.addAll(vcDao.getAllSuperClassURIs(equivURI));
+            }
+            allSuperclassURIs.addAll(vcDao.getAllSuperClassURIs(classURI));
+        }
+        
+        List<VClass> vclasses = new ArrayList<VClass>();
+        for(String vclassURI : allSuperclassURIs) {
+            VClass vclass = vcDao.getVClassByURI(vclassURI);
+            if (vclass != null) {
+                vclasses.add(vclass);
+            }
+        }
+    	
+    	Collection<PropertyInstance> piList = getAllPropInstByVClasses(vclasses);
+    	
+    	for (PropertyInstance pi : piList) {
+    		pi.setDomainClassURI(ind.getVClassURI());
+    		// TODO: improve.  This is so the DWR property editing passes the 
+    		// individual's VClass to get the right restrictions
     	}
-    	for (PropertyInstance pi : propURI2propInst.values()) {
-    		pi.setDomainClassURI(ind.getVClassURI()); // TODO: improve.  This is so the DWR property editing passes the individual's VClass to get the right restrictions
-    	}
-    	List<PropertyInstance> piList = new ArrayList<PropertyInstance>();
-    	piList.addAll(propURI2propInst.values());
-		Collections.sort(piList, new PropInstSorter());
+
 		return piList;
     }
     
@@ -126,15 +148,19 @@ public class PropertyInstanceDaoJena extends JenaBaseDao implements
     	public int compare(VClass vc1, VClass vc2) {
     		if (vcDao.isSubClassOf(vc1, vc2)) {
     			return -1;
-    		} else return 0;
+    		} else if (vcDao.isSubClassOf(vc2, vc1)) {
+    		    return 1;
+    		} else {
+    		    return 0;
+    		}
     	}
     }
+    
     
     public Collection<PropertyInstance> getAllPropInstByVClass(String classURI) {
         if (classURI==null || classURI.length()<1) {
             return null;
         }
-        List<PropertyInstance> propInsts = new ArrayList();
         
         VClassDao vcDao = getWebappDaoFactory().getVClassDao();
         
@@ -142,54 +168,135 @@ public class PropertyInstanceDaoJena extends JenaBaseDao implements
        
         allSuperclassURIs.add(classURI);
         for (String equivURI : vcDao.getEquivalentClassURIs(classURI)) {
-        	allSuperclassURIs.add(equivURI);
-        	allSuperclassURIs.addAll(vcDao.getAllSuperClassURIs(equivURI));
+            allSuperclassURIs.add(equivURI);
+            allSuperclassURIs.addAll(vcDao.getAllSuperClassURIs(equivURI));
         }
         allSuperclassURIs.addAll(vcDao.getAllSuperClassURIs(classURI));
         
+        List<VClass> vclasses = new ArrayList<VClass>();
+        for(String vclassURI : allSuperclassURIs) {
+            VClass vclass = vcDao.getVClassByURI(vclassURI);
+            if (vclass != null) {
+                vclasses.add(vclass);
+            }
+        }
+        return getAllPropInstByVClasses(vclasses);
+    }
+    
+    private void updatePropertyRangeMap(Map<String, Resource[]> map, 
+                                        String propURI, 
+                                        Resource[] ranges) {
+        Resource[] existingRanges = map.get(propURI);
+        if (existingRanges == null) {
+            map.put(propURI, ranges);
+        } else if (existingRanges[0] == null && existingRanges[1] != null) {
+            existingRanges[0] = ranges[0];
+            map.put(propURI, existingRanges);
+        } else if (existingRanges[0] != null && existingRanges[1] == null) {
+            existingRanges[1] = ranges[1];
+            map.put(propURI, existingRanges);            
+        }
+    }
+    
+    public Collection<PropertyInstance> getAllPropInstByVClasses(List<VClass> vclasses) {
+        
+        List<PropertyInstance> propInsts = new ArrayList<PropertyInstance>();
+        
+        if(vclasses == null || vclasses.isEmpty()) {
+            return propInsts;
+        }
+        
+        Collections.sort(vclasses, new VClassHierarchyRanker(this.getWebappDaoFactory().getVClassDao()));
+        
+        OntModel ontModel = getOntModelSelector().getTBoxModel();
+        
         try {
         
-        	getOntModel().enterCriticalSection(Lock.READ);
+        	ontModel.enterCriticalSection(Lock.READ);
         	
-        	Set<ObjectProperty> applicableProperties = new HashSet<ObjectProperty>();
+        	// map object property URI to an array of two resources:
+        	// the first is the "allValuesFrom" resource and the second is
+        	// "someValuesFrom"
+        	Map<String, Resource[]> applicableProperties = 
+        	        new HashMap<String, Resource[]>();
         	
         	try {
-		        for (String VClassURI : allSuperclassURIs) {
-		        	OntClass ontClass = getOntClass(getOntModel(),VClassURI);
+		        for (VClass vclass : vclasses) {
+		            if (vclass.isAnonymous()) {
+		                continue; 
+		            }
+		            String VClassURI = vclass.getURI();
+		            
+		        	OntClass ontClass = getOntClass(ontModel,VClassURI);
 		        	if (ontClass != null) {
-		        		if (ontClass.isRestriction()) {
-		        			// TODO: check if restriction is something like
-		        			// maxCardinality 0 or allValuesFrom owl:Nothing,
-		        			// in which case the property is NOT applicable!
-		        			Restriction rest = (Restriction) ontClass.as(Restriction.class);
-		        			OntProperty onProperty = rest.getOnProperty();
-		        			if (onProperty != null && onProperty.canAs(ObjectProperty.class)) {
-		        				applicableProperties.add((ObjectProperty)onProperty.as(ObjectProperty.class));
-		        			}
+		        	    List<OntClass> relatedClasses = new ArrayList<OntClass>();
+		        	    relatedClasses.addAll(ontClass.listEquivalentClasses().toList());
+		        	    relatedClasses.addAll(ontClass.listSuperClasses().toList());
+		        	    for (OntClass relatedClass : relatedClasses) {
+    		        	    // find properties in restrictions
+    		        		if (relatedClass.isRestriction()) {
+    		        			// TODO: check if restriction is something like
+    		        			// maxCardinality 0 or allValuesFrom owl:Nothing,
+    		        			// in which case the property is NOT applicable!
+    		        			Restriction rest = (Restriction) relatedClass.as(Restriction.class);
+    		        			OntProperty onProperty = rest.getOnProperty();
+    		        			if (onProperty != null && onProperty.canAs(ObjectProperty.class)) {
+    		        			    Resource[] ranges = new Resource[2];
+    		        			    if (rest.isAllValuesFromRestriction()) {
+    		        			        ranges[0] = (rest.asAllValuesFromRestriction()).getAllValuesFrom();
+    		        			    } else if (rest.isSomeValuesFromRestriction()) {
+                                        ranges[1] = (rest.asSomeValuesFromRestriction()).getSomeValuesFrom();
+                                    }
+    		        				updatePropertyRangeMap(applicableProperties, onProperty.getURI(), ranges);
+    		        			}
+    		        		}
+		        	    }
+		        		
+		        		// find properties with class in domain
+		        		ResIterator pit = ontModel.listSubjectsWithProperty(
+		        		        RDFS.domain, ontClass);
+		        		while (pit.hasNext()) {
+		        		    Resource prop = pit.nextResource();
+		        		    if (prop.getNameSpace() != null 
+		        		            && !NONUSER_NAMESPACES.contains(
+		        		                    prop.getNameSpace()) ) {
+		        		        StmtIterator rangeSit = prop.listProperties(
+		        		                RDFS.range);
+		        		        Resource rangeRes = null;
+		        		        while (rangeSit.hasNext()) {    
+		        		            Statement s = rangeSit.nextStatement();
+		        		            if (s.getObject().isURIResource()) {
+		        		                rangeRes = (Resource) s.getObject();
+		        		            }
+		        		        }
+		        		        Resource[] ranges = new Resource[2];
+		        		        ranges[0] = rangeRes;
+		        		        updatePropertyRangeMap(
+		        		                applicableProperties, prop.getURI(), ranges);
+		        		        
+		        		    }
 		        		}
 		        		
 		        	}
 		        }       
         	} catch (Exception e) {
-        		log.error("Unable to get applicable properties for " + classURI
-        				+ " by examining property restrictions", e);
+        		log.error("Unable to get applicable properties " +
+        		          "by examining property restrictions and domains", e);
         	}
         	
-	        HashSet allSuperclassURIset = new HashSet(allSuperclassURIs);
-	        Iterator ops = getOntModel().listObjectProperties();
-	        while (ops.hasNext()) {
-	            ObjectProperty op = (ObjectProperty) ops.next();
-	            if (op.getNameSpace() != null && !NONUSER_NAMESPACES.contains(op.getNameSpace()) ) {
-	                Resource domainRes = op.getDomain();         
-	                if (domainRes != null && allSuperclassURIset.contains(getURIStr(domainRes))) {
-	                	applicableProperties.add(op);
-	                }	                
-	            }
-	        }
-	        for (Iterator<ObjectProperty> appPropIt = applicableProperties.iterator(); appPropIt.hasNext();) {
-	        	ObjectProperty op = appPropIt.next();
+        	// make the PropertyInstance objects
+	        for (String propertyURI : applicableProperties.keySet()) {
+	        	ObjectProperty op = ontModel.getObjectProperty(propertyURI);
+	        	if (op == null) {
+	        	    continue;
+	        	}
 	        	String domainURIStr = getURIStr(op.getDomain());
-	        	Resource rangeRes = op.getRange();
+	        	Resource[] foundRanges = applicableProperties.get(propertyURI);
+	        	Resource rangeRes = (foundRanges[0] != null) 
+	        	        ? foundRanges[0]
+	        	        : (op.getRange() == null && foundRanges[1] != null)
+	        	                ? foundRanges[1]
+	        	                : op.getRange();
                 PropertyInstance pi = new PropertyInstance();
                 if (rangeRes != null) {
                 	String rangeClassURI;
@@ -217,10 +324,9 @@ public class PropertyInstanceDaoJena extends JenaBaseDao implements
                 pi.setRangePublic(getLabelOrId(op));
                 pi.setDomainPublic(getLabelOrId(op));
                 propInsts.add(pi);
-	        }
-        
+	        }      
         } finally {
-        	getOntModel().leaveCriticalSection();
+        	ontModel.leaveCriticalSection();
         }
         
         Collections.sort(propInsts, new PropInstSorter());
@@ -314,35 +420,42 @@ public class PropertyInstanceDaoJena extends JenaBaseDao implements
     }
 
     public int insertProp(PropertyInstanceIface prop) {
-    	return insertProp(prop, getOntModelSelector().getABoxModel());
+    	return insertProp(prop, getOntModelSelector());
     }
 
-    public int insertProp(PropertyInstanceIface prop, OntModel ontModel) {
+    public int insertProp(PropertyInstanceIface prop, OntModelSelector oms) {
+        OntModel ontModel = oms.getABoxModel();
+        OntModel tboxModel = oms.getTBoxModel();
         ontModel.enterCriticalSection(Lock.WRITE);
         try {
-            Resource subjRes = ontModel.getResource(prop.getSubjectEntURI());
-            OntProperty pred = ontModel.getOntProperty(prop.getPropertyURI());            
-            Resource objRes = ontModel.getResource(prop.getObjectEntURI());
-            if ( (subjRes != null) && (pred != null) && (objRes != null) ) {
-            	getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),true,prop.getSubjectEntURI()));
-            	try {
-            		ontModel.add(subjRes,pred,objRes);
-                	updatePropertyDateTimeValue(subjRes,MODTIME,Calendar.getInstance().getTime(),getOntModel());
-            	} finally {
-            		getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),false,prop.getSubjectEntURI()));
-            	}
-            	OntProperty invPred = pred.getInverse();
-                if (invPred != null) {
-                	getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),true,prop.getObjectEntURI()));
-                    try {
-                    	ontModel.add(objRes,invPred,subjRes);
-                    	updatePropertyDateTimeValue(objRes,MODTIME,Calendar.getInstance().getTime(),getOntModel());
-                    } finally {
-                    	getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),false,prop.getSubjectEntURI()));
+            tboxModel.enterCriticalSection(Lock.READ);
+            try {
+                Resource subjRes = ontModel.getResource(prop.getSubjectEntURI());
+                OntProperty pred = tboxModel.getOntProperty(prop.getPropertyURI());            
+                Resource objRes = ontModel.getResource(prop.getObjectEntURI());
+                if ( (subjRes != null) && (pred != null) && (objRes != null) ) {
+                	getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),true,prop.getSubjectEntURI()));
+                	try {
+                		ontModel.add(subjRes,pred,objRes);
+                    	updatePropertyDateTimeValue(subjRes,MODTIME,Calendar.getInstance().getTime(),getOntModel());
+                	} finally {
+                		getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),false,prop.getSubjectEntURI()));
+                	}
+                	OntProperty invPred = pred.getInverse();
+                    if (invPred != null) {
+                    	getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),true,prop.getObjectEntURI()));
+                        try {
+                        	ontModel.add(objRes,invPred,subjRes);
+                        	updatePropertyDateTimeValue(objRes,MODTIME,Calendar.getInstance().getTime(),getOntModel());
+                        } finally {
+                        	getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),false,prop.getSubjectEntURI()));
+                        }
                     }
                 }
+                return 0;
+            } finally {
+                tboxModel.leaveCriticalSection();
             }
-            return 0;
         } finally {
             ontModel.leaveCriticalSection();
         }

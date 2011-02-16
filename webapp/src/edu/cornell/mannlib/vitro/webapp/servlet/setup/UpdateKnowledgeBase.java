@@ -18,6 +18,7 @@ import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
@@ -28,8 +29,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDao;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SimpleOntModelSelector;
-import edu.cornell.mannlib.vitro.webapp.ontology.update.OntologyUpdateSettings;
-import edu.cornell.mannlib.vitro.webapp.ontology.update.OntologyUpdater;
+import edu.cornell.mannlib.vitro.webapp.ontology.update.KnowledgeBaseUpdater;
+import edu.cornell.mannlib.vitro.webapp.ontology.update.UpdateSettings;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup;
 
 /**
@@ -42,39 +43,47 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	
 	private final static Log log = LogFactory.getLog(UpdateKnowledgeBase.class);
 	
-	private final String DATA_DIR = "/WEB-INF/ontologies/update/";
-	private final String LOG_DIR = "logs/";
-	private final String CHANGED_DATA_DIR = "changedData/";
-	private final String ASK_QUERY_FILE = DATA_DIR + "ask.sparql";
-	private final String SUCCESS_ASSERTIONS_FILE = DATA_DIR + "success.n3";
-	private final String SUCCESS_RDF_FORMAT = "N3";
-	private final String DIFF_FILE = DATA_DIR + "diff.tab.txt";
-	private final String LOG_FILE = DATA_DIR + LOG_DIR + "knowledgeBaseUpdate.log";
-	private final String ERROR_LOG_FILE = DATA_DIR + LOG_DIR + 	"knowledgeBaseUpdate.error.log";
-	private final String REMOVED_DATA_FILE = DATA_DIR + CHANGED_DATA_DIR + 	"removedData.n3";
-	private final String ADDED_DATA_FILE = DATA_DIR + CHANGED_DATA_DIR + "addedData.n3";
-	private final String SPARQL_CONSTRUCT_ADDITIONS_DIR = DATA_DIR + "sparqlConstructs/additions/";
-	private final String SPARQL_CONSTRUCT_DELETIONS_DIR = DATA_DIR + "sparqlConstructs/deletions/";
-	private final String MISC_REPLACEMENTS_FILE = DATA_DIR + "miscReplacements.rdf";
-	private final String OLD_TBOX_MODEL_DIR = DATA_DIR + "oldVersion/";
-	private final String NEW_TBOX_MODEL_DIR = "/WEB-INF/submodels/";
-	private final String OLD_TBOX_ANNOTATIONS_DIR = DATA_DIR + "oldAnnotations/";
-	private final String NEW_TBOX_ANNOTATIONS_DIR = "/WEB-INF/ontologies/user";
+	private static final String DATA_DIR = "/WEB-INF/ontologies/update/";
+	private static final String LOG_DIR = "logs/";
+	private static final String CHANGED_DATA_DIR = "changedData/";
+	private static final String ASK_QUERY_FILE = DATA_DIR + "ask.sparql";
+	private static final String ASK_EMPTY_QUERY_FILE = DATA_DIR + "askEmpty.sparql";
+	private static final String ASK_EVER_QUERY_FILE = DATA_DIR + "askEver.sparql";
+	private static final String SUCCESS_ASSERTIONS_FILE = DATA_DIR + "success.n3";
+	private static final String SUCCESS_RDF_FORMAT = "N3";
+	private static final String DIFF_FILE = DATA_DIR + "diff.tab.txt";
+	private static final String LOG_FILE = DATA_DIR + LOG_DIR + "knowledgeBaseUpdate.log";
+	private static final String ERROR_LOG_FILE = DATA_DIR + LOG_DIR + 	"knowledgeBaseUpdate.error.log";
+	private static final String REMOVED_DATA_FILE = DATA_DIR + CHANGED_DATA_DIR + 	"removedData.n3";
+	private static final String ADDED_DATA_FILE = DATA_DIR + CHANGED_DATA_DIR + "addedData.n3";
+	private static final String SPARQL_CONSTRUCT_ADDITIONS_DIR = DATA_DIR + "sparqlConstructs/additions/";
+	private static final String SPARQL_CONSTRUCT_ADDITIONS_PASS2_DIR = DATA_DIR + "sparqlConstructs/additions-pass2/";
+	private static final String SPARQL_CONSTRUCT_DELETIONS_DIR = DATA_DIR + "sparqlConstructs/deletions/";
+	private static final String MISC_REPLACEMENTS_FILE = DATA_DIR + "miscReplacements.rdf";
+	private static final String OLD_TBOX_MODEL_DIR = DATA_DIR + "oldVersion/";
+	private static final String NEW_TBOX_MODEL_DIR = "/WEB-INF/submodels/";
+	private static final String OLD_TBOX_ANNOTATIONS_DIR = DATA_DIR + "oldAnnotations/";
+	private static final String NEW_TBOX_ANNOTATIONS_DIR = "/WEB-INF/ontologies/user";
 	
 	public void contextInitialized(ServletContextEvent sce) {
 				
+	    if (AbortStartup.isStartupAborted(sce.getServletContext())) {
+            return;
+        }
+	    
 		try {
 
 			ServletContext ctx = sce.getServletContext();
+
+			OntModelSelector oms = new SimpleOntModelSelector((OntModel) sce.getServletContext().getAttribute(JenaBaseDao.ASSERTIONS_ONT_MODEL_ATTRIBUTE_NAME));
 			
-			OntModelSelector oms = new SimpleOntModelSelector(
-					(OntModel) sce.getServletContext().getAttribute(
-							JenaBaseDao.ASSERTIONS_ONT_MODEL_ATTRIBUTE_NAME));
-			
-			OntologyUpdateSettings settings = new OntologyUpdateSettings();
-			settings.setAskQueryFile(ctx.getRealPath(ASK_QUERY_FILE));
+			UpdateSettings settings = new UpdateSettings();
+			settings.setAskQueryFile(getAskQueryPath(ctx));
+			settings.setAskEverQueryFile(getAskEverQueryPath(ctx));
+			settings.setAskEmptyQueryFile(getAskEmptyQueryPath(ctx));
 			settings.setDataDir(ctx.getRealPath(DATA_DIR));
 			settings.setSparqlConstructAdditionsDir(ctx.getRealPath(SPARQL_CONSTRUCT_ADDITIONS_DIR));
+			settings.setSparqlConstructAdditionsPass2Dir(ctx.getRealPath(SPARQL_CONSTRUCT_ADDITIONS_PASS2_DIR));
 			settings.setSparqlConstructDeletionsDir(ctx.getRealPath(SPARQL_CONSTRUCT_DELETIONS_DIR));
 			settings.setDiffFile(ctx.getRealPath(DIFF_FILE));
 			settings.setSuccessAssertionsFile(ctx.getRealPath(SUCCESS_ASSERTIONS_FILE));
@@ -98,15 +107,16 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			
 			try {
 				
-			  OntologyUpdater ontologyUpdater = new OntologyUpdater(settings);
+			  KnowledgeBaseUpdater ontologyUpdater = new KnowledgeBaseUpdater(settings);
 			  
 			  try {
 				  if (ontologyUpdater.updateRequired()) {
 					  ctx.setAttribute(LuceneSetup.INDEX_REBUILD_REQUESTED_AT_STARTUP, Boolean.TRUE);
 					  doMiscAppMetadataReplacements(ctx.getRealPath(MISC_REPLACEMENTS_FILE), oms);
+					  reloadDisplayModel(ctx);
 				  }
 			  } catch (Throwable t){
-				  log.error("Unable to perform miscellaneous application metadata replacements", t);
+				  log.warn("Unable to perform miscellaneous application metadata replacements", t);
 			  }
 			  
 			  ontologyUpdater.update();
@@ -167,10 +177,33 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		    		applicationMetadataModel.leaveCriticalSection();
 		    	}
 		    }
+		} catch (FileNotFoundException fnfe) {
+			log.info("No miscellaneous application metadata replacements were performed.");
+		
 		} catch (Exception e) {
 			log.error("Error performing miscellaneous application metadata " +
 					" replacements.", e);
 		}
+	}
+	
+	private void reloadDisplayModel(ServletContext ctx) {
+	    log.info("Reloading display model");
+	    Object o = ctx.getAttribute("displayOntModel");
+	    if (o instanceof OntModel) {
+	        OntModel displayModel = (OntModel) o;
+	        displayModel.removeAll((Resource) null, (Property) null, (RDFNode) null);
+	        if (displayModel.size() != 0) {
+	            log.error("Display model not cleared successfully");
+	        }
+            JenaPersistentDataSourceSetup.readOntologyFilesInPathSet(
+                    JenaPersistentDataSourceSetup.APPPATH, ctx, displayModel);
+            log.info("Display model reloaded");
+            if (displayModel.size() == 0) {
+                log.warn("Display model empty after reloading");
+            }
+	    } else {
+	        log.error("No display model found in context");
+	    }
 	}
 	
 	private OntModel loadModelFromDirectory(String directoryPath) {
@@ -206,5 +239,16 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	public void contextDestroyed(ServletContextEvent arg0) {
 		// nothing to do	
 	}
-
+	public static String getAskQueryPath(ServletContext ctx) {
+		return ctx.getRealPath(ASK_QUERY_FILE);
+	
+    }	
+	public static String getAskEverQueryPath(ServletContext ctx) {
+		return ctx.getRealPath(ASK_EVER_QUERY_FILE);
+	
+    }
+	public static String getAskEmptyQueryPath(ServletContext ctx) {
+		return ctx.getRealPath(ASK_EMPTY_QUERY_FILE);
+	
+    }
 }

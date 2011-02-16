@@ -49,7 +49,7 @@ public class MemToRDBModelSynchronizer extends StatementListener {
 			lastEditTimeMillis = System.currentTimeMillis();
 			this.editInProgress = false;
 			if (!cleanupThreadActive) {
-				(new Thread(new Cleanup(this))).start();
+				(new Thread(new Cleanup(this), "MemToRDBModelSynchronizer")).start();
 			}
 		}
 	}
@@ -63,7 +63,7 @@ public class MemToRDBModelSynchronizer extends StatementListener {
 			lastEditTimeMillis = System.currentTimeMillis();
 			this.editInProgress = false;
 			if (!cleanupThreadActive) {
-				(new Thread(new Cleanup(this))).start();
+				(new Thread(new Cleanup(this), "MemToRDBModelSynchronizer")).start();
 			}
 		}
 	}

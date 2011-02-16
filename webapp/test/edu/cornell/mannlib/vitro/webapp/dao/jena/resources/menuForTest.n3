@@ -1,0 +1,84 @@
+# $This file is distributed under the terms of the license in /doc/license.txt$ 
+
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix core: <http://vivoweb.org/ontology/core#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+### This file is for the test MenuDaoJenaTest.java it is derived from vivoDefaultMenu.n3 in the vivo product.
+
+#### Default Menu ####
+
+display:DefaultMenu 
+    a  display:MainMenu ;
+    display:hasElement display:EventsMenuItem ;
+    display:hasElement display:HomeMenuItem ;
+    display:hasElement display:OrganizationsMenuItem ;
+    display:hasElement display:PeopleMenuItem ;
+    display:hasElement display:PublicationsMenuItem .
+
+#### Menu Items for Default Menu ####
+
+
+display:HomeMenuItem 
+    a display:NavigationElement ;
+    display:menuPosition "1";
+    display:linkText "Home";
+    display:toPage display:Home .
+
+display:PeopleMenuItem 
+    a display:NavigationElement ;
+    display:menuPosition "2";
+    display:linkText "People";
+    display:toPage display:People .
+
+display:PublicationsMenuItem     
+    a display:NavigationElement ;
+    display:menuPosition "3";
+    display:linkText "Publications";
+    display:toPage display:Publications .
+
+display:EventsMenuItem 
+    a display:NavigationElement ;
+    display:menuPosition "4";
+    display:linkText "Events";
+    display:toPage display:Events .
+
+display:OrganizationsMenuItem 
+    a display:NavigationElement ;
+    display:menuPosition "5";
+    display:linkText "Organizations";
+    display:toPage display:Organizations .  
+
+########## Pages ############
+
+display:Home 
+    a display:Page ;
+    display:requiresBodyTemplate "home.ftl" ;
+    display:title "Home" ;
+    display:urlMapping "/home" .
+
+display:Events 
+    a display:Page ;
+    display:requiresBodyTemplate "Events.ftl" ;
+    display:title "Events" ;
+    display:urlMapping "/events" .
+
+display:Organizations 
+    a display:Page ;
+    display:requiresBodyTemplate "organizations.ftl" ;
+    display:title "Organizations" ;
+    display:urlMapping "/organizations" .
+
+display:People 
+    a display:Page ;
+    display:requiresBodyTemplate "people.ftl" ;
+    display:title "People" ;
+    display:urlMapping "/people" .
+
+display:Publications 
+    a display:Page ;
+    display:requiresBodyTemplate "publications.ftl" ;
+    display:title "Publications" ;
+    display:urlMapping "/publications" .

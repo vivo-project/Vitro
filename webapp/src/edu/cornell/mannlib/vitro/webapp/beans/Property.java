@@ -13,12 +13,12 @@ public class Property extends BaseResourceBean {
 
     private String  customEntryForm       = null;
     private String  groupURI              = null;
-    private String  editLabel             = null; // keep so can set in a context-specific way
+    private String  label                 = null; // keep so can set in a context-specific way
     private final boolean subjectSide     = true; // only relevant to ObjectProperty
     
     public Property() {
-        this.groupURI              = null;
-        this.editLabel             = null;
+        this.groupURI = null;
+        this.label = null;
     }
 
     public String getCustomEntryForm() {
@@ -36,11 +36,11 @@ public class Property extends BaseResourceBean {
 		this.groupURI = in;
 	}
 	
-    public String getEditLabel() {
-        return editLabel;
+    public String getLabel() {
+        return label;
     }
-    public void setEditLabel(String label) {
-        this.editLabel = label;
+    public void setLabel(String label) {
+        this.label = label;
     }
     
     public boolean isSubjectSide() {
@@ -51,27 +51,19 @@ public class Property extends BaseResourceBean {
      * Sorts Property objects, by property rank, then alphanumeric.
      * @author bdc34
      */
-    public static class DisplayComparatorIgnoringPropertyGroup implements Comparator {
-        
+    public static class DisplayComparatorIgnoringPropertyGroup implements Comparator {        
         public int compare(Object o1, Object o2) {
             //log.warn("starting property display comparator; ignoring group ");
             Property p1 = o1 == null ? null : (Property) o1;
             Property p2 = o2 == null ? null : (Property) o2;
-            if (p1==null || p2==null) {
-                log.error("Null property passed to DisplayComparatorIgnoringPropertyGroup");
+            if (p1==null || p2==null) {                
                 return 0;
             }
             //log.warn("comparing property "+p1.getLocalName()+" (rank "+determineDisplayRank(p1)+") to property "+p2.getLocalName()+" (rank "+determineDisplayRank(p2)+") ...");
             int diff = determineDisplayRank(p1) - determineDisplayRank(p2);
             if (diff==0) {
-                String p1Str = p1.getEditLabel() == null ? p1.getURI() : p1.getEditLabel();
-                if (p1.getEditLabel()==null) {
-                    log.warn("null edit label for property "+p1.getURI());
-                }
-                String p2Str = p2.getEditLabel() == null ? p2.getURI() : p2.getEditLabel();
-                if (p2.getEditLabel() == null) {
-                    log.warn("null edit label for property "+p2.getURI());
-                }
+                String p1Str = p1.getLabel() == null ? p1.getURI() : p1.getLabel();                
+                String p2Str = p2.getLabel() == null ? p2.getURI() : p2.getLabel();                
                 return p1Str.compareTo(p2Str);
             }
             return diff;

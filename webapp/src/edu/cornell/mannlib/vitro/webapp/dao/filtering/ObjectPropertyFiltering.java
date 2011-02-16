@@ -116,8 +116,8 @@ public class ObjectPropertyFiltering extends ObjectProperty {
     }
 
     @Override
-    public String getEditLabel() {
-        return innerObjectProperty.getEditLabel();
+    public String getLabel() {
+        return innerObjectProperty.getLabel();
     }
 
     @Override
@@ -354,8 +354,8 @@ public class ObjectPropertyFiltering extends ObjectProperty {
     }
 
     @Override
-    public void setEditLabel(String label) {
-        innerObjectProperty.setEditLabel(label);
+    public void setLabel(String label) {
+        innerObjectProperty.setLabel(label);
     }
 
     @Override

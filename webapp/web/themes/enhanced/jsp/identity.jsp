@@ -10,20 +10,15 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.web.BreadCrumbsUtil" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
+<%@ page import="edu.cornell.mannlib.vedit.beans.LoginStatusBean" %>
 
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c" %>
 
-<jsp:useBean id="loginHandler" class="edu.cornell.mannlib.vedit.beans.LoginFormBean" scope="session" />
-
 <%    
-    HttpSession currentSession = request.getSession();
-    String currentSessionIdStr = currentSession.getId();
-    int securityLevel = -1;
-    String loginName = null;
-    if (loginHandler.testSessionLevel(request) > -1) {
-        securityLevel = Integer.parseInt(loginHandler.getLoginRole());
-        loginName = loginHandler.getLoginName();
-    }
+    LoginStatusBean loginBean = LoginStatusBean.getBean(request);
+    boolean isLoggedIn = loginBean.isLoggedIn();
+    String loginName = loginBean.getUsername();
+
      // VITRO FILE
     final Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.web.menu.jsp");
 
@@ -74,11 +69,10 @@ portal.getRootBreadCrumbURL() : request.getContextPath()+"/";
   <ul id="otherMenu">
   
     <%-- A user is logged in --%>
-    <% if (securityLevel > 0) { %>
+    <% if (isLoggedIn) { %>
 
-      <c:url var="logoutHref" value="<%= Controllers.LOGOUT_JSP %>">
+      <c:url var="logoutHref" value="<%= Controllers.LOGOUT %>">
         <c:param name="home" value="${currentPortal}" />
-        <c:param name="loginSubmitMode" value="Log Out" /> 
       </c:url>
   
       <c:url var="siteAdminHref" value="<%= Controllers.SITE_ADMIN %>">

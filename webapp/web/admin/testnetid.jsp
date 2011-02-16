@@ -5,7 +5,6 @@
 <%@ page import="com.hp.hpl.jena.shared.Lock" %>
 <%@ page import="com.thoughtworks.xstream.XStream" %>
 <%@ page import="com.thoughtworks.xstream.io.xml.DomDriver" %>
-<%@ page import="edu.cornell.mannlib.vedit.beans.LoginFormBean" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Individual" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.VitroRequest" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory" %>
@@ -19,10 +18,9 @@
 <%@ page import="org.apache.commons.logging.LogFactory" %>
 <%@ page import="java.io.StringReader" %>
 <%@ page import="java.util.*" %>
-<%@page import="edu.cornell.mannlib.vitro.webapp.auth.identifier.NetIdIdentifierFactory.NetId"%>
-<%@page import="edu.cornell.mannlib.vitro.webapp.auth.identifier.NetIdIdentifierFactory"%>
-<%@page import="edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingUriFactory.SelfEditing"%>
-<%@page import="edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingUriFactory"%>
+<%@page import="edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory.NetId"%>
+<%@page import="edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory.SelfEditing"%>
+<%@page import="edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.identifier.ArrayIdentifierBundle"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle"%>
 <%@page import="java.io.IOException"%>
@@ -52,8 +50,8 @@ private void checkNetId( String inNetId, JspWriter out, HttpServletRequest reque
             && inNetId.length() > 0
             && inNetId.length() < 100 ){
     
-        NetIdIdentifierFactory.NetId netid = new NetId(inNetId);                        
-        SelfEditingUriFactory.SelfEditing selfE = null;
+        SelfEditingIdentifierFactory.NetId netid = new NetId(inNetId);                        
+        SelfEditingIdentifierFactory.SelfEditing selfE = null;
                 
         IdentifierBundle idb = new ArrayIdentifierBundle();
         idb.add(netid);
@@ -75,7 +73,6 @@ private void checkNetId( String inNetId, JspWriter out, HttpServletRequest reque
         }else{
             out.println("could not find a Individual with the neditd of " + inNetId );
         }
-            //putNetIdInSession(session, selfE, netid);            
         
     }else{
         out.println("no remote user value found or value was longer than 100 chars.");    

@@ -23,10 +23,9 @@
 <%@page import="java.util.HashSet"%>
 <%@page import="java.util.Set"%>
 <%@page import="java.util.Arrays"%>
-<%@page import="java.util.ArrayList"%><h2>Execute SPARQL CONSTRUCT
-Query</h2>
+<%@page import="java.util.ArrayList"%>
 
-<p><a href="ingest">Ingest Home</a></p>
+<h2><a class="ingestMenu" href="ingest">Ingest Menu</a> > Execute SPARQL CONSTRUCT Query</h2>
 
 <c:if test="${requestScope.constructedStmtCount != null}">
 	<h3 class="notice">${requestScope.constructedStmtCount} statements
@@ -63,7 +62,9 @@ Query</h2>
                   jenaOntModel.leaveCriticalSection();
 	      }
         %>
-</select> <textarea rows="16" cols="40" name="sparqlQueryStr"><c:choose>
+</select> 
+
+<textarea rows="16" cols="40" name="sparqlQueryStr" class="maxWidth"><c:choose>
     <c:when test="${param.sparqlQueryStr != null}">
         ${param.sparqlQueryStr}
     </c:when>
@@ -141,6 +142,13 @@ PREFIX <%=prefixText%>: <<%=urlText%>><%}}%>
 <h3>Select Destination Model</h3>
 
 <select name="destinationModelName">
+    <option value="vitro:baseOntModel"
+		<% if ("vitro:baseOntModel".equals(request.getParameter("destinationModelName"))) {
+                  %>
+		selected="selected" <%
+                 }
+              %> />webapp
+	assertions</option>
 	<option value="vitro:jenaOntModel"
 		<% if ("vitro:jenaOntModel".equals(request.getParameter("destinationModelName"))) {
             	  %>
@@ -148,13 +156,6 @@ PREFIX <%=prefixText%>: <<%=urlText%>><%}}%>
             	 }
               %> />webapp
 	model</option>
-	<option value="vitro:baseOntModel"
-		<% if ("vitro:baseOntModel".equals(request.getParameter("destinationModelName"))) {
-                  %>
-		selected="selected" <%
-                 }
-              %> />webapp
-	assertions</option>
 	<%
     for (Iterator it = maker.listModels(); it.hasNext(); ) {
     String modelName = (String) it.next();
@@ -182,4 +183,4 @@ PREFIX <%=prefixText%>: <<%=urlText%>><%}}%>
 		<p><input type="checkbox" name="reasoning" value="pellet" />
 		include Pellet OWL-DL reasoning</p>
 	</c:otherwise>
-</c:choose> <input type="submit" value="Execute CONSTRUCT" />
+</c:choose> <input id="submit" type="submit" value="Execute CONSTRUCT" />

@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -13,6 +15,8 @@ import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import edu.cornell.mannlib.vitro.webapp.edit.elements.EditElement;
 
 public class Field {
 
@@ -50,6 +54,11 @@ public class Field {
      * What type of options is this?
      */
     private OptionsType optionsType;
+    
+    /**
+     * Special class to use for option type
+     */
+    private Class customOptionType;
     
      /**
      * Used for  building Options when OptionsType is INDIVIDUALS_VIA_OBJECT_PROPERTY
@@ -105,10 +114,16 @@ public class Field {
     private List <String> retractions;
 
     private Map<String, String> queryForExisting;
-    
+
+    /**
+     * Property for special edit element.
+     */
+    private EditElement editElement=null;;
+        
     /* *********************** Constructors ************************** */
 
     public Field(String config, String varName) {
+        name=varName;
         JSONObject jsonObj  = null;
         try{
             jsonObj = new JSONObject(config);
@@ -124,8 +139,8 @@ public class Field {
     }
 
     public Field() {}
-    
-    private static String[] parameterNames = {"newResource","validators","optionsType","predicateUri","objectClassUri","rangeDatatypeUri","rangeLang","literalOptions","assertions"};
+        
+    private static String[] parameterNames = {"editElement","newResource","validators","optionsType","predicateUri","objectClassUri","rangeDatatypeUri","rangeLang","literalOptions","assertions"};
     static{  Arrays.sort(parameterNames); }
     
     private void setValuesFromJson(JSONObject obj, String fieldName){
@@ -147,7 +162,8 @@ public class Field {
                         
             setLiteralOptions(obj.getJSONArray("literalOptions"));
             setAssertions(EditConfiguration.JsonArrayToStringList(obj.getJSONArray("assertions")));
-                        
+                                          
+            setEditElement( obj, fieldName);           
             
             //check for odd parameters
             JSONArray names = obj.names();
@@ -163,8 +179,60 @@ public class Field {
         }
     }
 
+    public void setEditElement(EditElement editElement){
+        this.editElement = editElement;
+    }
+    
+    /**
+     * A field may specify a class for additional features. 
+     */
+    private void setEditElement(JSONObject fieldConfigObj, String fieldName) {        
+        String className = fieldConfigObj.optString("editElement");
+        if( className == null || className.isEmpty() )
+            return;
+        setOptionsType(Field.OptionsType.UNDEFINED);
+        Class clz = null;
+        try {
+            clz = Class.forName(className);           
+        } catch (ClassNotFoundException e) {
+            log.error("Java Class " + className + " not found for field " + name);
+            return;
+        } catch (SecurityException e) {
+            log.error("Problem with Java Class " + className + " for field " + name, e);
+            return;
+        } catch (IllegalArgumentException e) {
+            log.error("Problem with Java Class " +className + " for field " + name, e);
+            return;
+        } 
+
+        Class[] types = new Class[]{ Field.class };
+        Constructor cons;
+        try {
+            cons = clz.getConstructor(types);
+        } catch (SecurityException e) {
+            log.error("Problem with Java Class " + className + " for field " + name, e);            
+            return;                        
+        } catch (NoSuchMethodException e) {
+            log.error("Java Class " + className + " must have a constructor that takes a Field.", e);            
+            return;
+        }
+        Object[] args = new Object[] { this };        
+        Object obj;
+        try {
+            obj = cons.newInstance(args);
+        } catch (Exception e) {
+            log.error("Problem with Java Class " + className + " for field " + name, e);            
+            return;   
+        }  
+        
+        editElement = (EditElement)obj;                       
+    }
 
     /* ****************** Getters and Setters ******************************* */
+
+    public String getName(){
+        return name;
+    }
     
     public List<String> getRetractions() {
         return retractions;
@@ -203,37 +271,43 @@ public class Field {
         optionsType = ot;
     }
     public void setOptionsType(String s) {
-        if ("LITERALS".equals(s)) {
-            setOptionsType(Field.OptionsType.LITERALS);
-        } else if ("HARDCODED_LITERALS".equals(s)) {
-            setOptionsType(Field.OptionsType.HARDCODED_LITERALS);
-        } else if ("STRINGS_VIA_DATATYPE_PROPERTY".equalsIgnoreCase(s)) {
-            setOptionsType(Field.OptionsType.STRINGS_VIA_DATATYPE_PROPERTY);
-        } else if ("INDIVIDUALS_VIA_OBJECT_PROPERTY".equalsIgnoreCase(s)) {
-            setOptionsType(Field.OptionsType.INDIVIDUALS_VIA_OBJECT_PROPERTY);
-        } else if ("INDIVIDUALS_VIA_VCLASS".equalsIgnoreCase(s)) {
-            setOptionsType(Field.OptionsType.INDIVIDUALS_VIA_VCLASS);
-        } else if ("MONIKERS_VIA_VCLASS".equalsIgnoreCase(s)) {
-            setOptionsType(Field.OptionsType.MONIKERS_VIA_VCLASS);
-        } else if ("DATETIME".equalsIgnoreCase(s)) {
-            setOptionsType(Field.OptionsType.DATETIME);
-        } else if ("CHILD_VCLASSES".equalsIgnoreCase(s)) {            
-            setOptionsType(Field.OptionsType.CHILD_VCLASSES);
-        } else if ("CHILD_VCLASSES_WITH_PARENT".equalsIgnoreCase(s)) {            
-            setOptionsType(Field.OptionsType.CHILD_VCLASSES_WITH_PARENT);  
-        } else if ("VCLASSGROUP".equalsIgnoreCase(s)) {            
-            setOptionsType(Field.OptionsType.VCLASSGROUP);              
-        } else if ("FILE".equalsIgnoreCase(s)) {
-            setOptionsType(Field.OptionsType.FILE);            
-        } else if ("DATE".equalsIgnoreCase(s)) {
-            setOptionsType(Field.OptionsType.DATE);
-        } else if ("TIME".equalsIgnoreCase(s)) {
-        	setOptionsType(Field.OptionsType.TIME);
-        } else {
-            setOptionsType(Field.OptionsType.UNDEFINED);
-        }
+        setOptionsType( getOptionForString(s));
     }
 
+    public static OptionsType getOptionForString(String s){
+        if( s== null || s.isEmpty() )
+            return OptionsType.UNDEFINED;
+        if ("LITERALS".equals(s)) {
+            return Field.OptionsType.LITERALS;
+        } else if ("HARDCODED_LITERALS".equals(s)) {
+            return Field.OptionsType.HARDCODED_LITERALS;
+        } else if ("STRINGS_VIA_DATATYPE_PROPERTY".equalsIgnoreCase(s)) {
+            return Field.OptionsType.STRINGS_VIA_DATATYPE_PROPERTY;
+        } else if ("INDIVIDUALS_VIA_OBJECT_PROPERTY".equalsIgnoreCase(s)) {
+            return Field.OptionsType.INDIVIDUALS_VIA_OBJECT_PROPERTY;
+        } else if ("INDIVIDUALS_VIA_VCLASS".equalsIgnoreCase(s)) {
+            return Field.OptionsType.INDIVIDUALS_VIA_VCLASS;
+        } else if ("MONIKERS_VIA_VCLASS".equalsIgnoreCase(s)) {
+            return Field.OptionsType.MONIKERS_VIA_VCLASS;
+        } else if ("DATETIME".equalsIgnoreCase(s)) {
+            return Field.OptionsType.DATETIME;
+        } else if ("CHILD_VCLASSES".equalsIgnoreCase(s)) {            
+            return Field.OptionsType.CHILD_VCLASSES;
+        } else if ("CHILD_VCLASSES_WITH_PARENT".equalsIgnoreCase(s)) {            
+            return Field.OptionsType.CHILD_VCLASSES_WITH_PARENT;  
+        } else if ("VCLASSGROUP".equalsIgnoreCase(s)) {            
+            return Field.OptionsType.VCLASSGROUP;              
+        } else if ("FILE".equalsIgnoreCase(s)) {
+            return Field.OptionsType.FILE;            
+        } else if ("DATE".equalsIgnoreCase(s)) {
+            return Field.OptionsType.DATE;
+        } else if ("TIME".equalsIgnoreCase(s)) {
+            return Field.OptionsType.TIME;
+        } else {
+            return Field.OptionsType.UNDEFINED;
+        } 
+    }
+    
     public String getPredicateUri() {
         return predicateUri;
     }
@@ -322,5 +396,13 @@ public class Field {
        return copy;
     }
 
+    public EditElement getEditElement(){
+        return editElement;
+    }
+    
+    /* this is mainly for unit testing */
+    public void setName(String name){
+        this.name = name;    
+    }
 
 }

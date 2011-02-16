@@ -68,7 +68,7 @@ public class UserMailController extends VitroHttpServlet{
             request.setAttribute("portalId",Integer.valueOf(portalBean.getPortalId()));
 
             request.setAttribute("title", portalBean.getAppName()+" Mail Users Form");
-            request.setAttribute("bodyJsp", "/emailUsers.jsp");// <<< this is where the body gets set
+            request.setAttribute("bodyJsp", "/templates/parts/emailUsers.jsp");// <<< this is where the body gets set
             request.setAttribute("portalBean",portalBean);
 
             RequestDispatcher rd =

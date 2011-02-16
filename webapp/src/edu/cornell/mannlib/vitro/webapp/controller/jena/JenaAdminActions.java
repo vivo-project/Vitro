@@ -380,7 +380,7 @@ public class JenaAdminActions extends BaseEditController {
         	try {
         		taxonomyModel.write(response.getOutputStream());
         	} catch (Exception e) {
-        		log.error(e);
+        		log.error(e, e);
         	}
         }
     }

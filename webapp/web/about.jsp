@@ -1,4 +1,6 @@
 <%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
+<%-- This the non-freemarker AboutController iis still used by datastar. That 
+     controller uses this jsp. --%>
 
 <div id="content">
 

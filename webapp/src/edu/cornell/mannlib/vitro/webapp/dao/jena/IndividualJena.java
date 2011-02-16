@@ -43,10 +43,10 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
+import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.filestorage.FileModelHelper;
-import edu.cornell.mannlib.vitro.webapp.filestorage.FileServingHelper;
+import edu.cornell.mannlib.vitro.webapp.filestorage.model.ImageInfo;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
 
@@ -342,28 +342,10 @@ public class IndividualJena extends IndividualImpl implements Individual {
             try {
                 moniker = webappDaoFactory.getJenaBaseDao().getPropertyStringValue(ind,webappDaoFactory.getJenaBaseDao().MONIKER);
                 if (moniker == null) {
-                	try {
-                        // trying to deal with the fact that an entity may have more than 1 VClass
-                        List<VClass> clasList = this.getVClasses(true);
-                        if (clasList == null || clasList.size() < 2) {
-                            moniker = getVClass().getName();
-                        } else {
-                            VClass preferredClass = null;
-                            for (VClass clas : clasList) {
-                                if (clas.getCustomDisplayView() != null && clas.getCustomDisplayView().length()>0) {
-                                    // arbitrarily deciding that the preferred class (could be >1) is one with a custom view
-                                    preferredClass = clas;
-                                    log.debug("Found direct class ["+clas.getName()+"] with custom view "+clas.getCustomDisplayView()+"; resetting entity vClass to this class");
-                                }
-                            }
-                            if (preferredClass == null) {
-                                // no basis for selecting a preferred class name to use
-                                moniker = null; // was this.getVClass().getName();
-                            } else {
-                                moniker = preferredClass.getName();
-                            }
-                        }
-                	} catch (Exception e) {}
+                  //Changing behavior to moniker because it is taking extra time to get the vclass
+                  //alternative if the moniker isn't filled out.  That time is wasted if the vclass alternative isn't desired.
+                  //see NIHVIVO-2001
+                    moniker = "";
                 }
                 return moniker;
             } finally {
@@ -488,12 +470,10 @@ public class IndividualJena extends IndividualImpl implements Individual {
 		if (this.mainImageUri != NOT_INITIALIZED) {
 			return mainImageUri;
 		} else {
-			RDFNode value = ind.getPropertyValue(ind.getModel().getProperty(VitroVocabulary.IND_MAIN_IMAGE));
-			if (value != null && value.isResource()) {
-				Resource valueRes = (Resource) value;
-				String resUri = valueRes.getURI();
-				if (resUri != null) {
-					mainImageUri = resUri;
+			for (ObjectPropertyStatement stmt : getObjectPropertyStatements()) {
+				if (stmt.getPropertyURI()
+						.equals(VitroVocabulary.IND_MAIN_IMAGE)) {
+					mainImageUri = stmt.getObjectURI();
 					return mainImageUri;
 				}
 			}
@@ -503,38 +483,33 @@ public class IndividualJena extends IndividualImpl implements Individual {
 
 	@Override
 	public String getImageUrl() {
-		if (this.imageUrl != null) {
-			log.debug("imageUrl was cached for " + getURI() + ": '"
-					+ this.imageUrl + "'");
-			return imageUrl;
-		} else {
-			String imageUri = FileModelHelper.getMainImageBytestreamUri(this);
-			String filename = FileModelHelper.getMainImageFilename(this);
-			imageUrl = FileServingHelper.getBytestreamAliasUrl(imageUri,
-					filename);
-			log.debug("figured imageUrl for " + getURI() + ": '"
-					+ this.imageUrl + "'");
-			return imageUrl;
+		if (this.imageInfo == null) {
+			this.imageInfo = ImageInfo.instanceFromEntityUri(webappDaoFactory, this);
+			log.trace("figured imageInfo for " + getURI() + ": '"
+					+ this.imageInfo + "'");
 		}
+		if (this.imageInfo == null) {
+			this.imageInfo = ImageInfo.EMPTY_IMAGE_INFO;
+			log.trace("imageInfo for " + getURI() + " is empty.");
+		}
+		return this.imageInfo.getMainImage().getBytestreamAliasUrl();
 	}
 
 	@Override
 	public String getThumbUrl() {
-		if (this.thumbUrl != null) {
-			log.debug("thumbUrl was cached for " + getURI() + ": '"
-					+ this.thumbUrl + "'");
-			return thumbUrl;
-		} else {
-			String imageUri = FileModelHelper.getThumbnailBytestreamUri(this);
-			String filename = FileModelHelper.getThumbnailFilename(this);
-			thumbUrl = FileServingHelper.getBytestreamAliasUrl(imageUri, filename);
-			log.debug("figured thumbUrl for " + getURI() + ": '"
-					+ this.thumbUrl + "'");
-			return thumbUrl;
+		if (this.imageInfo == null) {
+			this.imageInfo = ImageInfo.instanceFromEntityUri(webappDaoFactory, this);
+			log.trace("figured imageInfo for " + getURI() + ": '"
+					+ this.imageInfo + "'");
 		}
+		if (this.imageInfo == null) {
+			this.imageInfo = ImageInfo.EMPTY_IMAGE_INFO;
+			log.trace("imageInfo for " + getURI() + " is empty.");
+		}
+		return this.imageInfo.getThumbnail().getBytestreamAliasUrl();
 	}
 
-    public String getAnchor() {
+	public String getAnchor() {
         if (this.anchor != null) {
             return anchor;
         } else {
@@ -743,6 +718,14 @@ public class IndividualJena extends IndividualImpl implements Individual {
             return this.propertyList;
         }
     }
+
+    @Override 
+    public List<ObjectProperty> getPopulatedObjectPropertyList() {
+        if (populatedObjectPropertyList == null) {
+            populatedObjectPropertyList = webappDaoFactory.getObjectPropertyDao().getObjectPropertyList(this);
+        }
+        return populatedObjectPropertyList;       
+    }
     
     @Override
     public Map<String,ObjectProperty> getObjectPropertyMap() {
@@ -788,6 +771,14 @@ public class IndividualJena extends IndividualImpl implements Individual {
             }
             return this.datatypePropertyList;
         }
+    }
+    
+    @Override 
+    public List<DataProperty> getPopulatedDataPropertyList() {
+        if (populatedDataPropertyList == null) {
+            populatedDataPropertyList = webappDaoFactory.getDataPropertyDao().getDataPropertyList(this);
+        }
+        return populatedDataPropertyList;       
     }
     
     @Override
@@ -1006,10 +997,10 @@ public class IndividualJena extends IndividualImpl implements Individual {
 
                     int rv = 0;
                     try {
-                        if( val1 instanceof String ) {
+                        if( val1 instanceof String )
                         	rv = collator.compare( ((String)val1) , ((String)val2) );
                             //rv = ((String)val1).compareTo((String)val2);
-                        } else if ( val1 instanceof Date ) {
+                        else if( val1 instanceof Date ) {
                             DateTime dt1 = new DateTime((Date)val1);
                             DateTime dt2 = new DateTime((Date)val2);
                             rv = dt1.compareTo(dt2);
@@ -1034,7 +1025,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
 
     		
     	} catch (Exception e) {
-    		log.error(e);
+    		log.error(e, e);
     	}
     }
     

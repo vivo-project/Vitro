@@ -10,11 +10,14 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -26,26 +29,29 @@ import com.hp.hpl.jena.rdf.model.ModelMaker;
 import com.hp.hpl.jena.shared.JenaException;
 import com.hp.hpl.jena.shared.Lock;
 
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaModelUtils;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSpecialModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest;
 
 public class RDFUploadController extends BaseEditController {
 	
-    private static int maxFileSizeInBytes = 1024 * 1024 * 2000; //2000mb 
+    private static int maxFileSizeInBytes = 1024 * 1024 * 2000; //2000mb
     private static FileItem fileStream=null; 
     private static final String INGEST_MENU_JSP = "/jenaIngest/ingestMenu.jsp";
     private static final String LOAD_RDF_DATA_JSP = "/jenaIngest/loadRDFData.jsp";
+    private static final String LIST_MODELS_JSP = "/jenaIngest/listModels.jsp";
 	
 	public void doPost(HttpServletRequest rawRequest,
 			HttpServletResponse response) throws ServletException, IOException {
+	    
 		FileUploadServletRequest req = FileUploadServletRequest.parseRequest(rawRequest,
 				maxFileSizeInBytes);
 		if (req.hasFileUploadException()) {
@@ -57,16 +63,10 @@ public class RDFUploadController extends BaseEditController {
 	    
 		VitroRequest request = new VitroRequest(req);		
 		if (!checkLoginStatus(request,response) ){
-		    try {
-                response.sendRedirect(getDefaultLandingPage(request));
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
 		    return;
 		}		
 		
-		LoginFormBean loginBean = (LoginFormBean) request.getSession().getAttribute("loginHandler");
+		LoginStatusBean loginBean = LoginStatusBean.getBean(request);
 		
 		try {
 			super.doGet(request,response);
@@ -89,6 +89,10 @@ public class RDFUploadController extends BaseEditController {
 		String languageStr = request.getParameter("language");
 		
 		boolean makeClassgroups = (request.getParameter("makeClassgroups") != null);
+		
+		// add directly to the ABox model without reading first into 
+		// a temporary in-memory model
+		boolean directRead = ("directAddABox".equals(request.getParameter("mode")));
 		
 		int[] portalArray = null;
 		String individualCheckIn = request.getParameter("checkIndividualsIntoPortal"); 
@@ -113,14 +117,21 @@ public class RDFUploadController extends BaseEditController {
 		}
           
 		String uploadDesc ="";		
-		
-		OntModel tempModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+				
+		OntModel uploadModel = (directRead) 
+		    ? getABoxModel(request.getSession(), getServletContext())
+		    : ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
 		
 		/* ********************* GET RDF by URL ********************** */
 		String RDFUrlStr =  request.getParameter("rdfUrl");
 		if (RDFUrlStr != null && RDFUrlStr.length() > 0) {
 			try {
-				tempModel.read(RDFUrlStr, languageStr); // languageStr may be null and default would be RDF/XML
+			    uploadModel.enterCriticalSection(Lock.WRITE);
+			    try {
+			        uploadModel.read(RDFUrlStr, languageStr); // languageStr may be null and default would be RDF/XML
+			    } finally {
+			        uploadModel.leaveCriticalSection();
+			    }
 				uploadDesc = verb + " RDF from " + RDFUrlStr;				
 			} catch (JenaException ex){
 	                forwardToFileUploadError("Could not parse file to " + languageStr + ": " + ex.getMessage(), req, response);
@@ -134,7 +145,12 @@ public class RDFUploadController extends BaseEditController {
 		    if( fileStreams.get("rdfStream") != null && fileStreams.get("rdfStream").size() > 0 ){
 		        FileItem rdfStream = fileStreams.get("rdfStream").get(0);
 		        try {
-		            tempModel.read( rdfStream.getInputStream(), null, languageStr);
+		            uploadModel.enterCriticalSection(Lock.WRITE);
+		            try {
+		                uploadModel.read( rdfStream.getInputStream(), null, languageStr);
+		            } finally {
+		                uploadModel.leaveCriticalSection();
+		            }
 		            uploadDesc = verb + " RDF from file " + rdfStream.getName();                
 		        } catch (IOException e) {
 		            forwardToFileUploadError("Could not read file: " + e.getLocalizedMessage(), req, response);
@@ -150,22 +166,31 @@ public class RDFUploadController extends BaseEditController {
 		        }
 		    }
 		}
+		
 		/* ********** Do the model changes *********** */
-		long stmtCount = 0L;
-		if( tempModel != null ){
-		    OntModel memModel=null;
-		    try {
-		        memModel = (OntModel) request.getSession().getAttribute("baseOntModel");
-		    } catch (Exception e) {}
-		    if (memModel==null) {
-		        memModel = (OntModel) getServletContext().getAttribute("baseOntModel");
+		if( !directRead && uploadModel != null ){
+		    long tboxstmtCount = 0L;
+		    long aboxstmtCount = 0L;
+
+			JenaModelUtils xutil = new JenaModelUtils();
+		    OntModel tboxModel = getTBoxModel(
+		            request.getSession(), getServletContext());
+		    OntModel aboxModel = getABoxModel(
+		            request.getSession(), getServletContext());
+		    OntModel tboxChangeModel=null;
+		    Model aboxChangeModel=null;
+		    if (tboxModel != null) {
+		    	tboxChangeModel = xutil.extractTBox(uploadModel);
+		        tboxstmtCount = operateOnModel(request.getFullWebappDaoFactory(), tboxModel,tboxChangeModel,remove,makeClassgroups,portalArray,loginBean.getUserURI());
 		    }
-		    if (memModel != null) {
-		        stmtCount = operateOnModel(request.getFullWebappDaoFactory(), memModel,tempModel,remove,makeClassgroups,portalArray,loginBean.getUserURI());
-		    }					
+		    if (aboxModel != null) {
+		    	aboxChangeModel = uploadModel.remove(tboxChangeModel);
+		        aboxstmtCount = operateOnModel(request.getFullWebappDaoFactory(), aboxModel,aboxChangeModel,remove,makeClassgroups,portalArray,loginBean.getUserURI());
+		    }
+		    request.setAttribute("uploadDesc", uploadDesc + ". " + verb + " " + (tboxstmtCount + aboxstmtCount) + "  statements.");
+		} else {
+		    request.setAttribute("uploadDesc", "RDF upload successful.");
 		}
-			
-		request.setAttribute("uploadDesc", uploadDesc + ". " + verb + " " + stmtCount + "  statements.");
 	    
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         request.setAttribute("bodyJsp","/templates/edit/specific/upload_rdf_result.jsp");
@@ -192,8 +217,10 @@ public class RDFUploadController extends BaseEditController {
 		
 		if (docLoc!=null && modelName != null) {
 			doLoadRDFData(modelName,docLoc,filePath,languageStr,maker);
-			request.setAttribute("title","Ingest Menu");
-			request.setAttribute("bodyJsp",INGEST_MENU_JSP);
+			//request.setAttribute("title","Ingest Menu");
+			//request.setAttribute("bodyJsp",INGEST_MENU_JSP);
+			request.setAttribute("title","Available Models");
+			request.setAttribute("bodyJsp",LIST_MODELS_JSP);
 		} else {
 			request.setAttribute("title","Load RDF Data");
 			request.setAttribute("bodyJsp",LOAD_RDF_DATA_JSP);
@@ -290,7 +317,33 @@ public class RDFUploadController extends BaseEditController {
   		ModelMaker myVjmm = (ModelMaker) request.getSession().getAttribute("vitroJenaModelMaker");
   		myVjmm = (myVjmm == null) ? (ModelMaker) getServletContext().getAttribute("vitroJenaModelMaker") : myVjmm;
   		return new VitroJenaSpecialModelMaker(myVjmm, request);
-  	}
+  	 }
+     
+     private OntModel getABoxModel(HttpSession session, ServletContext ctx) {   
+         if (session != null 
+                 && session.getAttribute("baseOntModelSelector")
+                         instanceof OntModelSelector) {
+             return ((OntModelSelector) 
+                     session.getAttribute("baseOntModelSelector"))
+                     .getABoxModel();   
+         } else {
+             return ((OntModelSelector) 
+                     ctx.getAttribute("baseOntModelSelector")).getABoxModel();
+         }
+     }    
+
+     private OntModel getTBoxModel(HttpSession session, ServletContext ctx) {   
+         if (session != null 
+                 && session.getAttribute("baseOntModelSelector")
+                         instanceof OntModelSelector) {
+             return ((OntModelSelector) 
+                     session.getAttribute("baseOntModelSelector"))
+                     .getTBoxModel();   
+         } else {
+             return ((OntModelSelector) 
+                     ctx.getAttribute("baseOntModelSelector")).getTBoxModel();
+         }
+     }    
      
 	private static final Log log = LogFactory.getLog(RDFUploadController.class.getName());
 }

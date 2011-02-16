@@ -42,7 +42,7 @@ public class TitleCase {
             "to","of","by","at","for","but","in","with","has","de","von"};
 
     public static String toTitleCase(String in){
-        if( in == null && in.length() ==0 )
+        if( in == null || in.length() ==0 )
             return in;
 
         in = in.toLowerCase();
@@ -80,7 +80,7 @@ public class TitleCase {
     }
 
     private static String capitalizeWord(String in){
-        if( in == null && in.length() == 0 )
+        if( in == null || in.length() == 0 )
             return in;
         if( in.length() == 1 )
             return in.toUpperCase();

@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Calendar;
 
 import javax.servlet.http.HttpSession;
 
@@ -28,6 +27,8 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.vocabulary.XSD;
 
 import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
+import edu.cornell.mannlib.vitro.webapp.edit.elements.EditElement;
+import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 
 public class EditSubmission {
     private String editKey;
@@ -108,14 +109,30 @@ public class EditSubmission {
             	} else {
             		log.debug("time fields for parameter " + var + " were not on form" );
             	}
-        	} else {
+        	} else if( field.getEditElement() != null ){        	    
+        	    log.debug("skipping field with edit element, it should not be in literals on form list");
+            }else{
             	String[] valuesArray = queryParameters.get(var); 
                 List<String> valueList = (valuesArray != null) ? Arrays.asList(valuesArray) : null;                
                 if( valueList != null && valueList.size() > 0 ) {
-                    literalsFromForm.put(var, createLiteral(valueList.get(0), field.getRangeDatatypeUri(), field.getRangeLang()));
+                    String value = valueList.get(0);
+                    
+                    // remove any characters that are not valid in XML 1.0
+                    // from user input so they don't cause problems
+                    // with model serialization
+                    value = EditN3Utils.stripInvalidXMLChars(value);
+                    
+                    if (!StringUtils.isEmpty(value)) {
+                        literalsFromForm.put(var, createLiteral(
+                                                    value, 
+                                                    field.getRangeDatatypeUri(), 
+                                                    field.getRangeLang()));
+                    }
+                    
                     if(valueList != null && valueList.size() > 1 )
                         log.debug("For field " + var +", cannot yet handle multiple " +
-                        		"Literals for a single field, using first Literal on list");                            
+                        		"Literals for a single field, using first Literal on list");
+                    
                 }else{
                     log.debug("could not find value for parameter " + var  );
                 }
@@ -131,6 +148,8 @@ public class EditSubmission {
         	}
         }
         
+        processEditElementFields(editConfig,queryParameters);
+        
         this.basicValidation = new BasicValidation(editConfig,this);
         Map<String,String> errors = basicValidation.validateUris( urisFromForm );
         if( errors != null ) {
@@ -140,7 +159,7 @@ public class EditSubmission {
         errors = basicValidation.validateLiterals( literalsFromForm );
         if( errors != null ) {
             validationErrors.putAll( errors);
-        }
+        }                
         
         if(editConfig.getValidators() != null ){
         	for( N3Validator validator : editConfig.getValidators()){
@@ -150,10 +169,39 @@ public class EditSubmission {
         				validationErrors.putAll(errors);
         		}
         	}
-        }
+        }               
         
+        if( log.isDebugEnabled() )
+            log.debug( this.toString() );
     }
 
+    protected void processEditElementFields(EditConfiguration editConfig, Map<String,String[]> queryParameters ){
+        for( String fieldName : editConfig.getFields().keySet()){
+            Field field = editConfig.getFields().get(fieldName);
+            if( field != null && field.getEditElement() != null ){
+                EditElement element = field.getEditElement();                
+                log.debug("Checking EditElement for field " + fieldName + " type: " + element.getClass().getName());
+                
+                //check for validation error messages
+                Map<String,String> errMsgs = 
+                    element.getValidationMessages(fieldName, editConfig, queryParameters);
+                validationErrors.putAll(errMsgs);
+                                
+                if( errMsgs == null || errMsgs.isEmpty()){                    
+                    //only check for uris and literals when element has no validation errors
+                    Map<String,String> urisFromElement = element.getURIs(fieldName, editConfig, queryParameters);
+                    if( urisFromElement != null )
+                        urisFromForm.putAll(urisFromElement);
+                    Map<String,Literal> literalsFromElement = element.getLiterals(fieldName, editConfig, queryParameters);
+                    if( literalsFromElement != null )
+                        literalsFromForm.putAll(literalsFromElement);
+                }else{
+                    log.debug("got validation errors for field " + fieldName + " not processing field for literals or URIs");
+                }
+            }            
+        }        
+    }
+    
     public EditSubmission(Map<String, String[]> queryParameters, EditConfiguration editConfig, 
     		Map<String, List<FileItem>> fileItems) {
     	this(queryParameters,editConfig);    	
@@ -161,13 +209,13 @@ public class EditSubmission {
     	validationErrors.putAll(this.basicValidation.validateFiles( fileItems ) );
 	}
 
-	protected Literal createLiteral(String value, String datatypeUri, String lang){
+	protected Literal createLiteral(String value, String datatypeUri, String lang) {
         if( datatypeUri != null ){            
             if( "http://www.w3.org/2001/XMLSchema:anyURI".equals(datatypeUri) ){
                 try {
                     return literalCreationModel.createTypedLiteral( URLEncoder.encode(value, "UTF8"), datatypeUri);
                 } catch (UnsupportedEncodingException e) { 
-                    log.error(e);
+                    log.error(e, e);
                 }                
             }   
             return literalCreationModel.createTypedLiteral(value, datatypeUri);

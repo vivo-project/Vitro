@@ -14,11 +14,10 @@ import edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFac
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.ServletIdentifierBundleFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.JenaNetidPolicy;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.JenaNetidPolicy.ContextSetup;
 
 /**
  * Class used to setup a JenaNetidPolicy using the default.  
- * This setups the JenaNetidPolicy and a NetIdIdentifierFactory.
+ * This setups the JenaNetidPolicy and a SelfEditingIdentifierFactory.
  * 
  * See JenaNetidPolicy.setupDefault() for the sparql queries that will
  * be used by the default JenaNetidPolicy.

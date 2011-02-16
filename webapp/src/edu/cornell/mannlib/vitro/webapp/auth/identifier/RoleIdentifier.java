@@ -2,8 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.identifier;
 
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory.SelfEditing;
-
 public abstract class  RoleIdentifier implements Identifier {
     public abstract String getRole();
     public abstract String getUri();

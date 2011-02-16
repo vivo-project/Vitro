@@ -39,15 +39,14 @@
 
   <!-- Listeners ****************************************************** -->
 
+  <listener>
+    <listener-class>edu.cornell.mannlib.vitro.webapp.config.RevisionInfoSetup</listener-class>
+  </listener>
+
   <!-- DefaultThemeSetup needs to run before the JenaDataSourceSetup
        to allow creation of default portal and tab -->
   <listener>
     <listener-class>edu.cornell.mannlib.vitro.webapp.servlet.setup.DefaultThemeSetup</listener-class>
-  </listener>
-
-  <!-- experimental ModelMaker for ingest workflows - BJL 2008-06-01 -->
-  <listener>
-    <listener-class>edu.cornell.mannlib.vitro.webapp.servlet.setup.VitroJenaModelMakerSetup</listener-class>
   </listener>
 
   <!-- Comment out this listener to run Vitro without a database -->
@@ -104,10 +103,11 @@
   <!-- See documentation for details. -->
   <!-- If used, must be run after JenaDataSourceSetup -->
 
+<!--
   <listener>
     <listener-class>edu.cornell.mannlib.vitro.webapp.servlet.setup.PelletReasonerSetup</listener-class>
   </listener>
-
+-->
 
   <!-- The followng listener records all edit changes, in reified form, to another database model -->
   <!-- still at an experimental stage -->
@@ -130,6 +130,11 @@
 	        edu.cornell.mannlib.vitro.webapp.auth.policy.setup.SelfEditingPolicySetup
 		</listener-class>
 	</listener>  -->
+
+<!--  -->    
+  <listener>
+    <listener-class> edu.cornell.mannlib.vitro.webapp.auth.policy.setup.InformationResourceEditingPolicySetup</listener-class>
+  </listener> --> 
     
     <listener>
         <listener-class>
@@ -154,7 +159,7 @@
  
   <listener>
     <listener-class>
-        edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreeMarkerSetup
+        edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerSetup
     </listener-class>
   </listener>
 
@@ -165,6 +170,10 @@
     </listener-class>
   </listener>
   
+   <listener>
+    <listener-class>edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache$Setup</listener-class>
+   </listener>
+ 
   <!--
     <listener>
         <listener-class>
@@ -306,6 +315,43 @@
     <url-pattern>/SearchIndex</url-pattern>
   </servlet-mapping>
 
+<servlet>
+     <servlet-name>SimpleReasonerRecomputeController</servlet-name>
+     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.SimpleReasonerRecomputeController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+     <servlet-name>SimpleReasonerRecomputeController</servlet-name>
+     <url-pattern>/RecomputeInferences</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+     <servlet-name>SDBSetupController</servlet-name>
+     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.SDBSetupController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+     <servlet-name>SDBSetupController</servlet-name>
+     <url-pattern>/sdbsetup</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>MenuN3EditController</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.MenuN3EditController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MenuN3EditController</servlet-name>
+    <url-pattern>/menuN3Editor</url-pattern>
+  </servlet-mapping>
+
+
+  <servlet>
+    <servlet-name>ajaxSparqlQuery</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.ajax.SparqlQueryAjaxController</servlet-class>    
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ajaxSparqlQuery</servlet-name>
+    <url-pattern>/ajax/sparqlQuery</url-pattern>    
+  </servlet-mapping>
+  
 <!-- This is the new navigation controller.  It is not ready for the 1.1 release
      see http://issues.library.cornell.edu/browse/NIHVIVO-597  
   <servlet>
@@ -317,16 +363,6 @@
   	<url-pattern>/nav/*</url-pattern>
   </servlet-mapping>
   -->
-  
-  <servlet>
-    <servlet-name>TestController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.TestController</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>TestController</servlet-name>
-    <url-pattern>/test</url-pattern>
-  </servlet-mapping>
-
 
   <servlet>
     <servlet-name>fetch</servlet-name>
@@ -342,16 +378,34 @@
     <servlet-name>AboutController</servlet-name>
     <url-pattern>/about</url-pattern>
   </servlet-mapping>
-  
+
   <servlet>
-    <servlet-name>FreeMarkerTestController</servlet-name>
+    <servlet-name>HomePageController</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.HomePageController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>HomePageController</servlet-name>
+    <url-pattern>/home</url-pattern>
+  </servlet-mapping>
+        
+  <servlet>
+    <servlet-name>FreemarkerTestController</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.TestController</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>FreeMarkerTestController</servlet-name>
+    <servlet-name>FreemarkerTestController</servlet-name>
     <url-pattern>/freemarkertest</url-pattern>
   </servlet-mapping>
-  
+
+  <servlet>
+    <servlet-name>FreemarkerSamplesController</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.SamplesController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>FreemarkerSamplesController</servlet-name>
+    <url-pattern>/freemarkersamples</url-pattern>
+  </servlet-mapping>
+    
   <servlet>
     <servlet-name>FakeSelfEditController</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.FakeSelfEditController</servlet-class>
@@ -363,7 +417,7 @@
 
   <servlet>
     <servlet-name>SiteAdminController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.SiteAdminController</servlet-class>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.SiteAdminController</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>SiteAdminController</servlet-name>
@@ -372,6 +426,24 @@
   <servlet-mapping>
     <servlet-name>SiteAdminController</servlet-name>
     <url-pattern>/siteAdmin.jsp</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>EmptyController</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.EmptyController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>EmptyController</servlet-name>
+    <url-pattern>/login</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>RevisionInfoController</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.RevisionInfoController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>RevisionInfoController</servlet-name>
+    <url-pattern>/revisionInfo</url-pattern>
   </servlet-mapping>
 
   <servlet>
@@ -390,15 +462,6 @@
   <servlet-mapping>
     <servlet-name>FlagUpdateController</servlet-name>
     <url-pattern>/flagUpdate</url-pattern>
-  </servlet-mapping>
-
-  <servlet>
-    <servlet-name>SitemapIndexController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.SitemapIndexController</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>SitemapIndexController</servlet-name>
-    <url-pattern>/sitemap.xml</url-pattern>
   </servlet-mapping>
 
   <servlet>
@@ -426,6 +489,15 @@
   <servlet-mapping>
     <servlet-name>JenaIngestController</servlet-name>
     <url-pattern>/ingest</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>JenaCsv2RdfController</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.jena.JenaCsv2RdfController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>JenaCsv2RdfController</servlet-name>
+    <url-pattern>/csv2rdf</url-pattern>
   </servlet-mapping>
 
   <servlet>
@@ -852,15 +924,6 @@
     <servlet-name>ObjectPropertyStatementListingController</servlet-name>
     <url-pattern>/listObjectPropertyStatements</url-pattern>
   </servlet-mapping>
-
-  <servlet>
-    <servlet-name>EntityListController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.EntityListController</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>EntityListController</servlet-name>
-    <url-pattern>/entitylist</url-pattern>
-  </servlet-mapping>
   
   <servlet>
     <servlet-name>IndividualListController</servlet-name>
@@ -872,8 +935,17 @@
   </servlet-mapping>
   
   <servlet>
+    <servlet-name>EntityURLController</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.EntityURLController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>EntityURLController</servlet-name>
+    <url-pattern>/entityurl/*</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
     <servlet-name>SearchController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.search.controller.PagedSearchController</servlet-class>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.search.controller.FreemarkerPagedSearchController</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>SearchController</servlet-name>
@@ -905,7 +977,16 @@
     <servlet-name>AutocompleteController</servlet-name>
     <url-pattern>/populateselect</url-pattern>
   </servlet-mapping>
-  
+
+  <servlet>
+    <servlet-name>ReorderController</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.ReorderController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ReorderController</servlet-name>
+    <url-pattern>/edit/reorder</url-pattern>
+  </servlet-mapping>
+    
   <servlet>
     <servlet-name>AdminController</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.AdminController</servlet-class>
@@ -951,18 +1032,18 @@
     <url-pattern>/TabEntitiesController</url-pattern>
   </servlet-mapping>
 
-  <!--  NOTICE: index.jsp is mapped to TabControler so that we 
-    		can have the urls that use to be in the system still work even 
-            though we no longer use index.jsp           -->
-  <servlet>
-    <servlet-name>TabController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.TabController</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>TabController</servlet-name>
-    <url-pattern>/index.jsp</url-pattern>
-  </servlet-mapping>
-
+  <!--  NOTICE: index.jsp is mapped to TabController so that we 
+            can have the urls that use to be in the system still work even 
+              though we no longer use index.jsp           -->
+    <servlet>
+      <servlet-name>TabController</servlet-name>
+      <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.TabController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+      <servlet-name>TabController</servlet-name>
+      <url-pattern>/index.jsp</url-pattern>
+    </servlet-mapping>
+    
   <!-- <servlet>
        <servlet-name>EntityPropertyListController</servlet-name>     
        <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.EntityPropertyListController</servlet-class>
@@ -1036,9 +1117,32 @@
      <load-on-startup>5</load-on-startup>
   </servlet>
 
+  <!--
   <servlet>
     <servlet-name>entity</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.EntityController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>entity</servlet-name>
+    <url-pattern>/entityold</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>entity</servlet-name>
+    <url-pattern>/entityold/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>entity</servlet-name>
+    <url-pattern>/individualold/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>entity</servlet-name>
+    <url-pattern>/displayold/*</url-pattern>
+  </servlet-mapping>
+  -->  
+  
+  <servlet>
+     <servlet-name>ontology</servlet-name>
+     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.OntologyController</servlet-class>
   </servlet>
 
   <servlet>
@@ -1052,15 +1156,50 @@
   </servlet>
 
   <servlet>
-    <servlet-name>logout</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.Logout</servlet-class>
-    <init-param>
-      <param-name>properties</param-name>
-      <param-value>WEB-INF/classes/formbeans/Login_forms.properties</param-value>
-    </init-param>
-    <!--load-on-startup>2</load-on-startup-->
+    <servlet-name>loginExternalAuthSetup</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.authenticate.LoginExternalAuthSetup</servlet-class>
   </servlet>
 
+  <servlet>
+    <servlet-name>loginExternalAuthReturn</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.authenticate.LoginExternalAuthReturn</servlet-class>
+  </servlet>
+
+  <servlet>
+    <servlet-name>programLogin</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.authenticate.ProgramLogin</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>programLogin</servlet-name>
+    <url-pattern>/programLogin</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>logout</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.Logout</servlet-class>
+  </servlet>
+
+  <servlet>
+    <servlet-name>unrecognizedUser</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.authenticate.UnrecognizedUserController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>unrecognizedUser</servlet-name>
+    <url-pattern>/unrecognizedUser</url-pattern>
+  </servlet-mapping>
+
+<!-- 
+  <servlet>
+    <servlet-name>FakeExternalAuthController</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.authenticate.FakeExternalAuthController</servlet-class>
+    <load-on-startup />
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>FakeExternalAuthController</servlet-name>
+    <url-pattern>/admin/fakeExternalAuth</url-pattern>
+  </servlet-mapping>
+ -->
+ 
   <servlet>
     <servlet-name>browsecontroller</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.BrowseController</servlet-class>
@@ -1131,7 +1270,7 @@
     <url-pattern>/admin/sparqlquery</url-pattern>
   </servlet-mapping>
   
-  <!-- 
+  <!--
   <servlet>
     <servlet-name>DummyVisClient</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.visualization.DummyVisClientController</servlet-class>
@@ -1141,8 +1280,8 @@
     <servlet-name>DummyVisClient</servlet-name>
     <url-pattern>/admin/dummyVisClient</url-pattern>
   </servlet-mapping>
-   -->
-   
+  -->
+  
    <servlet>
     <servlet-name>VisualizationController</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.visualization.VisualizationController</servlet-class>
@@ -1189,21 +1328,35 @@
     <servlet-name>mailusers</servlet-name>
     <url-pattern>/mailusers</url-pattern>
   </servlet-mapping>
+  
   <servlet-mapping>
-    <servlet-name>entity</servlet-name>
+    <servlet-name>individual</servlet-name>
     <url-pattern>/entity</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
-    <servlet-name>entity</servlet-name>
+    <servlet-name>individual</servlet-name>
     <url-pattern>/entity/*</url-pattern>
   </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>entity</servlet-name>
-    <url-pattern>/individual/*</url-pattern>
+    <servlet-mapping>
+    <servlet-name>individual</servlet-name>
+    <url-pattern>/individual</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
-    <servlet-name>entity</servlet-name>
+    <servlet-name>individual</servlet-name>
+    <url-pattern>/individual/*</url-pattern>
+  </servlet-mapping>
+    <servlet-mapping>
+    <servlet-name>individual</servlet-name>
+    <url-pattern>/display</url-pattern>
+  </servlet-mapping> 
+  <servlet-mapping>
+    <servlet-name>individual</servlet-name>
     <url-pattern>/display/*</url-pattern>
+  </servlet-mapping>  
+  
+  <servlet-mapping>
+    <servlet-name>ontology</servlet-name>
+    <url-pattern>/ontology/*</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>updateEntityFlags</servlet-name>
@@ -1212,6 +1365,14 @@
   <servlet-mapping>
     <servlet-name>authenticate</servlet-name>
     <url-pattern>/authenticate</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>loginExternalAuthSetup</servlet-name>
+    <url-pattern>/loginExternalAuth</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>loginExternalAuthReturn</servlet-name>
+    <url-pattern>/loginExternalAuthReturn</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>logout</servlet-name>
@@ -1240,6 +1401,71 @@
   <servlet-mapping>
     <servlet-name>generic_delete</servlet-name>
     <url-pattern>/generic_delete</url-pattern>
+  </servlet-mapping>
+
+  <!-- ==================== sparql query builder ==================== -->
+  
+  <servlet>
+    <servlet-name>SparlQueryBuilder</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.SparqlQueryBuilderServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>SparlQueryBuilder</servlet-name>
+    <url-pattern>/admin/sparqlquerybuilder</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>GetAllClasses</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.sparql.GetAllClasses</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>GetAllClasses</servlet-name>
+    <url-pattern>/admin/getAllClasses</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>GetAllPrefix</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.sparql.GetAllPrefix</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>GetAllPrefix</servlet-name>
+    <url-pattern>/admin/getAllPrefix</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>GetClazzDataProperties</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.sparql.GetClazzDataProperties</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>GetClazzDataProperties</servlet-name>
+    <url-pattern>/admin/getClazzDataProperties</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>GetClazzAllProperties</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.sparql.GetClazzAllProperties</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>GetClazzAllProperties</servlet-name>
+    <url-pattern>/admin/getClazzAllProperties</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>GetClazzObjectProperties</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.sparql.GetClazzObjectProperties</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>GetClazzObjectProperties</servlet-name>
+    <url-pattern>/admin/getClazzObjectProperties</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>GetObjectClasses</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.sparql.GetObjectClasses</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>GetObjectClasses</servlet-name>
+    <url-pattern>/admin/getObjectClasses</url-pattern>
   </servlet-mapping>
 
   <!-- ==================== tag libraries ============================== -->
@@ -1297,3 +1523,8 @@
 
   
 </web-app>
+
+<mime-mapping>
+    <extension>ico</extension>
+    <mime-type>image/x-icon</mime-type>
+</mime-mapping>

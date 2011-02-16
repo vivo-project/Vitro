@@ -28,7 +28,7 @@ import edu.cornell.mannlib.vedit.beans.DynamicField;
 import edu.cornell.mannlib.vedit.beans.DynamicFieldRow;
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.beans.FormObject;
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.beans.Option;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vedit.forwarder.PageForwarder;
@@ -86,7 +86,7 @@ public class EntityRetryController extends BaseEditController {
 
         WebappDaoFactory wadf = (vreq.getAssertionsWebappDaoFactory()!=null) ? vreq.getAssertionsWebappDaoFactory() : vreq.getFullWebappDaoFactory();
         
-        LoginFormBean loginBean = (LoginFormBean) request.getSession().getAttribute("loginHandler");
+        LoginStatusBean loginBean = LoginStatusBean.getBean(request);
         WebappDaoFactory myWebappDaoFactory = wadf.getUserAwareDaoFactory(loginBean.getUserURI());
 
         IndividualDao ewDao = myWebappDaoFactory.getIndividualDao();
@@ -186,7 +186,7 @@ public class EntityRetryController extends BaseEditController {
 			hash.put("VClassURI", optList);
         }
         
-        hash.put("Moniker", new ArrayList());
+        hash.put("Moniker", getMonikerOptionsList(individualForEditing, ewDao));
         
         hash.put("HiddenFromDisplayBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getDisplayOptionsList(individualForEditing));    
         hash.put("ProhibitedFromUpdateBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getUpdateOptionsList(individualForEditing));
@@ -326,7 +326,8 @@ public class EntityRetryController extends BaseEditController {
         request.setAttribute("title","Individual Editing Form");
         request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+portal.getThemeDir()+"css/edit.css\"/>");
         request.setAttribute("scripts", "/js/edit/entityRetry.js");
-        request.setAttribute("bodyAttr"," onLoad=\"monikerInit()\"");
+        // NC Commenting this out for now. Going to pass on DWR for moniker and use jQuery instead
+        // request.setAttribute("bodyAttr"," onLoad=\"monikerInit()\"");
         request.setAttribute("_action",action);
         request.setAttribute("unqualifiedClassName","Individual");
         setRequestAttributes(request,epo);
@@ -339,6 +340,24 @@ public class EntityRetryController extends BaseEditController {
             log.error(e.getStackTrace());
         }
 
+    }
+    
+    private List<Option> getMonikerOptionsList(Individual entity,
+                                               IndividualDao indDao) {
+        ArrayList<Option> monikerOpts = new ArrayList<Option>();
+        monikerOpts.add(new Option("", "none", (entity.getMoniker() == null)));
+        if (entity.getVClassURI() != null) {
+            List<String> monikers = indDao.monikers(entity.getVClassURI());
+            if (monikers != null) {
+                for (String moniker : monikers) {
+                    monikerOpts.add(new Option(
+                            moniker, moniker, 
+                                    moniker.equals(entity.getMoniker())));
+                }
+            }
+        }
+        monikerOpts.add(new Option("", "[new moniker]"));
+        return monikerOpts;
     }
 
     public void doGet (HttpServletRequest request, HttpServletResponse response) {

@@ -17,9 +17,7 @@
 
 %>
 
-    <p><a href="ingest">Ingest Home</a></p>
-
-    <h2>Subtract One Model from Another</h2>
+    <h2><a class="ingestMenu" href="ingest">Ingest Menu</a> > Subtract One Model from Another</h2>
 
     <form action="ingest" method="get"i>
         <input type="hidden" name="action" value="subtractModels"/>
@@ -61,4 +59,4 @@
 	</select>
     <p>model in which difference should be saved</p>
 
-    <input type="submit" value="Subtract models"/>
+    <input id="submit" type="submit" value="Subtract models"/>

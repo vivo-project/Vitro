@@ -1,0 +1,69 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+/****************************************
+ Vitro base styles
+ 
+ Styles declared here are intended for
+ application-wide use.
+ 
+ Original version
+ 2011-01-12 UI Team
+ 
+ Last updated
+ 2011-01-13
+*****************************************/
+
+/* <------ MISCELLANEOUS*/
+.clear {
+    clear: both;
+}
+.hidden {
+    display: none !important;
+}
+/* <------ USER FEEDBACK*/
+#error-alert {
+    color: #900;
+    padding: 10px;
+    margin-bottom: 5px;
+    height: 30px;
+}
+#error-alert img {
+    float:left;
+    margin: 0;
+    padding: 0;
+    vertical-align: middle;  	
+}
+#error-alert p {
+    padding-left: 30px;
+    font-size: .9em;
+    line-height: 30px;
+}
+#error-alert p.login-alert {
+    padding-top: 0;
+}
+#confirmation-alert {
+    color: #169f43;
+    padding: 0;
+    margin-bottom: 5px;
+    height: 30px;
+}
+#confirmation-alert img {
+    float: left;
+    margin: 0;
+    padding: 0;
+    vertical-align: middle;
+}
+#confirmation-alert p {
+    padding-left: 30px;
+    font-size: .9em;
+    line-height: 30px;
+}
+#flash-message{
+    background-color: #7285a0;
+    padding: .5em;  
+    margin-bottom: 10px;
+}
+/* <------ INDEX PAGE*/
+.siteMap h2 {
+    padding-bottom: 0;
+}

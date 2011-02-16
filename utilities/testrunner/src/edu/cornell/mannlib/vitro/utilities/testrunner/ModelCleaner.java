@@ -3,22 +3,30 @@
 package edu.cornell.mannlib.vitro.utilities.testrunner;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import edu.cornell.mannlib.vitro.utilities.testrunner.listener.Listener;
 
 /**
  * Resets the RDF-Model to a known state, in preparation for the next Selenium
  * test suite.
  */
 public class ModelCleaner {
+	public static final String TEST_USER_ONTOLOGY_FILENAME = "test-user-model.owl";
 	private final ModelCleanerProperties properties;
+	private final TomcatController tomcatController;
 	private final CommandRunner runner;
 	private final Listener listener;
 
-	public ModelCleaner(SeleniumRunnerParameters parms) {
+	public ModelCleaner(SeleniumRunnerParameters parms,
+			TomcatController tomcatController) {
 		this.properties = parms.getModelCleanerProperties();
 		this.listener = parms.getListener();
 		this.runner = new CommandRunner(parms);
+		this.tomcatController = tomcatController;
 
 		sanityCheck();
 	}
@@ -42,42 +50,39 @@ public class ModelCleaner {
 	 *             if a problem occurs in a sub-process.
 	 */
 	public void clean() throws CommandRunnerException {
-		stopTheWebapp();
-		dropDatabase();
-		createAndLoadDatabase();
-		startTheWebapp();
+		tomcatController.stopTheWebapp();
+		insertTheUserFile();
+		recreateTheDatabase();
+		tomcatController.startTheWebapp();
+		removeTheUserFile();
 	}
 
 	/**
-	 * Stop Tomcat and wait the prescribed number of seconds for it to clean up.
+	 * Copy the test data ontology file into the auth area, so we get our
+	 * pre-defined admin user.
 	 */
-	private void stopTheWebapp() throws CommandRunnerException {
-		String tomcatStopCommand = properties.getTomcatStopCommand();
-		int tomcatStopDelay = properties.getTomcatStopDelay();
-
-		listener.webappStopping(tomcatStopCommand);
-		runner.run(parseCommandLine(tomcatStopCommand));
-
-		int returnCode = runner.getReturnCode();
-		if (returnCode != 0) {
-			listener.webappStopFailed(returnCode);
-			// Throw no exception - this can happen if Tomcat isn't running.
+	private void insertTheUserFile() {
+		InputStream userOntologyStream = this.getClass().getResourceAsStream(
+				TEST_USER_ONTOLOGY_FILENAME);
+		if (userOntologyStream == null) {
+			throw new FatalException(
+					"Couldn't find the Test User Ontology file: '"
+							+ TEST_USER_ONTOLOGY_FILENAME + "'");
 		}
 
-		listener.webappWaitingForStop(tomcatStopDelay);
+		File userOntologyTarget = figureUserOntologyTarget();
 		try {
-			Thread.sleep(tomcatStopDelay * 1000L);
-		} catch (InterruptedException e) {
-			// Just continue.
+			FileHelper.copy(userOntologyStream, userOntologyTarget);
+			userOntologyStream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-
-		listener.webappStopped();
 	}
 
 	/**
-	 * Delete the database.
+	 * Drop the database and create it again, empty.
 	 */
-	private void dropDatabase() {
+	private void recreateTheDatabase() {
 		String mysqlStatement = "drop database " + properties.getMysqlDbName()
 				+ "; create database " + properties.getMysqlDbName()
 				+ " character set utf8;";
@@ -96,54 +101,15 @@ public class ModelCleaner {
 	}
 
 	/**
-	 * Rebuild the database.
+	 * Remove the test data ontology file, so we leave no trace.
 	 */
-	private void createAndLoadDatabase() {
-		String mysqlStatement = "source "
-				+ convertBackslashes(properties.getMysqlDumpfile()) + ";";
-
-		listener.loadDatabaseStarting(mysqlStatement);
-		executeMysqlStatement(mysqlStatement);
-
-		int returnCode = runner.getReturnCode();
-		if (returnCode != 0) {
-			listener.loadDatabaseFailed(returnCode);
-			throw new FatalException("loadDatabase() failed: return code="
-					+ returnCode);
+	private void removeTheUserFile() {
+		File userOntologyTarget = figureUserOntologyTarget();
+		userOntologyTarget.delete();
+		if (userOntologyTarget.exists()) {
+			listener.logWarning("Failed to delete the test data ontology "
+					+ "file: '" + TEST_USER_ONTOLOGY_FILENAME + "'");
 		}
-
-		listener.loadDatabaseComplete();
-	}
-
-	/**
-	 * Start Tomcat and wait for it to initialize.
-	 */
-	private void startTheWebapp() {
-		String tomcatStartCommand = properties.getTomcatStartCommand();
-		int tomcatStartDelay = properties.getTomcatStartDelay();
-
-		listener.webappStarting(tomcatStartCommand);
-		try {
-			runner.runAsBackground(parseCommandLine(tomcatStartCommand));
-		} catch (CommandRunnerException e) {
-			throw new FatalException(e);
-		}
-
-		int returnCode = runner.getReturnCode();
-		if (returnCode != 0) {
-			listener.webappStartFailed(returnCode);
-			throw new FatalException("startTheWebapp() failed: return code="
-					+ returnCode);
-		}
-
-		listener.webappWaitingForStart(tomcatStartDelay);
-		try {
-			Thread.sleep(tomcatStartDelay * 1000L);
-		} catch (InterruptedException e) {
-			// Just continue.
-		}
-
-		listener.webappStarted();
 	}
 
 	/**
@@ -166,48 +132,23 @@ public class ModelCleaner {
 	}
 
 	/**
-	 * A command line must be broken into separate arguments, where arguments
-	 * are delimited by blanks unless the blank (and the argument) is enclosed
-	 * in quotes.
+	 * Figure out where the test data ontology file should go. C:\Program
+	 * Files\Apache Software Foundation\Tomcat
+	 * 6.0\webapps\vivo\WEB-INF\ontologies\auth
 	 */
-	static List<String> parseCommandLine(String commandLine) {
-		List<String> pieces = new ArrayList<String>();
-		StringBuilder piece = null;
-		boolean inDelimiter = true;
-		boolean inQuotes = false;
-		for (int i = 0; i < commandLine.length(); i++) {
-			char thisChar = commandLine.charAt(i);
-			if ((thisChar == ' ') && !inQuotes) {
-				if (inDelimiter) {
-					// No effect.
-				} else {
-					inDelimiter = true;
-					pieces.add(piece.toString());
-				}
-			} else if (thisChar == '"') {
-				// Quotes are not carried into the parsed strings.
-				inQuotes = !inQuotes;
-			} else { // Not a blank or a quote.
-				if (inDelimiter) {
-					inDelimiter = false;
-					piece = new StringBuilder();
-				}
-				piece.append(thisChar);
-			}
+	private File figureUserOntologyTarget() {
+		File webappDirectory = properties.getWebappDirectory();
+		File authDirectory = new File(webappDirectory,
+				"WEB-INF/ontologies/auth");
+
+		if (!authDirectory.exists()) {
+			throw new FatalException("Target directory for the test data "
+					+ "ontology file doesn't exist. Webapp directory is '"
+					+ webappDirectory + "', target directory is '"
+					+ authDirectory + "'");
 		}
 
-		// There is an implied delimiter at the end of the command line.
-		if (!inDelimiter) {
-			pieces.add(piece.toString());
-		}
-
-		// Quotes must appear in pairs
-		if (inQuotes) {
-			throw new IllegalArgumentException(
-					"Command line contains mismatched quotes: " + commandLine);
-		}
-
-		return pieces;
+		return new File(authDirectory, TEST_USER_ONTOLOGY_FILENAME);
 	}
 
 	static String convertBackslashes(File file) {

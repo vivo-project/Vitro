@@ -120,7 +120,7 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
             
             for (ObjectProperty op : objectPropertyList) {
                 if (!SUPPRESSED_OBJECT_PROPERTIES.contains(op)) {
-                    op.setEditLabel(op.getDomainPublic());
+                    op.setLabel(op.getDomainPublic());
                     mergedPropertyList.add(op);
                 }else{
                     log.debug("suppressed " + op.getURI());
@@ -142,7 +142,7 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
                                 } else if (op.getURI() == null) {
                                     log.error("ObjectProperty op returned with null propertyURI from opDao.getObjectPropertyByURI()");
                                 } else if (!alreadyOnPropertyList(mergedPropertyList,op)) {
-                                    op.setEditLabel(op.getDomainPublic());
+                                    op.setLabel(op.getDomainPublic());
                                     mergedPropertyList.add(op);
                                 }
                             }
@@ -158,7 +158,7 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
             // now do much the same with data properties: get the list of populated data properties, then add in placeholders for missing ones
             List<DataProperty> dataPropertyList = subject.getDataPropertyList();
             for (DataProperty dp : dataPropertyList) {
-                dp.setEditLabel(dp.getPublicName());
+                dp.setLabel(dp.getPublicName());
                 mergedPropertyList.add(dp);
             }
 
@@ -171,7 +171,7 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
                             if (dp.getURI() == null) {
                                 log.error("DataProperty dp returned with null propertyURI from dpDao.getAllPossibleDatapropsForIndividual()");
                             } else if (!alreadyOnPropertyList(mergedPropertyList,dp)) {
-                                dp.setEditLabel(dp.getPublicName());
+                                dp.setLabel(dp.getPublicName());
                                 mergedPropertyList.add(dp);
                             }
                         } else {
@@ -309,7 +309,7 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
         int count = groupsList.size();
         PropertyGroup tempGroup = null;
         if (unassignedGroupName!=null) {
-            tempGroup = pgDao.createTempPropertyGroup(unassignedGroupName,MAX_GROUP_DISPLAY_RANK);
+            tempGroup = pgDao.createDummyPropertyGroup(unassignedGroupName,MAX_GROUP_DISPLAY_RANK);
             log.debug("creating temp property group "+unassignedGroupName+" for any unassigned properties");
         }
         switch (count) {
@@ -336,7 +336,7 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
                      if (tempGroup!=null) { // not assigned any group yet and are creating a group for unassigned properties
                          if (!alreadyOnPropertyList(tempGroup.getPropertyList(),p)) {
                              tempGroup.getPropertyList().add(p);
-                             log.debug("adding property "+p.getEditLabel()+" to members of temp group "+unassignedGroupName);
+                             log.debug("adding property "+p.getLabel()+" to members of temp group "+unassignedGroupName);
                          }
                      } // otherwise don't put that property on the list
                  } else if (p.getGroupURI().equals(pg.getURI())) {
@@ -405,7 +405,7 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
                     }
                 }
             } catch (Exception ex) {
-                log.error("Cannot retrieve p1GroupRank for group "+p1.getEditLabel());
+                log.error("Cannot retrieve p1GroupRank for group "+p1.getLabel());
             }
             
             int p2GroupRank=MAX_GROUP_RANK;
@@ -417,7 +417,7 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
                     }
                 }
             } catch (Exception ex) {
-                log.error("Cannot retrieve p2GroupRank for group "+p2.getEditLabel());
+                log.error("Cannot retrieve p2GroupRank for group "+p2.getLabel());
             }
             
             // int diff = pgDao.getGroupByURI(p1.getGroupURI()).getDisplayRank() - pgDao.getGroupByURI(p2.getGroupURI()).getDisplayRank();
@@ -425,7 +425,7 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
             if (diff==0) {
                 diff = determineDisplayRank(p1) - determineDisplayRank(p2);
                 if (diff==0) {
-                    return p1.getEditLabel().compareTo(p2.getEditLabel());
+                    return p1.getLabel().compareTo(p2.getLabel());
                 } else {
                     return diff;
                 }
@@ -573,7 +573,11 @@ public class EntityMergedPropertyListController extends VitroHttpServlet {
 
         for (ObjectPropertyStatement statement : statements) {
             Individual object = statement.getObject();
-            relatedStatements.add(object.getObjectPropertyStatements(op).get(0));
+            List<ObjectPropertyStatement> statementsForObject = object.getObjectPropertyStatements(op);
+            // Could be empty for statements with no linked individual.
+            if ( ! statementsForObject.isEmpty() ) {
+                relatedStatements.add(statementsForObject.get(0));
+            }
         }
 
         return relatedStatements;

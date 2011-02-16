@@ -9,9 +9,6 @@ import static edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUpload
 import static edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest.FILE_ITEM_MAP;
 import static edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest.FILE_UPLOAD_EXCEPTION;
 
-import java.awt.image.renderable.ParameterBlock;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.media.jai.Interpolation;
 import javax.media.jai.JAI;
 import javax.media.jai.RenderedOp;
 import javax.media.jai.util.ImagingListener;
@@ -31,7 +27,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.sun.media.jai.codec.JPEGEncodeParam;
 import com.sun.media.jai.codec.MemoryCacheSeekableStream;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -40,8 +35,8 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadControl
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadController.Dimensions;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadController.UserMistakeException;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.filestorage.FileModelHelper;
 import edu.cornell.mannlib.vitro.webapp.filestorage.TempFileHolder;
+import edu.cornell.mannlib.vitro.webapp.filestorage.UploadedFileHelper;
 import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileAlreadyExistsException;
 import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorage;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
@@ -102,14 +97,13 @@ public class ImageUploadHelper {
 				new NonNoisyImagingListener());
 	}
 
-	private final WebappDaoFactory webAppDaoFactory;
-	private final FileModelHelper fileModelHelper;
 	private final FileStorage fileStorage;
+	private final UploadedFileHelper uploadedFileHelper;
 
 	ImageUploadHelper(FileStorage fileStorage, WebappDaoFactory webAppDaoFactory) {
-		this.webAppDaoFactory = webAppDaoFactory;
-		this.fileModelHelper = new FileModelHelper(webAppDaoFactory);
 		this.fileStorage = fileStorage;
+		this.uploadedFileHelper = new UploadedFileHelper(fileStorage,
+				webAppDaoFactory);
 	}
 
 	/**
@@ -178,10 +172,8 @@ public class ImageUploadHelper {
 			inputStream = fileItem.getInputStream();
 			String mimeType = getMimeType(fileItem);
 			String filename = getSimpleFilename(fileItem);
-			WebappDaoFactory wadf = vreq.getWebappDaoFactory();
-
-			FileInfo fileInfo = FileModelHelper.createFile(fileStorage, wadf,
-					filename, mimeType, inputStream);
+			FileInfo fileInfo = uploadedFileHelper.createFile(filename,
+					mimeType, inputStream);
 
 			TempFileHolder.attach(vreq.getSession(), ATTRIBUTE_TEMP_FILE,
 					fileInfo);
@@ -287,13 +279,14 @@ public class ImageUploadHelper {
 			mainStream = fileStorage.getInputStream(mainBytestreamUri,
 					mainFilename);
 
-			thumbStream = scaleImageForThumbnail(mainStream, crop);
+			thumbStream = new ImageUploadThumbnailer(THUMBNAIL_HEIGHT,
+					THUMBNAIL_WIDTH).cropAndScale(mainStream, crop);
 
 			String mimeType = RECOGNIZED_FILE_TYPES.get(".jpg");
 			String filename = createThumbnailFilename(mainFilename);
+			FileInfo fileInfo = uploadedFileHelper.createFile(filename,
+					mimeType, thumbStream);
 
-			FileInfo fileInfo = FileModelHelper.createFile(fileStorage,
-					webAppDaoFactory, filename, mimeType, thumbStream);
 			log.debug("Created thumbnail: " + fileInfo);
 			return fileInfo;
 		} catch (FileAlreadyExistsException e) {
@@ -321,64 +314,11 @@ public class ImageUploadHelper {
 	}
 
 	/**
-	 * If this entity already had a main image, remove the connection. If the
-	 * image and the thumbnail are no longer used by anyone, remove them from
-	 * the model, and from the file system.
+	 * If this entity already had a main image, remove it. If the image and the
+	 * thumbnail are no longer used by anyone, throw them away.
 	 */
 	void removeExistingImage(Individual person) {
-		Individual mainImage = fileModelHelper.removeMainImage(person);
-		if (mainImage == null) {
-			return;
-		}
-
-		removeExistingThumbnail(person);
-
-		if (!fileModelHelper.isFileReferenced(mainImage)) {
-			Individual bytes = FileModelHelper.getBytestreamForFile(mainImage);
-			if (bytes != null) {
-				try {
-					fileStorage.deleteFile(bytes.getURI());
-				} catch (IOException e) {
-					throw new IllegalStateException(
-							"Can't delete the main image file: '"
-									+ bytes.getURI() + "' for '"
-									+ person.getName() + "' ("
-									+ person.getURI() + ")", e);
-				}
-			}
-			fileModelHelper.removeFileFromModel(mainImage);
-		}
-	}
-
-	/**
-	 * If the entity already has a thumbnail, remove it. If there are no other
-	 * references to the thumbnail, delete it from the model and from the file
-	 * system.
-	 */
-	void removeExistingThumbnail(Individual person) {
-		Individual mainImage = FileModelHelper.getMainImage(person);
-		Individual thumbnail = FileModelHelper.getThumbnailForImage(mainImage);
-		if (thumbnail == null) {
-			return;
-		}
-
-		fileModelHelper.removeThumbnail(person);
-
-		if (!fileModelHelper.isFileReferenced(thumbnail)) {
-			Individual bytes = FileModelHelper.getBytestreamForFile(thumbnail);
-			if (bytes != null) {
-				try {
-					fileStorage.deleteFile(bytes.getURI());
-				} catch (IOException e) {
-					throw new IllegalStateException(
-							"Can't delete the thumbnail file: '"
-									+ bytes.getURI() + "' for '"
-									+ person.getName() + "' ("
-									+ person.getURI() + ")", e);
-				}
-			}
-			fileModelHelper.removeFileFromModel(thumbnail);
-		}
+		uploadedFileHelper.removeMainImage(person);
 	}
 
 	/**
@@ -386,7 +326,7 @@ public class ImageUploadHelper {
 	 */
 	void storeImageFiles(Individual entity, FileInfo newImage,
 			FileInfo thumbnail) {
-		FileModelHelper.setImagesOnEntity(webAppDaoFactory, entity, newImage,
+		uploadedFileHelper.setImagesOnEntity(entity.getURI(), newImage,
 				thumbnail);
 	}
 
@@ -444,85 +384,6 @@ public class ImageUploadHelper {
 	}
 
 	/**
-	 * Create a thumbnail from a source image, given a cropping rectangle (x, y,
-	 * width, height).
-	 */
-	private InputStream scaleImageForThumbnail(InputStream source,
-			CropRectangle crop) throws IOException {
-		try {
-			// Read the main image.
-			MemoryCacheSeekableStream stream = new MemoryCacheSeekableStream(
-					source);
-			RenderedOp mainImage = JAI.create("stream", stream);
-			int imageWidth = mainImage.getWidth();
-			int imageHeight = mainImage.getHeight();
-
-			// Adjust the crop rectangle, if needed, to compensate for scaling
-			// and to limit to the image size.
-			crop = adjustCropRectangle(crop, imageWidth, imageHeight);
-
-			// Crop the image.
-			ParameterBlock cropParams = new ParameterBlock();
-			cropParams.addSource(mainImage);
-			cropParams.add((float) crop.x);
-			cropParams.add((float) crop.y);
-			cropParams.add((float) crop.width);
-			cropParams.add((float) crop.height);
-			RenderedOp croppedImage = JAI.create("crop", cropParams);
-
-			// Figure the scales.
-			float scaleWidth = ((float) THUMBNAIL_WIDTH) / ((float) crop.width);
-			float scaleHeight = ((float) THUMBNAIL_HEIGHT)
-					/ ((float) crop.height);
-			log.debug("Generating a thumbnail, scales: " + scaleWidth + ", "
-					+ scaleHeight);
-
-			// Create the parameters for the scaling operation.
-			Interpolation interpolation = Interpolation
-					.getInstance(Interpolation.INTERP_BILINEAR);
-			ParameterBlock scaleParams = new ParameterBlock();
-			scaleParams.addSource(croppedImage);
-			scaleParams.add(scaleWidth); // x scale factor
-			scaleParams.add(scaleHeight); // y scale factor
-			scaleParams.add(0.0F); // x translate
-			scaleParams.add(0.0F); // y translate
-			scaleParams.add(interpolation);
-			RenderedOp image2 = JAI.create("scale", scaleParams);
-
-			JPEGEncodeParam encodeParam = new JPEGEncodeParam();
-			encodeParam.setQuality(1.0F);
-
-			ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-			JAI.create("encode", image2, bytes, "JPEG", encodeParam);
-			bytes.close();
-			return new ByteArrayInputStream(bytes.toByteArray());
-		} catch (Exception e) {
-			throw new IllegalStateException("Failed to scale the image", e);
-		}
-	}
-
-	/**
-	 * The bounds of the cropping rectangle should be limited to the bounds of
-	 * the image.
-	 */
-	private CropRectangle adjustCropRectangle(CropRectangle crop,
-			int imageWidth, int imageHeight) {
-		log.debug("Generating a thumbnail, initial crop info: " + crop);
-
-		// Insure that x and y fall within the image dimensions.
-		int x = Math.max(0, Math.min(imageWidth, Math.abs(crop.x)));
-		int y = Math.max(0, Math.min(imageHeight, Math.abs(crop.y)));
-
-		// Insure that width and height are reasonable.
-		int w = Math.max(5, Math.min(imageWidth - x, crop.width));
-		int h = Math.max(5, Math.min(imageHeight - y, crop.height));
-
-		CropRectangle bounded = new CropRectangle(x, y, h, w);
-		log.debug("Generating a thumbnail, bounded crop info: " + bounded);
-		return bounded;
-	}
-
-	/**
 	 * <p>
 	 * This {@link ImagingListener} means that Java Advanced Imaging won't dump
 	 * an exception log to {@link System#out}. It writes to the log, instead.
@@ -532,7 +393,7 @@ public class ImageUploadHelper {
 	 * is written as a simple log message.
 	 * </p>
 	 */
-	private static class NonNoisyImagingListener implements ImagingListener {
+	static class NonNoisyImagingListener implements ImagingListener {
 		@Override
 		public boolean errorOccurred(String message, Throwable thrown,
 				Object where, boolean isRetryable) throws RuntimeException {

@@ -10,60 +10,39 @@ import java.util.Properties;
  * model.
  */
 public class ModelCleanerProperties {
-	public static final String PROP_TOMCAT_START_COMMAND = "tomcat_start_command";
-	public static final String PROP_TOMCAT_START_DELAY = "tomcat_start_delay";
-	public static final String PROP_TOMCAT_STOP_COMMAND = "tomcat_stop_command";
-	public static final String PROP_TOMCAT_STOP_DELAY = "tomcat_stop_delay";
 	public static final String PROP_MYSQL_USERNAME = "mysql_username";
 	public static final String PROP_MYSQL_PASSWORD = "mysql_password";
 	public static final String PROP_MYSQL_DB_NAME = "mysql_db_name";
-	public static final String PROP_MYSQL_DUMPFILE = "mysql_dumpfile";
+	public static final String PROP_WEBAPP_DIRECTORY = "vivo_webapp_directory";
+	public static final String PROP_TOMCAT_CHECK_READY_COMMAND = "tomcat_check_ready_command";
+	public static final String PROP_TOMCAT_STOP_COMMAND = "tomcat_stop_command";
+	public static final String PROP_TOMCAT_START_COMMAND = "tomcat_start_command";
 
-	private final String tomcatStartCommand;
-	private final int tomcatStartDelay;
-	private final String tomcatStopCommand;
-	private final int tomcatStopDelay;
 	private final String mysqlUsername;
 	private final String mysqlPassword;
 	private final String mysqlDbName;
-	private final File mysqlDumpfile;
+	private final File webappDirectory;
+	private final String tomcatCheckReadyCommand;
+	private final String tomcatStopCommand;
+	private final String tomcatStartCommand;
 
 	/**
 	 * Confirm that we have the expected properties, and that their values seem
 	 * reasonable.
 	 */
 	public ModelCleanerProperties(Properties props) {
-		this.tomcatStartCommand = getRequiredProperty(props,
-				PROP_TOMCAT_START_COMMAND);
-		this.tomcatStartDelay = getRequiredIntegerProperty(props,
-				PROP_TOMCAT_START_DELAY);
-
-		this.tomcatStopCommand = getRequiredProperty(props,
-				PROP_TOMCAT_STOP_COMMAND);
-		this.tomcatStopDelay = getRequiredIntegerProperty(props,
-				PROP_TOMCAT_STOP_DELAY);
-
 		this.mysqlUsername = getRequiredProperty(props, PROP_MYSQL_USERNAME);
 		this.mysqlPassword = getRequiredProperty(props, PROP_MYSQL_PASSWORD);
 		this.mysqlDbName = getRequiredProperty(props, PROP_MYSQL_DB_NAME);
 
-		this.mysqlDumpfile = confirmDumpfile(props);
-	}
+		this.webappDirectory = confirmWebappDirectory(props);
 
-	public String getTomcatStartCommand() {
-		return tomcatStartCommand;
-	}
-
-	public int getTomcatStartDelay() {
-		return tomcatStartDelay;
-	}
-
-	public String getTomcatStopCommand() {
-		return tomcatStopCommand;
-	}
-
-	public int getTomcatStopDelay() {
-		return tomcatStopDelay;
+		this.tomcatCheckReadyCommand = getRequiredProperty(props,
+				PROP_TOMCAT_CHECK_READY_COMMAND);
+		this.tomcatStopCommand = getRequiredProperty(props,
+				PROP_TOMCAT_STOP_COMMAND);
+		this.tomcatStartCommand = getRequiredProperty(props,
+				PROP_TOMCAT_START_COMMAND);
 	}
 
 	public String getMysqlUsername() {
@@ -78,8 +57,20 @@ public class ModelCleanerProperties {
 		return mysqlDbName;
 	}
 
-	public File getMysqlDumpfile() {
-		return mysqlDumpfile;
+	public File getWebappDirectory() {
+		return webappDirectory;
+	}
+
+	public String getTomcatCheckReadyCommand() {
+		return tomcatCheckReadyCommand;
+	}
+
+	public String getTomcatStopCommand() {
+		return tomcatStopCommand;
+	}
+
+	public String getTomcatStartCommand() {
+		return tomcatStartCommand;
 	}
 
 	/**
@@ -95,44 +86,35 @@ public class ModelCleanerProperties {
 		return value;
 	}
 
-	private int getRequiredIntegerProperty(Properties props, String key) {
-		String value = getRequiredProperty(props, key);
-		try {
-			return Integer.parseInt(value.trim());
-		} catch (NumberFormatException e) {
-			throw new IllegalArgumentException("Property value for '" + key
-					+ "' is not a valid integer: " + value);
-		}
-	}
-
 	/**
-	 * The dumpfile parameter must point to an existing file.
+	 * The dumpfile parameter must point to an existing directory.
 	 */
-	private File confirmDumpfile(Properties props) {
-		String filename = getRequiredProperty(props, PROP_MYSQL_DUMPFILE);
-		File dumpfile = new File(filename);
-		if (!dumpfile.exists()) {
+	private File confirmWebappDirectory(Properties props) {
+		String filename = getRequiredProperty(props, PROP_WEBAPP_DIRECTORY);
+		File webappDirectory = new File(filename);
+		if (!webappDirectory.exists()) {
 			throw new IllegalArgumentException("Invalid value for '"
-					+ PROP_MYSQL_DUMPFILE + "': file '" + filename
+					+ PROP_WEBAPP_DIRECTORY + "': directory '" + filename
 					+ "' does not exist.");
 		}
-		if (!dumpfile.isFile()) {
+		if (!webappDirectory.isDirectory()) {
 			throw new IllegalArgumentException("Invalid value for '"
-					+ PROP_MYSQL_DUMPFILE + "': '" + filename
-					+ "' is not a file.");
+					+ PROP_WEBAPP_DIRECTORY + "': '" + filename
+					+ "' is not a directory.");
 		}
-		if (!dumpfile.canRead()) {
+		if (!webappDirectory.canWrite()) {
 			throw new IllegalArgumentException("Invalid value for '"
-					+ PROP_MYSQL_DUMPFILE + "': file '" + filename
-					+ "' is not readable.");
+					+ PROP_WEBAPP_DIRECTORY + "': directory '" + filename
+					+ "' is not writeable.");
 		}
-		return dumpfile;
+		return webappDirectory;
 	}
 
 	public String toString() {
-		return "\n      tomcatStartCommand: " + tomcatStartCommand
-				+ "\n      tomcatStartDelay: " + tomcatStartDelay
-				+ "\n      tomcatStopCommand: " + tomcatStopCommand
-				+ "\n      tomcatStopDelay: " + tomcatStopDelay;
+		return "\n      mysqlUsername: " + mysqlUsername
+				+ "\n      mysqlPassword: " + mysqlPassword
+				+ "\n      mysqlDbName: " + mysqlDbName
+				+ "\n      webappDirectory: " + webappDirectory;
 	}
+
 }

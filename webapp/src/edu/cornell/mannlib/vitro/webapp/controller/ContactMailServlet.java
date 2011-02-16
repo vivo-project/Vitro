@@ -31,8 +31,8 @@ import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 public class ContactMailServlet extends VitroHttpServlet {
 	private static final Log log = LogFactory.getLog(ContactMailServlet.class);
 	
-    private final static String CONFIRM_PAGE        = "/thankyou.jsp";
-    private final static String ERR_PAGE            = "/contact_err.jsp";
+    private final static String CONFIRM_PAGE        = "/templates/parts/thankyou.jsp";
+    private final static String ERR_PAGE            = "/templates/parts/contact_err.jsp";
     private final static String SPAM_MESSAGE        = "Your message was flagged as spam.";
     private final static String EMAIL_BACKUP_FILE_PATH = "/WEB-INF/LatestMessage.html";
     

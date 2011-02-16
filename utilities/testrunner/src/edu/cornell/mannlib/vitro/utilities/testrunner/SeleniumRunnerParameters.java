@@ -11,9 +11,12 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+
+import edu.cornell.mannlib.vitro.utilities.testrunner.listener.Listener;
+import edu.cornell.mannlib.vitro.utilities.testrunner.listener.LoggingListener;
+import edu.cornell.mannlib.vitro.utilities.testrunner.listener.MulticastListener;
 
 /**
  * Holds the runtime parameters that are read from the properties file, perhaps
@@ -44,12 +47,13 @@ public class SeleniumRunnerParameters {
 	private final Collection<File> suiteParentDirectories;
 	private final ModelCleanerProperties modelCleanerProperties;
 	private final IgnoredTests ignoredTests;
-	private final File summaryCssFile;
 
-	private Collection<File> selectedSuites = Collections.emptySet();
 	private boolean cleanModel = true;
 	private boolean cleanUploads = true;
-	private Listener listener = new Listener(System.out);
+
+	// If we fail during the parameter parsing, we'll still write the log
+	// somewhere.
+	private Listener listener = new LoggingListener(System.out);
 
 	/**
 	 * Read the required properties from the property file, and do some checks
@@ -70,11 +74,10 @@ public class SeleniumRunnerParameters {
 		this.uploadDirectory = checkReadWriteDirectory(props,
 				PROP_UPLOAD_DIRECTORY);
 
-		this.summaryCssFile = checkSummaryCssFile(props);
-
 		this.outputDirectory = checkOutputDirectory(props);
 		this.logFile = new File(this.outputDirectory, LOGFILE_NAME);
-		this.listener = new Listener(this.logFile);
+		this.listener = new MulticastListener();
+		addListener(new LoggingListener(this.logFile));
 
 		this.suiteParentDirectories = checkSuiteParentDirectories(props);
 
@@ -114,16 +117,6 @@ public class SeleniumRunnerParameters {
 				}
 			}
 		}
-	}
-
-	/**
-	 * The CSS file must be specified, must exist, and must be readable.
-	 */
-	private File checkSummaryCssFile(Properties props) {
-		String summaryCssPath = getRequiredProperty(props, PROP_SUMMARY_CSS);
-		File cssFile = new File(summaryCssPath);
-		FileHelper.checkReadableFile(cssFile, "File '" + summaryCssPath + "'");
-		return cssFile;
 	}
 
 	/**
@@ -341,6 +334,15 @@ public class SeleniumRunnerParameters {
 		return seleniumJarPath;
 	}
 
+	public void addListener(Listener l) {
+		if (listener instanceof MulticastListener) {
+			((MulticastListener) listener).addListener(l);
+		} else {
+			throw new IllegalStateException("Listener is not a multi-cast -- "
+					+ "can't add new listeners.");
+		}
+	}
+
 	public Listener getListener() {
 		return listener;
 	}
@@ -361,10 +363,6 @@ public class SeleniumRunnerParameters {
 		return logFile;
 	}
 
-	public File getSummaryCssFile() {
-		return summaryCssFile;
-	}
-
 	public Collection<File> getSuiteParentDirectories() {
 		return suiteParentDirectories;
 	}
@@ -375,14 +373,6 @@ public class SeleniumRunnerParameters {
 
 	public IgnoredTests getIgnoredTests() {
 		return ignoredTests;
-	}
-
-	public void setSelectedSuites(Collection<File> selectedSuites) {
-		this.selectedSuites = selectedSuites;
-	}
-
-	public Collection<File> getSelectedSuites() {
-		return new ArrayList<File>(this.selectedSuites);
 	}
 
 	public boolean isCleanModel() {
@@ -411,17 +401,8 @@ public class SeleniumRunnerParameters {
 				+ "\n  outputDirectory: " + outputDirectory
 				+ "\n  suiteParentDirectories: " + suiteParentDirectories
 				+ "\n  modelCleanerProperties: " + modelCleanerProperties
-				+ "\n" + ignoredTests + "\n\n  selectedSuites: "
-				+ showSelectedSuites() + "\n  cleanModel: " + cleanModel
+				+ "\n" + ignoredTests + "\n  cleanModel: " + cleanModel
 				+ "\n  cleanUploads: " + cleanUploads;
-	}
-
-	private String showSelectedSuites() {
-		StringBuilder buffer = new StringBuilder();
-		for (File suite : selectedSuites) {
-			buffer.append("\n      ").append(suite.getPath());
-		}
-		return buffer.toString();
 	}
 
 	/**
@@ -429,7 +410,6 @@ public class SeleniumRunnerParameters {
 	 * recognize a suite directory because it contains a file named Suite.html.
 	 */
 	public Collection<File> findSuiteDirs(File parentDir) {
-		System.out.println("parentDir: " + parentDir);
 		return Arrays.asList(parentDir.listFiles(new FileFilter() {
 			public boolean accept(File pathname) {
 				if (!pathname.isDirectory()) {

@@ -2,23 +2,20 @@
 
 package edu.cornell.mannlib.vitro.webapp.search.controller;
 
-import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
-import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreeMarkerHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ExceptionResponseValues;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
-import freemarker.template.Configuration;
 
 /**
  * Accepts requests to rebuild or update the search index.  It uses
@@ -31,72 +28,29 @@ import freemarker.template.Configuration;
  * An example of the IndexBuilder and LuceneIndexer getting setup is in LuceneSetup.
  *
  * @author bdc34
- *
  */
-public class IndexController extends FreeMarkerHttpServlet {
+public class IndexController extends FreemarkerHttpServlet {
 	
-	private static final Log log = LogFactory.getLog(IndexController.class.getName());
+	private static final Log log = LogFactory.getLog(IndexController.class);
 	
-//    public void doPost(HttpServletRequest request, HttpServletResponse response)
-//    throws ServletException,IOException {
-//        doGet(request, response);
-//    }
-//
-//    public void doGet( HttpServletRequest request, HttpServletResponse response )
-//    throws IOException, ServletException {
-//        
-//        Object obj = request.getSession().getAttribute("loginHandler");        
-//        LoginFormBean loginHandler = null;
-//        if( obj != null && obj instanceof LoginFormBean )
-//            loginHandler = ((LoginFormBean)obj);
-//        if( loginHandler == null ||
-//            ! "authenticated".equalsIgnoreCase(loginHandler.getLoginStatus()) ||
-//             Integer.parseInt(loginHandler.getLoginRole()) <= 5 ){       
-//            
-//            String redirectURL=request.getContextPath() + Controllers.SITE_ADMIN + "?login=block";
-//            response.sendRedirect(redirectURL);
-//            return;
-//        }
-//        
-//        long start = System.currentTimeMillis();
-//        try {
-//            IndexBuilder builder = (IndexBuilder)getServletContext().getAttribute(IndexBuilder.class.getName());
-//            if( request.getParameter("update") != null ){
-//                builder.doUpdateIndex();
-//            }else{
-//                builder.doIndexRebuild();
-//            }
-//            
-//        } catch (IndexingException e) {
-//            log.error("IndexController -- Error building index: " + e);
-//        }
-//        long delta = System.currentTimeMillis() - start;
-//        String msg = "Search index complete. Elapsed time " + delta + " msec.";
-//    }
-    
-    
-    protected String getTitle(String siteName) {
+    @Override
+    protected String getTitle(String siteName, VitroRequest vreq) {
         return "Full Search Index Rebuild";
     }
     
-    protected String getBody(VitroRequest request, Map<String, Object> body, Configuration config) {       
+    @Override
+    protected int requiredLoginLevel() {
+        // User must be logged in to view this page.
+        return LoginStatusBean.DBA;
+    }
+    
+    @Override
+    protected ResponseValues processRequest(VitroRequest vreq) { 
+        Map<String, Object> body = new HashMap<String, Object>();
         
-        Object obj = request.getSession().getAttribute("loginHandler");        
-        LoginFormBean loginHandler = null;
-        if( obj != null && obj instanceof LoginFormBean )
-            loginHandler = ((LoginFormBean)obj);
-        if( loginHandler == null ||
-            ! "authenticated".equalsIgnoreCase(loginHandler.getLoginStatus()) ||
-             Integer.parseInt(loginHandler.getLoginRole()) <= 5 ){       
-            
-            body.put("message","You must login to rebuild the search index."); 
-            return mergeBodyToTemplate("message.ftl", body, config);
-        }
-        
-        long start = System.currentTimeMillis();
         try {
             IndexBuilder builder = (IndexBuilder)getServletContext().getAttribute(IndexBuilder.class.getName());
-            if( request.getParameter("update") != null ){
+            if( vreq.getParameter("update") != null ){
                 builder.doUpdateIndex();
             }else{
                 builder.doIndexRebuild();
@@ -105,10 +59,10 @@ public class IndexController extends FreeMarkerHttpServlet {
         } catch (IndexingException e) {
         	log.error("Error rebuilding search index",e);
         	body.put("errorMessage", "There was an error while rebuilding the search index. " + e.getMessage());
-        	return mergeBodyToTemplate("errorMessage.ftl", body, config);            
+        	return new ExceptionResponseValues(Template.ERROR_MESSAGE.toString(), body, e);            
         }
         
-         body.put("message","Rebuilding of index started."); 
-        return mergeBodyToTemplate("message.ftl", body, config);
+        body.put("message","Rebuilding of index started."); 
+        return new TemplateResponseValues(Template.MESSAGE.toString(), body);
     }
 }

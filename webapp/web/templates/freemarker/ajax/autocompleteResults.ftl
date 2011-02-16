@@ -3,7 +3,7 @@
 <#-- Template for autocomplete results. -->
 
 <#--
-<#import "json.ftl" as json>
+<#import "lib-json.ftl" as json>
 <@json.array results />
 -->
 

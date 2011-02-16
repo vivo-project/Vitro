@@ -11,7 +11,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.rdf.model.impl.Util;
 
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.DbAdminEditingIdentifierFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.Identifier;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
@@ -20,14 +20,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFac
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.VisitingPolicyIface;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AddDataPropStmt;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AddObjectPropStmt;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AddResource;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.DropDataPropStmt;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.DropObjectPropStmt;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.DropResource;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.EditDataPropStmt;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.EditObjPropStmt;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.admin.AddNewUser;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.admin.LoadOntology;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.admin.RebuildTextIndex;
@@ -42,6 +34,14 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ontology.CreateOwlC
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ontology.DefineDataProperty;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ontology.DefineObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ontology.RemoveOwlClass;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPropStmt;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropStmt;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropDataPropStmt;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropObjectPropStmt;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditDataPropStmt;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjPropStmt;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.resource.AddResource;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.resource.DropResource;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 /**
@@ -137,7 +137,7 @@ public class DbAdminEditingPolicy implements VisitingPolicyIface {
             return pd.setMessage("Unable to get a role for the dbAdmin from IdBundle");
         
         try{
-            if( Integer.parseInt( roleStr ) /*<*/ != LoginFormBean.DBA) {
+            if( Integer.parseInt( roleStr ) /*<*/ != LoginStatusBean.DBA) {
                 return pd.setMessage("DbAdminEditingPolicy found role of "+roleStr+" and only authorizes for users logged in as DB_ADMIN");
             }
         } catch(NumberFormatException nef){
@@ -267,27 +267,27 @@ public class DbAdminEditingPolicy implements VisitingPolicyIface {
             return new BasicPolicyDecision(this.defaultFailure,"DbAdminEditingPolicy, null action or ids");
         }
         //cannot edit resources related to system
-        if(  prohibitedNs.contains( action.uriOfSubject() ) ) { // jc55 was getResourceURI()
+        if(  prohibitedNs.contains( action.getSubjectUri() ) ) { // jc55 was getResourceURI()
             log.debug("DbAdminEditingPolicy for DropDatapropStmt is inconclusive because it does not grant access to admin resources");
             return new BasicPolicyDecision(this.defaultFailure,"DbAdminEditingPolicy does not grant access to admin resources");
         }
 
         //many predicates are prohibited by namespace but there are many ones that dbAdmin editors need to work with
-        if(  prohibitedNs.contains(action.uriOfPredicate() ) && ! editableVitroUris.contains( action.uriOfPredicate() ) ) {
+        if(  prohibitedNs.contains(action.getPredicateUri() ) && ! editableVitroUris.contains( action.getPredicateUri() ) ) {
             log.debug("DbAdminEditingPolicy for DropDatapropStmt is inconclusive because it does not grant access to admin controls");
             return new BasicPolicyDecision(this.defaultFailure,"DbAdminEditingPolicy does not grant access to admin controls");
         }
         
         //cannot edit resources related to system
-        if( !canModifyResource( action.uriOfSubject() ) ) {
-            log.debug("DbAdminEditingPolicy for EditDatapropStmt action is inconclusive because it does not grant access to admin resources; cannot modify " + action.uriOfSubject());
+        if( !canModifyResource( action.getSubjectUri() ) ) {
+            log.debug("DbAdminEditingPolicy for EditDatapropStmt action is inconclusive because it does not grant access to admin resources; cannot modify " + action.getSubjectUri());
             return new BasicPolicyDecision(this.defaultFailure,"DbAdminEditingPolicy does not grant access to admin resources; " +
-                    "cannot modify " + action.uriOfSubject());
+                    "cannot modify " + action.getSubjectUri());
         }
-        if( !canModifyPredicate( action.uriOfPredicate() ) ) {
-            log.debug("DbAdminEditingPolicy does not grant access to prohibited predicates or certain namespaces: cannot modify " + action.uriOfPredicate());
+        if( !canModifyPredicate( action.getPredicateUri() ) ) {
+            log.debug("DbAdminEditingPolicy does not grant access to prohibited predicates or certain namespaces: cannot modify " + action.getPredicateUri());
             return new BasicPolicyDecision(this.defaultFailure,"DbAdminEditingPolicy does not grant access to prohibited predicates or certain namespaces: " +
-                    "cannot modify " + action.uriOfPredicate());
+                    "cannot modify " + action.getPredicateUri());
         }
         log.debug("DbAdminEditingPolicy for DropDatapropStmt returns authorization because the user is a dbAdmin");
         
@@ -324,17 +324,17 @@ public class DbAdminEditingPolicy implements VisitingPolicyIface {
             return new BasicPolicyDecision(this.defaultFailure,"DbAdminEditingPolicy has null action or ids");
 
         //cannot edit resources related to system
-        if(  prohibitedNs.contains( action.getResourceUri() ) )
+        if(  prohibitedNs.contains( action.getSubjectUri() ) )
             return new BasicPolicyDecision(this.defaultFailure,"DbAdminEditingPolicy does not grant access to admin resources from prohibited namespaces");
 
         //many predicates are prohibited by namespace but there are many ones that dbAdmin editors need to work with
-        if(  prohibitedNs.contains(action.getDataPropUri() ) && ! editableVitroUris.contains( action.getDataPropUri() ) )
+        if(  prohibitedNs.contains(action.getPredicateUri() ) && ! editableVitroUris.contains( action.getPredicateUri() ) )
             return new BasicPolicyDecision(this.defaultFailure,"DbAdminEditingPolicy does not grant access to admin controls");
         
-        if( !canModifyPredicate( action.getDataPropUri() ) ) {
-            log.debug("DbAdminEditingPolicy for AddDataPropStmt does not grant access to prohibited predicates or certain namespaces: cannot modify " + action.getDataPropUri());
+        if( !canModifyPredicate( action.getPredicateUri() ) ) {
+            log.debug("DbAdminEditingPolicy for AddDataPropStmt does not grant access to prohibited predicates or certain namespaces: cannot modify " + action.getPredicateUri());
             return new BasicPolicyDecision(this.defaultFailure,"DbAdminEditingPolicy for AddDataPropStmt does not grant access to prohibited predicates or certain namespaces: " +
-                    "cannot modify " + action.getDataPropUri());
+                    "cannot modify " + action.getPredicateUri());
         }
         
         return new BasicPolicyDecision(Authorization.AUTHORIZED,"DbAdminEditingPolicy: user may add this data property statement");
@@ -351,15 +351,15 @@ public class DbAdminEditingPolicy implements VisitingPolicyIface {
         }
 
         //cannot edit resources related to system
-        if( !canModifyResource( action.uriOfSubject() ) ) {
-            log.debug("DbAdminEditingPolicy for EditDatapropStmt action is inconclusive because it does not grant access to admin resources; cannot modify " + action.uriOfSubject());
+        if( !canModifyResource( action.getSubjectUri() ) ) {
+            log.debug("DbAdminEditingPolicy for EditDatapropStmt action is inconclusive because it does not grant access to admin resources; cannot modify " + action.getSubjectUri());
             return new BasicPolicyDecision(this.defaultFailure,"DbAdminEditingPolicy does not grant access to admin resources; " +
-                    "cannot modify " + action.uriOfSubject());
+                    "cannot modify " + action.getSubjectUri());
         }
-        if( !canModifyPredicate( action.uriOfPredicate() ) ) {
-            log.debug("DbAdminEditingPolicy for EditDataPropStmt does not grant access to prohibited predicates or certain namespaces: cannot modify " + action.uriOfPredicate());
+        if( !canModifyPredicate( action.getPredicateUri() ) ) {
+            log.debug("DbAdminEditingPolicy for EditDataPropStmt does not grant access to prohibited predicates or certain namespaces: cannot modify " + action.getPredicateUri());
             return new BasicPolicyDecision(this.defaultFailure,"DbAdminEditingPolicy for EditDataPropStmt does not grant access to prohibited predicates or certain namespaces: " +
-                    "cannot modify " + action.uriOfPredicate());
+                    "cannot modify " + action.getPredicateUri());
         }
         
         log.debug("DbAdminEditingPolicy for EditDatapropStmt returns authorization because the user is a dbAdmin");

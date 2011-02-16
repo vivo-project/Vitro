@@ -11,16 +11,18 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.store.LockObtainFailedException;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
@@ -35,15 +37,20 @@ import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexerIface;
  */
 public class LuceneIndexer implements IndexerIface {
 	
-	private final static Log log = LogFactory.getLog(LuceneIndexer.class.getName());	
+	private final static Log log = LogFactory.getLog(LuceneIndexer.class);
+	
     LinkedList<Obj2DocIface> obj2DocList = new LinkedList<Obj2DocIface>();
-    String indexDir = null;
+    String baseIndexDir = null;
+    String liveIndexDir = null;
     Analyzer analyzer = null;
     List<Searcher> searchers = Collections.EMPTY_LIST;
     IndexWriter writer = null;
     boolean indexing = false;
+    boolean fullRebuild = false;
     HashSet<String> urisIndexed;
     private LuceneIndexFactory luceneIndexFactory;
+    private String currentOffLineDir;
+    
 
     //JODA timedate library can use java date format strings.
     //http://java.sun.com/j2se/1.3/docs/api/java/text/SimpleDateFormat.html
@@ -70,40 +77,15 @@ public class LuceneIndexer implements IndexerIface {
     private static final IndexWriter.MaxFieldLength MAX_FIELD_LENGTH =
         IndexWriter.MaxFieldLength.UNLIMITED;
 
-    public LuceneIndexer(String indexDir, List<Searcher> searchers, Analyzer analyzer ) throws IOException{
-        this.indexDir = indexDir;
+    public LuceneIndexer(String baseIndexDir, String liveIndexDir,  List<Searcher> searchers, Analyzer analyzer ) throws IOException{
+        this.baseIndexDir = baseIndexDir;
+        this.liveIndexDir = liveIndexDir;
         this.analyzer = analyzer;
         if( searchers != null )
             this.searchers = searchers;
-        makeIndexIfNone();
-    }
-    
-    private synchronized void makeIndexIfNone() throws IOException {        
-        if( !indexExists( indexDir ) )
-            makeNewIndex();                           
-    }
 
-    private boolean indexExists(String dir){
-        Directory fsDir = null;
-        IndexSearcher isearcher = null ;
-        try{
-            fsDir = FSDirectory.getDirectory(indexDir);
-            isearcher = new IndexSearcher(fsDir);
-            return true;
-        }catch(Exception ex){
-            return false;
-        }finally{
-            try{
-                if( isearcher != null )
-                    isearcher.close();
-                if( fsDir != null)
-                    fsDir.close();
-            }catch(Exception ex){}
-        }
-    }
-
-    public synchronized void setIndexDir(String dirName) {
-        indexDir = dirName;
+        updateTo1p2();
+        makeEmptyIndexIfNone();        
     }
 
     public synchronized void addObj2Doc(Obj2DocIface o2d) {
@@ -122,9 +104,16 @@ public class LuceneIndexer implements IndexerIface {
         searchers.add( s );
     }
     
+    @Override
+    public synchronized void prepareForRebuild() throws IndexingException {
+        if( this.indexing )
+            log.error("Only an update will be performed, must call prepareForRebuild() before startIndexing()");
+        else
+            this.fullRebuild = true;        
+    }
+    
     /**
      * Checks to see if indexing is currently happening.
-     * @return
      */
     public synchronized boolean isIndexing(){
         return indexing;
@@ -132,28 +121,29 @@ public class LuceneIndexer implements IndexerIface {
 
     public synchronized void startIndexing() throws IndexingException{
         while( indexing ){ //wait for indexing to end.
-            log.info("LuceneIndexer.startIndexing() waiting...");
+            log.debug("LuceneIndexer.startIndexing() waiting...");
             try{ wait(); } catch(InterruptedException ex){}
         }
+        checkStartPreconditions();
         try {
-            log.info("Starting to index");
-            if( writer == null )
-                writer =  
-                    new IndexWriter(indexDir,analyzer,false, MAX_FIELD_LENGTH);
+            log.debug("Starting to index");        
+            if( this.fullRebuild ){
+                String offLineDir = getOffLineBuildDir();
+                this.currentOffLineDir = offLineDir;
+                writer = new IndexWriter(offLineDir, analyzer, true, MAX_FIELD_LENGTH);
+            }else{                
+                writer = getLiveIndexWriter(false);                
+            }
             indexing = true;
             urisIndexed = new HashSet<String>();
-        } catch(Throwable ioe){
-            try{
-                makeNewIndex();
-                indexing = true;
-            }catch(Throwable ioe2){
-                throw new IndexingException("LuceneIndexer.startIndexing() unable " +
-                        "to make indexModifier " + ioe2.getMessage());
-            }        
+        } catch(Throwable th){
+            throw new IndexingException("startIndexing() unable " +
+                         "to make IndexWriter:" + th.getMessage());
         }finally{
             notifyAll();
         }
     }
+
 
     public synchronized void endIndexing() {
         if( ! indexing ){ 
@@ -162,10 +152,13 @@ public class LuceneIndexer implements IndexerIface {
         }            
         try {
         	urisIndexed = null;
-            log.info("ending index");
+            log.debug("ending index");
             if( writer != null )
                 writer.optimize();
-                                    
+                     
+            if( this.fullRebuild )
+                bringRebuildOnLine();
+            
             //close the searcher so it will find the newly indexed documents
             for( Searcher s : searchers){
                 s.close();
@@ -176,17 +169,22 @@ public class LuceneIndexer implements IndexerIface {
         } catch (IOException e) {
             log.error("LuceneIndexer.endIndexing() - "
                     + "unable to optimize lucene index: \n" + e);
-        }finally{
-            closeModifier();
+        }finally{            
+            fullRebuild = false;
+            closeWriter();
             indexing = false;
             notifyAll();
         }
     }
 
-    public synchronized Analyzer getAnalyzer(){
-           return analyzer;
-    }
+    public void setLuceneIndexFactory(LuceneIndexFactory lif) {
+        luceneIndexFactory = lif;    
+    } 
 
+    public synchronized Analyzer getAnalyzer(){
+        return analyzer;
+    }
+    
     /**
      * Indexes an object.  startIndexing() must be called before this method
      * to setup the modifier.
@@ -205,28 +203,29 @@ public class LuceneIndexer implements IndexerIface {
         	if( urisIndexed.contains(ind.getURI()) ){
         		log.debug("already indexed " + ind.getURI() );
         		return;
-        	}else
+        	}else{
         		urisIndexed.add(ind.getURI());
-        	
-            Iterator<Obj2DocIface> it = getObj2DocList().iterator();
-            while (it.hasNext()) {
-                Obj2DocIface obj2doc = (Obj2DocIface) it.next();
-                if (obj2doc.canTranslate(ind)) {
-                	Document d = (Document) obj2doc.translate(ind);
-                	if( d != null){                		                		                		
-                		if( !newDoc ){                    	                    		
-                			writer.updateDocument((Term)obj2doc.getIndexId(ind), d);
-                			log.debug("updated " + ind.getName() + " " + ind.getURI());
-                		}else{                    	
-                    		writer.addDocument(d);
-                    		log.debug("added " + ind.getName() + " " + ind.getURI());
-                		}
-                    }else{
-                    	log.debug("could not translate, removing from index " + ind.getURI());
-                    	writer.deleteDocuments((Term)obj2doc.getIndexId(ind));
+        	    log.debug("indexing " + ind.getURI());
+                Iterator<Obj2DocIface> it = getObj2DocList().iterator();
+                while (it.hasNext()) {
+                    Obj2DocIface obj2doc = (Obj2DocIface) it.next();
+                    if (obj2doc.canTranslate(ind)) {
+                    	Document d = (Document) obj2doc.translate(ind);
+                    	if( d != null){                		                		                		
+                    		if( !newDoc ){                    	                    		
+                    			writer.updateDocument((Term)obj2doc.getIndexId(ind), d);
+                    			log.debug("updated " + ind.getName() + " " + ind.getURI());
+                    		}else{                    	
+                        		writer.addDocument(d);
+                        		log.debug("added " + ind.getName() + " " + ind.getURI());
+                    		}
+                        }else{
+                        	log.debug("removing from index " + ind.getURI());
+                        	writer.deleteDocuments((Term)obj2doc.getIndexId(ind));
+                        }
                     }
                 }
-            }
+        	}
         } catch (IOException ex) {
             throw new IndexingException(ex.getMessage());
         }
@@ -240,7 +239,7 @@ public class LuceneIndexer implements IndexerIface {
         if( writer == null )
             throw new IndexingException("LuceneIndexer: cannot delete from " +
             		"index, IndexWriter is null.");
-        try {
+        try {            
             Iterator<Obj2DocIface> it = getObj2DocList().iterator();
             while (it.hasNext()) {
                 Obj2DocIface obj2doc = (Obj2DocIface) it.next();
@@ -255,40 +254,13 @@ public class LuceneIndexer implements IndexerIface {
     }
 
     /**
-     * clear the index by deleting the directory and make a new empty index.
-     */
-    public synchronized void clearIndex() throws IndexingException{
-        
-        log.debug("Clearing the index at "+indexDir);
-        closeModifier();
-        deleteDir(new File(indexDir));
-        
-        try {
-            makeNewIndex();
-            for(Searcher s : searchers){
-                s.close();
-            }
-            //this is the call that replaces Searcher.close()
-            luceneIndexFactory.forceNewIndexSearcher();
-        } catch (IOException e) {
-            throw new IndexingException(e.getMessage());
-        }
-        notifyAll();
-    }
-
-    /**
      *  This will make a new directory and create a lucene index in it.
      */
     private synchronized void makeNewIndex() throws  IOException{
-        log.debug("Making new index dir and initially empty lucene index  at " + indexDir);
-        closeModifier();
-        File dir = new File(indexDir);
-        dir.mkdirs();
-        //This will wipe out an existing index because of the true flag
-        writer = new IndexWriter(indexDir,analyzer,true,MAX_FIELD_LENGTH);
+     
     }
-
-    private synchronized void closeModifier(){
+    
+    private synchronized void closeWriter(){
         if( writer != null )try{
             writer.commit();
             writer.close();
@@ -303,10 +275,63 @@ public class LuceneIndexer implements IndexerIface {
         writer = null;
     }   
 
+    private synchronized void bringRebuildOnLine() {
+        closeWriter();
+        File offLineDir = new File(currentOffLineDir);
+        File liveDir = new File(liveIndexDir);
+
+        log.debug("deleting old live directory " + liveDir.getAbsolutePath());
+        boolean deleted = deleteDir(liveDir);
+        if (! deleted ){
+            log.debug("failed to delete live index directory " 
+                    + liveDir.getAbsolutePath());
+            log.debug("Attempting to close searcher and delete live directory");
+            this.luceneIndexFactory.forceClose();
+            boolean secondDeleted = deleteDir(liveDir);
+            if( ! secondDeleted ){
+                log.error("Search index is out of date and cannot be replaced " +
+                		"because could not remove lucene index from directory" 
+                        + liveDir.getAbsolutePath());
+            }
+            return;
+        }
+
+        log.debug("moving " + offLineDir.getAbsolutePath() + " to " 
+                + liveDir.getAbsolutePath());
+        
+        boolean success =  offLineDir.renameTo( liveDir );
+        if( ! success ){
+            log.error("could not move off line index at " 
+                    + offLineDir.getAbsolutePath() + " to live index directory " 
+                    + liveDir.getAbsolutePath());
+            return;
+        }            
+
+        File oldWorkignDir = new File(currentOffLineDir);
+        if( oldWorkignDir.exists() )
+            log.debug("old working directory should have been removed " +
+            		"but still exits at " + oldWorkignDir.getAbsolutePath());
+
+        currentOffLineDir = null;
+    }  
+    
+    private synchronized String getOffLineBuildDir(){
+        File baseDir = new File(baseIndexDir);
+        baseDir.mkdirs();
+        File tmpDir = new File( baseIndexDir + File.separator + "tmp" );
+        tmpDir.mkdir();        
+        File offLineBuildDir = new File( baseIndexDir + File.separator + "tmp"  + File.separator + "offLineRebuild" + System.currentTimeMillis());
+        offLineBuildDir.mkdir();
+        String dirName = offLineBuildDir.getAbsolutePath();
+        if( ! dirName.endsWith(File.separator) )
+            dirName = dirName + File.separator;
+        return dirName;            
+    }
+    
     public long getModified() {
         long rv = 0;
         try{
-            FSDirectory d = FSDirectory.getDirectory(indexDir);
+            FSDirectory d = FSDirectory.getDirectory(liveIndexDir);
             rv = IndexReader.lastModified(d);
         }catch(IOException ex){
             log.error("LuceneIndexer.getModified() - could not get modified time "+ ex);
@@ -322,18 +347,130 @@ public class LuceneIndexer implements IndexerIface {
         if (dir.isDirectory()) {
             String[] children = dir.list();
             for (int i=0; i<children.length; i++) {
-                boolean success = deleteDir(new File(dir, children[i]));
-                if (!success) {
+                File child = new File(dir, children[i]);
+				boolean childDeleted = deleteDir(child);
+                if (!childDeleted) {
+                	log.debug("failed to delete " + child.getAbsolutePath());
                     return false;
                 }
             }
         }
         // The directory is now empty so delete it
-        return dir.delete();
+        boolean deleted = dir.delete();
+        if (!deleted) {
+        	log.debug("failed to delete " + dir.getAbsolutePath());
+        }
+        return deleted;
+    }   
+
+    private void checkStartPreconditions() {        
+        if( this.writer != null )
+            log.error("it is expected that the writer would " +
+                    "be null but it isn't");
+        if( this.currentOffLineDir != null)
+            log.error("it is expected that the current" +
+                    "OffLineDir would be null but it is " + currentOffLineDir);      
+        if( indexing )
+            log.error("indexing should not be set to true just yet");        
     }
 
-    public void setLuceneIndexFactory(LuceneIndexFactory lif) {
-        luceneIndexFactory = lif;    
+    private IndexWriter getLiveIndexWriter(boolean createNew) throws CorruptIndexException, LockObtainFailedException, IOException{
+        return new IndexWriter(this.liveIndexDir, analyzer, createNew, MAX_FIELD_LENGTH);
     }
 
+    private synchronized void makeEmptyIndexIfNone() throws IOException {        
+        if( !liveIndexExists() ){
+            log.debug("Making new index dir and initially empty lucene index  at " + liveIndexDir);
+            closeWriter();
+            makeIndexDirs();            
+            writer = getLiveIndexWriter(true);
+            closeWriter();
+        }                                   
+    }
+
+    private synchronized void makeIndexDirs() throws IOException{            
+        File baseDir = new File(baseIndexDir);
+        if( ! baseDir.exists())
+            baseDir.mkdirs();
+        
+        File dir = new File(liveIndexDir);
+        if( ! dir.exists() )
+            dir.mkdirs();        
+    }
+    
+    private boolean liveIndexExists(){        
+        return indexExistsAt(liveIndexDir);        
+    }    
+
+    private boolean indexExistsAt(String dirName){
+        Directory fsDir = null;
+        try{
+            fsDir = FSDirectory.getDirectory(dirName);
+            return IndexReader.indexExists(fsDir);            
+        }catch(Exception ex){
+            return false;
+        }finally{
+            try{
+                if( fsDir != null)
+                    fsDir.close();
+            }catch(Exception ex){}
+        }
+    }
+    
+    /*
+     * In needed, create new 1.2 style index directories and copy old index to new dirs.
+     */
+    private synchronized void updateTo1p2() throws IOException {
+        //check if live index directory exists, don't check for a lucene index.
+        File liveDirF = new File(this.liveIndexDir);
+        if( ! liveDirF.exists() && indexExistsAt(baseIndexDir)){
+            log.info("Updating to vitro 1.2 search index directory structure");
+            makeIndexDirs();            
+            File live = new File(liveIndexDir);
+            
+            //copy existing index to live index directory
+            File baseDir = new File(baseIndexDir);
+            for( File file : baseDir.listFiles()){                                
+                if( ! file.isDirectory() && ! live.getName().equals(file.getName() ) ){
+                    FileUtils.copyFile(file, new File(liveIndexDir+File.separator+file.getName()));
+                    boolean success = file.delete();
+                    if( ! success )
+                        log.error("could not delete "+ baseIndexDir + file.getName());
+                }
+            }
+            log.info("Done updating to vitro 1.2 search index directory structure.");
+        }        
+    }
+    
+    public boolean isIndexEmpty() throws CorruptIndexException, IOException{                
+        IndexWriter writer = null;
+        try{
+            writer = getLiveIndexWriter(false);            
+            return  writer.numDocs() == 0;
+        }finally{
+            if (writer != null) writer.close();
+        }
+    }
+
+    public boolean isIndexCorroupt(){
+        //if it is clear it out but don't rebuild.
+        return false;
+    }
+
+    @Override
+    public synchronized void abortIndexingAndCleanUp() {
+        if( ! indexing )
+            log.error("abortIndexingAndCleanUp() should only be called if LuceneIndexer is indexing.");
+        else if( ! fullRebuild )
+            log.error("abortIndexingAndCleanUp() should only be called if LuceneIndexer to end an aborted full index rebuild");
+        else{
+            closeWriter();
+            File offLineDir = new File(currentOffLineDir);
+            boolean deleted = deleteDir(offLineDir);
+            //log might be null if system is shutting down.
+            if( ! deleted ){
+                System.out.println("Could not clean up temp indexing dir " + currentOffLineDir);
+            }
+        }                
+    }    
 }

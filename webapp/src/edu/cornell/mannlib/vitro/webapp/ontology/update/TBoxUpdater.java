@@ -3,9 +3,11 @@
 package edu.cornell.mannlib.vitro.webapp.ontology.update;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -16,6 +18,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
+import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
@@ -29,9 +32,14 @@ public class TBoxUpdater {
 	private OntModel oldTboxAnnotationsModel;
 	private OntModel newTboxAnnotationsModel;
 	private OntModel siteModel;
-	private OntologyChangeLogger logger;  
-	private OntologyChangeRecord record;
+	private ChangeLogger logger;  
+	private ChangeRecord record;
 	private boolean detailLogs = false;
+	
+    private static final String classGroupURI = "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#ClassGroup";
+	private Resource classGroupClass = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createResource(classGroupURI);
+    private static final String inClassGroupURI = "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#inClassGroup";
+	private Property inClassGroupProp = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createProperty(inClassGroupURI);
 
 	/**
 	 * 
@@ -49,8 +57,8 @@ public class TBoxUpdater {
 	public TBoxUpdater(OntModel oldTboxAnnotationsModel,
 			           OntModel newTboxAnnotationsModel,
 			           OntModel siteModel,
-		               OntologyChangeLogger logger,
-		               OntologyChangeRecord record) {
+		               ChangeLogger logger,
+		               ChangeRecord record) {
 		
 		this.oldTboxAnnotationsModel = oldTboxAnnotationsModel;
 		this.newTboxAnnotationsModel = newTboxAnnotationsModel;
@@ -84,7 +92,7 @@ public class TBoxUpdater {
 	 *  Note: as specified, this method for now assumes that no new vitro annotation
 	 *  properties have been introduced. This should be updated for future versions.
 	 */
-	public void updateVitroPropertyDefaultValues() throws IOException {
+	public void updateDefaultAnnotationValues() throws IOException {
 				
 		siteModel.enterCriticalSection(Lock.WRITE);
 		
@@ -130,18 +138,21 @@ public class TBoxUpdater {
 				 // first check to see if the site has a local value change
 				 // that should override the deletion
 				 List<RDFNode> siteObjects = siteModel.listObjectsOfProperty(subject, predicate).toList();
+				
 				 if (siteObjects.size() > 1) {
-					 logger.logError("Error: found " + siteObjects.size() +
+					 logger.log("WARNING: found " + siteObjects.size() +
 							 " statements with subject = " + subject.getURI() + 
 							 " and property = " + predicate.getURI() +
-							 " in the site database. (maximum of one is expected)");
+							 " in the site database (maximum of one is expected)");
 				 }
+				 
 				 if (siteObjects.size() > 0) {
 					 RDFNode siteNode = siteObjects.get(0);
 					 if (siteNode.equals(oldObject)) {
 						 retractions.add(siteModel.listStatements(subject, predicate, (RDFNode) null));		 
 					 }
 				 }
+				 
 				 continue;				 			 
 			 }
 			
@@ -157,7 +168,7 @@ public class TBoxUpdater {
 				 logger.log("WARNING: found " + i +
 						 " statements with subject = " + subject.getURI() + 
 						 " and property = " + predicate.getURI() +
-						 " in the new version of the annotations ontology. (maximum of one is expected)");
+						 " in the new version of the annotations ontology (maximum of one is expected)");
 				 continue; 
 			 }
 			 
@@ -203,7 +214,7 @@ public class TBoxUpdater {
 					 logger.log("WARNING: found " + i +
 							 " statements with subject = " + subject.getURI() + 
 							 " and property = " + predicate.getURI() +
-							 " in the site annotations model. (maximum of one is expected). "); 
+							 " in the site annotations model (maximum of one is expected) "); 
 					 continue; 
 				 }
 				 	 
@@ -246,16 +257,18 @@ public class TBoxUpdater {
 		   siteModel.remove(actualRetractions);
 		   record.recordRetractions(actualRetractions);
 		
+		   long numAdded = actualAdditions.size();
+		   long numRemoved = actualRetractions.size();
+		   
 		   // log summary of changes
-		   if (actualAdditions.size() > 0) {
+		   if (numAdded > 0) {
 	           logger.log("Updated the default vitro annotation value for " + 
-	        		   actualAdditions.size() + " statements in the knowledge base.");
+	        		   numAdded + " statements in the knowledge base");
 		   }
 		   
-           long numRemoved = actualRetractions.size() - actualAdditions.size();
            if (numRemoved > 0) {
 	           logger.log("Removed " + numRemoved +
-	        		      " outdated vitro annotation property setting" + ((numRemoved > 1) ? "s" : "") + " from the knowledge base.");
+	        		      " outdated vitro annotation property setting" + ((numRemoved > 1) ? "s" : "") + " from the knowledge base");
            }
            
 		    //	   Copy annotation property settings that were introduced in the new ontology
@@ -285,13 +298,128 @@ public class TBoxUpdater {
 			// log the additions - summary
 			if (newAnnotationSettingsToAdd.size() > 0) {
 				boolean plural = (newAnnotationSettingsToAdd.size() > 1);
-	            logger.log("Added " + newAnnotationSettingsToAdd.size() + " new annotation property setting" + (plural ? "s" : "") + " to the knowledge base. This includes " +
+	            logger.log("Added " + newAnnotationSettingsToAdd.size() + " new annotation property setting" + (plural ? "s" : "") + " to the knowledge base. This includes only " +
 	                         "existing annotation properties applied to existing classes where they weren't applied before, or existing " +
-	                         "properties applied to new classes. No new annotation properties have been introduced.");
+	                         "properties applied to new classes.");
 			}
 		   
 	} finally {
 		siteModel.leaveCriticalSection();
 	}
 }
+	
+/**
+ * 
+ * Update a knowledge base to align with changes to the vitro annotation model  
+ * in a new version of the ontology. The two versions of the ontology and the
+ * knowledge base to be updated are provided in the class constructor and are
+ * referenced via class level variables. 
+ *                    
+ * Currently, this method only handles deletions of a ClassGroup
+ *                    
+ *  Writes to the change log file, the error log file, and the incremental change
+ *  knowledge base.                  
+ *  
+ */	
+public void updateAnnotationModel() throws IOException {
+		
+	   // for each ClassGroup in the old vitro annotations model: if it is not in 
+	   // the new vitro annotations model and the site has no classes asserted to 
+	   // be in that class group then delete it.
+	   // TODO: the site will have classes asserted to be in it if we have switched
+	   // the default assignment in the new version but haven't migration yet. How
+	   // to handle this?
+	   
+	   removeObsoleteAnnotations();
+	   
+	   siteModel.enterCriticalSection(Lock.WRITE);
+	   
+	   try {	
+		    Model retractions = ModelFactory.createDefaultModel();
+		    
+			StmtIterator iter = oldTboxAnnotationsModel.listStatements((Resource) null, RDF.type, classGroupClass);
+	  	
+			while (iter.hasNext()) {  
+			  Statement stmt = iter.next();
+						  
+			  if (!newTboxAnnotationsModel.contains(stmt) && !usesGroup(siteModel, stmt.getSubject())) {
+				  long pre = retractions.size();
+				  retractions.add(siteModel.listStatements(stmt.getSubject(),(Property) null,(RDFNode)null));
+				  long post = retractions.size();
+				  if ((post - pre) > 0) {
+				     logger.log("Removed the " + stmt.getSubject().getURI() + " ClassGroup from the annotations model");
+				  }  
+			  }
+			}
+	    	
+			if (retractions.size() > 0) {
+			   siteModel.remove(retractions);
+			   record.recordRetractions(retractions);
+		    }   
+		        
+		} finally {
+			siteModel.leaveCriticalSection();
+		}
+
+	   // If we were going to handle add, this is the logic:
+	   // for each ClassGroup in new old vitro annotations model: if it is not in 
+	   // the old vitro annotations and it is not in the site model, then 
+	   // add it.
+	   
+}
+
+public boolean usesGroup(Model model, Resource theClassGroup) throws IOException {
+	   
+   model.enterCriticalSection(Lock.READ);
+     
+   try {	   
+	   return (model.contains((Resource) null, inClassGroupProp, theClassGroup) ? true : false);
+   } finally {
+	   model.leaveCriticalSection();
+   }
+}
+
+public void removeObsoleteAnnotations() throws IOException {
+		
+	Resource subj1 = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createResource("http://vivoweb.org/ontology/florida#StatewideGoalAndFocusArea");
+	Resource obj1 = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createResource("http://vivoweb.org/ontology#vitroClassGrouptopics");
+	
+	Property subj2 = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createProperty("http://vivoweb.org/ontology/florida#divisionOfSponsoredResearchNumber");
+	Resource obj2 = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createResource("http://vivoweb.org/ontology#vitroPropertyGroupidentifiers");
+	
+	Property subj3 = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createProperty("http://vivoweb.org/ontology/florida#statewideGoalAndFocusArea");
+	Resource obj3 = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createResource("http://vivoweb.org/ontology#vitroPropertyGroupoutreach");
+	
+	Property inPropertyGroupProp = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createProperty("http://vitro.mannlib.cornell.edu/ns/vitro/0.7#inPropertyGroup");
+	   
+    siteModel.enterCriticalSection(Lock.WRITE);
+   
+    try {	
+	    Model retractions = ModelFactory.createDefaultModel();
+	    
+        if (siteModel.contains(subj1, inClassGroupProp, obj1) ) {
+        	retractions.add(subj1, inClassGroupProp, obj1);
+        	logger.log("Removed statement " + ABoxUpdater.stmtString(subj1, inClassGroupProp, obj1) + " from the knowledge base (assumed to be obsolete)");
+        }
+
+        if (siteModel.contains(subj2, inPropertyGroupProp, obj2) ) {
+        	retractions.add(subj2, inPropertyGroupProp, obj2);
+        	logger.log("Removed statement " + ABoxUpdater.stmtString(subj2, inPropertyGroupProp, obj2) + " from the knowledge base (assumed to be obsolete)");
+        }
+
+        if (siteModel.contains(subj3, inPropertyGroupProp, obj3) ) {
+        	retractions.add(subj3, inPropertyGroupProp, obj3);
+        	logger.log("Removed statement " + ABoxUpdater.stmtString(subj3, inPropertyGroupProp, obj3) + " from the knowledge base (assumed to be obsolete)");
+        }
+    	
+		if (retractions.size() > 0) {
+		   siteModel.remove(retractions);
+		   record.recordRetractions(retractions);
+	    }   
+	        
+	 } finally {
+		siteModel.leaveCriticalSection();
+	 }
+}
+
 }

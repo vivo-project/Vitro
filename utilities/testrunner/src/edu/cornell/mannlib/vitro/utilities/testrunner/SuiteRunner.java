@@ -6,6 +6,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.cornell.mannlib.vitro.utilities.testrunner.listener.Listener;
+
 /**
  * Run a Selenium TestSuite in a sub-process.
  */

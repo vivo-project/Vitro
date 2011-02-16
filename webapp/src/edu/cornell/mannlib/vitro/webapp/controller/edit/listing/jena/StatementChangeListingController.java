@@ -24,7 +24,7 @@ import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
 
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
@@ -59,7 +59,7 @@ public class StatementChangeListingController extends BaseEditController {
         
         try {
         	
-        LoginFormBean loginBean = (LoginFormBean) request.getSession().getAttribute("loginHandler");
+        LoginStatusBean loginBean = LoginStatusBean.getBean(vrequest);
         
         // TODO: need to make this more restrictive
         String userURI = (request.getParameter("userURI") != null) ? request.getParameter("userURI") : loginBean.getUserURI();

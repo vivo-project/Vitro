@@ -23,10 +23,9 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.filestorage.FileModelHelper;
-import edu.cornell.mannlib.vitro.webapp.filestorage.FileServingHelper;
 import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorage;
 import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup;
+import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
 
 /**
  * <p>
@@ -79,9 +78,10 @@ public class FileServingServlet extends VitroHttpServlet {
 		String path = request.getServletPath() + request.getPathInfo();
 		log.debug("Path is '" + path + "'");
 
-		String uri = FileServingHelper.getBytestreamUri(path);
-		log.debug("Bytestream URI is '" + uri + "'");
-		if (uri == null) {
+		FileInfo fileInfo = FileInfo.instanceFromAliasUrl(request
+				.getFullWebappDaoFactory(), path);
+		log.debug("File info is '" + fileInfo + "'");
+		if (fileInfo == null) {
 			String message = "The request path is not valid for the File servlet: '"
 					+ path + "'";
 			log.error(message);
@@ -91,12 +91,7 @@ public class FileServingServlet extends VitroHttpServlet {
 
 		// Validate that the file exists, with the requested URI and filename.
 		String requestedFilename = getFilename(path);
-		String actualFilename = fileStorage.getFilename(uri);
-		if (actualFilename == null) {
-			log.debug("Requested a non-existent file: " + path);
-			response.sendError(SC_NOT_FOUND, ("File not found: " + path));
-			return;
-		}
+		String actualFilename = fileInfo.getFilename();
 		if (!actualFilename.equals(requestedFilename)
 				&& !actualFilename.equals(decode(requestedFilename))) {
 			log.warn("The requested filename does not match the "
@@ -107,13 +102,12 @@ public class FileServingServlet extends VitroHttpServlet {
 		}
 
 		// Get the MIME type.
-		String mimeType = new FileModelHelper(request.getFullWebappDaoFactory())
-				.getMimeTypeForBytestream(uri);
+		String mimeType = fileInfo.getMimeType();
 
 		// Open the actual byte stream.
 		InputStream in;
 		try {
-			in = fileStorage.getInputStream(uri, actualFilename);
+			in = fileStorage.getInputStream(fileInfo.getBytestreamUri(), actualFilename);
 		} catch (FileNotFoundException e) {
 			log.error(e, e);
 			response.sendError(SC_INTERNAL_SERVER_ERROR, e.toString());

@@ -4,9 +4,10 @@ package edu.cornell.mannlib.vitro.webapp.dao.filtering;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import net.sf.jga.algorithms.Filter;
-
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
@@ -80,5 +81,29 @@ class ObjectPropertyStatementDaoFiltering extends BaseFiltering implements Objec
 	public int insertNewObjectPropertyStatement(ObjectPropertyStatement objPropertyStmt) {
         return innerObjectPropertyStatementDao.insertNewObjectPropertyStatement(objPropertyStmt);
     }
+
+
+    @Override
+    // RY What about filtering?
+    public List<Map<String, String>> getObjectPropertyStatementsForIndividualByProperty(
+            String subjectUri, String propertyUri, String query) {
+        return innerObjectPropertyStatementDao.getObjectPropertyStatementsForIndividualByProperty(subjectUri, propertyUri, query);
+    }
+    
+    @Override
+    // RY What about filtering?
+    public List<Map<String, String>> getObjectPropertyStatementsForIndividualByProperty(
+            String subjectUri, String propertyUri, String query, Set<String> queryStrings) {
+        return innerObjectPropertyStatementDao.getObjectPropertyStatementsForIndividualByProperty(subjectUri, propertyUri, query, queryStrings);
+    }
+
+
+
+//    @Override
+//    // RY What about filtering?
+//    public Map<String, List<Map<String, Object>>> getCollatedObjectPropertyStatementsForIndividual(
+//            String subjectUri, String propertyUri, String query) {
+//        return innerObjectPropertyStatementDao.getCollatedObjectPropertyStatementsForIndividual(subjectUri, propertyUri, query);
+//    }
 
 }

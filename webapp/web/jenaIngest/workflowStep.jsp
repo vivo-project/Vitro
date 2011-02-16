@@ -16,8 +16,7 @@
     }
 
 %>
-
-    <h2>Execute RDF-Encoded Ingest Workflow</h2>
+    <h2><a class="ingestMenu" href="ingest">Ingest Menu</a> > Execute RDF-Encoded Ingest Workflow</h2>
 
     <form action="ingest" method="get"i>
         <input type="hidden" name="action" value="executeWorkflow"/>
@@ -46,4 +45,4 @@
         %>
         </select>
   
-    <input type="submit" value="Execute Workflow"/>
+    <input id="submit" type="submit" value="Execute Workflow"/>

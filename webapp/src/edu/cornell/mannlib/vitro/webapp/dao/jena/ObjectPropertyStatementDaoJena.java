@@ -3,11 +3,27 @@
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.QuerySolutionMap;
+import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.query.Syntax;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
@@ -25,8 +41,14 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.event.IndividualUpdateEvent;
 
 public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements ObjectPropertyStatementDao {
 
-    public ObjectPropertyStatementDaoJena(WebappDaoFactoryJena wadf) {
+    protected static final Log log = LogFactory.getLog(ObjectPropertyStatementDaoJena.class);
+    
+    private DatasetWrapperFactory dwf;
+    
+    public ObjectPropertyStatementDaoJena(DatasetWrapperFactory dwf,
+                                          WebappDaoFactoryJena wadf) {
         super(wadf);
+        this.dwf = dwf;
     }
 
     @Override
@@ -59,11 +81,12 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         else {
         	Map<String, ObjectProperty> uriToObjectProperty = new HashMap<String,ObjectProperty>();
         	
-        	ObjectPropertyDaoJena opDaoJena = new ObjectPropertyDaoJena(getWebappDaoFactory());
+        	ObjectPropertyDaoJena opDaoJena = new ObjectPropertyDaoJena(dwf, getWebappDaoFactory());
         	
-        	getOntModel().enterCriticalSection(Lock.READ);
+        	OntModel ontModel = getOntModelSelector().getABoxModel();
+        	ontModel.enterCriticalSection(Lock.READ);
         	try {
-	            Resource ind = getOntModel().getResource(entity.getURI());
+	            Resource ind = ontModel.getResource(entity.getURI());
 	            List<ObjectPropertyStatement> objPropertyStmtList = new ArrayList<ObjectPropertyStatement>();
 	            ClosableIterator<Statement> propIt = ind.listProperties();
 	            try {
@@ -119,7 +142,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
 	            }
 	            entity.setObjectPropertyStatements(objPropertyStmtList);
         	} finally {
-        		getOntModel().leaveCriticalSection();
+        		ontModel.leaveCriticalSection();
         	}
             return entity;
         }
@@ -227,4 +250,132 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         return 0;
     }
 
+    @Override 
+    public List<Map<String, String>> getObjectPropertyStatementsForIndividualByProperty(
+            String subjectUri, 
+            String propertyUri, 
+            String queryString) {
+        
+        return getObjectPropertyStatementsForIndividualByProperty(
+                subjectUri, propertyUri, null);
+        
+    }
+    
+    @Override
+    /*
+     * SPARQL-based method for getting values related to a single object property.
+     * We cannot return a List<ObjectPropertyStatement> here, the way the corresponding method of
+     * DataPropertyStatementDaoJena returns a List<DataPropertyStatement>. We need to accomodate
+     * custom queries that could request any data in addition to just the object of the statement.
+     * However, we do need to get the object of the statement so that we have it to create editing links.
+     */
+    public List<Map<String, String>> getObjectPropertyStatementsForIndividualByProperty(
+            String subjectUri, 
+            String propertyUri, 
+            String queryString, 
+            Set<String> constructQueryStrings ) {  
+        
+        Model constructedModel = constructModelForSelectQueries(
+                subjectUri, propertyUri, constructQueryStrings);
+        
+        log.debug("Query string for object property " + propertyUri + ": " + queryString);
+        
+        Query query = null;
+        try {
+            query = QueryFactory.create(queryString, Syntax.syntaxARQ);
+        } catch(Throwable th){
+            log.error("Could not create SPARQL query for query string. " + th.getMessage());
+            log.error(queryString);
+            return Collections.emptyList();
+        } 
+        
+        // RY One oddity here is that SDB adds the bound variables to the query select terms,
+        // even if they're not included in the query.
+        QuerySolutionMap initialBindings = new QuerySolutionMap();
+        initialBindings.add("subject", ResourceFactory.createResource(subjectUri));
+        initialBindings.add("property", ResourceFactory.createResource(propertyUri));
+
+        // Run the SPARQL query to get the properties
+        List<Map<String, String>> list = new ArrayList<Map<String, String>>();
+        DatasetWrapper w = dwf.getDatasetWrapper();
+        Dataset dataset = w.getDataset();
+        dataset.getLock().enterCriticalSection(Lock.READ);
+        try {
+            
+            
+            QueryExecution qexec = (constructedModel == null) 
+                    ? QueryExecutionFactory.create(
+                            query, dataset, initialBindings)
+                    : QueryExecutionFactory.create(
+                            query, constructedModel, initialBindings);
+            
+            ResultSet results = qexec.execSelect();
+
+            while (results.hasNext()) {
+                QuerySolution soln = results.nextSolution();
+                list.add(QueryUtils.querySolutionToStringValueMap(soln));
+            }
+            
+        } finally {
+            dataset.getLock().leaveCriticalSection();
+            w.close();
+        }
+        return list;
+    }
+ 
+    private Model constructModelForSelectQueries(String subjectUri,
+                                                 String propertyUri,
+                                                 Set<String> constructQueries) {
+        
+        if (constructQueries == null) {
+            return null;
+        }
+        
+        Model constructedModel = ModelFactory.createDefaultModel();
+        
+        for (String queryString : constructQueries) {
+         
+            log.debug("CONSTRUCT query string for object property " + 
+                    propertyUri + ": " + queryString);
+            
+            Query query = null;
+            try {
+                query = QueryFactory.create(queryString, Syntax.syntaxARQ);
+            } catch(Throwable th){
+                log.error("Could not create CONSTRUCT SPARQL query for query " +
+                          "string. " + th.getMessage());
+                log.error(queryString);
+                return constructedModel;
+            } 
+        
+            QuerySolutionMap initialBindings = new QuerySolutionMap();
+            initialBindings.add(
+                    "subject", ResourceFactory.createResource(subjectUri));
+            initialBindings.add(
+                    "property", ResourceFactory.createResource(propertyUri));
+        
+            List<Map<String, String>> list = new ArrayList<Map<String, String>>();
+            DatasetWrapper w = dwf.getDatasetWrapper();
+            Dataset dataset = w.getDataset();
+            dataset.getLock().enterCriticalSection(Lock.READ);
+            try {           
+                
+                QueryExecution qe = QueryExecutionFactory.create(
+                        query, dataset, initialBindings);
+                try {
+                    qe.execConstruct(constructedModel);
+                } finally {
+                    qe.close();
+                }
+                      
+            } finally {
+                dataset.getLock().leaveCriticalSection();
+                w.close();
+            }
+        }
+        
+        return constructedModel;
+        
+    }
+    
 }

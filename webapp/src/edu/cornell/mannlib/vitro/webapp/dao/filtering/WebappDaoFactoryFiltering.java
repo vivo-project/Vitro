@@ -11,16 +11,19 @@ import edu.cornell.mannlib.vitro.webapp.dao.Classes2ClassesDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
+import edu.cornell.mannlib.vitro.webapp.dao.DisplayModelDao;
 import edu.cornell.mannlib.vitro.webapp.dao.FlagDao;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.KeywordDao;
 import edu.cornell.mannlib.vitro.webapp.dao.KeywordIndividualRelationDao;
 import edu.cornell.mannlib.vitro.webapp.dao.LinksDao;
 import edu.cornell.mannlib.vitro.webapp.dao.LinktypeDao;
+import edu.cornell.mannlib.vitro.webapp.dao.MenuDao;
 import edu.cornell.mannlib.vitro.webapp.dao.NamespaceDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
+import edu.cornell.mannlib.vitro.webapp.dao.PageDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PortalDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
@@ -299,6 +302,23 @@ public class WebappDaoFactoryFiltering implements WebappDaoFactory {
         return filteringVClassDao;
     }
 
+    @Override
+    public PageDao getPageDao() {
+        return innerWebappDaoFactory.getPageDao();
+    }
 
-
+    @Override
+    public MenuDao getMenuDao(){
+        return innerWebappDaoFactory.getMenuDao();
+    }    
+    
+    @Override
+    public DisplayModelDao getDisplayModelDao(){
+        return innerWebappDaoFactory.getDisplayModelDao();
+    }
+    
+    @Override 
+    public void close() {
+        innerWebappDaoFactory.close();
+    }
 }

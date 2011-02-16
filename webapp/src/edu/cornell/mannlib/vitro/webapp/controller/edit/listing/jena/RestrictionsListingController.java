@@ -25,7 +25,6 @@ import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
@@ -58,8 +57,6 @@ public class RestrictionsListingController extends BaseEditController {
         
         epo = super.createEpo(request);
         
-        LoginFormBean loginBean = (LoginFormBean) request.getSession().getAttribute("loginHandler");
-
         OntModel ontModel = (OntModel) getServletContext().getAttribute("jenaOntModel");
         
         ObjectPropertyDao opDao = vrequest.getFullWebappDaoFactory().getObjectPropertyDao();

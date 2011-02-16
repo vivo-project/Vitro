@@ -17,6 +17,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 
 import org.apache.log4j.Level;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -38,6 +39,7 @@ public class FileStorageSetupTest extends AbstractTestClass {
 
 	private static final String configProperties = "#mock config properties file\n";
 	private static File tempDir;
+	private static File fsBaseDir;
 
 	private FileStorageSetup fss;
 	private ServletContextEvent sce;
@@ -68,6 +70,17 @@ public class FileStorageSetupTest extends AbstractTestClass {
 		fss = new FileStorageSetup();
 		sc = new ServletContextStub();
 		sce = new ServletContextEvent(sc);
+	}
+	
+	@Before
+	public void createBaseDirectory() {
+		fsBaseDir = new File(tempDir, "fsBaseDirectory");
+		fsBaseDir.mkdir();
+	}
+	
+	@After
+	public void cleanupBaseDirectory() {
+		purgeDirectoryRecursively(fsBaseDir);
 	}
 
 	@AfterClass
@@ -101,24 +114,29 @@ public class FileStorageSetupTest extends AbstractTestClass {
 	@Test
 	public void defaultNamespaceNotSpecified() {
 		setLoggerLevel(FileStorageSetup.class, Level.OFF);
-		setConfigurationProperties(tempDir.getPath(), null);
+		setConfigurationProperties(fsBaseDir.getPath(), null);
 		fss.contextInitialized(sce);
 		assertNull("no default namespace",
 				sc.getAttribute(FileStorageSetup.ATTRIBUTE_NAME));
 	}
 
+	// This no longer throws an exception - it should be a success.
 	@Test
 	public void defaultNamespaceIsBogus() throws IOException {
-		setLoggerLevel(FileStorageSetup.class, Level.OFF);
-		setConfigurationProperties(tempDir.getPath(), "namespace");
+		setLoggerLevel(FileStorageSetup.class, Level.ERROR);
+		setConfigurationProperties(fsBaseDir.getPath(), "namespace");
 		fss.contextInitialized(sce);
-		assertNull("default namespace is bogus",
-				sc.getAttribute(FileStorageSetup.ATTRIBUTE_NAME));
+
+		Object o = sc.getAttribute(FileStorageSetup.ATTRIBUTE_NAME);
+		FileStorage fs = (FileStorage) o;
+
+		assertEquals("implementation class", FileStorageImpl.class,
+				fs.getClass());
 	}
 
 	@Test
 	public void success() throws IOException {
-		setConfigurationProperties(tempDir.getPath(),
+		setConfigurationProperties(fsBaseDir.getPath(),
 				"http://vivo.myDomain.edu/individual/");
 		fss.contextInitialized(sce);
 

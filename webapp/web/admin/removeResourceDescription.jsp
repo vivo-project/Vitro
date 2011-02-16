@@ -1,15 +1,13 @@
 <%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
 
-<%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
-
-<%@ page import="edu.cornell.mannlib.vedit.beans.LoginFormBean" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
 
+<%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
+<%@ taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
+
+<vitro:confirmLoginStatus level="CURATOR" />
+
 <%
-    if(session == null || !LoginFormBean.loggedIn(request, LoginFormBean.CURATOR)) {
-        %><c:redirect url="<%= Controllers.LOGIN %>" /><%
-    }
-    
     String resourceURIStr = request.getParameter("resourceURI");
     if (resourceURIStr != null) {
         

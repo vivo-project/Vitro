@@ -8,19 +8,23 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.RdfLiteralHash" %>
-<%@ page import="edu.cornell.mannlib.vedit.beans.LoginFormBean" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Portal" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary" %>
 <%@ page import="java.util.HashMap" %>
 <%@ page import="org.apache.commons.logging.Log" %>
 <%@ page import="org.apache.commons.logging.LogFactory" %>
+<%@ taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
 
 <%
     //org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.edit.editDatapropStmtRequestDispatch.jsp");
     final Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.edit.editDatapropStmtRequestDispatch.jsp");
 %>
+
+<vitro:confirmLoginStatus allowSelfEditing="true" />
+
 <%
     // Decide which form to forward to, set subjectUri, subjectUriJson, predicateUri, predicateUriJson in request
     // Also get the Individual for the subjectUri and put it in the request scope
@@ -39,10 +43,6 @@
     final String DEFAULT_VITRO_NS_FORM = "defaultVitroNsDataPropForm.jsp";
     final String DEFAULT_ERROR_FORM = "error.jsp";
     
-    if (!VitroRequestPrep.isSelfEditing(request) && !LoginFormBean.loggedIn(request, LoginFormBean.NON_EDITOR)) {        
-        %> <c:redirect url="<%= Controllers.LOGIN %>" /> <%  
-    }
-
     VitroRequest vreq = new VitroRequest(request);
     if( EditConfiguration.getEditKey( vreq ) == null ){
         vreq.setAttribute("editKey",EditConfiguration.newEditKey(session));
@@ -50,13 +50,21 @@
         vreq.setAttribute("editKey", EditConfiguration.getEditKey( vreq ));
     }
 
+    //set title to Edit to maintain functionality from 1.1.1 and avoid updates to Selenium tests
+    request.setAttribute("title","Edit");
+    
     String subjectUri   = vreq.getParameter("subjectUri");
     String predicateUri = vreq.getParameter("predicateUri");
     String formParam    = vreq.getParameter("editForm");
     String command      = vreq.getParameter("cmd");
     
     String vitroNsProp = (String) vreq.getParameter("vitroNsProp");
-    boolean isVitroNsProp = (vitroNsProp != null && vitroNsProp.equals("true")) ? true : false;
+    
+    boolean isVitroNsProp = false;
+    // On new Freemarker individual page, the editing link for rdfs:label doesn't get this url param attached
+    if ( "true".equals(vitroNsProp) || predicateUri.equals(VitroVocabulary.LABEL) ) {
+        isVitroNsProp = true;
+    }
 
     if( subjectUri == null || subjectUri.trim().length() == 0 ) {
         log.error("required subjectUri parameter missing");
@@ -85,7 +93,6 @@
     DataProperty dataproperty = wdf.getDataPropertyDao().getDataPropertyByURI( predicateUri );
     if( dataproperty == null) {
         // No dataproperty will be returned for a vitro ns prop, but we shouldn't throw an error.
-        // RY This is not necessarily true...
         if (!isVitroNsProp) {
             log.error("Could not find data property '"+predicateUri+"' in model");
             throw new Error("editDatapropStmtRequest.jsp: Could not find DataProperty in model: " + predicateUri);

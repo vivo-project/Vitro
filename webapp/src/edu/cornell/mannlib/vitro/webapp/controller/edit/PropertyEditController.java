@@ -38,7 +38,7 @@ public class PropertyEditController extends BaseEditController {
     public void doPost (HttpServletRequest request, HttpServletResponse response) {
         final int NUM_COLS=17;
 
-        if (!checkLoginStatus(request,response,(String)request.getAttribute("fetchURI")))
+        if (!checkLoginStatus(request,response))
             return;
 
         try {

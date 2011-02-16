@@ -28,14 +28,14 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AddDataPropStmt;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AddObjectPropStmt;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.DropDataPropStmt;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.DropObjectPropStmt;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.EditDataPropStmt;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.EditObjPropStmt;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPropStmt;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropStmt;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropDataPropStmt;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropObjectPropStmt;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditDataPropStmt;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjPropStmt;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
@@ -44,11 +44,9 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.RdfLiteralHash;
-import edu.cornell.mannlib.vitro.webapp.filestorage.FileModelHelper;
+import edu.cornell.mannlib.vitro.webapp.filestorage.model.ImageInfo;
 import edu.cornell.mannlib.vitro.webapp.utils.FrontEndEditingUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 
@@ -157,9 +155,6 @@ public class PropertyEditLinks extends TagSupport{
                 if (data == null) { // link to add a new value
                     links = doObjProp( subjectUri, predicateUri, policyToAccess(ids, policy, subjectUri, predicateUri), contextPath );
                 } else { // links to edit or delete an existing value  
-                    // RY **** May need new policyToAccess which gets the specific obj prop statement using the data as well as subject and predicate
-                    // This is NOT the correct object property statement - we need the link individual uri in data, instead of the link URL
-                    // Then we can combine this with doObjPropStmt
                     ObjectPropertyStatement prop = new ObjectPropertyStatementImpl(subjectUri, predicateUri, data);
                     links = doObjPropStmt( prop, policyToAccess(ids, policy, prop), contextPath );                       
                 }                    
@@ -490,19 +485,22 @@ public class PropertyEditLinks extends TagSupport{
     
 	protected LinkStruct[] doImageLinks(Individual entity,
 			IdentifierBundle ids, PolicyIface policy, String contextPath) {
-		Individual mainImage = FileModelHelper.getMainImage(entity);
-		Individual thumbnail = FileModelHelper.getThumbnailForImage(mainImage);
+		VitroRequest vreq = new VitroRequest((HttpServletRequest) pageContext
+				.getRequest());
+		ImageInfo imageInfo = ImageInfo.instanceFromEntityUri(vreq
+				.getFullWebappDaoFactory(), entity);
 
 		String subjectUri = entity.getURI();
 		String predicateUri = VitroVocabulary.IND_MAIN_IMAGE;
 
-		if (thumbnail == null) {
+		if (imageInfo == null) {
 			EditLinkAccess[] accesses = policyToAccess(ids, policy, subjectUri,
 					predicateUri);
 
 			if (contains(accesses, EditLinkAccess.ADDNEW)) {
 				log.debug("permission to ADD main image to " + subjectUri);
-				boolean isPerson = entity.isVClass("http://xmlns.com/foaf/0.1/Person");
+				boolean isPerson = entity
+						.isVClass("http://xmlns.com/foaf/0.1/Person");
 				if (isPerson) {
 					return new LinkStruct[] { getImageLink(subjectUri,
 							contextPath, "edit", "upload an image", "add") };
@@ -516,7 +514,7 @@ public class PropertyEditLinks extends TagSupport{
 			}
 		} else {
 			ObjectPropertyStatement prop = new ObjectPropertyStatementImpl(
-					subjectUri, predicateUri, mainImage.getURI());
+					subjectUri, predicateUri, imageInfo.getMainImage().getUri());
 			EditLinkAccess[] allowedAccessTypeArray = policyToAccess(ids,
 					policy, prop);
 
@@ -540,8 +538,7 @@ public class PropertyEditLinks extends TagSupport{
 			}
 			return links.toArray(new LinkStruct[links.size()]);
 		}
-	}
-    
+	}    
 
     /* ********************* utility methods ********************************* */
     protected static String makeRelativeHref( String baseUrl, String ... queries ) {

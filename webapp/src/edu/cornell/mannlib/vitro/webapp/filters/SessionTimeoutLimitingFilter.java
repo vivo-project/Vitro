@@ -13,7 +13,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 
 /**
  * Manipulate the maximum inactive interval on sessions.
@@ -56,8 +56,7 @@ public class SessionTimeoutLimitingFilter implements Filter {
 		}
 
 		// If logged in, leave it alone.
-		Object loginBean = session.getAttribute("loginHandler");
-		if (loginBean instanceof LoginFormBean) {
+		if (LoginStatusBean.getBean(request).isLoggedIn()) {
 			return;
 		}
 

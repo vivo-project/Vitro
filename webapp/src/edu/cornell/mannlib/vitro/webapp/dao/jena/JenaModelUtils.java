@@ -16,6 +16,8 @@ import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
+import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
@@ -145,38 +147,42 @@ public class JenaModelUtils {
 	
 private final OntModelSpec DEFAULT_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM;
 	
-	public OntModel extractTBox( Model inputModel ) {
-		return extractTBox( inputModel, null );
+	public OntModel extractTBox( Model inputModel) {
+	return extractTBox(inputModel, null);	
 	}
 	
 	public OntModel extractTBox( Model inputModel, String namespace ) {
-		
+	    Dataset dataset = DatasetFactory.create(inputModel);
+        return extractTBox( dataset, namespace, null );
+	}
+	
+	public OntModel extractTBox( Dataset dataset, String namespace, String graphURI ) {
 		OntModel tboxModel = ModelFactory.createOntologyModel(DEFAULT_ONT_MODEL_SPEC);
 		
 		List<String> queryStrList = new LinkedList<String>();
 		
 		// Use SPARQL DESCRIBE queries to extract the RDF for named ontology entities
 		
-		queryStrList.add( makeDescribeQueryStr( OWL.Class.getURI(), namespace ) );
-		queryStrList.add( makeDescribeQueryStr( OWL.ObjectProperty.getURI(), namespace ) );
-		queryStrList.add( makeDescribeQueryStr( OWL.DatatypeProperty.getURI(), namespace ) );
+		queryStrList.add( makeDescribeQueryStr( OWL.Class.getURI(), namespace, graphURI ) );
+		queryStrList.add( makeDescribeQueryStr( OWL.ObjectProperty.getURI(), namespace, graphURI ) );
+		queryStrList.add( makeDescribeQueryStr( OWL.DatatypeProperty.getURI(), namespace, graphURI ) );
 		// if we're using to a hash namespace, the URI of the Ontology resource will be
 		// that namespace minus the final hash mark.
 		if ( namespace != null && namespace.endsWith("#") ) {
-			queryStrList.add( makeDescribeQueryStr( OWL.Ontology.getURI(), namespace.substring(0,namespace.length()-2) ) );	
+			queryStrList.add( makeDescribeQueryStr( OWL.Ontology.getURI(), namespace.substring(0,namespace.length()-2), graphURI ) );	
 		} else {
-			queryStrList.add( makeDescribeQueryStr( OWL.Ontology.getURI(), namespace ) );
+			queryStrList.add( makeDescribeQueryStr( OWL.Ontology.getURI(), namespace, graphURI ) );
 		}
 		
 		// Perform the SPARQL DESCRIBEs
 		for ( String queryStr : queryStrList ) {
 			Query tboxSparqlQuery = QueryFactory.create(queryStr);
-			QueryExecution qe = QueryExecutionFactory.create(tboxSparqlQuery,inputModel);
+			QueryExecution qe = QueryExecutionFactory.create(tboxSparqlQuery,dataset);
 			try {
-				inputModel.enterCriticalSection(Lock.READ);
+				dataset.getLock().enterCriticalSection(Lock.READ);
 				qe.execDescribe(tboxModel);
 			} finally {
-				inputModel.leaveCriticalSection();
+				dataset.getLock().leaveCriticalSection();
 			}
 		}
 		
@@ -185,12 +191,23 @@ private final OntModelSpec DEFAULT_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM;
 	}
 	
 	private String makeDescribeQueryStr( String typeURI, String namespace ) {
+	    return makeDescribeQueryStr( typeURI, namespace, null );
+	} 	
+		
+	private String makeDescribeQueryStr( String typeURI, String namespace, String graphURI ) {
 		
 		StringBuffer describeQueryStrBuff = new StringBuffer() 
 			.append("PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n")
 			.append("PREFIX afn: <http://jena.hpl.hp.com/ARQ/function#> \n")
-			.append("DESCRIBE ?res WHERE { \n") 
-			.append("    ?res rdf:type <").append(typeURI).append("> . \n")
+			.append("DESCRIBE ?res WHERE { \n");
+			if (graphURI != null) {
+				describeQueryStrBuff
+				.append("GRAPH " + graphURI + "{ \n");
+			}
+			describeQueryStrBuff
+			.append("    ?res rdf:type <").append(typeURI).append("> . \n");
+			
+			describeQueryStrBuff
 			.append("    FILTER (!isBlank(?res)) \n");
 		
 		if (namespace == null) {
@@ -216,6 +233,10 @@ private final OntModelSpec DEFAULT_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM;
 			.append(namespace)
 			.append("\") \n");	
 		}
+		if (graphURI != null) {
+			describeQueryStrBuff
+			.append("} \n");
+		}
 			
 		describeQueryStrBuff.append("} \n");
 		
@@ -223,36 +244,61 @@ private final OntModelSpec DEFAULT_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM;
 		
 	}
 	
-	public Model extractABox( Model inputModel ) {
+	public Model extractABox(Model inputModel){
+		Dataset dataset = DatasetFactory.create(inputModel);
+	    return extractABox(dataset, null, null);
+	}
 	
-		Model aboxModel = ModelFactory.createDefaultModel();
+	public Model extractABox( Dataset unionDataset, Dataset baseOrInfDataset, String graphURI ) {
 		
+		Model aboxModel = ModelFactory.createDefaultModel();
+
 		// iterate through all classes and DESCRIBE each of their instances
 		// Note that this could be simplified if we knew that the model was a
 		// reasoning model: we could then simply describe all instances of 
 		// owl:Thing.
+
+		//OntModel ontModel = ( inputModel instanceof OntModel ) 
+		//? (OntModel)inputModel
+		//: ModelFactory.createOntologyModel( DEFAULT_ONT_MODEL_SPEC, inputModel );
+		OntModel ontModel = extractTBox(unionDataset, null, graphURI);
 		
-		OntModel ontModel = ( inputModel instanceof OntModel ) 
-			? (OntModel)inputModel
-			: ModelFactory.createOntologyModel( DEFAULT_ONT_MODEL_SPEC, inputModel );
 	
 		try {
 			ontModel.enterCriticalSection(Lock.READ);
 			Iterator classIt = ontModel.listNamedClasses();
+			QueryExecution qe = null;
 			while ( classIt.hasNext() ) {
+				
 				OntClass ontClass = (OntClass) classIt.next();
-				if ( !(ontClass.getNameSpace().startsWith(OWL.getURI()) )  
-					 && !(ontClass.getNameSpace().startsWith(VitroVocabulary.vitroURI))	) {
+				//if ( !(ontClass.getNameSpace().startsWith(OWL.getURI()) )  
+				// && !(ontClass.getNameSpace().startsWith(VitroVocabulary.vitroURI))	) {
+			 if(!(ontClass.getNameSpace().startsWith(OWL.getURI()))){
 					
-					String queryStr = makeDescribeQueryStr( ontClass.getURI(), null );
+					String queryStr = makeDescribeQueryStr( ontClass.getURI(), null, graphURI );
 					
 					Query aboxSparqlQuery = QueryFactory.create(queryStr);
-					QueryExecution qe = QueryExecutionFactory.create(aboxSparqlQuery,inputModel);
-					try {
-						inputModel.enterCriticalSection(Lock.READ);
-						qe.execDescribe(aboxModel);
-					} finally {
-						inputModel.leaveCriticalSection();
+					if(baseOrInfDataset != null){
+						qe = QueryExecutionFactory.create(aboxSparqlQuery,baseOrInfDataset);
+					}
+					else{
+						qe = QueryExecutionFactory.create(aboxSparqlQuery,unionDataset);
+					}
+					if(baseOrInfDataset != null){
+						try {
+							baseOrInfDataset.getLock().enterCriticalSection(Lock.READ);
+							qe.execDescribe(aboxModel); // puts the statements about each resource into aboxModel.
+						} finally {
+							baseOrInfDataset.getLock().leaveCriticalSection();
+						}
+					}
+					else{
+						try {
+							unionDataset.getLock().enterCriticalSection(Lock.READ);
+							qe.execDescribe(aboxModel); // puts the statements about each resource into aboxModel.
+						} finally {
+							unionDataset.getLock().leaveCriticalSection();
+						}
 					}
 					
 				}

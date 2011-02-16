@@ -9,14 +9,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.hp.hpl.jena.iri.IRI;
 import com.hp.hpl.jena.iri.IRIFactory;
 import com.hp.hpl.jena.iri.Violation;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.ontology.OntResource;
+import com.hp.hpl.jena.query.DataSource;
+import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -30,22 +33,24 @@ import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
-import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.ApplicationDao;
 import edu.cornell.mannlib.vitro.webapp.dao.Classes2ClassesDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
+import edu.cornell.mannlib.vitro.webapp.dao.DisplayModelDao;
 import edu.cornell.mannlib.vitro.webapp.dao.FlagDao;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.KeywordDao;
 import edu.cornell.mannlib.vitro.webapp.dao.KeywordIndividualRelationDao;
 import edu.cornell.mannlib.vitro.webapp.dao.LinksDao;
 import edu.cornell.mannlib.vitro.webapp.dao.LinktypeDao;
+import edu.cornell.mannlib.vitro.webapp.dao.MenuDao;
 import edu.cornell.mannlib.vitro.webapp.dao.NamespaceDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
+import edu.cornell.mannlib.vitro.webapp.dao.PageDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PortalDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
@@ -58,6 +63,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 
 public class WebappDaoFactoryJena implements WebappDaoFactory {
 
@@ -67,7 +73,7 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     protected KeywordDao keywordDao;
     protected LinksDao linksDao;
     protected LinktypeDao linktypeDao;
-    protected ApplicationDao applicationDao;
+    protected ApplicationDaoJena applicationDao;
     protected PortalDao portalDao;
     protected TabDao tabDao;
     protected TabIndividualRelationDao tabs2EntsDao;
@@ -77,6 +83,9 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     protected VClassGroupDao vClassGroupDao;
     protected PropertyGroupDao propertyGroupDao;
 
+    private PageDao pageDao;
+    private MenuDao menuDao;
+    
     protected OntModelSelector ontModelSelector;
     
     protected String defaultNamespace;
@@ -93,7 +102,9 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
 	protected boolean INCLUDE_TOP_CONCEPT = false;
 	protected boolean INCLUDE_BOTTOM_CONCEPT = false;
 	
-	private Map<String,String> properties = new HashMap<String,String>(); 
+	private Map<String,String> properties = new HashMap<String,String>();
+	
+	protected DatasetWrapperFactory dwf;
 
     // for temporary use to construct URIs for the things that still use integer IDs.
     // As these objects get changed to support getURI(), this should become unnecessary.
@@ -108,9 +119,16 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
         this.userURI = userURI;
         this.flag2ValueMap = base.flag2ValueMap;
         this.flag2ClassLabelMap = base.flag2ClassLabelMap;
+        this.dwf = base.dwf;
     }
 
-    public WebappDaoFactoryJena(OntModelSelector ontModelSelector, String defaultNamespace, HashSet<String> nonuserNamespaces, String[] preferredLanguages, String userURI){
+    public WebappDaoFactoryJena(OntModelSelector ontModelSelector, 
+                                OntModelSelector baseOntModelSelector,
+                                OntModelSelector inferenceOntModelSelector,
+                                String defaultNamespace, 
+                                HashSet<String> nonuserNamespaces, 
+                                String[] preferredLanguages, 
+                                String userURI){
     	
         this.ontModelSelector = ontModelSelector;
         
@@ -158,14 +176,61 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
         if (languageUniversalsModel.size()>0) {
         	this.ontModelSelector.getTBoxModel().addSubModel(languageUniversalsModel);
         }
+        
+        Model assertions = (baseOntModelSelector != null) 
+                ? baseOntModelSelector.getFullModel()
+                : ontModelSelector.getFullModel();
+        Model inferences = (inferenceOntModelSelector != null) 
+                ? inferenceOntModelSelector.getFullModel()
+                : null;
+        
+        Dataset dataset = makeInMemoryDataset(assertions, inferences);      
+        this.dwf = new StaticDatasetFactory(dataset);
+        
     } 
+    
+    public static Dataset makeInMemoryDataset(Model assertions, Model inferences) {
+        DataSource dataset = DatasetFactory.create();
+        
+        OntModel union = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+        
+        if (assertions != null) {
+            dataset.addNamedModel(JenaDataSourceSetupBase.JENA_DB_MODEL, assertions);
+            union.addSubModel(assertions);
+        } 
+        if (inferences != null) {
+            dataset.addNamedModel(JenaDataSourceSetupBase.JENA_INF_MODEL, 
+                    inferences);
+            union.addSubModel(inferences);
+        }
+        dataset.setDefaultModel(union);
+        return dataset;
+    }
+    
+    public WebappDaoFactoryJena(OntModelSelector ontModelSelector, 
+            String defaultNamespace, 
+            HashSet<String> nonuserNamespaces, 
+            String[] preferredLanguages, 
+            String userURI){
+        this(ontModelSelector, 
+             null, 
+             null,
+             defaultNamespace,
+             nonuserNamespaces, 
+             preferredLanguages, 
+             userURI);
+    }
 
     public WebappDaoFactoryJena(OntModelSelector ontModelSelector, String defaultNamespace, HashSet<String> nonuserNamespaces, String[] preferredLanguages){
         this(ontModelSelector, defaultNamespace, nonuserNamespaces, preferredLanguages, null);
     }
+    
+    public WebappDaoFactoryJena(OntModelSelector ontModelSelector, OntModelSelector baseOntModelSelector, OntModelSelector inferenceOntModelSelector, String defaultNamespace, HashSet<String> nonuserNamespaces, String[] preferredLanguages){
+        this(ontModelSelector, baseOntModelSelector, inferenceOntModelSelector, defaultNamespace, nonuserNamespaces, preferredLanguages, null);
+    }
 
     public WebappDaoFactoryJena(OntModelSelector ontModelSelector) {
-        this(ontModelSelector, null, null, null, null);
+        this(ontModelSelector, null, null, null, null, null);
     }
 
     public WebappDaoFactoryJena(OntModel ontModel, String defaultNamespace, HashSet<String> nonuserNamespaces, String[] preferredLanguages, String userURI){
@@ -177,7 +242,7 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     }
 
     public WebappDaoFactoryJena(OntModel ontModel) {
-        this(new SimpleOntModelSelector(ontModel), null, null, null, null);
+        this(new SimpleOntModelSelector(ontModel), null, null, null, null, null);
     }
     
     public OntModelSelector getOntModelSelector() {
@@ -489,7 +554,8 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     DataPropertyStatementDao dataPropertyStatementDao = null;
     public DataPropertyStatementDao getDataPropertyStatementDao() {
         if( dataPropertyStatementDao == null )
-            dataPropertyStatementDao = new DataPropertyStatementDaoJena(this);
+            dataPropertyStatementDao = new DataPropertyStatementDaoJena(
+                    dwf, this);
         return dataPropertyStatementDao;
     }
 
@@ -503,7 +569,7 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     DataPropertyDao dataPropertyDao = null;
     public DataPropertyDao getDataPropertyDao() {
         if( dataPropertyDao == null )
-            dataPropertyDao = new DataPropertyDaoJena(this);
+            dataPropertyDao = new DataPropertyDaoJena(dwf, this);
         return dataPropertyDao;
     }
 
@@ -524,7 +590,8 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     ObjectPropertyStatementDao objectPropertyStatementDao = null;
     public ObjectPropertyStatementDao getObjectPropertyStatementDao() {
         if( objectPropertyStatementDao == null )
-            objectPropertyStatementDao = new ObjectPropertyStatementDaoJena(this);
+            objectPropertyStatementDao = new ObjectPropertyStatementDaoJena(
+                    dwf, this);
         return objectPropertyStatementDao;
     }
 
@@ -538,7 +605,7 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     private ObjectPropertyDao objectPropertyDao = null;
     public ObjectPropertyDao getObjectPropertyDao() {
         if( objectPropertyDao == null )
-            objectPropertyDao = new ObjectPropertyDaoJena(this);
+            objectPropertyDao = new ObjectPropertyDaoJena(dwf, this);
         return objectPropertyDao;
     }
 
@@ -549,14 +616,15 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
         return propertyInstanceDao;
     }
 
-    private VClassDao vClassDao = null;
+    protected VClassDao vClassDao = null;
     public VClassDao getVClassDao() {
         if( vClassDao == null )
             vClassDao = new VClassDaoJena(this);
         return vClassDao;
     }
 
-    private JenaBaseDao jenaBaseDao = null;
+    private JenaBaseDao jenaBaseDao = null;    
+    
     public JenaBaseDao getJenaBaseDao() {
         if (jenaBaseDao == null) {
             jenaBaseDao = new JenaBaseDao(this);
@@ -572,4 +640,30 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
         return this.flag2ClassLabelMap;
     }
 
+    @Override
+    public PageDao getPageDao() {
+        if( pageDao == null )
+            pageDao = new PageDaoJena(this);
+        return pageDao;
+    }
+
+    @Override
+    public MenuDao getMenuDao(){
+        if( menuDao == null )
+            menuDao = new MenuDaoJena(this);
+        return menuDao;
+    }
+    
+    @Override
+    public DisplayModelDao getDisplayModelDao(){
+        return new DisplayModelDaoJena( this );
+    }
+    
+    @Override
+    public void close() {
+        if (applicationDao != null) {
+            applicationDao.close();
+        }   
+    }
+   
 }

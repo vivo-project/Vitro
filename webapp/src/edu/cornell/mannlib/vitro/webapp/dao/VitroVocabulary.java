@@ -29,13 +29,15 @@ public class VitroVocabulary {
     public static final String OWL = "http://www.w3.org/2002/07/owl#";
     public static final String OWL_ONTOLOGY = OWL+"Ontology";
     public static final String OWL_THING = OWL+"Thing";
+    
+    public static final String AFN = "http://jena.hpl.hp.com/ARQ/function#";
 
     public static final String label = vitroURI + "label";
     
     // an OWL DL-compatible surrogate for rdf:value for use with boxing idiom
     public static final String value = vitroURI + "value";
     
-    public static final String DISPLAY = "http://vitro.mannlib.cornell.edu/ontologies/display/1.1#";
+    public static final String DISPLAY = DisplayVocabulary.DISPLAY_NS;
 
     // properties found on the beans
 
@@ -102,6 +104,7 @@ public class VitroVocabulary {
     public static final String PROPERTY_CUSTOMENTRYFORMANNOT = vitroURI+"customEntryFormAnnot";
     public static final String PROPERTY_CUSTOMDISPLAYVIEWANNOT = vitroURI+"customDisplayViewAnnot";
     public static final String PROPERTY_CUSTOMSHORTVIEWANNOT = vitroURI+"customShortViewAnnot";
+    public static final String PROPERTY_CUSTOM_LIST_VIEW_ANNOT = vitroURI + "customListViewAnnot";
     public static final String PROPERTY_SELECTFROMEXISTINGANNOT = vitroURI+"selectFromExistingAnnot";
     public static final String PROPERTY_OFFERCREATENEWOPTIONANNOT = vitroURI+"offerCreateNewOptionAnnot";
     public static final String PROPERTY_INPROPERTYGROUPANNOT = vitroURI+"inPropertyGroupAnnot";
@@ -290,8 +293,38 @@ public class VitroVocabulary {
     public static final String FS_ATTRIBUTION = VITRO_PUBLIC + "attribution";
     public static final String FS_DOWNLOAD_LOCATION = VITRO_PUBLIC + "downloadLocation";
     public static final String FS_THUMBNAIL_IMAGE = VITRO_PUBLIC + "thumbnailImage";
-    
+    public static final String FS_ALIAS_URL = VITRO_PUBLIC + "directDownloadUrl";
+
     public static final String IND_MAIN_IMAGE = VITRO_PUBLIC + "mainImage";
     public static final String IND_IMAGE = VITRO_PUBLIC + "image";
 
+    // =============== Date Time with Precision vocabulary ===============
+    private static final String DATETIME_NS = "http://vivoweb.org/ontology/core#";
+    
+    protected  static final String[] PRECISIONS = {
+        DATETIME_NS+"noPrecision", // this individual doesn't actually exist in the ontology
+        DATETIME_NS+"yearPrecision",
+        DATETIME_NS+"yearMonthPrecision",
+        DATETIME_NS+"yearMonthDayPrecision",
+        DATETIME_NS+"yearMonthDayHourPrecision",
+        DATETIME_NS+"yearMonthDayHourMinutePrecision",
+        DATETIME_NS+"yearMonthDayTimePrecision"};
+
+    //The Precision.ordinal method is used so do 
+    //not change the order of these enums.
+    public enum Precision {
+        NONE(PRECISIONS[0]),
+        YEAR(PRECISIONS[1]),
+        MONTH(PRECISIONS[2]),
+        DAY(PRECISIONS[3]),
+        HOUR(PRECISIONS[4]),
+        MINUTE(PRECISIONS[5]),
+        SECOND(PRECISIONS[6]);        
+        
+        private final String URI;
+        Precision(String uri){
+            URI=uri;
+        }
+        public String uri(){return URI;}
+    }
 }

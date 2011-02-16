@@ -275,6 +275,7 @@ public class BrowseController extends VitroHttpServlet {
         private boolean awareOfQueueChange = false;
 
         RebuildGroupCacheThread(BrowseController controller) {
+        	super("RebuildGroupCacheThread");
             this.controller = controller;
         }
         public void run() {

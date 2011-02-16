@@ -18,32 +18,32 @@
 # The AI ingest files are exceptions -- until we decide otherwise.
 utilities/ingest/**/*
 
-# Doctype declaration
+# PROBLEM: Can't find any info on licensing.
 webapp/web/templates/freemarker/page/partials/doctype.html
 
-# ContentType from Google gdata API, Apache 2.0 license included in file.
+# See /doc/3rd-party-licenses.txt for LICENSE file
 webapp/src/edu/cornell/mannlib/vitro/webapp/web/ContentType.java
 
-# The JSON Java source files from json.org
+# See /doc/3rd-party-licenses.txt for LICENSE file
 webapp/src/org/json/*
 
-# TinyMCE from tinymce.moxiecode.com
+# See /doc/3rd-party-licenses.txt for LICENSE file
+webapp/src/edu/cornell/mannlib/vitro/webapp/utils/JSONtoFmModel.java
+
+# See /doc/3rd-party-licenses.txt for LICENSE file
 webapp/web/js/tiny_mce/*
 webapp/web/js/tiny_mce/**/*
 
-# From apache.org under the Apache license.
+# See /doc/3rd-party-licenses.txt for LICENSE file
 webapp/web/admin/axis/SOAPMonitorApplet.java
 services/additions/admin/axis/SOAPMonitorApplet.java
 
-# JQuery from jquery.com
+# See /doc/3rd-party-licenses.txt for LICENSE file
 webapp/web/js/jquery.js
 webapp/web/js/jquery-ui/*
 webapp/web/js/jquery_plugins/*
 
-# From pajhome.org.uk
-webapp/web/js/md5.js
-
-# From dojotoolkit.org
+# See /doc/3rd-party-licenses.txt for LICENSE file
 webapp/web/dojo.js
 webapp/web/src/AdapterRegistry.js
 webapp/web/src/animation/*
@@ -54,8 +54,6 @@ webapp/web/src/bootstrap2.js
 webapp/web/src/browser_debug.js
 webapp/web/src/collections/*
 webapp/web/src/compat/*
-webapp/web/src/crypto/*
-webapp/web/src/crypto.js
 webapp/web/src/data/*
 webapp/web/src/data.js
 webapp/web/src/date.js
@@ -115,30 +113,54 @@ webapp/web/src/widget/*
 webapp/web/src/widget/**/*
 webapp/web/src/xml/*
 
-# Sample code from Google.
+# See /doc/3rd-party-licenses.txt for LICENSE file
 webapp/web/templates/freemarker/page/partials/googleAnalytics.ftl
 
-# PROBLEM? Third-party tlds - where do they come from?
+# See /doc/3rd-party-licenses.txt for LICENSE file
+webapp/config/tlds/sparqltag.tld
+
+# See /doc/3rd-party-licenses.txt for LICENSE file
 webapp/config/tlds/c.tld
 webapp/config/tlds/fn.tld
-webapp/config/tlds/sparqltag.tld
+
+# PROBLEM: Can't find any info on licensing.
+webapp/config/tlds/database.tld
+
+# See /doc/3rd-party-licenses.txt for LICENSE file
 webapp/config/tlds/taglibs-mailer.tld
+
+# See /doc/3rd-party-licenses.txt for LICENSE file
 webapp/config/tlds/taglibs-random.tld
 webapp/config/tlds/taglibs-string.tld
 
-# PROBLEM: It appears that these files require a LICENSE file to accompany them.
+# See /doc/3rd-party-licenses.txt for LICENSE file
 webapp/web/themes/enhanced/css/blueprint/grid.css
 webapp/web/themes/enhanced/css/blueprint/ie.css
 
-# PROBLEM: This is from www.involutionstudios.com, not blueprint. What are the license restrictions? 
+# PROBLEM: Can't find any info on licensing.
 webapp/web/themes/enhanced/css/blueprint/liquid.css
 
-# PROBLEM? from simon.incutio.com, but what are the license restrictions?
+# See /doc/3rd-party-licenses.txt for LICENSE file
 webapp/web/js/betterDateInput.js
 
-# PROBLEM? from wrox.com, but what are the license restrictions?
+# PROBLEM: Can't find any info on licensing.
 webapp/web/js/detect.js
 
-# PROBLEM? perhaps from www.dannyg.com, but what are the license restrictions?
+# See /doc/3rd-party-licenses.txt for LICENSE file
 webapp/web/toggle.js
 webapp/web/js/toggle.js
+
+# See /doc/3rd-party-licenses.txt for LICENSE file
+webapp/web/js/html5.js
+
+# See /doc/3rd-party-licenses.txt for LICENSE file
+webapp/web/js/selectivizr.js
+
+# PROBLEM: Can't find any info on licensing.
+webapp/web/js/jquery_plugins/supersleight.js
+
+# See /doc/3rd-party-licenses.txt for LICENSE file
+webapp/web/js/raphael/*
+
+# See /doc/3rd-party-licenses.txt for LICENSE file
+webapp/web/js/sparql/prototype.js
