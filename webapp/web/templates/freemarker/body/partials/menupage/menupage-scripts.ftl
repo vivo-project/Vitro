@@ -2,13 +2,7 @@
 
 <#-- Template to setup and call scripts for menupages -->
 
-<#----------------------------------------------------------------------------------
-requestedPage is currently provided by FreemarkerHttpServlet. Should this be moved
-to PageController? Maybe we should have Java provide the domain name directly
-instead of the full URL of the requested page? Chintan was also asking for a
-template variable with the domain name for an AJAX request with visualizations.
------------------------------------------------------------------------------------->
-<#assign domainName = requestedPage?substring(0, requestedPage?index_of("/", 7)) />
+
 
 <#list vClassGroup as vClass>
     <#if (vClass.entityCount > 0)>
@@ -21,10 +15,11 @@ template variable with the domain name for an AJAX request with visualizations.
     </#if>
 </#list>
 
+<#-- For v1.3: The controller should pass in the dataservice url. -->
 <script type="text/javascript">
     var menupageData = {
-        baseUrl: '${domainName + urls.base}',
-        dataServiceUrl: '${domainName + urls.base}/dataservice?getLuceneIndividualsByVClass=1&vclassId=',
+        baseUrl: '${urls.base}',
+        dataServiceUrl: '${urls.base}/dataservice?getLuceneIndividualsByVClass=1&vclassId=',
         defaultBrowseVClassUri: '${firstNonEmptyVClass}'
     };
 </script>

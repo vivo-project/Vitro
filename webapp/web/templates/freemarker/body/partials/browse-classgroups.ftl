@@ -63,18 +63,11 @@ ${stylesheets.add("/css/browseClassGroups.css")}
             </section> <!-- #browse-classes -->
         </section> <!-- #browse -->
         
-        <#----------------------------------------------------------------------------------
-        requestedPage is currently provided by FreemarkerHttpServlet. Should this be moved
-        to PageController? Maybe we should have Java provide the domain name directly
-        instead of the full URL of the requested page? Chintan was also asking for a
-        template variable with the domain name for an AJAX request with visualizations.
-        ------------------------------------------------------------------------------------>
-        <#assign domainName = requestedPage?substring(0, requestedPage?index_of("/", 7)) />
-
+        <#-- For v1.3: The controller should pass in the dataservice url. -->
         <script type="text/javascript">
             var browseData = {
-                baseUrl: '${domainName + urls.base}',
-                dataServiceUrl: '${domainName + urls.base}/dataservice?getVClassesForVClassGroup=1&classgroupUri=',
+                baseUrl: '${urls.base}',
+                dataServiceUrl: '${urls.base}/dataservice?getVClassesForVClassGroup=1&classgroupUri=',
                 defaultBrowseClassGroupUri: '${firstPopulatedClassGroup.uri!}',
                 defaultBrowseClassGroupCount: '${firstPopulatedClassGroup.individualCount!}'
             };
