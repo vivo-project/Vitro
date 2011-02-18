@@ -39,6 +39,7 @@ public class UserRetryController extends BaseEditController {
     private static final String ROLE_PROTOCOL = "role:/";  // this is weird; need to revisit
     private static final Log log = LogFactory.getLog(UserRetryController.class.getName());
 
+    @Override
     public void doPost (HttpServletRequest req, HttpServletResponse response) {
 
     	VitroRequest request = new VitroRequest(req);
@@ -73,7 +74,7 @@ public class UserRetryController extends BaseEditController {
         if (!epo.getUseRecycledBean()){
             if (request.getParameter("uri") != null) {
                 try {
-                    userForEditing = (User)uDao.getUserByURI(request.getParameter("uri"));
+                    userForEditing = uDao.getUserByURI(request.getParameter("uri"));
                     userForEditing.setRoleURI(ROLE_PROTOCOL+userForEditing.getRoleURI());
                     action = "update";
                     epo.setAction("udpate");
@@ -117,17 +118,16 @@ public class UserRetryController extends BaseEditController {
 
         //set the getMethod so we can retrieve a new bean after we've inserted it
         try {
-            Class[] args = new Class[1];
-            args[0] = String.class;
+            Class<?>[] args = new Class[] {String.class};
             epo.setGetMethod(uDao.getClass().getDeclaredMethod("getUserByURI",args));
         } catch (NoSuchMethodException e) {
             log.error(this.getClass().getName()+" could not find the getVClassByURI method");
         }
 
-        HashMap optionMap = new HashMap();
+        HashMap<String, List<Option>> optionMap = new HashMap<String, List<Option>>();
 
         LoginStatusBean loginBean = LoginStatusBean.getBean(request);
-        List roleOptionList = new LinkedList();
+        List<Option> roleOptionList = new LinkedList<Option>();
         
         /* bdc34: Datastar needs non-backend-editing users for logging in non-Cornell people*/
         /* SelfEditingPolicySetup.SELF_EDITING_POLICY_WAS_SETUP is set by the SelfEditingPolicySetup context listener */
@@ -197,7 +197,8 @@ public class UserRetryController extends BaseEditController {
 
     }
 
-    public void doGet (HttpServletRequest request, HttpServletResponse response) {
+    @Override
+	public void doGet (HttpServletRequest request, HttpServletResponse response) {
         doPost(request, response);
     }
 
@@ -208,7 +209,8 @@ public class UserRetryController extends BaseEditController {
             portalId = currPortalId;
         }
 
-        public void doForward(HttpServletRequest request, HttpServletResponse response, EditProcessObject epo){
+        @Override
+		public void doForward(HttpServletRequest request, HttpServletResponse response, EditProcessObject epo){
             String newUserUrl = "userEdit?home="+portalId+"&uri=";
             User u = (User) epo.getNewBean();
             try {
