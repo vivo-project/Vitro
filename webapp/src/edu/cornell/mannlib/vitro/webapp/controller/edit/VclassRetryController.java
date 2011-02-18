@@ -144,7 +144,7 @@ public class VclassRetryController extends BaseEditController {
             log.error(this.getClass().getName()+" could not find the getVClassByURI method");
         }
 
-        HashMap<String,List> optionMap = new HashMap<String,List>();
+        HashMap<String, List<Option>> optionMap = new HashMap<String,List<Option>>();
         try {
             VClassGroupDao vcgDao = request.getFullWebappDaoFactory().getVClassGroupDao();
             List classGroupOptionList = FormUtils.makeOptionListFromBeans(vcgDao.getPublicGroupsWithVClasses(),"URI","PublicName",vclassForEditing.getGroupURI(),null,(vclassForEditing.getGroupURI()!=null && !(vclassForEditing.getGroupURI().equals(""))));
