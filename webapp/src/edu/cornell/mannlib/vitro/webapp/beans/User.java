@@ -107,7 +107,8 @@ public class User implements Comparable<User> {
         this.firstName = firstName;
     }
 
-    public int compareTo(User other) {
+    @Override
+	public int compareTo(User other) {
         Collator collator = Collator.getInstance();
         if( this.getUsername() == null && other.getUsername() == null )
         	return 0;
@@ -118,5 +119,19 @@ public class User implements Comparable<User> {
         else
         	return collator.compare(this.getUsername(),other.getUsername());
     }
-
+    
+	@Override
+	public String toString() {
+		return "User[URI=" + URI + ", namespace=" + namespace + ", localName="
+				+ localName + ", username=" + username + ", oldPassword="
+				+ oldPassword + ", md5password=" + md5password + ", modTime="
+				+ dateToString(modTime) + ", firstTime="
+				+ dateToString(firstTime) + ", loginCount=" + loginCount
+				+ ", roleURI=" + roleURI + ", lastName=" + lastName
+				+ ", firstName=" + firstName + "]";
+	}
+	
+	private String dateToString(Date date) {
+		return (date == null) ? "null" : String.valueOf(date.getTime());
+	}
 }
