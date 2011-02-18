@@ -23,7 +23,7 @@ import edu.cornell.mannlib.vedit.beans.Option;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vedit.forwarder.PageForwarder;
 import edu.cornell.mannlib.vedit.forwarder.impl.UrlForwarder;
-import edu.cornell.mannlib.vedit.listener.EditPreProcessor;
+import edu.cornell.mannlib.vedit.listener.ChangeListener;
 import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vedit.validator.ValidationObject;
 import edu.cornell.mannlib.vedit.validator.Validator;
@@ -101,9 +101,9 @@ public class UserRetryController extends BaseEditController {
         epo.setValidatorMap(validatorMap);
 
         //preprocessors
-        epo.setPreProcessorList(Collections.singletonList(new UserPasswordPreProcessor()));
-        
+       
         //set up any listeners
+        epo.setChangeListenerList(Collections.singletonList(new UserPasswordChangeListener()));
 
         //set portal flag to current portal
         Portal currPortal = (Portal) request.getAttribute("portalBean");
@@ -282,28 +282,111 @@ public class UserRetryController extends BaseEditController {
 			}
 		}
     }
-    
-	/**
-	 * The "Md5password" field from the form is actually in clear text. Pull the
-	 * raw version from the {@link User} and replce it with an encoded one.
-	 */
-	class UserPasswordPreProcessor implements EditPreProcessor {
+
+    /**
+     * When a new password is created, encode it.
+     */
+	class UserPasswordChangeListener implements ChangeListener {
+		/** 
+		 * Encode the password for a new user.
+		 */
 		@Override
-		public void process(Object o, EditProcessObject epo) {
-			if (!(o instanceof User)) {
-				log.error("Can't apply password encoding without a User object: "
-						+ o);
-				return;
+		public void doInserted(Object newObj, EditProcessObject epo) {
+			try {
+				User newUser = convertToUser(newObj);
+				UserDao userDao = getUserDaoFromEPO(epo);
+				encodePasswordAndUpdateUser("insert", newUser, userDao);
+			} catch (PwException e) {
+				log.error(e.getMessage());
 			}
-			User user = (User) o;
+		}
+
+		/**
+		 * Encode the password for an updated user, if it has changed.
+		 */
+		@Override
+		public void doUpdated(Object oldObj, Object newObj,
+				EditProcessObject epo) {
+			try {
+				User newUser = convertToUser(newObj);
+				User oldUser = convertToUser(oldObj);
+				UserDao userDao = getUserDaoFromEPO(epo);
+				if (passwordHasChanged(newUser, oldUser)) {
+					encodePasswordAndUpdateUser("update", newUser, userDao);
+				} else {
+					log.debug("update: password has not changed.");
+				}
+			} catch (PwException e) {
+				log.error(e.getMessage());
+			}
+		}
+
+		/** 
+		 * Do nothing for a deleted user.
+		 */
+		@Override
+		public void doDeleted(Object oldObj, EditProcessObject epo) {
+			log.debug("delete: nothing to do");
+		}
+		
+		private User convertToUser(Object o) throws PwException {
+			if (o instanceof User) {
+				return (User) o;
+			} else {
+				throw new PwException("Can't apply password encoding without a "
+						+ "User object: " + o);
+			}
+		}
+
+		private UserDao getUserDaoFromEPO(EditProcessObject epo)
+				throws PwException {
+			if (epo == null) {
+				throw new PwException(
+						"Can't apply password encoding without an "
+								+ "EditProcessObject");
+			}
+			
+			Object dao = epo.getDataAccessObject();
+			
+			if (dao instanceof UserDao) {
+				return (UserDao) dao;
+			} else {
+				throw new PwException(
+						"Can't apply password encoding without a "
+								+ "UserDao object: " + dao);
+			}
+		}
+
+		private boolean passwordHasChanged(User newUser, User oldUser)
+				throws PwException {
+			String newPw = newUser.getMd5password();
+			String oldPw = oldUser.getMd5password();
+			if (newPw == null) {
+				throw new PwException("Can't encode a null password");
+			}
+			return !newPw.equals(oldPw);
+		}
+
+		private void encodePasswordAndUpdateUser(String action, User user, UserDao userDao) {
 			String rawPassword = user.getMd5password();
+			if (rawPassword == null) {
+				log.error("Can't encode a null password");
+			}
 
 			String encodedPassword = Authenticate.applyMd5Encoding(rawPassword);
+			log.trace(action + ": Raw password '" + rawPassword
+					+ "', encoded '" + encodedPassword + "'");
 
-			log.trace("Raw password '" + rawPassword + "', encoded '"
-					+ encodedPassword + "'");
 			user.setMd5password(encodedPassword);
+
+			userDao.updateUser(user);
 		}
 	}
-
+	
+	class PwException extends Exception {
+		public PwException(String message) {
+			super(message);
+		}
+	}
+	
 }
