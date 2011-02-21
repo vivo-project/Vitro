@@ -9,6 +9,7 @@ import java.util.Map;
 import javax.servlet.http.HttpSession;
 
 import edu.cornell.mannlib.vedit.forwarder.PageForwarder;
+import edu.cornell.mannlib.vedit.validator.Validator;
 import edu.cornell.mannlib.vedit.beans.FormObject;
 import java.lang.reflect.Method;
 import java.io.Serializable;
@@ -24,10 +25,10 @@ public class EditProcessObject implements Serializable {
     private Object beanMask = null;
     private List simpleMask = new LinkedList();
 
-    private HashMap validatorMap = new HashMap();
-    private HashMap errMsgMap = new HashMap();
+    private Map<String, List<Validator>> validatorMap = new HashMap<String, List<Validator>>();
+    private Map<String, String> errMsgMap = new HashMap<String, String>();
 
-    private HashMap defaultValueMap = new HashMap();
+    private Map<String, String> defaultValueMap = new HashMap<String, String>();
 
     private List preProcessorList = new LinkedList();
     private List changeListenerList = new LinkedList();
@@ -58,9 +59,9 @@ public class EditProcessObject implements Serializable {
 
     private Map requestParameterMap = null;
 
-    private HashMap badValueMap = new HashMap();
+    private Map<String, String> badValueMap = new HashMap<String, String>();
     
-    private HashMap<String,Object> attributeMap = new HashMap<String,Object>();
+    private Map<String,Object> attributeMap = new HashMap<String, Object>();
 
     private Method getMethod = null;
     //assumed to take an integer primary key argument, at least for now
@@ -272,39 +273,39 @@ public class EditProcessObject implements Serializable {
         this.getMethod = getMethod;
     }
 
-    public HashMap getDefaultValueMap() {
+    public Map<String, String> getDefaultValueMap() {
         return defaultValueMap;
     }
 
-    public void setDefaultValueMap(HashMap dvh) {
+    public void setDefaultValueMap(Map<String, String> dvh) {
         this.defaultValueMap = dvh;
     }
 
-    public HashMap getValidatorMap(){
+    public Map<String, List<Validator>> getValidatorMap(){
         return validatorMap;
     }
 
-    public void setValidatorMap(HashMap validatorMap){
+    public void setValidatorMap(Map<String, List<Validator>> validatorMap){
         this.validatorMap = validatorMap;
     }
 
-    public HashMap getErrMsgMap() {
+    public Map<String, String> getErrMsgMap() {
         return errMsgMap;
     }
 
-    public void setErrMsgMap(HashMap emh){
+    public void setErrMsgMap(Map<String, String> emh){
         errMsgMap = emh;
     }
 
-    public HashMap getBadValueMap() {
+    public Map<String, String> getBadValueMap() {
         return badValueMap;
     }
 
-    public void setBadValueMap(HashMap bvh){
+    public void setBadValueMap(Map<String, String> bvh){
         badValueMap = bvh;
     }
 
-    public Map getAttributeMap() {
+    public Map<String, Object> getAttributeMap() {
     	return this.attributeMap;
     }
     

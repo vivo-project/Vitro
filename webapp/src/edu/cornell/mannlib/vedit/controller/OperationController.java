@@ -9,6 +9,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -278,9 +279,9 @@ public class OperationController extends BaseEditController {
                 }
                 if (fieldValid){
                     if (currValue.length()==0) {
-                        HashMap defaultHash = epo.getDefaultValueMap();
+                        Map<String, String> defaultHash = epo.getDefaultValueMap();
                         try {
-                            String defaultValue = (String)defaultHash.get(currParam);
+                            String defaultValue = defaultHash.get(currParam);
                             if (defaultValue != null)
                                 currValue=defaultValue;
                         } catch (Exception e) {}

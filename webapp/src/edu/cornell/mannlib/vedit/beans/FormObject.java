@@ -6,13 +6,14 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class FormObject implements Serializable {
 
     private HashMap<String, String> values = new HashMap<String, String>();
     private HashMap<String, List<Option>> optionLists = new HashMap<String, List<Option>>();
     private HashMap<String, List<Checkbox>> checkboxLists = new HashMap<String, List<Checkbox>>();
-    private HashMap<String, String> errorMap = new HashMap<String, String>();
+    private Map<String, String> errorMap = new HashMap<String, String>();
     private List<DynamicField> dynamicFields = new ArrayList<DynamicField>();
 
     public HashMap<String, String> getValues(){
@@ -43,11 +44,11 @@ public class FormObject implements Serializable {
         return checkboxLists;
     }
 
-    public HashMap<String, String> getErrorMap(){
+    public Map<String, String> getErrorMap(){
         return errorMap;
     }
 
-    public void setErrorMap(HashMap<String, String> errorMap){
+    public void setErrorMap(Map<String, String> errorMap){
         this.errorMap = errorMap;
     }
 

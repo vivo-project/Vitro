@@ -34,7 +34,7 @@ public class FormUtils {
         return htmlFormFromBean(bean,action,null,foo,new HashMap());
     }
 
-    public static String htmlFormFromBean (Object bean, String action, FormObject foo, HashMap badValuesHash) {
+    public static String htmlFormFromBean (Object bean, String action, FormObject foo, Map<String, String> badValuesHash) {
         return htmlFormFromBean(bean,action,null,foo,badValuesHash);
     }
 
@@ -47,7 +47,7 @@ public class FormUtils {
      * @return XHTML markup of an editing form for the specified class
      * @author bjl23
      */
-    public static String htmlFormFromBean (Object bean, String action, EditProcessObject epo, FormObject foo, HashMap BadValuesHash) {
+    public static String htmlFormFromBean (Object bean, String action, EditProcessObject epo, FormObject foo, Map<String, String> BadValuesHash) {
 
         String formMarkup = "";
 
