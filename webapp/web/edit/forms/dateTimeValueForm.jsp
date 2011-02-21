@@ -51,8 +51,8 @@
 <v:jsonset var="n3ForValue">
     ?subject      <${toDateTimeValue}> ?valueNode .
     ?valueNode  <${type}> <${valueType}> .
-    ?valueNode  <${dateTimeValue}> ?dateTimeField.value .
-    ?valueNode  <${dateTimePrecision}> ?dateTimeField.precision .
+    ?valueNode  <${dateTimeValue}> ?dateTimeField-value .
+    ?valueNode  <${dateTimePrecision}> ?dateTimeField-precision .
 </v:jsonset>
 
 <%-- Queries for editing an existing role --%>
@@ -120,11 +120,11 @@
     "sparqlForLiterals" : { },
     "sparqlForUris" : {  },
     "sparqlForExistingLiterals" : {
-        "dateTimeField.value"   : "${existingDateTimeValueQuery}",
+        "dateTimeField-value"   : "${existingDateTimeValueQuery}",
     },
     "sparqlForExistingUris" : {
         "valueNode"      : "${existingNodeQuery}",
-        "dateTimeField.precision": "${existingPrecisionQuery}"
+        "dateTimeField-precision": "${existingPrecisionQuery}"
     },
     "fields" : {     
       "dateTimeField" : {

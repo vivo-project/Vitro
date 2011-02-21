@@ -49,12 +49,12 @@ public class DateTimeWithPrecisionTest {
         DateTimeWithPrecision dtwp = new DateTimeWithPrecision(field);
         
         Map<String,String[]> queryParameters = new HashMap<String, String[]>();                        
-        queryParameters.put(FIELDNAME+".year", new String[]{"1999" });
-        queryParameters.put(FIELDNAME+".month", new String[]{"12"});
-        queryParameters.put(FIELDNAME+".day", new String[]{"01"});
-        queryParameters.put(FIELDNAME+".hour", new String[]{"12"});
-        queryParameters.put(FIELDNAME+".minute", new String[]{"00"});
-        queryParameters.put(FIELDNAME+".second", new String[]{"00"});                        
+        queryParameters.put(FIELDNAME+"-year", new String[]{"1999" });
+        queryParameters.put(FIELDNAME+"-month", new String[]{"12"});
+        queryParameters.put(FIELDNAME+"-day", new String[]{"01"});
+        queryParameters.put(FIELDNAME+"-hour", new String[]{"12"});
+        queryParameters.put(FIELDNAME+"-minute", new String[]{"00"});
+        queryParameters.put(FIELDNAME+"-second", new String[]{"00"});                        
         EditConfiguration editConfig=null;
         Map<String,String> validationMsgs = dtwp.getValidationMessages("testfield", editConfig, queryParameters);        
         Assert.assertNotNull(validationMsgs);
@@ -76,11 +76,11 @@ public class DateTimeWithPrecisionTest {
         DateTimeWithPrecision dtwp = new DateTimeWithPrecision(field);
         
         Map<String,String[]> queryParameters = new HashMap<String, String[]>();                        
-        queryParameters.put(FIELDNAME+".year", new String[]{"1999" });
-        queryParameters.put(FIELDNAME+".month", new String[]{"12"});
-        queryParameters.put(FIELDNAME+".day", new String[]{"01"});
-        queryParameters.put(FIELDNAME+".hour", new String[]{"12"});
-        queryParameters.put(FIELDNAME+".minute", new String[]{"00"});
+        queryParameters.put(FIELDNAME+"-year", new String[]{"1999" });
+        queryParameters.put(FIELDNAME+"-month", new String[]{"12"});
+        queryParameters.put(FIELDNAME+"-day", new String[]{"01"});
+        queryParameters.put(FIELDNAME+"-hour", new String[]{"12"});
+        queryParameters.put(FIELDNAME+"-minute", new String[]{"00"});
         //no seconds
         
         EditConfiguration editConfig=null;
@@ -96,17 +96,17 @@ public class DateTimeWithPrecisionTest {
     }
     
     @Test
-    public void precisionHourssValidationTest() throws Exception{
+    public void precisionHoursValidationTest() throws Exception{
         String FIELDNAME = "testfield";        
         Field field = new Field();
         field.setName(FIELDNAME);
         DateTimeWithPrecision dtwp = new DateTimeWithPrecision(field);
         
         Map<String,String[]> queryParameters = new HashMap<String, String[]>();                        
-        queryParameters.put(FIELDNAME+".year", new String[]{"1999" });
-        queryParameters.put(FIELDNAME+".month", new String[]{"12"});
-        queryParameters.put(FIELDNAME+".day", new String[]{"01"});
-        queryParameters.put(FIELDNAME+".hour", new String[]{"12"});
+        queryParameters.put(FIELDNAME+"-year", new String[]{"1999" });
+        queryParameters.put(FIELDNAME+"-month", new String[]{"12"});
+        queryParameters.put(FIELDNAME+"-day", new String[]{"01"});
+        queryParameters.put(FIELDNAME+"-hour", new String[]{"12"});
         //no minutes
         //no seconds
         
@@ -130,9 +130,9 @@ public class DateTimeWithPrecisionTest {
         DateTimeWithPrecision dtwp = new DateTimeWithPrecision(field);
         
         Map<String,String[]> queryParameters = new HashMap<String, String[]>();                        
-        queryParameters.put(FIELDNAME+".year", new String[]{"1999" });
-        queryParameters.put(FIELDNAME+".month", new String[]{"12"});
-        queryParameters.put(FIELDNAME+".day", new String[]{"01"});
+        queryParameters.put(FIELDNAME+"-year", new String[]{"1999" });
+        queryParameters.put(FIELDNAME+"-month", new String[]{"12"});
+        queryParameters.put(FIELDNAME+"-day", new String[]{"01"});
         //no hours
         //no minutes
         //no seconds
@@ -157,8 +157,8 @@ public class DateTimeWithPrecisionTest {
         DateTimeWithPrecision dtwp = new DateTimeWithPrecision(field);
         
         Map<String,String[]> queryParameters = new HashMap<String, String[]>();                        
-        queryParameters.put(FIELDNAME+".year", new String[]{"1999" });
-        queryParameters.put(FIELDNAME+".month", new String[]{"12"});
+        queryParameters.put(FIELDNAME+"-year", new String[]{"1999" });
+        queryParameters.put(FIELDNAME+"-month", new String[]{"12"});
         //no days
         //no hours
         //no minutes
@@ -184,7 +184,7 @@ public class DateTimeWithPrecisionTest {
         DateTimeWithPrecision dtwp = new DateTimeWithPrecision(field);
         
         Map<String,String[]> queryParameters = new HashMap<String, String[]>();                        
-        queryParameters.put(FIELDNAME+".year", new String[]{"1999" });
+        queryParameters.put(FIELDNAME+"-year", new String[]{"1999" });
         //no months
         //no days
         //no hours
@@ -243,7 +243,7 @@ public class DateTimeWithPrecisionTest {
         DateTimeWithPrecision dtwp = new DateTimeWithPrecision(field);
         
         Map<String,String[]> queryParameters = new HashMap<String, String[]>();                        
-        queryParameters.put(FIELDNAME+".year", new String[]{"1999" });
+        queryParameters.put(FIELDNAME+"-year", new String[]{"1999" });
         //no months
         //no days
         //no hours
@@ -279,9 +279,9 @@ public class DateTimeWithPrecisionTest {
         
         /* Check if it works with day number under 29 */
         Map<String,String[]> queryParameters = new HashMap<String, String[]>();                        
-        queryParameters.put(FIELDNAME+".year", new String[]{"1999" });
-        queryParameters.put(FIELDNAME+".month", new String[]{"12"});
-        queryParameters.put(FIELDNAME+".day", new String[]{"28"});
+        queryParameters.put(FIELDNAME+"-year", new String[]{"1999" });
+        queryParameters.put(FIELDNAME+"-month", new String[]{"12"});
+        queryParameters.put(FIELDNAME+"-day", new String[]{"28"});
                 
         Map<String,String> validationMsgs = dtwp.getValidationMessages("testfield", (EditConfiguration)null, queryParameters);        
         Assert.assertNotNull(validationMsgs);
@@ -293,9 +293,9 @@ public class DateTimeWithPrecisionTest {
         
         /* Check for days greater than 28 */
         queryParameters = new HashMap<String, String[]>();                        
-        queryParameters.put(FIELDNAME+".year", new String[]{"1999" });
-        queryParameters.put(FIELDNAME+".month", new String[]{"12"});
-        queryParameters.put(FIELDNAME+".day", new String[]{"30"});
+        queryParameters.put(FIELDNAME+"-year", new String[]{"1999" });
+        queryParameters.put(FIELDNAME+"-month", new String[]{"12"});
+        queryParameters.put(FIELDNAME+"-day", new String[]{"30"});
                 
         validationMsgs = dtwp.getValidationMessages("testfield", (EditConfiguration)null, queryParameters);        
         Assert.assertNotNull(validationMsgs);
@@ -307,9 +307,9 @@ public class DateTimeWithPrecisionTest {
         
         /* Check for leap year */
         queryParameters = new HashMap<String, String[]>();                        
-        queryParameters.put(FIELDNAME+".year", new String[]{"2000" });
-        queryParameters.put(FIELDNAME+".month", new String[]{"2"});
-        queryParameters.put(FIELDNAME+".day", new String[]{"29"});
+        queryParameters.put(FIELDNAME+"-year", new String[]{"2000" });
+        queryParameters.put(FIELDNAME+"-month", new String[]{"2"});
+        queryParameters.put(FIELDNAME+"-day", new String[]{"29"});
                 
         validationMsgs = dtwp.getValidationMessages("testfield", (EditConfiguration)null, queryParameters);        
         Assert.assertNotNull(validationMsgs);
@@ -321,9 +321,9 @@ public class DateTimeWithPrecisionTest {
         
         /* check for non leap year */
         queryParameters = new HashMap<String, String[]>();                        
-        queryParameters.put(FIELDNAME+".year", new String[]{"1999" });
-        queryParameters.put(FIELDNAME+".month", new String[]{"2"});
-        queryParameters.put(FIELDNAME+".day", new String[]{"29"});
+        queryParameters.put(FIELDNAME+"-year", new String[]{"1999" });
+        queryParameters.put(FIELDNAME+"-month", new String[]{"2"});
+        queryParameters.put(FIELDNAME+"-day", new String[]{"29"});
                 
         validationMsgs = dtwp.getValidationMessages("testfield", (EditConfiguration)null, queryParameters);        
         Assert.assertNotNull(validationMsgs);

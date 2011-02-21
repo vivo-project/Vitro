@@ -35,7 +35,7 @@ vitro.customFormUtils = {
             // For now we can remove the error elements. Later we may include them in
             // the markup, for customized positioning, in which case we will empty them
             // but not remove them here. See findValidationErrors().  
-            $('*[id=' + $(this).attr('id') + '_validationError]').remove();
+            $('[id=' + $(this).attr('id') + '_validationError]').remove();
         });
     	    
     },

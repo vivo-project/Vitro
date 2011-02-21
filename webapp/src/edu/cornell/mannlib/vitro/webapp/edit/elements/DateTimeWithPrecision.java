@@ -27,7 +27,7 @@ import freemarker.template.Configuration;
 
 /**
  * This is intended to work in conjunction with a template to create the HTML for a 
- * datetime with precision and to convert he submitted parameters into 
+ * datetime with precision and to convert the submitted parameters into 
  * varname -> Literal and varname -> URI maps.
  * 
  * The variables that get passed to the template are defined in:
@@ -257,7 +257,7 @@ public class DateTimeWithPrecision extends BaseEditElement {
         Map<String,Literal> literalMap = new HashMap<String,Literal>();
        
         Literal datetime =getDateTime( queryParameters);
-        literalMap.put(fieldName+".value", datetime);
+        literalMap.put(fieldName+"-value", datetime);
         
         return literalMap;
     }
@@ -273,25 +273,25 @@ public class DateTimeWithPrecision extends BaseEditElement {
         if( BLANK_SENTINEL.equals( submittedPrec ) )
             return null;
         
-        Integer year = parseToInt(fieldName+".year", queryParameters);
+        Integer year = parseToInt(fieldName+"-year", queryParameters);
         
         //this is the case where date has not been filled out at all.        
         if( year == null ) 
             return null;
         
-        Integer month = parseToInt(fieldName+".month", queryParameters);
+        Integer month = parseToInt(fieldName+"-month", queryParameters);
         if( month == null || month == 0 ) 
             month = 1;        
-        Integer day = parseToInt(fieldName+".day", queryParameters);
+        Integer day = parseToInt(fieldName+"-day", queryParameters);
         if( day == null || day == 0 )
             day = 1;
-        Integer hour = parseToInt(fieldName+".hour", queryParameters);
+        Integer hour = parseToInt(fieldName+"-hour", queryParameters);
         if( hour == null )
             hour = 0;
-        Integer minute = parseToInt(fieldName+".minute", queryParameters);
+        Integer minute = parseToInt(fieldName+"-minute", queryParameters);
         if( minute == null )
             minute = 0;
-        Integer second = parseToInt(fieldName+".second", queryParameters);
+        Integer second = parseToInt(fieldName+"-second", queryParameters);
         if( second == null )
             second = 0;
         int mills = 0;
@@ -326,12 +326,12 @@ public class DateTimeWithPrecision extends BaseEditElement {
         try {
             precisionUri = getSubmittedPrecision( queryParameters);
         } catch (Exception e) {
-            log.error("getURIS() should only be called on input that passed getValidationErrors()");
+            log.error("getURIs() should only be called on input that passed getValidationErrors()");
             return Collections.emptyMap();        
         }
         Map<String,String> uriMap = new HashMap<String,String>();
         if( precisionUri != null )
-            uriMap.put(fieldName+".precision", precisionUri);        
+            uriMap.put(fieldName+"-precision", precisionUri);        
         return uriMap;
     }
     
@@ -342,12 +342,12 @@ public class DateTimeWithPrecision extends BaseEditElement {
      */
     protected String getSubmittedPrecision(Map<String, String[]> queryParameters) throws Exception {
         
-        Integer year = parseToInt(fieldName+".year",queryParameters);
-        Integer month = parseToInt(fieldName+".month",queryParameters);
-        Integer day = parseToInt(fieldName+".day",queryParameters);
-        Integer hour  = parseToInt(fieldName+".hour",queryParameters);
-        Integer minute = parseToInt(fieldName+".minute",queryParameters);
-        Integer second = parseToInt(fieldName+".second",queryParameters);
+        Integer year = parseToInt(fieldName+"-year",queryParameters);
+        Integer month = parseToInt(fieldName+"-month",queryParameters);
+        Integer day = parseToInt(fieldName+"-day",queryParameters);
+        Integer hour  = parseToInt(fieldName+"-hour",queryParameters);
+        Integer minute = parseToInt(fieldName+"-minute",queryParameters);
+        Integer second = parseToInt(fieldName+"-second",queryParameters);
         Integer[] values = { year, month, day, hour, minute, second };
         
         /*  find the most significant date field that is null. */
@@ -393,8 +393,8 @@ public class DateTimeWithPrecision extends BaseEditElement {
         //check that any parameters we got are single values
         String[] names = {"year","month","day","hour","minute","second", "precision"};
         for( String name:names){            
-            if ( !hasNoneOrSingle(fieldName+"."+name, queryParameters))
-                errorMsgMap.put(fieldName+"."+name, "must have only one value for " + name);            
+            if ( !hasNoneOrSingle(fieldName+"-"+name, queryParameters))
+                errorMsgMap.put(fieldName+"-"+name, "must have only one value for " + name);            
         }
         
         String precisionURI = null;
@@ -430,72 +430,72 @@ public class DateTimeWithPrecision extends BaseEditElement {
                 
         //just check if the values for the precision parse to integers
         if( precisionURI.equals(VitroVocabulary.Precision.YEAR.uri() ) ){
-            if( ! canParseToNumber(fieldName+".year" ,qp))
-                errors.put(fieldName+".year", NON_INTEGER_YEAR);            
+            if( ! canParseToNumber(fieldName+"-year" ,qp))
+                errors.put(fieldName+"-year", NON_INTEGER_YEAR);            
         }else if( precisionURI.equals( VitroVocabulary.Precision.MONTH.uri() )){
-            if( ! canParseToNumber(fieldName+".year" ,qp))
-                errors.put(fieldName+".year", NON_INTEGER_YEAR);
-            if( ! canParseToNumber(fieldName+".month" ,qp))
-                errors.put(fieldName+".month", NON_INTEGER_MONTH);
+            if( ! canParseToNumber(fieldName+"-year" ,qp))
+                errors.put(fieldName+"-year", NON_INTEGER_YEAR);
+            if( ! canParseToNumber(fieldName+"-month" ,qp))
+                errors.put(fieldName+"-month", NON_INTEGER_MONTH);
         }else if( precisionURI.equals( VitroVocabulary.Precision.DAY.uri() )){
-            if( ! canParseToNumber(fieldName+".year" ,qp))
-                errors.put(fieldName+".year", NON_INTEGER_YEAR);
-            if( ! canParseToNumber(fieldName+".month" ,qp))
-                errors.put(fieldName+".month", NON_INTEGER_MONTH);
-            if( ! canParseToNumber(fieldName+".day" ,qp))
-                errors.put(fieldName+".day", NON_INTEGER_DAY);
+            if( ! canParseToNumber(fieldName+"-year" ,qp))
+                errors.put(fieldName+"-year", NON_INTEGER_YEAR);
+            if( ! canParseToNumber(fieldName+"-month" ,qp))
+                errors.put(fieldName+"-month", NON_INTEGER_MONTH);
+            if( ! canParseToNumber(fieldName+"-day" ,qp))
+                errors.put(fieldName+"-day", NON_INTEGER_DAY);
         }else if( precisionURI.equals( VitroVocabulary.Precision.HOUR.uri() )){
-            if( ! canParseToNumber(fieldName+".year" ,qp))
-                errors.put(fieldName+".year", NON_INTEGER_YEAR);
-            if( ! canParseToNumber(fieldName+".month" ,qp))
-                errors.put(fieldName+".month", NON_INTEGER_MONTH);
-            if( ! canParseToNumber(fieldName+".day" ,qp))
-                errors.put(fieldName+".day", NON_INTEGER_DAY);
-            if( ! canParseToNumber(fieldName+".hour" ,qp))
-                errors.put(fieldName+".hour", NON_INTEGER_HOUR);
+            if( ! canParseToNumber(fieldName+"-year" ,qp))
+                errors.put(fieldName+"-year", NON_INTEGER_YEAR);
+            if( ! canParseToNumber(fieldName+"-month" ,qp))
+                errors.put(fieldName+"-month", NON_INTEGER_MONTH);
+            if( ! canParseToNumber(fieldName+"-day" ,qp))
+                errors.put(fieldName+"-day", NON_INTEGER_DAY);
+            if( ! canParseToNumber(fieldName+"-hour" ,qp))
+                errors.put(fieldName+"-hour", NON_INTEGER_HOUR);
         }else if( precisionURI.equals( VitroVocabulary.Precision.MINUTE.uri() )){
-            if( ! canParseToNumber(fieldName+".year" ,qp))
-                errors.put(fieldName+".year", NON_INTEGER_YEAR);
-            if( ! canParseToNumber(fieldName+".month" ,qp))
-                errors.put(fieldName+".month", NON_INTEGER_MONTH);
-            if( ! canParseToNumber(fieldName+".day" ,qp))
-                errors.put(fieldName+".day", NON_INTEGER_DAY);
-            if( ! canParseToNumber(fieldName+".hour" ,qp))
-                errors.put(fieldName+".hour", NON_INTEGER_HOUR);
-            if( ! canParseToNumber(fieldName+".minute" ,qp))
-                errors.put(fieldName+".minute", NON_INTEGER_HOUR);
+            if( ! canParseToNumber(fieldName+"-year" ,qp))
+                errors.put(fieldName+"-year", NON_INTEGER_YEAR);
+            if( ! canParseToNumber(fieldName+"-month" ,qp))
+                errors.put(fieldName+"-month", NON_INTEGER_MONTH);
+            if( ! canParseToNumber(fieldName+"-day" ,qp))
+                errors.put(fieldName+"-day", NON_INTEGER_DAY);
+            if( ! canParseToNumber(fieldName+"-hour" ,qp))
+                errors.put(fieldName+"-hour", NON_INTEGER_HOUR);
+            if( ! canParseToNumber(fieldName+"-minute" ,qp))
+                errors.put(fieldName+"-minute", NON_INTEGER_HOUR);
         }else if( precisionURI.equals( VitroVocabulary.Precision.SECOND.uri() )){
-            if( ! canParseToNumber(fieldName+".year" ,qp))
-                errors.put(fieldName+".year", NON_INTEGER_YEAR);
-            if( ! canParseToNumber(fieldName+".month" ,qp))
-                errors.put(fieldName+".month", NON_INTEGER_MONTH);
-            if( ! canParseToNumber(fieldName+".day" ,qp))
-                errors.put(fieldName+".day", NON_INTEGER_DAY);
-            if( ! canParseToNumber(fieldName+".hour" ,qp))
-                errors.put(fieldName+".hour", NON_INTEGER_HOUR);
-            if( ! canParseToNumber(fieldName+".minute" ,qp))
-                errors.put(fieldName+".minute", NON_INTEGER_HOUR);
-            if( ! canParseToNumber(fieldName+".second" ,qp))
-                errors.put(fieldName+".second", NON_INTEGER_SECOND);
+            if( ! canParseToNumber(fieldName+"-year" ,qp))
+                errors.put(fieldName+"-year", NON_INTEGER_YEAR);
+            if( ! canParseToNumber(fieldName+"-month" ,qp))
+                errors.put(fieldName+"-month", NON_INTEGER_MONTH);
+            if( ! canParseToNumber(fieldName+"-day" ,qp))
+                errors.put(fieldName+"-day", NON_INTEGER_DAY);
+            if( ! canParseToNumber(fieldName+"-hour" ,qp))
+                errors.put(fieldName+"-hour", NON_INTEGER_HOUR);
+            if( ! canParseToNumber(fieldName+"-minute" ,qp))
+                errors.put(fieldName+"-minute", NON_INTEGER_HOUR);
+            if( ! canParseToNumber(fieldName+"-second" ,qp))
+                errors.put(fieldName+"-second", NON_INTEGER_SECOND);
         }
                        
         //check if we can make a valid date with these integers
-        year = parseToInt(fieldName+".year", qp);
+        year = parseToInt(fieldName+"-year", qp);
         if( year == null ) 
             year = 1999;
-        month= parseToInt(fieldName+".month", qp);
+        month= parseToInt(fieldName+"-month", qp);
         if(month == null )
             month = 1;
-        day = parseToInt(fieldName+".day", qp);
+        day = parseToInt(fieldName+"-day", qp);
         if( day == null )
              day = 1;
-        hour = parseToInt(fieldName+".hour", qp);
+        hour = parseToInt(fieldName+"-hour", qp);
         if( hour == null )
             hour = 0;
-        minute = parseToInt(fieldName+".minute",qp);
+        minute = parseToInt(fieldName+"-minute",qp);
         if( minute == null )
             minute = 0;
-        second = parseToInt(fieldName+".second", qp);
+        second = parseToInt(fieldName+"-second", qp);
         if( second == null )
             second = 0;                
                 
@@ -506,27 +506,27 @@ public class DateTimeWithPrecision extends BaseEditElement {
         try{
             dateTime = dateTime.withYear(year);
         }catch(IllegalArgumentException iae){
-           errors.put(fieldName+".year", iae.getLocalizedMessage());   
+           errors.put(fieldName+"-year", iae.getLocalizedMessage());   
         }
         try{
             dateTime = dateTime.withMonthOfYear(month);
         }catch(IllegalArgumentException iae){
-            errors.put(fieldName+".month", iae.getLocalizedMessage());
+            errors.put(fieldName+"-month", iae.getLocalizedMessage());
         }
         try{
             dateTime = dateTime.withDayOfMonth(day);
         }catch(IllegalArgumentException iae){
-            errors.put(fieldName+".day", iae.getLocalizedMessage());
+            errors.put(fieldName+"-day", iae.getLocalizedMessage());
         }
         try{
             dateTime = dateTime.withHourOfDay(hour);
         }catch(IllegalArgumentException iae){
-            errors.put(fieldName+".hour", iae.getLocalizedMessage());
+            errors.put(fieldName+"-hour", iae.getLocalizedMessage());
         }
         try{
             dateTime = dateTime.withSecondOfMinute(second);
         }catch(IllegalArgumentException iae){
-            errors.put(fieldName+".second", iae.getLocalizedMessage());    
+            errors.put(fieldName+"-second", iae.getLocalizedMessage());    
         }       
 
         return errors;
@@ -605,8 +605,8 @@ public class DateTimeWithPrecision extends BaseEditElement {
         return null;                
     }
     
-    public String getValueVariableName(){ return fieldName + ".value" ; }
-    public String getPrecisionVariableName(){ return fieldName + ".precision" ; }
+    public String getValueVariableName(){ return fieldName + "-value" ; }
+    public String getPrecisionVariableName(){ return fieldName + "-precision" ; }
 }
 
 
