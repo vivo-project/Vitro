@@ -4,13 +4,19 @@ package edu.cornell.mannlib.vitro.webapp.web.directives.dump;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper;
+import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 import edu.cornell.mannlib.vitro.webapp.web.directives.BaseTemplateDirectiveModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 import freemarker.core.Environment;
@@ -73,7 +79,7 @@ public class DumpHelper {
             // view in the dump. Not sure if we should handle our application-specific, non-template
             // model objects in the same way. For now, these get assigned a shorthand type below.
             if (unwrappedModel instanceof BaseTemplateModel) {
-                value = ((BaseTemplateModel)unwrappedModel).dump();   
+                value = getTemplateModelDump((BaseTemplateModel)unwrappedModel); //((BaseTemplateModel)unwrappedModel).dump();   
                 type = className;
             }            
             // Can't use this, because tm of (at least some) POJOs are
@@ -121,6 +127,87 @@ public class DumpHelper {
         } catch (IOException e) {
             log.error("Error writing dump of " + modelName + ".");
         }          
+    }
+    
+    protected List<Method> getMethodsAvailableToTemplate(Class<?> cls) {
+        List<Method> methods = new ArrayList<Method>();
+
+        // Go up the class hierarchy only as far as the immediate subclass of BaseTemplateModel
+        if (! cls.getName().equals("edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel")) {
+            methods = getDeclaredPublicMethods(cls);
+            methods.addAll(getMethodsAvailableToTemplate(cls.getSuperclass()));
+        }
+        
+        return methods;
+    }
+        
+    private List<Method> getDeclaredPublicMethods(Class<?> cls) {
+        
+        List<Method> methods = new ArrayList<Method>();
+        Method[] declaredMethods = cls.getDeclaredMethods();
+        for (Method m : declaredMethods) {
+            int mod = m.getModifiers();
+            if (Modifier.isPublic(mod) && !Modifier.isStatic(mod)) {
+                // if the method takes args, make sure the BeanWrapper used makes this method visible
+                methods.add(m);
+            }
+        }
+        return methods;
+    }
+    
+    protected String getMethodDisplayName(Method method) {
+        String methodName = method.getName();
+        methodName = methodName.replaceAll("^(get|is)", "");
+        methodName = methodName.substring(0, 1).toLowerCase() + methodName.substring(1);
+
+        Class<?>[] paramTypes = method.getParameterTypes();
+        String paramList = "";
+        if (paramTypes.length > 0) {
+            List<String> paramTypeList = new ArrayList<String>(paramTypes.length);
+            for (Class<?> cls : paramTypes) {
+                String name = cls.getName();
+                String[] nameParts = name.split("\\.");
+                String typeName = nameParts[nameParts.length-1];
+                typeName = typeName.replaceAll(";", "s");
+                typeName = typeName.substring(0,1).toLowerCase() + typeName.substring(1);
+                paramTypeList.add(typeName);
+            }
+            paramList = "(" + StringUtils.join(paramTypeList) + ")";
+        }
+        
+        return methodName + paramList;        
+    }
+    
+    private String getTemplateModelDump(BaseTemplateModel model) {
+        
+        log.debug(model.getClass());
+        Map<String, Object> map = new HashMap<String, Object>();        
+        List<Method> publicMethods = getMethodsAvailableToTemplate(model.getClass());        
+        Map<String, String> properties = new HashMap<String, String>();
+        List<String> methods = new ArrayList<String>();
+        for (Method method : publicMethods) {
+            String key = getMethodDisplayName(method);
+            
+            if (key.endsWith(")")) {
+                methods.add(key);
+            } else {
+                try {                   
+                    Object value = method.invoke(model);
+                    if (value == null) {
+                        value = "null"; // distinguish a null from an empty string
+                    }
+                    properties.put(key, value.toString());
+                } catch (Exception e) {
+                    log.error(e, e);
+                    continue;
+                }
+            }
+        }
+
+        map.put("properties", properties);
+        map.put("methods", methods);
+        return BaseTemplateDirectiveModel.processTemplateToString("dump-tm.ftl", map, env);
+        
     }
     
 }

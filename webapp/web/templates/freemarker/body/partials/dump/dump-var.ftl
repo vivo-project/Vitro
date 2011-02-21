@@ -5,8 +5,8 @@
 <div class="var"> 
     <p><strong>Variable name: <em>${var}</em></strong></p>
     <#if value??>
-        <p><strong>Value:</strong> ${value}</p>
         <p><strong>Type:</strong> ${type}</p>
+        <div><strong>Value:</strong> ${value}</div>        
     <#else>
         <p>Variable is undefined in the data model</p>
     </#if>   

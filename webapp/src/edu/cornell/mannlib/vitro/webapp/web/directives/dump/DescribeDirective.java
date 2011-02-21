@@ -18,7 +18,6 @@ import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 import edu.cornell.mannlib.vitro.webapp.web.directives.BaseTemplateDirectiveModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 import freemarker.core.Environment;
-import freemarker.template.Configuration;
 import freemarker.template.SimpleScalar;
 import freemarker.template.TemplateDirectiveBody;
 import freemarker.template.TemplateException;
@@ -31,7 +30,6 @@ public class DescribeDirective extends BaseTemplateDirectiveModel {
 
     private static final Log log = LogFactory.getLog(DescribeDirective.class);
     
-    @SuppressWarnings("unchecked")
     @Override
     public void execute(Environment env, Map params, TemplateModel[] loopVars,
             TemplateDirectiveBody body) throws TemplateException, IOException {
@@ -74,16 +72,17 @@ public class DescribeDirective extends BaseTemplateDirectiveModel {
                 varName + " is not a template model.");                 
         }
         
-        List<Method> methods = getPublicMethods(unwrappedModel.getClass());
-        List<String> methodDescriptions = new ArrayList<String>(methods.size());
+        DumpHelper helper = new DumpHelper(env); 
+        List<Method> methods = helper.getMethodsAvailableToTemplate(unwrappedModel.getClass());
+        List<String> methodDisplayNames = new ArrayList<String>(methods.size());
         for (Method m : methods) {
-            methodDescriptions.add(getMethodDescription(m));
+            methodDisplayNames.add(helper.getMethodDisplayName(m));
         }
-        Collections.sort(methodDescriptions);
+        Collections.sort(methodDisplayNames);
         
         Map<String, Object> map = new HashMap<String, Object>(); 
         map.put("var", varName);
-        map.put("methods", methodDescriptions);
+        map.put("methods", methodDisplayNames);
         
         try {
             map.put("stylesheets", dataModel.get("stylesheets"));
@@ -91,7 +90,6 @@ public class DescribeDirective extends BaseTemplateDirectiveModel {
             log.error("Error getting value of stylesheets variable from data model.");
         }
 
-        DumpHelper helper = new DumpHelper(env); 
         helper.writeDump("describe.ftl", map, varName);   
     }
     
@@ -115,57 +113,6 @@ public class DescribeDirective extends BaseTemplateDirectiveModel {
         map.put("examples", examples);
         
         return mergeToHelpTemplate(map, env);
-    }
-    
-    private List<Method> getPublicMethods(Class<?> cls) {
-        List<Method> methods = new ArrayList<Method>();
-
-        // Go up the class hierarchy only as far as the immediate subclass of BaseTemplateModel
-        if (! cls.getName().equals("edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel")) {
-            methods = getDeclaredPublicMethods(cls);
-            methods.addAll(getPublicMethods(cls.getSuperclass()));
-        }
-        
-        return methods;
-    }
-    
-    private List<Method> getDeclaredPublicMethods(Class<?> cls) {
-        
-        List<Method> methods = new ArrayList<Method>();
-        Method[] declaredMethods = cls.getDeclaredMethods();
-        for (Method m : declaredMethods) {
-            int mod = m.getModifiers();
-            if (Modifier.isPublic(mod) && !Modifier.isStatic(mod)) {
-                methods.add(m);
-            }
-        }
-        return methods;
-    }
-   
-    
-    private String getMethodDescription(Method method) {
-        
-        String methodName = method.getName();
-        methodName = methodName.replaceAll("^(get|is)", "");
-        methodName = methodName.substring(0, 1).toLowerCase() + methodName.substring(1);
-
-        Class<?>[] paramTypes = method.getParameterTypes();
-        String paramList = "";
-        if (paramTypes.length > 0) {
-            List<String> paramTypeList = new ArrayList<String>(paramTypes.length);
-            for (Class<?> cls : paramTypes) {
-                String name = cls.getName();
-                String[] nameParts = name.split("\\.");
-                String typeName = nameParts[nameParts.length-1];
-                typeName = typeName.replaceAll(";", "s");
-                typeName = typeName.substring(0,1).toLowerCase() + typeName.substring(1);
-                paramTypeList.add(typeName);
-            }
-            paramList = "(" + StringUtils.join(paramTypeList) + ")";
-        }
-        
-        return methodName + paramList;
-
     }
 
 }
