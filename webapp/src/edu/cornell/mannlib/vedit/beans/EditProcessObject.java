@@ -6,11 +6,9 @@ import java.util.List;
 import java.util.LinkedList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Stack;
 import javax.servlet.http.HttpSession;
 
 import edu.cornell.mannlib.vedit.forwarder.PageForwarder;
-import edu.cornell.mannlib.vedit.beans.BeanDependency;
 import edu.cornell.mannlib.vedit.beans.FormObject;
 import java.lang.reflect.Method;
 import java.io.Serializable;
@@ -63,10 +61,6 @@ public class EditProcessObject implements Serializable {
     private HashMap badValueMap = new HashMap();
     
     private HashMap<String,Object> attributeMap = new HashMap<String,Object>();
-
-    /***** experimental ******/
-    private Stack epoStack = new Stack();
-    private HashMap beanDependencies = new HashMap();
 
     private Method getMethod = null;
     //assumed to take an integer primary key argument, at least for now
@@ -322,29 +316,4 @@ public class EditProcessObject implements Serializable {
     	this.attributeMap.put(key, value);
     }
     
-    public Stack getEpoStack(){
-        return epoStack;
-    }
-
-    public HashMap /*to BeanDependency*/ getBeanDependencies(){
-        return beanDependencies;
-    }
-
-    public void setBeanDependencies(HashMap beanDependencies){
-        this.beanDependencies = beanDependencies;
-    }
-
-    public BeanDependency getBeanDependency(String name){
-        return (BeanDependency) beanDependencies.get(name);
-    }
-
-    public Object getDependentBean(String name){
-        return ((BeanDependency)beanDependencies.get(name)).getBean();
-    }
-
-    /******* probably will need to change this *******/
-    public void setEpoStack(Stack epoStack){
-        this.epoStack = epoStack;
-    }
-
 }
