@@ -21,12 +21,15 @@ import com.hp.hpl.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
+import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SearchReindexingListener;
+import edu.cornell.mannlib.vitro.webapp.search.beans.IndividualProhibitedFromSearch;
+import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
 
 /**
@@ -83,7 +86,13 @@ public class LuceneSetupCJK implements javax.servlet.ServletContextListener {
             //here we want to put the LuceneIndex object into the application scope
             LuceneIndexer indexer = new LuceneIndexer(indexDir, liveIndexDir, null, getAnalyzer());            
             context.setAttribute(LuceneSetup.ANALYZER, getAnalyzer());
-            indexer.addObj2Doc(new Entity2LuceneDoc());                      
+            
+            OntModel displayOntModel = (OntModel) sce.getServletContext().getAttribute("displayOntModel");
+            Entity2LuceneDoc translator = new Entity2LuceneDoc( 
+                    new ProhibitedFromSearch(DisplayVocabulary.PRIMARY_LUCENE_INDEX_URI, displayOntModel),
+                    new IndividualProhibitedFromSearch(context) );                                  
+            indexer.addObj2Doc(translator);     
+                                              
             indexer.setLuceneIndexFactory(lif);
             
             //This is where the builder gets the list of places to try to 

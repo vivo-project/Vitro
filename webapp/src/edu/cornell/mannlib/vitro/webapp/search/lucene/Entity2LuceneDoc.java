@@ -2,9 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.search.lucene;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -24,9 +21,9 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
+import edu.cornell.mannlib.vitro.webapp.search.beans.IndividualProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.docbuilder.Obj2DocIface;
-import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
 
 /**
  * This class expect that Entities passed to it will have
@@ -88,7 +85,17 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
     public static VitroLuceneTermNames term = new VitroLuceneTermNames();
 
     private static String entClassName = Individual.class.getName();
-    private ProhibitedFromSearch classesProhibitedFromSearch = null;
+    
+    private ProhibitedFromSearch classesProhibitedFromSearch;
+    
+    private IndividualProhibitedFromSearch individualProhibited;
+    
+    public Entity2LuceneDoc(
+            ProhibitedFromSearch classesProhibitedFromSearch, 
+            IndividualProhibitedFromSearch individualProhibited){
+        this.classesProhibitedFromSearch = classesProhibitedFromSearch;
+        this.individualProhibited = individualProhibited;
+    }
     
     public boolean canTranslate(Object obj) {    	
         return (obj != null && obj instanceof Individual);        	
@@ -118,6 +125,11 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
             return null;
         }
         
+        //filter out class groups, owl:ObjectProperties etc.
+        if( individualProhibited.isIndividualProhibited( id ) ){
+            return null;
+        }
+        
         /* Types and ClassGroup */
         boolean prohibited = false;
         List<VClass> vclasses = ent.getVClasses(false);
@@ -130,12 +142,7 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
             } else if ( clz.getURI().startsWith( OWL.NS ) ){
                 log.debug("not indexing " + id + " because of type " + clz.getURI());
                 return null;
-            }else if( clz.getURI().startsWith( VitroVocabulary.vitroURI ) 
-                 || clz.getURI().startsWith( VitroVocabulary.VITRO_PUBLIC )
-                 || clz.getURI().startsWith( VitroVocabulary.PSEUDO_BNODE_NS) ){                
-                log.debug("not indexing " + id + " because of type " + clz.getURI());
-                return null;
-            }else{                
+             }else{                
                 if( !prohibited && classesProhibitedFromSearch.isClassProhibited(clz.getURI()) )
                     prohibited = true;                                                   
                 
