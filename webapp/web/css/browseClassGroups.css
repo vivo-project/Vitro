@@ -73,7 +73,7 @@ a.browse-superclass {
 ul#classes-in-classgroup {
     float: left;
     width: 90%;
-    padding: 0 10px 15px 22px;
+    padding: 0 10px 0 22px;
     margin-top: 20px;
     margin-bottom: 10px;
 }
