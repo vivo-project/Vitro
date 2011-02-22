@@ -71,7 +71,7 @@ public class DescribeDirective extends BaseTemplateDirectiveModel {
         }
         
         DumpHelper helper = new DumpHelper(env); 
-        List<Method> methods = helper.getMethodsAvailableToTemplate(unwrappedModel.getClass());
+        List<Method> methods = helper.getMethodsAvailableToTemplate(tm, unwrappedModel.getClass());
         List<String> methodDisplayNames = new ArrayList<String>(methods.size());
         for (Method m : methods) {
             methodDisplayNames.add(helper.getMethodDisplayName(m));
