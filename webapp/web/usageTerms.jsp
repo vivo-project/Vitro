@@ -9,8 +9,7 @@
         third parties, both individuals and organizations, commercial and otherwise. The use of this material 
         is protected by copyright and unless the terms of use are clearly stated with respect to individual items, 
         users must seek permission from the copyright owner for all uses that are not allowed by fair use and 
-        other provisions of the United States Copyright Act. Redistribution or commercial use is prohibited 
-        without express written permission.</p>
+        other provisions of the United States Copyright Act.</p>
         <h3>Disclaimer of Liability:</h3>
         <p class="normal">${copyrightAnchor} makes no warranty, expressed or implied, including the warranties of merchantability 
         and fitness for a particular purpose, or assumes any legal liability or responsibility for the accuracy, 
