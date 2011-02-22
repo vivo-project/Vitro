@@ -4,11 +4,9 @@ package edu.cornell.mannlib.vitro.webapp.web.directives.dump;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +20,9 @@ import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 import freemarker.core.Environment;
 import freemarker.template.TemplateBooleanModel;
 import freemarker.template.TemplateDateModel;
+import freemarker.template.TemplateDirectiveModel;
 import freemarker.template.TemplateHashModel;
+import freemarker.template.TemplateMethodModel;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
 import freemarker.template.TemplateNumberModel;
@@ -52,6 +52,7 @@ public class DumpHelper {
             tm = dataModel.get(varName);
         } catch (TemplateModelException tme) {
             log.error("Error getting value of template model " + varName + " from data model.");
+            return null;
         }
 
         Map<String, Object> map = new HashMap<String, Object>();
@@ -63,6 +64,7 @@ public class DumpHelper {
                 unwrappedModel = DeepUnwrap.permissiveUnwrap(tm);
             } catch (TemplateModelException e) {
                 log.error("Cannot unwrap template model  " + varName + ".");
+                return null;
             }
             
             // Just use toString() method for now. Handles nested collections. Could make more sophisticated later.
@@ -148,7 +150,8 @@ public class DumpHelper {
         for (Method m : declaredMethods) {
             int mod = m.getModifiers();
             if (Modifier.isPublic(mod) && !Modifier.isStatic(mod)) {
-                // if the method takes args, make sure the BeanWrapper used makes this method visible
+                // If the method takes args, make sure the BeanWrapper used makes this method visible.
+                // RY It may not be possible to determine this.
                 methods.add(m);
             }
         }
@@ -192,11 +195,19 @@ public class DumpHelper {
                 methods.add(key);
             } else {
                 try {                   
-                    Object value = method.invoke(model);
-                    if (value == null) {
+                    Object result = method.invoke(model);
+                    String value = null;
+                    if (result == null) {
                         value = "null"; // distinguish a null from an empty string
+//                    } else if (result instanceof TemplateDirectiveModel) {
+//                        // value = string output of the help() method processed through template
+//                    } else if (result instanceof TemplateMethodModel) {
+//                        // value = string output of the help() method processed through template
+                    } else {
+                        value = result.toString();
                     }
-                    properties.put(key, value.toString());
+                    
+                    properties.put(key, value);
                 } catch (Exception e) {
                     log.error(e, e);
                     continue;

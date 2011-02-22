@@ -59,7 +59,7 @@ public class HelpDirective extends BaseTemplateDirectiveModel {
         Configuration config = env.getConfiguration();
         Map<String, Object> map = new HashMap<String, Object>();
         
-        String help = ((BaseTemplateDirectiveModel) value).help(env);
+        String help = ((BaseTemplateDirectiveModel) value).help(directiveName, env);
         map.put("help", help);
         
         try {
@@ -74,20 +74,20 @@ public class HelpDirective extends BaseTemplateDirectiveModel {
     }
     
     
-    public String help(Environment env) {
+    public String help(String name, Environment env) {
         Map<String, Object> map = new HashMap<String, Object>();
         
-        String name = getDirectiveName();
         map.put("name", name);
         
-        map.put("effect", "Output directive help.");
+        map.put("effect", "Output help for directive or method.");
         
         Map<String, String> params = new HashMap<String, String>();
-        params.put("var", "name of directive");
+        params.put("var", "name of directive/method");
         map.put("params", params);
         
         List<String> examples = new ArrayList<String>();
         examples.add("<@" + name + " directive=\"dump\" />");
+        examples.add("<@" + name + " method=\"profileUrl\" />");
         map.put("examples", examples);
         
         return mergeToHelpTemplate(map, env);

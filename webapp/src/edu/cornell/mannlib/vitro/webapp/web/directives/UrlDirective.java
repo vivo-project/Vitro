@@ -60,10 +60,9 @@ public class UrlDirective extends BaseTemplateDirectiveModel {
         out.write(url);
     }
 
-    public String help(Environment env) {
+    public String help(String name, Environment env) {
         Map<String, Object> map = new HashMap<String, Object>();
         
-        String name = getDirectiveName();
         map.put("name", name);
         
         map.put("effect", "Generate a full url from a path. Use for generating src attribute of image tags.");

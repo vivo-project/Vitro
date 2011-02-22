@@ -3,23 +3,23 @@
 <#-- Template for displaying directive help -->
 
 <div class="directive">
-    <p><strong>Directive name:</strong> ${name}</p> 
+    <p><strong>Method name:</strong> ${name}</p> 
     
-    <#if effect??>
-        <p><strong>Effect:</strong> ${effect}</p>
+    <#if returnValue??>
+        <p><strong>Return value:</strong> ${returnValue}</p>
         
         <#if comments??>
             <p><strong>Comments:</strong> ${comments}</p>     
         </#if>      
         
-        <p><strong>Parameters: </strong>
+        <p><strong>Parameters:</strong>
         <#if params??>
             </p>
-            <ul>
-                <#list params?keys as param>
-                    <li><strong>${param}:</strong> ${params[param]}</li>   
+            <ol>
+                <#list params as param>
+                    <li>${param}</li>   
                 </#list>
-            </ul>
+            </ol>
         <#else>
             none</p>
         </#if>
@@ -35,6 +35,6 @@
         </#if>
         
     <#else>
-        <p>No help available for this directive.</p>
+        <p>No help available for this method.</p>
     </#if>
 </div>

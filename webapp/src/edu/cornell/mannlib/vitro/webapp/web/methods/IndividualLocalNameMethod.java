@@ -1,22 +1,24 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.web.functions;
+package edu.cornell.mannlib.vitro.webapp.web.methods;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import freemarker.core.Environment;
-import freemarker.template.TemplateMethodModel;
 import freemarker.template.TemplateModelException;
 
-public class IndividualLocalNameMethod implements TemplateMethodModel {
+public class IndividualLocalNameMethod extends BaseTemplateMethodModel {
 
+    @SuppressWarnings("rawtypes")
     @Override
     public String exec(List args) throws TemplateModelException {
         if (args.size() != 1) {
@@ -33,4 +35,23 @@ public class IndividualLocalNameMethod implements TemplateMethodModel {
         return individual.getLocalName();
     }
 
+    @Override
+    public String help(String name, Environment env) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        
+        map.put("name", name);
+        
+        map.put("returnValue", "The local name of the individual");
+
+        List<String>params = new ArrayList<String>();
+        params.add("Uri of individual");
+        map.put("params", params);
+        
+        List<String> examples = new ArrayList<String>();
+        examples.add(name + "(individual.uri)");
+        map.put("examples", examples);
+        
+        return mergeToHelpTemplate(map, env);
+    }
+    
 }

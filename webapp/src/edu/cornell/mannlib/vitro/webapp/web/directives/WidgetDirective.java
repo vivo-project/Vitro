@@ -93,10 +93,9 @@ public class WidgetDirective extends BaseTemplateDirectiveModel {
         
     }
 
-    public String help(Environment env) {
+    public String help(String name, Environment env) {
         Map<String, Object> map = new HashMap<String, Object>();
-        
-        String name = getDirectiveName();
+
         map.put("name", name);
         
         map.put("effect", "Add a reuseable block of markup and functionality to the template, with associated scripts and stylesheets injected into the page &lt;head&gt; element.");

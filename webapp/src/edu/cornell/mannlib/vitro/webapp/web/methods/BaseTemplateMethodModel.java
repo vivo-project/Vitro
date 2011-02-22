@@ -1,6 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
-
-package edu.cornell.mannlib.vitro.webapp.web.directives;
+package edu.cornell.mannlib.vitro.webapp.web.methods;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -12,26 +10,23 @@ import org.apache.commons.logging.LogFactory;
 
 import freemarker.core.Environment;
 import freemarker.template.Template;
-import freemarker.template.TemplateDirectiveModel;
 import freemarker.template.TemplateException;
-import freemarker.template.TemplateHashModel;
-import freemarker.template.TemplateModelException;
-import freemarker.template.utility.DeepUnwrap;
+import freemarker.template.TemplateMethodModel;
 
-public abstract class BaseTemplateDirectiveModel implements TemplateDirectiveModel {
+public abstract class BaseTemplateMethodModel implements TemplateMethodModel {
 
-    private static final Log log = LogFactory.getLog(BaseTemplateDirectiveModel.class);
+    private static final Log log = LogFactory.getLog(BaseTemplateMethodModel.class);
     
     public String help(String name, Environment env) {
         Map<String, Object> map = new HashMap<String, Object>();
-        
+
         map.put("name", name);
         
         return mergeToHelpTemplate(map, env);
     }
     
     protected String mergeToHelpTemplate(Map<String, Object> map, Environment env) {
-        return processTemplateToString("help-directive.ftl", map, env);        
+        return processTemplateToString("help-method.ftl", map, env);        
     }
     
     public static String processTemplateToString(String templateName, Map<String, Object> map, Environment env) {
@@ -57,5 +52,5 @@ public abstract class BaseTemplateDirectiveModel implements TemplateDirectiveMod
         }  
         return template;        
     }
-    
+
 }

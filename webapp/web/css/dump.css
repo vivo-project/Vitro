@@ -8,18 +8,36 @@
     padding: 1em 0;
     margin: 1em 0;
 }
+
 .dump li {
     list-style-type: none;
 }
-.dump.directive h6 {
+
+.dump .directive h6 {
     margin-top: 1em;
 }
+
 .dump.datamodel .var, 
 .dump.datamodel .directive {
     border-bottom: 1px solid #ccc; 
     padding: 1em 0;
     margin: 1em 0;   
 }
+
 .dump .var p {
     margin-bottom: .3em;
+}
+
+.dump .directive ol, 
+.dump .directive ul {
+    margin-left: 1.5em;
+}
+
+.dump .directive ol li, 
+.dump .directive ul li {
+    margin-bottom: .5em;
+}
+
+.dump .directive ol li {
+    list-style: decimal inside none;
 }

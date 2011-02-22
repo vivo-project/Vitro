@@ -13,8 +13,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.web.directives.BaseTemplateDirectiveModel;
+import edu.cornell.mannlib.vitro.webapp.web.methods.BaseTemplateMethodModel;
 import freemarker.core.Environment;
-import freemarker.template.Configuration;
 import freemarker.template.TemplateDirectiveBody;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateHashModel;
@@ -52,12 +52,16 @@ public class DumpAllDirective extends BaseTemplateDirectiveModel {
         DumpHelper helper = new DumpHelper(env);       
         List<String> models = new ArrayList<String>();
         List<String> directives = new ArrayList<String>();
-        
+        List<String> methods = new ArrayList<String>();
+
         for (String var : varNames) {
             Object value = dm.get(var);
             if (value instanceof BaseTemplateDirectiveModel) {
-                String help = ((BaseTemplateDirectiveModel) value).help(env);
+                String help = ((BaseTemplateDirectiveModel) value).help(var, env);
                 directives.add(help);
+            } else if (value instanceof BaseTemplateMethodModel) {
+                String help = ((BaseTemplateMethodModel) value).help(var, env);
+                methods.add(help);                
             } else {
                 models.add(helper.getVariableDump(var));
             }
@@ -66,6 +70,7 @@ public class DumpAllDirective extends BaseTemplateDirectiveModel {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("models", models);
         map.put("directives", directives);
+        map.put("methods", methods);
         map.put("containingTemplate", env.getTemplate().getName());
 
         try {
@@ -78,11 +83,10 @@ public class DumpAllDirective extends BaseTemplateDirectiveModel {
 
     }
 
-   @Override
-    public String help(Environment env) {
+    @Override
+    public String help(String name, Environment env) {
         Map<String, Object> map = new HashMap<String, Object>();
         
-        String name = getDirectiveName();
         map.put("name", name);
         
         map.put("effect", "Dump the contents of the template data model.");

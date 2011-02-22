@@ -4,7 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.web.directives.dump;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -14,7 +13,6 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 import edu.cornell.mannlib.vitro.webapp.web.directives.BaseTemplateDirectiveModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 import freemarker.core.Environment;
@@ -93,11 +91,10 @@ public class DescribeDirective extends BaseTemplateDirectiveModel {
         helper.writeDump("describe.ftl", map, varName);   
     }
     
-    
-    public String help(Environment env) {
+    @Override
+    public String help(String name, Environment env) {
         Map<String, Object> map = new HashMap<String, Object>();
         
-        String name = getDirectiveName();
         map.put("name", name);
         
         map.put("effect", "Describe the methods callable on a template variable.");

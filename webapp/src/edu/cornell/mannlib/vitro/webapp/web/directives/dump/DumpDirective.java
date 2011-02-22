@@ -60,10 +60,10 @@ public class DumpDirective extends BaseTemplateDirectiveModel {
         helper.writeDump("dump.ftl", map, var);   
     }
         
-    public String help(Environment env) {
+    @Override
+    public String help(String name, Environment env) {
         Map<String, Object> map = new HashMap<String, Object>();
         
-        String name = getDirectiveName();
         map.put("name", name);
         
         map.put("effect", "Dump the contents of a template variable.");
