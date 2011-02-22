@@ -50,8 +50,13 @@ public class DumpHelper {
         TemplateModel tm =  null;
         try {
             tm = dataModel.get(varName);
-        } catch (TemplateModelException tme) {
-            log.error("Error getting value of template model " + varName + " from data model.");
+        } catch (TemplateModelException e) {
+            log.error("Error getting value of template model '" + varName + "' from data model.");
+            return null;
+        }
+        
+        if (tm == null) {
+            log.error("No variable '" + varName + "' defined in data model." );
             return null;
         }
 
