@@ -43,8 +43,8 @@ public abstract class BaseTemplateModel {
         servletContext = context;
     }
     
-//    public String dump() {
-//        return toString(); // fallback when subclass doesn't define a class-specific dump()
-//    }
+    public String dump() {
+        return toString(); // fallback when subclass doesn't define a class-specific dump()
+    }
 
 }

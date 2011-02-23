@@ -101,12 +101,14 @@ public class FreemarkerConfigurationLoader {
         }
 
         // Specify how templates will see the data model. 
-        // The default wrapper exposes set methods unless exposure level is set.
-        // By default we want to block exposure of set methods. 
+        // The Freemarker default wrapper exposes set methods and get methods that take
+        // arguments. We block exposure to these methods by default. 
         BeansWrapper wrapper = new DefaultObjectWrapper();
-        wrapper.setExposureLevel(BeansWrapper.EXPOSE_PROPERTIES_ONLY);
+        int defaultExposureLevel = BeansWrapper.EXPOSE_PROPERTIES_ONLY;
+        wrapper.setExposureLevel(defaultExposureLevel);
         config.setObjectWrapper(wrapper);
-
+        config.setCustomAttribute("defaultExposureLevel", defaultExposureLevel);
+        
         // Set some formatting defaults. These can be overridden at the template
         // or environment (template-processing) level, or for an individual
         // token by using built-ins.

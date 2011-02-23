@@ -24,6 +24,11 @@
     margin: 1em 0;   
 }
 
+.dump ol li, 
+.dump ul li {
+    margin-bottom: .5em;
+}
+
 .dump .var p {
     margin-bottom: .3em;
 }
@@ -31,11 +36,6 @@
 .dump .directive ol, 
 .dump .directive ul {
     margin-left: 1.5em;
-}
-
-.dump .directive ol li, 
-.dump .directive ul li {
-    margin-bottom: .5em;
 }
 
 .dump .directive ol li {

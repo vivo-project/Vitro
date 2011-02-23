@@ -75,6 +75,10 @@ public abstract class Files extends BaseTemplateModel {
         return tags;
     }
 
+    public String dump() {
+        return list.toString();
+    }
+    
     protected abstract String getTag(String url);
     
 }

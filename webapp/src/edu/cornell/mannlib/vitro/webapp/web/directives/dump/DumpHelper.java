@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -21,6 +23,7 @@ import freemarker.core.Environment;
 import freemarker.ext.beans.BeanModel;
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.ext.beans.WrapperExtractor;
+import freemarker.template.Configuration;
 import freemarker.template.TemplateBooleanModel;
 import freemarker.template.TemplateDateModel;
 import freemarker.template.TemplateHashModel;
@@ -53,17 +56,12 @@ public class DumpHelper {
             tm = dataModel.get(varName);
         } catch (TemplateModelException e) {
             log.error("Error getting value of template model '" + varName + "' from data model.");
-            return null;
-        }
-        
-        if (tm == null) {
-            log.error("No variable '" + varName + "' defined in data model." );
-            return null;
         }
 
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("var", varName);
         
+        // DON'T return null if tm == null. We still want to return the map to the template.
         if (tm != null) {   
             Object unwrappedModel = null;
             try {
@@ -87,7 +85,7 @@ public class DumpHelper {
             // view in the dump. Not sure if we should handle our application-specific, non-template
             // model objects in the same way. For now, these get assigned a shorthand type below.
             if (unwrappedModel instanceof BaseTemplateModel) {
-                value = getTemplateModelDump(tm, (BaseTemplateModel)unwrappedModel); //((BaseTemplateModel)unwrappedModel).dump();   
+                map.putAll(getTemplateModelValues(tm, (BaseTemplateModel)unwrappedModel)); 
                 type = className;
             }            
             // Can't use this, because tm of (at least some) POJOs are
@@ -115,8 +113,13 @@ public class DumpHelper {
                 type = className;
             }
             
-            map.put("value", value);
             map.put("type", type);
+            
+            // Don't overwrite value returned from getTemplateModelValues().
+            if (! map.containsKey("value")) {
+                map.put("value", value);
+            }           
+            
         }
 
         return map;
@@ -133,18 +136,37 @@ public class DumpHelper {
     }
     
     protected List<Method> getMethodsAvailableToTemplate(TemplateModel wrappedModel, Class<?> cls) {
+        
+        int exposureLevel;
+        // Get the exposure level of the BeansWrapper that wrapped this object.
+        if (wrappedModel instanceof BeanModel) {
+            exposureLevel = WrapperExtractor.getWrapperExposureLevel((BeanModel) wrappedModel);
+            log.debug("Exposure level for class " + cls.getCanonicalName() + " of type " + wrappedModel.getClass() + " = " + exposureLevel);
+        // We don't expect to get here, since we are dealing only with BaseTemplateModel objects, which get wrapped into BeanModel objects, 
+        // but it's here as a safety net.
+        } else {
+            HttpServletRequest request = (HttpServletRequest) env.getCustomAttribute("request");
+            Configuration config = (Configuration) request.getAttribute("freemarkerConfig");
+            exposureLevel = (Integer) config.getCustomAttribute("defaultExposureLevel");
+            log.debug("Class " + cls.getCanonicalName() + " of type " + wrappedModel.getClass() + " uses default exposure level " + exposureLevel);
+        }
+        
+        return getMethodsAvailableToTemplate(exposureLevel, cls);
+    }
+    
+    private List<Method> getMethodsAvailableToTemplate(int exposureLevel, Class<?> cls) {
         List<Method> methods = new ArrayList<Method>();
-
+        
         // Go up the class hierarchy only as far as the immediate subclass of BaseTemplateModel
         if (! cls.getName().equals("edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel")) {
-            methods = getDeclaredMethodsAvailableToTemplate(wrappedModel, cls);
-            methods.addAll(getMethodsAvailableToTemplate(wrappedModel, cls.getSuperclass()));
+            methods = getDeclaredMethodsAvailableToTemplate(exposureLevel, cls);
+            methods.addAll(getMethodsAvailableToTemplate(exposureLevel, cls.getSuperclass()));
         }
         
         return methods;
     }
         
-    private List<Method> getDeclaredMethodsAvailableToTemplate(TemplateModel wrappedModel, Class<?> cls) {
+    private List<Method> getDeclaredMethodsAvailableToTemplate(int exposureLevel, Class<?> cls) {
         
         List<Method> methods = new ArrayList<Method>();
         Method[] declaredMethods = cls.getDeclaredMethods();
@@ -152,18 +174,10 @@ public class DumpHelper {
             int mod = method.getModifiers();
             if (Modifier.isPublic(mod) && !Modifier.isStatic(mod)) {
                 Class<?>[] params = method.getParameterTypes();
-                // If the method takes arguments...
-                if (params.length > 0) {                    
-                    // Unless the object has been wrapped with a non-default BeansWrapper with an exposure
-                    // level that is more permissive than the Configuration's default BeansWrapper, this
-                    // method is not visible to the template.
-                    if ( ! ( wrappedModel instanceof BeanModel ) ) { 
-                        continue;
-                    }
-                    int exposureLevel = WrapperExtractor.getWrapperExposureLevel((BeanModel)wrappedModel);
-                    if ( exposureLevel > BeansWrapper.EXPOSE_SAFE ) {
-                        continue;
-                    }
+                // If the method takes arguments, then it is not available to the template unless
+                // the exposure level of the BeansWrapper that wrapped the object allows it. 
+                if (params.length > 0 && exposureLevel > BeansWrapper.EXPOSE_SAFE) {                    
+                    continue;
                 }
                 methods.add(method);
             }
@@ -194,20 +208,20 @@ public class DumpHelper {
         return methodName + paramList;        
     }
     
-    private String getTemplateModelDump(TemplateModel wrappedModel, BaseTemplateModel unwrappedModel) {
+    private Map<String, Object> getTemplateModelValues(TemplateModel wrappedModel, BaseTemplateModel unwrappedModel) {
 
-//        if (tm instanceof BeanModel) {                
-//            int exposureLevel = WrapperExtractor.getWrapperExposureLevel((BeanModel) tm);
-//            log.debug(varName + " is an instance of BeanModel. Exposure level = " + exposureLevel);
-//        }
+        Map<String, Object> map = new HashMap<String, Object>();   
+        map.put("value", unwrappedModel.dump());
         
-        Map<String, Object> map = new HashMap<String, Object>();        
         List<Method> publicMethods = getMethodsAvailableToTemplate(wrappedModel, unwrappedModel.getClass());        
         Map<String, String> properties = new HashMap<String, String>();
         List<String> methods = new ArrayList<String>();
         for (Method method : publicMethods) {
-            String key = getMethodDisplayName(method);
-            
+            // Don't include the dump method, since this is used above to provide the value of the object.
+            if (method.getName().equals("dump")) {
+                continue;
+            }
+            String key = getMethodDisplayName(method);           
             if (key.endsWith(")")) {
                 methods.add(key);
             } else {
@@ -221,11 +235,10 @@ public class DumpHelper {
                 }
             }
         }
-
+        
         map.put("properties", properties);
         map.put("methods", methods);
-        return BaseTemplateDirectiveModel.processTemplateToString("dump-tm.ftl", map, env);
-        
+        return map;        
     }
     
 }
