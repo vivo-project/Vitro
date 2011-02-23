@@ -4,7 +4,7 @@
  
 <div class="var"> 
     <#if var??> <#-- not defined for a nested template model object -->
-        <p><strong>Variable name: ${var}</strong></p>
+        <p><strong>Variable name:</strong> ${var}</p>
     </#if>
     
     <#if value??>

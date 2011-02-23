@@ -213,54 +213,11 @@ public class DumpHelper {
     }
     
     private Map<String, Object> getTemplateModelValues(TemplateModel wrappedModel, BaseTemplateModel unwrappedModel) {
-
-        Map<String, Object> map = new HashMap<String, Object>();   
-        map.put("value", unwrappedModel.dump());
-        
         int exposureLevel = getExposureLevel(wrappedModel, unwrappedModel.getClass());
-        List<Method> publicMethods = getMethodsAvailableToTemplate(exposureLevel, unwrappedModel.getClass());        
-        Map<String, String> properties = new HashMap<String, String>();
-        List<String> methods = new ArrayList<String>();
-        for (Method method : publicMethods) {
-            // Don't include the dump method, since this is used above to provide the value of the object.
-            if (method.getName().equals("dump")) {
-                continue;
-            }
-            String key = getMethodDisplayName(method);           
-            if (key.endsWith(")")) {
-                methods.add(key);
-            } else {
-                try {                   
-                    Object result = method.invoke(unwrappedModel);
-                    String value;
-                    if (result ==  null) {
-                        value = "null";
-                    } else if (result instanceof BaseTemplateModel) {
-                       value = getTemplateModelDump((BaseTemplateModel)result, exposureLevel); 
-                    } else {
-                        // Don't use ?html in the template, because then the output of
-                        // getTemplateModelDump, which is html, gets escaped too.
-                        value = StringEscapeUtils.escapeHtml(result.toString());
-                    }
-                    properties.put(key, value);
-                } catch (Exception e) {
-                    log.error(e, e);
-                    continue;
-                }
-            }
-        }
-        
-        map.put("properties", properties);
-        map.put("methods", methods);
-        return map;        
+        return getTemplateModelValues(unwrappedModel, exposureLevel);      
     }
     
-    private String getTemplateModelDump(BaseTemplateModel model, int exposureLevel) {
-        // What we need to do here is recurse down into the model and display the value, type, 
-        // properties, and methods for each one. Pull out the part shared by this and getTemplateModelValues
-        // into a common method. This will return the string so that the template doesn't have to follow
-        // the recursion.
-
+    private Map<String, Object> getTemplateModelValues(BaseTemplateModel model, int exposureLevel) {
         Map<String, Object> map = new HashMap<String, Object>();   
         map.put("value", model.dump());
         
@@ -299,7 +256,11 @@ public class DumpHelper {
         map.put("type", model.getClass().getName());
         map.put("properties", properties);
         map.put("methods", methods);        
-        
+        return map;
+    }
+    
+    private String getTemplateModelDump(BaseTemplateModel model, int exposureLevel) {
+        Map<String, Object> map = getTemplateModelValues(model, exposureLevel);       
         return BaseTemplateDirectiveModel.processTemplateToString("dump-var.ftl", map, env);
     }
     
