@@ -3,7 +3,10 @@
 <#-- Template for dumping a template variable -->
  
 <div class="var"> 
-    <p><strong>Variable name: ${var}</strong></p>
+    <#if var??> <#-- not defined for a nested template model object -->
+        <p><strong>Variable name: ${var}</strong></p>
+    </#if>
+    
     <#if value??>
         <p><strong>Type:</strong> ${type}</p>
         <p><strong>Value:</strong> ${value}</p>    
@@ -13,7 +16,7 @@
             <p><strong>Properties:</strong></p>
             <ul>
                 <#list properties?keys as property>
-                    <li>${property}: ${properties[property]?html}</li>
+                    <li>${property}: ${properties[property]}</li>
                 </#list>
             </ul>
         </#if>

@@ -41,3 +41,7 @@
 .dump .directive ol li {
     list-style: decimal inside none;
 }
+
+.var .var {
+    margin-left: 1.5em;
+}
