@@ -22,7 +22,7 @@ import edu.cornell.mannlib.vitro.utilities.revisioninfo.ProcessRunner.ProcessExc
  * is a working directory, then we can build the info from the responses we get
  * from "svn info" and "svnversion".
  * 
- * If that doesn't work, read the information from the ".revisionInfo" file in
+ * If that doesn't work, read the information from the "revisionInfo" file in
  * the product directory. Presumably, that file was created when the source was
  * exported from Subversion.
  * 
@@ -62,7 +62,7 @@ public class RevisionInfoBuilder {
 	private static final String[] SVNVERSION_COMMAND = { "svnversion", "." };
 	private static final String[] SVN_INFO_COMMAND = { "svn", "info" };
 	private static final String INFO_LINE_DELIMITER = " ~ ";
-	private static final String REVISION_INFO_FILENAME = ".revisionInfo";
+	private static final String REVISION_INFO_FILENAME = "revisionInfo";
 
 	private final String productName;
 	private final File productDirectory;
