@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -24,18 +23,15 @@ import com.hp.hpl.jena.util.iterator.ClosableIterator;
 
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDaoCon;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaModelUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.SearchReindexingListener;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SimpleOntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSDBModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase.TripleStoreType;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapper;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.InitialJenaModelUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.NamespaceMapperJena;
@@ -44,7 +40,9 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
 	
 	private static final Log log = LogFactory.getLog(JenaDataSourceSetup.class.getName());
 	
-    public void contextInitialized(ServletContextEvent sce) {
+    @Override
+	public void contextInitialized(ServletContextEvent sce) {
+    	ServletContext ctx = sce.getServletContext();
     	        
         String tripleStoreTypeStr = 
             ConfigurationProperties.getProperty(
@@ -56,23 +54,23 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
         }
 
         
-        if (AbortStartup.isStartupAborted(sce.getServletContext())) {
+		if (AbortStartup.isStartupAborted(ctx)) {
             return;
         }
         
         try {
             
-            OntModel memModel = (OntModel) sce.getServletContext().getAttribute("jenaOntModel");
+            OntModel memModel = (OntModel) ctx.getAttribute("jenaOntModel");
             if (memModel == null) {
             	memModel = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC);
             	log.warn("WARNING: no database connected.  Changes will disappear after context restart.");
-            	sce.getServletContext().setAttribute("jenaOntModel",memModel);
+            	ctx.setAttribute("jenaOntModel",memModel);
             }            
             memModel.addSubModel((new JenaBaseDaoCon()).getConstModel()); // add the vitro tbox to the model
             
-            OntModel inferenceModel = ontModelFromContextAttribute(sce.getServletContext(), "inferenceOntModel");
+            OntModel inferenceModel = ontModelFromContextAttribute(ctx, "inferenceOntModel");
             
-            OntModel userAccountsModel = ontModelFromContextAttribute(sce.getServletContext(), "userAccountsOntModel");            
+            OntModel userAccountsModel = ontModelFromContextAttribute(ctx, "userAccountsOntModel");            
             if (userAccountsModel.size() == 0) {
         		checkMainModelForUserAccounts(memModel, userAccountsModel);
         	}
@@ -86,57 +84,57 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
         	inferenceOms.setUserAccountsModel(userAccountsModel);
         	unionOms.setUserAccountsModel(userAccountsModel);       
             
-        	OntModel displayModel = ontModelFromContextAttribute(sce.getServletContext(),"displayOntModel");
+        	OntModel displayModel = ontModelFromContextAttribute(ctx,"displayOntModel");
         	baseOms.setDisplayModel(displayModel);
         	inferenceOms.setDisplayModel(displayModel);
         	unionOms.setDisplayModel(displayModel);
         			
         	checkForNamespaceMismatch( memModel, defaultNamespace );
         	
-            sce.getServletContext().setAttribute("baseOntModel", memModel);
+            ctx.setAttribute("baseOntModel", memModel);
             WebappDaoFactory baseWadf = new WebappDaoFactoryJena(
                     baseOms, defaultNamespace, null, null);
-            sce.getServletContext().setAttribute("assertionsWebappDaoFactory",baseWadf);
-            ModelContext.setBaseOntModelSelector(baseOms, sce.getServletContext());
+            ctx.setAttribute("assertionsWebappDaoFactory",baseWadf);
+            ModelContext.setBaseOntModelSelector(baseOms, ctx);
             
-            sce.getServletContext().setAttribute("inferenceOntModel", inferenceModel);
+            ctx.setAttribute("inferenceOntModel", inferenceModel);
             WebappDaoFactory infWadf = new WebappDaoFactoryJena(
                     inferenceOms, defaultNamespace, null, null);
-            sce.getServletContext().setAttribute("deductionsWebappDaoFactory", infWadf);
-            ModelContext.setInferenceOntModelSelector(inferenceOms, sce.getServletContext());
+            ctx.setAttribute("deductionsWebappDaoFactory", infWadf);
+            ModelContext.setInferenceOntModelSelector(inferenceOms, ctx);
             
-            sce.getServletContext().setAttribute("jenaOntModel", unionModel);  
+            ctx.setAttribute("jenaOntModel", unionModel);  
             WebappDaoFactory wadf = new WebappDaoFactoryJena(
                     unionOms, baseOms, inferenceOms,  defaultNamespace, null, null);
-            sce.getServletContext().setAttribute("webappDaoFactory",wadf);
-            ModelContext.setUnionOntModelSelector(unionOms, sce.getServletContext());
+            ctx.setAttribute("webappDaoFactory",wadf);
+            ModelContext.setUnionOntModelSelector(unionOms, ctx);
             
             ApplicationBean appBean = getApplicationBeanFromOntModel(memModel,wadf);
             if (appBean != null) {
-            	sce.getServletContext().setAttribute("applicationBean", appBean);
+            	ctx.setAttribute("applicationBean", appBean);
             }
             
             if (isEmpty(memModel)) {
-            	loadDataFromFilesystem(memModel, sce.getServletContext());
+            	loadDataFromFilesystem(memModel, ctx);
             }
             
             if (userAccountsModel.size() == 0) {
-            	readOntologyFilesInPathSet(AUTHPATH, sce.getServletContext(), userAccountsModel);
+            	readOntologyFilesInPathSet(AUTHPATH, ctx, userAccountsModel);
 	            if (userAccountsModel.size() == 0) {
-	            	createInitialAdminUser(userAccountsModel);
+	            	createInitialAdminUser(userAccountsModel, ctx);
 	            }
             }                        
             
             ensureEssentialInterfaceData(memModel, sce, wadf);        
             
         	NamespaceMapper namespaceMapper = new NamespaceMapperJena(unionModel, unionModel, defaultNamespace);
-        	sce.getServletContext().setAttribute("NamespaceMapper", namespaceMapper);
+        	ctx.setAttribute("NamespaceMapper", namespaceMapper);
         	memModel.getBaseModel().register(namespaceMapper);
         	
-        	makeModelMakerFromConnectionProperties(TripleStoreType.RDB);
+        	makeModelMakerFromConnectionProperties(TripleStoreType.RDB, ctx);
         	VitroJenaModelMaker vjmm = getVitroJenaModelMaker();
         	setVitroJenaModelMaker(vjmm,sce);
-        	makeModelMakerFromConnectionProperties(TripleStoreType.SDB);
+        	makeModelMakerFromConnectionProperties(TripleStoreType.SDB, ctx);
         	VitroJenaSDBModelMaker vsmm = getVitroJenaSDBModelMaker();
         	setVitroJenaSDBModelMaker(vsmm,sce);
         	
@@ -185,7 +183,9 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
     /* ====================================================================== */
     
     
-    public void contextDestroyed(ServletContextEvent sce) {
+    @Override
+	public void contextDestroyed(ServletContextEvent sce) {
+    	// Nothing to do
     }
 
     private ApplicationBean getApplicationBeanFromOntModel(OntModel ontModel,WebappDaoFactory wadf) {

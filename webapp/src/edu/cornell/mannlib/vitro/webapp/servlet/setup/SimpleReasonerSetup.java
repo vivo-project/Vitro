@@ -2,8 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
-import java.sql.Connection;
-
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -13,23 +11,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mindswap.pellet.PelletOptions;
 
-import com.hp.hpl.jena.graph.Graph;
-import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.sdb.SDBFactory;
-import com.hp.hpl.jena.sdb.Store;
-import com.hp.hpl.jena.sdb.StoreDesc;
-import com.hp.hpl.jena.sdb.sql.SDBConnection;
-import com.hp.hpl.jena.sdb.store.DatabaseType;
-import com.hp.hpl.jena.sdb.store.LayoutType;
 import com.hp.hpl.jena.vocabulary.OWL;
 
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.RDBGraphGenerator;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.RegeneratingGraph;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.SDBGraphGenerator;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.ReasonerConfiguration;
@@ -45,6 +31,7 @@ public class SimpleReasonerSetup implements ServletContextListener {
 	static final String JENA_INF_MODEL_REBUILD = "http://vitro.mannlib.cornell.edu/default/vitro-kb-inf-rebuild";
 	static final String JENA_INF_MODEL_SCRATCHPAD = "http://vitro.mannlib.cornell.edu/default/vitro-kb-inf-scratchpad";
 
+	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 	    
 	    if (AbortStartup.isStartupAborted(sce.getServletContext())) {
@@ -97,13 +84,13 @@ public class SimpleReasonerSetup implements ServletContextListener {
                     JENA_INF_MODEL_REBUILD, 
                     JenaDataSourceSetupBase.DB_ONT_MODEL_SPEC, 
                     TripleStoreType.SDB, 
-                    dbType);            
+                    dbType, ctx);            
             Model scratchModel = JenaDataSourceSetupBase.makeDBModel(
                     bds, 
                     JENA_INF_MODEL_SCRATCHPAD, 
                     JenaDataSourceSetupBase.DB_ONT_MODEL_SPEC, 
                     TripleStoreType.SDB, 
-                    dbType); 
+                    dbType, ctx); 
 	        
 	        
 	        // the simple reasoner will register itself as a listener to the ABox assertions
@@ -137,6 +124,7 @@ public class SimpleReasonerSetup implements ServletContextListener {
 		}		
 	}
 	
+	@Override
 	public void contextDestroyed(ServletContextEvent arg0) {
 		// nothing to do
 	}

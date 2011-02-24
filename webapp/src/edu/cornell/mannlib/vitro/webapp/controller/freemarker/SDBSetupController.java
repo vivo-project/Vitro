@@ -90,7 +90,7 @@ public class SDBSetupController extends FreemarkerHttpServlet {
            Boolean done = true;
            getServletContext().setAttribute("done",done);
            StoreDesc storeDesc = jenaDataSourceSetupSDB.makeStoreDesc();
-           BasicDataSource bds = jenaDataSourceSetupSDB.makeDataSourceFromConfigurationProperties();
+           BasicDataSource bds = jenaDataSourceSetupSDB.makeDataSourceFromConfigurationProperties(getServletContext());
            Store store = null;
 		try {
 			store = JenaDataSourceSetupSDB.connectStore(bds, storeDesc);

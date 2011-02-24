@@ -23,11 +23,14 @@ public class JenaPersistentDBOnlyDataSourceSetup extends JenaDataSourceSetupBase
 	
 	private static final Log log = LogFactory.getLog(JenaPersistentDataSourceSetup.class.getName());
 	
+	@Override
 	public void contextInitialized(ServletContextEvent sce) {
-		OntModel memModel = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC);
+        ServletContext ctx = sce.getServletContext();
+
+        OntModel memModel = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC);
 		OntModel dbModel = null;
         try {
-            Model dbPlainModel = makeDBModelFromConfigurationProperties(JENA_DB_MODEL, DB_ONT_MODEL_SPEC);
+            Model dbPlainModel = makeDBModelFromConfigurationProperties(JENA_DB_MODEL, DB_ONT_MODEL_SPEC, ctx);
             dbModel = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC,dbPlainModel);
             boolean isEmpty = true;
             ClosableIterator stmtIt = dbModel.listStatements();
@@ -42,15 +45,14 @@ public class JenaPersistentDBOnlyDataSourceSetup extends JenaDataSourceSetupBase
             if (isEmpty) {
                 long startTime = System.currentTimeMillis();
                 System.out.println("Reading ontology files into database");
-                ServletContext ctx = sce.getServletContext();
                 readOntologyFilesInPathSet(USERPATH, ctx, dbModel);
                 readOntologyFilesInPathSet(AUTHPATH, ctx, dbModel);
                 readOntologyFilesInPathSet(SYSTEMPATH, ctx, dbModel);
                 System.out.println((System.currentTimeMillis()-startTime)/1000+" seconds to populate DB");
             }
 
-            //readOntologyFilesInPathSet(sce.getServletContext().getResourcePaths(AUTHPATH), sce, dbModel);
-            //readOntologyFilesInPathSet(sce.getServletContext().getResourcePaths(SYSTEMPATH), sce, dbModel);
+            //readOntologyFilesInPathSet(ctx.getResourcePaths(AUTHPATH), sce, dbModel);
+            //readOntologyFilesInPathSet(ctx.getResourcePaths(SYSTEMPATH), sce, dbModel);
 
             memModel = dbModel;
             
@@ -65,7 +67,6 @@ public class JenaPersistentDBOnlyDataSourceSetup extends JenaDataSourceSetupBase
 		try {
 	        if (dbModel==null) {
 	            System.out.println("Reading ontology files");
-	            ServletContext ctx = sce.getServletContext();
 	            readOntologyFilesInPathSet(USERPATH, ctx, dbModel);
 	            readOntologyFilesInPathSet(AUTHPATH, ctx, dbModel);
 	            readOntologyFilesInPathSet(SYSTEMPATH, ctx, dbModel);
@@ -77,20 +78,21 @@ public class JenaPersistentDBOnlyDataSourceSetup extends JenaDataSourceSetupBase
         
         // default inference graph
         try {
-        	Model infDbPlainModel = makeDBModelFromConfigurationProperties(JENA_INF_MODEL, DB_ONT_MODEL_SPEC);
+        	Model infDbPlainModel = makeDBModelFromConfigurationProperties(JENA_INF_MODEL, DB_ONT_MODEL_SPEC, ctx);
         	OntModel infDbModel = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC,infDbPlainModel);
-        	sce.getServletContext().setAttribute("inferenceOntModel",infDbModel);
+        	ctx.setAttribute("inferenceOntModel",infDbModel);
         } catch (Throwable e) {
         	log.error(e, e);
         }
            
-        sce.getServletContext().setAttribute("jenaOntModel", memModel);
-        sce.getServletContext().setAttribute("persistentOntModel", dbModel);
+        ctx.setAttribute("jenaOntModel", memModel);
+        ctx.setAttribute("persistentOntModel", dbModel);
         
         // BJL23: This is a funky hack until I completely rework how the models get set up in a more sane fashion
-        sce.getServletContext().setAttribute("useModelSynchronizers", "false");
+        ctx.setAttribute("useModelSynchronizers", "false");
 	}
 	
+	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
         //Close the database connection
         //try {

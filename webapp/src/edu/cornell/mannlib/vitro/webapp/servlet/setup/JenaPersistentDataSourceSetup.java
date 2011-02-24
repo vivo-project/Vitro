@@ -6,7 +6,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -26,9 +25,11 @@ public class JenaPersistentDataSourceSetup extends JenaDataSourceSetupBase
 	private static final Log log = LogFactory.getLog(
 	        JenaPersistentDataSourceSetup.class.getName());
 	
+	@Override
 	public void contextInitialized(ServletContextEvent sce) {
+        ServletContext ctx = sce.getServletContext();
 		
-	    if (AbortStartup.isStartupAborted(sce.getServletContext())) {
+	    if (AbortStartup.isStartupAborted(ctx)) {
             return;
         }
 	    
@@ -39,14 +40,13 @@ public class JenaPersistentDataSourceSetup extends JenaDataSourceSetupBase
         try {
         	
             dbModel = makeDBModelFromConfigurationProperties(
-                    JENA_DB_MODEL, DB_ONT_MODEL_SPEC);
+                    JENA_DB_MODEL, DB_ONT_MODEL_SPEC, ctx);
             
             boolean firstStartup = isFirstStartup(dbModel);
 
             if (firstStartup) {
                 long startTime = System.currentTimeMillis();
                 System.out.println("Reading ontology files into database");
-                ServletContext ctx = sce.getServletContext();
                 readOntologyFilesInPathSet(USERPATH, ctx, dbModel);
                 readOntologyFilesInPathSet(SYSTEMPATH, ctx, dbModel);
                 System.out.println(
@@ -55,7 +55,7 @@ public class JenaPersistentDataSourceSetup extends JenaDataSourceSetupBase
             }
             
             
-            if (isSDBActive()) {
+            if (isSDBActive(ctx)) {
                 memModel = ModelFactory.createOntologyModel(
                         this.DB_ONT_MODEL_SPEC, dbModel); 
                 // no in-memory copying
@@ -94,10 +94,10 @@ public class JenaPersistentDataSourceSetup extends JenaDataSourceSetupBase
         // default inference graph
         try {
         	Model infDbModel = makeDBModelFromConfigurationProperties(
-        	        JENA_INF_MODEL, DB_ONT_MODEL_SPEC);
+        	        JENA_INF_MODEL, DB_ONT_MODEL_SPEC, ctx);
         	OntModel infModel = null; 
         	if (infDbModel != null) {
-        	    if (isSDBActive()) {
+        	    if (isSDBActive(ctx)) {
         	        infModel = ModelFactory.createOntologyModel(
                             MEM_ONT_MODEL_SPEC, infDbModel);
         	    } else {
@@ -112,7 +112,7 @@ public class JenaPersistentDataSourceSetup extends JenaDataSourceSetupBase
         	    }
         	}
         	infModel.getBaseModel().register(new ModelSynchronizer(infDbModel));
-        	sce.getServletContext().setAttribute("inferenceOntModel",infModel);
+        	ctx.setAttribute("inferenceOntModel",infModel);
         } catch (Throwable e) {
         	log.error("Unable to load inference cache from DB", e);
         }
@@ -120,12 +120,12 @@ public class JenaPersistentDataSourceSetup extends JenaDataSourceSetupBase
         // user accounts Model
         try {
         	Model userAccountsDbModel = makeDBModelFromConfigurationProperties(
-        	        JENA_USER_ACCOUNTS_MODEL, DB_ONT_MODEL_SPEC);
+        	        JENA_USER_ACCOUNTS_MODEL, DB_ONT_MODEL_SPEC, ctx);
 			if (userAccountsDbModel.size() == 0) {
 				readOntologyFilesInPathSet(AUTHPATH, sce.getServletContext(),
 						userAccountsDbModel);
 				if (userAccountsDbModel.size() == 0) {
-					createInitialAdminUser(userAccountsDbModel);
+					createInitialAdminUser(userAccountsDbModel, ctx);
 				}
 			}
         	OntModel userAccountsModel = ModelFactory.createOntologyModel(
@@ -142,7 +142,7 @@ public class JenaPersistentDataSourceSetup extends JenaDataSourceSetupBase
         // display, editing and navigation Model 
 	    try {
 	    	Model appDbModel = makeDBModelFromConfigurationProperties(
-	    	        JENA_DISPLAY_METADATA_MODEL, DB_ONT_MODEL_SPEC);
+	    	        JENA_DISPLAY_METADATA_MODEL, DB_ONT_MODEL_SPEC, ctx);
 			if (appDbModel.size() == 0) 
 				readOntologyFilesInPathSet(
 				        APPPATH, sce.getServletContext(),appDbModel);			
@@ -150,12 +150,12 @@ public class JenaPersistentDataSourceSetup extends JenaDataSourceSetupBase
 	    	        MEM_ONT_MODEL_SPEC);
 	    	appModel.add(appDbModel);
 	    	appModel.getBaseModel().register(new ModelSynchronizer(appDbModel));
-	    	sce.getServletContext().setAttribute("displayOntModel", appModel);
+	    	ctx.setAttribute("displayOntModel", appModel);
 	    } catch (Throwable t) {
 	    	log.error("Unable to load user application configuration model from DB", t);
 	    }
 	    
-        sce.getServletContext().setAttribute("jenaOntModel", memModel);
+        ctx.setAttribute("jenaOntModel", memModel);
        
 	}
 	
@@ -171,7 +171,9 @@ public class JenaPersistentDataSourceSetup extends JenaDataSourceSetupBase
         }
 	}
 	
+	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
+		// Nothing to do.
 	}
 	
 }

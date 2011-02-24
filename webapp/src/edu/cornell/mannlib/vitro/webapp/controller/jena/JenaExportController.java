@@ -97,7 +97,7 @@ public class JenaExportController extends BaseEditController {
 		}
 		
 		
-		String mode = (JenaDataSourceSetupBase.isSDBActive()) ? "SDB" : "RDB"; 
+		String mode = (JenaDataSourceSetupBase.isSDBActive(vreq)) ? "SDB" : "RDB"; 
 		if( "abox".equals(subgraphParam)){
 			model = ModelFactory.createDefaultModel();
 			if("inferred".equals(assertedOrInferredParam)){

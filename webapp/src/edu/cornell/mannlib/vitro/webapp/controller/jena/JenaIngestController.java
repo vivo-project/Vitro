@@ -13,18 +13,15 @@ import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -55,12 +52,8 @@ import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.sdb.SDBFactory;
-import com.hp.hpl.jena.sdb.Store;
 import com.hp.hpl.jena.sdb.StoreDesc;
 import com.hp.hpl.jena.sdb.sql.JDBC;
-import com.hp.hpl.jena.sdb.sql.SDBConnection;
 import com.hp.hpl.jena.sdb.store.DatabaseType;
 import com.hp.hpl.jena.sdb.store.LayoutType;
 import com.hp.hpl.jena.shared.Lock;
@@ -68,7 +61,6 @@ import com.hp.hpl.jena.util.ResourceUtils;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
-import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
@@ -82,7 +74,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSpecialModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetup;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupSDB;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestWorkflowProcessor;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.WorkflowOntology;
@@ -117,6 +108,7 @@ public class JenaIngestController extends BaseEditController {
 	private static final String RENAME_RESOURCE = "/jenaIngest/renameResource.jsp";
 	private static final String RENAME_RESULT = "/jenaIngest/renameResult.jsp";
 
+	@Override
 	public void doGet (HttpServletRequest request, HttpServletResponse response) {
 
 		if (!checkLoginStatus(request,response)) {
@@ -134,7 +126,7 @@ public class JenaIngestController extends BaseEditController {
 			String modelT = (String)getServletContext().getAttribute("modelT");
 			String info = (String)getServletContext().getAttribute("info");
 			if(modelT == null){
-				boolean initialSwitch = new JenaDataSourceSetupBase().isSDBActive();
+				boolean initialSwitch = JenaDataSourceSetupBase.isSDBActive(vreq);
 				if(initialSwitch){
 					VitroJenaSDBModelMaker vsmm = (VitroJenaSDBModelMaker) getServletContext().getAttribute("vitroJenaSDBModelMaker");
 					vreq.getSession().setAttribute("vitroJenaModelMaker", vsmm);
@@ -909,11 +901,12 @@ public class JenaIngestController extends BaseEditController {
         String driver = loadDriver(dbTypeObj);
 		System.out.println("Connecting to DB at "+jdbcUrl);
 		StoreDesc storeDesc = new StoreDesc(LayoutType.LayoutTripleNodesHash,dbTypeObj) ; 
-    	BasicDataSource bds = JenaDataSourceSetup.makeBasicDataSource(
-    	        driver, jdbcUrl, username, password);
+    	ServletContext ctx = vreq.getSession().getServletContext();
+		BasicDataSource bds = JenaDataSourceSetup.makeBasicDataSource(
+    	        driver, jdbcUrl, username, password, ctx);
     	try {
     	    VitroJenaSDBModelMaker vsmm = new VitroJenaSDBModelMaker(storeDesc, bds);
-    	  	VitroJenaModelMaker vjmm = new VitroJenaModelMaker(jdbcUrl, username, password, dbType);
+    	  	VitroJenaModelMaker vjmm = new VitroJenaModelMaker(jdbcUrl, username, password, dbType, ctx);
         	getServletContext().setAttribute("vitroJenaSDBModelMaker", vsmm);
         	getServletContext().setAttribute("vitroJenaModelMaker", vjmm);
         	if("SDB".equals(tripleStore))

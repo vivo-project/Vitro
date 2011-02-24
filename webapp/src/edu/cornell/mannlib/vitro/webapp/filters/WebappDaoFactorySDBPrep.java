@@ -57,10 +57,11 @@ public class WebappDaoFactorySDBPrep implements Filter {
             Pattern.compile("/.*/images/.*")
     };
 	
+	@Override
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain filterChain) throws IOException, ServletException {
 		
-		if ( (!(JenaDataSourceSetupBase.isSDBActive())) || 
+		if ( (!(JenaDataSourceSetupBase.isSDBActive(request))) || 
 		        (request.getAttribute(
 		                "WebappDaoFactorySDBPrep.setup") != null) ) {
 			// don't run multiple times or if SDB is not active
@@ -134,6 +135,7 @@ public class WebappDaoFactorySDBPrep implements Filter {
 		
 	}
 
+	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
 		try {
 			_ctx = filterConfig.getServletContext();
@@ -142,6 +144,7 @@ public class WebappDaoFactorySDBPrep implements Filter {
 		}		
 	}
 	
+	@Override
 	public void destroy() {
 		// no destroy actions
 	}

@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.dbcp.BasicDataSource;
@@ -23,7 +24,6 @@ import com.hp.hpl.jena.rdf.model.ModelMaker;
 import com.hp.hpl.jena.rdf.model.ModelReader;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
-import com.hp.hpl.jena.util.iterator.NiceIterator;
 import com.hp.hpl.jena.util.iterator.WrappedIterator;
 
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
@@ -51,7 +51,7 @@ public class VitroJenaModelMaker implements ModelMaker {
 	private HashMap<String,Model> modelCache;
 	private HttpServletRequest request = null;
 	
-	public VitroJenaModelMaker(String jdbcUrl, String username, String password, String dbTypeStr) {
+	public VitroJenaModelMaker(String jdbcUrl, String username, String password, String dbTypeStr, ServletContext ctx) {
 		this.jdbcUrl = jdbcUrl;
 		this.username = username;
 		this.password = password;
@@ -65,7 +65,7 @@ public class VitroJenaModelMaker implements ModelMaker {
 		}
 		this.dataSource = JenaDataSourceSetupBase.makeBasicDataSource(
 				driverName,
-					jdbcUrl, username, password);
+					jdbcUrl, username, password, ctx);
 		modelCache = new HashMap<String,Model>();
 	}
 	
@@ -89,12 +89,14 @@ public class VitroJenaModelMaker implements ModelMaker {
 		return this.modelCache;
 	}
 	
+	@Override
 	public void close() {
 		// TODO Auto-generated method stub
 		// So, in theory, this should close database connections and drop references
 		// to in-memory models and all that kind of stuff.
 	}
 
+	@Override
 	public Model createModel(String arg0) {
 		Model specialModel = null;
 		if ( (specialModel = getSpecialModel(arg0)) != null ) { return specialModel; }
@@ -110,6 +112,7 @@ public class VitroJenaModelMaker implements ModelMaker {
 		}
 	}
 
+	@Override
 	public Model createModel(String arg0, boolean arg1) {
 		Model specialModel = null;
 		if ( (specialModel = getSpecialModel(arg0)) != null ) { return specialModel; }
@@ -123,11 +126,13 @@ public class VitroJenaModelMaker implements ModelMaker {
 		}
 	}
 	
+	@Override
 	public GraphMaker getGraphMaker() {
 		throw new UnsupportedOperationException(this.getClass().getName() +
 				" does not support getGraphMaker()"); 
 	}
 
+	@Override
 	public boolean hasModel(String arg0) {
 		DBConnection conn = new DBConnection(jdbcUrl, username, password, dbTypeStr);
 		try {
@@ -141,6 +146,7 @@ public class VitroJenaModelMaker implements ModelMaker {
 		}
 	}
 
+	@Override
 	public ExtendedIterator listModels() {
 		DBConnection conn = new DBConnection(jdbcUrl, username, password, dbTypeStr);
 		try {
@@ -155,6 +161,7 @@ public class VitroJenaModelMaker implements ModelMaker {
 		}
 	}
 
+	@Override
 	public Model openModel(String arg0, boolean arg1) {
 		Model specialModel = null;
 		if ( (specialModel = getSpecialModel(arg0)) != null ) { return specialModel; }
@@ -168,6 +175,7 @@ public class VitroJenaModelMaker implements ModelMaker {
 		}
 	}
 
+	@Override
 	public void removeModel(String arg0) {
 		Model m = modelCache.get(arg0);
 		if (m != null) {
@@ -210,12 +218,14 @@ public class VitroJenaModelMaker implements ModelMaker {
 		return null;
 	}
 	
+	@Override
 	public Model createDefaultModel() {
 		throw new UnsupportedOperationException(this.getClass().getName() +
 				" does not support createDefaultModel()");
 	}
 
 	
+	@Override
 	public Model createFreshModel() {
 		throw new UnsupportedOperationException(this.getClass().getName() +
 				" does not support createFreshModel()");	}
@@ -233,6 +243,7 @@ public class VitroJenaModelMaker implements ModelMaker {
 	}
 
 	
+	@Override
 	public Model openModel(String arg0) {
 		Model specialModel = null;
 		if ( (specialModel = getSpecialModel(arg0)) != null ) { return specialModel; }
@@ -247,6 +258,7 @@ public class VitroJenaModelMaker implements ModelMaker {
 	}
 
 	
+	@Override
 	public Model openModelIfPresent(String arg0) {
 		Model specialModel = null;
 		if ( (specialModel = getSpecialModel(arg0)) != null ) { return specialModel; }
@@ -261,6 +273,7 @@ public class VitroJenaModelMaker implements ModelMaker {
 	}
 
 	
+	@Override
 	public Model getModel(String arg0) {
 		Model specialModel = null;
 		if ( (specialModel = getSpecialModel(arg0)) != null ) { return specialModel; }
@@ -275,6 +288,7 @@ public class VitroJenaModelMaker implements ModelMaker {
 	}
 
 	
+	@Override
 	public Model getModel(String arg0, ModelReader arg1) {
 		Model specialModel = null;
 		if ( (specialModel = getSpecialModel(arg0)) != null ) { return specialModel; }
