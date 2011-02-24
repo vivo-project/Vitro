@@ -240,7 +240,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 */
 	private ResponseValues doUploadImage(VitroRequest vreq, Individual entity) {
 		ImageUploadHelper helper = new ImageUploadHelper(fileStorage,
-				vreq.getFullWebappDaoFactory());
+				vreq.getFullWebappDaoFactory(), getServletContext());
 
 		try {
 			// Did they provide a file to upload? If not, show an error.
@@ -283,7 +283,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	private ResponseValues doCreateThumbnail(VitroRequest vreq,
 			Individual entity) {
 		ImageUploadHelper helper = new ImageUploadHelper(fileStorage,
-				vreq.getFullWebappDaoFactory());
+				vreq.getFullWebappDaoFactory(), getServletContext());
 
 		try {
 			CropRectangle crop = validateCropCoordinates(vreq);
@@ -305,7 +305,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 */
 	private ResponseValues doDeleteImage(VitroRequest vreq, Individual entity) {
 		ImageUploadHelper helper = new ImageUploadHelper(fileStorage,
-				vreq.getFullWebappDaoFactory());
+				vreq.getFullWebappDaoFactory(), getServletContext());
 
 		helper.removeExistingImage(entity);
 
@@ -318,7 +318,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 */
 	private ResponseValues doDeleteThenEdit(VitroRequest vreq, Individual entity) {
 		ImageUploadHelper helper = new ImageUploadHelper(fileStorage,
-				vreq.getFullWebappDaoFactory());
+				vreq.getFullWebappDaoFactory(), getServletContext());
 
 		helper.removeExistingImage(entity);
 
@@ -395,8 +395,11 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 		// the template would add the placeholder url to the edit link, since it already
 		// knows which placeholder it's using. However, this requires a significantly more
 		// complex implementation, so keeping it simple for now.
-		String dummyThumbnailUrl = entity.isVClass("http://xmlns.com/foaf/0.1/Person") ?
-		        DUMMY_THUMBNAIL_PERSON_URL : DUMMY_THUMBNAIL_NON_PERSON_URL;
+		boolean isPerson = (entity != null)
+				&& entity.isVClass("http://xmlns.com/foaf/0.1/Person");
+		String dummyThumbnailUrl = isPerson ? DUMMY_THUMBNAIL_PERSON_URL
+				: DUMMY_THUMBNAIL_NON_PERSON_URL;
+		
 		rv.put(BODY_THUMBNAIL_URL, UrlBuilder.getUrl(dummyThumbnailUrl));
 		rv.put(BODY_FORM_ACTION, formAction);
 		rv.put(BODY_CANCEL_URL, cancelUrl);

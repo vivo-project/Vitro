@@ -113,7 +113,7 @@ public class FileServingHelperTest extends AbstractTestClass {
 	}
 
 	private void assertCorrectUrl(String uri, String filename, String expected) {
-		String actual = FileServingHelper.getBytestreamAliasUrl(uri, filename);
+		String actual = FileServingHelper.getBytestreamAliasUrl(uri, filename, null);
 		assertEquals("url", expected, actual);
 	}
 

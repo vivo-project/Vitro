@@ -5,6 +5,8 @@ package edu.cornell.mannlib.vitro.webapp.filestorage;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
+import javax.servlet.ServletContext;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -19,13 +21,13 @@ public class FileServingHelper {
 
 	private static final String DEFAULT_PATH = "/individual/";
 	private static final String FILE_PATH = "/file/";
-	private static final String DEFAULT_NAMESPACE = initializeDefaultNamespace();
+	private static boolean warned; // Only issue the warning once.
 
 	/**
-	 * At startup, get the default namespace from the configuration properties,
-	 * and trim off the suffix.
+	 * Get the default namespace from the configuration properties, and trim off
+	 * the suffix.
 	 */
-	private static String initializeDefaultNamespace() {
+	private static String getDefaultNamespace(ServletContext ctx) {
 		String defaultNamespace = ConfigurationProperties
 				.getProperty(FileStorageSetup.PROPERTY_DEFAULT_NAMESPACE);
 		if (defaultNamespace == null) {
@@ -35,8 +37,11 @@ public class FileServingHelper {
 		}
 
 		if (!defaultNamespace.endsWith(DEFAULT_PATH)) {
-			log.warn("Default namespace does not match the expected form: '"
-					+ defaultNamespace + "'");
+			if (!warned) {
+				log.warn("Default namespace does not match the expected form: '"
+						+ defaultNamespace + "'");
+				warned = true;
+			}
 		}
 
 		return defaultNamespace;
@@ -60,16 +65,20 @@ public class FileServingHelper {
 	 *         <li>null, if the original URI or the filename was null.</li>
 	 *         </ul>
 	 */
-	public static String getBytestreamAliasUrl(String uri, String filename) {
+	public static String getBytestreamAliasUrl(String uri, String filename,
+			ServletContext ctx) {
 		if ((uri == null) || (filename == null)) {
 			return null;
 		}
-		if (!uri.startsWith(DEFAULT_NAMESPACE)) {
+
+		String defaultNamespace = getDefaultNamespace(ctx);
+
+		if (!uri.startsWith(defaultNamespace)) {
 			log.warn("uri does not start with the default namespace: '" + uri
 					+ "'");
 			return uri;
 		}
-		String remainder = uri.substring(DEFAULT_NAMESPACE.length());
+		String remainder = uri.substring(defaultNamespace.length());
 
 		try {
 			filename = URLEncoder.encode(filename, "UTF-8");
@@ -98,7 +107,7 @@ public class FileServingHelper {
 	 * 
 	 * @return the URI, or <code>null</code> if the URL couldn't be translated.
 	 */
-	public static String getBytestreamUri(String path) {
+	public static String getBytestreamUri(String path, ServletContext ctx) {
 		if (path == null) {
 			return null;
 		}
@@ -115,6 +124,6 @@ public class FileServingHelper {
 		}
 		remainder = remainder.substring(0, slashHere);
 
-		return DEFAULT_NAMESPACE + remainder;
+		return getDefaultNamespace(ctx) + remainder;
 	}
 }

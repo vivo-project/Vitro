@@ -48,11 +48,11 @@ public class UpdateUploadedFiles implements ServletContextListener {
 	 */
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
-	    
-	    if (AbortStartup.isStartupAborted(sce.getServletContext())) {
-            return;
-        }
-	    
+
+		if (AbortStartup.isStartupAborted(sce.getServletContext())) {
+			return;
+		}
+
 		try {
 			ServletContext ctx = sce.getServletContext();
 
@@ -120,7 +120,7 @@ public class UpdateUploadedFiles implements ServletContextListener {
 			 * Update from old-style storage to new-style storage.
 			 */
 			FileStorageUpdater fsu = new FileStorageUpdater(wadf, jenaOntModel,
-					fileStorage, uploadDirectory, webappImageDirectory);
+					fileStorage, uploadDirectory, webappImageDirectory, ctx);
 			fsu.update();
 
 			/*

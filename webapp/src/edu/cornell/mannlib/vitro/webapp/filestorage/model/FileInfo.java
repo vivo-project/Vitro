@@ -4,6 +4,8 @@ package edu.cornell.mannlib.vitro.webapp.filestorage.model;
 
 import java.util.List;
 
+import javax.servlet.ServletContext;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -32,8 +34,8 @@ public class FileInfo {
 	 * URI, find the surrogate, and get the info. Otherwise, return null.
 	 */
 	public static FileInfo instanceFromAliasUrl(
-			WebappDaoFactory webappDaoFactory, String path) {
-		String bytestreamUri = FileServingHelper.getBytestreamUri(path);
+			WebappDaoFactory webappDaoFactory, String path, ServletContext ctx) {
+		String bytestreamUri = FileServingHelper.getBytestreamUri(path, ctx);
 		if (bytestreamUri == null) {
 			return null;
 		}
