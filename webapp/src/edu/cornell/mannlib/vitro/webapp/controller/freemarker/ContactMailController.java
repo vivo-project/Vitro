@@ -20,7 +20,6 @@ import javax.mail.Transport;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
@@ -51,30 +50,18 @@ public class ContactMailController extends FreemarkerHttpServlet {
     private final static String TEMPLATE_BACKUP = "contactForm-backup.ftl";
     private final static String TEMPLATE_ERROR = "contactForm-error.ftl";
     
-    private static String smtpHost = null;
+    private static String smtpHost = "";
 
-    public void init(ServletConfig servletConfig) throws javax.servlet.ServletException {
-        super.init(servletConfig);
-        smtpHost = getSmtpHostFromProperties();
+    @Override
+    public void init() {
+        smtpHost = ConfigurationProperties.getProperty("Vitro.smtpHost", "");
+		if (smtpHost.isEmpty()) {
+			log.debug("No Vitro.smtpHost specified");
+		} else {
+			log.debug("Found Vitro.smtpHost value of " + smtpHost);
+		}
     }
     
-    public static boolean isSmtpHostConfigured() {
-        if( smtpHost==null || smtpHost.equals("")) {
-            return false;
-        }
-        return true;
-    }
-
-	public static String getSmtpHostFromProperties() {
-		String host = ConfigurationProperties.getProperty("Vitro.smtpHost");
-		if (host != null && !host.equals("")) {
-			log.debug("Found Vitro.smtpHost value of " + host);
-		} else {
-			log.debug("No Vitro.smtpHost specified");
-		}
-		return (host != null && host.length() > 0) ? host : null;
-	}
-	
 	@Override
     protected String getTitle(String siteName, VitroRequest vreq) {
         return siteName + " Feedback Form";
@@ -90,7 +77,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
         
         String statusMsg = null; // holds the error status
         
-        if (!isSmtpHostConfigured()) {
+        if (smtpHost.isEmpty()) {
             body.put("errorMessage", 
                     "This application has not yet been configured to send mail. " +
                     "An smtp host has not been specified in the configuration properties file.");
