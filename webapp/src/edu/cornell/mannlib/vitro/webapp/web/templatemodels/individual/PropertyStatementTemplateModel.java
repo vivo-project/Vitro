@@ -24,11 +24,13 @@ public abstract class PropertyStatementTemplateModel extends BaseTemplateModel {
     private List<EditAccess> editAccessList = null;
     
     PropertyStatementTemplateModel(String subjectUri, String propertyUri, EditingPolicyHelper policyHelper) {
+        // Instantiate the list even if not editing, so calls to getEditUrl() and getDeleteUrl() from 
+        // dump methods don't generate an error when they call isEditable() and isDeletable().
+        editAccessList = new ArrayList<EditAccess>(); 
         
         if (policyHelper != null) { // we're editing
             this.subjectUri = subjectUri;
-            this.propertyUri = propertyUri;  
-            editAccessList = new ArrayList<EditAccess>(); 
+            this.propertyUri = propertyUri;              
         }
     }
     

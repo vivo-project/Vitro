@@ -2,11 +2,13 @@
 
 package freemarker.ext.beans;
 
-import freemarker.template.TemplateModel;
-
 /**
  * Class to extract information about the wrapper used to wrap an object in 
- * the template model.
+ * the template model. This is something of a hack: the class belongs to
+ * package freemarker.ext.beans so we can get at protected members of
+ * BeanModel and BeansWrapper. The Freemarker API unfortunately provides 
+ * no way to get  the wrapper that is used to wrap an object in the 
+ * template data model.
  */
 public class WrapperExtractor {
     
@@ -17,4 +19,9 @@ public class WrapperExtractor {
     public static int getWrapperExposureLevel(BeanModel model) {
         return model.wrapper.getExposureLevel();
     }
+    
+    public static int getWrapperExposureLevel(BeansWrapper wrapper) {
+        return wrapper.getExposureLevel();
+    }
+
 }

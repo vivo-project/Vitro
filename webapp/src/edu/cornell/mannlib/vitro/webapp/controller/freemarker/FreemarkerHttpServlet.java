@@ -286,8 +286,6 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
 
     protected BeansWrapper getNonDefaultBeansWrapper(int exposureLevel) {
         BeansWrapper wrapper = new DefaultObjectWrapper();
-        // Too bad exposure levels are ints instead of enum values; what happens if 
-        // we send an int that's not a defined exposure level?
         wrapper.setExposureLevel(exposureLevel);
         return wrapper;
     }

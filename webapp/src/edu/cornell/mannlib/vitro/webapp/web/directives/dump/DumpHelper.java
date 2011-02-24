@@ -146,14 +146,15 @@ public class DumpHelper {
         // Get the exposure level of the BeansWrapper that wrapped this object.
         if (model instanceof BeanModel) {
             exposureLevel = WrapperExtractor.getWrapperExposureLevel((BeanModel) model);
-            log.debug("Exposure level for class " + cls.getCanonicalName() + " of type " + model.getClass() + " = " + exposureLevel);
+            log.debug("Exposure level for class " + cls.getCanonicalName() + " wrapped as " + model.getClass() + " = " + exposureLevel);
         // We don't expect to get here, since we are dealing only with BaseTemplateModel objects, which get wrapped into BeanModel objects, 
         // but it's here as a safety net.
         } else {
             HttpServletRequest request = (HttpServletRequest) env.getCustomAttribute("request");
             Configuration config = (Configuration) request.getAttribute("freemarkerConfig");
-            exposureLevel = (Integer) config.getCustomAttribute("defaultExposureLevel");
-            log.debug("Class " + cls.getCanonicalName() + " of type " + model.getClass() + " uses default exposure level " + exposureLevel);
+            BeansWrapper wrapper = (BeansWrapper) config.getObjectWrapper();
+            exposureLevel = WrapperExtractor.getWrapperExposureLevel(wrapper);
+            log.debug("Class " + cls.getCanonicalName() + " wrapped as " + model.getClass() + " uses default exposure level " + exposureLevel);
         }
         
         return exposureLevel;
@@ -263,5 +264,5 @@ public class DumpHelper {
         Map<String, Object> map = getTemplateModelValues(model, exposureLevel);       
         return BaseTemplateDirectiveModel.processTemplateToString("dump-var.ftl", map, env);
     }
-    
+
 }
