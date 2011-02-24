@@ -19,18 +19,20 @@ import edu.cornell.mannlib.vitro.webapp.controller.ContactMailServlet;
  */
 public class UserMailController extends VitroHttpServlet{
 
-    public void doPost(HttpServletRequest request, HttpServletResponse response)
+    @Override
+	public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         doGet(request, response);
     }
 
-    public void doGet( HttpServletRequest request, HttpServletResponse response )
+    @Override
+	public void doGet( HttpServletRequest request, HttpServletResponse response )
     throws IOException, ServletException {
         super.doGet(request,response);
         VitroRequest vreq = new VitroRequest(request);
         try {
         //this try block passes any errors to error.jsp
-            if (!ContactMailServlet.isSmtpHostConfigured()) {
+            if (!ContactMailServlet.isSmtpHostConfigured(request)) {
                 request.setAttribute("title", "Mail All Users Form");
                 request.setAttribute("bodyJsp", "/contact_err.jsp");// <<< this is where the body gets set
                 request.setAttribute("ERR","This application has not yet been configured to send mail -- " +

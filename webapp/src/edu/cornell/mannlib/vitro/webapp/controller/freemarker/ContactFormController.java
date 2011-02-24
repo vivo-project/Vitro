@@ -2,14 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -17,12 +11,10 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.ContactMailServlet;
-import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
-import freemarker.template.Configuration;
 
 /**
  *  Controller for comments ("contact us") page
@@ -48,7 +40,7 @@ public class ContactFormController extends FreemarkerHttpServlet {
         Portal portal = vreq.getPortal();
         Map<String, Object> body = new HashMap<String, Object>();
         
-        if (!ContactMailServlet.isSmtpHostConfigured()) {
+        if (!ContactMailServlet.isSmtpHostConfigured(vreq)) {
             body.put("errorMessage", 
                      "This application has not yet been configured to send mail. " +
                      "An smtp host has not been specified in the configuration properties file.");

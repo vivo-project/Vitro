@@ -256,7 +256,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         urls.put("base", UrlBuilder.contextPath);
 
         urls.put("about", urlBuilder.getPortalUrl(Route.ABOUT));
-        if (ContactMailServlet.getSmtpHostFromProperties() != null) {
+        if (ContactMailServlet.isSmtpHostConfigured(vreq)) {
             urls.put("contact", urlBuilder.getPortalUrl(Route.CONTACT));
         }
         urls.put("search", urlBuilder.getPortalUrl(Route.SEARCH));  

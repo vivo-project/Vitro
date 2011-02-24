@@ -17,7 +17,6 @@ import javax.mail.Transport;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,6 +28,8 @@ import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 
 public class ContactMailServlet extends VitroHttpServlet {
+	public static final String SMTPHOST_PROPERTY = "Vitro.smtpHost";
+		
 	private static final Log log = LogFactory.getLog(ContactMailServlet.class);
 	
     private final static String CONFIRM_PAGE        = "/templates/parts/thankyou.jsp";
@@ -42,28 +43,21 @@ public class ContactMailServlet extends VitroHttpServlet {
 	
     private static String smtpHost = null;
 
-    public void init(ServletConfig servletConfig) throws javax.servlet.ServletException {
-        super.init(servletConfig);
-        smtpHost = getSmtpHostFromProperties();
+    public static boolean isSmtpHostConfigured(HttpServletRequest req) {
+    	return ConfigurationProperties.getProperty(SMTPHOST_PROPERTY, "").length() > 0;
     }
     
-    public static boolean isSmtpHostConfigured() {
-        if( smtpHost==null || smtpHost.equals("")) {
-            return false;
-        }
-        return true;
+    @Override
+    public void init() {
+        smtpHost = ConfigurationProperties.getProperty(SMTPHOST_PROPERTY, "");
+		if (smtpHost.isEmpty()) {
+			log.debug("No Vitro.smtpHost specified");
+		} else {
+			log.debug("Found Vitro.smtpHost value of " + smtpHost);
+		}
     }
 
-	public static String getSmtpHostFromProperties() {
-		String host = ConfigurationProperties.getProperty("Vitro.smtpHost");
-		if (host != null && !host.equals("")) {
-			log.debug("Found Vitro.smtpHost value of " + host);
-		} else {
-			log.debug("No Vitro.smtpHost specified");
-		}
-		return (host != null && host.length() > 0) ? host : null;
-	}
-    
+    @Override
     public void doGet( HttpServletRequest request, HttpServletResponse response )
         throws ServletException, IOException {
     	

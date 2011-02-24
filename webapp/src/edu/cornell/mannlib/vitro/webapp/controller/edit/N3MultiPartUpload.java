@@ -517,7 +517,7 @@ public class N3MultiPartUpload extends VitroHttpServlet {
 	        String email = uDao.getUserEmailAddress(userURI);
 	        String deliveryFrom = "hjk54@cornell.edu";//TO DO: replace with email address to be used
 	        //Now send message
-	        MailUtil mu = new MailUtil();
+	        MailUtil mu = new MailUtil(request);
 	        List<String> deliverToArray = new ArrayList<String>();
 	        deliverToArray.add(email);
 	        

@@ -27,6 +27,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
+import edu.cornell.mannlib.vitro.webapp.controller.ContactMailServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper.TemplateProcessingException;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
@@ -54,7 +55,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
 
     @Override
     public void init() {
-        smtpHost = ConfigurationProperties.getProperty("Vitro.smtpHost", "");
+        smtpHost = ConfigurationProperties.getProperty(ContactMailServlet.SMTPHOST_PROPERTY, "");
 		if (smtpHost.isEmpty()) {
 			log.debug("No Vitro.smtpHost specified");
 		} else {

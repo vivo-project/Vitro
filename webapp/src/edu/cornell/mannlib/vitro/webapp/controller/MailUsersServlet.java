@@ -16,7 +16,6 @@ import javax.mail.Transport;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,32 +32,21 @@ public class MailUsersServlet extends VitroHttpServlet {
 	
     public static HttpServletRequest request;
     public static HttpServletRequest response;
-    private static String smtpHost = null;
+    private static String smtpHost = "";
    // private static final Log log = LogFactory.getLog(ContactMailServlet.class.getName());
 
-    public void init(ServletConfig servletConfig) throws javax.servlet.ServletException {
-        super.init(servletConfig);
-        smtpHost = getSmtpHostFromProperties();
-    }
-    
-    public static boolean isSmtpHostConfigured() {
-        if( smtpHost==null || smtpHost.equals("")) {
-            return false;
-        }
-        return true;
-    }
-
-	private String getSmtpHostFromProperties() {
-		String host = ConfigurationProperties.getProperty("Vitro.smtpHost");
-		if (host != null && !host.equals("")) {
-			log.debug("Found Vitro.smtpHost value of " + host);
+    @Override
+	public void init() {
+        smtpHost = ConfigurationProperties.getProperty(ContactMailServlet.SMTPHOST_PROPERTY, "");
+		if (smtpHost.isEmpty()) {
+			log.debug("No Vitro.smtpHost specified");
 		} else {
-			log.warn("No Vitro.smtpHost specified");
+			log.debug("Found Vitro.smtpHost value of " + smtpHost);
 		}
-		return (host != null && host.length() > 0) ? host : null;
-	}
+    }
     
-    public void doGet( HttpServletRequest request, HttpServletResponse response )
+    @Override
+	public void doGet( HttpServletRequest request, HttpServletResponse response )
         throws ServletException, IOException {
         VitroRequest vreq = new VitroRequest(request);
         Portal portal = vreq.getPortal();
