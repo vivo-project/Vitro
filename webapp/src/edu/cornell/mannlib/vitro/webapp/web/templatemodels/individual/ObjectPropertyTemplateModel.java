@@ -119,8 +119,10 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     }
     
     @Override 
-    protected Object getPropertyDisplayTier(Property p) {
-        return ((ObjectProperty)p).getDomainDisplayTier();
+    protected int getPropertyDisplayTier(Property p) {
+        // For some reason ObjectProperty.getDomainDisplayTier() returns a String
+        // rather than an int. That should probably be fixed.
+        return Integer.parseInt(((ObjectProperty)p).getDomainDisplayTier());
     }
 
     @Override 

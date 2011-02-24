@@ -134,7 +134,7 @@ name will be used as the label. -->
         <span class="verbosePropertyListing">
             <a class="propertyLink" href="${verboseDisplay.propertyEditUrl}">${verboseDisplay.localName}</a> 
             (${property.type?lower_case} property);
-            display tier: ${verboseDisplay.displayTier} within group; 
+            display tier: ${verboseDisplay.displayTier}; 
             display level: ${verboseDisplay.displayLevel};
             update level: ${verboseDisplay.updateLevel}
         </span>

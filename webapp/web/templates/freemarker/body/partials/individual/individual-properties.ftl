@@ -5,7 +5,7 @@
 <#import "lib-properties.ftl" as p>
 
 <#list propertyGroups.all as group>
-    <#assign groupname = group.name(nameForOtherGroup)>
+    <#assign groupName = group.name(nameForOtherGroup)>
     
     <section class="property-group" role="region">
         <nav class="scroll-up" role="navigation">
@@ -15,8 +15,8 @@
         </nav>
         
         <#-- Display the group heading --> 
-        <#if groupname?has_content>
-            <h2 id="${groupname}">${groupname?capitalize}</h2>
+        <#if groupName?has_content>
+            <h2 id="${groupName}">${groupName?capitalize}</h2>
         </#if>
         
         <#-- List the properties in the group -->

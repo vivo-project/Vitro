@@ -179,15 +179,25 @@ public class SiteAdminController extends FreemarkerHttpServlet {
         urls.put("objectPropertyHierarchy", urlBuilder.getPortalUrl("/showObjectPropertyHierarchy", new ParamMap("iffRoot", "true")));
         map.put("urls", urls);
         
+        // Get current verbose property display value
         String verbose = vreq.getParameter("verbose");
-        boolean verbosePropertyValue = "true".equals(verbose) ? true : false;
-        vreq.getSession().setAttribute("verbosePropertyDisplay", verbosePropertyValue);
+        Boolean verbosePropertyDisplayValue;
+        // If the form was submitted, get that value
+        if (verbose != null) {
+            verbosePropertyDisplayValue = "true".equals(verbose);
+        // If form not submitted, get the session value
+        } else {
+            Boolean verbosePropertyDisplayValueInSession = (Boolean) vreq.getSession().getAttribute("verbosePropertyDisplay"); 
+            // True if session value is true, otherwise (session value is false or null) false
+            verbosePropertyDisplayValue = Boolean.TRUE.equals(verbosePropertyDisplayValueInSession);           
+        }
+        vreq.getSession().setAttribute("verbosePropertyDisplay", verbosePropertyDisplayValue);
         
         Map<String, Object> verbosePropertyForm = new HashMap<String, Object>();
-        verbosePropertyForm.put("verboseFieldValue", String.valueOf(!verbosePropertyValue)); // the form toggles the current value
+        verbosePropertyForm.put("verboseFieldValue", String.valueOf(!verbosePropertyDisplayValue)); // the form toggles the current value
         verbosePropertyForm.put("action", urlBuilder.getPortalUrl(Route.SITE_ADMIN));
-        verbosePropertyForm.put("currentValue", verbosePropertyValue ? "on" : "off");
-        verbosePropertyForm.put("newValue", verbosePropertyValue ? "off" : "on");
+        verbosePropertyForm.put("currentValue", verbosePropertyDisplayValue ? "on" : "off");
+        verbosePropertyForm.put("newValue", verbosePropertyDisplayValue ? "off" : "on");
         map.put("verbosePropertyForm", verbosePropertyForm);
         
         return map;

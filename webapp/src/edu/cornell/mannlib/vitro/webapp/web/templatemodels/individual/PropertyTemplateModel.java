@@ -51,8 +51,8 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
         if (GroupedPropertyList.VITRO_PROPS_TO_ADD_TO_LIST.contains(property)) {
             return;
         }
-        Boolean verboseDisplayFlag = (Boolean) vreq.getSession().getAttribute("verbosePropertyDisplay");
-        if ( ! Boolean.TRUE.equals(verboseDisplayFlag))  {
+        Boolean verboseDisplayValue = (Boolean) vreq.getSession().getAttribute("verbosePropertyDisplay");
+        if ( ! Boolean.TRUE.equals(verboseDisplayValue))  {
             return;
         }
         
@@ -72,7 +72,7 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
         verboseDisplay.put("propertyEditUrl", editUrl);
     }
     
-    protected abstract Object getPropertyDisplayTier(Property p);
+    protected abstract int getPropertyDisplayTier(Property p);
     protected abstract Route getPropertyEditRoute();
     
     protected void setName(String name) {

@@ -66,7 +66,7 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
     }
     
     @Override 
-    protected Object getPropertyDisplayTier(Property p) {
+    protected int getPropertyDisplayTier(Property p) {
         return ((DataProperty)p).getDisplayTier();
     }
 
