@@ -65,7 +65,7 @@
 Assumes property is non-null. -->
 <#macro objectPropertyListing property editable template=property.template>
     <#local localName = property.localName>
-    <h2 id="${localName}">${property.name?capitalize} <@addLink property editable /></h2>
+    <h2 id="${localName}">${property.name?capitalize} <@addLink property editable /> <@verboseDisplay property /></h2>    
     <ul id="individual-${localName}" role="list">
         <@p.objectProperty property editable />
     </ul>
@@ -83,7 +83,7 @@ name will be used as the label. -->
 <#macro addLinkWithLabel property editable label="${property.name?capitalize}">
     <#local addLink><@addLink property editable label /></#local>
     <#if addLink?has_content>
-        <h2 id="${property.localName}">${label} ${addLink}</h2> 
+        <h2 id="${property.localName}">${label} ${addLink} <@verboseDisplay property /></h2>         
     </#if>
 </#macro>
 
@@ -97,7 +97,7 @@ name will be used as the label. -->
 </#macro>
 
 <#macro propertyLabel property label="${property.name?capitalize}">
-    <h2 id="${property.localName}">${label}</h2> 
+    <h2 id="${property.localName}">${label} <@verboseDisplay property /></h2>     
 </#macro>
 
 <#macro propertyListItem property statement editable>
@@ -125,6 +125,19 @@ name will be used as the label. -->
     <#local url = statement.deleteUrl>
     <#if url?has_content>
         <a class="delete-${propertyLocalName}" href="${url}" title="delete this entry"><img  class="delete-individual" src="${urls.images}/individual/deleteIcon.gif" alt="delete" /></a>
+    </#if>
+</#macro>
+
+<#macro verboseDisplay property>
+    <#local verboseDisplay = property.verboseDisplay!>
+    <#if verboseDisplay?has_content>       
+        <span class="verbosePropertyListing">
+            <a class="propertyLink" href="${verboseDisplay.propertyEditUrl}">${verboseDisplay.localName}</a> 
+            (${property.type?lower_case} property);
+            display tier: ${verboseDisplay.displayTier} within group; 
+            display level: ${verboseDisplay.displayLevel};
+            update level: ${verboseDisplay.updateLevel}
+        </span>
     </#if>
 </#macro>
 

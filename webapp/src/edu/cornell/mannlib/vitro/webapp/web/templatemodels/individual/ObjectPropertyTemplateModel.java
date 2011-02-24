@@ -5,7 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -23,17 +22,19 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropStmt;
+import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
+import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import freemarker.cache.TemplateLoader;
@@ -94,12 +95,9 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
             EditingPolicyHelper policyHelper)
         throws InvalidConfigurationException {
         
-        super(op, subject, policyHelper);
-        
-        log.debug("Creating template model for object property " + op.getURI());
-        
+        super(op, subject, policyHelper, vreq);        
         setName(op.getDomainPublic());
-
+        
         // Get the config for this object property
         try {
             config = new PropertyListConfig(op, vreq);
@@ -120,6 +118,16 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         }
     }
     
+    @Override 
+    protected Object getPropertyDisplayTier(Property p) {
+        return ((ObjectProperty)p).getDomainDisplayTier();
+    }
+
+    @Override 
+    protected Route getPropertyEditRoute() {
+        return Route.OBJECT_PROPERTY_EDIT;
+    }
+
     protected ConfigError checkQuery(String queryString) {
         if (StringUtils.isBlank(queryString)) {
             return ConfigError.NO_SELECT_QUERY;

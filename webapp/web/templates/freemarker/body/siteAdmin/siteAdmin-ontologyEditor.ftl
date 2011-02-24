@@ -33,14 +33,12 @@
             <li><a href="${ontologyEditor.urls.propertyGroups}">Property groups</a></li>
         </ul>
         
-        <#-- NIHVIVO-1590 This feature temporarily disabled in v1.2 due to time constraints.
         <#assign formId = "verbosePropertyForm">
         <form id="${formId}" action="${ontologyEditor.verbosePropertyForm.action}#${formId}" method="get">
             <input type="hidden" name="verbose" value="${ontologyEditor.verbosePropertyForm.verboseFieldValue}" />
             <span>Verbose property display for this session is <b>${ontologyEditor.verbosePropertyForm.currentValue}</b>.</span>
             <input type="submit" id="submit" value="Turn ${ontologyEditor.verbosePropertyForm.newValue}" />
         </form>  
-        -->
         
     </div>                       
 </#if>

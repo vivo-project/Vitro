@@ -15,9 +15,11 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAct
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPropStmt;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 
 public class DataPropertyTemplateModel extends PropertyTemplateModel {
@@ -32,8 +34,9 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
     DataPropertyTemplateModel(DataProperty dp, Individual subject, VitroRequest vreq, 
             EditingPolicyHelper policyHelper, List<DataProperty> populatedDataPropertyList) {
         
-        super(dp, subject, policyHelper);
+        super(dp, subject, policyHelper, vreq);
         setName(dp.getPublicName());
+
         statements = new ArrayList<DataPropertyStatementTemplateModel>();
         
         // If the property is populated, get the data property statements via a sparql query
@@ -60,6 +63,16 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
                 }
             }
         }
+    }
+    
+    @Override 
+    protected Object getPropertyDisplayTier(Property p) {
+        return ((DataProperty)p).getDisplayTier();
+    }
+
+    @Override 
+    protected Route getPropertyEditRoute() {
+        return Route.DATA_PROPERTY_EDIT;
     }
     
     /* Access methods for templates */

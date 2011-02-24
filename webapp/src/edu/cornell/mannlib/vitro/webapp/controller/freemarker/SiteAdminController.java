@@ -179,10 +179,9 @@ public class SiteAdminController extends FreemarkerHttpServlet {
         urls.put("objectPropertyHierarchy", urlBuilder.getPortalUrl("/showObjectPropertyHierarchy", new ParamMap("iffRoot", "true")));
         map.put("urls", urls);
         
-        // RY Make sure this works for true, false, and undefined values of the param
         String verbose = vreq.getParameter("verbose");
         boolean verbosePropertyValue = "true".equals(verbose) ? true : false;
-        vreq.getSession().setAttribute("verbosePropertyListing", verbosePropertyValue);
+        vreq.getSession().setAttribute("verbosePropertyDisplay", verbosePropertyValue);
         
         Map<String, Object> verbosePropertyForm = new HashMap<String, Object>();
         verbosePropertyForm.put("verboseFieldValue", String.valueOf(!verbosePropertyValue)); // the form toggles the current value

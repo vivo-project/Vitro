@@ -46,7 +46,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
     private static final int MAX_GROUP_DISPLAY_RANK = 99;
     
     @SuppressWarnings("serial")
-    private static final List<String> VITRO_PROPS_TO_ADD_TO_LIST = new ArrayList<String>() {{
+    protected static final List<String> VITRO_PROPS_TO_ADD_TO_LIST = new ArrayList<String>() {{
         add(VitroVocabulary.PRIMARY_LINK);
         add(VitroVocabulary.ADDITIONAL_LINK);
         add(VitroVocabulary.IND_MAIN_IMAGE);
