@@ -4,30 +4,22 @@ package edu.cornell.mannlib.vitro.webapp.filestorage.backend;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
 
-import javax.naming.InitialContext;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 
 import org.apache.log4j.Level;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-import stubs.javax.naming.InitialContextStub;
-import stubs.javax.naming.spi.InitialContextFactoryStub;
+import stubs.edu.cornell.mannlib.vitro.webapp.config.ConfigurationPropertiesStub;
 import stubs.javax.servlet.ServletContextStub;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
-import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 
 /**
  * Test the methods of {@link FileStorageSetup}
@@ -37,7 +29,6 @@ public class FileStorageSetupTest extends AbstractTestClass {
 	// framework
 	// ----------------------------------------------------------------------
 
-	private static final String configProperties = "#mock config properties file\n";
 	private static File tempDir;
 	private static File fsBaseDir;
 
@@ -45,46 +36,26 @@ public class FileStorageSetupTest extends AbstractTestClass {
 	private ServletContextEvent sce;
 	private ServletContext sc;
 
-	/**
-	 * Use a mock {@link InitialContext} to create an empty
-	 * {@link ConfigurationProperties} object. Each test can use
-	 * {@link #setConfigurationProperties(String, String)} to populate it as
-	 * they choose.
-	 */
-	@BeforeClass
-	public static void createConfigurationProperties() throws Exception {
-		tempDir = createTempDirectory("FileStorageFactoryTest");
-
-		File propsFile = createFile(tempDir, "config.properties",
-				configProperties);
-
-		System.setProperty(InitialContext.INITIAL_CONTEXT_FACTORY,
-				InitialContextFactoryStub.class.getName());
-		InitialContextStub.reset();
-		new InitialContext().bind("java:comp/env/path.configuration",
-				propsFile.getPath());
-	}
-
 	@Before
 	public void createFileStorageSetup() {
 		fss = new FileStorageSetup();
+	}
+
+	@Before
+	public void createContext() {
 		sc = new ServletContextStub();
 		sce = new ServletContextEvent(sc);
 	}
-	
+
 	@Before
-	public void createBaseDirectory() {
+	public void createBaseDirectory() throws IOException {
+		tempDir = createTempDirectory("FileStorageFactoryTest");
 		fsBaseDir = new File(tempDir, "fsBaseDirectory");
 		fsBaseDir.mkdir();
 	}
-	
+
 	@After
 	public void cleanupBaseDirectory() {
-		purgeDirectoryRecursively(fsBaseDir);
-	}
-
-	@AfterClass
-	public static void cleanup() {
 		purgeDirectoryRecursively(tempDir);
 	}
 
@@ -102,7 +73,7 @@ public class FileStorageSetupTest extends AbstractTestClass {
 	}
 
 	@Test
-	public void baseDirectoryDoesntExist() throws IOException {
+	public void baseDirectoryDoesntExist() {
 		setLoggerLevel(FileStorageSetup.class, Level.OFF);
 		setConfigurationProperties("/bogus/Directory",
 				"http://vivo.myDomain.edu/individual/");
@@ -122,7 +93,7 @@ public class FileStorageSetupTest extends AbstractTestClass {
 
 	// This no longer throws an exception - it should be a success.
 	@Test
-	public void defaultNamespaceIsBogus() throws IOException {
+	public void defaultNamespaceIsBogus() {
 		setLoggerLevel(FileStorageSetup.class, Level.ERROR);
 		setConfigurationProperties(fsBaseDir.getPath(), "namespace");
 		fss.contextInitialized(sce);
@@ -135,7 +106,7 @@ public class FileStorageSetupTest extends AbstractTestClass {
 	}
 
 	@Test
-	public void success() throws IOException {
+	public void success() {
 		setConfigurationProperties(fsBaseDir.getPath(),
 				"http://vivo.myDomain.edu/individual/");
 		fss.contextInitialized(sce);
@@ -153,22 +124,19 @@ public class FileStorageSetupTest extends AbstractTestClass {
 
 	private void setConfigurationProperties(String baseDir,
 			String defaultNamespace) {
-		Map<String, String> map = new HashMap<String, String>();
+		ConfigurationPropertiesStub props = new ConfigurationPropertiesStub();
+
 		if (baseDir != null) {
-			map.put(FileStorageSetup.PROPERTY_FILE_STORAGE_BASE_DIR, baseDir);
+			props.setProperty(FileStorageSetup.PROPERTY_FILE_STORAGE_BASE_DIR,
+					baseDir);
 		}
 		if (defaultNamespace != null) {
-			map.put(FileStorageSetup.PROPERTY_DEFAULT_NAMESPACE,
+			props.setProperty(FileStorageSetup.PROPERTY_DEFAULT_NAMESPACE,
 					defaultNamespace);
 		}
 
-		try {
-			Field f = ConfigurationProperties.class.getDeclaredField("theMap");
-			f.setAccessible(true);
-			f.set(null, map);
-		} catch (Exception e) {
-			fail("Exception while setting config properties: " + e);
-		}
+		setLoggerLevel(ConfigurationProperties.class, Level.WARN);
+		props.setBean(sc);
 	}
 
 }
