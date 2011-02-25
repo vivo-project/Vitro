@@ -2,9 +2,11 @@
 
 $(document).ready(function(){
 
+    // Use jQuery() instead of $() alias, because dwr/util.js, loaded on back end editing 
+    // pages, overwrites $.
     // fade out welcome-message when user logs in
-    $('section#welcome-message').css('display', 'block').delay(2000).fadeOut(1500);
+    jQuery('section#welcome-message').css('display', 'block').delay(2000).fadeOut(1500);
     
     // fade in flash-message when user logs out
-    $('section#flash-message').css('display', 'none').fadeIn(1500);
+    jQuery('section#flash-message').css('display', 'none').fadeIn(1500);
 });
