@@ -12,7 +12,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
-import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LoginInProcessFlag;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
@@ -41,7 +41,8 @@ public class LoginWidget extends Widget {
             this.macroName = macroName;
         }
 
-        public String toString() {
+        @Override
+		public String toString() {
             return macroName;
         }
         
@@ -63,7 +64,8 @@ public class LoginWidget extends Widget {
             this.variableName = variableName;
         }
 
-        public String toString() {
+        @Override
+		public String toString() {
             return variableName;
         }
         
@@ -131,7 +133,8 @@ public class LoginWidget extends Widget {
         values.put(TemplateVariable.FORM_ACTION.toString(), getAuthenticateUrl(request));
         values.put(TemplateVariable.LOGIN_NAME.toString(), bean.getUsername());
         
-		String externalAuthDisplayName = ConfigurationProperties.getProperty("externalAuth.buttonText");
+		String externalAuthDisplayName = ConfigurationProperties.getBean(
+				request).getProperty("externalAuth.buttonText");
 		if (externalAuthDisplayName != null) {
 			values.put(TemplateVariable.EXTERNAL_AUTH_URL.toString(),
 					UrlBuilder.getUrl(EXTERNAL_AUTH_SETUP_URL));

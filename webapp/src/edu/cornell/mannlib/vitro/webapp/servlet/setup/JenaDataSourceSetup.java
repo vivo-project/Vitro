@@ -21,8 +21,8 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 
-import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDaoCon;
@@ -45,7 +45,7 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
     	ServletContext ctx = sce.getServletContext();
     	        
         String tripleStoreTypeStr = 
-            ConfigurationProperties.getProperty(
+            ConfigurationProperties.getBean(sce).getProperty(
                     "VitroConnection.DataSource.tripleStoreType", "RDB");
         
         if ("SDB".equals(tripleStoreTypeStr)) {
@@ -89,7 +89,7 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
         	inferenceOms.setDisplayModel(displayModel);
         	unionOms.setDisplayModel(displayModel);
         			
-        	checkForNamespaceMismatch( memModel, defaultNamespace );
+        	checkForNamespaceMismatch( memModel, defaultNamespace, sce );
         	
             ctx.setAttribute("baseOntModel", memModel);
             WebappDaoFactory baseWadf = new WebappDaoFactoryJena(
@@ -148,8 +148,9 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
     } 
 
     
-    private void checkForNamespaceMismatch(OntModel model, String defaultNamespace) {
-        String defaultNamespaceFromDeployProperties = ConfigurationProperties.getProperty("Vitro.defaultNamespace");
+    private void checkForNamespaceMismatch(OntModel model, String defaultNamespace, ServletContextEvent sce) {
+		String defaultNamespaceFromDeployProperties = ConfigurationProperties
+				.getBean(sce).getProperty("Vitro.defaultNamespace");
         if( defaultNamespaceFromDeployProperties == null ){            
             log.error("Could not get namespace from deploy.properties.");
         }               

@@ -13,7 +13,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
 
-import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDao;
 import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorage;
@@ -94,7 +94,7 @@ public class UpdateUploadedFiles implements ServletContextListener {
 						+ "UpdateUploadedFiles?");
 			}
 
-			String uploadDirectoryName = ConfigurationProperties
+			String uploadDirectoryName = ConfigurationProperties.getBean(ctx)
 					.getProperty(FileStorageSetup.PROPERTY_FILE_STORAGE_BASE_DIR);
 			if (uploadDirectoryName == null) {
 				throw new IllegalStateException("Upload directory name is null");
@@ -106,7 +106,7 @@ public class UpdateUploadedFiles implements ServletContextListener {
 						+ "' does not exist.");
 			}
 
-			String vivoDefaultNamespace = ConfigurationProperties
+			String vivoDefaultNamespace = ConfigurationProperties.getBean(ctx)
 					.getProperty(FileStorageSetup.PROPERTY_DEFAULT_NAMESPACE);
 			if (vivoDefaultNamespace == null) {
 				throw new IllegalStateException("Default namespace is null.");

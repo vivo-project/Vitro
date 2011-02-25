@@ -26,7 +26,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.hp.hpl.jena.util.iterator.WrappedIterator;
 
-import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 
 /**
@@ -56,8 +56,8 @@ public class VitroJenaModelMaker implements ModelMaker {
 		this.username = username;
 		this.password = password;
 		this.dbTypeStr = dbTypeStr;
-		String driverName = ConfigurationProperties
-			.getProperty("VitroConnection.DataSource.driver");
+		String driverName = ConfigurationProperties.getBean(ctx).getProperty(
+				"VitroConnection.DataSource.driver");
 		// This property is no longer used?
 		// We'll change it all around in 1.2 anyway.
 		if(driverName == null) {

@@ -16,21 +16,23 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.ContactMailServlet;
 
 public class MailUtil {
 	private static final Log log = LogFactory.getLog(MailUtil.class);
 	
 	 	private String smtpHost = "";
-        public MailUtil(HttpServletRequest req){
-            smtpHost = ConfigurationProperties.getProperty(ContactMailServlet.SMTPHOST_PROPERTY, "");
-    		if (smtpHost.isEmpty()) {
-    			log.debug("No Vitro.smtpHost specified");
-    		} else {
-    			log.debug("Found Vitro.smtpHost value of " + smtpHost);
-    		}
-        }
+	
+		public MailUtil(HttpServletRequest req) {
+			smtpHost = ConfigurationProperties.getBean(req)
+					.getProperty(ContactMailServlet.SMTPHOST_PROPERTY, "");
+			if (smtpHost.isEmpty()) {
+				log.debug("No Vitro.smtpHost specified");
+			} else {
+				log.debug("Found Vitro.smtpHost value of " + smtpHost);
+			}
+		}
         
         public void sendMessage(String messageText, String subject, String from, String to, List<String> deliverToArray) throws IOException{
         	Properties props = System.getProperties();

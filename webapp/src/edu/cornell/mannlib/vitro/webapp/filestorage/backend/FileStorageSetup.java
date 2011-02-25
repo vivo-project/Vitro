@@ -13,7 +13,7 @@ import javax.servlet.ServletContextListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 
 /**
  * Initializes the file storage system, and stores a reference in the servlet
@@ -48,8 +48,8 @@ public class FileStorageSetup implements ServletContextListener {
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 		try {
-			File baseDirectory = figureBaseDir();
-			Collection<String> fileNamespace = confirmDefaultNamespace();
+			File baseDirectory = figureBaseDir(sce);
+			Collection<String> fileNamespace = confirmDefaultNamespace(sce);
 			FileStorage fs = new FileStorageImpl(baseDirectory, fileNamespace);
 
 			ServletContext sc = sce.getServletContext();
@@ -65,9 +65,9 @@ public class FileStorageSetup implements ServletContextListener {
 	 * 
 	 * For use by the constructor in implementations of {@link FileStorage}.
 	 */
-	private File figureBaseDir() {
-		String baseDirPath = ConfigurationProperties
-				.getProperty(PROPERTY_FILE_STORAGE_BASE_DIR);
+	private File figureBaseDir(ServletContextEvent sce) {
+		String baseDirPath = ConfigurationProperties.getBean(sce)
+			.getProperty(PROPERTY_FILE_STORAGE_BASE_DIR);
 		if (baseDirPath == null) {
 			throw new IllegalArgumentException(
 					"Configuration properties must contain a value for '"
@@ -85,8 +85,8 @@ public class FileStorageSetup implements ServletContextListener {
 	 * 
 	 * @returns a collection containing the default namespace.
 	 */
-	private Collection<String> confirmDefaultNamespace() {
-		String defaultNamespace = ConfigurationProperties
+	private Collection<String> confirmDefaultNamespace(ServletContextEvent sce) {
+		String defaultNamespace = ConfigurationProperties.getBean(sce)
 				.getProperty(PROPERTY_DEFAULT_NAMESPACE);
 		if (defaultNamespace == null) {
 			throw new IllegalArgumentException(

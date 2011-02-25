@@ -10,20 +10,17 @@ import org.apache.commons.logging.LogFactory;
 import org.mindswap.pellet.PelletOptions;
 
 import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.vocabulary.OWL;
 
-import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.ReasonerConfiguration;
 
 public class PelletReasonerSetup implements ServletContextListener {
-	
 	private static final Log log = LogFactory.getLog(PelletReasonerSetup.class.getName());
-
 	
-	
+	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 		
 	    if (AbortStartup.isStartupAborted(sce.getServletContext())) {
@@ -34,7 +31,7 @@ public class PelletReasonerSetup implements ServletContextListener {
 			
 	        //FIXME refactor this
             String tripleStoreTypeStr = 
-                ConfigurationProperties.getProperty(
+                ConfigurationProperties.getBean(sce).getProperty(
                         "VitroConnection.DataSource.tripleStoreType", "RDB");
             if ("SDB".equals(tripleStoreTypeStr)) {
                 (new SimpleReasonerSetup()).contextInitialized(sce);
@@ -76,6 +73,7 @@ public class PelletReasonerSetup implements ServletContextListener {
 		}
 	}
 	
+	@Override
 	public void contextDestroyed(ServletContextEvent arg0) {
 		//
 	}

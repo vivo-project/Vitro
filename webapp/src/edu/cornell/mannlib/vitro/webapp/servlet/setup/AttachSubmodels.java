@@ -5,9 +5,9 @@ package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Set;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -18,7 +18,7 @@ import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
-import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDao;
 
 public class AttachSubmodels implements ServletContextListener {
@@ -27,18 +27,20 @@ public class AttachSubmodels implements ServletContextListener {
 	
 	private static final Log log = LogFactory.getLog( AttachSubmodels.class );
 	
+	@Override
 	public void contextInitialized( ServletContextEvent sce ) {
 	    
-	    if (AbortStartup.isStartupAborted(sce.getServletContext())) {
+	    ServletContext ctx = sce.getServletContext();
+		if (AbortStartup.isStartupAborted(ctx)) {
             return;
         }
 	    
 		try {
 		    
 		    //FIXME refactor this
-            String tripleStoreTypeStr = 
-                ConfigurationProperties.getProperty(
-                        "VitroConnection.DataSource.tripleStoreType", "RDB");
+			String tripleStoreTypeStr = ConfigurationProperties.getBean(sce)
+					.getProperty("VitroConnection.DataSource.tripleStoreType",
+							"RDB");
             if ("SDB".equals(tripleStoreTypeStr)) {
                 (new FileGraphSetup()).contextInitialized(sce);
                 return;
@@ -46,13 +48,13 @@ public class AttachSubmodels implements ServletContextListener {
             }
 		    
 			int attachmentCount = 0;
-			OntModel baseModel = (OntModel) sce.getServletContext().getAttribute( JenaBaseDao.ASSERTIONS_ONT_MODEL_ATTRIBUTE_NAME );
-			Set<String> pathSet = sce.getServletContext().getResourcePaths( PATH );
+			OntModel baseModel = (OntModel) ctx.getAttribute( JenaBaseDao.ASSERTIONS_ONT_MODEL_ATTRIBUTE_NAME );
+			Set<String> pathSet = ctx.getResourcePaths( PATH );
 			if (pathSet == null) { 
 				return;
 			}
 			for ( String p : pathSet ) {
-				File file = new File( sce.getServletContext().getRealPath( p ) );
+				File file = new File( ctx.getRealPath( p ) );
 				try {
 					FileInputStream fis = new FileInputStream( file );
 					try {
@@ -96,6 +98,7 @@ public class AttachSubmodels implements ServletContextListener {
 		
 	}
 	
+	@Override
 	public void contextDestroyed( ServletContextEvent sce ) {
 		// nothing to worry about
 	}

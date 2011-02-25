@@ -24,7 +24,7 @@ import com.hp.hpl.jena.sdb.StoreDesc;
 import com.hp.hpl.jena.sdb.store.DatabaseType;
 import com.hp.hpl.jena.sdb.store.LayoutType;
 
-import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDaoCon;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDBGraphGenerator;
@@ -119,8 +119,8 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     static final OntModelSpec MEM_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM; 
    
     private String getJdbcUrl(ServletContext ctx) {
-        String jdbcUrl = ConfigurationProperties.getProperty(
-        "VitroConnection.DataSource.url");
+		String jdbcUrl = ConfigurationProperties.getBean(ctx).getProperty(
+				"VitroConnection.DataSource.url");
 
         // Ensure that MySQL handles unicode properly, else all kinds of
         // horrible nastiness ensues.
@@ -142,14 +142,14 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
        
         String jdbcUrl = getJdbcUrl(ctx);
    
-        String username = ConfigurationProperties.getProperty(
-                "VitroConnection.DataSource.username");
-        String password = ConfigurationProperties.getProperty(
+		String username = ConfigurationProperties.getBean(ctx).getProperty(
+				"VitroConnection.DataSource.username");
+        String password = ConfigurationProperties.getBean(ctx).getProperty(
                 "VitroConnection.DataSource.password");
         BasicDataSource ds = makeBasicDataSource(
                 getDbDriverClassName(ctx), jdbcUrl, username, password, ctx);
 
-        String dns = ConfigurationProperties.getProperty(
+        String dns = ConfigurationProperties.getBean(ctx).getProperty(
                 "Vitro.defaultNamespace");
         defaultNamespace = (dns != null && dns.length() > 0) ? dns : null;
        
@@ -166,13 +166,14 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     * a properties file.
     */
     public final BasicDataSource makeDataSourceFromConfigurationProperties(ServletContext ctx){
-        String dbDriverClassname = ConfigurationProperties.getProperty(
-                "VitroConnection.DataSource.driver", getDbDriverClassName(ctx));
+		String dbDriverClassname = ConfigurationProperties.getBean(ctx)
+				.getProperty("VitroConnection.DataSource.driver",
+						getDbDriverClassName(ctx));
         String jdbcUrl = getJdbcUrl(ctx);
-        String username = ConfigurationProperties.getProperty(
-                "VitroConnection.DataSource.username");
-        String password = ConfigurationProperties.getProperty(
-                "VitroConnection.DataSource.password");
+		String username = ConfigurationProperties.getBean(ctx).getProperty(
+				"VitroConnection.DataSource.username");
+		String password = ConfigurationProperties.getBean(ctx).getProperty(
+				"VitroConnection.DataSource.password");
         return makeBasicDataSource(
                 dbDriverClassname, jdbcUrl, username, password, ctx);
     }
@@ -203,8 +204,8 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
        ds.setUsername(username);
        ds.setPassword(password);
        int maxActiveInt = DEFAULT_MAXACTIVE;
-       String maxActiveStr = ConfigurationProperties
-               .getProperty("VitroConnection.DataSource.pool.maxActive");   
+		String maxActiveStr = ConfigurationProperties.getBean(ctx).getProperty(
+				"VitroConnection.DataSource.pool.maxActive");
        if (!StringUtils.isEmpty(maxActiveStr)) {
            try {
                maxActiveInt = Integer.parseInt(maxActiveStr);    
@@ -216,8 +217,8 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
        int maxIdleInt = (maxActiveInt > DEFAULT_MAXACTIVE) 
                ? maxActiveInt / 4
                : DEFAULT_MAXIDLE;
-       String maxIdleStr = ConfigurationProperties
-               .getProperty("VitroConnection.DataSource.pool.maxIdle");   
+		String maxIdleStr = ConfigurationProperties.getBean(ctx).getProperty(
+				"VitroConnection.DataSource.pool.maxIdle");
        if (!StringUtils.isEmpty(maxIdleStr)) {
            try {
                maxIdleInt = Integer.parseInt(maxIdleStr);    
@@ -282,11 +283,13 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
             		                ds, dbType, jenaDbModelName)); 
             		break;
             	case SDB:
-            	    String layoutStr = ConfigurationProperties.getProperty(
-            	            "VitroConnection.DataSource.sdb.layout",
-            	            "layout2/hash");
-            	    String dbtypeStr = ConfigurationProperties.getProperty(
-            	            "VitroConnection.DataSource.dbtype", "MySQL");
+					String layoutStr = ConfigurationProperties.getBean(ctx)
+							.getProperty(
+									"VitroConnection.DataSource.sdb.layout",
+									"layout2/hash");
+					String dbtypeStr = ConfigurationProperties.getBean(ctx)
+							.getProperty("VitroConnection.DataSource.dbtype",
+									"MySQL");
             		StoreDesc desc = new StoreDesc(
             		        LayoutType.fetch(layoutStr),
             		        DatabaseType.fetch(dbtypeStr) );
@@ -346,7 +349,7 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
      */
     protected void createInitialAdminUser(Model model, ServletContext ctx) {
         String initialAdminUsername = ConfigurationProperties
-                .getProperty("initialAdminUser");
+                .getBean(ctx).getProperty("initialAdminUser");
         if (initialAdminUsername == null) {
             return;
         }
@@ -380,9 +383,9 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     
     protected void makeModelMakerFromConnectionProperties(TripleStoreType type, ServletContext ctx){
     	String jdbcUrl = getJdbcUrl(ctx);
-    	String username = ConfigurationProperties.getProperty(
+    	String username = ConfigurationProperties.getBean(ctx).getProperty(
     	        "VitroConnection.DataSource.username");
-    	String password = ConfigurationProperties.getProperty(
+    	String password = ConfigurationProperties.getBean(ctx).getProperty(
     	        "VitroConnection.DataSource.password");
     	
     	if (TripleStoreType.RDB.equals(type)){
@@ -426,7 +429,7 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     
     public static boolean isSDBActive(ServletContext ctx) {
     	String tripleStoreTypeStr = 
-    		ConfigurationProperties.getProperty(
+    		ConfigurationProperties.getBean(ctx).getProperty(
     				"VitroConnection.DataSource.tripleStoreType", "RDB");
     	return ("SDB".equals(tripleStoreTypeStr)); 
     }
@@ -439,21 +442,20 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     	return vsmm;
     }
 
-    private static String getDbType(ServletContext ctx) {
-        return ConfigurationProperties.getProperty( // database type
-                "VitroConnection.DataSource.dbtype","MySQL");
-    }
-    
-    private static String getDbDriverClassName(ServletContext ctx) {
-        return ConfigurationProperties.getProperty(
-                "VitroConnection.DataSource.driver",
-                "com.mysql.jdbc.Driver");
+	private static String getDbType(ServletContext ctx) {
+		return ConfigurationProperties.getBean(ctx).getProperty( // database type
+				"VitroConnection.DataSource.dbtype", "MySQL");
+	}
 
-    }
-    private static String getValidationQuery(ServletContext ctx) { 
-        return ConfigurationProperties.getProperty(
-                "VitroConnection.DataSource.validationQuery", "SELECT 1");
-    }
+	private static String getDbDriverClassName(ServletContext ctx) {
+		return ConfigurationProperties.getBean(ctx).getProperty(
+				"VitroConnection.DataSource.driver", "com.mysql.jdbc.Driver");
 
+	}
+
+	private static String getValidationQuery(ServletContext ctx) {
+		return ConfigurationProperties.getBean(ctx).getProperty(
+				"VitroConnection.DataSource.validationQuery", "SELECT 1");
+	}
 
 }

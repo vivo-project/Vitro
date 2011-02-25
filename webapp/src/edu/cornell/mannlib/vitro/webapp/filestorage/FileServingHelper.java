@@ -10,7 +10,7 @@ import javax.servlet.ServletContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup;
 
 /**
@@ -28,7 +28,7 @@ public class FileServingHelper {
 	 * the suffix.
 	 */
 	private static String getDefaultNamespace(ServletContext ctx) {
-		String defaultNamespace = ConfigurationProperties
+		String defaultNamespace = ConfigurationProperties.getBean(ctx)
 				.getProperty(FileStorageSetup.PROPERTY_DEFAULT_NAMESPACE);
 		if (defaultNamespace == null) {
 			throw new IllegalArgumentException(

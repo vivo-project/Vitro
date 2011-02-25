@@ -41,8 +41,8 @@ import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
 
-import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDaoCon;
@@ -117,14 +117,14 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
             inferenceOms.setDisplayModel(displayModel);
             unionOms.setDisplayModel(displayModel);
                     
-            checkForNamespaceMismatch( memModel, defaultNamespace );
+            checkForNamespaceMismatch( memModel, defaultNamespace, sce );
 
             // SDB setup
             
             // union default graph
             SDB.getContext().set(SDB.unionDefaultGraph, true) ;
 
-            StoreDesc storeDesc = makeStoreDesc();
+            StoreDesc storeDesc = makeStoreDesc(ctx);
             setApplicationStoreDesc(storeDesc, ctx);
 
             BasicDataSource bds = makeDataSourceFromConfigurationProperties(ctx);
@@ -343,8 +343,9 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
     } 
 
     
-    private void checkForNamespaceMismatch(OntModel model, String defaultNamespace) {
-        String defaultNamespaceFromDeployProperites = ConfigurationProperties.getProperty("Vitro.defaultNamespace");
+    private void checkForNamespaceMismatch(OntModel model, String defaultNamespace, ServletContextEvent sce) {
+		String defaultNamespaceFromDeployProperites = ConfigurationProperties
+				.getBean(sce).getProperty("Vitro.defaultNamespace");
         if( defaultNamespaceFromDeployProperites == null ){            
             log.error("Could not get namespace from deploy.properties.");
         }               
@@ -562,11 +563,11 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
    		return;
     }
     
-    public static StoreDesc makeStoreDesc() {
-        String layoutStr = ConfigurationProperties.getProperty(
-                "VitroConnection.DataSource.sdb.layout","layout2/hash");
-        String dbtypeStr = ConfigurationProperties.getProperty(
-                "VitroConnection.DataSource.dbtype", "MySQL");
+    public static StoreDesc makeStoreDesc(ServletContext ctx) {
+		String layoutStr = ConfigurationProperties.getBean(ctx).getProperty(
+				"VitroConnection.DataSource.sdb.layout", "layout2/hash");
+		String dbtypeStr = ConfigurationProperties.getBean(ctx).getProperty(
+				"VitroConnection.DataSource.dbtype", "MySQL");
        return new StoreDesc(
                 LayoutType.fetch(layoutStr),
                 DatabaseType.fetch(dbtypeStr) );

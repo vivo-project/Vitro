@@ -14,7 +14,7 @@ import org.mindswap.pellet.PelletOptions;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.vocabulary.OWL;
 
-import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
@@ -75,7 +75,7 @@ public class SimpleReasonerSetup implements ServletContextListener {
 	        ServletContext ctx = sce.getServletContext();
 	        BasicDataSource bds = JenaDataSourceSetupBase
 	                                .getApplicationDataSource(ctx);
-	        String dbType = ConfigurationProperties.getProperty( // database type
+	        String dbType = ConfigurationProperties.getBean(ctx).getProperty( // database type
                     "VitroConnection.DataSource.dbtype","MySQL");
 	        
 	        	        

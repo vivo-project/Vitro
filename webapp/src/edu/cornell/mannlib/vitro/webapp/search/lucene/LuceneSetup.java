@@ -25,8 +25,9 @@ import org.apache.lucene.search.BooleanQuery;
 
 import com.hp.hpl.jena.ontology.OntModel;
 
-import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
@@ -38,7 +39,6 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.ObjectSourceIface;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.AbortStartup;
-import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 
 /**
  * Setup objects for lucene searching and indexing.
@@ -69,6 +69,7 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 	 * Gets run to set up DataSource when the webapp servlet context gets
 	 * created.
 	 */
+	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 	    
 	    if (AbortStartup.isStartupAborted(sce.getServletContext())) {
@@ -78,7 +79,7 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 		try {
 			ServletContext context = sce.getServletContext();
 
-			String baseIndexDir = getBaseIndexDirName();
+			String baseIndexDir = getBaseIndexDirName(context);
 			log.info("Setting up Lucene index. Base directory of lucene index: " + baseIndexDir);
 
 			setBoolMax();
@@ -98,7 +99,9 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
             
 			// Here we want to put the LuceneIndex object into the application scope.
 			// This will attempt to create a new directory and empty index if there is none.
-			LuceneIndexer indexer = new LuceneIndexer(getBaseIndexDirName(),liveIndexDir, null, getAnalyzer());
+			LuceneIndexer indexer = new LuceneIndexer(
+					getBaseIndexDirName(context), liveIndexDir, null,
+					getAnalyzer());
 			context.setAttribute(ANALYZER, getAnalyzer());
 			
 			OntModel displayOntModel = (OntModel) sce.getServletContext().getAttribute("displayOntModel");
@@ -139,7 +142,7 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 			SearchReindexingListener srl = new SearchReindexingListener(builder);
 			ModelContext.registerListenerForChanges(ctx, srl);
 									
-			if( (Boolean)sce.getServletContext().getAttribute(INDEX_REBUILD_REQUESTED_AT_STARTUP) instanceof Boolean &&
+			if( sce.getServletContext().getAttribute(INDEX_REBUILD_REQUESTED_AT_STARTUP) instanceof Boolean &&
 				(Boolean)sce.getServletContext().getAttribute(INDEX_REBUILD_REQUESTED_AT_STARTUP) ){
 			    log.info("Rebuild of lucene index required before startup.");
 				builder.doIndexRebuild();												
@@ -148,7 +151,7 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 				    n++;
 					if( n % 20 == 0 ) //output message every 10 sec. 
 					    log.info("Still rebuilding lucene  index");
-					Thread.currentThread().sleep(500);
+					Thread.sleep(500);
 				}				
 			}
 			
@@ -163,6 +166,7 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 	/**
 	 * Gets run when the webApp Context gets destroyed.
 	 */
+	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
 		log.debug("**** Running " + this.getClass().getName() + ".contextDestroyed()");
 		IndexBuilder builder = (IndexBuilder) sce.getServletContext().getAttribute(IndexBuilder.class.getName());
@@ -195,9 +199,9 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 	 * @throws IOException
 	 *             if the directory doesn't exist and we fail to create it.
 	 */
-	private String getBaseIndexDirName()
+	private String getBaseIndexDirName(ServletContext ctx)
 			throws IOException {
-		String dirName = ConfigurationProperties
+		String dirName = ConfigurationProperties.getBean(ctx)
 				.getProperty("LuceneSetup.indexDir");
 		if (dirName == null) {
 			throw new IllegalStateException(
