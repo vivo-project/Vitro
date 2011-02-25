@@ -4,6 +4,18 @@ package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
 import javax.servlet.ServletContext;
 
+/**
+ * Provide a mechanism so a ServletContextListener can set a flag that tells
+ * other ServletContextListeners not to run.
+ * 
+ * The listener that detects a problem should still throw an exception, so
+ * Tomcat will declare that the startup has failed and mark the application as
+ * not runnable. However, Tomcat will still run the other listeners before
+ * giving up. Hence, the need for this flag.
+ * 
+ * If the other listeners are looking for this flag, they can (and should)
+ * decide to simply exit rather than attempting to initialize.
+ */
 public class AbortStartup {
 
     private static final String ATTRIBUTE_NAME = AbortStartup.class.getName();
