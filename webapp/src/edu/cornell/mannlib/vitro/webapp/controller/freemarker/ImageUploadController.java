@@ -17,7 +17,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
-import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.auth.AuthorizationHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
@@ -25,6 +24,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPro
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropObjectPropStmt;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjPropStmt;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ExceptionResponseValues;
@@ -49,9 +49,6 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 			.getLog(ImageUploadController.class);
 
 	private static final String ATTRIBUTE_REFERRING_PAGE = "ImageUploadController.referringPage";
-
-	private static final String DEFAULT_NAMESPACE = ConfigurationProperties
-			.getProperty("Vitro.defaultNamespace");
 
 	public static final String DUMMY_THUMBNAIL_PERSON_URL = "/images/placeholders/person.thumbnail.jpg"; 
     public static final String DUMMY_THUMBNAIL_NON_PERSON_URL = "/images/placeholders/non.person.thumbnail.jpg"; 
@@ -477,12 +474,13 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 			return referrer;
 		}
 
-		if (DEFAULT_NAMESPACE == null) {
+		String defaultNamespace = getDefaultNamespace();
+		if (defaultNamespace == null) {
 			return "";
-		} else if (!entityUri.startsWith(DEFAULT_NAMESPACE)) {
+		} else if (!entityUri.startsWith(defaultNamespace)) {
 			return "";
 		} else {
-			String tail = entityUri.substring(DEFAULT_NAMESPACE.length());
+			String tail = entityUri.substring(defaultNamespace.length());
 			if (!tail.startsWith("/")) {
 				tail = "/" + tail;
 			}
@@ -640,5 +638,11 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 				+ "' as self-editor;  requested action = " + ra);
 		return authorized;
 	}
+
+	private String getDefaultNamespace() {
+		return ConfigurationProperties.getBean(getServletContext())
+				.getProperty("Vitro.defaultNamespace");
+	}
+
 
 }

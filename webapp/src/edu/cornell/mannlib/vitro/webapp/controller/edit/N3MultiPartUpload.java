@@ -33,7 +33,7 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
-import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
@@ -86,28 +86,27 @@ public class N3MultiPartUpload extends VitroHttpServlet {
      */
     @Override
     public void init() throws ServletException {
-        super.init();
-        
-            fileUriPrefix = ConfigurationProperties.getProperty("n3.defaultUriPrefix",
-                    DEFAULT_FILE_URI_PREFIX);
-            baseDirectoryForFiles = ConfigurationProperties.getProperty("n3.baseDirectoryForFiles",
-                    DEFAULT_BASE_DIR);
+		ConfigurationProperties configProperties = ConfigurationProperties
+				.getBean(getServletContext());
 
-            String postUploadProcess = ConfigurationProperties.getProperty("n3.postUploadProcess");
-            System.out.println("Attempting to load postUploadProcess "
-                    + postUploadProcess);
-            postUpload = getPostUpload(postUploadProcess);
+		fileUriPrefix = configProperties.getProperty("n3.defaultUriPrefix",
+				DEFAULT_FILE_URI_PREFIX);
+		baseDirectoryForFiles = configProperties.getProperty(
+				"n3.baseDirectoryForFiles", DEFAULT_BASE_DIR);
 
-            String maxSize = ConfigurationProperties.getProperty("n3.maxSize", Long
-                    .toString(DEFAULT_MAX_SIZE));
-            //DEBUG ADDED
-            System.out.println("Max size is " + maxSize);
-            try {
-                maxFileSize = Integer.parseInt(maxSize);
-            } catch (NumberFormatException nfe) {
-                log.error(nfe);
-                maxFileSize = DEFAULT_MAX_SIZE;
-            }
+		String postUploadProcess = configProperties.getProperty("n3.postUploadProcess");
+		System.out.println("Attempting to load postUploadProcess "
+				+ postUploadProcess);
+		postUpload = getPostUpload(postUploadProcess);
+
+		String maxSize = configProperties.getProperty("n3.maxSize",	Long.toString(DEFAULT_MAX_SIZE));
+		log.debug("Max size is " + maxSize);
+		try {
+			maxFileSize = Integer.parseInt(maxSize);
+		} catch (NumberFormatException nfe) {
+			log.error(nfe);
+			maxFileSize = DEFAULT_MAX_SIZE;
+		}
     }
 
     @Override

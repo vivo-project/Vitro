@@ -13,8 +13,8 @@ import javax.servlet.ServletContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.cache.FileTemplateLoader;
@@ -89,7 +89,7 @@ public class FreemarkerConfigurationLoader {
         
         Configuration config = new Configuration();
         
-        String buildEnv = ConfigurationProperties.getProperty("Environment.build");
+        String buildEnv = ConfigurationProperties.getBean(context).getProperty("Environment.build");
         log.debug("Current build environment: " + buildEnv);
         if ("development".equals(buildEnv)) { // Set Environment.build = development in deploy.properties
             log.debug("Disabling Freemarker template caching in development build.");

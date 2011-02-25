@@ -5,6 +5,9 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -22,7 +25,6 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Exc
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RedirectResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
-import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasoner;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupSDB;
 
 public class SDBSetupController extends FreemarkerHttpServlet {
@@ -59,7 +61,7 @@ public class SDBSetupController extends FreemarkerHttpServlet {
                     		body.put("sdbstatus"," ");
                 	}
                 	else if(setupsignal!=null && setupsignal.equals("setup")){
-                		new Thread(new SDBSetupRunner(jenaDataSourceSetupSDB)).start();
+                		new Thread(new SDBSetupRunner(jenaDataSourceSetupSDB, vreq)).start();
                 		messageStr = "SDB setup started.";
                         getServletContext().setAttribute("sdbsetup", "showButton");
                 	}	
@@ -81,15 +83,18 @@ public class SDBSetupController extends FreemarkerHttpServlet {
         
         private JenaDataSourceSetupSDB jenaDataSourceSetupSDB;
         final OntModelSpec MEM_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM;
+        private final ServletContext ctx;
         
-        public SDBSetupRunner(JenaDataSourceSetupSDB jenaDataSourceSetupSDB) {
+        public SDBSetupRunner(JenaDataSourceSetupSDB jenaDataSourceSetupSDB, HttpServletRequest req) {
             this.jenaDataSourceSetupSDB = jenaDataSourceSetupSDB;
+            this.ctx = req.getSession().getServletContext();
         }
         
-        public void run() {
+        @Override
+		public void run() {
            Boolean done = true;
            getServletContext().setAttribute("done",done);
-           StoreDesc storeDesc = jenaDataSourceSetupSDB.makeStoreDesc();
+           StoreDesc storeDesc = jenaDataSourceSetupSDB.makeStoreDesc(ctx);
            BasicDataSource bds = jenaDataSourceSetupSDB.makeDataSourceFromConfigurationProperties(getServletContext());
            Store store = null;
 		try {

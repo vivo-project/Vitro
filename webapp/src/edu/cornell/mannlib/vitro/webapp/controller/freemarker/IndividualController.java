@@ -30,7 +30,6 @@ import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
-import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -39,6 +38,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ExceptionResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RdfResponseValues;
@@ -56,7 +56,6 @@ import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasoner;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapper;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapperFactory;
 import edu.cornell.mannlib.vitro.webapp.web.ContentType;
-import edu.cornell.mannlib.vitro.webapp.web.methods.IndividualLocalNameMethod;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ListedIndividualTemplateModel;
 import freemarker.ext.beans.BeansWrapper;
@@ -549,7 +548,8 @@ public class IndividualController extends FreemarkerHttpServlet {
 	}
  
 	private boolean getTemporalVisualizationFlag() {
-		String property = ConfigurationProperties.getProperty("visualization.temporal");
+		String property = ConfigurationProperties.getBean(getServletContext())
+				.getProperty("visualization.temporal");
 		return "enabled".equals(property);
 	}
 
@@ -620,7 +620,8 @@ public class IndividualController extends FreemarkerHttpServlet {
         return null;
     }
 
-    public void doPost(HttpServletRequest request, HttpServletResponse response)
+    @Override
+	public void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException,IOException {
         doGet(request, response);
     }

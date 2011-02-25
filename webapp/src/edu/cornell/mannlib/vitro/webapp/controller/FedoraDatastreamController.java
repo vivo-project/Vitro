@@ -35,12 +35,12 @@ import com.hp.hpl.jena.vocabulary.XSD;
 import com.ibm.icu.util.Calendar;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
-import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
@@ -93,8 +93,9 @@ public class FedoraDatastreamController extends VitroHttpServlet implements Cons
     /**
      * The get will present a form to the user. 
      */
-    public void doGet( HttpServletRequest req, HttpServletResponse res )
-    throws IOException, ServletException {
+    @Override
+	public void doGet(HttpServletRequest req, HttpServletResponse res)
+			throws IOException, ServletException {
         try {
             super.doGet(req, res);
             log.debug("In doGet");
@@ -217,8 +218,9 @@ public class FedoraDatastreamController extends VitroHttpServlet implements Cons
         }
     }
                 
-    public void doPost(HttpServletRequest rawRequest, HttpServletResponse res)
-    throws ServletException,IOException {
+    @Override
+	public void doPost(HttpServletRequest rawRequest, HttpServletResponse res)
+			throws ServletException, IOException {
         try{          
         	FileUploadServletRequest req = FileUploadServletRequest.parseRequest(rawRequest, maxFileSize);
        		if (req.hasFileUploadException()) {
@@ -547,13 +549,16 @@ public class FedoraDatastreamController extends VitroHttpServlet implements Cons
     	return success;
     }
     
+	@Override
 	public void init() throws ServletException {
 		super.init();
 
-		baseDirectoryForFiles = ConfigurationProperties.getProperty(
+		ConfigurationProperties configProperties = ConfigurationProperties
+				.getBean(getServletContext());
+		baseDirectoryForFiles = configProperties.getProperty(
 				"n3.baseDirectoryForFiles", DEFAULT_BASE_DIR);
 
-		String maxSize = ConfigurationProperties.getProperty("n3.maxSize", Long
+		String maxSize = configProperties.getProperty("n3.maxSize", Long
 				.toString(DEFAULT_MAX_SIZE));
 		try {
 			maxFileSize = Integer.parseInt(maxSize);
@@ -669,7 +674,7 @@ public class FedoraDatastreamController extends VitroHttpServlet implements Cons
         public FdcException(String message) {
             super(message);           
         }
-    };
+    }
     
     private static final String RELOAD_MSG = 
         "<p>The fedora configuartion file will be reloaded if " +

@@ -13,7 +13,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 
 /**
  * Capture the properties used by the External Authorization system, and use
@@ -58,17 +58,17 @@ public class ExternalAuthHelper {
 			return DUMMY_HELPER;
 		}
 
-		ServletContext context = session.getServletContext();
+		ServletContext ctx = session.getServletContext();
 
-		Object attr = context.getAttribute(BEAN_ATTRIBUTE);
+		Object attr = ctx.getAttribute(BEAN_ATTRIBUTE);
 		if (attr instanceof ExternalAuthHelper) {
 			log.trace("Found a bean: " + attr);
 			return (ExternalAuthHelper) attr;
 		}
 
-		ExternalAuthHelper bean = buildBean();
+		ExternalAuthHelper bean = buildBean(ctx);
 		log.debug("Created a bean: " + bean);
-		setBean(context, bean);
+		setBean(ctx, bean);
 		return bean;
 	}
 
@@ -78,10 +78,10 @@ public class ExternalAuthHelper {
 		context.setAttribute(BEAN_ATTRIBUTE, bean);
 	}
 
-	private static ExternalAuthHelper buildBean() {
-		String externalAuthServerUrl = ConfigurationProperties
+	private static ExternalAuthHelper buildBean(ServletContext ctx) {
+		String externalAuthServerUrl = ConfigurationProperties.getBean(ctx)
 				.getProperty(PROPERTY_EXTERNAL_AUTH_SERVER_URL);
-		String externalAuthHeaderName = ConfigurationProperties
+		String externalAuthHeaderName = ConfigurationProperties.getBean(ctx)
 				.getProperty(PROPERTY_EXTERNAL_AUTH_USERNAME_HEADER);
 
 		return new ExternalAuthHelper(externalAuthServerUrl,

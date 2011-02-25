@@ -23,8 +23,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
 
 public class MailUsersServlet extends VitroHttpServlet {
@@ -37,7 +37,8 @@ public class MailUsersServlet extends VitroHttpServlet {
 
     @Override
 	public void init() {
-        smtpHost = ConfigurationProperties.getProperty(ContactMailServlet.SMTPHOST_PROPERTY, "");
+		smtpHost = ConfigurationProperties.getBean(getServletContext())
+				.getProperty(ContactMailServlet.SMTPHOST_PROPERTY, "");
 		if (smtpHost.isEmpty()) {
 			log.debug("No Vitro.smtpHost specified");
 		} else {
@@ -226,7 +227,8 @@ public class MailUsersServlet extends VitroHttpServlet {
 
     }
 
-    public void doPost( HttpServletRequest request, HttpServletResponse response )
+    @Override
+	public void doPost( HttpServletRequest request, HttpServletResponse response )
         throws ServletException, IOException
     {
         doGet( request, response );

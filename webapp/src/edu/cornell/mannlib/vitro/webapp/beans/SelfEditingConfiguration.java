@@ -9,7 +9,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 
 /**
@@ -41,14 +41,14 @@ public class SelfEditingConfiguration {
 	 */
 	public static SelfEditingConfiguration getBean(ServletRequest request) {
 		if (!(request instanceof HttpServletRequest)) {
-			log.trace("Not an HttpServletRequest: " + request);
-			return buildBean();
+			log.error("Not an HttpServletRequest: " + request);
+			return new SelfEditingConfiguration(null);
 		}
 
 		HttpSession session = ((HttpServletRequest) request).getSession(false);
 		if (session == null) {
 			log.trace("No session; no need to create one.");
-			return buildBean();
+			return new SelfEditingConfiguration(null);
 		}
 
 		Object attr = session.getAttribute(BEAN_ATTRIBUTE);
@@ -57,14 +57,14 @@ public class SelfEditingConfiguration {
 			return (SelfEditingConfiguration) attr;
 		}
 
-		SelfEditingConfiguration bean = buildBean();
+		SelfEditingConfiguration bean = buildBean(session);
 		log.debug("Created a bean: " + bean);
 		session.setAttribute(BEAN_ATTRIBUTE, bean);
 		return bean;
 	}
 
-	private static SelfEditingConfiguration buildBean() {
-		String selfEditingIdMatchingProperty = ConfigurationProperties
+	private static SelfEditingConfiguration buildBean(HttpSession session) {
+		String selfEditingIdMatchingProperty = ConfigurationProperties.getBean(session)
 				.getProperty(PROPERTY_SELF_EDITING_ID_MATCHING_PROPERTY);
 		return new SelfEditingConfiguration(selfEditingIdMatchingProperty);
 	}
