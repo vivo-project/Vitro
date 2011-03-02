@@ -22,12 +22,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropStmt;
-import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
@@ -321,10 +321,10 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         private static final String DEFAULT_CONFIG_FILE_NAME = "listViewConfig-default.xml";
         
         private static final String NODE_NAME_QUERY_CONSTRUCT = "query-construct";
-        private static final String NODE_NAME_QUERY_BASE = "query-base";
-        private static final String NODE_NAME_QUERY_COLLATED = "query-collated";
+        private static final String NODE_NAME_QUERY_SELECT = "query-select";
         private static final String NODE_NAME_TEMPLATE = "template";
         private static final String NODE_NAME_POSTPROCESSOR = "postprocessor";
+        private static final String NODE_NAME_COLLATION_FRAGMENT = "collation-fragment";
 
         /* NB The default post-processor is not the same as the post-processor for the default view. The latter
          * actually defines its own post-processor, whereas the default post-processor is used for custom views
@@ -427,17 +427,13 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
                 db = dbf.newDocumentBuilder();
                 Document doc = db.parse(configFilePath);
                 String propertyUri = op.getURI();
+                
                 // Required values
-                String queryNodeName = 
-                    // Don't test op.getCollateBySubclass(), since if creating a CollatedObjectPropertyTemplateModel failed,
-                    // we now want to create an UncollatedObjectPropertyTemplateModel
-                    (ObjectPropertyTemplateModel.this instanceof CollatedObjectPropertyTemplateModel) ?
-                        NODE_NAME_QUERY_COLLATED : NODE_NAME_QUERY_BASE;
-                        
-                log.debug("Using query element " + queryNodeName + " for object property " + propertyUri);
-                selectQuery = getConfigValue(doc, queryNodeName, propertyUri);
+                selectQuery = getSelectQuery(doc, propertyUri);
+                
                 templateName = getConfigValue(doc, NODE_NAME_TEMPLATE, propertyUri); 
                 
+                // Optional values
                 constructQueries = getConfigValues(doc, NODE_NAME_QUERY_CONSTRUCT, propertyUri);
                 
                 String postprocessorName = getConfigValue(doc, NODE_NAME_POSTPROCESSOR, propertyUri);
@@ -458,8 +454,33 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
                 
             } catch (Exception e) {
                 log.error("Error processing config file " + configFilePath, e);
-                // What should we do here?
             }            
+        }
+        
+        private String getSelectQuery(Document doc, String propertyUri) {
+            Node selectQueryNode = doc.getElementsByTagName(NODE_NAME_QUERY_SELECT).item(0);
+            String value = null;
+            if (selectQueryNode != null) {
+                boolean removeCollationFragments = ObjectPropertyTemplateModel.this instanceof UncollatedObjectPropertyTemplateModel;
+                NodeList children = selectQueryNode.getChildNodes();
+                int childCount = children.getLength();
+                value = "";
+                for (int i = 0; i < childCount; i++) {
+                    Node node = children.item(i);    
+                    if (node.getNodeName().equals(NODE_NAME_COLLATION_FRAGMENT)) {
+                        if (removeCollationFragments) {
+                            continue;
+                        }
+                        value += node.getChildNodes().item(0).getNodeValue();
+                    } else {
+                        value += node.getNodeValue();
+                    }     
+                }
+                log.debug("Found config parameter " + NODE_NAME_QUERY_SELECT + " for object property " + propertyUri +  " with value " + value);
+            } else {
+                log.error("No value found for config parameter " + NODE_NAME_QUERY_SELECT + " for object property " + propertyUri);
+            }
+            return value;
         }
         
         private void getPostProcessor(String name, WebappDaoFactory wdf) throws Exception {
@@ -469,11 +490,10 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         }
  
         private String getConfigValue(Document doc, String nodeName, String propertyUri) {
-            NodeList nodes = doc.getElementsByTagName(nodeName);
-            Element element = (Element) nodes.item(0); 
+            Node node = doc.getElementsByTagName(nodeName).item(0);
             String value = null;
-            if (element != null) {
-                value = element.getChildNodes().item(0).getNodeValue();   
+            if (node != null) {
+                value = node.getChildNodes().item(0).getNodeValue();   
                 log.debug("Found config parameter " + nodeName + " for object property " + propertyUri +  " with value " + value);
             } else {
                 log.debug("No value found for config parameter " + nodeName + " for object property " + propertyUri);
@@ -488,8 +508,8 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
             if (nodeCount > 0) {
                 values = new HashSet<String>(nodeCount);
                 for (int i = 0; i < nodeCount; i++) {
-                    Element element = (Element) nodes.item(i);
-                    String value = element.getChildNodes().item(0).getNodeValue();
+                    Node node = nodes.item(i);
+                    String value = node.getChildNodes().item(0).getNodeValue();
                     values.add(value);  
                     log.debug("Found config parameter " + nodeName + " for object property " + propertyUri +  " with value " + value);
                 }
@@ -518,7 +538,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     public String getType() {
         return TYPE;
     }
-    
+
     public String getTemplate() {
         return config.templateName;
     }

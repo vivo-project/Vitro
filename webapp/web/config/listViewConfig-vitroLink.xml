@@ -6,7 +6,7 @@
      See guidelines in vitro/doc/list_view_configuration_guidelines.txt --> 
 
 <list-view-config>
-    <query-base>    
+    <query-select>    
         PREFIX vitro: &lt;http://vitro.mannlib.cornell.edu/ns/vitro/0.7#&gt;
         PREFIX afn:  &lt;http://jena.hpl.hp.com/ARQ/function#&gt;   
               
@@ -19,7 +19,7 @@
             OPTIONAL { ?link vitro:linkURL ?url }
             OPTIONAL { ?link vitro:linkDisplayRank ?rank }
         } ORDER BY ?rank
-    </query-base>
+    </query-select>
 
     <query-construct>
         CONSTRUCT {
