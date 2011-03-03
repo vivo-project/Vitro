@@ -2,6 +2,9 @@
         "http://getahead.org/dwr//dwr20.dtd">
 
 <dwr>
+
+  <!-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+
   <allow>
 
     <!-- create blocks define how the java object on the server gets created, -->
