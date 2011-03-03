@@ -178,15 +178,6 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 			<fileset dir="${webapp.dir}/config/tlds" includes="**/*" excludes="*.LCK" />
 		</copy>
 
-		<!-- TODO Get rid of these webservices files -->
-		<copy todir="${war-webinf.dir}/lib">
-			<fileset dir="${webapp.dir}/../services/lib" includes="**/*" excludes="*.LCK" />
-		</copy>
-		<copy todir="${build.dir}/war">
-			<fileset dir="${webapp.dir}/../services/additions" includes="**/*" />
-		</copy>
-		<!-- TODO Get rid of these webservices files -->
-
 		<!-- copy any xml files from source tree to the war directory -->
 		<copy todir="${build.dir}/war/WEB-INF/classes">
 			<fileset dir="${webapp.dir}/src" includes="**/*.xml" />
