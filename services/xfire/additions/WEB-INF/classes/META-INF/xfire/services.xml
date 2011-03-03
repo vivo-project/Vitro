@@ -1,9 +1,0 @@
-<beans xmlns="http://xfire.codehaus.org/config/1.0">
-  <service>
-    <name>VitroWs</name>
-    <namespace>http://vitro.mannlib.cornell.edu/VitroWs2</namespace>
-    <serviceClass>edu.cornell.mannlib.vitro.webservices.VitroWs2</serviceClass>
-    <implementationClass>edu.cornell.mannlib.vitro.webservices.VitroWs2</implementationClass>
-  </service>
-</beans>
-
