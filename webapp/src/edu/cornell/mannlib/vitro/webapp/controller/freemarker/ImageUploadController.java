@@ -49,9 +49,6 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 			.getLog(ImageUploadController.class);
 
 	private static final String ATTRIBUTE_REFERRING_PAGE = "ImageUploadController.referringPage";
-
-	public static final String DUMMY_THUMBNAIL_PERSON_URL = "/images/placeholders/person.thumbnail.jpg"; 
-    public static final String DUMMY_THUMBNAIL_NON_PERSON_URL = "/images/placeholders/non.person.thumbnail.jpg"; 
     
 	/** Limit file size to 6 megabytes. */
 	public static final int MAXIMUM_FILE_SIZE = 6 * 1024 * 1024;
@@ -68,6 +65,11 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 
 	/** The form field of the uploaded file; use as a key to the FileItem map. */
 	public static final String PARAMETER_UPLOADED_FILE = "datafile";
+	
+	/** The image to use as a placeholder when the individual has no image. Determined
+	 * by the template.
+	 */
+	public static final String PARAMETER_PLACEHOLDER_URL = "placeholder";
 
 	/** Here is the main image file. Hold on to it. */
 	public static final String ACTION_UPLOAD = "upload";
@@ -381,23 +383,18 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 */
 	private TemplateResponseValues showAddImagePage(VitroRequest vreq,
 			Individual entity) {
+	    
+	    String placeholderUrl = (String) vreq.getParameter(PARAMETER_PLACEHOLDER_URL);
+	       
 		String formAction = (entity == null) ? "" : formAction(entity.getURI(),
-				ACTION_UPLOAD);
+				ACTION_UPLOAD, placeholderUrl);
 		String cancelUrl = (entity == null) ? "" : exitPageUrl(vreq,
 				entity.getURI());
 
 		TemplateResponseValues rv = new TemplateResponseValues(TEMPLATE_NEW);
-		
-		// rjy7 We should not be referencing particular ontology values here, and ideally
-		// the template would add the placeholder url to the edit link, since it already
-		// knows which placeholder it's using. However, this requires a significantly more
-		// complex implementation, so keeping it simple for now.
-		boolean isPerson = (entity != null)
-				&& entity.isVClass("http://xmlns.com/foaf/0.1/Person");
-		String dummyThumbnailUrl = isPerson ? DUMMY_THUMBNAIL_PERSON_URL
-				: DUMMY_THUMBNAIL_NON_PERSON_URL;
-		
-		rv.put(BODY_THUMBNAIL_URL, UrlBuilder.getUrl(dummyThumbnailUrl));
+
+
+		rv.put(BODY_THUMBNAIL_URL, placeholderUrl);
 		rv.put(BODY_FORM_ACTION, formAction);
 		rv.put(BODY_CANCEL_URL, cancelUrl);
 		rv.put(BODY_TITLE, "Upload image" + forName(entity));
@@ -417,11 +414,12 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 */
 	private TemplateResponseValues showReplaceImagePage(VitroRequest vreq,
 			Individual entity, ImageInfo imageInfo) {
+	    String placeholderUrl = (String) vreq.getParameter(PARAMETER_PLACEHOLDER_URL);
 		TemplateResponseValues rv = new TemplateResponseValues(TEMPLATE_REPLACE);
 		rv.put(BODY_THUMBNAIL_URL, UrlBuilder.getUrl(imageInfo.getThumbnail()
 				.getBytestreamAliasUrl()));
-		rv.put(BODY_DELETE_URL, formAction(entity.getURI(), ACTION_DELETE_EDIT));
-		rv.put(BODY_FORM_ACTION, formAction(entity.getURI(), ACTION_UPLOAD));
+		rv.put(BODY_DELETE_URL, formAction(entity.getURI(), ACTION_DELETE_EDIT, placeholderUrl));
+		rv.put(BODY_FORM_ACTION, formAction(entity.getURI(), ACTION_UPLOAD, placeholderUrl));
 		rv.put(BODY_CANCEL_URL, exitPageUrl(vreq, entity.getURI()));
 		rv.put(BODY_TITLE, "Replace image" + forName(entity));
 		return rv;
@@ -444,11 +442,12 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 */
 	private TemplateResponseValues showCropImagePage(VitroRequest vreq,
 			Individual entity, String imageUrl, Dimensions dimensions) {
+        String placeholderUrl = (String) vreq.getParameter(PARAMETER_PLACEHOLDER_URL);	    
 		TemplateResponseValues rv = new TemplateResponseValues(TEMPLATE_CROP);
 		rv.put(BODY_MAIN_IMAGE_URL, UrlBuilder.getUrl(imageUrl));
 		rv.put(BODY_MAIN_IMAGE_HEIGHT, dimensions.height);
 		rv.put(BODY_MAIN_IMAGE_WIDTH, dimensions.width);
-		rv.put(BODY_FORM_ACTION, formAction(entity.getURI(), ACTION_SAVE));
+		rv.put(BODY_FORM_ACTION, formAction(entity.getURI(), ACTION_SAVE, placeholderUrl));
 		rv.put(BODY_CANCEL_URL, exitPageUrl(vreq, entity.getURI()));
 		rv.put(BODY_TITLE, "Crop Photo" + forName(entity));
 		return rv;
@@ -493,9 +492,9 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 * back to this controller, along with the desired action and the Entity
 	 * URI.
 	 */
-	private String formAction(String entityUri, String action) {
+	private String formAction(String entityUri, String action, String placeholderUrl) {
 		UrlBuilder.ParamMap params = new UrlBuilder.ParamMap(
-				PARAMETER_ENTITY_URI, entityUri, PARAMETER_ACTION, action);
+				PARAMETER_ENTITY_URI, entityUri, PARAMETER_ACTION, action, PARAMETER_PLACEHOLDER_URL, placeholderUrl);
 		return UrlBuilder.getPath(URL_HERE, params);
 	}
 
