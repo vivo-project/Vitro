@@ -25,8 +25,6 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
     
     private static final Log log = LogFactory.getLog(BaseIndividualTemplateModel.class);
     
-    private static final String PATH = Route.INDIVIDUAL.path();
-    
     protected Individual individual;
     protected VitroRequest vreq;
     protected UrlBuilder urlBuilder;

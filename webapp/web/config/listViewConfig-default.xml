@@ -14,10 +14,11 @@
         SELECT <collation-fragment> ?subclass </collation-fragment>
                ?object ?name ?moniker {
             ?subject ?property ?object
-            <collation-fragment> OPTIONAL { ?object a ?subclass } </collation-fragment>
+            <collation-fragment> OPTIONAL { ?object a ?subclass } 
+            FILTER ( afn:namespace(?subclass) != "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#" )   
+            </collation-fragment>
             OPTIONAL { ?object rdfs:label ?name }
-            OPTIONAL { ?object vitro:moniker ?moniker }           
-            FILTER ( afn:namespace(?subclass) != "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#" )                     
+            OPTIONAL { ?object vitro:moniker ?moniker }               
         } ORDER BY <collation-fragment> ?subclass </collation-fragment> ?name ?object  
     </query-select>
 
