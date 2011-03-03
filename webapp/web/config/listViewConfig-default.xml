@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
-<!-- Default list view config file for uncollated object properties 
+<!-- Default list view config file for object properties 
     
      See guidelines in vitro/doc/list_view_configuration_guidelines.txt -->
 
@@ -12,7 +12,7 @@
         PREFIX afn:  &lt;http://jena.hpl.hp.com/ARQ/function#&gt;
           
         SELECT <collation-fragment> ?subclass </collation-fragment>
-               ?object ?name ?moniker {
+               ?object ?name ?moniker WHERE {
             ?subject ?property ?object
             <collation-fragment> OPTIONAL { ?object a ?subclass } 
             FILTER ( afn:namespace(?subclass) != "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#" )   

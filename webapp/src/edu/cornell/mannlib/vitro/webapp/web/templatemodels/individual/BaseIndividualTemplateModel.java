@@ -70,15 +70,15 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
         return UrlBuilder.getIndividualProfileUrl(individual, vreq.getWebappDaoFactory());
     }
 
-    // This remains as a convenience method for getting the image url. We could instead use a custom list 
-    // view for mainImage which would provide this data in the query results.
+    // For image, we use the default list view and Individual methods to reconstruct the image
+    // url from various triples. A custom list view would require that logic to be duplicated here.
     public String getImageUrl() {
         String imageUrl = individual.getImageUrl();
         return imageUrl == null ? null : getUrl(imageUrl);
     }
 
-    // This remains as a convenience method for getting the thumbnail url. We could instead use a custom list 
-    // view for mainImage which would provide this data in the query results.
+    // For image, we use the default list view and Individual methods to reconstruct the image
+    // url from various triples. A custom list view would require that logic to be duplicated here.
     public String getThumbUrl() {
         String thumbUrl = individual.getThumbUrl();
         return thumbUrl == null ? null : getUrl(thumbUrl);
