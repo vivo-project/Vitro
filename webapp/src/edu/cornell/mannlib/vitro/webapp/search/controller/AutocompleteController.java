@@ -29,8 +29,9 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.WildcardQuery;
 
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.controller.ajax.VitroAjaxController;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper.TemplateProcessingException;
 import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
 import edu.cornell.mannlib.vitro.webapp.search.SearchException;
@@ -44,7 +45,7 @@ import freemarker.template.Configuration;
  * through a Lucene search. 
  */
 
-public class AutocompleteController extends FreemarkerHttpServlet{
+public class AutocompleteController extends VitroAjaxController {
 
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(AutocompleteController.class);
@@ -56,18 +57,12 @@ public class AutocompleteController extends FreemarkerHttpServlet{
     String NORESULT_MSG = "";    
     private int defaultMaxSearchSize= 1000;
 
-    public void doPost(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-        doGet(request, response);
-    }
-
-    public void doGet(HttpServletRequest request, HttpServletResponse response)
-    throws IOException, ServletException {
+    protected void doRequest(VitroRequest vreq, HttpServletResponse response)
+        throws IOException, ServletException {
         
         Map<String, Object> map = new HashMap<String, Object>();
 
-        VitroRequest vreq = new VitroRequest(request);
-        Configuration config = getConfig(vreq);
+        Configuration config = getFreemarkerConfiguration(vreq);
         PortalFlag portalFlag = vreq.getPortalFlag();
         
         try {
@@ -76,7 +71,7 @@ public class AutocompleteController extends FreemarkerHttpServlet{
             if( vreq.getWebappDaoFactory() == null 
                     || vreq.getWebappDaoFactory().getIndividualDao() == null ){
                 log.error("makeUsableBeans() could not get IndividualDao ");
-                doSearchError(map, config, request, response);
+                doSearchError(map, config, vreq, response);
                 return;
             }                    
             
@@ -88,7 +83,7 @@ public class AutocompleteController extends FreemarkerHttpServlet{
             Query query = getQuery(vreq, portalFlag, analyzer, qtxt);             
             if (query == null ) {
                 log.debug("query for '" + qtxt +"' is null.");
-                doNoQuery(map, config, request, response);
+                doNoQuery(map, config, vreq, response);
                 return;
             }
             log.debug("query for '" + qtxt +"' is " + query.toString());
@@ -106,20 +101,20 @@ public class AutocompleteController extends FreemarkerHttpServlet{
                     topDocs = searcherForRequest.search(query,null,maxHitSize);
                 }catch (Exception ex){
                     log.error(ex);
-                    doFailedSearch(map, config, request, response);
+                    doFailedSearch(map, config, vreq, response);
                     return;
                 }
             }
 
             if( topDocs == null || topDocs.scoreDocs == null){
                 log.error("topDocs for a search was null");                
-                doFailedSearch(map, config, request, response);
+                doFailedSearch(map, config, vreq, response);
                 return;
             }
             
             int hitsLength = topDocs.scoreDocs.length;
             if ( hitsLength < 1 ){                
-                doFailedSearch(map, config, request, response);
+                doFailedSearch(map, config, vreq, response);
                 return;
             }            
             log.debug("found "+hitsLength+" hits"); 
@@ -140,14 +135,14 @@ public class AutocompleteController extends FreemarkerHttpServlet{
 
             Collections.sort(results);
             map.put("results", results);
-            writeTemplate(TEMPLATE_DEFAULT, map, config, request, response);
+            writeTemplate(TEMPLATE_DEFAULT, map, config, vreq, response);
         
         } catch (TemplateProcessingException e) {
             log.error(e, e);
         } catch (Throwable e) {
             log.error("AutocompleteController(): " + e);            
             try {
-                doSearchError(map, config, request, response);
+                doSearchError(map, config, vreq, response);
             } catch (TemplateProcessingException e1) {
                 log.error(e1.getMessage(), e1);
             }
@@ -170,7 +165,7 @@ public class AutocompleteController extends FreemarkerHttpServlet{
             return (Analyzer)obj;        
     }
 
-    private Query getQuery(VitroRequest request, PortalFlag portalState,
+    private Query getQuery(VitroRequest vreq, PortalFlag portalState,
                        Analyzer analyzer, String querystr) throws SearchException{
         
         Query query = null;
@@ -185,12 +180,12 @@ public class AutocompleteController extends FreemarkerHttpServlet{
                 return null;
             } 
 
-            query = makeNameQuery(querystr, analyzer, request);
+            query = makeNameQuery(querystr, analyzer, vreq);
             
             // Filter by type
             {
                 BooleanQuery boolQuery = new BooleanQuery(); 
-                String typeParam = (String) request.getParameter("type");
+                String typeParam = (String) vreq.getParameter("type");
                 boolQuery.add(  new TermQuery(
                         new Term(VitroLuceneTermNames.RDFTYPE, 
                                 typeParam)),
@@ -392,6 +387,11 @@ public class AutocompleteController extends FreemarkerHttpServlet{
             SearchResult sr = (SearchResult) o;
             return label.compareTo(sr.getLabel());
         }
+    }
+
+    @Override
+    protected boolean testIsAuthorized(HttpServletRequest request) {
+        return LoginStatusBean.getBean(request).isLoggedIn();
     }
     
 
