@@ -2,14 +2,17 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.ajax.VitroAjaxController;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
@@ -21,16 +24,22 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
  * @author rjy7
  *
  */
-public class ReorderController extends PrimitiveRdfEdit {
+public class ReorderController extends VitroAjaxController {
 
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(ReorderController.class);
 
     private static String RANK_PREDICATE_PARAMETER_NAME = "predicate";
     private static String INDIVIDUAL_PREDICATE_PARAMETER_NAME = "individuals";
+
+
+    @Override
+    protected boolean testIsAuthorized(HttpServletRequest request) {
+        return LoginStatusBean.getBean(request).isLoggedIn();
+    }
     
     @Override
-    protected void processRequest(VitroRequest vreq, HttpServletResponse response) {
+    protected void doRequest(VitroRequest vreq, HttpServletResponse response) {
 
         String errorMsg = null;
         String rankPredicate = vreq.getParameter(RANK_PREDICATE_PARAMETER_NAME);
@@ -88,51 +97,6 @@ public class ReorderController extends PrimitiveRdfEdit {
             
             counter++;
         }
-
-//        // Alternate implementation: build up a model of additions and retractions, use only one db write
-//        DataPropertyDao dpDao = wadf.getDataPropertyDao();  
-//        if( dpDao == null) {
-//            errorMsg = "No DataPropertyDao available";
-//            log.error(errorMsg);
-//            doError(response, errorMsg, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-//            return;
-//        }      
-//        DataProperty dp = dpDao.getDataPropertyByURI(rankPredicate);
-//        String rangeDatatypeUri = dp.getRangeDatatypeURI();
-//        
-//        Model additions = com.hp.hpl.jena.rdf.model.ModelFactory.createDefaultModel();        
-//        Model retractions = com.hp.hpl.jena.rdf.model.ModelFactory.createDefaultModel();        
-//        OntModel model = getQueryModel(vreq);
-//        
-//        int counter = 1;
-//        for (String individualUri : individualUris) {
-//            Resource resource = model.createResource(individualUri);
-//            Property property = model.getProperty(rankPredicate);
-//            // Remove all existing rank statements for this individual and predicate
-//            StmtIterator stmts = model.listStatements(resource, property, (RDFNode) null);  
-//            retractions.add(stmts);
-//            
-//            Literal lit = null;
-//            if (rangeDatatypeUri != null) {
-//                lit = model.createTypedLiteral(counter, rangeDatatypeUri);
-//            } else {
-//                lit = model.createLiteral(String.valueOf(counter));
-//                // or: lit = model.createTypedLiteral(count) ?
-//            }
-//            Statement stmt = model.createStatement(resource, property, lit);
-//            additions.add(stmt);
-//            
-//            counter++;
-//        }
-//        ServletContext sc = getServletContext();
-//        String editorUri = EditN3Utils.getEditorUri(vreq, vreq.getSession(false), sc);           
-//        try {
-//            processChanges( additions, retractions, getWriteModel(vreq), getQueryModel(vreq), editorUri);
-//        } catch (Exception e) {
-//            doError(response,e.getMessage(),HttpStatus.SC_INTERNAL_SERVER_ERROR);
-//            return;
-//        }          
-//        // end alternate implementation
         
         response.setStatus(HttpServletResponse.SC_OK);
         

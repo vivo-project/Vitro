@@ -2,24 +2,32 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.ajax.VitroAjaxController;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 
-public class PrimitiveDelete extends PrimitiveRdfEdit {
+public class PrimitiveDelete extends VitroAjaxController {
 
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(PrimitiveDelete.class);  
 
     @Override
-    protected void processRequest(VitroRequest vreq, HttpServletResponse response) {
+    protected boolean testIsAuthorized(HttpServletRequest request) {
+        return LoginStatusBean.getBean(request).isLoggedIn();
+    }
+    
+    @Override
+    protected void doRequest(VitroRequest vreq, HttpServletResponse response) {
      
         String uriToDelete = vreq.getParameter("deletion");
         if (StringUtils.isEmpty(uriToDelete)) {

@@ -92,5 +92,13 @@ public abstract class VitroAjaxController extends HttpServlet {
             log.error(e, e);
         } 
 	}
-
+    
+    protected void doError(HttpServletResponse response, String errorMsg, int httpstatus){
+        response.setStatus(httpstatus);
+        try {
+            response.getWriter().write(errorMsg);
+        } catch (IOException e) {
+            log.debug("IO exception during output",e );
+        }
+    }
 }

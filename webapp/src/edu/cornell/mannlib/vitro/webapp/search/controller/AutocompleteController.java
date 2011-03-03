@@ -57,6 +57,13 @@ public class AutocompleteController extends VitroAjaxController {
     String NORESULT_MSG = "";    
     private int defaultMaxSearchSize= 1000;
 
+
+    @Override
+    protected boolean testIsAuthorized(HttpServletRequest request) {
+        return LoginStatusBean.getBean(request).isLoggedIn();
+    }
+    
+    @Override
     protected void doRequest(VitroRequest vreq, HttpServletResponse response)
         throws IOException, ServletException {
         
@@ -388,12 +395,5 @@ public class AutocompleteController extends VitroAjaxController {
             return label.compareTo(sr.getLabel());
         }
     }
-
-    @Override
-    protected boolean testIsAuthorized(HttpServletRequest request) {
-        return LoginStatusBean.getBean(request).isLoggedIn();
-    }
-    
-
 
 }

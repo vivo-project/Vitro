@@ -23,67 +23,23 @@ import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
+import edu.cornell.mannlib.vitro.webapp.controller.ajax.VitroAjaxController;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DependentResourceDeleteJena;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditN3Utils;
 
-public class PrimitiveRdfEdit extends FreemarkerHttpServlet{
+public class PrimitiveRdfEdit extends VitroAjaxController {
 
     private static final long serialVersionUID = 1L;
 
     @Override
-    protected String getTitle(String siteName, VitroRequest vreq) {
-        return "RDF edit";
+    protected boolean testIsAuthorized(HttpServletRequest request) {
+        return LoginStatusBean.getBean(request).isLoggedIn();
     }
 
     @Override
-    protected int requiredLoginLevel() {
-        return LoginStatusBean.EDITOR;
-    }
-    
-    @Override
-    protected ResponseValues processRequest(VitroRequest vreq) {
-        return new TemplateResponseValues("primitiveRdfEdit.ftl");
-    }
-    
-    @Override
-    public void doPost(HttpServletRequest request,
+    protected void doRequest(VitroRequest vreq,
             HttpServletResponse response) throws ServletException, IOException {
-        
-        VitroRequest vreq = new VitroRequest(request);
-        if( !LoginStatusBean.getBean(request).isLoggedIn()){
-            doError(response,"You must be logged in to use this servlet.",HttpStatus.SC_UNAUTHORIZED);
-            return;
-        }
-        
-//        PolicyIface policy = RequestPolicyList.getPolicies( request );
-//        
-//        if( policy == null || ( policy instanceof PolicyList && ((PolicyList)policy).size() == 0 )){
-//            policy = ServletPolicyList.getPolicies( getServletContext() );
-//            if( policy == null || ( policy instanceof PolicyList && ((PolicyList)policy).size() == 0 )){            
-//                log.debug("No policy found in request at " + RequestPolicyList.POLICY_LIST);
-//                doError(response, "no policy found.",500);
-//                return;                
-//            }
-//        }              
-//        
-//        IdentifierBundle ids = (IdentifierBundle)ServletIdentifierBundleFactory
-//            .getIdBundleForRequest(request,request.getSession(false),getServletContext());
-//        
-//        if( ids == null ){
-//            log.error("No IdentifierBundle objects for request");
-//            doError(response,"no identifiers found",500);
-//            return;
-//        }
-        
-        processRequest(vreq, response);
-
-    }
-    
-    protected void processRequest(VitroRequest vreq, HttpServletResponse response) {
         
         //Test error case
         /*
@@ -121,17 +77,6 @@ public class PrimitiveRdfEdit extends FreemarkerHttpServlet{
             return;
         }
 
-
-        //check permissions     
-        //TODO: (bdc34)This is not yet implemented, must check the IDs against the policies for permissons before doing an edit!
-        // rjy7 put policy check in separate method so subclasses can inherit
-        boolean hasPermission = true;
-        
-        if( !hasPermission ){
-            //if not okay, send error message
-            doError(response,"Insufficent permissions.",HttpStatus.SC_UNAUTHORIZED);
-            return;
-        }
 
         ServletContext sc = getServletContext();
         String editorUri = EditN3Utils.getEditorUri(vreq, vreq.getSession(false), sc);           
@@ -206,15 +151,6 @@ public class PrimitiveRdfEdit extends FreemarkerHttpServlet{
             }
         }
         return models;
-    }
-    
-    protected void doError(HttpServletResponse response, String errorMsg, int httpstatus){
-        response.setStatus(httpstatus);
-        try {
-            response.getWriter().write(errorMsg);
-        } catch (IOException e) {
-            log.debug("IO exception during output",e );
-        }
     }
     
     protected OntModel getWriteModel(HttpServletRequest request){
