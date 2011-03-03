@@ -61,6 +61,7 @@ all      - Runs "clean", then "deploy".
 clean    - Delete all artifacts so the next build will be from scratch.
 compile  - Compile the Java source files.
 test     - Compile and run the JUnit tests.
+war      - Create a WAR file to be deployed in a servlet container.
 deploy   - Deploy the application directly into the Tomcat webapps directory.
 	    </echo>
 	</target>
@@ -308,6 +309,15 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		<sync todir="${webapp.deploy.home}" includeemptydirs="true">
 			<fileset dir="${build.dir}/war" />
 		</sync>
+	</target>
+	
+	<!-- ================================= 
+          target: war              
+         ================================= -->
+	<target name="war"
+	        depends="revisionInfo"
+	        description="--> Build the app and create a WAR file">
+		<jar basedir="${build.dir}/war" destfile="${build.dir}/${webapp.name}.war"/>
 	</target>
 
 	<!-- ================================= 

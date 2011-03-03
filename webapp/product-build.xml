@@ -235,6 +235,21 @@
 	</target>
 
 	<!-- ================================= 
+          target: war              
+         ================================= -->
+	<target name="war" description="--> Build the app and create a WAR file">
+		<innercall target="revisionInfo" />
+		<antcall target="productWar" />
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: productWar                      
+         - - - - - - - - - - - - - - - - - -->
+    <target name="productWar"  depends="productRevisionInfo">
+		<jar basedir="${build.dir}/war" destfile="${build.dir}/${webapp.name}.war"/>
+    </target>
+
+	<!-- ================================= 
           target: licenser             
           
           In regular use, checks that all appropriate source files have license tags.
