@@ -86,10 +86,10 @@ import freemarker.template.Configuration;
  * Rewritten to use Freemarker: rjy7
  *
  */
-public class FreemarkerPagedSearchController extends FreemarkerHttpServlet implements Searcher {
+public class PagedSearchController extends FreemarkerHttpServlet implements Searcher {
 
     private static final long serialVersionUID = 1L;
-    private static final Log log = LogFactory.getLog(FreemarkerPagedSearchController.class.getName());
+    private static final Log log = LogFactory.getLog(PagedSearchController.class.getName());
     private static final String XML_REQUEST_PARAM = "xml";
     
     private IndexSearcher searcher = null;

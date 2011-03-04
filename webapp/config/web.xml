@@ -138,7 +138,7 @@
 		</listener-class>
 	</listener>  -->
 
-<!--  -->    
+<!--  
   <listener>
     <listener-class> edu.cornell.mannlib.vitro.webapp.auth.policy.setup.InformationResourceEditingPolicySetup</listener-class>
   </listener> --> 
@@ -952,7 +952,7 @@
   
   <servlet>
     <servlet-name>SearchController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.search.controller.FreemarkerPagedSearchController</servlet-class>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.search.controller.PagedSearchController</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>SearchController</servlet-name>
@@ -1050,25 +1050,6 @@
       <servlet-name>TabController</servlet-name>
       <url-pattern>/index.jsp</url-pattern>
     </servlet-mapping>
-    
-  <!-- <servlet>
-       <servlet-name>EntityPropertyListController</servlet-name>     
-       <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.EntityPropertyListController</servlet-class>
-     </servlet>
-     <servlet-mapping>
-       <servlet-name>EntityPropertyListController</servlet-name>
-       <url-pattern>/entityPropList</url-pattern>
-     </servlet-mapping>
--->
-
-  <servlet>
-    <servlet-name>EntityMergedPropertyListController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.EntityMergedPropertyListController</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>EntityMergedPropertyListController</servlet-name>
-    <url-pattern>/entityMergedPropList</url-pattern>
-  </servlet-mapping>
 
   <servlet>
     <servlet-name>DashboardPropertyListController</servlet-name>
@@ -1129,6 +1110,11 @@
      <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.OntologyController</servlet-class>
   </servlet>
 
+  <servlet>
+    <servlet-name>individual</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualController</servlet-class>
+  </servlet>
+  
   <servlet>
     <servlet-name>updateEntityFlags</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.UpdateEntityFlagServlet</servlet-class>
@@ -1508,7 +1494,3 @@
   
 </web-app>
 
-<mime-mapping>
-    <extension>ico</extension>
-    <mime-type>image/x-icon</mime-type>
-</mime-mapping>
