@@ -56,7 +56,7 @@ public class IndexController extends FreemarkerHttpServlet {
                 builder.doIndexRebuild();
             }
             
-        } catch (IndexingException e) {
+        } catch (Exception e) {
         	log.error("Error rebuilding search index",e);
         	body.put("errorMessage", "There was an error while rebuilding the search index. " + e.getMessage());
         	return new ExceptionResponseValues(Template.ERROR_MESSAGE.toString(), body, e);            

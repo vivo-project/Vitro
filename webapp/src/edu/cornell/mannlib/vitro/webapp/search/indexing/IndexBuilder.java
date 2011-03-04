@@ -20,9 +20,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ObjectSourceIface;
-import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 
 /**
  * The IndexBuilder is used to rebuild or update a search index.
@@ -59,7 +57,7 @@ public class IndexBuilder extends Thread {
 
     public IndexBuilder(ServletContext context,
                 IndexerIface indexer,
-                List /*ObjectSourceIface*/ sources){
+                List<ObjectSourceIface> sources){
         super("IndexBuilder");
         this.indexer = indexer;
         this.sourceList = sources;
@@ -71,7 +69,7 @@ public class IndexBuilder extends Thread {
     
     protected IndexBuilder(){
         //for testing only
-        this( null, null, Collections.emptyList());        
+        this( null, null, Collections.<ObjectSourceIface>emptyList());        
     }
     
     public void addObjectSource(ObjectSourceIface osi) {    	
@@ -87,7 +85,7 @@ public class IndexBuilder extends Thread {
         return sourceList;
     }
 
-    public synchronized void doIndexRebuild() throws IndexingException {
+    public synchronized void doIndexRebuild() {
     	//set flag for full index rebuild
     	this.reindexRequested = true; 	
     	//wake up     						
@@ -180,20 +178,15 @@ public class IndexBuilder extends Thread {
 	    this.updatedInds = addDepResourceClasses(updatedInds);	            	
 	}	
   
-    protected void indexRebuild() throws IndexingException {
+    protected void indexRebuild() {
         log.info("Rebuild of search index is starting.");
 
-        Iterator<ObjectSourceIface> sources = sourceList.iterator();
-        List listOfIterators = new LinkedList();
-        while (sources.hasNext()) {
-            Object obj = sources.next();
-            if (obj != null && obj instanceof ObjectSourceIface)
-                listOfIterators.add((((ObjectSourceIface) obj)
+        List<Iterator<Individual>> listOfIterators = new LinkedList<Iterator<Individual>>();
+        for (ObjectSourceIface objectSource: sourceList) {
+            if (objectSource != null) {
+                listOfIterators.add(((objectSource)
                         .getAllOfThisTypeIterator()));
-            else
-                log.warn("\tskipping object of class "
-                        + obj.getClass().getName() + "\n"
-                        + "\tIt doesn not implement ObjectSourceIface.\n");
+            }
         }
 
         // clear out changed uris since we are doing a full index rebuild
@@ -202,28 +195,23 @@ public class IndexBuilder extends Thread {
         if (listOfIterators.size() == 0) 
             log.warn("Warning: no ObjectSources found.");        
 
-        doBuild(listOfIterators, Collections.EMPTY_LIST );
+        doBuild(listOfIterators, Collections.<Individual>emptyList() );
         if( log != null )  //log might be null if system is shutting down.
             log.info("Rebuild of search index is complete.");
     }
       
-    protected void updatedIndex() throws IndexingException{
+    protected void updatedIndex() {
         log.debug("Starting updateIndex()");
         long since = indexer.getModified() - 60000;
                         
-        Iterator<ObjectSourceIface> sources = sourceList.iterator();        
         List<Iterator<Individual>> listOfIterators = 
             new LinkedList<Iterator<Individual>>();
         
-        while (sources.hasNext()) {
-            Object obj = sources.next();
-            if (obj != null && obj instanceof ObjectSourceIface)
-                listOfIterators.add((((ObjectSourceIface) obj)
+        for (ObjectSourceIface objectSource: sourceList) {
+        	if (objectSource != null) {
+                listOfIterators.add(((objectSource)
                         .getUpdatedSinceIterator(since)));
-            else
-                log.warn("\tskipping object of class "
-                        + obj.getClass().getName() + "\n"
-                        + "\tIt doesn not implement " + "ObjectSourceIface.\n");
+        	}
         }
                      
         makeAddAndDeleteLists( getAndEmptyChangedUris());                   
@@ -266,16 +254,12 @@ public class IndexBuilder extends Thread {
             }            
 
             //get an iterator for all of the sources of indexable objects
-            Iterator sourceIters = sourceIterators.iterator();
-            Object obj = null;
-            while (sourceIters.hasNext()) {
-                obj = sourceIters.next();
-                if (obj == null || !(obj instanceof Iterator)) {
-                    log.warn("skipping object of class " + obj.getClass().getName() 
-                            + "It doesn not implement Iterator.");
-                    continue;
-                }
-                indexForSource((Iterator)obj, newDocs);
+            for (Iterator<Individual> sourceIterator: sourceIterators) {
+            	if (sourceIterator == null) {
+                	log.warn("skipping null iterator");
+            	} else {
+                    indexForSource(sourceIterator, newDocs);
+            	}
             }
         } catch (AbortIndexing abort){
             if( log != null)
@@ -376,25 +360,32 @@ public class IndexBuilder extends Thread {
         public BuilderObjectSource( List<Individual>  individuals){
             this.individuals=individuals;
         }        
-        public Iterator getAllOfThisTypeIterator() {
-            return new Iterator(){
-                final Iterator it = individuals.iterator();
+        @Override
+		public Iterator<Individual> getAllOfThisTypeIterator() {
+            return new Iterator<Individual>(){
+                final Iterator<Individual> it = individuals.iterator();
                 
-                public boolean hasNext() {
+                @Override
+				public boolean hasNext() {
                     return it.hasNext();
                 }
                 
-                public Object next() {
+                @Override
+				public Individual next() {
                     return it.next();
                 }
                 
-                public void remove() { /* not implemented */}               
+                @Override
+				public void remove() { /* not implemented */}               
             };
         }        
-        public Iterator getUpdatedSinceIterator(long msSinceEpoc) {
+        @Override
+		public Iterator<Individual> getUpdatedSinceIterator(long msSinceEpoc) {
             return getAllOfThisTypeIterator();
         }
     }
     
-    private class AbortIndexing extends Exception { }    
+    private class AbortIndexing extends Exception {
+    	// Just a vanilla exception
+    }    
 }
