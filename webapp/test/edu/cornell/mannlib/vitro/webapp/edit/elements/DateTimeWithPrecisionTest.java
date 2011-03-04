@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -46,7 +47,14 @@ public class DateTimeWithPrecisionTest {
         for( String zoneId : allZones ){
             Object v[] = new Object[1];
             v[0] = TimeZone.getTimeZone(zoneId);
-            data.add(v);
+            try{
+                DateTimeZone dtz = DateTimeZone.forID(zoneId);
+                if( dtz != null ){
+                    data.add(v);    
+                }
+            }catch(IllegalArgumentException ex){
+                //cannot convert to joda datetimezone.
+            }            
         }
         return data;
     }
@@ -104,8 +112,7 @@ public class DateTimeWithPrecisionTest {
         String precisionURI = null;        
         precisionURI = dtwp.getSubmittedPrecision( queryParameters);
         
-        Assert.assertNotNull(precisionURI);
-        //Assert.assertEquals(dtwp.PRECISIONS[6], precisionURI);        
+        Assert.assertNotNull(precisionURI);        
         Assert.assertEquals(VitroVocabulary.Precision.SECOND.uri(), precisionURI);
     }
     
@@ -300,13 +307,15 @@ public class DateTimeWithPrecisionTest {
         Assert.assertNotNull(date);        
         Assert.assertEquals( XSDDatatype.XSDdateTime.getURI() ,date.getDatatypeURI() );
         
-        DateTime result = new DateTime( date.getLexicalForm() );
-        DateTime expected = new DateTime(1999,1,1,0,0,0,0);
-        Assert.assertEquals(expected, result);
-        
         Object obj = date.getValue();
         Assert.assertNotNull(obj);
-        Assert.assertEquals(XSDDateTime.class, obj.getClass());        
+        Assert.assertEquals(XSDDateTime.class, obj.getClass());
+        
+        DateTime result = new DateTime( date.getLexicalForm());
+        DateTime expected = new DateTime(1999,1,1,0,0,0,0 );
+        Assert.assertEquals(expected.toInstant() , result.toInstant());
+        
+        Assert.assertEquals("1999-01-01T00:00:00" , date.getLexicalForm() );                        
     }
 
     

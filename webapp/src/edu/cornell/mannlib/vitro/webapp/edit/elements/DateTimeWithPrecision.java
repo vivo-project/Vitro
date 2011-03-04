@@ -7,16 +7,21 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.ISODateTimeFormat;
 
+import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
@@ -293,26 +298,16 @@ public class DateTimeWithPrecision extends BaseEditElement {
             minute = 0;
         Integer second = parseToInt(fieldName+"-second", queryParameters);
         if( second == null )
-            second = 0;
-        int mills = 0;
-        
+            second = 0;                
         
         DateTime value = new DateTime(
                 year.intValue(),month.intValue(),day.intValue(),
-                hour.intValue(),minute.intValue(),second.intValue(),mills);
-        
-        Date dValue = value.toDate();
-        
-        /*This isn't doing what I want it to do.  It is recording the correct instance of timeb
-         * but it is recording it with the timezone UTC/zulu */          
-        //return ResourceFactory.createTypedLiteral(ISODateTimeFormat.dateTimeNoMillis().print(value),XSDDatatype.XSDdateTime);
-         
-        Calendar c = Calendar.getInstance();
-        c.setTime(value.toDate());        
-        
-        Model m = ModelFactory.createDefaultModel();
-        Literal lit = m.createTypedLiteral( c );  
-        return lit;
+                hour.intValue(),minute.intValue(),second.intValue(),0/*millis*/
+        );
+                
+        return ResourceFactory.createTypedLiteral(
+                ISODateTimeFormat.dateHourMinuteSecond().print(value), /*does not include timezone*/
+                XSDDatatype.XSDdateTime);
     }
 
     /**
