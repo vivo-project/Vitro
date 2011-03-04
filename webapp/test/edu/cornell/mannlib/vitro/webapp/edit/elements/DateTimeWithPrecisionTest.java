@@ -2,13 +2,21 @@
 
 package edu.cornell.mannlib.vitro.webapp.edit.elements;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.joda.time.DateTime;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.datatypes.xsd.XSDDateTime;
@@ -20,8 +28,41 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditSubmission;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.Field;
 
 
+@RunWith(value= Parameterized.class)
 public class DateTimeWithPrecisionTest {
 
+    TimeZone orginalTimeZone;
+    TimeZone testZone;
+    
+    public DateTimeWithPrecisionTest(TimeZone tz){
+        orginalTimeZone = TimeZone.getDefault();
+        testZone = tz;
+    }
+
+    @Parameters
+    public static Collection<Object[]> data(){
+        String allZones[] = TimeZone.getAvailableIDs();
+        ArrayList<Object[]> data = new ArrayList<Object[]>( allZones.length );
+        for( String zoneId : allZones ){
+            Object v[] = new Object[1];
+            v[0] = TimeZone.getTimeZone(zoneId);
+            data.add(v);
+        }
+        return data;
+    }
+
+    @Before
+    public void beforeTest(){
+        TimeZone.setDefault( testZone );
+    }
+    
+    @After
+    public void after(){
+        if( orginalTimeZone != null){
+            TimeZone.setDefault(orginalTimeZone);
+        }
+    }
+    
     @Test 
     public void fieldNameTemplateVariableTest() throws Exception{
         String FIELDNAME = "testfield";       
@@ -333,4 +374,5 @@ public class DateTimeWithPrecisionTest {
         Assert.assertNotNull(precisionURI);
         Assert.assertEquals(VitroVocabulary.Precision.DAY.uri(), precisionURI);
     }
+        
 }
