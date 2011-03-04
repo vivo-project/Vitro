@@ -8,7 +8,6 @@ import java.io.Writer;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -35,6 +34,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.TabEntitiesController.PageRecord;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListController;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
@@ -43,8 +43,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.SelectListGenerator;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassGroupTemplateModel;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModel;
 
 /**
@@ -222,9 +220,9 @@ public class JSONServlet extends VitroHttpServlet {
                                 .put("name",vclass.getName()));
         
         if (vclass != null) {
-            String alpha = EntityListController.getAlphaParamter(vreq);
-            int page = EntityListController.getPageParameter(vreq);
-            Map<String,Object> map = EntityListController.getResultsForVClass(
+            String alpha = IndividualListController.getAlphaParameter(vreq);
+            int page = IndividualListController.getPageParameter(vreq);
+            Map<String,Object> map = IndividualListController.getResultsForVClass(
                     vclass.getURI(), 
                     page, 
                     alpha, 

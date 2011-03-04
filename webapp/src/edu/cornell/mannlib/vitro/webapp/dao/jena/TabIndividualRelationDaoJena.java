@@ -2,6 +2,12 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -9,27 +15,16 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
+
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Tab;
 import edu.cornell.mannlib.vitro.webapp.beans.TabIndividualRelation;
-import edu.cornell.mannlib.vitro.webapp.controller.EntityController;
-import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.TabIndividualRelationDao;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 public class TabIndividualRelationDaoJena extends JenaBaseDao implements TabIndividualRelationDao {
 
-    private static final Log log = LogFactory.getLog(EntityController.class.getName());
+    private static final Log log = LogFactory.getLog(TabIndividualRelationDaoJena.class.getName());
 
     public TabIndividualRelationDaoJena(WebappDaoFactoryJena wadf) {
         super(wadf);

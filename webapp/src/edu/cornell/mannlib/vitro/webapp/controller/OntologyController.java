@@ -47,7 +47,6 @@ public class OntologyController extends VitroHttpServlet{
     private static final Log log = LogFactory.getLog(OntologyController.class.getName());
     
     private String default_jsp      = Controllers.BASIC_JSP;
-    private String default_body_jsp = Controllers.ENTITY_JSP;
     private ApplicationBean appBean;
     
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
